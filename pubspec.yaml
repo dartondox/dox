@@ -1,7 +1,7 @@
 name: dox_core
-description: A starting point for Dart libraries or applications.
+description: Dox core
 version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/necessarylion/dox-core
 
 environment:
   sdk: '>=2.19.0 <3.0.0'
