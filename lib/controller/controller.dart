@@ -1,0 +1,3 @@
+class Controller {
+  inject<T>() {}
+}
