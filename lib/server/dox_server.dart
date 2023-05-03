@@ -18,7 +18,8 @@ class DoxServer {
   Future<HttpServer> listen(int port, {Function? onError}) async {
     Env.load();
     final server = await HttpServer.bind(InternetAddress.anyIPv4, port);
-    print('\x1B[34mServer started at http://127.0.0.1:${server.port}\x1B[0m');
+    print(
+        '\x1B[34m[Dox] Server started at http://127.0.0.1:${server.port}\x1B[0m');
 
     server.listen(
       RouteHandler().handle,
