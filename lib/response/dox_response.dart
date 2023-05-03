@@ -40,7 +40,7 @@ abstract class DoxResponse {
       responseData = jsonEncode(payload as Map<String, dynamic>);
       res.headers.contentType = ContentType.json;
     } else if (payload is Model) {
-      responseData = jsonEncode((payload).toJson());
+      responseData = (payload).toJson();
       res.headers.contentType = ContentType.json;
     } else {
       responseData = payload.toString();

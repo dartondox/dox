@@ -8,6 +8,7 @@ export 'dox.dart';
 export 'env/env.dart';
 export 'exception/exception_handler.dart';
 export 'exception/http_exception.dart';
+export 'exception/internal_error_exception.dart';
 export 'exception/not_found_exception.dart';
 export 'exception/query_exception.dart';
 export 'exception/unauthorized_exception.dart';

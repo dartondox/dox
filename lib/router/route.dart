@@ -15,9 +15,9 @@ class Route {
     return "/${path.replaceAll(RegExp('^\\/+|\\/+\$'), '')}";
   }
 
-  addRoute(method, String route, controllers) {
+  addRoute(method, String route, controller) {
     route = Route.sanitizeRoutePath(route);
-    routes.add(RouteData(method, route, controllers));
+    routes.add(RouteData(method, route, controller));
   }
 
   static group(prefix, Function(SubRoute) callback) {
@@ -28,59 +28,90 @@ class Route {
     Route()._prefix = prefix;
   }
 
-  static get(route, controllers) {
-    Route().addRoute('GET', Route()._prefix + route, controllers);
+  static resource(route, controller) {
+    /// GET /resource
+    Route().addRoute('GET', Route()._prefix + route, controller.index);
+
+    /// GET /resource/create
+    Route().addRoute(
+        'GET', '${Route()._prefix + route}/create', controller.create);
+
+    /// POST /resource
+    Route().addRoute('POST', Route()._prefix + route, controller.store);
+
+    /// GET /resource/{id}
+    Route().addRoute('GET', '${Route()._prefix + route}/{id}', controller.show);
+
+    /// GET /resource/{id}/edit
+    Route().addRoute(
+        'GET', '${Route()._prefix + route}/{id}/edit', controller.edit);
+
+    /// PUT /resource/{id}
+    Route()
+        .addRoute('PUT', '${Route()._prefix + route}/{id}', controller.update);
+
+    /// PATCH /resource/{id}
+    Route().addRoute(
+        'PATCH', '${Route()._prefix + route}/{id}', controller.update);
+
+    /// DELETE /resource/{id}
+    Route().addRoute(
+        'DELETE', '${Route()._prefix + route}/{id}', controller.destroy);
   }
 
-  static post(route, controllers) {
-    Route().addRoute('POST', Route()._prefix + route, controllers);
+  static get(route, controller) {
+    Route().addRoute('GET', Route()._prefix + route, controller);
   }
 
-  static put(route, controllers) {
-    Route().addRoute('PUT', Route()._prefix + route, controllers);
+  static post(route, controller) {
+    Route().addRoute('POST', Route()._prefix + route, controller);
   }
 
-  static delete(route, controllers) {
-    Route().addRoute('DELETE', Route()._prefix + route, controllers);
+  static put(route, controller) {
+    Route().addRoute('PUT', Route()._prefix + route, controller);
   }
 
-  static purge(route, controllers) {
-    Route().addRoute('PURGE', Route()._prefix + route, controllers);
+  static delete(route, controller) {
+    Route().addRoute('DELETE', Route()._prefix + route, controller);
   }
 
-  static patch(route, controllers) {
-    Route().addRoute('PATCH', Route()._prefix + route, controllers);
+  static purge(route, controller) {
+    Route().addRoute('PURGE', Route()._prefix + route, controller);
   }
 
-  static options(route, controllers) {
-    Route().addRoute('OPTIONS', Route()._prefix + route, controllers);
+  static patch(route, controller) {
+    Route().addRoute('PATCH', Route()._prefix + route, controller);
   }
 
-  static copy(route, controllers) {
-    Route().addRoute('COPY', Route()._prefix + route, controllers);
+  static options(route, controller) {
+    Route().addRoute('OPTIONS', Route()._prefix + route, controller);
   }
 
-  static view(route, controllers) {
-    Route().addRoute('VIEW', Route()._prefix + route, controllers);
+  static copy(route, controller) {
+    Route().addRoute('COPY', Route()._prefix + route, controller);
   }
 
-  static link(route, controllers) {
-    Route().addRoute('LINK', Route()._prefix + route, controllers);
+  static view(route, controller) {
+    Route().addRoute('VIEW', Route()._prefix + route, controller);
   }
 
-  static unlink(route, controllers) {
-    Route().addRoute('UNLINK', Route()._prefix + route, controllers);
+  static link(route, controller) {
+    Route().addRoute('LINK', Route()._prefix + route, controller);
   }
 
-  static lock(route, controllers) {
-    Route().addRoute('UNLINK', Route()._prefix + route, controllers);
+  static unlink(route, controller) {
+    Route().addRoute('UNLINK', Route()._prefix + route, controller);
   }
 
-  static unlock(route, controllers) {
-    Route().addRoute('UNLOCK', Route()._prefix + route, controllers);
+  static lock(route, controller) {
+    Route().addRoute('UNLINK', Route()._prefix + route, controller);
   }
 
-  static propfind(route, controllers) {
-    Route().addRoute('PROPFIND', Route()._prefix + route, controllers);
+  static unlock(route, controller) {
+    Route().addRoute('UNLOCK', Route()._prefix + route, controller);
+  }
+
+  static propfind(route, controller) {
+    Route().addRoute('PROPFIND', Route()._prefix + route, controller);
   }
 }

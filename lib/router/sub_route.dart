@@ -5,63 +5,67 @@ class SubRoute {
 
   const SubRoute(this.prefix);
 
-  get(route, controllers) {
-    Route.get('$prefix/$route', controllers);
+  resource(route, controller) {
+    Route.resource('$prefix/$route', controller);
   }
 
-  post(route, controllers) {
-    Route.post('$prefix/$route', controllers);
+  get(route, controller) {
+    Route.get('$prefix/$route', controller);
   }
 
-  put(route, controllers) {
-    Route.put('$prefix/$route', controllers);
+  post(route, controller) {
+    Route.post('$prefix/$route', controller);
   }
 
-  delete(route, controllers) {
-    Route.delete('$prefix/$route', controllers);
+  put(route, controller) {
+    Route.put('$prefix/$route', controller);
+  }
+
+  delete(route, controller) {
+    Route.delete('$prefix/$route', controller);
   }
 
   group(p, Function(SubRoute) callback) {
     callback(SubRoute('$prefix/$p'));
   }
 
-  purge(route, controllers) {
-    Route.purge('$prefix/$route', controllers);
+  purge(route, controller) {
+    Route.purge('$prefix/$route', controller);
   }
 
-  patch(route, controllers) {
-    Route.patch('$prefix/$route', controllers);
+  patch(route, controller) {
+    Route.patch('$prefix/$route', controller);
   }
 
-  options(route, controllers) {
-    Route.options('$prefix/$route', controllers);
+  options(route, controller) {
+    Route.options('$prefix/$route', controller);
   }
 
-  copy(route, controllers) {
-    Route.copy('$prefix/$route', controllers);
+  copy(route, controller) {
+    Route.copy('$prefix/$route', controller);
   }
 
-  view(route, controllers) {
-    Route.view('$prefix/$route', controllers);
+  view(route, controller) {
+    Route.view('$prefix/$route', controller);
   }
 
-  link(route, controllers) {
-    Route.link('$prefix/$route', controllers);
+  link(route, controller) {
+    Route.link('$prefix/$route', controller);
   }
 
-  unlink(route, controllers) {
-    Route.unlink('$prefix/$route', controllers);
+  unlink(route, controller) {
+    Route.unlink('$prefix/$route', controller);
   }
 
-  lock(route, controllers) {
-    Route.lock('$prefix/$route', controllers);
+  lock(route, controller) {
+    Route.lock('$prefix/$route', controller);
   }
 
-  unlock(route, controllers) {
-    Route.unlock('$prefix/$route', controllers);
+  unlock(route, controller) {
+    Route.unlock('$prefix/$route', controller);
   }
 
-  propfind(route, controllers) {
-    Route.propfind('$prefix/$route', controllers);
+  propfind(route, controller) {
+    Route.propfind('$prefix/$route', controller);
   }
 }
