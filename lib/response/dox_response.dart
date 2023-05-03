@@ -42,6 +42,15 @@ abstract class DoxResponse {
     } else if (payload is Model) {
       responseData = (payload).toJson();
       res.headers.contentType = ContentType.json;
+    } else if (payload is List) {
+      var data = (payload).map((e) {
+        if (e is Model) {
+          return e.toMap();
+        }
+        return e;
+      }).toList();
+      res.headers.contentType = ContentType.json;
+      responseData = jsonEncode(data);
     } else {
       responseData = payload.toString();
     }

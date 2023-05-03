@@ -9,7 +9,7 @@ environment:
 dependencies:
   postgres: ^2.6.1
   dart_dotenv: ^1.0.1
-  dox_query_builder: ^1.0.2
+  dox_query_builder: ^1.0.3
   path: ^1.8.3
 
 dev_dependencies:
