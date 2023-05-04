@@ -103,7 +103,7 @@ class RouteHandler {
       if (controller is Function) {
         /// when it is a function and last item, it mean it is a controller
         if (controller == route.controllers.last) {
-          return _handleController(controller, doxReq, httpRequest);
+          return await _handleController(controller, doxReq, httpRequest);
         }
         result = await controller(doxReq);
       }
