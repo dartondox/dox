@@ -15,16 +15,18 @@ class RouteHandler {
 
       // if controller is a Function
       if (route.controllers is Function) {
-        return _handleController(route.controllers, doxReq, req);
+        return await _handleController(route.controllers, doxReq, req);
       }
 
       // if list controller
       if (route.controllers is List) {
-        return _handleListController(route, doxReq, req);
+        return await _handleListController(route, doxReq, req);
       }
 
       return DoxResponse.send(route.controllers, req);
     } catch (error) {
+      req.response.write(error.toString());
+      req.response.close();
       print(error);
     }
   }
@@ -91,7 +93,7 @@ class RouteHandler {
     return req.response.close();
   }
 
-  _handleListController(
+  Future _handleListController(
     RouteData route,
     DoxRequest doxReq,
     HttpRequest httpRequest,
@@ -123,7 +125,7 @@ class RouteHandler {
     }
   }
 
-  _handleController(
+  Future _handleController(
     controller,
     DoxRequest doxRequest,
     HttpRequest httpRequest,

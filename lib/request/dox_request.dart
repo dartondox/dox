@@ -6,12 +6,13 @@ import 'package:dox_core/dox_core.dart';
 class DoxRequest {
   final HttpRequest httpRequest;
   final HttpResponse httpResponse;
-  Map param = {};
-  Map query = {};
+  Map<String, dynamic> param = {};
+  Map<String, dynamic> query = {};
   String method = 'GET';
   Uri uri;
   Map body = {};
   dynamic bodyString;
+  Map<String, dynamic> _allRequest = {};
 
   DoxRequest(this.httpRequest, this.httpResponse, this.uri);
 
@@ -33,10 +34,15 @@ class DoxRequest {
       i.body = jsonDecode(bodyString);
     }
     i.bodyString = bodyString;
+    i._allRequest = {...i.query, ...i.body};
     return i;
   }
 
   Map<String, dynamic> all() {
-    return {...query, ...body};
+    return _allRequest;
+  }
+
+  dynamic input(key) {
+    return _allRequest[key];
   }
 }
