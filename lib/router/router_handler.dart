@@ -31,7 +31,7 @@ class RouteHandler {
         return await _handleListController(route, doxReq, req);
       }
 
-      return DoxResponse.send(route.controllers, req);
+      return RouterResponse.send(route.controllers, req);
     } catch (error) {
       req.response.write(error.toString());
       req.response.close();
@@ -127,7 +127,7 @@ class RouteHandler {
         doxReq = result;
       } else {
         /// else result is from controller and ready to response
-        DoxResponse.send(result, httpRequest);
+        RouterResponse.send(result, httpRequest);
         break;
       }
     }
@@ -140,7 +140,7 @@ class RouteHandler {
   ) async {
     List args = doxRequest.param.values.toList();
     var result = await Function.apply(controller, [doxRequest, ...args]);
-    DoxResponse.send(result, httpRequest);
+    RouterResponse.send(result, httpRequest);
   }
 
   setCors(HttpRequest req) {

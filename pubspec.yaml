@@ -1,6 +1,6 @@
 name: dox_core
 description: Dox core
-version: 0.0.6
+version: 0.0.7
 repository: https://github.com/necessarylion/dox-core
 
 environment:

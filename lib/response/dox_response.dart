@@ -3,26 +3,18 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 
-abstract class DoxResponse {
+class RouterResponse {
   dynamic payload;
 
   final HttpResponse response;
 
-  DoxResponse(this.response);
-
-  contentType(ContentType data) {
-    response.headers.contentType = data;
-  }
-
-  write(data) {
-    response.write(data);
-  }
-
-  close() {
-    response.close();
-  }
+  RouterResponse(this.response);
 
   static send(payload, HttpRequest request) {
+    if (payload is DoxResponse) {
+      return payload.write(request);
+    }
+
     HttpResponse res = request.response;
 
     if (DoxServer().exceptionHandler != null) {
@@ -59,4 +51,52 @@ abstract class DoxResponse {
         "\x1B[34m[${res.statusCode}]\x1B[0m \x1B[32m${request.method} ${request.uri.path}\x1B[0m");
     res.close();
   }
+}
+
+class DoxResponse {
+  final dynamic content;
+  Map<String, dynamic> _headers = {};
+  int _statusCode = HttpStatus.ok;
+  ContentType? _contentType;
+
+  DoxResponse(this.content);
+
+  /// Set response status code default 200
+  DoxResponse statusCode(int code) {
+    _statusCode = code;
+    return this;
+  }
+
+  DoxResponse contentType(ContentType contentType) {
+    _contentType = contentType;
+    return this;
+  }
+
+  /// set headers
+  DoxResponse header(key, value) {
+    _headers[key] = value;
+    return this;
+  }
+
+  /// set list of headers by Map
+  DoxResponse withHeaders(Map<String, dynamic> values) {
+    _headers = values;
+    return this;
+  }
+
+  /// this function for internal use only
+  write(HttpRequest request) {
+    _headers.forEach((key, value) {
+      request.response.headers.add(key, value);
+    });
+    request.response.statusCode = _statusCode;
+    if (_contentType != null) {
+      request.response.headers.contentType = _contentType;
+    }
+    return RouterResponse.send(content, request);
+  }
+}
+
+DoxResponse response(content) {
+  return DoxResponse(content);
 }
