@@ -39,7 +39,7 @@ class Dox {
   }
 
   Future<dynamic> initQueryBuilder() async {
-    var config = Dox().config;
+    var config = Dox().config.dbConfig;
     if (config.dbDriver == DatabaseDriver.postgres) {
       PgPool db = PgPool(
         PgEndpoint(

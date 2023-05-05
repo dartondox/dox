@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/utils/aes.dart';
 
 class DoxRequest {
   final HttpRequest httpRequest;
@@ -58,11 +57,19 @@ class DoxRequest {
     return ret;
   }
 
+  /// Get user IP
+  /// ```
+  /// req.ip();
+  /// ```
+  String? ip() {
+    return httpRequest.connectionInfo?.remoteAddress.address ?? 'unknown';
+  }
+
   /// Get request value
   /// ```
   /// req.input('email');
   /// ```
-  dynamic input(key) {
+  String? input(key) {
     return _allRequest[key];
   }
 
@@ -72,7 +79,7 @@ class DoxRequest {
   ///   /// do something
   /// }
   /// ```
-  dynamic has(String key) {
+  bool has(String key) {
     String val = _allRequest[key].toString();
     return val != 'null' || val.isNotEmpty ? true : false;
   }
@@ -81,7 +88,7 @@ class DoxRequest {
   /// ```
   /// req.header('X-Token');
   /// ```
-  dynamic header(key) {
+  String? header(key) {
     return headers.value(key);
   }
 
@@ -89,7 +96,7 @@ class DoxRequest {
   /// ```
   /// req.add('foo', bar);
   /// ```
-  dynamic add(key, value) {
+  void add(key, value) {
     _allRequest[key] = value;
     body[key] = value;
   }
@@ -98,7 +105,7 @@ class DoxRequest {
   /// ```
   /// req.merge({"foo" : bar});
   /// ```
-  dynamic merge(Map<String, dynamic> values) {
+  void merge(Map<String, dynamic> values) {
     _allRequest = {..._allRequest, ...values};
     body = {...body, ...values};
   }
@@ -107,9 +114,9 @@ class DoxRequest {
   /// ```
   /// req.cookie('authKey');
   /// ```
-  cookie(key, {bool decode = true}) {
+  String cookie(key, {bool decode = true}) {
     if (decode) {
-      return AESEncoder(Dox().config.appKey).decode(_cookies[key]);
+      return AESEncryptor.decode(_cookies[key]);
     }
     return _cookies[key];
   }
