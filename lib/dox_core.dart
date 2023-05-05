@@ -17,6 +17,7 @@ export 'exception/unauthorized_exception.dart';
 export 'exception/validation_exception.dart';
 export 'middleware/dox_middleware.dart';
 export 'request/dox_request.dart';
+export 'response/dox_cookie.dart';
 export 'response/dox_response.dart';
 export 'router/route.dart';
 export 'router/route_types.dart';

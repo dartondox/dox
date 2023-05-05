@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/utils/aes.dart';
 
 class DoxRequest {
   final HttpRequest httpRequest;
@@ -14,6 +15,7 @@ class DoxRequest {
   Map body = {};
   dynamic bodyString;
   Map<String, dynamic> _allRequest = {};
+  final Map<String, dynamic> _cookies = {};
 
   DoxRequest(this.httpRequest, this.httpResponse, this.uri, this.headers);
 
@@ -32,6 +34,7 @@ class DoxRequest {
     }
     i.bodyString = bodyString;
     i._allRequest = {...i.query, ...i.body};
+    i._getCookies();
     return i;
   }
 
@@ -98,5 +101,30 @@ class DoxRequest {
   dynamic merge(Map<String, dynamic> values) {
     _allRequest = {..._allRequest, ...values};
     body = {...body, ...values};
+  }
+
+  /// get cookie value from header
+  /// ```
+  /// req.cookie('authKey');
+  /// ```
+  cookie(key, {bool decode = true}) {
+    if (decode) {
+      return AESEncoder(Dox().config.appKey).decode(_cookies[key]);
+    }
+    return _cookies[key];
+  }
+
+  _getCookies() {
+    List<String>? cookies = httpRequest.headers[HttpHeaders.cookieHeader];
+    if (cookies == null) {
+      return;
+    }
+    for (var cookie in cookies) {
+      int equalsIndex = cookie.indexOf('=');
+      var parts = cookie.trim().split('=');
+      String name = cookie.substring(0, equalsIndex);
+      String value = cookie.substring(equalsIndex + 1);
+      _cookies[name] = value;
+    }
   }
 }

@@ -19,6 +19,8 @@ class CORSConfig {
 }
 
 abstract class AppConfig {
+  String get appKey;
+
   int get serverPort;
   String get dbDriver;
   String get dbHost;

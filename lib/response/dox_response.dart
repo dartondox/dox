@@ -58,6 +58,7 @@ class DoxResponse {
   Map<String, dynamic> _headers = {};
   int _statusCode = HttpStatus.ok;
   ContentType? _contentType;
+  String? _cookie;
 
   DoxResponse(this.content);
 
@@ -67,6 +68,7 @@ class DoxResponse {
     return this;
   }
 
+  /// set content type such as json, text, html
   DoxResponse contentType(ContentType contentType) {
     _contentType = contentType;
     return this;
@@ -78,13 +80,19 @@ class DoxResponse {
     return this;
   }
 
-  /// set list of headers by Map
+  /// Set cookie
+  DoxResponse cookie(DoxCookie cookie, {bool setExpire = false}) {
+    _cookie = setExpire ? cookie.expire() : cookie.get();
+    return this;
+  }
+
+  /// Set list of headers by Map
   DoxResponse withHeaders(Map<String, dynamic> values) {
     _headers = values;
     return this;
   }
 
-  /// this function for internal use only
+  /// This function for internal use only
   write(HttpRequest request) {
     _headers.forEach((key, value) {
       request.response.headers.add(key, value);
@@ -93,6 +101,7 @@ class DoxResponse {
     if (_contentType != null) {
       request.response.headers.contentType = _contentType;
     }
+    request.response.headers.add(HttpHeaders.setCookieHeader, _cookie!);
     return RouterResponse.send(content, request);
   }
 }
