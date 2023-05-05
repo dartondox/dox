@@ -144,20 +144,18 @@ class RouteHandler {
   }
 
   setCors(HttpRequest req) {
-    CORSConfig? cors = Dox().config.cors;
-    if (cors != null) {
-      parseCorsValue(req, 'Access-Control-Allow-Origin', cors.allowOrigin);
-      parseCorsValue(req, 'Access-Control-Allow-Methods', cors.allowMethods);
-      parseCorsValue(req, 'Access-Control-Allow-Headers', cors.allowMHeaders);
-      parseCorsValue(req, 'Access-Control-Expose-Headers', cors.exposeHeaders);
-      if (cors.allowCredentials != null) {
-        req.response.headers.add('Access-Control-Allow-Credentials',
-            cors.allowCredentials.toString());
-      }
-      if (cors.maxAge != null) {
-        req.response.headers
-            .add('Access-Control-Max-Age', cors.maxAge.toString());
-      }
+    CORSConfig cors = Dox().config.cors;
+    parseCorsValue(req, 'Access-Control-Allow-Origin', cors.allowOrigin);
+    parseCorsValue(req, 'Access-Control-Allow-Methods', cors.allowMethods);
+    parseCorsValue(req, 'Access-Control-Allow-Headers', cors.allowMHeaders);
+    parseCorsValue(req, 'Access-Control-Expose-Headers', cors.exposeHeaders);
+    if (cors.allowCredentials != null) {
+      req.response.headers.add(
+          'Access-Control-Allow-Credentials', cors.allowCredentials.toString());
+    }
+    if (cors.maxAge != null) {
+      req.response.headers
+          .add('Access-Control-Max-Age', cors.maxAge.toString());
     }
   }
 

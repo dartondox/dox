@@ -128,7 +128,6 @@ class DoxRequest {
     }
     for (var cookie in cookies) {
       int equalsIndex = cookie.indexOf('=');
-      var parts = cookie.trim().split('=');
       String name = cookie.substring(0, equalsIndex);
       String value = cookie.substring(equalsIndex + 1);
       _cookies[name] = value;
