@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_query_builder/dox_query_builder.dart';
 
 abstract class DoxResponse {
   dynamic payload;

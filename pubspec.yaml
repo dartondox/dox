@@ -1,15 +1,15 @@
 name: dox_core
 description: Dox core
-version: 0.0.5
+version: 0.0.6
 repository: https://github.com/necessarylion/dox-core
 
 environment:
   sdk: '>=2.19.0 <3.0.0'
 
 dependencies:
-  postgres: ^2.6.1
+  postgres_pool: ^2.1.6
   dart_dotenv: ^1.0.1
-  dox_query_builder: ^1.0.3
+  dox_query_builder: ^1.0.9
   path: ^1.8.3
 
 dev_dependencies:
