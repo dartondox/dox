@@ -3,7 +3,7 @@ import 'package:dox_core/dox_core.dart';
 class CORSConfig {
   final dynamic allowOrigin;
   final dynamic allowMethods;
-  final dynamic allowMHeaders;
+  final dynamic allowHeaders;
   final dynamic exposeHeaders;
   final bool? allowCredentials;
   final int? maxAge;
@@ -11,7 +11,7 @@ class CORSConfig {
   const CORSConfig({
     this.allowOrigin,
     this.allowMethods,
-    this.allowMHeaders,
+    this.allowHeaders,
     this.exposeHeaders,
     this.allowCredentials,
     this.maxAge,

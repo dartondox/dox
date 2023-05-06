@@ -147,7 +147,7 @@ class RouteHandler {
     CORSConfig cors = Dox().config.cors;
     parseCorsValue(req, 'Access-Control-Allow-Origin', cors.allowOrigin);
     parseCorsValue(req, 'Access-Control-Allow-Methods', cors.allowMethods);
-    parseCorsValue(req, 'Access-Control-Allow-Headers', cors.allowMHeaders);
+    parseCorsValue(req, 'Access-Control-Allow-Headers', cors.allowHeaders);
     parseCorsValue(req, 'Access-Control-Expose-Headers', cors.exposeHeaders);
     if (cors.allowCredentials != null) {
       req.response.headers.add(
