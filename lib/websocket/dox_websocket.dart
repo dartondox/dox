@@ -35,8 +35,8 @@ class DoxWebsocket {
         String event = payload['event'];
         dynamic message = payload['message'];
         if (events[event] != null) {
-          Function.apply(
-              events[event] as Function, [SocketEmitter(socketId), message]);
+          Function.apply(events[event] as Function,
+              [SocketEmitter(sender: socketId), message]);
         }
         if (event == 'joinRoom') {
           _joinRoom(message, socketId);
@@ -89,9 +89,9 @@ class DoxWebsocket {
 class SocketEmitter {
   String? _roomId;
 
-  final String sender;
+  final String? sender;
 
-  SocketEmitter(this.sender);
+  SocketEmitter({this.sender});
 
   SocketEmitter room(roomId) {
     _roomId = roomId;
@@ -99,7 +99,9 @@ class SocketEmitter {
   }
 
   emitExceptSender(String event, dynamic message) {
-    emit(event, message, exclude: [sender]);
+    if (sender != null) {
+      emit(event, message, exclude: [sender!]);
+    }
   }
 
   emit(String event, dynamic message, {List<String> exclude = const []}) {
