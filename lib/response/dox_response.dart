@@ -11,6 +11,10 @@ class RouterResponse {
   RouterResponse(this.response);
 
   static send(payload, HttpRequest request) {
+    if (payload is WebSocket) {
+      return;
+    }
+
     if (payload is DoxResponse) {
       return payload.write(request);
     }

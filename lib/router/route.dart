@@ -59,6 +59,14 @@ class Route {
         'DELETE', '${Route()._prefix + route}/{id}', controller.destroy);
   }
 
+  static websocket({
+    required DoxWebsocket websocket,
+    String route = 'ws',
+    List middleware = const [],
+  }) {
+    Route().addRoute('GET', route, [...middleware, websocket.handle]);
+  }
+
   static get(route, controller) {
     Route().addRoute('GET', Route()._prefix + route, controller);
   }

@@ -2,13 +2,11 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 
-class RouteHandler {
+class DoxHttpRequest {
   List<RouteData> get routes => Route().routes;
 
   dynamic handle(HttpRequest req) async {
     try {
-      setCors(req);
-
       // preflight
       if (req.method == 'OPTIONS') {
         req.response.statusCode = HttpStatus.ok;
@@ -141,29 +139,5 @@ class RouteHandler {
     List args = doxRequest.param.values.toList();
     var result = await Function.apply(controller, [doxRequest, ...args]);
     RouterResponse.send(result, httpRequest);
-  }
-
-  setCors(HttpRequest req) {
-    CORSConfig cors = Dox().config.cors;
-    parseCorsValue(req, 'Access-Control-Allow-Origin', cors.allowOrigin);
-    parseCorsValue(req, 'Access-Control-Allow-Methods', cors.allowMethods);
-    parseCorsValue(req, 'Access-Control-Allow-Headers', cors.allowHeaders);
-    parseCorsValue(req, 'Access-Control-Expose-Headers', cors.exposeHeaders);
-    if (cors.allowCredentials != null) {
-      req.response.headers.add(
-          'Access-Control-Allow-Credentials', cors.allowCredentials.toString());
-    }
-    if (cors.maxAge != null) {
-      req.response.headers
-          .add('Access-Control-Max-Age', cors.maxAge.toString());
-    }
-  }
-
-  parseCorsValue(HttpRequest req, key, data) {
-    if (data is List<String> && data.isNotEmpty) {
-      req.response.headers.add(key, data.join(','));
-    } else if (data is String && data.isNotEmpty) {
-      req.response.headers.add(key, data);
-    }
   }
 }
