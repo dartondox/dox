@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/router/dox_http_request.dart';
-import 'package:dox_core/websocket/dox_websocket.dart';
 
 class DoxServer {
   static final DoxServer _singleton = DoxServer._internal();
