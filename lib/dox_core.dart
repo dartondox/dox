@@ -1,7 +1,5 @@
 library dox_core;
 
-export 'package:dox_query_builder/dox_query_builder.dart';
-
 export 'config/app_config.dart';
 export 'db/db_driver.dart';
 export 'dox.dart';
