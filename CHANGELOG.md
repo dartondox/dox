@@ -1,3 +1,7 @@
+# version 0.0.17
+
+- Separate Query builder from core
+
 # version 0.0.16
 
 - Replace with dox query builder
