@@ -1,4 +1,4 @@
-# version 0.0.15
+# version 0.0.16
 
 - Replace with dox query builder
 - Added feature to auto encode List<Model> response
