@@ -34,12 +34,12 @@ class RouterResponse {
     if (payload is Map) {
       responseData = jsonEncode(payload as Map<String, dynamic>);
       res.headers.contentType = ContentType.json;
-    } else if (payload is Model) {
+    } else if (_hasMethod(() => payload.toJson)) {
       responseData = (payload).toJson();
       res.headers.contentType = ContentType.json;
     } else if (payload is List) {
       var data = (payload).map((e) {
-        if (e is Model) {
+        if (_hasMethod(() => e.toMap)) {
           return e.toMap();
         }
         return e;
@@ -54,6 +54,15 @@ class RouterResponse {
     print(
         "\x1B[34m[${res.statusCode}]\x1B[0m \x1B[32m${request.method} ${request.uri.path}\x1B[0m");
     res.close();
+  }
+
+  static bool _hasMethod(Function creator) {
+    try {
+      creator();
+      return true;
+    } catch (err) {
+      return false;
+    }
   }
 }
 

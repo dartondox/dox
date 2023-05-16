@@ -29,6 +29,8 @@ class Route {
   }
 
   static resource(route, controller) {
+    route = "/$route";
+
     /// GET /resource
     Route().addRoute('GET', Route()._prefix + route, controller.index);
 
