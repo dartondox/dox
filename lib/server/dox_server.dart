@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/router/dox_http_request.dart';
+import 'package:dox_core/utils/logger.dart';
 
 class DoxServer {
   static final DoxServer _singleton = DoxServer._internal();
@@ -12,7 +13,7 @@ class DoxServer {
 
   DoxServer._internal();
 
-  ExceptionHandler? exceptionHandler;
+  Handler? responseHandler;
 
   late HttpServer httpServer;
   DoxWebsocket? doxWebsocket;
@@ -20,9 +21,7 @@ class DoxServer {
   Future<HttpServer> listen(int port, {Function? onError}) async {
     Env.load();
     final server = await HttpServer.bind(InternetAddress.anyIPv4, port);
-    print(
-        '\x1B[34m[Dox] Server started at http://127.0.0.1:${server.port}\x1B[0m');
-
+    DoxLogger.info("Server started at http://127.0.0.1:${server.port}");
     server.listen(
       (HttpRequest req) {
         _setCors(req);
@@ -34,8 +33,8 @@ class DoxServer {
     return server;
   }
 
-  setExceptionHandler(ExceptionHandler handler) {
-    exceptionHandler = handler;
+  setResponseHandler(Handler handler) {
+    responseHandler = handler;
   }
 
   _setCors(HttpRequest req) {

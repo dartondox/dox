@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dox_core/dox.dart';
+import 'package:dox_core/utils/logger.dart';
 import 'package:encrypt/encrypt.dart';
 
 class AESEncryptor {
@@ -21,7 +22,7 @@ class AESEncryptor {
       final decrypted = encrypter.decrypt64(cipherText, iv: iv);
       return utf8.decode(base64.decode(decrypted));
     } catch (error) {
-      print(error);
+      DoxLogger.danger(error.toString());
       return '';
     }
   }

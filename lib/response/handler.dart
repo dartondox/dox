@@ -1,5 +1,5 @@
 import 'dart:io';
 
-abstract class ExceptionHandler {
+abstract class Handler {
   handle(dynamic data, HttpResponse res);
 }

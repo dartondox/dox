@@ -21,6 +21,7 @@ class Dox {
     List<Router> routers = config.routers;
     for (Router router in routers) {
       Route.prefix(router.prefix);
+      Route.use(router.middleware);
       router.register();
     }
   }
@@ -41,7 +42,7 @@ class Dox {
   _initServer() {
     var config = Dox().config;
     DoxServer server = DoxServer();
-    server.setExceptionHandler(config.exceptionHandler);
+    server.setResponseHandler(config.responseHandler);
     server.listen(config.serverPort);
   }
 }

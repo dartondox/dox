@@ -45,7 +45,7 @@ abstract class AppConfig {
 
   DBConfig get dbConfig;
 
-  ExceptionHandler get exceptionHandler;
+  Handler get responseHandler;
 
   List<Router> get routers;
 
