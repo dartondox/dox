@@ -21,7 +21,7 @@ class LogMiddleware extends DoxMiddleware {
     if (filter != null) {
       text = filter!(text);
     }
-    DoxLogger.info(text);
+    DoxLogger.log(text);
     return req;
   }
 }

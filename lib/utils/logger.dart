@@ -1,6 +1,6 @@
 class DoxLogger {
   static log(text) {
-    print(text.toString());
+    print(text);
   }
 
   static info(text) {

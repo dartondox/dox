@@ -12,37 +12,53 @@ class DoxResponse {
   DoxResponse(this.content);
 
   /// Set response status code default 200
+  /// ```
+  /// res.statusCode(200);
+  /// ```
   DoxResponse statusCode(int code) {
     _statusCode = code;
     return this;
   }
 
   /// set content type such as json, text, html
+  /// ```
+  /// res.statusCode(ContentType.json);
+  /// ```
   DoxResponse contentType(ContentType contentType) {
     _contentType = contentType;
     return this;
   }
 
   /// set headers
+  /// ```
+  /// res.header('Authorization', 'Bearer xxx');
+  /// ```
   DoxResponse header(key, value) {
     _headers[key] = value;
     return this;
   }
 
   /// Set cookie
+  /// ```
+  /// var DoxCookie('key', 'value');
+  /// res.cookie(cookie);
+  /// ```
   DoxResponse cookie(DoxCookie cookie, {bool setExpire = false}) {
     _cookie = setExpire ? cookie.expire() : cookie.get();
     return this;
   }
 
   /// Set list of headers by Map
+  /// ```
+  /// res.withHeaders({'Authorization' : 'Bearer xxx'});
+  /// ```
   DoxResponse withHeaders(Map<String, dynamic> values) {
     _headers = values;
     return this;
   }
 
-  /// This function for internal use only
-  write(HttpRequest request) {
+  /// This function is for internal use only
+  process(HttpRequest request) {
     _headers.forEach((key, value) {
       request.response.headers.add(key, value);
     });

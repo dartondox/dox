@@ -1,5 +1,5 @@
-import 'dart:io';
+import 'package:dox_core/dox_core.dart';
 
 abstract class Handler {
-  handle(dynamic data, HttpResponse res);
+  handle(DoxResponse res);
 }

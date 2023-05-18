@@ -16,13 +16,14 @@ class RouterResponse {
     }
 
     if (payload is DoxResponse) {
-      return payload.write(request);
+      return payload.process(request);
     }
 
     HttpResponse res = request.response;
 
     if (DoxServer().responseHandler != null) {
-      var responseHandler = DoxServer().responseHandler?.handle(payload, res);
+      var responseHandler =
+          DoxServer().responseHandler?.handle(DoxResponse(payload));
       if (responseHandler != null) {
         payload = responseHandler;
       }
