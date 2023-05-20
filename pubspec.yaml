@@ -1,7 +1,7 @@
 name: dox_core
 description: Dox core
 version: 1.0.0-alpha.0
-repository: https://github.com/necessarylion/dox-core
+repository: https://github.com/dartondox/dox-core
 
 environment:
   sdk: '>=2.19.0 <4.0.0'
