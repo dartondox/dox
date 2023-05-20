@@ -8,7 +8,7 @@ class DoxRequest {
   final HttpResponse httpResponse;
   Map<String, dynamic> param = {};
   Map<String, dynamic> query = {};
-  final HttpHeaders headers;
+  final HttpHeaders _headers;
   String method = 'GET';
   Uri uri;
   Map body = {};
@@ -16,7 +16,7 @@ class DoxRequest {
   Map<String, dynamic> _allRequest = {};
   final Map<String, dynamic> _cookies = {};
 
-  DoxRequest(this.httpRequest, this.httpResponse, this.uri, this.headers);
+  DoxRequest(this.httpRequest, this.httpResponse, this.uri, this._headers);
 
   static Future<DoxRequest> httpRequestToDoxRequest(
     HttpRequest request,
@@ -89,7 +89,19 @@ class DoxRequest {
   /// req.header('X-Token');
   /// ```
   String? header(key) {
-    return headers.value(key);
+    return _headers.value(key);
+  }
+
+  /// Get all headers value
+  /// ```
+  /// req.headers;
+  /// ```
+  Map<String, dynamic> get headers {
+    Map<String, dynamic> ret = {};
+    _headers.forEach((name, values) {
+      ret[name] = values.join('');
+    });
+    return ret;
   }
 
   /// Add new request value
@@ -114,8 +126,8 @@ class DoxRequest {
   /// ```
   /// req.cookie('authKey');
   /// ```
-  String cookie(key, {bool decode = true}) {
-    if (decode) {
+  String cookie(key, {bool decrypt = true}) {
+    if (decrypt) {
       return AESEncryptor.decode(_cookies[key]);
     }
     return _cookies[key];

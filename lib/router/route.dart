@@ -8,6 +8,8 @@ class Route {
 
   String _prefix = '';
 
+  List _preMiddleware = [];
+
   List<RouteData> routes = [];
 
   static sanitizeRoutePath(String path) {
@@ -15,13 +17,25 @@ class Route {
     return "/${path.replaceAll(RegExp('^\\/+|\\/+\$'), '')}";
   }
 
-  addRoute(method, String route, controller) {
+  _addRoute(method, String route, controller) {
     route = Route.sanitizeRoutePath(route);
-    routes.add(RouteData(method, route, controller));
+    List controllers = [];
+    controllers.addAll(_preMiddleware);
+    if (controller is Function) {
+      controllers.add(controller);
+    }
+    if (controller is List) {
+      controllers.addAll(controller);
+    }
+    routes.add(RouteData(method, route, controllers));
   }
 
   static group(prefix, Function(SubRoute) callback) {
     callback(SubRoute(prefix));
+  }
+
+  static use(List controllers) {
+    Route()._preMiddleware = controllers;
   }
 
   static prefix(prefix) {
@@ -32,32 +46,33 @@ class Route {
     route = "/$route";
 
     /// GET /resource
-    Route().addRoute('GET', Route()._prefix + route, controller.index);
+    Route()._addRoute('GET', Route()._prefix + route, controller.index);
 
     /// GET /resource/create
-    Route().addRoute(
+    Route()._addRoute(
         'GET', '${Route()._prefix + route}/create', controller.create);
 
     /// POST /resource
-    Route().addRoute('POST', Route()._prefix + route, controller.store);
+    Route()._addRoute('POST', Route()._prefix + route, controller.store);
 
     /// GET /resource/{id}
-    Route().addRoute('GET', '${Route()._prefix + route}/{id}', controller.show);
+    Route()
+        ._addRoute('GET', '${Route()._prefix + route}/{id}', controller.show);
 
     /// GET /resource/{id}/edit
-    Route().addRoute(
+    Route()._addRoute(
         'GET', '${Route()._prefix + route}/{id}/edit', controller.edit);
 
     /// PUT /resource/{id}
     Route()
-        .addRoute('PUT', '${Route()._prefix + route}/{id}', controller.update);
+        ._addRoute('PUT', '${Route()._prefix + route}/{id}', controller.update);
 
     /// PATCH /resource/{id}
-    Route().addRoute(
+    Route()._addRoute(
         'PATCH', '${Route()._prefix + route}/{id}', controller.update);
 
     /// DELETE /resource/{id}
-    Route().addRoute(
+    Route()._addRoute(
         'DELETE', '${Route()._prefix + route}/{id}', controller.destroy);
   }
 
@@ -66,62 +81,62 @@ class Route {
     String route = 'ws',
     List middleware = const [],
   }) {
-    Route().addRoute('GET', route, [...middleware, websocket.handle]);
+    Route()._addRoute('GET', route, [...middleware, websocket.handle]);
   }
 
   static get(route, controller) {
-    Route().addRoute('GET', Route()._prefix + route, controller);
+    Route()._addRoute('GET', Route()._prefix + route, controller);
   }
 
   static post(route, controller) {
-    Route().addRoute('POST', Route()._prefix + route, controller);
+    Route()._addRoute('POST', Route()._prefix + route, controller);
   }
 
   static put(route, controller) {
-    Route().addRoute('PUT', Route()._prefix + route, controller);
+    Route()._addRoute('PUT', Route()._prefix + route, controller);
   }
 
   static delete(route, controller) {
-    Route().addRoute('DELETE', Route()._prefix + route, controller);
+    Route()._addRoute('DELETE', Route()._prefix + route, controller);
   }
 
   static purge(route, controller) {
-    Route().addRoute('PURGE', Route()._prefix + route, controller);
+    Route()._addRoute('PURGE', Route()._prefix + route, controller);
   }
 
   static patch(route, controller) {
-    Route().addRoute('PATCH', Route()._prefix + route, controller);
+    Route()._addRoute('PATCH', Route()._prefix + route, controller);
   }
 
   static options(route, controller) {
-    Route().addRoute('OPTIONS', Route()._prefix + route, controller);
+    Route()._addRoute('OPTIONS', Route()._prefix + route, controller);
   }
 
   static copy(route, controller) {
-    Route().addRoute('COPY', Route()._prefix + route, controller);
+    Route()._addRoute('COPY', Route()._prefix + route, controller);
   }
 
   static view(route, controller) {
-    Route().addRoute('VIEW', Route()._prefix + route, controller);
+    Route()._addRoute('VIEW', Route()._prefix + route, controller);
   }
 
   static link(route, controller) {
-    Route().addRoute('LINK', Route()._prefix + route, controller);
+    Route()._addRoute('LINK', Route()._prefix + route, controller);
   }
 
   static unlink(route, controller) {
-    Route().addRoute('UNLINK', Route()._prefix + route, controller);
+    Route()._addRoute('UNLINK', Route()._prefix + route, controller);
   }
 
   static lock(route, controller) {
-    Route().addRoute('UNLINK', Route()._prefix + route, controller);
+    Route()._addRoute('UNLINK', Route()._prefix + route, controller);
   }
 
   static unlock(route, controller) {
-    Route().addRoute('UNLOCK', Route()._prefix + route, controller);
+    Route()._addRoute('UNLOCK', Route()._prefix + route, controller);
   }
 
   static propfind(route, controller) {
-    Route().addRoute('PROPFIND', Route()._prefix + route, controller);
+    Route()._addRoute('PROPFIND', Route()._prefix + route, controller);
   }
 }

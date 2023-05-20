@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 
-class ValidationException extends BaseHttpException {
+class ValidationException extends HttpException {
   ValidationException({
-    message = 'Validation failed',
+    message = const {},
     errorCode = 'validation_failed',
     code = HttpStatus.unprocessableEntity,
   }) {

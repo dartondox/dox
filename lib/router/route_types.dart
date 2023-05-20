@@ -1,5 +1,6 @@
 abstract class Router {
   String get prefix => '';
+  List get middleware => [];
   register();
 }
 
@@ -8,5 +9,14 @@ class RouteData {
   String path;
   final dynamic controllers;
   Map<String, dynamic> params = {};
-  RouteData(this.method, this.path, this.controllers);
+  final List preMiddleware;
+  final List postMiddleware;
+
+  RouteData(
+    this.method,
+    this.path,
+    this.controllers, {
+    this.preMiddleware = const [],
+    this.postMiddleware = const [],
+  });
 }

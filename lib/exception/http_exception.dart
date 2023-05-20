@@ -1,5 +1,10 @@
-abstract class BaseHttpException {
+abstract class HttpException {
   int code = 500;
   String errorCode = 'server_error';
-  String message = 'Server Error';
+  dynamic message = 'Server Error';
+
+  @override
+  String toString() {
+    return message.toString();
+  }
 }

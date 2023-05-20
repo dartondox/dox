@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 
-class NotFoundHttpException extends BaseHttpException {
+class NotFoundHttpException extends HttpException {
   NotFoundHttpException({
     message = 'Not Found',
     errorCode = 'not_found',

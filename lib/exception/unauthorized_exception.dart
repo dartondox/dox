@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 
-class UnAuthorizedException extends BaseHttpException {
+class UnAuthorizedException extends HttpException {
   UnAuthorizedException({
     message = 'Failed to authorize',
     errorCode = 'unauthorized',
