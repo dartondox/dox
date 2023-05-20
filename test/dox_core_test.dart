@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:http/http.dart' as http;
@@ -14,6 +15,7 @@ String baseUrl = 'http://localhost:${config.serverPort}';
 void main() {
   group('Http', () {
     setUp(() {
+      dox.websocket(websocket: DoxWebsocket());
       dox.initialize(config);
     });
 
@@ -161,6 +163,37 @@ void main() {
       expect(res.headers['x-key'], 'ABCD');
 
       dox.server.close();
+    });
+
+    test('websocket', () async {
+      WebSocket socket =
+          await WebSocket.connect('ws://localhost:${config.serverPort}/ws');
+
+      await sleep(1);
+
+      DoxWebsocket.on('intro', (SocketEmitter emitter, message) {
+        expect(message, 'hello');
+      });
+
+      DoxWebsocket.on('json', (SocketEmitter emitter, message) {
+        expect(message['title'], 'hello');
+      });
+
+      var data = jsonEncode({
+        "event": "intro",
+        "message": "hello",
+      });
+
+      var jsonData = jsonEncode({
+        "event": "json",
+        "message": {"title": "hello"}
+      });
+
+      socket.add(data);
+      socket.add(jsonData);
+
+      await sleep(1);
+      socket.close();
     });
   });
 }
