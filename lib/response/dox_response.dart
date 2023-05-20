@@ -66,7 +66,9 @@ class DoxResponse {
     if (_contentType != null) {
       request.response.headers.contentType = _contentType;
     }
-    request.response.headers.add(HttpHeaders.setCookieHeader, _cookie!);
+    if (_cookie != null) {
+      request.response.headers.add(HttpHeaders.setCookieHeader, _cookie!);
+    }
     return RouterResponse.send(content, request);
   }
 }

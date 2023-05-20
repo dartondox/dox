@@ -11,7 +11,7 @@ class Dox {
 
   late AppConfig config;
 
-  static DoxServer get server => DoxServer();
+  DoxServer get server => DoxServer();
 
   initialize(AppConfig config) {
     Env.load();

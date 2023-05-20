@@ -33,6 +33,10 @@ class DoxServer {
     return server;
   }
 
+  close({bool force = false}) {
+    httpServer.close(force: force);
+  }
+
   setResponseHandler(Handler handler) {
     responseHandler = handler;
   }

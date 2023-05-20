@@ -1,13 +1,10 @@
-abstract class BaseHttpException {
+abstract class HttpException {
   int code = 500;
   String errorCode = 'server_error';
-  String message = 'Server Error';
+  dynamic message = 'Server Error';
 
-  Map<String, dynamic> toMap() {
-    return {
-      "code": code,
-      "error_code": errorCode,
-      "message": message,
-    };
+  @override
+  String toString() {
+    return message.toString();
   }
 }

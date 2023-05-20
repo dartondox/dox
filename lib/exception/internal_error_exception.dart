@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 
-class InternalErrorException extends BaseHttpException {
+class InternalErrorException extends HttpException {
   InternalErrorException({
     message = 'Server Error',
     errorCode = 'server_error',

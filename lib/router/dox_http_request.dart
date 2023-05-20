@@ -1,7 +1,11 @@
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/utils/logger.dart';
 
+/// this is a class which get matched routes and
+/// pass http request to route middleware and controllers
+/// and response from controllers is passed to `RouterResponse.send`
 class DoxHttpRequest {
   List<RouteData> get routes => Route().routes;
 
@@ -13,27 +17,26 @@ class DoxHttpRequest {
         return req.response.close();
       }
 
+      /// getting matched route
       RouteData? route = getMatchRoute(req.uri.path, req.method);
       if (route == null) {
         return _routeNotFound(req);
       }
+
+      /// convert http request into DoxRequest
+      /// we did not use constructor here because we require
+      /// async await to get body string from HttpRequest.
       var doxReq = await DoxRequest.httpRequestToDoxRequest(req, route);
 
-      // if controller is a Function
-      if (route.controllers is Function) {
-        return await _handleController(route.controllers, doxReq, req);
+      /// route.controllers will be always list
+      /// see Route()._addRoute() for explanation
+      return await _handleListController(route, doxReq, req);
+    } catch (error, stackTrace) {
+      if (error is Exception) {
+        DoxLogger.warn(error);
+        DoxLogger.danger(stackTrace.toString());
       }
-
-      // if list controller
-      if (route.controllers is List) {
-        return await _handleListController(route, doxReq, req);
-      }
-
-      return RouterResponse.send(route.controllers, req);
-    } catch (error) {
-      req.response.write(error.toString());
-      req.response.close();
-      print(error);
+      return RouterResponse.send(error, req);
     }
   }
 
@@ -107,21 +110,30 @@ class DoxHttpRequest {
     dynamic result;
     for (var controller in route.controllers) {
       if (controller is Function) {
-        /// when it is a function and last item, it mean it is a controller
+        /// when it is a function and last item, it mean it is a final controller
         if (controller == route.controllers.last) {
-          return await _handleController(controller, doxReq, httpRequest);
+          await _handleController(controller, doxReq, httpRequest);
+
+          /// end the loop
+          break;
         }
+
+        /// this mean a function middleware
         result = await controller(doxReq);
       }
 
-      // when controller is middleware
+      /// this mean a dox base class middleware
+      /// where it have handle function
       if (controller is DoxMiddleware) {
         DoxMiddleware middleware = controller;
         result = await Function.apply(middleware.handle, [doxReq]);
       }
 
       /// if request is dox Request, it mean result is from middleware
+      /// mean need to pass values to next controller.
       if (result is DoxRequest) {
+        /// override doxReq from arguments and
+        /// in order to pass in next loop
         doxReq = result;
       } else {
         /// else result is from controller and ready to response
