@@ -1,0 +1,21 @@
+name: Test
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  Test-Package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: 'Test plugin'
+        uses: k-paxian/dart-package-publisher@v1.5.1
+        with:
+          credentialJson: ${{ secrets.DART_CREDENTIAL }}
+          flutter: false
+          suppressBuildRunner: true
+          testRunOnly: false
+          dryRunOnly: false
