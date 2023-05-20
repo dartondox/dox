@@ -1,3 +1,12 @@
+# version 1.0.0-alpha.0
+
+- Refactor the code
+- Added test cases
+- Added support for global middleware
+- Added support to throw error exception in response and add support to handle via response handler
+- Rename BaseHttpException to HttpException
+- Bug fixed on cookie response
+
 # version 0.0.17
 
 - Separate Query builder from core
