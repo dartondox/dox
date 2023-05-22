@@ -46,9 +46,10 @@ class RouterResponse {
       payload = payload.toString();
     }
 
-    if (payload is Exception) {
+    if (payload is Exception || payload is Error) {
       res.statusCode = HttpStatus.internalServerError;
-      payload = payload.toString().split(': ')[1];
+      List<String?> parts = payload.toString().split(': ');
+      payload = parts.length >= 2 ? parts[1] : payload.toString();
     }
 
     String responseData;

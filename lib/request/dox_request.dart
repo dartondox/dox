@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/validation/dox_validator.dart';
 
 class DoxRequest {
   final HttpRequest httpRequest;
@@ -131,6 +132,14 @@ class DoxRequest {
       return AESEncryptor.decode(_cookies[key]);
     }
     return _cookies[key];
+  }
+
+  validate(Map<String, String> rules) {
+    var validator = DoxValidator(all());
+    validator.validate(rules);
+    if (validator.hasError) {
+      throw ValidationException(message: validator.errors);
+    }
   }
 
   _getCookies() {

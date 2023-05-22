@@ -32,7 +32,7 @@ class DoxHttpRequest {
       /// see Route()._addRoute() for explanation
       return await _handleListController(route, doxReq, req);
     } catch (error, stackTrace) {
-      if (error is Exception) {
+      if (error is Exception || error is Error) {
         DoxLogger.warn(error);
         DoxLogger.danger(stackTrace.toString());
       }
