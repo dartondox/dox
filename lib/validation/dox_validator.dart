@@ -4,44 +4,105 @@ import 'package:dox_core/validation/rules.dart';
 import 'package:sprintf/sprintf.dart';
 
 class DoxValidator {
-  final Map<String, dynamic> data;
   DoxValidator(this.data);
+
+  final Map<String, dynamic> data;
 
   final Map<String, dynamic> _errors = {};
 
+  List get _methodNoNeedToSplitArguments => ['in'];
+
+  bool get hasError => _errors.isNotEmpty;
+
+  Map<String, dynamic> get errors => _errors;
+
+  addCustomRule(
+    String ruleName, {
+    required String message,
+    required bool Function(Map<String, dynamic>, dynamic, String?) fn,
+  }) {
+    _matchings[ruleName] = {
+      "message": message,
+      "function": fn,
+    };
+  }
+
   validate(Map<String, String> rules) {
     rules.forEach((field, rule) {
-      if (field.contains('.*.')) {
+      if (_isNestedValidation(field)) {
         var parts = field.split('.*.');
-        var list = data.getParam(parts[0]);
-        var firstPart = parts[0];
-        parts.removeAt(0);
-        _loopListForValidation(firstPart, rule, list, parts);
+
+        /// eg. products
+        var mainField = parts[0];
+
+        /// getting list of products from data.
+        var list = data.getParam(mainField);
+
+        /// remove main filed to loop and get final field to validate
+        List fieldsExceptMainField = parts.sublist(1);
+        _nestedArrayValidation(mainField, fieldsExceptMainField, rule, list);
       } else {
         dynamic value = data.getParam(field);
-        String name = field.split('.').last;
-        _validateField(field, name, value, rule);
-      }
-    });
-  }
 
-  _loopListForValidation(
-      firstPart, rule, List<Map<String, dynamic>> items, List parts) {
-    items.asMap().forEach((index, fl) {
-      if (parts.length == 1) {
-        var value = fl[parts.first];
+        /// in case user.info, field name should be only info
+        String fieldName = field.split('.').last;
         _validateField(
-            '$firstPart.$index.${parts.first}', parts.first, value, rule);
-      } else if (parts.length >= 2) {
-        List newParts = parts.sublist(1);
-        List<Map<String, dynamic>> i = fl.getParam(parts.first);
-        _loopListForValidation(
-            '$firstPart.$index.${parts.first}', rule, i, newParts);
+          field: field,
+          name: fieldName,
+          value: value,
+          rule: rule,
+        );
       }
     });
   }
 
-  _validateField(String field, String name, dynamic value, String rule) {
+  bool _isNestedValidation(field) {
+    return field.contains('.*.');
+  }
+
+  _nestedArrayValidation(
+    mainField,
+    List fields,
+    String rule,
+    List<Map<String, dynamic>> items,
+  ) {
+    items.asMap().forEach((index, item) {
+      String field = fields.first;
+      String fieldNameWithPositionIndex = '$mainField.$index.$field';
+
+      /// this mean we already get field value to validate
+      if (fields.length == 1) {
+        var value = item.getParam(field);
+
+        _validateField(
+          field: fieldNameWithPositionIndex,
+          name: field.split('.').last,
+          value: value,
+          rule: rule,
+        );
+      }
+
+      /// this mean we still need to get the actual field value
+      else if (fields.length >= 2) {
+        List fieldsExceptMainField = fields.sublist(1);
+        List<Map<String, dynamic>> newItems = item.getParam(field);
+
+        _nestedArrayValidation(
+          fieldNameWithPositionIndex,
+          fieldsExceptMainField,
+          rule,
+          newItems,
+        );
+      }
+    });
+  }
+
+  _validateField({
+    required String field,
+    required String name,
+    dynamic value,
+    required String rule,
+  }) {
     var rulesForEachName = rule.split('|');
     for (String r in rulesForEachName) {
       String? error = _applyMatchingRule(field, name, value, r);
@@ -77,27 +138,6 @@ class DoxValidator {
       return error;
     }
     return null;
-  }
-
-  List get _methodNoNeedToSplitArguments => ['in'];
-
-  bool hasError() {
-    return _errors.isNotEmpty;
-  }
-
-  Map<String, dynamic> getErrors() {
-    return _errors;
-  }
-
-  addCustomRule(
-    String ruleName, {
-    required String message,
-    required bool Function(Map<String, dynamic>, dynamic, String?) fn,
-  }) {
-    _matchings[ruleName] = {
-      "message": message,
-      "function": fn,
-    };
   }
 
   final Map<String, Map<String, dynamic>> _matchings = {

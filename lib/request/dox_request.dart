@@ -137,8 +137,8 @@ class DoxRequest {
   validate(Map<String, String> rules) {
     var validator = DoxValidator(all());
     validator.validate(rules);
-    if (validator.hasError()) {
-      throw ValidationException(message: validator.getErrors());
+    if (validator.hasError) {
+      throw ValidationException(message: validator.errors);
     }
   }
 
