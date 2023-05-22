@@ -1,6 +1,8 @@
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/logger.dart';
+import 'package:dox_core/validation/nested_validation_visitor.dart';
 import 'package:dox_core/validation/rules.dart';
+import 'package:dox_core/validation/type.dart';
 import 'package:sprintf/sprintf.dart';
 
 class DoxValidator {
@@ -30,28 +32,21 @@ class DoxValidator {
   validate(Map<String, String> rules) {
     rules.forEach((field, rule) {
       if (_isNestedValidation(field)) {
-        var parts = field.split('.*.');
-
-        /// eg. products
-        var mainField = parts[0];
-
-        /// getting list of products from data.
-        var list = data.getParam(mainField);
-
-        /// remove main filed to loop and get final field to validate
-        List fieldsExceptMainField = parts.sublist(1);
-        _nestedArrayValidation(mainField, fieldsExceptMainField, rule, list);
-      } else {
-        dynamic value = data.getParam(field);
-
-        /// in case user.info, field name should be only info
-        String fieldName = field.split('.').last;
-        _validateField(
+        var visitor = NestedValidationVisitor(
+          data: data,
           field: field,
-          name: fieldName,
-          value: value,
           rule: rule,
         );
+        for (ValidationItem item in visitor.fieldsToValidate) {
+          _validateItem(item);
+        }
+      } else {
+        _validateItem(ValidationItem(
+          field: field,
+          name: field.split('.').last,
+          value: data.getParam(field),
+          rule: rule,
+        ));
       }
     });
   }
@@ -60,54 +55,13 @@ class DoxValidator {
     return field.contains('.*.');
   }
 
-  _nestedArrayValidation(
-    mainField,
-    List fields,
-    String rule,
-    List<Map<String, dynamic>> items,
-  ) {
-    items.asMap().forEach((index, item) {
-      String field = fields.first;
-      String fieldNameWithPositionIndex = '$mainField.$index.$field';
-
-      /// this mean we already get field value to validate
-      if (fields.length == 1) {
-        var value = item.getParam(field);
-
-        _validateField(
-          field: fieldNameWithPositionIndex,
-          name: field.split('.').last,
-          value: value,
-          rule: rule,
-        );
-      }
-
-      /// this mean we still need to get the actual field value
-      else if (fields.length >= 2) {
-        List fieldsExceptMainField = fields.sublist(1);
-        List<Map<String, dynamic>> newItems = item.getParam(field);
-
-        _nestedArrayValidation(
-          fieldNameWithPositionIndex,
-          fieldsExceptMainField,
-          rule,
-          newItems,
-        );
-      }
-    });
-  }
-
-  _validateField({
-    required String field,
-    required String name,
-    dynamic value,
-    required String rule,
-  }) {
-    var rulesForEachName = rule.split('|');
-    for (String r in rulesForEachName) {
-      String? error = _applyMatchingRule(field, name, value, r);
+  _validateItem(ValidationItem item) {
+    var rulesForEachName = item.rule.split('|');
+    for (String rule in rulesForEachName) {
+      String? error =
+          _applyMatchingRule(item.field, item.name, item.value, rule);
       if (error != null) {
-        _errors[field] = error;
+        _errors[item.field] = error;
         break;
       }
     }
