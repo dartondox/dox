@@ -17,8 +17,11 @@ extension MapExtensions on Map {
     List<String> parts = keys.split(".");
     List<String> k = parts.sublist(0, parts.length - 1);
 
-    Map<String, dynamic> data = value;
+    var data = value;
     for (var i in k) {
+      if (data[i] is List) {
+        return data[i];
+      }
       data = data[i];
     }
     return data[parts.last];

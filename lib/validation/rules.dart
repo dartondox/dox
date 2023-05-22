@@ -9,7 +9,7 @@ class Rules {
   static bool isEmail(Map<String, dynamic> data, dynamic value, [args]) {
     final emailRegex = RegExp(
         r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,})$');
-    return emailRegex.hasMatch(value);
+    return emailRegex.hasMatch(value.toString());
   }
 
   static bool isString(Map<String, dynamic> data, dynamic value, [args]) {
@@ -79,7 +79,7 @@ class Rules {
 
   static bool isDate(Map<String, dynamic> data, dynamic value, [args]) {
     try {
-      DateTime? dateTime = DateTime.tryParse(value);
+      DateTime? dateTime = DateTime.tryParse(value.toString());
       return dateTime != null;
     } catch (e) {
       return false;
@@ -98,7 +98,7 @@ class Rules {
   static bool isUUID(Map<String, dynamic> data, dynamic value, [args]) {
     final uuidRegex = RegExp(
         r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
-    return uuidRegex.hasMatch(value);
+    return uuidRegex.hasMatch(value.toString());
   }
 
   static bool maxLength(Map<String, dynamic> data, dynamic value, [max]) {

@@ -3,6 +3,15 @@ import 'package:test/test.dart';
 
 void main() {
   group('Validation |', () {
+    test('required on null with dot', () {
+      var validator = DoxValidator({
+        'user': {'name': null}
+      });
+      validator.validate({"user.name": 'required'});
+      var errors = validator.getErrors();
+      expect(errors['user.name'], 'The name is required');
+    });
+
     test('required on null', () {
       var validator = DoxValidator({'email': null});
       validator.validate({"email": 'required'});
@@ -249,7 +258,7 @@ void main() {
       });
       var errors = validator.getErrors();
       expect(errors['info.name'], null);
-      expect(errors['info.email'], 'The info.email is required');
+      expect(errors['info.email'], 'The email is required');
     });
 
     test('invalid url', () {
@@ -501,6 +510,34 @@ void main() {
       validator.validate({"dob": 'required_if_not:type,login'});
       var errors = validator.getErrors();
       expect(errors['dob'], null);
+    });
+
+    test('with dots', () {
+      Map<String, dynamic> data = {
+        'products': [
+          {
+            "name": "iphone",
+            "items": [
+              {'title': 'charger'},
+              {'title': 'case'},
+            ]
+          },
+          {
+            "name": "xbox",
+            "items": [
+              {'title': 'cable'},
+              {'title': ''},
+            ]
+          }
+        ],
+      };
+      var validator = DoxValidator(data);
+      validator.validate({
+        "products.*.items.*.title": 'required',
+        "products.*.name": 'email',
+      });
+      var errors = validator.getErrors();
+      expect(errors.length, 3);
     });
   });
 }

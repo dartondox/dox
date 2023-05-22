@@ -6,12 +6,14 @@ void main() {
     test('get param by dot', () {
       Map<String, dynamic> map = {
         'user': {
-          'info': {'name': 'aj'}
+          'info': {'name': 'aj'},
+          'hobbies': ['reading', 'driving', 'dancing']
         }
       };
 
       expect(map.getParam('user.info.name'), 'aj');
       expect(map.getParam('user.info'), {'name': 'aj'});
+      expect(map.getParam('user.hobbies'), ['reading', 'driving', 'dancing']);
     });
 
     test('remove param by dot', () {

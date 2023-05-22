@@ -11,19 +11,49 @@ class DoxValidator {
 
   validate(Map<String, String> rules) {
     rules.forEach((field, rule) {
-      dynamic value = data.getParam(field);
-      var rulesForEachName = rule.split('|');
-      for (String r in rulesForEachName) {
-        String? error = _applyMatchingRule(field, value, r);
-        if (error != null) {
-          _errors[field] = error;
-          break;
-        }
+      if (field.contains('.*.')) {
+        var parts = field.split('.*.');
+        var list = data.getParam(parts[0]);
+        var firstPart = parts[0];
+        parts.removeAt(0);
+        _loopListForValidation(firstPart, rule, list, parts);
+      } else {
+        dynamic value = data.getParam(field);
+        String name = field.split('.').last;
+        _validateField(field, name, value, rule);
       }
     });
   }
 
-  String? _applyMatchingRule(String field, dynamic value, String rule) {
+  _loopListForValidation(
+      firstPart, rule, List<Map<String, dynamic>> items, List parts) {
+    items.asMap().forEach((index, fl) {
+      if (parts.length == 1) {
+        var value = fl[parts.first];
+        _validateField(
+            '$firstPart.$index.${parts.first}', parts.first, value, rule);
+      } else if (parts.length >= 2) {
+        List newParts = parts.sublist(1);
+        List<Map<String, dynamic>> i = fl.getParam(parts.first);
+        _loopListForValidation(
+            '$firstPart.$index.${parts.first}', rule, i, newParts);
+      }
+    });
+  }
+
+  _validateField(String field, String name, dynamic value, String rule) {
+    var rulesForEachName = rule.split('|');
+    for (String r in rulesForEachName) {
+      String? error = _applyMatchingRule(field, name, value, r);
+      if (error != null) {
+        _errors[field] = error;
+        break;
+      }
+    }
+  }
+
+  String? _applyMatchingRule(
+      String field, String name, dynamic value, String rule) {
     List parts = rule.split(':');
     String key = parts.first;
     String? args = parts.length >= 2 ? parts[1] : '';
@@ -36,7 +66,7 @@ class DoxValidator {
     if (result == false) {
       String error = match['message']
           .toString()
-          .replaceAll('{attribute}', field)
+          .replaceAll('{attribute}', name)
           .replaceAll('{value}', value == null ? '' : value.toString());
       if (args != null && args.isNotEmpty) {
         var arguments = _methodNoNeedToSplitArguments.contains(key)
