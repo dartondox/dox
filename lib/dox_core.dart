@@ -13,6 +13,7 @@ export 'exception/validation_exception.dart';
 export 'ioc/ioc_container.dart';
 export 'middleware/dox_middleware.dart';
 export 'request/dox_request.dart';
+export 'request/request_file.dart';
 export 'response/dox_cookie.dart';
 export 'response/dox_response.dart';
 export 'response/handler.dart';

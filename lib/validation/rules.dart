@@ -1,9 +1,14 @@
+import 'package:dox_core/dox_core.dart';
+
 class Rules {
   static bool isRequired(Map<String, dynamic> data, dynamic value, [args]) {
     if (value == null) {
       return false;
     }
-    return value.isNotEmpty;
+    if (value is List) {
+      return value.isNotEmpty;
+    }
+    return value.toString().isNotEmpty;
   }
 
   static bool isEmail(Map<String, dynamic> data, dynamic value, [args]) {
@@ -219,5 +224,46 @@ class Rules {
       return isRequired(data, value);
     }
     return true;
+  }
+
+  static bool isImage(Map<String, dynamic> data, dynamic value, [args]) {
+    if (value is! RequestFile) {
+      return false;
+    }
+    List<String> extensions = [
+      'jpg',
+      'jpeg',
+      'png',
+      'gif',
+      'bmp',
+      'svg',
+      'webp',
+      'tiff',
+      'ico'
+    ];
+    if (args.toString().isNotEmpty) {
+      extensions = args.split(',');
+    }
+    if (extensions.contains(value.extension)) {
+      return true;
+    }
+    return false;
+  }
+
+  /// not a file => false
+  /// if added supported extension in validation, check with extension
+  /// return true
+  static bool isFile(Map<String, dynamic> data, dynamic value, [args]) {
+    if (value is! RequestFile) {
+      return false;
+    }
+    if (args.toString().isEmpty) {
+      return true;
+    }
+    List<String> extensions = args.split(',');
+    if (extensions.contains(value.extension)) {
+      return true;
+    }
+    return false;
   }
 }

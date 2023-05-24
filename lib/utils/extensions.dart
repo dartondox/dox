@@ -29,14 +29,14 @@ extension MapExtensions on Map {
 }
 
 extension JoinWithAnd on List {
-  String joinWithAnd([String separator = ", "]) {
+  String joinWithAnd([String separator = ", ", String lastJoinText = 'and']) {
     List items = this;
     if (items.length <= 1) {
       return items.join();
     } else {
       final lastItem = items.removeLast();
       final joinedItems = items.join(separator);
-      return '$joinedItems, and $lastItem';
+      return '$joinedItems, $lastJoinText $lastItem';
     }
   }
 }

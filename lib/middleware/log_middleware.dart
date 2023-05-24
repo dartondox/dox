@@ -15,7 +15,6 @@ class LogMiddleware extends DoxMiddleware {
       'timestamp': DateTime.now().toIso8601String(),
       'payload': {
         'request': req.all(),
-        'headers': req.headers,
       }
     };
     if (filter != null) {
