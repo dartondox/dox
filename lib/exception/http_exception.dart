@@ -3,8 +3,10 @@ abstract class HttpException {
   String errorCode = 'server_error';
   dynamic message = 'Server Error';
 
-  @override
-  String toString() {
+  dynamic toResponse() {
+    if (message is Map) {
+      return message;
+    }
     return message.toString();
   }
 }

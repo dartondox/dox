@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/request/form_data_visitor.dart';
 import 'package:dox_core/validation/dox_validator.dart';
 
 class DoxRequest {
@@ -12,8 +13,7 @@ class DoxRequest {
   final HttpHeaders _headers;
   String method = 'GET';
   Uri uri;
-  Map body = {};
-  dynamic bodyString;
+  Map<String, dynamic> body = {};
   Map<String, dynamic> _allRequest = {};
   final Map<String, dynamic> _cookies = {};
 
@@ -28,14 +28,30 @@ class DoxRequest {
     i.param = route.params;
     i.method = route.method;
     i.query = request.uri.queryParameters;
-    var bodyString = await utf8.decoder.bind(request).join();
-    if (request.headers.contentType.toString().contains('json')) {
+
+    if (i.isJson()) {
+      var bodyString = await utf8.decoder.bind(request).join();
       i.body = jsonDecode(bodyString);
     }
-    i.bodyString = bodyString;
+
+    if (i.isFormData()) {
+      var visitor = FormDataVisitor(request);
+      await visitor.process();
+      i.body = visitor.inputs;
+    }
+
     i._allRequest = {...i.query, ...i.body};
     i._getCookies();
     return i;
+  }
+
+  bool isFormData() {
+    return httpRequest.headers.contentType?.mimeType.contains('form-data') ==
+        true;
+  }
+
+  bool isJson() {
+    return httpRequest.headers.contentType.toString().contains('json') == true;
   }
 
   /// Get all request from body and query
@@ -70,7 +86,7 @@ class DoxRequest {
   /// ```
   /// req.input('email');
   /// ```
-  String? input(key) {
+  dynamic input(key) {
     return _allRequest[key];
   }
 

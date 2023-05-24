@@ -43,13 +43,12 @@ class RouterResponse {
     /// which will parse into json and response as json
     if (payload is HttpException) {
       res.statusCode = payload.code;
-      payload = payload.toString();
+      payload = payload.toResponse();
     }
 
     if (payload is Exception || payload is Error) {
       res.statusCode = HttpStatus.internalServerError;
-      List<String?> parts = payload.toString().split(': ');
-      payload = parts.length >= 2 ? parts[1] : payload.toString();
+      payload = payload.toString();
     }
 
     String responseData;

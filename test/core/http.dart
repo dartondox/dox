@@ -70,7 +70,7 @@ httpTest() {
     var response = await http.get(url);
 
     expect(response.statusCode, 500);
-    expect(response.body, 'something went wrong');
+    expect(response.body, 'Exception: something went wrong');
   });
 
   test('http exception', () async {

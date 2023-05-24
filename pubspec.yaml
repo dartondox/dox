@@ -12,6 +12,9 @@ dependencies:
   dart_dotenv: ^1.0.1
   path: ^1.8.3
   sprintf: ^7.0.0
+  mime: ^1.0.4
+  string_scanner: ^1.1.0
+  uuid: ^3.0.6
 
 dev_dependencies:
   lints: ^2.0.0

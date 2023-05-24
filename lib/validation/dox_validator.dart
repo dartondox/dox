@@ -70,28 +70,31 @@ class DoxValidator {
   String? _applyMatchingRule(
       String field, String name, dynamic value, String rule) {
     List parts = rule.split(':');
-    String key = parts.first;
-    String? args = parts.length >= 2 ? parts[1] : '';
-    var match = _matchings[key];
+    String ruleKey = parts.first.toString().toLowerCase();
+    String args = parts.length >= 2 ? parts[1] : '';
+    var match = _matchings[ruleKey];
     if (match == null) {
-      DoxLogger.warn("$key rule doesn't exist.");
+      DoxLogger.warn("$ruleKey rule doesn't exist.");
       return null;
     }
+
     bool result = Function.apply(match['function'], [data, value, args]);
-    if (result == false) {
-      String error = match['message']
-          .toString()
-          .replaceAll('{attribute}', name)
-          .replaceAll('{value}', value == null ? '' : value.toString());
-      if (args != null && args.isNotEmpty) {
-        var arguments = _methodNoNeedToSplitArguments.contains(key)
-            ? [args.split(',').joinWithAnd()]
-            : args.split(',');
-        return sprintf(error, arguments);
-      }
-      return error;
+    if (result == true) {
+      return null;
     }
-    return null;
+    String error = match['message']
+        .toString()
+        .replaceAll('{attribute}', name)
+        .replaceAll('{value}', value == null ? '' : value.toString());
+
+    if (args.isNotEmpty) {
+      var arguments = _methodNoNeedToSplitArguments.contains(ruleKey)
+          ? [args.split(',').joinWithAnd()]
+          : args.split(',');
+      return sprintf(error, arguments);
+    }
+
+    return error;
   }
 
   final Map<String, Map<String, dynamic>> _matchings = {
@@ -218,6 +221,14 @@ class DoxValidator {
     'required_if_not': {
       'message': 'The {attribute} is required',
       'function': Rules.requiredIfNot,
+    },
+    'image': {
+      'message': 'The {attribute} is either invalid or unsupported extension',
+      'function': Rules.isImage,
+    },
+    'file': {
+      'message': 'The {attribute} is either invalid or unsupported extension',
+      'function': Rules.isFile,
     },
   };
 }
