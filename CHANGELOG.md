@@ -1,3 +1,9 @@
+# version 1.0.0-alpha.1
+
+- Added support for validation
+- Added support for form data for file uploading
+- Improve error handling
+
 # version 1.0.0-alpha.0
 
 - Refactor the code
