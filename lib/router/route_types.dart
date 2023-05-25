@@ -1,3 +1,5 @@
+import 'package:dox_core/dox_core.dart';
+
 abstract class Router {
   String get prefix => '';
   List get middleware => [];
@@ -11,6 +13,7 @@ class RouteData {
   Map<String, dynamic> params = {};
   final List preMiddleware;
   final List postMiddleware;
+  final FormRequest? formRequest;
 
   RouteData(
     this.method,
@@ -18,5 +21,6 @@ class RouteData {
     this.controllers, {
     this.preMiddleware = const [],
     this.postMiddleware = const [],
+    this.formRequest,
   });
 }

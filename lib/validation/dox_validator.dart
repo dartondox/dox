@@ -29,6 +29,14 @@ class DoxValidator {
     };
   }
 
+  setMessages(Map<String, String> messages) {
+    messages.forEach((key, value) {
+      if (_matchings[key] != null) {
+        _matchings[key]?['message'] = value;
+      }
+    });
+  }
+
   validate(Map<String, String> rules) {
     rules.forEach((field, rule) {
       if (_isNestedValidation(field)) {

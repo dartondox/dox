@@ -7,26 +7,28 @@ import 'package:dox_core/validation/dox_validator.dart';
 
 class DoxRequest {
   final HttpRequest httpRequest;
-  final HttpResponse httpResponse;
+
+  String method = 'GET';
+  Uri get uri => httpRequest.uri;
+  HttpResponse get response => httpRequest.response;
+
   Map<String, dynamic> param = {};
   Map<String, dynamic> query = {};
-  final HttpHeaders _headers;
-  String method = 'GET';
-  Uri uri;
   Map<String, dynamic> body = {};
+
   Map<String, dynamic> _allRequest = {};
+  HttpHeaders get _headers => httpRequest.headers;
   final Map<String, dynamic> _cookies = {};
 
-  DoxRequest(this.httpRequest, this.httpResponse, this.uri, this._headers);
+  DoxRequest(this.httpRequest);
 
   static Future<DoxRequest> httpRequestToDoxRequest(
     HttpRequest request,
     RouteData route,
   ) async {
-    DoxRequest i =
-        DoxRequest(request, request.response, request.uri, request.headers);
+    DoxRequest i = DoxRequest(request);
     i.param = route.params;
-    i.method = route.method;
+    i.method = route.method.toUpperCase();
     i.query = request.uri.queryParameters;
 
     if (i.isJson()) {
@@ -78,7 +80,7 @@ class DoxRequest {
   /// ```
   /// req.ip();
   /// ```
-  String? ip() {
+  String ip() {
     return httpRequest.connectionInfo?.remoteAddress.address ?? 'unknown';
   }
 
@@ -90,7 +92,7 @@ class DoxRequest {
     return _allRequest[key];
   }
 
-  /// Determining If Input Is Present
+  /// Check if input is present
   /// ```
   /// if(req.has('email')) {
   ///   /// do something
@@ -150,8 +152,12 @@ class DoxRequest {
     return _cookies[key];
   }
 
-  validate(Map<String, String> rules) {
+  validate(Map<String, String> rules,
+      {Map<String, String> messages = const {}}) {
     var validator = DoxValidator(all());
+    if (messages.isNotEmpty) {
+      validator.setMessages(messages);
+    }
     validator.validate(rules);
     if (validator.hasError) {
       throw ValidationException(message: validator.errors);
@@ -169,5 +175,15 @@ class DoxRequest {
       String value = cookie.substring(equalsIndex + 1);
       _cookies[name] = value;
     }
+  }
+
+  mapInputs(Map<String, String> mapper) {
+    mapper.forEach((from, to) {
+      if (from != to) {
+        var temp = _allRequest[from];
+        _allRequest[to] = temp;
+        _allRequest.remove(from);
+      }
+    });
   }
 }
