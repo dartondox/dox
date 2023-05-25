@@ -8,14 +8,14 @@
 
 ## About Dox
 
-Dox is a powerful framework specifically developed for dark web application backend development. It provides a comprehensive set of tools and features to streamline the development process and enhance the security and anonymity of dark web applications.
+Dox is a powerful framework specifically developed for web application backend development with Dart. It provides a comprehensive set of tools and features to streamline the development process.
 
 ## Features
 
 
 - **Modular Architecture**: Dox follows a modular architecture, making it easy to extend and customize functionalities based on project requirements.
-- **Scalability**: The framework is designed to handle high traffic and scale effortlessly as your dark web application grows.
-- **Developer-Friendly**: With its intuitive APIs and clear documentation, Dox makes it easier for developers to create and maintain dark web applications.
+- **Scalability**: The framework is designed to handle high traffic and scale effortlessly as your web application grows.
+- **Developer-Friendly**: With its intuitive APIs and clear documentation, Dox makes it easier for developers to create and maintain web applications.
 - **Simple, fast routing**: Dox offers a simple and efficient routing system, allowing developers to define and handle routes easily for building robust web applications. 
 - **ORM Support with Strong Query Builder**: Dox provides an ORM (Object-Relational Mapping) system along with a powerful query builder, enabling developers to interact with databases efficiently.
 - **Validation of Request Data**: Dox includes built-in validation capabilities, allowing developers to validate incoming request data easily and ensure data integrity.
