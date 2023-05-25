@@ -28,6 +28,10 @@ Dox is a powerful framework specifically developed for web application backend d
 
 For detailed information about the framework and its functionalities, refer to the [Dox Documentation](https://dartondox.dev).
 
+## Security Vulnerabilities
+
+We take the security of our software seriously. If you identify any security vulnerabilities in our application, please notify us immediately by sending an email to support@dartondox.dev. We appreciate your responsible disclosure and will respond promptly to address and resolve any identified security issues. Your cooperation helps us maintain the integrity and safety of our software for all users.
+
 ## Contributing
 
 We welcome contributions from the community! If you'd like to contribute to the Dox framework, please fork the repo and PR to us.
