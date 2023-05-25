@@ -1,5 +1,5 @@
 <div align="center">
-<img style='margin-bottom: 15px' src="https://raw.githubusercontent.com/dartondox/assets/main/dox-logo.png" width="70" />
+<img style='margin-bottom: 20px' src="https://raw.githubusercontent.com/dartondox/assets/main/dox-logo.png" width="70" />
 <div style="display:inliine-block">
 <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" height="20"/> <img src="https://github.com/dartondox/dox-core/actions/workflows/test.yaml/badge.svg?branch=v1.x" height="20"/> <img src="https://img.shields.io/github/stars/dartondox/dox-core.svg" height="20"/> <img src="https://img.shields.io/github/forks/dartondox/dox-core.svg" height="20"/> <img src="https://img.shields.io/github/license/dartondox/dox-core.svg" height="20"/>
 </div>
