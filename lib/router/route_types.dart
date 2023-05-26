@@ -14,12 +14,14 @@ class RouteData {
   final List preMiddleware;
   final List postMiddleware;
   FormRequest Function()? formRequest;
+  final String? resourceKey;
 
-  RouteData(
-    this.method,
-    this.path,
-    this.controllers, {
+  RouteData({
+    required this.method,
+    required this.path,
+    required this.controllers,
     this.preMiddleware = const [],
     this.postMiddleware = const [],
+    this.resourceKey,
   });
 }

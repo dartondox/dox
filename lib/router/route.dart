@@ -12,11 +12,12 @@ class Route {
 
   List<RouteData> routes = [];
 
-  bool resourceAdded = false;
+  String? _resourceKey;
 
   formRequest(FormRequest Function() formRequest) {
-    if (resourceAdded) {
-      List<RouteData> resourceRoutes = routes.sublist(routes.length - 8);
+    if (_resourceKey != null) {
+      List<RouteData> resourceRoutes =
+          routes.where((r) => r.resourceKey == _resourceKey).toList();
       for (RouteData r in resourceRoutes) {
         r.formRequest = formRequest;
       }
@@ -31,9 +32,9 @@ class Route {
     return "/${path.replaceAll(RegExp('^\\/+|\\/+\$'), '')}";
   }
 
-  Route _addRoute(method, String route, controller) {
-    Route().resourceAdded = false;
-    route = Route.sanitizeRoutePath(route);
+  Route _addRoute(method, String path, controller, {String? resourceKey}) {
+    Route()._resourceKey = null;
+    path = Route.sanitizeRoutePath(path);
     List controllers = [];
     controllers.addAll(_preMiddleware);
     if (controller is Function) {
@@ -43,9 +44,10 @@ class Route {
       controllers.addAll(controller);
     }
     routes.add(RouteData(
-      method,
-      route,
-      controllers,
+      method: method,
+      path: path,
+      controllers: controllers,
+      resourceKey: resourceKey,
     ));
     return this;
   }
@@ -127,39 +129,39 @@ class Route {
   }
 
   static Route resource(route, controller) {
-    route = "/$route";
+    var prefix = "${Route()._prefix}/$route";
 
     /// GET /resource
-    Route()._addRoute('GET', Route()._prefix + route, controller.index);
+    Route()._addRoute('GET', prefix, controller.index, resourceKey: prefix);
 
     /// GET /resource/create
-    Route()._addRoute(
-        'GET', '${Route()._prefix + route}/create', controller.create);
+    Route()._addRoute('GET', '$prefix/create', controller.create,
+        resourceKey: prefix);
 
     /// POST /resource
-    Route()._addRoute('POST', Route()._prefix + route, controller.store);
+    Route()._addRoute('POST', prefix, controller.store, resourceKey: prefix);
 
     /// GET /resource/{id}
     Route()
-        ._addRoute('GET', '${Route()._prefix + route}/{id}', controller.show);
+        ._addRoute('GET', '$prefix/{id}', controller.show, resourceKey: prefix);
 
     /// GET /resource/{id}/edit
-    Route()._addRoute(
-        'GET', '${Route()._prefix + route}/{id}/edit', controller.edit);
+    Route()._addRoute('GET', '$prefix/{id}/edit', controller.edit,
+        resourceKey: prefix);
 
     /// PUT /resource/{id}
-    Route()
-        ._addRoute('PUT', '${Route()._prefix + route}/{id}', controller.update);
+    Route()._addRoute('PUT', '$prefix/{id}', controller.update,
+        resourceKey: prefix);
 
     /// PATCH /resource/{id}
-    Route()._addRoute(
-        'PATCH', '${Route()._prefix + route}/{id}', controller.update);
+    Route()._addRoute('PATCH', '$prefix/{id}', controller.update,
+        resourceKey: prefix);
 
     /// DELETE /resource/{id}
-    Route()._addRoute(
-        'DELETE', '${Route()._prefix + route}/{id}', controller.destroy);
+    Route()._addRoute('DELETE', '$prefix/{id}', controller.destroy,
+        resourceKey: prefix);
 
-    Route().resourceAdded = true;
+    Route()._resourceKey = prefix;
 
     return Route();
   }
