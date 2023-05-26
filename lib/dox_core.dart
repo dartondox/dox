@@ -18,6 +18,7 @@ export 'request/request_file.dart';
 export 'response/dox_cookie.dart';
 export 'response/dox_response.dart';
 export 'response/handler.dart';
+export 'response/serializer.dart';
 export 'router/route.dart';
 export 'router/route_types.dart';
 export 'router/router_response.dart';

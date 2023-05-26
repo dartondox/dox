@@ -51,6 +51,11 @@ class RouterResponse {
       payload = payload.toString();
     }
 
+    if (payload is Serializer) {
+      res.headers.contentType = ContentType.json;
+      payload = payload.toJson();
+    }
+
     String responseData;
 
     /// if payload is Map or List, parse into json
