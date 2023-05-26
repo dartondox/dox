@@ -152,6 +152,12 @@ class DoxRequest {
     return _cookies[key];
   }
 
+  /// validate input request
+  /// ```
+  /// req.validate({'title': 'required'});
+  /// req.validate({'title': 'required'},
+  ///   messages : {'required' : 'The {attribute} is required'});
+  /// ```
   validate(Map<String, String> rules,
       {Map<String, String> messages = const {}}) {
     var validator = DoxValidator(all());
@@ -177,7 +183,7 @@ class DoxRequest {
     }
   }
 
-  mapInputs(Map<String, String> mapper) {
+  void mapInputs(Map<String, String> mapper) {
     mapper.forEach((from, to) {
       if (from != to) {
         var temp = _allRequest[from];

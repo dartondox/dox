@@ -4,9 +4,6 @@ class BlogRequest extends FormRequest {
   String? title;
 
   @override
-  bool get useAsControllerRequest => true;
-
-  @override
   setUp() {
     title = input('title');
   }

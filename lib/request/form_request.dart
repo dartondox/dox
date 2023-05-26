@@ -1,7 +1,7 @@
 import 'package:dox_core/request/dox_request.dart';
 
 abstract class FormRequest {
-  bool get useAsControllerRequest => false;
+  bool get useAsControllerRequest => true;
 
   void setUp() {}
 
@@ -19,11 +19,11 @@ abstract class FormRequest {
 
   late DoxRequest request;
 
-  setRequest(DoxRequest req) {
+  void setRequest(DoxRequest req) {
     request = req;
   }
 
-  String method = 'GET';
+  String get method => request.method;
   Uri get uri => request.uri;
 
   Map<String, dynamic> get param => request.param;
@@ -62,6 +62,11 @@ abstract class FormRequest {
   /// check if input is present
   bool has(String key) {
     return request.has(key);
+  }
+
+  // get cookie
+  String cookie(dynamic key, {bool decrypt = true}) {
+    return request.cookie(key, decrypt: decrypt);
   }
 
   /// Get header value
