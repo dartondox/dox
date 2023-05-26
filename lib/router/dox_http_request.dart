@@ -112,7 +112,7 @@ class DoxHttpRequest {
       if (controller is Function) {
         /// when it is a function and last item, it mean it is a final controller
         if (controller == route.controllers.last) {
-          await _handleController(controller, doxReq, httpRequest);
+          await _handleController(route, controller, doxReq, httpRequest);
 
           /// end the loop
           break;
@@ -144,12 +144,37 @@ class DoxHttpRequest {
   }
 
   Future _handleController(
+    RouteData route,
     controller,
     DoxRequest doxRequest,
     HttpRequest httpRequest,
   ) async {
     List args = doxRequest.param.values.toList();
-    var result = await Function.apply(controller, [doxRequest, ...args]);
+    FormRequest? formReq = route.formRequest;
+
+    if (formReq != null) {
+      /// mapping request inputs field
+      doxRequest.mapInputs(formReq.mapInputs());
+
+      /// setting dox request to custom form request
+      formReq.setRequest(doxRequest);
+
+      /// run setup();
+      formReq.setUp();
+
+      /// finally validate;
+      doxRequest.validate(
+        formReq.rules(),
+        messages: formReq.messages(),
+      );
+    }
+
+    dynamic result;
+    if (formReq != null && formReq.useAsControllerRequest) {
+      result = await Function.apply(controller, [formReq, ...args]);
+    } else {
+      result = await Function.apply(controller, [doxRequest, ...args]);
+    }
     RouterResponse.send(result, httpRequest);
   }
 }

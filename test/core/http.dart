@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 
 import 'config/app.dart';
 import 'controllers/example.controller.dart';
+import 'requests/blog_request.dart';
 
 httpTest() {
   Config config = Config();
@@ -159,5 +160,24 @@ httpTest() {
 
     expect(res.statusCode, 200);
     expect(res.body, 'pong');
+  });
+
+  test('custom request', () async {
+    Route.post('/custom_request', (BlogRequest req) {
+      expect(req.title, 'dox');
+      return req.title;
+    }, request: BlogRequest());
+
+    var url = Uri.parse('$baseUrl/custom_request');
+    var res = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        "title": 'dox',
+      }),
+    );
+
+    expect(res.statusCode, 200);
+    expect(res.body, 'dox');
   });
 }
