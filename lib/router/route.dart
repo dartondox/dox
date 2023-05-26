@@ -12,12 +12,27 @@ class Route {
 
   List<RouteData> routes = [];
 
+  bool resourceAdded = false;
+
+  formRequest(FormRequest Function() formRequest) {
+    if (resourceAdded) {
+      List<RouteData> resourceRoutes = routes.sublist(routes.length - 8);
+      for (RouteData r in resourceRoutes) {
+        r.formRequest = formRequest;
+      }
+    } else {
+      RouteData latestRoute = routes.last;
+      latestRoute.formRequest = formRequest;
+    }
+  }
+
   static sanitizeRoutePath(String path) {
     path = path.replaceAll(RegExp(r'/+'), '/');
     return "/${path.replaceAll(RegExp('^\\/+|\\/+\$'), '')}";
   }
 
-  _addRoute(method, String route, controller, {FormRequest? request}) {
+  Route _addRoute(method, String route, controller) {
+    Route().resourceAdded = false;
     route = Route.sanitizeRoutePath(route);
     List controllers = [];
     controllers.addAll(_preMiddleware);
@@ -31,8 +46,8 @@ class Route {
       method,
       route,
       controllers,
-      formRequest: request,
     ));
+    return this;
   }
 
   static group(prefix, Function(SubRoute) callback) {
@@ -47,47 +62,6 @@ class Route {
     Route()._prefix = prefix;
   }
 
-  static resource(route, controller, {FormRequest? request}) {
-    route = "/$route";
-
-    /// GET /resource
-    Route()._addRoute('GET', Route()._prefix + route, controller.index,
-        request: request);
-
-    /// GET /resource/create
-    Route()._addRoute(
-        'GET', '${Route()._prefix + route}/create', controller.create,
-        request: request);
-
-    /// POST /resource
-    Route()._addRoute('POST', Route()._prefix + route, controller.store,
-        request: request);
-
-    /// GET /resource/{id}
-    Route()._addRoute('GET', '${Route()._prefix + route}/{id}', controller.show,
-        request: request);
-
-    /// GET /resource/{id}/edit
-    Route()._addRoute(
-        'GET', '${Route()._prefix + route}/{id}/edit', controller.edit,
-        request: request);
-
-    /// PUT /resource/{id}
-    Route()._addRoute(
-        'PUT', '${Route()._prefix + route}/{id}', controller.update,
-        request: request);
-
-    /// PATCH /resource/{id}
-    Route()._addRoute(
-        'PATCH', '${Route()._prefix + route}/{id}', controller.update,
-        request: request);
-
-    /// DELETE /resource/{id}
-    Route()._addRoute(
-        'DELETE', '${Route()._prefix + route}/{id}', controller.destroy,
-        request: request);
-  }
-
   static websocket({
     required DoxWebsocket websocket,
     String route = 'ws',
@@ -96,73 +70,97 @@ class Route {
     Route()._addRoute('GET', route, [...middleware, websocket.handle]);
   }
 
-  static get(route, controller, {FormRequest? request}) {
-    Route()._addRoute('GET', Route()._prefix + route, controller,
-        request: request);
+  static Route get(route, controller) {
+    return Route()._addRoute('GET', Route()._prefix + route, controller);
   }
 
-  static post(route, controller, {FormRequest? request}) {
-    Route()._addRoute('POST', Route()._prefix + route, controller,
-        request: request);
+  static Route post(route, controller, {Function? request}) {
+    return Route()._addRoute('POST', Route()._prefix + route, controller);
   }
 
-  static put(route, controller, {FormRequest? request}) {
-    Route()._addRoute('PUT', Route()._prefix + route, controller,
-        request: request);
+  static Route put(route, controller) {
+    return Route()._addRoute('PUT', Route()._prefix + route, controller);
   }
 
-  static delete(route, controller, {FormRequest? request}) {
-    Route()._addRoute('DELETE', Route()._prefix + route, controller,
-        request: request);
+  static Route delete(route, controller) {
+    return Route()._addRoute('DELETE', Route()._prefix + route, controller);
   }
 
-  static purge(route, controller, {FormRequest? request}) {
-    Route()._addRoute('PURGE', Route()._prefix + route, controller,
-        request: request);
+  static Route purge(route, controller) {
+    return Route()._addRoute('PURGE', Route()._prefix + route, controller);
   }
 
-  static patch(route, controller, {FormRequest? request}) {
-    Route()._addRoute('PATCH', Route()._prefix + route, controller,
-        request: request);
+  static Route patch(route, controller) {
+    return Route()._addRoute('PATCH', Route()._prefix + route, controller);
   }
 
-  static options(route, controller, {FormRequest? request}) {
-    Route()._addRoute('OPTIONS', Route()._prefix + route, controller,
-        request: request);
+  static Route options(route, controller) {
+    return Route()._addRoute('OPTIONS', Route()._prefix + route, controller);
   }
 
-  static copy(route, controller, {FormRequest? request}) {
-    Route()._addRoute('COPY', Route()._prefix + route, controller,
-        request: request);
+  static Route copy(route, controller) {
+    return Route()._addRoute('COPY', Route()._prefix + route, controller);
   }
 
-  static view(route, controller, {FormRequest? request}) {
-    Route()._addRoute('VIEW', Route()._prefix + route, controller,
-        request: request);
+  static Route view(route, controller) {
+    return Route()._addRoute('VIEW', Route()._prefix + route, controller);
   }
 
-  static link(route, controller, {FormRequest? request}) {
-    Route()._addRoute('LINK', Route()._prefix + route, controller,
-        request: request);
+  static Route link(route, controller) {
+    return Route()._addRoute('LINK', Route()._prefix + route, controller);
   }
 
-  static unlink(route, controller, {FormRequest? request}) {
-    Route()._addRoute('UNLINK', Route()._prefix + route, controller,
-        request: request);
+  static Route unlink(route, controller) {
+    return Route()._addRoute('UNLINK', Route()._prefix + route, controller);
   }
 
-  static lock(route, controller, {FormRequest? request}) {
-    Route()._addRoute('UNLINK', Route()._prefix + route, controller,
-        request: request);
+  static Route lock(route, controller) {
+    return Route()._addRoute('UNLINK', Route()._prefix + route, controller);
   }
 
-  static unlock(route, controller, {FormRequest? request}) {
-    Route()._addRoute('UNLOCK', Route()._prefix + route, controller,
-        request: request);
+  static Route unlock(route, controller) {
+    return Route()._addRoute('UNLOCK', Route()._prefix + route, controller);
   }
 
-  static propfind(route, controller, {FormRequest? request}) {
-    Route()._addRoute('PROPFIND', Route()._prefix + route, controller,
-        request: request);
+  static Route propfind(route, controller) {
+    return Route()._addRoute('PROPFIND', Route()._prefix + route, controller);
+  }
+
+  static Route resource(route, controller) {
+    route = "/$route";
+
+    /// GET /resource
+    Route()._addRoute('GET', Route()._prefix + route, controller.index);
+
+    /// GET /resource/create
+    Route()._addRoute(
+        'GET', '${Route()._prefix + route}/create', controller.create);
+
+    /// POST /resource
+    Route()._addRoute('POST', Route()._prefix + route, controller.store);
+
+    /// GET /resource/{id}
+    Route()
+        ._addRoute('GET', '${Route()._prefix + route}/{id}', controller.show);
+
+    /// GET /resource/{id}/edit
+    Route()._addRoute(
+        'GET', '${Route()._prefix + route}/{id}/edit', controller.edit);
+
+    /// PUT /resource/{id}
+    Route()
+        ._addRoute('PUT', '${Route()._prefix + route}/{id}', controller.update);
+
+    /// PATCH /resource/{id}
+    Route()._addRoute(
+        'PATCH', '${Route()._prefix + route}/{id}', controller.update);
+
+    /// DELETE /resource/{id}
+    Route()._addRoute(
+        'DELETE', '${Route()._prefix + route}/{id}', controller.destroy);
+
+    Route().resourceAdded = true;
+
+    return Route();
   }
 }

@@ -149,10 +149,13 @@ class DoxHttpRequest {
     DoxRequest doxRequest,
     HttpRequest httpRequest,
   ) async {
+    dynamic result;
     List args = doxRequest.param.values.toList();
-    FormRequest? formReq = route.formRequest;
+    FormRequest Function()? creator = route.formRequest;
 
-    if (formReq != null) {
+    if (creator != null) {
+      FormRequest formReq = creator();
+
       /// mapping request inputs field
       doxRequest.mapInputs(formReq.mapInputs());
 
@@ -167,14 +170,15 @@ class DoxHttpRequest {
         formReq.rules(),
         messages: formReq.messages(),
       );
+
+      if (formReq.useAsControllerRequest) {
+        result = await Function.apply(controller, [formReq, ...args]);
+        RouterResponse.send(result, httpRequest);
+        return;
+      }
     }
 
-    dynamic result;
-    if (formReq != null && formReq.useAsControllerRequest) {
-      result = await Function.apply(controller, [formReq, ...args]);
-    } else {
-      result = await Function.apply(controller, [doxRequest, ...args]);
-    }
+    result = await Function.apply(controller, [doxRequest, ...args]);
     RouterResponse.send(result, httpRequest);
   }
 }

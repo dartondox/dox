@@ -13,7 +13,7 @@ class RouteData {
   Map<String, dynamic> params = {};
   final List preMiddleware;
   final List postMiddleware;
-  final FormRequest? formRequest;
+  FormRequest Function()? formRequest;
 
   RouteData(
     this.method,
@@ -21,6 +21,5 @@ class RouteData {
     this.controllers, {
     this.preMiddleware = const [],
     this.postMiddleware = const [],
-    this.formRequest,
   });
 }

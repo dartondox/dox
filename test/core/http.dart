@@ -166,7 +166,7 @@ httpTest() {
     Route.post('/custom_request', (BlogRequest req) {
       expect(req.title, 'dox');
       return req.title;
-    }, request: BlogRequest());
+    }).formRequest(() => BlogRequest());
 
     var url = Uri.parse('$baseUrl/custom_request');
     var res = await http.post(

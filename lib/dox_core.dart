@@ -25,5 +25,6 @@ export 'router/sub_route.dart';
 export 'server/dox_server.dart';
 export 'utils/aes_encryptor.dart';
 export 'utils/extensions.dart';
+export 'utils/global.dart';
 export 'utils/hash.dart';
 export 'websocket/dox_websocket.dart';

@@ -5,67 +5,67 @@ class SubRoute {
 
   const SubRoute(this.prefix);
 
-  resource(route, controller, {FormRequest? request}) {
-    Route.resource('$prefix/$route', controller, request: request);
-  }
-
-  get(route, controller, {FormRequest? request}) {
-    Route.get('$prefix/$route', controller, request: request);
-  }
-
-  post(route, controller, {FormRequest? request}) {
-    Route.post('$prefix/$route', controller, request: request);
-  }
-
-  put(route, controller, {FormRequest? request}) {
-    Route.put('$prefix/$route', controller, request: request);
-  }
-
-  delete(route, controller, {FormRequest? request}) {
-    Route.delete('$prefix/$route', controller, request: request);
-  }
-
   group(p, Function(SubRoute) callback) {
     callback(SubRoute('$prefix/$p'));
   }
 
-  purge(route, controller, {FormRequest? request}) {
-    Route.purge('$prefix/$route', controller, request: request);
+  Route resource(route, controller) {
+    return Route.resource('$prefix/$route', controller);
   }
 
-  patch(route, controller, {FormRequest? request}) {
-    Route.patch('$prefix/$route', controller, request: request);
+  Route get(route, controller) {
+    return Route.get('$prefix/$route', controller);
   }
 
-  options(route, controller, {FormRequest? request}) {
-    Route.options('$prefix/$route', controller, request: request);
+  Route post(route, controller) {
+    return Route.post('$prefix/$route', controller);
   }
 
-  copy(route, controller, {FormRequest? request}) {
-    Route.copy('$prefix/$route', controller, request: request);
+  Route put(route, controller) {
+    return Route.put('$prefix/$route', controller);
   }
 
-  view(route, controller, {FormRequest? request}) {
-    Route.view('$prefix/$route', controller, request: request);
+  Route delete(route, controller) {
+    return Route.delete('$prefix/$route', controller);
   }
 
-  link(route, controller, {FormRequest? request}) {
-    Route.link('$prefix/$route', controller, request: request);
+  Route purge(route, controller) {
+    return Route.purge('$prefix/$route', controller);
   }
 
-  unlink(route, controller, {FormRequest? request}) {
-    Route.unlink('$prefix/$route', controller, request: request);
+  Route patch(route, controller) {
+    return Route.patch('$prefix/$route', controller);
   }
 
-  lock(route, controller, {FormRequest? request}) {
-    Route.lock('$prefix/$route', controller, request: request);
+  Route options(route, controller) {
+    return Route.options('$prefix/$route', controller);
   }
 
-  unlock(route, controller, {FormRequest? request}) {
-    Route.unlock('$prefix/$route', controller, request: request);
+  Route copy(route, controller) {
+    return Route.copy('$prefix/$route', controller);
   }
 
-  propfind(route, controller, {FormRequest? request}) {
-    Route.propfind('$prefix/$route', controller, request: request);
+  Route view(route, controller) {
+    return Route.view('$prefix/$route', controller);
+  }
+
+  Route link(route, controller) {
+    return Route.link('$prefix/$route', controller);
+  }
+
+  Route unlink(route, controller) {
+    return Route.unlink('$prefix/$route', controller);
+  }
+
+  Route lock(route, controller) {
+    return Route.lock('$prefix/$route', controller);
+  }
+
+  Route unlock(route, controller) {
+    return Route.unlock('$prefix/$route', controller);
+  }
+
+  Route propfind(route, controller) {
+    return Route.propfind('$prefix/$route', controller);
   }
 }
