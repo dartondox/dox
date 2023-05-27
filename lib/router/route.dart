@@ -2,6 +2,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/router/sub_route.dart';
 import 'package:dox_core/utils/utils.dart';
+import 'package:dox_core/websocket/dox_websocket.dart';
 
 class Route {
   /// Singleton
@@ -52,14 +53,16 @@ class Route {
 
   /// add websocket route
   /// ```
-  /// Route.websocket(websocket: DoxWebsocket());
+  /// Route.websocket('ws', (socket) {
+  ///   socket.on('intro', controller);
+  /// });
   /// ```
-  static websocket({
-    required DoxWebsocket websocket,
-    String route = 'ws',
-    List middleware = const [],
-  }) {
-    Route()._addRoute('GET', route, [...middleware, websocket.handle]);
+  static websocket(String route, Function(DoxWebsocket) callback,
+      {List middleware = const []}) {
+    var ws = DoxWebsocket(route);
+    Route()
+        ._addRoute('GET', Route()._prefix + route, [...middleware, ws.handle]);
+    callback(ws);
   }
 
   /// get route

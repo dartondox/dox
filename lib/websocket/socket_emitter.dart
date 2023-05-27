@@ -1,17 +1,20 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/utils/logger.dart';
+import 'package:dox_core/websocket/socket_storage.dart';
 
 class SocketEmitter {
-  String? _roomId;
+  String? roomId;
 
   final String? sender;
 
-  SocketEmitter({this.sender});
+  SocketEmitter({this.sender, this.roomId});
 
-  SocketEmitter room(roomId) {
-    _roomId = roomId;
+  SocketStorage storage = SocketStorage();
+
+  SocketEmitter room(id) {
+    roomId = id;
     return this;
   }
 
@@ -26,12 +29,16 @@ class SocketEmitter {
       "event": event,
       "message": message,
     });
-    List<String> members = DoxWebsocket().rooms[_roomId] ?? [];
+    if (roomId == null) {
+      DoxLogger.warn('set a room to emit');
+      return;
+    }
+    List<String> members = storage.getConnectionsFromRoom(roomId!);
     for (String socketId in members) {
       if (!exclude.contains(socketId)) {
-        var data = DoxWebsocket().activeConnections[socketId];
-        if (data != null) {
-          WebSocket websocket = data['websocket'] as WebSocket;
+        var connection = storage.getConnection(socketId);
+        if (connection != null) {
+          WebSocket websocket = connection['websocket'] as WebSocket;
           websocket.add(payload);
         }
       }

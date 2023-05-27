@@ -38,5 +38,4 @@ export 'utils/global.dart';
 export 'utils/hash.dart';
 
 /// Websocket
-export 'websocket/dox_websocket.dart';
 export 'websocket/socket_emitter.dart';

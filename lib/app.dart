@@ -27,23 +27,6 @@ class Dox {
     dox._registerRoute();
   }
 
-  /// register websocket
-  /// ```
-  /// dox.websocket(websocket: DoxWebsocket());
-  /// ```
-  Dox websocket({
-    required DoxWebsocket websocket,
-    String route = 'ws',
-    List middleware = const [],
-  }) {
-    Route.websocket(
-      websocket: websocket,
-      route: route,
-      middleware: middleware,
-    );
-    return this;
-  }
-
   _registerRoute() {
     List<Router> routers = _config.routers;
     for (Router router in routers) {
