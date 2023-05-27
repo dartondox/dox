@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/router/dox_http_request.dart';
+import 'package:dox_core/router/http_request_handler.dart';
 import 'package:dox_core/utils/logger.dart';
 
 class DoxServer {
@@ -27,7 +27,7 @@ class DoxServer {
     server.listen(
       (HttpRequest req) {
         _setCors(req);
-        DoxHttpRequest().handle(req);
+        HttpRequestHandler().handle(req);
       },
       onError: onError ?? (error) => {print(error)},
     );

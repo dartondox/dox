@@ -1,11 +1,5 @@
 import 'package:dox_core/dox_core.dart';
 
-abstract class Router {
-  String get prefix => '';
-  List get middleware => [];
-  register();
-}
-
 class RouteData {
   final String method;
   String path;

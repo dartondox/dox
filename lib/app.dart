@@ -1,4 +1,5 @@
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/server/dox_server.dart';
 
 class Dox {
   /// setup singleton

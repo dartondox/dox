@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/request/form_data_visitor.dart';
+import 'package:dox_core/router/route_data.dart';
+import 'package:dox_core/utils/aes_encryptor.dart';
 import 'package:dox_core/validation/dox_validator.dart';
 
 class DoxRequest {
@@ -22,6 +24,8 @@ class DoxRequest {
 
   DoxRequest(this.httpRequest);
 
+  /// we are not using constructor here
+  /// because we need to call async to read body data
   static Future<DoxRequest> httpRequestToDoxRequest(
     HttpRequest request,
     RouteData route,

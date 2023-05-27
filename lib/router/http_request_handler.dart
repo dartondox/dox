@@ -1,13 +1,15 @@
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/router/http_response_handler.dart';
+import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/logger.dart';
 import 'package:dox_core/utils/utils.dart';
 
 /// this is a class which get matched routes and
 /// pass http request to route middleware and controllers
-/// and response from controllers is passed to `RouterResponse.send`
-class DoxHttpRequest {
+/// and response from controllers is passed to `HttpResponseHandler.send`
+class HttpRequestHandler {
   dynamic handle(HttpRequest req) async {
     try {
       // preflight
@@ -35,7 +37,7 @@ class DoxHttpRequest {
         DoxLogger.warn(error);
         DoxLogger.danger(stackTrace.toString());
       }
-      return RouterResponse.send(error, req);
+      return HttpResponseHandler.send(error, req);
     }
   }
 
@@ -136,7 +138,7 @@ class DoxHttpRequest {
         doxReq = result;
       } else {
         /// else result is from controller and ready to response
-        RouterResponse.send(result, httpRequest);
+        HttpResponseHandler.send(result, httpRequest);
         break;
       }
     }
@@ -172,12 +174,12 @@ class DoxHttpRequest {
 
       if (formReq.useAsControllerRequest) {
         result = await Function.apply(controller, [formReq, ...args]);
-        RouterResponse.send(result, httpRequest);
+        HttpResponseHandler.send(result, httpRequest);
         return;
       }
     }
 
     result = await Function.apply(controller, [doxRequest, ...args]);
-    RouterResponse.send(result, httpRequest);
+    HttpResponseHandler.send(result, httpRequest);
   }
 }
