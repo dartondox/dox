@@ -9,19 +9,31 @@ class DoxWebsocket {
   factory DoxWebsocket() => _singleton;
   DoxWebsocket._internal();
 
+  /// active websocket connections
   Map<String, Map<String, dynamic>> activeConnections = {};
 
+  /// active rooms with active users in the room
   Map<String, List<String>> rooms = {};
 
+  /// registered websocket events listener
   Map<String, Function> events = {};
 
+  /// register websocket event
+  /// ```
+  /// DoxWebsocket.on('info', (SocketEmitter emitter, message) {
+  ///   /// do something here
+  /// });
+  /// ```
   static on(event, Function(SocketEmitter, dynamic) controller) {
     DoxWebsocket().events[event] = controller;
   }
 
+  /// handle http request and convert into websocket
   handle(DoxRequest req) async {
     WebSocket websocket = await WebSocketTransformer.upgrade(req.httpRequest);
     String socketId = 'websocket:${DateTime.now().microsecondsSinceEpoch}';
+
+    /// add to active connection
     activeConnections[socketId] = {
       "socket_id": socketId,
       "websocket": websocket,
@@ -82,42 +94,6 @@ class DoxWebsocket {
   _removeFromRoom(String roomId, String socketId) {
     if (DoxWebsocket().rooms[roomId] != null) {
       DoxWebsocket().rooms[roomId]?.remove(socketId);
-    }
-  }
-}
-
-class SocketEmitter {
-  String? _roomId;
-
-  final String? sender;
-
-  SocketEmitter({this.sender});
-
-  SocketEmitter room(roomId) {
-    _roomId = roomId;
-    return this;
-  }
-
-  emitExceptSender(String event, dynamic message) {
-    if (sender != null) {
-      emit(event, message, exclude: [sender!]);
-    }
-  }
-
-  emit(String event, dynamic message, {List<String> exclude = const []}) {
-    String payload = jsonEncode({
-      "event": event,
-      "message": message,
-    });
-    List<String> members = DoxWebsocket().rooms[_roomId] ?? [];
-    for (String socketId in members) {
-      if (!exclude.contains(socketId)) {
-        var data = DoxWebsocket().activeConnections[socketId];
-        if (data != null) {
-          WebSocket websocket = data['websocket'] as WebSocket;
-          websocket.add(payload);
-        }
-      }
     }
   }
 }

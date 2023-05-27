@@ -14,6 +14,7 @@ class Serializer<T> {
     }
   }
 
+  /// convert model into Map
   Map<String, dynamic> convert(T m) {
     return {};
   }

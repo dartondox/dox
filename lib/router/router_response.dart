@@ -5,8 +5,6 @@ import 'package:dox_core/dox_core.dart';
 
 /// this is the class to response HttpRequest
 class RouterResponse {
-  dynamic payload;
-
   final HttpResponse response;
 
   RouterResponse(this.response);

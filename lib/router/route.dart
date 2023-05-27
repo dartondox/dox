@@ -1,4 +1,5 @@
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/utils/utils.dart';
 
 class Route {
   /// Singleton
@@ -7,20 +8,11 @@ class Route {
   Route._internal();
 
   String _prefix = '';
-
   List _preMiddleware = [];
-
-  List<RouteData> routes = [];
-
   String? _resourceKey;
 
-  List<RouteData> _getRecentlyAddedRoutes() {
-    if (_resourceKey != null) {
-      return routes.where((r) => r.resourceKey == _resourceKey).toList();
-    } else {
-      return [routes.last];
-    }
-  }
+  /// get list of routes registered
+  List<RouteData> routes = [];
 
   formRequest(FormRequest Function() formRequest) {
     for (RouteData r in _getRecentlyAddedRoutes()) {
@@ -28,43 +20,38 @@ class Route {
     }
   }
 
-  static sanitizeRoutePath(String path) {
-    path = path.replaceAll(RegExp(r'/+'), '/');
-    return "/${path.replaceAll(RegExp('^\\/+|\\/+\$'), '')}";
-  }
-
-  Route _addRoute(method, String path, controller, {String? resourceKey}) {
-    Route()._resourceKey = null;
-    path = Route.sanitizeRoutePath(path);
-    List controllers = [];
-    controllers.addAll(_preMiddleware);
-    if (controller is Function) {
-      controllers.add(controller);
-    }
-    if (controller is List) {
-      controllers.addAll(controller);
-    }
-    routes.add(RouteData(
-      method: method,
-      path: path,
-      controllers: controllers,
-      resourceKey: resourceKey,
-    ));
-    return this;
-  }
-
+  /// group route
+  /// ```
+  /// Route.group('blog', (route) {
+  ///   route.get('all', controller);
+  ///   route.put('{id}/activate', controller);
+  /// });
+  /// ```
   static group(prefix, Function(SubRoute) callback) {
     callback(SubRoute(prefix));
   }
 
-  static use(List controllers) {
-    Route()._preMiddleware = controllers;
+  /// add global middleware
+  /// ```
+  /// Route.use([Middleware()]);
+  /// ```
+  static use(List middleware) {
+    Route()._preMiddleware = middleware;
   }
 
+  /// set prefix for the route, this will affect
+  /// its below routes
+  /// ```
+  /// Route.prefix('blog');
+  /// ```
   static prefix(prefix) {
     Route()._prefix = prefix;
   }
 
+  /// add websocket route
+  /// ```
+  /// Route.websocket(websocket: DoxWebsocket());
+  /// ```
   static websocket({
     required DoxWebsocket websocket,
     String route = 'ws',
@@ -73,62 +60,122 @@ class Route {
     Route()._addRoute('GET', route, [...middleware, websocket.handle]);
   }
 
+  /// get route
+  /// ```
+  /// Route.get('path', controller);
+  /// ```
   static Route get(route, controller) {
     return Route()._addRoute('GET', Route()._prefix + route, controller);
   }
 
+  /// post route
+  /// ```
+  /// Route.post('path', controller);
+  ///
   static Route post(route, controller, {Function? request}) {
     return Route()._addRoute('POST', Route()._prefix + route, controller);
   }
 
+  /// put route
+  /// ```
+  /// Route.put('path', controller);
+  ///
   static Route put(route, controller) {
     return Route()._addRoute('PUT', Route()._prefix + route, controller);
   }
 
+  /// delete route
+  /// ```
+  /// Route.delete('path', controller);
+  ///
   static Route delete(route, controller) {
     return Route()._addRoute('DELETE', Route()._prefix + route, controller);
   }
 
+  /// purge route
+  /// ```
+  /// Route.purge('path', controller);
+  ///
   static Route purge(route, controller) {
     return Route()._addRoute('PURGE', Route()._prefix + route, controller);
   }
 
+  /// patch route
+  /// ```
+  /// Route.patch('path', controller);
+  ///
   static Route patch(route, controller) {
     return Route()._addRoute('PATCH', Route()._prefix + route, controller);
   }
 
+  /// options route
+  /// ```
+  /// Route.options('path', controller);
+  ///
   static Route options(route, controller) {
     return Route()._addRoute('OPTIONS', Route()._prefix + route, controller);
   }
 
+  /// copy route
+  /// ```
+  /// Route.copy('path', controller);
+  ///
   static Route copy(route, controller) {
     return Route()._addRoute('COPY', Route()._prefix + route, controller);
   }
 
+  /// view route
+  /// ```
+  /// Route.view('path', controller);
+  ///
   static Route view(route, controller) {
     return Route()._addRoute('VIEW', Route()._prefix + route, controller);
   }
 
+  /// link route
+  /// ```
+  /// Route.link('path', controller);
+  ///
   static Route link(route, controller) {
     return Route()._addRoute('LINK', Route()._prefix + route, controller);
   }
 
+  /// unlink route
+  /// ```
+  /// Route.unlink('path', controller);
+  ///
   static Route unlink(route, controller) {
     return Route()._addRoute('UNLINK', Route()._prefix + route, controller);
   }
 
+  /// lock route
+  /// ```
+  /// Route.lock('path', controller);
+  ///
   static Route lock(route, controller) {
     return Route()._addRoute('UNLINK', Route()._prefix + route, controller);
   }
 
+  /// unlock route
+  /// ```
+  /// Route.unlock('path', controller);
+  ///
   static Route unlock(route, controller) {
     return Route()._addRoute('UNLOCK', Route()._prefix + route, controller);
   }
 
+  /// propfind route
+  /// ```
+  /// Route.propfind('path', controller);
+  ///
   static Route propfind(route, controller) {
     return Route()._addRoute('PROPFIND', Route()._prefix + route, controller);
   }
 
+  /// resource route
+  /// ```
+  /// Route.resource('blog', BlogController());
+  ///
   static Route resource(route, controller) {
     var prefix = "${Route()._prefix}/$route";
 
@@ -165,5 +212,33 @@ class Route {
     Route()._resourceKey = prefix;
 
     return Route();
+  }
+
+  List<RouteData> _getRecentlyAddedRoutes() {
+    if (_resourceKey != null) {
+      return routes.where((r) => r.resourceKey == _resourceKey).toList();
+    } else {
+      return [routes.last];
+    }
+  }
+
+  Route _addRoute(method, String path, controller, {String? resourceKey}) {
+    Route()._resourceKey = null;
+    path = sanitizeRoutePath(path);
+    List controllers = [];
+    controllers.addAll(_preMiddleware);
+    if (controller is Function) {
+      controllers.add(controller);
+    }
+    if (controller is List) {
+      controllers.addAll(controller);
+    }
+    routes.add(RouteData(
+      method: method,
+      path: path,
+      controllers: controllers,
+      resourceKey: resourceKey,
+    ));
+    return this;
   }
 }

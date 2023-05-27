@@ -47,11 +47,13 @@ class DoxRequest {
     return i;
   }
 
+  /// http request data is form data
   bool isFormData() {
     return httpRequest.headers.contentType?.mimeType.contains('form-data') ==
         true;
   }
 
+  /// http request data is json
   bool isJson() {
     return httpRequest.headers.contentType.toString().contains('json') == true;
   }

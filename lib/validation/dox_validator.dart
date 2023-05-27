@@ -6,18 +6,30 @@ import 'package:dox_core/validation/type.dart';
 import 'package:sprintf/sprintf.dart';
 
 class DoxValidator {
-  DoxValidator(this.data);
-
+  /// request data
   final Map<String, dynamic> data;
 
+  /// internal constants
   final Map<String, dynamic> _errors = {};
-
   List get _methodNoNeedToSplitArguments => ['in'];
 
+  DoxValidator(this.data);
+
+  /// check validation has errors
   bool get hasError => _errors.isNotEmpty;
 
+  /// get list of error messages
   Map<String, dynamic> get errors => _errors;
 
+  /// add custom rule
+  /// ```
+  /// validator.addCustomRule('unique', {
+  ///   message: 'The {value} already exist',
+  ///   fn: (Map<String, dynamic> data, dynamic value, String? arguments) {
+  ///     /// add your logic here
+  ///   }
+  /// });
+  /// ```
   addCustomRule(
     String ruleName, {
     required String message,
@@ -29,6 +41,10 @@ class DoxValidator {
     };
   }
 
+  /// set custom validator messages
+  /// ```
+  /// validator.setMessages({'required': 'The {attribute} is required});
+  /// ```
   setMessages(Map<String, String> messages) {
     messages.forEach((key, value) {
       if (_matchings[key] != null) {
@@ -37,6 +53,10 @@ class DoxValidator {
     });
   }
 
+  /// validate your data
+  /// ```
+  /// validator.validate({'field' : 'required|string'});
+  /// ```
   validate(Map<String, String> rules) {
     rules.forEach((field, rule) {
       if (_isNestedValidation(field)) {

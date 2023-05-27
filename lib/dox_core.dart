@@ -1,8 +1,8 @@
 library dox_core;
 
+export 'app.dart';
 export 'config/app_config.dart';
 export 'db/db_driver.dart';
-export 'dox.dart';
 export 'env/env.dart';
 export 'exception/http_exception.dart';
 export 'exception/internal_error_exception.dart';
@@ -29,3 +29,4 @@ export 'utils/extensions.dart';
 export 'utils/global.dart';
 export 'utils/hash.dart';
 export 'websocket/dox_websocket.dart';
+export 'websocket/socket_emitter.dart';

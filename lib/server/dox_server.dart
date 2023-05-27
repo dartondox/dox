@@ -5,19 +5,21 @@ import 'package:dox_core/router/dox_http_request.dart';
 import 'package:dox_core/utils/logger.dart';
 
 class DoxServer {
+  /// register singleton
   static final DoxServer _singleton = DoxServer._internal();
-
-  factory DoxServer() {
-    return _singleton;
-  }
-
+  factory DoxServer() => _singleton;
   DoxServer._internal();
 
+  /// httpServer dart:io
+  late HttpServer httpServer;
+
+  /// set responseHandler
   Handler? responseHandler;
 
-  late HttpServer httpServer;
-  DoxWebsocket? doxWebsocket;
-
+  /// listen the request
+  /// ```
+  /// DoxServer().listen(3000);
+  /// ```
   Future<HttpServer> listen(int port, {Function? onError}) async {
     Env.load();
     final server = await HttpServer.bind(InternetAddress.anyIPv4, port);
@@ -33,20 +35,28 @@ class DoxServer {
     return server;
   }
 
+  /// close http server
+  /// ```
+  /// server.close();
+  /// ```
   close({bool force = false}) {
     httpServer.close(force: force);
   }
 
+  /// set response handler
+  /// ```
+  /// server.setResponseHandler(Handler());
+  /// ```
   setResponseHandler(Handler handler) {
     responseHandler = handler;
   }
 
   _setCors(HttpRequest req) {
     CORSConfig cors = Dox().config.cors;
-    _parseCorsValue(req, 'Access-Control-Allow-Origin', cors.allowOrigin);
-    _parseCorsValue(req, 'Access-Control-Allow-Methods', cors.allowMethods);
-    _parseCorsValue(req, 'Access-Control-Allow-Headers', cors.allowHeaders);
-    _parseCorsValue(req, 'Access-Control-Expose-Headers', cors.exposeHeaders);
+    _setCorsValue(req, 'Access-Control-Allow-Origin', cors.allowOrigin);
+    _setCorsValue(req, 'Access-Control-Allow-Methods', cors.allowMethods);
+    _setCorsValue(req, 'Access-Control-Allow-Headers', cors.allowHeaders);
+    _setCorsValue(req, 'Access-Control-Expose-Headers', cors.exposeHeaders);
     if (cors.allowCredentials != null) {
       req.response.headers.add(
           'Access-Control-Allow-Credentials', cors.allowCredentials.toString());
@@ -57,7 +67,7 @@ class DoxServer {
     }
   }
 
-  _parseCorsValue(HttpRequest req, key, data) {
+  _setCorsValue(HttpRequest req, key, data) {
     if (data is List<String> && data.isNotEmpty) {
       req.response.headers.add(key, data.join(','));
     } else if (data is String && data.isNotEmpty) {
