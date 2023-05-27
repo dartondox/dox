@@ -14,16 +14,17 @@ class Route {
 
   String? _resourceKey;
 
-  formRequest(FormRequest Function() formRequest) {
+  List<RouteData> _getRecentlyAddedRoutes() {
     if (_resourceKey != null) {
-      List<RouteData> resourceRoutes =
-          routes.where((r) => r.resourceKey == _resourceKey).toList();
-      for (RouteData r in resourceRoutes) {
-        r.formRequest = formRequest;
-      }
+      return routes.where((r) => r.resourceKey == _resourceKey).toList();
     } else {
-      RouteData latestRoute = routes.last;
-      latestRoute.formRequest = formRequest;
+      return [routes.last];
+    }
+  }
+
+  formRequest(FormRequest Function() formRequest) {
+    for (RouteData r in _getRecentlyAddedRoutes()) {
+      r.formRequest = formRequest;
     }
   }
 

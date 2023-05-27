@@ -48,6 +48,15 @@ class DoxResponse {
     return this;
   }
 
+  /// set cache
+  /// ```
+  /// res.cache(Duration(seconds: 10));
+  /// ```
+  DoxResponse cache(Duration duration) {
+    _headers['Cache-Control'] = 'max-age=${duration.inSeconds}';
+    return this;
+  }
+
   /// Set list of headers by Map
   /// ```
   /// res.withHeaders({'Authorization' : 'Bearer xxx'});
