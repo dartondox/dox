@@ -14,14 +14,14 @@ class Serializer<T> {
     }
   }
 
-  Map<String, dynamic> toMap(T m) {
+  Map<String, dynamic> convert(T m) {
     return {};
   }
 
   toJson() {
     List<Map<String, dynamic>> ret = [];
     for (T p in _payload) {
-      ret.add(toMap(p));
+      ret.add(convert(p));
     }
     if (_isSingular) {
       return ret.isNotEmpty ? ret.first : null;
