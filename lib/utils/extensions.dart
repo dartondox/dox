@@ -1,4 +1,8 @@
 extension MapExtensions on Map {
+  /// remove parameter from map with dot
+  /// ```
+  /// map.removeParam('user.info');
+  /// ```
   Map<String, dynamic> removeParam(String keys) {
     dynamic value = this;
     List<String> parts = keys.split(".");
@@ -12,6 +16,10 @@ extension MapExtensions on Map {
     return value;
   }
 
+  /// get parameter from map with dot
+  /// ```
+  /// map.getParam('user.info');
+  /// ``
   dynamic getParam(String keys) {
     dynamic value = this;
     List<String> parts = keys.split(".");
@@ -29,6 +37,11 @@ extension MapExtensions on Map {
 }
 
 extension JoinWithAnd on List {
+  /// jon list<String> with separator and the last item with 'and' or 'or'
+  /// ```
+  /// list.joinWithAnd();
+  /// list.joinWithAnd(',', 'and');
+  /// ```
   String joinWithAnd([String separator = ", ", String lastJoinText = 'and']) {
     List items = this;
     if (items.length <= 1) {

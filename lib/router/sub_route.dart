@@ -1,71 +1,137 @@
 import 'package:dox_core/dox_core.dart';
 
 class SubRoute {
-  final String prefix;
+  final String _prefix;
 
-  const SubRoute(this.prefix);
+  const SubRoute(this._prefix);
 
-  resource(route, controller, {FormRequest? request}) {
-    Route.resource('$prefix/$route', controller, request: request);
+  /// group route
+  /// ```
+  /// route.group('blog', (r) {
+  ///   r.get('/', controller);
+  /// });
+  /// ```
+  group(prefix, Function(SubRoute) callback) {
+    callback(SubRoute('$_prefix/$prefix'));
   }
 
-  get(route, controller, {FormRequest? request}) {
-    Route.get('$prefix/$route', controller, request: request);
+  /// resource route
+  /// ```
+  /// Route.resource('blog', BlogController());
+  ///
+  Route resource(route, controller) {
+    return Route.resource('$_prefix/$route', controller);
   }
 
-  post(route, controller, {FormRequest? request}) {
-    Route.post('$prefix/$route', controller, request: request);
+  /// get route
+  /// ```
+  /// Route.get('path', controller);
+  ///
+  Route get(route, controller) {
+    return Route.get('$_prefix/$route', controller);
   }
 
-  put(route, controller, {FormRequest? request}) {
-    Route.put('$prefix/$route', controller, request: request);
+  /// post route
+  /// ```
+  /// Route.post('path', controller);
+  ///
+  Route post(route, controller) {
+    return Route.post('$_prefix/$route', controller);
   }
 
-  delete(route, controller, {FormRequest? request}) {
-    Route.delete('$prefix/$route', controller, request: request);
+  /// put route
+  /// ```
+  /// Route.put('path', controller);
+  ///
+  Route put(route, controller) {
+    return Route.put('$_prefix/$route', controller);
   }
 
-  group(p, Function(SubRoute) callback) {
-    callback(SubRoute('$prefix/$p'));
+  /// delete route
+  /// ```
+  /// Route.delete('path', controller);
+  ///
+  Route delete(route, controller) {
+    return Route.delete('$_prefix/$route', controller);
   }
 
-  purge(route, controller, {FormRequest? request}) {
-    Route.purge('$prefix/$route', controller, request: request);
+  /// purge route
+  /// ```
+  /// Route.purge('path', controller);
+  ///
+  Route purge(route, controller) {
+    return Route.purge('$_prefix/$route', controller);
   }
 
-  patch(route, controller, {FormRequest? request}) {
-    Route.patch('$prefix/$route', controller, request: request);
+  /// patch route
+  /// ```
+  /// Route.patch('path', controller);
+  ///
+  Route patch(route, controller) {
+    return Route.patch('$_prefix/$route', controller);
   }
 
-  options(route, controller, {FormRequest? request}) {
-    Route.options('$prefix/$route', controller, request: request);
+  /// options route
+  /// ```
+  /// Route.options('path', controller);
+  ///
+  Route options(route, controller) {
+    return Route.options('$_prefix/$route', controller);
   }
 
-  copy(route, controller, {FormRequest? request}) {
-    Route.copy('$prefix/$route', controller, request: request);
+  /// copy route
+  /// ```
+  /// Route.copy('path', controller);
+  ///
+  Route copy(route, controller) {
+    return Route.copy('$_prefix/$route', controller);
   }
 
-  view(route, controller, {FormRequest? request}) {
-    Route.view('$prefix/$route', controller, request: request);
+  /// view route
+  /// ```
+  /// Route.view('path', controller);
+  ///
+  Route view(route, controller) {
+    return Route.view('$_prefix/$route', controller);
   }
 
-  link(route, controller, {FormRequest? request}) {
-    Route.link('$prefix/$route', controller, request: request);
+  /// link route
+  /// ```
+  /// Route.link('path', controller);
+  ///
+  Route link(route, controller) {
+    return Route.link('$_prefix/$route', controller);
   }
 
-  unlink(route, controller, {FormRequest? request}) {
-    Route.unlink('$prefix/$route', controller, request: request);
+  /// unlink route
+  /// ```
+  /// Route.unlink('path', controller);
+  ///
+  Route unlink(route, controller) {
+    return Route.unlink('$_prefix/$route', controller);
   }
 
-  lock(route, controller, {FormRequest? request}) {
-    Route.lock('$prefix/$route', controller, request: request);
+  /// lock route
+  /// ```
+  /// Route.lock('path', controller);
+  ///
+  Route lock(route, controller) {
+    return Route.lock('$_prefix/$route', controller);
   }
 
-  unlock(route, controller, {FormRequest? request}) {
-    Route.unlock('$prefix/$route', controller, request: request);
+  /// unlock route
+  /// ```
+  /// Route.unlock('path', controller);
+  ///
+  Route unlock(route, controller) {
+    return Route.unlock('$_prefix/$route', controller);
   }
 
-  propfind(route, controller, {FormRequest? request}) {
-    Route.propfind('$prefix/$route', controller, request: request);
+  /// propfind route
+  /// ```
+  /// Route.propfind('path', controller);
+  ///
+  Route propfind(route, controller) {
+    return Route.propfind('$_prefix/$route', controller);
   }
 }

@@ -1,14 +1,15 @@
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/router/http_response_handler.dart';
+import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/logger.dart';
+import 'package:dox_core/utils/utils.dart';
 
 /// this is a class which get matched routes and
 /// pass http request to route middleware and controllers
-/// and response from controllers is passed to `RouterResponse.send`
-class DoxHttpRequest {
-  List<RouteData> get routes => Route().routes;
-
+/// and response from controllers is passed to `HttpResponseHandler.send`
+class HttpRequestHandler {
   dynamic handle(HttpRequest req) async {
     try {
       // preflight
@@ -18,7 +19,7 @@ class DoxHttpRequest {
       }
 
       /// getting matched route
-      RouteData? route = getMatchRoute(req.uri.path, req.method);
+      RouteData? route = _getMatchRoute(req.uri.path, req.method);
       if (route == null) {
         return _routeNotFound(req);
       }
@@ -36,7 +37,7 @@ class DoxHttpRequest {
         DoxLogger.warn(error);
         DoxLogger.danger(stackTrace.toString());
       }
-      return RouterResponse.send(error, req);
+      return HttpResponseHandler.send(error, req);
     }
   }
 
@@ -66,15 +67,15 @@ class DoxHttpRequest {
     return Map.fromIterables(parameterNames, parameterValues);
   }
 
-  RouteData? getMatchRoute(String inputRoute, String method) {
-    List<RouteData> methodMatchedRoutes = routes.where((route) {
+  RouteData? _getMatchRoute(String inputRoute, String method) {
+    List<RouteData> methodMatchedRoutes = Route().routes.where((route) {
       return route.method.toLowerCase() == method.toLowerCase();
     }).toList();
 
     RouteData? matchRoute;
     for (var route in methodMatchedRoutes) {
-      route.path = Route.sanitizeRoutePath(route.path);
-      inputRoute = Route.sanitizeRoutePath(inputRoute);
+      route.path = sanitizeRoutePath(route.path);
+      inputRoute = sanitizeRoutePath(inputRoute);
 
       /// when route is the same route exactly same route
       /// route without params, eg. /api/example
@@ -137,7 +138,7 @@ class DoxHttpRequest {
         doxReq = result;
       } else {
         /// else result is from controller and ready to response
-        RouterResponse.send(result, httpRequest);
+        HttpResponseHandler.send(result, httpRequest);
         break;
       }
     }
@@ -149,10 +150,13 @@ class DoxHttpRequest {
     DoxRequest doxRequest,
     HttpRequest httpRequest,
   ) async {
+    dynamic result;
     List args = doxRequest.param.values.toList();
-    FormRequest? formReq = route.formRequest;
+    FormRequest Function()? creator = route.formRequest;
 
-    if (formReq != null) {
+    if (creator != null) {
+      FormRequest formReq = creator();
+
       /// mapping request inputs field
       doxRequest.mapInputs(formReq.mapInputs());
 
@@ -167,14 +171,15 @@ class DoxHttpRequest {
         formReq.rules(),
         messages: formReq.messages(),
       );
+
+      if (formReq.useAsControllerRequest) {
+        result = await Function.apply(controller, [formReq, ...args]);
+        HttpResponseHandler.send(result, httpRequest);
+        return;
+      }
     }
 
-    dynamic result;
-    if (formReq != null && formReq.useAsControllerRequest) {
-      result = await Function.apply(controller, [formReq, ...args]);
-    } else {
-      result = await Function.apply(controller, [doxRequest, ...args]);
-    }
-    RouterResponse.send(result, httpRequest);
+    result = await Function.apply(controller, [doxRequest, ...args]);
+    HttpResponseHandler.send(result, httpRequest);
   }
 }

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:dox_core/dox.dart';
+import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/logger.dart';
 import 'package:encrypt/encrypt.dart';
 

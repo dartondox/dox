@@ -2,14 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/server/dox_server.dart';
 
 /// this is the class to response HttpRequest
-class RouterResponse {
-  dynamic payload;
-
+class HttpResponseHandler {
   final HttpResponse response;
 
-  RouterResponse(this.response);
+  HttpResponseHandler(this.response);
 
   static send(payload, HttpRequest request) {
     /// websocket handler will return websocket payload
@@ -49,6 +48,11 @@ class RouterResponse {
     if (payload is Exception || payload is Error) {
       res.statusCode = HttpStatus.internalServerError;
       payload = payload.toString();
+    }
+
+    if (payload is Serializer) {
+      res.headers.contentType = ContentType.json;
+      payload = payload.toJson();
     }
 
     String responseData;

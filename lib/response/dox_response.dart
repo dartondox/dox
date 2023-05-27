@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/router/http_response_handler.dart';
 
 class DoxResponse {
   final dynamic content;
@@ -48,6 +49,15 @@ class DoxResponse {
     return this;
   }
 
+  /// set cache
+  /// ```
+  /// res.cache(Duration(seconds: 10));
+  /// ```
+  DoxResponse cache(Duration duration) {
+    _headers['Cache-Control'] = 'max-age=${duration.inSeconds}';
+    return this;
+  }
+
   /// Set list of headers by Map
   /// ```
   /// res.withHeaders({'Authorization' : 'Bearer xxx'});
@@ -69,7 +79,7 @@ class DoxResponse {
     if (_cookie != null) {
       request.response.headers.add(HttpHeaders.setCookieHeader, _cookie!);
     }
-    return RouterResponse.send(content, request);
+    return HttpResponseHandler.send(content, request);
   }
 }
 

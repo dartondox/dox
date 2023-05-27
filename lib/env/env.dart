@@ -15,8 +15,15 @@ class Env {
     Env().env = DotEnv().getDotEnv();
   }
 
+  /// get env value
+  /// ```
+  /// Evn.get('APP_KEY');
+  /// Evn.get('APP_KEY', 'with_default_value_if_null');
+  /// ```
   static String get(key, [dynamic defaultValue]) {
     String value = Env().env[key].toString();
-    return value.isEmpty || value == 'null' ? defaultValue : value;
+    return value.isEmpty || value.toLowerCase() == 'null'
+        ? defaultValue
+        : value;
   }
 }

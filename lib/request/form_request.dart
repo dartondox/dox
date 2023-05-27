@@ -3,16 +3,20 @@ import 'package:dox_core/request/dox_request.dart';
 abstract class FormRequest {
   bool get useAsControllerRequest => true;
 
+  /// run on initial
   void setUp() {}
 
+  /// set validation rules
   Map<String, String> rules() {
     return {};
   }
 
+  /// set validation messages
   Map<String, String> messages() {
     return {};
   }
 
+  /// use this function to change request input name
   Map<String, String> mapInputs() {
     return {};
   }
@@ -31,10 +35,12 @@ abstract class FormRequest {
   Map<String, dynamic> get body => request.body;
   Map<String, dynamic> get headers => request.headers;
 
+  /// check request data is form data
   bool isFormData() {
     return request.isFormData();
   }
 
+  /// check request data is json data
   bool isJson() {
     return request.isJson();
   }
