@@ -158,6 +158,38 @@ class DoxRequest {
     return _cookies[key];
   }
 
+  /// get user agent from header
+  /// ```
+  /// req.userAgent();
+  /// ```
+  String userAgent() {
+    return header('user-agent') ?? 'unknown';
+  }
+
+  /// get host|domain
+  /// ```
+  /// req.host()
+  /// ```
+  String host() {
+    return header('host') ?? 'unknown';
+  }
+
+  /// get origin
+  /// ```
+  /// req.origin()
+  /// ```
+  String? origin() {
+    return header('origin');
+  }
+
+  /// get referer
+  /// ```
+  /// req.referer()
+  /// ```
+  String? referer() {
+    return header('referer');
+  }
+
   /// validate input request
   /// ```
   /// req.validate({'title': 'required'});
