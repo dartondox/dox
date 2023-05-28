@@ -11,7 +11,6 @@ class Route {
   String _prefix = '';
   String? _domain;
   List _preMiddleware = [];
-  String? _resourceKey;
 
   /// get list of routes registered
   List<RouteData> routes = [];
@@ -196,50 +195,33 @@ class Route {
     var prefix = "${Route()._prefix}/$route";
 
     /// GET /resource
-    Route()._addRoute('GET', prefix, controller.index, resourceKey: prefix);
+    Route()._addRoute('GET', prefix, controller.index);
 
     /// GET /resource/create
-    Route()._addRoute('GET', '$prefix/create', controller.create,
-        resourceKey: prefix);
+    Route()._addRoute('GET', '$prefix/create', controller.create);
 
     /// POST /resource
-    Route()._addRoute('POST', prefix, controller.store, resourceKey: prefix);
+    Route()._addRoute('POST', prefix, controller.store);
 
     /// GET /resource/{id}
-    Route()
-        ._addRoute('GET', '$prefix/{id}', controller.show, resourceKey: prefix);
+    Route()._addRoute('GET', '$prefix/{id}', controller.show);
 
     /// GET /resource/{id}/edit
-    Route()._addRoute('GET', '$prefix/{id}/edit', controller.edit,
-        resourceKey: prefix);
+    Route()._addRoute('GET', '$prefix/{id}/edit', controller.edit);
 
     /// PUT /resource/{id}
-    Route()._addRoute('PUT', '$prefix/{id}', controller.update,
-        resourceKey: prefix);
+    Route()._addRoute('PUT', '$prefix/{id}', controller.update);
 
     /// PATCH /resource/{id}
-    Route()._addRoute('PATCH', '$prefix/{id}', controller.update,
-        resourceKey: prefix);
+    Route()._addRoute('PATCH', '$prefix/{id}', controller.update);
 
     /// DELETE /resource/{id}
-    Route()._addRoute('DELETE', '$prefix/{id}', controller.destroy,
-        resourceKey: prefix);
-
-    Route()._resourceKey = prefix;
+    Route()._addRoute('DELETE', '$prefix/{id}', controller.destroy);
 
     return Route();
   }
 
-  List<RouteData> _getRecentlyAddedRoutes() {
-    if (_resourceKey != null) {
-      return routes.where((r) => r.resourceKey == _resourceKey).toList();
-    } else {
-      return [routes.last];
-    }
-  }
-
-  Route _addRoute(method, String path, controller, {String? resourceKey}) {
-    Route()._resourceKey = null;
+  Route _addRoute(method, String path, controller) {
     path = sanitizeRoutePath(path);
     List controllers = [];
     controllers.addAll(_preMiddleware);
@@ -253,7 +235,6 @@ class Route {
       method: method,
       path: path,
       controllers: controllers,
-      resourceKey: resourceKey,
       domain: _domain,
     ));
     return this;
