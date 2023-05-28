@@ -24,7 +24,14 @@ class Dox {
     Dox dox = Dox();
     dox._config = c;
     dox._startHttpServer();
+    dox._registerFormRequests();
     dox._registerRoute();
+  }
+
+  _registerFormRequests() {
+    _config.formRequests.forEach((key, value) {
+      Global.ioc.registerByName(key.toString(), value);
+    });
   }
 
   _registerRoute() {
@@ -32,12 +39,6 @@ class Dox {
     for (Router router in routers) {
       Route.prefix(router.prefix);
       Route.use(router.middleware);
-
-      /// register request defined in router
-      router.requests.forEach((key, value) {
-        Global.ioc.registerByName(key.toString(), value);
-      });
-
       router.register();
     }
   }
