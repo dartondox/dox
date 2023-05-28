@@ -60,12 +60,8 @@ class DoxValidator {
   validate(Map<String, String> rules) {
     rules.forEach((field, rule) {
       if (_isNestedValidation(field)) {
-        var visitor = NestedValidationVisitor(
-          data: data,
-          field: field,
-          rule: rule,
-        );
-        for (ValidationItem item in visitor.fieldsToValidate) {
+        var v = NestedValidationVisitor(data: data, field: field, rule: rule);
+        for (ValidationItem item in v.fieldsToValidate) {
           _validateItem(item);
         }
       } else {

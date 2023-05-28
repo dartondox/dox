@@ -8,7 +8,8 @@ class RouteData {
   final List preMiddleware;
   final List postMiddleware;
   FormRequest Function()? formRequest;
-  final String? resourceKey;
+
+  final String? domain;
 
   RouteData({
     required this.method,
@@ -16,6 +17,6 @@ class RouteData {
     required this.controllers,
     this.preMiddleware = const [],
     this.postMiddleware = const [],
-    this.resourceKey,
+    this.domain,
   });
 }

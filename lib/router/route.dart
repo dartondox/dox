@@ -1,38 +1,98 @@
 import 'package:dox_core/router/route_data.dart';
-import 'package:dox_core/router/sub_route.dart';
 import 'package:dox_core/utils/utils.dart';
 import 'package:dox_core/websocket/dox_websocket.dart';
 
 class Route {
-  /// Singleton
+  /// register as singleton
   static final Route _singleton = Route._internal();
   factory Route() => _singleton;
   Route._internal();
 
   String _prefix = '';
+  String? _domain;
   List _preMiddleware = [];
-  String? _resourceKey;
 
   /// get list of routes registered
   List<RouteData> routes = [];
 
   /// group route
   /// ```
-  /// Route.group('blog', (route) {
-  ///   route.get('all', controller);
-  ///   route.put('{id}/activate', controller);
+  /// Route.group('blog', () {
+  ///   Route.get('all', controller);
+  ///   Route.put('{id}/activate', controller);
   /// });
   /// ```
-  static group(prefix, Function(SubRoute) callback) {
-    callback(SubRoute(prefix));
+  static group(prefix, Function() callback) {
+    var originalPrefix = Route()._prefix;
+
+    /// set new prefix
+    Route()._prefix = originalPrefix + prefix;
+    callback();
+
+    /// restore original prefix
+    Route()._prefix = originalPrefix;
+  }
+
+  /// domain route
+  /// ```
+  /// Route.group('example.com', () {
+  ///   Route.get('/ping', controller);
+  /// });
+  /// ```
+  static domain(domain, Function() callback) {
+    var originalDomain = Route()._domain;
+
+    /// set new domain
+    Route()._domain = domain;
+    callback();
+
+    /// restore original domain
+    Route()._domain = originalDomain;
+  }
+
+  /// middleware for group of routes
+  /// ```
+  /// Route.group('example.com', () {
+  ///   Route.get('/ping', controller);
+  /// });
+  /// ```
+  static middleware(List middleware, Function() callback) {
+    var originalMiddleware = Route()._preMiddleware;
+
+    /// set new middleware
+    Route()._preMiddleware = [...originalMiddleware, ...middleware];
+    callback();
+
+    /// restore original middleware
+    Route()._preMiddleware = originalMiddleware;
   }
 
   /// add global middleware
   /// ```
   /// Route.use([Middleware()]);
   /// ```
-  static use(List middleware) {
-    Route()._preMiddleware = middleware;
+  static resetWithNewMiddleware(middleware) {
+    List list = [];
+    if (middleware is List) {
+      list = middleware;
+    } else {
+      list = [middleware];
+    }
+    Route()._preMiddleware = list;
+  }
+
+  /// add global middleware
+  /// ```
+  /// Route.use([Middleware()]);
+  /// ```
+  static use(middleware) {
+    List list = [];
+    if (middleware is List) {
+      list = middleware;
+    } else {
+      list = [middleware];
+    }
+    Route()._preMiddleware.add(list);
   }
 
   /// set prefix for the route, this will affect
@@ -178,50 +238,33 @@ class Route {
     var prefix = "${Route()._prefix}/$route";
 
     /// GET /resource
-    Route()._addRoute('GET', prefix, controller.index, resourceKey: prefix);
+    Route()._addRoute('GET', prefix, controller.index);
 
     /// GET /resource/create
-    Route()._addRoute('GET', '$prefix/create', controller.create,
-        resourceKey: prefix);
+    Route()._addRoute('GET', '$prefix/create', controller.create);
 
     /// POST /resource
-    Route()._addRoute('POST', prefix, controller.store, resourceKey: prefix);
+    Route()._addRoute('POST', prefix, controller.store);
 
     /// GET /resource/{id}
-    Route()
-        ._addRoute('GET', '$prefix/{id}', controller.show, resourceKey: prefix);
+    Route()._addRoute('GET', '$prefix/{id}', controller.show);
 
     /// GET /resource/{id}/edit
-    Route()._addRoute('GET', '$prefix/{id}/edit', controller.edit,
-        resourceKey: prefix);
+    Route()._addRoute('GET', '$prefix/{id}/edit', controller.edit);
 
     /// PUT /resource/{id}
-    Route()._addRoute('PUT', '$prefix/{id}', controller.update,
-        resourceKey: prefix);
+    Route()._addRoute('PUT', '$prefix/{id}', controller.update);
 
     /// PATCH /resource/{id}
-    Route()._addRoute('PATCH', '$prefix/{id}', controller.update,
-        resourceKey: prefix);
+    Route()._addRoute('PATCH', '$prefix/{id}', controller.update);
 
     /// DELETE /resource/{id}
-    Route()._addRoute('DELETE', '$prefix/{id}', controller.destroy,
-        resourceKey: prefix);
-
-    Route()._resourceKey = prefix;
+    Route()._addRoute('DELETE', '$prefix/{id}', controller.destroy);
 
     return Route();
   }
 
-  List<RouteData> _getRecentlyAddedRoutes() {
-    if (_resourceKey != null) {
-      return routes.where((r) => r.resourceKey == _resourceKey).toList();
-    } else {
-      return [routes.last];
-    }
-  }
-
-  Route _addRoute(method, String path, controller, {String? resourceKey}) {
-    Route()._resourceKey = null;
+  Route _addRoute(method, String path, controller) {
     path = sanitizeRoutePath(path);
     List controllers = [];
     controllers.addAll(_preMiddleware);
@@ -235,7 +278,7 @@ class Route {
       method: method,
       path: path,
       controllers: controllers,
-      resourceKey: resourceKey,
+      domain: _domain,
     ));
     return this;
   }

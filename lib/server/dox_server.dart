@@ -27,7 +27,7 @@ class DoxServer {
     server.listen(
       (HttpRequest req) {
         _setCors(req);
-        HttpRequestHandler().handle(req);
+        httpRequestHandler(req);
       },
       onError: onError ?? (error) => {print(error)},
     );

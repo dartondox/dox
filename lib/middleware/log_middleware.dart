@@ -1,12 +1,12 @@
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/logger.dart';
 
-class RequestLogMiddleware extends DoxMiddleware {
+class LogMiddleware extends DoxMiddleware {
   Function(Map<String, dynamic>)? filter;
 
   final bool withHeader;
 
-  RequestLogMiddleware({this.filter, this.withHeader = false});
+  LogMiddleware({this.filter, this.withHeader = false});
 
   @override
   handle(DoxRequest req) {
