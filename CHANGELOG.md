@@ -1,3 +1,13 @@
+# version 1.0.0-alpha.2
+
+- Support domain routing
+- Improvement group routing
+- Support middleware routing
+- Added app level middleware support 
+- Added function's self documentation
+- Websocket improvement and support multiple path
+- Support serializer
+
 # version 1.0.0-alpha.1
 
 - Added support for validation
