@@ -151,7 +151,10 @@ class HttpRequestHandler {
     HttpRequest httpRequest,
   ) async {
     dynamic result;
-    List args = doxRequest.param.values.toList();
+    List args = _shouldPassParamArguments(controller)
+        ? doxRequest.param.values.toList()
+        : [];
+
     FormRequest Function()? creator = route.formRequest;
 
     if (creator != null) {
@@ -181,5 +184,10 @@ class HttpRequestHandler {
 
     result = await Function.apply(controller, [doxRequest, ...args]);
     HttpResponseHandler.send(result, httpRequest);
+  }
+
+  _shouldPassParamArguments(controller) {
+    List args = controller.toString().split('(')[1].split(')')[0].split(', ');
+    return args.length == 1 ? false : true;
   }
 }
