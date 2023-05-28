@@ -1,8 +1,6 @@
 import 'package:dox_core/request/dox_request.dart';
 
 abstract class FormRequest {
-  bool get useAsControllerRequest => true;
-
   /// run on initial
   void setUp() {}
 

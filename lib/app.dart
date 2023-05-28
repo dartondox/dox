@@ -32,6 +32,12 @@ class Dox {
     for (Router router in routers) {
       Route.prefix(router.prefix);
       Route.use(router.middleware);
+
+      /// register request defined in router
+      router.requests.forEach((key, value) {
+        Global.ioc.registerByName(key.toString(), value);
+      });
+
       router.register();
     }
   }

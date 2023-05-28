@@ -1,4 +1,3 @@
-import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/router/sub_route.dart';
 import 'package:dox_core/utils/utils.dart';
@@ -16,12 +15,6 @@ class Route {
 
   /// get list of routes registered
   List<RouteData> routes = [];
-
-  formRequest(FormRequest Function() formRequest) {
-    for (RouteData r in _getRecentlyAddedRoutes()) {
-      r.formRequest = formRequest;
-    }
-  }
 
   /// group route
   /// ```

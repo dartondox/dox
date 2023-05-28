@@ -151,34 +151,37 @@ class HttpRequestHandler {
     HttpRequest httpRequest,
   ) async {
     dynamic result;
-    List args = _shouldPassParamArguments(controller)
-        ? doxRequest.param.values.toList()
-        : [];
 
-    FormRequest Function()? creator = route.formRequest;
+    List args = doxRequest.param.values
+        .toList()
+        .sublist(0, _lengthOfArgs(controller) - 1);
 
-    if (creator != null) {
-      FormRequest formReq = creator();
+    List types = _getControllerParamsType(controller);
 
-      /// mapping request inputs field
-      doxRequest.mapInputs(formReq.mapInputs());
+    if (types.isNotEmpty) {
+      String requestName = types.first;
+      if (requestName != 'DoxRequest') {
+        FormRequest? formReq = Global.ioc.getByName(requestName);
+        if (formReq != null && _isRequestMatched(controller, formReq)) {
+          /// mapping request inputs field
+          doxRequest.mapInputs(formReq.mapInputs());
 
-      /// setting dox request to custom form request
-      formReq.setRequest(doxRequest);
+          /// setting dox request to custom form request
+          formReq.setRequest(doxRequest);
 
-      /// run setup();
-      formReq.setUp();
+          /// run setup();
+          formReq.setUp();
 
-      /// finally validate;
-      doxRequest.validate(
-        formReq.rules(),
-        messages: formReq.messages(),
-      );
+          /// finally validate;
+          doxRequest.validate(
+            formReq.rules(),
+            messages: formReq.messages(),
+          );
 
-      if (formReq.useAsControllerRequest) {
-        result = await Function.apply(controller, [formReq, ...args]);
-        HttpResponseHandler.send(result, httpRequest);
-        return;
+          result = await Function.apply(controller, [formReq, ...args]);
+          HttpResponseHandler.send(result, httpRequest);
+          return;
+        }
       }
     }
 
@@ -186,8 +189,20 @@ class HttpRequestHandler {
     HttpResponseHandler.send(result, httpRequest);
   }
 
-  _shouldPassParamArguments(controller) {
-    List args = controller.toString().split('(')[1].split(')')[0].split(', ');
-    return args.length == 1 ? false : true;
+  /// checking that controller first request param is matched
+  /// with custom request from route
+  _isRequestMatched(controller, req) {
+    List args = _getControllerParamsType(controller);
+    return args[0].toString() == req.runtimeType.toString();
+  }
+
+  List _getControllerParamsType(controller) {
+    return controller.toString().split('(')[1].split(')')[0].split(', ');
+  }
+
+  /// check wether controller assign second parameter as param
+  _lengthOfArgs(controller) {
+    List args = _getControllerParamsType(controller);
+    return args.length;
   }
 }
