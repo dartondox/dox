@@ -17,9 +17,9 @@ class Route {
 
   /// group route
   /// ```
-  /// Route.group('blog', (route) {
-  ///   route.get('all', controller);
-  ///   route.put('{id}/activate', controller);
+  /// Route.group('blog', () {
+  ///   Route.get('all', controller);
+  ///   Route.put('{id}/activate', controller);
   /// });
   /// ```
   static group(prefix, Function() callback) {
@@ -33,6 +33,12 @@ class Route {
     Route()._prefix = originalPrefix;
   }
 
+  /// domain route
+  /// ```
+  /// Route.group('example.com', () {
+  ///   Route.get('/ping', controller);
+  /// });
+  /// ```
   static domain(domain, Function() callback) {
     var originalDomain = Route()._domain;
 
@@ -44,12 +50,49 @@ class Route {
     Route()._domain = originalDomain;
   }
 
+  /// middleware for group of routes
+  /// ```
+  /// Route.group('example.com', () {
+  ///   Route.get('/ping', controller);
+  /// });
+  /// ```
+  static middleware(List middleware, Function() callback) {
+    var originalMiddleware = Route()._preMiddleware;
+
+    /// set new middleware
+    Route()._preMiddleware = [...originalMiddleware, ...middleware];
+    callback();
+
+    /// restore original middleware
+    Route()._preMiddleware = originalMiddleware;
+  }
+
   /// add global middleware
   /// ```
   /// Route.use([Middleware()]);
   /// ```
-  static use(List middleware) {
-    Route()._preMiddleware = middleware;
+  static resetWithNewMiddleware(middleware) {
+    List list = [];
+    if (middleware is List) {
+      list = middleware;
+    } else {
+      list = [middleware];
+    }
+    Route()._preMiddleware = list;
+  }
+
+  /// add global middleware
+  /// ```
+  /// Route.use([Middleware()]);
+  /// ```
+  static use(middleware) {
+    List list = [];
+    if (middleware is List) {
+      list = middleware;
+    } else {
+      list = [middleware];
+    }
+    Route()._preMiddleware.add(list);
   }
 
   /// set prefix for the route, this will affect
