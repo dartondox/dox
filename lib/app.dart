@@ -38,7 +38,7 @@ class Dox {
     List<Router> routers = _config.routers;
     for (Router router in routers) {
       Route.prefix(router.prefix);
-      Route.use(router.middleware);
+      Route.use([..._config.globalMiddleware, ...router.middleware]);
       router.register();
     }
   }
