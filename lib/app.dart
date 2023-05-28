@@ -18,6 +18,7 @@ class Dox {
   /// initialize dox application
   /// - load env
   /// - start http server
+  /// - start form requests in global ioc
   /// - register routes
   initialize(AppConfig c) {
     Env.load();
@@ -28,12 +29,14 @@ class Dox {
     dox._registerRoute();
   }
 
+  /// register form request assign in app config
   _registerFormRequests() {
     _config.formRequests.forEach((key, value) {
-      Global.ioc.registerByName(key.toString(), value);
+      Global.ioc.registerRequest(key.toString(), value);
     });
   }
 
+  /// register routes assign in app config
   _registerRoute() {
     List<Router> routers = _config.routers;
     for (Router router in routers) {
@@ -44,6 +47,7 @@ class Dox {
     }
   }
 
+  /// start http server
   _startHttpServer() {
     DoxServer server = DoxServer();
     server.setResponseHandler(_config.responseHandler);

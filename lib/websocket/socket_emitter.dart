@@ -3,27 +3,43 @@ import 'dart:io';
 
 import 'package:dox_core/utils/logger.dart';
 import 'package:dox_core/websocket/socket_storage.dart';
+import 'package:dox_core/websocket/web_socket_info.dart';
 
 class SocketEmitter {
+  /// room id to sent message
   String? roomId;
 
+  /// sender socket id
   final String? sender;
+
+  /// storage to get active connection
+  final SocketStorage _storage = SocketStorage();
 
   SocketEmitter({this.sender, this.roomId});
 
-  SocketStorage storage = SocketStorage();
-
+  /// set room to sent message
+  /// ```
+  /// emitter.room('ABC');
+  /// ```
   SocketEmitter room(id) {
     roomId = id;
     return this;
   }
 
+  /// set message except the sender
+  /// ```
+  /// emitter.emitExceptSender('event', message);
+  /// ```
   emitExceptSender(String event, dynamic message) {
     if (sender != null) {
       emit(event, message, exclude: [sender!]);
     }
   }
 
+  /// set message to everyone in the room
+  /// ```
+  /// emitter.emit('event', message);
+  /// ```
   emit(String event, dynamic message, {List<String> exclude = const []}) {
     String payload = jsonEncode({
       "event": event,
@@ -33,12 +49,12 @@ class SocketEmitter {
       DoxLogger.warn('set a room to emit');
       return;
     }
-    List<String> members = storage.getConnectionsFromRoom(roomId!);
+    List<String> members = _storage.getWebSocketIdsOfTheRoom(roomId!);
     for (String socketId in members) {
       if (!exclude.contains(socketId)) {
-        var connection = storage.getConnection(socketId);
-        if (connection != null) {
-          WebSocket websocket = connection['websocket'] as WebSocket;
+        WebSocketInfo? info = _storage.getWebSocketInfo(socketId);
+        if (info != null) {
+          WebSocket websocket = info.websocket;
           websocket.add(payload);
         }
       }

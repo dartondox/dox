@@ -3,7 +3,7 @@ import 'package:dox_core/utils/utils.dart';
 import 'package:dox_core/websocket/dox_websocket.dart';
 
 class Route {
-  /// Singleton
+  /// register as singleton
   static final Route _singleton = Route._internal();
   factory Route() => _singleton;
   Route._internal();

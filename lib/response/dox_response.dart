@@ -79,7 +79,7 @@ class DoxResponse {
     if (_cookie != null) {
       request.response.headers.add(HttpHeaders.setCookieHeader, _cookie!);
     }
-    return HttpResponseHandler.send(content, request);
+    return httpResponseHandler(content, request);
   }
 }
 
