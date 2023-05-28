@@ -18,8 +18,10 @@ class HttpRequestHandler {
         return req.response.close();
       }
 
+      String? domain = req.headers.value('host');
+
       /// getting matched route
-      RouteData? route = _getMatchRoute(req.uri.path, req.method);
+      RouteData? route = _getMatchRoute(req.uri.path, req.method, domain);
       if (route == null) {
         return _routeNotFound(req);
       }
@@ -67,9 +69,14 @@ class HttpRequestHandler {
     return Map.fromIterables(parameterNames, parameterValues);
   }
 
-  RouteData? _getMatchRoute(String inputRoute, String method) {
+  RouteData? _getMatchRoute(String inputRoute, String method, String? domain) {
     List<RouteData> methodMatchedRoutes = Route().routes.where((route) {
-      return route.method.toLowerCase() == method.toLowerCase();
+      if (domain != null && route.domain != null) {
+        return route.method.toLowerCase() == method.toLowerCase() &&
+            route.domain?.toLowerCase() == domain.toLowerCase();
+      } else {
+        return route.method.toLowerCase() == method.toLowerCase();
+      }
     }).toList();
 
     RouteData? matchRoute;

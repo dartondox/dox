@@ -1,5 +1,4 @@
 import 'package:dox_core/router/route_data.dart';
-import 'package:dox_core/router/sub_route.dart';
 import 'package:dox_core/utils/utils.dart';
 import 'package:dox_core/websocket/dox_websocket.dart';
 
@@ -10,6 +9,7 @@ class Route {
   Route._internal();
 
   String _prefix = '';
+  String? _domain;
   List _preMiddleware = [];
   String? _resourceKey;
 
@@ -23,8 +23,26 @@ class Route {
   ///   route.put('{id}/activate', controller);
   /// });
   /// ```
-  static group(prefix, Function(SubRoute) callback) {
-    callback(SubRoute(prefix));
+  static group(prefix, Function() callback) {
+    var originalPrefix = Route()._prefix;
+
+    /// set new prefix
+    Route()._prefix = originalPrefix + prefix;
+    callback();
+
+    /// restore original prefix
+    Route()._prefix = originalPrefix;
+  }
+
+  static domain(domain, Function() callback) {
+    var originalDomain = Route()._domain;
+
+    /// set new domain
+    Route()._domain = domain;
+    callback();
+
+    /// restore original domain
+    Route()._domain = originalDomain;
   }
 
   /// add global middleware
@@ -236,6 +254,7 @@ class Route {
       path: path,
       controllers: controllers,
       resourceKey: resourceKey,
+      domain: _domain,
     ));
     return this;
   }
