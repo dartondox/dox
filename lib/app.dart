@@ -45,6 +45,8 @@ class Dox {
           [..._config.globalMiddleware, ...router.middleware]);
       router.register();
     }
+    Route.prefix('');
+    Route.resetWithNewMiddleware([]);
   }
 
   /// start http server
