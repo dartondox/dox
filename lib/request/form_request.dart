@@ -79,4 +79,24 @@ abstract class FormRequest {
   String? header(key) {
     return request.header(key);
   }
+
+  /// get user agent from header`
+  String userAgent() {
+    return request.userAgent();
+  }
+
+  /// get host
+  String host() {
+    return request.host();
+  }
+
+  /// get origin
+  String? origin() {
+    return request.origin();
+  }
+
+  /// get origin
+  String? referer() {
+    return request.referer();
+  }
 }

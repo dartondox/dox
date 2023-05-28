@@ -10,16 +10,18 @@ websocketTest() {
   Config config = Config();
 
   test('websocket', () async {
+    Route.websocket('ws', (socket) {
+      socket.on('intro', (SocketEmitter emitter, message) {
+        expect(message, 'hello');
+      });
+
+      socket.on('json', (SocketEmitter emitter, message) {
+        expect(message['title'], 'hello');
+      });
+    });
+
     WebSocket socket =
         await WebSocket.connect('ws://localhost:${config.serverPort}/ws');
-
-    DoxWebsocket.on('intro', (SocketEmitter emitter, message) {
-      expect(message, 'hello');
-    });
-
-    DoxWebsocket.on('json', (SocketEmitter emitter, message) {
-      expect(message['title'], 'hello');
-    });
 
     var data = jsonEncode({
       "event": "intro",

@@ -11,7 +11,6 @@ Dox dox = Dox();
 void main() {
   group('Http', () {
     setUpAll(() async {
-      dox.websocket(websocket: DoxWebsocket());
       dox.initialize(Config());
       await Future.delayed(Duration(milliseconds: 500));
     });

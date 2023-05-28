@@ -2,18 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/websocket/socket_storage.dart';
 
 class DoxWebsocket {
-  /// Singleton
-  static final DoxWebsocket _singleton = DoxWebsocket._internal();
-  factory DoxWebsocket() => _singleton;
-  DoxWebsocket._internal();
+  final String defaultRoom;
 
-  /// active websocket connections
-  Map<String, Map<String, dynamic>> activeConnections = {};
+  DoxWebsocket(this.defaultRoom);
 
-  /// active rooms with active users in the room
-  Map<String, List<String>> rooms = {};
+  SocketStorage storage = SocketStorage();
 
   /// registered websocket events listener
   Map<String, Function> events = {};
@@ -24,76 +20,66 @@ class DoxWebsocket {
   ///   /// do something here
   /// });
   /// ```
-  static on(event, Function(SocketEmitter, dynamic) controller) {
-    DoxWebsocket().events[event] = controller;
+  on(event, Function(SocketEmitter, dynamic) controller) {
+    events[event] = controller;
   }
 
   /// handle http request and convert into websocket
   handle(DoxRequest req) async {
-    WebSocket websocket = await WebSocketTransformer.upgrade(req.httpRequest);
-    String socketId = 'websocket:${DateTime.now().microsecondsSinceEpoch}';
+    WebSocket ws = await WebSocketTransformer.upgrade(req.httpRequest);
+    String socketId = _createSocketId();
 
     /// add to active connection
-    activeConnections[socketId] = {
-      "socket_id": socketId,
-      "websocket": websocket,
-      "previous_room": null,
-      "current_room": null,
-    };
+    storage.addConnection(socketId, ws);
+    _joinRoom(defaultRoom, socketId);
 
-    websocket.listen(
-      (dynamic msg) async {
-        Map<String, dynamic> payload = jsonDecode(msg);
-        String event = payload['event'];
+    ws.listen(
+      (dynamic data) async {
+        Map<String, dynamic> payload = jsonDecode(data);
+
+        String eventName = payload['event'];
         dynamic message = payload['message'];
-        if (events[event] != null) {
-          Function.apply(events[event] as Function,
-              [SocketEmitter(sender: socketId), message]);
+        Function? controller = events[eventName];
+
+        if (controller != null) {
+          var emitter =
+              SocketEmitter(sender: socketId, roomId: payload['room']);
+          Function.apply(controller, [emitter, message]);
         }
-        if (event == 'joinRoom') {
+
+        if (eventName == 'joinRoom') {
           _joinRoom(message, socketId);
         }
       },
       onDone: () async {
-        _removeSocketIdFromCurrentRoom(socketId);
-        activeConnections.remove(socketId);
+        _removeConnectionFromRoom(socketId);
+        storage.removeConnection(socketId);
       },
       onError: (dynamic error) async {
-        _removeSocketIdFromCurrentRoom(socketId);
-        activeConnections.remove(socketId);
+        _removeConnectionFromRoom(socketId);
+        storage.removeConnection(socketId);
       },
     );
-    return websocket;
+    return ws;
   }
 
+  /// Join the room and
+  /// update connection current room joining room Id
   _joinRoom(String roomId, String socketId) {
-    /// add socket id to room
-    if (DoxWebsocket().rooms[roomId] == null) {
-      DoxWebsocket().rooms[roomId] = [];
-    }
-    DoxWebsocket().rooms[roomId]?.add(socketId);
+    storage.addConnectionToRoom(socketId, roomId);
+    storage.updateConnectionRoomId(socketId, roomId);
+  }
 
-    /// assign active room to it's connection
-    var data = DoxWebsocket().activeConnections[socketId];
-    if (data != null) {
-      data['current_room'] = roomId;
-      if (data['previous_room'] != null) {
-        _removeFromRoom(data['previous_room'], socketId);
-      }
-      data['previous_room'] = roomId;
+  /// get connection current room and
+  /// remove the connection from the room
+  _removeConnectionFromRoom(socketId) {
+    var connection = storage.getConnection(socketId);
+    if (connection != null && connection['current_room'] != null) {
+      storage.removeConnectionFromRoom(socketId, connection['current_room']);
     }
   }
 
-  _removeSocketIdFromCurrentRoom(socketId) {
-    var data = DoxWebsocket().activeConnections[socketId];
-    if (data != null && data['current_room'] != null) {
-      _removeFromRoom(data['current_room'], socketId);
-    }
-  }
-
-  _removeFromRoom(String roomId, String socketId) {
-    if (DoxWebsocket().rooms[roomId] != null) {
-      DoxWebsocket().rooms[roomId]?.remove(socketId);
-    }
+  _createSocketId() {
+    return 'websocket:${DateTime.now().microsecondsSinceEpoch}';
   }
 }
