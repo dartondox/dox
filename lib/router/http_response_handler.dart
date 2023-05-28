@@ -59,11 +59,11 @@ class HttpResponseHandler {
 
     /// if payload is Map or List, parse into json
     /// and response as json
-    if (payload is Map || payload is List) {
+    if (payload is! String) {
       responseData = jsonEncode(payload);
       res.headers.contentType = ContentType.json;
     } else {
-      responseData = payload.toString();
+      responseData = payload;
     }
 
     /// finally write and close http connection

@@ -151,35 +151,58 @@ class HttpRequestHandler {
     HttpRequest httpRequest,
   ) async {
     dynamic result;
-    List args = doxRequest.param.values.toList();
-    FormRequest Function()? creator = route.formRequest;
 
-    if (creator != null) {
-      FormRequest formReq = creator();
+    List args = doxRequest.param.values
+        .toList()
+        .sublist(0, _lengthOfArgs(controller) - 1);
 
-      /// mapping request inputs field
-      doxRequest.mapInputs(formReq.mapInputs());
+    List types = _getControllerParamsType(controller);
 
-      /// setting dox request to custom form request
-      formReq.setRequest(doxRequest);
+    if (types.isNotEmpty) {
+      String requestName = types.first;
+      if (requestName != 'DoxRequest') {
+        FormRequest? formReq = Global.ioc.getByName(requestName);
+        if (formReq != null && _isRequestMatched(controller, formReq)) {
+          /// mapping request inputs field
+          doxRequest.mapInputs(formReq.mapInputs());
 
-      /// run setup();
-      formReq.setUp();
+          /// setting dox request to custom form request
+          formReq.setRequest(doxRequest);
 
-      /// finally validate;
-      doxRequest.validate(
-        formReq.rules(),
-        messages: formReq.messages(),
-      );
+          /// run setup();
+          formReq.setUp();
 
-      if (formReq.useAsControllerRequest) {
-        result = await Function.apply(controller, [formReq, ...args]);
-        HttpResponseHandler.send(result, httpRequest);
-        return;
+          /// finally validate;
+          doxRequest.validate(
+            formReq.rules(),
+            messages: formReq.messages(),
+          );
+
+          result = await Function.apply(controller, [formReq, ...args]);
+          HttpResponseHandler.send(result, httpRequest);
+          return;
+        }
       }
     }
 
     result = await Function.apply(controller, [doxRequest, ...args]);
     HttpResponseHandler.send(result, httpRequest);
+  }
+
+  /// checking that controller first request param is matched
+  /// with custom request from route
+  _isRequestMatched(controller, req) {
+    List args = _getControllerParamsType(controller);
+    return args[0].toString() == req.runtimeType.toString();
+  }
+
+  List _getControllerParamsType(controller) {
+    return controller.toString().split('(')[1].split(')')[0].split(', ');
+  }
+
+  /// check wether controller assign second parameter as param
+  _lengthOfArgs(controller) {
+    List args = _getControllerParamsType(controller);
+    return args.length;
   }
 }

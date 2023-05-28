@@ -47,6 +47,10 @@ abstract class AppConfig {
 
   Handler get responseHandler;
 
+  Map<Type, Function()> get formRequests => {};
+
+  List get globalMiddleware => [];
+
   List<Router> get routers;
 
   CORSConfig get cors;

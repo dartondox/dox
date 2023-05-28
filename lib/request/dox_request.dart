@@ -230,4 +230,16 @@ class DoxRequest {
       }
     });
   }
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> ret = {};
+    _allRequest.forEach((key, value) {
+      if (value is RequestFile) {
+        ret[key] = value.filename;
+      } else {
+        ret[key] = value;
+      }
+    });
+    return ret;
+  }
 }

@@ -24,14 +24,21 @@ class Dox {
     Dox dox = Dox();
     dox._config = c;
     dox._startHttpServer();
+    dox._registerFormRequests();
     dox._registerRoute();
+  }
+
+  _registerFormRequests() {
+    _config.formRequests.forEach((key, value) {
+      Global.ioc.registerByName(key.toString(), value);
+    });
   }
 
   _registerRoute() {
     List<Router> routers = _config.routers;
     for (Router router in routers) {
       Route.prefix(router.prefix);
-      Route.use(router.middleware);
+      Route.use([..._config.globalMiddleware, ...router.middleware]);
       router.register();
     }
   }
