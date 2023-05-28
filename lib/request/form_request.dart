@@ -97,4 +97,8 @@ abstract class FormRequest {
   String? referer() {
     return request.referer();
   }
+
+  toJson() {
+    return request.toJson();
+  }
 }
