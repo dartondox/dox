@@ -6,8 +6,12 @@ class Config extends AppConfig {
   @override
   String get appKey => '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt';
 
+  int _serverPort = 50010;
+
   @override
-  int get serverPort => 50010;
+  int get serverPort => _serverPort;
+
+  set serverPort(val) => _serverPort = val;
 
   @override
   DBConfig get dbConfig => DBConfig(
