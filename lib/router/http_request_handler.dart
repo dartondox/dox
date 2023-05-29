@@ -184,14 +184,14 @@ Future _handleController(
         /// setting dox request to custom form request
         formReq.setRequest(doxRequest);
 
-        /// run setup();
-        formReq.setUp();
-
-        /// finally validate;
+        /// validate request
         doxRequest.validate(
           formReq.rules(),
           messages: formReq.messages(),
         );
+
+        /// run setup()
+        formReq.setUp();
 
         result = await Function.apply(controller, [formReq, ...args]);
         httpResponseHandler(result, httpRequest);
