@@ -11,4 +11,7 @@ jobs:
       - uses: dart-lang/setup-dart@v1
 
       - run: dart pub get
-      - run: dart test --coverage
+      - run: dart run test --coverage=./coverage
+      - run: dart pub global activate coverage
+      - run: dart pub global run coverage:format_coverage --packages=.dart_tool/package_config.json --report-on=lib --lcov -o ./coverage/lcov.info -i ./coverage
+      - run: genhtml -o ./coverage/report ./coverage/lcov.info
