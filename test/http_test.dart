@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 
 import 'core/config/app.dart';
 import 'core/controllers/example.controller.dart';
+import 'core/requests/blog_request.dart';
 
 Config config = Config();
 String baseUrl = 'http://localhost:${config.serverPort}';
@@ -120,6 +121,23 @@ void main() {
       expect(res.statusCode, 200);
       expect(res.body, 'pong');
       expect(res.headers['x-key'], 'ABCD');
+    });
+
+    test('custom form request', () async {
+      Global.ioc.register<BlogRequest>((i) => BlogRequest());
+      Route.post('/custom_form_request', (BlogRequest req) {
+        expect(req.title, 'hello');
+        return req.title;
+      });
+
+      var url = Uri.parse('$baseUrl/custom_form_request');
+      var res =
+          await http.post(url, body: jsonEncode({'title': 'hello'}), headers: {
+        'content-type': 'application/json',
+      });
+
+      expect(res.statusCode, 200);
+      expect(res.body, 'hello');
     });
   });
 }
