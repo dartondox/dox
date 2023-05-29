@@ -4,11 +4,11 @@ on:
   push:
 
 jobs:
-  build:
+  Test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: dart-lang/setup-dart@v1
 
       - run: dart pub get
-      - run: dart test
+      - run: dart test --coverage
