@@ -11,12 +11,4 @@ jobs:
       - uses: dart-lang/setup-dart@v1
 
       - run: dart pub get
-      - run: dart pub global activate coverage
-      - run: dart run test --coverage=./coverage
-      - run: dart pub global run coverage:format_coverage --packages=.dart_tool/package_config.json --report-on=lib --lcov -o ./coverage/lcov.info -i ./coverage
-
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - run: dart test
