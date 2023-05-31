@@ -8,7 +8,7 @@ class DoxResponse {
   Map<String, dynamic> _headers = {};
   int _statusCode = HttpStatus.ok;
   ContentType? _contentType;
-  String? _cookie;
+  final List<String> _cookies = [];
 
   DoxResponse(this.content);
 
@@ -45,7 +45,7 @@ class DoxResponse {
   /// res.cookie(cookie);
   /// ```
   DoxResponse cookie(DoxCookie cookie, {bool setExpire = false}) {
-    _cookie = setExpire ? cookie.expire() : cookie.get();
+    _cookies.add(setExpire ? cookie.expire() : cookie.get());
     return this;
   }
 
@@ -76,8 +76,8 @@ class DoxResponse {
     if (_contentType != null) {
       request.response.headers.contentType = _contentType;
     }
-    if (_cookie != null) {
-      request.response.headers.add(HttpHeaders.setCookieHeader, _cookie!);
+    for (var cookie in _cookies) {
+      request.response.headers.add(HttpHeaders.setCookieHeader, cookie);
     }
     return httpResponseHandler(content, request);
   }

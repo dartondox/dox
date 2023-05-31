@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:http/http.dart' as http;
@@ -98,6 +99,19 @@ void main() {
       expect(response.body, jsonEncode(responseData));
     });
 
+    test('cache response', () async {
+      Route.get('/cache_response', (DoxRequest req) {
+        return response('pong').cache(Duration(seconds: 10));
+      });
+
+      var url = Uri.parse('$baseUrl/cache_response');
+      var res = await http.get(url);
+
+      expect(res.statusCode, 200);
+      expect(res.body, 'pong');
+      expect(res.headers['cache-control'], 'max-age=10');
+    });
+
     test('custom status', () async {
       Route.get('/custom_status', (DoxRequest req) {
         return response('pong').statusCode(207);
@@ -121,6 +135,75 @@ void main() {
       expect(res.statusCode, 200);
       expect(res.body, 'pong');
       expect(res.headers['x-key'], 'ABCD');
+    });
+
+    test('content type', () async {
+      Route.get('/content_type', (DoxRequest req) {
+        return response('pong').contentType(ContentType.text);
+      });
+
+      var url = Uri.parse('$baseUrl/content_type');
+      var res = await http.get(url);
+
+      expect(res.statusCode, 200);
+      expect(res.body, 'pong');
+      expect(res.headers['content-type'], 'text/plain; charset=utf-8');
+    });
+
+    test('dox request', () async {
+      Route.post('/with_headers/{id}', (DoxRequest req) {
+        expect(req.header('x-auth-key'), 'Bearer 1234');
+        expect(req.headers['x-auth-key'], 'Bearer 1234');
+        expect(req.input('title'), 'hello');
+        expect(req.body['title'], 'hello');
+        expect(req.param['id'], '1');
+        expect(req.method, 'POST');
+        expect(req.uri.path, '/with_headers/1');
+        expect(req.all()['title'], 'hello');
+        expect(req.has('title'), true);
+        expect(req.has('not_exist'), false);
+        expect(req.only(['title'])['title'], 'hello');
+        expect(req.isJson(), true);
+        expect(req.host().contains('localhost'), true);
+        expect(req.ip(), '127.0.0.1');
+        expect(req.isFormData(), false);
+
+        return response('pong').withHeaders({
+          'x-key': 'ABCD',
+        });
+      });
+
+      var url = Uri.parse('$baseUrl/with_headers/1');
+      var res = await http.post(
+        url,
+        headers: {
+          'content-type': 'application/json',
+          'x-auth-key': 'Bearer 1234',
+        },
+        body: jsonEncode({
+          'title': 'hello',
+        }),
+      );
+
+      expect(res.statusCode, 200);
+      expect(res.body, 'pong');
+      expect(res.headers['x-key'], 'ABCD');
+    });
+
+    test('cookie response', () async {
+      Route.get('/custom_header', (DoxRequest req) {
+        var cookie = DoxCookie('x-key', 'ABCD');
+        var cookie2 = DoxCookie('x-key2', 'ABCD', encrypt: false);
+        return response('pong').cookie(cookie).cookie(cookie2);
+      });
+
+      var url = Uri.parse('$baseUrl/custom_header');
+      var res = await http.get(url);
+
+      expect(res.statusCode, 200);
+      expect(res.body, 'pong');
+      expect(res.headers['set-cookie'],
+          'x-key=Ewh5wQRRo0v5ljLQpLNAcA==; Max-Age=3600000,x-key2=ABCD; Max-Age=3600000');
     });
 
     test('custom form request', () async {
