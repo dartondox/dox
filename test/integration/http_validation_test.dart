@@ -4,8 +4,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
-import 'core/config/app.dart';
-import 'core/requests/blog_request.dart';
+import 'requirements/config/app.dart';
 
 Config config = Config();
 String baseUrl = 'http://localhost:${config.serverPort}';
@@ -60,26 +59,6 @@ void main() {
 
       expect(res.statusCode, 200);
       expect(res.body, 'pong');
-    });
-
-    test('custom request', () async {
-      Global.ioc.register<BlogRequest>((i) => BlogRequest());
-      Route.post('/custom_request', (BlogRequest req) {
-        expect(req.title, 'dox');
-        return req.title;
-      });
-
-      var url = Uri.parse('$baseUrl/custom_request');
-      var res = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          "title": 'dox',
-        }),
-      );
-
-      expect(res.statusCode, 200);
-      expect(res.body, 'dox');
     });
   });
 }

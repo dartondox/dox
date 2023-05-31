@@ -153,7 +153,7 @@ class DoxRequest {
   /// ```
   String cookie(key, {bool decrypt = true}) {
     if (decrypt) {
-      return AESEncryptor.decode(_cookies[key]);
+      return AESEncryptor.decode(_cookies[key], Dox().config.appKey);
     }
     return _cookies[key];
   }

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dox_core/app.dart';
 import 'package:dox_core/utils/aes_encryptor.dart';
 
 class DoxCookie {
@@ -46,7 +47,8 @@ class DoxCookie {
   /// cookie.get();
   /// ```
   String get() {
-    String val = encrypt ? AESEncryptor.encode(value) : value;
+    String val =
+        encrypt ? AESEncryptor.encode(value, Dox().config.appKey) : value;
 
     var cookie = Cookie(key, val);
     cookie.maxAge = maxAge.inMilliseconds;

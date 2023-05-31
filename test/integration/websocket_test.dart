@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
-import 'core/config/app.dart';
+import 'requirements/config/app.dart';
 
 Config config = Config();
 String baseUrl = 'http://localhost:${config.serverPort}';

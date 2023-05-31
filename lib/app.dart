@@ -15,6 +15,9 @@ class Dox {
   /// get app config
   AppConfig get config => _config;
 
+  /// set config
+  set config(AppConfig val) => _config = val;
+
   /// initialize dox application
   /// - load env
   /// - start http server

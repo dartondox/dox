@@ -1,0 +1,27 @@
+name: Test
+
+on:
+  push:
+
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dart-lang/setup-dart@v1
+
+      - name: Configure functions
+        run: |
+          dart pub get \
+          dart pub global activate coverage \
+      
+      - run: dart test
+      - run: |
+          dart run test --coverage=./coverage
+          art pub global run coverage:format_coverage --packages=.dart_tool/package_config.json --report-on=lib --lcov -o ./coverage/lcov.info -i ./coverage
+  
+      - uses: vebr/jest-lcov-reporter@v0.2.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          lcov-file: ./coverage/lcov.info

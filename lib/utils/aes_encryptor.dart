@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/logger.dart';
 import 'package:encrypt/encrypt.dart';
 
@@ -9,10 +8,10 @@ class AESEncryptor {
   ///```
   /// AESEncryptor.encode('message');
   ///```
-  static String encode(content) {
+  static String encode(content, String secret) {
     var plainText = base64.encode(utf8.encode(content));
     final iv = IV.fromLength(16);
-    final key = Key.fromUtf8(Dox().config.appKey);
+    final key = Key.fromUtf8(secret);
     final encrypter = Encrypter(AES(key));
     final encrypted = encrypter.encrypt(plainText, iv: iv);
     return encrypted.base64;
@@ -22,9 +21,9 @@ class AESEncryptor {
   ///```
   /// AESEncryptor.decode('encoded_message');
   ///```
-  static String decode(content) {
+  static String decode(content, String secret) {
     try {
-      final key = Key.fromUtf8(Dox().config.appKey);
+      final key = Key.fromUtf8(secret);
       final iv = IV.fromLength(16);
       final encrypter = Encrypter(AES(key));
       final decrypted = encrypter.decrypt64(content, iv: iv);

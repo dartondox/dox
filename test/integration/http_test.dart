@@ -4,9 +4,9 @@ import 'package:dox_core/dox_core.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
-import 'core/config/app.dart';
-import 'core/controllers/example.controller.dart';
-import 'core/requests/blog_request.dart';
+import 'requirements/config/app.dart';
+import 'requirements/controllers/example.controller.dart';
+import 'requirements/requests/blog_request.dart';
 
 Config config = Config();
 String baseUrl = 'http://localhost:${config.serverPort}';
