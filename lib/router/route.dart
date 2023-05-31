@@ -211,7 +211,7 @@ class Route {
   /// Route.lock('path', controller);
   ///
   static Route lock(route, controller) {
-    return Route()._addRoute('UNLINK', Route()._prefix + route, controller);
+    return Route()._addRoute('LOCK', Route()._prefix + route, controller);
   }
 
   /// unlock route

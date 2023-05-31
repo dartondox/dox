@@ -105,8 +105,11 @@ class DoxRequest {
   /// }
   /// ```
   bool has(String key) {
-    String val = _allRequest[key].toString();
-    return val != 'null' || val.isNotEmpty ? true : false;
+    String? val = _allRequest[key];
+    if (val == null) {
+      return false;
+    }
+    return val.toString().isNotEmpty ? true : false;
   }
 
   /// Get header value
@@ -153,7 +156,7 @@ class DoxRequest {
   /// ```
   String cookie(key, {bool decrypt = true}) {
     if (decrypt) {
-      return AESEncryptor.decode(_cookies[key]);
+      return AESEncryptor.decode(_cookies[key], Dox().config.appKey);
     }
     return _cookies[key];
   }
