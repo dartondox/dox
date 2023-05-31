@@ -2,6 +2,7 @@ import 'package:dox_core/dox_core.dart';
 
 import '../handler.dart';
 import '../middleware/custom_middleware.dart';
+import '../requests/blog_request.dart';
 import 'api_router.dart';
 
 class Config extends AppConfig {
@@ -36,6 +37,11 @@ class Config extends AppConfig {
 
   @override
   List get globalMiddleware => [customMiddleware];
+
+  @override
+  Map<Type, Function()> get formRequests => {
+        BlogRequest: () => BlogRequest(),
+      };
 
   @override
   List<Router> get routers => [ApiRouter()];

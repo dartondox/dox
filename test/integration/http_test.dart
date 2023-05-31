@@ -124,7 +124,6 @@ void main() {
     });
 
     test('custom form request', () async {
-      Global.ioc.register<BlogRequest>((i) => BlogRequest());
       Route.post('/custom_form_request', (BlogRequest req) {
         expect(req.title, 'hello');
         return req.title;

@@ -16,5 +16,11 @@ void main() {
       expect(dbConfig.dbUsername, 'postgres');
       expect(dbConfig.enableQueryLog, false);
     });
+
+    test('global middleware', () {
+      AppConfig config = Config();
+      List middleware = config.globalMiddleware;
+      expect(middleware.length, 1);
+    });
   });
 }
