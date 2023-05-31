@@ -191,13 +191,13 @@ void main() {
     });
 
     test('cookie response', () async {
-      Route.get('/custom_header', (DoxRequest req) {
+      Route.get('/cookie_response', (DoxRequest req) {
         var cookie = DoxCookie('x-key', 'ABCD');
         var cookie2 = DoxCookie('x-key2', 'ABCD', encrypt: false);
         return response('pong').cookie(cookie).cookie(cookie2);
       });
 
-      var url = Uri.parse('$baseUrl/custom_header');
+      var url = Uri.parse('$baseUrl/cookie_response');
       var res = await http.get(url);
 
       expect(res.statusCode, 200);
