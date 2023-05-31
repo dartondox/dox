@@ -1,6 +1,8 @@
 import 'package:dox_core/dox_core.dart';
 
 import '../handler.dart';
+import '../middleware/custom_middleware.dart';
+import 'api_router.dart';
 
 class Config extends AppConfig {
   @override
@@ -33,5 +35,8 @@ class Config extends AppConfig {
   Handler get responseHandler => ResponseHandler();
 
   @override
-  List<Router> get routers => [];
+  List get globalMiddleware => [customMiddleware];
+
+  @override
+  List<Router> get routers => [ApiRouter()];
 }

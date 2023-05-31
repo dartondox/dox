@@ -44,6 +44,15 @@ void main() {
       expect(abc, newAbc);
     });
 
+    test('register singleton and get by name', () {
+      var ioc = IocContainer();
+      ioc.registerSingleton<ABC>((i) => ABC());
+
+      ABC abc = ioc.getByName('ABC');
+      ABC newAbc = ioc.getByName('ABC');
+      expect(abc, newAbc);
+    });
+
     test('register request', () {
       var ioc = IocContainer();
       ioc.registerRequest('ABC', () => ABC());
