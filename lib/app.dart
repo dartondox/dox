@@ -7,16 +7,11 @@ class Dox {
   factory Dox() => _singleton;
   Dox._internal();
 
-  late AppConfig _config;
-
   /// get dox http server
   DoxServer get server => DoxServer();
 
   /// get app config
-  AppConfig get config => _config;
-
-  /// set config
-  set config(AppConfig val) => _config = val;
+  late AppConfig config;
 
   /// initialize dox application
   /// - load env
@@ -26,7 +21,7 @@ class Dox {
   initialize(AppConfig c) {
     Env.load();
     Dox dox = Dox();
-    dox._config = c;
+    dox.config = c;
     dox._startHttpServer();
     dox._registerFormRequests();
     dox._registerRoute();
@@ -34,18 +29,18 @@ class Dox {
 
   /// register form request assign in app config
   _registerFormRequests() {
-    _config.formRequests.forEach((key, value) {
+    config.formRequests.forEach((key, value) {
       Global.ioc.registerRequest(key.toString(), value);
     });
   }
 
   /// register routes assign in app config
   _registerRoute() {
-    List<Router> routers = _config.routers;
+    List<Router> routers = config.routers;
     for (Router router in routers) {
       Route.prefix(router.prefix);
       Route.resetWithNewMiddleware(
-          [..._config.globalMiddleware, ...router.middleware]);
+          [...config.globalMiddleware, ...router.middleware]);
       router.register();
     }
     Route.prefix('');
@@ -55,7 +50,7 @@ class Dox {
   /// start http server
   _startHttpServer() {
     DoxServer server = DoxServer();
-    server.setResponseHandler(_config.responseHandler);
-    server.listen(_config.serverPort);
+    server.setResponseHandler(config.responseHandler);
+    server.listen(config.serverPort);
   }
 }
