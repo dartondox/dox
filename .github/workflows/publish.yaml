@@ -1,11 +1,11 @@
-name: Test
+name: Release
 
 on:
   release:
     types: [created]
 
 jobs:
-  Test-Package:
+  Release:
     runs-on: ubuntu-latest
 
     steps:
