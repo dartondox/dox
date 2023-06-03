@@ -22,14 +22,14 @@ class DoxServer {
   /// ```
   Future<HttpServer> listen(int port, {Function? onError}) async {
     Env.load();
-    final server = await HttpServer.bind(InternetAddress.anyIPv4, port);
+    HttpServer server = await HttpServer.bind(InternetAddress.anyIPv4, port);
     DoxLogger.info("Server started at http://127.0.0.1:${server.port}");
     server.listen(
       (HttpRequest req) {
         _setCors(req);
         httpRequestHandler(req);
       },
-      onError: onError ?? (error) => {print(error)},
+      onError: onError ?? (dynamic error) => print(error),
     );
     httpServer = server;
     return server;
@@ -39,19 +39,19 @@ class DoxServer {
   /// ```
   /// server.close();
   /// ```
-  close({bool force = false}) {
-    httpServer.close(force: force);
+  Future<void> close({bool force = false}) async {
+    await httpServer.close(force: force);
   }
 
   /// set response handler
   /// ```
   /// server.setResponseHandler(Handler());
   /// ```
-  setResponseHandler(Handler handler) {
+  void setResponseHandler(Handler handler) {
     responseHandler = handler;
   }
 
-  _setCors(HttpRequest req) {
+  void _setCors(HttpRequest req) {
     CORSConfig cors = Dox().config.cors;
     _setCorsValue(req, 'Access-Control-Allow-Origin', cors.allowOrigin);
     _setCorsValue(req, 'Access-Control-Allow-Methods', cors.allowMethods);
@@ -67,7 +67,7 @@ class DoxServer {
     }
   }
 
-  _setCorsValue(HttpRequest req, key, data) {
+  void _setCorsValue(HttpRequest req, String key, dynamic data) {
     if (data is List<String> && data.isNotEmpty) {
       req.response.headers.add(key, data.join(','));
     } else if (data is String && data.isNotEmpty) {

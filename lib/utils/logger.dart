@@ -1,6 +1,6 @@
 class DoxLogger {
   /// log the text with white color
-  static log(text) {
+  static void log(dynamic text) {
     print(text);
   }
 
@@ -8,7 +8,7 @@ class DoxLogger {
   /// ```
   /// DoxLogger.info('using dox is fun');
   /// ```
-  static info(text) {
+  static void info(dynamic text) {
     print("\x1B[36m$text\x1B[0m");
   }
 
@@ -16,7 +16,7 @@ class DoxLogger {
   /// ```
   /// DoxLogger.info('careful!');
   ///
-  static warn(text) {
+  static void warn(dynamic text) {
     print("\x1B[34m$text\x1B[0m");
   }
 
@@ -24,7 +24,7 @@ class DoxLogger {
   /// ```
   /// DoxLogger.info('success');
   ///
-  static success(text) {
+  static void success(dynamic text) {
     print("\x1B[32m$text\x1B[0m");
   }
 
@@ -32,7 +32,7 @@ class DoxLogger {
   /// ```
   /// DoxLogger.danger('failed');
   ///
-  static danger(text) {
+  static void danger(dynamic text) {
     print("\x1B[31m$text\x1B[0m");
   }
 }

@@ -10,10 +10,10 @@ class Route {
 
   String _prefix = '';
   String? _domain;
-  List _preMiddleware = [];
+  List<dynamic> _preMiddleware = <dynamic>[];
 
   /// get list of routes registered
-  List<RouteData> routes = [];
+  List<RouteData> routes = <RouteData>[];
 
   /// group route
   /// ```
@@ -22,8 +22,8 @@ class Route {
   ///   Route.put('{id}/activate', controller);
   /// });
   /// ```
-  static group(prefix, Function() callback) {
-    var originalPrefix = Route()._prefix;
+  static void group(String prefix, Function() callback) {
+    String originalPrefix = Route()._prefix;
 
     /// set new prefix
     Route()._prefix = originalPrefix + prefix;
@@ -39,8 +39,8 @@ class Route {
   ///   Route.get('/ping', controller);
   /// });
   /// ```
-  static domain(domain, Function() callback) {
-    var originalDomain = Route()._domain;
+  static void domain(String domain, Function() callback) {
+    String? originalDomain = Route()._domain;
 
     /// set new domain
     Route()._domain = domain;
@@ -56,11 +56,11 @@ class Route {
   ///   Route.get('/ping', controller);
   /// });
   /// ```
-  static middleware(List middleware, Function() callback) {
-    var originalMiddleware = Route()._preMiddleware;
+  static void middleware(List<dynamic> middleware, Function() callback) {
+    List<dynamic> originalMiddleware = Route()._preMiddleware;
 
     /// set new middleware
-    Route()._preMiddleware = [...originalMiddleware, ...middleware];
+    Route()._preMiddleware = <dynamic>[...originalMiddleware, ...middleware];
     callback();
 
     /// restore original middleware
@@ -71,12 +71,12 @@ class Route {
   /// ```
   /// Route.use([Middleware()]);
   /// ```
-  static resetWithNewMiddleware(middleware) {
-    List list = [];
+  static void resetWithNewMiddleware(dynamic middleware) {
+    List<dynamic> list = <dynamic>[];
     if (middleware is List) {
       list = middleware;
     } else {
-      list = [middleware];
+      list = <dynamic>[middleware];
     }
     Route()._preMiddleware = list;
   }
@@ -85,12 +85,12 @@ class Route {
   /// ```
   /// Route.use([Middleware()]);
   /// ```
-  static use(middleware) {
-    List list = [];
+  static void use(dynamic middleware) {
+    List<dynamic> list = <dynamic>[];
     if (middleware is List) {
       list = middleware;
     } else {
-      list = [middleware];
+      list = <dynamic>[middleware];
     }
     Route()._preMiddleware.add(list);
   }
@@ -100,7 +100,7 @@ class Route {
   /// ```
   /// Route.prefix('blog');
   /// ```
-  static prefix(prefix) {
+  static void prefix(String prefix) {
     Route()._prefix = prefix;
   }
 
@@ -110,11 +110,11 @@ class Route {
   ///   socket.on('intro', controller);
   /// });
   /// ```
-  static websocket(String route, Function(DoxWebsocket) callback,
-      {List middleware = const []}) {
-    var ws = DoxWebsocket(route);
-    Route()
-        ._addRoute('GET', Route()._prefix + route, [...middleware, ws.handle]);
+  static void websocket(String route, Function(DoxWebsocket) callback,
+      {List<dynamic> middleware = const <dynamic>[]}) {
+    DoxWebsocket ws = DoxWebsocket(route);
+    Route()._addRoute(
+        'GET', Route()._prefix + route, <dynamic>[...middleware, ws.handle]);
     callback(ws);
   }
 
@@ -122,7 +122,7 @@ class Route {
   /// ```
   /// Route.get('path', controller);
   /// ```
-  static Route get(route, controller) {
+  static Route get(String route, dynamic controller) {
     return Route()._addRoute('GET', Route()._prefix + route, controller);
   }
 
@@ -130,7 +130,7 @@ class Route {
   /// ```
   /// Route.post('path', controller);
   ///
-  static Route post(route, controller, {Function? request}) {
+  static Route post(String route, dynamic controller, {Function? request}) {
     return Route()._addRoute('POST', Route()._prefix + route, controller);
   }
 
@@ -138,7 +138,7 @@ class Route {
   /// ```
   /// Route.put('path', controller);
   ///
-  static Route put(route, controller) {
+  static Route put(String route, dynamic controller) {
     return Route()._addRoute('PUT', Route()._prefix + route, controller);
   }
 
@@ -146,7 +146,7 @@ class Route {
   /// ```
   /// Route.delete('path', controller);
   ///
-  static Route delete(route, controller) {
+  static Route delete(String route, dynamic controller) {
     return Route()._addRoute('DELETE', Route()._prefix + route, controller);
   }
 
@@ -154,7 +154,7 @@ class Route {
   /// ```
   /// Route.purge('path', controller);
   ///
-  static Route purge(route, controller) {
+  static Route purge(String route, dynamic controller) {
     return Route()._addRoute('PURGE', Route()._prefix + route, controller);
   }
 
@@ -162,7 +162,7 @@ class Route {
   /// ```
   /// Route.patch('path', controller);
   ///
-  static Route patch(route, controller) {
+  static Route patch(String route, dynamic controller) {
     return Route()._addRoute('PATCH', Route()._prefix + route, controller);
   }
 
@@ -170,7 +170,7 @@ class Route {
   /// ```
   /// Route.options('path', controller);
   ///
-  static Route options(route, controller) {
+  static Route options(String route, dynamic controller) {
     return Route()._addRoute('OPTIONS', Route()._prefix + route, controller);
   }
 
@@ -178,7 +178,7 @@ class Route {
   /// ```
   /// Route.copy('path', controller);
   ///
-  static Route copy(route, controller) {
+  static Route copy(String route, dynamic controller) {
     return Route()._addRoute('COPY', Route()._prefix + route, controller);
   }
 
@@ -186,7 +186,7 @@ class Route {
   /// ```
   /// Route.view('path', controller);
   ///
-  static Route view(route, controller) {
+  static Route view(String route, dynamic controller) {
     return Route()._addRoute('VIEW', Route()._prefix + route, controller);
   }
 
@@ -194,7 +194,7 @@ class Route {
   /// ```
   /// Route.link('path', controller);
   ///
-  static Route link(route, controller) {
+  static Route link(String route, dynamic controller) {
     return Route()._addRoute('LINK', Route()._prefix + route, controller);
   }
 
@@ -202,7 +202,7 @@ class Route {
   /// ```
   /// Route.unlink('path', controller);
   ///
-  static Route unlink(route, controller) {
+  static Route unlink(String route, dynamic controller) {
     return Route()._addRoute('UNLINK', Route()._prefix + route, controller);
   }
 
@@ -210,7 +210,7 @@ class Route {
   /// ```
   /// Route.lock('path', controller);
   ///
-  static Route lock(route, controller) {
+  static Route lock(String route, dynamic controller) {
     return Route()._addRoute('LOCK', Route()._prefix + route, controller);
   }
 
@@ -218,7 +218,7 @@ class Route {
   /// ```
   /// Route.unlock('path', controller);
   ///
-  static Route unlock(route, controller) {
+  static Route unlock(String route, dynamic controller) {
     return Route()._addRoute('UNLOCK', Route()._prefix + route, controller);
   }
 
@@ -226,7 +226,7 @@ class Route {
   /// ```
   /// Route.propfind('path', controller);
   ///
-  static Route propfind(route, controller) {
+  static Route propfind(String route, dynamic controller) {
     return Route()._addRoute('PROPFIND', Route()._prefix + route, controller);
   }
 
@@ -234,8 +234,8 @@ class Route {
   /// ```
   /// Route.resource('blog', BlogController());
   ///
-  static Route resource(route, controller) {
-    var prefix = "${Route()._prefix}/$route";
+  static Route resource(String route, dynamic controller) {
+    String prefix = "${Route()._prefix}/$route";
 
     /// GET /resource
     Route()._addRoute('GET', prefix, controller.index);
@@ -264,9 +264,9 @@ class Route {
     return Route();
   }
 
-  Route _addRoute(method, String path, controller) {
+  Route _addRoute(String method, String path, dynamic controller) {
     path = sanitizeRoutePath(path);
-    List controllers = [];
+    List<dynamic> controllers = <dynamic>[];
     controllers.addAll(_preMiddleware);
     if (controller is Function) {
       controllers.add(controller);

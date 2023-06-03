@@ -18,39 +18,39 @@ class Dox {
   /// - start http server
   /// - start form requests in global ioc
   /// - register routes
-  initialize(AppConfig c) {
+  Future<void> initialize(AppConfig c) async {
     Env.load();
     Dox dox = Dox();
     dox.config = c;
-    dox._startHttpServer();
     dox._registerFormRequests();
     dox._registerRoute();
+    await dox._startHttpServer();
   }
 
   /// register form request assign in app config
-  _registerFormRequests() {
-    config.formRequests.forEach((key, value) {
+  void _registerFormRequests() {
+    config.formRequests.forEach((Type key, Function() value) {
       Global.ioc.registerRequest(key.toString(), value);
     });
   }
 
   /// register routes assign in app config
-  _registerRoute() {
+  void _registerRoute() {
     List<Router> routers = config.routers;
     for (Router router in routers) {
       Route.prefix(router.prefix);
       Route.resetWithNewMiddleware(
-          [...config.globalMiddleware, ...router.middleware]);
+          <dynamic>[...config.globalMiddleware, ...router.middleware]);
       router.register();
     }
     Route.prefix('');
-    Route.resetWithNewMiddleware([]);
+    Route.resetWithNewMiddleware(<dynamic>[]);
   }
 
   /// start http server
-  _startHttpServer() {
+  Future<void> _startHttpServer() async {
     DoxServer server = DoxServer();
     server.setResponseHandler(config.responseHandler);
-    server.listen(config.serverPort);
+    await server.listen(config.serverPort);
   }
 }

@@ -3,13 +3,9 @@ import 'package:test/test.dart';
 
 void main() {
   test('query_exception', () {
-    var exception = QueryException(
-      message: 'Error in sql query',
-      errorCode: 'sql_query_error',
-      code: 500,
-    );
+    QueryException exception = QueryException();
 
-    var res = exception.toResponse();
+    dynamic res = exception.toResponse();
     expect(res, 'Error in sql query');
     expect(exception.code, 500);
   });

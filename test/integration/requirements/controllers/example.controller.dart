@@ -1,11 +1,11 @@
 import 'package:dox_core/dox_core.dart';
 
 class ExampleController {
-  testException(DoxRequest req) {
+  void testException(DoxRequest req) {
     throw Exception('something went wrong');
   }
 
-  httpException(DoxRequest req) {
+  void httpException(DoxRequest req) {
     throw UnAuthorizedException();
   }
 }

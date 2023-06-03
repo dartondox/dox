@@ -4,9 +4,9 @@ import 'package:dox_core/dox_core.dart';
 
 class UnAuthorizedException extends HttpException {
   UnAuthorizedException({
-    message = 'Failed to authorize',
-    errorCode = 'unauthorized',
-    code = HttpStatus.unauthorized,
+    String message = 'Failed to authorize',
+    String errorCode = 'unauthorized',
+    int code = HttpStatus.unauthorized,
   }) {
     super.code = code;
     super.errorCode = errorCode;

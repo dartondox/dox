@@ -9,13 +9,13 @@ class LogMiddleware extends DoxMiddleware {
   LogMiddleware({this.filter, this.withHeader = false});
 
   @override
-  handle(DoxRequest req) {
-    var text = {
+  DoxRequest handle(DoxRequest req) {
+    Map<String, dynamic> text = <String, dynamic>{
       'level': 'INFO',
       'message': "${req.method} ${req.uri.path}",
       'source_ip': req.ip(),
       'timestamp': DateTime.now().toIso8601String(),
-      'payload': {
+      'payload': <String, dynamic>{
         'request': req.all(),
         'headers': withHeader ? req.headers : null,
       }

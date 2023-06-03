@@ -14,13 +14,13 @@ class DoxRequest {
   Uri get uri => httpRequest.uri;
   HttpResponse get response => httpRequest.response;
 
-  Map<String, dynamic> param = {};
-  Map<String, dynamic> query = {};
-  Map<String, dynamic> body = {};
+  Map<String, dynamic> param = <String, dynamic>{};
+  Map<String, dynamic> query = <String, dynamic>{};
+  Map<String, dynamic> body = <String, dynamic>{};
 
-  Map<String, dynamic> _allRequest = {};
+  Map<String, dynamic> _allRequest = <String, dynamic>{};
   HttpHeaders get _headers => httpRequest.headers;
-  final Map<String, dynamic> _cookies = {};
+  final Map<String, dynamic> _cookies = <String, dynamic>{};
 
   DoxRequest(this.httpRequest);
 
@@ -36,17 +36,17 @@ class DoxRequest {
     i.query = request.uri.queryParameters;
 
     if (i.isJson()) {
-      var bodyString = await utf8.decoder.bind(request).join();
+      String bodyString = await utf8.decoder.bind(request).join();
       i.body = jsonDecode(bodyString);
     }
 
     if (i.isFormData()) {
-      var visitor = FormDataVisitor(request);
+      FormDataVisitor visitor = FormDataVisitor(request);
       await visitor.process();
       i.body = visitor.inputs;
     }
 
-    i._allRequest = {...i.query, ...i.body};
+    i._allRequest = <String, dynamic>{...i.query, ...i.body};
     i._getCookies();
     return i;
   }
@@ -75,7 +75,7 @@ class DoxRequest {
   /// req.only(['email', 'name']);
   /// ```
   Map<String, dynamic> only(List<String> keys) {
-    Map<String, dynamic> ret = {};
+    Map<String, dynamic> ret = <String, dynamic>{};
     for (String key in keys) {
       ret[key] = _allRequest[key];
     }
@@ -94,7 +94,7 @@ class DoxRequest {
   /// ```
   /// req.input('email');
   /// ```
-  dynamic input(key) {
+  dynamic input(String key) {
     return _allRequest[key];
   }
 
@@ -116,7 +116,7 @@ class DoxRequest {
   /// ```
   /// req.header('X-Token');
   /// ```
-  String? header(key) {
+  String? header(String key) {
     return _headers.value(key);
   }
 
@@ -125,9 +125,9 @@ class DoxRequest {
   /// req.headers;
   /// ```
   Map<String, dynamic> get headers {
-    Map<String, dynamic> ret = {};
-    _headers.forEach((name, values) {
-      ret[name] = values.join('');
+    Map<String, dynamic> ret = <String, dynamic>{};
+    _headers.forEach((String name, List<String> values) {
+      ret[name] = values.join();
     });
     return ret;
   }
@@ -136,7 +136,7 @@ class DoxRequest {
   /// ```
   /// req.add('foo', bar);
   /// ```
-  void add(key, value) {
+  void add(String key, dynamic value) {
     _allRequest[key] = value;
     body[key] = value;
   }
@@ -146,15 +146,15 @@ class DoxRequest {
   /// req.merge({"foo" : bar});
   /// ```
   void merge(Map<String, dynamic> values) {
-    _allRequest = {..._allRequest, ...values};
-    body = {...body, ...values};
+    _allRequest = <String, dynamic>{..._allRequest, ...values};
+    body = <String, dynamic>{...body, ...values};
   }
 
   /// get cookie value from header
   /// ```
   /// req.cookie('authKey');
   /// ```
-  String cookie(key, {bool decrypt = true}) {
+  String cookie(String key, {bool decrypt = true}) {
     if (decrypt) {
       return AESEncryptor.decode(_cookies[key], Dox().config.appKey);
     }
@@ -199,9 +199,9 @@ class DoxRequest {
   /// req.validate({'title': 'required'},
   ///   messages : {'required' : 'The {attribute} is required'});
   /// ```
-  validate(Map<String, String> rules,
-      {Map<String, String> messages = const {}}) {
-    var validator = DoxValidator(all());
+  void validate(Map<String, String> rules,
+      {Map<String, String> messages = const <String, String>{}}) {
+    DoxValidator validator = DoxValidator(all());
     if (messages.isNotEmpty) {
       validator.setMessages(messages);
     }
@@ -211,12 +211,12 @@ class DoxRequest {
     }
   }
 
-  _getCookies() {
+  void _getCookies() {
     List<String>? cookies = httpRequest.headers[HttpHeaders.cookieHeader];
     if (cookies == null) {
       return;
     }
-    for (var cookie in cookies) {
+    for (String cookie in cookies) {
       int equalsIndex = cookie.indexOf('=');
       String name = cookie.substring(0, equalsIndex);
       String value = cookie.substring(equalsIndex + 1);
@@ -225,9 +225,9 @@ class DoxRequest {
   }
 
   void mapInputs(Map<String, String> mapper) {
-    mapper.forEach((from, to) {
+    mapper.forEach((String from, String to) {
       if (from != to) {
-        var temp = _allRequest[from];
+        dynamic temp = _allRequest[from];
         _allRequest[to] = temp;
         _allRequest.remove(from);
       }
@@ -235,8 +235,8 @@ class DoxRequest {
   }
 
   Map<String, dynamic> toJson() {
-    Map<String, dynamic> ret = {};
-    _allRequest.forEach((key, value) {
+    Map<String, dynamic> ret = <String, dynamic>{};
+    _allRequest.forEach((String key, dynamic value) {
       if (value is RequestFile) {
         ret[key] = value.filename;
       } else {

@@ -7,7 +7,7 @@ class Env {
     return _singleton;
   }
 
-  Map<String, dynamic> env = {};
+  Map<String, dynamic> env = <String, dynamic>{};
 
   Env._internal();
 
@@ -20,7 +20,7 @@ class Env {
   /// Evn.get('APP_KEY');
   /// Evn.get('APP_KEY', 'with_default_value_if_null');
   /// ```
-  static String get(key, [dynamic defaultValue]) {
+  static String get(String key, [dynamic defaultValue]) {
     String value = Env().env[key].toString();
     return value.isEmpty || value.toLowerCase() == 'null'
         ? defaultValue

@@ -10,8 +10,8 @@ class DoxValidator {
   final Map<String, dynamic> data;
 
   /// internal constants
-  final Map<String, dynamic> _errors = {};
-  List get _methodNoNeedToSplitArguments => ['in'];
+  final Map<String, String> _errors = <String, String>{};
+  List<String> get _methodNoNeedToSplitArguments => <String>['in'];
 
   DoxValidator(this.data);
 
@@ -19,7 +19,7 @@ class DoxValidator {
   bool get hasError => _errors.isNotEmpty;
 
   /// get list of error messages
-  Map<String, dynamic> get errors => _errors;
+  Map<String, String> get errors => _errors;
 
   /// add custom rule
   /// ```
@@ -30,12 +30,12 @@ class DoxValidator {
   ///   }
   /// });
   /// ```
-  addCustomRule(
+  void addCustomRule(
     String ruleName, {
     required String message,
     required bool Function(Map<String, dynamic>, dynamic, String?) fn,
   }) {
-    _matchings[ruleName] = {
+    _matchings[ruleName] = <String, dynamic>{
       "message": message,
       "function": fn,
     };
@@ -45,8 +45,8 @@ class DoxValidator {
   /// ```
   /// validator.setMessages({'required': 'The {attribute} is required});
   /// ```
-  setMessages(Map<String, String> messages) {
-    messages.forEach((key, value) {
+  void setMessages(Map<String, String> messages) {
+    messages.forEach((String key, String value) {
       if (_matchings[key] != null) {
         _matchings[key]?['message'] = value;
       }
@@ -57,10 +57,11 @@ class DoxValidator {
   /// ```
   /// validator.validate({'field' : 'required|string'});
   /// ```
-  validate(Map<String, String> rules) {
-    rules.forEach((field, rule) {
+  void validate(Map<String, String> rules) {
+    rules.forEach((String field, String rule) {
       if (_isNestedValidation(field)) {
-        var v = NestedValidationVisitor(data: data, field: field, rule: rule);
+        NestedValidationVisitor v =
+            NestedValidationVisitor(data: data, field: field, rule: rule);
         for (ValidationItem item in v.fieldsToValidate) {
           _validateItem(item);
         }
@@ -75,12 +76,12 @@ class DoxValidator {
     });
   }
 
-  bool _isNestedValidation(field) {
+  bool _isNestedValidation(String field) {
     return field.contains('.*.');
   }
 
-  _validateItem(ValidationItem item) {
-    var rulesForEachName = item.rule.split('|');
+  void _validateItem(ValidationItem item) {
+    List<String> rulesForEachName = item.rule.split('|');
     for (String rule in rulesForEachName) {
       String? error =
           _applyMatchingRule(item.field, item.name, item.value, rule);
@@ -93,16 +94,17 @@ class DoxValidator {
 
   String? _applyMatchingRule(
       String field, String name, dynamic value, String rule) {
-    List parts = rule.split(':');
+    List<String> parts = rule.split(':');
     String ruleKey = parts.first.toString().toLowerCase();
     String args = parts.length >= 2 ? parts[1] : '';
-    var match = _matchings[ruleKey];
+    Map<String, dynamic>? match = _matchings[ruleKey];
     if (match == null) {
       DoxLogger.warn("$ruleKey rule doesn't exist.");
       return null;
     }
 
-    bool result = Function.apply(match['function'], [data, value, args]);
+    bool result =
+        Function.apply(match['function'], <dynamic>[data, value, args]);
     if (result == true) {
       return null;
     }
@@ -112,8 +114,8 @@ class DoxValidator {
         .replaceAll('{value}', value == null ? '' : value.toString());
 
     if (args.isNotEmpty) {
-      var arguments = _methodNoNeedToSplitArguments.contains(ruleKey)
-          ? [args.split(',').joinWithAnd()]
+      List<String> arguments = _methodNoNeedToSplitArguments.contains(ruleKey)
+          ? <String>[args.split(',').joinWithAnd()]
           : args.split(',');
       return sprintf(error, arguments);
     }
@@ -121,136 +123,137 @@ class DoxValidator {
     return error;
   }
 
-  final Map<String, Map<String, dynamic>> _matchings = {
-    'required': {
+  final Map<String, Map<String, dynamic>> _matchings =
+      <String, Map<String, dynamic>>{
+    'required': <String, dynamic>{
       'message': 'The {attribute} is required',
       'function': Rules.isRequired,
     },
-    'email': {
+    'email': <String, dynamic>{
       'message': 'The {attribute} is not a valid email',
       'function': Rules.isEmail,
     },
-    'string': {
+    'string': <String, dynamic>{
       'message': 'The {attribute} must be a string',
       'function': Rules.isString,
     },
-    'numeric': {
+    'numeric': <String, dynamic>{
       'message': 'The {attribute} must be a number',
       'function': Rules.isNumeric,
     },
-    'ip': {
+    'ip': <String, dynamic>{
       'message': 'The {attribute} must be an ip address',
       'function': Rules.isIp,
     },
-    'boolean': {
+    'boolean': <String, dynamic>{
       'message': 'The {attribute} must be a boolean',
       'function': Rules.isBoolean,
     },
-    'integer': {
+    'integer': <String, dynamic>{
       'message': 'The {attribute} must be an integer',
       'function': Rules.isInteger,
     },
-    'double': {
+    'double': <String, dynamic>{
       'message': 'The {attribute} must be a double',
       'function': Rules.isDouble,
     },
-    'array': {
+    'array': <String, dynamic>{
       'message': 'The {attribute} must be an array',
       'function': Rules.isArray,
     },
-    'json': {
+    'json': <String, dynamic>{
       'message': 'The {attribute} is not a valid json',
       'function': Rules.isJson,
     },
-    'alpha': {
+    'alpha': <String, dynamic>{
       'message': 'The {attribute} must be an alphabetic',
       'function': Rules.isAlpha,
     },
-    'alpha_dash': {
+    'alpha_dash': <String, dynamic>{
       'message': 'The {attribute} must be only alphabetic and dash',
       'function': Rules.isAlphaDash,
     },
-    'alpha_numeric': {
+    'alpha_numeric': <String, dynamic>{
       'message': 'The {attribute} must be only alphabetic and number',
       'function': Rules.isAlphaNumeric,
     },
-    'date': {
+    'date': <String, dynamic>{
       'message': 'The {attribute} must be a date',
       'function': Rules.isDate,
     },
-    'url': {
+    'url': <String, dynamic>{
       'message': 'The {attribute} must be a url',
       'function': Rules.isUrl,
     },
-    'uuid': {
+    'uuid': <String, dynamic>{
       'message': 'The {attribute} is invalid uuid',
       'function': Rules.isUUID,
     },
-    'min_length': {
+    'min_length': <String, dynamic>{
       'message': 'The {attribute} must be at least %s character',
       'function': Rules.minLength,
     },
-    'max_length': {
+    'max_length': <String, dynamic>{
       'message': 'The {attribute} may not be greater than %s character',
       'function': Rules.maxLength,
     },
-    'length_between': {
+    'length_between': <String, dynamic>{
       'message': 'The {attribute} must be between %s and %s character',
       'function': Rules.lengthBetween,
     },
-    'between': {
+    'between': <String, dynamic>{
       'message': 'The {attribute} must be between %s and %s',
       'function': Rules.between,
     },
-    'in': {
+    'in': <String, dynamic>{
       'message': 'The selected {attribute} is invalid. Valid options are %s',
       'function': Rules.inArray,
     },
-    'not_in': {
+    'not_in': <String, dynamic>{
       'message': 'The {attribute} field cannot be {value}',
       'function': Rules.notInArray,
     },
-    'start_with': {
+    'start_with': <String, dynamic>{
       'message': 'The {attribute} must start with %s',
       'function': Rules.startWith,
     },
-    'end_with': {
+    'end_with': <String, dynamic>{
       'message': 'The {attribute} must end with %s',
       'function': Rules.endWith,
     },
-    'greater_than': {
+    'greater_than': <String, dynamic>{
       'message': 'The {attribute} must be greater than %s',
       'function': Rules.greaterThan,
     },
-    'less_than': {
+    'less_than': <String, dynamic>{
       'message': 'The {attribute} must be less than %s',
       'function': Rules.lessThan,
     },
-    'min': {
+    'min': <String, dynamic>{
       'message': 'The {attribute} must be greater than or equal %s',
       'function': Rules.min,
     },
-    'max': {
+    'max': <String, dynamic>{
       'message': 'The {attribute} must be less than or equal %s',
       'function': Rules.max,
     },
-    'confirmed': {
+    'confirmed': <String, dynamic>{
       'message': 'The two password did not match',
       'function': Rules.confirmed,
     },
-    'required_if': {
+    'required_if': <String, dynamic>{
       'message': 'The {attribute} is required',
       'function': Rules.requiredIf,
     },
-    'required_if_not': {
+    'required_if_not': <String, dynamic>{
       'message': 'The {attribute} is required',
       'function': Rules.requiredIfNot,
     },
-    'image': {
+    'image': <String, dynamic>{
       'message': 'The {attribute} is either invalid or unsupported extension',
       'function': Rules.isImage,
     },
-    'file': {
+    'file': <String, dynamic>{
       'message': 'The {attribute} is either invalid or unsupported extension',
       'function': Rules.isFile,
     },
