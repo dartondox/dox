@@ -5,10 +5,10 @@ import 'package:dox_core/router/http_response_handler.dart';
 
 class DoxResponse {
   final dynamic content;
-  Map<String, dynamic> _headers = {};
+  Map<String, dynamic> _headers = <String, dynamic>{};
   int _statusCode = HttpStatus.ok;
   ContentType? _contentType;
-  final List<String> _cookies = [];
+  final List<String> _cookies = <String>[];
 
   DoxResponse(this.content);
 
@@ -34,7 +34,7 @@ class DoxResponse {
   /// ```
   /// res.header('Authorization', 'Bearer xxx');
   /// ```
-  DoxResponse header(key, value) {
+  DoxResponse header(String key, dynamic value) {
     _headers[key] = value;
     return this;
   }
@@ -68,21 +68,21 @@ class DoxResponse {
   }
 
   /// This function is for internal use only
-  process(HttpRequest request) {
-    _headers.forEach((key, value) {
+  dynamic process(HttpRequest request) {
+    _headers.forEach((String key, dynamic value) {
       request.response.headers.add(key, value);
     });
     request.response.statusCode = _statusCode;
     if (_contentType != null) {
       request.response.headers.contentType = _contentType;
     }
-    for (var cookie in _cookies) {
+    for (String cookie in _cookies) {
       request.response.headers.add(HttpHeaders.setCookieHeader, cookie);
     }
     return httpResponseHandler(content, request);
   }
 }
 
-DoxResponse response(content) {
+DoxResponse response(dynamic content) {
   return DoxResponse(content);
 }

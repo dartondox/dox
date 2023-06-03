@@ -4,20 +4,20 @@ class BlogRequest extends FormRequest {
   String? title;
 
   @override
-  setUp() {
+  void setUp() {
     title = input('title');
   }
 
   @override
   Map<String, String> rules() {
-    return {
+    return <String, String>{
       'title': 'required',
     };
   }
 
   @override
   Map<String, String> messages() {
-    return {
+    return <String, String>{
       'required': 'The {attribute} is missing',
     };
   }

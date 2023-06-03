@@ -1,5 +1,5 @@
 class Serializer<T> {
-  List<T> _payload = [];
+  List<T> _payload = <T>[];
 
   bool _isSingular = true;
 
@@ -10,17 +10,17 @@ class Serializer<T> {
     }
     if (data is T) {
       _isSingular = true;
-      _payload = [data];
+      _payload = <T>[data];
     }
   }
 
   /// convert model into Map
   Map<String, dynamic> convert(T m) {
-    return {};
+    return <String, dynamic>{};
   }
 
-  toJson() {
-    List<Map<String, dynamic>> ret = [];
+  dynamic toJson() {
+    List<Map<String, dynamic>> ret = <Map<String, dynamic>>[];
     for (T p in _payload) {
       ret.add(convert(p));
     }

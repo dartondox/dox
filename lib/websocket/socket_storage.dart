@@ -8,10 +8,11 @@ class SocketStorage {
   SocketStorage._internal();
 
   /// active websocket connections
-  final Map<String, WebSocketInfo> _socketConnections = {};
+  final Map<String, WebSocketInfo> _socketConnections =
+      <String, WebSocketInfo>{};
 
   /// active rooms with active users in the room
-  final Map<String, List<String>> _rooms = {};
+  final Map<String, List<String>> _rooms = <String, List<String>>{};
 
   /// add new websocket to active connections
   /// this is used when new ws connection is connected
@@ -43,7 +44,7 @@ class SocketStorage {
   /// this is use to join the room
   void addWebSocketIdToRoom(String socketId, String roomId) {
     if (_rooms[roomId] == null) {
-      _rooms[roomId] = [];
+      _rooms[roomId] = <String>[];
     }
     _rooms[roomId]?.add(socketId);
     updateActiveRoomId(socketId, roomId);
@@ -66,7 +67,7 @@ class SocketStorage {
   /// get list of socket id from the room
   /// this is used when we want to emit message to specific room
   List<String> getWebSocketIdsOfTheRoom(String roomId) {
-    return _rooms[roomId] ?? [];
+    return _rooms[roomId] ?? <String>[];
   }
 
   /// remove websocketId from the room

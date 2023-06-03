@@ -9,12 +9,13 @@ import 'package:dox_core/utils/utils.dart';
 /// this is a class which get matched routes and
 /// pass http request to route middleware and controllers
 /// and response from controllers is passed to `httpResponseHandler`
-dynamic httpRequestHandler(HttpRequest req) async {
+Future<void> httpRequestHandler(HttpRequest req) async {
   try {
     // preflight
     if (req.method == 'OPTIONS') {
       req.response.statusCode = HttpStatus.ok;
-      return req.response.close();
+      await req.response.close();
+      return;
     }
 
     String? domain = req.headers.value('host');
@@ -22,30 +23,33 @@ dynamic httpRequestHandler(HttpRequest req) async {
     /// getting matched route
     RouteData? route = _getMatchRoute(req.uri.path, req.method, domain);
     if (route == null) {
-      return _routeNotFound(req);
+      await _routeNotFound(req);
+      return;
     }
 
     /// convert http request into DoxRequest
     /// we did not use constructor here because we require
     /// async await to get body string from HttpRequest.
-    var doxReq = await DoxRequest.httpRequestToDoxRequest(req, route);
+    DoxRequest doxReq = await DoxRequest.httpRequestToDoxRequest(req, route);
 
     /// route.controllers will be always list
     /// see Route()._addRoute() for explanation
-    return await _handleMiddlewareController(route, doxReq, req);
+    await _handleMiddlewareController(route, doxReq, req);
+    return;
   } catch (error, stackTrace) {
     if (error is Exception || error is Error) {
       DoxLogger.warn(error);
       DoxLogger.danger(stackTrace.toString());
     }
-    return httpResponseHandler(error, req);
+    httpResponseHandler(error, req);
+    return;
   }
 }
 
 /// get matched route from the list
 /// method, domain, path
 RouteData? _getMatchRoute(String inputRoute, String method, String? domain) {
-  List<RouteData> methodMatchedRoutes = Route().routes.where((route) {
+  List<RouteData> methodMatchedRoutes = Route().routes.where((RouteData route) {
     if (domain != null && route.domain != null) {
       return route.method.toLowerCase() == method.toLowerCase() &&
           route.domain?.toLowerCase() == domain.toLowerCase();
@@ -55,7 +59,7 @@ RouteData? _getMatchRoute(String inputRoute, String method, String? domain) {
   }).toList();
 
   RouteData? matchRoute;
-  for (var route in methodMatchedRoutes) {
+  for (RouteData route in methodMatchedRoutes) {
     route.path = sanitizeRoutePath(route.path);
     inputRoute = sanitizeRoutePath(inputRoute);
 
@@ -68,8 +72,8 @@ RouteData? _getMatchRoute(String inputRoute, String method, String? domain) {
 
     /// when route have params
     /// eg. /api/admin/{adminId}
-    var parameterNames = _getParameterNameFromRoute(route);
-    var matches = _getPatternMatches(inputRoute, route);
+    Iterable<String> parameterNames = _getParameterNameFromRoute(route);
+    Iterable<RegExpMatch> matches = _getPatternMatches(inputRoute, route);
 
     if (matches.isNotEmpty) {
       matchRoute = route;
@@ -85,8 +89,8 @@ RouteData? _getMatchRoute(String inputRoute, String method, String? domain) {
 Iterable<String> _getParameterNameFromRoute(RouteData route) {
   return route.path
       .split('/')
-      .where((part) => part.startsWith('{') && part.endsWith('}'))
-      .map((part) => part.substring(1, part.length - 1));
+      .where((String part) => part.startsWith('{') && part.endsWith('}'))
+      .map((String part) => part.substring(1, part.length - 1));
 }
 
 /// get pattern matched routes from the list
@@ -94,8 +98,8 @@ Iterable<RegExpMatch> _getPatternMatches(
   String input,
   RouteData route,
 ) {
-  var pattern = RegExp(
-      '^${route.path.replaceAllMapped(RegExp(r'{[^/]+}'), (match) => '([^/]+)').replaceAll('/', '\\/')}\$');
+  RegExp pattern = RegExp(
+      '^${route.path.replaceAllMapped(RegExp(r'{[^/]+}'), (Match match) => '([^/]+)').replaceAll('/', '\\/')}\$');
   return pattern.allMatches(input);
 }
 
@@ -105,25 +109,25 @@ Map<String, dynamic> _getParameterAsMap(
   Iterable<RegExpMatch> matches,
   Iterable<String> parameterNames,
 ) {
-  var match = matches.first;
-  var parameterValues =
-      match.groups(List<int>.generate(parameterNames.length, (i) => i + 1));
-  return Map.fromIterables(parameterNames, parameterValues);
+  RegExpMatch match = matches.first;
+  List<String?> parameterValues =
+      match.groups(List<int>.generate(parameterNames.length, (int i) => i + 1));
+  return Map<String, dynamic>.fromIterables(parameterNames, parameterValues);
 }
 
-_routeNotFound(HttpRequest req) {
+Future<void> _routeNotFound(HttpRequest req) async {
   req.response.write('${req.method} ${req.uri.path} not found');
-  return req.response.close();
+  await req.response.close();
 }
 
 /// Handle middleware and controllers
-Future _handleMiddlewareController(
+Future<void> _handleMiddlewareController(
   RouteData route,
   DoxRequest doxReq,
   HttpRequest httpRequest,
 ) async {
   dynamic result;
-  for (var controller in route.controllers) {
+  for (dynamic controller in route.controllers) {
     if (controller is Function) {
       /// when it is a function and last item, it mean it is a final controller
       if (controller == route.controllers.last) {
@@ -141,7 +145,7 @@ Future _handleMiddlewareController(
     /// where it have handle function
     if (controller is DoxMiddleware) {
       DoxMiddleware middleware = controller;
-      result = await Function.apply(middleware.handle, [doxReq]);
+      result = await Function.apply(middleware.handle, <dynamic>[doxReq]);
     }
 
     /// if request is dox Request, it mean result is from middleware
@@ -159,19 +163,19 @@ Future _handleMiddlewareController(
 }
 
 /// handle controller
-Future _handleController(
+Future<void> _handleController(
   RouteData route,
-  controller,
+  dynamic controller,
   DoxRequest doxRequest,
   HttpRequest httpRequest,
 ) async {
   dynamic result;
 
-  List args = doxRequest.param.values
+  List<dynamic> args = doxRequest.param.values
       .toList()
       .sublist(0, _lengthOfControllerArguments(controller) - 1);
 
-  List types = _getControllerArgumentDataTypes(controller);
+  List<String> types = _getControllerArgumentDataTypes(controller);
 
   if (types.isNotEmpty) {
     String requestName = types.first;
@@ -193,33 +197,33 @@ Future _handleController(
         /// run setup()
         formReq.setUp();
 
-        result = await Function.apply(controller, [formReq, ...args]);
+        result = await Function.apply(controller, <dynamic>[formReq, ...args]);
         httpResponseHandler(result, httpRequest);
         return;
       }
     }
   }
 
-  result = await Function.apply(controller, [doxRequest, ...args]);
+  result = await Function.apply(controller, <dynamic>[doxRequest, ...args]);
   httpResponseHandler(result, httpRequest);
 }
 
 /// checking that controller first request param is matched
 /// with custom form request
-bool _isFormRequestTypeMatched(controller, req) {
-  List args = _getControllerArgumentDataTypes(controller);
+bool _isFormRequestTypeMatched(dynamic controller, dynamic req) {
+  List<String> args = _getControllerArgumentDataTypes(controller);
   return args[0].toString() == req.runtimeType.toString();
 }
 
 /// get controller arguments data type
 /// eg. [DoxRequest, String]
-List _getControllerArgumentDataTypes(controller) {
+List<String> _getControllerArgumentDataTypes(dynamic controller) {
   return controller.toString().split('(')[1].split(')')[0].split(', ');
 }
 
 /// get length controller arguments to check how many arguments
 /// need to pass to the controller
-_lengthOfControllerArguments(controller) {
-  List args = _getControllerArgumentDataTypes(controller);
+int _lengthOfControllerArguments(dynamic controller) {
+  List<String> args = _getControllerArgumentDataTypes(controller);
   return args.length;
 }

@@ -16,12 +16,11 @@ void main() {
   group('Http |', () {
     setUpAll(() async {
       config.serverPort = 50011;
-      Dox().initialize(config);
-      await Future.delayed(Duration(milliseconds: 500));
+      await Dox().initialize(config);
     });
 
-    tearDownAll(() {
-      Dox().server.close();
+    tearDownAll(() async {
+      await Dox().server.close();
     });
 
     test('ping -> pong', () async {
@@ -29,8 +28,8 @@ void main() {
         return 'pong';
       });
 
-      var url = Uri.parse('$baseUrl/ping');
-      var response = await http.get(url);
+      Uri url = Uri.parse('$baseUrl/ping');
+      http.Response response = await http.get(url);
 
       expect(response.statusCode, 200);
       expect(response.body, 'pong');
@@ -41,8 +40,8 @@ void main() {
         return 'pong $name';
       });
 
-      var url = Uri.parse('$baseUrl/ping/dox');
-      var response = await http.get(url);
+      Uri url = Uri.parse('$baseUrl/ping/dox');
+      http.Response response = await http.get(url);
 
       expect(response.statusCode, 200);
       expect(response.body, 'pong dox');
@@ -54,21 +53,21 @@ void main() {
         return 'pong $name $type';
       });
 
-      var url = Uri.parse('$baseUrl/ping/dox/framework');
-      var response = await http.get(url);
+      Uri url = Uri.parse('$baseUrl/ping/dox/framework');
+      http.Response response = await http.get(url);
 
       expect(response.statusCode, 200);
       expect(response.body, 'pong dox framework');
     });
 
     test('json response', () async {
-      var responseData = {"ping": "pong"};
+      Map<String, String> responseData = <String, String>{"ping": "pong"};
       Route.get('/json', (DoxRequest req) {
         return responseData;
       });
 
-      var url = Uri.parse('$baseUrl/json');
-      var response = await http.get(url);
+      Uri url = Uri.parse('$baseUrl/json');
+      http.Response response = await http.get(url);
 
       expect(response.statusCode, 200);
       expect(response.body, jsonEncode(responseData));
@@ -79,21 +78,21 @@ void main() {
     test('http exception', () async {
       Route.get('/http_exception', ExampleController().httpException);
 
-      var url = Uri.parse('$baseUrl/http_exception');
-      var response = await http.get(url);
+      Uri url = Uri.parse('$baseUrl/http_exception');
+      http.Response response = await http.get(url);
 
       expect(response.statusCode, 401);
       expect(response.body, 'Failed to authorize');
     });
 
     test('list', () async {
-      var responseData = ['1', '2', '4'];
+      List<String> responseData = <String>['1', '2', '4'];
       Route.get('/list', (DoxRequest req) {
         return responseData;
       });
 
-      var url = Uri.parse('$baseUrl/list');
-      var response = await http.get(url);
+      Uri url = Uri.parse('$baseUrl/list');
+      http.Response response = await http.get(url);
 
       expect(response.statusCode, 200);
       expect(response.body, jsonEncode(responseData));
@@ -104,8 +103,8 @@ void main() {
         return response('pong').cache(Duration(seconds: 10));
       });
 
-      var url = Uri.parse('$baseUrl/cache_response');
-      var res = await http.get(url);
+      Uri url = Uri.parse('$baseUrl/cache_response');
+      http.Response res = await http.get(url);
 
       expect(res.statusCode, 200);
       expect(res.body, 'pong');
@@ -117,8 +116,8 @@ void main() {
         return response('pong').statusCode(207);
       });
 
-      var url = Uri.parse('$baseUrl/custom_status');
-      var res = await http.get(url);
+      Uri url = Uri.parse('$baseUrl/custom_status');
+      http.Response res = await http.get(url);
 
       expect(res.statusCode, 207);
       expect(res.body, 'pong');
@@ -129,8 +128,8 @@ void main() {
         return response('pong').header('x-key', 'ABCD');
       });
 
-      var url = Uri.parse('$baseUrl/custom_header');
-      var res = await http.get(url);
+      Uri url = Uri.parse('$baseUrl/custom_header');
+      http.Response res = await http.get(url);
 
       expect(res.statusCode, 200);
       expect(res.body, 'pong');
@@ -142,8 +141,8 @@ void main() {
         return response('pong').contentType(ContentType.text);
       });
 
-      var url = Uri.parse('$baseUrl/content_type');
-      var res = await http.get(url);
+      Uri url = Uri.parse('$baseUrl/content_type');
+      http.Response res = await http.get(url);
 
       expect(res.statusCode, 200);
       expect(res.body, 'pong');
@@ -162,25 +161,25 @@ void main() {
         expect(req.all()['title'], 'hello');
         expect(req.has('title'), true);
         expect(req.has('not_exist'), false);
-        expect(req.only(['title'])['title'], 'hello');
+        expect(req.only(<String>['title'])['title'], 'hello');
         expect(req.isJson(), true);
         expect(req.host().contains('localhost'), true);
         expect(req.ip(), '127.0.0.1');
         expect(req.isFormData(), false);
 
-        return response('pong').withHeaders({
+        return response('pong').withHeaders(<String, String>{
           'x-key': 'ABCD',
         });
       });
 
-      var url = Uri.parse('$baseUrl/with_headers/1');
-      var res = await http.post(
+      Uri url = Uri.parse('$baseUrl/with_headers/1');
+      http.Response res = await http.post(
         url,
-        headers: {
+        headers: <String, String>{
           'content-type': 'application/json',
           'x-auth-key': 'Bearer 1234',
         },
-        body: jsonEncode({
+        body: jsonEncode(<String, String>{
           'title': 'hello',
         }),
       );
@@ -192,13 +191,13 @@ void main() {
 
     test('cookie response', () async {
       Route.get('/cookie_response', (DoxRequest req) {
-        var cookie = DoxCookie('x-key', 'ABCD');
-        var cookie2 = DoxCookie('x-key2', 'ABCD', encrypt: false);
+        DoxCookie cookie = DoxCookie('x-key', 'ABCD');
+        DoxCookie cookie2 = DoxCookie('x-key2', 'ABCD', encrypt: false);
         return response('pong').cookie(cookie).cookie(cookie2);
       });
 
-      var url = Uri.parse('$baseUrl/cookie_response');
-      var res = await http.get(url);
+      Uri url = Uri.parse('$baseUrl/cookie_response');
+      http.Response res = await http.get(url);
 
       expect(res.statusCode, 200);
       expect(res.body, 'pong');
@@ -212,11 +211,12 @@ void main() {
         return req.title;
       });
 
-      var url = Uri.parse('$baseUrl/custom_form_request');
-      var res =
-          await http.post(url, body: jsonEncode({'title': 'hello'}), headers: {
-        'content-type': 'application/json',
-      });
+      Uri url = Uri.parse('$baseUrl/custom_form_request');
+      http.Response res = await http.post(url,
+          body: jsonEncode(<String, String>{'title': 'hello'}),
+          headers: <String, String>{
+            'content-type': 'application/json',
+          });
 
       expect(res.statusCode, 200);
       expect(res.body, 'hello');

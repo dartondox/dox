@@ -13,7 +13,7 @@ class Hash {
   /// ```
   /// Hash.verify('secret', '<hashedString>');
   /// ```
-  static bool verify(password, hashedPassword) {
+  static bool verify(String password, String hashedPassword) {
     return BCrypt.checkpw(password, hashedPassword);
   }
 }

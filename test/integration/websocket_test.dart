@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/websocket/dox_websocket.dart';
 import 'package:test/test.dart';
 
 import 'requirements/config/app.dart';
@@ -13,21 +14,20 @@ void main() {
   group('Websocket |', () {
     setUpAll(() async {
       config.serverPort = 50013;
-      Dox().initialize(config);
-      await Future.delayed(Duration(milliseconds: 500));
+      await Dox().initialize(config);
     });
 
-    tearDownAll(() {
-      Dox().server.close();
+    tearDownAll(() async {
+      await Dox().server.close();
     });
 
     test('websocket', () async {
-      Route.websocket('ws', (socket) {
-        socket.on('intro', (SocketEmitter emitter, message) {
+      Route.websocket('ws', (DoxWebsocket socket) {
+        socket.on('intro', (SocketEmitter emitter, dynamic message) {
           expect(message, 'hello');
         });
 
-        socket.on('json', (SocketEmitter emitter, message) {
+        socket.on('json', (SocketEmitter emitter, dynamic message) {
           expect(message['title'], 'hello');
         });
       });
@@ -35,20 +35,20 @@ void main() {
       WebSocket socket =
           await WebSocket.connect('ws://localhost:${config.serverPort}/ws');
 
-      var data = jsonEncode({
+      String data = jsonEncode(<String, String>{
         "event": "intro",
         "message": "hello",
       });
 
-      var jsonData = jsonEncode({
+      String jsonData = jsonEncode(<String, dynamic>{
         "event": "json",
-        "message": {"title": "hello"}
+        "message": <String, String>{"title": "hello"}
       });
 
       socket.add(data);
       socket.add(jsonData);
 
-      socket.close();
+      await socket.close();
     });
   });
 }

@@ -5,7 +5,7 @@ class ApiRouter extends Router {
   String get prefix => 'api';
 
   @override
-  register() {
-    Route.get('ping', (req) => 'pong');
+  void register() {
+    Route.get('ping', (DoxRequest req) => 'pong');
   }
 }

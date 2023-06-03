@@ -4,9 +4,9 @@ import 'package:dox_core/dox_core.dart';
 
 class ValidationException extends HttpException {
   ValidationException({
-    message = const {},
-    errorCode = 'validation_failed',
-    code = HttpStatus.unprocessableEntity,
+    dynamic message = const <String, dynamic>{},
+    String errorCode = 'validation_failed',
+    int code = HttpStatus.unprocessableEntity,
   }) {
     super.code = code;
     super.errorCode = errorCode;

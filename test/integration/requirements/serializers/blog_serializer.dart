@@ -10,7 +10,7 @@ class BlogSerializer extends Serializer<Blog> {
   /// convert model into Map
   @override
   Map<String, dynamic> convert(Blog m) {
-    return {
+    return <String, String>{
       'title': m.title,
     };
   }

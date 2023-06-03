@@ -6,17 +6,17 @@ abstract class FormRequest {
 
   /// set validation rules
   Map<String, String> rules() {
-    return {};
+    return <String, String>{};
   }
 
   /// set validation messages
   Map<String, String> messages() {
-    return {};
+    return <String, String>{};
   }
 
   /// use this function to change request input name
   Map<String, String> mapInputs() {
-    return {};
+    return <String, String>{};
   }
 
   late DoxRequest request;
@@ -59,7 +59,7 @@ abstract class FormRequest {
   }
 
   /// Get request value
-  dynamic input(key) {
+  dynamic input(String key) {
     return request.input(key);
   }
 
@@ -74,7 +74,7 @@ abstract class FormRequest {
   }
 
   /// Get header value
-  String? header(key) {
+  String? header(String key) {
     return request.header(key);
   }
 
@@ -98,7 +98,7 @@ abstract class FormRequest {
     return request.referer();
   }
 
-  toJson() {
+  Map<String, dynamic> toJson() {
     return request.toJson();
   }
 }

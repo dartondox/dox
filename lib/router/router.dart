@@ -1,5 +1,5 @@
 abstract class Router {
   String get prefix => '';
-  List get middleware => [];
-  register();
+  List<dynamic> get middleware => <dynamic>[];
+  void register();
 }

@@ -1,12 +1,12 @@
 class IocContainer {
-  final Map<String, dynamic> _dependencies = {};
-  final Map<String, dynamic> _singletonDependencies = {};
+  final Map<String, dynamic> _dependencies = <String, dynamic>{};
+  final Map<String, dynamic> _singletonDependencies = <String, dynamic>{};
 
   /// register a request class in ioc container
   /// ```
   /// ioc.registerRequest('BlogRequest', () => BlogRequest());
   /// ```
-  registerRequest(name, Function callback) {
+  void registerRequest(String name, Function callback) {
     if (name != 'dynamic') {
       _dependencies[name] = () => callback();
     }
@@ -17,7 +17,7 @@ class IocContainer {
   /// ioc.registerByName('name', (i) => Bar());
   /// ioc.registerByName('name', (i) => Foo(i.get<Bar>()));
   /// ```
-  registerByName(name, Function(IocContainer) callback) {
+  void registerByName(String name, Function(IocContainer) callback) {
     if (name != 'dynamic') {
       _dependencies[name] = () => callback(this);
     }
@@ -29,7 +29,7 @@ class IocContainer {
   ///
   /// ioc.register<Foo>((i) => Foo(i.get<Bar>()));
   /// ```
-  register<T>(Function(IocContainer) callback) {
+  void register<T>(Function(IocContainer) callback) {
     if (T.toString() != 'dynamic') {
       _dependencies[T.toString()] = () => callback(this);
     }
@@ -40,7 +40,7 @@ class IocContainer {
   /// ioc.registerSingleton<Bar>((i) => Bar());
   /// ```
   /// bar will create only once instance
-  registerSingleton<T>(Function(IocContainer) callback) {
+  void registerSingleton<T>(Function(IocContainer) callback) {
     if (T.toString() != 'dynamic') {
       _singletonDependencies[T.toString()] = callback(this);
     }
@@ -61,14 +61,14 @@ class IocContainer {
   /// ```
   /// Foo foo = ioc.get<Foo>();
   /// ```
-  getByName(String name) {
+  dynamic getByName(String name) {
     if (_haveInSingleton(name)) {
       return _singletonDependencies[name];
     }
     return _dependencies[name] != null ? _dependencies[name]() : null;
   }
 
-  _haveInSingleton(name) {
+  bool _haveInSingleton(String name) {
     return _singletonDependencies[name] != null;
   }
 }

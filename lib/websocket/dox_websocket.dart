@@ -20,7 +20,7 @@ class DoxWebsocket {
   DoxWebsocket(this._defaultRoom);
 
   /// registered websocket events listener
-  final Map<String, Function> _events = {};
+  final Map<String, Function> _events = <String, Function>{};
 
   /// register websocket event
   /// ```
@@ -28,12 +28,12 @@ class DoxWebsocket {
   ///   /// your logic here
   /// });
   /// ```
-  on(event, Function(SocketEmitter, dynamic) controller) {
+  void on(String event, Function(SocketEmitter, dynamic) controller) {
     _events[event] = controller;
   }
 
   /// handle http request and convert into websocket
-  handle(DoxRequest req) async {
+  Future<WebSocket> handle(DoxRequest req) async {
     WebSocket ws = await WebSocketTransformer.upgrade(req.httpRequest);
     String socketId = _createSocketId(req);
 
@@ -50,9 +50,9 @@ class DoxWebsocket {
         Function? controller = _events[eventName];
 
         if (controller != null) {
-          var emitter =
+          SocketEmitter emitter =
               SocketEmitter(sender: socketId, roomId: payload['room']);
-          Function.apply(controller, [emitter, message]);
+          Function.apply(controller, <dynamic>[emitter, message]);
         }
 
         if (eventName == _joinRoomEventName) {
@@ -70,7 +70,7 @@ class DoxWebsocket {
   }
 
   /// creating socket id with unique timestamp
-  _createSocketId(DoxRequest req) {
+  String _createSocketId(DoxRequest req) {
     return 'ws:${uuid.v4()}';
   }
 }

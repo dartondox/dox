@@ -1,4 +1,4 @@
-extension MapExtensions on Map {
+extension MapExtensions on Map<dynamic, dynamic> {
   /// remove parameter from map with dot
   /// ```
   /// map.removeParam('user.info');
@@ -9,7 +9,7 @@ extension MapExtensions on Map {
     List<String> k = parts.sublist(0, parts.length - 1);
 
     Map<String, dynamic> data = value;
-    for (var i in k) {
+    for (String i in k) {
       data = data[i];
     }
     data.remove(parts.last);
@@ -25,8 +25,8 @@ extension MapExtensions on Map {
     List<String> parts = keys.split(".");
     List<String> k = parts.sublist(0, parts.length - 1);
 
-    var data = value;
-    for (var i in k) {
+    Map<dynamic, dynamic> data = value;
+    for (String i in k) {
       if (data[i] is List) {
         return data[i];
       }
@@ -36,19 +36,19 @@ extension MapExtensions on Map {
   }
 }
 
-extension JoinWithAnd on List {
+extension JoinWithAnd on List<String> {
   /// jon list<String> with separator and the last item with 'and' or 'or'
   /// ```
   /// list.joinWithAnd();
   /// list.joinWithAnd(',', 'and');
   /// ```
   String joinWithAnd([String separator = ", ", String lastJoinText = 'and']) {
-    List items = this;
+    List<dynamic> items = this;
     if (items.length <= 1) {
       return items.join();
     } else {
-      final lastItem = items.removeLast();
-      final joinedItems = items.join(separator);
+      String lastItem = items.removeLast();
+      String joinedItems = items.join(separator);
       return '$joinedItems, $lastJoinText $lastItem';
     }
   }

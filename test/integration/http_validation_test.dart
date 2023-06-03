@@ -13,25 +13,24 @@ void main() {
   group('Http |', () {
     setUpAll(() async {
       config.serverPort = 50012;
-      Dox().initialize(config);
-      await Future.delayed(Duration(milliseconds: 500));
+      await Dox().initialize(config);
     });
 
-    tearDownAll(() {
-      Dox().server.close();
+    tearDownAll(() async {
+      await Dox().server.close();
     });
 
     test('validation failed', () async {
       Route.post('/validation', (DoxRequest req) {
-        req.validate({
+        req.validate(<String, String>{
           'name': 'required',
           'email': 'required|email',
         });
         return 'pong';
       });
 
-      var url = Uri.parse('$baseUrl/validation');
-      var res = await http.post(url);
+      Uri url = Uri.parse('$baseUrl/validation');
+      http.Response res = await http.post(url);
 
       expect(res.statusCode, 422);
       expect(res.body.contains('email is required'), true);
@@ -40,18 +39,18 @@ void main() {
 
     test('validation passed', () async {
       Route.post('/validation_passed', (DoxRequest req) {
-        req.validate({
+        req.validate(<String, String>{
           'name': 'required',
           'email': 'required|email',
         });
         return 'pong';
       });
 
-      var url = Uri.parse('$baseUrl/validation_passed');
-      var res = await http.post(
+      Uri url = Uri.parse('$baseUrl/validation_passed');
+      http.Response res = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
+        headers: <String, String>{'Content-Type': 'application/json'},
+        body: jsonEncode(<String, String>{
           "name": 'dox',
           "email": 'support@dartondox.dev',
         }),

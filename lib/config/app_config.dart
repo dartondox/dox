@@ -47,9 +47,9 @@ abstract class AppConfig {
 
   Handler get responseHandler;
 
-  Map<Type, Function()> get formRequests => {};
+  Map<Type, Function()> get formRequests => <Type, Function()>{};
 
-  List get globalMiddleware => [];
+  List<dynamic> get globalMiddleware => <dynamic>[];
 
   List<Router> get routers;
 

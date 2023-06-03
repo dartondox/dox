@@ -14,7 +14,7 @@ class Config extends AppConfig {
   @override
   int get serverPort => _serverPort;
 
-  set serverPort(val) => _serverPort = val;
+  set serverPort(int val) => _serverPort = val;
 
   @override
   DBConfig get dbConfig => DBConfig(
@@ -36,13 +36,13 @@ class Config extends AppConfig {
   Handler get responseHandler => ResponseHandler();
 
   @override
-  List get globalMiddleware => [customMiddleware];
+  List<dynamic> get globalMiddleware => <dynamic>[customMiddleware];
 
   @override
-  Map<Type, Function()> get formRequests => {
+  Map<Type, Function()> get formRequests => <Type, Function()>{
         BlogRequest: () => BlogRequest(),
       };
 
   @override
-  List<Router> get routers => [ApiRouter()];
+  List<Router> get routers => <Router>[ApiRouter()];
 }

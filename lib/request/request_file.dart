@@ -45,7 +45,7 @@ class RequestFile {
     return file.path.replaceFirst(Directory.current.path, '');
   }
 
-  _sanitizePath(String path) {
+  String _sanitizePath(String path) {
     path = path.replaceAll(RegExp(r'/+'), '/');
     return "/${path.replaceAll(RegExp('^\\/+|\\/+\$'), '')}";
   }

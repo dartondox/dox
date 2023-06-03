@@ -21,7 +21,7 @@ class SocketEmitter {
   /// ```
   /// emitter.room('ABC');
   /// ```
-  SocketEmitter room(id) {
+  SocketEmitter room(dynamic id) {
     roomId = id;
     return this;
   }
@@ -30,9 +30,9 @@ class SocketEmitter {
   /// ```
   /// emitter.emitExceptSender('event', message);
   /// ```
-  emitExceptSender(String event, dynamic message) {
+  void emitExceptSender(String event, dynamic message) {
     if (sender != null) {
-      emit(event, message, exclude: [sender!]);
+      emit(event, message, exclude: <String>[sender!]);
     }
   }
 
@@ -40,8 +40,9 @@ class SocketEmitter {
   /// ```
   /// emitter.emit('event', message);
   /// ```
-  emit(String event, dynamic message, {List<String> exclude = const []}) {
-    String payload = jsonEncode({
+  void emit(String event, dynamic message,
+      {List<String> exclude = const <String>[]}) {
+    String payload = jsonEncode(<String, dynamic>{
       "event": event,
       "message": message,
     });
