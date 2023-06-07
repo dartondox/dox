@@ -1,3 +1,12 @@
+# version 1.0.1
+
+- added missing types on functions and arguments
+- added linter rules
+
+# version 1.0.0
+
+- First stable release
+
 # version 1.0.0-alpha.2
 
 - Support domain routing
