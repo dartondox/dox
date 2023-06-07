@@ -1,7 +1,7 @@
 # version 1.0.1
 
-- added missing types on functions and arguments
-- added linter rules
+- Added missing types on functions and arguments
+- Added linter rules
 
 # version 1.0.0
 
