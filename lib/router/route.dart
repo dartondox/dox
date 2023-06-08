@@ -237,29 +237,33 @@ class Route {
   static Route resource(String route, dynamic controller) {
     String prefix = "${Route()._prefix}/$route";
 
-    /// GET /resource
-    Route()._addRoute('GET', prefix, controller.index);
+    try {
+      /// GET /resource
+      Route()._addRoute('GET', prefix, controller.index);
 
-    /// GET /resource/create
-    Route()._addRoute('GET', '$prefix/create', controller.create);
+      /// GET /resource/create
+      Route()._addRoute('GET', '$prefix/create', controller.create);
 
-    /// POST /resource
-    Route()._addRoute('POST', prefix, controller.store);
+      /// POST /resource
+      Route()._addRoute('POST', prefix, controller.store);
 
-    /// GET /resource/{id}
-    Route()._addRoute('GET', '$prefix/{id}', controller.show);
+      /// GET /resource/{id}
+      Route()._addRoute('GET', '$prefix/{id}', controller.show);
 
-    /// GET /resource/{id}/edit
-    Route()._addRoute('GET', '$prefix/{id}/edit', controller.edit);
+      /// GET /resource/{id}/edit
+      Route()._addRoute('GET', '$prefix/{id}/edit', controller.edit);
 
-    /// PUT /resource/{id}
-    Route()._addRoute('PUT', '$prefix/{id}', controller.update);
+      /// PUT /resource/{id}
+      Route()._addRoute('PUT', '$prefix/{id}', controller.update);
 
-    /// PATCH /resource/{id}
-    Route()._addRoute('PATCH', '$prefix/{id}', controller.update);
+      /// PATCH /resource/{id}
+      Route()._addRoute('PATCH', '$prefix/{id}', controller.update);
 
-    /// DELETE /resource/{id}
-    Route()._addRoute('DELETE', '$prefix/{id}', controller.destroy);
+      /// DELETE /resource/{id}
+      Route()._addRoute('DELETE', '$prefix/{id}', controller.destroy);
+    } catch (error) {
+      /// ignore errors
+    }
 
     return Route();
   }
