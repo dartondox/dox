@@ -1,3 +1,7 @@
+# version 1.0.2
+
+- Bug fixed method not found on resource route
+
 # version 1.0.1
 
 - Added missing types on functions and arguments
