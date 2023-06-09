@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/logger.dart';
 
@@ -23,7 +25,7 @@ class LogMiddleware extends DoxMiddleware {
     if (filter != null) {
       text = filter!(text);
     }
-    DoxLogger.log(text);
+    DoxLogger.log(jsonEncode(text));
     return req;
   }
 }
