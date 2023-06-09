@@ -23,7 +23,7 @@ class DoxServer {
   Future<HttpServer> listen(int port, {Function? onError}) async {
     Env.load();
     HttpServer server = await HttpServer.bind(InternetAddress.anyIPv4, port);
-    DoxLogger.info("Server started at http://127.0.0.1:${server.port}");
+    DoxLogger.info('Server started at http://127.0.0.1:${server.port}');
     server.listen(
       (HttpRequest req) {
         _setCors(req);

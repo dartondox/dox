@@ -29,7 +29,7 @@ class AESEncryptor {
       String decrypted = encrypter.decrypt64(content, iv: iv);
       return utf8.decode(base64.decode(decrypted));
     } catch (error) {
-      DoxLogger.danger("AESEncryption Error: ${error.toString()}");
+      DoxLogger.danger('AESEncryption Error: ${error.toString()}');
       return '';
     }
   }

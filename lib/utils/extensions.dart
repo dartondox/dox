@@ -5,7 +5,7 @@ extension MapExtensions on Map<dynamic, dynamic> {
   /// ```
   Map<String, dynamic> removeParam(String keys) {
     dynamic value = this;
-    List<String> parts = keys.split(".");
+    List<String> parts = keys.split('.');
     List<String> k = parts.sublist(0, parts.length - 1);
 
     Map<String, dynamic> data = value;
@@ -22,7 +22,7 @@ extension MapExtensions on Map<dynamic, dynamic> {
   /// ``
   dynamic getParam(String keys) {
     dynamic value = this;
-    List<String> parts = keys.split(".");
+    List<String> parts = keys.split('.');
     List<String> k = parts.sublist(0, parts.length - 1);
 
     Map<dynamic, dynamic> data = value;
@@ -42,7 +42,7 @@ extension JoinWithAnd on List<String> {
   /// list.joinWithAnd();
   /// list.joinWithAnd(',', 'and');
   /// ```
-  String joinWithAnd([String separator = ", ", String lastJoinText = 'and']) {
+  String joinWithAnd([String separator = ', ', String lastJoinText = 'and']) {
     List<dynamic> items = this;
     if (items.length <= 1) {
       return items.join();

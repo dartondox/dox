@@ -36,13 +36,13 @@ void main() {
           await WebSocket.connect('ws://localhost:${config.serverPort}/ws');
 
       String data = jsonEncode(<String, String>{
-        "event": "intro",
-        "message": "hello",
+        'event': 'intro',
+        'message': 'hello',
       });
 
       String jsonData = jsonEncode(<String, dynamic>{
-        "event": "json",
-        "message": <String, String>{"title": "hello"}
+        'event': 'json',
+        'message': <String, String>{'title': 'hello'}
       });
 
       socket.add(data);

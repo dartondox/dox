@@ -237,7 +237,7 @@ class Route {
   /// Route.resource('blog', BlogController());
   ///
   static Route resource(String route, dynamic controller) {
-    String prefix = "${Route()._prefix}/$route";
+    String prefix = '${Route()._prefix}/$route';
 
     /// GET /resource
     try {
