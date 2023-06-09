@@ -43,8 +43,8 @@ class SocketEmitter {
   void emit(String event, dynamic message,
       {List<String> exclude = const <String>[]}) {
     String payload = jsonEncode(<String, dynamic>{
-      "event": event,
-      "message": message,
+      'event': event,
+      'message': message,
     });
     if (roomId == null) {
       DoxLogger.warn('set a room to emit');

@@ -3,6 +3,7 @@ import 'package:dox_core/router/route_data.dart';
 import 'package:test/test.dart';
 
 import '../integration/requirements/controllers/admin.controller.dart';
+import '../integration/requirements/controllers/blog.controller.dart';
 
 void main() {
   group('Route |', () {
@@ -161,6 +162,33 @@ void main() {
 
       expect(routes[7].path, '/admins/{id}');
       expect(routes[7].method, 'DELETE');
+    });
+
+    test('resource route with missing method', () {
+      Route.resource('blogs', BlogController());
+
+      List<RouteData> routes = Route().routes;
+
+      expect(routes[0].path, '/blogs');
+      expect(routes[0].method, 'GET');
+
+      expect(routes[1].path, '/blogs/create');
+      expect(routes[1].method, 'GET');
+
+      expect(routes[2].path, '/blogs/{id}');
+      expect(routes[2].method, 'GET');
+
+      expect(routes[3].path, '/blogs/{id}/edit');
+      expect(routes[3].method, 'GET');
+
+      expect(routes[4].path, '/blogs/{id}');
+      expect(routes[4].method, 'PUT');
+
+      expect(routes[5].path, '/blogs/{id}');
+      expect(routes[5].method, 'PATCH');
+
+      expect(routes[6].path, '/blogs/{id}');
+      expect(routes[6].method, 'DELETE');
     });
 
     test('domain route', () {

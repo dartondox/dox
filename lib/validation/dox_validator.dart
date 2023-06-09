@@ -36,8 +36,8 @@ class DoxValidator {
     required bool Function(Map<String, dynamic>, dynamic, String?) fn,
   }) {
     _matchings[ruleName] = <String, dynamic>{
-      "message": message,
-      "function": fn,
+      'message': message,
+      'function': fn,
     };
   }
 

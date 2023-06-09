@@ -1,3 +1,5 @@
+// ignore_for_file: empty_catches
+
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/utils.dart';
 import 'package:dox_core/websocket/dox_websocket.dart';
@@ -235,35 +237,47 @@ class Route {
   /// Route.resource('blog', BlogController());
   ///
   static Route resource(String route, dynamic controller) {
-    String prefix = "${Route()._prefix}/$route";
+    String prefix = '${Route()._prefix}/$route';
 
+    /// GET /resource
     try {
-      /// GET /resource
       Route()._addRoute('GET', prefix, controller.index);
+    } catch (error) {}
 
-      /// GET /resource/create
+    /// GET /resource/create
+    try {
       Route()._addRoute('GET', '$prefix/create', controller.create);
+    } catch (error) {}
 
-      /// POST /resource
+    /// POST /resource
+    try {
       Route()._addRoute('POST', prefix, controller.store);
+    } catch (error) {}
 
-      /// GET /resource/{id}
+    /// GET /resource/{id}
+    try {
       Route()._addRoute('GET', '$prefix/{id}', controller.show);
+    } catch (error) {}
 
-      /// GET /resource/{id}/edit
+    /// GET /resource/{id}/edit
+    try {
       Route()._addRoute('GET', '$prefix/{id}/edit', controller.edit);
+    } catch (error) {}
 
-      /// PUT /resource/{id}
+    /// PUT /resource/{id}
+    try {
       Route()._addRoute('PUT', '$prefix/{id}', controller.update);
+    } catch (error) {}
 
-      /// PATCH /resource/{id}
+    /// PATCH /resource/{id}
+    try {
       Route()._addRoute('PATCH', '$prefix/{id}', controller.update);
+    } catch (error) {}
 
-      /// DELETE /resource/{id}
+    /// DELETE /resource/{id}
+    try {
       Route()._addRoute('DELETE', '$prefix/{id}', controller.destroy);
-    } catch (error) {
-      /// ignore errors
-    }
+    } catch (error) {}
 
     return Route();
   }

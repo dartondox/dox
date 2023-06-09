@@ -12,7 +12,7 @@ class LogMiddleware extends DoxMiddleware {
   DoxRequest handle(DoxRequest req) {
     Map<String, dynamic> text = <String, dynamic>{
       'level': 'INFO',
-      'message': "${req.method} ${req.uri.path}",
+      'message': '${req.method} ${req.uri.path}',
       'source_ip': req.ip(),
       'timestamp': DateTime.now().toIso8601String(),
       'payload': <String, dynamic>{

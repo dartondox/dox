@@ -61,7 +61,7 @@ void main() {
     });
 
     test('json response', () async {
-      Map<String, String> responseData = <String, String>{"ping": "pong"};
+      Map<String, String> responseData = <String, String>{'ping': 'pong'};
       Route.get('/json', (DoxRequest req) {
         return responseData;
       });

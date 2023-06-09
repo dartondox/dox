@@ -51,8 +51,8 @@ void main() {
         url,
         headers: <String, String>{'Content-Type': 'application/json'},
         body: jsonEncode(<String, String>{
-          "name": 'dox',
-          "email": 'support@dartondox.dev',
+          'name': 'dox',
+          'email': 'support@dartondox.dev',
         }),
       );
 
