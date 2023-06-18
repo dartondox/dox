@@ -1,7 +1,13 @@
 library dox_core;
 
 export 'app.dart';
+
+/// auth
+export 'auth/auth.dart';
+
+/// app
 export 'config/app_config.dart';
+export 'constants/constants.dart';
 export 'db/db_driver.dart';
 export 'env/env.dart';
 

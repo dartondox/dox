@@ -24,6 +24,8 @@ class DoxRequest {
 
   DoxRequest(this.httpRequest);
 
+  dynamic get auth => input(AUTH_REQUEST_KEY);
+
   /// we are not using constructor here
   /// because we need to call async to read body data
   static Future<DoxRequest> httpRequestToDoxRequest(
@@ -154,10 +156,9 @@ class DoxRequest {
   /// ```
   /// req.cookie('authKey');
   /// ```
-  String cookie(String key, {bool decrypt = true}) {
-    if (decrypt) {
-      return AESEncryptor.decode(_cookies[key], Dox().config.appKey);
-    }
+  String? cookie(String key, {bool decrypt = true}) {
+    if (_cookies[key] == null) return null;
+    if (decrypt) AESEncryptor.decode(_cookies[key], Dox().config.appKey);
     return _cookies[key];
   }
 
@@ -224,6 +225,7 @@ class DoxRequest {
     }
   }
 
+  /// map request input keys
   void mapInputs(Map<String, String> mapper) {
     mapper.forEach((String from, String to) {
       if (from != to) {
@@ -234,6 +236,7 @@ class DoxRequest {
     });
   }
 
+  /// support jsonEncode to convert json
   Map<String, dynamic> toJson() {
     Map<String, dynamic> ret = <String, dynamic>{};
     _allRequest.forEach((String key, dynamic value) {

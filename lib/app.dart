@@ -13,18 +13,31 @@ class Dox {
   /// get app config
   late AppConfig config;
 
+  /// auth guard
+  Guard? authGuard;
+
   /// initialize dox application
   /// - load env
   /// - start http server
   /// - start form requests in global ioc
   /// - register routes
-  Future<void> initialize(AppConfig c) async {
+  Future<void> initialize(AppConfig config) async {
     Env.load();
     Dox dox = Dox();
-    dox.config = c;
+    dox.config = config;
     dox._registerFormRequests();
     dox._registerRoute();
     await dox._startHttpServer();
+  }
+
+  /// set authorization config
+  /// and this function can only call after initialize()
+  /// ```
+  /// await dox.initialize(config)
+  /// dox.setAuthConfig(AuthConfig())
+  /// ```
+  void setAuthConfig(AuthConfigInterface authConfig) {
+    Dox().authGuard = authConfig.guards[authConfig.defaultGuard];
   }
 
   /// register form request assign in app config
