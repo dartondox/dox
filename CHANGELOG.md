@@ -1,3 +1,7 @@
+# version 1.0.5
+
+- Modify request auth getter to function to support type injection
+
 # version 1.0.4
 
 - Added interfaces/classes for authentication

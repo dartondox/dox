@@ -24,7 +24,7 @@ class DoxRequest {
 
   DoxRequest(this.httpRequest);
 
-  dynamic get auth => input(AUTH_REQUEST_KEY);
+  T? auth<T>() => input(AUTH_REQUEST_KEY);
 
   /// we are not using constructor here
   /// because we need to call async to read body data
