@@ -1,3 +1,9 @@
+# version 1.0.4
+
+- Added interfaces/classes for authentication
+- Bug fixed on router prefix
+- Bug fixed on cookie return type `String?`
+
 # version 1.0.3
 
 - Ignore error on missing method of resource route
