@@ -103,7 +103,7 @@ class Route {
   /// Route.prefix('blog');
   /// ```
   static void prefix(String prefix) {
-    Route()._prefix = prefix;
+    Route()._prefix = '$prefix/';
   }
 
   /// add websocket route

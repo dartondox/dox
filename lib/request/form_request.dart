@@ -69,7 +69,7 @@ abstract class FormRequest {
   }
 
   // get cookie
-  String cookie(dynamic key, {bool decrypt = true}) {
+  String? cookie(dynamic key, {bool decrypt = true}) {
     return request.cookie(key, decrypt: decrypt);
   }
 
