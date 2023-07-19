@@ -3,8 +3,16 @@ import 'package:dox_core/server/dox_server.dart';
 
 class Dox {
   /// setup singleton
-  static final Dox _singleton = Dox._internal();
-  factory Dox() => _singleton;
+  static Dox? _singleton;
+
+  factory Dox() {
+    if (_singleton == null) {
+      Env().load();
+      _singleton = Dox._internal();
+    }
+    return _singleton!;
+  }
+
   Dox._internal();
 
   /// get dox http server
@@ -22,7 +30,6 @@ class Dox {
   /// - start form requests in global ioc
   /// - register routes
   Future<void> initialize(AppConfig config) async {
-    Env.load();
     Dox dox = Dox();
     dox.config = config;
     dox._registerFormRequests();

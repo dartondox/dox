@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dox_core/dox_core.dart';
 
 class CORSConfig {
@@ -50,6 +52,8 @@ abstract class AppConfig {
   Map<Type, Function()> get formRequests => <Type, Function()>{};
 
   List<dynamic> get globalMiddleware => <dynamic>[];
+
+  File? get envFile => null;
 
   List<Router> get routers;
 
