@@ -1,3 +1,7 @@
+# version 1.0.6
+
+- Remove third party dot env package and replace with own `Env` class
+
 # version 1.0.5
 
 - Modify request auth getter to function to support type injection
