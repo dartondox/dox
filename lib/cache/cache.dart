@@ -1,5 +1,5 @@
-import 'package:dox_core/cache/cache_driver.dart';
 import 'package:dox_core/cache/cache_driver_interface.dart';
+import 'package:dox_core/cache/cache_store.dart';
 import 'package:dox_core/cache/file_cache_driver.dart';
 
 class Cache {

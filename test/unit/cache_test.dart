@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dox_core/cache/cache_driver.dart';
+import 'package:dox_core/cache/cache_store.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
