@@ -59,7 +59,6 @@ class DoxServer {
       'Access-Control-Allow-Headers': cors.allowHeaders,
       'Access-Control-Expose-Headers': cors.exposeHeaders,
       'Access-Control-Allow-Credentials': cors.allowCredentials,
-      'Access-Control-Max-Age': cors.maxAge
     };
 
     headers.forEach((String key, dynamic value) {

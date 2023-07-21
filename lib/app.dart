@@ -24,6 +24,19 @@ class Dox {
   /// auth guard
   Guard? authGuard;
 
+  /// maximum thread
+  int _maxThread = 1;
+
+  /// set maximum thread
+  void maximumThread(int value) {
+    _maxThread = value;
+  }
+
+  /// get maximum thread
+  int getMaximumThread() {
+    return _maxThread;
+  }
+
   /// initialize dox application
   /// it load env and set config
   /// ```

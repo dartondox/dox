@@ -15,7 +15,7 @@ String baseUrl = 'http://localhost:${config.serverPort}';
 void main() {
   group('Http |', () {
     setUpAll(() async {
-      config.serverPort = 50011;
+      config.serverPort = 50012;
       Dox().initialize(config);
       await Dox().startServer();
     });

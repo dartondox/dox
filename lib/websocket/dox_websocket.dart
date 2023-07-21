@@ -33,8 +33,8 @@ class DoxWebsocket {
   }
 
   /// handle http request and convert into websocket
-  Future<WebSocket> handle(DoxRequest req) async {
-    WebSocket ws = await WebSocketTransformer.upgrade(req.httpRequest);
+  Future<WebSocket?> handle(DoxRequest req) async {
+    WebSocket ws = await WebSocketTransformer.upgrade(req.httpRequest!);
     String socketId = _createSocketId(req);
 
     /// add to active connection

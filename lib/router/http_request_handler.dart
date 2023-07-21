@@ -1,6 +1,9 @@
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/router/http_body_parser.dart';
+import 'package:dox_core/router/http_isolate_handler.dart';
+import 'package:dox_core/router/http_mc_handler.dart';
 import 'package:dox_core/router/http_response_handler.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/logger.dart';
@@ -11,31 +14,53 @@ import 'package:dox_core/utils/utils.dart';
 /// and response from controllers is passed to `httpResponseHandler`
 Future<void> httpRequestHandler(HttpRequest req) async {
   try {
-    // preflight
+    // return 200 status on preflight
     if (req.method == 'OPTIONS') {
       req.response.statusCode = HttpStatus.ok;
       await req.response.close();
       return;
     }
 
-    String? domain = req.headers.value('host');
-
     /// getting matched route
-    RouteData? route = _getMatchRoute(req.uri.path, req.method, domain);
+    RouteData? route =
+        _getMatchRoute(req.uri.path, req.method, req.headers.value('host'));
+
     if (route == null) {
-      await _routeNotFound(req);
+      httpResponseHandler('${req.method} ${req.uri.path} not found', req);
       return;
     }
 
-    /// convert http request into DoxRequest
-    /// we did not use constructor here because we require
-    /// async await to get body string from HttpRequest.
-    DoxRequest doxReq = await DoxRequest.httpRequestToDoxRequest(req, route);
+    bool isWebSocket = WebSocketTransformer.isUpgradeRequest(req);
 
-    /// route.controllers will be always list
-    /// see Route()._addRoute() for explanation
-    await _handleMiddlewareController(route, doxReq, req);
-    return;
+    Map<String, dynamic> body = await HttpBodyParser.process(req);
+
+    DoxRequest doxReq = DoxRequest(
+      route: route,
+      uri: req.uri,
+      body: body,
+      contentType: req.headers.contentType,
+      clientIp: req.connectionInfo?.remoteAddress.address,
+      httpHeaders: req.headers,
+    );
+
+    /// form data do not support isolate
+    if (HttpBodyParser.isFormData(req.headers.contentType)) {
+      dynamic result = await handleMiddlewareAndController(route, doxReq);
+      httpResponseHandler(result, req);
+      return;
+    }
+
+    /// websocket requests required http request and do not support isolate
+    if (isWebSocket) {
+      doxReq.setHttpRequest(req);
+      dynamic result = await handleMiddlewareAndController(route, doxReq);
+      httpResponseHandler(result, req);
+      return;
+    }
+
+    httpIsolateHandler(doxReq, route, (dynamic response) {
+      httpResponseHandler(response, req);
+    });
   } catch (error, stackTrace) {
     if (error is Exception || error is Error) {
       DoxLogger.warn(error);
@@ -113,117 +138,4 @@ Map<String, dynamic> _getParameterAsMap(
   List<String?> parameterValues =
       match.groups(List<int>.generate(parameterNames.length, (int i) => i + 1));
   return Map<String, dynamic>.fromIterables(parameterNames, parameterValues);
-}
-
-Future<void> _routeNotFound(HttpRequest req) async {
-  req.response.write('${req.method} ${req.uri.path} not found');
-  await req.response.close();
-}
-
-/// Handle middleware and controllers
-Future<void> _handleMiddlewareController(
-  RouteData route,
-  DoxRequest doxReq,
-  HttpRequest httpRequest,
-) async {
-  dynamic result;
-  for (dynamic controller in route.controllers) {
-    if (controller is Function) {
-      /// when it is a function and last item, it mean it is a final controller
-      if (controller == route.controllers.last) {
-        await _handleController(route, controller, doxReq, httpRequest);
-
-        /// end the loop
-        break;
-      }
-
-      /// this mean a function middleware
-      result = await controller(doxReq);
-    }
-
-    /// this mean a dox base class middleware
-    /// where it have handle function
-    if (controller is DoxMiddleware) {
-      DoxMiddleware middleware = controller;
-      result = await Function.apply(middleware.handle, <dynamic>[doxReq]);
-    }
-
-    /// if request is dox Request, it mean result is from middleware
-    /// mean need to pass values to next controller.
-    if (result is DoxRequest) {
-      /// override doxReq from arguments and
-      /// in order to pass in next loop
-      doxReq = result;
-    } else {
-      /// else result is from controller and ready to response
-      httpResponseHandler(result, httpRequest);
-      break;
-    }
-  }
-}
-
-/// handle controller
-Future<void> _handleController(
-  RouteData route,
-  dynamic controller,
-  DoxRequest doxRequest,
-  HttpRequest httpRequest,
-) async {
-  dynamic result;
-
-  List<dynamic> args = doxRequest.param.values
-      .toList()
-      .sublist(0, _lengthOfControllerArguments(controller) - 1);
-
-  List<String> types = _getControllerArgumentDataTypes(controller);
-
-  if (types.isNotEmpty) {
-    String requestName = types.first;
-    if (requestName != 'DoxRequest') {
-      FormRequest? formReq = Global.ioc.getByName(requestName);
-      if (formReq != null && _isFormRequestTypeMatched(controller, formReq)) {
-        /// mapping request inputs field
-        doxRequest.mapInputs(formReq.mapInputs());
-
-        /// setting dox request to custom form request
-        formReq.setRequest(doxRequest);
-
-        /// validate request
-        doxRequest.validate(
-          formReq.rules(),
-          messages: formReq.messages(),
-        );
-
-        /// run setup()
-        formReq.setUp();
-
-        result = await Function.apply(controller, <dynamic>[formReq, ...args]);
-        httpResponseHandler(result, httpRequest);
-        return;
-      }
-    }
-  }
-
-  result = await Function.apply(controller, <dynamic>[doxRequest, ...args]);
-  httpResponseHandler(result, httpRequest);
-}
-
-/// checking that controller first request param is matched
-/// with custom form request
-bool _isFormRequestTypeMatched(dynamic controller, dynamic req) {
-  List<String> args = _getControllerArgumentDataTypes(controller);
-  return args[0].toString() == req.runtimeType.toString();
-}
-
-/// get controller arguments data type
-/// eg. [DoxRequest, String]
-List<String> _getControllerArgumentDataTypes(dynamic controller) {
-  return controller.toString().split('(')[1].split(')')[0].split(', ');
-}
-
-/// get length controller arguments to check how many arguments
-/// need to pass to the controller
-int _lengthOfControllerArguments(dynamic controller) {
-  List<String> args = _getControllerArgumentDataTypes(controller);
-  return args.length;
 }
