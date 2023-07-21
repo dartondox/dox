@@ -102,8 +102,7 @@ class FileCacheDriver implements CacheDriverInterface {
 
   /// get data from cache file
   Map<String, dynamic> _getData() {
-    List<int> binaryData = _cacheFile.readAsBytesSync();
-    String jsonData = utf8.decode(binaryData);
+    String jsonData = _cacheFile.readAsStringSync().trim();
     if (jsonData.isEmpty) {
       return <String, dynamic>{};
     }
@@ -115,7 +114,6 @@ class FileCacheDriver implements CacheDriverInterface {
   void _writeData(Map<String, dynamic> data) {
     String jsonData = json.encode(data);
     String encodedData = AESEncryptor.encode(jsonData, _secret);
-    List<int> binaryData = utf8.encode(encodedData);
-    _cacheFile.writeAsBytesSync(binaryData);
+    _cacheFile.writeAsStringSync(encodedData);
   }
 }
