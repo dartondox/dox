@@ -50,27 +50,40 @@ class DoxServer {
     responseHandler = handler;
   }
 
+  /// set cors in the response header
   void _setCors(HttpRequest req) {
     CORSConfig cors = Dox().config.cors;
-    _setCorsValue(req, 'Access-Control-Allow-Origin', cors.allowOrigin);
-    _setCorsValue(req, 'Access-Control-Allow-Methods', cors.allowMethods);
-    _setCorsValue(req, 'Access-Control-Allow-Headers', cors.allowHeaders);
-    _setCorsValue(req, 'Access-Control-Expose-Headers', cors.exposeHeaders);
-    if (cors.allowCredentials != null) {
-      req.response.headers.add(
-          'Access-Control-Allow-Credentials', cors.allowCredentials.toString());
-    }
-    if (cors.maxAge != null) {
-      req.response.headers
-          .add('Access-Control-Max-Age', cors.maxAge.toString());
-    }
+    Map<String, dynamic> headers = <String, dynamic>{
+      'Access-Control-Allow-Origin': cors.allowOrigin,
+      'Access-Control-Allow-Methods': cors.allowMethods,
+      'Access-Control-Allow-Headers': cors.allowHeaders,
+      'Access-Control-Expose-Headers': cors.exposeHeaders,
+      'Access-Control-Allow-Credentials': cors.allowCredentials,
+      'Access-Control-Max-Age': cors.maxAge
+    };
+
+    headers.forEach((String key, dynamic value) {
+      _setCorsValue(req.response, key, value);
+    });
   }
 
-  void _setCorsValue(HttpRequest req, String key, dynamic data) {
+  // set cors in header
+  void _setCorsValue(HttpResponse res, String key, dynamic data) {
+    /// when data is list of string, eg. ['GET', 'POST']
     if (data is List<String> && data.isNotEmpty) {
-      req.response.headers.add(key, data.join(','));
-    } else if (data is String && data.isNotEmpty) {
-      req.response.headers.add(key, data);
+      res.headers.add(key, data.join(','));
+      return;
+    }
+
+    /// when data is string, eg. 'GET'
+    if (data is String && data.isNotEmpty) {
+      res.headers.add(key, data);
+      return;
+    }
+
+    /// when data is other type and has value, just convert to string
+    if (data != null) {
+      res.headers.add(key, data.toString());
     }
   }
 }

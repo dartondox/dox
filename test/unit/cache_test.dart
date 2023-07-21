@@ -17,7 +17,7 @@ void main() {
         storage.deleteSync(recursive: true);
       }
       config.serverPort = 50011;
-      await Dox().initialize(config);
+      Dox().initialize(config);
     });
 
     test('put', () {

@@ -13,7 +13,8 @@ void main() {
   group('Http |', () {
     setUpAll(() async {
       config.serverPort = 50012;
-      await Dox().initialize(config);
+      Dox().initialize(config);
+      await Dox().startServer();
     });
 
     tearDownAll(() async {

@@ -25,26 +25,34 @@ class Dox {
   Guard? authGuard;
 
   /// initialize dox application
-  /// - load env
-  /// - start http server
-  /// - start form requests in global ioc
-  /// - register routes
-  Future<void> initialize(AppConfig config) async {
-    Dox dox = Dox();
-    dox.config = config;
-    dox._registerFormRequests();
-    dox._registerRoute();
-    await dox._startHttpServer();
+  /// it load env and set config
+  /// ```
+  /// Dox().initialize(config);
+  /// ```
+  void initialize(AppConfig appConfig) async {
+    config = appConfig;
+  }
+
+  /// start dox server
+  /// ```
+  /// await Dox().startServer();
+  /// ```
+  Future<void> startServer() async {
+    _registerFormRequests();
+    _registerRoute();
+    DoxServer server = DoxServer();
+    server.setResponseHandler(config.responseHandler);
+    await server.listen(config.serverPort);
   }
 
   /// set authorization config
   /// and this function can only call after initialize()
   /// ```
-  /// await dox.initialize(config)
-  /// dox.setAuthConfig(AuthConfig())
+  /// await Dox().initialize(config)
+  /// Dox().setAuthConfig(AuthConfig())
   /// ```
   void setAuthConfig(AuthConfigInterface authConfig) {
-    Dox().authGuard = authConfig.guards[authConfig.defaultGuard];
+    authGuard = authConfig.guards[authConfig.defaultGuard];
   }
 
   /// register form request assign in app config
@@ -59,18 +67,13 @@ class Dox {
     List<Router> routers = config.routers;
     for (Router router in routers) {
       Route.prefix(router.prefix);
-      Route.resetWithNewMiddleware(
-          <dynamic>[...config.globalMiddleware, ...router.middleware]);
+      Route.resetWithNewMiddleware(<dynamic>[
+        ...config.globalMiddleware,
+        ...router.middleware,
+      ]);
       router.register();
     }
     Route.prefix('');
     Route.resetWithNewMiddleware(<dynamic>[]);
-  }
-
-  /// start http server
-  Future<void> _startHttpServer() async {
-    DoxServer server = DoxServer();
-    server.setResponseHandler(config.responseHandler);
-    await server.listen(config.serverPort);
   }
 }

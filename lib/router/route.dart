@@ -69,9 +69,12 @@ class Route {
     Route()._preMiddleware = originalMiddleware;
   }
 
-  /// add global middleware
+  /// set global middleware
+  /// this will remove previous middleware and
+  /// update new middleware from input
+  /// input can be list for single middleware
   /// ```
-  /// Route.use([Middleware()]);
+  /// Route.resetWithNewMiddleware([Middleware()]);
   /// ```
   static void resetWithNewMiddleware(dynamic middleware) {
     List<dynamic> list = <dynamic>[];

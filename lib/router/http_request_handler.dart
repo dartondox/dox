@@ -63,9 +63,9 @@ RouteData? _getMatchRoute(String inputRoute, String method, String? domain) {
     route.path = sanitizeRoutePath(route.path);
     inputRoute = sanitizeRoutePath(inputRoute);
 
-    /// when route is the same route exactly same route
+    /// When route is the same route exactly same route.
     /// route without params, eg. /api/example
-    if (route.path == inputRoute) {
+    if (route.path.trim() == inputRoute.trim()) {
       matchRoute = route;
       break;
     }
