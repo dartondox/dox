@@ -79,7 +79,9 @@ class FileCacheDriver implements CacheDriverInterface {
   /// create cache file if not exist
   /// and return cache file
   File get _cacheFile {
-    String fileName = base64.encode(utf8.encode('dox-framework-cache-$tag'));
+    String fileName = base64
+        .encode(utf8.encode('dox-framework-cache-$tag'))
+        .replaceAll('=', '');
 
     File cacheFile = File('${Directory.current.path}/$folder/$fileName');
 
@@ -100,7 +102,8 @@ class FileCacheDriver implements CacheDriverInterface {
 
   /// get data from cache file
   Map<String, dynamic> _getData() {
-    String jsonData = _cacheFile.readAsStringSync();
+    List<int> binaryData = _cacheFile.readAsBytesSync();
+    String jsonData = utf8.decode(binaryData);
     if (jsonData.isEmpty) {
       return <String, dynamic>{};
     }
@@ -112,6 +115,7 @@ class FileCacheDriver implements CacheDriverInterface {
   void _writeData(Map<String, dynamic> data) {
     String jsonData = json.encode(data);
     String encodedData = AESEncryptor.encode(jsonData, _secret);
-    _cacheFile.writeAsStringSync(encodedData);
+    List<int> binaryData = utf8.encode(encodedData);
+    _cacheFile.writeAsBytesSync(binaryData);
   }
 }

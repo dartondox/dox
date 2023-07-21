@@ -13,7 +13,9 @@ void main() {
   group('Cache |', () {
     setUpAll(() async {
       Directory storage = Directory('${Directory.current.path}/storage/');
-      storage.deleteSync(recursive: true);
+      if (storage.existsSync()) {
+        storage.deleteSync(recursive: true);
+      }
       config.serverPort = 50011;
       await Dox().initialize(config);
     });
