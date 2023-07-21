@@ -26,12 +26,17 @@ class Dox {
 
   /// initialize dox application
   /// it load env and set config
-  void initialize(AppConfig config) async {
-    Dox dox = Dox();
-    dox.config = config;
+  /// ```
+  /// Dox().initialize(config);
+  /// ```
+  void initialize(AppConfig appConfig) async {
+    config = appConfig;
   }
 
   /// start dox server
+  /// ```
+  /// await Dox().startServer();
+  /// ```
   Future<void> startServer() async {
     _registerFormRequests();
     _registerRoute();
@@ -43,11 +48,11 @@ class Dox {
   /// set authorization config
   /// and this function can only call after initialize()
   /// ```
-  /// await dox.initialize(config)
-  /// dox.setAuthConfig(AuthConfig())
+  /// await Dox().initialize(config)
+  /// Dox().setAuthConfig(AuthConfig())
   /// ```
   void setAuthConfig(AuthConfigInterface authConfig) {
-    Dox().authGuard = authConfig.guards[authConfig.defaultGuard];
+    authGuard = authConfig.guards[authConfig.defaultGuard];
   }
 
   /// register form request assign in app config
@@ -62,8 +67,10 @@ class Dox {
     List<Router> routers = config.routers;
     for (Router router in routers) {
       Route.prefix(router.prefix);
-      Route.resetWithNewMiddleware(
-          <dynamic>[...config.globalMiddleware, ...router.middleware]);
+      Route.resetWithNewMiddleware(<dynamic>[
+        ...config.globalMiddleware,
+        ...router.middleware,
+      ]);
       router.register();
     }
     Route.prefix('');
