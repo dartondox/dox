@@ -25,16 +25,19 @@ class Dox {
   Guard? authGuard;
 
   /// initialize dox application
-  /// - load env
-  /// - start http server
-  /// - start form requests in global ioc
-  /// - register routes
-  Future<void> initialize(AppConfig config) async {
+  /// it load env and set config
+  void initialize(AppConfig config) async {
     Dox dox = Dox();
     dox.config = config;
-    dox._registerFormRequests();
-    dox._registerRoute();
-    await dox._startHttpServer();
+  }
+
+  /// start dox server
+  Future<void> startServer() async {
+    _registerFormRequests();
+    _registerRoute();
+    DoxServer server = DoxServer();
+    server.setResponseHandler(config.responseHandler);
+    await server.listen(config.serverPort);
   }
 
   /// set authorization config
@@ -65,12 +68,5 @@ class Dox {
     }
     Route.prefix('');
     Route.resetWithNewMiddleware(<dynamic>[]);
-  }
-
-  /// start http server
-  Future<void> _startHttpServer() async {
-    DoxServer server = DoxServer();
-    server.setResponseHandler(config.responseHandler);
-    await server.listen(config.serverPort);
   }
 }

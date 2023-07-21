@@ -14,7 +14,8 @@ void main() {
   group('Websocket |', () {
     setUpAll(() async {
       config.serverPort = 50013;
-      await Dox().initialize(config);
+      Dox().initialize(config);
+      await Dox().startServer();
     });
 
     tearDownAll(() async {
