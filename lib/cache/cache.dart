@@ -28,26 +28,52 @@ class Cache {
     }
   }
 
+  /// set key => value to cache
+  /// default duration is 1 hour
+  /// ```
+  /// Cache().put('foo', 'bar');
+  /// Cache().put('foo', 'bar', duration: Duration(hours: 24));
+  /// ```
   void put(String key, String value, {Duration? duration}) {
     _driver.put(key, value, duration: duration);
   }
 
+  /// set key => value to cache forever
+  /// ```
+  /// Cache().forever('foo', 'bar');
+  /// ```
   void forever(String key, String value) {
     _driver.forever(key, value);
   }
 
+  /// remove a key from cache
+  /// ```
+  /// Cache().forget('foo');
+  ///
   void forget(String key) {
     _driver.forget(key);
   }
 
+  /// remove all cache
+  /// ```
+  /// Cache().flush();
+  ///
   void flush() {
     _driver.flush();
   }
 
+  /// get a value from cache
+  /// ```
+  /// String? value = Cache().get('foo');
+  ///
   String? get(String key) {
     return _driver.get(key);
   }
 
+  /// get a value exist
+  /// ```
+  /// bool has = Cache().has('foo');
+  ///
   bool has(String key) {
     return _driver.has(key);
   }
