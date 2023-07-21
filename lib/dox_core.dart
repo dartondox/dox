@@ -5,6 +5,9 @@ export 'app.dart';
 /// auth
 export 'auth/auth.dart';
 
+/// cache
+export 'cache/cache.dart';
+
 /// app
 export 'config/app_config.dart';
 export 'constants/constants.dart';

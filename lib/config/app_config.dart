@@ -1,5 +1,4 @@
-import 'dart:io';
-
+/// coverage:ignore-file
 import 'package:dox_core/dox_core.dart';
 
 class CORSConfig {
@@ -21,7 +20,7 @@ class CORSConfig {
 }
 
 class DBConfig {
-  final String dbDriver;
+  final DatabaseDriver dbDriver;
   final String dbHost;
   final int dbPort;
   final String dbName;
@@ -52,8 +51,6 @@ abstract class AppConfig {
   Map<Type, Function()> get formRequests => <Type, Function()>{};
 
   List<dynamic> get globalMiddleware => <dynamic>[];
-
-  File? get envFile => null;
 
   List<Router> get routers;
 
