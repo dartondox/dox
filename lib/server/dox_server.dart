@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/router/http_request_handler.dart';
+import 'package:dox_core/http/http_request_handler.dart';
 import 'package:dox_core/utils/logger.dart';
 
 class DoxServer {
@@ -59,7 +59,6 @@ class DoxServer {
       'Access-Control-Allow-Headers': cors.allowHeaders,
       'Access-Control-Expose-Headers': cors.exposeHeaders,
       'Access-Control-Allow-Credentials': cors.allowCredentials,
-      'Access-Control-Max-Age': cors.maxAge
     };
 
     headers.forEach((String key, dynamic value) {

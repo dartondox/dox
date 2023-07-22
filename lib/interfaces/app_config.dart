@@ -7,7 +7,6 @@ class CORSConfig {
   final dynamic allowHeaders;
   final dynamic exposeHeaders;
   final bool? allowCredentials;
-  final int? maxAge;
 
   const CORSConfig({
     this.allowOrigin,
@@ -15,7 +14,6 @@ class CORSConfig {
     this.allowHeaders,
     this.exposeHeaders,
     this.allowCredentials,
-    this.maxAge,
   });
 }
 

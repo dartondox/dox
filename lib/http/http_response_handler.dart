@@ -4,7 +4,10 @@ import 'dart:io';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/server/dox_server.dart';
 
-dynamic httpResponseHandler(dynamic payload, HttpRequest request) {
+Future<dynamic> httpResponseHandler(
+  dynamic payload,
+  HttpRequest request,
+) async {
   /// websocket handler will return websocket payload
   /// and in this case we need to remain the connection open for
   /// websocket communication. so there is no `res.close()`;
@@ -21,6 +24,11 @@ dynamic httpResponseHandler(dynamic payload, HttpRequest request) {
   }
 
   HttpResponse res = request.response;
+
+  if (payload == null) {
+    res.statusCode = HttpStatus.ok;
+    await res.close();
+  }
 
   /// if there is responseHandler we handle responseHandler and
   /// get new payload and override existing payload
@@ -57,5 +65,5 @@ dynamic httpResponseHandler(dynamic payload, HttpRequest request) {
 
   /// finally write and close http connection
   res.write(responseData);
-  res.close();
+  await res.close();
 }

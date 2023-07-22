@@ -1,67 +1,55 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/request/form_data_visitor.dart';
+import 'package:dox_core/http/request/http_request_body.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/aes_encryptor.dart';
 import 'package:dox_core/validation/dox_validator.dart';
 
 class DoxRequest {
-  final HttpRequest httpRequest;
+  final RouteData route;
+  final Uri uri;
+  final ContentType? contentType;
+  final HttpHeaders httpHeaders;
 
+  final String? clientIp;
   String method = 'GET';
-  Uri get uri => httpRequest.uri;
-  HttpResponse get response => httpRequest.response;
+  HttpRequest? httpRequest;
 
+  Map<String, dynamic> body = <String, dynamic>{};
   Map<String, dynamic> param = <String, dynamic>{};
   Map<String, dynamic> query = <String, dynamic>{};
-  Map<String, dynamic> body = <String, dynamic>{};
 
-  Map<String, dynamic> _allRequest = <String, dynamic>{};
-  HttpHeaders get _headers => httpRequest.headers;
   final Map<String, dynamic> _cookies = <String, dynamic>{};
+  Map<String, dynamic> _allRequest = <String, dynamic>{};
 
-  DoxRequest(this.httpRequest);
+  DoxRequest({
+    required this.route,
+    required this.uri,
+    required this.body,
+    this.contentType,
+    this.clientIp,
+    required this.httpHeaders,
+  }) {
+    method = route.method.toUpperCase();
+    param = route.params;
+    query = uri.queryParameters;
+    _allRequest = <String, dynamic>{...query, ...body};
+    _getCookies();
+  }
 
-  T? auth<T>() => input(AUTH_REQUEST_KEY);
-
-  /// we are not using constructor here
-  /// because we need to call async to read body data
-  static Future<DoxRequest> httpRequestToDoxRequest(
-    HttpRequest request,
-    RouteData route,
-  ) async {
-    DoxRequest i = DoxRequest(request);
-    i.param = route.params;
-    i.method = route.method.toUpperCase();
-    i.query = request.uri.queryParameters;
-
-    if (i.isJson()) {
-      String bodyString = await utf8.decoder.bind(request).join();
-      i.body = jsonDecode(bodyString);
-    }
-
-    if (i.isFormData()) {
-      FormDataVisitor visitor = FormDataVisitor(request);
-      await visitor.process();
-      i.body = visitor.inputs;
-    }
-
-    i._allRequest = <String, dynamic>{...i.query, ...i.body};
-    i._getCookies();
-    return i;
+  void setHttpRequest(HttpRequest req) {
+    httpRequest = req;
   }
 
   /// http request data is form data
   bool isFormData() {
-    return httpRequest.headers.contentType?.mimeType.contains('form-data') ==
-        true;
+    return HttpBody.isFormData(contentType);
   }
 
   /// http request data is json
   bool isJson() {
-    return httpRequest.headers.contentType.toString().contains('json') == true;
+    return HttpBody.isJson(contentType);
   }
 
   /// Get all request from body and query
@@ -89,8 +77,11 @@ class DoxRequest {
   /// req.ip();
   /// ```
   String ip() {
-    return httpRequest.connectionInfo?.remoteAddress.address ?? 'unknown';
+    return clientIp ?? 'unknown';
   }
+
+  /// get auth class
+  T? auth<T>() => input(AUTH_REQUEST_KEY);
 
   /// Get request value
   /// ```
@@ -102,9 +93,7 @@ class DoxRequest {
 
   /// Check if input is present
   /// ```
-  /// if(req.has('email')) {
-  ///   /// do something
-  /// }
+  /// req.has('email')
   /// ```
   bool has(String key) {
     String? val = _allRequest[key];
@@ -119,7 +108,7 @@ class DoxRequest {
   /// req.header('X-Token');
   /// ```
   String? header(String key) {
-    return _headers.value(key);
+    return httpHeaders.value(key);
   }
 
   /// Get all headers value
@@ -128,7 +117,7 @@ class DoxRequest {
   /// ```
   Map<String, dynamic> get headers {
     Map<String, dynamic> ret = <String, dynamic>{};
-    _headers.forEach((String name, List<String> values) {
+    httpHeaders.forEach((String name, List<String> values) {
       ret[name] = values.join();
     });
     return ret;
@@ -213,7 +202,7 @@ class DoxRequest {
   }
 
   void _getCookies() {
-    List<String>? cookies = httpRequest.headers[HttpHeaders.cookieHeader];
+    List<String>? cookies = httpHeaders[HttpHeaders.cookieHeader];
     if (cookies == null) {
       return;
     }

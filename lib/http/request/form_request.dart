@@ -1,4 +1,4 @@
-import 'package:dox_core/request/dox_request.dart';
+import 'package:dox_core/dox_core.dart';
 
 abstract class FormRequest {
   /// run on initial

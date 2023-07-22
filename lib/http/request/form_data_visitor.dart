@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:dox_core/request/request_file.dart';
+import 'package:dox_core/dox_core.dart';
 import 'package:mime/mime.dart';
 import 'package:string_scanner/string_scanner.dart';
 
