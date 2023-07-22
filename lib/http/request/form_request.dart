@@ -2,7 +2,7 @@ import 'package:dox_core/dox_core.dart';
 
 abstract class FormRequest {
   /// run on initial
-  void setUp() {}
+  dynamic setUp() {}
 
   /// set validation rules
   Map<String, String> rules() {

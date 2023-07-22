@@ -2,11 +2,9 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/router/route_data.dart';
 
 /// Handle middleware and controllers
-Future<dynamic> middlewareAndControllerHandler(
-  RouteData route,
-  DoxRequest doxReq,
-) async {
+Future<dynamic> middlewareAndControllerHandler(DoxRequest doxReq) async {
   dynamic result;
+  RouteData route = doxReq.route;
 
   for (dynamic controller in route.controllers) {
     if (controller is Function) {
@@ -77,7 +75,7 @@ Future<dynamic> _handleController(
         );
 
         /// run setup()
-        formReq.setUp();
+        await formReq.setUp();
 
         result = await Function.apply(
             controller, <dynamic>[formReq, ...controllerArguments]);

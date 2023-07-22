@@ -5,7 +5,6 @@ import 'package:async/async.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/multi_thread/multi_thread_interfaces.dart';
 import 'package:dox_core/multi_thread/multi_thread_isolate_handler.dart';
-import 'package:dox_core/router/route_data.dart';
 
 class DoxMultiThread {
   /// singleton
@@ -21,12 +20,11 @@ class DoxMultiThread {
   /// DoxMultiThread().handleRequest(route, doxRequest, callback);
   /// ```
   void handleRequest(
-    RouteData route,
     DoxRequest doxRequest,
     Function(dynamic) callback,
   ) async {
     DoxThread thread = _getRandomThread();
-    thread.sendPort?.send(<dynamic>[route, doxRequest]);
+    thread.sendPort?.send(doxRequest);
     dynamic response = await thread.stream.next;
     callback(response);
   }
