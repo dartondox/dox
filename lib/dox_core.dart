@@ -2,14 +2,8 @@ library dox_core;
 
 export 'app.dart';
 
-/// auth
-export 'auth/auth.dart';
-
 /// cache
 export 'cache/cache.dart';
-
-/// app
-export 'config/app_config.dart';
 export 'constants/constants.dart';
 export 'db/db_driver.dart';
 export 'env/env.dart';
@@ -33,14 +27,20 @@ export 'http/response/dox_response.dart';
 export 'http/response/handler.dart';
 export 'http/response/serializer.dart';
 
-/// Tools
+/// interfaces
+export 'interfaces/app_config.dart';
+
+/// auth
+export 'interfaces/auth.dart';
+export 'interfaces/dox_middleware.dart';
 export 'interfaces/dox_service.dart';
+export 'interfaces/router.dart';
+
+/// Tools
 export 'ioc/ioc_container.dart';
-export 'middleware/dox_middleware.dart';
 
 /// Router
 export 'router/route.dart';
-export 'router/router.dart';
 
 /// Utils
 export 'utils/extensions.dart';
