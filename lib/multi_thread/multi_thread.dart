@@ -26,7 +26,7 @@ class DoxMultiThread {
     Function(dynamic) callback,
   ) async {
     DoxThread thread = _getRandomThread();
-    thread.sendPort?.send([route, doxRequest]);
+    thread.sendPort?.send(<dynamic>[route, doxRequest]);
     dynamic response = await thread.stream.next;
     callback(response);
   }

@@ -1,5 +1,4 @@
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/interfaces/dox_service.dart';
 import 'package:dox_core/multi_thread/multi_thread.dart';
 import 'package:dox_core/server/dox_server.dart';
 

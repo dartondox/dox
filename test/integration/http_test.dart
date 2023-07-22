@@ -189,7 +189,7 @@ void main() {
 
     test('dox request', () async {
       Route.post('/with_headers/{id}', (DoxRequest req) {
-        return response({
+        return response(<String, dynamic>{
           'x-auth-key': req.header('x-auth-key'),
           'x-auth-key2': req.headers['x-auth-key'],
           'title': req.input('title'),

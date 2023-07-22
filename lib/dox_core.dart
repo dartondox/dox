@@ -34,6 +34,7 @@ export 'http/response/handler.dart';
 export 'http/response/serializer.dart';
 
 /// Tools
+export 'interfaces/dox_service.dart';
 export 'ioc/ioc_container.dart';
 export 'middleware/dox_middleware.dart';
 

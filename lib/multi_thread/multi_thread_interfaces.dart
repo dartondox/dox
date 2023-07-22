@@ -2,7 +2,6 @@ import 'dart:isolate';
 
 import 'package:async/async.dart';
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/interfaces/dox_service.dart';
 
 class DoxThread {
   SendPort? sendPort;
