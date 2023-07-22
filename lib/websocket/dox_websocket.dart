@@ -11,9 +11,6 @@ class DoxWebsocket {
   /// initially default room is path of the socket eg. /ws
   final String _defaultRoom;
 
-  /// event name to join the room
-  final String _joinRoomEventName = 'joinRoom';
-
   /// storage to store active socket connection
   final SocketStorage _storage = SocketStorage();
 
@@ -45,8 +42,8 @@ class DoxWebsocket {
       (dynamic data) async {
         Map<String, dynamic> payload = jsonDecode(data);
 
-        String eventName = payload['event'];
-        dynamic message = payload['message'];
+        String eventName = payload[WEB_SOCKET_EVENT_KEY];
+        dynamic message = payload[WEB_SOCKET_MESSAGE_KEY];
         Function? controller = _events[eventName];
 
         if (controller != null) {
@@ -55,14 +52,14 @@ class DoxWebsocket {
           Function.apply(controller, <dynamic>[emitter, message]);
         }
 
-        if (eventName == _joinRoomEventName) {
+        if (eventName == WEB_SOCKET_JOIN_ROOM_EVENT_NAME) {
           _storage.addWebSocketIdToRoom(socketId, message);
         }
       },
-      onDone: () async {
+      onDone: () {
         _storage.removeWebSocketInfo(socketId);
       },
-      onError: (dynamic error) async {
+      onError: (dynamic error) {
         _storage.removeWebSocketInfo(socketId);
       },
     );
