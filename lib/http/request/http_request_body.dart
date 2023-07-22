@@ -1,16 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dox_core/request/form_data_visitor.dart';
+import 'package:dox_core/http/request/form_data_visitor.dart';
 
-class HttpBodyParser {
-  static Future<Map<String, dynamic>> process(HttpRequest request) async {
-    if (HttpBodyParser.isJson(request.headers.contentType)) {
+class HttpBody {
+  static Future<Map<String, dynamic>> read(HttpRequest request) async {
+    if (HttpBody.isJson(request.headers.contentType)) {
       String bodyString = await utf8.decoder.bind(request).join();
       return jsonDecode(bodyString);
     }
 
-    if (HttpBodyParser.isFormData(request.headers.contentType)) {
+    if (HttpBody.isFormData(request.headers.contentType)) {
       FormDataVisitor visitor = FormDataVisitor(request);
       await visitor.process();
       return visitor.inputs;

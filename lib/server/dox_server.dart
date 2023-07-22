@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/router/http_request_handler.dart';
+import 'package:dox_core/http/http_request_handler.dart';
 import 'package:dox_core/utils/logger.dart';
 
 class DoxServer {

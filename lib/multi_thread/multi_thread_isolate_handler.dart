@@ -1,8 +1,8 @@
 import 'dart:isolate';
 
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/router/http_mc_handler.dart';
-import 'package:dox_core/router/multi_thread_interfaces.dart';
+import 'package:dox_core/http/http_controller_handler.dart';
+import 'package:dox_core/multi_thread/multi_thread_interfaces.dart';
 
 /// process middleware and controller and sent data via sentPort
 void multiThreadIsolateHandler(IsolateSpawnParameter param) async {
@@ -19,7 +19,7 @@ void multiThreadIsolateHandler(IsolateSpawnParameter param) async {
   sendPort.send(receivePort.sendPort);
 
   receivePort.listen((dynamic request) {
-    handleMiddlewareAndController(
+    middlewareAndControllerHandler(
       request[0],
       request[1],
     ).then((dynamic result) {

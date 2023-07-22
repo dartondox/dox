@@ -3,8 +3,8 @@ import 'dart:math';
 
 import 'package:async/async.dart';
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/router/multi_thread_interfaces.dart';
-import 'package:dox_core/router/multi_thread_isolate_handler.dart';
+import 'package:dox_core/multi_thread/multi_thread_interfaces.dart';
+import 'package:dox_core/multi_thread/multi_thread_isolate_handler.dart';
 import 'package:dox_core/router/route_data.dart';
 
 class DoxMultiThread {
@@ -50,7 +50,7 @@ class DoxMultiThread {
       IsolateSpawnParameter(
         receivePort.sendPort,
         Dox().config,
-        Dox().multiThreadServices,
+        Dox().doxServices,
       ),
     );
 

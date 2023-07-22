@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/router/http_body_parser.dart';
-import 'package:dox_core/router/http_mc_handler.dart';
-import 'package:dox_core/router/http_response_handler.dart';
-import 'package:dox_core/router/multi_thread.dart';
+import 'package:dox_core/http/http_controller_handler.dart';
+import 'package:dox_core/http/http_response_handler.dart';
+import 'package:dox_core/http/request/http_request_body.dart';
+import 'package:dox_core/multi_thread/multi_thread.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/logger.dart';
 import 'package:dox_core/utils/utils.dart';
@@ -16,8 +16,7 @@ Future<void> httpRequestHandler(HttpRequest req) async {
   try {
     // return 200 status on preflight
     if (req.method == 'OPTIONS') {
-      req.response.statusCode = HttpStatus.ok;
-      await req.response.close();
+      await httpResponseHandler(null, req);
       return;
     }
 
@@ -26,13 +25,13 @@ Future<void> httpRequestHandler(HttpRequest req) async {
         _getMatchRoute(req.uri.path, req.method, req.headers.value('host'));
 
     if (route == null) {
-      httpResponseHandler('${req.method} ${req.uri.path} not found', req);
+      await httpResponseHandler('${req.method} ${req.uri.path} not found', req);
       return;
     }
 
     bool isWebSocket = WebSocketTransformer.isUpgradeRequest(req);
 
-    Map<String, dynamic> body = await HttpBodyParser.process(req);
+    Map<String, dynamic> body = await HttpBody.read(req);
 
     DoxRequest doxReq = DoxRequest(
       route: route,
@@ -44,17 +43,17 @@ Future<void> httpRequestHandler(HttpRequest req) async {
     );
 
     /// form data do not support isolate
-    if (HttpBodyParser.isFormData(req.headers.contentType)) {
-      dynamic result = await handleMiddlewareAndController(route, doxReq);
-      httpResponseHandler(result, req);
+    if (HttpBody.isFormData(req.headers.contentType)) {
+      dynamic result = await middlewareAndControllerHandler(route, doxReq);
+      await httpResponseHandler(result, req);
       return;
     }
 
     /// websocket requests required http request and do not support isolate
     if (isWebSocket) {
       doxReq.setHttpRequest(req);
-      dynamic result = await handleMiddlewareAndController(route, doxReq);
-      httpResponseHandler(result, req);
+      dynamic result = await middlewareAndControllerHandler(route, doxReq);
+      await httpResponseHandler(result, req);
       return;
     }
 
@@ -70,7 +69,7 @@ Future<void> httpRequestHandler(HttpRequest req) async {
       DoxLogger.warn(error);
       DoxLogger.danger(stackTrace.toString());
     }
-    httpResponseHandler(error, req);
+    await httpResponseHandler(error, req);
     return;
   }
 }

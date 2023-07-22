@@ -1,8 +1,8 @@
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/logger.dart';
 import 'package:dox_core/validation/nested_validation_visitor.dart';
-import 'package:dox_core/validation/rules.dart';
 import 'package:dox_core/validation/validation_item.dart';
+import 'package:dox_core/validation/validation_rules.dart';
 import 'package:sprintf/sprintf.dart';
 
 class DoxValidator {

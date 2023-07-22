@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/router/http_response_handler.dart';
+import 'package:dox_core/http/http_response_handler.dart';
 
 class DoxResponse {
   final dynamic content;

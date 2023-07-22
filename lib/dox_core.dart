@@ -22,20 +22,20 @@ export 'exception/query_exception.dart';
 export 'exception/unauthorized_exception.dart';
 export 'exception/validation_exception.dart';
 
+/// Request
+export 'http/request/dox_request.dart';
+export 'http/request/form_request.dart';
+export 'http/request/request_file.dart';
+
+/// Response
+export 'http/response/dox_cookie.dart';
+export 'http/response/dox_response.dart';
+export 'http/response/handler.dart';
+export 'http/response/serializer.dart';
+
 /// Tools
 export 'ioc/ioc_container.dart';
 export 'middleware/dox_middleware.dart';
-
-/// Request
-export 'request/dox_request.dart';
-export 'request/form_request.dart';
-export 'request/request_file.dart';
-
-/// Response
-export 'response/dox_cookie.dart';
-export 'response/dox_response.dart';
-export 'response/handler.dart';
-export 'response/serializer.dart';
 
 /// Router
 export 'router/route.dart';

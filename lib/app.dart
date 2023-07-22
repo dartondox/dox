@@ -1,6 +1,6 @@
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/interfaces/dox_service.dart';
-import 'package:dox_core/router/multi_thread.dart';
+import 'package:dox_core/multi_thread/multi_thread.dart';
 import 'package:dox_core/server/dox_server.dart';
 
 class Dox {
@@ -29,10 +29,10 @@ class Dox {
   /// auth guard
   Guard? authGuard;
 
-  /// _multi thread
-  int _multiThread = 3;
+  /// total thread
+  int _totalThread = 3;
 
-  List<DoxService> multiThreadServices = <DoxService>[];
+  List<DoxService> doxServices = <DoxService>[];
 
   /// initialize dox application
   /// it load env and set config
@@ -51,25 +51,25 @@ class Dox {
     _registerFormRequests();
     _registerRoute();
 
-    for (DoxService service in multiThreadServices) {
+    for (DoxService service in doxServices) {
       await service.setup(config);
     }
   }
 
-  /// add initializers
+  /// add services that need to run on isolate spawn
   void addServices(List<DoxService> services) {
-    multiThreadServices.addAll(services);
+    doxServices.addAll(services);
   }
 
-  /// add initializers
+  /// add service that need to run on isolate spawn
   void addService(DoxService service) {
-    multiThreadServices.add(service);
+    doxServices.add(service);
   }
 
   /// set total thread
   /// default is 3
   void totalThread(int value) {
-    _multiThread = value;
+    _totalThread = value;
   }
 
   /// start dox server
@@ -78,7 +78,7 @@ class Dox {
   /// ```
   Future<void> startServer() async {
     await startServices();
-    await DoxMultiThread().create(_multiThread);
+    await DoxMultiThread().create(_totalThread);
     DoxServer server = DoxServer();
     server.setResponseHandler(config.responseHandler);
     await server.listen(config.serverPort);

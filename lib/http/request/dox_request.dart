@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/router/http_body_parser.dart';
+import 'package:dox_core/http/request/http_request_body.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/aes_encryptor.dart';
 import 'package:dox_core/validation/dox_validator.dart';
@@ -44,12 +44,12 @@ class DoxRequest {
 
   /// http request data is form data
   bool isFormData() {
-    return HttpBodyParser.isFormData(contentType);
+    return HttpBody.isFormData(contentType);
   }
 
   /// http request data is json
   bool isJson() {
-    return HttpBodyParser.isJson(contentType);
+    return HttpBody.isJson(contentType);
   }
 
   /// Get all request from body and query
