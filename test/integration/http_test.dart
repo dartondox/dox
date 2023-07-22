@@ -150,46 +150,6 @@ void main() {
       expect(res.headers['content-type'], 'text/plain; charset=utf-8');
     });
 
-    test('dox request', () async {
-      Route.post('/with_headers/{id}', (DoxRequest req) {
-        expect(req.header('x-auth-key'), 'Bearer 1234');
-        expect(req.headers['x-auth-key'], 'Bearer 1234');
-        expect(req.input('title'), 'hello');
-        expect(req.body['title'], 'hello');
-        expect(req.param['id'], '1');
-        expect(req.method, 'POST');
-        expect(req.uri.path, '/with_headers/1');
-        expect(req.all()['title'], 'hello');
-        expect(req.has('title'), true);
-        expect(req.has('not_exist'), false);
-        expect(req.only(<String>['title'])['title'], 'hello');
-        expect(req.isJson(), true);
-        expect(req.host().contains('localhost'), true);
-        expect(req.ip(), '127.0.0.1');
-        expect(req.isFormData(), false);
-
-        return response('pong').withHeaders(<String, String>{
-          'x-key': 'ABCD',
-        });
-      });
-
-      Uri url = Uri.parse('$baseUrl/with_headers/1');
-      http.Response res = await http.post(
-        url,
-        headers: <String, String>{
-          'content-type': 'application/json',
-          'x-auth-key': 'Bearer 1234',
-        },
-        body: jsonEncode(<String, String>{
-          'title': 'hello',
-        }),
-      );
-
-      expect(res.statusCode, 200);
-      expect(res.body, 'pong');
-      expect(res.headers['x-key'], 'ABCD');
-    });
-
     test('cookie response', () async {
       Route.get('/cookie_response', (DoxRequest req) {
         DoxCookie cookie = DoxCookie('x-key', 'ABCD');
@@ -207,20 +167,78 @@ void main() {
     });
 
     test('custom form request', () async {
-      Route.post('/custom_form_request', (BlogRequest req) {
-        expect(req.title, 'hello');
-        return req.title;
-      });
+      Route.post(
+        '/custom_form_request',
+        (BlogRequest req) {
+          return req.title;
+        },
+      );
 
       Uri url = Uri.parse('$baseUrl/custom_form_request');
-      http.Response res = await http.post(url,
-          body: jsonEncode(<String, String>{'title': 'hello'}),
-          headers: <String, String>{
-            'content-type': 'application/json',
-          });
+      http.Response res = await http.post(
+        url,
+        body: jsonEncode(<String, String>{'title': 'hello'}),
+        headers: <String, String>{
+          'content-type': 'application/json',
+        },
+      );
 
       expect(res.statusCode, 200);
       expect(res.body, 'hello');
+    });
+
+    test('dox request', () async {
+      Route.post('/with_headers/{id}', (DoxRequest req) {
+        return response({
+          'x-auth-key': req.header('x-auth-key'),
+          'x-auth-key2': req.headers['x-auth-key'],
+          'title': req.input('title'),
+          'title2': req.body['title'],
+          'title3': req.all()['title'],
+          'title4': req.only(<String>['title'])['title'],
+          'id': req.param['id'],
+          'method': req.method,
+          'path': req.uri.path,
+          'has_title': req.has('title'),
+          'has_desc': req.has('desc'),
+          'is_json': req.isJson(),
+          'is_form_data': req.isFormData(),
+          'host': req.host(),
+          'ip': req.ip(),
+        }).withHeaders(<String, String>{
+          'x-key': 'ABCD',
+        });
+      });
+
+      Uri url = Uri.parse('$baseUrl/with_headers/1');
+      http.Response res = await http.post(
+        url,
+        headers: <String, String>{
+          'content-type': 'application/json',
+          'x-auth-key': 'Bearer 1234',
+        },
+        body: jsonEncode(<String, String>{
+          'title': 'hello',
+        }),
+      );
+      Map<String, dynamic> jsond = jsonDecode(res.body);
+      expect(jsond['x-auth-key'], 'Bearer 1234');
+      expect(jsond['x-auth-key2'], 'Bearer 1234');
+      expect(jsond['title'], 'hello');
+      expect(jsond['title2'], 'hello');
+      expect(jsond['title3'], 'hello');
+      expect(jsond['title4'], 'hello');
+      expect(jsond['id'], '1');
+      expect(jsond['method'], 'POST');
+      expect(jsond['path'], '/with_headers/1');
+      expect(jsond['has_title'], true);
+      expect(jsond['has_desc'], false);
+      expect(jsond['is_json'], true);
+      expect(jsond['is_form_data'], false);
+      expect(jsond['host'].toString().contains('localhost'), true);
+      expect(jsond['ip'], '127.0.0.1');
+      expect(res.statusCode, 200);
+      expect(res.headers['x-key'], 'ABCD');
     });
   });
 }

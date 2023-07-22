@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/router/http_body_parser.dart';
-import 'package:dox_core/router/http_isolate_handler.dart';
 import 'package:dox_core/router/http_mc_handler.dart';
 import 'package:dox_core/router/http_response_handler.dart';
+import 'package:dox_core/router/multi_thread.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/logger.dart';
 import 'package:dox_core/utils/utils.dart';
@@ -58,9 +58,13 @@ Future<void> httpRequestHandler(HttpRequest req) async {
       return;
     }
 
-    httpIsolateHandler(doxReq, route, (dynamic response) {
-      httpResponseHandler(response, req);
-    });
+    DoxMultiThread().handleRequest(
+      route,
+      doxReq,
+      (dynamic response) {
+        httpResponseHandler(response, req);
+      },
+    );
   } catch (error, stackTrace) {
     if (error is Exception || error is Error) {
       DoxLogger.warn(error);

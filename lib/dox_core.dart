@@ -43,7 +43,6 @@ export 'router/router.dart';
 
 /// Utils
 export 'utils/extensions.dart';
-export 'utils/global.dart';
 export 'utils/hash.dart';
 
 /// Websocket
