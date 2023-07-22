@@ -1,5 +1,6 @@
 /// coverage:ignore-file
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/utils/logger.dart';
 
 class CORSConfig {
   final dynamic allowOrigin;
@@ -23,6 +24,12 @@ abstract class AppConfig {
   int get serverPort;
 
   Handler get responseHandler;
+
+  void Function(Object?, StackTrace) get errorHandler =>
+      (Object? error, StackTrace stackTrace) {
+        DoxLogger.warn(error);
+        DoxLogger.danger(stackTrace.toString());
+      };
 
   Map<Type, Function()> get formRequests => <Type, Function()>{};
 

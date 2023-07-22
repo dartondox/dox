@@ -1,11 +1,12 @@
 import 'dart:io';
 
+import 'package:dox_core/constants/http_request_method.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_response_handler.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/utils.dart';
 
-Future<RouteData?> httpRouteHandler(HttpRequest req) async {
+RouteData? httpRouteHandler(HttpRequest req) {
   RouteData? route = _getMatchRoute(
     req.uri.path,
     req.method,
@@ -13,8 +14,13 @@ Future<RouteData?> httpRouteHandler(HttpRequest req) async {
   );
 
   if (route == null) {
-    req.response.statusCode = HttpStatus.notFound;
-    await httpResponseHandler('${req.method} ${req.uri.path} not found', req);
+    /// return 200 status on preflight OPTIONS Method
+    if (req.method == HttpRequestMethod.OPTIONS.name) {
+      httpResponseHandler(null, req);
+    } else {
+      req.response.statusCode = HttpStatus.notFound;
+      httpResponseHandler('${req.method} ${req.uri.path} not found', req);
+    }
   }
   return route;
 }

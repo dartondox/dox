@@ -19,13 +19,12 @@ void multiThreadIsolateHandler(IsolateSpawnParameter param) async {
   sendPort.send(receivePort.sendPort);
 
   receivePort.listen((dynamic request) {
-    middlewareAndControllerHandler(
-      request[0],
-      request[1],
-    ).then((dynamic result) {
-      sendPort.send(result);
-    }).catchError((dynamic error) {
-      sendPort.send(error);
-    });
+    if (request is DoxRequest) {
+      middlewareAndControllerHandler(request).then((dynamic result) {
+        sendPort.send(result);
+      }).catchError((dynamic error) {
+        sendPort.send(error);
+      });
+    }
   });
 }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class DoxLogger {
   /// log the text with white color
   static void log(dynamic text) {
@@ -14,15 +16,15 @@ class DoxLogger {
 
   /// log the text using warn color (yellow)
   /// ```
-  /// DoxLogger.info('careful!');
+  /// DoxLogger.warn('careful!');
   ///
   static void warn(dynamic text) {
-    print('\x1B[34m$text\x1B[0m');
+    print('\x1B[33m$text\x1B[0m');
   }
 
   /// log the text using success color (green)
   /// ```
-  /// DoxLogger.info('success');
+  /// DoxLogger.success('success');
   ///
   static void success(dynamic text) {
     print('\x1B[32m$text\x1B[0m');
@@ -34,5 +36,18 @@ class DoxLogger {
   ///
   static void danger(dynamic text) {
     print('\x1B[31m$text\x1B[0m');
+  }
+
+  /// log as json string
+  /// this function is user for logging services
+  /// eg. datadog, sentry etc..
+  static void prettyLog(String level, String message, [dynamic data]) {
+    Map<String, dynamic> text = <String, dynamic>{
+      'level': level.toUpperCase(),
+      'message': message.toString(),
+      'timestamp': DateTime.now().toIso8601String(),
+      'payload': data
+    };
+    DoxLogger.log(jsonEncode(text));
   }
 }
