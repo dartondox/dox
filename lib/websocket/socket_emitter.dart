@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/logger.dart';
 import 'package:dox_core/websocket/socket_storage.dart';
 import 'package:dox_core/websocket/web_socket_info.dart';
@@ -43,8 +44,8 @@ class SocketEmitter {
   void emit(String event, dynamic message,
       {List<String> exclude = const <String>[]}) {
     String payload = jsonEncode(<String, dynamic>{
-      'event': event,
-      'message': message,
+      WEB_SOCKET_EVENT_KEY: event,
+      WEB_SOCKET_MESSAGE_KEY: message,
     });
     if (roomId == null) {
       DoxLogger.warn('set a room to emit');

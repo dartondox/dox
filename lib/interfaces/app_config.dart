@@ -17,32 +17,10 @@ class CORSConfig {
   });
 }
 
-class DBConfig {
-  final DatabaseDriver dbDriver;
-  final String dbHost;
-  final int dbPort;
-  final String dbName;
-  final String dbUsername;
-  final String dbPassword;
-  final bool enableQueryLog;
-
-  const DBConfig({
-    required this.dbDriver,
-    required this.dbHost,
-    required this.dbPort,
-    required this.dbName,
-    required this.dbUsername,
-    required this.dbPassword,
-    required this.enableQueryLog,
-  });
-}
-
 abstract class AppConfig {
   String get appKey;
 
   int get serverPort;
-
-  DBConfig get dbConfig;
 
   Handler get responseHandler;
 

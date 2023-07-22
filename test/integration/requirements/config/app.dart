@@ -17,17 +17,6 @@ class Config extends AppConfig {
   set serverPort(int val) => _serverPort = val;
 
   @override
-  DBConfig get dbConfig => DBConfig(
-        dbDriver: DatabaseDriver.postgres,
-        dbHost: 'localhost',
-        dbPort: int.parse('5432'),
-        dbName: 'postgres',
-        dbUsername: 'postgres',
-        dbPassword: 'postgres',
-        enableQueryLog: false,
-      );
-
-  @override
   CORSConfig get cors => CORSConfig(
         allowOrigin: '*',
       );

@@ -5,7 +5,6 @@ export 'app.dart';
 /// cache
 export 'cache/cache.dart';
 export 'constants/constants.dart';
-export 'db/db_driver.dart';
 export 'env/env.dart';
 
 /// Exceptions
