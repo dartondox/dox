@@ -54,7 +54,7 @@ class DoxResponse {
   /// res.cache(Duration(seconds: 10));
   /// ```
   DoxResponse cache(Duration duration) {
-    _headers['Cache-Control'] = 'max-age=${duration.inSeconds}';
+    _headers[HttpHeaders.cacheControlHeader] = 'max-age=${duration.inSeconds}';
     return this;
   }
 
