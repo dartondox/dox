@@ -21,8 +21,12 @@ Future<void> httpRequestHandler(HttpRequest req) async {
     }
 
     /// getting matched route
-    RouteData? route =
-        _getMatchRoute(req.uri.path, req.method, req.headers.value('host'));
+    /// by checking with path, method, and host/domain
+    RouteData? route = _getMatchRoute(
+      req.uri.path,
+      req.method,
+      req.headers.value(HttpHeaders.hostHeader),
+    );
 
     if (route == null) {
       await httpResponseHandler('${req.method} ${req.uri.path} not found', req);
@@ -42,7 +46,7 @@ Future<void> httpRequestHandler(HttpRequest req) async {
       httpHeaders: req.headers,
     );
 
-    /// form data do not support isolate
+    /// form data do not support isolate or multithread
     if (HttpBody.isFormData(req.headers.contentType)) {
       dynamic result = await middlewareAndControllerHandler(route, doxReq);
       await httpResponseHandler(result, req);

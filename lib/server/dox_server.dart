@@ -54,11 +54,11 @@ class DoxServer {
   void _setCors(HttpRequest req) {
     CORSConfig cors = Dox().config.cors;
     Map<String, dynamic> headers = <String, dynamic>{
-      'Access-Control-Allow-Origin': cors.allowOrigin,
-      'Access-Control-Allow-Methods': cors.allowMethods,
-      'Access-Control-Allow-Headers': cors.allowHeaders,
-      'Access-Control-Expose-Headers': cors.exposeHeaders,
-      'Access-Control-Allow-Credentials': cors.allowCredentials,
+      HttpHeaders.accessControlAllowOriginHeader: cors.allowOrigin,
+      HttpHeaders.accessControlAllowMethodsHeader: cors.allowMethods,
+      HttpHeaders.accessControlAllowHeadersHeader: cors.allowHeaders,
+      HttpHeaders.accessControlExposeHeadersHeader: cors.exposeHeaders,
+      HttpHeaders.accessControlAllowCredentialsHeader: cors.allowCredentials,
     };
 
     headers.forEach((String key, dynamic value) {

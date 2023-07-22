@@ -38,6 +38,7 @@ class DoxRequest {
     _getCookies();
   }
 
+  /// only use to handle web socket
   void setHttpRequest(HttpRequest req) {
     httpRequest = req;
   }
@@ -77,7 +78,7 @@ class DoxRequest {
   /// req.ip();
   /// ```
   String ip() {
-    return clientIp ?? 'unknown';
+    return clientIp ?? UNKNOWN;
   }
 
   /// get auth class
@@ -106,6 +107,7 @@ class DoxRequest {
   /// Get header value
   /// ```
   /// req.header('X-Token');
+  /// req.header(HttpHeaders.userAgentHeader);
   /// ```
   String? header(String key) {
     return httpHeaders.value(key);
@@ -156,7 +158,7 @@ class DoxRequest {
   /// req.userAgent();
   /// ```
   String userAgent() {
-    return header('user-agent') ?? 'unknown';
+    return header(HttpHeaders.userAgentHeader) ?? UNKNOWN;
   }
 
   /// get host|domain
@@ -164,7 +166,7 @@ class DoxRequest {
   /// req.host()
   /// ```
   String host() {
-    return header('host') ?? 'unknown';
+    return header(HttpHeaders.hostHeader) ?? UNKNOWN;
   }
 
   /// get origin
@@ -180,7 +182,7 @@ class DoxRequest {
   /// req.referer()
   /// ```
   String? referer() {
-    return header('referer');
+    return header(HttpHeaders.refererHeader);
   }
 
   /// validate input request

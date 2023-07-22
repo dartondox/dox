@@ -1,1 +1,0 @@
-enum DatabaseDriver { postgres, mysql }
