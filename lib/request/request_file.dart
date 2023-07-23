@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as path;
@@ -15,8 +16,6 @@ class RequestFile {
   /// eg. png, jpeg, pdf
   String get extension =>
       path.extension(filename).toLowerCase().replaceFirst('.', '');
-
-  Future<List<int>> get bytes => stream.first;
 
   RequestFile({
     required this.filename,
@@ -40,7 +39,7 @@ class RequestFile {
     if (!directory.existsSync()) {
       directory.createSync(recursive: true);
     }
-    List<int> b = await bytes;
+    List<int> b = await convertMimeMultipartToBytes(stream);
     await file.writeAsBytes(b);
     return file.path.replaceFirst(Directory.current.path, '');
   }
@@ -48,5 +47,25 @@ class RequestFile {
   String _sanitizePath(String path) {
     path = path.replaceAll(RegExp(r'/+'), '/');
     return "/${path.replaceAll(RegExp('^\\/+|\\/+\$'), '')}";
+  }
+
+  /// convert mimeMultipart To bytes
+  Future<Uint8List> convertMimeMultipartToBytes(MimeMultipart multipart) async {
+    List<Uint8List> partBytesList = <Uint8List>[];
+
+    // Read each part of the MimeMultipart and convert them to bytes
+    await for (List<int> part in multipart) {
+      // Read the MimePart and convert it into bytes
+      List<int> partBytes = part.toList();
+      Uint8List bytes =
+          Uint8List.fromList(partBytes.map((int byte) => byte).toList());
+      partBytesList.add(bytes);
+    }
+
+    // Combine all the bytes from individual parts into a single Uint8List
+    Uint8List combinedBytes = Uint8List.fromList(
+        partBytesList.expand((Uint8List element) => element).toList());
+
+    return combinedBytes;
   }
 }
