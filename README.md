@@ -12,7 +12,7 @@ Dox is a powerful framework specifically developed for web application backend d
 
 ## Features
 
-- **MultiThread HTTP Server**: Dox support multi-threaded HTTP server using isolates that will can handle 10x concurrency requests with high speed.
+- **MultiThread HTTP Server**: Dox support multi-threaded HTTP server using isolates that can handle 10x concurrency requests with high speed.
 - **Modular Architecture**: Dox follows a modular architecture, making it easy to extend and customize functionalities based on project requirements.
 - **Scalability**: The framework is designed to handle high traffic and scale effortlessly as your web application grows.
 - **Developer-Friendly**: With its intuitive APIs and clear documentation, Dox makes it easier for developers to create and maintain web applications.

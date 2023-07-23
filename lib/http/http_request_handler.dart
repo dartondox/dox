@@ -46,5 +46,6 @@ Future<DoxRequest> getDoxRequest(HttpRequest req, RouteData route) async {
     contentType: req.headers.contentType,
     clientIp: req.connectionInfo?.remoteAddress.address,
     httpHeaders: req.headers,
+    httpRequest: req,
   );
 }

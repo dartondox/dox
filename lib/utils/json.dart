@@ -14,5 +14,5 @@ dynamic advanceEncode(dynamic object) {
   if (object is DateTime) {
     return object.toIso8601String();
   }
-  return object;
+  return object.toJson();
 }
