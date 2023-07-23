@@ -31,6 +31,8 @@ class Dox {
   /// total thread
   int _totalIsolate = 1;
 
+  /// list of services that need to run when
+  /// creating isolate
   List<DoxService> doxServices = <DoxService>[];
 
   /// initialize dox application
@@ -66,11 +68,10 @@ class Dox {
   Future<void> startServer() async {
     if (_totalIsolate == 1) {
       await startServices();
-      DoxServer server = DoxServer();
-      server.setResponseHandler(config.responseHandler);
-      await server.listen(config.serverPort, isolateId: 1);
+      DoxServer().setResponseHandler(config.responseHandler);
+      await DoxServer().listen(config.serverPort, isolateId: 1);
     } else {
-      await DoxIsolate().create(_totalIsolate);
+      await DoxIsolate().spawn(_totalIsolate);
     }
   }
 

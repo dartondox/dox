@@ -9,7 +9,6 @@ void isolateHandler(IsolateSpawnParameter param) async {
   Dox().authGuard = param.authGuard;
   await Dox().startServices();
 
-  DoxServer server = DoxServer();
-  server.setResponseHandler(param.config.responseHandler);
-  await server.listen(param.config.serverPort, isolateId: param.isolateId);
+  DoxServer().setResponseHandler(param.config.responseHandler);
+  await DoxServer().listen(param.config.serverPort, isolateId: param.isolateId);
 }
