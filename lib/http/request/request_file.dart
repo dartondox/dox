@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:dox_core/utils/extensions/num.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as path;
 import 'package:uuid/uuid.dart';
@@ -11,6 +12,7 @@ class RequestFile {
   final String filename;
   final String filetype;
   final MimeMultipart stream;
+  Uint8List? _bytes;
 
   /// Get file extension
   /// eg. png, jpeg, pdf
@@ -22,6 +24,23 @@ class RequestFile {
     required this.filetype,
     required this.stream,
   });
+
+  /// get file content in bytes
+  /// ```
+  /// await file.bytes
+  /// ```
+  Future<Uint8List> get bytes async {
+    _bytes ??= await _convertMultipartToBytes(stream);
+    return _bytes!;
+  }
+
+  /// get file size in kilobytes
+  /// ```
+  /// await file.size
+  /// ```
+  Future<num> get size async {
+    return _bytesToKB(await bytes);
+  }
 
   /// this function will store the file in your project storage folder
   ///
@@ -39,33 +58,38 @@ class RequestFile {
     if (!directory.existsSync()) {
       directory.createSync(recursive: true);
     }
-    List<int> b = await convertMimeMultipartToBytes(stream);
-    await file.writeAsBytes(b);
+    await file.writeAsBytes(await bytes);
     return file.path.replaceFirst(Directory.current.path, '');
   }
 
+  /// convert bytes list into kilobytes
+  num _bytesToKB(Uint8List bytesList) {
+    int totalBytes =
+        bytesList.reduce((int value, int element) => value + element);
+    num sizeInKB = totalBytes / 1024;
+    return sizeInKB.toFixed(2);
+  }
+
+  /// sanitize the path to store
   String _sanitizePath(String path) {
     path = path.replaceAll(RegExp(r'/+'), '/');
     return "/${path.replaceAll(RegExp('^\\/+|\\/+\$'), '')}";
   }
 
   /// convert mimeMultipart To bytes
-  Future<Uint8List> convertMimeMultipartToBytes(MimeMultipart multipart) async {
-    List<Uint8List> partBytesList = <Uint8List>[];
+  Future<Uint8List> _convertMultipartToBytes(MimeMultipart multipart) async {
+    List<int> partBytesList = <int>[];
 
-    // Read each part of the MimeMultipart and convert them to bytes
     await for (List<int> part in multipart) {
-      // Read the MimePart and convert it into bytes
       List<int> partBytes = part.toList();
-      Uint8List bytes =
-          Uint8List.fromList(partBytes.map((int byte) => byte).toList());
-      partBytesList.add(bytes);
+      partBytesList.addAll(partBytes);
     }
 
     // Combine all the bytes from individual parts into a single Uint8List
-    Uint8List combinedBytes = Uint8List.fromList(
-        partBytesList.expand((Uint8List element) => element).toList());
+    Uint8List uint8list = Uint8List.fromList(
+      partBytesList.map((int byte) => byte).toList(),
+    );
 
-    return combinedBytes;
+    return uint8list;
   }
 }
