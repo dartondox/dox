@@ -23,7 +23,6 @@ export 'http/request/request_file.dart';
 /// Response
 export 'http/response/dox_cookie.dart';
 export 'http/response/dox_response.dart';
-export 'http/response/handler.dart';
 export 'http/response/serializer.dart';
 
 /// interfaces
@@ -33,6 +32,7 @@ export 'interfaces/app_config.dart';
 export 'interfaces/auth.dart';
 export 'interfaces/dox_middleware.dart';
 export 'interfaces/dox_service.dart';
+export 'interfaces/response_handler_interface.dart';
 export 'interfaces/router.dart';
 
 /// Tools
