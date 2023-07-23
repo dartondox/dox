@@ -18,7 +18,7 @@ class Database implements DoxService {
   int concurrency = 10;
 
   @override
-  Future<void> setup(AppConfig appConfig) async {
+  Future<void> setup() async {
     Database().endPoint = PgEndpoint(
       host: Env.get('DB_HOST', 'localhost'),
       port: int.parse(Env.get('DB_PORT', '5432')),

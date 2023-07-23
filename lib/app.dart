@@ -100,7 +100,7 @@ class Dox {
     _registerRoute();
 
     for (DoxService service in doxServices) {
-      await service.setup(config);
+      await service.setup();
     }
   }
 

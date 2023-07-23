@@ -10,7 +10,7 @@ class Redis implements DoxService {
   late Command command;
 
   @override
-  Future<void> setup(AppConfig appConfig) async {
+  Future<void> setup() async {
     RedisConnection conn = RedisConnection();
     String tls = Env.get('REDIS_TLS', 'false');
     String host = Env.get('REDIS_HOST', 'localhost');
@@ -30,9 +30,5 @@ class Redis implements DoxService {
         <dynamic>['AUTH', username, password],
       );
     }
-  }
-
-  Future<void> close() async {
-    await Redis().command.get_connection().close();
   }
 }
