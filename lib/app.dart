@@ -1,5 +1,5 @@
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/multi_thread/multi_thread.dart';
+import 'package:dox_core/isolate/dox_isolate.dart';
 import 'package:dox_core/server/dox_server.dart';
 
 class Dox {
@@ -29,7 +29,7 @@ class Dox {
   Guard? authGuard;
 
   /// total thread
-  int _totalThread = 3;
+  int _totalIsolate = 3;
 
   List<DoxService> doxServices = <DoxService>[];
 
@@ -41,6 +41,42 @@ class Dox {
   void initialize(AppConfig appConfig) async {
     ioc = IocContainer();
     config = appConfig;
+  }
+
+  /// set total thread
+  /// default is 3
+  void totalIsolate(int value) {
+    _totalIsolate = value;
+  }
+
+  /// set authorization config
+  /// and this function can only call after initialize()
+  /// ```
+  /// await Dox().initialize(config)
+  /// Dox().setAuthConfig(AuthConfig())
+  /// ```
+  void setAuthConfig(AuthConfigInterface authConfig) {
+    authGuard = authConfig.guards[authConfig.defaultGuard];
+  }
+
+  /// start dox server
+  /// ```
+  /// await Dox().startServer();
+  /// ```
+  Future<void> startServer() async {
+    await DoxIsolate().create(_totalIsolate);
+  }
+
+  /// ####### functions need to run on isolate #######
+
+  /// add services that need to run on isolate spawn
+  void addServices(List<DoxService> services) {
+    doxServices.addAll(services);
+  }
+
+  /// add service that need to run on isolate spawn
+  void addService(DoxService service) {
+    doxServices.add(service);
   }
 
   /// start service registered to dox
@@ -55,43 +91,7 @@ class Dox {
     }
   }
 
-  /// add services that need to run on isolate spawn
-  void addServices(List<DoxService> services) {
-    doxServices.addAll(services);
-  }
-
-  /// add service that need to run on isolate spawn
-  void addService(DoxService service) {
-    doxServices.add(service);
-  }
-
-  /// set total thread
-  /// default is 3
-  void totalThread(int value) {
-    _totalThread = value;
-  }
-
-  /// start dox server
-  /// ```
-  /// await Dox().startServer();
-  /// ```
-  Future<void> startServer() async {
-    await startServices();
-    await DoxMultiThread().create(_totalThread);
-    DoxServer server = DoxServer();
-    server.setResponseHandler(config.responseHandler);
-    await server.listen(config.serverPort);
-  }
-
-  /// set authorization config
-  /// and this function can only call after initialize()
-  /// ```
-  /// await Dox().initialize(config)
-  /// Dox().setAuthConfig(AuthConfig())
-  /// ```
-  void setAuthConfig(AuthConfigInterface authConfig) {
-    authGuard = authConfig.guards[authConfig.defaultGuard];
-  }
+  /// ################ end ###########
 
   /// register form request assign in app config
   void _registerFormRequests() {

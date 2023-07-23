@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_cors_handler.dart';
 import 'package:dox_core/http/http_request_handler.dart';
-import 'package:dox_core/utils/logger.dart';
 
 class DoxServer {
   /// register singleton
@@ -21,9 +20,13 @@ class DoxServer {
   /// ```
   /// DoxServer().listen(3000);
   /// ```
-  Future<HttpServer> listen(int port, {Function? onError}) async {
-    HttpServer server = await HttpServer.bind(InternetAddress.anyIPv4, port);
-    DoxLogger.info('Server started at http://127.0.0.1:${server.port}');
+  Future<HttpServer> listen(int port,
+      {Function? onError, int? isolateId}) async {
+    HttpServer server = await HttpServer.bind(
+      InternetAddress.anyIPv6,
+      port,
+      shared: true,
+    );
     server.listen(
       (HttpRequest req) {
         httpCorsHandler(req);
