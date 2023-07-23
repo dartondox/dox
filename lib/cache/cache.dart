@@ -1,18 +1,10 @@
 import 'package:dox_core/cache/cache_driver_interface.dart';
 import 'package:dox_core/cache/drivers/file/file_cache_driver.dart';
-import 'package:dox_core/cache/drivers/redis/redis_cache_driver.dart';
 import 'package:dox_core/dox_core.dart';
 
 class Cache {
-  CacheStore _store = Dox().config.cacheStore;
   String _tag = 'default';
   CacheDriverInterface? _customDriver = Dox().config.customCacheDriver;
-
-  /// set a driver to store the data
-  Cache store(CacheStore store) {
-    _store = store;
-    return this;
-  }
 
   Cache driver(CacheDriverInterface driver) {
     _customDriver = driver;
@@ -28,16 +20,11 @@ class Cache {
   /// get the cache driver
   CacheDriverInterface get _driver {
     if (_customDriver != null) {
-      return _customDriver!;
+      CacheDriverInterface d = _customDriver!;
+      d.setTag(_tag);
+      return d;
     }
-    switch (_store) {
-      case CacheStore.file:
-        return FileCacheDriver(tag: _tag);
-      case CacheStore.redis:
-        return RedisCacheDriver(tag: _tag);
-      default:
-        return FileCacheDriver(tag: _tag);
-    }
+    return FileCacheDriver(tag: _tag);
   }
 
   /// set key => value to cache

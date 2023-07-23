@@ -7,16 +7,25 @@ import 'package:dox_core/utils/aes_encryptor.dart';
 
 class FileCacheDriver implements CacheDriverInterface {
   /// tag name
-  final String tag;
+  @override
+  String tag;
 
   /// cache folder directory
   final String folder = 'storage/cache';
 
+  @override
+  String get prefix => 'dox-framework-cache-$tag';
+
   /// Store cache into file
-  const FileCacheDriver({required this.tag});
+  FileCacheDriver({this.tag = ''});
 
   /// Dox() APP_KEY to encrypt data
   String get _secret => Dox().config.appKey;
+
+  @override
+  void setTag(String tagName) {
+    tag = tagName;
+  }
 
   /// set key value into cache
   /// default duration 1 hour
@@ -80,9 +89,7 @@ class FileCacheDriver implements CacheDriverInterface {
   /// create cache file if not exist
   /// and return cache file
   File get _cacheFile {
-    String fileName = base64
-        .encode(utf8.encode('dox-framework-cache-$tag'))
-        .replaceAll('=', '');
+    String fileName = base64.encode(utf8.encode(prefix)).replaceAll('=', '');
 
     File cacheFile = File('${Directory.current.path}/$folder/$fileName');
 

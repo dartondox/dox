@@ -1,21 +1,28 @@
 import 'package:dox_core/cache/cache_driver_interface.dart';
-import 'package:dox_core/cache/drivers/redis/redis.dart';
 import 'package:redis/redis.dart';
 
+import 'redis.dart';
+
 class RedisCacheDriver implements CacheDriverInterface {
-  final Redis redis = Redis();
+  Redis redis = Redis();
 
-  /// tag name
-  final String tag;
+  @override
+  String tag = '';
 
-  RedisCacheDriver({required this.tag});
+  @override
+  String get prefix => 'dox-framework-cache-$tag:';
 
-  String get _prefix => 'dox-framework-cache-$tag:';
+  RedisCacheDriver();
+
+  @override
+  void setTag(String tagName) {
+    tag = tagName;
+  }
 
   @override
   Future<void> flush() async {
     Command cmd = await redis.command;
-    List<dynamic> res = await cmd.send_object(<dynamic>['KEYS', '$_prefix*']);
+    List<dynamic> res = await cmd.send_object(<dynamic>['KEYS', '$prefix*']);
     if (res.isNotEmpty) {
       await cmd.send_object(<dynamic>['DEL', ...res]);
     }
@@ -29,13 +36,13 @@ class RedisCacheDriver implements CacheDriverInterface {
   @override
   Future<void> forget(String key) async {
     Command cmd = await redis.command;
-    return await cmd.send_object(<dynamic>['DEL', _prefix + key]);
+    return await cmd.send_object(<dynamic>['DEL', prefix + key]);
   }
 
   @override
   Future<dynamic> get(String key) async {
     Command cmd = await redis.command;
-    return await cmd.send_object(<dynamic>['GET', _prefix + key]);
+    return await cmd.send_object(<dynamic>['GET', prefix + key]);
   }
 
   @override
@@ -53,7 +60,7 @@ class RedisCacheDriver implements CacheDriverInterface {
 
     await cmd.send_object(<dynamic>[
       'SET',
-      _prefix + key,
+      prefix + key,
       value,
       'PXAT',
       time.millisecondsSinceEpoch,

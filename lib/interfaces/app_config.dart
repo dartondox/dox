@@ -41,6 +41,4 @@ abstract class AppConfig {
   CORSConfig get cors;
 
   CacheDriverInterface? get customCacheDriver => null;
-
-  CacheStore cacheStore = CacheStore.file;
 }

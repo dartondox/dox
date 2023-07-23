@@ -34,8 +34,4 @@ class Config extends AppConfig {
 
   @override
   List<Router> get routers => <Router>[ApiRouter()];
-
-  @override
-  // ignore: overridden_fields
-  CacheStore cacheStore = CacheStore.file;
 }

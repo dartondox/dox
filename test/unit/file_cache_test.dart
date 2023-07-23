@@ -26,7 +26,7 @@ void main() {
     });
 
     test('get', () async {
-      await Cache().store(CacheStore.systemDefault).forget('name');
+      await Cache().forget('name');
       String? value2 = await Cache().get('name');
       expect(value2, null);
     });
@@ -49,12 +49,6 @@ void main() {
 
       String? value2 = await Cache().tag('ABC').get('name');
       expect(value2, null);
-    });
-
-    test('store', () async {
-      await Cache().store(CacheStore.file).put('name', 'Dox');
-      String? value = await Cache().get('name');
-      expect(value, 'Dox');
     });
 
     test('json', () async {
