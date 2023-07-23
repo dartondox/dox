@@ -9,7 +9,6 @@ import 'package:dox_core/router/route_data.dart';
 
 void httpWebSocketHandler(HttpRequest req, RouteData route) {
   getDoxRequest(req, route).then((DoxRequest doxReq) {
-    doxReq.setHttpRequest(req);
     middlewareAndControllerHandler(doxReq).then((dynamic result) {
       httpResponseHandler(result, req);
     }).onError((Object? error, StackTrace stackTrace) {

@@ -1,3 +1,10 @@
+# version 2.0.0
+
+- support multi thread with services (database, redis) running on each isolate
+- bug fixed on multipart form data file store
+- add cache class use file driver as default and support customer drivers such as redis, memcached
+- improved route
+
 # version 1.0.6
 
 - Remove third party dot env package and replace with own `Env` class

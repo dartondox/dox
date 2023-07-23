@@ -11,10 +11,10 @@ class DoxRequest {
   final Uri uri;
   final ContentType? contentType;
   final HttpHeaders httpHeaders;
+  final HttpRequest httpRequest;
 
   final String? clientIp;
   String method = 'GET';
-  HttpRequest? httpRequest;
 
   Map<String, dynamic> body = <String, dynamic>{};
   Map<String, dynamic> param = <String, dynamic>{};
@@ -30,17 +30,13 @@ class DoxRequest {
     this.contentType,
     this.clientIp,
     required this.httpHeaders,
+    required this.httpRequest,
   }) {
     method = route.method.toUpperCase();
     param = route.params;
     query = uri.queryParameters;
     _allRequest = <String, dynamic>{...query, ...body};
     _getCookies();
-  }
-
-  /// only use to handle web socket
-  void setHttpRequest(HttpRequest req) {
-    httpRequest = req;
   }
 
   /// http request data is form data
