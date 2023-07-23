@@ -39,7 +39,7 @@ class RequestFile {
     if (!directory.existsSync()) {
       directory.createSync(recursive: true);
     }
-    List<int> b = await convertMimeMultipartToBytes(stream);
+    Uint8List b = await _convertMimeMultipartToBytes(stream);
     await file.writeAsBytes(b);
     return file.path.replaceFirst(Directory.current.path, '');
   }
@@ -50,22 +50,20 @@ class RequestFile {
   }
 
   /// convert mimeMultipart To bytes
-  Future<Uint8List> convertMimeMultipartToBytes(MimeMultipart multipart) async {
-    List<Uint8List> partBytesList = <Uint8List>[];
+  Future<Uint8List> _convertMimeMultipartToBytes(
+      MimeMultipart multipart) async {
+    List<int> partBytesList = <int>[];
 
-    // Read each part of the MimeMultipart and convert them to bytes
     await for (List<int> part in multipart) {
-      // Read the MimePart and convert it into bytes
       List<int> partBytes = part.toList();
-      Uint8List bytes =
-          Uint8List.fromList(partBytes.map((int byte) => byte).toList());
-      partBytesList.add(bytes);
+      partBytesList.addAll(partBytes);
     }
 
     // Combine all the bytes from individual parts into a single Uint8List
-    Uint8List combinedBytes = Uint8List.fromList(
-        partBytesList.expand((Uint8List element) => element).toList());
+    Uint8List uint8list = Uint8List.fromList(
+      partBytesList.map((int byte) => byte).toList(),
+    );
 
-    return combinedBytes;
+    return uint8list;
   }
 }
