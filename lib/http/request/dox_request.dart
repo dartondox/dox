@@ -227,7 +227,7 @@ class DoxRequest {
     });
   }
 
-  /// support jsonEncode to convert json
+  /// support JSON.stringify to convert json
   Map<String, dynamic> toJson() {
     Map<String, dynamic> ret = <String, dynamic>{};
     _allRequest.forEach((String key, dynamic value) {

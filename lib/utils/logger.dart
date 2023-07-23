@@ -1,4 +1,4 @@
-import 'dart:convert';
+import 'package:dox_core/utils/json.dart';
 
 class DoxLogger {
   /// log the text with white color
@@ -48,6 +48,6 @@ class DoxLogger {
       'timestamp': DateTime.now().toIso8601String(),
       'payload': data
     };
-    DoxLogger.log(jsonEncode(text));
+    DoxLogger.log(JSON.stringify(text));
   }
 }
