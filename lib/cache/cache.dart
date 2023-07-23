@@ -1,5 +1,4 @@
 import 'package:dox_core/cache/cache_driver_interface.dart';
-import 'package:dox_core/cache/cache_store.dart';
 import 'package:dox_core/cache/drivers/file/file_cache_driver.dart';
 import 'package:dox_core/cache/drivers/redis/redis_cache_driver.dart';
 import 'package:dox_core/dox_core.dart';
@@ -15,8 +14,9 @@ class Cache {
     return this;
   }
 
-  void driver(CacheDriverInterface driver) {
+  Cache driver(CacheDriverInterface driver) {
     _customDriver = driver;
+    return this;
   }
 
   /// set tag for the cache

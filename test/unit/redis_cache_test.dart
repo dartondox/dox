@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:dox_core/cache/cache_store.dart';
+import 'package:dox_core/cache/drivers/redis/redis_cache_driver.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
@@ -9,17 +9,38 @@ import '../integration/requirements/config/app.dart';
 Config config = Config();
 
 void main() {
-  group('Cache |', () {
+  group('Redis Cache |', () {
     setUpAll(() async {
       config.cacheStore = CacheStore.redis;
       config.serverPort = 50011;
       Dox().initialize(config);
     });
 
+    tearDownAll(() async {
+      await Cache().flush();
+    });
+
+    test('put with driver', () async {
+      await Cache()
+          .driver(RedisCacheDriver(tag: 'dox'))
+          .put('put-with-driver', 'Dox');
+      String? value = await Cache()
+          .driver(RedisCacheDriver(tag: 'dox'))
+          .get('put-with-driver');
+      expect(value, 'Dox');
+    });
+
     test('put', () async {
       await Cache().put('name', 'Dox');
       String? value = await Cache().get('name');
       expect(value, 'Dox');
+    });
+
+    test('forget', () async {
+      await Cache().put('forget', 'Dox');
+      await Cache().forget('forget');
+      String? value = await Cache().get('forget');
+      expect(value, null);
     });
 
     test('has', () async {
