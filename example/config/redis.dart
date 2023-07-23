@@ -2,7 +2,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:redis/redis.dart';
 
 class Redis implements DoxService {
-  /// Declare as Singleton
+  /// Declare as Singleton to reuse connection
   static final Redis _i = Redis._internal();
   factory Redis() => _i;
   Redis._internal();

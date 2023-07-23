@@ -15,7 +15,7 @@ void main() async {
   Dox().addService(Redis());
 
   /// set total thread
-  Dox().totalIsolate(6);
+  Dox().totalIsolate(3);
 
   /// run database migration before starting server
   /// running migration should not be on part of Dox services

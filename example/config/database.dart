@@ -4,7 +4,7 @@ import 'package:dox_query_builder/dox_query_builder.dart';
 import 'package:postgres_pool/postgres_pool.dart';
 
 class Database implements DoxService {
-  /// Declare as Singleton
+  /// Declare as Singleton to reuse connection pool
   static final Database _i = Database._internal();
   factory Database() => _i;
   Database._internal();

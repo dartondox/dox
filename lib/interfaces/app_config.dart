@@ -22,6 +22,8 @@ class CORSConfig {
 abstract class AppConfig {
   String get appKey;
 
+  int totalIsolate = 3;
+
   int get serverPort;
 
   ResponseHandlerInterface get responseHandler;
