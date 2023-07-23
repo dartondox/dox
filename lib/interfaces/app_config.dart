@@ -1,4 +1,5 @@
 /// coverage:ignore-file
+import 'package:dox_core/cache/cache_driver_interface.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/logger.dart';
 
@@ -38,4 +39,6 @@ abstract class AppConfig {
   List<Router> get routers;
 
   CORSConfig get cors;
+
+  CacheDriverInterface? get customCacheDriver => null;
 }

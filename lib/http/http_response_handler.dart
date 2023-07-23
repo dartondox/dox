@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/server/dox_server.dart';
 
-void httpResponseHandler(
+dynamic httpResponseHandler(
   dynamic payload,
   HttpRequest request,
 ) {
@@ -16,7 +16,8 @@ void httpResponseHandler(
   }
 
   /// if payload is DoxResponse, DoxResponse have process function
-  /// which pass payload again to this function `RouterResponse.send`
+  /// which will set header and status code in the response
+  /// and will pass payload/content back to this function `httpResponseHandler`
   /// where the payload is not DoxResponse anymore
   /// so it will continue belows process
   if (payload is DoxResponse) {

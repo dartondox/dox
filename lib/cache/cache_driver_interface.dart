@@ -1,19 +1,27 @@
 /// coverage:ignore-file
 
 abstract class CacheDriverInterface {
-  void put(String key, String value, {Duration? duration}) {}
+  String tag = '';
 
-  void forever(String key, String value) {}
+  String get prefix => 'dox-framework-cache-$tag:';
 
-  void forget(String key) {}
+  Future<void> put(String key, String value, {Duration? duration}) async {}
 
-  void flush() {}
+  Future<void> forever(String key, String value) async {}
 
-  String? get(String key) {
+  Future<void> forget(String key) async {}
+
+  Future<void> flush() async {}
+
+  void setTag(String tagName) {
+    tag = tagName;
+  }
+
+  Future<dynamic> get(String key) async {
     return null;
   }
 
-  bool has(String key) {
+  Future<bool> has(String key) async {
     return true;
   }
 }
