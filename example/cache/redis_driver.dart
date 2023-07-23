@@ -1,11 +1,9 @@
 import 'package:dox_core/cache/cache_driver_interface.dart';
 import 'package:redis/redis.dart';
 
-import 'redis.dart';
+import '../config/redis.dart';
 
 class RedisCacheDriver implements CacheDriverInterface {
-  Redis redis = Redis();
-
   @override
   String tag = '';
 
@@ -21,7 +19,7 @@ class RedisCacheDriver implements CacheDriverInterface {
 
   @override
   Future<void> flush() async {
-    Command cmd = await redis.command;
+    Command cmd = Redis().command;
     List<dynamic> res = await cmd.send_object(<dynamic>['KEYS', '$prefix*']);
     if (res.isNotEmpty) {
       await cmd.send_object(<dynamic>['DEL', ...res]);
@@ -35,13 +33,13 @@ class RedisCacheDriver implements CacheDriverInterface {
 
   @override
   Future<void> forget(String key) async {
-    Command cmd = await redis.command;
+    Command cmd = Redis().command;
     return await cmd.send_object(<dynamic>['DEL', prefix + key]);
   }
 
   @override
   Future<dynamic> get(String key) async {
-    Command cmd = await redis.command;
+    Command cmd = Redis().command;
     return await cmd.send_object(<dynamic>['GET', prefix + key]);
   }
 
@@ -56,7 +54,7 @@ class RedisCacheDriver implements CacheDriverInterface {
     duration = duration ?? Duration(hours: 1);
     DateTime time = DateTime.now().add(duration);
 
-    Command cmd = await redis.command;
+    Command cmd = Redis().command;
 
     await cmd.send_object(<dynamic>[
       'SET',
