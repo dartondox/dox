@@ -4,6 +4,7 @@ export 'app.dart';
 
 /// cache
 export 'cache/cache.dart';
+export 'cache/cache_store.dart';
 export 'constants/constants.dart';
 export 'env/env.dart';
 

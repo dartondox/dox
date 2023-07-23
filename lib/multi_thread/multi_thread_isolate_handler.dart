@@ -22,7 +22,10 @@ void multiThreadIsolateHandler(IsolateSpawnParameter param) async {
     if (request is DoxRequest) {
       middlewareAndControllerHandler(request).then((dynamic result) {
         sendPort.send(result);
-      }).catchError((dynamic error) {
+      }).onError((dynamic error, StackTrace stackTrace) {
+        if (error is Exception || error is Error) {
+          Dox().config.errorHandler(error, stackTrace);
+        }
         sendPort.send(error);
       });
     }

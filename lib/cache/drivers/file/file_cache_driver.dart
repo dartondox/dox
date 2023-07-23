@@ -21,7 +21,7 @@ class FileCacheDriver implements CacheDriverInterface {
   /// set key value into cache
   /// default duration 1 hour
   @override
-  void put(String key, String value, {Duration? duration}) {
+  Future<void> put(String key, String value, {Duration? duration}) async {
     duration ??= Duration(hours: 1);
     Map<String, dynamic> existingData = _getData();
     existingData[key] = <String, dynamic>{
@@ -33,13 +33,13 @@ class FileCacheDriver implements CacheDriverInterface {
 
   /// set key value into cache forever
   @override
-  void forever(String key, String value) {
-    put(key, value, duration: Duration(days: 365 * 100));
+  Future<void> forever(String key, String value) async {
+    await put(key, value, duration: Duration(days: 365 * 1000));
   }
 
   /// remove a key from cache
   @override
-  void forget(String key) {
+  Future<void> forget(String key) async {
     Map<String, dynamic> existingData = _getData();
     existingData.remove(key);
     _writeData(existingData);
@@ -47,13 +47,13 @@ class FileCacheDriver implements CacheDriverInterface {
 
   /// flush all the cache
   @override
-  void flush() {
+  Future<void> flush() async {
     _writeData(<String, dynamic>{});
   }
 
   /// get value from cache
   @override
-  String? get(String key) {
+  Future<dynamic> get(String key) async {
     Map<String, dynamic>? data = _getData()[key];
 
     if (data == null) {
@@ -64,6 +64,7 @@ class FileCacheDriver implements CacheDriverInterface {
     int currentTime = DateTime.now().millisecondsSinceEpoch;
 
     if (currentTime > expiredAt) {
+      await forget(key);
       return null;
     }
 
@@ -72,8 +73,8 @@ class FileCacheDriver implements CacheDriverInterface {
 
   /// check value exist
   @override
-  bool has(String key) {
-    return get(key) != null ? true : false;
+  Future<bool> has(String key) async {
+    return await get(key) != null ? true : false;
   }
 
   /// create cache file if not exist

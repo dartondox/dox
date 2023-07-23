@@ -1,19 +1,19 @@
 /// coverage:ignore-file
 
 abstract class CacheDriverInterface {
-  void put(String key, String value, {Duration? duration}) {}
+  Future<void> put(String key, String value, {Duration? duration}) async {}
 
-  void forever(String key, String value) {}
+  Future<void> forever(String key, String value) async {}
 
-  void forget(String key) {}
+  Future<void> forget(String key) async {}
 
-  void flush() {}
+  Future<void> flush() async {}
 
-  String? get(String key) {
+  Future<dynamic> get(String key) async {
     return null;
   }
 
-  bool has(String key) {
+  Future<bool> has(String key) async {
     return true;
   }
 }

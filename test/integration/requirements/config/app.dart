@@ -1,3 +1,4 @@
+import 'package:dox_core/cache/cache_store.dart';
 import 'package:dox_core/dox_core.dart';
 
 import '../handler.dart';
@@ -34,4 +35,7 @@ class Config extends AppConfig {
 
   @override
   List<Router> get routers => <Router>[ApiRouter()];
+
+  @override
+  CacheStore get cacheStore => CacheStore.file;
 }
