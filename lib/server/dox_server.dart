@@ -15,7 +15,7 @@ class DoxServer {
   late HttpServer httpServer;
 
   /// set responseHandler
-  Handler? responseHandler;
+  ResponseHandlerInterface? responseHandler;
 
   /// listen the request
   /// ```
@@ -47,7 +47,7 @@ class DoxServer {
   /// ```
   /// server.setResponseHandler(Handler());
   /// ```
-  void setResponseHandler(Handler handler) {
+  void setResponseHandler(ResponseHandlerInterface handler) {
     responseHandler = handler;
   }
 }

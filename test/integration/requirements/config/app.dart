@@ -22,7 +22,7 @@ class Config extends AppConfig {
       );
 
   @override
-  Handler get responseHandler => ResponseHandler();
+  ResponseHandlerInterface get responseHandler => ResponseHandler();
 
   @override
   List<dynamic> get globalMiddleware => <dynamic>[customMiddleware];

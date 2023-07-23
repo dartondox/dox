@@ -24,7 +24,7 @@ abstract class AppConfig {
 
   int get serverPort;
 
-  Handler get responseHandler;
+  ResponseHandlerInterface get responseHandler;
 
   void Function(Object?, StackTrace) get errorHandler =>
       (Object? error, StackTrace stackTrace) {
