@@ -3,8 +3,6 @@ import 'dart:isolate';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/isolate/isolate_handler.dart';
 import 'package:dox_core/isolate/isolate_interfaces.dart';
-import 'package:dox_core/utils/logger.dart';
-import 'package:sprintf/sprintf.dart';
 
 class DoxIsolate {
   /// singleton
@@ -23,10 +21,6 @@ class DoxIsolate {
     for (int i = 0; i < count; i++) {
       await _spawn(i + 1);
     }
-    DoxLogger.info(sprintf(
-      'Server started at http://127.0.0.1:%s',
-      <dynamic>[Dox().config.serverPort],
-    ));
   }
 
   /// kill all the isolate

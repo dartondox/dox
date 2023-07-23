@@ -1,8 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/server/dox_server.dart';
+import 'package:dox_core/utils/json.dart';
 
 dynamic httpResponseHandler(
   dynamic payload,
@@ -54,12 +54,16 @@ dynamic httpResponseHandler(
     payload = payload.toString();
   }
 
+  if (payload is DateTime) {
+    payload = payload.toIso8601String();
+  }
+
   String responseData;
 
   /// if payload is Map or List, parse into json
   /// and response as json
   if (payload is! String) {
-    responseData = jsonEncode(payload);
+    responseData = JSON.stringify(payload);
     res.headers.contentType = ContentType.json;
   } else {
     responseData = payload;

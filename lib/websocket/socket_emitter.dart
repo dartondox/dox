@@ -1,7 +1,7 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/utils/json.dart';
 import 'package:dox_core/utils/logger.dart';
 import 'package:dox_core/websocket/socket_storage.dart';
 import 'package:dox_core/websocket/web_socket_info.dart';
@@ -43,7 +43,7 @@ class SocketEmitter {
   /// ```
   void emit(String event, dynamic message,
       {List<String> exclude = const <String>[]}) {
-    String payload = jsonEncode(<String, dynamic>{
+    String payload = JSON.stringify(<String, dynamic>{
       WEB_SOCKET_EVENT_KEY: event,
       WEB_SOCKET_MESSAGE_KEY: message,
     });

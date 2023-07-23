@@ -7,6 +7,9 @@ import 'api_router.dart';
 
 class Config extends AppConfig {
   @override
+  int get totalIsolate => 1;
+
+  @override
   String get appKey => '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt';
 
   int _serverPort = 50010;
