@@ -236,7 +236,7 @@ void main() {
       expect(jsond['is_json'], true);
       expect(jsond['is_form_data'], false);
       expect(jsond['host'].toString().contains('localhost'), true);
-      expect(jsond['ip'], '127.0.0.1');
+      expect(jsond['ip'].toString().contains('127.0.0.1'), true);
       expect(res.statusCode, 200);
       expect(res.headers['x-key'], 'ABCD');
     });

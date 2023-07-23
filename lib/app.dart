@@ -29,7 +29,7 @@ class Dox {
   Guard? authGuard;
 
   /// total thread
-  int _totalIsolate = 3;
+  int _totalIsolate = 1;
 
   List<DoxService> doxServices = <DoxService>[];
 
@@ -64,7 +64,14 @@ class Dox {
   /// await Dox().startServer();
   /// ```
   Future<void> startServer() async {
-    await DoxIsolate().create(_totalIsolate);
+    if (_totalIsolate == 1) {
+      await startServices();
+      DoxServer server = DoxServer();
+      server.setResponseHandler(config.responseHandler);
+      await server.listen(config.serverPort, isolateId: 1);
+    } else {
+      await DoxIsolate().create(_totalIsolate);
+    }
   }
 
   /// ####### functions need to run on isolate #######
