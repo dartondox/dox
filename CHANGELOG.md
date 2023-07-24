@@ -1,9 +1,16 @@
-# version 2.0.0
+# version 2.0.0-alpha.0
 
-- support multi thread with services (database, redis) running on each isolate
-- bug fixed on multipart form data file store
-- add cache class use file driver as default and support customer drivers such as redis, memcached
-- improved route
+- Added support multi-thread http server which is 10x faster on concurrency request.
+- Added support for services (i.e database, redis) to run on each isolate/multi-thread
+- Added cache class that run file driver as default and 
+- Added support for custom cache drivers, i.e redis, memcached
+- Added `JSON.stringify()` and `JSON.parse()` that support DateTime to encode
+- Added support for DateTime object on http response/return data
+- Added support of size and bytes information on uploaded RequestFile 
+- Bug fixed on multipart form data file store
+- Removed database config option in app config.
+- Moved Ioc container from `Global.ioc` to `Dox().ioc`
+- Improvement on routes
 
 # version 1.0.6
 
