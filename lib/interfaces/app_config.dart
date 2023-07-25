@@ -42,5 +42,15 @@ abstract class AppConfig {
 
   CORSConfig get cors;
 
-  CacheDriverInterface? get customCacheDriver => null;
+  CacheConfig get cacheConfig => CacheConfig();
+}
+
+class CacheConfig {
+  final String defaultDriver;
+  final Map<String, CacheDriverInterface> drivers;
+
+  const CacheConfig({
+    this.defaultDriver = 'file',
+    this.drivers = const <String, CacheDriverInterface>{},
+  });
 }
