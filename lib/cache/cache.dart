@@ -1,13 +1,18 @@
-import 'package:dox_core/cache/cache_driver_interface.dart';
 import 'package:dox_core/cache/drivers/file/file_cache_driver.dart';
 import 'package:dox_core/dox_core.dart';
 
 class Cache {
   String _tag = 'default';
-  CacheDriverInterface? _customDriver = Dox().config.customCacheDriver;
+  String? _store;
 
-  Cache driver(CacheDriverInterface driver) {
-    _customDriver = driver;
+  Map<String, CacheDriverInterface> cacheDrivers =
+      <String, CacheDriverInterface>{
+    'file': FileCacheDriver(),
+    ...Dox().config.cacheConfig.drivers,
+  };
+
+  Cache store(String store) {
+    _store = store;
     return this;
   }
 
@@ -19,12 +24,12 @@ class Cache {
 
   /// get the cache driver
   CacheDriverInterface get _driver {
-    if (_customDriver != null) {
-      CacheDriverInterface d = _customDriver!;
-      d.setTag(_tag);
-      return d;
-    }
-    return FileCacheDriver(tag: _tag);
+    _store ??= Dox().config.cacheConfig.defaultDriver;
+    CacheDriverInterface d = cacheDrivers[_store] ??
+        cacheDrivers[Dox().config.cacheConfig.defaultDriver] ??
+        FileCacheDriver();
+    d.setTag(_tag);
+    return d;
   }
 
   /// set key => value to cache
