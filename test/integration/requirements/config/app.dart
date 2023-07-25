@@ -1,3 +1,4 @@
+import 'package:dox_core/cache/drivers/file/file_cache_driver.dart';
 import 'package:dox_core/dox_core.dart';
 
 import '../handler.dart';
@@ -37,4 +38,12 @@ class Config extends AppConfig {
 
   @override
   List<Router> get routers => <Router>[ApiRouter()];
+
+  @override
+  CacheConfig get cacheConfig => CacheConfig(
+        defaultDriver: 'redis',
+        drivers: <String, CacheDriverInterface>{
+          'file': FileCacheDriver(),
+        },
+      );
 }
