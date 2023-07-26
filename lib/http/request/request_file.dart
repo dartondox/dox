@@ -42,6 +42,14 @@ class RequestFile {
     return _bytesToKB(await bytes);
   }
 
+  /// get file extension
+  /// ```
+  /// await file.fileExtension
+  /// ```
+  String? get fileExtension {
+    return filetype.split('/').last;
+  }
+
   /// this function will store the file in your project storage folder
   ///
   /// ```
@@ -49,7 +57,7 @@ class RequestFile {
   /// String filename = await image.store();
   /// ```
   Future<String> store(String folder) async {
-    return Storage().put(folder, await bytes);
+    return Storage().put(folder, await bytes, fileExtension: fileExtension);
   }
 
   /// convert bytes list into kilobytes

@@ -31,13 +31,18 @@ class LocalStorageDriver implements StorageDriverInterface {
   }
 
   @override
-  Future<String> put(String folder, List<int> bytes) async {
-    String? ext = lookupMimeType('', headerBytes: bytes)?.split('/').last;
-    if (ext == null) {
+  Future<String> put(
+    String folder,
+    List<int> bytes, {
+    String? fileExtension,
+  }) async {
+    fileExtension = fileExtension ??
+        lookupMimeType('', headerBytes: bytes)?.split('/').last;
+    if (fileExtension == null) {
       throw Exception('invalid file');
     }
     String uid = uuid.v1();
-    String path = _sanitizePath('$storagePath/$folder/$uid.$ext');
+    String path = _sanitizePath('$storagePath/$folder/$uid.$fileExtension');
     File file = File(path);
 
     Directory directory = Directory(file.parent.path);
