@@ -9,3 +9,5 @@ const String WEB_SOCKET_JOIN_ROOM_EVENT_NAME = 'joinRoom';
 const String WEB_SOCKET_EVENT_KEY = 'event';
 
 const String WEB_SOCKET_MESSAGE_KEY = 'message';
+
+const String FILE_DOWNLOAD_HEADER = 'Content-Disposition';

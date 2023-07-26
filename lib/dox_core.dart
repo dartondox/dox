@@ -42,6 +42,10 @@ export 'ioc/ioc_container.dart';
 /// Router
 export 'router/route.dart';
 
+/// storage
+export 'storage/storage.dart';
+export 'storage/storage_driver_interface.dart';
+
 /// Utils
 export 'utils/extensions.dart';
 export 'utils/hash.dart';

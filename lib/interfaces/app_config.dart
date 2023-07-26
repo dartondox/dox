@@ -1,23 +1,5 @@
-/// coverage:ignore-file
-import 'package:dox_core/cache/cache_driver_interface.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/logger.dart';
-
-class CORSConfig {
-  final dynamic allowOrigin;
-  final dynamic allowMethods;
-  final dynamic allowHeaders;
-  final dynamic exposeHeaders;
-  final bool? allowCredentials;
-
-  const CORSConfig({
-    this.allowOrigin,
-    this.allowMethods,
-    this.allowHeaders,
-    this.exposeHeaders,
-    this.allowCredentials,
-  });
-}
 
 abstract class AppConfig {
   String get appKey;
@@ -43,6 +25,24 @@ abstract class AppConfig {
   CORSConfig get cors;
 
   CacheConfig get cacheConfig => CacheConfig();
+
+  FileStorageConfig get fileStorageConfig => FileStorageConfig();
+}
+
+class CORSConfig {
+  final dynamic allowOrigin;
+  final dynamic allowMethods;
+  final dynamic allowHeaders;
+  final dynamic exposeHeaders;
+  final bool? allowCredentials;
+
+  const CORSConfig({
+    this.allowOrigin,
+    this.allowMethods,
+    this.allowHeaders,
+    this.exposeHeaders,
+    this.allowCredentials,
+  });
 }
 
 class CacheConfig {
@@ -52,5 +52,15 @@ class CacheConfig {
   const CacheConfig({
     this.defaultDriver = 'file',
     this.drivers = const <String, CacheDriverInterface>{},
+  });
+}
+
+class FileStorageConfig {
+  final String defaultDriver;
+  final Map<String, StorageDriverInterface> drivers;
+
+  const FileStorageConfig({
+    this.defaultDriver = 'file',
+    this.drivers = const <String, StorageDriverInterface>{},
   });
 }

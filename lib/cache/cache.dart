@@ -11,12 +11,21 @@ class Cache {
     ...Dox().config.cacheConfig.drivers,
   };
 
+  /// Set where to store the cache.
+  /// The name you set in the cache drivers configuration
+  /// Example `drivers => {'file' : FileCacheDriver()}`,
+  /// then store name is `file`
   Cache store(String store) {
     _store = store;
     return this;
   }
 
   /// set tag for the cache
+  /// This is the categorize the cache and
+  /// useful when you want to flush only specific tag
+  /// ```
+  /// Cache().tag('tag').put('key', 'value');
+  /// ```
   Cache tag(String name) {
     _tag = name;
     return this;
