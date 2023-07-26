@@ -27,8 +27,20 @@ dynamic httpResponseHandler(
   HttpResponse res = request.response;
 
   if (payload == null) {
-    res.statusCode = HttpStatus.ok;
     res.close();
+    return;
+  }
+
+  /// if payload is stream
+  if (payload is StreamFile) {
+    res.headers.contentType = payload.contentType;
+    res.addStream(payload.stream).then((_) => res.close());
+    return;
+  }
+
+  // if payload is stream
+  if (payload is Stream<List<int>>) {
+    res.addStream(payload).then((_) => res.close());
     return;
   }
 

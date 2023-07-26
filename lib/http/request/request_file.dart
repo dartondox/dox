@@ -1,6 +1,6 @@
-import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/extensions/num.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as path;
@@ -48,18 +48,8 @@ class RequestFile {
   /// RequestFile image = req.input('image');
   /// String filename = await image.store();
   /// ```
-  Future<String> store({String folder = 'storage'}) async {
-    String uid = uuid.v1();
-    String path =
-        _sanitizePath('${Directory.current.path}/$folder/$uid.$extension');
-    File file = File(path);
-
-    Directory directory = Directory(file.parent.path);
-    if (!directory.existsSync()) {
-      directory.createSync(recursive: true);
-    }
-    await file.writeAsBytes(await bytes);
-    return file.path.replaceFirst(Directory.current.path, '');
+  Future<String> store(String folder) async {
+    return Storage().put(folder, await bytes);
   }
 
   /// convert bytes list into kilobytes
@@ -68,12 +58,6 @@ class RequestFile {
         bytesList.reduce((int value, int element) => value + element);
     num sizeInKB = totalBytes / 1024;
     return sizeInKB.toFixed(2);
-  }
-
-  /// sanitize the path to store
-  String _sanitizePath(String path) {
-    path = path.replaceAll(RegExp(r'/+'), '/');
-    return "/${path.replaceAll(RegExp('^\\/+|\\/+\$'), '')}";
   }
 
   /// convert mimeMultipart To bytes
