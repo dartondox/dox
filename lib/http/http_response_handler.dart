@@ -38,6 +38,13 @@ dynamic httpResponseHandler(
     return;
   }
 
+  if (payload is DownloadableFile) {
+    res.headers.contentType = payload.contentType;
+    res.headers.add(FILE_DOWNLOAD_HEADER, payload.contentDisposition);
+    res.addStream(payload.stream).then((_) => res.close());
+    return;
+  }
+
   // if payload is stream
   if (payload is Stream<List<int>>) {
     res.addStream(payload).then((_) => res.close());

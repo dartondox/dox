@@ -10,6 +10,16 @@ class StreamFile {
   const StreamFile(this.contentType, this.stream);
 }
 
+class DownloadableFile {
+  final ContentType contentType;
+  final Stream<List<int>> stream;
+
+  String contentDisposition = '';
+  DownloadableFile(this.contentType, this.stream, String filename) {
+    contentDisposition = 'attachment; filename="$filename"';
+  }
+}
+
 class Storage {
   String? _disk;
 
@@ -86,16 +96,16 @@ class Storage {
 
   /// return the file as downloadable/stream file
   /// ```
-  /// StreamFile file = Storage().download('images/avatar/sample.jpeg');
+  /// StreamFile file = Storage().stream('images/avatar/sample.jpeg');
   /// return file;
   /// ```
   /// or
   /// ```
-  /// StreamFile file = Storage().download('images/avatar/sample.jpeg');
+  /// StreamFile file = Storage().stream('images/avatar/sample.jpeg');
   /// return response(file);
   /// ```
-  Future<StreamFile> download(String filepath) async {
-    List<int>? image = await get(filepath);
+  Future<StreamFile> stream(String filename) async {
+    List<int>? image = await get(filename);
     if (image == null) {
       throw Exception('file not found');
     }
@@ -111,5 +121,38 @@ class Storage {
     ContentType contentType = ContentType(primaryType, subType);
     Stream<List<int>> stream = Stream.fromIterable(<List<int>>[image]);
     return StreamFile(contentType, stream);
+  }
+
+  /// return the file as downloadable/stream file
+  /// ```
+  /// DownloadableFile file = Storage().download('images/avatar/sample.jpeg');
+  /// return file;
+  /// ```
+  /// or
+  /// ```
+  /// DownloadableFile file = Storage().download('images/avatar/sample.jpeg');
+  /// return response(file);
+  /// ```
+  Future<DownloadableFile> download(String filename) async {
+    List<int>? image = await get(filename);
+    if (image == null) {
+      throw Exception('file not found');
+    }
+
+    String? primaryType =
+        lookupMimeType('', headerBytes: image)?.split('/').first;
+    String? subType = lookupMimeType('', headerBytes: image)?.split('/').last;
+
+    if (primaryType == null || subType == null) {
+      throw Exception('invalid file');
+    }
+
+    ContentType contentType = ContentType(primaryType, subType);
+    Stream<List<int>> stream = Stream.fromIterable(<List<int>>[image]);
+    return DownloadableFile(
+      contentType,
+      stream,
+      filename.split('/').last,
+    );
   }
 }

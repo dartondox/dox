@@ -21,6 +21,12 @@ class DoxResponse {
       _contentType = content.contentType;
       content = content.stream;
     }
+
+    if (content is DownloadableFile) {
+      header(FILE_DOWNLOAD_HEADER, content.contentDisposition);
+      _contentType = content.contentType;
+      content = content.stream;
+    }
   }
 
   /// Set response status code default 200
