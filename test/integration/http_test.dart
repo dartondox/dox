@@ -42,6 +42,26 @@ void main() {
       expect(res.body, 'pong');
     });
 
+    test('ping -> pong', () async {
+      DoxRequest middlewareFn(DoxRequest req) {
+        return req;
+      }
+
+      String pong(DoxRequest req) {
+        return 'pong';
+      }
+
+      Route.middleware([middlewareFn, ClassBasedMiddleware()], () {
+        Route.get('/middleware_route', pong);
+      });
+
+      Uri url = Uri.parse('$baseUrl/middleware_route');
+      http.Response res = await http.get(url);
+
+      expect(res.statusCode, 200);
+      expect(res.body, 'pong');
+    });
+
     test('param route', () async {
       Route.get('/ping/{name}', (DoxRequest req, String name) {
         return 'pong $name';

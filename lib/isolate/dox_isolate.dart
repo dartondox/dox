@@ -13,6 +13,9 @@ class DoxIsolate {
   final List<Isolate> _isolates = <Isolate>[];
   final List<ReceivePort> _receivePorts = <ReceivePort>[];
 
+  /// get list of running isolates
+  List<Isolate> get isolates => _isolates;
+
   /// create threads
   /// ```
   /// await DoxIsolate().spawn(3)

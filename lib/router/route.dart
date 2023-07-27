@@ -77,14 +77,8 @@ class Route {
   /// ```
   /// Route.resetWithNewMiddleware([Middleware()]);
   /// ```
-  static void resetWithNewMiddleware(dynamic middleware) {
-    List<dynamic> list = <dynamic>[];
-    if (middleware is List) {
-      list = middleware;
-    } else {
-      list = <dynamic>[middleware];
-    }
-    Route()._preMiddleware = list;
+  static void resetWithNewMiddleware(List<dynamic> middleware) {
+    Route()._preMiddleware = middleware;
   }
 
   /// add global middleware
@@ -98,7 +92,7 @@ class Route {
     } else {
       list = <dynamic>[middleware];
     }
-    Route()._preMiddleware.add(list);
+    Route()._preMiddleware.addAll(list);
   }
 
   /// set prefix for the route, this will affect
