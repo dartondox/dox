@@ -12,5 +12,5 @@ jobs:
       - uses: dart-lang/setup-dart@v1
 
       - run: dart pub get
-      - run: dart test
+      - run: dart test --concurrency=1
       - run: dart analyze
