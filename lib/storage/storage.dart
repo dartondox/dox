@@ -65,9 +65,9 @@ class Storage {
   Future<String> put(
     String folder,
     List<int> bytes, {
-    String? fileExtension,
+    String? extension,
   }) async {
-    return _driver.put(folder, bytes, fileExtension: fileExtension);
+    return _driver.put(folder, bytes, extension: extension);
   }
 
   /// get stored file into bytes
@@ -119,7 +119,8 @@ class Storage {
     }
 
     ContentType contentType = ContentType(primaryType, subType);
-    Stream<List<int>> stream = Stream.fromIterable(<List<int>>[image]);
+    Stream<List<int>> stream =
+        Stream<List<int>>.fromIterable(<List<int>>[image]);
     return StreamFile(contentType, stream);
   }
 
@@ -148,7 +149,8 @@ class Storage {
     }
 
     ContentType contentType = ContentType(primaryType, subType);
-    Stream<List<int>> stream = Stream.fromIterable(<List<int>>[image]);
+    Stream<List<int>> stream =
+        Stream<List<int>>.fromIterable(<List<int>>[image]);
     return DownloadableFile(
       contentType,
       stream,

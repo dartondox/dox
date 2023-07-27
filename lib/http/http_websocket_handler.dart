@@ -12,9 +12,15 @@ void httpWebSocketHandler(HttpRequest req, RouteData route) {
     middlewareAndControllerHandler(doxReq).then((dynamic result) {
       httpResponseHandler(result, req);
     }).onError((Object? error, StackTrace stackTrace) {
+      /// coverage:ignore-start
       httpErrorHandler(req, error, stackTrace);
+
+      /// coverage:ignore-end
     });
   }).onError((Object? error, StackTrace stackTrace) {
+    /// coverage:ignore-start
     httpErrorHandler(req, error, stackTrace);
+
+    /// coverage:ignore-end
   });
 }

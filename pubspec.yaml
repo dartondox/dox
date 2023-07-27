@@ -23,3 +23,4 @@ dev_dependencies:
   postgres_pool: ^2.1.6
   dox_query_builder: ^1.1.13
   dox_migration: ^1.0.4
+  http_parser: ^4.0.2

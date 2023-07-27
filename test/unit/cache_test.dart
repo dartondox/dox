@@ -27,7 +27,7 @@ void main() {
 
     test('put with duration', () async {
       await Cache().put('delay', 'Dox', duration: Duration(microseconds: 1));
-      await Future.delayed(Duration(milliseconds: 1));
+      await Future<dynamic>.delayed(Duration(milliseconds: 1));
       String? value = await Cache().get('delay');
       expect(value, null);
     });

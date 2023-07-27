@@ -26,6 +26,14 @@ void main() {
       expect(errors['email'], 'The email is required');
     });
 
+    test('required on list empty', () {
+      DoxValidator validator =
+          DoxValidator(<String, dynamic>{'items': <String>[]});
+      validator.validate(<String, String>{'items': 'required'});
+      Map<String, dynamic> errors = validator.errors;
+      expect(errors['items'], 'The items is required');
+    });
+
     test('should not be error', () {
       DoxValidator validator =
           DoxValidator(<String, dynamic>{'email': 'support@dartondox.dev'});
@@ -90,6 +98,13 @@ void main() {
       validator.validate(<String, String>{'name': 'alpha'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['name'], 'The name must be an alphabetic');
+    });
+
+    test('alpha numeric', () {
+      DoxValidator validator = DoxValidator(<String, dynamic>{'name': '&@#'});
+      validator.validate(<String, String>{'name': 'alpha_numeric'});
+      Map<String, dynamic> errors = validator.errors;
+      expect(errors['name'], 'The name must be only alphabetic and number');
     });
 
     test('alpha_dash', () {

@@ -5,6 +5,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
+import '../utils/file_upload.dart';
 import 'requirements/config/app.dart';
 import 'requirements/controllers/example.controller.dart';
 import 'requirements/middleware/custom_middleware.dart';
@@ -37,10 +38,10 @@ void main() {
       Route.get('/ping', <dynamic>[middlewareFn, ClassBasedMiddleware(), pong]);
 
       Uri url = Uri.parse('$baseUrl/ping');
-      http.Response response = await http.get(url);
+      http.Response res = await http.get(url);
 
-      expect(response.statusCode, 200);
-      expect(response.body, 'pong');
+      expect(res.statusCode, 200);
+      expect(res.body, 'pong');
     });
 
     test('param route', () async {
@@ -49,10 +50,33 @@ void main() {
       });
 
       Uri url = Uri.parse('$baseUrl/ping/dox');
-      http.Response response = await http.get(url);
+      http.Response res = await http.get(url);
 
-      expect(response.statusCode, 200);
-      expect(response.body, 'pong dox');
+      expect(res.statusCode, 200);
+      expect(res.body, 'pong dox');
+    });
+
+    test('date response', () async {
+      Route.get('/date/response', (DoxRequest req, String name) {
+        return DateTime(2023);
+      });
+
+      Route.get('/date/response/json', (DoxRequest req, String name) {
+        return <String, dynamic>{
+          'date': DateTime(2023),
+        };
+      });
+
+      Uri url = Uri.parse('$baseUrl/date/response');
+      http.Response res = await http.get(url);
+      expect(res.statusCode, 200);
+      expect(res.body, '2023-01-01T00:00:00.000');
+
+      Uri url2 = Uri.parse('$baseUrl/date/response/json');
+      http.Response res2 = await http.get(url2);
+      Map<String, dynamic> data = jsonDecode(res2.body);
+      expect(res2.statusCode, 200);
+      expect(data['date'], '2023-01-01T00:00:00.000');
     });
 
     test('throw an error', () async {
@@ -80,6 +104,65 @@ void main() {
       expect(response.statusCode, 200);
     });
 
+    test('file stream or image url', () async {
+      /// clear storage image folder
+      Directory storage = Directory('${Directory.current.path}/storage/images');
+      if (storage.existsSync()) {
+        storage.deleteSync(recursive: true);
+      }
+
+      /// upload image
+      Route.post('/image', (DoxRequest req) async {
+        req.validate(<String, String>{
+          'image': 'file:png|image:png',
+        });
+        RequestFile file = req.input('image');
+        String url = await file.store('images');
+        return <String, dynamic>{
+          'url': url,
+          'size': await file.size,
+          'extension': file.extension,
+        };
+      });
+
+      /// stream image
+      Route.get('/image/stream', (DoxRequest req) async {
+        return await Storage().stream(req.input('image'));
+      });
+
+      /// stream image
+      Route.get('/image/download', (DoxRequest req) async {
+        return await Storage().download(req.input('image'));
+      });
+
+      /// stream image
+      Route.get('/image/stream2', (DoxRequest req) async {
+        StreamFile file = await Storage().stream(req.input('image'));
+        return response(file.stream).contentType(file.contentType);
+      });
+
+      /// upload image from client
+      String dir = Directory.current.path;
+      File imageFile = File('$dir/test/integration/storage/dox.png');
+      String? result = await uploadImage('$baseUrl/image', imageFile);
+      Map<String, dynamic> data = jsonDecode(result!);
+
+      /// fetch image from client
+      http.Response res = await http
+          .get(Uri.parse("$baseUrl/image/stream?image=${data['url']}"));
+      expect(res.headers['content-type'], 'image/png');
+
+      http.Response res2 = await http
+          .get(Uri.parse("$baseUrl/image/stream2?image=${data['url']}"));
+      expect(res2.headers['content-type'], 'image/png');
+
+      http.Response res3 = await http
+          .get(Uri.parse("$baseUrl/image/download?image=${data['url']}"));
+      expect(res3.headers['content-type'], 'image/png');
+      expect(res3.headers['content-disposition'],
+          'attachment; filename="${data['url'].toString().split('/').last}"');
+    });
+
     test('double param route', () async {
       Route.get('/ping/{name}/{type}',
           (DoxRequest req, String name, String type) {
@@ -87,10 +170,10 @@ void main() {
       });
 
       Uri url = Uri.parse('$baseUrl/ping/dox/framework');
-      http.Response response = await http.get(url);
+      http.Response res = await http.get(url);
 
-      expect(response.statusCode, 200);
-      expect(response.body, 'pong dox framework');
+      expect(res.statusCode, 200);
+      expect(res.body, 'pong dox framework');
     });
 
     test('json response', () async {
@@ -100,22 +183,21 @@ void main() {
       });
 
       Uri url = Uri.parse('$baseUrl/json');
-      http.Response response = await http.get(url);
+      http.Response res = await http.get(url);
 
-      expect(response.statusCode, 200);
-      expect(response.body, jsonEncode(responseData));
-      expect(
-          response.headers['content-type']?.contains('application/json'), true);
+      expect(res.statusCode, 200);
+      expect(res.body, jsonEncode(responseData));
+      expect(res.headers['content-type']?.contains('application/json'), true);
     });
 
     test('http exception', () async {
       Route.get('/http_exception', ExampleController().httpException);
 
       Uri url = Uri.parse('$baseUrl/http_exception');
-      http.Response response = await http.get(url);
+      http.Response res = await http.get(url);
 
-      expect(response.statusCode, 401);
-      expect(response.body, 'Failed to authorize');
+      expect(res.statusCode, 401);
+      expect(res.body, 'Failed to authorize');
     });
 
     test('list', () async {
@@ -125,10 +207,10 @@ void main() {
       });
 
       Uri url = Uri.parse('$baseUrl/list');
-      http.Response response = await http.get(url);
+      http.Response res = await http.get(url);
 
-      expect(response.statusCode, 200);
-      expect(response.body, jsonEncode(responseData));
+      expect(res.statusCode, 200);
+      expect(res.body, jsonEncode(responseData));
     });
 
     test('cache response', () async {
@@ -142,6 +224,20 @@ void main() {
       expect(res.statusCode, 200);
       expect(res.body, 'pong');
       expect(res.headers['cache-control'], 'max-age=10');
+    });
+
+    test('domain test', () async {
+      Route.domain('localhost:${config.serverPort}', () {
+        Route.get('/domain/test', (DoxRequest doxRequest) {
+          return 'pong';
+        });
+      });
+
+      Uri url = Uri.parse('$baseUrl/domain/test');
+      http.Response res = await http.get(url);
+
+      expect(res.statusCode, 200);
+      expect(res.body, 'pong');
     });
 
     test('custom status', () async {
