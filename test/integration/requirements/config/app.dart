@@ -1,5 +1,6 @@
 import 'package:dox_core/cache/drivers/file/file_cache_driver.dart';
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/utils/logger.dart';
 
 import '../handler.dart';
 import '../middleware/custom_middleware.dart';
@@ -23,6 +24,8 @@ class Config extends AppConfig {
   @override
   CORSConfig get cors => CORSConfig(
         allowOrigin: '*',
+        allowMethods: <String>['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
+        allowCredentials: true,
       );
 
   @override
@@ -38,6 +41,12 @@ class Config extends AppConfig {
 
   @override
   List<Router> get routers => <Router>[ApiRouter()];
+
+  @override
+  void Function(Object? error, StackTrace stackTrace) get errorHandler =>
+      (Object? error, StackTrace stackTrace) {
+        DoxLogger.danger(error);
+      };
 
   @override
   CacheConfig get cacheConfig => CacheConfig(

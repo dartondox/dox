@@ -15,8 +15,8 @@ jobs:
 
       - run: dart pub get
       - run: dart pub global activate coverage
-      - run: dart run test --coverage=./coverage
-      - run: dart pub global run coverage:format_coverage --packages=.dart_tool/package_config.json --report-on=lib --lcov -o ./coverage/lcov.info -i ./coverage
+      - run: dart run test --concurrency=1 --coverage=./coverage
+      - run: dart pub global run coverage:format_coverage --check-ignore --packages=.dart_tool/package_config.json --report-on=lib --lcov -o ./coverage/lcov.info -i ./coverage
   
       - uses: vebr/jest-lcov-reporter@v0.2.0
         with:

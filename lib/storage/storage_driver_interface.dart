@@ -1,5 +1,5 @@
 abstract class StorageDriverInterface {
-  Future<String> put(String filePath, List<int> bytes, {String? fileExtension});
+  Future<String> put(String filePath, List<int> bytes, {String? extension});
 
   Future<List<int>?> get(String filepath);
 

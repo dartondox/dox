@@ -4,6 +4,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
+import '../utils/start_http_server.dart';
 import 'requirements/config/app.dart';
 
 Config config = Config();
@@ -12,9 +13,7 @@ String baseUrl = 'http://localhost:${config.serverPort}';
 void main() {
   group('Http |', () {
     setUpAll(() async {
-      config.serverPort = 50012;
-      Dox().initialize(config);
-      await Dox().startServer();
+      await startHttpServer(config);
     });
 
     tearDownAll(() async {

@@ -65,9 +65,9 @@ class Storage {
   Future<String> put(
     String folder,
     List<int> bytes, {
-    String? fileExtension,
+    String? extension,
   }) async {
-    return _driver.put(folder, bytes, fileExtension: fileExtension);
+    return _driver.put(folder, bytes, extension: extension);
   }
 
   /// get stored file into bytes
@@ -107,19 +107,21 @@ class Storage {
   Future<StreamFile> stream(String filename) async {
     List<int>? image = await get(filename);
     if (image == null) {
-      throw Exception('file not found');
+      throw NotFoundHttpException(message: 'file not found');
     }
 
-    String? primaryType =
-        lookupMimeType('', headerBytes: image)?.split('/').first;
-    String? subType = lookupMimeType('', headerBytes: image)?.split('/').last;
+    String? mimeType = lookupMimeType(filename, headerBytes: image);
 
-    if (primaryType == null || subType == null) {
-      throw Exception('invalid file');
+    if (mimeType == null) {
+      throw NotFoundHttpException(message: 'invalid file');
     }
+
+    String primaryType = mimeType.split('/').first;
+    String subType = mimeType.split('/').last;
 
     ContentType contentType = ContentType(primaryType, subType);
-    Stream<List<int>> stream = Stream.fromIterable(<List<int>>[image]);
+    Stream<List<int>> stream =
+        Stream<List<int>>.fromIterable(<List<int>>[image]);
     return StreamFile(contentType, stream);
   }
 
@@ -134,25 +136,8 @@ class Storage {
   /// return response(file);
   /// ```
   Future<DownloadableFile> download(String filename) async {
-    List<int>? image = await get(filename);
-    if (image == null) {
-      throw Exception('file not found');
-    }
-
-    String? primaryType =
-        lookupMimeType('', headerBytes: image)?.split('/').first;
-    String? subType = lookupMimeType('', headerBytes: image)?.split('/').last;
-
-    if (primaryType == null || subType == null) {
-      throw Exception('invalid file');
-    }
-
-    ContentType contentType = ContentType(primaryType, subType);
-    Stream<List<int>> stream = Stream.fromIterable(<List<int>>[image]);
-    return DownloadableFile(
-      contentType,
-      stream,
-      filename.split('/').last,
-    );
+    StreamFile streamFile = await stream(filename);
+    String name = filename.split('/').last;
+    return DownloadableFile(streamFile.contentType, streamFile.stream, name);
   }
 }

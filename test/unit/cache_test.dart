@@ -15,14 +15,20 @@ void main() {
       if (storage.existsSync()) {
         storage.deleteSync(recursive: true);
       }
-      config.serverPort = 50011;
       Dox().initialize(config);
     });
 
     test('put', () async {
-      await Cache().put('name', 'Dox');
+      await Cache().store('file').put('name', 'Dox');
       String? value = await Cache().get('name');
       expect(value, 'Dox');
+    });
+
+    test('put with duration', () async {
+      await Cache().put('delay', 'Dox', duration: Duration(microseconds: 1));
+      await Future<dynamic>.delayed(Duration(milliseconds: 1));
+      String? value = await Cache().get('delay');
+      expect(value, null);
     });
 
     test('get', () async {

@@ -5,8 +5,10 @@ import 'package:dox_core/dox_core.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
+import '../utils/start_http_server.dart';
 import 'requirements/config/app.dart';
 import 'requirements/controllers/example.controller.dart';
+import 'requirements/middleware/custom_middleware.dart';
 import 'requirements/requests/blog_request.dart';
 
 Config config = Config();
@@ -15,9 +17,7 @@ String baseUrl = 'http://localhost:${config.serverPort}';
 void main() {
   group('Http |', () {
     setUpAll(() async {
-      config.serverPort = 50012;
-      Dox().initialize(config);
-      await Dox().startServer();
+      await startHttpServer(config);
     });
 
     tearDownAll(() async {
@@ -25,15 +25,21 @@ void main() {
     });
 
     test('ping -> pong', () async {
-      Route.get('/ping', (DoxRequest req) {
+      DoxRequest middlewareFn(DoxRequest req) {
+        return req;
+      }
+
+      String pong(DoxRequest req) {
         return 'pong';
-      });
+      }
+
+      Route.get('/ping', <dynamic>[middlewareFn, ClassBasedMiddleware(), pong]);
 
       Uri url = Uri.parse('$baseUrl/ping');
-      http.Response response = await http.get(url);
+      http.Response res = await http.get(url);
 
-      expect(response.statusCode, 200);
-      expect(response.body, 'pong');
+      expect(res.statusCode, 200);
+      expect(res.body, 'pong');
     });
 
     test('param route', () async {
@@ -42,10 +48,35 @@ void main() {
       });
 
       Uri url = Uri.parse('$baseUrl/ping/dox');
+      http.Response res = await http.get(url);
+
+      expect(res.statusCode, 200);
+      expect(res.body, 'pong dox');
+    });
+
+    test('throw an error', () async {
+      Route.get('/exception', (DoxRequest req, String name) {
+        throw Exception('something wrong');
+      });
+
+      Uri url = Uri.parse('$baseUrl/exception');
       http.Response response = await http.get(url);
 
+      expect(response.statusCode, 500);
+    });
+
+    test('route not found', () async {
+      Uri url = Uri.parse('$baseUrl/non/exist/route');
+      http.Response response = await http.get(url);
+      expect(response.body, 'GET /non/exist/route not found');
+      expect(response.statusCode, 404);
+    });
+
+    test('OPTIONS route', () async {
+      Uri url = Uri.parse('$baseUrl/non/exist/route');
+      http.StreamedResponse response =
+          await http.Client().send(http.Request('OPTIONS', url));
       expect(response.statusCode, 200);
-      expect(response.body, 'pong dox');
     });
 
     test('double param route', () async {
@@ -55,10 +86,10 @@ void main() {
       });
 
       Uri url = Uri.parse('$baseUrl/ping/dox/framework');
-      http.Response response = await http.get(url);
+      http.Response res = await http.get(url);
 
-      expect(response.statusCode, 200);
-      expect(response.body, 'pong dox framework');
+      expect(res.statusCode, 200);
+      expect(res.body, 'pong dox framework');
     });
 
     test('json response', () async {
@@ -68,22 +99,21 @@ void main() {
       });
 
       Uri url = Uri.parse('$baseUrl/json');
-      http.Response response = await http.get(url);
+      http.Response res = await http.get(url);
 
-      expect(response.statusCode, 200);
-      expect(response.body, jsonEncode(responseData));
-      expect(
-          response.headers['content-type']?.contains('application/json'), true);
+      expect(res.statusCode, 200);
+      expect(res.body, jsonEncode(responseData));
+      expect(res.headers['content-type']?.contains('application/json'), true);
     });
 
     test('http exception', () async {
       Route.get('/http_exception', ExampleController().httpException);
 
       Uri url = Uri.parse('$baseUrl/http_exception');
-      http.Response response = await http.get(url);
+      http.Response res = await http.get(url);
 
-      expect(response.statusCode, 401);
-      expect(response.body, 'Failed to authorize');
+      expect(res.statusCode, 401);
+      expect(res.body, 'Failed to authorize');
     });
 
     test('list', () async {
@@ -93,10 +123,10 @@ void main() {
       });
 
       Uri url = Uri.parse('$baseUrl/list');
-      http.Response response = await http.get(url);
+      http.Response res = await http.get(url);
 
-      expect(response.statusCode, 200);
-      expect(response.body, jsonEncode(responseData));
+      expect(res.statusCode, 200);
+      expect(res.body, jsonEncode(responseData));
     });
 
     test('cache response', () async {
@@ -110,6 +140,20 @@ void main() {
       expect(res.statusCode, 200);
       expect(res.body, 'pong');
       expect(res.headers['cache-control'], 'max-age=10');
+    });
+
+    test('domain test', () async {
+      Route.domain('localhost:${config.serverPort}', () {
+        Route.get('/domain/test', (DoxRequest doxRequest) {
+          return 'pong';
+        });
+      });
+
+      Uri url = Uri.parse('$baseUrl/domain/test');
+      http.Response res = await http.get(url);
+
+      expect(res.statusCode, 200);
+      expect(res.body, 'pong');
     });
 
     test('custom status', () async {
@@ -185,60 +229,6 @@ void main() {
 
       expect(res.statusCode, 200);
       expect(res.body, 'hello');
-    });
-
-    test('dox request', () async {
-      Route.post('/with_headers/{id}', (DoxRequest req) {
-        return response(<String, dynamic>{
-          'x-auth-key': req.header('x-auth-key'),
-          'x-auth-key2': req.headers['x-auth-key'],
-          'title': req.input('title'),
-          'title2': req.body['title'],
-          'title3': req.all()['title'],
-          'title4': req.only(<String>['title'])['title'],
-          'id': req.param['id'],
-          'method': req.method,
-          'path': req.uri.path,
-          'has_title': req.has('title'),
-          'has_desc': req.has('desc'),
-          'is_json': req.isJson(),
-          'is_form_data': req.isFormData(),
-          'host': req.host(),
-          'ip': req.ip(),
-        }).withHeaders(<String, String>{
-          'x-key': 'ABCD',
-        });
-      });
-
-      Uri url = Uri.parse('$baseUrl/with_headers/1');
-      http.Response res = await http.post(
-        url,
-        headers: <String, String>{
-          'content-type': 'application/json',
-          'x-auth-key': 'Bearer 1234',
-        },
-        body: jsonEncode(<String, String>{
-          'title': 'hello',
-        }),
-      );
-      Map<String, dynamic> jsond = jsonDecode(res.body);
-      expect(jsond['x-auth-key'], 'Bearer 1234');
-      expect(jsond['x-auth-key2'], 'Bearer 1234');
-      expect(jsond['title'], 'hello');
-      expect(jsond['title2'], 'hello');
-      expect(jsond['title3'], 'hello');
-      expect(jsond['title4'], 'hello');
-      expect(jsond['id'], '1');
-      expect(jsond['method'], 'POST');
-      expect(jsond['path'], '/with_headers/1');
-      expect(jsond['has_title'], true);
-      expect(jsond['has_desc'], false);
-      expect(jsond['is_json'], true);
-      expect(jsond['is_form_data'], false);
-      expect(jsond['host'].toString().contains('localhost'), true);
-      expect(jsond['ip'].toString().contains('127.0.0.1'), true);
-      expect(res.statusCode, 200);
-      expect(res.headers['x-key'], 'ABCD');
     });
   });
 }

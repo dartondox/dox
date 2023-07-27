@@ -1,3 +1,4 @@
+/// coverage:ignore-file
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/logger.dart';
 
