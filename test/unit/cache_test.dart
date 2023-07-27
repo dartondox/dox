@@ -15,7 +15,6 @@ void main() {
       if (storage.existsSync()) {
         storage.deleteSync(recursive: true);
       }
-      config.serverPort = 50011;
       Dox().initialize(config);
     });
 

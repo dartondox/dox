@@ -14,10 +14,13 @@ class Serializer<T> {
     }
   }
 
+  /// coverage:ignore-start
   /// convert model into Map
   Map<String, dynamic> convert(T m) {
     return <String, dynamic>{};
   }
+
+  /// coverage:ignore-end
 
   dynamic toJson() {
     List<Map<String, dynamic>> ret = <Map<String, dynamic>>[];

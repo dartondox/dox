@@ -13,16 +13,17 @@ Future<String?> uploadImage(String apiUrl, File imageFile) async {
 
     // Create the multipart request, add file and headers
     MultipartRequest request = MultipartRequest('POST', Uri.parse(apiUrl));
+    String filename = imageFile.path.split('/').last;
+    String ext = filename.split('.').last;
     MultipartFile multipartFile = MultipartFile(
       'image',
       stream,
       length,
-      contentType: MediaType('image', 'png'),
-      filename: imageFile.path.split('/').last,
+      contentType: MediaType('image', ext),
+      filename: filename,
     );
 
     request.fields['foo'] = 'bar';
-
     request.files.add(multipartFile);
 
     // Optional: If your API requires any headers, you can set them here

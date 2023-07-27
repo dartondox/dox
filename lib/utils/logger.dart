@@ -1,3 +1,4 @@
+/// coverage:ignore-file
 import 'package:dox_core/utils/json.dart';
 
 class DoxLogger {

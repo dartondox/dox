@@ -5,6 +5,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/websocket/dox_websocket.dart';
 import 'package:test/test.dart';
 
+import '../utils/start_http_server.dart';
 import 'requirements/config/app.dart';
 
 Config config = Config();
@@ -13,9 +14,7 @@ String baseUrl = 'http://localhost:${config.serverPort}';
 void main() {
   group('Websocket |', () {
     setUpAll(() async {
-      config.serverPort = 50013;
-      Dox().initialize(config);
-      await Dox().startServer();
+      await startHttpServer(config);
     });
 
     tearDownAll(() async {

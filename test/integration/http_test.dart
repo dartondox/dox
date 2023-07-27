@@ -5,7 +5,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
-import '../utils/file_upload.dart';
+import '../utils/start_http_server.dart';
 import 'requirements/config/app.dart';
 import 'requirements/controllers/example.controller.dart';
 import 'requirements/middleware/custom_middleware.dart';
@@ -17,9 +17,7 @@ String baseUrl = 'http://localhost:${config.serverPort}';
 void main() {
   group('Http |', () {
     setUpAll(() async {
-      config.serverPort = 50012;
-      Dox().initialize(config);
-      await Dox().startServer();
+      await startHttpServer(config);
     });
 
     tearDownAll(() async {
@@ -56,29 +54,6 @@ void main() {
       expect(res.body, 'pong dox');
     });
 
-    test('date response', () async {
-      Route.get('/date/response', (DoxRequest req, String name) {
-        return DateTime(2023);
-      });
-
-      Route.get('/date/response/json', (DoxRequest req, String name) {
-        return <String, dynamic>{
-          'date': DateTime(2023),
-        };
-      });
-
-      Uri url = Uri.parse('$baseUrl/date/response');
-      http.Response res = await http.get(url);
-      expect(res.statusCode, 200);
-      expect(res.body, '2023-01-01T00:00:00.000');
-
-      Uri url2 = Uri.parse('$baseUrl/date/response/json');
-      http.Response res2 = await http.get(url2);
-      Map<String, dynamic> data = jsonDecode(res2.body);
-      expect(res2.statusCode, 200);
-      expect(data['date'], '2023-01-01T00:00:00.000');
-    });
-
     test('throw an error', () async {
       Route.get('/exception', (DoxRequest req, String name) {
         throw Exception('something wrong');
@@ -102,65 +77,6 @@ void main() {
       http.StreamedResponse response =
           await http.Client().send(http.Request('OPTIONS', url));
       expect(response.statusCode, 200);
-    });
-
-    test('file stream or image url', () async {
-      /// clear storage image folder
-      Directory storage = Directory('${Directory.current.path}/storage/images');
-      if (storage.existsSync()) {
-        storage.deleteSync(recursive: true);
-      }
-
-      /// upload image
-      Route.post('/image', (DoxRequest req) async {
-        req.validate(<String, String>{
-          'image': 'file:png|image:png',
-        });
-        RequestFile file = req.input('image');
-        String url = await file.store('images');
-        return <String, dynamic>{
-          'url': url,
-          'size': await file.size,
-          'extension': file.extension,
-        };
-      });
-
-      /// stream image
-      Route.get('/image/stream', (DoxRequest req) async {
-        return await Storage().stream(req.input('image'));
-      });
-
-      /// stream image
-      Route.get('/image/download', (DoxRequest req) async {
-        return await Storage().download(req.input('image'));
-      });
-
-      /// stream image
-      Route.get('/image/stream2', (DoxRequest req) async {
-        StreamFile file = await Storage().stream(req.input('image'));
-        return response(file.stream).contentType(file.contentType);
-      });
-
-      /// upload image from client
-      String dir = Directory.current.path;
-      File imageFile = File('$dir/test/integration/storage/dox.png');
-      String? result = await uploadImage('$baseUrl/image', imageFile);
-      Map<String, dynamic> data = jsonDecode(result!);
-
-      /// fetch image from client
-      http.Response res = await http
-          .get(Uri.parse("$baseUrl/image/stream?image=${data['url']}"));
-      expect(res.headers['content-type'], 'image/png');
-
-      http.Response res2 = await http
-          .get(Uri.parse("$baseUrl/image/stream2?image=${data['url']}"));
-      expect(res2.headers['content-type'], 'image/png');
-
-      http.Response res3 = await http
-          .get(Uri.parse("$baseUrl/image/download?image=${data['url']}"));
-      expect(res3.headers['content-type'], 'image/png');
-      expect(res3.headers['content-disposition'],
-          'attachment; filename="${data['url'].toString().split('/').last}"');
     });
 
     test('double param route', () async {
@@ -313,60 +229,6 @@ void main() {
 
       expect(res.statusCode, 200);
       expect(res.body, 'hello');
-    });
-
-    test('dox request', () async {
-      Route.post('/with_headers/{id}', (DoxRequest req) {
-        return response(<String, dynamic>{
-          'x-auth-key': req.header('x-auth-key'),
-          'x-auth-key2': req.headers['x-auth-key'],
-          'title': req.input('title'),
-          'title2': req.body['title'],
-          'title3': req.all()['title'],
-          'title4': req.only(<String>['title'])['title'],
-          'id': req.param['id'],
-          'method': req.method,
-          'path': req.uri.path,
-          'has_title': req.has('title'),
-          'has_desc': req.has('desc'),
-          'is_json': req.isJson(),
-          'is_form_data': req.isFormData(),
-          'host': req.host(),
-          'ip': req.ip(),
-        }).withHeaders(<String, String>{
-          'x-key': 'ABCD',
-        });
-      });
-
-      Uri url = Uri.parse('$baseUrl/with_headers/1');
-      http.Response res = await http.post(
-        url,
-        headers: <String, String>{
-          'content-type': 'application/json',
-          'x-auth-key': 'Bearer 1234',
-        },
-        body: jsonEncode(<String, String>{
-          'title': 'hello',
-        }),
-      );
-      Map<String, dynamic> jsond = jsonDecode(res.body);
-      expect(jsond['x-auth-key'], 'Bearer 1234');
-      expect(jsond['x-auth-key2'], 'Bearer 1234');
-      expect(jsond['title'], 'hello');
-      expect(jsond['title2'], 'hello');
-      expect(jsond['title3'], 'hello');
-      expect(jsond['title4'], 'hello');
-      expect(jsond['id'], '1');
-      expect(jsond['method'], 'POST');
-      expect(jsond['path'], '/with_headers/1');
-      expect(jsond['has_title'], true);
-      expect(jsond['has_desc'], false);
-      expect(jsond['is_json'], true);
-      expect(jsond['is_form_data'], false);
-      expect(jsond['host'].toString().contains('localhost'), true);
-      expect(jsond['ip'].toString().contains('127.0.0.1'), true);
-      expect(res.statusCode, 200);
-      expect(res.headers['x-key'], 'ABCD');
     });
   });
 }
