@@ -7,6 +7,7 @@ import 'package:test/test.dart';
 
 import 'requirements/config/app.dart';
 import 'requirements/controllers/example.controller.dart';
+import 'requirements/middleware/custom_middleware.dart';
 import 'requirements/requests/blog_request.dart';
 
 Config config = Config();
@@ -25,9 +26,15 @@ void main() {
     });
 
     test('ping -> pong', () async {
-      Route.get('/ping', (DoxRequest req) {
+      DoxRequest middlewareFn(DoxRequest req) {
+        return req;
+      }
+
+      String pong(DoxRequest req) {
         return 'pong';
-      });
+      }
+
+      Route.get('/ping', <dynamic>[middlewareFn, ClassBasedMiddleware(), pong]);
 
       Uri url = Uri.parse('$baseUrl/ping');
       http.Response response = await http.get(url);
@@ -46,6 +53,31 @@ void main() {
 
       expect(response.statusCode, 200);
       expect(response.body, 'pong dox');
+    });
+
+    test('throw an error', () async {
+      Route.get('/exception', (DoxRequest req, String name) {
+        throw Exception('something wrong');
+      });
+
+      Uri url = Uri.parse('$baseUrl/exception');
+      http.Response response = await http.get(url);
+
+      expect(response.statusCode, 500);
+    });
+
+    test('route not found', () async {
+      Uri url = Uri.parse('$baseUrl/non/exist/route');
+      http.Response response = await http.get(url);
+      expect(response.body, 'GET /non/exist/route not found');
+      expect(response.statusCode, 404);
+    });
+
+    test('OPTIONS route', () async {
+      Uri url = Uri.parse('$baseUrl/non/exist/route');
+      http.StreamedResponse response =
+          await http.Client().send(http.Request('OPTIONS', url));
+      expect(response.statusCode, 200);
     });
 
     test('double param route', () async {

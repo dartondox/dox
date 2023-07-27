@@ -6,30 +6,30 @@ Future<dynamic> middlewareAndControllerHandler(DoxRequest doxReq) async {
   dynamic result;
   RouteData route = doxReq.route;
 
-  for (dynamic controller in route.controllers) {
-    if (controller is Function) {
-      /// when it is a function and last item, it mean it is a final controller
-      if (controller == route.controllers.last) {
-        return await _handleController(route, controller, doxReq);
+  for (dynamic fn in route.controllers) {
+    if (fn is Function) {
+      /// when it is a function and last item int the list,
+      /// it mean it is a final controller
+      if (fn == route.controllers.last) {
+        return await _handleController(route, fn, doxReq);
       }
 
-      /// this mean a function middleware
-      /// since there is more functions in the `route.controllers`
-      result = await controller(doxReq);
+      /// A function but not last item,
+      /// it mean function base middleware which
+      /// need to pass the result to next `fn`
+      result = await fn(doxReq);
     }
 
-    /// this mean a dox base class middleware
-    /// where it have handle function
-    if (controller is DoxMiddleware) {
-      DoxMiddleware middleware = controller;
-      result = await Function.apply(middleware.handle, <dynamic>[doxReq]);
+    /// DoxMiddleware class
+    /// with handle function
+    if (fn is DoxMiddleware) {
+      result = await fn.handle(doxReq);
     }
 
-    /// if request is dox Request, it mean result is from middleware
-    /// mean need to pass values to next controller.
+    /// if result is dox Request, it mean result is from middleware
+    /// and need to pass values to next controller.
     if (result is DoxRequest) {
-      /// override doxReq from arguments and
-      /// in order to pass in next loop
+      /// override doxReq from arguments in order to pass in the next loop
       doxReq = result;
     } else {
       /// else result is from controller and ready to response
@@ -41,19 +41,24 @@ Future<dynamic> middlewareAndControllerHandler(DoxRequest doxReq) async {
 /// handle controller
 Future<dynamic> _handleController(
   RouteData route,
-  dynamic controller,
+  dynamic fn,
   DoxRequest doxRequest,
 ) async {
   dynamic result;
 
-  /// controller arguments except first arguments
-  List<dynamic> controllerArguments = doxRequest.param.values
-      .toList()
-      .sublist(0, _lengthOfControllerArguments(controller) - 1);
+  /// length of param arguments need to pass to controller
+  /// -1 to remove do request
+  int lengthOfParam = _lengthOfControllerArguments(fn) - 1;
+
+  /// controller arguments except first arguments(doxRequest)
+  /// param values from route `/user/{name}`
+  List<dynamic> controllerArguments = doxRequest.param.values.isNotEmpty
+      ? doxRequest.param.values.toList().sublist(0, lengthOfParam)
+      : _generateEmptyArgumentValues(lengthOfParam);
 
   /// controller argument data types
   List<String> controllerArgumentsDataType =
-      _getControllerArgumentDataTypes(controller);
+      _getControllerArgumentDataTypes(fn);
 
   /// if the first argument data type is not DoxRequest,
   /// controller request custom FormRequest class
@@ -61,7 +66,7 @@ Future<dynamic> _handleController(
     String requestName = controllerArgumentsDataType.first;
     if (requestName != 'DoxRequest') {
       FormRequest? formReq = Dox().ioc.getByName(requestName);
-      if (formReq != null && _isFormRequestTypeMatched(controller, formReq)) {
+      if (formReq != null && _isFormRequestTypeMatched(fn, formReq)) {
         /// mapping request inputs field
         doxRequest.mapInputs(formReq.mapInputs());
 
@@ -78,14 +83,14 @@ Future<dynamic> _handleController(
         await formReq.setUp();
 
         result = await Function.apply(
-            controller, <dynamic>[formReq, ...controllerArguments]);
+            fn, <dynamic>[formReq, ...controllerArguments]);
         return result;
       }
     }
   }
 
   return await Function.apply(
-      controller, <dynamic>[doxRequest, ...controllerArguments]);
+      fn, <dynamic>[doxRequest, ...controllerArguments]);
 }
 
 /// checking that controller first request param is matched
@@ -106,4 +111,12 @@ List<String> _getControllerArgumentDataTypes(dynamic controller) {
 int _lengthOfControllerArguments(dynamic controller) {
   List<String> args = _getControllerArgumentDataTypes(controller);
   return args.length;
+}
+
+List<String> _generateEmptyArgumentValues(int count) {
+  List<String> ret = <String>[];
+  for (int i = 0; i < count; i++) {
+    ret.add('');
+  }
+  return ret;
 }
