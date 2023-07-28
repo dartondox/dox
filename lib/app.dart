@@ -30,6 +30,9 @@ class Dox {
   /// auth guard
   Guard? authGuard;
 
+  /// total isolate to spawn
+  int? _totalIsolate;
+
   /// list of services that need to run when
   /// creating isolate
   List<DoxService> doxServices = <DoxService>[];
@@ -47,7 +50,7 @@ class Dox {
   /// set total thread
   /// default is 3
   void totalIsolate(int value) {
-    Dox().config.totalIsolate = value;
+    _totalIsolate = value;
   }
 
   /// set authorization config
@@ -65,17 +68,16 @@ class Dox {
   /// await Dox().startServer();
   /// ```
   Future<void> startServer() async {
-    int totalIsolate = Dox().config.totalIsolate;
-
-    if (totalIsolate == 1) {
+    _totalIsolate ??= Dox().config.totalIsolate;
+    if (_totalIsolate == 1) {
       await startServices();
       DoxServer().setResponseHandler(config.responseHandler);
       await DoxServer().listen(config.serverPort, isolateId: 1);
     } else {
-      await DoxIsolate().spawn(totalIsolate);
+      await DoxIsolate().spawn(_totalIsolate!);
     }
     DoxLogger.info(sprintf(
-      'Server started at http://127.0.0.1:%s with $totalIsolate isolate',
+      'Server started at http://127.0.0.1:%s with $_totalIsolate isolate',
       <dynamic>[Dox().config.serverPort],
     ));
   }

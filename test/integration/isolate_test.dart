@@ -8,7 +8,7 @@ import 'requirements/handler.dart';
 
 class Config extends AppConfig {
   @override
-  int get totalIsolate => 2;
+  int get totalIsolate => 1;
 
   @override
   String get appKey => '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt';
@@ -39,6 +39,7 @@ void main() {
   group('Isolate', () {
     setUpAll(() async {
       Dox().initialize(config);
+      Dox().totalIsolate(2);
       await Dox().startServer();
     });
 
