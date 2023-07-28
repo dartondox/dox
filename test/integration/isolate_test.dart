@@ -35,10 +35,16 @@ class Config extends AppConfig {
 Config config = Config();
 String baseUrl = 'http://localhost:${config.serverPort}';
 
+class ExampleService implements DoxService {
+  @override
+  void setup() {}
+}
+
 void main() {
   group('Isolate', () {
     setUpAll(() async {
       Dox().initialize(config);
+      Dox().addService(ExampleService());
       Dox().totalIsolate(2);
       await Dox().startServer();
     });

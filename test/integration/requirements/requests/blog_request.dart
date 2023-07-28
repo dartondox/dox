@@ -9,6 +9,13 @@ class BlogRequest extends FormRequest {
   }
 
   @override
+  Map<String, String> mapInputs() {
+    return <String, String>{
+      'foo': 'bar',
+    };
+  }
+
+  @override
   Map<String, String> rules() {
     return <String, String>{
       'title': 'required',

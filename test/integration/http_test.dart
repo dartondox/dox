@@ -231,24 +231,28 @@ void main() {
     });
 
     test('custom form request', () async {
-      Route.post(
-        '/custom_form_request',
-        (BlogRequest req) {
-          return req.title;
-        },
-      );
+      Route.post('/custom_form_request', (BlogRequest req) {
+        return <String, dynamic>{
+          'title': req.title,
+          'bar': req.input('bar'),
+        };
+      });
 
       Uri url = Uri.parse('$baseUrl/custom_form_request');
       http.Response res = await http.post(
         url,
-        body: jsonEncode(<String, String>{'title': 'hello'}),
+        body: jsonEncode(<String, String>{
+          'title': 'hello',
+          'foo': 'bar',
+        }),
         headers: <String, String>{
           'content-type': 'application/json',
         },
       );
-
+      Map<String, dynamic> jsond = jsonDecode(res.body);
       expect(res.statusCode, 200);
-      expect(res.body, 'hello');
+      expect(jsond['title'], 'hello');
+      expect(jsond['bar'], 'bar');
     });
   });
 }
