@@ -6,7 +6,6 @@ class RouteData {
   final dynamic controllers;
   Map<String, dynamic> params = <String, dynamic>{};
   final List<dynamic> preMiddleware;
-  final List<dynamic> postMiddleware;
   FormRequest Function()? formRequest;
 
   final String? domain;
@@ -16,7 +15,6 @@ class RouteData {
     required this.path,
     required this.controllers,
     this.preMiddleware = const <dynamic>[],
-    this.postMiddleware = const <dynamic>[],
     this.domain,
   });
 }

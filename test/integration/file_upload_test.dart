@@ -27,8 +27,6 @@ void main() {
     });
 
     test('file upload | stream | download', () async {
-      /// clear storage image folder
-
       /// upload image
       Route.post('/image', (DoxRequest req) async {
         req.validate(<String, String>{
@@ -152,8 +150,58 @@ void main() {
       expect(res.body, 'file not found');
     });
 
-    /// test invalid file
-    /// test invalid file type
-    /// test non-existent image
+    test('handle file with response()', () async {
+      /// upload image
+      Route.post('/file', (DoxRequest req) async {
+        req.validate(<String, String>{
+          'image': 'file:png|image:png',
+        });
+        RequestFile file = req.input('image');
+        String url = await Storage().putRequestFile('images', file);
+        return <String, dynamic>{
+          'url': url,
+          'size': await file.size,
+          'extension': file.extension,
+        };
+      });
+
+      /// stream image
+      Route.get('/file/stream', (DoxRequest req) async {
+        StreamFile file = await Storage().stream(req.input('image'));
+        return response().stream(file.stream).contentType(file.contentType);
+      });
+
+      /// stream image
+      Route.get('/file/stream2', (DoxRequest req) async {
+        StreamFile file = await Storage().stream(req.input('image'));
+        return response(file);
+      });
+
+      /// stream image
+      Route.get('/file/download', (DoxRequest req) async {
+        DownloadableFile file = await Storage().download(req.input('image'));
+        return response(file);
+      });
+
+      /// upload image from client
+      String dir = Directory.current.path;
+      File imageFile = File('$dir/test/integration/storage/dox.png');
+      String? result = await uploadImage('$baseUrl/file', imageFile);
+      Map<String, dynamic> data = jsonDecode(result!);
+
+      http.Response res = await http
+          .get(Uri.parse("$baseUrl/file/stream?image=${data['url']}"));
+      expect(res.headers['content-type'], 'image/png');
+
+      http.Response res2 = await http
+          .get(Uri.parse("$baseUrl/file/stream2?image=${data['url']}"));
+      expect(res2.headers['content-type'], 'image/png');
+
+      http.Response res3 = await http
+          .get(Uri.parse("$baseUrl/file/download?image=${data['url']}"));
+      expect(res3.headers['content-type'], 'image/png');
+      expect(res3.headers['content-disposition'],
+          'attachment; filename="${data['url'].toString().split('/').last}"');
+    });
   });
 }

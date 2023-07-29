@@ -59,7 +59,7 @@ class DoxWebsocket {
         if (controller != null) {
           /// prepare emitter to pass to controller
           SocketEmitter emitter =
-              SocketEmitter(sender: socketId, roomId: payload['room']);
+              SocketEmitter(sender: socketId, roomId: _defaultRoom);
           Function.apply(controller, <dynamic>[emitter, message]);
         }
 
@@ -75,11 +75,15 @@ class DoxWebsocket {
         /// active connection storage
         _storage.removeWebSocketInfo(socketId);
       },
+
+      /// coverage:ignore-start
       onError: (dynamic error) {
         /// if websocket has error, remove socket from
         /// active connection storage
         _storage.removeWebSocketInfo(socketId);
       },
+
+      /// coverage:ignore-end
     );
 
     /// return websocket, so that response controller
