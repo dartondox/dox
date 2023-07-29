@@ -223,7 +223,6 @@ class DoxRequest {
     });
   }
 
-  /// coverage:ignore-start
   /// support JSON.stringify to convert json
   Map<String, dynamic> toJson() {
     Map<String, dynamic> ret = <String, dynamic>{};
@@ -236,6 +235,4 @@ class DoxRequest {
     });
     return ret;
   }
-
-  /// coverage:ignore-end
 }
