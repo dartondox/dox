@@ -29,18 +29,12 @@ void httpRequestHandler(HttpRequest req) {
         httpErrorHandler(req, error, stackTrace);
       });
     }).onError((Object? error, StackTrace stackTrace) {
-      /// coverage:ignore-start
       httpErrorHandler(req, error, stackTrace);
-
-      /// coverage:ignore-end
     });
 
     /// form data do not support isolate or multithread
   } catch (error, stackTrace) {
-    /// coverage:ignore-start
     httpErrorHandler(req, error, stackTrace);
-
-    /// coverage:ignore-end
   }
 }
 

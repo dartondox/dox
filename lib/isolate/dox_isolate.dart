@@ -3,6 +3,7 @@ import 'dart:isolate';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/isolate/isolate_handler.dart';
 import 'package:dox_core/isolate/isolate_interfaces.dart';
+import 'package:dox_core/websocket/event.dart';
 
 class DoxIsolate {
   /// singleton
@@ -10,11 +11,13 @@ class DoxIsolate {
   factory DoxIsolate() => _singleton;
   DoxIsolate._internal();
 
-  final List<Isolate> _isolates = <Isolate>[];
-  final List<ReceivePort> _receivePorts = <ReceivePort>[];
+  final Map<int, Isolate> _isolates = <int, Isolate>{};
+  final Map<int, ReceivePort> _receivePorts = <int, ReceivePort>{};
+  final Map<int, SendPort> _sendPorts = <int, SendPort>{};
 
   /// get list of running isolates
-  List<Isolate> get isolates => _isolates;
+  Map<int, Isolate> get isolates => _isolates;
+  Map<int, SendPort> get sendPorts => _sendPorts;
 
   /// create threads
   /// ```
@@ -28,12 +31,13 @@ class DoxIsolate {
 
   /// kill all the isolate
   void killAll() {
-    for (Isolate isolate in _isolates) {
+    _isolates.forEach((int id, Isolate isolate) {
       isolate.kill();
-    }
-    for (ReceivePort receivePort in _receivePorts) {
+    });
+
+    _receivePorts.forEach((int id, ReceivePort receivePort) {
       receivePort.close();
-    }
+    });
   }
 
   /// create a thread
@@ -51,7 +55,21 @@ class DoxIsolate {
       ),
     );
 
-    _isolates.add(isolate);
-    _receivePorts.add((receivePort));
+    receivePort.listen((dynamic message) {
+      if (message is SendPort) {
+        _sendPorts[isolateId] = message;
+      }
+      if (message is WebSocketEmitEvent) {
+        DoxIsolate().isolates.forEach((int isolateId, _) {
+          SendPort? sendPort = DoxIsolate().sendPorts[isolateId];
+          if (sendPort != null) {
+            sendPort.send(message);
+          }
+        });
+      }
+    });
+
+    _isolates[isolateId] = isolate;
+    _receivePorts[isolateId] = receivePort;
   }
 }

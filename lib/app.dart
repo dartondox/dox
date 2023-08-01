@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/isolate/dox_isolate.dart';
 import 'package:dox_core/server/dox_server.dart';
@@ -26,6 +28,12 @@ class Dox {
 
   /// global dox ioc containers
   late IocContainer ioc;
+
+  /// isolate send port
+  SendPort? sendPort;
+
+  /// isolate Id
+  int? isolateId;
 
   /// auth guard
   Guard? authGuard;
