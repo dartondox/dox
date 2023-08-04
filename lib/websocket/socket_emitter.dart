@@ -32,9 +32,9 @@ class SocketEmitter {
     return this;
   }
 
-  /// set message except the sender
+  /// emit message only to sender
   /// ```
-  /// emitter.emitExceptSender('event', message);
+  /// emitter.emitToSender('event', message);
   /// ```
   void emitToSender(String event, dynamic message) {
     String payload = JSON.stringify(<String, dynamic>{
