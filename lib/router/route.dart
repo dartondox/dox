@@ -112,7 +112,7 @@ class Route {
   /// ```
   static void websocket(String route, Function(DoxWebsocket) callback,
       {List<dynamic> middleware = const <dynamic>[]}) {
-    DoxWebsocket ws = DoxWebsocket(route);
+    DoxWebsocket ws = DoxWebsocket();
     Route()._addRoute(HttpRequestMethod.GET, Route()._prefix + route,
         <dynamic>[...middleware, ws.handle]);
     callback(ws);

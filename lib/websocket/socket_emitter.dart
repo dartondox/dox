@@ -8,7 +8,7 @@ import 'package:dox_core/websocket/web_socket_info.dart';
 
 class SocketEmitter {
   /// room id to sent message
-  String roomId;
+  String _roomId;
 
   /// sender socket id
   final String sender;
@@ -20,15 +20,14 @@ class SocketEmitter {
   /// storage to get active connection
   final SocketStorage _storage = SocketStorage();
 
-  SocketEmitter(
-      {required this.sender, required this.roomId, this.via = 'callback'});
+  SocketEmitter(this.sender, this._roomId, {this.via = 'callback'});
 
   /// set room to sent message
   /// ```
   /// emitter.room('ABC');
   /// ```
   SocketEmitter room(dynamic id) {
-    roomId = id;
+    _roomId = id;
     return this;
   }
 
@@ -37,14 +36,10 @@ class SocketEmitter {
   /// emitter.emitToSender('event', message);
   /// ```
   void emitToSender(String event, dynamic message) {
-    String payload = JSON.stringify(<String, dynamic>{
-      WEB_SOCKET_EVENT_KEY: event,
-      WEB_SOCKET_MESSAGE_KEY: message,
-    });
     WebSocketInfo? info = _storage.getWebSocketInfo(sender);
     if (info != null) {
       WebSocket websocket = info.websocket;
-      websocket.add(payload);
+      websocket.add(_createPayload(event, message));
     }
   }
 
@@ -62,18 +57,14 @@ class SocketEmitter {
   /// ```
   void emit(String event, dynamic message,
       {List<String> exclude = const <String>[]}) {
-    String payload = JSON.stringify(<String, dynamic>{
-      WEB_SOCKET_EVENT_KEY: event,
-      WEB_SOCKET_MESSAGE_KEY: message,
-    });
-    List<String> members = _storage.getWebSocketIdsOfTheRoom(roomId);
+    List<String> members = _storage.getWebSocketIdsOfTheRoom(_roomId);
 
     /// If sending from callback, it mean we need to notify other isolates.
     /// So, sending to other isolates to get active connections of the rooms and
     /// sent message to correct clients
     if (via == 'callback' && Dox().sendPort != null) {
       WebSocketEmitEvent emitEvent =
-          WebSocketEmitEvent(sender, roomId, message, event, exclude);
+          WebSocketEmitEvent(sender, _roomId, message, event, exclude);
       Dox().sendPort?.send(emitEvent);
       return;
     }
@@ -83,9 +74,20 @@ class SocketEmitter {
         WebSocketInfo? info = _storage.getWebSocketInfo(socketId);
         if (info != null) {
           WebSocket websocket = info.websocket;
-          websocket.add(payload);
+          websocket.add(_createPayload(event, message));
         }
       }
     }
+  }
+
+  /// create payload to sent message
+  String _createPayload(String event, dynamic message) {
+    return JSON.stringify(<String, dynamic>{
+      WEB_SOCKET_EVENT_KEY: event,
+      WEB_SOCKET_MESSAGE_KEY: message,
+      WEB_SOCKET_SENDER_KEY: sender,
+      WEB_SOCKET_ROOM_KEY:
+          _roomId == WEB_SOCKET_DEFAULT_ROOM_NAME ? null : _roomId,
+    });
   }
 }

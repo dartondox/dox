@@ -21,8 +21,8 @@ void isolateHandler(IsolateSpawnParameter param) async {
   receivePort.listen((dynamic message) {
     /// listen for to emit message and
     if (message is WebSocketEmitEvent) {
-      SocketEmitter emitter = SocketEmitter(
-          sender: message.senderId, roomId: message.roomId, via: 'isolate');
+      SocketEmitter emitter =
+          SocketEmitter(message.senderId, message.roomId, via: 'isolate');
       emitter.emit(message.event, message.message, exclude: message.exclude);
     }
   });

@@ -10,4 +10,10 @@ const String WEB_SOCKET_EVENT_KEY = 'event';
 
 const String WEB_SOCKET_MESSAGE_KEY = 'message';
 
+const String WEB_SOCKET_SENDER_KEY = 'sender';
+
+const String WEB_SOCKET_ROOM_KEY = 'room';
+
+const String WEB_SOCKET_DEFAULT_ROOM_NAME = '__default';
+
 const String FILE_DOWNLOAD_HEADER = 'Content-Disposition';

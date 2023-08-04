@@ -8,13 +8,10 @@ import 'package:uuid/uuid.dart';
 Uuid uuid = Uuid();
 
 class DoxWebsocket {
-  /// initially default room is path of the socket eg. /ws
-  final String _defaultRoom;
-
   /// storage to store active socket connection
   final SocketStorage _storage = SocketStorage();
 
-  DoxWebsocket(this._defaultRoom);
+  DoxWebsocket();
 
   /// registered websocket events listener
   final Map<String, Function> _events = <String, Function>{};
@@ -39,13 +36,13 @@ class DoxWebsocket {
 
     /// prepare emitter to pass to controller
     SocketEmitter emitter =
-        SocketEmitter(sender: socketId, roomId: _defaultRoom);
+        SocketEmitter(socketId, WEB_SOCKET_DEFAULT_ROOM_NAME);
 
     /// add to active ws connection storage to reuse later
     _storage.addWebSocketInfo(socketId, ws);
 
     /// add socket id to the room default room is the route eg. /ws
-    _storage.addWebSocketIdToRoom(socketId, _defaultRoom);
+    _storage.addWebSocketIdToRoom(socketId, WEB_SOCKET_DEFAULT_ROOM_NAME);
 
     /// send connected event to client
     emitter.emitToSender('connected', <String, String>{'id': socketId});
