@@ -1,5 +1,5 @@
 class WebSocketEmitEvent {
-  final String? senderId;
+  final String senderId;
   final String roomId;
   final dynamic message;
   final String event;
