@@ -17,10 +17,6 @@ class SocketEmitter {
   /// via callback or via isolate
   final String via;
 
-  /// where it is sending from
-  /// via callback or via isolate
-  final String via;
-
   /// storage to get active connection
   final SocketStorage _storage = SocketStorage();
 
