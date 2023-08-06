@@ -1,3 +1,10 @@
+# version 2.0.0-alpha.1
+
+- Support storage class for file storage
+- Add more unit/integration test coverage
+- Fix bug for websocket running on multiple isolates
+- Update cache config setting on app config
+
 # version 2.0.0-alpha.0
 
 - Added support for multi-thread http server which is 10x faster on concurrency request
