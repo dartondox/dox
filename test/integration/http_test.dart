@@ -51,7 +51,7 @@ void main() {
         return 'pong';
       }
 
-      Route.middleware([middlewareFn, ClassBasedMiddleware()], () {
+      Route.middleware(<dynamic>[middlewareFn, ClassBasedMiddleware()], () {
         Route.get('/middleware_route', pong);
       });
 
