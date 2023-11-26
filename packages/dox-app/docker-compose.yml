@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+
+  # Http server
+  dox:
+    build: .
+    hostname: dox
+    ports:
+      # export:internal
+      - "${APP_PORT}:${APP_PORT}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Postgres database
+  postgres:
+    image: postgres:14.1
+    environment: 
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "3002:5432"
+    restart: always
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-q', '-U', 'postgres']
+      interval: 5s
+      retries: 5
+    volumes:
+      - .docker/build:/var/lib/postgresql/data

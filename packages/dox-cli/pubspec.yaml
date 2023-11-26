@@ -1,0 +1,21 @@
+name: dox
+description: This is a cli tool to generate migration, model and to handle database migration with dox framework. It support up and down methods to control migration version.
+version: 1.1.1
+repository: https://github.com/dartondox/dox
+homepage: https://dartondox.dev
+
+environment:
+  sdk: '>=2.19.0 <4.0.0'
+
+dependencies:
+  dox_migration: ^1.0.3
+  postgres: ^2.6.1
+  watcher: ^1.0.2
+  path: ^1.8.3
+
+dev_dependencies:
+  lints: ^2.0.0
+  test: ^1.21.0
+
+executables:
+  dox: dox

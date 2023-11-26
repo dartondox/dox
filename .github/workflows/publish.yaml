@@ -1,21 +1,39 @@
-name: Publish
+name: Release
 
 on:
   push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+*'
+    branches:
+    - main
 
+concurrency:
+  group: "publish"
+  cancel-in-progress: true
+    
 jobs:
-  Publish:
-    permissions:
-      id-token: write
+  publish:
+    if: |
+      startsWith(github.event.head_commit.message, 'release')
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
-      - uses: dart-lang/setup-dart@v1
-
-      - run: dart pub get
-      - run: dart test --concurrency=1
-      - run: dart analyze
-      - run: dart pub publish --force
+    - uses: actions/checkout@v3
+    - uses: dart-lang/setup-dart@v1
+      with:
+        sdk: stable
+    - name: Set dart credentials
+      run: |
+        mkdir "$XDG_CONFIG_HOME/dart"
+        echo '${{ secrets.PUB_CREDENTIALS }}' > "$XDG_CONFIG_HOME/dart/pub-credentials.json"
+    - name: Prepare git
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+    - name: Activate melos
+      run: dart pub global activate melos
+    - name: Publish package
+      run: melos publish --no-dry-run --git-tag-version --yes
+    - name: Create tags
+      uses: CasperWA/push-protected@v2
+      with:
+        token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
+        tags: true
+        branch: main

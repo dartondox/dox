@@ -1,0 +1,15 @@
+targets:
+  $default:
+    builders:
+      dox_builder|annotations:
+        enabled: true
+
+builders:
+  dox_builder:
+    target: ":dox_builder"
+    import: "package:dox_builder/dox_builder.dart"
+    builder_factories: ["buildDoxModel"]
+    build_extensions: { ".dart": [".g.dart", ".dox_model_generator.g.part"] }
+    auto_apply: dependents
+    build_to: cache
+    applies_builders: ["source_gen|combining_builder"]

@@ -1,0 +1,4 @@
+name: dox_app
+
+packages:
+  - packages/*

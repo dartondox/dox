@@ -1,0 +1,25 @@
+name: dox_app
+publish_to: 'none'
+
+environment:
+  sdk: '>=2.19.0 <4.0.0'
+
+dependencies:
+  postgres_pool: ^2.1.6
+  ioredis: ^1.0.2
+  short_uuids: ^2.0.0
+  dox_auth: ^1.0.1
+  dox_migration: ^1.0.4 
+  dox_core: ^2.0.0-alpha.1
+  dox_websocket: ^1.0.0-beta.0
+  dox_query_builder: ^1.1.15
+
+dev_dependencies:
+  dox_builder: ^1.0.3
+  build_runner: ^2.3.3
+  lints: ^2.0.0
+  test: ^1.21.0
+  http: ^1.0.0
+
+assets:
+  - .env
