@@ -1,4 +1,4 @@
-name: dox_app
+name: dox_framework
 
 packages:
   - packages/*
