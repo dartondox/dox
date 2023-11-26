@@ -1,3 +1,1 @@
-# Dox Annotation
-
-## [Full documentation](https://dartondox.dev/)
+/Users/zinkyawkyaw/projects/dox/dox-original/README.md

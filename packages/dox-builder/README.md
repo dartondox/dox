@@ -1,3 +1,1 @@
-# Dox Builder
-
-## [Full documentation](https://dartondox.dev/)
+/Users/zinkyawkyaw/projects/dox/dox-original/README.md
