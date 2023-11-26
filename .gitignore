@@ -7,3 +7,4 @@ bin/server
 .docker
 packages/dox-app/storage
 pubspec_overrides.yaml
+.idea
