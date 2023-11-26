@@ -1,1 +1,1 @@
-/Users/zinkyawkyaw/projects/dox/dox-original/README.md
+../../README.md
