@@ -39,7 +39,13 @@ jobs:
           cd site
           git init
           git checkout -b gh-pages
-          git remote add origin https://necessarylion:${{ secrets.PUSH_TO_PROTECTED_BRANCH }}@github.com/dartondox/dox.git
+          git remote add origin https://github.com/dartondox/dox.git
           git add .
           git commit -m "Deploy MkDocs to GitHub Pages"
-          git push --set-upstream origin gh-pages -f
+      - name: Push
+        uses: CasperWA/push-protected@v2
+        with:
+          token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
+          tags: false
+          branch: gh-pages
+          force: true
