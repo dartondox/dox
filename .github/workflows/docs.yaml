@@ -30,6 +30,10 @@ jobs:
         run: |
           REPO_URL=$(git config --get remote.origin.url)
           echo "Repository URL: $REPO_URL"
+      - name: Prepare git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
 
       - name: Deploy to GitHub Pages with Force Push
         run: |
