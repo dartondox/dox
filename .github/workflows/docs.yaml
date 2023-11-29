@@ -41,5 +41,5 @@ jobs:
           git checkout -b gh-pages
           git add .
           git commit -m "Deploy MkDocs to GitHub Pages"
-          git remote add origin https://github.com/dartondox/dox
-          git push --force https://x-access-token:${{ secrets.PUSH_TO_PROTECTED_BRANCH }}@github.com/dartondox/dox.git gh-pages
+          git remote add origin https://necessarylion:${{ secrets.PUSH_TO_PROTECTED_BRANCH }}@github.com/dartondox/dox.git
+          git push --force
