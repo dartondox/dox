@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dox_app/config/app.dart';
 import 'package:dox_core/dox_core.dart';
@@ -9,6 +10,10 @@ Config config = Config();
 void main() {
   group('Cache |', () {
     setUpAll(() async {
+      Directory storage = Directory('${Directory.current.path}/storage/');
+      if (storage.existsSync()) {
+        storage.deleteSync(recursive: true);
+      }
       Dox().initialize(config);
     });
 

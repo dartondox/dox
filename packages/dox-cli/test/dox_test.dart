@@ -1,5 +1,9 @@
 import 'package:test/test.dart';
 
 void main() {
-  test('calculate', () {});
+  group('A group of tests', () {
+    test('First Test', () {
+      expect(true, true);
+    });
+  });
 }

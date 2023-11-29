@@ -21,7 +21,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
     ports:
-      - "3002:5432"
+      - "5432:5432"
     restart: always
     healthcheck:
       test: ['CMD', 'pg_isready', '-q', '-U', 'postgres']

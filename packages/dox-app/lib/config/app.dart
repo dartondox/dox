@@ -3,6 +3,7 @@ import 'package:dox_app/http/requests/blog.request.dart';
 import 'package:dox_app/routes/api.dart';
 import 'package:dox_app/routes/web.dart';
 import 'package:dox_app/routes/websocket.dart';
+import 'package:dox_core/cache/drivers/file/file_cache_driver.dart';
 import 'package:dox_core/dox_core.dart';
 
 class Config extends AppConfig {
@@ -39,6 +40,12 @@ class Config extends AppConfig {
         allowMethods: '*',
         allowCredentials: true,
         exposeHeaders: '*',
+      );
+  @override
+  CacheConfig get cacheConfig => CacheConfig(
+        drivers: <String, CacheDriverInterface>{
+          'file': FileCacheDriver(),
+        },
       );
 
   @override

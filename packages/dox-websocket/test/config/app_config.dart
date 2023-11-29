@@ -2,19 +2,21 @@ import 'package:dox_core/cache/drivers/file/file_cache_driver.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/logger.dart';
 
-import '../handler.dart';
-import '../middleware/custom_middleware.dart';
-import '../requests/blog_request.dart';
-import 'api_router.dart';
+import 'router.dart';
+
+class ResponseHandler extends ResponseHandlerInterface {
+  @override
+  void handle(DoxResponse res) {}
+}
 
 class Config extends AppConfig {
   @override
-  int get totalIsolate => 1;
+  int get totalIsolate => 3;
 
   @override
   String get appKey => '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt';
 
-  int _serverPort = 50010;
+  int _serverPort = 3001;
 
   @override
   int get serverPort => _serverPort;
@@ -24,23 +26,12 @@ class Config extends AppConfig {
   @override
   CORSConfig get cors => CORSConfig(
         allowOrigin: '*',
-        allowMethods: <String>['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
+        allowMethods: '*',
         allowCredentials: true,
       );
 
   @override
-  ResponseHandlerInterface get responseHandler => ResponseHandler();
-
-  @override
-  List<dynamic> get globalMiddleware => <dynamic>[customMiddleware];
-
-  @override
-  Map<Type, Function()> get formRequests => <Type, Function()>{
-        BlogRequest: () => BlogRequest(),
-      };
-
-  @override
-  List<Router> get routers => <Router>[ApiRouter()];
+  List<Router> get routers => <Router>[WebsocketRouter()];
 
   @override
   void Function(Object? error, StackTrace stackTrace) get errorHandler =>
@@ -50,8 +41,12 @@ class Config extends AppConfig {
 
   @override
   CacheConfig get cacheConfig => CacheConfig(
+        defaultDriver: 'redis',
         drivers: <String, CacheDriverInterface>{
           'file': FileCacheDriver(),
         },
       );
+
+  @override
+  ResponseHandlerInterface get responseHandler => ResponseHandler();
 }
