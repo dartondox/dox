@@ -1,4 +1,8 @@
 name: dox_framework
 
 packages:
-  - packages/*
+  - packages/**
+
+scripts:
+  test:
+    exec: dart test --concurrency=1

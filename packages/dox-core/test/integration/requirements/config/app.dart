@@ -50,7 +50,6 @@ class Config extends AppConfig {
 
   @override
   CacheConfig get cacheConfig => CacheConfig(
-        defaultDriver: 'redis',
         drivers: <String, CacheDriverInterface>{
           'file': FileCacheDriver(),
         },

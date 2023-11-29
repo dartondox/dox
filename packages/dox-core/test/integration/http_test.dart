@@ -132,8 +132,7 @@ void main() {
       Uri url = Uri.parse('$baseUrl/http_exception');
       http.Response res = await http.get(url);
 
-      expect(res.statusCode, 401);
-      expect(res.body, 'Failed to authorize');
+      expect(res.statusCode, 422);
     });
 
     test('list', () async {

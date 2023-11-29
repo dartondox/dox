@@ -9,8 +9,8 @@ Future<PostgreSQLConnection> connection() async {
     host,
     port,
     "postgres",
-    username: "admin",
-    password: "password",
+    username: "postgres",
+    password: "postgres",
   );
   await db.open();
   return db;
@@ -24,8 +24,8 @@ PgPool poolConnection() {
       host: host,
       port: port,
       database: 'postgres',
-      username: 'admin',
-      password: 'password',
+      username: 'postgres',
+      password: 'postgres',
     ),
     settings: PgPoolSettings()
       ..maxConnectionAge = Duration(hours: 1)
