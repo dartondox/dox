@@ -31,12 +31,15 @@ jobs:
           REPO_URL=$(git config --get remote.origin.url)
           echo "Repository URL: $REPO_URL"
 
-      - name: Deploy to GitHub Pages with Force Push
+      - name: Git config
         run: |
-          cd site
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           git config --global init.defaultBranch main
+
+      - name: Deploy to GitHub Pages with Force Push
+        run: |
+          cd site
           git init
           git remote add origin https://necessarylion:${{ secrets.PUSH_TO_PROTECTED_BRANCH }}@github.com/dartondox/dox.git
           git checkout -b gh-pages
