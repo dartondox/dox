@@ -31,7 +31,6 @@ theme:
   icon:
     repo: fontawesome/brands/github
   name: material
-  custom_dir: overrides
   palette:
    # Palette toggle for dark mode
   - scheme: default
