@@ -16,6 +16,5 @@ jobs:
         uses: mhausenblas/mkdocs-deploy-gh-pages@master
         env:
           GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
-          CUSTOM_DOMAIN: dartondox.dev
           CONFIG_FILE: mkdocs.yml
           EXTRA_PACKAGES: build-base
