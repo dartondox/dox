@@ -33,13 +33,13 @@ jobs:
 
       - name: Deploy to GitHub Pages with Force Push
         run: |
+          cd site
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           git config --global init.defaultBranch main
-          cd site
           git init
+          git remote add origin https://necessarylion:${{ secrets.PUSH_TO_PROTECTED_BRANCH }}@github.com/dartondox/dox.git
           git checkout -b gh-pages
           git add .
           git commit -m "Deploy MkDocs to GitHub Pages"
-          git remote add origin https://necessarylion:${{ secrets.PUSH_TO_PROTECTED_BRANCH }}@github.com/dartondox/dox.git
           git push --set-upstream origin gh-pages -f
