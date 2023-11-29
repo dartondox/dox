@@ -15,6 +15,7 @@ jobs:
       - name: Deploy docs
         uses: mhausenblas/mkdocs-deploy-gh-pages@master
         env:
-          GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
+          PERSONAL_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CONFIG_FILE: mkdocs.yml
           EXTRA_PACKAGES: build-base
