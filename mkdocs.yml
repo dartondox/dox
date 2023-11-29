@@ -1,0 +1,95 @@
+site_name: "DOX"
+repo_url: https://github.com/dartondox/dox-core
+site_url: https://dartondox.dev
+copyright: Copyright &copy; 2023 - 2024 Dart On Dox
+extra_css:
+  - css/style.css
+extra:
+  analytics:
+    provider: google
+    property: G-GY82BXCJF8
+  social:
+    - icon: fontawesome/brands/github
+      name: Github
+      link: https://github.com/dartondox
+    - icon: fontawesome/brands/discord 
+      link: https://discord.com/invite/pBfWrsvBSV
+      name: Discord
+theme:
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.expand
+  font:
+    text: Inclusive Sans
+  favicon: assets/favicon.png
+  logo: assets/logo.svg
+  icon:
+    repo: fontawesome/brands/github
+  name: material
+  palette:
+   # Palette toggle for dark mode
+  - scheme: default
+    primary: custom
+    toggle:
+      icon: material/brightness-4
+      name: Switch to dark mode
+  
+  # Palette toggle for light mode
+  - scheme: slate
+    primary: custom
+    toggle:
+      icon: material/brightness-7 
+      name: Switch to light mode
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+nav:
+  - Getting Started: 
+    - index.md
+    - the-basic/installation.md
+    - the-basic/routing.md
+    - the-basic/request.md
+    - the-basic/response.md
+    - the-basic/controller.md
+    - the-basic/middleware.md
+    - the-basic/validation.md
+  - Digging deeper:
+    - digging-deeper/cache.md
+    - digging-deeper/file-storage.md
+    - digging-deeper/env.md
+    - digging-deeper/isolate.md
+    - digging-deeper/services.md
+    - digging-deeper/websocket.md
+    - digging-deeper/dox-cli.md
+    - digging-deeper/deployment.md
+    - digging-deeper/testing.md
+  - Database:
+    - database/migration.md
+    - database/query-builder.md
+    - Model:
+      - database/model/index.md
+      - Relationship:
+        - database/model/relationship/has-one.md
+        - database/model/relationship/has-many.md
+        - database/model/relationship/belongs-to.md
+        - database/model/relationship/many-to-many.md
+      - database/model/serializer.md
+  - Security:
+    - security/authentication.md
+    - security/cors.md
+    - security/encryption.md
+    - security/hashing.md
+  - Others:
+    - others/releases.md
+    - others/contribute.md

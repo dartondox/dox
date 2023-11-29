@@ -1,0 +1,48 @@
+name: MkDocs Deploy
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install mkdocs
+          pip install mkdocs-material
+
+      - name: Build MkDocs site
+        run: mkdocs build
+
+      - name: Get GitHub repository URL
+        run: |
+          REPO_URL=$(git config --get remote.origin.url)
+          echo "Repository URL: $REPO_URL"
+
+      - name: Git config
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global init.defaultBranch main
+
+      - name: Deploy to GitHub Pages with Force Push
+        run: |
+          cd site
+          git init
+          git remote add origin https://necessarylion:${{ secrets.PUSH_TO_PROTECTED_BRANCH }}@github.com/dartondox/dox.git
+          git checkout -b gh-pages
+          git add .
+          git commit -m "Deploy MkDocs to GitHub Pages"
+          git push --set-upstream origin gh-pages -f
