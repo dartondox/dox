@@ -91,5 +91,7 @@ nav:
     - security/encryption.md
     - security/hashing.md
   - Others:
-    - others/releases.md
     - others/contribute.md
+    - Releases:
+      - others/releases/core-release.md
+      - others/releases/query-builder-release.md

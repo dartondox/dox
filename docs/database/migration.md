@@ -52,8 +52,32 @@ DB_PASSWORD=password
     ```py
     dox migrate:rollback
     ```
+## With `.sql` example
 
-## Create table
+```py
+-- up
+CREATE TABLE IF NOT EXISTS blog (
+    id serial PRIMARY KEY,
+	user_id int NOT NULL,
+	title VARCHAR ( 255 ) NOT NULL,
+	slug VARCHAR ( 255 ) NOT NULL,
+	description TEXT,
+	deleted_at TIMESTAMP,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP 
+)
+
+-- down
+DROP TABLE IF EXISTS blog 
+```
+
+!!! info
+    Employ `--up` and `--down` to differentiate the migration scripts for upward and downward actions.
+
+
+## With `.dart` example
+
+### Create table
 
 === "Example"
 
@@ -71,7 +95,7 @@ DB_PASSWORD=password
     Dox adheres to singular table naming conventions, but you can still employ custom table names in your model. For additional details, please refer to [custom table name in model](model/index.md/#doxmodel-options).
 
 
-## Update table
+### Update table
 
 === "Example"
 
@@ -97,7 +121,7 @@ DB_PASSWORD=password
     });
     ```
 
-## Drop table
+### Drop table
 
 === "Example"
 
@@ -105,7 +129,7 @@ DB_PASSWORD=password
     await Schema.drop('blog');
     ```
 
-## Drop column
+### Drop column
 
 
 === "Example"
@@ -116,7 +140,7 @@ DB_PASSWORD=password
     });
     ```
 
-## Rename column
+### Rename column
 
 
 === "Example"
@@ -127,7 +151,7 @@ DB_PASSWORD=password
     });
     ```
 
-## Data types
+### Data types
 
 | Command                           | Description                                          |
 | --------------------------------- | ---------------------------------------------------- |
