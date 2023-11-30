@@ -2,8 +2,8 @@ name: MkDocs Deploy
 
 on:
   push:
-    branches:
-      - main  
+    # branches:
+    #   - develop  
 
 jobs:
   deploy:
