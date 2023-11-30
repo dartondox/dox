@@ -4,7 +4,40 @@ WebSocket is a communication protocol that enables real-time, full-duplex, bidir
 
 ## Usage
 
-### 1. Create websocket controller
+### 1. Create websocket service with redis adapter
+
+```dart
+class WebsocketService implements DoxService {
+  @override
+  void setup() {
+    Redis sub = Redis();
+    Redis pub = sub.duplicate();
+
+    WebsocketServer io = WebsocketServer(Dox());
+    io.adapter(WebsocketRedisAdapter(
+      subscriber: sub,
+      publisher: pub,
+    ));
+  }
+}
+```
+
+!!! info
+    While running with multiple isolate(multithread), the Dox WebSocket require Redis adapter which require [`ioredis`](https://pub.dev/packages/ioredis) package to function. Currently, Dox WebSocket only supports the Redis adapter. And if you do not want to use any adapter, please set total isolate value to 1 `int get totalIsolate => 1` in `lib/config/app.dart` to function properly.
+
+### 2. Register websocket service to dox
+
+```dart
+/// bin/server.dart
+....
+
+Dox().addService(WebsocketService());
+
+....
+await Dox().startServer();
+```
+
+### 3. Create websocket controller
 
 ```bash
 dox create:controller SocketController -ws
@@ -12,14 +45,15 @@ dox create:controller SocketController -ws
 
 ```dart
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_websocket/dox_websocket.dart';
 
 class ChatWebSocketController {
-  intro(SocketEmitter emitter, message) {
+  intro(WebsocketEmitter emitter, dynamic message) {
     // sent message to chart room but exclude the sender
     emitter.room('chat').emitExceptSender('intro', message);
   }
 
-  noti(SocketEmitter emitter, message) {
+  noti(WebsocketEmitter emitter, dynamic message) {
     // sent message to chart room including the sender
     emitter.room('chat').emit('noti', message);
   }
@@ -29,19 +63,19 @@ class ChatWebSocketController {
 !!! tip "Note"
     As webSocket maintains an open connection, there is no requirement to send back any values from your controller method.
 
-### 2. register websocket route
+### 4. register websocket route
 
 ```dart
 ChatWebSocketController controller = ChatWebSocketController();
 
-Router.websocket('ws', (socket) {
+Router.websocket('ws', (WebsocketEvent event) {
     // when client sent an event called `intro`, 
     // it will execute `controller.intro` method
-    socket.on('intro', controller.intro);
+    event.on('intro', controller.intro);
     
     // when client sent an event called `noti`, 
     // it will execute `controller.noti` method
-    socket.on('noti', controller.noti);
+    event.on('noti', controller.noti);
 });
 ```
 
