@@ -9,7 +9,6 @@ import '../utils/file_upload.dart';
 import '../utils/start_http_server.dart';
 import 'requirements/config/app.dart';
 
-Config config = Config();
 String baseUrl = 'http://localhost:${config.serverPort}';
 
 void main() {

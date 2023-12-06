@@ -50,7 +50,7 @@ class DoxServer {
   /// ```
   /// server.setResponseHandler(Handler());
   /// ```
-  void setResponseHandler(ResponseHandlerInterface handler) {
+  void setResponseHandler(ResponseHandlerInterface? handler) {
     responseHandler = handler;
   }
 }

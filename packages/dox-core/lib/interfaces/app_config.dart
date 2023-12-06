@@ -2,32 +2,39 @@
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/logger.dart';
 
-abstract class AppConfig {
-  String get appKey;
+void defaultErrorHandler(Object? error, StackTrace stackTrace) {
+  DoxLogger.warn(error);
+  DoxLogger.danger(stackTrace.toString());
+}
 
-  int totalIsolate = 3;
+class AppConfig {
+  final String appKey;
+  final int serverPort;
+  final int totalIsolate;
+  final ResponseHandlerInterface? responseHandler;
+  final Function(Object?, StackTrace) errorHandler;
+  final Map<Type, FormRequest Function()> formRequests;
+  final List<dynamic> globalMiddleware;
+  final List<Router> routers;
+  final CORSConfig cors;
+  final CacheConfig cache;
+  final FileStorageConfig fileStorage;
+  final List<DoxService> services;
 
-  int get serverPort;
-
-  ResponseHandlerInterface get responseHandler;
-
-  void Function(Object?, StackTrace) get errorHandler =>
-      (Object? error, StackTrace stackTrace) {
-        DoxLogger.warn(error);
-        DoxLogger.danger(stackTrace.toString());
-      };
-
-  Map<Type, Function()> get formRequests => <Type, Function()>{};
-
-  List<dynamic> get globalMiddleware => <dynamic>[];
-
-  List<Router> get routers;
-
-  CORSConfig get cors;
-
-  CacheConfig get cacheConfig => CacheConfig();
-
-  FileStorageConfig get fileStorageConfig => FileStorageConfig();
+  AppConfig({
+    required this.appKey,
+    this.serverPort = 3000,
+    this.totalIsolate = 3,
+    this.services = const <DoxService>[],
+    this.formRequests = const <Type, FormRequest Function()>{},
+    this.globalMiddleware = const <dynamic>[],
+    this.routers = const <Router>[],
+    this.cors = const CORSConfig(),
+    this.cache = const CacheConfig(),
+    this.fileStorage = const FileStorageConfig(),
+    this.errorHandler = defaultErrorHandler,
+    this.responseHandler,
+  });
 }
 
 class CORSConfig {
@@ -61,7 +68,7 @@ class FileStorageConfig {
   final Map<String, StorageDriverInterface> drivers;
 
   const FileStorageConfig({
-    this.defaultDriver = 'file',
+    this.defaultDriver = 'local',
     this.drivers = const <String, StorageDriverInterface>{},
   });
 }

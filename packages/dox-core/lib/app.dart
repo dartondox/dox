@@ -72,6 +72,7 @@ class Dox implements IDox {
   /// await Dox().startServer();
   /// ```
   Future<void> startServer() async {
+    addServices(config.services);
     _totalIsolate ??= Dox().config.totalIsolate;
     int isolatesToSpawn = _totalIsolate ?? 1;
 

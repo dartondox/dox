@@ -26,7 +26,7 @@ class Storage {
   Map<String, StorageDriverInterface> storageDriver =
       <String, StorageDriverInterface>{
     'local': LocalStorageDriver(),
-    ...Dox().config.fileStorageConfig.drivers,
+    ...Dox().config.fileStorage.drivers,
   };
 
   /// set the disk name
@@ -40,7 +40,7 @@ class Storage {
 
   StorageDriverInterface get _driver {
     return storageDriver[_disk] ??
-        storageDriver[Dox().config.fileStorageConfig.defaultDriver] ??
+        storageDriver[Dox().config.fileStorage.defaultDriver] ??
         LocalStorageDriver();
   }
 

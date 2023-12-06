@@ -1,6 +1,5 @@
 import 'package:dox_core/cache/drivers/file/file_cache_driver.dart';
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/utils/logger.dart';
 
 import 'router.dart';
 
@@ -9,44 +8,38 @@ class ResponseHandler extends ResponseHandlerInterface {
   void handle(DoxResponse res) {}
 }
 
-class Config extends AppConfig {
-  @override
-  int get totalIsolate => 3;
+AppConfig appConfig = AppConfig(
+  /// application key
+  appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
 
-  @override
-  String get appKey => '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt';
+  /// application server port
+  serverPort: 3004,
 
-  int _serverPort = 3001;
+  /// total multi-thread isolate to run
+  totalIsolate: 3,
 
-  @override
-  int get serverPort => _serverPort;
+  // cors configuration
+  cors: CORSConfig(
+    allowOrigin: '*',
+    allowMethods: '*',
+    allowCredentials: true,
+  ),
 
-  set serverPort(int val) => _serverPort = val;
+  /// response handler
+  responseHandler: ResponseHandler(),
 
-  @override
-  CORSConfig get cors => CORSConfig(
-        allowOrigin: '*',
-        allowMethods: '*',
-        allowCredentials: true,
-      );
+  /// global middleware
+  globalMiddleware: <dynamic>[],
 
-  @override
-  List<Router> get routers => <Router>[WebsocketRouter()];
+  /// routers
+  routers: <Router>[
+    WebsocketRouter(),
+  ],
 
-  @override
-  void Function(Object? error, StackTrace stackTrace) get errorHandler =>
-      (Object? error, StackTrace stackTrace) {
-        DoxLogger.danger(error);
-      };
-
-  @override
-  CacheConfig get cacheConfig => CacheConfig(
-        defaultDriver: 'redis',
-        drivers: <String, CacheDriverInterface>{
-          'file': FileCacheDriver(),
-        },
-      );
-
-  @override
-  ResponseHandlerInterface get responseHandler => ResponseHandler();
-}
+  /// cache driver configuration
+  cache: CacheConfig(
+    drivers: <String, CacheDriverInterface>{
+      'file': FileCacheDriver(),
+    },
+  ),
+);

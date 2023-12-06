@@ -5,8 +5,6 @@ import 'package:dox_app/config/app.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
-Config config = Config();
-
 void main() {
   group('Cache |', () {
     setUpAll(() async {
@@ -14,7 +12,7 @@ void main() {
       if (storage.existsSync()) {
         storage.deleteSync(recursive: true);
       }
-      Dox().initialize(config);
+      Dox().initialize(appConfig);
     });
 
     test('put', () async {

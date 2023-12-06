@@ -1,63 +1,51 @@
+import 'package:dox_app/config/cache.dart';
+import 'package:dox_app/config/cors.dart';
+import 'package:dox_app/config/services.dart';
+import 'package:dox_app/config/storage.dart';
 import 'package:dox_app/http/handler.dart';
 import 'package:dox_app/http/requests/blog.request.dart';
 import 'package:dox_app/routes/api.dart';
 import 'package:dox_app/routes/web.dart';
 import 'package:dox_app/routes/websocket.dart';
-import 'package:dox_core/cache/drivers/file/file_cache_driver.dart';
 import 'package:dox_core/dox_core.dart';
 
-class Config extends AppConfig {
-  @override
-  int get totalIsolate => 6;
+AppConfig appConfig = AppConfig(
+  /// application key
+  appKey: Env.get('APP_KEY'),
 
-  @override
-  String get appKey => Env.get('APP_KEY');
+  /// application server port
+  serverPort: int.parse(Env.get('APP_PORT', 3000)),
 
-  @override
-  int get serverPort => int.parse(Env.get('APP_PORT', 3000));
+  /// total multi-thread isolate to run
+  totalIsolate: 6,
 
-  @override
-  Map<Type, Function()> get formRequests => <Type, Function()>{
-        BlogRequest: () => BlogRequest(),
-      };
+  /// global middleware
+  globalMiddleware: <dynamic>[],
 
-  @override
-  List<dynamic> get globalMiddleware => <dynamic>[
-        // LogMiddleware(filter: logFilter, withHeader: true),
-      ];
+  /// form requests
+  formRequests: <Type, FormRequest Function()>{
+    BlogRequest: () => BlogRequest(),
+  },
 
-  @override
-  List<Router> get routers => <Router>[
-        WebRouter(),
-        ApiRouter(),
-        WebsocketRouter(),
-      ];
+  /// routers
+  routers: <Router>[
+    WebRouter(),
+    ApiRouter(),
+    WebsocketRouter(),
+  ],
 
-  @override
-  CORSConfig get cors => CORSConfig(
-        allowOrigin: '*',
-        allowHeaders: '*',
-        allowMethods: '*',
-        allowCredentials: true,
-        exposeHeaders: '*',
-      );
-  @override
-  CacheConfig get cacheConfig => CacheConfig(
-        drivers: <String, CacheDriverInterface>{
-          'file': FileCacheDriver(),
-        },
-      );
+  /// response handler
+  responseHandler: ResponseHandler(),
 
-  @override
-  ResponseHandlerInterface get responseHandler => ResponseHandler();
+  /// service to run on multithread server
+  services: services,
 
-  // @override
-  // void Function(Object? error, StackTrace stackTrace) get errorHandler =>
-  //     (Object? error, StackTrace stackTrace) {
-  //       DoxLogger.prettyLog(
-  //         'error',
-  //         error.toString(),
-  //         stackTrace.toString(),
-  //       );
-  //     };
-}
+  /// cors configuration
+  cors: cors,
+
+  /// cache driver configuration
+  cache: cache,
+
+  /// file storage driver configuration
+  fileStorage: storage,
+);
