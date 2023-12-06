@@ -39,5 +39,7 @@ jobs:
         sdk: stable
     - name: Activate melos
       run: dart pub global activate melos
+    - name: Melos Bootstrap
+      run: melos bs
     - name: Run Tests
       run: melos test
