@@ -5,12 +5,11 @@ import 'package:dox_core/dox_core.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
-Config config = Config();
-String baseUrl = 'http://localhost:${config.serverPort}';
+String baseUrl = 'http://localhost:${appConfig.serverPort}';
 
 void main() {
   setUpAll(() async {
-    Dox().initialize(config);
+    Dox().initialize(appConfig);
     Dox().addService(AuthService());
     Dox().addService(WebsocketService());
     await Dox().startServer();

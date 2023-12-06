@@ -9,8 +9,7 @@ import 'package:test/test.dart';
 
 import 'config/app_config.dart';
 
-Config config = Config();
-String baseUrl = 'http://localhost:${config.serverPort}';
+String baseUrl = 'http://localhost:${appConfig.serverPort}';
 
 class WebsocketService implements DoxService {
   @override
@@ -29,7 +28,7 @@ class WebsocketService implements DoxService {
 void main() {
   group('Websocket |', () {
     setUpAll(() async {
-      Dox().initialize(config);
+      Dox().initialize(appConfig);
       Dox().addService(WebsocketService());
       await Dox().startServer();
     });
@@ -40,7 +39,7 @@ void main() {
 
     test('websocket', () async {
       WebSocket socket =
-          await WebSocket.connect('ws://localhost:${config.serverPort}/ws');
+          await WebSocket.connect('ws://localhost:${appConfig.serverPort}/ws');
 
       String data = jsonEncode(<String, String>{
         'event': 'intro',
@@ -63,7 +62,7 @@ void main() {
       socket.add(jsonData);
 
       WebSocket socket2 =
-          await WebSocket.connect('ws://localhost:${config.serverPort}/ws');
+          await WebSocket.connect('ws://localhost:${appConfig.serverPort}/ws');
 
       String joinRoomData = jsonEncode(<String, String>{
         'event': 'joinRoom',

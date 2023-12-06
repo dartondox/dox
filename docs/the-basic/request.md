@@ -60,7 +60,7 @@ Register a request in `lib/config/app.dart`
 
 ```dart
 @override
-Map<Type, Function()> get formRequests => {
+Map<Type, FormRequest Function()> get formRequests => {
     BlogRequest:() => BlogRequest(),
 };
 ```

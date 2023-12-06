@@ -21,12 +21,22 @@ class Env {
   /// ```
   /// Evn.get('APP_KEY');
   /// Evn.get('APP_KEY', 'with_default_value_if_null');
+  /// Evn.get<int>('PORT', 3000); (This will return int type)
+  /// Evn.get<num>('PORT', 3000); (This will return num type)
+  /// Evn.get<String>('APP_KEY'); (This will return type String)
+  /// Current this function support String, int and num types.
   /// ```
-  static String get(String key, [dynamic defaultValue]) {
+  static T get<T>(String key, [dynamic defaultValue]) {
     String value = Env().env[key].toString();
-    return value.isEmpty || value.toLowerCase() == 'null'
-        ? defaultValue
-        : value;
+    String val =
+        value.isEmpty || value.toLowerCase() == 'null' ? defaultValue : value;
+    if (T.toString() == 'int') {
+      return int.parse(val) as T;
+    }
+    if (T.toString() == 'num') {
+      return num.parse(val) as T;
+    }
+    return val as T;
   }
 
   /// load env from .env of project directory

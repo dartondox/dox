@@ -6,8 +6,6 @@ import 'package:test/test.dart';
 
 import '../integration/requirements/config/app.dart';
 
-Config config = Config();
-
 void main() {
   group('Cache |', () {
     setUpAll(() async {

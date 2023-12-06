@@ -6,7 +6,7 @@ import '../integration/requirements/config/app.dart';
 void main() {
   group('DoxCookie |', () {
     test('get', () {
-      Dox().config = Config();
+      Dox().config = config;
       DoxCookie cookie = DoxCookie('x-auth', 'Bearerxxxxxxxxx');
       String cookieValue = cookie.get();
       expect(cookieValue,
@@ -14,7 +14,7 @@ void main() {
     });
 
     test('expire', () {
-      Dox().config = Config();
+      Dox().config = config;
       DoxCookie cookie = DoxCookie('x-auth', '');
       String cookieValue = cookie.expire();
       expect(cookieValue, 'x-auth=; Max-Age=-1000');

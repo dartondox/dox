@@ -11,7 +11,6 @@ import 'requirements/controllers/example.controller.dart';
 import 'requirements/middleware/custom_middleware.dart';
 import 'requirements/requests/blog_request.dart';
 
-Config config = Config();
 String baseUrl = 'http://localhost:${config.serverPort}';
 
 void main() {

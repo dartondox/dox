@@ -6,34 +6,26 @@ import 'package:test/test.dart';
 import 'requirements/config/api_router.dart';
 import 'requirements/handler.dart';
 
-class Config extends AppConfig {
-  @override
-  int get totalIsolate => 1;
+AppConfig isolateConfig = AppConfig(
+  /// application key
+  appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
 
-  @override
-  String get appKey => '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt';
+  /// application server port
+  serverPort: 50010,
 
-  int _serverPort = 50010;
+  /// total multi-thread isolate to run
+  totalIsolate: 1,
 
-  @override
-  int get serverPort => _serverPort;
+  /// response handler
+  responseHandler: ResponseHandler(),
 
-  set serverPort(int val) => _serverPort = val;
+  /// routers
+  routers: <Router>[
+    ApiRouter(),
+  ],
+);
 
-  @override
-  CORSConfig get cors => CORSConfig(
-        allowOrigin: '*',
-      );
-
-  @override
-  ResponseHandlerInterface get responseHandler => ResponseHandler();
-
-  @override
-  List<Router> get routers => <Router>[ApiRouter()];
-}
-
-Config config = Config();
-String baseUrl = 'http://localhost:${config.serverPort}';
+String baseUrl = 'http://localhost:${isolateConfig.serverPort}';
 
 class ExampleService implements DoxService {
   @override
@@ -43,7 +35,7 @@ class ExampleService implements DoxService {
 void main() {
   group('Isolate', () {
     setUpAll(() async {
-      Dox().initialize(config);
+      Dox().initialize(isolateConfig);
       Dox().addService(ExampleService());
       Dox().totalIsolate(5);
       await Dox().startServer();
