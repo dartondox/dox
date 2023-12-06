@@ -10,7 +10,7 @@ dependencies:
   short_uuids: ^2.0.0
   dox_auth: ^2.0.0-alpha.2
   dox_migration: ^1.0.4 
-  dox_core: ^2.0.0-alpha.2
+  dox_core: ^2.0.0-alpha.3
   dox_websocket: ^1.0.0-beta.1
   dox_query_builder: ^1.1.15
 

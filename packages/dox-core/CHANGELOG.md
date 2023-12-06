@@ -1,3 +1,7 @@
+# version 2.0.0-alpha.3
+
+- Restructure app configuration
+
 # version 2.0.0-alpha.2
 
 - Extract websocket as separate package `dox-websocket`
