@@ -23,10 +23,14 @@ class AuthProvider {
   });
 }
 
-abstract class IAuthConfig {
-  String get defaultGuard => 'web';
+class AuthConfig {
+  final String defaultGuard;
+  final Map<String, AuthGuard> guards;
 
-  Map<String, AuthGuard> get guards => <String, AuthGuard>{};
+  AuthConfig({
+    required this.defaultGuard,
+    this.guards = const <String, AuthGuard>{},
+  });
 }
 
 abstract class AuthDriver {
