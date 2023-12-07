@@ -9,7 +9,7 @@ class Auth implements IAuth {
 
   AuthDriver get _driver => AuthEngine().driver;
 
-  static void initialize(IAuthConfig authConfig) {
+  static void initialize(AuthConfig authConfig) {
     AuthEngine().init(authConfig);
   }
 

@@ -17,7 +17,7 @@ class Migration {
   /// main function to run migration
   /// - will create migration table if not exist
   /// - will run migrations from db/migration folder
-  Future<void> migrate({PgEndpoint? endPoint}) async {
+  Future<void> migrate([PgEndpoint? endPoint]) async {
     endPoint = getEndpoint(endPoint);
     pool = PgPool(endPoint);
     await createMigrationTableIfNotExist(pool);

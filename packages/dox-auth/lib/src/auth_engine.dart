@@ -1,7 +1,7 @@
 import 'package:dox_auth/src/interfaces.dart';
 
 class AuthEngine {
-  late IAuthConfig config;
+  late AuthConfig config;
 
   /// get auth guard
   AuthGuard get guard => config.guards[config.defaultGuard]!;
@@ -17,7 +17,7 @@ class AuthEngine {
   factory AuthEngine() => _singleton;
   AuthEngine._internal();
 
-  void init(IAuthConfig authConfig) {
+  void init(AuthConfig authConfig) {
     config = authConfig;
   }
 }
