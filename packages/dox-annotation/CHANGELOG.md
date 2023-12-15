@@ -1,3 +1,7 @@
+## 1.0.5-alpha2.0
+
+- Add IDoxMiddleware interface
+
 ## 1.0.5-alpha1.9
 
 - Remove auth annotation

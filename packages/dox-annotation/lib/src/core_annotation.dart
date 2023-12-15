@@ -7,8 +7,12 @@ abstract class IDox {
 }
 
 abstract class IDoxRequest {
+  late Uri uri;
   String method = 'GET';
   HttpRequest get httpRequest;
+  ContentType? get contentType;
+  String getRouteIdentifier();
+  dynamic getRouteData();
   Map<String, dynamic> get headers;
   String? header(String key);
   void add(String key, dynamic value);
@@ -28,7 +32,8 @@ abstract class IDoxRequest {
   String? referer();
   void validate(Map<String, String> rules,
       {Map<String, String> messages = const <String, String>{}});
-  void mapInputs(Map<String, String> mapper);
+  void processInputMapper(Map<String, String> mapper);
+  Map<String, dynamic> toJson();
 }
 
 abstract class IStorageDriver {
@@ -61,4 +66,8 @@ abstract class IHttpException {
     }
     return message.toString();
   }
+}
+
+abstract class IDoxMiddleware {
+  dynamic handle(IDoxRequest req);
 }
