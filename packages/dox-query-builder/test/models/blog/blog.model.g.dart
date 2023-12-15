@@ -22,7 +22,18 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
 
   set uid(dynamic val) => tempIdValue = val;
 
-  Blog get newQuery => Blog();
+  Blog query() => Blog();
+
+  @override
+  List<String> get tableColumns => <String>[
+        'uid',
+        'title',
+        'status',
+        'body',
+        'deleted_at',
+        'created_at',
+        'updated_at'
+      ];
 
   @override
   List<String> get preloadList => <String>[
@@ -103,8 +114,13 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
       'deleted_at': instance.deletedAt?.toIso8601String(),
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
+      'blog_info': toMap(instance.blogInfo),
+      'blog_infos': toMap(instance.blogInfos),
     };
     map['title'] = Blog.slugTitle(map);
+
+    List<String> preload = getPreload();
+
     return map;
   }
 }

@@ -22,7 +22,11 @@ class SongGenerator extends Model<Song> {
 
   set id(dynamic val) => tempIdValue = val;
 
-  Song get newQuery => Song();
+  Song query() => Song();
+
+  @override
+  List<String> get tableColumns =>
+      <String>['id', 'title', 'created_at', 'updated_at'];
 
   @override
   List<String> get preloadList => <String>[];
@@ -73,6 +77,11 @@ class SongGenerator extends Model<Song> {
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
     };
+
+    List<String> preload = getPreload();
+    if (preload.contains('artists')) {
+      map['artists'] = toMap(instance.artists);
+    }
 
     return map;
   }

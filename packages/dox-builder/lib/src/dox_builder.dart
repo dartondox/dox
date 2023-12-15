@@ -85,7 +85,10 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
 
       ${_primaryKeySetterAndGetter(primaryKey)}
 
-      $className get newQuery => $className();
+      $className query() => $className();
+
+      @override
+      List<String> get tableColumns => <String>[${map['tableColumns'].join(',')}];
 
       @override
       List<String> get preloadList => <String>[
@@ -224,6 +227,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
   _getCodeForToMap(ModelVisitor visitor) {
     String jsonMapper = '';
     String parseContent = '';
+    List<String> tableColumns = [];
     String className = visitor.className;
     visitor.columns.forEach((filedName, values) {
       String? beforeSave = values['beforeSave'];
@@ -240,6 +244,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         parseContent += "map['$jsonKey'] = $className.$beforeSave(map);\n";
       }
       jsonMapper += "'$jsonKey' : $setValue,\n";
+      tableColumns.add("'$jsonKey'");
     });
 
     String toMapRelation = "\nList<String> preload = getPreload();\n";
@@ -262,6 +267,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     return {
       'jsonMapper': jsonMapper,
       'parseContent': parseContent,
+      'tableColumns': tableColumns,
     };
   }
 }

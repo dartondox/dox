@@ -196,7 +196,7 @@ void main() {
       blog.description = "something";
       await blog.save();
 
-      Blog? check = await blog.newQuery.find(blog.uid);
+      Blog? check = await blog.query().find(blog.uid);
       expect(check?.uid, blog.uid);
     });
 
