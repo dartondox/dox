@@ -22,7 +22,11 @@ class BlogInfoGenerator extends Model<BlogInfo> {
 
   set id(dynamic val) => tempIdValue = val;
 
-  BlogInfo get newQuery => BlogInfo();
+  BlogInfo query() => BlogInfo();
+
+  @override
+  List<String> get tableColumns =>
+      <String>['id', 'info', 'blog_id', 'created_at', 'updated_at'];
 
   @override
   List<String> get preloadList => <String>[];
@@ -76,6 +80,11 @@ class BlogInfoGenerator extends Model<BlogInfo> {
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
     };
+
+    List<String> preload = getPreload();
+    if (preload.contains('blog')) {
+      map['blog'] = toMap(instance.blog);
+    }
 
     return map;
   }

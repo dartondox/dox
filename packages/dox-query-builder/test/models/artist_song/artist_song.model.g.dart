@@ -22,7 +22,11 @@ class ArtistSongGenerator extends Model<ArtistSong> {
 
   set id(dynamic val) => tempIdValue = val;
 
-  ArtistSong get newQuery => ArtistSong();
+  ArtistSong query() => ArtistSong();
+
+  @override
+  List<String> get tableColumns =>
+      <String>['id', 'blog_id', 'artist_id', 'created_at', 'updated_at'];
 
   @override
   List<String> get preloadList => <String>[];

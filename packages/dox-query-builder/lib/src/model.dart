@@ -7,6 +7,8 @@ class Model<T> extends QueryBuilder<T> {
 
   List<String> hidden = <String>[];
 
+  List<String> tableColumns = <String>[];
+
   bool _debug = SqlQueryBuilder().debug;
 
   @override
@@ -40,7 +42,7 @@ class Model<T> extends QueryBuilder<T> {
     String? createdAtColumn = timestampsColumn['created_at'];
     String? updatedAtColumn = timestampsColumn['updated_at'];
 
-    Map<String, dynamic> values = toMap();
+    Map<String, dynamic> values = toMap(removeRelations: true);
     if (values[primaryKey] == null) {
       values.removeWhere((String key, dynamic value) => value == null);
 
@@ -106,8 +108,17 @@ class Model<T> extends QueryBuilder<T> {
   /// Map<String, dynamic> m = blog?.toMap();
   /// Map<String, dynamic> m = blog?.toMap(original: true);
   /// ```
-  Map<String, dynamic> toMap(
-      {bool original = false, bool removeHiddenField = false}) {
+  Map<String, dynamic> toMap({
+    bool original = false,
+    bool removeHiddenField = false,
+    bool removeRelations = false,
+  }) {
+    if (removeRelations == true) {
+      List<String> columns = tableColumns;
+      Map<String, dynamic> data = convertToMap(this);
+      data.removeWhere((String key, _) => !columns.contains(key));
+      return data;
+    }
     if (original == true && originalMap.isNotEmpty) {
       return originalMap;
     }
