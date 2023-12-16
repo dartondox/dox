@@ -175,7 +175,7 @@ class Blog extends BlogGenerator {
 ## New query
 
 !!! info
-    If you do not want to create new class and reuse existing class to do new query, use can use `newQuery` attribute.
+    If you do not want to create new class and reuse existing class to do new query, use can use `query()` function.
 
 === "Example"
 
@@ -184,8 +184,8 @@ class Blog extends BlogGenerator {
     List Blog> blogs = await blog.where('status', 'active')
         .where('user', 'super_user').get();
 
-    // reset existing get query and make new one using `newQuery`
-    List Blog> blog = await blog.newQuery
+    // reset existing get query and make new one using `query()`
+    List Blog> blog = await blog.query()
         .where('status', 'deleted').where('user', 'normal').get();
     ```
 
