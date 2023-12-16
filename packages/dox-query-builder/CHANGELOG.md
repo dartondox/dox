@@ -1,3 +1,8 @@
+## 1.1.16
+
+- Bug fixed on save
+- Change `newQuery` to `query()` and deprecate `newQuery`
+
 ## 1.1.15
 
 - Bug fixed on toMap

@@ -1,3 +1,8 @@
+## 1.0.4
+
+- Change `newQuery` to `query()` and deprecate `newQuery`
+- Bug fix on `save()`
+
 ## 1.0.3
 
 - Bug fixed on eager/preload data missing in `toMap` response.

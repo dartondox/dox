@@ -1,3 +1,7 @@
+# version 2.0.0-alpha.4
+
+- Restructure response handler and middleware
+
 # version 2.0.0-alpha.3
 
 - Restructure app configuration
