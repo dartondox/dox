@@ -9,8 +9,21 @@ class WebsocketRouter extends Router {
   void register() {
     Route.websocket('ws', (WebsocketEvent event) {
       event.on('intro', (WebsocketEmitter emitter, dynamic message) {
-        print(message);
         emitter.emit('intro', message);
+      });
+
+      event.on('json', (WebsocketEmitter emitter, dynamic message) {
+        emitter.emit('json_response', message);
+      });
+    });
+
+    Route.websocket('chat', (WebsocketEvent event) {
+      event.on('intro', (WebsocketEmitter emitter, dynamic message) {
+        emitter.emit('intro', message);
+      });
+
+      event.on('json', (WebsocketEmitter emitter, dynamic message) {
+        emitter.emit('json_response', message);
       });
     });
   }

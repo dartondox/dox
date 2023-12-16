@@ -1,4 +1,4 @@
-import 'package:dox_app/models/user/user.model.dart';
+import 'package:dox_app/app/models/user/user.model.dart';
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 

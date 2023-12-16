@@ -1,4 +1,4 @@
-import 'package:dox_app/models/blog/blog.model.dart';
+import 'package:dox_app/app/models/blog/blog.model.dart';
 import 'package:dox_query_builder/dox_query_builder.dart';
 
 part 'category.model.g.dart';

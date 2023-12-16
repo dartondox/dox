@@ -1,6 +1,6 @@
-import 'package:dox_app/http/requests/blog.request.dart';
-import 'package:dox_app/models/blog/blog.model.dart';
-import 'package:dox_app/models/category/category.model.dart';
+import 'package:dox_app/app/http/requests/blog.request.dart';
+import 'package:dox_app/app/models/blog/blog.model.dart';
+import 'package:dox_app/app/models/category/category.model.dart';
 import 'package:dox_query_builder/dox_query_builder.dart';
 
 class BlogService {

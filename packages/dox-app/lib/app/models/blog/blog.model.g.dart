@@ -22,7 +22,7 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
 
   set id(dynamic val) => tempIdValue = val;
 
-  Blog get newQuery => Blog();
+  static Blog query() => Blog();
 
   @override
   List<String> get preloadList => <String>[];

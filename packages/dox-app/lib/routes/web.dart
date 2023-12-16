@@ -1,5 +1,4 @@
-import 'package:dox_app/services/database_service.dart';
-import 'package:dox_auth/dox_auth.dart';
+import 'package:dox_app/config/postgres.dart';
 import 'package:dox_core/dox_core.dart';
 
 class WebRouter extends Router {
@@ -8,13 +7,6 @@ class WebRouter extends Router {
 
   @override
   void register() {
-    Route.get('/auth', <dynamic>[
-      AuthMiddleware.handle,
-      (DoxRequest req) {
-        return 'hello';
-      }
-    ]);
-
     Route.get('/ping', (DoxRequest req) async {
       return 'pong';
     });
@@ -49,7 +41,7 @@ class WebRouter extends Router {
     });
 
     Route.put('/ping', (DoxRequest req) async {
-      return await DatabaseService().pool.query('SELECT * from blog');
+      return await pool.query('SELECT * from blog');
     });
   }
 }
