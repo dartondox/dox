@@ -1,6 +1,6 @@
 name: dox_builder
 description: Dox builder for dox framework
-version: 1.0.3
+version: 1.0.4
 repository: https://github.com/dartondox/dox
 homepage: https://dartondox.dev
 
