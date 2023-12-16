@@ -9,5 +9,3 @@ const String WEB_SOCKET_MESSAGE_KEY = 'message';
 const String WEB_SOCKET_SENDER_KEY = 'sender';
 
 const String WEB_SOCKET_ROOM_KEY = 'room';
-
-const String WEB_SOCKET_DEFAULT_ROOM_NAME = '__default';

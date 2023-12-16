@@ -5,7 +5,9 @@ import 'router.dart';
 
 class ResponseHandler extends ResponseHandlerInterface {
   @override
-  void handle(DoxResponse res) {}
+  DoxResponse handle(DoxResponse res) {
+    return res;
+  }
 }
 
 AppConfig appConfig = AppConfig(
@@ -16,13 +18,13 @@ AppConfig appConfig = AppConfig(
   serverPort: 3004,
 
   /// total multi-thread isolate to run
-  totalIsolate: 3,
+  totalIsolate: 1,
 
   // cors configuration
   cors: CORSConfig(
-    allowOrigin: '*',
-    allowMethods: '*',
-    allowCredentials: true,
+    origin: '*',
+    methods: '*',
+    credentials: true,
   ),
 
   /// response handler

@@ -8,8 +8,13 @@ class WebsocketEmitEvent {
   final String event;
   final List<dynamic> exclude;
 
-  const WebsocketEmitEvent(
-      this.senderId, this.roomId, this.message, this.event, this.exclude);
+  const WebsocketEmitEvent({
+    required this.senderId,
+    required this.roomId,
+    required this.message,
+    required this.event,
+    required this.exclude,
+  });
 
   @override
   toString() {
@@ -25,11 +30,11 @@ class WebsocketEmitEvent {
   static fromString(String json) {
     Map<String, dynamic> jsond = JSON.parse(json);
     return WebsocketEmitEvent(
-      jsond['senderId'],
-      jsond['roomId'],
-      jsond['message'],
-      jsond['event'],
-      jsond['exclude'],
+      senderId: jsond['senderId'],
+      roomId: jsond['roomId'],
+      message: jsond['message'],
+      event: jsond['event'],
+      exclude: jsond['exclude'],
     );
   }
 
@@ -38,8 +43,7 @@ class WebsocketEmitEvent {
       WEB_SOCKET_EVENT_KEY: event,
       WEB_SOCKET_MESSAGE_KEY: message,
       WEB_SOCKET_SENDER_KEY: senderId,
-      WEB_SOCKET_ROOM_KEY:
-          roomId == WEB_SOCKET_DEFAULT_ROOM_NAME ? null : roomId,
+      WEB_SOCKET_ROOM_KEY: roomId,
     });
   }
 }

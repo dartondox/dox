@@ -23,8 +23,8 @@ class WebsocketEmitter {
   /// ```
   /// emitter.room('ABC');
   /// ```
-  WebsocketEmitter room(dynamic id) {
-    _roomId = id;
+  WebsocketEmitter room(dynamic room) {
+    _roomId = room;
     return this;
   }
 
@@ -35,8 +35,13 @@ class WebsocketEmitter {
   void emitToSender(String event, dynamic message) {
     WebsocketInfo? info = _storage.getWebSocketInfo(sender);
     if (info != null) {
-      WebsocketEmitEvent emitEvent =
-          WebsocketEmitEvent(sender, _roomId, message, event, []);
+      WebsocketEmitEvent emitEvent = WebsocketEmitEvent(
+        senderId: sender,
+        roomId: _roomId,
+        message: message,
+        event: event,
+        exclude: [],
+      );
 
       /// we do not need to send via adaptor
       /// since sender will be always on the same isolate
@@ -45,7 +50,7 @@ class WebsocketEmitter {
     }
   }
 
-  /// set message except the sender
+  /// sent message except the sender
   /// ```
   /// emitter.emitExceptSender('event', message);
   /// ```
@@ -53,14 +58,19 @@ class WebsocketEmitter {
     emit(event, message, exclude: <String>[sender]);
   }
 
-  /// set message to everyone in the room
+  /// sent message to everyone in the room
   /// ```
   /// emitter.emit('event', message);
   /// ```
   void emit(String event, dynamic message,
       {List<String> exclude = const <String>[]}) {
-    WebsocketEmitEvent emitEvent =
-        WebsocketEmitEvent(sender, _roomId, message, event, exclude);
+    WebsocketEmitEvent emitEvent = WebsocketEmitEvent(
+      senderId: sender,
+      roomId: _roomId,
+      message: message,
+      event: event,
+      exclude: exclude,
+    );
 
     WebsocketAdapterInterface? adapter = WebsocketServer().getAdapter();
 
@@ -70,7 +80,6 @@ class WebsocketEmitter {
       emitEventToSockets(emitEvent);
       return;
     }
-
     adapter.emit(emitEvent);
   }
 
