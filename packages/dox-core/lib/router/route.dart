@@ -5,7 +5,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/utils.dart';
 
-/// get list of routes registered
+/// list of routes registered
 List<RouteData> _routes = <RouteData>[];
 
 class Route {
@@ -16,6 +16,8 @@ class Route {
 
   String _prefix = '';
   String? _domain;
+  bool? _corsEnabled;
+
   List<dynamic> _preMiddleware = <dynamic>[];
 
   /// get list of routes registered
@@ -59,6 +61,43 @@ class Route {
 
     /// restore original domain
     Route()._domain = originalDomain;
+  }
+
+  /// group of route to enabled cors
+  /// ```
+  /// Route.enabledCors(() {
+  ///   Route.get('/ping', controller);
+  /// });
+  /// ```
+  static void enabledCors(Function() callback) {
+    _cors(true, callback);
+  }
+
+  // group of route to disabled cors
+  /// ```
+  /// Route.disabledCors() {
+  ///   Route.get('/ping', controller);
+  /// });
+  /// ```
+  static void disabledCors(Function() callback) {
+    _cors(false, callback);
+  }
+
+  /// group of route to enable/disable cors
+  /// ```
+  /// Route.cors(true, () {
+  ///   Route.get('/ping', controller);
+  /// });
+  /// ```
+  static void _cors(bool enabled, Function() callback) {
+    bool? originalCorsConfig = Route()._corsEnabled;
+
+    /// set new domain
+    Route()._corsEnabled = enabled;
+    callback();
+
+    /// restore original domain
+    Route()._corsEnabled = originalCorsConfig;
   }
 
   /// middleware for group of routes
@@ -260,7 +299,7 @@ class Route {
   /// resource route
   /// ```
   /// Route.resource('blog', BlogController());
-  ///
+  /// ```
   static Route resource(String route, dynamic controller) {
     String prefix = '${Route()._prefix}/$route';
 
@@ -327,6 +366,7 @@ class Route {
       path: path,
       controllers: controllers,
       domain: _domain,
+      corsEnabled: _corsEnabled,
     ));
     return this;
   }

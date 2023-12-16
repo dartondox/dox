@@ -22,7 +22,7 @@ Future<dynamic> middlewareAndControllerHandler(DoxRequest doxReq) async {
 
     /// DoxMiddleware class
     /// with handle function
-    if (fn is DoxMiddleware) {
+    if (fn is IDoxMiddleware) {
       result = await fn.handle(doxReq);
     }
 
@@ -68,7 +68,7 @@ Future<dynamic> _handleController(
       FormRequest? formReq = Dox().ioc.getByName(requestName);
       if (formReq != null && _isFormRequestTypeMatched(fn, formReq)) {
         /// mapping request inputs field
-        doxRequest.mapInputs(formReq.mapInputs());
+        doxRequest.processInputMapper(formReq.mapInputs());
 
         /// setting dox request to custom form request
         formReq.setRequest(doxRequest);

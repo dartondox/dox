@@ -2,20 +2,22 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 
-void httpCorsHandler(HttpRequest req) {
+void httpCorsHandler(bool? enabled, HttpRequest req) {
   CORSConfig cors = Dox().config.cors;
+  if (enabled ?? cors.enabled) {
+    Map<String, dynamic> headers = <String, dynamic>{
+      HttpHeaders.accessControlAllowOriginHeader: cors.origin,
+      HttpHeaders.accessControlAllowMethodsHeader: cors.methods,
+      HttpHeaders.accessControlAllowHeadersHeader: cors.headers,
+      HttpHeaders.accessControlExposeHeadersHeader: cors.exposeHeaders,
+      HttpHeaders.accessControlAllowCredentialsHeader: cors.credentials,
+      HttpHeaders.accessControlMaxAgeHeader: cors.maxAge,
+    };
 
-  Map<String, dynamic> headers = <String, dynamic>{
-    HttpHeaders.accessControlAllowOriginHeader: cors.allowOrigin,
-    HttpHeaders.accessControlAllowMethodsHeader: cors.allowMethods,
-    HttpHeaders.accessControlAllowHeadersHeader: cors.allowHeaders,
-    HttpHeaders.accessControlExposeHeadersHeader: cors.exposeHeaders,
-    HttpHeaders.accessControlAllowCredentialsHeader: cors.allowCredentials,
-  };
-
-  headers.forEach((String key, dynamic value) {
-    _setCorsValue(req.response, key, value);
-  });
+    headers.forEach((String key, dynamic value) {
+      _setCorsValue(req.response, key, value);
+    });
+  }
 }
 
 // set cors in header

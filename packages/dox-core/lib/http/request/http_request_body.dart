@@ -7,7 +7,11 @@ class HttpBody {
   static Future<Map<String, dynamic>> read(HttpRequest request) async {
     if (HttpBody.isJson(request.headers.contentType)) {
       String bodyString = await utf8.decoder.bind(request).join();
-      return jsonDecode(bodyString);
+      try {
+        return jsonDecode(bodyString);
+      } catch (err) {
+        return <String, dynamic>{};
+      }
     }
 
     if (HttpBody.isFormData(request.headers.contentType)) {

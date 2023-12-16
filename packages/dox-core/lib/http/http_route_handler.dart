@@ -16,10 +16,10 @@ RouteData? httpRouteHandler(HttpRequest req) {
   if (route == null) {
     /// return 200 status on preflight OPTIONS Method
     if (req.method == HttpRequestMethod.OPTIONS.name) {
-      httpResponseHandler(null, req);
+      responseDataHandler(null, req);
     } else {
       req.response.statusCode = HttpStatus.notFound;
-      httpResponseHandler('${req.method} ${req.uri.path} not found', req);
+      responseDataHandler('${req.method} ${req.uri.path} not found', req);
     }
   }
   return route;

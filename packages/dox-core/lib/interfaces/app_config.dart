@@ -3,8 +3,8 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/logger.dart';
 
 void defaultErrorHandler(Object? error, StackTrace stackTrace) {
-  DoxLogger.warn(error);
-  DoxLogger.danger(stackTrace.toString());
+  Logger.warn(error);
+  Logger.danger(stackTrace.toString());
 }
 
 class AppConfig {
@@ -19,6 +19,7 @@ class AppConfig {
   final CORSConfig cors;
   final CacheConfig cache;
   final FileStorageConfig fileStorage;
+  final LoggerConfig logger;
   final List<DoxService> services;
 
   AppConfig({
@@ -30,6 +31,7 @@ class AppConfig {
     this.globalMiddleware = const <dynamic>[],
     this.routers = const <Router>[],
     this.cors = const CORSConfig(),
+    this.logger = const LoggerConfig(),
     this.cache = const CacheConfig(),
     this.fileStorage = const FileStorageConfig(),
     this.errorHandler = defaultErrorHandler,
@@ -38,18 +40,36 @@ class AppConfig {
 }
 
 class CORSConfig {
-  final dynamic allowOrigin;
-  final dynamic allowMethods;
-  final dynamic allowHeaders;
+  final bool enabled;
+  final dynamic origin;
+  final dynamic methods;
+  final dynamic headers;
   final dynamic exposeHeaders;
-  final bool? allowCredentials;
+  final bool? credentials;
+  final num? maxAge;
 
   const CORSConfig({
-    this.allowOrigin,
-    this.allowMethods,
-    this.allowHeaders,
+    this.enabled = true,
+    this.origin,
+    this.methods,
+    this.headers,
     this.exposeHeaders,
-    this.allowCredentials,
+    this.credentials,
+    this.maxAge,
+  });
+}
+
+class LoggerConfig {
+  final String name;
+  final bool enabled;
+  final bool prettyPrint;
+  final String level;
+
+  const LoggerConfig({
+    this.name = '',
+    this.enabled = false,
+    this.prettyPrint = false,
+    this.level = 'info',
   });
 }
 

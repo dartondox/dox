@@ -19,9 +19,10 @@ AppConfig config = AppConfig(
 
   // cors configuration
   cors: CORSConfig(
-    allowOrigin: '*',
-    allowMethods: <String>['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
-    allowCredentials: true,
+    enabled: false,
+    origin: '*',
+    methods: <String>['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
+    credentials: true,
   ),
 
   /// response handler
@@ -42,7 +43,7 @@ AppConfig config = AppConfig(
 
   /// error handler
   errorHandler: (Object? error, StackTrace stackTrace) {
-    DoxLogger.danger(error);
+    Logger.danger(error);
   },
 
   /// cache driver configuration

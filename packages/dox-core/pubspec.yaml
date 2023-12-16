@@ -14,7 +14,7 @@ dependencies:
   mime: ^1.0.4
   string_scanner: ^1.1.0
   uuid: ^3.0.6
-  dox_annotation: ^1.0.5-alpha1.9
+  dox_annotation: ^1.0.5-alpha2.0
 
 dev_dependencies:
   lints: ^2.0.0

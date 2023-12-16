@@ -9,7 +9,7 @@ class ApiRouter extends Router {
   @override
   void register() {
     Route.use(customMiddleware);
-    Route.use(<DoxMiddleware>[ClassBasedMiddleware()]);
+    Route.use(<IDoxMiddleware>[ClassBasedMiddleware()]);
 
     Route.get('ping', (DoxRequest req) => 'pong');
   }

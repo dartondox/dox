@@ -23,13 +23,14 @@ class Env {
   /// Evn.get('APP_KEY', 'with_default_value_if_null');
   /// Evn.get<int>('PORT', 3000); (This will return int type)
   /// Evn.get<num>('PORT', 3000); (This will return num type)
-  /// Evn.get<String>('APP_KEY'); (This will return type String)
-  /// Current this function support String, int and num types.
+  /// Evn.get<String>('APP_KEY'); (This will return String type)
+  /// Currently this function support String, int and num types.
   /// ```
   static T get<T>(String key, [dynamic defaultValue]) {
     String value = Env().env[key].toString();
-    String val =
-        value.isEmpty || value.toLowerCase() == 'null' ? defaultValue : value;
+    String val = value.isEmpty || value.toLowerCase() == 'null'
+        ? defaultValue.toString()
+        : value;
     if (T.toString() == 'int') {
       return int.parse(val) as T;
     }

@@ -4,9 +4,9 @@ DoxRequest customMiddleware(DoxRequest req) {
   return req;
 }
 
-class ClassBasedMiddleware implements DoxMiddleware {
+class ClassBasedMiddleware implements IDoxMiddleware {
   @override
-  DoxRequest handle(DoxRequest req) {
+  IDoxRequest handle(IDoxRequest req) {
     return req;
   }
 }

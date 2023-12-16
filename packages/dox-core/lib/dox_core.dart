@@ -11,7 +11,6 @@ export 'constants/constants.dart';
 export 'env/env.dart';
 
 /// Exceptions
-
 export 'exception/internal_error_exception.dart';
 export 'exception/not_found_exception.dart';
 export 'exception/query_exception.dart';
@@ -29,15 +28,13 @@ export 'http/response/serializer.dart';
 
 /// interfaces
 export 'interfaces/app_config.dart';
-
-/// auth
-export 'interfaces/dox_middleware.dart';
 export 'interfaces/dox_service.dart';
 export 'interfaces/response_handler_interface.dart';
 export 'interfaces/router.dart';
 
 /// Tools
 export 'ioc/ioc_container.dart';
+export 'middleware/log_middleware.dart';
 
 /// Router
 export 'router/route.dart';
