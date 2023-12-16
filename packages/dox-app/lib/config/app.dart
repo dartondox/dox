@@ -1,51 +1,80 @@
+import 'package:dox_app/app/http/handler.dart';
 import 'package:dox_app/config/cache.dart';
 import 'package:dox_app/config/cors.dart';
+import 'package:dox_app/config/logger.dart';
 import 'package:dox_app/config/services.dart';
 import 'package:dox_app/config/storage.dart';
-import 'package:dox_app/http/handler.dart';
-import 'package:dox_app/http/requests/blog.request.dart';
 import 'package:dox_app/routes/api.dart';
 import 'package:dox_app/routes/web.dart';
 import 'package:dox_app/routes/websocket.dart';
 import 'package:dox_core/dox_core.dart';
 
 AppConfig appConfig = AppConfig(
-  /// application key
-  appKey: Env.get('APP_KEY'),
+  /// Application secret key
+  /// -------------------------------
+  /// This key is use to encrypt/decrypt the data such as cache and cookies.
+  /// Make sure to keep the `APP_KEY` as an environment variable and secure.
+  ///
+  /// Note: Changing the application key for an existing app will make all
+  /// the cookies and cache invalid and also the existing encrypted data
+  /// will not be decrypted.
+  appKey: Env.get<String>('APP_KEY'),
 
-  /// application server port
-  serverPort: int.parse(Env.get('APP_PORT', 3000)),
+  /// Server port
+  /// -------------------------------
+  /// App will be running on this port.
+  serverPort: Env.get<int>('APP_PORT', 3000),
 
-  /// total multi-thread isolate to run
-  totalIsolate: 6,
+  /// Total isolate (multi thread)
+  /// -------------------------------
+  /// Total isolate to run the application.
+  /// Depending on your machine CPU and RAM, you can adjust the the number
+  /// of isolates. The more isolate application have, the more it can handle
+  /// concurrency requests.
+  totalIsolate: Env.get<int>('APP_TOTAL_ISOLATE', 6),
 
-  /// global middleware
-  globalMiddleware: <dynamic>[],
+  /// Form requests
+  /// -------------------------------
+  /// Register form request to dox in order to inject into the controller.
+  /// Example,
+  /// {
+  ///   BlogRequest : () => BlogRequest(),
+  ///   UserRequest : () => UserRequest(),
+  /// }
+  formRequests: <Type, FormRequest Function()>{},
 
-  /// form requests
-  formRequests: <Type, FormRequest Function()>{
-    BlogRequest: () => BlogRequest(),
-  },
+  /// Global middleware
+  /// -------------------------------
+  /// By registering global middleware here,
+  /// middleware will be applied to all the routes.
+  globalMiddleware: <dynamic>[
+    LogMiddleware(enabled: true),
+  ],
 
-  /// routers
+  /// Routers
+  /// -------------------------------
+  /// Register routers to create route to dox framework.
   routers: <Router>[
     WebRouter(),
     ApiRouter(),
     WebsocketRouter(),
   ],
 
-  /// response handler
+  /// Response handler
   responseHandler: ResponseHandler(),
 
-  /// service to run on multithread server
-  services: services,
-
-  /// cors configuration
-  cors: cors,
-
-  /// cache driver configuration
+  /// Cache driver configuration
   cache: cache,
 
-  /// file storage driver configuration
+  /// File storage driver configuration
   fileStorage: storage,
+
+  /// Cors configuration
+  cors: cors,
+
+  /// Service to run on multithread server
+  services: services,
+
+  /// logger configuration
+  logger: logger,
 );

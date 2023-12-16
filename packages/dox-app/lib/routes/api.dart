@@ -1,6 +1,6 @@
-import 'package:dox_app/http/controllers/api.controller.dart';
-import 'package:dox_app/http/controllers/auth.controller.dart';
-import 'package:dox_app/http/controllers/blog.controller.dart';
+import 'package:dox_app/app/http/controllers/api.controller.dart';
+import 'package:dox_app/app/http/controllers/auth.controller.dart';
+import 'package:dox_app/app/http/controllers/blog.controller.dart';
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 
@@ -24,7 +24,7 @@ class ApiRouter extends Router {
     Route.post('/auth/login', authController.login);
     Route.post('/auth/register', authController.register);
     Route.get('/auth/user', <dynamic>[
-      AuthMiddleware.handle,
+      AuthMiddleware(),
       authController.user,
     ]);
   }

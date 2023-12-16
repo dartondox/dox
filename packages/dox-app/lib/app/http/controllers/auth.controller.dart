@@ -1,6 +1,8 @@
-import 'package:dox_app/models/user/user.model.dart';
+import 'package:dox_app/app/http/serializers/user.serializer.dart';
+import 'package:dox_app/app/models/user/user.model.dart';
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/utils/logger.dart';
 
 class AuthController {
   Future<dynamic> login(DoxRequest req) async {
@@ -25,7 +27,6 @@ class AuthController {
 
   Future<dynamic> register(DoxRequest req) async {
     User user = User();
-    user.debug(true);
     user.name = 'AJ';
     user.email = 'aj@mail.com';
     user.password = Hash.make('password');
@@ -34,9 +35,10 @@ class AuthController {
   }
 
   Future<dynamic> user(DoxRequest req) async {
-    if (req.auth?.isLoggedIn() == true) {
-      return req.auth?.user();
+    IAuth? auth = req.auth;
+    if (auth?.isLoggedIn() == true) {
+      Logger.info('${auth?.user<User>()?.name} is logged in');
+      return UserSerializer(auth?.user());
     }
-    throw UnAuthorizedException(message: 'reach to controller');
   }
 }

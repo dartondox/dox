@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'user.model.dart';
+part of 'category.model.dart';
 
 // **************************************************************************
 // Generator: DoxModelBuilder
@@ -8,7 +8,7 @@ part of 'user.model.dart';
 
 // ignore_for_file: always_specify_types
 
-class UserGenerator extends Model<User> with SoftDeletes<User> {
+class CategoryGenerator extends Model<Category> {
   @override
   String get primaryKey => 'id';
 
@@ -18,30 +18,50 @@ class UserGenerator extends Model<User> with SoftDeletes<User> {
         'updated_at': 'updated_at',
       };
 
-  @override
-  String get tableName => 'users';
-
   int? get id => tempIdValue;
 
   set id(dynamic val) => tempIdValue = val;
 
-  User get newQuery => User();
+  static Category query() => Category();
 
   @override
   List<String> get preloadList => <String>[];
 
   @override
-  Map<String, Function> get relationsResultMatcher => <String, Function>{};
+  Map<String, Function> get relationsResultMatcher => <String, Function>{
+        'blogs': getBlogs,
+      };
 
   @override
-  Map<String, Function> get relationsQueryMatcher => <String, Function>{};
+  Map<String, Function> get relationsQueryMatcher => <String, Function>{
+        'blogs': queryBlogs,
+      };
+
+  static Future<void> getBlogs(List<Model<Category>> list) async {
+    var result = await getManyToMany<Category, Blog>(queryBlogs(list), list);
+    for (dynamic i in list) {
+      if (result[i.tempIdValue.toString()] != null) {
+        i.blogs = result[i.tempIdValue.toString()]!;
+      }
+    }
+  }
+
+  static Blog? queryBlogs(List<Model<Category>> list) {
+    return manyToMany<Category, Blog>(
+      list,
+      () => Blog(),
+      localKey: 'id',
+      relatedKey: 'id',
+      pivotForeignKey: 'category_id',
+      pivotRelatedForeignKey: 'blog_id',
+      onQuery: Category.onQueryActiveUser,
+    );
+  }
 
   @override
-  User fromMap(Map<String, dynamic> m) => User()
+  Category fromMap(Map<String, dynamic> m) => Category()
     ..id = m['id'] as int?
     ..name = m['name'] as String?
-    ..email = m['email'] as String?
-    ..password = m['password'] as String?
     ..createdAt = m['created_at'] == null
         ? null
         : DateTime.parse(m['created_at'] as String)
@@ -51,15 +71,18 @@ class UserGenerator extends Model<User> with SoftDeletes<User> {
 
   @override
   Map<String, dynamic> convertToMap(dynamic i) {
-    User instance = i as User;
+    Category instance = i as Category;
     Map<String, dynamic> map = <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
-      'email': instance.email,
-      'password': instance.password,
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
     };
+
+    List<String> preload = getPreload();
+    if (preload.contains('blogs')) {
+      map['blogs'] = toMap(instance.blogs);
+    }
 
     return map;
   }

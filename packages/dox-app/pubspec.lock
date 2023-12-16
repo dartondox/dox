@@ -231,14 +231,14 @@ packages:
       path: "../dox-annotation"
       relative: true
     source: path
-    version: "1.0.5-alpha1.9"
+    version: "1.0.5-alpha2.0"
   dox_auth:
     dependency: "direct main"
     description:
       path: "../dox-auth"
       relative: true
     source: path
-    version: "2.0.0-alpha.2"
+    version: "2.0.0-alpha.3"
   dox_builder:
     dependency: "direct dev"
     description:
@@ -259,7 +259,7 @@ packages:
       path: "../dox-migration"
       relative: true
     source: path
-    version: "1.0.4"
+    version: "2.0.0-alpha.1"
   dox_query_builder:
     dependency: "direct main"
     description:

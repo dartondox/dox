@@ -1,8 +1,8 @@
 import 'package:dox_core/dox_core.dart';
 
-class CustomMiddleware extends DoxMiddleware {
+class CustomMiddleware extends IDoxMiddleware {
   @override
-  DoxRequest handle(DoxRequest req) {
+  IDoxRequest handle(IDoxRequest req) {
     /// write your logic here
     return req;
   }
