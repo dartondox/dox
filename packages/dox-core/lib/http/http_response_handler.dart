@@ -8,22 +8,35 @@ dynamic httpResponseHandler(
   dynamic payload,
   HttpRequest request,
 ) {
-  /// websocket handler will return websocket payload
+  /// Websocket handler will return websocket payload
   /// and in this case we need to remain the connection open for
-  /// websocket communication. so there is no `res.close()`;
+  /// websocket communication. So there is no `res.close()` required.
   if (payload is WebSocket) {
     return;
   }
 
-  /// if payload is DoxResponse, DoxResponse have process function
-  /// which will set header and status code in the response
-  /// and will pass payload/content back to this function `httpResponseHandler`
-  /// where the payload is not DoxResponse anymore
-  /// so it will continue belows process
-  if (payload is DoxResponse) {
-    return payload.process(request);
+  /// If there is responseHandler set, handle responseHandler
+  /// before DoxResponse process. The responseHandler will return
+  /// DoxResponse to process
+  ResponseHandlerInterface? customResponseHandler = DoxServer().responseHandler;
+  if (customResponseHandler != null) {
+    DoxResponse doxResponse = customResponseHandler
+        .handle(payload is DoxResponse ? payload : DoxResponse(payload));
+    payload = doxResponse;
   }
 
+  /// If payload is DoxResponse, DoxResponse have process function
+  /// which will set header and status code in the response
+  /// and will pass payload/content to `responseDataHandler` function.
+  if (payload is DoxResponse) {
+    payload.process(request);
+    return;
+  }
+}
+
+/// Handle response for different types of data
+/// such as string, stream, Model, List, encodable.
+void responseDataHandler(dynamic payload, HttpRequest request) {
   HttpResponse res = request.response;
 
   if (payload == null) {
@@ -38,6 +51,8 @@ dynamic httpResponseHandler(
     return;
   }
 
+  /// if payload is downloadable file,
+  /// we response contentDisposition header with stream data.
   if (payload is DownloadableFile) {
     res.headers.contentType = payload.contentType;
     res.headers.add(FILE_DOWNLOAD_HEADER, payload.contentDisposition);
@@ -49,15 +64,6 @@ dynamic httpResponseHandler(
   if (payload is Stream<List<int>>) {
     res.addStream(payload).then((_) => res.close());
     return;
-  }
-
-  /// if there is responseHandler we handle responseHandler and
-  /// get new payload and override existing payload
-  if (DoxServer().responseHandler != null) {
-    dynamic result = DoxServer().responseHandler?.handle(DoxResponse(payload));
-    if (result != null) {
-      payload = result;
-    }
   }
 
   /// if payload handle base Http Exception

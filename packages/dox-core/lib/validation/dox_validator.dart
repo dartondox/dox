@@ -99,7 +99,7 @@ class DoxValidator {
     String args = parts.length >= 2 ? parts[1] : '';
     Map<String, dynamic>? match = _matchings[ruleKey];
     if (match == null) {
-      DoxLogger.warn("$ruleKey rule doesn't exist.");
+      Logger.warn("$ruleKey rule doesn't exist.");
       return null;
     }
 

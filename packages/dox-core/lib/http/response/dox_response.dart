@@ -6,7 +6,7 @@ import 'package:dox_core/http/http_response_handler.dart';
 class DoxResponse {
   /// content can be anything
   /// String, int, Map, json serializable object, Stream<List<int>>
-  dynamic content;
+  dynamic _contentData;
 
   Map<String, dynamic> _headers = <String, dynamic>{};
   int? _statusCode;
@@ -16,16 +16,15 @@ class DoxResponse {
 
   /// content can be anything
   /// String, int, Map, json serializable object, Stream<List<int>>
-  DoxResponse(this.content) {
-    if (content is StreamFile) {
-      _contentType = content.contentType;
-      content = content.stream;
+  DoxResponse(this._contentData) {
+    if (_contentData is StreamFile) {
+      _contentType = _contentData.contentType;
     }
 
-    if (content is DownloadableFile) {
-      header(FILE_DOWNLOAD_HEADER, content.contentDisposition);
-      _contentType = content.contentType;
-      content = content.stream;
+    if (_contentData is DownloadableFile) {
+      header(FILE_DOWNLOAD_HEADER, _contentData.contentDisposition);
+      _contentType = _contentData.contentType;
+      _contentData = _contentData.stream;
     }
   }
 
@@ -38,8 +37,29 @@ class DoxResponse {
     return this;
   }
 
+  /// Set response status code default 200
+  /// ```
+  /// res.setContent({"foo": "bar"});
+  /// ```
+  DoxResponse content(dynamic content) {
+    _contentData = content;
+    return this;
+  }
+
+  /// Get original content data
+  /// ```
+  /// res.getContent();
+  /// ```
+  dynamic getContent() {
+    return _contentData;
+  }
+
+  /// set stream data to response
+  /// ```
+  /// res.stream(streamData);
+  /// ```
   DoxResponse stream(Stream<List<int>> stream) {
-    content = stream;
+    content(stream);
     return this;
   }
 
@@ -103,7 +123,7 @@ class DoxResponse {
     for (String cookie in _cookies) {
       request.response.headers.add(HttpHeaders.setCookieHeader, cookie);
     }
-    return httpResponseHandler(content, request);
+    return responseDataHandler(_contentData, request);
   }
 }
 

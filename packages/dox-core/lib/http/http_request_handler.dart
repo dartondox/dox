@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_controller_handler.dart';
+import 'package:dox_core/http/http_cors_handler.dart';
 import 'package:dox_core/http/http_error_handler.dart';
 import 'package:dox_core/http/http_response_handler.dart';
 import 'package:dox_core/http/http_route_handler.dart';
@@ -16,6 +17,8 @@ void httpRequestHandler(HttpRequest req) {
   try {
     RouteData? route = httpRouteHandler(req);
     if (route == null) return;
+
+    httpCorsHandler(route.corsEnabled, req);
 
     if (WebSocketTransformer.isUpgradeRequest(req)) {
       httpWebSocketHandler(req, route);

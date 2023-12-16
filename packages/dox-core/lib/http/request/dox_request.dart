@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
@@ -8,13 +9,20 @@ import 'package:dox_core/validation/dox_validator.dart';
 
 class DoxRequest implements IDoxRequest {
   final RouteData route;
-  final Uri uri;
-  final ContentType? contentType;
+
   final HttpHeaders httpHeaders;
+
+  @override
+  final ContentType? contentType;
+
   @override
   final HttpRequest httpRequest;
 
+  @override
+  late Uri uri;
+
   final String? clientIp;
+
   @override
   String method = 'GET';
 
@@ -39,6 +47,19 @@ class DoxRequest implements IDoxRequest {
     query = uri.queryParameters;
     _allRequest = <String, dynamic>{...query, ...body};
     _getCookies();
+  }
+
+  /// get route identifier
+  @override
+  String getRouteIdentifier() {
+    return base64.encode(
+        utf8.encode('${route.method}|${route.domain ?? ''}${route.path}'));
+  }
+
+  /// get route identifier
+  @override
+  RouteData getRouteData() {
+    return route;
   }
 
   /// http request data is form data
@@ -232,9 +253,9 @@ class DoxRequest implements IDoxRequest {
     }
   }
 
-  /// map request input keys
+  /// map the request input keys
   @override
-  void mapInputs(Map<String, String> mapper) {
+  void processInputMapper(Map<String, String> mapper) {
     mapper.forEach((String from, String to) {
       if (from != to) {
         dynamic temp = _allRequest[from];
@@ -244,7 +265,8 @@ class DoxRequest implements IDoxRequest {
     });
   }
 
-  /// support JSON.stringify to convert json
+  /// To support jsonEncode
+  @override
   Map<String, dynamic> toJson() {
     Map<String, dynamic> ret = <String, dynamic>{};
     _allRequest.forEach((String key, dynamic value) {

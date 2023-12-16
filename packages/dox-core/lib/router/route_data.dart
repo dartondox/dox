@@ -9,11 +9,13 @@ class RouteData {
   FormRequest Function()? formRequest;
 
   final String? domain;
+  final bool? corsEnabled;
 
   RouteData({
     required this.method,
     required this.path,
     required this.controllers,
+    this.corsEnabled,
     this.preMiddleware = const <dynamic>[],
     this.domain,
   });
