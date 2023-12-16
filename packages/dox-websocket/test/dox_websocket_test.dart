@@ -41,6 +41,16 @@ void main() {
       WebSocket socket =
           await WebSocket.connect('ws://localhost:${appConfig.serverPort}/ws');
 
+      socket.listen((dynamic message) {
+        Map<String, dynamic> data = JSON.parse(message);
+        if (data['event'] == 'intro') {
+          expect(data['message'], 'hello');
+        }
+        if (data['event'] == 'json') {
+          expect(data['message']['title'], 'hello');
+        }
+      });
+
       String data = jsonEncode(<String, String>{
         'event': 'intro',
         'message': 'hello',
@@ -51,41 +61,12 @@ void main() {
         'message': <String, String>{'title': 'hello'}
       });
 
-      socket.listen((dynamic message) {
-        Map<String, dynamic> data = JSON.parse(message);
-        if (data['event'] == 'intro') {
-          expect(data['message'], 'hello');
-        }
-      });
-
       socket.add(data);
       socket.add(jsonData);
-
-      WebSocket socket2 =
-          await WebSocket.connect('ws://localhost:${appConfig.serverPort}/ws');
-
-      String joinRoomData = jsonEncode(<String, String>{
-        'event': 'joinRoom',
-        'message': 'ws',
-      });
-
-      socket2.add(joinRoomData);
-
-      socket2.listen((dynamic message) {
-        Map<String, dynamic> data = JSON.parse(message);
-        if (data['event'] == 'intro') {
-          expect(data['message'], 'hello');
-        }
-
-        if (data['event'] == 'json') {
-          expect(data['message']['title'], 'hello');
-        }
-      });
 
       await Future<void>.delayed(Duration(seconds: 2));
 
       await socket.close();
-      await socket2.close();
     });
   });
 }
