@@ -6,8 +6,9 @@ import 'package:dox_query_builder/dox_query_builder.dart';
 
 const String AUTH_REQUEST_KEY = 'dox_authentication_instance';
 
-class AuthMiddleware {
-  static Future<IDoxRequest> handle(IDoxRequest req) async {
+class AuthMiddleware implements IDoxMiddleware {
+  @override
+  Future<IDoxRequest> handle(IDoxRequest req) async {
     Auth auth = Auth();
 
     // verify token from header and get user data from database
