@@ -6,10 +6,12 @@ String _getSample(className, filename) {
   return '''
 import 'package:dox_core/dox_core.dart';
 
-class ${className}Middleware extends DoxMiddleware {
+class ${className}Middleware extends IDoxMiddleware {
   @override
-  handle(DoxRequest req) {
+  dynamic handle(IDoxRequest req) {
     /// add your logic here
+    /// return req (IDoxRequest) to process next to the controller
+    /// or throw an error or return Map, String, List etc to return 200 response
     return req;
   }
 }
@@ -20,7 +22,7 @@ bool createMiddleware(String filename) {
   filename = filename.toLowerCase().replaceAll('middleware', '');
   filename = pascalToSnake(filename);
   String className = snakeToPascal(filename);
-  String path = '${Directory.current.path}/lib/http/middleware/';
+  String path = '${Directory.current.path}/lib/app/http/middleware/';
   String middlewareName = '$filename.middleware';
   final file = File('$path$filename.middleware.dart');
 

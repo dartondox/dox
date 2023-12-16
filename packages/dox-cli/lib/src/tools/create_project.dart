@@ -12,7 +12,7 @@ createProject(projectName) async {
   Process.runSync('git', [
     'clone',
     '-b',
-    'main',
+    'v2.x',
     'https://github.com/necessarylion/dox-sample.git',
     projectName
   ]);
