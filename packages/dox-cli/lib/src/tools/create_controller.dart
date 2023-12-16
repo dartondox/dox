@@ -7,19 +7,21 @@ String _getSample(className, filename) {
 import 'package:dox_core/dox_core.dart';
 
 class ${className}Controller {
-  index(DoxRequest req) async {
-    return 'Support String, Map, Model, List and List<Model> to return';
+  Future<dynamic> index(DoxRequest req) async {
+    /// write your logic here
   }
 }
+
+${className}Controller ${toPascalWithFirstLetterLowerCase(className)}Controller = ${className}Controller();
 ''';
 }
 
 String _getWsSample(className, filename) {
   return '''
-import 'package:dox_core/dox_core.dart';
+import 'package:dox_websocket/dox_websocket.dart';
 
 class ${className}Controller {
-  index(SocketEmitter emitter, message) async {
+  void index(WebsocketEmitter emitter, dynamic message) async {
     /// write your logic here
   }
 }
@@ -32,26 +34,28 @@ import 'package:dox_core/dox_core.dart';
 
 class ${className}Controller {
   /// GET /resource
-  index(DoxRequest req) async {}
+  Future<dynamic> index(DoxRequest req) async {}
 
   /// GET /resource/create
-  create(DoxRequest req) async {}
+  Future<dynamic> create(DoxRequest req) async {}
 
   /// POST /resource
-  store(DoxRequest req) async {}
+  Future<dynamic> store(DoxRequest req) async {}
 
   /// GET /resource/{id}
-  show(DoxRequest req, String id) async {}
+  Future<dynamic> show(DoxRequest req, String id) async {}
 
   /// GET /resource/{id}/edit
-  edit(DoxRequest req, String id) async {}
+  Future<dynamic> edit(DoxRequest req, String id) async {}
 
   /// PUT|PATCH /resource/{id}
-  update(DoxRequest req, String id) async {}
+  Future<dynamic> update(DoxRequest req, String id) async {}
 
   /// DELETE /resource/{id}
-  destroy(DoxRequest req, String id) async {}
+  Future<dynamic> destroy(DoxRequest req, String id) async {}
 }
+
+${className}Controller ${toPascalWithFirstLetterLowerCase(className)}Controller = ${className}Controller();
 ''';
 }
 
@@ -59,7 +63,7 @@ bool createController(String filename, bool resource) {
   filename = filename.toLowerCase().replaceAll('controller', '');
   filename = pascalToSnake(filename);
   String className = snakeToPascal(filename);
-  String path = '${Directory.current.path}/lib/http/controllers/';
+  String path = '${Directory.current.path}/lib/app/http/controllers/';
   String controllerName = '$filename.controller';
   final file = File('$path$filename.controller.dart');
 
@@ -82,7 +86,7 @@ bool createWsController(String filename) {
   filename = filename.toLowerCase().replaceAll('controller', '');
   filename = pascalToSnake(filename);
   String className = snakeToPascal(filename);
-  String path = '${Directory.current.path}/lib/ws/controllers/';
+  String path = '${Directory.current.path}/lib/app/ws/controllers/';
   String controllerName = '$filename.controller';
   final file = File('$path$filename.controller.dart');
 

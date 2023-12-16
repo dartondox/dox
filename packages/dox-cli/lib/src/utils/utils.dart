@@ -15,6 +15,9 @@ String pascalToSnake(String input) {
     }
   }
   String finalString = result.toString().replaceAll(RegExp('_+'), '_');
+  finalString = finalString.endsWith('_')
+      ? finalString.substring(0, finalString.length - 1)
+      : finalString;
   return finalString;
 }
 
@@ -22,9 +25,16 @@ String snakeToPascal(String input) {
   final parts = input.split('_');
   final result = StringBuffer();
   for (final part in parts) {
-    result.write('${part[0].toUpperCase()}${part.substring(1)}');
+    if (part.isNotEmpty) {
+      result.write('${part[0].toUpperCase()}${part.substring(1)}');
+    }
   }
-  return result.toString();
+  return result.toString().isEmpty ? input : result.toString();
+}
+
+String toPascalWithFirstLetterLowerCase(String input) {
+  String pascalString = snakeToPascal(input);
+  return '${pascalString[0].toLowerCase()}${pascalString.substring(1)}';
 }
 
 Map<String, String> loadEnv() {

@@ -11,7 +11,7 @@ part '$filename.model.g.dart';
 @DoxModel()
 class $className extends ${className}Generator {
   @override
-  List<String> get hidden => [];
+  List<String> get hidden => <String>[];
 }
 ''';
 }
@@ -19,7 +19,7 @@ class $className extends ${className}Generator {
 bool createModel(filename) {
   filename = pascalToSnake(filename);
   String className = snakeToPascal(filename);
-  String path = '${Directory.current.path}/lib/models/$filename/';
+  String path = '${Directory.current.path}/lib/app/models/$filename/';
   final file = File('$path$filename.model.dart');
 
   if (file.existsSync()) {

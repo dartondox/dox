@@ -12,12 +12,12 @@ class ${className}Request extends FormRequest {
 
   @override
   Map<String, String> rules() {
-    return {};
+    return <String, String>{};
   }
 
   @override
   Map<String, String> messages() {
-    return {};
+    return <String, String>{};
   }
 }
 ''';
@@ -27,7 +27,7 @@ bool createRequest(String filename) {
   filename = filename.toLowerCase().replaceAll('request', '');
   filename = pascalToSnake(filename);
   String className = snakeToPascal(filename);
-  String path = '${Directory.current.path}/lib/http/requests/';
+  String path = '${Directory.current.path}/lib/app/http/requests/';
   String requestName = '$filename.request';
   final file = File('$path$filename.request.dart');
 
