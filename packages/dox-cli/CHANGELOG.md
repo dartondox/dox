@@ -1,3 +1,7 @@
+## 2.0.0-alpha.1
+
+- Compatible with core version 2
+
 ## 1.1.1
 
 - handle migration with dox_migration
