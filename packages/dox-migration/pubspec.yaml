@@ -1,6 +1,6 @@
 name: dox_migration
 description: Database migration package for Postgres SQL
-version: 2.0.0-alpha.1
+version: 2.0.0-alpha.2
 repository: https://github.com/dartondox/dox
 
 environment:

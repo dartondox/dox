@@ -1,3 +1,7 @@
+## 2.0.0-alpha.2
+
+- Remove .dart option
+
 ## 1.0.4
 
 - Improve loading .env

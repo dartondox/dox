@@ -1,6 +1,6 @@
 name: dox_builder
 description: Dox builder for dox framework
-version: 2.0.0-alpha.1
+version: 2.0.0-alpha.2
 repository: https://github.com/dartondox/dox
 homepage: https://dartondox.dev
 
@@ -11,7 +11,7 @@ dependencies:
   build: ^2.4.0
   source_gen: ^1.3.1
   analyzer: ^5.12.0
-  dox_annotation: ^1.0.5-alpha1.9
+  dox_annotation: ^1.0.5-alpha2.1
 
 dev_dependencies:
   lints: ^2.0.0
