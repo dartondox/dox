@@ -1,4 +1,3 @@
-import 'package:dox_app/config/postgres.dart';
 import 'package:dox_core/dox_core.dart';
 
 class WebRouter extends Router {
@@ -38,10 +37,6 @@ class WebRouter extends Router {
     Route.post('/ping', (DoxRequest req) async {
       RequestFile file = req.input('image');
       return Storage().put('images', await file.bytes);
-    });
-
-    Route.put('/ping', (DoxRequest req) async {
-      return await pool.query('SELECT * from blog');
     });
   }
 }

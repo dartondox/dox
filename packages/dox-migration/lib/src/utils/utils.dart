@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dox_migration/src/utils/file_extension.dart';
-import 'package:postgres_pool/postgres_pool.dart';
+import 'package:postgres/postgres.dart';
 
 enum MigrationType { up, down }
 
@@ -11,7 +11,7 @@ String fileGetContents(File file) {
 }
 
 /// crete migration table if not exist
-Future<void> createMigrationTableIfNotExist(PgPool pool) async {
+Future<void> createMigrationTableIfNotExist(Connection conn) async {
   String query = '''
       CREATE TABLE IF NOT EXISTS dox_db_migration 
       (
@@ -20,12 +20,12 @@ Future<void> createMigrationTableIfNotExist(PgPool pool) async {
         batch INTEGER NOT NULL
       )
     ''';
-  await pool.query(query);
+  await conn.execute(Sql.named(query));
 }
 
 /// save migration record to migrations table with batch number
 Future<void> saveMigratedRecord(
-    PgPool pool, File file, int batch, MigrationType type) async {
+    Connection conn, File file, int batch, MigrationType type) async {
   if (type == MigrationType.up) {
     String query = '''
       INSERT INTO dox_db_migration 
@@ -34,10 +34,8 @@ Future<void> saveMigratedRecord(
       (@filename, @batch) 
       RETURNING id
     ''';
-    await pool.query(query, substitutionValues: <String, dynamic>{
-      'filename': file.name,
-      'batch': batch
-    });
+    await conn.execute(Sql.named(query),
+        parameters: <String, dynamic>{'filename': file.name, 'batch': batch});
     return;
   }
 
@@ -45,28 +43,27 @@ Future<void> saveMigratedRecord(
       DELETE from dox_db_migration 
       WHERE migration = @filename
     ''';
-  await pool.query(query, substitutionValues: <String, dynamic>{
+  await conn.execute(Sql.named(query), parameters: <String, dynamic>{
     'filename': file.name,
   });
   return;
 }
 
 // get the next batch number
-Future<int> getNextBatchNumber(PgPool pool) async {
+Future<int> getNextBatchNumber(Connection conn) async {
   String query = '''
         SELECT batch FROM dox_db_migration 
         ORDER BY batch desc 
         LIMIT 1 OFFSET 0
       ''';
-  List<Map<String, Map<String, dynamic>>> latestBatch =
-      await pool.mappedResultsQuery(query);
+  Result latestBatch = await conn.execute(query);
 
   int batchNumber = 1;
 
   if (latestBatch.isNotEmpty && latestBatch.first.isNotEmpty) {
-    if (latestBatch.first['dox_db_migration']?['batch'] != null) {
-      String latestBatchNumberString =
-          latestBatch.first['dox_db_migration']?['batch'].toString() ?? '0';
+    int? latestBatchNumber = latestBatch.first.toColumnMap()['batch'] ?? 0;
+    if (latestBatchNumber != null) {
+      String latestBatchNumberString = latestBatchNumber.toString();
       batchNumber = int.parse(latestBatchNumberString) + 1;
     }
   }

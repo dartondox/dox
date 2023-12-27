@@ -8,11 +8,11 @@ import 'models/blog_info/blog_info.model.dart';
 void main() {
   group('Model |', () {
     setUp(() async {
-      SqlQueryBuilder.initialize(database: poolConnection());
+      SqlQueryBuilder.initialize(database: await poolConnection());
       await Schema.create('blog', (Table table) {
         table.id('uid');
         table.string('title');
-        table.char('status').withDefault('active');
+        table.string('status').withDefault('active');
         table.text('body');
         table.string('slug').nullable();
         table.softDeletes();
@@ -49,6 +49,7 @@ void main() {
       expect(blog.title, 'dox query builder');
       expect(blog.description, 'Best orm for the dart');
       expect(blog.uid, 1);
+      expect(blog.status, 'active');
     });
 
     test('insert', () async {

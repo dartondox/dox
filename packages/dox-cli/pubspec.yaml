@@ -9,7 +9,6 @@ environment:
 
 dependencies:
   dox_migration: ^1.0.3
-  postgres: ^2.6.1
   watcher: ^1.0.2
   path: ^1.8.3
 

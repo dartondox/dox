@@ -29,7 +29,8 @@ mixin Insert<T> implements SharedMixin<T> {
         await insertMultiple(<Map<String, dynamic>>[data]);
     if (result.isNotEmpty) {
       Map<String, Map<String, dynamic>> insertedData = result.first;
-      int id = insertedData[tableName]?[primaryKey] ?? 0;
+      String tableId = insertedData.keys.first;
+      int id = insertedData[tableId]?[primaryKey] ?? 0;
       resetSubstitutionValues();
       return await queryBuilder.find(id);
     }

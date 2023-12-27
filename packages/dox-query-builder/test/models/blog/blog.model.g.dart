@@ -119,8 +119,6 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
     };
     map['title'] = Blog.slugTitle(map);
 
-    List<String> preload = getPreload();
-
     return map;
   }
 }

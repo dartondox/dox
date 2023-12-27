@@ -1,4 +1,5 @@
 import 'package:dox_query_builder/dox_query_builder.dart';
+import 'package:postgres/postgres.dart';
 
 import 'count.dart';
 import 'delete.dart';
@@ -144,13 +145,12 @@ class QueryBuilder<T>
   /// ```
   /// var result = await QueryBuilder.query('select * from blog where id =  @id', {'id' : 1});
   ///
-  static Future<List<Map<String, Map<String, dynamic>>>> query(
+  static Future<Result> query(
     String query, {
     Map<String, dynamic>? substitutionValues = const <String, dynamic>{},
   }) {
-    return SqlQueryBuilder().db.mappedResultsQuery(
-          query,
-          substitutionValues: substitutionValues,
-        );
+    return SqlQueryBuilder()
+        .db
+        .execute(query, substitutionValues: substitutionValues);
   }
 }
