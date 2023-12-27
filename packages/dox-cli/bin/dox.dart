@@ -21,12 +21,19 @@ void main(List<String> args) async {
   ];
 
   if (args.length == 1 && versionKeys.contains(args[0])) {
-    print('Dox version: 1.1.1');
+    print('Dox version: 2.0.0-alpha.2');
     return;
   }
 
   if (args.length == 2 && args[0] == 'create') {
     createProject(args[1]);
+    return;
+  }
+
+  if (args.length == 4 &&
+      args[0] == 'create' &&
+      (args[2] == '--version' || args[2] == '--v')) {
+    createProject(args[1], args[3]);
     return;
   }
 

@@ -1,3 +1,7 @@
+## 2.0.0-alpha.2
+
+- Add option to create project with specific version
+
 ## 2.0.0-alpha.1
 
 - Compatible with core version 2
