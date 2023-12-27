@@ -23,7 +23,7 @@ class PostgresDriver extends DBDriver {
 
   /// run query and return map result
   @override
-  Future<List<Map<String, Map<String, dynamic>>>> mappedResultsQuery(
+  Future<List<Map<String, dynamic>>> mappedResultsQuery(
     String query, {
     Map<String, dynamic>? substitutionValues,
   }) async {
@@ -44,37 +44,7 @@ class PostgresDriver extends DBDriver {
 
 /// extension on postgres
 extension ToMapList on Result {
-  List<Map<String, Map<String, dynamic>>> toMapList() {
-    List<Map<String, Map<String, dynamic>>> data =
-        <Map<String, Map<String, dynamic>>>[];
-    forEach((ResultRow element) {
-      data.add(element.toMappedColumns());
-    });
-    return data;
-  }
-}
-
-extension ToMappedColumns on ResultRow {
-  Map<String, Map<String, dynamic>> toMappedColumns() {
-    Map<String, Map<String, dynamic>> data = <String, Map<String, dynamic>>{};
-
-    for (var (int i, ResultSchemaColumn col) in schema.columns.indexed) {
-      String tableId = col.tableOid.toString();
-      if (col.columnName case String name) {
-        if (data[tableId] == null) {
-          data[tableId] = <String, dynamic>{};
-        }
-        Map<String, dynamic> table = data[tableId]!;
-        table[name] = this[i];
-      } else {
-        if (data[tableId] == null) {
-          data[tableId] = <String, dynamic>{};
-        }
-        Map<String, dynamic> table = data[tableId]!;
-        String name = '[$i]';
-        table[name] = this[i];
-      }
-    }
-    return data;
+  List<Map<String, dynamic>> toMapList() {
+    return map((ResultRow element) => element.toColumnMap()).toList();
   }
 }
