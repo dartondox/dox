@@ -248,10 +248,13 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     });
 
     String toMapRelation = "\nList<String> preload = getPreload();\n";
+    List<String> preloadRelations = [];
+
     visitor.relations.forEach((key, value) {
       if (value['eager'] == true) {
         jsonMapper += "'${toSnakeCase(key)}': toMap(instance.$key),\n";
       } else {
+        preloadRelations.add(key);
         toMapRelation += """
         if (preload.contains('${toSnakeCase(key)}')) {
           map['${toSnakeCase(key)}'] = toMap(instance.$key);
@@ -260,7 +263,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       }
     });
 
-    if (visitor.relations.isNotEmpty) {
+    if (preloadRelations.isNotEmpty) {
       parseContent += toMapRelation;
     }
 
