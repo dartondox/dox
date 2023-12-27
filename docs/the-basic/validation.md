@@ -41,7 +41,7 @@ class BlogController {
                 'email': 'required|email',
             },
             messages: {
-                'required' : 'the {attribute} is required',
+                'required' : 'the {field} is required',
                 'email' : 'the {value} is not valid email',
             },
         );
@@ -50,7 +50,7 @@ class BlogController {
 ```
 
 !!! info
-    The validator will automatically substitute `{attribute}` and `{value}` with the corresponding request field and its value.
+    The validator will automatically substitute `{field}` and `{value}` with the corresponding request field and its value.
 
 ## Nested Validation
 

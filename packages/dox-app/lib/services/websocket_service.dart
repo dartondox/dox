@@ -6,7 +6,7 @@ import 'package:ioredis/ioredis.dart';
 class WebsocketService implements DoxService {
   @override
   void setup() {
-    Redis sub = redis;
+    Redis sub = redis.duplicate();
     Redis pub = sub.duplicate();
 
     WebsocketServer io = WebsocketServer(Dox());

@@ -59,10 +59,10 @@ dox create:request Blog
 Register a request in `lib/config/app.dart`
 
 ```dart
-@override
-Map<Type, FormRequest Function()> get formRequests => {
+
+formRequests: <Type, FormRequest Function()>{
     BlogRequest:() => BlogRequest(),
-};
+},
 ```
 
 !!! info "Why?"
@@ -95,7 +95,7 @@ Map<Type, FormRequest Function()> get formRequests => {
         @override
         Map<String, String> messages() {
             return {
-                'required': "The {attribute} is required"
+                'required': "The {field} is required"
             };
         }
     }

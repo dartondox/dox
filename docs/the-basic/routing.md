@@ -89,15 +89,6 @@ Routes can be found in `lib/routes` folder. And `api.dart` is with prefix `/api`
     });
     ```
 
-=== "Websocket"
-
-    ```dart
-    Router.websocket('ws', (socket) {
-        socket.on('event', controller.intro);
-        socket.on('noti', controller.noti);
-    });
-    ```
-
 ## Resource
 
 ```dart
@@ -237,12 +228,12 @@ Route.get('/ping', (DoxRequest req) => 'pong');
 === "Class based middleware"
 
     ```dart
-    class LoggerMiddleware extends DoxMiddleware {
+    class LoggerMiddleware extends IDoxMiddleware {
         @override
-        handle(DoxRequest req) {
+        handle(IDoxRequest req) {
             /// write your logic here
 
-            /// return DoxRequest back to continue next function (controller)
+            /// return DoxRequest back to continue next to the controller
             return req;
         }
     }
@@ -254,7 +245,7 @@ Route.get('/ping', (DoxRequest req) => 'pong');
     authMiddleware(DoxRequest req) {
         /// write your logic here
 
-        /// return DoxRequest back to continue next function (controller)
+        /// return DoxRequest back to continue next to the controller
         return req;
     }
     ```

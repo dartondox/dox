@@ -23,18 +23,15 @@ class WebsocketService implements DoxService {
 ```
 
 !!! info
-    While running with multiple isolate(multithread), the Dox WebSocket require Redis adapter which require [`ioredis`](https://pub.dev/packages/ioredis) package to function. Currently, Dox WebSocket only supports the Redis adapter. And if you do not want to use any adapter, please set total isolate value to 1 `int get totalIsolate => 1` in `lib/config/app.dart` to function properly.
+    While running with multiple isolate(multithread), the Dox WebSocket require Redis adapter which require [`ioredis`](https://pub.dev/packages/ioredis) package to function. Currently, Dox WebSocket only supports the Redis adapter. And if you do not want to use any adapter, please set total isolate value to `1` in `lib/config/app.dart` to function properly.
 
-### 2. Register websocket service to dox
+### 2. Register websocket service to dox `app/config/services.dart`
 
 ```dart
-/// bin/server.dart
-....
-
-Dox().addService(WebsocketService());
-
-....
-await Dox().startServer();
+List<DoxService> services = <DoxService>[
+  ... /// other services
+  WebsocketService,
+];
 ```
 
 ### 3. Create websocket controller
@@ -63,7 +60,7 @@ class ChatWebSocketController {
 !!! tip "Note"
     As webSocket maintains an open connection, there is no requirement to send back any values from your controller method.
 
-### 4. register websocket route
+### 4. register websocket route and events
 
 ```dart
 ChatWebSocketController controller = ChatWebSocketController();

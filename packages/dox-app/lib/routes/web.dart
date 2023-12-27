@@ -1,3 +1,4 @@
+import 'package:dox_app/app/http/controllers/web.controller.dart';
 import 'package:dox_core/dox_core.dart';
 
 class WebRouter extends Router {
@@ -6,6 +7,9 @@ class WebRouter extends Router {
 
   @override
   void register() {
+    WebController webController = WebController();
+    Route.get('/redis', webController.testRedis);
+
     Route.get('/ping', (DoxRequest req) async {
       return 'pong';
     });

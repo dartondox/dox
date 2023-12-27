@@ -25,7 +25,7 @@ class BlogRequest extends FormRequest {
   @override
   Map<String, String> messages() {
     return <String, String>{
-      'required': 'The {attribute} is missing',
+      'required': 'The {field} is missing',
     };
   }
 }

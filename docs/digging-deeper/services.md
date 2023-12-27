@@ -1,57 +1,41 @@
 # Services
 
-If your application requires additional services like a database or Redis, you'll need to create a class that implements the `DoxService` interface and then register it with Dox. Since Dox operates with isolates (multi-threading), these extra services must be passed to each isolate to ensure their availability on all isolates.
+If your application requires additional services like a database, auth etc.., you'll need to create a class that implements the `DoxService` interface and then register it with Dox. Since Dox operates with isolates (multi-threading), these extra services must be passed to each isolate to ensure their availability on all isolates.
 
-### Example with redis
+### Example with auth
 
-=== "Redis service"
+=== "AuthService"
 
     ```dart
-    class Redis implements DoxService {
-        /// Declare as Singleton reuse connection
-        static final Redis _i = Redis._internal();
-        factory Redis() => _i;
-        Redis._internal();
-
-        late Command command;
-
+    class AuthService implements DoxService {
         @override
-        Future<void> setup() async {
-            RedisConnection conn = RedisConnection();
-            String tls = Env.get('REDIS_TLS', 'false');
-            String host = Env.get('REDIS_HOST', 'localhost');
-            int port = int.parse(Env.get('REDIS_PORT', '6379'));
+        void setup() {
+            Auth.initialize(AuthConfig(
+            /// default auth guard
+            defaultGuard: 'web',
 
-            if (tls == 'true') {
-                Redis().command = await conn.connectSecure(host, port);
-            } else {
-                Redis().command = await conn.connect(host, port);
-            }
-
-            String username = Env.get('REDIS_USERNAME', '');
-            String password = Env.get('REDIS_PASSWORD', '');
-
-            if (username.isNotEmpty && password.isNotEmpty) {
-                await Redis().command.send_object(
-                    <dynamic>['AUTH', username, password],
-                );
-            }
+            /// list of auth guards
+            guards: <String, AuthGuard>{
+                'web': AuthGuard(
+                driver: JwtAuthDriver(secret: SecretKey(Env.get('APP_KEY'))),
+                provider: AuthProvider(
+                    model: () => User(),
+                ),
+                ),
+            },
+            ));
         }
     }
     ```
 
 #####
-=== "Register into dox `bin/server.dart`"
+=== "Register into dox `app/config/services.dart`"
 
-    ```dart
-    void main() async {
-        /// Initialize Dox
-        Dox().initialize(Config());
+```dart
+List<DoxService> services = <DoxService>[
+  ... /// other services
+  AuthService,
+];
+```
 
-        /// register redis service
-        Dox().addService(Redis());
-
-        /// start dox http server
-        await Dox().startServer();
-    }
-    ```
+ 
