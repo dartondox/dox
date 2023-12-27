@@ -24,7 +24,7 @@ class QueryBuilderHelper<T> {
     return query;
   }
 
-  Future<List<Map<String, Map<String, dynamic>>>> runQuery(String query) async {
+  Future<List<Map<String, dynamic>>> runQuery(String query) async {
     Map<String, dynamic> values = queryBuilder.substitutionValues;
     if (queryBuilder.shouldDebug) queryBuilder.logger.log(query, values);
     DBDriver db = queryBuilder.db;
@@ -33,22 +33,17 @@ class QueryBuilderHelper<T> {
   }
 
   List<Map<String, dynamic>> getMapResult(
-    List<Map<String, Map<String, dynamic>>> queryResult,
+    List<Map<String, dynamic>> queryResult,
   ) {
     List<Map<String, dynamic>> result = <Map<String, dynamic>>[];
     // setting key values format from query result
-    for (Map<String, Map<String, dynamic>> row in queryResult) {
+    for (Map<String, dynamic> data in queryResult) {
       Map<String, dynamic> ret = <String, dynamic>{};
-      (row).forEach((String mainKey, Map<String, dynamic> data) {
-        (data).forEach((String key, dynamic value) {
-          if (ret[key] == null) {
-            ret[key] = value is DateTime ? value.toIso8601String() : value;
-          } else {
-            ret["${mainKey}_$key"] =
-                value is DateTime ? value.toIso8601String() : value;
-          }
-        });
+
+      (data).forEach((String key, dynamic value) {
+        ret[key] = value is DateTime ? value.toIso8601String() : value;
       });
+
       result.add(ret);
     }
     return result;
@@ -56,7 +51,7 @@ class QueryBuilderHelper<T> {
 
   // ignore: always_specify_types
   Future<List> formatResult(
-    List<Map<String, Map<String, dynamic>>> queryResult,
+    List<Map<String, dynamic>> queryResult,
   ) async {
     List<Map<String, dynamic>> result = getMapResult(queryResult);
 

@@ -7,8 +7,7 @@ abstract class DBDriver {
       {Map<String, dynamic>? substitutionValues});
 
   /// run query and return map result
-  Future<List<Map<String, Map<String, dynamic>>>> mappedResultsQuery(
-      String query,
+  Future<List<Map<String, dynamic>>> mappedResultsQuery(String query,
       {Map<String, dynamic>? substitutionValues});
 
   /// run query, this function do not return any value

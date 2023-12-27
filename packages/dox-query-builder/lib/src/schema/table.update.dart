@@ -76,16 +76,13 @@ mixin TableUpdate implements TableSharedMixin {
   Future<List<String>> getTableColumns() async {
     String query =
         "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '$tableName'";
-    List<Map<String, Map<String, dynamic>>> result =
-        await db.mappedResultsQuery(query);
+    List<Map<String, dynamic>> result = await db.mappedResultsQuery(query);
 
     List<String> columns = <String>[];
 
-    for (Map<String, Map<String, dynamic>> element in result) {
-      element.forEach((String key, Map<String, dynamic> value) {
-        value.forEach((String key2, dynamic value2) {
-          columns.add(value2.toString());
-        });
+    for (Map<String, dynamic> element in result) {
+      element.forEach((String key2, dynamic value2) {
+        columns.add(value2.toString());
       });
     }
     return columns;

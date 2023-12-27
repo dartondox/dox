@@ -25,12 +25,11 @@ mixin Insert<T> implements SharedMixin<T> {
   // ignore: always_specify_types
   Future insert(Map<String, dynamic> data) async {
     // ignore: always_specify_types
-    List<Map<String, Map<String, dynamic>>> result =
+    List<Map<String, dynamic>> result =
         await insertMultiple(<Map<String, dynamic>>[data]);
     if (result.isNotEmpty) {
-      Map<String, Map<String, dynamic>> insertedData = result.first;
-      String tableId = insertedData.keys.first;
-      int id = insertedData[tableId]?[primaryKey] ?? 0;
+      Map<String, dynamic> insertedData = result.first;
+      int id = insertedData[primaryKey] ?? 0;
       resetSubstitutionValues();
       return await queryBuilder.find(id);
     }
@@ -45,7 +44,7 @@ mixin Insert<T> implements SharedMixin<T> {
   ///   {"title" : "Another blog title"},
   /// ]);
   /// ```
-  Future<List<Map<String, Map<String, dynamic>>>> insertMultiple(
+  Future<List<Map<String, dynamic>>> insertMultiple(
       List<Map<String, dynamic>> list) async {
     List<String> columns = <String>[];
     List<String> values = <String>[];
