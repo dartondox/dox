@@ -1,23 +1,61 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox/dox.dart';
 
-createProject(projectName) async {
+createProject(projectName, [String? versionName]) async {
   projectName = pascalToSnake(projectName);
-
-  print("\x1B[32m✔\x1B[0m Project name - $projectName");
 
   final projectFolder = Directory('${Directory.current.path}/$projectName');
 
-  Process.runSync('git', [
+  if (projectFolder.existsSync()) {
+    print('\x1B[31mFolder name "$projectName" already exist\x1B[0m');
+    return;
+  }
+
+  print("\x1B[32m✔\x1B[0m Project name : $projectName");
+  print("\x1B[32m✔\x1B[0m Creating...");
+
+  ProcessResult version = Process.runSync('curl', [
+    'https://api.github.com/repos/dartondox/dox-sample/releases/latest',
+    '-s',
+  ]);
+
+  Map<String, dynamic> versionData = jsonDecode(version.stdout);
+
+  /// use version name if provided, else use latest version
+  String latestTag = versionName ?? versionData['name'];
+
+  /// replace v with empty space if there is v in version and join again v
+  /// so that it work for both 'v2.0.0' and '2.0.0'
+  latestTag = 'v${latestTag.replaceFirst('v', '')}';
+
+  print("\x1B[32m✔\x1B[0m Version : $latestTag");
+
+  ProcessResult result = Process.runSync('git', [
     'clone',
-    '-b',
-    'v2.x',
-    'https://github.com/necessarylion/dox-sample.git',
+    '--depth',
+    '1',
+    '--branch',
+    latestTag,
+    'https://github.com/dartondox/dox-sample.git',
     projectName
   ]);
 
+  if (result.stderr != null) {
+    if (result.stderr.toString().contains('Could not find')) {
+      print('\x1B[31m${result.stderr}\x1B[0m');
+      return;
+    }
+  }
+
   Directory gitDirectory = Directory('${projectFolder.path}/.git');
+
+  if (!gitDirectory.existsSync()) {
+    return;
+  }
+
+  /// remove `.git` folder
   gitDirectory.deleteSync(recursive: true);
 
   // Replace the project name in all files
