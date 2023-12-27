@@ -21,49 +21,50 @@ Package link : [https://pub.dev/packages/dox_auth](https://pub.dev/packages/dox_
 
 ## Usage
 
-#### 1. Setup auth config
+#### 1. Setup auth service
 
-Create auth config file `lib/config/auth.dart`.
+Create auth service file `lib/services/auth_service.dart`.
 
 ```dart
-import 'package:dox_auth/dox_auth.dart';
-import 'package:dox_core/dox_core.dart';
-import 'package:poc_app/models/user/user.model.dart';
-
-class AuthConfig extends AuthConfigInterface {
+class AuthService implements DoxService {
   @override
-  String get defaultGuard => 'web';
+  void setup() {
+    Auth.initialize(AuthConfig(
+      /// default auth guard
+      defaultGuard: 'web',
 
-  @override
-  Map<String, Guard> get guards => <String, Guard>{
-        'web': Guard(
-          driver: JwtDriver(
-            secret: SecretKey(Env.get('APP_KEY')),
-          ),
-          provider: Provider(
+      /// list of auth guards
+      guards: <String, AuthGuard>{
+        'web': AuthGuard(
+          driver: JwtAuthDriver(secret: SecretKey(Env.get('APP_KEY'))),
+          provider: AuthProvider(
             model: () => User(),
           ),
         ),
-      };
+      },
+    ));
+  }
 }
+
 ```
 
-#### 2. Register auth config
-
-Modify `bin/server.dart` to add auth config
+#### 2. Register into dox `app/config/services.dart`
 
 ```dart
-Dox().initialize(Config());
-Dox().setAuthConfig(AuthConfig());
+List<DoxService> services = <DoxService>[
+  ... /// other services
+  AuthService,
+];
 ```
+
 
 #### 3. Register auth middleware
 
-Register `doxAuthMiddleware` in route.
+Register `AuthMiddleware()` in route.
 
 ```dart
 Route.get('/auth/user', <dynamic>[
-  doxAuthMiddleware, 
+  AuthMiddleware(), 
   authController.user
 ]);
 ```
@@ -93,7 +94,7 @@ Verify logged in user or fetch user information.
 
 ```dart
 Future<dynamic> fetchUser(DoxRequest req) async {
-  Auth? auth = req.auth<Auth>();
+  IAuth? auth = req.auth;
   if (auth?.isLoggedIn() == true) {
     return auth?.user();
   }

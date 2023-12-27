@@ -14,12 +14,12 @@ Middleware serves as a connector between routes and controllers, and its signifi
 === "Middleware"
 
     ```dart
-    class LoggerMiddleware extends DoxMiddleware {
+    class LoggerMiddleware extends IDoxMiddleware {
         @override
-        handle(DoxRequest req) {
+        handle(IDoxRequest req) {
             /// write your logic here
 
-            /// return DoxRequest back to continue next function (controller)
+            /// return DoxRequest back to continue next to the controller
             return req; 
         }
     }
@@ -44,7 +44,7 @@ If you prefer not to use class-based middleware, you have the option to create m
     authMiddleware(DoxRequest req) {
         /// write your logic here
 
-        /// return DoxRequest back to continue next function (controller)
+        /// return DoxRequest back to continue next to the controller
         return req;
     }
     ```
@@ -60,12 +60,12 @@ If you prefer not to use class-based middleware, you have the option to create m
 === "Class based middleware"
 
     ```dart
-    class LoggerMiddleware extends DoxMiddleware {
+    class LoggerMiddleware extends IDoxMiddleware {
         @override
-        handle(DoxRequest req) {
+        handle(IDoxRequest req) {
             /// write your logic here
 
-            /// return DoxRequest back to continue next function (controller)
+            /// return DoxRequest back to continue next to the controller
             return req;
         }
     }
@@ -77,7 +77,7 @@ If you prefer not to use class-based middleware, you have the option to create m
     authMiddleware(DoxRequest req) {
         /// write your logic here
 
-        /// return DoxRequest back to continue next function (controller)
+        /// return DoxRequest back to continue next to the controller
         return req;
     }
     ```

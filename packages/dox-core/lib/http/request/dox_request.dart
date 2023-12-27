@@ -225,7 +225,7 @@ class DoxRequest implements IDoxRequest {
   /// ```
   /// req.validate({'title': 'required'});
   /// req.validate({'title': 'required'},
-  ///   messages : {'required' : 'The {attribute} is required'});
+  ///   messages : {'required' : 'The {field} is required'});
   /// ```
   @override
   void validate(Map<String, String> rules,

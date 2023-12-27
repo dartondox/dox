@@ -50,7 +50,7 @@ dox build_runner:build
 
 ```py
 dox build (compile into machine code)
-bin/dox (run exec file to serve http server)
+bin/server (run exec file to serve http server)
 ```
 
 ## Generate app key

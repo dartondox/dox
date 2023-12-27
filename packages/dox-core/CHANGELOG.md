@@ -1,3 +1,7 @@
+# version 2.0.0-alpha.6
+
+- Change validation {attribute} to {field}
+
 # version 2.0.0-alpha.5
 
 - Update postgres

@@ -3,14 +3,16 @@
 ## Integration test
 
 ```dart
+import 'package:dox_app/config/app.dart';
+import 'package:dox_core/dox_core.dart';
 import 'package:http/http.dart' as http;
+import 'package:test/test.dart';
 
-Config config = Config();
 String baseUrl = 'http://localhost:${config.serverPort}';
 
 void main() {
     setUpAll(() async {
-        Dox().initialize(config);
+        Dox().initialize(appConfig);
         await Dox().startServer();
 
         // for for few seconds to fully started http server

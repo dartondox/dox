@@ -8,10 +8,6 @@ dart pub global activate dox
 
 ```py
 dox create new_blog
-cd new_blog
-dart pub get
-cp .env.example .env (and modify .env variables)
-dox serve or dox s to start http server
 ```
 !!! warning "Export bin path"
     Please make sure you have included `bin` path to your profile. If you did not added path to your profile yet, open `~/.bashrc` or `~/.zshrc` and paste below line.
@@ -19,3 +15,15 @@ dox serve or dox s to start http server
     ```bash
     export PATH="$PATH":"~/.pub-cache/bin"
     ```
+
+## Create a specific version
+
+```py
+dox create new_blog --version v2.0.0
+```
+
+## Or download from github
+
+```py
+https://github.com/dartondox/dox-sample/archive/refs/tags/v2.0.0.zip
+```
