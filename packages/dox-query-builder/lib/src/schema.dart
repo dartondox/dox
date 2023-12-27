@@ -7,7 +7,7 @@ class Schema {
   /// await Schema.create('table', (Table table) {
   ///   table.id();
   ///   table.string('title').nullable();
-  ///   table.char('status').withDefault('active');
+  ///   table.string('status').withDefault('active');
   ///   table.text('body');
   ///   table.softDeletes();
   ///   table.timestamps();
@@ -25,7 +25,7 @@ class Schema {
   /// await Schema.table('table', (Table table) {
   ///   table.id();
   ///   table.string('title').nullable();
-  ///   table.char('status').withDefault('active');
+  ///   table.string('status').withDefault('active');
   ///   table.text('body');
   ///   table.softDeletes();
   ///   table.timestamps();

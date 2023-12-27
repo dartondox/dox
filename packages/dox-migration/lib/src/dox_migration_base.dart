@@ -1,15 +1,13 @@
 import 'dart:io';
 
-import 'package:dox_migration/src/migrations/dart_ext_migration.dart';
 import 'package:dox_migration/src/migrations/sql_ext_migration.dart';
 import 'package:dox_migration/src/utils/env.dart';
 import 'package:dox_migration/src/utils/file_extension.dart';
 import 'package:dox_migration/src/utils/logger.dart';
 import 'package:dox_migration/src/utils/utils.dart';
-import 'package:postgres_pool/postgres_pool.dart';
+import 'package:postgres/postgres.dart';
 
 class Migration {
-  late PgPool pool;
   String from;
 
   Migration({this.from = 'app'});
@@ -17,37 +15,35 @@ class Migration {
   /// main function to run migration
   /// - will create migration table if not exist
   /// - will run migrations from db/migration folder
-  Future<void> migrate([PgEndpoint? endPoint]) async {
-    endPoint = getEndpoint(endPoint);
-    pool = PgPool(endPoint);
-    await createMigrationTableIfNotExist(pool);
-    await _runMigration(endPoint, MigrationType.up);
-    await _closeConnection();
+  Future<void> migrate([Connection? connection]) async {
+    Connection conn = connection ?? await _getConnection();
+    await createMigrationTableIfNotExist(conn);
+    await _runMigration(conn, MigrationType.up);
+    await _closeConnection(conn);
   }
 
   /// main function to run migration
   /// - will create migration table if not exist
   /// - will run migrations from db/migration folder
-  Future<void> rollback({PgEndpoint? endPoint}) async {
-    endPoint = getEndpoint(endPoint);
-    pool = PgPool(endPoint);
-    await createMigrationTableIfNotExist(pool);
-    await _runMigration(endPoint, MigrationType.down);
-    await _closeConnection();
+  Future<void> rollback([Connection? connection]) async {
+    Connection conn = connection ?? await _getConnection();
+    await createMigrationTableIfNotExist(conn);
+    await _runMigration(conn, MigrationType.down);
+    await _closeConnection(conn);
   }
 
-  PgEndpoint getEndpoint(PgEndpoint? endPoint) {
-    if (endPoint != null) {
-      return endPoint;
-    }
+  Future<Connection> _getConnection() async {
     // get endpoint from env
     Map<String, String> env = loadEnv();
-    return PgEndpoint(
-      host: env['DB_HOST'] ?? 'localhost',
-      port: int.parse(env['DB_PORT'] ?? '5432'),
-      database: env['DB_NAME'] ?? 'dox',
-      username: env['DB_USERNAME'] ?? 'postgres',
-      password: env['DB_PASSWORD'] ?? 'postgres',
+    return await Connection.open(
+      Endpoint(
+        host: env['DB_HOST'] ?? 'localhost',
+        port: int.parse(env['DB_PORT'] ?? '5432'),
+        database: env['DB_NAME'] ?? 'dox',
+        username: env['DB_USERNAME'] ?? 'postgres',
+        password: env['DB_PASSWORD'] ?? 'postgres',
+      ),
+      settings: ConnectionSettings(sslMode: SslMode.disable),
     );
   }
 
@@ -60,30 +56,25 @@ class Migration {
   }
 
   /// check whether migration is already done or not
-  Future<bool> isMigrated(File file) async {
+  Future<bool> isMigrated(Connection conn, File file) async {
     String query = '''
       SELECT * FROM dox_db_migration 
       WHERE migration = @filename 
       LIMIT 1 OFFSET 0
     ''';
 
-    List<Map<String, Map<String, dynamic>>> migratedValue =
-        await pool.mappedResultsQuery(
-      query,
-      substitutionValues: <String, String>{'filename': file.name},
-    );
+    Result migratedValue = await conn.execute(Sql.named(query),
+        parameters: <String, String>{'filename': file.name});
     return migratedValue.isNotEmpty;
   }
 
   /// process migration
-  Future<void> _runMigration(
-      PgEndpoint databaseEndPoint, MigrationType type) async {
+  Future<void> _runMigration(Connection conn, MigrationType type) async {
     try {
       Directory migrationDirectory = getMigrationDirectory();
-      Directory tempDirectory = getTempDirectory();
 
       List<File> migrationFiles = getFilesFromDirectory(migrationDirectory);
-      int nextBatch = await getNextBatchNumber(pool);
+      int nextBatch = await getNextBatchNumber(conn);
 
       List<File> newMigrationFileList = <File>[];
 
@@ -91,25 +82,15 @@ class Migration {
         bool showRunMigration = true;
 
         if (type == MigrationType.up) {
-          showRunMigration = await isMigrated(file) == false;
+          showRunMigration = await isMigrated(conn, file) == false;
         } else {
-          showRunMigration = await isMigrated(file) == true;
+          showRunMigration = await isMigrated(conn, file) == true;
         }
 
         if (showRunMigration) {
           newMigrationFileList.add(file);
-          if (file.ext == 'dart') {
-            await DartExtMigration(
-              pool: pool,
-              tempDirectory: tempDirectory,
-              databaseEndPoint: databaseEndPoint,
-              migrationDirectory: migrationDirectory,
-              type: type,
-            ).run(file, nextBatch);
-          }
-
           if (file.ext == 'sql') {
-            await SqlExtMigration(pool: pool, type: type).run(file, nextBatch);
+            await SqlExtMigration(conn: conn, type: type).run(file, nextBatch);
           }
         }
       }
@@ -128,7 +109,7 @@ class Migration {
     }
   }
 
-  Future<void> _closeConnection() async {
-    await pool.close();
+  Future<void> _closeConnection(Connection conn) async {
+    await conn.close();
   }
 }

@@ -1,4 +1,5 @@
 import 'package:dox_query_builder/dox_query_builder.dart';
+import 'package:postgres/postgres.dart';
 
 class SqlQueryBuilder {
   static final SqlQueryBuilder _singleton = SqlQueryBuilder._internal();
@@ -9,7 +10,7 @@ class SqlQueryBuilder {
 
   SqlQueryBuilder._internal();
 
-  DBDriver db = PostgresDriver();
+  late DBDriver db;
 
   bool debug = true;
 
@@ -24,7 +25,7 @@ class SqlQueryBuilder {
   /// );
   /// ```
   static void initialize({
-    required dynamic database,
+    required Connection database,
     bool debug = false,
     QueryPrinter? printer,
   }) {

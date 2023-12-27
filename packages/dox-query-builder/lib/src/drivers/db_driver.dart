@@ -1,5 +1,11 @@
+import 'package:postgres/postgres.dart';
+
 /// interface for database driver
 abstract class DBDriver {
+  /// run query and return map result
+  Future<Result> execute(String query,
+      {Map<String, dynamic>? substitutionValues});
+
   /// run query and return map result
   Future<List<Map<String, Map<String, dynamic>>>> mappedResultsQuery(
       String query,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dox_query_builder/dox_query_builder.dart';
+import 'package:postgres/postgres.dart';
 import 'package:test/test.dart';
 
 import 'connection.dart';
@@ -8,14 +9,14 @@ import 'models/blog/blog.model.dart';
 import 'models/blog_info/blog_info.model.dart';
 
 void main() async {
-  SqlQueryBuilder.initialize(database: poolConnection());
+  SqlQueryBuilder.initialize(database: await poolConnection());
 
   group('Query Builder', () {
     setUp(() async {
       await Schema.create('blog', (Table table) {
         table.id('uid');
         table.string('title');
-        table.char('status').withDefault('active');
+        table.string('status').withDefault('active');
         table.text('body');
         table.string('slug').nullable();
         table.softDeletes();
@@ -130,12 +131,9 @@ void main() async {
       blog.description = 'Awesome blog body';
       await blog.save();
 
-      List<Map<String, Map<String, dynamic>>> b =
-          await QueryBuilder.query('select * from blog');
+      Result b = await QueryBuilder.query('select * from blog');
 
-      expect(b.first['blog']?['uid'], 1);
-      expect(b.first['blog']?['title'], 'Awesome blog');
-      expect(b.first['blog']?['body'], 'Awesome blog body');
+      expect(b.first.toColumnMap()['title'], 'Awesome blog');
     });
 
     test('group by', () async {

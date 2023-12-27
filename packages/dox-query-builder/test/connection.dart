@@ -1,34 +1,20 @@
 import 'dart:io';
 
-import 'package:postgres_pool/postgres_pool.dart';
+import 'package:postgres/postgres.dart';
 
-Future<PostgreSQLConnection> connection() async {
+Future<Connection> poolConnection() {
   String host = Platform.environment['DB_HOST'] ?? 'localhost';
   int port = int.parse(Platform.environment['PORT'] ?? '5432');
-  PostgreSQLConnection db = PostgreSQLConnection(
-    host,
-    port,
-    "postgres",
-    username: "postgres",
-    password: "postgres",
-  );
-  await db.open();
-  return db;
-}
-
-PgPool poolConnection() {
-  String host = Platform.environment['DB_HOST'] ?? 'localhost';
-  int port = int.parse(Platform.environment['PORT'] ?? '5432');
-  return PgPool(
-    PgEndpoint(
+  return Connection.open(
+    Endpoint(
       host: host,
       port: port,
       database: 'postgres',
       username: 'postgres',
       password: 'postgres',
     ),
-    settings: PgPoolSettings()
-      ..maxConnectionAge = Duration(hours: 1)
-      ..concurrency = 4,
+    settings: PoolSettings(
+      sslMode: SslMode.disable,
+    ),
   );
 }

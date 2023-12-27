@@ -22,7 +22,11 @@ class CategoryGenerator extends Model<Category> {
 
   set id(dynamic val) => tempIdValue = val;
 
-  static Category query() => Category();
+  Category query() => Category();
+
+  @override
+  List<String> get tableColumns =>
+      <String>['id', 'name', 'created_at', 'updated_at'];
 
   @override
   List<String> get preloadList => <String>[];

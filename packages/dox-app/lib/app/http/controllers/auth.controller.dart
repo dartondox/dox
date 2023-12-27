@@ -40,5 +40,6 @@ class AuthController {
       Logger.info('${auth?.user<User>()?.name} is logged in');
       return UserSerializer(auth?.user());
     }
+    return UnAuthorizedException();
   }
 }

@@ -1,7 +1,7 @@
 import 'package:dox_core/dox_core.dart';
-import 'package:postgres_pool/postgres_pool.dart';
+import 'package:postgres/postgres.dart';
 
-PgEndpoint postgresEndpoint = PgEndpoint(
+Endpoint postgresEndpoint = Endpoint(
   /// database host
   host: Env.get('DB_HOST', 'localhost'),
 
@@ -19,16 +19,13 @@ PgEndpoint postgresEndpoint = PgEndpoint(
 );
 
 /// postgres pool connection configuration
-PgPool pool = PgPool(
-  postgresEndpoint,
+PoolSettings postgresPoolSetting = PoolSettings(
+  /// The maximum number of concurrent sessions.
+  maxConnectionCount: 10,
 
-  /// postgres setting
-  settings: PgPoolSettings()
+  /// The maximum duration a connection is kept open.
+  /// New sessions won't be scheduled after this limit is reached.
+  maxConnectionAge: Duration(hours: 1),
 
-    /// The maximum duration a connection is kept open.
-    /// New sessions won't be scheduled after this limit is reached.
-    ..maxConnectionAge = Duration(hours: 1)
-
-    /// The maximum number of concurrent sessions.
-    ..concurrency = 10,
+  sslMode: SslMode.disable,
 );

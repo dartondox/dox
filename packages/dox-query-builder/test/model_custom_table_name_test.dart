@@ -7,7 +7,7 @@ import 'models/user/user.model.dart';
 void main() {
   group('Model with custom table name', () {
     setUp(() async {
-      SqlQueryBuilder.initialize(database: poolConnection());
+      SqlQueryBuilder.initialize(database: await poolConnection());
       await Schema.create('users', (Table table) {
         table.id();
         table.string('name');

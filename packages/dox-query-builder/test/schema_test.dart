@@ -4,11 +4,11 @@ import 'package:test/test.dart';
 import 'connection.dart';
 
 void main() async {
-  SqlQueryBuilder.initialize(database: await connection());
+  SqlQueryBuilder.initialize(database: await poolConnection());
 
   group('Schema |', () {
     setUp(() async {
-      SqlQueryBuilder.initialize(database: poolConnection());
+      SqlQueryBuilder.initialize(database: await poolConnection());
       await Schema.create('schema_test_table', (Table table) {
         table.id();
         table.uuid('uuid');
@@ -23,7 +23,7 @@ void main() async {
         table.time('published_time');
         table.timestampTz('expired_at');
         table.string('title');
-        table.char('status').withDefault('active');
+        table.string('status').withDefault('active');
         table.text('body');
         table.text('column_to_drop');
         table.string('slug').nullable();
@@ -40,7 +40,7 @@ void main() async {
       await Schema.table('schema_test_table', (Table table) {
         table.renameColumn('title', 'new_title_column');
         table.string('blog_title').nullable();
-        table.char('status').withDefault('pending');
+        table.string('status').withDefault('pending');
         table.string('body');
         table.string('slug').unique().nullable();
         table.string('column1').nullable();

@@ -7,6 +7,6 @@ class UserSerializer extends Serializer<User> {
 
   @override
   Map<String, dynamic> convert(User m) {
-    return <String, dynamic>{};
+    return m.toJson();
   }
 }

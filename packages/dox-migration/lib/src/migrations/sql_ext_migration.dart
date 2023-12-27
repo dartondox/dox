@@ -3,14 +3,14 @@ import 'dart:io';
 import 'package:dox_migration/src/utils/file_extension.dart';
 import 'package:dox_migration/src/utils/logger.dart';
 import 'package:dox_migration/src/utils/utils.dart';
-import 'package:postgres_pool/postgres_pool.dart';
+import 'package:postgres/postgres.dart';
 
 class SqlExtMigration {
-  final PgPool pool;
+  final Connection conn;
   final MigrationType type;
 
   const SqlExtMigration({
-    required this.pool,
+    required this.conn,
     required this.type,
   });
 
@@ -57,7 +57,7 @@ class SqlExtMigration {
     if (query == null) return;
     if (query.isEmpty) return;
     query = query.replaceAll(RegExp(r'\s+'), ' ').trim();
-    await pool.query(query);
-    await saveMigratedRecord(pool, file, batch, type);
+    await conn.execute(Sql.named(query));
+    await saveMigratedRecord(conn, file, batch, type);
   }
 }
