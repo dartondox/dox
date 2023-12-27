@@ -1,3 +1,7 @@
+## 2.0.0-alpha.1
+
+- Bug fix on the builder
+
 ## 1.0.4
 
 - Change `newQuery` to `query()` and deprecate `newQuery`

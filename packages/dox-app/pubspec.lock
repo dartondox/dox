@@ -231,42 +231,42 @@ packages:
       path: "../dox-annotation"
       relative: true
     source: path
-    version: "1.0.5-alpha2.0"
+    version: "1.0.5-alpha2.1"
   dox_auth:
     dependency: "direct main"
     description:
       path: "../dox-auth"
       relative: true
     source: path
-    version: "2.0.0-beta.1"
+    version: "2.0.0-beta.2"
   dox_builder:
     dependency: "direct dev"
     description:
       path: "../dox-builder"
       relative: true
     source: path
-    version: "1.0.4"
+    version: "2.0.0-alpha.1"
   dox_core:
     dependency: "direct main"
     description:
       path: "../dox-core"
       relative: true
     source: path
-    version: "2.0.0-alpha.4"
+    version: "2.0.0-alpha.5"
   dox_migration:
     dependency: "direct main"
     description:
       path: "../dox-migration"
       relative: true
     source: path
-    version: "2.0.0-alpha.1"
+    version: "2.0.0-alpha.2"
   dox_query_builder:
     dependency: "direct main"
     description:
       path: "../dox-query-builder"
       relative: true
     source: path
-    version: "1.1.16"
+    version: "2.0.0-alpha.1"
   dox_websocket:
     dependency: "direct main"
     description:

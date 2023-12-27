@@ -1,3 +1,7 @@
+## 2.0.0-alpha.3
+
+- Fix migration issue
+
 ## 2.0.0-alpha.2
 
 - Add option to create project with specific version
