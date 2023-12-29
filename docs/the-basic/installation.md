@@ -27,3 +27,13 @@ dox create new_blog --version v2.0.0
 ```py
 https://github.com/dartondox/dox-sample/archive/refs/tags/v2.0.0.zip
 ```
+
+## Start server
+
+```py
+dox s
+
+or 
+
+bin/dox s
+```

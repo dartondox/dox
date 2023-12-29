@@ -3,7 +3,9 @@ repo_url: https://github.com/dartondox/dox-core
 site_url: https://dartondox.dev
 copyright: Copyright &copy; 2023 - 2024 Dart On Dox
 extra_css:
-  - css/style.css
+  - assets/style.css
+extra_javascript:
+  - assets/script.js
 extra:
   analytics:
     provider: google
