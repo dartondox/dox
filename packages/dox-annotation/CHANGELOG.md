@@ -1,4 +1,4 @@
-## 1.0.5-alpha2.1
+## 1.0.5
 
 - Add IDoxMiddleware interface
 
