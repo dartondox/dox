@@ -1,3 +1,7 @@
+## 2.0.1
+
+- bug fix on dox create command
+
 ## 2.0.0
 
 - Release stable version v2.0
