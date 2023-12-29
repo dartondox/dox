@@ -1,3 +1,7 @@
+## 2.0.0
+
+- Support postgres driver v3
+
 ## 1.1.16
 
 - Bug fixed on save
