@@ -1,3 +1,7 @@
+## 2.0.0
+
+- Release stable version v2.0
+
 ## 2.0.0-alpha.2
 
 - Remove .dart option
