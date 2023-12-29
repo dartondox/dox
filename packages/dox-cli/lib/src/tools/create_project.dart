@@ -62,9 +62,11 @@ createProject(projectName, [String? versionName]) async {
   final files = projectFolder.listSync(recursive: true);
   for (final file in files) {
     if (file is File) {
-      final content =
-          file.readAsStringSync().replaceAll('dox_sample', projectName);
-      file.writeAsStringSync(content);
+      if (!file.path.contains('bin/dox')) {
+        final content =
+            file.readAsStringSync().replaceAll('dox_sample', projectName);
+        file.writeAsStringSync(content);
+      }
     }
   }
 
