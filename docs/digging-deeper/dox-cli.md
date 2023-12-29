@@ -15,6 +15,9 @@ dart pub global activate dox
     export PATH="$PATH":"~/.pub-cache/bin"
     ```
 
+!!! tips
+    You can also use `bin/dox {command}` from your project folder to run server or create migration etc..
+
 ## Update package
 
 ```py
