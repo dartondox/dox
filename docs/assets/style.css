@@ -45,3 +45,14 @@ body[data-md-color-scheme="slate"] .highlight .n {
 body[data-md-color-scheme="default"] .highlight .n {
     color: #025596;
 }
+
+body[data-md-color-scheme="default"] p code {
+    font-weight: bold !important;
+    color: #176bad !important;
+    background: #d5d5d5 !important;
+}
+
+body[data-md-color-scheme="slate"] p code {
+    font-weight: bold !important;
+    color: #176bad !important;
+}

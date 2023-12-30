@@ -37,3 +37,22 @@ or
 
 bin/dox s
 ```
+
+## Start server with docker
+
+```py
+docker-compose up -d --build
+```
+
+!!! tips
+    Ensure that setting `APP_ENV` in `.env` to `development` facilitates server operations with hot reloading during development, while configuring it as `production` ensures compilation into machine code for server deployment.
+    
+## Watch the builder
+
+```py
+dart run build_runner watch 
+
+or 
+
+dox build_runner:watch
+```
