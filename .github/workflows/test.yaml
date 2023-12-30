@@ -12,7 +12,7 @@ jobs:
       mariadb:
         image: mariadb:latest
         ports:
-          - 3306
+          - 3306:3306
         env:
           MYSQL_USER: dox
           MYSQL_PASSWORD: password
