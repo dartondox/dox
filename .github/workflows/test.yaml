@@ -14,15 +14,17 @@ jobs:
         ports:
           - 3306
         env:
-          MYSQL_USER: dox
+          MYSQL_USER: user
           MYSQL_PASSWORD: password
           MYSQL_DATABASE: dox-framework
           MYSQL_ROOT_PASSWORD: password
         options: >-
-            --health-cmd="mysqladmin ping" 
-            --health-interval=5s 
-            --health-timeout=2s 
-            --health-retries=3
+          --health-cmd="healthcheck.sh 
+          --connect 
+          --innodb_initialized" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=3
 
       postgres:
         image: postgres:latest
@@ -62,4 +64,4 @@ jobs:
     - name: Run Test (query builder postgres)
       run: melos test_query_builder_postgres
     - name: Run Test (query builder mysql)
-      run: USER=dox melos test_query_builder_mysql
+      run: melos test_query_builder_mysql
