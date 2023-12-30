@@ -65,7 +65,10 @@ class Table with TableUpdate {
   }
 
   TableColumn money(String name) {
-    TableColumn col = TableColumn(name: name, type: "MONEY");
+    TableColumn col = TableColumn(
+      name: name,
+      type: dbDriver.getName() == Driver.mysql ? "integer" : "MONEY",
+    );
     columns.add(col);
     return col;
   }
@@ -77,7 +80,9 @@ class Table with TableUpdate {
   }
 
   TableColumn jsonb(String name) {
-    TableColumn col = TableColumn(name: name, type: "JSONB");
+    TableColumn col = TableColumn(
+        name: name,
+        type: dbDriver.getName() == Driver.mysql ? "JSON" : 'JSONB');
     columns.add(col);
     return col;
   }

@@ -5,10 +5,11 @@ import 'connection.dart';
 import 'models/blog/blog.model.dart';
 import 'models/blog_info/blog_info.model.dart';
 
-void main() {
+void main() async {
+  await initQueryBuilder();
+
   group('Model |', () {
     setUp(() async {
-      SqlQueryBuilder.initialize(database: await poolConnection());
       await Schema.create('blog', (Table table) {
         table.id('uid');
         table.string('title');

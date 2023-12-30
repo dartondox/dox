@@ -42,4 +42,8 @@ jobs:
     - name: Melos Bootstrap
       run: melos bs
     - name: Run Tests
-      run: melos test
+      run: melos test --no-select
+    - name: Run Test (query builder postgres)
+      run: melos test_query_builder_postgres
+    - name: Run Test (query builder mysql)
+      run: melos test_query_builder_mysql
