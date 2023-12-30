@@ -14,7 +14,7 @@ jobs:
         ports:
           - 3306
         env:
-          MYSQL_USER: user
+          MYSQL_USER: dox
           MYSQL_PASSWORD: password
           MYSQL_DATABASE: dox-framework
           MYSQL_ROOT_PASSWORD: password
@@ -64,4 +64,4 @@ jobs:
     - name: Run Test (query builder postgres)
       run: melos test_query_builder_postgres
     - name: Run Test (query builder mysql)
-      run: melos test_query_builder_mysql
+      run: USER=dox melos test_query_builder_mysql
