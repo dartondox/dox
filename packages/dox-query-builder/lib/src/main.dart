@@ -1,5 +1,5 @@
 import 'package:dox_query_builder/dox_query_builder.dart';
-import 'package:postgres/postgres.dart';
+import 'package:dox_query_builder/src/drivers/mysql_driver.dart';
 
 class SqlQueryBuilder {
   static final SqlQueryBuilder _singleton = SqlQueryBuilder._internal();
@@ -10,7 +10,7 @@ class SqlQueryBuilder {
 
   SqlQueryBuilder._internal();
 
-  late DBDriver db;
+  late DBDriver dbDriver;
 
   bool debug = true;
 
@@ -25,12 +25,20 @@ class SqlQueryBuilder {
   /// );
   /// ```
   static void initialize({
-    required Connection database,
+    required dynamic database,
     bool debug = false,
     QueryPrinter? printer,
+    Driver driver = Driver.postgres,
   }) {
     SqlQueryBuilder sql = SqlQueryBuilder();
-    sql.db = PostgresDriver(conn: database);
+
+    if (driver == Driver.postgres) {
+      sql.dbDriver = PostgresDriver(conn: database);
+    }
+    if (driver == Driver.mysql) {
+      sql.dbDriver = MysqlDriver(conn: database);
+    }
+
     sql.debug = debug;
     // coverage:ignore-start
     if (printer != null) {

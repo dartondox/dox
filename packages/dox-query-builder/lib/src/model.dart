@@ -43,16 +43,17 @@ class Model<T> extends QueryBuilder<T> {
     String? updatedAtColumn = timestampsColumn['updated_at'];
 
     Map<String, dynamic> values = toMap(removeRelations: true);
+    DateTime currentTime = now();
     if (values[primaryKey] == null) {
       values.removeWhere((String key, dynamic value) => value == null);
 
       if (createdAtColumn != null) {
-        values[createdAtColumn] = now();
+        values[createdAtColumn] = currentTime;
         createdAt = values[createdAtColumn];
       }
 
       if (updatedAtColumn != null) {
-        values[updatedAtColumn] = now();
+        values[updatedAtColumn] = currentTime;
         updatedAt = values[updatedAtColumn];
       }
 
@@ -68,7 +69,7 @@ class Model<T> extends QueryBuilder<T> {
       values.remove(createdAtColumn);
       values.removeWhere((String key, dynamic value) => value == null);
       if (updatedAtColumn != null) {
-        values[updatedAtColumn] = now();
+        values[updatedAtColumn] = currentTime;
         updatedAt = values[updatedAtColumn];
       }
 

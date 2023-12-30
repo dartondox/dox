@@ -14,9 +14,9 @@ mixin Update<T> implements SharedMixin<T> {
 
     List<String> columnToUpdate = <String>[];
     data.forEach((String column, dynamic value) {
-      String key = helper.parseColumnKey(column);
-      columnToUpdate.add("$column = @$key");
-      addSubstitutionValues(key, value);
+      String columnKey = helper.parseColumnKey(column);
+      columnToUpdate.add("$column = $columnKey");
+      addSubstitutionValues(columnKey, value);
     });
     q += columnToUpdate.join(',');
     q += helper.getCommonQuery();

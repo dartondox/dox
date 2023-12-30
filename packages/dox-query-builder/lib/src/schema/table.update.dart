@@ -70,13 +70,14 @@ mixin TableUpdate implements TableSharedMixin {
     if (debug) {
       logger.log(query); // coverage:ignore-line
     }
-    await db.mappedResultsQuery(query);
+    await dbDriver.mappedResultsQuery(query);
   }
 
   Future<List<String>> getTableColumns() async {
     String query =
         "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '$tableName'";
-    List<Map<String, dynamic>> result = await db.mappedResultsQuery(query);
+    List<Map<String, dynamic>> result =
+        await dbDriver.mappedResultsQuery(query);
 
     List<String> columns = <String>[];
 

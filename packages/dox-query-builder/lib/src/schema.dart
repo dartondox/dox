@@ -44,7 +44,7 @@ class Schema {
   /// ```
   static Future<void> drop(String tableName) async {
     await SqlQueryBuilder()
-        .db
+        .dbDriver
         .query("DROP TABLE IF EXISTS $tableName RESTRICT");
   }
 }

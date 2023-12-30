@@ -8,7 +8,8 @@ import 'models/blog_info/blog_info.model.dart';
 void main() {
   group('Model |', () {
     setUp(() async {
-      SqlQueryBuilder.initialize(database: await poolConnection());
+      SqlQueryBuilder.initialize(
+          database: await poolConnection(), driver: Driver.mysql);
       await Schema.create('blog', (Table table) {
         table.id('uid');
         table.string('title');

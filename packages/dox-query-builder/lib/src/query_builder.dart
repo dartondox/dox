@@ -1,5 +1,4 @@
 import 'package:dox_query_builder/dox_query_builder.dart';
-import 'package:postgres/postgres.dart';
 
 import 'count.dart';
 import 'delete.dart';
@@ -43,7 +42,7 @@ class QueryBuilder<T>
   String primaryKey = 'id';
 
   @override
-  DBDriver get db => SqlQueryBuilder().db;
+  DBDriver get dbDriver => SqlQueryBuilder().dbDriver;
 
   @override
   QueryBuilderHelper<T> get helper => QueryBuilderHelper<T>(this);
@@ -71,8 +70,9 @@ class QueryBuilder<T>
   String tableName = '';
 
   @override
-  dynamic addSubstitutionValues(String key, dynamic value) {
-    return _substitutionValues[key] = value;
+  void addSubstitutionValues(String key, dynamic value) {
+    String index = key.replaceFirst('@', '');
+    _substitutionValues[index] = value;
   }
 
   @override
@@ -145,12 +145,12 @@ class QueryBuilder<T>
   /// ```
   /// var result = await QueryBuilder.query('select * from blog where id =  @id', {'id' : 1});
   ///
-  static Future<Result> query(
+  static Future<T> query<T>(
     String query, {
     Map<String, dynamic>? substitutionValues = const <String, dynamic>{},
   }) {
     return SqlQueryBuilder()
-        .db
-        .execute(query, substitutionValues: substitutionValues);
+        .dbDriver
+        .execute<T>(query, substitutionValues: substitutionValues);
   }
 }

@@ -9,22 +9,28 @@ class PostgresDriver extends DBDriver {
   /// constructor
   PostgresDriver({required this.conn});
 
+  @override
+  Driver getName() {
+    return Driver.postgres;
+  }
+
   /// run query and return map result
   @override
-  Future<Result> execute(
+  Future<T> execute<T>(
     String query, {
     Map<String, dynamic>? substitutionValues,
   }) async {
     Result result = await conn.runTx((TxSession s) async {
       return await s.execute(Sql.named(query), parameters: substitutionValues);
     });
-    return result;
+    return result as T;
   }
 
   /// run query and return map result
   @override
   Future<List<Map<String, dynamic>>> mappedResultsQuery(
     String query, {
+    String? primaryKey,
     Map<String, dynamic>? substitutionValues,
   }) async {
     Result result =
