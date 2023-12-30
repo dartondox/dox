@@ -8,6 +8,22 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
+
+      mariadb:
+        image: mariadb:latest
+        ports:
+          - 3306
+        env:
+          MYSQL_USER: root
+          MYSQL_PASSWORD: password
+          MYSQL_DATABASE: dox-framework
+          MYSQL_ROOT_PASSWORD: password
+        options: >-
+            --health-cmd="mysqladmin ping" 
+            --health-interval=5s 
+            --health-timeout=2s 
+            --health-retries=3
+
       postgres:
         image: postgres:latest
         env:
