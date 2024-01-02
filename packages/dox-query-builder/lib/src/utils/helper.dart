@@ -6,7 +6,8 @@ class QueryBuilderHelper<T> {
 
   String parseColumnKey(String column) {
     String timestamp = DateTime.now().microsecondsSinceEpoch.toString();
-    return "$column$timestamp".replaceAll(RegExp(r'[^\w]'), "");
+    String key = "$column$timestamp".replaceAll(RegExp(r'[^\w]'), "");
+    return '@$key';
   }
 
   String getCommonQuery({bool isCountQuery = false}) {
@@ -27,9 +28,12 @@ class QueryBuilderHelper<T> {
   Future<List<Map<String, dynamic>>> runQuery(String query) async {
     Map<String, dynamic> values = queryBuilder.substitutionValues;
     if (queryBuilder.shouldDebug) queryBuilder.logger.log(query, values);
-    DBDriver db = queryBuilder.db;
     query = query.replaceAll(RegExp(' +'), ' ');
-    return await db.mappedResultsQuery(query, substitutionValues: values);
+    return await queryBuilder.dbDriver.mappedResultsQuery(
+      query,
+      substitutionValues: values,
+      primaryKey: queryBuilder.primaryKey,
+    );
   }
 
   List<Map<String, dynamic>> getMapResult(

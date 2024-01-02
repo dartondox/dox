@@ -1,3 +1,5 @@
+import 'package:dox_query_builder/dox_query_builder.dart';
+
 import 'shared_mixin.dart';
 
 mixin Insert<T> implements SharedMixin<T> {
@@ -29,11 +31,13 @@ mixin Insert<T> implements SharedMixin<T> {
         await insertMultiple(<Map<String, dynamic>>[data]);
     if (result.isNotEmpty) {
       Map<String, dynamic> insertedData = result.first;
-      int id = insertedData[primaryKey] ?? 0;
+      int? id = insertedData[primaryKey];
       resetSubstitutionValues();
-      return await queryBuilder.find(id);
+      if (id != null) {
+        return await queryBuilder.find(id);
+      }
     }
-    return null;
+    return <String, dynamic>{};
   }
 
   /// insert/create multiple records
@@ -59,14 +63,18 @@ mixin Insert<T> implements SharedMixin<T> {
       List<String> ret = <String>[];
       data.forEach((String key, dynamic value) {
         String columnKey = helper.parseColumnKey(key);
-        ret.add("@$columnKey");
+        ret.add(columnKey);
         addSubstitutionValues(columnKey, value);
       });
       values.add("(${ret.join(',')})");
     }
 
+    String returningQuery = queryBuilder.dbDriver.getName() == Driver.postgres
+        ? 'RETURNING $primaryKey'
+        : '';
+
     String query =
-        "INSERT INTO $tableName (${columns.join(',')}) VALUES ${values.join(',')} RETURNING $primaryKey";
+        "INSERT INTO $tableName (${columns.join(',')}) VALUES ${values.join(',')} $returningQuery";
     return await helper.runQuery(query);
   }
 }

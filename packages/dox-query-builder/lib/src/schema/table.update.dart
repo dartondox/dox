@@ -1,3 +1,5 @@
+import 'package:dox_query_builder/dox_query_builder.dart';
+
 import 'table.column.dart';
 import 'table.shared_mixin.dart';
 
@@ -44,7 +46,11 @@ mixin TableUpdate implements TableSharedMixin {
 
     /// changing type
     if (col.type != null) {
-      queries.add("ALTER COLUMN ${col.name} TYPE ${col.type}");
+      if (dbDriver.getName() == Driver.mysql) {
+        queries.add("MODIFY COLUMN ${col.name} ${col.type}");
+      } else {
+        queries.add("ALTER COLUMN ${col.name} TYPE ${col.type}");
+      }
     }
 
     /// changing default value
@@ -53,8 +59,13 @@ mixin TableUpdate implements TableSharedMixin {
     }
 
     /// set null
-    queries.add(
-        "ALTER COLUMN ${col.name} ${col.isNullable ? 'DROP NOT NULL' : 'SET NOT NULL'}");
+    if (dbDriver.getName() == Driver.mysql) {
+      queries.add(
+          "MODIFY COLUMN ${col.name} ${col.isNullable ? 'NULL' : 'NOT NULL'}");
+    } else {
+      queries.add(
+          "ALTER COLUMN ${col.name} ${col.isNullable ? 'DROP NOT NULL' : 'SET NOT NULL'}");
+    }
 
     /// set unique
     if (col.isUnique) {
@@ -62,21 +73,24 @@ mixin TableUpdate implements TableSharedMixin {
     }
 
     /// run final query
-    String query = "ALTER TABLE $tableName ${queries.join(',')}";
-    return await _runQuery(query);
+    for (String q in queries) {
+      String query = "ALTER TABLE $tableName $q";
+      return await _runQuery(query);
+    }
   }
 
   Future<void> _runQuery(String query) async {
     if (debug) {
       logger.log(query); // coverage:ignore-line
     }
-    await db.mappedResultsQuery(query);
+    await dbDriver.mappedResultsQuery(query);
   }
 
   Future<List<String>> getTableColumns() async {
     String query =
         "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '$tableName'";
-    List<Map<String, dynamic>> result = await db.mappedResultsQuery(query);
+    List<Map<String, dynamic>> result =
+        await dbDriver.mappedResultsQuery(query);
 
     List<String> columns = <String>[];
 

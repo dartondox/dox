@@ -4,10 +4,11 @@ import 'package:test/test.dart';
 import 'connection.dart';
 import 'models/user/user.model.dart';
 
-void main() {
+void main() async {
+  await initQueryBuilder();
+
   group('Model with custom table name', () {
     setUp(() async {
-      SqlQueryBuilder.initialize(database: await poolConnection());
       await Schema.create('users', (Table table) {
         table.id();
         table.string('name');

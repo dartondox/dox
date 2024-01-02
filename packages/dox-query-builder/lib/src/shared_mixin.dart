@@ -7,7 +7,7 @@ abstract class SharedMixin<T> {
   QueryBuilder<T> get queryBuilder;
   QueryBuilderHelper<T> get helper;
   Logger get logger;
-  DBDriver get db;
+  DBDriver get dbDriver;
   Map<String, dynamic> get substitutionValues;
   String get selectQueryString;
   String primaryKey = 'id';

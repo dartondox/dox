@@ -1,4 +1,6 @@
 import 'package:dox_query_builder/dox_query_builder.dart';
+import 'package:dox_query_builder/src/drivers/mysql_driver.dart';
+import 'package:mysql1/mysql1.dart';
 import 'package:postgres/postgres.dart';
 
 class SqlQueryBuilder {
@@ -10,7 +12,7 @@ class SqlQueryBuilder {
 
   SqlQueryBuilder._internal();
 
-  late DBDriver db;
+  late DBDriver dbDriver;
 
   bool debug = true;
 
@@ -25,12 +27,29 @@ class SqlQueryBuilder {
   /// );
   /// ```
   static void initialize({
-    required Connection database,
+    required dynamic database,
     bool debug = false,
     QueryPrinter? printer,
+    Driver driver = Driver.postgres,
   }) {
     SqlQueryBuilder sql = SqlQueryBuilder();
-    sql.db = PostgresDriver(conn: database);
+
+    if (driver == Driver.postgres) {
+      if (database is! Connection) {
+        throw Exception(
+            'Invalid database connection. It must be postgres `Connection` type');
+      }
+      sql.dbDriver = PostgresDriver(conn: database);
+    } else if (driver == Driver.mysql) {
+      if (database is! MySqlConnection) {
+        throw Exception(
+            'Invalid database connection. It must be `MySqlConnection` type');
+      }
+      sql.dbDriver = MysqlDriver(conn: database);
+    } else {
+      throw Exception('Invalid driver or not supported');
+    }
+
     sql.debug = debug;
     // coverage:ignore-start
     if (printer != null) {

@@ -14,7 +14,10 @@ class Table with TableUpdate {
   bool debug = SqlQueryBuilder().debug;
 
   @override
-  DBDriver get db => SqlQueryBuilder().db;
+  DBDriver get dbDriver => SqlQueryBuilder().dbDriver;
+
+  String get defaultTimestampType =>
+      dbDriver.getName() == Driver.postgres ? 'TIMESTAMPTZ' : 'TIMESTAMP';
 
   // coverage:ignore-start
   @override
@@ -62,7 +65,10 @@ class Table with TableUpdate {
   }
 
   TableColumn money(String name) {
-    TableColumn col = TableColumn(name: name, type: "MONEY");
+    TableColumn col = TableColumn(
+      name: name,
+      type: dbDriver.getName() == Driver.postgres ? "MONEY" : "INTEGER",
+    );
     columns.add(col);
     return col;
   }
@@ -74,7 +80,9 @@ class Table with TableUpdate {
   }
 
   TableColumn jsonb(String name) {
-    TableColumn col = TableColumn(name: name, type: "JSONB");
+    TableColumn col = TableColumn(
+        name: name,
+        type: dbDriver.getName() == Driver.postgres ? "JSONB" : 'JSON');
     columns.add(col);
     return col;
   }
@@ -123,23 +131,24 @@ class Table with TableUpdate {
   }
 
   TableColumn timestampTz(String name) {
-    TableColumn col = TableColumn(name: name, type: 'TIMESTAMPTZ');
+    TableColumn col = TableColumn(name: name, type: defaultTimestampType);
     columns.add(col);
     return col;
   }
 
   TableColumn softDeletes([dynamic name]) {
     TableColumn col =
-        TableColumn(name: name ?? 'deleted_at', type: 'TIMESTAMPTZ').nullable();
+        TableColumn(name: name ?? 'deleted_at', type: defaultTimestampType)
+            .nullable();
     columns.add(col);
     return col;
   }
 
   void timestamps() {
     TableColumn createdAt =
-        TableColumn(name: 'created_at', type: 'TIMESTAMPTZ').nullable();
+        TableColumn(name: 'created_at', type: defaultTimestampType).nullable();
     TableColumn updatedAt =
-        TableColumn(name: 'updated_at', type: 'TIMESTAMPTZ').nullable();
+        TableColumn(name: 'updated_at', type: defaultTimestampType).nullable();
     columns.add(createdAt);
     columns.add(updatedAt);
   }
@@ -172,6 +181,6 @@ class Table with TableUpdate {
     if (debug) {
       logger.log(query); // coverage:ignore-line
     }
-    await db.mappedResultsQuery(query);
+    await dbDriver.mappedResultsQuery(query);
   }
 }

@@ -73,9 +73,9 @@ mixin Where<T> implements SharedMixin<T> {
     }
     String columnKey = helper.parseColumnKey(column);
     if (_wheres.isEmpty) {
-      _wheres.add("$column $condition @$columnKey");
+      _wheres.add("$column $condition $columnKey");
     } else {
-      _wheres.add("$type $column $condition @$columnKey");
+      _wheres.add("$type $column $condition $columnKey");
     }
     addSubstitutionValues(columnKey, value);
     return queryBuilder;

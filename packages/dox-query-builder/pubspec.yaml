@@ -1,5 +1,5 @@
 name: dox_query_builder
-description: PostgresSQL query builder, Support Model, Where, orWhere, Find, Join, softDeletes, Debugging and many mores.
+description: PostgresSQL, MYSQL query builder, Support Model, Where, orWhere, Find, Join, softDeletes, Debugging and many mores.
 version: 2.0.0
 repository: https://github.com/dartondox/dox
 homepage: https://dartondox.dev
@@ -9,6 +9,7 @@ environment:
 
 dependencies:
   postgres: ^3.0.5
+  mysql1: ^0.20.0
   dox_annotation: ^1.0.5
   
 dev_dependencies:

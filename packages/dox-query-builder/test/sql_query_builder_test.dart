@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dox_query_builder/dox_query_builder.dart';
+import 'package:mysql1/mysql1.dart';
 import 'package:postgres/postgres.dart';
 import 'package:test/test.dart';
 
@@ -9,7 +10,7 @@ import 'models/blog/blog.model.dart';
 import 'models/blog_info/blog_info.model.dart';
 
 void main() async {
-  SqlQueryBuilder.initialize(database: await poolConnection());
+  await initQueryBuilder();
 
   group('Query Builder', () {
     setUp(() async {
@@ -131,9 +132,13 @@ void main() async {
       blog.description = 'Awesome blog body';
       await blog.save();
 
-      Result b = await QueryBuilder.query('select * from blog');
-
-      expect(b.first.toColumnMap()['title'], 'Awesome blog');
+      if (getDriver() == Driver.postgres) {
+        Result b = await QueryBuilder.query('select * from blog');
+        expect(b.first.toColumnMap()['title'], 'Awesome blog');
+      } else {
+        Results b = await QueryBuilder.query<Results>('select * from blog');
+        expect(b.first.fields['title'], 'Awesome blog');
+      }
     });
 
     test('group by', () async {
