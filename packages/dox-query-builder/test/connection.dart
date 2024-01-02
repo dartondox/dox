@@ -13,17 +13,17 @@ Future<void> initQueryBuilder() async {
 }
 
 Future<dynamic> poolConnection() {
-  if (Platform.environment['DRIVER'] == 'postgres') {
-    return postgresConnection();
-  } else {
+  if (Platform.environment['DRIVER'] == 'mysql') {
     return mysqlConnection();
+  } else {
+    return postgresConnection();
   }
 }
 
 Driver getDriver() {
-  if (Platform.environment['DRIVER'] == 'postgres') {
-    return Driver.postgres;
-  } else {
+  if (Platform.environment['DRIVER'] == 'mysql') {
     return Driver.mysql;
+  } else {
+    return Driver.postgres;
   }
 }
