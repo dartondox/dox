@@ -64,4 +64,4 @@ jobs:
     - name: Run Test (query builder postgres)
       run: melos test_query_builder_postgres
     - name: Run Test (query builder mysql)
-      run: USER=dox melos test_query_builder_mysql
+      run: DB_USER=dox melos test_query_builder_mysql
