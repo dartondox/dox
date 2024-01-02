@@ -17,7 +17,7 @@ class Table with TableUpdate {
   DBDriver get dbDriver => SqlQueryBuilder().dbDriver;
 
   String get defaultTimestampType =>
-      dbDriver.getName() == Driver.mysql ? 'TIMESTAMP' : 'TIMESTAMPTZ';
+      dbDriver.getName() == Driver.postgres ? 'TIMESTAMPTZ' : 'TIMESTAMP';
 
   // coverage:ignore-start
   @override
@@ -67,7 +67,7 @@ class Table with TableUpdate {
   TableColumn money(String name) {
     TableColumn col = TableColumn(
       name: name,
-      type: dbDriver.getName() == Driver.mysql ? "integer" : "MONEY",
+      type: dbDriver.getName() == Driver.postgres ? "MONEY" : "INTEGER",
     );
     columns.add(col);
     return col;
@@ -82,7 +82,7 @@ class Table with TableUpdate {
   TableColumn jsonb(String name) {
     TableColumn col = TableColumn(
         name: name,
-        type: dbDriver.getName() == Driver.mysql ? "JSON" : 'JSONB');
+        type: dbDriver.getName() == Driver.postgres ? "JSONB" : 'JSON');
     columns.add(col);
     return col;
   }

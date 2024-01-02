@@ -69,9 +69,9 @@ mixin Insert<T> implements SharedMixin<T> {
       values.add("(${ret.join(',')})");
     }
 
-    String returningQuery = queryBuilder.dbDriver.getName() == Driver.mysql
-        ? ''
-        : 'RETURNING $primaryKey';
+    String returningQuery = queryBuilder.dbDriver.getName() == Driver.postgres
+        ? 'RETURNING $primaryKey'
+        : '';
 
     String query =
         "INSERT INTO $tableName (${columns.join(',')}) VALUES ${values.join(',')} $returningQuery";
