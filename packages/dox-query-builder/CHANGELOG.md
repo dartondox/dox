@@ -1,3 +1,7 @@
+## 2.1.0
+
+- Added support for MYSQL driver
+
 ## 2.0.0
 
 - Support postgres driver v3
