@@ -266,7 +266,7 @@ packages:
       path: "../dox-query-builder"
       relative: true
     source: path
-    version: "2.0.0"
+    version: "2.1.0"
   dox_websocket:
     dependency: "direct main"
     description:
@@ -427,7 +427,7 @@ packages:
     source: hosted
     version: "1.0.4"
   mysql1:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: mysql1
       sha256: "68aec7003d2abc85769bafa1777af3f4a390a90c31032b89636758ff8eb839e9"

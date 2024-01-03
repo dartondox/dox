@@ -1,7 +1,6 @@
-import 'package:dox_app/config/postgres.dart';
+import 'package:dox_app/config/database.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_query_builder/dox_query_builder.dart';
-import 'package:postgres/postgres.dart';
 
 /// Query builder service
 /// --------------------------
@@ -12,15 +11,6 @@ class ORMService implements DoxService {
   @override
   Future<void> setup() async {
     /// Initialize Sql QueryBuilder
-    SqlQueryBuilder.initialize(
-      database: await Connection.open(
-        postgresEndpoint,
-        settings: postgresPoolSetting,
-      ),
-      debug: true,
-      printer: Env.get('APP_ENV') == 'development'
-          ? PrettyQueryPrinter()
-          : ConsoleQueryPrinter(),
-    );
+    await SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
   }
 }

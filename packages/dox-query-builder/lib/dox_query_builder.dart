@@ -18,6 +18,7 @@ export 'src/relationships/many_to_many.dart';
 export 'src/schema.dart';
 export 'src/schema/table.dart';
 export 'src/soft_deletes.dart';
+export 'src/types/database_config.dart';
 export 'src/types/pagination_result.dart';
 export 'src/utils/annotation.dart';
 export 'src/utils/functions.dart';
