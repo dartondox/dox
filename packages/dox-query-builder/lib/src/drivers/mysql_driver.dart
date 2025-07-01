@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:dox_query_builder/dox_query_builder.dart';
 import 'package:mysql1/mysql1.dart';
 
+MySqlConnection? _globalMysqlConnection;
+
 /// driver for postgres SQL
 /// support PostgreSQLConnection and PgPool
 class MysqlDriver extends DBDriver {
-  final MySqlConnection conn;
+  dynamic conn;
 
   /// constructor
   MysqlDriver({required this.conn});
@@ -16,14 +18,32 @@ class MysqlDriver extends DBDriver {
     return Driver.mysql;
   }
 
+  Future<MySqlConnection> _getConnection() async {
+    /// preventing to create duplicate mysql connection
+    if (_globalMysqlConnection != null) {
+      return _globalMysqlConnection!;
+    }
+
+    /// if connection is future, we need to connect first
+    if (conn is Future) {
+      conn = await conn;
+    }
+
+    /// assign to global
+    _globalMysqlConnection = conn;
+
+    /// return connection
+    return conn;
+  }
+
   /// run query and return map result
   @override
   Future<T> execute<T>(
     String query, {
     Map<String, dynamic>? substitutionValues,
   }) async {
-    dynamic result =
-        await conn.run(query, substitutionValues: substitutionValues);
+    MySqlConnection c = await _getConnection();
+    dynamic result = await c.run(query, substitutionValues: substitutionValues);
     return result as T;
   }
 
@@ -34,7 +54,8 @@ class MysqlDriver extends DBDriver {
     String? primaryKey,
     Map<String, dynamic>? substitutionValues,
   }) async {
-    return await conn.execute(
+    MySqlConnection c = await _getConnection();
+    return await c.execute(
       query,
       primaryKey: primaryKey,
       substitutionValues: substitutionValues,
@@ -47,7 +68,8 @@ class MysqlDriver extends DBDriver {
     String query, {
     Map<String, dynamic>? substitutionValues,
   }) async {
-    await conn.run(query, substitutionValues: substitutionValues);
+    MySqlConnection c = await _getConnection();
+    await c.run(query, substitutionValues: substitutionValues);
   }
 }
 

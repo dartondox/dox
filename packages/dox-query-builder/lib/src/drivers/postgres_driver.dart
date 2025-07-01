@@ -1,10 +1,12 @@
 import 'package:dox_query_builder/dox_query_builder.dart';
 import 'package:postgres/postgres.dart';
 
+Connection? _globalPostgresConnection;
+
 /// driver for postgres SQL
 /// support PostgreSQLConnection and PgPool
 class PostgresDriver extends DBDriver {
-  final Connection conn;
+  dynamic conn;
 
   /// constructor
   PostgresDriver({required this.conn});
@@ -14,13 +16,32 @@ class PostgresDriver extends DBDriver {
     return Driver.postgres;
   }
 
+  Future<Connection> _getConnection() async {
+    /// preventing to create duplicate mysql connection
+    if (_globalPostgresConnection != null) {
+      return _globalPostgresConnection!;
+    }
+
+    /// if connection is future, we need to connect first
+    if (conn is Future) {
+      conn = await conn;
+    }
+
+    /// assign to global
+    _globalPostgresConnection = conn;
+
+    /// return connection
+    return conn;
+  }
+
   /// run query and return map result
   @override
   Future<T> execute<T>(
     String query, {
     Map<String, dynamic>? substitutionValues,
   }) async {
-    Result result = await conn.runTx((TxSession s) async {
+    Connection c = await _getConnection();
+    Result result = await c.runTx((TxSession s) async {
       return await s.execute(Sql.named(query), parameters: substitutionValues);
     });
     return result as T;
@@ -42,9 +63,7 @@ class PostgresDriver extends DBDriver {
   @override
   Future<void> query(String query,
       {Map<String, dynamic>? substitutionValues}) async {
-    await conn.runTx((TxSession s) async {
-      await s.execute(Sql.named(query), parameters: substitutionValues);
-    });
+    await execute(query, substitutionValues: substitutionValues);
   }
 }
 

@@ -11,6 +11,6 @@ class ORMService implements DoxService {
   @override
   Future<void> setup() async {
     /// Initialize Sql QueryBuilder
-    await SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
+    SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
   }
 }

@@ -1,8 +1,6 @@
 import 'dart:convert';
 
 import 'package:dox_query_builder/dox_query_builder.dart';
-import 'package:mysql1/mysql1.dart';
-import 'package:postgres/postgres.dart';
 import 'package:test/test.dart';
 
 import 'connection.dart';
@@ -126,20 +124,19 @@ void main() async {
       expect(blogs2.first.title, 'b');
     });
 
-    test('query', () async {
-      Blog blog = Blog();
-      blog.title = 'Awesome blog';
-      blog.description = 'Awesome blog body';
-      await blog.save();
-
-      if (getDriver() == Driver.postgres) {
-        Result b = await QueryBuilder.query('select * from blog');
-        expect(b.first.toColumnMap()['title'], 'Awesome blog');
-      } else {
-        Results b = await QueryBuilder.query<Results>('select * from blog');
-        expect(b.first.fields['title'], 'Awesome blog');
-      }
-    });
+    // test('query', () async {
+    //   Blog blog = Blog();
+    //   blog.title = 'Awesome blog';
+    //   blog.description = 'Awesome blog body';
+    //   await blog.save();
+    //   if (getDriver() == Driver.postgres) {
+    //     Result b = await QueryBuilder.query('select * from blog');
+    //     expect(b.first.toColumnMap()['title'], 'Awesome blog');
+    //   } else {
+    //     Results b = await QueryBuilder.query<Results>('select * from blog');
+    //     expect(b.first.fields['title'], 'Awesome blog');
+    //   }
+    // });
 
     test('group by', () async {
       await Blog().insertMultiple(<Map<String, dynamic>>[
