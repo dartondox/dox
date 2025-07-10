@@ -18,12 +18,12 @@ DatabaseConfig databaseConfig = DatabaseConfig(
     /// -------------------------------
     'postgres': ConnectionConfig(
       driver: Driver.postgres,
-      port: 5433,
+      port: 5432,
       user: 'postgres',
       password: 'postgres',
       database: 'postgres',
       extra: <String, dynamic>{
-        'maxConnectionCount': 10,
+        'maxConnectionCount': 20,
         'maxConnectionAge': Duration(hours: 1),
       },
       debug: false,
@@ -36,7 +36,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
     'mysql': ConnectionConfig(
       driver: Driver.mysql,
       port: 3306,
-      user: 'dox',
+      user: Platform.environment['DB_USER'] ?? 'root',
       password: 'password',
       database: 'dox-framework',
       extra: <String, dynamic>{
