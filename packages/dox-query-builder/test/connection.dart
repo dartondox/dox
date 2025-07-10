@@ -24,7 +24,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
       database: 'postgres',
       extra: <String, dynamic>{
         'maxConnectionCount': 20,
-        'maxConnectionAge': Duration(hours: 1),
+        'maxConnectionAge': Duration(milliseconds: 500),
       },
       debug: false,
       printer: ConsoleQueryPrinter(),
