@@ -18,7 +18,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
     /// -------------------------------
     'postgres': ConnectionConfig(
       driver: Driver.postgres,
-      port: 5432,
+      port: int.parse(Platform.environment['DB_PORT'] ?? '5432'),
       user: 'postgres',
       password: 'postgres',
       database: 'postgres',
@@ -35,7 +35,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
     /// -------------------------------
     'mysql': ConnectionConfig(
       driver: Driver.mysql,
-      port: 3306,
+      port: int.parse(Platform.environment['DB_PORT'] ?? '3306'),
       user: Platform.environment['DB_USER'] ?? 'root',
       password: 'password',
       database: 'dox-framework',

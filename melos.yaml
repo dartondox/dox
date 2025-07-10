@@ -11,13 +11,13 @@ scripts:
       ignore: "dox_query_builder"
 
   test_query_builder_postgres:
-    exec: DRIVER=postgres dart test --concurrency=1
+    exec: DRIVER=postgres DB_PORT=5433 dart test --concurrency=1
     packageFilters:
       noSelect: true
       scope: "dox_query_builder"
 
   test_query_builder_mysql:
-    exec: DRIVER=mysql dart test --concurrency=1
+    exec: DRIVER=mysql DB_PORT=3306 dart test --concurrency=1
     packageFilters:
       noSelect: true
       scope: "dox_query_builder"
