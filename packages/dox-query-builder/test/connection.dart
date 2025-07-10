@@ -36,7 +36,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
     'mysql': ConnectionConfig(
       driver: Driver.mysql,
       port: 3306,
-      user: 'root',
+      user: 'dox',
       password: 'password',
       database: 'dox-framework',
       extra: <String, dynamic>{
