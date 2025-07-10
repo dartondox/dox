@@ -36,7 +36,25 @@ class PostgresDriver extends DBDriver {
 
   /// run query and return map result
   @override
-  Future<T> execute<T>(
+  Future<List<Map<String, dynamic>>> query(
+    String query, {
+    String? primaryKey,
+    Map<String, dynamic>? substitutionValues,
+  }) async {
+    Result result =
+        await _internalQuery(query, substitutionValues: substitutionValues);
+    return result.toMapList();
+  }
+
+  /// only run query
+  @override
+  Future<void> execute(String query,
+      {Map<String, dynamic>? substitutionValues}) async {
+    await _internalQuery(query, substitutionValues: substitutionValues);
+  }
+
+  /// run query and return map result
+  Future<T> _internalQuery<T>(
     String query, {
     Map<String, dynamic>? substitutionValues,
   }) async {
@@ -45,25 +63,6 @@ class PostgresDriver extends DBDriver {
       return await s.execute(Sql.named(query), parameters: substitutionValues);
     });
     return result as T;
-  }
-
-  /// run query and return map result
-  @override
-  Future<List<Map<String, dynamic>>> mappedResultsQuery(
-    String query, {
-    String? primaryKey,
-    Map<String, dynamic>? substitutionValues,
-  }) async {
-    Result result =
-        await execute(query, substitutionValues: substitutionValues);
-    return result.toMapList();
-  }
-
-  /// only run query
-  @override
-  Future<void> query(String query,
-      {Map<String, dynamic>? substitutionValues}) async {
-    await execute(query, substitutionValues: substitutionValues);
   }
 }
 

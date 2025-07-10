@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dox_query_builder/dox_query_builder.dart';
 import 'package:mysql1/mysql1.dart' as mysql;
 
@@ -8,7 +10,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
   /// The primary connection for making database queries across the application
   /// You can use any key from the `connections` Map defined in this same
   /// file.
-  connection: 'mysql',
+  connection: Platform.environment['DRIVER'] ?? 'mysql',
 
   connections: <String, ConnectionConfig>{
     /// -------------------------------
@@ -16,7 +18,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
     /// -------------------------------
     'postgres': ConnectionConfig(
       driver: Driver.postgres,
-      port: 5432,
+      port: 5433,
       user: 'postgres',
       password: 'postgres',
       database: 'postgres',

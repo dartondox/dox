@@ -164,12 +164,12 @@ class QueryBuilder<T>
   /// ```
   /// var result = await QueryBuilder.query('select * from blog where id =  @id', {'id' : 1});
   ///
-  static Future<T> query<T>(
+  static Future<List<Map<String, dynamic>>> query(
     String query, {
     Map<String, dynamic>? substitutionValues = const <String, dynamic>{},
   }) {
     return SqlQueryBuilder()
         .dbDriver
-        .execute<T>(query, substitutionValues: substitutionValues);
+        .query(query, substitutionValues: substitutionValues);
   }
 }

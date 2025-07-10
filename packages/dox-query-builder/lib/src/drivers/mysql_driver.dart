@@ -38,18 +38,7 @@ class MysqlDriver extends DBDriver {
 
   /// run query and return map result
   @override
-  Future<T> execute<T>(
-    String query, {
-    Map<String, dynamic>? substitutionValues,
-  }) async {
-    MySqlConnection c = await _getConnection();
-    dynamic result = await c.run(query, substitutionValues: substitutionValues);
-    return result as T;
-  }
-
-  /// run query and return map result
-  @override
-  Future<List<Map<String, dynamic>>> mappedResultsQuery(
+  Future<List<Map<String, dynamic>>> query(
     String query, {
     String? primaryKey,
     Map<String, dynamic>? substitutionValues,
@@ -64,7 +53,7 @@ class MysqlDriver extends DBDriver {
 
   /// only run query
   @override
-  Future<void> query(
+  Future<void> execute(
     String query, {
     Map<String, dynamic>? substitutionValues,
   }) async {

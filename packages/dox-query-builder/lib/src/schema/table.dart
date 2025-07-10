@@ -181,6 +181,6 @@ class Table with TableUpdate {
     if (debug) {
       logger.log(query); // coverage:ignore-line
     }
-    await dbDriver.mappedResultsQuery(query);
+    await dbDriver.execute(query);
   }
 }
