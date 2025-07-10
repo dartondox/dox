@@ -49,6 +49,5 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 );
 
 Future<void> initQueryBuilder() async {
-  print('PORT: ${int.parse(Platform.environment['DB_PORT'] ?? '5432')}');
   SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
 }
