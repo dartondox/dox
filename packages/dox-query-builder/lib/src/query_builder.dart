@@ -42,7 +42,16 @@ class QueryBuilder<T>
   String primaryKey = 'id';
 
   @override
-  DBDriver get dbDriver => SqlQueryBuilder().dbDriver;
+  String? connection;
+
+  @override
+  DBDriver get dbDriver {
+    if (connection != null) {
+      print(connection);
+      return SqlQueryBuilder().getDBDriver(connection);
+    }
+    return SqlQueryBuilder().dbDriver;
+  }
 
   @override
   QueryBuilderHelper<T> get helper => QueryBuilderHelper<T>(this);
@@ -98,10 +107,20 @@ class QueryBuilder<T>
   /// set debug on or of
   ///
   /// ```
-  /// QueryBuilder.table('blog').debug(true)
+  /// QueryBuilder().debug(true)
   /// ```
   QueryBuilder<T> debug([bool? debug]) {
     shouldDebug = debug ?? true;
+    return this;
+  }
+
+  /// use different connection to query
+  ///
+  /// ```
+  /// QueryBuilder().withConnection('mysql')
+  /// ```
+  QueryBuilder<T> withConnection(String connectionName) {
+    connection = connectionName;
     return this;
   }
 
@@ -145,12 +164,12 @@ class QueryBuilder<T>
   /// ```
   /// var result = await QueryBuilder.query('select * from blog where id =  @id', {'id' : 1});
   ///
-  static Future<T> query<T>(
+  static Future<List<Map<String, dynamic>>> query(
     String query, {
     Map<String, dynamic>? substitutionValues = const <String, dynamic>{},
   }) {
     return SqlQueryBuilder()
         .dbDriver
-        .execute<T>(query, substitutionValues: substitutionValues);
+        .query(query, substitutionValues: substitutionValues);
   }
 }

@@ -1,6 +1,7 @@
 import 'package:dox/dox.dart';
 import 'package:dox/src/tools/create_controller.dart';
 import 'package:dox/src/tools/create_middleware.dart';
+import 'package:dox/src/tools/create_migration.dart';
 import 'package:dox/src/tools/create_project.dart';
 import 'package:dox/src/tools/create_request.dart';
 import 'package:dox/src/tools/create_serializer.dart';
@@ -8,7 +9,6 @@ import 'package:dox/src/tools/generate_key.dart';
 import 'package:dox/src/tools/help.dart';
 import 'package:dox/src/tools/server_serve.dart';
 import 'package:dox/src/tools/update_dox.dart';
-import 'package:dox_migration/dox_migration.dart';
 
 void main(List<String> args) async {
   List<String> versionKeys = [
@@ -60,15 +60,15 @@ void main(List<String> args) async {
     return;
   }
 
-  if (args.length == 1 && args[0] == 'migrate') {
-    await Migration(from: 'cli').migrate();
-    return;
-  }
+  // if (args.length == 1 && args[0] == 'migrate') {
+  //   await Migration(from: 'cli').migrate();
+  //   return;
+  // }
 
-  if (args.length == 1 && args[0] == 'migrate:rollback') {
-    await Migration(from: 'cli').rollback();
-    return;
-  }
+  // if (args.length == 1 && args[0] == 'migrate:rollback') {
+  //   await Migration(from: 'cli').rollback();
+  //   return;
+  // }
 
   List<String> serveKeys = [
     'serve',

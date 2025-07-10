@@ -8,7 +8,6 @@ environment:
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
-  dox_migration: ^2.0.0
   watcher: ^1.0.2
   path: ^1.8.3
 

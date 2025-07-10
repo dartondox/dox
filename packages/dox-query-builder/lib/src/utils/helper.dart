@@ -29,7 +29,7 @@ class QueryBuilderHelper<T> {
     Map<String, dynamic> values = queryBuilder.substitutionValues;
     if (queryBuilder.shouldDebug) queryBuilder.logger.log(query, values);
     query = query.replaceAll(RegExp(' +'), ' ');
-    return await queryBuilder.dbDriver.mappedResultsQuery(
+    return await queryBuilder.dbDriver.query(
       query,
       substitutionValues: values,
       primaryKey: queryBuilder.primaryKey,

@@ -6,13 +6,14 @@ environment:
 
 dependencies:
   postgres: ^3.0.5
+  mysql1: ^0.20.0
   ioredis: ^1.0.2
   short_uuids: ^2.0.0
   dox_auth: ^2.0.0
   dox_migration: ^2.0.0
   dox_core: ^2.0.0
   dox_websocket: ^1.0.0
-  dox_query_builder: ^2.0.0
+  dox_query_builder: ^2.1.0
 
 dev_dependencies:
   dox_builder: ^2.0.0

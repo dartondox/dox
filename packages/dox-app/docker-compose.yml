@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
 
   # Http server
@@ -16,16 +14,19 @@ services:
   # Postgres database
   postgres:
     image: postgres:14.1
+    volumes:
+      - ../.docker/build/postgres:/var/lib/postgresql/data
     environment: 
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
+    expose:
+      - ${DB_PORT}
     ports:
-      - "5432:5432"
+      - "${DB_PORT}:${DB_PORT}"
+    command: -p ${DB_PORT}
     restart: always
     healthcheck:
-      test: ['CMD', 'pg_isready', '-q', '-U', 'postgres']
+      test: ['CMD', 'pg_isready', '-q', '-U', 'postgres', '-p', '${DB_PORT}']
       interval: 5s
       retries: 5
-    volumes:
-      - .docker/build:/var/lib/postgresql/data
