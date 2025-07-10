@@ -8,7 +8,9 @@ scripts:
   test:
     exec: dart test --concurrency=1
     packageFilters:
-      ignore: "dox_query_builder"
+      noSelect: true
+      ignore:
+        - "dox_query_builder"
 
   test_query_builder_postgres:
     exec: DRIVER=postgres dart test --concurrency=1

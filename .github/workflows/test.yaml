@@ -59,6 +59,8 @@ jobs:
       run: dart pub global activate melos
     - name: Melos Bootstrap
       run: melos bs
+    - name: Copy .env.example to .env
+      run: cp dox_app/.env.example dox_app/.env
     - name: Run Tests
       run: melos test --no-select
     - name: Run Test (query builder postgres)
