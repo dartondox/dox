@@ -19,6 +19,7 @@ Dox is a powerful framework specifically developed for web application backend d
 - **Simple, fast routing**: Dox offers a simple and efficient routing system, allowing developers to define and handle routes easily for building robust web applications. 
 - **ORM Support with Strong Query Builder**: Dox provides an ORM (Object-Relational Mapping) system along with a powerful query builder, enabling developers to interact with databases efficiently.
 - **Validation of Request Data**: Dox includes built-in validation capabilities, allowing developers to validate incoming request data easily and ensure data integrity.
+- **Database Migration**: The framework offers database migration support, allowing developers to manage and apply database schema changes seamlessly.
 - **Web Socket**: Dox provides WebSocket support, enabling real-time communication and bidirectional data exchange between the server and clients.
 - **CORS**: Dox includes Cross-Origin Resource Sharing (CORS) support, allowing developers to control and manage cross-origin requests for enhanced security.
 - **CLI (Command-Line Interface)**: Dox provides a command-line interface with useful commands to streamline development tasks, such as creating migrations, generating models, and more.
