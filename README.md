@@ -1,6 +1,9 @@
 <div align="center">
 <img src="https://raw.githubusercontent.com/dartondox/assets/main/dox-logo.png" width="70" />
 </br></br>
+
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/dartondox/dox?utm_source=oss&utm_medium=github&utm_campaign=dartondox%2Fdox&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
+
 <div style="display:inliine-block">
 <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" height="20"/> <img src="https://github.com/dartondox/dox/actions/workflows/test.yaml/badge.svg?branch=v1.x" height="20"/> <img src="https://img.shields.io/github/stars/dartondox/dox.svg" height="20"/> <img src="https://img.shields.io/github/forks/dartondox/dox.svg" height="20"/> <img src="https://img.shields.io/github/license/dartondox/dox.svg" height="20"/>
 </div>
