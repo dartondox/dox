@@ -9,3 +9,4 @@ pubspec_overrides.yaml
 .idea
 site
 .env
+dox
