@@ -247,7 +247,7 @@ class CommandRegistry {
 
     CommandDefinition(
       command: 'create:migration',
-      helpInfo: 'create:migration <migration_name> [--sql|--dart]',
+      helpInfo: 'create:migration <migration_name> --[sql|dart]',
       description: 'Create a new migration',
       category: CommandCategory.database,
       minArgs: 1,
