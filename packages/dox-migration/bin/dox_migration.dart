@@ -4,10 +4,12 @@ import 'package:dox_migration/src/dox_migration_base.dart';
 void main(List<String> args) async {
   if (args.length == 2 && args[0] == 'migrate') {
     await Migration(from: 'cli').migrate();
+    return;
   }
 
   if (args.length == 2 && args[0] == 'rollback') {
     await Migration(from: 'cli').rollback();
+    return;
   }
 
   if (args.length == 2 && args[0] == 'create') {

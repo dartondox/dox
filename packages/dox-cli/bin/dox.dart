@@ -1,7 +1,6 @@
 import 'package:dox/dox.dart';
 import 'package:dox/src/tools/create_controller.dart';
 import 'package:dox/src/tools/create_middleware.dart';
-import 'package:dox/src/tools/create_migration.dart';
 import 'package:dox/src/tools/create_project.dart';
 import 'package:dox/src/tools/create_request.dart';
 import 'package:dox/src/tools/create_serializer.dart';
@@ -9,6 +8,7 @@ import 'package:dox/src/tools/generate_key.dart';
 import 'package:dox/src/tools/help.dart';
 import 'package:dox/src/tools/server_serve.dart';
 import 'package:dox/src/tools/update_dox.dart';
+import 'package:dox_migration/dox_migration.dart';
 
 void main(List<String> args) async {
   List<String> versionKeys = [
@@ -37,38 +37,10 @@ void main(List<String> args) async {
     return;
   }
 
-  if (args.length == 2 && args[0] == 'create:migration') {
-    MigrationFile(args[1], 'sql');
-    return;
-  }
-
-  if (args.length == 3 && args[0] == 'create:migration') {
-    MigrationFile(args[1], args[2]);
-    return;
-  }
-
   if (args.length == 2 && args[0] == 'create:model') {
     createModel(args[1]);
     return;
   }
-
-  if (args.length == 3 && args[0] == 'create:model' && args[2] == '-m') {
-    bool shouldCreateMigration = createModel(args[1]);
-    if (shouldCreateMigration) {
-      MigrationFile('Create${args[1]}Table', 'sql');
-    }
-    return;
-  }
-
-  // if (args.length == 1 && args[0] == 'migrate') {
-  //   await Migration(from: 'cli').migrate();
-  //   return;
-  // }
-
-  // if (args.length == 1 && args[0] == 'migrate:rollback') {
-  //   await Migration(from: 'cli').rollback();
-  //   return;
-  // }
 
   List<String> serveKeys = [
     'serve',
@@ -147,6 +119,26 @@ void main(List<String> args) async {
 
   if (args.length == 1 && args[0] == 'help') {
     help();
+    return;
+  }
+
+  if (args.length == 2 && args[0] == 'migrate') {
+    await Migration(from: 'cli').migrate();
+    return;
+  }
+
+  if (args.length == 2 && args[0] == 'rollback') {
+    await Migration(from: 'cli').rollback();
+    return;
+  }
+
+  if (args.length == 2 && args[0] == 'create') {
+    MigrationFile(args[1], 'sql');
+    return;
+  }
+
+  if (args.length == 3 && args[0] == 'create') {
+    MigrationFile(args[1], args[2]);
     return;
   }
 

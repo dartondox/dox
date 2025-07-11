@@ -10,6 +10,7 @@ environment:
 dependencies:
   watcher: ^1.0.2
   path: ^1.8.3
+  dox_migration: ^2.0.0
 
 dev_dependencies:
   lints: ^2.0.0
