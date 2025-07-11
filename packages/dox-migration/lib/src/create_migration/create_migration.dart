@@ -62,7 +62,7 @@ Future<void> down() async {
 String _sampleSql = '''
 -- up
 CREATE TABLE IF NOT EXISTS table_name (
-  id serial PRIMARY KEY,
+  id serial PRIMARY KEY
 )
 
 -- down
