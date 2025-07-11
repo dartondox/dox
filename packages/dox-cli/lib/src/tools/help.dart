@@ -12,8 +12,8 @@ help() {
   create:middleware <name>            Create a middleware
   create:request <name>               Create a form request
   create:migration <name> --sql|dart  Create a migration
-  migrate                             Run migrations
-  migrate:rollback                    Rollback migrations
+  migration:run                       Run migrations
+  migration:rollback                  Rollback migrations
   key:generate                        Generate app key
   update                              Update dox-cli to latest version""");
 }

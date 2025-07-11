@@ -11,137 +11,156 @@ import 'package:dox/src/tools/update_dox.dart';
 import 'package:dox_migration/dox_migration.dart';
 
 void main(List<String> args) async {
-  List<String> versionKeys = [
-    '--version',
-    'version',
-    '-version',
-    'v',
-    '-v',
-    '--v'
-  ];
+  if (args.isEmpty) {
+    print('Could not find a command. Run `dox help` for more information.');
+    return;
+  }
 
-  if (args.length == 1 && versionKeys.contains(args[0])) {
+  final command = args[0];
+  final commandArgs = args.skip(1).toList();
+
+  try {
+    await _executeCommand(command, commandArgs);
+  } catch (e) {
+    print(e);
+  }
+}
+
+Future<void> _executeCommand(String command, List<String> args) async {
+  // Version commands
+  if (_isVersionCommand(command)) {
     print('Dox version: 2.0.1');
     return;
   }
 
-  if (args.length == 2 && args[0] == 'create') {
-    createProject(args[1]);
+  // Create project commands
+  if (command == 'create' && args.isNotEmpty) {
+    final projectName = args[0];
+    final version =
+        args.length >= 3 && _isVersionFlag(args[1]) ? args[2] : null;
+    createProject(projectName, version);
     return;
   }
 
-  if (args.length == 4 &&
-      args[0] == 'create' &&
-      (args[2] == '--version' || args[2] == '--v')) {
-    createProject(args[1], args[3]);
+  // Create model command
+  if (command == 'create:model' && args.length == 1) {
+    createModel(args[0]);
     return;
   }
 
-  if (args.length == 2 && args[0] == 'create:model') {
-    createModel(args[1]);
+  // Serve commands
+  if (_isServeCommand(command)) {
+    if (args.isNotEmpty && args[0] == '--ignore-build-runner') {
+      serverServe();
+    } else {
+      watchBuilder();
+      serverServe();
+    }
     return;
   }
 
-  List<String> serveKeys = [
-    'serve',
-    'server',
-    's',
-  ];
-
-  if (args.length == 1 && serveKeys.contains(args[0])) {
-    watchBuilder();
-    serverServe();
-    return;
-  }
-
-  if (args.length == 2 &&
-      serveKeys.contains(args[0]) &&
-      args[1] == '--ignore-build-runner') {
-    serverServe();
-    return;
-  }
-
-  if (args.length == 1 && args[0] == 'build_runner:watch') {
+  // Build runner commands
+  if (command == 'build_runner:watch') {
     watchBuilder();
     return;
   }
 
-  if (args.length == 1 && args[0] == 'build_runner:build') {
+  if (command == 'build_runner:build') {
     buildBuilder();
     return;
   }
 
-  if (args.length == 1 && args[0] == 'build') {
+  if (command == 'build') {
     buildBuilder();
     buildServer();
     return;
   }
 
-  if (args.length == 1 && args[0] == 'update') {
+  // Update command
+  if (command == 'update') {
     updateDox();
     return;
   }
 
-  if (args.length == 2 && args[0] == 'create:controller') {
-    createController(args[1], false);
+  // Create controller commands
+  if (command == 'create:controller' && args.isNotEmpty) {
+    final controllerName = args[0];
+    final isResource = args.length >= 2 && args[1] == '-r';
+    final isWebSocket = args.length >= 2 && args[1] == '-ws';
+
+    if (isWebSocket) {
+      createWsController(controllerName);
+    } else {
+      createController(controllerName, isResource);
+    }
     return;
   }
 
-  if (args.length == 2 && args[0] == 'create:middleware') {
-    createMiddleware(args[1]);
+  // Create middleware command
+  if (command == 'create:middleware' && args.length == 1) {
+    createMiddleware(args[0]);
     return;
   }
 
-  if (args.length == 2 && args[0] == 'create:request') {
-    createRequest(args[1]);
+  // Create request command
+  if (command == 'create:request' && args.length == 1) {
+    createRequest(args[0]);
     return;
   }
 
-  if (args.length == 2 && args[0] == 'create:serializer') {
-    createSerializer(args[1]);
+  // Create serializer command
+  if (command == 'create:serializer' && args.length == 1) {
+    createSerializer(args[0]);
     return;
   }
 
-  if (args.length == 3 && args[0] == 'create:controller' && args[2] == '-r') {
-    createController(args[1], true);
-    return;
-  }
-
-  if (args.length == 3 && args[0] == 'create:controller' && args[2] == '-ws') {
-    createWsController(args[1]);
-    return;
-  }
-
-  if (args.length == 1 && args[0] == 'key:generate') {
+  // Key generation command
+  if (command == 'key:generate') {
     generateKey();
     return;
   }
 
-  if (args.length == 1 && args[0] == 'help') {
+  // Help command
+  if (command == 'help') {
     help();
     return;
   }
 
-  if (args.length == 2 && args[0] == 'migration:run') {
+  // Migration commands
+  if (command == 'migration:run' && args.isEmpty) {
     await Migration(from: 'cli').migrate();
     return;
   }
 
-  if (args.length == 2 && args[0] == 'migration:rollback') {
+  if (command == 'migration:rollback' && args.isEmpty) {
     await Migration(from: 'cli').rollback();
     return;
   }
 
-  if (args.length == 2 && args[0] == 'create:migration') {
-    MigrationFile(args[1], 'sql');
+  if (command == 'create:migration' && args.isNotEmpty) {
+    final migrationName = args[0];
+    final type = args.length >= 2 ? args[1] : 'sql';
+    MigrationFile(migrationName, type);
     return;
   }
 
-  if (args.length == 3 && args[0] == 'create:migration') {
-    MigrationFile(args[1], args[2]);
-    return;
-  }
+  // If no command matches, throw an exception to trigger the error message
+  throw Exception(
+      'Could not find a command named "$command". Run `dox help` for more information.');
+}
 
-  print(
-      'Could not find a command named "${args[0]}". Run `dox help` for more information.');
+/// Check if the command is a app version command
+bool _isVersionCommand(String command) {
+  const versionKeys = ['--version', 'version', '-version', 'v', '-v', '--v'];
+  return versionKeys.contains(command);
+}
+
+/// Check if the flag is a project version flag
+bool _isVersionFlag(String flag) {
+  return flag == '--version' || flag == '--v';
+}
+
+bool _isServeCommand(String command) {
+  const serveKeys = ['serve', 'server', 's'];
+  return serveKeys.contains(command);
 }
