@@ -8,14 +8,19 @@ import 'package:dox/src/tools/generate_key.dart';
 import 'package:dox/src/tools/help.dart';
 import 'package:dox/src/tools/server_serve.dart';
 import 'package:dox/src/tools/update_dox.dart';
+import 'package:dox/src/version.dart';
 import 'package:dox_migration/dox_migration.dart';
+
+import 'types.dart';
 
 /// Example of how to add a new command:
 ///
 /// CommandRegistry.addCommand(
 ///   CommandDefinition(
 ///     command: 'new:command',
+///     helpInfo: 'new:command <arg1> [arg2]',
 ///     description: 'Description of what this command does',
+///     category: CommandCategory.generation,
 ///     minArgs: 1,
 ///     maxArgs: 2,
 ///     aliases: ['nc', 'new'],
@@ -25,55 +30,6 @@ import 'package:dox_migration/dox_migration.dart';
 ///     },
 ///   ),
 /// );
-
-typedef CommandFunction = Future<void> Function(List<String> args);
-
-enum CommandCategory {
-  project('Project', 0),
-  development('Development', 1),
-  build('Build', 2),
-  buildRunner('Build Runner', 3),
-  generation('Generation', 4),
-  database('Database', 5),
-  system('System', 6);
-
-  final String displayName;
-  final int order;
-  const CommandCategory(this.displayName, this.order);
-}
-
-class CommandDefinition {
-  final String command;
-  final String helpInfo;
-  final String description;
-  final CommandCategory category;
-  final int minArgs;
-  final int maxArgs;
-  final CommandFunction function;
-  final List<String> aliases;
-
-  const CommandDefinition({
-    required this.command,
-    required this.helpInfo,
-    required this.description,
-    required this.category,
-    required this.function,
-    this.minArgs = 0,
-    this.maxArgs = -1, // -1 means unlimited
-    this.aliases = const [],
-  });
-
-  bool matches(String inputCommand) {
-    return command == inputCommand || aliases.contains(inputCommand);
-  }
-
-  bool validateArgs(List<String> args) {
-    if (args.length < minArgs) return false;
-    if (maxArgs != -1 && args.length > maxArgs) return false;
-    return true;
-  }
-}
-
 class CommandRegistry {
   static final List<CommandDefinition> _commands = [
     // Version commands
@@ -84,7 +40,7 @@ class CommandRegistry {
       category: CommandCategory.system,
       aliases: ['--version', '-version', 'v', '-v', '--v'],
       function: (args) async {
-        print('Dox version: 2.0.1');
+        print('Dox version: $version');
       },
     ),
 
@@ -98,8 +54,9 @@ class CommandRegistry {
       maxArgs: 3,
       function: (args) async {
         final projectName = args[0];
-        final version =
-            args.length >= 3 && _isVersionFlag(args[1]) ? args[2] : null;
+        final flag = args[1];
+        bool isVersionFlag = flag == '--version' || flag == '--v';
+        final version = args.length >= 3 && isVersionFlag ? args[2] : null;
         createProject(projectName, version);
       },
     ),
@@ -320,8 +277,4 @@ class CommandRegistry {
   static void addCommand(CommandDefinition command) {
     _commands.add(command);
   }
-}
-
-bool _isVersionFlag(String flag) {
-  return flag == '--version' || flag == '--v';
 }

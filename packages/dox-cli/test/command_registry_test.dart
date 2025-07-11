@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dox/src/command_registry.dart';
+import 'package:dox/src/types.dart';
 import 'package:test/test.dart';
 
 // Helper class to capture output
@@ -78,7 +79,7 @@ void main() {
       expect(command, isNotNull);
 
       // For now, just test that the command exists and can be executed
-      // We'll test actual output in integration tests
+      // The version will be 'unknown' in test environment since pubspec.yaml might not be available
       expect(() => command!.function([]), returnsNormally);
     });
 

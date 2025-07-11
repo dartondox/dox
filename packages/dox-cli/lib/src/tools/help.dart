@@ -1,4 +1,5 @@
 import '../command_registry.dart';
+import '../types.dart';
 
 help() {
   print("Usage: dox <command> [arguments] \n");
