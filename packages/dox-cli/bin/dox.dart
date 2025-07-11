@@ -122,22 +122,22 @@ void main(List<String> args) async {
     return;
   }
 
-  if (args.length == 2 && args[0] == 'migrate') {
+  if (args.length == 2 && args[0] == 'migration:run') {
     await Migration(from: 'cli').migrate();
     return;
   }
 
-  if (args.length == 2 && args[0] == 'rollback') {
+  if (args.length == 2 && args[0] == 'migration:rollback') {
     await Migration(from: 'cli').rollback();
     return;
   }
 
-  if (args.length == 2 && args[0] == 'create') {
+  if (args.length == 2 && args[0] == 'create:migration') {
     MigrationFile(args[1], 'sql');
     return;
   }
 
-  if (args.length == 3 && args[0] == 'create') {
+  if (args.length == 3 && args[0] == 'create:migration') {
     MigrationFile(args[1], args[2]);
     return;
   }
