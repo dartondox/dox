@@ -66,6 +66,6 @@ jobs:
     - name: Run Tests
       run: melos test --no-select
     - name: Run Test (query builder postgres)
-      run: DB_PORT=5432 melos test_query_builder_postgres
+      run: DB_PORT=5432 melos test_pg
     - name: Run Test (query builder mysql)
-      run: DB_USER=dox DB_PORT=3306 melos test_query_builder_mysql
+      run: DB_USER=dox DB_PORT=3306 melos test_mysql
