@@ -1,6 +1,6 @@
 name: dox_auth
 description: Authentication package for dox framework with jsonwebtoken(jwt) driver.
-version: 2.0.0
+version: 3.0.0
 repository: https://github.com/dartondox/dox
 
 environment:

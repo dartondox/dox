@@ -4,6 +4,11 @@ Map<String, String> loadEnv() {
   Map<String, String> data = <String, String>{};
 
   File envFile = File('${Directory.current.path}/.env');
+
+  if (!envFile.existsSync()) {
+    throw Exception('Could not find .env file');
+  }
+
   String contents = envFile.readAsStringSync();
 
   // splitting with new line for each variables

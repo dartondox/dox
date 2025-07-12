@@ -111,7 +111,7 @@ dox create:migration create_foo_table
 ## Run migration
 
 ```py
-dox migrate
+dox migration:run
 ```
 
 !!! info 
@@ -128,7 +128,7 @@ DB_PASSWORD=password
 ## Rollback migration
 
 ```py
-dox migrate:rollback
+dox migration:rollback
 ```
 
 ## Deactivate CLI

@@ -35,16 +35,20 @@ class Migration {
   Future<Connection> _getConnection() async {
     // get endpoint from env
     Map<String, String> env = loadEnv();
-    return await Connection.open(
-      Endpoint(
-        host: env['DB_HOST'] ?? 'localhost',
-        port: int.parse(env['DB_PORT'] ?? '5432'),
-        database: env['DB_NAME'] ?? 'dox',
-        username: env['DB_USERNAME'] ?? 'postgres',
-        password: env['DB_PASSWORD'] ?? 'postgres',
-      ),
-      settings: ConnectionSettings(sslMode: SslMode.disable),
-    );
+    try {
+      return await Connection.open(
+        Endpoint(
+          host: env['DB_HOST'] ?? 'localhost',
+          port: int.parse(env['DB_PORT'] ?? '5432'),
+          database: env['DB_NAME'] ?? 'dox',
+          username: env['DB_USERNAME'] ?? 'postgres',
+          password: env['DB_PASSWORD'] ?? 'postgres',
+        ),
+        settings: ConnectionSettings(sslMode: SslMode.disable),
+      );
+    } catch (e) {
+      throw Exception('Could not connect to database: $e');
+    }
   }
 
   /// clear temporary directory

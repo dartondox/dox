@@ -61,8 +61,10 @@ Future<void> down() async {
 
 String _sampleSql = '''
 -- up
--- Write your up query here. Do not remove `-- up` comment.
+CREATE TABLE IF NOT EXISTS table_name (
+  id serial PRIMARY KEY
+)
 
 -- down
--- Write your down query here. Do not remove `-- down` comment.
+DROP TABLE IF EXISTS table_name 
 ''';
