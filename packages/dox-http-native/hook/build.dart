@@ -22,7 +22,19 @@ const String _releases = 'https://github.com/dartondox/dox/releases/download';
 
 /// sha256 of each release asset. Fill it from `SHA256SUMS` of the release
 /// (see .github/workflows/native.yaml) before publishing to pub.dev.
-const Map<String, String> _sha256 = <String, String>{};
+/// These are from the release `dox_http_native-v3.0.0-alpha.2`.
+const Map<String, String> _sha256 = <String, String>{
+  'dox_http_native-linux-arm64.so':
+      '0673e9d29c77fa8e144421bdbbf51b97bb94a02514e79ea268715bd3d58b8ecc',
+  'dox_http_native-linux-x64.so':
+      '8bf935374620a75f6ed5fe41a1343e21ab5254d4af8aefd23f2cd9b9ba1b9fd5',
+  'dox_http_native-macos-arm64.dylib':
+      '9f325add44c572dc9957b2e7dcc935b26bb19fb31511b86699b35393e110fcce',
+  'dox_http_native-macos-x64.dylib':
+      'da00e359a979883b3fd4d58c655e809a3fa06b15482b1ae4e500af3580df013d',
+  'dox_http_native-windows-x64.dll':
+      '2d40c5804e7108dbb2a9b813dca5a4097acace75de9d747b6d0fb7c431fd1eb1',
+};
 
 void main(List<String> args) async {
   await build(args, (BuildInput input, BuildOutputBuilder output) async {
