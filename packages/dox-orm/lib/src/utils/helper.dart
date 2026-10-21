@@ -11,8 +11,10 @@ class QueryBuilderHelper<T> {
   String parseColumnKey(String column) {
     String timestamp = DateTime.now().microsecondsSinceEpoch.toString();
     _paramKeyCounter++;
-    String key = "$column${timestamp}_$_paramKeyCounter"
-        .replaceAll(RegExp(r'[^\w]'), "");
+    String key = "$column${timestamp}_$_paramKeyCounter".replaceAll(
+      RegExp(r'[^\w]'),
+      "",
+    );
     return '@$key';
   }
 
@@ -61,9 +63,7 @@ class QueryBuilderHelper<T> {
   }
 
   // ignore: always_specify_types
-  Future<List> formatResult(
-    List<Map<String, dynamic>> queryResult,
-  ) async {
+  Future<List> formatResult(List<Map<String, dynamic>> queryResult) async {
     List<Map<String, dynamic>> result = getMapResult(queryResult);
 
     if (queryBuilder.getRawQuery().isNotEmpty) {
@@ -98,11 +98,9 @@ class QueryBuilderHelper<T> {
       String char = input[i];
       // Check if the current character is uppercase
       if (char == char.toUpperCase() && i > 0) {
-        snakeCase +=
-            '_'; // Add an underscore if it's uppercase and not the first character
+        snakeCase += '_'; // Add an underscore if it's uppercase and not the first character
       }
-      snakeCase += char
-          .toLowerCase(); // Convert the character to lowercase and add it to the result
+      snakeCase += char.toLowerCase(); // Convert the character to lowercase and add it to the result
     }
     return snakeCase.replaceAll(RegExp(r'_+'), '_');
   }

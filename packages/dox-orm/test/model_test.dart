@@ -44,7 +44,7 @@ void main() async {
     test('create', () async {
       Blog blog = await Blog().create(<String, dynamic>{
         'title': 'dox query builder',
-        'body': 'Best orm for the dart'
+        'body': 'Best orm for the dart',
       });
 
       expect(blog.title, 'dox query builder');
@@ -56,7 +56,7 @@ void main() async {
     test('insert', () async {
       Blog blog = await Blog().insert(<String, dynamic>{
         'title': 'dox query builder',
-        'body': 'Best orm for the dart'
+        'body': 'Best orm for the dart',
       });
 
       expect(blog.title, 'dox query builder');
@@ -68,12 +68,9 @@ void main() async {
       await Blog().insertMultiple(<Map<String, dynamic>>[
         <String, dynamic>{
           'title': 'dox query builder',
-          'body': 'Best orm for the dart'
+          'body': 'Best orm for the dart',
         },
-        <String, dynamic>{
-          'title': 'dox core',
-          'body': 'dart web framework',
-        }
+        <String, dynamic>{'title': 'dox core', 'body': 'dart web framework'},
       ]);
 
       int total = await Blog().count();
@@ -214,10 +211,13 @@ void main() async {
 
     test('toSql', () async {
       String query = Blog().where('uid', 1).toSql();
-      String q =
-          SqlQueryBuilder().dbDriver.getName() == Driver.mysql ? '`' : '"';
-      expect(query,
-          "SELECT * FROM ${q}blog$q WHERE (${q}uid$q = 1) AND ${q}blog$q.${q}deleted_at$q IS NULL");
+      String q = SqlQueryBuilder().dbDriver.getName() == Driver.mysql
+          ? '`'
+          : '"';
+      expect(
+        query,
+        "SELECT * FROM ${q}blog$q WHERE (${q}uid$q = 1) AND ${q}blog$q.${q}deleted_at$q IS NULL",
+      );
     });
 
     test('toMap', () async {
@@ -250,8 +250,9 @@ void main() async {
       blog.description = "something";
       await blog.save();
 
-      Blog findBlog =
-          await Blog().select('*, title as something').find(blog.uid);
+      Blog findBlog = await Blog()
+          .select('*, title as something')
+          .find(blog.uid);
 
       Map<String, dynamic> data = findBlog.toMap(original: true);
       expect(data['something'], blog.title);

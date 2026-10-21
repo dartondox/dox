@@ -59,7 +59,6 @@ DBDriver getDatabaseDriver(Driver driver, dynamic database) {
   if (driver == Driver.postgres) {
     return PostgresDriver(conn: database);
   }
-
   /// checking validation for mysql connection
   else if (driver == Driver.mysql) {
     return MysqlDriver(conn: database);

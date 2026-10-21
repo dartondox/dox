@@ -23,8 +23,9 @@ void main() async {
         'default': rows.first['dflt_value'],
       };
     }
-    String schemaName =
-        driver == Driver.mysql ? 'DATABASE()' : 'current_schema()';
+    String schemaName = driver == Driver.mysql
+        ? 'DATABASE()'
+        : 'current_schema()';
     String type = driver == Driver.mysql ? 'column_type' : 'data_type';
     List<Map<String, dynamic>> rows = await db.query(
       'SELECT $type AS t, is_nullable AS n, column_default AS d, '
@@ -425,10 +426,7 @@ void main() async {
 
       await add(1, 1);
       await add(1, 2);
-      await expectLater(
-        add(1, 1),
-        throwsA(anything),
-      );
+      await expectLater(add(1, 1), throwsA(anything));
     });
 
     test('rename, drop, dropIfExists', () async {

@@ -91,6 +91,7 @@ nav:
     - database/schema.md
     - Model:
       - database/model/index.md
+      - database/model/events.md
       - Relationship:
         - database/model/relationship/has-one.md
         - database/model/relationship/has-many.md

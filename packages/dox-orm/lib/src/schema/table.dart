@@ -267,9 +267,10 @@ class Table {
 
   /// `{table}_{columns}_{type}`, eg. `users_email_unique`
   String indexName(String type, List<String> columns) {
-    return '${name}_${columns.join('_')}_$type'
-        .toLowerCase()
-        .replaceAll(RegExp(r'[-.]'), '_');
+    return '${name}_${columns.join('_')}_$type'.toLowerCase().replaceAll(
+      RegExp(r'[-.]'),
+      '_',
+    );
   }
 
   void _index(CommandType type, String suffix, Object columns, String? name) {
@@ -315,8 +316,9 @@ class Table {
   }
 
   void _drop(CommandType type, String suffix, Object index) {
-    String name =
-        index is String ? index : indexName(suffix, columnList(index));
+    String name = index is String
+        ? index
+        : indexName(suffix, columnList(index));
     commands.add(TableCommand(type, name: name));
   }
 

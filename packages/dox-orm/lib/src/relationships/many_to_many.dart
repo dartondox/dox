@@ -32,15 +32,18 @@ M? manyToMany<T, M>(
   pivotRelatedForeignKey = pivotRelatedForeignKey ?? '${relatedTable}_id';
 
   List<dynamic> ids = list
-      .map((Model<T> i) => i.toMap()[localKey])
+      .map((Model<T> i) => i.convertToMap(i)[localKey])
       .where((dynamic id) => id != null)
       .toList();
 
   QueryBuilder<M> q = related
       .debug(local.shouldDebug)
       .select('$relatedTable.*, $pivotTable.$pivotForeignKey as _owner_id')
-      .leftJoin(pivotTable, '$pivotTable.$pivotRelatedForeignKey',
-          '$relatedTable.$relatedKey')
+      .leftJoin(
+        pivotTable,
+        '$pivotTable.$pivotRelatedForeignKey',
+        '$relatedTable.$relatedKey',
+      )
       .whereIn('$pivotTable.$pivotForeignKey', ids);
 
   if (onQuery != null) {
@@ -85,7 +88,9 @@ Future<Map<String, List<M>>> getManyToMany<T, M>(
   String? localKey = _localKeys[q];
   Map<String, List<M>> byOwner = <String, List<M>>{};
   for (Model<T> i in list) {
-    dynamic key = localKey == null ? i.tempIdValue : i.toMap()[localKey];
+    dynamic key = localKey == null
+        ? i.tempIdValue
+        : i.convertToMap(i)[localKey];
     byOwner[i.tempIdValue.toString()] = ret[key.toString()] ?? <M>[];
   }
   return byOwner;

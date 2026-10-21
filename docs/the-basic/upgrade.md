@@ -80,6 +80,20 @@ Each query no longer runs in its own transaction. Use [`QueryBuilder.transaction
 - `getDatabaseConnection()` returns a `MySQLConnectionPool`.
 - A connection you pass to the migration package must be a `mysql_dart` `MySQLConnection` or `MySQLConnectionPool`.
 
+**`save()`, `delete()` and `forceDelete()` return `Future<bool>`.**
+They return `false` when a model event cancels them. Code that overrides these methods in a model must use `Future<bool>`.
+
+**A model can not have a field or method named like a model hook.**
+The `Model` class now has `onSaving()`, `onCreated()`, `onDeleted()` and the other [event hooks](../database/model/events.md), plus `restore()`, `saveQuietly()`, `hasModelHooks` and `setComputedValues()`.
+Fix: rename a field with one of these names.
+
+**`dox_builder` needs the new analyzer.**
+It uses `analyzer` 14, `source_gen` 4 and `build` 5, so it needs Dart **3.13** or newer.
+Set `build_runner: ^2.17.1` in `dev_dependencies`.
+Other builders in your app (for example `json_serializable`) must also support `analyzer` 14.
+
+**New:** [computed values](../database/model/index.md#computed-values) with `@Computed()`, [model events and observers](../database/model/events.md), and `restore()` for soft deleted models.
+
 **New:** SQLite, `whereNull`, `whereNotNull`, `whereNotIn`, `orWhereIn`, `orWhereNotIn`, `selectRaw`, `boolean()` column, transactions.
 See [Database](../database/index.md).
 

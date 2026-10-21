@@ -16,14 +16,14 @@ M? belongsTo<T, M>(
   foreignKey = foreignKey ?? "${owner.tableName}_id";
 
   List<dynamic> ids = list
-      .map((dynamic i) => i.toMap()[foreignKey])
+      .map((dynamic i) => i.convertToMap(i)[foreignKey])
       .where((dynamic id) => id != null)
       .toList();
 
   owner
       .select(<String>[
         '${owner.tableName}.*',
-        '${foreign.tableName}.${foreign.primaryKey} as _foreign_id'
+        '${foreign.tableName}.${foreign.primaryKey} as _foreign_id',
       ])
       .leftJoin(
         foreign.tableName,

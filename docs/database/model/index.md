@@ -166,6 +166,16 @@ class Blog extends BlogGenerator {
     await blog?.delete(); // only deletes this record
     ```
 
+=== "Restore a soft deleted record"
+
+    ```dart
+    Blog? blog = await Blog().withTrash().find(1);
+    await blog?.restore(); // sets deleted_at back to NULL
+    ```
+
+!!! info
+    `save()`, `delete()`, `forceDelete()` and `restore()` fire [model events](events.md).
+
 ## To map
 
 === "To map"
@@ -197,11 +207,11 @@ class Blog extends BlogGenerator {
 
     ```dart
     Blog blog = Blog();
-    List Blog> blogs = await blog.where('status', 'active')
+    List<Blog> blogs = await blog.where('status', 'active')
         .where('user', 'super_user').get();
 
     // reset existing get query and make new one using `query()`
-    List Blog> blog = await blog.query()
+    List<Blog> blog = await blog.query()
         .where('status', 'deleted').where('user', 'normal').get();
     ```
 
@@ -213,6 +223,53 @@ class Blog extends BlogGenerator {
     @DoxModel()
     class User extends UserGenerator {
         @override
-        List String> get hidden => ['password', 'remember_token'];
+        List<String> get hidden => ['password', 'remember_token'];
     }
     ```
+
+## Computed values
+
+A computed value is a getter that is added to `toJson()` and `toMap()`.
+It is like `$appends` with an accessor in Laravel.
+
+Add `@Computed()` to a getter in the model, then run `dart run build_runner build`.
+
+```dart
+@DoxModel()
+class User extends UserGenerator {
+  @Column(name: 'first_name')
+  String? firstName;
+
+  @Column(name: 'last_name')
+  String? lastName;
+
+  @Computed() // json key: full_name
+  String get fullName => '$firstName $lastName';
+
+  @Computed(name: 'initials') // custom json key
+  String get shortName => '${firstName?[0]}${lastName?[0]}';
+}
+```
+
+```dart
+User? user = await User().find(1);
+print(user?.toJson());
+// {id: 1, first_name: John, last_name: Wick, ..., full_name: John Wick, initials: JW}
+```
+
+- The default key is the getter name in snake_case (`fullName` becomes `full_name`).
+- A computed value is **never a column**. It is not read from the database, and it is not sent in `INSERT` or `UPDATE`.
+- `hidden` also hides computed values. Use the json key, for example `['full_name']`.
+- Computed values of loaded relations are in the nested json too.
+- `toMap(original: true)` returns the raw database row, so it has no computed values.
+
+!!! info "Performance"
+    The code is made by `build_runner`. There is no reflection.
+    A model without `@Computed()` does no extra work in `toJson()`.
+    A getter runs each time `toJson()` or `toMap()` is called, so keep it fast.
+
+!!! info "Casts"
+    Dox has no `$casts` list. The field type does the cast:
+    `DateTime?` is parsed from the database, and a JSON column can be a
+    `Map<String, dynamic>?` or `List<dynamic>?` field.
+    For other conversions, use the `beforeSave` and `beforeGet` hooks of `@Column`.

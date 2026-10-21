@@ -13,8 +13,6 @@ Future<Connection> postgresConnection() {
       username: 'postgres',
       password: 'postgres',
     ),
-    settings: PoolSettings(
-      sslMode: SslMode.disable,
-    ),
+    settings: PoolSettings(sslMode: SslMode.disable),
   );
 }

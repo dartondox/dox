@@ -45,8 +45,10 @@ abstract class SchemaGrammar {
   String wrap(String name) {
     return name
         .split('.')
-        .map((String part) =>
-            '$quote${part.replaceAll(quote, '$quote$quote')}$quote')
+        .map(
+          (String part) =>
+              '$quote${part.replaceAll(quote, '$quote$quote')}$quote',
+        )
         .join('.');
   }
 
@@ -109,12 +111,19 @@ abstract class SchemaGrammar {
     for (ColumnDefinition c in columns) {
       List<String> cols = <String>[c.name];
       if (c.isUnique) {
-        sql.add(compileIndex(
-            table, 'UNIQUE INDEX', table.indexName('unique', cols), cols));
+        sql.add(
+          compileIndex(
+            table,
+            'UNIQUE INDEX',
+            table.indexName('unique', cols),
+            cols,
+          ),
+        );
       }
       if (c.isIndex) {
         sql.add(
-            compileIndex(table, 'INDEX', table.indexName('index', cols), cols));
+          compileIndex(table, 'INDEX', table.indexName('index', cols), cols),
+        );
       }
       String? comment = compileComment(table, c);
       if (comment != null) {
@@ -146,7 +155,7 @@ abstract class SchemaGrammar {
         ];
       case CommandType.addIndex:
         return <String>[
-          compileIndex(table, 'INDEX', command.name!, command.columns)
+          compileIndex(table, 'INDEX', command.name!, command.columns),
         ];
       case CommandType.unique:
         return <String>[
@@ -155,7 +164,7 @@ abstract class SchemaGrammar {
       case CommandType.primary:
         if (table.creating) return <String>[];
         return <String>[
-          'ALTER TABLE $t ADD PRIMARY KEY (${columnize(command.columns)})'
+          'ALTER TABLE $t ADD PRIMARY KEY (${columnize(command.columns)})',
         ];
       case CommandType.dropIndex:
       case CommandType.dropUnique:
@@ -169,7 +178,11 @@ abstract class SchemaGrammar {
   }
 
   String compileIndex(
-      Table table, String kind, String name, List<String> columns) {
+    Table table,
+    String kind,
+    String name,
+    List<String> columns,
+  ) {
     return 'CREATE $kind ${wrap(name)} ON ${wrap(table.name)} (${columnize(columns)})';
   }
 

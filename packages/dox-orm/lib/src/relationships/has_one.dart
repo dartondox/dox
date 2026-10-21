@@ -18,7 +18,7 @@ M? hasOne<T, M>(
   foreignKey = foreignKey ?? "${owner.tableName}_id";
 
   List<dynamic> ids = list
-      .map((Model<T> i) => i.toMap()[localKey])
+      .map((Model<T> i) => i.convertToMap(i)[localKey])
       .where((dynamic id) => id != null)
       .toList();
 
@@ -35,10 +35,7 @@ M? hasOne<T, M>(
 
 /// get result of one to one relationship query
 /// the result is keyed by each owner primary key (tempIdValue).
-Future<Map<String, M>> getHasOne<T, M>(
-  dynamic q,
-  List<Model<T>> list,
-) async {
+Future<Map<String, M>> getHasOne<T, M>(dynamic q, List<Model<T>> list) async {
   if (q == null) return <String, M>{}; // coverage:ignore-line
   List<M> results = await q.get();
 
@@ -55,7 +52,9 @@ Future<Map<String, M>> getHasOne<T, M>(
   String? localKey = _localKeys[q];
   Map<String, M> byOwner = <String, M>{};
   for (Model<T> i in list) {
-    dynamic key = localKey == null ? i.tempIdValue : i.toMap()[localKey];
+    dynamic key = localKey == null
+        ? i.tempIdValue
+        : i.convertToMap(i)[localKey];
     M? value = ret[key.toString()];
     if (value != null) {
       byOwner[i.tempIdValue.toString()] = value;

@@ -13,8 +13,9 @@ void main() async {
 
   Future<bool> isMariaDb() async {
     if (!isMysql()) return false;
-    List<Map<String, dynamic>> rows =
-        await QueryBuilder.query('SELECT VERSION() as v');
+    List<Map<String, dynamic>> rows = await QueryBuilder.query(
+      'SELECT VERSION() as v',
+    );
     return rows.first['v'].toString().contains('MariaDB');
   }
 
@@ -155,20 +156,15 @@ void main() async {
     });
 
     test('json arrays are decoded and plain text is not', () async {
-      await QueryBuilder.table('blog_info').insert(<String, dynamic>{
-        'info': '[1, 2]',
-        'blog_id': 1,
-      });
-      Map<String, dynamic> info =
-          await QueryBuilder.table('blog_info').getFirst();
+      await QueryBuilder.table('blog_info')
+          .insert(<String, dynamic>{'info': '[1, 2]', 'blog_id': 1});
+      Map<String, dynamic> info = await QueryBuilder.table('blog_info')
+          .getFirst();
       expect(info['info'], <int>[1, 2]);
 
       await QueryBuilder.table('blog')
           .setPrimaryKey('uid')
-          .insert(<String, dynamic>{
-        'title': 't',
-        'body': '{"a": 1}',
-      });
+          .insert(<String, dynamic>{'title': 't', 'body': '{"a": 1}'});
       Map<String, dynamic> blog = await QueryBuilder.table('blog').getFirst();
 
       /// mariadb can not tell text from json, see docs
@@ -231,8 +227,9 @@ void main() async {
           'status': 'draft',
         },
       ]);
-      List<Map<String, dynamic>> rows =
-          await QueryBuilder.table('blog').orderBy('uid').get();
+      List<Map<String, dynamic>> rows = await QueryBuilder.table('blog')
+          .orderBy('uid')
+          .get();
       expect(rows.first['slug'], null);
       expect(rows.first['status'], 'active');
       expect(rows.last['slug'], 's');
@@ -287,8 +284,9 @@ void main() async {
       await QueryBuilder.table('schema_fix')
           .insert(<String, dynamic>{'slug': 'a'});
       expect(
-        () => QueryBuilder.table('schema_fix')
-            .insert(<String, dynamic>{'slug': 'a'}),
+        () =>
+            QueryBuilder.table('schema_fix')
+                .insert(<String, dynamic>{'slug': 'a'}),
         throwsA(anything),
       );
     });
@@ -303,8 +301,8 @@ void main() async {
         table.string('other').nullable().withDefault("o'k").change();
       });
       await QueryBuilder.table('schema_fix').insert(<String, dynamic>{'id': 1});
-      Map<String, dynamic> row =
-          await QueryBuilder.table('schema_fix').getFirst();
+      Map<String, dynamic> row = await QueryBuilder.table('schema_fix')
+          .getFirst();
       expect(row['name'], "it's");
       expect(row['other'], "o'k");
     });

@@ -114,8 +114,9 @@ class ConnectionConfig {
   /// get postgres connection pool.
   /// it opens up to `maxConnectionCount` connections when needed.
   Future<postgres.Pool<dynamic>> _getPostgresConnection() async {
-    postgres.SslMode sslMode =
-        useSSL ? postgres.SslMode.require : postgres.SslMode.disable;
+    postgres.SslMode sslMode = useSSL
+        ? postgres.SslMode.require
+        : postgres.SslMode.disable;
 
     return postgres.Pool<dynamic>.withEndpoints(
       <postgres.Endpoint>[

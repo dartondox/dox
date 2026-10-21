@@ -20,8 +20,8 @@ mixin Truncate<T> implements SharedMixin<T> {
     }
     String reset = resetId
         ? queryBuilder.dbDriver.getName() == Driver.postgres
-            ? 'RESTART IDENTITY CASCADE'
-            : ''
+              ? 'RESTART IDENTITY CASCADE'
+              : ''
         : '';
     String query = "TRUNCATE TABLE ${helper.wrap(tableName)} $reset";
     await helper.runQuery(query);

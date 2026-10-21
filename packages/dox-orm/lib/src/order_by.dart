@@ -24,7 +24,8 @@ mixin OrderBy<T> implements SharedMixin<T> {
       throw ArgumentError.value(type, 'type', 'must be asc or desc');
     }
     _orderBy.add(
-        '${helper.wrap(column.toString())} ${type == null ? '' : type.toString()}');
+      '${helper.wrap(column.toString())} ${type == null ? '' : type.toString()}',
+    );
     return queryBuilder;
   }
 }

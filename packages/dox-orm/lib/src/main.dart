@@ -20,9 +20,7 @@ class SqlQueryBuilder {
   DatabaseConfig? databaseConfig;
 
   /// initialize with DatabaseConfig class
-  static void initializeWithDatabaseConfig(
-    DatabaseConfig config,
-  ) async {
+  static void initializeWithDatabaseConfig(DatabaseConfig config) async {
     SqlQueryBuilder().databaseConfig = config;
     ConnectionConfig connConfig = config.getConnectionConfig();
 
@@ -40,8 +38,9 @@ class SqlQueryBuilder {
       return dbDriver;
     }
 
-    ConnectionConfig? connConfig =
-        databaseConfig?.getConnectionConfig(connection);
+    ConnectionConfig? connConfig = databaseConfig?.getConnectionConfig(
+      connection,
+    );
 
     if (connConfig != null) {
       dynamic conn = _globalConnections[connection];

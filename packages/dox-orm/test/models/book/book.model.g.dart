@@ -14,9 +14,9 @@ class BookGenerator extends Model<Book> {
 
   @override
   Map<String, dynamic> get timestampsColumn => <String, dynamic>{
-        'created_at': 'created_at',
-        'updated_at': 'updated_at',
-      };
+    'created_at': 'created_at',
+    'updated_at': 'updated_at',
+  };
 
   int? get id => tempIdValue;
 
@@ -25,8 +25,13 @@ class BookGenerator extends Model<Book> {
   Book query() => Book();
 
   @override
-  List<String> get tableColumns =>
-      <String>['id', 'title', 'author_code', 'created_at', 'updated_at'];
+  List<String> get tableColumns => <String>[
+    'id',
+    'title',
+    'author_code',
+    'created_at',
+    'updated_at',
+  ];
 
   @override
   List<String> get preloadList => <String>[];

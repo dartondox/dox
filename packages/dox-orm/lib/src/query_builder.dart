@@ -188,8 +188,9 @@ class QueryBuilder<T>
     String query, {
     Map<String, dynamic>? substitutionValues = const <String, dynamic>{},
   }) {
-    return SqlQueryBuilder()
-        .dbDriver
-        .query(query, substitutionValues: substitutionValues);
+    return SqlQueryBuilder().dbDriver.query(
+      query,
+      substitutionValues: substitutionValues,
+    );
   }
 }

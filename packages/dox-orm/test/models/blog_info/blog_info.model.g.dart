@@ -14,9 +14,9 @@ class BlogInfoGenerator extends Model<BlogInfo> {
 
   @override
   Map<String, dynamic> get timestampsColumn => <String, dynamic>{
-        'created_at': 'created_at',
-        'updated_at': 'updated_at',
-      };
+    'created_at': 'created_at',
+    'updated_at': 'updated_at',
+  };
 
   int? get id => tempIdValue;
 
@@ -25,21 +25,26 @@ class BlogInfoGenerator extends Model<BlogInfo> {
   BlogInfo query() => BlogInfo();
 
   @override
-  List<String> get tableColumns =>
-      <String>['id', 'info', 'blog_id', 'created_at', 'updated_at'];
+  List<String> get tableColumns => <String>[
+    'id',
+    'info',
+    'blog_id',
+    'created_at',
+    'updated_at',
+  ];
 
   @override
   List<String> get preloadList => <String>[];
 
   @override
   Map<String, Function> get relationsResultMatcher => <String, Function>{
-        'blog': getBlog,
-      };
+    'blog': getBlog,
+  };
 
   @override
   Map<String, Function> get relationsQueryMatcher => <String, Function>{
-        'blog': queryBlog,
-      };
+    'blog': queryBlog,
+  };
 
   static Future<void> getBlog(List<Model<BlogInfo>> list) async {
     var result = await getBelongsTo<BlogInfo, Blog>(queryBlog(list), list);
@@ -87,5 +92,11 @@ class BlogInfoGenerator extends Model<BlogInfo> {
     }
 
     return map;
+  }
+
+  @override
+  void setComputedValues(Map<String, dynamic> map) {
+    BlogInfo instance = this as BlogInfo;
+    map['has_info'] = instance.hasInfo;
   }
 }

@@ -18,7 +18,7 @@ M? hasMany<T, M>(
   foreignKey = foreignKey ?? "${owner.tableName}_id";
 
   List<dynamic> ids = list
-      .map((Model<T> i) => i.toMap()[localKey])
+      .map((Model<T> i) => i.convertToMap(i)[localKey])
       .where((dynamic id) => id != null)
       .toList();
 
@@ -59,7 +59,9 @@ Future<Map<String, List<M>>> getHasMany<T, M>(
   String? localKey = _localKeys[q];
   Map<String, List<M>> byOwner = <String, List<M>>{};
   for (Model<T> i in list) {
-    dynamic key = localKey == null ? i.tempIdValue : i.toMap()[localKey];
+    dynamic key = localKey == null
+        ? i.tempIdValue
+        : i.convertToMap(i)[localKey];
     byOwner[i.tempIdValue.toString()] = ret[key.toString()] ?? <M>[];
   }
   return byOwner;

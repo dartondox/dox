@@ -16,8 +16,12 @@ mixin Join<T> implements SharedMixin<T> {
   /// ```
   /// List admins = await Admin().leftJoin('admin_info', 'admin_info.admin_id', 'admin.id').get();
   /// ```
-  QueryBuilder<T> leftJoin(String arg1, String arg2, String arg3,
-      [dynamic arg4]) {
+  QueryBuilder<T> leftJoin(
+    String arg1,
+    String arg2,
+    String arg3, [
+    dynamic arg4,
+  ]) {
     return _query('LEFT JOIN', arg1, arg2, arg3, arg4);
   }
 
@@ -26,8 +30,12 @@ mixin Join<T> implements SharedMixin<T> {
   /// ```
   /// List admins = await Admin().rightJoin('admin_info', 'admin_info.admin_id', 'admin.id').get();
   /// ```
-  QueryBuilder<T> rightJoin(String arg1, String arg2, String arg3,
-      [dynamic arg4]) {
+  QueryBuilder<T> rightJoin(
+    String arg1,
+    String arg2,
+    String arg3, [
+    dynamic arg4,
+  ]) {
     return _query('RIGHT JOIN', arg1, arg2, arg3, arg4);
   }
 
@@ -67,8 +75,13 @@ mixin Join<T> implements SharedMixin<T> {
     return _rawQuery('RIGHT JOIN', rawQuery, params);
   }
 
-  QueryBuilder<T> _query(String type, String arg1, String arg2, String arg3,
-      [dynamic arg4]) {
+  QueryBuilder<T> _query(
+    String type,
+    String arg1,
+    String arg2,
+    String arg3, [
+    dynamic arg4,
+  ]) {
     String condition = '=';
     String joinTable = arg1;
     String firstJoinColumn = arg2;
@@ -78,7 +91,8 @@ mixin Join<T> implements SharedMixin<T> {
       secondJoinColumn = arg4;
     }
     _joins.add(
-        "$type ${helper.wrap(joinTable)} on ${helper.wrap(firstJoinColumn)} $condition ${helper.wrap(secondJoinColumn)}");
+      "$type ${helper.wrap(joinTable)} on ${helper.wrap(firstJoinColumn)} $condition ${helper.wrap(secondJoinColumn)}",
+    );
     return queryBuilder;
   }
 

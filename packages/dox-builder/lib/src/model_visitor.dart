@@ -1,85 +1,136 @@
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/visitor.dart';
 
-class ModelVisitor extends SimpleElementVisitor<void> {
+/// model hook methods, see Model.onSaving() in dox_orm
+const List<String> _hookNames = <String>[
+  'onSaving',
+  'onSaved',
+  'onCreating',
+  'onCreated',
+  'onUpdating',
+  'onUpdated',
+  'onDeleting',
+  'onDeleted',
+  'onRestoring',
+  'onRestored',
+  'onForceDeleting',
+  'onForceDeleted',
+];
+
+const List<String> _relationTypes = <String>[
+  'HasOne',
+  'HasMany',
+  'BelongsTo',
+  'ManyToMany',
+];
+
+/// Reads the columns, relations and computed getters of a model class.
+class ModelVisitor {
   String className = '';
   Map<String, Map<String, dynamic>> columns = {};
 
   Map<String, Map<String, dynamic>> relations = {};
 
-  @override
-  void visitConstructorElement(ConstructorElement element) {
-    final returnType = element.returnType.toString();
-    className = returnType.replaceFirst('*', '');
+  /// getter name => json key
+  Map<String, String> computed = {};
+
+  /// true when the class declares a model hook like onCreating()
+  bool hasHooks = false;
+
+  void visitClass(ClassElement element) {
+    className = element.displayName;
+    hasHooks = element.methods.any(
+      (MethodElement m) => !m.isStatic && _hookNames.contains(m.displayName),
+    );
+    for (FieldElement field in element.fields) {
+      if (field.isOriginDeclaration && !field.isStatic) {
+        _visitField(field);
+      }
+    }
+    for (GetterElement getter in element.getters) {
+      if (getter.isOriginDeclaration && !getter.isStatic) {
+        _visitGetter(getter);
+      }
+    }
   }
 
-  @override
-  void visitFieldElement(FieldElement element) {
-    var isColumn = element.metadata
-        .where((m) => m.element?.displayName == 'Column')
-        .isNotEmpty;
+  void _visitGetter(GetterElement element) {
+    ElementAnnotation? computedMeta = _findAnnotation(
+      element.metadata,
+      <String>['Computed'],
+    );
+    if (computedMeta == null) return;
+    String name = element.displayName;
+    String? key = computedMeta
+        .computeConstantValue()
+        ?.getField('name')
+        ?.toStringValue();
+    computed[name] = key ?? name;
+  }
 
-    var isRelation = element.metadata
-        .where((m) => ['HasOne', 'HasMany', 'BelongsTo', 'ManyToMany']
-            .contains(m.element?.displayName))
-        .isNotEmpty;
+  void _visitField(FieldElement element) {
+    String name = element.displayName;
 
-    String elementKey = element.name;
-
-    if (isRelation == true) {
-      ElementAnnotation metaData = element.metadata.first;
-      DartObject? object = metaData.computeConstantValue();
-      var onQuery = object?.getField('onQuery')?.toFunctionValue()?.displayName;
-
+    ElementAnnotation? relationMeta = _findAnnotation(
+      element.metadata,
+      _relationTypes,
+    );
+    if (relationMeta != null) {
+      DartObject? object = relationMeta.computeConstantValue();
       String? model = object
           ?.getField('model')
           ?.toTypeValue()
-          .toString()
-          .replaceFirst('*', '');
+          ?.getDisplayString();
 
-      String? foreignKey = object?.getField('foreignKey')?.toStringValue();
-      String? localKey = object?.getField('localKey')?.toStringValue();
-      String? relatedKey = object?.getField('relatedKey')?.toStringValue();
-      String? pivotForeignKey =
-          object?.getField('pivotForeignKey')?.toStringValue();
-      String? pivotRelatedForeignKey =
-          object?.getField('pivotRelatedForeignKey')?.toStringValue();
-      String? pivotTable = object?.getField('pivotTable')?.toStringValue();
-      bool eager = object?.getField('eager')?.toBoolValue() ?? false;
-
-      relations[element.name] = {
-        'relationType': metaData.element?.displayName,
+      relations[name] = {
+        'relationType': _annotationName(relationMeta),
         'model': model?.replaceFirst('?', ''),
-        'dataType': element.type.toString().replaceFirst('*', ''),
-        'localKey': localKey,
-        'foreignKey': foreignKey,
-        'onQuery': onQuery,
-        'eager': eager,
-        'relatedKey': relatedKey,
-        'pivotForeignKey': pivotForeignKey,
-        'pivotRelatedForeignKey': pivotRelatedForeignKey,
-        'pivotTable': pivotTable
+        'dataType': element.type.getDisplayString(),
+        'localKey': object?.getField('localKey')?.toStringValue(),
+        'foreignKey': object?.getField('foreignKey')?.toStringValue(),
+        'onQuery': _functionName(object, 'onQuery'),
+        'eager': object?.getField('eager')?.toBoolValue() ?? false,
+        'relatedKey': object?.getField('relatedKey')?.toStringValue(),
+        'pivotForeignKey': object?.getField('pivotForeignKey')?.toStringValue(),
+        'pivotRelatedForeignKey': object
+            ?.getField('pivotRelatedForeignKey')
+            ?.toStringValue(),
+        'pivotTable': object?.getField('pivotTable')?.toStringValue(),
       };
     }
 
-    if (isColumn) {
-      DartObject? object = element.metadata.first.computeConstantValue();
-      var key = object?.getField('name')?.toStringValue();
-      elementKey = key ?? element.name;
-
-      String? beforeSave =
-          object?.getField('beforeSave')?.toFunctionValue()?.displayName;
-
-      String? beforeGet =
-          object?.getField('beforeGet')?.toFunctionValue()?.displayName;
-
-      columns[element.name] = {
-        'type': element.type.toString().replaceFirst('*', ''),
-        'jsonKey': elementKey,
-        'beforeSave': beforeSave,
-        'beforeGet': beforeGet,
+    ElementAnnotation? columnMeta = _findAnnotation(element.metadata, <String>[
+      'Column',
+    ]);
+    if (columnMeta != null) {
+      DartObject? object = columnMeta.computeConstantValue();
+      columns[name] = {
+        'type': element.type.getDisplayString(),
+        'jsonKey': object?.getField('name')?.toStringValue() ?? name,
+        'beforeSave': _functionName(object, 'beforeSave'),
+        'beforeGet': _functionName(object, 'beforeGet'),
       };
     }
+  }
+
+  String? _functionName(DartObject? object, String field) {
+    // toFunctionValue is marked experimental in analyzer 7, and it is
+    // the stable toFunctionValue in analyzer 8+.
+    // ignore: experimental_member_use
+    return object?.getField(field)?.toFunctionValue()?.displayName;
+  }
+
+  ElementAnnotation? _findAnnotation(Metadata metadata, List<String> names) {
+    for (ElementAnnotation m in metadata.annotations) {
+      if (names.contains(_annotationName(m))) return m;
+    }
+    return null;
+  }
+
+  /// class name of the annotation, `@Column()` => `Column`
+  String? _annotationName(ElementAnnotation m) {
+    Element? e = m.element;
+    if (e is ConstructorElement) return e.enclosingElement.displayName;
+    return e?.displayName;
   }
 }
