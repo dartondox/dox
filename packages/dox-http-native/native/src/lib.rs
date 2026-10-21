@@ -443,15 +443,28 @@ fn simple(code: StatusCode) -> Answer {
     r
 }
 
+/// How often an idle server checks that its isolate is still alive.
+const PROBE: Duration = Duration::from_millis(100);
+
 /// Posts the batch once all tasks that are ready this tick have added to it.
+///
+/// When idle, it posts an empty message every [PROBE]. A killed isolate
+/// does not call `dox_stop`, so this is how its server finds out and stops.
+/// Without it, the dead server keeps its listener (on Linux one of the
+/// SO_REUSEPORT sockets) and loses the connections the kernel gives it.
 async fn flusher(ctx: Rc<Ctx>, port: i64) {
     let mut out = Vec::new();
     loop {
-        ctx.notify.notified().await;
-        tokio::task::yield_now().await;
-        std::mem::swap(&mut out, &mut *ctx.batch.borrow_mut());
-        if out.is_empty() {
-            continue;
+        let probe = tokio::select! {
+            _ = ctx.notify.notified() => false,
+            _ = tokio::time::sleep(PROBE) => true,
+        };
+        if !probe {
+            tokio::task::yield_now().await;
+            std::mem::swap(&mut out, &mut *ctx.batch.borrow_mut());
+            if out.is_empty() {
+                continue;
+            }
         }
         if !post(port, &out) {
             // the isolate is gone (killed or closed). stop this server so

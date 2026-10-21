@@ -152,6 +152,7 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
   bool _inBatch = false;
 
   void _onBatch(Uint8List b) {
+    if (b.isEmpty) return; // a probe from Rust: "is this isolate alive?"
     ByteData d = ByteData.sublistView(b);
     int p = 0;
     _inBatch = true;

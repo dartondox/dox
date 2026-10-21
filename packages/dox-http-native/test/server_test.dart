@@ -228,11 +228,12 @@ void main() {
     }
     expect(seen.length, greaterThan(1));
 
-    // a killed isolate stops its server, the others keep the port
+    // a killed isolate stops its server (the idle probe finds it within
+    // 100 ms), the others keep the port. no request may be lost after that.
     for (Isolate isolate in isolates) {
       isolate.kill(priority: Isolate.immediate);
     }
-    await Future<void>.delayed(const Duration(milliseconds: 100));
+    await Future<void>.delayed(const Duration(milliseconds: 400));
     int ok = 0;
     for (int i = 0; i < 20; i++) {
       String out = await raw(
@@ -242,7 +243,7 @@ void main() {
       );
       if (out.startsWith('HTTP/1.1 200')) ok++;
     }
-    expect(ok, greaterThanOrEqualTo(17)); // the first ones may hit a dead one
+    expect(ok, 20);
     await main.close();
   });
 }
