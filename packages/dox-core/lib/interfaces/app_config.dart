@@ -11,6 +11,17 @@ void defaultErrorHandler(Object? error, StackTrace stackTrace) {
   Logger.danger(stackTrace.toString());
 }
 
+/// Which HTTP server Dox runs on.
+enum ServerBackend {
+  /// Rust (hyper) owns the sockets and parses HTTP, see `dox_http_native`.
+  /// The default. Dox uses dart:io instead when the native library can not
+  /// load, or when the app has WebSocket or Socket.IO routes.
+  native,
+
+  /// The `dart:io` HttpServer.
+  dartIo,
+}
+
 class AppConfig {
   final String appKey;
   final int serverPort;
@@ -63,6 +74,11 @@ class AppConfig {
   /// It costs CPU on every response. Let the proxy do it when you have one.
   final bool compress;
 
+  /// The HTTP server. Default [ServerBackend.native]. The env var
+  /// `DOX_SERVER=dartio` wins over this value. `DOX_SERVER=native` forces
+  /// the native server, even for an app with WebSocket routes.
+  final ServerBackend server;
+
   AppConfig({
     required this.appKey,
     this.serverPort = 3000,
@@ -92,6 +108,7 @@ class AppConfig {
     this.maxMultipartSize = 100 * 1024 * 1024,
     this.trustedProxies = const <String>[],
     this.compress = false,
+    this.server = ServerBackend.native,
   }) : totalIsolate = totalIsolate ?? Platform.numberOfProcessors;
 }
 
