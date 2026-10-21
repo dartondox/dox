@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Fix: a `@Dto` body with a `RequestFile` field shows as `multipart/form-data` in the OpenAPI docs.
+- Fix: `req.ip()` gave `::ffff:127.0.0.1` for IPv4 clients. Now it gives `127.0.0.1`. The same goes for `X-Forwarded-For` hops.
 - Needs Dart 3.13 or newer.
 - All dependencies updated to their latest versions.
 - Removed the `encrypt` package (not maintained, and it blocked `pointycastle` 4). AES for cookies and the file cache now uses `pointycastle` 4. The output is the same, so old cookies and cache files still decode.

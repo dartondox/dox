@@ -1,5 +1,6 @@
 ## Unreleased
 
+- A request body with a file field (`format: binary`, also in a list) uses `multipart/form-data` instead of `application/json`, so the `/docs` page can send files. `RouteDoc(bodyMediaType:)` sets it by hand.
 - Needs Dart 3.13 or newer.
 - All dependencies updated to their latest versions.
 - `DoxRouteAdapter` reads `preMiddleware` and `body` from a route when it has them.

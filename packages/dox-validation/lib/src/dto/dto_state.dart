@@ -118,7 +118,14 @@ class DtoState extends ParseState {
   /// The input is not an object. At the top it is the `_root` key.
   void notObject(Object? input, List<Object> path, Map<String, String> m) {
     if (path.isEmpty) {
-      fail(path, '_root', IssueCodes.object, DefaultMessages.object, input);
+      fail(
+        path,
+        '_root',
+        IssueCodes.object,
+        DefaultMessages.rootObject,
+        input,
+        messages: m,
+      );
       return;
     }
     Object key = path.last;

@@ -95,6 +95,64 @@ void main() {
   });
 
   group('RouteDoc.toOperation', () {
+    test('a body with a file field uses multipart/form-data', () {
+      Map<String, dynamic> file = <String, dynamic>{
+        'type': 'string',
+        'format': 'binary',
+      };
+      for (Object field in <Object>[
+        file,
+        <String, dynamic>{'type': 'array', 'items': file},
+        <String, dynamic>{
+          'anyOf': <dynamic>[
+            file,
+            <String, dynamic>{'type': 'null'},
+          ],
+        },
+      ]) {
+        RouteDoc doc = RouteDoc(
+          method: 'post',
+          path: '/files',
+          body: <String, dynamic>{
+            'type': 'object',
+            'properties': <String, dynamic>{
+              'file': field,
+              'note': <String, dynamic>{'type': 'string'},
+            },
+          },
+        );
+        Map<String, dynamic> content =
+            doc.toOperation(resolver)['requestBody']['content']
+                as Map<String, dynamic>;
+        expect(content.keys, <String>['multipart/form-data']);
+      }
+    });
+
+    test('a body without a file field uses JSON', () {
+      RouteDoc doc = RouteDoc(
+        method: 'post',
+        path: '/users',
+        body: UserSchema(),
+      );
+      Map<String, dynamic> content =
+          doc.toOperation(resolver)['requestBody']['content']
+              as Map<String, dynamic>;
+      expect(content.keys, <String>['application/json']);
+    });
+
+    test('bodyMediaType wins over the guess', () {
+      RouteDoc doc = RouteDoc(
+        method: 'post',
+        path: '/users',
+        body: UserSchema(),
+        bodyMediaType: 'multipart/form-data',
+      );
+      Map<String, dynamic> content =
+          doc.toOperation(resolver)['requestBody']['content']
+              as Map<String, dynamic>;
+      expect(content.keys, <String>['multipart/form-data']);
+    });
+
     test('adds path params with a default string schema', () {
       RouteDoc doc = RouteDoc(
         method: 'GET',

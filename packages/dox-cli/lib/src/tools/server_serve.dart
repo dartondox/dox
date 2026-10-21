@@ -70,8 +70,16 @@ Future<Process> watchBuilder() async {
   return process;
 }
 
+/// `dart run build_runner build`. build_runner removed
+/// `--delete-conflicting-outputs`, so it is not passed.
+const List<String> buildRunnerBuildArgs = <String>[
+  'run',
+  'build_runner',
+  'build',
+];
+
 Future<void> buildBuilder() async {
-  var process = await Process.start('dart', ['run', 'build_runner', 'build']);
+  var process = await Process.start('dart', buildRunnerBuildArgs);
   process.stdout.transform(utf8.decoder).listen((data) {
     List lines = data.split("\n");
     print(lines.first.toString().replaceAll('INFO', 'Dox'));
@@ -104,14 +112,7 @@ Future<void> buildServer() async {
   bool usesBuildRunner =
       File('pubspec.yaml').existsSync() &&
       File('pubspec.yaml').readAsStringSync().contains('build_runner');
-  if (usesBuildRunner &&
-      await _run('dart', <String>[
-            'run',
-            'build_runner',
-            'build',
-            '--delete-conflicting-outputs',
-          ]) !=
-          0) {
+  if (usesBuildRunner && await _run('dart', buildRunnerBuildArgs) != 0) {
     exitCode = 1;
     return;
   }

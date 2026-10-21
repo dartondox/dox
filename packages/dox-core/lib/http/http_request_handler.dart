@@ -68,7 +68,8 @@ bool _mounted(HttpRequest req, Map<String, RawRequestHandler> mounts) {
 }
 
 Future<DoxRequest> getDoxRequest(HttpRequest req, RouteData route) async {
-  String? remote = req.connectionInfo?.remoteAddress.address;
+  String? address = req.connectionInfo?.remoteAddress.address;
+  String? remote = address == null ? null : TrustedProxy.normalize(address);
   String? clientIp = remote;
   String scheme = 'http';
   TrustedProxy proxy = _trustedProxy();

@@ -225,7 +225,7 @@ void main() {
       http.Response res = await postJson('/users', <int>[1, 2]);
       expect(res.statusCode, 422);
       expect(json(res), <String, dynamic>{
-        '_root': 'The _root must be an object',
+        '_root': 'The request body must be a JSON object.',
       });
     });
 

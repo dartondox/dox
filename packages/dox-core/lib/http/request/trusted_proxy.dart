@@ -17,6 +17,16 @@ class TrustedProxy {
 
   bool get enabled => _any || _ranges.isNotEmpty;
 
+  /// `::ffff:1.2.3.4` becomes `1.2.3.4`. The server listens on IPv6, so
+  /// IPv4 clients come in this form. Other values stay the same.
+  static String normalize(String ip) {
+    if (ip.length > 7 && ip.startsWith('::') && ip.contains('.')) {
+      String prefix = ip.substring(0, 7).toLowerCase();
+      if (prefix == '::ffff:') return ip.substring(7);
+    }
+    return ip;
+  }
+
   /// is [ip] one of our proxies?
   bool trusts(String ip) {
     if (_any) return true;
@@ -36,10 +46,10 @@ class TrustedProxy {
     for (int i = hops.length - 1; i >= 0; i--) {
       String hop = hops[i].trim();
       if (hop.isEmpty) continue;
-      if (!trusts(hop)) return hop;
+      if (!trusts(hop)) return normalize(hop);
       remote = hop;
     }
-    return remote;
+    return normalize(remote);
   }
 
   /// `https` when a trusted proxy says the client used https
