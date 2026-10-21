@@ -13,8 +13,10 @@ AppConfig isolateConfig = AppConfig(
   /// application key
   appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
 
-  /// application server port
-  serverPort: 50010,
+  /// own port: the isolates killed here can keep their native listener
+  /// until it gets a request. On Linux (SO_REUSEPORT) other test files on
+  /// the same port would then lose requests.
+  serverPort: 50077,
 
   /// total multi-thread isolate to run
   totalIsolate: 1,
@@ -44,6 +46,7 @@ void main() {
 
     tearDownAll(() async {
       DoxIsolate().killAll();
+      await Dox().server.close();
     });
 
     test('test', () async {
