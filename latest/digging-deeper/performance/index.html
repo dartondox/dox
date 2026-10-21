@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://dartondox.dev/3.x/digging-deeper/performance/">
       
       
-        <link rel="prev" href="../deployment/">
+        <link rel="prev" href="../native-server/">
       
       
         <link rel="next" href="../testing/">
@@ -767,6 +767,8 @@
       
         
       
+        
+      
     
     
     
@@ -1043,6 +1045,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../native-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Native server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1104,6 +1134,45 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#benchmark" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benchmark
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Benchmark">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-core" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 core
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-cores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 cores
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#numbers" class="md-nav__link">
@@ -2419,6 +2488,45 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#benchmark" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benchmark
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Benchmark">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-core" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 core
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-cores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 cores
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#numbers" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2523,6 +2631,133 @@
 <li>Keep the default isolates (one per CPU core).</li>
 <li>Keep the body limits on. Uploads stream to disk.</li>
 </ol>
+<h2 id="benchmark">Benchmark</h2>
+<p>A "hello world" test. Each server answers <code>GET /</code> with the plain text
+<code>Hello World</code>. Dox is a small real Dox app with one route.</p>
+<p>Hello world only measures framework overhead. A real app spends most of its
+time on the database, JSON and your own code, so the gaps are much smaller
+there.</p>
+<h3 id="1-core">1 core</h3>
+<table>
+<thead>
+<tr>
+<th>Server</th>
+<th style="text-align: right;">req/s</th>
+<th style="text-align: right;">p99 ms</th>
+<th style="text-align: right;">CPU %</th>
+<th style="text-align: right;">peak MB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dox, native server</td>
+<td style="text-align: right;">171,042</td>
+<td style="text-align: right;">0.92</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">9</td>
+</tr>
+<tr>
+<td>Dox, <code>dart:io</code> server</td>
+<td style="text-align: right;">33,154</td>
+<td style="text-align: right;">5.48</td>
+<td style="text-align: right;">101</td>
+<td style="text-align: right;">39</td>
+</tr>
+<tr>
+<td>Bun 1.4.3</td>
+<td style="text-align: right;">181,162</td>
+<td style="text-align: right;">1.13</td>
+<td style="text-align: right;">101</td>
+<td style="text-align: right;">14</td>
+</tr>
+<tr>
+<td>Node 24.22.0</td>
+<td style="text-align: right;">81,909</td>
+<td style="text-align: right;">2.26</td>
+<td style="text-align: right;">101</td>
+<td style="text-align: right;">54</td>
+</tr>
+<tr>
+<td>Pure Rust hyper (the ceiling)</td>
+<td style="text-align: right;">254,349</td>
+<td style="text-align: right;">0.47</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">5</td>
+</tr>
+</tbody>
+</table>
+<p>On one core, Dox with the native server is about as fast as Bun (0.94x).
+It is 5x faster than Dox on <code>dart:io</code>.</p>
+<h3 id="4-cores">4 cores</h3>
+<table>
+<thead>
+<tr>
+<th>Server</th>
+<th style="text-align: right;">req/s</th>
+<th style="text-align: right;">p99 ms</th>
+<th style="text-align: right;">CPU %</th>
+<th style="text-align: right;">peak MB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dox, native server, 4 isolates</td>
+<td style="text-align: right;">337,486</td>
+<td style="text-align: right;">0.67</td>
+<td style="text-align: right;">306</td>
+<td style="text-align: right;">18</td>
+</tr>
+<tr>
+<td>Dox, <code>dart:io</code> server, 4 isolates</td>
+<td style="text-align: right;">142,334</td>
+<td style="text-align: right;">3.45</td>
+<td style="text-align: right;">345</td>
+<td style="text-align: right;">25</td>
+</tr>
+<tr>
+<td>Bun 1.4.3</td>
+<td style="text-align: right;">184,844</td>
+<td style="text-align: right;">1.07</td>
+<td style="text-align: right;">101</td>
+<td style="text-align: right;">15</td>
+</tr>
+<tr>
+<td>Node 24.22.0</td>
+<td style="text-align: right;">80,726</td>
+<td style="text-align: right;">2.26</td>
+<td style="text-align: right;">101</td>
+<td style="text-align: right;">55</td>
+</tr>
+<tr>
+<td>Go 1.27.3 (<code>net/http</code>)</td>
+<td style="text-align: right;">336,274</td>
+<td style="text-align: right;">2.57</td>
+<td style="text-align: right;">334</td>
+<td style="text-align: right;">16</td>
+</tr>
+</tbody>
+</table>
+<p>Bun and Node use one thread, so more cores do not help them. Dox runs one
+isolate per core and shares the port (<code>SO_REUSEPORT</code>). On 4 cores Dox is
+1.8x Bun at 100 connections and 2.3x Bun at 256 connections
+(415,537 req/s). It is as fast as Go. Here wrk was close to its own limit
+(about 280-330% of its 400%), so Dox may go higher on a bigger machine.</p>
+<p>With pipelining (16 requests per batch), Dox native gives 153k req/s on
+1 core (Bun: 200k) and 400-483k req/s on 4 cores (Bun: 199k).</p>
+<p>How it was run: measured with wrk in Docker on an Apple M2 (linux/arm64),
+CPU pinned.</p>
+<ul>
+<li>Docker on an Apple M2 (8 CPUs in the Docker VM), <code>linux/arm64</code>.</li>
+<li>The server and wrk run in two containers, pinned to different CPUs:
+  server on CPU 0 (or 0-3), wrk on CPUs 2-7 (or 4-7).</li>
+<li>wrk 4.2.0, 100 connections (the tables) and 256 connections.
+  5 seconds warm-up, then 3 runs of 10 seconds. The tables show the median.</li>
+<li>CPU % and peak memory come from <code>docker stats</code>. 100% = one core.</li>
+<li>Dart 3.13.6, Rust 1.99.1. Dox is built with <code>dart build cli</code> (this is
+  what <code>dox build</code> does). The build hook of <code>dox_http_native</code> builds the
+  Rust library with cargo.</li>
+<li><code>DOX_SERVER=dartio</code> runs the same Dox app on <code>dart:io</code>.</li>
+</ul>
 <h2 id="numbers">Numbers</h2>
 <p>Measured on a MacBook (Apple M-series, 8 cores), Dart 3.13. The load tool
 ran on the same machine, so it took some of the CPU. Treat the numbers as a
@@ -2731,7 +2966,7 @@ be lost. Errors from <code>Logger</code> are still written right away.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../deployment/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Deployment">
+          <a href="../native-server/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Native server">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2741,7 +2976,7 @@ be lost. Errors from <code>Logger</code> are still written right away.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Deployment
+                Native server
               </div>
             </div>
           </a>
