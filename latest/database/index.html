@@ -2612,19 +2612,11 @@ A column with an alias (<code>active as is_active</code>) is not converted.</p>
 </div>
 <div class="admonition info">
 <p class="admonition-title">Native library</p>
-<p>The <code>sqlite3</code> package (v2) loads the SQLite library of the system.
-macOS has it. On Debian or Ubuntu, install <code>libsqlite3-dev</code> (it gives <code>libsqlite3.so</code>).
-<code>dart compile exe</code> works. Apps that do not use SQLite do not need the library.
-In the Dox Docker image (<code>FROM scratch</code>), copy the library into the final image:</p>
-<div class="highlight"><pre><span></span><code><span class="k">FROM</span><span class="w"> </span><span class="s">dart:stable</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">build</span>
-<span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>--no-install-recommends<span class="w"> </span>libsqlite3-0
-<span class="c"># ... build as before ...</span>
-
-<span class="k">FROM</span><span class="w"> </span><span class="s">scratch</span>
-<span class="k">COPY</span><span class="w"> </span>--from<span class="o">=</span>build<span class="w"> </span>/runtime/<span class="w"> </span>/
-<span class="k">COPY</span><span class="w"> </span>--from<span class="o">=</span>build<span class="w"> </span>/usr/lib/*-linux-gnu/libsqlite3.so.0<span class="w"> </span>/usr/lib/libsqlite3.so
-<span class="c"># ... copy the server as before ...</span>
-</code></pre></div>
+<p>The <code>sqlite3</code> package (v3) bundles SQLite with a build hook. You do not install
+a system library. <code>dart run</code> and <code>dart test</code> run the hook by themselves.
+For the AOT binary use <code>dox build</code> (it runs <code>dart build cli</code>). It puts the library
+in <code>build/bundle/lib/</code>, next to <code>build/bundle/bin/server</code>. Keep the two folders together.
+<code>dart compile exe</code> does not work with build hooks. See <a href="../digging-deeper/deployment/">Deployment</a>.</p>
 </div>
 
 

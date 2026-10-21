@@ -2736,7 +2736,7 @@
 </tr>
 <tr>
 <td><code>dox build</code></td>
-<td>build the native (AOT) binary into <code>build/server</code></td>
+<td>build the native (AOT) bundle into <code>build/bundle</code></td>
 </tr>
 <tr>
 <td><code>dox build_runner:watch</code> / <code>dox build_runner:build</code></td>
@@ -2821,9 +2821,9 @@
 <span class="n">dox</span> <span class="n">build_runner</span><span class="p">:</span><span class="n">build</span>
 </code></pre></div>
 <h2 id="build-project-for-production">Build project for production</h2>
-<div class="highlight"><pre><span></span><code><span class="n">dox</span> <span class="n">build</span>      <span class="o">//</span> <span class="n">runs</span> <span class="n">build_runner</span><span class="p">,</span> <span class="n">then</span> <span class="n">dart</span> <span class="nb">compile</span> <span class="n">exe</span>
-<span class="n">cd</span> <span class="n">build</span>
-<span class="o">./</span><span class="n">server</span>       <span class="o">//</span> <span class="n">start</span> <span class="n">the</span> <span class="n">server</span>
+<div class="highlight"><pre><span></span><code><span class="n">dox</span> <span class="n">build</span>      <span class="o">//</span> <span class="n">runs</span> <span class="n">build_runner</span><span class="p">,</span> <span class="n">then</span> <span class="n">dart</span> <span class="n">build</span> <span class="n">cli</span>
+<span class="n">cd</span> <span class="n">build</span><span class="o">/</span><span class="n">bundle</span>
+<span class="o">./</span><span class="nb">bin</span><span class="o">/</span><span class="n">server</span>   <span class="o">//</span> <span class="n">start</span> <span class="n">the</span> <span class="n">server</span>
 </code></pre></div>
 <p><code>dox build</code> exits with code 1 when a step fails, so CI can stop. See <a href="../deployment/">Deployment</a>.</p>
 <h2 id="generate-app-key">Generate app key</h2>

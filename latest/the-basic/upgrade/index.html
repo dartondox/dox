@@ -2576,7 +2576,7 @@
 </div>
 <h2 id="do-these-first">Do these first</h2>
 <ol>
-<li>Use Dart <strong>3.6</strong> or newer.</li>
+<li>Use Dart <strong>3.13</strong> or newer.</li>
 <li>Set every Dox package to the same version, <code>^3.0.0-alpha.1</code>. All Dox packages now share one version.</li>
 <li>Replace <code>dox_query_builder</code> with <code>dox_orm</code>.</li>
 <li>If you use <code>ioredis</code> in your app, update it to <code>^2.0.0-alpha.1</code>.</li>
@@ -2584,7 +2584,7 @@
 <li>Read the list below. Each item says what breaks and how to fix it.</li>
 </ol>
 <div class="highlight"><pre><span></span><code><span class="nt">environment</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">sdk</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^3.6.0</span>
+<span class="w">  </span><span class="nt">sdk</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^3.13.0</span>
 
 <span class="nt">dependencies</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">dox_core</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^3.0.0-alpha.1</span>
@@ -2596,7 +2596,7 @@
 
 <span class="nt">dev_dependencies</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">dox_builder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^3.0.0-alpha.1</span>
-<span class="w">  </span><span class="nt">build_runner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^2.3.3</span>
+<span class="w">  </span><span class="nt">build_runner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^2.17.1</span>
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><span class="c1">// old</span>
 <span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_query_builder/dox_query_builder.dart'</span><span class="p">;</span>
@@ -2705,7 +2705,12 @@ Fix: use the Redis adapter, or set <code>totalIsolate: 1</code> (or <code>APP_TO
 <p><strong>Real environment variables win over <code>.env</code>.</strong>
 Before, <code>Env.get()</code> only read the <code>.env</code> file. Now a variable set in the shell or in Docker wins.</p>
 <p><strong>gzip is off by default.</strong> Turn it on with <code>AppConfig(compress: true)</code>, or let your proxy do it.</p>
-<p><strong><code>dox build</code> makes an AOT binary in <code>build/server</code>.</strong> See <a href="../../digging-deeper/deployment/">Deployment</a>.</p>
+<p><strong><code>dox build</code> makes an AOT bundle in <code>build/bundle</code>.</strong> The binary is <code>build/bundle/bin/server</code>.
+It uses <code>dart build cli</code>, not <code>dart compile exe</code>. <code>dox_orm</code> uses <code>sqlite3</code> v3, which bundles SQLite
+with a build hook, and <code>dart compile exe</code> stops with "does not support build hooks".
+If your own Dockerfile or CI runs <code>dart compile exe</code>, change it to
+<code>dart build cli --target bin/server.dart --output build</code> and copy all of <code>build/bundle</code>.
+See <a href="../../digging-deeper/deployment/">Deployment</a>.</p>
 <h2 id="validation">Validation</h2>
 <p><strong>A missing or <code>null</code> field skips its rules.</strong>
 Only <code>required</code>, <code>required_if</code> and <code>required_if_not</code> still run.

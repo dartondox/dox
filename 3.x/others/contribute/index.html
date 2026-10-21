@@ -2314,35 +2314,41 @@
 <div class="highlight"><pre><span></span><code><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">dartondox</span><span class="o">/</span><span class="n">dox</span><span class="o">.</span><span class="n">git</span>
 </code></pre></div>
 <h4 id="2-install-melos-if-not-installed">2. Install melos if not installed</h4>
-<p>This repo uses melos 3. Melos 7 and newer use a different config.</p>
-<div class="highlight"><pre><span></span><code><span class="n">dart</span> <span class="n">pub</span> <span class="k">global</span> <span class="n">activate</span> <span class="n">melos</span> <span class="mf">3.4.0</span>
+<p>The repo is a <a href="https://dart.dev/tools/pub/workspaces">Dart pub workspace</a>.
+The melos config is in the root <code>pubspec.yaml</code> (under <code>melos:</code>). Use Dart 3.13 or newer.</p>
+<div class="highlight"><pre><span></span><code><span class="n">dart</span> <span class="n">pub</span> <span class="k">global</span> <span class="n">activate</span> <span class="n">melos</span>
 </code></pre></div>
 <h4 id="3-run-melos-bootstrap">3. Run melos bootstrap</h4>
+<p>It runs one <code>dart pub get</code> at the root. All local packages are linked, and there is
+one <code>pubspec.lock</code> for the whole repo.</p>
 <div class="highlight"><pre><span></span><code><span class="n">melos</span> <span class="n">bs</span>
 </code></pre></div>
 <h4 id="4-other-useful-commands">4. Other Useful Commands</h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># Run all tests (not dox_orm)</span>
-<span class="n">melos</span> <span class="n">run</span> <span class="n">test</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">select</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Run all tests (not dox_orm).</span>
+<span class="c1"># Use `melos run test`. `melos test` is a built-in melos command.</span>
+<span class="n">melos</span> <span class="n">run</span> <span class="n">test</span>
 
 <span class="c1"># Analyze and check format (same as CI)</span>
-<span class="n">melos</span> <span class="n">run</span> <span class="n">analyze</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">select</span>
-<span class="n">dart</span> <span class="nb">format</span> <span class="o">--</span><span class="n">output</span><span class="o">=</span><span class="n">none</span> <span class="o">--</span><span class="nb">set</span><span class="o">-</span><span class="n">exit</span><span class="o">-</span><span class="k">if</span><span class="o">-</span><span class="n">changed</span> <span class="o">.</span>
+<span class="n">melos</span> <span class="n">run</span> <span class="n">analyze</span>
+<span class="n">melos</span> <span class="n">run</span> <span class="n">format_check</span>
 
 <span class="c1"># Run tests for dox_orm with postgres, mysql or sqlite</span>
 <span class="n">DB_PORT</span><span class="o">=</span><span class="mi">5432</span> <span class="n">melos</span> <span class="n">run</span> <span class="n">test_pg</span>
 <span class="n">DB_USER</span><span class="o">=</span><span class="n">dox</span> <span class="n">DB_PORT</span><span class="o">=</span><span class="mi">3306</span> <span class="n">melos</span> <span class="n">run</span> <span class="n">test_mysql</span>
 <span class="n">melos</span> <span class="n">run</span> <span class="n">test_sqlite</span>
 
-<span class="c1"># Generate dox cli executable file</span>
+<span class="c1"># Build the dox cli executable (AOT).</span>
+<span class="c1"># `dart compile exe` does not work: sqlite3 has a build hook. Use `dart build cli`.</span>
 <span class="n">cd</span> <span class="n">packages</span><span class="o">/</span><span class="n">dox</span><span class="o">-</span><span class="n">cli</span>
-<span class="n">dart</span> <span class="nb">compile</span> <span class="n">exe</span> <span class="nb">bin</span><span class="o">/</span><span class="n">dox</span><span class="o">.</span><span class="n">dart</span> <span class="o">-</span><span class="n">o</span> <span class="nb">bin</span><span class="o">/</span><span class="n">dox</span>
+<span class="n">dart</span> <span class="n">build</span> <span class="n">cli</span> <span class="o">--</span><span class="n">target</span> <span class="nb">bin</span><span class="o">/</span><span class="n">dox</span><span class="o">.</span><span class="n">dart</span> <span class="o">--</span><span class="n">output</span> <span class="n">build</span>
 
 <span class="c1"># Run dox cli executable file</span>
-<span class="nb">bin</span><span class="o">/</span><span class="n">dox</span> <span class="o">--</span><span class="n">version</span>
+<span class="n">build</span><span class="o">/</span><span class="n">bundle</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">dox</span> <span class="o">--</span><span class="n">version</span>
 </code></pre></div>
 <h4 id="if-failed-to-run-the-project">If failed to run the project</h4>
 <ul>
-<li>remove all pubspec.lock files</li>
+<li>remove <code>pubspec.lock</code> and <code>.dart_tool</code> at the root</li>
+<li>remove any old <code>pubspec_overrides.yaml</code> and <code>pubspec.lock</code> in <code>packages/*</code> (from melos 3)</li>
 <li>and run <code>melos bs</code> again</li>
 </ul>
 <h1 id="release-maintainers">Release (maintainers)</h1>
@@ -2375,7 +2381,7 @@ A package is skipped when that version is already on pub.dev. So if a run fails 
 fix the problem and click "Re-run jobs". It continues where it stopped.</p>
 <h4 id="dry-run">Dry run</h4>
 <p>Open Actions &gt; Release &gt; "Run workflow". It runs <code>dart pub publish --dry-run</code> for every
-package and publishes nothing. Warnings (for example local path overrides or a missing
+package and publishes nothing. Warnings (for example a missing
 CHANGELOG entry) are shown as yellow warnings and do not fail the run.</p>
 <h4 id="one-time-setup">One-time setup</h4>
 <p>On pub.dev, for each package (<code>dox_annotation</code>, <code>dox_builder</code>, <code>dox_orm</code>,

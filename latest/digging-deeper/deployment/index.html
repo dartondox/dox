@@ -2527,7 +2527,7 @@ production.</p>
 <p>Compile the app to a native binary (AOT).</p>
 <div class="highlight"><pre><span></span><code>dox<span class="w"> </span>build
 </code></pre></div>
-<p>This makes a <code>build/</code> folder:</p>
+<p>This makes a <code>build/bundle/</code> folder:</p>
 <table>
 <thead>
 <tr>
@@ -2537,36 +2537,68 @@ production.</p>
 </thead>
 <tbody>
 <tr>
-<td><code>build/server</code></td>
+<td><code>build/bundle/bin/server</code></td>
 <td>the native binary. No Dart SDK needed to run it</td>
 </tr>
 <tr>
-<td><code>build/db/</code></td>
+<td><code>build/bundle/lib/</code></td>
+<td>native libraries from build hooks (eg. SQLite)</td>
+</tr>
+<tr>
+<td><code>build/bundle/db/</code></td>
 <td>your migrations, run at start</td>
 </tr>
 <tr>
-<td><code>build/.env.example</code></td>
-<td>copy it to <code>build/.env</code>, or use env variables</td>
+<td><code>build/bundle/.env.example</code></td>
+<td>copy it to <code>build/bundle/.env</code>, or use env variables</td>
 </tr>
 </tbody>
 </table>
 <p><code>dox build</code> runs <code>build_runner</code> first (when your app uses it). Then it runs
-<code>dart compile exe bin/server.dart -o build/server</code>. It exits with code 1 when
-a step fails, so CI can stop.</p>
+<code>dart build cli --target bin/server.dart --output build</code>. It exits with code 1
+when a step fails, so CI can stop.</p>
+<div class="admonition warning">
+<p class="admonition-title">Not <code>dart compile exe</code></p>
+<p><code>dox_orm</code> depends on <code>sqlite3</code> v3. It bundles SQLite with a build hook.
+<code>dart compile exe</code> does not run build hooks, so it stops with an error.
+<code>dart build cli</code> is the same AOT compiler and runs the hooks.
+Keep <code>bin/</code> and <code>lib/</code> together: the binary loads the libraries from <code>../lib</code>.</p>
+</div>
 <p>Start the application.</p>
-<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>build
-./server
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>build/bundle
+./bin/server
 </code></pre></div>
 <p>The binary reads <code>.env</code> and <code>db/</code> from the folder you start it in.
 A real environment variable wins over the <code>.env</code> file.</p>
 <h2 id="docker">Docker</h2>
 <p>The <code>Dockerfile</code> in a new Dox app is a multi-stage build:</p>
 <ol>
-<li>The <code>dart:stable</code> image builds the AOT binary.</li>
+<li>The <code>dart:stable</code> image builds the AOT bundle with
+   <code>dart build cli --target bin/server.dart --output build</code>.</li>
 <li>The final image is <code>FROM scratch</code>. It holds only the Dart AOT runtime
-   files (<code>/runtime/</code> from the dart image), your binary, <code>db/</code> and an empty
-   <code>/tmp</code>. The image is about 11 MB.</li>
+   files (<code>/runtime/</code> from the dart image), the bundle (<code>/app/bin/server</code> and
+   <code>/app/lib/</code>), <code>db/</code> and an empty <code>/tmp</code>.</li>
 </ol>
+<div class="highlight"><pre><span></span><code><span class="k">FROM</span><span class="w"> </span><span class="s">dart:stable</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">build</span>
+<span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
+<span class="k">COPY</span><span class="w"> </span>pubspec.*<span class="w"> </span>./
+<span class="k">RUN</span><span class="w"> </span>dart<span class="w"> </span>pub<span class="w"> </span>get
+<span class="k">COPY</span><span class="w"> </span>.<span class="w"> </span>.
+<span class="k">RUN</span><span class="w"> </span>dart<span class="w"> </span>pub<span class="w"> </span>get<span class="w"> </span>--offline
+<span class="k">RUN</span><span class="w"> </span>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build<span class="w"> </span>--delete-conflicting-outputs
+<span class="k">RUN</span><span class="w"> </span>dart<span class="w"> </span>build<span class="w"> </span>cli<span class="w"> </span>--target<span class="w"> </span>bin/server.dart<span class="w"> </span>--output<span class="w"> </span>build
+<span class="k">RUN</span><span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/out/app/storage<span class="w"> </span>/out/tmp<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="o">&amp;&amp;</span><span class="w"> </span>chmod<span class="w"> </span><span class="m">1777</span><span class="w"> </span>/out/tmp<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="o">&amp;&amp;</span><span class="w"> </span>cp<span class="w"> </span>-r<span class="w"> </span>build/bundle/.<span class="w"> </span>/out/app/<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="o">&amp;&amp;</span><span class="w"> </span>cp<span class="w"> </span>-r<span class="w"> </span>db<span class="w"> </span>/out/app/db
+
+<span class="k">FROM</span><span class="w"> </span><span class="s">scratch</span>
+<span class="k">COPY</span><span class="w"> </span>--from<span class="o">=</span>build<span class="w"> </span>/runtime/<span class="w"> </span>/
+<span class="k">COPY</span><span class="w"> </span>--from<span class="o">=</span>build<span class="w"> </span>/out/<span class="w"> </span>/
+<span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
+<span class="k">EXPOSE</span><span class="w"> </span><span class="s">3000</span>
+<span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">"/app/bin/server"</span><span class="p">]</span>
+</code></pre></div>
 <p>The image has no <code>.env</code> file, so secrets stay out of it. Pass config as
 environment variables.</p>
 <div class="highlight"><pre><span></span><code>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>my-app<span class="w"> </span>.
@@ -2661,9 +2693,9 @@ real client:</p>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="c1"># /etc/systemd/system/dox.service</span>
 <span class="k">[Service]</span>
-<span class="na">WorkingDirectory</span><span class="o">=</span><span class="s">/srv/app/build</span>
-<span class="na">ExecStart</span><span class="o">=</span><span class="s">/srv/app/build/server</span>
-<span class="na">EnvironmentFile</span><span class="o">=</span><span class="s">/srv/app/build/.env</span>
+<span class="na">WorkingDirectory</span><span class="o">=</span><span class="s">/srv/app/build/bundle</span>
+<span class="na">ExecStart</span><span class="o">=</span><span class="s">/srv/app/build/bundle/bin/server</span>
+<span class="na">EnvironmentFile</span><span class="o">=</span><span class="s">/srv/app/build/bundle/.env</span>
 <span class="na">Restart</span><span class="o">=</span><span class="s">always</span>
 
 <span class="k">[Install]</span>
