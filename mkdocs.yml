@@ -32,34 +32,61 @@ theme:
     - navigation.sections
     - navigation.expand
     - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+    - toc.follow
   font:
-    text: Inclusive Sans
+    text: Instrument Sans
+    code: JetBrains Mono
   favicon: assets/favicon.png
   logo: assets/logo.svg
   icon:
     repo: fontawesome/brands/github
   name: material
+  # follows the system setting first; the toggle cycles auto -> light -> dark
   palette:
-   # Palette toggle for dark mode
-  - scheme: default
+  - media: "(prefers-color-scheme)"
+    toggle:
+      icon: material/brightness-auto
+      name: Switch to light mode
+
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
     primary: custom
+    accent: custom
+    toggle:
+      icon: material/brightness-7
+      name: Switch to dark mode
+
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: custom
+    accent: custom
     toggle:
       icon: material/brightness-4
-      name: Switch to dark mode
-  
-  # Palette toggle for light mode
-  - scheme: slate
-    primary: custom
-    toggle:
-      icon: material/brightness-7 
-      name: Switch to light mode
+      name: Switch to system preference
 
 markdown_extensions:
   - admonition
+  - attr_list
+  - md_in_html
+  - tables
   - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 nav:
   - Getting Started:
