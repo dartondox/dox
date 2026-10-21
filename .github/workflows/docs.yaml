@@ -50,9 +50,10 @@ jobs:
         with:
           ref: ${{ (github.event_name == 'workflow_dispatch' && inputs.version == '2.x') && inputs.ref || github.ref }}
           fetch-depth: 0
-          # GITHUB_TOKEN is enough when gh-pages is not protected.
-          # If gh-pages is protected, set the PUSH_TO_PROTECTED_BRANCH secret.
-          token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH || github.token }}
+          # The built-in GITHUB_TOKEN is used. It can push to gh-pages
+          # because gh-pages is not protected.
+          # Keep persist-credentials on (the default) so the git push works.
+          token: ${{ github.token }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
