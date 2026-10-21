@@ -1,7 +1,7 @@
 # dox_openapi
 
 Make an OpenAPI 3.1 document for a Dox app. Output it as JSON and YAML, and
-show it in a Swagger UI page.
+show it in a Scalar (or Swagger UI) page.
 
 In a Dox app you write no docs code: `dox_builder` reads your routes,
 request classes and controllers, and `dox_core` serves `/docs`.
@@ -69,6 +69,10 @@ content type for `/openapi.json`, `/openapi.yaml` and `/docs`.
 OpenApiServer server = OpenApiServer(api);
 OpenApiResponse? res = server.handle('/docs'); // res.body, res.contentType
 ```
+
+`/docs` uses Scalar. Pass `ui: DocsUi.swagger` for Swagger UI, and
+`scalar: ScalarOptions(theme: ScalarTheme.moon, darkMode: true)` to
+change the Scalar page.
 
 ## CLI
 

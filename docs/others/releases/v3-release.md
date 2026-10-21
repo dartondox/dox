@@ -8,7 +8,7 @@ All Dox packages now share one version. Coming from 2.x? Read the [upgrade guide
 
 - `dox_orm`: the new name of `dox_query_builder`.
 - [`dox_validation`](../../packages/validation.md): typed schemas, coercion, custom rules, JSON Schema.
-- [`dox_openapi`](../../packages/openapi.md): OpenAPI 3.1 as JSON and YAML, Swagger UI.
+- [`dox_openapi`](../../packages/openapi.md): OpenAPI 3.1 as JSON and YAML, a Scalar (or Swagger UI) docs page.
 - [`dox_storage`](../../packages/storage.md): local, S3 and memory disks, signed URLs.
 - [`dox_cache`](../../packages/cache.md): memory, file and Redis cache with tags and locks.
 - [`dox_socketio`](../../packages/socketio.md): Socket.IO v4 server with a Redis adapter.

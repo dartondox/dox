@@ -1,7 +1,7 @@
 # OpenAPI
 
 Dox makes OpenAPI 3.1 docs for your API by itself.
-You write no docs code. You get a Swagger UI page at `/docs`, plus `/openapi.json` and `/openapi.yaml`.
+You write no docs code. You get a [Scalar](https://github.com/scalar/scalar) docs page at `/docs`, plus `/openapi.json` and `/openapi.yaml`.
 
 The docs come from three places:
 
@@ -44,6 +44,41 @@ Start the app and open `http://localhost:3000/docs`.
   So production is off unless you set `enabled: true`.
 - When the docs are off, there is no extra work per request.
 - The document is built and encoded on the first `/docs` request, then kept. It is built again only when routes are added.
+
+### The docs page
+
+`/docs` uses [Scalar](https://github.com/scalar/scalar) by default.
+The page loads Scalar from the jsDelivr CDN, at a fixed version, and reads `/openapi.json`.
+
+Change the look with `scalar:`:
+
+```dart
+OpenApiConfig(
+  registry: openApiRegistry,
+  pageTitle: 'Blog API docs',          // default: info.title
+  scalar: ScalarOptions(
+    theme: ScalarTheme.purple,         // default: ScalarTheme.default_
+    darkMode: true,                    // start in dark mode (default: false)
+    showDownloadButton: false,         // hide "Download OpenAPI" (default: true)
+    proxyUrl: 'https://proxy.scalar.com', // default: null, no proxy
+  ),
+);
+```
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `theme` | `ScalarTheme.default_` | Color theme. Same names as Scalar: `moon`, `purple`, `deepSpace`, `saturn`, `kepler`, `mars` and more. |
+| `darkMode` | `false` | Start in dark mode. The user can still switch. |
+| `showDownloadButton` | `true` | Show the button that downloads the document. |
+| `proxyUrl` | `null` | Send "Try it" requests through this proxy. Off by default, so requests go from the browser straight to your API. |
+
+`pageTitle` and all options are escaped, so a value can not break the page.
+
+To use Swagger UI instead, set `ui:`:
+
+```dart
+OpenApiConfig(registry: openApiRegistry, ui: DocsUi.swagger);
+```
 
 ## What you write, what you get
 
@@ -302,6 +337,7 @@ api.toYaml();                              // YAML
 await api.writeFiles('storage/openapi');   // openapi.json + openapi.yaml
 
 OpenApiServer server = OpenApiServer(api); // body + content type for /openapi.json, /openapi.yaml, /docs
+// Swagger UI: OpenApiServer(api, ui: DocsUi.swagger)
 ```
 
 A schema can be a JSON Schema `Map`, a [`dox_validation`](validation.md) schema, or any object with `toJsonSchema()`.

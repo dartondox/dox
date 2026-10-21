@@ -11,6 +11,9 @@ import 'package:dox_openapi/dox_openapi.dart';
 ///   registry: openApiRegistry,
 /// );
 /// ```
+///
+/// The page at `/docs` uses Scalar. Use `ui: DocsUi.swagger` for
+/// Swagger UI.
 class OpenApiConfig {
   /// Serve the docs routes. When null, they are on only when `APP_ENV`
   /// is `development` or `local`, so production is off by default.
@@ -34,6 +37,16 @@ class OpenApiConfig {
   /// `lib/openapi.g.dart`. Run `dart run build_runner build` to make it.
   final OpenApiRegistry registry;
 
+  /// The UI of the `/docs` page. Scalar by default.
+  final DocsUi ui;
+
+  /// Options for the Scalar page: theme, dark mode, download button
+  /// and proxy.
+  final ScalarOptions scalar;
+
+  /// Title of the `/docs` page. Uses [Info.title] when null.
+  final String? pageTitle;
+
   const OpenApiConfig({
     this.enabled,
     this.info = const Info(title: 'Dox API', version: '1.0.0'),
@@ -42,6 +55,9 @@ class OpenApiConfig {
     this.securityByMiddleware =
         const <String, List<Map<String, List<String>>>>{},
     this.registry = const OpenApiRegistry(),
+    this.ui = DocsUi.scalar,
+    this.scalar = const ScalarOptions(),
+    this.pageTitle,
   });
 
   /// true when the docs routes are served

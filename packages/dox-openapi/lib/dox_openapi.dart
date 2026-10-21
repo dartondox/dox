@@ -3,6 +3,7 @@ library;
 
 export 'src/api_doc.dart';
 export 'src/constants/openapi_constants.dart';
+export 'src/docs_ui.dart';
 export 'src/dox_route_adapter.dart';
 export 'src/info.dart';
 export 'src/openapi.dart';
