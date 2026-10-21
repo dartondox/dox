@@ -29,6 +29,7 @@ env:
     dox-orm:dox_orm
     dox-query-builder:dox_query_builder
     dox-migration:dox_migration
+    dox-http-native:dox_http_native
     dox-core:dox_core
     dox-auth:dox_auth
     dox-websocket:dox_websocket

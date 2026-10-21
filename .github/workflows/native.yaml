@@ -1,0 +1,98 @@
+name: Native
+
+# dox_http_native: the Rust HTTP library.
+#
+# Every push: build the library on Linux, run the Rust and Dart tests.
+#
+# A tag like `dox_http_native-v3.0.0-alpha.1`: build the library for the 5
+# targets and upload them to a GitHub release of that tag, with SHA256SUMS.
+# Then copy the hashes into `_sha256` in packages/dox-http-native/hook/build.dart
+# before you publish the package. The hook downloads these files, so users
+# do not need Rust.
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - name: Rust checks
+        working-directory: packages/dox-http-native/native
+        run: |
+          cargo fmt --check
+          cargo clippy --release --all-targets -- -D warnings
+          cargo test
+          cargo build --release
+      # the build hook uses native/target/release when it is there
+      - name: Dart tests
+        working-directory: packages/dox-http-native
+        run: |
+          dart pub get
+          dart analyze --fatal-infos .
+          dart test --concurrency=1
+
+  build:
+    if: startsWith(github.ref, 'refs/tags/dox_http_native-v')
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: macos-latest, target: aarch64-apple-darwin, file: libdox_http_native.dylib, asset: dox_http_native-macos-arm64.dylib }
+          - { os: macos-latest, target: x86_64-apple-darwin, file: libdox_http_native.dylib, asset: dox_http_native-macos-x64.dylib }
+          # 22.04: an older glibc, so the library loads on more Linux systems
+          - { os: ubuntu-22.04, target: x86_64-unknown-linux-gnu, file: libdox_http_native.so, asset: dox_http_native-linux-x64.so }
+          - { os: ubuntu-22.04-arm, target: aarch64-unknown-linux-gnu, file: libdox_http_native.so, asset: dox_http_native-linux-arm64.so }
+          - { os: windows-latest, target: x86_64-pc-windows-msvc, file: dox_http_native.dll, asset: dox_http_native-windows-x64.dll }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - name: Build
+        working-directory: packages/dox-http-native/native
+        shell: bash
+        run: |
+          cargo build --release --target ${{ matrix.target }}
+          mkdir -p ../../../dist
+          cp target/${{ matrix.target }}/release/${{ matrix.file }} ../../../dist/${{ matrix.asset }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: dist/${{ matrix.asset }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Upload to the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          cd dist
+          sha256sum dox_http_native-* > SHA256SUMS
+          cat SHA256SUMS
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" * --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" * --repo "$GITHUB_REPOSITORY" \
+              --title "$TAG" --notes "Ready-built dox_http_native libraries. See SHA256SUMS."
+          fi
