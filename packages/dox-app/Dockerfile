@@ -16,7 +16,7 @@ RUN dart pub get
 # `dart build cli` is AOT like `dart compile exe`, and it also runs build
 # hooks. sqlite3 v3 uses a build hook to bundle SQLite into build/bundle/lib.
 WORKDIR /src/packages/dox-app
-RUN dart run build_runner build --delete-conflicting-outputs
+RUN dart run build_runner build
 RUN dart build cli --target bin/server.dart --output build
 
 # Lay out the final file tree:

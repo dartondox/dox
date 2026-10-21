@@ -451,8 +451,21 @@ void main() {
         2,
       ], DtoState(root: <int>[1, 2]));
       expect(result.errors, <String, String>{
-        '_root': 'The _root must be an object',
+        '_root': 'The request body must be a JSON object.',
       });
+    });
+
+    test('the _root message can be changed by the resolver', () async {
+      ParseResult<Object> result = await $CreateUserDto.run(
+        <int>[1],
+        DtoState(
+          root: <int>[1],
+          resolver: MessageResolver(
+            messages: <String, String>{'_root.object': 'Send an object'},
+          ),
+        ),
+      );
+      expect(result.errors, <String, String>{'_root': 'Send an object'});
     });
   });
 

@@ -31,6 +31,15 @@ void main() {
       expect(proxy.trusts('172.32.0.1'), false);
     });
 
+    test('ipv4-mapped ipv6 becomes plain ipv4', () {
+      expect(TrustedProxy.normalize('::ffff:127.0.0.1'), '127.0.0.1');
+      expect(TrustedProxy.normalize('::FFFF:10.0.0.1'), '10.0.0.1');
+      expect(TrustedProxy.normalize('::1'), '::1');
+      expect(TrustedProxy.normalize('8.8.8.8'), '8.8.8.8');
+      TrustedProxy proxy = TrustedProxy(<String>['10.0.0.0/8']);
+      expect(proxy.clientIp('10.1.2.3', '::ffff:1.2.3.4'), '1.2.3.4');
+    });
+
     test('ipv6 range and wildcard', () {
       expect(TrustedProxy(<String>['fd00::/8']).trusts('fd12::1'), true);
       expect(TrustedProxy(<String>['fd00::/8']).trusts('fe80::1'), false);

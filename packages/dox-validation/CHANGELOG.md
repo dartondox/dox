@@ -1,5 +1,6 @@
 ## Unreleased
 
+- A JSON body that is not an object now says `The request body must be a JSON object.` (key `_root`). Change it with the message key `_root.object`.
 - Needs Dart 3.13 or newer.
 - All dependencies updated to their latest versions.
 - New: DTOs. A class with `@Dto()` and rule annotations (`@Length`, `@Email`, `@Min`, `@Regex`, `@MaxSize`, ...). `dox_builder` writes a `const DtoSchema<T>` with the checks, a converter and the JSON Schema. See the Validation guide.

@@ -60,7 +60,7 @@ COPY pubspec.* ./
 RUN dart pub get
 COPY . .
 RUN dart pub get --offline
-RUN dart run build_runner build --delete-conflicting-outputs
+RUN dart run build_runner build
 RUN dart build cli --target bin/server.dart --output build
 RUN mkdir -p /out/app/storage /out/tmp \
   && chmod 1777 /out/tmp \

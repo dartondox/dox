@@ -33,6 +33,9 @@ class OpenApiConstants {
   /// Media type used for request and response bodies.
   static const String bodyMediaType = 'application/json';
 
+  /// Media type used for request bodies that have a file field.
+  static const String multipartMediaType = 'multipart/form-data';
+
   /// Swagger UI version loaded from the CDN.
   static const String swaggerUiVersion = '5.34.0';
 

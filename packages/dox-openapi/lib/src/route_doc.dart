@@ -56,6 +56,10 @@ class RouteDoc {
   /// Request body schema.
   final Object? body;
 
+  /// Media type of the request body. Null means `multipart/form-data`
+  /// when [body] has a file field (`format: binary`), else JSON.
+  final String? bodyMediaType;
+
   /// Responses by status code.
   final Map<int, ResponseDoc> responses;
 
@@ -79,6 +83,7 @@ class RouteDoc {
     this.params = const <String, Object>{},
     this.query,
     this.body,
+    this.bodyMediaType,
     this.responses = const <int, ResponseDoc>{},
     this.security,
     this.deprecated = false,
@@ -100,11 +105,12 @@ class RouteDoc {
     _put(op, 'parameters', parameters.isEmpty ? null : parameters);
     Object? requestBody = body;
     if (requestBody != null) {
+      Map<String, dynamic> schema = resolver.resolve(requestBody);
       op['requestBody'] = <String, dynamic>{
         'required': true,
         'content': <String, dynamic>{
-          OpenApiConstants.bodyMediaType: <String, dynamic>{
-            'schema': resolver.resolve(requestBody),
+          bodyMediaType ?? mediaTypeFor(schema): <String, dynamic>{
+            'schema': schema,
           },
         },
       };
@@ -114,6 +120,33 @@ class RouteDoc {
     _put(op, 'deprecated', deprecated ? true : null);
     op.addAll(extensions);
     return op;
+  }
+
+  /// Returns `multipart/form-data` when [schema] has a file field
+  /// (`format: binary`, also in a list), else `application/json`.
+  /// A `$ref` schema is not followed: pass the schema it points to.
+  static String mediaTypeFor(Map<String, dynamic> schema) {
+    Object? properties = schema['properties'];
+    if (properties is Map) {
+      for (Object? field in properties.values) {
+        if (_isFile(field) || (field is Map && _isFile(field['items']))) {
+          return OpenApiConstants.multipartMediaType;
+        }
+      }
+    }
+    return OpenApiConstants.bodyMediaType;
+  }
+
+  static bool _isFile(Object? schema) {
+    if (schema is! Map) return false;
+    if (schema['format'] == 'binary') return true;
+    Object? anyOf = schema['anyOf'] ?? schema['oneOf'];
+    if (anyOf is List) {
+      for (Object? option in anyOf) {
+        if (_isFile(option)) return true;
+      }
+    }
+    return false;
   }
 
   List<Map<String, dynamic>> _pathParameters(SchemaResolver resolver) {

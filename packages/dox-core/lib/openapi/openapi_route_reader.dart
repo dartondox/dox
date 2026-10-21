@@ -48,7 +48,10 @@ class OpenApiRouteReader {
     List<Map<String, List<String>>>? security = _security(middleware);
     Object? request = _request(route, op);
     bool inQuery = _inQuery(method, op, request);
-    if (inQuery) request = _queryObject(request);
+    Object? schema = _schema(request);
+    if (inQuery) {
+      request = schema is Map && schema['properties'] is Map ? schema : null;
+    }
     return RouteDoc(
       method: method,
       path: path,
@@ -60,6 +63,9 @@ class OpenApiRouteReader {
       params: _params(route, op),
       query: inQuery ? request : null,
       body: inQuery ? null : request,
+      bodyMediaType: !inQuery && schema is Map<String, dynamic>
+          ? RouteDoc.mediaTypeFor(schema)
+          : null,
       responses: _responses(op, request != null, security != null, path),
       security: security,
       extensions: middleware.isEmpty
@@ -126,9 +132,10 @@ class OpenApiRouteReader {
     return !_bodyMethods.contains(method);
   }
 
-  /// a query needs an object with properties, so a `$ref` to a `@Dto`
-  /// is replaced by its schema. null when it is not an object.
-  Object? _queryObject(Object? request) {
+  /// the schema of [request]. a `$ref` to a `@Dto` is replaced by its
+  /// schema: a query needs its properties, and a body needs to know
+  /// if it has a file field.
+  Object? _schema(Object? request) {
     Object? schema = request;
     if (schema is Map<String, dynamic>) {
       Object? ref = schema[r'$ref'];
@@ -139,7 +146,7 @@ class OpenApiRouteReader {
     } else if (schema != null) {
       schema = const SchemaResolver().resolve(schema);
     }
-    return schema is Map && schema['properties'] is Map ? schema : null;
+    return schema;
   }
 
   List<Map<String, List<String>>>? _security(List<String> middleware) {

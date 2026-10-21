@@ -13,6 +13,9 @@ class DefaultMessages {
   static const String date = 'The {field} must be a date';
   static const String array = 'The {field} must be an array';
   static const String object = 'The {field} must be an object';
+
+  /// The whole request body is not an object (the `_root` key).
+  static const String rootObject = 'The request body must be a JSON object.';
   static const String json = 'The {field} is not a valid json';
   static const String file = 'The {field} must be a file';
   static const String fileExtension =

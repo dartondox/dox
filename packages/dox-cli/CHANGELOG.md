@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Fix: `dox build` no longer passes `--delete-conflicting-outputs` to build_runner (it was removed and printed a warning).
 - Needs Dart 3.13 or newer.
 - All dependencies updated to their latest versions.
 - `dox build` now runs `dart build cli` (AOT, with build hooks). The output is `build/bundle/`. Start it with `cd build/bundle && ./bin/server`.

@@ -24,6 +24,8 @@ class PostController {
   dynamic search(DoxRequest req) => <String, dynamic>{};
 
   dynamic secret(DoxRequest req) => 'x';
+
+  dynamic upload(DoxRequest req) => 'ok';
 }
 
 class UserController {
@@ -61,6 +63,12 @@ const OpenApiRegistry registry = OpenApiRegistry(
       schema: <String, dynamic>{r'$ref': '#/components/schemas/SearchPosts'},
     ),
     OpenApiOperation(
+      controller: 'PostController',
+      method: 'upload',
+      argumentTypes: <String>['DoxRequest'],
+      schema: <String, dynamic>{r'$ref': '#/components/schemas/UploadPhoto'},
+    ),
+    OpenApiOperation(
       controller: 'UserController',
       method: 'index',
       argumentTypes: <String>['DoxRequest'],
@@ -84,6 +92,7 @@ const OpenApiRegistry registry = OpenApiRegistry(
     // the builder writes the full path, with the group prefix
     OpenApiRouteBinding('GET', '/users/', 'UserController.index'),
     OpenApiRouteBinding('GET', '/tags/', 'TagController.index'),
+    OpenApiRouteBinding('POST', '/upload', 'PostController.upload'),
   ],
   schemas: <String, Map<String, dynamic>>{
     'Post': <String, dynamic>{
@@ -98,6 +107,13 @@ const OpenApiRegistry registry = OpenApiRegistry(
         'q': <String, dynamic>{'type': 'string'},
       },
       'required': <String>['q'],
+    },
+    'UploadPhoto': <String, dynamic>{
+      'type': 'object',
+      'properties': <String, dynamic>{
+        'photo': <String, dynamic>{'type': 'string', 'format': 'binary'},
+        'note': <String, dynamic>{'type': 'string'},
+      },
     },
   },
 );
@@ -124,6 +140,7 @@ class DocsRouter extends Router {
     Route.get('/posts/{id}/full', PostController().show);
     Route.get('/search', PostController().search);
     Route.get('/secret', PostController().secret);
+    Route.post('/upload', PostController().upload);
     Route.put(
       '/posts/{id}',
       (DoxRequest req, String id) => id,
@@ -228,6 +245,18 @@ void main() {
     /// `'/'` routes in groups each find their own docs
     expect(doc['paths']['/users']['get']['summary'], 'List users');
     expect(doc['paths']['/tags']['get']['summary'], 'List tags');
+  });
+
+  test('a body with a file field uses multipart/form-data', () {
+    Map<String, dynamic> doc = OpenApiDocument(config.openApi)
+        .build(Route().routes)
+        .toJson();
+    Map<String, dynamic> content =
+        doc['paths']['/upload']['post']['requestBody']['content'];
+    expect(content.keys, <String>['multipart/form-data']);
+    expect(content['multipart/form-data']['schema'], <String, dynamic>{
+      r'$ref': '#/components/schemas/UploadPhoto',
+    });
   });
 
   test('AuthMiddleware gets bearerAuth without config', () {
