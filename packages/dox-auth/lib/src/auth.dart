@@ -1,7 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 import 'package:dox_auth/src/auth_engine.dart';
 import 'package:dox_auth/src/interfaces.dart';
-import 'package:dox_query_builder/dox_query_builder.dart';
+import 'package:dox_orm/dox_orm.dart';
 
 class Auth implements IAuth {
   /// user data

@@ -1,4 +1,4 @@
-library dox_auth;
+library;
 
 export 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 

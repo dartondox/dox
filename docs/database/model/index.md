@@ -25,7 +25,7 @@
 === "Sample Model"
 
 ```dart
-import 'package:dox_query_builder/dox_query_builder.dart';
+import 'package:dox_orm/dox_orm.dart';
 part 'blog.model.g.dart';
 
 @DoxModel()

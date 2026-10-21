@@ -10,7 +10,13 @@ Redis redis = Redis(
     host: Env.get('REDIS_HOST', '127.0.0.1'),
     port: Env.get('REDIS_PORT', 6379),
     db: Env.get('REDIS_DB', 0),
-    username: Env.get('REDIS_USERNAME', ''),
-    password: Env.get('REDIS_PASSWORD', ''),
+    // Empty means no login. ioredis sends AUTH for any non-null value.
+    username: _emptyToNull(Env.get('REDIS_USERNAME', '')),
+    password: _emptyToNull(Env.get('REDIS_PASSWORD', '')),
   ),
 );
+
+String? _emptyToNull(String value) {
+  if (value.isEmpty) return null;
+  return value;
+}

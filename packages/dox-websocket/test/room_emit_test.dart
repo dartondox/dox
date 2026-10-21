@@ -8,6 +8,7 @@ import 'package:ioredis/ioredis.dart';
 import 'package:test/test.dart';
 
 import 'config/app_config.dart';
+import 'config/redis_env.dart';
 
 const int port = 3016;
 
@@ -66,7 +67,7 @@ Future<void> wait() => Future<void>.delayed(Duration(milliseconds: 300));
 
 Future<bool> redisReachable() async {
   try {
-    Socket s = await Socket.connect('localhost', 6379,
+    Socket s = await Socket.connect(redisHost, redisPort,
         timeout: Duration(milliseconds: 500));
     s.destroy();
     return true;
@@ -124,10 +125,10 @@ void main() {
 
   test('room emit | redis adapter', () async {
     if (!await redisReachable()) {
-      markTestSkipped('redis is not reachable on localhost:6379');
+      markTestSkipped('redis is not reachable on $redisHost:$redisPort');
       return;
     }
-    Redis sub = Redis();
+    Redis sub = testRedis();
     WebsocketServer().adapter(
         WebsocketRedisAdapter(subscriber: sub, publisher: sub.duplicate()));
     await wait();

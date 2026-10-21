@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
-/// Streams one multipart upload of <mb> MB to the server and prints the
+/// Streams one multipart upload of `mb` MB to the server and prints the
 /// server's peak RSS afterwards.
-/// Usage: dart run benchmark/upload.dart <baseUrl> [mb=50] [path=/upload]
+/// Usage: dart run benchmark/`upload.dart <baseUrl> [mb=50] [path=/upload]`
 void main(List<String> args) async {
   String base = args[0];
   int mb = args.length > 1 ? int.parse(args[1]) : 50;

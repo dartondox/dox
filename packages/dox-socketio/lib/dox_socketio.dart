@@ -1,5 +1,5 @@
 /// Socket.IO v4 server for Dart and the Dox framework.
-library dox_socketio;
+library;
 
 export 'src/adapter/adapter.dart';
 export 'src/adapter/in_memory_adapter.dart';

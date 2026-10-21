@@ -23,14 +23,14 @@ class StorageException implements Exception {
 
 /// The file does not exist.
 class FileNotFoundException extends StorageException {
-  const FileNotFoundException(String key, {Object? cause})
-      : super(key, 'File not found', cause: cause);
+  const FileNotFoundException(String key, {super.cause})
+      : super(key, 'File not found');
 }
 
 /// The driver is not allowed to do this (file system permissions, S3 403).
 class PermissionDeniedException extends StorageException {
-  const PermissionDeniedException(String key, {Object? cause})
-      : super(key, 'Permission denied', cause: cause);
+  const PermissionDeniedException(String key, {super.cause})
+      : super(key, 'Permission denied');
 }
 
 /// The key is not safe, for example it uses `..` or an absolute path.
@@ -41,12 +41,10 @@ class InvalidKeyException extends StorageException {
 
 /// The driver does not support this operation.
 class UnsupportedOperationException extends StorageException {
-  const UnsupportedOperationException(String key, String message)
-      : super(key, message);
+  const UnsupportedOperationException(super.key, super.message);
 }
 
 /// Any other driver failure (network error, S3 500, disk full, ...).
 class DriverException extends StorageException {
-  const DriverException(String key, String message, {Object? cause})
-      : super(key, message, cause: cause);
+  const DriverException(super.key, super.message, {super.cause});
 }

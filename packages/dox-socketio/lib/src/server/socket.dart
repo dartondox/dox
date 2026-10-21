@@ -151,7 +151,8 @@ class Socket {
       data: <Object?>[event, if (data != null) data],
     ));
     if (timeout == null) return completer.future;
-    return completer.future.timeout(timeout, onTimeout: _AckTimeout(this, id));
+    return completer.future
+        .timeout(timeout, onTimeout: _AckTimeout(this, id).call);
   }
 
   /// Joins [room].

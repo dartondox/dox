@@ -1,4 +1,4 @@
-## 3.0.0
+## 3.0.0-alpha.1
 
 - First release.
 - Build an OpenAPI 3.1 document with `OpenApi` and `ApiDoc`.

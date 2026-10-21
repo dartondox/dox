@@ -1,4 +1,4 @@
-## 3.0.0
+## 3.0.0-alpha.1
 
 - Initial version.
 - `DriveManager` and `Disk` with a FlyDrive-like API.

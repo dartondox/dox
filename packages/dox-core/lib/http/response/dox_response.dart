@@ -6,7 +6,7 @@ import 'package:mime/mime.dart';
 
 class DoxResponse {
   /// content can be anything
-  /// String, int, Map, json serializable object, Stream<List<int>>
+  /// String, int, Map, json serializable object, `Stream<List<int>>`
   dynamic _contentData;
 
   Map<String, dynamic> _headers = <String, dynamic>{};
@@ -16,7 +16,7 @@ class DoxResponse {
   final List<String> _cookies = <String>[];
 
   /// content can be anything
-  /// String, int, Map, json serializable object, Stream<List<int>>, File
+  /// String, int, Map, json serializable object, `Stream<List<int>>`, File
   DoxResponse(this._contentData) {
     if (_contentData is StreamFile) {
       _contentType = _contentData.contentType;
@@ -136,7 +136,7 @@ class DoxResponse {
 }
 
 /// content can be anything
-/// String, int, Map, json serializable object, Stream<List<int>>, File
+/// String, int, Map, json serializable object, `Stream<List<int>>`, File
 DoxResponse response([dynamic content]) {
   return DoxResponse(content);
 }

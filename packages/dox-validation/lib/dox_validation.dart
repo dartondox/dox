@@ -9,7 +9,7 @@
 /// });
 /// Map<String, dynamic> data = user.parse(input);
 /// ```
-library dox_validation;
+library;
 
 import 'src/validator.dart';
 

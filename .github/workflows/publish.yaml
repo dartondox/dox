@@ -20,15 +20,23 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # Folder:package, in publish order (each one only needs the ones before it).
+  # Folder:package, in publish order. Each one only needs the ones before it,
+  # dev_dependencies too (pub checks them on publish).
+  # dox_query_builder only re-exports dox_orm, so it comes after dox_orm.
   PACKAGES: >-
     dox-annotation:dox_annotation
     dox-builder:dox_builder
+    dox-orm:dox_orm
     dox-query-builder:dox_query_builder
     dox-migration:dox_migration
     dox-core:dox_core
     dox-auth:dox_auth
     dox-websocket:dox_websocket
+    dox-validation:dox_validation
+    dox-openapi:dox_openapi
+    dox-storage:dox_storage
+    dox-cache:dox_cache
+    dox-socketio:dox_socketio
     dox-cli:dox
 
 jobs:
@@ -66,7 +74,7 @@ jobs:
           sdk: stable
       - name: Melos bootstrap (links local packages, so unpublished sibling versions resolve)
         run: |
-          dart pub global activate melos
+          dart pub global activate melos 3.4.0
           melos bs
       - name: Dry run publish
         run: |

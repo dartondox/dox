@@ -20,7 +20,9 @@ import 'in_memory_adapter.dart';
 ///
 /// The message format is the one of `@socket.io/redis-adapter` with a JSON
 /// parser: `[uid, packet, {rooms, except, flags}]` on the channel
-/// `socket.io#<namespace>#`.
+/// `socket.io#<namespace>#`. It listens with PSUBSCRIBE on
+/// `socket.io#<namespace>#*`, so it also gets the room channels
+/// (`socket.io#<namespace>#<room>#`) that Node.js uses for one room.
 class RedisAdapter extends InMemoryAdapter {
   RedisAdapter({
     required this.publisher,
@@ -41,12 +43,12 @@ class RedisAdapter extends InMemoryAdapter {
   /// Id of this server. Messages with this id are ignored.
   final String uid;
 
-  final Map<String, Namespace> _channels = <String, Namespace>{};
-  final List<String> _toSubscribe = <String>[];
-  Future<void> _subscribing = Future<void>.value();
+  /// Namespace of each PSUBSCRIBE pattern.
+  final Map<String, Namespace> _patterns = <String, Namespace>{};
+  final List<Future<void>> _subscribing = <Future<void>>[];
 
   /// Completes when all namespace channels are subscribed.
-  Future<void> ready() => _subscribing;
+  Future<void> ready() => Future.wait(_subscribing);
 
   /// Channel name of [nsp].
   String channelOf(Namespace nsp) => '$key#${nsp.name}#';
@@ -54,22 +56,21 @@ class RedisAdapter extends InMemoryAdapter {
   @override
   void init(Namespace nsp) {
     super.init(nsp);
-    String channel = channelOf(nsp);
-    _channels[channel] = nsp;
-    _toSubscribe.add(channel);
-    if (_toSubscribe.length == 1) _subscribing = _subscribeAll();
+    String pattern = '${_escapeGlob(channelOf(nsp))}*';
+    _patterns[pattern] = nsp;
+    _subscribing.add(_psubscribe(pattern));
   }
 
-  // ponytail: one SUBSCRIBE at a time, because parallel SUBSCRIBE calls
-  // hang in ioredis 1.0.3.
-  Future<void> _subscribeAll() async {
-    while (_toSubscribe.isNotEmpty) {
-      RedisSubscriber subscription =
-          await subscriber.subscribe(_toSubscribe.first);
-      subscription.onMessage = onRedisMessage;
-      _toSubscribe.removeAt(0);
-    }
+  Future<void> _psubscribe(String pattern) async {
+    RedisSubscriber subscription = await subscriber.psubscribe(pattern);
+    subscription.onPatternMessage = onRedisMessage;
   }
+
+  /// Escape glob characters, so a namespace name is matched as plain text.
+  static String _escapeGlob(String text) =>
+      text.replaceAllMapped(RegExp(r'[*?\[\]\\]'), _escapeMatch);
+
+  static String _escapeMatch(Match match) => '\\${match[0]}';
 
   @override
   Future<void> broadcast(
@@ -91,10 +92,11 @@ class RedisAdapter extends InMemoryAdapter {
     await super.broadcast(nsp, packet, options);
   }
 
-  /// Handles a message from another server.
-  void onRedisMessage(String channel, String? message) {
+  /// Handles a message from another server. [channel] is the main channel
+  /// or a room channel of the namespace of [pattern].
+  void onRedisMessage(String pattern, String channel, String? message) {
     if (message == null || message.isEmpty) return;
-    Namespace? nsp = _channels[channel];
+    Namespace? nsp = _patterns[pattern];
     if (nsp == null) return;
     try {
       List<dynamic> parts = jsonDecode(message) as List<dynamic>;

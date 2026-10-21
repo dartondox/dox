@@ -1,5 +1,5 @@
 /// Cache for Dart and Dox: memory, file and Redis drivers.
-library dox_cache;
+library;
 
 export 'src/cache_clock.dart';
 export 'src/cache_config.dart';

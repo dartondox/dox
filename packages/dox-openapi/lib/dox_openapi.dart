@@ -1,5 +1,5 @@
 /// Generate an OpenAPI 3.1 document for a Dox app.
-library dox_openapi;
+library;
 
 export 'src/api_doc.dart';
 export 'src/constants/openapi_constants.dart';

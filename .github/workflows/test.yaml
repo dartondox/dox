@@ -10,7 +10,7 @@ jobs:
     services:
 
       mariadb:
-        image: mariadb:latest
+        image: mariadb:11
         ports:
           - 3306:3306
         env:
@@ -19,17 +19,17 @@ jobs:
           MYSQL_DATABASE: dox-framework
           MYSQL_ROOT_PASSWORD: password
         options: >-
-          --health-cmd="healthcheck.sh 
-          --connect 
-          --innodb_initialized" 
-          --health-interval=10s 
-          --health-timeout=5s 
+          --health-cmd="healthcheck.sh
+          --connect
+          --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
           --health-retries=3
 
       postgres:
-        image: postgres:latest
+        image: postgres:16
         env:
-          POSTGRES_DB: postgres        
+          POSTGRES_DB: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
         ports:
@@ -57,7 +57,7 @@ jobs:
           --health-retries=30
 
       redis:
-        image: redis
+        image: redis:7
         ports:
           - 6379:6379
         options: >-
@@ -67,32 +67,51 @@ jobs:
           --health-retries 5
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     # sqlite tests load the system libsqlite3.so (package sqlite3 v2)
     - name: Install libsqlite3
       run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
+    # dox_socketio interop tests run the real socket.io-client in node
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24
+    # dox_storage S3 tests use MinIO on port 9100. A service can not pass the
+    # `server` command, so it is started here.
+    - name: Start MinIO
+      run: |
+        docker run -d --name minio -p 9100:9000 \
+          -e MINIO_ROOT_USER=minioadmin -e MINIO_ROOT_PASSWORD=minioadmin \
+          cgr.dev/chainguard/minio:latest server /tmp/data
+        for i in $(seq 1 30); do
+          curl -sf http://localhost:9100/minio/health/live && break
+          sleep 1
+        done
     - uses: dart-lang/setup-dart@v1
       with:
         sdk: stable
+    # melos.yaml is the melos 3 format. Melos 7+ needs a pub workspace instead.
     - name: Activate melos
-      run: dart pub global activate melos
+      run: dart pub global activate melos 3.4.0
     - name: Melos Bootstrap
       run: melos bs
+    - name: Analyze
+      run: melos run analyze --no-select
+    - name: Check format
+      run: dart format --output=none --set-exit-if-changed .
     - name: Copy .env.example to .env of app
       run: cp packages/dox-app/.env.example packages/dox-app/.env
     - name: Copy .env.example to .env of cli
       run: cp packages/dox-cli/.env.example packages/dox-cli/.env
     - name: Run Tests
       run: melos test --no-select
-    - name: Run Test (query builder postgres)
+    - name: Run Test (orm postgres)
       run: DB_PORT=5432 melos test_pg
-    - name: Run Test (query builder mariadb)
+    - name: Run Test (orm mariadb)
       run: DB_USER=dox DB_PORT=3306 melos test_mysql
-    - name: Run Test (query builder mysql 8.4)
+    - name: Run Test (orm mysql 8.4)
       run: DB_USER=dox DB_PORT=3307 melos test_mysql
-    - name: Run Test (query builder sqlite)
-      working-directory: packages/dox-query-builder
-      run: DRIVER=sqlite dart test --concurrency=1
+    - name: Run Test (orm sqlite)
+      run: melos test_sqlite
     - name: Run Test (migration mysql 8.4)
       working-directory: packages/dox-migration
       run: MYSQL_PORT=3307 dart test

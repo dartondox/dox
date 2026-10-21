@@ -11,12 +11,13 @@ import '../constants/cache_constants.dart';
 ///
 /// Uses only `Redis.sendCommand`, so the ioredis `keyPrefix` option is
 /// not used. Set [prefix] instead. `flush` deletes only keys that start
-/// with [prefix] (SCAN + DEL in a small Lua step). It never runs FLUSHDB.
+/// with [prefix] (SCAN, then DEL). It never runs FLUSHDB.
+/// Redis error replies throw `RedisError` (from ioredis).
 class RedisDriver extends CacheDriver {
   RedisDriver(
     this.redis, {
     this.prefix = CacheConstants.defaultPrefix,
-    this.maxValueBytes = CacheConstants.redisMaxValueBytes,
+    this.maxValueBytes,
   });
 
   /// The connection. Inject your own or use [RedisDriverFactory].
@@ -25,15 +26,9 @@ class RedisDriver extends CacheDriver {
   @override
   final String prefix;
 
-  /// Values bigger than this throw [ArgumentError]. Null means no limit.
-  /// ioredis 1.0.3 can not read replies bigger than about 64 KB.
+  /// Values bigger than this throw [ArgumentError]. Null (the default)
+  /// means no limit.
   final int? maxValueBytes;
-
-  /// One SCAN step that deletes the keys it finds. Returns the next cursor.
-  static const String _flushScript = '''
-local r = redis.call('SCAN', ARGV[1], 'MATCH', ARGV[2], 'COUNT', ARGV[3])
-for _, k in ipairs(r[2]) do redis.call('DEL', k) end
-return r[1]''';
 
   /// Delete the lock only when the owner token matches.
   static const String _releaseScript = '''
@@ -48,12 +43,38 @@ return 0''';
     return reply == null ? null : jsonDecode(reply.toString());
   }
 
+  /// One MGET for all keys.
+  @override
+  Future<Map<String, dynamic>> many(List<String> keys) async {
+    Map<String, dynamic> result = <String, dynamic>{};
+    if (keys.isEmpty) return result;
+    List<dynamic> replies = await redis.sendCommand(
+            <String>['MGET', for (String key in keys) prefix + key])
+        as List<dynamic>;
+    for (int i = 0; i < keys.length; i++) {
+      Object? reply = replies[i];
+      result[keys[i]] = reply == null ? null : jsonDecode(reply.toString());
+    }
+    return result;
+  }
+
+  /// All SETs in one pipeline write.
+  @override
+  Future<void> putMany(Map<String, Object?> values, Duration? ttl) async {
+    if (values.isEmpty) return;
+    RedisPipeline pipeline = redis.pipeline();
+    for (MapEntry<String, Object?> entry in values.entries) {
+      List<String> command = _setCommand(entry.key, entry.value, ttl);
+      pipeline.call(command.first, command.sublist(1));
+    }
+    for (Object? reply in await pipeline.exec()) {
+      if (reply is RedisError) throw reply;
+    }
+  }
+
   @override
   Future<void> put(String key, Object? value, Duration? ttl) async {
-    Object? reply = await redis.sendCommand(_setCommand(key, value, ttl));
-    if (reply != 'OK') {
-      throw StateError('Redis SET failed: $reply');
-    }
+    await redis.sendCommand(_setCommand(key, value, ttl));
   }
 
   @override
@@ -64,15 +85,14 @@ return 0''';
 
   @override
   Future<int> increment(String key, int by) async {
-    Object? reply =
-        await redis.sendCommand(<String>['INCRBY', prefix + key, '$by']);
-    return _toInt(reply);
+    return await redis.sendCommand(<String>['INCRBY', prefix + key, '$by'])
+        as int;
   }
 
   @override
   Future<bool> forget(String key) async {
-    Object? reply = await redis.sendCommand(<String>['DEL', prefix + key]);
-    return _toInt(reply) > 0;
+    int deleted = await redis.sendCommand(<String>['DEL', prefix + key]) as int;
+    return deleted > 0;
   }
 
   @override
@@ -81,17 +101,22 @@ return 0''';
       throw StateError('RedisDriver.flush needs a prefix. '
           'It will not delete the whole database.');
     }
+    String pattern = '${_escapeGlob(prefix)}*';
     String cursor = '0';
     do {
-      Object? reply = await redis.sendCommand(<String>[
-        'EVAL',
-        _flushScript,
-        '0',
+      List<dynamic> reply = await redis.sendCommand(<String>[
+        'SCAN',
         cursor,
-        '${_escapeGlob(prefix)}*',
+        'MATCH',
+        pattern,
+        'COUNT',
         '${CacheConstants.redisScanCount}',
-      ]);
-      cursor = reply.toString();
+      ]) as List<dynamic>;
+      cursor = reply[0].toString();
+      List<String> keys = List<String>.from(reply[1] as List<dynamic>);
+      if (keys.isNotEmpty) {
+        await redis.sendCommand(<String>['DEL', ...keys]);
+      }
     } while (cursor != '0');
   }
 
@@ -114,7 +139,7 @@ return 0''';
   Future<bool> releaseLock(String name, String owner) async {
     Object? reply = await redis.sendCommand(
         <String>['EVAL', _releaseScript, '1', _lockKey(name), owner]);
-    return _toInt(reply) == 1;
+    return reply == 1;
   }
 
   String _lockKey(String name) {
@@ -137,16 +162,6 @@ return 0''';
   /// Redis needs at least 1 ms.
   String _milliseconds(Duration ttl) {
     return '${ttl.inMilliseconds < 1 ? 1 : ttl.inMilliseconds}';
-  }
-
-  /// ioredis 1.0.3 gives integers and errors as strings. Newer versions
-  /// give int and throw on errors. This handles both.
-  int _toInt(Object? reply) {
-    int? value = int.tryParse('$reply');
-    if (value == null) {
-      throw StateError('Redis error: $reply');
-    }
-    return value;
   }
 
   /// Escape glob characters so the prefix is matched as plain text.
@@ -182,8 +197,6 @@ class RedisDriverFactory implements CacheDriverFactory {
   const RedisDriverFactory();
 
   /// Wait before reconnect: 50 ms per try, at most 2 s.
-  /// ioredis 1.0.3 crashes on reconnect when `RedisOptions` has no
-  /// retryStrategy, so always pass one (this one is fine).
   static Duration retryDelay(int times) {
     return Duration(milliseconds: min(times * 50, 2000));
   }

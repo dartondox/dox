@@ -12,8 +12,10 @@ git clone git@github.com:dartondox/dox.git
 
 #### 2. Install melos if not installed 
 
+This repo uses melos 3. Melos 7 and newer use a different config.
+
 ```py
-dart pub global activate melos
+dart pub global activate melos 3.4.0
 ```
 
 #### 3. Run melos bootstrap
@@ -25,14 +27,17 @@ melos bs
 #### 4. Other Useful Commands
 
 ```py
-# Run all tests
-melos run test
+# Run all tests (not dox_orm)
+melos run test --no-select
 
-# Run tests for dox_query_builder with postgres
-melos run test_query_builder_postgres
+# Analyze and check format (same as CI)
+melos run analyze --no-select
+dart format --output=none --set-exit-if-changed .
 
-# Run tests for dox_query_builder with mysql
-melos run test_query_builder_mysql
+# Run tests for dox_orm with postgres, mysql or sqlite
+DB_PORT=5432 melos run test_pg
+DB_USER=dox DB_PORT=3306 melos run test_mysql
+melos run test_sqlite
 
 # Generate dox cli executable file
 cd packages/dox-cli
@@ -75,8 +80,9 @@ It uses pub.dev automated publishing, so no token or secret is needed.
    ```
 
 The workflow first checks that the tag matches the root version and every package version.
-Then it publishes in this order: `dox_annotation`, `dox_builder`, `dox_query_builder`,
-`dox_migration`, `dox_core`, `dox_auth`, `dox_websocket`, `dox`.
+Then it publishes in this order: `dox_annotation`, `dox_builder`, `dox_orm`,
+`dox_query_builder`, `dox_migration`, `dox_core`, `dox_auth`, `dox_websocket`,
+`dox_validation`, `dox_openapi`, `dox_storage`, `dox_cache`, `dox_socketio`, `dox`.
 A package is skipped when that version is already on pub.dev. So if a run fails halfway,
 fix the problem and click "Re-run jobs". It continues where it stopped.
 
@@ -88,8 +94,9 @@ CHANGELOG entry) are shown as yellow warnings and do not fail the run.
 
 #### One-time setup
 
-On pub.dev, for each package (`dox_annotation`, `dox_builder`, `dox_query_builder`,
-`dox_migration`, `dox_core`, `dox_auth`, `dox_websocket`, `dox`):
+On pub.dev, for each package (`dox_annotation`, `dox_builder`, `dox_orm`,
+`dox_query_builder`, `dox_migration`, `dox_core`, `dox_auth`, `dox_websocket`,
+`dox_validation`, `dox_openapi`, `dox_storage`, `dox_cache`, `dox_socketio`, `dox`):
 
 1. Open `https://pub.dev/packages/<name>/admin`.
 2. Under "Automated publishing", click "Enable publishing from GitHub Actions".

@@ -2,6 +2,21 @@
 
 Query Builder provides a user-friendly interface where users can define the criteria and parameters for database queries without needing to write the SQL code manually. Query builders are commonly used in database management systems and data analysis tools to streamline the query creation process, making it more accessible to users who may not be proficient in writing SQL queries.
 
+## Installation
+
+The query builder and models live in the `dox_orm` package.
+
+```bash
+dart pub add dox_orm
+```
+
+```dart
+import 'package:dox_orm/dox_orm.dart';
+```
+
+!!! note
+    `dox_orm` was called `dox_query_builder` before 3.0. The old package only re-exports `dox_orm` now. Change your `pubspec.yaml` and imports to `dox_orm`.
+
 ## Supported databases
 
 | Database | `Driver` | Dart package | Pool | Good for |

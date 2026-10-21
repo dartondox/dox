@@ -1,4 +1,6 @@
 /// coverage:ignore-file
+library;
+
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';

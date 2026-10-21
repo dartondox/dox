@@ -103,17 +103,15 @@ RedisDriver(Redis(RedisOptions(host: '127.0.0.1', port: 6379)), prefix: 'app:')
 Config options: `host`, `port`, `username`, `password`, `db`, `tls`, `prefix`.
 
 - `put` uses `SET key value PX ttl`. `add` adds `NX`. `increment` uses `INCRBY`.
-- `flush` deletes only keys with the prefix (SCAN + DEL in a small Lua step).
+- `flush` deletes only keys with the prefix (SCAN, then DEL).
   It never runs `FLUSHDB`. An empty prefix makes `flush` throw.
 - Locks use `SET NX PX` with a random owner token. Release is a Lua script that
   deletes the key only when the token matches.
 - The ioredis `keyPrefix` option is not used. Use the store `prefix`.
-- With ioredis 1.0.3, values over 60 KB throw `ArgumentError`.
-  That version can not read bigger replies. Change `maxValueBytes` after you
-  upgrade ioredis.
-- When you build `RedisOptions` yourself, pass a `retryStrategy`
-  (for example `RedisDriverFactory.retryDelay`). ioredis 1.0.3 crashes on
-  reconnect without one.
+- `many` uses one `MGET`. `putMany` sends all `SET`s in one pipeline.
+- There is no size limit by default. Set `maxValueBytes` to refuse big values
+  (they throw `ArgumentError`).
+- Redis error replies throw `RedisError` (from ioredis).
 
 ## Tags
 

@@ -48,7 +48,7 @@ class MigrationFile {
 }
 
 String _sampleDart = '''
-import 'package:dox_query_builder/dox_query_builder.dart'; // ignore: file_names
+import 'package:dox_orm/dox_orm.dart'; // ignore: file_names
 
 Future<void> up() async {
   await Schema.create('table_name', (Table table) {});

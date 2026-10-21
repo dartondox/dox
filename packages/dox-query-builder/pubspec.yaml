@@ -1,20 +1,14 @@
 name: dox_query_builder
-description: PostgreSQL, MySQL, MariaDB and SQLite query builder, Support Model, Where, orWhere, Find, Join, softDeletes, Debugging and many mores.
-version: 3.0.0
+description: Replaced by dox_orm. This package only re-exports dox_orm, so old imports keep working.
+version: 3.0.0-alpha.1
 repository: https://github.com/dartondox/dox
 homepage: https://dartondox.dev
 
 environment:
-  sdk: '>=3.6.0 <4.0.0'
+  sdk: ^3.6.0
 
 dependencies:
-  postgres: ^3.0.5
-  mysql_dart: ^3.0.1
-  sqlite3: ^2.9.4
-  dox_annotation: ^1.0.5
-  
+  dox_orm: ^3.0.0-alpha.1
+
 dev_dependencies:
-  lints: ^2.0.0
-  test: ^1.21.0
-  build_runner: ^2.3.3
-  dox_builder: ^2.0.0
+  lints: ^5.1.1

@@ -1,5 +1,6 @@
-## Unreleased
+## 3.0.0-alpha.1
 
+- Removed the `dox_migration` executable from pubspec (its script was removed before). Use the `dox` CLI.
 - Added SQLite: `DB_CONNECTION=sqlite` and `DB_DATABASE=<file path>`.
 - MySQL driver is now `mysql_dart` (was `mysql1`). The MySQL 8 default login (`caching_sha2_password`) works.
 - `migrate()` and the other commands also take a pool (postgres `Pool`, mysql `MySQLConnectionPool`). Each file runs in one transaction on one connection.

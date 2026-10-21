@@ -37,7 +37,7 @@ extension MapExtensions on Map<dynamic, dynamic> {
 }
 
 extension JoinWithAnd on List<String> {
-  /// jon list<String> with separator and the last item with 'and' or 'or'
+  /// jon `List<String>` with separator and the last item with 'and' or 'or'
   /// ```
   /// list.joinWithAnd();
   /// list.joinWithAnd(',', 'and');

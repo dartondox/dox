@@ -158,6 +158,8 @@ void main() {
       sio.Socket dartClient = await connectClient(server.url, 'r1');
       Completer<Object?> fromNode = Completer<Object?>();
       dartClient.on('from-node', fromNode.complete);
+      Completer<Object?> fromNodeRoom = Completer<Object?>();
+      dartClient.on('from-node-room', fromNodeRoom.complete);
 
       Process process = await node
           .start('redis-node.mjs', <String>['redis://$redisHost:$redisPort']);
@@ -176,6 +178,8 @@ void main() {
       int code = await process.exitCode.timeout(Duration(seconds: 15));
       expect(code, 0, reason: errors.toString());
       expect(await fromNode.future.timeout(Duration(seconds: 5)), 'hi dart');
+      expect(
+          await fromNodeRoom.future.timeout(Duration(seconds: 5)), 'hi room');
       dartClient.dispose();
     });
   }, skip: skip ?? NodeRunner.skipReason());

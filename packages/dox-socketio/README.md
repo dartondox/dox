@@ -127,8 +127,10 @@ can share broadcasts with a Dart server when it uses a JSON parser:
 createAdapter(pub, sub, { parser: { encode: JSON.stringify, decode: JSON.parse } })
 ```
 
-Limits: Node.js broadcasts to exactly one room go to a room channel that the
-Dart adapter does not listen to yet. `fetchSockets`, `socketsJoin` and
+The Dart adapter listens with PSUBSCRIBE, so it also gets the room channels
+that Node.js uses when it broadcasts to exactly one room.
+
+Limits: `fetchSockets`, `socketsJoin` and
 broadcast acks only work on the local server.
 
 HTTP long-polling needs sticky sessions when you run many servers behind one

@@ -89,7 +89,7 @@ sealed class DriveEntry {
 
 /// A file in a listing.
 class DriveFile extends DriveEntry {
-  const DriveFile(String key) : super(key);
+  const DriveFile(super.key);
 
   @override
   String toString() {
@@ -99,7 +99,7 @@ class DriveFile extends DriveEntry {
 
 /// A folder in a listing.
 class DriveDirectory extends DriveEntry {
-  const DriveDirectory(String key) : super(key);
+  const DriveDirectory(super.key);
 
   @override
   String toString() {

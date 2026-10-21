@@ -8,13 +8,14 @@ import 'package:ioredis/ioredis.dart';
 import 'package:test/test.dart';
 
 import 'config/app_config.dart';
+import 'config/redis_env.dart';
 
 String baseUrl = 'http://localhost:${appConfig.serverPort}';
 
 class WebsocketService implements DoxService {
   @override
   void setup() {
-    Redis sub = Redis();
+    Redis sub = testRedis();
     Redis pub = sub.duplicate();
 
     WebsocketServer io = WebsocketServer(Dox());

@@ -3,6 +3,8 @@
 # - sets `version:` in each packages/*/pubspec.yaml
 # - sets every sibling dependency (dox_core, dox_annotation, ...) to ^<version>
 # - writes the CLI version constant
+# Package names come from each packages/*/pubspec.yaml, so new packages are picked up
+# by themselves. dox_app has no version line, only its sibling constraints change.
 # Run from the repo root. Safe to run many times. Works with BSD (macOS) and GNU sed.
 set -euo pipefail
 

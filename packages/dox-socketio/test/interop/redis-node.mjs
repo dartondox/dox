@@ -2,7 +2,7 @@
 // plus one client connected to it. Used to check that the Dart RedisAdapter
 // talks the same format.
 // Usage: node redis-node.mjs <redisUrl>
-// Sends `from-node` to all, then prints READY. Exits 0 after it gets `from-dart`.
+// Sends `from-node` to all and `from-node-room` to room r1, then prints READY. Exits 0 after it gets `from-dart`.
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import { io as connect } from 'socket.io-client';
@@ -36,8 +36,10 @@ client.on('from-dart', (data) => {
 client.on('connect', () => {
   // Give the adapter a moment to subscribe, then tell Dart we are ready.
   setTimeout(() => {
-    // No room, so it goes on the main channel the Dart adapter listens to.
+    // No room: this goes on the main channel.
     io.emit('from-node', 'hi dart');
+    // Exactly one room: Node.js uses the room channel for this.
+    io.to('r1').emit('from-node-room', 'hi room');
     console.log('READY');
   }, 300);
 });

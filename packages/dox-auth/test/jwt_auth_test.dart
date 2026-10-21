@@ -1,7 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_auth/src/hash.dart';
-import 'package:dox_query_builder/dox_query_builder.dart';
+import 'package:dox_orm/dox_orm.dart';
 import 'package:test/test.dart';
 
 const String secret = '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt';

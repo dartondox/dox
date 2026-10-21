@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:isolate';
 
 /// Tiny keep-alive HTTP load generator (no wrk/oha needed).
-/// Usage: dart run benchmark/load.dart <url> [connections=64] [seconds=10] [workers=4]
+/// Usage: dart run benchmark/`load.dart <url> [connections=64] [seconds=10] [workers=4]`
 void main(List<String> args) async {
   Uri url = Uri.parse(args[0]);
   int connections = args.length > 1 ? int.parse(args[1]) : 64;

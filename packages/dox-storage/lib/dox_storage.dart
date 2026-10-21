@@ -1,5 +1,5 @@
 /// File storage for dox: local disk, S3 and S3-compatible services.
-library dox_storage;
+library;
 
 export 'src/clock.dart';
 export 'src/constants/storage_constants.dart';

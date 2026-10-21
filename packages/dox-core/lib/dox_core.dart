@@ -1,4 +1,4 @@
-library dox_core;
+library;
 
 export 'package:dox_annotation/dox_annotation.dart';
 

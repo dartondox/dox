@@ -112,6 +112,18 @@ Future<void> main() async {
           RedisDriver(redis, prefix: '').flush(), throwsStateError);
     });
 
+    test('big value (1 MB) round trips', () async {
+      String big = 'x' * (1024 * 1024);
+      await driver.put('big', big, null);
+      expect(await driver.get('big'), big);
+    });
+
+    test('many and putMany use one round trip each', () async {
+      await driver.putMany(<String, Object?>{'m1': 1, 'm2': 'two'}, null);
+      expect(await driver.many(<String>['m1', 'm2', 'missing']),
+          <String, dynamic>{'m1': 1, 'm2': 'two', 'missing': null});
+    });
+
     test('too big value throws before sending', () async {
       RedisDriver small =
           RedisDriver(redis, prefix: 'dox_cache_spec:', maxValueBytes: 10);

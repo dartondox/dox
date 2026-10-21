@@ -1,4 +1,4 @@
-# version 3.0.0
+## 3.0.0-alpha.1
 
 - First release of `dox_validation`.
 - Fluent schema builder: string, int, num, bool, date, enum, literal, list, object, map, union, any, file.

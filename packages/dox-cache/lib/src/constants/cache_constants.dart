@@ -31,10 +31,6 @@ class CacheConstants {
   /// How many keys one SCAN step looks at during flush.
   static const int redisScanCount = 500;
 
-  /// ioredis 1.0.3 cuts replies bigger than one socket chunk (about 64 KB).
-  /// The Redis driver refuses bigger values so the connection does not break.
-  static const int redisMaxValueBytes = 60 * 1024;
-
   /// Wait time between tries in `CacheLock.block`.
   static const Duration lockPollInterval = Duration(milliseconds: 50);
 

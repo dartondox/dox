@@ -17,6 +17,7 @@ import 'types.dart';
 
 /// Example of how to add a new command:
 ///
+/// ```dart
 /// CommandRegistry.addCommand(
 ///   CommandDefinition(
 ///     command: 'new:command',
@@ -32,6 +33,7 @@ import 'types.dart';
 ///     },
 ///   ),
 /// );
+/// ```
 class CommandRegistry {
   static final List<CommandDefinition> _commands = [
     // Version commands

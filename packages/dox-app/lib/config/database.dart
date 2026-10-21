@@ -1,6 +1,5 @@
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_query_builder/dox_query_builder.dart';
-import 'package:mysql1/mysql1.dart' as mysql;
+import 'package:dox_orm/dox_orm.dart';
 
 DatabaseConfig databaseConfig = DatabaseConfig(
   /// -------------------------------
@@ -41,7 +40,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
       password: Env.get('DB_PASSWORD', 'password'),
       database: Env.get('DB_NAME', 'dox'),
       extra: <String, dynamic>{
-        'characterSet': mysql.CharacterSet.UTF8MB4,
+        'collation': 'utf8mb4_general_ci',
       },
       debug: true,
       printer: ConsoleQueryPrinter(),
