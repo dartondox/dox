@@ -44,7 +44,7 @@ jobs:
           # build hook). DOX_SERVER=dartio runs dox_core on dart:io too.
           - { name: 'core (native)', packages: dox-core }
           - { name: 'core (dart:io)', packages: dox-core, vars: DOX_SERVER=dartio }
-          - { name: 'app', packages: dox-app }
+          - { name: 'app', packages: dox-app, services: redis }
           - { name: 'builder, cli', packages: 'dox-builder dox-cli' }
           - { name: 'small packages', packages: 'dox-annotation dox-auth dox-openapi dox-validation dox-http-native' }
           - { name: 'redis (cache, socketio, websocket)', packages: 'dox-cache dox-socketio dox-websocket', services: redis }
