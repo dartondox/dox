@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/request/http_request_body.dart';
+import 'package:dox_core/http/request/trusted_proxy.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/aes_encryptor.dart';
 
@@ -20,19 +21,34 @@ class DoxRequest implements IDoxRequest {
   @override
   late Uri uri;
 
-  final String? clientIp;
+  final String? _givenIp;
+  final String _givenScheme;
+  final bool _readClient;
 
-  final String _scheme;
+  /// ip and scheme, read from the socket on first use when [_readClient].
+  /// the socket call is slow, and most requests never need it.
+  late final ({String? ip, String scheme}) _client = _readClient
+      ? TrustedProxy.readClient(httpRequest, Dox().config.trustedProxies)
+      : (ip: _givenIp, scheme: _givenScheme);
+
+  String? get clientIp => _client.ip;
+
+  String get _scheme => _client.scheme;
 
   @override
   String method = 'GET';
 
   Map<String, dynamic> body = <String, dynamic>{};
   Map<String, dynamic> param = <String, dynamic>{};
-  Map<String, dynamic> query = <String, dynamic>{};
 
-  final Map<String, dynamic> _cookies = <String, dynamic>{};
-  Map<String, dynamic> _allRequest = <String, dynamic>{};
+  /// the query string, read on first use
+  late Map<String, dynamic> query = uri.queryParameters;
+
+  /// cookies from the header, read on first use
+  late final Map<String, dynamic> _cookies = _getCookies();
+
+  /// query and body together, made on first use
+  late Map<String, dynamic> _allRequest = <String, dynamic>{...query, ...body};
 
   /// The body as it was read, for DTOs. `body` is its map.
   final RequestBody requestBody;
@@ -42,17 +58,17 @@ class DoxRequest implements IDoxRequest {
     required this.uri,
     required this.body,
     this.contentType,
-    this.clientIp,
-    this._scheme = 'http',
+    String? clientIp,
+    String scheme = 'http',
     required this.httpHeaders,
     required this.httpRequest,
     RequestBody? requestBody,
-  }) : requestBody = requestBody ?? RequestBody(body) {
+    this._readClient = false,
+  }) : _givenIp = clientIp,
+       _givenScheme = scheme,
+       requestBody = requestBody ?? RequestBody(body) {
     method = route.method.toUpperCase();
     param = route.params;
-    query = uri.queryParameters;
-    _allRequest = <String, dynamic>{...query, ...body};
-    _getCookies();
   }
 
   /// get route identifier
@@ -290,10 +306,11 @@ class DoxRequest implements IDoxRequest {
     return out;
   }
 
-  void _getCookies() {
+  Map<String, dynamic> _getCookies() {
+    Map<String, dynamic> out = <String, dynamic>{};
     List<String>? cookies = httpHeaders[HttpHeaders.cookieHeader];
     if (cookies == null) {
-      return;
+      return out;
     }
 
     /// one header can hold many cookies, eg. `a=1; b=2`
@@ -302,8 +319,9 @@ class DoxRequest implements IDoxRequest {
       if (equalsIndex < 0) continue;
       String name = cookie.substring(0, equalsIndex).trim();
       String value = cookie.substring(equalsIndex + 1).trim();
-      _cookies[name] = value;
+      out[name] = value;
     }
+    return out;
   }
 
   /// To support jsonEncode

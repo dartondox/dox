@@ -61,6 +61,37 @@ void main() {
       expect(res.body, 'pong');
     });
 
+    test('first matching route wins, also for plain paths', () async {
+      Route.get('/order_check/{id}', (DoxRequest req) => 'param');
+      Route.get('/order_check/plain', (DoxRequest req) => 'plain');
+      Route.get('/order_plain', (DoxRequest req) => 'first');
+      Route.get('/order_plain', (DoxRequest req) => 'second');
+
+      http.Response res = await http.get(
+        Uri.parse('$baseUrl/order_check/plain'),
+      );
+      expect(res.body, 'param');
+      res = await http.get(Uri.parse('$baseUrl/order_plain/'));
+      expect(res.body, 'first');
+    });
+
+    test('async middleware, then sync controller', () async {
+      Future<DoxRequest> slow(DoxRequest req) async {
+        await Future<void>.delayed(Duration.zero);
+        return req;
+      }
+
+      Route.get('/async_mw', <dynamic>[
+        slow,
+        ClassBasedMiddleware(),
+        (DoxRequest req) => 'done',
+      ]);
+
+      http.Response res = await http.get(Uri.parse('$baseUrl/async_mw'));
+      expect(res.statusCode, 200);
+      expect(res.body, 'done');
+    });
+
     test('param route', () async {
       Route.get('/ping/{name}', (DoxRequest req, String name) {
         return 'pong $name';

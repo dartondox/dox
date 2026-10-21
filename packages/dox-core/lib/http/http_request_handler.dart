@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
@@ -8,7 +9,6 @@ import 'package:dox_core/http/http_response_handler.dart';
 import 'package:dox_core/http/http_route_handler.dart';
 import 'package:dox_core/http/http_websocket_handler.dart';
 import 'package:dox_core/http/request/http_request_body.dart';
-import 'package:dox_core/http/request/trusted_proxy.dart';
 import 'package:dox_core/router/route_data.dart';
 
 /// this is a class which get matched routes and
@@ -30,19 +30,19 @@ void httpRequestHandler(HttpRequest req) {
       return;
     }
 
-    getDoxRequest(req, route)
-        .then((DoxRequest doxReq) {
-          middlewareAndControllerHandler(doxReq)
-              .then((dynamic result) {
-                httpResponseHandler(result, req);
-              })
-              .onError((Object? error, StackTrace stackTrace) {
-                httpErrorHandler(req, error, stackTrace);
-              });
-        })
-        .onError((Object? error, StackTrace stackTrace) {
-          httpErrorHandler(req, error, stackTrace);
-        });
+    /// no Content-Type means no body to read. then the request is
+    /// made at once, with no Future in between.
+    if (req.headers.contentType == null) {
+      _run(req, _doxRequest(req, route, RequestBody.empty()));
+    } else {
+      HttpBody.read(req)
+          .then((RequestBody body) {
+            _run(req, _doxRequest(req, route, body));
+          })
+          .onError((Object? error, StackTrace stackTrace) {
+            httpErrorHandler(req, error, stackTrace);
+          });
+    }
 
     /// form data do not support isolate or multithread
   } catch (error, stackTrace) {
@@ -67,39 +67,37 @@ bool _mounted(HttpRequest req, Map<String, RawRequestHandler> mounts) {
   return false;
 }
 
-Future<DoxRequest> getDoxRequest(HttpRequest req, RouteData route) async {
-  String? address = req.connectionInfo?.remoteAddress.address;
-  String? remote = address == null ? null : TrustedProxy.normalize(address);
-  String? clientIp = remote;
-  String scheme = 'http';
-  TrustedProxy proxy = _trustedProxy();
-  if (remote != null && proxy.enabled) {
-    clientIp = proxy.clientIp(remote, req.headers.value('x-forwarded-for'));
-    scheme = proxy.scheme(remote, req.headers.value('x-forwarded-proto'));
+/// run middleware and controller, then send the result.
+/// a plain value is sent at once. only a Future waits.
+void _run(HttpRequest req, DoxRequest doxReq) {
+  FutureOr<dynamic> result = runMiddlewareAndController(doxReq);
+  if (result is Future<dynamic>) {
+    result
+        .then((dynamic value) {
+          httpResponseHandler(value, req);
+        })
+        .onError((Object? error, StackTrace stackTrace) {
+          httpErrorHandler(req, error, stackTrace);
+        });
+  } else {
+    httpResponseHandler(result, req);
   }
-  RequestBody body = await HttpBody.read(req);
+}
+
+Future<DoxRequest> getDoxRequest(HttpRequest req, RouteData route) async {
+  return _doxRequest(req, route, await HttpBody.read(req));
+}
+
+DoxRequest _doxRequest(HttpRequest req, RouteData route, RequestBody body) {
   return DoxRequest(
     route: route,
     uri: req.uri,
     body: body.map,
     requestBody: body,
     contentType: req.headers.contentType,
-    clientIp: clientIp,
-    scheme: scheme,
     httpHeaders: req.headers,
     httpRequest: req,
+    // the client ip needs a socket call, so it is read on first use only
+    readClient: true,
   );
-}
-
-List<String>? _proxyList;
-TrustedProxy _proxy = TrustedProxy(const <String>[]);
-
-/// parse `trustedProxies` once per isolate, not on every request
-TrustedProxy _trustedProxy() {
-  List<String> list = Dox().config.trustedProxies;
-  if (!identical(list, _proxyList)) {
-    _proxy = TrustedProxy(list);
-    _proxyList = list;
-  }
-  return _proxy;
 }

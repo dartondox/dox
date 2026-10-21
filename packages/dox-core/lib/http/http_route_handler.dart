@@ -36,17 +36,37 @@ RouteData? httpRouteHandler(HttpRequest req) {
 
 /// routes grouped by method, rebuilt when the route list changes.
 /// keeps the registration order, so the first match still wins.
-Map<String, List<RouteData>> _byMethod = <String, List<RouteData>>{};
+Map<String, _MethodRoutes> _byMethod = <String, _MethodRoutes>{};
 List<RouteData>? _indexedList;
 int _indexedLength = -1;
 
-Map<String, List<RouteData>> _routeIndex() {
+/// the routes of one method, plus a map for plain paths (no params).
+class _MethodRoutes {
+  final List<RouteData> list = <RouteData>[];
+
+  /// path -> the first route with that exact path, when no route before
+  /// it can match the same url (no param route, no domain route before
+  /// it). then a map lookup gives the same answer as the scan.
+  final Map<String, RouteData> exact = <String, RouteData>{};
+
+  void buildExact() {
+    for (RouteData route in list) {
+      if (route.pattern != null || route.domain != null) break;
+      exact.putIfAbsent(route.path.trim(), () => route);
+    }
+  }
+}
+
+Map<String, _MethodRoutes> _routeIndex() {
   List<RouteData> routes = Route().routes;
   if (!identical(routes, _indexedList) || routes.length != _indexedLength) {
-    Map<String, List<RouteData>> index = <String, List<RouteData>>{};
+    Map<String, _MethodRoutes> index = <String, _MethodRoutes>{};
     for (RouteData route in routes) {
       route.path = sanitizeRoutePath(route.path);
-      (index[route.method.toUpperCase()] ??= <RouteData>[]).add(route);
+      (index[route.method.toUpperCase()] ??= _MethodRoutes()).list.add(route);
+    }
+    for (_MethodRoutes group in index.values) {
+      group.buildExact();
     }
     _byMethod = index;
     _indexedList = routes;
@@ -58,10 +78,13 @@ Map<String, List<RouteData>> _routeIndex() {
 /// get matched route from the list
 /// method, domain, path
 RouteData? _getMatchRoute(String inputRoute, String method, String? domain) {
-  List<RouteData>? candidates = _routeIndex()[method.toUpperCase()];
-  if (candidates == null) return null;
+  _MethodRoutes? group = _routeIndex()[method.toUpperCase()];
+  if (group == null) return null;
+  List<RouteData> candidates = group.list;
 
   inputRoute = sanitizeRoutePath(inputRoute).trim();
+  RouteData? exact = group.exact[inputRoute];
+  if (exact != null) return exact;
   String? host = domain?.toLowerCase();
 
   for (RouteData route in candidates) {
