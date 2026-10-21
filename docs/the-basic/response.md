@@ -147,4 +147,4 @@ return response().stream(file.stream).contentType(file.contentType);
     ```
 
 !!! info "Encrypt / Decrypt"
-    By default, a cookie's value is encrypted and decrypted using the `APP_KEY`. You can opt to disable encryption by setting `encrypt: false` when setting a cookie and disable decryption by setting `decode: false` when retrieving a cookie.
+    By default, a cookie's value is encrypted and decrypted using the `APP_KEY`. You can opt to disable encryption by setting `encrypt: false` when setting a cookie and disable decryption by setting `decrypt: false` when retrieving a cookie, eg. `req.cookie(key, decrypt: false)`.

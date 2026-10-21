@@ -63,10 +63,10 @@ class WebsocketEventHandler implements WebsocketEvent {
         dynamic message = payload[WEB_SOCKET_MESSAGE_KEY];
 
         /// if event name is WEB_SOCKET_JOIN_ROOM_EVENT_NAME,
-        /// join to the room and message is room name
+        /// join to the room and message is room name.
+        /// store the plain name, so `emitter.room(name)` finds it.
         if (eventName == WEB_SOCKET_JOIN_ROOM_EVENT_NAME) {
-          String room = defaultRoomId + message;
-          _storage.addWebSocketIdToRoom(socketId, room);
+          _storage.addWebSocketIdToRoom(socketId, message.toString());
           return;
         }
 

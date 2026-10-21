@@ -18,9 +18,12 @@ class Migration {
   /// - [connection] is optional postgres `Connection` or mysql `MySqlConnection`
   Future<void> migrate([dynamic connection]) async {
     DbConnection conn = await _getConnection(connection);
-    await createMigrationTableIfNotExist(conn);
-    await _runMigration(conn);
-    await _closeConnection(conn);
+    try {
+      await createMigrationTableIfNotExist(conn);
+      await _runMigration(conn);
+    } finally {
+      await _closeConnection(conn);
+    }
   }
 
   /// undo migrations, newest first
@@ -29,26 +32,35 @@ class Migration {
   /// - [connection] is optional postgres `Connection` or mysql `MySqlConnection`
   Future<void> rollback([dynamic connection, int? step]) async {
     DbConnection conn = await _getConnection(connection);
-    await createMigrationTableIfNotExist(conn);
-    await _runRollback(conn, step: step);
-    await _closeConnection(conn);
+    try {
+      await createMigrationTableIfNotExist(conn);
+      await _runRollback(conn, step: step);
+    } finally {
+      await _closeConnection(conn);
+    }
   }
 
   /// undo all migrations, newest first
   Future<void> reset([dynamic connection]) async {
     DbConnection conn = await _getConnection(connection);
-    await createMigrationTableIfNotExist(conn);
-    await _runRollback(conn, all: true);
-    await _closeConnection(conn);
+    try {
+      await createMigrationTableIfNotExist(conn);
+      await _runRollback(conn, all: true);
+    } finally {
+      await _closeConnection(conn);
+    }
   }
 
   /// undo all migrations, then run them again
   Future<void> refresh([dynamic connection]) async {
     DbConnection conn = await _getConnection(connection);
-    await createMigrationTableIfNotExist(conn);
-    await _runRollback(conn, all: true);
-    await _runMigration(conn);
-    await _closeConnection(conn);
+    try {
+      await createMigrationTableIfNotExist(conn);
+      await _runRollback(conn, all: true);
+      await _runMigration(conn);
+    } finally {
+      await _closeConnection(conn);
+    }
   }
 
   Future<DbConnection> _getConnection(dynamic connection) async {
@@ -83,7 +95,8 @@ class Migration {
     return migratedValue.isNotEmpty;
   }
 
-  /// run migrations that are not done yet, in file order
+  /// run migrations that are not done yet, in file order.
+  /// throw on the first failed migration, later ones may need it.
   Future<void> _runMigration(DbConnection conn) async {
     try {
       Directory migrationDirectory = getMigrationDirectory();
@@ -96,21 +109,21 @@ class Migration {
       for (File file in migrationFiles) {
         if (await isMigrated(conn, file)) continue;
         newMigrationFileList.add(file);
-        // stop here, later migrations may need this one
-        if (!await _runFile(conn, file, MigrationType.up, nextBatch)) break;
+        if (!await _runFile(conn, file, MigrationType.up, nextBatch)) {
+          throw Exception('Migration failed: ${file.name}');
+        }
       }
-
-      await _clearTempFolder();
 
       if (newMigrationFileList.isEmpty) {
         Logger.info('Migrations are already up to date!');
       }
-    } catch (error) {
-      print(error);
+    } finally {
+      await _clearTempFolder();
     }
   }
 
-  /// undo migrations from dox_db_migration table, newest first
+  /// undo migrations from dox_db_migration table, newest first.
+  /// throw on the first failed or missing migration.
   Future<void> _runRollback(DbConnection conn,
       {int? step, bool all = false}) async {
     try {
@@ -133,19 +146,18 @@ class Migration {
       for (Map<String, dynamic> row in rows) {
         File? file = files[row['migration'].toString()];
         if (file == null) {
-          Logger.danger('Migration file not found: ${row['migration']}');
-          break;
+          throw Exception('Migration file not found: ${row['migration']}');
         }
-        if (!await _runFile(conn, file, MigrationType.down, 0)) break;
+        if (!await _runFile(conn, file, MigrationType.down, 0)) {
+          throw Exception('Rollback failed: ${file.name}');
+        }
       }
-
-      await _clearTempFolder();
 
       if (rows.isEmpty) {
         Logger.info('Nothing to rollback!');
       }
-    } catch (error) {
-      print(error);
+    } finally {
+      await _clearTempFolder();
     }
   }
 

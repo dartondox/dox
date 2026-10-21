@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dox_core/constants/http_request_method.dart';
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/http/http_cors_handler.dart';
 import 'package:dox_core/http/http_response_handler.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/utils.dart';
@@ -14,8 +15,16 @@ RouteData? httpRouteHandler(HttpRequest req) {
   );
 
   if (route == null) {
-    /// return 200 status on preflight OPTIONS Method
+    /// answer preflight OPTIONS with 204 and cors headers.
+    /// use cors setting of the route the browser is asking about.
     if (req.method == HttpRequestMethod.OPTIONS.name) {
+      RouteData? target = _getMatchRoute(
+        req.uri.path,
+        req.headers.value('access-control-request-method') ?? '',
+        req.headers.value(HttpHeaders.hostHeader),
+      );
+      httpCorsHandler(target?.corsEnabled, req);
+      req.response.statusCode = HttpStatus.noContent;
       responseDataHandler(null, req);
     } else {
       req.response.statusCode = HttpStatus.notFound;

@@ -13,6 +13,12 @@ class Rules {
     return value.toString().isNotEmpty;
   }
 
+  /// marker rule, null values are allowed
+  static bool isNullable(
+      Map<String, dynamic> data, dynamic value, String args) {
+    return true;
+  }
+
   /// check field is email
   static bool isEmail(Map<String, dynamic> data, dynamic value, String args) {
     RegExp emailRegex = RegExp(
@@ -127,12 +133,12 @@ class Rules {
 
   /// check field character is given max length
   static bool maxLength(Map<String, dynamic> data, dynamic value, String max) {
-    return value.toString().length < num.parse(max.toString());
+    return value.toString().length <= num.parse(max.toString());
   }
 
   /// check field character is given min length
   static bool minLength(Map<String, dynamic> data, dynamic value, String min) {
-    return value.toString().length > num.parse(min.toString());
+    return value.toString().length >= num.parse(min.toString());
   }
 
   /// check field character is between given length

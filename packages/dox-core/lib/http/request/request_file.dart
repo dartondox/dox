@@ -54,9 +54,7 @@ class RequestFile {
 
   /// convert bytes list into kilobytes
   num _bytesToKB(Uint8List bytesList) {
-    int totalBytes =
-        bytesList.reduce((int value, int element) => value + element);
-    num sizeInKB = totalBytes / 1024;
+    num sizeInKB = bytesList.length / 1024;
     return sizeInKB.toFixed(2);
   }
 

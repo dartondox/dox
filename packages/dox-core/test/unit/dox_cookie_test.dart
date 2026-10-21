@@ -10,14 +10,14 @@ void main() {
       DoxCookie cookie = DoxCookie('x-auth', 'Bearerxxxxxxxxx');
       String cookieValue = cookie.get();
       expect(cookieValue,
-          'x-auth=EzBl7TV9yA+U1lLsyfMgTPjbCRh/5FQOODjbEwej58Y=; Max-Age=3600000');
+          'x-auth=EzBl7TV9yA+U1lLsyfMgTPjbCRh/5FQOODjbEwej58Y=; Max-Age=3600');
     });
 
     test('expire', () {
       Dox().config = config;
       DoxCookie cookie = DoxCookie('x-auth', '');
       String cookieValue = cookie.expire();
-      expect(cookieValue, 'x-auth=; Max-Age=-1000');
+      expect(cookieValue, 'x-auth=; Max-Age=-1');
     });
   });
 }

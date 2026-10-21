@@ -74,6 +74,9 @@ void main() {
       String? result = await uploadImage('$baseUrl/image', imageFile);
       Map<String, dynamic> data = jsonDecode(result!);
 
+      /// size is the byte count in kilobytes
+      expect(data['size'], closeTo(imageFile.lengthSync() / 1024, 0.01));
+
       /// fetch image from client
       http.Response res = await http
           .get(Uri.parse("$baseUrl/image/stream?image=${data['url']}"));

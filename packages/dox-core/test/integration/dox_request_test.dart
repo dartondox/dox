@@ -33,6 +33,7 @@ void main() {
           'path': req.uri.path,
           'has_title': req.has('title'),
           'has_desc': req.has('desc'),
+          'has_count': req.has('count'),
           'is_json': req.isJson(),
           'is_form_data': req.isFormData(),
           'host': req.host(),
@@ -49,11 +50,13 @@ void main() {
           'content-type': 'application/json',
           'x-auth-key': 'Bearer 1234',
         },
-        body: jsonEncode(<String, String>{
+        body: jsonEncode(<String, dynamic>{
           'title': 'hello',
+          'count': 5,
         }),
       );
       Map<String, dynamic> jsond = jsonDecode(res.body);
+      expect(jsond['has_count'], true);
       expect(jsond['x-auth-key'], 'Bearer 1234');
       expect(jsond['x-auth-key2'], 'Bearer 1234');
       expect(jsond['title'], 'hello');
@@ -79,6 +82,7 @@ void main() {
       Route.post('/get_cookies', (DoxRequest req) async {
         return <String, dynamic>{
           'cookie': req.cookie('auth-key'),
+          'raw': req.cookie('other', decrypt: false),
           'userAgent': req.userAgent(),
           'origin': req.origin(),
           'referer': req.referer(),
@@ -90,14 +94,15 @@ void main() {
       http.Response res = await http.post(
         Uri.parse('$baseUrl/get_cookies'),
         headers: <String, String>{
-          'cookie': 'auth-key=$cookieValue',
+          'cookie': 'other=1; auth-key=$cookieValue',
           'user-agent': 'dox-test',
           'origin': 'localhost',
           'referer': 'referer',
         },
       );
       Map<String, dynamic> jsond = jsonDecode(res.body);
-      expect(jsond['cookie'], cookieValue);
+      expect(jsond['cookie'], authKeyValue);
+      expect(jsond['raw'], '1');
       expect(jsond['userAgent'], 'dox-test');
       expect(jsond['origin'], 'localhost');
       expect(jsond['referer'], 'referer');

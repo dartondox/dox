@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dox/src/tools/create_controller.dart';
 import 'package:dox/src/tools/create_middleware.dart';
 import 'package:dox/src/tools/create_model.dart';
@@ -232,7 +234,7 @@ class CommandRegistry {
       category: CommandCategory.database,
       aliases: ['migrate'],
       function: (args) async {
-        await Migration(from: 'cli').migrate();
+        await _migrate(Migration(from: 'cli').migrate());
       },
     ),
 
@@ -253,7 +255,7 @@ class CommandRegistry {
             return;
           }
         }
-        await Migration(from: 'cli').rollback(null, step);
+        await _migrate(Migration(from: 'cli').rollback(null, step));
       },
     ),
 
@@ -264,7 +266,7 @@ class CommandRegistry {
       category: CommandCategory.database,
       aliases: ['migrate:reset'],
       function: (args) async {
-        await Migration(from: 'cli').reset();
+        await _migrate(Migration(from: 'cli').reset());
       },
     ),
 
@@ -275,7 +277,7 @@ class CommandRegistry {
       category: CommandCategory.database,
       aliases: ['migrate:refresh'],
       function: (args) async {
-        await Migration(from: 'cli').refresh();
+        await _migrate(Migration(from: 'cli').refresh());
       },
     ),
 
@@ -310,5 +312,17 @@ class CommandRegistry {
 
   static void addCommand(CommandDefinition command) {
     _commands.add(command);
+  }
+}
+
+/// wait for a migration task.
+/// print the error and set exit code 1 when it fails,
+/// so scripts and CI see the failure.
+Future<void> _migrate(Future<void> task) async {
+  try {
+    await task;
+  } catch (error) {
+    print(error);
+    exitCode = 1;
   }
 }

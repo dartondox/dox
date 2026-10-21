@@ -95,7 +95,7 @@ void main() {
       Uri url = Uri.parse('$baseUrl/non/exist/route');
       http.StreamedResponse response =
           await http.Client().send(http.Request('OPTIONS', url));
-      expect(response.statusCode, 200);
+      expect(response.statusCode, 204);
     });
 
     test('double param route', () async {
@@ -225,7 +225,31 @@ void main() {
       expect(res.statusCode, 200);
       expect(res.body, 'pong');
       expect(res.headers['set-cookie'],
-          'x-key=Ewh5wQRRo0v5ljLQpLNAcA==; Max-Age=3600000,x-key2=ABCD; Max-Age=3600000');
+          'x-key=Ewh5wQRRo0v5ljLQpLNAcA==; Max-Age=3600,x-key2=ABCD; Max-Age=3600');
+    });
+
+    test('cors preflight without options route', () async {
+      Route.enabledCors(() {
+        Route.post('/cors_preflight', (DoxRequest req) => 'ok');
+      });
+
+      http.Request req =
+          http.Request('OPTIONS', Uri.parse('$baseUrl/cors_preflight'));
+      req.headers['origin'] = 'http://example.com';
+      req.headers['access-control-request-method'] = 'POST';
+      http.StreamedResponse res = await req.send();
+
+      expect(res.statusCode, 204);
+      expect(res.headers['access-control-allow-origin'], '*');
+      expect(res.headers['access-control-allow-methods'],
+          'GET,POST,DELETE,PUT,PATCH');
+
+      /// no route for the path, cors is disabled in config
+      http.StreamedResponse res2 =
+          await http.Request('OPTIONS', Uri.parse('$baseUrl/no_such_route'))
+              .send();
+      expect(res2.statusCode, 204);
+      expect(res2.headers['access-control-allow-origin'], null);
     });
 
     test('custom form request', () async {

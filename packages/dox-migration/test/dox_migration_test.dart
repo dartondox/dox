@@ -217,8 +217,18 @@ INSERT INTO not_a_table VALUES (1)
 DROP TABLE IF EXISTS mig_fail
 ''');
 
-        await Migration().migrate();
+        writeMigration('2023_01_02_000000_later', '''
+-- up
+CREATE TABLE mig_tag (id INTEGER PRIMARY KEY)
+
+-- down
+DROP TABLE IF EXISTS mig_tag
+''');
+
+        await expectLater(Migration().migrate(), throwsException);
         expect(await migrations(), isEmpty);
+        // stop at the first failure, the later migration does not run
+        expect(await tableExists('mig_tag'), false);
         // mysql auto commits DDL, so only postgres rolls back the table
         expect(await tableExists('mig_fail'), driver == 'mysql');
       });

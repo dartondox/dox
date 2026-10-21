@@ -33,7 +33,7 @@ class DoxCookie {
   /// ```
   String expire() {
     Cookie cookie = Cookie(key, value);
-    cookie.maxAge = Duration(milliseconds: -1).inMicroseconds;
+    cookie.maxAge = -1;
     cookie.path = path;
     cookie.domain = domain;
     cookie.httpOnly = httpOnly;
@@ -51,7 +51,7 @@ class DoxCookie {
         encrypt ? AESEncryptor.encode(value, Dox().config.appKey) : value;
 
     Cookie cookie = Cookie(key, val);
-    cookie.maxAge = maxAge.inMilliseconds;
+    cookie.maxAge = maxAge.inSeconds;
     cookie.path = path;
     cookie.domain = domain;
     cookie.httpOnly = httpOnly;

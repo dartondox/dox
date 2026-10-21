@@ -130,7 +130,39 @@ class BlogController {
     }
     ```
 
+## Optional fields
+
+A field that is missing, `null` or an empty string is optional.
+Its other rules are skipped. Only `required`, `required_if` and `required_if_not` still run.
+
+```dart
+req.validate({
+    'status': 'in:active,inactive', // passes when status is not sent
+    'age': 'required|integer', // fails when age is not sent
+});
+```
+
 ## Rules
+
+#### `nullable`
+
+The field may be `null`. Other rules run only when it has a value.
+
+```dart
+req.validate({
+    'age': 'nullable|integer',
+});
+```
+
+#### `sometimes`
+
+Validate the field only when it is sent. Use it with `required` to allow a missing field but reject an empty one.
+
+```dart
+req.validate({
+    'name': 'sometimes|required',
+});
+```
 
 #### `required`
 
@@ -401,6 +433,9 @@ req.validate({
     'title': 'min_length:20',
 });
 ```
+
+!!! info
+    `min_length` and `max_length` include the limit. `min_length:20` accepts 20 characters.
 
 #### `max_length`
 
