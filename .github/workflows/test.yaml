@@ -3,121 +3,134 @@ name: Test
 on:
   push:
 
+# A new push to a branch cancels the old run of that branch.
+# Runs on develop are never cancelled.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/develop' }}
+
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
-
-    services:
-
-      mariadb:
-        image: mariadb:11
-        ports:
-          - 3306:3306
-        env:
-          MYSQL_USER: dox
-          MYSQL_PASSWORD: password
-          MYSQL_DATABASE: dox-framework
-          MYSQL_ROOT_PASSWORD: password
-        options: >-
-          --health-cmd="healthcheck.sh
-          --connect
-          --innodb_initialized"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      # MySQL 8.4 with the default caching_sha2_password login
-      mysql84:
-        image: mysql:8.4
-        ports:
-          - 3307:3306
-        env:
-          MYSQL_USER: dox
-          MYSQL_PASSWORD: password
-          MYSQL_DATABASE: dox-framework
-          MYSQL_ROOT_PASSWORD: password
-        options: >-
-          --health-cmd="mysqladmin ping -h127.0.0.1 -udox -ppassword"
-          --health-interval=5s
-          --health-timeout=5s
-          --health-retries=30
-
-      redis:
-        image: redis:7
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
-    - uses: actions/checkout@v4
-    # dox_socketio interop tests run the real socket.io-client in node
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 24
-    # dox_storage S3 tests use MinIO on port 9100. A service can not pass the
-    # `server` command, so it is started here.
-    - name: Start MinIO
-      run: |
-        docker run -d --name minio -p 9100:9000 \
-          -e MINIO_ROOT_USER=minioadmin -e MINIO_ROOT_PASSWORD=minioadmin \
-          cgr.dev/chainguard/minio:latest server /tmp/data
-        for i in $(seq 1 30); do
-          curl -sf http://localhost:9100/minio/health/live && break
-          sleep 1
-        done
-    - uses: dart-lang/setup-dart@v1
-      with:
-        sdk: stable
-    # The repo is a Dart pub workspace. Melos config is in the root pubspec.yaml.
-    # `melos bs` runs one `dart pub get` for the whole workspace.
-    - name: Activate melos
-      run: dart pub global activate melos
-    - name: Melos Bootstrap
-      run: melos bs
-    - name: Analyze
-      run: melos run analyze
-    - name: Check format
-      run: melos run format_check
-    - name: Copy .env.example to .env of app
-      run: cp packages/dox-app/.env.example packages/dox-app/.env
-    - name: Copy .env.example to .env of cli
-      run: cp packages/dox-cli/.env.example packages/dox-cli/.env
-    # `melos run test`, not `melos test` (a built-in command in melos 8)
-    - name: Run Tests
-      run: melos run test
-    # the default run above uses the native server (dox_http_native,
-    # built from source with cargo by its build hook). Run dox_core on
-    # dart:io too.
-    - name: Run Test (dox_core on dart:io)
-      working-directory: packages/dox-core
-      run: DOX_SERVER=dartio dart test --concurrency=1
-    - name: Run Test (orm postgres)
-      run: DB_PORT=5432 melos run test_pg
-    - name: Run Test (orm mariadb)
-      run: DB_USER=dox DB_PORT=3306 melos run test_mysql
-    - name: Run Test (orm mysql 8.4)
-      run: DB_USER=dox DB_PORT=3307 melos run test_mysql
-    # sqlite3 v3 bundles SQLite with a build hook. No system library needed.
-    - name: Run Test (orm sqlite)
-      run: melos run test_sqlite
-    - name: Run Test (migration mysql 8.4)
-      working-directory: packages/dox-migration
-      run: MYSQL_PORT=3307 dart test
+      - uses: actions/checkout@v7
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - uses: actions/cache@v6
+        with:
+          path: ~/.pub-cache
+          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: pub-${{ runner.os }}-
+      # The repo is a Dart pub workspace. One `dart pub get` at the root
+      # is all that `melos bootstrap` does.
+      - run: dart pub get
+      - name: Analyze
+        run: dart run melos run analyze
+      - name: Check format
+        run: dart format --output=none --set-exit-if-changed .
+
+  tests:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # packages: folders under packages/ to run `dart test` in.
+        # vars: env vars for `dart test`.
+        # services: containers to start (postgres, mariadb, mysql84, redis, minio).
+        include:
+          # the default server is native (dox_http_native, built by its
+          # build hook). DOX_SERVER=dartio runs dox_core on dart:io too.
+          - { name: 'core (native)', packages: dox-core }
+          - { name: 'core (dart:io)', packages: dox-core, vars: DOX_SERVER=dartio }
+          - { name: 'app', packages: dox-app }
+          - { name: 'builder, cli', packages: 'dox-builder dox-cli' }
+          - { name: 'small packages', packages: 'dox-annotation dox-auth dox-openapi dox-validation dox-http-native' }
+          - { name: 'redis (cache, socketio, websocket)', packages: 'dox-cache dox-socketio dox-websocket', services: redis }
+          - { name: 'storage (minio)', packages: dox-storage, services: minio }
+          - { name: 'orm (postgres)', packages: dox-orm, vars: DRIVER=postgres DB_PORT=5432, services: postgres }
+          - { name: 'orm (mariadb)', packages: dox-orm, vars: DRIVER=mysql DB_USER=dox DB_PORT=3306, services: mariadb }
+          - { name: 'orm (mysql 8.4)', packages: dox-orm, vars: DRIVER=mysql DB_USER=dox DB_PORT=3307, services: mysql84 }
+          # sqlite3 v3 bundles SQLite with a build hook. No system library needed.
+          - { name: 'orm (sqlite)', packages: dox-orm, vars: DRIVER=sqlite }
+          # the migration tests run on postgres, mysql and sqlite in one run
+          - { name: 'migration (mariadb)', packages: dox-migration, services: postgres mariadb }
+          - { name: 'migration (mysql 8.4)', packages: dox-migration, vars: MYSQL_PORT=3307, services: postgres mysql84 }
+    steps:
+      # Start the containers first. They boot while the next steps run.
+      - name: Start services
+        if: matrix.services
+        run: |
+          for s in ${{ matrix.services }}; do
+            case $s in
+              postgres)
+                docker run -d --name postgres -p 5432:5432 \
+                  -e POSTGRES_DB=postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres \
+                  --health-cmd pg_isready --health-interval 2s postgres:16 ;;
+              mariadb)
+                docker run -d --name mariadb -p 3306:3306 \
+                  -e MYSQL_USER=dox -e MYSQL_PASSWORD=password -e MYSQL_DATABASE=dox-framework -e MYSQL_ROOT_PASSWORD=password \
+                  --health-cmd "healthcheck.sh --connect --innodb_initialized" --health-interval 2s mariadb:11 ;;
+              # MySQL 8.4 with the default caching_sha2_password login
+              mysql84)
+                docker run -d --name mysql84 -p 3307:3306 \
+                  -e MYSQL_USER=dox -e MYSQL_PASSWORD=password -e MYSQL_DATABASE=dox-framework -e MYSQL_ROOT_PASSWORD=password \
+                  --health-cmd "mysqladmin ping -h127.0.0.1 -udox -ppassword" --health-interval 2s mysql:8.4 ;;
+              redis)
+                docker run -d --name redis -p 6379:6379 \
+                  --health-cmd "redis-cli ping" --health-interval 2s redis:7 ;;
+              # dox_storage S3 tests use MinIO on port 9100
+              minio)
+                docker run -d --name minio -p 9100:9000 \
+                  -e MINIO_ROOT_USER=minioadmin -e MINIO_ROOT_PASSWORD=minioadmin \
+                  cgr.dev/chainguard/minio:latest server /tmp/data ;;
+            esac
+          done
+      - uses: actions/checkout@v7
+      # dox_socketio interop tests run the real socket.io-client in node
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - uses: actions/cache@v6
+        with:
+          path: ~/.pub-cache
+          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: pub-${{ runner.os }}-
+      - run: dart pub get
+      - name: Copy .env.example to .env of app and cli
+        run: |
+          cp packages/dox-app/.env.example packages/dox-app/.env
+          cp packages/dox-cli/.env.example packages/dox-cli/.env
+      - name: Wait for services
+        if: matrix.services
+        run: |
+          for s in ${{ matrix.services }}; do
+            if [ "$s" = minio ]; then
+              timeout 90 sh -c 'until curl -sf http://localhost:9100/minio/health/live; do sleep 1; done'
+            else
+              timeout 90 sh -c "until [ \"\$(docker inspect -f '{{.State.Health.Status}}' $s)\" = healthy ]; do sleep 1; done"
+            fi
+            echo "$s is up"
+          done
+      - name: Run tests
+        run: |
+          for p in ${{ matrix.packages }}; do
+            echo "::group::$p"
+            (cd packages/$p && env ${{ matrix.vars }} dart test --concurrency=1)
+            echo "::endgroup::"
+          done
+
+  # The required check on develop is named "test". This job keeps that name
+  # and fails when any job above fails.
+  test:
+    if: always()
+    needs: [lint, tests]
+    runs-on: ubuntu-latest
+    steps:
+      - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
+      - run: echo all green
