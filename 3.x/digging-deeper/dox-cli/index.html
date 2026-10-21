@@ -2803,6 +2803,14 @@
 <td>make a new <code>APP_KEY</code></td>
 </tr>
 <tr>
+<td><code>dox env:generate</code></td>
+<td>make <code>lib/config/env.dart</code> (the typed env class) from <code>.env.example</code>, see <a href="../env/">Environment Variables</a></td>
+</tr>
+<tr>
+<td><code>dox env:check</code></td>
+<td>check the env against <code>lib/config/env.dart</code>. Prints every missing or bad key (exit code 1)</td>
+</tr>
+<tr>
 <td><code>dox openapi:generate [dir]</code></td>
 <td>write <code>openapi.json</code> and <code>openapi.yaml</code> (default <code>storage/openapi</code>), see <a href="../../packages/openapi/#write-the-files-dox-openapigenerate">OpenAPI</a></td>
 </tr>
