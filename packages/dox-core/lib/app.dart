@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/isolate/dox_isolate.dart';
 import 'package:dox_core/server/dox_server.dart';
 import 'package:dox_core/utils/logger.dart';
+import 'package:dox_socketio/dox_socketio.dart';
 import 'package:sprintf/sprintf.dart';
 
 IocContainer _ioc = IocContainer();
@@ -34,6 +37,25 @@ class Dox implements IDox {
 
   /// websocket
   IDoxWebsocket? websocket;
+
+  /// validator used by `req.validate()` and form requests.
+  /// replace it to use your own `dox_validation` Validator.
+  RequestValidator validator = RequestValidator();
+
+  /// cache stores from `config.cache`, made on first use in each isolate.
+  /// `Cache()` uses it. replace it in tests.
+  late CacheManager cache = CacheManager(config.cache);
+
+  /// storage disks from `config.storage`, made on first use in each
+  /// isolate. `Storage()` uses it. replace it in tests.
+  late DriveManager storage = StorageDiskFactory(appKey: config.appKey)
+      .create(config.storage);
+
+  /// Socket.IO server of this isolate, when `config.socketIo` is enabled.
+  /// ```
+  /// Dox().socketIo?.to('room').emit('news', data);
+  /// ```
+  SocketIoServer? socketIo;
 
   /// total isolate to spawn
   int? _totalIsolate;
@@ -72,6 +94,7 @@ class Dox implements IDox {
   /// await Dox().startServer();
   /// ```
   Future<void> startServer() async {
+    checkAppKey();
     addServices(config.services);
     _totalIsolate ??= Dox().config.totalIsolate;
     int isolatesToSpawn = _totalIsolate!;
@@ -90,6 +113,19 @@ class Dox implements IDox {
         <dynamic>[Dox().config.serverPort],
       ),
     );
+  }
+
+  /// stop at startup when `APP_KEY` is missing in production.
+  /// without a key, cookies and other encrypted data use an empty
+  /// (predictable) key. outside production it only logs a warning.
+  void checkAppKey() {
+    if (config.appKey.trim().isNotEmpty) return;
+    String message =
+        'APP_KEY is not set. Run `dox key:generate` and put the key in .env';
+    if (Env.get<String>('APP_ENV').toLowerCase() == 'production') {
+      throw StateError(message);
+    }
+    Logger.warn(message);
   }
 
   /// ####### functions need to run on isolate #######
@@ -113,6 +149,48 @@ class Dox implements IDox {
     }
     _registerFormRequests();
     _registerRoute();
+    _mountSocketIo();
+    if (config.openApi.isEnabled) OpenApiDocument(config.openApi).register();
+  }
+
+  /// write `openapi.json` and `openapi.yaml` of the app routes into [dir].
+  /// `bin/openapi.dart` calls this for `dox openapi:generate`.
+  /// ```
+  /// Dox().initialize(appConfig);
+  /// await Dox().writeOpenApi('storage/openapi');
+  /// ```
+  Future<List<File>> writeOpenApi(String dir) async {
+    addServices(config.services);
+    for (DoxService service in doxServices) {
+      await service.setup();
+    }
+    _registerFormRequests();
+    _registerRoute();
+    return OpenApiDocument(config.openApi).write(dir);
+  }
+
+  /// Socket.IO gets the raw requests of its path, before the router.
+  void _mountSocketIo() {
+    SocketIoConfig settings = config.socketIo;
+    if (!settings.enabled) return;
+    SocketIoServer io = SocketIoServer(
+      options: settings.options,
+      adapter: settings.adapter?.create(),
+    );
+    for (NamespaceHandler handler in settings.namespaces) {
+      io.register(handler);
+    }
+    socketIo = io;
+    Route.mount(settings.options.path, io.handle);
+    if (isolateId == 1 &&
+        config.totalIsolate > 1 &&
+        settings.options.transports.contains('polling')) {
+      Logger.info(
+        'Socket.IO runs on ${config.totalIsolate} isolates: '
+        "clients should use transports: ['websocket'] (long-polling needs "
+        'one isolate or sticky sessions), with a Redis adapter.',
+      );
+    }
   }
 
   /// ################ end ###########

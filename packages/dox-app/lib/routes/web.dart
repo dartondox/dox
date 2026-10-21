@@ -14,15 +14,13 @@ class WebRouter extends Router {
       return 'pong';
     });
 
+    /// serve files of the local disk with signed URLs:
+    /// `String url = await Storage().signedUrl(path);`
+    Route.files('files');
+
+    /// stream a stored file as a download, from any disk
     Route.get('/download', (DoxRequest req) async {
-      try {
-        DownloadableFile file = await Storage().download(
-          '/images/3d975270-2bbb-11ee-9f99-ddd56a1df7a6.jpeg',
-        );
-        return response(file);
-      } catch (error) {
-        return error.toString();
-      }
+      return Storage().download(req.input('path'));
     });
 
     Route.delete('/image', (DoxRequest req) async {

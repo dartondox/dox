@@ -2,6 +2,9 @@
 
 - Needs Dart 3.13 or newer.
 - All dependencies updated to their latest versions.
+- `DoxRouteAdapter` reads `preMiddleware` and `body` from a route when it has them.
+- A Dox catch-all param `{path*}` becomes `{path}` in the document.
+
 
 ## 3.0.0-alpha.1
 

@@ -13,6 +13,7 @@ dependencies:
   dox_core: ^3.0.0-alpha.1
   dox_websocket: ^3.0.0-alpha.1
   dox_orm: ^3.0.0-alpha.1
+  dox_socketio: ^3.0.0-alpha.1
 
 dev_dependencies:
   dox_builder: ^3.0.0-alpha.1

@@ -3,6 +3,69 @@
 `dox_openapi` makes an OpenAPI 3.1 document for your Dox app.
 You get `openapi.json`, `openapi.yaml` and a Swagger UI page at `/docs`.
 
+## In a Dox app
+
+`dox_core` has it built in. Add an `OpenApiConfig` to `AppConfig`:
+
+```dart
+// config/openapi.dart
+OpenApiConfig openApi = OpenApiConfig(
+  info: Info(title: 'Blog API', version: '1.0.0'),
+  servers: <Server>[Server('https://api.example.com')],
+  securitySchemes: <String, SecurityScheme>{'bearerAuth': SecurityScheme.bearer()},
+  securityByMiddleware: <String, List<Map<String, List<String>>>>{
+    'AuthMiddleware': <Map<String, List<String>>>[<String, List<String>>{'bearerAuth': <String>[]}],
+  },
+);
+
+AppConfig(openApi: openApi, ...);
+```
+
+- `GET /docs` (Swagger UI), `GET /openapi.json` and `GET /openapi.yaml` are added after your routes.
+- `enabled` is `null` by default: the docs are on only when `APP_ENV` is `development` or `local`.
+  So production is off unless you set `enabled: true`. When it is off, there is no extra work per request.
+- Every route is added. The document is built on the first `/docs` request, and again when routes change.
+- Request bodies come from the route `body:` option, or from the form request of the controller
+  (`schema()` first, then `rules()`):
+
+```dart
+Route.post('/posts', controller.store, body: v.object(<String, Schema<Object?>>{
+  'title': v.string().min(3),
+}));
+
+// or: store(PostRequest req) where PostRequest has schema() or rules()
+```
+
+- Middleware names come from the route groups and router middleware (`preMiddleware`), so
+  `securityByMiddleware` knows which routes need a login.
+
+### Write the files: `dox openapi:generate`
+
+```bash
+dox openapi:generate              # storage/openapi/openapi.json and openapi.yaml
+dox openapi:generate docs/api     # another folder
+```
+
+It runs `bin/openapi.dart` of your app:
+
+```dart
+// bin/openapi.dart
+import 'dart:io';
+
+import 'package:dox_core/dox_core.dart';
+import 'package:my_app/config/app.dart';
+
+Future<void> main(List<String> args) async {
+  Dox().initialize(appConfig);
+  await Dox().writeOpenApi(args.isEmpty ? 'storage/openapi' : args.first);
+  exit(0);
+}
+```
+
+`writeOpenApi` runs your services and registers the routes. It does not start the server.
+
+The rest of this page is for describing routes by hand, and for using `dox_openapi` outside Dox.
+
 ## Install
 
 ```bash

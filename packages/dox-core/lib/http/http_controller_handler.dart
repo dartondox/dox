@@ -57,9 +57,7 @@ Future<dynamic> _handleController(
       : _generateEmptyArgumentValues(lengthOfParam);
 
   /// controller argument data types
-  List<String> controllerArgumentsDataType = _getControllerArgumentDataTypes(
-    fn,
-  );
+  List<String> controllerArgumentsDataType = controllerArgumentDataTypes(fn);
 
   /// if the first argument data type is not DoxRequest,
   /// controller request custom FormRequest class
@@ -74,8 +72,14 @@ Future<dynamic> _handleController(
         /// setting dox request to custom form request
         formReq.setRequest(doxRequest);
 
-        /// validate request
-        doxRequest.validate(formReq.rules(), messages: formReq.messages());
+        /// validate request: schema() first, then rules()
+        ObjectSchema? schema = formReq.schema();
+        formReq.validated = schema != null
+            ? await doxRequest.validateSchema(schema)
+            : await doxRequest.validateAsync(
+                formReq.rules(),
+                messages: formReq.messages(),
+              );
 
         /// run setup()
         await formReq.setUp();
@@ -98,7 +102,7 @@ Future<dynamic> _handleController(
 /// checking that controller first request param is matched
 /// with custom form request
 bool _isFormRequestTypeMatched(dynamic controller, dynamic req) {
-  List<String> args = _getControllerArgumentDataTypes(controller);
+  List<String> args = controllerArgumentDataTypes(controller);
   return args[0].toString() == req.runtimeType.toString();
 }
 
@@ -107,7 +111,7 @@ final Expando<List<String>> _argumentTypes = Expando<List<String>>();
 
 /// get controller arguments data type
 /// eg. [DoxRequest, String]
-List<String> _getControllerArgumentDataTypes(dynamic controller) {
+List<String> controllerArgumentDataTypes(dynamic controller) {
   return _argumentTypes[controller] ??= controller
       .toString()
       .split('(')[1]
@@ -118,7 +122,7 @@ List<String> _getControllerArgumentDataTypes(dynamic controller) {
 /// get length controller arguments to check how many arguments
 /// need to pass to the controller
 int _lengthOfControllerArguments(dynamic controller) {
-  List<String> args = _getControllerArgumentDataTypes(controller);
+  List<String> args = controllerArgumentDataTypes(controller);
   return args.length;
 }
 

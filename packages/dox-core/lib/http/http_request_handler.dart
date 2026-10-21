@@ -16,6 +16,10 @@ import 'package:dox_core/router/route_data.dart';
 /// and response from controllers is passed to `httpResponseHandler`
 void httpRequestHandler(HttpRequest req) {
   try {
+    /// raw handlers like Socket.IO. empty map when nothing is mounted.
+    Map<String, RawRequestHandler> mounts = Route().mounts;
+    if (mounts.isNotEmpty && _mounted(req, mounts)) return;
+
     RouteData? route = httpRouteHandler(req);
     if (route == null) return;
 
@@ -44,6 +48,23 @@ void httpRequestHandler(HttpRequest req) {
   } catch (error, stackTrace) {
     httpErrorHandler(req, error, stackTrace);
   }
+}
+
+/// hand the request to a mounted handler. it writes the response itself.
+bool _mounted(HttpRequest req, Map<String, RawRequestHandler> mounts) {
+  String path = req.uri.path;
+  for (MapEntry<String, RawRequestHandler> mount in mounts.entries) {
+    String prefix = mount.key;
+    if (path.startsWith(prefix) ||
+        (prefix.endsWith('/') &&
+            path == prefix.substring(0, prefix.length - 1))) {
+      mount.value(req).catchError((Object error, StackTrace stackTrace) {
+        Dox().config.errorHandler(error, stackTrace);
+      });
+      return true;
+    }
+  }
+  return false;
 }
 
 Future<DoxRequest> getDoxRequest(HttpRequest req, RouteData route) async {

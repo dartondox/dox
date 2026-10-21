@@ -1,94 +1,132 @@
-import 'package:dox_core/cache/drivers/file/file_cache_driver.dart';
+import 'dart:async';
+
 import 'package:dox_core/dox_core.dart';
 
+/// Cache facade on top of `dox_cache`.
+///
+/// Stores come from `AppConfig.cache`. Each store is built once per isolate.
+/// ```
+/// await Cache().put('foo', 'bar', duration: Duration(minutes: 5));
+/// await Cache().store('redis').get('foo');
+/// await Cache().tag('users').flush();
+/// ```
+/// Values must be JSON types (Map, List, String, num, bool).
 class Cache {
-  String _tag = 'default';
+  /// [manager] is the `dox_cache` CacheManager. Default is `Dox().cache`.
+  Cache({this._manager});
+
+  final CacheManager? _manager;
   String? _store;
+  List<String>? _tags;
 
-  Map<String, CacheDriverInterface> cacheDrivers =
-      <String, CacheDriverInterface>{
-        'file': FileCacheDriver(),
-        ...Dox().config.cache.drivers,
-      };
-
-  /// Set where to store the cache.
-  /// The name you set in the cache drivers configuration
-  /// Example `drivers => {'file' : FileCacheDriver()}`,
-  /// then store name is `file`
+  /// Use the store with this name from the config.
+  /// ```
+  /// Cache().store('file').put('key', 'value');
+  /// ```
   Cache store(String store) {
     _store = store;
     return this;
   }
 
-  /// set tag for the cache
-  /// This is the categorize the cache and
-  /// useful when you want to flush only specific tag
+  /// Put the items under a tag, so you can flush only this tag.
   /// ```
-  /// Cache().tag('tag').put('key', 'value');
+  /// Cache().tag('users').put('u1', 'Ann');
+  /// Cache().tag('users').flush();
   /// ```
   Cache tag(String name) {
-    _tag = name;
+    return tags(<String>[name]);
+  }
+
+  /// Same as [tag], with many tags.
+  Cache tags(List<String> names) {
+    _tags = names;
     return this;
   }
 
-  /// get the cache driver
-  CacheDriverInterface get _driver {
-    _store ??= Dox().config.cache.defaultDriver;
-    CacheDriverInterface d =
-        cacheDrivers[_store] ??
-        cacheDrivers[Dox().config.cache.defaultDriver] ??
-        FileCacheDriver();
-    d.setTag(_tag);
-    return d;
+  /// The `dox_cache` store, for the methods that are not here.
+  CacheStore get repository {
+    CacheStore store = (_manager ?? Dox().cache).store(_store);
+    List<String>? names = _tags;
+    return names == null ? store : store.tags(names);
   }
 
-  /// set key => value to cache
-  /// default duration is 1 hour
+  /// Store a value. No duration means forever.
   /// ```
   /// await Cache().put('foo', 'bar');
   /// await Cache().put('foo', 'bar', duration: Duration(hours: 24));
   /// ```
-  Future<void> put(String key, String value, {Duration? duration}) async {
-    await _driver.put(key, value, duration: duration);
+  Future<void> put(String key, Object? value, {Duration? duration}) {
+    return repository.put(key, value, duration);
   }
 
-  /// set key => value to cache forever
-  /// ```
-  /// await Cache().forever('foo', 'bar');
-  /// ```
-  Future<void> forever(String key, String value) async {
-    await _driver.forever(key, value);
+  /// Store a value forever.
+  Future<void> forever(String key, Object? value) {
+    return repository.forever(key, value);
   }
 
-  /// remove a key from cache
-  /// ```
-  /// await Cache().forget('foo');
-  ///
-  Future<void> forget(String key) async {
-    await _driver.forget(key);
+  /// Store only when the key is missing. True when it was stored.
+  Future<bool> add(String key, Object? value, {Duration? duration}) {
+    return repository.add(key, value, duration);
   }
 
-  /// remove all cache
-  /// ```
-  /// await Cache().flush();
-  ///
-  Future<void> flush() async {
-    await _driver.flush();
-  }
-
-  /// get a value from cache
+  /// Get a value, or [defaultValue] when it is missing.
   /// ```
   /// String? value = await Cache().get('foo');
-  ///
-  Future<dynamic> get(String key) async {
-    return await _driver.get(key);
+  /// ```
+  Future<dynamic> get(String key, [Object? defaultValue]) {
+    return repository.get(key, defaultValue);
   }
 
-  /// get a value exist
+  /// True when the key has a value.
+  Future<bool> has(String key) {
+    return repository.has(key);
+  }
+
+  /// Remove a key.
+  Future<bool> forget(String key) {
+    return repository.forget(key);
+  }
+
+  /// Remove all items of the store (or of the tag).
+  Future<void> flush() {
+    return repository.flush();
+  }
+
+  /// Get a value and remove it.
+  Future<dynamic> pull(String key, [Object? defaultValue]) {
+    return repository.pull(key, defaultValue);
+  }
+
+  /// Add [by] to an integer. A missing key starts at 0.
+  Future<int> increment(String key, [int by = 1]) {
+    return repository.increment(key, by);
+  }
+
+  /// Take [by] from an integer. A missing key starts at 0.
+  Future<int> decrement(String key, [int by = 1]) {
+    return repository.decrement(key, by);
+  }
+
+  /// The cached value, or run [compute] and store the result.
   /// ```
-  /// bool has = await Cache().has('foo');
-  ///
-  Future<bool> has(String key) async {
-    return await _driver.has(key);
+  /// List<dynamic> posts = await Cache().remember('posts',
+  ///   Duration(minutes: 5), () => Post().all());
+  /// ```
+  Future<T> remember<T>(
+    String key,
+    Duration? duration,
+    FutureOr<T> Function() compute,
+  ) {
+    return repository.remember<T>(key, duration, compute);
+  }
+
+  /// Like [remember], but the value never expires.
+  Future<T> rememberForever<T>(String key, FutureOr<T> Function() compute) {
+    return repository.rememberForever<T>(key, compute);
+  }
+
+  /// An atomic lock. Memory and Redis stores support it.
+  CacheLock lock(String name, [Duration? ttl, String? owner]) {
+    return repository.lock(name, ttl, owner);
   }
 }

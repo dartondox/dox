@@ -1,12 +1,17 @@
 library;
 
 export 'package:dox_annotation/dox_annotation.dart';
+export 'package:dox_cache/dox_cache.dart'
+    show CacheConfig, CacheLock, CacheManager, CacheStore;
+export 'package:dox_openapi/dox_openapi.dart' show Info, SecurityScheme, Server;
+export 'package:dox_storage/dox_storage.dart'
+    show Disk, DriveManager, FileNotFoundException, StorageException;
+export 'package:dox_validation/dox_validation.dart' hide ValidationException;
 
 export 'app.dart';
 
 /// cache
 export 'cache/cache.dart';
-export 'cache/cache_driver_interface.dart';
 export 'constants/constants.dart';
 export 'env/env.dart';
 
@@ -33,6 +38,11 @@ export 'interfaces/dox_service.dart';
 export 'interfaces/response_handler_interface.dart';
 export 'interfaces/router.dart';
 
+/// OpenAPI and Socket.IO
+export 'openapi/openapi_config.dart';
+export 'openapi/openapi_document.dart';
+export 'socketio/socket_io_config.dart';
+
 /// Tools
 export 'ioc/ioc_container.dart';
 export 'middleware/log_middleware.dart';
@@ -42,7 +52,10 @@ export 'router/route.dart';
 
 /// storage
 export 'storage/storage.dart';
-export 'storage/storage_driver_interface.dart';
+export 'storage/storage_config.dart';
+
+/// Validation
+export 'validation/request_validator.dart';
 
 /// Utils
 export 'utils/extensions.dart';

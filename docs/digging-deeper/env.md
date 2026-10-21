@@ -29,3 +29,26 @@
     ```dart
     Env.get<String>('APP_KEY')
     ```
+=== "Bool"
+
+    ```dart
+    Env.get<bool>('SOCKETIO_ENABLED', false) // true, 1, yes, on
+    ```
+
+=== "Nullable"
+
+    ```dart
+    Env.get<String?>('AWS_BUCKET') // null when it is not set
+    ```
+
+## Missing values
+
+A missing or empty key gives the default. With no default:
+
+- `String` gives an empty string `''`. It is never the text `"null"`.
+- `String?` and `dynamic` give `null`.
+- `int`, `num`, `double` and `bool` throw an `ArgumentError` with the key name. A value that is not a number throws too.
+
+!!! warning "APP_KEY"
+    When `APP_KEY` is empty and `APP_ENV=production`, `Dox().startServer()` stops with an error.
+    In other environments it logs a warning. Make a key with `dox key:generate`.

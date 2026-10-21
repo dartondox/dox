@@ -9,6 +9,7 @@ import 'package:dox/src/tools/create_request.dart';
 import 'package:dox/src/tools/create_serializer.dart';
 import 'package:dox/src/tools/generate_key.dart';
 import 'package:dox/src/tools/help.dart';
+import 'package:dox/src/tools/openapi_generate.dart';
 import 'package:dox/src/tools/server_serve.dart';
 import 'package:dox/src/tools/update_dox.dart';
 import 'package:dox/src/utils/utils.dart';
@@ -227,6 +228,18 @@ class CommandRegistry {
       category: CommandCategory.generation,
       function: (args) async {
         generateKey();
+      },
+    ),
+
+    // OpenAPI
+    CommandDefinition(
+      command: 'openapi:generate',
+      helpInfo: 'openapi:generate [dir]',
+      description: 'Write openapi.json and openapi.yaml (runs bin/openapi.dart, default dir storage/openapi)',
+      category: CommandCategory.generation,
+      maxArgs: 1,
+      function: (args) async {
+        await openApiGenerate(args);
       },
     ),
 

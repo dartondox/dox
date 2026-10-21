@@ -3,11 +3,12 @@
 `dox_validation` checks data with typed schemas, like [Zod](https://zod.dev).
 You describe the shape once. You get typed output, all errors at once, and a JSON Schema for free.
 
-!!! tip "Which one should I use?"
-    - Simple form checks with rule strings (`'required|email'`): use [`req.validate()`](../the-basic/validation.md). It is built into `dox_core`.
-    - Typed output, nested objects, custom rules or OpenAPI docs: use `dox_validation` (this page).
+!!! tip "Built into Dox"
+    `dox_core` uses `dox_validation` for `req.validate()`, and it exports it.
+    In a Dox app you do not add or import anything: `import 'package:dox_core/dox_core.dart'` gives `v`, `Schema` and the rest.
+    See [Validation](../the-basic/validation.md) for `req.validate()`, `validateAsync()`, `validateSchema()` and the `unique` / `exists` rules.
 
-## Install
+## Install (outside Dox)
 
 ```bash
 dart pub add dox_validation
@@ -43,20 +44,19 @@ if (!result.success) {
 ```dart
 class UserController {
   Future<dynamic> store(DoxRequest req) async {
-    ParseResult<Map<String, dynamic>> result = createUser.safeParse(req.all());
-    if (!result.success) {
-      return response(<String, dynamic>{'errors': result.errors}).statusCode(422);
-    }
-    Map<String, dynamic> data = result.value!;
+    // 422 with {field: message} when it fails
+    Map<String, dynamic> data = await req.validateSchema(createUser);
     // ... save data
   }
 }
 ```
 
+Or in a [form request](../the-basic/request.md#schema): return the schema from `schema()`.
+A `schema.parse()` that throws inside a controller also answers `422`.
+
 !!! note
-    `dox_core` and `dox_validation` both have a class called `ValidationException`.
-    If you import both packages in one file, hide one of them:
-    `import 'package:dox_validation/dox_validation.dart' hide ValidationException;`
+    `dox_core` exports `dox_validation` without its `ValidationException`, because `dox_core` has its own
+    (the HTTP 422 one). `dox_orm` also has a `Schema` class. In a file that uses both, import `dox_orm` with a prefix.
 
 ## Schemas
 

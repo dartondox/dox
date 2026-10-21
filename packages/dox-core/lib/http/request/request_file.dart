@@ -14,7 +14,7 @@ final Uuid uuid = Uuid();
 /// to a temp file while the request is read, so a big upload does not
 /// fill the RAM. The temp file is deleted when the response is done, so
 /// call [store] or [moveTo] before you return from the controller.
-class RequestFile {
+class RequestFile implements FileInput {
   final String filename;
   final String filetype;
 
@@ -38,6 +38,7 @@ class RequestFile {
 
   /// Get file extension
   /// eg. png, jpeg, pdf
+  @override
   String get extension =>
       path.extension(filename).toLowerCase().replaceFirst('.', '');
 

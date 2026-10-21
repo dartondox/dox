@@ -4,6 +4,27 @@ abstract class FormRequest {
   /// run on initial
   dynamic setUp() {}
 
+  /// a `dox_validation` schema for the request body.
+  /// when it is not null it is used instead of [rules],
+  /// and the typed output is in [validated].
+  /// build it once (eg. a `static final` field), it runs on every request.
+  /// it also gives the request body for the OpenAPI docs.
+  /// ```
+  /// static final ObjectSchema _schema = v.object(<String, Schema<Object?>>{
+  ///   'title': v.string().min(3),
+  /// });
+  ///
+  /// @override
+  /// ObjectSchema? schema() => _schema;
+  /// ```
+  ObjectSchema? schema() {
+    return null;
+  }
+
+  /// the validated data (from [schema] or [rules]),
+  /// set before [setUp] runs.
+  Map<String, dynamic> validated = <String, dynamic>{};
+
   /// set validation rules
   Map<String, String> rules() {
     return <String, String>{};
