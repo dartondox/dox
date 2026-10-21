@@ -45,7 +45,51 @@ const socket = io('http://localhost:3001');
 socket.emit('chat', 'hi', (answer) => console.log(answer)); // 'ok'
 ```
 
-## Where to run it
+## In a Dox app: same port as HTTP
+
+`dox_core` can serve Socket.IO at `/socket.io/` on the app port. It is off by default.
+
+```dart
+// config/socketio.dart
+SocketIoConfig socketIo = SocketIoConfig(
+  enabled: Env.get<bool>('SOCKETIO_ENABLED', false),
+  namespaces: <NamespaceHandler>[ChatNamespace()],
+  adapter: const RedisSocketAdapterFactory(), // shares broadcasts between isolates
+);
+
+/// makes the Redis adapter inside each isolate
+class RedisSocketAdapterFactory extends SocketAdapterFactory {
+  const RedisSocketAdapterFactory();
+
+  @override
+  Adapter create() {
+    return RedisAdapter(subscriber: redis.duplicate(), publisher: redis);
+  }
+}
+
+AppConfig(socketIo: socketIo, ...);
+```
+
+- Requests to `/socket.io/` go to Socket.IO before the router. Middleware and body reading are skipped.
+- When it is off, there is no extra work per request.
+- `Dox().socketIo` is the server of this isolate: `Dox().socketIo?.to('room').emit('news', data)`.
+- `dox_websocket` (`Route.websocket`) still works next to it.
+
+!!! warning "Many isolates"
+    Dox runs one isolate per CPU core, and each isolate has its own Socket.IO server.
+
+    - Clients should connect with **websocket only**. One websocket stays on one isolate.
+      With the Redis adapter, a broadcast reaches clients on every isolate.
+    - HTTP long-polling sends many requests, and they can reach different isolates. It only works
+      with `totalIsolate: 1`, or with sticky sessions in front of many single-isolate servers.
+
+    ```js
+    const socket = io('http://localhost:3000/chat', { transports: ['websocket'] });
+    ```
+
+    Dox logs this hint at startup when it runs many isolates and polling is allowed.
+
+## Where to run it (outside Dox)
 
 `io.listen(port)` opens its own port. Run it in its own small program, for example `bin/socket.dart`,
 next to the Dox HTTP server. Put both behind the same proxy.

@@ -60,6 +60,36 @@ Routes can be found in `lib/routes` folder. And `api.dart` is with prefix `/api`
     }
     ```
 
+## Catch-all param
+
+`{name*}` matches the rest of the path, with slashes.
+
+```dart
+Route.get('/docs/{page*}', (DoxRequest req, String page) {
+    return page; // GET /docs/a/b/c gives 'a/b/c'
+});
+```
+
+## Serve storage files
+
+`Route.files(path)` serves files of a storage disk at `GET <path>/{key*}`. By default only signed URLs work.
+See [File Storage](../digging-deeper/file-storage.md#serve-local-signed-urls).
+
+```dart
+Route.files('files');
+Route.files('public', disk: 'local', signed: false);
+```
+
+## Request body for the docs
+
+`post`, `put` and `patch` take a `body:` schema. It shows in the [OpenAPI docs](../packages/openapi.md). It does not validate.
+
+```dart
+Route.post('/posts', controller.store, body: v.object(<String, Schema<Object?>>{
+    'title': v.string().min(3),
+}));
+```
+
 ## Group Routes
 
 === "Prefix"

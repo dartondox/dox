@@ -1,4 +1,3 @@
-import 'package:dox_core/cache/drivers/file/file_cache_driver.dart';
 import 'package:dox_core/dox_core.dart';
 
 import 'router.dart';
@@ -34,6 +33,10 @@ AppConfig appConfig = AppConfig(
 
   /// cache driver configuration
   cache: CacheConfig(
-    drivers: <String, CacheDriverInterface>{'file': FileCacheDriver()},
+    defaultStore: 'file',
+    stores: <String, Map<String, dynamic>>{
+      'file': <String, dynamic>{'driver': 'file', 'path': 'storage/cache'},
+      'memory': <String, dynamic>{'driver': 'memory'},
+    },
   ),
 );

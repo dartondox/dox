@@ -5,7 +5,6 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/request/http_request_body.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/aes_encryptor.dart';
-import 'package:dox_core/validation/dox_validator.dart';
 
 class DoxRequest implements IDoxRequest {
   final RouteData route;
@@ -239,25 +238,45 @@ class DoxRequest implements IDoxRequest {
     return header(HttpHeaders.refererHeader);
   }
 
-  /// validate input request
+  /// validate input request with string rules.
+  /// returns the validated fields (only the fields that have rules).
+  /// throws `ValidationException` (422) when the data is not valid.
   /// ```
   /// req.validate({'title': 'required'});
   /// req.validate({'title': 'required'},
   ///   messages : {'required' : 'The {field} is required'});
   /// ```
+  /// rules that need the database (`unique`, `exists`) are async,
+  /// use [validateAsync] for them.
   @override
-  void validate(
+  Map<String, dynamic> validate(
     Map<String, String> rules, {
     Map<String, String> messages = const <String, String>{},
   }) {
-    DoxValidator validator = DoxValidator(all());
-    if (messages.isNotEmpty) {
-      validator.setMessages(messages);
-    }
-    validator.validate(rules);
-    if (validator.hasError) {
-      throw ValidationException(message: validator.errors);
-    }
+    return Dox().validator.validate(all(), rules, messages: messages);
+  }
+
+  /// same as [validate], and also runs async rules like `unique:users,email`
+  /// ```
+  /// await req.validateAsync({'email': 'required|email|unique:users,email'});
+  /// ```
+  Future<Map<String, dynamic>> validateAsync(
+    Map<String, String> rules, {
+    Map<String, String> messages = const <String, String>{},
+  }) {
+    return Dox().validator.validateAsync(all(), rules, messages: messages);
+  }
+
+  /// validate the request with a `dox_validation` schema and
+  /// return its typed output. Async rules work too.
+  /// ```
+  /// Map<String, dynamic> data = await req.validateSchema(v.object({
+  ///   'email': v.string().email(),
+  ///   'age': v.coerce.int().min(18),
+  /// }));
+  /// ```
+  Future<O> validateSchema<O>(Schema<O> schema) {
+    return Dox().validator.validateSchema(schema, all());
   }
 
   void _getCookies() {

@@ -1,7 +1,8 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/storage/local_storage_driver.dart';
+import 'package:dox_storage/dox_storage.dart';
 import 'package:mime/mime.dart';
 
 class StreamFile {
@@ -31,14 +32,21 @@ class DownloadableFile {
   }
 }
 
+/// Storage facade on top of `dox_storage`.
+///
+/// Disks come from `AppConfig.storage`. Files are read as streams, so a
+/// big file is never loaded into memory to send it.
+/// ```
+/// String path = await Storage().put('images', bytes, extension: 'png');
+/// return Storage().disk('s3').download(path);
+/// Disk s3 = Storage().use('s3'); // full dox_storage API
+/// ```
 class Storage {
-  String? _disk;
+  /// [manager] is the `dox_storage` DriveManager. Default is `Dox().storage`.
+  Storage({this._manager});
 
-  Map<String, StorageDriverInterface> storageDriver =
-      <String, StorageDriverInterface>{
-        'local': LocalStorageDriver(),
-        ...Dox().config.fileStorage.drivers,
-      };
+  final DriveManager? _manager;
+  String? _disk;
 
   /// set the disk name
   /// ```
@@ -49,149 +57,140 @@ class Storage {
     return this;
   }
 
-  StorageDriverInterface get _driver {
-    return storageDriver[_disk] ??
-        storageDriver[Dox().config.fileStorage.defaultDriver] ??
-        LocalStorageDriver();
+  /// The `dox_storage` disk, for the full API (copy, move, list, ...).
+  Disk use([String? name]) {
+    return (_manager ?? Dox().storage).use(name ?? _disk);
   }
 
-  /// store the request file into storage
+  /// store the request file into storage, with a new uuid file name.
+  /// a temp file on the local disk is moved, not read into memory.
   /// ```
   /// RequestFile file = req.input('avatar');
-  /// Storage().putRequestFile('images/avatar', file);
+  /// String path = await Storage().putRequestFile('images/avatar', file);
   /// ```
   Future<String> putRequestFile(String folder, RequestFile requestFile) async {
-    StorageDriverInterface driver = _driver;
     String? extension = requestFile.extension.isEmpty
-        ? null
+        ? await _sniff(requestFile.stream())
         : requestFile.extension;
-
-    /// local disk: move the temp file, do not load it into memory
-    if (driver is LocalStorageDriver) {
-      return driver.putRequestFile(folder, requestFile, extension: extension);
+    String key = _newKey(folder, extension);
+    Disk target = use();
+    DriverContract driver = target.driver;
+    if (driver is LocalDriver) {
+      await requestFile.moveTo(driver.pathFor(target.normalizer.key(key)));
+    } else {
+      await target.putStream(key, requestFile.stream());
     }
-    return driver.put(folder, await requestFile.bytes, extension: extension);
+    return '/$key';
   }
 
-  /// store file with bytes into storage
+  /// store bytes with a new uuid file name and return its path.
+  /// the extension is guessed from the bytes when not given.
   /// ```
-  /// RequestFile file = req.input('avatar');
-  /// Storage().put(
-  ///   'images/avatar',
-  ///   await file.bytes,
-  ///   fileExtension: file.fileExtension, /// this is optional
-  /// );
+  /// String path = await Storage().put('images', bytes, extension: 'png');
   /// ```
   Future<String> put(
     String folder,
     List<int> bytes, {
     String? extension,
   }) async {
-    return _driver.put(folder, bytes, extension: extension);
+    extension ??= lookupMimeType('', headerBytes: bytes)?.split('/').last;
+    String key = _newKey(folder, extension);
+    await use().put(key, bytes);
+    return '/$key';
   }
 
-  /// get stored file into bytes
-  /// ```
-  /// Storage().get('images/avatar/sample.jpeg');
-  /// ```
-  Future<List<int>?> get(String filename) async {
-    return _driver.get(filename);
+  /// get stored file as bytes, or null when it does not exist.
+  /// prefer [stream] or [download] to send a file.
+  Future<Uint8List?> get(String filename) async {
+    try {
+      return await use().get(_key(filename));
+    } on FileNotFoundException {
+      return null;
+    }
   }
 
   /// check the file exists in storage
-  /// ```
-  /// Storage().exists('images/avatar/sample.jpeg');
-  /// ```
-  Future<bool> exists(String filename) async {
-    return _driver.exists(filename);
+  Future<bool> exists(String filename) {
+    return use().exists(_key(filename));
   }
 
-  /// delete file from storage
-  /// ```
-  /// Storage().exists('images/avatar/sample.jpeg');
-  ///```
-  Future<dynamic> delete(String filename) async {
-    return _driver.delete(filename);
+  /// delete file from storage. a missing file is not an error.
+  Future<void> delete(String filename) {
+    return use().delete(_key(filename));
   }
 
-  /// return the file as downloadable/stream file
+  /// public URL of a file (needs `url` in the disk config)
+  Future<String> url(String filename) {
+    return use().getUrl(_key(filename));
+  }
+
+  /// a URL that works for [expiresIn]. For the local disk, serve it with
+  /// `Route.files('files')` and set the disk `url` to that path.
+  Future<String> signedUrl(
+    String filename, {
+    Duration expiresIn = const Duration(minutes: 30),
+  }) {
+    return use().getSignedUrl(
+      _key(filename),
+      options: SignedUrlOptions(expiresIn: expiresIn),
+    );
+  }
+
+  /// return the file as a stream, from any disk.
   /// ```
-  /// StreamFile file = Storage().stream('images/avatar/sample.jpeg');
-  /// return file;
-  /// ```
-  /// or
-  /// ```
-  /// StreamFile file = Storage().stream('images/avatar/sample.jpeg');
-  /// return response(file);
+  /// return await Storage().stream('images/avatar/sample.jpeg');
   /// ```
   Future<StreamFile> stream(String filename) async {
-    StorageDriverInterface driver = _driver;
-    if (driver is LocalStorageDriver) {
-      return _streamLocal(driver.file(filename));
-    }
-
-    List<int>? image = await get(filename);
-    if (image == null) {
+    String key = _key(filename);
+    Disk target = use();
+    try {
+      ObjectMetaData meta = await target.getMetaData(key);
+      return StreamFile(
+        ContentType.parse(meta.contentType),
+        await target.getStream(key),
+        length: meta.size,
+      );
+    } on FileNotFoundException {
       throw NotFoundHttpException(message: 'file not found');
     }
-
-    String? mimeType = lookupMimeType(filename, headerBytes: image);
-
-    if (mimeType == null) {
-      throw NotFoundHttpException(message: 'invalid file');
-    }
-
-    String primaryType = mimeType.split('/').first;
-    String subType = mimeType.split('/').last;
-
-    ContentType contentType = ContentType(primaryType, subType);
-    Stream<List<int>> stream = Stream<List<int>>.fromIterable(<List<int>>[
-      image,
-    ]);
-    return StreamFile(contentType, stream);
   }
 
-  /// return the file as downloadable/stream file
+  /// return the file as a download (Content-Disposition: attachment).
   /// ```
-  /// DownloadableFile file = Storage().download('images/avatar/sample.jpeg');
-  /// return file;
-  /// ```
-  /// or
-  /// ```
-  /// DownloadableFile file = Storage().download('images/avatar/sample.jpeg');
-  /// return response(file);
+  /// return await Storage().download('images/avatar/sample.jpeg');
   /// ```
   Future<DownloadableFile> download(String filename) async {
-    StreamFile streamFile = await stream(filename);
-    String name = filename.split('/').last;
+    StreamFile file = await stream(filename);
     return DownloadableFile(
-      streamFile.contentType,
-      streamFile.stream,
-      name,
-      length: streamFile.length,
+      file.contentType,
+      file.stream,
+      filename.split('/').last,
+      length: file.length,
     );
   }
 
-  /// stream a local file from disk instead of reading it all into memory
-  Future<StreamFile> _streamLocal(File file) async {
-    if (!await file.exists()) {
-      throw NotFoundHttpException(message: 'file not found');
+  /// old paths start with `/`. dox_storage keys do not.
+  String _key(String filename) {
+    int start = 0;
+    while (start < filename.length && filename.codeUnitAt(start) == 47) {
+      start++;
     }
+    return filename.substring(start);
+  }
+
+  String _newKey(String folder, String? extension) {
+    if (extension == null) throw ArgumentError('invalid file');
+    String dir = _key(folder);
+    String name = '${uuid.v1()}.$extension';
+    return dir.isEmpty ? name : '$dir/$name';
+  }
+
+  Future<String?> _sniff(Stream<List<int>> stream) async {
     List<int> head = <int>[];
-    await for (List<int> chunk in file.openRead(
-      0,
-      defaultMagicNumbersMaxLength,
-    )) {
+    await for (List<int> chunk in stream) {
       head.addAll(chunk);
+      if (head.length >= defaultMagicNumbersMaxLength) break;
     }
-    String? mimeType = lookupMimeType(file.path, headerBytes: head);
-    if (mimeType == null) {
-      throw NotFoundHttpException(message: 'invalid file');
-    }
-    return StreamFile(
-      ContentType.parse(mimeType),
-      file.openRead(),
-      length: await file.length(),
-    );
+    return lookupMimeType('', headerBytes: head)?.split('/').last;
   }
 }

@@ -561,13 +561,13 @@ void main() {
       );
     });
 
-    test('null without nullable runs rules', () {
+    test('null without nullable skips rules (old dox behavior)', () {
       expect(
         check(
           <String, dynamic>{'age': null},
           <String, String>{'age': 'integer'},
-        ).keys,
-        <String>['age'],
+        ),
+        isEmpty,
       );
     });
 

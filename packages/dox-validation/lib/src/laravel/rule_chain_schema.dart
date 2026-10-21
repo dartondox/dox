@@ -109,13 +109,10 @@ class RuleChainSchema extends Schema<Object?> {
     return !_skipOthers(input);
   }
 
-  /// Missing, `null` with `nullable`, or empty text: skip normal rules.
+  /// Missing, `null` or empty text: skip normal rules (old dox behavior).
   bool _skipOthers(Object? input) {
-    if (input is Undefined) {
+    if (input is Undefined || input == null) {
       return true;
-    }
-    if (input == null) {
-      return allowNull;
     }
     return input is String && input.trim().isEmpty;
   }

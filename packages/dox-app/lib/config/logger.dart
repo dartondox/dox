@@ -4,7 +4,7 @@ LoggerConfig logger = LoggerConfig(
   /// Application name
   /// -------------------------------
   /// The name of the application you want to add to the log.
-  name: Env.get('APP_NAME'),
+  name: Env.get('APP_NAME', 'dox'),
 
   /// Toggle logger
   /// -------------------------------

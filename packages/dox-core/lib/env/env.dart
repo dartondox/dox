@@ -19,28 +19,60 @@ class Env {
 
   /// get env value
   /// ```
-  /// Evn.get('APP_KEY');
-  /// Evn.get('APP_KEY', 'with_default_value_if_null');
-  /// Evn.get<int>('PORT', 3000); (This will return int type)
-  /// Evn.get<num>('PORT', 3000); (This will return num type)
-  /// Evn.get<String>('APP_KEY'); (This will return String type)
-  /// Currently this function support String, int and num types.
+  /// Env.get('APP_KEY');
+  /// Env.get('APP_KEY', 'with_default_value_if_null');
+  /// Env.get<int>('PORT', 3000); (This will return int type)
+  /// Env.get<num>('PORT', 3000); (This will return num type)
+  /// Env.get<bool>('DEBUG', false); (true/1/yes/on is true)
+  /// Env.get<String?>('APP_NAME'); (null when it is not set)
+  /// ```
+  /// A missing or empty key gives the default. With no default:
+  /// - a nullable type (`String?`, `dynamic`) gives `null`
+  /// - `String` gives an empty string, never the text "null"
+  /// - `int`, `num`, `double` and `bool` throw an [ArgumentError]
   ///
   /// A real environment variable wins over the `.env` file, so a docker
   /// or systemd deploy can pass config without a `.env` file.
-  /// ```
   static T get<T>(String key, [dynamic defaultValue]) {
-    String value = (Platform.environment[key] ?? Env().env[key]).toString();
-    String val = value.isEmpty || value.toLowerCase() == 'null'
-        ? defaultValue.toString()
-        : value;
-    if (T.toString() == 'int') {
-      return int.parse(val) as T;
+    String? value = Platform.environment[key] ?? Env().env[key];
+    if (value == null || value.isEmpty || value.toLowerCase() == 'null') {
+      if (defaultValue == null) return _missing<T>(key);
+      if (defaultValue is T) return defaultValue;
+      value = defaultValue.toString();
     }
-    if (T.toString() == 'num') {
-      return num.parse(val) as T;
+    return _cast<T>(key, value);
+  }
+
+  static T _missing<T>(String key) {
+    if (null is T) return null as T;
+    if (<T>[] is List<String>) return '' as T;
+    throw ArgumentError('Env key "$key" is not set and has no default');
+  }
+
+  static T _cast<T>(String key, String value) {
+    if (<T>[] is List<String>) return value as T;
+    String type = T.toString().replaceAll('?', '');
+    Object? result = switch (type) {
+      'int' => int.tryParse(value),
+      'double' => double.tryParse(value),
+      'num' => num.tryParse(value),
+      'bool' => _bool(value),
+      _ => value,
+    };
+    if (result == null) {
+      throw ArgumentError('Env key "$key" is not a valid $type: "$value"');
     }
-    return val as T;
+    return result as T;
+  }
+
+  static bool? _bool(String value) {
+    switch (value.toLowerCase()) {
+      case 'true' || '1' || 'yes' || 'on':
+        return true;
+      case 'false' || '0' || 'no' || 'off':
+        return false;
+    }
+    return null;
   }
 
   /// load env from .env of project directory

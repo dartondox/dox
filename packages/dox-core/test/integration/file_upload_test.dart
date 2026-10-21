@@ -45,7 +45,7 @@ void main() {
 
       /// stream image
       Route.get('/image/download', (DoxRequest req) async {
-        return await Storage().disk('file').download(req.input('image'));
+        return await Storage().disk('local').download(req.input('image'));
       });
 
       /// stream image

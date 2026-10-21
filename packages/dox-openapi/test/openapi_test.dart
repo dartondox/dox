@@ -16,6 +16,20 @@ class FakeRoute {
   FakeRoute(this.method, this.path, this.controllers);
 }
 
+/// Same shape as the new dox_core RouteData, with preMiddleware and body.
+class FullRoute extends FakeRoute {
+  final List<dynamic> preMiddleware;
+  final Object? body;
+
+  FullRoute(
+    super.method,
+    super.path,
+    super.controllers, {
+    this.preMiddleware = const <dynamic>[],
+    this.body,
+  });
+}
+
 class AuthMiddleware {}
 
 class LogMiddleware {}
@@ -217,6 +231,26 @@ void main() {
       );
       expect(adapter.middlewareNames(null), isEmpty);
       expect(adapter.middlewareNames(handler), isEmpty);
+    });
+
+    test('reads preMiddleware and body when the route has them', () {
+      AuthMiddleware auth = AuthMiddleware();
+      ApiDoc docs = ApiDoc();
+      const DoxRouteAdapter().addTo(docs, <Object>[
+        FullRoute(
+          'POST',
+          '/posts',
+          <dynamic>[auth, LogMiddleware(), handler],
+          preMiddleware: <dynamic>[auth],
+          body: <String, dynamic>{'type': 'object'},
+        ),
+      ]);
+      RouteDoc doc = docs.routes.first;
+      expect(doc.extensions['x-dox-middleware'], <String>[
+        'AuthMiddleware',
+        'LogMiddleware',
+      ]);
+      expect(doc.body, <String, dynamic>{'type': 'object'});
     });
   });
 

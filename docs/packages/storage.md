@@ -3,9 +3,11 @@
 `dox_storage` gives one API for files on many places: local disk, AWS S3 and S3-compatible services.
 The API follows [FlyDrive](https://flydrive.dev) and Laravel Filesystem.
 
-!!! tip "Which one should I use?"
-    - Save uploads to the local `storage` folder: the built-in [`Storage()`](../digging-deeper/file-storage.md) in `dox_core` is enough.
-    - S3, R2, MinIO, signed URLs or many disks: use `dox_storage` (this page).
+!!! tip "Built into Dox"
+    `dox_core` uses `dox_storage` for [`Storage()`](../digging-deeper/file-storage.md).
+    In a Dox app, set the disks in `config/storage.dart` (a `StorageConfig`), and use `Storage()`.
+    `Storage().use('s3')` gives the `Disk` of this page. `Route.files('files')` serves local signed URLs.
+    This page is for the full `Disk` API and for using `dox_storage` outside Dox.
 
 ## Install
 
@@ -102,6 +104,8 @@ String upload = await disk.getSignedUploadUrl('avatars/2.png',
 - Set `urlBase` to serve public files from a CDN.
 
 ### Check a local signed URL
+
+In a Dox app, `Route.files('files')` does this for you.
 
 `LocalDriver.getSignedUrl` returns `<urlBase>/<key>?expires=...&signature=...`.
 Check it in the route that serves the file:

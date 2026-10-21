@@ -5,8 +5,15 @@ class RouteData {
   String path;
   final dynamic controllers;
   Map<String, dynamic> params = <String, dynamic>{};
+
+  /// middleware from groups and routers (`Route.middleware`, global
+  /// middleware). they are also the first items of [controllers].
   final List<dynamic> preMiddleware;
   FormRequest Function()? formRequest;
+
+  /// request body schema for the OpenAPI docs, from the `body:` option.
+  /// any object with `toJsonSchema()`, like a `dox_validation` schema.
+  Object? body;
 
   final String? domain;
   final bool? corsEnabled;
@@ -18,6 +25,7 @@ class RouteData {
     this.corsEnabled,
     this.preMiddleware = const <dynamic>[],
     this.domain,
+    this.body,
   });
 
   /// regex for a route with params like `/blog/{id}`, built once.
@@ -27,7 +35,8 @@ class RouteData {
     return _pattern;
   }
 
-  /// names of the params, eg. `['id']` for `/blog/{id}`
+  /// names of the params, eg. `['id']` for `/blog/{id}`.
+  /// `{path*}` matches the rest of the url, slashes too.
   List<String> get paramNames {
     _compile();
     return _paramNames;
@@ -43,13 +52,17 @@ class RouteData {
     _paramNames = <String>[
       for (String part in path.split('/'))
         if (part.startsWith('{') && part.endsWith('}'))
-          part.substring(1, part.length - 1),
+          part.substring(1, part.length - 1).replaceAll('*', ''),
     ];
     _pattern = _paramNames.isEmpty
         ? null
         : RegExp(
-            '^${path.replaceAllMapped(RegExp(r'{[^/]+}'), (Match match) => '([^/]+)').replaceAll('/', '\\/')}\$',
+            '^${path.replaceAllMapped(RegExp(r'{[^/]+}'), _paramPattern).replaceAll('/', '\\/')}\$',
           );
+  }
+
+  static String _paramPattern(Match match) {
+    return match[0]!.endsWith('*}') ? '(.+)' : '([^/]+)';
   }
 
   /// a copy for one request, with its own params.
@@ -63,6 +76,7 @@ class RouteData {
         corsEnabled: corsEnabled,
         preMiddleware: preMiddleware,
         domain: domain,
+        body: body,
       )
       ..params = values
       ..formRequest = formRequest

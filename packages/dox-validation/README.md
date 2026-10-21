@@ -185,9 +185,9 @@ rules.parse(request.all());
 
 How it works:
 
-- A missing field that is not `required` skips all its other rules.
+- A missing or `null` field that is not `required` skips all its other rules.
 - Empty text that is not `required` also skips other rules.
-- `nullable`: `null` is fine.
+- `nullable`: `null` is fine. It also marks the field as nullable in JSON Schema.
 - `sometimes`: skip everything when the field is missing, even `required`.
 - Each field stops at its first failed rule, so there is one message per field.
 - Dotted keys make nested objects. `*` makes a list.

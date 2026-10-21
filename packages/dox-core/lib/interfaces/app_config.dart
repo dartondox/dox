@@ -21,8 +21,18 @@ class AppConfig {
   final List<dynamic> globalMiddleware;
   final List<Router> routers;
   final CORSConfig cors;
+
+  /// cache stores for `Cache()`, see `dox_cache`
   final CacheConfig cache;
-  final FileStorageConfig fileStorage;
+
+  /// storage disks for `Storage()`, see `dox_storage`
+  final StorageConfig storage;
+
+  /// `/docs`, `/openapi.json` and `/openapi.yaml`, see `dox_openapi`
+  final OpenApiConfig openApi;
+
+  /// Socket.IO on the http port, see `dox_socketio`. Off by default.
+  final SocketIoConfig socketIo;
   final LoggerConfig logger;
   final List<DoxService> services;
 
@@ -57,8 +67,16 @@ class AppConfig {
     this.routers = const <Router>[],
     this.cors = const CORSConfig(),
     this.logger = const LoggerConfig(),
-    this.cache = const CacheConfig(),
-    this.fileStorage = const FileStorageConfig(),
+    this.cache = const CacheConfig(
+      defaultStore: 'file',
+      stores: <String, Map<String, dynamic>>{
+        'file': <String, dynamic>{'driver': 'file', 'path': 'storage/cache'},
+        'memory': <String, dynamic>{'driver': 'memory'},
+      },
+    ),
+    this.storage = const StorageConfig(),
+    this.openApi = const OpenApiConfig(),
+    this.socketIo = const SocketIoConfig(),
     this.errorHandler = defaultErrorHandler,
     this.responseHandler,
     this.maxBodySize = 10 * 1024 * 1024,
@@ -99,25 +117,5 @@ class LoggerConfig {
     this.enabled = false,
     this.prettyPrint = false,
     this.level = 'info',
-  });
-}
-
-class CacheConfig {
-  final String defaultDriver;
-  final Map<String, CacheDriverInterface> drivers;
-
-  const CacheConfig({
-    this.defaultDriver = 'file',
-    this.drivers = const <String, CacheDriverInterface>{},
-  });
-}
-
-class FileStorageConfig {
-  final String defaultDriver;
-  final Map<String, StorageDriverInterface> drivers;
-
-  const FileStorageConfig({
-    this.defaultDriver = 'local',
-    this.drivers = const <String, StorageDriverInterface>{},
   });
 }

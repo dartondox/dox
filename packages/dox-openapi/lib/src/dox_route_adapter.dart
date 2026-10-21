@@ -10,6 +10,10 @@ import 'route_doc.dart';
 /// DoxRouteAdapter().addTo(docs, Route().routes);
 /// ```
 ///
+/// When a route has `preMiddleware` (dox_core sets it), middleware names
+/// come from it and from the inline middleware before the handler.
+/// When a route has `body` (a schema), it becomes the request body.
+///
 /// Routes that already have docs are kept as they are. Methods that
 /// OpenAPI does not support (for example `PURGE`) are skipped.
 class DoxRouteAdapter {
@@ -34,12 +38,16 @@ class DoxRouteAdapter {
       if (!PathConverter.isSupportedMethod(method) || docs.has(method, path)) {
         continue;
       }
-      List<String> middleware = middlewareNames(r.controllers);
+      List<String> middleware = middlewareNames(
+        r.controllers,
+        preMiddleware: _read(() => r.preMiddleware),
+      );
       docs.add(
         RouteDoc(
           method: method,
           path: path,
           summary: '${method.toUpperCase()} ${PathConverter.path(path)}',
+          body: _read(() => r.body),
           security: _security(middleware),
           extensions: middleware.isEmpty
               ? const <String, dynamic>{}
@@ -53,18 +61,37 @@ class DoxRouteAdapter {
 
   /// Returns class names of the middleware in [controllers].
   /// The last item is the handler, and plain functions have no useful name,
-  /// so both are left out.
-  List<String> middlewareNames(Object? controllers) {
+  /// so both are left out. [preMiddleware] are the group middleware that
+  /// dox_core puts first in [controllers].
+  List<String> middlewareNames(Object? controllers, {Object? preMiddleware}) {
     if (controllers is! List || controllers.isEmpty) {
       return <String>[];
     }
+    List<Object?> items = <Object?>[
+      if (preMiddleware is List) ...preMiddleware,
+      ...controllers.sublist(
+        preMiddleware is List && preMiddleware.length < controllers.length
+            ? preMiddleware.length
+            : 0,
+        controllers.length - 1,
+      ),
+    ];
     List<String> names = <String>[];
-    for (Object? item in controllers.sublist(0, controllers.length - 1)) {
+    for (Object? item in items) {
       if (item != null && item is! Function) {
         names.add(item.runtimeType.toString());
       }
     }
     return names;
+  }
+
+  /// Reads an optional field of a route object. Null when it has none.
+  Object? _read(Object? Function() getter) {
+    try {
+      return getter();
+    } on NoSuchMethodError {
+      return null;
+    }
   }
 
   List<Map<String, List<String>>>? _security(List<String> middleware) {

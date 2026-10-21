@@ -13,6 +13,7 @@ dependencies:
   mysql_dart: ^3.0.1
   sqlite3: ^3.7.1
   dox_annotation: ^3.0.0-alpha.1
+  dox_validation: ^3.0.0-alpha.1
   
 dev_dependencies:
   lints: ^6.1.0

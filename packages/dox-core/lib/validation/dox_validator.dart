@@ -1,24 +1,20 @@
-import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/utils/logger.dart';
-import 'package:dox_core/validation/nested_validation_visitor.dart';
-import 'package:dox_core/validation/validation_item.dart';
-import 'package:dox_core/validation/validation_rules.dart';
-import 'package:sprintf/sprintf.dart';
+import 'package:dox_validation/dox_validation.dart' hide ValidationException;
 
+/// Old dox validator API, kept for apps that use it directly.
+/// It runs on `dox_validation` (`v.fromRules()`), like `req.validate()`.
+///
+/// ```
+/// DoxValidator validator = DoxValidator(data);
+/// validator.validate({'email': 'required|email'});
+/// if (validator.hasError) print(validator.errors);
+/// ```
 class DoxValidator {
   /// request data
   final Map<String, dynamic> data;
 
-  /// internal constants
   final Map<String, String> _errors = <String, String>{};
-  List<String> get _methodNoNeedToSplitArguments => <String>['in'];
-
-  /// rules that still run when the field is missing, null or empty
-  List<String> get _implicitRules => <String>[
-    'required',
-    'required_if',
-    'required_if_not',
-  ];
+  final Map<String, String> _messages = <String, String>{};
+  Validator? _validator;
 
   DoxValidator(this.data);
 
@@ -30,34 +26,34 @@ class DoxValidator {
 
   /// add custom rule
   /// ```
-  /// validator.addCustomRule('unique', {
-  ///   message: 'The {value} already exist',
-  ///   fn: (Map<String, dynamic> data, dynamic value, String? arguments) {
-  ///     /// add your logic here
-  ///   }
-  /// });
+  /// validator.addCustomRule('even', message: 'The {field} must be even',
+  ///   fn: (Map<String, dynamic> data, dynamic value, String? args) {
+  ///     return value is int && value.isEven;
+  ///   });
   /// ```
   void addCustomRule(
     String ruleName, {
     required String message,
     required bool Function(Map<String, dynamic>, dynamic, String?) fn,
   }) {
-    _matchings[ruleName] = <String, dynamic>{
-      'message': message,
-      'function': fn,
-    };
+    Validator validator = _validator ??= Validator();
+    validator.registerRule(ruleName, (RuleDefinition definition) {
+      return _CustomRule(
+        ruleName,
+        message,
+        fn,
+        data,
+        definition.args.join(','),
+      );
+    });
   }
 
-  /// set custom validator messages
+  /// set custom validator messages by rule name
   /// ```
-  /// validator.setMessages({'required': 'The {field} is required});
+  /// validator.setMessages({'required': 'The {field} is required'});
   /// ```
   void setMessages(Map<String, String> messages) {
-    messages.forEach((String key, String value) {
-      if (_matchings[key] != null) {
-        _matchings[key]?['message'] = value;
-      }
-    });
+    _messages.addAll(messages);
   }
 
   /// validate your data
@@ -65,232 +61,44 @@ class DoxValidator {
   /// validator.validate({'field' : 'required|string'});
   /// ```
   void validate(Map<String, String> rules) {
-    rules.forEach((String field, String rule) {
-      if (_isNestedValidation(field)) {
-        NestedValidationVisitor v = NestedValidationVisitor(
-          data: data,
-          field: field,
-          rule: rule,
-        );
-        for (ValidationItem item in v.fieldsToValidate) {
-          _validateItem(item);
-        }
-      } else {
-        _validateItem(
-          ValidationItem(
-            field: field,
-            name: field.split('.').last,
-            value: data.getParam(field),
-            rule: rule,
-          ),
-        );
-      }
-    });
+    ObjectSchema schema = (_validator ?? v).fromRules(
+      rules,
+      messages: _messages,
+    );
+    ParseResult<Map<String, dynamic>> result = schema.safeParse(data);
+    _errors.addAll(result.errors);
   }
 
-  bool _isNestedValidation(String field) {
-    return field.contains('.*.');
-  }
-
-  void _validateItem(ValidationItem item) {
-    List<String> rulesForEachName = item.rule.split('|');
-    bool isEmpty =
-        item.value == null || (item.value is String && item.value.isEmpty);
-
-    /// `sometimes` only validates the field when it is sent
-    if (item.value == null && rulesForEachName.contains('sometimes')) return;
-
-    for (String rule in rulesForEachName) {
-      /// missing, null or empty field only runs required rules
-      String ruleKey = rule.split(':').first.toLowerCase();
-      if (isEmpty && !_implicitRules.contains(ruleKey)) continue;
-
-      String? error = _applyMatchingRule(
-        item.field,
-        item.name,
-        item.value,
-        rule,
-      );
-      if (error != null) {
-        _errors[item.field] = error;
-        break;
-      }
-    }
-  }
-
-  String? _applyMatchingRule(
-    String field,
-    String name,
-    dynamic value,
-    String rule,
-  ) {
-    List<String> parts = rule.split(':');
-    String ruleKey = parts.first.toString().toLowerCase();
-    String args = parts.length >= 2 ? parts[1] : '';
-    Map<String, dynamic>? match = _matchings[ruleKey];
-    if (match == null) {
-      Logger.warn("$ruleKey rule doesn't exist.");
-      return null;
-    }
-
-    bool result = Function.apply(match['function'], <dynamic>[
+  /// same as [validate], and also runs async rules like `unique`
+  Future<void> validateAsync(Map<String, String> rules) async {
+    ObjectSchema schema = (_validator ?? v).fromRules(
+      rules,
+      messages: _messages,
+    );
+    ParseResult<Map<String, dynamic>> result = await schema.safeParseAsync(
       data,
-      value,
-      args,
-    ]);
-    if (result == true) {
-      return null;
-    }
-    String error = match['message']
-        .toString()
-        .replaceAll('{field}', name)
-        .replaceAll('{value}', value == null ? '' : value.toString());
-
-    if (args.isNotEmpty) {
-      List<String> arguments = _methodNoNeedToSplitArguments.contains(ruleKey)
-          ? <String>[args.split(',').joinWithAnd()]
-          : args.split(',');
-      return sprintf(error, arguments);
-    }
-
-    return error;
+    );
+    _errors.addAll(result.errors);
   }
+}
 
-  final Map<String, Map<String, dynamic>>
-  _matchings = <String, Map<String, dynamic>>{
-    'required': <String, dynamic>{
-      'message': 'The {field} is required',
-      'function': Rules.isRequired,
-    },
-    'nullable': <String, dynamic>{'message': '', 'function': Rules.isNullable},
-    'sometimes': <String, dynamic>{'message': '', 'function': Rules.isNullable},
-    'email': <String, dynamic>{
-      'message': 'The {field} is not a valid email',
-      'function': Rules.isEmail,
-    },
-    'string': <String, dynamic>{
-      'message': 'The {field} must be a string',
-      'function': Rules.isString,
-    },
-    'numeric': <String, dynamic>{
-      'message': 'The {field} must be a number',
-      'function': Rules.isNumeric,
-    },
-    'ip': <String, dynamic>{
-      'message': 'The {field} must be an ip address',
-      'function': Rules.isIp,
-    },
-    'boolean': <String, dynamic>{
-      'message': 'The {field} must be a boolean',
-      'function': Rules.isBoolean,
-    },
-    'integer': <String, dynamic>{
-      'message': 'The {field} must be an integer',
-      'function': Rules.isInteger,
-    },
-    'double': <String, dynamic>{
-      'message': 'The {field} must be a double',
-      'function': Rules.isDouble,
-    },
-    'array': <String, dynamic>{
-      'message': 'The {field} must be an array',
-      'function': Rules.isArray,
-    },
-    'json': <String, dynamic>{
-      'message': 'The {field} is not a valid json',
-      'function': Rules.isJson,
-    },
-    'alpha': <String, dynamic>{
-      'message': 'The {field} must be an alphabetic',
-      'function': Rules.isAlpha,
-    },
-    'alpha_dash': <String, dynamic>{
-      'message': 'The {field} must be only alphabetic and dash',
-      'function': Rules.isAlphaDash,
-    },
-    'alpha_numeric': <String, dynamic>{
-      'message': 'The {field} must be only alphabetic and number',
-      'function': Rules.isAlphaNumeric,
-    },
-    'date': <String, dynamic>{
-      'message': 'The {field} must be a date',
-      'function': Rules.isDate,
-    },
-    'url': <String, dynamic>{
-      'message': 'The {field} must be a url',
-      'function': Rules.isUrl,
-    },
-    'uuid': <String, dynamic>{
-      'message': 'The {field} is invalid uuid',
-      'function': Rules.isUUID,
-    },
-    'min_length': <String, dynamic>{
-      'message': 'The {field} must be at least %s character',
-      'function': Rules.minLength,
-    },
-    'max_length': <String, dynamic>{
-      'message': 'The {field} may not be greater than %s character',
-      'function': Rules.maxLength,
-    },
-    'length_between': <String, dynamic>{
-      'message': 'The {field} must be between %s and %s character',
-      'function': Rules.lengthBetween,
-    },
-    'between': <String, dynamic>{
-      'message': 'The {field} must be between %s and %s',
-      'function': Rules.between,
-    },
-    'in': <String, dynamic>{
-      'message': 'The selected {field} is invalid. Valid options are %s',
-      'function': Rules.inArray,
-    },
-    'not_in': <String, dynamic>{
-      'message': 'The {field} field cannot be {value}',
-      'function': Rules.notInArray,
-    },
-    'start_with': <String, dynamic>{
-      'message': 'The {field} must start with %s',
-      'function': Rules.startWith,
-    },
-    'end_with': <String, dynamic>{
-      'message': 'The {field} must end with %s',
-      'function': Rules.endWith,
-    },
-    'greater_than': <String, dynamic>{
-      'message': 'The {field} must be greater than %s',
-      'function': Rules.greaterThan,
-    },
-    'less_than': <String, dynamic>{
-      'message': 'The {field} must be less than %s',
-      'function': Rules.lessThan,
-    },
-    'min': <String, dynamic>{
-      'message': 'The {field} must be greater than or equal %s',
-      'function': Rules.min,
-    },
-    'max': <String, dynamic>{
-      'message': 'The {field} must be less than or equal %s',
-      'function': Rules.max,
-    },
-    'confirmed': <String, dynamic>{
-      'message': 'The two password did not match',
-      'function': Rules.confirmed,
-    },
-    'required_if': <String, dynamic>{
-      'message': 'The {field} is required',
-      'function': Rules.requiredIf,
-    },
-    'required_if_not': <String, dynamic>{
-      'message': 'The {field} is required',
-      'function': Rules.requiredIfNot,
-    },
-    'image': <String, dynamic>{
-      'message': 'The {field} is either invalid or unsupported extension',
-      'function': Rules.isImage,
-    },
-    'file': <String, dynamic>{
-      'message': 'The {field} is either invalid or unsupported extension',
-      'function': Rules.isFile,
-    },
-  };
+class _CustomRule extends Rule<Object?> {
+  _CustomRule(this._name, this._message, this._fn, this._data, this._args);
+
+  final String _name;
+  final String _message;
+  final bool Function(Map<String, dynamic>, dynamic, String?) _fn;
+  final Map<String, dynamic> _data;
+  final String _args;
+
+  @override
+  String get name => _name;
+
+  @override
+  String get defaultMessage => _message;
+
+  @override
+  bool check(Object? value, RuleContext context) {
+    return _fn(_data, value, _args);
+  }
 }

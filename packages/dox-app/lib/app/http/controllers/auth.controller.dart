@@ -24,10 +24,16 @@ class AuthController {
   }
 
   Future<dynamic> register(DoxRequest req) async {
+    /// `unique` checks the database, so use validateAsync
+    Map<String, dynamic> data = await req.validateAsync(<String, String>{
+      'name': 'required|string',
+      'email': 'required|email|unique:users,email',
+      'password': 'required|min_length:8',
+    });
     User user = User();
-    user.name = 'AJ';
-    user.email = 'aj@mail.com';
-    user.password = Hash.make('password');
+    user.name = data['name'];
+    user.email = data['email'];
+    user.password = Hash.make(data['password']);
     await user.save();
     return user;
   }
