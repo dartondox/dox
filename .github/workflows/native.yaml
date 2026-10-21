@@ -93,6 +93,10 @@ jobs:
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$TAG" * --clobber --repo "$GITHUB_REPOSITORY"
           else
-            gh release create "$TAG" * --repo "$GITHUB_REPOSITORY" \
+            # never "latest": that stays the framework release.
+            # a version with "-" (like 3.0.0-alpha.2) is a prerelease.
+            pre=""
+            case "$TAG" in *-v*-*) pre="--prerelease" ;; esac
+            gh release create "$TAG" * --repo "$GITHUB_REPOSITORY" $pre --latest=false \
               --title "$TAG" --notes "Ready-built dox_http_native libraries. See SHA256SUMS."
           fi
