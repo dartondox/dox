@@ -42,8 +42,13 @@ melos:
     format_check:
       run: dart format --output=none --set-exit-if-changed .
 
+    # one package at a time: the packages share one .dart_tool, and build
+    # hooks (dox_http_native, sqlite3) that run at the same time can drop
+    # each other's native assets.
     test:
-      exec: dart test --concurrency=1
+      exec:
+        command: dart test --concurrency=1
+        concurrency: 1
       packageFilters:
         dirExists: test
         ignore:
