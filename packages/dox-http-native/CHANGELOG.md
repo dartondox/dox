@@ -1,4 +1,4 @@
-## 3.0.0-alpha.1
+## 3.0.0-alpha.2
 
 - First release.
 - Native HTTP/1.1 server: Rust (hyper, tokio) owns the sockets and parses

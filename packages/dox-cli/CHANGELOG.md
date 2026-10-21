@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.2
 
 - Fix: `dox build` no longer passes `--delete-conflicting-outputs` to build_runner (it was removed and printed a warning).
 - Needs Dart 3.13 or newer.

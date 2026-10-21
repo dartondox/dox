@@ -102,6 +102,6 @@ cd .. && dart test --concurrency=1
 ```
 
 To make a release of the libraries, push a tag like
-`dox_http_native-v3.0.0-alpha.1`. The `Native` workflow builds the 5
+`dox_http_native-v3.0.0-alpha.2`. The `Native` workflow builds the 5
 libraries and uploads them with a `SHA256SUMS` file. Copy the hashes into
 `_sha256` in `hook/build.dart` before you publish the package.

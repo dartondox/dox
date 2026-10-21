@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.2
 
 - New default server: `dox_http_native` (Rust hyper parses HTTP, your code stays in Dart). Hello world goes from about 41k to about 144k req/s on one isolate. Set `server: ServerBackend.dartIo` in `AppConfig` (or `DOX_SERVER=dartio`) to use `dart:io`. Dox uses `dart:io` by itself, with one warning line, when the native library does not load, and for apps with WebSocket or Socket.IO routes.
 - Faster requests: a simple `GET` hello world went from about 31k to about 40k req/s on one isolate (plain `dart:io` is about 46k). A request with no body and sync middleware and controller now runs with no `Future`. `req.ip()`, the query, `req.all()` and cookies are read on first use only. Reading the client ip was the biggest cost, because it asks the socket. Clean paths skip the two regex calls, and plain routes are found with a map lookup.

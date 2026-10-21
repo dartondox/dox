@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.2
 
 - A request body with a file field (`format: binary`, also in a list) uses `multipart/form-data` instead of `application/json`, so the `/docs` page can send files. `RouteDoc(bodyMediaType:)` sets it by hand.
 - Needs Dart 3.13 or newer.
