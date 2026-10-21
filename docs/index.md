@@ -1,7 +1,48 @@
-# Getting Started
+---
+title: Getting Started
+hide:
+  - toc
+---
 
+<div class="dox-hero" markdown>
+
+<div class="dox-hero__text" markdown>
+
+# Fast backends<br>in Dart
+
+<p class="dox-hero__lead">
 Dox is a web backend framework for Dart, like Laravel.
-It gives you routing, an ORM, migrations, validation, auth, WebSocket and a CLI in one place.
+Routing, an ORM, migrations, validation, auth and a CLI come in one place.
+It runs one isolate per CPU core and builds to a small native binary.
+</p>
+
+<p class="dox-hero__actions" markdown>
+[Get started](the-basic/installation.md){ .md-button .md-button--primary }
+[GitHub](https://github.com/dartondox/dox){ .md-button }
+</p>
+
+</div>
+
+<div class="dox-hero__code" markdown>
+
+```dart
+Route.get('/blogs', BlogController.index);
+
+class BlogController {
+  static Future<List<Blog>> index(DoxRequest req) async {
+    req.validate({'status': 'required|in:active,draft'});
+
+    // runs on Postgres, MySQL or SQLite
+    return Blog()
+        .where('status', req.input('status'))
+        .get();
+  }
+}
+```
+
+</div>
+
+</div>
 
 !!! warning "You are reading the 3.x docs (alpha)"
     `3.0.0-alpha.1` is a preview. Things can still change before the stable release.
@@ -10,26 +51,57 @@ It gives you routing, an ORM, migrations, validation, auth, WebSocket and a CLI 
     - Coming from 2.x? Read the [upgrade guide](the-basic/upgrade.md).
     - Need the old docs? Pick **2.x** in the version menu at the top.
 
----
+## Quick start
 
-## Features
+You need Dart 3.13 or newer.
 
-**Fast, multi-core HTTP server**: Dox runs one isolate per CPU core. Bodies are streamed, and `dox build` makes a small native binary. See [Performance](digging-deeper/performance.md).
+```bash
+dart pub global activate dox 3.0.0-alpha.1   # install the CLI
+dox create new_blog                          # make a new project
+cd new_blog && dox s                         # start the server
+```
 
-**Simple routing**: Define routes, groups, middleware and resource routes in a few lines. See [Routing](the-basic/routing.md).
+## Why Dox
 
-**ORM and query builder**: Models and a query builder for Postgres, MySQL/MariaDB and SQLite, with transactions. See [Database](database/index.md).
+<div class="grid cards" markdown>
 
-**Migrations**: Create and change tables with `.sql` or Dart files, and roll them back. See [Migration](database/migration.md).
+-   :material-lightning-bolt: **Fast by default**
 
-**Validation**: Rule strings with `req.validate()`, or typed schemas with [`dox_validation`](packages/validation.md).
+    One isolate per CPU core and streamed bodies. `dox build` makes an AOT native binary.
+    See [Performance](digging-deeper/performance.md).
 
-**WebSocket and Socket.IO**: Real-time events with [WebSocket](digging-deeper/websocket.md) or [Socket.IO](packages/socketio.md).
+-   :material-database-outline: **ORM and query builder**
 
-**Storage and cache**: Local disk and S3 with [`dox_storage`](packages/storage.md). Memory, file and Redis cache with [`dox_cache`](packages/cache.md).
+    Models, relations, migrations and transactions for Postgres, MySQL/MariaDB and SQLite.
+    See [Database](database/index.md).
 
-**OpenAPI**: Make OpenAPI 3.1 docs and a Swagger UI page with [`dox_openapi`](packages/openapi.md).
+-   :material-check-decagram-outline: **Typed validation**
 
-**Security**: JWT [authentication](security/authentication.md), [CORS](security/cors.md), [encryption](security/encryption.md) and [hashing](security/hashing.md).
+    Schemas like Zod with [`dox_validation`](packages/validation.md), or rule strings with [`req.validate()`](the-basic/validation.md).
 
-**CLI**: Create projects, controllers, models and migrations, and build for production. See [Dox CLI](digging-deeper/dox-cli.md).
+-   :material-file-document-outline: **OpenAPI**
+
+    Make OpenAPI 3.1 docs and a Swagger UI page with [`dox_openapi`](packages/openapi.md).
+
+-   :material-folder-outline: **File storage**
+
+    Local disk and S3 behind one API with [`dox_storage`](packages/storage.md).
+
+-   :material-cached: **Cache**
+
+    Memory, file and Redis cache with [`dox_cache`](packages/cache.md).
+
+-   :material-access-point: **Real time**
+
+    Events with [WebSocket](digging-deeper/websocket.md) or [Socket.IO](packages/socketio.md).
+
+-   :material-shield-lock-outline: **Security**
+
+    JWT [authentication](security/authentication.md), [CORS](security/cors.md), [encryption](security/encryption.md) and [hashing](security/hashing.md).
+
+-   :material-console: **CLI**
+
+    Create projects, controllers, models and migrations, and build for production.
+    See [Dox CLI](digging-deeper/dox-cli.md).
+
+</div>
