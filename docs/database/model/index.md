@@ -3,8 +3,8 @@
 ## Create
 
 ```bash
-dox create:model Blog
-dox create:migration create_blog_table   # the table, if you need one
+dox create:model Blog      # only the model
+dox create:model Blog -m   # the model and its migration (table `blogs`)
 ```
 
 !!! info

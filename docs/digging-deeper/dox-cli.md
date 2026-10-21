@@ -32,12 +32,13 @@ dart pub global activate dox 3.0.0-alpha.1
 | `dox create:middleware <name>` | create a middleware |
 | `dox create:request <name>` | create a form request |
 | `dox create:serializer <name>` | create a serializer |
-| `dox create:model <name>` | create a model |
-| `dox create:migration <name> [--sql\|--dart]` | create a migration file |
+| `dox create:model <name> [-m]` (or `make:model`) | create a model, and with `-m` its migration |
+| `dox make:migration <name> [--sql]` (or `create:migration`) | create a Dart migration, or a `.sql` one with `--sql` |
 | `dox migration:run` (or `dox migrate`) | run new migrations |
 | `dox migration:rollback [--step=N]` | undo the last batch |
 | `dox migration:reset` | undo all migrations |
 | `dox migration:refresh` | undo all, then run all again |
+| `dox migration:status` | show which migrations ran |
 | `dox key:generate` | make a new `APP_KEY` |
 | `dox update` | update the CLI |
 | `dox version` (or `dox -v`) | show the CLI version |
@@ -133,16 +134,19 @@ dox create:serializer Blog
 
 ```py
 dox create:model Blog
+dox create:model Blog -m   // also makes the create_blogs_table migration
 ```
 
-!!! note
-    `create:model` no longer takes `-m`. Make the migration with `dox create:migration create_blog_table`.
+`-m` (or `--migration`) makes a Dart migration `create_<table>_table`.
+The table name is the model name in plural snake case: `BlogPost` makes `blog_posts`.
+The model gets `@DoxModel(table: 'blog_posts')`, so it uses the same table.
+`make:model` is the same command.
 
 ## Create migration
 
 ```py
-dox create:migration create_blog_table          // .sql file (default)
-dox create:migration create_blog_table --dart   // .dart file
+dox make:migration create_blogs_table          // .dart file (default)
+dox make:migration create_blogs_table --sql    // .sql file
 ```
 
 ## Run migration

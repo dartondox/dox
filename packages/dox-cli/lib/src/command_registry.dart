@@ -11,6 +11,7 @@ import 'package:dox/src/tools/generate_key.dart';
 import 'package:dox/src/tools/help.dart';
 import 'package:dox/src/tools/server_serve.dart';
 import 'package:dox/src/tools/update_dox.dart';
+import 'package:dox/src/utils/utils.dart';
 import 'package:dox/src/version.dart';
 import 'package:dox_migration/dox_migration.dart';
 
@@ -69,13 +70,30 @@ class CommandRegistry {
     // Create model
     CommandDefinition(
       command: 'create:model',
-      helpInfo: 'create:model <model_name>',
-      description: 'Create a new model',
+      helpInfo: 'create:model <model_name> [-m|--migration]',
+      description:
+          'Create a new model, and with -m a create_<table>_table migration',
       category: CommandCategory.generation,
+      aliases: ['make:model'],
       minArgs: 1,
-      maxArgs: 1,
+      maxArgs: 2,
       function: (args) async {
-        createModel(args[0]);
+        if (args.length < 2) {
+          createModel(args[0]);
+          return;
+        }
+        if (args[1] != '-m' && args[1] != '--migration') {
+          print('Invalid option ${args[1]}, use -m or --migration');
+          exitCode = 1;
+          return;
+        }
+
+        /// `BlogPost` => table `blog_posts`, same guess as `constrained()`
+        String table =
+            ForeignIdColumnDefinition.guessTable(pascalToSnake(args[0]));
+        if (createModel(args[0], table: table)) {
+          createMigration('create_${table}_table');
+        }
       },
     ),
 

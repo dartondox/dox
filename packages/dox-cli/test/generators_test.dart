@@ -102,6 +102,57 @@ void main() {
     });
   });
 
+  group('create:model -m', () {
+    List<String> migrationFiles() => Directory('db/migration')
+        .listSync()
+        .map((FileSystemEntity f) => f.uri.pathSegments.last)
+        .toList()
+      ..sort();
+
+    test('-m makes the model and a create_<plural>_table migration', () async {
+      await CommandRegistry.findCommand('create:model')!
+          .function(<String>['BlogPost', '-m']);
+      String model = read('lib/app/models/blog_post/blog_post.model.dart');
+      expect(model, contains("@DoxModel(table: 'blog_posts')"));
+      List<String> files = migrationFiles();
+      expect(files, contains('migrations.dart'));
+      String name = files.firstWhere(
+        (String f) => f.endsWith('_create_blog_posts_table.dart'),
+      );
+      String c = read('db/migration/$name');
+      expect(c, contains("await schema.create('blog_posts', (Table table) {"));
+      expect(read('db/migration/migrations.dart'),
+          contains('CreateBlogPostsTable()'));
+      expect(File('bin/migrate.dart').existsSync(), isTrue);
+    });
+
+    test('make:model and --migration work too', () async {
+      expect(
+          CommandRegistry.findCommand('make:model')?.command, 'create:model');
+      await CommandRegistry.findCommand('make:model')!
+          .function(<String>['Category', '--migration']);
+      expect(
+          migrationFiles()
+              .any((String f) => f.endsWith('_create_categories_table.dart')),
+          isTrue);
+    });
+
+    test('without -m: no migration, default table', () async {
+      await CommandRegistry.findCommand('create:model')!
+          .function(<String>['User']);
+      expect(
+          read('lib/app/models/user/user.model.dart'), contains('@DoxModel()'));
+      expect(Directory('db').existsSync(), isFalse);
+    });
+
+    test('unknown flag makes nothing', () async {
+      await CommandRegistry.findCommand('create:model')!
+          .function(<String>['User', '-x']);
+      exitCode = 0;
+      expect(Directory('lib').existsSync(), isFalse);
+    });
+  });
+
   group('make:migration', () {
     Future<List<File>> run(List<String> args) async {
       await CommandRegistry.findCommand('make:migration')!.function(args);

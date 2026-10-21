@@ -169,7 +169,7 @@ For a busy production app, use Postgres or MySQL.
     A column with an alias (`active as is_active`) is not converted.
 
 !!! warning "Limits"
-    - `Schema.table` changes a column (type, null, default) by making the table again
+    - `schema.table` with `.change()` changes a column (type, null, default) by making the table again
       and copying the rows. It keeps the primary key, foreign keys, unique columns and indexes.
       It throws for tables with `CHECK` constraints or generated columns.
     - `dropColumn` does not work on a primary key, unique or indexed column (SQLite limit).

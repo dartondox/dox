@@ -85,6 +85,28 @@ See [Database](../database/index.md).
 
 ## Migrations
 
+**Migrations are Dart files now.**
+`dox make:migration create_users_table` makes a Dart class in `db/migration`.
+It also makes the registry `db/migration/migrations.dart` and, once, `bin/migrate.dart`.
+The `dox migration:*` commands run `bin/migrate.dart` in your app.
+Old `.sql` migrations still run. Use `make:migration <name> --sql` for a new `.sql` file.
+`dox migration:status` shows which migrations ran.
+
+**The runner is renamed.**
+`Migration()` is now `Migrator()`. `Migration` is now the base class of a Dart migration.
+`migrate(conn)` is now `Migrator(connection: conn).migrate()`.
+`rollback(null, 2)` is now `rollback(step: 2)`.
+
+**The schema builder changed.** See [Schema builder](../database/schema.md).
+
+- `Schema.create(...)` is now `Schema().create(...)`, or the `schema` given to `up`.
+- In `schema.table(...)` a column is added. Add `.change()` to change a column that exists.
+- `string()` is `VARCHAR(255)` by default. It was 100.
+- `id()` is `BIGSERIAL` on Postgres. It was `SERIAL`.
+- `money()`, `float4()` and `float8()` are removed. Use `decimal()`, `float()` or `double()`.
+- `foreignId('user_id').constrained()` guesses a plural table: `users`, `categories`.
+- `CREATE TABLE` and `CREATE UNIQUE INDEX` no longer add `IF NOT EXISTS`. Check with `schema.hasTable()` first if you need it.
+
 **Rollback undoes only the last batch, newest first.**
 Use `dox migration:rollback --step=2` for more. `migration:reset` undoes all. `migration:refresh` undoes all and runs them again.
 
@@ -159,8 +181,11 @@ Before, a login with only a password could match the first user in the table.
 `dox create:controller BlogPost` makes `blog_post.controller.dart` with class `BlogPostController`.
 Generated models import `package:dox_orm/dox_orm.dart`.
 
-**`create:model` no longer takes `-m`.**
-Make the migration on its own: `dox create:migration create_blog_table`.
+**`create:migration` is now `make:migration`.** The old name still works.
+It makes a Dart file by default. `--dart` is gone, use `--sql` for a `.sql` file.
+
+**`create:model Blog -m` makes a Dart migration.**
+The migration is `create_blogs_table`, and the model gets `@DoxModel(table: 'blogs')`.
 
 ## Moving to the new packages (optional)
 
