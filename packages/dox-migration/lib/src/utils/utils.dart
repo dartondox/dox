@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:dox_migration/src/utils/db_connection.dart';
-import 'package:dox_migration/src/utils/file_extension.dart';
 
 enum MigrationType { up, down }
 
@@ -30,7 +29,7 @@ Future<void> createMigrationTableIfNotExist(DbConnection conn) async {
 /// save migration record to migrations table with batch number
 Future<void> saveMigratedRecord(
   DbConnection conn,
-  File file,
+  String name,
   int batch,
   MigrationType type,
 ) async {
@@ -41,7 +40,7 @@ Future<void> saveMigratedRecord(
       VALUES 
       (?, ?)
     ''';
-    await conn.execute(query, <Object>[file.name, batch]);
+    await conn.execute(query, <Object>[name, batch]);
     return;
   }
 
@@ -49,7 +48,7 @@ Future<void> saveMigratedRecord(
       DELETE from dox_db_migration 
       WHERE migration = ?
     ''';
-  await conn.execute(query, <Object>[file.name]);
+  await conn.execute(query, <Object>[name]);
   return;
 }
 
@@ -79,20 +78,13 @@ Directory getMigrationDirectory() {
   return Directory('${Directory.current.path}/db/migration');
 }
 
-/// get temporary directory `db/migration/tmp`
-Directory getTempDirectory() {
-  return Directory('${getMigrationDirectory().path}/tmp');
-}
-
-/// get list of files from db/migration folder
+/// get the `.sql` files of the db/migration folder (none when it is missing)
 List<File> getFilesFromDirectory(Directory migrationDirectory) {
+  if (!migrationDirectory.existsSync()) return <File>[];
   List<File> migrationFiles = migrationDirectory
       .listSync()
       .whereType<File>()
-      .where(
-        (File entity) =>
-            entity.path.endsWith('.dart') || entity.path.endsWith('.sql'),
-      )
+      .where((File entity) => entity.path.endsWith('.sql'))
       .toList();
 
   /// sort by filename

@@ -1,5 +1,7 @@
 # Query builder
 
+From 3.0, this package is called `dox_orm`. See [3.x](v3-release.md).
+
 ### v1.1.15
 
 - Bug fixed on toMap

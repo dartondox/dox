@@ -1,4 +1,13 @@
 library;
 
-export 'src/create_migration/create_migration.dart';
-export 'src/dox_migration_base.dart';
+export 'package:dox_orm/dox_orm.dart'
+    show
+        ColumnDefinition,
+        DBDriver,
+        ForeignIdColumnDefinition,
+        ForeignKeyDefinition,
+        Schema,
+        Table;
+
+export 'src/migration.dart';
+export 'src/migrator.dart';

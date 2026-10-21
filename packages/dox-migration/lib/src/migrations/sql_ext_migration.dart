@@ -1,59 +1,24 @@
 import 'dart:io';
 
 import 'package:dox_migration/src/utils/db_connection.dart';
-import 'package:dox_migration/src/utils/file_extension.dart';
-import 'package:dox_migration/src/utils/logger.dart';
 import 'package:dox_migration/src/utils/utils.dart';
 
+/// a `.sql` migration file with `-- up` and `-- down` sections
 class SqlExtMigration {
-  final DbConnection conn;
-  final MigrationType type;
+  final File file;
 
-  const SqlExtMigration({required this.conn, required this.type});
+  const SqlExtMigration(this.file);
 
-  /// run the migration, return false when it failed
-  Future<bool> run(File file, int batch) async {
-    String info = type == MigrationType.up ? 'Migrating' : 'Rolling back';
-    Logger.info('$info: ${file.name}');
-    Map<String, String> queries = getQueries(file);
-    try {
-      if (type == MigrationType.up) {
-        await _runQuery(queries['up'], file, batch);
-      }
-      if (type == MigrationType.down) {
-        await _runQuery(queries['down'], file, batch);
-      }
-
-      String info2 = type == MigrationType.up ? 'Migrated' : 'Finished';
-      Logger.info('$info2: ${file.name}');
-      return true;
-    } catch (error) {
-      Logger.warn(queries[type.name]);
-      Logger.danger('Error: ${error.toString()}');
-      return false;
-    }
-  }
-
-  Map<String, String> getQueries(File file) {
-    return parseMigrationSql(fileGetContents(file));
-  }
-
-  Future<void> _runQuery(String? query, File file, int batch) async {
-    if (query == null) return;
-    if (query.isEmpty) return;
-    // mysql can not run many statements in one query, so run one by one.
-    List<String> statements = splitSqlStatements(
+  /// run the [type] section, one statement at a time
+  /// (mysql can not run many statements in one query)
+  Future<void> run(DbConnection conn, MigrationType type) async {
+    String? query = parseMigrationSql(fileGetContents(file))[type.name];
+    if (query == null || query.isEmpty) return;
+    for (String statement in splitSqlStatements(
       query,
       backslashEscape: conn.isMysql,
-    );
-
-    // mysql auto commits DDL (create, alter, drop), so rollback on error
-    // only undoes data changes there. postgres and sqlite undo everything.
-    await conn.transaction((DbConnection tx) async {
-      for (String statement in statements) {
-        await tx.execute(statement);
-      }
-      await saveMigratedRecord(tx, file, batch, type);
-    });
+    )) {
+      await conn.execute(statement);
+    }
   }
 }

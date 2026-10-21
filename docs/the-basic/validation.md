@@ -1,6 +1,11 @@
 # Validation
 
-Dox offers multiple approaches for validating the request data in your application.
+`req.validate()` checks the request data with rule strings, like `'required|email'`.
+When a rule fails, Dox answers `422` with the errors.
+
+!!! tip "Need typed output or nested schemas?"
+    Use [`dox_validation`](../packages/validation.md). It has typed schemas, custom rules and JSON Schema.
+    `v.fromRules()` takes the same rule strings as this page.
 
 === "Validation"
 
@@ -131,6 +136,9 @@ class BlogController {
     ```
 
 ## Optional fields
+
+!!! note "Changed in 3.x"
+    Before 3.x, all rules ran on a missing field. So `'status': 'in:active,inactive'` failed when `status` was not sent.
 
 A field that is missing, `null` or an empty string is optional.
 Its other rules are skipped. Only `required`, `required_if` and `required_if_not` still run.

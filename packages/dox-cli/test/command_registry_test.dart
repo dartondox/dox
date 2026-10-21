@@ -58,6 +58,7 @@ void main() {
         'migrate:rollback': 'migration:rollback',
         'migrate:reset': 'migration:reset',
         'migrate:refresh': 'migration:refresh',
+        'migrate:status': 'migration:status',
       };
       aliases.forEach((alias, command) {
         expect(CommandRegistry.findCommand(alias)?.command, command);

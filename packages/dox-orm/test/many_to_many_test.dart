@@ -11,23 +11,23 @@ void main() async {
 
   group('Many To Many |', () {
     setUp(() async {
-      await Schema.drop('artist');
-      await Schema.drop('song');
-      await Schema.drop('artist_song');
-      await Schema.create('artist', (Table table) {
+      await Schema().dropIfExists('artist');
+      await Schema().dropIfExists('song');
+      await Schema().dropIfExists('artist_song');
+      await Schema().create('artist', (Table table) {
         table.id();
         table.string('name');
         table.timestamps();
       });
 
-      await Schema.create('song', (Table table) {
+      await Schema().create('song', (Table table) {
         table.id();
         table.string('title');
         table.timestamps();
       });
 
-      await Schema.create('artist_song', (Table table) {
-        table.id('id');
+      await Schema().create('artist_song', (Table table) {
+        table.id();
         table.integer('song_id');
         table.integer('artist_id');
         table.timestamps();

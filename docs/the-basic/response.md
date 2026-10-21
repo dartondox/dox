@@ -59,12 +59,23 @@ The response can take various forms, including strings, maps, models, serializer
     }
     ```
 
+=== "file"
+
+    ```dart
+    /// File: streamed, with Content-Length and Range support
+    class VideoController {
+        show(DoxRequest req) {
+            return File('storage/video.mp4');
+        }
+    }
+    ```
+
 === "download"
 
     ```dart
-    /// List<Model>
+    /// DownloadableFile
     class PdfController {
-        download(DoxRequest req) {
+        download(DoxRequest req) async {
             DownloadableFile file = await Storage().download('filename.pdf');
 
             return file;
@@ -75,9 +86,9 @@ The response can take various forms, including strings, maps, models, serializer
 === "stream"
 
     ```dart
-    /// List<Model>
+    /// StreamFile
     class PdfController {
-        download(DoxRequest req) {
+        download(DoxRequest req) async {
             StreamFile file = await Storage().stream('filename.pdf');
 
             return file;
@@ -87,6 +98,18 @@ The response can take various forms, including strings, maps, models, serializer
 
 !!! info
     Models and lists of models will be automatically converted into JSON format and arrays of JSON.
+
+## Files and big responses
+
+Return a `File` or a `Stream<List<int>>`. Dox pipes it to the client. It does not load it all into memory.
+
+- A `File` sets `Content-Type` (from the file name), `Content-Length` and `Accept-Ranges`.
+- It answers `Range: bytes=...` with `206 Partial Content`. Video players can seek, and downloads can resume.
+- `Storage().stream()` and `Storage().download()` on the local disk also stream the file.
+
+```dart
+Route.get('/video', (DoxRequest req) => File('storage/video.mp4'));
+```
 
 ## With
 
@@ -105,7 +128,7 @@ The response can take various forms, including strings, maps, models, serializer
     ```dart
     return response().withHeaders({
         'Authorization' : 'Bearer xxxxxx',
-        'ContentType', 'application/json'
+        'ContentType': 'application/json'
     });
     ```
 
@@ -135,6 +158,20 @@ return response().stream(file.stream).contentType(file.contentType);
 
     ```dart
     var cookie = DoxCookie('key', 'value');
+    return response().cookie(cookie);
+    ```
+
+=== "With options"
+
+    ```dart
+    var cookie = DoxCookie(
+        'token',
+        'value',
+        maxAge: Duration(days: 7), // sent as Max-Age in seconds. default 1 hour
+        httpOnly: true,
+        secure: true,
+        path: '/',
+    );
     return response().cookie(cookie);
     ```
 

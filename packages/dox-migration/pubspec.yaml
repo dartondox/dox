@@ -7,6 +7,7 @@ environment:
   sdk: ^3.6.0
 
 dependencies:
+  dox_orm: ^3.0.0-alpha.1
   mysql_dart: ^3.0.1
   sqlite3: ^2.9.4
   postgres: ^3.0.4

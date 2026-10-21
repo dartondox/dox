@@ -29,22 +29,77 @@ class ApiController {
 
 ## Form data (File)
 
-To access the uploaded image file from the request, the code utilizes the `req.input('image')` method. This assumes that the incoming request is structured as a 'multipart/form-data' form with a file input field named `image`.
+An uploaded file is a `RequestFile`. Get it with `req.input('image')`.
+The request must be `multipart/form-data`, with a file field named `image`.
 
 ```dart
 class ApiController {
-    uploadImage(DoxRequest req, String name) {
+    Future<dynamic> uploadImage(DoxRequest req) async {
         req.validate({
             'image': 'required|image:png,jpg',
         });
-        
+
         RequestFile image = req.input('image');
-        String uploadedPath = await image.store();
-        
+        String uploadedPath = await image.store('images');
+
         return {"filename" : uploadedPath};
     }
 }
 ```
+
+### `RequestFile`
+
+```dart
+RequestFile file = req.input('video');
+
+file.filename;        // name from the client
+file.filetype;        // content type, like video/mp4
+file.extension;       // mp4
+file.length;          // size in bytes
+await file.size;      // size in KB
+file.stream();        // read it in chunks
+await file.store('videos');              // save to storage. returns the path
+await file.moveTo('/data/videos/1.mp4'); // move it. returns the new File
+await file.bytes;     // the whole file in memory. avoid for big files
+```
+
+!!! warning "Save the file before you return"
+    A file up to 1 MB stays in memory. A bigger file is streamed to a temp file while it arrives.
+    The temp file is **deleted when the response is sent**.
+    So call `store`, `moveTo` or `stream` before your controller returns.
+
+### Size limits
+
+A body that is too big gets `413 Payload Too Large`. Dox checks `Content-Length` first,
+and also counts the bytes while reading.
+
+```dart
+AppConfig(
+  maxBodySize: 10 * 1024 * 1024,        // JSON and urlencoded, default 10 MB
+  maxMultipartSize: 100 * 1024 * 1024,  // form-data uploads, default 100 MB
+);
+```
+
+Set the same limit in your proxy, like `client_max_body_size` in nginx.
+
+## Cookies
+
+```dart
+String? token = req.cookie('token');                 // decrypted value
+String? raw = req.cookie('theme', decrypt: false);   // value as sent
+```
+
+See [Response](response.md#cookie) to set a cookie.
+
+## Client IP and scheme
+
+```dart
+req.ip();       // client IP
+req.scheme();   // http or https
+req.isSecure(); // true for https
+```
+
+Behind a proxy, set `trustedProxies` so these show the real client. See [Deployment](../digging-deeper/deployment.md#https-put-a-proxy-in-front).
 
 ## Custom Form Request
 

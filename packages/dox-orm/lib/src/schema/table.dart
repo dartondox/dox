@@ -1,213 +1,358 @@
-import 'package:dox_orm/dox_orm.dart';
-
-import '../utils/logger.dart';
+import 'grammars/schema_grammar.dart';
 import 'table.column.dart';
-import 'table.update.dart';
 
-class Table with TableUpdate {
-  @override
-  final List<TableColumn> columns = <TableColumn>[];
-  @override
-  String tableName = '';
+enum CommandType {
+  drop,
+  dropIfExists,
+  rename,
+  dropColumn,
+  renameColumn,
+  addIndex,
+  unique,
+  primary,
+  dropIndex,
+  dropUnique,
+  foreign,
+  dropForeign,
+}
 
-  @override
-  bool debug = SqlQueryBuilder().debug;
+/// one table level change (index, foreign key, drop, rename, ...)
+class TableCommand {
+  final CommandType type;
+  final List<String> columns;
+  final String? name;
+  final String? to;
+  final ForeignKeyDefinition? foreign;
 
-  @override
-  DBDriver get dbDriver => SqlQueryBuilder().dbDriver;
+  const TableCommand(
+    this.type, {
+    this.columns = const <String>[],
+    this.name,
+    this.to,
+    this.foreign,
+  });
+}
 
-  String get defaultTimestampType =>
-      dbDriver.getName() == Driver.postgres ? 'TIMESTAMPTZ' : 'TIMESTAMP';
+/// the blueprint of a table: its columns and commands.
+/// `Schema` gives it to your callback, then runs its sql.
+///
+/// ```
+/// await schema.create('posts', (Table table) {
+///   table.id();
+///   table.foreignId('user_id').constrained().cascadeOnDelete();
+///   table.string('title');
+///   table.timestamps();
+/// });
+/// ```
+class Table {
+  final String name;
 
-  // coverage:ignore-start
-  @override
-  Logger get logger => Logger();
-  // coverage:ignore-end
+  /// true in `Schema.create`, false in `Schema.table`
+  final bool creating;
 
-  Table table(String table) {
-    tableName = table;
-    return this;
+  final List<ColumnDefinition> columns = <ColumnDefinition>[];
+  final List<TableCommand> commands = <TableCommand>[];
+
+  Table(this.name, {this.creating = false});
+
+  /// sql for this table, for the database of [grammar]
+  List<String> toSql(SchemaGrammar grammar) => grammar.compile(this);
+
+  ColumnDefinition _add(ColumnDefinition column) {
+    columns.add(column);
+    return column;
   }
 
-  void id([dynamic column]) {
-    /// sqlite needs `INTEGER PRIMARY KEY` to make an auto increment id
-    String type = dbDriver.getName() == Driver.sqlite
-        ? 'INTEGER PRIMARY KEY AUTOINCREMENT'
-        : 'SERIAL PRIMARY KEY';
-    columns.add(TableColumn(name: column ?? 'id', type: type));
+  ColumnDefinition _col(String name, ColumnType type) {
+    return _add(ColumnDefinition(name, type));
   }
 
-  TableColumn uuid([dynamic column]) {
-    /// mysql do not have UUID type
-    TableColumn col = TableColumn(
-      name: column ?? 'uuid',
-      type: dbDriver.getName() == Driver.postgres ? 'UUID' : 'CHAR(36)',
+  // ---------------------------------------------------------------
+  // ids
+  // ---------------------------------------------------------------
+
+  /// auto increment big integer primary key
+  ColumnDefinition id([String name = 'id']) => bigIncrements(name);
+
+  ColumnDefinition bigIncrements(String name) {
+    return _col(name, ColumnType.bigIncrements)
+      ..autoIncrement = true
+      ..isUnsigned = true;
+  }
+
+  ColumnDefinition increments(String name) {
+    return _col(name, ColumnType.increments)
+      ..autoIncrement = true
+      ..isUnsigned = true;
+  }
+
+  // ---------------------------------------------------------------
+  // text
+  // ---------------------------------------------------------------
+
+  ColumnDefinition char(String name, [int length = 255]) {
+    return _add(ColumnDefinition(name, ColumnType.char, length: length));
+  }
+
+  ColumnDefinition string(String name, [int length = 255]) {
+    return _add(ColumnDefinition(name, ColumnType.string, length: length));
+  }
+
+  ColumnDefinition text(String name) => _col(name, ColumnType.text);
+
+  ColumnDefinition mediumText(String name) {
+    return _col(name, ColumnType.mediumText);
+  }
+
+  ColumnDefinition longText(String name) => _col(name, ColumnType.longText);
+
+  // ---------------------------------------------------------------
+  // numbers
+  // ---------------------------------------------------------------
+
+  ColumnDefinition integer(String name) => _col(name, ColumnType.integer);
+
+  ColumnDefinition bigInteger(String name) {
+    return _col(name, ColumnType.bigInteger);
+  }
+
+  ColumnDefinition smallInteger(String name) {
+    return _col(name, ColumnType.smallInteger);
+  }
+
+  ColumnDefinition tinyInteger(String name) {
+    return _col(name, ColumnType.tinyInteger);
+  }
+
+  ColumnDefinition unsignedInteger(String name) => integer(name).unsigned();
+
+  ColumnDefinition unsignedBigInteger(String name) {
+    return bigInteger(name).unsigned();
+  }
+
+  ColumnDefinition unsignedSmallInteger(String name) {
+    return smallInteger(name).unsigned();
+  }
+
+  ColumnDefinition unsignedTinyInteger(String name) {
+    return tinyInteger(name).unsigned();
+  }
+
+  ColumnDefinition float(String name) => _col(name, ColumnType.float);
+
+  ColumnDefinition double(String name) => _col(name, ColumnType.double);
+
+  ColumnDefinition decimal(String name, [int precision = 8, int scale = 2]) {
+    return _add(
+      ColumnDefinition(
+        name,
+        ColumnType.decimal,
+        precision: precision,
+        scale: scale,
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------
+  // other types
+  // ---------------------------------------------------------------
+
+  ColumnDefinition boolean(String name) => _col(name, ColumnType.boolean);
+
+  ColumnDefinition date(String name) => _col(name, ColumnType.date);
+
+  ColumnDefinition dateTime(String name) => _col(name, ColumnType.dateTime);
+
+  ColumnDefinition dateTimeTz(String name) {
+    return _col(name, ColumnType.dateTimeTz);
+  }
+
+  ColumnDefinition time(String name) => _col(name, ColumnType.time);
+
+  ColumnDefinition timestamp(String name) {
+    return _col(name, ColumnType.timestamp);
+  }
+
+  ColumnDefinition timestampTz(String name) {
+    return _col(name, ColumnType.timestampTz);
+  }
+
+  ColumnDefinition json(String name) => _col(name, ColumnType.json);
+
+  ColumnDefinition jsonb(String name) => _col(name, ColumnType.jsonb);
+
+  ColumnDefinition uuid([String name = 'uuid']) {
+    return _col(name, ColumnType.uuid);
+  }
+
+  ColumnDefinition binary(String name) => _col(name, ColumnType.binary);
+
+  /// a column that only takes one of [values].
+  /// ENUM on mysql, a CHECK constraint on postgres and sqlite.
+  ColumnDefinition enumeration(String name, List<String> values) {
+    return _add(
+      ColumnDefinition(name, ColumnType.enumeration, allowed: values),
+    );
+  }
+
+  /// big unsigned integer for a foreign key, add `.constrained()`
+  ForeignIdColumnDefinition foreignId(String name) {
+    ForeignIdColumnDefinition col = ForeignIdColumnDefinition(
+      this,
+      name,
+      ColumnType.bigInteger,
+    )..isUnsigned = true;
+    columns.add(col);
+    return col;
+  }
+
+  /// uuid column for a foreign key, add `.constrained()`
+  ForeignIdColumnDefinition foreignUuid(String name) {
+    ForeignIdColumnDefinition col = ForeignIdColumnDefinition(
+      this,
+      name,
+      ColumnType.uuid,
     );
     columns.add(col);
     return col;
   }
 
-  /// BOOLEAN on postgres and sqlite, TINYINT(1) on mysql (read back as bool)
-  TableColumn boolean(String name) {
-    TableColumn col = TableColumn(
-      name: name,
-      type: dbDriver.getName() == Driver.mysql ? 'TINYINT(1)' : 'BOOLEAN',
-    );
-    columns.add(col);
-    return col;
-  }
-
-  TableColumn integer(String name) {
-    TableColumn col = TableColumn(name: name, type: 'INTEGER');
-    columns.add(col);
-    return col;
-  }
-
-  TableColumn bigInteger(String name) {
-    TableColumn col = TableColumn(name: name, type: 'BIGINT');
-    columns.add(col);
-    return col;
-  }
-
-  TableColumn string(String name, [dynamic length]) {
-    TableColumn col = TableColumn(
-      name: name,
-      type: "VARCHAR(${length ?? '100'})",
-    );
-    columns.add(col);
-    return col;
-  }
-
-  TableColumn char(String name, [dynamic length]) {
-    TableColumn col = TableColumn(name: name, type: "CHAR(${length ?? '8'})");
-    columns.add(col);
-    return col;
-  }
-
-  TableColumn money(String name) {
-    TableColumn col = TableColumn(
-      name: name,
-      type: dbDriver.getName() == Driver.postgres ? "MONEY" : "INTEGER",
-    );
-    columns.add(col);
-    return col;
-  }
-
-  TableColumn json(String name) {
-    TableColumn col = TableColumn(name: name, type: "JSON");
-    columns.add(col);
-    return col;
-  }
-
-  TableColumn jsonb(String name) {
-    TableColumn col = TableColumn(
-      name: name,
-      type: dbDriver.getName() == Driver.postgres ? "JSONB" : 'JSON',
-    );
-    columns.add(col);
-    return col;
-  }
-
-  TableColumn decimal(String name, [dynamic length, dynamic decimalPoint]) {
-    TableColumn col = TableColumn(
-      name: name,
-      type: "DECIMAL(${length ?? '8'}, ${decimalPoint ?? '2'})",
-    );
-    columns.add(col);
-    return col;
-  }
-
-  TableColumn float4(String name) {
-    TableColumn col = TableColumn(name: name, type: "float4");
-    columns.add(col);
-    return col;
-  }
-
-  TableColumn float8(String name) {
-    TableColumn col = TableColumn(name: name, type: "float8");
-    columns.add(col);
-    return col;
-  }
-
-  TableColumn text(String name) {
-    TableColumn col = TableColumn(name: name, type: 'TEXT');
-    columns.add(col);
-    return col;
-  }
-
-  TableColumn timestamp(String name) {
-    TableColumn col = TableColumn(name: name, type: 'TIMESTAMP');
-    columns.add(col);
-    return col;
-  }
-
-  TableColumn date(String name) {
-    TableColumn col = TableColumn(name: name, type: 'DATE');
-    columns.add(col);
-    return col;
-  }
-
-  TableColumn time(String name) {
-    TableColumn col = TableColumn(name: name, type: 'TIME');
-    columns.add(col);
-    return col;
-  }
-
-  TableColumn timestampTz(String name) {
-    TableColumn col = TableColumn(name: name, type: defaultTimestampType);
-    columns.add(col);
-    return col;
-  }
-
-  TableColumn softDeletes([dynamic name]) {
-    TableColumn col = TableColumn(
-      name: name ?? 'deleted_at',
-      type: defaultTimestampType,
-    ).nullable();
-    columns.add(col);
-    return col;
-  }
-
+  /// nullable `created_at` and `updated_at`
+  /// (TIMESTAMPTZ on postgres, TIMESTAMP on others)
   void timestamps() {
-    TableColumn createdAt = TableColumn(
-      name: 'created_at',
-      type: defaultTimestampType,
-    ).nullable();
-    TableColumn updatedAt = TableColumn(
-      name: 'updated_at',
-      type: defaultTimestampType,
-    ).nullable();
-    columns.add(createdAt);
-    columns.add(updatedAt);
+    timestampTz('created_at').nullable();
+    timestampTz('updated_at').nullable();
   }
+
+  /// nullable `deleted_at`, used by `SoftDeletes`
+  ColumnDefinition softDeletes([String name = 'deleted_at']) {
+    return timestampTz(name).nullable();
+  }
+
+  /// nullable `remember_token` VARCHAR(100)
+  ColumnDefinition rememberToken() {
+    return string('remember_token', 100).nullable();
+  }
+
+  /// `{name}_id` and `{name}_type` with an index on both
+  void morphs(String name) {
+    unsignedBigInteger('${name}_id');
+    string('${name}_type');
+    index(<String>['${name}_type', '${name}_id']);
+  }
+
+  // ---------------------------------------------------------------
+  // columns changes
+  // ---------------------------------------------------------------
 
   void dropColumn(String name) {
-    TableColumn col = TableColumn(name: name, shouldDrop: true);
-    columns.add(col);
+    commands.add(TableCommand(CommandType.dropColumn, columns: <String>[name]));
+  }
+
+  void dropColumns(List<String> names) {
+    for (String name in names) {
+      dropColumn(name);
+    }
   }
 
   void renameColumn(String from, String to) {
-    TableColumn col = TableColumn(name: from, renameTo: to);
-    columns.add(col);
+    commands.add(
+      TableCommand(CommandType.renameColumn, columns: <String>[from], to: to),
+    );
   }
 
-  Future<void> create() async {
-    String query = "CREATE TABLE IF NOT EXISTS ${dbDriver.wrap(tableName)} (";
+  // ---------------------------------------------------------------
+  // indexes and keys. [columns] is a String or a List<String>.
+  // ---------------------------------------------------------------
 
-    List<String> ret = <String>[];
-    for (TableColumn col in columns) {
-      String unique = col.isUnique ? ' UNIQUE' : '';
+  /// `{table}_{columns}_{type}`, eg. `users_email_unique`
+  String indexName(String type, List<String> columns) {
+    return '${name}_${columns.join('_')}_$type'
+        .toLowerCase()
+        .replaceAll(RegExp(r'[-.]'), '_');
+  }
 
-      ret.add(
-        "${dbDriver.wrap(col.name)} ${col.type} ${col.isNullable ? 'NULL' : 'NOT NULL'}${defaultQuery(col)}$unique",
-      );
-    }
+  void _index(CommandType type, String suffix, Object columns, String? name) {
+    List<String> cols = columnList(columns);
+    commands.add(
+      TableCommand(type, columns: cols, name: name ?? indexName(suffix, cols)),
+    );
+  }
 
-    query += ret.join(',');
-    query += ")";
-    if (debug) {
-      logger.log(query); // coverage:ignore-line
-    }
-    await dbDriver.execute(query);
+  void index(Object columns, [String? name]) {
+    _index(CommandType.addIndex, 'index', columns, name);
+  }
+
+  void unique(Object columns, [String? name]) {
+    _index(CommandType.unique, 'unique', columns, name);
+  }
+
+  void primary(Object columns) {
+    commands.add(
+      TableCommand(CommandType.primary, columns: columnList(columns)),
+    );
+  }
+
+  ForeignKeyDefinition foreign(Object columns, [String? name]) {
+    List<String> cols = columnList(columns);
+    ForeignKeyDefinition fk = ForeignKeyDefinition(
+      cols,
+      name ?? indexName('foreign', cols),
+    );
+    commands.add(TableCommand(CommandType.foreign, foreign: fk));
+    return fk;
+  }
+
+  /// [index] is the index name, or its columns (`List<String>`)
+  void dropIndex(Object index) => _drop(CommandType.dropIndex, 'index', index);
+
+  void dropUnique(Object index) {
+    _drop(CommandType.dropUnique, 'unique', index);
+  }
+
+  void dropForeign(Object index) {
+    _drop(CommandType.dropForeign, 'foreign', index);
+  }
+
+  void _drop(CommandType type, String suffix, Object index) {
+    String name =
+        index is String ? index : indexName(suffix, columnList(index));
+    commands.add(TableCommand(type, name: name));
+  }
+
+  // ---------------------------------------------------------------
+  // table
+  // ---------------------------------------------------------------
+
+  void drop() => commands.add(const TableCommand(CommandType.drop));
+
+  void dropIfExists() {
+    commands.add(const TableCommand(CommandType.dropIfExists));
+  }
+
+  void rename(String to) {
+    commands.add(TableCommand(CommandType.rename, to: to));
+  }
+
+  /// sqlite can not change a column or add/drop a foreign key with ALTER,
+  /// `Schema` rebuilds the table for these
+  bool get needsSqliteRebuild {
+    return !creating &&
+        (columns.any((ColumnDefinition c) => c.isChange) ||
+            commands.any(_isForeignCommand));
+  }
+
+  /// this table without the changes that need a sqlite rebuild
+  Table withoutSqliteRebuild() {
+    Table table = Table(name);
+    table.columns.addAll(columns.where((ColumnDefinition c) => !c.isChange));
+    table.commands.addAll(
+      commands.where((TableCommand c) => !_isForeignCommand(c)),
+    );
+    return table;
+  }
+
+  static bool _isForeignCommand(TableCommand c) {
+    return c.type == CommandType.foreign || c.type == CommandType.dropForeign;
   }
 }

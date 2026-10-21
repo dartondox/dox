@@ -1,5 +1,9 @@
 # File Storage
 
+!!! tip "Need S3 or signed URLs?"
+    This page is the simple built-in `Storage()` of `dox_core`.
+    For S3, R2, MinIO, signed URLs and many disks, use [`dox_storage`](../packages/storage.md).
+
 Dox file storage offers straightforward drivers for managing local file systems and extends the capability to develop custom drivers for cloud services like AWS or Digital Ocean Spaces.
 
 ```dart
@@ -34,7 +38,7 @@ This function accepts a byte sequence as input and stores it. It is designed for
 ```dart
 RequestFile file = req.input('image');
 
-String url = await Storage().put('images', file.bytes);
+String url = await Storage().put('images', await file.bytes);
 ```
 
 ### `get`

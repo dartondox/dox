@@ -1,12 +1,19 @@
 site_name: "DOX"
-repo_url: https://github.com/dartondox/dox-core
+repo_url: https://github.com/dartondox/dox
 site_url: https://dartondox.dev
-copyright: Copyright &copy; 2023 - 2024 Dart On Dox
+copyright: Copyright &copy; 2023 - 2026 Dart On Dox
+# broken links and anchors fail `mkdocs build --strict`
+validation:
+  anchors: warn
+  unrecognized_links: warn
 extra_css:
   - assets/style.css
 extra_javascript:
   - assets/script.js
 extra:
+  version:
+    provider: mike
+    alias: true
   analytics:
     provider: google
     property: G-GY82BXCJF8
@@ -25,7 +32,6 @@ theme:
     - navigation.sections
     - navigation.expand
     - navigation.indexes
-    - navigation.expand
   font:
     text: Inclusive Sans
   favicon: assets/favicon.png
@@ -52,14 +58,14 @@ markdown_extensions:
   - admonition
   - pymdownx.details
   - pymdownx.superfences
-  - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
 
 nav:
-  - Getting Started: 
+  - Getting Started:
     - index.md
     - the-basic/installation.md
+    - the-basic/upgrade.md
     - the-basic/routing.md
     - the-basic/request.md
     - the-basic/response.md
@@ -78,8 +84,11 @@ nav:
     - digging-deeper/performance.md
     - digging-deeper/testing.md
   - Database:
-    - database/migration.md
+    - database/index.md
     - database/query-builder.md
+    - database/transactions.md
+    - database/migration.md
+    - database/schema.md
     - Model:
       - database/model/index.md
       - Relationship:
@@ -88,6 +97,12 @@ nav:
         - database/model/relationship/belongs-to.md
         - database/model/relationship/many-to-many.md
       - database/model/serializer.md
+  - Packages:
+    - packages/validation.md
+    - packages/openapi.md
+    - packages/storage.md
+    - packages/cache.md
+    - packages/socketio.md
   - Security:
     - security/authentication.md
     - security/cors.md
@@ -96,5 +111,6 @@ nav:
   - Others:
     - others/contribute.md
     - Releases:
+      - others/releases/v3-release.md
       - others/releases/core-release.md
       - others/releases/query-builder-release.md

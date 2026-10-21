@@ -102,26 +102,95 @@ void main() {
     });
   });
 
-  group('create:migration', () {
+  group('make:migration', () {
     Future<List<File>> run(List<String> args) async {
-      await CommandRegistry.findCommand('create:migration')!.function(args);
-      return Directory('db/migration').listSync().whereType<File>().toList();
+      await CommandRegistry.findCommand('make:migration')!.function(args);
+      return Directory('db/migration').listSync().whereType<File>().toList()
+        ..sort((File a, File b) => a.path.compareTo(b.path));
     }
 
-    test('writes a timestamped sql file with up and down sections', () async {
-      List<File> files = await run(<String>['CreateBlogPostsTable']);
-      expect(files, hasLength(1));
-      String name = files.first.uri.pathSegments.last;
-      expect(name, matches(RegExp(r'^\d{4}_\d{2}_\d{2}_\d+_.*\.sql$')));
-      expect(name, contains('create_blog_posts_table'));
-      String c = files.first.readAsStringSync();
-      expect(c, contains('-- up'));
-      expect(c, contains('-- down'));
+    String fileName(File f) => f.uri.pathSegments.last;
+
+    test('create_x_table: a Dart migration that creates table x', () async {
+      List<File> files = await run(<String>['create_users_table']);
+      File migration = files.firstWhere(
+        (File f) => fileName(f) != 'migrations.dart',
+      );
+      expect(
+        fileName(migration),
+        matches(RegExp(r'^\d{4}_\d{2}_\d{2}_\d{6}_create_users_table\.dart$')),
+      );
+      String c = migration.readAsStringSync();
+      expect(c, contains('class CreateUsersTable extends Migration {'));
+      expect(c, contains("await schema.create('users', (Table table) {"));
+      expect(c, contains('table.id();'));
+      expect(c, contains("await schema.dropIfExists('users');"));
     });
 
-    test('--sql flag writes a sql file', () async {
+    test('add_y_to_x_table: a Dart migration that changes table x', () async {
+      List<File> files = await run(<String>['add_avatar_to_users_table']);
+      String c = files
+          .firstWhere((File f) => fileName(f) != 'migrations.dart')
+          .readAsStringSync();
+      expect(c, contains('class AddAvatarToUsersTable extends Migration {'));
+      expect(c, contains("await schema.table('users', (Table table) {"));
+    });
+
+    test('other names get an empty migration', () async {
+      List<File> files = await run(<String>['SeedThings']);
+      String c = files
+          .firstWhere((File f) => fileName(f) != 'migrations.dart')
+          .readAsStringSync();
+      expect(c, contains('class SeedThings extends Migration {'));
+    });
+
+    test('registry lists the Dart migrations sorted by name', () async {
+      Directory('db/migration').createSync(recursive: true);
+      File('db/migration/2020_01_02_000000_b.dart')
+          .writeAsStringSync('class B extends Migration {}');
+      File('db/migration/2020_01_01_000000_a.dart')
+          .writeAsStringSync('class A extends Migration {}');
+      File('db/migration/2020_01_01_000000_skip.sql').writeAsStringSync('');
+      await run(<String>['create_posts_table']);
+      String registry = read('db/migration/migrations.dart');
+      expect(registry, contains("import '2020_01_01_000000_a.dart' as m1;"));
+      expect(registry, contains("import '2020_01_02_000000_b.dart' as m2;"));
+      expect(
+        registry,
+        contains("    '2020_01_01_000000_a',\n    m1.A(),\n"),
+      );
+      expect(
+        registry,
+        contains("    '2020_01_02_000000_b',\n    m2.B(),\n"),
+      );
+      expect(registry, contains('m3.CreatePostsTable()'));
+      expect(registry, isNot(contains('skip')));
+      expect(registry, isNot(contains('migrations.dart')));
+    });
+
+    test('makes bin/migrate.dart once', () async {
+      await run(<String>['create_a_table']);
+      expect(read('bin/migrate.dart'),
+          contains('Migrator(migrations: migrations)'));
+      File('bin/migrate.dart').writeAsStringSync('// mine');
+      await run(<String>['create_b_table']);
+      expect(read('bin/migrate.dart'), '// mine');
+    });
+
+    test('--sql flag writes a sql file, no registry', () async {
       List<File> files = await run(<String>['add_index', '--sql']);
       expect(files.single.path, endsWith('add_index.sql'));
+      String c = files.single.readAsStringSync();
+      expect(c, contains('-- up'));
+      expect(c, contains('-- down'));
+      expect(File('bin/migrate.dart').existsSync(), isFalse);
+    });
+
+    test('create:migration is an alias', () {
+      expect(
+        CommandRegistry.findCommand('create:migration')?.command,
+        'make:migration',
+      );
     });
 
     test('creates the db/migration folder when missing', () async {
