@@ -184,6 +184,16 @@
    "GitHub", so the box was mostly empty and pushed the group off the right edge. */
 .md-header__source { width: auto; }
 .md-header__source .md-source__repository { max-width: none; }
+/* Smaller gap between the search box and the GitHub button.
+   Material uses 1.4rem; the GitHub icon box already adds space. */
+@media screen and (min-width: 60em) {
+  [dir="ltr"] .md-header__source {
+    margin-left: 0.6rem;
+  }
+  [dir="rtl"] .md-header__source {
+    margin-right: 0.6rem;
+  }
+}
 
 /* Line the right header group (toggle, search, GitHub) up with the
    right edge of the page content. Material's header has only 0.2rem
