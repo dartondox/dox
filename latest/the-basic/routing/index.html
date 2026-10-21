@@ -641,6 +641,39 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#catch-all-param" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Catch-all param
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#serve-storage-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Serve storage files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#request-body-for-the-docs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Request body for the docs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#group-routes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2451,6 +2484,39 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#catch-all-param" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Catch-all param
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#serve-storage-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Serve storage files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#request-body-for-the-docs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Request body for the docs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#group-routes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2598,6 +2664,24 @@
 </div>
 </div>
 </div>
+<h2 id="catch-all-param">Catch-all param</h2>
+<p><code>{name*}</code> matches the rest of the path, with slashes.</p>
+<div class="highlight"><pre><span></span><code><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/docs/{page*}'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">page</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">page</span><span class="p">;</span><span class="w"> </span><span class="c1">// GET /docs/a/b/c gives 'a/b/c'</span>
+<span class="p">});</span>
+</code></pre></div>
+<h2 id="serve-storage-files">Serve storage files</h2>
+<p><code>Route.files(path)</code> serves files of a storage disk at <code>GET &lt;path&gt;/{key*}</code>. By default only signed URLs work.
+See <a href="../../digging-deeper/file-storage/#serve-local-signed-urls">File Storage</a>.</p>
+<div class="highlight"><pre><span></span><code><span class="n">Route</span><span class="p">.</span><span class="n">files</span><span class="p">(</span><span class="s1">'files'</span><span class="p">);</span>
+<span class="n">Route</span><span class="p">.</span><span class="n">files</span><span class="p">(</span><span class="s1">'public'</span><span class="p">,</span><span class="w"> </span><span class="nl">disk:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span><span class="w"> </span><span class="nl">signed:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span>
+</code></pre></div>
+<h2 id="request-body-for-the-docs">Request body for the docs</h2>
+<p><code>post</code>, <code>put</code> and <code>patch</code> take a <code>body:</code> schema. It shows in the <a href="../../packages/openapi/">OpenAPI docs</a>. It does not validate.</p>
+<div class="highlight"><pre><span></span><code><span class="n">Route</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/posts'</span><span class="p">,</span><span class="w"> </span><span class="n">controller</span><span class="p">.</span><span class="n">store</span><span class="p">,</span><span class="w"> </span><span class="nl">body:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">object</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Schema</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;&gt;</span><span class="p">{</span>
+<span class="w">    </span><span class="s1">'title'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">().</span><span class="n">min</span><span class="p">(</span><span class="m">3</span><span class="p">),</span>
+<span class="p">}));</span>
+</code></pre></div>
 <h2 id="group-routes">Group Routes</h2>
 <div class="tabbed-set tabbed-alternate" data-tabs="3:3"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><input id="__tabbed_3_3" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Prefix</label><label for="__tabbed_3_2">Domain</label><label for="__tabbed_3_3">Middleware</label></div>
 <div class="tabbed-content">

@@ -936,6 +936,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#missing-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Missing values
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2351,6 +2362,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#missing-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Missing values
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2391,7 +2413,7 @@ Before 3.x, only the <code>.env</code> file was read.</p>
 </div>
 </div>
 <h2 id="with-type">With type</h2>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Int</label><label for="__tabbed_2_2">String</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:4"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><input id="__tabbed_2_4" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Int</label><label for="__tabbed_2_2">String</label><label for="__tabbed_2_3">Bool</label><label for="__tabbed_2_4">Nullable</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'APP_PORT'</span><span class="p">,</span><span class="w"> </span><span class="m">3000</span><span class="p">)</span>
@@ -2401,7 +2423,27 @@ Before 3.x, only the <code>.env</code> file was read.</p>
 <div class="highlight"><pre><span></span><code><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'APP_KEY'</span><span class="p">)</span>
 </code></pre></div>
 </div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'SOCKETIO_ENABLED'</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="c1">// true, 1, yes, on</span>
+</code></pre></div>
 </div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">?&gt;</span><span class="p">(</span><span class="s1">'AWS_BUCKET'</span><span class="p">)</span><span class="w"> </span><span class="c1">// null when it is not set</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h2 id="missing-values">Missing values</h2>
+<p>A missing or empty key gives the default. With no default:</p>
+<ul>
+<li><code>String</code> gives an empty string <code>''</code>. It is never the text <code>"null"</code>.</li>
+<li><code>String?</code> and <code>dynamic</code> give <code>null</code>.</li>
+<li><code>int</code>, <code>num</code>, <code>double</code> and <code>bool</code> throw an <code>ArgumentError</code> with the key name. A value that is not a number throws too.</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">APP_KEY</p>
+<p>When <code>APP_KEY</code> is empty and <code>APP_ENV=production</code>, <code>Dox().startServer()</code> stops with an error.
+In other environments it logs a warning. Make a key with <code>dox key:generate</code>.</p>
 </div>
 
 

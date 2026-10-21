@@ -1772,6 +1772,34 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#in-a-dox-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In a Dox app
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="In a Dox app">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#write-the-files-dox-openapigenerate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Write the files: dox openapi:generate
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#install" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2396,6 +2424,34 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#in-a-dox-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In a Dox app
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="In a Dox app">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#write-the-files-dox-openapigenerate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Write the files: dox openapi:generate
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#install" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2484,6 +2540,57 @@
 <h1 id="openapi">OpenAPI</h1>
 <p><code>dox_openapi</code> makes an OpenAPI 3.1 document for your Dox app.
 You get <code>openapi.json</code>, <code>openapi.yaml</code> and a Swagger UI page at <code>/docs</code>.</p>
+<h2 id="in-a-dox-app">In a Dox app</h2>
+<p><code>dox_core</code> has it built in. Add an <code>OpenApiConfig</code> to <code>AppConfig</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// config/openapi.dart</span>
+<span class="n">OpenApiConfig</span><span class="w"> </span><span class="n">openApi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenApiConfig</span><span class="p">(</span>
+<span class="w">  </span><span class="nl">info:</span><span class="w"> </span><span class="n">Info</span><span class="p">(</span><span class="nl">title:</span><span class="w"> </span><span class="s1">'Blog API'</span><span class="p">,</span><span class="w"> </span><span class="nl">version:</span><span class="w"> </span><span class="s1">'1.0.0'</span><span class="p">),</span>
+<span class="w">  </span><span class="nl">servers:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Server</span><span class="o">&gt;</span><span class="p">[</span><span class="n">Server</span><span class="p">(</span><span class="s1">'https://api.example.com'</span><span class="p">)],</span>
+<span class="w">  </span><span class="nl">securitySchemes:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">SecurityScheme</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'bearerAuth'</span><span class="o">:</span><span class="w"> </span><span class="n">SecurityScheme</span><span class="p">.</span><span class="n">bearer</span><span class="p">()},</span>
+<span class="w">  </span><span class="nl">securityByMiddleware:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;&gt;&gt;&gt;</span><span class="p">{</span>
+<span class="w">    </span><span class="s1">'AuthMiddleware'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;&gt;&gt;</span><span class="p">[</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;&gt;</span><span class="p">{</span><span class="s1">'bearerAuth'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[]}],</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="p">);</span>
+
+<span class="n">AppConfig</span><span class="p">(</span><span class="nl">openApi:</span><span class="w"> </span><span class="n">openApi</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span>
+</code></pre></div>
+<ul>
+<li><code>GET /docs</code> (Swagger UI), <code>GET /openapi.json</code> and <code>GET /openapi.yaml</code> are added after your routes.</li>
+<li><code>enabled</code> is <code>null</code> by default: the docs are on only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>.
+  So production is off unless you set <code>enabled: true</code>. When it is off, there is no extra work per request.</li>
+<li>Every route is added. The document is built on the first <code>/docs</code> request, and again when routes change.</li>
+<li>Request bodies come from the route <code>body:</code> option, or from the form request of the controller
+  (<code>schema()</code> first, then <code>rules()</code>):</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">Route</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/posts'</span><span class="p">,</span><span class="w"> </span><span class="n">controller</span><span class="p">.</span><span class="n">store</span><span class="p">,</span><span class="w"> </span><span class="nl">body:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">object</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Schema</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;&gt;</span><span class="p">{</span>
+<span class="w">  </span><span class="s1">'title'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">().</span><span class="n">min</span><span class="p">(</span><span class="m">3</span><span class="p">),</span>
+<span class="p">}));</span>
+
+<span class="c1">// or: store(PostRequest req) where PostRequest has schema() or rules()</span>
+</code></pre></div>
+<ul>
+<li>Middleware names come from the route groups and router middleware (<code>preMiddleware</code>), so
+  <code>securityByMiddleware</code> knows which routes need a login.</li>
+</ul>
+<h3 id="write-the-files-dox-openapigenerate">Write the files: <code>dox openapi:generate</code></h3>
+<div class="highlight"><pre><span></span><code>dox<span class="w"> </span>openapi:generate<span class="w">              </span><span class="c1"># storage/openapi/openapi.json and openapi.yaml</span>
+dox<span class="w"> </span>openapi:generate<span class="w"> </span>docs/api<span class="w">     </span><span class="c1"># another folder</span>
+</code></pre></div>
+<p>It runs <code>bin/openapi.dart</code> of your app:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// bin/openapi.dart</span>
+<span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+
+<span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/app.dart'</span><span class="p">;</span>
+
+<span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">Dox</span><span class="p">().</span><span class="n">initialize</span><span class="p">(</span><span class="n">appConfig</span><span class="p">);</span>
+<span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">Dox</span><span class="p">().</span><span class="n">writeOpenApi</span><span class="p">(</span><span class="n">args</span><span class="p">.</span><span class="n">isEmpty</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s1">'storage/openapi'</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">args</span><span class="p">.</span><span class="n">first</span><span class="p">);</span>
+<span class="w">  </span><span class="n">exit</span><span class="p">(</span><span class="m">0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><code>writeOpenApi</code> runs your services and registers the routes. It does not start the server.</p>
+<p>The rest of this page is for describing routes by hand, and for using <code>dox_openapi</code> outside Dox.</p>
 <h2 id="install">Install</h2>
 <div class="highlight"><pre><span></span><code>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_openapi
 </code></pre></div>

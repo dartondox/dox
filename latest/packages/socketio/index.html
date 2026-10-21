@@ -1878,10 +1878,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#where-to-run-it" class="md-nav__link">
+  <a href="#in-a-dox-app-same-port-as-http" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where to run it
+        In a Dox app: same port as HTTP
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-to-run-it-outside-dox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where to run it (outside Dox)
       
     </span>
   </a>
@@ -2429,10 +2440,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#where-to-run-it" class="md-nav__link">
+  <a href="#in-a-dox-app-same-port-as-http" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where to run it
+        In a Dox app: same port as HTTP
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-to-run-it-outside-dox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where to run it (outside Dox)
       
     </span>
   </a>
@@ -2542,7 +2564,47 @@ The official clients connect to it with no changes: <code>socket.io-client</code
 <span class="kd">const</span><span class="w"> </span><span class="nx">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">io</span><span class="p">(</span><span class="s1">'http://localhost:3001'</span><span class="p">);</span>
 <span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'chat'</span><span class="p">,</span><span class="w"> </span><span class="s1">'hi'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">answer</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">answer</span><span class="p">));</span><span class="w"> </span><span class="c1">// 'ok'</span>
 </code></pre></div>
-<h2 id="where-to-run-it">Where to run it</h2>
+<h2 id="in-a-dox-app-same-port-as-http">In a Dox app: same port as HTTP</h2>
+<p><code>dox_core</code> can serve Socket.IO at <code>/socket.io/</code> on the app port. It is off by default.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// config/socketio.dart</span>
+<span class="n">SocketIoConfig</span><span class="w"> </span><span class="n">socketIo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoConfig</span><span class="p">(</span>
+<span class="w">  </span><span class="nl">enabled:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'SOCKETIO_ENABLED'</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">),</span>
+<span class="w">  </span><span class="nl">namespaces:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">NamespaceHandler</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ChatNamespace</span><span class="p">()],</span>
+<span class="w">  </span><span class="nl">adapter:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">RedisSocketAdapterFactory</span><span class="p">(),</span><span class="w"> </span><span class="c1">// shares broadcasts between isolates</span>
+<span class="p">);</span>
+
+<span class="c1">/// makes the Redis adapter inside each isolate</span>
+<span class="kd">class</span><span class="w"> </span><span class="nc">RedisSocketAdapterFactory</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">SocketAdapterFactory</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">RedisSocketAdapterFactory</span><span class="p">();</span>
+
+<span class="w">  </span><span class="nd">@override</span>
+<span class="w">  </span><span class="n">Adapter</span><span class="w"> </span><span class="n">create</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">RedisAdapter</span><span class="p">(</span><span class="nl">subscriber:</span><span class="w"> </span><span class="n">redis</span><span class="p">.</span><span class="n">duplicate</span><span class="p">(),</span><span class="w"> </span><span class="nl">publisher:</span><span class="w"> </span><span class="n">redis</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">AppConfig</span><span class="p">(</span><span class="nl">socketIo:</span><span class="w"> </span><span class="n">socketIo</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span>
+</code></pre></div>
+<ul>
+<li>Requests to <code>/socket.io/</code> go to Socket.IO before the router. Middleware and body reading are skipped.</li>
+<li>When it is off, there is no extra work per request.</li>
+<li><code>Dox().socketIo</code> is the server of this isolate: <code>Dox().socketIo?.to('room').emit('news', data)</code>.</li>
+<li><code>dox_websocket</code> (<code>Route.websocket</code>) still works next to it.</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Many isolates</p>
+<p>Dox runs one isolate per CPU core, and each isolate has its own Socket.IO server.</p>
+<ul>
+<li>Clients should connect with <strong>websocket only</strong>. One websocket stays on one isolate.
+  With the Redis adapter, a broadcast reaches clients on every isolate.</li>
+<li>HTTP long-polling sends many requests, and they can reach different isolates. It only works
+  with <code>totalIsolate: 1</code>, or with sticky sessions in front of many single-isolate servers.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">io</span><span class="p">(</span><span class="s1">'http://localhost:3000/chat'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">transports</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'websocket'</span><span class="p">]</span><span class="w"> </span><span class="p">});</span>
+</code></pre></div>
+<p>Dox logs this hint at startup when it runs many isolates and polling is allowed.</p>
+</div>
+<h2 id="where-to-run-it-outside-dox">Where to run it (outside Dox)</h2>
 <p><code>io.listen(port)</code> opens its own port. Run it in its own small program, for example <code>bin/socket.dart</code>,
 next to the Dox HTTP server. Put both behind the same proxy.</p>
 <ul>

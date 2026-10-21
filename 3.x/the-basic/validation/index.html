@@ -759,6 +759,50 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#validated-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validated data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database-rules-unique-and-exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database rules: unique and exists
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#typed-schemas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Typed schemas
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom rules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#custom-validation-message" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -863,6 +907,28 @@
     <span class="md-ellipsis">
       
         required_if_not
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        unique
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        exists
       
     </span>
   </a>
@@ -2799,6 +2865,50 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#validated-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validated data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database-rules-unique-and-exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database rules: unique and exists
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#typed-schemas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Typed schemas
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom rules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#custom-validation-message" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2903,6 +3013,28 @@
     <span class="md-ellipsis">
       
         required_if_not
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        unique
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        exists
       
     </span>
   </a>
@@ -3289,12 +3421,9 @@
 
 <h1 id="validation">Validation</h1>
 <p><code>req.validate()</code> checks the request data with rule strings, like <code>'required|email'</code>.
-When a rule fails, Dox answers <code>422</code> with the errors.</p>
-<div class="admonition tip">
-<p class="admonition-title">Need typed output or nested schemas?</p>
-<p>Use <a href="../../packages/validation/"><code>dox_validation</code></a>. It has typed schemas, custom rules and JSON Schema.
-<code>v.fromRules()</code> takes the same rule strings as this page.</p>
-</div>
+When a rule fails, Dox answers <code>422</code> with the errors, like <code>{"email": "The email is required"}</code>.</p>
+<p>It runs on <a href="../../packages/validation/"><code>dox_validation</code></a>, which is built into <code>dox_core</code>.
+The rule strings become a schema once (<code>v.fromRules()</code>), and Dox keeps it for the next request.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Validation</label><label for="__tabbed_1_2">Request body</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -3325,6 +3454,65 @@ When a rule fails, Dox answers <code>422</code> with the errors.</p>
 <p class="admonition-title">Tip</p>
 <p>Multiple rules can be separated by a vertical bar, represented as " | ".</p>
 </div>
+<h2 id="validated-data">Validated data</h2>
+<p><code>validate()</code> returns only the fields that have rules. The values are not changed.</p>
+<div class="highlight"><pre><span></span><code><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">validate</span><span class="p">({</span>
+<span class="w">    </span><span class="s1">'title'</span><span class="o">:</span><span class="w"> </span><span class="s1">'required|string'</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">'body'</span><span class="o">:</span><span class="w"> </span><span class="s1">'required'</span><span class="p">,</span>
+<span class="p">});</span>
+</code></pre></div>
+<h2 id="database-rules-unique-and-exists">Database rules: <code>unique</code> and <code>exists</code></h2>
+<p>These rules read the database, so they are async. Use <code>validateAsync</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">validateAsync</span><span class="p">({</span>
+<span class="w">    </span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="s1">'required|email|unique:users,email'</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">'category_id'</span><span class="o">:</span><span class="w"> </span><span class="s1">'required|exists:categories,id'</span><span class="p">,</span>
+<span class="p">});</span>
+</code></pre></div>
+<ul>
+<li><code>unique:table,column</code>: no row has this value. <code>column</code> defaults to the field name.</li>
+<li><code>unique:users,email,5</code>: ignore the row with <code>id = 5</code> (for an update). <code>unique:users,email,5,user_id</code> uses another id column.</li>
+<li><code>exists:table,column</code>: a row with this value must exist.</li>
+</ul>
+<p>They use the default connection of <code>dox_orm</code>. <code>SqlQueryBuilder.initialize()</code> adds them, so they work once the ORM service runs.
+<code>req.validate()</code> with an async rule throws an error that tells you to use <code>validateAsync</code>.
+A <a href="../request/#custom-form-request">form request</a> always runs async rules.</p>
+<h2 id="typed-schemas">Typed schemas</h2>
+<p><code>validateSchema</code> takes a <code>dox_validation</code> schema and returns its typed output.
+Use <code>v.coerce</code> for query strings and form data, because they are text.</p>
+<div class="highlight"><pre><span></span><code><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">validateSchema</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">object</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Schema</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;&gt;</span><span class="p">{</span>
+<span class="w">    </span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">().</span><span class="n">trim</span><span class="p">().</span><span class="n">min</span><span class="p">(</span><span class="m">3</span><span class="p">),</span>
+<span class="w">    </span><span class="s1">'age'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">coerce</span><span class="p">.</span><span class="kt">int</span><span class="p">().</span><span class="n">min</span><span class="p">(</span><span class="m">18</span><span class="p">),</span>
+<span class="w">    </span><span class="s1">'tags'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">list</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">()).</span><span class="n">max</span><span class="p">(</span><span class="m">5</span><span class="p">).</span><span class="n">optional</span><span class="p">(),</span>
+<span class="p">}));</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="s1">'age'</span><span class="p">];</span><span class="w"> </span><span class="c1">// an int, not '18'</span>
+</code></pre></div>
+<p><code>v</code>, <code>Schema</code> and the other <code>dox_validation</code> names come with <code>import 'package:dox_core/dox_core.dart'</code>.
+A <code>schema.parse(...)</code> that fails inside a controller also answers <code>422</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title"><code>Schema</code> from <code>dox_orm</code></p>
+<p><code>dox_orm</code> also has a <code>Schema</code> class (the schema builder). In a file that imports both and uses <code>Schema</code>,
+add a prefix: <code>import 'package:dox_orm/dox_orm.dart' as orm;</code>.</p>
+</div>
+<h2 id="custom-rules">Custom rules</h2>
+<p>Add a rule name for rule strings:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">EvenRule</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Rule</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@override</span>
+<span class="w">    </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'even'</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nd">@override</span>
+<span class="w">    </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">defaultMessage</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'The {field} must be even'</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nd">@override</span>
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">check</span><span class="p">(</span><span class="kt">Object</span><span class="o">?</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">RuleContext</span><span class="w"> </span><span class="n">context</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kt">int</span><span class="p">.</span><span class="n">tryParse</span><span class="p">(</span><span class="s1">'</span><span class="si">$</span><span class="n">value</span><span class="s1">'</span><span class="p">)</span><span class="o">?</span><span class="p">.</span><span class="n">isEven</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">v</span><span class="p">.</span><span class="n">registerRule</span><span class="p">(</span><span class="s1">'even'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">RuleDefinition</span><span class="w"> </span><span class="n">d</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">EvenRule</span><span class="p">());</span>
+<span class="n">req</span><span class="p">.</span><span class="n">validate</span><span class="p">({</span><span class="s1">'count'</span><span class="o">:</span><span class="w"> </span><span class="s1">'required|even'</span><span class="p">});</span>
+</code></pre></div>
+<p>For a database check, extend <code>AsyncRule</code> and use <code>validateAsync</code>.
+An unknown rule name throws an error when the rules are first used.</p>
 <h2 id="custom-validation-message">Custom validation message</h2>
 <div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">BlogController</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">create</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -3470,6 +3658,14 @@ Its other rules are skipped. Only <code>required</code>, <code>required_if</code
 <p class="admonition-title">Info</p>
 <p>Name is required if status is inactive.</p>
 </div>
+<h4 id="unique"><code>unique</code></h4>
+<p>The value must not be in the table yet. Async, use <code>validateAsync</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">validateAsync</span><span class="p">({</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="s1">'required|email|unique:users,email'</span><span class="p">});</span>
+</code></pre></div>
+<h4 id="exists"><code>exists</code></h4>
+<p>The value must be in the table. Async, use <code>validateAsync</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">validateAsync</span><span class="p">({</span><span class="s1">'user_id'</span><span class="o">:</span><span class="w"> </span><span class="s1">'required|exists:users,id'</span><span class="p">});</span>
+</code></pre></div>
 <h4 id="email"><code>email</code></h4>
 <div class="highlight"><pre><span></span><code><span class="n">req</span><span class="p">.</span><span class="n">validate</span><span class="p">({</span>
 <span class="w">    </span><span class="s1">'user_email'</span><span class="o">:</span><span class="w"> </span><span class="s1">'email'</span><span class="p">,</span>

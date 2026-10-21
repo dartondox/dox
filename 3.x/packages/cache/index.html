@@ -2594,11 +2594,11 @@
 <h1 id="cache-dox_cache">Cache (dox_cache)</h1>
 <p><code>dox_cache</code> is a cache like Laravel Cache. It has <code>remember</code>, tags, atomic locks and four drivers.</p>
 <div class="admonition tip">
-<p class="admonition-title">Which one should I use?</p>
-<ul>
-<li>A simple file cache: the built-in <a href="../../digging-deeper/cache/"><code>Cache()</code></a> in <code>dox_core</code> is enough.</li>
-<li>Redis, memory with LRU, <code>remember</code>, <code>increment</code> or locks: use <code>dox_cache</code> (this page).</li>
-</ul>
+<p class="admonition-title">Built into Dox</p>
+<p><code>dox_core</code> uses <code>dox_cache</code> for <a href="../../digging-deeper/cache/"><code>Cache()</code></a>.
+In a Dox app, set the stores in <code>config/cache.dart</code> (the <code>CacheConfig</code> of this page), and use <code>Cache()</code>.
+<code>Dox().cache</code> is the <code>CacheManager</code>. <code>Cache().repository</code> is the <code>CacheStore</code>.
+This page is for the full API and for using <code>dox_cache</code> outside Dox.</p>
 </div>
 <h2 id="install">Install</h2>
 <div class="highlight"><pre><span></span><code>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_cache
@@ -2607,8 +2607,8 @@
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code>dox_core</code> also has a <code>CacheConfig</code> class. If you import both packages in one file,
-use a prefix: <code>import 'package:dox_cache/dox_cache.dart' as cache;</code></p>
+<p><code>dox_core</code> exports <code>CacheConfig</code>, <code>CacheManager</code>, <code>CacheStore</code> and <code>CacheLock</code> from this package.
+They are the same classes, so importing both packages is fine.</p>
 </div>
 <h2 id="drivers">Drivers</h2>
 <table>

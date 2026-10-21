@@ -690,10 +690,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#moving-to-the-new-packages-optional" class="md-nav__link">
+  <a href="#cache" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Moving to the new packages (optional)
+        Cache
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File storage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#new-built-in-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New built-in features
       
     </span>
   </a>
@@ -2539,10 +2572,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#moving-to-the-new-packages-optional" class="md-nav__link">
+  <a href="#cache" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Moving to the new packages (optional)
+        Cache
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File storage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#new-built-in-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New built-in features
       
     </span>
   </a>
@@ -2715,8 +2781,17 @@ See <a href="../../digging-deeper/deployment/">Deployment</a>.</p>
 <p><strong>A missing or <code>null</code> field skips its rules.</strong>
 Only <code>required</code>, <code>required_if</code> and <code>required_if_not</code> still run.
 Before, <code>'status': 'in:active,inactive'</code> failed when <code>status</code> was not sent. Now it passes.
-Fix: add <code>required</code> where the field must be sent. Use <code>nullable</code> and <code>sometimes</code> for the other cases.
-See <a href="../validation/">Validation</a>.</p>
+Fix: add <code>required</code> where the field must be sent. Use <code>nullable</code> and <code>sometimes</code> for the other cases.</p>
+<p><strong>Validation runs on <code>dox_validation</code>.</strong> The messages and the <code>{field: message}</code> error map are the same.</p>
+<ul>
+<li><strong>An unknown rule name throws</strong> when the rules are first used. Before, it logged a warning and was skipped. Fix: correct the name, or add it with <code>v.registerRule()</code>.</li>
+<li><code>DoxValidator.addCustomRule()</code> still works. For new code, use <code>v.registerRule()</code>.</li>
+<li><code>req.validate()</code> now returns the validated fields (it returned nothing).</li>
+<li><code>dox_core</code> now exports the <code>dox_validation</code> names (<code>v</code>, <code>Schema</code>, <code>Rule</code>, ...). <code>dox_orm</code> also has a <code>Schema</code> class.
+  A file that imports both and uses <code>Schema</code> gets an "ambiguous import" error. Fix: <code>import 'package:dox_orm/dox_orm.dart' as orm;</code> or <code>hide Schema</code>.</li>
+<li>A class of yours named like a <code>dox_validation</code> class (for example <code>Validator</code> or <code>Rule</code>) wins in its own file. In other files, hide the <code>dox_core</code> one.</li>
+</ul>
+<p>See <a href="../validation/">Validation</a>.</p>
 <h2 id="websocket">WebSocket</h2>
 <p><strong>Rooms use the plain room name.</strong>
 Emit to the same name the client sent with <code>joinRoom</code>. <code>room()</code> returns a new emitter and does not stay set for later events.</p>
@@ -2731,12 +2806,66 @@ Generated models import <code>package:dox_orm/dox_orm.dart</code>.</p>
 It makes a Dart file by default. <code>--dart</code> is gone, use <code>--sql</code> for a <code>.sql</code> file.</p>
 <p><strong><code>create:model Blog -m</code> makes a Dart migration.</strong>
 The migration is <code>create_blogs_table</code>, and the model gets <code>@DoxModel(table: 'blogs')</code>.</p>
-<h2 id="moving-to-the-new-packages-optional">Moving to the new packages (optional)</h2>
-<p>The built-in <code>Cache()</code> and <code>Storage()</code> in <code>dox_core</code> still work. If you move to the new packages, note:</p>
+<h2 id="cache">Cache</h2>
+<p><strong><code>Cache()</code> runs on <code>dox_cache</code>.</strong> The config changed:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// old</span>
+<span class="n">CacheConfig</span><span class="p">(</span>
+<span class="w">  </span><span class="nl">defaultDriver:</span><span class="w"> </span><span class="s1">'file'</span><span class="p">,</span>
+<span class="w">  </span><span class="nl">drivers:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">CacheDriverInterface</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'file'</span><span class="o">:</span><span class="w"> </span><span class="n">FileCacheDriver</span><span class="p">()},</span>
+<span class="p">);</span>
+
+<span class="c1">// new</span>
+<span class="n">CacheConfig</span><span class="p">(</span>
+<span class="w">  </span><span class="nl">defaultStore:</span><span class="w"> </span><span class="s1">'file'</span><span class="p">,</span>
+<span class="w">  </span><span class="nl">stores:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="p">{</span>
+<span class="w">    </span><span class="s1">'file'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'file'</span><span class="p">,</span><span class="w"> </span><span class="s1">'path'</span><span class="o">:</span><span class="w"> </span><span class="s1">'storage/cache'</span><span class="p">},</span>
+<span class="w">    </span><span class="s1">'redis'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'redis'</span><span class="p">,</span><span class="w"> </span><span class="s1">'host'</span><span class="o">:</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">},</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="p">);</span>
+</code></pre></div>
 <ul>
-<li><a href="../../packages/cache/"><code>dox_cache</code></a>: values must be JSON types. <code>put</code> with no ttl keeps the value <strong>forever</strong> (the old <code>Cache()</code> kept it 1 hour).</li>
-<li><a href="../../packages/storage/"><code>dox_storage</code></a>: a new <code>Disk</code> API with S3 and signed URLs.</li>
-<li><a href="../../packages/validation/"><code>dox_validation</code></a>: typed schemas. <code>v.fromRules()</code> takes your old rule strings.</li>
+<li><code>CacheDriverInterface</code> and <code>FileCacheDriver</code> are gone. For your own driver, see <a href="../../packages/cache/#your-own-driver">dox_cache</a>.</li>
+<li><strong>Values must be JSON types</strong> (<code>Map</code>, <code>List</code>, <code>String</code>, <code>num</code>, <code>bool</code>). Other types throw.</li>
+<li><strong><code>put</code> with no <code>duration</code> keeps the value forever.</strong> Before, it kept it 1 hour. Pass <code>duration:</code> where you need a limit.</li>
+<li><code>Cache().flush()</code> with no tag empties the whole store.</li>
+<li>Old cache files are not read. The new files are plain JSON, not encrypted. Delete <code>storage/cache</code> once.</li>
+</ul>
+<p>See <a href="../../digging-deeper/cache/">Cache</a>.</p>
+<h2 id="file-storage">File storage</h2>
+<p><strong><code>Storage()</code> runs on <code>dox_storage</code>.</strong> <code>AppConfig(fileStorage:)</code> is now <code>AppConfig(storage:)</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// old</span>
+<span class="n">FileStorageConfig</span><span class="p">(</span>
+<span class="w">  </span><span class="nl">defaultDriver:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span>
+<span class="w">  </span><span class="nl">drivers:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">StorageDriverInterface</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'local'</span><span class="o">:</span><span class="w"> </span><span class="n">LocalStorageDriver</span><span class="p">()},</span>
+<span class="p">);</span>
+
+<span class="c1">// new</span>
+<span class="n">StorageConfig</span><span class="p">(</span>
+<span class="w">  </span><span class="nl">defaultDisk:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span>
+<span class="w">  </span><span class="nl">disks:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="p">{</span>
+<span class="w">    </span><span class="s1">'local'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span><span class="w"> </span><span class="s1">'root'</span><span class="o">:</span><span class="w"> </span><span class="s1">'storage'</span><span class="p">},</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="p">);</span>
+</code></pre></div>
+<ul>
+<li><code>StorageDriverInterface</code> and <code>LocalStorageDriver</code> are gone. Implement <code>DriverContract</code> from <code>dox_storage</code> and call <code>Dox().storage.register(name, driver)</code>.</li>
+<li><code>Storage().disk('name')</code> with a name that is not in the config throws. Before, it used the default disk.</li>
+<li><code>put</code>, <code>putRequestFile</code>, <code>get</code>, <code>exists</code>, <code>delete</code>, <code>stream</code> and <code>download</code> work as before. Paths still look like <code>/images/&lt;uuid&gt;.png</code>.</li>
+<li><code>stream()</code> now gets the content type from the file extension, not from the first bytes.</li>
+</ul>
+<p>See <a href="../../digging-deeper/file-storage/">File Storage</a>.</p>
+<h2 id="environment">Environment</h2>
+<p><strong>A missing key is never the text <code>"null"</code>.</strong>
+Before, <code>Env.get('APP_KEY')</code> with no <code>APP_KEY</code> gave <code>"null"</code>, so the app used a key anyone can guess.
+Now a <code>String</code> gives <code>''</code>, <code>String?</code> gives <code>null</code>, and <code>int</code>, <code>num</code>, <code>double</code>, <code>bool</code> throw an <code>ArgumentError</code>.
+Fix: give a default where a key is optional, for example <code>Env.get&lt;int&gt;('APP_PORT', 3000)</code>.</p>
+<p><strong>An empty <code>APP_KEY</code> stops the server in production</strong> (<code>APP_ENV=production</code>). Run <code>dox key:generate</code>.</p>
+<h2 id="new-built-in-features">New built-in features</h2>
+<ul>
+<li><a href="../../packages/openapi/#in-a-dox-app">OpenAPI docs</a> at <code>/docs</code>, on by default only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>. <code>dox openapi:generate</code> writes the files.</li>
+<li><a href="../../packages/socketio/#in-a-dox-app-same-port-as-http">Socket.IO</a> on the app port, off by default.</li>
+<li><a href="../validation/#database-rules-unique-and-exists"><code>unique</code> and <code>exists</code> rules</a>, <code>validateAsync()</code>, <code>validateSchema()</code> and <code>FormRequest.schema()</code>.</li>
+<li><code>Route.files()</code> for local signed URLs, and the catch-all route param <code>{path*}</code>.</li>
 </ul>
 
 

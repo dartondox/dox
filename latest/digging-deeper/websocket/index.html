@@ -2653,7 +2653,9 @@
 <p><code>dox_websocket</code> adds a WebSocket server to the Dox HTTP server. Use it for live chat, notifications and other real-time updates.</p>
 <div class="admonition tip">
 <p class="admonition-title">Want Socket.IO clients?</p>
-<p>Use <a href="../../packages/socketio/"><code>dox_socketio</code></a>. It works with the official Socket.IO clients and has acks and namespaces.</p>
+<p>Use <a href="../../packages/socketio/#in-a-dox-app-same-port-as-http">Socket.IO</a>. Turn it on with <code>AppConfig(socketIo: SocketIoConfig(enabled: true))</code>.
+It runs on the same port, works with the official Socket.IO clients, and has acks and namespaces.
+<code>dox_websocket</code> keeps working next to it.</p>
 </div>
 <h2 id="usage">Usage</h2>
 <h3 id="1-create-websocket-service-with-redis-adapter">1. Create websocket service with redis adapter</h3>

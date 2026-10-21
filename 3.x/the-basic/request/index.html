@@ -807,6 +807,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        validated
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2656,6 +2678,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        validated
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2824,6 +2868,30 @@ and also counts the bytes while reading.</p>
 <p>This function serves as the location for defining validation rules for input requests.</p>
 <h4 id="messages"><code>messages</code></h4>
 <p>In this function, you have the ability to configure custom validation messages for input form request validation. Check <a href="../validation/#custom-validation-message">here</a> for more about validation.</p>
+<h4 id="schema"><code>schema</code></h4>
+<p>Return a <code>dox_validation</code> schema to check the body with typed output. When <code>schema()</code> is not <code>null</code>, Dox uses it instead of <code>rules()</code>.
+Build it once in a <code>static final</code> field, because <code>schema()</code> runs on every request.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">SignUpRequest</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">FormRequest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">ObjectSchema</span><span class="w"> </span><span class="n">_schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">object</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Schema</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;&gt;</span><span class="p">{</span>
+<span class="w">        </span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">().</span><span class="n">trim</span><span class="p">().</span><span class="n">min</span><span class="p">(</span><span class="m">3</span><span class="p">),</span>
+<span class="w">        </span><span class="s1">'age'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">coerce</span><span class="p">.</span><span class="kt">int</span><span class="p">().</span><span class="n">min</span><span class="p">(</span><span class="m">18</span><span class="p">),</span>
+<span class="w">    </span><span class="p">});</span>
+
+<span class="w">    </span><span class="nd">@override</span>
+<span class="w">    </span><span class="n">ObjectSchema</span><span class="o">?</span><span class="w"> </span><span class="n">schema</span><span class="p">()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">_schema</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The schema (or the <code>rules()</code>) also becomes the request body in the <a href="../../packages/openapi/">OpenAPI docs</a>.</p>
+<h4 id="validated"><code>validated</code></h4>
+<p>The checked data, set before <code>setUp()</code> runs. With <code>schema()</code> it is the typed output. With <code>rules()</code> it is the fields that have rules.</p>
+<div class="highlight"><pre><span></span><code><span class="n">store</span><span class="p">(</span><span class="n">SignUpRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">validated</span><span class="p">[</span><span class="s1">'age'</span><span class="p">];</span>
+<span class="p">}</span>
+</code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>A form request always validates with async support, so <code>unique</code> and <code>exists</code> rules work in <code>rules()</code>.</p>
+</div>
 
 
 
