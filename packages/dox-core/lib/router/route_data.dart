@@ -1,4 +1,4 @@
-import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/http/http_controller_handler.dart';
 
 class RouteData {
   final String method;
@@ -9,7 +9,6 @@ class RouteData {
   /// middleware from groups and routers (`Route.middleware`, global
   /// middleware). they are also the first items of [controllers].
   final List<dynamic> preMiddleware;
-  FormRequest Function()? formRequest;
 
   /// request body schema for the OpenAPI docs, from the `body:` option.
   /// any object with `toJsonSchema()`, like a `dox_validation` schema.
@@ -17,6 +16,24 @@ class RouteData {
 
   final String? domain;
   final bool? corsEnabled;
+
+  ControllerPlan? _handler;
+  bool _handlerRead = false;
+
+  /// How to call the controller (the last function of [controllers]),
+  /// read once. Null when the route has no controller function.
+  /// Throws a [StateError] when a parameter type is not known.
+  ControllerPlan? get handler {
+    if (!_handlerRead) {
+      Object? list = controllers;
+      Object? last = list is List<dynamic> && list.isNotEmpty
+          ? list.last
+          : null;
+      _handler = last is Function ? ControllerPlan.of(last, this) : null;
+      _handlerRead = true;
+    }
+    return _handler;
+  }
 
   RouteData({
     required this.method,
@@ -37,6 +54,7 @@ class RouteData {
 
   /// names of the params, eg. `['id']` for `/blog/{id}`.
   /// `{path*}` matches the rest of the url, slashes too.
+  /// `{id?}` is optional: `/blog` and `/blog/5` both match.
   List<String> get paramNames {
     _compile();
     return _paramNames;
@@ -52,17 +70,24 @@ class RouteData {
     _paramNames = <String>[
       for (String part in path.split('/'))
         if (part.startsWith('{') && part.endsWith('}'))
-          part.substring(1, part.length - 1).replaceAll('*', ''),
+          part
+              .substring(1, part.length - 1)
+              .replaceAll('*', '')
+              .replaceAll('?', ''),
     ];
     _pattern = _paramNames.isEmpty
         ? null
-        : RegExp(
-            '^${path.replaceAllMapped(RegExp(r'{[^/]+}'), _paramPattern).replaceAll('/', '\\/')}\$',
-          );
+        : RegExp('^${path.replaceAllMapped(_param, _paramPattern)}\$');
   }
 
+  static final RegExp _param = RegExp(r'/?{[^/]+}');
+
   static String _paramPattern(Match match) {
-    return match[0]!.endsWith('*}') ? '(.+)' : '([^/]+)';
+    String text = match[0]!;
+    String slash = text.startsWith('/') ? '/' : '';
+    if (text.endsWith('*}')) return '$slash(.+)';
+    if (text.endsWith('?}')) return '(?:$slash([^/]+))?';
+    return '$slash([^/]+)';
   }
 
   /// a copy for one request, with its own params.
@@ -79,7 +104,8 @@ class RouteData {
         body: body,
       )
       ..params = values
-      ..formRequest = formRequest
+      .._handler = handler
+      .._handlerRead = true
       .._pattern = _pattern
       .._paramNames = _paramNames
       .._compiledFor = _compiledFor;

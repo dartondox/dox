@@ -17,7 +17,15 @@ class AppConfig {
   final int totalIsolate;
   final ResponseHandlerInterface? responseHandler;
   final Function(Object?, StackTrace) errorHandler;
-  final Map<Type, FormRequest Function()> formRequests;
+
+  /// Every DTO of the app: `dtos` from `lib/dtos.g.dart`.
+  /// Dox finds the DTO of a controller parameter and of
+  /// `req.validate<T>()` with it.
+  final List<DtoSchema<Object>> dtos;
+
+  /// Messages for validation errors, for example in other languages.
+  /// Default: the English messages.
+  final MessageResolver? validationMessages;
   final List<dynamic> globalMiddleware;
   final List<Router> routers;
   final CORSConfig cors;
@@ -62,7 +70,8 @@ class AppConfig {
     /// isolates (threads) that serve http. Default: one per CPU core.
     int? totalIsolate,
     this.services = const <DoxService>[],
-    this.formRequests = const <Type, FormRequest Function()>{},
+    this.dtos = const <DtoSchema<Object>>[],
+    this.validationMessages,
     this.globalMiddleware = const <dynamic>[],
     this.routers = const <Router>[],
     this.cors = const CORSConfig(),

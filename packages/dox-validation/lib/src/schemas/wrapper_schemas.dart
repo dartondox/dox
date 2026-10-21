@@ -5,7 +5,7 @@ import '../core/schema.dart';
 import '../core/sentinels.dart';
 
 /// The value may be missing. Made by `.optional()`.
-class OptionalSchema<O> extends Schema<O?>
+class OptionalSchema<O> extends BaseSchema<O?>
     with FluentSchema<OptionalSchema<O>, O?> {
   OptionalSchema(this.inner);
 
@@ -63,7 +63,7 @@ class OptionalSchema<O> extends Schema<O?>
 }
 
 /// The value may be `null`. Made by `.nullable()`.
-class NullableSchema<O> extends Schema<O?>
+class NullableSchema<O> extends BaseSchema<O?>
     with FluentSchema<NullableSchema<O>, O?> {
   NullableSchema(this.inner);
 
@@ -121,7 +121,7 @@ class NullableSchema<O> extends Schema<O?>
 }
 
 /// Uses a default value when the input is missing. Made by `.defaultTo()`.
-class DefaultSchema<O> extends Schema<O>
+class DefaultSchema<O> extends BaseSchema<O>
     with FluentSchema<DefaultSchema<O>, O> {
   DefaultSchema(this.inner, this.defaultValue);
 
@@ -185,7 +185,7 @@ class DefaultSchema<O> extends Schema<O>
 
 /// Changes the output after the inner schema passes.
 /// Made by `.transform()`. JSON Schema shows the input shape.
-class TransformSchema<I, O> extends Schema<O>
+class TransformSchema<I, O> extends BaseSchema<O>
     with FluentSchema<TransformSchema<I, O>, O> {
   TransformSchema(this.inner, this.transformer);
 

@@ -7,7 +7,7 @@ import '../core/sentinels.dart';
 
 /// Schema for a map with any keys, where every value matches [values].
 /// Made by `v.map()`. Keys are checked with [keys] when given.
-class MapSchema<V> extends Schema<Map<String, V>>
+class MapSchema<V> extends BaseSchema<Map<String, V>>
     with FluentSchema<MapSchema<V>, Map<String, V>> {
   MapSchema(this.values, {this.keys});
 

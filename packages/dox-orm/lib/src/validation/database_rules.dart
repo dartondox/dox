@@ -2,50 +2,71 @@ import 'package:dox_validation/dox_validation.dart';
 
 import '../query_builder.dart';
 
-/// Counts rows where `column = value`. The default uses the default
-/// connection of the query builder. Swap it in tests.
-class RowCounter {
-  const RowCounter();
+/// Reads rows for [Unique] and [Exists]. Soft-deleted rows count too,
+/// because it reads the table, not the model.
+class RowFinder {
+  const RowFinder();
 
-  /// Number of rows in [table] where [column] is [value].
+  /// The values of [values] that are in [column] of [table], as text.
   /// When [exceptColumn] is set, rows where it equals [exceptValue] are
-  /// not counted.
-  Future<int> count(
+  /// left out. One `WHERE IN` query.
+  Future<Set<String>> found(
     String table,
     String column,
-    Object? value, {
+    List<Object?> values, {
     String? exceptColumn,
     Object? exceptValue,
-  }) {
+    String? connection,
+  }) async {
     QueryBuilder<dynamic> query = QueryBuilder.table(table)
-        .where(column, value);
+        .select(column)
+        .whereIn(column, values);
     if (exceptColumn != null) {
       query = query.where(exceptColumn, '!=', exceptValue);
     }
-    return query.count();
+    if (connection != null) query = query.withConnection(connection);
+    List<dynamic> rows = await query.get();
+    Set<String> found = <String>{};
+    for (dynamic row in rows) {
+      if (row is Map) found.add('${row[column]}');
+    }
+    return found;
   }
 }
 
-/// `unique:table,column,except,idColumn`: no other row has this value.
+/// No row in [table] has this value.
 ///
-/// - `unique:users` checks the column with the field name.
-/// - `unique:users,email,5` ignores the row with `id = 5` (for updates).
-/// - `unique:users,email,5,user_id` uses `user_id` instead of `id`.
-class UniqueRule extends AsyncRule<Object?> {
-  UniqueRule({
-    required this.table,
-    required this.column,
-    this.except,
-    this.idColumn = 'id',
-    this.counter = const RowCounter(),
+/// ```dart
+/// @Unique('users', column: 'email')
+/// final String email;
+///
+/// // PUT /users/{id}: skip the row being updated
+/// @Unique('users', column: 'email', ignoreParam: 'id')
+/// final String email;
+/// ```
+/// [column] defaults to the input key. On a `List` field each item is
+/// checked, all in one query.
+class Unique extends AsyncRule<Object?> {
+  const Unique(
+    this.table, {
+    this.column,
+    this.ignoreParam,
+    this.ignoreColumn = 'id',
+    this.connection,
+    this.finder = const RowFinder(),
     super.message,
   });
 
   final String table;
-  final String column;
-  final String? except;
-  final String idColumn;
-  final RowCounter counter;
+  final String? column;
+
+  /// A path param name. The row where [ignoreColumn] equals it is skipped.
+  final String? ignoreParam;
+  final String ignoreColumn;
+
+  /// A `dox_orm` connection name. Default: the default connection.
+  final String? connection;
+  final RowFinder finder;
 
   @override
   String get name => 'unique';
@@ -55,31 +76,49 @@ class UniqueRule extends AsyncRule<Object?> {
 
   @override
   Future<bool> checkAsync(Object? value, RuleContext context) async {
-    String? skip = except;
-    bool hasExcept = skip != null && skip.isNotEmpty && skip != 'NULL';
-    int total = await counter.count(
+    return (await failedItems(<Object?>[value], context)).isEmpty;
+  }
+
+  @override
+  Future<List<int>> failedItems(
+    List<Object?> values,
+    RuleContext context,
+  ) async {
+    String? param = ignoreParam;
+    String? skip = param == null ? null : context.state.params[param];
+    Set<String> taken = await finder.found(
       table,
-      column,
-      value,
-      exceptColumn: hasExcept ? idColumn : null,
-      exceptValue: hasExcept ? (int.tryParse(skip) ?? skip) : null,
+      column ?? context.field,
+      values,
+      exceptColumn: skip == null ? null : ignoreColumn,
+      exceptValue: skip == null ? null : (int.tryParse(skip) ?? skip),
+      connection: connection,
     );
-    return total == 0;
+    return <int>[
+      for (int i = 0; i < values.length; i++)
+        if (taken.contains('${values[i]}')) i,
+    ];
   }
 }
 
-/// `exists:table,column`: a row with this value must exist.
-class ExistsRule extends AsyncRule<Object?> {
-  ExistsRule({
-    required this.table,
-    required this.column,
-    this.counter = const RowCounter(),
+/// A row in [table] has this value: `@Exists('teams')`.
+/// [column] defaults to `id`.
+/// On a `List` field each item is checked, all in one query.
+class Exists extends AsyncRule<Object?> {
+  const Exists(
+    this.table, {
+    this.column = 'id',
+    this.connection,
+    this.finder = const RowFinder(),
     super.message,
   });
 
   final String table;
   final String column;
-  final RowCounter counter;
+
+  /// A `dox_orm` connection name. Default: the default connection.
+  final String? connection;
+  final RowFinder finder;
 
   @override
   String get name => 'exists';
@@ -89,53 +128,23 @@ class ExistsRule extends AsyncRule<Object?> {
 
   @override
   Future<bool> checkAsync(Object? value, RuleContext context) async {
-    return await counter.count(table, column, value) > 0;
-  }
-}
-
-/// Adds the database rules `unique` and `exists` to a [Validator].
-/// `SqlQueryBuilder.initialize()` adds them to the global `v`, so dox
-/// apps get them when the database is set up.
-///
-/// ```dart
-/// await req.validateAsync({'email': 'required|email|unique:users,email'});
-/// ```
-class DatabaseRules {
-  const DatabaseRules({this.counter = const RowCounter()});
-
-  final RowCounter counter;
-
-  /// Register `unique` and `exists` on [validator].
-  void registerOn(Validator validator) {
-    validator.registerRule('unique', _unique);
-    validator.registerRule('exists', _exists);
+    return (await failedItems(<Object?>[value], context)).isEmpty;
   }
 
-  Rule<Object?> _unique(RuleDefinition d) {
-    return UniqueRule(
-      table: _table(d),
-      column: d.arg(1, _fieldName(d)),
-      except: d.args.length > 2 ? d.arg(2) : null,
-      idColumn: d.arg(3, 'id'),
-      counter: counter,
+  @override
+  Future<List<int>> failedItems(
+    List<Object?> values,
+    RuleContext context,
+  ) async {
+    Set<String> found = await finder.found(
+      table,
+      column,
+      values,
+      connection: connection,
     );
+    return <int>[
+      for (int i = 0; i < values.length; i++)
+        if (!found.contains('${values[i]}')) i,
+    ];
   }
-
-  Rule<Object?> _exists(RuleDefinition d) {
-    return ExistsRule(
-      table: _table(d),
-      column: d.arg(1, _fieldName(d)),
-      counter: counter,
-    );
-  }
-
-  String _table(RuleDefinition d) {
-    String table = d.arg(0);
-    if (table.isEmpty) {
-      throw ArgumentError('Rule "${d.name}" on "${d.field}" needs a table');
-    }
-    return table;
-  }
-
-  String _fieldName(RuleDefinition d) => d.field.split('.').last;
 }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/isolate/dox_isolate.dart';
+import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/server/dox_server.dart';
 import 'package:dox_core/utils/logger.dart';
 import 'package:dox_socketio/dox_socketio.dart';
@@ -38,9 +39,26 @@ class Dox implements IDox {
   /// websocket
   IDoxWebsocket? websocket;
 
-  /// validator used by `req.validate()` and form requests.
-  /// replace it to use your own `dox_validation` Validator.
-  RequestValidator validator = RequestValidator();
+  /// checks DTOs and schemas for `req.validate<T>()` and controller
+  /// parameters.
+  RequestValidator validator = const RequestValidator();
+
+  /// the DTOs of the app, from `config.dtos`. Empty before [initialize].
+  DtoRegistry get dtos {
+    return _dtos ??= DtoRegistry(
+      _initialized ? config.dtos : const <DtoSchema<Object>>[],
+    );
+  }
+
+  DtoRegistry? _dtos;
+
+  /// validation messages, from `config.validationMessages`.
+  MessageResolver get messages {
+    MessageResolver? custom = _initialized ? config.validationMessages : null;
+    return custom ?? MessageResolver.global;
+  }
+
+  bool _initialized = false;
 
   /// cache stores from `config.cache`, made on first use in each isolate.
   /// `Cache()` uses it. replace it in tests.
@@ -71,6 +89,8 @@ class Dox implements IDox {
   /// ```
   void initialize(AppConfig appConfig) async {
     config = appConfig;
+    _initialized = true;
+    _dtos = null;
   }
 
   /// override total isolate from config
@@ -147,8 +167,8 @@ class Dox implements IDox {
     for (DoxService service in doxServices) {
       await service.setup();
     }
-    _registerFormRequests();
     _registerRoute();
+    _resolveControllers();
     _mountSocketIo();
     if (config.openApi.isEnabled) OpenApiDocument(config.openApi).register();
   }
@@ -164,7 +184,6 @@ class Dox implements IDox {
     for (DoxService service in doxServices) {
       await service.setup();
     }
-    _registerFormRequests();
     _registerRoute();
     return OpenApiDocument(config.openApi).write(dir);
   }
@@ -195,11 +214,12 @@ class Dox implements IDox {
 
   /// ################ end ###########
 
-  /// register form request assign in app config
-  void _registerFormRequests() {
-    config.formRequests.forEach((Type key, Function() value) {
-      Dox().ioc.registerRequest(key.toString(), value);
-    });
+  /// read the parameter types of every controller once, at start.
+  /// a type that is not known stops the server here, not on a request.
+  void _resolveControllers() {
+    for (RouteData route in Route().routes) {
+      route.handler;
+    }
   }
 
   /// register routes assign in app config

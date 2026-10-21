@@ -76,10 +76,12 @@ Future<DoxRequest> getDoxRequest(HttpRequest req, RouteData route) async {
     clientIp = proxy.clientIp(remote, req.headers.value('x-forwarded-for'));
     scheme = proxy.scheme(remote, req.headers.value('x-forwarded-proto'));
   }
+  RequestBody body = await HttpBody.read(req);
   return DoxRequest(
     route: route,
     uri: req.uri,
-    body: await HttpBody.read(req),
+    body: body.map,
+    requestBody: body,
     contentType: req.headers.contentType,
     clientIp: clientIp,
     scheme: scheme,

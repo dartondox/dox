@@ -30,7 +30,7 @@ dart pub global activate dox 3.0.0-alpha.1
 | `dox build_runner:watch` / `dox build_runner:build` | run the code generator |
 | `dox create:controller <name> [-r] [-ws]` | create a controller |
 | `dox create:middleware <name>` | create a middleware |
-| `dox create:request <name>` | create a form request |
+| `dox create:dto <name>` | create a DTO (typed, checked input) |
 | `dox create:serializer <name>` | create a serializer |
 | `dox create:model <name> [-m]` (or `make:model`) | create a model, and with `-m` its migration |
 | `dox make:migration <name> [--sql]` (or `create:migration`) | create a Dart migration, or a `.sql` one with `--sql` |
@@ -111,7 +111,7 @@ dox key:generate
 
 !!! info "File and class names"
     Word breaks are kept. `dox create:controller BlogPost` makes `blog_post.controller.dart`
-    with the class `BlogPostController`. The same is true for middleware, requests and serializers.
+    with the class `BlogPostController`. The same is true for middleware, DTOs and serializers.
 
 ## Create middleware
 
@@ -119,13 +119,14 @@ dox key:generate
 dox create:middleware auth_middleware
 ```
 
-## Create request
+## Create DTO
 
 ```py
-dox create:request Blog
+dox create:dto CreateBlog
 ```
 
-See [Custom Form Request](../the-basic/request.md#custom-form-request).
+It makes `lib/app/http/dtos/create_blog.dto.dart`. Then run `dox build_runner:build`.
+See [Validation](../the-basic/validation.md).
 
 ## Create serializer
 

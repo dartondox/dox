@@ -1,7 +1,5 @@
 import 'core/message_resolver.dart';
 import 'core/schema.dart';
-import 'laravel/rule_registry.dart';
-import 'laravel/rules_schema_builder.dart';
 import 'schemas/list_schema.dart';
 import 'schemas/map_schema.dart';
 import 'schemas/number_schemas.dart';
@@ -10,8 +8,7 @@ import 'schemas/scalar_schemas.dart';
 import 'schemas/string_schema.dart';
 import 'schemas/union_schema.dart';
 
-/// Makes schemas. Use the top-level `v`, or make your own instance
-/// with its own [RuleRegistry] (handy for tests and DI).
+/// Makes schemas. Use the top-level `v`.
 ///
 /// ```dart
 /// ObjectSchema user = v.object(<String, Schema<Object?>>{
@@ -20,11 +17,7 @@ import 'schemas/union_schema.dart';
 /// });
 /// ```
 class Validator {
-  Validator({RuleRegistry? registry})
-    : registry = registry ?? RuleRegistry.withDefaults();
-
-  /// Rules used by [fromRules].
-  final RuleRegistry registry;
+  const Validator();
 
   /// Schemas that convert text input first. Good for query strings
   /// and form data.
@@ -95,23 +88,6 @@ class Validator {
   /// An uploaded file (a `FileInput`).
   FileSchema file() {
     return FileSchema();
-  }
-
-  /// Build a schema from Laravel style rules.
-  ///
-  /// ```dart
-  /// v.fromRules({'email': 'required|email', 'age': 'nullable|integer'});
-  /// ```
-  ObjectSchema fromRules(
-    Map<String, String> rules, {
-    Map<String, String> messages = const <String, String>{},
-  }) {
-    return RulesSchemaBuilder(registry).build(rules, messages: messages);
-  }
-
-  /// Add a rule name for [fromRules], like `unique:users,email`.
-  void registerRule(String name, RuleBuilder builder) {
-    registry.register(name, builder);
   }
 
   /// The global message resolver. Same as [MessageResolver.global].

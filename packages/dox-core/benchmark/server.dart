@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 
+import 'bench.dto.dart';
+
 /// Small app used by the benchmark.
 /// Usage: dart run benchmark/server.dart [isolates] [port]
 class BenchRouter extends Router {
@@ -17,6 +19,11 @@ class BenchRouter extends Router {
 
     Route.get('/user/{id}', (DoxRequest req, String id) {
       return <String, dynamic>{'id': id};
+    });
+
+    /// a POST body with 6 fields, checked by a DTO
+    Route.post('/dto', (CreateMember body) {
+      return <String, dynamic>{'name': body.name, 'age': body.age};
     });
 
     /// file stays on disk (temp file), nothing big in memory
@@ -53,6 +60,7 @@ void main(List<String> args) async {
       serverPort: port,
       totalIsolate: isolates,
       responseHandler: BenchHandler(),
+      dtos: <DtoSchema<Object>>[CreateMember.schema],
       routers: <Router>[BenchRouter()],
       globalMiddleware: <dynamic>[
         LogMiddleware(enabled: Platform.environment['LOG'] == '1'),

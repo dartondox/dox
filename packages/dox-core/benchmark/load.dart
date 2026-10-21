@@ -3,12 +3,14 @@ import 'dart:io';
 import 'dart:isolate';
 
 /// Tiny keep-alive HTTP load generator (no wrk/oha needed).
-/// Usage: dart run benchmark/`load.dart <url> [connections=64] [seconds=10] [workers=4]`
+/// Usage: dart run benchmark/`load.dart <url> [connections=64] [seconds=10] [workers=4] [json body]`
+/// With a JSON body it sends POST requests.
 void main(List<String> args) async {
   Uri url = Uri.parse(args[0]);
   int connections = args.length > 1 ? int.parse(args[1]) : 64;
   int seconds = args.length > 2 ? int.parse(args[2]) : 10;
   int workers = args.length > 3 ? int.parse(args[3]) : 4;
+  String? body = args.length > 4 ? args[4] : null;
 
   ReceivePort port = ReceivePort();
   for (int i = 0; i < workers; i++) {
@@ -17,6 +19,7 @@ void main(List<String> args) async {
       url,
       connections ~/ workers,
       seconds,
+      body,
     ]);
   }
 
@@ -46,6 +49,7 @@ Future<void> _worker(List<dynamic> a) async {
   Uri url = a[1];
   int conns = a[2];
   int seconds = a[3];
+  String? body = a[4];
   HttpClient client = HttpClient()..maxConnectionsPerHost = conns;
   DateTime end = DateTime.now().add(Duration(seconds: seconds));
   int count = 0;
@@ -59,7 +63,13 @@ Future<void> _worker(List<dynamic> a) async {
         ..reset()
         ..start();
       try {
-        HttpClientRequest req = await client.getUrl(url);
+        HttpClientRequest req = body == null
+            ? await client.getUrl(url)
+            : await client.postUrl(url);
+        if (body != null) {
+          req.headers.contentType = ContentType.json;
+          req.write(body);
+        }
         HttpClientResponse res = await req.close();
         await res.drain<void>();
         if (res.statusCode != 200) errors++;

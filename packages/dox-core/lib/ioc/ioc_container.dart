@@ -2,16 +2,6 @@ class IocContainer {
   final Map<String, dynamic> _dependencies = <String, dynamic>{};
   final Map<String, dynamic> _singletonDependencies = <String, dynamic>{};
 
-  /// register a request class in ioc container
-  /// ```
-  /// ioc.registerRequest('BlogRequest', () => BlogRequest());
-  /// ```
-  void registerRequest(String name, Function callback) {
-    if (name != 'dynamic') {
-      _dependencies[name] = () => callback();
-    }
-  }
-
   /// register a class in ioc container
   /// ```
   /// ioc.registerByName('name', (i) => Bar());

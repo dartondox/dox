@@ -4,7 +4,7 @@ import 'package:dox/src/command_registry.dart';
 import 'package:dox/src/tools/create_controller.dart';
 import 'package:dox/src/tools/create_middleware.dart';
 import 'package:dox/src/tools/create_model.dart';
-import 'package:dox/src/tools/create_request.dart';
+import 'package:dox/src/tools/create_dto.dart';
 import 'package:dox/src/tools/create_serializer.dart';
 import 'package:test/test.dart';
 
@@ -61,11 +61,18 @@ void main() {
       expect(c, contains('return req;'));
     });
 
-    test('request', () {
-      expect(createRequest('BlogPostRequest'), isTrue);
-      String c = read('lib/app/http/requests/blog_post.request.dart');
-      expect(c, contains('class BlogPostRequest extends FormRequest'));
-      expect(c, contains('Map<String, String> messages()'));
+    test('dto', () {
+      expect(createDto('CreateBlogPost'), isTrue);
+      String c = read('lib/app/http/dtos/create_blog_post.dto.dart');
+      expect(c, contains('@Dto()'));
+      expect(c, contains('class CreateBlogPost {'));
+      expect(c, contains("part 'create_blog_post.dto.g.dart';"));
+      expect(
+        c,
+        contains(
+          r'static const DtoSchema<CreateBlogPost> schema = $CreateBlogPostDto;',
+        ),
+      );
     });
 
     test('serializer imports the matching model', () {
@@ -96,11 +103,11 @@ void main() {
       expect(createModel('User'), isFalse);
     });
 
-    test('middleware, request, serializer', () {
+    test('middleware, dto, serializer', () {
       expect(createMiddleware('Auth'), isTrue);
       expect(createMiddleware('Auth'), isFalse);
-      expect(createRequest('User'), isTrue);
-      expect(createRequest('User'), isFalse);
+      expect(createDto('User'), isTrue);
+      expect(createDto('User'), isFalse);
       expect(createSerializer('User'), isTrue);
       expect(createSerializer('User'), isFalse);
     });

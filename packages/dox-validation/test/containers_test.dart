@@ -56,7 +56,7 @@ void main() {
         },
       );
       expect(result.errors, <String, String>{
-        'name': 'The name must be at least 2 character',
+        'name': 'The name must be at least 2 characters',
         'address.city': 'The city must be a string',
         'tags.1': 'The tags must be a string',
       });

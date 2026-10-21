@@ -29,10 +29,10 @@ import 'parse_state.dart';
 /// v.string().use(SlugRule());
 /// ```
 abstract class Rule<T> {
-  Rule({this.message});
+  const Rule({this.message});
 
   /// Custom message for this rule. It wins over every other message.
-  String? message;
+  final String? message;
 
   /// Rule name. Also used as the issue code.
   String get name;
@@ -47,12 +47,6 @@ abstract class Rule<T> {
 
   /// `true` when the rule needs [checkAsync]. Then use `parseAsync`.
   bool get isAsync {
-    return false;
-  }
-
-  /// `true` when the rule must run even if the value is missing or empty.
-  /// Only used by `v.fromRules()`. `required` is an implicit rule.
-  bool get isImplicit {
     return false;
   }
 
@@ -90,7 +84,7 @@ abstract class Rule<T> {
 
 /// A rule that only has an async check, like "email is unique in the DB".
 abstract class AsyncRule<T> extends Rule<T> {
-  AsyncRule({super.message});
+  const AsyncRule({super.message});
 
   @override
   bool get isAsync {
@@ -104,6 +98,17 @@ abstract class AsyncRule<T> extends Rule<T> {
 
   @override
   Future<bool> checkAsync(T value, RuleContext context);
+
+  /// Check every item of [values] and give the indexes of the items that
+  /// fail. Used for a `List<T>` field. The default calls [checkAsync] for
+  /// each item. A database rule can override it to use one query.
+  Future<List<int>> failedItems(List<T> values, RuleContext context) async {
+    List<int> failed = <int>[];
+    for (int i = 0; i < values.length; i++) {
+      if (!await checkAsync(values[i], context)) failed.add(i);
+    }
+    return failed;
+  }
 }
 
 /// What a rule can see and do while it runs.

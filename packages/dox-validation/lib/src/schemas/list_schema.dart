@@ -7,7 +7,7 @@ import '../core/sentinels.dart';
 import '../rules/collection_rules.dart';
 
 /// Schema for a list where every item matches [item]. Made by `v.list()`.
-class ListSchema<T> extends Schema<List<T>>
+class ListSchema<T> extends BaseSchema<List<T>>
     with FluentSchema<ListSchema<T>, List<T>> {
   ListSchema(this.item);
 

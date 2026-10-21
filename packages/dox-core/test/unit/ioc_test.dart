@@ -53,14 +53,6 @@ void main() {
       expect(abc, newAbc);
     });
 
-    test('register request', () {
-      IocContainer ioc = IocContainer();
-      ioc.registerRequest('ABC', () => ABC());
-
-      ABC abc = ioc.get<ABC>();
-      expect(abc.sayHello(), 'hello');
-    });
-
     test('register should not equal 2 instance', () {
       IocContainer ioc = IocContainer();
       ioc.register<ABC>((IocContainer i) => ABC());

@@ -1,12 +1,12 @@
 # dox_validation
 
-Schema validation for Dart, like [Zod](https://zod.dev).
+Typed input for Dart.
 
-- Fluent schemas with typed output.
+- DTO classes: a class with `@Dto()` and rule annotations. `dox_builder` writes the checks as plain Dart code.
+- Fluent schemas, like [Zod](https://zod.dev), for input you only know at runtime.
 - All problems come back at once, each with a path, a code and a message.
 - Every schema implements the [Standard Schema](https://standardschema.dev) interface (`StandardSchema`).
 - Every schema can export JSON Schema (draft 2020-12, OpenAPI 3.1) with `toJsonSchema()`.
-- Laravel style string rules (`'required|email|max:255'`) still work with `v.fromRules()`.
 - No dependencies.
 
 ## Quick start
@@ -165,48 +165,31 @@ createUser.safeParse(input, messages: MessageResolver(messages: <String, String>
 v.messages = MyGermanResolver();
 ```
 
-## Laravel style rules
-
-`v.fromRules()` builds an `ObjectSchema` from the rule strings that dox apps already use.
+## DTOs
 
 ```dart
-final ObjectSchema rules = v.fromRules(<String, String>{
-  'email': 'required|email|max:255',
-  'age': 'nullable|integer|min:18',
-  'nickname': 'sometimes|required|string',
-  'address.city': 'required',
-  'products.*.name': 'required',
-}, messages: <String, String>{
-  'email.required': 'Email please',
-});
+part 'create_user.dto.g.dart';
 
-rules.parse(request.all());
+@Dto()
+class CreateUser {
+  @Length(min: 3, max: 50)
+  @Trim()
+  final String name;
+
+  @Email()
+  final String email;
+
+  const CreateUser({required this.name, required this.email});
+
+  static const DtoSchema<CreateUser> schema = $CreateUserDto;
+}
+
+CreateUser user = await CreateUser.schema.validateMap(input);
 ```
 
-How it works:
-
-- A missing or `null` field that is not `required` skips all its other rules.
-- Empty text that is not `required` also skips other rules.
-- `nullable`: `null` is fine. It also marks the field as nullable in JSON Schema.
-- `sometimes`: skip everything when the field is missing, even `required`.
-- Each field stops at its first failed rule, so there is one message per field.
-- Dotted keys make nested objects. `*` makes a list.
-- The output has only the fields that have rules. The values are not changed.
-- An unknown rule name throws an `ArgumentError` when the schema is built.
-
-Rules: `required`, `required_if`, `required_if_not`, `string`, `numeric`, `integer`, `double`, `boolean`, `array`, `json`, `date`, `email`, `ip`, `url`, `uuid`, `alpha`, `alpha_dash`, `alpha_numeric`, `min_length`, `max_length`, `length_between`, `between`, `greater_than`, `less_than`, `min`, `max`, `in`, `not_in`, `start_with`, `end_with`, `confirmed`, `image`, `file`, plus the flags `nullable`, `sometimes`, `bail`.
-
-`min` and `max` check text length when the field also has `string`, list size for lists, and the number value otherwise.
-
-Add your own rule name:
-
-```dart
-v.registerRule('unique', (RuleDefinition definition) {
-  return UniqueRule(table: definition.arg(0)); // 'unique:users'
-});
-```
-
-For dependency injection, make your own `Validator(registry: RuleRegistry.withDefaults())` instead of using the global `v`.
+Run `dart run build_runner build` (`dox_builder` is a dev dependency). See the
+[Validation guide](https://dartondox.dev/the-basic/validation/) and the
+[rules reference](https://dartondox.dev/the-basic/validation-rules/).
 
 ## JSON Schema
 
@@ -230,8 +213,6 @@ v.object(<String, Schema<Object?>>{
   "additionalProperties": false
 }
 ```
-
-`v.fromRules(...)` schemas export JSON Schema too.
 
 ## Standard Schema
 

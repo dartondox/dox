@@ -34,7 +34,7 @@ void main() {
     expect(list['tags'], <String>['Blog']);
     expect(
       <dynamic>[for (dynamic p in list['parameters']) p['name']],
-      <String>['page', 'limit'],
+      <String>['page', 'limit', 'with_trashed'],
     );
     expect(
       list['responses']['200']['content']['application/json']['schema'],
@@ -44,7 +44,11 @@ void main() {
     Map<String, dynamic> store = doc['paths']['/api/blogs']['post'];
     Map<String, dynamic> body =
         store['requestBody']['content']['application/json']['schema'];
-    expect(body['required'], <String>['title', 'description']);
+    expect(body, <String, dynamic>{r'$ref': '#/components/schemas/SaveBlog'});
+    expect(doc['components']['schemas']['SaveBlog']['required'], <String>[
+      'title',
+      'description',
+    ]);
     expect(store['responses'].keys, contains('422'));
 
     Map<String, dynamic> show = doc['paths']['/api/blogs/{id}']['get'];

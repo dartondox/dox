@@ -22,8 +22,45 @@ class RouteCall {
 
 /// Finds `Route.<method>(path, handler)` and `Route.resource(path, c)`
 /// calls in a library, and the controller method each one points to.
+///
+/// The path has the prefixes of `Route.group('/users', ...)` and of the
+/// `prefix` getter of a `Router` class, when they are plain strings,
+/// the same way the router joins them at runtime. So two `'/'` routes in
+/// two groups get two full paths.
 class RouteScanner extends RecursiveAstVisitor<void> {
   final List<RouteCall> calls = <RouteCall>[];
+
+  /// the prefix of the current router class and groups, or null when one
+  /// of them is not a plain string
+  String? _prefix = '';
+
+  @override
+  void visitClassDeclaration(ClassDeclaration node) {
+    String? old = _prefix;
+    _prefix = _routerPrefix(node);
+    super.visitClassDeclaration(node);
+    _prefix = old;
+  }
+
+  /// `String get prefix => 'api';` of a Router: `api/`, like
+  /// `Route.prefix()` does at runtime
+  String? _routerPrefix(ClassDeclaration node) {
+    for (ClassMember member in node.body.members) {
+      if (member is! MethodDeclaration || !member.isGetter) continue;
+      if (member.name.lexeme != 'prefix') continue;
+      FunctionBody body = member.body;
+      Expression? value;
+      if (body is ExpressionFunctionBody) value = body.expression;
+      if (body is BlockFunctionBody) {
+        for (Statement statement in body.block.statements) {
+          if (statement is ReturnStatement) value = statement.expression;
+        }
+      }
+      String? text = value == null ? null : _path(value);
+      return text == null ? null : '$text/';
+    }
+    return '';
+  }
 
   static const Set<String> _methods = <String>{
     'get',
@@ -63,6 +100,15 @@ class RouteScanner extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
+    if (_isGroup(node)) {
+      String? old = _prefix;
+      Expression first = node.argumentList.arguments.first.argumentExpression;
+      String? group = _path(first);
+      _prefix = old == null || group == null ? null : '$old$group';
+      super.visitMethodInvocation(node);
+      _prefix = old;
+      return;
+    }
     super.visitMethodInvocation(node);
     Expression? target = node.target;
     if (target is! SimpleIdentifier || target.name != 'Route') return;
@@ -74,7 +120,11 @@ class RouteScanner extends RecursiveAstVisitor<void> {
     ];
     if (args.length < 2) return;
     String name = node.methodName.name;
-    String? path = _path(args[0]);
+    String? written = _path(args[0]);
+    String? prefix = _prefix;
+    String? path = written == null || prefix == null || prefix.isEmpty
+        ? written
+        : '$prefix$written'.replaceAll(RegExp('/+'), '/');
     if (name == 'resource') {
       _addResource(path, args[1]);
     } else if (_methods.contains(name)) {
@@ -115,6 +165,14 @@ class RouteScanner extends RecursiveAstVisitor<void> {
         );
       }
     }
+  }
+
+  bool _isGroup(MethodInvocation node) {
+    Expression? target = node.target;
+    return target is SimpleIdentifier &&
+        target.name == 'Route' &&
+        node.methodName.name == 'group' &&
+        node.argumentList.arguments.isNotEmpty;
   }
 
   Element? _element(Expression node) {

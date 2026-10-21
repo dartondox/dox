@@ -89,13 +89,13 @@ nav:
   - Getting Started:
     - index.md
     - the-basic/installation.md
-    - the-basic/upgrade.md
     - the-basic/routing.md
     - the-basic/request.md
     - the-basic/response.md
     - the-basic/controller.md
     - the-basic/middleware.md
     - the-basic/validation.md
+    - the-basic/validation-rules.md
   - Digging deeper:
     - digging-deeper/cache.md
     - digging-deeper/file-storage.md

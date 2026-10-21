@@ -8,7 +8,7 @@ import '../core/sentinels.dart';
 import '../rules/string_rules.dart';
 
 /// Schema for text. Made by `v.string()`.
-class StringSchema extends Schema<String>
+class StringSchema extends BaseSchema<String>
     with FluentSchema<StringSchema, String> {
   StringSchema({
     this.coerce = false,

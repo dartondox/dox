@@ -1,6 +1,6 @@
 # 3.x
 
-All Dox packages now share one version. Coming from 2.x? Read the [upgrade guide](../../the-basic/upgrade.md).
+All Dox packages now share one version.
 
 ### v3.0.0-alpha.1
 

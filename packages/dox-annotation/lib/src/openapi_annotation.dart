@@ -39,7 +39,7 @@ class Tags {
   const Tags(this.names);
 }
 
-/// The request class of the route: a `@Dto` class or a form request,
+/// The request class of the route: a `@Dto` class,
 /// for example `@Request(CreateUser)`. It goes in the body for POST,
 /// PUT and PATCH, and in the query for the other methods.
 /// Use it when the builder can not find it by itself.

@@ -1,0 +1,13 @@
+# dox_core only uses the generator for the DTOs of its tests and benchmark.
+targets:
+  $default:
+    sources:
+      - lib/**
+      - test/dtos/**
+      - benchmark/**
+      - $package$
+    builders:
+      dox_builder:openapi:
+        enabled: false
+      dox_builder:dtos:
+        enabled: false

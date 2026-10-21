@@ -5,17 +5,75 @@ import 'dart:typed_data';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/request/form_data_visitor.dart';
 
+/// What kind of body a request has.
+enum BodyKind {
+  /// no `Content-Type`
+  none,
+
+  /// JSON (`application/json` or any `+json` type)
+  json,
+
+  /// a `Content-Type` of JSON, but the bytes are not valid JSON
+  invalidJson,
+
+  /// `application/x-www-form-urlencoded`
+  urlEncoded,
+
+  /// `multipart/form-data`
+  multipart,
+
+  /// any other `Content-Type`
+  other,
+}
+
+/// The body of a request, read once.
+class RequestBody {
+  RequestBody(
+    this.map, {
+    this.kind = BodyKind.none,
+    this.json,
+    this.text,
+    this.parts,
+  });
+
+  /// An empty body.
+  RequestBody.empty() : this(<String, dynamic>{});
+
+  /// The body as a map (`req.body`). Repeated form keys keep the last value.
+  final Map<String, dynamic> map;
+
+  final BodyKind kind;
+
+  /// The decoded JSON value, any type (a DTO reads this).
+  final Object? json;
+
+  /// The raw text of an urlencoded body.
+  final String? text;
+
+  /// The parts of a multipart body, in order, with repeated keys.
+  final List<MapEntry<String, Object>>? parts;
+}
+
 class HttpBody {
-  static Future<Map<String, dynamic>> read(HttpRequest request) async {
+  static Future<RequestBody> read(HttpRequest request) async {
     ContentType? contentType = request.headers.contentType;
+
+    if (contentType == null) return RequestBody.empty();
 
     if (HttpBody.isJson(contentType)) {
       Uint8List bytes = await readBytes(request, Dox().config.maxBodySize);
+      if (bytes.isEmpty) {
+        return RequestBody.empty();
+      }
       try {
-        dynamic data = _jsonUtf8.convert(bytes);
-        return data is Map<String, dynamic> ? data : <String, dynamic>{};
+        Object? data = _jsonUtf8.convert(bytes);
+        return RequestBody(
+          data is Map<String, dynamic> ? data : <String, dynamic>{},
+          kind: BodyKind.json,
+          json: data,
+        );
       } catch (err) {
-        return <String, dynamic>{};
+        return RequestBody(<String, dynamic>{}, kind: BodyKind.invalidJson);
       }
     }
 
@@ -24,19 +82,26 @@ class HttpBody {
       _checkContentLength(request, max);
       FormDataVisitor visitor = FormDataVisitor(request, limit(request, max));
       await visitor.process();
-      return visitor.inputs;
+      return RequestBody(
+        visitor.inputs,
+        kind: BodyKind.multipart,
+        parts: visitor.parts,
+      );
     }
 
     if (HttpBody.isUrlEncoded(contentType)) {
       Uint8List bytes = await readBytes(request, Dox().config.maxBodySize);
+      String text = utf8.decode(bytes, allowMalformed: true);
+      Map<String, dynamic> map = <String, dynamic>{};
       try {
-        return Uri.splitQueryString(utf8.decode(bytes, allowMalformed: true));
+        map = Uri.splitQueryString(text);
       } catch (err) {
-        return <String, dynamic>{};
+        /// bad percent encoding: an empty body
       }
+      return RequestBody(map, kind: BodyKind.urlEncoded, text: text);
     }
 
-    return <String, dynamic>{};
+    return RequestBody(<String, dynamic>{}, kind: BodyKind.other);
   }
 
   /// read the whole body, but stop with 413 once it passes [max] bytes.

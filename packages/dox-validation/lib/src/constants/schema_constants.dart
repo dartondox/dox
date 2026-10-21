@@ -16,16 +16,14 @@ class SchemaConstants {
   /// Words that coerce to `false`.
   static const List<String> falseWords = <String>['false', '0', 'no', 'off'];
 
-  /// Default image extensions for the `image` rule.
+  /// Image types for `@Image()` and `v.file().image()`.
+  /// No `svg`: an SVG file can hold scripts.
   static const List<String> imageExtensions = <String>[
     'jpg',
     'jpeg',
     'png',
     'gif',
-    'bmp',
-    'svg',
     'webp',
-    'tiff',
-    'ico',
+    'bmp',
   ];
 }

@@ -34,10 +34,6 @@ class OpenApiOperation {
   /// by position: the first one is for the first `{param}`.
   final List<Map<String, dynamic>> params;
 
-  /// Class name of the form request, found in the IoC at runtime.
-  /// Used when [schema] is null.
-  final String? formRequest;
-
   /// The request schema: a JSON Schema map (often a `$ref` to a `@Dto`
   /// class) or an object with `toJsonSchema()`.
   final Object? schema;
@@ -60,7 +56,6 @@ class OpenApiOperation {
     this.deprecated = false,
     this.ignore = false,
     this.params = const <Map<String, dynamic>>[],
-    this.formRequest,
     this.schema,
     this.requestIn,
     this.responses = const <int, ResponseDoc>{},

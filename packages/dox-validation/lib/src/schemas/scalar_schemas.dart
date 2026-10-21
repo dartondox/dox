@@ -1,3 +1,4 @@
+import '../dto/file_types.dart';
 import '../constants/default_messages.dart';
 import '../constants/issue_codes.dart';
 import '../constants/schema_constants.dart';
@@ -10,7 +11,7 @@ import '../core/sentinels.dart';
 import '../rules/collection_rules.dart';
 
 /// Schema for `true` / `false`. Made by `v.bool()`.
-class BoolSchema extends Schema<bool> with FluentSchema<BoolSchema, bool> {
+class BoolSchema extends BaseSchema<bool> with FluentSchema<BoolSchema, bool> {
   BoolSchema({this.coerce = false});
 
   /// Accept `"true"`, `"1"`, `"yes"`, `"on"`, `1` and the false words.
@@ -55,7 +56,7 @@ class BoolSchema extends Schema<bool> with FluentSchema<BoolSchema, bool> {
 ///
 /// Without coercion it only accepts [DateTime] objects. Use
 /// `v.coerce.date()` for ISO text (JSON, query strings).
-class DateSchema extends Schema<DateTime>
+class DateSchema extends BaseSchema<DateTime>
     with FluentSchema<DateSchema, DateTime> {
   DateSchema({this.coerce = false});
 
@@ -108,7 +109,7 @@ class DateSchema extends Schema<DateTime>
 }
 
 /// Value must be one of [values]. Made by `v.enumOf()`.
-class EnumSchema<T> extends Schema<T> with FluentSchema<EnumSchema<T>, T> {
+class EnumSchema<T> extends BaseSchema<T> with FluentSchema<EnumSchema<T>, T> {
   EnumSchema(List<T> values) : values = List<T>.unmodifiable(values);
 
   /// Allowed values.
@@ -149,7 +150,7 @@ class EnumSchema<T> extends Schema<T> with FluentSchema<EnumSchema<T>, T> {
 }
 
 /// Value must equal [value]. Made by `v.literal()`.
-class LiteralSchema<T> extends Schema<T>
+class LiteralSchema<T> extends BaseSchema<T>
     with FluentSchema<LiteralSchema<T>, T> {
   LiteralSchema(this.value);
 
@@ -189,7 +190,8 @@ class LiteralSchema<T> extends Schema<T>
 }
 
 /// Accepts any value, even `null` or missing. Made by `v.any()`.
-class AnySchema extends Schema<Object?> with FluentSchema<AnySchema, Object?> {
+class AnySchema extends BaseSchema<Object?>
+    with FluentSchema<AnySchema, Object?> {
   @override
   bool get isOptional {
     return true;
@@ -227,7 +229,7 @@ class AnySchema extends Schema<Object?> with FluentSchema<AnySchema, Object?> {
 
 /// Schema for uploaded files. Made by `v.file()`.
 /// The value must implement [FileInput].
-class FileSchema extends Schema<FileInput>
+class FileSchema extends BaseSchema<FileInput>
     with FluentSchema<FileSchema, FileInput> {
   /// Extension must be one of [allowed], like `['pdf']`.
   FileSchema extensions(List<String> allowed, {String? message}) {

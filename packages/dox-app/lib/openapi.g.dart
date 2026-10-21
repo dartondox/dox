@@ -24,12 +24,11 @@ const OpenApiRegistry openApiRegistry = OpenApiRegistry(
     OpenApiOperation(
       controller: 'BlogController',
       method: 'index',
-      argumentTypes: <String>['DoxRequest'],
+      argumentTypes: <String>['ListBlogs'],
       summary: 'List blogs',
       description: 'One page of blogs, oldest first.',
       tags: <String>['Blog'],
       schema: <String, dynamic>{'\$ref': '#/components/schemas/ListBlogs'},
-      requestIn: 'query',
       responses: <int, ResponseDoc>{
         200: ResponseDoc(
           description: 'Successful response',
@@ -40,10 +39,10 @@ const OpenApiRegistry openApiRegistry = OpenApiRegistry(
     OpenApiOperation(
       controller: 'BlogController',
       method: 'store',
-      argumentTypes: <String>['BlogRequest'],
+      argumentTypes: <String>['SaveBlog'],
       summary: 'Create a blog',
       tags: <String>['Blog'],
-      formRequest: 'BlogRequest',
+      schema: <String, dynamic>{'\$ref': '#/components/schemas/SaveBlog'},
       responses: <int, ResponseDoc>{
         200: ResponseDoc(
           description: 'Successful response',
@@ -54,11 +53,11 @@ const OpenApiRegistry openApiRegistry = OpenApiRegistry(
     OpenApiOperation(
       controller: 'BlogController',
       method: 'show',
-      argumentTypes: <String>['DoxRequest', 'String'],
+      argumentTypes: <String>['int'],
       summary: 'Get one blog',
       tags: <String>['Blog'],
       params: <Map<String, dynamic>>[
-        <String, dynamic>{'type': 'string'},
+        <String, dynamic>{'type': 'integer'},
       ],
       responses: <int, ResponseDoc>{
         200: ResponseDoc(
@@ -70,13 +69,13 @@ const OpenApiRegistry openApiRegistry = OpenApiRegistry(
     OpenApiOperation(
       controller: 'BlogController',
       method: 'update',
-      argumentTypes: <String>['BlogRequest', 'String'],
+      argumentTypes: <String>['int', 'SaveBlog'],
       summary: 'Update a blog',
       tags: <String>['Blog'],
       params: <Map<String, dynamic>>[
-        <String, dynamic>{'type': 'string'},
+        <String, dynamic>{'type': 'integer'},
       ],
-      formRequest: 'BlogRequest',
+      schema: <String, dynamic>{'\$ref': '#/components/schemas/SaveBlog'},
       responses: <int, ResponseDoc>{
         200: ResponseDoc(
           description: 'Successful response',
@@ -87,11 +86,11 @@ const OpenApiRegistry openApiRegistry = OpenApiRegistry(
     OpenApiOperation(
       controller: 'BlogController',
       method: 'destroy',
-      argumentTypes: <String>['DoxRequest', 'String'],
+      argumentTypes: <String>['int'],
       summary: 'Delete a blog',
       tags: <String>['Blog'],
       params: <Map<String, dynamic>>[
-        <String, dynamic>{'type': 'string'},
+        <String, dynamic>{'type': 'integer'},
       ],
       responses: <int, ResponseDoc>{
         200: ResponseDoc(
@@ -106,24 +105,19 @@ const OpenApiRegistry openApiRegistry = OpenApiRegistry(
     OpenApiOperation(
       controller: 'AuthController',
       method: 'login',
-      argumentTypes: <String>['DoxRequest'],
+      argumentTypes: <String>['LoginUser'],
       summary: 'Log in',
       description: 'Gives a bearer token for the `Authorization` header.',
       tags: <String>['Auth'],
       schema: <String, dynamic>{'\$ref': '#/components/schemas/LoginUser'},
       responses: <int, ResponseDoc>{
-        200: ResponseDoc(
-          description: 'Successful response',
-          schema: <String, dynamic>{
-            '\$ref': '#/components/schemas/LoginResult',
-          },
-        ),
+        200: ResponseDoc(description: 'Successful response'),
       },
     ),
     OpenApiOperation(
       controller: 'AuthController',
       method: 'register',
-      argumentTypes: <String>['DoxRequest'],
+      argumentTypes: <String>['RegisterUser'],
       summary: 'Make an account',
       tags: <String>['Auth'],
       schema: <String, dynamic>{'\$ref': '#/components/schemas/RegisterUser'},
@@ -162,26 +156,27 @@ const OpenApiRegistry openApiRegistry = OpenApiRegistry(
     OpenApiOperation(
       controller: 'WebController',
       method: 'testRedis',
-      argumentTypes: <String>[],
+      argumentTypes: <String>['DoxRequest'],
       ignore: true,
     ),
   ],
   routes: <OpenApiRouteBinding>[
-    OpenApiRouteBinding('GET', 'ping', 'ApiController.pong'),
-    OpenApiRouteBinding('GET', 'blogs', 'BlogController.index'),
-    OpenApiRouteBinding('POST', 'blogs', 'BlogController.store'),
-    OpenApiRouteBinding('GET', 'blogs/{id}', 'BlogController.show'),
-    OpenApiRouteBinding('PUT', 'blogs/{id}', 'BlogController.update'),
-    OpenApiRouteBinding('PATCH', 'blogs/{id}', 'BlogController.update'),
-    OpenApiRouteBinding('DELETE', 'blogs/{id}', 'BlogController.destroy'),
-    OpenApiRouteBinding('POST', '/auth/login', 'AuthController.login'),
-    OpenApiRouteBinding('POST', '/auth/register', 'AuthController.register'),
-    OpenApiRouteBinding('GET', '/auth/user', 'AuthController.user'),
+    OpenApiRouteBinding('GET', 'api/ping', 'ApiController.pong'),
+    OpenApiRouteBinding('GET', 'api/blogs', 'BlogController.index'),
+    OpenApiRouteBinding('POST', 'api/blogs', 'BlogController.store'),
+    OpenApiRouteBinding('GET', 'api/blogs/{id}', 'BlogController.show'),
+    OpenApiRouteBinding('PUT', 'api/blogs/{id}', 'BlogController.update'),
+    OpenApiRouteBinding('PATCH', 'api/blogs/{id}', 'BlogController.update'),
+    OpenApiRouteBinding('DELETE', 'api/blogs/{id}', 'BlogController.destroy'),
+    OpenApiRouteBinding('POST', 'api/auth/login', 'AuthController.login'),
+    OpenApiRouteBinding('POST', 'api/auth/register', 'AuthController.register'),
+    OpenApiRouteBinding('GET', 'api/auth/user', 'AuthController.user'),
     OpenApiRouteBinding('GET', '/redis', 'WebController.testRedis'),
   ],
   schemas: <String, Map<String, dynamic>>{
     'ListBlogs': <String, dynamic>{
       'type': 'object',
+      'title': 'ListBlogs',
       'properties': <String, dynamic>{
         'page': <String, dynamic>{
           'type': 'integer',
@@ -195,6 +190,11 @@ const OpenApiRegistry openApiRegistry = OpenApiRegistry(
           'maximum': 100,
           'description': 'Blogs per page.',
           'default': 20,
+        },
+        'with_trashed': <String, dynamic>{
+          'type': 'boolean',
+          'description': 'Also list deleted blogs.',
+          'default': false,
         },
       },
     },
@@ -210,6 +210,15 @@ const OpenApiRegistry openApiRegistry = OpenApiRegistry(
           'items': <String, dynamic>{},
         },
       },
+    },
+    'SaveBlog': <String, dynamic>{
+      'type': 'object',
+      'title': 'SaveBlog',
+      'properties': <String, dynamic>{
+        'title': <String, dynamic>{'type': 'string', 'maxLength': 255},
+        'description': <String, dynamic>{'type': 'string'},
+      },
+      'required': <dynamic>['title', 'description'],
     },
     'Blog': <String, dynamic>{
       'type': 'object',
@@ -290,26 +299,16 @@ const OpenApiRegistry openApiRegistry = OpenApiRegistry(
     },
     'LoginUser': <String, dynamic>{
       'type': 'object',
+      'title': 'LoginUser',
       'properties': <String, dynamic>{
         'email': <String, dynamic>{'type': 'string', 'format': 'email'},
         'password': <String, dynamic>{'type': 'string'},
       },
       'required': <dynamic>['email', 'password'],
     },
-    'LoginResult': <String, dynamic>{
-      'type': 'object',
-      'properties': <String, dynamic>{
-        'success': <String, dynamic>{'type': 'boolean'},
-        'token': <String, dynamic>{
-          'type': 'string',
-          'description': 'Bearer token for the `Authorization` header.',
-        },
-        'user': <String, dynamic>{'\$ref': '#/components/schemas/User'},
-      },
-      'required': <dynamic>['success', 'token', 'user'],
-    },
     'RegisterUser': <String, dynamic>{
       'type': 'object',
+      'title': 'RegisterUser',
       'properties': <String, dynamic>{
         'name': <String, dynamic>{
           'type': 'string',

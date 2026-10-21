@@ -33,20 +33,23 @@ class JsonSchemaReader {
   JsonSchemaReader(
     this.ast, {
     this.annotations = const AnnotationReader(),
-    this.dto = const DtoSchema(),
+    this.dto = const DtoJsonSchema(),
     this.model = const ModelSchema(),
+    this.refPrefix = '#/components/schemas/',
   });
 
   final AstLoader ast;
   final AnnotationReader annotations;
-  final DtoSchema dto;
+  final DtoJsonSchema dto;
   final ModelSchema model;
 
   /// Named schemas for `components/schemas`, by class name.
   final Map<String, Map<String, dynamic>> components =
       <String, Map<String, dynamic>>{};
 
-  static const String refPrefix = '#/components/schemas/';
+  /// Where a `$ref` points: `#/components/schemas/` for OpenAPI,
+  /// `#/$defs/` for the JSON Schema of one DTO.
+  final String refPrefix;
 
   static const Map<String, dynamic> _pagination = <String, dynamic>{
     'type': 'object',
@@ -178,6 +181,9 @@ class JsonSchemaReader {
       }
       return <String, dynamic>{'type': 'string', 'enum': names};
     }
+    if (_isFile(type)) {
+      return <String, dynamic>{'type': 'string', 'format': 'binary'};
+    }
     if (element is! ClassElement) return null;
     if (dto.isDto(element)) {
       return _component(name, element, _dtoKind);
@@ -232,6 +238,11 @@ class JsonSchemaReader {
       }
     }
     return of(data, nullable: false);
+  }
+
+  /// an uploaded file (`RequestFile` implements `FileInput`)
+  bool _isFile(InterfaceType type) {
+    return _supertype(type, 'FileInput') != null;
   }
 
   InterfaceType? _supertype(InterfaceType type, String name) {

@@ -43,16 +43,16 @@ class ${className}Controller {
   Future<dynamic> store(DoxRequest req) async {}
 
   /// GET /resource/{id}
-  Future<dynamic> show(DoxRequest req, String id) async {}
+  Future<dynamic> show(DoxRequest req, int id) async {}
 
   /// GET /resource/{id}/edit
-  Future<dynamic> edit(DoxRequest req, String id) async {}
+  Future<dynamic> edit(DoxRequest req, int id) async {}
 
   /// PUT|PATCH /resource/{id}
-  Future<dynamic> update(DoxRequest req, String id) async {}
+  Future<dynamic> update(DoxRequest req, int id) async {}
 
   /// DELETE /resource/{id}
-  Future<dynamic> destroy(DoxRequest req, String id) async {}
+  Future<dynamic> destroy(DoxRequest req, int id) async {}
 }
 
 ${className}Controller ${toPascalWithFirstLetterLowerCase(className)}Controller = ${className}Controller();

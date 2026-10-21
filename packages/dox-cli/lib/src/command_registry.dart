@@ -5,7 +5,7 @@ import 'package:dox/src/tools/create_middleware.dart';
 import 'package:dox/src/tools/create_migration.dart';
 import 'package:dox/src/tools/create_model.dart';
 import 'package:dox/src/tools/create_project.dart';
-import 'package:dox/src/tools/create_request.dart';
+import 'package:dox/src/tools/create_dto.dart';
 import 'package:dox/src/tools/create_serializer.dart';
 import 'package:dox/src/tools/env_tools.dart';
 import 'package:dox/src/tools/generate_key.dart';
@@ -195,16 +195,16 @@ class CommandRegistry {
       },
     ),
 
-    // Create request command
+    // Create DTO command
     CommandDefinition(
-      command: 'create:request',
-      helpInfo: 'create:request <request_name>',
-      description: 'Create a new request class',
+      command: 'create:dto',
+      helpInfo: 'create:dto <dto_name>',
+      description: 'Create a new DTO (typed, checked input)',
       category: CommandCategory.development,
       minArgs: 1,
       maxArgs: 1,
       function: (args) async {
-        createRequest(args[0]);
+        createDto(args[0]);
       },
     ),
 

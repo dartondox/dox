@@ -29,6 +29,7 @@ export 'env/env.dart';
 export 'env/env_reader.dart';
 
 /// Exceptions
+export 'exception/bad_request_exception.dart';
 export 'exception/internal_error_exception.dart';
 export 'exception/not_found_exception.dart';
 export 'exception/payload_too_large_exception.dart';
@@ -37,7 +38,6 @@ export 'exception/validation_exception.dart';
 
 /// Request
 export 'http/request/dox_request.dart';
-export 'http/request/form_request.dart';
 export 'http/request/request_file.dart';
 
 /// Response

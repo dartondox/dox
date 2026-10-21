@@ -9,13 +9,10 @@ import 'ast_finders.dart';
 
 /// The request of one controller method.
 class RequestData {
-  const RequestData({this.schema, this.formRequest, this.where});
+  const RequestData({this.schema, this.where});
 
   /// JSON Schema, often a `$ref` to a `@Dto` class.
   final Map<String, dynamic>? schema;
-
-  /// Class name of a form request. dox_core finds it in the IoC.
-  final String? formRequest;
 
   /// `body`, `query`, or null to choose by the HTTP method.
   final String? where;
@@ -27,7 +24,8 @@ class RequestData {
 /// 1. `@Body(T)`, `@Query(T)` or `@Request(T)` on the method.
 /// 2. An argument whose type is a `@Dto` class: `store(CreateUser body)`.
 /// 3. A `req.validate<T>()` call in the method body, with a `@Dto` `T`.
-/// 4. A first argument that is a `FormRequest`: `store(BlogRequest req)`.
+///
+/// A `@Dto(source: Source.query)` (or `Source.body`) chooses the place.
 class RequestReader {
   RequestReader(this.types, {this.annotations = const AnnotationReader()});
 
@@ -62,29 +60,23 @@ class RequestReader {
       DartType? type = args == null || args.isEmpty ? null : args.first.type;
       if (type != null && isDto(type)) return _of(type, null);
     }
-    List<FormalParameterElement> params = method.formalParameters;
-    if (params.isNotEmpty && _isFormRequest(params.first.type)) {
-      return _of(params.first.type, null);
-    }
     return null;
   }
 
   Future<RequestData?> _of(DartType type, String? where) async {
-    if (_isFormRequest(type)) {
-      return RequestData(
-        formRequest: (type as InterfaceType).element.displayName,
-        where: where,
-      );
-    }
     Map<String, dynamic>? schema = await types.of(type, nullable: false);
-    return schema == null ? null : RequestData(schema: schema, where: where);
+    if (schema == null) return null;
+    return RequestData(schema: schema, where: where ?? _source(type));
   }
 
-  bool _isFormRequest(DartType type) {
-    if (type is! InterfaceType) return false;
-    for (InterfaceType parent in type.allSupertypes) {
-      if (parent.element.displayName == 'FormRequest') return true;
-    }
-    return false;
+  /// `body` or `query` from `@Dto(source: ...)`, or null for auto.
+  String? _source(DartType type) {
+    if (type is! InterfaceType) return null;
+    String? source = annotations
+        .first(type.element, 'Dto')
+        ?.getField('source')
+        ?.variable
+        ?.displayName;
+    return source == 'query' || source == 'body' ? source : null;
   }
 }

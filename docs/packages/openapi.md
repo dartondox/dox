@@ -6,7 +6,7 @@ You write no docs code. You get a [Scalar](https://github.com/scalar/scalar) doc
 The docs come from three places:
 
 - **the routes**: method, path, path params, middleware (login),
-- **the request classes**: a `@Dto` class or a form request,
+- **the request classes**: a `@Dto` class,
 - **the controllers**: the `///` comment, the arguments and the return type of each method.
 
 ## In a Dox app
@@ -161,10 +161,10 @@ The builder looks in this order. The first one wins.
 1. `@Body(T)`, `@Query(T)` or `@Request(T)` on the method.
 2. An argument whose type is a `@Dto` class: `store(CreateBlog body)`.
 3. A `req.validate<T>()` call in the method, where `T` is a `@Dto` class.
-4. A first argument that is a form request: `store(BlogRequest req)`. Its `schema()` or `rules()` is used.
 
 For `POST`, `PUT` and `PATCH` the request is the JSON body.
 For other methods each field is one query parameter.
+`@Dto(source: Source.query)` or `Source.body` chooses the place by hand.
 The route `body:` option still works, and it wins over all of these.
 
 A `@Dto` class:
@@ -189,12 +189,9 @@ class CreateBlog {
 }
 ```
 
-Field annotations: `@Length(min:, max:)`, `@Email()`, `@Min(n)`, `@Max(n)`, `@Pattern(regex)`,
-`@MinItems(n)`, `@MaxItems(n)`, `@Format('uuid')` and `@Trim()`.
-
-!!! note
-    In a file that imports `dox_core`, `Pattern` means the annotation, not `Pattern` of `dart:core`.
-    Add `hide Pattern` to the import if you need the `dart:core` one.
+The keys are the same as the keys the DTO reads: snake_case by default (`postCode` is `post_code`),
+or `@Name('key')`, or `@Dto(keyCase: KeyCase.field)`.
+Each rule annotation adds its JSON Schema keys. See the [rules reference](../the-basic/validation-rules.md).
 
 ### Response
 

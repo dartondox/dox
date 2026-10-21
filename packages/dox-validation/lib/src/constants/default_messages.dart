@@ -14,7 +14,8 @@ class DefaultMessages {
   static const String array = 'The {field} must be an array';
   static const String object = 'The {field} must be an object';
   static const String json = 'The {field} is not a valid json';
-  static const String file =
+  static const String file = 'The {field} must be a file';
+  static const String fileExtension =
       'The {field} is either invalid or unsupported extension';
   static const String inList =
       'The selected {field} is invalid. Valid options are {values}';
@@ -22,15 +23,17 @@ class DefaultMessages {
   static const String literal = 'The {field} must be {expected}';
   static const String union = 'The {field} does not match any allowed type';
   static const String unrecognizedKeys = 'The {field} has unknown keys: {keys}';
+  static const String notAllowed = 'The {field} field is not allowed';
   static const String custom = 'The {field} is invalid';
 
   static const String minLength =
-      'The {field} must be at least {min} character';
+      'The {field} must be at least {min} characters';
   static const String maxLength =
-      'The {field} may not be greater than {max} character';
-  static const String length = 'The {field} must be exactly {length} character';
+      'The {field} may not be greater than {max} characters';
+  static const String length =
+      'The {field} must be exactly {length} characters';
   static const String lengthBetween =
-      'The {field} must be between {min} and {max} character';
+      'The {field} must be between {min} and {max} characters';
   static const String email = 'The {field} is not a valid email';
   static const String url = 'The {field} must be a url';
   static const String uuid = 'The {field} is invalid uuid';
@@ -56,11 +59,18 @@ class DefaultMessages {
   static const String minItems = 'The {field} must have at least {min} items';
   static const String maxItems =
       'The {field} may not have more than {max} items';
+  static const String uniqueItems = 'The {field} must not have duplicate items';
+
+  static const String after = 'The {field} must be a date after {date}';
+  static const String before = 'The {field} must be a date before {date}';
+
+  static const String maxSize = 'The {field} may not be larger than {max}';
+  static const String mimes = 'The {field} must be a file of type: {types}';
+  static const String image = 'The {field} must be an image';
+  static const String positive = 'The {field} must be greater than 0';
 
   static const String afterOrEqual =
       'The {field} must be a date after or equal to {date}';
   static const String beforeOrEqual =
       'The {field} must be a date before or equal to {date}';
-
-  static const String confirmed = 'The two password did not match';
 }

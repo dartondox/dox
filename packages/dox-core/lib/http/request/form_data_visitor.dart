@@ -23,6 +23,9 @@ class FormDataVisitor {
 
   final Map<String, dynamic> inputs = <String, dynamic>{};
 
+  /// every part in order, also repeated keys (a DTO reads these)
+  final List<MapEntry<String, Object>> parts = <MapEntry<String, Object>>[];
+
   /// fails when the body stream fails (eg. 413). the mime parser only
   /// reports body errors on the outer stream, never on the open part,
   /// so a part reader must also watch this or it waits forever.
@@ -47,15 +50,18 @@ class FormDataVisitor {
 
       String? inputName = data['name'];
       if (inputName != null) {
+        Object value;
         if (data['filename'] == null || data['filename']!.isEmpty) {
-          inputs[inputName] = await _utf8.bind(_guard(formItem)).join();
+          value = await _utf8.bind(_guard(formItem)).join();
         } else {
-          inputs[inputName] = await _readFile(
+          value = await _readFile(
             formItem,
             data['filename'].toString(),
             contentType.toString(),
           );
         }
+        inputs[inputName] = value;
+        parts.add(MapEntry<String, Object>(inputName, value));
       } else {
         await _guard(formItem).drain<void>();
       }
@@ -74,8 +80,13 @@ class FormDataVisitor {
     RandomAccessFile? raf;
     File? temp;
     int length = 0;
+    List<int> head = <int>[];
     try {
       await for (List<int> chunk in _guard(part)) {
+        if (head.length < FileTypes.headSize) {
+          int take = FileTypes.headSize - head.length;
+          head.addAll(chunk.length > take ? chunk.sublist(0, take) : chunk);
+        }
         length += chunk.length;
         if (raf == null && length > multipartMemoryLimit) {
           temp = File(
@@ -101,6 +112,7 @@ class FormDataVisitor {
       length: length,
       bytes: temp == null ? buffer.takeBytes() : null,
       file: temp,
+      head: head,
     );
   }
 
