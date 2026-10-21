@@ -34,71 +34,61 @@ RouteData? httpRouteHandler(HttpRequest req) {
   return route;
 }
 
+/// routes grouped by method, rebuilt when the route list changes.
+/// keeps the registration order, so the first match still wins.
+Map<String, List<RouteData>> _byMethod = <String, List<RouteData>>{};
+List<RouteData>? _indexedList;
+int _indexedLength = -1;
+
+Map<String, List<RouteData>> _routeIndex() {
+  List<RouteData> routes = Route().routes;
+  if (!identical(routes, _indexedList) || routes.length != _indexedLength) {
+    Map<String, List<RouteData>> index = <String, List<RouteData>>{};
+    for (RouteData route in routes) {
+      route.path = sanitizeRoutePath(route.path);
+      (index[route.method.toUpperCase()] ??= <RouteData>[]).add(route);
+    }
+    _byMethod = index;
+    _indexedList = routes;
+    _indexedLength = routes.length;
+  }
+  return _byMethod;
+}
+
 /// get matched route from the list
 /// method, domain, path
 RouteData? _getMatchRoute(String inputRoute, String method, String? domain) {
-  List<RouteData> methodMatchedRoutes = Route().routes.where((RouteData route) {
-    if (domain != null && route.domain != null) {
-      return route.method.toLowerCase() == method.toLowerCase() &&
-          route.domain?.toLowerCase() == domain.toLowerCase();
-    } else {
-      return route.method.toLowerCase() == method.toLowerCase();
+  List<RouteData>? candidates = _routeIndex()[method.toUpperCase()];
+  if (candidates == null) return null;
+
+  inputRoute = sanitizeRoutePath(inputRoute).trim();
+  String? host = domain?.toLowerCase();
+
+  for (RouteData route in candidates) {
+    if (host != null &&
+        route.domain != null &&
+        route.domain!.toLowerCase() != host) {
+      continue;
     }
-  }).toList();
 
-  RouteData? matchRoute;
-  for (RouteData route in methodMatchedRoutes) {
-    route.path = sanitizeRoutePath(route.path);
-    inputRoute = sanitizeRoutePath(inputRoute);
-
-    /// When route is the same route exactly same route.
     /// route without params, eg. /api/example
-    if (route.path.trim() == inputRoute.trim()) {
-      matchRoute = route;
-      break;
+    RegExp? pattern = route.pattern;
+    if (pattern == null) {
+      if (route.path.trim() == inputRoute) return route;
+      continue;
     }
 
     /// when route have params
     /// eg. /api/admin/{adminId}
-    Iterable<String> parameterNames = _getParameterNameFromRoute(route);
-    Iterable<RegExpMatch> matches = _getPatternMatches(inputRoute, route);
-
-    if (matches.isNotEmpty) {
-      matchRoute = route;
-      matchRoute.params = _getParameterAsMap(matches, parameterNames);
-      break;
+    RegExpMatch? match = pattern.firstMatch(inputRoute);
+    if (match != null) {
+      List<String> names = route.paramNames;
+      Map<String, dynamic> params = <String, dynamic>{};
+      for (int i = 0; i < names.length; i++) {
+        params[names[i]] = match.group(i + 1);
+      }
+      return route.withParams(params);
     }
   }
-  return matchRoute;
-}
-
-/// get parameter name from named route eg. /blog/{id}
-/// eg ('id')
-Iterable<String> _getParameterNameFromRoute(RouteData route) {
-  return route.path
-      .split('/')
-      .where((String part) => part.startsWith('{') && part.endsWith('}'))
-      .map((String part) => part.substring(1, part.length - 1));
-}
-
-/// get pattern matched routes from the list
-Iterable<RegExpMatch> _getPatternMatches(
-  String input,
-  RouteData route,
-) {
-  RegExp pattern = RegExp(
-      '^${route.path.replaceAllMapped(RegExp(r'{[^/]+}'), (Match match) => '([^/]+)').replaceAll('/', '\\/')}\$');
-  return pattern.allMatches(input);
-}
-
-/// get the param from the named route as Map response
-/// eg {'id' : 1}
-Map<String, dynamic> _getParameterAsMap(
-  Iterable<RegExpMatch> matches,
-  Iterable<String> parameterNames,
-) {
-  RegExpMatch match = matches.first;
-  List<String?> parameterValues =
-      match.groups(List<int>.generate(parameterNames.length, (int i) => i + 1));
-  return Map<String, dynamic>.fromIterables(parameterNames, parameterValues);
+  return null;
 }

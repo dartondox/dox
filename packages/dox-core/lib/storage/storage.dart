@@ -7,15 +7,22 @@ import 'package:mime/mime.dart';
 class StreamFile {
   final ContentType contentType;
   final Stream<List<int>> stream;
-  const StreamFile(this.contentType, this.stream);
+
+  /// size in bytes when known, sent as Content-Length
+  final int? length;
+  const StreamFile(this.contentType, this.stream, {this.length});
 }
 
 class DownloadableFile {
   final ContentType contentType;
   final Stream<List<int>> stream;
 
+  /// size in bytes when known, sent as Content-Length
+  final int? length;
+
   String contentDisposition = '';
-  DownloadableFile(this.contentType, this.stream, String filename) {
+  DownloadableFile(this.contentType, this.stream, String filename,
+      {this.length}) {
     contentDisposition = 'attachment; filename="$filename"';
   }
 }
@@ -50,7 +57,15 @@ class Storage {
   /// Storage().putRequestFile('images/avatar', file);
   /// ```
   Future<String> putRequestFile(String folder, RequestFile requestFile) async {
-    return _driver.put(folder, await requestFile.bytes);
+    StorageDriverInterface driver = _driver;
+    String? extension =
+        requestFile.extension.isEmpty ? null : requestFile.extension;
+
+    /// local disk: move the temp file, do not load it into memory
+    if (driver is LocalStorageDriver) {
+      return driver.putRequestFile(folder, requestFile, extension: extension);
+    }
+    return driver.put(folder, await requestFile.bytes, extension: extension);
   }
 
   /// store file with bytes into storage
@@ -105,6 +120,11 @@ class Storage {
   /// return response(file);
   /// ```
   Future<StreamFile> stream(String filename) async {
+    StorageDriverInterface driver = _driver;
+    if (driver is LocalStorageDriver) {
+      return _streamLocal(driver.file(filename));
+    }
+
     List<int>? image = await get(filename);
     if (image == null) {
       throw NotFoundHttpException(message: 'file not found');
@@ -138,6 +158,32 @@ class Storage {
   Future<DownloadableFile> download(String filename) async {
     StreamFile streamFile = await stream(filename);
     String name = filename.split('/').last;
-    return DownloadableFile(streamFile.contentType, streamFile.stream, name);
+    return DownloadableFile(
+      streamFile.contentType,
+      streamFile.stream,
+      name,
+      length: streamFile.length,
+    );
+  }
+
+  /// stream a local file from disk instead of reading it all into memory
+  Future<StreamFile> _streamLocal(File file) async {
+    if (!await file.exists()) {
+      throw NotFoundHttpException(message: 'file not found');
+    }
+    List<int> head = <int>[];
+    await for (List<int> chunk
+        in file.openRead(0, defaultMagicNumbersMaxLength)) {
+      head.addAll(chunk);
+    }
+    String? mimeType = lookupMimeType(file.path, headerBytes: head);
+    if (mimeType == null) {
+      throw NotFoundHttpException(message: 'invalid file');
+    }
+    return StreamFile(
+      ContentType.parse(mimeType),
+      file.openRead(),
+      length: await file.length(),
+    );
   }
 }

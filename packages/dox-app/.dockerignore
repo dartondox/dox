@@ -8,3 +8,6 @@ build/
 .idea/
 packages
 .docker/build
+.env
+pubspec_overrides.yaml
+storage/

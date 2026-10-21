@@ -119,11 +119,11 @@ class CommandRegistry {
     CommandDefinition(
       command: 'build',
       helpInfo: 'build',
-      description: 'Build the application',
+      description:
+          'AOT compile the app for production into build/server (use this, not dart run, in production)',
       category: CommandCategory.build,
       function: (args) async {
-        buildBuilder();
-        buildServer();
+        await buildServer();
       },
     ),
 

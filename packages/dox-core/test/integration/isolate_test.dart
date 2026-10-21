@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:isolate';
+
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/isolate/dox_isolate.dart';
 import 'package:http/http.dart' as http;
@@ -52,6 +55,25 @@ void main() {
       expect(res.statusCode, 200);
       expect(res.body, 'pong');
       expect(DoxIsolate().isolates.length, 5 - 1);
+    });
+
+    test('dead isolate is started again', () async {
+      DoxIsolate().restartDelay = Duration(milliseconds: 10);
+      Isolate old = DoxIsolate().isolates[2]!;
+      old.kill(priority: Isolate.immediate);
+
+      Isolate? fresh;
+      for (int i = 0; i < 100 && fresh == null; i++) {
+        await Future<void>.delayed(Duration(milliseconds: 20));
+        Isolate? current = DoxIsolate().isolates[2];
+        if (current != null && current != old) fresh = current;
+      }
+      expect(fresh, isNotNull);
+      expect(DoxIsolate().isolates.length, 5 - 1);
+    });
+
+    test('default isolates is one per cpu core', () {
+      expect(AppConfig(appKey: 'x').totalIsolate, Platform.numberOfProcessors);
     });
   });
 }

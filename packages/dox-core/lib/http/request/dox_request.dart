@@ -23,6 +23,8 @@ class DoxRequest implements IDoxRequest {
 
   final String? clientIp;
 
+  final String _scheme;
+
   @override
   String method = 'GET';
 
@@ -39,9 +41,10 @@ class DoxRequest implements IDoxRequest {
     required this.body,
     this.contentType,
     this.clientIp,
+    String scheme = 'http',
     required this.httpHeaders,
     required this.httpRequest,
-  }) {
+  }) : _scheme = scheme {
     method = route.method.toUpperCase();
     param = route.params;
     query = uri.queryParameters;
@@ -103,6 +106,20 @@ class DoxRequest implements IDoxRequest {
   @override
   String ip() {
     return clientIp ?? UNKNOWN;
+  }
+
+  /// `http` or `https`. Behind a proxy listed in `trustedProxies` this
+  /// comes from `X-Forwarded-Proto`. Dart itself only serves plain http.
+  /// ```
+  /// req.scheme();
+  /// ```
+  String scheme() {
+    return _scheme;
+  }
+
+  /// true when the client used https (see [scheme])
+  bool isSecure() {
+    return _scheme == 'https';
   }
 
   /// get auth class
