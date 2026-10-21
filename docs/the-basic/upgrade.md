@@ -182,6 +182,16 @@ See [Deployment](../digging-deeper/deployment.md).
 Only `required`, `required_if` and `required_if_not` still run.
 Before, `'status': 'in:active,inactive'` failed when `status` was not sent. Now it passes.
 Fix: add `required` where the field must be sent. Use `nullable` and `sometimes` for the other cases.
+
+**Validation runs on `dox_validation`.** The messages and the `{field: message}` error map are the same.
+
+- **An unknown rule name throws** when the rules are first used. Before, it logged a warning and was skipped. Fix: correct the name, or add it with `v.registerRule()`.
+- `DoxValidator.addCustomRule()` still works. For new code, use `v.registerRule()`.
+- `req.validate()` now returns the validated fields (it returned nothing).
+- `dox_core` now exports the `dox_validation` names (`v`, `Schema`, `Rule`, ...). `dox_orm` also has a `Schema` class.
+  A file that imports both and uses `Schema` gets an "ambiguous import" error. Fix: `import 'package:dox_orm/dox_orm.dart' as orm;` or `hide Schema`.
+- A class of yours named like a `dox_validation` class (for example `Validator` or `Rule`) wins in its own file. In other files, hide the `dox_core` one.
+
 See [Validation](validation.md).
 
 ## WebSocket
@@ -206,10 +216,74 @@ It makes a Dart file by default. `--dart` is gone, use `--sql` for a `.sql` file
 **`create:model Blog -m` makes a Dart migration.**
 The migration is `create_blogs_table`, and the model gets `@DoxModel(table: 'blogs')`.
 
-## Moving to the new packages (optional)
+## Cache
 
-The built-in `Cache()` and `Storage()` in `dox_core` still work. If you move to the new packages, note:
+**`Cache()` runs on `dox_cache`.** The config changed:
 
-- [`dox_cache`](../packages/cache.md): values must be JSON types. `put` with no ttl keeps the value **forever** (the old `Cache()` kept it 1 hour).
-- [`dox_storage`](../packages/storage.md): a new `Disk` API with S3 and signed URLs.
-- [`dox_validation`](../packages/validation.md): typed schemas. `v.fromRules()` takes your old rule strings.
+```dart
+// old
+CacheConfig(
+  defaultDriver: 'file',
+  drivers: <String, CacheDriverInterface>{'file': FileCacheDriver()},
+);
+
+// new
+CacheConfig(
+  defaultStore: 'file',
+  stores: <String, Map<String, dynamic>>{
+    'file': <String, dynamic>{'driver': 'file', 'path': 'storage/cache'},
+    'redis': <String, dynamic>{'driver': 'redis', 'host': '127.0.0.1'},
+  },
+);
+```
+
+- `CacheDriverInterface` and `FileCacheDriver` are gone. For your own driver, see [dox_cache](../packages/cache.md#your-own-driver).
+- **Values must be JSON types** (`Map`, `List`, `String`, `num`, `bool`). Other types throw.
+- **`put` with no `duration` keeps the value forever.** Before, it kept it 1 hour. Pass `duration:` where you need a limit.
+- `Cache().flush()` with no tag empties the whole store.
+- Old cache files are not read. The new files are plain JSON, not encrypted. Delete `storage/cache` once.
+
+See [Cache](../digging-deeper/cache.md).
+
+## File storage
+
+**`Storage()` runs on `dox_storage`.** `AppConfig(fileStorage:)` is now `AppConfig(storage:)`:
+
+```dart
+// old
+FileStorageConfig(
+  defaultDriver: 'local',
+  drivers: <String, StorageDriverInterface>{'local': LocalStorageDriver()},
+);
+
+// new
+StorageConfig(
+  defaultDisk: 'local',
+  disks: <String, Map<String, dynamic>>{
+    'local': <String, dynamic>{'driver': 'local', 'root': 'storage'},
+  },
+);
+```
+
+- `StorageDriverInterface` and `LocalStorageDriver` are gone. Implement `DriverContract` from `dox_storage` and call `Dox().storage.register(name, driver)`.
+- `Storage().disk('name')` with a name that is not in the config throws. Before, it used the default disk.
+- `put`, `putRequestFile`, `get`, `exists`, `delete`, `stream` and `download` work as before. Paths still look like `/images/<uuid>.png`.
+- `stream()` now gets the content type from the file extension, not from the first bytes.
+
+See [File Storage](../digging-deeper/file-storage.md).
+
+## Environment
+
+**A missing key is never the text `"null"`.**
+Before, `Env.get('APP_KEY')` with no `APP_KEY` gave `"null"`, so the app used a key anyone can guess.
+Now a `String` gives `''`, `String?` gives `null`, and `int`, `num`, `double`, `bool` throw an `ArgumentError`.
+Fix: give a default where a key is optional, for example `Env.get<int>('APP_PORT', 3000)`.
+
+**An empty `APP_KEY` stops the server in production** (`APP_ENV=production`). Run `dox key:generate`.
+
+## New built-in features
+
+- [OpenAPI docs](../packages/openapi.md#in-a-dox-app) at `/docs`, on by default only when `APP_ENV` is `development` or `local`. `dox openapi:generate` writes the files.
+- [Socket.IO](../packages/socketio.md#in-a-dox-app-same-port-as-http) on the app port, off by default.
+- [`unique` and `exists` rules](validation.md#database-rules-unique-and-exists), `validateAsync()`, `validateSchema()` and `FormRequest.schema()`.
+- `Route.files()` for local signed URLs, and the catch-all route param `{path*}`.

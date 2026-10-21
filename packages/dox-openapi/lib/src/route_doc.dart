@@ -185,8 +185,11 @@ class PathConverter {
   static final RegExp _braceParam = RegExp(r'\{([^{}/]+)\}');
 
   /// Turns `/users/:id` or `users/{id}/` into `/users/{id}`.
+  /// A Dox catch-all param `{path*}` becomes `{path}`.
   static String path(String input) {
-    String out = input.replaceAllMapped(_colonParam, _toBrace);
+    String out = input
+        .replaceAllMapped(_colonParam, _toBrace)
+        .replaceAll('*}', '}');
     out = out.replaceAll(RegExp(r'/+'), '/');
     out = out.replaceAll(RegExp(r'^/+|/+$'), '');
     return '/$out';

@@ -1,4 +1,5 @@
 import 'package:dox_orm/dox_orm.dart';
+import 'package:dox_validation/dox_validation.dart' show v;
 
 Map<String, dynamic> _globalConnections = <String, dynamic>{};
 
@@ -73,6 +74,9 @@ class SqlQueryBuilder {
 
     sql.dbDriver = getDatabaseDriver(driver, database);
     sql.debug = debug;
+
+    /// `unique` and `exists` validation rules use this database
+    const DatabaseRules().registerOn(v);
     // coverage:ignore-start
     if (printer != null) {
       sql.printer = printer;

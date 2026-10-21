@@ -3,6 +3,24 @@
 - Needs Dart 3.13 or newer.
 - All dependencies updated to their latest versions.
 - Removed the `encrypt` package (not maintained, and it blocked `pointycastle` 4). AES for cookies and the file cache now uses `pointycastle` 4. The output is the same, so old cookies and cache files still decode.
+- Fix: `Env.get()` of a missing key with no default gave the text `"null"`. A missing `APP_KEY` became the key `"null"`, which anyone can guess. Now `String` gives `''`, `String?` gives `null`, and `int`/`num`/`double`/`bool` throw a clear error. New: `Env.get<bool>()`.
+- Startup stops with an error when `APP_KEY` is empty and `APP_ENV=production`. Other environments log a warning.
+- Validation runs on `dox_validation`. The old validator code is removed. Messages and the `{field: message}` error map are the same.
+- `req.validate()` returns the validated fields. New `await req.validateAsync()` for async rules, and `await req.validateSchema(schema)` for typed output.
+- New rules `unique:table,column` and `exists:table,column` (from `dox_orm`).
+- `FormRequest.schema()`: a fluent schema used before `rules()`. The result is in `validated`. Form requests run async rules.
+- `RequestFile` implements `FileInput`, so `v.file()` and the `file` / `image` rules work.
+- A `ValidationException` from `dox_validation` (for example `schema.parse()` in a controller) answers 422.
+- `dox_core` exports `dox_validation` (not its `ValidationException`). `dox_orm` also has `Schema`: use a prefix in a file that needs both.
+- Breaking: `Cache()` runs on `dox_cache`. `AppConfig.cache` is a `dox_cache` `CacheConfig(defaultStore:, stores:)` with option maps. `CacheDriverInterface` and `FileCacheDriver` are removed. Values must be JSON types. `put` without a duration keeps the value forever (was 1 hour). New: `add`, `pull`, `increment`, `decrement`, `remember`, `rememberForever`, `lock`, `tags`.
+- Breaking: `Storage()` runs on `dox_storage`. `AppConfig.fileStorage` is now `AppConfig.storage` (`StorageConfig(defaultDisk:, disks:)` with option maps for `local`, `s3`, `memory`). `StorageDriverInterface` and `LocalStorageDriver` are removed. An unknown disk name throws.
+- `Storage().stream()` and `download()` stream from any disk (S3 too), with `Content-Length`. New: `url`, `signedUrl`, `use()` for the full `Disk`.
+- New `Route.files('files')` serves local signed URLs (403 for a bad signature). New catch-all route param `{path*}`.
+- OpenAPI: `AppConfig(openApi: OpenApiConfig(...))` adds `/docs`, `/openapi.json` and `/openapi.yaml`. On by default only when `APP_ENV` is development or local. Bodies come from the route `body:` option or the form request. `Dox().writeOpenApi(dir)` writes the files.
+- `RouteData.preMiddleware` now holds the group and router middleware.
+- Socket.IO: `AppConfig(socketIo: SocketIoConfig(enabled: true, ...))` serves `/socket.io/` on the app port, before the router. `Route.mount(prefix, handler)` is the raw hook. Off by default.
+- No extra work per request when OpenAPI or Socket.IO is off.
+
 
 ## 3.0.0-alpha.1
 

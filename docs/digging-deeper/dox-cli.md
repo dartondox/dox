@@ -40,6 +40,7 @@ dart pub global activate dox 3.0.0-alpha.1
 | `dox migration:refresh` | undo all, then run all again |
 | `dox migration:status` | show which migrations ran |
 | `dox key:generate` | make a new `APP_KEY` |
+| `dox openapi:generate [dir]` | write `openapi.json` and `openapi.yaml` (default `storage/openapi`), see [OpenAPI](../packages/openapi.md#write-the-files-dox-openapigenerate) |
 | `dox update` | update the CLI |
 | `dox version` (or `dox -v`) | show the CLI version |
 | `dox help [command]` | show help |

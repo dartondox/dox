@@ -1,11 +1,10 @@
 # Validation
 
 `req.validate()` checks the request data with rule strings, like `'required|email'`.
-When a rule fails, Dox answers `422` with the errors.
+When a rule fails, Dox answers `422` with the errors, like `{"email": "The email is required"}`.
 
-!!! tip "Need typed output or nested schemas?"
-    Use [`dox_validation`](../packages/validation.md). It has typed schemas, custom rules and JSON Schema.
-    `v.fromRules()` takes the same rule strings as this page.
+It runs on [`dox_validation`](../packages/validation.md), which is built into `dox_core`.
+The rule strings become a schema once (`v.fromRules()`), and Dox keeps it for the next request.
 
 === "Validation"
 
@@ -35,6 +34,82 @@ When a rule fails, Dox answers `422` with the errors.
 
 !!! tip
     Multiple rules can be separated by a vertical bar, represented as " | ".
+
+## Validated data
+
+`validate()` returns only the fields that have rules. The values are not changed.
+
+```dart
+Map<String, dynamic> data = req.validate({
+    'title': 'required|string',
+    'body': 'required',
+});
+```
+
+## Database rules: `unique` and `exists`
+
+These rules read the database, so they are async. Use `validateAsync`:
+
+```dart
+Map<String, dynamic> data = await req.validateAsync({
+    'email': 'required|email|unique:users,email',
+    'category_id': 'required|exists:categories,id',
+});
+```
+
+- `unique:table,column`: no row has this value. `column` defaults to the field name.
+- `unique:users,email,5`: ignore the row with `id = 5` (for an update). `unique:users,email,5,user_id` uses another id column.
+- `exists:table,column`: a row with this value must exist.
+
+They use the default connection of `dox_orm`. `SqlQueryBuilder.initialize()` adds them, so they work once the ORM service runs.
+`req.validate()` with an async rule throws an error that tells you to use `validateAsync`.
+A [form request](request.md#custom-form-request) always runs async rules.
+
+## Typed schemas
+
+`validateSchema` takes a `dox_validation` schema and returns its typed output.
+Use `v.coerce` for query strings and form data, because they are text.
+
+```dart
+Map<String, dynamic> data = await req.validateSchema(v.object(<String, Schema<Object?>>{
+    'name': v.string().trim().min(3),
+    'age': v.coerce.int().min(18),
+    'tags': v.list(v.string()).max(5).optional(),
+}));
+int age = data['age']; // an int, not '18'
+```
+
+`v`, `Schema` and the other `dox_validation` names come with `import 'package:dox_core/dox_core.dart'`.
+A `schema.parse(...)` that fails inside a controller also answers `422`.
+
+!!! warning "`Schema` from `dox_orm`"
+    `dox_orm` also has a `Schema` class (the schema builder). In a file that imports both and uses `Schema`,
+    add a prefix: `import 'package:dox_orm/dox_orm.dart' as orm;`.
+
+## Custom rules
+
+Add a rule name for rule strings:
+
+```dart
+class EvenRule extends Rule<Object?> {
+    @override
+    String get name => 'even';
+
+    @override
+    String get defaultMessage => 'The {field} must be even';
+
+    @override
+    bool check(Object? value, RuleContext context) {
+        return int.tryParse('$value')?.isEven ?? false;
+    }
+}
+
+v.registerRule('even', (RuleDefinition d) => EvenRule());
+req.validate({'count': 'required|even'});
+```
+
+For a database check, extend `AsyncRule` and use `validateAsync`.
+An unknown rule name throws an error when the rules are first used.
 
 ## Custom validation message
 
@@ -203,6 +278,22 @@ req.validate({
 
 !!! info
     Name is required if status is inactive.
+
+#### `unique`
+
+The value must not be in the table yet. Async, use `validateAsync`.
+
+```dart
+await req.validateAsync({'email': 'required|email|unique:users,email'});
+```
+
+#### `exists`
+
+The value must be in the table. Async, use `validateAsync`.
+
+```dart
+await req.validateAsync({'user_id': 'required|exists:users,id'});
+```
 
 #### `email`
 

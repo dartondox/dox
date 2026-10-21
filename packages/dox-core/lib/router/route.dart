@@ -1,12 +1,21 @@
 // ignore_for_file: empty_catches
 
+import 'dart:io';
+
 import 'package:dox_core/constants/http_request_method.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/router/route_data.dart';
+import 'package:dox_core/storage/storage_file_controller.dart';
 import 'package:dox_core/utils/utils.dart';
 
 /// list of routes registered
 List<RouteData> _routes = <RouteData>[];
+
+/// raw handler for every request under a path prefix, see [Route.mount]
+typedef RawRequestHandler = Future<void> Function(HttpRequest request);
+
+/// prefix => handler. empty unless something is mounted.
+final Map<String, RawRequestHandler> _mounts = <String, RawRequestHandler>{};
 
 class Route {
   /// register as singleton
@@ -22,6 +31,36 @@ class Route {
 
   /// get list of routes registered
   List<RouteData> get routes => _routes;
+
+  /// raw handlers added with [mount]
+  Map<String, RawRequestHandler> get mounts => _mounts;
+
+  /// send every request whose path starts with [prefix] straight to
+  /// [handler], before routing, middleware and body reading.
+  /// the handler writes and closes the response itself.
+  /// Socket.IO uses this for `/socket.io/`.
+  /// ```
+  /// Route.mount('/socket.io/', io.handle);
+  /// ```
+  static void mount(String prefix, RawRequestHandler handler) {
+    _mounts[prefix] = handler;
+  }
+
+  /// remove a handler added with [mount]
+  static void unmount(String prefix) {
+    _mounts.remove(prefix);
+  }
+
+  /// serve files of a storage disk at `GET <path>/<key>`.
+  /// with [signed] (default) only URLs from `Storage().signedUrl()` work,
+  /// others get 403. set the disk `url` option to the full url of [path].
+  /// ```
+  /// Route.files('files'); // GET /files/{key*}
+  /// String url = await Storage().signedUrl('images/a.png');
+  /// ```
+  static Route files(String path, {String? disk, bool signed = true}) {
+    return get('$path/{key*}', StorageFileController(disk, signed).serve);
+  }
 
   // set route list
   void setRoutes(List<RouteData> routeList) {
@@ -191,11 +230,14 @@ class Route {
   /// ```
   /// Route.post('path', controller);
   ///
-  static Route post(String route, dynamic controller, {Function? request}) {
+  /// [body] is the request body schema for the OpenAPI docs
+  /// (eg. a `dox_validation` schema).
+  static Route post(String route, dynamic controller, {Object? body}) {
     return Route()._addRoute(
       HttpRequestMethod.POST,
       Route()._prefix + route,
       controller,
+      body: body,
     );
   }
 
@@ -203,11 +245,12 @@ class Route {
   /// ```
   /// Route.put('path', controller);
   ///
-  static Route put(String route, dynamic controller) {
+  static Route put(String route, dynamic controller, {Object? body}) {
     return Route()._addRoute(
       HttpRequestMethod.PUT,
       Route()._prefix + route,
       controller,
+      body: body,
     );
   }
 
@@ -239,11 +282,12 @@ class Route {
   /// ```
   /// Route.patch('path', controller);
   ///
-  static Route patch(String route, dynamic controller) {
+  static Route patch(String route, dynamic controller, {Object? body}) {
     return Route()._addRoute(
       HttpRequestMethod.PATCH,
       Route()._prefix + route,
       controller,
+      body: body,
     );
   }
 
@@ -413,7 +457,12 @@ class Route {
     return Route();
   }
 
-  Route _addRoute(HttpRequestMethod method, String path, dynamic controller) {
+  Route _addRoute(
+    HttpRequestMethod method,
+    String path,
+    dynamic controller, {
+    Object? body,
+  }) {
     path = sanitizeRoutePath(path);
     List<dynamic> controllers = <dynamic>[];
     controllers.addAll(_preMiddleware);
@@ -430,6 +479,8 @@ class Route {
         controllers: controllers,
         domain: _domain,
         corsEnabled: _corsEnabled,
+        preMiddleware: List<dynamic>.unmodifiable(_preMiddleware),
+        body: body,
       ),
     );
     return this;

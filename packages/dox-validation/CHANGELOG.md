@@ -2,6 +2,8 @@
 
 - Needs Dart 3.13 or newer.
 - All dependencies updated to their latest versions.
+- `fromRules()`: a `null` field that is not `required` now skips its other rules, like the old dox-core validator. `nullable` still marks the field nullable in JSON Schema.
+
 
 ## 3.0.0-alpha.1
 

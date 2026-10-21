@@ -1,10 +1,13 @@
 import 'dart:io';
 
 import 'package:dox_app/app/http/handler.dart';
+import 'package:dox_app/app/http/requests/blog.request.dart';
 import 'package:dox_app/config/cache.dart';
 import 'package:dox_app/config/cors.dart';
 import 'package:dox_app/config/logger.dart';
+import 'package:dox_app/config/openapi.dart';
 import 'package:dox_app/config/services.dart';
+import 'package:dox_app/config/socketio.dart';
 import 'package:dox_app/config/storage.dart';
 import 'package:dox_app/routes/api.dart';
 import 'package:dox_app/routes/web.dart';
@@ -42,7 +45,9 @@ AppConfig appConfig = AppConfig(
   ///   BlogRequest : () => BlogRequest(),
   ///   UserRequest : () => UserRequest(),
   /// }
-  formRequests: <Type, FormRequest Function()>{},
+  formRequests: <Type, FormRequest Function()>{
+    BlogRequest: () => BlogRequest(),
+  },
 
   /// Global middleware
   /// -------------------------------
@@ -58,11 +63,17 @@ AppConfig appConfig = AppConfig(
   /// Response handler
   responseHandler: ResponseHandler(),
 
-  /// Cache driver configuration
+  /// Cache stores (config/cache.dart)
   cache: cache,
 
-  /// File storage driver configuration
-  fileStorage: storage,
+  /// Storage disks (config/storage.dart)
+  storage: storage,
+
+  /// OpenAPI docs at /docs (config/openapi.dart)
+  openApi: openApi,
+
+  /// Socket.IO on the app port (config/socketio.dart)
+  socketIo: socketIo,
 
   /// Cors configuration
   cors: cors,

@@ -183,3 +183,35 @@ This function serves as the location for defining validation rules for input req
 #### `messages`
 
 In this function, you have the ability to configure custom validation messages for input form request validation. Check [here](validation.md#custom-validation-message) for more about validation.
+
+#### `schema`
+
+Return a `dox_validation` schema to check the body with typed output. When `schema()` is not `null`, Dox uses it instead of `rules()`.
+Build it once in a `static final` field, because `schema()` runs on every request.
+
+```dart
+class SignUpRequest extends FormRequest {
+    static final ObjectSchema _schema = v.object(<String, Schema<Object?>>{
+        'name': v.string().trim().min(3),
+        'age': v.coerce.int().min(18),
+    });
+
+    @override
+    ObjectSchema? schema() => _schema;
+}
+```
+
+The schema (or the `rules()`) also becomes the request body in the [OpenAPI docs](../packages/openapi.md).
+
+#### `validated`
+
+The checked data, set before `setUp()` runs. With `schema()` it is the typed output. With `rules()` it is the fields that have rules.
+
+```dart
+store(SignUpRequest req) {
+    int age = req.validated['age'];
+}
+```
+
+!!! info
+    A form request always validates with async support, so `unique` and `exists` rules work in `rules()`.

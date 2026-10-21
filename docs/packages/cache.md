@@ -2,9 +2,11 @@
 
 `dox_cache` is a cache like Laravel Cache. It has `remember`, tags, atomic locks and four drivers.
 
-!!! tip "Which one should I use?"
-    - A simple file cache: the built-in [`Cache()`](../digging-deeper/cache.md) in `dox_core` is enough.
-    - Redis, memory with LRU, `remember`, `increment` or locks: use `dox_cache` (this page).
+!!! tip "Built into Dox"
+    `dox_core` uses `dox_cache` for [`Cache()`](../digging-deeper/cache.md).
+    In a Dox app, set the stores in `config/cache.dart` (the `CacheConfig` of this page), and use `Cache()`.
+    `Dox().cache` is the `CacheManager`. `Cache().repository` is the `CacheStore`.
+    This page is for the full API and for using `dox_cache` outside Dox.
 
 ## Install
 
@@ -17,8 +19,8 @@ import 'package:dox_cache/dox_cache.dart';
 ```
 
 !!! note
-    `dox_core` also has a `CacheConfig` class. If you import both packages in one file,
-    use a prefix: `import 'package:dox_cache/dox_cache.dart' as cache;`
+    `dox_core` exports `CacheConfig`, `CacheManager`, `CacheStore` and `CacheLock` from this package.
+    They are the same classes, so importing both packages is fine.
 
 ## Drivers
 

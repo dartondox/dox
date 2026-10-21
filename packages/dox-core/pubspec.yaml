@@ -16,9 +16,15 @@ dependencies:
   string_scanner: ^1.4.1
   uuid: ^4.6.0
   dox_annotation: ^3.0.0-alpha.1
+  dox_cache: ^3.0.0-alpha.1
+  dox_openapi: ^3.0.0-alpha.1
+  dox_socketio: ^3.0.0-alpha.1
+  dox_storage: ^3.0.0-alpha.1
+  dox_validation: ^3.0.0-alpha.1
 
 dev_dependencies:
   lints: ^6.1.0
   test: ^1.33.0
   http: ^1.6.0
   http_parser: ^4.1.2
+  dox_orm: ^3.0.0-alpha.1
