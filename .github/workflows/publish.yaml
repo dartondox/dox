@@ -136,6 +136,21 @@ jobs:
             echo "::error::dart pub get still cannot resolve $1 $VERSION"
             exit 1
           }
+          # The OIDC token from setup-dart lives only a few minutes. The waits
+          # above can take longer, so get a new token right before each publish.
+          # Same steps as setup-dart: OIDC token for audience https://pub.dev,
+          # put it in PUB_TOKEN, register it with `dart pub token add`.
+          refresh_pub_token() {
+            PUB_TOKEN=$(curl -sSf -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+              "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=https://pub.dev" | jq -r '.value')
+            if [ -z "$PUB_TOKEN" ] || [ "$PUB_TOKEN" = "null" ]; then
+              echo "::error::Could not get a new OIDC token for pub.dev"
+              exit 1
+            fi
+            echo "::add-mask::$PUB_TOKEN"
+            export PUB_TOKEN
+            dart pub token add https://pub.dev --env-var PUB_TOKEN
+          }
           for entry in $PACKAGES; do
             dir=${entry%%:*}
             name=${entry##*:}
@@ -146,6 +161,7 @@ jobs:
               continue
             fi
             echo "::group::Publish $name $VERSION"
+            refresh_pub_token
             (cd "packages/$dir" && dart pub publish --force)
             echo "::endgroup::"
             wait_resolvable "$name" 20 30
