@@ -81,7 +81,7 @@ cd new_blog && dox s                         # start the server
 
 -   :material-file-document-outline: **OpenAPI**
 
-    Make OpenAPI 3.1 docs and a Swagger UI page with [`dox_openapi`](packages/openapi.md).
+    Make OpenAPI 3.1 docs and a Scalar docs page with [`dox_openapi`](packages/openapi.md).
 
 -   :material-folder-outline: **File storage**
 

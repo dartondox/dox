@@ -125,6 +125,8 @@ AppConfig config = AppConfig(
       ],
     },
     registry: registry,
+    pageTitle: 'Test docs',
+    scalar: ScalarOptions(theme: ScalarTheme.purple, darkMode: true),
   ),
 );
 
@@ -228,7 +230,11 @@ void main() {
 
     http.Response docs = await http.get(Uri.parse('$baseUrl/docs'));
     expect(docs.headers['content-type'], startsWith('text/html'));
-    expect(docs.body, contains('swagger-ui'));
+    expect(docs.body, contains('@scalar/api-reference@1.75.1'));
+    expect(docs.body, contains('"url":"/openapi.json"'));
+    expect(docs.body, contains('"theme":"purple","darkMode":true'));
+    expect(docs.body, contains('<title>Test docs</title>'));
+    expect(docs.body, isNot(contains('swagger-ui')));
   });
 
   test('routes added later show up in the docs', () async {

@@ -34,7 +34,10 @@ class OpenApiConstants {
   static const String bodyMediaType = 'application/json';
 
   /// Swagger UI version loaded from the CDN.
-  static const String swaggerUiVersion = '5.17.14';
+  static const String swaggerUiVersion = '5.34.0';
+
+  /// Scalar (`@scalar/api-reference`) version loaded from the CDN.
+  static const String scalarVersion = '1.75.1';
 
   /// HTTP methods that OpenAPI 3.1 allows in a path item.
   static const List<String> methods = <String>[

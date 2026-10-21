@@ -84,7 +84,12 @@ class OpenApiDocument {
     List<RouteData> routes = Route().routes;
     OpenApiServer? server = _server;
     if (server == null || _builtFor != routes.length) {
-      server = _server = OpenApiServer(build(routes));
+      server = _server = OpenApiServer(
+        build(routes),
+        pageTitle: config.pageTitle,
+        ui: config.ui,
+        scalar: config.scalar,
+      );
       _builtFor = routes.length;
     }
     OpenApiResponse? res = server.handle(req.uri.path);
