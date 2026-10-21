@@ -14,7 +14,7 @@
         <link rel="prev" href="../schema/">
       
       
-        <link rel="next" href="relationship/has-one/">
+        <link rel="next" href="events/">
       
       
         
@@ -1300,6 +1300,8 @@
       
         
       
+        
+      
     
     
     
@@ -1363,6 +1365,34 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model events
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
       
@@ -1389,10 +1419,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_6_2" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_6_3" >
         
           
-          <label class="md-nav__link" for="__nav_3_6_2" id="__nav_3_6_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_6_3" id="__nav_3_6_3_label" tabindex="0">
             
   
   
@@ -1410,8 +1440,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_6_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_6_2">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_6_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_6_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2432,6 +2462,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#computed-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Computed values
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2594,14 +2635,23 @@ On update, a field is set to <code>NULL</code> only when it had a value before
 for example with <code>select()</code>, are not changed.</p>
 </div>
 <h2 id="delete">Delete</h2>
-<div class="tabbed-set tabbed-alternate" data-tabs="5:1"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Delete a record</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Delete a record</label><label for="__tabbed_5_2">Restore a soft deleted record</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
 <span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="o">?</span><span class="p">.</span><span class="n">delete</span><span class="p">();</span><span class="w"> </span><span class="c1">// only deletes this record</span>
 </code></pre></div>
 </div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">withTrash</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+<span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="o">?</span><span class="p">.</span><span class="n">restore</span><span class="p">();</span><span class="w"> </span><span class="c1">// sets deleted_at back to NULL</span>
+</code></pre></div>
 </div>
+</div>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p><code>save()</code>, <code>delete()</code>, <code>forceDelete()</code> and <code>restore()</code> fire <a href="events/">model events</a>.</p>
 </div>
 <h2 id="to-map">To map</h2>
 <div class="tabbed-set tabbed-alternate" data-tabs="6:1"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">To map</label></div>
@@ -2637,11 +2687,11 @@ for example with <code>select()</code>, are not changed.</p>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="n">Blog</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Blog</span><span class="p">();</span>
-<span class="n">List</span><span class="w"> </span><span class="n">Blog</span><span class="o">&gt;</span><span class="w"> </span><span class="n">blogs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'active'</span><span class="p">)</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">&gt;</span><span class="w"> </span><span class="n">blogs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'active'</span><span class="p">)</span>
 <span class="w">    </span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'user'</span><span class="p">,</span><span class="w"> </span><span class="s1">'super_user'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
 
 <span class="c1">// reset existing get query and make new one using `query()`</span>
-<span class="n">List</span><span class="w"> </span><span class="n">Blog</span><span class="o">&gt;</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">query</span><span class="p">()</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">&gt;</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">query</span><span class="p">()</span>
 <span class="w">    </span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'deleted'</span><span class="p">).</span><span class="n">where</span><span class="p">(</span><span class="s1">'user'</span><span class="p">,</span><span class="w"> </span><span class="s1">'normal'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
 </code></pre></div>
 </div>
@@ -2654,11 +2704,54 @@ for example with <code>select()</code>, are not changed.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@DoxModel</span><span class="p">()</span>
 <span class="kd">class</span><span class="w"> </span><span class="nc">User</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">UserGenerator</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nd">@override</span>
-<span class="w">    </span><span class="n">List</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">hidden</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">[</span><span class="s1">'password'</span><span class="p">,</span><span class="w"> </span><span class="s1">'remember_token'</span><span class="p">];</span>
+<span class="w">    </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">hidden</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">[</span><span class="s1">'password'</span><span class="p">,</span><span class="w"> </span><span class="s1">'remember_token'</span><span class="p">];</span>
 <span class="p">}</span>
 </code></pre></div>
 </div>
 </div>
+</div>
+<h2 id="computed-values">Computed values</h2>
+<p>A computed value is a getter that is added to <code>toJson()</code> and <code>toMap()</code>.
+It is like <code>$appends</code> with an accessor in Laravel.</p>
+<p>Add <code>@Computed()</code> to a getter in the model, then run <code>dart run build_runner build</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@DoxModel</span><span class="p">()</span>
+<span class="kd">class</span><span class="w"> </span><span class="nc">User</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">UserGenerator</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nd">@Column</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'first_name'</span><span class="p">)</span>
+<span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">firstName</span><span class="p">;</span>
+
+<span class="w">  </span><span class="nd">@Column</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'last_name'</span><span class="p">)</span>
+<span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">lastName</span><span class="p">;</span>
+
+<span class="w">  </span><span class="nd">@Computed</span><span class="p">()</span><span class="w"> </span><span class="c1">// json key: full_name</span>
+<span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">fullName</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'</span><span class="si">$</span><span class="n">firstName</span><span class="s1"> </span><span class="si">$</span><span class="n">lastName</span><span class="s1">'</span><span class="p">;</span>
+
+<span class="w">  </span><span class="nd">@Computed</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'initials'</span><span class="p">)</span><span class="w"> </span><span class="c1">// custom json key</span>
+<span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">shortName</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'</span><span class="si">${</span><span class="n">firstName</span><span class="o">?</span><span class="p">[</span><span class="m">0</span><span class="p">]</span><span class="si">}${</span><span class="n">lastName</span><span class="o">?</span><span class="p">[</span><span class="m">0</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+<span class="n">print</span><span class="p">(</span><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">toJson</span><span class="p">());</span>
+<span class="c1">// {id: 1, first_name: John, last_name: Wick, ..., full_name: John Wick, initials: JW}</span>
+</code></pre></div>
+<ul>
+<li>The default key is the getter name in snake_case (<code>fullName</code> becomes <code>full_name</code>).</li>
+<li>A computed value is <strong>never a column</strong>. It is not read from the database, and it is not sent in <code>INSERT</code> or <code>UPDATE</code>.</li>
+<li><code>hidden</code> also hides computed values. Use the json key, for example <code>['full_name']</code>.</li>
+<li>Computed values of loaded relations are in the nested json too.</li>
+<li><code>toMap(original: true)</code> returns the raw database row, so it has no computed values.</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title">Performance</p>
+<p>The code is made by <code>build_runner</code>. There is no reflection.
+A model without <code>@Computed()</code> does no extra work in <code>toJson()</code>.
+A getter runs each time <code>toJson()</code> or <code>toMap()</code> is called, so keep it fast.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Casts</p>
+<p>Dox has no <code>$casts</code> list. The field type does the cast:
+<code>DateTime?</code> is parsed from the database, and a JSON column can be a
+<code>Map&lt;String, dynamic&gt;?</code> or <code>List&lt;dynamic&gt;?</code> field.
+For other conversions, use the <code>beforeSave</code> and <code>beforeGet</code> hooks of <code>@Column</code>.</p>
 </div>
 
 

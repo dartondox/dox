@@ -1455,6 +1455,8 @@
       
         
       
+        
+      
     
     
     
@@ -1517,6 +1519,34 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../../database/model/events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model events
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
       
@@ -1543,10 +1573,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_6_2" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_6_3" >
         
           
-          <label class="md-nav__link" for="__nav_3_6_2" id="__nav_3_6_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_6_3" id="__nav_3_6_3_label" tabindex="0">
             
   
   
@@ -1564,8 +1594,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_6_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_6_2">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_6_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_6_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2609,6 +2639,16 @@ Each query no longer runs in its own transaction. Use <a href="../../database/tr
 <li><code>getDatabaseConnection()</code> returns a <code>MySQLConnectionPool</code>.</li>
 <li>A connection you pass to the migration package must be a <code>mysql_dart</code> <code>MySQLConnection</code> or <code>MySQLConnectionPool</code>.</li>
 </ul>
+<p><strong><code>save()</code>, <code>delete()</code> and <code>forceDelete()</code> return <code>Future&lt;bool&gt;</code>.</strong>
+They return <code>false</code> when a model event cancels them. Code that overrides these methods in a model must use <code>Future&lt;bool&gt;</code>.</p>
+<p><strong>A model can not have a field or method named like a model hook.</strong>
+The <code>Model</code> class now has <code>onSaving()</code>, <code>onCreated()</code>, <code>onDeleted()</code> and the other <a href="../../database/model/events/">event hooks</a>, plus <code>restore()</code>, <code>saveQuietly()</code>, <code>hasModelHooks</code> and <code>setComputedValues()</code>.
+Fix: rename a field with one of these names.</p>
+<p><strong><code>dox_builder</code> needs the new analyzer.</strong>
+It uses <code>analyzer</code> 14, <code>source_gen</code> 4 and <code>build</code> 5, so it needs Dart <strong>3.13</strong> or newer.
+Set <code>build_runner: ^2.17.1</code> in <code>dev_dependencies</code>.
+Other builders in your app (for example <code>json_serializable</code>) must also support <code>analyzer</code> 14.</p>
+<p><strong>New:</strong> <a href="../../database/model/#computed-values">computed values</a> with <code>@Computed()</code>, <a href="../../database/model/events/">model events and observers</a>, and <code>restore()</code> for soft deleted models.</p>
 <p><strong>New:</strong> SQLite, <code>whereNull</code>, <code>whereNotNull</code>, <code>whereNotIn</code>, <code>orWhereIn</code>, <code>orWhereNotIn</code>, <code>selectRaw</code>, <code>boolean()</code> column, transactions.
 See <a href="../../database/">Database</a>.</p>
 <h2 id="migrations">Migrations</h2>
