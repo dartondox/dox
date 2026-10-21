@@ -26,7 +26,9 @@ void main() {
       String payload = parser.encodePayload(<EnginePacket>[
         EnginePacket(EnginePacketType.message, 'hello'),
         EnginePacket(
-            EnginePacketType.message, Uint8List.fromList(<int>[1, 2, 3, 4])),
+          EnginePacketType.message,
+          Uint8List.fromList(<int>[1, 2, 3, 4]),
+        ),
         EnginePacket(EnginePacketType.pong),
       ]);
       expect(payload, '4hello\x1ebAQIDBA==\x1e3');
@@ -61,23 +63,28 @@ void main() {
 
     test('encodes connect, event, ack in the default namespace', () {
       expect(
-        encoder.encode(SocketPacket(
-          type: SocketPacketType.connect,
-          data: <String, String>{'sid': 'abc'},
-        )),
+        encoder.encode(
+          SocketPacket(
+            type: SocketPacketType.connect,
+            data: <String, String>{'sid': 'abc'},
+          ),
+        ),
         <Object>['0{"sid":"abc"}'],
       );
       expect(
-        encoder.encode(SocketPacket(
-          type: SocketPacketType.event,
-          data: <Object>['chat', 'hi'],
-          id: 12,
-        )),
+        encoder.encode(
+          SocketPacket(
+            type: SocketPacketType.event,
+            data: <Object>['chat', 'hi'],
+            id: 12,
+          ),
+        ),
         <Object>['212["chat","hi"]'],
       );
       expect(
         encoder.encode(
-            SocketPacket(type: SocketPacketType.ack, id: 3, data: <Object>[1])),
+          SocketPacket(type: SocketPacketType.ack, id: 3, data: <Object>[1]),
+        ),
         <Object>['33[1]'],
       );
     });
@@ -85,16 +92,19 @@ void main() {
     test('adds a custom namespace', () {
       expect(
         encoder.encode(
-            SocketPacket(type: SocketPacketType.disconnect, nsp: '/admin')),
+          SocketPacket(type: SocketPacketType.disconnect, nsp: '/admin'),
+        ),
         <Object>['1/admin,'],
       );
       expect(
-        encoder.encode(SocketPacket(
-          type: SocketPacketType.event,
-          nsp: '/admin',
-          id: 1,
-          data: <Object>['x'],
-        )),
+        encoder.encode(
+          SocketPacket(
+            type: SocketPacketType.event,
+            nsp: '/admin',
+            id: 1,
+            data: <Object>['x'],
+          ),
+        ),
         <Object>['2/admin,1["x"]'],
       );
     });
@@ -102,17 +112,19 @@ void main() {
     test('turns binary data into attachments', () {
       Uint8List a = Uint8List.fromList(<int>[1]);
       Uint8List b = Uint8List.fromList(<int>[2]);
-      List<Object> parts = encoder.encode(SocketPacket(
-        type: SocketPacketType.event,
-        nsp: '/files',
-        data: <Object>[
-          'upload',
-          <String, Object>{
-            'a': a,
-            'list': <Object>[b, 'text']
-          },
-        ],
-      ));
+      List<Object> parts = encoder.encode(
+        SocketPacket(
+          type: SocketPacketType.event,
+          nsp: '/files',
+          data: <Object>[
+            'upload',
+            <String, Object>{
+              'a': a,
+              'list': <Object>[b, 'text'],
+            },
+          ],
+        ),
+      );
       expect(
         parts.first,
         '52-/files,["upload",{"a":{"_placeholder":true,"num":0},'
@@ -122,13 +134,15 @@ void main() {
     });
 
     test('binary ack', () {
-      List<Object> parts = encoder.encode(SocketPacket(
-        type: SocketPacketType.ack,
-        id: 7,
-        data: <Object>[
-          Uint8List.fromList(<int>[9])
-        ],
-      ));
+      List<Object> parts = encoder.encode(
+        SocketPacket(
+          type: SocketPacketType.ack,
+          id: 7,
+          data: <Object>[
+            Uint8List.fromList(<int>[9]),
+          ],
+        ),
+      );
       expect(parts.first, '61-7[{"_placeholder":true,"num":0}]');
     });
   });
@@ -154,7 +168,7 @@ void main() {
       expect(packet.id, 42);
       expect(packet.data, <Object>[
         'msg',
-        <String, Object>{'a': 1}
+        <String, Object>{'a': 1},
       ]);
     });
 
@@ -167,8 +181,10 @@ void main() {
     test('waits for binary attachments', () {
       SocketDecoder decoder = SocketDecoder();
       expect(
-        decoder.add('52-3["up",{"_placeholder":true,"num":1},'
-            '{"_placeholder":true,"num":0}]'),
+        decoder.add(
+          '52-3["up",{"_placeholder":true,"num":1},'
+          '{"_placeholder":true,"num":0}]',
+        ),
         isNull,
       );
       expect(decoder.add(Uint8List.fromList(<int>[1])), isNull);
@@ -178,19 +194,21 @@ void main() {
       expect(packet.data, <Object>[
         'up',
         <int>[2],
-        <int>[1]
+        <int>[1],
       ]);
     });
 
     test('round trips binary through the encoder', () {
       Uint8List bytes = Uint8List.fromList(<int>[0, 255]);
-      List<Object> parts = const SocketEncoder().encode(SocketPacket(
-        type: SocketPacketType.event,
-        data: <Object>[
-          'e',
-          <String, Object>{'b': bytes}
-        ],
-      ));
+      List<Object> parts = const SocketEncoder().encode(
+        SocketPacket(
+          type: SocketPacketType.event,
+          data: <Object>[
+            'e',
+            <String, Object>{'b': bytes},
+          ],
+        ),
+      );
       SocketDecoder decoder = SocketDecoder();
       SocketPacket? packet;
       for (Object part in parts) {
@@ -198,7 +216,7 @@ void main() {
       }
       expect(packet!.data, <Object>[
         'e',
-        <String, Object>{'b': bytes}
+        <String, Object>{'b': bytes},
       ]);
     });
 
@@ -211,10 +229,7 @@ void main() {
       expect(() => SocketDecoder().add('1{}'), throwsFormatException);
       expect(() => SocketDecoder().add('5x-["a"]'), throwsFormatException);
       expect(() => SocketDecoder().add('2[bad json'), throwsFormatException);
-      expect(
-        () => SocketDecoder().add(Uint8List(1)),
-        throwsFormatException,
-      );
+      expect(() => SocketDecoder().add(Uint8List(1)), throwsFormatException);
       SocketDecoder waiting = SocketDecoder()
         ..add('51-["a",{"_placeholder":true,"num":0}]');
       expect(() => waiting.add('2["b"]'), throwsFormatException);

@@ -6,8 +6,11 @@ import 'package:dox_orm/dox_orm.dart';
 class BlogService {
   BlogService();
 
-  Future<Pagination> listing(dynamic limit, dynamic page,
-      {bool withTrashed = false}) async {
+  Future<Pagination> listing(
+    dynamic limit,
+    dynamic page, {
+    bool withTrashed = false,
+  }) async {
     int limitValue = int.parse(limit.toString());
     int pageValue = int.parse(page.toString());
     int offset = (pageValue - 1) * limitValue;

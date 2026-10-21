@@ -7,10 +7,9 @@ abstract class BuiltInRule<T> extends Rule<T> {
     this._name,
     this._defaultMessage, {
     super.message,
-    Map<String, Object?> params = const <String, Object?>{},
-    Map<String, dynamic> json = const <String, dynamic>{},
-  })  : _params = params,
-        _json = json;
+    this._params = const <String, Object?>{},
+    this._json = const <String, dynamic>{},
+  });
 
   final String _name;
   final String _defaultMessage;

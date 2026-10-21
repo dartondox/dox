@@ -26,7 +26,7 @@ dart pub global activate dox 3.0.0-alpha.1
 | --- | --- |
 | `dox create <name> [--version <v>]` | create a new project |
 | `dox serve` (or `dox s`) | start the dev server with build_runner watch |
-| `dox build` | build the native (AOT) binary into `build/server` |
+| `dox build` | build the native (AOT) bundle into `build/bundle` |
 | `dox build_runner:watch` / `dox build_runner:build` | run the code generator |
 | `dox create:controller <name> [-r] [-ws]` | create a controller |
 | `dox create:middleware <name>` | create a middleware |
@@ -73,9 +73,9 @@ dox build_runner:build
 ## Build project for production
 
 ```py
-dox build      // runs build_runner, then dart compile exe
-cd build
-./server       // start the server
+dox build      // runs build_runner, then dart build cli
+cd build/bundle
+./bin/server   // start the server
 ```
 
 `dox build` exits with code 1 when a step fails, so CI can stop. See [Deployment](deployment.md).

@@ -72,9 +72,13 @@ void main() {
       expect(createSerializer('BlogPostSerializer'), isTrue);
       String c = read('lib/app/http/serializers/blog_post.serializer.dart');
       expect(
-          c, contains('class BlogPostSerializer extends Serializer<BlogPost>'));
+        c,
+        contains('class BlogPostSerializer extends Serializer<BlogPost>'),
+      );
       expect(
-          c, contains("'../../../app/models/blog_post/blog_post.model.dart'"));
+        c,
+        contains("'../../../app/models/blog_post/blog_post.model.dart'"),
+      );
     });
   });
 
@@ -103,11 +107,12 @@ void main() {
   });
 
   group('create:model -m', () {
-    List<String> migrationFiles() => Directory('db/migration')
-        .listSync()
-        .map((FileSystemEntity f) => f.uri.pathSegments.last)
-        .toList()
-      ..sort();
+    List<String> migrationFiles() =>
+        Directory('db/migration')
+            .listSync()
+            .map((FileSystemEntity f) => f.uri.pathSegments.last)
+            .toList()
+          ..sort();
 
     test('-m makes the model and a create_<plural>_table migration', () async {
       await CommandRegistry.findCommand('create:model')!
@@ -121,27 +126,35 @@ void main() {
       );
       String c = read('db/migration/$name');
       expect(c, contains("await schema.create('blog_posts', (Table table) {"));
-      expect(read('db/migration/migrations.dart'),
-          contains('CreateBlogPostsTable()'));
+      expect(
+        read('db/migration/migrations.dart'),
+        contains('CreateBlogPostsTable()'),
+      );
       expect(File('bin/migrate.dart').existsSync(), isTrue);
     });
 
     test('make:model and --migration work too', () async {
       expect(
-          CommandRegistry.findCommand('make:model')?.command, 'create:model');
+        CommandRegistry.findCommand('make:model')?.command,
+        'create:model',
+      );
       await CommandRegistry.findCommand('make:model')!
           .function(<String>['Category', '--migration']);
       expect(
-          migrationFiles()
-              .any((String f) => f.endsWith('_create_categories_table.dart')),
-          isTrue);
+        migrationFiles().any(
+          (String f) => f.endsWith('_create_categories_table.dart'),
+        ),
+        isTrue,
+      );
     });
 
     test('without -m: no migration, default table', () async {
       await CommandRegistry.findCommand('create:model')!
           .function(<String>['User']);
       expect(
-          read('lib/app/models/user/user.model.dart'), contains('@DoxModel()'));
+        read('lib/app/models/user/user.model.dart'),
+        contains('@DoxModel()'),
+      );
       expect(Directory('db').existsSync(), isFalse);
     });
 
@@ -206,14 +219,8 @@ void main() {
       String registry = read('db/migration/migrations.dart');
       expect(registry, contains("import '2020_01_01_000000_a.dart' as m1;"));
       expect(registry, contains("import '2020_01_02_000000_b.dart' as m2;"));
-      expect(
-        registry,
-        contains("    '2020_01_01_000000_a',\n    m1.A(),\n"),
-      );
-      expect(
-        registry,
-        contains("    '2020_01_02_000000_b',\n    m2.B(),\n"),
-      );
+      expect(registry, contains("    '2020_01_01_000000_a',\n    m1.A(),\n"));
+      expect(registry, contains("    '2020_01_02_000000_b',\n    m2.B(),\n"));
       expect(registry, contains('m3.CreatePostsTable()'));
       expect(registry, isNot(contains('skip')));
       expect(registry, isNot(contains('migrations.dart')));
@@ -221,8 +228,10 @@ void main() {
 
     test('makes bin/migrate.dart once', () async {
       await run(<String>['create_a_table']);
-      expect(read('bin/migrate.dart'),
-          contains('Migrator(migrations: migrations)'));
+      expect(
+        read('bin/migrate.dart'),
+        contains('Migrator(migrations: migrations)'),
+      );
       File('bin/migrate.dart').writeAsStringSync('// mine');
       await run(<String>['create_b_table']);
       expect(read('bin/migrate.dart'), '// mine');
@@ -254,16 +263,18 @@ void main() {
   group('dox binary', () {
     test('make files through the real cli in a temp dir', () async {
       String bin = '${originalCwd.path}/bin/dox.dart';
-      ProcessResult r = await Process.run(
-        Platform.resolvedExecutable,
-        <String>['run', bin, 'create:model', 'Post'],
-        workingDirectory: tempDir.path,
-      );
+      ProcessResult r = await Process.run(Platform.resolvedExecutable, <String>[
+        'run',
+        bin,
+        'create:model',
+        'Post',
+      ], workingDirectory: tempDir.path);
       expect(r.exitCode, 0, reason: '${r.stdout}${r.stderr}');
       expect(
-          File('${tempDir.path}/lib/app/models/post/post.model.dart')
-              .existsSync(),
-          isTrue);
+        File('${tempDir.path}/lib/app/models/post/post.model.dart')
+            .existsSync(),
+        isTrue,
+      );
     });
   });
 }

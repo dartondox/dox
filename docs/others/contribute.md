@@ -12,13 +12,17 @@ git clone git@github.com:dartondox/dox.git
 
 #### 2. Install melos if not installed 
 
-This repo uses melos 3. Melos 7 and newer use a different config.
+The repo is a [Dart pub workspace](https://dart.dev/tools/pub/workspaces).
+The melos config is in the root `pubspec.yaml` (under `melos:`). Use Dart 3.13 or newer.
 
 ```py
-dart pub global activate melos 3.4.0
+dart pub global activate melos
 ```
 
 #### 3. Run melos bootstrap
+
+It runs one `dart pub get` at the root. All local packages are linked, and there is
+one `pubspec.lock` for the whole repo.
 
 ```py
 melos bs
@@ -27,29 +31,32 @@ melos bs
 #### 4. Other Useful Commands
 
 ```py
-# Run all tests (not dox_orm)
-melos run test --no-select
+# Run all tests (not dox_orm).
+# Use `melos run test`. `melos test` is a built-in melos command.
+melos run test
 
 # Analyze and check format (same as CI)
-melos run analyze --no-select
-dart format --output=none --set-exit-if-changed .
+melos run analyze
+melos run format_check
 
 # Run tests for dox_orm with postgres, mysql or sqlite
 DB_PORT=5432 melos run test_pg
 DB_USER=dox DB_PORT=3306 melos run test_mysql
 melos run test_sqlite
 
-# Generate dox cli executable file
+# Build the dox cli executable (AOT).
+# `dart compile exe` does not work: sqlite3 has a build hook. Use `dart build cli`.
 cd packages/dox-cli
-dart compile exe bin/dox.dart -o bin/dox
+dart build cli --target bin/dox.dart --output build
 
 # Run dox cli executable file
-bin/dox --version
+build/bundle/bin/dox --version
 ```
 
 #### If failed to run the project
 
-- remove all pubspec.lock files
+- remove `pubspec.lock` and `.dart_tool` at the root
+- remove any old `pubspec_overrides.yaml` and `pubspec.lock` in `packages/*` (from melos 3)
 - and run `melos bs` again
 
 # Release (maintainers)
@@ -89,7 +96,7 @@ fix the problem and click "Re-run jobs". It continues where it stopped.
 #### Dry run
 
 Open Actions > Release > "Run workflow". It runs `dart pub publish --dry-run` for every
-package and publishes nothing. Warnings (for example local path overrides or a missing
+package and publishes nothing. Warnings (for example a missing
 CHANGELOG entry) are shown as yellow warnings and do not fail the run.
 
 #### One-time setup

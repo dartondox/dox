@@ -1,3 +1,9 @@
+## Unreleased
+
+- Needs Dart 3.13 or newer.
+- All dependencies updated to their latest versions.
+- Removed the `encrypt` package (not maintained, and it blocked `pointycastle` 4). AES for cookies and the file cache now uses `pointycastle` 4. The output is the same, so old cookies and cache files still decode.
+
 ## 3.0.0-alpha.1
 
 - Version 3 of Dox. All Dox packages now share one version.

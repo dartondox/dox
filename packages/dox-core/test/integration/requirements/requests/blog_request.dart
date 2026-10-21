@@ -10,22 +10,16 @@ class BlogRequest extends FormRequest {
 
   @override
   Map<String, String> mapInputs() {
-    return <String, String>{
-      'foo': 'bar',
-    };
+    return <String, String>{'foo': 'bar'};
   }
 
   @override
   Map<String, String> rules() {
-    return <String, String>{
-      'title': 'required',
-    };
+    return <String, String>{'title': 'required'};
   }
 
   @override
   Map<String, String> messages() {
-    return <String, String>{
-      'required': 'The {field} is missing',
-    };
+    return <String, String>{'required': 'The {field} is missing'};
   }
 }

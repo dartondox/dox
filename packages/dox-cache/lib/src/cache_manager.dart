@@ -61,7 +61,8 @@ class CacheManager {
     CacheDriverFactory? factory = _factories[driverName];
     if (factory == null) {
       throw ArgumentError(
-          'Cache driver "$driverName" of store "$storeName" is not supported');
+        'Cache driver "$driverName" of store "$storeName" is not supported',
+      );
     }
     return factory.create(options);
   }

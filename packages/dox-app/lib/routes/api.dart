@@ -23,9 +23,6 @@ class ApiRouter extends Router {
 
     Route.post('/auth/login', authController.login);
     Route.post('/auth/register', authController.register);
-    Route.get('/auth/user', <dynamic>[
-      AuthMiddleware(),
-      authController.user,
-    ]);
+    Route.get('/auth/user', <dynamic>[AuthMiddleware(), authController.user]);
   }
 }

@@ -6,7 +6,5 @@ CacheConfig cache = CacheConfig(
   defaultDriver: Env.get('CACHE_DRIVER', 'file'),
 
   /// register cache driver list
-  drivers: <String, CacheDriverInterface>{
-    'file': FileCacheDriver(),
-  },
+  drivers: <String, CacheDriverInterface>{'file': FileCacheDriver()},
 );

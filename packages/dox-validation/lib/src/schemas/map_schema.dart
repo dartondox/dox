@@ -57,8 +57,11 @@ class MapSchema<V> extends Schema<Map<String, V>>
       Object? keyOut = keySchema == null
           ? key
           : await keySchema.parseValueAsync(key, state, childPath);
-      Object? valueOut =
-          await values.parseValueAsync(entry.value, state, childPath);
+      Object? valueOut = await values.parseValueAsync(
+        entry.value,
+        state,
+        childPath,
+      );
       _put(output, keyOut, valueOut);
     }
     return output;

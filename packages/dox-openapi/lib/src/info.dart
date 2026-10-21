@@ -51,19 +51,15 @@ class SecurityScheme {
 
   /// Bearer token in the `Authorization` header, JWT by default.
   SecurityScheme.bearer({String bearerFormat = 'JWT'})
-      : _json = <String, dynamic>{
-          'type': 'http',
-          'scheme': 'bearer',
-          'bearerFormat': bearerFormat,
-        };
+    : _json = <String, dynamic>{
+        'type': 'http',
+        'scheme': 'bearer',
+        'bearerFormat': bearerFormat,
+      };
 
   /// API key in a header, query or cookie.
   SecurityScheme.apiKey({required String name, String location = 'header'})
-      : _json = <String, dynamic>{
-          'type': 'apiKey',
-          'name': name,
-          'in': location,
-        };
+    : _json = <String, dynamic>{'type': 'apiKey', 'name': name, 'in': location};
 
   /// Returns the OpenAPI security scheme object.
   Map<String, dynamic> toJson() {

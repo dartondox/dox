@@ -1,3 +1,9 @@
+## Unreleased
+
+- Needs Dart 3.13 or newer.
+- All dependencies updated to their latest versions.
+- `sqlite3` 3 (SQLite is bundled, no system library needed).
+
 ## 3.0.0-alpha.1
 
 - Removed the `dox_migration` executable from pubspec (its script was removed before). Use the `dox` CLI.

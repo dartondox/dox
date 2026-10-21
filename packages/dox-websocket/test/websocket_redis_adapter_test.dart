@@ -18,8 +18,11 @@ Redis newRedis() => Redis(RedisOptions(host: redisHost, port: redisPort));
 
 Future<bool> redisReachable() async {
   try {
-    Socket s = await Socket.connect(redisHost, redisPort,
-        timeout: Duration(seconds: 1));
+    Socket s = await Socket.connect(
+      redisHost,
+      redisPort,
+      timeout: Duration(seconds: 1),
+    );
     s.destroy();
     return true;
   } catch (_) {
@@ -31,10 +34,9 @@ class RedisWebsocketService implements DoxService {
   @override
   void setup() {
     Redis sub = newRedis();
-    WebsocketServer(Dox()).adapter(WebsocketRedisAdapter(
-      subscriber: sub,
-      publisher: sub.duplicate(),
-    ));
+    WebsocketServer(Dox()).adapter(
+      WebsocketRedisAdapter(subscriber: sub, publisher: sub.duplicate()),
+    );
   }
 }
 
@@ -43,14 +45,16 @@ void main() async {
 
   group('Websocket redis adapter |', () {
     setUpAll(() async {
-      Dox().initialize(AppConfig(
-        appKey: appConfig.appKey,
-        serverPort: port,
-        totalIsolate: 1,
-        responseHandler: appConfig.responseHandler,
-        routers: <Router>[RoomsRouter()],
-        cache: appConfig.cache,
-      ));
+      Dox().initialize(
+        AppConfig(
+          appKey: appConfig.appKey,
+          serverPort: port,
+          totalIsolate: 1,
+          responseHandler: appConfig.responseHandler,
+          routers: <Router>[RoomsRouter()],
+          cache: appConfig.cache,
+        ),
+      );
       Dox().addService(RedisWebsocketService());
       await Dox().startServer();
       // let the adapter finish its subscribe call

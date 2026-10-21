@@ -79,8 +79,8 @@ class RouteDoc {
     this.responses = const <int, ResponseDoc>{},
     this.security,
     this.extensions = const <String, dynamic>{},
-  })  : method = PathConverter.method(method),
-        path = PathConverter.path(path);
+  }) : method = PathConverter.method(method),
+       path = PathConverter.path(path);
 
   /// Returns the OpenAPI operation object.
   Map<String, dynamic> toOperation(SchemaResolver resolver) {
@@ -136,11 +136,15 @@ class RouteDoc {
     Object? properties = schema['properties'];
     if (properties is! Map) {
       throw ArgumentError.value(
-          source, 'query', 'Query schema must be an object with properties');
+        source,
+        'query',
+        'Query schema must be an object with properties',
+      );
     }
     Object? requiredList = schema['required'];
-    Set<Object?> required =
-        requiredList is List ? requiredList.toSet() : <Object?>{};
+    Set<Object?> required = requiredList is List
+        ? requiredList.toSet()
+        : <Object?>{};
     List<Map<String, dynamic>> list = <Map<String, dynamic>>[];
     for (MapEntry<dynamic, dynamic> entry in properties.entries) {
       list.add(<String, dynamic>{

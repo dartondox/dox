@@ -9,18 +9,21 @@ void main() {
       });
       expect(s.parse(<String, dynamic>{}), <String, dynamic>{});
       expect(s.safeParse(<String, dynamic>{'nick': null}).success, false);
-      expect(s.parse(<String, dynamic>{'nick': 'd'}),
-          <String, dynamic>{'nick': 'd'});
+      expect(s.parse(<String, dynamic>{'nick': 'd'}), <String, dynamic>{
+        'nick': 'd',
+      });
     });
 
     test('nullable allows null, not missing', () {
       ObjectSchema s = v.object(<String, Schema<Object?>>{
         'nick': v.string().nullable(),
       });
-      expect(s.parse(<String, dynamic>{'nick': null}),
-          <String, dynamic>{'nick': null});
-      expect(s.safeParse(<String, dynamic>{}).errors,
-          <String, String>{'nick': 'The nick is required'});
+      expect(s.parse(<String, dynamic>{'nick': null}), <String, dynamic>{
+        'nick': null,
+      });
+      expect(s.safeParse(<String, dynamic>{}).errors, <String, String>{
+        'nick': 'The nick is required',
+      });
     });
 
     test('nullish allows both', () {
@@ -37,8 +40,9 @@ void main() {
         'page': v.coerce.int().min(1).defaultTo(1),
       });
       expect(s.parse(<String, dynamic>{}), <String, dynamic>{'page': 1});
-      expect(s.parse(<String, dynamic>{'page': '3'}),
-          <String, dynamic>{'page': 3});
+      expect(s.parse(<String, dynamic>{'page': '3'}), <String, dynamic>{
+        'page': 3,
+      });
       expect(s.safeParse(<String, dynamic>{'page': '0'}).success, false);
     });
 
@@ -49,8 +53,9 @@ void main() {
 
   group('transform |', () {
     test('changes output type', () {
-      TransformSchema<String, int> s =
-          v.string().transform<int>((String value) {
+      TransformSchema<String, int> s = v.string().transform<int>((
+        String value,
+      ) {
         return value.length;
       });
       expect(s.parse('dox'), 3);
@@ -58,8 +63,9 @@ void main() {
 
     test('does not run on invalid input', () {
       int calls = 0;
-      TransformSchema<String, int> s =
-          v.string().min(5).transform<int>((String value) {
+      TransformSchema<String, int> s = v.string().min(5).transform<int>((
+        String value,
+      ) {
         calls++;
         return value.length;
       });
@@ -68,10 +74,12 @@ void main() {
     });
 
     test('refine after transform sees new value', () {
-      TransformSchema<String, int> s =
-          v.string().transform<int>(int.parse).refine((int value) {
-        return value.isEven;
-      }, message: 'must be even');
+      TransformSchema<String, int> s = v
+          .string()
+          .transform<int>(int.parse)
+          .refine((int value) {
+            return value.isEven;
+          }, message: 'must be even');
       expect(s.parse('4'), 4);
       expect(s.safeParse('3').issues.first.message, 'must be even');
     });
@@ -79,42 +87,56 @@ void main() {
 
   group('refine and superRefine |', () {
     test('refine keeps schema methods', () {
-      StringSchema s = v.string().refine((String value) {
-        return value != 'admin';
-      }, message: 'The {field} is taken').min(3);
+      StringSchema s = v
+          .string()
+          .refine((String value) {
+            return value != 'admin';
+          }, message: 'The {field} is taken')
+          .min(3);
       expect(s.safeParse('admin').issues.first.message, 'The value is taken');
       expect(s.safeParse('ab').success, false);
       expect(s.safeParse('dox').success, true);
     });
 
     test('object refine with path', () {
-      ObjectSchema s = v.object(<String, Schema<Object?>>{
-        'password': v.string(),
-        'confirm': v.string(),
-      }).refine((Map<String, dynamic> data) {
-        return data['password'] == data['confirm'];
-      }, message: 'Passwords do not match', path: <Object>['confirm']);
-      ParseResult<Map<String, dynamic>> result =
-          s.safeParse(<String, dynamic>{'password': 'a', 'confirm': 'b'});
-      expect(
-          result.errors, <String, String>{'confirm': 'Passwords do not match'});
+      ObjectSchema s = v
+          .object(<String, Schema<Object?>>{
+            'password': v.string(),
+            'confirm': v.string(),
+          })
+          .refine(
+            (Map<String, dynamic> data) {
+              return data['password'] == data['confirm'];
+            },
+            message: 'Passwords do not match',
+            path: <Object>['confirm'],
+          );
+      ParseResult<Map<String, dynamic>> result = s.safeParse(<String, dynamic>{
+        'password': 'a',
+        'confirm': 'b',
+      });
+      expect(result.errors, <String, String>{
+        'confirm': 'Passwords do not match',
+      });
     });
 
     test('object refine skipped when fields fail', () {
       int calls = 0;
-      ObjectSchema s = v.object(<String, Schema<Object?>>{
-        'a': v.string(),
-      }).refine((Map<String, dynamic> data) {
-        calls++;
-        return true;
-      });
+      ObjectSchema s = v
+          .object(<String, Schema<Object?>>{'a': v.string()})
+          .refine((Map<String, dynamic> data) {
+            calls++;
+            return true;
+          });
       s.safeParse(<String, dynamic>{});
       expect(calls, 0);
     });
 
     test('superRefine adds many issues', () {
-      ListSchema<int> s =
-          v.list(v.int()).superRefine((List<int> list, RuleContext context) {
+      ListSchema<int> s = v.list(v.int()).superRefine((
+        List<int> list,
+        RuleContext context,
+      ) {
         for (int i = 0; i < list.length; i++) {
           if (list[i] < 0) {
             context.addIssue('No negative numbers', path: <Object>[i]);
@@ -133,8 +155,10 @@ void main() {
     }
 
     test('refineAsync works with parseAsync', () async {
-      StringSchema s =
-          v.string().email().refineAsync(isFree, message: 'Email taken');
+      StringSchema s = v.string().email().refineAsync(
+        isFree,
+        message: 'Email taken',
+      );
       expect(await s.parseAsync('new@dox.dev'), 'new@dox.dev');
       ParseResult<String> result = await s.safeParseAsync('taken@dox.dev');
       expect(result.issues.first.message, 'Email taken');
@@ -152,24 +176,28 @@ void main() {
 
     test('nested async inside list and object', () async {
       ObjectSchema s = v.object(<String, Schema<Object?>>{
-        'users': v.list(v.object(<String, Schema<Object?>>{
-          'email': v.string().refineAsync(isFree, message: 'taken'),
-        })),
+        'users': v.list(
+          v.object(<String, Schema<Object?>>{
+            'email': v.string().refineAsync(isFree, message: 'taken'),
+          }),
+        ),
       });
-      ParseResult<Map<String, dynamic>> result =
-          await s.safeParseAsync(<String, dynamic>{
-        'users': <Map<String, dynamic>>[
-          <String, dynamic>{'email': 'ok@dox.dev'},
-          <String, dynamic>{'email': 'taken@dox.dev'},
-        ],
-      });
+      ParseResult<Map<String, dynamic>> result = await s.safeParseAsync(
+        <String, dynamic>{
+          'users': <Map<String, dynamic>>[
+            <String, dynamic>{'email': 'ok@dox.dev'},
+            <String, dynamic>{'email': 'taken@dox.dev'},
+          ],
+        },
+      );
       expect(result.errors, <String, String>{'users.1.email': 'taken'});
     });
 
     test('superRefineAsync', () async {
-      StringSchema s = v
-          .string()
-          .superRefineAsync((String value, RuleContext context) async {
+      StringSchema s = v.string().superRefineAsync((
+        String value,
+        RuleContext context,
+      ) async {
         if (!await isFree(value)) {
           context.addIssue('taken', code: 'unique');
         }
@@ -180,7 +208,9 @@ void main() {
 
     test('parseAsync throws ValidationException', () async {
       await expectLater(
-          v.string().parseAsync(1), throwsA(isA<ValidationException>()));
+        v.string().parseAsync(1),
+        throwsA(isA<ValidationException>()),
+      );
     });
   });
 }

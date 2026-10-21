@@ -119,7 +119,9 @@ void main() {
         await Process.run('chmod', <String>['644', file.path]);
       });
       expect(
-          disk.get('locked/a.txt'), throwsA(isA<PermissionDeniedException>()));
+        disk.get('locked/a.txt'),
+        throwsA(isA<PermissionDeniedException>()),
+      );
     }, testOn: '!windows');
 
     group('signed URLs', () {

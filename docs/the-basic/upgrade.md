@@ -5,7 +5,7 @@
 
 ## Do these first
 
-1. Use Dart **3.6** or newer.
+1. Use Dart **3.13** or newer.
 2. Set every Dox package to the same version, `^3.0.0-alpha.1`. All Dox packages now share one version.
 3. Replace `dox_query_builder` with `dox_orm`.
 4. If you use `ioredis` in your app, update it to `^2.0.0-alpha.1`.
@@ -14,7 +14,7 @@
 
 ```yaml
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.13.0
 
 dependencies:
   dox_core: ^3.0.0-alpha.1
@@ -26,7 +26,7 @@ dependencies:
 
 dev_dependencies:
   dox_builder: ^3.0.0-alpha.1
-  build_runner: ^2.3.3
+  build_runner: ^2.17.1
 ```
 
 ```dart
@@ -169,7 +169,12 @@ Before, `Env.get()` only read the `.env` file. Now a variable set in the shell o
 
 **gzip is off by default.** Turn it on with `AppConfig(compress: true)`, or let your proxy do it.
 
-**`dox build` makes an AOT binary in `build/server`.** See [Deployment](../digging-deeper/deployment.md).
+**`dox build` makes an AOT bundle in `build/bundle`.** The binary is `build/bundle/bin/server`.
+It uses `dart build cli`, not `dart compile exe`. `dox_orm` uses `sqlite3` v3, which bundles SQLite
+with a build hook, and `dart compile exe` stops with "does not support build hooks".
+If your own Dockerfile or CI runs `dart compile exe`, change it to
+`dart build cli --target bin/server.dart --output build` and copy all of `build/bundle`.
+See [Deployment](../digging-deeper/deployment.md).
 
 ## Validation
 

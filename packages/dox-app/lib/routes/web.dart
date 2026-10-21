@@ -16,8 +16,9 @@ class WebRouter extends Router {
 
     Route.get('/download', (DoxRequest req) async {
       try {
-        DownloadableFile file = await Storage()
-            .download('/images/3d975270-2bbb-11ee-9f99-ddd56a1df7a6.jpeg');
+        DownloadableFile file = await Storage().download(
+          '/images/3d975270-2bbb-11ee-9f99-ddd56a1df7a6.jpeg',
+        );
         return response(file);
       } catch (error) {
         return error.toString();

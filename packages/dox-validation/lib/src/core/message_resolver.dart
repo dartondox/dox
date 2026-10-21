@@ -38,7 +38,7 @@ class MessageRequest {
 /// [MessageResolver.global] or pass it to `safeParse(messages: ...)`.
 class MessageResolver {
   MessageResolver({Map<String, String> messages = const <String, String>{}})
-      : _messages = <String, String>{...messages};
+    : _messages = <String, String>{...messages};
 
   /// The resolver used when none is passed to `parse`.
   static MessageResolver global = MessageResolver();
@@ -57,7 +57,8 @@ class MessageResolver {
 
   /// Build the final message.
   String resolve(MessageRequest request) {
-    String template = request.customMessage ??
+    String template =
+        request.customMessage ??
         _findTemplate(request.code, request.path) ??
         request.fallback;
     return format(template, request.params);

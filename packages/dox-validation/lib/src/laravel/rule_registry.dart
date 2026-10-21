@@ -75,7 +75,8 @@ class RuleRegistry {
     RuleBuilder? builder = _builders[definition.name];
     if (builder == null) {
       throw ArgumentError(
-          'Unknown validation rule "${definition.name}" on "${definition.field}".');
+        'Unknown validation rule "${definition.name}" on "${definition.field}".',
+      );
     }
     return builder(definition);
   }

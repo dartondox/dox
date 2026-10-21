@@ -102,11 +102,13 @@ class ConnectionConfig {
     sqlite.Database db = database == ':memory:'
         ? sqlite.sqlite3.openInMemory()
         : sqlite.sqlite3.open(database);
+    // busy_timeout first: switching to WAL needs a lock, and many isolates
+    // open the file at the same time on start.
+    db.execute('PRAGMA busy_timeout = ${extra['busyTimeout'] as int? ?? 5000}');
     if (database != ':memory:') {
       db.execute('PRAGMA journal_mode = WAL');
       db.execute('PRAGMA synchronous = NORMAL');
     }
-    db.execute('PRAGMA busy_timeout = ${extra['busyTimeout'] as int? ?? 5000}');
     db.execute('PRAGMA foreign_keys = ON');
     return db;
   }

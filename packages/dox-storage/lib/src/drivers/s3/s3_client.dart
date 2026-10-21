@@ -23,13 +23,13 @@ class S3Client {
     this.clock = const Clock(),
     this.xml = const S3Xml(),
   }) : signer = SigV4Signer(
-          credentials: AwsCredentials(
-            accessKeyId: config.accessKeyId,
-            secretAccessKey: config.secretAccessKey,
-            sessionToken: config.sessionToken,
-          ),
-          region: config.region,
-        );
+         credentials: AwsCredentials(
+           accessKeyId: config.accessKeyId,
+           secretAccessKey: config.secretAccessKey,
+           sessionToken: config.sessionToken,
+         ),
+         region: config.region,
+       );
 
   /// Service endpoint without trailing slash.
   Uri get endpoint {
@@ -136,7 +136,8 @@ class S3Client {
   Never fail(int status, String body, String key) {
     String? code = xml.first(body, 'Code');
     String? message = xml.first(body, 'Message');
-    String detail = 'S3 $status${code == null ? '' : ' $code'}'
+    String detail =
+        'S3 $status${code == null ? '' : ' $code'}'
         '${message == null ? '' : ': $message'}';
     if (code == 'NoSuchKey' || (status == 404 && code != 'NoSuchBucket')) {
       throw FileNotFoundException(key, cause: detail);

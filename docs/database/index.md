@@ -180,18 +180,8 @@ For a busy production app, use Postgres or MySQL.
     - There is no `RIGHT JOIN` before SQLite 3.39.
 
 !!! info "Native library"
-    The `sqlite3` package (v2) loads the SQLite library of the system.
-    macOS has it. On Debian or Ubuntu, install `libsqlite3-dev` (it gives `libsqlite3.so`).
-    `dart compile exe` works. Apps that do not use SQLite do not need the library.
-    In the Dox Docker image (`FROM scratch`), copy the library into the final image:
-
-    ```dockerfile
-    FROM dart:stable AS build
-    RUN apt-get update && apt-get install -y --no-install-recommends libsqlite3-0
-    # ... build as before ...
-
-    FROM scratch
-    COPY --from=build /runtime/ /
-    COPY --from=build /usr/lib/*-linux-gnu/libsqlite3.so.0 /usr/lib/libsqlite3.so
-    # ... copy the server as before ...
-    ```
+    The `sqlite3` package (v3) bundles SQLite with a build hook. You do not install
+    a system library. `dart run` and `dart test` run the hook by themselves.
+    For the AOT binary use `dox build` (it runs `dart build cli`). It puts the library
+    in `build/bundle/lib/`, next to `build/bundle/bin/server`. Keep the two folders together.
+    `dart compile exe` does not work with build hooks. See [Deployment](../digging-deeper/deployment.md).

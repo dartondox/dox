@@ -50,7 +50,7 @@ class ValueTools {
 /// `required`: value must be present and not empty.
 class RequiredRule extends BuiltInRule<Object?> {
   RequiredRule({super.message})
-      : super(IssueCodes.required, DefaultMessages.required);
+    : super(IssueCodes.required, DefaultMessages.required);
 
   @override
   bool get isImplicit {
@@ -66,13 +66,15 @@ class RequiredRule extends BuiltInRule<Object?> {
 /// `required_if:other,value1,value2` and `required_if_not:other,value`.
 class RequiredIfRule extends BuiltInRule<Object?> {
   RequiredIfRule(this.other, this.values, {this.negate = false, super.message})
-      : super(negate ? IssueCodes.requiredIfNot : IssueCodes.requiredIf,
-            DefaultMessages.required,
-            params: <String, Object?>{
-              'other': other,
-              'values': ListText.joinWithAnd(values),
-              'args': <Object?>[other, ...values],
-            });
+    : super(
+        negate ? IssueCodes.requiredIfNot : IssueCodes.requiredIf,
+        DefaultMessages.required,
+        params: <String, Object?>{
+          'other': other,
+          'values': ListText.joinWithAnd(values),
+          'args': <Object?>[other, ...values],
+        },
+      );
 
   /// Dotted path of the other field, from the root.
   final String other;
@@ -127,12 +129,14 @@ class ValueTestRule extends BuiltInRule<Object?> {
 /// no `string` rule (old dox behavior).
 class SizeRule extends BuiltInRule<Object?> {
   SizeRule(this.limit, {required this.isMax, required this.kind, super.message})
-      : super(isMax ? IssueCodes.max : IssueCodes.min,
-            isMax ? DefaultMessages.max : DefaultMessages.min,
-            params: <String, Object?>{
-              isMax ? 'max' : 'min': limit,
-              'args': <Object?>[limit],
-            });
+    : super(
+        isMax ? IssueCodes.max : IssueCodes.min,
+        isMax ? DefaultMessages.max : DefaultMessages.min,
+        params: <String, Object?>{
+          isMax ? 'max' : 'min': limit,
+          'args': <Object?>[limit],
+        },
+      );
 
   /// The limit.
   final num limit;
@@ -215,7 +219,7 @@ enum SizeKind { unknown, number, text, list }
 /// `confirmed` or `confirmed:other_field`.
 class ConfirmedRule extends BuiltInRule<Object?> {
   ConfirmedRule(this.other, {super.message})
-      : super(IssueCodes.confirmed, DefaultMessages.confirmed);
+    : super(IssueCodes.confirmed, DefaultMessages.confirmed);
 
   /// Dotted path of the other field. Empty means `<field>_confirmation`.
   final String other;
@@ -239,8 +243,11 @@ class ConfirmedRule extends BuiltInRule<Object?> {
 /// extension when [extensions] is not empty.
 class FileValueRule extends BuiltInRule<Object?> {
   FileValueRule(String name, this.extensions, {super.message})
-      : super(name, DefaultMessages.file,
-            json: <String, dynamic>{'type': 'string', 'format': 'binary'});
+    : super(
+        name,
+        DefaultMessages.file,
+        json: <String, dynamic>{'type': 'string', 'format': 'binary'},
+      );
 
   /// Allowed extensions. Empty means any.
   final List<String> extensions;

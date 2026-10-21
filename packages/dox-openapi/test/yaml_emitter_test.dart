@@ -142,11 +142,13 @@ void main() {
     });
 
     test('writes infinity and NaN as YAML floats', () {
-      Object? back = loadYaml(emitter.emit(<String, dynamic>{
-        'pos': double.infinity,
-        'neg': double.negativeInfinity,
-        'nan': double.nan,
-      }));
+      Object? back = loadYaml(
+        emitter.emit(<String, dynamic>{
+          'pos': double.infinity,
+          'neg': double.negativeInfinity,
+          'nan': double.nan,
+        }),
+      );
       Map<dynamic, dynamic> map = back as Map<dynamic, dynamic>;
       expect(map['pos'], double.infinity);
       expect(map['neg'], double.negativeInfinity);
@@ -154,8 +156,10 @@ void main() {
     });
 
     test('rejects values that are not JSON', () {
-      expect(() => emitter.emit(<String, dynamic>{'x': DateTime(2020)}),
-          throwsArgumentError);
+      expect(
+        () => emitter.emit(<String, dynamic>{'x': DateTime(2020)}),
+        throwsArgumentError,
+      );
     });
   });
 }

@@ -1,7 +1,7 @@
 # Installation
 
 !!! warning "3.x is alpha"
-    The latest version is `3.0.0-alpha.1`. It needs **Dart 3.6** or newer.
+    The latest version is `3.0.0-alpha.1`. It needs **Dart 3.13** or newer.
     Coming from 2.x? Read the [upgrade guide](upgrade.md).
 
 ## Install the CLI

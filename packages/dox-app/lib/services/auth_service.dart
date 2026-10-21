@@ -5,19 +5,19 @@ import 'package:dox_core/dox_core.dart';
 class AuthService implements DoxService {
   @override
   void setup() {
-    Auth.initialize(AuthConfig(
-      /// default auth guard
-      defaultGuard: 'web',
+    Auth.initialize(
+      AuthConfig(
+        /// default auth guard
+        defaultGuard: 'web',
 
-      /// list of auth guards
-      guards: <String, AuthGuard>{
-        'web': AuthGuard(
-          driver: JwtAuthDriver(secret: SecretKey(Env.get('APP_KEY'))),
-          provider: AuthProvider(
-            model: () => User(),
+        /// list of auth guards
+        guards: <String, AuthGuard>{
+          'web': AuthGuard(
+            driver: JwtAuthDriver(secret: SecretKey(Env.get('APP_KEY'))),
+            provider: AuthProvider(model: () => User()),
           ),
-        ),
-      },
-    ));
+        },
+      ),
+    );
   }
 }

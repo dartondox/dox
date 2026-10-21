@@ -16,8 +16,7 @@ class ApiDoc {
   final Map<String, Object> _schemas = <String, Object>{};
 
   /// Creates an empty registry.
-  ApiDoc({SchemaResolver resolver = const SchemaResolver()})
-      : _resolver = resolver;
+  ApiDoc({this._resolver = const SchemaResolver()});
 
   /// The resolver used for all schemas.
   SchemaResolver get resolver {
@@ -49,20 +48,22 @@ class ApiDoc {
     List<Map<String, List<String>>>? security,
     Map<String, dynamic> extensions = const <String, dynamic>{},
   }) {
-    return add(RouteDoc(
-      method: method,
-      path: path,
-      summary: summary,
-      description: description,
-      operationId: operationId,
-      tags: tags,
-      params: params,
-      query: query,
-      body: body,
-      responses: responses,
-      security: security,
-      extensions: extensions,
-    ));
+    return add(
+      RouteDoc(
+        method: method,
+        path: path,
+        summary: summary,
+        description: description,
+        operationId: operationId,
+        tags: tags,
+        params: params,
+        query: query,
+        body: body,
+        responses: responses,
+        security: security,
+        extensions: extensions,
+      ),
+    );
   }
 
   /// Adds or replaces [doc].
@@ -73,10 +74,9 @@ class ApiDoc {
 
   /// Returns true when docs exist for this method and path.
   bool has(String method, String path) {
-    return _routes.containsKey(_key(
-      PathConverter.method(method),
-      PathConverter.path(path),
-    ));
+    return _routes.containsKey(
+      _key(PathConverter.method(method), PathConverter.path(path)),
+    );
   }
 
   /// Saves a named schema under `components/schemas` and returns its `$ref`.

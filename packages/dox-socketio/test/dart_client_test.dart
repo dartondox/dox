@@ -31,8 +31,9 @@ void main() {
       Completer<Object?> welcome = Completer<Object?>();
       socket.on('welcome', welcome.complete);
       socket.connect();
-      Map<dynamic, dynamic> data = await welcome.future
-          .timeout(Duration(seconds: 5)) as Map<dynamic, dynamic>;
+      Map<dynamic, dynamic> data = await welcome.future.timeout(
+        Duration(seconds: 5),
+      ) as Map<dynamic, dynamic>;
       expect(data['id'], socket.id);
 
       Completer<Object?> echo = Completer<Object?>();

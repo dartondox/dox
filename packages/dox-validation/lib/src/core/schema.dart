@@ -249,7 +249,9 @@ abstract class Schema<O> implements StandardSchema<Object?, O> {
     O typed = output as O;
     for (Rule<O> rule in rules) {
       await rule.applyAsync(
-          typed, RuleContext(state: state, path: path, value: typed));
+        typed,
+        RuleContext(state: state, path: path, value: typed),
+      );
     }
     return typed;
   }

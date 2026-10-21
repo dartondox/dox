@@ -31,8 +31,10 @@ void main() {
 
   group('SchemaResolver', () {
     test('accepts a raw map', () {
-      expect(resolver.resolve(<String, dynamic>{'type': 'string'}),
-          <String, dynamic>{'type': 'string'});
+      expect(
+        resolver.resolve(<String, dynamic>{'type': 'string'}),
+        <String, dynamic>{'type': 'string'},
+      );
     });
 
     test('accepts a JsonSchemaSource', () {
@@ -59,8 +61,10 @@ void main() {
 
   group('PathConverter', () {
     test('turns colon params into braces', () {
-      expect(PathConverter.path('/users/:id/posts/:postId'),
-          '/users/{id}/posts/{postId}');
+      expect(
+        PathConverter.path('/users/:id/posts/:postId'),
+        '/users/{id}/posts/{postId}',
+      );
     });
 
     test('cleans slashes', () {
@@ -82,8 +86,10 @@ void main() {
 
     test('makes operation ids', () {
       expect(PathConverter.operationId('get', '/users/{id}'), 'getUsersById');
-      expect(PathConverter.operationId('post', '/api/blog-posts'),
-          'postApiBlogPosts');
+      expect(
+        PathConverter.operationId('post', '/api/blog-posts'),
+        'postApiBlogPosts',
+      );
       expect(PathConverter.operationId('get', '/'), 'get');
     });
   });
@@ -138,9 +144,10 @@ void main() {
 
     test('rejects a query schema without properties', () {
       RouteDoc doc = RouteDoc(
-          method: 'get',
-          path: '/x',
-          query: <String, dynamic>{'type': 'string'});
+        method: 'get',
+        path: '/x',
+        query: <String, dynamic>{'type': 'string'},
+      );
       expect(() => doc.toOperation(resolver), throwsArgumentError);
     });
 
@@ -165,22 +172,27 @@ void main() {
       expect(op['tags'], <String>['users']);
       expect(op['operationId'], 'postUsers');
       expect(
-          ((op['requestBody'] as Map<dynamic, dynamic>)['content']
-              as Map<dynamic, dynamic>)['application/json'],
-          <String, dynamic>{'schema': UserSchema().toJsonSchema()});
+        ((op['requestBody'] as Map<dynamic, dynamic>)['content']
+            as Map<dynamic, dynamic>)['application/json'],
+        <String, dynamic>{'schema': UserSchema().toJsonSchema()},
+      );
       Map<dynamic, dynamic> responses =
           op['responses'] as Map<dynamic, dynamic>;
       expect(responses.keys, <String>['201', '422']);
-      expect((responses['422'] as Map<dynamic, dynamic>).containsKey('content'),
-          isFalse);
+      expect(
+        (responses['422'] as Map<dynamic, dynamic>).containsKey('content'),
+        isFalse,
+      );
       expect(op['security'], isNotNull);
       expect(op['x-internal'], isTrue);
       expect(op.containsKey('parameters'), isFalse);
     });
 
     test('gives a default 200 response', () {
-      Map<String, dynamic> op =
-          RouteDoc(method: 'get', path: '/ping').toOperation(resolver);
+      Map<String, dynamic> op = RouteDoc(
+        method: 'get',
+        path: '/ping',
+      ).toOperation(resolver);
       expect(op['responses'], <String, dynamic>{
         '200': <String, dynamic>{'description': 'Successful response'},
       });

@@ -31,11 +31,10 @@ class RequestFile {
     required this.filename,
     required this.filetype,
     required this.length,
-    Uint8List? bytes,
+    this._bytes,
     File? file,
-  })  : _bytes = bytes,
-        _file = file,
-        _isTemp = file != null;
+  }) : _file = file,
+       _isTemp = file != null;
 
   /// Get file extension
   /// eg. png, jpeg, pdf

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import '../utils/utils.dart';
 
-String _getSample(className, filename) {
+String _getSample(String className, String filename) {
   return '''
 import 'package:dox_core/dox_core.dart';
 
@@ -16,7 +16,7 @@ ${className}Controller ${toPascalWithFirstLetterLowerCase(className)}Controller 
 ''';
 }
 
-String _getWsSample(className, filename) {
+String _getWsSample(String className, String filename) {
   return '''
 import 'package:dox_websocket/dox_websocket.dart';
 
@@ -28,7 +28,7 @@ class ${className}Controller {
 ''';
 }
 
-String _getResourceSample(className, filename) {
+String _getResourceSample(String className, String filename) {
   return '''
 import 'package:dox_core/dox_core.dart';
 

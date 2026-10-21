@@ -301,9 +301,13 @@ DROP TABLE IF EXISTS mig_tag
 
       List<MigrationEntry> dartMigrations = <MigrationEntry>[
         MigrationEntry(
-            '2023_01_01_000000_create_user_table', CreateUserTable()),
+          '2023_01_01_000000_create_user_table',
+          CreateUserTable(),
+        ),
         MigrationEntry(
-            '2023_01_03_000000_create_post_table', CreatePostTable()),
+          '2023_01_03_000000_create_post_table',
+          CreatePostTable(),
+        ),
       ];
 
       test('dart migrations: migrate, status, rollback', () async {
@@ -320,7 +324,9 @@ DROP TABLE IF EXISTS mig_tag
         );
         List<MigrationStatus> status = await migrator.status();
         expect(
-            status.every((MigrationStatus s) => s.ran && s.batch == 1), true);
+          status.every((MigrationStatus s) => s.ran && s.batch == 1),
+          true,
+        );
 
         await migrator.rollback();
         expect(await tableExists('mig_post'), false);

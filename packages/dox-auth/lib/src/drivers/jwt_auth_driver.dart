@@ -127,11 +127,7 @@ class JwtAuthDriver extends AuthDriver {
   String? createToken(Map<String, dynamic>? userPayload) {
     try {
       JWT jwt = JWT(userPayload, issuer: issuer);
-      return jwt.sign(
-        secret,
-        algorithm: algorithm,
-        expiresIn: expiresIn,
-      );
+      return jwt.sign(secret, algorithm: algorithm, expiresIn: expiresIn);
     } catch (error) {
       return null;
     }

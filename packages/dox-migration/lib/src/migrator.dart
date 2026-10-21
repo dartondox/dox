@@ -136,15 +136,17 @@ class Migrator {
     int? step = int.tryParse(value);
     if (step == null || step < 1 || !args.first.startsWith('--step')) {
       throw ArgumentError(
-          'Invalid option ${args.join(' ')}, use --step=<count>');
+        'Invalid option ${args.join(' ')}, use --step=<count>',
+      );
     }
     return step;
   }
 
   /// one connection for the whole run
   Future<T> _withDriver<T>(Future<T> Function(MigrationDriver d) task) async {
-    DbConnection conn =
-        connection != null ? DbConnection(connection) : await _open();
+    DbConnection conn = connection != null
+        ? DbConnection(connection)
+        : await _open();
     try {
       MigrationDriver driver = MigrationDriver(conn);
       await createMigrationTableIfNotExist(conn);
@@ -216,7 +218,8 @@ class Migrator {
     if (step != null && !all) {
       query += ' ORDER BY id DESC LIMIT $step';
     } else if (!all) {
-      query += ' WHERE batch = (SELECT MAX(batch) FROM dox_db_migration)'
+      query +=
+          ' WHERE batch = (SELECT MAX(batch) FROM dox_db_migration)'
           ' ORDER BY id DESC';
     } else {
       query += ' ORDER BY id DESC';
@@ -260,7 +263,8 @@ class Migrator {
 
     /// sqlite: foreign keys are off while it runs, so a table rebuild can
     /// drop a table that others point to. they are checked before commit.
-    bool sqliteFk = d.conn.isSqlite &&
+    bool sqliteFk =
+        d.conn.isSqlite &&
         (await d.conn.execute('PRAGMA foreign_keys')).first.values.first == 1;
 
     Future<void> body() async {
@@ -274,8 +278,9 @@ class Migrator {
       await saveMigratedRecord(d.conn, name, batch, type);
     }
 
-    bool transaction =
-        migration is Migration ? migration.withinTransaction : true;
+    bool transaction = migration is Migration
+        ? migration.withinTransaction
+        : true;
 
     if (sqliteFk) await d.conn.execute('PRAGMA foreign_keys = OFF');
     try {

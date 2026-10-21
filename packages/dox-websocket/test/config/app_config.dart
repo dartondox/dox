@@ -21,11 +21,7 @@ AppConfig appConfig = AppConfig(
   totalIsolate: 1,
 
   // cors configuration
-  cors: CORSConfig(
-    origin: '*',
-    methods: '*',
-    credentials: true,
-  ),
+  cors: CORSConfig(origin: '*', methods: '*', credentials: true),
 
   /// response handler
   responseHandler: ResponseHandler(),
@@ -34,14 +30,10 @@ AppConfig appConfig = AppConfig(
   globalMiddleware: <dynamic>[],
 
   /// routers
-  routers: <Router>[
-    WebsocketRouter(),
-  ],
+  routers: <Router>[WebsocketRouter()],
 
   /// cache driver configuration
   cache: CacheConfig(
-    drivers: <String, CacheDriverInterface>{
-      'file': FileCacheDriver(),
-    },
+    drivers: <String, CacheDriverInterface>{'file': FileCacheDriver()},
   ),
 );

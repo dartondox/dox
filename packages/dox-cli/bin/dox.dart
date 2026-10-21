@@ -21,14 +21,16 @@ Future<void> _executeCommand(String command, List<String> args) async {
 
   if (commandDefinition == null) {
     print(
-        'Could not find a command named "$command". Run `dox help` for more information.');
+      'Could not find a command named "$command". Run `dox help` for more information.',
+    );
     return;
   }
 
   if (!commandDefinition.validateArgs(args)) {
     print('Invalid number of arguments for command "$command".');
     print(
-        'Expected: ${commandDefinition.minArgs}${commandDefinition.maxArgs != -1 ? ' to ${commandDefinition.maxArgs}' : '+'} arguments');
+      'Expected: ${commandDefinition.minArgs}${commandDefinition.maxArgs != -1 ? ' to ${commandDefinition.maxArgs}' : '+'} arguments',
+    );
     print('Received: ${args.length} arguments');
     return;
   }

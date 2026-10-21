@@ -58,10 +58,7 @@ void main() {
     test('json', () async {
       await Cache().forever(
         'student',
-        jsonEncode(<String, dynamic>{
-          'name': 'John',
-          'age': 16,
-        }),
+        jsonEncode(<String, dynamic>{'name': 'John', 'age': 16}),
       );
       String? value = await Cache().get('student');
       Map<String, dynamic> data = jsonDecode(value!);

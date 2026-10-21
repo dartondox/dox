@@ -41,10 +41,10 @@ class DoxRequest implements IDoxRequest {
     required this.body,
     this.contentType,
     this.clientIp,
-    String scheme = 'http',
+    this._scheme = 'http',
     required this.httpHeaders,
     required this.httpRequest,
-  }) : _scheme = scheme {
+  }) {
     method = route.method.toUpperCase();
     param = route.params;
     query = uri.queryParameters;
@@ -56,7 +56,8 @@ class DoxRequest implements IDoxRequest {
   @override
   String getRouteIdentifier() {
     return base64.encode(
-        utf8.encode('${route.method}|${route.domain ?? ''}${route.path}'));
+      utf8.encode('${route.method}|${route.domain ?? ''}${route.path}'),
+    );
   }
 
   /// get route identifier
@@ -245,8 +246,10 @@ class DoxRequest implements IDoxRequest {
   ///   messages : {'required' : 'The {field} is required'});
   /// ```
   @override
-  void validate(Map<String, String> rules,
-      {Map<String, String> messages = const <String, String>{}}) {
+  void validate(
+    Map<String, String> rules, {
+    Map<String, String> messages = const <String, String>{},
+  }) {
     DoxValidator validator = DoxValidator(all());
     if (messages.isNotEmpty) {
       validator.setMessages(messages);

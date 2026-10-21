@@ -21,7 +21,7 @@ import 'schemas/union_schema.dart';
 /// ```
 class Validator {
   Validator({RuleRegistry? registry})
-      : registry = registry ?? RuleRegistry.withDefaults();
+    : registry = registry ?? RuleRegistry.withDefaults();
 
   /// Rules used by [fromRules].
   final RuleRegistry registry;

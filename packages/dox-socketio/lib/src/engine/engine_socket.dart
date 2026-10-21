@@ -34,11 +34,9 @@ class EngineSocket implements TransportListener {
     required this.id,
     required this.request,
     required Transport transport,
-    required ServerOptions options,
-    required EngineSessionStore store,
-  })  : _transport = transport,
-        _options = options,
-        _store = store {
+    required this._options,
+    required this._store,
+  }) : _transport = transport {
     transport.listener = this;
   }
 
@@ -78,7 +76,8 @@ class EngineSocket implements TransportListener {
   /// Sends the open packet and starts the heartbeat.
   void open() {
     _state = _ReadyState.open;
-    bool canUpgrade = _options.allowUpgrades &&
+    bool canUpgrade =
+        _options.allowUpgrades &&
         _transport is PollingTransport &&
         _options.transports.contains(transportWebsocket);
     String handshake = jsonEncode(<String, Object>{

@@ -14,8 +14,11 @@ class DoxValidator {
   List<String> get _methodNoNeedToSplitArguments => <String>['in'];
 
   /// rules that still run when the field is missing, null or empty
-  List<String> get _implicitRules =>
-      <String>['required', 'required_if', 'required_if_not'];
+  List<String> get _implicitRules => <String>[
+    'required',
+    'required_if',
+    'required_if_not',
+  ];
 
   DoxValidator(this.data);
 
@@ -64,18 +67,23 @@ class DoxValidator {
   void validate(Map<String, String> rules) {
     rules.forEach((String field, String rule) {
       if (_isNestedValidation(field)) {
-        NestedValidationVisitor v =
-            NestedValidationVisitor(data: data, field: field, rule: rule);
+        NestedValidationVisitor v = NestedValidationVisitor(
+          data: data,
+          field: field,
+          rule: rule,
+        );
         for (ValidationItem item in v.fieldsToValidate) {
           _validateItem(item);
         }
       } else {
-        _validateItem(ValidationItem(
-          field: field,
-          name: field.split('.').last,
-          value: data.getParam(field),
-          rule: rule,
-        ));
+        _validateItem(
+          ValidationItem(
+            field: field,
+            name: field.split('.').last,
+            value: data.getParam(field),
+            rule: rule,
+          ),
+        );
       }
     });
   }
@@ -97,8 +105,12 @@ class DoxValidator {
       String ruleKey = rule.split(':').first.toLowerCase();
       if (isEmpty && !_implicitRules.contains(ruleKey)) continue;
 
-      String? error =
-          _applyMatchingRule(item.field, item.name, item.value, rule);
+      String? error = _applyMatchingRule(
+        item.field,
+        item.name,
+        item.value,
+        rule,
+      );
       if (error != null) {
         _errors[item.field] = error;
         break;
@@ -107,7 +119,11 @@ class DoxValidator {
   }
 
   String? _applyMatchingRule(
-      String field, String name, dynamic value, String rule) {
+    String field,
+    String name,
+    dynamic value,
+    String rule,
+  ) {
     List<String> parts = rule.split(':');
     String ruleKey = parts.first.toString().toLowerCase();
     String args = parts.length >= 2 ? parts[1] : '';
@@ -117,8 +133,11 @@ class DoxValidator {
       return null;
     }
 
-    bool result =
-        Function.apply(match['function'], <dynamic>[data, value, args]);
+    bool result = Function.apply(match['function'], <dynamic>[
+      data,
+      value,
+      args,
+    ]);
     if (result == true) {
       return null;
     }
@@ -137,20 +156,14 @@ class DoxValidator {
     return error;
   }
 
-  final Map<String, Map<String, dynamic>> _matchings =
-      <String, Map<String, dynamic>>{
+  final Map<String, Map<String, dynamic>>
+  _matchings = <String, Map<String, dynamic>>{
     'required': <String, dynamic>{
       'message': 'The {field} is required',
       'function': Rules.isRequired,
     },
-    'nullable': <String, dynamic>{
-      'message': '',
-      'function': Rules.isNullable,
-    },
-    'sometimes': <String, dynamic>{
-      'message': '',
-      'function': Rules.isNullable,
-    },
+    'nullable': <String, dynamic>{'message': '', 'function': Rules.isNullable},
+    'sometimes': <String, dynamic>{'message': '', 'function': Rules.isNullable},
     'email': <String, dynamic>{
       'message': 'The {field} is not a valid email',
       'function': Rules.isEmail,

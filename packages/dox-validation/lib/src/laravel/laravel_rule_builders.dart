@@ -67,86 +67,140 @@ class LaravelRuleBuilders {
   // Types ----------------------------------------------------------------
 
   static Rule<Object?> string(RuleDefinition d) {
-    return ValueTestRule(IssueCodes.string, DefaultMessages.string, isString,
-        json: <String, dynamic>{'type': 'string'});
+    return ValueTestRule(
+      IssueCodes.string,
+      DefaultMessages.string,
+      isString,
+      json: <String, dynamic>{'type': 'string'},
+    );
   }
 
   static Rule<Object?> numeric(RuleDefinition d) {
-    return ValueTestRule(IssueCodes.numeric, DefaultMessages.numeric, isNumeric,
-        json: <String, dynamic>{'type': 'number'});
+    return ValueTestRule(
+      IssueCodes.numeric,
+      DefaultMessages.numeric,
+      isNumeric,
+      json: <String, dynamic>{'type': 'number'},
+    );
   }
 
   static Rule<Object?> integer(RuleDefinition d) {
-    return ValueTestRule(IssueCodes.integer, DefaultMessages.integer, isInteger,
-        json: <String, dynamic>{'type': 'integer'});
+    return ValueTestRule(
+      IssueCodes.integer,
+      DefaultMessages.integer,
+      isInteger,
+      json: <String, dynamic>{'type': 'integer'},
+    );
   }
 
   static Rule<Object?> doubleType(RuleDefinition d) {
-    return ValueTestRule(IssueCodes.double, DefaultMessages.double, isDouble,
-        json: <String, dynamic>{'type': 'number'});
+    return ValueTestRule(
+      IssueCodes.double,
+      DefaultMessages.double,
+      isDouble,
+      json: <String, dynamic>{'type': 'number'},
+    );
   }
 
   static Rule<Object?> boolean(RuleDefinition d) {
-    return ValueTestRule(IssueCodes.boolean, DefaultMessages.boolean, isBoolean,
-        json: <String, dynamic>{'type': 'boolean'});
+    return ValueTestRule(
+      IssueCodes.boolean,
+      DefaultMessages.boolean,
+      isBoolean,
+      json: <String, dynamic>{'type': 'boolean'},
+    );
   }
 
   static Rule<Object?> array(RuleDefinition d) {
-    return ValueTestRule(IssueCodes.array, DefaultMessages.array, isArray,
-        json: <String, dynamic>{'type': 'array'});
+    return ValueTestRule(
+      IssueCodes.array,
+      DefaultMessages.array,
+      isArray,
+      json: <String, dynamic>{'type': 'array'},
+    );
   }
 
   static Rule<Object?> json(RuleDefinition d) {
-    return ValueTestRule(IssueCodes.json, DefaultMessages.json, isMap,
-        json: <String, dynamic>{'type': 'object'});
+    return ValueTestRule(
+      IssueCodes.json,
+      DefaultMessages.json,
+      isMap,
+      json: <String, dynamic>{'type': 'object'},
+    );
   }
 
   static Rule<Object?> date(RuleDefinition d) {
-    return ValueTestRule(IssueCodes.date, DefaultMessages.date, isDate,
-        json: <String, dynamic>{'type': 'string', 'format': 'date'});
+    return ValueTestRule(
+      IssueCodes.date,
+      DefaultMessages.date,
+      isDate,
+      json: <String, dynamic>{'type': 'string', 'format': 'date'},
+    );
   }
 
   // Formats --------------------------------------------------------------
 
   static Rule<Object?> email(RuleDefinition d) {
-    return _pattern(IssueCodes.email, DefaultMessages.email, Patterns.email,
-        <String, dynamic>{'type': 'string', 'format': 'email'});
+    return _pattern(
+      IssueCodes.email,
+      DefaultMessages.email,
+      Patterns.email,
+      <String, dynamic>{'type': 'string', 'format': 'email'},
+    );
   }
 
   static Rule<Object?> ip(RuleDefinition d) {
-    return _pattern(IssueCodes.ip, DefaultMessages.ip, Patterns.ipv4,
-        <String, dynamic>{'type': 'string', 'format': 'ipv4'});
+    return _pattern(
+      IssueCodes.ip,
+      DefaultMessages.ip,
+      Patterns.ipv4,
+      <String, dynamic>{'type': 'string', 'format': 'ipv4'},
+    );
   }
 
   static Rule<Object?> uuid(RuleDefinition d) {
-    return _pattern(IssueCodes.uuid, DefaultMessages.uuid, Patterns.uuid,
-        <String, dynamic>{'type': 'string', 'format': 'uuid'});
+    return _pattern(
+      IssueCodes.uuid,
+      DefaultMessages.uuid,
+      Patterns.uuid,
+      <String, dynamic>{'type': 'string', 'format': 'uuid'},
+    );
   }
 
   static Rule<Object?> alpha(RuleDefinition d) {
-    return _pattern(IssueCodes.alpha, DefaultMessages.alpha, Patterns.alpha,
-        <String, dynamic>{'pattern': Patterns.alpha.pattern});
+    return _pattern(
+      IssueCodes.alpha,
+      DefaultMessages.alpha,
+      Patterns.alpha,
+      <String, dynamic>{'pattern': Patterns.alpha.pattern},
+    );
   }
 
   static Rule<Object?> alphaDash(RuleDefinition d) {
     return _pattern(
-        IssueCodes.alphaDash,
-        DefaultMessages.alphaDash,
-        Patterns.alphaDash,
-        <String, dynamic>{'pattern': Patterns.alphaDash.pattern});
+      IssueCodes.alphaDash,
+      DefaultMessages.alphaDash,
+      Patterns.alphaDash,
+      <String, dynamic>{'pattern': Patterns.alphaDash.pattern},
+    );
   }
 
   static Rule<Object?> alphaNumeric(RuleDefinition d) {
     return _pattern(
-        IssueCodes.alphaNumeric,
-        DefaultMessages.alphaNumeric,
-        Patterns.alphaNumeric,
-        <String, dynamic>{'pattern': Patterns.alphaNumeric.pattern});
+      IssueCodes.alphaNumeric,
+      DefaultMessages.alphaNumeric,
+      Patterns.alphaNumeric,
+      <String, dynamic>{'pattern': Patterns.alphaNumeric.pattern},
+    );
   }
 
   static Rule<Object?> url(RuleDefinition d) {
-    return ValueTestRule(IssueCodes.url, DefaultMessages.url, isUrl,
-        json: <String, dynamic>{'type': 'string', 'format': 'uri'});
+    return ValueTestRule(
+      IssueCodes.url,
+      DefaultMessages.url,
+      isUrl,
+      json: <String, dynamic>{'type': 'string', 'format': 'uri'},
+    );
   }
 
   static Rule<Object?> startWith(RuleDefinition d) {
@@ -206,15 +260,16 @@ class LaravelRuleBuilders {
   static Rule<Object?> lengthBetween(RuleDefinition d) {
     List<num> range = _range(d);
     return CallbackRule(
-      name: IssueCodes.lengthBetween,
-      defaultMessage: DefaultMessages.lengthBetween,
-      params: <String, Object?>{
-        'min': range[0],
-        'max': range[1],
-        'args': <Object?>[d.arg(0), d.arg(1)],
-      },
-      callback: _Length(range[0], range[1]).check,
-    )..jsonHint = <String, dynamic>{
+        name: IssueCodes.lengthBetween,
+        defaultMessage: DefaultMessages.lengthBetween,
+        params: <String, Object?>{
+          'min': range[0],
+          'max': range[1],
+          'args': <Object?>[d.arg(0), d.arg(1)],
+        },
+        callback: _Length(range[0], range[1]).check,
+      )
+      ..jsonHint = <String, dynamic>{
         'minLength': range[0],
         'maxLength': range[1],
       };
@@ -303,8 +358,9 @@ class LaravelRuleBuilders {
   }
 
   static Rule<Object?> image(RuleDefinition d) {
-    List<String> extensions =
-        d.args.isEmpty ? FileValueRule.imageExtensions : d.args;
+    List<String> extensions = d.args.isEmpty
+        ? FileValueRule.imageExtensions
+        : d.args;
     return FileValueRule(IssueCodes.image, extensions);
   }
 
@@ -375,7 +431,8 @@ class LaravelRuleBuilders {
     num? value = num.tryParse(d.arg(index));
     if (value == null) {
       throw ArgumentError(
-          'Rule "${d.name}" on "${d.field}" needs a number, got "${d.arg(index)}".');
+        'Rule "${d.name}" on "${d.field}" needs a number, got "${d.arg(index)}".',
+      );
     }
     return value;
   }

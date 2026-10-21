@@ -1,3 +1,11 @@
+## Unreleased
+
+- Needs Dart 3.13 or newer.
+- All dependencies updated to their latest versions.
+- `sqlite3` 3. SQLite is now bundled by a build hook, so no system `libsqlite3` is needed.
+- Breaking: `dart compile exe` does not work with build hooks. Use `dart build cli` (or `dox build`).
+- SQLite: set `busy_timeout` before `journal_mode = WAL`. Before, many isolates that opened the same file at start could fail with "database is locked".
+
 ## 3.0.0-alpha.1
 
 - Renamed from `dox_query_builder` to `dox_orm`. Change `package:dox_query_builder/dox_query_builder.dart` to `package:dox_orm/dox_orm.dart`. The old package still works for now: it only re-exports this one.

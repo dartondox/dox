@@ -53,10 +53,10 @@ class LocalDriver implements DriverContract {
     this.config, {
     this.clock = const Clock(),
     this.encoder = const KeyEncoder(),
-  })  : root = p.normalize(p.absolute(config.root)),
-        signer = config.appKey == null
-            ? null
-            : LocalUrlSigner(config.appKey!, clock: clock);
+  }) : root = p.normalize(p.absolute(config.root)),
+       signer = config.appKey == null
+           ? null
+           : LocalUrlSigner(config.appKey!, clock: clock);
 
   /// Check a signed URL in the route that serves files.
   /// [key] is the decoded file key from the path.
@@ -124,7 +124,8 @@ class LocalDriver implements DriverContract {
       size: stat.size,
       contentType: lookupMimeType(key) ?? StorageConstants.defaultContentType,
       lastModified: stat.modified.toUtc(),
-      etag: '${stat.size.toRadixString(16)}-'
+      etag:
+          '${stat.size.toRadixString(16)}-'
           '${stat.modified.millisecondsSinceEpoch.toRadixString(16)}',
     );
   }

@@ -21,294 +21,438 @@ void main() {
   group('fromRules: old dox-core behavior |', () {
     test('required on null with dot', () {
       expect(
-          check(<String, dynamic>{
-            'user': <String, dynamic>{'name': null}
-          }, <String, String>{
-            'user.name': 'required'
-          })['user.name'],
-          'The name is required');
+        check(
+          <String, dynamic>{
+            'user': <String, dynamic>{'name': null},
+          },
+          <String, String>{'user.name': 'required'},
+        )['user.name'],
+        'The name is required',
+      );
     });
 
     test('required on null, empty text, empty list', () {
       expect(
-          check(<String, dynamic>{'email': null},
-              <String, String>{'email': 'required'})['email'],
-          'The email is required');
+        check(
+          <String, dynamic>{'email': null},
+          <String, String>{'email': 'required'},
+        )['email'],
+        'The email is required',
+      );
       expect(
-          check(<String, dynamic>{'email': ''},
-              <String, String>{'email': 'required'})['email'],
-          'The email is required');
+        check(
+          <String, dynamic>{'email': ''},
+          <String, String>{'email': 'required'},
+        )['email'],
+        'The email is required',
+      );
       expect(
-          check(<String, dynamic>{'items': <String>[]},
-              <String, String>{'items': 'required'})['items'],
-          'The items is required');
+        check(
+          <String, dynamic>{'items': <String>[]},
+          <String, String>{'items': 'required'},
+        )['items'],
+        'The items is required',
+      );
     });
 
     test('email', () {
       expect(
-          check(<String, dynamic>{'email': 'invalid'},
-              <String, String>{'email': 'required|email'})['email'],
-          'The email is not a valid email');
+        check(
+          <String, dynamic>{'email': 'invalid'},
+          <String, String>{'email': 'required|email'},
+        )['email'],
+        'The email is not a valid email',
+      );
       expect(
-          check(<String, dynamic>{'email': 'support@dartondox.dev'},
-              <String, String>{'email': 'required|email'}),
-          isEmpty);
+        check(
+          <String, dynamic>{'email': 'support@dartondox.dev'},
+          <String, String>{'email': 'required|email'},
+        ),
+        isEmpty,
+      );
     });
 
     test('numeric, integer, double', () {
       expect(
-          check(<String, dynamic>{'age': '1'},
-              <String, String>{'age': 'numeric'}),
-          isEmpty);
+        check(
+          <String, dynamic>{'age': '1'},
+          <String, String>{'age': 'numeric'},
+        ),
+        isEmpty,
+      );
       expect(
-          check(
-              <String, dynamic>{'age': 1}, <String, String>{'age': 'numeric'}),
-          isEmpty);
+        check(<String, dynamic>{'age': 1}, <String, String>{'age': 'numeric'}),
+        isEmpty,
+      );
       expect(
-          check(<String, dynamic>{'age': 'abcd'},
-              <String, String>{'age': 'numeric'})['age'],
-          'The age must be a number');
+        check(
+          <String, dynamic>{'age': 'abcd'},
+          <String, String>{'age': 'numeric'},
+        )['age'],
+        'The age must be a number',
+      );
       expect(
-          check(<String, dynamic>{'age': '10'},
-              <String, String>{'age': 'integer'}),
-          isEmpty);
+        check(
+          <String, dynamic>{'age': '10'},
+          <String, String>{'age': 'integer'},
+        ),
+        isEmpty,
+      );
       expect(
-          check(<String, dynamic>{'age': '10.2'},
-              <String, String>{'age': 'integer'})['age'],
-          'The age must be an integer');
+        check(
+          <String, dynamic>{'age': '10.2'},
+          <String, String>{'age': 'integer'},
+        )['age'],
+        'The age must be an integer',
+      );
       expect(
-          check(<String, dynamic>{'amount': 'double'},
-              <String, String>{'amount': 'double'})['amount'],
-          'The amount must be a double');
+        check(
+          <String, dynamic>{'amount': 'double'},
+          <String, String>{'amount': 'double'},
+        )['amount'],
+        'The amount must be a double',
+      );
       expect(
-          check(<String, dynamic>{'amount': '10.2'},
-              <String, String>{'amount': 'double'}),
-          isEmpty);
+        check(
+          <String, dynamic>{'amount': '10.2'},
+          <String, String>{'amount': 'double'},
+        ),
+        isEmpty,
+      );
     });
 
     test('alpha family', () {
       expect(
-          check(<String, dynamic>{'name': 'dox1'},
-              <String, String>{'name': 'alpha'})['name'],
-          'The name must be an alphabetic');
+        check(
+          <String, dynamic>{'name': 'dox1'},
+          <String, String>{'name': 'alpha'},
+        )['name'],
+        'The name must be an alphabetic',
+      );
       expect(
-          check(<String, dynamic>{'name': '&@#'},
-              <String, String>{'name': 'alpha_numeric'})['name'],
-          'The name must be only alphabetic and number');
+        check(
+          <String, dynamic>{'name': '&@#'},
+          <String, String>{'name': 'alpha_numeric'},
+        )['name'],
+        'The name must be only alphabetic and number',
+      );
       expect(
-          check(<String, dynamic>{'name': 'dox_web-framework'},
-              <String, String>{'name': 'alpha_dash'}),
-          isEmpty);
+        check(
+          <String, dynamic>{'name': 'dox_web-framework'},
+          <String, String>{'name': 'alpha_dash'},
+        ),
+        isEmpty,
+      );
       expect(
-          check(<String, dynamic>{'name': 1},
-              <String, String>{'name': 'alpha_dash'})['name'],
-          'The name must be only alphabetic and dash');
+        check(
+          <String, dynamic>{'name': 1},
+          <String, String>{'name': 'alpha_dash'},
+        )['name'],
+        'The name must be only alphabetic and dash',
+      );
     });
 
     test('ip, boolean, array, json, date, url, uuid', () {
       expect(
-          check(<String, dynamic>{'ip': 'abcd'}, <String, String>{'ip': 'ip'})[
-              'ip'],
-          'The ip must be an ip address');
+        check(
+          <String, dynamic>{'ip': 'abcd'},
+          <String, String>{'ip': 'ip'},
+        )['ip'],
+        'The ip must be an ip address',
+      );
       expect(
-          check(<String, dynamic>{'active': true},
-              <String, String>{'active': 'boolean'}),
-          isEmpty);
+        check(
+          <String, dynamic>{'active': true},
+          <String, String>{'active': 'boolean'},
+        ),
+        isEmpty,
+      );
       expect(
-          check(<String, dynamic>{'active': 'true'},
-              <String, String>{'active': 'boolean'})['active'],
-          'The active must be a boolean');
+        check(
+          <String, dynamic>{'active': 'true'},
+          <String, String>{'active': 'boolean'},
+        )['active'],
+        'The active must be a boolean',
+      );
       expect(
-          check(<String, dynamic>{'list': 'text'},
-              <String, String>{'list': 'array'})['list'],
-          'The list must be an array');
+        check(
+          <String, dynamic>{'list': 'text'},
+          <String, String>{'list': 'array'},
+        )['list'],
+        'The list must be an array',
+      );
       expect(
-          check(<String, dynamic>{'info': 'user info'},
-              <String, String>{'info': 'json'})['info'],
-          'The info is not a valid json');
+        check(
+          <String, dynamic>{'info': 'user info'},
+          <String, String>{'info': 'json'},
+        )['info'],
+        'The info is not a valid json',
+      );
       expect(
-          check(<String, dynamic>{'dob': '1994-11-22'},
-              <String, String>{'dob': 'date'}),
-          isEmpty);
+        check(
+          <String, dynamic>{'dob': '1994-11-22'},
+          <String, String>{'dob': 'date'},
+        ),
+        isEmpty,
+      );
       expect(
-          check(<String, dynamic>{'dob': '1994/11/22'},
-              <String, String>{'dob': 'date'})['dob'],
-          'The dob must be a date');
+        check(
+          <String, dynamic>{'dob': '1994/11/22'},
+          <String, String>{'dob': 'date'},
+        )['dob'],
+        'The dob must be a date',
+      );
       expect(
-          check(<String, dynamic>{'url': 'just string'},
-              <String, String>{'url': 'url'})['url'],
-          'The url must be a url');
+        check(
+          <String, dynamic>{'url': 'just string'},
+          <String, String>{'url': 'url'},
+        )['url'],
+        'The url must be a url',
+      );
       expect(
-          check(<String, dynamic>{'uuid': 'just string'},
-              <String, String>{'uuid': 'uuid'})['uuid'],
-          'The uuid is invalid uuid');
+        check(
+          <String, dynamic>{'uuid': 'just string'},
+          <String, String>{'uuid': 'uuid'},
+        )['uuid'],
+        'The uuid is invalid uuid',
+      );
     });
 
     test('in and not_in', () {
       expect(
-          check(<String, dynamic>{'status': 'active'},
-              <String, String>{'status': 'in:active,pending'}),
-          isEmpty);
+        check(
+          <String, dynamic>{'status': 'active'},
+          <String, String>{'status': 'in:active,pending'},
+        ),
+        isEmpty,
+      );
       expect(
-          check(<String, dynamic>{'status': 'failed'},
-              <String, String>{'status': 'in:active,pending'})['status'],
-          'The selected status is invalid. Valid options are active, and pending');
+        check(
+          <String, dynamic>{'status': 'failed'},
+          <String, String>{'status': 'in:active,pending'},
+        )['status'],
+        'The selected status is invalid. Valid options are active, and pending',
+      );
       expect(
-          check(<String, dynamic>{'status': 'active'},
-              <String, String>{'status': 'not_in:active,pending'})['status'],
-          'The status field cannot be active');
+        check(
+          <String, dynamic>{'status': 'active'},
+          <String, String>{'status': 'not_in:active,pending'},
+        )['status'],
+        'The status field cannot be active',
+      );
     });
 
     test('lengths', () {
       String uuid = '3f1d2c8e-1b2a-4c3d-9e8f-0a1b2c3d4e5f';
       expect(
-          check(<String, dynamic>{'uuid': uuid},
-              <String, String>{'uuid': 'min_length:50'})['uuid'],
-          'The uuid must be at least 50 character');
+        check(
+          <String, dynamic>{'uuid': uuid},
+          <String, String>{'uuid': 'min_length:50'},
+        )['uuid'],
+        'The uuid must be at least 50 character',
+      );
       expect(
-          check(<String, dynamic>{'uuid': uuid},
-              <String, String>{'uuid': 'max_length:10'})['uuid'],
-          'The uuid may not be greater than 10 character');
+        check(
+          <String, dynamic>{'uuid': uuid},
+          <String, String>{'uuid': 'max_length:10'},
+        )['uuid'],
+        'The uuid may not be greater than 10 character',
+      );
       expect(
-          check(<String, dynamic>{'uuid': uuid},
-              <String, String>{'uuid': 'length_between:10,15'})['uuid'],
-          'The uuid must be between 10 and 15 character');
+        check(
+          <String, dynamic>{'uuid': uuid},
+          <String, String>{'uuid': 'length_between:10,15'},
+        )['uuid'],
+        'The uuid must be between 10 and 15 character',
+      );
       expect(
-          check(<String, dynamic>{'uuid': uuid},
-              <String, String>{'uuid': 'length_between:10,50'}),
-          isEmpty);
+        check(
+          <String, dynamic>{'uuid': uuid},
+          <String, String>{'uuid': 'length_between:10,50'},
+        ),
+        isEmpty,
+      );
     });
 
     test('min, max, greater_than, less_than, between', () {
       expect(
-          check(<String, dynamic>{'age': '1'},
-              <String, String>{'age': 'min:10'})['age'],
-          'The age must be greater than or equal 10');
+        check(
+          <String, dynamic>{'age': '1'},
+          <String, String>{'age': 'min:10'},
+        )['age'],
+        'The age must be greater than or equal 10',
+      );
       expect(
-          check(<String, dynamic>{'age': '10'},
-              <String, String>{'age': 'min:10'}),
-          isEmpty);
+        check(
+          <String, dynamic>{'age': '10'},
+          <String, String>{'age': 'min:10'},
+        ),
+        isEmpty,
+      );
       expect(
-          check(<String, dynamic>{'age': '11'},
-              <String, String>{'age': 'max:10'})['age'],
-          'The age must be less than or equal 10');
+        check(
+          <String, dynamic>{'age': '11'},
+          <String, String>{'age': 'max:10'},
+        )['age'],
+        'The age must be less than or equal 10',
+      );
       expect(
-          check(<String, dynamic>{'age': '6'},
-              <String, String>{'age': 'greater_than:10'})['age'],
-          'The age must be greater than 10');
+        check(
+          <String, dynamic>{'age': '6'},
+          <String, String>{'age': 'greater_than:10'},
+        )['age'],
+        'The age must be greater than 10',
+      );
       expect(
-          check(<String, dynamic>{'age': '11'},
-              <String, String>{'age': 'less_than:10'})['age'],
-          'The age must be less than 10');
+        check(
+          <String, dynamic>{'age': '11'},
+          <String, String>{'age': 'less_than:10'},
+        )['age'],
+        'The age must be less than 10',
+      );
       expect(
-          check(<String, dynamic>{'age': 20},
-              <String, String>{'age': 'between:1,10'})['age'],
-          'The age must be between 1 and 10');
+        check(
+          <String, dynamic>{'age': 20},
+          <String, String>{'age': 'between:1,10'},
+        )['age'],
+        'The age must be between 1 and 10',
+      );
     });
 
     test('min and max on text and lists (Laravel style)', () {
       expect(
-          check(<String, dynamic>{'name': 'ab'},
-              <String, String>{'name': 'string|min:3'})['name'],
-          'The name must be at least 3 character');
+        check(
+          <String, dynamic>{'name': 'ab'},
+          <String, String>{'name': 'string|min:3'},
+        )['name'],
+        'The name must be at least 3 character',
+      );
       expect(
-          check(<String, dynamic>{'name': '12'},
-              <String, String>{'name': 'string|min:3'})['name'],
-          'The name must be at least 3 character');
+        check(
+          <String, dynamic>{'name': '12'},
+          <String, String>{'name': 'string|min:3'},
+        )['name'],
+        'The name must be at least 3 character',
+      );
       expect(
-          check(<String, dynamic>{
-            'tags': <int>[1]
-          }, <String, String>{
-            'tags': 'array|min:2'
-          })['tags'],
-          'The tags must have at least 2 items');
+        check(
+          <String, dynamic>{
+            'tags': <int>[1],
+          },
+          <String, String>{'tags': 'array|min:2'},
+        )['tags'],
+        'The tags must have at least 2 items',
+      );
     });
 
     test('start_with and end_with', () {
       expect(
-          check(<String, dynamic>{'name': 'dox'},
-              <String, String>{'name': 'start_with:dart'})['name'],
-          'The name must start with dart');
+        check(
+          <String, dynamic>{'name': 'dox'},
+          <String, String>{'name': 'start_with:dart'},
+        )['name'],
+        'The name must start with dart',
+      );
       expect(
-          check(<String, dynamic>{'name': 'dox'},
-              <String, String>{'name': 'end_with:dart'})['name'],
-          'The name must end with dart');
+        check(
+          <String, dynamic>{'name': 'dox'},
+          <String, String>{'name': 'end_with:dart'},
+        )['name'],
+        'The name must end with dart',
+      );
       expect(
-          check(<String, dynamic>{'name': 'dox'},
-              <String, String>{'name': 'end_with:x'}),
-          isEmpty);
+        check(
+          <String, dynamic>{'name': 'dox'},
+          <String, String>{'name': 'end_with:x'},
+        ),
+        isEmpty,
+      );
     });
 
     test('confirmed', () {
       expect(
-          check(<String, dynamic>{
-            'password': '123',
-            'password_confirmation': '1234',
-          }, <String, String>{
-            'password': 'confirmed'
-          })['password'],
-          'The two password did not match');
+        check(
+          <String, dynamic>{'password': '123', 'password_confirmation': '1234'},
+          <String, String>{'password': 'confirmed'},
+        )['password'],
+        'The two password did not match',
+      );
       expect(
-          check(<String, dynamic>{
-            'password': '123',
-            'password_confirmation': '123',
-          }, <String, String>{
-            'password': 'confirmed'
-          }),
-          isEmpty);
+        check(
+          <String, dynamic>{'password': '123', 'password_confirmation': '123'},
+          <String, String>{'password': 'confirmed'},
+        ),
+        isEmpty,
+      );
       expect(
-          check(<String, dynamic>{
-            'password': '123',
-            'password_confirm': '123',
-          }, <String, String>{
-            'password': 'confirmed:password_confirm'
-          }),
-          isEmpty);
+        check(
+          <String, dynamic>{'password': '123', 'password_confirm': '123'},
+          <String, String>{'password': 'confirmed:password_confirm'},
+        ),
+        isEmpty,
+      );
     });
 
     test('confirmed uses the sibling in nested data', () {
       expect(
-          check(<String, dynamic>{
-            'user': <String, dynamic>{
-              'pin': '1',
-              'pin_confirmation': '2',
-            },
-          }, <String, String>{
-            'user.pin': 'confirmed'
-          }).keys,
-          <String>['user.pin']);
+        check(
+          <String, dynamic>{
+            'user': <String, dynamic>{'pin': '1', 'pin_confirmation': '2'},
+          },
+          <String, String>{'user.pin': 'confirmed'},
+        ).keys,
+        <String>['user.pin'],
+      );
     });
 
     test('required_if and required_if_not', () {
       expect(
-          check(<String, dynamic>{'type': 'register'},
-              <String, String>{'dob': 'required_if:type,register'})['dob'],
-          'The dob is required');
+        check(
+          <String, dynamic>{'type': 'register'},
+          <String, String>{'dob': 'required_if:type,register'},
+        )['dob'],
+        'The dob is required',
+      );
       expect(
-          check(<String, dynamic>{'type': 'login'},
-              <String, String>{'dob': 'required_if:type,register'}),
-          isEmpty);
+        check(
+          <String, dynamic>{'type': 'login'},
+          <String, String>{'dob': 'required_if:type,register'},
+        ),
+        isEmpty,
+      );
       expect(
-          check(<String, dynamic>{'type': 'register'},
-              <String, String>{'dob': 'required_if_not:type,login'})['dob'],
-          'The dob is required');
+        check(
+          <String, dynamic>{'type': 'register'},
+          <String, String>{'dob': 'required_if_not:type,login'},
+        )['dob'],
+        'The dob is required',
+      );
       expect(
-          check(<String, dynamic>{'type': 'login'},
-              <String, String>{'dob': 'required_if_not:type,login'}),
-          isEmpty);
+        check(
+          <String, dynamic>{'type': 'login'},
+          <String, String>{'dob': 'required_if_not:type,login'},
+        ),
+        isEmpty,
+      );
       expect(
-          check(<String, dynamic>{'type': 'b'},
-              <String, String>{'dob': 'required_if:type,a,b'}).keys,
-          <String>['dob']);
+        check(
+          <String, dynamic>{'type': 'b'},
+          <String, String>{'dob': 'required_if:type,a,b'},
+        ).keys,
+        <String>['dob'],
+      );
     });
 
     test('map with dot', () {
-      Map<String, String> errors = check(<String, dynamic>{
-        'info': <String, String>{'name': 'dox', 'email': ''}
-      }, <String, String>{
-        'info.name': 'required|string',
-        'info.email': 'required|email',
-      });
+      Map<String, String> errors = check(
+        <String, dynamic>{
+          'info': <String, String>{'name': 'dox', 'email': ''},
+        },
+        <String, String>{
+          'info.name': 'required|string',
+          'info.email': 'required|email',
+        },
+      );
       expect(errors, <String, String>{'info.email': 'The email is required'});
     });
 
@@ -320,15 +464,15 @@ void main() {
             'items': <Map<String, String>>[
               <String, String>{'title': ''},
               <String, String>{'title': 'case'},
-            ]
+            ],
           },
           <String, dynamic>{
             'name': '',
             'items': <Map<String, String>>[
               <String, String>{'title': 'cable'},
               <String, String>{'title': ''},
-            ]
-          }
+            ],
+          },
         ],
       };
       Map<String, String> errors = check(data, <String, String>{
@@ -344,21 +488,33 @@ void main() {
 
     test('image and file', () {
       expect(
-          check(<String, dynamic>{'photo': FakeFile('png')},
-              <String, String>{'photo': 'image'}),
-          isEmpty);
+        check(
+          <String, dynamic>{'photo': FakeFile('png')},
+          <String, String>{'photo': 'image'},
+        ),
+        isEmpty,
+      );
       expect(
-          check(<String, dynamic>{'photo': FakeFile('pdf')},
-              <String, String>{'photo': 'image'})['photo'],
-          'The photo is either invalid or unsupported extension');
+        check(
+          <String, dynamic>{'photo': FakeFile('pdf')},
+          <String, String>{'photo': 'image'},
+        )['photo'],
+        'The photo is either invalid or unsupported extension',
+      );
       expect(
-          check(<String, dynamic>{'doc': FakeFile('pdf')},
-              <String, String>{'doc': 'file:pdf,doc'}),
-          isEmpty);
+        check(
+          <String, dynamic>{'doc': FakeFile('pdf')},
+          <String, String>{'doc': 'file:pdf,doc'},
+        ),
+        isEmpty,
+      );
       expect(
-          check(<String, dynamic>{'doc': 'x'}, <String, String>{'doc': 'file'})
-              .keys,
-          <String>['doc']);
+        check(
+          <String, dynamic>{'doc': 'x'},
+          <String, String>{'doc': 'file'},
+        ).keys,
+        <String>['doc'],
+      );
     });
 
     test('custom messages by rule and by field', () {
@@ -377,9 +533,9 @@ void main() {
     });
 
     test('stops at first failed rule per field', () {
-      ParseResult<Map<String, dynamic>> result = v.fromRules(<String, String>{
-        'email': 'required|email|min_length:20'
-      }).safeParse(<String, dynamic>{'email': 'x'});
+      ParseResult<Map<String, dynamic>> result = v
+          .fromRules(<String, String>{'email': 'required|email|min_length:20'})
+          .safeParse(<String, dynamic>{'email': 'x'});
       expect(result.issues.length, 1);
       expect(result.issues.single.code, IssueCodes.email);
     });
@@ -388,55 +544,72 @@ void main() {
   group('fromRules: Laravel presence rules |', () {
     test('missing and not required skips all rules', () {
       expect(
-          check(<String, dynamic>{},
-              <String, String>{'email': 'email|max_length:5'}),
-          isEmpty);
+        check(<String, dynamic>{}, <String, String>{
+          'email': 'email|max_length:5',
+        }),
+        isEmpty,
+      );
     });
 
     test('empty text and not required skips rules', () {
       expect(
-          check(<String, dynamic>{'email': ''},
-              <String, String>{'email': 'email'}),
-          isEmpty);
+        check(
+          <String, dynamic>{'email': ''},
+          <String, String>{'email': 'email'},
+        ),
+        isEmpty,
+      );
     });
 
     test('null without nullable runs rules', () {
       expect(
-          check(<String, dynamic>{'age': null},
-              <String, String>{'age': 'integer'}).keys,
-          <String>['age']);
+        check(
+          <String, dynamic>{'age': null},
+          <String, String>{'age': 'integer'},
+        ).keys,
+        <String>['age'],
+      );
     });
 
     test('nullable allows null', () {
       expect(
-          check(<String, dynamic>{'age': null},
-              <String, String>{'age': 'nullable|integer|min:18'}),
-          isEmpty);
+        check(
+          <String, dynamic>{'age': null},
+          <String, String>{'age': 'nullable|integer|min:18'},
+        ),
+        isEmpty,
+      );
       expect(
-          check(<String, dynamic>{'age': 10},
-              <String, String>{'age': 'nullable|integer|min:18'}).keys,
-          <String>['age']);
+        check(
+          <String, dynamic>{'age': 10},
+          <String, String>{'age': 'nullable|integer|min:18'},
+        ).keys,
+        <String>['age'],
+      );
     });
 
     test('sometimes skips required when missing', () {
       Map<String, String> rules = <String, String>{
-        'name': 'sometimes|required'
+        'name': 'sometimes|required',
       };
       expect(check(<String, dynamic>{}, rules), isEmpty);
-      expect(
-          check(<String, dynamic>{'name': ''}, rules).keys, <String>['name']);
+      expect(check(<String, dynamic>{'name': ''}, rules).keys, <String>[
+        'name',
+      ]);
     });
 
     test('output has only fields with rules, values unchanged', () {
-      Map<String, dynamic> out = v.fromRules(<String, String>{
-        'age': 'integer',
-        'user.name': 'required',
-        'missing': 'string',
-      }).parse(<String, dynamic>{
-        'age': '18',
-        'extra': true,
-        'user': <String, dynamic>{'name': 'dox', 'secret': 1},
-      });
+      Map<String, dynamic> out = v
+          .fromRules(<String, String>{
+            'age': 'integer',
+            'user.name': 'required',
+            'missing': 'string',
+          })
+          .parse(<String, dynamic>{
+            'age': '18',
+            'extra': true,
+            'user': <String, dynamic>{'name': 'dox', 'secret': 1},
+          });
       expect(out, <String, dynamic>{
         'age': '18',
         'user': <String, dynamic>{'name': 'dox'},
@@ -445,9 +618,9 @@ void main() {
 
     test('missing parent of dotted key still checks required', () {
       expect(
-          check(
-              <String, dynamic>{}, <String, String>{'info.email': 'required'}),
-          <String, String>{'info.email': 'The email is required'});
+        check(<String, dynamic>{}, <String, String>{'info.email': 'required'}),
+        <String, String>{'info.email': 'The email is required'},
+      );
     });
 
     test('rules on parent and children', () {
@@ -457,12 +630,13 @@ void main() {
       };
       expect(check(<String, dynamic>{}, rules).keys, <String>['items']);
       expect(
-          check(<String, dynamic>{
-            'items': <Map<String, dynamic>>[
-              <String, dynamic>{'id': 'x'},
-            ],
-          }, rules),
-          <String, String>{'items.0.id': 'The id must be an integer'});
+        check(<String, dynamic>{
+          'items': <Map<String, dynamic>>[
+            <String, dynamic>{'id': 'x'},
+          ],
+        }, rules),
+        <String, String>{'items.0.id': 'The id must be an integer'},
+      );
     });
 
     test('unknown rule throws when building', () {
@@ -490,10 +664,12 @@ void main() {
           },
         );
       });
-      ObjectSchema s =
-          validator.fromRules(<String, String>{'n': 'required|even'});
-      expect(s.safeParse(<String, dynamic>{'n': 3}).errors,
-          <String, String>{'n': 'The n must be even'});
+      ObjectSchema s = validator.fromRules(<String, String>{
+        'n': 'required|even',
+      });
+      expect(s.safeParse(<String, dynamic>{'n': 3}).errors, <String, String>{
+        'n': 'The n must be even',
+      });
       expect(v.registry.has('even'), false);
     });
 
@@ -502,19 +678,25 @@ void main() {
       validator.registerRule('unique', (RuleDefinition d) {
         return FakeUniqueRule(d.arg(0));
       });
-      ObjectSchema s = validator
-          .fromRules(<String, String>{'email': 'required|unique:users'});
-      ParseResult<Map<String, dynamic>> result =
-          await s.safeParseAsync(<String, dynamic>{'email': 'taken@dox.dev'});
-      expect(result.errors,
-          <String, String>{'email': 'The email already exists in users'});
+      ObjectSchema s = validator.fromRules(<String, String>{
+        'email': 'required|unique:users',
+      });
+      ParseResult<Map<String, dynamic>> result = await s.safeParseAsync(
+        <String, dynamic>{'email': 'taken@dox.dev'},
+      );
+      expect(result.errors, <String, String>{
+        'email': 'The email already exists in users',
+      });
     });
 
     test('fromRules result can be extended with fluent schemas', () {
       ObjectSchema s = v.fromRules(<String, String>{'name': 'required'}).extend(
-          <String, Schema<Object?>>{'age': v.coerce.int().optional()});
-      expect(s.parse(<String, dynamic>{'name': 'x', 'age': '3'}),
-          <String, dynamic>{'name': 'x', 'age': 3});
+        <String, Schema<Object?>>{'age': v.coerce.int().optional()},
+      );
+      expect(
+        s.parse(<String, dynamic>{'name': 'x', 'age': '3'}),
+        <String, dynamic>{'name': 'x', 'age': 3},
+      );
     });
   });
 }

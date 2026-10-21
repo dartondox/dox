@@ -9,8 +9,10 @@ void main() {
       Dox().config = config;
       DoxCookie cookie = DoxCookie('x-auth', 'Bearerxxxxxxxxx');
       String cookieValue = cookie.get();
-      expect(cookieValue,
-          'x-auth=EzBl7TV9yA+U1lLsyfMgTPjbCRh/5FQOODjbEwej58Y=; Max-Age=3600');
+      expect(
+        cookieValue,
+        'x-auth=EzBl7TV9yA+U1lLsyfMgTPjbCRh/5FQOODjbEwej58Y=; Max-Age=3600',
+      );
     });
 
     test('expire', () {

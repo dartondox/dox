@@ -37,9 +37,7 @@ AppConfig config = AppConfig(
   },
 
   /// routers
-  routers: <Router>[
-    ApiRouter(),
-  ],
+  routers: <Router>[ApiRouter()],
 
   /// error handler
   errorHandler: (Object? error, StackTrace stackTrace) {
@@ -48,8 +46,6 @@ AppConfig config = AppConfig(
 
   /// cache driver configuration
   cache: CacheConfig(
-    drivers: <String, CacheDriverInterface>{
-      'file': FileCacheDriver(),
-    },
+    drivers: <String, CacheDriverInterface>{'file': FileCacheDriver()},
   ),
 );

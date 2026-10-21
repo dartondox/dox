@@ -39,9 +39,18 @@ DatabaseConfig databaseConfig = DatabaseConfig(
       user: Env.get('DB_USERNAME', 'root'),
       password: Env.get('DB_PASSWORD', 'password'),
       database: Env.get('DB_NAME', 'dox'),
-      extra: <String, dynamic>{
-        'collation': 'utf8mb4_general_ci',
-      },
+      extra: <String, dynamic>{'collation': 'utf8mb4_general_ci'},
+      debug: true,
+      printer: ConsoleQueryPrinter(),
+    ),
+
+    /// -------------------------------
+    /// SQLite config
+    /// -------------------------------
+    /// `database` is a file path or `:memory:`.
+    'sqlite': ConnectionConfig(
+      driver: Driver.sqlite,
+      database: Env.get('DB_NAME', 'dox.sqlite'),
       debug: true,
       printer: ConsoleQueryPrinter(),
     ),

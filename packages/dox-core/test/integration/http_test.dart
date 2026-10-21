@@ -93,14 +93,18 @@ void main() {
 
     test('OPTIONS route', () async {
       Uri url = Uri.parse('$baseUrl/non/exist/route');
-      http.StreamedResponse response =
-          await http.Client().send(http.Request('OPTIONS', url));
+      http.StreamedResponse response = await http.Client().send(
+        http.Request('OPTIONS', url),
+      );
       expect(response.statusCode, 204);
     });
 
     test('double param route', () async {
-      Route.get('/ping/{name}/{type}',
-          (DoxRequest req, String name, String type) {
+      Route.get('/ping/{name}/{type}', (
+        DoxRequest req,
+        String name,
+        String type,
+      ) {
         return 'pong $name $type';
       });
 
@@ -224,8 +228,10 @@ void main() {
 
       expect(res.statusCode, 200);
       expect(res.body, 'pong');
-      expect(res.headers['set-cookie'],
-          'x-key=Ewh5wQRRo0v5ljLQpLNAcA==; Max-Age=3600,x-key2=ABCD; Max-Age=3600');
+      expect(
+        res.headers['set-cookie'],
+        'x-key=Ewh5wQRRo0v5ljLQpLNAcA==; Max-Age=3600,x-key2=ABCD; Max-Age=3600',
+      );
     });
 
     test('cors preflight without options route', () async {
@@ -233,43 +239,40 @@ void main() {
         Route.post('/cors_preflight', (DoxRequest req) => 'ok');
       });
 
-      http.Request req =
-          http.Request('OPTIONS', Uri.parse('$baseUrl/cors_preflight'));
+      http.Request req = http.Request(
+        'OPTIONS',
+        Uri.parse('$baseUrl/cors_preflight'),
+      );
       req.headers['origin'] = 'http://example.com';
       req.headers['access-control-request-method'] = 'POST';
       http.StreamedResponse res = await req.send();
 
       expect(res.statusCode, 204);
       expect(res.headers['access-control-allow-origin'], '*');
-      expect(res.headers['access-control-allow-methods'],
-          'GET,POST,DELETE,PUT,PATCH');
+      expect(
+        res.headers['access-control-allow-methods'],
+        'GET,POST,DELETE,PUT,PATCH',
+      );
 
       /// no route for the path, cors is disabled in config
-      http.StreamedResponse res2 =
-          await http.Request('OPTIONS', Uri.parse('$baseUrl/no_such_route'))
-              .send();
+      http.StreamedResponse res2 = await http.Request(
+        'OPTIONS',
+        Uri.parse('$baseUrl/no_such_route'),
+      ).send();
       expect(res2.statusCode, 204);
       expect(res2.headers['access-control-allow-origin'], null);
     });
 
     test('custom form request', () async {
       Route.post('/custom_form_request', (BlogRequest req) {
-        return <String, dynamic>{
-          'title': req.title,
-          'bar': req.input('bar'),
-        };
+        return <String, dynamic>{'title': req.title, 'bar': req.input('bar')};
       });
 
       Uri url = Uri.parse('$baseUrl/custom_form_request');
       http.Response res = await http.post(
         url,
-        body: jsonEncode(<String, String>{
-          'title': 'hello',
-          'foo': 'bar',
-        }),
-        headers: <String, String>{
-          'content-type': 'application/json',
-        },
+        body: jsonEncode(<String, String>{'title': 'hello', 'foo': 'bar'}),
+        headers: <String, String>{'content-type': 'application/json'},
       );
       Map<String, dynamic> jsond = jsonDecode(res.body);
       expect(res.statusCode, 200);

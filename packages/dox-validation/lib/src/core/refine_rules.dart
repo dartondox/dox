@@ -13,18 +13,19 @@ typedef SuperCheckFunction<T> = void Function(T value, RuleContext context);
 
 /// Signature for an async check that adds its own issues.
 typedef AsyncSuperCheckFunction<T> = Future<void> Function(
-    T value, RuleContext context);
+  T value,
+  RuleContext context,
+);
 
 /// Rule made by `.refine()` and `.refineAsync()`.
 class RefineRule<T> extends Rule<T> {
   RefineRule({
-    CheckFunction<T>? check,
-    AsyncCheckFunction<T>? asyncCheck,
+    this._check,
+    this._asyncCheck,
     super.message,
     this.code = IssueCodes.custom,
     this.extraPath = const <Object>[],
-  })  : _check = check,
-        _asyncCheck = asyncCheck;
+  });
 
   final CheckFunction<T>? _check;
   final AsyncCheckFunction<T>? _asyncCheck;
@@ -100,11 +101,7 @@ class RefineRule<T> extends Rule<T> {
 /// Rule made by `.superRefine()` and `.superRefineAsync()`.
 /// The function adds issues itself with `context.addIssue()`.
 class SuperRefineRule<T> extends Rule<T> {
-  SuperRefineRule({
-    SuperCheckFunction<T>? check,
-    AsyncSuperCheckFunction<T>? asyncCheck,
-  })  : _check = check,
-        _asyncCheck = asyncCheck;
+  SuperRefineRule({this._check, this._asyncCheck});
 
   final SuperCheckFunction<T>? _check;
   final AsyncSuperCheckFunction<T>? _asyncCheck;
@@ -167,15 +164,12 @@ class SuperRefineRule<T> extends Rule<T> {
 /// ```
 class CallbackRule extends Rule<Object?> {
   CallbackRule({
-    required String name,
-    required String defaultMessage,
-    required bool Function(Object? value, RuleContext context) callback,
-    Map<String, Object?> params = const <String, Object?>{},
+    required this._name,
+    required this._defaultMessage,
+    required this._callback,
+    this._params = const <String, Object?>{},
     super.message,
-  })  : _name = name,
-        _defaultMessage = defaultMessage,
-        _callback = callback,
-        _params = params;
+  });
 
   final String _name;
   final String _defaultMessage;

@@ -6,6 +6,7 @@ homepage: https://dartondox.dev
 
 environment:
   sdk: ^3.13.0
+resolution: workspace
 
 dev_dependencies:
   lints: ^6.1.0

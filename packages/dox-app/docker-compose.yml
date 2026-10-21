@@ -2,7 +2,10 @@ services:
 
   # Http server
   dox:
-    build: .
+    # the app is part of the dox pub workspace, so build from the repo root
+    build:
+      context: ../..
+      dockerfile: packages/dox-app/Dockerfile
     hostname: dox
     # config is read from env vars; the image has no .env file
     env_file: .env

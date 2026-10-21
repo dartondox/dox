@@ -72,10 +72,10 @@ jobs:
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
-      - name: Melos bootstrap (links local packages, so unpublished sibling versions resolve)
-        run: |
-          dart pub global activate melos 3.4.0
-          melos bs
+      # Pub workspace: one `dart pub get` at the root links all local packages,
+      # so unpublished sibling versions resolve.
+      - name: Resolve the workspace
+        run: dart pub get
       - name: Dry run publish
         run: |
           FAIL=0
@@ -87,7 +87,7 @@ jobs:
             code=$?
             set -e
             echo "::endgroup::"
-            # 0 = clean, 65 = warnings only (for example: local path overrides, CHANGELOG).
+            # 0 = clean, 65 = warnings only (for example: CHANGELOG, version jump).
             if [ $code -eq 65 ]; then
               echo "::warning::$dir: dry run has warnings. Open the log group to read them."
             elif [ $code -ne 0 ]; then

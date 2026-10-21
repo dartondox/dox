@@ -2,7 +2,7 @@ import 'dart:io';
 
 import '../utils/utils.dart';
 
-String _getSample(className, filename) {
+String _getSample(String className, String filename) {
   return '''
 import 'package:dox_core/dox_core.dart';
 

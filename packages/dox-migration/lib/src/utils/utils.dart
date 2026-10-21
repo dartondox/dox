@@ -15,7 +15,8 @@ Future<void> createMigrationTableIfNotExist(DbConnection conn) async {
   String id = conn.isSqlite
       ? 'INTEGER PRIMARY KEY AUTOINCREMENT'
       : 'SERIAL PRIMARY KEY NOT NULL';
-  String query = '''
+  String query =
+      '''
       CREATE TABLE IF NOT EXISTS dox_db_migration 
       (
         id $id, 

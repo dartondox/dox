@@ -13,8 +13,11 @@ class RedisEnv {
   /// True when a TCP connection to Redis works.
   static Future<bool> isReachable() async {
     try {
-      Socket socket =
-          await Socket.connect(host, port, timeout: const Duration(seconds: 1));
+      Socket socket = await Socket.connect(
+        host,
+        port,
+        timeout: const Duration(seconds: 1),
+      );
       socket.destroy();
       return true;
     } on SocketException {

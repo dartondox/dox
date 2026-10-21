@@ -47,8 +47,9 @@ class DoxCookie {
   /// cookie.get();
   /// ```
   String get() {
-    String val =
-        encrypt ? AESEncryptor.encode(value, Dox().config.appKey) : value;
+    String val = encrypt
+        ? AESEncryptor.encode(value, Dox().config.appKey)
+        : value;
 
     Cookie cookie = Cookie(key, val);
     cookie.maxAge = maxAge.inSeconds;

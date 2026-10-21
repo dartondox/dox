@@ -33,9 +33,7 @@ void main() {
 
     test('date response', () async {
       Route.get('/date/response/json', (DoxRequest req, String name) {
-        return <String, dynamic>{
-          'date': DateTime(2023),
-        };
+        return <String, dynamic>{'date': DateTime(2023)};
       });
 
       /// response DateTime in json

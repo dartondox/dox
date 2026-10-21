@@ -1,3 +1,9 @@
+## Unreleased
+
+- Needs Dart 3.13 or newer.
+- All dependencies updated to their latest versions.
+- `WebsocketAdapterInterface.emit` now has a `void` return type.
+
 ## 3.0.0-alpha.1
 
 - Version 3 of Dox. All Dox packages now share one version.

@@ -236,8 +236,13 @@ class FileSchema extends Schema<FileInput>
 
   /// Must be an image (jpg, png, gif and more).
   FileSchema image({String? message}) {
-    return use(FileExtensionRule(SchemaConstants.imageExtensions,
-        code: IssueCodes.image, message: message));
+    return use(
+      FileExtensionRule(
+        SchemaConstants.imageExtensions,
+        code: IssueCodes.image,
+        message: message,
+      ),
+    );
   }
 
   @override

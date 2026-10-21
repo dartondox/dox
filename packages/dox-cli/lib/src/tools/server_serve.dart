@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:watcher/watcher.dart';
 
-serverServe() async {
+Future<void> serverServe() async {
   DirectoryWatcher watcher = DirectoryWatcher(Directory.current.path);
   Timer? timer;
   Process? process;
@@ -31,7 +31,7 @@ serverServe() async {
   });
 }
 
-Future<Process> _startServer([message]) async {
+Future<Process> _startServer([String? message]) async {
   if (message != null) {
     print('\x1B[34m[Dox] $message..\x1B[0m');
   }
@@ -56,7 +56,7 @@ Future<Process> _startServer([message]) async {
   return process;
 }
 
-watchBuilder() async {
+Future<Process> watchBuilder() async {
   var process = await Process.start('dart', ['run', 'build_runner', 'watch']);
 
   process.stderr.transform(utf8.decoder).listen((data) {
@@ -70,7 +70,7 @@ watchBuilder() async {
   return process;
 }
 
-buildBuilder() async {
+Future<void> buildBuilder() async {
   var process = await Process.start('dart', ['run', 'build_runner', 'build']);
   process.stdout.transform(utf8.decoder).listen((data) {
     List lines = data.split("\n");
@@ -89,15 +89,20 @@ buildBuilder() async {
 
 /// AOT compile the app for production.
 ///
-/// output:
-///   build/server              native binary (no Dart SDK needed to run)
-///   build/db/                 migrations, read at start
-///   build/.env.example        copy it to build/.env or set env vars
+/// output (a `dart build cli` bundle):
+///   build/bundle/bin/server     native binary (no Dart SDK needed to run)
+///   build/bundle/lib/           native libraries from build hooks (eg. SQLite)
+///   build/bundle/db/            migrations, read at start
+///   build/bundle/.env.example   copy it to .env or set env vars
+///
+/// `dart compile exe` can not build packages with build hooks (sqlite3 v3),
+/// so this uses `dart build cli`. It is the same AOT compiler.
 ///
 /// `dart run` (used by `dox serve`) is JIT: more memory and slower start.
 /// never run production with it.
 Future<void> buildServer() async {
-  bool usesBuildRunner = File('pubspec.yaml').existsSync() &&
+  bool usesBuildRunner =
+      File('pubspec.yaml').existsSync() &&
       File('pubspec.yaml').readAsStringSync().contains('build_runner');
   if (usesBuildRunner &&
       await _run('dart', <String>[
@@ -111,31 +116,40 @@ Future<void> buildServer() async {
     return;
   }
 
-  Directory('build').createSync(recursive: true);
   if (await _run('dart', <String>[
-        'compile',
-        'exe',
+        'build',
+        'cli',
+        '--target',
         'bin/server.dart',
-        '-o',
-        'build/server',
+        '--output',
+        'build',
       ]) !=
       0) {
     exitCode = 1;
     return;
   }
 
-  if (Directory('db').existsSync()) _copyDir(Directory('db'), 'build/db');
+  Directory oldDb = Directory('build/bundle/db');
+  if (oldDb.existsSync()) oldDb.deleteSync(recursive: true);
+  if (Directory('db').existsSync()) {
+    _copyDir(Directory('db'), 'build/bundle/db');
+  }
   if (File('.env.example').existsSync()) {
-    File('.env.example').copySync('build/.env.example');
+    File('.env.example').copySync('build/bundle/.env.example');
   }
   print(
-      '\x1B[32m[Dox] Built build/server. Run it with: cd build && ./server\x1B[0m');
+    '\x1B[32m[Dox] Built build/bundle. Run it with: '
+    'cd build/bundle && ./bin/server\x1B[0m',
+  );
 }
 
 /// run a command with its output shown, return the exit code
 Future<int> _run(String command, List<String> args) async {
-  Process process =
-      await Process.start(command, args, mode: ProcessStartMode.inheritStdio);
+  Process process = await Process.start(
+    command,
+    args,
+    mode: ProcessStartMode.inheritStdio,
+  );
   return process.exitCode;
 }
 

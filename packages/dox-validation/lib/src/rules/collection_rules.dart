@@ -6,9 +6,12 @@ import 'built_in_rule.dart';
 /// List must have at least [min] items.
 class MinItemsRule<T> extends BuiltInRule<List<T>> {
   MinItemsRule(this.min, {super.message})
-      : super(IssueCodes.minItems, DefaultMessages.minItems,
-            params: <String, Object?>{'min': min},
-            json: <String, dynamic>{'minItems': min});
+    : super(
+        IssueCodes.minItems,
+        DefaultMessages.minItems,
+        params: <String, Object?>{'min': min},
+        json: <String, dynamic>{'minItems': min},
+      );
 
   final int min;
 
@@ -21,9 +24,12 @@ class MinItemsRule<T> extends BuiltInRule<List<T>> {
 /// List may have at most [max] items.
 class MaxItemsRule<T> extends BuiltInRule<List<T>> {
   MaxItemsRule(this.max, {super.message})
-      : super(IssueCodes.maxItems, DefaultMessages.maxItems,
-            params: <String, Object?>{'max': max},
-            json: <String, dynamic>{'maxItems': max});
+    : super(
+        IssueCodes.maxItems,
+        DefaultMessages.maxItems,
+        params: <String, Object?>{'max': max},
+        json: <String, dynamic>{'maxItems': max},
+      );
 
   final int max;
 
@@ -36,8 +42,11 @@ class MaxItemsRule<T> extends BuiltInRule<List<T>> {
 /// Date must be on or after [date].
 class AfterOrEqualRule extends BuiltInRule<DateTime> {
   AfterOrEqualRule(this.date, {super.message})
-      : super(IssueCodes.afterOrEqual, DefaultMessages.afterOrEqual,
-            params: <String, Object?>{'date': date});
+    : super(
+        IssueCodes.afterOrEqual,
+        DefaultMessages.afterOrEqual,
+        params: <String, Object?>{'date': date},
+      );
 
   final DateTime date;
 
@@ -50,8 +59,11 @@ class AfterOrEqualRule extends BuiltInRule<DateTime> {
 /// Date must be on or before [date].
 class BeforeOrEqualRule extends BuiltInRule<DateTime> {
   BeforeOrEqualRule(this.date, {super.message})
-      : super(IssueCodes.beforeOrEqual, DefaultMessages.beforeOrEqual,
-            params: <String, Object?>{'date': date});
+    : super(
+        IssueCodes.beforeOrEqual,
+        DefaultMessages.beforeOrEqual,
+        params: <String, Object?>{'date': date},
+      );
 
   final DateTime date;
 
@@ -63,10 +75,15 @@ class BeforeOrEqualRule extends BuiltInRule<DateTime> {
 
 /// File extension must be one of [extensions].
 class FileExtensionRule extends BuiltInRule<FileInput> {
-  FileExtensionRule(this.extensions,
-      {String code = IssueCodes.file, super.message})
-      : super(code, DefaultMessages.file,
-            params: <String, Object?>{'extensions': extensions.join(', ')});
+  FileExtensionRule(
+    this.extensions, {
+    String code = IssueCodes.file,
+    super.message,
+  }) : super(
+         code,
+         DefaultMessages.file,
+         params: <String, Object?>{'extensions': extensions.join(', ')},
+       );
 
   final List<String> extensions;
 

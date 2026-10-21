@@ -3,6 +3,62 @@ publish_to: 'none'
 version: 3.0.0-alpha.1
 
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.13.0
+
+# Dart pub workspace: one `dart pub get` at the root links all packages
+# and writes one pubspec.lock.
+workspace:
+  - packages/dox-annotation
+  - packages/dox-app
+  - packages/dox-auth
+  - packages/dox-builder
+  - packages/dox-cache
+  - packages/dox-cli
+  - packages/dox-core
+  - packages/dox-migration
+  - packages/dox-openapi
+  - packages/dox-orm
+  - packages/dox-query-builder
+  - packages/dox-socketio
+  - packages/dox-storage
+  - packages/dox-validation
+  - packages/dox-websocket
+
 dev_dependencies:
-  melos: ^3.2.0
+  melos: ^8.9.0
+
+melos:
+  command:
+    run:
+      # scripts run on all matching packages, no package prompt
+      noSelect: true
+
+  # `melos test` is a built-in command in melos 8. Use `melos run test`.
+  scripts:
+    analyze:
+      exec: dart analyze --fatal-infos .
+
+    format_check:
+      run: dart format --output=none --set-exit-if-changed .
+
+    test:
+      exec: dart test --concurrency=1
+      packageFilters:
+        dirExists: test
+        ignore:
+          - dox_orm
+
+    test_pg:
+      exec: DRIVER=postgres dart test --concurrency=1
+      packageFilters:
+        scope: dox_orm
+
+    test_mysql:
+      exec: DRIVER=mysql dart test --concurrency=1
+      packageFilters:
+        scope: dox_orm
+
+    test_sqlite:
+      exec: DRIVER=sqlite dart test --concurrency=1
+      packageFilters:
+        scope: dox_orm

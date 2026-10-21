@@ -20,9 +20,7 @@ class AuthController {
       }).header('Authorization', token);
     }
 
-    return <String, dynamic>{
-      'success': false,
-    };
+    return <String, dynamic>{'success': false};
   }
 
   Future<dynamic> register(DoxRequest req) async {

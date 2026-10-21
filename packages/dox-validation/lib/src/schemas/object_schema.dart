@@ -64,8 +64,10 @@ class ObjectSchema extends Schema<Map<String, dynamic>>
 
   /// Add or replace keys.
   ObjectSchema extend(Map<String, Schema<Object?>> more) {
-    return _withShape(
-        <String, Schema<Object?>>{...shape, ...more}, unknownKeys);
+    return _withShape(<String, Schema<Object?>>{
+      ...shape,
+      ...more,
+    }, unknownKeys);
   }
 
   /// Keep only [keys].
@@ -94,8 +96,9 @@ class ObjectSchema extends Schema<Map<String, dynamic>>
     Map<String, Schema<Object?>> next = <String, Schema<Object?>>{};
     for (MapEntry<String, Schema<Object?>> entry in shape.entries) {
       Schema<Object?> child = entry.value;
-      next[entry.key] =
-          child.isOptional ? child : OptionalSchema<Object?>(child);
+      next[entry.key] = child.isOptional
+          ? child
+          : OptionalSchema<Object?>(child);
     }
     return _withShape(next, unknownKeys);
   }
@@ -116,7 +119,10 @@ class ObjectSchema extends Schema<Map<String, dynamic>>
     Map<String, dynamic> output = <String, dynamic>{};
     for (MapEntry<String, Schema<Object?>> entry in shape.entries) {
       Object? value = entry.value.parseValue(
-          _read(input, entry.key), state, <Object>[...path, entry.key]);
+        _read(input, entry.key),
+        state,
+        <Object>[...path, entry.key],
+      );
       _put(output, entry.key, value);
     }
     _unknown(input, output, state, path);
@@ -136,7 +142,10 @@ class ObjectSchema extends Schema<Map<String, dynamic>>
     Map<String, dynamic> output = <String, dynamic>{};
     for (MapEntry<String, Schema<Object?>> entry in shape.entries) {
       Object? value = await entry.value.parseValueAsync(
-          _read(input, entry.key), state, <Object>[...path, entry.key]);
+        _read(input, entry.key),
+        state,
+        <Object>[...path, entry.key],
+      );
       _put(output, entry.key, value);
     }
     _unknown(input, output, state, path);

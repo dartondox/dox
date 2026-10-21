@@ -5,7 +5,7 @@ import 'sentinels.dart';
 /// Data shared by every schema during one parse call.
 class ParseState {
   ParseState({required this.root, MessageResolver? resolver})
-      : resolver = resolver ?? MessageResolver.global;
+    : resolver = resolver ?? MessageResolver.global;
 
   /// The whole input given to `parse`. Rules use it to read other fields.
   final Object? root;
@@ -36,19 +36,23 @@ class ParseState {
       'value': value is Undefined ? null : value,
       ...params,
     };
-    String text = resolver.resolve(MessageRequest(
-      code: code,
-      path: path,
-      params: allParams,
-      fallback: fallback,
-      customMessage: message,
-    ));
-    issues.add(ValidationIssue(
-      path: List<Object>.unmodifiable(path),
-      code: code,
-      message: text,
-      params: allParams,
-    ));
+    String text = resolver.resolve(
+      MessageRequest(
+        code: code,
+        path: path,
+        params: allParams,
+        fallback: fallback,
+        customMessage: message,
+      ),
+    );
+    issues.add(
+      ValidationIssue(
+        path: List<Object>.unmodifiable(path),
+        code: code,
+        message: text,
+        params: allParams,
+      ),
+    );
   }
 
   /// The name used for `{field}`: the last text key in the path.

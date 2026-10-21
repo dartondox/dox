@@ -14,8 +14,8 @@ class MemoryDriver extends CacheDriver {
   MemoryDriver({
     this.prefix = CacheConstants.defaultPrefix,
     this.maxSize,
-    CacheClock clock = const CacheClock(),
-  }) : _clock = clock;
+    this._clock = const CacheClock(),
+  });
 
   @override
   final String prefix;
@@ -172,7 +172,8 @@ class MemoryDriverFactory implements CacheDriverFactory {
   @override
   CacheDriver create(Map<String, dynamic> options) {
     return MemoryDriver(
-      prefix: options[CacheConstants.prefixOption] as String? ??
+      prefix:
+          options[CacheConstants.prefixOption] as String? ??
           CacheConstants.defaultPrefix,
       maxSize: options[CacheConstants.maxSizeOption] as int?,
       clock: _clock,

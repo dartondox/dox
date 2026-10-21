@@ -158,15 +158,20 @@ class Route {
   ///   socket.on('intro', controller);
   /// });
   /// ```
-  static void websocket(String route, Function(WebsocketEvent) callback,
-      {List<dynamic> middleware = const <dynamic>[]}) {
+  static void websocket(
+    String route,
+    Function(WebsocketEvent) callback, {
+    List<dynamic> middleware = const <dynamic>[],
+  }) {
     IDoxWebsocket? ws = Dox().websocket;
     if (ws == null) {
       throw Exception('websocket is not registered');
     }
     WebsocketEvent event = ws.create();
-    Route()._addRoute(HttpRequestMethod.GET, Route()._prefix + route,
-        <dynamic>[...middleware, event.handle]);
+    Route()._addRoute(HttpRequestMethod.GET, Route()._prefix + route, <dynamic>[
+      ...middleware,
+      event.handle,
+    ]);
     callback(event);
   }
 
@@ -175,8 +180,11 @@ class Route {
   /// Route.get('path', controller);
   /// ```
   static Route get(String route, dynamic controller) {
-    return Route()
-        ._addRoute(HttpRequestMethod.GET, Route()._prefix + route, controller);
+    return Route()._addRoute(
+      HttpRequestMethod.GET,
+      Route()._prefix + route,
+      controller,
+    );
   }
 
   /// post route
@@ -184,8 +192,11 @@ class Route {
   /// Route.post('path', controller);
   ///
   static Route post(String route, dynamic controller, {Function? request}) {
-    return Route()
-        ._addRoute(HttpRequestMethod.POST, Route()._prefix + route, controller);
+    return Route()._addRoute(
+      HttpRequestMethod.POST,
+      Route()._prefix + route,
+      controller,
+    );
   }
 
   /// put route
@@ -193,8 +204,11 @@ class Route {
   /// Route.put('path', controller);
   ///
   static Route put(String route, dynamic controller) {
-    return Route()
-        ._addRoute(HttpRequestMethod.PUT, Route()._prefix + route, controller);
+    return Route()._addRoute(
+      HttpRequestMethod.PUT,
+      Route()._prefix + route,
+      controller,
+    );
   }
 
   /// delete route
@@ -203,7 +217,10 @@ class Route {
   ///
   static Route delete(String route, dynamic controller) {
     return Route()._addRoute(
-        HttpRequestMethod.DELETE, Route()._prefix + route, controller);
+      HttpRequestMethod.DELETE,
+      Route()._prefix + route,
+      controller,
+    );
   }
 
   /// purge route
@@ -212,7 +229,10 @@ class Route {
   ///
   static Route purge(String route, dynamic controller) {
     return Route()._addRoute(
-        HttpRequestMethod.PURGE, Route()._prefix + route, controller);
+      HttpRequestMethod.PURGE,
+      Route()._prefix + route,
+      controller,
+    );
   }
 
   /// patch route
@@ -221,7 +241,10 @@ class Route {
   ///
   static Route patch(String route, dynamic controller) {
     return Route()._addRoute(
-        HttpRequestMethod.PATCH, Route()._prefix + route, controller);
+      HttpRequestMethod.PATCH,
+      Route()._prefix + route,
+      controller,
+    );
   }
 
   /// options route
@@ -230,7 +253,10 @@ class Route {
   ///
   static Route options(String route, dynamic controller) {
     return Route()._addRoute(
-        HttpRequestMethod.OPTIONS, Route()._prefix + route, controller);
+      HttpRequestMethod.OPTIONS,
+      Route()._prefix + route,
+      controller,
+    );
   }
 
   /// copy route
@@ -238,8 +264,11 @@ class Route {
   /// Route.copy('path', controller);
   ///
   static Route copy(String route, dynamic controller) {
-    return Route()
-        ._addRoute(HttpRequestMethod.COPY, Route()._prefix + route, controller);
+    return Route()._addRoute(
+      HttpRequestMethod.COPY,
+      Route()._prefix + route,
+      controller,
+    );
   }
 
   /// view route
@@ -247,8 +276,11 @@ class Route {
   /// Route.view('path', controller);
   ///
   static Route view(String route, dynamic controller) {
-    return Route()
-        ._addRoute(HttpRequestMethod.VIEW, Route()._prefix + route, controller);
+    return Route()._addRoute(
+      HttpRequestMethod.VIEW,
+      Route()._prefix + route,
+      controller,
+    );
   }
 
   /// link route
@@ -256,8 +288,11 @@ class Route {
   /// Route.link('path', controller);
   ///
   static Route link(String route, dynamic controller) {
-    return Route()
-        ._addRoute(HttpRequestMethod.LINK, Route()._prefix + route, controller);
+    return Route()._addRoute(
+      HttpRequestMethod.LINK,
+      Route()._prefix + route,
+      controller,
+    );
   }
 
   /// unlink route
@@ -266,7 +301,10 @@ class Route {
   ///
   static Route unlink(String route, dynamic controller) {
     return Route()._addRoute(
-        HttpRequestMethod.UNLINK, Route()._prefix + route, controller);
+      HttpRequestMethod.UNLINK,
+      Route()._prefix + route,
+      controller,
+    );
   }
 
   /// lock route
@@ -274,8 +312,11 @@ class Route {
   /// Route.lock('path', controller);
   ///
   static Route lock(String route, dynamic controller) {
-    return Route()
-        ._addRoute(HttpRequestMethod.LOCK, Route()._prefix + route, controller);
+    return Route()._addRoute(
+      HttpRequestMethod.LOCK,
+      Route()._prefix + route,
+      controller,
+    );
   }
 
   /// unlock route
@@ -284,7 +325,10 @@ class Route {
   ///
   static Route unlock(String route, dynamic controller) {
     return Route()._addRoute(
-        HttpRequestMethod.UNLOCK, Route()._prefix + route, controller);
+      HttpRequestMethod.UNLOCK,
+      Route()._prefix + route,
+      controller,
+    );
   }
 
   /// propfind route
@@ -293,7 +337,10 @@ class Route {
   ///
   static Route propfind(String route, dynamic controller) {
     return Route()._addRoute(
-        HttpRequestMethod.PROPFIND, Route()._prefix + route, controller);
+      HttpRequestMethod.PROPFIND,
+      Route()._prefix + route,
+      controller,
+    );
   }
 
   /// resource route
@@ -311,7 +358,10 @@ class Route {
     /// GET /resource/create
     try {
       Route()._addRoute(
-          HttpRequestMethod.GET, '$prefix/create', controller.create);
+        HttpRequestMethod.GET,
+        '$prefix/create',
+        controller.create,
+      );
     } catch (error) {}
 
     /// POST /resource
@@ -327,25 +377,37 @@ class Route {
     /// GET /resource/{id}/edit
     try {
       Route()._addRoute(
-          HttpRequestMethod.GET, '$prefix/{id}/edit', controller.edit);
+        HttpRequestMethod.GET,
+        '$prefix/{id}/edit',
+        controller.edit,
+      );
     } catch (error) {}
 
     /// PUT /resource/{id}
     try {
-      Route()
-          ._addRoute(HttpRequestMethod.PUT, '$prefix/{id}', controller.update);
+      Route()._addRoute(
+        HttpRequestMethod.PUT,
+        '$prefix/{id}',
+        controller.update,
+      );
     } catch (error) {}
 
     /// PATCH /resource/{id}
     try {
       Route()._addRoute(
-          HttpRequestMethod.PATCH, '$prefix/{id}', controller.update);
+        HttpRequestMethod.PATCH,
+        '$prefix/{id}',
+        controller.update,
+      );
     } catch (error) {}
 
     /// DELETE /resource/{id}
     try {
       Route()._addRoute(
-          HttpRequestMethod.DELETE, '$prefix/{id}', controller.destroy);
+        HttpRequestMethod.DELETE,
+        '$prefix/{id}',
+        controller.destroy,
+      );
     } catch (error) {}
 
     return Route();
@@ -361,13 +423,15 @@ class Route {
     if (controller is List) {
       controllers.addAll(controller);
     }
-    _routes.add(RouteData(
-      method: method.name,
-      path: path,
-      controllers: controllers,
-      domain: _domain,
-      corsEnabled: _corsEnabled,
-    ));
+    _routes.add(
+      RouteData(
+        method: method.name,
+        path: path,
+        controllers: controllers,
+        domain: _domain,
+        corsEnabled: _corsEnabled,
+      ),
+    );
     return this;
   }
 }

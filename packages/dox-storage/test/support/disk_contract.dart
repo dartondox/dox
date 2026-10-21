@@ -66,8 +66,11 @@ void runDiskContract(
       expect(
         disk.get('missing.txt'),
         throwsA(
-          isA<FileNotFoundException>()
-              .having((FileNotFoundException e) => e.key, 'key', 'missing.txt'),
+          isA<FileNotFoundException>().having(
+            (FileNotFoundException e) => e.key,
+            'key',
+            'missing.txt',
+          ),
         ),
       );
     });
@@ -145,8 +148,10 @@ void runDiskContract(
       await disk.put('x/1.txt', '1');
       await disk.put('2.txt', '2');
       await disk.deleteAll();
-      ListResult result =
-          await disk.listAll('', const ListOptions(recursive: true));
+      ListResult result = await disk.listAll(
+        '',
+        const ListOptions(recursive: true),
+      );
       expect(result.objects, isEmpty);
     });
 
@@ -189,8 +194,10 @@ void runDiskContract(
       await disk.put('docs/a.txt', 'a');
       await disk.put('docs/sub/c.txt', 'c');
       await disk.put('other.txt', 'o');
-      ListResult result =
-          await disk.listAll('docs', const ListOptions(recursive: true));
+      ListResult result = await disk.listAll(
+        'docs',
+        const ListOptions(recursive: true),
+      );
       expect(_describe(result), <String>[
         'file:docs/a.txt',
         'file:docs/sub/c.txt',
@@ -244,9 +251,13 @@ void runDiskContract(
 
     test('path traversal and absolute keys are rejected', () async {
       expect(
-          disk.put('../escape.txt', 'x'), throwsA(isA<InvalidKeyException>()));
+        disk.put('../escape.txt', 'x'),
+        throwsA(isA<InvalidKeyException>()),
+      );
       expect(
-          disk.get('a/../../etc/passwd'), throwsA(isA<InvalidKeyException>()));
+        disk.get('a/../../etc/passwd'),
+        throwsA(isA<InvalidKeyException>()),
+      );
       expect(disk.get('/etc/passwd'), throwsA(isA<InvalidKeyException>()));
       expect(disk.get(r'..\windows'), throwsA(isA<InvalidKeyException>()));
       expect(disk.deleteAll('..'), throwsA(isA<InvalidKeyException>()));

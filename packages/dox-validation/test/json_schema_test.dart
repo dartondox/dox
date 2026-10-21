@@ -5,17 +5,21 @@ void main() {
   group('toJsonSchema |', () {
     test('string with formats and lengths', () {
       expect(
-          v.string().min(3).max(50).email().toJsonSchema(), <String, dynamic>{
-        'type': 'string',
-        'minLength': 3,
-        'maxLength': 50,
-        'format': 'email',
-      });
+        v.string().min(3).max(50).email().toJsonSchema(),
+        <String, dynamic>{
+          'type': 'string',
+          'minLength': 3,
+          'maxLength': 50,
+          'format': 'email',
+        },
+      );
       expect(v.string().uuid().toJsonSchema()['format'], 'uuid');
       expect(v.string().url().toJsonSchema()['format'], 'uri');
       expect(v.string().datetime().toJsonSchema()['format'], 'date-time');
-      expect(v.string().regex(RegExp(r'^\d+$')).toJsonSchema()['pattern'],
-          r'^\d+$');
+      expect(
+        v.string().regex(RegExp(r'^\d+$')).toJsonSchema()['pattern'],
+        r'^\d+$',
+      );
     });
 
     test('numbers', () {
@@ -25,29 +29,38 @@ void main() {
         'maximum': 10,
       });
       expect(
-          v.num().gt(0).lt(1).multipleOf(0.5).toJsonSchema(), <String, dynamic>{
-        'type': 'number',
-        'exclusiveMinimum': 0,
-        'exclusiveMaximum': 1,
-        'multipleOf': 0.5,
-      });
+        v.num().gt(0).lt(1).multipleOf(0.5).toJsonSchema(),
+        <String, dynamic>{
+          'type': 'number',
+          'exclusiveMinimum': 0,
+          'exclusiveMaximum': 1,
+          'multipleOf': 0.5,
+        },
+      );
     });
 
     test('bool, date, enum, literal, any, file', () {
       expect(v.bool().toJsonSchema(), <String, dynamic>{'type': 'boolean'});
-      expect(v.date().toJsonSchema(),
-          <String, dynamic>{'type': 'string', 'format': 'date-time'});
+      expect(v.date().toJsonSchema(), <String, dynamic>{
+        'type': 'string',
+        'format': 'date-time',
+      });
       expect(
-          v.enumOf<String>(<String>['a', 'b']).toJsonSchema(),
-          <String, dynamic>{
-            'type': 'string',
-            'enum': <String>['a', 'b'],
-          });
-      expect(v.literal<int>(1).toJsonSchema(),
-          <String, dynamic>{'type': 'integer', 'const': 1});
+        v.enumOf<String>(<String>['a', 'b']).toJsonSchema(),
+        <String, dynamic>{
+          'type': 'string',
+          'enum': <String>['a', 'b'],
+        },
+      );
+      expect(v.literal<int>(1).toJsonSchema(), <String, dynamic>{
+        'type': 'integer',
+        'const': 1,
+      });
       expect(v.any().toJsonSchema(), <String, dynamic>{});
-      expect(v.file().toJsonSchema(),
-          <String, dynamic>{'type': 'string', 'format': 'binary'});
+      expect(v.file().toJsonSchema(), <String, dynamic>{
+        'type': 'string',
+        'format': 'binary',
+      });
     });
 
     test('nullable, default, describe, example', () {
@@ -55,30 +68,30 @@ void main() {
         'type': <String>['string', 'null'],
       });
       expect(
-          v.enumOf<String>(<String>['a']).nullable().toJsonSchema(),
-          <String, dynamic>{
-            'anyOf': <Map<String, dynamic>>[
-              <String, dynamic>{
-                'type': 'string',
-                'enum': <String>['a'],
-              },
-              <String, dynamic>{'type': 'null'},
-            ],
-          });
+        v.enumOf<String>(<String>['a']).nullable().toJsonSchema(),
+        <String, dynamic>{
+          'anyOf': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'type': 'string',
+              'enum': <String>['a'],
+            },
+            <String, dynamic>{'type': 'null'},
+          ],
+        },
+      );
       expect(
-          v.int()
-              .defaultTo(1)
-              .describe('Page number')
-              .example(2)
-              .toJsonSchema(),
-          <String, dynamic>{
-            'type': 'integer',
-            'default': 1,
-            'description': 'Page number',
-            'examples': <int>[2],
-          });
-      expect(v.date().defaultTo(DateTime.utc(2024)).toJsonSchema()['default'],
-          '2024-01-01T00:00:00.000Z');
+        v.int().defaultTo(1).describe('Page number').example(2).toJsonSchema(),
+        <String, dynamic>{
+          'type': 'integer',
+          'default': 1,
+          'description': 'Page number',
+          'examples': <int>[2],
+        },
+      );
+      expect(
+        v.date().defaultTo(DateTime.utc(2024)).toJsonSchema()['default'],
+        '2024-01-01T00:00:00.000Z',
+      );
     });
 
     test('object with required list and strict', () {
@@ -124,19 +137,21 @@ void main() {
 
     test('union', () {
       expect(
-          v.union<Object?>(
-              <Schema<Object?>>[v.string(), v.int()]).toJsonSchema(),
-          <String, dynamic>{
-            'anyOf': <Map<String, dynamic>>[
-              <String, dynamic>{'type': 'string'},
-              <String, dynamic>{'type': 'integer'},
-            ],
-          });
+        v.union<Object?>(<Schema<Object?>>[v.string(), v.int()]).toJsonSchema(),
+        <String, dynamic>{
+          'anyOf': <Map<String, dynamic>>[
+            <String, dynamic>{'type': 'string'},
+            <String, dynamic>{'type': 'integer'},
+          ],
+        },
+      );
     });
 
     test('transform shows the input shape', () {
-      expect(v.string().transform<int>(int.parse).toJsonSchema(),
-          <String, dynamic>{'type': 'string'});
+      expect(
+        v.string().transform<int>(int.parse).toJsonSchema(),
+        <String, dynamic>{'type': 'string'},
+      );
     });
 
     test('fromRules', () {

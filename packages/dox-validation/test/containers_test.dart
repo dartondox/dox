@@ -9,8 +9,11 @@ void main() {
     });
 
     test('issue path has the index', () {
-      ParseResult<List<int>> result =
-          v.list(v.int()).safeParse(<Object>[1, 'x', 3]);
+      ParseResult<List<int>> result = v.list(v.int()).safeParse(<Object>[
+        1,
+        'x',
+        3,
+      ]);
       expect(result.issues.single.path, <Object>[1]);
     });
 
@@ -21,17 +24,17 @@ void main() {
     });
 
     test('rejects non list', () {
-      expect(v.list(v.int()).safeParse('x').issues.first.message,
-          'The value must be an array');
+      expect(
+        v.list(v.int()).safeParse('x').issues.first.message,
+        'The value must be an array',
+      );
     });
   });
 
   group('object |', () {
     ObjectSchema user = v.object(<String, Schema<Object?>>{
       'name': v.string().min(2),
-      'address': v.object(<String, Schema<Object?>>{
-        'city': v.string(),
-      }),
+      'address': v.object(<String, Schema<Object?>>{'city': v.string()}),
       'tags': v.list(v.string()),
     });
 
@@ -45,12 +48,13 @@ void main() {
     });
 
     test('nested paths in issues', () {
-      ParseResult<Map<String, dynamic>> result =
-          user.safeParse(<String, dynamic>{
-        'name': 'd',
-        'address': <String, dynamic>{'city': 5},
-        'tags': <Object>['a', 2],
-      });
+      ParseResult<Map<String, dynamic>> result = user.safeParse(
+        <String, dynamic>{
+          'name': 'd',
+          'address': <String, dynamic>{'city': 5},
+          'tags': <Object>['a', 2],
+        },
+      );
       expect(result.errors, <String, String>{
         'name': 'The name must be at least 2 character',
         'address.city': 'The city must be a string',
@@ -75,19 +79,25 @@ void main() {
 
     test('strip is default', () {
       ObjectSchema s = v.object(<String, Schema<Object?>>{'a': v.int()});
-      expect(s.parse(<String, dynamic>{'a': 1, 'b': 2}),
-          <String, dynamic>{'a': 1});
+      expect(s.parse(<String, dynamic>{'a': 1, 'b': 2}), <String, dynamic>{
+        'a': 1,
+      });
     });
 
     test('strict and passthrough', () {
       ObjectSchema s = v.object(<String, Schema<Object?>>{'a': v.int()});
-      ParseResult<Map<String, dynamic>> result =
-          s.strict().safeParse(<String, dynamic>{'a': 1, 'b': 2, 'c': 3});
+      ParseResult<Map<String, dynamic>> result = s.strict().safeParse(
+        <String, dynamic>{'a': 1, 'b': 2, 'c': 3},
+      );
       expect(result.issues.single.code, IssueCodes.unrecognizedKeys);
       expect(
-          result.issues.single.message, 'The value has unknown keys: b, and c');
-      expect(s.passthrough().parse(<String, dynamic>{'a': 1, 'b': 2}),
-          <String, dynamic>{'a': 1, 'b': 2});
+        result.issues.single.message,
+        'The value has unknown keys: b, and c',
+      );
+      expect(
+        s.passthrough().parse(<String, dynamic>{'a': 1, 'b': 2}),
+        <String, dynamic>{'a': 1, 'b': 2},
+      );
     });
 
     test('pick, omit, extend, partial', () {
@@ -97,17 +107,22 @@ void main() {
       });
       expect(base.pick(<String>['a']).shape.keys, <String>['a']);
       expect(base.omit(<String>['a']).shape.keys, <String>['b']);
-      expect(base.extend(<String, Schema<Object?>>{'c': v.int()}).shape.keys,
-          <String>['a', 'b', 'c']);
+      expect(
+        base.extend(<String, Schema<Object?>>{'c': v.int()}).shape.keys,
+        <String>['a', 'b', 'c'],
+      );
       expect(base.partial().safeParse(<String, dynamic>{}).success, true);
       expect(
-          base.partial().safeParse(<String, dynamic>{'a': 'x'}).success, false);
+        base.partial().safeParse(<String, dynamic>{'a': 'x'}).success,
+        false,
+      );
     });
 
     test('accepts Map with other generic types', () {
       ObjectSchema s = v.object(<String, Schema<Object?>>{'a': v.string()});
-      expect(
-          s.parse(<dynamic, dynamic>{'a': 'x'}), <String, dynamic>{'a': 'x'});
+      expect(s.parse(<dynamic, dynamic>{'a': 'x'}), <String, dynamic>{
+        'a': 'x',
+      });
     });
   });
 
@@ -115,8 +130,10 @@ void main() {
     test('checks every value', () {
       MapSchema<int> s = v.map(v.int());
       expect(s.parse(<String, int>{'a': 1}), <String, int>{'a': 1});
-      expect(s.safeParse(<String, Object>{'a': 1, 'b': 'x'}).errors.keys,
-          <String>['b']);
+      expect(
+        s.safeParse(<String, Object>{'a': 1, 'b': 'x'}).errors.keys,
+        <String>['b'],
+      );
     });
 
     test('checks keys', () {
@@ -127,8 +144,10 @@ void main() {
   });
 
   group('union |', () {
-    UnionSchema<Object?> s =
-        v.union<Object?>(<Schema<Object?>>[v.string(), v.int()]);
+    UnionSchema<Object?> s = v.union<Object?>(<Schema<Object?>>[
+      v.string(),
+      v.int(),
+    ]);
 
     test('first match wins', () {
       expect(s.parse('a'), 'a');
@@ -142,25 +161,30 @@ void main() {
 
     test('null is required unless an option allows it', () {
       expect(s.safeParse(null).issues.single.code, IssueCodes.required);
-      UnionSchema<Object?> withNull = v.union<Object?>(
-          <Schema<Object?>>[v.string(), v.literal<Object?>(null).nullable()]);
+      UnionSchema<Object?> withNull = v.union<Object?>(<Schema<Object?>>[
+        v.string(),
+        v.literal<Object?>(null).nullable(),
+      ]);
       expect(withNull.safeParse(null).success, true);
     });
 
     test('union of objects', () {
-      UnionSchema<Map<String, dynamic>> shapes =
-          v.union<Map<String, dynamic>>(<Schema<Map<String, dynamic>>>[
-        v.object(<String, Schema<Object?>>{
-          'type': v.literal<String>('circle'),
-          'r': v.num(),
-        }),
-        v.object(<String, Schema<Object?>>{
-          'type': v.literal<String>('square'),
-          'side': v.num(),
-        }),
-      ]);
-      expect(shapes.parse(<String, dynamic>{'type': 'square', 'side': 2}),
-          <String, dynamic>{'type': 'square', 'side': 2});
+      UnionSchema<Map<String, dynamic>> shapes = v.union<Map<String, dynamic>>(
+        <Schema<Map<String, dynamic>>>[
+          v.object(<String, Schema<Object?>>{
+            'type': v.literal<String>('circle'),
+            'r': v.num(),
+          }),
+          v.object(<String, Schema<Object?>>{
+            'type': v.literal<String>('square'),
+            'side': v.num(),
+          }),
+        ],
+      );
+      expect(
+        shapes.parse(<String, dynamic>{'type': 'square', 'side': 2}),
+        <String, dynamic>{'type': 'square', 'side': 2},
+      );
     });
   });
 }

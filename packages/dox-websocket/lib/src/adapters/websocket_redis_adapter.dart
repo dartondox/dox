@@ -11,15 +11,12 @@ class WebsocketRedisAdapter implements WebsocketAdapterInterface {
   final Redis subscriber;
   final Redis publisher;
 
-  WebsocketRedisAdapter({
-    required this.subscriber,
-    required this.publisher,
-  }) {
+  WebsocketRedisAdapter({required this.subscriber, required this.publisher}) {
     listen();
   }
 
   @override
-  emit(WebsocketEmitEvent event) async {
+  Future<void> emit(WebsocketEmitEvent event) async {
     publisher.publish(_channelKey, event.toString());
   }
 

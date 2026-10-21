@@ -112,7 +112,10 @@ class CacheStore {
   /// The cached value, or run [compute], store its result for [ttl]
   /// and return it. [T] should be a JSON type.
   Future<T> remember<T>(
-      String key, Duration? ttl, FutureOr<T> Function() compute) async {
+    String key,
+    Duration? ttl,
+    FutureOr<T> Function() compute,
+  ) async {
     dynamic cached = await get(key);
     if (cached != null) {
       return cached as T;
@@ -124,7 +127,9 @@ class CacheStore {
 
   /// Like [remember], but the value never expires.
   Future<T> rememberForever<T>(
-      String key, FutureOr<T> Function() compute) async {
+    String key,
+    FutureOr<T> Function() compute,
+  ) async {
     return await remember<T>(key, null, compute);
   }
 

@@ -60,8 +60,10 @@ class ListSchema<T> extends Schema<List<T>>
     }
     List<T> output = <T>[];
     for (int i = 0; i < input.length; i++) {
-      Object? value =
-          await item.parseValueAsync(input[i], state, <Object>[...path, i]);
+      Object? value = await item.parseValueAsync(input[i], state, <Object>[
+        ...path,
+        i,
+      ]);
       _add(output, value);
     }
     return output;

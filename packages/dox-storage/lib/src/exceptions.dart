@@ -24,19 +24,19 @@ class StorageException implements Exception {
 /// The file does not exist.
 class FileNotFoundException extends StorageException {
   const FileNotFoundException(String key, {super.cause})
-      : super(key, 'File not found');
+    : super(key, 'File not found');
 }
 
 /// The driver is not allowed to do this (file system permissions, S3 403).
 class PermissionDeniedException extends StorageException {
   const PermissionDeniedException(String key, {super.cause})
-      : super(key, 'Permission denied');
+    : super(key, 'Permission denied');
 }
 
 /// The key is not safe, for example it uses `..` or an absolute path.
 class InvalidKeyException extends StorageException {
   const InvalidKeyException(String key, String reason)
-      : super(key, 'Invalid key: $reason');
+    : super(key, 'Invalid key: $reason');
 }
 
 /// The driver does not support this operation.

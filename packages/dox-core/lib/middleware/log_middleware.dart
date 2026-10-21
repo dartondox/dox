@@ -10,20 +10,14 @@ class LogMiddleware implements IDoxMiddleware {
   final bool withHeader;
   final bool enabled;
 
-  LogMiddleware({
-    required this.enabled,
-    this.filter,
-    this.withHeader = false,
-  });
+  LogMiddleware({required this.enabled, this.filter, this.withHeader = false});
 
   @override
   IDoxRequest handle(IDoxRequest req) {
     if (!enabled) {
       return req;
     }
-    Map<String, dynamic> payload = <String, dynamic>{
-      'request': req.toJson(),
-    };
+    Map<String, dynamic> payload = <String, dynamic>{'request': req.toJson()};
 
     if (withHeader) {
       payload['headers'] = req.headers;
@@ -34,7 +28,7 @@ class LogMiddleware implements IDoxMiddleware {
       'message': '${req.method} ${req.uri.path}',
       'source_ip': req.ip(),
       'timestamp': DateTime.now().toIso8601String(),
-      'payload': payload
+      'payload': payload,
     };
     if (filter != null) {
       text = filter!(text);

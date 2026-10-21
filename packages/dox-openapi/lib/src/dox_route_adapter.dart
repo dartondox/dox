@@ -35,15 +35,17 @@ class DoxRouteAdapter {
         continue;
       }
       List<String> middleware = middlewareNames(r.controllers);
-      docs.add(RouteDoc(
-        method: method,
-        path: path,
-        summary: '${method.toUpperCase()} ${PathConverter.path(path)}',
-        security: _security(middleware),
-        extensions: middleware.isEmpty
-            ? const <String, dynamic>{}
-            : <String, dynamic>{'x-dox-middleware': middleware},
-      ));
+      docs.add(
+        RouteDoc(
+          method: method,
+          path: path,
+          summary: '${method.toUpperCase()} ${PathConverter.path(path)}',
+          security: _security(middleware),
+          extensions: middleware.isEmpty
+              ? const <String, dynamic>{}
+              : <String, dynamic>{'x-dox-middleware': middleware},
+        ),
+      );
       added++;
     }
     return added;

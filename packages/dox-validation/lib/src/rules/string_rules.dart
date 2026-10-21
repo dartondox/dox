@@ -7,9 +7,12 @@ import 'built_in_rule.dart';
 /// Text must have at least [min] characters.
 class MinLengthRule extends BuiltInRule<String> {
   MinLengthRule(this.min, {super.message})
-      : super(IssueCodes.minLength, DefaultMessages.minLength,
-            params: <String, Object?>{'min': min},
-            json: <String, dynamic>{'minLength': min});
+    : super(
+        IssueCodes.minLength,
+        DefaultMessages.minLength,
+        params: <String, Object?>{'min': min},
+        json: <String, dynamic>{'minLength': min},
+      );
 
   final int min;
 
@@ -22,9 +25,12 @@ class MinLengthRule extends BuiltInRule<String> {
 /// Text may have at most [max] characters.
 class MaxLengthRule extends BuiltInRule<String> {
   MaxLengthRule(this.max, {super.message})
-      : super(IssueCodes.maxLength, DefaultMessages.maxLength,
-            params: <String, Object?>{'max': max},
-            json: <String, dynamic>{'maxLength': max});
+    : super(
+        IssueCodes.maxLength,
+        DefaultMessages.maxLength,
+        params: <String, Object?>{'max': max},
+        json: <String, dynamic>{'maxLength': max},
+      );
 
   final int max;
 
@@ -37,9 +43,12 @@ class MaxLengthRule extends BuiltInRule<String> {
 /// Text must have exactly [length] characters.
 class LengthRule extends BuiltInRule<String> {
   LengthRule(this.length, {super.message})
-      : super(IssueCodes.length, DefaultMessages.length,
-            params: <String, Object?>{'length': length},
-            json: <String, dynamic>{'minLength': length, 'maxLength': length});
+    : super(
+        IssueCodes.length,
+        DefaultMessages.length,
+        params: <String, Object?>{'length': length},
+        json: <String, dynamic>{'minLength': length, 'maxLength': length},
+      );
 
   final int length;
 
@@ -57,9 +66,12 @@ class RegexRule extends BuiltInRule<String> {
     String defaultMessage = DefaultMessages.regex,
     Map<String, dynamic>? json,
     super.message,
-  }) : super(code, defaultMessage,
-            params: <String, Object?>{'pattern': pattern.pattern},
-            json: json ?? <String, dynamic>{'pattern': pattern.pattern});
+  }) : super(
+         code,
+         defaultMessage,
+         params: <String, Object?>{'pattern': pattern.pattern},
+         json: json ?? <String, dynamic>{'pattern': pattern.pattern},
+       );
 
   final RegExp pattern;
 
@@ -72,35 +84,44 @@ class RegexRule extends BuiltInRule<String> {
 /// Text must be an email address.
 class EmailRule extends RegexRule {
   EmailRule({super.message})
-      : super(Patterns.email,
-            code: IssueCodes.email,
-            defaultMessage: DefaultMessages.email,
-            json: <String, dynamic>{'format': 'email'});
+    : super(
+        Patterns.email,
+        code: IssueCodes.email,
+        defaultMessage: DefaultMessages.email,
+        json: <String, dynamic>{'format': 'email'},
+      );
 }
 
 /// Text must be a UUID.
 class UuidRule extends RegexRule {
   UuidRule({super.message})
-      : super(Patterns.uuid,
-            code: IssueCodes.uuid,
-            defaultMessage: DefaultMessages.uuid,
-            json: <String, dynamic>{'format': 'uuid'});
+    : super(
+        Patterns.uuid,
+        code: IssueCodes.uuid,
+        defaultMessage: DefaultMessages.uuid,
+        json: <String, dynamic>{'format': 'uuid'},
+      );
 }
 
 /// Text must be an IPv4 address.
 class IpRule extends RegexRule {
   IpRule({super.message})
-      : super(Patterns.ipv4,
-            code: IssueCodes.ip,
-            defaultMessage: DefaultMessages.ip,
-            json: <String, dynamic>{'format': 'ipv4'});
+    : super(
+        Patterns.ipv4,
+        code: IssueCodes.ip,
+        defaultMessage: DefaultMessages.ip,
+        json: <String, dynamic>{'format': 'ipv4'},
+      );
 }
 
 /// Text must be an ISO 8601 date time.
 class DateTimeStringRule extends BuiltInRule<String> {
   DateTimeStringRule({super.message})
-      : super(IssueCodes.datetime, DefaultMessages.datetime,
-            json: <String, dynamic>{'format': 'date-time'});
+    : super(
+        IssueCodes.datetime,
+        DefaultMessages.datetime,
+        json: <String, dynamic>{'format': 'date-time'},
+      );
 
   @override
   bool check(String value, RuleContext context) {
@@ -112,8 +133,11 @@ class DateTimeStringRule extends BuiltInRule<String> {
 /// Text must be a URL with a scheme and a host, like `https://x.dev`.
 class UrlRule extends BuiltInRule<String> {
   UrlRule({super.message})
-      : super(IssueCodes.url, DefaultMessages.url,
-            json: <String, dynamic>{'format': 'uri'});
+    : super(
+        IssueCodes.url,
+        DefaultMessages.url,
+        json: <String, dynamic>{'format': 'uri'},
+      );
 
   @override
   bool check(String value, RuleContext context) {
@@ -125,9 +149,12 @@ class UrlRule extends BuiltInRule<String> {
 /// Text must start with [prefix].
 class StartsWithRule extends BuiltInRule<String> {
   StartsWithRule(this.prefix, {super.message})
-      : super(IssueCodes.startWith, DefaultMessages.startWith,
-            params: <String, Object?>{'prefix': prefix},
-            json: <String, dynamic>{'pattern': '^${RegExp.escape(prefix)}'});
+    : super(
+        IssueCodes.startWith,
+        DefaultMessages.startWith,
+        params: <String, Object?>{'prefix': prefix},
+        json: <String, dynamic>{'pattern': '^${RegExp.escape(prefix)}'},
+      );
 
   final String prefix;
 
@@ -140,9 +167,12 @@ class StartsWithRule extends BuiltInRule<String> {
 /// Text must end with [suffix].
 class EndsWithRule extends BuiltInRule<String> {
   EndsWithRule(this.suffix, {super.message})
-      : super(IssueCodes.endWith, DefaultMessages.endWith,
-            params: <String, Object?>{'suffix': suffix},
-            json: <String, dynamic>{'pattern': '${RegExp.escape(suffix)}\$'});
+    : super(
+        IssueCodes.endWith,
+        DefaultMessages.endWith,
+        params: <String, Object?>{'suffix': suffix},
+        json: <String, dynamic>{'pattern': '${RegExp.escape(suffix)}\$'},
+      );
 
   final String suffix;
 
@@ -155,9 +185,12 @@ class EndsWithRule extends BuiltInRule<String> {
 /// Text must contain [text].
 class IncludesRule extends BuiltInRule<String> {
   IncludesRule(this.text, {super.message})
-      : super(IssueCodes.includes, DefaultMessages.includes,
-            params: <String, Object?>{'text': text},
-            json: <String, dynamic>{'pattern': RegExp.escape(text)});
+    : super(
+        IssueCodes.includes,
+        DefaultMessages.includes,
+        params: <String, Object?>{'text': text},
+        json: <String, dynamic>{'pattern': RegExp.escape(text)},
+      );
 
   final String text;
 

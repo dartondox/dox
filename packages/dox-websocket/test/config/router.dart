@@ -2,11 +2,11 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_websocket/dox_websocket.dart';
 
 class WsController {
-  intro(WebsocketEmitter emitter, dynamic message) {
+  void intro(WebsocketEmitter emitter, dynamic message) {
     emitter.emit('intro', message);
   }
 
-  json(WebsocketEmitter emitter, dynamic message) {
+  void json(WebsocketEmitter emitter, dynamic message) {
     emitter.emit('json', message);
   }
 }

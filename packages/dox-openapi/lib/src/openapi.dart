@@ -36,8 +36,8 @@ class OpenApi {
     this.security,
     ApiDoc? docs,
     YamlEmitter yamlEmitter = const YamlEmitter(),
-  })  : docs = docs ?? ApiDoc(),
-        _yaml = yamlEmitter;
+  }) : docs = docs ?? ApiDoc(),
+       _yaml = yamlEmitter;
 
   /// Returns the full document as a map.
   Map<String, dynamic> toJson() {
@@ -61,8 +61,9 @@ class OpenApi {
 
   /// Returns the document as JSON text.
   String toJsonString({bool pretty = true}) {
-    JsonEncoder encoder =
-        pretty ? const JsonEncoder.withIndent('  ') : const JsonEncoder();
+    JsonEncoder encoder = pretty
+        ? const JsonEncoder.withIndent('  ')
+        : const JsonEncoder();
     return encoder.convert(toJson());
   }
 

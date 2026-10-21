@@ -79,7 +79,7 @@ class Logger {
       'name': Dox().config.logger.name,
       'message': message.toString(),
       'timestamp': DateTime.now().toIso8601String(),
-      'payload': data
+      'payload': data,
     };
     print(JSON.stringify(text));
   }

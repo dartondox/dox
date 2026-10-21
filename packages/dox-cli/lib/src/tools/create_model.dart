@@ -2,7 +2,7 @@ import 'dart:io';
 
 import '../utils/utils.dart';
 
-String _getSample(className, filename, String? table) {
+String _getSample(String className, String filename, String? table) {
   String annotation = table == null ? '' : "table: '$table'";
   return '''
 import 'package:dox_orm/dox_orm.dart';
@@ -19,7 +19,7 @@ class $className extends ${className}Generator {
 
 /// [table] sets `@DoxModel(table: ...)`, so the model uses that table
 /// (`create:model X -m` makes the plural table, the model default is singular).
-bool createModel(filename, {String? table}) {
+bool createModel(String filename, {String? table}) {
   filename = pascalToSnake(filename);
   String className = snakeToPascal(filename);
   String path = '${Directory.current.path}/lib/app/models/$filename/';
@@ -31,8 +31,10 @@ bool createModel(filename, {String? table}) {
   }
 
   file.createSync(recursive: true);
-  file.writeAsStringSync(_getSample(className, filename, table),
-      mode: FileMode.write);
+  file.writeAsStringSync(
+    _getSample(className, filename, table),
+    mode: FileMode.write,
+  );
   print('\x1B[32m$className model created successfully.\x1B[0m');
   return true;
 }
