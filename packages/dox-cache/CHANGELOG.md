@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.2
 
 - Needs Dart 3.13 or newer.
 - All dependencies updated to their latest versions.

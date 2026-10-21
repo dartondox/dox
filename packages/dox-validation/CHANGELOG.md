@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.2
 
 - A JSON body that is not an object now says `The request body must be a JSON object.` (key `_root`). Change it with the message key `_root.object`.
 - Needs Dart 3.13 or newer.
