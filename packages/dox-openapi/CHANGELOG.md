@@ -4,6 +4,10 @@
 - All dependencies updated to their latest versions.
 - `DoxRouteAdapter` reads `preMiddleware` and `body` from a route when it has them.
 - A Dox catch-all param `{path*}` becomes `{path}` in the document.
+- New `OpenApiRegistry`, `OpenApiOperation` and `OpenApiRouteBinding`: the docs that `dox_builder` finds in the code. `OpenApiRegistry.find()` matches them to a live route.
+- `RouteDoc` and `ApiDoc.route()` take `deprecated`.
+- `OpenApiServer` builds and encodes the document once, on the first call, and keeps it. Make a new `OpenApiServer` after you change the `OpenApi`.
+- `OpenApi.yamlEmitter` is now a public field.
 
 
 ## 3.0.0-alpha.1

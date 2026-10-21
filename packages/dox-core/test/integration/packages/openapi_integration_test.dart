@@ -4,6 +4,9 @@ import 'dart:io';
 import 'package:dox_core/dox_core.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
+import 'package:yaml/yaml.dart';
+
+import '../../../../dox-openapi/test/support/openapi_checker.dart';
 
 const int port = 50024;
 const String baseUrl = 'http://localhost:$port';
@@ -22,7 +25,66 @@ class PostRequest extends FormRequest {
 
 class PostController {
   dynamic store(PostRequest req) => req.validated;
+
+  dynamic show(DoxRequest req, String id) => id;
+
+  dynamic search(DoxRequest req) => <String, dynamic>{};
+
+  dynamic secret(DoxRequest req) => 'x';
 }
+
+/// what dox_builder writes into lib/openapi.g.dart for PostController
+const OpenApiRegistry registry = OpenApiRegistry(
+  operations: <OpenApiOperation>[
+    OpenApiOperation(
+      controller: 'PostController',
+      method: 'show',
+      argumentTypes: <String>['DoxRequest', 'String'],
+      summary: 'Get one post',
+      tags: <String>['Post'],
+      params: <Map<String, dynamic>>[
+        <String, dynamic>{'type': 'integer'},
+      ],
+      responses: <int, ResponseDoc>{
+        200: ResponseDoc(
+          description: 'Successful response',
+          schema: <String, dynamic>{r'$ref': '#/components/schemas/Post'},
+        ),
+      },
+    ),
+    OpenApiOperation(
+      controller: 'PostController',
+      method: 'search',
+      argumentTypes: <String>['DoxRequest'],
+      tags: <String>['Post'],
+      schema: <String, dynamic>{r'$ref': '#/components/schemas/SearchPosts'},
+    ),
+    OpenApiOperation(
+      controller: 'PostController',
+      method: 'secret',
+      argumentTypes: <String>['DoxRequest'],
+      ignore: true,
+    ),
+  ],
+  routes: <OpenApiRouteBinding>[
+    OpenApiRouteBinding('GET', 'posts/{id}/full', 'PostController.show'),
+  ],
+  schemas: <String, Map<String, dynamic>>{
+    'Post': <String, dynamic>{
+      'type': 'object',
+      'properties': <String, dynamic>{
+        'id': <String, dynamic>{'type': 'integer'},
+      },
+    },
+    'SearchPosts': <String, dynamic>{
+      'type': 'object',
+      'properties': <String, dynamic>{
+        'q': <String, dynamic>{'type': 'string'},
+      },
+      'required': <String>['q'],
+    },
+  },
+);
 
 class DocsRouter extends Router {
   @override
@@ -32,6 +94,9 @@ class DocsRouter extends Router {
   void register() {
     Route.get('/posts/{id}', (DoxRequest req, String id) => id);
     Route.post('/posts', PostController().store);
+    Route.get('/posts/{id}/full', PostController().show);
+    Route.get('/search', PostController().search);
+    Route.get('/secret', PostController().secret);
     Route.put(
       '/posts/{id}',
       (DoxRequest req, String id) => id,
@@ -59,6 +124,7 @@ AppConfig config = AppConfig(
         <String, List<String>>{'bearerAuth': <String>[]},
       ],
     },
+    registry: registry,
   ),
 );
 
@@ -97,6 +163,62 @@ void main() {
       put['requestBody']['content']['application/json']['schema']['properties']['title']['minLength'],
       3,
     );
+  });
+
+  test('the registry adds summary, params, query, schemas and errors', () {
+    Map<String, dynamic> doc = OpenApiDocument(config.openApi)
+        .build(Route().routes)
+        .toJson();
+    expect(OpenApiChecker().check(doc), isEmpty);
+
+    Map<String, dynamic> show = doc['paths']['/posts/{id}/full']['get'];
+    expect(show['operationId'], 'PostController.show');
+    expect(show['summary'], 'Get one post');
+    expect(show['tags'], <String>['Post']);
+    expect(show['parameters'][0]['schema'], <String, dynamic>{
+      'type': 'integer',
+    });
+    expect(show['responses'].keys, <String>['200', '401', '404', '500']);
+
+    /// a GET request class becomes query params
+    Map<String, dynamic> search = doc['paths']['/search']['get'];
+    expect(search['parameters'], <dynamic>[
+      <String, dynamic>{
+        'name': 'q',
+        'in': 'query',
+        'required': true,
+        'schema': <String, dynamic>{'type': 'string'},
+      },
+    ]);
+    expect(search['responses'].keys, contains('422'));
+    expect(doc['components']['schemas'].keys, contains('ValidationError'));
+
+    /// @ApiIgnore
+    expect(doc['paths'].keys, isNot(contains('/secret')));
+
+    /// not in the registry: a basic entry
+    expect(doc['paths']['/posts']['post']['operationId'], 'postPosts');
+  });
+
+  test('AuthMiddleware gets bearerAuth without config', () {
+    Map<String, dynamic> doc = OpenApiDocument(
+      const OpenApiConfig(registry: registry),
+    ).build(Route().routes).toJson();
+    expect(OpenApiChecker().check(doc), isEmpty);
+    expect(
+      doc['components']['securitySchemes']['bearerAuth']['scheme'],
+      'bearer',
+    );
+    expect(doc['paths']['/search']['get']['security'], <dynamic>[
+      <String, dynamic>{'bearerAuth': <dynamic>[]},
+    ]);
+  });
+
+  test('YAML and JSON give the same document', () async {
+    http.Response json = await http.get(Uri.parse('$baseUrl/openapi.json'));
+    http.Response yaml = await http.get(Uri.parse('$baseUrl/openapi.yaml'));
+    Object? fromYaml = jsonDecode(jsonEncode(loadYaml(yaml.body)));
+    expect(fromYaml, jsonDecode(json.body));
   });
 
   test('openapi.yaml and docs page', () async {

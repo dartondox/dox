@@ -1,14 +1,15 @@
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/http/http_controller_handler.dart';
+import 'package:dox_core/openapi/openapi_route_reader.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_openapi/dox_openapi.dart';
 
 /// Builds the OpenAPI document from the registered routes and serves it.
 ///
-/// Request bodies come from the route `body:` option, or from the form
-/// request of the controller (`schema()`, else `rules()`).
+/// Each route gets its docs from [OpenApiConfig.registry] (made by
+/// `dox_builder` from the controllers), the route `body:` option and the
+/// form request. Routes the registry does not know still get a basic entry.
 class OpenApiDocument {
   OpenApiDocument(this.config);
 
@@ -20,24 +21,47 @@ class OpenApiDocument {
     OpenApiConstants.yamlPath,
   ];
 
+  /// the 422 answer of dox: `{field: message}`
+  static const Map<String, dynamic> _validationErrorSchema = <String, dynamic>{
+    'type': 'object',
+    'additionalProperties': <String, dynamic>{'type': 'string'},
+    'example': <String, dynamic>{'title': 'The title field is required'},
+  };
+
   OpenApiServer? _server;
   int _builtFor = -1;
 
   /// The document for [routes].
   OpenApi build(Iterable<RouteData> routes) {
-    List<RouteData> list = <RouteData>[];
-    for (RouteData route in routes) {
-      if (_paths.contains(route.path)) continue;
-      route.body ??= _formRequestBody(route);
-      list.add(route);
-    }
+    OpenApiRouteReader reader = OpenApiRouteReader(config);
     ApiDoc docs = ApiDoc();
-    DoxRouteAdapter(securityByMiddleware: config.securityByMiddleware)
-        .addTo(docs, list);
+    for (RouteData route in routes) {
+      if (_paths.contains(route.path) ||
+          !PathConverter.isSupportedMethod(route.method)) {
+        continue;
+      }
+      RouteDoc? doc = reader.read(route);
+      if (doc != null) docs.add(doc);
+    }
+    for (MapEntry<String, Map<String, dynamic>> schema
+        in config.registry.schemas.entries) {
+      docs.schema(schema.key, schema.value);
+    }
+    if (reader.usesValidationError) {
+      docs.schema(OpenApiRouteReader.validationError, _validationErrorSchema);
+    }
+    Map<String, SecurityScheme> schemes = config.securitySchemes;
+    if (reader.usesBearerAuth &&
+        !schemes.containsKey(OpenApiRouteReader.bearerAuth)) {
+      schemes = <String, SecurityScheme>{
+        ...schemes,
+        OpenApiRouteReader.bearerAuth: SecurityScheme.bearer(),
+      };
+    }
     return OpenApi(
       info: config.info,
       servers: config.servers,
-      securitySchemes: config.securitySchemes,
+      securitySchemes: schemes,
       docs: docs,
     );
   }
@@ -54,8 +78,8 @@ class OpenApiDocument {
     }
   }
 
-  /// Controller of the docs routes. The document is built on the first
-  /// request, and again only when routes were added.
+  /// Controller of the docs routes. The document is built and encoded on
+  /// the first request, and again only when routes were added.
   dynamic serve(DoxRequest req) {
     List<RouteData> routes = Route().routes;
     OpenApiServer? server = _server;
@@ -66,27 +90,5 @@ class OpenApiDocument {
     OpenApiResponse? res = server.handle(req.uri.path);
     if (res == null) return null;
     return response(res.body).contentType(ContentType.parse(res.contentType));
-  }
-
-  /// schema of the form request that the controller takes, if any
-  Object? _formRequestBody(RouteData route) {
-    Object? controllers = route.controllers;
-    if (controllers is! List || controllers.isEmpty) return null;
-    Object? handler = controllers.last;
-    if (handler is! Function) return null;
-    try {
-      List<String> types = controllerArgumentDataTypes(handler);
-      if (types.isEmpty || types.first == 'DoxRequest') return null;
-      Object? request = Dox().ioc.getByName(types.first);
-      if (request is! FormRequest) return null;
-      ObjectSchema? schema = request.schema();
-      if (schema != null) return schema;
-      Map<String, String> rules = request.rules();
-      if (rules.isEmpty) return null;
-      return Dox().validator.schemaFor(rules, request.messages());
-    } catch (_) {
-      /// docs must not break the app. a route without a body is fine.
-      return null;
-    }
   }
 }

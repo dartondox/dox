@@ -32,17 +32,26 @@ class OpenApiServer {
   OpenApiServer(this.api, {String? pageTitle})
     : pageTitle = pageTitle ?? api.info.title;
 
-  /// The JSON document.
+  /// The document is made once, on the first call, and kept.
+  late final Map<String, dynamic> _doc = api.toJson();
+  late final OpenApiResponse _json = OpenApiResponse(
+    const JsonEncoder.withIndent('  ').convert(_doc),
+    OpenApiConstants.jsonContentType,
+  );
+  late final OpenApiResponse _yaml = OpenApiResponse(
+    api.yamlEmitter.emit(_doc),
+    OpenApiConstants.yamlContentType,
+  );
+  late final OpenApiResponse _page = docsPage();
+
+  /// The JSON document. Made once, then kept.
   OpenApiResponse json() {
-    return OpenApiResponse(
-      api.toJsonString(),
-      OpenApiConstants.jsonContentType,
-    );
+    return _json;
   }
 
-  /// The YAML document.
+  /// The YAML document. Made once, then kept.
   OpenApiResponse yaml() {
-    return OpenApiResponse(api.toYaml(), OpenApiConstants.yamlContentType);
+    return _yaml;
   }
 
   /// A Swagger UI page that loads [specUrl] from a CDN.
@@ -82,7 +91,7 @@ class OpenApiServer {
       case OpenApiConstants.yamlPath:
         return yaml();
       case OpenApiConstants.docsPath:
-        return docsPage();
+        return _page;
     }
     return null;
   }

@@ -1,3 +1,4 @@
+import 'package:dox_app/app/http/dto/auth.dto.dart';
 import 'package:dox_app/app/http/serializers/user.serializer.dart';
 import 'package:dox_app/app/models/user/user.model.dart';
 import 'package:dox_auth/dox_auth.dart';
@@ -5,6 +6,11 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/logger.dart';
 
 class AuthController {
+  /// Log in
+  ///
+  /// Gives a bearer token for the `Authorization` header.
+  @Request(LoginUser)
+  @Response(200, LoginResult)
   Future<dynamic> login(DoxRequest req) async {
     Map<String, dynamic> credentials = req.only(<String>['email', 'password']);
 
@@ -23,7 +29,9 @@ class AuthController {
     return <String, dynamic>{'success': false};
   }
 
-  Future<dynamic> register(DoxRequest req) async {
+  /// Make an account
+  @Request(RegisterUser)
+  Future<User> register(DoxRequest req) async {
     /// `unique` checks the database, so use validateAsync
     Map<String, dynamic> data = await req.validateAsync(<String, String>{
       'name': 'required|string',
@@ -38,6 +46,7 @@ class AuthController {
     return user;
   }
 
+  /// The logged in user
   Future<dynamic> user(DoxRequest req) async {
     IAuth? auth = req.auth;
     if (auth?.isLoggedIn() == true) {

@@ -46,6 +46,7 @@ class ApiDoc {
     Object? body,
     Map<int, ResponseDoc> responses = const <int, ResponseDoc>{},
     List<Map<String, List<String>>>? security,
+    bool deprecated = false,
     Map<String, dynamic> extensions = const <String, dynamic>{},
   }) {
     return add(
@@ -61,6 +62,7 @@ class ApiDoc {
         body: body,
         responses: responses,
         security: security,
+        deprecated: deprecated,
         extensions: extensions,
       ),
     );

@@ -3,7 +3,16 @@ library;
 export 'package:dox_annotation/dox_annotation.dart';
 export 'package:dox_cache/dox_cache.dart'
     show CacheConfig, CacheLock, CacheManager, CacheStore;
-export 'package:dox_openapi/dox_openapi.dart' show Info, SecurityScheme, Server;
+export 'package:dox_openapi/dox_openapi.dart'
+    show
+        Info,
+        OpenApi,
+        OpenApiOperation,
+        OpenApiRegistry,
+        OpenApiRouteBinding,
+        ResponseDoc,
+        SecurityScheme,
+        Server;
 export 'package:dox_storage/dox_storage.dart'
     show Disk, DriveManager, FileNotFoundException, StorageException;
 export 'package:dox_validation/dox_validation.dart' hide ValidationException;

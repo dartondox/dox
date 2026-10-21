@@ -4,10 +4,11 @@ import 'package:dox_openapi/dox_openapi.dart';
 /// OpenAPI docs for the app: `/docs`, `/openapi.json` and `/openapi.yaml`.
 ///
 /// ```
+/// import 'package:my_app/openapi.g.dart';
+///
 /// OpenApiConfig(
 ///   info: Info(title: 'Blog API', version: '1.0.0'),
-///   securitySchemes: {'bearerAuth': SecurityScheme.bearer()},
-///   securityByMiddleware: {'AuthMiddleware': [{'bearerAuth': []}]},
+///   registry: openApiRegistry,
 /// );
 /// ```
 class OpenApiConfig {
@@ -25,7 +26,13 @@ class OpenApiConfig {
   final Map<String, SecurityScheme> securitySchemes;
 
   /// Security for routes that use a middleware class with this name.
+  /// `AuthMiddleware` gets `bearerAuth` when it is not in this map.
   final Map<String, List<Map<String, List<String>>>> securityByMiddleware;
+
+  /// What `dox_builder` found in the code: controller docs, route calls
+  /// and model schemas. Pass `openApiRegistry` from the generated
+  /// `lib/openapi.g.dart`. Run `dart run build_runner build` to make it.
+  final OpenApiRegistry registry;
 
   const OpenApiConfig({
     this.enabled,
@@ -34,6 +41,7 @@ class OpenApiConfig {
     this.securitySchemes = const <String, SecurityScheme>{},
     this.securityByMiddleware =
         const <String, List<Map<String, List<String>>>>{},
+    this.registry = const OpenApiRegistry(),
   });
 
   /// true when the docs routes are served

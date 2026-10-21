@@ -1,6 +1,5 @@
 import 'package:dox_app/app/http/requests/blog.request.dart';
 import 'package:dox_app/app/models/blog/blog.model.dart';
-import 'package:dox_app/app/models/category/category.model.dart';
 import 'package:dox_orm/dox_orm.dart';
 
 class BlogService {
@@ -25,9 +24,8 @@ class BlogService {
         );
   }
 
-  Future<dynamic> findById(dynamic id) async {
-    Category? cat = await Category().preload('blogs').find(1);
-    return cat;
+  Future<Blog?> findById(dynamic id) async {
+    return Blog().find(id);
   }
 
   Future<void> delete(dynamic id) async {
