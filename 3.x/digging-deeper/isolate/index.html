@@ -540,34 +540,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/upgrade/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Upgrade from 2.x to 3.x
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../the-basic/routing/" class="md-nav__link">
         
   
@@ -716,6 +688,34 @@
     
   
     Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
   
 
     
@@ -1783,7 +1783,7 @@
   <span class="md-ellipsis">
     
   
-    Validation schemas
+    dox_validation
   
 
     
@@ -2449,7 +2449,7 @@ So one process uses the whole machine.</p>
 <ol>
 <li>runs the <code>setup()</code> of each service in <code>services</code> (for example it opens
    its own database pool),</li>
-<li>registers the routes and form requests.</li>
+<li>registers the routes, and reads the parameter types of each controller once.</li>
 </ol>
 <p>This is cheap: it happens once at start, not per request. Keep <code>setup()</code>
 light. Open connections there, but do not load big data into memory, because

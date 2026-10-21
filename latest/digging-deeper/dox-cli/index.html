@@ -540,34 +540,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/upgrade/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Upgrade from 2.x to 3.x
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../the-basic/routing/" class="md-nav__link">
         
   
@@ -716,6 +688,34 @@
     
   
     Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
   
 
     
@@ -1149,10 +1149,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#create-request" class="md-nav__link">
+  <a href="#create-dto" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Create request
+        Create DTO
       
     </span>
   </a>
@@ -1926,7 +1926,7 @@
   <span class="md-ellipsis">
     
   
-    Validation schemas
+    dox_validation
   
 
     
@@ -2617,10 +2617,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#create-request" class="md-nav__link">
+  <a href="#create-dto" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Create request
+        Create DTO
       
     </span>
   </a>
@@ -2763,8 +2763,8 @@
 <td>create a middleware</td>
 </tr>
 <tr>
-<td><code>dox create:request &lt;name&gt;</code></td>
-<td>create a form request</td>
+<td><code>dox create:dto &lt;name&gt;</code></td>
+<td>create a DTO (typed, checked input)</td>
 </tr>
 <tr>
 <td><code>dox create:serializer &lt;name&gt;</code></td>
@@ -2873,15 +2873,16 @@
 <div class="admonition info">
 <p class="admonition-title">File and class names</p>
 <p>Word breaks are kept. <code>dox create:controller BlogPost</code> makes <code>blog_post.controller.dart</code>
-with the class <code>BlogPostController</code>. The same is true for middleware, requests and serializers.</p>
+with the class <code>BlogPostController</code>. The same is true for middleware, DTOs and serializers.</p>
 </div>
 <h2 id="create-middleware">Create middleware</h2>
 <div class="language-py highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">dox</span> <span class="n">create</span><span class="p">:</span><span class="n">middleware</span> <span class="n">auth_middleware</span>
 </span></code></pre></div>
-<h2 id="create-request">Create request</h2>
-<div class="language-py highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">dox</span> <span class="n">create</span><span class="p">:</span><span class="n">request</span> <span class="n">Blog</span>
+<h2 id="create-dto">Create DTO</h2>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">dox</span> <span class="n">create</span><span class="p">:</span><span class="n">dto</span> <span class="n">CreateBlog</span>
 </span></code></pre></div>
-<p>See <a href="../../the-basic/request/#custom-form-request">Custom Form Request</a>.</p>
+<p>It makes <code>lib/app/http/dtos/create_blog.dto.dart</code>. Then run <code>dox build_runner:build</code>.
+See <a href="../../the-basic/validation/">Validation</a>.</p>
 <h2 id="create-serializer">Create serializer</h2>
 <div class="language-py highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">dox</span> <span class="n">create</span><span class="p">:</span><span class="n">serializer</span> <span class="n">Blog</span>
 </span></code></pre></div>

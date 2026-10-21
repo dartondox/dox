@@ -540,34 +540,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/upgrade/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Upgrade from 2.x to 3.x
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../the-basic/routing/" class="md-nav__link">
         
   
@@ -716,6 +688,34 @@
     
   
     Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
   
 
     
@@ -1703,7 +1703,7 @@
   <span class="md-ellipsis">
     
   
-    Validation schemas
+    dox_validation
   
 
     
@@ -2723,7 +2723,7 @@ You write no docs code. You get a <a href="https://github.com/scalar/scalar">Sca
 <p>The docs come from three places:</p>
 <ul>
 <li><strong>the routes</strong>: method, path, path params, middleware (login),</li>
-<li><strong>the request classes</strong>: a <code>@Dto</code> class or a form request,</li>
+<li><strong>the request classes</strong>: a <code>@Dto</code> class,</li>
 <li><strong>the controllers</strong>: the <code>///</code> comment, the arguments and the return type of each method.</li>
 </ul>
 <h2 id="in-a-dox-app">In a Dox app</h2>
@@ -2914,10 +2914,10 @@ The page loads Scalar from the jsDelivr CDN, at a fixed version, and reads <code
 <li><code>@Body(T)</code>, <code>@Query(T)</code> or <code>@Request(T)</code> on the method.</li>
 <li>An argument whose type is a <code>@Dto</code> class: <code>store(CreateBlog body)</code>.</li>
 <li>A <code>req.validate&lt;T&gt;()</code> call in the method, where <code>T</code> is a <code>@Dto</code> class.</li>
-<li>A first argument that is a form request: <code>store(BlogRequest req)</code>. Its <code>schema()</code> or <code>rules()</code> is used.</li>
 </ol>
 <p>For <code>POST</code>, <code>PUT</code> and <code>PATCH</code> the request is the JSON body.
 For other methods each field is one query parameter.
+<code>@Dto(source: Source.query)</code> or <code>Source.body</code> chooses the place by hand.
 The route <code>body:</code> option still works, and it wins over all of these.</p>
 <p>A <code>@Dto</code> class:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nd">@Dto</span><span class="p">()</span>
@@ -2938,13 +2938,9 @@ The route <code>body:</code> option still works, and it wins over all of these.<
 </span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="w">      </span><span class="kd">required</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">status</span><span class="p">,</span><span class="w"> </span><span class="kd">required</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">tags</span><span class="p">});</span>
 </span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Field annotations: <code>@Length(min:, max:)</code>, <code>@Email()</code>, <code>@Min(n)</code>, <code>@Max(n)</code>, <code>@Pattern(regex)</code>,
-<code>@MinItems(n)</code>, <code>@MaxItems(n)</code>, <code>@Format('uuid')</code> and <code>@Trim()</code>.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>In a file that imports <code>dox_core</code>, <code>Pattern</code> means the annotation, not <code>Pattern</code> of <code>dart:core</code>.
-Add <code>hide Pattern</code> to the import if you need the <code>dart:core</code> one.</p>
-</div>
+<p>The keys are the same as the keys the DTO reads: snake_case by default (<code>postCode</code> is <code>post_code</code>),
+or <code>@Name('key')</code>, or <code>@Dto(keyCase: KeyCase.field)</code>.
+Each rule annotation adds its JSON Schema keys. See the <a href="../../the-basic/validation-rules/">rules reference</a>.</p>
 <h3 id="response">Response</h3>
 <p>The return type of the method gives the <code>200</code> answer. <code>Future&lt;T&gt;</code> counts as <code>T</code>.</p>
 <table>
@@ -3178,7 +3174,7 @@ Paths can use <code>{id}</code> or <code>:id</code>. Both become <code>{id}</cod
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../validation/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Validation schemas">
+          <a href="../validation/" class="md-footer__link md-footer__link--prev" aria-label="Previous: dox_validation">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -3188,7 +3184,7 @@ Paths can use <code>{id}</code> or <code>:id</code>. Both become <code>{id}</cod
                 Previous
               </span>
               <div class="md-ellipsis">
-                Validation schemas
+                dox_validation
               </div>
             </div>
           </a>

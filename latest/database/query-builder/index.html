@@ -540,34 +540,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/upgrade/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Upgrade from 2.x to 3.x
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../the-basic/routing/" class="md-nav__link">
         
   
@@ -716,6 +688,34 @@
     
   
     Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
   
 
     
@@ -2072,7 +2072,7 @@
   <span class="md-ellipsis">
     
   
-    Validation schemas
+    dox_validation
   
 
     
@@ -3010,13 +3010,12 @@ It works on Postgres, MySQL/MariaDB and SQLite.</p>
 <li>For transactions, see <a href="../transactions/">Transactions</a>.</li>
 </ul>
 <div class="admonition note">
-<p class="admonition-title">Changes in 3.x</p>
+<p class="admonition-title">Good to know</p>
 <ul>
-<li>Table and column names are quoted. On Postgres, <code>userId</code> is not the same as <code>userid</code> any more.</li>
+<li>Table and column names are quoted. On Postgres, <code>userId</code> and <code>userid</code> are two names.</li>
 <li><code>orderBy</code> throws an <code>ArgumentError</code> when the direction is not <code>asc</code> or <code>desc</code>.</li>
 <li><code>toSql()</code> wraps the where part in brackets.</li>
 <li><code>count()</code> ignores <code>limit</code>, <code>offset</code> and <code>orderBy</code>. With <code>groupBy</code> it returns the number of groups.</li>
-<li>See the <a href="../../the-basic/upgrade/">upgrade guide</a> for all changes.</li>
 </ul>
 </div>
 <h3 id="create"><code>create</code></h3>

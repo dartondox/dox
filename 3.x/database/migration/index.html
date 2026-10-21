@@ -540,34 +540,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/upgrade/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Upgrade from 2.x to 3.x
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../the-basic/routing/" class="md-nav__link">
         
   
@@ -716,6 +688,34 @@
     
   
     Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
   
 
     
@@ -1403,17 +1403,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#upgrade-from-dox-2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Upgrade from Dox 2
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1864,7 +1853,7 @@
   <span class="md-ellipsis">
     
   
-    Validation schemas
+    dox_validation
   
 
     
@@ -2555,17 +2544,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#upgrade-from-dox-2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Upgrade from Dox 2
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -2806,17 +2784,6 @@ Use <code>id INTEGER PRIMARY KEY AUTOINCREMENT</code> for SQLite. <code>table.id
   and reads the <code>.sql</code> files from the folder, merged by name.</li>
 <li>Without <code>bin/migrate.dart</code> (a project with only <code>.sql</code> files): <code>dox</code> runs the <code>.sql</code> files itself, like before.</li>
 <li>A Dart and a <code>.sql</code> migration with the same name is an error.</li>
-</ul>
-<h2 id="upgrade-from-dox-2">Upgrade from Dox 2</h2>
-<ul>
-<li><code>Migration()</code> is now <code>Migrator()</code>. <code>Migration</code> is the base class of a Dart migration.</li>
-<li><code>Migrator().migrate(connection)</code> is now <code>Migrator(connection: connection).migrate()</code>.</li>
-<li><code>rollback(null, 2)</code> is now <code>rollback(step: 2)</code>.</li>
-<li><code>Schema.create(...)</code> is now <code>Schema().create(...)</code> (or the <code>schema</code> given to <code>up</code>).
-  See the <a href="../schema/">schema builder</a>.</li>
-<li><code>make:migration</code> makes a Dart file. Use <code>--sql</code> for a <code>.sql</code> file.</li>
-<li>Old <code>.sql</code> migrations keep their names, so they do not run again.
-  You can turn one into a Dart file with the <strong>same name</strong>. It will not run again either.</li>
 </ul>
 
 

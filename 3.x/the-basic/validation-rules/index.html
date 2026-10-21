@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://dartondox.dev/3.x/the-basic/upgrade/">
+        <link rel="canonical" href="https://dartondox.dev/3.x/the-basic/validation-rules/">
       
       
-        <link rel="prev" href="../installation/">
+        <link rel="prev" href="../validation/">
       
       
-        <link rel="next" href="../routing/">
+        <link rel="next" href="../../digging-deeper/cache/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Upgrade from 2.x to 3.x - DOX</title>
+        <title>Validation rules - DOX</title>
       
     
     
@@ -88,7 +88,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#upgrade-from-2x-to-3x" class="md-skip">
+        <a href="#validation-rules" class="md-skip">
           Skip to content
         </a>
       
@@ -125,7 +125,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Upgrade from 2.x to 3.x
+              Validation rules
             
           </span>
         </div>
@@ -540,235 +540,6 @@
                 
   
   
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Upgrade from 2.x to 3.x
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Upgrade from 2.x to 3.x
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#do-these-first" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Do these first
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#database-and-query-builder" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Database and query builder
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#migrations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Migrations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#requests-and-responses" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Requests and responses
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#server-and-config" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Server and config
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#validation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Validation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#websocket" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        WebSocket
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#auth" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Auth
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cli" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CLI
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cache" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cache
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#file-storage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        File storage
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#environment" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Environment
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#new-names-from-dox_core" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        New names from dox_core
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#new-built-in-features" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        New built-in features
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
   
   
     <li class="md-nav__item">
@@ -928,6 +699,191 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#type-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Type errors
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#text" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Text
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#change-text" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Change text
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#numbers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Numbers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lists
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#keys-and-dto-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keys and DTO options
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-the-generator-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the generator checks
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1904,7 +1860,7 @@
   <span class="md-ellipsis">
     
   
-    Validation schemas
+    dox_validation
   
 
     
@@ -2496,10 +2452,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#do-these-first" class="md-nav__link">
+  <a href="#type-errors" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Do these first
+        Type errors
       
     </span>
   </a>
@@ -2507,10 +2463,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#database-and-query-builder" class="md-nav__link">
+  <a href="#text" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Database and query builder
+        Text
       
     </span>
   </a>
@@ -2518,10 +2474,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#migrations" class="md-nav__link">
+  <a href="#change-text" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Migrations
+        Change text
       
     </span>
   </a>
@@ -2529,10 +2485,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#requests-and-responses" class="md-nav__link">
+  <a href="#numbers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Requests and responses
+        Numbers
       
     </span>
   </a>
@@ -2540,10 +2496,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#server-and-config" class="md-nav__link">
+  <a href="#lists" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Server and config
+        Lists
       
     </span>
   </a>
@@ -2551,10 +2507,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#validation" class="md-nav__link">
+  <a href="#dates" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Validation
+        Dates
       
     </span>
   </a>
@@ -2562,10 +2518,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#websocket" class="md-nav__link">
+  <a href="#files" class="md-nav__link">
     <span class="md-ellipsis">
       
-        WebSocket
+        Files
       
     </span>
   </a>
@@ -2573,10 +2529,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#auth" class="md-nav__link">
+  <a href="#database" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Auth
+        Database
       
     </span>
   </a>
@@ -2584,10 +2540,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cli" class="md-nav__link">
+  <a href="#keys-and-dto-options" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CLI
+        Keys and DTO options
       
     </span>
   </a>
@@ -2595,54 +2551,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cache" class="md-nav__link">
+  <a href="#what-the-generator-checks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Cache
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#file-storage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        File storage
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#environment" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Environment
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#new-names-from-dox_core" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        New names from dox_core
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#new-built-in-features" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        New built-in features
+        What the generator checks
       
     </span>
   </a>
@@ -2669,244 +2581,476 @@
   
 
 
-<h1 id="upgrade-from-2x-to-3x">Upgrade from 2.x to 3.x</h1>
-<div class="admonition warning">
-<p class="admonition-title">3.x is alpha</p>
-<p><code>3.0.0-alpha.1</code> can still change before the stable release. The 2.x docs stay online: pick <strong>2.x</strong> in the version menu at the top.</p>
-</div>
-<h2 id="do-these-first">Do these first</h2>
-<ol>
-<li>Use Dart <strong>3.13</strong> or newer.</li>
-<li>Set every Dox package to the same version, <code>^3.0.0-alpha.1</code>. All Dox packages now share one version.</li>
-<li>Replace <code>dox_query_builder</code> with <code>dox_orm</code>.</li>
-<li>If you use <code>ioredis</code> in your app, update it to <code>^2.0.0-alpha.1</code>.</li>
-<li>Run <code>dart pub upgrade</code>, then <code>dox build_runner:build</code>.</li>
-<li>Read the list below. Each item says what breaks and how to fix it.</li>
-</ol>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">environment</span><span class="p">:</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">sdk</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^3.13.0</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nt">dependencies</span><span class="p">:</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nt">dox_core</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^3.0.0-alpha.1</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nt">dox_orm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^3.0.0-alpha.1</span><span class="w">        </span><span class="c1"># was dox_query_builder</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="nt">dox_migration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^3.0.0-alpha.1</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="nt">dox_auth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^3.0.0-alpha.1</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="nt">dox_websocket</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^3.0.0-alpha.1</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="nt">ioredis</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^2.0.0-alpha.1</span><span class="w">        </span><span class="c1"># only if you use redis</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nt">dev_dependencies</span><span class="p">:</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="nt">dox_builder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^3.0.0-alpha.1</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">  </span><span class="nt">build_runner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^2.17.1</span>
-</span></code></pre></div>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// old</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_query_builder/dox_query_builder.dart'</span><span class="p">;</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1">// new</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
-</span></code></pre></div>
-<div class="admonition info">
-<p class="admonition-title">Info</p>
-<p><code>dox_query_builder</code> 3.x still works. It only re-exports <code>dox_orm</code>. New fixes go to <code>dox_orm</code> only.</p>
-</div>
-<h2 id="database-and-query-builder">Database and query builder</h2>
-<p><strong>Names are quoted.</strong>
-Table and column names are now quoted (<code>"name"</code> on Postgres, <code>`name`</code> on MySQL).
-On Postgres a quoted name is case sensitive.
-If you made a column with <code>CREATE TABLE ... (userId int)</code> without quotes, Postgres saved it as <code>userid</code>.
-Now <code>where('userId', 1)</code> looks for <code>"userId"</code> and fails.
-Fix: use the real (lower case) name, or rename the column. For raw SQL use <code>selectRaw</code> and <code>whereRaw</code>.</p>
-<p><strong><code>orderBy</code> checks the direction.</strong>
-A direction that is not <code>asc</code> or <code>desc</code> now throws an <code>ArgumentError</code>. Before, it was put into the SQL.
-Fix: only pass <code>asc</code> or <code>desc</code>.</p>
-<p><strong><code>toSql()</code> output changed.</strong>
-The where part is wrapped in brackets, and names are quoted.
-Fix: update tests that compare SQL text.</p>
-<p><strong><code>count()</code> changed.</strong>
-It ignores <code>limit</code>, <code>offset</code> and <code>orderBy</code>.
-With <code>groupBy</code> it returns the number of groups. Before, it returned the size of the first group.</p>
-<p><strong><code>model.delete()</code> and <code>model.forceDelete()</code> delete only that row.</strong>
-Before, they had no where condition and deleted <strong>every row</strong> of the table.</p>
-<p><strong><code>forceDelete()</code> also deletes soft deleted rows.</strong>
-<code>withTrash(false)</code> on a model without soft deletes no longer adds a <code>deleted_at</code> filter.</p>
-<p><strong>Postgres uses a real pool.</strong>
-Each query no longer runs in its own transaction. Use <a href="../../database/transactions/"><code>QueryBuilder.transaction()</code></a> when you need one.</p>
-<p><strong><code>save()</code> can set a field to <code>null</code> on update.</strong> Before, <code>null</code> fields were skipped.</p>
-<p><strong>MySQL driver is now <code>mysql_dart</code> (was <code>mysql1</code>).</strong></p>
+<h1 id="validation-rules">Validation rules</h1>
+<p>Every annotation you can put on a <code>@Dto</code> field. See <a href="../validation/">Validation</a> for how DTOs work.</p>
+<p>How to read the tables:</p>
 <ul>
-<li><code>extra['characterSet']</code> is not read any more. Use <code>extra['collation']</code> (default <code>utf8mb4_general_ci</code>).</li>
-<li><code>TIME</code> columns are now a <code>String</code> (was a <code>Duration</code>).</li>
-<li><code>BLOB</code> columns are now a <code>Uint8List</code> (was text).</li>
-<li>Only JSON columns are decoded to <code>Map</code>/<code>List</code>. MariaDB still decodes JSON-like text.</li>
-<li><code>getDatabaseConnection()</code> returns a <code>MySQLConnectionPool</code>.</li>
-<li>A connection you pass to the migration package must be a <code>mysql_dart</code> <code>MySQLConnection</code> or <code>MySQLConnectionPool</code>.</li>
+<li><strong>Code</strong> is the error code. Use it in <code>@Dto(messages: ...)</code> and in a <code>MessageResolver</code>.</li>
+<li><strong>Message</strong> is the default English text. <code>{field}</code> is the last key of the path.</li>
+<li>Every annotation also takes <code>message:</code>. It wins over every other message.</li>
+<li>All limits include the limit itself, unless the table says "exclusive".</li>
+<li>On a <code>List&lt;T&gt;</code> field, a value rule checks each item. Only the list rules check the list itself.</li>
 </ul>
-<p><strong><code>save()</code>, <code>delete()</code> and <code>forceDelete()</code> return <code>Future&lt;bool&gt;</code>.</strong>
-They return <code>false</code> when a model event cancels them. Code that overrides these methods in a model must use <code>Future&lt;bool&gt;</code>.</p>
-<p><strong>A model can not have a field or method named like a model hook.</strong>
-The <code>Model</code> class now has <code>onSaving()</code>, <code>onCreated()</code>, <code>onDeleted()</code> and the other <a href="../../database/model/events/">event hooks</a>, plus <code>restore()</code>, <code>saveQuietly()</code>, <code>hasModelHooks</code> and <code>setComputedValues()</code>.
-Fix: rename a field with one of these names.</p>
-<p><strong><code>dox_builder</code> needs the new analyzer.</strong>
-It uses <code>analyzer</code> 14, <code>source_gen</code> 4 and <code>build</code> 5, so it needs Dart <strong>3.13</strong> or newer.
-Set <code>build_runner: ^2.17.1</code> in <code>dev_dependencies</code>.
-Other builders in your app (for example <code>json_serializable</code>) must also support <code>analyzer</code> 14.</p>
-<p><strong>New:</strong> <a href="../../database/model/#computed-values">computed values</a> with <code>@Computed()</code>, <a href="../../database/model/events/">model events and observers</a>, and <code>restore()</code> for soft deleted models.</p>
-<p><strong>New:</strong> SQLite, <code>whereNull</code>, <code>whereNotNull</code>, <code>whereNotIn</code>, <code>orWhereIn</code>, <code>orWhereNotIn</code>, <code>selectRaw</code>, <code>boolean()</code> column, transactions.
-See <a href="../../database/">Database</a>.</p>
-<h2 id="migrations">Migrations</h2>
-<p><strong>Migrations are Dart files now.</strong>
-<code>dox make:migration create_users_table</code> makes a Dart class in <code>db/migration</code>.
-It also makes the registry <code>db/migration/migrations.dart</code> and, once, <code>bin/migrate.dart</code>.
-The <code>dox migration:*</code> commands run <code>bin/migrate.dart</code> in your app.
-Old <code>.sql</code> migrations still run. Use <code>make:migration &lt;name&gt; --sql</code> for a new <code>.sql</code> file.
-<code>dox migration:status</code> shows which migrations ran.</p>
-<p><strong>The runner is renamed.</strong>
-<code>Migration()</code> is now <code>Migrator()</code>. <code>Migration</code> is now the base class of a Dart migration.
-<code>migrate(conn)</code> is now <code>Migrator(connection: conn).migrate()</code>.
-<code>rollback(null, 2)</code> is now <code>rollback(step: 2)</code>.</p>
-<p><strong>The schema builder changed.</strong> See <a href="../../database/schema/">Schema builder</a>.</p>
+<h2 id="type-errors">Type errors</h2>
+<p>These have no annotation. They come from the field type.</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>When</th>
+<th>Message</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>required</code></td>
+<td>a required field is missing, <code>null</code>, or <code>""</code></td>
+<td><code>The {field} is required</code></td>
+</tr>
+<tr>
+<td><code>string</code></td>
+<td>not a string</td>
+<td><code>The {field} must be a string</code></td>
+</tr>
+<tr>
+<td><code>integer</code></td>
+<td>not a whole number</td>
+<td><code>The {field} must be an integer</code></td>
+</tr>
+<tr>
+<td><code>numeric</code></td>
+<td>not a number (<code>double</code>, <code>num</code>)</td>
+<td><code>The {field} must be a number</code></td>
+</tr>
+<tr>
+<td><code>boolean</code></td>
+<td>not a bool</td>
+<td><code>The {field} must be a boolean</code></td>
+</tr>
+<tr>
+<td><code>date</code></td>
+<td>not an ISO 8601 date</td>
+<td><code>The {field} must be a date</code></td>
+</tr>
+<tr>
+<td><code>in</code></td>
+<td>not a name of the enum</td>
+<td><code>The selected {field} is invalid. Valid options are {values}</code></td>
+</tr>
+<tr>
+<td><code>array</code></td>
+<td>not a list</td>
+<td><code>The {field} must be an array</code></td>
+</tr>
+<tr>
+<td><code>object</code></td>
+<td>not an object (nested DTO, <code>Map</code>)</td>
+<td><code>The {field} must be an object</code></td>
+</tr>
+<tr>
+<td><code>file</code></td>
+<td>not a file</td>
+<td><code>The {field} must be a file</code></td>
+</tr>
+<tr>
+<td><code>unrecognized_keys</code></td>
+<td>unknown key, with <code>@Dto(strict: true)</code></td>
+<td><code>The {field} field is not allowed</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="text">Text</h2>
+<p>For <code>String</code> fields (and <code>List&lt;String&gt;</code> items).</p>
+<table>
+<thead>
+<tr>
+<th>Annotation</th>
+<th>Code</th>
+<th>Message</th>
+<th>JSON Schema</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@Length(min: 3, max: 50)</code></td>
+<td><code>length_between</code></td>
+<td><code>The {field} must be between {min} and {max} characters</code></td>
+<td><code>minLength</code>, <code>maxLength</code></td>
+</tr>
+<tr>
+<td><code>@Length(min: 6, max: 6)</code></td>
+<td><code>length</code></td>
+<td><code>The {field} must be exactly {length} characters</code></td>
+<td><code>minLength</code>, <code>maxLength</code></td>
+</tr>
+<tr>
+<td><code>@MinLength(3)</code></td>
+<td><code>min_length</code></td>
+<td><code>The {field} must be at least {min} characters</code></td>
+<td><code>minLength</code></td>
+</tr>
+<tr>
+<td><code>@MaxLength(50)</code></td>
+<td><code>max_length</code></td>
+<td><code>The {field} may not be greater than {max} characters</code></td>
+<td><code>maxLength</code></td>
+</tr>
+<tr>
+<td><code>@Email()</code></td>
+<td><code>email</code></td>
+<td><code>The {field} is not a valid email</code></td>
+<td><code>format: email</code></td>
+</tr>
+<tr>
+<td><code>@Url()</code></td>
+<td><code>url</code></td>
+<td><code>The {field} must be a url</code></td>
+<td><code>format: uri</code></td>
+</tr>
+<tr>
+<td><code>@Uuid()</code></td>
+<td><code>uuid</code></td>
+<td><code>The {field} is invalid uuid</code></td>
+<td><code>format: uuid</code></td>
+</tr>
+<tr>
+<td><code>@Ip()</code></td>
+<td><code>ip</code></td>
+<td><code>The {field} must be an ip address</code></td>
+<td><code>anyOf</code> <code>ipv4</code> / <code>ipv6</code></td>
+</tr>
+<tr>
+<td><code>@Regex(r'[a-z]+')</code></td>
+<td><code>regex</code></td>
+<td><code>The {field} format is invalid</code></td>
+<td><code>pattern</code></td>
+</tr>
+<tr>
+<td><code>@In(['a', 'b'])</code></td>
+<td><code>in</code></td>
+<td><code>The selected {field} is invalid. Valid options are {values}</code></td>
+<td><code>enum</code></td>
+</tr>
+<tr>
+<td><code>@NotIn(['root'])</code></td>
+<td><code>not_in</code></td>
+<td><code>The {field} field cannot be {value}</code></td>
+<td><code>not: {enum}</code></td>
+</tr>
+<tr>
+<td><code>@StartsWith('dox')</code></td>
+<td><code>start_with</code></td>
+<td><code>The {field} must start with {prefix}</code></td>
+<td><code>pattern</code></td>
+</tr>
+<tr>
+<td><code>@EndsWith('.dev')</code></td>
+<td><code>end_with</code></td>
+<td><code>The {field} must end with {suffix}</code></td>
+<td><code>pattern</code></td>
+</tr>
+<tr>
+<td><code>@Alpha()</code></td>
+<td><code>alpha</code></td>
+<td><code>The {field} must be an alphabetic</code></td>
+<td><code>pattern</code></td>
+</tr>
+<tr>
+<td><code>@AlphaNumeric()</code></td>
+<td><code>alpha_numeric</code></td>
+<td><code>The {field} must be only alphabetic and number</code></td>
+<td><code>pattern</code></td>
+</tr>
+<tr>
+<td><code>@AlphaDash()</code></td>
+<td><code>alpha_dash</code></td>
+<td><code>The {field} must be only alphabetic and dash</code></td>
+<td><code>pattern</code></td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
 <ul>
-<li><code>Schema.create(...)</code> is now <code>Schema().create(...)</code>, or the <code>schema</code> given to <code>up</code>.</li>
-<li>In <code>schema.table(...)</code> a column is added. Add <code>.change()</code> to change a column that exists.</li>
-<li><code>string()</code> is <code>VARCHAR(255)</code> by default. It was 100.</li>
-<li><code>id()</code> is <code>BIGSERIAL</code> on Postgres. It was <code>SERIAL</code>.</li>
-<li><code>money()</code>, <code>float4()</code> and <code>float8()</code> are removed. Use <code>decimal()</code>, <code>float()</code> or <code>double()</code>.</li>
-<li><code>foreignId('user_id').constrained()</code> guesses a plural table: <code>users</code>, <code>categories</code>.</li>
-<li><code>CREATE TABLE</code> and <code>CREATE UNIQUE INDEX</code> no longer add <code>IF NOT EXISTS</code>. Check with <code>schema.hasTable()</code> first if you need it.</li>
+<li><code>@Length</code> has <code>min:</code> and <code>max:</code>. Both are optional, but you must give one.
+  With only <code>min:</code> it acts like <code>@MinLength</code>, with only <code>max:</code> like <code>@MaxLength</code>.</li>
+<li>Length counts characters (Unicode code points). <code>é</code> counts as 1.</li>
+<li><code>@Url()</code> needs <code>http</code> or <code>https</code> and a host.</li>
+<li><code>@Uuid()</code> takes any version. Upper or lower case.</li>
+<li><code>@Regex(pattern, {message})</code> must match the <strong>whole</strong> value. You do not need <code>^</code> and <code>$</code>.
+  The regex is checked when the generator runs. A bad regex stops the build.</li>
+<li><code>@Alpha()</code>, <code>@AlphaNumeric()</code> and <code>@AlphaDash()</code> use ASCII letters <code>a-z</code>, <code>A-Z</code>. <code>@AlphaDash()</code> also allows <code>-</code> and <code>_</code>.</li>
+<li><code>@In</code> and <code>@NotIn</code> compare exactly (case matters).</li>
 </ul>
-<p><strong>Rollback undoes only the last batch, newest first.</strong>
-Use <code>dox migration:rollback --step=2</code> for more. <code>migration:reset</code> undoes all. <code>migration:refresh</code> undoes all and runs them again.</p>
-<p><strong>A failed migration stops the run.</strong>
-The command throws and the CLI exits with code 1. Each file runs in one transaction.</p>
-<p><strong><code>.sql</code> parsing is stricter.</strong>
-Only lines <code>-- up</code> and <code>-- down</code> start a section. A <code>;</code> inside quotes, comments or <code>$$</code> bodies does not split a statement.</p>
-<p><strong>The <code>dox_migration</code> executable is gone.</strong> Use the <code>dox</code> CLI.</p>
-<p>See <a href="../../database/migration/">Migration</a>.</p>
-<h2 id="requests-and-responses">Requests and responses</h2>
-<p><strong>Big uploads go to a temp file.</strong>
-A file over 1 MB is streamed to a temp file. The temp file is deleted when the response is sent.
-Fix: save the file (<code>store</code>, <code>moveTo</code> or <code>stream</code>) before your controller returns.</p>
-<p><strong>Body size limits.</strong>
-A JSON or urlencoded body over 10 MB, or a form-data body over 100 MB, gets <code>413 Payload Too Large</code>.
-Fix: raise <code>maxBodySize</code> or <code>maxMultipartSize</code> in <code>AppConfig</code> if you need more.</p>
-<p><strong><code>RequestFile</code> changed.</strong></p>
+<h2 id="change-text">Change text</h2>
+<p>These change the value before the rules run. They always run in this order, wherever you put them:
+<code>@Trim</code>, then <code>@Lowercase</code> or <code>@Uppercase</code>, then the "empty string is missing" check.</p>
+<table>
+<thead>
+<tr>
+<th>Annotation</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@Trim()</code></td>
+<td>removes spaces at the start and the end</td>
+</tr>
+<tr>
+<td><code>@Lowercase()</code></td>
+<td>makes the text lower case</td>
+</tr>
+<tr>
+<td><code>@Uppercase()</code></td>
+<td>makes the text upper case</td>
+</tr>
+<tr>
+<td><code>@AllowEmpty()</code></td>
+<td>keeps <code>""</code> as a value. Without it, <code>""</code> counts as missing.</td>
+</tr>
+</tbody>
+</table>
+<p>They have no error and no JSON Schema output. <code>@Lowercase()</code> and <code>@Uppercase()</code> together stop the build.</p>
+<h2 id="numbers">Numbers</h2>
+<p>For <code>int</code>, <code>double</code> and <code>num</code> fields (and list items).</p>
+<table>
+<thead>
+<tr>
+<th>Annotation</th>
+<th>Code</th>
+<th>Message</th>
+<th>JSON Schema</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@Min(18)</code></td>
+<td><code>min</code></td>
+<td><code>The {field} must be greater than or equal {min}</code></td>
+<td><code>minimum</code></td>
+</tr>
+<tr>
+<td><code>@Max(100)</code></td>
+<td><code>max</code></td>
+<td><code>The {field} must be less than or equal {max}</code></td>
+<td><code>maximum</code></td>
+</tr>
+<tr>
+<td><code>@Range(1, 10)</code></td>
+<td><code>between</code></td>
+<td><code>The {field} must be between {min} and {max}</code></td>
+<td><code>minimum</code>, <code>maximum</code></td>
+</tr>
+<tr>
+<td><code>@Positive()</code></td>
+<td><code>greater_than</code></td>
+<td><code>The {field} must be greater than 0</code></td>
+<td><code>exclusiveMinimum: 0</code></td>
+</tr>
+<tr>
+<td><code>@GreaterThan(0.5)</code></td>
+<td><code>greater_than</code></td>
+<td><code>The {field} must be greater than {min}</code> (exclusive)</td>
+<td><code>exclusiveMinimum</code></td>
+</tr>
+<tr>
+<td><code>@LessThan(100)</code></td>
+<td><code>less_than</code></td>
+<td><code>The {field} must be less than {max}</code> (exclusive)</td>
+<td><code>exclusiveMaximum</code></td>
+</tr>
+<tr>
+<td><code>@In([1, 2, 3])</code></td>
+<td><code>in</code></td>
+<td><code>The selected {field} is invalid. Valid options are {values}</code></td>
+<td><code>enum</code></td>
+</tr>
+<tr>
+<td><code>@NotIn([0])</code></td>
+<td><code>not_in</code></td>
+<td><code>The {field} field cannot be {value}</code></td>
+<td><code>not: {enum}</code></td>
+</tr>
+</tbody>
+</table>
+<p>The values are <code>num</code>. <code>@Min(1.5)</code> on an <code>int</code> field stops the build.</p>
+<h2 id="lists">Lists</h2>
+<p>For <code>List&lt;T&gt;</code> fields. These check the list, not the items.</p>
+<table>
+<thead>
+<tr>
+<th>Annotation</th>
+<th>Code</th>
+<th>Message</th>
+<th>JSON Schema</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@MinItems(1)</code></td>
+<td><code>min_items</code></td>
+<td><code>The {field} must have at least {min} items</code></td>
+<td><code>minItems</code></td>
+</tr>
+<tr>
+<td><code>@MaxItems(5)</code></td>
+<td><code>max_items</code></td>
+<td><code>The {field} may not have more than {max} items</code></td>
+<td><code>maxItems</code></td>
+</tr>
+<tr>
+<td><code>@UniqueItems()</code></td>
+<td><code>unique_items</code></td>
+<td><code>The {field} must not have duplicate items</code></td>
+<td><code>uniqueItems: true</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>@UniqueItems()</code> works for <code>String</code>, numbers, <code>bool</code>, enums and <code>DateTime</code>. On a list of DTOs it stops the build.</p>
+<h2 id="dates">Dates</h2>
+<p>For <code>DateTime</code> fields.</p>
+<table>
+<thead>
+<tr>
+<th>Annotation</th>
+<th>Code</th>
+<th>Message</th>
+<th>JSON Schema</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@After('2000-01-01')</code></td>
+<td><code>after</code></td>
+<td><code>The {field} must be a date after {date}</code></td>
+<td><code>format: date-time</code></td>
+</tr>
+<tr>
+<td><code>@Before('now')</code></td>
+<td><code>before</code></td>
+<td><code>The {field} must be a date before {date}</code></td>
+<td><code>format: date-time</code></td>
+</tr>
+</tbody>
+</table>
 <ul>
-<li>The constructor takes <code>filename</code>, <code>filetype</code>, <code>length</code>, and <code>bytes</code> or <code>file</code>. The <code>stream</code> argument is gone.</li>
-<li><code>size</code> is now right: it is the size in KB. Before, it added up the byte values.</li>
-<li>New: <code>length</code> (bytes), <code>stream()</code>, <code>moveTo()</code>, <code>file</code>.</li>
+<li>The value is an ISO 8601 date, or <code>'now'</code> (the time of the request).</li>
+<li>Both are exclusive: <code>@After('2000-01-01')</code> does not accept <code>2000-01-01T00:00:00Z</code>.</li>
+<li>To compare two fields (end after start), use <a href="../validation/#checks-across-fields-validate"><code>validate()</code></a>.</li>
 </ul>
-<p><strong>Cookie <code>Max-Age</code> is in seconds.</strong>
-Before, Dox sent milliseconds, so a 1 hour cookie lived 1000 hours.
-<code>req.cookie()</code> now returns the decrypted value, and many cookies in one header work.</p>
-<p><strong>CORS preflight.</strong> An <code>OPTIONS</code> request with no route answers <code>204</code> with the CORS headers.</p>
-<p>See <a href="../request/">Request</a> and <a href="../response/">Response</a>.</p>
-<h2 id="server-and-config">Server and config</h2>
-<p><strong>Isolates default to the CPU count (was 3).</strong>
-Each isolate has its own memory. Websocket rooms without a Redis adapter only reach clients on the same isolate.
-Fix: use the Redis adapter, or set <code>totalIsolate: 1</code> (or <code>APP_TOTAL_ISOLATE=1</code>). See <a href="../../digging-deeper/isolate/">Isolate</a>.</p>
-<p><strong>Real environment variables win over <code>.env</code>.</strong>
-Before, <code>Env.get()</code> only read the <code>.env</code> file. Now a variable set in the shell or in Docker wins.</p>
-<p><strong>gzip is off by default.</strong> Turn it on with <code>AppConfig(compress: true)</code>, or let your proxy do it.</p>
-<p><strong><code>dox build</code> makes an AOT bundle in <code>build/bundle</code>.</strong> The binary is <code>build/bundle/bin/server</code>.
-It uses <code>dart build cli</code>, not <code>dart compile exe</code>. <code>dox_orm</code> uses <code>sqlite3</code> v3, which bundles SQLite
-with a build hook, and <code>dart compile exe</code> stops with "does not support build hooks".
-If your own Dockerfile or CI runs <code>dart compile exe</code>, change it to
-<code>dart build cli --target bin/server.dart --output build</code> and copy all of <code>build/bundle</code>.
-See <a href="../../digging-deeper/deployment/">Deployment</a>.</p>
-<h2 id="validation">Validation</h2>
-<p><strong>A missing or <code>null</code> field skips its rules.</strong>
-Only <code>required</code>, <code>required_if</code> and <code>required_if_not</code> still run.
-Before, <code>'status': 'in:active,inactive'</code> failed when <code>status</code> was not sent. Now it passes.
-Fix: add <code>required</code> where the field must be sent. Use <code>nullable</code> and <code>sometimes</code> for the other cases.</p>
-<p><strong>Validation runs on <code>dox_validation</code>.</strong> The messages and the <code>{field: message}</code> error map are the same.</p>
+<h2 id="files">Files</h2>
+<p>For <code>RequestFile</code> and <code>List&lt;RequestFile&gt;</code> fields.</p>
+<table>
+<thead>
+<tr>
+<th>Annotation</th>
+<th>Code</th>
+<th>Message</th>
+<th>JSON Schema</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@MaxSize('2MB')</code></td>
+<td><code>max_size</code></td>
+<td><code>The {field} may not be larger than {max}</code></td>
+<td><code>maxLength</code> (bytes)</td>
+</tr>
+<tr>
+<td><code>@Mimes(['pdf', 'png'])</code></td>
+<td><code>mimes</code></td>
+<td><code>The {field} must be a file of type: {types}</code></td>
+<td><code>contentMediaType</code></td>
+</tr>
+<tr>
+<td><code>@Image()</code></td>
+<td><code>image</code></td>
+<td><code>The {field} must be an image</code></td>
+<td><code>contentMediaType: image/*</code></td>
+</tr>
+</tbody>
+</table>
 <ul>
-<li><strong>An unknown rule name throws</strong> when the rules are first used. Before, it logged a warning and was skipped. Fix: correct the name, or add it with <code>v.registerRule()</code>.</li>
-<li><code>DoxValidator.addCustomRule()</code> still works. For new code, use <code>v.registerRule()</code>.</li>
-<li><code>req.validate()</code> now returns the validated fields (it returned nothing).</li>
-<li><code>dox_core</code> now exports the <code>dox_validation</code> names (<code>v</code>, <code>Schema</code>, <code>Rule</code>, ...). <code>dox_orm</code> also has a <code>Schema</code> class.
-  A file that imports both and uses <code>Schema</code> gets an "ambiguous import" error. Fix: <code>import 'package:dox_orm/dox_orm.dart' as orm;</code> or <code>hide Schema</code>.</li>
-<li>A class of yours named like a <code>dox_validation</code> class (for example <code>Validator</code> or <code>Rule</code>) wins in its own file. In other files, hide the <code>dox_core</code> one.</li>
+<li><code>@MaxSize</code> units: <code>B</code>, <code>KB</code>, <code>MB</code>, <code>GB</code>. <code>1KB</code> = 1024 bytes. A bad size text stops the build.</li>
+<li><code>@Mimes</code> takes file extensions. Dox finds the real type from the first bytes of the file.
+  For types without a byte signature (like <code>txt</code> or <code>csv</code>), it uses the file name extension.</li>
+<li><code>@Image()</code> is <code>@Mimes(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'])</code>. No <code>svg</code>.</li>
+<li>The JSON Schema of a file is <code>{"type": "string", "format": "binary"}</code>, plus the keys above.</li>
 </ul>
-<p>See <a href="../validation/">Validation</a>.</p>
-<h2 id="websocket">WebSocket</h2>
-<p><strong>Rooms use the plain room name.</strong>
-Emit to the same name the client sent with <code>joinRoom</code>. <code>room()</code> returns a new emitter and does not stay set for later events.</p>
-<h2 id="auth">Auth</h2>
-<p><strong><code>attempt()</code> returns <code>null</code> when the email, the password or the stored hash is missing.</strong>
-Before, a login with only a password could match the first user in the table.</p>
-<h2 id="cli">CLI</h2>
-<p><strong>Generated names keep word breaks.</strong>
-<code>dox create:controller BlogPost</code> makes <code>blog_post.controller.dart</code> with class <code>BlogPostController</code>.
-Generated models import <code>package:dox_orm/dox_orm.dart</code>.</p>
-<p><strong><code>create:migration</code> is now <code>make:migration</code>.</strong> The old name still works.
-It makes a Dart file by default. <code>--dart</code> is gone, use <code>--sql</code> for a <code>.sql</code> file.</p>
-<p><strong><code>create:model Blog -m</code> makes a Dart migration.</strong>
-The migration is <code>create_blogs_table</code>, and the model gets <code>@DoxModel(table: 'blogs')</code>.</p>
-<h2 id="cache">Cache</h2>
-<p><strong><code>Cache()</code> runs on <code>dox_cache</code>.</strong> The config changed:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// old</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">CacheConfig</span><span class="p">(</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nl">defaultDriver:</span><span class="w"> </span><span class="s1">'file'</span><span class="p">,</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nl">drivers:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">CacheDriverInterface</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'file'</span><span class="o">:</span><span class="w"> </span><span class="n">FileCacheDriver</span><span class="p">()},</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">);</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1">// new</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="n">CacheConfig</span><span class="p">(</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="nl">defaultStore:</span><span class="w"> </span><span class="s1">'file'</span><span class="p">,</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">  </span><span class="nl">stores:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="p">{</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="s1">'file'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'file'</span><span class="p">,</span><span class="w"> </span><span class="s1">'path'</span><span class="o">:</span><span class="w"> </span><span class="s1">'storage/cache'</span><span class="p">},</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="s1">'redis'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'redis'</span><span class="p">,</span><span class="w"> </span><span class="s1">'host'</span><span class="o">:</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">},</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="p">);</span>
-</span></code></pre></div>
+<h2 id="database">Database</h2>
+<p>From <code>dox_orm</code>. Async: they run after all other checks passed.</p>
+<table>
+<thead>
+<tr>
+<th>Annotation</th>
+<th>Code</th>
+<th>Message</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@Unique(table, {column, ignoreParam, ignoreColumn, connection})</code></td>
+<td><code>unique</code></td>
+<td><code>The {field} has already been taken</code></td>
+</tr>
+<tr>
+<td><code>@Exists(table, {column, connection})</code></td>
+<td><code>exists</code></td>
+<td><code>The selected {field} is invalid</code></td>
+</tr>
+</tbody>
+</table>
 <ul>
-<li><code>CacheDriverInterface</code> and <code>FileCacheDriver</code> are gone. For your own driver, see <a href="../../packages/cache/#your-own-driver">dox_cache</a>.</li>
-<li><strong>Values must be JSON types</strong> (<code>Map</code>, <code>List</code>, <code>String</code>, <code>num</code>, <code>bool</code>). Other types throw.</li>
-<li><strong><code>put</code> with no <code>duration</code> keeps the value forever.</strong> Before, it kept it 1 hour. Pass <code>duration:</code> where you need a limit.</li>
-<li><code>Cache().flush()</code> with no tag empties the whole store.</li>
-<li>Old cache files are not read. The new files are plain JSON, not encrypted. Delete <code>storage/cache</code> once.</li>
+<li><code>@Unique</code> column default: the input key. <code>@Exists</code> column default: <code>id</code>.</li>
+<li><code>ignoreParam: 'id'</code> skips the row where <code>ignoreColumn</code> (default <code>id</code>) equals the path param <code>{id}</code>.</li>
+<li>They add nothing to the JSON Schema.</li>
 </ul>
-<p>See <a href="../../digging-deeper/cache/">Cache</a>.</p>
-<h2 id="file-storage">File storage</h2>
-<p><strong><code>Storage()</code> runs on <code>dox_storage</code>.</strong> <code>AppConfig(fileStorage:)</code> is now <code>AppConfig(storage:)</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// old</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">FileStorageConfig</span><span class="p">(</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nl">defaultDriver:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nl">drivers:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">StorageDriverInterface</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'local'</span><span class="o">:</span><span class="w"> </span><span class="n">LocalStorageDriver</span><span class="p">()},</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">);</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1">// new</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">StorageConfig</span><span class="p">(</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="nl">defaultDisk:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="nl">disks:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="p">{</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">    </span><span class="s1">'local'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span><span class="w"> </span><span class="s1">'root'</span><span class="o">:</span><span class="w"> </span><span class="s1">'storage'</span><span class="p">},</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="p">);</span>
-</span></code></pre></div>
+<p>See <a href="../validation/#database-rules-unique-and-exists">Database rules</a>.</p>
+<h2 id="keys-and-dto-options">Keys and DTO options</h2>
+<table>
+<thead>
+<tr>
+<th>Annotation</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@Name('emailAddress')</code></td>
+<td>the input key for this field. Default: the field name in snake_case.</td>
+</tr>
+<tr>
+<td><code>@Dto()</code></td>
+<td>marks the class.</td>
+</tr>
+<tr>
+<td><code>@Dto(source: Source.query)</code></td>
+<td>where to read: <code>Source.auto</code> (default), <code>Source.query</code>, <code>Source.body</code>.</td>
+</tr>
+<tr>
+<td><code>@Dto(keyCase: KeyCase.field)</code></td>
+<td>keys: <code>KeyCase.snake</code> (default) or <code>KeyCase.field</code> (the Dart name as is).</td>
+</tr>
+<tr>
+<td><code>@Dto(strict: true)</code></td>
+<td>unknown keys are errors. Default <code>false</code>: they are dropped.</td>
+</tr>
+<tr>
+<td><code>@Dto(messages: {...})</code></td>
+<td>messages by <code>code</code> or <code>key.code</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>A <code>///</code> doc comment on a field becomes its <code>description</code> in the JSON Schema.</p>
+<h2 id="what-the-generator-checks">What the generator checks</h2>
+<p>The build stops with a clear error when:</p>
 <ul>
-<li><code>StorageDriverInterface</code> and <code>LocalStorageDriver</code> are gone. Implement <code>DriverContract</code> from <code>dox_storage</code> and call <code>Dox().storage.register(name, driver)</code>.</li>
-<li><code>Storage().disk('name')</code> with a name that is not in the config throws. Before, it used the default disk.</li>
-<li><code>put</code>, <code>putRequestFile</code>, <code>get</code>, <code>exists</code>, <code>delete</code>, <code>stream</code> and <code>download</code> work as before. Paths still look like <code>/images/&lt;uuid&gt;.png</code>.</li>
-<li><code>stream()</code> now gets the content type from the file extension, not from the first bytes.</li>
-</ul>
-<p>See <a href="../../digging-deeper/file-storage/">File Storage</a>.</p>
-<h2 id="environment">Environment</h2>
-<p><strong>A missing key is never the text <code>"null"</code>.</strong>
-Before, <code>Env.get('APP_KEY')</code> with no <code>APP_KEY</code> gave <code>"null"</code>, so the app used a key anyone can guess.
-Now a <code>String</code> gives <code>''</code>, <code>String?</code> gives <code>null</code>, and <code>int</code>, <code>num</code>, <code>double</code>, <code>bool</code> throw an <code>ArgumentError</code>.
-Fix: give a default where a key is optional, for example <code>Env.get&lt;int&gt;('APP_PORT', 3000)</code>.</p>
-<p><strong>An empty <code>APP_KEY</code> stops the server in production</strong> (<code>APP_ENV=production</code>). Run <code>dox key:generate</code>.</p>
-<h2 id="new-names-from-dox_core">New names from <code>dox_core</code></h2>
-<p><code>dox_core</code> now exports the OpenAPI and DTO annotations: <code>Request</code>, <code>Response</code>, <code>Body</code>, <code>Query</code>, <code>Tags</code>, <code>Summary</code>, <code>Description</code>, <code>Dto</code>, <code>Length</code>, <code>Email</code>, <code>Min</code>, <code>Max</code>, <code>Pattern</code>, <code>MinItems</code>, <code>MaxItems</code>, <code>Trim</code>, <code>Format</code>, and lower case names like <code>summary</code>, <code>body</code>, <code>query</code>.</p>
-<ul>
-<li><strong><code>Pattern</code> means the annotation</strong> in a file that imports <code>dox_core</code>. Fix: <code>import 'package:dox_core/dox_core.dart' hide Pattern;</code> if you need <code>Pattern</code> of <code>dart:core</code>.</li>
-<li><strong>Two <code>Request</code> or <code>Response</code> classes</strong>: a file that imports <code>dox_core</code> and <code>package:http</code> (or another package with these names) without a prefix gets an "ambiguous import" error. Fix: <code>import 'package:http/http.dart' as http;</code>.</li>
-<li><code>dox_builder</code> writes a new file, <code>lib/openapi.g.dart</code>, in apps with controllers. Commit it like the other <code>.g.dart</code> files.</li>
-</ul>
-<h2 id="new-built-in-features">New built-in features</h2>
-<ul>
-<li><a href="../../packages/openapi/#in-a-dox-app">OpenAPI docs</a> at <code>/docs</code>, on by default only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>. They are made from your routes, request classes and controllers: run <code>dox build_runner:build</code>, then pass <code>openApiRegistry</code> from <code>lib/openapi.g.dart</code> to <code>OpenApiConfig(registry:)</code>. <code>dox openapi:generate</code> writes the files.</li>
-<li><a href="../../packages/socketio/#in-a-dox-app-same-port-as-http">Socket.IO</a> on the app port, off by default.</li>
-<li><a href="../validation/#database-rules-unique-and-exists"><code>unique</code> and <code>exists</code> rules</a>, <code>validateAsync()</code>, <code>validateSchema()</code> and <code>FormRequest.schema()</code>.</li>
-<li><code>Route.files()</code> for local signed URLs, and the catch-all route param <code>{path*}</code>.</li>
+<li>a field is not <code>final</code>, or is not a parameter of the unnamed constructor,</li>
+<li>a field type is not supported (see <a href="../validation/#types">Types</a>),</li>
+<li>a rule does not fit the field type (like <code>@Email()</code> on an <code>int</code>),</li>
+<li>a <code>Maybe&lt;T&gt;</code> field has no <code>const Maybe.missing()</code> default,</li>
+<li>two <code>@Dto</code> classes in the app have the same name,</li>
+<li>the class is generic, or extends another class (other than <code>Object</code>).</li>
 </ul>
 
 
@@ -2947,7 +3091,7 @@ Fix: give a default where a key is optional, for example <code>Env.get&lt;int&gt
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../installation/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Installation">
+          <a href="../validation/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Validation">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2957,20 +3101,20 @@ Fix: give a default where a key is optional, for example <code>Env.get&lt;int&gt
                 Previous
               </span>
               <div class="md-ellipsis">
-                Installation
+                Validation
               </div>
             </div>
           </a>
         
         
           
-          <a href="../routing/" class="md-footer__link md-footer__link--next" aria-label="Next: Routing">
+          <a href="../../digging-deeper/cache/" class="md-footer__link md-footer__link--next" aria-label="Next: Cache">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Routing
+                Cache
               </div>
             </div>
             <div class="md-footer__button md-icon">

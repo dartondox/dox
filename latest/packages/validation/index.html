@@ -25,7 +25,7 @@
     
     
       
-        <title>Validation schemas - DOX</title>
+        <title>dox_validation - DOX</title>
       
     
     
@@ -88,7 +88,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#validation-schemas" class="md-skip">
+        <a href="#dox_validation" class="md-skip">
           Skip to content
         </a>
       
@@ -125,7 +125,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Validation schemas
+              dox_validation
             
           </span>
         </div>
@@ -540,34 +540,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/upgrade/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Upgrade from 2.x to 3.x
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../the-basic/routing/" class="md-nav__link">
         
   
@@ -716,6 +688,34 @@
     
   
     Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
   
 
     
@@ -1712,7 +1712,7 @@
   <span class="md-ellipsis">
     
   
-    Validation schemas
+    dox_validation
   
 
     
@@ -1730,7 +1730,7 @@
   <span class="md-ellipsis">
     
   
-    Validation schemas
+    dox_validation
   
 
     
@@ -1767,10 +1767,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quick-start" class="md-nav__link">
+  <a href="#dtos" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quick start
+        DTOs
       
     </span>
   </a>
@@ -1778,17 +1778,46 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#use-it-in-a-controller" class="md-nav__link">
+  <a href="#dtoschemat" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Use it in a controller
+        DtoSchema&lt;T&gt;
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DtoSchema&lt;T&gt;">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#json-schema-of-a-dto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JSON Schema of a DTO
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
+  <a href="#fluent-schemas-for-dynamic-input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fluent schemas (for dynamic input)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fluent schemas (for dynamic input)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#schemas" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1798,8 +1827,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#coercion" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1809,8 +1838,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#checks-across-fields" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1820,8 +1849,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#async-checks" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1831,15 +1860,20 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#custom-rules" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#custom-rules-in-a-fluent-schema" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Custom rules
+        Custom rules in a fluent schema
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1848,28 +1882,6 @@
     <span class="md-ellipsis">
       
         Messages
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rule-strings-with-fromrules" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule strings with fromRules
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#json-schema" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        JSON Schema
       
     </span>
   </a>
@@ -2485,10 +2497,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quick-start" class="md-nav__link">
+  <a href="#dtos" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quick start
+        DTOs
       
     </span>
   </a>
@@ -2496,17 +2508,46 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#use-it-in-a-controller" class="md-nav__link">
+  <a href="#dtoschemat" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Use it in a controller
+        DtoSchema&lt;T&gt;
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DtoSchema&lt;T&gt;">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#json-schema-of-a-dto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JSON Schema of a DTO
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
+  <a href="#fluent-schemas-for-dynamic-input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fluent schemas (for dynamic input)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fluent schemas (for dynamic input)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#schemas" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2516,8 +2557,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#coercion" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2527,8 +2568,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#checks-across-fields" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2538,8 +2579,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#async-checks" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2549,15 +2590,20 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#custom-rules" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#custom-rules-in-a-fluent-schema" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Custom rules
+        Custom rules in a fluent schema
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2566,28 +2612,6 @@
     <span class="md-ellipsis">
       
         Messages
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rule-strings-with-fromrules" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule strings with fromRules
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#json-schema" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        JSON Schema
       
     </span>
   </a>
@@ -2625,55 +2649,168 @@
   
 
 
-<h1 id="validation-schemas">Validation schemas</h1>
-<p><code>dox_validation</code> checks data with typed schemas, like <a href="https://zod.dev">Zod</a>.
-You describe the shape once. You get typed output, all errors at once, and a JSON Schema for free.</p>
+<h1 id="dox_validation">dox_validation</h1>
+<p><code>dox_validation</code> checks input and gives you typed Dart objects.
+It has two parts:</p>
+<ol>
+<li><strong>DTOs</strong>: a class with <code>@Dto()</code> and rule annotations. A generator writes the checks. Use this for almost everything.</li>
+<li><strong>Fluent schemas</strong>: <code>v.object(...)</code>, like <a href="https://zod.dev">Zod</a>. Use it only when the shape is known at runtime.</li>
+</ol>
+<p>Both give all errors at once, and a JSON Schema for <a href="../openapi/">OpenAPI</a>.</p>
 <div class="admonition tip">
 <p class="admonition-title">Built into Dox</p>
-<p><code>dox_core</code> uses <code>dox_validation</code> for <code>req.validate()</code>, and it exports it.
-In a Dox app you do not add or import anything: <code>import 'package:dox_core/dox_core.dart'</code> gives <code>v</code>, <code>Schema</code> and the rest.
-See <a href="../../the-basic/validation/">Validation</a> for <code>req.validate()</code>, <code>validateAsync()</code>, <code>validateSchema()</code> and the <code>unique</code> / <code>exists</code> rules.</p>
+<p><code>dox_core</code> uses <code>dox_validation</code> and exports it. <code>import 'package:dox_core/dox_core.dart'</code> is all you need.
+The guide is at <a href="../../the-basic/validation/">Validation</a>. Every rule is in the <a href="../../the-basic/validation-rules/">rules reference</a>.
+This page is about the package itself, and about using it outside Dox.</p>
 </div>
 <h2 id="install-outside-dox">Install (outside Dox)</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_validation
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dev:dox_builder<span class="w"> </span>dev:build_runner
 </span></code></pre></div>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_validation/dox_validation.dart'</span><span class="p">;</span>
 </span></code></pre></div>
-<h2 id="quick-start">Quick start</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">final</span><span class="w"> </span><span class="n">ObjectSchema</span><span class="w"> </span><span class="n">createUser</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">object</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Schema</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;&gt;</span><span class="p">{</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">().</span><span class="n">trim</span><span class="p">().</span><span class="n">min</span><span class="p">(</span><span class="m">3</span><span class="p">).</span><span class="n">max</span><span class="p">(</span><span class="m">50</span><span class="p">),</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">().</span><span class="n">email</span><span class="p">(),</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="s1">'age'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">coerce</span><span class="p">.</span><span class="kt">int</span><span class="p">().</span><span class="n">min</span><span class="p">(</span><span class="m">18</span><span class="p">).</span><span class="n">optional</span><span class="p">(),</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="s1">'role'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">enumOf</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'admin'</span><span class="p">,</span><span class="w"> </span><span class="s1">'user'</span><span class="p">]).</span><span class="n">defaultTo</span><span class="p">(</span><span class="s1">'user'</span><span class="p">),</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="s1">'tags'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">list</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">()).</span><span class="n">max</span><span class="p">(</span><span class="m">5</span><span class="p">),</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">});</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="c1">// throws ValidationException when the input is not valid</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createUser</span><span class="p">.</span><span class="n">parse</span><span class="p">(</span><span class="n">input</span><span class="p">);</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="c1">// never throws for bad input</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="n">ParseResult</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createUser</span><span class="p">.</span><span class="n">safeParse</span><span class="p">(</span><span class="n">input</span><span class="p">);</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">result</span><span class="p">.</span><span class="n">success</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">  </span><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">errors</span><span class="p">);</span><span class="w"> </span><span class="c1">// {'email': 'The email is not a valid email'}</span>
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="p">}</span>
+<p>The DTO generator is in <code>dox_builder</code>. Run it with <code>dart run build_runner build</code>.
+<code>@Unique</code> and <code>@Exists</code> are in <code>dox_orm</code>, not here.</p>
+<h2 id="dtos">DTOs</h2>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_validation/dox_validation.dart'</span><span class="p">;</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">part</span><span class="w"> </span><span class="s1">'create_user.dto.g.dart'</span><span class="p">;</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nd">@Dto</span><span class="p">()</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="kd">class</span><span class="w"> </span><span class="nc">CreateUser</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="nd">@Length</span><span class="p">(</span><span class="nl">min:</span><span class="w"> </span><span class="m">3</span><span class="p">,</span><span class="w"> </span><span class="nl">max:</span><span class="w"> </span><span class="m">50</span><span class="p">)</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="nd">@Trim</span><span class="p">()</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">  </span><span class="nd">@Email</span><span class="p">()</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">email</span><span class="p">;</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">CreateUser</span><span class="p">({</span><span class="kd">required</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="kd">required</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">email</span><span class="p">});</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">DtoSchema</span><span class="o">&lt;</span><span class="n">CreateUser</span><span class="o">&gt;</span><span class="w"> </span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">$CreateUserDto</span><span class="p">;</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="p">}</span>
 </span></code></pre></div>
-<h2 id="use-it-in-a-controller">Use it in a controller</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">UserController</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">store</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="c1">// 422 with {field: message} when it fails</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">validateSchema</span><span class="p">(</span><span class="n">createUser</span><span class="p">);</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="c1">// ... save data</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">}</span>
+<p>The generator makes, for each <code>@Dto</code> class:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>$CreateUserDto</code></td>
+<td>a <code>const</code> <code>DtoSchema&lt;CreateUser&gt;</code>: the checks, the converter and the JSON Schema</td>
+</tr>
+<tr>
+<td><code>lib/dtos.g.dart</code></td>
+<td><code>const List&lt;DtoSchema&lt;Object&gt;&gt; dtos</code>: every DTO in <code>lib/</code>. Dox uses it to find DTOs by type.</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>static const ... schema = $CreateUserDto;</code> line is how you reach the schema: <code>CreateUser.schema</code>.</p>
+<h2 id="dtoschemat"><code>DtoSchema&lt;T&gt;</code></h2>
+<p><code>DtoSchema&lt;T&gt;</code> is also a <code>Schema&lt;T&gt;</code>. So it works everywhere a schema works:
+inside <code>v.object(...)</code>, <code>v.list(...)</code>, with OpenAPI, and as a <code>StandardSchema</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Future&lt;T&gt; validateMap(Map&lt;String, dynamic&gt; input, {Source source = Source.body, Map&lt;String, String&gt; params = const {}})</code></td>
+<td>all checks, then the object. Throws <code>ValidationException</code> with the errors.</td>
+</tr>
+<tr>
+<td><code>Future&lt;ParseResult&lt;T&gt;&gt; safeValidateMap(input, {source, params})</code></td>
+<td>the same, but never throws for bad input. <code>result.success</code>, <code>result.value</code>, <code>result.errors</code>.</td>
+</tr>
+<tr>
+<td><code>T fromMap(Map&lt;String, dynamic&gt; input)</code></td>
+<td>builds the object with <strong>no checks</strong>. Reads keys, converts JSON types, uses defaults. A wrong type throws a <code>TypeError</code>. Only for data you trust.</td>
+</tr>
+<tr>
+<td><code>Map&lt;String, dynamic&gt; toMap(T value)</code></td>
+<td>the object as a map with the input keys (snake_case). <code>DateTime</code> becomes an ISO 8601 string, an enum its name.</td>
+</tr>
+<tr>
+<td><code>Map&lt;String, dynamic&gt; toJsonSchema()</code></td>
+<td>JSON Schema (draft 2020-12).</td>
+</tr>
+<tr>
+<td><code>parse</code>, <code>safeParse</code>, <code>parseAsync</code>, <code>safeParseAsync</code></td>
+<td>the normal <code>Schema</code> methods, with <code>Source.body</code>. <code>parse</code> throws a <code>StateError</code> when the DTO has async rules.</td>
+</tr>
+<tr>
+<td><code>Type get type</code>, <code>String get name</code></td>
+<td><code>CreateUser</code> and <code>'CreateUser'</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><code>source: Source.query</code> reads the map like a query string: text is converted to the field type.
+<code>params</code> are path params, used by <code>@Unique(ignoreParam: ...)</code>.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">ParseResult</span><span class="o">&lt;</span><span class="n">CreateUser</span><span class="o">&gt;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">CreateUser</span><span class="p">.</span><span class="n">schema</span><span class="p">.</span><span class="n">safeValidateMap</span><span class="p">(</span><span class="n">input</span><span class="p">);</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">result</span><span class="p">.</span><span class="n">success</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">errors</span><span class="p">);</span><span class="w"> </span><span class="c1">// {'email': 'The email is not a valid email'}</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Or in a <a href="../../the-basic/request/#schema">form request</a>: return the schema from <code>schema()</code>.
-A <code>schema.parse()</code> that throws inside a controller also answers <code>422</code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code>dox_core</code> exports <code>dox_validation</code> without its <code>ValidationException</code>, because <code>dox_core</code> has its own
-(the HTTP 422 one). <code>dox_orm</code> also has a <code>Schema</code> class. In a file that uses both, import <code>dox_orm</code> with a prefix.</p>
+<p><code>dox_core</code> has its own <code>ValidationException</code> (the HTTP 422 one), so it does not export the one from <code>dox_validation</code>.
+In a Dox app, both answer <code>422</code> when thrown in a controller. In tests, prefer <code>safeValidateMap</code>.</p>
 </div>
-<h2 id="schemas">Schemas</h2>
+<h3 id="json-schema-of-a-dto">JSON Schema of a DTO</h3>
+<p>For the <code>CreateUser</code> from the <a href="../../the-basic/validation/">Validation guide</a> (with <code>age</code> and <code>role</code>):</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">CreateUser</span><span class="p">.</span><span class="n">schema</span><span class="p">.</span><span class="n">toJsonSchema</span><span class="p">();</span>
+</span></code></pre></div>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CreateUser"</span><span class="p">,</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w"> </span><span class="nt">"minLength"</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="nt">"maxLength"</span><span class="p">:</span><span class="w"> </span><span class="mi">50</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w"> </span><span class="nt">"format"</span><span class="p">:</span><span class="w"> </span><span class="s2">"email"</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"integer"</span><span class="p">,</span><span class="w"> </span><span class="s2">"null"</span><span class="p">],</span><span class="w"> </span><span class="nt">"minimum"</span><span class="p">:</span><span class="w"> </span><span class="mi">18</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="nt">"role"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w"> </span><span class="nt">"enum"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"admin"</span><span class="p">,</span><span class="w"> </span><span class="s2">"user"</span><span class="p">],</span><span class="w"> </span><span class="nt">"default"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user"</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">  </span><span class="nt">"required"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"name"</span><span class="p">,</span><span class="w"> </span><span class="s2">"email"</span><span class="p">]</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li><code>required</code> lists the required fields only.</li>
+<li>A nullable field has <code>"type": [..., "null"]</code>. A default becomes <code>default</code>.</li>
+<li>A nested DTO goes in <code>$defs</code> under its class name, with a <code>$ref</code>. OpenAPI moves it to <code>components/schemas</code>.</li>
+<li><code>@Dto(strict: true)</code> adds <code>"additionalProperties": false</code>.</li>
+<li>A <code>///</code> doc comment on a field becomes <code>description</code>.</li>
+<li>Each rule adds its keys. See the <a href="../../the-basic/validation-rules/">rules reference</a>.</li>
+</ul>
+<h2 id="fluent-schemas-for-dynamic-input">Fluent schemas (for dynamic input)</h2>
+<p>Use these when you only know the fields at runtime. The output is a <code>Map</code>, not a class.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">final</span><span class="w"> </span><span class="n">ObjectSchema</span><span class="w"> </span><span class="n">createUser</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">object</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Schema</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;&gt;</span><span class="p">{</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">().</span><span class="n">trim</span><span class="p">().</span><span class="n">min</span><span class="p">(</span><span class="m">3</span><span class="p">).</span><span class="n">max</span><span class="p">(</span><span class="m">50</span><span class="p">),</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">().</span><span class="n">email</span><span class="p">(),</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="s1">'age'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">coerce</span><span class="p">.</span><span class="kt">int</span><span class="p">().</span><span class="n">min</span><span class="p">(</span><span class="m">18</span><span class="p">).</span><span class="n">optional</span><span class="p">(),</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="s1">'role'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">enumOf</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'admin'</span><span class="p">,</span><span class="w"> </span><span class="s1">'user'</span><span class="p">]).</span><span class="n">defaultTo</span><span class="p">(</span><span class="s1">'user'</span><span class="p">),</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="s1">'tags'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">list</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">()).</span><span class="n">max</span><span class="p">(</span><span class="m">5</span><span class="p">),</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="s1">'address'</span><span class="o">:</span><span class="w"> </span><span class="n">Address</span><span class="p">.</span><span class="n">schema</span><span class="p">,</span><span class="w"> </span><span class="c1">// a DTO inside a fluent schema</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="p">});</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="c1">// throws ValidationException when the input is not valid</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createUser</span><span class="p">.</span><span class="n">parse</span><span class="p">(</span><span class="n">input</span><span class="p">);</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="c1">// never throws for bad input</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="n">ParseResult</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createUser</span><span class="p">.</span><span class="n">safeParse</span><span class="p">(</span><span class="n">input</span><span class="p">);</span>
+</span></code></pre></div>
+<p>In a controller: <code>Map&lt;String, dynamic&gt; data = await req.validateSchema(createUser);</code></p>
+<div class="admonition warning">
+<p class="admonition-title">Different defaults</p>
+<p>Fluent schemas do not follow the DTO rules. A key is required unless you add <code>optional()</code>.
+<code>""</code> is a value, not "missing". Text is not converted, unless you use <code>v.coerce</code>.</p>
+</div>
+<h3 id="schemas">Schemas</h3>
 <table>
 <thead>
 <tr>
@@ -2733,133 +2870,47 @@ A <code>schema.parse()</code> that throws inside a controller also answers <code
 <li><code>transform(fn)</code>, <code>refine(fn)</code>, <code>refineAsync(fn)</code>, <code>superRefine(fn)</code>, <code>use(rule)</code>.</li>
 <li><code>describe(text)</code>, <code>example(x)</code>: only used in the JSON Schema.</li>
 </ul>
-<h2 id="coercion">Coercion</h2>
-<p>Query strings and form data are always text. <code>v.coerce</code> turns text into the right type first.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">v</span><span class="p">.</span><span class="n">coerce</span><span class="p">.</span><span class="kt">int</span><span class="p">().</span><span class="n">parse</span><span class="p">(</span><span class="s1">'42'</span><span class="p">);</span><span class="w">       </span><span class="c1">// 42</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">v</span><span class="p">.</span><span class="n">coerce</span><span class="p">.</span><span class="kt">num</span><span class="p">().</span><span class="n">parse</span><span class="p">(</span><span class="s1">'4.5'</span><span class="p">);</span><span class="w">      </span><span class="c1">// 4.5</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">v</span><span class="p">.</span><span class="n">coerce</span><span class="p">.</span><span class="kt">bool</span><span class="p">().</span><span class="n">parse</span><span class="p">(</span><span class="s1">'on'</span><span class="p">);</span><span class="w">      </span><span class="c1">// true (true/1/yes/on, false/0/no/off)</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">v</span><span class="p">.</span><span class="n">coerce</span><span class="p">.</span><span class="n">date</span><span class="p">().</span><span class="n">parse</span><span class="p">(</span><span class="s1">'2024-01-31'</span><span class="p">);</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">v</span><span class="p">.</span><span class="n">coerce</span><span class="p">.</span><span class="n">string</span><span class="p">().</span><span class="n">parse</span><span class="p">(</span><span class="m">5</span><span class="p">);</span><span class="w">       </span><span class="c1">// '5'</span>
+<h3 id="coercion">Coercion</h3>
+<p>Query strings and form data are text. <code>v.coerce</code> turns text into the right type first.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">v</span><span class="p">.</span><span class="n">coerce</span><span class="p">.</span><span class="kt">int</span><span class="p">().</span><span class="n">parse</span><span class="p">(</span><span class="s1">'42'</span><span class="p">);</span><span class="w">       </span><span class="c1">// 42</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">v</span><span class="p">.</span><span class="n">coerce</span><span class="p">.</span><span class="kt">num</span><span class="p">().</span><span class="n">parse</span><span class="p">(</span><span class="s1">'4.5'</span><span class="p">);</span><span class="w">      </span><span class="c1">// 4.5</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">v</span><span class="p">.</span><span class="n">coerce</span><span class="p">.</span><span class="kt">bool</span><span class="p">().</span><span class="n">parse</span><span class="p">(</span><span class="s1">'on'</span><span class="p">);</span><span class="w">      </span><span class="c1">// true (true/1/yes/on, false/0/no/off)</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">v</span><span class="p">.</span><span class="n">coerce</span><span class="p">.</span><span class="n">date</span><span class="p">().</span><span class="n">parse</span><span class="p">(</span><span class="s1">'2024-01-31'</span><span class="p">);</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">v</span><span class="p">.</span><span class="n">coerce</span><span class="p">.</span><span class="n">string</span><span class="p">().</span><span class="n">parse</span><span class="p">(</span><span class="m">5</span><span class="p">);</span><span class="w">       </span><span class="c1">// '5'</span>
 </span></code></pre></div>
-<h2 id="checks-across-fields">Checks across fields</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">final</span><span class="w"> </span><span class="n">ObjectSchema</span><span class="w"> </span><span class="n">signUp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">object</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Schema</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;&gt;</span><span class="p">{</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="s1">'password'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">().</span><span class="n">min</span><span class="p">(</span><span class="m">8</span><span class="p">),</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="s1">'confirm'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">(),</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">}).</span><span class="n">refine</span><span class="p">((</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="s1">'password'</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="s1">'confirm'</span><span class="p">];</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="p">},</span><span class="w"> </span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Passwords do not match'</span><span class="p">,</span><span class="w"> </span><span class="nl">path:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'confirm'</span><span class="p">]);</span>
+<h3 id="checks-across-fields">Checks across fields</h3>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">final</span><span class="w"> </span><span class="n">ObjectSchema</span><span class="w"> </span><span class="n">signUp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">object</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Schema</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;&gt;</span><span class="p">{</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="s1">'password'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">().</span><span class="n">min</span><span class="p">(</span><span class="m">8</span><span class="p">),</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="s1">'confirm'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">(),</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="p">}).</span><span class="n">refine</span><span class="p">((</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="s1">'password'</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="s1">'confirm'</span><span class="p">];</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">},</span><span class="w"> </span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Passwords do not match'</span><span class="p">,</span><span class="w"> </span><span class="nl">path:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'confirm'</span><span class="p">]);</span>
 </span></code></pre></div>
-<h2 id="async-checks">Async checks</h2>
-<p>Use <code>refineAsync</code> for a check that needs the database.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">final</span><span class="w"> </span><span class="n">StringSchema</span><span class="w"> </span><span class="n">email</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">().</span><span class="n">email</span><span class="p">().</span><span class="n">refineAsync</span><span class="p">(</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="p">(</span><span class="kt">String</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="kd">await</span><span class="w"> </span><span class="n">users</span><span class="p">.</span><span class="n">emailExists</span><span class="p">(</span><span class="n">value</span><span class="p">));</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="nl">message:</span><span class="w"> </span><span class="s1">'The {field} is already taken'</span><span class="p">,</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="p">);</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="kd">await</span><span class="w"> </span><span class="n">email</span><span class="p">.</span><span class="n">parseAsync</span><span class="p">(</span><span class="s1">'a@dox.dev'</span><span class="p">);</span>
+<h3 id="async-checks">Async checks</h3>
+<p><code>refineAsync</code> runs a check that needs the database. Then use <code>parseAsync()</code> or <code>safeParseAsync()</code>.
+<code>parse()</code> throws a <code>StateError</code> when a schema has async checks.</p>
+<h3 id="custom-rules-in-a-fluent-schema">Custom rules in a fluent schema</h3>
+<p>A <code>Rule&lt;T&gt;</code> class works in both worlds: as an annotation on a DTO, and with <code>use()</code> here.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">().</span><span class="n">min</span><span class="p">(</span><span class="m">3</span><span class="p">).</span><span class="n">use</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Slug</span><span class="p">());</span>
 </span></code></pre></div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p><code>parse()</code> throws a <code>StateError</code> when a schema has async checks.
-Use <code>parseAsync()</code> or <code>safeParseAsync()</code> then.</p>
-</div>
-<h2 id="custom-rules">Custom rules</h2>
-<p>Extend <code>Rule</code> for a check you want to reuse.
-Add an extension method, so it looks like a built-in check.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">SlugRule</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Rule</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="n">SlugRule</span><span class="p">({</span><span class="k">super</span><span class="p">.</span><span class="n">message</span><span class="p">});</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s1">'slug'</span><span class="p">;</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">defaultMessage</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s1">'The {field} must be a slug'</span><span class="p">;</span>
-</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>
-</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">check</span><span class="p">(</span><span class="kt">String</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">RuleContext</span><span class="w"> </span><span class="n">context</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">RegExp</span><span class="p">(</span><span class="s1">r'^[a-z0-9-]+$'</span><span class="p">).</span><span class="n">hasMatch</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
-</span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-7-18"><a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="p">}</span>
-</span><span id="__span-7-19"><a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>
-</span><span id="__span-7-20"><a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="kd">extension</span><span class="w"> </span><span class="nc">SlugMethods</span><span class="w"> </span><span class="kd">on</span><span class="w"> </span><span class="n">StringSchema</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-21"><a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="w">  </span><span class="n">StringSchema</span><span class="w"> </span><span class="n">slug</span><span class="p">({</span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">message</span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-22"><a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">use</span><span class="p">(</span><span class="n">SlugRule</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="n">message</span><span class="p">));</span>
-</span><span id="__span-7-23"><a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-7-24"><a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a><span class="p">}</span>
-</span><span id="__span-7-25"><a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>
-</span><span id="__span-7-26"><a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">().</span><span class="n">min</span><span class="p">(</span><span class="m">3</span><span class="p">).</span><span class="n">slug</span><span class="p">();</span>
-</span></code></pre></div>
-<ul>
-<li>For a database check, extend <code>AsyncRule</code> and implement <code>checkAsync</code>.</li>
-<li><code>RuleContext</code> gives <code>path</code>, <code>field</code>, <code>root</code> (the whole input) and <code>lookup('other.field')</code>.</li>
-</ul>
+<p>See <a href="../../the-basic/validation/#custom-rules">Custom rules</a> for how to write one.</p>
 <h2 id="messages">Messages</h2>
-<p>Each error has a <code>code</code>, like <code>required</code> or <code>min_length</code>. Dox finds the message in this order:</p>
-<ol>
-<li>The message on the check: <code>.min(3, message: 'Too short')</code>.</li>
-<li><code>messages['path.code']</code>, like <code>email.required</code>.</li>
-<li><code>messages['code']</code>, like <code>required</code>.</li>
-<li>The default English text.</li>
-</ol>
-<p>Placeholders: <code>{field}</code>, <code>{value}</code>, and rule values like <code>{min}</code> and <code>{max}</code>.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1">// for the whole app</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">v</span><span class="p">.</span><span class="n">messages</span><span class="p">.</span><span class="n">setMessages</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'required'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Please fill in {field}'</span><span class="p">});</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1">// for one call</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">createUser</span><span class="p">.</span><span class="n">safeParse</span><span class="p">(</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="nl">messages:</span><span class="w"> </span><span class="n">MessageResolver</span><span class="p">(</span><span class="nl">messages:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="s1">'email.required'</span><span class="o">:</span><span class="w"> </span><span class="s1">'We need your email'</span><span class="p">,</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="p">}));</span>
+<p>Each error has a code, like <code>required</code> or <code>min_length</code>.
+Placeholders: <code>{field}</code>, <code>{value}</code>, and rule values like <code>{min}</code> and <code>{max}</code>.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">// for the whole app (outside Dox; in Dox use AppConfig(validationMessages: ...))</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">MessageResolver</span><span class="p">.</span><span class="n">global</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MessageResolver</span><span class="p">(</span><span class="nl">messages:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="s1">'required'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Please fill in {field}'</span><span class="p">,</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="p">});</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="c1">// for one call</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="n">createUser</span><span class="p">.</span><span class="n">safeParse</span><span class="p">(</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="nl">messages:</span><span class="w"> </span><span class="n">MessageResolver</span><span class="p">(</span><span class="nl">messages:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">  </span><span class="s1">'email.required'</span><span class="o">:</span><span class="w"> </span><span class="s1">'We need your email'</span><span class="p">,</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="p">}));</span>
 </span></code></pre></div>
-<p>For other languages, extend <code>MessageResolver</code> and override <code>resolve()</code>.</p>
-<h2 id="rule-strings-with-fromrules">Rule strings with <code>fromRules</code></h2>
-<p>Do you already have rule strings? <code>v.fromRules()</code> turns them into a schema.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">final</span><span class="w"> </span><span class="n">ObjectSchema</span><span class="w"> </span><span class="n">rules</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">fromRules</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="s1">'required|email|max:255'</span><span class="p">,</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="s1">'age'</span><span class="o">:</span><span class="w"> </span><span class="s1">'nullable|integer|min:18'</span><span class="p">,</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="s1">'nickname'</span><span class="o">:</span><span class="w"> </span><span class="s1">'sometimes|required|string'</span><span class="p">,</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="s1">'address.city'</span><span class="o">:</span><span class="w"> </span><span class="s1">'required'</span><span class="p">,</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="s1">'products.*.name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'required'</span><span class="p">,</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="p">});</span>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="n">rules</span><span class="p">.</span><span class="n">parse</span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">all</span><span class="p">());</span>
-</span></code></pre></div>
-<ul>
-<li>A missing field that is not <code>required</code> skips its other rules.</li>
-<li><code>nullable</code>: <code>null</code> is fine. <code>sometimes</code>: skip everything when the field is missing.</li>
-<li>Each field stops at its first error, so there is one message per field.</li>
-<li>An unknown rule name throws an <code>ArgumentError</code> when the schema is built.</li>
-</ul>
-<p>Add your own rule name:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">v</span><span class="p">.</span><span class="n">registerRule</span><span class="p">(</span><span class="s1">'unique'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">RuleDefinition</span><span class="w"> </span><span class="n">definition</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">UniqueRule</span><span class="p">(</span><span class="nl">table:</span><span class="w"> </span><span class="n">definition</span><span class="p">.</span><span class="n">arg</span><span class="p">(</span><span class="m">0</span><span class="p">));</span><span class="w"> </span><span class="c1">// 'unique:users'</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="p">});</span>
-</span></code></pre></div>
-<h2 id="json-schema">JSON Schema</h2>
-<p>Every schema can export JSON Schema (draft 2020-12, the one OpenAPI 3.1 uses).
-Pass it to <a href="../openapi/">OpenAPI</a> to document your API.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">v</span><span class="p">.</span><span class="n">object</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Schema</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;&gt;</span><span class="p">{</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">().</span><span class="n">email</span><span class="p">().</span><span class="n">describe</span><span class="p">(</span><span class="s1">'Login email'</span><span class="p">),</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="s1">'age'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="kt">int</span><span class="p">().</span><span class="n">min</span><span class="p">(</span><span class="m">18</span><span class="p">).</span><span class="n">nullable</span><span class="p">(),</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="p">}).</span><span class="n">strict</span><span class="p">().</span><span class="n">toJsonSchema</span><span class="p">();</span>
-</span></code></pre></div>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nt">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w"> </span><span class="nt">"format"</span><span class="p">:</span><span class="w"> </span><span class="s2">"email"</span><span class="p">,</span><span class="w"> </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Login email"</span><span class="w"> </span><span class="p">},</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"integer"</span><span class="p">,</span><span class="w"> </span><span class="s2">"null"</span><span class="p">],</span><span class="w"> </span><span class="nt">"minimum"</span><span class="p">:</span><span class="w"> </span><span class="mi">18</span><span class="w"> </span><span class="p">}</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">  </span><span class="nt">"required"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"email"</span><span class="p">,</span><span class="w"> </span><span class="s2">"age"</span><span class="p">],</span>
-</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">  </span><span class="nt">"additionalProperties"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
-</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="p">}</span>
-</span></code></pre></div>
+<p>For other languages, extend <code>MessageResolver</code> and override <code>resolve()</code>.
+See <a href="../../the-basic/validation/#messages">Messages</a>.</p>
 <h2 id="standard-schema">Standard Schema</h2>
-<p>Every schema implements the <a href="https://standardschema.dev">Standard Schema</a> interface (<code>StandardSchema</code>).
+<p>Every schema, and every <code>DtoSchema</code>, implements the <a href="https://standardschema.dev">Standard Schema</a> interface (<code>StandardSchema</code>).
 Code that only needs to validate can accept any <code>StandardSchema</code>, from Dox or from another library.</p>
 
 
