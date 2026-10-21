@@ -115,21 +115,38 @@ jobs:
             curl -sf "https://pub.dev/api/packages/$1" \
               | jq -e --arg v "$VERSION" 'any(.versions[]; .version == $v)' > /dev/null
           }
+          # The pub client can see an older, cached package list than the API
+          # does (CDN lag). So wait until `dart pub get` itself resolves the new
+          # version. Then the next package's publish can resolve it too.
+          # A fresh PUB_CACHE per probe, so no local cached list hides the new version.
+          wait_resolvable() {
+            probe=$(mktemp -d)
+            printf 'name: probe\nenvironment:\n  sdk: ^3.0.0\ndependencies:\n  %s: %s\n' \
+              "$1" "$VERSION" > "$probe/pubspec.yaml"
+            for i in $(seq 1 "$2"); do
+              if (cd "$probe" && PUB_CACHE="$probe/cache" dart pub get > "$probe/log" 2>&1); then
+                echo "$1 $VERSION resolves with dart pub get."
+                rm -rf "$probe"
+                return 0
+              fi
+              echo "Waiting for dart pub get to resolve $1 $VERSION ($i/$2)"
+              sleep "$3"
+            done
+            cat "$probe/log"
+            echo "::error::dart pub get still cannot resolve $1 $VERSION"
+            exit 1
+          }
           for entry in $PACKAGES; do
             dir=${entry%%:*}
             name=${entry##*:}
             if has_version "$name"; then
               echo "$name $VERSION is already on pub.dev. Skipping."
+              # A re-run after a failure: make sure the client sees it too.
+              wait_resolvable "$name" 20 30
               continue
             fi
             echo "::group::Publish $name $VERSION"
             (cd "packages/$dir" && dart pub publish --force)
             echo "::endgroup::"
-            # Wait until pub.dev lists the new version, so the next package can resolve it.
-            for i in $(seq 1 30); do
-              has_version "$name" && break
-              echo "Waiting for $name $VERSION on pub.dev ($i/30)"
-              sleep 10
-            done
-            has_version "$name" || { echo "::error::$name $VERSION not visible on pub.dev"; exit 1; }
+            wait_resolvable "$name" 20 30
           done
