@@ -180,6 +180,10 @@
   padding-bottom: 0.35rem;
 }
 .md-search__form { border-radius: 8px; }
+/* Material gives the repo button a fixed 11.7rem width. Our label is only
+   "GitHub", so the box was mostly empty and pushed the group off the right edge. */
+.md-header__source { width: auto; }
+.md-header__source .md-source__repository { max-width: none; }
 
 /* ---------- Navigation ---------- */
 .md-nav__title { font-weight: 700; }
