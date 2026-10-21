@@ -19,18 +19,35 @@ class Migration {
   Future<void> migrate([dynamic connection]) async {
     DbConnection conn = await _getConnection(connection);
     await createMigrationTableIfNotExist(conn);
-    await _runMigration(conn, MigrationType.up);
+    await _runMigration(conn);
     await _closeConnection(conn);
   }
 
-  /// main function to run migration
-  /// - will create migration table if not exist
-  /// - will run migrations from db/migration folder
+  /// undo migrations, newest first
+  /// - without [step], undo the last batch
+  /// - with [step], undo the last [step] migrations
   /// - [connection] is optional postgres `Connection` or mysql `MySqlConnection`
-  Future<void> rollback([dynamic connection]) async {
+  Future<void> rollback([dynamic connection, int? step]) async {
     DbConnection conn = await _getConnection(connection);
     await createMigrationTableIfNotExist(conn);
-    await _runMigration(conn, MigrationType.down);
+    await _runRollback(conn, step: step);
+    await _closeConnection(conn);
+  }
+
+  /// undo all migrations, newest first
+  Future<void> reset([dynamic connection]) async {
+    DbConnection conn = await _getConnection(connection);
+    await createMigrationTableIfNotExist(conn);
+    await _runRollback(conn, all: true);
+    await _closeConnection(conn);
+  }
+
+  /// undo all migrations, then run them again
+  Future<void> refresh([dynamic connection]) async {
+    DbConnection conn = await _getConnection(connection);
+    await createMigrationTableIfNotExist(conn);
+    await _runRollback(conn, all: true);
+    await _runMigration(conn);
     await _closeConnection(conn);
   }
 
@@ -66,8 +83,8 @@ class Migration {
     return migratedValue.isNotEmpty;
   }
 
-  /// process migration
-  Future<void> _runMigration(DbConnection conn, MigrationType type) async {
+  /// run migrations that are not done yet, in file order
+  Future<void> _runMigration(DbConnection conn) async {
     try {
       Directory migrationDirectory = getMigrationDirectory();
 
@@ -77,34 +94,66 @@ class Migration {
       List<File> newMigrationFileList = <File>[];
 
       for (File file in migrationFiles) {
-        bool showRunMigration = true;
-
-        if (type == MigrationType.up) {
-          showRunMigration = await isMigrated(conn, file) == false;
-        } else {
-          showRunMigration = await isMigrated(conn, file) == true;
-        }
-
-        if (showRunMigration) {
-          newMigrationFileList.add(file);
-          if (file.ext == 'sql') {
-            await SqlExtMigration(conn: conn, type: type).run(file, nextBatch);
-          }
-        }
+        if (await isMigrated(conn, file)) continue;
+        newMigrationFileList.add(file);
+        // stop here, later migrations may need this one
+        if (!await _runFile(conn, file, MigrationType.up, nextBatch)) break;
       }
 
       await _clearTempFolder();
 
-      if (newMigrationFileList.isEmpty && type == MigrationType.up) {
+      if (newMigrationFileList.isEmpty) {
         Logger.info('Migrations are already up to date!');
       }
+    } catch (error) {
+      print(error);
+    }
+  }
 
-      if (newMigrationFileList.isEmpty && type == MigrationType.down) {
+  /// undo migrations from dox_db_migration table, newest first
+  Future<void> _runRollback(DbConnection conn,
+      {int? step, bool all = false}) async {
+    try {
+      String query = 'SELECT migration FROM dox_db_migration';
+      if (step != null && !all) {
+        query += ' ORDER BY id DESC LIMIT $step';
+      } else if (!all) {
+        query += ' WHERE batch = (SELECT MAX(batch) FROM dox_db_migration)'
+            ' ORDER BY id DESC';
+      } else {
+        query += ' ORDER BY id DESC';
+      }
+      List<Map<String, dynamic>> rows = await conn.execute(query);
+
+      Map<String, File> files = <String, File>{
+        for (File file in getFilesFromDirectory(getMigrationDirectory()))
+          file.name: file,
+      };
+
+      for (Map<String, dynamic> row in rows) {
+        File? file = files[row['migration'].toString()];
+        if (file == null) {
+          Logger.danger('Migration file not found: ${row['migration']}');
+          break;
+        }
+        if (!await _runFile(conn, file, MigrationType.down, 0)) break;
+      }
+
+      await _clearTempFolder();
+
+      if (rows.isEmpty) {
         Logger.info('Nothing to rollback!');
       }
     } catch (error) {
       print(error);
     }
+  }
+
+  /// run one migration file, return false when it failed
+  Future<bool> _runFile(
+      DbConnection conn, File file, MigrationType type, int batch) async {
+    if (file.ext != 'sql') return true;
+    return SqlExtMigration(conn: conn, type: type).run(file, batch);
   }
 
   Future<void> _closeConnection(DbConnection conn) async {

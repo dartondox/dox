@@ -112,6 +112,8 @@ dox create:migration create_foo_table
 
 ```py
 dox migration:run
+or
+dox migrate
 ```
 
 !!! info 
@@ -135,8 +137,14 @@ DB_PASSWORD=password
 ## Rollback migration
 
 ```py
-dox migration:rollback
+dox migration:rollback          // undo the last batch
+dox migration:rollback --step=2 // undo the last 2 migrations
+dox migration:reset             // undo all migrations
+dox migration:refresh           // undo all migrations, then run them again
 ```
+
+!!! info
+    `migrate:rollback`, `migrate:reset` and `migrate:refresh` also work.
 
 ## Deactivate CLI
 

@@ -230,6 +230,7 @@ class CommandRegistry {
       helpInfo: 'migration:run',
       description: 'Run pending migrations',
       category: CommandCategory.database,
+      aliases: ['migrate'],
       function: (args) async {
         await Migration(from: 'cli').migrate();
       },
@@ -237,11 +238,44 @@ class CommandRegistry {
 
     CommandDefinition(
       command: 'migration:rollback',
-      helpInfo: 'migration:rollback',
-      description: 'Rollback the last migration',
+      helpInfo: 'migration:rollback [--step=<count>]',
+      description:
+          'Rollback the last batch, or the last <count> migrations with --step',
       category: CommandCategory.database,
+      aliases: ['migrate:rollback'],
+      maxArgs: 1,
       function: (args) async {
-        await Migration(from: 'cli').rollback();
+        int? step;
+        if (args.isNotEmpty) {
+          step = int.tryParse(args[0].replaceFirst('--step=', ''));
+          if (step == null || step < 1 || !args[0].startsWith('--step=')) {
+            print('Invalid option ${args[0]}, use --step=<count>');
+            return;
+          }
+        }
+        await Migration(from: 'cli').rollback(null, step);
+      },
+    ),
+
+    CommandDefinition(
+      command: 'migration:reset',
+      helpInfo: 'migration:reset',
+      description: 'Rollback all migrations',
+      category: CommandCategory.database,
+      aliases: ['migrate:reset'],
+      function: (args) async {
+        await Migration(from: 'cli').reset();
+      },
+    ),
+
+    CommandDefinition(
+      command: 'migration:refresh',
+      helpInfo: 'migration:refresh',
+      description: 'Rollback all migrations and run them again',
+      category: CommandCategory.database,
+      aliases: ['migrate:refresh'],
+      function: (args) async {
+        await Migration(from: 'cli').refresh();
       },
     ),
 

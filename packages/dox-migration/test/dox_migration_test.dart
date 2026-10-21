@@ -62,6 +62,7 @@ void main() {
         db = await DbConnection.open(env);
         for (String table in <String>[
           'dox_db_migration',
+          'mig_comment',
           'mig_blog',
           'mig_tag',
           'mig_fail',
@@ -113,10 +114,97 @@ DROP TABLE IF EXISTS mig_tag
         expect((await migrations()).map((Map<String, dynamic> r) => r['batch']),
             <int>[1, 2]);
 
+        // rollback only undoes the last batch
+        await Migration().rollback();
+        expect(await tableExists('mig_tag'), false);
+        expect(await tableExists('mig_blog'), true);
+        expect((await migrations()).map((Map<String, dynamic> r) => r['batch']),
+            <int>[1]);
+
         await Migration().rollback();
         expect(await tableExists('mig_blog'), false);
-        expect(await tableExists('mig_tag'), false);
         expect(await migrations(), isEmpty);
+      });
+
+      test('rollback runs in reverse order, step and reset', () async {
+        writeMigration('2023_01_01_000000_create_blog', '''
+-- up
+CREATE TABLE mig_blog (id INTEGER PRIMARY KEY)
+
+-- down
+DROP TABLE mig_blog
+''');
+        // comment table needs blog table, so it must be dropped first
+        writeMigration('2023_01_02_000000_create_comment', '''
+-- up
+CREATE TABLE mig_comment (
+  id INTEGER PRIMARY KEY,
+  blog_id INTEGER REFERENCES mig_blog (id)
+)
+
+-- down
+DROP TABLE mig_comment
+''');
+        await Migration().migrate();
+        expect(await tableExists('mig_comment'), true);
+
+        await Migration().rollback();
+        expect(await tableExists('mig_comment'), false);
+        expect(await tableExists('mig_blog'), false);
+        expect(await migrations(), isEmpty);
+
+        await Migration().migrate();
+        writeMigration('2023_01_03_000000_create_tag', '''
+-- up
+CREATE TABLE mig_tag (id INTEGER PRIMARY KEY)
+
+-- down
+DROP TABLE mig_tag
+''');
+        await Migration().migrate();
+
+        // step undoes the last n migrations, even across batches
+        await Migration().rollback(null, 2);
+        expect(await tableExists('mig_tag'), false);
+        expect(await tableExists('mig_comment'), false);
+        expect(await tableExists('mig_blog'), true);
+        expect(
+            (await migrations())
+                .map((Map<String, dynamic> r) => r['migration']),
+            <String>['2023_01_01_000000_create_blog']);
+
+        await Migration().migrate();
+        await Migration().reset();
+        expect(await tableExists('mig_blog'), false);
+        expect(await migrations(), isEmpty);
+
+        await Migration().refresh();
+        expect(await tableExists('mig_tag'), true);
+        expect((await migrations()).length, 3);
+      });
+
+      test('sql with dashes, semicolons in strings and comments', () async {
+        writeMigration('2023_01_01_000000_create_blog', '''
+-- up
+-- a normal comment; with a semicolon
+CREATE TABLE mig_blog (
+  id INTEGER PRIMARY KEY,
+  title VARCHAR(255) -- the title
+);
+/* block comment; with a semicolon */
+INSERT INTO mig_blog (id, title) VALUES (1, 'a-b; c -- d');
+INSERT INTO mig_blog (id, title) VALUES (2 - 0, 'it''s');
+
+-- down
+DROP TABLE mig_blog
+''');
+        await Migration().migrate();
+        List<Map<String, dynamic>> rows =
+            await db.execute('SELECT id, title FROM mig_blog ORDER BY id');
+        expect(rows.map((Map<String, dynamic> r) => r['title'].toString()),
+            <String>['a-b; c -- d', "it's"]);
+        await Migration().rollback();
+        expect(await tableExists('mig_blog'), false);
       });
 
       test('failed migration is not recorded', () async {

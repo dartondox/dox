@@ -17,8 +17,11 @@
 === "Command"
 
     ```py
-    dox migrate
+    dox migration:run
     ```
+
+!!! info
+    `dox migrate` is a short name for the same command.
 
 !!! info
     Please make sure that you have created `.env` file with with below variable names to run migration.
@@ -40,11 +43,36 @@ DB_PASSWORD=password
 
 ## Rollback migration
 
-=== "Command"
+Rollback undoes the last batch. A batch is the group of migrations that ran in one `migration:run`.
+Migrations are undone newest first.
+
+=== "Last batch"
 
     ```py
-    dox migrate:rollback
+    dox migration:rollback
     ```
+
+=== "Last 2 migrations"
+
+    ```py
+    dox migration:rollback --step=2
+    ```
+
+=== "All migrations"
+
+    ```py
+    dox migration:reset
+    ```
+
+=== "All, then run again"
+
+    ```py
+    dox migration:refresh
+    ```
+
+!!! info
+    `migrate:rollback`, `migrate:reset` and `migrate:refresh` are short names for the same commands.
+
 ## Example
 
 ```py
@@ -65,4 +93,10 @@ DROP TABLE IF EXISTS blog
 ```
 
 !!! info
-    Employ `--up` and `--down` to differentiate the migration scripts for upward and downward actions.
+    Put the `up` sql under a line `-- up`, and the `down` sql under a line `-- down`.
+    Each of these lines must be on its own line.
+    Other `--` lines are normal sql comments.
+
+!!! info
+    Statements are split on `;`.
+    A `;` inside quotes, comments or a postgres `$$ ... $$` body does not split.
