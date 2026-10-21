@@ -5,18 +5,18 @@ import 'package:dox_core/router/route_data.dart';
 Future<dynamic> middlewareAndControllerHandler(DoxRequest doxReq) async {
   dynamic result;
   RouteData route = doxReq.route;
+  List<dynamic> controllers = route.controllers;
 
-  for (dynamic fn in route.controllers) {
+  for (int i = 0; i < controllers.length; i++) {
+    dynamic fn = controllers[i];
     if (fn is Function) {
-      /// when it is a function and last item int the list,
-      /// it mean it is a final controller
-      if (fn == route.controllers.last) {
-        return await _handleController(route, fn, doxReq);
+      /// the last function is the controller
+      if (i == controllers.length - 1) {
+        return await route.handler!.call(doxReq);
       }
 
-      /// A function but not last item,
-      /// it mean function base middleware which
-      /// need to pass the result to next `fn`
+      /// a function before it is a middleware, which gives the request
+      /// (to go on) or a response
       result = await fn(doxReq);
     }
 
@@ -26,110 +26,250 @@ Future<dynamic> middlewareAndControllerHandler(DoxRequest doxReq) async {
       result = await fn.handle(doxReq);
     }
 
-    /// if result is dox Request, it mean result is from middleware
-    /// and need to pass values to next controller.
+    /// a request from a middleware goes on to the next item,
+    /// anything else is the response
     if (result is DoxRequest) {
-      /// override doxReq from arguments in order to pass in the next loop
       doxReq = result;
     } else {
-      /// else result is from controller and ready to response
       return result;
     }
   }
 }
 
-/// handle controller
-Future<dynamic> _handleController(
-  RouteData route,
-  dynamic fn,
-  DoxRequest doxRequest,
-) async {
-  dynamic result;
+/// What Dox gives to one parameter of a controller.
+enum ArgKind { request, dto, path }
 
-  /// length of param arguments need to pass to controller
-  /// -1 to remove do request
-  int lengthOfParam = _lengthOfControllerArguments(fn) - 1;
+/// The type of a path param parameter.
+enum PathType { string, integer, decimal, number, boolean }
 
-  /// controller arguments except first arguments(doxRequest)
-  /// param values from route `/user/{name}`
-  List<dynamic> controllerArguments = doxRequest.param.values.isNotEmpty
-      ? doxRequest.param.values.toList().sublist(0, lengthOfParam)
-      : _generateEmptyArgumentValues(lengthOfParam);
+/// One parameter of a controller.
+class ControllerArg {
+  const ControllerArg(
+    this.kind, {
+    this.dto,
+    this.pathType = PathType.string,
+    this.nullable = false,
+    this.param = '',
+  });
 
-  /// controller argument data types
-  List<String> controllerArgumentsDataType = controllerArgumentDataTypes(fn);
+  final ArgKind kind;
 
-  /// if the first argument data type is not DoxRequest,
-  /// controller request custom FormRequest class
-  if (controllerArgumentsDataType.isNotEmpty) {
-    String requestName = controllerArgumentsDataType.first;
-    if (requestName != 'DoxRequest') {
-      FormRequest? formReq = Dox().ioc.getByName(requestName);
-      if (formReq != null && _isFormRequestTypeMatched(fn, formReq)) {
-        /// mapping request inputs field
-        doxRequest.processInputMapper(formReq.mapInputs());
+  /// the DTO, for [ArgKind.dto]
+  final DtoSchema<Object>? dto;
 
-        /// setting dox request to custom form request
-        formReq.setRequest(doxRequest);
+  /// the type of a path param
+  final PathType pathType;
 
-        /// validate request: schema() first, then rules()
-        ObjectSchema? schema = formReq.schema();
-        formReq.validated = schema != null
-            ? await doxRequest.validateSchema(schema)
-            : await doxRequest.validateAsync(
-                formReq.rules(),
-                messages: formReq.messages(),
-              );
+  /// `int?`: the param may be missing (`{id?}`)
+  final bool nullable;
 
-        /// run setup()
-        await formReq.setUp();
+  /// the name of the path param
+  final String param;
+}
 
-        result = await Function.apply(fn, <dynamic>[
-          formReq,
-          ...controllerArguments,
-        ]);
-        return result;
+/// How to call one controller: what goes in each parameter.
+///
+/// It is made once per route, at start. Dox reads the parameter types
+/// from the function type (no `dart:mirrors`), and finds DTOs in
+/// `AppConfig(dtos: dtos)`. Each request only fills the list and calls
+/// the function.
+class ControllerPlan {
+  ControllerPlan(this.fn, this.args);
+
+  final Function fn;
+  final List<ControllerArg> args;
+
+  static const Map<String, PathType> _pathTypes = <String, PathType>{
+    'String': PathType.string,
+    'int': PathType.integer,
+    'double': PathType.decimal,
+    'num': PathType.number,
+    'bool': PathType.boolean,
+  };
+
+  /// The plan for [fn] on [route]. Throws a [StateError] when a
+  /// parameter type is not known.
+  static ControllerPlan of(Function fn, RouteData route) {
+    String where = '${route.method} ${route.path}';
+    List<String> types = ControllerTypes.parameters(fn, where);
+    List<String> params = route.paramNames;
+    List<ControllerArg> args = <ControllerArg>[];
+    int paths = 0;
+    bool hasDto = false;
+    for (int i = 0; i < types.length; i++) {
+      String type = types[i];
+      bool nullable = type.endsWith('?');
+      String name = nullable ? type.substring(0, type.length - 1) : type;
+      if (name == 'DoxRequest' || name == 'IDoxRequest') {
+        args.add(const ControllerArg(ArgKind.request));
+        continue;
+      }
+      // an untyped first parameter `(req)` is the request
+      if (name == 'dynamic' && i == 0 && !types.contains('DoxRequest')) {
+        args.add(const ControllerArg(ArgKind.request));
+        continue;
+      }
+      PathType? pathType = name == 'dynamic' || name == 'Object'
+          ? PathType.string
+          : _pathTypes[name];
+      if (pathType != null) {
+        if (paths >= params.length) {
+          throw StateError(
+            'Route $where: the controller has more path params than the '
+            'route has {...} params (${params.length}).',
+          );
+        }
+        args.add(
+          ControllerArg(
+            ArgKind.path,
+            pathType: pathType,
+            nullable: nullable || name == 'dynamic',
+            param: params[paths++],
+          ),
+        );
+        continue;
+      }
+      DtoSchema<Object>? dto = Dox().dtos.ofName(name);
+      if (dto == null) {
+        throw StateError(
+          'Route $where: the controller parameter type $type is not known. '
+          'Use DoxRequest, a @Dto class, or String, int, double, num, bool '
+          'for path params. For a DTO: did you run '
+          '`dart run build_runner build` and set `dtos: dtos` in AppConfig?',
+        );
+      }
+      if (hasDto) {
+        throw StateError('Route $where: a controller can have one @Dto only.');
+      }
+      hasDto = true;
+      args.add(ControllerArg(ArgKind.dto, dto: dto));
+    }
+    return ControllerPlan(fn, args);
+  }
+
+  /// Fill the parameters for [req] and call the controller.
+  /// A path param that does not fit its type answers 404.
+  Future<dynamic> call(DoxRequest req) async {
+    int count = args.length;
+    if (count == 1 && args[0].kind == ArgKind.request) {
+      return await fn(req);
+    }
+    List<dynamic> values = List<dynamic>.filled(count, null);
+    ControllerArg? dtoArg;
+    int dtoIndex = -1;
+    for (int i = 0; i < count; i++) {
+      ControllerArg arg = args[i];
+      switch (arg.kind) {
+        case ArgKind.request:
+          values[i] = req;
+        case ArgKind.path:
+          values[i] = _path(arg, req.param[arg.param]);
+        case ArgKind.dto:
+          dtoArg = arg;
+          dtoIndex = i;
       }
     }
+    // path params first: when one is wrong, the DTO is not checked
+    if (dtoArg != null) {
+      values[dtoIndex] = await Dox().validator.validateDto(req, dtoArg.dto!);
+    }
+    switch (count) {
+      case 0:
+        return await fn();
+      case 1:
+        return await fn(values[0]);
+      case 2:
+        return await fn(values[0], values[1]);
+      case 3:
+        return await fn(values[0], values[1], values[2]);
+      case 4:
+        return await fn(values[0], values[1], values[2], values[3]);
+    }
+    return await Function.apply(fn, values);
   }
 
-  return await Function.apply(fn, <dynamic>[
-    doxRequest,
-    ...controllerArguments,
-  ]);
-}
-
-/// checking that controller first request param is matched
-/// with custom form request
-bool _isFormRequestTypeMatched(dynamic controller, dynamic req) {
-  List<String> args = controllerArgumentDataTypes(controller);
-  return args[0].toString() == req.runtimeType.toString();
-}
-
-/// argument types per controller, so `toString()` is parsed only once
-final Expando<List<String>> _argumentTypes = Expando<List<String>>();
-
-/// get controller arguments data type
-/// eg. [DoxRequest, String]
-List<String> controllerArgumentDataTypes(dynamic controller) {
-  return _argumentTypes[controller] ??= controller
-      .toString()
-      .split('(')[1]
-      .split(')')[0]
-      .split(', ');
-}
-
-/// get length controller arguments to check how many arguments
-/// need to pass to the controller
-int _lengthOfControllerArguments(dynamic controller) {
-  List<String> args = controllerArgumentDataTypes(controller);
-  return args.length;
-}
-
-List<String> _generateEmptyArgumentValues(int count) {
-  List<String> ret = <String>[];
-  for (int i = 0; i < count; i++) {
-    ret.add('');
+  Object? _path(ControllerArg arg, Object? raw) {
+    if (raw == null) {
+      if (arg.nullable) return null;
+      throw NotFoundHttpException();
+    }
+    String text = '$raw';
+    switch (arg.pathType) {
+      case PathType.string:
+        return text;
+      case PathType.integer:
+        int? value = int.tryParse(text, radix: 10);
+        if (value != null) return value;
+      case PathType.decimal:
+        double? value = double.tryParse(text);
+        if (value != null && value.isFinite) return value;
+      case PathType.number:
+        num? value = int.tryParse(text, radix: 10) ?? double.tryParse(text);
+        if (value != null && value.isFinite) return value;
+      case PathType.boolean:
+        if (text == 'true' || text == '1') return true;
+        if (text == 'false' || text == '0') return false;
+    }
+    throw NotFoundHttpException();
   }
-  return ret;
+}
+
+/// Reads the parameter types of a function from its runtime type,
+/// like `(DoxRequest, int) => Future<User>`.
+class ControllerTypes {
+  const ControllerTypes._();
+
+  /// The type names of the positional parameters of [fn].
+  static List<String> parameters(Function fn, String where) {
+    String text = fn.runtimeType.toString();
+    if (text.startsWith('<')) {
+      throw StateError('Route $where: a controller can not be generic.');
+    }
+    int start = text.indexOf('(');
+    int end = _closing(text, start);
+    if (start < 0 || end < 0) {
+      throw StateError('Route $where: can not read the controller type $text.');
+    }
+    String inside = text.substring(start + 1, end).trim();
+    if (inside.isEmpty) return <String>[];
+    if (inside.contains('{') || inside.contains('[')) {
+      throw StateError(
+        'Route $where: only positional parameters are supported, '
+        'not named or [optional] ones ($text).',
+      );
+    }
+    return _split(inside);
+  }
+
+  static int _closing(String text, int start) {
+    int depth = 0;
+    for (int i = start; i >= 0 && i < text.length; i++) {
+      String char = text[i];
+      if (char == '(' || char == '<') depth++;
+      if (char == ')' || char == '>') {
+        // `=>` is not a closing bracket
+        if (char == '>' && i > 0 && text[i - 1] == '=') continue;
+        depth--;
+        if (depth == 0 && char == ')') return i;
+      }
+    }
+    return -1;
+  }
+
+  static List<String> _split(String text) {
+    List<String> parts = <String>[];
+    int depth = 0;
+    int from = 0;
+    for (int i = 0; i < text.length; i++) {
+      String char = text[i];
+      if (char == '<' || char == '(') depth++;
+      if (char == '>' || char == ')') depth--;
+      if (char == ',' && depth == 0) {
+        parts.add(text.substring(from, i).trim());
+        from = i + 1;
+      }
+    }
+    parts.add(text.substring(from).trim());
+    return parts;
+  }
 }

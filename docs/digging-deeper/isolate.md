@@ -28,7 +28,7 @@ Each isolate has its own memory. At start, every isolate:
 
 1. runs the `setup()` of each service in `services` (for example it opens
    its own database pool),
-2. registers the routes and form requests.
+2. registers the routes, and reads the parameter types of each controller once.
 
 This is cheap: it happens once at start, not per request. Keep `setup()`
 light. Open connections there, but do not load big data into memory, because

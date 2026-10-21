@@ -15,17 +15,20 @@ import 'validation_exception.dart';
 
 /// Base class of every schema. [O] is the output type.
 ///
-/// Subclasses implement [parseType] (type check and coercion),
-/// [jsonSchemaBase] and [copySchema].
+/// Subclasses implement [parseType] (type check and coercion) and
+/// [jsonSchemaBase]. The fluent schemas extend [BaseSchema].
+/// A generated DTO schema extends it directly, so it can be `const`.
 abstract class Schema<O> implements StandardSchema<Object?, O> {
+  const Schema();
+
   /// Rules that run after the type check.
-  final List<Rule<O>> rules = <Rule<O>>[];
+  List<Rule<O>> get rules;
 
   /// Text for docs. Set with `.describe()`.
-  String? description;
+  String? get description;
 
   /// Example values for docs. Set with `.example()`.
-  final List<Object?> examples = <Object?>[];
+  List<Object?> get examples;
 
   @override
   String get vendor {
@@ -163,17 +166,6 @@ abstract class Schema<O> implements StandardSchema<Object?, O> {
   /// JSON Schema keys for the type, like `{'type': 'string'}`.
   Map<String, dynamic> jsonSchemaBase();
 
-  /// Make a copy with the same settings. Used by the fluent methods.
-  Schema<O> copySchema();
-
-  /// Copy rules and meta data from this schema into [target].
-  T copyBaseInto<T extends Schema<O>>(T target) {
-    target.rules.addAll(rules);
-    target.description = description;
-    target.examples.addAll(examples);
-    return target;
-  }
-
   /// Check the type and return the output, or [invalid].
   /// [input] is never `null` or [undefined] here.
   Object? parseType(Object? input, ParseState state, List<Object> path);
@@ -281,5 +273,32 @@ abstract class Schema<O> implements StandardSchema<Object?, O> {
       value: input,
       params: <String, Object?>{'received': input.runtimeType.toString()},
     );
+  }
+}
+
+/// Base of the fluent schemas (`v.string()`, `v.object()`, ...).
+/// It keeps the rules and docs in fields, so each fluent method can copy
+/// the schema and add one more.
+abstract class BaseSchema<O> extends Schema<O> {
+  BaseSchema();
+
+  @override
+  final List<Rule<O>> rules = <Rule<O>>[];
+
+  @override
+  String? description;
+
+  @override
+  final List<Object?> examples = <Object?>[];
+
+  /// Make a copy with the same settings. Used by the fluent methods.
+  BaseSchema<O> copySchema();
+
+  /// Copy rules and meta data from this schema into [target].
+  T copyBaseInto<T extends BaseSchema<O>>(T target) {
+    target.rules.addAll(rules);
+    target.description = description;
+    target.examples.addAll(examples);
+    return target;
   }
 }

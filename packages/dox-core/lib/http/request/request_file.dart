@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/dox_core.dart' hide Uuid;
 import 'package:dox_core/utils/extensions/num.dart';
 import 'package:path/path.dart' as path;
 import 'package:uuid/uuid.dart';
@@ -19,6 +19,7 @@ class RequestFile implements FileInput {
   final String filetype;
 
   /// size of the file in bytes
+  @override
   final int length;
 
   Uint8List? _bytes;
@@ -33,8 +34,24 @@ class RequestFile implements FileInput {
     required this.length,
     this._bytes,
     File? file,
+    this._head,
   }) : _file = file,
        _isTemp = file != null;
+
+  final List<int>? _head;
+
+  /// the first bytes of the file. `@Mimes` and `@Image` read the real
+  /// file type from them.
+  @override
+  List<int> get head {
+    List<int>? known = _head;
+    if (known != null) return known;
+    Uint8List? memory = _bytes;
+    if (memory == null) return const <int>[];
+    return memory.length > FileTypes.headSize
+        ? Uint8List.sublistView(memory, 0, FileTypes.headSize)
+        : memory;
+  }
 
   /// Get file extension
   /// eg. png, jpeg, pdf

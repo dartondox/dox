@@ -30,11 +30,6 @@ abstract class IDoxRequest {
   String host();
   String? origin();
   String? referer();
-  void validate(
-    Map<String, String> rules, {
-    Map<String, String> messages = const <String, String>{},
-  });
-  void processInputMapper(Map<String, String> mapper);
   Map<String, dynamic> toJson();
 }
 

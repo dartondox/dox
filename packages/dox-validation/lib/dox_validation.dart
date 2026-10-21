@@ -1,4 +1,5 @@
-/// Schema validation for Dart, like Zod.
+/// Typed input for Dart: DTO classes with generated checks, and
+/// fluent schemas like Zod for input you only know at runtime.
 ///
 /// ```dart
 /// import 'package:dox_validation/dox_validation.dart';
@@ -15,6 +16,7 @@ import 'src/validator.dart';
 
 export 'src/constants/default_messages.dart';
 export 'src/constants/issue_codes.dart';
+export 'src/constants/patterns.dart';
 export 'src/constants/schema_constants.dart';
 export 'src/core/data_path.dart';
 export 'src/core/fluent_schema.dart';
@@ -28,11 +30,11 @@ export 'src/core/rule.dart';
 export 'src/core/schema.dart';
 export 'src/core/sentinels.dart';
 export 'src/core/validation_exception.dart';
-export 'src/laravel/laravel_rule_builders.dart';
-export 'src/laravel/laravel_rules.dart';
-export 'src/laravel/rule_chain_schema.dart';
-export 'src/laravel/rule_registry.dart';
-export 'src/laravel/rules_schema_builder.dart';
+export 'src/dto/dto_annotations.dart';
+export 'src/dto/dto_schema.dart';
+export 'src/dto/dto_state.dart';
+export 'src/dto/file_types.dart';
+export 'src/dto/maybe.dart';
 export 'src/rules/built_in_rule.dart';
 export 'src/rules/collection_rules.dart';
 export 'src/rules/number_rules.dart';
@@ -49,4 +51,4 @@ export 'src/standard/standard_schema.dart';
 export 'src/validator.dart';
 
 /// The default [Validator]. Use it like `v.string().email()`.
-final Validator v = Validator();
+const Validator v = Validator();

@@ -2,7 +2,16 @@
 
 - Needs Dart 3.13 or newer.
 - All dependencies updated to their latest versions.
-- `fromRules()`: a `null` field that is not `required` now skips its other rules, like the old dox-core validator. `nullable` still marks the field nullable in JSON Schema.
+- New: DTOs. A class with `@Dto()` and rule annotations (`@Length`, `@Email`, `@Min`, `@Regex`, `@MaxSize`, ...). `dox_builder` writes a `const DtoSchema<T>` with the checks, a converter and the JSON Schema. See the Validation guide.
+- New: `DtoSchema<T>` with `validateMap`, `safeValidateMap`, `fromMap`, `toMap` and `toJsonSchema`. It is also a `Schema<T>`.
+- New: `Maybe<T>` knows a missing key from `null`. `DtoErrors` for checks across fields in `validate()`.
+- New: `FileTypes` finds the real type of a file from its first bytes. `@Image()` and `v.file().image()` do not allow `svg`.
+- New: `MessageRequest.locale`, `ParseState.params`. A message set on a rule is used as it is; the resolver only fills its placeholders.
+- `Rule` has a `const` constructor and a `final` `message`, so a rule class works as an annotation. `AsyncRule.failedItems()` checks a list in one call.
+- `FileInput` has `length` and `head` (the first bytes).
+- `Schema` has a `const` constructor. The fluent schemas extend `BaseSchema`.
+- Text length messages say "characters".
+- Breaking: removed `v.fromRules()`, `v.registerRule()`, `RuleRegistry`, `RuleDefinition`, `CallbackRule` and all rule strings. Use a DTO, or a `Rule<T>` class.
 
 
 ## 3.0.0-alpha.1

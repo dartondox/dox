@@ -3,8 +3,9 @@
 - Needs Dart 3.13 or newer.
 - All dependencies updated to their latest versions.
 - OpenAPI annotations, all optional: `@Summary`, `@Description`, `@Tags`, `@Request`, `@Body`, `@Query`, `@Response`, `@ApiDeprecated`, `@ApiIgnore`, `@DoxController`. Lower case names work too (`@summary(...)`), except `@Response`.
-- DTO annotations: `@Dto`, `@Length`, `@Email`, `@Min`, `@Max`, `@Pattern`, `@MinItems`, `@MaxItems`, `@Trim`, `@Format`.
-- Breaking (small): these names are exported by `dox_core` too. `Pattern` now means the annotation in files that import `dox_core` (add `hide Pattern` if you need the `dart:core` one). If a file also imports a package with a `Request` or `Response` class (like `package:http`) without a prefix, add a prefix to that import.
+- The DTO annotations (`@Dto`, `@Length`, `@Email`, ...) live in `dox_validation`. `dox_core` exports them.
+- `IDoxRequest` has no `validate()` and no `processInputMapper()` any more. Use a DTO.
+- Breaking (small): these names are exported by `dox_core` too. If a file also imports a package with a `Request` or `Response` class (like `package:http`) without a prefix, add a prefix to that import.
 
 ## 3.0.0-alpha.1
 

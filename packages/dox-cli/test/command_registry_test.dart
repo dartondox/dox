@@ -130,7 +130,7 @@ void main() {
       Directory('lib/app/models').createSync(recursive: true);
       Directory('lib/app/http/controllers').createSync(recursive: true);
       Directory('lib/app/http/middleware').createSync(recursive: true);
-      Directory('lib/app/http/requests').createSync(recursive: true);
+      Directory('lib/app/http/dtos').createSync(recursive: true);
       Directory('lib/app/http/serializers').createSync(recursive: true);
       Directory('lib/app/ws/controllers').createSync(recursive: true);
       Directory('db/migration').createSync(recursive: true);
@@ -195,10 +195,10 @@ void main() {
       expect(content, contains('index(DoxRequest req)'));
       expect(content, contains('create(DoxRequest req)'));
       expect(content, contains('store(DoxRequest req)'));
-      expect(content, contains('show(DoxRequest req, String id)'));
-      expect(content, contains('edit(DoxRequest req, String id)'));
-      expect(content, contains('update(DoxRequest req, String id)'));
-      expect(content, contains('destroy(DoxRequest req, String id)'));
+      expect(content, contains('show(DoxRequest req, int id)'));
+      expect(content, contains('edit(DoxRequest req, int id)'));
+      expect(content, contains('update(DoxRequest req, int id)'));
+      expect(content, contains('destroy(DoxRequest req, int id)'));
     });
 
     test('create:controller with websocket flag should generate websocket controller', () {
@@ -247,20 +247,17 @@ void main() {
       expect(content, contains('handle(IDoxRequest req)'));
     });
 
-    test('create:request should generate request file', () {
-      final command = CommandRegistry.findCommand('create:request');
+    test('create:dto should generate a DTO file', () {
+      final command = CommandRegistry.findCommand('create:dto');
       expect(command, isNotNull);
 
-      expect(() => command!.function(['UserRequest']), returnsNormally);
+      expect(() => command!.function(['CreateUser']), returnsNormally);
 
-      // Check if file was created
-      final requestFile = File('lib/app/http/requests/user.request.dart');
-      expect(requestFile.existsSync(), isTrue);
+      final dtoFile = File('lib/app/http/dtos/create_user.dto.dart');
+      expect(dtoFile.existsSync(), isTrue);
 
-      // Check file content
-      final content = requestFile.readAsStringSync();
-      expect(content, contains('class UserRequest extends FormRequest'));
-      expect(content, contains('Map<String, String> rules()'));
+      final content = dtoFile.readAsStringSync();
+      expect(content, contains('class CreateUser {'));
     });
 
     test('create:serializer should generate serializer file', () {

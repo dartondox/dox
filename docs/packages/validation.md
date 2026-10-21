@@ -229,10 +229,3 @@ See [Messages](../the-basic/validation.md#messages).
 
 Every schema, and every `DtoSchema`, implements the [Standard Schema](https://standardschema.dev) interface (`StandardSchema`).
 Code that only needs to validate can accept any `StandardSchema`, from Dox or from another library.
-
-## Removed in 3.x
-
-- `v.fromRules()` and rule strings like `'required|email'`.
-- `v.registerRule()` and `RuleDefinition`. Write a `Rule<T>` class instead.
-
-See [Upgrade: Validation](../the-basic/upgrade.md#validation).

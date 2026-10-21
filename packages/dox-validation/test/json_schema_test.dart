@@ -153,42 +153,5 @@ void main() {
         <String, dynamic>{'type': 'string'},
       );
     });
-
-    test('fromRules', () {
-      ObjectSchema s = v.fromRules(<String, String>{
-        'email': 'required|email|max:255',
-        'age': 'nullable|integer|min:18',
-        'status': 'in:active,pending',
-        'items.*.title': 'required|string',
-      });
-      expect(s.toJsonSchema(), <String, dynamic>{
-        'type': 'object',
-        'properties': <String, dynamic>{
-          'email': <String, dynamic>{
-            'type': 'string',
-            'format': 'email',
-            'maxLength': 255,
-          },
-          'age': <String, dynamic>{
-            'type': <String>['integer', 'null'],
-            'minimum': 18,
-          },
-          'status': <String, dynamic>{
-            'enum': <String>['active', 'pending'],
-          },
-          'items': <String, dynamic>{
-            'type': 'array',
-            'items': <String, dynamic>{
-              'type': 'object',
-              'properties': <String, dynamic>{
-                'title': <String, dynamic>{'type': 'string'},
-              },
-              'required': <String>['title'],
-            },
-          },
-        },
-        'required': <String>['email'],
-      });
-    });
   });
 }

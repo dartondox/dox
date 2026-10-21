@@ -5,7 +5,7 @@
 - `sqlite3` 3. SQLite is now bundled by a build hook, so no system `libsqlite3` is needed.
 - Breaking: `dart compile exe` does not work with build hooks. Use `dart build cli` (or `dox build`).
 - SQLite: set `busy_timeout` before `journal_mode = WAL`. Before, many isolates that opened the same file at start could fail with "database is locked".
-- New validation rules `unique:table,column[,except,idColumn]` and `exists:table,column` (`UniqueRule`, `ExistsRule`, `DatabaseRules`). `SqlQueryBuilder.initialize()` adds them to `dox_validation`'s global `v`.
+- New DTO rules `@Unique('users', column: 'email', ignoreParam: 'id')` and `@Exists('teams')`. They run after all other checks. A `List` field is checked with one `WHERE IN` query. Soft-deleted rows count too.
 
 
 ## 3.0.0-alpha.1

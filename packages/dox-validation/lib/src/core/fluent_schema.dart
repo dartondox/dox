@@ -7,10 +7,10 @@ import 'schema.dart';
 ///
 /// [S] is the schema class itself, so `v.string().refine(...).min(3)`
 /// still has the string methods.
-mixin FluentSchema<S extends Schema<O>, O> on Schema<O> {
+mixin FluentSchema<S extends BaseSchema<O>, O> on BaseSchema<O> {
   /// Add a reusable [Rule].
   S use(Rule<O> rule) {
-    Schema<O> next = copySchema();
+    BaseSchema<O> next = copySchema();
     next.rules.add(rule);
     return next as S;
   }
@@ -65,14 +65,14 @@ mixin FluentSchema<S extends Schema<O>, O> on Schema<O> {
 
   /// Add a description for docs (JSON Schema `description`).
   S describe(String text) {
-    Schema<O> next = copySchema();
+    BaseSchema<O> next = copySchema();
     next.description = text;
     return next as S;
   }
 
   /// Add an example value for docs (JSON Schema `examples`).
   S example(Object? value) {
-    Schema<O> next = copySchema();
+    BaseSchema<O> next = copySchema();
     next.examples.add(value);
     return next as S;
   }

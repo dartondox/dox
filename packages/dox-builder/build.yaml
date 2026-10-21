@@ -21,3 +21,11 @@ builders:
     build_extensions: { "$lib$": ["openapi.g.dart"] }
     auto_apply: dependents
     build_to: source
+
+  # lib/dtos.g.dart: every @Dto of the app, for AppConfig(dtos: dtos)
+  dtos:
+    import: "package:dox_builder/dox_builder.dart"
+    builder_factories: ["buildDoxDtos"]
+    build_extensions: { "$lib$": ["dtos.g.dart"] }
+    auto_apply: dependents
+    build_to: source

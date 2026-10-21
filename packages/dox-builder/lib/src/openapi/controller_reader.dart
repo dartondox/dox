@@ -75,10 +75,7 @@ class ControllerReader {
   }
 
   bool _skip(MethodElement method) {
-    return method.isStatic ||
-        method.isPrivate ||
-        method.isOperator ||
-        method.formalParameters.isEmpty;
+    return method.isStatic || method.isPrivate || method.isOperator;
   }
 
   Future<OperationData> _operation(
@@ -155,13 +152,20 @@ class ControllerReader {
     return <String>[for (DartObject name in names) ?name.toStringValue()];
   }
 
-  /// schemas of the path params: the arguments after the first one,
-  /// except a `@Dto` argument.
+  /// schemas of the path params: the positional arguments that are not
+  /// the request and not a `@Dto`, in order.
   Future<List<Map<String, dynamic>>> _params(MethodElement method) async {
     List<Map<String, dynamic>> params = <Map<String, dynamic>>[];
     List<FormalParameterElement> args = method.formalParameters;
-    for (int i = 1; i < args.length; i++) {
-      if (!args[i].isPositional || requests.isDto(args[i].type)) continue;
+    for (int i = 0; i < args.length; i++) {
+      String type = args[i].type.element?.displayName ?? '';
+      if (!args[i].isPositional ||
+          requests.isDto(args[i].type) ||
+          type == 'DoxRequest' ||
+          type == 'IDoxRequest' ||
+          (i == 0 && args[i].type is DynamicType)) {
+        continue;
+      }
       params.add(
         await types.of(args[i].type, nullable: false) ??
             <String, dynamic>{'type': 'string'},

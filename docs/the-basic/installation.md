@@ -2,7 +2,6 @@
 
 !!! warning "3.x is alpha"
     The latest version is `3.0.0-alpha.1`. It needs **Dart 3.13** or newer.
-    Coming from 2.x? Read the [upgrade guide](upgrade.md).
 
 ## Install the CLI
 
@@ -31,8 +30,7 @@ dox create new_blog --version v2.0.1
 ```
 
 !!! info "Use 3.x in a project"
-    Set every Dox package in `pubspec.yaml` to `^3.0.0-alpha.1`, and `dox_query_builder` to `dox_orm`.
-    The [upgrade guide](upgrade.md#do-these-first) shows the full `pubspec.yaml`.
+    Set every Dox package in `pubspec.yaml` to `^3.0.0-alpha.1`. Use `dox_orm` for the database.
 
 ## Packages
 

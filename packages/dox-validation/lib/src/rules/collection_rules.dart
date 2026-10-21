@@ -1,3 +1,4 @@
+import '../dto/file_types.dart';
 import '../constants/default_messages.dart';
 import '../constants/issue_codes.dart';
 import '../core/rule.dart';
@@ -73,7 +74,8 @@ class BeforeOrEqualRule extends BuiltInRule<DateTime> {
   }
 }
 
-/// File extension must be one of [extensions].
+/// The file must be one of the types [extensions], like `['pdf']`.
+/// The real type comes from the first bytes of the file (see [FileTypes]).
 class FileExtensionRule extends BuiltInRule<FileInput> {
   FileExtensionRule(
     this.extensions, {
@@ -81,7 +83,7 @@ class FileExtensionRule extends BuiltInRule<FileInput> {
     super.message,
   }) : super(
          code,
-         DefaultMessages.file,
+         DefaultMessages.fileExtension,
          params: <String, Object?>{'extensions': extensions.join(', ')},
        );
 
@@ -89,15 +91,6 @@ class FileExtensionRule extends BuiltInRule<FileInput> {
 
   @override
   bool check(FileInput value, RuleContext context) {
-    return extensions.contains(value.extension.toLowerCase());
+    return FileTypes.matches(value, extensions);
   }
-}
-
-/// Any uploaded file the validator can check.
-///
-/// dox-core `RequestFile` should implement this, so `v.file()` and the
-/// `image` / `file` string rules can read it.
-abstract class FileInput {
-  /// File extension without the dot, like `png`.
-  String get extension;
 }

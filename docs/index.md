@@ -53,7 +53,6 @@ class BlogController {
     `3.0.0-alpha.1` is a preview. Things can still change before the stable release.
 
     - New here? Start with [Installation](the-basic/installation.md).
-    - Coming from 2.x? Read the [upgrade guide](the-basic/upgrade.md).
     - Need the old docs? Pick **2.x** in the version menu at the top.
 
 ## Quick start

@@ -20,7 +20,7 @@ void main() {
     });
 
     test('date response', () async {
-      Route.get('/date/response', (DoxRequest req, String name) {
+      Route.get('/date/response', (DoxRequest req) {
         return DateTime(2023);
       });
 
@@ -32,7 +32,7 @@ void main() {
     });
 
     test('date response', () async {
-      Route.get('/date/response/json', (DoxRequest req, String name) {
+      Route.get('/date/response/json', (DoxRequest req) {
         return <String, dynamic>{'date': DateTime(2023)};
       });
 

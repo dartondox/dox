@@ -21,7 +21,7 @@ enum UnknownKeys {
 
 /// Schema for a map with known keys. Made by `v.object()`.
 /// The output is a new `Map<String, dynamic>`.
-class ObjectSchema extends Schema<Map<String, dynamic>>
+class ObjectSchema extends BaseSchema<Map<String, dynamic>>
     with FluentSchema<ObjectSchema, Map<String, dynamic>> {
   ObjectSchema(
     Map<String, Schema<Object?>> shape, {

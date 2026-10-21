@@ -194,7 +194,8 @@ class PathConverter {
   static String path(String input) {
     String out = input
         .replaceAllMapped(_colonParam, _toBrace)
-        .replaceAll('*}', '}');
+        .replaceAll('*}', '}')
+        .replaceAll('?}', '}');
     out = out.replaceAll(RegExp(r'/+'), '/');
     out = out.replaceAll(RegExp(r'^/+|/+$'), '');
     return '/$out';

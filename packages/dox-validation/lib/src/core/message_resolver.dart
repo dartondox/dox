@@ -8,6 +8,7 @@ class MessageRequest {
     required this.params,
     required this.fallback,
     this.customMessage,
+    this.locale,
   });
 
   /// Issue code, like `required`.
@@ -24,6 +25,10 @@ class MessageRequest {
 
   /// Message set on the rule itself, like `.min(3, message: '...')`.
   final String? customMessage;
+
+  /// The language of the request, like `th`, from `Accept-Language`.
+  /// `null` when there is none.
+  final String? locale;
 }
 
 /// Turns issue codes into messages.

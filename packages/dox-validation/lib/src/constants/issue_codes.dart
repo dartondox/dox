@@ -1,7 +1,7 @@
 /// Codes used in [ValidationIssue.code].
 ///
-/// Most codes match the Laravel style rule names, so one message map
-/// works for both the fluent schemas and `v.fromRules()`.
+/// The same codes work for DTOs and fluent schemas, so one message map
+/// works for both.
 class IssueCodes {
   static const String required = 'required';
   static const String string = 'string';
@@ -48,11 +48,14 @@ class IssueCodes {
 
   static const String minItems = 'min_items';
   static const String maxItems = 'max_items';
+  static const String uniqueItems = 'unique_items';
+
+  static const String after = 'after';
+  static const String before = 'before';
+
+  static const String maxSize = 'max_size';
+  static const String mimes = 'mimes';
 
   static const String afterOrEqual = 'after_or_equal';
   static const String beforeOrEqual = 'before_or_equal';
-
-  static const String confirmed = 'confirmed';
-  static const String requiredIf = 'required_if';
-  static const String requiredIfNot = 'required_if_not';
 }

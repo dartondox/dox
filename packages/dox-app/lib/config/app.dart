@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:dox_app/app/http/handler.dart';
-import 'package:dox_app/app/http/requests/blog.request.dart';
 import 'package:dox_app/config/cache.dart';
 import 'package:dox_app/config/cors.dart';
 import 'package:dox_app/config/logger.dart';
@@ -9,6 +8,7 @@ import 'package:dox_app/config/openapi.dart';
 import 'package:dox_app/config/services.dart';
 import 'package:dox_app/config/socketio.dart';
 import 'package:dox_app/config/storage.dart';
+import 'package:dox_app/dtos.g.dart';
 import 'package:dox_app/routes/api.dart';
 import 'package:dox_app/routes/web.dart';
 import 'package:dox_app/routes/websocket.dart';
@@ -37,17 +37,11 @@ AppConfig appConfig = AppConfig(
   /// Set `APP_TOTAL_ISOLATE` to change it.
   totalIsolate: Env.get<int>('APP_TOTAL_ISOLATE', Platform.numberOfProcessors),
 
-  /// Form requests
+  /// DTOs
   /// -------------------------------
-  /// Register form request to dox in order to inject into the controller.
-  /// Example,
-  /// {
-  ///   BlogRequest : () => BlogRequest(),
-  ///   UserRequest : () => UserRequest(),
-  /// }
-  formRequests: <Type, FormRequest Function()>{
-    BlogRequest: () => BlogRequest(),
-  },
+  /// Every @Dto class of the app, from lib/dtos.g.dart.
+  /// Run `dox build_runner:build` after you add one.
+  dtos: dtos,
 
   /// Global middleware
   /// -------------------------------

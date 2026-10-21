@@ -3,7 +3,7 @@ import 'package:dox_core/utils/logger.dart';
 
 import '../handler.dart';
 import '../middleware/custom_middleware.dart';
-import '../requests/blog_request.dart';
+import '../../../dtos/dtos.dart';
 import 'api_router.dart';
 
 AppConfig config = AppConfig(
@@ -30,10 +30,8 @@ AppConfig config = AppConfig(
   /// global middleware
   globalMiddleware: <dynamic>[customMiddleware],
 
-  /// form requests
-  formRequests: <Type, FormRequest Function()>{
-    BlogRequest: () => BlogRequest(),
-  },
+  /// the DTOs of the tests
+  dtos: testDtos,
 
   /// routers
   routers: <Router>[ApiRouter()],

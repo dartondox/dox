@@ -80,12 +80,13 @@ class OpenApiRouteReader {
     if (config.registry.operations.isEmpty) return null;
     String? name = _functionName.firstMatch(handler.toString())?.group(1);
     if (name == null) return null;
-    return config.registry.find(
-      route.method,
-      route.path,
-      name,
-      controllerArgumentDataTypes(handler),
-    );
+    List<String> types;
+    try {
+      types = ControllerTypes.parameters(handler as Function, route.path);
+    } catch (_) {
+      types = const <String>[];
+    }
+    return config.registry.find(route.method, route.path, name, types);
   }
 
   String _operationId(OpenApiOperation? op, String method, String path) {
@@ -110,41 +111,10 @@ class OpenApiRouteReader {
     return params;
   }
 
-  /// request schema. order: route `body:`, the generated schema (a
-  /// `@Dto` class), then the form request.
+  /// request schema: the route `body:`, else the generated schema
+  /// (a `@Dto` class)
   Object? _request(RouteData route, OpenApiOperation? op) {
-    Object? body = route.body;
-    if (body != null) return body;
-    try {
-      Object? schema = op?.schema;
-      if (schema != null) return schema;
-      String? formRequest = op?.formRequest;
-      return formRequest != null
-          ? _formRequestSchema(formRequest)
-          : _formRequestOfHandler(route);
-    } catch (_) {
-      /// docs must not break the app. a route without a body is fine.
-      return null;
-    }
-  }
-
-  /// form request of a handler that the registry does not know
-  Object? _formRequestOfHandler(RouteData route) {
-    Object? handler = _handler(route);
-    if (handler == null) return null;
-    List<String> types = controllerArgumentDataTypes(handler);
-    if (types.isEmpty || types.first == 'DoxRequest') return null;
-    return _formRequestSchema(types.first);
-  }
-
-  Object? _formRequestSchema(String name) {
-    Object? request = Dox().ioc.getByName(name);
-    if (request is! FormRequest) return null;
-    ObjectSchema? schema = request.schema();
-    if (schema != null) return schema;
-    Map<String, String> rules = request.rules();
-    if (rules.isEmpty) return null;
-    return Dox().validator.schemaFor(rules, request.messages());
+    return route.body ?? op?.schema;
   }
 
   /// GET and DELETE send the fields in the query, POST, PUT and PATCH

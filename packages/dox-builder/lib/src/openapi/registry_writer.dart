@@ -73,7 +73,6 @@ class RegistryWriter {
     }
     RequestData? request = op.request;
     if (request != null) {
-      _named(out, 'formRequest', request.formRequest);
       if (request.schema != null) {
         out.write('schema: ${literal.write(request.schema)}, ');
       }

@@ -7,7 +7,8 @@ import '../core/sentinels.dart';
 
 /// The value must match one of [options]. The first match wins.
 /// Made by `v.union()`.
-class UnionSchema<O> extends Schema<O> with FluentSchema<UnionSchema<O>, O> {
+class UnionSchema<O> extends BaseSchema<O>
+    with FluentSchema<UnionSchema<O>, O> {
   UnionSchema(List<Schema<O>> options)
     : options = List<Schema<O>>.unmodifiable(options);
 

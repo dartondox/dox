@@ -49,11 +49,5 @@ void main() {
   );
   print(bad.errors);
 
-  ObjectSchema legacy = v.fromRules(<String, String>{
-    'email': 'required|email|max:255',
-    'age': 'nullable|integer|min:18',
-  });
-  print(legacy.safeParse(<String, dynamic>{'email': 'x'}).errors);
-
   print(createPost.toJsonSchema());
 }

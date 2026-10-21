@@ -8,11 +8,11 @@ import 'package:test/test.dart';
 /// a small copy of dox_core: the builder finds things by class name.
 const String _core = '''
 export 'package:dox_annotation/dox_annotation.dart';
+export 'package:dox_validation/src/dto/dto_annotations.dart';
 
 class DoxRequest {
   T validate<T>() => throw UnimplementedError();
 }
-abstract class FormRequest {}
 abstract class IHttpException {}
 class UnAuthorizedException extends IHttpException {}
 class DoxResponse {}
@@ -32,7 +32,9 @@ class BelongsTo {
   final Type model;
   const BelongsTo(this.model);
 }
+class Router {}
 class Route {
+  static void group(String prefix, Function() callback) {}
   static Route get(String path, dynamic c) => Route();
   static Route post(String path, dynamic c, {Object? body}) => Route();
   static Route resource(String path, dynamic c) => Route();
@@ -89,9 +91,10 @@ class CreateUser {
 
   final Role role;
 
-  @Pattern(r'^[a-z]+\$')
-  @Format('hostname')
+  @Regex('[a-z]+')
   final String host;
+
+  final String? firstName;
 
   @MinItems(1)
   @MaxItems(3)
@@ -105,10 +108,9 @@ class CreateUser {
     this.role = Role.user,
     required this.host,
     required this.addresses,
+    this.firstName,
   });
 }
-
-class UserRequest extends FormRequest {}
 
 class UserSerializer extends Serializer<User> {
   UserSerializer(super.data);
@@ -155,7 +157,7 @@ class UserController {
 
 @DoxController(tag: 'Me')
 class ProfileController {
-  @Request(UserRequest)
+  @Request(Address)
   UserSerializer me(DoxRequest req) => UserSerializer(User());
 
   @Query(CreateUser)
@@ -172,6 +174,21 @@ class Routes {
     Route.get('/users/{id}/again', <dynamic>[Object(), users.show]);
   }
 }
+
+class TeamController {
+  /// List teams
+  Future<List<User>> index() async => <User>[];
+}
+
+class ApiRoutes extends Router {
+  String get prefix => 'api';
+
+  void register() {
+    Route.group('/teams', () {
+      Route.get('/', TeamController().index);
+    });
+  }
+}
 ''';
 
 String _annotationFile(String name) {
@@ -185,15 +202,14 @@ Future<String> _generate(Map<String, String> sources) async {
     <String, String>{
       'dox_annotation|lib/dox_annotation.dart': '''
 export 'src/dox_model.dart';
-export 'src/dto_annotation.dart';
 export 'src/openapi_annotation.dart';
 ''',
       'dox_annotation|lib/src/dox_model.dart': _annotationFile(
         'dox_model.dart',
       ),
-      'dox_annotation|lib/src/dto_annotation.dart': _annotationFile(
-        'dto_annotation.dart',
-      ),
+      'dox_validation|lib/src/dto/dto_annotations.dart': File(
+        '../dox-validation/lib/src/dto/dto_annotations.dart',
+      ).readAsStringSync(),
       'dox_annotation|lib/src/openapi_annotation.dart': _annotationFile(
         'openapi_annotation.dart',
       ),
@@ -257,6 +273,15 @@ void main() {
         contains(
           _flat(
             "OpenApiRouteBinding('GET', '/users/{id}/again', 'UserController.show')",
+          ),
+        ),
+      );
+      // the router prefix and the group are in the path
+      expect(
+        out,
+        contains(
+          _flat(
+            "OpenApiRouteBinding('GET', 'api/teams/', 'TeamController.index')",
           ),
         ),
       );
@@ -358,7 +383,8 @@ tags: <String>['User'],'''),
         contains(
           _flat(
             "method: 'me', argumentTypes: <String>['DoxRequest'], "
-            "tags: <String>['Me'], formRequest: 'UserRequest',",
+            "tags: <String>['Me'], "
+            "schema: <String, dynamic>{'\\\$ref': '#/components/schemas/Address'}",
           ),
         ),
       );
@@ -401,14 +427,15 @@ tags: <String>['User'],'''),
         out,
         contains(
           _flat('''
-'CreateUser': <String, dynamic>{'type': 'object',
+'CreateUser': <String, dynamic>{'type': 'object', 'title': 'CreateUser',
 'properties': <String, dynamic>{
 'name': <String, dynamic>{'type': 'string', 'minLength': 2, 'maxLength': 50},
 'email': <String, dynamic>{'type': 'string', 'format': 'email'},
 'bio': <String, dynamic>{'type': <dynamic>['string', 'null'], 'description': 'Short text about the user.'},
 'age': <String, dynamic>{'type': 'integer', 'minimum': 18, 'maximum': 130, 'default': 18},
 'role': <String, dynamic>{'type': 'string', 'enum': <dynamic>['admin', 'user'], 'default': 'user'},
-'host': <String, dynamic>{'type': 'string', 'pattern': '^[a-z]+\\\$', 'format': 'hostname'},
+'host': <String, dynamic>{'type': 'string', 'pattern': '^(?:[a-z]+)\\\$'},
+'first_name': <String, dynamic>{'type': <dynamic>['string', 'null']},
 'addresses': <String, dynamic>{'type': 'array',
 'items': <String, dynamic>{'\\\$ref': '#/components/schemas/Address'},
 'minItems': 1, 'maxItems': 3}},

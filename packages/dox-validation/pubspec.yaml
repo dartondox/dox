@@ -1,5 +1,5 @@
 name: dox_validation
-description: Schema validation for Dart, like Zod. Typed parse results, JSON Schema export, Standard Schema interface and Laravel style string rules.
+description: Typed input for Dart. DTO classes with generated checks, fluent schemas like Zod, JSON Schema export and the Standard Schema interface.
 version: 3.0.0-alpha.1
 repository: https://github.com/dartondox/dox
 homepage: https://dartondox.dev

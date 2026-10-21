@@ -185,22 +185,6 @@ void main() {
       );
     });
   });
-
-  group('CallbackRule |', () {
-    test('works with use()', () {
-      AnySchema s = v.any().use(
-        CallbackRule(
-          name: 'even',
-          defaultMessage: 'The {field} must be even',
-          callback: (Object? value, RuleContext context) {
-            return value is int && value.isEven;
-          },
-        ),
-      );
-      expect(s.safeParse(2).success, true);
-      expect(s.safeParse(3).issues.first.message, 'The value must be even');
-    });
-  });
 }
 
 class GermanResolver extends MessageResolver {

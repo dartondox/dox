@@ -16,21 +16,22 @@ class AuthMiddleware implements IDoxMiddleware {
   dynamic handle(IDoxRequest req) => req;
 }
 
-class PostRequest extends FormRequest {
-  @override
-  Map<String, String> rules() => <String, String>{
-    'title': 'required|string|max:100',
-  };
-}
-
 class PostController {
-  dynamic store(PostRequest req) => req.validated;
+  dynamic store(DoxRequest req) => 'ok';
 
   dynamic show(DoxRequest req, String id) => id;
 
   dynamic search(DoxRequest req) => <String, dynamic>{};
 
   dynamic secret(DoxRequest req) => 'x';
+}
+
+class UserController {
+  dynamic index(DoxRequest req) => <dynamic>[];
+}
+
+class TagController {
+  dynamic index(DoxRequest req) => <dynamic>[];
 }
 
 /// what dox_builder writes into lib/openapi.g.dart for PostController
@@ -60,6 +61,18 @@ const OpenApiRegistry registry = OpenApiRegistry(
       schema: <String, dynamic>{r'$ref': '#/components/schemas/SearchPosts'},
     ),
     OpenApiOperation(
+      controller: 'UserController',
+      method: 'index',
+      argumentTypes: <String>['DoxRequest'],
+      summary: 'List users',
+    ),
+    OpenApiOperation(
+      controller: 'TagController',
+      method: 'index',
+      argumentTypes: <String>['DoxRequest'],
+      summary: 'List tags',
+    ),
+    OpenApiOperation(
       controller: 'PostController',
       method: 'secret',
       argumentTypes: <String>['DoxRequest'],
@@ -68,6 +81,9 @@ const OpenApiRegistry registry = OpenApiRegistry(
   ],
   routes: <OpenApiRouteBinding>[
     OpenApiRouteBinding('GET', 'posts/{id}/full', 'PostController.show'),
+    // the builder writes the full path, with the group prefix
+    OpenApiRouteBinding('GET', '/users/', 'UserController.index'),
+    OpenApiRouteBinding('GET', '/tags/', 'TagController.index'),
   ],
   schemas: <String, Map<String, dynamic>>{
     'Post': <String, dynamic>{
@@ -93,7 +109,18 @@ class DocsRouter extends Router {
   @override
   void register() {
     Route.get('/posts/{id}', (DoxRequest req, String id) => id);
-    Route.post('/posts', PostController().store);
+    Route.post(
+      '/posts',
+      PostController().store,
+      body: v.object(<String, Schema<Object?>>{'title': v.string().max(100)}),
+    );
+    // three `'/'` routes in groups, each with its own docs
+    Route.group('/users', () {
+      Route.get('/', UserController().index);
+    });
+    Route.group('/tags', () {
+      Route.get('/', TagController().index);
+    });
     Route.get('/posts/{id}/full', PostController().show);
     Route.get('/search', PostController().search);
     Route.get('/secret', PostController().secret);
@@ -110,9 +137,6 @@ AppConfig config = AppConfig(
   serverPort: port,
   totalIsolate: 1,
   routers: <Router>[DocsRouter()],
-  formRequests: <Type, FormRequest Function()>{
-    PostRequest: () => PostRequest(),
-  },
   openApi: OpenApiConfig(
     enabled: true,
     info: Info(title: 'Test API', version: '2.0.0'),
@@ -198,6 +222,10 @@ void main() {
 
     /// not in the registry: a basic entry
     expect(doc['paths']['/posts']['post']['operationId'], 'postPosts');
+
+    /// `'/'` routes in groups each find their own docs
+    expect(doc['paths']['/users']['get']['summary'], 'List users');
+    expect(doc['paths']['/tags']['get']['summary'], 'List tags');
   });
 
   test('AuthMiddleware gets bearerAuth without config', () {

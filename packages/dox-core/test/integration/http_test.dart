@@ -9,7 +9,7 @@ import '../utils/start_http_server.dart';
 import 'requirements/config/app.dart';
 import 'requirements/controllers/example.controller.dart';
 import 'requirements/middleware/custom_middleware.dart';
-import 'requirements/requests/blog_request.dart';
+import '../dtos/rules.dto.dart';
 
 String baseUrl = 'http://localhost:${config.serverPort}';
 
@@ -263,21 +263,24 @@ void main() {
       expect(res2.headers['access-control-allow-origin'], null);
     });
 
-    test('custom form request', () async {
-      Route.post('/custom_form_request', (BlogRequest req) {
-        return <String, dynamic>{'title': req.title, 'bar': req.input('bar')};
+    test('a DTO as a controller parameter', () async {
+      Route.post('/dto_param', (CreateUser body) {
+        return <String, dynamic>{'name': body.name, 'role': body.role.name};
       });
 
-      Uri url = Uri.parse('$baseUrl/custom_form_request');
+      Uri url = Uri.parse('$baseUrl/dto_param');
       http.Response res = await http.post(
         url,
-        body: jsonEncode(<String, String>{'title': 'hello', 'foo': 'bar'}),
+        body: jsonEncode(<String, String>{
+          'name': ' hello ',
+          'email': 'a@dox.dev',
+          'foo': 'bar',
+        }),
         headers: <String, String>{'content-type': 'application/json'},
       );
       Map<String, dynamic> jsond = jsonDecode(res.body);
       expect(res.statusCode, 200);
-      expect(jsond['title'], 'hello');
-      expect(jsond['bar'], 'bar');
+      expect(jsond, <String, dynamic>{'name': 'hello', 'role': 'user'});
     });
   });
 }

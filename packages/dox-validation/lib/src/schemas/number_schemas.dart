@@ -7,8 +7,8 @@ import '../core/sentinels.dart';
 import '../rules/number_rules.dart';
 
 /// Shared number methods for [IntSchema] and [NumSchema].
-mixin NumberChecks<S extends Schema<N>, N extends num>
-    on Schema<N>, FluentSchema<S, N> {
+mixin NumberChecks<S extends BaseSchema<N>, N extends num>
+    on BaseSchema<N>, FluentSchema<S, N> {
   /// At least [value].
   S min(num value, {String? message}) {
     return use(MinRule<N>(value, message: message));
@@ -46,7 +46,7 @@ mixin NumberChecks<S extends Schema<N>, N extends num>
 }
 
 /// Schema for whole numbers. Made by `v.int()`.
-class IntSchema extends Schema<int>
+class IntSchema extends BaseSchema<int>
     with FluentSchema<IntSchema, int>, NumberChecks<IntSchema, int> {
   IntSchema({this.coerce = false});
 
@@ -96,7 +96,7 @@ class IntSchema extends Schema<int>
 }
 
 /// Schema for any number. Made by `v.num()`.
-class NumSchema extends Schema<num>
+class NumSchema extends BaseSchema<num>
     with FluentSchema<NumSchema, num>, NumberChecks<NumSchema, num> {
   NumSchema({this.coerce = false});
 

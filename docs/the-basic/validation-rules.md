@@ -141,8 +141,8 @@ From `dox_orm`. Async: they run after all other checks passed.
 
 | Annotation | Code | Message |
 | --- | --- | --- |
-| `@Unique(table, [column], {ignoreParam, ignoreColumn, connection})` | `unique` | `The {field} has already been taken` |
-| `@Exists(table, [column], {connection})` | `exists` | `The selected {field} is invalid` |
+| `@Unique(table, {column, ignoreParam, ignoreColumn, connection})` | `unique` | `The {field} has already been taken` |
+| `@Exists(table, {column, connection})` | `exists` | `The selected {field} is invalid` |
 
 - `@Unique` column default: the input key. `@Exists` column default: `id`.
 - `ignoreParam: 'id'` skips the row where `ignoreColumn` (default `id`) equals the path param `{id}`.

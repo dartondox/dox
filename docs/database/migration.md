@@ -218,14 +218,3 @@ Both kinds can live in `db/migration`. They run in file name order (the timestam
   and reads the `.sql` files from the folder, merged by name.
 - Without `bin/migrate.dart` (a project with only `.sql` files): `dox` runs the `.sql` files itself, like before.
 - A Dart and a `.sql` migration with the same name is an error.
-
-## Upgrade from Dox 2
-
-- `Migration()` is now `Migrator()`. `Migration` is the base class of a Dart migration.
-- `Migrator().migrate(connection)` is now `Migrator(connection: connection).migrate()`.
-- `rollback(null, 2)` is now `rollback(step: 2)`.
-- `Schema.create(...)` is now `Schema().create(...)` (or the `schema` given to `up`).
-  See the [schema builder](schema.md).
-- `make:migration` makes a Dart file. Use `--sql` for a `.sql` file.
-- Old `.sql` migrations keep their names, so they do not run again.
-  You can turn one into a Dart file with the **same name**. It will not run again either.

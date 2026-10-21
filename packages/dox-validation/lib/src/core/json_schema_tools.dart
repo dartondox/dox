@@ -1,5 +1,22 @@
 /// Small helpers for building JSON Schema maps.
 class JsonSchemaTools {
+  /// Add [keys] to the map at [path] inside [json], like
+  /// `['properties', 'slug']`. Used by DTOs for custom rule keys.
+  static void merge(
+    Map<String, dynamic> json,
+    List<String> path,
+    Map<String, dynamic> keys,
+  ) {
+    if (keys.isEmpty) return;
+    Map<String, dynamic> current = json;
+    for (String part in path) {
+      Object? next = current[part];
+      if (next is! Map<String, dynamic>) return;
+      current = next;
+    }
+    current.addAll(keys);
+  }
+
   /// Add `description` and `examples` to [json].
   static Map<String, dynamic> addMeta(
     Map<String, dynamic> json,

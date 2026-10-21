@@ -43,7 +43,6 @@ void main() {
         v.string().nullable(),
         v.string().defaultTo('x'),
         v.string().transform<int>(int.parse),
-        v.fromRules(<String, String>{'a': 'required'}),
       ];
       for (Object schema in schemas) {
         expect(schema, isA<StandardSchema<Object?, Object?>>());

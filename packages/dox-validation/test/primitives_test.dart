@@ -2,11 +2,29 @@ import 'package:dox_validation/dox_validation.dart';
 import 'package:test/test.dart';
 
 class FakeFile implements FileInput {
-  FakeFile(this.extension);
+  FakeFile(this.extension, [this.head = const <int>[]]);
 
   @override
   final String extension;
+
+  @override
+  final List<int> head;
+
+  @override
+  int get length => head.length;
 }
+
+const List<int> pngBytes = <int>[
+  0x89,
+  0x50,
+  0x4E,
+  0x47,
+  0x0D,
+  0x0A,
+  0x1A,
+  0x0A,
+];
+const List<int> pdfBytes = <int>[0x25, 0x50, 0x44, 0x46, 0x2D, 0x31];
 
 String firstCode(ParseResult<Object?> result) {
   return result.issues.first.code;
@@ -197,10 +215,26 @@ void main() {
 
     test('file checks type and extension', () {
       expect(v.file().safeParse('x.png').success, false);
-      expect(v.file().image().safeParse(FakeFile('png')).success, true);
-      expect(v.file().image().safeParse(FakeFile('pdf')).success, false);
       expect(
-        v.file().extensions(<String>['pdf']).safeParse(FakeFile('PDF')).success,
+        v.file().image().safeParse(FakeFile('png', pngBytes)).success,
+        true,
+      );
+      // the name says png, the bytes say pdf
+      expect(
+        v.file().image().safeParse(FakeFile('png', pdfBytes)).success,
+        false,
+      );
+      expect(
+        v
+            .file()
+            .extensions(<String>['pdf'])
+            .safeParse(FakeFile('PDF', pdfBytes))
+            .success,
+        true,
+      );
+      // no byte signature: the name decides
+      expect(
+        v.file().extensions(<String>['csv']).safeParse(FakeFile('csv')).success,
         true,
       );
     });

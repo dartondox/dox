@@ -34,6 +34,9 @@ class DoxRequest implements IDoxRequest {
   final Map<String, dynamic> _cookies = <String, dynamic>{};
   Map<String, dynamic> _allRequest = <String, dynamic>{};
 
+  /// The body as it was read, for DTOs. `body` is its map.
+  final RequestBody requestBody;
+
   DoxRequest({
     required this.route,
     required this.uri,
@@ -43,7 +46,8 @@ class DoxRequest implements IDoxRequest {
     this._scheme = 'http',
     required this.httpHeaders,
     required this.httpRequest,
-  }) {
+    RequestBody? requestBody,
+  }) : requestBody = requestBody ?? RequestBody(body) {
     method = route.method.toUpperCase();
     param = route.params;
     query = uri.queryParameters;
@@ -238,45 +242,52 @@ class DoxRequest implements IDoxRequest {
     return header(HttpHeaders.refererHeader);
   }
 
-  /// validate input request with string rules.
-  /// returns the validated fields (only the fields that have rules).
-  /// throws `ValidationException` (422) when the data is not valid.
+  /// Check the request with the DTO [T] and give the typed object.
+  /// Throws the 422 [ValidationException] when the input is not valid.
+  /// [source] wins over the `source` of the DTO.
   /// ```
-  /// req.validate({'title': 'required'});
-  /// req.validate({'title': 'required'},
-  ///   messages : {'required' : 'The {field} is required'});
+  /// CreateUser data = await req.validate<CreateUser>();
   /// ```
-  /// rules that need the database (`unique`, `exists`) are async,
-  /// use [validateAsync] for them.
-  @override
-  Map<String, dynamic> validate(
-    Map<String, String> rules, {
-    Map<String, String> messages = const <String, String>{},
-  }) {
-    return Dox().validator.validate(all(), rules, messages: messages);
+  Future<T> validate<T>({Source? source}) async {
+    DtoSchema<Object>? schema = Dox().dtos.ofType(T);
+    if (schema == null) {
+      throw StateError(
+        '$T is not a known DTO. Add @Dto() to it, run '
+        '`dart run build_runner build` and set `dtos: dtos` '
+        '(lib/dtos.g.dart) in AppConfig.',
+      );
+    }
+    return await Dox().validator.validateDto(this, schema, source: source) as T;
   }
 
-  /// same as [validate], and also runs async rules like `unique:users,email`
-  /// ```
-  /// await req.validateAsync({'email': 'required|email|unique:users,email'});
-  /// ```
-  Future<Map<String, dynamic>> validateAsync(
-    Map<String, String> rules, {
-    Map<String, String> messages = const <String, String>{},
-  }) {
-    return Dox().validator.validateAsync(all(), rules, messages: messages);
-  }
-
-  /// validate the request with a `dox_validation` schema and
-  /// return its typed output. Async rules work too.
+  /// Check the request (query and body) with a fluent `dox_validation`
+  /// schema and give its output. Only for input you know at runtime.
   /// ```
   /// Map<String, dynamic> data = await req.validateSchema(v.object({
   ///   'email': v.string().email(),
-  ///   'age': v.coerce.int().min(18),
   /// }));
   /// ```
   Future<O> validateSchema<O>(Schema<O> schema) {
     return Dox().validator.validateSchema(schema, all());
+  }
+
+  /// The first language of the `Accept-Language` header, like `th`.
+  /// `null` when there is none.
+  String? get locale {
+    String? header = httpHeaders.value(HttpHeaders.acceptLanguageHeader);
+    if (header == null) return null;
+    String first = header.split(',').first.split(';').first.trim();
+    if (first.isEmpty || first == '*') return null;
+    return first.split('-').first.toLowerCase();
+  }
+
+  /// The path params as text, like `{'id': '5'}`.
+  Map<String, String> get pathParams {
+    Map<String, String> out = <String, String>{};
+    for (MapEntry<String, dynamic> entry in param.entries) {
+      if (entry.value != null) out[entry.key] = '${entry.value}';
+    }
+    return out;
   }
 
   void _getCookies() {
@@ -293,18 +304,6 @@ class DoxRequest implements IDoxRequest {
       String value = cookie.substring(equalsIndex + 1).trim();
       _cookies[name] = value;
     }
-  }
-
-  /// map the request input keys
-  @override
-  void processInputMapper(Map<String, String> mapper) {
-    mapper.forEach((String from, String to) {
-      if (from != to) {
-        dynamic temp = _allRequest[from];
-        _allRequest[to] = temp;
-        _allRequest.remove(from);
-      }
-    });
   }
 
   /// To support jsonEncode

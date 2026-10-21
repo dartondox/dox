@@ -1,9 +1,5 @@
 # Validation
 
-!!! note "New in 3.x"
-    Rule strings like `'required|email'` are gone. You describe the input as a Dart class (a DTO).
-    Coming from 2.x? See [Upgrade: Validation](upgrade.md#validation).
-
 Write a class with `@Dto()`. Ask for it in your controller.
 Dox reads the request, checks it, and gives you a typed object.
 When the input is wrong, Dox answers `422` with the errors. Your controller does not run.
@@ -246,6 +242,7 @@ Route.put('/users/{id}', controller.update);
 Future<User> update(int id, UpdateUser body) async { ... }
 ```
 
+A path param that does not fit its type (like `abc` for `int id`) answers `404`.
 See [Controller: parameters](controller.md#parameters).
 
 ## Keys: snake_case by default
@@ -316,6 +313,12 @@ Every rule is in the [rules reference](validation-rules.md). The short list:
     Only `@MinItems`, `@MaxItems` and `@UniqueItems` check the list itself.
 
 The generator stops with an error when a rule does not fit the type, like `@Email()` on an `int`.
+
+!!! note "Name clash"
+    `dox_core` exports the rule names (`Uuid`, `Name`, `Range`, `Image`, ...).
+    A file that also imports a package with the same name, like `package:uuid`, gets an "ambiguous import" error.
+    Fix it with `hide`: `import 'package:dox_core/dox_core.dart' hide Uuid;`.
+    `dox_orm` has a `Schema` class too: `import 'package:dox_orm/dox_orm.dart' hide Schema;`.
 
 ### Enums or `@In`
 
@@ -462,12 +465,12 @@ The exact API:
 These come from `dox_orm`. They read the database, so they run last.
 
 ```dart
-import 'package:dox_orm/dox_orm.dart';
+import 'package:dox_orm/dox_orm.dart' hide Schema;
 
 @Dto()
 class CreateUser {
   @Email()
-  @Unique('users', 'email')
+  @Unique('users', column: 'email')
   final String email;
 
   @Exists('teams') // column defaults to id
@@ -484,14 +487,14 @@ class CreateUser {
 
 | Annotation | Passes when |
 | --- | --- |
-| `@Unique(table, [column])` | no row has this value. `column` defaults to the input key. |
-| `@Exists(table, [column])` | a row has this value. `column` defaults to `id`. |
+| `@Unique(table, {column})` | no row has this value. `column` defaults to the input key. |
+| `@Exists(table, {column})` | a row has this value. `column` defaults to `id`. |
 
 For an update, skip the row you are updating. `ignoreParam` names a path param:
 
 ```dart
 // PUT /users/{id}
-@Unique('users', 'email', ignoreParam: 'id') // WHERE id != {id}
+@Unique('users', column: 'email', ignoreParam: 'id') // WHERE id != {id}
 final String email;
 ```
 
@@ -503,14 +506,18 @@ final String email;
 
 ## The order of checks
 
-1. Read the input and convert types. Missing required fields.
-2. Change text (`@Trim`, `@Lowercase`, `@Uppercase`), then the field rules, top to bottom.
+1. Read the input and convert types. Change text (`@Trim`, `@Lowercase`, `@Uppercase`). Missing required fields.
+2. The field rules, top to bottom.
 3. The `validate()` method (nested DTOs first, then the parent).
 4. Async rules (`@Unique`, `@Exists`, your `AsyncRule`), one at a time, in field order.
 
 **Each step runs only when the step before it had no errors.**
 So the database is never asked about input that is already wrong.
-Inside one step, Dox collects the errors of all fields.
+
+- Steps 1 and 2 run per DTO. A nested DTO checks its own types first, then its own rules.
+  So one answer can have a type error in `address` and a rule error in `items.1`.
+- Inside one step, Dox collects the errors of all fields.
+- A default value is not checked by the field rules. (Async rules check the final value.)
 
 ## The error response
 
@@ -723,6 +730,11 @@ Options of both methods:
 - `params: {'id': '5'}` gives path params, for `@Unique(ignoreParam: 'id')`.
 
 `@Unique` and `@Exists` need a database. Use a test database, or test those fields in an integration test.
+
+## Not in 3.0
+
+- A DTO can not extend another class, and can not be generic. The generator stops with an error.
+- An enum value is always its Dart name. Custom wire values (like `"ADMIN"` for `Role.admin`) are not supported.
 
 ## Performance
 

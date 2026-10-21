@@ -6,12 +6,11 @@ It works on Postgres, MySQL/MariaDB and SQLite.
 - Set up the database first: see [Database](index.md).
 - For transactions, see [Transactions](transactions.md).
 
-!!! note "Changes in 3.x"
-    - Table and column names are quoted. On Postgres, `userId` is not the same as `userid` any more.
+!!! note "Good to know"
+    - Table and column names are quoted. On Postgres, `userId` and `userid` are two names.
     - `orderBy` throws an `ArgumentError` when the direction is not `asc` or `desc`.
     - `toSql()` wraps the where part in brackets.
     - `count()` ignores `limit`, `offset` and `orderBy`. With `groupBy` it returns the number of groups.
-    - See the [upgrade guide](../the-basic/upgrade.md) for all changes.
 
 ### `create`
 

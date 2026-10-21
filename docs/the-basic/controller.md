@@ -124,9 +124,10 @@ Rules:
 
 **Path param types.** Text from the URL is converted:
 
-- `int`: `"42"` is `42`. `"abc"` or `"4.5"` gives `422` `{"id": "The id must be an integer"}`.
+- `int`: `"42"` is `42`. `"abc"` or `"4.5"` answers `404 Not Found`: no such page.
 - `double`, `num`: `"4.5"` is `4.5`.
 - `bool`: `true`, `1` / `false`, `0`.
+- Any other text answers `404` too.
 - Path params are checked first. When one is wrong, the DTO is not checked.
 
 **Checked at start.** The server does not start when:

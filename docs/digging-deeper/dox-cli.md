@@ -126,9 +126,6 @@ dox create:dto CreateBlog
 It makes `lib/app/http/dtos/create_blog.dto.dart`. Then run `dox build_runner:build`.
 See [Validation](../the-basic/validation.md).
 
-!!! note
-    `dox create:request` is removed in 3.x. Form requests are replaced by DTOs.
-
 ## Create serializer
 
 ```py

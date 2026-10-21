@@ -89,7 +89,6 @@ nav:
   - Getting Started:
     - index.md
     - the-basic/installation.md
-    - the-basic/upgrade.md
     - the-basic/routing.md
     - the-basic/request.md
     - the-basic/response.md

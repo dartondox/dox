@@ -28,7 +28,6 @@ void main() {
     test('file upload | stream | download', () async {
       /// upload image
       Route.post('/image', (DoxRequest req) async {
-        req.validate(<String, String>{'image': 'file:png|image:png'});
         RequestFile file = req.input('image');
         String url = await Storage().putRequestFile('images', file);
         return <String, dynamic>{
@@ -162,7 +161,6 @@ void main() {
     test('handle file with response()', () async {
       /// upload image
       Route.post('/file', (DoxRequest req) async {
-        req.validate(<String, String>{'image': 'file:png|image:png'});
         RequestFile file = req.input('image');
         String url = await Storage().putRequestFile('images', file);
         return <String, dynamic>{
