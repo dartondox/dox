@@ -23,6 +23,7 @@ export 'app.dart';
 export 'cache/cache.dart';
 export 'constants/constants.dart';
 export 'env/env.dart';
+export 'env/env_reader.dart';
 
 /// Exceptions
 export 'exception/internal_error_exception.dart';

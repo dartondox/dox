@@ -4,6 +4,8 @@
 - All dependencies updated to their latest versions.
 - `dox build` now runs `dart build cli` (AOT, with build hooks). The output is `build/bundle/`. Start it with `cd build/bundle && ./bin/server`.
 - New `dox openapi:generate [dir]`. It runs the app's `bin/openapi.dart` and writes `openapi.json` and `openapi.yaml` (default `storage/openapi`).
+- New `dox env:generate`: makes `lib/config/env.dart` (the typed env class) from `.env.example`.
+- New `dox env:check`: loads the typed env and prints every missing or bad key (exit code 1).
 
 
 ## 3.0.0-alpha.1

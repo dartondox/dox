@@ -4,6 +4,7 @@
 - All dependencies updated to their latest versions.
 - New builder `dox_builder:openapi`. It writes `lib/openapi.g.dart` with the OpenAPI docs of the app: it reads the `Route.*` calls, the controllers, the `@Dto` classes and the models. It writes nothing when the package has no controllers.
 - `DtoSchema`, `ModelSchema` and `JsonSchemaReader`: the JSON Schema of a `@Dto` class, a model or any Dart type. Other builders can use them.
+- New: `@DoxEnv()` classes get `_$<Class>` in the `.g.dart` part. Each getter is read from the env once, converted to its type (String, int, double, num, bool, Uri, Duration, enum, List<String>) and kept in a final field. A getter body is the default. A nullable getter is optional. `load()` throws one `EnvException` with every missing or bad key.
 
 ## 3.0.0-alpha.1
 

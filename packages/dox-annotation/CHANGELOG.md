@@ -5,6 +5,7 @@
 - OpenAPI annotations, all optional: `@Summary`, `@Description`, `@Tags`, `@Request`, `@Body`, `@Query`, `@Response`, `@ApiDeprecated`, `@ApiIgnore`, `@DoxController`. Lower case names work too (`@summary(...)`), except `@Response`.
 - DTO annotations: `@Dto`, `@Length`, `@Email`, `@Min`, `@Max`, `@Pattern`, `@MinItems`, `@MaxItems`, `@Trim`, `@Format`.
 - Breaking (small): these names are exported by `dox_core` too. `Pattern` now means the annotation in files that import `dox_core` (add `hide Pattern` if you need the `dart:core` one). If a file also imports a package with a `Request` or `Response` class (like `package:http`) without a prefix, add a prefix to that import.
+- New `@DoxEnv()` and `@EnvKey('X')` for the typed env class.
 
 ## 3.0.0-alpha.1
 
