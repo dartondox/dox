@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/server/dox_server.dart';
@@ -15,27 +17,28 @@ dynamic httpResponseHandler(
     return;
   }
 
+  DoxResponse doxResponse =
+      payload is DoxResponse ? payload : DoxResponse(payload);
+
   /// If there is responseHandler set, handle responseHandler
   /// before DoxResponse process. The responseHandler will return
   /// DoxResponse to process
   ResponseHandlerInterface? customResponseHandler = DoxServer().responseHandler;
   if (customResponseHandler != null) {
-    DoxResponse doxResponse = customResponseHandler
-        .handle(payload is DoxResponse ? payload : DoxResponse(payload));
-    payload = doxResponse;
+    doxResponse = customResponseHandler.handle(doxResponse);
   }
 
-  /// If payload is DoxResponse, DoxResponse have process function
+  /// DoxResponse have process function
   /// which will set header and status code in the response
   /// and will pass payload/content to `responseDataHandler` function.
-  if (payload is DoxResponse) {
-    payload.process(request);
-    return;
-  }
+  doxResponse.process(request);
 }
 
+/// encodes json straight to utf8 bytes, without building a String first
+final JsonUtf8Encoder _jsonUtf8 = JsonUtf8Encoder(null, advanceEncode);
+
 /// Handle response for different types of data
-/// such as string, stream, Model, List, encodable.
+/// such as string, stream, file, Model, List, encodable.
 void responseDataHandler(dynamic payload, HttpRequest request) {
   HttpResponse res = request.response;
 
@@ -44,10 +47,17 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
     return;
   }
 
+  /// file on disk: streamed, with Content-Length and Range support
+  if (payload is File) {
+    _pipe(request, _sendFile(payload, request));
+    return;
+  }
+
   /// if payload is stream
   if (payload is StreamFile) {
     res.headers.contentType = payload.contentType;
-    res.addStream(payload.stream).then((_) => res.close());
+    if (payload.length != null) res.contentLength = payload.length!;
+    _pipe(request, res.addStream(payload.stream));
     return;
   }
 
@@ -56,13 +66,14 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
   if (payload is DownloadableFile) {
     res.headers.contentType = payload.contentType;
     res.headers.add(FILE_DOWNLOAD_HEADER, payload.contentDisposition);
-    res.addStream(payload.stream).then((_) => res.close());
+    if (payload.length != null) res.contentLength = payload.length!;
+    _pipe(request, res.addStream(payload.stream));
     return;
   }
 
-  // if payload is stream
+  // if payload is stream, pipe it chunk by chunk (no buffering)
   if (payload is Stream<List<int>>) {
-    res.addStream(payload).then((_) => res.close());
+    _pipe(request, res.addStream(payload));
     return;
   }
 
@@ -83,18 +94,80 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
     payload = payload.toIso8601String();
   }
 
-  String responseData;
+  List<int> bytes;
 
   /// if payload is Map or List, parse into json
   /// and response as json
   if (payload is! String) {
-    responseData = JSON.stringify(payload);
+    bytes = _jsonUtf8.convert(payload);
     res.headers.contentType = ContentType.json;
   } else {
-    responseData = payload;
+    bytes = res.encoding.encode(payload);
   }
 
-  /// finally write and close http connection
-  res.write(responseData);
+  /// finally write and close http connection.
+  /// known length lets the client skip chunked decoding.
+  /// dart:io only gzips when the length is not set, so skip it then.
+  if (!Dox().config.compress) res.contentLength = bytes.length;
+  res.add(bytes);
   res.close();
+}
+
+/// wait for a streamed body, then close the response.
+/// a failing stream is logged and the connection is closed,
+/// instead of crashing the isolate with an unhandled error.
+Future<void> _pipe(HttpRequest request, Future<dynamic> body) async {
+  HttpResponse res = request.response;
+  try {
+    await body;
+  } catch (error, stackTrace) {
+    Dox().config.errorHandler(error, stackTrace);
+  }
+  try {
+    await res.close();
+  } catch (_) {
+    /// client already gone
+  }
+}
+
+final RegExp _rangePattern = RegExp(r'^bytes=(\d*)-(\d*)$');
+
+/// stream a file. supports a single `Range: bytes=a-b`
+/// so video players and download managers can seek and resume.
+Future<void> _sendFile(File file, HttpRequest request) async {
+  HttpResponse res = request.response;
+  if (!await file.exists()) {
+    res.statusCode = HttpStatus.notFound;
+    res.headers.contentType = ContentType.text;
+    res.write('file not found');
+    return;
+  }
+  int length = await file.length();
+  int start = 0;
+  int end = length - 1;
+  res.headers.set(HttpHeaders.acceptRangesHeader, 'bytes');
+
+  String? range = request.headers.value(HttpHeaders.rangeHeader);
+  Match? match = range == null ? null : _rangePattern.firstMatch(range.trim());
+  if (match != null && (match[1]!.isNotEmpty || match[2]!.isNotEmpty)) {
+    if (match[1]!.isEmpty) {
+      /// `bytes=-500` means the last 500 bytes
+      start = max(0, length - int.parse(match[2]!));
+    } else {
+      start = int.parse(match[1]!);
+      if (match[2]!.isNotEmpty) end = min(int.parse(match[2]!), length - 1);
+    }
+    if (start > end || start >= length) {
+      res.statusCode = HttpStatus.requestedRangeNotSatisfiable;
+      res.headers.set(HttpHeaders.contentRangeHeader, 'bytes */$length');
+      res.contentLength = 0;
+      return;
+    }
+    res.statusCode = HttpStatus.partialContent;
+    res.headers
+        .set(HttpHeaders.contentRangeHeader, 'bytes $start-$end/$length');
+  }
+
+  res.contentLength = end - start + 1;
+  await res.addStream(file.openRead(start, end + 1));
 }

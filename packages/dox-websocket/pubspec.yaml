@@ -1,16 +1,16 @@
 name: dox_websocket
 description: Websocket library for dox framework.
-version: 3.0.0
+version: 3.0.0-alpha.1
 repository: https://github.com/dartondox/dox
 environment:
-  sdk: ^3.1.0
+  sdk: ^3.6.0
 
 dependencies:
-  uuid: ^3.0.6
-  dox_annotation: ^1.0.5
-  ioredis: ^1.0.2
+  uuid: ^4.5.1
+  dox_annotation: ^3.0.0-alpha.1
+  ioredis: ^2.0.0-alpha.1
 
 dev_dependencies:
-  lints: ^2.0.0
-  test: ^1.21.0
-  dox_core: ^2.0.0
+  lints: ^5.1.1
+  test: ^1.26.3
+  dox_core: ^3.0.0-alpha.1

@@ -5,7 +5,7 @@ import 'package:dox_websocket/src/websocket_storage.dart';
 
 class WebsocketEmitter {
   /// room id to sent message
-  String _roomId;
+  final String _roomId;
 
   /// sender socket id
   final String sender;
@@ -19,13 +19,14 @@ class WebsocketEmitter {
 
   WebsocketEmitter(this.sender, this._roomId, {this.via = 'callback'});
 
-  /// set room to sent message
+  /// set room to sent message.
+  /// return a new emitter, so the room does not stick
+  /// to the next events of this connection.
   /// ```
   /// emitter.room('ABC');
   /// ```
   WebsocketEmitter room(dynamic room) {
-    _roomId = room;
-    return this;
+    return WebsocketEmitter(sender, room.toString(), via: via);
   }
 
   /// emit message only to sender

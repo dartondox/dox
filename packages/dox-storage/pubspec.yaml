@@ -1,0 +1,21 @@
+name: dox_storage
+description: File storage for the dox framework. One API for local disk, AWS S3 and S3-compatible services (R2, MinIO, Spaces), with swappable drivers.
+version: 3.0.0-alpha.1
+repository: https://github.com/dartondox/dox
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  crypto: ^3.0.3
+  http: ^1.2.0
+  mime: ^2.0.0
+  path: ^1.8.3
+
+dev_dependencies:
+  lints: ^5.1.1
+  test: ^1.26.3
+
+# Public AWS example keys used by the SigV4 test vectors.
+false_secrets:
+  - /test/fixtures/sigv4_vectors.json

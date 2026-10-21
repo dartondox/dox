@@ -1,39 +1,135 @@
 name: Release
 
+# Push a tag like v3.0.0-alpha.1 to publish all packages to pub.dev.
+# Run it by hand (workflow_dispatch) to do a dry run only. Nothing is published then.
+# Tests are not run here. The Test workflow runs on every push, so wait for it
+# to be green on the release commit before you push the tag.
+
 on:
   push:
-    branches:
-    - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  id-token: write # pub.dev automated publishing (OIDC)
+  contents: read
 
 concurrency:
-  group: "publish"
-  cancel-in-progress: true
-    
+  group: publish
+  cancel-in-progress: false
+
+env:
+  # Folder:package, in publish order. Each one only needs the ones before it,
+  # dev_dependencies too (pub checks them on publish).
+  # dox_query_builder only re-exports dox_orm, so it comes after dox_orm.
+  PACKAGES: >-
+    dox-annotation:dox_annotation
+    dox-builder:dox_builder
+    dox-orm:dox_orm
+    dox-query-builder:dox_query_builder
+    dox-migration:dox_migration
+    dox-core:dox_core
+    dox-auth:dox_auth
+    dox-websocket:dox_websocket
+    dox-validation:dox_validation
+    dox-openapi:dox_openapi
+    dox-storage:dox_storage
+    dox-cache:dox_cache
+    dox-socketio:dox_socketio
+    dox-cli:dox
+
 jobs:
-  publish:
-    if: |
-      startsWith(github.event.head_commit.message, 'release')
+  check-version:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: dart-lang/setup-dart@v1
-      with:
-        sdk: stable
-    - name: Set dart credentials
-      run: |
-        mkdir "$XDG_CONFIG_HOME/dart"
-        echo '${{ secrets.PUB_CREDENTIALS }}' > "$XDG_CONFIG_HOME/dart/pub-credentials.json"
-    - name: Prepare git
-      run: |
-        git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-    - name: Activate melos
-      run: dart pub global activate melos
-    - name: Publish package
-      run: melos publish --no-dry-run --git-tag-version --yes
-    - name: Create tags
-      uses: CasperWA/push-protected@v2
-      with:
-        token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
-        tags: true
-        branch: main
+      - uses: actions/checkout@v4
+      - name: Check that tag and all package versions match the root version
+        run: |
+          VERSION=$(sed -nE 's/^version:[[:space:]]*([^[:space:]]+).*/\1/p' pubspec.yaml)
+          echo "Root version: $VERSION"
+          if [ "$GITHUB_REF_TYPE" = "tag" ] && [ "${GITHUB_REF_NAME#v}" != "$VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match root pubspec version $VERSION"
+            exit 1
+          fi
+          FAIL=0
+          for entry in $PACKAGES; do
+            dir=${entry%%:*}
+            v=$(sed -nE 's/^version:[[:space:]]*([^[:space:]]+).*/\1/p' "packages/$dir/pubspec.yaml")
+            if [ "$v" != "$VERSION" ]; then
+              echo "::error::packages/$dir has version $v, expected $VERSION. Run bin/update_versions.sh"
+              FAIL=1
+            fi
+          done
+          exit $FAIL
+
+  dry-run:
+    if: github.event_name == 'workflow_dispatch'
+    needs: check-version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - name: Melos bootstrap (links local packages, so unpublished sibling versions resolve)
+        run: |
+          dart pub global activate melos 3.4.0
+          melos bs
+      - name: Dry run publish
+        run: |
+          FAIL=0
+          for entry in $PACKAGES; do
+            dir=${entry%%:*}
+            echo "::group::$dir"
+            set +e
+            (cd "packages/$dir" && dart pub publish --dry-run)
+            code=$?
+            set -e
+            echo "::endgroup::"
+            # 0 = clean, 65 = warnings only (for example: local path overrides, CHANGELOG).
+            if [ $code -eq 65 ]; then
+              echo "::warning::$dir: dry run has warnings. Open the log group to read them."
+            elif [ $code -ne 0 ]; then
+              echo "::error::$dir: dry run failed (exit $code)"
+              FAIL=1
+            fi
+          done
+          exit $FAIL
+
+  publish:
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    needs: check-version
+    runs-on: ubuntu-latest
+    environment: pub.dev
+    steps:
+      - uses: actions/checkout@v4
+      # Sets up the OIDC token for pub.dev. No PUB_CREDENTIALS secret needed.
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - name: Publish packages in order
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          has_version() {
+            curl -sf "https://pub.dev/api/packages/$1" \
+              | jq -e --arg v "$VERSION" 'any(.versions[]; .version == $v)' > /dev/null
+          }
+          for entry in $PACKAGES; do
+            dir=${entry%%:*}
+            name=${entry##*:}
+            if has_version "$name"; then
+              echo "$name $VERSION is already on pub.dev. Skipping."
+              continue
+            fi
+            echo "::group::Publish $name $VERSION"
+            (cd "packages/$dir" && dart pub publish --force)
+            echo "::endgroup::"
+            # Wait until pub.dev lists the new version, so the next package can resolve it.
+            for i in $(seq 1 30); do
+              has_version "$name" && break
+              echo "Waiting for $name $VERSION on pub.dev ($i/30)"
+              sleep 10
+            done
+            has_version "$name" || { echo "::error::$name $VERSION not visible on pub.dev"; exit 1; }
+          done

@@ -577,5 +577,73 @@ void main() {
       expect(errors['products.1.name'], 'The name is required');
       expect(errors.length, 3);
     });
+    test('absent optional field skips other rules', () {
+      DoxValidator validator = DoxValidator(<String, dynamic>{'name': 'dox'});
+      validator.validate(<String, String>{
+        'status': 'in:active,inactive',
+        'age': 'integer|min:1',
+        'email': 'email',
+        'avatar': 'image',
+      });
+      expect(validator.errors, isEmpty);
+    });
+
+    test('null or empty optional field skips other rules', () {
+      DoxValidator validator =
+          DoxValidator(<String, dynamic>{'status': null, 'age': ''});
+      validator.validate(<String, String>{
+        'status': 'in:active,inactive',
+        'age': 'integer',
+      });
+      expect(validator.errors, isEmpty);
+    });
+
+    test('present optional field still runs rules', () {
+      DoxValidator validator = DoxValidator(<String, dynamic>{'status': 'x'});
+      validator.validate(<String, String>{'status': 'in:active,inactive'});
+      expect(validator.errors['status'],
+          'The selected status is invalid. Valid options are active, and inactive');
+    });
+
+    test('required still fails on absent field', () {
+      DoxValidator validator = DoxValidator(<String, dynamic>{});
+      validator.validate(<String, String>{'status': 'required|in:a,b'});
+      expect(validator.errors['status'], 'The status is required');
+    });
+
+    test('required_if still runs on absent field', () {
+      DoxValidator validator = DoxValidator(<String, dynamic>{'type': 'login'});
+      validator.validate(<String, String>{'dob': 'required_if:type,login'});
+      expect(validator.errors['dob'], 'The dob is required');
+    });
+
+    test('nullable', () {
+      DoxValidator validator =
+          DoxValidator(<String, dynamic>{'age': null, 'count': 'abc'});
+      validator.validate(<String, String>{
+        'age': 'nullable|integer',
+        'count': 'nullable|integer',
+      });
+      expect(validator.errors['age'], null);
+      expect(validator.errors['count'], 'The count must be an integer');
+    });
+
+    test('sometimes', () {
+      DoxValidator validator = DoxValidator(<String, dynamic>{'b': ''});
+      validator.validate(<String, String>{
+        'a': 'sometimes|required',
+        'b': 'sometimes|required',
+      });
+      expect(validator.errors['a'], null);
+      expect(validator.errors['b'], 'The b is required');
+    });
+
+    test('min_length and max_length include the limit', () {
+      DoxValidator validator = DoxValidator(<String, dynamic>{'code': 'abcd'});
+      validator.validate(<String, String>{
+        'code': 'min_length:4|max_length:4',
+      });
+      expect(validator.errors, isEmpty);
+    });
   });
 }

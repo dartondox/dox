@@ -52,6 +52,21 @@ void main() {
       expect(command.validateArgs(['User', 'extra']), isFalse);
     });
 
+    test('migration commands have laravel style aliases', () {
+      const Map<String, String> aliases = {
+        'migrate': 'migration:run',
+        'migrate:rollback': 'migration:rollback',
+        'migrate:reset': 'migration:reset',
+        'migrate:refresh': 'migration:refresh',
+      };
+      aliases.forEach((alias, command) {
+        expect(CommandRegistry.findCommand(alias)?.command, command);
+      });
+      final rollback = CommandRegistry.findCommand('migration:rollback')!;
+      expect(rollback.validateArgs(['--step=2']), isTrue);
+      expect(rollback.validateArgs(['--step=2', 'extra']), isFalse);
+    });
+
     test('should get all commands', () {
       final commands = CommandRegistry.getAllCommands();
       expect(commands, isNotEmpty);

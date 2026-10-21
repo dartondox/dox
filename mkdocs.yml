@@ -75,6 +75,7 @@ nav:
     - digging-deeper/websocket.md
     - digging-deeper/dox-cli.md
     - digging-deeper/deployment.md
+    - digging-deeper/performance.md
     - digging-deeper/testing.md
   - Database:
     - database/migration.md

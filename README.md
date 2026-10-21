@@ -20,10 +20,16 @@ Dox is a powerful framework specifically developed for web application backend d
 - **Scalability**: The framework is designed to handle high traffic and scale effortlessly as your web application grows.
 - **Developer-Friendly**: With its intuitive APIs and clear documentation, Dox makes it easier for developers to create and maintain web applications.
 - **Simple, fast routing**: Dox offers a simple and efficient routing system, allowing developers to define and handle routes easily for building robust web applications. 
-- **ORM Support with Strong Query Builder**: Dox provides an ORM (Object-Relational Mapping) system along with a powerful query builder, enabling developers to interact with databases efficiently.
+- **Fast**: Request bodies are streamed, the server uses all CPU cores, and the router is fast.
+- **ORM and Query Builder** (`dox_orm`): Models, relations and a query builder for PostgreSQL, MySQL, MariaDB and SQLite. MySQL uses a real connection pool.
 - **Validation of Request Data**: Dox includes built-in validation capabilities, allowing developers to validate incoming request data easily and ensure data integrity.
 - **Database Migration**: The framework offers database migration support, allowing developers to manage and apply database schema changes seamlessly.
 - **Web Socket**: Dox provides WebSocket support, enabling real-time communication and bidirectional data exchange between the server and clients.
+- **Socket.IO** (`dox_socketio`): A Socket.IO v4 server, with a Redis adapter.
+- **Cache** (`dox_cache`): Memory, file and Redis drivers, with locks and tags.
+- **Storage** (`dox_storage`): One API for local disk, AWS S3 and S3-compatible services.
+- **Schema validation** (`dox_validation`): Zod-like schemas with typed results.
+- **OpenAPI** (`dox_openapi`): OpenAPI 3.1 docs as JSON and YAML, with a docs page.
 - **CORS**: Dox includes Cross-Origin Resource Sharing (CORS) support, allowing developers to control and manage cross-origin requests for enhanced security.
 - **CLI (Command-Line Interface)**: Dox provides a command-line interface with useful commands to streamline development tasks, such as creating migrations, generating models, and more.
 

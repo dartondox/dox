@@ -1,4 +1,5 @@
 /// coverage:ignore-file
+library;
 
 abstract class CacheDriverInterface {
   String tag = '';

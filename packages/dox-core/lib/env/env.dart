@@ -25,9 +25,12 @@ class Env {
   /// Evn.get<num>('PORT', 3000); (This will return num type)
   /// Evn.get<String>('APP_KEY'); (This will return String type)
   /// Currently this function support String, int and num types.
+  ///
+  /// A real environment variable wins over the `.env` file, so a docker
+  /// or systemd deploy can pass config without a `.env` file.
   /// ```
   static T get<T>(String key, [dynamic defaultValue]) {
-    String value = Env().env[key].toString();
+    String value = (Platform.environment[key] ?? Env().env[key]).toString();
     String val = value.isEmpty || value.toLowerCase() == 'null'
         ? defaultValue.toString()
         : value;

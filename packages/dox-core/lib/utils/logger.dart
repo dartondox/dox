@@ -1,4 +1,6 @@
 /// coverage:ignore-file
+library;
+
 import 'package:dox_core/app.dart';
 import 'package:dox_core/utils/json.dart';
 

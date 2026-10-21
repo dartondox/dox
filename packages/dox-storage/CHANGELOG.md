@@ -1,0 +1,7 @@
+## 3.0.0-alpha.1
+
+- Initial version.
+- `DriveManager` and `Disk` with a FlyDrive-like API.
+- Drivers: `LocalDriver`, `S3Driver` (AWS S3, R2, MinIO, Spaces, GCS interop), `MemoryDriver`.
+- AWS Signature V4 signing, presigned download and upload URLs, multipart upload.
+- `DriveManager.fake()` for tests.

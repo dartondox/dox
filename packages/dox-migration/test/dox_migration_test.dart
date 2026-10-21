@@ -1,9 +1,301 @@
+import 'dart:io';
+
+import 'package:dox_migration/dox_migration.dart';
+import 'package:dox_migration/src/utils/db_connection.dart';
+import 'package:mysql_dart/mysql_dart.dart' as mysql;
+import 'package:postgres/postgres.dart' as postgres;
 import 'package:test/test.dart';
 
+/// env for each driver, defaults match the services in .github/workflows
+Map<String, Map<String, String>> drivers = <String, Map<String, String>>{
+  'postgres': <String, String>{
+    'DB_CONNECTION': 'postgres',
+    'DB_HOST': 'localhost',
+    'DB_PORT': Platform.environment['PG_PORT'] ?? '5432',
+    'DB_NAME': 'postgres',
+    'DB_USERNAME': 'postgres',
+    'DB_PASSWORD': 'postgres',
+  },
+  'mysql': <String, String>{
+    'DB_CONNECTION': 'mysql',
+    'DB_HOST': 'localhost',
+    'DB_PORT': Platform.environment['MYSQL_PORT'] ?? '3306',
+    'DB_NAME': 'dox-framework',
+    'DB_USERNAME': 'dox',
+    'DB_PASSWORD': 'password',
+  },
+  // no server needed, the file is made in the system temp folder
+  'sqlite': <String, String>{
+    'DB_CONNECTION': 'sqlite',
+    'DB_DATABASE': '${Directory.systemTemp.path}/dox_migration_test.db',
+  },
+};
+
 void main() {
-  group('A group of tests', () {
-    test('First test', () {
-      expect(true, true);
+  Directory originalDir = Directory.current;
+
+  for (String driver in drivers.keys) {
+    group(driver, () {
+      Map<String, String> env = drivers[driver]!;
+      late Directory tempDir;
+      late DbConnection db;
+
+      void writeMigration(String name, String sql) {
+        File('${tempDir.path}/db/migration/$name.sql').writeAsStringSync(sql);
+      }
+
+      Future<List<Map<String, dynamic>>> migrations() {
+        return db.execute(
+          'SELECT migration, batch FROM dox_db_migration ORDER BY id',
+        );
+      }
+
+      Future<bool> tableExists(String table) async {
+        try {
+          await db.execute('SELECT * FROM $table');
+          return true;
+        } catch (_) {
+          return false;
+        }
+      }
+
+      setUp(() async {
+        tempDir = Directory.systemTemp.createTempSync('dox_migration_');
+        Directory('${tempDir.path}/db/migration').createSync(recursive: true);
+        File('${tempDir.path}/.env').writeAsStringSync(
+          env.entries
+              .map((MapEntry<String, String> e) => '${e.key}=${e.value}')
+              .join('\n'),
+        );
+        Directory.current = tempDir;
+
+        db = await DbConnection.open(env);
+        for (String table in <String>[
+          'dox_db_migration',
+          'mig_comment',
+          'mig_blog',
+          'mig_tag',
+          'mig_fail',
+        ]) {
+          await db.execute('DROP TABLE IF EXISTS $table');
+        }
+      });
+
+      tearDown(() async {
+        await db.close();
+        Directory.current = originalDir;
+        tempDir.deleteSync(recursive: true);
+      });
+
+      test('migrate and rollback with batch numbers', () async {
+        writeMigration('2023_01_01_000000_create_blog', '''
+-- up
+CREATE TABLE mig_blog (
+  id INTEGER PRIMARY KEY,
+  title VARCHAR(255)
+);
+INSERT INTO mig_blog (id, title) VALUES (1, 'hello')
+
+-- down
+DROP TABLE IF EXISTS mig_blog
+''');
+
+        await Migration().migrate();
+        expect(await tableExists('mig_blog'), true);
+        List<Map<String, dynamic>> rows = await db.execute(
+          'SELECT title FROM mig_blog',
+        );
+        expect(rows.first['title'], 'hello');
+        expect(
+          (await migrations()).map((Map<String, dynamic> r) => r['batch']),
+          <int>[1],
+        );
+
+        // nothing new, nothing changes
+        await Migration().migrate();
+        expect((await migrations()).length, 1);
+
+        writeMigration('2023_01_02_000000_create_tag', '''
+-- up
+CREATE TABLE mig_tag (id INTEGER PRIMARY KEY)
+
+-- down
+DROP TABLE IF EXISTS mig_tag
+''');
+        await Migration().migrate();
+        expect(await tableExists('mig_tag'), true);
+        expect(
+          (await migrations()).map((Map<String, dynamic> r) => r['batch']),
+          <int>[1, 2],
+        );
+
+        // rollback only undoes the last batch
+        await Migration().rollback();
+        expect(await tableExists('mig_tag'), false);
+        expect(await tableExists('mig_blog'), true);
+        expect(
+          (await migrations()).map((Map<String, dynamic> r) => r['batch']),
+          <int>[1],
+        );
+
+        await Migration().rollback();
+        expect(await tableExists('mig_blog'), false);
+        expect(await migrations(), isEmpty);
+      });
+
+      test('rollback runs in reverse order, step and reset', () async {
+        writeMigration('2023_01_01_000000_create_blog', '''
+-- up
+CREATE TABLE mig_blog (id INTEGER PRIMARY KEY)
+
+-- down
+DROP TABLE mig_blog
+''');
+        // comment table needs blog table, so it must be dropped first
+        writeMigration('2023_01_02_000000_create_comment', '''
+-- up
+CREATE TABLE mig_comment (
+  id INTEGER PRIMARY KEY,
+  blog_id INTEGER REFERENCES mig_blog (id)
+)
+
+-- down
+DROP TABLE mig_comment
+''');
+        await Migration().migrate();
+        expect(await tableExists('mig_comment'), true);
+
+        await Migration().rollback();
+        expect(await tableExists('mig_comment'), false);
+        expect(await tableExists('mig_blog'), false);
+        expect(await migrations(), isEmpty);
+
+        await Migration().migrate();
+        writeMigration('2023_01_03_000000_create_tag', '''
+-- up
+CREATE TABLE mig_tag (id INTEGER PRIMARY KEY)
+
+-- down
+DROP TABLE mig_tag
+''');
+        await Migration().migrate();
+
+        // step undoes the last n migrations, even across batches
+        await Migration().rollback(null, 2);
+        expect(await tableExists('mig_tag'), false);
+        expect(await tableExists('mig_comment'), false);
+        expect(await tableExists('mig_blog'), true);
+        expect(
+          (await migrations()).map((Map<String, dynamic> r) => r['migration']),
+          <String>['2023_01_01_000000_create_blog'],
+        );
+
+        await Migration().migrate();
+        await Migration().reset();
+        expect(await tableExists('mig_blog'), false);
+        expect(await migrations(), isEmpty);
+
+        await Migration().refresh();
+        expect(await tableExists('mig_tag'), true);
+        expect((await migrations()).length, 3);
+      });
+
+      test('sql with dashes, semicolons in strings and comments', () async {
+        writeMigration('2023_01_01_000000_create_blog', '''
+-- up
+-- a normal comment; with a semicolon
+CREATE TABLE mig_blog (
+  id INTEGER PRIMARY KEY,
+  title VARCHAR(255) -- the title
+);
+/* block comment; with a semicolon */
+INSERT INTO mig_blog (id, title) VALUES (1, 'a-b; c -- d');
+INSERT INTO mig_blog (id, title) VALUES (2 - 0, 'it''s');
+
+-- down
+DROP TABLE mig_blog
+''');
+        await Migration().migrate();
+        List<Map<String, dynamic>> rows = await db.execute(
+          'SELECT id, title FROM mig_blog ORDER BY id',
+        );
+        expect(
+          rows.map((Map<String, dynamic> r) => r['title'].toString()),
+          <String>['a-b; c -- d', "it's"],
+        );
+        await Migration().rollback();
+        expect(await tableExists('mig_blog'), false);
+      });
+
+      /// the query builder gives a pool (not one connection), the migration
+      /// must still run each file in one transaction on one connection
+      test('migrate with a pool', () async {
+        dynamic pool;
+        if (driver == 'postgres') {
+          pool = postgres.Pool<dynamic>.withEndpoints(
+            <postgres.Endpoint>[
+              postgres.Endpoint(
+                host: env['DB_HOST']!,
+                port: int.parse(env['DB_PORT']!),
+                database: env['DB_NAME']!,
+                username: env['DB_USERNAME'],
+                password: env['DB_PASSWORD'],
+              ),
+            ],
+            settings: postgres.PoolSettings(sslMode: postgres.SslMode.disable),
+          );
+        } else if (driver == 'mysql') {
+          pool = mysql.MySQLConnectionPool(
+            host: env['DB_HOST'],
+            port: int.parse(env['DB_PORT']!),
+            userName: env['DB_USERNAME']!,
+            password: env['DB_PASSWORD'],
+            databaseName: env['DB_NAME'],
+            maxConnections: 5,
+            secure: false,
+            allowPublicKeyRetrieval: true,
+          );
+        } else {
+          return;
+        }
+        writeMigration('2023_01_01_000000_create_blog', '''
+-- up
+CREATE TABLE mig_blog (id INTEGER PRIMARY KEY);
+INSERT INTO mig_blog (id) VALUES (1)
+
+-- down
+DROP TABLE mig_blog
+''');
+        await Migration().migrate(pool);
+        expect(await tableExists('mig_blog'), true);
+        expect((await migrations()).length, 1);
+      });
+
+      test('failed migration is not recorded', () async {
+        writeMigration('2023_01_01_000000_fail', '''
+-- up
+CREATE TABLE mig_fail (id INTEGER PRIMARY KEY);
+INSERT INTO not_a_table VALUES (1)
+
+-- down
+DROP TABLE IF EXISTS mig_fail
+''');
+
+        writeMigration('2023_01_02_000000_later', '''
+-- up
+CREATE TABLE mig_tag (id INTEGER PRIMARY KEY)
+
+-- down
+DROP TABLE IF EXISTS mig_tag
+''');
+
+        await expectLater(Migration().migrate(), throwsException);
+        expect(await migrations(), isEmpty);
+        // stop at the first failure, the later migration does not run
+        expect(await tableExists('mig_tag'), false);
+        // mysql auto commits DDL, so only postgres rolls back the table
+        expect(await tableExists('mig_fail'), driver == 'mysql');
+      });
     });
-  });
+  }
 }

@@ -23,6 +23,8 @@ class DoxRequest implements IDoxRequest {
 
   final String? clientIp;
 
+  final String _scheme;
+
   @override
   String method = 'GET';
 
@@ -39,9 +41,10 @@ class DoxRequest implements IDoxRequest {
     required this.body,
     this.contentType,
     this.clientIp,
+    String scheme = 'http',
     required this.httpHeaders,
     required this.httpRequest,
-  }) {
+  }) : _scheme = scheme {
     method = route.method.toUpperCase();
     param = route.params;
     query = uri.queryParameters;
@@ -105,6 +108,20 @@ class DoxRequest implements IDoxRequest {
     return clientIp ?? UNKNOWN;
   }
 
+  /// `http` or `https`. Behind a proxy listed in `trustedProxies` this
+  /// comes from `X-Forwarded-Proto`. Dart itself only serves plain http.
+  /// ```
+  /// req.scheme();
+  /// ```
+  String scheme() {
+    return _scheme;
+  }
+
+  /// true when the client used https (see [scheme])
+  bool isSecure() {
+    return _scheme == 'https';
+  }
+
   /// get auth class
   @override
   IAuth? get auth => input(AUTH_REQUEST_KEY);
@@ -124,7 +141,7 @@ class DoxRequest implements IDoxRequest {
   /// ```
   @override
   bool has(String key) {
-    String? val = _allRequest[key];
+    dynamic val = _allRequest[key];
     if (val == null) {
       return false;
     }
@@ -181,7 +198,7 @@ class DoxRequest implements IDoxRequest {
   @override
   String? cookie(String key, {bool decrypt = true}) {
     if (_cookies[key] == null) return null;
-    if (decrypt) AESEncryptor.decode(_cookies[key], Dox().config.appKey);
+    if (decrypt) return AESEncryptor.decode(_cookies[key], Dox().config.appKey);
     return _cookies[key];
   }
 
@@ -245,10 +262,13 @@ class DoxRequest implements IDoxRequest {
     if (cookies == null) {
       return;
     }
-    for (String cookie in cookies) {
+
+    /// one header can hold many cookies, eg. `a=1; b=2`
+    for (String cookie in cookies.expand((String c) => c.split(';'))) {
       int equalsIndex = cookie.indexOf('=');
-      String name = cookie.substring(0, equalsIndex);
-      String value = cookie.substring(equalsIndex + 1);
+      if (equalsIndex < 0) continue;
+      String name = cookie.substring(0, equalsIndex).trim();
+      String value = cookie.substring(equalsIndex + 1).trim();
       _cookies[name] = value;
     }
   }

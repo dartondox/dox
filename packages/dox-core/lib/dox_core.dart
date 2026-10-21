@@ -1,4 +1,4 @@
-library dox_core;
+library;
 
 export 'package:dox_annotation/dox_annotation.dart';
 
@@ -13,6 +13,7 @@ export 'env/env.dart';
 /// Exceptions
 export 'exception/internal_error_exception.dart';
 export 'exception/not_found_exception.dart';
+export 'exception/payload_too_large_exception.dart';
 export 'exception/query_exception.dart';
 export 'exception/validation_exception.dart';
 

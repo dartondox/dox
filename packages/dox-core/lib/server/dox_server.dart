@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
@@ -26,12 +27,18 @@ class DoxServer {
       port,
       shared: true,
     );
-    server.listen(
-      (HttpRequest req) {
-        httpRequestHandler(req);
-      },
-      onError: onError ?? (dynamic error) => print(error),
-    );
+    server.autoCompress = Dox().config.compress;
+
+    /// a stray async error from app code (eg. an un-awaited future that
+    /// fails) is logged here, instead of killing the whole isolate.
+    runZonedGuarded(() {
+      server.listen(
+        httpRequestHandler,
+        onError: onError ?? (dynamic error) => stderr.writeln(error),
+      );
+    }, (Object error, StackTrace stackTrace) {
+      Dox().config.errorHandler(error, stackTrace);
+    });
     httpServer = server;
     return server;
   }

@@ -52,7 +52,7 @@ class Dox implements IDox {
   }
 
   /// override total isolate from config
-  /// default is 3
+  /// default is one per CPU core
   void totalIsolate(int value) {
     _totalIsolate = value;
   }
@@ -74,7 +74,7 @@ class Dox implements IDox {
   Future<void> startServer() async {
     addServices(config.services);
     _totalIsolate ??= Dox().config.totalIsolate;
-    int isolatesToSpawn = _totalIsolate ?? 1;
+    int isolatesToSpawn = _totalIsolate!;
 
     if (isolatesToSpawn > 1) {
       await DoxIsolate().spawn(isolatesToSpawn);

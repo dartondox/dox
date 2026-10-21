@@ -1,4 +1,8 @@
 /// coverage:ignore-file
+library;
+
+import 'dart:io';
+
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/logger.dart';
 
@@ -22,10 +26,31 @@ class AppConfig {
   final LoggerConfig logger;
   final List<DoxService> services;
 
+  /// Max size in bytes of a JSON or urlencoded body. Bigger bodies get
+  /// 413 Payload Too Large. Default 10 MB.
+  final int maxBodySize;
+
+  /// Max size in bytes of a multipart/form-data body (file uploads).
+  /// Bigger bodies get 413 Payload Too Large. Default 100 MB.
+  final int maxMultipartSize;
+
+  /// IPs or CIDR ranges of reverse proxies (nginx, Caddy, load balancer)
+  /// that Dox trusts. Only when the direct client is in this list does Dox
+  /// read `X-Forwarded-For` for `req.ip()` and `X-Forwarded-Proto` for
+  /// `req.scheme()`. Use `['*']` to trust any client (only safe when the
+  /// app port is not reachable from outside). Empty by default.
+  final List<String> trustedProxies;
+
+  /// gzip responses in Dart (`HttpServer.autoCompress`). Off by default.
+  /// It costs CPU on every response. Let the proxy do it when you have one.
+  final bool compress;
+
   AppConfig({
     required this.appKey,
     this.serverPort = 3000,
-    this.totalIsolate = 3,
+
+    /// isolates (threads) that serve http. Default: one per CPU core.
+    int? totalIsolate,
     this.services = const <DoxService>[],
     this.formRequests = const <Type, FormRequest Function()>{},
     this.globalMiddleware = const <dynamic>[],
@@ -36,7 +61,11 @@ class AppConfig {
     this.fileStorage = const FileStorageConfig(),
     this.errorHandler = defaultErrorHandler,
     this.responseHandler,
-  });
+    this.maxBodySize = 10 * 1024 * 1024,
+    this.maxMultipartSize = 100 * 1024 * 1024,
+    this.trustedProxies = const <String>[],
+    this.compress = false,
+  }) : totalIsolate = totalIsolate ?? Platform.numberOfProcessors;
 }
 
 class CORSConfig {

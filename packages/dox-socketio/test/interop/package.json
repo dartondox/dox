@@ -1,0 +1,12 @@
+{
+  "name": "dox-socketio-interop",
+  "private": true,
+  "type": "module",
+  "description": "Runs the official Socket.IO clients against the Dart server.",
+  "dependencies": {
+    "@socket.io/redis-adapter": "8.3.0",
+    "redis": "4.7.1",
+    "socket.io": "4.8.4",
+    "socket.io-client": "4.8.4"
+  }
+}

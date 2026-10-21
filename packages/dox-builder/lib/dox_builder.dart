@@ -1,4 +1,4 @@
-library dox_builder;
+library;
 
 import 'package:build/build.dart';
 import 'package:dox_builder/src/dox_builder.dart';

@@ -1,18 +1,16 @@
 name: dox_migration
-description: Database migration package for Postgres SQL
-version: 3.0.0
+description: Database migration package for Postgres, MySQL, MariaDB and SQLite
+version: 3.0.0-alpha.1
 repository: https://github.com/dartondox/dox
 
 environment:
-  sdk: ^3.0.0
+  sdk: ^3.6.0
 
-# Add regular dependencies here.
 dependencies:
+  mysql_dart: ^3.0.1
+  sqlite3: ^2.9.4
   postgres: ^3.0.4
 
 dev_dependencies:
-  lints: ^2.0.0
-  test: ^1.21.0
-
-executables:
-  dox_migration: dox_migration
+  lints: ^5.1.1
+  test: ^1.26.3

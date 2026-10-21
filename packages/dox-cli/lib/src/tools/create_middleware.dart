@@ -19,8 +19,7 @@ class ${className}Middleware extends IDoxMiddleware {
 }
 
 bool createMiddleware(String filename) {
-  filename = filename.toLowerCase().replaceAll('middleware', '');
-  filename = pascalToSnake(filename);
+  filename = pascalToSnake(filename).replaceAll(RegExp(r'_?middleware$'), '');
   String className = snakeToPascal(filename);
   String path = '${Directory.current.path}/lib/app/http/middleware/';
   String middlewareName = '$filename.middleware';

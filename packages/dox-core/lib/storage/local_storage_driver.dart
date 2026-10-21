@@ -30,6 +30,34 @@ class LocalStorageDriver implements StorageDriverInterface {
     }
   }
 
+  /// the file on disk for a stored [filename]
+  File file(String filename) {
+    return File(_sanitizePath('$storagePath/$filename'));
+  }
+
+  /// store an uploaded file. a temp file is moved, not copied
+  /// into memory, so big uploads stay cheap.
+  Future<String> putRequestFile(
+    String folder,
+    RequestFile requestFile, {
+    String? extension,
+  }) async {
+    if (extension == null) {
+      List<int> head = <int>[];
+      await for (List<int> chunk in requestFile.stream()) {
+        head.addAll(chunk);
+        if (head.length >= defaultMagicNumbersMaxLength) break;
+      }
+      extension = lookupMimeType('', headerBytes: head)?.split('/').last;
+    }
+    if (extension == null) {
+      throw Exception('invalid file');
+    }
+    String path = _sanitizePath('$storagePath/$folder/${uuid.v1()}.$extension');
+    File saved = await requestFile.moveTo(path);
+    return saved.path.replaceFirst(storagePath, '');
+  }
+
   @override
   Future<String> put(
     String folder,

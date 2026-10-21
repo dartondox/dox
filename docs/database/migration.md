@@ -17,13 +17,17 @@
 === "Command"
 
     ```py
-    dox migrate
+    dox migration:run
     ```
+
+!!! info
+    `dox migrate` is a short name for the same command.
 
 !!! info
     Please make sure that you have created `.env` file with with below variable names to run migration.
 
 ```bash
+DB_CONNECTION=postgres # or mysql
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=postgres
@@ -31,13 +35,57 @@ DB_USERNAME=admin
 DB_PASSWORD=password
 ```
 
+For SQLite, only two variables are needed:
+
+```bash
+DB_CONNECTION=sqlite
+DB_DATABASE=storage/app.db # file path, made if missing
+```
+
+!!! info
+    `DB_CONNECTION` can be `postgres`, `mysql` (also MariaDB) or `sqlite`. The default is `postgres`.
+    The default port is `5432` for postgres and `3306` for mysql.
+    On MySQL, statements like `CREATE`, `ALTER` and `DROP` save right away.
+    So if a migration fails half way, these changes are not undone.
+    Postgres and SQLite undo the whole file.
+
+!!! warning "SQLite ids"
+    In SQLite, `id serial PRIMARY KEY` does not make an auto increment id. The id stays `NULL`.
+    Use `id INTEGER PRIMARY KEY AUTOINCREMENT` in SQL for SQLite.
+    `Schema` with `table.id()` does this for you.
+
 ## Rollback migration
 
-=== "Command"
+Rollback undoes the last batch. A batch is the group of migrations that ran in one `migration:run`.
+Migrations are undone newest first.
+
+=== "Last batch"
 
     ```py
-    dox migrate:rollback
+    dox migration:rollback
     ```
+
+=== "Last 2 migrations"
+
+    ```py
+    dox migration:rollback --step=2
+    ```
+
+=== "All migrations"
+
+    ```py
+    dox migration:reset
+    ```
+
+=== "All, then run again"
+
+    ```py
+    dox migration:refresh
+    ```
+
+!!! info
+    `migrate:rollback`, `migrate:reset` and `migrate:refresh` are short names for the same commands.
+
 ## Example
 
 ```py
@@ -58,4 +106,10 @@ DROP TABLE IF EXISTS blog
 ```
 
 !!! info
-    Employ `--up` and `--down` to differentiate the migration scripts for upward and downward actions.
+    Put the `up` sql under a line `-- up`, and the `down` sql under a line `-- down`.
+    Each of these lines must be on its own line.
+    Other `--` lines are normal sql comments.
+
+!!! info
+    Statements are split on `;`.
+    A `;` inside quotes, comments or a postgres `$$ ... $$` body does not split.

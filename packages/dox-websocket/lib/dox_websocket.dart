@@ -1,4 +1,4 @@
-library dox_websocket;
+library;
 
 export 'src/adapters/websocket_adapter.dart';
 export 'src/adapters/websocket_redis_adapter.dart';

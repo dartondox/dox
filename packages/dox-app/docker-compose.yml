@@ -4,6 +4,11 @@ services:
   dox:
     build: .
     hostname: dox
+    # config is read from env vars; the image has no .env file
+    env_file: .env
+    environment:
+      - DB_HOST=postgres
+    restart: unless-stopped
     ports:
       # export:internal
       - "${APP_PORT}:${APP_PORT}"

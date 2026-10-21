@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dox_app/app/http/handler.dart';
 import 'package:dox_app/config/cache.dart';
 import 'package:dox_app/config/cors.dart';
@@ -27,11 +29,10 @@ AppConfig appConfig = AppConfig(
 
   /// Total isolate (multi thread)
   /// -------------------------------
-  /// Total isolate to run the application.
-  /// Depending on your machine CPU and RAM, you can adjust the the number
-  /// of isolates. The more isolate application have, the more it can handle
-  /// concurrency requests.
-  totalIsolate: Env.get<int>('APP_TOTAL_ISOLATE', 6),
+  /// Isolates that serve http requests, all on the same port.
+  /// Default is one per CPU core, which uses all cores.
+  /// Set `APP_TOTAL_ISOLATE` to change it.
+  totalIsolate: Env.get<int>('APP_TOTAL_ISOLATE', Platform.numberOfProcessors),
 
   /// Form requests
   /// -------------------------------

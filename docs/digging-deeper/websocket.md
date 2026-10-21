@@ -166,6 +166,10 @@ Set the room before emit to client
 emitter.room('chat').emit('event-name', message);
 ```
 
+!!! info
+    Use the same name the client sent with `joinRoom`.
+    `room()` returns a new emitter. The room does not stay set for later events.
+
 #### `emit`
 
 Emit to all the client connected to the same websocket route.

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
-import 'package:http_parser/http_parser.dart';
 
 Future<String?> uploadImage(String apiUrl, File imageFile) async {
   try {

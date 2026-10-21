@@ -1,7 +1,7 @@
 import 'package:dox_app/app/models/category/category.model.dart';
 import 'package:dox_app/app/models/user/user.model.dart';
 import 'package:dox_app/utils/extensions.dart';
-import 'package:dox_query_builder/dox_query_builder.dart';
+import 'package:dox_orm/dox_orm.dart';
 
 part 'blog.model.g.dart';
 

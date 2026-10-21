@@ -1,5 +1,5 @@
 import 'package:dox_app/app/models/blog/blog.model.dart';
-import 'package:dox_query_builder/dox_query_builder.dart';
+import 'package:dox_orm/dox_orm.dart';
 
 part 'category.model.g.dart';
 

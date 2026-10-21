@@ -1,4 +1,4 @@
-library dox_annotation;
+library;
 
 export 'src/auth_annotation.dart';
 export 'src/core_annotation.dart';

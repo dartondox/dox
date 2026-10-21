@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dox/src/tools/create_controller.dart';
 import 'package:dox/src/tools/create_middleware.dart';
 import 'package:dox/src/tools/create_model.dart';
@@ -15,6 +17,7 @@ import 'types.dart';
 
 /// Example of how to add a new command:
 ///
+/// ```dart
 /// CommandRegistry.addCommand(
 ///   CommandDefinition(
 ///     command: 'new:command',
@@ -30,6 +33,7 @@ import 'types.dart';
 ///     },
 ///   ),
 /// );
+/// ```
 class CommandRegistry {
   static final List<CommandDefinition> _commands = [
     // Version commands
@@ -117,11 +121,11 @@ class CommandRegistry {
     CommandDefinition(
       command: 'build',
       helpInfo: 'build',
-      description: 'Build the application',
+      description:
+          'AOT compile the app for production into build/server (use this, not dart run, in production)',
       category: CommandCategory.build,
       function: (args) async {
-        buildBuilder();
-        buildServer();
+        await buildServer();
       },
     ),
 
@@ -230,18 +234,52 @@ class CommandRegistry {
       helpInfo: 'migration:run',
       description: 'Run pending migrations',
       category: CommandCategory.database,
+      aliases: ['migrate'],
       function: (args) async {
-        await Migration(from: 'cli').migrate();
+        await _migrate(Migration(from: 'cli').migrate());
       },
     ),
 
     CommandDefinition(
       command: 'migration:rollback',
-      helpInfo: 'migration:rollback',
-      description: 'Rollback the last migration',
+      helpInfo: 'migration:rollback [--step=<count>]',
+      description:
+          'Rollback the last batch, or the last <count> migrations with --step',
       category: CommandCategory.database,
+      aliases: ['migrate:rollback'],
+      maxArgs: 1,
       function: (args) async {
-        await Migration(from: 'cli').rollback();
+        int? step;
+        if (args.isNotEmpty) {
+          step = int.tryParse(args[0].replaceFirst('--step=', ''));
+          if (step == null || step < 1 || !args[0].startsWith('--step=')) {
+            print('Invalid option ${args[0]}, use --step=<count>');
+            return;
+          }
+        }
+        await _migrate(Migration(from: 'cli').rollback(null, step));
+      },
+    ),
+
+    CommandDefinition(
+      command: 'migration:reset',
+      helpInfo: 'migration:reset',
+      description: 'Rollback all migrations',
+      category: CommandCategory.database,
+      aliases: ['migrate:reset'],
+      function: (args) async {
+        await _migrate(Migration(from: 'cli').reset());
+      },
+    ),
+
+    CommandDefinition(
+      command: 'migration:refresh',
+      helpInfo: 'migration:refresh',
+      description: 'Rollback all migrations and run them again',
+      category: CommandCategory.database,
+      aliases: ['migrate:refresh'],
+      function: (args) async {
+        await _migrate(Migration(from: 'cli').refresh());
       },
     ),
 
@@ -276,5 +314,17 @@ class CommandRegistry {
 
   static void addCommand(CommandDefinition command) {
     _commands.add(command);
+  }
+}
+
+/// wait for a migration task.
+/// print the error and set exit code 1 when it fails,
+/// so scripts and CI see the failure.
+Future<void> _migrate(Future<void> task) async {
+  try {
+    await task;
+  } catch (error) {
+    print(error);
+    exitCode = 1;
   }
 }

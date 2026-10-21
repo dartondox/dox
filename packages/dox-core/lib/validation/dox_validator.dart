@@ -13,6 +13,10 @@ class DoxValidator {
   final Map<String, String> _errors = <String, String>{};
   List<String> get _methodNoNeedToSplitArguments => <String>['in'];
 
+  /// rules that still run when the field is missing, null or empty
+  List<String> get _implicitRules =>
+      <String>['required', 'required_if', 'required_if_not'];
+
   DoxValidator(this.data);
 
   /// check validation has errors
@@ -82,7 +86,17 @@ class DoxValidator {
 
   void _validateItem(ValidationItem item) {
     List<String> rulesForEachName = item.rule.split('|');
+    bool isEmpty =
+        item.value == null || (item.value is String && item.value.isEmpty);
+
+    /// `sometimes` only validates the field when it is sent
+    if (item.value == null && rulesForEachName.contains('sometimes')) return;
+
     for (String rule in rulesForEachName) {
+      /// missing, null or empty field only runs required rules
+      String ruleKey = rule.split(':').first.toLowerCase();
+      if (isEmpty && !_implicitRules.contains(ruleKey)) continue;
+
       String? error =
           _applyMatchingRule(item.field, item.name, item.value, rule);
       if (error != null) {
@@ -128,6 +142,14 @@ class DoxValidator {
     'required': <String, dynamic>{
       'message': 'The {field} is required',
       'function': Rules.isRequired,
+    },
+    'nullable': <String, dynamic>{
+      'message': '',
+      'function': Rules.isNullable,
+    },
+    'sometimes': <String, dynamic>{
+      'message': '',
+      'function': Rules.isNullable,
     },
     'email': <String, dynamic>{
       'message': 'The {field} is not a valid email',

@@ -1,7 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_auth/src/hash.dart';
-import 'package:dox_query_builder/dox_query_builder.dart';
+import 'package:dox_orm/dox_orm.dart';
 
 class JwtAuthDriver extends AuthDriver {
   /// Jwt secret
@@ -74,6 +74,12 @@ class JwtAuthDriver extends AuthDriver {
   ///```
   @override
   Future<Model<dynamic>?> attempt(Map<String, dynamic> credentials) async {
+    /// password must be a string, otherwise login fails
+    dynamic password = credentials[provider.passwordField];
+    if (password is! String) {
+      return null;
+    }
+
     /// setup new model from auth config
     Model<dynamic> model = provider.model();
 
@@ -82,27 +88,30 @@ class JwtAuthDriver extends AuthDriver {
 
     /// find with credential except password field
     /// since password field is encrypted, we do not need to include
+    bool hasIdentifier = false;
     credentials.forEach((String key, dynamic value) {
       if (key != provider.passwordField &&
-          provider.identifierFields.contains(key)) {
+          provider.identifierFields.contains(key) &&
+          value != null) {
         query.where(key, value);
+        hasIdentifier = true;
       }
     });
+
+    /// without an identifier the query would match any user
+    if (!hasIdentifier) {
+      return null;
+    }
 
     /// get first record
     Model<dynamic>? userData = await query.getFirst();
 
     if (userData != null) {
       /// convert to json to get password field
-      Map<String, dynamic>? jsond = userData.toMap(original: true);
+      dynamic hashed = userData.toMap(original: true)[provider.passwordField];
 
       /// verify password
-      bool passwordVerified = Hash.verify(
-        credentials[provider.passwordField],
-        jsond[provider.passwordField]!,
-      );
-
-      if (passwordVerified) {
+      if (hashed is String && Hash.verify(password, hashed)) {
         /// if password is verify login and get jwt token
         return userData;
       }

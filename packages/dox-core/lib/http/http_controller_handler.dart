@@ -100,10 +100,14 @@ bool _isFormRequestTypeMatched(dynamic controller, dynamic req) {
   return args[0].toString() == req.runtimeType.toString();
 }
 
+/// argument types per controller, so `toString()` is parsed only once
+final Expando<List<String>> _argumentTypes = Expando<List<String>>();
+
 /// get controller arguments data type
 /// eg. [DoxRequest, String]
 List<String> _getControllerArgumentDataTypes(dynamic controller) {
-  return controller.toString().split('(')[1].split(')')[0].split(', ');
+  return _argumentTypes[controller] ??=
+      controller.toString().split('(')[1].split(')')[0].split(', ');
 }
 
 /// get length controller arguments to check how many arguments

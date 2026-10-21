@@ -2,10 +2,11 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_response_handler.dart';
+import 'package:mime/mime.dart';
 
 class DoxResponse {
   /// content can be anything
-  /// String, int, Map, json serializable object, Stream<List<int>>
+  /// String, int, Map, json serializable object, `Stream<List<int>>`
   dynamic _contentData;
 
   Map<String, dynamic> _headers = <String, dynamic>{};
@@ -15,16 +16,18 @@ class DoxResponse {
   final List<String> _cookies = <String>[];
 
   /// content can be anything
-  /// String, int, Map, json serializable object, Stream<List<int>>
+  /// String, int, Map, json serializable object, `Stream<List<int>>`, File
   DoxResponse(this._contentData) {
     if (_contentData is StreamFile) {
       _contentType = _contentData.contentType;
     }
 
-    if (_contentData is DownloadableFile) {
-      header(FILE_DOWNLOAD_HEADER, _contentData.contentDisposition);
-      _contentType = _contentData.contentType;
-      _contentData = _contentData.stream;
+    dynamic data = _contentData;
+    if (data is DownloadableFile) {
+      header(FILE_DOWNLOAD_HEADER, data.contentDisposition);
+      _contentType = data.contentType;
+      _contentData =
+          StreamFile(data.contentType, data.stream, length: data.length);
     }
   }
 
@@ -117,6 +120,11 @@ class DoxResponse {
     if (_statusCode != null) {
       request.response.statusCode = _statusCode!;
     }
+    dynamic content = _contentData;
+    if (_contentType == null && content is File) {
+      _contentType = ContentType.parse(
+          lookupMimeType(content.path) ?? 'application/octet-stream');
+    }
     if (_contentType != null) {
       request.response.headers.contentType = _contentType;
     }
@@ -128,7 +136,7 @@ class DoxResponse {
 }
 
 /// content can be anything
-/// String, int, Map, json serializable object, Stream<List<int>>
+/// String, int, Map, json serializable object, `Stream<List<int>>`, File
 DoxResponse response([dynamic content]) {
   return DoxResponse(content);
 }

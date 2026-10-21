@@ -4,7 +4,7 @@ import '../utils/utils.dart';
 
 String _getSample(className, filename) {
   return '''
-import 'package:dox_query_builder/dox_query_builder.dart';
+import 'package:dox_orm/dox_orm.dart';
 
 part '$filename.model.g.dart';
 
