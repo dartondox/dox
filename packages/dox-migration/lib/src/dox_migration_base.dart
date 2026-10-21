@@ -15,7 +15,7 @@ class Migration {
   /// main function to run migration
   /// - will create migration table if not exist
   /// - will run migrations from db/migration folder
-  /// - [connection] is optional postgres `Connection` or mysql `MySqlConnection`
+  /// - [connection] is optional postgres `Connection`/`Pool`, mysql `MySQLConnection`/`MySQLConnectionPool` or sqlite `Database`
   Future<void> migrate([dynamic connection]) async {
     DbConnection conn = await _getConnection(connection);
     try {
@@ -29,7 +29,7 @@ class Migration {
   /// undo migrations, newest first
   /// - without [step], undo the last batch
   /// - with [step], undo the last [step] migrations
-  /// - [connection] is optional postgres `Connection` or mysql `MySqlConnection`
+  /// - [connection] is optional postgres `Connection`/`Pool`, mysql `MySQLConnection`/`MySQLConnectionPool` or sqlite `Database`
   Future<void> rollback([dynamic connection, int? step]) async {
     DbConnection conn = await _getConnection(connection);
     try {
@@ -90,8 +90,10 @@ class Migration {
       LIMIT 1 OFFSET 0
     ''';
 
-    List<Map<String, dynamic>> migratedValue =
-        await conn.execute(query, <Object>[file.name]);
+    List<Map<String, dynamic>> migratedValue = await conn.execute(
+      query,
+      <Object>[file.name],
+    );
     return migratedValue.isNotEmpty;
   }
 
@@ -124,8 +126,11 @@ class Migration {
 
   /// undo migrations from dox_db_migration table, newest first.
   /// throw on the first failed or missing migration.
-  Future<void> _runRollback(DbConnection conn,
-      {int? step, bool all = false}) async {
+  Future<void> _runRollback(
+    DbConnection conn, {
+    int? step,
+    bool all = false,
+  }) async {
     try {
       String query = 'SELECT migration FROM dox_db_migration';
       if (step != null && !all) {
@@ -163,7 +168,11 @@ class Migration {
 
   /// run one migration file, return false when it failed
   Future<bool> _runFile(
-      DbConnection conn, File file, MigrationType type, int batch) async {
+    DbConnection conn,
+    File file,
+    MigrationType type,
+    int batch,
+  ) async {
     if (file.ext != 'sql') return true;
     return SqlExtMigration(conn: conn, type: type).run(file, batch);
   }

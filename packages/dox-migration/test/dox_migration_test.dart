@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:dox_migration/dox_migration.dart';
 import 'package:dox_migration/src/utils/db_connection.dart';
+import 'package:mysql_dart/mysql_dart.dart' as mysql;
+import 'package:postgres/postgres.dart' as postgres;
 import 'package:test/test.dart';
 
 /// env for each driver, defaults match the services in .github/workflows
@@ -22,6 +24,11 @@ Map<String, Map<String, String>> drivers = <String, Map<String, String>>{
     'DB_USERNAME': 'dox',
     'DB_PASSWORD': 'password',
   },
+  // no server needed, the file is made in the system temp folder
+  'sqlite': <String, String>{
+    'DB_CONNECTION': 'sqlite',
+    'DB_DATABASE': '${Directory.systemTemp.path}/dox_migration_test.db',
+  },
 };
 
 void main() {
@@ -39,7 +46,8 @@ void main() {
 
       Future<List<Map<String, dynamic>>> migrations() {
         return db.execute(
-            'SELECT migration, batch FROM dox_db_migration ORDER BY id');
+          'SELECT migration, batch FROM dox_db_migration ORDER BY id',
+        );
       }
 
       Future<bool> tableExists(String table) async {
@@ -54,9 +62,11 @@ void main() {
       setUp(() async {
         tempDir = Directory.systemTemp.createTempSync('dox_migration_');
         Directory('${tempDir.path}/db/migration').createSync(recursive: true);
-        File('${tempDir.path}/.env').writeAsStringSync(env.entries
-            .map((MapEntry<String, String> e) => '${e.key}=${e.value}')
-            .join('\n'));
+        File('${tempDir.path}/.env').writeAsStringSync(
+          env.entries
+              .map((MapEntry<String, String> e) => '${e.key}=${e.value}')
+              .join('\n'),
+        );
         Directory.current = tempDir;
 
         db = await DbConnection.open(env);
@@ -92,11 +102,14 @@ DROP TABLE IF EXISTS mig_blog
 
         await Migration().migrate();
         expect(await tableExists('mig_blog'), true);
-        List<Map<String, dynamic>> rows =
-            await db.execute('SELECT title FROM mig_blog');
+        List<Map<String, dynamic>> rows = await db.execute(
+          'SELECT title FROM mig_blog',
+        );
         expect(rows.first['title'], 'hello');
-        expect((await migrations()).map((Map<String, dynamic> r) => r['batch']),
-            <int>[1]);
+        expect(
+          (await migrations()).map((Map<String, dynamic> r) => r['batch']),
+          <int>[1],
+        );
 
         // nothing new, nothing changes
         await Migration().migrate();
@@ -111,15 +124,19 @@ DROP TABLE IF EXISTS mig_tag
 ''');
         await Migration().migrate();
         expect(await tableExists('mig_tag'), true);
-        expect((await migrations()).map((Map<String, dynamic> r) => r['batch']),
-            <int>[1, 2]);
+        expect(
+          (await migrations()).map((Map<String, dynamic> r) => r['batch']),
+          <int>[1, 2],
+        );
 
         // rollback only undoes the last batch
         await Migration().rollback();
         expect(await tableExists('mig_tag'), false);
         expect(await tableExists('mig_blog'), true);
-        expect((await migrations()).map((Map<String, dynamic> r) => r['batch']),
-            <int>[1]);
+        expect(
+          (await migrations()).map((Map<String, dynamic> r) => r['batch']),
+          <int>[1],
+        );
 
         await Migration().rollback();
         expect(await tableExists('mig_blog'), false);
@@ -169,9 +186,9 @@ DROP TABLE mig_tag
         expect(await tableExists('mig_comment'), false);
         expect(await tableExists('mig_blog'), true);
         expect(
-            (await migrations())
-                .map((Map<String, dynamic> r) => r['migration']),
-            <String>['2023_01_01_000000_create_blog']);
+          (await migrations()).map((Map<String, dynamic> r) => r['migration']),
+          <String>['2023_01_01_000000_create_blog'],
+        );
 
         await Migration().migrate();
         await Migration().reset();
@@ -199,12 +216,59 @@ INSERT INTO mig_blog (id, title) VALUES (2 - 0, 'it''s');
 DROP TABLE mig_blog
 ''');
         await Migration().migrate();
-        List<Map<String, dynamic>> rows =
-            await db.execute('SELECT id, title FROM mig_blog ORDER BY id');
-        expect(rows.map((Map<String, dynamic> r) => r['title'].toString()),
-            <String>['a-b; c -- d', "it's"]);
+        List<Map<String, dynamic>> rows = await db.execute(
+          'SELECT id, title FROM mig_blog ORDER BY id',
+        );
+        expect(
+          rows.map((Map<String, dynamic> r) => r['title'].toString()),
+          <String>['a-b; c -- d', "it's"],
+        );
         await Migration().rollback();
         expect(await tableExists('mig_blog'), false);
+      });
+
+      /// the query builder gives a pool (not one connection), the migration
+      /// must still run each file in one transaction on one connection
+      test('migrate with a pool', () async {
+        dynamic pool;
+        if (driver == 'postgres') {
+          pool = postgres.Pool<dynamic>.withEndpoints(
+            <postgres.Endpoint>[
+              postgres.Endpoint(
+                host: env['DB_HOST']!,
+                port: int.parse(env['DB_PORT']!),
+                database: env['DB_NAME']!,
+                username: env['DB_USERNAME'],
+                password: env['DB_PASSWORD'],
+              ),
+            ],
+            settings: postgres.PoolSettings(sslMode: postgres.SslMode.disable),
+          );
+        } else if (driver == 'mysql') {
+          pool = mysql.MySQLConnectionPool(
+            host: env['DB_HOST'],
+            port: int.parse(env['DB_PORT']!),
+            userName: env['DB_USERNAME']!,
+            password: env['DB_PASSWORD'],
+            databaseName: env['DB_NAME'],
+            maxConnections: 5,
+            secure: false,
+            allowPublicKeyRetrieval: true,
+          );
+        } else {
+          return;
+        }
+        writeMigration('2023_01_01_000000_create_blog', '''
+-- up
+CREATE TABLE mig_blog (id INTEGER PRIMARY KEY);
+INSERT INTO mig_blog (id) VALUES (1)
+
+-- down
+DROP TABLE mig_blog
+''');
+        await Migration().migrate(pool);
+        expect(await tableExists('mig_blog'), true);
+        expect((await migrations()).length, 1);
       });
 
       test('failed migration is not recorded', () async {

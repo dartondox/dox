@@ -12,10 +12,14 @@ String fileGetContents(File file) {
 
 /// crete migration table if not exist
 Future<void> createMigrationTableIfNotExist(DbConnection conn) async {
+  // sqlite needs INTEGER PRIMARY KEY for an auto increment id
+  String id = conn.isSqlite
+      ? 'INTEGER PRIMARY KEY AUTOINCREMENT'
+      : 'SERIAL PRIMARY KEY NOT NULL';
   String query = '''
       CREATE TABLE IF NOT EXISTS dox_db_migration 
       (
-        id SERIAL PRIMARY KEY NOT NULL, 
+        id $id, 
         migration VARCHAR(100) NOT NULL,
         batch INTEGER NOT NULL
       )
@@ -25,7 +29,11 @@ Future<void> createMigrationTableIfNotExist(DbConnection conn) async {
 
 /// save migration record to migrations table with batch number
 Future<void> saveMigratedRecord(
-    DbConnection conn, File file, int batch, MigrationType type) async {
+  DbConnection conn,
+  File file,
+  int batch,
+  MigrationType type,
+) async {
   if (type == MigrationType.up) {
     String query = '''
       INSERT INTO dox_db_migration 
@@ -81,8 +89,10 @@ List<File> getFilesFromDirectory(Directory migrationDirectory) {
   List<File> migrationFiles = migrationDirectory
       .listSync()
       .whereType<File>()
-      .where((File entity) =>
-          entity.path.endsWith('.dart') || entity.path.endsWith('.sql'))
+      .where(
+        (File entity) =>
+            entity.path.endsWith('.dart') || entity.path.endsWith('.sql'),
+      )
       .toList();
 
   /// sort by filename

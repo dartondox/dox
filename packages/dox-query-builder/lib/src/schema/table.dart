@@ -30,7 +30,11 @@ class Table with TableUpdate {
   }
 
   void id([dynamic column]) {
-    columns.add(TableColumn(name: column ?? 'id', type: "SERIAL PRIMARY KEY"));
+    /// sqlite needs `INTEGER PRIMARY KEY` to make an auto increment id
+    String type = dbDriver.getName() == Driver.sqlite
+        ? 'INTEGER PRIMARY KEY AUTOINCREMENT'
+        : 'SERIAL PRIMARY KEY';
+    columns.add(TableColumn(name: column ?? 'id', type: type));
   }
 
   TableColumn uuid([dynamic column]) {
@@ -43,11 +47,11 @@ class Table with TableUpdate {
     return col;
   }
 
-  /// BOOLEAN on postgres, TINYINT(1) on mysql (read back as bool)
+  /// BOOLEAN on postgres and sqlite, TINYINT(1) on mysql (read back as bool)
   TableColumn boolean(String name) {
     TableColumn col = TableColumn(
       name: name,
-      type: dbDriver.getName() == Driver.postgres ? 'BOOLEAN' : 'TINYINT(1)',
+      type: dbDriver.getName() == Driver.mysql ? 'TINYINT(1)' : 'BOOLEAN',
     );
     columns.add(col);
     return col;
@@ -66,8 +70,10 @@ class Table with TableUpdate {
   }
 
   TableColumn string(String name, [dynamic length]) {
-    TableColumn col =
-        TableColumn(name: name, type: "VARCHAR(${length ?? '100'})");
+    TableColumn col = TableColumn(
+      name: name,
+      type: "VARCHAR(${length ?? '100'})",
+    );
     columns.add(col);
     return col;
   }
@@ -95,15 +101,18 @@ class Table with TableUpdate {
 
   TableColumn jsonb(String name) {
     TableColumn col = TableColumn(
-        name: name,
-        type: dbDriver.getName() == Driver.postgres ? "JSONB" : 'JSON');
+      name: name,
+      type: dbDriver.getName() == Driver.postgres ? "JSONB" : 'JSON',
+    );
     columns.add(col);
     return col;
   }
 
   TableColumn decimal(String name, [dynamic length, dynamic decimalPoint]) {
     TableColumn col = TableColumn(
-        name: name, type: "DECIMAL(${length ?? '8'}, ${decimalPoint ?? '2'})");
+      name: name,
+      type: "DECIMAL(${length ?? '8'}, ${decimalPoint ?? '2'})",
+    );
     columns.add(col);
     return col;
   }
@@ -151,18 +160,23 @@ class Table with TableUpdate {
   }
 
   TableColumn softDeletes([dynamic name]) {
-    TableColumn col =
-        TableColumn(name: name ?? 'deleted_at', type: defaultTimestampType)
-            .nullable();
+    TableColumn col = TableColumn(
+      name: name ?? 'deleted_at',
+      type: defaultTimestampType,
+    ).nullable();
     columns.add(col);
     return col;
   }
 
   void timestamps() {
-    TableColumn createdAt =
-        TableColumn(name: 'created_at', type: defaultTimestampType).nullable();
-    TableColumn updatedAt =
-        TableColumn(name: 'updated_at', type: defaultTimestampType).nullable();
+    TableColumn createdAt = TableColumn(
+      name: 'created_at',
+      type: defaultTimestampType,
+    ).nullable();
+    TableColumn updatedAt = TableColumn(
+      name: 'updated_at',
+      type: defaultTimestampType,
+    ).nullable();
     columns.add(createdAt);
     columns.add(updatedAt);
   }
@@ -185,7 +199,8 @@ class Table with TableUpdate {
       String unique = col.isUnique ? ' UNIQUE' : '';
 
       ret.add(
-          "${dbDriver.wrap(col.name)} ${col.type} ${col.isNullable ? 'NULL' : 'NOT NULL'}${defaultQuery(col)}$unique");
+        "${dbDriver.wrap(col.name)} ${col.type} ${col.isNullable ? 'NULL' : 'NOT NULL'}${defaultQuery(col)}$unique",
+      );
     }
 
     query += ret.join(',');

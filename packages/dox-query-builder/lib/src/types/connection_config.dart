@@ -1,10 +1,11 @@
 import 'package:dox_query_builder/dox_query_builder.dart';
-import 'package:mysql1/mysql1.dart' as mysql;
+import 'package:mysql_dart/mysql_dart.dart' as mysql;
 import 'package:postgres/postgres.dart' as postgres;
+import 'package:sqlite3/sqlite3.dart' as sqlite;
 
 class ConnectionConfig {
   /// Database driver
-  /// Driver.mysql or Driver.postgres
+  /// Driver.postgres, Driver.mysql (also mariadb) or Driver.sqlite
   Driver driver;
 
   /// Enable debugging mode
@@ -26,7 +27,8 @@ class ConnectionConfig {
   /// database password
   String password;
 
-  /// database name
+  /// database name.
+  /// for sqlite it is the file path, or `:memory:`
   String database;
 
   /// database connection port
@@ -36,48 +38,77 @@ class ConnectionConfig {
   bool useSSL;
 
   /// extra configuration for the connection
-  /// eg. `characterSet` for mysql and `maxConnectionCount` for postgres
+  /// eg. `maxConnectionCount` for postgres and mysql,
+  /// `busyTimeout` for sqlite
   Map<String, dynamic> extra;
 
+  /// [user], [password] and [port] are not used by sqlite
   ConnectionConfig({
     required this.driver,
     this.host = 'localhost',
     this.useSSL = false,
-    required this.user,
-    required this.password,
+    this.user = '',
+    this.password = '',
     required this.database,
-    required this.port,
+    this.port = 0,
     this.extra = const <String, dynamic>{},
     required this.debug,
     this.printer,
   });
 
-  /// get database connection
-  /// with mysql `MySqlConnection` or postgres `Pool` type
+  /// get database connection: postgres `Pool`, mysql `MySQLConnectionPool`
+  /// or sqlite `Database`
   Future<dynamic> getDatabaseConnection() {
     if (driver == Driver.mysql) {
-      return _getMysqlConnection();
+      return Future<dynamic>.value(_getMysqlPool());
+    }
+    if (driver == Driver.sqlite) {
+      return Future<dynamic>.value(_openSqlite());
     }
     return _getPostgresConnection();
   }
 
-  /// get mysql connection
-  Future<mysql.MySqlConnection> _getMysqlConnection() {
-    return mysql.MySqlConnection.connect(
-      mysql.ConnectionSettings(
-        host: host,
-        port: port,
-        user: user,
-        password: password,
-        db: database,
-        useSSL: useSSL,
-        useCompression: extra['useCompression'] ?? false,
-        maxPacketSize: extra['maxPacketSize'] ?? 16 * 1024 * 1024,
-        timeout: extra['timeout'] ?? const Duration(seconds: 30),
-        characterSet: extra['characterSet'] ?? mysql.CharacterSet.UTF8MB4,
-      ),
-      isUnixSocket: extra['isUnixSocket'] ?? false,
+  /// get mysql connection pool.
+  /// it opens up to `maxConnectionCount` connections (default 10) when
+  /// needed. caching_sha2_password (mysql 8 default) works without TLS:
+  /// the password is encrypted with the server RSA key. it asks the server
+  /// for the key, unless you give it in `serverPublicKey` (safer).
+  mysql.MySQLConnectionPool _getMysqlPool() {
+    return mysql.MySQLConnectionPool(
+      host: host,
+      port: port,
+      userName: user,
+      password: password,
+      databaseName: database,
+      maxConnections: extra['maxConnectionCount'] ?? 10,
+      secure: useSSL,
+      collation: extra['collation'] ?? 'utf8mb4_general_ci',
+      timeoutMs: extra['timeoutMs'] ?? 10000,
+      allowPublicKeyRetrieval: extra['allowPublicKeyRetrieval'] ?? true,
+      serverPublicKey: extra['serverPublicKey'],
+      timeZone: extra['timeZone'],
+      maxConnectionAge: extra['maxConnectionAge'] ?? const Duration(hours: 12),
+      autoPreparedStatementCacheCapacity:
+          extra['preparedStatementCacheSize'] ?? 32,
     );
+  }
+
+  /// open sqlite database file (made if missing), or `:memory:`.
+  /// - WAL: readers do not wait for the writer, faster writes.
+  /// - busy_timeout: wait for a lock (eg. another isolate writing)
+  ///   instead of failing right away.
+  /// - foreign_keys: sqlite turns them off by default.
+  sqlite.Database _openSqlite() {
+    sqlite.Database db = database == ':memory:'
+        ? sqlite.sqlite3.openInMemory()
+        : sqlite.sqlite3.open(database);
+    if (database != ':memory:') {
+      db.execute('PRAGMA journal_mode = WAL');
+      db.execute('PRAGMA synchronous = NORMAL');
+    }
+    db.execute('PRAGMA busy_timeout = ${extra['busyTimeout'] as int? ?? 5000}');
+    db.execute('PRAGMA foreign_keys = ON');
+    return db;
   }
 
   /// get postgres connection pool.

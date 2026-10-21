@@ -9,10 +9,7 @@ class SqlExtMigration {
   final DbConnection conn;
   final MigrationType type;
 
-  const SqlExtMigration({
-    required this.conn,
-    required this.type,
-  });
+  const SqlExtMigration({required this.conn, required this.type});
 
   /// run the migration, return false when it failed
   Future<bool> run(File file, int batch) async {
@@ -45,21 +42,18 @@ class SqlExtMigration {
     if (query == null) return;
     if (query.isEmpty) return;
     // mysql can not run many statements in one query, so run one by one.
-    List<String> statements =
-        splitSqlStatements(query, backslashEscape: conn.isMysql);
+    List<String> statements = splitSqlStatements(
+      query,
+      backslashEscape: conn.isMysql,
+    );
 
     // mysql auto commits DDL (create, alter, drop), so rollback on error
-    // only undoes data changes there. postgres undoes everything.
-    await conn.execute('BEGIN');
-    try {
+    // only undoes data changes there. postgres and sqlite undo everything.
+    await conn.transaction((DbConnection tx) async {
       for (String statement in statements) {
-        await conn.execute(statement);
+        await tx.execute(statement);
       }
-      await saveMigratedRecord(conn, file, batch, type);
-      await conn.execute('COMMIT');
-    } catch (error) {
-      await conn.execute('ROLLBACK');
-      rethrow;
-    }
+      await saveMigratedRecord(tx, file, batch, type);
+    });
   }
 }

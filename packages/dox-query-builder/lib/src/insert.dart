@@ -27,8 +27,9 @@ mixin Insert<T> implements SharedMixin<T> {
   // ignore: always_specify_types
   Future insert(Map<String, dynamic> data) async {
     // ignore: always_specify_types
-    List<Map<String, dynamic>> result =
-        await insertMultiple(<Map<String, dynamic>>[data]);
+    List<Map<String, dynamic>> result = await insertMultiple(
+      <Map<String, dynamic>>[data],
+    );
 
     /// id can be any type (int, uuid string...).
     /// mysql only returns auto increment ids, so use the given id if any.
@@ -52,12 +53,27 @@ mixin Insert<T> implements SharedMixin<T> {
   /// columns are all keys from all rows.
   /// a row without a key uses the column default value.
   Future<List<Map<String, dynamic>>> insertMultiple(
-      List<Map<String, dynamic>> list) async {
+    List<Map<String, dynamic>> list,
+  ) async {
     if (list.isEmpty) {
       return <Map<String, dynamic>>[];
     }
-    List<String> columns =
-        <String>{for (Map<String, dynamic> data in list) ...data.keys}.toList();
+    List<String> columns = <String>{
+      for (Map<String, dynamic> data in list) ...data.keys,
+    }.toList();
+
+    /// sqlite has no `DEFAULT` in VALUES, so rows with missing keys are
+    /// inserted one by one
+    if (queryBuilder.dbDriver.getName() == Driver.sqlite &&
+        list.length > 1 &&
+        list.any((Map<String, dynamic> d) => d.length != columns.length)) {
+      List<Map<String, dynamic>> result = <Map<String, dynamic>>[];
+      for (Map<String, dynamic> data in list) {
+        result.addAll(await insertMultiple(<Map<String, dynamic>>[data]));
+        resetSubstitutionValues();
+      }
+      return result;
+    }
     List<String> values = <String>[];
 
     // creating values to insert (value1, val2);
@@ -78,7 +94,7 @@ mixin Insert<T> implements SharedMixin<T> {
       values.add("(${ret.join(',')})");
     }
 
-    String returningQuery = queryBuilder.dbDriver.getName() == Driver.postgres
+    String returningQuery = queryBuilder.dbDriver.supportsReturning
         ? 'RETURNING ${helper.wrap(primaryKey)}'
         : '';
 

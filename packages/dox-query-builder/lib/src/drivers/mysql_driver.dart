@@ -2,28 +2,21 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:dox_query_builder/dox_query_builder.dart';
-import 'package:mysql1/mysql1.dart';
+import 'package:mysql_dart/mysql_dart.dart';
+import 'package:mysql_dart/mysql_protocol.dart';
 
 /// zone key to find the connections that have an open transaction
 const Symbol _txKey = #doxMysqlTransaction;
 
-/// mysql field types
-const int _fieldTypeTiny = 0x01;
-const int _fieldTypeJson = 0xf5;
-
-/// driver for mysql and mariadb
+/// driver for mysql and mariadb, uses a `MySQLConnectionPool`.
+/// values are sent as bound params of prepared statements.
 class MysqlDriver extends DBDriver {
   dynamic conn;
 
   /// constructor
   MysqlDriver({required this.conn});
 
-  /// ponytail: mysql1 has no pool, so each named connection is one
-  /// database connection. while a transaction is open, other queries on
-  /// it wait until the transaction ends. use a pool if throughput matters.
-  static final Expando<Future<void>> _transactionDone = Expando<Future<void>>();
-
-  /// true when the server is mariadb, saved per connection
+  /// true when the server is mariadb, saved per pool
   static final Expando<bool> _isMariaDb = Expando<bool>();
 
   @override
@@ -31,32 +24,42 @@ class MysqlDriver extends DBDriver {
     return Driver.mysql;
   }
 
-  Future<MySqlConnection> _getConnection() async {
+  Future<MySQLConnectionPool> _getPool() async {
     /// if connection is future, we need to connect first.
-    /// the connection is kept on this driver, so each named connection
-    /// keeps its own database connection.
+    /// the pool is kept on this driver, so each named connection
+    /// keeps its own pool.
     if (conn is Future) {
       conn = await conn;
     }
-    MySqlConnection c = conn;
-    if (_isMariaDb[c] == null) {
-      Results version = await c.query('SELECT VERSION()');
-      _isMariaDb[c] =
-          version.first.values?.first.toString().contains('MariaDB') ?? false;
+    MySQLConnectionPool pool = conn;
+    if (_isMariaDb[pool] == null) {
+      IResultSet version = await pool.execute('SELECT VERSION()');
+      _isMariaDb[pool] =
+          version.rows.first.colAt(0).toString().contains('MariaDB');
     }
-
-    /// wait for a transaction from outside this zone to end
-    if (!_inTransaction(c)) {
-      while (_transactionDone[c] != null) {
-        await _transactionDone[c];
-      }
-    }
-    return c;
+    return pool;
   }
 
-  bool _inTransaction(MySqlConnection c) {
-    Set<MySqlConnection>? open = Zone.current[_txKey];
-    return open?.contains(c) ?? false;
+  /// run [sql] in the open transaction if any, else on a free pooled
+  /// connection
+  Future<IResultSet> _run(String sql, Map<String, dynamic>? values) async {
+    MySQLConnectionPool pool = await _getPool();
+    var (String query, List<Object?> params) = toPositionalParams(
+      sql,
+      values,
+      _toMysqlValue,
+    );
+
+    /// no params: text protocol, one round trip.
+    /// params: prepared statement (cached per connection by the driver).
+    Object? args = params.isEmpty ? null : params;
+    MySQLConnection? tx = Zone.current[_txKey]?[pool];
+    if (tx != null) {
+      return await tx.execute(query, args);
+    }
+    return await pool.withConnection((MySQLConnection c) {
+      return c.execute(query, args);
+    });
   }
 
   /// run query and return map result
@@ -66,13 +69,19 @@ class MysqlDriver extends DBDriver {
     String? primaryKey,
     Map<String, dynamic>? substitutionValues,
   }) async {
-    MySqlConnection c = await _getConnection();
-    return await c.execute(
-      query,
-      primaryKey: primaryKey,
-      substitutionValues: substitutionValues,
-      isMariaDb: _isMariaDb[c] ?? false,
-    );
+    IResultSet result = await _run(query, substitutionValues);
+
+    /// insert query returns the new auto increment id
+    if (result.numOfColumns == 0) {
+      int id = result.lastInsertID.toInt();
+      if (id > 0 && primaryKey != null) {
+        return <Map<String, dynamic>>[
+          <String, dynamic>{primaryKey: id},
+        ];
+      }
+      return <Map<String, dynamic>>[];
+    }
+    return _toMapList(result, _isMariaDb[conn] ?? false);
   }
 
   /// only run query
@@ -81,139 +90,129 @@ class MysqlDriver extends DBDriver {
     String query, {
     Map<String, dynamic>? substitutionValues,
   }) async {
-    MySqlConnection c = await _getConnection();
-    await c.run(query, substitutionValues: substitutionValues);
+    await _run(query, substitutionValues);
   }
 
+  /// one pooled connection runs the whole transaction. other queries use
+  /// other connections of the pool.
   /// note: in mysql, schema changes (create/alter/drop table) commit the
   /// transaction right away, they can not be rolled back.
   @override
   Future<R> transaction<R>(Future<R> Function() callback) async {
-    MySqlConnection c = await _getConnection();
+    MySQLConnectionPool pool = await _getPool();
+    Map<dynamic, MySQLConnection>? open = Zone.current[_txKey];
 
     /// ponytail: a nested transaction joins the outer one (no savepoint)
-    if (_inTransaction(c)) {
+    if (open?[pool] != null) {
       return await callback();
     }
-
-    /// another transaction can start while we wait, so check again
-    while (_transactionDone[c] != null) {
-      await _transactionDone[c];
-    }
-    Completer<void> done = Completer<void>();
-    _transactionDone[c] = done.future;
-
-    Set<MySqlConnection> open = <MySqlConnection>{
-      ...?Zone.current[_txKey],
-      c,
-    };
-    try {
-      await c.query('START TRANSACTION');
-      R result = await runZoned(
-        callback,
-        zoneValues: <Symbol, dynamic>{_txKey: open},
-      );
-      await c.query('COMMIT');
-      return result;
-    } catch (error) {
-      await c.query('ROLLBACK');
-      rethrow;
-    } finally {
-      _transactionDone[c] = null;
-      done.complete();
-    }
-  }
-}
-
-/// extension on mysql connection
-extension MySqlConnectionExecute on MySqlConnection {
-  Future<List<Map<String, dynamic>>> execute(
-    String sql, {
-    String? primaryKey,
-    Map<String, dynamic>? substitutionValues,
-    bool isMariaDb = false,
-  }) async {
-    Results results = await run(sql, substitutionValues: substitutionValues);
-
-    /// if result has last insert id, it mean insert query and need to return
-    /// correct id
-    if (results.insertId != null &&
-        results.insertId! > 0 &&
-        primaryKey != null) {
-      return <Map<String, dynamic>>[
-        <String, dynamic>{primaryKey: results.insertId}
-      ];
-    }
-
-    /// normal get query which need to return list of map data
-    /// similar to postgres
-    return _parseResultToMap(results, isMariaDb);
-  }
-
-  Future<Results> run(
-    String sql, {
-    Map<String, dynamic>? substitutionValues,
-  }) async {
-    Map<String, dynamic> values = substitutionValues ?? <String, dynamic>{};
-    List<Object?> params = <Object?>[];
-
-    /// mysql use `?` placeholder, so replace each known `@key` in the order
-    /// it shows in the sql, and add its value in the same order.
-    /// unknown `@word` (eg. 'a@b.com' inside a string) is kept as it is.
-    sql = sql.replaceAllMapped(RegExp(r'@(\w+)'), (Match m) {
-      String key = m.group(1)!;
-      if (!values.containsKey(key)) {
-        return m.group(0)!;
-      }
-      params.add(_toMysqlValue(values[key]));
-      return '?';
+    return await pool.withConnection((MySQLConnection c) {
+      return c.transactional((MySQLConnection tx) {
+        return runZoned(
+          callback,
+          zoneValues: <Symbol, dynamic>{
+            _txKey: <dynamic, MySQLConnection>{...?open, pool: tx},
+          },
+        );
+      });
     });
-    return await query(sql, params);
   }
 
-  /// json rule:
+  /// convert each value by its column type.
+  /// - TINYINT(1) (used by boolean()) is bool.
   /// - mysql: only JSON columns are decoded (objects and arrays).
   /// - mariadb: JSON is a LONGTEXT column, so the type is unknown.
   ///   text that starts with `{` or `[` and is valid json is decoded.
-  /// TINYINT(1) (used by boolean()) is returned as bool.
-  List<Map<String, dynamic>> _parseResultToMap(
-      Results results, bool isMariaDb) {
-    List<Map<String, dynamic>> result = <Map<String, dynamic>>[];
-    for (ResultRow element in results) {
+  /// - DATE, DATETIME and TIMESTAMP are DateTime in UTC.
+  /// - DECIMAL is double.
+  List<Map<String, dynamic>> _toMapList(IResultSet result, bool isMariaDb) {
+    List<ResultSetColumn> cols = result.cols.toList();
+    List<String> names = <String>[for (ResultSetColumn c in cols) c.name];
+    List<int> types = <int>[for (ResultSetColumn c in cols) _kindOf(c)];
+    int length = cols.length;
+
+    List<Map<String, dynamic>> list = <Map<String, dynamic>>[];
+    for (ResultSetRow row in result.rows) {
       Map<String, dynamic> data = <String, dynamic>{};
-      for (int i = 0; i < results.fields.length; i++) {
-        Field field = results.fields[i];
-        dynamic value = element[i];
+      for (int i = 0; i < length; i++) {
+        dynamic value = row.colAt(i);
+        data[names[i]] =
+            value == null ? null : _convert(types[i], value, isMariaDb);
+      }
+      list.add(data);
+    }
+    return list;
+  }
 
-        if (value == null) {
-          data[field.name!] = null;
-          continue;
-        }
+  static const int _kText = 0;
+  static const int _kBool = 1;
+  static const int _kInt = 2;
+  static const int _kDouble = 3;
+  static const int _kDate = 4;
+  static const int _kJson = 5;
+  static const int _kLongText = 6;
 
-        /// blob need to convert to string
-        bool isBlob = value is Blob;
-        if (isBlob) {
-          value = value.toString();
-        }
+  int _kindOf(ResultSetColumn col) {
+    switch (col.type.intVal) {
+      case mysqlColumnTypeTiny:
+        return col.length == 1 ? _kBool : _kInt;
+      case mysqlColumnTypeShort:
+      case mysqlColumnTypeLong:
+      case mysqlColumnTypeLongLong:
+      case mysqlColumnTypeInt24:
+      case mysqlColumnTypeYear:
+        return _kInt;
+      case mysqlColumnTypeFloat:
+      case mysqlColumnTypeDouble:
+      case mysqlColumnTypeDecimal:
+      case mysqlColumnTypeNewDecimal:
+        return _kDouble;
+      case mysqlColumnTypeDate:
+      case mysqlColumnTypeNewDate:
+      case mysqlColumnTypeDateTime:
+      case mysqlColumnTypeDateTime2:
+      case mysqlColumnTypeTimestamp:
+      case mysqlColumnTypeTimestamp2:
+        return _kDate;
+      case mysqlColumnTypeJson:
+        return _kJson;
+      case mysqlColumnTypeBlob:
+      case mysqlColumnTypeLongBlob:
+      case mysqlColumnTypeMediumBlob:
+      case mysqlColumnTypeTinyBlob:
+        return _kLongText;
+      default:
+        return _kText;
+    }
+  }
 
-        if (field.type == _fieldTypeJson) {
-          value = value is String ? jsonDecode(value) : value;
-        } else if (isMariaDb && isBlob && _looksLikeJson(value)) {
+  dynamic _convert(int kind, dynamic value, bool isMariaDb) {
+    switch (kind) {
+      case _kBool:
+        return value is bool ? value : value.toString() != '0';
+      case _kInt:
+        return value is int ? value : int.tryParse(value.toString()) ?? value;
+      case _kDouble:
+        return value is double
+            ? value
+            : double.tryParse(value.toString()) ?? value;
+      case _kDate:
+
+        /// mysql has no time zone in DATETIME, read it as UTC
+        return parseDbDate(value);
+      case _kJson:
+        return value is String ? jsonDecode(value) : value;
+      case _kLongText:
+        if (isMariaDb && value is String && _looksLikeJson(value)) {
           try {
-            value = jsonDecode(value);
+            return jsonDecode(value);
           } catch (error) {
             /// not json, keep the text
           }
-        } else if (field.type == _fieldTypeTiny &&
-            field.length == 1 &&
-            value is int) {
-          value = value != 0;
         }
-        data[field.name!] = value;
-      }
-      result.add(data);
+        return value;
     }
-    return result;
+    return value;
   }
 
   bool _looksLikeJson(String value) {
@@ -221,22 +220,26 @@ extension MySqlConnectionExecute on MySqlConnection {
     return text.startsWith('{') || text.startsWith('[');
   }
 
-  Object? _toMysqlValue(dynamic value) {
-    if (value == null) {
-      return null;
+  static Object? _toMysqlValue(dynamic value) {
+    if (value == null || value is int || value is double) {
+      return value;
     } else if (value is bool) {
       return value ? 1 : 0;
     } else if (value is Map || value is List) {
       return jsonEncode(value);
     } else if (value is DateTime) {
       return value.toIso8601String().split('.').first;
-    } else if (value.toString().endsWith('Z')) {
-      try {
-        return DateTime.parse(value).toIso8601String().split('.').first;
-      } catch (error) {
-        return value.toString();
+    }
+    String text = value.toString();
+
+    /// iso date string with `Z` (eg. from model timestamps), mysql
+    /// DATETIME do not accept the `Z`
+    if (text.endsWith('Z')) {
+      DateTime? date = DateTime.tryParse(text);
+      if (date != null) {
+        return date.toIso8601String().split('.').first;
       }
     }
-    return value.toString();
+    return text;
   }
 }

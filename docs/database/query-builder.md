@@ -2,9 +2,66 @@
 
 Query Builder provides a user-friendly interface where users can define the criteria and parameters for database queries without needing to write the SQL code manually. Query builders are commonly used in database management systems and data analysis tools to streamline the query creation process, making it more accessible to users who may not be proficient in writing SQL queries.
 
+## Supported databases
+
+| Database | `Driver` | Dart package | Pool | Good for |
+|---|---|---|---|---|
+| Postgres | `Driver.postgres` | `postgres` | Yes | Production |
+| MySQL 8+ and MariaDB | `Driver.mysql` | `mysql_dart` | Yes | Production |
+| SQLite | `Driver.sqlite` | `sqlite3` | No, one connection per isolate | Dev, tests, small apps |
+
+## Config
+
+Put the connections in `lib/config/database.dart`.
+
+```dart
+DatabaseConfig databaseConfig = DatabaseConfig(
+  connection: Env.get('DB_CONNECTION', 'postgres'),
+  connections: <String, ConnectionConfig>{
+    'postgres': ConnectionConfig(
+      driver: Driver.postgres,
+      host: 'localhost',
+      port: 5432,
+      user: 'postgres',
+      password: 'postgres',
+      database: 'postgres',
+      extra: <String, dynamic>{'maxConnectionCount': 10},
+      debug: false,
+    ),
+    'mysql': ConnectionConfig(
+      driver: Driver.mysql, // also for MariaDB
+      host: 'localhost',
+      port: 3306,
+      user: 'root',
+      password: 'password',
+      database: 'dox',
+      extra: <String, dynamic>{'maxConnectionCount': 10},
+      debug: false,
+    ),
+    'sqlite': ConnectionConfig(
+      driver: Driver.sqlite,
+      database: 'storage/app.db', // file path, or ':memory:'
+      debug: false,
+    ),
+  },
+);
+```
+
+!!! info "MySQL `extra` options"
+    `maxConnectionCount` (default 10) is the pool size.
+    `collation` (default `utf8mb4_general_ci`), `timeoutMs`, `timeZone` and `maxConnectionAge`
+    are also read.
+    The MySQL 8 default login (`caching_sha2_password`) works, also without TLS.
+    Without TLS the driver asks the server for its RSA key to encrypt the password.
+    To not ask, give the key in `serverPublicKey`, or set `useSSL: true`.
+    Set `allowPublicKeyRetrieval: false` to turn the asking off.
+
+!!! info "SQLite `extra` options"
+    `busyTimeout` (default 5000 ms) is how long a query waits for a lock.
+
 !!! info "Table and column names are quoted"
     Table and column names you pass to `select`, `where`, `join`, `groupBy`, `orderBy`,
-    `insert` and `update` are quoted: `"name"` on Postgres and `` `name` `` on MySQL.
+    `insert` and `update` are quoted: `"name"` on Postgres and SQLite, and `` `name` `` on MySQL.
     So names like `order` or `key` work.
     `table.column`, `*` and `column as alias` are handled.
     A value with `(` (for example `count(*) as total`) is kept as it is.
@@ -464,10 +521,12 @@ Query Builder provides a user-friendly interface where users can define the crit
 ### Connections
 
 !!! info
-    Postgres uses a connection pool. Set the pool size with `maxConnectionCount`
+    Postgres and MySQL use a connection pool. Set the pool size with `maxConnectionCount`
     in the connection `extra` config.
-    MySQL uses one connection for each connection name. While a transaction is open,
-    other queries on that connection wait until it ends.
+    A transaction uses one connection of the pool. Other queries use the other connections.
+    Values are always sent as bound parameters, never written into the SQL text.
+    SQLite uses one connection per isolate. While a transaction is open,
+    other queries of that isolate wait until it ends.
 
 ### MySQL JSON
 
@@ -477,3 +536,61 @@ Query Builder provides a user-friendly interface where users can define the crit
     MariaDB stores JSON as `LONGTEXT`, so the driver can not see the column type.
     On MariaDB, text that starts with `{` or `[` and is valid JSON is decoded.
     `boolean()` columns (`TINYINT(1)`) are read as `bool`.
+
+### MySQL types
+
+!!! info
+    MySQL values are converted by column type:
+    integers to `int`, `FLOAT`, `DOUBLE` and `DECIMAL` to `double`,
+    `DATE`, `DATETIME` and `TIMESTAMP` to `DateTime` (read as UTC),
+    `boolean()` (`TINYINT(1)`) to `bool`. `TIME` stays a `String`.
+
+## SQLite
+
+SQLite is good for development, tests and small apps.
+For a busy production app, use Postgres or MySQL.
+
+!!! info "How it runs"
+    The `sqlite3` package calls SQLite directly (FFI). A query blocks the isolate while it runs.
+    Each isolate has one connection. While a transaction is open, other queries of that isolate wait.
+    The database file uses WAL mode, so readers do not wait for the writer.
+    `busy_timeout` makes a query wait for a lock from another isolate instead of failing.
+    Foreign keys are turned on.
+
+!!! info "Types"
+    SQLite has no bool, JSON or date type.
+    `boolean()` is saved as `0`/`1` and read back as `bool`.
+    `json()` is saved as text and read back as `Map` or `List`.
+    Dates are saved as ISO text in UTC and read back as `DateTime`.
+    This uses the type in `CREATE TABLE`, so it works on tables made by `Schema` or by SQL
+    with the same type names (`BOOLEAN`, `JSON`, `TIMESTAMP`, `DATE`, `DATETIME`).
+    The driver finds the type by the table names in the query.
+    A column with an alias (`active as is_active`) is not converted.
+
+!!! warning "Limits"
+    - `Schema.table` changes a column (type, null, default) by making the table again
+      and copying the rows. It keeps the primary key, foreign keys, unique columns and indexes.
+      It throws for tables with `CHECK` constraints or generated columns.
+    - `dropColumn` does not work on a primary key, unique or indexed column (SQLite limit).
+    - A new column with `NOT NULL` needs a default value.
+    - `truncate()` runs `DELETE FROM` and resets the id counter.
+    - `insertMultiple` with rows that have different keys inserts the rows one by one,
+      because SQLite has no `DEFAULT` in `VALUES`.
+    - There is no `RIGHT JOIN` before SQLite 3.39.
+
+!!! info "Native library"
+    The `sqlite3` package (v2) loads the SQLite library of the system.
+    macOS has it. On Debian or Ubuntu, install `libsqlite3-dev` (it gives `libsqlite3.so`).
+    `dart compile exe` works. Apps that do not use SQLite do not need the library.
+    In the Dox Docker image (`FROM scratch`), copy the library into the final image:
+
+    ```dockerfile
+    FROM dart:stable AS build
+    RUN apt-get update && apt-get install -y --no-install-recommends libsqlite3-0
+    # ... build as before ...
+
+    FROM scratch
+    COPY --from=build /runtime/ /
+    COPY --from=build /usr/lib/*-linux-gnu/libsqlite3.so.0 /usr/lib/libsqlite3.so
+    # ... copy the server as before ...
+    ```

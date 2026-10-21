@@ -40,6 +40,22 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+      # MySQL 8.4 with the default caching_sha2_password login
+      mysql84:
+        image: mysql:8.4
+        ports:
+          - 3307:3306
+        env:
+          MYSQL_USER: dox
+          MYSQL_PASSWORD: password
+          MYSQL_DATABASE: dox-framework
+          MYSQL_ROOT_PASSWORD: password
+        options: >-
+          --health-cmd="mysqladmin ping -h127.0.0.1 -udox -ppassword"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=30
+
       redis:
         image: redis
         ports:
@@ -52,21 +68,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    # MySQL 8.4 is started here, not as a service, because it needs server
-    # options. mysql1 (the dart driver) can not do the first
-    # caching_sha2_password login, so the test user uses mysql_native_password.
-    # This option is removed in MySQL 9.
-    - name: Start MySQL 8.4
-      run: |
-        docker run -d --name mysql84 -p 3307:3306 \
-          -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=dox-framework \
-          -e MYSQL_USER=dox -e MYSQL_PASSWORD=password \
-          mysql:8.4 --mysql-native-password=ON \
-          --authentication-policy=mysql_native_password
-        for i in $(seq 1 60); do
-          docker exec mysql84 mysqladmin ping -h127.0.0.1 -udox -ppassword --silent && break
-          sleep 2
-        done
+    # sqlite tests load the system libsqlite3.so (package sqlite3 v2)
+    - name: Install libsqlite3
+      run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
     - uses: dart-lang/setup-dart@v1
       with:
         sdk: stable
@@ -86,3 +90,9 @@ jobs:
       run: DB_USER=dox DB_PORT=3306 melos test_mysql
     - name: Run Test (query builder mysql 8.4)
       run: DB_USER=dox DB_PORT=3307 melos test_mysql
+    - name: Run Test (query builder sqlite)
+      working-directory: packages/dox-query-builder
+      run: DRIVER=sqlite dart test --concurrency=1
+    - name: Run Test (migration mysql 8.4)
+      working-directory: packages/dox-migration
+      run: MYSQL_PORT=3307 dart test

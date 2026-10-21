@@ -19,6 +19,9 @@ class PostgresDriver extends DBDriver {
     return Driver.postgres;
   }
 
+  @override
+  bool get supportsReturning => true;
+
   /// `Connection` or `Pool`, both can run queries and transactions
   Future<dynamic> _getConnection() async {
     /// if connection is future, we need to connect first.
@@ -37,15 +40,19 @@ class PostgresDriver extends DBDriver {
     String? primaryKey,
     Map<String, dynamic>? substitutionValues,
   }) async {
-    Result result =
-        await _internalQuery(query, substitutionValues: substitutionValues);
+    Result result = await _internalQuery(
+      query,
+      substitutionValues: substitutionValues,
+    );
     return result.toMapList();
   }
 
   /// only run query
   @override
-  Future<void> execute(String query,
-      {Map<String, dynamic>? substitutionValues}) async {
+  Future<void> execute(
+    String query, {
+    Map<String, dynamic>? substitutionValues,
+  }) async {
     await _internalQuery(query, substitutionValues: substitutionValues);
   }
 
@@ -59,9 +66,12 @@ class PostgresDriver extends DBDriver {
       return await callback();
     }
     return await c.runTx((TxSession session) {
-      return runZoned(callback, zoneValues: <Symbol, dynamic>{
-        _txKey: <dynamic, TxSession>{...?open, c: session},
-      });
+      return runZoned(
+        callback,
+        zoneValues: <Symbol, dynamic>{
+          _txKey: <dynamic, TxSession>{...?open, c: session},
+        },
+      );
     });
   }
 

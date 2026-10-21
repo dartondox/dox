@@ -35,11 +35,24 @@ DB_USERNAME=admin
 DB_PASSWORD=password
 ```
 
+For SQLite, only two variables are needed:
+
+```bash
+DB_CONNECTION=sqlite
+DB_DATABASE=storage/app.db # file path, made if missing
+```
+
 !!! info
-    `DB_CONNECTION` can be `postgres` or `mysql`. The default is `postgres`.
+    `DB_CONNECTION` can be `postgres`, `mysql` (also MariaDB) or `sqlite`. The default is `postgres`.
     The default port is `5432` for postgres and `3306` for mysql.
     On MySQL, statements like `CREATE`, `ALTER` and `DROP` save right away.
     So if a migration fails half way, these changes are not undone.
+    Postgres and SQLite undo the whole file.
+
+!!! warning "SQLite ids"
+    In SQLite, `id serial PRIMARY KEY` does not make an auto increment id. The id stays `NULL`.
+    Use `id INTEGER PRIMARY KEY AUTOINCREMENT` in SQL for SQLite.
+    `Schema` with `table.id()` does this for you.
 
 ## Rollback migration
 

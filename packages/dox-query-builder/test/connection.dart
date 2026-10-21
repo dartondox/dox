@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:dox_query_builder/dox_query_builder.dart';
-import 'package:mysql1/mysql1.dart' as mysql;
 
 DatabaseConfig databaseConfig = DatabaseConfig(
   /// -------------------------------
@@ -39,9 +38,18 @@ DatabaseConfig databaseConfig = DatabaseConfig(
       user: Platform.environment['DB_USER'] ?? 'root',
       password: 'password',
       database: 'dox-framework',
-      extra: <String, dynamic>{
-        'characterSet': mysql.CharacterSet.UTF8MB4,
-      },
+      debug: false,
+      printer: ConsoleQueryPrinter(),
+    ),
+
+    /// -------------------------------
+    /// Sqlite config
+    /// -------------------------------
+    /// DB_DATABASE is a file path, default is an in memory database
+    /// (one per test file, each file runs in its own isolate).
+    'sqlite': ConnectionConfig(
+      driver: Driver.sqlite,
+      database: Platform.environment['DB_DATABASE'] ?? ':memory:',
       debug: false,
       printer: ConsoleQueryPrinter(),
     ),
