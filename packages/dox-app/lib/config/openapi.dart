@@ -1,4 +1,5 @@
 import 'package:dox_app/openapi.g.dart';
+import 'package:dox_app/config/env.dart';
 import 'package:dox_core/dox_core.dart';
 
 /// OpenAPI docs
@@ -10,6 +11,6 @@ import 'package:dox_core/dox_core.dart';
 /// The docs come from the routes, the controllers and the models.
 /// `dart run build_runner build` makes `lib/openapi.g.dart`.
 OpenApiConfig openApi = OpenApiConfig(
-  info: Info(title: Env.get('APP_NAME', 'dox'), version: '1.0.0'),
+  info: Info(title: env.appName, version: '1.0.0'),
   registry: openApiRegistry,
 );

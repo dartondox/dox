@@ -1,10 +1,11 @@
+import 'package:dox_app/config/env.dart';
 import 'package:dox_core/dox_core.dart';
 
 LoggerConfig logger = LoggerConfig(
   /// Application name
   /// -------------------------------
   /// The name of the application you want to add to the log.
-  name: Env.get('APP_NAME', 'dox'),
+  name: env.appName,
 
   /// Toggle logger
   /// -------------------------------
@@ -14,11 +15,11 @@ LoggerConfig logger = LoggerConfig(
   /// Logging level
   /// -------------------------------
   /// The level from which you want the logger to flush logs.
-  level: Env.get('LOG_LEVEL', 'info'),
+  level: env.logLevel,
 
   /// Pretty print
   /// -------------------------------
   /// It is highly advised NOT to use `prettyPrint` in production, since it
   /// can have huge impact on performance.
-  prettyPrint: Env.get('APP_ENV') == 'development',
+  prettyPrint: env.appEnv == 'development',
 );

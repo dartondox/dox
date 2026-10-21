@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dox_app/app/http/handler.dart';
 import 'package:dox_app/app/http/requests/blog.request.dart';
 import 'package:dox_app/config/cache.dart';
@@ -12,6 +10,7 @@ import 'package:dox_app/config/storage.dart';
 import 'package:dox_app/routes/api.dart';
 import 'package:dox_app/routes/web.dart';
 import 'package:dox_app/routes/websocket.dart';
+import 'package:dox_app/config/env.dart';
 import 'package:dox_core/dox_core.dart';
 
 AppConfig appConfig = AppConfig(
@@ -23,19 +22,19 @@ AppConfig appConfig = AppConfig(
   /// Note: Changing the application key for an existing app will make all
   /// the cookies and cache invalid and also the existing encrypted data
   /// will not be decrypted.
-  appKey: Env.get<String>('APP_KEY'),
+  appKey: env.appKey,
 
   /// Server port
   /// -------------------------------
   /// App will be running on this port.
-  serverPort: Env.get<int>('APP_PORT', 3000),
+  serverPort: env.appPort,
 
   /// Total isolate (multi thread)
   /// -------------------------------
   /// Isolates that serve http requests, all on the same port.
   /// Default is one per CPU core, which uses all cores.
   /// Set `APP_TOTAL_ISOLATE` to change it.
-  totalIsolate: Env.get<int>('APP_TOTAL_ISOLATE', Platform.numberOfProcessors),
+  totalIsolate: env.appTotalIsolate,
 
   /// Form requests
   /// -------------------------------
