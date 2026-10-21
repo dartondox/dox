@@ -179,8 +179,11 @@ class MemoryDriver implements DriverContract {
 
   @override
   Future<ListResult> listAll(String prefix, ListOptions options) async {
-    List<DriveEntry> entries =
-        _listing.fromKeys(_files.keys, prefix, options.recursive);
+    List<DriveEntry> entries = _listing.fromKeys(
+      _files.keys,
+      prefix,
+      options.recursive,
+    );
     return _listing.paginate(entries, options);
   }
 }

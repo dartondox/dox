@@ -21,8 +21,12 @@ class DownloadableFile {
   final int? length;
 
   String contentDisposition = '';
-  DownloadableFile(this.contentType, this.stream, String filename,
-      {this.length}) {
+  DownloadableFile(
+    this.contentType,
+    this.stream,
+    String filename, {
+    this.length,
+  }) {
     contentDisposition = 'attachment; filename="$filename"';
   }
 }
@@ -32,9 +36,9 @@ class Storage {
 
   Map<String, StorageDriverInterface> storageDriver =
       <String, StorageDriverInterface>{
-    'local': LocalStorageDriver(),
-    ...Dox().config.fileStorage.drivers,
-  };
+        'local': LocalStorageDriver(),
+        ...Dox().config.fileStorage.drivers,
+      };
 
   /// set the disk name
   /// ```
@@ -58,8 +62,9 @@ class Storage {
   /// ```
   Future<String> putRequestFile(String folder, RequestFile requestFile) async {
     StorageDriverInterface driver = _driver;
-    String? extension =
-        requestFile.extension.isEmpty ? null : requestFile.extension;
+    String? extension = requestFile.extension.isEmpty
+        ? null
+        : requestFile.extension;
 
     /// local disk: move the temp file, do not load it into memory
     if (driver is LocalStorageDriver) {
@@ -140,8 +145,9 @@ class Storage {
     String subType = mimeType.split('/').last;
 
     ContentType contentType = ContentType(primaryType, subType);
-    Stream<List<int>> stream =
-        Stream<List<int>>.fromIterable(<List<int>>[image]);
+    Stream<List<int>> stream = Stream<List<int>>.fromIterable(<List<int>>[
+      image,
+    ]);
     return StreamFile(contentType, stream);
   }
 
@@ -172,8 +178,10 @@ class Storage {
       throw NotFoundHttpException(message: 'file not found');
     }
     List<int> head = <int>[];
-    await for (List<int> chunk
-        in file.openRead(0, defaultMagicNumbersMaxLength)) {
+    await for (List<int> chunk in file.openRead(
+      0,
+      defaultMagicNumbersMaxLength,
+    )) {
       head.addAll(chunk);
     }
     String? mimeType = lookupMimeType(file.path, headerBytes: head);

@@ -46,17 +46,19 @@ class BenchHandler extends ResponseHandlerInterface {
 void main(List<String> args) async {
   int isolates = args.isNotEmpty ? int.parse(args[0]) : 1;
   int port = args.length > 1 ? int.parse(args[1]) : 4000;
-  Dox().initialize(AppConfig(
-    maxMultipartSize: 200 * 1024 * 1024,
-    appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
-    serverPort: port,
-    totalIsolate: isolates,
-    responseHandler: BenchHandler(),
-    routers: <Router>[BenchRouter()],
-    globalMiddleware: <dynamic>[
-      LogMiddleware(enabled: Platform.environment['LOG'] == '1'),
-    ],
-  ));
+  Dox().initialize(
+    AppConfig(
+      maxMultipartSize: 200 * 1024 * 1024,
+      appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+      serverPort: port,
+      totalIsolate: isolates,
+      responseHandler: BenchHandler(),
+      routers: <Router>[BenchRouter()],
+      globalMiddleware: <dynamic>[
+        LogMiddleware(enabled: Platform.environment['LOG'] == '1'),
+      ],
+    ),
+  );
   await Dox().startServer();
   print('ready');
 }

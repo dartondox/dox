@@ -19,8 +19,8 @@ class SocketEvent {
     required this.name,
     required this.args,
     required this.socket,
-    int? ackId,
-  }) : _ackId = ackId;
+    this._ackId,
+  });
 
   /// Event name.
   final String name;
@@ -49,12 +49,14 @@ class SocketEvent {
     int? id = _ackId;
     if (id == null) return;
     _ackId = null;
-    socket.sendPacket(SocketPacket(
-      type: SocketPacketType.ack,
-      nsp: socket.nsp.name,
-      id: id,
-      data: args,
-    ));
+    socket.sendPacket(
+      SocketPacket(
+        type: SocketPacketType.ack,
+        nsp: socket.nsp.name,
+        id: id,
+        data: args,
+      ),
+    );
   }
 }
 
@@ -65,8 +67,8 @@ class Socket {
     required this.nsp,
     required this.client,
     required this.handshake,
-    HandlerRunner runner = const HandlerRunner(),
-  }) : _runner = runner;
+    this._runner = const HandlerRunner(),
+  });
 
   /// Socket id. It is also a room this socket is in.
   final String id;
@@ -125,11 +127,13 @@ class Socket {
   /// Sends [event] with many arguments to this client.
   void emitArgs(String event, List<Object?> args) {
     _checkEventName(event);
-    sendPacket(SocketPacket(
-      type: SocketPacketType.event,
-      nsp: nsp.name,
-      data: <Object?>[event, ...args],
-    ));
+    sendPacket(
+      SocketPacket(
+        type: SocketPacketType.event,
+        nsp: nsp.name,
+        data: <Object?>[event, ...args],
+      ),
+    );
   }
 
   /// Sends [event] and waits for the client ack. Returns the ack arguments.
@@ -144,15 +148,19 @@ class Socket {
     int id = _nextAckId++;
     Completer<List<Object?>> completer = Completer<List<Object?>>();
     _acks[id] = completer;
-    sendPacket(SocketPacket(
-      type: SocketPacketType.event,
-      nsp: nsp.name,
-      id: id,
-      data: <Object?>[event, if (data != null) data],
-    ));
+    sendPacket(
+      SocketPacket(
+        type: SocketPacketType.event,
+        nsp: nsp.name,
+        id: id,
+        data: <Object?>[event, ?data],
+      ),
+    );
     if (timeout == null) return completer.future;
-    return completer.future
-        .timeout(timeout, onTimeout: _AckTimeout(this, id).call);
+    return completer.future.timeout(
+      timeout,
+      onTimeout: _AckTimeout(this, id).call,
+    );
   }
 
   /// Joins [room].
@@ -199,11 +207,13 @@ class Socket {
   void onConnect() {
     _connected = true;
     join(id);
-    sendPacket(SocketPacket(
-      type: SocketPacketType.connect,
-      nsp: nsp.name,
-      data: <String, Object>{'sid': id},
-    ));
+    sendPacket(
+      SocketPacket(
+        type: SocketPacketType.connect,
+        nsp: nsp.name,
+        data: <String, Object>{'sid': id},
+      ),
+    );
   }
 
   /// Called by the client for packets of this namespace.
@@ -245,8 +255,9 @@ class Socket {
       socket: this,
       ackId: packet.id,
     );
-    for (EventHandler handler
-        in List<EventHandler>.of(_handlers[name] ?? const <EventHandler>[])) {
+    for (EventHandler handler in List<EventHandler>.of(
+      _handlers[name] ?? const <EventHandler>[],
+    )) {
       unawaited(_runner.run(handler, event));
     }
   }
@@ -258,10 +269,14 @@ class Socket {
   }
 
   void _emitLocal(String name, String reason) {
-    SocketEvent event =
-        SocketEvent(name: name, args: <Object?>[reason], socket: this);
-    for (EventHandler handler
-        in List<EventHandler>.of(_handlers[name] ?? const <EventHandler>[])) {
+    SocketEvent event = SocketEvent(
+      name: name,
+      args: <Object?>[reason],
+      socket: this,
+    );
+    for (EventHandler handler in List<EventHandler>.of(
+      _handlers[name] ?? const <EventHandler>[],
+    )) {
       unawaited(_runner.run(handler, event));
     }
   }

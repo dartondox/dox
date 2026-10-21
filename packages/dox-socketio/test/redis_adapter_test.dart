@@ -21,8 +21,11 @@ final int redisPort = int.parse(Platform.environment['REDIS_PORT'] ?? '6379');
 String? redisSkipReason() {
   try {
     // A sync check, so the tests can be skipped before they are declared.
-    ProcessResult result =
-        Process.runSync('nc', <String>['-z', redisHost, '$redisPort']);
+    ProcessResult result = Process.runSync('nc', <String>[
+      '-z',
+      redisHost,
+      '$redisPort',
+    ]);
     return result.exitCode == 0
         ? null
         : 'redis is not reachable at $redisHost:$redisPort';
@@ -34,7 +37,9 @@ String? redisSkipReason() {
 RedisAdapter newAdapter() {
   Redis subscriber = Redis(RedisOptions(host: redisHost, port: redisPort));
   return RedisAdapter(
-      subscriber: subscriber, publisher: subscriber.duplicate());
+    subscriber: subscriber,
+    publisher: subscriber.duplicate(),
+  );
 }
 
 Future<sio.Socket> connectClient(String url, String room) async {
@@ -101,8 +106,9 @@ void main() {
       outside.on('cross', (dynamic _) => outsideGot = true);
 
       await serverB.io.to('room1').emit('cross', <String, int>{'n': 1});
-      expect(await got.future.timeout(Duration(seconds: 5)),
-          <String, dynamic>{'n': 1});
+      expect(await got.future.timeout(Duration(seconds: 5)), <String, dynamic>{
+        'n': 1,
+      });
 
       // local() must not leave server B.
       Completer<Object?> local = Completer<Object?>();
@@ -123,9 +129,9 @@ void main() {
         if (!message.isCompleted && text != null) message.complete(text);
       };
       await serverA.io.to('r').except('x').emit('hello', 'world');
-      List<dynamic> parts =
-          jsonDecode(await message.future.timeout(Duration(seconds: 5)))
-              as List<dynamic>;
+      List<dynamic> parts = jsonDecode(
+        await message.future.timeout(Duration(seconds: 5)),
+      ) as List<dynamic>;
       expect(parts[0], adapterA.uid);
       expect(parts[1], <String, dynamic>{
         'type': 2,
@@ -161,8 +167,9 @@ void main() {
       Completer<Object?> fromNodeRoom = Completer<Object?>();
       dartClient.on('from-node-room', fromNodeRoom.complete);
 
-      Process process = await node
-          .start('redis-node.mjs', <String>['redis://$redisHost:$redisPort']);
+      Process process = await node.start('redis-node.mjs', <String>[
+        'redis://$redisHost:$redisPort',
+      ]);
       StringBuffer errors = StringBuffer();
       process.stderr.transform(utf8.decoder).listen(errors.write);
       Completer<void> ready = Completer<void>();
@@ -170,8 +177,8 @@ void main() {
           .transform(utf8.decoder)
           .transform(const LineSplitter())
           .listen((String line) {
-        if (line == 'READY' && !ready.isCompleted) ready.complete();
-      });
+            if (line == 'READY' && !ready.isCompleted) ready.complete();
+          });
       await ready.future.timeout(Duration(seconds: 15));
 
       await server.io.to('r1').emit('from-dart', <String, int>{'x': 1});
@@ -179,7 +186,9 @@ void main() {
       expect(code, 0, reason: errors.toString());
       expect(await fromNode.future.timeout(Duration(seconds: 5)), 'hi dart');
       expect(
-          await fromNodeRoom.future.timeout(Duration(seconds: 5)), 'hi room');
+        await fromNodeRoom.future.timeout(Duration(seconds: 5)),
+        'hi room',
+      );
       dartClient.dispose();
     });
   }, skip: skip ?? NodeRunner.skipReason());

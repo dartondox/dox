@@ -21,9 +21,8 @@ class FileDriver extends CacheDriver {
   FileDriver({
     Directory? directory,
     this.prefix = CacheConstants.defaultPrefix,
-    CacheClock clock = const CacheClock(),
-  })  : directory = directory ?? Directory(CacheConstants.defaultFilePath),
-        _clock = clock;
+    this._clock = const CacheClock(),
+  }) : directory = directory ?? Directory(CacheConstants.defaultFilePath);
 
   /// Folder for the cache files. `flush` deletes everything inside it.
   final Directory directory;
@@ -143,9 +142,12 @@ class FileDriverFactory implements CacheDriverFactory {
   @override
   CacheDriver create(Map<String, dynamic> options) {
     return FileDriver(
-      directory: Directory(options[CacheConstants.pathOption] as String? ??
-          CacheConstants.defaultFilePath),
-      prefix: options[CacheConstants.prefixOption] as String? ??
+      directory: Directory(
+        options[CacheConstants.pathOption] as String? ??
+            CacheConstants.defaultFilePath,
+      ),
+      prefix:
+          options[CacheConstants.prefixOption] as String? ??
           CacheConstants.defaultPrefix,
       clock: _clock,
     );

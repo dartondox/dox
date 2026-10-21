@@ -42,7 +42,8 @@ class NullDriverFactory implements CacheDriverFactory {
   @override
   CacheDriver create(Map<String, dynamic> options) {
     return NullDriver(
-      prefix: options[CacheConstants.prefixOption] as String? ??
+      prefix:
+          options[CacheConstants.prefixOption] as String? ??
           CacheConstants.defaultPrefix,
     );
   }

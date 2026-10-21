@@ -103,8 +103,9 @@ class OpenApiChecker {
       if (location == 'path') {
         declared.add(param['name'] as String);
         if (param['required'] != true) {
-          _errors
-              .add('$where: path parameter ${param['name']} must be required');
+          _errors.add(
+            '$where: path parameter ${param['name']} must be required',
+          );
         }
       }
     }

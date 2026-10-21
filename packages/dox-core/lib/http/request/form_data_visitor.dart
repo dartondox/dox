@@ -36,7 +36,8 @@ class FormDataVisitor {
   /// next one arrives, so the whole body is never held in memory.
   Future<void> process() async {
     MimeMultipartTransformer transformer = MimeMultipartTransformer(
-        request.headers.contentType!.parameters['boundary']!);
+      request.headers.contentType!.parameters['boundary']!,
+    );
 
     await for (MimeMultipart formItem in _watch(body).transform(transformer)) {
       String partHeaders = formItem.headers['content-disposition']!;
@@ -77,8 +78,9 @@ class FormDataVisitor {
       await for (List<int> chunk in _guard(part)) {
         length += chunk.length;
         if (raf == null && length > multipartMemoryLimit) {
-          temp =
-              File('${Directory.systemTemp.path}/dox-upload-${uuid.v4()}.tmp');
+          temp = File(
+            '${Directory.systemTemp.path}/dox-upload-${uuid.v4()}.tmp',
+          );
           _deleteWhenDone(temp);
           raf = await temp.open(mode: FileMode.write);
           await raf.writeFrom(buffer.takeBytes());

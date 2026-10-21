@@ -13,10 +13,7 @@ class BlogRequest extends FormRequest {
 
   @override
   Map<String, String> rules() {
-    return <String, String>{
-      'title': 'required',
-      'description': 'required',
-    };
+    return <String, String>{'title': 'required', 'description': 'required'};
   }
 
   @override

@@ -4,10 +4,7 @@ class AuthGuard {
   final AuthDriver driver;
   final AuthProvider provider;
 
-  const AuthGuard({
-    required this.driver,
-    required this.provider,
-  });
+  const AuthGuard({required this.driver, required this.provider});
 }
 
 class AuthProvider {

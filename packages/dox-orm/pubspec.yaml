@@ -6,11 +6,12 @@ homepage: https://dartondox.dev
 
 environment:
   sdk: ^3.13.0
+resolution: workspace
 
 dependencies:
   postgres: ^3.5.20
   mysql_dart: ^3.0.1
-  sqlite3: '>=2.9.4 <4.0.0'
+  sqlite3: ^3.7.1
   dox_annotation: ^3.0.0-alpha.1
   
 dev_dependencies:

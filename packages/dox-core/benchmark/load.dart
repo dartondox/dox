@@ -12,10 +12,12 @@ void main(List<String> args) async {
 
   ReceivePort port = ReceivePort();
   for (int i = 0; i < workers; i++) {
-    await Isolate.spawn(
-      _worker,
-      <dynamic>[port.sendPort, url, connections ~/ workers, seconds],
-    );
+    await Isolate.spawn(_worker, <dynamic>[
+      port.sendPort,
+      url,
+      connections ~/ workers,
+      seconds,
+    ]);
   }
 
   int total = 0;
@@ -33,8 +35,10 @@ void main(List<String> args) async {
   latencies.sort();
   int p(double q) =>
       latencies.isEmpty ? 0 : latencies[(latencies.length * q).floor()];
-  print('requests/s: ${(total / seconds).round()}  '
-      'p50: ${p(0.5) / 1000}ms  p99: ${p(0.99) / 1000}ms  errors: $errors');
+  print(
+    'requests/s: ${(total / seconds).round()}  '
+    'p50: ${p(0.5) / 1000}ms  p99: ${p(0.99) / 1000}ms  errors: $errors',
+  );
 }
 
 Future<void> _worker(List<dynamic> a) async {

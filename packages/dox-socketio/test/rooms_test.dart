@@ -17,8 +17,11 @@ void main() {
     });
 
     test('rooms are a union', () {
-      expect(store.match(<String>{'room1', 'room2'}, <String>{}),
-          <String>{'a', 'b', 'c'});
+      expect(store.match(<String>{'room1', 'room2'}, <String>{}), <String>{
+        'a',
+        'b',
+        'c',
+      });
       expect(store.match(<String>{'room1'}, <String>{}), <String>{'a', 'b'});
     });
 
@@ -56,7 +59,7 @@ void main() {
       BroadcastOptions back = BroadcastOptions.fromJson(<String, dynamic>{
         'rooms': <String>['r'],
         'except': <String>[],
-        'flags': <String, dynamic>{}
+        'flags': <String, dynamic>{},
       });
       expect(back.rooms, <String>{'r'});
       expect(back.local, isFalse);

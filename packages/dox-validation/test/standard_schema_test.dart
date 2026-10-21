@@ -71,14 +71,16 @@ void main() {
 
     test('generic consumer reads issues and paths', () async {
       ObjectSchema s = v.object(<String, Schema<Object?>>{
-        'user':
-            v.object(<String, Schema<Object?>>{'email': v.string().email()}),
+        'user': v.object(<String, Schema<Object?>>{
+          'email': v.string().email(),
+        }),
       });
       expect(
-          await problems(s, <String, dynamic>{
-            'user': <String, dynamic>{'email': 'x'},
-          }),
-          <String>['user.email: The email is not a valid email']);
+        await problems(s, <String, dynamic>{
+          'user': <String, dynamic>{'email': 'x'},
+        }),
+        <String>['user.email: The email is not a valid email'],
+      );
     });
 
     test('a custom StandardSchema works with the same consumer', () async {

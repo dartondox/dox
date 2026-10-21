@@ -23,12 +23,14 @@ mixin FluentSchema<S extends Schema<O>, O> on Schema<O> {
     String code = 'custom',
     List<Object> path = const <Object>[],
   }) {
-    return use(RefineRule<O>(
-      check: check,
-      message: message,
-      code: code,
-      extraPath: path,
-    ));
+    return use(
+      RefineRule<O>(
+        check: check,
+        message: message,
+        code: code,
+        extraPath: path,
+      ),
+    );
   }
 
   /// Add an async one-off check, like "email is unique".
@@ -39,12 +41,14 @@ mixin FluentSchema<S extends Schema<O>, O> on Schema<O> {
     String code = 'custom',
     List<Object> path = const <Object>[],
   }) {
-    return use(RefineRule<O>(
-      asyncCheck: check,
-      message: message,
-      code: code,
-      extraPath: path,
-    ));
+    return use(
+      RefineRule<O>(
+        asyncCheck: check,
+        message: message,
+        code: code,
+        extraPath: path,
+      ),
+    );
   }
 
   /// Add a check that can add many issues with `context.addIssue()`.

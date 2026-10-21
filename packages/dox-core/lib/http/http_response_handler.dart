@@ -6,10 +6,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/server/dox_server.dart';
 import 'package:dox_core/utils/json.dart';
 
-dynamic httpResponseHandler(
-  dynamic payload,
-  HttpRequest request,
-) {
+dynamic httpResponseHandler(dynamic payload, HttpRequest request) {
   /// Websocket handler will return websocket payload
   /// and in this case we need to remain the connection open for
   /// websocket communication. So there is no `res.close()` required.
@@ -17,8 +14,9 @@ dynamic httpResponseHandler(
     return;
   }
 
-  DoxResponse doxResponse =
-      payload is DoxResponse ? payload : DoxResponse(payload);
+  DoxResponse doxResponse = payload is DoxResponse
+      ? payload
+      : DoxResponse(payload);
 
   /// If there is responseHandler set, handle responseHandler
   /// before DoxResponse process. The responseHandler will return
@@ -164,8 +162,10 @@ Future<void> _sendFile(File file, HttpRequest request) async {
       return;
     }
     res.statusCode = HttpStatus.partialContent;
-    res.headers
-        .set(HttpHeaders.contentRangeHeader, 'bytes $start-$end/$length');
+    res.headers.set(
+      HttpHeaders.contentRangeHeader,
+      'bytes $start-$end/$length',
+    );
   }
 
   res.contentLength = end - start + 1;

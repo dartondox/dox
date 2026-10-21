@@ -10,8 +10,8 @@ class WebsocketTransport extends Transport {
   WebsocketTransport(
     this._socket, {
     required this.maxHttpBufferSize,
-    EngineParser parser = const EngineParser(),
-  }) : _parser = parser {
+    this._parser = const EngineParser(),
+  }) {
     _subscription = _socket.listen(
       _onFrame,
       onDone: _onDone,
@@ -45,7 +45,9 @@ class WebsocketTransport extends Transport {
       packet = _parser.decodeFrame(frame as Object);
     } on FormatException {
       _closeWith(
-          WebSocketStatus.invalidFramePayloadData, CloseReason.parseError);
+        WebSocketStatus.invalidFramePayloadData,
+        CloseReason.parseError,
+      );
       return;
     }
     listener?.onTransportPacket(this, packet);
@@ -84,5 +86,5 @@ class WebsocketTransport extends Transport {
     unawaited(_socket.close(code).then(_ignore, onError: _ignore));
   }
 
-  static void _ignore([Object? _, Object? __]) {}
+  static void _ignore([Object? _, Object? _]) {}
 }

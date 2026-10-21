@@ -14,10 +14,9 @@ import 'transport.dart';
 class PollingTransport extends Transport {
   PollingTransport({
     required this.maxHttpBufferSize,
-    EngineParser parser = const EngineParser(),
-    HttpResponder responder = const HttpResponder(),
-  })  : _parser = parser,
-        _responder = responder;
+    this._parser = const EngineParser(),
+    this._responder = const HttpResponder(),
+  });
 
   final int maxHttpBufferSize;
   final EngineParser _parser;
@@ -81,8 +80,12 @@ class PollingTransport extends Transport {
       listener?.onTransportClose(this, CloseReason.parseError);
       return;
     }
-    _responder.send(request.response, HttpStatus.ok, 'ok',
-        contentType: 'text/html');
+    _responder.send(
+      request.response,
+      HttpStatus.ok,
+      'ok',
+      contentType: 'text/html',
+    );
     for (EnginePacket packet in packets) {
       if (_closed) break;
       listener?.onTransportPacket(this, packet);
@@ -105,7 +108,10 @@ class PollingTransport extends Transport {
     if (poll == null) return;
     _poll = null;
     _responder.send(
-        poll.response, HttpStatus.ok, _parser.encodePayload(packets));
+      poll.response,
+      HttpStatus.ok,
+      _parser.encodePayload(packets),
+    );
   }
 
   /// Stops this transport after an upgrade. A waiting poll gets a noop.
@@ -126,7 +132,8 @@ class PollingTransport extends Transport {
   }
 
   String _closePayload() {
-    return _parser.encodePayload(
-        const <EnginePacket>[EnginePacket(EnginePacketType.close)]);
+    return _parser.encodePayload(const <EnginePacket>[
+      EnginePacket(EnginePacketType.close),
+    ]);
   }
 }

@@ -25,10 +25,9 @@ class SocketIoServer implements EngineConnectionListener {
     this.options = const ServerOptions(),
     Adapter? adapter,
     IdGenerator? ids,
-    HttpResponder responder = const HttpResponder(),
-  })  : adapter = adapter ?? InMemoryAdapter(),
-        _ids = ids ?? IdGenerator(),
-        _responder = responder {
+    this._responder = const HttpResponder(),
+  }) : adapter = adapter ?? InMemoryAdapter(),
+       _ids = ids ?? IdGenerator() {
     engine = EngineServer(options: options, connectionListener: this);
     of(defaultNamespace);
   }
@@ -106,10 +105,7 @@ class SocketIoServer implements EngineConnectionListener {
   }
 
   /// Starts a `dart:io` server on [port]. Use port 0 for a free port.
-  Future<HttpServer> listen(
-    int port, {
-    Object address = '127.0.0.1',
-  }) async {
+  Future<HttpServer> listen(int port, {Object address = '127.0.0.1'}) async {
     HttpServer server = await HttpServer.bind(address, port);
     attach(server);
     return server;

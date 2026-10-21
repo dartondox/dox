@@ -96,13 +96,17 @@ void main() {
       ObjectSchema s = v.object(<String, Schema<Object?>>{
         'slug': v.string().min(3).slug(message: 'Bad {field}'),
       });
-      expect(s.safeParse(<String, dynamic>{'slug': 'A B'}).errors,
-          <String, String>{'slug': 'Bad slug'});
+      expect(
+        s.safeParse(<String, dynamic>{'slug': 'A B'}).errors,
+        <String, String>{'slug': 'Bad slug'},
+      );
     });
 
     test('params fill placeholders', () {
-      ParseResult<String> result =
-          v.string().use(MinWordsRule(3)).safeParse('one two');
+      ParseResult<String> result = v
+          .string()
+          .use(MinWordsRule(3))
+          .safeParse('one two');
       expect(result.issues.first.message, 'The value needs 3 words');
     });
 
@@ -123,31 +127,28 @@ void main() {
 
   group('messages |', () {
     test('global resolver by code', () {
-      v.messages.setMessages(<String, String>{
-        'required': '{field} is needed',
-      });
+      v.messages.setMessages(<String, String>{'required': '{field} is needed'});
       ObjectSchema s = v.object(<String, Schema<Object?>>{'name': v.string()});
       expect(s.safeParse(<String, dynamic>{}).errors['name'], 'name is needed');
     });
 
     test('path specific and wildcard keys', () {
-      MessageResolver resolver = MessageResolver(messages: <String, String>{
-        'email.required': 'Email please',
-        'items.*.name.required': 'Item name please',
-      });
+      MessageResolver resolver = MessageResolver(
+        messages: <String, String>{
+          'email.required': 'Email please',
+          'items.*.name.required': 'Item name please',
+        },
+      );
       ObjectSchema s = v.object(<String, Schema<Object?>>{
         'email': v.string(),
         'name': v.string(),
-        'items': v.list(v.object(<String, Schema<Object?>>{
-          'name': v.string(),
-        })),
+        'items': v.list(
+          v.object(<String, Schema<Object?>>{'name': v.string()}),
+        ),
       });
-      ParseResult<Map<String, dynamic>> result = s.safeParse(
-        <String, dynamic>{
-          'items': <Map<String, dynamic>>[<String, dynamic>{}],
-        },
-        messages: resolver,
-      );
+      ParseResult<Map<String, dynamic>> result = s.safeParse(<String, dynamic>{
+        'items': <Map<String, dynamic>>[<String, dynamic>{}],
+      }, messages: resolver);
       expect(result.errors, <String, String>{
         'email': 'Email please',
         'name': 'The name is required',
@@ -156,46 +157,46 @@ void main() {
     });
 
     test('rule message wins over resolver', () {
-      v.messages = MessageResolver(messages: <String, String>{
-        'min_length': 'global',
-      });
+      v.messages = MessageResolver(
+        messages: <String, String>{'min_length': 'global'},
+      );
       expect(
-          v
-              .string()
-              .min(3, message: 'local')
-              .safeParse('a')
-              .issues
-              .first
-              .message,
-          'local');
+        v.string().min(3, message: 'local').safeParse('a').issues.first.message,
+        'local',
+      );
       expect(v.string().min(3).safeParse('a').issues.first.message, 'global');
     });
 
     test('custom resolver subclass for i18n', () {
-      ParseResult<String> result =
-          v.string().safeParse(null, messages: GermanResolver());
+      ParseResult<String> result = v.string().safeParse(
+        null,
+        messages: GermanResolver(),
+      );
       expect(result.issues.first.message, 'value ist erforderlich');
     });
 
     test('old %s placeholders', () {
       MessageResolver resolver = MessageResolver();
       expect(
-          resolver.format('between %s and %s', <String, Object?>{
-            'args': <Object?>[1, 5],
-          }),
-          'between 1 and 5');
+        resolver.format('between %s and %s', <String, Object?>{
+          'args': <Object?>[1, 5],
+        }),
+        'between 1 and 5',
+      );
     });
   });
 
   group('CallbackRule |', () {
     test('works with use()', () {
-      AnySchema s = v.any().use(CallbackRule(
-            name: 'even',
-            defaultMessage: 'The {field} must be even',
-            callback: (Object? value, RuleContext context) {
-              return value is int && value.isEven;
-            },
-          ));
+      AnySchema s = v.any().use(
+        CallbackRule(
+          name: 'even',
+          defaultMessage: 'The {field} must be even',
+          callback: (Object? value, RuleContext context) {
+            return value is int && value.isEven;
+          },
+        ),
+      );
       expect(s.safeParse(2).success, true);
       expect(s.safeParse(3).issues.first.message, 'The value must be even');
     });

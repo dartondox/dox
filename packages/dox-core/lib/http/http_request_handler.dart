@@ -26,15 +26,19 @@ void httpRequestHandler(HttpRequest req) {
       return;
     }
 
-    getDoxRequest(req, route).then((DoxRequest doxReq) {
-      middlewareAndControllerHandler(doxReq).then((dynamic result) {
-        httpResponseHandler(result, req);
-      }).onError((Object? error, StackTrace stackTrace) {
-        httpErrorHandler(req, error, stackTrace);
-      });
-    }).onError((Object? error, StackTrace stackTrace) {
-      httpErrorHandler(req, error, stackTrace);
-    });
+    getDoxRequest(req, route)
+        .then((DoxRequest doxReq) {
+          middlewareAndControllerHandler(doxReq)
+              .then((dynamic result) {
+                httpResponseHandler(result, req);
+              })
+              .onError((Object? error, StackTrace stackTrace) {
+                httpErrorHandler(req, error, stackTrace);
+              });
+        })
+        .onError((Object? error, StackTrace stackTrace) {
+          httpErrorHandler(req, error, stackTrace);
+        });
 
     /// form data do not support isolate or multithread
   } catch (error, stackTrace) {

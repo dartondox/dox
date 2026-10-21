@@ -42,5 +42,5 @@ class HttpResponder {
     );
   }
 
-  static void _ignore([Object? _, Object? __]) {}
+  static void _ignore([Object? _, Object? _]) {}
 }

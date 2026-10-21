@@ -39,8 +39,11 @@ class MainNamespace extends NamespaceHandler {
   }
 
   Future<void> onAskMe(SocketEvent event) async {
-    List<Object?> answer = await event.socket
-        .emitWithAck('question', 'hello?', timeout: Duration(seconds: 3));
+    List<Object?> answer = await event.socket.emitWithAck(
+      'question',
+      'hello?',
+      timeout: Duration(seconds: 3),
+    );
     event.socket.emit('answer-was', answer);
   }
 
@@ -107,7 +110,7 @@ class AdminNamespace extends NamespaceHandler {
 /// Starts a server with the test namespaces on a free port.
 class TestApp {
   TestApp({ServerOptions options = const ServerOptions(), Adapter? adapter})
-      : io = SocketIoServer(options: options, adapter: adapter) {
+    : io = SocketIoServer(options: options, adapter: adapter) {
     io.register(MainNamespace(events));
     io.register(AdminNamespace());
   }

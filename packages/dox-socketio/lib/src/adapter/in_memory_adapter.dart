@@ -6,8 +6,7 @@ import 'adapter.dart';
 
 /// Default adapter. Rooms live in memory of this server only.
 class InMemoryAdapter implements Adapter {
-  InMemoryAdapter({SocketEncoder encoder = const SocketEncoder()})
-      : _encoder = encoder;
+  InMemoryAdapter({this._encoder = const SocketEncoder()});
 
   final SocketEncoder _encoder;
   final Map<String, RoomStore> _stores = <String, RoomStore>{};
@@ -91,9 +90,7 @@ class RoomStore {
 
   /// Sockets in any of [rooms] (all when empty), minus those in [except].
   Set<String> match(Set<String> rooms, Set<String> except) {
-    Set<String> skip = <String>{
-      for (String room in except) ...?_rooms[room],
-    };
+    Set<String> skip = <String>{for (String room in except) ...?_rooms[room]};
     Iterable<String> candidates = rooms.isEmpty
         ? _sids.keys
         : <String>{for (String room in rooms) ...?_rooms[room]};

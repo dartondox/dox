@@ -31,12 +31,20 @@ void main() {
 
     tearDown(() => app.stop());
 
-    Future<void> runScenario(String name,
-        [List<String> extra = const <String>[]]) async {
-      ProcessResult result =
-          await node.run('client.mjs', <String>[name, app.url, ...extra]);
-      expect(result.exitCode, 0,
-          reason: 'stdout: ${result.stdout}\nstderr: ${result.stderr}');
+    Future<void> runScenario(
+      String name, [
+      List<String> extra = const <String>[],
+    ]) async {
+      ProcessResult result = await node.run('client.mjs', <String>[
+        name,
+        app.url,
+        ...extra,
+      ]);
+      expect(
+        result.exitCode,
+        0,
+        reason: 'stdout: ${result.stdout}\nstderr: ${result.stderr}',
+      );
     }
 
     test('connect over websocket only', () => runScenario('websocket-only'));
@@ -55,11 +63,15 @@ void main() {
 
     test('namespace with auth middleware', () => runScenario('namespace-auth'));
 
-    test('binary over websocket',
-        () => runScenario('binary', <String>['websocket']));
+    test(
+      'binary over websocket',
+      () => runScenario('binary', <String>['websocket']),
+    );
 
-    test('binary over polling',
-        () => runScenario('binary', <String>['polling']));
+    test(
+      'binary over polling',
+      () => runScenario('binary', <String>['polling']),
+    );
 
     test('disconnect and reconnect', () async {
       await runScenario('reconnect');

@@ -42,8 +42,10 @@ void main() {
 
     test('collects all failed checks', () {
       ParseResult<String> result = v.string().min(10).email().safeParse('x');
-      expect(result.issues.map((ValidationIssue i) => i.code).toList(),
-          <String>[IssueCodes.minLength, IssueCodes.email]);
+      expect(
+        result.issues.map((ValidationIssue i) => i.code).toList(),
+        <String>[IssueCodes.minLength, IssueCodes.email],
+      );
     });
 
     test('formats', () {
@@ -52,24 +54,29 @@ void main() {
       expect(v.string().url().safeParse('https://dartondox.dev').success, true);
       expect(v.string().url().safeParse('just text').success, false);
       expect(
-          v
-              .string()
-              .uuid()
-              .safeParse('3f1d2c8e-1b2a-4c3d-9e8f-0a1b2c3d4e5f')
-              .success,
-          true);
+        v
+            .string()
+            .uuid()
+            .safeParse('3f1d2c8e-1b2a-4c3d-9e8f-0a1b2c3d4e5f')
+            .success,
+        true,
+      );
       expect(v.string().uuid().safeParse('abc').success, false);
       expect(v.string().ip().safeParse('192.168.1.1').success, true);
       expect(v.string().ip().safeParse('999.1.1.1').success, false);
-      expect(v.string().datetime().safeParse('2024-01-31T10:00:00Z').success,
-          true);
+      expect(
+        v.string().datetime().safeParse('2024-01-31T10:00:00Z').success,
+        true,
+      );
       expect(v.string().datetime().safeParse('2024/01/31').success, false);
     });
 
     test('regex, startsWith, endsWith, includes', () {
       expect(v.string().regex(RegExp(r'^\d+$')).safeParse('123').success, true);
       expect(
-          v.string().regex(RegExp(r'^\d+$')).safeParse('12a').success, false);
+        v.string().regex(RegExp(r'^\d+$')).safeParse('12a').success,
+        false,
+      );
       expect(v.string().startsWith('do').safeParse('dox').success, true);
       expect(v.string().startsWith('da').safeParse('dox').success, false);
       expect(v.string().endsWith('x').safeParse('dox').success, true);
@@ -92,8 +99,10 @@ void main() {
     });
 
     test('custom message per rule', () {
-      ParseResult<String> result =
-          v.string().min(3, message: 'Too short: {min}').safeParse('a');
+      ParseResult<String> result = v
+          .string()
+          .min(3, message: 'Too short: {min}')
+          .safeParse('a');
       expect(result.issues.first.message, 'Too short: 3');
     });
 
@@ -133,8 +142,10 @@ void main() {
 
     test('message has the limit', () {
       ParseResult<int> result = v.int().min(18).safeParse(3);
-      expect(result.issues.first.message,
-          'The value must be greater than or equal 18');
+      expect(
+        result.issues.first.message,
+        'The value must be greater than or equal 18',
+      );
     });
   });
 
@@ -165,8 +176,10 @@ void main() {
       EnumSchema<String> s = v.enumOf<String>(<String>['active', 'pending']);
       expect(s.parse('active'), 'active');
       ParseResult<String> result = s.safeParse('failed');
-      expect(result.issues.first.message,
-          'The selected value is invalid. Valid options are active, and pending');
+      expect(
+        result.issues.first.message,
+        'The selected value is invalid. Valid options are active, and pending',
+      );
     });
 
     test('literal', () {
@@ -187,12 +200,9 @@ void main() {
       expect(v.file().image().safeParse(FakeFile('png')).success, true);
       expect(v.file().image().safeParse(FakeFile('pdf')).success, false);
       expect(
-          v
-              .file()
-              .extensions(<String>['pdf'])
-              .safeParse(FakeFile('PDF'))
-              .success,
-          true);
+        v.file().extensions(<String>['pdf']).safeParse(FakeFile('PDF')).success,
+        true,
+      );
     });
   });
 
@@ -224,8 +234,10 @@ void main() {
 
     test('date from text and millis', () {
       expect(v.coerce.date().parse('2024-01-31'), DateTime(2024, 1, 31));
-      expect(v.coerce.date().parse(0),
-          DateTime.fromMillisecondsSinceEpoch(0, isUtc: true));
+      expect(
+        v.coerce.date().parse(0),
+        DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+      );
       expect(v.coerce.date().safeParse('not a date').success, false);
     });
 

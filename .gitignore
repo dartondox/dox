@@ -12,6 +12,8 @@ site
 pubspec.yaml.backup
 packages/dox-app/bin/dox
 
-# Lock files only for the app, not for library packages
+# Pub workspace: one pubspec.lock at the root. No lock files in packages.
 packages/*/pubspec.lock
-!packages/dox-app/pubspec.lock
+
+# `dart build cli` / `dox build` output
+build/

@@ -47,9 +47,8 @@ class Namespace {
     this.name,
     this.adapter, {
     IdGenerator? ids,
-    HandlerRunner runner = const HandlerRunner(),
-  })  : _ids = ids ?? IdGenerator(),
-        _runner = runner {
+    this._runner = const HandlerRunner(),
+  }) : _ids = ids ?? IdGenerator() {
     adapter.init(this);
   }
 
@@ -120,21 +119,24 @@ class Namespace {
         await middleware(socket);
       }
     } catch (error) {
-      client.sendPacket(SocketPacket(
-        type: SocketPacketType.connectError,
-        nsp: name,
-        data: error is SocketIoException
-            ? error.toJson()
-            : <String, Object>{'message': error.toString()},
-      ));
+      client.sendPacket(
+        SocketPacket(
+          type: SocketPacketType.connectError,
+          nsp: name,
+          data: error is SocketIoException
+              ? error.toJson()
+              : <String, Object>{'message': error.toString()},
+        ),
+      );
       return;
     }
     if (!client.isOpen) return;
     sockets[socket.id] = socket;
     client.addSocket(socket);
     socket.onConnect();
-    for (ConnectionHandler handler
-        in List<ConnectionHandler>.of(_connectionHandlers)) {
+    for (ConnectionHandler handler in List<ConnectionHandler>.of(
+      _connectionHandlers,
+    )) {
       await _runner.run(handler, socket);
     }
   }

@@ -74,14 +74,17 @@ void main() {
     });
 
     test('file holds value and expiry as JSON', () async {
-      await driver.put(
-          'a', <String, dynamic>{'b': 1}, const Duration(seconds: 10));
-      Map<String, dynamic> data =
-          jsonDecode(await driver.fileFor('a').readAsString())
-              as Map<String, dynamic>;
+      await driver.put('a', <String, dynamic>{
+        'b': 1,
+      }, const Duration(seconds: 10));
+      Map<String, dynamic> data = jsonDecode(
+        await driver.fileFor('a').readAsString(),
+      ) as Map<String, dynamic>;
       expect(data['value'], <String, dynamic>{'b': 1});
-      expect(data['expires_at'],
-          clock.now().add(const Duration(seconds: 10)).millisecondsSinceEpoch);
+      expect(
+        data['expires_at'],
+        clock.now().add(const Duration(seconds: 10)).millisecondsSinceEpoch,
+      );
     });
 
     test('no temp files are left after writes', () async {

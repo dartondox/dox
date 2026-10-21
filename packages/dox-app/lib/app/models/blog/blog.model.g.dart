@@ -14,9 +14,9 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
 
   @override
   Map<String, dynamic> get timestampsColumn => <String, dynamic>{
-        'created_at': 'created_at',
-        'updated_at': 'updated_at',
-      };
+    'created_at': 'created_at',
+    'updated_at': 'updated_at',
+  };
 
   int? get id => tempIdValue;
 
@@ -26,29 +26,29 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
 
   @override
   List<String> get tableColumns => <String>[
-        'id',
-        'user_id',
-        'title',
-        'slug',
-        'description',
-        'created_at',
-        'updated_at'
-      ];
+    'id',
+    'user_id',
+    'title',
+    'slug',
+    'description',
+    'created_at',
+    'updated_at',
+  ];
 
   @override
   List<String> get preloadList => <String>[];
 
   @override
   Map<String, Function> get relationsResultMatcher => <String, Function>{
-        'user': getUser,
-        'categories': getCategories,
-      };
+    'user': getUser,
+    'categories': getCategories,
+  };
 
   @override
   Map<String, Function> get relationsQueryMatcher => <String, Function>{
-        'user': queryUser,
-        'categories': queryCategories,
-      };
+    'user': queryUser,
+    'categories': queryCategories,
+  };
 
   static Future<void> getUser(List<Model<Blog>> list) async {
     var result = await getBelongsTo<Blog, User>(queryUser(list), list);
@@ -69,8 +69,10 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
   }
 
   static Future<void> getCategories(List<Model<Blog>> list) async {
-    var result =
-        await getManyToMany<Blog, Category>(queryCategories(list), list);
+    var result = await getManyToMany<Blog, Category>(
+      queryCategories(list),
+      list,
+    );
     for (dynamic i in list) {
       if (result[i.tempIdValue.toString()] != null) {
         i.categories = result[i.tempIdValue.toString()]!;

@@ -46,11 +46,7 @@ class ListOptions {
   /// The token from the previous page.
   final String? paginationToken;
 
-  const ListOptions({
-    this.recursive = false,
-    this.limit,
-    this.paginationToken,
-  });
+  const ListOptions({this.recursive = false, this.limit, this.paginationToken});
 }
 
 /// Facts about a stored file.

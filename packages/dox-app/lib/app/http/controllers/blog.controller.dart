@@ -5,12 +5,10 @@ import 'package:dox_core/dox_core.dart';
 class BlogController {
   /// GET /blogs
   Future<dynamic> index(DoxRequest req) async {
-    req.validate(
-      <String, String>{
-        'page': 'required|integer',
-        'limit': 'required|integer',
-      },
-    );
+    req.validate(<String, String>{
+      'page': 'required|integer',
+      'limit': 'required|integer',
+    });
     bool withTrashed = req.input('with_trashed').toString() == '1';
     return BlogService().listing(
       req.input('limit'),

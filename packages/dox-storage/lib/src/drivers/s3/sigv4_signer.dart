@@ -68,7 +68,8 @@ class SigV4Signer {
     );
     String scope = _scope(now);
     String signature = _signature(now, _stringToSign(amzDate, scope, request));
-    all['authorization'] = '${StorageConstants.sigV4Algorithm} '
+    all['authorization'] =
+        '${StorageConstants.sigV4Algorithm} '
         'Credential=${credentials.accessKeyId}/$scope, '
         'SignedHeaders=$signedHeaders, Signature=$signature';
     return all;
@@ -116,10 +117,7 @@ class SigV4Signer {
       all,
       StorageConstants.unsignedPayload,
     );
-    String signature = _signature(
-      now,
-      _stringToSign(amzDate, scope, request),
-    );
+    String signature = _signature(now, _stringToSign(amzDate, scope, request));
     String base = '${uri.scheme}://${uri.authority}${uri.path}';
     return Uri.parse('$base?$canonicalQuery&X-Amz-Signature=$signature');
   }
@@ -129,7 +127,8 @@ class SigV4Signer {
   static String encode(String value, {bool encodeSlash = true}) {
     StringBuffer out = StringBuffer();
     for (int byte in utf8.encode(value)) {
-      bool unreserved = (byte >= 0x41 && byte <= 0x5A) ||
+      bool unreserved =
+          (byte >= 0x41 && byte <= 0x5A) ||
           (byte >= 0x61 && byte <= 0x7A) ||
           (byte >= 0x30 && byte <= 0x39) ||
           byte == 0x2D ||
@@ -187,8 +186,10 @@ class SigV4Signer {
       int equals = part.indexOf('=');
       String name = equals == -1 ? part : part.substring(0, equals);
       String value = equals == -1 ? '' : part.substring(equals + 1);
-      pairs
-          .add(<String>[Uri.decodeComponent(name), Uri.decodeComponent(value)]);
+      pairs.add(<String>[
+        Uri.decodeComponent(name),
+        Uri.decodeComponent(value),
+      ]);
     }
     return pairs;
   }

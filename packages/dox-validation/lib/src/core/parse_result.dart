@@ -4,13 +4,13 @@ import 'issue.dart';
 /// The result of `safeParse`.
 class ParseResult<O> implements StandardResult<O> {
   ParseResult.success(O this.value)
-      : success = true,
-        issues = const <ValidationIssue>[];
+    : success = true,
+      issues = const <ValidationIssue>[];
 
   ParseResult.failure(List<ValidationIssue> issues)
-      : success = false,
-        value = null,
-        issues = List<ValidationIssue>.unmodifiable(issues);
+    : success = false,
+      value = null,
+      issues = List<ValidationIssue>.unmodifiable(issues);
 
   @override
   final bool success;

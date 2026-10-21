@@ -6,6 +6,7 @@ homepage: https://dartondox.dev
 
 environment:
   sdk: ^3.13.0
+resolution: workspace
 
 dependencies:
   build: ^5.0.0

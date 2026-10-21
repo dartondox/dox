@@ -19,10 +19,7 @@ class WebsocketService implements DoxService {
     Redis pub = sub.duplicate();
 
     WebsocketServer io = WebsocketServer(Dox());
-    io.adapter(WebsocketRedisAdapter(
-      subscriber: sub,
-      publisher: pub,
-    ));
+    io.adapter(WebsocketRedisAdapter(subscriber: sub, publisher: pub));
   }
 }
 
@@ -39,8 +36,9 @@ void main() {
     });
 
     test('websocket', () async {
-      WebSocket socket =
-          await WebSocket.connect('ws://localhost:${appConfig.serverPort}/ws');
+      WebSocket socket = await WebSocket.connect(
+        'ws://localhost:${appConfig.serverPort}/ws',
+      );
 
       socket.listen((dynamic message) {
         Map<String, dynamic> data = JSON.parse(message);
@@ -59,7 +57,7 @@ void main() {
 
       String jsonData = jsonEncode(<String, dynamic>{
         'event': 'json',
-        'message': <String, String>{'title': 'hello'}
+        'message': <String, String>{'title': 'hello'},
       });
 
       socket.add(data);

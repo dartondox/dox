@@ -14,9 +14,9 @@ class CategoryGenerator extends Model<Category> {
 
   @override
   Map<String, dynamic> get timestampsColumn => <String, dynamic>{
-        'created_at': 'created_at',
-        'updated_at': 'updated_at',
-      };
+    'created_at': 'created_at',
+    'updated_at': 'updated_at',
+  };
 
   int? get id => tempIdValue;
 
@@ -25,21 +25,25 @@ class CategoryGenerator extends Model<Category> {
   Category query() => Category();
 
   @override
-  List<String> get tableColumns =>
-      <String>['id', 'name', 'created_at', 'updated_at'];
+  List<String> get tableColumns => <String>[
+    'id',
+    'name',
+    'created_at',
+    'updated_at',
+  ];
 
   @override
   List<String> get preloadList => <String>[];
 
   @override
   Map<String, Function> get relationsResultMatcher => <String, Function>{
-        'blogs': getBlogs,
-      };
+    'blogs': getBlogs,
+  };
 
   @override
   Map<String, Function> get relationsQueryMatcher => <String, Function>{
-        'blogs': queryBlogs,
-      };
+    'blogs': queryBlogs,
+  };
 
   static Future<void> getBlogs(List<Model<Category>> list) async {
     var result = await getManyToMany<Category, Blog>(queryBlogs(list), list);

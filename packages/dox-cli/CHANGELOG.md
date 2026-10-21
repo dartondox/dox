@@ -1,3 +1,9 @@
+## Unreleased
+
+- Needs Dart 3.13 or newer.
+- All dependencies updated to their latest versions.
+- `dox build` now runs `dart build cli` (AOT, with build hooks). The output is `build/bundle/`. Start it with `cd build/bundle && ./bin/server`.
+
 ## 3.0.0-alpha.1
 
 - Version 3 of Dox. All Dox packages now share one version.

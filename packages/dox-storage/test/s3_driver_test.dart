@@ -158,7 +158,9 @@ void main() {
   group('S3Driver errors', () {
     test('404 NoSuchKey becomes FileNotFoundException', () async {
       s3.reply(
-          404, '<Error><Code>NoSuchKey</Code><Message>gone</Message></Error>');
+        404,
+        '<Error><Code>NoSuchKey</Code><Message>gone</Message></Error>',
+      );
       expect(
         diskWith(config()).get('a.txt'),
         throwsA(isA<FileNotFoundException>()),
@@ -192,8 +194,11 @@ void main() {
       expect(
         diskWith(config()).put('k.txt', 'x'),
         throwsA(
-          isA<DriverException>()
-              .having((DriverException e) => e.key, 'key', 'k.txt'),
+          isA<DriverException>().having(
+            (DriverException e) => e.key,
+            'key',
+            'k.txt',
+          ),
         ),
       );
     });
@@ -356,13 +361,15 @@ void main() {
       expect(result.paginationToken, isNull);
       expect(s3.requests[1].url.queryParameters['continuation-token'], 'tok');
       expect(
-          s3.requests[0].url.queryParameters.containsKey('delimiter'), isFalse);
+        s3.requests[0].url.queryParameters.containsKey('delimiter'),
+        isFalse,
+      );
     });
 
     test('with a limit it returns one page and a token', () async {
       s3.reply(200, listPage(keys: <String>['p/1'], next: 'tok'));
-      ListResult result =
-          await diskWith(config()).listAll('p', const ListOptions(limit: 1));
+      ListResult result = await diskWith(config())
+          .listAll('p', const ListOptions(limit: 1));
       expect(result.paginationToken, 'tok');
       expect(s3.requests.single.url.queryParameters['max-keys'], '1');
     });
@@ -407,9 +414,10 @@ void main() {
 
     test('big stream uses multipart upload', () async {
       s3.reply(
-          200,
-          '<InitiateMultipartUploadResult><UploadId>U1</UploadId>'
-          '</InitiateMultipartUploadResult>');
+        200,
+        '<InitiateMultipartUploadResult><UploadId>U1</UploadId>'
+        '</InitiateMultipartUploadResult>',
+      );
       s3.reply(200, '', <String, String>{'etag': '"e1"'});
       s3.reply(200, '', <String, String>{'etag': '"e2"'});
       s3.reply(200, '', <String, String>{'etag': '"e3"'});
@@ -427,7 +435,9 @@ void main() {
       expect(calls[3], 'PUT partNumber=3&uploadId=U1 5');
       expect(calls[4], startsWith('POST uploadId=U1'));
       expect(
-          s3.requests[0].headers['content-type'], 'application/octet-stream');
+        s3.requests[0].headers['content-type'],
+        'application/octet-stream',
+      );
       expect(
         s3.requests[4].body,
         '<CompleteMultipartUpload>'

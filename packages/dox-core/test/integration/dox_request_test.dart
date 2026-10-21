@@ -38,9 +38,7 @@ void main() {
           'is_form_data': req.isFormData(),
           'host': req.host(),
           'ip': req.ip(),
-        }).withHeaders(<String, String>{
-          'x-key': 'ABCD',
-        });
+        }).withHeaders(<String, String>{'x-key': 'ABCD'});
       });
 
       Uri url = Uri.parse('$baseUrl/with_headers/1');
@@ -50,10 +48,7 @@ void main() {
           'content-type': 'application/json',
           'x-auth-key': 'Bearer 1234',
         },
-        body: jsonEncode(<String, dynamic>{
-          'title': 'hello',
-          'count': 5,
-        }),
+        body: jsonEncode(<String, dynamic>{'title': 'hello', 'count': 5}),
       );
       Map<String, dynamic> jsond = jsonDecode(res.body);
       expect(jsond['has_count'], true);
@@ -122,12 +117,8 @@ void main() {
       Uri url = Uri.parse('$baseUrl/request/add/merge');
       http.Response res = await http.post(
         url,
-        headers: <String, String>{
-          'content-type': 'application/json',
-        },
-        body: jsonEncode(<String, String>{
-          'title': 'hello',
-        }),
+        headers: <String, String>{'content-type': 'application/json'},
+        body: jsonEncode(<String, String>{'title': 'hello'}),
       );
       Map<String, dynamic> jsond = jsonDecode(res.body);
       expect(jsond['title'], 'hello');
@@ -143,12 +134,8 @@ void main() {
       Uri url = Uri.parse('$baseUrl/request/add/merge');
       http.Response res = await http.post(
         url,
-        headers: <String, String>{
-          'content-type': 'application/json',
-        },
-        body: jsonEncode(<String, String>{
-          'title': 'hello',
-        }),
+        headers: <String, String>{'content-type': 'application/json'},
+        body: jsonEncode(<String, String>{'title': 'hello'}),
       );
       Map<String, dynamic> jsond = jsonDecode(res.body);
       expect(jsond['title'], 'hello');

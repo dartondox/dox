@@ -7,16 +7,22 @@ void main() {
       Map<String, dynamic> map = <String, dynamic>{
         'user': <String, dynamic>{
           'info': <String, dynamic>{'name': 'aj'},
-          'hobbies': <String>['reading', 'driving', 'dancing']
-        }
+          'hobbies': <String>['reading', 'driving', 'dancing'],
+        },
       };
 
       expect(map.getParam('user.info.name'), 'aj');
       expect(map.getParam('user.info'), <String, String>{'name': 'aj'});
-      expect(map.getParam('user.hobbies'),
-          <String>['reading', 'driving', 'dancing']);
-      expect(map.getParam('user.hobbies.foo'),
-          <String>['reading', 'driving', 'dancing']);
+      expect(map.getParam('user.hobbies'), <String>[
+        'reading',
+        'driving',
+        'dancing',
+      ]);
+      expect(map.getParam('user.hobbies.foo'), <String>[
+        'reading',
+        'driving',
+        'dancing',
+      ]);
     });
 
     test('remove param by dot', () {
@@ -24,12 +30,12 @@ void main() {
         'user': <String, dynamic>{
           'info': <String, String>{'name': 'aj'},
           'foo': 'bar',
-        }
+        },
       };
 
       Map<String, dynamic> newMap = map.removeParam('user.info');
       expect(newMap, <String, dynamic>{
-        'user': <String, String>{'foo': 'bar'}
+        'user': <String, String>{'foo': 'bar'},
       });
     });
   });

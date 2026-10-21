@@ -51,7 +51,7 @@ Map<String, String> loadEnv() {
   return data;
 }
 
-String parseName(name) {
+String parseName(String name) {
   DateTime now = DateTime.now();
   String uuid =
       '${now.year}_${_formatNumber(now.month)}_${_formatNumber(now.day)}_${_formatNumber(now.hour)}${_formatNumber(now.minute)}${_formatNumber(now.second)}${now.microsecond}';
@@ -63,6 +63,6 @@ String _formatNumber(int number) {
   return number.toString().padLeft(2, '0');
 }
 
-String fileGetContents(path) {
+String fileGetContents(String path) {
   return File(path).readAsStringSync();
 }

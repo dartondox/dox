@@ -103,25 +103,32 @@ void main() {
       Map<String, dynamic> doc = buildApi().toJson();
       expect(checker.check(doc), isEmpty);
       expect(doc['openapi'], '3.1.0');
-      expect((doc['paths'] as Map<dynamic, dynamic>).keys,
-          <String>['/users/{id}', '/users']);
+      expect((doc['paths'] as Map<dynamic, dynamic>).keys, <String>[
+        '/users/{id}',
+        '/users',
+      ]);
       Map<dynamic, dynamic> components =
           doc['components'] as Map<dynamic, dynamic>;
-      expect((components['schemas'] as Map<dynamic, dynamic>).keys,
-          <String>['User']);
-      expect((components['securitySchemes'] as Map<dynamic, dynamic>).keys,
-          <String>['bearerAuth', 'apiKey']);
+      expect((components['schemas'] as Map<dynamic, dynamic>).keys, <String>[
+        'User',
+      ]);
+      expect(
+        (components['securitySchemes'] as Map<dynamic, dynamic>).keys,
+        <String>['bearerAuth', 'apiKey'],
+      );
     });
 
     test('groups methods under one path', () {
-      Map<dynamic, dynamic> users = (buildApi().toJson()['paths']
-          as Map<dynamic, dynamic>)['/users'] as Map<dynamic, dynamic>;
+      Map<dynamic, dynamic> users =
+          (buildApi().toJson()['paths'] as Map<dynamic, dynamic>)['/users']
+              as Map<dynamic, dynamic>;
       expect(users.keys, <String>['get', 'post']);
     });
 
     test('leaves out empty optional blocks', () {
-      Map<String, dynamic> doc =
-          OpenApi(info: const Info(title: 't', version: '1')).toJson();
+      Map<String, dynamic> doc = OpenApi(
+        info: const Info(title: 't', version: '1'),
+      ).toJson();
       expect(doc, <String, dynamic>{
         'openapi': '3.1.0',
         'info': <String, dynamic>{'title': 't', 'version': '1'},
@@ -171,8 +178,9 @@ void main() {
       Map<dynamic, dynamic> paths = doc['paths'] as Map<dynamic, dynamic>;
       expect(paths.containsKey('/cache'), isFalse);
       expect(paths.containsKey('/blog/{slug}/comments'), isTrue);
-      Map<dynamic, dynamic> getUser = (paths['/users/{id}']
-          as Map<dynamic, dynamic>)['get'] as Map<dynamic, dynamic>;
+      Map<dynamic, dynamic> getUser =
+          (paths['/users/{id}'] as Map<dynamic, dynamic>)['get']
+              as Map<dynamic, dynamic>;
       expect(getUser['summary'], 'Get one user');
     });
 
@@ -204,8 +212,9 @@ void main() {
     test('skips functions and the handler in middleware names', () {
       DoxRouteAdapter adapter = const DoxRouteAdapter();
       expect(
-          adapter.middlewareNames(<dynamic>[handler, LogMiddleware(), handler]),
-          <String>['LogMiddleware']);
+        adapter.middlewareNames(<dynamic>[handler, LogMiddleware(), handler]),
+        <String>['LogMiddleware'],
+      );
       expect(adapter.middlewareNames(null), isEmpty);
       expect(adapter.middlewareNames(handler), isEmpty);
     });
@@ -213,8 +222,10 @@ void main() {
 
   group('OpenApiChecker catches broken documents', () {
     test('missing info and bad version', () {
-      List<String> errors = checker.check(
-          <String, dynamic>{'openapi': '3.0.0', 'paths': <String, dynamic>{}});
+      List<String> errors = checker.check(<String, dynamic>{
+        'openapi': '3.0.0',
+        'paths': <String, dynamic>{},
+      });
       expect(errors, contains('openapi must be a 3.1.x string'));
       expect(errors, contains('info is required'));
     });
@@ -223,7 +234,8 @@ void main() {
       Map<String, dynamic> doc = buildApi().toJson();
       Map<dynamic, dynamic> op =
           ((doc['paths'] as Map<dynamic, dynamic>)['/users/{id}']
-              as Map<dynamic, dynamic>)['get'] as Map<dynamic, dynamic>;
+                  as Map<dynamic, dynamic>)['get']
+              as Map<dynamic, dynamic>;
       (op['parameters'] as List<dynamic>).clear();
       (op['parameters'] as List<dynamic>).add(<String, dynamic>{
         'name': 'other',
@@ -232,22 +244,32 @@ void main() {
         'schema': <String, dynamic>{'type': 'string'},
       });
       List<String> errors = checker.check(doc);
-      expect(errors,
-          contains('get /users/{id}: path parameter id is not declared'));
-      expect(errors,
-          contains('get /users/{id}: path parameter other is not in the path'));
+      expect(
+        errors,
+        contains('get /users/{id}: path parameter id is not declared'),
+      );
+      expect(
+        errors,
+        contains('get /users/{id}: path parameter other is not in the path'),
+      );
     });
 
     test('broken ref and unknown security scheme', () {
       ApiDoc docs = ApiDoc();
-      docs.route('GET', '/x',
-          body: docs.ref('Missing'),
-          security: <Map<String, List<String>>>[
-            <String, List<String>>{'nope': <String>[]},
-          ]);
+      docs.route(
+        'GET',
+        '/x',
+        body: docs.ref('Missing'),
+        security: <Map<String, List<String>>>[
+          <String, List<String>>{'nope': <String>[]},
+        ],
+      );
       List<String> errors = checker.check(
-          OpenApi(info: const Info(title: 't', version: '1'), docs: docs)
-              .toJson());
+        OpenApi(
+          info: const Info(title: 't', version: '1'),
+          docs: docs,
+        ).toJson(),
+      );
       expect(errors.join('\n'), contains('cannot resolve'));
       expect(errors, contains('security scheme nope is not defined'));
     });
@@ -267,28 +289,34 @@ void main() {
     test('writes openapi.json and openapi.yaml', () async {
       String dir = '${temp.path}/nested/out';
       List<File> files = await buildApi().writeFiles(dir);
-      expect(<String>[
-        files[0].uri.pathSegments.last,
-        files[1].uri.pathSegments.last
-      ], <String>[
-        'openapi.json',
-        'openapi.yaml'
-      ]);
+      expect(
+        <String>[
+          files[0].uri.pathSegments.last,
+          files[1].uri.pathSegments.last,
+        ],
+        <String>['openapi.json', 'openapi.yaml'],
+      );
       Object? json = jsonDecode(await files[0].readAsString());
-      Object? yaml =
-          jsonDecode(jsonEncode(loadYaml(await files[1].readAsString())));
+      Object? yaml = jsonDecode(
+        jsonEncode(loadYaml(await files[1].readAsString())),
+      );
       expect(yaml, json);
       expect(checker.check(json as Map<String, dynamic>), isEmpty);
     });
 
     test('generateOpenApi adds routes then writes files', () async {
       OpenApi api = buildApi();
-      List<File> files =
-          await generateOpenApi(api, temp.path, routes: doxRoutes());
+      List<File> files = await generateOpenApi(
+        api,
+        temp.path,
+        routes: doxRoutes(),
+      );
       Map<String, dynamic> json =
           jsonDecode(await files[0].readAsString()) as Map<String, dynamic>;
-      expect((json['paths'] as Map<dynamic, dynamic>).containsKey('/ping'),
-          isTrue);
+      expect(
+        (json['paths'] as Map<dynamic, dynamic>).containsKey('/ping'),
+        isTrue,
+      );
       expect(checker.check(json), isEmpty);
     });
   });

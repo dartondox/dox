@@ -9,7 +9,7 @@ import '../core/sentinels.dart';
 /// Made by `v.union()`.
 class UnionSchema<O> extends Schema<O> with FluentSchema<UnionSchema<O>, O> {
   UnionSchema(List<Schema<O>> options)
-      : options = List<Schema<O>>.unmodifiable(options);
+    : options = List<Schema<O>>.unmodifiable(options);
 
   /// The schemas to try, in order.
   final List<Schema<O>> options;

@@ -84,10 +84,12 @@ class Dox implements IDox {
     DoxServer().setResponseHandler(config.responseHandler);
     await DoxServer().listen(config.serverPort, isolateId: 1);
 
-    Logger.info(sprintf(
-      'Server started at http://127.0.0.1:%s with $isolatesToSpawn isolate',
-      <dynamic>[Dox().config.serverPort],
-    ));
+    Logger.info(
+      sprintf(
+        'Server started at http://127.0.0.1:%s with $isolatesToSpawn isolate',
+        <dynamic>[Dox().config.serverPort],
+      ),
+    );
   }
 
   /// ####### functions need to run on isolate #######

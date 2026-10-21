@@ -12,7 +12,7 @@ import 'constants/cache_constants.dart';
 /// ```
 abstract class CacheLock {
   CacheLock(this.name, this.ttl, [String? owner])
-      : owner = owner ?? randomOwner();
+    : owner = owner ?? randomOwner();
 
   /// Lock name.
   final String name;

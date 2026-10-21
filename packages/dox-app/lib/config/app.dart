@@ -48,18 +48,12 @@ AppConfig appConfig = AppConfig(
   /// -------------------------------
   /// By registering global middleware here,
   /// middleware will be applied to all the routes.
-  globalMiddleware: <dynamic>[
-    LogMiddleware(enabled: true),
-  ],
+  globalMiddleware: <dynamic>[LogMiddleware(enabled: true)],
 
   /// Routers
   /// -------------------------------
   /// Register routers to create route to dox framework.
-  routers: <Router>[
-    WebRouter(),
-    ApiRouter(),
-    WebsocketRouter(),
-  ],
+  routers: <Router>[WebRouter(), ApiRouter(), WebsocketRouter()],
 
   /// Response handler
   responseHandler: ResponseHandler(),

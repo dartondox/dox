@@ -27,7 +27,7 @@ class WebsocketEmitEvent {
     });
   }
 
-  static fromString(String json) {
+  static WebsocketEmitEvent fromString(String json) {
     Map<String, dynamic> jsond = JSON.parse(json);
     return WebsocketEmitEvent(
       senderId: jsond['senderId'],

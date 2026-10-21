@@ -71,15 +71,20 @@ FakeRequest bearer(String? token) {
 }
 
 void init({Duration? expiresIn}) {
-  Auth.initialize(AuthConfig(
-    defaultGuard: 'web',
-    guards: <String, AuthGuard>{
-      'web': AuthGuard(
-        driver: JwtAuthDriver(secret: SecretKey(secret), expiresIn: expiresIn),
-        provider: AuthProvider(model: () => FakeUser()),
-      ),
-    },
-  ));
+  Auth.initialize(
+    AuthConfig(
+      defaultGuard: 'web',
+      guards: <String, AuthGuard>{
+        'web': AuthGuard(
+          driver: JwtAuthDriver(
+            secret: SecretKey(secret),
+            expiresIn: expiresIn,
+          ),
+          provider: AuthProvider(model: () => FakeUser()),
+        ),
+      },
+    ),
+  );
 }
 
 void main() {
@@ -122,14 +127,16 @@ void main() {
       expect(auth.isLoggedIn(), isFalse);
     });
 
-    test('verifyToken with a token signed by another secret is rejected',
-        () async {
-      String token =
-          JWT(<String, dynamic>{'id': 1}).sign(SecretKey('other-secret'));
-      Auth auth = Auth();
-      await auth.verifyToken(bearer(token));
-      expect(auth.isLoggedIn(), isFalse);
-    });
+    test(
+      'verifyToken with a token signed by another secret is rejected',
+      () async {
+        String token = JWT(<String, dynamic>{'id': 1})
+            .sign(SecretKey('other-secret'));
+        Auth auth = Auth();
+        await auth.verifyToken(bearer(token));
+        expect(auth.isLoggedIn(), isFalse);
+      },
+    );
 
     test('verifyToken with an expired token is rejected', () async {
       init(expiresIn: Duration(seconds: 1));
@@ -150,54 +157,68 @@ void main() {
 
     test('attempt with right credentials returns a token', () async {
       Auth auth = Auth();
-      String? token = await auth.attempt(
-          <String, dynamic>{'email': 'a@dox.dev', 'password': 'secret'});
+      String? token = await auth.attempt(<String, dynamic>{
+        'email': 'a@dox.dev',
+        'password': 'secret',
+      });
       expect(token, isNotNull);
       expect(auth.isLoggedIn(), isTrue);
     });
 
     test('attempt with wrong password returns null', () async {
       Auth auth = Auth();
-      String? token = await auth.attempt(
-          <String, dynamic>{'email': 'a@dox.dev', 'password': 'wrong'});
+      String? token = await auth.attempt(<String, dynamic>{
+        'email': 'a@dox.dev',
+        'password': 'wrong',
+      });
       expect(token, isNull);
       expect(auth.isLoggedIn(), isFalse);
     });
 
     test('attempt with unknown email returns null', () async {
-      String? token = await Auth().attempt(
-          <String, dynamic>{'email': 'nobody@dox.dev', 'password': 'secret'});
+      String? token = await Auth().attempt(<String, dynamic>{
+        'email': 'nobody@dox.dev',
+        'password': 'secret',
+      });
       expect(token, isNull);
     });
 
     test('attempt without a password returns null', () async {
-      String? token =
-          await Auth().attempt(<String, dynamic>{'email': 'a@dox.dev'});
+      String? token = await Auth().attempt(<String, dynamic>{
+        'email': 'a@dox.dev',
+      });
       expect(token, isNull);
     });
 
     test('attempt with only a password returns null', () async {
-      String? token =
-          await Auth().attempt(<String, dynamic>{'password': 'secret'});
+      String? token = await Auth().attempt(<String, dynamic>{
+        'password': 'secret',
+      });
       expect(token, isNull);
     });
 
     test('attempt with a non-string password returns null', () async {
-      String? token = await Auth()
-          .attempt(<String, dynamic>{'email': 'a@dox.dev', 'password': 123});
+      String? token = await Auth().attempt(<String, dynamic>{
+        'email': 'a@dox.dev',
+        'password': 123,
+      });
       expect(token, isNull);
     });
   });
 
   group('AuthMiddleware |', () {
     test('rejects a request with no token', () async {
-      expect(() => AuthMiddleware().handle(FakeRequest()),
-          throwsA(isA<UnAuthorizedException>()));
+      expect(
+        () => AuthMiddleware().handle(FakeRequest()),
+        throwsA(isA<UnAuthorizedException>()),
+      );
     });
 
     test('rejects a request with a bad token', () async {
-      expect(() => AuthMiddleware().handle(bearer('bad.token.here')),
-          throwsA(isA<UnAuthorizedException>()));
+      expect(
+        () => AuthMiddleware().handle(bearer('bad.token.here')),
+        throwsA(isA<UnAuthorizedException>()),
+      );
     });
 
     test('accepts a request with a good token and merges auth', () async {

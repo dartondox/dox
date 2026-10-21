@@ -1,30 +1,35 @@
 # Production image: an AOT-compiled binary on an empty (scratch) base.
 # Never run production with `dart run`. It uses the JIT: more memory,
 # slower start. See docs/digging-deeper/deployment.md.
+#
+# This app is a package of the dox pub workspace, so build it from the
+# repo root (docker-compose.yml does this):
+#   docker build -f packages/dox-app/Dockerfile .
 
 FROM dart:stable AS build
 
-# Resolve app dependencies.
-WORKDIR /app
-COPY pubspec.* ./
+# Resolve the workspace (one pubspec.lock at the root).
+WORKDIR /src
+COPY . .
 RUN dart pub get
 
-# Copy app source code (except anything in .dockerignore) and AOT compile app.
-COPY . .
-RUN dart pub get --offline
+# `dart build cli` is AOT like `dart compile exe`, and it also runs build
+# hooks. sqlite3 v3 uses a build hook to bundle SQLite into build/bundle/lib.
+WORKDIR /src/packages/dox-app
 RUN dart run build_runner build --delete-conflicting-outputs
-RUN mkdir -p build && dart compile exe bin/server.dart -o build/server
+RUN dart build cli --target bin/server.dart --output build
 
 # Lay out the final file tree:
-# /app/bin/server, /app/db/migration, /app/storage and a writable /tmp
-# (uploads bigger than 1 MB are streamed to a temp file).
-RUN mkdir -p /out/app/bin /out/app/storage /out/tmp \
+# /app/bin/server, /app/lib (native libraries), /app/db/migration,
+# /app/storage and a writable /tmp (uploads bigger than 1 MB are streamed
+# to a temp file).
+RUN mkdir -p /out/app/storage /out/tmp \
   && chmod 1777 /out/tmp \
-  && cp build/server /out/app/bin/server \
+  && cp -r build/bundle/. /out/app/ \
   && cp -r db /out/app/db
 
 # Minimal serving image: the AOT runtime files from the dart image
-# (`/runtime/`) plus our binary. No Dart SDK, no source code.
+# (`/runtime/`) plus our bundle. No Dart SDK, no source code.
 FROM scratch
 COPY --from=build /runtime/ /
 COPY --from=build /out/ /

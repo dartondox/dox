@@ -5,7 +5,7 @@ void main() {
   group('Validation |', () {
     test('required on null with dot', () {
       DoxValidator validator = DoxValidator(<String, dynamic>{
-        'user': <String, dynamic>{'name': null}
+        'user': <String, dynamic>{'name': null},
       });
       validator.validate(<String, String>{'user.name': 'required'});
       Map<String, dynamic> errors = validator.errors;
@@ -27,32 +27,36 @@ void main() {
     });
 
     test('required on list empty', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'items': <String>[]});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'items': <String>[],
+      });
       validator.validate(<String, String>{'items': 'required'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['items'], 'The items is required');
     });
 
     test('should not be error', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'email': 'support@dartondox.dev'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'email': 'support@dartondox.dev',
+      });
       validator.validate(<String, String>{'email': 'required'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['email'], null);
     });
 
     test('invalid email', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'email': 'invalid'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'email': 'invalid',
+      });
       validator.validate(<String, String>{'email': 'required|email'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['email'], 'The email is not a valid email');
     });
 
     test('valid email', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'email': 'support@dartondox.dev'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'email': 'support@dartondox.dev',
+      });
       validator.validate(<String, String>{'email': 'required|email'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['email'], null);
@@ -108,8 +112,9 @@ void main() {
     });
 
     test('alpha_dash', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'name': 'dox_web-framework'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'name': 'dox_web-framework',
+      });
       validator.validate(<String, String>{'name': 'alpha_dash'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['name'], null);
@@ -137,8 +142,9 @@ void main() {
     });
 
     test('ip', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'ip': '192.168.1.1'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'ip': '192.168.1.1',
+      });
       validator.validate(<String, String>{'ip': 'ip'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['ip'], null);
@@ -152,8 +158,9 @@ void main() {
     });
 
     test('non boolean', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'active': 'true'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'active': 'true',
+      });
       validator.validate(<String, String>{'active': 'boolean'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['active'], 'The active must be a boolean');
@@ -181,16 +188,18 @@ void main() {
     });
 
     test('non double', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'amount': 'double'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'amount': 'double',
+      });
       validator.validate(<String, String>{'amount': 'double'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['amount'], 'The amount must be a double');
     });
 
     test('double', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'amount': '10.2'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'amount': '10.2',
+      });
       validator.validate(<String, String>{'amount': 'double'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['amount'], null);
@@ -198,7 +207,7 @@ void main() {
 
     test('array', () {
       DoxValidator validator = DoxValidator(<String, dynamic>{
-        'list': <String>['1', '2']
+        'list': <String>['1', '2'],
       });
       validator.validate(<String, String>{'list': 'array'});
       Map<String, dynamic> errors = validator.errors;
@@ -206,57 +215,66 @@ void main() {
     });
 
     test('non array', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'list': 'this is a string'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'list': 'this is a string',
+      });
       validator.validate(<String, String>{'list': 'array'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['list'], 'The list must be an array');
     });
 
     test('in', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'status': 'active'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'status': 'active',
+      });
       validator.validate(<String, String>{'status': 'in:active,pending'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['status'], null);
     });
 
     test('invalid in', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'status': 'failed'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'status': 'failed',
+      });
       validator.validate(<String, String>{'status': 'in:active,pending'});
       Map<String, dynamic> errors = validator.errors;
-      expect(errors['status'],
-          'The selected status is invalid. Valid options are active, and pending');
+      expect(
+        errors['status'],
+        'The selected status is invalid. Valid options are active, and pending',
+      );
     });
 
     test('not_in', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'status': 'failed'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'status': 'failed',
+      });
       validator.validate(<String, String>{'status': 'not_in:active,pending'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['status'], null);
     });
 
     test('invalid not_in', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'status': 'active'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'status': 'active',
+      });
       validator.validate(<String, String>{'status': 'not_in:active,pending'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['status'], 'The status field cannot be active');
     });
 
     test('date', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'dob': '1994-11-22'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'dob': '1994-11-22',
+      });
       validator.validate(<String, String>{'dob': 'date'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['dob'], null);
     });
 
     test('invalid date', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'dob': '1994/11/22'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'dob': '1994/11/22',
+      });
       validator.validate(<String, String>{'dob': 'date'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['dob'], 'The dob must be a date');
@@ -264,7 +282,7 @@ void main() {
 
     test('map', () {
       DoxValidator validator = DoxValidator(<String, dynamic>{
-        'info': <String, String>{'name': 'dox'}
+        'info': <String, String>{'name': 'dox'},
       });
       validator.validate(<String, String>{'info': 'json'});
       Map<String, dynamic> errors = validator.errors;
@@ -272,8 +290,9 @@ void main() {
     });
 
     test('not map', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'info': 'user info'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'info': 'user info',
+      });
       validator.validate(<String, String>{'info': 'json'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['info'], 'The info is not a valid json');
@@ -281,7 +300,7 @@ void main() {
 
     test('map with dot', () {
       DoxValidator validator = DoxValidator(<String, dynamic>{
-        'info': <String, String>{'name': 'dox', 'email': ''}
+        'info': <String, String>{'name': 'dox', 'email': ''},
       });
       validator.validate(<String, String>{
         'info.name': 'required|string',
@@ -293,80 +312,90 @@ void main() {
     });
 
     test('invalid url', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'url': 'just string'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'url': 'just string',
+      });
       validator.validate(<String, String>{'url': 'url'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['url'], 'The url must be a url');
     });
 
     test('url', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'url': 'https://dartondox.dev'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'url': 'https://dartondox.dev',
+      });
       validator.validate(<String, String>{'url': 'url'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['url'], null);
     });
 
     test('invalid uuid', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'uuid': 'just string'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'uuid': 'just string',
+      });
       validator.validate(<String, String>{'uuid': 'uuid'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['uuid'], 'The uuid is invalid uuid');
     });
 
     test('uuid', () {
-      DoxValidator validator = DoxValidator(
-          <String, dynamic>{'uuid': '30aa26a1-04f4-481e-80d1-59fdb4b9fdf5'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'uuid': '30aa26a1-04f4-481e-80d1-59fdb4b9fdf5',
+      });
       validator.validate(<String, String>{'uuid': 'uuid'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['uuid'], null);
     });
 
     test('invalid min_length', () {
-      DoxValidator validator = DoxValidator(
-          <String, dynamic>{'uuid': '30aa26a1-04f4-481e-80d1-59fdb4b9fdf5'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'uuid': '30aa26a1-04f4-481e-80d1-59fdb4b9fdf5',
+      });
       validator.validate(<String, String>{'uuid': 'min_length:50'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['uuid'], 'The uuid must be at least 50 character');
     });
 
     test('min_length', () {
-      DoxValidator validator = DoxValidator(
-          <String, dynamic>{'uuid': '30aa26a1-04f4-481e-80d1-59fdb4b9fdf5'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'uuid': '30aa26a1-04f4-481e-80d1-59fdb4b9fdf5',
+      });
       validator.validate(<String, String>{'uuid': 'min_length:10'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['uuid'], null);
     });
 
     test('invalid max_length', () {
-      DoxValidator validator = DoxValidator(
-          <String, dynamic>{'uuid': '30aa26a1-04f4-481e-80d1-59fdb4b9fdf5'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'uuid': '30aa26a1-04f4-481e-80d1-59fdb4b9fdf5',
+      });
       validator.validate(<String, String>{'uuid': 'max_length:10'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['uuid'], 'The uuid may not be greater than 10 character');
     });
 
     test('max_length', () {
-      DoxValidator validator = DoxValidator(
-          <String, dynamic>{'uuid': '30aa26a1-04f4-481e-80d1-59fdb4b9fdf5'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'uuid': '30aa26a1-04f4-481e-80d1-59fdb4b9fdf5',
+      });
       validator.validate(<String, String>{'uuid': 'max_length:50'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['uuid'], null);
     });
 
     test('invalid length between', () {
-      DoxValidator validator = DoxValidator(
-          <String, dynamic>{'uuid': '30aa26a1-04f4-481e-80d1-59fdb4b9fdf5'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'uuid': '30aa26a1-04f4-481e-80d1-59fdb4b9fdf5',
+      });
       validator.validate(<String, String>{'uuid': 'length_between:10,15'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['uuid'], 'The uuid must be between 10 and 15 character');
     });
 
     test('length between', () {
-      DoxValidator validator = DoxValidator(
-          <String, dynamic>{'uuid': '30aa26a1-04f4-481e-80d1-59fdb4b9fdf5'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'uuid': '30aa26a1-04f4-481e-80d1-59fdb4b9fdf5',
+      });
       validator.validate(<String, String>{'uuid': 'length_between:10,50'});
       Map<String, dynamic> errors = validator.errors;
       expect(errors['uuid'], null);
@@ -481,8 +510,9 @@ void main() {
         'password': '12345678',
         'password_confirm': '12345678',
       });
-      validator
-          .validate(<String, String>{'password': 'confirmed:password_confirm'});
+      validator.validate(<String, String>{
+        'password': 'confirmed:password_confirm',
+      });
       Map<String, dynamic> errors = validator.errors;
       expect(errors['password'], null);
     });
@@ -555,15 +585,15 @@ void main() {
             'items': <Map<String, String>>[
               <String, String>{'title': ''},
               <String, String>{'title': 'case'},
-            ]
+            ],
           },
           <String, dynamic>{
             'name': '',
             'items': <Map<String, String>>[
               <String, String>{'title': 'cable'},
               <String, String>{'title': ''},
-            ]
-          }
+            ],
+          },
         ],
       };
       DoxValidator validator = DoxValidator(data);
@@ -589,8 +619,10 @@ void main() {
     });
 
     test('null or empty optional field skips other rules', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'status': null, 'age': ''});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'status': null,
+        'age': '',
+      });
       validator.validate(<String, String>{
         'status': 'in:active,inactive',
         'age': 'integer',
@@ -601,8 +633,10 @@ void main() {
     test('present optional field still runs rules', () {
       DoxValidator validator = DoxValidator(<String, dynamic>{'status': 'x'});
       validator.validate(<String, String>{'status': 'in:active,inactive'});
-      expect(validator.errors['status'],
-          'The selected status is invalid. Valid options are active, and inactive');
+      expect(
+        validator.errors['status'],
+        'The selected status is invalid. Valid options are active, and inactive',
+      );
     });
 
     test('required still fails on absent field', () {
@@ -618,8 +652,10 @@ void main() {
     });
 
     test('nullable', () {
-      DoxValidator validator =
-          DoxValidator(<String, dynamic>{'age': null, 'count': 'abc'});
+      DoxValidator validator = DoxValidator(<String, dynamic>{
+        'age': null,
+        'count': 'abc',
+      });
       validator.validate(<String, String>{
         'age': 'nullable|integer',
         'count': 'nullable|integer',
@@ -640,9 +676,7 @@ void main() {
 
     test('min_length and max_length include the limit', () {
       DoxValidator validator = DoxValidator(<String, dynamic>{'code': 'abcd'});
-      validator.validate(<String, String>{
-        'code': 'min_length:4|max_length:4',
-      });
+      validator.validate(<String, String>{'code': 'min_length:4|max_length:4'});
       expect(validator.errors, isEmpty);
     });
   });

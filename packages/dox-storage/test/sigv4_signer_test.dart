@@ -28,8 +28,10 @@ void main() {
       Map<String, dynamic> vector = raw as Map<String, dynamic>;
       test(vector['name'] as String, () {
         Map<String, String> headers = <String, String>{};
-        (vector['headers'] as Map<String, dynamic>)
-            .forEach((String name, dynamic value) {
+        (vector['headers'] as Map<String, dynamic>).forEach((
+          String name,
+          dynamic value,
+        ) {
           headers[name] = value as String;
         });
         Map<String, String> signed = _signer(vector).sign(

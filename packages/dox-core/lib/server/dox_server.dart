@@ -20,8 +20,11 @@ class DoxServer {
   /// ```
   /// DoxServer().listen(3000);
   /// ```
-  Future<HttpServer> listen(int port,
-      {Function? onError, int? isolateId}) async {
+  Future<HttpServer> listen(
+    int port, {
+    Function? onError,
+    int? isolateId,
+  }) async {
     HttpServer server = await HttpServer.bind(
       InternetAddress.anyIPv6,
       port,
@@ -31,14 +34,17 @@ class DoxServer {
 
     /// a stray async error from app code (eg. an un-awaited future that
     /// fails) is logged here, instead of killing the whole isolate.
-    runZonedGuarded(() {
-      server.listen(
-        httpRequestHandler,
-        onError: onError ?? (dynamic error) => stderr.writeln(error),
-      );
-    }, (Object error, StackTrace stackTrace) {
-      Dox().config.errorHandler(error, stackTrace);
-    });
+    runZonedGuarded(
+      () {
+        server.listen(
+          httpRequestHandler,
+          onError: onError ?? (dynamic error) => stderr.writeln(error),
+        );
+      },
+      (Object error, StackTrace stackTrace) {
+        Dox().config.errorHandler(error, stackTrace);
+      },
+    );
     httpServer = server;
     return server;
   }

@@ -10,8 +10,9 @@ class NodeRunner {
   static String? skipReason() {
     try {
       ProcessResult node = Process.runSync('node', <String>['--version']);
-      ProcessResult npm =
-          Process.runSync('npm', <String>['--version'], runInShell: true);
+      ProcessResult npm = Process.runSync('npm', <String>[
+        '--version',
+      ], runInShell: true);
       if (node.exitCode != 0 || npm.exitCode != 0) return 'node/npm failed';
       return null;
     } on ProcessException {
@@ -35,16 +36,17 @@ class NodeRunner {
 
   /// Runs `node <script> <args>` and returns the result.
   Future<ProcessResult> run(String script, List<String> args) {
-    return Process.run(
-      'node',
-      <String>[script, ...args],
-      workingDirectory: dir,
-    ).timeout(const Duration(seconds: 20));
+    return Process.run('node', <String>[
+      script,
+      ...args,
+    ], workingDirectory: dir).timeout(const Duration(seconds: 20));
   }
 
   /// Starts `node <script> <args>` and returns the process.
   Future<Process> start(String script, List<String> args) {
-    return Process.start('node', <String>[script, ...args],
-        workingDirectory: dir);
+    return Process.start('node', <String>[
+      script,
+      ...args,
+    ], workingDirectory: dir);
   }
 }

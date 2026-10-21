@@ -27,14 +27,20 @@ class SchemaResolver {
     try {
       result = (source as dynamic).toJsonSchema();
     } on NoSuchMethodError {
-      throw ArgumentError.value(source, 'schema',
-          'Use a Map, a JsonSchemaSource or an object with toJsonSchema()');
+      throw ArgumentError.value(
+        source,
+        'schema',
+        'Use a Map, a JsonSchemaSource or an object with toJsonSchema()',
+      );
     }
     if (result is Map) {
       return Map<String, dynamic>.from(result);
     }
     throw ArgumentError.value(
-        source, 'schema', 'toJsonSchema() must return a Map');
+      source,
+      'schema',
+      'toJsonSchema() must return a Map',
+    );
   }
 
   /// Returns a `$ref` map that points to the named schema [name].

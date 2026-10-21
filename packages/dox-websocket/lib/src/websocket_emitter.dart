@@ -63,8 +63,11 @@ class WebsocketEmitter {
   /// ```
   /// emitter.emit('event', message);
   /// ```
-  void emit(String event, dynamic message,
-      {List<String> exclude = const <String>[]}) {
+  void emit(
+    String event,
+    dynamic message, {
+    List<String> exclude = const <String>[],
+  }) {
     WebsocketEmitEvent emitEvent = WebsocketEmitEvent(
       senderId: sender,
       roomId: _roomId,
@@ -84,7 +87,7 @@ class WebsocketEmitter {
     adapter.emit(emitEvent);
   }
 
-  static emitEventToSockets(WebsocketEmitEvent event) {
+  static void emitEventToSockets(WebsocketEmitEvent event) {
     List<String> members = _storage.getWebSocketIdsOfTheRoom(event.roomId);
     for (String socketId in members) {
       if (!event.exclude.contains(socketId)) {

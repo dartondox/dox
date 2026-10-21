@@ -89,7 +89,8 @@ class YamlEmitter {
 
   /// Returns [text] as a plain scalar when safe, or in double quotes.
   String quote(String text) {
-    bool plain = _plainSafe.hasMatch(text) &&
+    bool plain =
+        _plainSafe.hasMatch(text) &&
         !text.endsWith(' ') &&
         !_reserved.contains(text.toLowerCase());
     if (plain) {
@@ -116,7 +117,8 @@ class YamlEmitter {
       case 0x0D:
         return r'\r';
     }
-    bool printable = (rune >= 0x20 && rune <= 0x7E) ||
+    bool printable =
+        (rune >= 0x20 && rune <= 0x7E) ||
         rune == 0x85 ||
         (rune >= 0xA0 && rune <= 0xD7FF) ||
         (rune >= 0xE000 && rune <= 0xFFFD && rune != 0xFEFF) ||

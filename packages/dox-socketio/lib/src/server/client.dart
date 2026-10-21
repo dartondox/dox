@@ -12,11 +12,7 @@ import 'socket_io_server.dart';
 
 /// One Engine.IO connection. It can hold sockets of many namespaces.
 class Client implements EngineSocketListener {
-  Client(
-    this.server,
-    this.conn, {
-    SocketEncoder encoder = const SocketEncoder(),
-  }) : _encoder = encoder {
+  Client(this.server, this.conn, {this._encoder = const SocketEncoder()}) {
     conn.listener = this;
     _connectTimer = Timer(server.options.connectTimeout, _onConnectTimeout);
   }
@@ -96,11 +92,13 @@ class Client implements EngineSocketListener {
     if (_sockets.containsKey(packet.nsp)) return;
     Namespace? nsp = server.namespaceFor(packet.nsp);
     if (nsp == null) {
-      sendPacket(SocketPacket(
-        type: SocketPacketType.connectError,
-        nsp: packet.nsp,
-        data: const <String, Object>{'message': invalidNamespaceMessage},
-      ));
+      sendPacket(
+        SocketPacket(
+          type: SocketPacketType.connectError,
+          nsp: packet.nsp,
+          data: const <String, Object>{'message': invalidNamespaceMessage},
+        ),
+      );
       return;
     }
     Object? auth = packet.data;

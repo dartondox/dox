@@ -164,8 +164,9 @@ void main() {
       expect(() => command!.function(['UserController']), returnsNormally);
 
       // Check if file was created
-      final controllerFile =
-          File('lib/app/http/controllers/user.controller.dart');
+      final controllerFile = File(
+        'lib/app/http/controllers/user.controller.dart',
+      );
       expect(controllerFile.existsSync(), isTrue);
 
       // Check file content
@@ -174,18 +175,19 @@ void main() {
       expect(content, contains('index(DoxRequest req)'));
     });
 
-    test(
-        'create:controller with resource flag should generate resource controller',
-        () {
+    test('create:controller with resource flag should generate resource controller', () {
       final command = CommandRegistry.findCommand('create:controller');
       expect(command, isNotNull);
 
       expect(
-          () => command!.function(['UserController', '-r']), returnsNormally);
+        () => command!.function(['UserController', '-r']),
+        returnsNormally,
+      );
 
       // Check if file was created
-      final controllerFile =
-          File('lib/app/http/controllers/user.controller.dart');
+      final controllerFile = File(
+        'lib/app/http/controllers/user.controller.dart',
+      );
       expect(controllerFile.existsSync(), isTrue);
 
       // Check file content for resource methods
@@ -199,27 +201,32 @@ void main() {
       expect(content, contains('destroy(DoxRequest req, String id)'));
     });
 
-    test(
-        'create:controller with websocket flag should generate websocket controller',
-        () {
+    test('create:controller with websocket flag should generate websocket controller', () {
       final command = CommandRegistry.findCommand('create:controller');
       expect(command, isNotNull);
 
       expect(
-          () => command!.function(['UserController', '-ws']), returnsNormally);
+        () => command!.function(['UserController', '-ws']),
+        returnsNormally,
+      );
 
       // Check if file was created
-      final controllerFile =
-          File('lib/app/ws/controllers/user.controller.dart');
+      final controllerFile = File(
+        'lib/app/ws/controllers/user.controller.dart',
+      );
       expect(controllerFile.existsSync(), isTrue);
 
       // Check file content for websocket methods
       final content = controllerFile.readAsStringSync();
       expect(content, contains('class UserController'));
-      expect(content,
-          contains('index(WebsocketEmitter emitter, dynamic message)'));
-      expect(content,
-          contains('import \'package:dox_websocket/dox_websocket.dart\''));
+      expect(
+        content,
+        contains('index(WebsocketEmitter emitter, dynamic message)'),
+      );
+      expect(
+        content,
+        contains('import \'package:dox_websocket/dox_websocket.dart\''),
+      );
     });
 
     test('create:middleware should generate middleware file', () {
@@ -229,8 +236,9 @@ void main() {
       expect(() => command!.function(['AuthMiddleware']), returnsNormally);
 
       // Check if file was created
-      final middlewareFile =
-          File('lib/app/http/middleware/auth.middleware.dart');
+      final middlewareFile = File(
+        'lib/app/http/middleware/auth.middleware.dart',
+      );
       expect(middlewareFile.existsSync(), isTrue);
 
       // Check file content
@@ -262,8 +270,9 @@ void main() {
       expect(() => command!.function(['UserSerializer']), returnsNormally);
 
       // Check if file was created
-      final serializerFile =
-          File('lib/app/http/serializers/user.serializer.dart');
+      final serializerFile = File(
+        'lib/app/http/serializers/user.serializer.dart',
+      );
       expect(serializerFile.existsSync(), isTrue);
 
       // Check file content

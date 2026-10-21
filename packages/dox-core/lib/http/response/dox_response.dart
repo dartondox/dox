@@ -26,8 +26,11 @@ class DoxResponse {
     if (data is DownloadableFile) {
       header(FILE_DOWNLOAD_HEADER, data.contentDisposition);
       _contentType = data.contentType;
-      _contentData =
-          StreamFile(data.contentType, data.stream, length: data.length);
+      _contentData = StreamFile(
+        data.contentType,
+        data.stream,
+        length: data.length,
+      );
     }
   }
 
@@ -123,7 +126,8 @@ class DoxResponse {
     dynamic content = _contentData;
     if (_contentType == null && content is File) {
       _contentType = ContentType.parse(
-          lookupMimeType(content.path) ?? 'application/octet-stream');
+        lookupMimeType(content.path) ?? 'application/octet-stream',
+      );
     }
     if (_contentType != null) {
       request.response.headers.contentType = _contentType;

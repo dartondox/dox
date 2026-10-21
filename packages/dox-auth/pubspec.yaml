@@ -4,14 +4,15 @@ version: 3.0.0-alpha.1
 repository: https://github.com/dartondox/dox
 
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.13.0
+resolution: workspace
 
 dependencies:
-  bcrypt: ^1.1.3
-  dart_jsonwebtoken: ^3.1.1
+  bcrypt: ^1.2.0
+  dart_jsonwebtoken: ^3.4.1
   dox_annotation: ^3.0.0-alpha.1
   dox_orm: ^3.0.0-alpha.1
 
 dev_dependencies:
-  lints: ^5.1.1
-  test: ^1.26.3
+  lints: ^6.1.0
+  test: ^1.33.0

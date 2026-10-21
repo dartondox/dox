@@ -14,23 +14,30 @@ Compile the app to a native binary (AOT).
 dox build
 ```
 
-This makes a `build/` folder:
+This makes a `build/bundle/` folder:
 
-| File                 | What it is                                     |
-| -------------------- | ---------------------------------------------- |
-| `build/server`       | the native binary. No Dart SDK needed to run it |
-| `build/db/`          | your migrations, run at start                  |
-| `build/.env.example` | copy it to `build/.env`, or use env variables  |
+| File                        | What it is                                       |
+| --------------------------- | ------------------------------------------------ |
+| `build/bundle/bin/server`   | the native binary. No Dart SDK needed to run it  |
+| `build/bundle/lib/`         | native libraries from build hooks (eg. SQLite)   |
+| `build/bundle/db/`          | your migrations, run at start                    |
+| `build/bundle/.env.example` | copy it to `build/bundle/.env`, or use env variables |
 
 `dox build` runs `build_runner` first (when your app uses it). Then it runs
-`dart compile exe bin/server.dart -o build/server`. It exits with code 1 when
-a step fails, so CI can stop.
+`dart build cli --target bin/server.dart --output build`. It exits with code 1
+when a step fails, so CI can stop.
+
+!!! warning "Not `dart compile exe`"
+    `dox_orm` depends on `sqlite3` v3. It bundles SQLite with a build hook.
+    `dart compile exe` does not run build hooks, so it stops with an error.
+    `dart build cli` is the same AOT compiler and runs the hooks.
+    Keep `bin/` and `lib/` together: the binary loads the libraries from `../lib`.
 
 Start the application.
 
 ```bash
-cd build
-./server
+cd build/bundle
+./bin/server
 ```
 
 The binary reads `.env` and `db/` from the folder you start it in.
@@ -40,10 +47,33 @@ A real environment variable wins over the `.env` file.
 
 The `Dockerfile` in a new Dox app is a multi-stage build:
 
-1. The `dart:stable` image builds the AOT binary.
+1. The `dart:stable` image builds the AOT bundle with
+   `dart build cli --target bin/server.dart --output build`.
 2. The final image is `FROM scratch`. It holds only the Dart AOT runtime
-   files (`/runtime/` from the dart image), your binary, `db/` and an empty
-   `/tmp`. The image is about 11 MB.
+   files (`/runtime/` from the dart image), the bundle (`/app/bin/server` and
+   `/app/lib/`), `db/` and an empty `/tmp`.
+
+```dockerfile
+FROM dart:stable AS build
+WORKDIR /app
+COPY pubspec.* ./
+RUN dart pub get
+COPY . .
+RUN dart pub get --offline
+RUN dart run build_runner build --delete-conflicting-outputs
+RUN dart build cli --target bin/server.dart --output build
+RUN mkdir -p /out/app/storage /out/tmp \
+  && chmod 1777 /out/tmp \
+  && cp -r build/bundle/. /out/app/ \
+  && cp -r db /out/app/db
+
+FROM scratch
+COPY --from=build /runtime/ /
+COPY --from=build /out/ /
+WORKDIR /app
+EXPOSE 3000
+CMD ["/app/bin/server"]
+```
 
 The image has no `.env` file, so secrets stay out of it. Pass config as
 environment variables.
@@ -157,9 +187,9 @@ Dox uses all CPU cores by default (see [Isolate](isolate.md)).
 ```ini
 # /etc/systemd/system/dox.service
 [Service]
-WorkingDirectory=/srv/app/build
-ExecStart=/srv/app/build/server
-EnvironmentFile=/srv/app/build/.env
+WorkingDirectory=/srv/app/build/bundle
+ExecStart=/srv/app/build/bundle/bin/server
+EnvironmentFile=/srv/app/build/bundle/.env
 Restart=always
 
 [Install]

@@ -70,7 +70,10 @@ void main() {
           isA<DriverException>()
               .having((DriverException e) => e.key, 'key', 'a.txt')
               .having(
-                  (DriverException e) => e.cause, 'cause', isA<StateError>()),
+                (DriverException e) => e.cause,
+                'cause',
+                isA<StateError>(),
+              ),
         ),
       );
     });

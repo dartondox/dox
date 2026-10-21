@@ -44,12 +44,9 @@ void main() {
   });
   print(ok.value);
 
-  ParseResult<Map<String, dynamic>> bad =
-      createPost.safeParse(<String, dynamic>{
-    'title': 'Hi',
-    'slug': 'Hello Dox',
-    'status': 'archived',
-  });
+  ParseResult<Map<String, dynamic>> bad = createPost.safeParse(
+    <String, dynamic>{'title': 'Hi', 'slug': 'Hello Dox', 'status': 'archived'},
+  );
   print(bad.errors);
 
   ObjectSchema legacy = v.fromRules(<String, String>{

@@ -22,15 +22,12 @@ class S3Driver implements DriverContract {
   final S3Client client;
 
   /// Pass [httpClient] to reuse a client or to mock S3 in tests.
-  S3Driver(
-    this.config, {
-    http.Client? httpClient,
-    Clock clock = const Clock(),
-  }) : client = S3Client(
-          config,
-          httpClient: httpClient ?? http.Client(),
-          clock: clock,
-        );
+  S3Driver(this.config, {http.Client? httpClient, Clock clock = const Clock()})
+    : client = S3Client(
+        config,
+        httpClient: httpClient ?? http.Client(),
+        clock: clock,
+      );
 
   /// Close the HTTP client.
   void close() {
@@ -39,7 +36,8 @@ class S3Driver implements DriverContract {
 
   Map<String, String> _writeHeaders(String key, WriteOptions options) {
     Map<String, String> headers = <String, String>{
-      'content-type': options.contentType ??
+      'content-type':
+          options.contentType ??
           lookupMimeType(key) ??
           StorageConstants.defaultContentType,
     };
@@ -72,8 +70,10 @@ class S3Driver implements DriverContract {
 
   @override
   Future<Stream<List<int>>> getStream(String key) async {
-    http.StreamedResponse response =
-        await client.sendStreamed('GET', client.objectUri(key));
+    http.StreamedResponse response = await client.sendStreamed(
+      'GET',
+      client.objectUri(key),
+    );
     if (response.statusCode != 200) {
       client.fail(response.statusCode, await client.readBody(response), key);
     }
@@ -360,8 +360,10 @@ class S3Driver implements DriverContract {
       if (token != null) {
         query['continuation-token'] = token;
       }
-      http.Response response =
-          await client.send('GET', client.bucketUri(query));
+      http.Response response = await client.send(
+        'GET',
+        client.bucketUri(query),
+      );
       client.check(response, prefix);
       String body = client.text(response);
       for (String item in client.xml.all(body, 'Contents')) {
@@ -376,8 +378,9 @@ class S3Driver implements DriverContract {
         entries.add(DriveDirectory(folder.substring(0, folder.length - 1)));
       }
       bool truncated = client.xml.first(body, 'IsTruncated') == 'true';
-      token =
-          truncated ? client.xml.first(body, 'NextContinuationToken') : null;
+      token = truncated
+          ? client.xml.first(body, 'NextContinuationToken')
+          : null;
       if (token == null || limit != null) {
         break;
       }

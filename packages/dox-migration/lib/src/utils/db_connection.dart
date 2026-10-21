@@ -80,7 +80,8 @@ class DbConnection {
       Object? params = values.isEmpty ? null : values;
       mysql.IResultSet result = conn is mysql.MySQLConnectionPool
           ? await conn.withConnection(
-              (mysql.MySQLConnection c) => c.execute(query, params))
+              (mysql.MySQLConnection c) => c.execute(query, params),
+            )
           : await conn.execute(query, params);
       return <Map<String, dynamic>>[
         for (mysql.ResultSetRow row in result.rows) row.typedAssoc(),
@@ -114,21 +115,25 @@ class DbConnection {
       }
     }
     if (conn is mysql.MySQLConnectionPool) {
-      return await conn.withConnection((mysql.MySQLConnection c) =>
-          c.transactional(
-              (mysql.MySQLConnection tx) => callback(DbConnection(tx))));
+      return await conn.withConnection(
+        (mysql.MySQLConnection c) => c.transactional(
+          (mysql.MySQLConnection tx) => callback(DbConnection(tx)),
+        ),
+      );
     }
     if (conn is mysql.MySQLConnection) {
       return await conn.transactional(
-          (mysql.MySQLConnection tx) => callback(DbConnection(tx)));
+        (mysql.MySQLConnection tx) => callback(DbConnection(tx)),
+      );
     }
-    return await conn
-        .runTx((postgres.TxSession tx) => callback(DbConnection(tx)));
+    return await conn.runTx(
+      (postgres.TxSession tx) => callback(DbConnection(tx)),
+    );
   }
 
   Future<void> close() async {
     if (conn is sqlite.Database) {
-      (conn as sqlite.Database).dispose();
+      (conn as sqlite.Database).close();
       return;
     }
     await conn.close();

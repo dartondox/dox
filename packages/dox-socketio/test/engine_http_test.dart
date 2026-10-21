@@ -20,8 +20,10 @@ void main() {
     String? body,
     Map<String, String> headers = const <String, String>{},
   }) async {
-    HttpClientRequest req =
-        await client.openUrl(method, Uri.parse('${base()}?$query'));
+    HttpClientRequest req = await client.openUrl(
+      method,
+      Uri.parse('${base()}?$query'),
+    );
     headers.forEach(req.headers.set);
     if (body != null) req.write(body);
     HttpClientResponse res = await req.close();
@@ -30,8 +32,10 @@ void main() {
   }
 
   Future<String> handshake() async {
-    (int, String, HttpHeaders) res =
-        await request('GET', 'EIO=4&transport=polling');
+    (int, String, HttpHeaders) res = await request(
+      'GET',
+      'EIO=4&transport=polling',
+    );
     return (jsonDecode(res.$2.substring(1)) as Map<String, dynamic>)['sid']
         as String;
   }
@@ -44,16 +48,23 @@ void main() {
         pingTimeout: Duration(milliseconds: 200),
         maxHttpBufferSize: 100,
         cors: CorsOptions(
-            origins: <String>['http://allowed.test'], credentials: true),
+          origins: <String>['http://allowed.test'],
+          credentials: true,
+        ),
       ),
     );
     io.on('connection', (Socket socket) {
       socket.on(
-          'disconnect', (SocketEvent e) => reasons.add(e.data! as String));
+        'disconnect',
+        (SocketEvent e) => reasons.add(e.data! as String),
+      );
       socket.on('ask', (SocketEvent e) async {
         try {
-          await socket.emitWithAck('q', 1,
-              timeout: Duration(milliseconds: 100));
+          await socket.emitWithAck(
+            'q',
+            1,
+            timeout: Duration(milliseconds: 100),
+          );
         } on TimeoutException {
           socket.emit('timed-out');
         }
@@ -69,8 +80,10 @@ void main() {
   });
 
   test('polling handshake sends the open packet', () async {
-    (int, String, HttpHeaders) res =
-        await request('GET', 'EIO=4&transport=polling');
+    (int, String, HttpHeaders) res = await request(
+      'GET',
+      'EIO=4&transport=polling',
+    );
     expect(res.$1, 200);
     expect(res.$2[0], '0');
     Map<String, dynamic> open =
@@ -83,11 +96,15 @@ void main() {
   });
 
   test('errors use Engine.IO codes', () async {
-    (int, String, HttpHeaders) res =
-        await request('GET', 'EIO=3&transport=polling');
+    (int, String, HttpHeaders) res = await request(
+      'GET',
+      'EIO=3&transport=polling',
+    );
     expect(res.$1, 400);
-    expect(jsonDecode(res.$2),
-        <String, Object>{'code': 5, 'message': 'Unsupported protocol version'});
+    expect(jsonDecode(res.$2), <String, Object>{
+      'code': 5,
+      'message': 'Unsupported protocol version',
+    });
     res = await request('GET', 'EIO=4&transport=carrier-pigeon');
     expect((jsonDecode(res.$2) as Map<String, dynamic>)['code'], 0);
     res = await request('GET', 'EIO=4&transport=polling&sid=nope');
@@ -99,8 +116,9 @@ void main() {
   });
 
   test('other paths get 404', () async {
-    HttpClientRequest req =
-        await client.getUrl(Uri.parse('http://127.0.0.1:${http.port}/other'));
+    HttpClientRequest req = await client.getUrl(
+      Uri.parse('http://127.0.0.1:${http.port}/other'),
+    );
     HttpClientResponse res = await req.close();
     await res.drain<void>();
     expect(res.statusCode, 404);
@@ -119,8 +137,11 @@ void main() {
     expect(res.$3.value('access-control-allow-origin'), 'http://allowed.test');
     expect(res.$3.value('access-control-allow-credentials'), 'true');
     expect(res.$3.value('access-control-allow-headers'), 'x-token');
-    res = await request('GET', 'EIO=4&transport=polling',
-        headers: <String, String>{'origin': 'http://evil.test'});
+    res = await request(
+      'GET',
+      'EIO=4&transport=polling',
+      headers: <String, String>{'origin': 'http://evil.test'},
+    );
     expect(res.$3.value('access-control-allow-origin'), isNull);
   });
 
@@ -155,7 +176,8 @@ void main() {
 
   test('websocket: no pong means ping timeout', () async {
     WebSocket ws = await WebSocket.connect(
-        'ws://127.0.0.1:${http.port}/socket.io/?EIO=4&transport=websocket');
+      'ws://127.0.0.1:${http.port}/socket.io/?EIO=4&transport=websocket',
+    );
     StreamIterator<dynamic> frames = StreamIterator<dynamic>(ws);
     expect(await frames.moveNext(), isTrue);
     expect(frames.current as String, startsWith('0{'));
@@ -171,7 +193,8 @@ void main() {
 
   test('websocket: bad packet closes with parse error', () async {
     WebSocket ws = await WebSocket.connect(
-        'ws://127.0.0.1:${http.port}/socket.io/?EIO=4&transport=websocket');
+      'ws://127.0.0.1:${http.port}/socket.io/?EIO=4&transport=websocket',
+    );
     StreamIterator<dynamic> frames = StreamIterator<dynamic>(ws);
     await frames.moveNext();
     ws.add('40');
@@ -183,7 +206,8 @@ void main() {
 
   test('server ack times out', () async {
     WebSocket ws = await WebSocket.connect(
-        'ws://127.0.0.1:${http.port}/socket.io/?EIO=4&transport=websocket');
+      'ws://127.0.0.1:${http.port}/socket.io/?EIO=4&transport=websocket',
+    );
     StreamIterator<dynamic> frames = StreamIterator<dynamic>(ws);
     await frames.moveNext();
     ws.add('40');

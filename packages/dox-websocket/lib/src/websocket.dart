@@ -24,7 +24,7 @@ class WebsocketServer implements IDoxWebsocket {
 
   WebsocketAdapterInterface? _adaptor;
 
-  _initialize() {
+  void _initialize() {
     if (dox != null) {
       dox?.setWebsocket(this);
     }
@@ -35,7 +35,7 @@ class WebsocketServer implements IDoxWebsocket {
     return WebsocketEventHandler();
   }
 
-  adapter(WebsocketAdapterInterface adaptor) {
+  void adapter(WebsocketAdapterInterface adaptor) {
     _adaptor = adaptor;
   }
 

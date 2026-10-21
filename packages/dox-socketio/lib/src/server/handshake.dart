@@ -3,12 +3,12 @@ import '../engine/engine_request.dart';
 /// Details of the connection, like `socket.handshake` in Node.js.
 class Handshake {
   Handshake(EngineRequest request, this.auth)
-      : headers = request.headers,
-        query = request.query,
-        address = request.address,
-        url = request.url,
-        secure = request.secure,
-        time = request.time;
+    : headers = request.headers,
+      query = request.query,
+      address = request.address,
+      url = request.url,
+      secure = request.secure,
+      time = request.time;
 
   /// Request headers. Names are lower case.
   final Map<String, String> headers;

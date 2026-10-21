@@ -132,11 +132,7 @@ class RuleChainSchema extends Schema<Object?> {
     return input is Undefined ? null : input;
   }
 
-  RuleContext _context(
-    Object? input,
-    ParseState state,
-    List<Object> path,
-  ) {
+  RuleContext _context(Object? input, ParseState state, List<Object> path) {
     return RuleContext(state: state, path: path, value: _value(input));
   }
 
@@ -159,12 +155,14 @@ class RuleChainSchema extends Schema<Object?> {
 
   @override
   RuleChainSchema copySchema() {
-    return copyBaseInto(RuleChainSchema(
-      fieldRules: fieldRules,
-      allowNull: allowNull,
-      sometimes: sometimes,
-      child: child,
-    ));
+    return copyBaseInto(
+      RuleChainSchema(
+        fieldRules: fieldRules,
+        allowNull: allowNull,
+        sometimes: sometimes,
+        child: child,
+      ),
+    );
   }
 }
 
@@ -275,8 +273,10 @@ class ImplicitListSchema extends Schema<Object?> {
     }
     List<Object?> output = <Object?>[];
     for (int i = 0; i < input.length; i++) {
-      _add(output,
-          await item.parseValueAsync(input[i], state, <Object>[...path, i]));
+      _add(
+        output,
+        await item.parseValueAsync(input[i], state, <Object>[...path, i]),
+      );
     }
     return output;
   }

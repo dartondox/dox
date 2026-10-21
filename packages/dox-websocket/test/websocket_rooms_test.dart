@@ -89,10 +89,9 @@ class Client {
   }
 
   void send(String event, dynamic message) {
-    socket.add(jsonEncode(<String, dynamic>{
-      'event': event,
-      'message': message,
-    }));
+    socket.add(
+      jsonEncode(<String, dynamic>{'event': event, 'message': message}),
+    );
   }
 
   /// wait for the first message with this event (also checks old messages)
@@ -120,14 +119,16 @@ Future<void> settle() => Future<void>.delayed(Duration(milliseconds: 200));
 void main() {
   group('Websocket rooms (local, no adapter) |', () {
     setUpAll(() async {
-      Dox().initialize(AppConfig(
-        appKey: appConfig.appKey,
-        serverPort: port,
-        totalIsolate: 1,
-        responseHandler: appConfig.responseHandler,
-        routers: <Router>[RoomsRouter()],
-        cache: appConfig.cache,
-      ));
+      Dox().initialize(
+        AppConfig(
+          appKey: appConfig.appKey,
+          serverPort: port,
+          totalIsolate: 1,
+          responseHandler: appConfig.responseHandler,
+          routers: <Router>[RoomsRouter()],
+          cache: appConfig.cache,
+        ),
+      );
       Dox().addService(LocalWebsocketService());
       await Dox().startServer();
     });
@@ -221,17 +222,19 @@ void main() {
       await a.close();
     });
 
-    test('room name from joinRoom works with emitter.room(name) as in docs',
-        () async {
-      Client a = await Client.connect();
-      Client b = await Client.connect();
-      a.send('joinRoom', 'chat');
-      b.send('joinRoom', 'chat');
-      await settle();
-      a.send('docsRoom', <String, String>{'room': 'chat', 'text': 'hey'});
-      expect((await b.next('docsRoom'))['message'], 'hey');
-      await a.close();
-      await b.close();
-    });
+    test(
+      'room name from joinRoom works with emitter.room(name) as in docs',
+      () async {
+        Client a = await Client.connect();
+        Client b = await Client.connect();
+        a.send('joinRoom', 'chat');
+        b.send('joinRoom', 'chat');
+        await settle();
+        a.send('docsRoom', <String, String>{'room': 'chat', 'text': 'hey'});
+        expect((await b.next('docsRoom'))['message'], 'hey');
+        await a.close();
+        await b.close();
+      },
+    );
   });
 }

@@ -30,12 +30,14 @@ class OpenApiServer {
 
   /// Creates a server helper.
   OpenApiServer(this.api, {String? pageTitle})
-      : pageTitle = pageTitle ?? api.info.title;
+    : pageTitle = pageTitle ?? api.info.title;
 
   /// The JSON document.
   OpenApiResponse json() {
     return OpenApiResponse(
-        api.toJsonString(), OpenApiConstants.jsonContentType);
+      api.toJsonString(),
+      OpenApiConstants.jsonContentType,
+    );
   }
 
   /// The YAML document.
@@ -45,11 +47,13 @@ class OpenApiServer {
 
   /// A Swagger UI page that loads [specUrl] from a CDN.
   OpenApiResponse docsPage({String specUrl = OpenApiConstants.jsonPath}) {
-    String cdn = 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@'
+    String cdn =
+        'https://cdn.jsdelivr.net/npm/swagger-ui-dist@'
         '${OpenApiConstants.swaggerUiVersion}';
     String title = const HtmlEscape().convert(pageTitle);
     String url = jsonEncode(specUrl);
-    String html = '''
+    String html =
+        '''
 <!doctype html>
 <html lang="en">
 <head>

@@ -7,9 +7,9 @@ class Cache {
 
   Map<String, CacheDriverInterface> cacheDrivers =
       <String, CacheDriverInterface>{
-    'file': FileCacheDriver(),
-    ...Dox().config.cache.drivers,
-  };
+        'file': FileCacheDriver(),
+        ...Dox().config.cache.drivers,
+      };
 
   /// Set where to store the cache.
   /// The name you set in the cache drivers configuration
@@ -34,7 +34,8 @@ class Cache {
   /// get the cache driver
   CacheDriverInterface get _driver {
     _store ??= Dox().config.cache.defaultDriver;
-    CacheDriverInterface d = cacheDrivers[_store] ??
+    CacheDriverInterface d =
+        cacheDrivers[_store] ??
         cacheDrivers[Dox().config.cache.defaultDriver] ??
         FileCacheDriver();
     d.setTag(_tag);

@@ -9,11 +9,11 @@ class TrustedProxy {
   final List<_Cidr> _ranges;
 
   TrustedProxy(List<String> proxies)
-      : _any = proxies.contains('*'),
-        _ranges = <_Cidr>[
-          for (String p in proxies)
-            if (p != '*') _Cidr.parse(p),
-        ];
+    : _any = proxies.contains('*'),
+      _ranges = <_Cidr>[
+        for (String p in proxies)
+          if (p != '*') _Cidr.parse(p),
+      ];
 
   bool get enabled => _any || _ranges.isNotEmpty;
 

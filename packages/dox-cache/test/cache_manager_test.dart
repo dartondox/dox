@@ -19,16 +19,18 @@ void main() {
 
   setUp(() async {
     directory = await Directory.systemTemp.createTemp('dox_cache_manager_');
-    manager = CacheManager(CacheConfig(
-      defaultStore: 'memory',
-      stores: <String, Map<String, dynamic>>{
-        'memory': <String, dynamic>{'driver': 'memory', 'max_size': 10},
-        'file': <String, dynamic>{'driver': 'file', 'path': directory.path},
-        'off': <String, dynamic>{'driver': 'null'},
-        'custom': <String, dynamic>{'driver': 'counting', 'prefix': 'c:'},
-        'broken': <String, dynamic>{'driver': 'nope'},
-      },
-    ));
+    manager = CacheManager(
+      CacheConfig(
+        defaultStore: 'memory',
+        stores: <String, Map<String, dynamic>>{
+          'memory': <String, dynamic>{'driver': 'memory', 'max_size': 10},
+          'file': <String, dynamic>{'driver': 'file', 'path': directory.path},
+          'off': <String, dynamic>{'driver': 'null'},
+          'custom': <String, dynamic>{'driver': 'counting', 'prefix': 'c:'},
+          'broken': <String, dynamic>{'driver': 'nope'},
+        },
+      ),
+    );
   });
 
   tearDown(() async {

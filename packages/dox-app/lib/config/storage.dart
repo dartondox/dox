@@ -6,7 +6,5 @@ FileStorageConfig storage = FileStorageConfig(
   defaultDriver: Env.get('STORAGE_DRIVER', 'local'),
 
   // register storage driver list
-  drivers: <String, StorageDriverInterface>{
-    'local': LocalStorageDriver(),
-  },
+  drivers: <String, StorageDriverInterface>{'local': LocalStorageDriver()},
 );

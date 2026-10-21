@@ -92,44 +92,67 @@ class StringSchema extends Schema<String>
 
   /// Only letters.
   StringSchema alpha({String? message}) {
-    return use(RegexRule(Patterns.alpha,
+    return use(
+      RegexRule(
+        Patterns.alpha,
         code: IssueCodes.alpha,
         defaultMessage: DefaultMessages.alpha,
-        message: message));
+        message: message,
+      ),
+    );
   }
 
   /// Only letters, dash and underscore.
   StringSchema alphaDash({String? message}) {
-    return use(RegexRule(Patterns.alphaDash,
+    return use(
+      RegexRule(
+        Patterns.alphaDash,
         code: IssueCodes.alphaDash,
         defaultMessage: DefaultMessages.alphaDash,
-        message: message));
+        message: message,
+      ),
+    );
   }
 
   /// Only letters and numbers.
   StringSchema alphaNumeric({String? message}) {
-    return use(RegexRule(Patterns.alphaNumeric,
+    return use(
+      RegexRule(
+        Patterns.alphaNumeric,
         code: IssueCodes.alphaNumeric,
         defaultMessage: DefaultMessages.alphaNumeric,
-        message: message));
+        message: message,
+      ),
+    );
   }
 
   /// Remove spaces at both ends before the checks.
   StringSchema trim() {
     return copyBaseInto(
-        StringSchema(coerce: coerce, trimText: true, caseMode: caseMode));
+      StringSchema(coerce: coerce, trimText: true, caseMode: caseMode),
+    );
   }
 
   /// Make the text lower case before the checks.
   StringSchema toLowerCase() {
-    return copyBaseInto(StringSchema(
-        coerce: coerce, trimText: trimText, caseMode: TextCase.lower));
+    return copyBaseInto(
+      StringSchema(
+        coerce: coerce,
+        trimText: trimText,
+        caseMode: TextCase.lower,
+      ),
+    );
   }
 
   /// Make the text upper case before the checks.
   StringSchema toUpperCase() {
-    return copyBaseInto(StringSchema(
-        coerce: coerce, trimText: trimText, caseMode: TextCase.upper));
+    return copyBaseInto(
+      StringSchema(
+        coerce: coerce,
+        trimText: trimText,
+        caseMode: TextCase.upper,
+      ),
+    );
   }
 
   @override
@@ -169,7 +192,8 @@ class StringSchema extends Schema<String>
   @override
   StringSchema copySchema() {
     return copyBaseInto(
-        StringSchema(coerce: coerce, trimText: trimText, caseMode: caseMode));
+      StringSchema(coerce: coerce, trimText: trimText, caseMode: caseMode),
+    );
   }
 }
 

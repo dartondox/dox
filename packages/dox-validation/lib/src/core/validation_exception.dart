@@ -4,7 +4,7 @@ import 'parse_result.dart';
 /// Thrown by `parse` and `parseAsync` when the input is not valid.
 class ValidationException implements Exception {
   ValidationException(List<ValidationIssue> issues)
-      : issues = List<ValidationIssue>.unmodifiable(issues);
+    : issues = List<ValidationIssue>.unmodifiable(issues);
 
   /// All issues found.
   final List<ValidationIssue> issues;

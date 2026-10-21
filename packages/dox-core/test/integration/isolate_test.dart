@@ -23,9 +23,7 @@ AppConfig isolateConfig = AppConfig(
   responseHandler: ResponseHandler(),
 
   /// routers
-  routers: <Router>[
-    ApiRouter(),
-  ],
+  routers: <Router>[ApiRouter()],
 );
 
 String baseUrl = 'http://localhost:${isolateConfig.serverPort}';

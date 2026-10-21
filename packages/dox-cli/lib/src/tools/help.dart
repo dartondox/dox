@@ -1,7 +1,7 @@
 import '../command_registry.dart';
 import '../types.dart';
 
-help() {
+void help() {
   print("Usage: dox <command> [arguments] \n");
   print('Available commands: \n');
 
@@ -33,7 +33,7 @@ help() {
   }
 }
 
-helpCommand(String commandName) {
+void helpCommand(String commandName) {
   final command = CommandRegistry.findCommand(commandName);
 
   if (command == null) {

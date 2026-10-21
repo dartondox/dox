@@ -49,8 +49,8 @@ bool hasDartMigrations() {
   Directory dir = migrationDirectory();
   if (!dir.existsSync()) return false;
   return dir.listSync().whereType<File>().any(
-        (File f) => _migrationFile.hasMatch(f.uri.pathSegments.last),
-      );
+    (File f) => _migrationFile.hasMatch(f.uri.pathSegments.last),
+  );
 }
 
 /// write `db/migration/migrations.dart`: every Dart migration file of
@@ -60,11 +60,11 @@ void writeMigrationRegistry() {
   Directory dir = migrationDirectory();
   List<File> files = dir.existsSync()
       ? (dir
-          .listSync()
-          .whereType<File>()
-          .where((File f) => _migrationFile.hasMatch(f.uri.pathSegments.last))
-          .toList()
-        ..sort((File a, File b) => a.path.compareTo(b.path)))
+            .listSync()
+            .whereType<File>()
+            .where((File f) => _migrationFile.hasMatch(f.uri.pathSegments.last))
+            .toList()
+          ..sort((File a, File b) => a.path.compareTo(b.path)))
       : <File>[];
 
   StringBuffer imports = StringBuffer();
@@ -90,7 +90,8 @@ void writeMigrationRegistry() {
   }
 
   File registry = File('${dir.path}/migrations.dart');
-  String source = '''
+  String source =
+      '''
 // Made by `dox make:migration` and the `dox migration:*` commands.
 // Do not edit, it is made again from the files in this folder.
 import 'package:dox_migration/dox_migration.dart';
@@ -112,15 +113,15 @@ String dartMigrationSource(String snakeName) {
   if (RegExp(r'^\d').hasMatch(className)) className = 'M$className';
 
   RegExpMatch? create = RegExp(r'^create_(\w+)_table$').firstMatch(snakeName);
-  RegExpMatch? change = RegExp(
-    r'^\w+_(?:to|from|in|on)_(\w+)_table$',
-  ).firstMatch(snakeName);
+  RegExpMatch? change = RegExp(r'^\w+_(?:to|from|in|on)_(\w+)_table$')
+      .firstMatch(snakeName);
 
   String up;
   String down;
   if (create != null) {
     String table = create.group(1)!;
-    up = '''
+    up =
+        '''
     await schema.create('$table', (Table table) {
       table.id();
       table.timestamps();
@@ -128,11 +129,13 @@ String dartMigrationSource(String snakeName) {
     down = "    await schema.dropIfExists('$table');";
   } else if (change != null) {
     String table = change.group(1)!;
-    up = '''
+    up =
+        '''
     await schema.table('$table', (Table table) {
       // table.string('name').nullable();
     });''';
-    down = '''
+    down =
+        '''
     await schema.table('$table', (Table table) {
       // table.dropColumn('name');
     });''';

@@ -52,8 +52,10 @@ S3Driver minioDriver({String? secret, int? partSize}) {
 }
 
 Future<void> createBucket(S3Driver driver) async {
-  http.Response response =
-      await driver.client.send('PUT', driver.client.bucketUri());
+  http.Response response = await driver.client.send(
+    'PUT',
+    driver.client.bucketUri(),
+  );
   // 409 means the bucket is already there.
   if (response.statusCode != 200 && response.statusCode != 409) {
     throw StateError('Could not create bucket: ${response.body}');
@@ -113,8 +115,9 @@ Future<void> main() async {
 
       test('plain GET without a signature is denied', () async {
         await disk.put('extras/private.txt', 'x');
-        http.Response response =
-            await http.get(Uri.parse(await disk.getUrl('extras/private.txt')));
+        http.Response response = await http.get(
+          Uri.parse(await disk.getUrl('extras/private.txt')),
+        );
         expect(response.statusCode, 403);
       });
 
@@ -130,9 +133,12 @@ Future<void> main() async {
         );
         expect(response.statusCode, 200, reason: response.body);
         expect(
-            await disk.getString('extras/uploaded file.json'), '{"ok":true}');
-        ObjectMetaData meta =
-            await disk.getMetaData('extras/uploaded file.json');
+          await disk.getString('extras/uploaded file.json'),
+          '{"ok":true}',
+        );
+        ObjectMetaData meta = await disk.getMetaData(
+          'extras/uploaded file.json',
+        );
         expect(meta.contentType, 'application/json');
       });
 

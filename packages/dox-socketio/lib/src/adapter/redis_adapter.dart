@@ -79,10 +79,11 @@ class RedisAdapter extends InMemoryAdapter {
     BroadcastOptions options,
   ) async {
     if (!options.local) {
-      String message = jsonEncode(
-        <Object>[uid, packet.toJson(), options.toJson()],
-        toEncodable: _encodeBinary,
-      );
+      String message = jsonEncode(<Object>[
+        uid,
+        packet.toJson(),
+        options.toJson(),
+      ], toEncodable: _encodeBinary);
       try {
         await publisher.publish(channelOf(nsp), message);
       } catch (error) {
@@ -105,8 +106,9 @@ class RedisAdapter extends InMemoryAdapter {
       raw['data'] = _decodeBinary(raw['data']);
       SocketPacket packet = SocketPacket.fromJson(raw);
       if (packet.nsp != nsp.name) return;
-      BroadcastOptions options =
-          BroadcastOptions.fromJson(parts[2] as Map<String, dynamic>);
+      BroadcastOptions options = BroadcastOptions.fromJson(
+        parts[2] as Map<String, dynamic>,
+      );
       unawaited(super.broadcast(nsp, packet, options));
     } catch (error) {
       stderr.writeln('dox_socketio: bad redis message: $error');

@@ -115,8 +115,11 @@ void runCacheContract(DriverHarness harness, {Object? skip}) {
 
     test('many and putMany', () async {
       await cache.putMany(<String, Object?>{'a': 1, 'b': 'two'}, ttl);
-      expect(await cache.many(<String>['a', 'b', 'c']),
-          <String, dynamic>{'a': 1, 'b': 'two', 'c': null});
+      expect(await cache.many(<String>['a', 'b', 'c']), <String, dynamic>{
+        'a': 1,
+        'b': 'two',
+        'c': null,
+      });
       await harness.advance(pastTtl);
       expect(await cache.many(<String>['a']), <String, dynamic>{'a': null});
     });
@@ -144,8 +147,10 @@ void runCacheContract(DriverHarness harness, {Object? skip}) {
     });
 
     test('rememberForever', () async {
-      Map<String, dynamic> value =
-          await cache.rememberForever('rf', () => <String, dynamic>{'id': 1});
+      Map<String, dynamic> value = await cache.rememberForever(
+        'rf',
+        () => <String, dynamic>{'id': 1},
+      );
       expect(value, <String, dynamic>{'id': 1});
       await harness.advance(pastTtl);
       expect(await cache.get('rf'), <String, dynamic>{'id': 1});
@@ -187,8 +192,11 @@ void runCacheContract(DriverHarness harness, {Object? skip}) {
       test('same owner token can release', () async {
         CacheLock first = cache.lock('job2', const Duration(seconds: 5));
         expect(await first.get(), isTrue);
-        CacheLock again =
-            cache.lock('job2', const Duration(seconds: 5), first.owner);
+        CacheLock again = cache.lock(
+          'job2',
+          const Duration(seconds: 5),
+          first.owner,
+        );
         expect(await again.release(), isTrue);
       });
 
@@ -204,8 +212,10 @@ void runCacheContract(DriverHarness harness, {Object? skip}) {
         expect(await first.get(), isTrue);
         CacheLock second = cache.lock('job4', const Duration(seconds: 5));
         expect(await second.block(const Duration(milliseconds: 120)), isFalse);
-        Future<void>.delayed(const Duration(milliseconds: 80), first.release)
-            .ignore();
+        Future<void>.delayed(
+          const Duration(milliseconds: 80),
+          first.release,
+        ).ignore();
         expect(await second.block(const Duration(seconds: 2)), isTrue);
         await second.release();
       });

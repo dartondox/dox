@@ -57,8 +57,9 @@ Future<dynamic> _handleController(
       : _generateEmptyArgumentValues(lengthOfParam);
 
   /// controller argument data types
-  List<String> controllerArgumentsDataType =
-      _getControllerArgumentDataTypes(fn);
+  List<String> controllerArgumentsDataType = _getControllerArgumentDataTypes(
+    fn,
+  );
 
   /// if the first argument data type is not DoxRequest,
   /// controller request custom FormRequest class
@@ -74,23 +75,24 @@ Future<dynamic> _handleController(
         formReq.setRequest(doxRequest);
 
         /// validate request
-        doxRequest.validate(
-          formReq.rules(),
-          messages: formReq.messages(),
-        );
+        doxRequest.validate(formReq.rules(), messages: formReq.messages());
 
         /// run setup()
         await formReq.setUp();
 
-        result = await Function.apply(
-            fn, <dynamic>[formReq, ...controllerArguments]);
+        result = await Function.apply(fn, <dynamic>[
+          formReq,
+          ...controllerArguments,
+        ]);
         return result;
       }
     }
   }
 
-  return await Function.apply(
-      fn, <dynamic>[doxRequest, ...controllerArguments]);
+  return await Function.apply(fn, <dynamic>[
+    doxRequest,
+    ...controllerArguments,
+  ]);
 }
 
 /// checking that controller first request param is matched
@@ -106,8 +108,11 @@ final Expando<List<String>> _argumentTypes = Expando<List<String>>();
 /// get controller arguments data type
 /// eg. [DoxRequest, String]
 List<String> _getControllerArgumentDataTypes(dynamic controller) {
-  return _argumentTypes[controller] ??=
-      controller.toString().split('(')[1].split(')')[0].split(', ');
+  return _argumentTypes[controller] ??= controller
+      .toString()
+      .split('(')[1]
+      .split(')')[0]
+      .split(', ');
 }
 
 /// get length controller arguments to check how many arguments

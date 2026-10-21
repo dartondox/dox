@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
-generateKey() {
+void generateKey() {
   const chars =
       'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   final random = Random.secure();
@@ -15,7 +15,7 @@ generateKey() {
   overrideKey(secret);
 }
 
-void overrideKey(secret) {
+void overrideKey(String secret) {
   List<String> content = [];
   final file = File('${Directory.current.path}/.env');
   final contents = file.readAsStringSync();

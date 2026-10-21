@@ -51,10 +51,9 @@ class Client {
   }
 
   void send(String event, dynamic message) {
-    socket.add(jsonEncode(<String, dynamic>{
-      'event': event,
-      'message': message,
-    }));
+    socket.add(
+      jsonEncode(<String, dynamic>{'event': event, 'message': message}),
+    );
   }
 
   List<dynamic> got(String event) => messages
@@ -67,8 +66,11 @@ Future<void> wait() => Future<void>.delayed(Duration(milliseconds: 300));
 
 Future<bool> redisReachable() async {
   try {
-    Socket s = await Socket.connect(redisHost, redisPort,
-        timeout: Duration(milliseconds: 500));
+    Socket s = await Socket.connect(
+      redisHost,
+      redisPort,
+      timeout: Duration(milliseconds: 500),
+    );
     s.destroy();
     return true;
   } catch (_) {
@@ -105,14 +107,16 @@ Future<void> roomEmitCheck() async {
 
 void main() {
   setUpAll(() async {
-    Dox().initialize(AppConfig(
-      appKey: appConfig.appKey,
-      serverPort: port,
-      totalIsolate: 1,
-      responseHandler: appConfig.responseHandler,
-      routers: <Router>[RoomEmitRouter()],
-      cache: appConfig.cache,
-    ));
+    Dox().initialize(
+      AppConfig(
+        appKey: appConfig.appKey,
+        serverPort: port,
+        totalIsolate: 1,
+        responseHandler: appConfig.responseHandler,
+        routers: <Router>[RoomEmitRouter()],
+        cache: appConfig.cache,
+      ),
+    );
     WebsocketServer(Dox());
     await Dox().startServer();
   });
@@ -130,7 +134,8 @@ void main() {
     }
     Redis sub = testRedis();
     WebsocketServer().adapter(
-        WebsocketRedisAdapter(subscriber: sub, publisher: sub.duplicate()));
+      WebsocketRedisAdapter(subscriber: sub, publisher: sub.duplicate()),
+    );
     await wait();
     await roomEmitCheck();
   });

@@ -17,13 +17,7 @@ void main() {
     });
 
     test('rejects path traversal', () {
-      for (String bad in <String>[
-        '..',
-        '../a',
-        'a/../b',
-        'a/..',
-        r'a\..\b',
-      ]) {
+      for (String bad in <String>['..', '../a', 'a/../b', 'a/..', r'a\..\b']) {
         expect(
           () => normalizer.key(bad),
           throwsA(isA<InvalidKeyException>()),
@@ -43,8 +37,10 @@ void main() {
     });
 
     test('rejects null bytes and empty keys', () {
-      expect(() => normalizer.key('a\u0000b'),
-          throwsA(isA<InvalidKeyException>()));
+      expect(
+        () => normalizer.key('a\u0000b'),
+        throwsA(isA<InvalidKeyException>()),
+      );
       expect(() => normalizer.key(''), throwsA(isA<InvalidKeyException>()));
       expect(() => normalizer.key('./'), throwsA(isA<InvalidKeyException>()));
     });
@@ -53,7 +49,9 @@ void main() {
       expect(normalizer.prefix(''), '');
       expect(normalizer.prefix('photos/'), 'photos');
       expect(
-          () => normalizer.prefix('../x'), throwsA(isA<InvalidKeyException>()));
+        () => normalizer.prefix('../x'),
+        throwsA(isA<InvalidKeyException>()),
+      );
     });
   });
 

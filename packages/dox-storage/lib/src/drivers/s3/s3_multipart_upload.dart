@@ -63,8 +63,10 @@ class S3MultipartUpload {
   Future<void> complete() async {
     StringBuffer body = StringBuffer('<CompleteMultipartUpload>');
     for (int i = 0; i < _etags.length; i++) {
-      body.write('<Part><PartNumber>${i + 1}</PartNumber>'
-          '<ETag>${client.xml.escape(_etags[i])}</ETag></Part>');
+      body.write(
+        '<Part><PartNumber>${i + 1}</PartNumber>'
+        '<ETag>${client.xml.escape(_etags[i])}</ETag></Part>',
+      );
     }
     body.write('</CompleteMultipartUpload>');
     http.Response response = await client.send(

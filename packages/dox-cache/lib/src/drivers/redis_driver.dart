@@ -48,9 +48,10 @@ return 0''';
   Future<Map<String, dynamic>> many(List<String> keys) async {
     Map<String, dynamic> result = <String, dynamic>{};
     if (keys.isEmpty) return result;
-    List<dynamic> replies = await redis.sendCommand(
-            <String>['MGET', for (String key in keys) prefix + key])
-        as List<dynamic>;
+    List<dynamic> replies = await redis.sendCommand(<String>[
+      'MGET',
+      for (String key in keys) prefix + key,
+    ]) as List<dynamic>;
     for (int i = 0; i < keys.length; i++) {
       Object? reply = replies[i];
       result[keys[i]] = reply == null ? null : jsonDecode(reply.toString());
@@ -98,8 +99,10 @@ return 0''';
   @override
   Future<void> flush() async {
     if (prefix.isEmpty) {
-      throw StateError('RedisDriver.flush needs a prefix. '
-          'It will not delete the whole database.');
+      throw StateError(
+        'RedisDriver.flush needs a prefix. '
+        'It will not delete the whole database.',
+      );
     }
     String pattern = '${_escapeGlob(prefix)}*';
     String cursor = '0';
@@ -137,8 +140,13 @@ return 0''';
 
   /// Lua check-and-delete, so only the owner frees the lock.
   Future<bool> releaseLock(String name, String owner) async {
-    Object? reply = await redis.sendCommand(
-        <String>['EVAL', _releaseScript, '1', _lockKey(name), owner]);
+    Object? reply = await redis.sendCommand(<String>[
+      'EVAL',
+      _releaseScript,
+      '1',
+      _lockKey(name),
+      owner,
+    ]);
     return reply == 1;
   }
 
@@ -203,20 +211,25 @@ class RedisDriverFactory implements CacheDriverFactory {
 
   @override
   CacheDriver create(Map<String, dynamic> options) {
-    Redis redis = Redis(RedisOptions(
-      host: options[CacheConstants.hostOption] as String? ??
-          CacheConstants.defaultRedisHost,
-      port: options[CacheConstants.portOption] as int? ??
-          CacheConstants.defaultRedisPort,
-      username: options[CacheConstants.usernameOption] as String?,
-      password: options[CacheConstants.passwordOption] as String?,
-      db: options[CacheConstants.dbOption] as int? ?? 0,
-      secure: options[CacheConstants.tlsOption] as bool? ?? false,
-      retryStrategy: retryDelay,
-    ));
+    Redis redis = Redis(
+      RedisOptions(
+        host:
+            options[CacheConstants.hostOption] as String? ??
+            CacheConstants.defaultRedisHost,
+        port:
+            options[CacheConstants.portOption] as int? ??
+            CacheConstants.defaultRedisPort,
+        username: options[CacheConstants.usernameOption] as String?,
+        password: options[CacheConstants.passwordOption] as String?,
+        db: options[CacheConstants.dbOption] as int? ?? 0,
+        secure: options[CacheConstants.tlsOption] as bool? ?? false,
+        retryStrategy: retryDelay,
+      ),
+    );
     return RedisDriver(
       redis,
-      prefix: options[CacheConstants.prefixOption] as String? ??
+      prefix:
+          options[CacheConstants.prefixOption] as String? ??
           CacheConstants.defaultPrefix,
     );
   }

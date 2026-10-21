@@ -22,8 +22,5 @@ void isolateHandler(IsolateSpawnParameter param) async {
   /// starting server in new isolate
   DoxServer().setResponseHandler(param.config.responseHandler);
 
-  await DoxServer().listen(
-    param.config.serverPort,
-    isolateId: param.isolateId,
-  );
+  await DoxServer().listen(param.config.serverPort, isolateId: param.isolateId);
 }

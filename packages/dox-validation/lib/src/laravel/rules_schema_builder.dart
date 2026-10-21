@@ -93,12 +93,14 @@ class RulesSchemaBuilder {
       if (flags.contains(item.name)) {
         continue;
       }
-      Rule<Object?> rule = registry.build(RuleDefinition(
-        name: item.name,
-        args: item.args,
-        field: field,
-        fieldRules: names,
-      ));
+      Rule<Object?> rule = registry.build(
+        RuleDefinition(
+          name: item.name,
+          args: item.args,
+          field: field,
+          fieldRules: names,
+        ),
+      );
       rule.message ??= messages['$field.${item.name}'] ?? messages[item.name];
       rules.add(rule);
     }
@@ -120,10 +122,12 @@ class RulesSchemaBuilder {
       int colon = part.indexOf(':');
       String name = colon < 0 ? part : part.substring(0, colon);
       String args = colon < 0 ? '' : part.substring(colon + 1);
-      result.add(_Parsed(
-        name.trim().toLowerCase(),
-        args.isEmpty ? <String>[] : args.split(','),
-      ));
+      result.add(
+        _Parsed(
+          name.trim().toLowerCase(),
+          args.isEmpty ? <String>[] : args.split(','),
+        ),
+      );
     }
     return result;
   }

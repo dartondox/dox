@@ -1,3 +1,8 @@
+## Unreleased
+
+- Needs Dart 3.13 or newer.
+- All dependencies updated to their latest versions.
+
 ## 3.0.0-alpha.1
 
 - Uses `ioredis` 2.

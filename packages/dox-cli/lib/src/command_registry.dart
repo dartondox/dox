@@ -89,8 +89,9 @@ class CommandRegistry {
         }
 
         /// `BlogPost` => table `blog_posts`, same guess as `constrained()`
-        String table =
-            ForeignIdColumnDefinition.guessTable(pascalToSnake(args[0]));
+        String table = ForeignIdColumnDefinition.guessTable(
+          pascalToSnake(args[0]),
+        );
         if (createModel(args[0], table: table)) {
           createMigration('create_${table}_table');
         }
@@ -140,8 +141,7 @@ class CommandRegistry {
     CommandDefinition(
       command: 'build',
       helpInfo: 'build',
-      description:
-          'AOT compile the app for production into build/server (use this, not dart run, in production)',
+      description: 'AOT compile the app for production into build/bundle (use this, not dart run, in production)',
       category: CommandCategory.build,
       function: (args) async {
         await buildServer();
@@ -339,9 +339,7 @@ class CommandRegistry {
 
   static CommandDefinition? findCommand(String command) {
     try {
-      return _commands.firstWhere(
-        (cmd) => cmd.matches(command),
-      );
+      return _commands.firstWhere((cmd) => cmd.matches(command));
     } catch (e) {
       return null;
     }
@@ -373,11 +371,12 @@ Future<void> _migration(
     String dart = exe.split(Platform.pathSeparator).last.startsWith('dart')
         ? exe
         : 'dart';
-    Process process = await Process.start(
-      dart,
-      ['run', 'bin/migrate.dart', command, ...args],
-      mode: ProcessStartMode.inheritStdio,
-    );
+    Process process = await Process.start(dart, [
+      'run',
+      'bin/migrate.dart',
+      command,
+      ...args,
+    ], mode: ProcessStartMode.inheritStdio);
     int code = await process.exitCode;
     if (code != 0) exitCode = code;
     return;

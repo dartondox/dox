@@ -22,9 +22,8 @@ class EngineServer implements EngineSessionStore {
     required this.options,
     required this.connectionListener,
     IdGenerator? ids,
-    HttpResponder responder = const HttpResponder(),
-  })  : _ids = ids ?? IdGenerator(),
-        _responder = responder;
+    this._responder = const HttpResponder(),
+  }) : _ids = ids ?? IdGenerator();
 
   final ServerOptions options;
   final EngineConnectionListener connectionListener;
@@ -126,10 +125,9 @@ class EngineServer implements EngineSessionStore {
       return;
     }
     WebSocket socket = await WebSocketTransformer.upgrade(request);
-    session.maybeUpgrade(WebsocketTransport(
-      socket,
-      maxHttpBufferSize: options.maxHttpBufferSize,
-    ));
+    session.maybeUpgrade(
+      WebsocketTransport(socket, maxHttpBufferSize: options.maxHttpBufferSize),
+    );
   }
 
   void _applyCors(HttpRequest request, CorsOptions cors) {

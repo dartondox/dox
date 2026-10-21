@@ -48,7 +48,8 @@ class RouteData {
     _pattern = _paramNames.isEmpty
         ? null
         : RegExp(
-            '^${path.replaceAllMapped(RegExp(r'{[^/]+}'), (Match match) => '([^/]+)').replaceAll('/', '\\/')}\$');
+            '^${path.replaceAllMapped(RegExp(r'{[^/]+}'), (Match match) => '([^/]+)').replaceAll('/', '\\/')}\$',
+          );
   }
 
   /// a copy for one request, with its own params.
@@ -56,13 +57,13 @@ class RouteData {
   /// same time can not see each other's params.
   RouteData withParams(Map<String, dynamic> values) {
     return RouteData(
-      method: method,
-      path: path,
-      controllers: controllers,
-      corsEnabled: corsEnabled,
-      preMiddleware: preMiddleware,
-      domain: domain,
-    )
+        method: method,
+        path: path,
+        controllers: controllers,
+        corsEnabled: corsEnabled,
+        preMiddleware: preMiddleware,
+        domain: domain,
+      )
       ..params = values
       ..formRequest = formRequest
       .._pattern = _pattern

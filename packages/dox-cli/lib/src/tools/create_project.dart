@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:dox/dox.dart';
 
-createProject(projectName, [String? versionName]) async {
+Future<void> createProject(String projectName, [String? versionName]) async {
   projectName = pascalToSnake(projectName);
 
   final projectFolder = Directory('${Directory.current.path}/$projectName');
@@ -39,7 +39,7 @@ createProject(projectName, [String? versionName]) async {
     '--branch',
     latestTag,
     'https://github.com/dartondox/dox-sample.git',
-    projectName
+    projectName,
   ]);
 
   if (result.stderr != null) {
@@ -63,8 +63,10 @@ createProject(projectName, [String? versionName]) async {
   for (final file in files) {
     if (file is File) {
       if (!file.path.contains('bin/dox')) {
-        final content =
-            file.readAsStringSync().replaceAll('dox_sample', projectName);
+        final content = file.readAsStringSync().replaceAll(
+          'dox_sample',
+          projectName,
+        );
         file.writeAsStringSync(content);
       }
     }
