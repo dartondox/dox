@@ -10,10 +10,8 @@ import 'config/app_config.dart';
 
 const int port = 3005;
 
-/// Internal room id for room `name` on the `/ws` route.
-/// The server stores joined rooms as `room:<route id><name>`.
-String roomId([String name = '']) =>
-    'room:${base64.encode(utf8.encode('GET|/ws'))}$name';
+/// Default room of the `/ws` route (the room every connection is in).
+String roomId() => 'room:${base64.encode(utf8.encode('GET|/ws'))}';
 
 class RoomsController {
   /// emit to everyone in the default room of the route
@@ -21,9 +19,9 @@ class RoomsController {
     emitter.room(roomId()).emit('all', message);
   }
 
-  /// emit to a joined room, using the internal room id
+  /// emit to a joined room by its plain name, as the docs show it
   void toRoom(WebsocketEmitter emitter, dynamic message) {
-    emitter.room(roomId(message['room'])).emit('toRoom', message['text']);
+    emitter.room(message['room']).emit('toRoom', message['text']);
   }
 
   /// emit to a joined room, the way the docs show it: `room('chat')`
@@ -234,9 +232,6 @@ void main() {
       expect((await b.next('docsRoom'))['message'], 'hey');
       await a.close();
       await b.close();
-    },
-        skip: 'bug: joinRoom stores the room as "room:<route id><name>" but '
-            'emitter.room(name) uses the plain name, so the docs example '
-            'never reaches anyone');
+    });
   });
 }
