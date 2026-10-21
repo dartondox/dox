@@ -372,17 +372,87 @@ void main() {
       expect(loadYaml(yaml.body), isA<Map<dynamic, dynamic>>());
     });
 
-    test('serves an HTML docs page', () {
+    test('serves the Scalar page by default', () {
       OpenApiResponse page = server.handle('/docs')!;
       expect(page.contentType, startsWith('text/html'));
-      expect(page.body, contains('swagger-ui-dist@5.17.14'));
-      expect(page.body, contains('url: "/openapi.json"'));
+      expect(
+        page.body,
+        contains(
+          'https://cdn.jsdelivr.net/npm/@scalar/api-reference@1.75.1'
+          '/dist/browser/standalone.js',
+        ),
+      );
+      expect(
+        page.body,
+        contains(
+          "Scalar.createApiReference('#app', {\"url\":\"/openapi.json\","
+          '"theme":"default","darkMode":false,'
+          '"documentDownloadType":"both"});',
+        ),
+      );
       expect(page.body, contains('<title>Dox API</title>'));
+      expect(page.body, isNot(contains('swagger')));
+    });
+
+    test('serves Swagger UI with DocsUi.swagger', () {
+      OpenApiServer s = OpenApiServer(buildApi(), ui: DocsUi.swagger);
+      String body = s.handle('/docs')!.body;
+      expect(body, contains('swagger-ui-dist@5.34.0/swagger-ui-bundle.js'));
+      expect(body, contains('url: "/openapi.json"'));
+      expect(body, isNot(contains('scalar')));
+    });
+
+    test('puts Scalar options in the config', () {
+      OpenApiServer s = OpenApiServer(
+        buildApi(),
+        scalar: const ScalarOptions(
+          theme: ScalarTheme.deepSpace,
+          darkMode: true,
+          showDownloadButton: false,
+          proxyUrl: 'https://proxy.scalar.com',
+        ),
+      );
+      expect(
+        s.docsPage().body,
+        contains(
+          '{"url":"/openapi.json","theme":"deepSpace","darkMode":true,'
+          '"documentDownloadType":"none",'
+          '"proxyUrl":"https://proxy.scalar.com"}',
+        ),
+      );
     });
 
     test('escapes the page title', () {
       OpenApiServer s = OpenApiServer(buildApi(), pageTitle: '<b>&</b>');
       expect(s.docsPage().body, contains('&lt;b&gt;&amp;&lt;&#47;b&gt;'));
+      OpenApiServer w = OpenApiServer(
+        buildApi(),
+        pageTitle: '<b>&</b>',
+        ui: DocsUi.swagger,
+      );
+      expect(w.docsPage().body, contains('&lt;b&gt;&amp;&lt;&#47;b&gt;'));
+    });
+
+    test('a script tag in a value can not close the script', () {
+      String bad = '</script><script>alert(1)</script>';
+      OpenApiServer s = OpenApiServer(
+        buildApi(),
+        scalar: ScalarOptions(proxyUrl: bad),
+      );
+      String body = s.docsPage(specUrl: bad).body;
+      expect(body, isNot(contains(bad)));
+      expect(body, contains(r'"\u003c/script>\u003cscript>alert(1)'));
+      String swagger = OpenApiServer(
+        buildApi(),
+        ui: DocsUi.swagger,
+      ).docsPage(specUrl: bad).body;
+      expect(swagger, isNot(contains(bad)));
+      expect(swagger, contains(r'url: "\u003c/script>'));
+    });
+
+    test('scriptJson keeps the value', () {
+      String value = '</script> <!-- "x"';
+      expect(jsonDecode(scriptJson(value)), value);
     });
 
     test('returns null for other paths and lists its paths', () {

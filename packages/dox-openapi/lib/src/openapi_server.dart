@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'constants/openapi_constants.dart';
+import 'docs_ui.dart';
 import 'dox_route_adapter.dart';
 import 'openapi.dart';
 
@@ -28,9 +29,19 @@ class OpenApiServer {
   /// Title of the HTML docs page.
   final String pageTitle;
 
+  /// The UI of the docs page. Scalar by default.
+  final DocsUi ui;
+
+  /// Options for the Scalar page.
+  final ScalarOptions scalar;
+
   /// Creates a server helper.
-  OpenApiServer(this.api, {String? pageTitle})
-    : pageTitle = pageTitle ?? api.info.title;
+  OpenApiServer(
+    this.api, {
+    String? pageTitle,
+    this.ui = DocsUi.scalar,
+    this.scalar = const ScalarOptions(),
+  }) : pageTitle = pageTitle ?? api.info.title;
 
   /// The document is made once, on the first call, and kept.
   late final Map<String, dynamic> _doc = api.toJson();
@@ -54,21 +65,53 @@ class OpenApiServer {
     return _yaml;
   }
 
-  /// A Swagger UI page that loads [specUrl] from a CDN.
+  /// The HTML docs page ([ui]) that loads [specUrl].
   OpenApiResponse docsPage({String specUrl = OpenApiConstants.jsonPath}) {
-    String cdn =
-        'https://cdn.jsdelivr.net/npm/swagger-ui-dist@'
-        '${OpenApiConstants.swaggerUiVersion}';
-    String title = const HtmlEscape().convert(pageTitle);
-    String url = jsonEncode(specUrl);
-    String html =
-        '''
+    String html = switch (ui) {
+      DocsUi.scalar => _scalarPage(specUrl),
+      DocsUi.swagger => _swaggerPage(specUrl),
+    };
+    return OpenApiResponse(html, OpenApiConstants.htmlContentType);
+  }
+
+  /// Scalar from the CDN.
+  String _scalarPage(String specUrl) {
+    String script =
+        'https://cdn.jsdelivr.net/npm/@scalar/api-reference@'
+        '${OpenApiConstants.scalarVersion}/dist/browser/standalone.js';
+    String config = scriptJson(scalar.toJson(specUrl));
+    return '''
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>$title</title>
+  <title>${_title()}</title>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="$script"></script>
+  <script>
+    Scalar.createApiReference('#app', $config);
+  </script>
+</body>
+</html>
+''';
+  }
+
+  /// Swagger UI from the CDN.
+  String _swaggerPage(String specUrl) {
+    String cdn =
+        'https://cdn.jsdelivr.net/npm/swagger-ui-dist@'
+        '${OpenApiConstants.swaggerUiVersion}';
+    String url = scriptJson(specUrl);
+    return '''
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${_title()}</title>
   <link rel="stylesheet" href="$cdn/swagger-ui.css">
 </head>
 <body>
@@ -80,7 +123,10 @@ class OpenApiServer {
 </body>
 </html>
 ''';
-    return OpenApiResponse(html, OpenApiConstants.htmlContentType);
+  }
+
+  String _title() {
+    return const HtmlEscape().convert(pageTitle);
   }
 
   /// Returns the content for [path], or null when it is not a docs path.
