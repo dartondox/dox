@@ -11,3 +11,7 @@ site
 .env
 pubspec.yaml.backup
 packages/dox-app/bin/dox
+
+# Lock files only for the app, not for library packages
+packages/*/pubspec.lock
+!packages/dox-app/pubspec.lock
