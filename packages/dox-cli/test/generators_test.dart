@@ -8,10 +8,6 @@ import 'package:dox/src/tools/create_request.dart';
 import 'package:dox/src/tools/create_serializer.dart';
 import 'package:test/test.dart';
 
-const String multiWordBug =
-    'bug: create_controller/middleware/request/serializer call toLowerCase() '
-    'before pascalToSnake, so BlogPost becomes blogpost / class Blogpost';
-
 /// Generators write relative to the current directory,
 /// so each test runs inside its own temp dir.
 void main() {
@@ -37,13 +33,13 @@ void main() {
       String c = read('lib/app/http/controllers/blog_post.controller.dart');
       expect(c, contains('class BlogPostController {'));
       expect(c, contains('BlogPostController blogPostController ='));
-    }, skip: multiWordBug);
+    });
 
     test('websocket controller', () {
       expect(createWsController('ChatRoomController'), isTrue);
       String c = read('lib/app/ws/controllers/chat_room.controller.dart');
       expect(c, contains('class ChatRoomController {'));
-    }, skip: multiWordBug);
+    });
 
     test('model', () {
       expect(createModel('BlogPost'), isTrue);
@@ -63,14 +59,14 @@ void main() {
       String c = read('lib/app/http/middleware/rate_limit.middleware.dart');
       expect(c, contains('class RateLimitMiddleware extends IDoxMiddleware'));
       expect(c, contains('return req;'));
-    }, skip: multiWordBug);
+    });
 
     test('request', () {
       expect(createRequest('BlogPostRequest'), isTrue);
       String c = read('lib/app/http/requests/blog_post.request.dart');
       expect(c, contains('class BlogPostRequest extends FormRequest'));
       expect(c, contains('Map<String, String> messages()'));
-    }, skip: multiWordBug);
+    });
 
     test('serializer imports the matching model', () {
       expect(createSerializer('BlogPostSerializer'), isTrue);
@@ -79,7 +75,7 @@ void main() {
           c, contains('class BlogPostSerializer extends Serializer<BlogPost>'));
       expect(
           c, contains("'../../../app/models/blog_post/blog_post.model.dart'"));
-    }, skip: multiWordBug);
+    });
   });
 
   group('generators | existing file is not overwritten', () {

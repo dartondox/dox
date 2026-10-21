@@ -24,8 +24,7 @@ class ${className}Request extends FormRequest {
 }
 
 bool createRequest(String filename) {
-  filename = filename.toLowerCase().replaceAll('request', '');
-  filename = pascalToSnake(filename);
+  filename = pascalToSnake(filename).replaceAll(RegExp(r'_?request$'), '');
   String className = snakeToPascal(filename);
   String path = '${Directory.current.path}/lib/app/http/requests/';
   String requestName = '$filename.request';

@@ -60,8 +60,7 @@ ${className}Controller ${toPascalWithFirstLetterLowerCase(className)}Controller 
 }
 
 bool createController(String filename, bool resource) {
-  filename = filename.toLowerCase().replaceAll('controller', '');
-  filename = pascalToSnake(filename);
+  filename = pascalToSnake(filename).replaceAll(RegExp(r'_?controller$'), '');
   String className = snakeToPascal(filename);
   String path = '${Directory.current.path}/lib/app/http/controllers/';
   String controllerName = '$filename.controller';
@@ -83,8 +82,7 @@ bool createController(String filename, bool resource) {
 }
 
 bool createWsController(String filename) {
-  filename = filename.toLowerCase().replaceAll('controller', '');
-  filename = pascalToSnake(filename);
+  filename = pascalToSnake(filename).replaceAll(RegExp(r'_?controller$'), '');
   String className = snakeToPascal(filename);
   String path = '${Directory.current.path}/lib/app/ws/controllers/';
   String controllerName = '$filename.controller';

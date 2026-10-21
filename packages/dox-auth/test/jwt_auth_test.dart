@@ -174,9 +174,19 @@ void main() {
       String? token =
           await Auth().attempt(<String, dynamic>{'email': 'a@dox.dev'});
       expect(token, isNull);
-    },
-        skip: 'bug: JwtAuthDriver.attempt passes a null password to '
-            'Hash.verify and throws a TypeError instead of returning null');
+    });
+
+    test('attempt with only a password returns null', () async {
+      String? token =
+          await Auth().attempt(<String, dynamic>{'password': 'secret'});
+      expect(token, isNull);
+    });
+
+    test('attempt with a non-string password returns null', () async {
+      String? token = await Auth()
+          .attempt(<String, dynamic>{'email': 'a@dox.dev', 'password': 123});
+      expect(token, isNull);
+    });
   });
 
   group('AuthMiddleware |', () {
