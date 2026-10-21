@@ -14,6 +14,20 @@ dynamic httpResponseHandler(dynamic payload, HttpRequest request) {
     return;
   }
 
+  ResponseHandlerInterface? customResponseHandler = DoxServer().responseHandler;
+
+  /// a plain value (text, map, list...) with no custom handler needs no
+  /// DoxResponse: it would set no header and no status. files keep the
+  /// DoxResponse path, which sets their content type.
+  if (customResponseHandler == null &&
+      payload is! DoxResponse &&
+      payload is! File &&
+      payload is! StreamFile &&
+      payload is! DownloadableFile) {
+    responseDataHandler(payload, request);
+    return;
+  }
+
   DoxResponse doxResponse = payload is DoxResponse
       ? payload
       : DoxResponse(payload);
@@ -21,7 +35,6 @@ dynamic httpResponseHandler(dynamic payload, HttpRequest request) {
   /// If there is responseHandler set, handle responseHandler
   /// before DoxResponse process. The responseHandler will return
   /// DoxResponse to process
-  ResponseHandlerInterface? customResponseHandler = DoxServer().responseHandler;
   if (customResponseHandler != null) {
     doxResponse = customResponseHandler.handle(doxResponse);
   }

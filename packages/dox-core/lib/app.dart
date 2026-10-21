@@ -5,6 +5,7 @@ import 'package:dox_core/isolate/dox_isolate.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/server/dox_server.dart';
 import 'package:dox_core/utils/logger.dart';
+import 'package:dox_http_native/dox_http_native.dart';
 import 'package:dox_socketio/dox_socketio.dart';
 import 'package:sprintf/sprintf.dart';
 
@@ -119,6 +120,12 @@ class Dox implements IDox {
     _totalIsolate ??= Dox().config.totalIsolate;
     int isolatesToSpawn = _totalIsolate!;
 
+    /// Windows has no SO_REUSEPORT: one isolate owns the native listener.
+    if (Platform.isWindows && isolatesToSpawn > 1 && DoxServer.usesNative()) {
+      Logger.info('Windows: the native server runs on one isolate');
+      isolatesToSpawn = 1;
+    }
+
     if (isolatesToSpawn > 1) {
       await DoxIsolate().spawn(isolatesToSpawn);
     }
@@ -127,9 +134,13 @@ class Dox implements IDox {
     DoxServer().setResponseHandler(config.responseHandler);
     await DoxServer().listen(config.serverPort, isolateId: 1);
 
+    String backend = DoxServer().httpServer is NativeHttpServer
+        ? 'native'
+        : 'dart:io';
     Logger.info(
       sprintf(
-        'Server started at http://127.0.0.1:%s with $isolatesToSpawn isolate',
+        'Server started at http://127.0.0.1:%s with $isolatesToSpawn isolate '
+        '($backend)',
         <dynamic>[Dox().config.serverPort],
       ),
     );

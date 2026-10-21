@@ -17,6 +17,7 @@ dependencies:
   uuid: ^4.6.0
   dox_annotation: ^3.0.0-alpha.1
   dox_cache: ^3.0.0-alpha.1
+  dox_http_native: ^3.0.0-alpha.1
   dox_openapi: ^3.0.0-alpha.1
   dox_socketio: ^3.0.0-alpha.1
   dox_storage: ^3.0.0-alpha.1

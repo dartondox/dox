@@ -17,6 +17,28 @@ class TrustedProxy {
 
   bool get enabled => _any || _ranges.isNotEmpty;
 
+  static List<String>? _cachedList;
+  static TrustedProxy _cached = TrustedProxy(const <String>[]);
+
+  /// The client ip and scheme of [req]. [trusted] is the
+  /// `trustedProxies` setting. It is parsed once per isolate.
+  static ({String? ip, String scheme}) readClient(
+    HttpRequest req,
+    List<String> trusted,
+  ) {
+    if (!identical(trusted, _cachedList)) {
+      _cached = TrustedProxy(trusted);
+      _cachedList = trusted;
+    }
+    String? address = req.connectionInfo?.remoteAddress.address;
+    String? remote = address == null ? null : normalize(address);
+    if (remote == null || !_cached.enabled) return (ip: remote, scheme: 'http');
+    return (
+      ip: _cached.clientIp(remote, req.headers.value('x-forwarded-for')),
+      scheme: _cached.scheme(remote, req.headers.value('x-forwarded-proto')),
+    );
+  }
+
   /// `::ffff:1.2.3.4` becomes `1.2.3.4`. The server listens on IPv6, so
   /// IPv4 clients come in this form. Other values stay the same.
   static String normalize(String ip) {

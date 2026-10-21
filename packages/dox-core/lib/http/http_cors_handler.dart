@@ -4,20 +4,25 @@ import 'package:dox_core/dox_core.dart';
 
 void httpCorsHandler(bool? enabled, HttpRequest req) {
   CORSConfig cors = Dox().config.cors;
-  if (enabled ?? cors.enabled) {
-    Map<String, dynamic> headers = <String, dynamic>{
-      HttpHeaders.accessControlAllowOriginHeader: cors.origin,
-      HttpHeaders.accessControlAllowMethodsHeader: cors.methods,
-      HttpHeaders.accessControlAllowHeadersHeader: cors.headers,
-      HttpHeaders.accessControlExposeHeadersHeader: cors.exposeHeaders,
-      HttpHeaders.accessControlAllowCredentialsHeader: cors.credentials,
-      HttpHeaders.accessControlMaxAgeHeader: cors.maxAge,
-    };
+  if (!(enabled ?? cors.enabled)) return;
+  HttpResponse res = req.response;
 
-    headers.forEach((String key, dynamic value) {
-      _setCorsValue(req.response, key, value);
-    });
-  }
+  /// call each one directly, no map per request.
+  /// null values are skipped inside `_setCorsValue`.
+  _setCorsValue(res, HttpHeaders.accessControlAllowOriginHeader, cors.origin);
+  _setCorsValue(res, HttpHeaders.accessControlAllowMethodsHeader, cors.methods);
+  _setCorsValue(res, HttpHeaders.accessControlAllowHeadersHeader, cors.headers);
+  _setCorsValue(
+    res,
+    HttpHeaders.accessControlExposeHeadersHeader,
+    cors.exposeHeaders,
+  );
+  _setCorsValue(
+    res,
+    HttpHeaders.accessControlAllowCredentialsHeader,
+    cors.credentials,
+  );
+  _setCorsValue(res, HttpHeaders.accessControlMaxAgeHeader, cors.maxAge);
 }
 
 // set cors in header

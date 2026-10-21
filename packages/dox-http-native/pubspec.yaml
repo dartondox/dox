@@ -1,0 +1,18 @@
+name: dox_http_native
+description: Fast native HTTP/1.1 server for Dart and the Dox framework. Rust (hyper) parses HTTP, your handlers stay in Dart. Implements the dart:io HttpServer API.
+version: 3.0.0-alpha.1
+repository: https://github.com/dartondox/dox
+homepage: https://dartondox.dev
+
+environment:
+  sdk: ^3.13.0
+resolution: workspace
+
+dependencies:
+  code_assets: ^2.1.0
+  crypto: ^3.0.7
+  hooks: ^2.2.0
+
+dev_dependencies:
+  lints: ^6.1.0
+  test: ^1.33.0

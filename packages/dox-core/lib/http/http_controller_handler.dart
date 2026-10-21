@@ -1,30 +1,40 @@
+import 'dart:async';
+
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/router/route_data.dart';
 
 /// Handle middleware and controllers
 Future<dynamic> middlewareAndControllerHandler(DoxRequest doxReq) async {
-  dynamic result;
+  return await runMiddlewareAndController(doxReq);
+}
+
+/// Run middleware and controllers. It stays sync while every step gives
+/// a plain value, so a simple route needs no Future. At the first Future
+/// it waits, then goes on with the next item.
+FutureOr<dynamic> runMiddlewareAndController(DoxRequest doxReq) {
+  return _runFrom(doxReq, 0, null);
+}
+
+FutureOr<dynamic> _runFrom(DoxRequest doxReq, int start, dynamic result) {
   RouteData route = doxReq.route;
   List<dynamic> controllers = route.controllers;
+  int last = controllers.length - 1;
 
-  for (int i = 0; i < controllers.length; i++) {
+  for (int i = start; i <= last; i++) {
     dynamic fn = controllers[i];
     if (fn is Function) {
       /// the last function is the controller
-      if (i == controllers.length - 1) {
-        return await route.handler!.call(doxReq);
-      }
+      if (i == last) return route.handler!.call(doxReq);
 
       /// a function before it is a middleware, which gives the request
       /// (to go on) or a response
-      result = await fn(doxReq);
+      result = fn(doxReq);
+    } else if (fn is IDoxMiddleware) {
+      /// DoxMiddleware class with handle function
+      result = fn.handle(doxReq);
     }
 
-    /// DoxMiddleware class
-    /// with handle function
-    if (fn is IDoxMiddleware) {
-      result = await fn.handle(doxReq);
-    }
+    if (result is Future<dynamic>) return _resume(result, i + 1);
 
     /// a request from a middleware goes on to the next item,
     /// anything else is the response
@@ -34,6 +44,14 @@ Future<dynamic> middlewareAndControllerHandler(DoxRequest doxReq) async {
       return result;
     }
   }
+  return null;
+}
+
+/// wait for a middleware Future, then go on from item [next]
+Future<dynamic> _resume(Future<dynamic> pending, int next) async {
+  dynamic result = await pending;
+  if (result is DoxRequest) return await _runFrom(result, next, result);
+  return result;
 }
 
 /// What Dox gives to one parameter of a controller.
@@ -149,10 +167,11 @@ class ControllerPlan {
 
   /// Fill the parameters for [req] and call the controller.
   /// A path param that does not fit its type answers 404.
-  Future<dynamic> call(DoxRequest req) async {
+  /// Without a DTO it is sync and gives what the controller gives.
+  FutureOr<dynamic> call(DoxRequest req) {
     int count = args.length;
     if (count == 1 && args[0].kind == ArgKind.request) {
-      return await fn(req);
+      return fn(req);
     }
     List<dynamic> values = List<dynamic>.filled(count, null);
     ControllerArg? dtoArg;
@@ -170,22 +189,34 @@ class ControllerPlan {
       }
     }
     // path params first: when one is wrong, the DTO is not checked
-    if (dtoArg != null) {
-      values[dtoIndex] = await Dox().validator.validateDto(req, dtoArg.dto!);
-    }
-    switch (count) {
+    if (dtoArg != null) return _callWithDto(req, dtoArg, dtoIndex, values);
+    return _apply(values);
+  }
+
+  Future<dynamic> _callWithDto(
+    DoxRequest req,
+    ControllerArg dtoArg,
+    int dtoIndex,
+    List<dynamic> values,
+  ) async {
+    values[dtoIndex] = await Dox().validator.validateDto(req, dtoArg.dto!);
+    return await _apply(values);
+  }
+
+  dynamic _apply(List<dynamic> values) {
+    switch (values.length) {
       case 0:
-        return await fn();
+        return fn();
       case 1:
-        return await fn(values[0]);
+        return fn(values[0]);
       case 2:
-        return await fn(values[0], values[1]);
+        return fn(values[0], values[1]);
       case 3:
-        return await fn(values[0], values[1], values[2]);
+        return fn(values[0], values[1], values[2]);
       case 4:
-        return await fn(values[0], values[1], values[2], values[3]);
+        return fn(values[0], values[1], values[2], values[3]);
     }
-    return await Function.apply(fn, values);
+    return Function.apply(fn, values);
   }
 
   Object? _path(ControllerArg arg, Object? raw) {
