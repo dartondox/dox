@@ -92,11 +92,10 @@ mixin Get<T> implements SharedMixin<T> {
   String toSql() {
     String q = _buildQuery();
     Map<String, dynamic> values = queryBuilder.substitutionValues;
-    String query = '';
-    values.forEach((String key, dynamic value) {
-      query += q.replaceAll('@$key', value);
+    return q.replaceAllMapped(RegExp(r'@(\w+)'), (Match m) {
+      String key = m.group(1)!;
+      return values.containsKey(key) ? values[key].toString() : m.group(0)!;
     });
-    return query;
   }
 
   /// Get all record from table

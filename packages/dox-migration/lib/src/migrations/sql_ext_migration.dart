@@ -1,12 +1,12 @@
 import 'dart:io';
 
+import 'package:dox_migration/src/utils/db_connection.dart';
 import 'package:dox_migration/src/utils/file_extension.dart';
 import 'package:dox_migration/src/utils/logger.dart';
 import 'package:dox_migration/src/utils/utils.dart';
-import 'package:postgres/postgres.dart';
 
 class SqlExtMigration {
-  final Connection conn;
+  final DbConnection conn;
   final MigrationType type;
 
   const SqlExtMigration({
@@ -57,7 +57,27 @@ class SqlExtMigration {
     if (query == null) return;
     if (query.isEmpty) return;
     query = query.replaceAll(RegExp(r'\s+'), ' ').trim();
-    await conn.execute(Sql.named(query));
-    await saveMigratedRecord(conn, file, batch, type);
+
+    // mysql can not run many statements in one query, so run one by one.
+    // ponytail: split on `;`, breaks if a string value has `;` in it.
+    List<String> statements = query
+        .split(';')
+        .map((String s) => s.trim())
+        .where((String s) => s.isNotEmpty)
+        .toList();
+
+    // mysql auto commits DDL (create, alter, drop), so rollback on error
+    // only undoes data changes there. postgres undoes everything.
+    await conn.execute('BEGIN');
+    try {
+      for (String statement in statements) {
+        await conn.execute(statement);
+      }
+      await saveMigratedRecord(conn, file, batch, type);
+      await conn.execute('COMMIT');
+    } catch (error) {
+      await conn.execute('ROLLBACK');
+      rethrow;
+    }
   }
 }

@@ -1,26 +1,29 @@
 import 'package:dox_query_builder/dox_query_builder.dart';
 
+/// counter to make each param key unique, a timestamp alone can repeat
+/// when many keys are made in the same microsecond.
+int _paramKeyCounter = 0;
+
 class QueryBuilderHelper<T> {
   final QueryBuilder<T> queryBuilder;
   QueryBuilderHelper(this.queryBuilder);
 
   String parseColumnKey(String column) {
     String timestamp = DateTime.now().microsecondsSinceEpoch.toString();
-    String key = "$column$timestamp".replaceAll(RegExp(r'[^\w]'), "");
+    _paramKeyCounter++;
+    String key = "$column${timestamp}_$_paramKeyCounter"
+        .replaceAll(RegExp(r'[^\w]'), "");
     return '@$key';
   }
 
   String getCommonQuery({bool isCountQuery = false}) {
-    if (queryBuilder.isSoftDeletes) {
-      queryBuilder.whereRaw("${queryBuilder.tableName}.deleted_at IS NULL");
-    }
     String query = "";
     query += queryBuilder.getJoinQuery();
     query += queryBuilder.getWhereQuery();
+    query += queryBuilder.getGroupByQuery();
     if (!isCountQuery) {
       query += queryBuilder.getOrderByQuery();
     }
-    query += queryBuilder.getGroupByQuery();
     query += queryBuilder.getLimitQuery();
     return query;
   }

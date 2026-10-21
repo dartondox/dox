@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:dox_query_builder/dox_query_builder.dart';
 import 'package:mysql1/mysql1.dart';
 
-MySqlConnection? _globalMysqlConnection;
-
 /// driver for postgres SQL
 /// support PostgreSQLConnection and PgPool
 class MysqlDriver extends DBDriver {
@@ -19,20 +17,12 @@ class MysqlDriver extends DBDriver {
   }
 
   Future<MySqlConnection> _getConnection() async {
-    /// preventing to create duplicate mysql connection
-    if (_globalMysqlConnection != null) {
-      return _globalMysqlConnection!;
-    }
-
-    /// if connection is future, we need to connect first
+    /// if connection is future, we need to connect first.
+    /// the connection is kept on this driver, so each named connection
+    /// keeps its own database connection.
     if (conn is Future) {
       conn = await conn;
     }
-
-    /// assign to global
-    _globalMysqlConnection = conn;
-
-    /// return connection
     return conn;
   }
 
@@ -90,8 +80,20 @@ extension MySqlConnectionExecute on MySqlConnection {
     String sql, {
     Map<String, dynamic>? substitutionValues,
   }) async {
-    List<Object> params = _substitutionValuesToList(substitutionValues);
-    sql = sql.replaceAll(RegExp(r'@\w+'), '?');
+    Map<String, dynamic> values = substitutionValues ?? <String, dynamic>{};
+    List<Object?> params = <Object?>[];
+
+    /// mysql use `?` placeholder, so replace each known `@key` in the order
+    /// it shows in the sql, and add its value in the same order.
+    /// unknown `@word` (eg. 'a@b.com' inside a string) is kept as it is.
+    sql = sql.replaceAllMapped(RegExp(r'@(\w+)'), (Match m) {
+      String key = m.group(1)!;
+      if (!values.containsKey(key)) {
+        return m.group(0)!;
+      }
+      params.add(_toMysqlValue(values[key]));
+      return '?';
+    });
     return await query(sql, params);
   }
 
@@ -122,26 +124,22 @@ extension MySqlConnectionExecute on MySqlConnection {
     return result;
   }
 
-  List<String> _substitutionValuesToList(dynamic params) {
-    List<String> list = <String>[];
-    if (params != null && (params as Map<String, dynamic>).isNotEmpty) {
-      params.forEach((String key, dynamic value) {
-        if (value is Map) {
-          value = jsonEncode(value);
-        } else if (value is DateTime) {
-          value = value.toIso8601String().split('.').first;
-        } else if (value.toString().endsWith('Z')) {
-          try {
-            value = DateTime.parse(value).toIso8601String().split('.').first;
-          } catch (error) {
-            value = value.toString();
-          }
-        } else {
-          value = value.toString();
-        }
-        list.add(value);
-      });
+  Object? _toMysqlValue(dynamic value) {
+    if (value == null) {
+      return null;
+    } else if (value is bool) {
+      return value ? 1 : 0;
+    } else if (value is Map || value is List) {
+      return jsonEncode(value);
+    } else if (value is DateTime) {
+      return value.toIso8601String().split('.').first;
+    } else if (value.toString().endsWith('Z')) {
+      try {
+        return DateTime.parse(value).toIso8601String().split('.').first;
+      } catch (error) {
+        return value.toString();
+      }
     }
-    return list;
+    return value.toString();
   }
 }

@@ -5,6 +5,15 @@ mixin Where<T> implements SharedMixin<T> {
   final List<String> _wheres = <String>[];
 
   String getWhereQuery() {
+    /// wrap user conditions in brackets so an OR can not skip the
+    /// soft delete check.
+    if (isSoftDeletes) {
+      String softDelete = "$tableName.deleted_at IS NULL";
+      if (_wheres.isEmpty) {
+        return " WHERE $softDelete";
+      }
+      return " WHERE (${_wheres.join(' ')}) AND $softDelete";
+    }
     if (_wheres.isNotEmpty) {
       return " WHERE ${_wheres.join(' ')}";
     }
@@ -26,11 +35,21 @@ mixin Where<T> implements SharedMixin<T> {
   /// List blogs = await whereIn('id', [1, 2, 3]).get();
   /// ```
   QueryBuilder<T> whereIn(String column, List<dynamic> ids) {
-    String val = "(${ids.join(',')})";
+    /// empty list match nothing (`in ()` is not valid sql)
+    String condition = '1 = 0';
+    if (ids.isNotEmpty) {
+      List<String> keys = <String>[];
+      for (dynamic id in ids) {
+        String columnKey = helper.parseColumnKey(column);
+        keys.add(columnKey);
+        addSubstitutionValues(columnKey, id);
+      }
+      condition = "$column in (${keys.join(',')})";
+    }
     if (_wheres.isEmpty) {
-      _wheres.add("$column in $val");
+      _wheres.add(condition);
     } else {
-      _wheres.add("AND $column in $val");
+      _wheres.add("AND $condition");
     }
     return queryBuilder;
   }
@@ -66,10 +85,15 @@ mixin Where<T> implements SharedMixin<T> {
       [dynamic arg2, dynamic arg3]) {
     String column = arg1.toString();
     String condition = '=';
-    String value = arg2.toString();
+    dynamic value = arg2;
     if (arg3 != null) {
       condition = arg2;
-      value = arg3.toString();
+      value = arg3;
+    }
+
+    /// `= null` never match in sql, use IS NULL
+    if (value == null) {
+      return _rawQuery(type, "$column IS NULL");
     }
     String columnKey = helper.parseColumnKey(column);
     if (_wheres.isEmpty) {

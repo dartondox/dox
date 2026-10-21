@@ -47,7 +47,6 @@ class QueryBuilder<T>
   @override
   DBDriver get dbDriver {
     if (connection != null) {
-      print(connection);
       return SqlQueryBuilder().getDBDriver(connection);
     }
     return SqlQueryBuilder().dbDriver;

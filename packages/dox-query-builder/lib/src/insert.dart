@@ -61,11 +61,14 @@ mixin Insert<T> implements SharedMixin<T> {
     // creating values to insert (value1, val2);
     for (Map<String, dynamic> data in list) {
       List<String> ret = <String>[];
-      data.forEach((String key, dynamic value) {
+
+      /// follow the column order of the first row, so values do not go
+      /// to the wrong column when rows have keys in a different order
+      for (String key in columns) {
         String columnKey = helper.parseColumnKey(key);
         ret.add(columnKey);
-        addSubstitutionValues(columnKey, value);
-      });
+        addSubstitutionValues(columnKey, data[key]);
+      }
       values.add("(${ret.join(',')})");
     }
 

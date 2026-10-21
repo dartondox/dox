@@ -14,10 +14,10 @@ M? hasMany<T, M>(
   localKey = localKey ?? owner.primaryKey;
   foreignKey = foreignKey ?? "${owner.tableName}_id";
 
-  List<String> ids = list.map((Model<T> i) {
-    Map<String, dynamic> map = i.toMap();
-    return map[localKey].toString();
-  }).toList();
+  List<dynamic> ids = list
+      .map((Model<T> i) => i.toMap()[localKey])
+      .where((dynamic id) => id != null)
+      .toList();
 
   Model<M> m = model().debug(owner.shouldDebug);
 

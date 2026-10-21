@@ -179,6 +179,9 @@ Query Builder provides a user-friendly interface where users can define the crit
     await Actor().whereIn('id', ['1', '2']).get();
     ```
 
+!!! info
+    Each value is sent as a bound parameter. An empty list matches no rows.
+
 ### `where`
 
 === "where"
@@ -192,6 +195,13 @@ Query Builder provides a user-friendly interface where users can define the crit
     ```dart
     await Actor().where('name', '=', 'John Wick').get();
     await Actor().where('age', '>=', 23).get();
+    ```
+
+=== "Where null"
+
+    ```dart
+    // builds `deleted_at IS NULL`
+    await Actor().where('deleted_at', null).get();
     ```
 
 ### `orWhere`
@@ -281,7 +291,7 @@ Query Builder provides a user-friendly interface where users can define the crit
 === "asc"
 
     ```dart
-    await Actor().orderBy('name', 'desc').get();
+    await Actor().orderBy('name', 'asc').get();
     ```
 
 === "multiple columns"
@@ -292,6 +302,10 @@ Query Builder provides a user-friendly interface where users can define the crit
         .orderBy('id', 'desc')
         .get();
     ```
+
+!!! info
+    The direction must be `asc` or `desc`. Any other value throws an `ArgumentError`.
+    The column name is not escaped. Do not pass user input as the column name.
 
 
 ### `join`

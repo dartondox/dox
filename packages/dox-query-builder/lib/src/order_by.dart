@@ -18,6 +18,11 @@ mixin OrderBy<T> implements SharedMixin<T> {
   /// List blogs = await Blog().orderBy('id', 'desc').get()
   /// ```
   QueryBuilder<T> orderBy(dynamic column, [dynamic type]) {
+    /// only allow asc or desc, to block sql injection from user input
+    if (type != null &&
+        !<String>['asc', 'desc'].contains(type.toString().toLowerCase())) {
+      throw ArgumentError.value(type, 'type', 'must be asc or desc');
+    }
     _orderBy.add('$column ${type == null ? '' : type.toString()}');
     return queryBuilder;
   }

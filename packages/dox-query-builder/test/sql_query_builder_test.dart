@@ -406,5 +406,140 @@ void main() async {
       String json = jsonEncode(pagination2);
       expect(json.contains('total'), true);
     });
+
+    test('update with where saves the right values', () async {
+      await Blog().insertMultiple(<Map<String, dynamic>>[
+        <String, dynamic>{'title': 'title 1', 'body': 'body 1'},
+        <String, dynamic>{'title': 'title 2', 'body': 'body 2'},
+      ]);
+      await QueryBuilder.table('blog')
+          .where('uid', 1)
+          .update(<String, dynamic>{'title': 'updated'});
+
+      List<Map<String, dynamic>> rows = await QueryBuilder.table('blog')
+          .select('uid, title')
+          .orderBy('uid')
+          .get();
+      expect(rows.first['title'], 'updated');
+      expect(rows.last['title'], 'title 2');
+    });
+
+    test('model save updates the database', () async {
+      Blog blog = Blog();
+      blog.title = 'title 1';
+      blog.description = 'body';
+      await blog.save();
+
+      blog.title = 'new title';
+      await blog.save();
+
+      Blog? found = await Blog().find(blog.uid);
+      expect(found?.title, 'new title');
+    });
+
+    test('insert multiple with different key order', () async {
+      await Blog().insertMultiple(<Map<String, dynamic>>[
+        <String, dynamic>{'title': 'title 1', 'body': 'body 1'},
+        <String, dynamic>{'body': 'body 2', 'title': 'title 2'},
+      ]);
+      Map<String, dynamic> row =
+          await QueryBuilder.table('blog').where('uid', 2).getFirst();
+      expect(row['title'], 'title 2');
+      expect(row['body'], 'body 2');
+    });
+
+    test('insert null stores real null', () async {
+      await QueryBuilder.table('blog')
+          .setPrimaryKey('uid')
+          .insert(<String, dynamic>{'title': 't', 'body': 'b', 'slug': null});
+      int total =
+          await QueryBuilder.table('blog').whereRaw('slug IS NULL').count();
+      expect(total, 1);
+    });
+
+    test('where null', () async {
+      await Blog().insertMultiple(<Map<String, dynamic>>[
+        <String, dynamic>{'title': 'title 1', 'body': 'body 1', 'slug': null},
+        <String, dynamic>{'title': 'title 2', 'body': 'body 2', 'slug': 's'},
+      ]);
+      List<Blog> blogs = await Blog().where('slug', null).get();
+      expect(blogs.length, 1);
+      expect(blogs.first.title, 'title 1');
+    });
+
+    test('where in with strings and empty list', () async {
+      await Blog().insertMultiple(<Map<String, dynamic>>[
+        <String, dynamic>{'title': 'title 1', 'body': 'body 1'},
+        <String, dynamic>{'title': "it's 2", 'body': 'body 2'},
+      ]);
+      List<Blog> blogs =
+          await Blog().whereIn('title', <String>["it's 2"]).get();
+      expect(blogs.length, 1);
+      expect(blogs.first.uid, 2);
+
+      List<Blog> none = await Blog().whereIn('uid', <int>[]).get();
+      expect(none.length, 0);
+
+      List<int> ids = List<int>.generate(500, (int i) => i + 1);
+      List<Blog> all = await Blog().whereIn('uid', ids).get();
+      expect(all.length, 2);
+    });
+
+    test('or where does not show soft deleted rows', () async {
+      await Blog().insertMultiple(<Map<String, dynamic>>[
+        <String, dynamic>{'title': 'title 1', 'body': 'body 1'},
+        <String, dynamic>{'title': 'title 2', 'body': 'body 2'},
+      ]);
+      await Blog().where('uid', 1).delete();
+
+      int total = await Blog().where('uid', 1).orWhere('uid', 2).count();
+      expect(total, 1);
+    });
+
+    test('group by with order by', () async {
+      await Blog().insertMultiple(<Map<String, dynamic>>[
+        <String, dynamic>{'title': 'b', 'body': 'body'},
+        <String, dynamic>{'title': 'a', 'body': 'body'},
+        <String, dynamic>{'title': 'a', 'body': 'body'},
+      ]);
+      List<Map<String, dynamic>> rows = await Blog()
+          .select('title')
+          .groupBy('title')
+          .orderBy('title', 'desc')
+          .get();
+      expect(rows.first['title'], 'b');
+      expect(rows.last['title'], 'a');
+    });
+
+    test('order by rejects bad direction', () async {
+      expect(() => Blog().orderBy('uid', 'desc; DROP TABLE blog'),
+          throwsArgumentError);
+    });
+
+    test('at sign inside raw string is kept', () async {
+      await QueryBuilder.table('blog')
+          .setPrimaryKey('uid')
+          .insert(<String, dynamic>{'title': 'a@b.com', 'body': 'b'});
+      int total = await QueryBuilder.table('blog')
+          .whereRaw("title = 'a@b.com'")
+          .where('uid', 1)
+          .count();
+      expect(total, 1);
+    });
+
+    test('same raw param used twice', () async {
+      await QueryBuilder.table('blog')
+          .setPrimaryKey('uid')
+          .insert(<String, dynamic>{'title': 'x', 'body': 'x'});
+      int total = await QueryBuilder.table('blog').whereRaw(
+          'title = @v AND body = @v', <String, dynamic>{'v': 'x'}).count();
+      expect(total, 1);
+    });
+
+    test('toSql with many values', () async {
+      String query = Blog().where('uid', 1).where('title', 'x').toSql();
+      expect(query,
+          "SELECT * FROM blog WHERE (uid = 1 AND title = x) AND blog.deleted_at IS NULL");
+    });
   });
 }

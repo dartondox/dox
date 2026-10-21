@@ -15,10 +15,10 @@ M? belongsTo<T, M>(
   localKey = localKey ?? owner.primaryKey;
   foreignKey = foreignKey ?? "${owner.tableName}_id";
 
-  List<String> ids = list.map((dynamic i) {
-    Map<String, dynamic> map = i.toMap();
-    return map[foreignKey].toString();
-  }).toList();
+  List<dynamic> ids = list
+      .map((dynamic i) => i.toMap()[foreignKey])
+      .where((dynamic id) => id != null)
+      .toList();
 
   owner
       .select(<String>[

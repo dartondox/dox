@@ -55,5 +55,31 @@ void main() async {
       expect(true, columns.contains('slug'));
       expect(false, columns.contains('column_to_drop'));
     });
+
+    test('schema update changes nullable and default', () async {
+      await Schema.table('schema_test_table', (Table table) {
+        table.string('title').nullable();
+        table.string('status').withDefault('pending');
+      });
+      await QueryBuilder.table('schema_test_table').insert(<String, dynamic>{
+        'uuid': '6f1c8d2e-4b7a-4e3f-9c1d-2a5b6c7d8e9f',
+        'user_id': 1,
+        'price': 1,
+        'tags': '{}',
+        'views': 1,
+        'shares': 1,
+        'likes': 1,
+        'approved_at': DateTime.now(),
+        'published_date': DateTime.now(),
+        'published_time': '10:00:00',
+        'expired_at': DateTime.now(),
+        'body': 'b',
+        'column_to_drop': 'x',
+      });
+      Map<String, dynamic> row =
+          await QueryBuilder.table('schema_test_table').getFirst();
+      expect(row['title'], null);
+      expect(row['status'], 'pending');
+    });
   });
 }

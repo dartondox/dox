@@ -44,38 +44,41 @@ mixin TableUpdate implements TableSharedMixin {
   Future<void> _handleAlter(TableColumn col) async {
     List<String> queries = <String>[];
 
-    /// changing type
-    if (col.type != null) {
-      if (dbDriver.getName() == Driver.mysql) {
-        queries.add("MODIFY COLUMN ${col.name} ${col.type}");
-      } else {
+    String defaultQuery =
+        col.defaultValue != null ? " DEFAULT '${col.defaultValue}'" : '';
+
+    if (dbDriver.getName() == Driver.mysql) {
+      /// mysql MODIFY need the type and reset all column options,
+      /// so type, null and default must go in one query
+      queries.add(
+          "MODIFY COLUMN ${col.name} ${col.type} ${col.isNullable ? 'NULL' : 'NOT NULL'}$defaultQuery");
+    } else {
+      /// changing type
+      if (col.type != null) {
         queries.add("ALTER COLUMN ${col.name} TYPE ${col.type}");
       }
-    }
 
-    /// changing default value
-    if (col.defaultValue != null) {
-      queries.add("ALTER COLUMN ${col.name} SET DEFAULT '${col.defaultValue}'");
-    }
+      /// changing default value
+      if (col.defaultValue != null) {
+        queries
+            .add("ALTER COLUMN ${col.name} SET DEFAULT '${col.defaultValue}'");
+      }
 
-    /// set null
-    if (dbDriver.getName() == Driver.mysql) {
-      queries.add(
-          "MODIFY COLUMN ${col.name} ${col.isNullable ? 'NULL' : 'NOT NULL'}");
-    } else {
+      /// set null
       queries.add(
           "ALTER COLUMN ${col.name} ${col.isNullable ? 'DROP NOT NULL' : 'SET NOT NULL'}");
     }
 
     /// set unique
     if (col.isUnique) {
-      queries.add("ADD CONSTRAINT unique_${col.name} UNIQUE (${col.name})");
+      queries.add(
+          "ADD CONSTRAINT unique_${tableName}_${col.name} UNIQUE (${col.name})");
     }
 
-    /// run final query
+    /// run all queries
     for (String q in queries) {
       String query = "ALTER TABLE $tableName $q";
-      return await _runQuery(query);
+      await _runQuery(query);
     }
   }
 
@@ -88,7 +91,7 @@ mixin TableUpdate implements TableSharedMixin {
 
   Future<List<String>> getTableColumns() async {
     String query =
-        "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '$tableName'";
+        "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '$tableName' AND TABLE_SCHEMA = ${dbDriver.getName() == Driver.mysql ? 'DATABASE()' : 'current_schema()'}";
     List<Map<String, dynamic>> result = await dbDriver.query(query);
 
     List<String> columns = <String>[];

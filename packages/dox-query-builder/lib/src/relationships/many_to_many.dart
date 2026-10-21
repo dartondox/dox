@@ -28,10 +28,10 @@ M? manyToMany<T, M>(
   pivotForeignKey = pivotForeignKey ?? '${localTable}_id';
   pivotRelatedForeignKey = pivotRelatedForeignKey ?? '${relatedTable}_id';
 
-  List<String> ids = list.map((Model<T> i) {
-    Map<String, dynamic> map = i.toMap();
-    return map[localKey].toString();
-  }).toList();
+  List<dynamic> ids = list
+      .map((Model<T> i) => i.toMap()[localKey])
+      .where((dynamic id) => id != null)
+      .toList();
 
   QueryBuilder<M> q = related
       .debug(local.shouldDebug)

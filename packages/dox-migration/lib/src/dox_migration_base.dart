@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:dox_migration/src/migrations/sql_ext_migration.dart';
+import 'package:dox_migration/src/utils/db_connection.dart';
 import 'package:dox_migration/src/utils/env.dart';
 import 'package:dox_migration/src/utils/file_extension.dart';
 import 'package:dox_migration/src/utils/logger.dart';
 import 'package:dox_migration/src/utils/utils.dart';
-import 'package:postgres/postgres.dart';
 
 class Migration {
   String from;
@@ -15,8 +15,9 @@ class Migration {
   /// main function to run migration
   /// - will create migration table if not exist
   /// - will run migrations from db/migration folder
-  Future<void> migrate([Connection? connection]) async {
-    Connection conn = connection ?? await _getConnection();
+  /// - [connection] is optional postgres `Connection` or mysql `MySqlConnection`
+  Future<void> migrate([dynamic connection]) async {
+    DbConnection conn = await _getConnection(connection);
     await createMigrationTableIfNotExist(conn);
     await _runMigration(conn, MigrationType.up);
     await _closeConnection(conn);
@@ -25,27 +26,20 @@ class Migration {
   /// main function to run migration
   /// - will create migration table if not exist
   /// - will run migrations from db/migration folder
-  Future<void> rollback([Connection? connection]) async {
-    Connection conn = connection ?? await _getConnection();
+  /// - [connection] is optional postgres `Connection` or mysql `MySqlConnection`
+  Future<void> rollback([dynamic connection]) async {
+    DbConnection conn = await _getConnection(connection);
     await createMigrationTableIfNotExist(conn);
     await _runMigration(conn, MigrationType.down);
     await _closeConnection(conn);
   }
 
-  Future<Connection> _getConnection() async {
+  Future<DbConnection> _getConnection(dynamic connection) async {
+    if (connection != null) return DbConnection(connection);
     // get endpoint from env
     Map<String, String> env = loadEnv();
     try {
-      return await Connection.open(
-        Endpoint(
-          host: env['DB_HOST'] ?? 'localhost',
-          port: int.parse(env['DB_PORT'] ?? '5432'),
-          database: env['DB_NAME'] ?? 'dox',
-          username: env['DB_USERNAME'] ?? 'postgres',
-          password: env['DB_PASSWORD'] ?? 'postgres',
-        ),
-        settings: ConnectionSettings(sslMode: SslMode.disable),
-      );
+      return await DbConnection.open(env);
     } catch (e) {
       throw Exception('Could not connect to database: $e');
     }
@@ -60,20 +54,20 @@ class Migration {
   }
 
   /// check whether migration is already done or not
-  Future<bool> isMigrated(Connection conn, File file) async {
+  Future<bool> isMigrated(DbConnection conn, File file) async {
     String query = '''
       SELECT * FROM dox_db_migration 
-      WHERE migration = @filename 
+      WHERE migration = ? 
       LIMIT 1 OFFSET 0
     ''';
 
-    Result migratedValue = await conn.execute(Sql.named(query),
-        parameters: <String, String>{'filename': file.name});
+    List<Map<String, dynamic>> migratedValue =
+        await conn.execute(query, <Object>[file.name]);
     return migratedValue.isNotEmpty;
   }
 
   /// process migration
-  Future<void> _runMigration(Connection conn, MigrationType type) async {
+  Future<void> _runMigration(DbConnection conn, MigrationType type) async {
     try {
       Directory migrationDirectory = getMigrationDirectory();
 
@@ -113,7 +107,7 @@ class Migration {
     }
   }
 
-  Future<void> _closeConnection(Connection conn) async {
+  Future<void> _closeConnection(DbConnection conn) async {
     await conn.close();
   }
 }

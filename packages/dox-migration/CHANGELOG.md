@@ -1,3 +1,8 @@
+## 3.0.0
+
+- Support MySQL. Set `DB_CONNECTION=mysql` in `.env` (default is `postgres`)
+- Run each statement of a `.sql` migration one by one, inside a transaction
+
 ## 2.0.0
 
 - Release stable version v2.0

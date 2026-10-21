@@ -34,7 +34,11 @@ class Table with TableUpdate {
   }
 
   TableColumn uuid([dynamic column]) {
-    TableColumn col = TableColumn(name: column ?? 'uuid', type: 'UUID');
+    /// mysql do not have UUID type
+    TableColumn col = TableColumn(
+      name: column ?? 'uuid',
+      type: dbDriver.getName() == Driver.postgres ? 'UUID' : 'CHAR(36)',
+    );
     columns.add(col);
     return col;
   }

@@ -21,7 +21,7 @@ class DatabaseConfig {
       conn = connections[connectionName];
     }
     if (conn == null) {
-      throw Exception('$connection not found');
+      throw Exception('${connectionName ?? connection} not found');
     }
     return conn;
   }

@@ -1,7 +1,7 @@
 import 'dart:io';
 
+import 'package:dox_migration/src/utils/db_connection.dart';
 import 'package:dox_migration/src/utils/file_extension.dart';
-import 'package:postgres/postgres.dart';
 
 enum MigrationType { up, down }
 
@@ -11,7 +11,7 @@ String fileGetContents(File file) {
 }
 
 /// crete migration table if not exist
-Future<void> createMigrationTableIfNotExist(Connection conn) async {
+Future<void> createMigrationTableIfNotExist(DbConnection conn) async {
   String query = '''
       CREATE TABLE IF NOT EXISTS dox_db_migration 
       (
@@ -20,48 +20,44 @@ Future<void> createMigrationTableIfNotExist(Connection conn) async {
         batch INTEGER NOT NULL
       )
     ''';
-  await conn.execute(Sql.named(query));
+  await conn.execute(query);
 }
 
 /// save migration record to migrations table with batch number
 Future<void> saveMigratedRecord(
-    Connection conn, File file, int batch, MigrationType type) async {
+    DbConnection conn, File file, int batch, MigrationType type) async {
   if (type == MigrationType.up) {
     String query = '''
       INSERT INTO dox_db_migration 
       (migration,batch) 
       VALUES 
-      (@filename, @batch) 
-      RETURNING id
+      (?, ?)
     ''';
-    await conn.execute(Sql.named(query),
-        parameters: <String, dynamic>{'filename': file.name, 'batch': batch});
+    await conn.execute(query, <Object>[file.name, batch]);
     return;
   }
 
   String query = '''
       DELETE from dox_db_migration 
-      WHERE migration = @filename
+      WHERE migration = ?
     ''';
-  await conn.execute(Sql.named(query), parameters: <String, dynamic>{
-    'filename': file.name,
-  });
+  await conn.execute(query, <Object>[file.name]);
   return;
 }
 
 // get the next batch number
-Future<int> getNextBatchNumber(Connection conn) async {
+Future<int> getNextBatchNumber(DbConnection conn) async {
   String query = '''
         SELECT batch FROM dox_db_migration 
         ORDER BY batch desc 
         LIMIT 1 OFFSET 0
       ''';
-  Result latestBatch = await conn.execute(query);
+  List<Map<String, dynamic>> latestBatch = await conn.execute(query);
 
   int batchNumber = 1;
 
-  if (latestBatch.isNotEmpty && latestBatch.first.isNotEmpty) {
-    int? latestBatchNumber = latestBatch.first.toColumnMap()['batch'] ?? 0;
+  if (latestBatch.isNotEmpty) {
+    int? latestBatchNumber = latestBatch.first['batch'] ?? 0;
     if (latestBatchNumber != null) {
       String latestBatchNumberString = latestBatchNumber.toString();
       batchNumber = int.parse(latestBatchNumberString) + 1;

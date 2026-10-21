@@ -1,8 +1,6 @@
 import 'package:dox_query_builder/dox_query_builder.dart';
 import 'package:postgres/postgres.dart';
 
-Connection? _globalPostgresConnection;
-
 /// driver for postgres SQL
 /// support PostgreSQLConnection and PgPool
 class PostgresDriver extends DBDriver {
@@ -17,20 +15,12 @@ class PostgresDriver extends DBDriver {
   }
 
   Future<Connection> _getConnection() async {
-    /// preventing to create duplicate mysql connection
-    if (_globalPostgresConnection != null) {
-      return _globalPostgresConnection!;
-    }
-
-    /// if connection is future, we need to connect first
+    /// if connection is future, we need to connect first.
+    /// the connection is kept on this driver, so each named connection
+    /// keeps its own database connection.
     if (conn is Future) {
       conn = await conn;
     }
-
-    /// assign to global
-    _globalPostgresConnection = conn;
-
-    /// return connection
     return conn;
   }
 

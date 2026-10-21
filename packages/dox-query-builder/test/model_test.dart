@@ -214,7 +214,7 @@ void main() async {
 
     test('toSql', () async {
       String query = Blog().where('uid', 1).toSql();
-      expect("SELECT * FROM blog WHERE uid = 1 AND blog.deleted_at IS NULL",
+      expect("SELECT * FROM blog WHERE (uid = 1) AND blog.deleted_at IS NULL",
           query);
     });
 

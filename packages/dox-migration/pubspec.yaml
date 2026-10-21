@@ -1,5 +1,5 @@
 name: dox_migration
-description: Database migration package for Postgres SQL
+description: Database migration package for Postgres and MySQL
 version: 3.0.0
 repository: https://github.com/dartondox/dox
 
@@ -8,6 +8,7 @@ environment:
 
 # Add regular dependencies here.
 dependencies:
+  mysql1: ^0.20.0
   postgres: ^3.0.4
 
 dev_dependencies:
