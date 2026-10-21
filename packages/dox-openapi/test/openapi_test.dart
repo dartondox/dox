@@ -358,6 +358,11 @@ void main() {
   group('OpenApiServer', () {
     OpenApiServer server = OpenApiServer(buildApi());
 
+    test('builds and encodes the document once', () {
+      expect(identical(server.json().body, server.json().body), isTrue);
+      expect(identical(server.yaml().body, server.yaml().body), isTrue);
+    });
+
     test('serves JSON and YAML with content types', () {
       OpenApiResponse json = server.handle('/openapi.json')!;
       expect(json.contentType, startsWith('application/json'));

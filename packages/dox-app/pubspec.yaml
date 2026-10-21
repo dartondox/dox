@@ -21,6 +21,7 @@ dev_dependencies:
   lints: ^6.1.0
   test: ^1.33.0
   http: ^1.6.0
+  yaml: ^3.1.4
 
 assets:
   - .env

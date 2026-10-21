@@ -6,6 +6,7 @@ class WebController {
     return 'pong';
   }
 
+  @ApiIgnore()
   dynamic testRedis(DoxRequest req) async {
     await redis.set('dox', 'awesome');
     return await redis.get('dox');

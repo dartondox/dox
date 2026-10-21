@@ -3,6 +3,11 @@
 Make an OpenAPI 3.1 document for a Dox app. Output it as JSON and YAML, and
 show it in a Swagger UI page.
 
+In a Dox app you write no docs code: `dox_builder` reads your routes,
+request classes and controllers, and `dox_core` serves `/docs`.
+See the [OpenAPI docs](https://dartondox.dev/packages/openapi/).
+The API below is for describing routes by hand.
+
 ## Describe your API
 
 ```dart

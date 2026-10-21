@@ -376,9 +376,17 @@ Fix: give a default where a key is optional, for example `Env.get<int>('APP_PORT
 
 **An empty `APP_KEY` stops the server in production** (`APP_ENV=production`). Run `dox key:generate`.
 
+## New names from `dox_core`
+
+`dox_core` now exports the OpenAPI and DTO annotations: `Request`, `Response`, `Body`, `Query`, `Tags`, `Summary`, `Description`, `Dto`, `Length`, `Email`, `Min`, `Max`, `Pattern`, `MinItems`, `MaxItems`, `Trim`, `Format`, and lower case names like `summary`, `body`, `query`.
+
+- **`Pattern` means the annotation** in a file that imports `dox_core`. Fix: `import 'package:dox_core/dox_core.dart' hide Pattern;` if you need `Pattern` of `dart:core`.
+- **Two `Request` or `Response` classes**: a file that imports `dox_core` and `package:http` (or another package with these names) without a prefix gets an "ambiguous import" error. Fix: `import 'package:http/http.dart' as http;`.
+- `dox_builder` writes a new file, `lib/openapi.g.dart`, in apps with controllers. Commit it like the other `.g.dart` files.
+
 ## New built-in features
 
-- [OpenAPI docs](../packages/openapi.md#in-a-dox-app) at `/docs`, on by default only when `APP_ENV` is `development` or `local`. `dox openapi:generate` writes the files.
+- [OpenAPI docs](../packages/openapi.md#in-a-dox-app) at `/docs`, on by default only when `APP_ENV` is `development` or `local`. They are made from your routes, request classes and controllers: run `dox build_runner:build`, then pass `openApiRegistry` from `lib/openapi.g.dart` to `OpenApiConfig(registry:)`. `dox openapi:generate` writes the files.
 - [Socket.IO](../packages/socketio.md#in-a-dox-app-same-port-as-http) on the app port, off by default.
 - [Typed DTOs](validation.md) with `@Dto()`, typed [controller parameters](controller.md#parameters), and [`@Unique` / `@Exists`](validation.md#database-rules-unique-and-exists).
 - `Route.files()` for local signed URLs, and the catch-all route param `{path*}`.
