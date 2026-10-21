@@ -1,10 +1,16 @@
+import 'package:dox_app/app/http/dto/blog.dto.dart';
 import 'package:dox_app/app/http/requests/blog.request.dart';
 import 'package:dox_app/app/http/services/blog.service.dart';
+import 'package:dox_app/app/models/blog/blog.model.dart';
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_orm/dox_orm.dart';
 
 class BlogController {
-  /// GET /blogs
-  Future<dynamic> index(DoxRequest req) async {
+  /// List blogs
+  ///
+  /// One page of blogs, oldest first.
+  @Query(ListBlogs)
+  Future<Pagination> index(DoxRequest req) async {
     req.validate(<String, String>{
       'page': 'required|integer',
       'limit': 'required|integer',
@@ -17,23 +23,23 @@ class BlogController {
     );
   }
 
-  /// POST /blogs
-  Future<dynamic> store(BlogRequest req) async {
+  /// Create a blog
+  Future<Blog> store(BlogRequest req) async {
     return BlogService().create(req);
   }
 
-  /// GET /blogs/{id}
-  Future<dynamic> show(DoxRequest req, String id) async {
+  /// Get one blog
+  Future<Blog?> show(DoxRequest req, String id) async {
     return BlogService().findById(id);
   }
 
-  /// PUT|PATCH /blogs/{id}
-  Future<dynamic> update(BlogRequest req, String id) async {
+  /// Update a blog
+  Future<Blog?> update(BlogRequest req, String id) async {
     return BlogService().update(req, id);
   }
 
-  /// DELETE /blogs/{id}
-  Future<dynamic> destroy(DoxRequest req, String id) async {
+  /// Delete a blog
+  Future<Map<String, String>> destroy(DoxRequest req, String id) async {
     await BlogService().delete(id);
     return <String, String>{
       'status': 'success',

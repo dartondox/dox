@@ -62,6 +62,9 @@ class RouteDoc {
   /// Security requirements, for example `[{'bearerAuth': []}]`.
   final List<Map<String, List<String>>>? security;
 
+  /// True when the route is deprecated.
+  final bool deprecated;
+
   /// Extra `x-` fields added to the operation as they are.
   final Map<String, dynamic> extensions;
 
@@ -78,6 +81,7 @@ class RouteDoc {
     this.body,
     this.responses = const <int, ResponseDoc>{},
     this.security,
+    this.deprecated = false,
     this.extensions = const <String, dynamic>{},
   }) : method = PathConverter.method(method),
        path = PathConverter.path(path);
@@ -107,6 +111,7 @@ class RouteDoc {
     }
     op['responses'] = _responses(resolver);
     _put(op, 'security', security);
+    _put(op, 'deprecated', deprecated ? true : null);
     op.addAll(extensions);
     return op;
   }

@@ -20,6 +20,11 @@
 - `RouteData.preMiddleware` now holds the group and router middleware.
 - Socket.IO: `AppConfig(socketIo: SocketIoConfig(enabled: true, ...))` serves `/socket.io/` on the app port, before the router. `Route.mount(prefix, handler)` is the raw hook. Off by default.
 - No extra work per request when OpenAPI or Socket.IO is off.
+- OpenAPI docs are automatic. `dart run build_runner build` writes `lib/openapi.g.dart`. Pass it as `OpenApiConfig(registry: openApiRegistry)`. Each route then gets its summary and description (from the `///` comment), tags, `Class.method` operation id, typed path params, request (a `@Dto` class or a form request) and answer schema (from the return type), plus `401`, `404`, `422` and `500`.
+- A middleware whose class name ends with `AuthMiddleware` adds `bearerAuth` to the docs, with no config.
+- A `GET` or `DELETE` request class becomes query params in the docs.
+- `dox_core` exports `OpenApi`, `OpenApiRegistry`, `OpenApiOperation`, `OpenApiRouteBinding` and `ResponseDoc` of `dox_openapi`.
+- The OpenAPI JSON and YAML are encoded once and kept, not on each request.
 
 
 ## 3.0.0-alpha.1

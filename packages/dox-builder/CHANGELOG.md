@@ -2,6 +2,8 @@
 
 - Needs Dart 3.13 or newer.
 - All dependencies updated to their latest versions.
+- New builder `dox_builder:openapi`. It writes `lib/openapi.g.dart` with the OpenAPI docs of the app: it reads the `Route.*` calls, the controllers, the `@Dto` classes and the models. It writes nothing when the package has no controllers.
+- `DtoSchema`, `ModelSchema` and `JsonSchemaReader`: the JSON Schema of a `@Dto` class, a model or any Dart type. Other builders can use them.
 
 ## 3.0.0-alpha.1
 

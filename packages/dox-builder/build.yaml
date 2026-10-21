@@ -13,3 +13,11 @@ builders:
     auto_apply: dependents
     build_to: cache
     applies_builders: ["source_gen|combining_builder"]
+
+  # lib/openapi.g.dart: the OpenAPI docs of the app, see dox_openapi
+  openapi:
+    import: "package:dox_builder/dox_builder.dart"
+    builder_factories: ["buildDoxOpenApi"]
+    build_extensions: { "$lib$": ["openapi.g.dart"] }
+    auto_apply: dependents
+    build_to: source

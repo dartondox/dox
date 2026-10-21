@@ -12,6 +12,8 @@ dependencies:
   build: ^5.0.0
   source_gen: ^4.3.1
   analyzer: ^14.6.0
+  dart_style: ^3.1.14
+  glob: ^2.2.0
   dox_annotation: ^3.0.0-alpha.1
 
 dev_dependencies:

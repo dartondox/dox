@@ -26,7 +26,8 @@ class OpenApi {
   /// The route docs and named schemas.
   final ApiDoc docs;
 
-  final YamlEmitter _yaml;
+  /// Writes the YAML output.
+  final YamlEmitter yamlEmitter;
 
   /// Creates a builder. A new [ApiDoc] is made when [docs] is not given.
   OpenApi({
@@ -35,9 +36,8 @@ class OpenApi {
     this.securitySchemes = const <String, SecurityScheme>{},
     this.security,
     ApiDoc? docs,
-    YamlEmitter yamlEmitter = const YamlEmitter(),
-  }) : docs = docs ?? ApiDoc(),
-       _yaml = yamlEmitter;
+    this.yamlEmitter = const YamlEmitter(),
+  }) : docs = docs ?? ApiDoc();
 
   /// Returns the full document as a map.
   Map<String, dynamic> toJson() {
@@ -69,7 +69,7 @@ class OpenApi {
 
   /// Returns the document as YAML text.
   String toYaml() {
-    return _yaml.emit(toJson());
+    return yamlEmitter.emit(toJson());
   }
 
   /// Writes `openapi.json` and `openapi.yaml` into [dir].
