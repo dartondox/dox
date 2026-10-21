@@ -185,6 +185,15 @@
 .md-header__source { width: auto; }
 .md-header__source .md-source__repository { max-width: none; }
 
+/* Line the right header group (toggle, search, GitHub) up with the
+   right edge of the page content. Material's header has only 0.2rem
+   padding, the content has 0.8rem. */
+@media screen and (min-width: 76.25em) {
+  .md-header__inner {
+    padding-right: 0.8rem;
+  }
+}
+
 /* ---------- Navigation ---------- */
 .md-nav__title { font-weight: 700; }
 .md-nav__item--section > .md-nav__link {
