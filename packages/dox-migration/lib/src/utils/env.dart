@@ -1,12 +1,14 @@
 import 'dart:io';
 
+/// values of the `.env` file. without the file (eg. in docker), use the
+/// environment variables.
 Map<String, String> loadEnv() {
   Map<String, String> data = <String, String>{};
 
   File envFile = File('${Directory.current.path}/.env');
 
   if (!envFile.existsSync()) {
-    throw Exception('Could not find .env file');
+    return Platform.environment;
   }
 
   String contents = envFile.readAsStringSync();

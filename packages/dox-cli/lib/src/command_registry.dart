@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dox/src/tools/create_controller.dart';
 import 'package:dox/src/tools/create_middleware.dart';
+import 'package:dox/src/tools/create_migration.dart';
 import 'package:dox/src/tools/create_model.dart';
 import 'package:dox/src/tools/create_project.dart';
 import 'package:dox/src/tools/create_request.dart';
@@ -10,6 +11,7 @@ import 'package:dox/src/tools/generate_key.dart';
 import 'package:dox/src/tools/help.dart';
 import 'package:dox/src/tools/server_serve.dart';
 import 'package:dox/src/tools/update_dox.dart';
+import 'package:dox/src/utils/utils.dart';
 import 'package:dox/src/version.dart';
 import 'package:dox_migration/dox_migration.dart';
 
@@ -68,13 +70,30 @@ class CommandRegistry {
     // Create model
     CommandDefinition(
       command: 'create:model',
-      helpInfo: 'create:model <model_name>',
-      description: 'Create a new model',
+      helpInfo: 'create:model <model_name> [-m|--migration]',
+      description:
+          'Create a new model, and with -m a create_<table>_table migration',
       category: CommandCategory.generation,
+      aliases: ['make:model'],
       minArgs: 1,
-      maxArgs: 1,
+      maxArgs: 2,
       function: (args) async {
-        createModel(args[0]);
+        if (args.length < 2) {
+          createModel(args[0]);
+          return;
+        }
+        if (args[1] != '-m' && args[1] != '--migration') {
+          print('Invalid option ${args[1]}, use -m or --migration');
+          exitCode = 1;
+          return;
+        }
+
+        /// `BlogPost` => table `blog_posts`, same guess as `constrained()`
+        String table =
+            ForeignIdColumnDefinition.guessTable(pascalToSnake(args[0]));
+        if (createModel(args[0], table: table)) {
+          createMigration('create_${table}_table');
+        }
       },
     ),
 
@@ -236,7 +255,7 @@ class CommandRegistry {
       category: CommandCategory.database,
       aliases: ['migrate'],
       function: (args) async {
-        await _migrate(Migration(from: 'cli').migrate());
+        await _migration('run', args, () => Migrator().migrate());
       },
     ),
 
@@ -254,10 +273,15 @@ class CommandRegistry {
           step = int.tryParse(args[0].replaceFirst('--step=', ''));
           if (step == null || step < 1 || !args[0].startsWith('--step=')) {
             print('Invalid option ${args[0]}, use --step=<count>');
+            exitCode = 1;
             return;
           }
         }
-        await _migrate(Migration(from: 'cli').rollback(null, step));
+        await _migration(
+          'rollback',
+          args,
+          () => Migrator().rollback(step: step),
+        );
       },
     ),
 
@@ -268,7 +292,7 @@ class CommandRegistry {
       category: CommandCategory.database,
       aliases: ['migrate:reset'],
       function: (args) async {
-        await _migrate(Migration(from: 'cli').reset());
+        await _migration('reset', args, () => Migrator().reset());
       },
     ),
 
@@ -279,21 +303,36 @@ class CommandRegistry {
       category: CommandCategory.database,
       aliases: ['migrate:refresh'],
       function: (args) async {
-        await _migrate(Migration(from: 'cli').refresh());
+        await _migration('refresh', args, () => Migrator().refresh());
       },
     ),
 
     CommandDefinition(
-      command: 'create:migration',
-      helpInfo: 'create:migration <migration_name> --[sql|dart]',
-      description: 'Create a new migration',
+      command: 'migration:status',
+      helpInfo: 'migration:status',
+      description: 'Show which migrations ran, and their batch',
       category: CommandCategory.database,
+      aliases: ['migrate:status'],
+      function: (args) async {
+        await _migration(
+          'status',
+          args,
+          () async => Migrator.printStatus(await Migrator().status()),
+        );
+      },
+    ),
+
+    CommandDefinition(
+      command: 'make:migration',
+      helpInfo: 'make:migration <name> [--sql]',
+      description:
+          'Create a Dart migration (or a .sql one with --sql) in db/migration',
+      category: CommandCategory.database,
+      aliases: ['create:migration'],
       minArgs: 1,
       maxArgs: 2,
       function: (args) async {
-        final migrationName = args[0];
-        final type = args.length >= 2 ? args[1] : 'sql';
-        MigrationFile(migrationName, type);
+        createMigration(args[0], sql: args.length >= 2 && args[1] == '--sql');
       },
     ),
   ];
@@ -317,12 +356,42 @@ class CommandRegistry {
   }
 }
 
-/// wait for a migration task.
+/// run a migration command.
+/// - with `bin/migrate.dart` (Dart migrations): make the registry again,
+///   then run `dart run bin/migrate.dart <command>`, so the app code runs.
+/// - without it: run the `.sql` migrations here with [direct].
 /// print the error and set exit code 1 when it fails,
 /// so scripts and CI see the failure.
-Future<void> _migrate(Future<void> task) async {
+Future<void> _migration(
+  String command,
+  List<String> args,
+  Future<void> Function() direct,
+) async {
+  if (migrateEntryFile().existsSync()) {
+    writeMigrationRegistry();
+    String exe = Platform.resolvedExecutable;
+    String dart = exe.split(Platform.pathSeparator).last.startsWith('dart')
+        ? exe
+        : 'dart';
+    Process process = await Process.start(
+      dart,
+      ['run', 'bin/migrate.dart', command, ...args],
+      mode: ProcessStartMode.inheritStdio,
+    );
+    int code = await process.exitCode;
+    if (code != 0) exitCode = code;
+    return;
+  }
+  if (hasDartMigrations()) {
+    print(
+      'db/migration has Dart migrations, but bin/migrate.dart is missing. '
+      'Run `dox make:migration <name>` once to make it, or see the docs.',
+    );
+    exitCode = 1;
+    return;
+  }
   try {
-    await task;
+    await direct();
   } catch (error) {
     print(error);
     exitCode = 1;

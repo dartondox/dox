@@ -9,7 +9,7 @@ void main() async {
 
   group('Model with custom table name', () {
     setUp(() async {
-      await Schema.create('users', (Table table) {
+      await Schema().create('users', (Table table) {
         table.id();
         table.string('name');
         table.softDeletes();
@@ -17,7 +17,7 @@ void main() async {
     });
 
     tearDown(() async {
-      await Schema.drop('users');
+      await Schema().dropIfExists('users');
     });
 
     test('get user list', () async {

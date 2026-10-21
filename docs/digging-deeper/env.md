@@ -1,6 +1,11 @@
 # Environment Variables
 
-Dox allows you to access the environment variables from `.env` using `Env` class.
+`Env.get()` reads a value from the environment or from the `.env` file.
+
+!!! info "The environment wins"
+    A real environment variable (set in the shell, Docker or systemd) wins over the `.env` file.
+    So you can keep `.env` for development and use real variables in production.
+    Before 3.x, only the `.env` file was read.
 
 === "Example"
 

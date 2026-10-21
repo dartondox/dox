@@ -1,6 +1,9 @@
 # WebSocket
 
-WebSocket is a communication protocol that enables real-time, full-duplex, bidirectional data exchange between a client and a server over a single, long-lived connection. It is commonly used in web applications to facilitate interactive features like live chat, online gaming, and real-time updates, as it allows for efficient and low-latency data transfer without the overhead of constantly opening and closing connections. WebSocket is especially well-suited for scenarios where instant communication and data synchronization between client and server are crucial.
+`dox_websocket` adds a WebSocket server to the Dox HTTP server. Use it for live chat, notifications and other real-time updates.
+
+!!! tip "Want Socket.IO clients?"
+    Use [`dox_socketio`](../packages/socketio.md). It works with the official Socket.IO clients and has acks and namespaces.
 
 ## Usage
 
@@ -22,8 +25,12 @@ class WebsocketService implements DoxService {
 }
 ```
 
-!!! info
-    While running with multiple isolate(multithread), the Dox WebSocket require Redis adapter which require [`ioredis`](https://pub.dev/packages/ioredis) package to function. Currently, Dox WebSocket only supports the Redis adapter. And if you do not want to use any adapter, please set total isolate value to `1` in `lib/config/app.dart` to function properly.
+!!! warning "Many isolates need Redis"
+    Dox runs one isolate per CPU core by default. Each isolate has its own memory.
+    Without an adapter, a room only reaches clients on the same isolate.
+
+    - Use the Redis adapter. It needs [`ioredis`](https://pub.dev/packages/ioredis) `^2.0.0-alpha.1`.
+    - Or set `totalIsolate: 1` in `lib/config/app.dart` (or `APP_TOTAL_ISOLATE=1`).
 
 ### 2. Register websocket service to dox `app/config/services.dart`
 

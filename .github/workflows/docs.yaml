@@ -1,45 +1,150 @@
-name: MkDocs Deploy
+name: Docs
+
+# Versioned docs with mike (https://github.com/jimporter/mike).
+# Each version lives in its own folder on the gh-pages branch:
+#   /3.x/  docs from develop (alias /latest/, the default)
+#   /2.x/  old docs, deployed by hand from the v2.x branch
+# Old links like /the-basic/routing/ are kept as small redirect pages.
+# See docs/others/contribute.md, section "Docs".
 
 on:
   push:
     branches:
-      - main  
+      - develop
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - '.github/workflows/docs.yaml'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Docs version to deploy'
+        type: choice
+        options:
+          - '3.x'
+          - '2.x'
+        default: '3.x'
+      ref:
+        description: 'Branch or tag to build 2.x from'
+        default: 'v2.x'
+
+permissions:
+  contents: write
+
+# two deploys must not push to gh-pages at the same time
+concurrency:
+  group: docs-deploy
+  cancel-in-progress: false
+
+env:
+  MKDOCS_VERSION: '1.6.1'
+  MATERIAL_VERSION: '9.7.7'
+  MIKE_VERSION: '2.2.0'
 
 jobs:
   deploy:
-    if: |
-      startsWith(github.event.head_commit.message, 'update:docs')
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ (github.event_name == 'workflow_dispatch' && inputs.version == '2.x') && inputs.ref || github.ref }}
+          fetch-depth: 0
+          # GITHUB_TOKEN is enough when gh-pages is not protected.
+          # If gh-pages is protected, set the PUSH_TO_PROTECTED_BRANCH secret.
+          token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH || github.token }}
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: '3.12'
 
-      - name: Install dependencies
-        run: |
-          pip install mkdocs
-          pip install mkdocs-material
-
-      - name: Build MkDocs site
-        run: mkdocs build
+      - name: Install mkdocs, material and mike
+        run: pip install "mkdocs==$MKDOCS_VERSION" "mkdocs-material==$MATERIAL_VERSION" "mike==$MIKE_VERSION"
 
       - name: Git config
         run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          git config --global init.defaultBranch main
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages:gh-pages || true
 
-      - name: Deploy to GitHub Pages with Force Push
+      - name: Deploy 3.x (latest)
+        if: github.event_name == 'push' || inputs.version == '3.x'
         run: |
-          cd site
-          git init
-          git remote add origin https://github-actions[bot]:${{ secrets.PUSH_TO_PROTECTED_BRANCH }}@github.com/dartondox/dox.git
-          git checkout -b gh-pages
-          git add .
-          git commit -m "Deploy MkDocs to GitHub Pages"
-          git push --set-upstream origin gh-pages -f
+          mkdocs build --strict
+          mike deploy --update-aliases --alias-type copy --title "3.x (alpha)" 3.x latest
+
+      - name: Deploy 2.x
+        if: github.event_name == 'workflow_dispatch' && inputs.version == '2.x'
+        run: |
+          # the 2.x mkdocs.yml has no version selector, so add it here
+          printf 'INHERIT: mkdocs.yml\nextra:\n  version:\n    provider: mike\n' > mkdocs.mike.yml
+          mike deploy -F mkdocs.mike.yml --title "2.x" 2.x
+
+      - name: Redirect old links and keep CNAME
+        run: |
+          git worktree add ../gh-pages gh-pages
+          cd ../gh-pages
+          python3 - <<'PY'
+          # Before mike, the 2.x pages lived at the site root (/the-basic/routing/).
+          # Now each version has its own folder, so old links would break.
+          # This replaces every old root page with a small redirect page to the
+          # same page in /latest/ (or in /2.x/ when latest does not have it).
+          # It also writes the root index.html, 404.html and CNAME.
+          # It runs on every deploy and always gives the same result.
+          import json, os, shutil
+
+          versions = json.load(open('versions.json'))
+          names = {'.git', '.nojekyll', 'CNAME', 'versions.json'}
+          for v in versions:
+              names.add(v['version'])
+              names.update(v['aliases'])
+          home = 'latest' if os.path.isdir('latest') else versions[0]['version']
+
+          def redirect(url):
+              return ('<!doctype html><html><head><meta charset="utf-8">'
+                      '<title>Redirecting</title>'
+                      '<link rel="canonical" href="%s">'
+                      '<meta http-equiv="refresh" content="0; url=%s">'
+                      '</head><body><a href="%s">Redirecting</a></body></html>'
+                      % (url, url, url))
+
+          # collect old pages: every folder with an index.html
+          pages = set()
+          def collect(base, prefix):
+              for root, _, files in os.walk(base):
+                  if 'index.html' in files:
+                      pages.add(os.path.normpath(os.path.join(prefix, os.path.relpath(root, base))))
+              pages.discard('.')
+
+          for entry in os.listdir('.'):
+              if entry in names:
+                  continue
+              if os.path.isdir(entry):
+                  collect(entry, entry)  # old page or redirect page
+                  shutil.rmtree(entry)
+              else:
+                  os.remove(entry)  # old index.html, 404.html, sitemap.xml, ...
+          if os.path.isdir('2.x'):
+              collect('2.x', '')
+
+          for page in sorted(pages):
+              target = home if os.path.isdir(os.path.join(home, page)) else '2.x'
+              os.makedirs(page, exist_ok=True)
+              with open(os.path.join(page, 'index.html'), 'w') as f:
+                  f.write(redirect('/%s/%s/' % (target, page.replace(os.sep, '/'))))
+
+          with open('index.html', 'w') as f:
+              f.write(redirect('/%s/' % home))
+          with open('404.html', 'w') as f:
+              f.write('<!doctype html><html><head><meta charset="utf-8">'
+                      '<title>Page not found</title></head><body>'
+                      '<h1>Page not found</h1><p><a href="/%s/">Go to the docs</a></p>'
+                      '</body></html>' % home)
+          with open('CNAME', 'w') as f:
+              f.write('dartondox.dev\n')
+          print('redirect pages:', len(pages))
+          PY
+          git add -A
+          git diff --cached --quiet || git commit -m "Redirect old docs links"
+          git push origin gh-pages

@@ -49,7 +49,8 @@ void main() {
       expect(command.validateArgs([]), isFalse);
 
       // Test invalid arguments (too many)
-      expect(command.validateArgs(['User', 'extra']), isFalse);
+      expect(command.validateArgs(['User', '-m']), isTrue);
+      expect(command.validateArgs(['User', '-m', 'extra']), isFalse);
     });
 
     test('migration commands have laravel style aliases', () {
@@ -58,6 +59,7 @@ void main() {
         'migrate:rollback': 'migration:rollback',
         'migrate:reset': 'migration:reset',
         'migrate:refresh': 'migration:refresh',
+        'migrate:status': 'migration:status',
       };
       aliases.forEach((alias, command) {
         expect(CommandRegistry.findCommand(alias)?.command, command);
@@ -298,7 +300,8 @@ void main() {
 
       // Test that invalid arguments are handled
       expect(command!.validateArgs([]), isFalse);
-      expect(command.validateArgs(['User', 'extra']), isFalse);
+      expect(command.validateArgs(['User', '-m']), isTrue);
+      expect(command.validateArgs(['User', '-m', 'extra']), isFalse);
     });
   });
 

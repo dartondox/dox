@@ -9,7 +9,7 @@ void main() async {
 
   group('Transaction |', () {
     setUp(() async {
-      await Schema.create('blog', (Table table) {
+      await Schema().create('blog', (Table table) {
         table.id('uid');
         table.string('title');
         table.string('status').withDefault('active');
@@ -18,8 +18,8 @@ void main() async {
         table.softDeletes();
         table.timestamps();
       });
-      await Schema.create('blog_info', (Table table) {
-        table.id('id');
+      await Schema().create('blog_info', (Table table) {
+        table.id();
         table.json('info');
         table.integer('blog_id');
         table.timestamps();
@@ -27,8 +27,8 @@ void main() async {
     });
 
     tearDown(() async {
-      await Schema.drop('blog');
-      await Schema.drop('blog_info');
+      await Schema().dropIfExists('blog');
+      await Schema().dropIfExists('blog_info');
     });
 
     test('commit on success', () async {

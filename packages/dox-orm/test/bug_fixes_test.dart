@@ -20,7 +20,7 @@ void main() async {
 
   group('Bug fixes |', () {
     setUp(() async {
-      await Schema.create('blog', (Table table) {
+      await Schema().create('blog', (Table table) {
         table.id('uid');
         table.string('title');
         table.string('status').withDefault('active');
@@ -30,8 +30,8 @@ void main() async {
         table.timestamps();
       });
 
-      await Schema.create('blog_info', (Table table) {
-        table.id('id');
+      await Schema().create('blog_info', (Table table) {
+        table.id();
         table.json('info');
         table.integer('blog_id');
         table.timestamps();
@@ -39,8 +39,8 @@ void main() async {
     });
 
     tearDown(() async {
-      await Schema.drop('blog');
-      await Schema.drop('blog_info');
+      await Schema().dropIfExists('blog');
+      await Schema().dropIfExists('blog_info');
     });
 
     test('save can set a field to null on update', () async {
@@ -85,7 +85,7 @@ void main() async {
     });
 
     test('insert with uuid primary key', () async {
-      await Schema.create('uuid_item', (Table table) {
+      await Schema().create('uuid_item', (Table table) {
         table.uuid('id');
         table.string('name');
       });
@@ -93,26 +93,26 @@ void main() async {
       Map<String, dynamic> row = await QueryBuilder.table('uuid_item')
           .setPrimaryKey('id')
           .insert(<String, dynamic>{'id': id, 'name': 'x'});
-      await Schema.drop('uuid_item');
+      await Schema().dropIfExists('uuid_item');
       expect(row['id'], id);
       expect(row['name'], 'x');
     });
 
     test('relations with a custom local key', () async {
-      await Schema.create('author', (Table table) {
+      await Schema().create('author', (Table table) {
         table.id();
         table.string('code');
       });
-      await Schema.create('book', (Table table) {
+      await Schema().create('book', (Table table) {
         table.id();
         table.string('title');
         table.string('author_code');
       });
-      await Schema.create('tag', (Table table) {
+      await Schema().create('tag', (Table table) {
         table.id();
         table.string('title');
       });
-      await Schema.create('author_tag', (Table table) {
+      await Schema().create('author_tag', (Table table) {
         table.id();
         table.string('author_code');
         table.integer('tag_id');
@@ -138,10 +138,10 @@ void main() async {
           .orderBy('id')
           .get();
 
-      await Schema.drop('author');
-      await Schema.drop('book');
-      await Schema.drop('tag');
-      await Schema.drop('author_tag');
+      await Schema().dropIfExists('author');
+      await Schema().dropIfExists('book');
+      await Schema().dropIfExists('tag');
+      await Schema().dropIfExists('author_tag');
 
       Author b = authors.first;
       Author a = authors.last;
@@ -240,7 +240,7 @@ void main() async {
     });
 
     test('reserved words as table and column names', () async {
-      await Schema.create('order', (Table table) {
+      await Schema().create('order', (Table table) {
         table.id();
         table.string('key');
         table.string('group').nullable();
@@ -262,7 +262,7 @@ void main() async {
           .groupBy('group')
           .get();
       int total = await QueryBuilder.table('order').groupBy('group').count();
-      await Schema.drop('order');
+      await Schema().dropIfExists('order');
 
       expect(rows.first['key'], 'a');
       expect(rows.first['grp'], 'h');
@@ -273,19 +273,17 @@ void main() async {
 
   group('Schema fixes |', () {
     tearDown(() async {
-      await Schema.drop('schema_fix');
+      await Schema().dropIfExists('schema_fix');
     });
 
-    test('unique on existing column can run twice', () async {
-      await Schema.create('schema_fix', (Table table) {
+    test('unique on an existing column with change()', () async {
+      await Schema().create('schema_fix', (Table table) {
         table.id();
         table.string('slug').nullable();
       });
-      for (int i = 0; i < 2; i++) {
-        await Schema.table('schema_fix', (Table table) {
-          table.string('slug').unique().nullable();
-        });
-      }
+      await Schema().table('schema_fix', (Table table) {
+        table.string('slug').unique().nullable().change();
+      });
       await QueryBuilder.table('schema_fix')
           .insert(<String, dynamic>{'slug': 'a'});
       expect(
@@ -296,13 +294,13 @@ void main() async {
     });
 
     test('default value with a quote', () async {
-      await Schema.create('schema_fix', (Table table) {
+      await Schema().create('schema_fix', (Table table) {
         table.id();
         table.string('name').withDefault("it's");
         table.string('other').nullable();
       });
-      await Schema.table('schema_fix', (Table table) {
-        table.string('other').withDefault("o'k");
+      await Schema().table('schema_fix', (Table table) {
+        table.string('other').nullable().withDefault("o'k").change();
       });
       await QueryBuilder.table('schema_fix').insert(<String, dynamic>{'id': 1});
       Map<String, dynamic> row =

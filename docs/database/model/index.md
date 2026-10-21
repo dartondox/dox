@@ -2,17 +2,10 @@
 
 ## Create
 
-=== "Create"
-
-    ```bash
-    dox create:model Blog
-    ```
-
-=== "With migration"
-
-    ```bash
-    dox create:model Blog -m
-    ```
+```bash
+dox create:model Blog      # only the model
+dox create:model Blog -m   # the model and its migration (table `blogs`)
+```
 
 !!! info
     This will create a blog model inside `lib/models` folder.

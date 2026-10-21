@@ -1,5 +1,9 @@
 # Cache
 
+!!! tip "Need Redis, `remember` or locks?"
+    This page is the simple built-in `Cache()` of `dox_core`. Its default ttl is 1 hour.
+    For Redis, memory with LRU, `remember`, `increment` and locks, use [`dox_cache`](../packages/cache.md).
+
 Your application may involve data retrieval or processing tasks that are computationally intensive or time-consuming, potentially taking several seconds to finish. In such situations, it's a common practice to temporarily store the obtained data in a cache, enabling swift retrieval for subsequent requests requiring the same information. Typically, this cached data is stored in high-speed data stores like Memcached or Redis.
 
 Thankfully, Dox offers a versatile and consistent API for various cache backends, empowering you to harness their rapid data retrieval capabilities and enhance the performance of your web application.
