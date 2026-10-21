@@ -19,32 +19,19 @@ concurrency:
   group: publish
   cancel-in-progress: false
 
-env:
-  # Folder:package, in publish order. Each one only needs the ones before it,
-  # dev_dependencies too (pub checks them on publish).
-  # dox_query_builder only re-exports dox_orm, so it comes after dox_orm.
-  PACKAGES: >-
-    dox-annotation:dox_annotation
-    dox-builder:dox_builder
-    dox-orm:dox_orm
-    dox-query-builder:dox_query_builder
-    dox-migration:dox_migration
-    dox-http-native:dox_http_native
-    dox-core:dox_core
-    dox-auth:dox_auth
-    dox-websocket:dox_websocket
-    dox-validation:dox_validation
-    dox-openapi:dox_openapi
-    dox-storage:dox_storage
-    dox-cache:dox_cache
-    dox-socketio:dox_socketio
-    dox-cli:dox
-
 jobs:
   check-version:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Folder:package, in publish order. bin/publish_order.py sorts the
+      # packages by their pubspecs: each one comes after every sibling it
+      # depends on (dev_dependencies too, pub checks them on publish).
+      - name: Publish order
+        run: |
+          PACKAGES=$(python3 bin/publish_order.py | tr '\n' ' ')
+          echo "$PACKAGES" | tr ' ' '\n'
+          echo "PACKAGES=$PACKAGES" >> "$GITHUB_ENV"
       - name: Check that tag and all package versions match the root version
         run: |
           VERSION=$(sed -nE 's/^version:[[:space:]]*([^[:space:]]+).*/\1/p' pubspec.yaml)
@@ -70,6 +57,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Folder:package, in publish order. bin/publish_order.py sorts the
+      # packages by their pubspecs: each one comes after every sibling it
+      # depends on (dev_dependencies too, pub checks them on publish).
+      - name: Publish order
+        run: |
+          PACKAGES=$(python3 bin/publish_order.py | tr '\n' ' ')
+          echo "$PACKAGES" | tr ' ' '\n'
+          echo "PACKAGES=$PACKAGES" >> "$GITHUB_ENV"
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
@@ -105,6 +100,14 @@ jobs:
     environment: pub.dev
     steps:
       - uses: actions/checkout@v4
+      # Folder:package, in publish order. bin/publish_order.py sorts the
+      # packages by their pubspecs: each one comes after every sibling it
+      # depends on (dev_dependencies too, pub checks them on publish).
+      - name: Publish order
+        run: |
+          PACKAGES=$(python3 bin/publish_order.py | tr '\n' ' ')
+          echo "$PACKAGES" | tr ' ' '\n'
+          echo "PACKAGES=$PACKAGES" >> "$GITHUB_ENV"
       # Sets up the OIDC token for pub.dev. No PUB_CREDENTIALS secret needed.
       - uses: dart-lang/setup-dart@v1
         with:
@@ -130,6 +133,17 @@ jobs:
                 rm -rf "$probe"
                 return 0
               fi
+              # a sibling it needs is not on pub.dev: waiting will not help
+              for other in $PACKAGES; do
+                sib=${other##*:}
+                if [ "$sib" != "$1" ] && grep -qw "$sib" "$probe/log" \
+                  && grep -q "doesn't match any versions" "$probe/log" \
+                  && ! has_version "$sib"; then
+                  cat "$probe/log"
+                  echo "::error::$1 $VERSION needs $sib $VERSION, which is not on pub.dev. Fix the publish order (bin/publish_order.py)."
+                  exit 1
+                fi
+              done
               echo "Waiting for dart pub get to resolve $1 $VERSION ($i/$2)"
               sleep "$3"
             done
