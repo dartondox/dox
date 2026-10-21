@@ -1,3 +1,4 @@
+import 'package:dox_app/config/env.dart';
 import 'package:dox_core/dox_core.dart';
 
 /// Cache stores
@@ -6,7 +7,7 @@ import 'package:dox_core/dox_core.dart';
 /// Drivers: file, memory, redis, null. Values must be JSON types.
 /// Set `CACHE_STORE=redis` to share the cache between isolates and servers.
 CacheConfig cache = CacheConfig(
-  defaultStore: Env.get('CACHE_STORE', 'file'),
+  defaultStore: env.cacheStore,
   stores: <String, Map<String, dynamic>>{
     'file': <String, dynamic>{'driver': 'file', 'path': 'storage/cache'},
 
@@ -16,11 +17,11 @@ CacheConfig cache = CacheConfig(
     /// shared by all isolates and servers
     'redis': <String, dynamic>{
       'driver': 'redis',
-      'host': Env.get('REDIS_HOST', '127.0.0.1'),
-      'port': Env.get<int>('REDIS_PORT', 6379),
-      'db': Env.get<int>('REDIS_DB', 0),
-      'password': Env.get<String?>('REDIS_PASSWORD'),
-      'prefix': '${Env.get('APP_NAME', 'dox')}_cache:',
+      'host': env.redisHost,
+      'port': env.redisPort,
+      'db': env.redisDb,
+      'password': env.redisPassword,
+      'prefix': '${env.appName}_cache:',
     },
   },
 );

@@ -10,6 +10,7 @@
 - OpenAPI: `@Regex` (was `@Pattern`). `@Format` is removed. Form requests are removed.
 - Fix: the OpenAPI route list has the full path, with the `Router` prefix and `Route.group()` prefixes. Two `'/'` routes in two groups now each get their docs.
 - OpenAPI path params: every positional argument that is not the request and not a DTO.
+- New: `@DoxEnv()` classes get `_$<Class>` in the `.g.dart` part. Each getter is read from the env once, converted to its type (String, int, double, num, bool, Uri, Duration, enum, List<String>) and kept in a final field. A getter body is the default. A nullable getter is optional. `load()` throws one `EnvException` with every missing or bad key.
 
 ## 3.0.0-alpha.1
 

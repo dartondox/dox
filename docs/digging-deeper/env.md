@@ -1,53 +1,147 @@
 # Environment Variables
 
-`Env.get()` reads a value from the environment or from the `.env` file.
+Declare your env keys once, in a typed class. Then `env.appPort` is an `int`, your IDE suggests every key, and a missing key stops the app at startup.
+
+## The typed env class
+
+`lib/config/env.dart`:
+
+```dart
+import 'package:dox_core/dox_core.dart';
+
+part 'env.g.dart';
+
+enum LogLevel { debug, info, error }
+
+@DoxEnv()
+abstract class AppEnv {
+  static AppEnv load([EnvReader? reader]) {
+    return _$AppEnv.load(reader);
+  }
+
+  String get appName;                       // APP_NAME, required
+  String get appKey;                        // APP_KEY, required
+  int get dbPort => 5432;                   // DB_PORT, default 5432
+  bool get appDebug => false;               // APP_DEBUG, default false
+  LogLevel get logLevel => LogLevel.info;   // LOG_LEVEL=debug
+  Duration get cacheTtl => const Duration(minutes: 5); // CACHE_TTL=5m
+  List<String> get corsOrigins => <String>[];          // CORS_ORIGINS=a.com,b.com
+
+  @EnvKey('AWS_BUCKET')
+  String? get s3Bucket;                     // optional, null when not set
+}
+
+/// The env of the app. Read and checked once, on first use.
+final AppEnv env = AppEnv.load();
+```
+
+Run `dart run build_runner build` (or `dox build_runner:build`). It writes `env.g.dart`.
+
+Use it anywhere:
+
+```dart
+import 'package:my_app/config/env.dart';
+
+DatabaseConfig databaseConfig = DatabaseConfig(
+  connection: 'postgres',
+  connections: <String, ConnectionConfig>{
+    'postgres': ConnectionConfig(port: env.dbPort /* int */, ...),
+  },
+);
+```
+
+### The rules
+
+- **Key**: the getter name in UPPER_SNAKE case. `appName` reads `APP_NAME`, `s3Bucket` reads `S3_BUCKET`. Use `@EnvKey('X')` for another name.
+- **Default**: the getter body. It can be any expression, like `Platform.numberOfProcessors`. It runs only when the key is missing. A default can not read another env getter.
+- **Optional**: a nullable getter with no body (`String? get s3Bucket;`). It is `null` when the key is missing.
+- **Required**: any other getter with no body. A missing key stops the app.
+- **Empty**: an empty value (or the text `null`) counts as missing.
+
+### Types
+
+| Type | Value in `.env` |
+|------|-----------------|
+| `String` | any text |
+| `int`, `double`, `num` | `3000`, `0.5` |
+| `bool` | `true`/`false`, `1`/`0`, `yes`/`no`, `on`/`off` (any case) |
+| `Uri` | `https://dox.dev` |
+| `Duration` | a number and a unit: `500ms`, `30s`, `5m`, `2h`, `1d`. A plain number is seconds: `300` is 5 minutes. |
+| an enum | the name of a value, any case: `debug` |
+| `List<String>` | comma separated: `a, b, c`. Empty items are dropped. |
+
+Any other type is a build error.
+
+### Fail fast
+
+`AppEnv.load()` reads every key one time. Then it checks them all, and throws one `EnvException` that lists every missing or bad key:
+
+```
+EnvException: the env is not valid
+  - APP_KEY is missing
+  - DB_PORT must be an int, not "abc"
+```
+
+The `env` variable is made on first use. The config files use it, so this happens when the app starts. After that, `env.dbPort` is a plain field read. There is no lookup and no parsing on each request.
+
+## Where values come from
 
 !!! info "The environment wins"
     A real environment variable (set in the shell, Docker or systemd) wins over the `.env` file.
     So you can keep `.env` for development and use real variables in production.
-    Before 3.x, only the `.env` file was read.
+    The `.env` file is optional.
 
-=== "Example"
+## Commands
 
-    ```dart
-    Env.get('APP_KEY');
+```bash
+dox env:generate   # make lib/config/env.dart from .env.example
+dox env:check      # load the env and print every missing or bad key
+```
 
-    // With default values
-    Env.get('APP_KEY', 'default_value');
-    ```
+`dox env:generate` reads `.env.example`:
 
-## With type
+- digits become an `int` with that default: `APP_PORT=3000` gives `int get appPort => 3000;`
+- `true`/`false` become a `bool` with that default
+- an empty value becomes an optional `String?`
+- any other value becomes a required `String`. The example value is never a default, so a secret in the example can not leak into the code.
+- `#` comment lines above a key become its doc comment
 
-=== "Int"
+It does not overwrite an existing `lib/config/env.dart`. Run `dox build_runner:build` after it.
 
-    ```dart
-    Env.get<int>('APP_PORT', 3000)
-    ```
+`dox env:check` loads `AppEnv` from `lib/config/env.dart`, with the real environment and `.env`. It exits with code 1 when a key is missing or bad. Use it in CI or before a deploy.
 
-=== "String"
+## Tests
 
-    ```dart
-    Env.get<String>('APP_KEY')
-    ```
-=== "Bool"
+Pass your own values to `load()`. Nothing is read from the shell or `.env`:
 
-    ```dart
-    Env.get<bool>('SOCKETIO_ENABLED', false) // true, 1, yes, on
-    ```
+```dart
+AppEnv env = AppEnv.load(
+  EnvReader(
+    environment: <String, String>{'APP_KEY': 'test'},
+    dotEnv: <String, String>{'DB_PORT': '5433'},
+  ),
+);
+```
 
-=== "Nullable"
+## Env.get: dynamic keys
 
-    ```dart
-    Env.get<String?>('AWS_BUCKET') // null when it is not set
-    ```
+`Env.get()` still works. Use it for a key you only know at run time. For normal config, use the typed class.
 
-## Missing values
+```dart
+Env.get('APP_KEY');                     // String, '' when missing
+Env.get('APP_KEY', 'default_value');
+Env.get<int>('APP_PORT', 3000);
+Env.get<bool>('SOCKETIO_ENABLED', false); // true, 1, yes, on
+Env.get<String?>('AWS_BUCKET');          // null when it is not set
+```
 
 A missing or empty key gives the default. With no default:
 
 - `String` gives an empty string `''`. It is never the text `"null"`.
 - `String?` and `dynamic` give `null`.
 - `int`, `num`, `double` and `bool` throw an `ArgumentError` with the key name. A value that is not a number throws too.
+
+`Env.get()` looks up and converts the value on every call. Do not call it on a hot path.
 
 !!! warning "APP_KEY"
     When `APP_KEY` is empty and `APP_ENV=production`, `Dox().startServer()` stops with an error.

@@ -9,7 +9,8 @@
 - `RouteDoc` and `ApiDoc.route()` take `deprecated`.
 - `OpenApiServer` builds and encodes the document once, on the first call, and keeps it. Make a new `OpenApiServer` after you change the `OpenApi`.
 - `OpenApi.yamlEmitter` is now a public field.
-
+- `/docs` uses Scalar (`@scalar/api-reference` 1.75.1) by default. `OpenApiServer(ui: DocsUi.swagger)` gives Swagger UI. `ScalarOptions` sets the theme, dark mode, download button and proxy (off by default). The title and the config are escaped.
+- Swagger UI updated to 5.34.0.
 
 ## 3.0.0-alpha.1
 

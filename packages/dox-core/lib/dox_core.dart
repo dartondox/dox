@@ -5,12 +5,15 @@ export 'package:dox_cache/dox_cache.dart'
     show CacheConfig, CacheLock, CacheManager, CacheStore;
 export 'package:dox_openapi/dox_openapi.dart'
     show
+        DocsUi,
         Info,
         OpenApi,
         OpenApiOperation,
         OpenApiRegistry,
         OpenApiRouteBinding,
         ResponseDoc,
+        ScalarOptions,
+        ScalarTheme,
         SecurityScheme,
         Server;
 export 'package:dox_storage/dox_storage.dart'
@@ -23,6 +26,7 @@ export 'app.dart';
 export 'cache/cache.dart';
 export 'constants/constants.dart';
 export 'env/env.dart';
+export 'env/env_reader.dart';
 
 /// Exceptions
 export 'exception/bad_request_exception.dart';

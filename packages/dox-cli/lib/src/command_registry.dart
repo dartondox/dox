@@ -7,6 +7,7 @@ import 'package:dox/src/tools/create_model.dart';
 import 'package:dox/src/tools/create_project.dart';
 import 'package:dox/src/tools/create_dto.dart';
 import 'package:dox/src/tools/create_serializer.dart';
+import 'package:dox/src/tools/env_tools.dart';
 import 'package:dox/src/tools/generate_key.dart';
 import 'package:dox/src/tools/help.dart';
 import 'package:dox/src/tools/openapi_generate.dart';
@@ -228,6 +229,28 @@ class CommandRegistry {
       category: CommandCategory.generation,
       function: (args) async {
         generateKey();
+      },
+    ),
+
+    // Typed env
+    CommandDefinition(
+      command: 'env:generate',
+      helpInfo: 'env:generate',
+      description:
+          'Make lib/config/env.dart (typed env class) from .env.example',
+      category: CommandCategory.generation,
+      function: (args) async {
+        envGenerate();
+      },
+    ),
+
+    CommandDefinition(
+      command: 'env:check',
+      helpInfo: 'env:check',
+      description: 'Check the env against lib/config/env.dart and print missing or bad keys',
+      category: CommandCategory.system,
+      function: (args) async {
+        await envCheck();
       },
     ),
 

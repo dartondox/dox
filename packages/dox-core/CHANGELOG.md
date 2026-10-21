@@ -30,7 +30,8 @@
 - A `GET` or `DELETE` request class becomes query params in the docs.
 - `dox_core` exports `OpenApi`, `OpenApiRegistry`, `OpenApiOperation`, `OpenApiRouteBinding` and `ResponseDoc` of `dox_openapi`.
 - The OpenAPI JSON and YAML are encoded once and kept, not on each request.
-
+- New `EnvReader` and `EnvException` for the typed env class (`@DoxEnv()`). The real environment wins over `.env`, the same as `Env.get()`. `Env.get()` stays for dynamic keys.
+- OpenAPI: `/docs` uses Scalar by default. `OpenApiConfig(ui: DocsUi.swagger)` gives Swagger UI. New `OpenApiConfig` options: `scalar: ScalarOptions(...)` (theme, dark mode, download button, proxy) and `pageTitle`.
 
 ## 3.0.0-alpha.1
 

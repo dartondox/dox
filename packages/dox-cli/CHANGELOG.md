@@ -6,6 +6,8 @@
 - New `dox create:dto <name>`: makes `lib/app/http/dtos/<name>.dto.dart`. `dox create:request` is removed.
 - `dox create:controller -r` uses `int id` for the resource methods.
 - New `dox openapi:generate [dir]`. It runs the app's `bin/openapi.dart` and writes `openapi.json` and `openapi.yaml` (default `storage/openapi`).
+- New `dox env:generate`: makes `lib/config/env.dart` (the typed env class) from `.env.example`.
+- New `dox env:check`: loads the typed env and prints every missing or bad key (exit code 1).
 
 
 ## 3.0.0-alpha.1

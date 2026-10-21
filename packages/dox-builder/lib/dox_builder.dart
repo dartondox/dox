@@ -4,6 +4,7 @@ import 'package:build/build.dart';
 import 'package:dox_builder/src/dox_builder.dart';
 import 'package:dox_builder/src/dto/dto_generator.dart';
 import 'package:dox_builder/src/dto/dto_registry_builder.dart';
+import 'package:dox_builder/src/env_builder.dart';
 import 'package:dox_builder/src/openapi/openapi_builder.dart';
 import 'package:source_gen/source_gen.dart';
 
@@ -15,10 +16,12 @@ export 'src/schema/dto_schema.dart';
 export 'src/schema/json_schema_reader.dart';
 export 'src/schema/model_schema.dart';
 
-/// Models (`@DoxModel`) and DTOs (`@Dto`) go into the `.g.dart` part.
+/// Models (`@DoxModel`), DTOs (`@Dto`) and env classes (`@DoxEnv`) go into
+/// the `.g.dart` part.
 Builder buildDoxModel(BuilderOptions options) => SharedPartBuilder(<Generator>[
   DoxModelBuilder(),
   const DoxDtoGenerator(),
+  DoxEnvBuilder(),
 ], 'dox_model_generator');
 
 /// Writes `lib/dtos.g.dart` with every DTO of the app.

@@ -6,6 +6,7 @@
 - The DTO annotations (`@Dto`, `@Length`, `@Email`, ...) live in `dox_validation`. `dox_core` exports them.
 - `IDoxRequest` has no `validate()` and no `processInputMapper()` any more. Use a DTO.
 - Breaking (small): these names are exported by `dox_core` too. If a file also imports a package with a `Request` or `Response` class (like `package:http`) without a prefix, add a prefix to that import.
+- New `@DoxEnv()` and `@EnvKey('X')` for the typed env class.
 
 ## 3.0.0-alpha.1
 
