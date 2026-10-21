@@ -105,6 +105,7 @@ nav:
     - digging-deeper/websocket.md
     - digging-deeper/dox-cli.md
     - digging-deeper/deployment.md
+    - digging-deeper/native-server.md
     - digging-deeper/performance.md
     - digging-deeper/testing.md
   - Database:
