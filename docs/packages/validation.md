@@ -1,24 +1,124 @@
-# Validation schemas
+# dox_validation
 
-`dox_validation` checks data with typed schemas, like [Zod](https://zod.dev).
-You describe the shape once. You get typed output, all errors at once, and a JSON Schema for free.
+`dox_validation` checks input and gives you typed Dart objects.
+It has two parts:
+
+1. **DTOs**: a class with `@Dto()` and rule annotations. A generator writes the checks. Use this for almost everything.
+2. **Fluent schemas**: `v.object(...)`, like [Zod](https://zod.dev). Use it only when the shape is known at runtime.
+
+Both give all errors at once, and a JSON Schema for [OpenAPI](openapi.md).
 
 !!! tip "Built into Dox"
-    `dox_core` uses `dox_validation` for `req.validate()`, and it exports it.
-    In a Dox app you do not add or import anything: `import 'package:dox_core/dox_core.dart'` gives `v`, `Schema` and the rest.
-    See [Validation](../the-basic/validation.md) for `req.validate()`, `validateAsync()`, `validateSchema()` and the `unique` / `exists` rules.
+    `dox_core` uses `dox_validation` and exports it. `import 'package:dox_core/dox_core.dart'` is all you need.
+    The guide is at [Validation](../the-basic/validation.md). Every rule is in the [rules reference](../the-basic/validation-rules.md).
+    This page is about the package itself, and about using it outside Dox.
 
 ## Install (outside Dox)
 
 ```bash
 dart pub add dox_validation
+dart pub add dev:dox_builder dev:build_runner
 ```
 
 ```dart
 import 'package:dox_validation/dox_validation.dart';
 ```
 
-## Quick start
+The DTO generator is in `dox_builder`. Run it with `dart run build_runner build`.
+`@Unique` and `@Exists` are in `dox_orm`, not here.
+
+## DTOs
+
+```dart
+import 'package:dox_validation/dox_validation.dart';
+
+part 'create_user.dto.g.dart';
+
+@Dto()
+class CreateUser {
+  @Length(min: 3, max: 50)
+  @Trim()
+  final String name;
+
+  @Email()
+  final String email;
+
+  const CreateUser({required this.name, required this.email});
+
+  static const DtoSchema<CreateUser> schema = $CreateUserDto;
+}
+```
+
+The generator makes, for each `@Dto` class:
+
+| Name | What it is |
+| --- | --- |
+| `$CreateUserDto` | a `const` `DtoSchema<CreateUser>`: the checks, the converter and the JSON Schema |
+| `lib/dtos.g.dart` | `const List<DtoSchema<Object>> dtos`: every DTO in `lib/`. Dox uses it to find DTOs by type. |
+
+The `static const ... schema = $CreateUserDto;` line is how you reach the schema: `CreateUser.schema`.
+
+## `DtoSchema<T>`
+
+`DtoSchema<T>` is also a `Schema<T>`. So it works everywhere a schema works:
+inside `v.object(...)`, `v.list(...)`, with OpenAPI, and as a `StandardSchema`.
+
+| Member | Does |
+| --- | --- |
+| `Future<T> validateMap(Map<String, dynamic> input, {Source source = Source.body, Map<String, String> params = const {}})` | all checks, then the object. Throws `ValidationException` with the errors. |
+| `Future<ParseResult<T>> safeValidateMap(input, {source, params})` | the same, but never throws for bad input. `result.success`, `result.value`, `result.errors`. |
+| `T fromMap(Map<String, dynamic> input)` | builds the object with **no checks**. Reads keys, converts JSON types, uses defaults. A wrong type throws a `TypeError`. Only for data you trust. |
+| `Map<String, dynamic> toMap(T value)` | the object as a map with the input keys (snake_case). `DateTime` becomes an ISO 8601 string, an enum its name. |
+| `Map<String, dynamic> toJsonSchema()` | JSON Schema (draft 2020-12). |
+| `parse`, `safeParse`, `parseAsync`, `safeParseAsync` | the normal `Schema` methods, with `Source.body`. `parse` throws a `StateError` when the DTO has async rules. |
+| `Type get type`, `String get name` | `CreateUser` and `'CreateUser'`. |
+
+`source: Source.query` reads the map like a query string: text is converted to the field type.
+`params` are path params, used by `@Unique(ignoreParam: ...)`.
+
+```dart
+ParseResult<CreateUser> result = await CreateUser.schema.safeValidateMap(input);
+if (!result.success) {
+  print(result.errors); // {'email': 'The email is not a valid email'}
+}
+```
+
+!!! note
+    `dox_core` has its own `ValidationException` (the HTTP 422 one), so it does not export the one from `dox_validation`.
+    In a Dox app, both answer `422` when thrown in a controller. In tests, prefer `safeValidateMap`.
+
+### JSON Schema of a DTO
+
+For the `CreateUser` from the [Validation guide](../the-basic/validation.md) (with `age` and `role`):
+
+```dart
+CreateUser.schema.toJsonSchema();
+```
+
+```json
+{
+  "type": "object",
+  "title": "CreateUser",
+  "properties": {
+    "name": { "type": "string", "minLength": 3, "maxLength": 50 },
+    "email": { "type": "string", "format": "email" },
+    "age": { "type": ["integer", "null"], "minimum": 18 },
+    "role": { "type": "string", "enum": ["admin", "user"], "default": "user" }
+  },
+  "required": ["name", "email"]
+}
+```
+
+- `required` lists the required fields only.
+- A nullable field has `"type": [..., "null"]`. A default becomes `default`.
+- A nested DTO goes in `$defs` under its class name, with a `$ref`. OpenAPI moves it to `components/schemas`.
+- `@Dto(strict: true)` adds `"additionalProperties": false`.
+- A `///` doc comment on a field becomes `description`.
+- Each rule adds its keys. See the [rules reference](../the-basic/validation-rules.md).
+
+## Fluent schemas (for dynamic input)
+
+Use these when you only know the fields at runtime. The output is a `Map`, not a class.
 
 ```dart
 final ObjectSchema createUser = v.object(<String, Schema<Object?>>{
@@ -27,6 +127,7 @@ final ObjectSchema createUser = v.object(<String, Schema<Object?>>{
   'age': v.coerce.int().min(18).optional(),
   'role': v.enumOf<String>(<String>['admin', 'user']).defaultTo('user'),
   'tags': v.list(v.string()).max(5),
+  'address': Address.schema, // a DTO inside a fluent schema
 });
 
 // throws ValidationException when the input is not valid
@@ -34,31 +135,15 @@ Map<String, dynamic> data = createUser.parse(input);
 
 // never throws for bad input
 ParseResult<Map<String, dynamic>> result = createUser.safeParse(input);
-if (!result.success) {
-  print(result.errors); // {'email': 'The email is not a valid email'}
-}
 ```
 
-## Use it in a controller
+In a controller: `Map<String, dynamic> data = await req.validateSchema(createUser);`
 
-```dart
-class UserController {
-  Future<dynamic> store(DoxRequest req) async {
-    // 422 with {field: message} when it fails
-    Map<String, dynamic> data = await req.validateSchema(createUser);
-    // ... save data
-  }
-}
-```
+!!! warning "Different defaults"
+    Fluent schemas do not follow the DTO rules. A key is required unless you add `optional()`.
+    `""` is a value, not "missing". Text is not converted, unless you use `v.coerce`.
 
-Or in a [form request](../the-basic/request.md#schema): return the schema from `schema()`.
-A `schema.parse()` that throws inside a controller also answers `422`.
-
-!!! note
-    `dox_core` exports `dox_validation` without its `ValidationException`, because `dox_core` has its own
-    (the HTTP 422 one). `dox_orm` also has a `Schema` class. In a file that uses both, import `dox_orm` with a prefix.
-
-## Schemas
+### Schemas
 
 | Schema | Checks |
 | --- | --- |
@@ -82,9 +167,9 @@ On every schema:
 - `transform(fn)`, `refine(fn)`, `refineAsync(fn)`, `superRefine(fn)`, `use(rule)`.
 - `describe(text)`, `example(x)`: only used in the JSON Schema.
 
-## Coercion
+### Coercion
 
-Query strings and form data are always text. `v.coerce` turns text into the right type first.
+Query strings and form data are text. `v.coerce` turns text into the right type first.
 
 ```dart
 v.coerce.int().parse('42');       // 42
@@ -94,7 +179,7 @@ v.coerce.date().parse('2024-01-31');
 v.coerce.string().parse(5);       // '5'
 ```
 
-## Checks across fields
+### Checks across fields
 
 ```dart
 final ObjectSchema signUp = v.object(<String, Schema<Object?>>{
@@ -105,76 +190,31 @@ final ObjectSchema signUp = v.object(<String, Schema<Object?>>{
 }, message: 'Passwords do not match', path: <Object>['confirm']);
 ```
 
-## Async checks
+### Async checks
 
-Use `refineAsync` for a check that needs the database.
+`refineAsync` runs a check that needs the database. Then use `parseAsync()` or `safeParseAsync()`.
+`parse()` throws a `StateError` when a schema has async checks.
 
-```dart
-final StringSchema email = v.string().email().refineAsync(
-  (String value) async {
-    return !(await users.emailExists(value));
-  },
-  message: 'The {field} is already taken',
-);
+### Custom rules in a fluent schema
 
-await email.parseAsync('a@dox.dev');
-```
-
-!!! warning
-    `parse()` throws a `StateError` when a schema has async checks.
-    Use `parseAsync()` or `safeParseAsync()` then.
-
-## Custom rules
-
-Extend `Rule` for a check you want to reuse.
-Add an extension method, so it looks like a built-in check.
+A `Rule<T>` class works in both worlds: as an annotation on a DTO, and with `use()` here.
 
 ```dart
-class SlugRule extends Rule<String> {
-  SlugRule({super.message});
-
-  @override
-  String get name {
-    return 'slug';
-  }
-
-  @override
-  String get defaultMessage {
-    return 'The {field} must be a slug';
-  }
-
-  @override
-  bool check(String value, RuleContext context) {
-    return RegExp(r'^[a-z0-9-]+$').hasMatch(value);
-  }
-}
-
-extension SlugMethods on StringSchema {
-  StringSchema slug({String? message}) {
-    return use(SlugRule(message: message));
-  }
-}
-
-v.string().min(3).slug();
+v.string().min(3).use(const Slug());
 ```
 
-- For a database check, extend `AsyncRule` and implement `checkAsync`.
-- `RuleContext` gives `path`, `field`, `root` (the whole input) and `lookup('other.field')`.
+See [Custom rules](../the-basic/validation.md#custom-rules) for how to write one.
 
 ## Messages
 
-Each error has a `code`, like `required` or `min_length`. Dox finds the message in this order:
-
-1. The message on the check: `.min(3, message: 'Too short')`.
-2. `messages['path.code']`, like `email.required`.
-3. `messages['code']`, like `required`.
-4. The default English text.
-
+Each error has a code, like `required` or `min_length`.
 Placeholders: `{field}`, `{value}`, and rule values like `{min}` and `{max}`.
 
 ```dart
-// for the whole app
-v.messages.setMessages(<String, String>{'required': 'Please fill in {field}'});
+// for the whole app (outside Dox; in Dox use AppConfig(validationMessages: ...))
+MessageResolver.global = MessageResolver(messages: <String, String>{
+  'required': 'Please fill in {field}',
+});
 
 // for one call
 createUser.safeParse(input, messages: MessageResolver(messages: <String, String>{
@@ -183,61 +223,16 @@ createUser.safeParse(input, messages: MessageResolver(messages: <String, String>
 ```
 
 For other languages, extend `MessageResolver` and override `resolve()`.
-
-## Rule strings with `fromRules`
-
-Do you already have rule strings? `v.fromRules()` turns them into a schema.
-
-```dart
-final ObjectSchema rules = v.fromRules(<String, String>{
-  'email': 'required|email|max:255',
-  'age': 'nullable|integer|min:18',
-  'nickname': 'sometimes|required|string',
-  'address.city': 'required',
-  'products.*.name': 'required',
-});
-
-rules.parse(req.all());
-```
-
-- A missing field that is not `required` skips its other rules.
-- `nullable`: `null` is fine. `sometimes`: skip everything when the field is missing.
-- Each field stops at its first error, so there is one message per field.
-- An unknown rule name throws an `ArgumentError` when the schema is built.
-
-Add your own rule name:
-
-```dart
-v.registerRule('unique', (RuleDefinition definition) {
-  return UniqueRule(table: definition.arg(0)); // 'unique:users'
-});
-```
-
-## JSON Schema
-
-Every schema can export JSON Schema (draft 2020-12, the one OpenAPI 3.1 uses).
-Pass it to [OpenAPI](openapi.md) to document your API.
-
-```dart
-v.object(<String, Schema<Object?>>{
-  'email': v.string().email().describe('Login email'),
-  'age': v.int().min(18).nullable(),
-}).strict().toJsonSchema();
-```
-
-```json
-{
-  "type": "object",
-  "properties": {
-    "email": { "type": "string", "format": "email", "description": "Login email" },
-    "age": { "type": ["integer", "null"], "minimum": 18 }
-  },
-  "required": ["email", "age"],
-  "additionalProperties": false
-}
-```
+See [Messages](../the-basic/validation.md#messages).
 
 ## Standard Schema
 
-Every schema implements the [Standard Schema](https://standardschema.dev) interface (`StandardSchema`).
+Every schema, and every `DtoSchema`, implements the [Standard Schema](https://standardschema.dev) interface (`StandardSchema`).
 Code that only needs to validate can accept any `StandardSchema`, from Dox or from another library.
+
+## Removed in 3.x
+
+- `v.fromRules()` and rule strings like `'required|email'`.
+- `v.registerRule()` and `RuleDefinition`. Write a `Rule<T>` class instead.
+
+See [Upgrade: Validation](../the-basic/upgrade.md#validation).

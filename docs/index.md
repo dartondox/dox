@@ -28,14 +28,19 @@ It runs one isolate per CPU core and builds to a small native binary.
 ```dart
 Route.get('/blogs', BlogController.index);
 
-class BlogController {
-  static Future<List<Blog>> index(DoxRequest req) async {
-    req.validate({'status': 'required|in:active,draft'});
+enum Status { active, draft }
 
+@Dto()
+class BlogFilter {
+  final Status status; // ?status=active, else 422
+  const BlogFilter({required this.status});
+  static const DtoSchema<BlogFilter> schema = $BlogFilterDto;
+}
+
+class BlogController {
+  static Future<List<Blog>> index(BlogFilter query) async {
     // runs on Postgres, MySQL or SQLite
-    return Blog()
-        .where('status', req.input('status'))
-        .get();
+    return Blog().where('status', query.status.name).get();
   }
 }
 ```
@@ -77,7 +82,7 @@ cd new_blog && dox s                         # start the server
 
 -   :material-check-decagram-outline: **Typed validation**
 
-    Schemas like Zod with [`dox_validation`](packages/validation.md), or rule strings with [`req.validate()`](the-basic/validation.md).
+    Typed DTO classes, checked by generated code. See [Validation](the-basic/validation.md).
 
 -   :material-file-document-outline: **OpenAPI**
 

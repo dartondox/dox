@@ -10,7 +10,8 @@
 3. Replace `dox_query_builder` with `dox_orm`.
 4. If you use `ioredis` in your app, update it to `^2.0.0-alpha.1`.
 5. Run `dart pub upgrade`, then `dox build_runner:build`.
-6. Read the list below. Each item says what breaks and how to fix it.
+6. Replace rule strings and form requests with DTOs. See [Validation](#validation).
+7. Read the list below. Each item says what breaks and how to fix it.
 
 ```yaml
 environment:
@@ -178,21 +179,115 @@ See [Deployment](../digging-deeper/deployment.md).
 
 ## Validation
 
-**A missing or `null` field skips its rules.**
-Only `required`, `required_if` and `required_if_not` still run.
-Before, `'status': 'in:active,inactive'` failed when `status` was not sent. Now it passes.
-Fix: add `required` where the field must be sent. Use `nullable` and `sometimes` for the other cases.
+**Rule strings are gone. Input is a typed class (a DTO).**
+`req.validate({'title': 'required|string'})`, `v.fromRules()` and `FormRequest` are removed.
+Fix: write a `@Dto` class for each input, and ask for it in the controller. See [Validation](validation.md).
 
-**Validation runs on `dox_validation`.** The messages and the `{field: message}` error map are the same.
+```dart
+// 2.x
+class BlogController {
+  store(DoxRequest req) async {
+    req.validate({
+      'title': 'required|string|max_length:100',
+      'status': 'required|in:active,draft',
+      'tags': 'array',
+    });
+    String title = req.input('title');
+    // ...
+  }
+}
 
-- **An unknown rule name throws** when the rules are first used. Before, it logged a warning and was skipped. Fix: correct the name, or add it with `v.registerRule()`.
-- `DoxValidator.addCustomRule()` still works. For new code, use `v.registerRule()`.
-- `req.validate()` now returns the validated fields (it returned nothing).
-- `dox_core` now exports the `dox_validation` names (`v`, `Schema`, `Rule`, ...). `dox_orm` also has a `Schema` class.
+// 3.x
+enum Status { active, draft }
+
+@Dto()
+class CreateBlog {
+  @MaxLength(100)
+  final String title;
+  final Status status;
+  final List<String>? tags;
+
+  const CreateBlog({required this.title, required this.status, this.tags});
+
+  static const DtoSchema<CreateBlog> schema = $CreateBlogDto;
+}
+
+class BlogController {
+  Future<Blog> store(CreateBlog body) async {
+    String title = body.title;
+    // ...
+  }
+}
+```
+
+Steps:
+
+1. Make each DTO with `dox create:dto <Name>`.
+2. Run `dart run build_runner build`.
+3. Add `dtos: dtos` (from `lib/dtos.g.dart`) to `AppConfig`.
+4. Remove `formRequests:` from `AppConfig`.
+
+### APIs
+
+| 2.x | 3.x |
+| --- | --- |
+| `req.validate({...})` | a DTO controller parameter, or `await req.validate<T>()` |
+| `req.validateAsync({...})` | removed. `req.validate<T>()` is always async. |
+| `req.validateSchema(schema)` | the same. Only for [dynamic input](validation.md#dynamic-input-fluent-schemas). |
+| `class BlogRequest extends FormRequest` | `@Dto() class CreateBlog` |
+| `rules()` | annotations on the fields |
+| `messages()` | `@Dto(messages: {...})` or `message:` on an annotation |
+| `setUp()`, `mapInputs()`, `validated` | fields of the DTO. Rename a key with `@Name('key')`. |
+| `AppConfig(formRequests: {...})` | `AppConfig(dtos: dtos)` |
+| `dox create:request` | `dox create:dto` |
+| `v.fromRules()`, `v.registerRule()`, `DoxValidator.addCustomRule()` | a `Rule<T>` class used as an annotation. See [Custom rules](validation.md#custom-rules). |
+| `show(DoxRequest req, String id)` | still works. New: `show(int id)`. See [Controller: parameters](controller.md#parameters). |
+
+### Rules
+
+| 2.x rule | 3.x |
+| --- | --- |
+| `required` | a non-nullable field with no default: `final String name;` |
+| `nullable` | a nullable field: `final int? age;` |
+| `sometimes` | a nullable field, or `Maybe<T>` to know "missing" from `null` |
+| `required_if`, `required_if_not` | a nullable field, plus a check in [`validate()`](validation.md#checks-across-fields-validate) |
+| `string` | `String` |
+| `integer` | `int` |
+| `numeric`, `double` | `num`, `double` |
+| `boolean` | `bool` |
+| `array` | `List<T>` |
+| `json` | `Map<String, dynamic>` (send an object, not a JSON text) |
+| `date` | `DateTime` |
+| `email`, `url`, `uuid`, `ip` | `@Email()`, `@Url()`, `@Uuid()`, `@Ip()` |
+| `alpha`, `alpha_dash`, `alpha_numeric` | `@Alpha()`, `@AlphaDash()`, `@AlphaNumeric()` |
+| `in:a,b` | a Dart `enum`, or `@In(['a', 'b'])` |
+| `not_in:a,b` | `@NotIn(['a', 'b'])` |
+| `start_with:x`, `end_with:x` | `@StartsWith('x')`, `@EndsWith('x')` |
+| `min_length:3`, `max_length:50` | `@MinLength(3)`, `@MaxLength(50)` |
+| `length_between:3,50` | `@Length(min: 3, max: 50)` |
+| `min:18`, `max:100` | `@Min(18)`, `@Max(100)` |
+| `between:1,10` | `@Range(1, 10)` |
+| `greater_than:0`, `less_than:100` | `@GreaterThan(0)`, `@LessThan(100)` |
+| `confirmed` | a `password_confirmation` field, plus a check in `validate()` |
+| `unique:users,email,5` | `@Unique('users', 'email', ignoreParam: 'id')` |
+| `exists:teams,id` | `@Exists('teams', 'id')` |
+| `file:pdf,docx` | a `RequestFile` field with `@Mimes(['pdf', 'docx'])` |
+| `image`, `image:png,jpg` | a `RequestFile` field with `@Image()`, or `@Mimes(['png', 'jpg'])` |
+| `address.city` | a nested `@Dto` field: `final Address address;` |
+| `products.*.name` | a list of DTOs: `final List<Product> products;` |
+
+### Behaviour changes
+
+- **JSON types are strict.** `"18"` in a JSON body is not an `int`. Query and form data are still converted.
+- **Keys are snake_case by default.** A field `postCode` reads `post_code`. Use `@Name()` or `@Dto(keyCase: KeyCase.field)` to change it.
+- **Unknown keys are dropped** from the DTO. `req.body` still has the raw input.
+- **`""` counts as missing.** A required `String` rejects `""`. Add `@AllowEmpty()` to accept it.
+- **Database rules run last**, and only when all other checks passed.
+- **The 422 body is the same shape:** `{"field": "message"}`. Nested keys use dots, list items use the index: `items.0.name`.
+- `dox_core` exports the `dox_validation` names (`v`, `Schema`, `Rule`, `Dto`, `Min`, ...). `dox_orm` also has a `Schema` class.
   A file that imports both and uses `Schema` gets an "ambiguous import" error. Fix: `import 'package:dox_orm/dox_orm.dart' as orm;` or `hide Schema`.
-- A class of yours named like a `dox_validation` class (for example `Validator` or `Rule`) wins in its own file. In other files, hide the `dox_core` one.
-
-See [Validation](validation.md).
+- A class of yours named like a `dox_validation` class (for example `Rule`, `Name` or `Range`) wins in its own file. In other files, hide the `dox_core` one.
+- `Rule` has a `const` constructor now, and `message` is `final`.
 
 ## WebSocket
 
@@ -293,5 +388,5 @@ Fix: give a default where a key is optional, for example `Env.get<int>('APP_PORT
 
 - [OpenAPI docs](../packages/openapi.md#in-a-dox-app) at `/docs`, on by default only when `APP_ENV` is `development` or `local`. They are made from your routes, request classes and controllers: run `dox build_runner:build`, then pass `openApiRegistry` from `lib/openapi.g.dart` to `OpenApiConfig(registry:)`. `dox openapi:generate` writes the files.
 - [Socket.IO](../packages/socketio.md#in-a-dox-app-same-port-as-http) on the app port, off by default.
-- [`unique` and `exists` rules](validation.md#database-rules-unique-and-exists), `validateAsync()`, `validateSchema()` and `FormRequest.schema()`.
+- [Typed DTOs](validation.md) with `@Dto()`, typed [controller parameters](controller.md#parameters), and [`@Unique` / `@Exists`](validation.md#database-rules-unique-and-exists).
 - `Route.files()` for local signed URLs, and the catch-all route param `{path*}`.

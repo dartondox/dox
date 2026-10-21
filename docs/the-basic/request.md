@@ -1,51 +1,81 @@
 # Request
 
-## Request body
+## Typed input (recommended)
 
-You can use the map function to retrieve body data using `req.body['keyword']`. You can use the `req.body` to retrieve data from both JSON body and request parameters, like `?foo=bar`, by utilizing the map function.
+Ask for a [DTO](validation.md) in your controller. Dox reads the body (or the query for `GET`), checks it, and gives you a typed object.
 
 ```dart
 class ApiController {
-    sayHello(DoxRequest req) {
-        String name = req.body['name']
+    Future<String> sayHello(HelloInput input) async {
+        return 'Hello ${input.name}';
+    }
+}
+```
+
+Bad input gets `422` before your method runs. See [Validation](validation.md).
+
+## Raw input
+
+You can still read the raw values from the request.
+`req.body['name']` and `req.input('name')` read the JSON body, the form data and the query string (`?foo=bar`).
+These values are not checked.
+
+```dart
+class ApiController {
+    String sayHello(DoxRequest req) {
+        String name = req.input('name');
         return 'Hello $name';
     }
 }
 ```
 
-## Route Param
+## Route param
 
-Route parameters can be optional and can also be obtained from `req.param`.
+Ask for a path param as a typed parameter. `int id` gets `42` from `/users/42`.
 
 ```dart
-Route.get('/hello/{name}');
+Route.get('/hello/{name}', controller.sayHello);
+Route.get('/users/{id}', controller.show);
 
 class ApiController {
-    sayHello(DoxRequest req, String name) {
+    String sayHello(String name) {
         return 'Hello $name';
+    }
+
+    Future<User?> show(int id) async {
+        return User().find(id);
     }
 }
 ```
+
+The values are also in `req.param`. See [Controller: parameters](controller.md#parameters).
 
 ## Form data (File)
 
-An uploaded file is a `RequestFile`. Get it with `req.input('image')`.
-The request must be `multipart/form-data`, with a file field named `image`.
+An uploaded file is a `RequestFile`. The request must be `multipart/form-data`.
+Put the file in a DTO, so Dox checks its type and size:
 
 ```dart
+@Dto()
+class UploadImage {
+    @Image()
+    @MaxSize('5MB')
+    final RequestFile image;
+
+    const UploadImage({required this.image});
+
+    static const DtoSchema<UploadImage> schema = $UploadImageDto;
+}
+
 class ApiController {
-    Future<dynamic> uploadImage(DoxRequest req) async {
-        req.validate({
-            'image': 'required|image:png,jpg',
-        });
-
-        RequestFile image = req.input('image');
-        String uploadedPath = await image.store('images');
-
-        return {"filename" : uploadedPath};
+    Future<Map<String, String>> uploadImage(UploadImage input) async {
+        String uploadedPath = await input.image.store('images');
+        return <String, String>{'filename': uploadedPath};
     }
 }
 ```
+
+Without a DTO, `req.input('image')` gives the `RequestFile`, not checked.
 
 ### `RequestFile`
 
@@ -100,118 +130,3 @@ req.isSecure(); // true for https
 ```
 
 Behind a proxy, set `trustedProxies` so these show the real client. See [Deployment](../digging-deeper/deployment.md#https-put-a-proxy-in-front).
-
-## Custom Form Request
-
-#### Step 1. Create a request
-
-```bash
-dox create:request Blog
-```
-
-#### Step 2. Register in app
-
-Register a request in `lib/config/app.dart`
-
-```dart
-
-formRequests: <Type, FormRequest Function()>{
-    BlogRequest:() => BlogRequest(),
-},
-```
-
-!!! info "Why?"
-    If we don't utilize `dart:mirrors`, there isn't a straightforward method to instantiate a class from a string in Dart. Instead, we must register your request class in the `app.dart` file. As a result, Dox will seamlessly route the request to the corresponding controller.
-
-#### Step 3. Usage
-
-=== "blog.request.dart"
-
-    ```dart
-    import 'package:dox_core/dox_core.dart';
-
-    class BlogRequest extends FormRequest {
-        String? title;
-        String? description;
-
-        @override
-        void setUp() {
-            title = input('title');
-            description = input('desc');
-        }
-
-        @override
-        Map<String, String> rules() {
-            return {
-                'title': 'required',
-            };
-        }
-
-        @override
-        Map<String, String> messages() {
-            return {
-                'required': "The {field} is required"
-            };
-        }
-    }
-    ```
-
-=== "blog.controller.dart"
-
-    ```dart
-    class BlogController {
-        store(BlogRequest req) async {
-            Blog blog = Blog();
-            
-            blog.title = req.title;
-            blog.description = req.description;
-            
-            await blog.save();
-            return blog;
-        }
-    }
-    ```
-
-#### `setUp`
-
-Within this function, you have the opportunity to assign values to variables based on the incoming request, which can then be reused within the controller.
-
-#### `rules`
-
-This function serves as the location for defining validation rules for input requests.
-
-#### `messages`
-
-In this function, you have the ability to configure custom validation messages for input form request validation. Check [here](validation.md#custom-validation-message) for more about validation.
-
-#### `schema`
-
-Return a `dox_validation` schema to check the body with typed output. When `schema()` is not `null`, Dox uses it instead of `rules()`.
-Build it once in a `static final` field, because `schema()` runs on every request.
-
-```dart
-class SignUpRequest extends FormRequest {
-    static final ObjectSchema _schema = v.object(<String, Schema<Object?>>{
-        'name': v.string().trim().min(3),
-        'age': v.coerce.int().min(18),
-    });
-
-    @override
-    ObjectSchema? schema() => _schema;
-}
-```
-
-The schema (or the `rules()`) also becomes the request body in the [OpenAPI docs](../packages/openapi.md).
-
-#### `validated`
-
-The checked data, set before `setUp()` runs. With `schema()` it is the typed output. With `rules()` it is the fields that have rules.
-
-```dart
-store(SignUpRequest req) {
-    int age = req.validated['age'];
-}
-```
-
-!!! info
-    A form request always validates with async support, so `unique` and `exists` rules work in `rules()`.
