@@ -1,3 +1,19 @@
+## Unreleased
+
+- Added `whereNull`, `whereNotNull`, `orWhereNull`, `orWhereNotNull`, `whereNotIn`, `orWhereIn`, `orWhereNotIn` and `selectRaw`.
+- Added `QueryBuilder.transaction()`. Postgres now uses a real connection pool (`maxConnectionCount`) and no longer runs each query in its own transaction.
+- Added `boolean()` schema column (Postgres `BOOLEAN`, MySQL `TINYINT(1)`, read as `bool`).
+- Table and column names are now quoted (`"name"` on Postgres, `` `name` `` on MySQL). On Postgres, quoted names are case sensitive. Use `selectRaw`/`whereRaw` for raw SQL.
+- `count()` ignores `limit`, `offset` and `orderBy`. With `groupBy` it now returns the number of groups (before: the size of the first group).
+- `save()` can set a field to null on update.
+- `insert()` works with any primary key type (uuid strings too).
+- `model.delete()` and `model.forceDelete()` only delete that record. Before, they had no where condition.
+- `forceDelete()` also deletes soft deleted rows. `withTrash(false)` on a model without soft deletes no longer adds a `deleted_at` filter.
+- hasOne, hasMany and manyToMany work with a custom `localKey`.
+- `insertMultiple()` uses keys from all rows. Missing keys use the column default.
+- MySQL: only JSON columns are decoded (arrays too). MariaDB keeps decoding JSON-like text, because it stores JSON as text.
+- Schema: `unique()` on a column that is already unique is skipped. Default values are escaped.
+
 ## 2.1.0
 
 - Added support for MYSQL driver

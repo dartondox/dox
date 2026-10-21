@@ -10,12 +10,12 @@ mixin Update<T> implements SharedMixin<T> {
   /// ```
   Future<void> update(Map<String, dynamic> data) async {
     String q;
-    q = "UPDATE $tableName SET ";
+    q = "UPDATE ${helper.wrap(tableName)} SET ";
 
     List<String> columnToUpdate = <String>[];
     data.forEach((String column, dynamic value) {
       String columnKey = helper.parseColumnKey(column);
-      columnToUpdate.add("$column = $columnKey");
+      columnToUpdate.add("${helper.wrap(column)} = $columnKey");
       addSubstitutionValues(columnKey, value);
     });
     q += columnToUpdate.join(',');

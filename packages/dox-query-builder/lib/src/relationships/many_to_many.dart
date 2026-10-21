@@ -1,5 +1,8 @@
 import 'package:dox_query_builder/dox_query_builder.dart';
 
+/// local key used by each query, so the result can be matched to owners
+final Expando<String> _localKeys = Expando<String>();
+
 /// many to many relationship query
 M? manyToMany<T, M>(
   List<Model<T>> list,
@@ -43,6 +46,7 @@ M? manyToMany<T, M>(
   if (onQuery != null) {
     q = onQuery(q);
   }
+  _localKeys[q] = localKey;
   return q as M;
 }
 
@@ -56,6 +60,7 @@ String _sortTableByAlphabet(String firstTable, String secondTable) {
 }
 
 /// get result of many to many relationship query
+/// the result is keyed by each owner primary key (tempIdValue).
 Future<Map<String, List<M>>> getManyToMany<T, M>(
   dynamic q,
   List<Model<T>> list,
@@ -75,10 +80,13 @@ Future<Map<String, List<M>>> getManyToMany<T, M>(
     ret[ownerId]?.add(r);
   }
 
-  /// to prevent result null instead return empty list
+  /// match each owner by its local key, and use an empty list
+  /// instead of null when there is no result
+  String? localKey = _localKeys[q];
+  Map<String, List<M>> byOwner = <String, List<M>>{};
   for (Model<T> i in list) {
-    ret[i.tempIdValue.toString()] = ret[i.tempIdValue.toString()] ?? <M>[];
+    dynamic key = localKey == null ? i.tempIdValue : i.toMap()[localKey];
+    byOwner[i.tempIdValue.toString()] = ret[key.toString()] ?? <M>[];
   }
-
-  return ret;
+  return byOwner;
 }

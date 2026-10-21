@@ -214,8 +214,10 @@ void main() async {
 
     test('toSql', () async {
       String query = Blog().where('uid', 1).toSql();
-      expect("SELECT * FROM blog WHERE (uid = 1) AND blog.deleted_at IS NULL",
-          query);
+      String q =
+          SqlQueryBuilder().dbDriver.getName() == Driver.mysql ? '`' : '"';
+      expect(query,
+          "SELECT * FROM ${q}blog$q WHERE (${q}uid$q = 1) AND ${q}blog$q.${q}deleted_at$q IS NULL");
     });
 
     test('toMap', () async {

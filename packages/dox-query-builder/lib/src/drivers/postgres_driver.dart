@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:dox_query_builder/dox_query_builder.dart';
 import 'package:postgres/postgres.dart';
 
+/// zone key to find the open transaction of a connection
+const Symbol _txKey = #doxPostgresTransaction;
+
 /// driver for postgres SQL
-/// support PostgreSQLConnection and PgPool
+/// support postgres `Connection` and `Pool`
 class PostgresDriver extends DBDriver {
   dynamic conn;
 
@@ -14,7 +19,8 @@ class PostgresDriver extends DBDriver {
     return Driver.postgres;
   }
 
-  Future<Connection> _getConnection() async {
+  /// `Connection` or `Pool`, both can run queries and transactions
+  Future<dynamic> _getConnection() async {
     /// if connection is future, we need to connect first.
     /// the connection is kept on this driver, so each named connection
     /// keeps its own database connection.
@@ -43,16 +49,33 @@ class PostgresDriver extends DBDriver {
     await _internalQuery(query, substitutionValues: substitutionValues);
   }
 
-  /// run query and return map result
-  Future<T> _internalQuery<T>(
+  @override
+  Future<R> transaction<R>(Future<R> Function() callback) async {
+    dynamic c = await _getConnection();
+    Map<dynamic, TxSession>? open = Zone.current[_txKey];
+
+    /// ponytail: a nested transaction joins the outer one (no savepoint)
+    if (open?[c] != null) {
+      return await callback();
+    }
+    return await c.runTx((TxSession session) {
+      return runZoned(callback, zoneValues: <Symbol, dynamic>{
+        _txKey: <dynamic, TxSession>{...?open, c: session},
+      });
+    });
+  }
+
+  /// run query in the open transaction if any, else on the connection/pool
+  Future<Result> _internalQuery(
     String query, {
     Map<String, dynamic>? substitutionValues,
   }) async {
-    Connection c = await _getConnection();
-    Result result = await c.runTx((TxSession s) async {
-      return await s.execute(Sql.named(query), parameters: substitutionValues);
-    });
-    return result as T;
+    dynamic c = await _getConnection();
+    Session session = Zone.current[_txKey]?[c] ?? c;
+    return await session.execute(
+      Sql.named(query),
+      parameters: substitutionValues,
+    );
   }
 }
 

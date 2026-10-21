@@ -16,6 +16,10 @@ class QueryBuilderHelper<T> {
     return '@$key';
   }
 
+  /// quote a table or column name for the current driver
+  String wrap(String value) => queryBuilder.dbDriver.wrap(value);
+
+  /// count query do not need order by, limit and offset
   String getCommonQuery({bool isCountQuery = false}) {
     String query = "";
     query += queryBuilder.getJoinQuery();
@@ -23,8 +27,8 @@ class QueryBuilderHelper<T> {
     query += queryBuilder.getGroupByQuery();
     if (!isCountQuery) {
       query += queryBuilder.getOrderByQuery();
+      query += queryBuilder.getLimitQuery();
     }
-    query += queryBuilder.getLimitQuery();
     return query;
   }
 

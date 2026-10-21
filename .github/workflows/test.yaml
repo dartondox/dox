@@ -52,6 +52,21 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    # MySQL 8.4 is started here, not as a service, because it needs server
+    # options. mysql1 (the dart driver) can not do the first
+    # caching_sha2_password login, so the test user uses mysql_native_password.
+    # This option is removed in MySQL 9.
+    - name: Start MySQL 8.4
+      run: |
+        docker run -d --name mysql84 -p 3307:3306 \
+          -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=dox-framework \
+          -e MYSQL_USER=dox -e MYSQL_PASSWORD=password \
+          mysql:8.4 --mysql-native-password=ON \
+          --authentication-policy=mysql_native_password
+        for i in $(seq 1 60); do
+          docker exec mysql84 mysqladmin ping -h127.0.0.1 -udox -ppassword --silent && break
+          sleep 2
+        done
     - uses: dart-lang/setup-dart@v1
       with:
         sdk: stable
@@ -67,5 +82,7 @@ jobs:
       run: melos test --no-select
     - name: Run Test (query builder postgres)
       run: DB_PORT=5432 melos test_pg
-    - name: Run Test (query builder mysql)
+    - name: Run Test (query builder mariadb)
       run: DB_USER=dox DB_PORT=3306 melos test_mysql
+    - name: Run Test (query builder mysql 8.4)
+      run: DB_USER=dox DB_PORT=3307 melos test_mysql

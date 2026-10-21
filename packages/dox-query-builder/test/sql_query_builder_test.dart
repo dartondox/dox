@@ -143,8 +143,9 @@ void main() async {
         <String, dynamic>{'title': 'title 2', 'body': 'body'},
       ]);
 
+      /// count() with groupBy returns the number of groups
       int total = await Blog().groupBy('status').count();
-      expect(total, 3);
+      expect(total, 1);
 
       int total2 = await Blog().groupBy(<String>['status', 'title']).count();
       expect(total2, 2);
@@ -536,10 +537,56 @@ void main() async {
       expect(total, 1);
     });
 
+    test('where null and where not null', () async {
+      await Blog().insertMultiple(<Map<String, dynamic>>[
+        <String, dynamic>{'title': 'title 1', 'body': 'body 1'},
+        <String, dynamic>{'title': 'title 2', 'body': 'body 2', 'slug': 's'},
+        <String, dynamic>{'title': 'title 3', 'body': 'body 3'},
+      ]);
+      expect(await Blog().whereNull('slug').count(), 2);
+      expect(await Blog().whereNotNull('blog.slug').count(), 1);
+      expect(await Blog().where('title', 'title 1').orWhereNull('slug').count(),
+          2);
+      expect(
+          await Blog().where('title', 'title 1').orWhereNotNull('slug').count(),
+          2);
+    });
+
+    test('where in, not in and or variants', () async {
+      await Blog().insertMultiple(<Map<String, dynamic>>[
+        <String, dynamic>{'title': 'title 1', 'body': 'body 1'},
+        <String, dynamic>{'title': 'title 2', 'body': 'body 2'},
+        <String, dynamic>{'title': 'title 3', 'body': 'body 3'},
+      ]);
+      expect(await Blog().whereNotIn('uid', <int>[1, 2]).count(), 1);
+      expect(await Blog().whereNotIn('uid', <int>[]).count(), 3);
+      expect(await Blog().whereIn('uid', <int>[]).count(), 0);
+      expect(
+          await Blog().where('uid', 1).orWhereIn('uid', <int>[2]).count(), 2);
+      expect(await Blog().where('uid', 1).orWhereIn('uid', <int>[]).count(), 1);
+      expect(
+          await Blog().where('uid', 1).orWhereNotIn('uid', <int>[1, 2]).count(),
+          2);
+      expect(
+          await Blog().where('uid', 1).orWhereNotIn('uid', <int>[]).count(), 3);
+    });
+
+    test('select raw is not quoted', () async {
+      await Blog().insertMultiple(<Map<String, dynamic>>[
+        <String, dynamic>{'title': 'a', 'body': 'body'},
+        <String, dynamic>{'title': 'a', 'body': 'body'},
+      ]);
+      List<Map<String, dynamic>> rows =
+          await QueryBuilder.table('blog').selectRaw('DISTINCT title').get();
+      expect(rows.length, 1);
+    });
+
     test('toSql with many values', () async {
       String query = Blog().where('uid', 1).where('title', 'x').toSql();
+      String q =
+          SqlQueryBuilder().dbDriver.getName() == Driver.mysql ? '`' : '"';
       expect(query,
-          "SELECT * FROM blog WHERE (uid = 1 AND title = x) AND blog.deleted_at IS NULL");
+          "SELECT * FROM ${q}blog$q WHERE (${q}uid$q = 1 AND ${q}title$q = x) AND ${q}blog$q.${q}deleted_at$q IS NULL");
     });
   });
 }

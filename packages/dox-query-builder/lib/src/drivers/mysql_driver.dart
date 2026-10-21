@@ -1,15 +1,30 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:dox_query_builder/dox_query_builder.dart';
 import 'package:mysql1/mysql1.dart';
 
-/// driver for postgres SQL
-/// support PostgreSQLConnection and PgPool
+/// zone key to find the connections that have an open transaction
+const Symbol _txKey = #doxMysqlTransaction;
+
+/// mysql field types
+const int _fieldTypeTiny = 0x01;
+const int _fieldTypeJson = 0xf5;
+
+/// driver for mysql and mariadb
 class MysqlDriver extends DBDriver {
   dynamic conn;
 
   /// constructor
   MysqlDriver({required this.conn});
+
+  /// ponytail: mysql1 has no pool, so each named connection is one
+  /// database connection. while a transaction is open, other queries on
+  /// it wait until the transaction ends. use a pool if throughput matters.
+  static final Expando<Future<void>> _transactionDone = Expando<Future<void>>();
+
+  /// true when the server is mariadb, saved per connection
+  static final Expando<bool> _isMariaDb = Expando<bool>();
 
   @override
   Driver getName() {
@@ -23,7 +38,25 @@ class MysqlDriver extends DBDriver {
     if (conn is Future) {
       conn = await conn;
     }
-    return conn;
+    MySqlConnection c = conn;
+    if (_isMariaDb[c] == null) {
+      Results version = await c.query('SELECT VERSION()');
+      _isMariaDb[c] =
+          version.first.values?.first.toString().contains('MariaDB') ?? false;
+    }
+
+    /// wait for a transaction from outside this zone to end
+    if (!_inTransaction(c)) {
+      while (_transactionDone[c] != null) {
+        await _transactionDone[c];
+      }
+    }
+    return c;
+  }
+
+  bool _inTransaction(MySqlConnection c) {
+    Set<MySqlConnection>? open = Zone.current[_txKey];
+    return open?.contains(c) ?? false;
   }
 
   /// run query and return map result
@@ -38,6 +71,7 @@ class MysqlDriver extends DBDriver {
       query,
       primaryKey: primaryKey,
       substitutionValues: substitutionValues,
+      isMariaDb: _isMariaDb[c] ?? false,
     );
   }
 
@@ -50,6 +84,45 @@ class MysqlDriver extends DBDriver {
     MySqlConnection c = await _getConnection();
     await c.run(query, substitutionValues: substitutionValues);
   }
+
+  /// note: in mysql, schema changes (create/alter/drop table) commit the
+  /// transaction right away, they can not be rolled back.
+  @override
+  Future<R> transaction<R>(Future<R> Function() callback) async {
+    MySqlConnection c = await _getConnection();
+
+    /// ponytail: a nested transaction joins the outer one (no savepoint)
+    if (_inTransaction(c)) {
+      return await callback();
+    }
+
+    /// another transaction can start while we wait, so check again
+    while (_transactionDone[c] != null) {
+      await _transactionDone[c];
+    }
+    Completer<void> done = Completer<void>();
+    _transactionDone[c] = done.future;
+
+    Set<MySqlConnection> open = <MySqlConnection>{
+      ...?Zone.current[_txKey],
+      c,
+    };
+    try {
+      await c.query('START TRANSACTION');
+      R result = await runZoned(
+        callback,
+        zoneValues: <Symbol, dynamic>{_txKey: open},
+      );
+      await c.query('COMMIT');
+      return result;
+    } catch (error) {
+      await c.query('ROLLBACK');
+      rethrow;
+    } finally {
+      _transactionDone[c] = null;
+      done.complete();
+    }
+  }
 }
 
 /// extension on mysql connection
@@ -58,6 +131,7 @@ extension MySqlConnectionExecute on MySqlConnection {
     String sql, {
     String? primaryKey,
     Map<String, dynamic>? substitutionValues,
+    bool isMariaDb = false,
   }) async {
     Results results = await run(sql, substitutionValues: substitutionValues);
 
@@ -73,7 +147,7 @@ extension MySqlConnectionExecute on MySqlConnection {
 
     /// normal get query which need to return list of map data
     /// similar to postgres
-    return _parseResultToMap(results);
+    return _parseResultToMap(results, isMariaDb);
   }
 
   Future<Results> run(
@@ -97,31 +171,54 @@ extension MySqlConnectionExecute on MySqlConnection {
     return await query(sql, params);
   }
 
-  List<Map<String, dynamic>> _parseResultToMap(Results results) {
+  /// json rule:
+  /// - mysql: only JSON columns are decoded (objects and arrays).
+  /// - mariadb: JSON is a LONGTEXT column, so the type is unknown.
+  ///   text that starts with `{` or `[` and is valid json is decoded.
+  /// TINYINT(1) (used by boolean()) is returned as bool.
+  List<Map<String, dynamic>> _parseResultToMap(
+      Results results, bool isMariaDb) {
     List<Map<String, dynamic>> result = <Map<String, dynamic>>[];
     for (ResultRow element in results) {
       Map<String, dynamic> data = <String, dynamic>{};
-      element.fields.forEach((String key, dynamic value) {
-        /// blog need to convert to string
-        if (value is Blob) {
-          data[key] = value.toString();
-        } else {
-          data[key] = value;
+      for (int i = 0; i < results.fields.length; i++) {
+        Field field = results.fields[i];
+        dynamic value = element[i];
+
+        if (value == null) {
+          data[field.name!] = null;
+          continue;
         }
 
-        /// if data is json string
-        if (data[key].toString().startsWith('{"')) {
-          try {
-            /// convert to map
-            data[key] = jsonDecode(data[key]);
-          } catch (error) {
-            /// ignore error
-          }
+        /// blob need to convert to string
+        bool isBlob = value is Blob;
+        if (isBlob) {
+          value = value.toString();
         }
-      });
+
+        if (field.type == _fieldTypeJson) {
+          value = value is String ? jsonDecode(value) : value;
+        } else if (isMariaDb && isBlob && _looksLikeJson(value)) {
+          try {
+            value = jsonDecode(value);
+          } catch (error) {
+            /// not json, keep the text
+          }
+        } else if (field.type == _fieldTypeTiny &&
+            field.length == 1 &&
+            value is int) {
+          value = value != 0;
+        }
+        data[field.name!] = value;
+      }
       result.add(data);
     }
     return result;
+  }
+
+  bool _looksLikeJson(String value) {
+    String text = value.trimLeft();
+    return text.startsWith('{') || text.startsWith('[');
   }
 
   Object? _toMysqlValue(dynamic value) {

@@ -20,6 +20,9 @@ class Blog extends BlogGenerator {
   @Column()
   String? status;
 
+  @Column()
+  String? slug;
+
   @Column(name: 'body')
   String? description;
 

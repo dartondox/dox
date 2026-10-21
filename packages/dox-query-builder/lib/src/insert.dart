@@ -29,13 +29,14 @@ mixin Insert<T> implements SharedMixin<T> {
     // ignore: always_specify_types
     List<Map<String, dynamic>> result =
         await insertMultiple(<Map<String, dynamic>>[data]);
-    if (result.isNotEmpty) {
-      Map<String, dynamic> insertedData = result.first;
-      int? id = insertedData[primaryKey];
-      resetSubstitutionValues();
-      if (id != null) {
-        return await queryBuilder.find(id);
-      }
+
+    /// id can be any type (int, uuid string...).
+    /// mysql only returns auto increment ids, so use the given id if any.
+    dynamic id = result.isNotEmpty ? result.first[primaryKey] : null;
+    id ??= data[primaryKey];
+    resetSubstitutionValues();
+    if (id != null) {
+      return await queryBuilder.find(id);
     }
     return <String, dynamic>{};
   }
@@ -48,23 +49,28 @@ mixin Insert<T> implements SharedMixin<T> {
   ///   {"title" : "Another blog title"},
   /// ]);
   /// ```
+  /// columns are all keys from all rows.
+  /// a row without a key uses the column default value.
   Future<List<Map<String, dynamic>>> insertMultiple(
       List<Map<String, dynamic>> list) async {
-    List<String> columns = <String>[];
+    if (list.isEmpty) {
+      return <Map<String, dynamic>>[];
+    }
+    List<String> columns =
+        <String>{for (Map<String, dynamic> data in list) ...data.keys}.toList();
     List<String> values = <String>[];
-
-    // creating columns (col1, col2);
-    list.first.forEach((String key, dynamic value) {
-      columns.add(key);
-    });
 
     // creating values to insert (value1, val2);
     for (Map<String, dynamic> data in list) {
       List<String> ret = <String>[];
 
-      /// follow the column order of the first row, so values do not go
+      /// follow the same column order for every row, so values do not go
       /// to the wrong column when rows have keys in a different order
       for (String key in columns) {
+        if (!data.containsKey(key)) {
+          ret.add('DEFAULT');
+          continue;
+        }
         String columnKey = helper.parseColumnKey(key);
         ret.add(columnKey);
         addSubstitutionValues(columnKey, data[key]);
@@ -73,11 +79,11 @@ mixin Insert<T> implements SharedMixin<T> {
     }
 
     String returningQuery = queryBuilder.dbDriver.getName() == Driver.postgres
-        ? 'RETURNING $primaryKey'
+        ? 'RETURNING ${helper.wrap(primaryKey)}'
         : '';
 
     String query =
-        "INSERT INTO $tableName (${columns.join(',')}) VALUES ${values.join(',')} $returningQuery";
+        "INSERT INTO ${helper.wrap(tableName)} (${columns.map(helper.wrap).join(',')}) VALUES ${values.join(',')} $returningQuery";
     return await helper.runQuery(query);
   }
 }

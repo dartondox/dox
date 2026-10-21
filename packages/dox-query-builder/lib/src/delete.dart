@@ -15,10 +15,7 @@ mixin Delete<T> implements SharedMixin<T> {
     if (isSoftDeletes) {
       await queryBuilder.update(<String, dynamic>{'deleted_at': now()});
     } else {
-      String q;
-      q = "DELETE FROM $tableName";
-      q += helper.getCommonQuery();
-      await helper.runQuery(q);
+      await forceDelete();
     }
   }
 
@@ -31,8 +28,10 @@ mixin Delete<T> implements SharedMixin<T> {
   /// await Blog().where('id', 1).forceDelete();
   /// `
   Future<void> forceDelete() async {
+    /// also delete rows that are already soft deleted
+    withTrashed = true;
     String q;
-    q = "DELETE FROM $tableName";
+    q = "DELETE FROM ${helper.wrap(tableName)}";
     q += helper.getCommonQuery();
     await helper.runQuery(q);
   }

@@ -2,6 +2,15 @@
 
 Query Builder provides a user-friendly interface where users can define the criteria and parameters for database queries without needing to write the SQL code manually. Query builders are commonly used in database management systems and data analysis tools to streamline the query creation process, making it more accessible to users who may not be proficient in writing SQL queries.
 
+!!! info "Table and column names are quoted"
+    Table and column names you pass to `select`, `where`, `join`, `groupBy`, `orderBy`,
+    `insert` and `update` are quoted: `"name"` on Postgres and `` `name` `` on MySQL.
+    So names like `order` or `key` work.
+    `table.column`, `*` and `column as alias` are handled.
+    A value with `(` (for example `count(*) as total`) is kept as it is.
+    For anything else, use the raw functions (`selectRaw`, `whereRaw`, `joinRaw`).
+    On Postgres a quoted name is case sensitive, so `userId` is not the same as `userid`.
+
 ### `create`
 
 === "Create"
@@ -31,6 +40,11 @@ Query Builder provides a user-friendly interface where users can define the crit
     ]);
     ```
 
+!!! info
+    `insert` works with any primary key type, for example a uuid string.
+    `insertMultiple` uses the keys from all rows. When a row does not have a key,
+    that column gets its default value.
+
 ### `update`
 
 === "Update rows"
@@ -58,6 +72,10 @@ Query Builder provides a user-friendly interface where users can define the crit
     ```dart
     await Actor().where('age', '>=' , 23).count();
     ```
+
+!!! info
+    `count()` does not use `limit`, `offset` and `orderBy`.
+    With `groupBy`, `count()` returns the number of groups.
 
 ### `find`
 
@@ -129,7 +147,8 @@ Query Builder provides a user-friendly interface where users can define the crit
     ```
 
 !!! info
-    This work only with softDeletes.
+    This is for models with softDeletes. It also deletes rows that are already
+    soft deleted, so you do not need `withTrash()`.
 
 ### `withTrash`
 
@@ -143,7 +162,7 @@ Query Builder provides a user-friendly interface where users can define the crit
     ```
 
 !!! info
-    This work only with softDeletes.
+    This work only with softDeletes. On a model without softDeletes it does nothing.
 
 
 ### `select`
@@ -171,6 +190,13 @@ Query Builder provides a user-friendly interface where users can define the crit
         .select('id, name, age').where('name', 'John Wick').get();
     ```
 
+=== "Select raw"
+
+    ```dart
+    // nothing is quoted
+    await Actor().selectRaw('DISTINCT name').get();
+    ```
+
 ### `whereIn`
 
 === "Where in condition"
@@ -179,8 +205,38 @@ Query Builder provides a user-friendly interface where users can define the crit
     await Actor().whereIn('id', ['1', '2']).get();
     ```
 
+=== "Where not in"
+
+    ```dart
+    await Actor().whereNotIn('id', [1, 2]).get();
+    ```
+
+=== "Or where in / not in"
+
+    ```dart
+    await Actor().where('age', 60).orWhereIn('id', [1, 2]).get();
+    await Actor().where('age', 60).orWhereNotIn('id', [1, 2]).get();
+    ```
+
 !!! info
-    Each value is sent as a bound parameter. An empty list matches no rows.
+    Each value is sent as a bound parameter.
+    An empty list matches no rows for `whereIn`, and all rows for `whereNotIn`.
+
+### `whereNull`
+
+=== "Where null / not null"
+
+    ```dart
+    await Actor().whereNull('deleted_at').get();
+    await Actor().whereNotNull('deleted_at').get();
+    ```
+
+=== "Or where null / not null"
+
+    ```dart
+    await Actor().where('age', 60).orWhereNull('deleted_at').get();
+    await Actor().where('age', 60).orWhereNotNull('deleted_at').get();
+    ```
 
 ### `where`
 
@@ -305,7 +361,8 @@ Query Builder provides a user-friendly interface where users can define the crit
 
 !!! info
     The direction must be `asc` or `desc`. Any other value throws an `ArgumentError`.
-    The column name is not escaped. Do not pass user input as the column name.
+    The column name is quoted, but a name with `(` is kept as it is.
+    Do not pass user input as the column name.
 
 
 ### `join`
@@ -375,3 +432,48 @@ Query Builder provides a user-friendly interface where users can define the crit
     ```dart
     await Actor().debug(true).all();
     ```
+
+### `transaction`
+
+=== "Transaction"
+
+    ```dart
+    await QueryBuilder.transaction(() async {
+        Actor actor = Actor();
+        actor.name = 'John Wick';
+        await actor.save();
+        await QueryBuilder.table('actor_info').insert({'actor_id': actor.id});
+    });
+    ```
+
+=== "Other connection"
+
+    ```dart
+    await QueryBuilder.transaction(() async {
+        // ...
+    }, connection: 'mysql');
+    ```
+
+!!! info
+    The transaction commits when the function ends.
+    It rolls back when the function throws, and the error is thrown again.
+    All queries and models inside the function use the transaction.
+    A transaction inside another transaction joins the outer one.
+    On MySQL, create/alter/drop table commits right away and can not be rolled back.
+
+### Connections
+
+!!! info
+    Postgres uses a connection pool. Set the pool size with `maxConnectionCount`
+    in the connection `extra` config.
+    MySQL uses one connection for each connection name. While a transaction is open,
+    other queries on that connection wait until it ends.
+
+### MySQL JSON
+
+!!! info
+    On MySQL, JSON columns are decoded to `Map` or `List` when you read them.
+    Other text columns are not decoded.
+    MariaDB stores JSON as `LONGTEXT`, so the driver can not see the column type.
+    On MariaDB, text that starts with `{` or `[` and is valid JSON is decoded.
+    `boolean()` columns (`TINYINT(1)`) are read as `bool`.

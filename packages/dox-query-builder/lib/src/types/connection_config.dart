@@ -53,7 +53,7 @@ class ConnectionConfig {
   });
 
   /// get database connection
-  /// with  mysql `MysqlConnection` or postgres `Connection` type
+  /// with mysql `MySqlConnection` or postgres `Pool` type
   Future<dynamic> getDatabaseConnection() {
     if (driver == Driver.mysql) {
       return _getMysqlConnection();
@@ -80,19 +80,22 @@ class ConnectionConfig {
     );
   }
 
-  /// get mysql connection
-  Future<postgres.Connection> _getPostgresConnection() {
+  /// get postgres connection pool.
+  /// it opens up to `maxConnectionCount` connections when needed.
+  Future<postgres.Pool<dynamic>> _getPostgresConnection() async {
     postgres.SslMode sslMode =
         useSSL ? postgres.SslMode.require : postgres.SslMode.disable;
 
-    return postgres.Connection.open(
-      postgres.Endpoint(
-        host: host,
-        port: port,
-        username: user,
-        password: password,
-        database: database,
-      ),
+    return postgres.Pool<dynamic>.withEndpoints(
+      <postgres.Endpoint>[
+        postgres.Endpoint(
+          host: host,
+          port: port,
+          username: user,
+          password: password,
+          database: database,
+        ),
+      ],
       settings: postgres.PoolSettings(
         sslMode: extra['sslMode'] ?? sslMode,
         maxConnectionCount: extra['maxConnectionCount'],

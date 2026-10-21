@@ -23,7 +23,8 @@ mixin OrderBy<T> implements SharedMixin<T> {
         !<String>['asc', 'desc'].contains(type.toString().toLowerCase())) {
       throw ArgumentError.value(type, 'type', 'must be asc or desc');
     }
-    _orderBy.add('$column ${type == null ? '' : type.toString()}');
+    _orderBy.add(
+        '${helper.wrap(column.toString())} ${type == null ? '' : type.toString()}');
     return queryBuilder;
   }
 }

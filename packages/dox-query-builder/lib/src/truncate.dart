@@ -15,7 +15,7 @@ mixin Truncate<T> implements SharedMixin<T> {
             ? 'RESTART IDENTITY CASCADE'
             : ''
         : '';
-    String query = "TRUNCATE TABLE $tableName $reset";
+    String query = "TRUNCATE TABLE ${helper.wrap(tableName)} $reset";
     await helper.runQuery(query);
   }
 }

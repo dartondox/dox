@@ -78,7 +78,7 @@ mixin Join<T> implements SharedMixin<T> {
       secondJoinColumn = arg4;
     }
     _joins.add(
-        "$type $joinTable on $firstJoinColumn $condition $secondJoinColumn");
+        "$type ${helper.wrap(joinTable)} on ${helper.wrap(firstJoinColumn)} $condition ${helper.wrap(secondJoinColumn)}");
     return queryBuilder;
   }
 

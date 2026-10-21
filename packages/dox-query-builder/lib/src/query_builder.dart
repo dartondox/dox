@@ -75,6 +75,9 @@ class QueryBuilder<T>
   bool isSoftDeletes = false;
 
   @override
+  bool withTrashed = false;
+
+  @override
   String tableName = '';
 
   @override
@@ -139,7 +142,7 @@ class QueryBuilder<T>
   /// List blogs = await Blog().withTrash().all();
   /// ```
   QueryBuilder<T> withTrash([bool withTrashed = true]) {
-    isSoftDeletes = !withTrashed;
+    this.withTrashed = withTrashed;
     return queryBuilder;
   }
 
@@ -158,6 +161,24 @@ class QueryBuilder<T>
   // coverage:ignore-end
 
   /// **** map
+
+  /// run [callback] in one database transaction.
+  /// it commits when [callback] ends, and rolls back when it throws
+  /// (the error is thrown again). queries and models inside use the
+  /// transaction. a nested call joins the outer transaction.
+  ///
+  /// ```
+  /// await QueryBuilder.transaction(() async {
+  ///   await Blog().create({'title': 'a', 'body': 'b'});
+  ///   await QueryBuilder.table('blog_info').insert({'blog_id': 1});
+  /// });
+  /// ```
+  static Future<R> transaction<R>(
+    Future<R> Function() callback, {
+    String? connection,
+  }) {
+    return SqlQueryBuilder().getDBDriver(connection).transaction(callback);
+  }
 
   /// /// Direct raw query to database
   /// ```

@@ -18,10 +18,11 @@ mixin GroupBy<T> implements SharedMixin<T> {
   /// ```
   QueryBuilder<T> groupBy(dynamic column) {
     if (column is String) {
-      _groupBy = ' GROUP BY $column';
+      _groupBy = ' GROUP BY ${helper.wrap(column)}';
     }
     if (column is List) {
-      _groupBy = ' GROUP BY ${column.join(',')}';
+      _groupBy =
+          ' GROUP BY ${column.map((dynamic c) => helper.wrap(c.toString())).join(',')}';
     }
     return queryBuilder;
   }

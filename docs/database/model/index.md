@@ -150,6 +150,29 @@ class Blog extends BlogGenerator {
     await blog.save();
     ```
 
+=== "Set a field to null"
+
+    ```dart
+    Blog? blog = await Blog().find(1);
+    blog?.slug = null;
+    await blog?.save(); // slug is now NULL in the database
+    ```
+
+!!! info
+    On insert, `null` fields are not sent, so the database default is used.
+    On update, a field is set to `NULL` only when it had a value before
+    (loaded from the database or saved). Fields that were not loaded,
+    for example with `select()`, are not changed.
+
+## Delete
+
+=== "Delete a record"
+
+    ```dart
+    Blog? blog = await Blog().find(1);
+    await blog?.delete(); // only deletes this record
+    ```
+
 ## To map
 
 === "To map"

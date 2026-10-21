@@ -56,6 +56,21 @@ void main() async {
       expect(false, columns.contains('column_to_drop'));
     });
 
+    test('boolean column', () async {
+      await Schema.create('bool_test', (Table table) {
+        table.id();
+        table.boolean('active').withDefault(true);
+        table.boolean('done').nullable();
+      });
+      await QueryBuilder.table('bool_test')
+          .insert(<String, dynamic>{'done': false});
+      Map<String, dynamic> row =
+          await QueryBuilder.table('bool_test').getFirst();
+      await Schema.drop('bool_test');
+      expect(row['active'], true);
+      expect(row['done'], false);
+    });
+
     test('schema update changes nullable and default', () async {
       await Schema.table('schema_test_table', (Table table) {
         table.string('title').nullable();

@@ -8,7 +8,7 @@ mixin Get<T> implements SharedMixin<T> {
     if (queryBuilder.getRawQuery().isNotEmpty) {
       return queryBuilder.getRawQuery();
     }
-    String q = "SELECT $selectQueryString FROM $tableName";
+    String q = "SELECT $selectQueryString FROM ${helper.wrap(tableName)}";
     q += helper.getCommonQuery();
     q = q.replaceAll(RegExp(' +'), ' ');
     return q;
@@ -105,9 +105,9 @@ mixin Get<T> implements SharedMixin<T> {
   /// ```
   // ignore: always_specify_types
   Future all() async {
-    String query = "SELECT $selectQueryString FROM $tableName";
-    if (isSoftDeletes) {
-      query += ' WHERE $tableName.deleted_at IS NULL';
+    String query = "SELECT $selectQueryString FROM ${helper.wrap(tableName)}";
+    if (isSoftDeletes && !withTrashed) {
+      query += " WHERE ${helper.wrap('$tableName.deleted_at')} IS NULL";
     }
     return helper.formatResult(await helper.runQuery(query));
   }

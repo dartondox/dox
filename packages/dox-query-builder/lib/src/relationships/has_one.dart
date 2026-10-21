@@ -1,5 +1,8 @@
 import 'package:dox_query_builder/dox_query_builder.dart';
 
+/// local key used by each query, so the result can be matched to owners
+final Expando<String> _localKeys = Expando<String>();
+
 /// one to one relationship query
 M? hasOne<T, M>(
   List<Model<T>> list,
@@ -26,11 +29,16 @@ M? hasOne<T, M>(
   if (onQuery != null) {
     m = onQuery(m);
   }
+  _localKeys[m] = localKey;
   return m as M;
 }
 
 /// get result of one to one relationship query
-Future<Map<String, M>> getHasOne<T, M>(dynamic q, List<Model<T>> list) async {
+/// the result is keyed by each owner primary key (tempIdValue).
+Future<Map<String, M>> getHasOne<T, M>(
+  dynamic q,
+  List<Model<T>> list,
+) async {
   if (q == null) return <String, M>{}; // coverage:ignore-line
   List<M> results = await q.get();
 
@@ -43,5 +51,15 @@ Future<Map<String, M>> getHasOne<T, M>(dynamic q, List<Model<T>> list) async {
     ret[ownerId] = r;
   }
 
-  return ret;
+  /// match each owner by its local key
+  String? localKey = _localKeys[q];
+  Map<String, M> byOwner = <String, M>{};
+  for (Model<T> i in list) {
+    dynamic key = localKey == null ? i.tempIdValue : i.toMap()[localKey];
+    M? value = ret[key.toString()];
+    if (value != null) {
+      byOwner[i.tempIdValue.toString()] = value;
+    }
+  }
+  return byOwner;
 }

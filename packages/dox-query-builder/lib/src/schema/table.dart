@@ -43,6 +43,16 @@ class Table with TableUpdate {
     return col;
   }
 
+  /// BOOLEAN on postgres, TINYINT(1) on mysql (read back as bool)
+  TableColumn boolean(String name) {
+    TableColumn col = TableColumn(
+      name: name,
+      type: dbDriver.getName() == Driver.postgres ? 'BOOLEAN' : 'TINYINT(1)',
+    );
+    columns.add(col);
+    return col;
+  }
+
   TableColumn integer(String name) {
     TableColumn col = TableColumn(name: name, type: 'INTEGER');
     columns.add(col);
@@ -168,16 +178,14 @@ class Table with TableUpdate {
   }
 
   Future<void> create() async {
-    String query = "CREATE TABLE IF NOT EXISTS $tableName (";
+    String query = "CREATE TABLE IF NOT EXISTS ${dbDriver.wrap(tableName)} (";
 
     List<String> ret = <String>[];
     for (TableColumn col in columns) {
-      String defaultQuery =
-          col.defaultValue != null ? " DEFAULT '${col.defaultValue}'" : '';
       String unique = col.isUnique ? ' UNIQUE' : '';
 
       ret.add(
-          "${col.name} ${col.type} ${col.isNullable ? 'NULL' : 'NOT NULL'}$defaultQuery$unique");
+          "${dbDriver.wrap(col.name)} ${col.type} ${col.isNullable ? 'NULL' : 'NOT NULL'}${defaultQuery(col)}$unique");
     }
 
     query += ret.join(',');

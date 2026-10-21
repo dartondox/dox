@@ -29,6 +29,7 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
         'uid',
         'title',
         'status',
+        'slug',
         'body',
         'deleted_at',
         'created_at',
@@ -92,6 +93,7 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
     ..uid = m['uid'] as int?
     ..title = Blog.beforeGet(m)
     ..status = m['status'] as String?
+    ..slug = m['slug'] as String?
     ..description = m['body'] as String?
     ..deletedAt = m['deleted_at'] == null
         ? null
@@ -110,6 +112,7 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
       'uid': instance.uid,
       'title': instance.title,
       'status': instance.status,
+      'slug': instance.slug,
       'body': instance.description,
       'deleted_at': instance.deletedAt?.toIso8601String(),
       'created_at': instance.createdAt?.toIso8601String(),

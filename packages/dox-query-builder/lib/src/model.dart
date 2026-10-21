@@ -1,7 +1,8 @@
 import '../dox_query_builder.dart';
 
 class Model<T> extends QueryBuilder<T> {
-  int? tempIdValue;
+  /// primary key value, it can be any type (int, uuid string...)
+  dynamic tempIdValue;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -10,6 +11,9 @@ class Model<T> extends QueryBuilder<T> {
   List<String> tableColumns = <String>[];
 
   bool _debug = SqlQueryBuilder().debug;
+
+  /// values we last saved, so save() can tell when a field was set to null
+  Map<String, dynamic>? _savedValues;
 
   @override
   String get tableName => helper.toSnakeCase(runtimeType.toString());
@@ -63,11 +67,19 @@ class Model<T> extends QueryBuilder<T> {
           .insert(values);
 
       tempIdValue = res[primaryKey];
+      _savedValues = <String, dynamic>{...values, primaryKey: tempIdValue};
     } else {
       dynamic id = values[primaryKey];
       values.remove(primaryKey);
       values.remove(createdAtColumn);
-      values.removeWhere((String key, dynamic value) => value == null);
+
+      /// only send null when the field had a value before (set to null).
+      /// a field we never loaded or saved is skipped, so a model loaded
+      /// with select() does not clear the other columns.
+      Map<String, dynamic> saved = _savedValues ?? originalMap;
+      values.removeWhere(
+          (String key, dynamic value) => value == null && saved[key] == null);
+      _savedValues = <String, dynamic>{...saved, ...values};
       if (updatedAtColumn != null) {
         values[updatedAtColumn] = currentTime;
         updatedAt = values[updatedAtColumn];
@@ -78,6 +90,32 @@ class Model<T> extends QueryBuilder<T> {
           .debug(_debug)
           .where(primaryKey, id)
           .update(values);
+    }
+  }
+
+  /// delete this record (soft delete when the model use SoftDeletes)
+  ///
+  /// ```
+  /// Blog? blog = await Blog().find(1);
+  /// await blog?.delete();
+  /// ```
+  @override
+  Future<void> delete() async {
+    _whereThisRecord();
+    await super.delete();
+  }
+
+  /// delete this record from the table, also when soft deleted
+  @override
+  Future<void> forceDelete() async {
+    _whereThisRecord();
+    await super.forceDelete();
+  }
+
+  /// a loaded or saved model only deletes its own row
+  void _whereThisRecord() {
+    if (tempIdValue != null) {
+      where(primaryKey, tempIdValue);
     }
   }
 
