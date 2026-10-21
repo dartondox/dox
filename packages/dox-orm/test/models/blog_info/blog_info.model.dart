@@ -15,6 +15,9 @@ class BlogInfo extends BlogInfoGenerator {
   @BelongsTo(Blog, onQuery: onQuery)
   Blog? blog;
 
+  @Computed()
+  bool get hasInfo => info != null;
+
   static Model<Blog> onQuery(Blog q) {
     return q.debug(false);
   }

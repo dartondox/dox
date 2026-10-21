@@ -14,7 +14,8 @@ mixin Count<T> implements SharedMixin<T> {
     String q = "SELECT count(*) as total FROM $table";
     q += helper.getCommonQuery(isCountQuery: true);
     if (queryBuilder.getGroupByQuery().isNotEmpty) {
-      q = "SELECT count(*) as total FROM (SELECT 1 as one FROM $table"
+      q =
+          "SELECT count(*) as total FROM (SELECT 1 as one FROM $table"
           "${helper.getCommonQuery(isCountQuery: true)}) as dox_count";
     }
     List<dynamic> result = helper.getMapResult(await helper.runQuery(q));

@@ -34,8 +34,10 @@ class MysqlDriver extends DBDriver {
     MySQLConnectionPool pool = conn;
     if (_isMariaDb[pool] == null) {
       IResultSet version = await pool.execute('SELECT VERSION()');
-      _isMariaDb[pool] =
-          version.rows.first.colAt(0).toString().contains('MariaDB');
+      _isMariaDb[pool] = version.rows.first
+          .colAt(0)
+          .toString()
+          .contains('MariaDB');
     }
     return pool;
   }
@@ -136,8 +138,9 @@ class MysqlDriver extends DBDriver {
       Map<String, dynamic> data = <String, dynamic>{};
       for (int i = 0; i < length; i++) {
         dynamic value = row.colAt(i);
-        data[names[i]] =
-            value == null ? null : _convert(types[i], value, isMariaDb);
+        data[names[i]] = value == null
+            ? null
+            : _convert(types[i], value, isMariaDb);
       }
       list.add(data);
     }

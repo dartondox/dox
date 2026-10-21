@@ -8,10 +8,7 @@ class FileQueryPrinter implements QueryPrinter {
   Function(String)? filter;
   final File file;
 
-  FileQueryPrinter({
-    required this.file,
-    this.filter,
-  });
+  FileQueryPrinter({required this.file, this.filter});
 
   @override
   void log(String query, List<String> params) {
@@ -19,10 +16,7 @@ class FileQueryPrinter implements QueryPrinter {
       'timestamp': DateTime.now().toIso8601String(),
       'level': 'INFO',
       'message': query,
-      'payload': <String, dynamic>{
-        'query': query,
-        'params': params,
-      }
+      'payload': <String, dynamic>{'query': query, 'params': params},
     };
 
     Directory directory = file.parent;

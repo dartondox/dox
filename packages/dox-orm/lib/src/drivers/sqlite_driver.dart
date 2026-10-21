@@ -160,8 +160,9 @@ class SqliteDriver extends DBDriver {
       Map<String, dynamic> data = <String, dynamic>{};
       for (int i = 0; i < length; i++) {
         Object? value = row[i];
-        data[names[i]] =
-            convert && value != null ? _convert(columnKinds[i], value) : value;
+        data[names[i]] = convert && value != null
+            ? _convert(columnKinds[i], value)
+            : value;
       }
       list.add(data);
     }

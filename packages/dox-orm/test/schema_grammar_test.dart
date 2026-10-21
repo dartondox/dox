@@ -13,7 +13,9 @@ void main() {
     build(t);
     String sql = g.compile(t).first;
     return sql.substring(
-        'CREATE TABLE ${g.wrap('t')} ('.length, sql.length - 1);
+      'CREATE TABLE ${g.wrap('t')} ('.length,
+      sql.length - 1,
+    );
   }
 
   /// all sql of `Schema.table('t', build)` on [g]
@@ -32,10 +34,11 @@ void main() {
 
   /// [expected] per driver: postgres, mysql, sqlite
   void types(void Function(Table t) build, List<String> expected) {
-    expect(
-      <String>[col(pg, build), col(my, build), col(lite, build)],
-      expected,
-    );
+    expect(<String>[
+      col(pg, build),
+      col(my, build),
+      col(lite, build),
+    ], expected);
   }
 
   test('grammar for driver', () {
@@ -512,10 +515,7 @@ void main() {
     });
 
     test('foreign without on() throws', () {
-      expect(
-        () => create(pg, (Table t) => t.foreign('a')),
-        throwsStateError,
-      );
+      expect(() => create(pg, (Table t) => t.foreign('a')), throwsStateError);
     });
 
     test('constrained guesses the table', () {
@@ -730,22 +730,16 @@ void main() {
 
   group('table |', () {
     test('drop, dropIfExists, rename', () {
-      expect(
-        pg.compile(Table('t')..drop()),
-        <String>['DROP TABLE "t"'],
-      );
-      expect(
-        my.compile(Table('t')..dropIfExists()),
-        <String>['DROP TABLE IF EXISTS `t`'],
-      );
-      expect(
-        lite.compile(Table('t')..rename('u')),
-        <String>['ALTER TABLE "t" RENAME TO "u"'],
-      );
-      expect(
-        my.compile(Table('t')..rename('u')),
-        <String>['ALTER TABLE `t` RENAME TO `u`'],
-      );
+      expect(pg.compile(Table('t')..drop()), <String>['DROP TABLE "t"']);
+      expect(my.compile(Table('t')..dropIfExists()), <String>[
+        'DROP TABLE IF EXISTS `t`',
+      ]);
+      expect(lite.compile(Table('t')..rename('u')), <String>[
+        'ALTER TABLE "t" RENAME TO "u"',
+      ]);
+      expect(my.compile(Table('t')..rename('u')), <String>[
+        'ALTER TABLE `t` RENAME TO `u`',
+      ]);
     });
 
     test('toSql', () {

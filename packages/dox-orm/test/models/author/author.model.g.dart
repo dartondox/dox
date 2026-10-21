@@ -14,9 +14,9 @@ class AuthorGenerator extends Model<Author> {
 
   @override
   Map<String, dynamic> get timestampsColumn => <String, dynamic>{
-        'created_at': 'created_at',
-        'updated_at': 'updated_at',
-      };
+    'created_at': 'created_at',
+    'updated_at': 'updated_at',
+  };
 
   int? get id => tempIdValue;
 
@@ -25,25 +25,29 @@ class AuthorGenerator extends Model<Author> {
   Author query() => Author();
 
   @override
-  List<String> get tableColumns =>
-      <String>['id', 'code', 'created_at', 'updated_at'];
+  List<String> get tableColumns => <String>[
+    'id',
+    'code',
+    'created_at',
+    'updated_at',
+  ];
 
   @override
   List<String> get preloadList => <String>[];
 
   @override
   Map<String, Function> get relationsResultMatcher => <String, Function>{
-        'books': getBooks,
-        'book': getBook,
-        'tags': getTags,
-      };
+    'books': getBooks,
+    'book': getBook,
+    'tags': getTags,
+  };
 
   @override
   Map<String, Function> get relationsQueryMatcher => <String, Function>{
-        'books': queryBooks,
-        'book': queryBook,
-        'tags': queryTags,
-      };
+    'books': queryBooks,
+    'book': queryBook,
+    'tags': queryTags,
+  };
 
   static Future<void> getBooks(List<Model<Author>> list) async {
     var result = await getHasMany<Author, Book>(queryBooks(list), list);

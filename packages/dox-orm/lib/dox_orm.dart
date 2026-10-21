@@ -6,6 +6,7 @@ export 'src/drivers/db_driver.dart';
 export 'src/drivers/postgres_driver.dart';
 export 'src/main.dart';
 export 'src/model.dart';
+export 'src/model_events.dart';
 export 'src/printers/console_printer.dart';
 export 'src/printers/file_printer.dart';
 export 'src/printers/pretty_printer.dart';

@@ -14,9 +14,9 @@ class SongGenerator extends Model<Song> {
 
   @override
   Map<String, dynamic> get timestampsColumn => <String, dynamic>{
-        'created_at': 'created_at',
-        'updated_at': 'updated_at',
-      };
+    'created_at': 'created_at',
+    'updated_at': 'updated_at',
+  };
 
   int? get id => tempIdValue;
 
@@ -25,21 +25,25 @@ class SongGenerator extends Model<Song> {
   Song query() => Song();
 
   @override
-  List<String> get tableColumns =>
-      <String>['id', 'title', 'created_at', 'updated_at'];
+  List<String> get tableColumns => <String>[
+    'id',
+    'title',
+    'created_at',
+    'updated_at',
+  ];
 
   @override
   List<String> get preloadList => <String>[];
 
   @override
   Map<String, Function> get relationsResultMatcher => <String, Function>{
-        'artists': getArtists,
-      };
+    'artists': getArtists,
+  };
 
   @override
   Map<String, Function> get relationsQueryMatcher => <String, Function>{
-        'artists': queryArtists,
-      };
+    'artists': queryArtists,
+  };
 
   static Future<void> getArtists(List<Model<Song>> list) async {
     var result = await getManyToMany<Song, Artist>(queryArtists(list), list);
@@ -51,10 +55,7 @@ class SongGenerator extends Model<Song> {
   }
 
   static Artist? queryArtists(List<Model<Song>> list) {
-    return manyToMany<Song, Artist>(
-      list,
-      () => Artist(),
-    );
+    return manyToMany<Song, Artist>(list, () => Artist());
   }
 
   @override

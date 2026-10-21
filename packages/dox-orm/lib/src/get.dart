@@ -79,8 +79,9 @@ mixin Get<T> implements SharedMixin<T> {
   Future getFirst() async {
     queryBuilder.limit(1);
     // ignore: always_specify_types
-    List result =
-        await helper.formatResult(await helper.runQuery(_buildQuery()));
+    List result = await helper.formatResult(
+      await helper.runQuery(_buildQuery()),
+    );
     return result.isEmpty ? null : result.first;
   }
 

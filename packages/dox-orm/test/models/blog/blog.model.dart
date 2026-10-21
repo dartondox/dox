@@ -4,13 +4,10 @@ import '../blog_info/blog_info.model.dart';
 
 part 'blog.model.g.dart';
 
-@DoxModel(
-  primaryKey: 'uid',
-  softDelete: true,
-)
+@DoxModel(primaryKey: 'uid', softDelete: true)
 class Blog extends BlogGenerator {
   @override
-  List<String> get hidden => <String>['status'];
+  List<String> get hidden => <String>['status', 'secret_note'];
 
   @Column(beforeSave: slugTitle, beforeGet: beforeGet)
   String? title;
@@ -32,6 +29,12 @@ class Blog extends BlogGenerator {
 
   @HasMany(BlogInfo, eager: true, onQuery: onQuery)
   List<BlogInfo> blogInfos = <BlogInfo>[];
+
+  @Computed()
+  int get titleLength => title?.length ?? 0;
+
+  @Computed(name: 'secret_note')
+  String get secret => 'hidden';
 
   static String? slugTitle(Map<String, dynamic> map) {
     return map['title'];

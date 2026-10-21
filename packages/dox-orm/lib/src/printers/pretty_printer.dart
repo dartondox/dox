@@ -25,8 +25,10 @@ class PrettyQueryPrinter implements QueryPrinter {
   void _wrapLine(String line) {
     int len = logLength - 4;
     for (int i = 0; i < line.length; i += len) {
-      String q =
-          line.substring(i, i + len < line.length ? i + len : line.length);
+      String q = line.substring(
+        i,
+        i + len < line.length ? i + len : line.length,
+      );
       print("│\x1B[34m ${fillSpaceIfRequired(q)}\x1B[37m│");
     }
   }

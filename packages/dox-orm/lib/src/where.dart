@@ -129,7 +129,11 @@ mixin Where<T> implements SharedMixin<T> {
   }
 
   QueryBuilder<T> _whereIn(
-      String type, String column, List<dynamic> values, bool not) {
+    String type,
+    String column,
+    List<dynamic> values,
+    bool not,
+  ) {
     /// `in ()` is not valid sql, so an empty list becomes
     /// "no rows" for IN and "all rows" for NOT IN
     if (values.isEmpty) {
@@ -143,11 +147,17 @@ mixin Where<T> implements SharedMixin<T> {
     }
     String operator = not ? 'NOT IN' : 'IN';
     return _rawQuery(
-        type, "${helper.wrap(column)} $operator (${keys.join(',')})");
+      type,
+      "${helper.wrap(column)} $operator (${keys.join(',')})",
+    );
   }
 
-  QueryBuilder<T> _query(String type, dynamic arg1,
-      [dynamic arg2, dynamic arg3]) {
+  QueryBuilder<T> _query(
+    String type,
+    dynamic arg1, [
+    dynamic arg2,
+    dynamic arg3,
+  ]) {
     String column = arg1.toString();
     String condition = '=';
     dynamic value = arg2;

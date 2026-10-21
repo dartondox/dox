@@ -14,9 +14,9 @@ class UserGenerator extends Model<User> with SoftDeletes<User> {
 
   @override
   Map<String, dynamic> get timestampsColumn => <String, dynamic>{
-        'created_at': 'created_at',
-        'updated_at': 'updated_at',
-      };
+    'created_at': 'created_at',
+    'updated_at': 'updated_at',
+  };
 
   @override
   String get tableName => 'users';
@@ -28,8 +28,12 @@ class UserGenerator extends Model<User> with SoftDeletes<User> {
   User query() => User();
 
   @override
-  List<String> get tableColumns =>
-      <String>['id', 'name', 'created_at', 'updated_at'];
+  List<String> get tableColumns => <String>[
+    'id',
+    'name',
+    'created_at',
+    'updated_at',
+  ];
 
   @override
   List<String> get preloadList => <String>[];

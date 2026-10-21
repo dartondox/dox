@@ -6,6 +6,22 @@ class Column {
   const Column({this.name, this.beforeSave, this.beforeGet});
 }
 
+/// Adds a getter to toJson() and toMap(). It is never a table column.
+///
+/// ```
+/// @Computed()
+/// String get fullName => '$firstName $lastName'; // key: full_name
+///
+/// @Computed(name: 'display')
+/// String get displayName => name ?? '';
+/// ```
+class Computed {
+  /// json key, the default is the getter name in snake_case
+  final String? name;
+
+  const Computed({this.name});
+}
+
 class HasOne {
   final Type model;
   final String? foreignKey;
@@ -13,8 +29,13 @@ class HasOne {
   final Function? onQuery;
   final bool? eager;
 
-  const HasOne(this.model,
-      {this.foreignKey, this.localKey, this.onQuery, this.eager});
+  const HasOne(
+    this.model, {
+    this.foreignKey,
+    this.localKey,
+    this.onQuery,
+    this.eager,
+  });
 }
 
 class HasMany {
@@ -24,8 +45,13 @@ class HasMany {
   final Function? onQuery;
   final bool? eager;
 
-  const HasMany(this.model,
-      {this.foreignKey, this.localKey, this.onQuery, this.eager});
+  const HasMany(
+    this.model, {
+    this.foreignKey,
+    this.localKey,
+    this.onQuery,
+    this.eager,
+  });
 }
 
 class BelongsTo {
@@ -35,8 +61,13 @@ class BelongsTo {
   final Function? onQuery;
   final bool? eager;
 
-  const BelongsTo(this.model,
-      {this.foreignKey, this.localKey, this.onQuery, this.eager});
+  const BelongsTo(
+    this.model, {
+    this.foreignKey,
+    this.localKey,
+    this.onQuery,
+    this.eager,
+  });
 }
 
 class ManyToMany {

@@ -18,21 +18,19 @@ String toSnakeCase(String input) {
     String char = input[i];
     // Check if the current character is uppercase
     if (char == char.toUpperCase() && i > 0) {
-      snakeCase +=
-          '_'; // Add an underscore if it's uppercase and not the first character
+      snakeCase += '_'; // Add an underscore if it's uppercase and not the first character
     }
-    snakeCase += char
-        .toLowerCase(); // Convert the character to lowercase and add it to the result
+    snakeCase += char.toLowerCase(); // Convert the character to lowercase and add it to the result
   }
 
   return snakeCase.replaceAll(RegExp(r'_+'), '_');
 }
 
-ucFirst(String str) {
+String ucFirst(String str) {
   return str.substring(0, 1).toUpperCase() + str.substring(1);
 }
 
-lcFirst(String? str) {
+String lcFirst(String? str) {
   if (str == null) {
     return '';
   }

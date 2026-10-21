@@ -1,7 +1,5 @@
-// ignore_for_file: implementation_imports, depend_on_referenced_packages
-
 import 'package:analyzer/dart/element/element.dart';
-import 'package:build/src/builder/build_step.dart';
+import 'package:build/build.dart';
 import 'package:dox_annotation/dox_annotation.dart';
 import 'package:dox_builder/src/model_visitor.dart';
 import 'package:dox_builder/src/util.dart';
@@ -14,15 +12,18 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     ConstantReader annotation,
     BuildStep buildStep,
   ) {
-    String? tableName =
-        annotation.objectValue.getField('table')?.toStringValue();
+    String? tableName = annotation.objectValue
+        .getField('table')
+        ?.toStringValue();
     String primaryKeySnakeCase =
         annotation.objectValue.getField('primaryKey')?.toStringValue() ?? 'id';
     String primaryKey = toCamelCase(primaryKeySnakeCase);
-    String? createdAt =
-        annotation.objectValue.getField('createdAt')?.toStringValue();
-    String? updatedAt =
-        annotation.objectValue.getField('updatedAt')?.toStringValue();
+    String? createdAt = annotation.objectValue
+        .getField('createdAt')
+        ?.toStringValue();
+    String? updatedAt = annotation.objectValue
+        .getField('updatedAt')
+        ?.toStringValue();
     bool softDelete =
         annotation.objectValue.getField('softDelete')?.toBoolValue() ?? false;
 
@@ -34,10 +35,16 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         'jsonKey': primaryKeySnakeCase,
         'beforeSave': null,
         'beforeGet': null,
-      }
+      },
     });
 
-    element.visitChildren(visitor);
+    if (element is! ClassElement) {
+      throw InvalidGenerationSourceError(
+        '@DoxModel can only be used on a class.',
+        element: element,
+      );
+    }
+    visitor.visitClass(element);
 
     if (createdAt != null) {
       visitor.columns.addAll({
@@ -46,7 +53,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
           'jsonKey': createdAt,
           'beforeSave': null,
           'beforeGet': null,
-        }
+        },
       });
     }
     if (updatedAt != null) {
@@ -56,7 +63,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
           'jsonKey': updatedAt,
           'beforeSave': null,
           'beforeGet': null,
-        }
+        },
       });
     }
     String className = visitor.className;
@@ -65,6 +72,8 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
 
     var r = _getRelationsCode(visitor);
     var map = _getCodeForToMap(visitor);
+
+    String computedCode = _getCodeForComputedAndHooks(visitor);
 
     String softDeleteString = softDelete ? 'with SoftDeletes<$className>' : '';
 
@@ -120,11 +129,37 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         ${map['parseContent']}
         return map;
       }
+      $computedCode
     }
     """;
   }
 
-  _getRelationsCode(ModelVisitor visitor) {
+  /// only models with @Computed getters get setComputedValues(), and only
+  /// models with hooks get hasModelHooks. Other models do no extra work.
+  String _getCodeForComputedAndHooks(ModelVisitor visitor) {
+    String hooks = visitor.hasHooks
+        ? '''
+      @override
+      bool get hasModelHooks => true;
+    '''
+        : '';
+    if (visitor.computed.isEmpty) return hooks;
+    String className = visitor.className;
+    String content = '';
+    visitor.computed.forEach((getter, jsonKey) {
+      content += "map['${toSnakeCase(jsonKey)}'] = instance.$getter;\n";
+    });
+    return """
+      $hooks
+      @override
+      void setComputedValues(Map<String, dynamic> map) {
+        $className instance = this as $className;
+        $content
+      }
+    """;
+  }
+
+  Map<String, String> _getRelationsCode(ModelVisitor visitor) {
     String content = '';
     String mapResultContent = '';
     String mapQueryContent = '';
@@ -142,7 +177,8 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
 
       eagerLoad += value['eager'] == true ? "'$key'," : "";
 
-      content += """
+      content +=
+          """
       static Future<void> $getFunctionName(List<Model<${visitor.className}>> list) async {
         var result = await get${value['relationType']}<${visitor.className}, ${value['model']}>($queryFunctionName(list), list);
         for (dynamic i in list) {
@@ -175,11 +211,11 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     };
   }
 
-  _getParamKeyValue(value, key) {
+  String _getParamKeyValue(Map<String, dynamic> value, String key) {
     return value[key] != null ? ", $key: '${value[key]}'" : '';
   }
 
-  _getTableNameSetter(tableName) {
+  String _getTableNameSetter(String? tableName) {
     return tableName != null
         ? """
       @override
@@ -188,7 +224,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         : '';
   }
 
-  _primaryKeySetterAndGetter(primaryKey) {
+  String _primaryKeySetterAndGetter(String primaryKey) {
     return """
       int? get $primaryKey => tempIdValue;
       
@@ -196,7 +232,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     """;
   }
 
-  _getCodeForFromMap(ModelVisitor visitor) {
+  String _getCodeForFromMap(ModelVisitor visitor) {
     String content = '';
     String className = visitor.className;
 
@@ -206,7 +242,8 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       String setValue = '';
 
       if (values['type'] == 'DateTime?') {
-        setValue = """m['$jsonKey'] == null
+        setValue =
+            """m['$jsonKey'] == null
               ? null
               : DateTime.parse(m['$jsonKey'] as String)
           """;
@@ -224,7 +261,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     return content += ';';
   }
 
-  _getCodeForToMap(ModelVisitor visitor) {
+  Map<String, dynamic> _getCodeForToMap(ModelVisitor visitor) {
     String jsonMapper = '';
     String parseContent = '';
     List<String> tableColumns = [];
@@ -255,7 +292,8 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         jsonMapper += "'${toSnakeCase(key)}': toMap(instance.$key),\n";
       } else {
         preloadRelations.add(key);
-        toMapRelation += """
+        toMapRelation +=
+            """
         if (preload.contains('${toSnakeCase(key)}')) {
           map['${toSnakeCase(key)}'] = toMap(instance.$key);
         }

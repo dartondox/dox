@@ -58,12 +58,9 @@ void main() async {
       await Blog().insertMultiple(<Map<String, dynamic>>[
         <String, dynamic>{
           'title': 'dox query builder',
-          'body': 'Best orm for the dart'
+          'body': 'Best orm for the dart',
         },
-        <String, dynamic>{
-          'title': 'dox core',
-          'body': 'dart web framework',
-        }
+        <String, dynamic>{'title': 'dox core', 'body': 'dart web framework'},
       ]);
 
       List<Blog> blogs = await Blog().limit(1).get();
@@ -83,12 +80,9 @@ void main() async {
       await Blog().insertMultiple(<Map<String, dynamic>>[
         <String, dynamic>{
           'title': 'dox query builder',
-          'body': 'Best orm for the dart'
+          'body': 'Best orm for the dart',
         },
-        <String, dynamic>{
-          'title': 'dox core',
-          'body': 'dart web framework',
-        }
+        <String, dynamic>{'title': 'dox core', 'body': 'dart web framework'},
       ]);
 
       List<Blog> blog = await Blog().offset(0).limit(1).get();
@@ -129,8 +123,9 @@ void main() async {
       blog.title = 'Awesome blog';
       blog.description = 'Awesome blog body';
       await blog.save();
-      List<Map<String, dynamic>> res =
-          await QueryBuilder.query('select * from blog');
+      List<Map<String, dynamic>> res = await QueryBuilder.query(
+        'select * from blog',
+      );
       expect(res.first['title'], 'Awesome blog');
       expect(res.first['body'], 'Awesome blog body');
       expect(res.first['uid'], 1);
@@ -184,8 +179,9 @@ void main() async {
       blog.description = 'Best Orm';
       await blog.save();
 
-      Blog? findBlog =
-          await Blog().where('title', 'dox query builder').getFirst();
+      Blog? findBlog = await Blog()
+          .where('title', 'dox query builder')
+          .getFirst();
       expect(findBlog?.title, 'dox query builder');
       expect(findBlog?.uid, blog.uid);
     });
@@ -222,7 +218,9 @@ void main() async {
       await blog2.save();
 
       List<Blog> blogs = await Blog().where('title', 'title 1').orWhereRaw(
-          'title = @title', <String, String>{'title': 'title 2'}).get();
+        'title = @title',
+        <String, String>{'title': 'title 2'},
+      ).get();
 
       expect(blogs.first.title, 'title 1');
       expect(blogs.last.title, 'title 2');
@@ -239,9 +237,10 @@ void main() async {
       blog2.description = 'Best Orm';
       await blog2.save();
 
-      List<Blog> blogs = await Blog()
-          .where('status', '=', 'active')
-          .whereIn('uid', <int>[1, 2]).get();
+      List<Blog> blogs = await Blog().where('status', '=', 'active').whereIn(
+        'uid',
+        <int>[1, 2],
+      ).get();
 
       expect(blogs.first.title, 'title 1');
       expect(blogs.last.title, 'title 2');
@@ -258,9 +257,10 @@ void main() async {
       blog2.description = 'Best Orm';
       await blog2.save();
 
-      Blog? findBlog = await Blog()
-          .where('status', '=', 'active')
-          .whereRaw('uid = @id', <String, String>{'id': '1'}).getFirst();
+      Blog? findBlog = await Blog().where('status', '=', 'active').whereRaw(
+        'uid = @id',
+        <String, String>{'id': '1'},
+      ).getFirst();
 
       expect(findBlog?.uid, 1);
       expect(findBlog?.title, 'title 1');
@@ -289,8 +289,9 @@ void main() async {
       expect(map?['info']['foo'], 'bar');
 
       Blog? data2 = await Blog().leftJoinRaw(
-          'blog_info on blog_info.blog_id = blog.uid and blog.uid = @id',
-          <String, int>{'id': 1}).getFirst();
+        'blog_info on blog_info.blog_id = blog.uid and blog.uid = @id',
+        <String, int>{'id': 1},
+      ).getFirst();
 
       Map<String, dynamic>? map2 = data2?.toMap(original: true);
 
@@ -373,7 +374,7 @@ void main() async {
       for (int i = 0; i < 43; i++) {
         data.add(<String, dynamic>{
           'title': 'dox query builder',
-          'body': 'Best orm for the dart'
+          'body': 'Best orm for the dart',
         });
       }
 
@@ -443,8 +444,9 @@ void main() async {
         <String, dynamic>{'title': 'title 1', 'body': 'body 1'},
         <String, dynamic>{'body': 'body 2', 'title': 'title 2'},
       ]);
-      Map<String, dynamic> row =
-          await QueryBuilder.table('blog').where('uid', 2).getFirst();
+      Map<String, dynamic> row = await QueryBuilder.table('blog')
+          .where('uid', 2)
+          .getFirst();
       expect(row['title'], 'title 2');
       expect(row['body'], 'body 2');
     });
@@ -453,8 +455,9 @@ void main() async {
       await QueryBuilder.table('blog')
           .setPrimaryKey('uid')
           .insert(<String, dynamic>{'title': 't', 'body': 'b', 'slug': null});
-      int total =
-          await QueryBuilder.table('blog').whereRaw('slug IS NULL').count();
+      int total = await QueryBuilder.table('blog')
+          .whereRaw('slug IS NULL')
+          .count();
       expect(total, 1);
     });
 
@@ -473,8 +476,9 @@ void main() async {
         <String, dynamic>{'title': 'title 1', 'body': 'body 1'},
         <String, dynamic>{'title': "it's 2", 'body': 'body 2'},
       ]);
-      List<Blog> blogs =
-          await Blog().whereIn('title', <String>["it's 2"]).get();
+      List<Blog> blogs = await Blog().whereIn('title', <String>[
+        "it's 2",
+      ]).get();
       expect(blogs.length, 1);
       expect(blogs.first.uid, 2);
 
@@ -513,8 +517,10 @@ void main() async {
     });
 
     test('order by rejects bad direction', () async {
-      expect(() => Blog().orderBy('uid', 'desc; DROP TABLE blog'),
-          throwsArgumentError);
+      expect(
+        () => Blog().orderBy('uid', 'desc; DROP TABLE blog'),
+        throwsArgumentError,
+      );
     });
 
     test('at sign inside raw string is kept', () async {
@@ -532,8 +538,9 @@ void main() async {
       await QueryBuilder.table('blog')
           .setPrimaryKey('uid')
           .insert(<String, dynamic>{'title': 'x', 'body': 'x'});
-      int total = await QueryBuilder.table('blog').whereRaw(
-          'title = @v AND body = @v', <String, dynamic>{'v': 'x'}).count();
+      int total = await QueryBuilder.table('blog')
+          .whereRaw('title = @v AND body = @v', <String, dynamic>{'v': 'x'})
+          .count();
       expect(total, 1);
     });
 
@@ -545,11 +552,14 @@ void main() async {
       ]);
       expect(await Blog().whereNull('slug').count(), 2);
       expect(await Blog().whereNotNull('blog.slug').count(), 1);
-      expect(await Blog().where('title', 'title 1').orWhereNull('slug').count(),
-          2);
       expect(
-          await Blog().where('title', 'title 1').orWhereNotNull('slug').count(),
-          2);
+        await Blog().where('title', 'title 1').orWhereNull('slug').count(),
+        2,
+      );
+      expect(
+        await Blog().where('title', 'title 1').orWhereNotNull('slug').count(),
+        2,
+      );
     });
 
     test('where in, not in and or variants', () async {
@@ -562,13 +572,18 @@ void main() async {
       expect(await Blog().whereNotIn('uid', <int>[]).count(), 3);
       expect(await Blog().whereIn('uid', <int>[]).count(), 0);
       expect(
-          await Blog().where('uid', 1).orWhereIn('uid', <int>[2]).count(), 2);
+        await Blog().where('uid', 1).orWhereIn('uid', <int>[2]).count(),
+        2,
+      );
       expect(await Blog().where('uid', 1).orWhereIn('uid', <int>[]).count(), 1);
       expect(
-          await Blog().where('uid', 1).orWhereNotIn('uid', <int>[1, 2]).count(),
-          2);
+        await Blog().where('uid', 1).orWhereNotIn('uid', <int>[1, 2]).count(),
+        2,
+      );
       expect(
-          await Blog().where('uid', 1).orWhereNotIn('uid', <int>[]).count(), 3);
+        await Blog().where('uid', 1).orWhereNotIn('uid', <int>[]).count(),
+        3,
+      );
     });
 
     test('select raw is not quoted', () async {
@@ -576,17 +591,21 @@ void main() async {
         <String, dynamic>{'title': 'a', 'body': 'body'},
         <String, dynamic>{'title': 'a', 'body': 'body'},
       ]);
-      List<Map<String, dynamic>> rows =
-          await QueryBuilder.table('blog').selectRaw('DISTINCT title').get();
+      List<Map<String, dynamic>> rows = await QueryBuilder.table('blog')
+          .selectRaw('DISTINCT title')
+          .get();
       expect(rows.length, 1);
     });
 
     test('toSql with many values', () async {
       String query = Blog().where('uid', 1).where('title', 'x').toSql();
-      String q =
-          SqlQueryBuilder().dbDriver.getName() == Driver.mysql ? '`' : '"';
-      expect(query,
-          "SELECT * FROM ${q}blog$q WHERE (${q}uid$q = 1 AND ${q}title$q = x) AND ${q}blog$q.${q}deleted_at$q IS NULL");
+      String q = SqlQueryBuilder().dbDriver.getName() == Driver.mysql
+          ? '`'
+          : '"';
+      expect(
+        query,
+        "SELECT * FROM ${q}blog$q WHERE (${q}uid$q = 1 AND ${q}title$q = x) AND ${q}blog$q.${q}deleted_at$q IS NULL",
+      );
     });
   });
 }

@@ -7,10 +7,7 @@ class DatabaseConfig {
   /// List of database connections
   Map<String, ConnectionConfig> connections;
 
-  DatabaseConfig({
-    required this.connection,
-    required this.connections,
-  });
+  DatabaseConfig({required this.connection, required this.connections});
 
   /// get database connection configuration
   ConnectionConfig getConnectionConfig([String? connectionName]) {

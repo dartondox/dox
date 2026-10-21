@@ -14,9 +14,9 @@ class TagGenerator extends Model<Tag> {
 
   @override
   Map<String, dynamic> get timestampsColumn => <String, dynamic>{
-        'created_at': 'created_at',
-        'updated_at': 'updated_at',
-      };
+    'created_at': 'created_at',
+    'updated_at': 'updated_at',
+  };
 
   int? get id => tempIdValue;
 
@@ -25,8 +25,12 @@ class TagGenerator extends Model<Tag> {
   Tag query() => Tag();
 
   @override
-  List<String> get tableColumns =>
-      <String>['id', 'title', 'created_at', 'updated_at'];
+  List<String> get tableColumns => <String>[
+    'id',
+    'title',
+    'created_at',
+    'updated_at',
+  ];
 
   @override
   List<String> get preloadList => <String>[];

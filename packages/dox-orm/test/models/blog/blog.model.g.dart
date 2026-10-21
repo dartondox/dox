@@ -14,9 +14,9 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
 
   @override
   Map<String, dynamic> get timestampsColumn => <String, dynamic>{
-        'created_at': 'created_at',
-        'updated_at': 'updated_at',
-      };
+    'created_at': 'created_at',
+    'updated_at': 'updated_at',
+  };
 
   int? get uid => tempIdValue;
 
@@ -26,33 +26,30 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
 
   @override
   List<String> get tableColumns => <String>[
-        'uid',
-        'title',
-        'status',
-        'slug',
-        'body',
-        'deleted_at',
-        'created_at',
-        'updated_at'
-      ];
+    'uid',
+    'title',
+    'status',
+    'slug',
+    'body',
+    'deleted_at',
+    'created_at',
+    'updated_at',
+  ];
 
   @override
-  List<String> get preloadList => <String>[
-        'blogInfo',
-        'blogInfos',
-      ];
+  List<String> get preloadList => <String>['blogInfo', 'blogInfos'];
 
   @override
   Map<String, Function> get relationsResultMatcher => <String, Function>{
-        'blogInfo': getBlogInfo,
-        'blogInfos': getBlogInfos,
-      };
+    'blogInfo': getBlogInfo,
+    'blogInfos': getBlogInfos,
+  };
 
   @override
   Map<String, Function> get relationsQueryMatcher => <String, Function>{
-        'blogInfo': queryBlogInfo,
-        'blogInfos': queryBlogInfos,
-      };
+    'blogInfo': queryBlogInfo,
+    'blogInfos': queryBlogInfos,
+  };
 
   static Future<void> getBlogInfo(List<Model<Blog>> list) async {
     var result = await getHasOne<Blog, BlogInfo>(queryBlogInfo(list), list);
@@ -123,5 +120,12 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
     map['title'] = Blog.slugTitle(map);
 
     return map;
+  }
+
+  @override
+  void setComputedValues(Map<String, dynamic> map) {
+    Blog instance = this as Blog;
+    map['title_length'] = instance.titleLength;
+    map['secret_note'] = instance.secret;
   }
 }

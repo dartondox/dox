@@ -19,10 +19,7 @@ class SqliteTableRebuilder {
     r"""CHECK \("((?:[^"]|"")+)" IN \((?:'(?:[^']|'')*'(?:, )?)*\)\)""",
   );
 
-  static final RegExp _anyCheck = RegExp(
-    r'\bCHECK\s*\(',
-    caseSensitive: false,
-  );
+  static final RegExp _anyCheck = RegExp(r'\bCHECK\s*\(', caseSensitive: false);
 
   Future<void> rebuild(Table table) async {
     String tableName = table.name;
@@ -95,7 +92,8 @@ class SqliteTableRebuilder {
       if (change != null) {
         def = grammar.columnSql(table, change);
       } else {
-        def = '${grammar.wrap(name)} ${c['type']}'
+        def =
+            '${grammar.wrap(name)} ${c['type']}'
             "${c['notnull'] == 1 ? ' NOT NULL' : ''}"
             "${c['dflt_value'] != null ? ' DEFAULT ${c['dflt_value']}' : ''}"
             "${checks[name] != null ? ' ${checks[name]}' : ''}";
@@ -109,9 +107,7 @@ class SqliteTableRebuilder {
     }
     if (pk.isNotEmpty && !defs.any((String d) => d.contains('PRIMARY KEY'))) {
       defs.add(
-        'PRIMARY KEY (${grammar.columnize(<String>[
-              for (Map<String, dynamic> c in pk) c['name'] as String
-            ])})',
+        'PRIMARY KEY (${grammar.columnize(<String>[for (Map<String, dynamic> c in pk) c['name'] as String])})',
       );
     }
 
@@ -136,9 +132,7 @@ class SqliteTableRebuilder {
       }
       String to = fk.first['to'] == null
           ? ''
-          : ' (${grammar.columnize(<String>[
-                  for (Map<String, dynamic> f in fk) f['to'] as String
-                ])})';
+          : ' (${grammar.columnize(<String>[for (Map<String, dynamic> f in fk) f['to'] as String])})';
       defs.add(
         'FOREIGN KEY (${grammar.columnize(from)}) REFERENCES ${grammar.wrap(fk.first['table'] as String)}$to '
         'ON UPDATE ${fk.first['on_update']} ON DELETE ${fk.first['on_delete']}',

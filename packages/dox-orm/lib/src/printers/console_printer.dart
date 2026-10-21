@@ -6,9 +6,7 @@ import 'package:dox_orm/dox_orm.dart';
 class ConsoleQueryPrinter implements QueryPrinter {
   Function(String)? filter;
 
-  ConsoleQueryPrinter({
-    this.filter,
-  });
+  ConsoleQueryPrinter({this.filter});
 
   @override
   void log(String query, List<String> params) {
@@ -16,10 +14,7 @@ class ConsoleQueryPrinter implements QueryPrinter {
       'timestamp': DateTime.now().toIso8601String(),
       'level': 'INFO',
       'message': query,
-      'payload': <String, dynamic>{
-        'query': query,
-        'params': params,
-      }
+      'payload': <String, dynamic>{'query': query, 'params': params},
     };
     String stringToPrint = jsonEncode(payload);
     if (filter != null) {

@@ -87,8 +87,10 @@ class Schema {
   Future<void> build(Table table) async {
     if (grammar is SqliteGrammar && table.needsSqliteRebuild) {
       await _run(grammar.compile(table.withoutSqliteRebuild()));
-      await SqliteTableRebuilder(driver, grammar as SqliteGrammar)
-          .rebuild(table);
+      await SqliteTableRebuilder(
+        driver,
+        grammar as SqliteGrammar,
+      ).rebuild(table);
       return;
     }
     await _run(grammar.compile(table));
