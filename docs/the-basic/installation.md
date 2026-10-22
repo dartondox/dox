@@ -52,9 +52,9 @@ The file `db/dox.sqlite` is created at the first start.
 To use Postgres or MySQL instead, change `DB_CONNECTION` and the `DB_*`
 values in `.env`. See [Database](../database/index.md).
 
-!!! info "Use 3.x in an existing project"
-    Set every Dox package in `pubspec.yaml` to `^3.0.0-alpha.4`.
-    Use `dox_orm` for the database. `dox_query_builder` only re-exports `dox_orm` now.
+!!! info "Add Dox to an existing Dart project"
+    Add the packages you need to `pubspec.yaml`. All Dox packages share one
+    version, so use `^3.0.0-alpha.4` for each of them.
 
 ```yaml title="pubspec.yaml"
 dependencies:
@@ -121,7 +121,7 @@ All Dox packages use the same version.
 | --- | --- |
 | `dox` | the CLI |
 | `dox_core` | HTTP server, routing, requests, responses, validation |
-| `dox_orm` | query builder and models (was `dox_query_builder`) |
+| `dox_orm` | query builder and models |
 | `dox_migration` | database migrations |
 | `dox_auth` | JWT authentication |
 | `dox_websocket` | WebSocket server |

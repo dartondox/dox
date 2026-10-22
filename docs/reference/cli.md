@@ -30,7 +30,7 @@ Makes a new project from the [dox-sample](https://github.com/dartondox/dox-sampl
 What it does:
 
 1. Turns the name into `snake_case`. Stops with `Folder name "<name>" already exist` when the folder is there.
-2. Reads the latest release with `curl https://api.github.com/repos/dartondox/dox-sample/releases/latest`.
+2. Reads the release list of `dartondox/dox-sample` and takes the newest release with the same major version as the CLI.
 3. Runs `git clone --depth 1 --branch v<version> https://github.com/dartondox/dox-sample.git <name>`.
 4. Deletes the `.git` folder.
 5. Replaces `dox_sample` with your project name in every file, except files under `bin/dox`.

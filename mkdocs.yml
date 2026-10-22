@@ -1,11 +1,14 @@
 site_name: "DOX"
 repo_url: https://github.com/dartondox/dox
+edit_uri: edit/develop/docs/
 site_url: https://dartondox.dev
 copyright: Copyright &copy; 2023 - 2026 Dart On Dox
 # broken links and anchors fail `mkdocs build --strict`
 validation:
   anchors: warn
   unrecognized_links: warn
+hooks:
+  - hooks/docs_hooks.py
 extra_css:
   - assets/style.css
 extra_javascript:
@@ -34,6 +37,8 @@ theme:
     - search.suggest
     - search.highlight
     - content.code.copy
+    - content.code.annotate
+    - content.action.edit
     - content.tabs.link
     - toc.follow
   font:
@@ -78,6 +83,9 @@ markdown_extensions:
       line_spans: __span
       pygments_lang_class: true
   - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      base_path: ['.']
+      check_paths: true
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -105,7 +113,6 @@ nav:
     - Concepts:
       - concepts/how-dox-works.md
       - concepts/coming-from-laravel.md
-      - concepts/upgrade-to-3.md
   - The basics:
     - the-basic/routing.md
     - the-basic/request.md
@@ -174,8 +181,5 @@ nav:
     - reference/request-and-response.md
     - reference/http-exceptions.md
     - reference/troubleshooting.md
-    - Releases:
-      - others/releases/v3-release.md
-      - others/releases/core-release.md
-      - others/releases/query-builder-release.md
+    - reference/changelog.md
     - others/contribute.md

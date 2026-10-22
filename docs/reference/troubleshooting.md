@@ -108,7 +108,7 @@ dox create my_app
 RangeError (index): Invalid value: Only valid value is 0: 1
 ```
 
-**Cause.** A bug in the `dox` CLI up to `3.0.0-alpha.4`: the `create` command read the `--version` flag before it checked that one was given. The same versions also downloaded the 2.x template, because GitHub's "latest release" skips pre-releases.
+**Cause.** A bug in the `dox` CLI up to `3.0.0-alpha.4`: the `create` command read the `--version` flag before it checked that one was given. The same versions also downloaded an old project template.
 
 **Fix.** Update the CLI. The fix is in the version after `3.0.0-alpha.4`:
 

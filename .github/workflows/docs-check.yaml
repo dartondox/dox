@@ -1,0 +1,41 @@
+name: Docs check
+
+# Every pull request that touches the docs: the strict build must pass
+# (broken links and anchors fail it) and the text has no known typos.
+# Deploys happen in docs.yaml, on push to develop.
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'hooks/**'
+      - 'mkdocs.yml'
+      - '.github/workflows/docs-check.yaml'
+
+permissions:
+  contents: read
+
+env:
+  MKDOCS_VERSION: '1.6.1'
+  MATERIAL_VERSION: '9.7.7'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install mkdocs and material
+        run: pip install "mkdocs==$MKDOCS_VERSION" "mkdocs-material==$MATERIAL_VERSION" codespell
+      - name: Strict build
+        run: mkdocs build --strict
+      - name: Spelling
+        run: codespell docs --skip "*.svg,*.png,*.ico,*.css,*.js" --ignore-words .codespell-ignore
+      - name: No content tabs
+        run: |
+          if rg -n '^=== "' docs; then
+            echo "::error::Content tabs are not used in these docs. Use one code block or sub-headings."
+            exit 1
+          fi

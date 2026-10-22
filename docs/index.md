@@ -28,24 +28,34 @@ It runs one isolate per CPU core and builds to a small native binary.
 <div class="dox-hero__code" markdown>
 
 ```dart
-Route.get('/blogs', BlogController.index);
+Route.get('/blogs', BlogController.index); // (1)!
 
 enum Status { active, draft }
 
-@Dto()
+@Dto() // (2)!
 class BlogFilter {
   final Status status; // ?status=active, else 422
   const BlogFilter({required this.status});
-  static const DtoSchema<BlogFilter> schema = $BlogFilterDto;
+  static const DtoSchema<BlogFilter> schema =
+      $BlogFilterDto; // (3)!
 }
 
 class BlogController {
-  static Future<List<Blog>> index(BlogFilter query) async {
-    // runs on Postgres, MySQL or SQLite
-    return Blog().where('status', query.status.name).get();
+  static Future<List<Blog>> index(
+    BlogFilter query, // (4)!
+  ) async {
+    return Blog()
+        .where('status', query.status.name)
+        .get(); // (5)!
   }
 }
 ```
+
+1.  A route points at a static method. No reflection, no controller registry.
+2.  `@Dto()` marks an input class. `build_runner` generates the checks from the fields and their types.
+3.  The generated schema. The same schema feeds the OpenAPI docs.
+4.  Ask for the DTO as a parameter. Dox reads the query (or the body), checks it, and gives you a typed object. Bad input gets a `422` before your code runs.
+5.  The ORM. The same code runs on Postgres, MySQL and SQLite, through native Rust drivers.
 
 </div>
 
@@ -53,7 +63,6 @@ class BlogController {
 
 !!! warning "You are reading the 3.x docs (alpha)"
     `3.0.0-alpha.4` is a preview. Things can still change before the stable release.
-    Need the old docs? Pick **2.x** in the version menu at the top.
 
 ## Run it in two minutes
 
@@ -94,7 +103,7 @@ at a time.
 | New to Dox | [Tutorial: build a blog API](tutorial/index.md) | [Routing](the-basic/routing.md), [Request](the-basic/request.md), [Validation](the-basic/validation.md) |
 | Coming from Laravel | [Coming from Laravel](concepts/coming-from-laravel.md) | [How Dox works](concepts/how-dox-works.md) |
 | Looking for one answer | [Guides](guides/index.md) (uploads, auth, Docker, pagination...) | [Reference](reference/index.md) |
-| Upgrading from 2.x | [Upgrade to 3.0](concepts/upgrade-to-3.md) | [Troubleshooting](reference/troubleshooting.md) |
+| Going to production | [Deployment](digging-deeper/deployment.md) | [Docker](guides/docker.md), [Troubleshooting](reference/troubleshooting.md) |
 
 ## How fast
 
@@ -164,4 +173,5 @@ and how to run the benchmark yourself.
 ## Get help
 
 - Found a bug or have a question? Open an [issue on GitHub](https://github.com/dartondox/dox/issues).
+- Using an AI assistant? Give it [llms-full.txt](https://dartondox.dev/latest/llms-full.txt): all of these docs as one plain text file. [llms.txt](https://dartondox.dev/latest/llms.txt) is the page list.
 - Want to help? Read [Contribute](others/contribute.md).
