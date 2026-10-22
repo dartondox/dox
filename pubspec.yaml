@@ -19,6 +19,7 @@ workspace:
   - packages/dox-migration
   - packages/dox-openapi
   - packages/dox-orm
+  - packages/dox-postgres-native
   - packages/dox-query-builder
   - packages/dox-socketio
   - packages/dox-storage

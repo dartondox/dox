@@ -30,6 +30,9 @@ import 'package:dox_orm/dox_orm.dart';
 | MySQL 8+ and MariaDB | `Driver.mysql` | `mysql_dart` | Yes | Production |
 | SQLite | `Driver.sqlite` | `sqlite3` | No, one connection per isolate | Dev, tests, small apps |
 
+!!! tip
+    For more speed on Postgres, see the [native Postgres driver](postgres-native.md).
+
 ## Config
 
 Put the connections in `lib/config/database.dart`.
