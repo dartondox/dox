@@ -10,6 +10,10 @@
   A transaction that Dart does not end in 5 minutes is rolled back, so its
   connection goes back to the pool.
 - `tool/stress.dart`: a stress test that finds requests that never finish.
+- Faster queries. Plain queries now share connections: tokio-postgres
+  sends the queries of one connection together (pipelining). One tokio task
+  runs each batch from Dart, not one task per query. The SQL bytes are
+  cached, and binding named parameters builds no extra `Set`.
 
 ## 3.0.0-alpha.2
 

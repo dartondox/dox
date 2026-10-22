@@ -30,6 +30,8 @@ use std::time::Duration;
 
 use bytes::BytesMut;
 use deadpool_postgres::{Manager, ManagerConfig, Object, Pool, RecyclingMethod};
+use futures_util::StreamExt;
+use futures_util::stream::FuturesUnordered;
 use tokio::runtime::Handle;
 use tokio::sync::mpsc;
 use tokio_postgres::error::{ErrorPosition, SqlState};
@@ -156,7 +158,63 @@ impl<T: Clone> Registry<T> {
     }
 }
 
-static POOLS: Mutex<Option<Registry<Pool>>> = Mutex::new(None);
+static POOLS: Mutex<Option<Registry<Arc<Shared>>>> = Mutex::new(None);
+
+/// A pool, and the connections that plain queries share right now.
+///
+/// tokio-postgres pipelines the queries that run at the same time on one
+/// connection: it writes them together and reads their answers together.
+/// So a plain query does not wait for a free connection. It goes to an
+/// idle one, or a new one, or else to the least busy one. Transactions
+/// still get a connection of their own from the pool.
+struct Shared {
+    pool: Pool,
+    /// the strong count of each, minus one, is its number of queries
+    busy: Mutex<Vec<Arc<Object>>>,
+}
+
+impl Shared {
+    async fn lease(&self) -> Result<Lease<'_>, deadpool_postgres::PoolError> {
+        {
+            let busy = self.busy.lock().unwrap();
+            let least = busy
+                .iter()
+                .filter(|c| !c.is_closed())
+                .min_by_key(|c| Arc::strong_count(c));
+            let s = self.pool.status();
+            let grow = s.available > 0 || s.size < s.max_size;
+            if let Some(c) = least {
+                // someone waits for the pool (eg. a transaction): do not
+                // keep the connections busy, queue up behind it
+                if Arc::strong_count(c) == 1 || (!grow && s.waiting == 0) {
+                    return Ok(Lease(self, Some(c.clone())));
+                }
+            }
+        }
+        let client = Arc::new(self.pool.get().await?);
+        self.busy.lock().unwrap().push(client.clone());
+        Ok(Lease(self, Some(client)))
+    }
+}
+
+/// One query on a shared connection. On drop, a connection with no query
+/// left goes back to the pool.
+struct Lease<'a>(&'a Shared, Option<Arc<Object>>);
+
+impl std::ops::Deref for Lease<'_> {
+    type Target = Object;
+    fn deref(&self) -> &Object {
+        self.1.as_ref().unwrap()
+    }
+}
+
+impl Drop for Lease<'_> {
+    fn drop(&mut self) {
+        let mut busy = self.0.busy.lock().unwrap();
+        self.1 = None;
+        busy.retain(|c| Arc::strong_count(c) > 1);
+    }
+}
 static SINKS: Mutex<Option<Registry<Arc<Sink>>>> = Mutex::new(None);
 static TXS: Mutex<Option<Registry<mpsc::UnboundedSender<Job>>>> = Mutex::new(None);
 
@@ -556,7 +614,13 @@ fn parse(b: &[u8], p: &mut usize) -> Option<Request> {
     })
 }
 
-fn run(req: Request, sink: Arc<Sink>, rt: &Handle) {
+/// Runs a request of a transaction, or a begin, right away. Gives back a
+/// plain query, to run with the others of its batch in [run_plain].
+fn run(req: Request, sink: &Arc<Sink>, rt: &Handle) -> Option<Request> {
+    if req.tx == 0 && req.kind == 0 {
+        return Some(req);
+    }
+    let sink = sink.clone();
     let Request {
         id,
         pool,
@@ -567,7 +631,8 @@ fn run(req: Request, sink: Arc<Sink>, rt: &Handle) {
     } = req;
     if tx != 0 {
         let Some(sender) = with(&TXS, |r| r.get(tx)) else {
-            return sink.push(&message(id, "the transaction is closed"));
+            sink.push(&message(id, "the transaction is closed"));
+            return None;
         };
         let job = match kind {
             0 => Job::Query {
@@ -585,29 +650,45 @@ fn run(req: Request, sink: Arc<Sink>, rt: &Handle) {
         if sender.send(job).is_err() {
             sink.push(&message(id, "the transaction is closed"));
         }
-        return;
+        return None;
     }
     let Some(pool) = with(&POOLS, |r| r.get(pool)) else {
-        return sink.push(&message(id, "the pool is closed"));
+        sink.push(&message(id, "the pool is closed"));
+        return None;
     };
     match kind {
-        0 => {
-            rt.spawn(async move {
-                let out = timed(id, async {
-                    match pool.get().await {
-                        Ok(client) => query(&client, id, &sql, &params).await,
-                        Err(e) => pool_error(id, e),
-                    }
-                })
-                .await;
-                sink.push(&out);
-            });
-        }
         1 => {
-            rt.spawn(begin(id, pool, sink));
+            rt.spawn(begin(id, pool.pool.clone(), sink));
         }
         _ => sink.push(&message(id, "no transaction to end")),
     }
+    None
+}
+
+/// The plain queries of one batch from Dart, in one task. They all start
+/// in the first poll, so the queries that go to one connection cost one
+/// write. Results go to Dart as they come.
+fn run_plain(reqs: Vec<Request>, sink: Arc<Sink>, rt: &Handle) {
+    rt.spawn(async move {
+        let mut running: FuturesUnordered<_> = reqs
+            .into_iter()
+            .map(|r| async move {
+                let Some(pool) = with(&POOLS, |p| p.get(r.pool)) else {
+                    return message(r.id, "the pool is closed");
+                };
+                timed(r.id, async {
+                    match pool.lease().await {
+                        Ok(client) => query(&client, r.id, &r.sql, &r.params).await,
+                        Err(e) => pool_error(r.id, e),
+                    }
+                })
+                .await
+            })
+            .collect();
+        while let Some(out) = running.next().await {
+            sink.push(&out);
+        }
+    });
 }
 
 // ---- FFI ---------------------------------------------------------------
@@ -675,14 +756,18 @@ pub unsafe extern "C" fn dpg_connect(cfg: *const u8, len: i64, max_size: i64, th
         return -1;
     };
     runtime(threads.max(0) as usize);
-    with(&POOLS, |r| r.insert(pool)) as i64
+    let shared = Shared {
+        pool,
+        busy: Mutex::new(Vec::new()),
+    };
+    with(&POOLS, |r| r.insert(Arc::new(shared))) as i64
 }
 
 /// Closes the pool. Running queries finish, new ones fail.
 #[unsafe(no_mangle)]
 pub extern "C" fn dpg_close(pool: i64) {
     if let Some(pool) = with(&POOLS, |r| r.map.remove(&(pool as u64))) {
-        pool.close();
+        pool.pool.close();
     }
 }
 
@@ -715,8 +800,12 @@ pub unsafe extern "C" fn dpg_submit(sink: i64, ptr: *const u8, len: i64) {
     let Some(rt) = RUNTIME.get() else { return };
     let b = unsafe { std::slice::from_raw_parts(ptr, len as usize) };
     let mut p = 0;
+    let mut plain = Vec::new();
     while let Some(req) = parse(b, &mut p) {
-        run(req, sink.clone(), rt);
+        plain.extend(run(req, &sink, rt));
+    }
+    if !plain.is_empty() {
+        run_plain(plain, sink, rt);
     }
 }
 

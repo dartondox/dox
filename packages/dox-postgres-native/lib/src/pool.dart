@@ -151,8 +151,15 @@ class PgNativePool {
 
   /// Starts a transaction on one connection. Use its id as `transaction`
   /// of [query], then [commit] or [rollback] it.
-  Future<int> begin() =>
-      _Link.instance.send<int>(handle, 0, 1, '', const <TypedValue<Object>>[]);
+  Future<int> begin() => _Link.instance.send<int>(
+    handle,
+    0,
+    1,
+    _noSql,
+    const <TypedValue<Object>>[],
+  );
+
+  static final Uint8List _noSql = Uint8List(0);
 
   /// Commits the transaction and gives its connection back to the pool.
   Future<void> commit(int transaction) => _end(transaction, 2);
@@ -164,7 +171,7 @@ class PgNativePool {
     handle,
     transaction,
     kind,
-    '',
+    _noSql,
     const <TypedValue<Object>>[],
   );
 
@@ -199,7 +206,7 @@ class _Link {
     int pool,
     int tx,
     int kind,
-    String sql,
+    Uint8List sql,
     List<TypedValue<Object>> values,
   ) {
     int id = ++_nextId;
@@ -237,10 +244,9 @@ class _Link {
     int pool,
     int tx,
     int kind,
-    String sql,
+    Uint8List sql,
     List<TypedValue<Object>> values,
   ) {
-    List<int> sqlBytes = _ascii(sql) ? sql.codeUnits : utf8.encode(sql);
     List<(int, int, List<int>?)> params = <(int, int, List<int>?)>[
       for (TypedValue<Object> v in values) _encode(v),
     ];
@@ -253,9 +259,9 @@ class _Link {
     d.setUint8(start + 24, kind);
     d.setUint8(start + 25, 0);
     d.setUint16(start + 26, params.length, Endian.little);
-    d.setUint32(start + 28, sqlBytes.length, Endian.little);
+    d.setUint32(start + 28, sql.length, Endian.little);
     _len += 32;
-    _bytes(sqlBytes);
+    _bytes(sql);
     for ((int, int, List<int>?) p in params) {
       _ensure(9);
       _outData.setUint32(_len, p.$1, Endian.little);
@@ -264,13 +270,6 @@ class _Link {
       _len += 9;
       if (p.$3 != null) _bytes(p.$3!);
     }
-  }
-
-  static bool _ascii(String s) {
-    for (int i = 0; i < s.length; i++) {
-      if (s.codeUnitAt(i) > 127) return false;
-    }
-    return true;
   }
 
   /// (type oid, format, bytes) of one parameter, the same bytes the
