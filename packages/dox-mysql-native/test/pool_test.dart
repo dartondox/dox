@@ -7,12 +7,12 @@ import 'package:mysql_dart/exception.dart';
 import 'package:test/test.dart';
 
 /// DB_PORT and DB_USER like the dox_orm tests. MySQL 8.4 or MariaDB 11.
-Future<MysqlNativePool> open() {
-  return MysqlNativePool.connect(
+MysqlNativePool open({String? password}) {
+  return MysqlNativePool.open(
     host: Platform.environment['DB_HOST'] ?? '127.0.0.1',
     port: int.parse(Platform.environment['DB_PORT'] ?? '3306'),
     user: Platform.environment['DB_USER'] ?? 'root',
-    password: 'password',
+    password: password ?? 'password',
     database: 'dox-framework',
   );
 }
@@ -21,7 +21,7 @@ void main() {
   late MysqlNativePool pool;
 
   setUpAll(() async {
-    pool = await open();
+    pool = open();
     await pool.execute('DROP TABLE IF EXISTS mn_types');
     await pool.execute('''
       CREATE TABLE mn_types (
@@ -45,7 +45,7 @@ void main() {
       'INSERT INTO mn_types (i, big, small, tiny, flag, price, f, d, name, '
       'body, info, data, day, at, ts, t, y) '
       'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      <Object?>[
+      parameters: <Object?>[
         -7,
         9007199254740993,
         300,
@@ -70,9 +70,10 @@ void main() {
     expect(insert.insertId, greaterThan(0));
     String sql = 'SELECT * FROM mn_types WHERE id = ${insert.insertId}';
     MysqlNativeResult r = prepared
-        ? await pool.query('SELECT * FROM mn_types WHERE id = ?', <Object?>[
-            insert.insertId,
-          ])
+        ? await pool.query(
+            'SELECT * FROM mn_types WHERE id = @id',
+            parameters: <String, dynamic>{'id': insert.insertId},
+          )
         : await pool.query(sql);
     expect(r.rows, hasLength(1));
     return r.rows.first;
@@ -105,7 +106,10 @@ void main() {
   }
 
   test('null values', () async {
-    await pool.execute('INSERT INTO mn_types (i) VALUES (?)', <Object?>[null]);
+    await pool.execute(
+      'INSERT INTO mn_types (i) VALUES (?)',
+      parameters: <Object?>[null],
+    );
     MysqlNativeResult r = await pool.query('SELECT i, name, at FROM mn_types');
     expect(r.rows.single, <String, dynamic>{
       'i': null,
@@ -116,7 +120,8 @@ void main() {
 
   test('many queries at once', () async {
     List<MysqlNativeResult> all = await Future.wait(<Future<MysqlNativeResult>>[
-      for (int i = 0; i < 200; i++) pool.query('SELECT ? AS n', <Object?>[i]),
+      for (int i = 0; i < 200; i++)
+        pool.query('SELECT ? AS n', parameters: <Object?>[i]),
     ]);
     for (int i = 0; i < 200; i++) {
       expect(all[i].rows.single['n'], i);
@@ -124,20 +129,25 @@ void main() {
   });
 
   test('transaction commit and rollback', () async {
-    await pool.transaction((MysqlNativeTransaction tx) {
-      return tx.execute('INSERT INTO mn_types (i) VALUES (1)');
-    });
-    await expectLater(
-      pool.transaction((MysqlNativeTransaction tx) async {
-        await tx.execute('INSERT INTO mn_types (i) VALUES (2)');
-        MysqlNativeResult inside = await tx.query(
-          'SELECT COUNT(*) AS c FROM mn_types',
-        );
-        expect(inside.rows.single['c'], 2);
-        throw StateError('stop');
-      }),
-      throwsStateError,
+    int tx = await pool.begin();
+    await pool.execute('INSERT INTO mn_types (i) VALUES (1)', transaction: tx);
+    await pool.commit(tx);
+
+    tx = await pool.begin();
+    await pool.execute('INSERT INTO mn_types (i) VALUES (2)', transaction: tx);
+    MysqlNativeResult inside = await pool.query(
+      'SELECT COUNT(*) AS c FROM mn_types',
+      transaction: tx,
     );
+    expect(inside.rows.single['c'], 2);
+    // other connections do not see it yet
+    MysqlNativeResult outside = await pool.query(
+      'SELECT COUNT(*) AS c FROM mn_types',
+    );
+    expect(outside.rows.single['c'], 1);
+    await pool.rollback(tx);
+    await expectLater(pool.commit(tx), throwsA(isA<MySQLClientException>()));
+
     MysqlNativeResult r = await pool.query('SELECT i FROM mn_types');
     expect(r.rows, <Map<String, dynamic>>[
       <String, dynamic>{'i': 1},
@@ -163,28 +173,44 @@ void main() {
   });
 
   test('wrong password is a server error', () async {
+    MysqlNativePool bad = open(password: 'wrong');
     await expectLater(
-      MysqlNativePool.connect(
-        host: Platform.environment['DB_HOST'] ?? '127.0.0.1',
-        port: int.parse(Platform.environment['DB_PORT'] ?? '3306'),
-        user: Platform.environment['DB_USER'] ?? 'root',
-        password: 'wrong',
-        database: 'dox-framework',
+      bad.query('SELECT 1'),
+      throwsA(
+        isA<MySQLServerException>().having(
+          (MySQLServerException e) => e.errorCode,
+          'code',
+          1045,
+        ),
       ),
-      throwsA(isA<MySQLServerException>()),
     );
+    bad.close();
   });
 
   test('connection error is a client error', () async {
+    MysqlNativePool bad = MysqlNativePool.open(
+      port: 1,
+      user: 'root',
+      database: 'x',
+    );
     await expectLater(
-      MysqlNativePool.connect(port: 1, database: 'x'),
+      bad.query('SELECT 1'),
       throwsA(isA<MySQLClientException>()),
     );
+    bad.close();
+  });
+
+  test('bad params', () {
+    expect(() => pool.query('SELECT 1', parameters: 1), throwsArgumentError);
   });
 
   test('one pool used by many isolates', () async {
+    int handle = pool.handle;
     List<int> sums = await Future.wait(<Future<int>>[
-      for (int i = 0; i < 4; i++) Isolate.run(_isolateWork),
+      // the same settings give the same pool
+      for (int i = 0; i < 4; i++) Isolate.run(() => _isolateWork(0)),
+      // or pass the handle
+      for (int i = 0; i < 4; i++) Isolate.run(() => _isolateWork(handle)),
     ]);
     expect(sums, everyElement(_isolateSum));
   });
@@ -192,12 +218,14 @@ void main() {
 
 const int _isolateSum = 50 * 49 ~/ 2;
 
-Future<int> _isolateWork() async {
-  MysqlNativePool pool = await open();
+Future<int> _isolateWork(int handle) async {
+  MysqlNativePool pool = handle == 0
+      ? open()
+      : MysqlNativePool.fromHandle(handle);
   List<MysqlNativeResult> all = await Future.wait(<Future<MysqlNativeResult>>[
-    for (int i = 0; i < 50; i++) pool.query('SELECT ? AS n', <Object?>[i]),
+    for (int i = 0; i < 50; i++)
+      pool.query('SELECT ? AS n', parameters: <Object?>[i]),
   ]);
-  pool.close();
   int sum = 0;
   for (MysqlNativeResult r in all) {
     sum += r.rows.single['n'] as int;

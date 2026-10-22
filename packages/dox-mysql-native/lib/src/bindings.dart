@@ -12,11 +12,11 @@ external int doxMysqlVersion();
 @Native<Int32 Function(Pointer<Void>)>(symbol: 'dox_mysql_init')
 external int doxMysqlInit(Pointer<Void> dlData);
 
-@Native<Int64 Function(Pointer<Uint8>, Int64)>(
+@Native<Int64 Function(Pointer<Uint8>, Int64, Int32)>(
   symbol: 'dox_mysql_connect',
   isLeaf: true,
 )
-external int doxMysqlConnect(Pointer<Uint8> url, int length);
+external int doxMysqlConnect(Pointer<Uint8> url, int length, int threads);
 
 @Native<Void Function(Int64)>(symbol: 'dox_mysql_close', isLeaf: true)
 external void doxMysqlClose(int pool);

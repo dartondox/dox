@@ -40,7 +40,7 @@ void main() async {
     await (Function.apply(suite, <Object?>[]) as Future<void>);
   }
   // the tests run after all are declared, so this driver runs them all
-  SqlQueryBuilder().dbDriver = MysqlNativeDriver(
+  SqlQueryBuilder().dbDriver = MysqlNativeDriver.fromConfig(
     databaseConfig.getConnectionConfig(),
   );
   test('the tests ran on MysqlNativeDriver', () {

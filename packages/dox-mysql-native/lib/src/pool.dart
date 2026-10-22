@@ -5,6 +5,7 @@ import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:dox_mysql_native/src/bindings.dart';
+import 'package:dox_orm/dox_orm.dart' show toPositionalParams;
 import 'package:mysql_dart/exception.dart';
 
 /// The result of one query.
@@ -29,49 +30,54 @@ class MysqlNativeResult {
   );
 }
 
-/// A MySQL or MariaDB pool. Rust (mysql_async) runs the connections, the
-/// pool and a prepared statement cache per connection.
+/// A pool of MySQL or MariaDB connections, owned by Rust (mysql_async).
+/// Each connection keeps a cache of prepared statements.
 ///
 /// ```
-/// MysqlNativePool pool = await MysqlNativePool.connect(
-///   host: 'localhost', user: 'root', password: 'secret', database: 'app');
-/// MysqlNativeResult r = await pool.query('SELECT * FROM users WHERE id = ?', [1]);
-/// print(r.rows.first['name']);
+/// MysqlNativePool pool = MysqlNativePool.open(
+///   host: 'localhost', user: 'root', password: 'secret', database: 'app',
+/// );
+/// MysqlNativeResult r = await pool.query(
+///   'SELECT * FROM users WHERE id = ?',
+///   parameters: <Object?>[1],
+/// );
 /// ```
 ///
 /// Values come back typed: int, double (also DECIMAL), String, bool
 /// (TINYINT(1)), DateTime in UTC (DATE, DATETIME, TIMESTAMP), decoded JSON,
-/// Uint8List (BLOB, BINARY) and null. Params can be null, int, double,
-/// bool, String, DateTime, Uint8List, or a Map or List (sent as JSON).
+/// Uint8List (BLOB, BINARY) and null. MariaDB keeps JSON in LONGTEXT, so
+/// there TEXT that is a JSON object or array comes back decoded.
 ///
-/// Isolates that connect with the same settings share one pool.
+/// Connections open when they are needed. Isolates that open the same
+/// settings share one pool. Or give [handle] to another isolate and use
+/// [MysqlNativePool.fromHandle] there.
 class MysqlNativePool {
-  MysqlNativePool._(this._handle, this.isMariaDb);
+  MysqlNativePool.fromHandle(this.handle);
 
-  int _handle;
-
-  /// true when the server is MariaDB. MariaDB keeps JSON in LONGTEXT, so
-  /// TEXT values that are a JSON object or array come back decoded.
-  final bool isMariaDb;
+  /// the pool id in Rust. Works in every isolate of this process.
+  final int handle;
 
   /// true when the native library is loaded and works.
-  static bool get isAvailable => _Client.available;
+  static bool get isAvailable => _Link.available;
 
   /// why [isAvailable] is false, or null.
-  static String? get loadError => _Client.loadError;
+  static String? get loadError => _Link.loadError;
 
-  /// Open a pool and check the login with `SELECT VERSION()`.
-  /// [maxConnections] is per process: all isolates share the pool.
-  static Future<MysqlNativePool> connect({
+  /// Makes a pool of up to [maxConnections] connections.
+  ///
+  /// [threads] is the size of the Rust runtime of the whole process. Only
+  /// the first pool sets it. One thread is the fastest for most apps.
+  factory MysqlNativePool.open({
     String host = 'localhost',
     int port = 3306,
-    String user = 'root',
+    required String user,
     String password = '',
     required String database,
     int maxConnections = 10,
     bool secure = false,
     int statementCacheSize = 32,
     Duration maxConnectionAge = const Duration(hours: 12),
+    int threads = 1,
   }) {
     Uri url = Uri(
       scheme: 'mysql',
@@ -92,140 +98,82 @@ class MysqlNativePool {
         if (secure) 'require_ssl': 'true',
       },
     );
-    return fromUrl(url.toString());
+    return MysqlNativePool.fromUrl(url.toString(), threads: threads);
   }
 
-  /// Open a pool from a `mysql://user:password@host:port/database` URL.
-  /// It takes the options of mysql_async, like `?pool_max=20`.
-  static Future<MysqlNativePool> fromUrl(String url) async {
-    _Client client = _Client.instance;
+  /// Makes a pool from a `mysql://user:password@host:port/database` URL.
+  /// It takes the URL options of mysql_async, like `?pool_max=20`.
+  factory MysqlNativePool.fromUrl(String url, {int threads = 1}) {
+    if (!isAvailable) {
+      throw UnsupportedError('dox_mysql_native is not available: $loadError');
+    }
     Uint8List bytes = utf8.encode(url);
-    int handle = doxMysqlConnect(bytes.address, bytes.length);
+    int handle = doxMysqlConnect(bytes.address, bytes.length, threads);
     if (handle <= 0) {
-      throw MySQLClientException('dox_mysql_native: invalid url or options');
+      throw ArgumentError('dox_mysql_native: bad connection config');
     }
-    MysqlNativePool pool = MysqlNativePool._(handle, false);
-    try {
-      MysqlNativeResult version = await client.send(
-        handle,
-        0,
-        _opQuery,
-        'SELECT VERSION() AS v',
-        null,
-        false,
-      );
-      String text = '${version.rows.first['v']}';
-      return MysqlNativePool._(handle, text.contains('MariaDB'));
-    } catch (_) {
-      pool.close();
-      rethrow;
-    }
+    return MysqlNativePool.fromHandle(handle);
   }
 
-  /// Run [sql] and return its rows. Use `?` for [params].
-  /// Throws [MySQLServerException] for an error of the server
-  /// and [MySQLClientException] for a connection error.
-  Future<MysqlNativeResult> query(String sql, [List<Object?>? params]) {
-    return _Client.instance.send(_open, 0, _opQuery, sql, params, isMariaDb);
-  }
+  /// Runs [sql] and returns its rows.
+  ///
+  /// [parameters] is a list for `?` placeholders, or a map for `@name`
+  /// placeholders (like the Dox ORM). Values can be null, int, double,
+  /// bool, String, DateTime, Uint8List, or a Map or List (sent as JSON).
+  /// [transaction] is an id from [begin].
+  /// Throws [MySQLServerException] for errors from the server (with its
+  /// error code), [MySQLClientException] for others. The same as mysql_dart.
+  Future<MysqlNativeResult> query(
+    String sql, {
+    Object? parameters,
+    int transaction = 0,
+  }) => _send(_opQuery, sql, parameters, transaction);
 
   /// Like [query], but the rows are not sent back to Dart.
-  Future<MysqlNativeResult> execute(String sql, [List<Object?>? params]) {
-    return _Client.instance.send(_open, 0, _opExecute, sql, params, isMariaDb);
+  Future<MysqlNativeResult> execute(
+    String sql, {
+    Object? parameters,
+    int transaction = 0,
+  }) => _send(_opExecute, sql, parameters, transaction);
+
+  /// Starts a transaction on one connection. Use its id as `transaction`
+  /// of [query], then [commit] or [rollback] it.
+  Future<int> begin() async {
+    MysqlNativeResult r = await _send(_opBegin, '', null, 0);
+    return r.insertId;
   }
 
-  /// Run [action] in a transaction on one connection. Commit when it ends,
-  /// rollback when it throws.
-  Future<R> transaction<R>(
-    Future<R> Function(MysqlNativeTransaction tx) action,
-  ) async {
-    MysqlNativeTransaction tx = await begin();
-    R result;
-    try {
-      result = await action(tx);
-    } catch (_) {
-      await tx.rollback();
-      rethrow;
+  /// Commits the transaction and gives its connection back to the pool.
+  Future<void> commit(int transaction) =>
+      _send(_opCommit, '', null, transaction);
+
+  /// Rolls the transaction back and gives its connection back to the pool.
+  Future<void> rollback(int transaction) =>
+      _send(_opRollback, '', null, transaction);
+
+  /// Closes the pool for every isolate. Running queries finish.
+  void close() => doxMysqlClose(handle);
+
+  Future<MysqlNativeResult> _send(
+    int op,
+    String sql,
+    Object? parameters,
+    int transaction,
+  ) {
+    List<Object?> params;
+    if (parameters is Map<String, dynamic>) {
+      (sql, params) = toPositionalParams(sql, parameters, _same);
+    } else if (parameters is List<Object?>) {
+      params = parameters;
+    } else if (parameters == null) {
+      params = const <Object?>[];
+    } else {
+      throw ArgumentError.value(parameters, 'parameters', 'a List or a Map');
     }
-    await tx.commit();
-    return result;
+    return _Link.instance.send(handle, transaction, op, sql, params);
   }
 
-  /// Start a transaction. It keeps one connection until [commit] or
-  /// [MysqlNativeTransaction.rollback].
-  Future<MysqlNativeTransaction> begin() async {
-    MysqlNativeResult r = await _Client.instance.send(
-      _open,
-      0,
-      _opBegin,
-      '',
-      null,
-      false,
-    );
-    return MysqlNativeTransaction._(this, r.insertId);
-  }
-
-  /// Give up this pool. The connections close when no isolate uses the
-  /// pool anymore.
-  void close() {
-    if (_handle == 0) return;
-    doxMysqlClose(_handle);
-    _handle = 0;
-  }
-
-  int get _open {
-    if (_handle == 0) throw MySQLClientException('the pool is closed');
-    return _handle;
-  }
-}
-
-/// A transaction on one pooled connection.
-class MysqlNativeTransaction {
-  MysqlNativeTransaction._(this._pool, this._handle);
-
-  final MysqlNativePool _pool;
-  int _handle;
-
-  /// Run [sql] in this transaction and return its rows.
-  Future<MysqlNativeResult> query(String sql, [List<Object?>? params]) {
-    return _Client.instance.send(
-      _pool._open,
-      _open,
-      _opQuery,
-      sql,
-      params,
-      _pool.isMariaDb,
-    );
-  }
-
-  /// Like [query], but the rows are not sent back to Dart.
-  Future<MysqlNativeResult> execute(String sql, [List<Object?>? params]) {
-    return _Client.instance.send(
-      _pool._open,
-      _open,
-      _opExecute,
-      sql,
-      params,
-      _pool.isMariaDb,
-    );
-  }
-
-  /// Commit and give the connection back to the pool.
-  Future<void> commit() => _end(_opCommit);
-
-  /// Roll back and give the connection back to the pool.
-  Future<void> rollback() => _end(_opRollback);
-
-  Future<void> _end(int op) async {
-    int handle = _open;
-    _handle = 0;
-    await _Client.instance.send(_pool._open, handle, op, '', null, false);
-  }
-
-  int get _open {
-    if (_handle == 0) throw MySQLClientException('the transaction is closed');
-    return _handle;
-  }
+  static Object? _same(dynamic value) => value;
 }
 
 const int _opQuery = 0;
@@ -246,8 +194,8 @@ const int _tLongText = 8;
 
 /// One per isolate: the port Rust posts results to, and the requests
 /// that wait for them. Requests of one microtask go to Rust in one call.
-class _Client {
-  _Client._() {
+class _Link {
+  _Link._() {
     _port = RawReceivePort(_onBatch, 'dox_mysql_native');
     _port.keepIsolateAlive = false;
     _handle = doxMysqlClient(_port.sendPort.nativePort);
@@ -257,13 +205,13 @@ class _Client {
     }
   }
 
-  static _Client? _instance;
+  static _Link? _instance;
 
-  static _Client get instance {
+  static _Link get instance {
     if (!available) {
       throw UnsupportedError('dox_mysql_native is not available: $loadError');
     }
-    return _instance ??= _Client._();
+    return _instance ??= _Link._();
   }
 
   static bool? _available;
@@ -311,16 +259,15 @@ class _Client {
     int tx,
     int op,
     String sql,
-    List<Object?>? params,
-    bool mariaDb,
+    List<Object?> params,
   ) {
     int id = _nextId++;
-    _Pending pending = _Pending(mariaDb);
+    _Pending pending = _Pending();
     if (_pending.isEmpty) _port.keepIsolateAlive = true;
     _pending[id] = pending;
     int start = _len;
     try {
-      _write(id, pool, tx, op, sql, params ?? const <Object?>[]);
+      _write(id, pool, tx, op, sql, params);
     } catch (_) {
       _len = start;
       _done(id);
@@ -465,7 +412,7 @@ class _Client {
       if (pending == null) continue;
       _done(id);
       if (status == 0) {
-        pending.completer.complete(_rows(b, d, body, pending.mariaDb));
+        pending.completer.complete(_rows(b, d, body));
       } else {
         pending.completer.completeError(_error(b, d, body, len));
       }
@@ -483,7 +430,7 @@ class _Client {
     return MySQLClientException(message);
   }
 
-  static MysqlNativeResult _rows(Uint8List b, ByteData d, int p, bool maria) {
+  static MysqlNativeResult _rows(Uint8List b, ByteData d, int p) {
     int affected = d.getUint64(p, Endian.little);
     int insertId = d.getUint64(p + 8, Endian.little);
     int ncols = d.getUint32(p + 16, Endian.little);
@@ -529,7 +476,7 @@ class _Client {
               String text = _text(b, p, len);
               value = tag == _tJson
                   ? jsonDecode(text)
-                  : tag == _tLongText && maria
+                  : tag == _tLongText
                   ? _maybeJson(text)
                   : text;
             }
@@ -558,7 +505,5 @@ class _Client {
 }
 
 class _Pending {
-  _Pending(this.mariaDb);
-  final bool mariaDb;
   final Completer<MysqlNativeResult> completer = Completer<MysqlNativeResult>();
 }

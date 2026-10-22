@@ -27,6 +27,7 @@
 //! - error: u16 server error code (0 for a client error), u8 kind
 //!   (0 server, 1 client), 5 bytes sqlstate, then the message (utf8).
 use std::ffi::{CStr, c_char, c_int, c_void};
+use std::sync::atomic::{AtomicU8, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex, OnceLock};
 
 use mysql_async::consts::{ColumnFlags, ColumnType};
@@ -106,15 +107,14 @@ fn post(port: i64, data: &[u8]) -> bool {
 
 // ---- registries --------------------------------------------------------
 
+/// worker threads of the runtime, set by the first `dox_mysql_connect`
+static THREADS: AtomicUsize = AtomicUsize::new(1);
+
 fn runtime() -> &'static Runtime {
     static RT: OnceLock<Runtime> = OnceLock::new();
     RT.get_or_init(|| {
-        let threads = std::env::var("DOX_MYSQL_THREADS")
-            .ok()
-            .and_then(|v| v.parse().ok())
-            .unwrap_or(1);
         tokio::runtime::Builder::new_multi_thread()
-            .worker_threads(threads)
+            .worker_threads(THREADS.load(Ordering::Relaxed).max(1))
             .thread_name("dox_mysql")
             .enable_all()
             .build()
@@ -125,7 +125,8 @@ fn runtime() -> &'static Runtime {
 struct PoolEntry {
     url: String,
     pool: Pool,
-    users: usize,
+    /// 0 not known yet, 1 MySQL, 2 MariaDB
+    maria: Arc<AtomicU8>,
 }
 
 /// One isolate. Results wait in `out` until the next post.
@@ -136,7 +137,12 @@ struct Client {
 
 /// A transaction: one connection, taken from the pool until commit or
 /// rollback. The lock runs its queries one by one.
-type Tx = Arc<tokio::sync::Mutex<Conn>>;
+struct TxConn {
+    conn: tokio::sync::Mutex<Conn>,
+    maria: bool,
+}
+
+type Tx = Arc<TxConn>;
 
 static POOLS: Mutex<Slab<PoolEntry>> = Mutex::new(Slab::new());
 static CLIENTS: Mutex<Slab<Arc<Client>>> = Mutex::new(Slab::new());
@@ -148,9 +154,28 @@ fn get<T: Clone>(slab: &Mutex<Slab<T>>, handle: u64) -> Option<T> {
     slab.lock().unwrap().get(key).cloned()
 }
 
-fn pool_of(handle: u64) -> Option<Pool> {
-    let key = handle.checked_sub(1)? as usize;
-    POOLS.lock().unwrap().get(key).map(|e| e.pool.clone())
+fn pool_of(handle: u64) -> Result<(Pool, Arc<AtomicU8>), Fail> {
+    let key = handle.wrapping_sub(1) as usize;
+    let pools = POOLS.lock().unwrap();
+    let e = pools
+        .get(key)
+        .ok_or(Fail::Client("the pool is closed".into()))?;
+    Ok((e.pool.clone(), e.maria.clone()))
+}
+
+/// MariaDB keeps JSON in LONGTEXT, so Dart tries to decode its TEXT.
+/// Asked once per pool.
+async fn is_maria(conn: &mut Conn, flag: &AtomicU8) -> Result<bool, Fail> {
+    match flag.load(Ordering::Relaxed) {
+        1 => Ok(false),
+        2 => Ok(true),
+        _ => {
+            let v: Option<String> = conn.query_first("SELECT VERSION()").await?;
+            let maria = v.unwrap_or_default().contains("MariaDB");
+            flag.store(if maria { 2 } else { 1 }, Ordering::Relaxed);
+            Ok(maria)
+        }
+    }
 }
 
 // ---- requests ----------------------------------------------------------
@@ -235,13 +260,15 @@ impl From<mysql_async::Error> for Fail {
 async fn run(req: Request) -> Result<Vec<u8>, Fail> {
     match req.op {
         OP_BEGIN => {
-            let pool = pool_of(req.pool).ok_or(Fail::Client("pool is closed".into()))?;
+            let (pool, flag) = pool_of(req.pool)?;
             let mut conn = pool.get_conn().await?;
+            let maria = is_maria(&mut conn, &flag).await?;
             conn.query_drop("START TRANSACTION").await?;
-            let key = TXS
-                .lock()
-                .unwrap()
-                .insert(Arc::new(tokio::sync::Mutex::new(conn)));
+            let tx = Arc::new(TxConn {
+                conn: tokio::sync::Mutex::new(conn),
+                maria,
+            });
+            let key = TXS.lock().unwrap().insert(tx);
             Ok(ok_head(0, key as u64 + 1))
         }
         OP_COMMIT | OP_ROLLBACK => {
@@ -251,7 +278,7 @@ async fn run(req: Request) -> Result<Vec<u8>, Fail> {
                 .unwrap()
                 .try_remove(key)
                 .ok_or(Fail::Client("transaction is closed".into()))?;
-            let mut conn = tx.lock().await;
+            let mut conn = tx.conn.lock().await;
             let sql = if req.op == OP_COMMIT {
                 "COMMIT"
             } else {
@@ -264,12 +291,13 @@ async fn run(req: Request) -> Result<Vec<u8>, Fail> {
             let rows = req.op == OP_QUERY;
             if req.tx != 0 {
                 let tx = get(&TXS, req.tx).ok_or(Fail::Client("transaction is closed".into()))?;
-                let mut conn = tx.lock().await;
-                exec(&mut conn, &req.sql, req.params, rows).await
+                let mut conn = tx.conn.lock().await;
+                exec(&mut conn, &req.sql, req.params, rows, tx.maria).await
             } else {
-                let pool = pool_of(req.pool).ok_or(Fail::Client("pool is closed".into()))?;
+                let (pool, flag) = pool_of(req.pool)?;
                 let mut conn = pool.get_conn().await?;
-                exec(&mut conn, &req.sql, req.params, rows).await
+                let maria = is_maria(&mut conn, &flag).await?;
+                exec(&mut conn, &req.sql, req.params, rows, maria).await
             }
         }
         op => Err(Fail::Client(format!("unknown op {op}"))),
@@ -278,13 +306,19 @@ async fn run(req: Request) -> Result<Vec<u8>, Fail> {
 
 /// No params: text protocol, one round trip. Params: prepared statement,
 /// cached per connection by mysql_async.
-async fn exec(conn: &mut Conn, sql: &str, params: Vec<Value>, rows: bool) -> Result<Vec<u8>, Fail> {
+async fn exec(
+    conn: &mut Conn,
+    sql: &str,
+    params: Vec<Value>,
+    rows: bool,
+    maria: bool,
+) -> Result<Vec<u8>, Fail> {
     if params.is_empty() {
         let res = conn.query_iter(sql).await?;
-        read(res, rows).await
+        read(res, rows, maria).await
     } else {
         let res = conn.exec_iter(sql, Params::Positional(params)).await?;
-        read(res, rows).await
+        read(res, rows, maria).await
     }
 }
 
@@ -299,10 +333,20 @@ fn ok_head(affected: u64, insert_id: u64) -> Vec<u8> {
 
 /// Encodes the first result set. More result sets (multi statements) are
 /// read and dropped.
-async fn read<P: Protocol>(mut res: QueryResult<'_, '_, P>, rows: bool) -> Result<Vec<u8>, Fail> {
+async fn read<P: Protocol>(
+    mut res: QueryResult<'_, '_, P>,
+    rows: bool,
+    maria: bool,
+) -> Result<Vec<u8>, Fail> {
     let cols: Arc<[Column]> = res.columns().unwrap_or_else(|| Arc::from(Vec::new()));
     let mut out = ok_head(0, 0);
-    let kinds: Vec<Kind> = cols.iter().map(kind_of).collect();
+    let kinds: Vec<Kind> = cols
+        .iter()
+        .map(|c| match kind_of(c) {
+            Kind::LongText if !maria => Kind::Text,
+            kind => kind,
+        })
+        .collect();
     let mut count: u32 = 0;
     if rows {
         out[16..20].copy_from_slice(&(cols.len() as u32).to_le_bytes());
@@ -584,51 +628,48 @@ pub unsafe extern "C" fn dox_mysql_init(data: *mut c_void) -> i32 {
 
 /// Opens a pool for a `mysql://` URL (see mysql_async `Opts::from_url`).
 /// It connects lazily, on the first query. The same URL gives the same
-/// pool, so isolates share it. Returns a handle (> 0), or -1 for a bad URL.
+/// pool, so isolates share it. [threads] is the size of the runtime of the
+/// whole process: only the first call sets it. Returns a handle (> 0), or
+/// -1 for a bad URL.
 ///
 /// # Safety
 /// `url` must point to `len` bytes.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn dox_mysql_connect(url: *const u8, len: i64) -> i64 {
+pub unsafe extern "C" fn dox_mysql_connect(url: *const u8, len: i64, threads: i32) -> i64 {
     let bytes = unsafe { std::slice::from_raw_parts(url, len as usize) };
     let Ok(url) = std::str::from_utf8(bytes) else {
         return -1;
     };
     let mut pools = POOLS.lock().unwrap();
-    if let Some((key, entry)) = pools.iter_mut().find(|(_, e)| e.url == url) {
-        entry.users += 1;
+    if let Some((key, _)) = pools.iter().find(|(_, e)| e.url == url) {
         return key as i64 + 1;
     }
     let Ok(opts) = Opts::from_url(url) else {
         return -1;
     };
+    THREADS.store(threads.max(1) as usize, Ordering::Relaxed);
     // Pool::new spawns a task, so it needs the runtime
     let _guard = runtime().enter();
     let key = pools.insert(PoolEntry {
         url: url.to_string(),
         pool: Pool::new(opts),
-        users: 1,
+        maria: Arc::new(AtomicU8::new(0)),
     });
     key as i64 + 1
 }
 
-/// Gives up one use of a pool. The last one closes its connections.
+/// Closes a pool for every isolate. Running queries finish.
 #[unsafe(no_mangle)]
 pub extern "C" fn dox_mysql_close(handle: i64) {
     let Some(key) = (handle as u64).checked_sub(1) else {
         return;
     };
-    let mut pools = POOLS.lock().unwrap();
-    let Some(entry) = pools.get_mut(key as usize) else {
+    let Some(entry) = POOLS.lock().unwrap().try_remove(key as usize) else {
         return;
     };
-    entry.users -= 1;
-    if entry.users == 0 {
-        let pool = pools.remove(key as usize).pool;
-        runtime().spawn(async move {
-            let _ = pool.disconnect().await;
-        });
-    }
+    runtime().spawn(async move {
+        let _ = entry.pool.disconnect().await;
+    });
 }
 
 /// Opens a client: results are posted to `send_port`. Returns a handle,
