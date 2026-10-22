@@ -21,8 +21,18 @@ const int _kDate = 3;
 class SqliteDriver extends DBDriver {
   dynamic conn;
 
+  /// max prepared statements kept for the database
+  final int statementCacheSize;
+
   /// constructor
-  SqliteDriver({required this.conn});
+  SqliteDriver({
+    required this.conn,
+    this.statementCacheSize = defaultStatementCacheSize,
+  });
+
+  /// prepared statements of each database, by sql text
+  static final Expando<StatementCache<PreparedStatement>> _caches =
+      Expando<StatementCache<PreparedStatement>>();
 
   static final Expando<Future<void>> _transactionDone = Expando<Future<void>>();
 
@@ -72,7 +82,13 @@ class SqliteDriver extends DBDriver {
       substitutionValues,
       _toSqliteValue,
     );
-    ResultSet result = db.select(sql, params);
+    PreparedStatement statement = _statement(db, sql);
+    ResultSet result;
+    try {
+      result = statement.select(params);
+    } finally {
+      statement.reset();
+    }
 
     if (result.columnNames.isEmpty) {
       /// old sqlite without RETURNING: give the new row id of an insert
@@ -100,7 +116,47 @@ class SqliteDriver extends DBDriver {
       substitutionValues,
       _toSqliteValue,
     );
-    db.execute(sql, params);
+
+    /// no params: sqlite can run many statements in one text
+    if (params.isEmpty) {
+      db.execute(sql);
+      return;
+    }
+    PreparedStatement statement = _statement(db, sql);
+    try {
+      statement.execute(params);
+    } finally {
+      statement.reset();
+    }
+  }
+
+  /// the statement cache of [db], or null when it has none yet
+  StatementCache<PreparedStatement>? statementCacheOf(Database db) {
+    return _caches[db];
+  }
+
+  /// close all kept statements, eg. before you close the database
+  void clearStatementCache() {
+    if (conn is! Database) {
+      return;
+    }
+    for (PreparedStatement statement
+        in _caches[conn]?.clear() ?? <PreparedStatement>[]) {
+      statement.close();
+    }
+  }
+
+  /// the kept statement of [sql], prepared once
+  PreparedStatement _statement(Database db, String sql) {
+    StatementCache<PreparedStatement> cache = _caches[db] ??=
+        StatementCache<PreparedStatement>(statementCacheSize);
+    PreparedStatement? statement = cache.get(sql);
+    if (statement != null) {
+      return statement;
+    }
+    statement = db.prepare(sql, persistent: true, checkNoTail: true);
+    cache.put(sql, statement)?.close();
+    return statement;
   }
 
   @override
@@ -215,11 +271,26 @@ class _Schema {
   /// table name => column name => kind
   Map<String, Map<String, int>> _tables = <String, Map<String, int>>{};
 
+  /// result of [kindsFor] for each sql text
+  final Map<String, Map<String, int>> _bySql = <String, Map<String, int>>{};
+
+  PreparedStatement? _versionStatement;
+
   void refresh(Database db) {
-    int version = db.select('PRAGMA schema_version').first.columnAt(0) as int;
+    PreparedStatement statement = _versionStatement ??= db.prepare(
+      'PRAGMA schema_version',
+      persistent: true,
+    );
+    int version;
+    try {
+      version = statement.select().first.columnAt(0) as int;
+    } finally {
+      statement.reset();
+    }
     if (version == _version) {
       return;
     }
+    _bySql.clear();
     Map<String, Map<String, int>> tables = <String, Map<String, int>>{};
     ResultSet rows = db.select(
       "SELECT m.name AS t, p.name AS c, p.type AS ty FROM sqlite_schema m "
@@ -248,7 +319,14 @@ class _Schema {
   /// [sql]. an alias or a same-named column of another table may be
   /// converted too, cast in sql if that matters.
   Map<String, int> kindsFor(String sql) {
-    Map<String, int> kinds = <String, int>{};
+    Map<String, int>? known = _bySql[sql];
+    if (known != null) {
+      return known;
+    }
+    if (_bySql.length >= 2000) {
+      _bySql.clear();
+    }
+    Map<String, int> kinds = _bySql[sql] = <String, int>{};
     for (MapEntry<String, Map<String, int>> table in _tables.entries) {
       if (sql.contains(table.key)) {
         for (MapEntry<String, int> col in table.value.entries) {
