@@ -2762,7 +2762,10 @@ Use <code>redis</code> when isolates or servers must see the same data.</p>
 </span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">CacheStore</span><span class="w"> </span><span class="n">store</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cache</span><span class="p">.</span><span class="n">store</span><span class="p">();</span><span class="w">     </span><span class="c1">// the default store</span>
 </span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="kd">await</span><span class="w"> </span><span class="n">cache</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="s1">'file'</span><span class="p">).</span><span class="kd">get</span><span class="p">(</span><span class="s1">'a'</span><span class="p">);</span><span class="w">   </span><span class="c1">// a named store</span>
 </span></code></pre></div>
-<p>Redis options: <code>host</code>, <code>port</code>, <code>username</code>, <code>password</code>, <code>db</code>, <code>tls</code>, <code>prefix</code>.</p>
+<p>Redis options: <code>host</code>, <code>port</code>, <code>username</code>, <code>password</code>, <code>db</code>, <code>tls</code>, <code>prefix</code>, <code>pool_size</code>.</p>
+<p><code>pool_size</code> is the most Redis connections one store opens in one isolate. The default is 10.
+More connections help when many requests read the cache at the same time.
+Each Dox isolate has its own pool, so the total is <code>pool_size</code> times the number of isolates.</p>
 <h2 id="basic-use">Basic use</h2>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">store</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">5</span><span class="p">));</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">store</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'a'</span><span class="p">);</span><span class="w">               </span><span class="c1">// 1</span>
@@ -2794,6 +2797,10 @@ A zero or negative ttl removes the key.</p>
 <tr>
 <td><code>get(key, [default])</code></td>
 <td>the value, or the default when missing or expired</td>
+</tr>
+<tr>
+<td><code>getRaw(key)</code></td>
+<td>the stored JSON text, with no decode. Null when missing</td>
 </tr>
 <tr>
 <td><code>put(key, value, [ttl])</code></td>

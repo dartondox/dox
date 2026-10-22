@@ -918,6 +918,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#getraw" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        getRaw
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#remember" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2560,6 +2571,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#getraw" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        getRaw
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#remember" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2665,38 +2687,52 @@ It runs on <a href="../../packages/cache/"><code>dox_cache</code></a>, which is 
 <p>Dox runs one isolate per CPU core. Each isolate has its own <code>memory</code> store.
 Use <code>redis</code> when all isolates and servers must see the same data.</p>
 </div>
-<p>Redis options: <code>host</code>, <code>port</code>, <code>username</code>, <code>password</code>, <code>db</code>, <code>tls</code>, <code>prefix</code>.</p>
+<p>Redis options: <code>host</code>, <code>port</code>, <code>username</code>, <code>password</code>, <code>db</code>, <code>tls</code>, <code>prefix</code>, <code>pool_size</code>.</p>
+<p><code>pool_size</code> is the most Redis connections one store opens in one isolate. The default is 10.
+Each isolate has its own pool. So 4 isolates with <code>pool_size: 10</code> can open up to 40 connections.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="s1">'redis'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'redis'</span><span class="p">,</span><span class="w"> </span><span class="s1">'host'</span><span class="o">:</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">,</span><span class="w"> </span><span class="s1">'pool_size'</span><span class="o">:</span><span class="w"> </span><span class="m">20</span><span class="p">},</span>
+</span></code></pre></div>
 <h2 id="values-are-json">Values are JSON</h2>
 <p>Values must be JSON types: <code>Map</code>, <code>List</code>, <code>String</code>, <code>num</code>, <code>bool</code>.
 A <code>Map</code> comes back as <code>Map&lt;String, dynamic&gt;</code>.</p>
 <h2 id="usage">Usage</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// no duration: the value stays forever</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">put</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span><span class="w"> </span><span class="s1">'bar'</span><span class="p">);</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">put</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span><span class="w"> </span><span class="s1">'bar'</span><span class="p">,</span><span class="w"> </span><span class="nl">duration:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">10</span><span class="p">));</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="kd">get</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">);</span><span class="w">             </span><span class="c1">// 'bar', or null</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="kd">get</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span><span class="w"> </span><span class="s1">'default'</span><span class="p">);</span><span class="w">  </span><span class="c1">// a default when it is missing</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">has</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">);</span><span class="w">             </span><span class="c1">// true</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">forget</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">);</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">forever</span><span class="p">(</span><span class="s1">'settings'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'theme'</span><span class="o">:</span><span class="w"> </span><span class="s1">'dark'</span><span class="p">});</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">flush</span><span class="p">();</span><span class="w">                </span><span class="c1">// remove all items of the store</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// no duration: the value stays forever</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">put</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span><span class="w"> </span><span class="s1">'bar'</span><span class="p">);</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">put</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span><span class="w"> </span><span class="s1">'bar'</span><span class="p">,</span><span class="w"> </span><span class="nl">duration:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">10</span><span class="p">));</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="kd">get</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">);</span><span class="w">             </span><span class="c1">// 'bar', or null</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="kd">get</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span><span class="w"> </span><span class="s1">'default'</span><span class="p">);</span><span class="w">  </span><span class="c1">// a default when it is missing</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">has</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">);</span><span class="w">             </span><span class="c1">// true</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">forget</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">);</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">forever</span><span class="p">(</span><span class="s1">'settings'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'theme'</span><span class="o">:</span><span class="w"> </span><span class="s1">'dark'</span><span class="p">});</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">flush</span><span class="p">();</span><span class="w">                </span><span class="c1">// remove all items of the store</span>
 </span></code></pre></div>
+<h3 id="getraw"><code>getRaw</code></h3>
+<p><code>get</code> decodes the JSON text into Dart values. If you send the value back as JSON,
+Dox must encode it again. That is double work.
+<code>getRaw</code> gives the stored JSON text as is, so you can send it with no decode and no encode.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">getRaw</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">);</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">json</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="n">json</span><span class="p">).</span><span class="n">contentType</span><span class="p">(</span><span class="n">ContentType</span><span class="p">.</span><span class="n">json</span><span class="p">);</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>A stored <code>String</code> comes back as JSON, with its quotes: <code>"bar"</code>. A missing key gives <code>null</code>.</p>
 <h3 id="remember"><code>remember</code></h3>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">posts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">remember</span><span class="p">(</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="s1">'posts'</span><span class="p">,</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">5</span><span class="p">),</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="p">()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Post</span><span class="p">().</span><span class="n">all</span><span class="p">(),</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">posts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">remember</span><span class="p">(</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="s1">'posts'</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">5</span><span class="p">),</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="p">()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Post</span><span class="p">().</span><span class="n">all</span><span class="p">(),</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">);</span>
 </span></code></pre></div>
 <p>The value is read from the cache. When it is missing, the function runs and its result is stored.
 <code>rememberForever(key, fn)</code> does the same without expiry.</p>
 <h3 id="store"><code>store</code></h3>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">store</span><span class="p">(</span><span class="s1">'redis'</span><span class="p">).</span><span class="n">put</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span><span class="w"> </span><span class="s1">'bar'</span><span class="p">);</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">store</span><span class="p">(</span><span class="s1">'memory'</span><span class="p">).</span><span class="kd">get</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">store</span><span class="p">(</span><span class="s1">'redis'</span><span class="p">).</span><span class="n">put</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span><span class="w"> </span><span class="s1">'bar'</span><span class="p">);</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">store</span><span class="p">(</span><span class="s1">'memory'</span><span class="p">).</span><span class="kd">get</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">);</span>
 </span></code></pre></div>
 <h3 id="tag"><code>tag</code></h3>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">tag</span><span class="p">(</span><span class="s1">'users'</span><span class="p">).</span><span class="n">put</span><span class="p">(</span><span class="s1">'u1'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Ann'</span><span class="p">);</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">tag</span><span class="p">(</span><span class="s1">'users'</span><span class="p">).</span><span class="n">flush</span><span class="p">();</span><span class="w"> </span><span class="c1">// removes only the items of this tag</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">tag</span><span class="p">(</span><span class="s1">'users'</span><span class="p">).</span><span class="n">put</span><span class="p">(</span><span class="s1">'u1'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Ann'</span><span class="p">);</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">tag</span><span class="p">(</span><span class="s1">'users'</span><span class="p">).</span><span class="n">flush</span><span class="p">();</span><span class="w"> </span><span class="c1">// removes only the items of this tag</span>
 </span></code></pre></div>
 <h3 id="more">More</h3>
 <table>
@@ -2732,10 +2768,10 @@ A <code>Map</code> comes back as <code>Map&lt;String, dynamic&gt;</code>.</p>
 <p>See <a href="../../packages/cache/">dox_cache</a> for locks and custom drivers.</p>
 <h2 id="tests">Tests</h2>
 <p><code>Dox().cache</code> is the <code>CacheManager</code>. Replace it in a test:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">Dox</span><span class="p">().</span><span class="n">cache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CacheManager</span><span class="p">(</span><span class="n">CacheConfig</span><span class="p">(</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nl">defaultStore:</span><span class="w"> </span><span class="s1">'memory'</span><span class="p">,</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nl">stores:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="p">{</span><span class="s1">'memory'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'memory'</span><span class="p">}},</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">));</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">Dox</span><span class="p">().</span><span class="n">cache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CacheManager</span><span class="p">(</span><span class="n">CacheConfig</span><span class="p">(</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nl">defaultStore:</span><span class="w"> </span><span class="s1">'memory'</span><span class="p">,</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nl">stores:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="p">{</span><span class="s1">'memory'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'memory'</span><span class="p">}},</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="p">));</span>
 </span></code></pre></div>
 
 
