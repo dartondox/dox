@@ -109,7 +109,12 @@ fn post(port: i64, data: &[u8]) -> bool {
 fn runtime() -> &'static Runtime {
     static RT: OnceLock<Runtime> = OnceLock::new();
     RT.get_or_init(|| {
+        let threads = std::env::var("DOX_MYSQL_THREADS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(1);
         tokio::runtime::Builder::new_multi_thread()
+            .worker_threads(threads)
             .thread_name("dox_mysql")
             .enable_all()
             .build()
