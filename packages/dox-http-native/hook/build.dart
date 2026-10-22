@@ -22,18 +22,18 @@ const String _releases = 'https://github.com/dartondox/dox/releases/download';
 
 /// sha256 of each release asset. Fill it from `SHA256SUMS` of the release
 /// (see .github/workflows/native.yaml) before publishing to pub.dev.
-/// These are from the release `dox_http_native-v3.0.0-alpha.2`.
+/// These are from the release `dox_http_native-v3.0.0-alpha.3`.
 const Map<String, String> _sha256 = <String, String>{
   'dox_http_native-linux-arm64.so':
-      '0673e9d29c77fa8e144421bdbbf51b97bb94a02514e79ea268715bd3d58b8ecc',
+      'c95eb643d3dbfe6f12b56b1d114c3c700769839f188cb7afa0afdc950f083f6e',
   'dox_http_native-linux-x64.so':
-      '8bf935374620a75f6ed5fe41a1343e21ab5254d4af8aefd23f2cd9b9ba1b9fd5',
+      '24ae2863a08fd3ff9ec03631c3627dac49f5c94bd2f33e6dbc24ad3ec539d51e',
   'dox_http_native-macos-arm64.dylib':
-      '9f325add44c572dc9957b2e7dcc935b26bb19fb31511b86699b35393e110fcce',
+      'f8dba28cdf8a7a52fdd72465a9376c66d2ec1be60f3b0b25500cc4156623f228',
   'dox_http_native-macos-x64.dylib':
-      'da00e359a979883b3fd4d58c655e809a3fa06b15482b1ae4e500af3580df013d',
+      '65fcc4eadf3e28ac08624d36bfdfec4c562e2f0cea268bea2edd350355dd091a',
   'dox_http_native-windows-x64.dll':
-      '2d40c5804e7108dbb2a9b813dca5a4097acace75de9d747b6d0fb7c431fd1eb1',
+      '51b20d5fca8b8bca4a2c69adad692f67494a033e167d286154e29123fbf251a0',
 };
 
 void main(List<String> args) async {

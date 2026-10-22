@@ -1,29 +1,35 @@
 //! Native HTTP/1.1 server for Dart (dox_http_native).
 //!
 //! Rust only owns the sockets and parses HTTP (hyper 1.x). All app code
-//! stays in Dart. Each server runs on its own thread with one tokio
-//! `current_thread` runtime. One Dart isolate starts one server.
+//! stays in Dart. One Dart isolate starts one server. All servers of the
+//! process gets its own `dox-http` thread with one tokio `current_thread`
+//! runtime. `DOX_HTTP_THREAD=shared` puts all servers on one thread. A
+//! connection belongs to the server (isolate) whose socket accepted it, so
+//! its requests stay in order on one isolate.
 //!
 //! Flow: parsed requests are added to a batch. Once per runtime tick the
 //! batch is posted to a Dart `ReceivePort` with `Dart_PostCObject`. Dart
 //! runs the handlers and sends all answers back in one leaf FFI call,
-//! `dox_respond_batch`.
+//! `dox_respond_batch`. It puts them in the server's inbox and wakes the
+//! server thread once, not once per answer.
 //!
 //! Request record (little endian, 28 byte head): u64 id, u32 flags
 //! (bit 0: HTTP/1.0), u16 method_len, u16 target_len, u32 headers_len,
 //! u32 body_len, u16 remote_port, u16 reserved. Then 16 bytes remote ip
-//! (IPv6, IPv4 is mapped), method, target, "name: value\r\n" lines, body.
+//! (IPv6, IPv4 is mapped), method, target, headers, body. Each header is
+//! u16 name_len, u16 value_len, name (lowercase), value. With the lengths
+//! Dart finds one header without reading every byte.
 //!
 //! Response record (20 byte head): u64 id, u16 status, u16 flags,
 //! u32 headers_len, u32 body_len. Then header lines, body.
-use std::cell::{Cell, RefCell};
+use std::cell::RefCell;
 use std::convert::Infallible;
 use std::ffi::{CStr, c_char, c_int, c_void};
 use std::net::{IpAddr, SocketAddr, TcpListener as StdListener};
 use std::pin::Pin;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex, OnceLock};
+use std::sync::{Arc, Mutex, OnceLock, mpsc};
 use std::task::{Context, Poll};
 use std::thread::JoinHandle;
 use std::time::Duration;
@@ -41,9 +47,10 @@ use socket2::{Domain, Protocol, Socket, Type};
 use tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 use tokio::net::TcpStream;
 use tokio::sync::{Notify, oneshot};
+use tokio::task::JoinSet;
 
 /// Bump when the FFI functions or the record layout change.
-const ABI_VERSION: i32 = 1;
+const ABI_VERSION: i32 = 2;
 /// Max size of the request line plus headers. Bigger gets 431.
 const MAX_HEAD: usize = 16 * 1024;
 const RES_HEAD: usize = 20;
@@ -103,14 +110,32 @@ type Answer = Response<Full<Bytes>>;
 
 /// Shared by the Dart thread (answers) and the server thread.
 struct Server {
-    pending: Mutex<Slab<oneshot::Sender<Answer>>>,
+    /// answers from Dart, by request id. The server thread hands them out.
+    /// One lock and one wake per batch, not one per answer.
+    inbox: Mutex<Vec<(usize, Answer)>>,
+    answered: Notify,
     stopped: AtomicBool,
     stop: Notify,
     port: u16,
+    /// own thread mode: the server thread
     thread: Mutex<Option<JoinHandle<()>>>,
+    /// shared thread mode: gets a message (or closes) when the server ended
+    done: Mutex<Option<mpsc::Receiver<()>>>,
 }
 
 impl Server {
+    fn new(port: u16) -> Self {
+        Server {
+            inbox: Mutex::new(Vec::new()),
+            answered: Notify::new(),
+            stopped: AtomicBool::new(false),
+            stop: Notify::new(),
+            port,
+            thread: Mutex::new(None),
+            done: Mutex::new(None),
+        }
+    }
+
     fn shut_down(&self) {
         self.stopped.store(true, Ordering::Release);
         self.stop.notify_one();
@@ -120,6 +145,8 @@ impl Server {
 /// State of one server thread. Only that thread touches it.
 struct Ctx {
     server: Arc<Server>,
+    /// requests that wait for an answer from Dart
+    pending: RefCell<Slab<oneshot::Sender<Answer>>>,
     batch: RefCell<Vec<u8>>,
     notify: Notify,
     max_body: usize,
@@ -186,16 +213,11 @@ fn unbind(port: u16) {
     }
 }
 
-thread_local! {
-    /// true while `serve` runs on this thread (tasks can be spawned).
-    static SERVING: Cell<bool> = const { Cell::new(false) };
-}
-
 /// A TCP stream that closes gently ("lingering close"). When hyper drops
 /// it, unread bytes from the client would make the OS send a reset, and the
 /// client could lose our last answer (eg. 431 or 413). So first close our
 /// side, then read and drop what is left for up to one second.
-struct Lingering(Option<TcpStream>);
+struct Lingering(Option<TcpStream>, Rc<Ctx>);
 
 impl Lingering {
     fn io(self: Pin<&mut Self>) -> Pin<&mut TcpStream> {
@@ -248,7 +270,7 @@ impl Drop for Lingering {
         let Some(mut stream) = self.0.take() else {
             return;
         };
-        if !SERVING.with(Cell::get) {
+        if self.1.server.stopped.load(Ordering::Acquire) {
             return; // the server stops: close at once
         }
         tokio::task::spawn_local(async move {
@@ -283,9 +305,12 @@ fn peer_bytes(addr: SocketAddr) -> [u8; 18] {
 
 async fn serve(listener: StdListener, ctx: Rc<Ctx>, dart_port: i64) {
     let listener = tokio::net::TcpListener::from_std(listener).expect("listener");
-    tokio::task::spawn_local(flusher(ctx.clone(), dart_port));
+    // every task of this server. Dropping it at the end closes them all,
+    // also when other servers still run on the same thread.
+    let mut tasks = JoinSet::new();
+    tasks.spawn_local(flusher(ctx.clone(), dart_port));
+    tasks.spawn_local(deliver(ctx.clone()));
     let server = ctx.server.clone();
-    SERVING.with(|s| s.set(true));
     while !server.stopped.load(Ordering::Acquire) {
         tokio::select! {
             biased;
@@ -302,7 +327,9 @@ async fn serve(listener: StdListener, ctx: Rc<Ctx>, dart_port: i64) {
                 let _ = stream.set_nodelay(true);
                 let peer = peer_bytes(addr);
                 let ctx = ctx.clone();
-                tokio::task::spawn_local(async move {
+                while tasks.try_join_next().is_some() {} // forget closed ones
+                tasks.spawn_local(async move {
+                    let ctx2 = ctx.clone();
                     let svc = service_fn(move |req| handle(req, ctx.clone(), peer));
                     // hyper answers 400 for a bad request and 431 when the
                     // head is bigger than MAX_HEAD, then closes the connection.
@@ -312,13 +339,112 @@ async fn serve(listener: StdListener, ctx: Rc<Ctx>, dart_port: i64) {
                         .keep_alive(true)
                         .half_close(true)
                         .max_buf_size(MAX_HEAD)
-                        .serve_connection(TokioIo::new(Lingering(Some(stream))), svc)
+                        .serve_connection(TokioIo::new(Lingering(Some(stream), ctx2)), svc)
                         .await;
                 });
+                // let the accept loops of other servers on this thread take
+                // a turn. On macOS they all accept from one queue.
+                tokio::task::yield_now().await;
             }
         }
     }
-    SERVING.with(|s| s.set(false));
+}
+
+/// Runs one server until it stops, then frees its port.
+async fn run_server(listener: StdListener, server: Arc<Server>, dart_port: i64, max_body: usize) {
+    let port = server.port;
+    let ctx = Rc::new(Ctx {
+        server,
+        pending: RefCell::new(Slab::with_capacity(1024)),
+        batch: RefCell::new(Vec::with_capacity(1 << 16)),
+        notify: Notify::new(),
+        max_body,
+    });
+    serve(listener, ctx, dart_port).await;
+    unbind(port);
+}
+
+fn new_runtime() -> tokio::runtime::Runtime {
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .expect("runtime")
+}
+
+/// true: one `dox-http` thread serves the servers of all isolates.
+/// Off by default: `DOX_HTTP_THREAD=shared` turns it on. On 2 cores the one
+/// thread was the limit (about 115% CPU) and req/s fell by a quarter.
+fn shared_thread() -> bool {
+    static SHARED: OnceLock<bool> = OnceLock::new();
+    *SHARED.get_or_init(|| std::env::var("DOX_HTTP_THREAD").is_ok_and(|v| v == "shared"))
+}
+
+type Job = Box<dyn FnOnce() + Send>;
+
+/// The shared `dox-http` thread. It runs while at least one server uses it.
+struct SharedThread {
+    jobs: tokio::sync::mpsc::UnboundedSender<Job>,
+    users: usize,
+    _thread: JoinHandle<()>,
+}
+
+static SHARED_THREAD: Mutex<Option<SharedThread>> = Mutex::new(None);
+
+/// Starts `server` on the shared thread. Starts the thread when needed.
+fn start_shared(
+    listener: StdListener,
+    server: Arc<Server>,
+    dart_port: i64,
+    max_body: usize,
+) -> bool {
+    let (done_tx, done_rx) = mpsc::channel();
+    *server.done.lock().unwrap() = Some(done_rx);
+    let job: Job = Box::new(move || {
+        tokio::task::spawn_local(async move {
+            run_server(listener, server, dart_port, max_body).await;
+            // also runs for a killed isolate, which never calls dox_stop
+            leave_shared();
+            let _ = done_tx.send(());
+        });
+    });
+    let mut shared = SHARED_THREAD.lock().unwrap();
+    if shared.is_none() {
+        let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<Job>();
+        let thread = std::thread::Builder::new()
+            .name("dox-http".into())
+            .spawn(move || {
+                let rt = new_runtime();
+                let local = tokio::task::LocalSet::new();
+                local.block_on(&rt, async move {
+                    // ends when the last server stopped (the sender is dropped)
+                    while let Some(job) = rx.recv().await {
+                        job();
+                    }
+                });
+            });
+        let Ok(thread) = thread else { return false };
+        *shared = Some(SharedThread {
+            jobs: tx,
+            users: 0,
+            _thread: thread,
+        });
+    }
+    let t = shared.as_mut().unwrap();
+    t.users += 1;
+    t.jobs.send(job).is_ok()
+}
+
+/// One server of the shared thread ended. After the last one the thread
+/// ends by itself (its job channel closes). A new server starts a new one.
+/// Runs on the shared thread, so it can not join it.
+fn leave_shared() {
+    let mut shared = SHARED_THREAD.lock().unwrap();
+    if let Some(t) = shared.as_mut() {
+        t.users -= 1;
+        if t.users == 0 {
+            *shared = None; // drops the sender and the join handle
+        }
+    }
 }
 
 async fn handle(
@@ -405,7 +531,7 @@ fn enqueue(
     body: &[u8],
 ) -> oneshot::Receiver<Answer> {
     let (tx, rx) = oneshot::channel();
-    let id = ctx.server.pending.lock().unwrap().insert(tx) as u64;
+    let id = ctx.pending.borrow_mut().insert(tx) as u64;
     let mut b = ctx.batch.borrow_mut();
     let was_empty = b.is_empty();
     let (method, target) = (method.as_bytes(), target.as_bytes());
@@ -423,10 +549,11 @@ fn enqueue(
     b.extend_from_slice(target);
     let hstart = b.len();
     for (k, v) in headers {
+        // both fit in u16: the whole head is at most MAX_HEAD bytes
+        b.extend_from_slice(&(k.as_str().len() as u16).to_le_bytes());
+        b.extend_from_slice(&(v.len() as u16).to_le_bytes());
         b.extend_from_slice(k.as_str().as_bytes());
-        b.extend_from_slice(b": ");
         b.extend_from_slice(v.as_bytes());
-        b.extend_from_slice(b"\r\n");
     }
     let hlen = (b.len() - hstart) as u32;
     b[hlen_at..hlen_at + 4].copy_from_slice(&hlen.to_le_bytes());
@@ -475,6 +602,21 @@ async fn flusher(ctx: Rc<Ctx>, port: i64) {
         out.clear();
         if out.capacity() > 1 << 20 {
             out = Vec::new(); // do not keep a big body buffer forever
+        }
+    }
+}
+
+/// Hands the answers from Dart to the waiting requests.
+async fn deliver(ctx: Rc<Ctx>) {
+    let mut answers = Vec::new();
+    loop {
+        ctx.server.answered.notified().await;
+        std::mem::swap(&mut answers, &mut *ctx.server.inbox.lock().unwrap());
+        let mut pending = ctx.pending.borrow_mut();
+        for (id, r) in answers.drain(..) {
+            if let Some(tx) = pending.try_remove(id) {
+                let _ = tx.send(r);
+            }
         }
     }
 }
@@ -528,32 +670,22 @@ pub extern "C" fn dox_start(port: i32, send_port: i64, max_body: i64) -> i64 {
         Err(e) => return -(1000 + i64::from(e.raw_os_error().unwrap_or(0))),
     };
     let port = listener.local_addr().map(|a| a.port()).unwrap_or(0);
-    let server = Arc::new(Server {
-        pending: Mutex::new(Slab::with_capacity(1024)),
-        stopped: AtomicBool::new(false),
-        stop: Notify::new(),
-        port,
-        thread: Mutex::new(None),
-    });
-    let for_thread = server.clone();
+    let server = Arc::new(Server::new(port));
     let max_body = max_body.max(0) as usize;
+    if shared_thread() {
+        if !start_shared(listener, server.clone(), send_port, max_body) {
+            return -2;
+        }
+        return Arc::into_raw(server) as i64;
+    }
+    let for_thread = server.clone();
     let thread = std::thread::Builder::new()
         .name("dox-http".into())
         .spawn(move || {
-            let rt = tokio::runtime::Builder::new_current_thread()
-                .enable_all()
-                .build()
-                .expect("runtime");
+            let rt = new_runtime();
             let local = tokio::task::LocalSet::new();
-            let ctx = Rc::new(Ctx {
-                server: for_thread,
-                batch: RefCell::new(Vec::with_capacity(1 << 16)),
-                notify: Notify::new(),
-                max_body,
-            });
-            local.block_on(&rt, serve(listener, ctx, send_port));
-            drop(local); // closes every open connection
-            unbind(port);
+            local.block_on(&rt, run_server(listener, for_thread, send_port, max_body));
+            drop(local); // closes what is left (lingering closes)
         });
     match thread {
         Ok(t) => *server.thread.lock().unwrap() = Some(t),
@@ -584,6 +716,10 @@ pub unsafe extern "C" fn dox_stop(handle: i64) {
     if let Some(t) = thread {
         let _ = t.join();
     }
+    let done = server.done.lock().unwrap().take();
+    if let Some(done) = done {
+        let _ = done.recv(); // the server ended and freed its port
+    }
 }
 
 fn rd16(b: &[u8], p: usize) -> u16 {
@@ -602,8 +738,10 @@ fn rd32(b: &[u8], p: usize) -> usize {
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn dox_respond_batch(handle: i64, ptr: *const u8, len: i64) {
     let server = unsafe { &*(handle as *const Server) };
-    let b = unsafe { std::slice::from_raw_parts(ptr, len as usize) };
-    let mut answers = Vec::new();
+    // One copy of the whole batch. Bodies and header values are slices of
+    // it, so there is no copy or allocation per response for them.
+    let all = Bytes::copy_from_slice(unsafe { std::slice::from_raw_parts(ptr, len as usize) });
+    let b = &all[..];
     let mut p = 0;
     while p + RES_HEAD <= b.len() {
         let id = u64::from_le_bytes(b[p..p + 8].try_into().unwrap()) as usize;
@@ -614,35 +752,39 @@ pub unsafe extern "C" fn dox_respond_batch(handle: i64, ptr: *const u8, len: i64
         if h_at + hlen + blen > b.len() {
             break; // broken record: drop the rest
         }
-        let headers = &b[h_at..h_at + hlen];
-        let body = Bytes::copy_from_slice(&b[h_at + hlen..h_at + hlen + blen]);
-        p = h_at + hlen + blen;
-        let mut r = Response::new(Full::new(body));
+        let body_at = h_at + hlen;
+        p = body_at + blen;
+        let mut r = Response::new(Full::new(all.slice(body_at..p)));
         *r.status_mut() = StatusCode::from_u16(status).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR);
-        for line in headers.split(|&c| c == b'\n') {
+        let mut at = h_at;
+        for line in b[h_at..body_at].split(|&c| c == b'\n') {
+            let line_at = at;
+            at += line.len() + 1;
             let line = line.strip_suffix(b"\r").unwrap_or(line);
             let Some(colon) = line.iter().position(|&c| c == b':') else {
                 continue;
             };
+            let value = line[colon + 1..].trim_ascii_start();
+            let v_at = line_at + line.len() - value.len();
             let (Ok(k), Ok(v)) = (
                 HeaderName::from_bytes(&line[..colon]),
-                HeaderValue::from_bytes(line[colon + 1..].trim_ascii_start()),
+                HeaderValue::from_maybe_shared(all.slice(v_at..v_at + value.len())),
             ) else {
                 continue;
             };
             r.headers_mut().append(k, v);
         }
-        answers.push((id, r));
-    }
-    let senders: Vec<_> = {
-        let mut pending = server.pending.lock().unwrap();
-        answers
-            .into_iter()
-            .filter_map(|(id, r)| pending.try_remove(id).map(|tx| (tx, r)))
-            .collect()
-    };
-    for (tx, r) in senders {
-        let _ = tx.send(r);
+        // Wake the server thread on the first answer, so it writes that one
+        // while we build the rest. Later ones join the same wake as long as
+        // it has not taken the inbox yet.
+        let was_empty = {
+            let mut inbox = server.inbox.lock().unwrap();
+            inbox.push((id, r));
+            inbox.len() == 1
+        };
+        if was_empty {
+            server.answered.notify_one();
+        }
     }
 }
 
@@ -654,13 +796,7 @@ mod tests {
     fn start_bare() -> u16 {
         let listener = bind(0).unwrap();
         let port = listener.local_addr().unwrap().port();
-        let server = Arc::new(Server {
-            pending: Mutex::new(Slab::new()),
-            stopped: AtomicBool::new(false),
-            stop: Notify::new(),
-            port,
-            thread: Mutex::new(None),
-        });
+        let server = Arc::new(Server::new(port));
         std::thread::spawn(move || {
             let rt = tokio::runtime::Builder::new_current_thread()
                 .enable_all()
@@ -669,6 +805,7 @@ mod tests {
             let local = tokio::task::LocalSet::new();
             let ctx = Rc::new(Ctx {
                 server,
+                pending: RefCell::new(Slab::new()),
                 batch: RefCell::new(Vec::new()),
                 notify: Notify::new(),
                 max_body: 10,

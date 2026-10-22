@@ -10,6 +10,8 @@ hide:
 
 # Fast backends<br>in Dart
 
+<p class="dox-hero__lead"><strong>Write in Dart. Serve with Rust.</strong></p>
+
 <p class="dox-hero__lead">
 Dox is a web backend framework for Dart, like Laravel.
 Routing, an ORM, migrations, validation, auth and a CLI come in one place.

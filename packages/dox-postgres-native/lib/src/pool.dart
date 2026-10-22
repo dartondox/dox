@@ -350,17 +350,36 @@ class _Link {
     return fields;
   }
 
+  /// the column part of the last result, and its names and oids. The same
+  /// query gives the same columns, so most results skip the decode. The
+  /// same name strings also keep their hash code for the row maps.
+  static Uint8List _lastHead = Uint8List(0);
+  static List<String> _lastNames = const <String>[];
+  static List<int> _lastOids = const <int>[];
+
   static PgNativeResult _rows(Uint8List b, ByteData d, int at) {
     int count = d.getUint16(at, Endian.little);
+    int start = at;
     at += 2;
-    List<String> names = List<String>.filled(count, '');
-    List<int> oids = List<int>.filled(count, 0);
     for (int c = 0; c < count; c++) {
-      oids[c] = d.getUint32(at, Endian.little);
-      int len = d.getUint16(at + 4, Endian.little);
-      names[c] = utf8.decoder.convert(b, at + 6, at + 6 + len);
-      at += 6 + len;
+      at += 6 + d.getUint16(at + 4, Endian.little);
     }
+    if (!_same(_lastHead, b, start, at)) {
+      List<String> names = List<String>.filled(count, '');
+      List<int> oids = List<int>.filled(count, 0);
+      int p = start + 2;
+      for (int c = 0; c < count; c++) {
+        oids[c] = d.getUint32(p, Endian.little);
+        int len = d.getUint16(p + 4, Endian.little);
+        names[c] = utf8.decoder.convert(b, p + 6, p + 6 + len);
+        p += 6 + len;
+      }
+      _lastHead = Uint8List.fromList(Uint8List.sublistView(b, start, at));
+      _lastNames = List<String>.unmodifiable(names); // shared by results
+      _lastOids = oids;
+    }
+    List<String> names = _lastNames;
+    List<int> oids = _lastOids;
     int rowCount = d.getUint32(at, Endian.little);
     at += 4;
     List<Map<String, dynamic>> rows = List<Map<String, dynamic>>.generate(
@@ -382,6 +401,15 @@ class _Link {
       }
     }
     return PgNativeResult(names, rows);
+  }
+
+  /// true when [b] from [start] to [end] has the bytes of [head]
+  static bool _same(Uint8List head, Uint8List b, int start, int end) {
+    if (head.length != end - start) return false;
+    for (int i = 0; i < head.length; i++) {
+      if (head[i] != b[start + i]) return false;
+    }
+    return true;
   }
 
   static const int _y2kMicros = 946684800000000;
