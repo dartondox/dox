@@ -33,8 +33,10 @@ Pass it to `AppConfig(cache: cache)`. Each store is made once per isolate, the f
 
 Redis options: `host`, `port`, `username`, `password`, `db`, `tls`, `prefix`, `pool_size`.
 
-`pool_size` is the most Redis connections one store opens in one isolate. The default is 10.
-Each isolate has its own pool. So 4 isolates with `pool_size: 10` can open up to 40 connections.
+`pool_size` is the most Redis connections one store opens in one isolate (ioredis `maxConnection`). The default is 10.
+Most of the time a store uses only one connection. ioredis sends all commands on one shared connection and writes the commands of one event-loop turn together (auto-pipelining).
+It opens more connections only while a blocking command (like `BLPOP`) waits. The cache does not send blocking commands, so you rarely need to change `pool_size`.
+Each isolate has its own connection. So 4 isolates use about 4 connections.
 
 ```dart
 'redis': <String, dynamic>{'driver': 'redis', 'host': '127.0.0.1', 'pool_size': 20},

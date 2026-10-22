@@ -53,9 +53,10 @@ await cache.store('file').get('a');   // a named store
 
 Redis options: `host`, `port`, `username`, `password`, `db`, `tls`, `prefix`, `pool_size`.
 
-`pool_size` is the most Redis connections one store opens in one isolate. The default is 10.
-More connections help when many requests read the cache at the same time.
-Each Dox isolate has its own pool, so the total is `pool_size` times the number of isolates.
+`pool_size` is the most Redis connections one store opens in one isolate (ioredis `maxConnection`). The default is 10.
+Most of the time a store uses only one connection. ioredis sends all commands on one shared connection and writes the commands of one event-loop turn together (auto-pipelining).
+It opens more connections only while a blocking command (like `BLPOP`) waits. The cache does not send blocking commands, so you rarely need to change `pool_size`.
+Each Dox isolate has its own connection, so the total is about one per isolate.
 
 ## Basic use
 
