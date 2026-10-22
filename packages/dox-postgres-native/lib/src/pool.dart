@@ -359,7 +359,7 @@ class _Link {
     for (int c = 0; c < count; c++) {
       oids[c] = d.getUint32(at, Endian.little);
       int len = d.getUint16(at + 4, Endian.little);
-      names[c] = utf8.decode(Uint8List.sublistView(b, at + 6, at + 6 + len));
+      names[c] = utf8.decoder.convert(b, at + 6, at + 6 + len);
       at += 6 + len;
     }
     int rowCount = d.getUint32(at, Endian.little);
@@ -401,7 +401,7 @@ class _Link {
       case 21: // int2
         return d.getInt16(at);
       case 25 || 1043 || 19 || 1042: // text, varchar, name, bpchar
-        return utf8.decode(Uint8List.sublistView(b, at, at + len));
+        return utf8.decoder.convert(b, at, at + len);
       case 701: // float8
         return d.getFloat64(at);
       case 700: // float4
