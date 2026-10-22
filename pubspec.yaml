@@ -55,6 +55,8 @@ melos:
         dirExists: test
         ignore:
           - dox_orm
+          # needs MySQL or MariaDB, see .github/workflows/native.yaml
+          - dox_mysql_native
 
     test_pg:
       exec: DRIVER=postgres dart test --concurrency=1
