@@ -376,7 +376,7 @@ fn new_runtime() -> tokio::runtime::Runtime {
 /// thread was the limit (about 115% CPU) and req/s fell by a quarter.
 fn shared_thread() -> bool {
     static SHARED: OnceLock<bool> = OnceLock::new();
-    *SHARED.get_or_init(|| std::env::var("DOX_HTTP_THREAD").map_or(false, |v| v == "shared"))
+    *SHARED.get_or_init(|| std::env::var("DOX_HTTP_THREAD").is_ok_and(|v| v == "shared"))
 }
 
 type Job = Box<dyn FnOnce() + Send>;
