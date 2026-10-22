@@ -51,6 +51,11 @@ Dox also uses `dart:io` by itself in these cases:
 `DOX_SERVER=native` forces the native server, also for an app with WebSocket
 routes. WebSocket upgrades then fail with 500. Socket.IO long-polling works.
 
+Each isolate has its own Rust network thread. `DOX_HTTP_THREAD=shared` puts
+all isolates on one thread. It is off by default: on 2 cores the one thread
+was the limit and req/s fell by a quarter. Leave it off unless you measure
+a gain.
+
 ## Limits
 
 - Max size of the request line plus headers: 16 KB. Bigger gets `431`.
