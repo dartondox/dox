@@ -125,19 +125,13 @@ The table needs a nullable `deleted_at` column. In a migration, add `table.softD
 The default column name is the field name in snake_case.
 Use `name` when the column has another name.
 
-=== "Default"
+```dart
+@Column()
+String? userId; // column: user_id
 
-    ```dart
-    @Column()
-    String? userId; // column: user_id
-    ```
-
-=== "Custom column name"
-
-    ```dart
-    @Column(name: 'body')
-    String? description; // column: body
-    ```
+@Column(name: 'body')
+String? description; // column: body
+```
 
 ### Field types
 
@@ -164,75 +158,56 @@ The function gets a map and returns the value.
 - `beforeGet` runs when a row is read. It gets the row from the database.
   It returns the value for this field.
 
-=== "beforeSave"
+```dart
+@DoxModel()
+class Blog extends BlogGenerator {
+  @Column()
+  String? title;
 
-    ```dart
-    @DoxModel()
-    class Blog extends BlogGenerator {
-      @Column()
-      String? title;
+  // beforeSave: make the slug from the title
+  @Column(beforeSave: makeSlug)
+  String? slug;
 
-      @Column(beforeSave: makeSlug)
-      String? slug;
+  // beforeGet: old rows have no status, show them as draft
+  @Column(beforeGet: readStatus)
+  String? status;
 
-      static String? makeSlug(Map<String, dynamic> map) {
-        return map['title']?.toString().toLowerCase().replaceAll(' ', '-');
-      }
-    }
-    ```
+  static String? makeSlug(Map<String, dynamic> map) {
+    return map['title']?.toString().toLowerCase().replaceAll(' ', '-');
+  }
 
-=== "beforeGet"
-
-    ```dart
-    @DoxModel()
-    class Blog extends BlogGenerator {
-      @Column(beforeGet: readStatus)
-      String? status;
-
-      // old rows have no status, show them as draft
-      static String? readStatus(Map<String, dynamic> map) {
-        return map['status'] as String? ?? 'draft';
-      }
-    }
-    ```
+  static String? readStatus(Map<String, dynamic> map) {
+    return map['status'] as String? ?? 'draft';
+  }
+}
+```
 
 ## Save
 
 `save()` inserts a new model, or updates a model that has an id.
 
-=== "Insert"
+```dart
+// insert
+Blog blog = Blog();
+blog.title = 'My first blog';
+await blog.save();
+print(blog.id); // the new id
 
-    ```dart
-    Blog blog = Blog();
-    blog.title = 'My first blog';
-    await blog.save();
-    print(blog.id); // the new id
-    ```
+// update
+Blog? found = await Blog().find(1);
+found?.title = 'New title';
+await found?.save();
 
-=== "Update"
+// set a field to null
+found?.slug = null;
+await found?.save(); // slug is now NULL in the database
 
-    ```dart
-    Blog? blog = await Blog().find(1);
-    blog?.title = 'New title';
-    await blog?.save();
-    ```
-
-=== "Set a field to null"
-
-    ```dart
-    Blog? blog = await Blog().find(1);
-    blog?.slug = null;
-    await blog?.save(); // slug is now NULL in the database
-    ```
-
-=== "Create from a map"
-
-    ```dart
-    Blog blog = await Blog().create(<String, dynamic>{
-      'title': 'My first blog',
-      'status': 'draft',
-    });
-    ```
+// create from a map
+Blog created = await Blog().create(<String, dynamic>{
+  'title': 'My first blog',
+  'status': 'draft',
+});
+```
 
 - On insert, `null` fields are not sent, so the database default is used.
 - On update, a field is set to `NULL` only when it had a value before
@@ -242,26 +217,19 @@ The function gets a map and returns the value.
 
 ## Delete
 
-=== "Delete a record"
+```dart
+// delete a record
+Blog? blog = await Blog().find(1);
+await blog?.delete(); // deletes only this record
 
-    ```dart
-    Blog? blog = await Blog().find(1);
-    await blog?.delete(); // deletes only this record
-    ```
+// force delete
+Blog? trashed = await Blog().withTrash().find(1);
+await trashed?.forceDelete(); // deletes the row, also with softDelete
 
-=== "Force delete"
-
-    ```dart
-    Blog? blog = await Blog().withTrash().find(1);
-    await blog?.forceDelete(); // deletes the row, also with softDelete
-    ```
-
-=== "Restore"
-
-    ```dart
-    Blog? blog = await Blog().withTrash().find(1);
-    await blog?.restore(); // sets deleted_at back to NULL
-    ```
+// restore
+Blog? deleted = await Blog().withTrash().find(1);
+await deleted?.restore(); // sets deleted_at back to NULL
+```
 
 `save()`, `delete()`, `forceDelete()` and `restore()` fire [model events](events.md).
 

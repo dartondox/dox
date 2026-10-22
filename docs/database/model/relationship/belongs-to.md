@@ -10,44 +10,40 @@ The comment table has the column `user_id`.
 
 Add a field with `@BelongsTo(...)` to the model. The field type is the related model, nullable.
 
-=== "Comment"
+```dart title="lib/app/models/comment/comment.model.dart"
+import 'package:dox_orm/dox_orm.dart';
 
-    ```dart title="lib/app/models/comment/comment.model.dart"
-    import 'package:dox_orm/dox_orm.dart';
+import '../user/user.model.dart';
 
-    import '../user/user.model.dart';
+part 'comment.model.g.dart';
 
-    part 'comment.model.g.dart';
+@DoxModel()
+class Comment extends CommentGenerator {
+  @Column()
+  int? userId; // column user_id
 
-    @DoxModel()
-    class Comment extends CommentGenerator {
-      @Column()
-      int? userId; // column user_id
+  @Column()
+  String? content;
 
-      @Column()
-      String? content;
+  @BelongsTo(User)
+  User? user;
+}
+```
 
-      @BelongsTo(User)
-      User? user;
-    }
-    ```
+```dart title="lib/app/models/user/user.model.dart"
+import 'package:dox_orm/dox_orm.dart';
 
-=== "User"
+part 'user.model.g.dart';
 
-    ```dart title="lib/app/models/user/user.model.dart"
-    import 'package:dox_orm/dox_orm.dart';
+@DoxModel()
+class User extends UserGenerator {
+  @Column()
+  String? name;
 
-    part 'user.model.g.dart';
-
-    @DoxModel()
-    class User extends UserGenerator {
-      @Column()
-      String? name;
-
-      @Column()
-      String? status;
-    }
-    ```
+  @Column()
+  String? status;
+}
+```
 
 Run `dart run build_runner build` after you add a relationship.
 
@@ -56,51 +52,58 @@ Run `dart run build_runner build` after you add a relationship.
 The relation is not loaded by default. Load it in one of these ways.
 Use the field name (`'user'`) as the relation name.
 
-=== "preload"
+### `preload`
 
-    ```dart
-    List<Comment> comments = await Comment().preload('user').all();
-    for (Comment comment in comments) {
-      print(comment.user?.name);
-    }
-    ```
+Use it when you load the models with a query.
 
-    `preload` works with `find`, `get`, `all` and `getFirst`.
-    It runs one query for all comments, not one query per comment.
+```dart
+List<Comment> comments = await Comment().preload('user').all();
+for (Comment comment in comments) {
+  print(comment.user?.name);
+}
+```
 
-=== "$getRelation"
+`preload` works with `find`, `get`, `all` and `getFirst`.
+It runs one query for all comments, not one query per comment.
 
-    ```dart
-    Comment? comment = await Comment().find(1);
-    await comment?.$getRelation('user');
-    print(comment?.user?.name);
-    ```
+### `$getRelation`
 
-    Use it when you already have the model.
-    Do not call it in a loop over many models. Use `preload` for a list.
+Use it when you already have the model.
 
-=== "related"
+```dart
+Comment? comment = await Comment().find(1);
+await comment?.$getRelation('user');
+print(comment?.user?.name);
+```
 
-    ```dart
-    Comment? comment = await Comment().find(1);
-    User? activeUser = await comment
-        ?.related<User>('user')
-        ?.where('status', 'active')
-        .getFirst();
-    ```
+Do not call it in a loop over many models. Use `preload` for a list.
 
-    `related` gives a query. You can add more conditions before you run it.
-    It does not set `comment.user`.
+### `related`
 
-=== "eager"
+Use it when you need more conditions on the related row.
 
-    ```dart
-    @BelongsTo(User, eager: true)
-    User? user;
-    ```
+```dart
+Comment? comment = await Comment().find(1);
+User? activeUser = await comment
+    ?.related<User>('user')
+    ?.where('status', 'active')
+    .getFirst();
+```
 
-    With `eager: true`, every query of `Comment` loads the relation.
-    You do not call `preload`.
+`related` gives a query. You can add more conditions before you run it.
+It does not set `comment.user`.
+
+### `eager`
+
+Use it when every query of `Comment` should load the relation.
+
+```dart
+@BelongsTo(User, eager: true)
+User? user;
+```
+
+With `eager: true`, every query of `Comment` loads the relation.
+You do not call `preload`.
 
 The load runs this SQL:
 

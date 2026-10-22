@@ -9,37 +9,30 @@ A transaction runs many queries as one unit. Either all of them are saved, or no
 
 ## Use
 
-=== "Transaction"
+```dart
+// a transaction
+await QueryBuilder.transaction(() async {
+  Actor actor = Actor();
+  actor.name = 'John Wick';
+  await actor.save();
+  await QueryBuilder.table('actor_info').insert(<String, dynamic>{
+    'actor_id': actor.id,
+  });
+});
 
-    ```dart
-    await QueryBuilder.transaction(() async {
-      Actor actor = Actor();
-      actor.name = 'John Wick';
-      await actor.save();
-      await QueryBuilder.table('actor_info').insert(<String, dynamic>{
-        'actor_id': actor.id,
-      });
-    });
-    ```
+// return a value
+int? id = await QueryBuilder.transaction(() async {
+  Actor actor = Actor();
+  actor.name = 'John Wick';
+  await actor.save();
+  return actor.id;
+});
 
-=== "Return a value"
-
-    ```dart
-    int? id = await QueryBuilder.transaction(() async {
-      Actor actor = Actor();
-      actor.name = 'John Wick';
-      await actor.save();
-      return actor.id;
-    });
-    ```
-
-=== "Other connection"
-
-    ```dart
-    await QueryBuilder.transaction(() async {
-      // ...
-    }, connection: 'mysql');
-    ```
+// on another connection
+await QueryBuilder.transaction(() async {
+  // ...
+}, connection: 'mysql');
+```
 
 - All queries and models inside the function use the transaction.
   You do not pass a transaction object around.

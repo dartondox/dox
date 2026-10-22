@@ -29,43 +29,39 @@ await schema.create('artist_song', (Table table) {
 Add a field with `@ManyToMany(...)` to each model that needs it.
 The field type is a list of the related model. Start it as an empty list.
 
-=== "Artist"
+```dart title="lib/app/models/artist/artist.model.dart"
+import 'package:dox_orm/dox_orm.dart';
 
-    ```dart title="lib/app/models/artist/artist.model.dart"
-    import 'package:dox_orm/dox_orm.dart';
+import '../song/song.model.dart';
 
-    import '../song/song.model.dart';
+part 'artist.model.g.dart';
 
-    part 'artist.model.g.dart';
+@DoxModel()
+class Artist extends ArtistGenerator {
+  @Column()
+  String? name;
 
-    @DoxModel()
-    class Artist extends ArtistGenerator {
-      @Column()
-      String? name;
+  @ManyToMany(Song)
+  List<Song> songs = <Song>[];
+}
+```
 
-      @ManyToMany(Song)
-      List<Song> songs = <Song>[];
-    }
-    ```
+```dart title="lib/app/models/song/song.model.dart"
+import 'package:dox_orm/dox_orm.dart';
 
-=== "Song"
+import '../artist/artist.model.dart';
 
-    ```dart title="lib/app/models/song/song.model.dart"
-    import 'package:dox_orm/dox_orm.dart';
+part 'song.model.g.dart';
 
-    import '../artist/artist.model.dart';
+@DoxModel()
+class Song extends SongGenerator {
+  @Column()
+  String? title;
 
-    part 'song.model.g.dart';
-
-    @DoxModel()
-    class Song extends SongGenerator {
-      @Column()
-      String? title;
-
-      @ManyToMany(Artist)
-      List<Artist> artists = <Artist>[];
-    }
-    ```
+  @ManyToMany(Artist)
+  List<Artist> artists = <Artist>[];
+}
+```
 
 Run `dart run build_runner build` after you add a relationship.
 
@@ -74,54 +70,60 @@ Run `dart run build_runner build` after you add a relationship.
 The relation is not loaded by default. Load it in one of these ways.
 Use the field name (`'songs'`) as the relation name.
 
-=== "preload"
+### `preload`
 
-    ```dart
-    Artist? artist = await Artist().preload('songs').find(1);
-    print(artist?.songs.length);
+Use it when you load the models with a query.
 
-    List<Song> songs = await Song().preload('artists').get();
-    ```
+```dart
+Artist? artist = await Artist().preload('songs').find(1);
+print(artist?.songs.length);
 
-    `preload` works with `find`, `get`, `all` and `getFirst`.
-    For a list of models, it runs one query for all of them.
-    A model without links gets an empty list.
+List<Song> songs = await Song().preload('artists').get();
+```
 
-=== "$getRelation"
+`preload` works with `find`, `get`, `all` and `getFirst`.
+For a list of models, it runs one query for all of them.
+A model without links gets an empty list.
 
-    ```dart
-    Artist? artist = await Artist().find(1);
-    await artist?.$getRelation('songs');
-    print(artist?.songs.length);
-    ```
+### `$getRelation`
 
-    Use it when you already have the model.
+Use it when you already have the model.
 
-=== "related"
+```dart
+Artist? artist = await Artist().find(1);
+await artist?.$getRelation('songs');
+print(artist?.songs.length);
+```
 
-    ```dart
-    Artist? artist = await Artist().find(1);
-    List<Song> songs = await artist
-            ?.related<Song>('songs')
-            ?.orderBy('song.title')
-            .get() ??
-        <Song>[];
-    ```
+### `related`
 
-    `related` gives a query. You can add more conditions before you run it.
-    It does not set `artist.songs`.
-    The query joins the pivot table, so write `table.column` for column names.
+Use it when you need more conditions on the related rows.
 
-=== "eager"
+```dart
+Artist? artist = await Artist().find(1);
+List<Song> songs = await artist
+        ?.related<Song>('songs')
+        ?.orderBy('song.title')
+        .get() ??
+    <Song>[];
+```
 
-    ```dart
-    @ManyToMany(Song, eager: true)
-    List<Song> songs = <Song>[];
-    ```
+`related` gives a query. You can add more conditions before you run it.
+It does not set `artist.songs`.
+The query joins the pivot table, so write `table.column` for column names.
 
-    With `eager: true`, every query of `Artist` loads the relation.
-    You do not call `preload`.
-    Do not set `eager: true` on both sides. Each side would load the other side again and again.
+### `eager`
+
+Use it when every query of `Artist` should load the relation.
+
+```dart
+@ManyToMany(Song, eager: true)
+List<Song> songs = <Song>[];
+```
+
+With `eager: true`, every query of `Artist` loads the relation.
+You do not call `preload`.
+Do not set `eager: true` on both sides. Each side would load the other side again and again.
 
 The load runs this SQL:
 

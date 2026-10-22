@@ -24,42 +24,46 @@ dart pub add dox_websocket:^3.0.0-alpha.4
 
 The service creates the WebSocket server in every isolate. See [Services](services.md).
 
-=== "Many isolates (Redis)"
+#### Many isolates (Redis)
 
-    ```dart title="lib/services/websocket_service.dart"
-    import 'package:dox_core/dox_core.dart';
-    import 'package:dox_websocket/dox_websocket.dart';
-    import 'package:ioredis/ioredis.dart';
+Pick this for production. It works with more than one isolate and more than one server.
 
-    class WebsocketService implements DoxService {
-      @override
-      void setup() {
-        Redis sub = Redis(RedisOptions(host: Env.get('REDIS_HOST', '127.0.0.1')));
-        Redis pub = sub.duplicate();
+```dart title="lib/services/websocket_service.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_websocket/dox_websocket.dart';
+import 'package:ioredis/ioredis.dart';
 
-        WebsocketServer io = WebsocketServer(Dox());
-        io.adapter(WebsocketRedisAdapter(subscriber: sub, publisher: pub));
-      }
-    }
-    ```
+class WebsocketService implements DoxService {
+  @override
+  void setup() {
+    Redis sub = Redis(RedisOptions(host: Env.get('REDIS_HOST', '127.0.0.1')));
+    Redis pub = sub.duplicate();
 
-    Add [`ioredis`](https://pub.dev/packages/ioredis) `^2.0.0-alpha.2` to your `pubspec.yaml`.
+    WebsocketServer io = WebsocketServer(Dox());
+    io.adapter(WebsocketRedisAdapter(subscriber: sub, publisher: pub));
+  }
+}
+```
 
-=== "One isolate"
+Add [`ioredis`](https://pub.dev/packages/ioredis) `^2.0.0-alpha.2` to your `pubspec.yaml`.
 
-    ```dart title="lib/services/websocket_service.dart"
-    import 'package:dox_core/dox_core.dart';
-    import 'package:dox_websocket/dox_websocket.dart';
+#### One isolate
 
-    class WebsocketService implements DoxService {
-      @override
-      void setup() {
-        WebsocketServer(Dox());
-      }
-    }
-    ```
+Pick this for a small app or for local work, when you do not want Redis.
 
-    Set `totalIsolate: 1` in `lib/config/app.dart` (or `APP_TOTAL_ISOLATE=1`).
+```dart title="lib/services/websocket_service.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_websocket/dox_websocket.dart';
+
+class WebsocketService implements DoxService {
+  @override
+  void setup() {
+    WebsocketServer(Dox());
+  }
+}
+```
+
+Set `totalIsolate: 1` in `lib/config/app.dart` (or `APP_TOTAL_ISOLATE=1`).
 
 !!! warning "Many isolates need Redis"
     Dox runs one isolate per CPU core by default. Each isolate has its own memory.
@@ -145,56 +149,58 @@ Each client is also in a room for its route, so `emitter.emit()` with no room re
 
 ## Client examples
 
-=== "Dart"
+### Dart
 
-    ```dart
-    import 'dart:convert';
-    import 'dart:io';
+Use `WebSocket` from `dart:io`.
 
-    void main() async {
-      WebSocket socket = await WebSocket.connect('ws://localhost:3000/ws');
+```dart
+import 'dart:convert';
+import 'dart:io';
 
-      socket.listen((dynamic data) {
-        Map<String, dynamic> payload = jsonDecode(data as String);
-        print('${payload['event']}: ${payload['message']}');
-      });
+void main() async {
+  WebSocket socket = await WebSocket.connect('ws://localhost:3000/ws');
 
-      // join the chat room
-      socket.add(jsonEncode(<String, dynamic>{
-        'event': 'joinRoom',
-        'message': 'chat',
-      }));
+  socket.listen((dynamic data) {
+    Map<String, dynamic> payload = jsonDecode(data as String);
+    print('${payload['event']}: ${payload['message']}');
+  });
 
-      // send the intro event
-      socket.add(jsonEncode(<String, dynamic>{
-        'event': 'intro',
-        'message': 'Mingalaba!',
-      }));
-    }
-    ```
+  // join the chat room
+  socket.add(jsonEncode(<String, dynamic>{
+    'event': 'joinRoom',
+    'message': 'chat',
+  }));
 
-=== "JavaScript"
+  // send the intro event
+  socket.add(jsonEncode(<String, dynamic>{
+    'event': 'intro',
+    'message': 'Mingalaba!',
+  }));
+}
+```
 
-    Use the browser `WebSocket`, or the client [`@dartondox/websocket`](https://github.com/dartondox/dox-web-socket-client/):
+### JavaScript
 
-    ```js
-    import DoxWebsocket from '@dartondox/websocket';
+Use the browser `WebSocket`, or the client [`@dartondox/websocket`](https://github.com/dartondox/dox-web-socket-client/):
 
-    const socket = DoxWebsocket('ws://127.0.0.1:3000/ws', {
-      maxRetries: 18,
-      retryAfter: 2000,
-    });
+```js
+import DoxWebsocket from '@dartondox/websocket';
 
-    socket.onConnected(() => console.log(socket.id));
-    socket.onError(() => console.log('socket error'));
-    socket.onClose(() => console.log('socket closed'));
+const socket = DoxWebsocket('ws://127.0.0.1:3000/ws', {
+  maxRetries: 18,
+  retryAfter: 2000,
+});
 
-    // listen for the intro event from the server
-    socket.on('intro', (msg) => console.log(msg));
+socket.onConnected(() => console.log(socket.id));
+socket.onError(() => console.log('socket error'));
+socket.onClose(() => console.log('socket closed'));
 
-    // send the intro event
-    socket.emit('intro', 'Mingalaba!');
-    ```
+// listen for the intro event from the server
+socket.on('intro', (msg) => console.log(msg));
+
+// send the intro event
+socket.emit('intro', 'Mingalaba!');
+```
 
 ## WebsocketEmitter
 

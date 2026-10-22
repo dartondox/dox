@@ -167,22 +167,22 @@ It returns `null` when the password is not a `String`, when no identifier is giv
 
 ## Options
 
-=== "AuthProvider"
+### `AuthProvider`
 
-    | Option | Default | What it does |
-    | --- | --- | --- |
-    | `model` | required | a function that makes a new model, like `() => User()` |
-    | `identifierFields` | `['email']` | the fields `attempt` searches by |
-    | `passwordField` | `'password'` | the column with the bcrypt hash |
+| Option | Default | What it does |
+| --- | --- | --- |
+| `model` | required | a function that makes a new model, like `() => User()` |
+| `identifierFields` | `['email']` | the fields `attempt` searches by |
+| `passwordField` | `'password'` | the column with the bcrypt hash |
 
-=== "JwtAuthDriver"
+### `JwtAuthDriver`
 
-    | Option | Default | What it does |
-    | --- | --- | --- |
-    | `secret` | required | the key that signs tokens, like `SecretKey(env.appKey)` |
-    | `algorithm` | `JWTAlgorithm.HS256` | the signing algorithm |
-    | `expiresIn` | `null` | how long a token is valid. `null` means it never expires |
-    | `issuer` | `null` | the `iss` claim |
+| Option | Default | What it does |
+| --- | --- | --- |
+| `secret` | required | the key that signs tokens, like `SecretKey(env.appKey)` |
+| `algorithm` | `JWTAlgorithm.HS256` | the signing algorithm |
+| `expiresIn` | `null` | how long a token is valid. `null` means it never expires |
+| `issuer` | `null` | the `iss` claim |
 
 ## Things to know
 

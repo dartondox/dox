@@ -9,44 +9,40 @@ The other table keeps the foreign key (`post.user_id`).
 Add a field with `@HasMany(...)` to the model.
 The field type is a list of the related model. Start it as an empty list.
 
-=== "User"
+```dart title="lib/app/models/user/user.model.dart"
+import 'package:dox_orm/dox_orm.dart';
 
-    ```dart title="lib/app/models/user/user.model.dart"
-    import 'package:dox_orm/dox_orm.dart';
+import '../post/post.model.dart';
 
-    import '../post/post.model.dart';
+part 'user.model.g.dart';
 
-    part 'user.model.g.dart';
+@DoxModel()
+class User extends UserGenerator {
+  @Column()
+  String? name;
 
-    @DoxModel()
-    class User extends UserGenerator {
-      @Column()
-      String? name;
+  @HasMany(Post)
+  List<Post> posts = <Post>[];
+}
+```
 
-      @HasMany(Post)
-      List<Post> posts = <Post>[];
-    }
-    ```
+```dart title="lib/app/models/post/post.model.dart"
+import 'package:dox_orm/dox_orm.dart';
 
-=== "Post"
+part 'post.model.g.dart';
 
-    ```dart title="lib/app/models/post/post.model.dart"
-    import 'package:dox_orm/dox_orm.dart';
+@DoxModel()
+class Post extends PostGenerator {
+  @Column()
+  int? userId; // column user_id
 
-    part 'post.model.g.dart';
+  @Column()
+  String? title;
 
-    @DoxModel()
-    class Post extends PostGenerator {
-      @Column()
-      int? userId; // column user_id
-
-      @Column()
-      String? title;
-
-      @Column()
-      String? status;
-    }
-    ```
+  @Column()
+  String? status;
+}
+```
 
 Run `dart run build_runner build` after you add a relationship.
 
@@ -55,53 +51,59 @@ Run `dart run build_runner build` after you add a relationship.
 The relation is not loaded by default. Load it in one of these ways.
 Use the field name (`'posts'`) as the relation name.
 
-=== "preload"
+### `preload`
 
-    ```dart
-    User? user = await User().preload('posts').find(1);
-    print(user?.posts.length);
+Use it when you load the models with a query.
 
-    List<User> users = await User().preload('posts').get();
-    ```
+```dart
+User? user = await User().preload('posts').find(1);
+print(user?.posts.length);
 
-    `preload` works with `find`, `get`, `all` and `getFirst`.
-    For a list of users, it runs one query for all of them.
-    A user without posts gets an empty list.
+List<User> users = await User().preload('posts').get();
+```
 
-=== "$getRelation"
+`preload` works with `find`, `get`, `all` and `getFirst`.
+For a list of users, it runs one query for all of them.
+A user without posts gets an empty list.
 
-    ```dart
-    User? user = await User().find(1);
-    await user?.$getRelation('posts');
-    print(user?.posts.length);
-    ```
+### `$getRelation`
 
-    Use it when you already have the model.
+Use it when you already have the model.
 
-=== "related"
+```dart
+User? user = await User().find(1);
+await user?.$getRelation('posts');
+print(user?.posts.length);
+```
 
-    ```dart
-    User? user = await User().find(1);
-    List<Post> activePosts = await user
-            ?.related<Post>('posts')
-            ?.where('status', 'active')
-            .orderBy('id', 'desc')
-            .get() ??
-        <Post>[];
-    ```
+### `related`
 
-    `related` gives a query. You can add more conditions before you run it.
-    It does not set `user.posts`.
+Use it when you need more conditions on the related rows.
 
-=== "eager"
+```dart
+User? user = await User().find(1);
+List<Post> activePosts = await user
+        ?.related<Post>('posts')
+        ?.where('status', 'active')
+        .orderBy('id', 'desc')
+        .get() ??
+    <Post>[];
+```
 
-    ```dart
-    @HasMany(Post, eager: true)
-    List<Post> posts = <Post>[];
-    ```
+`related` gives a query. You can add more conditions before you run it.
+It does not set `user.posts`.
 
-    With `eager: true`, every query of `User` loads the relation.
-    You do not call `preload`.
+### `eager`
+
+Use it when every query of `User` should load the relation.
+
+```dart
+@HasMany(Post, eager: true)
+List<Post> posts = <Post>[];
+```
+
+With `eager: true`, every query of `User` loads the relation.
+You do not call `preload`.
 
 The load runs this SQL:
 

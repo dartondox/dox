@@ -14,33 +14,29 @@ A middleware can be `async`. Dox waits for it.
 
 ## Class based middleware
 
-=== "Create"
+Create one with the CLI. It writes `lib/app/http/middleware/logger.middleware.dart`.
 
-    ```bash
-    dox create:middleware Logger
-    ```
+```bash
+dox create:middleware Logger
+```
 
-    It writes `lib/app/http/middleware/logger.middleware.dart`.
+```dart title="lib/app/http/middleware/logger.middleware.dart"
+import 'package:dox_core/dox_core.dart';
 
-=== "Middleware"
+class LoggerMiddleware implements IDoxMiddleware {
+  @override
+  dynamic handle(IDoxRequest req) {
+    print('${req.method} ${req.uri.path}');
+    return req; // go on to the controller
+  }
+}
+```
 
-    ```dart title="lib/app/http/middleware/logger.middleware.dart"
-    import 'package:dox_core/dox_core.dart';
+Then put it on a route:
 
-    class LoggerMiddleware implements IDoxMiddleware {
-      @override
-      dynamic handle(IDoxRequest req) {
-        print('${req.method} ${req.uri.path}');
-        return req; // go on to the controller
-      }
-    }
-    ```
-
-=== "Route"
-
-    ```dart
-    Route.get('/ping', <dynamic>[LoggerMiddleware(), webController.pong]);
-    ```
+```dart title="lib/routes/api.dart"
+Route.get('/ping', <dynamic>[LoggerMiddleware(), webController.pong]);
+```
 
 !!! note
     `handle` takes an `IDoxRequest`, not a `DoxRequest`. This is the type that `IDoxMiddleware` asks for.
@@ -49,24 +45,20 @@ A middleware can be `async`. Dox waits for it.
 
 A function that takes a `DoxRequest` also works as middleware.
 
-=== "Middleware"
+```dart title="lib/app/http/middleware/api_key.middleware.dart"
+import 'package:dox_core/dox_core.dart';
 
-    ```dart
-    import 'package:dox_core/dox_core.dart';
+dynamic apiKeyMiddleware(DoxRequest req) {
+  if (req.header('X-Api-Key') != 'secret') {
+    return response(<String, String>{'message': 'Unauthorized'}).statusCode(401);
+  }
+  return req;
+}
+```
 
-    dynamic apiKeyMiddleware(DoxRequest req) {
-      if (req.header('X-Api-Key') != 'secret') {
-        return response(<String, String>{'message': 'Unauthorized'}).statusCode(401);
-      }
-      return req;
-    }
-    ```
-
-=== "Route"
-
-    ```dart
-    Route.get('/ping', <dynamic>[apiKeyMiddleware, webController.pong]);
-    ```
+```dart title="lib/routes/api.dart"
+Route.get('/ping', <dynamic>[apiKeyMiddleware, webController.pong]);
+```
 
 ## Many middleware on one route
 
@@ -92,31 +84,31 @@ Route.middleware(<dynamic>[LoggerMiddleware()], () {
 
 ## Middleware for a router or for all routes
 
-=== "One router"
+For one router, set its `middleware` list:
 
-    ```dart title="lib/routes/api.dart"
-    class ApiRouter extends Router {
-      @override
-      String get prefix => 'api';
+```dart title="lib/routes/api.dart"
+class ApiRouter extends Router {
+  @override
+  String get prefix => 'api';
 
-      @override
-      List<dynamic> get middleware => <dynamic>[LoggerMiddleware()];
+  @override
+  List<dynamic> get middleware => <dynamic>[LoggerMiddleware()];
 
-      @override
-      void register() {
-        // every route here runs LoggerMiddleware
-      }
-    }
-    ```
+  @override
+  void register() {
+    // every route here runs LoggerMiddleware
+  }
+}
+```
 
-=== "All routes"
+For all routes, set `globalMiddleware` in the app config:
 
-    ```dart title="lib/config/app.dart"
-    AppConfig appConfig = AppConfig(
-      globalMiddleware: <dynamic>[LogMiddleware(enabled: true)],
-      // ...
-    );
-    ```
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  globalMiddleware: <dynamic>[LogMiddleware(enabled: true)],
+  // ...
+);
+```
 
 The order is: global middleware, then router middleware, then group middleware, then route middleware.
 

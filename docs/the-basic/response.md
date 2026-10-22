@@ -18,49 +18,36 @@ Return the value from your controller. Dox turns it into the response.
 | `StreamFile`, `DownloadableFile` from `Storage()` | the file, streamed |
 | `response(...)` | full control: status, headers, cookies |
 
-=== "Text"
+```dart
+// text
+String ping(DoxRequest req) {
+  return 'pong';
+}
 
-    ```dart
-    String ping(DoxRequest req) {
-      return 'pong';
-    }
-    ```
+// JSON
+Map<String, String> hello(DoxRequest req) {
+  return <String, String>{'message': 'hello world!'};
+}
 
-=== "JSON"
+// a model
+Future<Blog?> show(int id) async {
+  return Blog().find(id);
+}
 
-    ```dart
-    Map<String, String> hello(DoxRequest req) {
-      return <String, String>{'message': 'hello world!'};
-    }
-    ```
+// a list of models
+Future<List<Blog>> index(DoxRequest req) async {
+  return Blog().all();
+}
 
-=== "Model"
-
-    ```dart
-    Future<Blog?> show(int id) async {
-      return Blog().find(id);
-    }
-    ```
-
-=== "List of models"
-
-    ```dart
-    Future<List<Blog>> index(DoxRequest req) async {
-      return Blog().all();
-    }
-    ```
-
-=== "Error"
-
-    ```dart
-    Future<Blog> show(int id) async {
-      Blog? blog = await Blog().find(id);
-      if (blog == null) {
-        throw NotFoundHttpException(); // 404 Not Found
-      }
-      return blog;
-    }
-    ```
+// an error
+Future<Blog> showOrFail(int id) async {
+  Blog? blog = await Blog().find(id);
+  if (blog == null) {
+    throw NotFoundHttpException(); // 404 Not Found
+  }
+  return blog;
+}
+```
 
 ## Errors
 
@@ -107,30 +94,23 @@ Return a `File` or a `Stream<List<int>>`. Dox sends it in chunks. It does not lo
 - It answers `Range: bytes=...` with `206 Partial Content`. Video players can seek, and downloads can resume.
 - `Storage().stream()` and `Storage().download()` on the local disk also stream the file.
 
-=== "File"
+```dart
+import 'dart:io';
 
-    ```dart
-    import 'dart:io';
+// a file from disk
+Route.get('/video', (DoxRequest req) => File('storage/video.mp4'));
 
-    Route.get('/video', (DoxRequest req) => File('storage/video.mp4'));
-    ```
+// a download from Storage
+Future<DownloadableFile> download(DoxRequest req) async {
+  // sends Content-Disposition, so the browser saves the file
+  return Storage().download('report.pdf');
+}
 
-=== "Download"
-
-    ```dart
-    Future<DownloadableFile> download(DoxRequest req) async {
-      // sends Content-Disposition, so the browser saves the file
-      return Storage().download('report.pdf');
-    }
-    ```
-
-=== "Stream"
-
-    ```dart
-    Future<StreamFile> show(DoxRequest req) async {
-      return Storage().stream('photo.jpg');
-    }
-    ```
+// a stream from Storage
+Future<StreamFile> show(DoxRequest req) async {
+  return Storage().stream('photo.jpg');
+}
+```
 
 See [File Storage](../digging-deeper/file-storage.md).
 
@@ -165,38 +145,28 @@ DoxResponse store(DoxRequest req) {
 
 ## Cookie
 
-=== "Set cookie"
+```dart
+// set a cookie
+DoxCookie cookie = DoxCookie('theme', 'dark');
+return response('ok').cookie(cookie);
 
-    ```dart
-    DoxCookie cookie = DoxCookie('theme', 'dark');
-    return response('ok').cookie(cookie);
-    ```
+// set a cookie with options
+DoxCookie token = DoxCookie(
+  'token',
+  'value',
+  maxAge: Duration(days: 7), // sent as Max-Age in seconds. default 1 hour
+  httpOnly: true,
+  secure: true,
+  path: '/',
+);
+return response('ok').cookie(token);
 
-=== "With options"
+// delete a cookie
+return response('ok').cookie(DoxCookie('token', ''), setExpire: true);
 
-    ```dart
-    DoxCookie cookie = DoxCookie(
-      'token',
-      'value',
-      maxAge: Duration(days: 7), // sent as Max-Age in seconds. default 1 hour
-      httpOnly: true,
-      secure: true,
-      path: '/',
-    );
-    return response('ok').cookie(cookie);
-    ```
-
-=== "Delete cookie"
-
-    ```dart
-    return response('ok').cookie(DoxCookie('token', ''), setExpire: true);
-    ```
-
-=== "Read cookie"
-
-    ```dart
-    String? token = req.cookie('token');
-    ```
+// read a cookie
+String? value = req.cookie('token');
+```
 
 !!! info "Encrypt and decrypt"
     By default, Dox encrypts the cookie value with `APP_KEY`, and decrypts it when you read it.

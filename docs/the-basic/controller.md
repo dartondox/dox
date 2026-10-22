@@ -12,24 +12,20 @@ dox create:controller Blog
 
 It writes `lib/app/http/controllers/blog.controller.dart`.
 
-=== "Controller"
+```dart title="lib/app/http/controllers/blog.controller.dart"
+import 'package:dox_core/dox_core.dart';
 
-    ```dart title="lib/app/http/controllers/blog.controller.dart"
-    import 'package:dox_core/dox_core.dart';
+class BlogController {
+  String index(DoxRequest req) {
+    return 'all blogs';
+  }
+}
+```
 
-    class BlogController {
-      String index(DoxRequest req) {
-        return 'all blogs';
-      }
-    }
-    ```
-
-=== "Route"
-
-    ```dart title="lib/routes/api.dart"
-    BlogController blogController = BlogController();
-    Route.get('/blogs', blogController.index);
-    ```
+```dart title="lib/routes/api.dart"
+BlogController blogController = BlogController();
+Route.get('/blogs', blogController.index);
+```
 
 ### Static method
 
@@ -57,46 +53,42 @@ Route.get('/blogs', listBlog);
 
 A resource controller has the 7 methods that `Route.resource` uses.
 
-=== "Create"
+Make one with the CLI:
 
-    ```bash
-    dox create:controller Blog -r
-    ```
+```bash
+dox create:controller Blog -r
+```
 
-=== "Controller"
+```dart title="lib/app/http/controllers/blog.controller.dart"
+import 'package:dox_core/dox_core.dart';
 
-    ```dart title="lib/app/http/controllers/blog.controller.dart"
-    import 'package:dox_core/dox_core.dart';
+class BlogController {
+  /// GET /resource
+  Future<dynamic> index(DoxRequest req) async {}
 
-    class BlogController {
-      /// GET /resource
-      Future<dynamic> index(DoxRequest req) async {}
+  /// GET /resource/create
+  Future<dynamic> create(DoxRequest req) async {}
 
-      /// GET /resource/create
-      Future<dynamic> create(DoxRequest req) async {}
+  /// POST /resource
+  Future<dynamic> store(DoxRequest req) async {}
 
-      /// POST /resource
-      Future<dynamic> store(DoxRequest req) async {}
+  /// GET /resource/{id}
+  Future<dynamic> show(DoxRequest req, int id) async {}
 
-      /// GET /resource/{id}
-      Future<dynamic> show(DoxRequest req, int id) async {}
+  /// GET /resource/{id}/edit
+  Future<dynamic> edit(DoxRequest req, int id) async {}
 
-      /// GET /resource/{id}/edit
-      Future<dynamic> edit(DoxRequest req, int id) async {}
+  /// PUT|PATCH /resource/{id}
+  Future<dynamic> update(DoxRequest req, int id) async {}
 
-      /// PUT|PATCH /resource/{id}
-      Future<dynamic> update(DoxRequest req, int id) async {}
+  /// DELETE /resource/{id}
+  Future<dynamic> destroy(DoxRequest req, int id) async {}
+}
+```
 
-      /// DELETE /resource/{id}
-      Future<dynamic> destroy(DoxRequest req, int id) async {}
-    }
-    ```
-
-=== "Route"
-
-    ```dart title="lib/routes/api.dart"
-    Route.resource('blogs', BlogController());
-    ```
+```dart title="lib/routes/api.dart"
+Route.resource('blogs', BlogController());
+```
 
 You can delete methods you do not need. `Route.resource` skips them.
 See [Routing: resource routes](routing.md#resource-routes).

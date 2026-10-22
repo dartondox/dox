@@ -18,50 +18,46 @@ This makes `lib/app/http/serializers/blog.serializer.dart`.
 
 ## Use
 
-=== "Serializer"
+```dart title="lib/app/http/serializers/blog.serializer.dart"
+import 'package:dox_core/dox_core.dart';
 
-    ```dart title="lib/app/http/serializers/blog.serializer.dart"
-    import 'package:dox_core/dox_core.dart';
+import '../../../app/models/blog/blog.model.dart';
 
-    import '../../../app/models/blog/blog.model.dart';
+class BlogSerializer extends Serializer<Blog> {
+  BlogSerializer(super.data);
 
-    class BlogSerializer extends Serializer<Blog> {
-      BlogSerializer(super.data);
+  @override
+  Map<String, dynamic> convert(Blog m) {
+    return <String, dynamic>{
+      'uid': m.id,
+      'title_en': m.title,
+    };
+  }
+}
+```
 
-      @override
-      Map<String, dynamic> convert(Blog m) {
-        return <String, dynamic>{
-          'uid': m.id,
-          'title_en': m.title,
-        };
-      }
-    }
-    ```
+```dart title="lib/app/http/controllers/blog.controller.dart"
+class BlogController {
+  Future<BlogSerializer> index(DoxRequest req) async {
+    List<Blog> blogs = await Blog().all();
+    return BlogSerializer(blogs); // a list
+  }
 
-=== "Controller"
+  Future<BlogSerializer> show(DoxRequest req, String id) async {
+    Blog? blog = await Blog().find(id);
+    return BlogSerializer(blog); // one model
+  }
+}
+```
 
-    ```dart
-    class BlogController {
-      Future<BlogSerializer> index(DoxRequest req) async {
-        List<Blog> blogs = await Blog().all();
-        return BlogSerializer(blogs); // a list
-      }
+The response of `show`:
 
-      Future<BlogSerializer> show(DoxRequest req, String id) async {
-        Blog? blog = await Blog().find(id);
-        return BlogSerializer(blog); // one model
-      }
-    }
-    ```
-
-=== "Response of show"
-
-    ```json
-    {
-      "uid": 1,
-      "title_en": "This is title"
-    }
-    ```
+```json
+{
+  "uid": 1,
+  "title_en": "This is title"
+}
+```
 
 - `convert` runs once for each model.
 - Give a list, and the response is a JSON list.

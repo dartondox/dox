@@ -78,7 +78,11 @@ markdown_extensions:
       line_spans: __span
       pygments_lang_class: true
   - pymdownx.inlinehilite
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.emoji:
@@ -89,6 +93,20 @@ nav:
   - Getting Started:
     - index.md
     - the-basic/installation.md
+    - Tutorial:
+      - tutorial/index.md
+      - tutorial/01-create-project.md
+      - tutorial/02-model-and-migration.md
+      - tutorial/03-routes-and-controller.md
+      - tutorial/04-validation.md
+      - tutorial/05-auth.md
+      - tutorial/06-test.md
+      - tutorial/07-build-and-deploy.md
+    - Concepts:
+      - concepts/how-dox-works.md
+      - concepts/coming-from-laravel.md
+      - concepts/upgrade-to-3.md
+  - The basics:
     - the-basic/routing.md
     - the-basic/request.md
     - the-basic/response.md
@@ -136,9 +154,28 @@ nav:
     - security/cors.md
     - security/encryption.md
     - security/hashing.md
-  - Others:
-    - others/contribute.md
+  - Guides:
+    - guides/index.md
+    - guides/file-upload.md
+    - guides/pagination.md
+    - guides/jwt-auth.md
+    - guides/custom-errors.md
+    - guides/background-work.md
+    - guides/static-files.md
+    - guides/cors-for-spa.md
+    - guides/environments.md
+    - guides/testing-with-database.md
+    - guides/docker.md
+  - Reference:
+    - reference/index.md
+    - reference/app-config.md
+    - reference/cli.md
+    - reference/env.md
+    - reference/request-and-response.md
+    - reference/http-exceptions.md
+    - reference/troubleshooting.md
     - Releases:
       - others/releases/v3-release.md
       - others/releases/core-release.md
       - others/releases/query-builder-release.md
+    - others/contribute.md

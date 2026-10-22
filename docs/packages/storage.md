@@ -138,57 +138,65 @@ if (!ok) {
 
 ## S3-compatible services
 
-=== "Cloudflare R2"
+### Cloudflare R2
 
-    ```dart
-    S3DriverConfig(
-      bucket: 'my-bucket',
-      region: 'auto',
-      endpoint: 'https://<account-id>.r2.cloudflarestorage.com',
-      accessKeyId: '...',
-      secretAccessKey: '...',
-      supportsAcl: false,
-    );
-    ```
+Set `supportsAcl: false`. R2 does not take ACL headers.
 
-=== "MinIO"
+```dart
+S3DriverConfig(
+  bucket: 'my-bucket',
+  region: 'auto',
+  endpoint: 'https://<account-id>.r2.cloudflarestorage.com',
+  accessKeyId: '...',
+  secretAccessKey: '...',
+  supportsAcl: false,
+);
+```
 
-    ```dart
-    S3DriverConfig(
-      bucket: 'my-bucket',
-      region: 'us-east-1',
-      endpoint: 'http://localhost:9000',
-      forcePathStyle: true,
-      accessKeyId: 'minioadmin',
-      secretAccessKey: 'minioadmin',
-    );
-    ```
+### MinIO
 
-=== "DigitalOcean Spaces"
+MinIO needs path style URLs, so set `forcePathStyle: true`.
 
-    ```dart
-    S3DriverConfig(
-      bucket: 'my-space',
-      region: 'nyc3',
-      endpoint: 'https://nyc3.digitaloceanspaces.com',
-      accessKeyId: '...',
-      secretAccessKey: '...',
-    );
-    ```
+```dart
+S3DriverConfig(
+  bucket: 'my-bucket',
+  region: 'us-east-1',
+  endpoint: 'http://localhost:9000',
+  forcePathStyle: true,
+  accessKeyId: 'minioadmin',
+  secretAccessKey: 'minioadmin',
+);
+```
 
-=== "Google Cloud Storage"
+### DigitalOcean Spaces
 
-    ```dart
-    S3DriverConfig(
-      bucket: 'my-bucket',
-      region: 'auto',
-      endpoint: 'https://storage.googleapis.com',
-      accessKeyId: 'GOOG...',
-      secretAccessKey: '...',
-      supportsAcl: false,
-      supportsBatchDelete: false,
-    );
-    ```
+Spaces works like S3. Put the region of your space in `region` and in the endpoint.
+
+```dart
+S3DriverConfig(
+  bucket: 'my-space',
+  region: 'nyc3',
+  endpoint: 'https://nyc3.digitaloceanspaces.com',
+  accessKeyId: '...',
+  secretAccessKey: '...',
+);
+```
+
+### Google Cloud Storage
+
+Set `supportsAcl: false` and `supportsBatchDelete: false`. GCS does not take ACL headers or the S3 batch delete call.
+
+```dart
+S3DriverConfig(
+  bucket: 'my-bucket',
+  region: 'auto',
+  endpoint: 'https://storage.googleapis.com',
+  accessKeyId: 'GOOG...',
+  secretAccessKey: '...',
+  supportsAcl: false,
+  supportsBatchDelete: false,
+);
+```
 
 !!! info "Big files"
     - `put` sends one request. S3 allows at most 5 GiB in one request.

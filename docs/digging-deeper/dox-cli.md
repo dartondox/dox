@@ -106,23 +106,11 @@ It writes a new `APP_KEY` to your `.env` file.
 
 ### Controller
 
-=== "Default"
-
-    ```bash
-    dox create:controller Blog
-    ```
-
-=== "Resource controller"
-
-    ```bash
-    dox create:controller Blog -r
-    ```
-
-=== "WebSocket controller"
-
-    ```bash
-    dox create:controller Chat -ws
-    ```
+```bash
+dox create:controller Blog       # default controller
+dox create:controller Blog -r    # resource controller
+dox create:controller Chat -ws   # WebSocket controller
+```
 
 - A default or resource controller goes to `lib/app/http/controllers/`.
 - A WebSocket controller goes to `lib/app/ws/controllers/`. See [WebSocket](websocket.md).

@@ -1,0 +1,516 @@
+# App config
+
+`AppConfig` is the one object you give to `Dox().initialize()`. It lives in `lib/config/app.dart`.
+This page lists every field, with its type, its default and what it does.
+
+Source: `packages/dox-core/lib/interfaces/app_config.dart`.
+
+## Server
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `appKey` | `String` | required | Encrypts cookies (`req.cookie()`, `DoxCookie`) and signs local storage URLs. In production the app stops at start when it is empty. Make one with `dox key:generate`. |
+| `serverPort` | `int` | `3000` | The port the HTTP server listens on. |
+| `totalIsolate` | `int?` | `Platform.numberOfProcessors` | Isolates (threads) that serve HTTP, all on the same port. On Windows the native server runs on one isolate. |
+| `server` | `ServerBackend` | `ServerBackend.native` | Which HTTP server runs: `native` (Rust, `dox_http_native`) or `dartIo`. The env var `DOX_SERVER` wins over this value. See [Native server](../digging-deeper/native-server.md). |
+| `compress` | `bool` | `false` | gzip responses in Dart (`HttpServer.autoCompress`). It costs CPU on every response. Let a proxy do it when you have one. |
+| `maxBodySize` | `int` | `10 * 1024 * 1024` (10 MB) | Biggest JSON or urlencoded body in bytes. Bigger gets `413`. |
+| `maxMultipartSize` | `int` | `100 * 1024 * 1024` (100 MB) | Biggest `multipart/form-data` body (file uploads) in bytes. Bigger gets `413`. |
+| `trustedProxies` | `List<String>` | `[]` | IPs or CIDR ranges of reverse proxies. Only when the direct client is in this list does Dox read `X-Forwarded-For` for `req.ip()` and `X-Forwarded-Proto` for `req.scheme()`. `['*']` trusts any client. |
+
+## Routing and request handling
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `routers` | `List<Router>` | `[]` | The router classes that register routes. |
+| `globalMiddleware` | `List<dynamic>` | `[]` | Middleware that runs on every route. A function or an `IDoxMiddleware`. |
+| `dtos` | `List<DtoSchema<Object>>` | `[]` | Every DTO of the app: `dtos` from `lib/dtos.g.dart`. Dox finds the DTO of a controller parameter and of `req.validate<T>()` with it. |
+| `validationMessages` | `MessageResolver?` | `null` (English messages) | Messages for validation errors, for example in other languages. |
+| `responseHandler` | `ResponseHandlerInterface?` | `null` | A class with `DoxResponse handle(DoxResponse res)`. It sees every response before it is sent. |
+| `errorHandler` | `Function(Object?, StackTrace)` | `defaultErrorHandler` | Called for every unhandled error. The default logs the error with `Logger.warn` and the stack with `Logger.danger`. |
+| `services` | `List<DoxService>` | `[]` | Classes with a `setup()` method. Dox runs them in every isolate at start. The ORM, auth and WebSocket are set up here. |
+
+## Sub configs
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `cors` | `CORSConfig` | `CORSConfig()` | CORS headers. See [CORSConfig](#corsconfig). |
+| `logger` | `LoggerConfig` | `LoggerConfig()` | The `Logger` output. See [LoggerConfig](#loggerconfig). |
+| `cache` | `CacheConfig` | `file` store in `storage/cache`, plus a `memory` store | Cache stores for `Cache()`. See [CacheConfig](#cacheconfig). |
+| `storage` | `StorageConfig` | `local` disk with root `storage` | Storage disks for `Storage()`. See [StorageConfig](#storageconfig). |
+| `openApi` | `OpenApiConfig` | `OpenApiConfig()` | `/docs`, `/openapi.json` and `/openapi.yaml`. See [OpenApiConfig](#openapiconfig). |
+| `socketIo` | `SocketIoConfig` | `SocketIoConfig()` (off) | Socket.IO on the HTTP port. See [SocketIoConfig](#socketioconfig). |
+
+## CORSConfig
+
+Source: `packages/dox-core/lib/interfaces/app_config.dart`. Headers are set in `packages/dox-core/lib/http/http_cors_handler.dart`.
+
+A value can be a `String` (`'*'` or a comma list) or a `List<String>`. A `null` value sends no header.
+
+| Field | Type | Default | Header |
+| --- | --- | --- | --- |
+| `enabled` | `bool` | `true` | Send CORS headers. A route can override it with its own `cors` setting. |
+| `origin` | `dynamic` | `null` | `Access-Control-Allow-Origin` |
+| `methods` | `dynamic` | `null` | `Access-Control-Allow-Methods` |
+| `headers` | `dynamic` | `null` | `Access-Control-Allow-Headers` |
+| `exposeHeaders` | `dynamic` | `null` | `Access-Control-Expose-Headers` |
+| `credentials` | `bool?` | `null` | `Access-Control-Allow-Credentials` |
+| `maxAge` | `num?` | `null` | `Access-Control-Max-Age` in seconds |
+
+!!! note
+    With the default `CORSConfig()` every value is `null`. So `enabled: true` alone sends no header. Set `origin` at least.
+
+## LoggerConfig
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `name` | `String` | `''` | The `name` field in each JSON log line. |
+| `enabled` | `bool` | `false` | Turn the `Logger` on. |
+| `prettyPrint` | `bool` | `false` | `true` prints colored text. `false` prints one JSON object per line (for log services). |
+| `level` | `String` | `'info'` | Stored, but not read by the logger in this version. |
+
+## CacheConfig
+
+Source: `packages/dox-cache/lib/src/cache_config.dart`. Option keys: `packages/dox-cache/lib/src/constants/cache_constants.dart`.
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `defaultStore` | `String` | required | The store `Cache()` uses when no store is named. |
+| `stores` | `Map<String, Map<String, dynamic>>` | required | Store name to options. Each store needs a `driver` option. |
+
+Options of each driver:
+
+| Driver | Option | Type | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| all | `driver` | `String` | required | `file`, `memory`, `redis` or `null` |
+| all | `prefix` | `String` | `dox_cache:` | Text in front of every key. |
+| `file` | `path` | `String` | `storage/cache` | Folder of the cache files. |
+| `memory` | `max_size` | `int` | no limit | Most items in the map. |
+| `redis` | `host` | `String` | `127.0.0.1` | Redis host. |
+| `redis` | `port` | `int` | `6379` | Redis port. |
+| `redis` | `username` | `String` | none | Redis user. |
+| `redis` | `password` | `String` | none | Redis password. |
+| `redis` | `db` | `int` | `0` | Redis database number. |
+| `redis` | `tls` | `bool` | `false` | Use TLS. |
+| `redis` | `pool_size` | `int` | `10` | Most connections per store. |
+
+## StorageConfig
+
+Source: `packages/dox-core/lib/storage/storage_config.dart`.
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `defaultDisk` | `String` | `'local'` | The disk `Storage()` uses when no disk is named. |
+| `disks` | `Map<String, Map<String, dynamic>>` | `{'local': {'driver': 'local', 'root': 'storage'}}` | Disk name to options. Each disk needs a `driver` option. |
+
+Options of each driver:
+
+| Driver | Option | Type | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| all | `driver` | `String` | required | `local`, `s3` or `memory` |
+| `local` | `root` | `String` | `storage` | Folder of the files. |
+| `local` | `url` | `String` | none | Base of the public URLs, like `http://localhost:3000/files`. |
+| `local` | `app_key` | `String` | `AppConfig.appKey` | Key that signs the URLs. |
+| `local` | `visibility` | `String` | `public` | `public` or `private`. |
+| `s3` | `bucket` | `String` | required | Bucket name. |
+| `s3` | `region` | `String` | `us-east-1` | Region. |
+| `s3` | `key` | `String` | required | Access key id. |
+| `s3` | `secret` | `String` | required | Secret access key. |
+| `s3` | `token` | `String` | none | Session token. |
+| `s3` | `endpoint` | `String` | none | Custom endpoint (R2, MinIO, Spaces). |
+| `s3` | `path_style` | `bool` | `false` | Use path style URLs. |
+| `s3` | `url` | `String` | none | Base of the public URLs. |
+| `s3` | `visibility` | `String` | `private` | `public` or `private`. |
+| `s3` | `acl` | `bool` | `true` | The service supports ACLs. |
+| `s3` | `batch_delete` | `bool` | `true` | The service supports batch delete. |
+
+An unknown driver throws `ArgumentError('Storage disk "<name>" has unknown driver "<type>"')`.
+
+## OpenApiConfig
+
+Source: `packages/dox-core/lib/openapi/openapi_config.dart`.
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `enabled` | `bool?` | `null` | Serve the docs routes. `null` means: on only when `APP_ENV` is `development` or `local`. |
+| `info` | `Info` | `Info(title: 'Dox API', version: '1.0.0')` | Title and version of the API. |
+| `servers` | `List<Server>` | `[]` | Base URLs of the API. |
+| `securitySchemes` | `Map<String, SecurityScheme>` | `{}` | Ways to log in, like `{'bearerAuth': SecurityScheme.bearer()}`. |
+| `securityByMiddleware` | `Map<String, List<Map<String, List<String>>>>` | `{}` | Security for routes that use a middleware class with this name. `AuthMiddleware` gets `bearerAuth` when it is not in the map. |
+| `registry` | `OpenApiRegistry` | `OpenApiRegistry()` (empty) | What `dox_builder` found in the code. Pass `openApiRegistry` from `lib/openapi.g.dart`. |
+| `ui` | `DocsUi` | `DocsUi.scalar` | `scalar` or `swagger`. |
+| `scalar` | `ScalarOptions` | `ScalarOptions()` | Options of the Scalar page. See below. |
+| `pageTitle` | `String?` | `null` (uses `info.title`) | Title of the `/docs` page. |
+
+`ScalarOptions` (`packages/dox-openapi/lib/src/docs_ui.dart`):
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `theme` | `ScalarTheme` | `ScalarTheme.default_` | One of `default_`, `alternate`, `moon`, `purple`, `solarized`, `bluePlanet`, `deepSpace`, `saturn`, `kepler`, `elysiajs`, `fastify`, `mars`, `laserwave`, `none`. |
+| `darkMode` | `bool` | `false` | Start in dark mode. |
+| `showDownloadButton` | `bool` | `true` | Show the download button for the OpenAPI document. |
+| `proxyUrl` | `String?` | `null` | Send "Try it" requests through this proxy. |
+
+## SocketIoConfig
+
+Source: `packages/dox-core/lib/socketio/socket_io_config.dart`.
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `enabled` | `bool` | `false` | Mount Socket.IO on the HTTP port at `/socket.io/`. |
+| `options` | `ServerOptions` | `ServerOptions()` | Engine options. See below. |
+| `namespaces` | `List<NamespaceHandler>` | `[]` | Namespaces to register, like `ChatNamespace()`. |
+| `adapter` | `SocketAdapterFactory?` | `null` (in memory) | Makes the adapter in each isolate. Use a Redis adapter with many isolates. |
+
+`ServerOptions` (`packages/dox-socketio/lib/src/engine/server_options.dart`). The defaults match the Node.js server.
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `path` | `String` | `/socket.io/` | URL path. Must end with `/`. |
+| `pingInterval` | `Duration` | 25 s | Time between two server pings. |
+| `pingTimeout` | `Duration` | 20 s | Time to wait for a pong before the session is closed. |
+| `upgradeTimeout` | `Duration` | 10 s | Time a websocket upgrade may take. |
+| `connectTimeout` | `Duration` | 45 s | Time a client has to join a namespace after the handshake. |
+| `maxHttpBufferSize` | `int` | `1000000` | Biggest message in bytes a client may send. |
+| `transports` | `List<String>` | `['polling', 'websocket']` | Allowed transports. |
+| `allowUpgrades` | `bool` | `true` | Allow upgrades from polling to websocket. |
+| `cors` | `CorsOptions?` | `null` (no CORS headers) | CORS for the long-polling requests. |
+
+`CorsOptions`:
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `origins` | `List<String>` | `['*']` | Allowed origins. |
+| `credentials` | `bool` | `false` | Send `Access-Control-Allow-Credentials: true`. |
+| `methods` | `List<String>` | `['GET', 'POST']` | Allowed methods for preflight. |
+| `allowedHeaders` | `List<String>?` | `null` (the requested headers) | Allowed request headers. |
+| `maxAge` | `Duration?` | `null` | How long a browser may cache the preflight answer. |
+
+## DatabaseConfig
+
+The database is not a field of `AppConfig`. A service calls `SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig)` in its `setup()`.
+Source: `packages/dox-orm/lib/src/types/database_config.dart` and `connection_config.dart`.
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `connection` | `String` | required | Name of the connection to use. A missing name throws `Exception('<name> not found')`. |
+| `connections` | `Map<String, ConnectionConfig>` | required | Connection name to config. |
+
+`ConnectionConfig`:
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `driver` | `Driver` | required | `Driver.postgres`, `Driver.mysql` (also MariaDB) or `Driver.sqlite`. |
+| `host` | `String` | `'localhost'` | Database host. Not used by sqlite. |
+| `port` | `int` | `0` | Database port. Not used by sqlite. |
+| `user` | `String` | `''` | Database user. Not used by sqlite. |
+| `password` | `String` | `''` | Database password. Not used by sqlite. |
+| `database` | `String` | required | Database name. For sqlite: the file path, or `:memory:`. |
+| `useSSL` | `bool` | `false` | Use TLS. Postgres with TLS uses the Dart driver, not the native one. |
+| `debug` | `bool` | required | Print every query with `printer`. |
+| `printer` | `QueryPrinter?` | `null` | `ConsoleQueryPrinter()`, `PrettyQueryPrinter()`, `FileQueryPrinter()` or your own. |
+| `extra` | `Map<String, dynamic>` | `{}` | Driver options. See below. |
+| `driverFactory` | `DBDriver Function(ConnectionConfig)?` | `null` | Your own driver class. It wins over every other setting. |
+
+Keys of `extra`:
+
+| Driver | Key | Type | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| postgres, mysql | `native` | `bool` | `true` | `false` uses the Dart driver instead of the native (Rust) one. |
+| postgres, mysql | `maxConnectionCount` | `int` | `10` | Most open connections. |
+| postgres, mysql | `preparedStatementCacheSize` | `int` | `100` | Prepared statements kept per connection. |
+| postgres | `sslMode` | postgres `SslMode` | none | Setting it uses the Dart driver. |
+| mysql | `collation` | `String` | `utf8mb4_general_ci` | Connection collation. |
+| mysql | `timeoutMs` | `int` | `10000` | Connect timeout. |
+| mysql | `allowPublicKeyRetrieval` | `bool` | `true` | Ask the server for its RSA key (needed for `caching_sha2_password` without TLS). |
+| mysql | `serverPublicKey` | `String` | none | The server RSA key, so it is not asked for. |
+| mysql | `timeZone` | `String` | none | Session time zone. |
+| mysql | `maxConnectionAge` | `Duration` | 12 hours | Close and reopen a connection after this time. |
+| sqlite | `busyTimeout` | `int` | `5000` | `PRAGMA busy_timeout` in milliseconds. |
+
+## AuthConfig
+
+Auth is not a field of `AppConfig`. A service calls `Auth.initialize(AuthConfig(...))` in its `setup()`.
+Source: `packages/dox-auth/lib/src/interfaces.dart`.
+
+| Class | Field | Type | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `AuthConfig` | `defaultGuard` | `String` | required | The guard `Auth()` uses when no guard is named. |
+| `AuthConfig` | `guards` | `Map<String, AuthGuard>` | `{}` | Guard name to guard. |
+| `AuthGuard` | `driver` | `AuthDriver` | required | How a token is made and checked, like `JwtAuthDriver(secret: SecretKey(...))`. |
+| `AuthGuard` | `provider` | `AuthProvider` | required | Where users come from. |
+| `AuthProvider` | `model` | `dynamic Function()` | required | Makes the user model, like `() => User()`. |
+| `AuthProvider` | `identifierFields` | `List<String>` | `['email']` | Columns `attempt()` matches the login with. |
+| `AuthProvider` | `passwordField` | `String` | `'password'` | Column with the bcrypt hash. |
+
+## Full example
+
+This is the `lib/config/app.dart` of a new project. The sub configs live in their own files in `lib/config/`.
+
+```dart title="lib/config/app.dart"
+import 'package:my_app/app/http/handler.dart';
+import 'package:my_app/config/cache.dart';
+import 'package:my_app/config/cors.dart';
+import 'package:my_app/config/env.dart';
+import 'package:my_app/config/logger.dart';
+import 'package:my_app/config/openapi.dart';
+import 'package:my_app/config/services.dart';
+import 'package:my_app/config/socketio.dart';
+import 'package:my_app/config/storage.dart';
+import 'package:my_app/dtos.g.dart';
+import 'package:my_app/routes/api.dart';
+import 'package:my_app/routes/web.dart';
+import 'package:my_app/routes/websocket.dart';
+import 'package:dox_core/dox_core.dart';
+
+AppConfig appConfig = AppConfig(
+  /// Encrypts cookies and cache. Keep APP_KEY secret.
+  appKey: env.appKey,
+
+  /// The port the server listens on.
+  serverPort: env.appPort,
+
+  /// Isolates that serve http. Default: one per CPU core.
+  totalIsolate: env.appTotalIsolate,
+
+  /// Every @Dto class, from lib/dtos.g.dart.
+  dtos: dtos,
+
+  /// Middleware for every route.
+  globalMiddleware: <dynamic>[LogMiddleware(enabled: true)],
+
+  /// The routers that register routes.
+  routers: <Router>[WebRouter(), ApiRouter(), WebsocketRouter()],
+
+  /// Sees every response before it is sent.
+  responseHandler: ResponseHandler(),
+
+  /// Cache stores (config/cache.dart).
+  cache: cache,
+
+  /// Storage disks (config/storage.dart).
+  storage: storage,
+
+  /// OpenAPI docs at /docs (config/openapi.dart).
+  openApi: openApi,
+
+  /// Socket.IO on the app port (config/socketio.dart).
+  socketIo: socketIo,
+
+  /// CORS headers (config/cors.dart).
+  cors: cors,
+
+  /// Services that run in every isolate (ORM, auth, websocket).
+  services: services,
+
+  /// Logger output (config/logger.dart).
+  logger: logger,
+);
+```
+
+The sub config files, with the values a new project ships:
+
+```dart title="lib/config/cors.dart"
+import 'package:dox_core/dox_core.dart';
+
+CORSConfig cors = CORSConfig(
+  enabled: false,
+  origin: '*',
+  methods: '*',
+  headers: '*',
+  exposeHeaders: <String>[
+    'cache-control',
+    'content-language',
+    'content-type',
+    'expires',
+    'last-modified',
+    'pragma',
+  ],
+  credentials: true,
+  maxAge: 90,
+);
+```
+
+```dart title="lib/config/cache.dart"
+import 'package:my_app/config/env.dart';
+import 'package:dox_core/dox_core.dart';
+
+CacheConfig cache = CacheConfig(
+  defaultStore: env.cacheStore,
+  stores: <String, Map<String, dynamic>>{
+    'file': <String, dynamic>{'driver': 'file', 'path': 'storage/cache'},
+    'memory': <String, dynamic>{'driver': 'memory', 'max_size': 10000},
+    'redis': <String, dynamic>{
+      'driver': 'redis',
+      'host': env.redisHost,
+      'port': env.redisPort,
+      'db': env.redisDb,
+      'password': env.redisPassword,
+      'prefix': '${env.appName}_cache:',
+    },
+  },
+);
+```
+
+```dart title="lib/config/storage.dart"
+import 'package:my_app/config/env.dart';
+import 'package:dox_core/dox_core.dart';
+
+StorageConfig storage = StorageConfig(
+  defaultDisk: env.storageDisk,
+  disks: <String, Map<String, dynamic>>{
+    'local': <String, dynamic>{
+      'driver': 'local',
+      'root': 'storage',
+      'url': '${env.appUrl}/files',
+    },
+    if (env.awsBucket != null)
+      's3': <String, dynamic>{
+        'driver': 's3',
+        'bucket': env.awsBucket,
+        'region': env.awsDefaultRegion,
+        'key': env.awsAccessKeyId,
+        'secret': env.awsSecretAccessKey,
+        'endpoint': env.awsEndpoint,
+      },
+  },
+);
+```
+
+```dart title="lib/config/openapi.dart"
+import 'package:my_app/openapi.g.dart';
+import 'package:my_app/config/env.dart';
+import 'package:dox_core/dox_core.dart';
+
+OpenApiConfig openApi = OpenApiConfig(
+  info: Info(title: env.appName, version: '1.0.0'),
+  registry: openApiRegistry,
+);
+```
+
+```dart title="lib/config/logger.dart"
+import 'package:my_app/config/env.dart';
+import 'package:dox_core/dox_core.dart';
+
+LoggerConfig logger = LoggerConfig(
+  name: env.appName,
+  enabled: true,
+  level: env.logLevel,
+  prettyPrint: env.appEnv == 'development',
+);
+```
+
+```dart title="lib/config/socketio.dart"
+import 'package:my_app/app/socket/chat.namespace.dart';
+import 'package:my_app/config/redis.dart';
+import 'package:my_app/config/env.dart';
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_socketio/dox_socketio.dart';
+
+SocketIoConfig socketIo = SocketIoConfig(
+  enabled: env.socketioEnabled,
+  namespaces: <NamespaceHandler>[ChatNamespace()],
+  adapter: const RedisSocketAdapterFactory(),
+);
+
+class RedisSocketAdapterFactory extends SocketAdapterFactory {
+  const RedisSocketAdapterFactory();
+
+  @override
+  Adapter create() {
+    return RedisAdapter(subscriber: redis.duplicate(), publisher: redis);
+  }
+}
+```
+
+```dart title="lib/config/database.dart"
+import 'package:my_app/config/env.dart';
+import 'package:dox_orm/dox_orm.dart';
+
+DatabaseConfig databaseConfig = DatabaseConfig(
+  connection: env.dbConnection,
+  connections: <String, ConnectionConfig>{
+    'postgres': ConnectionConfig(
+      driver: Driver.postgres,
+      host: env.dbHost,
+      port: env.dbPort ?? 5432,
+      user: env.dbUsername ?? 'postgres',
+      password: env.dbPassword ?? 'postgres',
+      database: env.dbName ?? 'dox',
+      extra: <String, dynamic>{
+        'maxConnectionCount': 10,
+        'maxConnectionAge': Duration(hours: 1),
+      },
+      debug: true,
+      printer: ConsoleQueryPrinter(),
+    ),
+    'mysql': ConnectionConfig(
+      driver: Driver.mysql,
+      host: env.dbHost,
+      port: env.dbPort ?? 3306,
+      user: env.dbUsername ?? 'root',
+      password: env.dbPassword ?? 'password',
+      database: env.dbName ?? 'dox',
+      extra: <String, dynamic>{'collation': 'utf8mb4_general_ci'},
+      debug: true,
+      printer: ConsoleQueryPrinter(),
+    ),
+    'sqlite': ConnectionConfig(
+      driver: Driver.sqlite,
+      database: env.dbName ?? 'dox.sqlite',
+      debug: true,
+      printer: ConsoleQueryPrinter(),
+    ),
+  },
+);
+```
+
+```dart title="lib/config/services.dart"
+import 'package:my_app/services/auth_service.dart';
+import 'package:my_app/services/orm_service.dart';
+import 'package:my_app/services/websocket_service.dart';
+import 'package:dox_core/dox_core.dart';
+
+List<DoxService> services = <DoxService>[
+  ORMService(),
+  AuthService(),
+  WebsocketService(),
+];
+```
+
+```dart title="lib/services/orm_service.dart"
+import 'package:my_app/config/database.dart';
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_orm/dox_orm.dart';
+
+class ORMService implements DoxService {
+  @override
+  Future<void> setup() async {
+    SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
+  }
+}
+```
+
+```dart title="lib/services/auth_service.dart"
+import 'package:my_app/app/models/user/user.model.dart';
+import 'package:my_app/config/env.dart';
+import 'package:dox_auth/dox_auth.dart';
+import 'package:dox_core/dox_core.dart';
+
+class AuthService implements DoxService {
+  @override
+  void setup() {
+    Auth.initialize(
+      AuthConfig(
+        defaultGuard: 'web',
+        guards: <String, AuthGuard>{
+          'web': AuthGuard(
+            driver: JwtAuthDriver(secret: SecretKey(env.appKey)),
+            provider: AuthProvider(model: () => User()),
+          ),
+        },
+      ),
+    );
+  }
+}
+```

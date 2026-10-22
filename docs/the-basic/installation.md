@@ -31,12 +31,26 @@ dox version
 dox create new_blog
 ```
 
-`dox create` downloads the latest release of [dox-sample](https://github.com/dartondox/dox-sample).
+`dox create` downloads the newest 3.x release of
+[dox-sample](https://github.com/dartondox/dox-sample), the starter project.
 To get one exact version, add `--version`:
 
 ```bash
-dox create new_blog --version v2.0.1
+dox create new_blog --version 3.0.0-alpha.4
 ```
+
+Then get the packages and make your `.env` file:
+
+```bash
+cd new_blog
+dart pub get
+cp .env.example .env
+```
+
+The starter project uses SQLite, so there is no database to install.
+The file `db/dox.sqlite` is created at the first start.
+To use Postgres or MySQL instead, change `DB_CONNECTION` and the `DB_*`
+values in `.env`. See [Database](../database/index.md).
 
 !!! info "Use 3.x in an existing project"
     Set every Dox package in `pubspec.yaml` to `^3.0.0-alpha.4`.
@@ -67,7 +81,17 @@ dox s
 To skip the builder, use `dox s --ignore-build-runner`.
 To start the server without the CLI, run `dart run bin/server.dart`.
 
-The server uses the port in `APP_PORT` in the `.env` file.
+At the first start it also runs the migrations in `db/migration`.
+The server uses the port in `APP_PORT` in the `.env` file (`3000` by default).
+Check it:
+
+```bash
+curl localhost:3000/ping
+```
+
+```text
+pong
+```
 
 ## Start the server with Docker
 
@@ -84,17 +108,10 @@ docker-compose up -d --build
 Dox makes code for models and DTOs with `build_runner`.
 `dox s` already runs it. To run it alone:
 
-=== "Watch"
-
-    ```bash
-    dox build_runner:watch
-    ```
-
-=== "Build once"
-
-    ```bash
-    dox build_runner:build
-    ```
+```bash
+dox build_runner:watch   # runs again on every file change
+dox build_runner:build   # runs once
+```
 
 ## Packages
 

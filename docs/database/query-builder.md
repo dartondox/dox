@@ -11,23 +11,17 @@ It works on Postgres, MySQL/MariaDB and SQLite.
 
 There are two ways to start a query.
 
-=== "With a model"
+```dart
+// with a model: the result is a list of Actor models
+List<Actor> actors = await Actor().where('age', '>=', 23).get();
 
-    ```dart
-    List<Actor> actors = await Actor().where('age', '>=', 23).get();
-    ```
+// with a table name: the result is a list of maps, one map per row
+List<Map<String, dynamic>> rows = await QueryBuilder.table('actor')
+    .where('age', '>=', 23)
+    .get();
+```
 
-    The result is a list of `Actor` models. See [Models](model/index.md).
-
-=== "With a table name"
-
-    ```dart
-    List<Map<String, dynamic>> rows = await QueryBuilder.table('actor')
-        .where('age', '>=', 23)
-        .get();
-    ```
-
-    The result is a list of maps, one map per row.
+See [Models](model/index.md) for the model way.
 
 The examples on this page use an `Actor` model on the table `actor`.
 The SQL in the examples is for Postgres. MySQL quotes names with `` ` `` instead of `"`.
@@ -61,19 +55,15 @@ List<Actor> actors = await Actor().all();
 
 Returns one row, or `null` when there is no match.
 
-=== "By primary key"
+```dart
+// by primary key
+Actor? actor = await Actor().find(1);
+// SELECT * FROM "actor" WHERE "id" = @id_p0 LIMIT 1
 
-    ```dart
-    Actor? actor = await Actor().find(1);
-    // SELECT * FROM "actor" WHERE "id" = @id_p0 LIMIT 1
-    ```
-
-=== "By another column"
-
-    ```dart
-    Actor? actor = await Actor().find('name', 'John Wick');
-    // SELECT * FROM "actor" WHERE "name" = @name_p0 LIMIT 1
-    ```
+// by another column
+Actor? byName = await Actor().find('name', 'John Wick');
+// SELECT * FROM "actor" WHERE "name" = @name_p0 LIMIT 1
+```
 
 ### `getFirst`
 
@@ -119,27 +109,20 @@ So you can return a `Pagination` from a controller.
 
 ### `where`
 
-=== "Equal"
+```dart
+// equal
+await Actor().where('name', 'John Wick').get();
+// WHERE "name" = @name_p0
 
-    ```dart
-    await Actor().where('name', 'John Wick').get();
-    // WHERE "name" = @name_p0
-    ```
+// other operator
+await Actor().where('age', '>=', 23).get();
+await Actor().where('name', '!=', 'John Wick').get();
+await Actor().where('name', 'like', 'John%').get();
 
-=== "Other operator"
-
-    ```dart
-    await Actor().where('age', '>=', 23).get();
-    await Actor().where('name', '!=', 'John Wick').get();
-    await Actor().where('name', 'like', 'John%').get();
-    ```
-
-=== "Null"
-
-    ```dart
-    await Actor().where('deleted_at', null).get();
-    // WHERE "deleted_at" IS NULL
-    ```
+// null
+await Actor().where('deleted_at', null).get();
+// WHERE "deleted_at" IS NULL
+```
 
 Many `where` calls are joined with `AND`.
 
@@ -200,32 +183,21 @@ await Actor()
 
 `select` sets the columns. Each call replaces the columns of the call before.
 
-=== "List"
+```dart
+// a list
+await Actor().select(<String>['id', 'name']).get();
+// SELECT "id","name" FROM "actor"
 
-    ```dart
-    await Actor().select(<String>['id', 'name']).get();
-    // SELECT "id","name" FROM "actor"
-    ```
+// comma separated
+await Actor().select('id, name, age').get();
 
-=== "Comma separated"
+// with a function
+await Actor().select('count(*) as total, name').groupBy('name').get();
+// SELECT count(*) as total,"name" FROM "actor" GROUP BY "name"
 
-    ```dart
-    await Actor().select('id, name, age').get();
-    ```
-
-=== "With a function"
-
-    ```dart
-    await Actor().select('count(*) as total, name').groupBy('name').get();
-    // SELECT count(*) as total,"name" FROM "actor" GROUP BY "name"
-    ```
-
-=== "Raw"
-
-    ```dart
-    // nothing is quoted
-    await Actor().selectRaw('DISTINCT name').get();
-    ```
+// raw: nothing is quoted
+await Actor().selectRaw('DISTINCT name').get();
+```
 
 A part with `(` is kept as it is. Other parts are quoted.
 

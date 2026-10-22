@@ -37,35 +37,13 @@ The leading `/` in a path is optional. `'ping'` and `'/ping'` are the same route
 
 ## Route methods
 
-=== "GET"
-
-    ```dart
-    Route.get('/blogs', controller.index);
-    ```
-
-=== "POST"
-
-    ```dart
-    Route.post('/blogs', controller.store);
-    ```
-
-=== "PUT"
-
-    ```dart
-    Route.put('/blogs/{id}', controller.update);
-    ```
-
-=== "PATCH"
-
-    ```dart
-    Route.patch('/blogs/{id}', controller.update);
-    ```
-
-=== "DELETE"
-
-    ```dart
-    Route.delete('/blogs/{id}', controller.destroy);
-    ```
+```dart
+Route.get('/blogs', controller.index);
+Route.post('/blogs', controller.store);
+Route.put('/blogs/{id}', controller.update);
+Route.patch('/blogs/{id}', controller.update);
+Route.delete('/blogs/{id}', controller.destroy);
+```
 
 !!! info
     There are also `Route.options`, `Route.copy`, `Route.view`, `Route.link`, `Route.unlink`,
@@ -75,32 +53,25 @@ The leading `/` in a path is optional. `'ping'` and `'/ping'` are the same route
 
 The second argument is the code that answers the request. It can be:
 
-=== "Function"
+```dart
+// a function
+Route.get('/ping', (DoxRequest req) => 'pong');
 
-    ```dart
-    Route.get('/ping', (DoxRequest req) => 'pong');
-    ```
+// a controller method
+WebController webController = WebController();
+Route.get('/ping', webController.pong);
 
-=== "Controller method"
+class WebController {
+  String pong(DoxRequest req) {
+    return 'pong';
+  }
+}
 
-    ```dart
-    WebController webController = WebController();
-    Route.get('/ping', webController.pong);
+// a list: middleware first, the controller last
+Route.get('/ping', <dynamic>[LoggerMiddleware(), webController.pong]);
+```
 
-    class WebController {
-      String pong(DoxRequest req) {
-        return 'pong';
-      }
-    }
-    ```
-
-=== "List with middleware"
-
-    ```dart
-    Route.get('/ping', <dynamic>[LoggerMiddleware(), webController.pong]);
-    ```
-
-    The last item is the controller. The items before it are [middleware](middleware.md).
+In a list, the last item is the controller. The items before it are [middleware](middleware.md).
 
 See [Controller](controller.md) for the parameters a handler can ask for.
 
@@ -143,33 +114,24 @@ Route.get('/docs/{page*}', (String page) {
 
 ## Group routes
 
-=== "Prefix"
+```dart
+// by prefix
+Route.group('/blogs', () {
+  Route.get('/', controller.index);     // GET /blogs
+  Route.get('/{id}', controller.show);  // GET /blogs/{id}
+});
 
-    ```dart
-    Route.group('/blogs', () {
-      Route.get('/', controller.index);     // GET /blogs
-      Route.get('/{id}', controller.show);  // GET /blogs/{id}
-    });
-    ```
+// by domain: these routes match only when the Host header is dartondox.com
+Route.domain('dartondox.com', () {
+  Route.get('/ping', controller.ping);
+});
 
-=== "Domain"
-
-    ```dart
-    Route.domain('dartondox.com', () {
-      Route.get('/ping', controller.ping);
-    });
-    ```
-
-    These routes match only when the `Host` header is `dartondox.com`.
-
-=== "Middleware"
-
-    ```dart
-    Route.middleware(<dynamic>[AuthMiddleware()], () {
-      Route.get('/me', controller.me);
-      Route.post('/logout', controller.logout);
-    });
-    ```
+// by middleware
+Route.middleware(<dynamic>[AuthMiddleware()], () {
+  Route.get('/me', controller.me);
+  Route.post('/logout', controller.logout);
+});
+```
 
 !!! warning "Start group paths with `/`"
     `Route.group` joins the text as it is. `Route.group('blogs', ...)` with `Route.get('all', ...)`

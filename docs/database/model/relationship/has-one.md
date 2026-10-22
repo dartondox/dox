@@ -8,41 +8,37 @@ The other table keeps the foreign key (`user_info.user_id`).
 
 Add a field with `@HasOne(...)` to the model. The field type is the related model, nullable.
 
-=== "User"
+```dart title="lib/app/models/user/user.model.dart"
+import 'package:dox_orm/dox_orm.dart';
 
-    ```dart title="lib/app/models/user/user.model.dart"
-    import 'package:dox_orm/dox_orm.dart';
+import '../user_info/user_info.model.dart';
 
-    import '../user_info/user_info.model.dart';
+part 'user.model.g.dart';
 
-    part 'user.model.g.dart';
+@DoxModel()
+class User extends UserGenerator {
+  @Column()
+  String? name;
 
-    @DoxModel()
-    class User extends UserGenerator {
-      @Column()
-      String? name;
+  @HasOne(UserInfo)
+  UserInfo? userInfo;
+}
+```
 
-      @HasOne(UserInfo)
-      UserInfo? userInfo;
-    }
-    ```
+```dart title="lib/app/models/user_info/user_info.model.dart"
+import 'package:dox_orm/dox_orm.dart';
 
-=== "UserInfo"
+part 'user_info.model.g.dart';
 
-    ```dart title="lib/app/models/user_info/user_info.model.dart"
-    import 'package:dox_orm/dox_orm.dart';
+@DoxModel()
+class UserInfo extends UserInfoGenerator {
+  @Column()
+  int? userId; // column user_id
 
-    part 'user_info.model.g.dart';
-
-    @DoxModel()
-    class UserInfo extends UserInfoGenerator {
-      @Column()
-      int? userId; // column user_id
-
-      @Column()
-      String? address;
-    }
-    ```
+  @Column()
+  String? address;
+}
+```
 
 Run `dart run build_runner build` after you add a relationship.
 
@@ -51,48 +47,54 @@ Run `dart run build_runner build` after you add a relationship.
 The relation is not loaded by default. Load it in one of these ways.
 Use the field name (`'userInfo'`) as the relation name.
 
-=== "preload"
+### `preload`
 
-    ```dart
-    User? user = await User().preload('userInfo').find(1);
-    print(user?.userInfo?.address);
-    ```
+Use it when you load the models with a query.
 
-    `preload` works with `find`, `get`, `all` and `getFirst`.
-    For a list of users, it runs one query for all of them.
+```dart
+User? user = await User().preload('userInfo').find(1);
+print(user?.userInfo?.address);
+```
 
-=== "$getRelation"
+`preload` works with `find`, `get`, `all` and `getFirst`.
+For a list of users, it runs one query for all of them.
 
-    ```dart
-    User? user = await User().find(1);
-    await user?.$getRelation('userInfo');
-    print(user?.userInfo?.address);
-    ```
+### `$getRelation`
 
-    Use it when you already have the model.
+Use it when you already have the model.
 
-=== "related"
+```dart
+User? user = await User().find(1);
+await user?.$getRelation('userInfo');
+print(user?.userInfo?.address);
+```
 
-    ```dart
-    User? user = await User().find(1);
-    UserInfo? info = await user
-        ?.related<UserInfo>('userInfo')
-        ?.where('address', '!=', '')
-        .getFirst();
-    ```
+### `related`
 
-    `related` gives a query. You can add more conditions before you run it.
-    It does not set `user.userInfo`.
+Use it when you need more conditions on the related row.
 
-=== "eager"
+```dart
+User? user = await User().find(1);
+UserInfo? info = await user
+    ?.related<UserInfo>('userInfo')
+    ?.where('address', '!=', '')
+    .getFirst();
+```
 
-    ```dart
-    @HasOne(UserInfo, eager: true)
-    UserInfo? userInfo;
-    ```
+`related` gives a query. You can add more conditions before you run it.
+It does not set `user.userInfo`.
 
-    With `eager: true`, every query of `User` loads the relation.
-    You do not call `preload`.
+### `eager`
+
+Use it when every query of `User` should load the relation.
+
+```dart
+@HasOne(UserInfo, eager: true)
+UserInfo? userInfo;
+```
+
+With `eager: true`, every query of `User` loads the relation.
+You do not call `preload`.
 
 The load runs this SQL:
 
