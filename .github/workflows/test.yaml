@@ -49,9 +49,15 @@ jobs:
           - { name: 'small packages', packages: 'dox-annotation dox-auth dox-openapi dox-validation dox-http-native' }
           - { name: 'redis (cache, socketio, websocket)', packages: 'dox-cache dox-socketio dox-websocket', services: redis }
           - { name: 'storage (minio)', packages: dox-storage, services: minio }
-          - { name: 'orm (postgres)', packages: dox-orm, vars: DRIVER=postgres DB_PORT=5432, services: postgres }
-          - { name: 'orm (mariadb)', packages: dox-orm, vars: DRIVER=mysql DB_USER=dox DB_PORT=3306, services: mariadb }
-          - { name: 'orm (mysql 8.4)', packages: dox-orm, vars: DRIVER=mysql DB_USER=dox DB_PORT=3307, services: mysql84 }
+          # the default database drivers are native (dox_postgres_native and
+          # dox_mysql_native, built by their build hooks with cargo).
+          # DOX_DB_DRIVER=dart runs the same tests on the Dart drivers.
+          - { name: 'orm (postgres)', packages: dox-orm dox-postgres-native, vars: DRIVER=postgres DB_PORT=5432, services: postgres }
+          - { name: 'orm (postgres, dart driver)', packages: dox-orm, vars: DRIVER=postgres DB_PORT=5432 DOX_DB_DRIVER=dart, services: postgres }
+          - { name: 'orm (mariadb)', packages: dox-orm dox-mysql-native, vars: DRIVER=mysql DB_USER=dox DB_PORT=3306, services: mariadb }
+          - { name: 'orm (mariadb, dart driver)', packages: dox-orm, vars: DRIVER=mysql DB_USER=dox DB_PORT=3306 DOX_DB_DRIVER=dart, services: mariadb }
+          - { name: 'orm (mysql 8.4)', packages: dox-orm dox-mysql-native, vars: DRIVER=mysql DB_USER=dox DB_PORT=3307, services: mysql84 }
+          - { name: 'orm (mysql 8.4, dart driver)', packages: dox-orm, vars: DRIVER=mysql DB_USER=dox DB_PORT=3307 DOX_DB_DRIVER=dart, services: mysql84 }
           # sqlite3 v3 bundles SQLite with a build hook. No system library needed.
           - { name: 'orm (sqlite)', packages: dox-orm, vars: DRIVER=sqlite }
           # the migration tests run on postgres, mysql and sqlite in one run
@@ -100,6 +106,15 @@ jobs:
           path: ~/.pub-cache
           key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
           restore-keys: pub-${{ runner.os }}-
+      # The build hooks of the native packages run `cargo build` (no release
+      # binaries yet). The runner has Rust. This keeps the cargo builds.
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            packages/dox-http-native/native -> ../../../.dart_tool/hooks_runner/shared/dox_http_native/build/cargo
+            packages/dox-postgres-native/native -> ../../../.dart_tool/hooks_runner/shared/dox_postgres_native/build/cargo
+            packages/dox-mysql-native/native -> ../../../.dart_tool/hooks_runner/shared/dox_mysql_native/build/cargo
+      - run: cargo --version
       - run: dart pub get
       - name: Copy .env.example to .env of app and cli
         run: |

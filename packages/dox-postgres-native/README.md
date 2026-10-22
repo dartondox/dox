@@ -1,6 +1,7 @@
 # dox_postgres_native
 
-A fast Postgres driver for Dart and the [Dox](https://dartondox.dev) ORM.
+A fast Postgres client for Dart. It is the default Postgres driver of the
+[Dox](https://dartondox.dev) ORM.
 Rust ([tokio-postgres](https://docs.rs/tokio-postgres)) owns the
 connections. Your code stays in Dart.
 
@@ -25,14 +26,8 @@ void main() async {
 }
 ```
 
-With the Dox ORM:
-
-```dart
-SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
-SqlQueryBuilder().dbDriver = PostgresNativeDriver.fromConfig(
-  databaseConfig.getConnectionConfig(),
-);
-```
+With the Dox ORM you do not add this package. `dox_orm` depends on it and
+uses it by default. Set `DOX_DB_DRIVER=dart` to use the Dart driver.
 
 - The build hook downloads a ready-built library when one exists for your
   system. Else it builds it with `cargo` (install Rust with rustup).

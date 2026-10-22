@@ -1,8 +1,8 @@
 # Native Postgres driver
 
-`dox_postgres_native` is a faster Postgres driver for the Dox ORM.
+`dox_postgres_native` is the default Postgres driver of the Dox ORM.
 Rust talks to the database. Your models, queries and transactions stay the
-same. You change one line of config.
+same. You do not change any config.
 
 - Rust ([tokio-postgres](https://docs.rs/tokio-postgres)) owns the
   connections and the pool.
@@ -14,7 +14,8 @@ same. You change one line of config.
   are the same `ServerException` classes.
 
 !!! warning "Alpha"
-    This driver is new. The default Dart driver is still the safe choice.
+    This driver is new. If you see a problem, [use the Dart driver](#use-the-dart-driver)
+    and tell us.
 
 ## Speed
 
@@ -33,6 +34,9 @@ server.
 
 ## Install
 
+`dox_orm` depends on `dox_postgres_native`. You do not add it yourself.
+Add it only to use `PgNativePool` without the ORM:
+
 ```bash
 dart pub add dox_postgres_native
 ```
@@ -45,27 +49,46 @@ then you need [Rust](https://rustup.rs).
 Use `dart run`, `dart test` or `dart build cli`. `dart compile exe` does not
 run build hooks.
 
-## Use it with the ORM
+## Native is the default
 
-Keep your Postgres `ConnectionConfig` as it is. Start the ORM like before,
-then put the native driver in place of the Dart one:
+You do not change any config. The ORM picks the driver like this:
 
-```dart
-import 'package:dox_postgres_native/dox_postgres_native.dart';
+1. `driverFactory` is set: the ORM uses your driver. It wins over
+   everything below.
+2. You ask for the Dart driver (see below): the ORM uses the Dart driver.
+3. The native library loads: the ORM uses the native driver.
+4. The native library does not load (no library for your system, no
+   Rust to build it, or a load error): the ORM uses the Dart driver. It
+   prints one warning line to stderr, like this:
 
-class ORMService implements DoxService {
-  @override
-  Future<void> setup() async {
-    SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
-    SqlQueryBuilder().dbDriver = PostgresNativeDriver.fromConfig(
-      databaseConfig.getConnectionConfig(),
-    );
-  }
-}
+```text
+[dox] warning: dox_postgres_native did not load, using the Dart postgres driver (...)
 ```
 
-That is all. `Model`, the query builder, `transaction()` and `Schema` now
-run on the native driver.
+Named connections (`Model.connection('x')`, `withConnection('x')`) follow
+the same rules.
+
+## Use the Dart driver
+
+For all connections, set the env var:
+
+```bash
+DOX_DB_DRIVER=dart dart run bin/server.dart
+```
+
+For one connection, set `native: false` in `extra`:
+
+```dart
+ConnectionConfig(
+  driver: Driver.postgres,
+  // ... host, user, password, database as before
+  extra: <String, dynamic>{'native': false},
+  debug: false,
+),
+```
+
+Postgres with TLS (`useSSL: true` or `extra['sslMode']`) always uses the
+Dart driver, because the native driver has no TLS yet.
 
 ## Options
 
@@ -81,7 +104,7 @@ The driver reads these keys from `extra` of the `ConnectionConfig`:
 Each isolate that runs `setup()` makes its own pool. To share one pool
 between isolates, give `driver.pool.handle` (an `int`) to the other
 isolates and use `PostgresNativeDriver(PgNativePool.fromHandle(handle))`
-there.
+there. `PostgresNativeDriver` comes from `package:dox_orm/dox_orm.dart`.
 
 ## Use it without the ORM
 
@@ -138,7 +161,7 @@ throw `PgException`.
 
 ## Not yet
 
-- SSL. `useSSL: true` throws. Use the Dart driver for SSL for now.
+- SSL. A connection with `useSSL: true` uses the Dart driver.
 - `maxConnectionAge`, `queryTimeout` and the other `extra` keys of the Dart
   driver are not read.
 - A nested `transaction()` joins the outer one, like the Dart driver

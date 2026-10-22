@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:dox_orm/dox_orm.dart';
-import 'package:dox_postgres_native/src/pool.dart';
+import 'package:dox_postgres_native/dox_postgres_native.dart';
 
 /// zone key to find the open transaction of a pool
 const Symbol _txKey = #doxPostgresNativeTransaction;
 
-/// The Dox ORM driver on [PgNativePool]. It acts like the built-in
-/// postgres driver: the same SQL, values and exceptions.
+/// The default Dox ORM driver for Postgres, on [PgNativePool]
+/// (dox_postgres_native). It acts like the Dart postgres driver: the same
+/// SQL, values and exceptions.
 class PostgresNativeDriver extends DBDriver {
   PostgresNativeDriver(this.pool);
 
@@ -50,21 +51,21 @@ class PostgresNativeDriver extends DBDriver {
     String query, {
     String? primaryKey,
     Map<String, dynamic>? substitutionValues,
-  }) async {
-    PgNativeResult result = await pool.query(
-      query,
-      parameters: substitutionValues,
-      transaction: _tx,
-    );
-    return result.rows;
+  }) {
+    // no async/await here: one `then` is less work per query
+    return pool
+        .query(query, parameters: substitutionValues, transaction: _tx)
+        .then(_rows);
   }
+
+  static List<Map<String, dynamic>> _rows(PgNativeResult result) => result.rows;
 
   @override
   Future<void> execute(
     String query, {
     Map<String, dynamic>? substitutionValues,
-  }) async {
-    await pool.query(query, parameters: substitutionValues, transaction: _tx);
+  }) {
+    return pool.query(query, parameters: substitutionValues, transaction: _tx);
   }
 
   @override

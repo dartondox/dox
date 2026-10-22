@@ -2,14 +2,15 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:dox_mysql_native/src/pool.dart';
+import 'package:dox_mysql_native/dox_mysql_native.dart';
 import 'package:dox_orm/dox_orm.dart';
 
 /// zone key to find the open transaction of a pool
 const Symbol _txKey = #doxMysqlNativeTransaction;
 
-/// The Dox ORM driver on [MysqlNativePool]. It acts like the built-in
-/// mysql driver (mysql_dart): the same SQL, values and exceptions.
+/// The default Dox ORM driver for MySQL and MariaDB, on [MysqlNativePool]
+/// (dox_mysql_native). It acts like the Dart mysql driver (mysql_dart):
+/// the same SQL, values and exceptions.
 class MysqlNativeDriver extends DBDriver {
   MysqlNativeDriver(this.pool);
 
@@ -17,11 +18,6 @@ class MysqlNativeDriver extends DBDriver {
   /// `maxConnectionCount` (default 10), `maxConnectionAge` (default 12
   /// hours), `preparedStatementCacheSize` (default 100) and `threads`
   /// (default 1) from `extra`. `useSSL` turns on TLS.
-  ///
-  /// Use it as the driver of a connection:
-  /// ```
-  /// driverFactory: MysqlNativeDriver.fromConfig,
-  /// ```
   factory MysqlNativeDriver.fromConfig(ConnectionConfig config) {
     Map<String, dynamic> extra = config.extra;
     return MysqlNativeDriver(
@@ -88,8 +84,8 @@ class MysqlNativeDriver extends DBDriver {
   Future<void> execute(
     String query, {
     Map<String, dynamic>? substitutionValues,
-  }) async {
-    await _run(query, substitutionValues, false);
+  }) {
+    return _run(query, substitutionValues, false);
   }
 
   /// one pooled connection runs the whole transaction.

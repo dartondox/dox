@@ -39,15 +39,16 @@ class ConnectionConfig {
 
   /// extra configuration for the connection
   /// eg. `maxConnectionCount` for postgres and mysql,
-  /// `busyTimeout` for sqlite
+  /// `busyTimeout` for sqlite.
+  /// `native: false` uses the Dart driver instead of the native one.
   Map<String, dynamic> extra;
 
-  /// use your own driver class instead of the built-in one, eg. a native
-  /// driver package. it gets this config and returns the driver.
-  /// [driver] is still used to pick the sql dialect.
+  /// use your own driver class instead of the built-in one.
+  /// it gets this config and returns the driver. it wins over every other
+  /// setting. [driver] is still used to pick the sql dialect.
   ///
   /// ```
-  /// driverFactory: PostgresNativeDriver.fromConfig,
+  /// driverFactory: MysqlDriverOfMyOwn.fromConfig,
   /// ```
   DBDriver Function(ConnectionConfig config)? driverFactory;
 
@@ -72,10 +73,15 @@ class ConnectionConfig {
       extra['preparedStatementCacheSize'] as int? ?? defaultStatementCacheSize;
 
   /// make the driver of this connection: [driverFactory] when it is set,
-  /// else the built-in driver for [driver]
+  /// else the native driver for postgres and mysql (see [NativeDrivers]),
+  /// else the Dart driver for [driver]
   DBDriver createDriver() {
     if (driverFactory != null) {
       return driverFactory!(this);
+    }
+    DBDriver? native = NativeDrivers.create(this);
+    if (native != null) {
+      return native;
     }
     return getDatabaseDriver(
       driver,

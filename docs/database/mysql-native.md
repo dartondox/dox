@@ -1,8 +1,8 @@
 # Native MySQL driver
 
-`dox_mysql_native` is a faster MySQL and MariaDB driver for the Dox ORM.
+`dox_mysql_native` is the default MySQL and MariaDB driver of the Dox ORM.
 Rust talks to the database. Your models, queries and transactions stay the
-same. You change one line of config.
+same. You do not change any config.
 
 - Rust ([mysql_async](https://docs.rs/mysql_async)) owns the connections
   and the pool.
@@ -16,7 +16,8 @@ same. You change one line of config.
   MariaDB 11.
 
 !!! warning "Alpha"
-    This driver is new. The default Dart driver is still the safe choice.
+    This driver is new. If you see a problem, [use the Dart driver](#use-the-dart-driver)
+    and tell us.
 
 ## Speed
 
@@ -43,6 +44,9 @@ like in a web server.
 
 ## Install
 
+`dox_orm` depends on `dox_mysql_native`. You do not add it yourself.
+Add it only to use `MysqlNativePool` without the ORM:
+
 ```bash
 dart pub add dox_mysql_native
 ```
@@ -55,34 +59,43 @@ then you need [Rust](https://rustup.rs).
 Use `dart run`, `dart test` or `dart build cli`. `dart compile exe` does not
 run build hooks.
 
-## Use it with the ORM
+## Native is the default
 
-Keep your MySQL `ConnectionConfig` as it is (`driver: Driver.mysql`).
-Add one line, `driverFactory`:
+You do not change any config. The ORM picks the driver like this:
 
-```dart
-import 'package:dox_mysql_native/dox_mysql_native.dart';
+1. `driverFactory` is set: the ORM uses your driver. It wins over
+   everything below.
+2. You ask for the Dart driver (see below): the ORM uses the Dart driver.
+3. The native library loads: the ORM uses the native driver.
+4. The native library does not load (no library for your system, no
+   Rust to build it, or a load error): the ORM uses the Dart driver. It
+   prints one warning line to stderr, like this:
 
-DatabaseConfig databaseConfig = DatabaseConfig(
-  connection: 'mysql',
-  connections: <String, ConnectionConfig>{
-    'mysql': ConnectionConfig(
-      driver: Driver.mysql,
-      host: 'localhost',
-      port: 3306,
-      user: 'root',
-      password: 'password',
-      database: 'dox',
-      extra: <String, dynamic>{'maxConnectionCount': 10},
-      debug: false,
-      driverFactory: MysqlNativeDriver.fromConfig, // the one new line
-    ),
-  },
-);
+```text
+[dox] warning: dox_mysql_native did not load, using the Dart mysql driver (...)
 ```
 
-That is all. `Model`, the query builder, `transaction()` and `Schema` now
-run on the native driver. Remove the line to go back to the Dart driver.
+Named connections (`Model.connection('x')`, `withConnection('x')`) follow
+the same rules.
+
+## Use the Dart driver
+
+For all connections, set the env var:
+
+```bash
+DOX_DB_DRIVER=dart dart run bin/server.dart
+```
+
+For one connection, set `native: false` in `extra`:
+
+```dart
+ConnectionConfig(
+  driver: Driver.mysql,
+  // ... host, user, password, database as before
+  extra: <String, dynamic>{'native': false},
+  debug: false,
+),
+```
 
 ## Options
 
@@ -101,6 +114,7 @@ Isolates that open a pool with the same settings share one pool in Rust.
 So `maxConnectionCount` is for the whole process, not per isolate. You can
 also give `driver.pool.handle` (an `int`) to another isolate and use
 `MysqlNativeDriver(MysqlNativePool.fromHandle(handle))` there.
+`MysqlNativeDriver` comes from `package:dox_orm/dox_orm.dart`.
 
 ## Use it without the ORM
 
