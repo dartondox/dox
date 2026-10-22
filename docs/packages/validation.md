@@ -65,8 +65,8 @@ inside `v.object(...)`, `v.list(...)`, with OpenAPI, and as a `StandardSchema`.
 
 | Member | Does |
 | --- | --- |
-| `Future<T> validateMap(Map<String, dynamic> input, {Source source = Source.body, Map<String, String> params = const {}})` | all checks, then the object. Throws `ValidationException` with the errors. |
-| `Future<ParseResult<T>> safeValidateMap(input, {source, params})` | the same, but never throws for bad input. `result.success`, `result.value`, `result.errors`. |
+| `Future<T> validateMap(Map<String, dynamic> input, {Source source = Source.body, Map<String, String> params = const {}, MessageResolver? messages, String? locale})` | all checks, then the object. Throws `ValidationException` with the errors. |
+| `Future<ParseResult<T>> safeValidateMap(input, {source, params, messages, locale})` | the same, but never throws for bad input. `result.success`, `result.value`, `result.errors`. |
 | `T fromMap(Map<String, dynamic> input)` | builds the object with **no checks**. Reads keys, converts JSON types, uses defaults. A wrong type throws a `TypeError`. Only for data you trust. |
 | `Map<String, dynamic> toMap(T value)` | the object as a map with the input keys (snake_case). `DateTime` becomes an ISO 8601 string, an enum its name. |
 | `Map<String, dynamic> toJsonSchema()` | JSON Schema (draft 2020-12). |
@@ -75,6 +75,7 @@ inside `v.object(...)`, `v.list(...)`, with OpenAPI, and as a `StandardSchema`.
 
 `source: Source.query` reads the map like a query string: text is converted to the field type.
 `params` are path params, used by `@Unique(ignoreParam: ...)`.
+`messages` and `locale` change the error text for this call. See [Messages](#messages).
 
 ```dart
 ParseResult<CreateUser> result = await CreateUser.schema.safeValidateMap(input);
@@ -82,6 +83,14 @@ if (!result.success) {
   print(result.errors); // {'email': 'The email is not a valid email'}
 }
 ```
+
+| `ParseResult` member | What it is |
+| --- | --- |
+| `success` | `true` when there are no errors |
+| `value` | the result. `null` when `success` is `false` |
+| `errors` | the first message for each field, like `{'user.email': '...'}` |
+| `fieldErrors` | all messages for each field |
+| `issues` | the full list of `ValidationIssue` objects, with code and path |
 
 !!! note
     `dox_core` has its own `ValidationException` (the HTTP 422 one), so it does not export the one from `dox_validation`.
@@ -164,7 +173,7 @@ On every schema:
 - `nullable()`: the value may be `null`. The key must be there.
 - `nullish()`: both.
 - `defaultTo(x)`: the value when the key is missing. (`default` is a reserved word in Dart.)
-- `transform(fn)`, `refine(fn)`, `refineAsync(fn)`, `superRefine(fn)`, `use(rule)`.
+- `transform(fn)`, `refine(fn)`, `refineAsync(fn)`, `superRefine(fn)`, `superRefineAsync(fn)`, `use(rule)`.
 - `describe(text)`, `example(x)`: only used in the JSON Schema.
 
 ### Coercion

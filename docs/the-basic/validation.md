@@ -1,10 +1,12 @@
 # Validation
 
+This page shows how to check request input with typed DTO classes.
+
 Write a class with `@Dto()`. Ask for it in your controller.
 Dox reads the request, checks it, and gives you a typed object.
 When the input is wrong, Dox answers `422` with the errors. Your controller does not run.
 
-```dart
+```dart title="lib/app/http/dtos/create_user.dto.dart"
 import 'package:dox_core/dox_core.dart';
 
 part 'create_user.dto.g.dart';
@@ -40,7 +42,7 @@ class CreateUser {
 }
 ```
 
-```dart
+```dart title="lib/app/http/controllers/user.controller.dart"
 class UserController {
   Future<User> store(CreateUser body) async {
     // body is already checked. body.age is an int?, body.role is a Role.
@@ -56,7 +58,7 @@ class UserController {
 Then run the generator:
 
 ```bash
-dart run build_runner build
+dox build_runner:build   # or: dart run build_runner build
 ```
 
 ## Setup
@@ -71,7 +73,7 @@ You do this once per app.
    It writes a `.dto.g.dart` file next to each DTO and one list of all DTOs in `lib/dtos.g.dart`.
 4. Give that list to the app in `lib/config/app.dart`:
 
-```dart
+```dart title="lib/config/app.dart"
 import 'package:my_app/dtos.g.dart';
 
 AppConfig appConfig = AppConfig(
@@ -82,6 +84,7 @@ AppConfig appConfig = AppConfig(
 
 !!! info "Why the list?"
     Dox does not use `dart:mirrors`. So it can not find a class by its name at runtime.
+    Without the list, a controller that asks for a DTO stops the server at start, with a clear error.
     The generated list tells Dox which classes are DTOs. You never edit it by hand.
 
 **What the generator makes for each DTO** (no reflection, works with `dox build` AOT):

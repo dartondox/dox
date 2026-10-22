@@ -1,6 +1,8 @@
 # Socket.IO
 
-`dox_socketio` is a Socket.IO server for Dart.
+This page shows how to run a Socket.IO server with `dox_socketio`, inside Dox or on its own.
+
+`dox_socketio` is a Socket.IO v4 server for Dart.
 The official clients connect to it with no changes: `socket.io-client` (JavaScript v4) and the Dart `socket_io_client` package.
 
 !!! tip "Socket.IO or WebSocket?"
@@ -49,11 +51,23 @@ socket.emit('chat', 'hi', (answer) => console.log(answer)); // 'ok'
 
 `dox_core` can serve Socket.IO at `/socket.io/` on the app port. It is off by default.
 
-```dart
-// config/socketio.dart
+`dox_core` does not export `dox_socketio`. Add it, and `ioredis` for the Redis adapter:
+
+```bash
+dart pub add dox_socketio ioredis
+```
+
+```dart title="lib/config/socketio.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_socketio/dox_socketio.dart';
+import 'package:ioredis/ioredis.dart';
+import 'package:my_app/app/socket/chat.namespace.dart';
+
+Redis redis = Redis(RedisOptions(host: '127.0.0.1', port: 6379));
+
 SocketIoConfig socketIo = SocketIoConfig(
   enabled: Env.get<bool>('SOCKETIO_ENABLED', false),
-  namespaces: <NamespaceHandler>[ChatNamespace()],
+  namespaces: <NamespaceHandler>[ChatNamespace(MessageService())],
   adapter: const RedisSocketAdapterFactory(), // shares broadcasts between isolates
 );
 
@@ -66,9 +80,21 @@ class RedisSocketAdapterFactory extends SocketAdapterFactory {
     return RedisAdapter(subscriber: redis.duplicate(), publisher: redis);
   }
 }
-
-AppConfig(socketIo: socketIo, ...);
 ```
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  socketIo: socketIo,
+  // ...
+);
+```
+
+| `SocketIoConfig` option | Default | What it does |
+| --- | --- | --- |
+| `enabled` | `false` | serve Socket.IO at `options.path` |
+| `options` | `ServerOptions()` | see [Options](#options) |
+| `namespaces` | `[]` | `NamespaceHandler` classes to register |
+| `adapter` | `null` (in-memory) | makes one adapter in each isolate |
 
 - Requests to `/socket.io/` go to Socket.IO before the router. Middleware and body reading are skipped.
 - When it is off, there is no extra work per request.
@@ -169,17 +195,31 @@ SocketIoServer(
 );
 ```
 
+| Option | Default | What it does |
+| --- | --- | --- |
+| `path` | `/socket.io/` | the URL path |
+| `pingInterval` | 25 s | how often the server sends a ping |
+| `pingTimeout` | 20 s | how long to wait for the pong before the client is gone |
+| `upgradeTimeout` | 10 s | how long an upgrade from polling to websocket may take |
+| `connectTimeout` | 45 s | how long the client has to join a namespace |
+| `maxHttpBufferSize` | 1,000,000 bytes | the biggest message |
+| `transports` | `['polling', 'websocket']` | allowed transports |
+| `allowUpgrades` | `true` | let polling clients move to websocket |
+| `cors` | `null` | CORS headers for polling requests |
+
 ## Many servers: Redis adapter
 
 With more than one server process, use the Redis adapter.
 Then a broadcast on one server reaches the clients of all servers.
 
 ```dart
-Redis sub = Redis(RedisOptions(host: '127.0.0.1', port: 6379));
+Redis redis = Redis(RedisOptions(host: '127.0.0.1', port: 6379));
 SocketIoServer io = SocketIoServer(
-  adapter: RedisAdapter(subscriber: sub, publisher: sub.duplicate()),
+  adapter: RedisAdapter(subscriber: redis.duplicate(), publisher: redis),
 );
 ```
+
+The subscriber needs its own connection. A Redis connection in subscribe mode can not run other commands.
 
 - It uses the message format of `@socket.io/redis-adapter`. A Node.js server can share broadcasts with it, when Node uses a JSON parser.
 - `fetchSockets`, `socketsJoin` and broadcast acks only work on the local server.

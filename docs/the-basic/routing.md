@@ -1,78 +1,207 @@
 # Routing
 
-Routes can be found in `lib/routes` folder. And `api.dart` is with prefix `/api`.
+A route connects a URL and an HTTP method to the code that answers it.
 
-## Supported routes
+## Where routes live
+
+Routes are in the `lib/routes` folder. Each file has one `Router` class.
+The `prefix` of the router is added in front of all its routes.
+
+```dart title="lib/routes/api.dart"
+import 'package:dox_core/dox_core.dart';
+
+class ApiRouter extends Router {
+  @override
+  String get prefix => 'api';
+
+  @override
+  List<dynamic> get middleware => <dynamic>[];
+
+  @override
+  void register() {
+    Route.get('/ping', (DoxRequest req) => 'pong'); // GET /api/ping
+  }
+}
+```
+
+Add each router to `routers` in `lib/config/app.dart`:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  routers: <Router>[WebRouter(), ApiRouter()],
+  // ...
+);
+```
+
+The leading `/` in a path is optional. `'ping'` and `'/ping'` are the same route.
+
+## Route methods
 
 === "GET"
 
     ```dart
-    Route.get(routeName, controller.method)
+    Route.get('/blogs', controller.index);
     ```
-
 
 === "POST"
 
     ```dart
-    Route.post(routeName, controller.method)
+    Route.post('/blogs', controller.store);
     ```
 
 === "PUT"
 
     ```dart
-    Route.put(routeName, controller.method)
+    Route.put('/blogs/{id}', controller.update);
     ```
 
 === "PATCH"
 
     ```dart
-    Route.patch(routeName, controller.method)
+    Route.patch('/blogs/{id}', controller.update);
     ```
 
 === "DELETE"
 
     ```dart
-    Route.delete(routeName, controller.method)
+    Route.delete('/blogs/{id}', controller.destroy);
     ```
 
 !!! info
-    Other supported routes are `COPY`, `HEAD`, `OPTIONS`, `LINK`, `UNLINK`, `PURGE`, `LOCK`, `UNLOCK` and `VIEW`.
+    There are also `Route.options`, `Route.copy`, `Route.view`, `Route.link`, `Route.unlink`,
+    `Route.purge`, `Route.lock`, `Route.unlock` and `Route.propfind`.
 
-## Param route
+## The handler
 
-=== "Route"
+The second argument is the code that answers the request. It can be:
 
-    ```dart
-    Route.get('/blog/{id}', info);
-    Route.get('/blog/{id}/activate', activate);
-
-    ```
-
-=== "Controller"
+=== "Function"
 
     ```dart
-    info(DoxRequest req, String id) {
-        /// your response here
-    }
+    Route.get('/ping', (DoxRequest req) => 'pong');
+    ```
 
-    activate(DoxRequest req, String id) {
-        /// your response here
+=== "Controller method"
+
+    ```dart
+    WebController webController = WebController();
+    Route.get('/ping', webController.pong);
+
+    class WebController {
+      String pong(DoxRequest req) {
+        return 'pong';
+      }
     }
     ```
 
-## Catch-all param
+=== "List with middleware"
+
+    ```dart
+    Route.get('/ping', <dynamic>[LoggerMiddleware(), webController.pong]);
+    ```
+
+    The last item is the controller. The items before it are [middleware](middleware.md).
+
+See [Controller](controller.md) for the parameters a handler can ask for.
+
+## Route params
+
+Put a param in `{}`. Ask for it as a typed parameter in the controller.
+
+```dart
+Route.get('/blogs/{id}', controller.show);
+
+class BlogController {
+  Future<Blog?> show(int id) async {
+    return Blog().find(id);
+  }
+}
+```
+
+`/blogs/abc` answers `404`, because `abc` is not an `int`.
+See [Controller: parameters](controller.md#parameters) for all the rules.
+
+### Optional param
+
+`{name?}` can be missing. Use a nullable type.
+
+```dart
+Route.get('/posts/{page?}', (int? page) {
+  return 'page ${page ?? 1}'; // GET /posts and GET /posts/2 both match
+});
+```
+
+### Catch-all param
 
 `{name*}` matches the rest of the path, with slashes.
 
 ```dart
-Route.get('/docs/{page*}', (DoxRequest req, String page) {
-    return page; // GET /docs/a/b/c gives 'a/b/c'
+Route.get('/docs/{page*}', (String page) {
+  return page; // GET /docs/a/b/c gives 'a/b/c'
 });
 ```
 
+## Group routes
+
+=== "Prefix"
+
+    ```dart
+    Route.group('/blogs', () {
+      Route.get('/', controller.index);     // GET /blogs
+      Route.get('/{id}', controller.show);  // GET /blogs/{id}
+    });
+    ```
+
+=== "Domain"
+
+    ```dart
+    Route.domain('dartondox.com', () {
+      Route.get('/ping', controller.ping);
+    });
+    ```
+
+    These routes match only when the `Host` header is `dartondox.com`.
+
+=== "Middleware"
+
+    ```dart
+    Route.middleware(<dynamic>[AuthMiddleware()], () {
+      Route.get('/me', controller.me);
+      Route.post('/logout', controller.logout);
+    });
+    ```
+
+!!! warning "Start group paths with `/`"
+    `Route.group` joins the text as it is. `Route.group('blogs', ...)` with `Route.get('all', ...)`
+    makes `blogsall`. Write `Route.group('/blogs', ...)` and `Route.get('/all', ...)`.
+
+To turn CORS on or off for some routes, see [CORS](../security/cors.md).
+
+## Resource routes
+
+One line makes the usual CRUD routes for a controller.
+
+```dart
+Route.resource('blogs', BlogController());
+```
+
+| Method | Path | Controller method |
+| --- | --- | --- |
+| `GET` | `/blogs` | `index` |
+| `GET` | `/blogs/create` | `create` |
+| `POST` | `/blogs` | `store` |
+| `GET` | `/blogs/{id}` | `show` |
+| `GET` | `/blogs/{id}/edit` | `edit` |
+| `PUT`, `PATCH` | `/blogs/{id}` | `update` |
+| `DELETE` | `/blogs/{id}` | `destroy` |
+
+A method that the controller does not have is skipped. No route is made for it.
+See [Resource controller](controller.md#resource-controller) to make one with the CLI.
+
 ## Serve storage files
 
-`Route.files(path)` serves files of a storage disk at `GET <path>/{key*}`. By default only signed URLs work.
+`Route.files(path)` serves the files of a storage disk at `GET <path>/{key*}`.
+By default only signed URLs work. Other requests get `403`.
 See [File Storage](../digging-deeper/file-storage.md#serve-local-signed-urls).
 
 ```dart
@@ -82,210 +211,11 @@ Route.files('public', disk: 'local', signed: false);
 
 ## Request body for the docs
 
-`post`, `put` and `patch` take a `body:` schema. It shows in the [OpenAPI docs](../packages/openapi.md). It does not validate.
+`post`, `put` and `patch` take a `body:` schema. It shows in the [OpenAPI docs](../packages/openapi.md).
+It does **not** check the request. To check input, use a [DTO](validation.md).
 
 ```dart
 Route.post('/posts', controller.store, body: v.object(<String, Schema<Object?>>{
-    'title': v.string().min(3),
+  'title': v.string().min(3),
 }));
 ```
-
-## Group Routes
-
-=== "Prefix"
-
-    ```dart
-    Route.group(prefix, () {
-        Route.get(path, controller.method);
-        Route.post(path, controller.method);
-    });
-    ```
-
-=== "Domain"
-
-    ```dart
-    Route.domain('dartondox.com', () {
-        Route.get(path, controller.method);
-        Route.post(path, controller.method);
-    });
-    ```
-
-=== "Middleware"
-
-    ```dart
-    Route.middleware([CustomMiddleware()], () {
-        Route.get(path, controller.method);
-        Route.post(path, controller.method);
-    });
-    ```
-
-## Resource
-
-```dart
-Route.resource('blogs', BlogController());
-```
-
-=== "index"
-
-    ```
-    GET /blogs
-    ```
-
-=== "create"
-
-    ```
-    GET /blogs/create
-    ```
-
-=== "store"
-
-    ```
-    POST /blogs
-    ```
-
-=== "show"
-
-    ```
-    GET /blogs/{id}
-    ```
-
-=== "edit"
-
-    ```
-    GET /blogs/{id}/edit
-    ```
-
-=== "update"
-
-    ```
-    PUT|PATCH /blogs/{id}
-    ```
-    
-=== "destroy"
-
-    ```
-    DELETE /blogs/{id}
-    ```
-
-!!! info
-    `index`, `create`, `store`, `show`, `edit`, `update` and `destroy` are controller methods.
-    *Check [here](controller.md/#resource-controller) documentation for generating resource controller.*
-
-## Route with callback
-
-```dart
-Route.get('/ping', (DoxRequest req) => 'pong');
-```
-
-## Route with controller
-
-=== "Route"
-
-    ```dart
-    var webController = WebController();
-    Route.get('ping', webController.pong);
-    /// or 
-    Route.get('ping', [webController.pong]);
-    ```
-
-=== "Controller"
-
-    ```dart
-    class WebController {
-        pong(DoxRequest req) async {
-            return 'pong';
-        }
-    }
-    ```
-
-## Class based middleware
-
-=== "Route"
-
-    ```dart
-    var loggerMiddleware = LoggerMiddleware();
-    Route.get('ping', [loggerMiddleware, webController.pong]);
-    ```
-
-=== "Middleware"
-
-    ```dart
-    class LoggerMiddleware extends DoxMiddleware {
-        @override
-        handle(DoxRequest req) {
-            /// write your logic here
-
-            /// return DoxRequest back to continue next function (controller)
-            return req;
-        }
-    }
-    ```
-
-!!! info
-    To implement class-based middleware, you can create a new class that extends the `DoxMiddleware` class. Within this new class, you'll need to define a handle method where you can incorporate your custom logic.
-
-
-## Function middleware
-
-=== "Route"
-
-    ```dart
-    Route.get('ping', [authMiddleware, webController.pong]);
-    ```
-
-=== "Function"
-
-    ```dart
-    authMiddleware(DoxRequest req) {
-        /// write your logic here
-
-        /// return DoxRequest back to continue next function (controller)
-        return req;
-    }
-    ```
-
-!!! info
-    To create function-based middleware, you can define a function that takes a DoxRequest parameter.
-
-## Route with multi-middleware
-
-=== "Route"
-
-    ```dart
-    Route.get('ping', [ loggerMiddleware, authMiddleware, webController.pong ]);
-    ```
-
-=== "Class based middleware"
-
-    ```dart
-    class LoggerMiddleware extends IDoxMiddleware {
-        @override
-        handle(IDoxRequest req) {
-            /// write your logic here
-
-            /// return DoxRequest back to continue next to the controller
-            return req;
-        }
-    }
-    ```
-
-=== "Function middleware"
-
-    ```dart
-    authMiddleware(DoxRequest req) {
-        /// write your logic here
-
-        /// return DoxRequest back to continue next to the controller
-        return req;
-    }
-    ```
-
-=== "Controller"
-
-    ```dart
-    class WebController {
-        pong(DoxRequest req) async {
-            return 'pong';
-        }
-    }
-    ```

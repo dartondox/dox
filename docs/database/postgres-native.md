@@ -55,7 +55,8 @@ You do not change any config. The ORM picks the driver like this:
 
 1. `driverFactory` is set: the ORM uses your driver. It wins over
    everything below.
-2. You ask for the Dart driver (see below): the ORM uses the Dart driver.
+2. You ask for the Dart driver (see below), or the connection uses TLS:
+   the ORM uses the Dart driver.
 3. The native library loads: the ORM uses the native driver.
 4. The native library does not load (no library for your system, no
    Rust to build it, or a load error): the ORM uses the Dart driver. It
@@ -65,7 +66,7 @@ You do not change any config. The ORM picks the driver like this:
 [dox] warning: dox_postgres_native did not load, using the Dart postgres driver (...)
 ```
 
-Named connections (`Model.connection('x')`, `withConnection('x')`) follow
+Named connections (`withConnection('x')`, `transaction(..., connection: 'x')`) follow
 the same rules.
 
 ## Use the Dart driver

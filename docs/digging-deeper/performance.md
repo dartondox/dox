@@ -1,5 +1,7 @@
 # Performance
 
+This page shows how fast Dox is, and how to keep your app fast in production.
+
 The short version:
 
 1. Build with `dox build` and run the AOT binary. Never `dart run` in production.
@@ -48,8 +50,7 @@ isolate per core and shares the port (`SO_REUSEPORT`). On 4 cores Dox is
 With pipelining (16 requests per batch), Dox native gives 153k req/s on
 1 core (Bun: 200k) and 400-483k req/s on 4 cores (Bun: 199k).
 
-How it was run: measured with wrk in Docker on an Apple M2 (linux/arm64),
-CPU pinned.
+How it was run:
 
 - Docker on an Apple M2 (8 CPUs in the Docker VM), `linux/arm64`.
 - The server and wrk run in two containers, pinned to different CPUs:
@@ -129,8 +130,8 @@ Set the same limit in the proxy (`client_max_body_size` in nginx).
 ## File uploads
 
 - A file up to 1 MB stays in memory.
-- A bigger file is written to a temp file while it arrives. A 50 MB upload
-  no longer needs 1 GB of RAM.
+- A bigger file is written to a temp file while it arrives. So a big upload
+  does not fill the memory.
 - The temp file is deleted when the response is done. So save it before you
   return from the controller.
 
@@ -181,18 +182,16 @@ AppConfig(compress: true);
 
 ## Logging
 
-`LogMiddleware` prints one JSON line per request. Writing to stdout blocks.
-Dox now collects log lines and writes them every 20 ms (or every 64 KB) in
-one write. If the process is killed hard, the last 20 ms of request logs can
+`LogMiddleware` prints one JSON line per request. Writing to stdout blocks
+the isolate. So Dox collects log lines and writes them every 20 ms (or every
+64 KB) in one write. If the process is killed hard, the last 20 ms of request logs can
 be lost. Errors from `Logger` are still written right away.
 
 Turn `LogMiddleware` off when a proxy already writes access logs.
 
-## What else was fixed on the hot path
+## What Dox does for you
 
-- Routes are grouped by method, and each route's regex is built once, not
+- Routes are grouped by method. The regex of each route is built once, not
   on every request.
-- Route params are now per request. Before, two requests to the same route
-  at the same time could see each other's params.
-- The controller's argument types are read once per controller, not three
-  times per request.
+- The argument types of each controller are read once at start, not on
+  every request.

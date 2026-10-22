@@ -13,9 +13,12 @@ Route.post('/avatar', (DoxRequest req) async {
 
 ## Config
 
-`config/storage.dart`:
+Without a config, Dox has one disk: `local`, in the `storage` folder.
+To add disks, make `lib/config/storage.dart`:
 
-```dart
+```dart title="lib/config/storage.dart"
+import 'package:dox_core/dox_core.dart';
+
 StorageConfig storage = StorageConfig(
   defaultDisk: Env.get('STORAGE_DISK', 'local'),
   disks: <String, Map<String, dynamic>>{
@@ -37,13 +40,15 @@ StorageConfig storage = StorageConfig(
 );
 ```
 
-Pass it to `AppConfig(storage: storage)`.
+Then pass it to `AppConfig(storage: storage)` in `lib/config/app.dart`.
 
 | Driver | Options |
 | --- | --- |
 | `local` | `root` (default `storage`), `url`, `app_key` (default: your APP_KEY), `visibility` |
 | `s3` | `bucket`, `region`, `key`, `secret`, `token`, `endpoint`, `path_style` (MinIO), `url` (CDN), `visibility`, `acl`, `batch_delete` |
 | `memory` | none. For tests |
+
+The `s3` disk needs `bucket`, `key` and `secret`. When one is missing, the first use of the disk throws an error.
 
 ## Functions
 
@@ -88,9 +93,10 @@ A big file is never loaded into memory. A missing file answers `404`.
 ## Serve local signed URLs
 
 ```dart
-// routes/web.dart
+// lib/routes/web.dart
 Route.files('files');                    // GET /files/{key*}, signed URLs only
 Route.files('public', signed: false);    // any file of the disk
+Route.files('docs', disk: 'memory');     // another disk than the default
 ```
 
 ```dart
@@ -102,7 +108,7 @@ Set the disk `url` option to the full URL of the route (`https://app.test/files`
 
 ## Tests
 
-`Dox().storage` is the `DriveManager`. Swap a disk with an in-memory fake:
+`Dox().storage` is the `DriveManager` that `Storage()` uses. `fake(name)` swaps a disk with an empty memory disk:
 
 ```dart
 Disk fake = Dox().storage.fake('s3');
@@ -111,9 +117,11 @@ expect(await fake.exists('reports/2024.pdf'), isTrue);
 Dox().storage.restore('s3');
 ```
 
+`Disk` keys have no `/` at the start. See [Testing](testing.md).
+
 ## Your own driver
 
-Implement `DriverContract` from `dox_storage` and register it, for example in a service:
+Implement `DriverContract` from `package:dox_storage/dox_storage.dart`. Register it in a [service](services.md), so every isolate has it:
 
 ```dart
 Dox().storage.register('dropbox', DropboxDriver());

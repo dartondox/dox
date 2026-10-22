@@ -1,140 +1,164 @@
 # BelongsTo
 
-A "belongs-to" relationship is a fundamental concept in database modeling. Consider a scenario where we have a `Comment` model associated with a `User` model. In this case, we define a method called `user` within the `Comment` model. This `user` method invokes the `BelongsTo` method and returns its output. This relationship signifies that a comment belongs to a particular user.
+Use `BelongsTo` when this table keeps the foreign key to another table.
+For example, a comment belongs to a user.
+The comment table has the column `user_id`.
 
-In practical terms, this means that each comment in our database is linked to a single user. When we want to retrieve the user associated with a specific comment, we can use the `user` method, making it easy to access user information for that comment. This `BelongsTo` relationship helps establish connections between records in a meaningful way, enhancing the organization and retrieval of data in our database system.
+`BelongsTo` is the other side of [HasOne](has-one.md) and [HasMany](has-many.md).
 
-=== "BelongsTo Class Structure"
+## Define it
 
-    ```dart
-    class BelongsTo {
-        final Type model;
-        final String? foreignKey;
-        final String? localKey;
-        final Function? onQuery;
-        final bool? eager;
+Add a field with `@BelongsTo(...)` to the model. The field type is the related model, nullable.
 
-        const BelongsTo(this.model,
-            {this.foreignKey, this.localKey, this.onQuery, this.eager});
-    }
-    ```
+=== "Comment"
 
+    ```dart title="lib/app/models/comment/comment.model.dart"
+    import 'package:dox_orm/dox_orm.dart';
 
-#####
-=== "User Model"
+    import '../user/user.model.dart';
 
-    ```dart
-    @DoxModel()
-    class User extends UserGenerator {
-        @Column()
-        String? name;
+    part 'comment.model.g.dart';
 
-        @Column()
-        String? status;
-    }
-    ```
-
-=== "Comment Model"
-
-    ```dart
     @DoxModel()
     class Comment extends CommentGenerator {
-        @Column()
-        String? userId;
+      @Column()
+      int? userId; // column user_id
 
-        @Column()
-        String? content;
+      @Column()
+      String? content;
 
-        @BelongsTo(User)
-        User? user;
+      @BelongsTo(User)
+      User? user;
     }
     ```
 
-## Usage
+=== "User"
 
-#### `$getRelation`
+    ```dart title="lib/app/models/user/user.model.dart"
+    import 'package:dox_orm/dox_orm.dart';
 
-```dart
-List<Comment> comments = await Comment().all();
+    part 'user.model.g.dart';
 
-for (Comment comment in comments) {
-    await comment.$getRelation('user')
-    User user = comment.user;
-}
-```
-!!! info
-    When `eager` is `true` the `$getRelation` do not need to call.
+    @DoxModel()
+    class User extends UserGenerator {
+      @Column()
+      String? name;
 
-#### `preload`
+      @Column()
+      String? status;
+    }
+    ```
 
-```dart
-List<Comment> comments = await Comment().preload('user').all();
-for (Comment comment in comments) {
-    User user = comment.user;
-}
-```
-!!! info
-    When `eager` is `true` the `preload` do not need to call.
+Run `dart run build_runner build` after you add a relationship.
 
-#### `related`
+## Load it
 
-```dart
-List<Comment> comments = await Comment().all();
+The relation is not loaded by default. Load it in one of these ways.
+Use the field name (`'user'`) as the relation name.
 
-for (Comment comment in comments) {
-    User user = await comment.related<User>('user')?.where('foo', 'bar').getFirst();
-}
+=== "preload"
+
+    ```dart
+    List<Comment> comments = await Comment().preload('user').all();
+    for (Comment comment in comments) {
+      print(comment.user?.name);
+    }
+    ```
+
+    `preload` works with `find`, `get`, `all` and `getFirst`.
+    It runs one query for all comments, not one query per comment.
+
+=== "$getRelation"
+
+    ```dart
+    Comment? comment = await Comment().find(1);
+    await comment?.$getRelation('user');
+    print(comment?.user?.name);
+    ```
+
+    Use it when you already have the model.
+    Do not call it in a loop over many models. Use `preload` for a list.
+
+=== "related"
+
+    ```dart
+    Comment? comment = await Comment().find(1);
+    User? activeUser = await comment
+        ?.related<User>('user')
+        ?.where('status', 'active')
+        .getFirst();
+    ```
+
+    `related` gives a query. You can add more conditions before you run it.
+    It does not set `comment.user`.
+
+=== "eager"
+
+    ```dart
+    @BelongsTo(User, eager: true)
+    User? user;
+    ```
+
+    With `eager: true`, every query of `Comment` loads the relation.
+    You do not call `preload`.
+
+The load runs this SQL:
+
+```sql
+SELECT "user".*, "comment"."id" as "_foreign_id" FROM "user"
+  LEFT JOIN "comment" on "comment"."user_id" = "user"."id"
+  WHERE "comment"."user_id" IN (@commentuser_id_p0, ...)
 ```
 
 ## Options
 
-#### `model`
+| Option | Default | What it is |
+|---|---|---|
+| `foreignKey` | `{related table}_id`, like `user_id` | The column in this table that points to the related model. |
+| `localKey` | the primary key of the related model | The column in the related table that `foreignKey` points to. |
+| `onQuery` | none | A static function that changes the query. |
+| `eager` | `false` | Load the relation on every query. |
+
+!!! warning "Custom table names"
+    The default `foreignKey` uses the table name of the related model, not its class name.
+    When `User` has `@DoxModel(table: 'users')`, the default is `users_id`.
+    Then set `foreignKey: 'user_id'` yourself.
+
+### `foreignKey` and `localKey`
 
 ```dart
-@BelongsTo(User)
-User? user;
-```
-#### `foreignKey`
-
-```dart
-@BelongsTo(User, foreignKey: 'user_id')
-User? user;
+@BelongsTo(User, foreignKey: 'author_id', localKey: 'id')
+User? author;
 ```
 
-#### `localKey`
+### `onQuery`
 
-```dart
-@BelongsTo(User, foreignKey: 'user_id', localKey: 'id')
-User? user;
-```
-
-#### `onQuery`
+`onQuery` is a static function in the same model class.
+It gets the query of the related model and returns it.
 
 ```dart
 @DoxModel()
 class Comment extends CommentGenerator {
-    @Column()
-    String? userId;
+  @Column()
+  int? userId;
 
-    @Column()
-    String? content;
+  @BelongsTo(User, onQuery: onlyActive)
+  User? activeUser;
 
-    @BelongsTo(User, onQuery: onQueryActiveUser)
-    User? activeUser;
-
-    static QueryBuilder<User> onQueryActiveUser(User q) {
-        return q.where('status', 'active');
-    }
+  static QueryBuilder<User> onlyActive(User q) {
+    return q.where('status', 'active');
+  }
 }
 ```
 
-!!! info
-    `onQuery` method must be a static method inside the model.
+## In JSON
 
-#### `eager`
+- A relation with `eager: true` is always in `toJson()`.
+- A relation loaded with `preload` is in `toJson()` of that query.
+- The JSON key is the field name in snake_case: `user`.
 
-```dart
-@BelongsTo(User, eager: true)
-User? user;
-```
-
+!!! warning "Known issue: names with more than one word"
+    For a relation without `eager: true`, `toJson()` looks for the snake_case name in the preload list.
+    But `preload` needs the field name (`'activeUser'`).
+    So a preloaded `activeUser` is on the model, but it is not in `toJson()`.
+    Use a one word field name, or `eager: true`, when you need it in JSON.

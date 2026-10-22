@@ -52,7 +52,7 @@ class BlogController {
 </div>
 
 !!! warning "You are reading the 3.x docs (alpha)"
-    `3.0.0-alpha.1` is a preview. Things can still change before the stable release.
+    `3.0.0-alpha.4` is a preview. Things can still change before the stable release.
 
     - New here? Start with [Installation](the-basic/installation.md).
     - Need the old docs? Pick **2.x** in the version menu at the top.
@@ -62,10 +62,13 @@ class BlogController {
 You need Dart 3.13 or newer.
 
 ```bash
-dart pub global activate dox 3.0.0-alpha.1   # install the CLI
+dart pub global activate dox 3.0.0-alpha.4   # install the CLI
 dox create new_blog                          # make a new project
 cd new_blog && dox s                         # start the server
 ```
+
+The server uses the port in `APP_PORT` in the `.env` file. Open `/ping` on that port to check it.
+See [Installation](the-basic/installation.md) for the details.
 
 ## Why Dox
 

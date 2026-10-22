@@ -1,5 +1,7 @@
 # Deployment
 
+This page shows how to build a Dox app for production and run it safely.
+
 !!! danger "Never run production with `dart run`"
     `dart run` (and `dox serve`) uses the JIT compiler. It is made for
     development. It uses about 25x more memory at start (around 390 MB
@@ -20,7 +22,7 @@ This makes a `build/bundle/` folder:
 | --------------------------- | ------------------------------------------------ |
 | `build/bundle/bin/server`   | the native binary. No Dart SDK needed to run it  |
 | `build/bundle/lib/`         | native libraries from build hooks (eg. SQLite)   |
-| `build/bundle/db/`          | your migrations, run at start                    |
+| `build/bundle/db/`          | your migrations                                  |
 | `build/bundle/.env.example` | copy it to `build/bundle/.env`, or use env variables |
 
 `dox build` runs `build_runner` first (when your app uses it). Then it runs
@@ -43,6 +45,9 @@ cd build/bundle
 The binary reads `.env` and `db/` from the folder you start it in.
 A real environment variable wins over the `.env` file.
 
+A new Dox app runs the migrations in `bin/server.dart`, before the server starts.
+So the database is up to date when the first request comes in.
+
 ## Docker
 
 The `Dockerfile` in a new Dox app is a multi-stage build:
@@ -60,7 +65,7 @@ COPY pubspec.* ./
 RUN dart pub get
 COPY . .
 RUN dart pub get --offline
-RUN dart run build_runner build
+RUN dart run build_runner build --delete-conflicting-outputs
 RUN dart build cli --target bin/server.dart --output build
 RUN mkdir -p /out/app/storage /out/tmp \
   && chmod 1777 /out/tmp \

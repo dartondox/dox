@@ -1,6 +1,6 @@
 # OpenAPI
 
-Dox makes OpenAPI 3.1 docs for your API by itself.
+This page shows how Dox makes OpenAPI 3.1 docs for your API, and how to change them.
 You write no docs code. You get a [Scalar](https://github.com/scalar/scalar) docs page at `/docs`, plus `/openapi.json` and `/openapi.yaml`.
 
 The docs come from three places:
@@ -23,18 +23,33 @@ Run it again after you change routes, controllers, request classes or models.
 
 ### 2. Pass the result to the config
 
-```dart
-// lib/config/openapi.dart
-import 'package:my_app/openapi.g.dart';
+```dart title="lib/config/openapi.dart"
 import 'package:dox_core/dox_core.dart';
+import 'package:my_app/openapi.g.dart';
 
 OpenApiConfig openApi = OpenApiConfig(
   info: Info(title: 'Blog API', version: '1.0.0'),
   registry: openApiRegistry,
 );
-
-AppConfig(openApi: openApi, ...);
 ```
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  openApi: openApi,
+  // ...
+);
+```
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `enabled` | `null` | `true` or `false` turns the docs routes on or off. `null`: on only when `APP_ENV` is `development` or `local` |
+| `info` | `Info(title: 'Dox API', version: '1.0.0')` | title and version of the API |
+| `servers` | `[]` | base URLs, like `[Server('https://api.my.app')]` |
+| `registry` | empty | `openApiRegistry` from `lib/openapi.g.dart` |
+| `securitySchemes`, `securityByMiddleware` | `{}` | see [Login schemes](#login-schemes) |
+| `ui` | `DocsUi.scalar` | the docs page: `DocsUi.scalar` or `DocsUi.swagger` |
+| `scalar` | `ScalarOptions()` | see [The docs page](#the-docs-page) |
+| `pageTitle` | `info.title` | title of the `/docs` page |
 
 ### 3. Open `/docs`
 
@@ -291,8 +306,7 @@ dox openapi:generate docs/api     # another folder
 
 It runs `bin/openapi.dart` of your app:
 
-```dart
-// bin/openapi.dart
+```dart title="bin/openapi.dart"
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
@@ -333,8 +347,12 @@ api.toJsonString();                        // pretty JSON
 api.toYaml();                              // YAML
 await api.writeFiles('storage/openapi');   // openapi.json + openapi.yaml
 
-OpenApiServer server = OpenApiServer(api); // body + content type for /openapi.json, /openapi.yaml, /docs
-// Swagger UI: OpenApiServer(api, ui: DocsUi.swagger)
+// Serve the docs from your own server
+OpenApiServer server = OpenApiServer(api); // Swagger UI: OpenApiServer(api, ui: DocsUi.swagger)
+OpenApiResponse? page = server.handle('/docs'); // also '/openapi.json' and '/openapi.yaml'
+if (page != null) {
+  // send page.body with the header Content-Type: page.contentType
+}
 ```
 
 A schema can be a JSON Schema `Map`, a [`dox_validation`](validation.md) schema, or any object with `toJsonSchema()`.

@@ -75,7 +75,7 @@ You do not change any config. The ORM picks the driver like this:
 [dox] warning: dox_mysql_native did not load, using the Dart mysql driver (...)
 ```
 
-Named connections (`Model.connection('x')`, `withConnection('x')`) follow
+Named connections (`withConnection('x')`, `transaction(..., connection: 'x')`) follow
 the same rules.
 
 ## Use the Dart driver

@@ -1,6 +1,6 @@
 # Validation rules
 
-Every annotation you can put on a `@Dto` field. See [Validation](validation.md) for how DTOs work.
+This page lists every annotation you can put on a `@Dto` field. See [Validation](validation.md) for how DTOs work.
 
 How to read the tables:
 

@@ -1,15 +1,30 @@
 # Cache
 
-`Cache()` stores data that is slow to make, so the next request can read it fast.
+`Cache()` keeps data that is slow to make, so the next request can read it fast.
 It runs on [`dox_cache`](../packages/cache.md), which is built into `dox_core`.
 
-Drivers: `file`, `memory`, `redis` and `null` (stores nothing).
+## Drivers
+
+| Driver | Where the data is | Shared between isolates | Locks |
+| --- | --- | --- | --- |
+| `file` | files in a folder (default `storage/cache`) | yes, on the same machine | no |
+| `memory` | a map inside the isolate | no | yes |
+| `redis` | a Redis server | yes, also between machines | yes |
+| `null` | nowhere. It stores nothing | - | no |
+
+!!! warning "Many isolates"
+    Dox runs one isolate per CPU core. Each isolate has its own `memory` store.
+    So a value you put in one isolate is missing in the others.
+    Use `redis` when all isolates and servers must see the same data.
 
 ## Config
 
-`config/cache.dart`:
+Without a config, Dox has a `file` store (the default) and a `memory` store.
+To change the stores, make `lib/config/cache.dart`:
 
-```dart
+```dart title="lib/config/cache.dart"
+import 'package:dox_core/dox_core.dart';
+
 CacheConfig cache = CacheConfig(
   defaultStore: Env.get('CACHE_STORE', 'file'),
   stores: <String, Map<String, dynamic>>{
@@ -25,27 +40,30 @@ CacheConfig cache = CacheConfig(
 );
 ```
 
-Pass it to `AppConfig(cache: cache)`. Each store is made once per isolate, the first time you use it.
+Then pass it to `AppConfig(cache: cache)` in `lib/config/app.dart`.
+Each store is made once per isolate, the first time you use it.
 
-!!! warning "Many isolates"
-    Dox runs one isolate per CPU core. Each isolate has its own `memory` store.
-    Use `redis` when all isolates and servers must see the same data.
+### Store options
 
-Redis options: `host`, `port`, `username`, `password`, `db`, `tls`, `prefix`, `pool_size`.
+| Driver | Options |
+| --- | --- |
+| `file` | `path` (default `storage/cache`), `prefix` |
+| `memory` | `max_size`: the most items. When it is full, the item that was used least recently is removed. No limit by default. Also `prefix`. |
+| `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db` (default `0`), `tls` (`true`/`false`), `pool_size`, `prefix` |
 
-`pool_size` is the most Redis connections one store opens in one isolate (ioredis `maxConnection`). The default is 10.
-Most of the time a store uses only one connection. ioredis sends all commands on one shared connection and writes the commands of one event-loop turn together (auto-pipelining).
-It opens more connections only while a blocking command (like `BLPOP`) waits. The cache does not send blocking commands, so you rarely need to change `pool_size`.
-Each isolate has its own connection. So 4 isolates use about 4 connections.
+The default `prefix` is `dox_cache:`.
 
-```dart
-'redis': <String, dynamic>{'driver': 'redis', 'host': '127.0.0.1', 'pool_size': 20},
-```
+### Redis `pool_size`
+
+`pool_size` is the most Redis connections that one store opens in one isolate. The default is 10.
+
+You rarely need to change it. A store sends all commands on one connection. It opens more connections only while a blocking command (like `BLPOP`) waits, and the cache does not send blocking commands.
+So each isolate uses about one connection: 4 isolates use about 4 connections.
 
 ## Values are JSON
 
-Values must be JSON types: `Map`, `List`, `String`, `num`, `bool`.
-A `Map` comes back as `Map<String, dynamic>`.
+A value must be a JSON type: `Map`, `List`, `String`, `num`, `bool` or `null`.
+A `Map` comes back as `Map<String, dynamic>`. A `List` comes back as `List<dynamic>`.
 
 ## Usage
 
@@ -54,30 +72,17 @@ A `Map` comes back as `Map<String, dynamic>`.
 await Cache().put('foo', 'bar');
 await Cache().put('foo', 'bar', duration: Duration(minutes: 10));
 
-await Cache().get('foo');             // 'bar', or null
-await Cache().get('foo', 'default');  // a default when it is missing
+await Cache().get('foo');             // 'bar', or null when missing
+await Cache().get('foo', 'default');  // 'default' when missing
 await Cache().has('foo');             // true
-await Cache().forget('foo');
+await Cache().forget('foo');          // remove one key
 await Cache().forever('settings', <String, dynamic>{'theme': 'dark'});
 await Cache().flush();                // remove all items of the store
 ```
 
-### `getRaw`
-
-`get` decodes the JSON text into Dart values. If you send the value back as JSON,
-Dox must encode it again. That is double work.
-`getRaw` gives the stored JSON text as is, so you can send it with no decode and no encode.
-
-```dart
-String? json = await Cache().getRaw('posts');
-if (json != null) {
-  return response(json).contentType(ContentType.json);
-}
-```
-
-A stored `String` comes back as JSON, with its quotes: `"bar"`. A missing key gives `null`.
-
 ### `remember`
+
+`remember` reads the value from the cache. When it is missing, the function runs and its result is stored.
 
 ```dart
 List<dynamic> posts = await Cache().remember(
@@ -87,42 +92,85 @@ List<dynamic> posts = await Cache().remember(
 );
 ```
 
-The value is read from the cache. When it is missing, the function runs and its result is stored.
-`rememberForever(key, fn)` does the same without expiry.
+`rememberForever(key, fn)` does the same with no expiry.
 
-### `store`
+### `getRaw`
+
+`get` decodes the stored JSON text into Dart values. If you then send the value as a JSON response, Dox must encode it again. That is double work.
+
+`getRaw` gives the stored JSON text as it is. You can send it with no decode and no encode:
+
+```dart
+String? json = await Cache().getRaw('posts');
+if (json != null) {
+  return response(json).contentType(ContentType.json);
+}
+```
+
+A missing key gives `null`. A stored `String` comes back as JSON, with its quotes: `"bar"`.
+
+### Another store
+
+`store(name)` uses a store from the config instead of the default store:
 
 ```dart
 await Cache().store('redis').put('foo', 'bar');
 await Cache().store('memory').get('foo');
 ```
 
-### `tag`
+### Tags
+
+Put items under a tag. Then you can remove only the items of that tag:
 
 ```dart
 await Cache().tag('users').put('u1', 'Ann');
 await Cache().tag('users').flush(); // removes only the items of this tag
 ```
 
-### More
+`tags(['a', 'b'])` uses many tags.
+
+### Locks
+
+A lock makes sure only one request (or one server) runs some code at a time.
+The `memory` and `redis` stores support locks. Use `redis` when many isolates must share the lock.
+
+```dart
+CacheLock lock = Cache().store('redis').lock('report', Duration(seconds: 30));
+if (await lock.get()) {
+  try {
+    await buildReport();
+  } finally {
+    await lock.release();
+  }
+}
+```
+
+- `get()` tries once. It is `true` when you got the lock.
+- `block(Duration(seconds: 5))` tries again and again until the time is over.
+- The lock is freed after its `ttl`, even if you never call `release()`.
+
+### More methods
 
 | Method | What it does |
 | --- | --- |
-| `add(key, value, duration:)` | store only when the key is missing |
+| `add(key, value, duration:)` | store only when the key is missing. `true` when it was stored |
 | `pull(key)` | get the value and remove it |
-| `increment(key, [by])` / `decrement(key, [by])` | change an integer |
-| `lock(name, ttl)` | atomic lock (memory and redis) |
+| `increment(key, [by])` / `decrement(key, [by])` | change an integer. A missing key starts at 0 |
 | `repository` | the `dox_cache` `CacheStore`, for everything else |
 
-See [dox_cache](../packages/cache.md) for locks and custom drivers.
+See [dox_cache](../packages/cache.md) for custom drivers.
 
 ## Tests
 
-`Dox().cache` is the `CacheManager`. Replace it in a test:
+`Dox().cache` is the `CacheManager` that `Cache()` uses. Replace it in a test, so the test needs no files and no Redis:
 
 ```dart
 Dox().cache = CacheManager(CacheConfig(
   defaultStore: 'memory',
-  stores: <String, Map<String, dynamic>>{'memory': <String, dynamic>{'driver': 'memory'}},
+  stores: <String, Map<String, dynamic>>{
+    'memory': <String, dynamic>{'driver': 'memory'},
+  },
 ));
 ```
+
+See [Testing](testing.md).

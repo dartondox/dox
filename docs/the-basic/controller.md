@@ -1,99 +1,106 @@
 # Controller
 
+A controller holds the code that answers a route. It can be a class method, a static method or a plain function.
+
 ## Class based controller
+
+Make one with the CLI:
 
 ```bash
 dox create:controller Blog
 ```
 
-=== "Route"
-
-    ```dart
-    AppController controller = AppController()
-    Route.get('/ping', controller.ping);
-    ```
+It writes `lib/app/http/controllers/blog.controller.dart`.
 
 === "Controller"
 
-    ```dart
-    class AppController {
-        ping(DoxRequest req) {
-            return 'pong';
-        }
+    ```dart title="lib/app/http/controllers/blog.controller.dart"
+    import 'package:dox_core/dox_core.dart';
+
+    class BlogController {
+      String index(DoxRequest req) {
+        return 'all blogs';
+      }
     }
     ```
-
-!!! info "with static method"
-    You can also use as static method in the controller.
 
 === "Route"
 
-    ```dart
-    Route.get('/ping', AppController.ping);
+    ```dart title="lib/routes/api.dart"
+    BlogController blogController = BlogController();
+    Route.get('/blogs', blogController.index);
     ```
 
-=== "Controller"
+### Static method
 
-    ```dart
-    class AppController {
-        static ping(DoxRequest req) {
-            return 'pong';
-        }
-    }
-    ```
+```dart
+class AppController {
+  static String ping(DoxRequest req) {
+    return 'pong';
+  }
+}
+
+Route.get('/ping', AppController.ping);
+```
 
 ## Function based controller
 
-=== "Route"
+```dart
+String listBlog(DoxRequest req) {
+  return 'all blogs';
+}
 
-    ```dart
-    Route.get('/ping', listBlog);
-    ```
-
-=== "Controller"
-
-    ```dart
-    listBlog(DoxRequest req) {
-        return 'pong';
-    }
-    ```
+Route.get('/blogs', listBlog);
+```
 
 ## Resource controller
+
+A resource controller has the 7 methods that `Route.resource` uses.
 
 === "Create"
 
     ```bash
     dox create:controller Blog -r
     ```
-######
-=== "Sample"
 
-    ```dart
+=== "Controller"
+
+    ```dart title="lib/app/http/controllers/blog.controller.dart"
     import 'package:dox_core/dox_core.dart';
 
     class BlogController {
-        /// GET /resource
-        index(DoxRequest req) async {}
+      /// GET /resource
+      Future<dynamic> index(DoxRequest req) async {}
 
-        /// GET /resource/create
-        create(DoxRequest req) async {}
+      /// GET /resource/create
+      Future<dynamic> create(DoxRequest req) async {}
 
-        /// POST /resource
-        store(DoxRequest req) async {}
+      /// POST /resource
+      Future<dynamic> store(DoxRequest req) async {}
 
-        /// GET /resource/{id}
-        show(DoxRequest req, int id) async {}
+      /// GET /resource/{id}
+      Future<dynamic> show(DoxRequest req, int id) async {}
 
-        /// GET /resource/{id}/edit
-        edit(DoxRequest req, int id) async {}
+      /// GET /resource/{id}/edit
+      Future<dynamic> edit(DoxRequest req, int id) async {}
 
-        /// PUT|PATCH /resource/{id}
-        update(DoxRequest req, int id) async {}
+      /// PUT|PATCH /resource/{id}
+      Future<dynamic> update(DoxRequest req, int id) async {}
 
-        /// DELETE /resource/{id}
-        destroy(DoxRequest req, int id) async {}
+      /// DELETE /resource/{id}
+      Future<dynamic> destroy(DoxRequest req, int id) async {}
     }
     ```
+
+=== "Route"
+
+    ```dart title="lib/routes/api.dart"
+    Route.resource('blogs', BlogController());
+    ```
+
+You can delete methods you do not need. `Route.resource` skips them.
+See [Routing: resource routes](routing.md#resource-routes).
+
 ## Parameters
 
 A controller asks for what it needs by **type**. Dox fills each parameter.
@@ -102,7 +109,7 @@ A controller asks for what it needs by **type**. Dox fills each parameter.
 Route.put('/teams/{teamId}/users/{id}', controller.update);
 
 class UserController {
-    Future<User> update(int teamId, int id, UpdateUser body) async { ... }
+  Future<User> update(int teamId, int id, UpdateUser body) async { ... }
 }
 ```
 
@@ -122,11 +129,11 @@ Rules:
 - A catch-all `{path*}` param is a `String`.
 - The same rules work for static methods and plain functions.
 
-**Path param types.** Text from the URL is converted:
+**Path param types.** Dox converts the text from the URL:
 
-- `int`: `"42"` is `42`. `"abc"` or `"4.5"` answers `404 Not Found`: no such page.
+- `int`: `"42"` is `42`. `"abc"` or `"4.5"` answers `404 Not Found`.
 - `double`, `num`: `"4.5"` is `4.5`.
-- `bool`: `true`, `1` / `false`, `0`.
+- `bool`: `true` or `1` is `true`. `false` or `0` is `false`.
 - Any other text answers `404` too.
 - Path params are checked first. When one is wrong, the DTO is not checked.
 
@@ -138,3 +145,7 @@ Rules:
 !!! info "Why types, not names?"
     Dox reads the parameter types of your method once, when the routes are registered at start. It needs no `dart:mirrors`.
     So `update(int teamId, int id)` works by position, not by the names `teamId` and `id`.
+
+## What to return
+
+Return a `String`, a `Map`, a model, a `File` and more. See [Response](response.md).
