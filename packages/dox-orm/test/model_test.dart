@@ -53,6 +53,27 @@ void main() async {
       expect(blog.status, 'active');
     });
 
+    test('find with the cached sql gives the right rows', () async {
+      await Blog().create(<String, dynamic>{'title': 'one', 'body': 'a'});
+      await Blog().create(<String, dynamic>{'title': 'two', 'body': 'b'});
+
+      /// the second find of each kind uses the cached sql
+      for (int i = 0; i < 2; i++) {
+        expect((await Blog().find(1))?.title, 'one');
+        expect((await Blog().find(2))?.title, 'two');
+        expect((await Blog().find('title', 'two'))?.uid, 2);
+        expect(await Blog().find(3), null);
+        expect(await Blog().where('title', 'one').find(2), null);
+      }
+
+      /// soft deleted rows are left out, but not with withTrash()
+      await (await Blog().find(1))!.delete();
+      for (int i = 0; i < 2; i++) {
+        expect(await Blog().find(1), null);
+        expect((await Blog().withTrash().find(1))?.title, 'one');
+      }
+    });
+
     test('insert', () async {
       Blog blog = await Blog().insert(<String, dynamic>{
         'title': 'dox query builder',

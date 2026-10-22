@@ -1,7 +1,12 @@
+import 'dart:async';
+
 import 'package:dox_orm/dox_orm.dart';
 
 final RegExp _notWord = RegExp(r'[^\w]');
 final RegExp _manySpaces = RegExp(' +');
+
+/// column name without the non word characters, made once
+final Map<String, String> _keyNames = <String, String>{};
 
 /// snake case table name of each model type, made once
 final Map<Type, String> _snakeNames = <Type, String>{};
@@ -17,7 +22,13 @@ class QueryBuilderHelper<T> {
   /// same keys every time, so the sql text is the same and the drivers can
   /// reuse their prepared statements.
   String parseColumnKey(String column) {
-    return '@${column.replaceAll(_notWord, '')}_p${_paramCount++}';
+    String? name = _keyNames[column];
+    if (name == null) {
+      /// ponytail: cleared when full, column names are a small set
+      if (_keyNames.length >= 1000) _keyNames.clear();
+      name = _keyNames[column] = column.replaceAll(_notWord, '');
+    }
+    return '@${name}_p${_paramCount++}';
   }
 
   /// quote a table or column name for the current driver
@@ -36,10 +47,14 @@ class QueryBuilderHelper<T> {
     return query;
   }
 
-  Future<List<Map<String, dynamic>>> runQuery(String query) {
+  /// [clean] is true when [query] has no double spaces (eg. from a cache)
+  Future<List<Map<String, dynamic>>> runQuery(
+    String query, {
+    bool clean = false,
+  }) {
     Map<String, dynamic> values = queryBuilder.substitutionValues;
     if (queryBuilder.shouldDebug) queryBuilder.logger.log(query, values);
-    if (query.contains('  ')) {
+    if (!clean && query.contains('  ')) {
       query = query.replaceAll(_manySpaces, ' ');
     }
     return queryBuilder.dbDriver.query(
@@ -64,8 +79,10 @@ class QueryBuilderHelper<T> {
     return queryResult;
   }
 
+  /// rows to models. It is sync when there are no relations to load,
+  /// so the caller does not wait one more microtask.
   // ignore: always_specify_types
-  Future<List> formatResult(List<Map<String, dynamic>> queryResult) async {
+  FutureOr<List> formatResult(List<Map<String, dynamic>> queryResult) {
     List<Map<String, dynamic>> result = getMapResult(queryResult);
 
     if (queryBuilder.getRawQuery().isNotEmpty) {
@@ -77,11 +94,11 @@ class QueryBuilderHelper<T> {
     }
 
     dynamic self = queryBuilder.self;
-    if (self != null && self != dynamic) {
+    if (self is Model) {
       List<String> preloads = self.customPreloadList;
       List<T> ret = <T>[];
       for (Map<String, dynamic> e in result) {
-        dynamic res = self.fromMap(e);
+        Model<dynamic> res = self.fromMap(e);
         res.originalMap = e;
         for (String preload in preloads) {
           res.preload(preload);
@@ -91,11 +108,16 @@ class QueryBuilderHelper<T> {
 
       /// no relations to load: skip the preload work
       if (ret.isNotEmpty && queryBuilder.getPreload().isNotEmpty) {
-        await queryBuilder.initPreload(ret as List<Model<T>>);
+        return _preload(ret);
       }
       return ret;
     }
     return result;
+  }
+
+  Future<List<T>> _preload(List<T> ret) async {
+    await queryBuilder.initPreload(ret as List<Model<T>>);
+    return ret;
   }
 
   /// snake case name of the model type, eg. `BlogInfo` is `blog_info`

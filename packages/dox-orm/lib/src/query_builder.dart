@@ -31,7 +31,8 @@ class QueryBuilder<T>
         Truncate<T>,
         Delete<T>,
         Count<T> {
-  Map<String, dynamic> _substitutionValues = <String, dynamic>{};
+  /// made on the first use, a find() with a cached sql makes it once
+  Map<String, dynamic>? _substitutionValues;
 
   dynamic self;
 
@@ -64,7 +65,8 @@ class QueryBuilder<T>
   bool shouldDebug = SqlQueryBuilder().debug;
 
   @override
-  Map<String, dynamic> get substitutionValues => _substitutionValues;
+  Map<String, dynamic> get substitutionValues =>
+      _substitutionValues ??= <String, dynamic>{};
 
   @override
   String get selectQueryString => getSelectQuery();
@@ -83,7 +85,7 @@ class QueryBuilder<T>
   @override
   void addSubstitutionValues(String key, dynamic value) {
     String index = key.replaceFirst('@', '');
-    _substitutionValues[index] = value;
+    substitutionValues[index] = value;
   }
 
   @override
@@ -148,7 +150,10 @@ class QueryBuilder<T>
 
   /// **** map
 
-  Map<String, dynamic> originalMap = <String, dynamic>{};
+  /// the row this model was made from
+  Map<String, dynamic> get originalMap => _originalMap ??= <String, dynamic>{};
+  set originalMap(Map<String, dynamic> value) => _originalMap = value;
+  Map<String, dynamic>? _originalMap;
 
   // coverage:ignore-start
   Map<String, dynamic> convertToMap(dynamic i) {
