@@ -5,7 +5,6 @@ import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:dox_mysql_native/src/bindings.dart';
-import 'package:dox_orm/dox_orm.dart' show toPositionalParams;
 import 'package:mysql_dart/exception.dart';
 
 /// The result of one query.
@@ -162,7 +161,7 @@ class MysqlNativePool {
   ) {
     List<Object?> params;
     if (parameters is Map<String, dynamic>) {
-      (sql, params) = toPositionalParams(sql, parameters, _same);
+      (sql, params) = _toPositional(sql, parameters);
     } else if (parameters is List<Object?>) {
       params = parameters;
     } else if (parameters == null) {
@@ -173,7 +172,25 @@ class MysqlNativePool {
     return _Link.instance.send(handle, transaction, op, sql, params);
   }
 
-  static Object? _same(dynamic value) => value;
+  /// changes each known `@key` to `?` and lists its value in the same
+  /// order. An unknown `@word` (eg. 'a@b.com' in a string) stays as it is.
+  // ponytail: no cache of the converted sql. The Dox ORM driver sends
+  // lists, so only direct pool users with maps pay for the regex.
+  static (String, List<Object?>) _toPositional(
+    String sql,
+    Map<String, dynamic> values,
+  ) {
+    List<Object?> params = <Object?>[];
+    String converted = sql.replaceAllMapped(_paramPattern, (Match m) {
+      String key = m.group(1)!;
+      if (!values.containsKey(key)) return m.group(0)!;
+      params.add(values[key]);
+      return '?';
+    });
+    return (converted, params);
+  }
+
+  static final RegExp _paramPattern = RegExp(r'@(\w+)');
 }
 
 const int _opQuery = 0;

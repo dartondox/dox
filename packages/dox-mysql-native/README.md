@@ -1,7 +1,7 @@
 # dox_mysql_native
 
-A fast MySQL and MariaDB driver for Dart and the [Dox](https://dartondox.dev)
-ORM. Rust ([mysql_async](https://docs.rs/mysql_async)) owns the
+A fast MySQL and MariaDB client for Dart. It is the default MySQL driver of
+the [Dox](https://dartondox.dev) ORM. Rust ([mysql_async](https://docs.rs/mysql_async)) owns the
 connections. Your code stays in Dart.
 
 Values come back with the same Dart types as with the Dox ORM on
@@ -25,15 +25,8 @@ void main() async {
 }
 ```
 
-With the Dox ORM, add one line to the MySQL `ConnectionConfig`:
-
-```dart
-'mysql': ConnectionConfig(
-  driver: Driver.mysql,
-  // ... host, user, password, database as before
-  driverFactory: MysqlNativeDriver.fromConfig,
-),
-```
+With the Dox ORM you do not add this package. `dox_orm` depends on it and
+uses it by default. Set `DOX_DB_DRIVER=dart` to use the Dart driver.
 
 - Works with MySQL 8.4 (`caching_sha2_password`) and MariaDB 11.
 - The build hook downloads a ready-built library when one exists for your

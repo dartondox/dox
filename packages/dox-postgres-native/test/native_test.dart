@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
 
-import 'package:dox_orm/dox_orm.dart';
 import 'package:dox_postgres_native/dox_postgres_native.dart';
 import 'package:postgres/postgres.dart';
 import 'package:test/test.dart';
@@ -300,25 +299,6 @@ void main() {
       );
     });
 
-    test('the ORM driver commits, rolls back and joins nested ones', () async {
-      PostgresNativeDriver driver = PostgresNativeDriver(native);
-      await driver.transaction(() async {
-        await driver.execute('INSERT INTO pgn_tx VALUES (1)');
-        await driver.transaction(() async {
-          await driver.execute('INSERT INTO pgn_tx VALUES (2)');
-        });
-      });
-      expect(await all(), <int>[1, 2]);
-      await expectLater(
-        driver.transaction(() async {
-          await driver.execute('INSERT INTO pgn_tx VALUES (3)');
-          throw StateError('stop');
-        }),
-        throwsStateError,
-      );
-      expect(await all(), <int>[1, 2]);
-    });
-
     test('a request sent after the end still gets an answer', () async {
       // Sent in one batch: Rust got the second end and the query while the
       // first end still ran. They waited forever.
@@ -369,25 +349,6 @@ void main() {
     );
     expect(count.rows.single['n'], 1600);
     await native.query('DROP TABLE pgn_iso');
-  });
-
-  test('fromConfig reads a Dox ConnectionConfig', () async {
-    PostgresNativeDriver driver = PostgresNativeDriver.fromConfig(
-      ConnectionConfig(
-        driver: Driver.postgres,
-        host: host,
-        port: port,
-        user: 'postgres',
-        password: 'postgres',
-        database: 'postgres',
-        debug: false,
-      ),
-    );
-    expect(driver.getName(), Driver.postgres);
-    expect(await driver.query('SHOW TimeZone'), <Map<String, dynamic>>[
-      <String, dynamic>{'TimeZone': 'UTC'},
-    ]);
-    driver.pool.close();
   });
 }
 

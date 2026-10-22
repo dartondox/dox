@@ -24,14 +24,20 @@ import 'package:dox_orm/dox_orm.dart';
 
 ## Supported databases
 
-| Database | `Driver` | Dart package | Pool | Good for |
-|---|---|---|---|---|
-| Postgres | `Driver.postgres` | `postgres` | Yes | Production |
-| MySQL 8+ and MariaDB | `Driver.mysql` | `mysql_dart` | Yes | Production |
-| SQLite | `Driver.sqlite` | `sqlite3` | No, one connection per isolate | Dev, tests, small apps |
+| Database | `Driver` | Default driver | Dart driver | Pool | Good for |
+|---|---|---|---|---|---|
+| Postgres | `Driver.postgres` | [`dox_postgres_native`](postgres-native.md) | `postgres` | Yes | Production |
+| MySQL 8+ and MariaDB | `Driver.mysql` | [`dox_mysql_native`](mysql-native.md) | `mysql_dart` | Yes | Production |
+| SQLite | `Driver.sqlite` | `sqlite3` | `sqlite3` | No, one connection per isolate | Dev, tests, small apps |
 
-!!! tip
-    For more speed, see the [native Postgres driver](postgres-native.md) and the [native MySQL driver](mysql-native.md).
+!!! info "Native drivers"
+    Postgres and MySQL use a native (Rust) driver by default. It is faster when many
+    requests run at the same time. You do not change any config.
+    If the native library can not load on your system, the ORM uses the Dart driver
+    and prints one warning line.
+    To always use the Dart driver, set `DOX_DB_DRIVER=dart`, or `extra: {'native': false}`
+    on one connection. See the [Postgres](postgres-native.md#use-the-dart-driver) and
+    [MySQL](mysql-native.md#use-the-dart-driver) pages.
 
 ## Config
 
@@ -97,7 +103,9 @@ DB_PASSWORD=postgres
 
 !!! info "MySQL `extra` options"
     `maxConnectionCount` (default 10) is the pool size.
-    `collation` (default `utf8mb4_general_ci`), `timeoutMs`, `timeZone` and `maxConnectionAge`
+    `maxConnectionAge`, `preparedStatementCacheSize` and `threads` are read by the native driver.
+    The keys below are read only by the Dart driver (`native: false`).
+    `collation` (default `utf8mb4_general_ci`), `timeoutMs` and `timeZone`
     are also read.
     The MySQL 8 default login (`caching_sha2_password`) works, also without TLS.
     Without TLS the driver asks the server for its RSA key to encrypt the password.

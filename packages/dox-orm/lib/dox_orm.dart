@@ -3,7 +3,10 @@ library;
 export 'package:dox_annotation/dox_annotation.dart';
 
 export 'src/drivers/db_driver.dart';
+export 'src/drivers/mysql_native_driver.dart';
+export 'src/drivers/native_drivers.dart';
 export 'src/drivers/postgres_driver.dart';
+export 'src/drivers/postgres_native_driver.dart';
 export 'src/drivers/statement_cache.dart';
 export 'src/main.dart';
 export 'src/model.dart';
