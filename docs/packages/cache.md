@@ -51,7 +51,11 @@ CacheStore store = cache.store();     // the default store
 await cache.store('file').get('a');   // a named store
 ```
 
-Redis options: `host`, `port`, `username`, `password`, `db`, `tls`, `prefix`.
+Redis options: `host`, `port`, `username`, `password`, `db`, `tls`, `prefix`, `pool_size`.
+
+`pool_size` is the most Redis connections one store opens in one isolate. The default is 10.
+More connections help when many requests read the cache at the same time.
+Each Dox isolate has its own pool, so the total is `pool_size` times the number of isolates.
 
 ## Basic use
 
@@ -83,6 +87,7 @@ List<dynamic> posts = await store.remember('posts', Duration(minutes: 10), () as
 | Method | What it does |
 | --- | --- |
 | `get(key, [default])` | the value, or the default when missing or expired |
+| `getRaw(key)` | the stored JSON text, with no decode. Null when missing |
 | `put(key, value, [ttl])` | store it |
 | `add(key, value, [ttl])` | store only when missing. Returns true when stored |
 | `has(key)` | true when the value is not null |

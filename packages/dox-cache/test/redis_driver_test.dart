@@ -169,6 +169,42 @@ Future<void> main() async {
       await otherRedis.disconnect();
     });
 
+    test('reads values written by the old code', () async {
+      // Old versions stored jsonEncode(value) with a plain SET.
+      await redis.sendCommand(<String>[
+        'SET',
+        'dox_cache_spec:*[x]:old',
+        '{"a":[1,"b"],"c":null}',
+      ]);
+      expect(await driver.get('old'), <String, dynamic>{
+        'a': <dynamic>[1, 'b'],
+        'c': null,
+      });
+      expect(await driver.getRaw('old'), '{"a":[1,"b"],"c":null}');
+      await redis.sendCommand(<String>['SET', 'dox_cache_spec:*[x]:n', 'null']);
+      expect(await driver.get('n'), isNull);
+      expect(await driver.getRaw('n'), isNull);
+    });
+
+    test('pool_size sets the ioredis max connections', () async {
+      RedisDriver pooled = const RedisDriverFactory().create(<String, dynamic>{
+        'host': RedisEnv.host,
+        'port': RedisEnv.port,
+        'pool_size': 3,
+      }) as RedisDriver;
+      expect(pooled.redis.option.maxConnection, 3);
+      await pooled.redis.disconnect();
+      RedisDriver plain = const RedisDriverFactory().create(<String, dynamic>{
+        'host': RedisEnv.host,
+        'port': RedisEnv.port,
+      }) as RedisDriver;
+      expect(
+        plain.redis.option.maxConnection,
+        CacheConstants.defaultRedisPoolSize,
+      );
+      await plain.redis.disconnect();
+    });
+
     test('factory builds a driver from config', () async {
       CacheDriver built = const RedisDriverFactory().create(<String, dynamic>{
         'host': RedisEnv.host,

@@ -42,6 +42,13 @@ class MemoryDriver extends CacheDriver {
     return entry == null ? null : jsonDecode(entry.value);
   }
 
+  /// The stored JSON text. No decode.
+  @override
+  Future<String?> getRaw(String key) async {
+    MemoryEntry? entry = _live(prefix + key);
+    return entry == null ? null : CacheDriver.liveText(entry.value);
+  }
+
   @override
   Future<void> put(String key, Object? value, Duration? ttl) async {
     _write(prefix + key, MemoryEntry(jsonEncode(value), _expiresAt(ttl)));

@@ -77,6 +77,15 @@ class Cache {
     return repository.get(key, defaultValue);
   }
 
+  /// The stored value as JSON text, with no decode. Null when missing.
+  /// Fast way to send a cached value as a JSON response.
+  /// ```
+  /// String? json = await Cache().getRaw('posts');
+  /// ```
+  Future<String?> getRaw(String key) {
+    return repository.getRaw(key);
+  }
+
   /// True when the key has a value.
   Future<bool> has(String key) {
     return repository.has(key);

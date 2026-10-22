@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'cache_lock.dart';
 
 /// A cache backend. Values are JSON-encodable: Map, List, String, num,
@@ -10,6 +12,19 @@ abstract class CacheDriver {
 
   /// The value, or null when missing or expired.
   Future<dynamic> get(String key);
+
+  /// The stored value as JSON text, or null when missing or expired.
+  /// Drivers that keep JSON text return it as is, with no decode.
+  Future<String?> getRaw(String key) async {
+    Object? value = await get(key);
+    return value == null ? null : jsonEncode(value);
+  }
+
+  /// [text] from the backend, or null when it is a stored null.
+  /// A stored null reads as a miss, the same as in [get].
+  static String? liveText(String text) {
+    return text == 'null' ? null : text;
+  }
 
   /// Store a value.
   Future<void> put(String key, Object? value, Duration? ttl);

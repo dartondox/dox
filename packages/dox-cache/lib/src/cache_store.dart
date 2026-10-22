@@ -21,9 +21,24 @@ class CacheStore {
   final CacheDriver driver;
 
   /// The value, or [defaultValue] when missing or expired.
-  Future<dynamic> get(String key, [Object? defaultValue]) async {
-    dynamic value = await driver.get(await itemKey(key));
-    return value ?? defaultValue;
+  Future<dynamic> get(String key, [Object? defaultValue]) {
+    FutureOr<String> fullKey = itemKey(key);
+    // Fast path: no extra async step when the key is ready.
+    if (fullKey is String && defaultValue == null) {
+      return driver.get(fullKey);
+    }
+    return _getOrDefault(fullKey, defaultValue);
+  }
+
+  /// The stored value as JSON text, with no decode, or null when missing.
+  /// Use it to send a cached value as a JSON response as is.
+  /// A stored String comes back with its quotes: `"bar"`.
+  Future<String?> getRaw(String key) async {
+    FutureOr<String> fullKey = itemKey(key);
+    if (fullKey is String) {
+      return driver.getRaw(fullKey);
+    }
+    return driver.getRaw(await fullKey);
   }
 
   /// True when the key has a non-null value.
@@ -146,8 +161,17 @@ class CacheStore {
   }
 
   /// Key sent to the driver. Tagged caches change it.
-  Future<String> itemKey(String key) async {
+  /// Plain stores return it right away, with no async step.
+  FutureOr<String> itemKey(String key) {
     return key;
+  }
+
+  Future<dynamic> _getOrDefault(
+    FutureOr<String> fullKey,
+    Object? defaultValue,
+  ) async {
+    dynamic value = await driver.get(await fullKey);
+    return value ?? defaultValue;
   }
 
   bool _isGone(Duration? ttl) {
