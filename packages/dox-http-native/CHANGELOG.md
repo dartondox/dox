@@ -1,3 +1,7 @@
+## 3.0.0-alpha.4
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.3
 
 - `DOX_HTTP_THREAD=shared` runs one `dox-http` thread for all isolates.

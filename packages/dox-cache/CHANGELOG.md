@@ -1,3 +1,7 @@
+## 3.0.0-alpha.4
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.3
 
 - New: `getRaw(key)` gives the stored value as JSON text, with no decode. Use it to send a cached value as a JSON response. Memory and Redis return the stored text as is. A stored String comes back with its quotes (`"bar"`). The stored format did not change, so old values still read the same.
