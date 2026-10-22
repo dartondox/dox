@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.3
 
 - New: `Cache().getRaw(key)` gives the cached value as JSON text, with no decode. Send it as a JSON response with no extra encode step.
 - New Redis cache option `pool_size` (see `dox_cache`).

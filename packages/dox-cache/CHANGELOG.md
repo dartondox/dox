@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.3
 
 - New: `getRaw(key)` gives the stored value as JSON text, with no decode. Use it to send a cached value as a JSON response. Memory and Redis return the stored text as is. A stored String comes back with its quotes (`"bar"`). The stored format did not change, so old values still read the same.
 - Faster `get`: a plain store builds the key with no async step. `itemKey` now returns `FutureOr<String>`. Memory `get` costs about 0.6 µs instead of 0.86 µs. Memory `getRaw` costs about 0.3 µs.

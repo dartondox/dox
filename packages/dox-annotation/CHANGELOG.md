@@ -1,3 +1,7 @@
+## 3.0.0-alpha.3
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.2
 
 - Needs Dart 3.13 or newer.
