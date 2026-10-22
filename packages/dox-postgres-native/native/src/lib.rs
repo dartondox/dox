@@ -26,6 +26,7 @@ use std::ffi::{CStr, c_char, c_int, c_void};
 use std::str::FromStr;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, OnceLock};
+use std::time::Duration;
 
 use bytes::BytesMut;
 use deadpool_postgres::{Manager, ManagerConfig, Object, Pool, RecyclingMethod};
@@ -43,6 +44,12 @@ const RES_HEAD: usize = 13;
 /// Statements kept per connection. Over this, the cache is cleared.
 /// ponytail: a simple clear, an LRU when apps use many different queries.
 const CACHE_MAX: usize = 512;
+/// Longest wait for one request (pool slot, connect and query), like the
+/// default `queryTimeout` of the `postgres` package. Over it the request
+/// fails with a clear error, so Dart never waits forever.
+/// ponytail: fixed. Make it a pool option when an app needs another value.
+const TIMEOUT: Duration = Duration::from_secs(300);
+const TIMED_OUT: &str = "dox_postgres_native: timeout, no answer in 300 s";
 
 // ---- Dart API DL -------------------------------------------------------
 // `NativeApi.initializeApiDLData` points to this table. We only need
@@ -395,6 +402,13 @@ async fn query(client: &Object, id: u64, sql: &str, params: &[Param]) -> Vec<u8>
     }
 }
 
+/// Runs `work` for request `id`, or gives a timeout error after [TIMEOUT].
+async fn timed(id: u64, work: impl Future<Output = Vec<u8>>) -> Vec<u8> {
+    tokio::time::timeout(TIMEOUT, work)
+        .await
+        .unwrap_or_else(|_| message(id, TIMED_OUT))
+}
+
 /// Work for the task that owns the connection of one transaction.
 enum Job {
     Query {
@@ -413,38 +427,63 @@ enum Job {
 /// Starts a transaction on one connection. Its queries run one after the
 /// other on that connection, in the order Dart sent them.
 async fn begin(id: u64, pool: Pool, sink: Arc<Sink>) {
-    let client = match pool.get().await {
-        Ok(c) => c,
-        Err(e) => return sink.push(&pool_error(id, e)),
+    let start = async {
+        let client = pool.get().await.map_err(|e| pool_error(id, e))?;
+        match client.batch_execute("BEGIN").await {
+            Ok(()) => Ok(client),
+            Err(e) => Err(error(id, &e)),
+        }
     };
-    if let Err(e) = client.batch_execute("BEGIN").await {
-        return sink.push(&error(id, &e));
-    }
+    let client = match tokio::time::timeout(TIMEOUT, start).await {
+        Ok(Ok(c)) => c,
+        Ok(Err(out)) => return sink.push(&out),
+        Err(_) => return sink.push(&message(id, TIMED_OUT)),
+    };
     let (tx, mut rx) = mpsc::unbounded_channel();
     let key = with(&TXS, |r| r.insert(tx));
     let mut out = Vec::with_capacity(RES_HEAD + 8);
     head(&mut out, id, 3);
     out.extend_from_slice(&key.to_le_bytes());
     sink.push(&done(out));
-    // ponytail: a transaction that Dart never ends keeps its connection.
-    while let Some(job) = rx.recv().await {
+    loop {
+        // Dart did not end it in time (eg. its isolate is gone): roll back
+        // and give the connection back, so the pool does not run dry.
+        let Ok(Some(job)) = tokio::time::timeout(TIMEOUT, rx.recv()).await else {
+            close(key, &mut rx);
+            let _ = tokio::time::timeout(TIMEOUT, client.batch_execute("ROLLBACK")).await;
+            return;
+        };
         match job {
             Job::Query {
                 id,
                 sql,
                 params,
                 sink,
-            } => sink.push(&query(&client, id, &sql, &params).await),
+            } => sink.push(&timed(id, query(&client, id, &sql, &params)).await),
             Job::End { id, commit, sink } => {
-                with(&TXS, |r| r.map.remove(&key));
+                close(key, &mut rx);
                 let sql = if commit { "COMMIT" } else { "ROLLBACK" };
-                let out = match client.batch_execute(sql).await {
-                    Ok(()) => message_ok(id),
-                    Err(e) => error(id, &e),
-                };
+                let out = timed(id, async {
+                    match client.batch_execute(sql).await {
+                        Ok(()) => message_ok(id),
+                        Err(e) => error(id, &e),
+                    }
+                })
+                .await;
                 return sink.push(&out);
             }
         }
+    }
+}
+
+/// Ends transaction `key` for new requests (they fail in `run`). The ones
+/// already sent (eg. a second rollback) get an answer here.
+fn close(key: u64, rx: &mut mpsc::UnboundedReceiver<Job>) {
+    with(&TXS, |r| r.map.remove(&key));
+    rx.close();
+    while let Ok(job) = rx.try_recv() {
+        let (Job::Query { id, sink, .. } | Job::End { id, sink, .. }) = job;
+        sink.push(&message(id, "the transaction is closed"));
     }
 }
 
@@ -554,10 +593,13 @@ fn run(req: Request, sink: Arc<Sink>, rt: &Handle) {
     match kind {
         0 => {
             rt.spawn(async move {
-                let out = match pool.get().await {
-                    Ok(client) => query(&client, id, &sql, &params).await,
-                    Err(e) => pool_error(id, e),
-                };
+                let out = timed(id, async {
+                    match pool.get().await {
+                        Ok(client) => query(&client, id, &sql, &params).await,
+                        Err(e) => pool_error(id, e),
+                    }
+                })
+                .await;
                 sink.push(&out);
             });
         }

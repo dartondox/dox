@@ -318,6 +318,40 @@ void main() {
       );
       expect(await all(), <int>[1, 2]);
     });
+
+    test('a request sent after the end still gets an answer', () async {
+      // Sent in one batch: Rust got the second end and the query while the
+      // first end still ran. They waited forever.
+      int tx = await native.begin();
+      List<Future<Object?>> after = <Future<Object?>>[
+        native.rollback(tx),
+        native.rollback(tx),
+        native.query('SELECT 1', transaction: tx),
+      ];
+      List<Object?> out = await Future.wait(<Future<Object?>>[
+        for (Future<Object?> f in after)
+          f.then<Object?>((_) => 'ok', onError: (Object e) => e),
+      ]).timeout(const Duration(seconds: 5));
+      expect(out.first, 'ok');
+      expect(out.skip(1), everyElement(isA<PgException>()));
+    });
+  });
+
+  test('a value Dart can not decode fails only its own query', () async {
+    // Out of the DateTime range. It threw in the middle of a result batch,
+    // so the other results of that batch were lost.
+    List<Future<Object?>> all = <Future<Object?>>[
+      for (int i = 0; i < 20; i++)
+        i == 10
+            ? native.query("SELECT '294276-12-31'::timestamp AS t")
+            : native.query('SELECT $i AS n'),
+    ];
+    List<Object?> out = await Future.wait(<Future<Object?>>[
+      for (Future<Object?> f in all)
+        f.then<Object?>((Object? r) => r, onError: (Object e) => e),
+    ]).timeout(const Duration(seconds: 5));
+    expect(out[10], isA<PgException>());
+    expect(out.whereType<PgNativeResult>(), hasLength(19));
   });
 
   test('one pool, used by many isolates', () async {
