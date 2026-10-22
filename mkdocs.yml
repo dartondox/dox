@@ -115,6 +115,7 @@ nav:
     - database/migration.md
     - database/schema.md
     - database/postgres-native.md
+    - database/mysql-native.md
     - Model:
       - database/model/index.md
       - database/model/events.md

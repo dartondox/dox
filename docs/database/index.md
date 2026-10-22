@@ -31,7 +31,7 @@ import 'package:dox_orm/dox_orm.dart';
 | SQLite | `Driver.sqlite` | `sqlite3` | No, one connection per isolate | Dev, tests, small apps |
 
 !!! tip
-    For more speed on Postgres, see the [native Postgres driver](postgres-native.md).
+    For more speed, see the [native Postgres driver](postgres-native.md) and the [native MySQL driver](mysql-native.md).
 
 ## Config
 
