@@ -1175,13 +1175,52 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#numbers" class="md-nav__link">
+  <a href="#app-benchmark" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Numbers
+        App benchmark
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="App benchmark">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-core_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 core
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-cores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 cores
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dart-vm-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dart VM flags
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2587,13 +2626,52 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#numbers" class="md-nav__link">
+  <a href="#app-benchmark" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Numbers
+        App benchmark
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="App benchmark">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-core_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 core
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-cores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 cores
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dart-vm-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dart VM flags
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2818,117 +2896,135 @@ CPU pinned.</p>
   Rust library with cargo.</li>
 <li><code>DOX_SERVER=dartio</code> runs the same Dox app on <code>dart:io</code>.</li>
 </ul>
-<h2 id="numbers">Numbers</h2>
-<p>Measured on a MacBook (Apple M-series, 8 cores), Dart 3.13. The load tool
-ran on the same machine, so it took some of the CPU. Treat the numbers as a
-comparison, not as a max.</p>
-<p><code>json</code> = <code>GET /json</code> returning a small map. <code>param</code> = <code>GET /user/{id}</code>.
-64 keep-alive connections, 8 seconds.</p>
+<h2 id="app-benchmark">App benchmark</h2>
+<p>A small real app, the same in each language: <code>GET /json</code> returns a map,
+<code>GET /db</code> reads one row by id from Postgres, <code>GET /queries?n=20</code> reads 20
+rows one after another. The table has 10,000 rows. Each server runs alone
+on one or two pinned CPUs, Postgres 18 and wrk on other CPUs, 256
+connections, 4 database connections per core, 3 runs of 10 seconds, median.
+Versions: Dox 3.0.0-alpha.3 (native server, <code>dox_postgres_native</code>), Go 1.27
+(<code>net/http</code> + pgx), Bun 1.4 (<code>Bun.serve</code> + <code>Bun.sql</code>), Node 24
+(<code>node:http</code> + <code>pg</code>), <code>dart:io</code> (<code>HttpServer</code> + <code>package:postgres</code>).</p>
+<h3 id="1-core_1">1 core</h3>
 <table>
 <thead>
 <tr>
-<th>Setup</th>
-<th>Start</th>
-<th>Idle memory</th>
-<th>json req/s</th>
-<th>param req/s</th>
+<th>Route</th>
+<th style="text-align: right;">Dox</th>
+<th style="text-align: right;">Bun</th>
+<th style="text-align: right;">Go</th>
+<th style="text-align: right;"><code>dart:io</code></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>JIT, 1 isolate</td>
-<td>1.0 s</td>
-<td>388 MB</td>
-<td>26-28k</td>
-<td>29k</td>
+<td>/json req/s</td>
+<td style="text-align: right;">157,036</td>
+<td style="text-align: right;">176,148</td>
+<td style="text-align: right;">79,884</td>
+<td style="text-align: right;">33,670</td>
 </tr>
 <tr>
-<td>AOT, 1 isolate</td>
-<td>0.05 s</td>
-<td>16 MB</td>
-<td>27-30k</td>
-<td>26-28k</td>
+<td>/db req/s</td>
+<td style="text-align: right;">85,381</td>
+<td style="text-align: right;">57,614</td>
+<td style="text-align: right;">36,706</td>
+<td style="text-align: right;">12,146</td>
 </tr>
 <tr>
-<td>JIT, 8 isolates</td>
-<td>1.0 s</td>
-<td>398 MB</td>
-<td>54-57k</td>
-<td>52-58k</td>
+<td>/queries req/s</td>
+<td style="text-align: right;">9,745</td>
+<td style="text-align: right;">10,097</td>
+<td style="text-align: right;">3,810</td>
+<td style="text-align: right;">966</td>
 </tr>
 <tr>
-<td>AOT, 8 isolates</td>
-<td>0.05 s</td>
-<td>16 MB</td>
-<td>60k</td>
-<td>56-62k</td>
+<td>/db p99 ms</td>
+<td style="text-align: right;">5.65</td>
+<td style="text-align: right;">6.11</td>
+<td style="text-align: right;">14.49</td>
+<td style="text-align: right;">47.62</td>
+</tr>
+<tr>
+<td>/db peak MB</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">62</td>
 </tr>
 </tbody>
 </table>
-<p>Before and after the changes in this release (AOT):</p>
+<h3 id="2-cores">2 cores</h3>
 <table>
 <thead>
 <tr>
-<th>Test</th>
-<th>Before</th>
-<th>After</th>
+<th>Route</th>
+<th style="text-align: right;">Dox</th>
+<th style="text-align: right;">Bun</th>
+<th style="text-align: right;">Go</th>
+<th style="text-align: right;">Node</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>json, 1 isolate</td>
-<td>23k/s</td>
-<td>27-30k/s</td>
+<td>/json req/s</td>
+<td style="text-align: right;">251,427</td>
+<td style="text-align: right;">385,553</td>
+<td style="text-align: right;">175,009</td>
+<td style="text-align: right;">156,389</td>
 </tr>
 <tr>
-<td>param, 1 isolate</td>
-<td>20k/s</td>
-<td>26-28k/s</td>
+<td>/db req/s</td>
+<td style="text-align: right;">138,514</td>
+<td style="text-align: right;">128,998</td>
+<td style="text-align: right;">49,393</td>
+<td style="text-align: right;">61,611</td>
 </tr>
 <tr>
-<td>json, 8 isolates</td>
-<td>54k/s</td>
-<td>60k/s</td>
+<td>/queries req/s</td>
+<td style="text-align: right;">12,902</td>
+<td style="text-align: right;">11,006</td>
+<td style="text-align: right;">5,134</td>
+<td style="text-align: right;">5,870</td>
 </tr>
 <tr>
-<td>param, 8 isolates</td>
-<td>52k/s</td>
-<td>56-62k/s</td>
+<td>/db p99 ms</td>
+<td style="text-align: right;">3.62</td>
+<td style="text-align: right;">5.61</td>
+<td style="text-align: right;">8.53</td>
+<td style="text-align: right;">8.06</td>
 </tr>
 <tr>
-<td>50 MB upload, peak memory</td>
-<td>1,100 MB</td>
-<td>72-93 MB</td>
-</tr>
-<tr>
-<td>50 MB upload, JIT peak memory</td>
-<td>1,380 MB</td>
-<td>389 MB (= JIT idle)</td>
-</tr>
-<tr>
-<td>request logs on, req/s cost</td>
-<td>-13%</td>
-<td>-4%</td>
+<td>/db peak MB</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">297</td>
 </tr>
 </tbody>
 </table>
-<p>For reference, a bare <code>dart:io</code> server with the same JSON gives about 44k/s on
-one isolate. So Dox adds some cost on top of <code>dart:io</code>, and that is the next
-place to look.</p>
-<p>Run it yourself (from <code>packages/dox-core</code>):</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>bash<span class="w"> </span>benchmark/run.sh<span class="w">          </span><span class="c1"># SECS=10 CONNS=64 N=&lt;cores&gt; to change</span>
-</span></code></pre></div>
-<p>It needs only Dart and <code>curl</code>. It uses a small Dart load tool
-(<code>benchmark/load.dart</code>), because <code>wrk</code> and <code>oha</code> are often not installed.</p>
+<p>Dox runs one isolate per core, Bun and Node one worker process per core.
+On the database routes Dox is ahead of all of them on 2 cores, and its p99
+is the lowest. On <code>/json</code> Bun is faster: its server is C++ and calls the
+JavaScript handler on the same thread, while Dox hands each batch of
+requests from the Rust thread to the Dart isolate.</p>
+<p>Dox on <code>dart:io</code> with the Dart <code>postgres</code> driver is 4 to 10 times slower
+than Dox with the native server and driver. Keep both on.</p>
+<h3 id="dart-vm-flags">Dart VM flags</h3>
+<p>We tried a bigger young generation (<code>DART_VM_OPTIONS=--new_gen_semi_max_size=64</code>
+and <code>128</code>) for a better p99. Over 5 runs the change was inside the noise,
+and memory did not move. So there is no flag to set. Dox never sets VM
+flags for you. <code>DART_VM_OPTIONS</code> is read by the AOT binary from
+<code>dox build</code>, so you can try your own.</p>
 <h2 id="request-body-limits">Request body limits</h2>
 <p>Dox reads a body while it streams in, and stops once it is too big.
 It answers <code>413 Payload Too Large</code>. It checks <code>Content-Length</code> first, so a
 big upload is refused before one byte is read. It also counts bytes while
 reading, so a client that sends no <code>Content-Length</code> (chunked) is stopped too.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nl">maxBodySize:</span><span class="w"> </span><span class="m">10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="p">,</span><span class="w">        </span><span class="c1">// JSON and urlencoded, default 10 MB</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nl">maxMultipartSize:</span><span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="p">,</span><span class="w">  </span><span class="c1">// form-data uploads, default 100 MB</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nl">maxBodySize:</span><span class="w"> </span><span class="m">10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="p">,</span><span class="w">        </span><span class="c1">// JSON and urlencoded, default 10 MB</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nl">maxMultipartSize:</span><span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="p">,</span><span class="w">  </span><span class="c1">// form-data uploads, default 100 MB</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">);</span>
 </span></code></pre></div>
 <p>Set the same limit in the proxy (<code>client_max_body_size</code> in nginx).</p>
 <h2 id="file-uploads">File uploads</h2>
@@ -2939,19 +3035,19 @@ reading, so a client that sends no <code>Content-Length</code> (chunked) is stop
 <li>The temp file is deleted when the response is done. So save it before you
   return from the controller.</li>
 </ul>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">RequestFile</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'video'</span><span class="p">);</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">file</span><span class="p">.</span><span class="n">length</span><span class="p">;</span><span class="w">          </span><span class="c1">// size in bytes</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">size</span><span class="p">;</span><span class="w">      </span><span class="c1">// size in KB</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">file</span><span class="p">.</span><span class="n">stream</span><span class="p">();</span><span class="w">        </span><span class="c1">// read it in chunks</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="s1">'videos'</span><span class="p">);</span><span class="w">           </span><span class="c1">// to storage (a cheap move on local disk)</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">moveTo</span><span class="p">(</span><span class="s1">'/data/videos/1.mp4'</span><span class="p">);</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">bytes</span><span class="p">;</span><span class="w">     </span><span class="c1">// whole file in memory. avoid for big files</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">RequestFile</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'video'</span><span class="p">);</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">file</span><span class="p">.</span><span class="n">length</span><span class="p">;</span><span class="w">          </span><span class="c1">// size in bytes</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">size</span><span class="p">;</span><span class="w">      </span><span class="c1">// size in KB</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">file</span><span class="p">.</span><span class="n">stream</span><span class="p">();</span><span class="w">        </span><span class="c1">// read it in chunks</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="s1">'videos'</span><span class="p">);</span><span class="w">           </span><span class="c1">// to storage (a cheap move on local disk)</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">moveTo</span><span class="p">(</span><span class="s1">'/data/videos/1.mp4'</span><span class="p">);</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">bytes</span><span class="p">;</span><span class="w">     </span><span class="c1">// whole file in memory. avoid for big files</span>
 </span></code></pre></div>
 <h2 id="big-responses">Big responses</h2>
 <p>Return a <code>Stream&lt;List&lt;int&gt;&gt;</code> or a <code>File</code>. Dox pipes it to the client and does
 not load it all into memory.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/video'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s1">'storage/video.mp4'</span><span class="p">));</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/video'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s1">'storage/video.mp4'</span><span class="p">));</span>
 </span></code></pre></div>
 <p>A <code>File</code> response sets <code>Content-Type</code> (from the file name),
 <code>Content-Length</code> and <code>Accept-Ranges</code>. It answers <code>Range: bytes=...</code> with
@@ -2962,7 +3058,7 @@ the file and send <code>Content-Length</code>.</p>
 <code>Content-Length</code> set.</p>
 <h2 id="gzip">gzip</h2>
 <p>gzip in Dart is off by default.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">AppConfig</span><span class="p">(</span><span class="nl">compress:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">AppConfig</span><span class="p">(</span><span class="nl">compress:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
 </span></code></pre></div>
 <ul>
 <li>It saves bandwidth, but costs CPU on every response, in the same isolate

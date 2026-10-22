@@ -2605,6 +2605,10 @@ system when you build the app.</p>
 </ul>
 <p><code>DOX_SERVER=native</code> forces the native server, also for an app with WebSocket
 routes. WebSocket upgrades then fail with 500. Socket.IO long-polling works.</p>
+<p>Each isolate has its own Rust network thread. <code>DOX_HTTP_THREAD=shared</code> puts
+all isolates on one thread. It is off by default: on 2 cores the one thread
+was the limit and req/s fell by a quarter. Leave it off unless you measure
+a gain.</p>
 <h2 id="limits">Limits</h2>
 <ul>
 <li>Max size of the request line plus headers: 16 KB. Bigger gets <code>431</code>.</li>
