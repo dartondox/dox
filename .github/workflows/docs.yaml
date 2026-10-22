@@ -102,13 +102,17 @@ jobs:
               names.update(v['aliases'])
           home = 'latest' if os.path.isdir('latest') else versions[0]['version']
 
+          # The script in <head> moves on before the page is drawn, and keeps
+          # the ?query and #hash. So the visitor sees no "Redirecting" page.
+          # The meta refresh and the <noscript> link are for no JavaScript.
           def redirect(url):
               return ('<!doctype html><html><head><meta charset="utf-8">'
-                      '<title>Redirecting</title>'
+                      '<title>Dox</title>'
                       '<link rel="canonical" href="%s">'
+                      '<script>location.replace("%s" + location.search + location.hash)</script>'
                       '<meta http-equiv="refresh" content="0; url=%s">'
-                      '</head><body><a href="%s">Redirecting</a></body></html>'
-                      % (url, url, url))
+                      '</head><body><noscript><a href="%s">Open the Dox docs</a></noscript></body></html>'
+                      % (url, url, url, url))
 
           # collect old pages: every folder with an index.html
           pages = set()
