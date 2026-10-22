@@ -607,5 +607,59 @@ void main() async {
         "SELECT * FROM ${q}blog$q WHERE (${q}uid$q = 1 AND ${q}title$q = x) AND ${q}blog$q.${q}deleted_at$q IS NULL",
       );
     });
+
+    test('no LIMIT or OFFSET that was not set, and no OFFSET 0', () async {
+      expect(Blog().where('uid', 1).toSql().contains('LIMIT'), false);
+      expect(Blog().limit(5).toSql(), endsWith(' LIMIT 5'));
+      expect(Blog().limit(5).offset(0).toSql(), endsWith(' LIMIT 5'));
+      expect(
+        Blog().limit(5).offset(10).toSql(),
+        endsWith(' LIMIT 5 OFFSET 10'),
+      );
+
+      /// OFFSET alone still works on every database
+      await Blog().insertMultiple(<Map<String, dynamic>>[
+        for (int i = 0; i < 3; i++)
+          <String, dynamic>{'title': 't$i', 'body': 'b'},
+      ]);
+      List<Blog> rest = await Blog().orderBy('uid').offset(1).get();
+      expect(rest.map((Blog b) => b.title), <String>['t1', 't2']);
+
+      /// find, getFirst and paginate page 1
+      _SqlRecorder recorder = _SqlRecorder();
+      QueryPrinter old = SqlQueryBuilder().printer;
+      SqlQueryBuilder().printer = recorder;
+      try {
+        await Blog().debug(true).find(1);
+        await Blog().debug(true).where('title', 't0').getFirst();
+        await Blog().debug(true).paginate(currentPage: 1, perPage: 2);
+      } finally {
+        SqlQueryBuilder().printer = old;
+      }
+      List<String> selects = recorder.queries
+          .where((String s) => s.startsWith('SELECT *'))
+          .toList();
+      expect(selects.length, 3);
+      for (String sql in selects) {
+        expect(sql, endsWith(' LIMIT ${sql.contains('LIMIT 2') ? 2 : 1}'));
+        expect(sql.contains('OFFSET'), false);
+      }
+    });
+
+    test('the same query gives the same param names', () async {
+      QueryBuilder<Blog> a = Blog().where('uid', 1).where('title', 'x');
+      QueryBuilder<Blog> b = Blog().where('uid', 2).where('title', 'y');
+      expect(a.substitutionValues.keys, b.substitutionValues.keys);
+      expect(a.substitutionValues.values, <dynamic>[1, 'x']);
+    });
   });
+}
+
+class _SqlRecorder implements QueryPrinter {
+  List<String> queries = <String>[];
+
+  @override
+  void log(String query, List<String> params) {
+    queries.add(query);
+  }
 }

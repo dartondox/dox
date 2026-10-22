@@ -33,16 +33,34 @@ abstract class DBDriver {
   /// `` `name` `` on mysql. it handles `table.column`, `*` and `column as alias`.
   /// a value with `(` is a raw expression and is not changed.
   String wrap(String value) {
+    String? known = _wrapped[value];
+    if (known != null) {
+      return known;
+    }
+
+    /// ponytail: cleared when full, names are a small set
+    if (_wrapped.length >= 1000) {
+      _wrapped.clear();
+    }
+    return _wrapped[value] = _wrap(value);
+  }
+
+  /// quoted names, made once
+  final Map<String, String> _wrapped = <String, String>{};
+
+  String _wrap(String value) {
     value = value.trim();
     if (value.contains('(')) {
       return value;
     }
-    List<String> alias = value.split(RegExp(r'\s+as\s+', caseSensitive: false));
+    List<String> alias = value.split(_aliasPattern);
     if (alias.length == 2) {
       return '${wrap(alias[0])} as ${_wrapPart(alias[1].trim())}';
     }
     return value.split('.').map(_wrapPart).join('.');
   }
+
+  static final RegExp _aliasPattern = RegExp(r'\s+as\s+', caseSensitive: false);
 
   String _wrapPart(String part) {
     if (part == '*') {
@@ -53,17 +71,22 @@ abstract class DBDriver {
   }
 }
 
-/// get database driver to run queries
-DBDriver getDatabaseDriver(Driver driver, dynamic database) {
-  /// checking validation for postgres connection
+/// get database driver to run queries.
+/// [statementCacheSize] is the max prepared statements kept per connection.
+DBDriver getDatabaseDriver(
+  Driver driver,
+  dynamic database, {
+  int statementCacheSize = defaultStatementCacheSize,
+}) {
   if (driver == Driver.postgres) {
-    return PostgresDriver(conn: database);
-  }
-  /// checking validation for mysql connection
-  else if (driver == Driver.mysql) {
+    return PostgresDriver(
+      conn: database,
+      statementCacheSize: statementCacheSize,
+    );
+  } else if (driver == Driver.mysql) {
     return MysqlDriver(conn: database);
   } else if (driver == Driver.sqlite) {
-    return SqliteDriver(conn: database);
+    return SqliteDriver(conn: database, statementCacheSize: statementCacheSize);
   }
   throw Exception('Invalid driver or not supported');
 }
@@ -76,10 +99,31 @@ DBDriver getDatabaseDriver(Driver driver, dynamic database) {
   Map<String, dynamic>? values,
   Object? Function(dynamic value) convert,
 ) {
-  List<Object?> params = <Object?>[];
   if (values == null || values.isEmpty) {
-    return (sql, params);
+    return (sql, <Object?>[]);
   }
+
+  /// fast path: the sql was seen before and every `@key` has a value
+  _QuestionSql q = _QuestionSql.of(sql);
+  List<String> names = q.names;
+  List<Object?> params = List<Object?>.filled(names.length, null);
+  for (int i = 0; i < names.length; i++) {
+    String key = names[i];
+    dynamic value = values[key];
+    if (value == null && !values.containsKey(key)) {
+      return _toPositionalSlow(sql, values, convert);
+    }
+    params[i] = convert(value);
+  }
+  return (q.sql, params);
+}
+
+(String, List<Object?>) _toPositionalSlow(
+  String sql,
+  Map<String, dynamic> values,
+  Object? Function(dynamic value) convert,
+) {
+  List<Object?> params = <Object?>[];
   sql = sql.replaceAllMapped(_paramPattern, (Match m) {
     String key = m.group(1)!;
     if (!values.containsKey(key)) {
@@ -92,6 +136,35 @@ DBDriver getDatabaseDriver(Driver driver, dynamic database) {
 }
 
 final RegExp _paramPattern = RegExp(r'@(\w+)');
+
+/// sql with every `@key` changed to `?`, made once per sql text
+class _QuestionSql {
+  final String sql;
+
+  /// key of each `?`, in order
+  final List<String> names;
+
+  _QuestionSql(this.sql, this.names);
+
+  /// ponytail: cleared when full, an LRU is not needed for sql texts
+  static final Map<String, _QuestionSql> _cache = <String, _QuestionSql>{};
+
+  static _QuestionSql of(String sql) {
+    _QuestionSql? q = _cache[sql];
+    if (q != null) {
+      return q;
+    }
+    if (_cache.length >= 2000) {
+      _cache.clear();
+    }
+    List<String> names = <String>[];
+    String converted = sql.replaceAllMapped(_paramPattern, (Match m) {
+      names.add(m.group(1)!);
+      return '?';
+    });
+    return _cache[sql] = _QuestionSql(converted, names);
+  }
+}
 
 /// parse a date from mysql or sqlite. a date without time zone is read as
 /// UTC. return [value] as it is when it is not a date.

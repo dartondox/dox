@@ -10,7 +10,9 @@ mixin Get<T> implements SharedMixin<T> {
     }
     String q = "SELECT $selectQueryString FROM ${helper.wrap(tableName)}";
     q += helper.getCommonQuery();
-    q = q.replaceAll(RegExp(' +'), ' ');
+    if (q.contains('  ')) {
+      q = q.replaceAll(RegExp(' +'), ' ');
+    }
     return q;
   }
 

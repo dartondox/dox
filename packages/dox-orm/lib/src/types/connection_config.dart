@@ -42,6 +42,15 @@ class ConnectionConfig {
   /// `busyTimeout` for sqlite
   Map<String, dynamic> extra;
 
+  /// use your own driver class instead of the built-in one, eg. a native
+  /// driver package. it gets this config and returns the driver.
+  /// [driver] is still used to pick the sql dialect.
+  ///
+  /// ```
+  /// driverFactory: PostgresNativeDriver.fromConfig,
+  /// ```
+  DBDriver Function(ConnectionConfig config)? driverFactory;
+
   /// [user], [password] and [port] are not used by sqlite
   ConnectionConfig({
     required this.driver,
@@ -54,7 +63,26 @@ class ConnectionConfig {
     this.extra = const <String, dynamic>{},
     required this.debug,
     this.printer,
+    this.driverFactory,
   });
+
+  /// max prepared statements kept per connection (default 100).
+  /// set it with `extra['preparedStatementCacheSize']`.
+  int get statementCacheSize =>
+      extra['preparedStatementCacheSize'] as int? ?? defaultStatementCacheSize;
+
+  /// make the driver of this connection: [driverFactory] when it is set,
+  /// else the built-in driver for [driver]
+  DBDriver createDriver() {
+    if (driverFactory != null) {
+      return driverFactory!(this);
+    }
+    return getDatabaseDriver(
+      driver,
+      getDatabaseConnection(),
+      statementCacheSize: statementCacheSize,
+    );
+  }
 
   /// get database connection: postgres `Pool`, mysql `MySQLConnectionPool`
   /// or sqlite `Database`
@@ -88,8 +116,7 @@ class ConnectionConfig {
       serverPublicKey: extra['serverPublicKey'],
       timeZone: extra['timeZone'],
       maxConnectionAge: extra['maxConnectionAge'] ?? const Duration(hours: 12),
-      autoPreparedStatementCacheCapacity:
-          extra['preparedStatementCacheSize'] ?? 32,
+      autoPreparedStatementCacheCapacity: statementCacheSize,
     );
   }
 

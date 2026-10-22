@@ -4,6 +4,7 @@ export 'package:dox_annotation/dox_annotation.dart';
 
 export 'src/drivers/db_driver.dart';
 export 'src/drivers/postgres_driver.dart';
+export 'src/drivers/statement_cache.dart';
 export 'src/main.dart';
 export 'src/model.dart';
 export 'src/model_events.dart';

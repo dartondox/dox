@@ -1,6 +1,8 @@
 import 'package:dox_orm/dox_orm.dart';
 
-Map<String, dynamic> _globalConnections = <String, dynamic>{};
+/// one driver per connection name, so each name keeps its own pool and
+/// its own statement caches
+Map<String, DBDriver> _globalDrivers = <String, DBDriver>{};
 
 class SqlQueryBuilder {
   static final SqlQueryBuilder _singleton = SqlQueryBuilder._internal();
@@ -21,15 +23,15 @@ class SqlQueryBuilder {
 
   /// initialize with DatabaseConfig class
   static void initializeWithDatabaseConfig(DatabaseConfig config) async {
-    SqlQueryBuilder().databaseConfig = config;
+    SqlQueryBuilder sql = SqlQueryBuilder();
+    sql.databaseConfig = config;
     ConnectionConfig connConfig = config.getConnectionConfig();
 
-    initialize(
-      database: connConfig.getDatabaseConnection(),
-      debug: connConfig.debug,
-      driver: connConfig.driver,
-      printer: connConfig.printer,
-    );
+    sql.dbDriver = connConfig.createDriver();
+    sql.debug = connConfig.debug;
+    if (connConfig.printer != null) {
+      sql.printer = connConfig.printer!;
+    }
   }
 
   /// Get database driver with connection name
@@ -37,22 +39,14 @@ class SqlQueryBuilder {
     if (connection == null || databaseConfig == null) {
       return dbDriver;
     }
-
-    ConnectionConfig? connConfig = databaseConfig?.getConnectionConfig(
+    DBDriver? driver = _globalDrivers[connection];
+    if (driver != null) {
+      return driver;
+    }
+    ConnectionConfig connConfig = databaseConfig!.getConnectionConfig(
       connection,
     );
-
-    if (connConfig != null) {
-      dynamic conn = _globalConnections[connection];
-
-      if (conn == null) {
-        conn = connConfig.getDatabaseConnection();
-        _globalConnections[connection] = conn;
-      }
-
-      return getDatabaseDriver(connConfig.driver, conn);
-    }
-    throw Exception('invalid connection');
+    return _globalDrivers[connection] = connConfig.createDriver();
   }
 
   /// initialize query builder

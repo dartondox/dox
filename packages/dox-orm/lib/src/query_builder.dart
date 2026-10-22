@@ -53,7 +53,7 @@ class QueryBuilder<T>
   }
 
   @override
-  QueryBuilderHelper<T> get helper => QueryBuilderHelper<T>(this);
+  late final QueryBuilderHelper<T> helper = QueryBuilderHelper<T>(this);
 
   // coverage:ignore-start
   @override
