@@ -103,6 +103,8 @@ class PgNativePool {
       'dbname=${_quote(database)}',
       // same session time zone as the postgres package
       'options=${_quote('-c TimeZone=$timeZone')}',
+      // same connect timeout as the postgres package
+      'connect_timeout=15',
       if (applicationName != null)
         'application_name=${_quote(applicationName)}',
     ].join(' ');
@@ -313,17 +315,25 @@ class _Link {
       p = at + len;
       Completer<Object?>? done = _pending.remove(id);
       if (done == null) continue;
-      switch (status) {
-        case 0:
-          done.complete(_rows(b, d, at));
-        case 1:
-          done.completeError(serverException(_fields(b, d, at)));
-        case 2:
-          done.completeError(
-            PgException(utf8.decode(Uint8List.sublistView(b, at, p))),
-          );
-        default:
-          done.complete(d.getUint64(at, Endian.little));
+      // one bad record fails its own request, not the rest of the batch
+      try {
+        switch (status) {
+          case 0:
+            done.complete(_rows(b, d, at));
+          case 1:
+            done.completeError(serverException(_fields(b, d, at)));
+          case 2:
+            done.completeError(
+              PgException(utf8.decode(Uint8List.sublistView(b, at, p))),
+            );
+          default:
+            done.complete(d.getUint64(at, Endian.little));
+        }
+      } catch (error, stack) {
+        done.completeError(
+          PgException('dox_postgres_native: can not read the result: $error'),
+          stack,
+        );
       }
     }
     if (_pending.isEmpty) _port.keepIsolateAlive = false;
