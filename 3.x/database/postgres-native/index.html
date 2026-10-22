@@ -1416,10 +1416,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#use-it-with-the-orm" class="md-nav__link">
+  <a href="#native-is-the-default" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Use it with the ORM
+        Native is the default
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-the-dart-driver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use the Dart driver
       
     </span>
   </a>
@@ -2545,10 +2556,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#use-it-with-the-orm" class="md-nav__link">
+  <a href="#native-is-the-default" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Use it with the ORM
+        Native is the default
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-the-dart-driver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use the Dart driver
       
     </span>
   </a>
@@ -2631,9 +2653,9 @@
 
 
 <h1 id="native-postgres-driver">Native Postgres driver</h1>
-<p><code>dox_postgres_native</code> is a faster Postgres driver for the Dox ORM.
+<p><code>dox_postgres_native</code> is the default Postgres driver of the Dox ORM.
 Rust talks to the database. Your models, queries and transactions stay the
-same. You change one line of config.</p>
+same. You do not change any config.</p>
 <ul>
 <li>Rust (<a href="https://docs.rs/tokio-postgres">tokio-postgres</a>) owns the
   connections and the pool.</li>
@@ -2646,7 +2668,8 @@ same. You change one line of config.</p>
 </ul>
 <div class="admonition warning">
 <p class="admonition-title">Alpha</p>
-<p>This driver is new. The default Dart driver is still the safe choice.</p>
+<p>This driver is new. If you see a problem, <a href="#use-the-dart-driver">use the Dart driver</a>
+and tell us.</p>
 </div>
 <h2 id="speed">Speed</h2>
 <p>One find-by-id query (<code>SELECT ... WHERE id = @id</code>), AOT build
@@ -2681,6 +2704,8 @@ same. You change one line of config.</p>
 <p>The gain is biggest when many requests run at the same time, like in a web
 server.</p>
 <h2 id="install">Install</h2>
+<p><code>dox_orm</code> depends on <code>dox_postgres_native</code>. You do not add it yourself.
+Add it only to use <code>PgNativePool</code> without the ORM:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_postgres_native
 </span></code></pre></div>
 <p>You do not need Rust when a ready-built library exists for your system
@@ -2689,23 +2714,35 @@ it. When there is none yet, the hook builds the library with <code>cargo</code>,
 then you need <a href="https://rustup.rs">Rust</a>.</p>
 <p>Use <code>dart run</code>, <code>dart test</code> or <code>dart build cli</code>. <code>dart compile exe</code> does not
 run build hooks.</p>
-<h2 id="use-it-with-the-orm">Use it with the ORM</h2>
-<p>Keep your Postgres <code>ConnectionConfig</code> as it is. Start the ORM like before,
-then put the native driver in place of the Dart one:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_postgres_native/dox_postgres_native.dart'</span><span class="p">;</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ORMService</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">DoxService</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="n">SqlQueryBuilder</span><span class="p">.</span><span class="n">initializeWithDatabaseConfig</span><span class="p">(</span><span class="n">databaseConfig</span><span class="p">);</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="n">SqlQueryBuilder</span><span class="p">().</span><span class="n">dbDriver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PostgresNativeDriver</span><span class="p">.</span><span class="n">fromConfig</span><span class="p">(</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">      </span><span class="n">databaseConfig</span><span class="p">.</span><span class="n">getConnectionConfig</span><span class="p">(),</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="p">);</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="p">}</span>
+<h2 id="native-is-the-default">Native is the default</h2>
+<p>You do not change any config. The ORM picks the driver like this:</p>
+<ol>
+<li><code>driverFactory</code> is set: the ORM uses your driver. It wins over
+   everything below.</li>
+<li>You ask for the Dart driver (see below): the ORM uses the Dart driver.</li>
+<li>The native library loads: the ORM uses the native driver.</li>
+<li>The native library does not load (no library for your system, no
+   Rust to build it, or a load error): the ORM uses the Dart driver. It
+   prints one warning line to stderr, like this:</li>
+</ol>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>[dox] warning: dox_postgres_native did not load, using the Dart postgres driver (...)
 </span></code></pre></div>
-<p>That is all. <code>Model</code>, the query builder, <code>transaction()</code> and <code>Schema</code> now
-run on the native driver.</p>
+<p>Named connections (<code>Model.connection('x')</code>, <code>withConnection('x')</code>) follow
+the same rules.</p>
+<h2 id="use-the-dart-driver">Use the Dart driver</h2>
+<p>For all connections, set the env var:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">DOX_DB_DRIVER</span><span class="o">=</span>dart<span class="w"> </span>dart<span class="w"> </span>run<span class="w"> </span>bin/server.dart
+</span></code></pre></div>
+<p>For one connection, set <code>native: false</code> in <code>extra</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">ConnectionConfig</span><span class="p">(</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">postgres</span><span class="p">,</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="c1">// ... host, user, password, database as before</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'native'</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="p">},</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nl">debug:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">),</span>
+</span></code></pre></div>
+<p>Postgres with TLS (<code>useSSL: true</code> or <code>extra['sslMode']</code>) always uses the
+Dart driver, because the native driver has no TLS yet.</p>
 <h2 id="options">Options</h2>
 <p>The driver reads these keys from <code>extra</code> of the <code>ConnectionConfig</code>:</p>
 <table>
@@ -2742,24 +2779,24 @@ run on the native driver.</p>
 <p>Each isolate that runs <code>setup()</code> makes its own pool. To share one pool
 between isolates, give <code>driver.pool.handle</code> (an <code>int</code>) to the other
 isolates and use <code>PostgresNativeDriver(PgNativePool.fromHandle(handle))</code>
-there.</p>
+there. <code>PostgresNativeDriver</code> comes from <code>package:dox_orm/dox_orm.dart</code>.</p>
 <h2 id="use-it-without-the-orm">Use it without the ORM</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">PgNativePool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PgNativePool</span><span class="p">.</span><span class="n">open</span><span class="p">(</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nl">user:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">);</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="n">PgNativeResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="s1">'SELECT id, name FROM users WHERE id = @id'</span><span class="p">,</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">  </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'id'</span><span class="o">:</span><span class="w"> </span><span class="m">1</span><span class="p">},</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="p">);</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">rows</span><span class="p">);</span><span class="w"> </span><span class="c1">// [{id: 1, name: Ada}]</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="kt">int</span><span class="w"> </span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="s1">'UPDATE users SET name = @n'</span><span class="p">,</span><span class="w"> </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'n'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Bob'</span><span class="p">},</span><span class="w"> </span><span class="nl">transaction:</span><span class="w"> </span><span class="n">tx</span><span class="p">);</span>
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">commit</span><span class="p">(</span><span class="n">tx</span><span class="p">);</span><span class="w"> </span><span class="c1">// or pool.rollback(tx)</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">PgNativePool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PgNativePool</span><span class="p">.</span><span class="n">open</span><span class="p">(</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nl">user:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">);</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">PgNativeResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="s1">'SELECT id, name FROM users WHERE id = @id'</span><span class="p">,</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'id'</span><span class="o">:</span><span class="w"> </span><span class="m">1</span><span class="p">},</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="p">);</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">rows</span><span class="p">);</span><span class="w"> </span><span class="c1">// [{id: 1, name: Ada}]</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="kt">int</span><span class="w"> </span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="s1">'UPDATE users SET name = @n'</span><span class="p">,</span><span class="w"> </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'n'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Bob'</span><span class="p">},</span><span class="w"> </span><span class="nl">transaction:</span><span class="w"> </span><span class="n">tx</span><span class="p">);</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">commit</span><span class="p">(</span><span class="n">tx</span><span class="p">);</span><span class="w"> </span><span class="c1">// or pool.rollback(tx)</span>
 </span></code></pre></div>
 <ul>
 <li><code>parameters</code> is a map for <code>@name</code>, or a list for <code>$1, $2</code>.</li>
@@ -2831,7 +2868,7 @@ there.</p>
 throw <code>PgException</code>.</p>
 <h2 id="not-yet">Not yet</h2>
 <ul>
-<li>SSL. <code>useSSL: true</code> throws. Use the Dart driver for SSL for now.</li>
+<li>SSL. A connection with <code>useSSL: true</code> uses the Dart driver.</li>
 <li><code>maxConnectionAge</code>, <code>queryTimeout</code> and the other <code>extra</code> keys of the Dart
   driver are not read.</li>
 <li>A nested <code>transaction()</code> joins the outer one, like the Dart driver

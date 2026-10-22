@@ -2542,7 +2542,8 @@
 <tr>
 <th>Database</th>
 <th><code>Driver</code></th>
-<th>Dart package</th>
+<th>Default driver</th>
+<th>Dart driver</th>
 <th>Pool</th>
 <th>Good for</th>
 </tr>
@@ -2551,6 +2552,7 @@
 <tr>
 <td>Postgres</td>
 <td><code>Driver.postgres</code></td>
+<td><a href="postgres-native/"><code>dox_postgres_native</code></a></td>
 <td><code>postgres</code></td>
 <td>Yes</td>
 <td>Production</td>
@@ -2558,6 +2560,7 @@
 <tr>
 <td>MySQL 8+ and MariaDB</td>
 <td><code>Driver.mysql</code></td>
+<td><a href="mysql-native/"><code>dox_mysql_native</code></a></td>
 <td><code>mysql_dart</code></td>
 <td>Yes</td>
 <td>Production</td>
@@ -2566,14 +2569,21 @@
 <td>SQLite</td>
 <td><code>Driver.sqlite</code></td>
 <td><code>sqlite3</code></td>
+<td><code>sqlite3</code></td>
 <td>No, one connection per isolate</td>
 <td>Dev, tests, small apps</td>
 </tr>
 </tbody>
 </table>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>For more speed, see the <a href="postgres-native/">native Postgres driver</a> and the <a href="mysql-native/">native MySQL driver</a>.</p>
+<div class="admonition info">
+<p class="admonition-title">Native drivers</p>
+<p>Postgres and MySQL use a native (Rust) driver by default. It is faster when many
+requests run at the same time. You do not change any config.
+If the native library can not load on your system, the ORM uses the Dart driver
+and prints one warning line.
+To always use the Dart driver, set <code>DOX_DB_DRIVER=dart</code>, or <code>extra: {'native': false}</code>
+on one connection. See the <a href="postgres-native/#use-the-dart-driver">Postgres</a> and
+<a href="mysql-native/#use-the-dart-driver">MySQL</a> pages.</p>
 </div>
 <h2 id="config">Config</h2>
 <p>Put the connections in <code>lib/config/database.dart</code>.
@@ -2629,7 +2639,9 @@
 <div class="admonition info">
 <p class="admonition-title">MySQL <code>extra</code> options</p>
 <p><code>maxConnectionCount</code> (default 10) is the pool size.
-<code>collation</code> (default <code>utf8mb4_general_ci</code>), <code>timeoutMs</code>, <code>timeZone</code> and <code>maxConnectionAge</code>
+<code>maxConnectionAge</code>, <code>preparedStatementCacheSize</code> and <code>threads</code> are read by the native driver.
+The keys below are read only by the Dart driver (<code>native: false</code>).
+<code>collation</code> (default <code>utf8mb4_general_ci</code>), <code>timeoutMs</code> and <code>timeZone</code>
 are also read.
 The MySQL 8 default login (<code>caching_sha2_password</code>) works, also without TLS.
 Without TLS the driver asks the server for its RSA key to encrypt the password.
