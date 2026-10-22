@@ -209,6 +209,7 @@ class RedisLock extends CacheLock {
 /// Builds a [RedisDriver] with a new connection.
 /// Options: host, port, username, password, db, tls, prefix, pool_size.
 /// pool_size is the most connections to open (ioredis maxConnection).
+/// ioredis shares one connection and only opens more for blocking commands.
 class RedisDriverFactory implements CacheDriverFactory {
   const RedisDriverFactory();
 

@@ -31,7 +31,7 @@ class WebsocketService implements DoxService {
     Dox runs one isolate per CPU core by default. Each isolate has its own memory.
     Without an adapter, a room only reaches clients on the same isolate.
 
-    - Use the Redis adapter. It needs [`ioredis`](https://pub.dev/packages/ioredis) `^2.0.0-alpha.1`.
+    - Use the Redis adapter. It needs [`ioredis`](https://pub.dev/packages/ioredis) `^2.0.0-alpha.2`.
     - Or set `totalIsolate: 1` in `lib/config/app.dart` (or `APP_TOTAL_ISOLATE=1`).
 
 ### 2. Register websocket service to dox `app/config/services.dart`
