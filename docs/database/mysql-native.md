@@ -26,16 +26,16 @@ One find-by-id query (`SELECT * FROM t WHERE id = @id`), AOT build
 
 | | Dart driver | Native driver |
 |---|---|---|
-| MySQL 8.4, one query at a time | 62 µs | 68 µs |
-| MySQL 8.4, 32 queries in flight | 26 µs per query | 11 µs per query |
-| MySQL 8.4, CPU time of the app per query | 33 µs | 14.5 µs |
-| MariaDB 11, one query at a time | 62 µs | 65 µs |
-| MariaDB 11, 32 queries in flight | 26 µs per query | 9.4 µs per query |
-| MariaDB 11, CPU time of the app per query | 33 µs | 13.6 µs |
+| MySQL 8.4, one query at a time | 61 µs | 67 µs |
+| MySQL 8.4, 32 queries in flight | 25 µs per query | 11 µs per query |
+| MySQL 8.4, CPU time of the app per query | 32 µs | 13.5 µs |
+| MariaDB 11, one query at a time | 59 µs | 63 µs |
+| MariaDB 11, 32 queries in flight | 25.5 µs per query | 9.7 µs per query |
+| MariaDB 11, CPU time of the app per query | 32.5 µs | 12.4 µs |
 
 The CPU time counts the Dart thread and the Rust thread. It is the limit
-on one CPU core: about 30,000 queries per second with the Dart driver and
-about 70,000 with the native driver.
+on one CPU core: about 31,000 queries per second with the Dart driver and
+about 75,000 with the native driver.
 
 One query at a time is about the same speed: most of the time is the trip
 to the database. The gain is big when many requests run at the same time,
@@ -58,33 +58,31 @@ run build hooks.
 ## Use it with the ORM
 
 Keep your MySQL `ConnectionConfig` as it is (`driver: Driver.mysql`).
-Start the ORM like before, then put the native driver in place of the Dart
-one:
+Add one line, `driverFactory`:
 
 ```dart
 import 'package:dox_mysql_native/dox_mysql_native.dart';
 
-class ORMService implements DoxService {
-  @override
-  Future<void> setup() async {
-    SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
-    SqlQueryBuilder().dbDriver = MysqlNativeDriver.fromConfig(
-      databaseConfig.getConnectionConfig(),
-    );
-  }
-}
+DatabaseConfig databaseConfig = DatabaseConfig(
+  connection: 'mysql',
+  connections: <String, ConnectionConfig>{
+    'mysql': ConnectionConfig(
+      driver: Driver.mysql,
+      host: 'localhost',
+      port: 3306,
+      user: 'root',
+      password: 'password',
+      database: 'dox',
+      extra: <String, dynamic>{'maxConnectionCount': 10},
+      debug: false,
+      driverFactory: MysqlNativeDriver.fromConfig, // the one new line
+    ),
+  },
+);
 ```
 
 That is all. `Model`, the query builder, `transaction()` and `Schema` now
-run on the native driver.
-
-!!! note "Soon: one line in the config"
-    `dox_orm` will get a `driverFactory` field on `ConnectionConfig`. Then
-    you add this one line to the MySQL connection, and nothing else:
-
-    ```dart
-    driverFactory: MysqlNativeDriver.fromConfig,
-    ```
+run on the native driver. Remove the line to go back to the Dart driver.
 
 ## Options
 
@@ -96,7 +94,7 @@ The driver reads the normal fields of the `ConnectionConfig` (`host`,
 |---|---|---|
 | `maxConnectionCount` | `10` | Most connections in the pool. |
 | `maxConnectionAge` | 12 hours | A connection older than this is closed and opened again. |
-| `preparedStatementCacheSize` | `32` | Prepared statements kept per connection. |
+| `preparedStatementCacheSize` | `100` | Prepared statements kept per connection. |
 | `threads` | `1` | Rust threads for all pools of the process. Only the first pool sets it. One thread is the fastest for most apps. |
 
 Isolates that open a pool with the same settings share one pool in Rust.

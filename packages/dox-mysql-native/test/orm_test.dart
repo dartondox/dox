@@ -35,14 +35,13 @@ const List<Function> _suites = <Function>[
 
 void main() async {
   databaseConfig.connection = 'mysql';
+  // the one line a user adds to the config
+  databaseConfig.getConnectionConfig().driverFactory =
+      MysqlNativeDriver.fromConfig;
   for (Function suite in _suites) {
     // each main calls initQueryBuilder() and declares its tests
     await (Function.apply(suite, <Object?>[]) as Future<void>);
   }
-  // the tests run after all are declared, so this driver runs them all
-  SqlQueryBuilder().dbDriver = MysqlNativeDriver.fromConfig(
-    databaseConfig.getConnectionConfig(),
-  );
   test('the tests ran on MysqlNativeDriver', () {
     expect(SqlQueryBuilder().dbDriver, isA<MysqlNativeDriver>());
   });

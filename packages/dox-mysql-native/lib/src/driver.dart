@@ -15,8 +15,13 @@ class MysqlNativeDriver extends DBDriver {
 
   /// Makes the pool from a Dox [ConnectionConfig]. Reads
   /// `maxConnectionCount` (default 10), `maxConnectionAge` (default 12
-  /// hours), `preparedStatementCacheSize` (default 32) and `threads`
+  /// hours), `preparedStatementCacheSize` (default 100) and `threads`
   /// (default 1) from `extra`. `useSSL` turns on TLS.
+  ///
+  /// Use it as the driver of a connection:
+  /// ```
+  /// driverFactory: MysqlNativeDriver.fromConfig,
+  /// ```
   factory MysqlNativeDriver.fromConfig(ConnectionConfig config) {
     Map<String, dynamic> extra = config.extra;
     return MysqlNativeDriver(
@@ -30,7 +35,7 @@ class MysqlNativeDriver extends DBDriver {
         maxConnections: extra['maxConnectionCount'] as int? ?? 10,
         maxConnectionAge:
             extra['maxConnectionAge'] as Duration? ?? const Duration(hours: 12),
-        statementCacheSize: extra['preparedStatementCacheSize'] as int? ?? 32,
+        statementCacheSize: config.statementCacheSize,
         threads: extra['threads'] as int? ?? 1,
       ),
     );

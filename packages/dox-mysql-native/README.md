@@ -25,13 +25,14 @@ void main() async {
 }
 ```
 
-With the Dox ORM:
+With the Dox ORM, add one line to the MySQL `ConnectionConfig`:
 
 ```dart
-SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
-SqlQueryBuilder().dbDriver = MysqlNativeDriver.fromConfig(
-  databaseConfig.getConnectionConfig(),
-);
+'mysql': ConnectionConfig(
+  driver: Driver.mysql,
+  // ... host, user, password, database as before
+  driverFactory: MysqlNativeDriver.fromConfig,
+),
 ```
 
 - Works with MySQL 8.4 (`caching_sha2_password`) and MariaDB 11.
