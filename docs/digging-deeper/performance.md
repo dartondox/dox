@@ -62,46 +62,53 @@ CPU pinned.
   Rust library with cargo.
 - `DOX_SERVER=dartio` runs the same Dox app on `dart:io`.
 
-## Numbers
+## App benchmark
 
-Measured on a MacBook (Apple M-series, 8 cores), Dart 3.13. The load tool
-ran on the same machine, so it took some of the CPU. Treat the numbers as a
-comparison, not as a max.
+A small real app, the same in each language: `GET /json` returns a map,
+`GET /db` reads one row by id from Postgres, `GET /queries?n=20` reads 20
+rows one after another. The table has 10,000 rows. Each server runs alone
+on one or two pinned CPUs, Postgres 18 and wrk on other CPUs, 256
+connections, 4 database connections per core, 3 runs of 10 seconds, median.
+Versions: Dox 3.0.0-alpha.3 (native server, `dox_postgres_native`), Go 1.27
+(`net/http` + pgx), Bun 1.4 (`Bun.serve` + `Bun.sql`), Node 24
+(`node:http` + `pg`), `dart:io` (`HttpServer` + `package:postgres`).
 
-`json` = `GET /json` returning a small map. `param` = `GET /user/{id}`.
-64 keep-alive connections, 8 seconds.
+### 1 core
 
-| Setup           | Start  | Idle memory | json req/s | param req/s |
-| --------------- | ------ | ----------- | ---------- | ----------- |
-| JIT, 1 isolate  | 1.0 s  | 388 MB      | 26-28k     | 29k         |
-| AOT, 1 isolate  | 0.05 s | 16 MB       | 27-30k     | 26-28k      |
-| JIT, 8 isolates | 1.0 s  | 398 MB      | 54-57k     | 52-58k      |
-| AOT, 8 isolates | 0.05 s | 16 MB       | 60k        | 56-62k      |
+| Route            | Dox     | Bun     | Go     | `dart:io` |
+| ---------------- | ------: | ------: | -----: | --------: |
+| /json req/s      | 157,036 | 176,148 | 79,884 | 33,670    |
+| /db req/s        | 85,381  | 57,614  | 36,706 | 12,146    |
+| /queries req/s   | 9,745   | 10,097  | 3,810  | 966       |
+| /db p99 ms       | 5.65    | 6.11    | 14.49  | 47.62     |
+| /db peak MB      | 24      | 36      | 18     | 62        |
 
-Before and after the changes in this release (AOT):
+### 2 cores
 
-| Test                         | Before   | After    |
-| ---------------------------- | -------- | -------- |
-| json, 1 isolate              | 23k/s    | 27-30k/s |
-| param, 1 isolate             | 20k/s    | 26-28k/s |
-| json, 8 isolates             | 54k/s    | 60k/s    |
-| param, 8 isolates            | 52k/s    | 56-62k/s |
-| 50 MB upload, peak memory    | 1,100 MB | 72-93 MB |
-| 50 MB upload, JIT peak memory| 1,380 MB | 389 MB (= JIT idle) |
-| request logs on, req/s cost  | -13%     | -4%      |
+| Route            | Dox     | Bun     | Go      | Node    |
+| ---------------- | ------: | ------: | ------: | ------: |
+| /json req/s      | 251,427 | 385,553 | 175,009 | 156,389 |
+| /db req/s        | 138,514 | 128,998 | 49,393  | 61,611  |
+| /queries req/s   | 12,902  | 11,006  | 5,134   | 5,870   |
+| /db p99 ms       | 3.62    | 5.61    | 8.53    | 8.06    |
+| /db peak MB      | 51      | 57      | 22      | 297     |
 
-For reference, a bare `dart:io` server with the same JSON gives about 44k/s on
-one isolate. So Dox adds some cost on top of `dart:io`, and that is the next
-place to look.
+Dox runs one isolate per core, Bun and Node one worker process per core.
+On the database routes Dox is ahead of all of them on 2 cores, and its p99
+is the lowest. On `/json` Bun is faster: its server is C++ and calls the
+JavaScript handler on the same thread, while Dox hands each batch of
+requests from the Rust thread to the Dart isolate.
 
-Run it yourself (from `packages/dox-core`):
+Dox on `dart:io` with the Dart `postgres` driver is 4 to 10 times slower
+than Dox with the native server and driver. Keep both on.
 
-```bash
-bash benchmark/run.sh          # SECS=10 CONNS=64 N=<cores> to change
-```
+### Dart VM flags
 
-It needs only Dart and `curl`. It uses a small Dart load tool
-(`benchmark/load.dart`), because `wrk` and `oha` are often not installed.
+We tried a bigger young generation (`DART_VM_OPTIONS=--new_gen_semi_max_size=64`
+and `128`) for a better p99. Over 5 runs the change was inside the noise,
+and memory did not move. So there is no flag to set. Dox never sets VM
+flags for you. `DART_VM_OPTIONS` is read by the AOT binary from
+`dox build`, so you can try your own.
 
 ## Request body limits
 
