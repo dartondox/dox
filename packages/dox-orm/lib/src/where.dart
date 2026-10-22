@@ -4,6 +4,9 @@ import 'shared_mixin.dart';
 mixin Where<T> implements SharedMixin<T> {
   final List<String> _wheres = <String>[];
 
+  /// true when a where condition was added
+  bool get hasWhere => _wheres.isNotEmpty;
+
   String getWhereQuery() {
     /// wrap user conditions in brackets so an OR can not skip the
     /// soft delete check.

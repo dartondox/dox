@@ -8,9 +8,15 @@ class Model<T> extends QueryBuilder<T> {
   DateTime? createdAt;
   DateTime? updatedAt;
 
-  List<String> hidden = <String>[];
+  /// fields left out of toJson()
+  List<String> get hidden => _hidden ??= <String>[];
+  set hidden(List<String> value) => _hidden = value;
+  List<String>? _hidden;
 
-  List<String> tableColumns = <String>[];
+  /// the generator overrides it with the model columns
+  List<String> get tableColumns => _tableColumns ??= <String>[];
+  set tableColumns(List<String> value) => _tableColumns = value;
+  List<String>? _tableColumns;
 
   bool _debug = SqlQueryBuilder().debug;
 
@@ -370,11 +376,24 @@ class Model<T> extends QueryBuilder<T> {
   /// start ********** preload
 
   List<String> get preloadList => <String>[]; // coverage:ignore-line
-  List<String> get customPreloadList => _preloadList; // coverage:ignore-line
-  final List<String> _preloadList = <String>[];
+  List<String> get customPreloadList =>
+      _preloads ?? const <String>[]; // coverage:ignore-line
 
-  Map<String, Function> relationsResultMatcher = <String, Function>{};
-  Map<String, Function> relationsQueryMatcher = <String, Function>{};
+  /// made on the first preload(), most models never call it
+  List<String>? _preloads;
+
+  /// the generator overrides these with the relations of the model
+  Map<String, Function> get relationsResultMatcher =>
+      _resultMatcher ??= <String, Function>{};
+  set relationsResultMatcher(Map<String, Function> value) =>
+      _resultMatcher = value;
+  Map<String, Function>? _resultMatcher;
+
+  Map<String, Function> get relationsQueryMatcher =>
+      _queryMatcher ??= <String, Function>{};
+  set relationsQueryMatcher(Map<String, Function> value) =>
+      _queryMatcher = value;
+  Map<String, Function>? _queryMatcher;
 
   /// preload relationship
   /// ```
@@ -382,7 +401,7 @@ class Model<T> extends QueryBuilder<T> {
   /// print(blog.comments);
   /// ```
   Model<T> preload(String key) {
-    _preloadList.add(key);
+    (_preloads ??= <String>[]).add(key);
     return this;
   }
 
@@ -421,12 +440,15 @@ class Model<T> extends QueryBuilder<T> {
 
   @override
   List<String> getPreload() {
-    return <String>{...preloadList, ..._preloadList}.toList();
+    List<String> list = preloadList;
+    List<String>? custom = _preloads;
+    if (custom == null && list.isEmpty) return const <String>[];
+    return <String>{...list, ...?custom}.toList();
   }
 
   @override
   Future<void> initPreload(List<Model<T>> list) async {
-    List<String> pList = <String>{...preloadList, ..._preloadList}.toList();
+    List<String> pList = getPreload();
     for (String key in pList) {
       await _getRelation(list, key);
     }
@@ -447,8 +469,8 @@ class Model<T> extends QueryBuilder<T> {
   /// Blog? blog = await Blog().find('name', 'John');
   /// ```
   @override
-  Future<T?> find(dynamic arg1, [dynamic arg2]) async {
-    return await super.find(arg1, arg2);
+  Future<T?> find(dynamic arg1, [dynamic arg2]) {
+    return super.find(arg1, arg2) as Future<T?>;
   }
 
   /// create a record
