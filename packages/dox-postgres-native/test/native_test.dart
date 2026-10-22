@@ -227,6 +227,11 @@ void main() {
         () => native.query('SELECT 1', parameters: <String, dynamic>{'x': 1}),
         throwsArgumentError,
       );
+      // same count of names, but a wrong one
+      expect(
+        () => native.query('SELECT @a', parameters: <String, dynamic>{'b': 1}),
+        throwsArgumentError,
+      );
     });
 
     test('a bad server is a PgException', () async {
@@ -315,6 +320,52 @@ void main() {
       expect(out.first, 'ok');
       expect(out.skip(1), everyElement(isA<PgException>()));
     });
+  });
+
+  test('queries share a connection, a transaction still gets one', () async {
+    PgNativePool small = PgNativePool.open(
+      host: host,
+      port: port,
+      user: 'postgres',
+      password: 'postgres',
+      database: 'postgres',
+      maxConnections: 2,
+    );
+    // many more queries than connections: each gets its own answer
+    Future<List<Object?>> load() => Future.wait(<Future<Object?>>[
+      for (int i = 0; i < 2000; i++)
+        small
+            .query(r'SELECT $1::int AS n', parameters: <int>[i])
+            .then((PgNativeResult r) => r.rows.single['n']),
+    ]);
+    Future<List<Object?>> busy = load();
+    // the shared connections do not keep a transaction waiting
+    int tx = await small.begin().timeout(const Duration(seconds: 5));
+    await small.query('SELECT 1', transaction: tx);
+    await small.commit(tx);
+    expect(await busy, <int>[for (int i = 0; i < 2000; i++) i]);
+    small.close();
+  });
+
+  test('a burst, then idle, then one query still finishes', () async {
+    // named and positional queries mixed in one burst, each with its answer
+    List<Object?> burst = await Future.wait(<Future<Object?>>[
+      for (int i = 0; i < 500; i++)
+        (i.isEven
+                ? native.query(
+                    'SELECT @n::int AS n',
+                    parameters: <String, int>{'n': i},
+                  )
+                : native.query(r'SELECT $1::int AS n', parameters: <int>[i]))
+            .then((PgNativeResult r) => r.rows.single['n']),
+    ]);
+    expect(burst, <int>[for (int i = 0; i < 500; i++) i]);
+    // the Rust side is idle now: a single query must still wake it
+    await Future<void>.delayed(const Duration(milliseconds: 200));
+    PgNativeResult one = await native
+        .query('SELECT 7 AS n')
+        .timeout(const Duration(seconds: 5));
+    expect(one.rows.single['n'], 7);
   });
 
   test('a value Dart can not decode fails only its own query', () async {
