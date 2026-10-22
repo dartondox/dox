@@ -1,3 +1,7 @@
+## 3.0.0-alpha.3
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.2
 
 - A JSON body that is not an object now says `The request body must be a JSON object.` (key `_root`). Change it with the message key `_root.object`.

@@ -1,5 +1,6 @@
-## Unreleased
+## 3.0.0-alpha.3
 
+- Column names and types are decoded once per result shape. The next result with the same columns reuses them.
 - Breaking: this package no longer depends on `dox_orm`. `PostgresNativeDriver` moved into `dox_orm`, which now uses it as its default Postgres driver. This package keeps `PgNativePool`.
 - Fix: a request never got an answer in two cases. A value that Dart can
   not decode (eg. a timestamp out of the `DateTime` range) lost every other

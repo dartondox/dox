@@ -1,3 +1,7 @@
+## 3.0.0-alpha.3
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.2
 
 - Fix: `dox build` no longer passes `--delete-conflicting-outputs` to build_runner (it was removed and printed a warning).

@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.3
 
 - Breaking: this package no longer depends on `dox_orm`. `MysqlNativeDriver` moved into `dox_orm`, which now uses it as its default MySQL driver. This package keeps `MysqlNativePool`, with the same API.
 

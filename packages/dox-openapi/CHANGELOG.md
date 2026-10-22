@@ -1,3 +1,7 @@
+## 3.0.0-alpha.3
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.2
 
 - A request body with a file field (`format: binary`, also in a list) uses `multipart/form-data` instead of `application/json`, so the `/docs` page can send files. `RouteDoc(bodyMediaType:)` sets it by hand.
