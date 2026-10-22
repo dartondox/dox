@@ -1,21 +1,19 @@
 import 'package:dox_orm/dox_orm.dart';
 
-/// counter to make each param key unique, a timestamp alone can repeat
-/// when many keys are made in the same microsecond.
-int _paramKeyCounter = 0;
+final RegExp _notWord = RegExp(r'[^\w]');
 
 class QueryBuilderHelper<T> {
   final QueryBuilder<T> queryBuilder;
   QueryBuilderHelper(this.queryBuilder);
 
+  /// number of param keys made by this query
+  int _paramCount = 0;
+
+  /// a param key that is unique in this query. the same query gives the
+  /// same keys every time, so the sql text is the same and the drivers can
+  /// reuse their prepared statements.
   String parseColumnKey(String column) {
-    String timestamp = DateTime.now().microsecondsSinceEpoch.toString();
-    _paramKeyCounter++;
-    String key = "$column${timestamp}_$_paramKeyCounter".replaceAll(
-      RegExp(r'[^\w]'),
-      "",
-    );
-    return '@$key';
+    return '@${column.replaceAll(_notWord, '')}_p${_paramCount++}';
   }
 
   /// quote a table or column name for the current driver
