@@ -1,3 +1,9 @@
+## Unreleased
+
+- New: `getRaw(key)` gives the stored value as JSON text, with no decode. Use it to send a cached value as a JSON response. Memory and Redis return the stored text as is. A stored String comes back with its quotes (`"bar"`). The stored format did not change, so old values still read the same.
+- Faster `get`: a plain store builds the key with no async step. `itemKey` now returns `FutureOr<String>`. Memory `get` costs about 0.6 µs instead of 0.86 µs. Memory `getRaw` costs about 0.3 µs.
+- New Redis option `pool_size`: the most connections one store opens (ioredis `maxConnection`). Default is 10, the same as before.
+
 ## 3.0.0-alpha.2
 
 - Needs Dart 3.13 or newer.

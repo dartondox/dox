@@ -1,3 +1,8 @@
+## Unreleased
+
+- New: `Cache().getRaw(key)` gives the cached value as JSON text, with no decode. Send it as a JSON response with no extra encode step.
+- New Redis cache option `pool_size` (see `dox_cache`).
+
 ## 3.0.0-alpha.2
 
 - New default server: `dox_http_native` (Rust hyper parses HTTP, your code stays in Dart). Hello world goes from about 41k to about 144k req/s on one isolate. Set `server: ServerBackend.dartIo` in `AppConfig` (or `DOX_SERVER=dartio`) to use `dart:io`. Dox uses `dart:io` by itself, with one warning line, when the native library does not load, and for apps with WebSocket or Socket.IO routes.

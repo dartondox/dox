@@ -31,7 +31,14 @@ Pass it to `AppConfig(cache: cache)`. Each store is made once per isolate, the f
     Dox runs one isolate per CPU core. Each isolate has its own `memory` store.
     Use `redis` when all isolates and servers must see the same data.
 
-Redis options: `host`, `port`, `username`, `password`, `db`, `tls`, `prefix`.
+Redis options: `host`, `port`, `username`, `password`, `db`, `tls`, `prefix`, `pool_size`.
+
+`pool_size` is the most Redis connections one store opens in one isolate. The default is 10.
+Each isolate has its own pool. So 4 isolates with `pool_size: 10` can open up to 40 connections.
+
+```dart
+'redis': <String, dynamic>{'driver': 'redis', 'host': '127.0.0.1', 'pool_size': 20},
+```
 
 ## Values are JSON
 
@@ -52,6 +59,21 @@ await Cache().forget('foo');
 await Cache().forever('settings', <String, dynamic>{'theme': 'dark'});
 await Cache().flush();                // remove all items of the store
 ```
+
+### `getRaw`
+
+`get` decodes the JSON text into Dart values. If you send the value back as JSON,
+Dox must encode it again. That is double work.
+`getRaw` gives the stored JSON text as is, so you can send it with no decode and no encode.
+
+```dart
+String? json = await Cache().getRaw('posts');
+if (json != null) {
+  return response(json).contentType(ContentType.json);
+}
+```
+
+A stored `String` comes back as JSON, with its quotes: `"bar"`. A missing key gives `null`.
 
 ### `remember`
 

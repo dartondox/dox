@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dox_cache/dox_cache.dart';
 import 'package:test/test.dart';
 
@@ -47,6 +49,29 @@ void runCacheContract(DriverHarness harness, {Object? skip}) {
 
     test('non JSON value throws', () async {
       await expectLater(cache.put('bad', DateTime(2026)), throwsA(anything));
+    });
+
+    test('getRaw gives the stored JSON text', () async {
+      Map<String, dynamic> value = <String, dynamic>{
+        'id': 1,
+        'tags': <dynamic>['a', null],
+        'text': 'say "hi"',
+      };
+      await cache.put('raw', value);
+      String? raw = await cache.getRaw('raw');
+      expect(jsonDecode(raw!), value);
+      await cache.put('raw_text', 'bar');
+      expect(await cache.getRaw('raw_text'), '"bar"');
+      expect(await cache.getRaw('missing'), isNull);
+      await cache.put('raw_null', null);
+      expect(await cache.getRaw('raw_null'), isNull);
+    });
+
+    test('getRaw works with tags', () async {
+      await cache.tags(<String>['t']).put('k', <int>[1, 2]);
+      expect(await cache.tags(<String>['t']).getRaw('k'), '[1,2]');
+      await cache.tags(<String>['t']).flush();
+      expect(await cache.tags(<String>['t']).getRaw('k'), isNull);
     });
 
     test('missing key gives null or default', () async {

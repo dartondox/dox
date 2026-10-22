@@ -43,6 +43,13 @@ return 0''';
     return reply == null ? null : jsonDecode(reply.toString());
   }
 
+  /// The stored JSON text. No decode.
+  @override
+  Future<String?> getRaw(String key) async {
+    Object? reply = await redis.sendCommand(<String>['GET', prefix + key]);
+    return reply == null ? null : CacheDriver.liveText(reply.toString());
+  }
+
   /// One MGET for all keys.
   @override
   Future<Map<String, dynamic>> many(List<String> keys) async {
@@ -200,7 +207,8 @@ class RedisLock extends CacheLock {
 }
 
 /// Builds a [RedisDriver] with a new connection.
-/// Options: host, port, username, password, db, tls, prefix.
+/// Options: host, port, username, password, db, tls, prefix, pool_size.
+/// pool_size is the most connections to open (ioredis maxConnection).
 class RedisDriverFactory implements CacheDriverFactory {
   const RedisDriverFactory();
 
@@ -224,6 +232,9 @@ class RedisDriverFactory implements CacheDriverFactory {
         db: options[CacheConstants.dbOption] as int? ?? 0,
         secure: options[CacheConstants.tlsOption] as bool? ?? false,
         retryStrategy: retryDelay,
+        maxConnection:
+            options[CacheConstants.poolSizeOption] as int? ??
+            CacheConstants.defaultRedisPoolSize,
       ),
     );
     return RedisDriver(

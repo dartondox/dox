@@ -74,6 +74,8 @@ void main() {
         expect(await Cache().store(store).get('user'), <String, dynamic>{
           'id': 1,
         });
+        expect(await Cache().store(store).getRaw('user'), '{"id":1}');
+        expect(await Cache().store(store).getRaw('nope'), isNull);
 
         await Cache().store(store).forget('name');
         expect(await Cache().store(store).get('name'), isNull);

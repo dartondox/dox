@@ -87,6 +87,17 @@ void main() {
       );
     });
 
+    test('reads files written by the old code', () async {
+      await directory.create(recursive: true);
+      await driver
+          .fileFor('old')
+          .writeAsString('{"value":{"a":[1,"b"]},"expires_at":null}');
+      expect(await driver.get('old'), <String, dynamic>{
+        'a': <dynamic>[1, 'b'],
+      });
+      expect(await driver.getRaw('old'), '{"a":[1,"b"]}');
+    });
+
     test('no temp files are left after writes', () async {
       for (int i = 0; i < 20; i++) {
         await driver.put('k$i', i, null);

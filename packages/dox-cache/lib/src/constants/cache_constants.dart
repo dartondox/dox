@@ -23,10 +23,15 @@ class CacheConstants {
   static const String passwordOption = 'password';
   static const String dbOption = 'db';
   static const String tlsOption = 'tls';
+  static const String poolSizeOption = 'pool_size';
 
   /// Redis defaults.
   static const String defaultRedisHost = '127.0.0.1';
   static const int defaultRedisPort = 6379;
+
+  /// Most Redis connections per store when `pool_size` is not set.
+  /// Same as the ioredis default.
+  static const int defaultRedisPoolSize = 10;
 
   /// How many keys one SCAN step looks at during flush.
   static const int redisScanCount = 500;
