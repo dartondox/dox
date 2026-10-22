@@ -2763,9 +2763,10 @@ Use <code>redis</code> when isolates or servers must see the same data.</p>
 </span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="kd">await</span><span class="w"> </span><span class="n">cache</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="s1">'file'</span><span class="p">).</span><span class="kd">get</span><span class="p">(</span><span class="s1">'a'</span><span class="p">);</span><span class="w">   </span><span class="c1">// a named store</span>
 </span></code></pre></div>
 <p>Redis options: <code>host</code>, <code>port</code>, <code>username</code>, <code>password</code>, <code>db</code>, <code>tls</code>, <code>prefix</code>, <code>pool_size</code>.</p>
-<p><code>pool_size</code> is the most Redis connections one store opens in one isolate. The default is 10.
-More connections help when many requests read the cache at the same time.
-Each Dox isolate has its own pool, so the total is <code>pool_size</code> times the number of isolates.</p>
+<p><code>pool_size</code> is the most Redis connections one store opens in one isolate (ioredis <code>maxConnection</code>). The default is 10.
+Most of the time a store uses only one connection. ioredis sends all commands on one shared connection and writes the commands of one event-loop turn together (auto-pipelining).
+It opens more connections only while a blocking command (like <code>BLPOP</code>) waits. The cache does not send blocking commands, so you rarely need to change <code>pool_size</code>.
+Each Dox isolate has its own connection, so the total is about one per isolate.</p>
 <h2 id="basic-use">Basic use</h2>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">store</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">5</span><span class="p">));</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">store</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'a'</span><span class="p">);</span><span class="w">               </span><span class="c1">// 1</span>
