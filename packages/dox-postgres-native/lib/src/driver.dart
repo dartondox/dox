@@ -1,0 +1,95 @@
+import 'dart:async';
+
+import 'package:dox_orm/dox_orm.dart';
+import 'package:dox_postgres_native/src/pool.dart';
+
+/// zone key to find the open transaction of a pool
+const Symbol _txKey = #doxPostgresNativeTransaction;
+
+/// The Dox ORM driver on [PgNativePool]. It acts like the built-in
+/// postgres driver: the same SQL, values and exceptions.
+class PostgresNativeDriver extends DBDriver {
+  PostgresNativeDriver(this.pool);
+
+  /// Makes the pool from a Dox [ConnectionConfig]. Reads `maxConnectionCount`
+  /// (default 10), `timeZone` (default UTC), `applicationName` and
+  /// `threads` (default 1) from `extra`.
+  factory PostgresNativeDriver.fromConfig(ConnectionConfig config) {
+    if (config.useSSL) {
+      // ponytail: no TLS yet. Add tokio-postgres-rustls when it is needed.
+      throw UnsupportedError('dox_postgres_native does not support SSL yet');
+    }
+    Map<String, dynamic> extra = config.extra;
+    return PostgresNativeDriver(
+      PgNativePool.open(
+        host: config.host,
+        port: config.port == 0 ? 5432 : config.port,
+        user: config.user,
+        password: config.password,
+        database: config.database,
+        maxConnections: extra['maxConnectionCount'] as int? ?? 10,
+        timeZone: extra['timeZone'] as String? ?? 'UTC',
+        applicationName: extra['applicationName'] as String?,
+        threads: extra['threads'] as int? ?? 1,
+      ),
+    );
+  }
+
+  final PgNativePool pool;
+
+  @override
+  Driver getName() => Driver.postgres;
+
+  @override
+  bool get supportsReturning => true;
+
+  int get _tx => (Zone.current[_txKey] as Map<PgNativePool, int>?)?[pool] ?? 0;
+
+  @override
+  Future<List<Map<String, dynamic>>> query(
+    String query, {
+    String? primaryKey,
+    Map<String, dynamic>? substitutionValues,
+  }) async {
+    PgNativeResult result = await pool.query(
+      query,
+      parameters: substitutionValues,
+      transaction: _tx,
+    );
+    return result.rows;
+  }
+
+  @override
+  Future<void> execute(
+    String query, {
+    Map<String, dynamic>? substitutionValues,
+  }) async {
+    await pool.query(query, parameters: substitutionValues, transaction: _tx);
+  }
+
+  @override
+  Future<R> transaction<R>(Future<R> Function() callback) async {
+    Map<PgNativePool, int>? open =
+        Zone.current[_txKey] as Map<PgNativePool, int>?;
+
+    /// ponytail: a nested transaction joins the outer one (no savepoint)
+    if (open?[pool] != null) {
+      return await callback();
+    }
+    int tx = await pool.begin();
+    R result;
+    try {
+      result = await runZoned(
+        callback,
+        zoneValues: <Symbol, dynamic>{
+          _txKey: <PgNativePool, int>{...?open, pool: tx},
+        },
+      );
+    } catch (_) {
+      await pool.rollback(tx);
+      rethrow;
+    }
+    await pool.commit(tx);
+    return result;
+  }
+}
