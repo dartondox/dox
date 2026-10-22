@@ -1,6 +1,10 @@
 import 'package:dox_orm/dox_orm.dart';
 
 final RegExp _notWord = RegExp(r'[^\w]');
+final RegExp _manySpaces = RegExp(' +');
+
+/// snake case table name of each model type, made once
+final Map<Type, String> _snakeNames = <Type, String>{};
 
 class QueryBuilderHelper<T> {
   final QueryBuilder<T> queryBuilder;
@@ -32,32 +36,32 @@ class QueryBuilderHelper<T> {
     return query;
   }
 
-  Future<List<Map<String, dynamic>>> runQuery(String query) async {
+  Future<List<Map<String, dynamic>>> runQuery(String query) {
     Map<String, dynamic> values = queryBuilder.substitutionValues;
     if (queryBuilder.shouldDebug) queryBuilder.logger.log(query, values);
-    query = query.replaceAll(RegExp(' +'), ' ');
-    return await queryBuilder.dbDriver.query(
+    if (query.contains('  ')) {
+      query = query.replaceAll(_manySpaces, ' ');
+    }
+    return queryBuilder.dbDriver.query(
       query,
       substitutionValues: values,
       primaryKey: queryBuilder.primaryKey,
     );
   }
 
+  /// dates become iso strings (models read them as strings).
+  /// the rows are new maps from the driver, so they are changed in place.
   List<Map<String, dynamic>> getMapResult(
     List<Map<String, dynamic>> queryResult,
   ) {
-    List<Map<String, dynamic>> result = <Map<String, dynamic>>[];
-    // setting key values format from query result
     for (Map<String, dynamic> data in queryResult) {
-      Map<String, dynamic> ret = <String, dynamic>{};
-
-      (data).forEach((String key, dynamic value) {
-        ret[key] = value is DateTime ? value.toIso8601String() : value;
-      });
-
-      result.add(ret);
+      for (MapEntry<String, dynamic> e in data.entries) {
+        if (e.value is DateTime) {
+          data[e.key] = (e.value as DateTime).toIso8601String();
+        }
+      }
     }
-    return result;
+    return queryResult;
   }
 
   // ignore: always_specify_types
@@ -72,22 +76,31 @@ class QueryBuilderHelper<T> {
       return result;
     }
 
-    if (queryBuilder.self != null &&
-        queryBuilder.self.toString() != 'dynamic') {
+    dynamic self = queryBuilder.self;
+    if (self != null && self != dynamic) {
+      List<String> preloads = self.customPreloadList;
       List<T> ret = <T>[];
       for (Map<String, dynamic> e in result) {
-        dynamic res = queryBuilder.self.fromMap(e);
+        dynamic res = self.fromMap(e);
         res.originalMap = e;
-        List<String> preloads = queryBuilder.self.customPreloadList;
         for (String preload in preloads) {
           res.preload(preload);
         }
         ret.add(res as T);
       }
-      await queryBuilder.initPreload(ret as List<Model<T>>);
+
+      /// no relations to load: skip the preload work
+      if (ret.isNotEmpty && queryBuilder.getPreload().isNotEmpty) {
+        await queryBuilder.initPreload(ret as List<Model<T>>);
+      }
       return ret;
     }
     return result;
+  }
+
+  /// snake case name of the model type, eg. `BlogInfo` is `blog_info`
+  String tableNameOf(Type type) {
+    return _snakeNames[type] ??= toSnakeCase(type.toString());
   }
 
   String toSnakeCase(String input) {

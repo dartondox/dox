@@ -33,16 +33,34 @@ abstract class DBDriver {
   /// `` `name` `` on mysql. it handles `table.column`, `*` and `column as alias`.
   /// a value with `(` is a raw expression and is not changed.
   String wrap(String value) {
+    String? known = _wrapped[value];
+    if (known != null) {
+      return known;
+    }
+
+    /// ponytail: cleared when full, names are a small set
+    if (_wrapped.length >= 1000) {
+      _wrapped.clear();
+    }
+    return _wrapped[value] = _wrap(value);
+  }
+
+  /// quoted names, made once
+  final Map<String, String> _wrapped = <String, String>{};
+
+  String _wrap(String value) {
     value = value.trim();
     if (value.contains('(')) {
       return value;
     }
-    List<String> alias = value.split(RegExp(r'\s+as\s+', caseSensitive: false));
+    List<String> alias = value.split(_aliasPattern);
     if (alias.length == 2) {
       return '${wrap(alias[0])} as ${_wrapPart(alias[1].trim())}';
     }
     return value.split('.').map(_wrapPart).join('.');
   }
+
+  static final RegExp _aliasPattern = RegExp(r'\s+as\s+', caseSensitive: false);
 
   String _wrapPart(String part) {
     if (part == '*') {

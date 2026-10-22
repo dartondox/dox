@@ -18,7 +18,7 @@ class Model<T> extends QueryBuilder<T> {
   Map<String, dynamic>? _savedValues;
 
   @override
-  String get tableName => helper.toSnakeCase(runtimeType.toString());
+  String get tableName => helper.tableNameOf(runtimeType);
 
   @override
   dynamic get self => this;
