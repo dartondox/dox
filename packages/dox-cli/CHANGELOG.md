@@ -1,3 +1,8 @@
+## Unreleased
+
+- Fix: `dox create my_app` without `--version` crashed with a `RangeError`.
+- Fix: `dox create` picked the GitHub "latest" template release, which skips pre-releases. During the 3.x alpha that gave the old 2.x template. It now takes the newest template with the same major version as the CLI.
+
 ## 3.0.0-alpha.4
 
 - Version bump only, to match the other packages.
