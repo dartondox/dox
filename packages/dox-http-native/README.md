@@ -29,6 +29,8 @@ void main() async {
   not run build hooks.
 - Each isolate can bind the same port (`SO_REUSEPORT` on Linux, one shared
   socket on macOS).
+- Each isolate has its own `dox-http` thread. `DOX_HTTP_THREAD=shared`
+  puts them all on one thread (slower on 2 cores in our tests).
 - `400` for bad requests, `431` for headers over 16 KB, `413` for bodies
   over `maxBodySize`.
 - Not yet: WebSocket upgrade (`detachSocket`), streaming a response while it

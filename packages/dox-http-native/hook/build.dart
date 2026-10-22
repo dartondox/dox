@@ -22,7 +22,7 @@ const String _releases = 'https://github.com/dartondox/dox/releases/download';
 
 /// sha256 of each release asset. Fill it from `SHA256SUMS` of the release
 /// (see .github/workflows/native.yaml) before publishing to pub.dev.
-/// These are from the release `dox_http_native-v3.0.0-alpha.2`.
+/// These are from the release `dox_http_native-v3.0.0-alpha.3`.
 const Map<String, String> _sha256 = <String, String>{
   'dox_http_native-linux-arm64.so':
       '0673e9d29c77fa8e144421bdbbf51b97bb94a02514e79ea268715bd3d58b8ecc',

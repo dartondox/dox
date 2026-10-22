@@ -1,3 +1,12 @@
+## 3.0.0-alpha.3
+
+- `DOX_HTTP_THREAD=shared` runs one `dox-http` thread for all isolates.
+  Default is still one thread per isolate, which measured faster.
+- Less work per request: request headers are read one name at a time,
+  answers are not copied again in Rust, one wake per answer batch.
+- Native ABI 2 (new header layout in the request record). Needs a new
+  native library build.
+
 ## 3.0.0-alpha.2
 
 - First release.

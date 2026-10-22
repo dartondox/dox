@@ -3,11 +3,13 @@ import 'dart:typed_data';
 
 /// [HttpHeaders] for the native server.
 ///
-/// Request headers are read from the raw `name: value\r\n` bytes on first
-/// use. Response headers share the server defaults until the first change
-/// (copy on write), so a plain response copies nothing.
+/// Request headers are read from the raw bytes from Rust, one name at a
+/// time, when the handler asks. Response headers share the server defaults
+/// until the first change (copy on write), so a plain response copies
+/// nothing.
 class NativeHeaders implements HttpHeaders {
-  /// Headers of a request, read from [raw] on first use. Not mutable.
+  /// Headers of a request, read from [raw] on use. Not mutable.
+  /// [raw] is the header block of the request record (see lib.rs).
   NativeHeaders.request(Uint8List raw, {required this._http10})
     : _raw = raw,
       _mutable = false;
@@ -31,6 +33,7 @@ class NativeHeaders implements HttpHeaders {
   final bool _mutable;
   final bool _http10;
 
+  /// null for request headers until a call needs all of them.
   Map<String, List<String>>? _map;
   bool _shared = false;
   int _contentLength = -1;
@@ -44,31 +47,51 @@ class NativeHeaders implements HttpHeaders {
 
   Map<String, List<String>> get _entries => _map ??= _parse(_raw!);
 
+  // Raw request headers (from Rust): per header u16 name length, u16 value
+  // length (little endian), the name (lowercase), the value.
+
   static Map<String, List<String>> _parse(Uint8List b) {
     Map<String, List<String>> out = <String, List<String>>{};
     int i = 0;
-    int n = b.length;
-    while (i < n) {
-      int colon = i;
-      while (colon < n && b[colon] != 58) {
-        colon++;
-      }
-      int end = colon;
-      while (end < n && b[end] != 13) {
-        end++;
-      }
-      if (colon >= n) break;
-      int v = colon + 1;
-      while (v < end && b[v] == 32) {
-        v++;
-      }
-      // hyper gives lowercase names
-      String name = String.fromCharCodes(b, i, colon);
-      String value = String.fromCharCodes(b, v, end);
-      (out[name] ??= <String>[]).add(value);
-      i = end + 2;
+    while (i + 4 <= b.length) {
+      int nameEnd = i + 4 + (b[i] | b[i + 1] << 8);
+      int end = nameEnd + (b[i + 2] | b[i + 3] << 8);
+      String name = String.fromCharCodes(b, i + 4, nameEnd);
+      (out[name] ??= <String>[]).add(String.fromCharCodes(b, nameEnd, end));
+      i = end;
     }
     return out;
+  }
+
+  /// the values of one header. A request reads only that name from the
+  /// raw bytes, so a handler that asks for one or two headers parses no more.
+  List<String>? _get(String name) {
+    Map<String, List<String>>? map = _map;
+    if (map != null) return map[name];
+    return _scan(_raw!, name);
+  }
+
+  static List<String>? _scan(Uint8List b, String name) {
+    List<String>? out;
+    int len = name.length;
+    int i = 0;
+    while (i + 4 <= b.length) {
+      int nameLen = b[i] | b[i + 1] << 8;
+      int nameEnd = i + 4 + nameLen;
+      int end = nameEnd + (b[i + 2] | b[i + 3] << 8);
+      if (nameLen == len && _startsWith(b, i + 4, name)) {
+        (out ??= <String>[]).add(String.fromCharCodes(b, nameEnd, end));
+      }
+      i = end;
+    }
+    return out;
+  }
+
+  static bool _startsWith(Uint8List b, int at, String name) {
+    for (int k = 0; k < name.length; k++) {
+      if (b[at + k] != name.codeUnitAt(k)) return false;
+    }
+    return true;
   }
 
   Map<String, List<String>> _own() {
@@ -100,7 +123,7 @@ class NativeHeaders implements HttpHeaders {
     if (name == HttpHeaders.contentLengthHeader && _mutable) {
       return _contentLength < 0 ? null : <String>['$_contentLength'];
     }
-    return _entries[name];
+    return _get(name);
   }
 
   @override
@@ -210,7 +233,7 @@ class NativeHeaders implements HttpHeaders {
   ContentType? get contentType {
     String? v = value(HttpHeaders.contentTypeHeader);
     if (v == null) return null;
-    if (!identical(v, _contentTypeOf)) {
+    if (v != _contentTypeOf) {
       _contentType = ContentType.parse(v);
       _contentTypeOf = v;
     }
@@ -221,10 +244,23 @@ class NativeHeaders implements HttpHeaders {
   set contentType(ContentType? type) {
     if (type == null) {
       removeAll(HttpHeaders.contentTypeHeader);
-    } else {
-      set(HttpHeaders.contentTypeHeader, type.toString());
+      return;
     }
+    // apps set the same const types (eg. ContentType.json) again and
+    // again. Keep the text of the last one, so it is not built each time.
+    if (!identical(type, _lastType)) {
+      _lastType = type;
+      _lastTypeText = type.toString();
+    }
+    String text = _lastTypeText!;
+    set(HttpHeaders.contentTypeHeader, text);
+    // the getter (and so `encoding`) then needs no parse
+    _contentType = type;
+    _contentTypeOf = _entries[HttpHeaders.contentTypeHeader]![0];
   }
+
+  static ContentType? _lastType;
+  static String? _lastTypeText;
 
   @override
   bool get chunkedTransferEncoding {
@@ -240,7 +276,7 @@ class NativeHeaders implements HttpHeaders {
 
   @override
   bool get persistentConnection {
-    String? c = _entries[HttpHeaders.connectionHeader]?.join(',').toLowerCase();
+    String? c = _get(HttpHeaders.connectionHeader)?.join(',').toLowerCase();
     if (c == null) return !_http10;
     if (c.contains('close')) return false;
     return !_http10 || c.contains('keep-alive');
