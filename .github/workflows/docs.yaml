@@ -104,15 +104,15 @@ jobs:
 
           # The script in <head> moves on before the page is drawn, and keeps
           # the ?query and #hash. So the visitor sees no "Redirecting" page.
-          # The meta refresh and the <noscript> link are for no JavaScript.
+          # The meta refresh is for no JavaScript. The body stays empty.
           def redirect(url):
               return ('<!doctype html><html><head><meta charset="utf-8">'
-                      '<title>Dox</title>'
+                      '<title></title>'
                       '<link rel="canonical" href="%s">'
                       '<script>location.replace("%s" + location.search + location.hash)</script>'
                       '<meta http-equiv="refresh" content="0; url=%s">'
-                      '</head><body><noscript><a href="%s">Open the Dox docs</a></noscript></body></html>'
-                      % (url, url, url, url))
+                      '</head><body></body></html>'
+                      % (url, url, url))
 
           # collect old pages: every folder with an index.html
           pages = set()
