@@ -1,3 +1,8 @@
+## Unreleased
+
+- Faster queries on all databases. Each connection keeps its prepared statements (LRU, 100 by default, `extra['preparedStatementCacheSize']`). The same query now has the same sql text, so the statements are reused. `find()` no longer sends `LIMIT 1 OFFSET 0`: LIMIT and OFFSET are only sent when set, and never `OFFSET 0`. Less work per row when models are built. A find by id on SQLite went from 23 µs to 6 µs.
+- New `ConnectionConfig.driverFactory`: plug in your own driver class with one line, eg. `driverFactory: PostgresNativeDriver.fromConfig`. The default and the named connections use it.
+
 ## 3.0.0-alpha.2
 
 - Needs Dart 3.13 or newer.
