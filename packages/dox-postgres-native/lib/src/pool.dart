@@ -194,8 +194,12 @@ class _Link {
 
   late final RawReceivePort _port;
   late final int _sink;
-  final Map<int, Completer<Object?>> _pending = <int, Completer<Object?>>{};
-  int _nextId = 0;
+
+  /// The waiting requests. The id of a request is its slot here. Rust
+  /// answers each id once, so a slot is free again after its answer.
+  final List<Completer<Object?>?> _pending = <Completer<Object?>?>[];
+  final List<int> _free = <int>[];
+  int _waiting = 0;
 
   Uint8List _out = Uint8List(1 << 14);
   late ByteData _outData = ByteData.sublistView(_out);
@@ -209,12 +213,17 @@ class _Link {
     Uint8List sql,
     List<TypedValue<Object>> values,
   ) {
-    int id = ++_nextId;
+    int id = _free.isEmpty ? _pending.length : _free.last;
     Completer<T> done = Completer<T>();
     // encode first: a bad value throws before anything is queued
     _write(id, pool, tx, kind, sql, values);
-    if (_pending.isEmpty) _port.keepIsolateAlive = true;
-    _pending[id] = done;
+    if (id == _pending.length) {
+      _pending.add(done);
+    } else {
+      _free.removeLast();
+      _pending[id] = done;
+    }
+    if (_waiting++ == 0) _port.keepIsolateAlive = true;
     if (!_flushQueued) {
       _flushQueued = true;
       scheduleMicrotask(_flush);
@@ -312,8 +321,11 @@ class _Link {
       int len = d.getUint32(p + 9, Endian.little);
       int at = p + 13;
       p = at + len;
-      Completer<Object?>? done = _pending.remove(id);
+      Completer<Object?>? done = id < _pending.length ? _pending[id] : null;
       if (done == null) continue;
+      _pending[id] = null;
+      _free.add(id);
+      _waiting--;
       // one bad record fails its own request, not the rest of the batch
       try {
         switch (status) {
@@ -335,7 +347,7 @@ class _Link {
         );
       }
     }
-    if (_pending.isEmpty) _port.keepIsolateAlive = false;
+    if (_waiting == 0) _port.keepIsolateAlive = false;
   }
 
   static List<(int, String)> _fields(Uint8List b, ByteData d, int at) {

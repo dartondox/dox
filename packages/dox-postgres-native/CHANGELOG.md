@@ -1,3 +1,7 @@
+## Unreleased
+
+- Less work per request. Rust copies a batch of requests once and keeps slices of it, instead of one copy of the SQL and of each parameter. A batch of plain queries uses one timeout timer, not one per query. Dart keeps waiting requests in a list, not a map.
+
 ## 3.0.0-alpha.3
 
 - Column names and types are decoded once per result shape. The next result with the same columns reuses them.

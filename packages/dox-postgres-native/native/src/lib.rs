@@ -26,9 +26,10 @@ use std::ffi::{CStr, c_char, c_int, c_void};
 use std::str::FromStr;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, OnceLock};
+use std::task::Poll;
 use std::time::Duration;
 
-use bytes::BytesMut;
+use bytes::{Bytes, BytesMut};
 use deadpool_postgres::{Manager, ManagerConfig, Object, Pool, RecyclingMethod};
 use futures_util::StreamExt;
 use futures_util::stream::FuturesUnordered;
@@ -376,11 +377,11 @@ fn rows(id: u64, stmt: &Statement, rows: &[Row]) -> Vec<u8> {
 
 // ---- queries -----------------------------------------------------------
 
-/// A parameter, already encoded by Dart.
+/// A parameter, already encoded by Dart. `data` is a slice of the batch.
 struct Param {
     oid: u32,
     binary: bool,
-    data: Option<Vec<u8>>,
+    data: Option<Bytes>,
 }
 
 impl std::fmt::Debug for Param {
@@ -428,7 +429,10 @@ fn stale(e: &tokio_postgres::Error) -> bool {
         || e.code() == Some(&SqlState::INVALID_SQL_STATEMENT_NAME)
 }
 
-async fn query(client: &Object, id: u64, sql: &str, params: &[Param]) -> Vec<u8> {
+async fn query(client: &Object, id: u64, sql: &[u8], params: &[Param]) -> Vec<u8> {
+    let Ok(sql) = std::str::from_utf8(sql) else {
+        return message(id, "dox_postgres_native: the sql is not UTF-8");
+    };
     let types: Vec<Type> = if params.iter().any(|p| p.oid != 0) {
         params.iter().map(|p| param_type(p.oid)).collect()
     } else {
@@ -471,7 +475,7 @@ async fn timed(id: u64, work: impl Future<Output = Vec<u8>>) -> Vec<u8> {
 enum Job {
     Query {
         id: u64,
-        sql: String,
+        sql: Bytes,
         params: Vec<Param>,
         sink: Arc<Sink>,
     },
@@ -565,17 +569,18 @@ fn rd64(b: &[u8], p: usize) -> u64 {
     u64::from_le_bytes(b[p..p + 8].try_into().unwrap())
 }
 
-/// One request record. None when it is broken.
+/// One request record. `sql` and the params are slices of the batch.
 struct Request {
     id: u64,
     pool: u64,
     tx: u64,
     kind: u8,
-    sql: String,
+    sql: Bytes,
     params: Vec<Param>,
 }
 
-fn parse(b: &[u8], p: &mut usize) -> Option<Request> {
+/// None when the record is broken.
+fn parse(b: &Bytes, p: &mut usize) -> Option<Request> {
     let at = *p;
     if at + REQ_HEAD > b.len() {
         return None;
@@ -583,7 +588,10 @@ fn parse(b: &[u8], p: &mut usize) -> Option<Request> {
     let count = rd16(b, at + 26);
     let sql_len = rd32(b, at + 28) as usize;
     let mut q = at + REQ_HEAD;
-    let sql = String::from_utf8_lossy(b.get(q..q + sql_len)?).into_owned();
+    if q + sql_len > b.len() {
+        return None;
+    }
+    let sql = b.slice(q..q + sql_len);
     q += sql_len;
     let mut params = Vec::with_capacity(count);
     for _ in 0..count {
@@ -597,8 +605,12 @@ fn parse(b: &[u8], p: &mut usize) -> Option<Request> {
         let data = if len < 0 {
             None
         } else {
-            let d = b.get(q..q + len as usize)?.to_vec();
-            q += len as usize;
+            let end = q + len as usize;
+            if end > b.len() {
+                return None;
+            }
+            let d = b.slice(q..end);
+            q = end;
             Some(d)
         };
         params.push(Param { oid, binary, data });
@@ -668,25 +680,49 @@ fn run(req: Request, sink: &Arc<Sink>, rt: &Handle) -> Option<Request> {
 /// The plain queries of one batch from Dart, in one task. They all start
 /// in the first poll, so the queries that go to one connection cost one
 /// write. Results go to Dart as they come.
+///
+/// They start together, so one timer for the batch gives each the same
+/// [TIMEOUT] as a timer per query, for one timer instead of many.
 fn run_plain(reqs: Vec<Request>, sink: Arc<Sink>, rt: &Handle) {
     rt.spawn(async move {
+        let ids: Vec<u64> = reqs.iter().map(|r| r.id).collect();
+        let mut answered = vec![false; ids.len()];
         let mut running: FuturesUnordered<_> = reqs
             .into_iter()
-            .map(|r| async move {
+            .enumerate()
+            .map(|(i, r)| async move {
                 let Some(pool) = with(&POOLS, |p| p.get(r.pool)) else {
-                    return message(r.id, "the pool is closed");
+                    return (i, message(r.id, "the pool is closed"));
                 };
-                timed(r.id, async {
-                    match pool.lease().await {
-                        Ok(client) => query(&client, r.id, &r.sql, &r.params).await,
-                        Err(e) => pool_error(r.id, e),
-                    }
-                })
-                .await
+                let out = match pool.lease().await {
+                    Ok(client) => query(&client, r.id, &r.sql, &r.params).await,
+                    Err(e) => pool_error(r.id, e),
+                };
+                (i, out)
             })
             .collect();
-        while let Some(out) = running.next().await {
-            sink.push(&out);
+        let mut deadline = std::pin::pin!(tokio::time::sleep(TIMEOUT));
+        loop {
+            // Some(item) for a result or the end, None at the deadline
+            let next = std::future::poll_fn(|cx| match running.poll_next_unpin(cx) {
+                Poll::Ready(item) => Poll::Ready(Some(item)),
+                Poll::Pending => deadline.as_mut().poll(cx).map(|()| None),
+            })
+            .await;
+            match next {
+                Some(Some((i, out))) => {
+                    answered[i] = true;
+                    sink.push(&out);
+                }
+                Some(None) => return,
+                None => break,
+            }
+        }
+        // dropping `running` stops the queries that are left
+        for (id, done) in ids.iter().zip(answered) {
+            if !done {
+                sink.push(&message(*id, TIMED_OUT));
+            }
         }
     });
 }
@@ -799,9 +835,12 @@ pub unsafe extern "C" fn dpg_submit(sink: i64, ptr: *const u8, len: i64) {
     };
     let Some(rt) = RUNTIME.get() else { return };
     let b = unsafe { std::slice::from_raw_parts(ptr, len as usize) };
+    // one copy of the batch: Dart reuses its buffer after this call.
+    // Requests keep slices of it.
+    let b = Bytes::copy_from_slice(b);
     let mut p = 0;
     let mut plain = Vec::new();
-    while let Some(req) = parse(b, &mut p) {
+    while let Some(req) = parse(&b, &mut p) {
         plain.extend(run(req, &sink, rt));
     }
     if !plain.is_empty() {
@@ -840,18 +879,20 @@ mod tests {
     fn parses_requests() {
         let mut b = request(1, "select $1, $2", &[Some("42"), None]);
         b.extend(request(2, "select 1", &[]));
+        let cut = Bytes::copy_from_slice(&b[..40]);
+        let b = Bytes::from(b);
         let mut p = 0;
         let a = parse(&b, &mut p).unwrap();
         assert_eq!((a.id, a.pool, a.kind), (1, 7, 0));
-        assert_eq!(a.sql, "select $1, $2");
+        assert_eq!(&a.sql[..], b"select $1, $2");
         assert_eq!(a.params[0].data.as_deref(), Some(&b"42"[..]));
         assert!(a.params[1].data.is_none());
         let c = parse(&b, &mut p).unwrap();
-        assert_eq!((c.id, c.sql.as_str()), (2, "select 1"));
+        assert_eq!((c.id, &c.sql[..]), (2, &b"select 1"[..]));
         assert!(parse(&b, &mut p).is_none());
         // a cut record is dropped
         let mut p = 0;
-        assert!(parse(&b[..40], &mut p).is_none());
+        assert!(parse(&cut, &mut p).is_none());
     }
 
     #[test]
@@ -876,16 +917,16 @@ mod tests {
         let p = [Param {
             oid: 0,
             binary: false,
-            data: Some(b"41".to_vec()),
+            data: Some(Bytes::from_static(b"41")),
         }];
-        let out = query(&client, 5, "select $1::int8 + 1 as n", &p).await;
+        let out = query(&client, 5, b"select $1::int8 + 1 as n", &p).await;
         assert_eq!(out[8], 0, "{:?}", String::from_utf8_lossy(&out));
         // 1 column int8 named n, 1 row with 8 bytes
         assert_eq!(rd16(&out, 13), 1);
         assert_eq!(rd32(&out, 15), 20);
         let at = out.len() - 8;
         assert_eq!(i64::from_be_bytes(out[at..].try_into().unwrap()), 42);
-        let bad = query(&client, 6, "select * from nope_missing", &[]).await;
+        let bad = query(&client, 6, b"select * from nope_missing", &[]).await;
         assert_eq!(bad[8], 1);
     }
 }
