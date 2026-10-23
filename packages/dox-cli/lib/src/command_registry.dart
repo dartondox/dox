@@ -62,7 +62,8 @@ class CommandRegistry {
       maxArgs: 3,
       function: (args) async {
         final projectName = args[0];
-        final flag = args[1];
+        // `dox create blog` has no flag: args[1] would throw a RangeError
+        final flag = args.length >= 2 ? args[1] : null;
         bool isVersionFlag = flag == '--version' || flag == '--v';
         final version = args.length >= 3 && isVersionFlag ? args[2] : null;
         createProject(projectName, version);
