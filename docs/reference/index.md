@@ -1,6 +1,6 @@
 # Reference
 
-Short lookup pages. Every value on these pages comes from the source code of version `3.0.0-alpha.4`.
+Short lookup pages. Every value on these pages comes from the source code of the latest `3.0.0-alpha.x` version.
 
 | Page | What is on it |
 | --- | --- |

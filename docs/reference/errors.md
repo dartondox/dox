@@ -236,7 +236,7 @@ Printed to stderr. The connection or the request fails, the app keeps running.
 | `Command "<name>" not found.` | `dox help <name>` with an unknown command. | Run `dox help`. |
 | `<name> already exists` | A `create:*` file is already there. | Pick another name, or delete the file. |
 | `Folder name "<name>" already exist` | `dox create` into a folder that exists. | Pick another name. |
-| `RangeError (index): Invalid value: Only valid value is 0: 1` | `dox create <name>` without `--version`, in `3.0.0-alpha.4`. | Pass `--version 3.0.0-alpha.4`. |
+| `RangeError (index): Invalid value: Only valid value is 0: 1` | `dox create <name>` without `--version`, in `3.0.0-alpha.4` and older. | Update the CLI: `dart pub global activate dox ^3.0.0-alpha`. |
 | `Invalid option <x>, use -m or --migration` | `dox create:model` with another option. | Use `-m`. |
 | `Invalid option <x>, use --step=<count>` | `dox migration:rollback` with another option. | Use `--step=2`. |
 | `db/migration has Dart migrations, but bin/migrate.dart is missing. ...` | Dart migrations but no entry file. | Run `dox make:migration <name>` once. |

@@ -17,7 +17,7 @@
 ### 1. Add the package
 
 ```bash
-dart pub add dox_websocket:^3.0.0-alpha.4
+dart pub add dox_websocket:^3.0.0-alpha
 ```
 
 ### 2. Create a WebSocket service

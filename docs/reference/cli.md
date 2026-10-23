@@ -25,7 +25,7 @@ Makes a new project from the [dox-sample](https://github.com/dartondox/dox-sampl
 
 | Option | Meaning |
 | --- | --- |
-| `--version <v>` (or `--v`) | The release tag to clone, like `3.0.0-alpha.4` or `v3.0.0-alpha.4`. Without it, the newest `dox-sample` release with the same major version as the CLI is used (pre-releases included). |
+| `--version <v>` (or `--v`) | The release tag to clone, like `3.0.0-alpha.5` or `v3.0.0-alpha.5`. Without it, the newest `dox-sample` release with the same major version as the CLI is used (pre-releases included). |
 
 What it does:
 
@@ -36,11 +36,6 @@ What it does:
 5. Replaces `dox_sample` with your project name in every file, except files under `bin/dox`.
 
 Needs `curl` and `git` on the `PATH`.
-
-!!! warning "Known bug: `dox create my_app` without `--version` throws `RangeError`"
-    The command reads `args[1]` before it checks how many arguments there are.
-    With only the project name you get `RangeError (index): Invalid value: Only valid value is 0: 1`.
-    Workaround: always pass the version, `dox create my_app --version 3.0.0-alpha.4`.
 
 Source: `packages/dox-cli/lib/src/tools/create_project.dart`.
 

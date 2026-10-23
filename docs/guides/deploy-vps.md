@@ -25,7 +25,7 @@ So build it inside the `dart:stable` image (it is Debian):
 
 ```bash
 docker run --rm -v "$PWD":/app -w /app dart:stable sh -c \
-  'dart pub get && dart pub global activate dox 3.0.0-alpha.4 && /root/.pub-cache/bin/dox build'
+  'dart pub get && dart pub global activate dox ^3.0.0-alpha && /root/.pub-cache/bin/dox build'
 ```
 
 The result is `build/bundle/`:

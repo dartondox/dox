@@ -12,7 +12,7 @@ RUN dart pub get --offline
 
 # `dox build` runs build_runner, then `dart build cli`.
 # The bundle is in build/bundle: bin/server, lib/, db/, .env.example
-RUN dart pub global activate dox 3.0.0-alpha.4 \
+RUN dart pub global activate dox ^3.0.0-alpha \
   && /root/.pub-cache/bin/dox build
 
 # The health check binary. Plain dart:io, so `dart compile exe` is fine.

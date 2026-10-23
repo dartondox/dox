@@ -118,7 +118,7 @@ Without a database (`GET /json`), Bun is faster.
 See [Performance](digging-deeper/performance.md) for every route and how to run the benchmark yourself.
 
 !!! warning "You are reading the 3.x docs (alpha)"
-    `3.0.0-alpha.4` is a preview. Things can still change before the stable release.
+    `3.0.0-alpha.x` is a preview. Things can still change before the stable release.
 
 ## Run it in two minutes
 
@@ -126,7 +126,7 @@ You need [Dart](https://dart.dev/get-dart) 3.13 or newer. Nothing else: the
 starter project uses SQLite, so there is no database to install.
 
 ```bash
-dart pub global activate dox 3.0.0-alpha.4   # install the CLI
+dart pub global activate dox ^3.0.0-alpha   # install the CLI
 dox create my_app                            # download the starter project
 cd my_app
 dart pub get

@@ -11,13 +11,12 @@ Source code: [github.com/dartondox/dox](https://github.com/dartondox/dox).
 ## Install
 
 ```bash
-dart pub global activate dox 3.0.0-alpha.4
+dart pub global activate dox ^3.0.0-alpha
 ```
 
 If your shell can not find `dox`, add `$HOME/.pub-cache/bin` to your `PATH`.
 
-Dox 3.x is in alpha (`3.0.0-alpha.4`). `dox update` installs the latest stable version, not a preview.
-To stay on a preview, run the install command with the version again.
+Dox 3.x is in alpha (`3.0.0-alpha.x`). `dox update` installs the newest version with the same major version, previews included.
 
 ## Use it
 

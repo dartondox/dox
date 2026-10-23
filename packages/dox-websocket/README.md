@@ -14,7 +14,7 @@ Source code: [github.com/dartondox/dox](https://github.com/dartondox/dox).
 dart pub add dox_websocket
 ```
 
-Dox 3.x is in alpha (`3.0.0-alpha.4`). The API can still change before the stable release.
+Dox 3.x is in alpha (`3.0.0-alpha.x`). The API can still change before the stable release.
 
 ## Use it
 

@@ -5,7 +5,7 @@ This step makes a new Dox project, points it at SQLite, starts the dev server an
 ## 1. Install the CLI and make the project
 
 ```bash
-dart pub global activate dox 3.0.0-alpha.4
+dart pub global activate dox ^3.0.0-alpha
 dox create blog
 cd blog
 dart pub get
@@ -15,7 +15,7 @@ dart pub get
 So every import in this tutorial starts with `package:blog/`.
 
 !!! note "Check the versions"
-    Open `pubspec.yaml`. Every Dox package must be `^3.0.0-alpha.4`.
+    Open `pubspec.yaml`. Every Dox package must be `^3.0.0-alpha`.
     If the template has an older version, change it and run `dart pub get` again.
 
 ## 2. Use SQLite

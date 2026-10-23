@@ -64,34 +64,21 @@ build/bundle/bin/dox --version
 ## Release (maintainers)
 
 The `Release` GitHub workflow (`.github/workflows/publish.yaml`) publishes all public packages to pub.dev.
-It runs when you push a tag like `v3.0.0-alpha.4`.
+It runs when you push a tag like `v3.0.0-alpha.5`.
 It uses pub.dev automated publishing, so it needs no token or secret.
 
 ### Steps
 
-1. Set the new version in the root `pubspec.yaml`, for example `version: 3.0.0-alpha.4`.
-2. Run the script.
-   ```bash
-   bash bin/update_versions.sh
-   ```
-   It copies the version to every `packages/*/pubspec.yaml`.
-   It sets every sibling dependency to `^3.0.0-alpha.4`.
-   It also writes the CLI version constant in `packages/dox-cli/lib/src/version.dart`.
-3. Add a `## 3.0.0-alpha.4` entry to the `CHANGELOG.md` of each package. pub.dev warns when it is missing.
-4. **New package only:** turn on pub.dev automated publishing for it. See [One-time setup](#one-time-setup).
-   If you skip this, the Release workflow fails on this package.
-   A new package must first exist on pub.dev, so publish its first version by hand with `dart pub publish`.
-5. Commit and push.
-   ```bash
-   git commit -am "release 3.0.0-alpha.4"
-   git push
-   ```
-6. Wait until the `Test` workflow is green for this commit. The Release workflow does not run the tests.
-7. Tag and push the tag. This starts the publish.
-   ```bash
-   git tag v3.0.0-alpha.4
-   git push origin v3.0.0-alpha.4
-   ```
+The full guide is [RELEASING.md](https://github.com/dartondox/dox/blob/develop/RELEASING.md) in the repo. In short:
+
+1. Bump every package with `bin/update_versions.sh`, and close the `## Unreleased` section of each `CHANGELOG.md`.
+2. Push one tag per native package (`dox_http_native-v<version>`, `dox_postgres_native-v<version>`, `dox_mysql_native-v<version>`). GitHub builds the libraries for 5 platforms.
+3. Write their hashes into the code with `dart run bin/native_hashes.dart <tag>`.
+4. Merge the release PR, then push the tag `v<version>`. This publishes to pub.dev.
+5. Release the matching `dox-sample` template.
+
+**New package only:** turn on pub.dev automated publishing for it first. See [One-time setup](#one-time-setup).
+A new package must first exist on pub.dev, so publish its first version by hand with `dart pub publish`.
 
 ### What the workflow does
 

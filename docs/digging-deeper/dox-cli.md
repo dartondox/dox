@@ -7,7 +7,7 @@ Run `dox help` to see all commands. Run `dox help <command>` for one command.
 ## Installation
 
 ```bash
-dart pub global activate dox 3.0.0-alpha.4
+dart pub global activate dox ^3.0.0-alpha
 ```
 
 !!! warning "Add the pub bin folder to your PATH"
@@ -56,10 +56,10 @@ dart pub global deactivate dox
 
 ```bash
 dox create new_blog
-dox create new_blog --version v3.0.0-alpha.4
+dox create new_blog --version v3.0.0-alpha.5
 ```
 
-`dox create` copies the [dox-sample](https://github.com/dartondox/dox-sample) template from GitHub. Without `--version`, it uses the latest release of the template.
+`dox create` copies the [dox-sample](https://github.com/dartondox/dox-sample) template from GitHub. Without `--version`, it uses the newest template release with the same major version as the CLI.
 
 ### Run the dev server
 
@@ -210,9 +210,9 @@ dox migration:refresh            # undo all migrations, then run them again
 
 ## Update the CLI
 
-`dox update` runs `dart pub global activate dox`. This installs the latest **stable** version, not a preview.
-To stay on a preview version, run the install command with the version again:
+`dox update` installs the newest version with the same major version as your CLI, previews included.
+To pick the version yourself, run the install command:
 
 ```bash
-dart pub global activate dox 3.0.0-alpha.4
+dart pub global activate dox ^3.0.0-alpha
 ```

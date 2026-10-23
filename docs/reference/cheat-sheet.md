@@ -25,7 +25,7 @@ See [CLI](cli.md) and [App config](app-config.md).
 ## CLI
 
 ```bash
-dox create my_app --version 3.0.0-alpha.4
+dox create my_app                  # newest 3.x template
 dox serve                          # dev server + build_runner watch
 dox build                          # AOT bundle in build/bundle
 dox build_runner:build             # make .g.dart files
