@@ -49,6 +49,16 @@ class PostgresNativeDriver extends DBDriver {
 
   int get _tx => (Zone.current[_txKey] as Map<PgNativePool, int>?)?[pool] ?? 0;
 
+  bool _closed = false;
+
+  /// close the pool of this driver. running queries finish first.
+  @override
+  Future<void> close() async {
+    if (_closed) return;
+    _closed = true;
+    pool.close();
+  }
+
   @override
   Future<List<Map<String, dynamic>>> query(
     String query, {

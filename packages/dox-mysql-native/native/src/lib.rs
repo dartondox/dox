@@ -127,6 +127,8 @@ struct PoolEntry {
     pool: Pool,
     /// 0 not known yet, 1 MySQL, 2 MariaDB
     maria: Arc<AtomicU8>,
+    /// how many opens use this pool. The last close disconnects it.
+    refs: usize,
 }
 
 /// One isolate. Results wait in `out` until the next post.
@@ -628,7 +630,8 @@ pub unsafe extern "C" fn dox_mysql_init(data: *mut c_void) -> i32 {
 
 /// Opens a pool for a `mysql://` URL (see mysql_async `Opts::from_url`).
 /// It connects lazily, on the first query. The same URL gives the same
-/// pool, so isolates share it. [threads] is the size of the runtime of the
+/// pool, so isolates share it. Each open needs one [dox_mysql_close].
+/// [threads] is the size of the runtime of the
 /// whole process: only the first call sets it. Returns a handle (> 0), or
 /// -1 for a bad URL.
 ///
@@ -641,7 +644,8 @@ pub unsafe extern "C" fn dox_mysql_connect(url: *const u8, len: i64, threads: i3
         return -1;
     };
     let mut pools = POOLS.lock().unwrap();
-    if let Some((key, _)) = pools.iter().find(|(_, e)| e.url == url) {
+    if let Some((key, entry)) = pools.iter_mut().find(|(_, e)| e.url == url) {
+        entry.refs += 1;
         return key as i64 + 1;
     }
     let Ok(opts) = Opts::from_url(url) else {
@@ -654,19 +658,28 @@ pub unsafe extern "C" fn dox_mysql_connect(url: *const u8, len: i64, threads: i3
         url: url.to_string(),
         pool: Pool::new(opts),
         maria: Arc::new(AtomicU8::new(0)),
+        refs: 1,
     });
     key as i64 + 1
 }
 
-/// Closes a pool for every isolate. Running queries finish.
+/// Gives back one open of a pool. The last one disconnects the pool for
+/// every isolate. Running queries finish.
 #[unsafe(no_mangle)]
 pub extern "C" fn dox_mysql_close(handle: i64) {
     let Some(key) = (handle as u64).checked_sub(1) else {
         return;
     };
-    let Some(entry) = POOLS.lock().unwrap().try_remove(key as usize) else {
+    let mut pools = POOLS.lock().unwrap();
+    let Some(entry) = pools.get_mut(key as usize) else {
         return;
     };
+    entry.refs -= 1;
+    if entry.refs > 0 {
+        return;
+    }
+    let entry = pools.remove(key as usize);
+    drop(pools);
     runtime().spawn(async move {
         let _ = entry.pool.disconnect().await;
     });
@@ -720,6 +733,21 @@ pub unsafe extern "C" fn dox_mysql_submit(client: i64, ptr: *const u8, len: i64)
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn shared_pool_closes_on_last_close() {
+        let url = b"mysql://root@127.0.0.1:1/close_test";
+        let open = || unsafe { dox_mysql_connect(url.as_ptr(), url.len() as i64, 1) };
+        let (a, b) = (open(), open());
+        assert_eq!(a, b);
+        let alive = || POOLS.lock().unwrap().contains((a - 1) as usize);
+        dox_mysql_close(a);
+        assert!(alive());
+        dox_mysql_close(b);
+        assert!(!alive());
+        // one more close does nothing
+        dox_mysql_close(a);
+    }
 
     #[test]
     fn civil_days() {

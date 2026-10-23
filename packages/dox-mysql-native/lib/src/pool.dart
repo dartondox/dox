@@ -157,7 +157,11 @@ class MysqlNativePool {
   Future<void> rollback(int transaction) =>
       _send(_opRollback, '', null, transaction);
 
-  /// Closes the pool for every isolate. Running queries finish.
+  /// Gives back this open of the pool. Isolates that open the same
+  /// settings share one pool, and the last [close] disconnects it for
+  /// all of them. Running queries finish. Call it once per
+  /// [MysqlNativePool.open]; a pool from [MysqlNativePool.fromHandle] is
+  /// closed by the isolate that opened it.
   void close() => doxMysqlClose(handle);
 
   Future<MysqlNativeResult> _send(

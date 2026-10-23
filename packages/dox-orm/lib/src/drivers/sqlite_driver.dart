@@ -64,6 +64,22 @@ class SqliteDriver extends DBDriver {
     return db;
   }
 
+  /// close the kept statements and the database
+  @override
+  Future<void> close() async {
+    Object? c = conn;
+    try {
+      if (c is Future) c = conn = await c;
+    } catch (_) {
+      conn = null;
+      return;
+    }
+    if (c is! Database) return;
+    clearStatementCache();
+    conn = null;
+    c.close();
+  }
+
   bool _inTransaction(Database db) {
     Set<Database>? open = Zone.current[_txKey];
     return open?.contains(db) ?? false;

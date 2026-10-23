@@ -29,6 +29,10 @@ abstract class DBDriver {
   /// all queries inside [callback] (models too) use the transaction.
   Future<R> transaction<R>(Future<R> Function() callback);
 
+  /// close the connections of this driver. it is safe to call it twice.
+  /// do not run queries on this driver after it.
+  Future<void> close() async {}
+
   /// quote a table or column name, `"name"` on postgres and sqlite and
   /// `` `name` `` on mysql. it handles `table.column`, `*` and `column as alias`.
   /// a value with `(` is a raw expression and is not changed.
