@@ -8,6 +8,12 @@ import 'socket_packet.dart';
 ///
 /// Use one decoder per connection.
 class SocketDecoder {
+  /// [maxAttachments] is the most binary parts one packet may have.
+  /// The parts are kept in memory until the last one comes.
+  SocketDecoder({this.maxAttachments = 10});
+
+  final int maxAttachments;
+
   SocketPacket? _pending;
   int _expected = 0;
   final List<Uint8List> _buffers = <Uint8List>[];
@@ -89,6 +95,9 @@ class SocketDecoder {
       int? count = dash < 0 ? null : int.tryParse(text.substring(i, dash));
       if (count == null || count < 0) {
         throw FormatException('illegal attachments', text);
+      }
+      if (count > maxAttachments) {
+        throw FormatException('too many attachments', text);
       }
       attachments = count;
       i = dash + 1;

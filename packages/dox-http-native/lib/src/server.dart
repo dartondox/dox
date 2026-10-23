@@ -143,7 +143,13 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
   Duration? idleTimeout = const Duration(seconds: 120);
 
   @override
-  String? serverHeader;
+  String? get serverHeader => _serverHeader;
+  String? _serverHeader;
+
+  @override
+  set serverHeader(String? value) {
+    _serverHeader = value == null ? null : checkHeaderValue(value);
+  }
 
   @override
   set sessionTimeout(int timeout) {}

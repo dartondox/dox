@@ -1,5 +1,7 @@
-## Unreleased
+## 3.0.0-alpha.6
 
+- Security: `Storage().putRequestFile()` and `RequestFile.store()` no longer trust the client file name when the bytes are a known format that does not match it. Before, a valid png sent as `a.html` passed `@Image`/`@Mimes` and was saved as `.html`, so `Route.files()` served it as `text/html` on the app origin (stored XSS). Now it is saved with the extension of the bytes (`.png`).
+- Security: new upload file names use a random uuid (v4), not a time-based one (v1). A v1 name shows the upload time and the server, and the next name is easy to guess.
 - Security: `LogMiddleware` writes `[REDACTED]` for body fields and headers whose name has `password`, `passwd`, `secret`, `token`, `authorization`, `cookie`, `api_key`, `api-key` or `apikey` in it (upper or lower case). Before, the login body (with the password) and, with `withHeader: true`, the `Authorization` header went to the log as plain text. Change the list with `LogMiddleware(redact: [...])`.
 - Graceful shutdown closes the cache stores of `Cache()` (eg. Redis), in every isolate, after the `DoxShutdown` services. Your app needs no extra code.
 - The `ORMService` of a new project implements `DoxShutdown` and calls `SqlQueryBuilder.close()`, so the database connections close on shutdown too. In an older project, add this to `lib/services/orm_service.dart`:

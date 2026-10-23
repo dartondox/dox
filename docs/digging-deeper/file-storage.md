@@ -88,6 +88,8 @@ await Storage().disk('s3').put('reports', bytes, extension: 'pdf');
 
 `putRequestFile` on the local disk moves the upload temp file. It does not read it into memory.
 
+`putRequestFile` and `file.store()` take the extension from the file name. When the bytes are a known format (png, jpg, pdf, zip, ...) that does not match the name, the extension of the bytes is used. So a png sent as `a.html` is saved as `.png` and is never served as a web page.
+
 ### `stream` and `download`
 
 ```dart

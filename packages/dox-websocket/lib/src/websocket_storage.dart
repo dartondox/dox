@@ -73,9 +73,14 @@ class WebsocketStorage {
 
   /// remove websocketId from the room
   /// this is used when user leave the room
+  /// an empty room is removed, so room names do not pile up in memory.
   void removeWebSocketIdFromRoom(String socketId, String? roomId) {
-    if (_rooms[roomId] != null && roomId != null) {
-      _rooms[roomId]?.remove(socketId);
-    }
+    List<String>? members = _rooms[roomId];
+    if (members == null) return;
+    members.remove(socketId);
+    if (members.isEmpty) _rooms.remove(roomId);
   }
+
+  /// true when the room has members
+  bool hasRoom(String roomId) => _rooms.containsKey(roomId);
 }

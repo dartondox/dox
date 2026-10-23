@@ -214,6 +214,48 @@ void main() {
       expect(token, isNull);
     });
 
+    test('an unknown email takes about as long as a wrong password', () async {
+      // warm up: the first call makes the dummy hash
+      await Auth().attempt(<String, dynamic>{
+        'email': 'x@dox.dev',
+        'password': 'x',
+      });
+
+      Stopwatch unknown = Stopwatch()..start();
+      await Auth().attempt(<String, dynamic>{
+        'email': 'nobody@dox.dev',
+        'password': 'secret',
+      });
+      unknown.stop();
+
+      Stopwatch wrong = Stopwatch()..start();
+      await Auth().attempt(<String, dynamic>{
+        'email': 'a@dox.dev',
+        'password': 'wrong',
+      });
+      wrong.stop();
+
+      // both run bcrypt. without it an unknown email answers in ~0 ms.
+      expect(
+        unknown.elapsedMicroseconds,
+        greaterThan(wrong.elapsedMicroseconds ~/ 4),
+      );
+    });
+
+    test('an empty secret is refused', () {
+      expect(() => JwtAuthDriver(secret: SecretKey('')), throwsArgumentError);
+      expect(() => JwtAuthDriver(secret: SecretKey('  ')), throwsArgumentError);
+    });
+
+    test('a user with no stored password cannot log in', () async {
+      users[2] = FakeUser(2, 'nopass@dox.dev');
+      String? token = await Auth().attempt(<String, dynamic>{
+        'email': 'nopass@dox.dev',
+        'password': 'dox-no-user',
+      });
+      expect(token, isNull);
+    });
+
     test('attempt without a password returns null', () async {
       String? token = await Auth().attempt(<String, dynamic>{
         'email': 'a@dox.dev',
