@@ -4,10 +4,21 @@ import 'package:dox_auth/src/interfaces.dart';
 import 'package:dox_orm/dox_orm.dart';
 
 class Auth implements IAuth {
+  /// The guard name from `AuthConfig.guards`.
+  /// null uses `AuthConfig.defaultGuard`.
+  /// ```
+  /// Auth(guard: 'admin').attempt(credentials);
+  /// ```
+  final String? guard;
+
+  Auth({this.guard});
+
   /// user data
   Model<dynamic>? _userData;
 
-  AuthDriver get _driver => AuthEngine().driver;
+  String get _guard => guard ?? AuthEngine().config.defaultGuard;
+
+  AuthDriver get _driver => AuthEngine().guard(_guard).driver;
 
   static void initialize(AuthConfig authConfig) {
     AuthEngine().init(authConfig);
@@ -15,7 +26,7 @@ class Auth implements IAuth {
 
   @override
   Future<void> verifyToken(IDoxRequest req) async {
-    _userData = await _driver.verifyToken(req);
+    _userData = await _driver.verifyToken(req, _guard);
   }
 
   @override
@@ -29,7 +40,7 @@ class Auth implements IAuth {
   }
 
   Future<String?> attempt(Map<String, dynamic> credentials) async {
-    _userData = await _driver.attempt(credentials);
+    _userData = await _driver.attempt(credentials, _guard);
     return _createToken();
   }
 
@@ -47,6 +58,6 @@ class Auth implements IAuth {
     if (_userData == null) {
       return null;
     }
-    return _driver.createToken(_userData?.toJson());
+    return _driver.createToken(_userData?.toJson(), _guard);
   }
 }

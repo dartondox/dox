@@ -9,7 +9,15 @@ void httpCorsHandler(bool? enabled, HttpRequest req) {
 
   /// call each one directly, no map per request.
   /// null values are skipped inside `_setCorsValue`.
-  _setCorsValue(res, HttpHeaders.accessControlAllowOriginHeader, cors.origin);
+  if (cors.origin is List) {
+    /// the answer depends on the request Origin, so caches must know it.
+    res.headers.add(HttpHeaders.varyHeader, 'Origin');
+  }
+  _setCorsValue(
+    res,
+    HttpHeaders.accessControlAllowOriginHeader,
+    corsAllowOrigin(cors.origin, req.headers.value('origin')),
+  );
   _setCorsValue(res, HttpHeaders.accessControlAllowMethodsHeader, cors.methods);
   _setCorsValue(res, HttpHeaders.accessControlAllowHeadersHeader, cors.headers);
   _setCorsValue(
@@ -23,6 +31,21 @@ void httpCorsHandler(bool? enabled, HttpRequest req) {
     cors.credentials,
   );
   _setCorsValue(res, HttpHeaders.accessControlMaxAgeHeader, cors.maxAge);
+}
+
+/// Get the value for the Access-Control-Allow-Origin header.
+///
+/// A browser accepts only one origin or `*` in this header.
+/// So when [origin] is a list, we look for [requestOrigin] in the list.
+/// We send back only that origin. If it is not in the list, we send nothing.
+/// A list that has `*` allows every origin.
+dynamic corsAllowOrigin(dynamic origin, String? requestOrigin) {
+  if (origin is! List) return origin;
+  if (origin.contains('*')) return '*';
+  if (requestOrigin != null && origin.contains(requestOrigin)) {
+    return requestOrigin;
+  }
+  return null;
 }
 
 // set cors in header

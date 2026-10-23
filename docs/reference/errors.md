@@ -73,7 +73,7 @@ See [Environment variables](../digging-deeper/env.md).
 | `404` `file not found` | `Storage().stream()` or `download()` of a missing file. | Check the path. |
 | `Invalid argument (trustedProxies): not an ip or cidr: "<value>"` | A bad entry in `AppConfig.trustedProxies`. | Use an IP, a CIDR like `10.0.0.0/8`, or `*`. |
 | `Invalid argument (type): must be asc or desc: "<value>"` | `orderBy(column, type)` with another direction. | Use `asc` or `desc`. |
-| `AESEncryption Error: <error>` | `AESEncryptor.decode` got bad text or a wrong key, for example an old cookie after a new `APP_KEY`. It returns `''`. | Nothing, or ask the user to log in again. |
+| `400` `decrypt_failed` | `AESEncryptor.decode` got changed text or a wrong key. It throws `DecryptException`. `req.cookie()` catches it and returns `null`. | Check the key. For a cookie, ask the user to log in again. |
 
 ## dox_auth
 

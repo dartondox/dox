@@ -18,12 +18,11 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 
 | Check | How | Read more |
 | --- | --- | --- |
-| JWT tokens expire | **Dox limit.** `JwtAuthDriver.expiresIn` is `null` by default, so tokens never expire. Set it: `JwtAuthDriver(secret: SecretKey(env.appKey), expiresIn: Duration(days: 7))`. | [Authentication](../security/authentication.md) |
+| JWT tokens expire | `JwtAuthDriver.expiresIn` is 1 hour by default. Pick a time that fits your app, like `JwtAuthDriver(secret: SecretKey(env.appKey), expiresIn: Duration(hours: 12))`. | [Authentication](../security/authentication.md) |
 | You can not revoke one token | **Dox limit.** There is no token list on the server. To log out everyone, change `APP_KEY`. | [Authentication](../security/authentication.md) |
 | Passwords are hashed | `user.password = Hash.make(input)` (bcrypt). Never store or encrypt a plain password. | [Hashing](../security/hashing.md) |
 | The hash is never sent | `List<String> get hidden => <String>['password'];` in the user model. The JWT payload is `user.toJson()`, and anyone can read it. | [Authentication](../security/authentication.md) |
 | Passwords have a max length | bcrypt throws on input over 72 bytes. Add `@MaxLength(72)` to the password field of the DTO. It counts characters, so non-ASCII text can still pass 72 bytes. | [Troubleshooting](troubleshooting.md) |
-| No sensitive data in `AESEncryptor` | It uses a fixed IV and no MAC. It is fine for cookies, not for tokens or personal data. | [Encryption](../security/encryption.md) |
 
 ## HTTP and network
 
@@ -32,7 +31,7 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | HTTPS at the proxy | Dox has no TLS server. Run Caddy or nginx in front. Keep the app port private. | [Deployment](../digging-deeper/deployment.md) |
 | `trustedProxies` is set behind a proxy | `AppConfig(trustedProxies: <String>['127.0.0.1', '::1'])`, or the proxy network, like `'172.16.0.0/12'`. Without it, `req.ip()` is the proxy and `req.scheme()` is `http`. Do not use `['*']` when the app port is public. | [App config](app-config.md) |
 | Body limits are on | Keep `maxBodySize` (10 MB) and `maxMultipartSize` (100 MB), or lower them. Set the same limit in the proxy: `client_max_body_size 100m;` | [Request](../the-basic/request.md) |
-| CORS has one real origin | `CORSConfig(origin: 'https://my.app')`. **Dox limit:** a list is joined into one header (`https://a.com,https://b.com`), and browsers reject it. Dox does not compare the list with the request `Origin`. For many origins, set the header in the proxy. | [CORS](../security/cors.md) |
+| CORS has real origins | `CORSConfig(origin: 'https://my.app')`, or a list like `<String>['https://my.app', 'https://admin.my.app']`. With a list, Dox sends back only the request origin when it is in the list. | [CORS](../security/cors.md) |
 | No `credentials: true` with `origin: '*'` | The new project's `cors.dart` has `origin: '*'` and `credentials: true` with `enabled: false`. When you turn CORS on, set a real origin first. | [CORS](../security/cors.md) |
 | Rate limiting | **Dox limit.** Dox has no rate limiter. Do it at the proxy. See [below](#rate-limit-at-the-proxy). | [Deployment](../digging-deeper/deployment.md) |
 | gzip at the proxy | Keep `compress: false`. Turn on gzip in Caddy (`encode gzip`) or nginx (`gzip on;`). | [Performance](../digging-deeper/performance.md) |

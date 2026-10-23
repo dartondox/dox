@@ -15,8 +15,8 @@ import 'package:my_app/config/env.dart';
 
 /// `enabled` is true by default, so every route sends the headers.
 CORSConfig cors = CORSConfig(
-  /// One origin only. A list is joined with commas, and browsers reject
-  /// that value. Set CORS_ORIGIN to the real front-end URL in production.
+  /// One origin, or a list of origins. Set CORS_ORIGIN to the real
+  /// front-end URL in production.
   origin: env.corsOrigin,
 
   methods: <String>['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
@@ -71,11 +71,10 @@ The origin is scheme, host and port. No path, no `/` at the end.
 
 Browsers do not send cookies when `origin` is `*`.
 
-!!! warning "One origin only"
-    `Access-Control-Allow-Origin` takes one origin or `*`.
-    Dox sends the value of `origin` as it is. It does not compare it with the `Origin` header of the request.
-    A list like `['https://a.com', 'https://b.com']` is joined to `https://a.com,https://b.com`. Browsers reject that.
-    So set one origin per environment. For two front-ends, run two API hosts, or put a proxy in front that picks the header.
+!!! note "Two or more front-ends"
+    Set `origin` to a list, like `['https://a.com', 'https://b.com']`.
+    Dox compares the `Origin` header of the request with the list.
+    It sends back only the origin that matches. If none matches, it sends no `Access-Control-Allow-Origin` header, and the browser blocks the call.
 
 ## Check it
 
@@ -115,7 +114,7 @@ In the browser, open the front-end and call the API with `fetch`. The console sh
 | The console says | The fix |
 | --- | --- |
 | `No 'Access-Control-Allow-Origin' header` | `CORS_ORIGIN` does not match the page origin exactly. Check `http` or `https`, and the port. |
-| `The value of ... header is 'a.com,b.com'` | More than one origin. Use one. |
+| `The value of ... header is 'a.com,b.com'` | `origin` is one text with commas. Use a `List<String>` instead. |
 | `Request header field x-foo is not allowed` | Add the header to `headers`. |
 | `credentials mode is 'include'` with `*` | Set `origin` to the front-end URL and `credentials: true`. |
 

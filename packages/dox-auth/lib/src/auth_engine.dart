@@ -3,14 +3,18 @@ import 'package:dox_auth/src/interfaces.dart';
 class AuthEngine {
   late AuthConfig config;
 
-  /// get auth guard
-  AuthGuard get guard => config.guards[config.defaultGuard]!;
-
-  /// get driver
-  AuthDriver get driver => guard.driver;
-
-  /// get auth provider
-  AuthProvider get provider => guard.provider;
+  /// get an auth guard by name. No name gives the default guard.
+  /// ```
+  /// AuthEngine().guard('admin');
+  /// ```
+  AuthGuard guard([String? name]) {
+    String key = name ?? config.defaultGuard;
+    AuthGuard? found = config.guards[key];
+    if (found == null) {
+      throw ArgumentError.value(key, 'guard', 'no auth guard with this name');
+    }
+    return found;
+  }
 
   /// singleton
   static final AuthEngine _singleton = AuthEngine._internal();

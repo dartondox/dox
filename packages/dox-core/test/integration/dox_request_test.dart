@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/utils/aes_encryptor.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
@@ -77,6 +76,7 @@ void main() {
       Route.post('/get_cookies', (DoxRequest req) async {
         return <String, dynamic>{
           'cookie': req.cookie('auth-key'),
+          'bad': req.cookie('bad'),
           'raw': req.cookie('other', decrypt: false),
           'userAgent': req.userAgent(),
           'origin': req.origin(),
@@ -89,7 +89,8 @@ void main() {
       http.Response res = await http.post(
         Uri.parse('$baseUrl/get_cookies'),
         headers: <String, String>{
-          'cookie': 'other=1; auth-key=$cookieValue',
+          'cookie':
+              'other=1; bad=AAAAAAAAAAAAAAAAAAAAAAAA; auth-key=$cookieValue',
           'user-agent': 'dox-test',
           'origin': 'localhost',
           'referer': 'referer',
@@ -98,6 +99,7 @@ void main() {
       Map<String, dynamic> jsond = jsonDecode(res.body);
       expect(jsond['cookie'], authKeyValue);
       expect(jsond['raw'], '1');
+      expect(jsond['bad'], null);
       expect(jsond['userAgent'], 'dox-test');
       expect(jsond['origin'], 'localhost');
       expect(jsond['referer'], 'referer');

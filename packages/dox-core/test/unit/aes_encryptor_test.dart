@@ -1,35 +1,54 @@
-import 'package:dox_core/utils/aes_encryptor.dart';
+import 'dart:convert';
+
+import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('AES Encryptor |', () {
+    String secret = '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt';
+    String message = 'Dox Framework {"k":"ünï"}';
+
     test('encode/decode success', () {
-      String secret = '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt';
-      String message = 'Dox Framework';
       String encoded = AESEncryptor.encode(message, secret);
-      String decoded = AESEncryptor.decode(encoded, secret);
-      expect(decoded, message);
+      expect(AESEncryptor.decode(encoded, secret), message);
     });
 
-    test('encode/decode failed', () {
-      String secret = '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt';
-      String message = 'Dox Framework';
-      String encoded = AESEncryptor.encode(message, secret);
-      String decoded = AESEncryptor.decode(encoded, 'abcd');
-      expect(decoded, '');
+    test('same text gives a different output each time', () {
+      expect(
+        AESEncryptor.encode(message, secret),
+        isNot(AESEncryptor.encode(message, secret)),
+      );
     });
 
-    // made with the old `encrypt` package, so old cookies and cache still work
-    test('decodes values from the old encrypt package', () {
-      String secret = '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt';
-      Map<String, String> old = <String, String>{
-        'Dox Framework': 'EBoKsR9VxA+oyQu0yIlxAfzkXBF/5FQOODjbEwej58Y=',
-        'a' * 47: 'Gwp17Q9H2B6oyXyw9ewOEMTEJ0Qqvx5qbWORd1L4raLje4tpcVK+juv8fkAGyznaEqFmhZChKuVGxm/AVqJlDn1we1pQCEsmKpUzF1a6H/A=',
-        '{"k":"ünï"}': 'JyR59x968R+GqUKt241wEfvCXBF/5FQOODjbEwej58Y=',
-      };
-      for (MapEntry<String, String> e in old.entries) {
-        expect(AESEncryptor.decode(e.value, secret), e.key);
-        expect(AESEncryptor.encode(e.key, secret), e.value);
+    test('decode with a wrong key throws', () {
+      String encoded = AESEncryptor.encode(message, secret);
+      expect(
+        () => AESEncryptor.decode(encoded, 'x' * 32),
+        throwsA(isA<DecryptException>()),
+      );
+    });
+
+    test('decode of changed text throws', () {
+      List<int> bytes = base64.decode(AESEncryptor.encode(message, secret));
+      bytes[20] ^= 1;
+      expect(
+        () => AESEncryptor.decode(base64.encode(bytes), secret),
+        throwsA(isA<DecryptException>()),
+      );
+    });
+
+    test('decode of bad text throws a 400 error', () {
+      for (String bad in <String>['', 'abc', 'not base64!']) {
+        expect(
+          () => AESEncryptor.decode(bad, secret),
+          throwsA(
+            isA<DecryptException>().having(
+              (DecryptException e) => e.code,
+              'code',
+              400,
+            ),
+          ),
+        );
       }
     });
   });

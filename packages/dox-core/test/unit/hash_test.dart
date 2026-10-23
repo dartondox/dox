@@ -16,5 +16,11 @@ void main() {
       bool result = Hash.verify('password', hashedPassword);
       expect(result, false);
     });
+
+    test('a malformed hash returns false', () {
+      for (String bad in <String>['', 'abc', r'$2a$10$short']) {
+        expect(Hash.verify('secret', bad), false);
+      }
+    });
   });
 }

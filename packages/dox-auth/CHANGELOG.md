@@ -1,3 +1,11 @@
+## Unreleased
+
+- Breaking: `JwtAuthDriver.expiresIn` is 1 hour by default. Before, it was `null`, and tokens never expired.
+- New: named guards work. Use `Auth(guard: 'admin')` and `AuthMiddleware(guard: 'admin')`. Before, only `defaultGuard` was used.
+- A token keeps its guard name in the `aud` claim. A token from one guard does not work on another guard.
+- `verifyToken` checks the `iss` claim when `issuer` is set.
+- Breaking: `AuthDriver` methods get the guard name as a new parameter. `AuthEngine().guard(name)` replaces `AuthEngine().driver` and `AuthEngine().provider`.
+
 ## 3.0.0-alpha.4
 
 - Version bump only, to match the other packages.

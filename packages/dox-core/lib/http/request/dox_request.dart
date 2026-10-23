@@ -5,7 +5,6 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/request/http_request_body.dart';
 import 'package:dox_core/http/request/trusted_proxy.dart';
 import 'package:dox_core/router/route_data.dart';
-import 'package:dox_core/utils/aes_encryptor.dart';
 
 class DoxRequest implements IDoxRequest {
   final RouteData route;
@@ -211,15 +210,21 @@ class DoxRequest implements IDoxRequest {
     body = <String, dynamic>{...body, ...values};
   }
 
-  /// get cookie value from header
+  /// get cookie value from header.
+  /// An encrypted cookie that was changed, or made with another key,
+  /// gives null.
   /// ```
   /// req.cookie('authKey');
   /// ```
   @override
   String? cookie(String key, {bool decrypt = true}) {
     if (_cookies[key] == null) return null;
-    if (decrypt) return AESEncryptor.decode(_cookies[key], Dox().config.appKey);
-    return _cookies[key];
+    if (!decrypt) return _cookies[key];
+    try {
+      return AESEncryptor.decode(_cookies[key], Dox().config.appKey);
+    } on DecryptException {
+      return null;
+    }
   }
 
   /// get user agent from header

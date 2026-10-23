@@ -9,9 +9,11 @@ void main() {
       Dox().config = config;
       DoxCookie cookie = DoxCookie('x-auth', 'Bearerxxxxxxxxx');
       String cookieValue = cookie.get();
+      RegExpMatch m = RegExp(r'^x-auth=(.+); Max-Age=3600$')
+          .firstMatch(cookieValue)!;
       expect(
-        cookieValue,
-        'x-auth=EzBl7TV9yA+U1lLsyfMgTPjbCRh/5FQOODjbEwej58Y=; Max-Age=3600',
+        AESEncryptor.decode(m.group(1)!, config.appKey),
+        'Bearerxxxxxxxxx',
       );
     });
 

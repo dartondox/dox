@@ -259,10 +259,10 @@ void main() {
 
       expect(res.statusCode, 200);
       expect(res.body, 'pong');
-      expect(
-        res.headers['set-cookie'],
-        'x-key=Ewh5wQRRo0v5ljLQpLNAcA==; Max-Age=3600,x-key2=ABCD; Max-Age=3600',
-      );
+      RegExpMatch m = RegExp(
+        r'^x-key=(.+); Max-Age=3600,x-key2=ABCD; Max-Age=3600$',
+      ).firstMatch(res.headers['set-cookie']!)!;
+      expect(AESEncryptor.decode(m.group(1)!, config.appKey), 'ABCD');
     });
 
     test('cors preflight without options route', () async {

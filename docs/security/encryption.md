@@ -7,10 +7,8 @@ You can also call it yourself.
 
 ## Encrypt and decrypt
 
-`AESEncryptor` is not exported by `package:dox_core/dox_core.dart`. Import it from its own file.
-
 ```dart
-import 'package:dox_core/utils/aes_encryptor.dart';
+import 'package:dox_core/dox_core.dart';
 
 String secret = env.appKey; // 32 characters
 
@@ -19,7 +17,8 @@ String decoded = AESEncryptor.decode(encoded, secret); // 'Hello world'
 ```
 
 - `encode` returns base64 text.
-- `decode` returns an empty string `''` when the text or the key is wrong. It does not throw.
+- The same text gives a different output each time.
+- `decode` throws `DecryptException` when the text was changed, or the key is wrong. It is a `400 Bad Request` error.
 - The secret must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256). Another length makes `encode` throw.
 
 Make a new 32-character `APP_KEY` with the CLI:
@@ -41,18 +40,14 @@ String? theme = req.cookie('theme');                    // decrypted
 String? raw = req.cookie('theme', decrypt: false);      // as sent
 ```
 
-If you change `APP_KEY`, old encrypted cookies read as `''`.
+`req.cookie(key)` returns `null` when the cookie was changed, or was made with another `APP_KEY`.
 
-## Limits
+## How it works
 
-!!! warning "Do not use it for sensitive data"
-    `AESEncryptor` uses AES in CTR mode with a fixed IV (all zeros).
-    It has no message check (no MAC).
+`AESEncryptor` uses AES-GCM.
 
-    - The same text with the same key always gives the same output. So a reader can see when two values are equal.
-    - Someone can change the encrypted text, and `decode` does not notice.
-
-    This keeps old cookies working. But it is not safe for passwords, tokens or personal data.
-    For those, use a library with an authenticated mode, like AES-GCM with a random nonce for each message.
+- Each message gets a new random 12-byte nonce.
+- The output is base64 of `nonce + encrypted text + tag`.
+- The 16-byte tag checks the message. If someone changes one byte, `decode` throws.
 
 To store passwords, do not encrypt them. Hash them. See [Hashing](hashing.md).

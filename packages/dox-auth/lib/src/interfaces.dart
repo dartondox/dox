@@ -30,10 +30,16 @@ class AuthConfig {
   });
 }
 
+/// A driver checks tokens and logins for a guard.
+/// [guard] is the name of the guard in `AuthConfig.guards`.
+/// Use `AuthEngine().guard(guard).provider` to get its user provider.
 abstract class AuthDriver {
-  Future<Model<dynamic>?> verifyToken(IDoxRequest req);
+  Future<Model<dynamic>?> verifyToken(IDoxRequest req, String guard);
 
-  Future<Model<dynamic>?> attempt(Map<String, dynamic> credentials);
+  Future<Model<dynamic>?> attempt(
+    Map<String, dynamic> credentials,
+    String guard,
+  );
 
-  String? createToken(Map<String, dynamic>? userPayload);
+  String? createToken(Map<String, dynamic>? userPayload, String guard);
 }

@@ -157,6 +157,7 @@ After `AuthMiddleware`, `req.auth` holds the login.
 | Method | What it does |
 | --- | --- |
 | `Auth.initialize(AuthConfig)` | sets the config. Call it once, in a service |
+| `Auth(guard: 'admin')` | uses another guard from `guards`. Without `guard`, it uses `defaultGuard` |
 | `await Auth().attempt(credentials)` | finds the user and checks the password. Gives a token, or `null` |
 | `Auth().login(user)` | gives a token for this user, with no password check |
 | `user<T>()` | the user after `attempt` or `login` |
@@ -181,18 +182,46 @@ It returns `null` when the password is not a `String`, when no identifier is giv
 | --- | --- | --- |
 | `secret` | required | the key that signs tokens, like `SecretKey(env.appKey)` |
 | `algorithm` | `JWTAlgorithm.HS256` | the signing algorithm |
-| `expiresIn` | `null` | how long a token is valid. `null` means it never expires |
-| `issuer` | `null` | the `iss` claim |
+| `expiresIn` | `Duration(hours: 1)` | how long a token is valid |
+| `issuer` | `null` | the `iss` claim. When set, `verifyToken` also checks it |
+
+## More than one guard
+
+Each guard has its own driver and its own user model.
+For example, users and admins in two tables:
+
+```dart
+AuthConfig(
+  defaultGuard: 'web',
+  guards: <String, AuthGuard>{
+    'web': AuthGuard(
+      driver: JwtAuthDriver(secret: SecretKey(env.appKey)),
+      provider: AuthProvider(model: () => User()),
+    ),
+    'admin': AuthGuard(
+      driver: JwtAuthDriver(secret: SecretKey(env.appKey)),
+      provider: AuthProvider(model: () => Admin()),
+    ),
+  },
+);
+```
+
+Pick the guard by name:
+
+```dart
+String? token = await Auth(guard: 'admin').attempt(credentials);
+
+Route.get('/admin', <dynamic>[AuthMiddleware(guard: 'admin'), adminController.index]);
+```
+
+The token keeps the guard name in its `aud` claim.
+So a token from the `web` guard does not work on the `admin` guard, even with the same secret.
+An unknown guard name throws an `ArgumentError`.
 
 ## Things to know
 
-!!! warning "Set `expiresIn`"
-    Without `expiresIn`, a token never expires.
-    A stolen token then works forever.
-    Set a duration, for example `Duration(days: 7)`.
 
 - **The token is not secret.** Its payload is `user.toJson()`. Anyone with the token can read it. Keep private columns in `hidden`.
 - **You can not cancel one token.** There is no token list on the server. A token works until it expires. If you change the `secret` (your `APP_KEY`), all tokens stop working.
-- **Only the default guard is used.** `Auth()` and `AuthMiddleware` always use `defaultGuard`. Other guards in `guards` are not read.
 - **The user is loaded on each request.** `AuthMiddleware` reads the user id from the token and runs `find(id)`. A deleted user can not log in, even with a valid token.
 - **Hash passwords** with `Hash.make()` before you save them. See [Hashing](hashing.md).
