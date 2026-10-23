@@ -1,3 +1,7 @@
+## Unreleased
+
+- Unix sockets. In `MysqlNativePool.open()`, a `host` that starts with `/` is the socket file. `fromUrl()` takes `?socket=/path`.
+
 ## 3.0.0-alpha.5
 
 - The hook comment says how to fill the sha256 list from a release: `dart run bin/native_hashes.dart <tag>`. The list stays empty until the first release.
