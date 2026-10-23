@@ -36,6 +36,14 @@ void handle(HttpRequest req) async {
               .join(),
         }),
       );
+    case '/bad-cookie':
+      res.cookies.add(Cookie('a', 'b')..domain = 'x\r\nset-cookie: c=d');
+      try {
+        await res.close();
+      } on FormatException {
+        res.cookies.clear();
+        res.write('refused');
+      }
     default:
       res.statusCode = HttpStatus.notFound;
       res.write('not found');
@@ -136,6 +144,11 @@ void main() {
     HttpClientResponse res = await req.close();
     expect(res.statusCode, 200);
     expect(<int>[for (List<int> c in await res.toList()) ...c], body);
+  });
+
+  test('a line break in a cookie domain or server header is refused', () async {
+    expect(await get('/bad-cookie'), (200, 'refused'));
+    expect(() => server.serverHeader = 'a\nb', throwsFormatException);
   });
 
   test('404', () async {
