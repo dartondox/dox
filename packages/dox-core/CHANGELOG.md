@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Security: `LogMiddleware` writes `[REDACTED]` for body fields and headers whose name has `password`, `passwd`, `secret`, `token`, `authorization`, `cookie`, `api_key` or `apikey` in it. Before, the login body (with the password) and, with `withHeader: true`, the `Authorization` header went to the log as plain text. Change the list with `LogMiddleware(redact: [...])`.
 - Graceful shutdown closes the cache stores of `Cache()` (eg. Redis), in every isolate, after the `DoxShutdown` services. Your app needs no extra code.
 - The `ORMService` of a new project implements `DoxShutdown` and calls `SqlQueryBuilder.close()`, so the database connections close on shutdown too. In an older project, add this to `lib/services/orm_service.dart`:
   ```dart

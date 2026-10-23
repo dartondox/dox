@@ -10,17 +10,39 @@ class LogMiddleware implements IDoxMiddleware {
   final bool withHeader;
   final bool enabled;
 
-  LogMiddleware({required this.enabled, this.filter, this.withHeader = false});
+  /// a body field or header whose name (lowercase) contains one of these
+  /// is logged as `[REDACTED]`, so passwords and tokens stay out of logs.
+  final List<String> redact;
+
+  static const List<String> defaultRedact = <String>[
+    'password',
+    'passwd',
+    'secret',
+    'token',
+    'authorization',
+    'cookie',
+    'api_key',
+    'apikey',
+  ];
+
+  LogMiddleware({
+    required this.enabled,
+    this.filter,
+    this.withHeader = false,
+    this.redact = defaultRedact,
+  });
 
   @override
   IDoxRequest handle(IDoxRequest req) {
     if (!enabled) {
       return req;
     }
-    Map<String, dynamic> payload = <String, dynamic>{'request': req.toJson()};
+    Map<String, dynamic> payload = <String, dynamic>{
+      'request': _redact(req.toJson()),
+    };
 
     if (withHeader) {
-      payload['headers'] = req.headers;
+      payload['headers'] = _redact(req.headers);
     }
 
     Map<String, dynamic> text = <String, dynamic>{
@@ -35,6 +57,26 @@ class LogMiddleware implements IDoxMiddleware {
     }
     _LogBuffer.write(JSON.stringify(text));
     return req;
+  }
+
+  /// a copy of [value] with the values of secret keys replaced
+  dynamic _redact(dynamic value) {
+    if (value is Map) {
+      return <String, dynamic>{
+        for (MapEntry<dynamic, dynamic> e in value.entries)
+          '${e.key}': _isSecret('${e.key}') ? '[REDACTED]' : _redact(e.value),
+      };
+    }
+    if (value is List) return value.map(_redact).toList();
+    return value;
+  }
+
+  bool _isSecret(String key) {
+    String name = key.toLowerCase();
+    for (String word in redact) {
+      if (name.contains(word)) return true;
+    }
+    return false;
   }
 }
 
