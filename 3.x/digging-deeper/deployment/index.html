@@ -4158,8 +4158,10 @@ real client:</p>
   <code>req.isSecure()</code> is true for <code>https</code>.</li>
 <li><code>trustedProxies</code> is empty by default. Then Dox ignores those headers,
   because any client can send them.</li>
-<li><code>['*']</code> trusts everyone. Only use it when the app port is not reachable
-  from outside.</li>
+<li><code>['*']</code> trusts any direct client. Only use it when the app port is not
+  reachable from outside. With <code>*</code>, <code>req.ip()</code> is the right-most
+  <code>X-Forwarded-For</code> hop, the one your proxy added. If you have two proxies
+  in a row, list their IPs or ranges instead.</li>
 </ul>
 <h3 id="caddy">Caddy</h3>
 <p>Caddy gets a certificate for you and sets <code>X-Forwarded-For</code> and

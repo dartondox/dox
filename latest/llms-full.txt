@@ -5640,8 +5640,10 @@ AppConfig(
   `req.isSecure()` is true for `https`.
 - `trustedProxies` is empty by default. Then Dox ignores those headers,
   because any client can send them.
-- `['*']` trusts everyone. Only use it when the app port is not reachable
-  from outside.
+- `['*']` trusts any direct client. Only use it when the app port is not
+  reachable from outside. With `*`, `req.ip()` is the right-most
+  `X-Forwarded-For` hop, the one your proxy added. If you have two proxies
+  in a row, list their IPs or ranges instead.
 
 ### Caddy
 
@@ -15043,7 +15045,7 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `maxBodySize` | `int` | `10 * 1024 * 1024` (10 MB) | Biggest JSON or urlencoded body in bytes. Bigger gets `413`. |
 | `maxMultipartSize` | `int` | `100 * 1024 * 1024` (100 MB) | Biggest `multipart/form-data` body (file uploads) in bytes. Bigger gets `413`. |
 | `shutdownTimeout` | `Duration` | `Duration(seconds: 8)` | On `SIGTERM` or `SIGINT`, how long open requests may run before Dox closes them. Keep it below the kill timeout of your platform. See [Graceful shutdown](../digging-deeper/deployment.md#graceful-shutdown). |
-| `trustedProxies` | `List<String>` | `[]` | IPs or CIDR ranges of reverse proxies. Only when the direct client is in this list does Dox read `X-Forwarded-For` for `req.ip()` and `X-Forwarded-Proto` for `req.scheme()`. `['*']` trusts any client. |
+| `trustedProxies` | `List<String>` | `[]` | IPs or CIDR ranges of reverse proxies. Only when the direct client is in this list does Dox read `X-Forwarded-For` for `req.ip()` and `X-Forwarded-Proto` for `req.scheme()`. `['*']` trusts any direct client, and takes the right-most `X-Forwarded-For` hop (the one the proxy added) as the client. |
 
 ## Routing and request handling
 
@@ -17114,6 +17116,7 @@ What changed in each package, newest first. This page is made from the
 
 - Security: `Storage().putRequestFile()` and `RequestFile.store()` no longer trust the client file name when the bytes are a known format that does not match it. Before, a valid png sent as `a.html` passed `@Image`/`@Mimes` and was saved as `.html`, so `Route.files()` served it as `text/html` on the app origin (stored XSS). Now it is saved with the extension of the bytes (`.png`).
 - Security: new upload file names use a random uuid (v4), not a time-based one (v1). A v1 name shows the upload time and the server, and the next name is easy to guess.
+- Security: `trustedProxies: ['*']` trusts the direct peer only. `req.ip()` is the right-most `X-Forwarded-For` hop, the one the proxy added. Before, `*` also trusted every hop in the header, so `req.ip()` was the left-most value, which the client sets (`X-Forwarded-For: 6.6.6.6`). That broke IP rate limits and allow lists, also behind the Fly.io proxy of the deploy guide.
 - Graceful shutdown closes the cache stores of `Cache()` (eg. Redis), in every isolate, after the `DoxShutdown` services. Your app needs no extra code.
 - The `ORMService` of a new project implements `DoxShutdown` and calls `SqlQueryBuilder.close()`, so the database connections close on shutdown too. In an older project, add this to `lib/services/orm_service.dart`:
   ```dart

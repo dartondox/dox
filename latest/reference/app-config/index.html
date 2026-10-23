@@ -4189,7 +4189,7 @@ This page lists every field, with its type, its default and what it does.</p>
 <td><code>trustedProxies</code></td>
 <td><code>List&lt;String&gt;</code></td>
 <td><code>[]</code></td>
-<td>IPs or CIDR ranges of reverse proxies. Only when the direct client is in this list does Dox read <code>X-Forwarded-For</code> for <code>req.ip()</code> and <code>X-Forwarded-Proto</code> for <code>req.scheme()</code>. <code>['*']</code> trusts any client.</td>
+<td>IPs or CIDR ranges of reverse proxies. Only when the direct client is in this list does Dox read <code>X-Forwarded-For</code> for <code>req.ip()</code> and <code>X-Forwarded-Proto</code> for <code>req.scheme()</code>. <code>['*']</code> trusts any direct client, and takes the right-most <code>X-Forwarded-For</code> hop (the one the proxy added) as the client.</td>
 </tr>
 </tbody>
 </table>
