@@ -96,9 +96,13 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
     payload = payload.toResponse();
   }
 
+  /// the text of an error can hold SQL, file paths or hosts. send it only
+  /// in development. it is logged by `errorHandler` in every env.
   if (payload is Exception || payload is Error) {
     res.statusCode = HttpStatus.internalServerError;
-    payload = payload.toString();
+    payload = _showErrors()
+        ? payload.toString()
+        : InternalErrorException().toResponse();
   }
 
   if (payload is DateTime) {
@@ -122,6 +126,11 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
   if (!Dox().config.compress) res.contentLength = bytes.length;
   res.add(bytes);
   res.close();
+}
+
+bool _showErrors() {
+  String env = Env.get<String>('APP_ENV').toLowerCase();
+  return env == 'development' || env == 'local';
 }
 
 /// wait for a streamed body, then close the response.

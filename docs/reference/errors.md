@@ -62,7 +62,7 @@ The table shows the `message` text.
 | `422` | `{"_root":"The input has too many items (max 1000) or levels (max 10)"}` | Form or query keys with more than 1000 list items or 10 levels. | Send less nested data. |
 | `422` | `{"<field>":"<message>"}` | A DTO check failed. | See [Validation rules](../the-basic/validation-rules.md). |
 | `431` | (no text) | Native server: request line plus headers over 16 KB. | Send smaller headers or cookies. |
-| `500` | `<error>.toString()` | Any error that is not an `IHttpException`. It also goes to `errorHandler`. | Look at the server log. |
+| `500` | `Server Error`, code `server_error`. When `APP_ENV` is `development` or `local`, the body is `<error>.toString()` as plain text. | Any error that is not an `IHttpException`. It also goes to `errorHandler`. | Look at the server log. |
 
 ## dox_core: DTOs, storage and config
 
