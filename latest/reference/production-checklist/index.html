@@ -4283,7 +4283,7 @@
 </tr>
 <tr>
 <td>Errors go to your tracker</td>
-<td>Set <code>AppConfig.errorHandler</code>. Any non-HTTP error is passed to it. The client gets <code>500</code> with the error text, so do not put secrets in exception messages.</td>
+<td>Set <code>AppConfig.errorHandler</code>. Any non-HTTP error is passed to it. The client gets <code>500</code> with <code>server_error</code>. The error text is sent only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>.</td>
 <td><a href="../http-exceptions/">HTTP exceptions</a></td>
 </tr>
 </tbody>
