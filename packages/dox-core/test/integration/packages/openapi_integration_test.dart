@@ -8,8 +8,7 @@ import 'package:yaml/yaml.dart';
 
 import '../../../../dox-openapi/test/support/openapi_checker.dart';
 
-const int port = 50024;
-const String baseUrl = 'http://localhost:$port';
+String get baseUrl => 'http://localhost:${Dox().server.httpServer.port}';
 
 class AuthMiddleware implements IDoxMiddleware {
   @override
@@ -151,7 +150,8 @@ class DocsRouter extends Router {
 
 AppConfig config = AppConfig(
   appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
-  serverPort: port,
+  // the OS picks a free port, so test files can run in parallel
+  serverPort: 0,
   totalIsolate: 1,
   routers: <Router>[DocsRouter()],
   openApi: OpenApiConfig(
