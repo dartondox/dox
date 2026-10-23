@@ -25,9 +25,18 @@ const String _releases = 'https://github.com/dartondox/dox/releases/download';
 /// `dox_mysql_native-v*` tag and uploads them with `SHA256SUMS`. Then fill
 /// this map before publishing to pub.dev:
 /// `dart run bin/native_hashes.dart dox_mysql_native-v<version>`
-// Empty on purpose: no `dox_mysql_native-v*` release exists yet. While it is
-// empty, the download step is skipped and the hook builds with cargo.
-const Map<String, String> _sha256 = <String, String>{};
+const Map<String, String> _sha256 = <String, String>{
+  'dox_mysql_native-linux-arm64.so':
+      '4a53722bdf89c48325111a3ee0776c291a5e84ba69525129fc319d05798029a3',
+  'dox_mysql_native-linux-x64.so':
+      '2f12b51b4864300e8c3f88116fde979d4d3f40132c85ffbbcb091164fe10f33a',
+  'dox_mysql_native-macos-arm64.dylib':
+      'ba073184c33ac731c81ed9fb16213f591daa2f4a01e4f9a0852bb9591ccbf3d6',
+  'dox_mysql_native-macos-x64.dylib':
+      'be29ddab2680b3c487b02f20b58109ac411db3244e4cdb064fcec52db6595be7',
+  'dox_mysql_native-windows-x64.dll':
+      '4d356405a865111b430c59d403f45f0cbc237a8bcabc97fac3690ee001edf87b',
+};
 
 void main(List<String> args) async {
   await build(args, (BuildInput input, BuildOutputBuilder output) async {

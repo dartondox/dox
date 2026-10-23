@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.5
 
 - Fix: CORS `origin` can be a list. Dox compares the request `Origin` with the list and sends back only the origin that matches, or no header. Before, it joined the list with commas, and browsers rejected it. A list also sends `Vary: Origin`.
 - Breaking: `AESEncryptor` now uses AES-GCM with a random nonce for each message. Before, it used AES-CTR with an all-zero nonce and no message check. Old encrypted cookies and values can not be read.

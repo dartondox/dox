@@ -25,9 +25,18 @@ const String _releases = 'https://github.com/dartondox/dox/releases/download';
 /// `dox_postgres_native-v*` tag and uploads them with `SHA256SUMS`. Then fill
 /// this map before publishing to pub.dev:
 /// `dart run bin/native_hashes.dart dox_postgres_native-v<version>`
-// Empty on purpose: no `dox_postgres_native-v*` release exists yet. While it is
-// empty, the download step is skipped and the hook builds with cargo.
-const Map<String, String> _sha256 = <String, String>{};
+const Map<String, String> _sha256 = <String, String>{
+  'dox_postgres_native-linux-arm64.so':
+      'dcf297fc1168c4c085078710e6d99bd025a75202b2a33098c70316c6392d3d37',
+  'dox_postgres_native-linux-x64.so':
+      '1d42e47e1cd372a7a41b8f9dac514819ec49e15466c52881bdd762b5c80f227b',
+  'dox_postgres_native-macos-arm64.dylib':
+      'a659662c4bcf82b09098a83a4d6a4dc89fdd29058349e7b739a484dabe6fa485',
+  'dox_postgres_native-macos-x64.dylib':
+      'b255087ea02462f18fd47d1bcf3ec153d9eb71a7c7365ba0dd1ffc4d0396ef10',
+  'dox_postgres_native-windows-x64.dll':
+      '2b97c8dd8fabb83be6a56d532b6cfb426c2987b00583a7b35768b1156b1b3325',
+};
 
 void main(List<String> args) async {
   await build(args, (BuildInput input, BuildOutputBuilder output) async {

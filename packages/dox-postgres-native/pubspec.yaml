@@ -1,6 +1,6 @@
 name: dox_postgres_native
 description: Fast native Postgres client for Dart, the default Postgres driver of the Dox ORM. Rust (tokio-postgres) owns the connections, your code stays in Dart.
-version: 3.0.0-alpha.4
+version: 3.0.0-alpha.5
 repository: https://github.com/dartondox/dox
 homepage: https://dartondox.dev
 

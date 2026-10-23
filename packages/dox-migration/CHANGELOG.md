@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.5
 
 - `DATABASE_URL` support. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. Its `sslmode` (Postgres) or `ssl` (MySQL) option turns TLS on.
 - A `DB_HOST` that starts with `/` is a Postgres Unix socket folder, like `/cloudsql/project:region:instance` on Cloud Run.

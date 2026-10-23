@@ -21,10 +21,20 @@ import 'package:hooks/hooks.dart';
 const String _releases = 'https://github.com/dartondox/dox/releases/download';
 
 /// sha256 of each release asset. Fill it from `SHA256SUMS` of the release
-/// (see .github/workflows/native.yaml) before publishing to pub.dev.
-/// Empty now: the code has native ABI 3, and no release has it yet. Until
-/// then the hook builds the library with cargo (or Dox uses dart:io).
-const Map<String, String> _sha256 = <String, String>{};
+/// (see .github/workflows/native.yaml) before publishing to pub.dev:
+/// `dart run bin/native_hashes.dart dox_http_native-v<version>`
+const Map<String, String> _sha256 = <String, String>{
+  'dox_http_native-linux-arm64.so':
+      'a101ed384aa236e54e430f0bf0c4375c79ab30210ac186404eca2df52a72b0fc',
+  'dox_http_native-linux-x64.so':
+      '80a824b75e68858dd1f61824abcc6a28d866b103538e59466ff4571a554dd6b0',
+  'dox_http_native-macos-arm64.dylib':
+      'ce1ca1a16927b6fb62217a34e9551ba230e19eaadc4eb6ae6af37e1f40d0e6e5',
+  'dox_http_native-macos-x64.dylib':
+      '7ae52845a4578813e502332da550c5b9b60fc13634805992bccbfc06039d55c4',
+  'dox_http_native-windows-x64.dll':
+      '545fad0e70341c8bae4303a89b2267dcd95773203638e9a34b2ca092ac6eb5ef',
+};
 
 void main(List<String> args) async {
   await build(args, (BuildInput input, BuildOutputBuilder output) async {

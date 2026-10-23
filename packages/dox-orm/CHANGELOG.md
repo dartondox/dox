@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.5
 
 - `DATABASE_URL` support. `ConnectionConfig.fromUrl()` reads `postgres://`, `postgresql://`, `mysql://`, `mariadb://`, `sqlite:` and `file:` urls: url-decoded user and password, host, port, database, `sslmode` and other options (they go to `extra`).
 - `DatabaseConfig` has a new `url`. It is `DATABASE_URL` from the environment when not given. When it is set, it wins: it replaces the default connection. Pass `url: ''` to turn it off.

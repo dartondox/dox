@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.5
 
 - Breaking: `JwtAuthDriver.expiresIn` is 1 hour by default. Before, it was `null`, and tokens never expired.
 - New: named guards work. Use `Auth(guard: 'admin')` and `AuthMiddleware(guard: 'admin')`. Before, only `defaultGuard` was used.
