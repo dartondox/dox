@@ -9,10 +9,14 @@ import 'package:test/test.dart';
 
 import '../db/migration/migrations.dart';
 
-String baseUrl = 'http://localhost:${appConfig.serverPort}';
+String get baseUrl => 'http://localhost:${Dox().server.httpServer.port}';
 
 void main() {
   setUpAll(() async {
+    // port 0: the OS picks a free port, so test files can run in parallel.
+    // Set it before the app reads its env.
+    Env().load();
+    Env().env['APP_PORT'] = '0';
     Dox().initialize(appConfig);
     Dox().totalIsolate(1);
     await Migrator(

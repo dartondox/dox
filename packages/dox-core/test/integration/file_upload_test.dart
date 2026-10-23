@@ -9,7 +9,7 @@ import '../utils/file_upload.dart';
 import '../utils/start_http_server.dart';
 import 'requirements/config/app.dart';
 
-String baseUrl = 'http://localhost:${config.serverPort}';
+String get baseUrl => 'http://localhost:${Dox().server.httpServer.port}';
 
 void main() {
   group('Http |', () {

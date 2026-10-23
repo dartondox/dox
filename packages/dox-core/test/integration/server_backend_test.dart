@@ -9,7 +9,8 @@ import '../utils/start_http_server.dart';
 AppConfig backendConfig({ServerBackend server = ServerBackend.native}) {
   return AppConfig(
     appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
-    serverPort: 50040,
+    // the OS picks a free port, so test files can run in parallel
+    serverPort: 0,
     totalIsolate: 1,
     server: server,
   );
@@ -31,7 +32,7 @@ void main() {
     HttpClient client = HttpClient();
     HttpClientResponse res = await (await client.get(
       'localhost',
-      50040,
+      Dox().server.httpServer.port,
       '/backend',
     )).close();
     expect(res.statusCode, 200);

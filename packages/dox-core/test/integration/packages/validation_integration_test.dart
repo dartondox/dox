@@ -9,8 +9,7 @@ import 'package:test/test.dart';
 import '../../dtos/database.dto.dart';
 import '../../dtos/dtos.dart';
 
-const int port = 50021;
-const String baseUrl = 'http://localhost:$port';
+String get baseUrl => 'http://localhost:${Dox().server.httpServer.port}';
 
 class ValidationRouter extends Router {
   @override
@@ -43,7 +42,8 @@ class ValidationRouter extends Router {
 
 AppConfig config = AppConfig(
   appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
-  serverPort: port,
+  // the OS picks a free port, so test files can run in parallel
+  serverPort: 0,
   totalIsolate: 1,
   routers: <Router>[ValidationRouter()],
   dtos: testDtos,
