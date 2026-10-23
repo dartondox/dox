@@ -125,6 +125,7 @@ A service runs once in every isolate at start. This one tells `dox_auth` which m
 
 ```dart title="lib/services/auth_service.dart"
 import 'package:blog/app/models/user/user.model.dart';
+import 'package:blog/config/env.dart';
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 
@@ -141,7 +142,7 @@ class AuthService implements DoxService {
         guards: <String, AuthGuard>{
           'api': AuthGuard(
             driver: JwtAuthDriver(
-              secret: SecretKey(Env.get<String>('APP_KEY')),
+              secret: SecretKey(env.appKey),
               expiresIn: const Duration(days: 7),
             ),
             provider: AuthProvider(model: () => User()),

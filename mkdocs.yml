@@ -113,6 +113,8 @@ nav:
     - Concepts:
       - concepts/how-dox-works.md
       - concepts/coming-from-laravel.md
+      - concepts/dart-frameworks.md
+      - concepts/status-and-roadmap.md
   - The basics:
     - the-basic/routing.md
     - the-basic/request.md
@@ -172,14 +174,23 @@ nav:
     - guides/cors-for-spa.md
     - guides/environments.md
     - guides/testing-with-database.md
-    - guides/docker.md
+    - guides/share-code-with-flutter.md
+    - guides/api-docs-with-openapi.md
+    - Deploy:
+      - guides/docker.md
+      - guides/deploy-vps.md
+      - guides/deploy-fly.md
+      - guides/deploy-cloud-run.md
   - Reference:
     - reference/index.md
+    - reference/cheat-sheet.md
     - reference/app-config.md
     - reference/cli.md
     - reference/env.md
     - reference/request-and-response.md
     - reference/http-exceptions.md
+    - reference/production-checklist.md
     - reference/troubleshooting.md
+    - reference/errors.md
     - reference/changelog.md
     - others/contribute.md

@@ -248,76 +248,240 @@ Source: `packages/dox-auth/lib/src/interfaces.dart`.
 This is the `lib/config/app.dart` of a new project. The sub configs live in their own files in `lib/config/`.
 
 ```dart title="lib/config/app.dart"
-import 'package:my_app/app/http/handler.dart';
+import 'dart:io';
+
+import 'package:dox_core/dox_core.dart';
+import 'package:my_app/app/http/response_handler.dart';
 import 'package:my_app/config/cache.dart';
 import 'package:my_app/config/cors.dart';
-import 'package:my_app/config/env.dart';
 import 'package:my_app/config/logger.dart';
-import 'package:my_app/config/openapi.dart';
 import 'package:my_app/config/services.dart';
-import 'package:my_app/config/socketio.dart';
 import 'package:my_app/config/storage.dart';
-import 'package:my_app/dtos.g.dart';
 import 'package:my_app/routes/api.dart';
 import 'package:my_app/routes/web.dart';
-import 'package:my_app/routes/websocket.dart';
-import 'package:dox_core/dox_core.dart';
+import 'package:my_app/config/env.dart';
 
 AppConfig appConfig = AppConfig(
-  /// Encrypts cookies and cache. Keep APP_KEY secret.
+  /// Application secret key
+  /// -------------------------------
+  /// This key is use to encrypt/decrypt the data such as cache and cookies.
+  /// Make sure to keep the `APP_KEY` as an environment variable and secure.
+  ///
+  /// Note: Changing the application key for an existing app will make all
+  /// the cookies and cache invalid and also the existing encrypted data
+  /// will not be decrypted.
   appKey: env.appKey,
 
-  /// The port the server listens on.
+  /// Server port
+  /// -------------------------------
+  /// App will be running on this port.
   serverPort: env.appPort,
 
-  /// Isolates that serve http. Default: one per CPU core.
-  totalIsolate: env.appTotalIsolate,
+  /// Total isolate (multi thread)
+  /// -------------------------------
+  /// Isolates that serve http requests, all on the same port.
+  /// Default is one per CPU core, so the app uses all cores.
+  /// Set `APP_TOTAL_ISOLATE` to change it.
+  totalIsolate: env.appTotalIsolate ?? Platform.numberOfProcessors,
 
-  /// Every @Dto class, from lib/dtos.g.dart.
-  dtos: dtos,
-
-  /// Middleware for every route.
+  /// Global middleware
+  /// -------------------------------
+  /// By registering global middleware here,
+  /// middleware will be applied to all the routes.
   globalMiddleware: <dynamic>[LogMiddleware(enabled: true)],
 
-  /// The routers that register routes.
-  routers: <Router>[WebRouter(), ApiRouter(), WebsocketRouter()],
+  /// Routers
+  /// -------------------------------
+  /// Register routers to create route to dox framework.
+  routers: <Router>[WebRouter(), ApiRouter()],
 
-  /// Sees every response before it is sent.
+  /// Response handler
   responseHandler: ResponseHandler(),
 
-  /// Cache stores (config/cache.dart).
+  /// Cache stores (config/cache.dart)
   cache: cache,
 
-  /// Storage disks (config/storage.dart).
+  /// Storage disks (config/storage.dart)
   storage: storage,
 
-  /// OpenAPI docs at /docs (config/openapi.dart).
-  openApi: openApi,
-
-  /// Socket.IO on the app port (config/socketio.dart).
-  socketIo: socketIo,
-
-  /// CORS headers (config/cors.dart).
+  /// Cors configuration
   cors: cors,
 
-  /// Services that run in every isolate (ORM, auth, websocket).
+  /// Service to run on multithread server
   services: services,
 
-  /// Logger output (config/logger.dart).
+  /// logger configuration
   logger: logger,
 );
 ```
 
+The config files read their values from `env`, the typed env class in `lib/config/env.dart`. See [Env reference](env.md).
+
 The sub config files, with the values a new project ships:
+
+```dart title="lib/config/cache.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:my_app/config/env.dart';
+
+/// Cache stores
+/// -------------------------------
+/// `Cache()` uses the default store. `Cache().store('memory')` picks one.
+/// Drivers: file, memory, redis, null. Values must be JSON types.
+CacheConfig cache = CacheConfig(
+  defaultStore: env.cacheStore,
+  stores: <String, Map<String, dynamic>>{
+    'file': <String, dynamic>{'driver': 'file', 'path': 'storage/cache'},
+
+    /// one map per isolate, fast, not shared
+    'memory': <String, dynamic>{'driver': 'memory', 'max_size': 10000},
+  },
+);
+```
+
+```dart title="lib/config/storage.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:my_app/config/env.dart';
+
+/// Storage disks
+/// -------------------------------
+/// `Storage()` uses the default disk. `Storage().disk('local')` picks one.
+/// Drivers: local, s3 (also R2, MinIO, Spaces), memory.
+StorageConfig storage = StorageConfig(
+  defaultDisk: env.storageDisk,
+  disks: <String, Map<String, dynamic>>{
+    /// files in the `storage` folder
+    'local': <String, dynamic>{'driver': 'local', 'root': 'storage'},
+  },
+);
+```
+
+```dart title="lib/config/logger.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:my_app/config/env.dart';
+
+LoggerConfig logger = LoggerConfig(
+  /// Application name
+  /// -------------------------------
+  /// The name of the application you want to add to the log.
+  name: env.appName,
+
+  /// Toggle logger
+  /// -------------------------------
+  /// Enable or disable logger in application.
+  enabled: true,
+
+  /// Logging level
+  /// -------------------------------
+  /// The level from which you want the logger to flush logs.
+  level: env.logLevel,
+
+  /// Pretty print
+  /// -------------------------------
+  /// It is highly advised NOT to use `prettyPrint` in production, since it
+  /// can have huge impact on performance.
+  prettyPrint: env.isDevelopment,
+);
+```
+
+```dart title="lib/config/database.dart"
+import 'package:dox_orm/dox_orm.dart';
+import 'package:my_app/config/env.dart';
+
+/// Print every SQL query only in development.
+/// Printing each query costs time, so it is off in production.
+bool _debug = env.isDevelopment;
+
+DatabaseConfig databaseConfig = DatabaseConfig(
+  /// Connection
+  /// -------------------------------
+  /// The connection to use. It is one key of `connections` below.
+  connection: env.dbConnection,
+
+  connections: <String, ConnectionConfig>{
+    /// Postgres
+    'postgres': ConnectionConfig(
+      driver: Driver.postgres,
+      host: env.dbHost,
+      port: env.dbPort ?? 5432,
+      user: env.dbUsername,
+      password: env.dbPassword,
+      database: env.dbName,
+      extra: <String, dynamic>{
+        /// Each isolate has its own pool.
+        'maxConnectionCount': 10,
+        'maxConnectionAge': Duration(hours: 1),
+      },
+      debug: _debug,
+      printer: PrettyQueryPrinter(),
+    ),
+
+    /// MySQL and MariaDB
+    'mysql': ConnectionConfig(
+      driver: Driver.mysql,
+      host: env.dbHost,
+      port: env.dbPort ?? 3306,
+      user: env.dbUsername,
+      password: env.dbPassword,
+      database: env.dbName,
+      extra: <String, dynamic>{'collation': 'utf8mb4_general_ci'},
+      debug: _debug,
+      printer: PrettyQueryPrinter(),
+    ),
+
+    /// SQLite. `DB_NAME` is a file path, or `:memory:`.
+    'sqlite': ConnectionConfig(
+      driver: Driver.sqlite,
+      database: env.dbName,
+      debug: _debug,
+      printer: PrettyQueryPrinter(),
+    ),
+  },
+);
+```
 
 ```dart title="lib/config/cors.dart"
 import 'package:dox_core/dox_core.dart';
 
 CORSConfig cors = CORSConfig(
+  /// Enabled
+  /// -------------------------------
+  /// A boolean to enable or disable CORS integration.
+  /// Setting to true will enable the CORS for all HTTP request.
   enabled: false,
+
+  /// Origin
+  /// -------------------------------
+  /// Set a list of origins to be allowed for `Access-Control-Allow-Origin`.
+  /// The value can be one of the following:
+  /// Array       : An array of allowed origins.
+  /// String      : Comma separated list of allowed origins.
+  /// String (*)  : A wildcard (*) to allow all request origins.
   origin: '*',
+
+  /// Methods
+  /// -------------------------------
+  /// Set a list of origins to be allowed for `Access-Control-Request-Method`.
+  /// The value can be one of the following:
+  /// Array       : An array of request methods.
+  /// String      : Comma separated list of request methods.
+  /// String (*)  : A wildcard (*) to allow all request methods.
   methods: '*',
+
+  /// Headers
+  /// -------------------------------
+  /// Set a list of origins to be allowed for `Access-Control-Allow-Headers`.
+  /// The value can be one of the following:
+  /// Array       : An array of allowed headers.
+  /// String      : Comma separated list of allowed headers.
+  /// String (*)  : A wildcard (*) to allow all request headers.
   headers: '*',
+
+  /// Expose Headers
+  /// -------------------------------
+  /// Set a list of origins to be allowed for `Access-Control-Expose-Headers`.
+  /// The value can be one of the following:
+  /// Array       : An array of expose headers.
+  /// String      : Comma separated list of expose headers.
   exposeHeaders: <String>[
     'cache-control',
     'content-language',
@@ -326,163 +490,41 @@ CORSConfig cors = CORSConfig(
     'last-modified',
     'pragma',
   ],
+
+  /// Credentials
+  /// -------------------------------
+  /// Toggle `Access-Control-Allow-Credentials` header.
   credentials: true,
+
+  /// MaxAge
+  /// -------------------------------
+  /// Define `Access-Control-Max-Age` header in seconds.
   maxAge: 90,
 );
 ```
 
-```dart title="lib/config/cache.dart"
-import 'package:my_app/config/env.dart';
-import 'package:dox_core/dox_core.dart';
-
-CacheConfig cache = CacheConfig(
-  defaultStore: env.cacheStore,
-  stores: <String, Map<String, dynamic>>{
-    'file': <String, dynamic>{'driver': 'file', 'path': 'storage/cache'},
-    'memory': <String, dynamic>{'driver': 'memory', 'max_size': 10000},
-    'redis': <String, dynamic>{
-      'driver': 'redis',
-      'host': env.redisHost,
-      'port': env.redisPort,
-      'db': env.redisDb,
-      'password': env.redisPassword,
-      'prefix': '${env.appName}_cache:',
-    },
-  },
-);
-```
-
-```dart title="lib/config/storage.dart"
-import 'package:my_app/config/env.dart';
-import 'package:dox_core/dox_core.dart';
-
-StorageConfig storage = StorageConfig(
-  defaultDisk: env.storageDisk,
-  disks: <String, Map<String, dynamic>>{
-    'local': <String, dynamic>{
-      'driver': 'local',
-      'root': 'storage',
-      'url': '${env.appUrl}/files',
-    },
-    if (env.awsBucket != null)
-      's3': <String, dynamic>{
-        'driver': 's3',
-        'bucket': env.awsBucket,
-        'region': env.awsDefaultRegion,
-        'key': env.awsAccessKeyId,
-        'secret': env.awsSecretAccessKey,
-        'endpoint': env.awsEndpoint,
-      },
-  },
-);
-```
-
-```dart title="lib/config/openapi.dart"
-import 'package:my_app/openapi.g.dart';
-import 'package:my_app/config/env.dart';
-import 'package:dox_core/dox_core.dart';
-
-OpenApiConfig openApi = OpenApiConfig(
-  info: Info(title: env.appName, version: '1.0.0'),
-  registry: openApiRegistry,
-);
-```
-
-```dart title="lib/config/logger.dart"
-import 'package:my_app/config/env.dart';
-import 'package:dox_core/dox_core.dart';
-
-LoggerConfig logger = LoggerConfig(
-  name: env.appName,
-  enabled: true,
-  level: env.logLevel,
-  prettyPrint: env.appEnv == 'development',
-);
-```
-
-```dart title="lib/config/socketio.dart"
-import 'package:my_app/app/socket/chat.namespace.dart';
-import 'package:my_app/config/redis.dart';
-import 'package:my_app/config/env.dart';
-import 'package:dox_core/dox_core.dart';
-import 'package:dox_socketio/dox_socketio.dart';
-
-SocketIoConfig socketIo = SocketIoConfig(
-  enabled: env.socketioEnabled,
-  namespaces: <NamespaceHandler>[ChatNamespace()],
-  adapter: const RedisSocketAdapterFactory(),
-);
-
-class RedisSocketAdapterFactory extends SocketAdapterFactory {
-  const RedisSocketAdapterFactory();
-
-  @override
-  Adapter create() {
-    return RedisAdapter(subscriber: redis.duplicate(), publisher: redis);
-  }
-}
-```
-
-```dart title="lib/config/database.dart"
-import 'package:my_app/config/env.dart';
-import 'package:dox_orm/dox_orm.dart';
-
-DatabaseConfig databaseConfig = DatabaseConfig(
-  connection: env.dbConnection,
-  connections: <String, ConnectionConfig>{
-    'postgres': ConnectionConfig(
-      driver: Driver.postgres,
-      host: env.dbHost,
-      port: env.dbPort ?? 5432,
-      user: env.dbUsername ?? 'postgres',
-      password: env.dbPassword ?? 'postgres',
-      database: env.dbName ?? 'dox',
-      extra: <String, dynamic>{
-        'maxConnectionCount': 10,
-        'maxConnectionAge': Duration(hours: 1),
-      },
-      debug: true,
-      printer: ConsoleQueryPrinter(),
-    ),
-    'mysql': ConnectionConfig(
-      driver: Driver.mysql,
-      host: env.dbHost,
-      port: env.dbPort ?? 3306,
-      user: env.dbUsername ?? 'root',
-      password: env.dbPassword ?? 'password',
-      database: env.dbName ?? 'dox',
-      extra: <String, dynamic>{'collation': 'utf8mb4_general_ci'},
-      debug: true,
-      printer: ConsoleQueryPrinter(),
-    ),
-    'sqlite': ConnectionConfig(
-      driver: Driver.sqlite,
-      database: env.dbName ?? 'dox.sqlite',
-      debug: true,
-      printer: ConsoleQueryPrinter(),
-    ),
-  },
-);
-```
-
 ```dart title="lib/config/services.dart"
-import 'package:my_app/services/auth_service.dart';
-import 'package:my_app/services/orm_service.dart';
-import 'package:my_app/services/websocket_service.dart';
 import 'package:dox_core/dox_core.dart';
+import 'package:my_app/services/orm_service.dart';
 
-List<DoxService> services = <DoxService>[
-  ORMService(),
-  AuthService(),
-  WebsocketService(),
-];
+/// Services to register on dox
+/// -------------------------------
+/// Since dox run on multi thread isolate, we need to register
+/// below extra services to dox so that dox can
+/// register again on new isolate.
+List<DoxService> services = <DoxService>[ORMService()];
 ```
 
 ```dart title="lib/services/orm_service.dart"
-import 'package:my_app/config/database.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart';
+import 'package:my_app/config/database.dart';
 
+/// Query builder service
+/// --------------------------
+/// Sets up the query builder, so this project can use the ORM.
+/// If this project does not need a database, delete this file
+/// and remove it from config/services.dart.
 class ORMService implements DoxService {
   @override
   Future<void> setup() async {
@@ -491,26 +533,4 @@ class ORMService implements DoxService {
 }
 ```
 
-```dart title="lib/services/auth_service.dart"
-import 'package:my_app/app/models/user/user.model.dart';
-import 'package:my_app/config/env.dart';
-import 'package:dox_auth/dox_auth.dart';
-import 'package:dox_core/dox_core.dart';
-
-class AuthService implements DoxService {
-  @override
-  void setup() {
-    Auth.initialize(
-      AuthConfig(
-        defaultGuard: 'web',
-        guards: <String, AuthGuard>{
-          'web': AuthGuard(
-            driver: JwtAuthDriver(secret: SecretKey(env.appKey)),
-            provider: AuthProvider(model: () => User()),
-          ),
-        },
-      ),
-    );
-  }
-}
-```
+A new project has no `openapi.dart`, `socketio.dart` or auth service. You add them when you need them. See [OpenAPI](../packages/openapi.md), [Socket.IO](../packages/socketio.md) and [Authentication](../security/authentication.md).

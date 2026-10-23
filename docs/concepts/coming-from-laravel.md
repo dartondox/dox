@@ -322,8 +322,8 @@ See [File Storage](../digging-deeper/file-storage.md).
 | Laravel | Dox |
 | --- | --- |
 | `config/*.php` files | `lib/config/*.dart` files, put together in `AppConfig` |
-| `env('APP_KEY')` | `Env.get<String>('APP_KEY')` |
-| `env('APP_PORT', 3000)` | `Env.get<int>('APP_PORT', 3000)` |
+| `env('APP_KEY')` | `env.appKey` (a getter in `lib/config/env.dart`) |
+| `env('APP_PORT', 3000)` | `env.appPort` (the default is in the getter: `int get appPort => 3000;`) |
 | `config('app.name')` | `env.appName` from the typed env class (`@DoxEnv()`) |
 | `php artisan config:cache` | not needed. The typed env is read once, at start. |
 
@@ -357,7 +357,7 @@ See [Testing](../digging-deeper/testing.md).
   Run `dox build_runner:build` after a change, or let `dox serve` watch for you.
 - **One native binary.** `dox build` makes an AOT binary in `build/bundle`. There is no interpreter, no `vendor/` folder and no `composer install` on the server.
   The Docker image is about 11 MB.
-- **A native HTTP server and native database drivers.** Rust parses HTTP and talks to Postgres and MySQL. Your code stays in Dart. You do not need Rust installed.
+- **A native HTTP server and native database drivers.** Rust parses HTTP and talks to Postgres and MySQL. Your code stays in Dart. The HTTP server comes ready-built. The database drivers need Rust (`cargo`) to build; without it, Dox uses the Dart drivers.
 - **Types everywhere.** A DTO is a class with typed fields. A path param is an `int`. A model field is a `String?`. The compiler finds many mistakes before you run the app.
 - **Async is explicit.** Database calls return a `Future`. You write `await`. One isolate serves many requests at the same time while it waits for the database.
 - **JSON API first.** Dox returns text, JSON, files and streams. It has no view layer.

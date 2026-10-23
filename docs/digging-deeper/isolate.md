@@ -11,6 +11,20 @@ Dox starts many isolates. Each one runs its own HTTP server on the same port. Th
 - Native server on Windows: only one isolate serves HTTP.
 - `dart:io` server: `HttpServer.bind(..., shared: true)` on every system.
 
+With the native server, each isolate has its own Rust acceptor on the port:
+
+```mermaid
+flowchart TD
+    OS["Port 3000<br>the OS spreads the connections"] --> A1["Rust acceptor"]
+    OS --> A2["Rust acceptor"]
+    OS --> A3["Rust acceptor"]
+    A1 --> I1["Isolate 1, main<br>own DB pool, own memory cache"]
+    A2 --> I2["Isolate 2<br>own DB pool, own memory cache"]
+    A3 --> I3["Isolate N<br>own DB pool, own memory cache"]
+    I2 -. "crash: started again after 1 second" .-> I2
+    I1 -. "crash: the process exits" .-> S["Supervisor restarts the process<br>Docker, systemd"]
+```
+
 See [Native server](native-server.md) for the two servers.
 
 ## How many isolates
@@ -22,7 +36,7 @@ To change it, set `totalIsolate` in `lib/config/app.dart`. A new app reads it fr
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
   // ...
-  totalIsolate: Env.get<int>('APP_TOTAL_ISOLATE', Platform.numberOfProcessors),
+  totalIsolate: env.appTotalIsolate ?? Platform.numberOfProcessors,
 );
 ```
 

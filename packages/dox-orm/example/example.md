@@ -1,82 +1,91 @@
-# Dart SQL Query Builder
+# dox_orm example
 
-## [Documentation](https://dox.zinkyawkyaw.dev/)
+A model, a migration and the common queries. The full guide is on
+[dartondox.dev](https://dartondox.dev/latest/database/).
 
-## Example Usage
+## 1. Config
 
-- Install required dependency
-
-```bash
-$ dart pub add json_serializable --dev
-$ dart pub add build_runner --dev
-```
-
-- Setup model
-
-```dart
-import 'package:postgres/postgres.dart';
+```dart title="lib/config/database.dart"
 import 'package:dox_orm/dox_orm.dart';
 
-part 'actor.model.g.dart';
+DatabaseConfig databaseConfig = DatabaseConfig(
+  connection: 'sqlite',
+  connections: <String, ConnectionConfig>{
+    'sqlite': ConnectionConfig(
+      driver: Driver.sqlite,
+      database: 'db/app.sqlite',
+    ),
+  },
+);
+```
 
-@IsModel()
-class Actor extends Model {
-  @Column()
-  int? id;
+## 2. Migration
 
-  @Column(name: 'name')
-  String? actorName;
+```dart title="db/migration/2026_01_01_000000_create_posts_table.dart"
+import 'package:dox_migration/dox_migration.dart';
 
-  @Column()
-  int? age;
-
-  @Column(name: 'created_at')
-  DateTime? createdAt;
-
-  @Column(name: 'updated_at')
-  DateTime? updatedAt;
+class CreatePostsTable extends Migration {
+  @override
+  Future<void> up(Schema schema) async {
+    await schema.create('posts', (Table table) {
+      table.id();
+      table.string('title');
+      table.text('body');
+      table.string('status').defaultTo('draft');
+      table.timestamps();
+    });
+  }
 
   @override
-  fromJson(Map<String, dynamic> json) => _$ActorFromJson(json);
-
-  @override
-  toMap() => _$ActorToJson(this);
+  Future<void> down(Schema schema) async {
+    await schema.dropIfExists('posts');
+  }
 }
 ```
 
-- Run build runner
+## 3. Model
 
-```bash
-$ dart run build_runner build
+```dart title="lib/app/models/post/post.model.dart"
+import 'package:dox_orm/dox_orm.dart';
+
+part 'post.model.g.dart';
+
+@DoxModel(table: 'posts')
+class Post extends PostGenerator {
+  @Column()
+  String? title;
+
+  @Column()
+  String? body;
+
+  @Column()
+  String? status;
+}
 ```
+
+Run `dart run build_runner build` to make `post.model.g.dart`.
+
+## 4. Queries
 
 ```dart
-void main() async {
-  // create database connection and open
-  PostgreSQLConnection db = PostgreSQLConnection(
-    'localhost',
-    5432,
-    'postgres',
-    username: 'admin',
-    password: 'password',
-  );
-  await db.open();
+// create
+Post post = Post()
+  ..title = 'Hello'
+  ..body = 'First post';
+await post.save();
 
-  // initialize SqlQueryBuilder, only once at main function
-  SqlQueryBuilder.initialize(database: db, debug: true);
+// read
+Post? one = await Post().find(post.id);
+List<Post> drafts = await Post()
+    .where('status', 'draft')
+    .orderBy('id', 'desc')
+    .limit(10)
+    .get();
 
-  // and finally use model from anywhere in the project.
-  Actor actor = Actor();
-  actor.actorName = 'John Wick';
-  actor.age = 60;
-  actor = await actor.save();
+// update
+one?.title = 'Hello again';
+await one?.save();
 
-  actor.actorName = "Tom Cruise";
-  actor = await actor.save(); // save again
-
-  print(actor.id);
-
-  Actor result = await Actor().where('name', 'Tom Cruise').get();
-  print(result.age);
-}
+// delete
+await one?.delete();
 ```

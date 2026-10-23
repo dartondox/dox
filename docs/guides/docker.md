@@ -87,7 +87,10 @@ RUN dart compile exe bin/health.dart -o build/bundle/bin/health
 RUN mkdir -p /out/app/storage /out/app/public /out/tmp \
   && chmod 1777 /out/tmp \
   && cp -r build/bundle/. /out/app/ \
-  && cp -r public/. /out/app/public/
+  && cp -r public/. /out/app/public/ \
+  # the native HTTP server (Rust) needs libgcc_s, which /runtime/ does not have
+  && LIBGCC=$(find / -name libgcc_s.so.1 -path '*lib*' | head -n 1) \
+  && mkdir -p /out$(dirname $LIBGCC) && cp $LIBGCC /out$LIBGCC
 
 # Stage 2: the Dart AOT runtime and the bundle only. No SDK, no source.
 FROM scratch
@@ -103,6 +106,16 @@ CMD ["/app/bin/server"]
 ```
 
 Delete the `public` lines when your app has no `public` folder.
+
+Check the start log in the container. It must end with `(native)`:
+
+```text
+Server started at http://127.0.0.1:3000 with 8 isolate (native)
+```
+
+Without the `libgcc_s` lines, the native HTTP server does not load in a
+`scratch` image. Dox then prints `dox_http_native did not load, using the
+dart:io server` and runs on the slower `dart:io` server.
 
 !!! warning "`dox build`, not `dart compile exe`"
     `dox_orm` bundles SQLite with a build hook. `dart compile exe` does not run build hooks and stops with an error.

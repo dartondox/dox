@@ -40,6 +40,10 @@ Dox makes the file `db/dox.sqlite` at the first start. The `db` folder is
 in the template. The `DB_HOST`, `DB_PORT`, `DB_USERNAME` and `DB_PASSWORD`
 lines are for Postgres and MySQL. SQLite does not read them.
 
+The app reads these keys through `lib/config/env.dart`. It is a typed class,
+so `env.appPort` is an `int` and reads `APP_PORT`. A missing `APP_KEY` stops
+the app at start. See [Environment variables](../digging-deeper/env.md).
+
 !!! note "The folder must exist"
     Dox makes the database file when it is missing, but not its folder.
     If you set `DB_NAME=storage/blog.sqlite`, run `mkdir storage` first.

@@ -11,12 +11,13 @@ Let a web app on another origin (`http://localhost:5173` in development, `https:
 
 ```dart title="lib/config/cors.dart"
 import 'package:dox_core/dox_core.dart';
+import 'package:my_app/config/env.dart';
 
 /// `enabled` is true by default, so every route sends the headers.
 CORSConfig cors = CORSConfig(
   /// One origin only. A list is joined with commas, and browsers reject
   /// that value. Set CORS_ORIGIN to the real front-end URL in production.
-  origin: Env.get('CORS_ORIGIN', 'http://localhost:5173'),
+  origin: env.corsOrigin,
 
   methods: <String>['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
 
@@ -43,6 +44,15 @@ AppConfig appConfig = AppConfig(
 ```
 
 ## 2. Set the origin per environment
+
+`CORS_ORIGIN` is a new key. Add a getter for it to the `AppEnv` class:
+
+```dart title="lib/config/env.dart"
+  /// the front-end URL that may call the API
+  String get corsOrigin => 'http://localhost:5173';
+```
+
+Run `dart run build_runner build` to update `env.g.dart`. Then set the value in `.env`:
 
 ```ini title=".env"
 CORS_ORIGIN=http://localhost:5173

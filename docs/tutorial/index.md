@@ -3,6 +3,9 @@
 This tutorial takes you from an empty folder to a small blog API that runs as one native binary.
 Every step has the full code and a `curl` command to check it.
 
+The finished project is on GitHub: [examples/blog-api](https://github.com/dartondox/dox/tree/develop/examples/blog-api).
+CI builds it and runs its tests on every push, so the code on these pages keeps working.
+
 ## What you will build
 
 A JSON API for blog posts.
@@ -71,6 +74,7 @@ blog/
 │   ├── config/
 │   │   ├── app.dart              * adds the DTO list
 │   │   ├── database.dart
+│   │   ├── env.dart              the .env keys, typed
 │   │   └── services.dart         * adds AuthService
 │   ├── routes/api.dart           *
 │   ├── services/

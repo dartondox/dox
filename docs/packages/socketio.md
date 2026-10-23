@@ -62,11 +62,12 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_socketio/dox_socketio.dart';
 import 'package:ioredis/ioredis.dart';
 import 'package:my_app/app/socket/chat.namespace.dart';
+import 'package:my_app/config/env.dart';
 
 Redis redis = Redis(RedisOptions(host: '127.0.0.1', port: 6379));
 
 SocketIoConfig socketIo = SocketIoConfig(
-  enabled: Env.get<bool>('SOCKETIO_ENABLED', false),
+  enabled: env.socketioEnabled,
   namespaces: <NamespaceHandler>[ChatNamespace(MessageService())],
   adapter: const RedisSocketAdapterFactory(), // shares broadcasts between isolates
 );
@@ -80,6 +81,13 @@ class RedisSocketAdapterFactory extends SocketAdapterFactory {
     return RedisAdapter(subscriber: redis.duplicate(), publisher: redis);
   }
 }
+```
+
+Add a getter for the `SOCKETIO_ENABLED` key to `lib/config/env.dart`, then run `dart run build_runner build`:
+
+```dart title="lib/config/env.dart"
+  /// serve Socket.IO on the app port
+  bool get socketioEnabled => false;
 ```
 
 ```dart title="lib/config/app.dart"

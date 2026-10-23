@@ -24,20 +24,30 @@ To change the stores, make `lib/config/cache.dart`:
 
 ```dart title="lib/config/cache.dart"
 import 'package:dox_core/dox_core.dart';
+import 'package:my_app/config/env.dart';
 
 CacheConfig cache = CacheConfig(
-  defaultStore: Env.get('CACHE_STORE', 'file'),
+  defaultStore: env.cacheStore,
   stores: <String, Map<String, dynamic>>{
     'file': <String, dynamic>{'driver': 'file', 'path': 'storage/cache'},
     'memory': <String, dynamic>{'driver': 'memory', 'max_size': 10000},
     'redis': <String, dynamic>{
       'driver': 'redis',
-      'host': Env.get('REDIS_HOST', '127.0.0.1'),
-      'port': Env.get<int>('REDIS_PORT', 6379),
+      'host': env.redisHost,
+      'port': env.redisPort,
       'prefix': 'app_cache:',
     },
   },
 );
+```
+
+Redis needs two keys that a new project does not have yet. Add them to
+`lib/config/env.dart` and run `dart run build_runner build`:
+
+```dart title="lib/config/env.dart"
+  String get redisHost => '127.0.0.1';
+
+  int get redisPort => 6379;
 ```
 
 Then pass it to `AppConfig(cache: cache)` in `lib/config/app.dart`.

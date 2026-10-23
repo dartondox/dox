@@ -10,3 +10,6 @@ Short lookup pages. Every value on these pages comes from the source code of ver
 | [HTTP exceptions](http-exceptions.md) | the exception classes, their status codes and the body a client gets |
 | [Request and response](request-and-response.md) | the members of `DoxRequest`, `DoxResponse` and `response()` |
 | [Troubleshooting](troubleshooting.md) | known problems, the exact error text, the cause and the fix |
+| [Cheat sheet](cheat-sheet.md) | one page of the code you use every day, with links to the full pages |
+| [Production checklist](production-checklist.md) | what to check before you deploy, and what Dox does not do for you |
+| [Error index](errors.md) | every message Dox prints or throws, when it happens and what to do |

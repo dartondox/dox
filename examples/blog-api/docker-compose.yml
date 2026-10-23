@@ -1,0 +1,39 @@
+# Local development:
+#   docker compose up -d postgres   # only the database, then `dox s`
+#   docker compose up -d --build    # the database and the app (AOT image)
+
+services:
+  # Http server (production image)
+  app:
+    build: .
+    # config is read from env vars; the image has no .env file
+    env_file: .env
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:${APP_PORT:-3000}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Postgres database
+  postgres:
+    image: postgres:18
+    environment:
+      - POSTGRES_USER=${DB_USERNAME:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
+      - POSTGRES_DB=${DB_NAME:-postgres}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres:/var/lib/postgresql
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-q', '-U', '${DB_USERNAME:-postgres}']
+      interval: 5s
+      retries: 5
+
+volumes:
+  postgres:

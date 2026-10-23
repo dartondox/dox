@@ -36,7 +36,7 @@ import 'package:ioredis/ioredis.dart';
 class WebsocketService implements DoxService {
   @override
   void setup() {
-    Redis sub = Redis(RedisOptions(host: Env.get('REDIS_HOST', '127.0.0.1')));
+    Redis sub = Redis(RedisOptions(host: env.redisHost));
     Redis pub = sub.duplicate();
 
     WebsocketServer io = WebsocketServer(Dox());

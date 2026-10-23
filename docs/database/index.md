@@ -8,6 +8,18 @@ Dox works with Postgres, MySQL, MariaDB and SQLite through the `dox_orm` package
 - [Transactions](transactions.md): many queries that succeed or fail together.
 - [Migration](migration.md) and [Schema](schema.md): create and change tables.
 
+This is how a query travels from your code to the database:
+
+```mermaid
+flowchart LR
+    M["Model or QueryBuilder"] --> S["SQL text<br>quoted names, @values"]
+    S --> D{"Driver"}
+    D --> N["Native Rust pool<br>dox_postgres_native, dox_mysql_native"]
+    D --> T["Dart driver<br>postgres, mysql_dart, sqlite3"]
+    N --> DB[("Database")]
+    T --> DB
+```
+
 ## Install
 
 The query builder and the models are in the `dox_orm` package.
@@ -19,11 +31,6 @@ dart pub add dox_orm
 ```dart
 import 'package:dox_orm/dox_orm.dart';
 ```
-
-!!! note
-    Before 3.0, this package was called `dox_query_builder`.
-    The old package now only re-exports `dox_orm`.
-    Change your `pubspec.yaml` and your imports to `dox_orm`.
 
 ## Supported databases
 
@@ -48,6 +55,20 @@ import 'package:dox_orm/dox_orm.dart';
     See the [Postgres](postgres-native.md#use-the-dart-driver) and
     [MySQL](mysql-native.md#use-the-dart-driver) pages.
 
+Dox picks the driver of a connection like this:
+
+```mermaid
+flowchart TD
+    A["Driver.postgres or Driver.mysql"] --> B{"DOX_DB_DRIVER=dart<br>or extra native: false?"}
+    B -->|yes| X["Dart driver"]
+    B -->|no| C{"Postgres with TLS?<br>useSSL or sslMode"}
+    C -->|yes| X
+    C -->|no| L{"Native library loads?"}
+    L -->|no| W["Dart driver<br>prints one warning"]
+    L -->|yes| N["Native Rust driver"]
+    Q["Driver.sqlite"] --> S["sqlite3<br>one connection per isolate"]
+```
+
 ## Config
 
 Put the connections in `lib/config/database.dart`.
@@ -58,7 +79,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart';
 
 DatabaseConfig databaseConfig = DatabaseConfig(
-  connection: Env.get('DB_CONNECTION', 'postgres'),
+  connection: env.dbConnection,
   connections: <String, ConnectionConfig>{
     'postgres': ConnectionConfig(
       driver: Driver.postgres,

@@ -18,9 +18,10 @@ To add disks, make `lib/config/storage.dart`:
 
 ```dart title="lib/config/storage.dart"
 import 'package:dox_core/dox_core.dart';
+import 'package:my_app/config/env.dart';
 
 StorageConfig storage = StorageConfig(
-  defaultDisk: Env.get('STORAGE_DISK', 'local'),
+  defaultDisk: env.storageDisk,
   disks: <String, Map<String, dynamic>>{
     'local': <String, dynamic>{
       'driver': 'local',
@@ -29,15 +30,32 @@ StorageConfig storage = StorageConfig(
     },
     's3': <String, dynamic>{
       'driver': 's3',
-      'bucket': Env.get('AWS_BUCKET'),
-      'region': Env.get('AWS_DEFAULT_REGION', 'us-east-1'),
-      'key': Env.get('AWS_ACCESS_KEY_ID'),
-      'secret': Env.get('AWS_SECRET_ACCESS_KEY'),
-      'endpoint': Env.get('AWS_ENDPOINT'), // R2, MinIO, Spaces
+      'bucket': env.awsBucket,
+      'region': env.awsDefaultRegion,
+      'key': env.awsAccessKeyId,
+      'secret': env.awsSecretAccessKey,
+      'endpoint': env.awsEndpoint, // R2, MinIO, Spaces
     },
     'memory': <String, dynamic>{'driver': 'memory'},
   },
 );
+```
+
+The `s3` disk reads five keys that a new project does not have yet. Add them to
+`lib/config/env.dart` and run `dart run build_runner build`. They are nullable,
+so the app still starts without them when you do not use S3:
+
+```dart title="lib/config/env.dart"
+  String? get awsBucket;
+
+  String get awsDefaultRegion => 'us-east-1';
+
+  String? get awsAccessKeyId;
+
+  String? get awsSecretAccessKey;
+
+  /// R2, MinIO or Spaces. Null for AWS.
+  String? get awsEndpoint;
 ```
 
 Then pass it to `AppConfig(storage: storage)` in `lib/config/app.dart`.

@@ -13,22 +13,31 @@ Give the `local` disk a `url`. `Storage().url()` uses it to build the public URL
 
 ```dart title="lib/config/storage.dart"
 import 'package:dox_core/dox_core.dart';
+import 'package:my_app/config/env.dart';
 
 StorageConfig storage = StorageConfig(
-  defaultDisk: Env.get('STORAGE_DISK', 'local'),
+  defaultDisk: env.storageDisk,
   disks: <String, Map<String, dynamic>>{
     /// uploads go to the `storage` folder.
     /// `url` is the public address of `Route.files('files', ...)`.
     'local': <String, dynamic>{
       'driver': 'local',
       'root': 'storage',
-      'url': '${Env.get('APP_URL', 'http://localhost:3000')}/files',
+      'url': '${env.appUrl}/files',
     },
   },
 );
 ```
 
-Add `APP_URL=http://localhost:3000` to your `.env`.
+`APP_URL` is a new key. Add a getter for it to the `AppEnv` class:
+
+```dart title="lib/config/env.dart"
+  /// the public URL of this app, used in file links
+  String get appUrl => 'http://localhost:3000';
+```
+
+Run `dart run build_runner build` to update `env.g.dart`.
+Then add `APP_URL=http://localhost:3000` to your `.env`.
 
 ## 2. Write the DTO
 

@@ -1,80 +1,66 @@
 # dox_openapi
 
-Make an OpenAPI 3.1 document for a Dox app. Output it as JSON and YAML, and
-show it in a Scalar (or Swagger UI) page.
+Make an OpenAPI 3.1 document (JSON and YAML) and serve it with a Scalar or Swagger UI docs page.
 
-In a Dox app you write no docs code: `dox_builder` reads your routes,
-request classes and controllers, and `dox_core` serves `/docs`.
-See the [OpenAPI docs](https://dartondox.dev/packages/openapi/).
-The API below is for describing routes by hand.
+[![pub package](https://img.shields.io/pub/v/dox_openapi.svg)](https://pub.dev/packages/dox_openapi)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/develop/LICENSE)
 
-## Describe your API
+Part of [Dox](https://dartondox.dev), a web backend framework for Dart, like Laravel.
+Source code: [github.com/dartondox/dox](https://github.com/dartondox/dox).
+
+## Install
+
+In a Dox app you do not add it and you write no docs code.
+`dox_builder` reads your routes, DTOs and controllers, and `dox_core` serves `/docs`.
+To use it on its own:
+
+```bash
+dart pub add dox_openapi
+```
+
+Dox 3.x is in alpha (`3.0.0-alpha.4`). The API can still change before the stable release.
+
+## Use it
+
+Describe routes by hand with `ApiDoc`:
 
 ```dart
 import 'package:dox_openapi/dox_openapi.dart';
 
-ApiDoc docs = ApiDoc();
-Map<String, dynamic> user = docs.schema('User', userSchema); // returns a $ref
+void main() async {
+  ApiDoc docs = ApiDoc();
+  docs.route('GET', '/users/{id}',
+      summary: 'Get one user',
+      tags: <String>['users'],
+      params: <String, Object>{'id': <String, dynamic>{'type': 'integer'}},
+      responses: <int, ResponseDoc>{
+        404: const ResponseDoc(description: 'Not found'),
+      });
 
-docs.route('GET', '/users/{id}',
-    summary: 'Get one user',
-    tags: <String>['users'],
-    params: <String, Object>{'id': <String, dynamic>{'type': 'integer'}},
-    query: pageSchema, // object schema, each property becomes a query param
-    responses: <int, ResponseDoc>{200: ResponseDoc(schema: user, description: 'The user')},
-    security: <Map<String, List<String>>>[<String, List<String>>{'bearerAuth': <String>[]}]);
+  OpenApi api = OpenApi(info: const Info(title: 'My API', version: '1.0.0'), docs: docs);
 
-OpenApi api = OpenApi(
-  info: const Info(title: 'My API', version: '1.0.0'),
-  servers: const <Server>[Server('https://api.example.com')],
-  securitySchemes: <String, SecurityScheme>{'bearerAuth': SecurityScheme.bearer()},
-  docs: docs,
-);
+  print(api.toYaml());
+  await api.writeFiles('storage/openapi'); // openapi.json + openapi.yaml
+
+  OpenApiServer server = OpenApiServer(api);
+  OpenApiResponse? page = server.handle('/docs'); // page.body, page.contentType
+}
 ```
 
-A schema can be:
+## Features
 
-- a raw `Map<String, dynamic>` (JSON Schema),
-- a `JsonSchemaSource`,
-- any object with a `toJsonSchema()` method, for example a `dox_validation` schema.
+- OpenAPI 3.1 output as a `Map`, JSON text or YAML.
+- `OpenApiServer` answers `/docs`, `/openapi.json` and `/openapi.yaml`. It does not need a router.
+- Scalar docs page by default. `DocsUi.swagger` gives Swagger UI.
+- A schema can be a JSON Schema `Map`, a `dox_validation` schema, or any object with `toJsonSchema()`.
+- `DoxRouteAdapter` adds a basic entry for each route you did not describe.
+- Paths with `{id}` or `:id` both become `{id}`.
 
-Paths can use `{id}` or `:id`. Both become `{id}`.
+## Documentation
 
-## Add the routes you did not document
+- [OpenAPI](https://dartondox.dev/latest/packages/openapi/)
+- [API reference](https://pub.dev/documentation/dox_openapi/latest/)
 
-```dart
-DoxRouteAdapter(securityByMiddleware: <String, List<Map<String, List<String>>>>{
-  'AuthMiddleware': <Map<String, List<String>>>[<String, List<String>>{'bearerAuth': <String>[]}],
-}).addTo(docs, Route().routes);
-```
+## License
 
-Each new route gets a basic entry. Routes with docs are not changed.
-Methods OpenAPI does not support (`PURGE`, `COPY`, ...) are skipped.
-
-## Output
-
-```dart
-api.toJson();            // Map
-api.toJsonString();      // pretty JSON
-api.toYaml();            // YAML
-await api.writeFiles('storage/openapi'); // openapi.json + openapi.yaml
-```
-
-## Serve it
-
-`OpenApiServer` does not depend on a router. It returns body text and a
-content type for `/openapi.json`, `/openapi.yaml` and `/docs`.
-
-```dart
-OpenApiServer server = OpenApiServer(api);
-OpenApiResponse? res = server.handle('/docs'); // res.body, res.contentType
-```
-
-`/docs` uses Scalar. Pass `ui: DocsUi.swagger` for Swagger UI, and
-`scalar: ScalarOptions(theme: ScalarTheme.moon, darkMode: true)` to
-change the Scalar page.
-
-## CLI
-
-`generateOpenApi(api, outputDir, routes: Route().routes)` adds the routes
-and writes both files. The `dox openapi:generate` command can call it.
+MIT. See [LICENSE](https://github.com/dartondox/dox/blob/develop/LICENSE).

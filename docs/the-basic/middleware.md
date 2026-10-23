@@ -23,14 +23,19 @@ dox create:middleware Logger
 ```dart title="lib/app/http/middleware/logger.middleware.dart"
 import 'package:dox_core/dox_core.dart';
 
-class LoggerMiddleware implements IDoxMiddleware {
+class LoggerMiddleware implements IDoxMiddleware { // (1)!
   @override
-  dynamic handle(IDoxRequest req) {
+  dynamic handle(IDoxRequest req) { // (2)!
     print('${req.method} ${req.uri.path}');
-    return req; // go on to the controller
+    return req; // (3)!
   }
 }
 ```
+
+1.  `IDoxMiddleware` is the interface for a class middleware. Dox calls its `handle` method.
+2.  `handle` gets the request. It can be `async`. Dox waits for it.
+3.  Return the request to go on to the next middleware, then the controller.
+    Return anything else, like `response(...)`, and Dox sends that as the response.
 
 Then put it on a route:
 
@@ -111,6 +116,17 @@ AppConfig appConfig = AppConfig(
 ```
 
 The order is: global middleware, then router middleware, then group middleware, then route middleware.
+
+```mermaid
+flowchart LR
+    Q["Request"] --> G["Global<br>globalMiddleware"]
+    G --> R["Router<br>middleware getter"]
+    R --> P["Group<br>Route.middleware"]
+    P --> T["Route<br>list before the controller"]
+    T --> C["Controller"]
+    C --> S["Response"]
+    G & R & P & T -.->|"returns a value or throws"| S
+```
 
 !!! tip "Built-in middleware"
     - `LogMiddleware` from `dox_core` writes one JSON log line per request.

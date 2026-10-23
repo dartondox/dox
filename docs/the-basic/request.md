@@ -7,12 +7,25 @@ This page shows how to read input, files, headers and cookies from a request.
 Ask for a [DTO](validation.md) in your controller. Dox reads the body (or the query for `GET`), checks it, and gives you a typed object.
 
 ```dart
-class ApiController {
-  Future<String> sayHello(HelloInput input) async {
-    return 'Hello ${input.name}';
+Route.put('/users/{id}', controller.update);
+
+class UserController {
+  Future<User?> update( // (1)!
+    int id, // (2)!
+    UpdateUser input, // (3)!
+  ) async {
+    User? user = await User().find(id);
+    user?.name = input.name;
+    await user?.save();
+    return user;
   }
 }
 ```
+
+1.  The return value is the response. Dox waits for a `Future`.
+    A `String` is sent as text. A `Map` or a model is sent as JSON.
+2.  A path param. It is `{id}` from the route. `/users/abc` answers `404`, because `abc` is not an `int`.
+3.  A DTO. Dox reads the body, checks it, and builds the object before this method runs.
 
 Bad input gets `422` before your method runs. See [Validation](validation.md).
 

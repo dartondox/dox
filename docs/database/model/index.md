@@ -28,20 +28,20 @@ dart run build_runner build
 ```dart title="lib/app/models/blog/blog.model.dart"
 import 'package:dox_orm/dox_orm.dart';
 
-part 'blog.model.g.dart';
+part 'blog.model.g.dart'; // (1)!
 
-@DoxModel()
-class Blog extends BlogGenerator {
-  @Column()
+@DoxModel() // (2)!
+class Blog extends BlogGenerator { // (3)!
+  @Column() // (4)!
   String? title;
 
-  @Column(beforeSave: makeSlug)
+  @Column(beforeSave: makeSlug) // (5)!
   String? slug;
 
   @Column()
   String? status;
 
-  @Column(name: 'body')
+  @Column(name: 'body') // (6)!
   String? description;
 
   @Column(name: 'user_id')
@@ -52,6 +52,14 @@ class Blog extends BlogGenerator {
   }
 }
 ```
+
+1.  `build_runner` writes this file. It holds the generated `BlogGenerator` class.
+2.  Marks the class as a model. The options, like `table` and `softDelete`, go here.
+    The table is `blog` by default: the class name in snake_case.
+3.  The generated class gives the model `id`, `createdAt` and `updatedAt`, and the query builder methods.
+4.  One `@Column()` field is one table column. The column name is the field name in snake_case.
+5.  `beforeSave` runs this static function before a save. It gets all values and returns the value for this column.
+6.  `name` sets the column name when it is not the snake_case of the field. `description` reads and writes `body`.
 
 - The model gets an `id` field, and `createdAt` and `updatedAt` fields. You do not declare them.
 - Each `@Column()` field is one table column.
@@ -330,3 +338,38 @@ await blog.save();
 A model can load related models.
 See [HasOne](relationship/has-one.md), [HasMany](relationship/has-many.md),
 [BelongsTo](relationship/belongs-to.md) and [ManyToMany](relationship/many-to-many.md).
+
+The relationship pages use these tables:
+
+```mermaid
+erDiagram
+    user ||--o| user_info : "HasOne"
+    user ||--o{ post : "HasMany"
+    user ||--o{ comment : "BelongsTo, from comment"
+    artist ||--o{ artist_song : "ManyToMany"
+    song ||--o{ artist_song : "ManyToMany"
+    user {
+        int id PK
+        string name
+    }
+    user_info {
+        int id PK
+        int user_id FK
+        string address
+    }
+    post {
+        int id PK
+        int user_id FK
+        string title
+    }
+    comment {
+        int id PK
+        int user_id FK
+        string content
+    }
+    artist_song {
+        int id PK
+        int artist_id FK
+        int song_id FK
+    }
+```

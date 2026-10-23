@@ -98,6 +98,16 @@ Dart SDK issue). Dox has no `bindSecure`.
 Run Dox on plain HTTP on a private port. Put [Caddy](https://caddyserver.com)
 or nginx in front of it. The proxy does TLS, HTTP/2 and gzip.
 
+The whole setup looks like this:
+
+```mermaid
+flowchart LR
+    C["Client"] -->|HTTPS| X["Caddy or nginx<br>TLS, HTTP/2, gzip, body size limit"]
+    X -->|"plain HTTP on 127.0.0.1:3000"| D["Dox binary<br>bin/server, one isolate per core"]
+    D -->|"one pool per isolate"| DB[("Database")]
+    M["Migrations<br>bin/server.dart runs them once, before the server starts"] --> DB
+```
+
 Then tell Dox to trust the proxy, so `req.ip()` and `req.scheme()` show the
 real client:
 

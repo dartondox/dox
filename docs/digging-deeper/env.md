@@ -4,7 +4,11 @@ Declare your env keys once, in a typed class. Then `env.appPort` is an `int`, yo
 
 ## The typed env class
 
-```dart title="lib/config/env.dart"
+A new project already has `lib/config/env.dart`, with the keys the config files read. The list is in the [Env reference](../reference/env.md#read-by-a-new-project).
+
+This example class shows the kinds of getters you can write:
+
+```dart
 import 'package:dox_core/dox_core.dart';
 
 part 'env.g.dart';
@@ -33,7 +37,7 @@ abstract class AppEnv {
 final AppEnv env = AppEnv.load();
 ```
 
-Run `dart run build_runner build` (or `dox build_runner:build`). It writes `env.g.dart`.
+Run `dart run build_runner build` (or `dox build_runner:build`) after each change to the class. It writes `env.g.dart`.
 
 Use it anywhere:
 
@@ -139,9 +143,9 @@ AppEnv env = AppEnv.load(
 );
 ```
 
-## Env.get: dynamic keys
+## Env.get: the low-level way
 
-`Env.get()` still works. Use it for a key you only know at run time. For normal config, use the typed class.
+`Env.get()` reads one key by name. Use it for a key you only know at run time. For normal config, use the typed class.
 
 ```dart
 Env.get<String>('APP_KEY');             // '' when missing

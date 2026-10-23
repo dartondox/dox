@@ -66,7 +66,7 @@ class AuthService implements DoxService {
       defaultGuard: 'web',
       guards: <String, AuthGuard>{
         'web': AuthGuard(
-          driver: JwtAuthDriver(secret: SecretKey(Env.get('APP_KEY'))),
+          driver: JwtAuthDriver(secret: SecretKey(env.appKey)),
           provider: AuthProvider(model: () => User()),
         ),
       },
