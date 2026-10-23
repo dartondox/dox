@@ -4229,7 +4229,7 @@ A real environment variable wins over <code>.env</code>, the same as <code>Env.g
 <li><code>DB_DATABASE</code> works too, in place of <code>DB_NAME</code>.</li>
 <li>The default port is <code>5432</code> for Postgres and <code>3306</code> for MySQL.</li>
 <li>One run uses one database connection.</li>
-<li>A <code>DB_HOST</code> that starts with <code>/</code> is a Postgres Unix socket folder, like <code>/cloudsql/project:region:instance</code>.</li>
+<li>A <code>DB_HOST</code> that starts with <code>/</code> is a Unix socket: the socket folder for Postgres, the socket file for MySQL. Eg. <code>/cloudsql/project:region:instance</code>.</li>
 <li>Migrations use TLS only with a <code>DATABASE_URL</code> that has <code>sslmode</code> (Postgres) or <code>ssl</code> (MySQL), like <code>?sslmode=require</code>.
   You can also give your own connection: <code>Migrator(migrations: migrations, connection: myPool)</code>.</li>
 </ul>

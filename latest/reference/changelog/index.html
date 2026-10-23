@@ -4246,6 +4246,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha5_7" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4327,6 +4338,17 @@
   
     <nav class="md-nav" aria-label="dox_mysql_native">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha5_8" class="md-nav__link">
@@ -4460,6 +4482,17 @@
   
     <nav class="md-nav" aria-label="dox_orm">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha5_10" class="md-nav__link">
@@ -5557,6 +5590,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha5_7" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5638,6 +5682,17 @@
   
     <nav class="md-nav" aria-label="dox_mysql_native">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha5_8" class="md-nav__link">
@@ -5771,6 +5826,17 @@
   
     <nav class="md-nav" aria-label="dox_orm">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha5_10" class="md-nav__link">
@@ -6558,6 +6624,10 @@
 <li>The build hook downloads a ready-built library. No Rust needed.</li>
 </ul>
 <h2 id="dox_migration">dox_migration</h2>
+<h3 id="unreleased_1">Unreleased</h3>
+<ul>
+<li>A <code>DB_HOST</code> that starts with <code>/</code> is a MySQL Unix socket file too (Postgres: the socket folder). <code>?socket=/path</code> works in a <code>mysql://</code> <code>DATABASE_URL</code>.</li>
+</ul>
 <h3 id="300-alpha5_7">3.0.0-alpha.5</h3>
 <ul>
 <li><code>DATABASE_URL</code> support. When it is set, it wins over <code>DB_CONNECTION</code> and the other <code>DB_*</code> keys. Its <code>sslmode</code> (Postgres) or <code>ssl</code> (MySQL) option turns TLS on.</li>
@@ -6597,6 +6667,10 @@
 <li>Fix statement split: <code>;</code> inside quotes, comments or <code>$$</code> bodies does not split</li>
 </ul>
 <h2 id="dox_mysql_native">dox_mysql_native</h2>
+<h3 id="unreleased_2">Unreleased</h3>
+<ul>
+<li>Unix sockets. In <code>MysqlNativePool.open()</code>, a <code>host</code> that starts with <code>/</code> is the socket file. <code>fromUrl()</code> takes <code>?socket=/path</code>.</li>
+</ul>
 <h3 id="300-alpha5_8">3.0.0-alpha.5</h3>
 <ul>
 <li>The hook comment says how to fill the sha256 list from a release: <code>dart run bin/native_hashes.dart &lt;tag&gt;</code>. The list stays empty until the first release.</li>
@@ -6655,6 +6729,10 @@
 <li>Output as JSON and YAML, write files, serve <code>/openapi.json</code>, <code>/openapi.yaml</code> and <code>/docs</code>.</li>
 </ul>
 <h2 id="dox_orm">dox_orm</h2>
+<h3 id="unreleased_3">Unreleased</h3>
+<ul>
+<li>MySQL and MariaDB Unix sockets. A host that starts with <code>/</code> is the socket file, like <code>/var/run/mysqld/mysqld.sock</code> or <code>/cloudsql/project:region:instance</code> on Cloud Run. Works on the native and the Dart driver. In a url, use <code>?socket=/path</code> or <code>?host=/path</code>.</li>
+</ul>
 <h3 id="300-alpha5_10">3.0.0-alpha.5</h3>
 <ul>
 <li><code>DATABASE_URL</code> support. <code>ConnectionConfig.fromUrl()</code> reads <code>postgres://</code>, <code>postgresql://</code>, <code>mysql://</code>, <code>mariadb://</code>, <code>sqlite:</code> and <code>file:</code> urls: url-decoded user and password, host, port, database, <code>sslmode</code> and other options (they go to <code>extra</code>).</li>

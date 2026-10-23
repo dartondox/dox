@@ -4126,9 +4126,10 @@ So do not set <code>APP_PORT</code> on Cloud Run. The app then follows <code>POR
 <li>Find the connection name of the instance: <code>gcloud sql instances describe INSTANCE --format='value(connectionName)'</code>. It looks like <code>PROJECT_ID:europe-west1:INSTANCE</code>.</li>
 <li>Deploy with <code>--add-cloudsql-instances &lt;connection name&gt;</code> (step 4). Cloud Run then makes the socket in <code>/cloudsql/&lt;connection name&gt;</code>.</li>
 <li>Give the service account the <code>roles/cloudsql.client</code> role.</li>
-<li>Set <code>DB_HOST=/cloudsql/&lt;connection name&gt;</code>. A host that starts with <code>/</code> is a Unix socket folder. See <a href="../../database/#unix-socket">Unix socket</a>.</li>
+<li>Set <code>DB_HOST=/cloudsql/&lt;connection name&gt;</code>. A host that starts with <code>/</code> is a Unix socket. See <a href="../../database/#unix-socket">Unix socket</a>.</li>
 </ol>
 <p>The same with one url: <code>DATABASE_URL=postgres://blog:&lt;password&gt;@/blog?host=/cloudsql/&lt;connection name&gt;</code>.</p>
+<p>For <strong>Cloud SQL for MySQL</strong>, use the same <code>DB_HOST</code> with <code>DB_CONNECTION=mysql</code>. Leave out <code>DB_PORT</code>. Or use one url: <code>DATABASE_URL=mysql://blog:&lt;password&gt;@/blog?socket=/cloudsql/&lt;connection name&gt;</code>.</p>
 <p>To use the <strong>private IP</strong> instead: give the instance a private IP on your VPC network, deploy with Direct VPC egress (<code>--network default --subnet default --vpc-egress private-ranges-only</code>), and use the private IP as <code>DB_HOST</code>.</p>
 <p>Do not use SQLite on Cloud Run. The file system of an instance is in memory, and each instance has its own. The data is lost when the instance stops.</p>
 <h2 id="4-deploy-from-source">4. Deploy from source</h2>

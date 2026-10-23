@@ -6537,7 +6537,7 @@ DATABASE_URL=postgres://app:s%40cret@db.example.com:5432/blog?sslmode=require
 - No port: `5432` for Postgres, `3306` for MySQL.
 - `sslmode`: `disable`, `allow` and `prefer` mean no TLS. `verify-full` checks the server certificate. Other values, like `require`, turn TLS on. For MySQL, `ssl=true` works too.
 - The native Postgres driver has no TLS yet. With TLS on, Postgres uses the Dart driver.
-- `host=/cloudsql/project:region:instance` connects to a Postgres Unix socket. See [Unix socket](#unix-socket).
+- `host=/path` (or `socket=/path`) connects to a Unix socket, like `host=/cloudsql/project:region:instance`. See [Unix socket](#unix-socket).
 - Any other option goes to `extra`, like `?maxConnectionCount=20`. A number becomes an `int`, `true` and `false` a `bool`.
 
 The ORM reads `DATABASE_URL` from the real environment, not from `.env`.
@@ -6557,7 +6557,7 @@ To make one `ConnectionConfig` from a url, use `ConnectionConfig.fromUrl(url)`.
 
 ### Unix socket
 
-A Postgres host that starts with `/` is a Unix socket folder, like in libpq.
+A host that starts with `/` is a Unix socket.
 Google Cloud SQL on Cloud Run uses `/cloudsql/PROJECT:REGION:INSTANCE`.
 
 ```bash
@@ -6566,9 +6566,22 @@ DB_HOST=/cloudsql/my-project:europe-west1:blog
 DATABASE_URL=postgres://blog:secret@/blog?host=/cloudsql/my-project:europe-west1:blog
 ```
 
+**Postgres**: the host is the socket folder, like in libpq.
 Both the native and the Dart Postgres driver use the socket file `<folder>/.s.PGSQL.<port>`.
 A host that already ends with `/.s.PGSQL.5432` works too.
-MySQL sockets are not supported.
+
+**MySQL and MariaDB**: the host is the socket file itself. The port is not used.
+On Cloud SQL, the socket file is `/cloudsql/PROJECT:REGION:INSTANCE`.
+A local server often uses `/var/run/mysqld/mysqld.sock` or `/tmp/mysql.sock`.
+
+```bash
+DB_CONNECTION=mysql
+DB_HOST=/var/run/mysqld/mysqld.sock
+# or
+DATABASE_URL=mysql://app:secret@/app?socket=/var/run/mysqld/mysqld.sock
+```
+
+`?socket=` and `?host=` do the same thing. Both the native and the Dart MySQL driver use the socket.
 
 ### `extra` options
 
@@ -7360,7 +7373,7 @@ DB_NAME=storage/app.db # file path, made if missing
 - `DB_DATABASE` works too, in place of `DB_NAME`.
 - The default port is `5432` for Postgres and `3306` for MySQL.
 - One run uses one database connection.
-- A `DB_HOST` that starts with `/` is a Postgres Unix socket folder, like `/cloudsql/project:region:instance`.
+- A `DB_HOST` that starts with `/` is a Unix socket: the socket folder for Postgres, the socket file for MySQL. Eg. `/cloudsql/project:region:instance`.
 - Migrations use TLS only with a `DATABASE_URL` that has `sslmode` (Postgres) or `ssl` (MySQL), like `?sslmode=require`.
   You can also give your own connection: `Migrator(migrations: migrations, connection: myPool)`.
 
@@ -14372,9 +14385,11 @@ Dox can use both. The Unix socket needs no VPC, so this guide uses it:
 1. Find the connection name of the instance: `gcloud sql instances describe INSTANCE --format='value(connectionName)'`. It looks like `PROJECT_ID:europe-west1:INSTANCE`.
 2. Deploy with `--add-cloudsql-instances <connection name>` (step 4). Cloud Run then makes the socket in `/cloudsql/<connection name>`.
 3. Give the service account the `roles/cloudsql.client` role.
-4. Set `DB_HOST=/cloudsql/<connection name>`. A host that starts with `/` is a Unix socket folder. See [Unix socket](../database/index.md#unix-socket).
+4. Set `DB_HOST=/cloudsql/<connection name>`. A host that starts with `/` is a Unix socket. See [Unix socket](../database/index.md#unix-socket).
 
 The same with one url: `DATABASE_URL=postgres://blog:<password>@/blog?host=/cloudsql/<connection name>`.
+
+For **Cloud SQL for MySQL**, use the same `DB_HOST` with `DB_CONNECTION=mysql`. Leave out `DB_PORT`. Or use one url: `DATABASE_URL=mysql://blog:<password>@/blog?socket=/cloudsql/<connection name>`.
 
 To use the **private IP** instead: give the instance a private IP on your VPC network, deploy with Direct VPC egress (`--network default --subnet default --vpc-egress private-ranges-only`), and use the private IP as `DB_HOST`.
 
@@ -15892,7 +15907,7 @@ The code reads env vars in three ways:
 | `DOX_DB_DRIVER` | `dox_orm` (`NativeDrivers.wanted()`) | not set (native driver) | `dart` uses the Dart `postgres` / `mysql_dart` driver instead of the native (Rust) one. Same as `extra: {'native': false}`. Real environment only. | `DOX_DB_DRIVER=dart` |
 | `DATABASE_URL` | `dox_orm` (`DatabaseConfig.url`), `dox_migration` | not set | A database url. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. `dox_orm` reads it from the real environment only. See [Database url](../database/index.md#database_url). | `DATABASE_URL=postgres://app:secret@db:5432/blog?sslmode=require` |
 | `DB_CONNECTION` | `dox_migration` (`DbConnection.open()`) | postgres | `postgres`, `mysql` or `sqlite`. Any other value means postgres. | `DB_CONNECTION=sqlite` |
-| `DB_HOST` | `dox_migration` | `localhost` | Database host. A path that starts with `/` is a Postgres Unix socket folder. | `DB_HOST=127.0.0.1` |
+| `DB_HOST` | `dox_migration` | `localhost` | Database host. A path that starts with `/` is a Unix socket: the folder for Postgres, the socket file for MySQL. | `DB_HOST=127.0.0.1` |
 | `DB_PORT` | `dox_migration` | `5432` (postgres), `3306` (mysql) | Database port. | `DB_PORT=5432` |
 | `DB_USERNAME` | `dox_migration` | `postgres` (postgres), `root` (mysql) | Database user. | `DB_USERNAME=app` |
 | `DB_PASSWORD` | `dox_migration` | `postgres` (postgres), empty (mysql) | Database password. | `DB_PASSWORD=secret` |
@@ -17154,6 +17169,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_migration
 
+### Unreleased
+
+- A `DB_HOST` that starts with `/` is a MySQL Unix socket file too (Postgres: the socket folder). `?socket=/path` works in a `mysql://` `DATABASE_URL`.
+
 ### 3.0.0-alpha.5
 
 - `DATABASE_URL` support. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. Its `sslmode` (Postgres) or `ssl` (MySQL) option turns TLS on.
@@ -17193,6 +17212,10 @@ What changed in each package, newest first. This page is made from the
 - Fix statement split: `;` inside quotes, comments or `$$` bodies does not split
 
 ## dox_mysql_native
+
+### Unreleased
+
+- Unix sockets. In `MysqlNativePool.open()`, a `host` that starts with `/` is the socket file. `fromUrl()` takes `?socket=/path`.
 
 ### 3.0.0-alpha.5
 
@@ -17253,6 +17276,10 @@ What changed in each package, newest first. This page is made from the
 - Output as JSON and YAML, write files, serve `/openapi.json`, `/openapi.yaml` and `/docs`.
 
 ## dox_orm
+
+### Unreleased
+
+- MySQL and MariaDB Unix sockets. A host that starts with `/` is the socket file, like `/var/run/mysqld/mysqld.sock` or `/cloudsql/project:region:instance` on Cloud Run. Works on the native and the Dart driver. In a url, use `?socket=/path` or `?host=/path`.
 
 ### 3.0.0-alpha.5
 
