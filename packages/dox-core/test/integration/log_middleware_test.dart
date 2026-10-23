@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 
 import '../utils/start_http_server.dart';
 
-const int port = 50085;
+int get port => Dox().server.httpServer.port;
 
 /// the server runs in another isolate, so the filter writes the log
 /// line to a file
@@ -31,7 +31,8 @@ void main() {
     await startHttpServer(
       AppConfig(
         appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
-        serverPort: port,
+        // the OS picks a free port, so test files can run in parallel
+        serverPort: 0,
         totalIsolate: 1,
         routers: <Router>[LogRouter()],
         globalMiddleware: <dynamic>[
