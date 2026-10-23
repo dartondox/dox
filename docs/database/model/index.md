@@ -76,6 +76,7 @@ All options go in `@DoxModel(...)`.
 | `primaryKeyType` | `int` | The Dart type of the primary key, like `String` for a UUID. |
 | `createdAt` | `'created_at'` | The column that keeps the create time. |
 | `updatedAt` | `'updated_at'` | The column that keeps the last update time. |
+| `timestamps` | `true` | `false` turns off `createdAt` and `updatedAt`. |
 | `softDelete` | `false` | `delete()` sets `deleted_at` and keeps the row. |
 
 ### `table`
@@ -132,6 +133,17 @@ class Blog extends BlogGenerator {}
 ```
 
 Read the values with `blog.createdAt` and `blog.updatedAt`.
+
+### `timestamps`
+
+Set `timestamps: false` when the table has no `created_at` and `updated_at` columns.
+
+```dart
+@DoxModel(timestamps: false)
+class Setting extends SettingGenerator {}
+```
+
+To turn off only one of them, set it to `null`, like `@DoxModel(updatedAt: null)`.
 
 ### `softDelete`
 

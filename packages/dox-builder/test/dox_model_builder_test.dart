@@ -149,5 +149,26 @@ class Device {}
 ''');
       expect(out, contains('int? get id => tempIdValue as int?;'));
     });
+
+    test('timestamps: false leaves out created_at and updated_at', () async {
+      String out = await _generate('''
+@DoxModel(timestamps: false)
+class Setting {}
+''');
+      expect(out, contains("'created_at': null"));
+      expect(out, contains("'updated_at': null"));
+      expect(out, isNot(contains('..createdAt')));
+      expect(out, isNot(contains("'created_at' :")));
+    });
+
+    test('updatedAt: null turns off only updated_at', () async {
+      String out = await _generate('''
+@DoxModel(updatedAt: null)
+class Log {}
+''');
+      expect(out, contains("'created_at': 'created_at'"));
+      expect(out, contains("'updated_at': null"));
+      expect(out, isNot(contains('..updatedAt')));
+    });
   });
 }

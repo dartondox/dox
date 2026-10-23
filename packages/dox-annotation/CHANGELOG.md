@@ -1,5 +1,6 @@
 ## Unreleased
 
+- New `timestamps` option on `@DoxModel`. `timestamps: false` turns off `created_at` and `updated_at`, like `$timestamps = false` in Laravel. `createdAt: null` or `updatedAt: null` turns off one of them.
 - New `primaryKeyType` option on `@DoxModel`. Use `primaryKeyType: String` for a UUID key. The default is `int`.
 
 ## 3.0.0-alpha.4

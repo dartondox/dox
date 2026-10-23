@@ -63,8 +63,11 @@ class ModelSchema {
             );
       properties[key] = await types.of(field.type) ?? <String, dynamic>{};
     }
+    bool timestamps = options?.getField('timestamps')?.toBoolValue() ?? true;
     for (String name in <String>['createdAt', 'updatedAt']) {
-      String? key = options?.getField(name)?.toStringValue();
+      String? key = timestamps
+          ? options?.getField(name)?.toStringValue()
+          : null;
       if (key != null) properties[toSnakeCase(key)] = _timestamp;
     }
     for (GetterElement getter in model.getters) {

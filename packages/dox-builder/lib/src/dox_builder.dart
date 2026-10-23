@@ -33,6 +33,10 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         ?.toStringValue();
     bool softDelete =
         annotation.objectValue.getField('softDelete')?.toBoolValue() ?? false;
+    if (annotation.objectValue.getField('timestamps')?.toBoolValue() == false) {
+      createdAt = null;
+      updatedAt = null;
+    }
 
     final visitor = ModelVisitor();
 
