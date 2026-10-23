@@ -166,18 +166,29 @@ jobs:
             export PUB_TOKEN
             dart pub token add https://pub.dev --env-var PUB_TOKEN
           }
+          # Wait only where it is needed: right before a package is published,
+          # wait until each Dox package it depends on (dev_dependencies too)
+          # resolves with `dart pub get`. Packages with no Dox dependency go
+          # out back to back. A dependency that resolved once is not checked
+          # again.
+          resolved=" "
           for entry in $PACKAGES; do
             dir=${entry%%:*}
             name=${entry##*:}
             if has_version "$name"; then
               echo "$name $VERSION is already on pub.dev. Skipping."
-              # A re-run after a failure: make sure the client sees it too.
-              wait_resolvable "$name" 20 30
               continue
             fi
+            for other in $PACKAGES; do
+              dep=${other##*:}
+              if [ "$dep" != "$name" ] && grep -qE "^[[:space:]]+$dep:" "packages/$dir/pubspec.yaml" \
+                && [ "${resolved#* $dep }" = "$resolved" ]; then
+                wait_resolvable "$dep" 40 15
+                resolved="$resolved$dep "
+              fi
+            done
             echo "::group::Publish $name $VERSION"
             refresh_pub_token
             (cd "packages/$dir" && dart pub publish --force)
             echo "::endgroup::"
-            wait_resolvable "$name" 20 30
           done
