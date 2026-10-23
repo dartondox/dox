@@ -25,6 +25,18 @@ void main() {
       expect(proxy.scheme('10.1.2.3', 'HTTPS, http'), 'https');
     });
 
+    test('wildcard trusts only the direct peer, not the hops', () {
+      TrustedProxy proxy = TrustedProxy(<String>['*']);
+      // the client sent `X-Forwarded-For: 6.6.6.6`, the proxy added its ip
+      expect(proxy.clientIp('10.1.2.3', '6.6.6.6, 1.2.3.4'), '1.2.3.4');
+      expect(proxy.clientIp('10.1.2.3', '1.2.3.4'), '1.2.3.4');
+      expect(proxy.scheme('10.1.2.3', 'https'), 'https');
+
+      // a listed range is still skipped
+      TrustedProxy both = TrustedProxy(<String>['*', '10.0.0.0/8']);
+      expect(both.clientIp('9.9.9.9', 'fake, 1.2.3.4, 10.0.0.5'), '1.2.3.4');
+    });
+
     test('ipv4-mapped ipv6 peer matches ipv4 rule', () {
       TrustedProxy proxy = TrustedProxy(<String>['172.16.0.0/12']);
       expect(proxy.trusts('::ffff:172.18.0.2'), true);
