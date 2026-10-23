@@ -38,20 +38,11 @@ jobs:
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
+      # the Dart build hook uses native/target/release when it is there
       - name: Rust checks
-        working-directory: packages/dox-http-native/native
-        run: |
-          cargo fmt --check
-          cargo clippy --release --all-targets -- -D warnings
-          cargo test
-          cargo build --release
-      # the build hook uses native/target/release when it is there
+        run: ci/rust-check.sh dox-http-native
       - name: Dart tests
-        working-directory: packages/dox-http-native
-        run: |
-          dart pub get
-          dart analyze --fatal-infos .
-          dart test --concurrency=1
+        run: ci/native-dart-tests.sh dox-http-native
 
   build:
     if: startsWith(github.ref, 'refs/tags/dox_http_native-v')
@@ -72,12 +63,12 @@ jobs:
         with:
           targets: ${{ matrix.target }}
       - name: Build
-        working-directory: packages/dox-http-native/native
         shell: bash
-        run: |
-          cargo build --release --target ${{ matrix.target }}
-          mkdir -p ../../../dist
-          cp target/${{ matrix.target }}/release/${{ matrix.file }} ../../../dist/${{ matrix.asset }}
+        env:
+          TARGET: ${{ matrix.target }}
+          FILE: ${{ matrix.file }}
+          ASSET: ${{ matrix.asset }}
+        run: bash ci/native-build.sh dox-http-native
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset }}
@@ -89,6 +80,9 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: ci
       - uses: actions/download-artifact@v4
         with:
           path: dist
@@ -97,20 +91,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
-        run: |
-          cd dist
-          sha256sum dox_http_native-* > SHA256SUMS
-          cat SHA256SUMS
-          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload "$TAG" * --clobber --repo "$GITHUB_REPOSITORY"
-          else
-            # never "latest": that stays the framework release.
-            # a version with "-" (like 3.0.0-alpha.2) is a prerelease.
-            pre=""
-            case "$TAG" in *-v*-*) pre="--prerelease" ;; esac
-            gh release create "$TAG" * --repo "$GITHUB_REPOSITORY" $pre --latest=false \
-              --title "$TAG" --notes "Ready-built dox_http_native libraries. See SHA256SUMS."
-          fi
+        run: ci/native-release.sh dox_http_native
 
   # ---- dox_postgres_native ---------------------------------------------
   #
@@ -126,13 +107,10 @@ jobs:
   postgres-test:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       # Postgres boots while the next steps run
       - name: Start Postgres 16
-        run: |
-          docker run -d --name postgres -p 5432:5432 \
-            -e POSTGRES_DB=postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres \
-            --health-cmd pg_isready --health-interval 2s postgres:16
-      - uses: actions/checkout@v4
+        run: ci/start-services.sh postgres
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy, rustfmt
@@ -140,23 +118,14 @@ jobs:
         with:
           sdk: stable
       - name: Wait for Postgres
-        run: timeout 90 sh -c "until [ \"\$(docker inspect -f '{{.State.Health.Status}}' postgres)\" = healthy ]; do sleep 1; done"
+        run: ci/wait-services.sh postgres
+      # the Dart build hook uses native/target/release when it is there
       - name: Rust checks
-        working-directory: packages/dox-postgres-native/native
         env:
           PG_URL: postgres://postgres:postgres@localhost:5432/postgres
-        run: |
-          cargo fmt --check
-          cargo clippy --release --all-targets -- -D warnings
-          cargo test --release
-          cargo build --release
-      # the build hook uses native/target/release when it is there
+        run: ci/rust-check.sh dox-postgres-native --release
       - name: Dart tests
-        working-directory: packages/dox-postgres-native
-        run: |
-          dart pub get
-          dart analyze --fatal-infos .
-          DRIVER=postgres DB_PORT=5432 dart test --concurrency=1
+        run: ci/native-dart-tests.sh dox-postgres-native
 
   postgres-build:
     if: startsWith(github.ref, 'refs/tags/dox_postgres_native-v')
@@ -177,12 +146,12 @@ jobs:
         with:
           targets: ${{ matrix.target }}
       - name: Build
-        working-directory: packages/dox-postgres-native/native
         shell: bash
-        run: |
-          cargo build --release --target ${{ matrix.target }}
-          mkdir -p ../../../dist
-          cp target/${{ matrix.target }}/release/${{ matrix.file }} ../../../dist/${{ matrix.asset }}
+        env:
+          TARGET: ${{ matrix.target }}
+          FILE: ${{ matrix.file }}
+          ASSET: ${{ matrix.asset }}
+        run: bash ci/native-build.sh dox-postgres-native
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset }}
@@ -194,6 +163,9 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: ci
       - uses: actions/download-artifact@v4
         with:
           path: dist
@@ -202,20 +174,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
-        run: |
-          cd dist
-          sha256sum dox_postgres_native-* > SHA256SUMS
-          cat SHA256SUMS
-          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload "$TAG" * --clobber --repo "$GITHUB_REPOSITORY"
-          else
-            # never "latest": that stays the framework release.
-            # a version with "-" (like 3.0.0-alpha.2) is a prerelease.
-            pre=""
-            case "$TAG" in *-v*-*) pre="--prerelease" ;; esac
-            gh release create "$TAG" * --repo "$GITHUB_REPOSITORY" $pre --latest=false \
-              --title "$TAG" --notes "Ready-built dox_postgres_native libraries. See SHA256SUMS."
-          fi
+        run: ci/native-release.sh dox_postgres_native
 
   # ---- dox_mysql_native ------------------------------------------------
   #
@@ -231,17 +190,11 @@ jobs:
   mysql-test:
     runs-on: ubuntu-latest
     steps:
-      # the databases boot while the next steps run
-      - name: Start MySQL 8.4 and MariaDB 11
-        run: |
-          docker run -d --name mariadb -p 3306:3306 \
-            -e MYSQL_USER=dox -e MYSQL_PASSWORD=password -e MYSQL_DATABASE=dox-framework -e MYSQL_ROOT_PASSWORD=password \
-            --health-cmd "healthcheck.sh --connect --innodb_initialized" --health-interval 2s mariadb:11
-          # caching_sha2_password, the default login of MySQL 8.4
-          docker run -d --name mysql84 -p 3307:3306 \
-            -e MYSQL_USER=dox -e MYSQL_PASSWORD=password -e MYSQL_DATABASE=dox-framework -e MYSQL_ROOT_PASSWORD=password \
-            --health-cmd "mysqladmin ping -h127.0.0.1 -udox -ppassword" --health-interval 2s mysql:8.4
       - uses: actions/checkout@v4
+      # the databases boot while the next steps run.
+      # mysql84: caching_sha2_password, the default login of MySQL 8.4
+      - name: Start MySQL 8.4 and MariaDB 11
+        run: ci/start-services.sh mariadb mysql84
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy, rustfmt
@@ -249,29 +202,12 @@ jobs:
         with:
           sdk: stable
       - name: Rust checks
-        working-directory: packages/dox-mysql-native/native
-        run: |
-          cargo fmt --check
-          cargo clippy --release --all-targets -- -D warnings
-          cargo test --release
-          cargo build --release
+        run: ci/rust-check.sh dox-mysql-native --release
       - name: Wait for the databases
-        run: |
-          for s in mariadb mysql84; do
-            timeout 90 sh -c "until [ \"\$(docker inspect -f '{{.State.Health.Status}}' $s)\" = healthy ]; do sleep 1; done"
-          done
-      # the build hook uses native/target/release when it is there
+        run: ci/wait-services.sh mariadb mysql84
+      # the Dart build hook uses native/target/release when it is there
       - name: Dart tests
-        working-directory: packages/dox-mysql-native
-        run: |
-          dart pub get
-          dart analyze --fatal-infos .
-          echo "::group::MariaDB 11"
-          DB_PORT=3306 DB_USER=dox dart test --concurrency=1
-          echo "::endgroup::"
-          echo "::group::MySQL 8.4"
-          DB_PORT=3307 DB_USER=dox dart test --concurrency=1
-          echo "::endgroup::"
+        run: ci/native-dart-tests.sh dox-mysql-native
 
   mysql-build:
     if: startsWith(github.ref, 'refs/tags/dox_mysql_native-v')
@@ -292,12 +228,12 @@ jobs:
         with:
           targets: ${{ matrix.target }}
       - name: Build
-        working-directory: packages/dox-mysql-native/native
         shell: bash
-        run: |
-          cargo build --release --target ${{ matrix.target }}
-          mkdir -p ../../../dist
-          cp target/${{ matrix.target }}/release/${{ matrix.file }} ../../../dist/${{ matrix.asset }}
+        env:
+          TARGET: ${{ matrix.target }}
+          FILE: ${{ matrix.file }}
+          ASSET: ${{ matrix.asset }}
+        run: bash ci/native-build.sh dox-mysql-native
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset }}
@@ -309,6 +245,9 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: ci
       - uses: actions/download-artifact@v4
         with:
           path: dist
@@ -317,17 +256,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
-        run: |
-          cd dist
-          sha256sum dox_mysql_native-* > SHA256SUMS
-          cat SHA256SUMS
-          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload "$TAG" * --clobber --repo "$GITHUB_REPOSITORY"
-          else
-            # never "latest": that stays the framework release.
-            # a version with "-" (like 3.0.0-alpha.2) is a prerelease.
-            pre=""
-            case "$TAG" in *-v*-*) pre="--prerelease" ;; esac
-            gh release create "$TAG" * --repo "$GITHUB_REPOSITORY" $pre --latest=false \
-              --title "$TAG" --notes "Ready-built dox_mysql_native libraries. See SHA256SUMS."
-          fi
+        run: ci/native-release.sh dox_mysql_native
