@@ -116,7 +116,7 @@ See [Environment variables](../digging-deeper/env.md).
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `Exception: Could not connect to database: <error>` | The migrator can not open the database. | Check `DB_*` values. A `.env` file wins over the real env here. See [Troubleshooting](troubleshooting.md#migrations-read-env-instead-of-the-real-environment). |
+| `Exception: Could not connect to database: <error>` | The migrator can not open the database. | Check `DATABASE_URL` or the `DB_*` values. A real env var wins over `.env`. |
 | `Unknown migration command: <cmd> (use run, rollback, reset, refresh or status)` | `dart run bin/migrate.dart <cmd>` with another command. | Use one of the five. |
 | `Invalid argument(s): Invalid option <x>, use --step=<count>` | `rollback` with a bad option. | Use `--step=2`. |
 | `Bad state: Migration <name> is both a Dart and a .sql migration` | Two files with the same name in `db/migration`. | Rename or delete one. |

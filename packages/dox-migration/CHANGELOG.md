@@ -1,3 +1,7 @@
+## Unreleased
+
+- Migrations read real environment variables too. Before, a `.env` file hid them. Now a real env var wins over `.env`, the same as `Env.get()` of dox_core. An empty value, or `null`, counts as missing.
+
 ## 3.0.0-alpha.4
 
 - Version bump only, to match the other packages.

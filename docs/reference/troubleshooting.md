@@ -122,33 +122,6 @@ Until then, pass the version by hand:
 dox create my_app --version 3.0.0-alpha.4
 ```
 
-## Migrations read `.env` instead of the real environment
-
-**Symptom.** `dox migration:run` (or `dart run bin/migrate.dart run`) in Docker or CI fails with
-
-```
-Exception: Could not connect to database: <driver error>
-```
-
-and the host, user or database in the error are the ones from your `.env`, not the ones you set in the environment.
-
-**Cause.** `dox_migration` has its own env loader (`packages/dox-migration/lib/src/utils/env.dart`). When a `.env` file exists in the current folder, it reads only that file. The real environment is used only when there is no `.env`. This is the opposite of `Env.get()` in `dox_core`, where the real environment wins.
-
-**Fix.** Pick one:
-
-- Do not ship a `.env` to the server. `dox build` copies `.env.example`, not `.env`. Set real env vars and leave `.env` out.
-- Put the right values in the `.env` of the server.
-- Open the connection yourself and give it to the migrator in `bin/migrate.dart`:
-
-    ```dart
-    exitCode = await Migrator(
-      migrations: migrations,
-      connection: myPostgresPool,
-    ).run(args);
-    ```
-
-The keys it reads are `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` and `DB_DATABASE` (or `DB_NAME`). See [Environment variables](env.md).
-
 ## A `.env` value with `#`
 
 **Symptom.** The app stops at start with
