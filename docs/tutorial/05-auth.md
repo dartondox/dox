@@ -5,7 +5,7 @@ This step adds register and login with a JWT token, and only lets a logged in us
 ## 1. Add the package
 
 ```bash
-dart pub add dox_auth:^3.0.0-alpha.4
+dart pub add dox_auth:^3.0.0-alpha
 ```
 
 ## 2. Make the users table

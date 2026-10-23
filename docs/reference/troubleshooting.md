@@ -110,16 +110,10 @@ RangeError (index): Invalid value: Only valid value is 0: 1
 
 **Cause.** A bug in the `dox` CLI up to `3.0.0-alpha.4`: the `create` command read the `--version` flag before it checked that one was given. The same versions also downloaded an old project template.
 
-**Fix.** Update the CLI. The fix is in the version after `3.0.0-alpha.4`:
+**Fix.** Update the CLI. The fix is in `3.0.0-alpha.5`:
 
 ```bash
-dart pub global activate dox
-```
-
-Until then, pass the version by hand:
-
-```bash
-dox create my_app --version 3.0.0-alpha.4
+dart pub global activate dox ^3.0.0-alpha
 ```
 
 ## A `.env` value with `#`
@@ -219,7 +213,7 @@ Dox opens a file database with `journal_mode = WAL`, `synchronous = NORMAL`, `fo
 zsh: command not found: dox
 ```
 
-right after `dart pub global activate dox 3.0.0-alpha.4`.
+right after `dart pub global activate dox ^3.0.0-alpha`.
 
 **Cause.** `dart pub global activate` puts the `dox` script in `$HOME/.pub-cache/bin`. That folder is not in your `PATH`.
 

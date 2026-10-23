@@ -13,7 +13,7 @@ Source code: [github.com/dartondox/dox](https://github.com/dartondox/dox).
 The easy way is the `dox` CLI. It makes a full starter project:
 
 ```bash
-dart pub global activate dox 3.0.0-alpha.4
+dart pub global activate dox ^3.0.0-alpha
 dox create my_app
 ```
 
@@ -23,7 +23,7 @@ To add the package to your own project:
 dart pub add dox_core
 ```
 
-Dox 3.x is in alpha (`3.0.0-alpha.4`). The API can still change before the stable release.
+Dox 3.x is in alpha (`3.0.0-alpha.x`). The API can still change before the stable release.
 
 ## Use it
 

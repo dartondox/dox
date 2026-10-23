@@ -38,11 +38,11 @@ environment:
   sdk: ^3.13.0
 
 dependencies:
-  dox_validation: ^3.0.0-alpha.4
+  dox_validation: ^3.0.0-alpha
 
 dev_dependencies:
   build_runner: ^2.17.1
-  dox_builder: ^3.0.0-alpha.4
+  dox_builder: ^3.0.0-alpha
 ```
 
 `dox_builder` is a dev dependency. It only runs when you generate code. The Flutter app does not get it.
@@ -111,13 +111,13 @@ environment:
   sdk: ^3.13.0
 
 dependencies:
-  dox_core: ^3.0.0-alpha.4
+  dox_core: ^3.0.0-alpha
   blog_shared:
     path: ../packages/blog_shared
 
 dev_dependencies:
   build_runner: ^2.17.1
-  dox_builder: ^3.0.0-alpha.4
+  dox_builder: ^3.0.0-alpha
 ```
 
 Dox finds a DTO in the `dtos` list of `AppConfig`. The server's own `lib/dtos.g.dart` lists only the DTOs in the server.
