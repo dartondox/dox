@@ -198,6 +198,19 @@ void main() {
       ]);
     });
 
+    test('refuses more attachments than maxAttachments', () {
+      expect(
+        () => SocketDecoder().add('51000000-["x"]'),
+        throwsFormatException,
+      );
+      expect(
+        () => SocketDecoder(maxAttachments: 2).add('53-["x"]'),
+        throwsFormatException,
+      );
+      expect(SocketDecoder(maxAttachments: 2).add('52-["x"]'), isNull);
+      expect(SocketDecoder().add('510-["x"]'), isNull);
+    });
+
     test('round trips binary through the encoder', () {
       Uint8List bytes = Uint8List.fromList(<int>[0, 255]);
       List<Object> parts = const SocketEncoder().encode(

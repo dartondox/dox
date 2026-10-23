@@ -1,3 +1,7 @@
+## Unreleased
+
+- Security: a binary packet may have at most 10 attachments (`SocketDecoder(maxAttachments: ...)`). More closes the connection with a parse error. Before, a client could send `51000000-[...]` before any auth and the server kept every binary frame after it in memory.
+
 ## 3.0.0-alpha.6
 
 - Version bump only, to match the other packages.
