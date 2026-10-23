@@ -7,6 +7,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart';
 import 'package:test/test.dart';
 
+import '../utils/free_port.dart';
 import '../utils/start_http_server.dart';
 
 class Cleanup implements DoxService, DoxShutdown {
@@ -75,7 +76,7 @@ void main() {
 
   for (ServerBackend backend in ServerBackend.values) {
     group('stop (${backend.name}) |', () {
-      int port = 50093 + backend.index;
+      late int port;
       late Cleanup cleanup;
 
       setUp(() async {
@@ -84,13 +85,15 @@ void main() {
         await startHttpServer(
           AppConfig(
             appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
-            serverPort: port,
+            // the OS picks a free port, so test files can run in parallel
+            serverPort: 0,
             totalIsolate: 1,
             server: backend,
             services: <DoxService>[cleanup, OrmService()],
             shutdownTimeout: const Duration(seconds: 2),
           ),
         );
+        port = Dox().server.httpServer.port;
       });
 
       test('open requests finish, new ones are refused', () async {
@@ -135,7 +138,8 @@ void main() {
       if (dartIo && backend == ServerBackend.native) continue;
       test('3 isolates finish open requests, then exit 0 '
           '(${backend.name})', () async {
-        int port = 50096 + backend.index;
+        // a free port, known before the start: 3 isolates share it
+        int port = await freePort();
         Process app = await Process.start(Platform.resolvedExecutable, <String>[
           'run',
           'test/integration/requirements/shutdown_app.dart',

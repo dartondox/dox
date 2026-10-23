@@ -5,6 +5,7 @@ import 'package:dox_core/server/dox_server.dart';
 import 'package:dox_http_native/dox_http_native.dart';
 import 'package:test/test.dart';
 
+import '../utils/free_port.dart';
 import '../utils/start_http_server.dart';
 
 void main() {
@@ -55,7 +56,8 @@ void main() {
       test('APP_HOST=127.0.0.1 listens on IPv4 loopback only '
           '(${backend.name})', () async {
         Env().env['APP_HOST'] = '127.0.0.1';
-        Env().env['PORT'] = '50092';
+        int port = await freePort();
+        Env().env['PORT'] = '$port';
         Route.get('/listen', (DoxRequest req) => 'ok');
         await startHttpServer(
           AppConfig(
@@ -71,19 +73,19 @@ void main() {
             server is NativeHttpServer,
             backend == ServerBackend.native && !dartIo,
           );
-          expect(server.port, 50092);
+          expect(server.port, port);
           expect(server.address, InternetAddress.loopbackIPv4);
           HttpClient client = HttpClient();
           HttpClientResponse res = await (await client.get(
             '127.0.0.1',
-            50092,
+            port,
             '/listen',
           )).close();
           expect(res.statusCode, 200);
           await res.drain<void>();
           client.close();
           await expectLater(
-            Socket.connect(InternetAddress.loopbackIPv6, 50092),
+            Socket.connect(InternetAddress.loopbackIPv6, port),
             throwsA(isA<SocketException>()),
           );
         } finally {

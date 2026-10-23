@@ -37,9 +37,13 @@ const scenarios = {
   // Start with polling, then upgrade to websocket.
   async 'polling-upgrade'() {
     const socket = connect();
+    // Read the first transport and wait for 'upgrade' now. On a fast
+    // machine the upgrade can be done before 'connect' fires.
+    const first = socket.io.engine.transport.name;
+    const upgraded = once(socket.io.engine, 'upgrade');
     await once(socket, 'connect');
-    assert(socket.io.engine.transport.name === 'polling', 'first transport is not polling');
-    await once(socket.io.engine, 'upgrade');
+    assert(first === 'polling', 'first transport is not polling');
+    await upgraded;
     assert(socket.io.engine.transport.name === 'websocket', 'upgrade failed');
     const reply = await socket.timeout(3000).emitWithAck('echo', 'after-upgrade');
     assert(reply === 'after-upgrade', 'bad echo after upgrade');

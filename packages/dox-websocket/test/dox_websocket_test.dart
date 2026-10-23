@@ -10,7 +10,7 @@ import 'package:test/test.dart';
 import 'config/app_config.dart';
 import 'config/redis_env.dart';
 
-String baseUrl = 'http://localhost:${appConfig.serverPort}';
+String get baseUrl => 'http://localhost:${Dox().server.httpServer.port}';
 
 class WebsocketService implements DoxService {
   @override
@@ -37,7 +37,7 @@ void main() {
 
     test('websocket', () async {
       WebSocket socket = await WebSocket.connect(
-        'ws://localhost:${appConfig.serverPort}/ws',
+        'ws://localhost:${Dox().server.httpServer.port}/ws',
       );
 
       socket.listen((dynamic message) {
