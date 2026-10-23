@@ -11,7 +11,7 @@ import 'requirements/controllers/example.controller.dart';
 import 'requirements/middleware/custom_middleware.dart';
 import '../dtos/rules.dto.dart';
 
-String baseUrl = 'http://localhost:${config.serverPort}';
+String get baseUrl => 'http://localhost:${Dox().server.httpServer.port}';
 
 void main() {
   group('Http |', () {
@@ -202,7 +202,7 @@ void main() {
     });
 
     test('domain test', () async {
-      Route.domain('localhost:${config.serverPort}', () {
+      Route.domain('localhost:${Dox().server.httpServer.port}', () {
         Route.get('/domain/test', (DoxRequest doxRequest) {
           return 'pong';
         });

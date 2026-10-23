@@ -10,8 +10,8 @@ AppConfig config = AppConfig(
   /// application key
   appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
 
-  /// application server port
-  serverPort: 50010,
+  /// the OS picks a free port, so test files can run in parallel
+  serverPort: 0,
 
   /// total multi-thread isolate to run
   totalIsolate: 1,

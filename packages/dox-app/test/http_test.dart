@@ -3,11 +3,17 @@ import 'package:dox_core/dox_core.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
-String baseUrl = 'http://localhost:${appConfig.serverPort}';
+String get baseUrl => 'http://localhost:${Dox().server.httpServer.port}';
 
 void main() {
   setUpAll(() async {
+    // port 0: the OS picks a free port, so test files can run in parallel.
+    // Set it before the app reads its env.
+    Env().load();
+    Env().env['APP_PORT'] = '0';
     Dox().initialize(appConfig);
+    // one isolate: with port 0 each isolate gets its own port
+    Dox().totalIsolate(1);
     await Dox().startServer();
     await Future<dynamic>.delayed(Duration(milliseconds: 500));
   });
