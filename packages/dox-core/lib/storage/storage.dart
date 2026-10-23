@@ -68,10 +68,12 @@ class Storage {
   /// RequestFile file = req.input('avatar');
   /// String path = await Storage().putRequestFile('images/avatar', file);
   /// ```
+  ///
+  /// the extension comes from the file name, unless the bytes are a known
+  /// format that does not match it. then the extension of the bytes is
+  /// used, so a png named `a.html` is stored as `.png`, not served as html.
   Future<String> putRequestFile(String folder, RequestFile requestFile) async {
-    String? extension = requestFile.extension.isEmpty
-        ? await _sniff(requestFile.stream())
-        : requestFile.extension;
+    String? extension = await _extension(requestFile);
     String key = _newKey(folder, extension);
     Disk target = use();
     DriverContract driver = target.driver;
@@ -181,8 +183,24 @@ class Storage {
   String _newKey(String folder, String? extension) {
     if (extension == null) throw ArgumentError('invalid file');
     String dir = _key(folder);
-    String name = '${uuid.v1()}.$extension';
+    String name = '${uuid.v4()}.$extension';
     return dir.isEmpty ? name : '$dir/$name';
+  }
+
+  /// byte formats whose name is not a file extension
+  static const Map<String, String> _formatExtensions = <String, String>{
+    'ftyp': 'mp4',
+    'ole': 'bin',
+  };
+
+  Future<String?> _extension(RequestFile file) async {
+    String name = file.extension;
+    String? format = FileTypes.sniff(file.head);
+    if (format != null &&
+        (name.isEmpty || !FileTypes.matches(file, <String>[name]))) {
+      return _formatExtensions[format] ?? format;
+    }
+    return name.isEmpty ? await _sniff(file.stream()) : name;
   }
 
   Future<String?> _sniff(Stream<List<int>> stream) async {

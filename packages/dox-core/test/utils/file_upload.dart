@@ -3,7 +3,11 @@ import 'dart:io';
 
 import 'package:http/http.dart';
 
-Future<String?> uploadImage(String apiUrl, File imageFile) async {
+Future<String?> uploadImage(
+  String apiUrl,
+  File imageFile, {
+  String? filename,
+}) async {
   try {
     // Open a byte stream
     ByteStream stream = ByteStream(imageFile.openRead());
@@ -12,7 +16,7 @@ Future<String?> uploadImage(String apiUrl, File imageFile) async {
 
     // Create the multipart request, add file and headers
     MultipartRequest request = MultipartRequest('POST', Uri.parse(apiUrl));
-    String filename = imageFile.path.split('/').last;
+    filename ??= imageFile.path.split('/').last;
     String ext = filename.split('.').last;
     MultipartFile multipartFile = MultipartFile(
       'image',
