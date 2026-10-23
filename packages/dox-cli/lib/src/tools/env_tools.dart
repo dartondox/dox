@@ -27,7 +27,7 @@ class EnvScaffold {
       int equal = text.indexOf('=');
       if (equal < 1) continue;
       String key = text.substring(0, equal).trim();
-      String value = _unquote(text.substring(equal + 1).trim());
+      String value = _value(text.substring(equal + 1).trim());
       getters.writeln();
       for (String comment in comments) {
         getters.writeln('  /// $comment');
@@ -72,14 +72,17 @@ final AppEnv env = AppEnv.load();
     return 'String get $name;';
   }
 
-  String _unquote(String value) {
-    if (value.length >= 2) {
-      String first = value[0];
-      if ((first == '"' || first == "'") && value.endsWith(first)) {
-        return value.substring(1, value.length - 1);
-      }
+  static final RegExp _comment = RegExp(r'(^|\s)#');
+
+  /// the value without quotes, or without a `# comment` after a space
+  String _value(String value) {
+    if (value.isNotEmpty && '"\'`'.contains(value[0])) {
+      int end = value.indexOf(value[0], 1);
+      if (end > 0) return value.substring(1, end);
     }
-    return value;
+    Match? comment = _comment.firstMatch(value);
+    if (comment != null) value = value.substring(0, comment.start);
+    return value.trim();
   }
 }
 

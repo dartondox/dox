@@ -25,7 +25,7 @@
 use std::cell::RefCell;
 use std::convert::Infallible;
 use std::ffi::{CStr, c_char, c_int, c_void};
-use std::net::{IpAddr, SocketAddr, TcpListener as StdListener};
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, TcpListener as StdListener};
 use std::pin::Pin;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -50,7 +50,7 @@ use tokio::sync::{Notify, oneshot};
 use tokio::task::JoinSet;
 
 /// Bump when the FFI functions or the record layout change.
-const ABI_VERSION: i32 = 2;
+const ABI_VERSION: i32 = 3;
 /// Max size of the request line plus headers. Bigger gets 431.
 const MAX_HEAD: usize = 16 * 1024;
 const RES_HEAD: usize = 20;
@@ -115,8 +115,12 @@ struct Server {
     inbox: Mutex<Vec<(usize, Answer)>>,
     answered: Notify,
     stopped: AtomicBool,
+    /// `dox_shutdown` was called: stop accepting, let open requests finish
+    draining: AtomicBool,
     stop: Notify,
     port: u16,
+    /// the address it listens on, for `unbind`
+    key: Key,
     /// own thread mode: the server thread
     thread: Mutex<Option<JoinHandle<()>>>,
     /// shared thread mode: gets a message (or closes) when the server ended
@@ -124,13 +128,15 @@ struct Server {
 }
 
 impl Server {
-    fn new(port: u16) -> Self {
+    fn new(key: Key) -> Self {
         Server {
             inbox: Mutex::new(Vec::new()),
             answered: Notify::new(),
             stopped: AtomicBool::new(false),
+            draining: AtomicBool::new(false),
             stop: Notify::new(),
-            port,
+            port: key.3,
+            key,
             thread: Mutex::new(None),
             done: Mutex::new(None),
         }
@@ -139,6 +145,18 @@ impl Server {
     fn shut_down(&self) {
         self.stopped.store(true, Ordering::Release);
         self.stop.notify_one();
+    }
+
+    fn drain(&self) {
+        self.draining.store(true, Ordering::Release);
+        self.stop.notify_one();
+    }
+
+    /// waits until `dox_stop` (or a dead isolate) stops the server
+    async fn wait_stopped(&self) {
+        while !self.stopped.load(Ordering::Acquire) {
+            self.stop.notified().await;
+        }
     }
 }
 
@@ -150,16 +168,45 @@ struct Ctx {
     batch: RefCell<Vec<u8>>,
     notify: Notify,
     max_body: usize,
+    /// tells every open connection to close after its current request
+    closing: Notify,
 }
 
-fn bind_new(port: u16) -> std::io::Result<StdListener> {
-    // dual stack like dart:io `anyIPv6`. IPv4 only when there is no IPv6.
-    let (socket, addr) = match Socket::new(Domain::IPV6, Type::STREAM, Some(Protocol::TCP)) {
-        Ok(s) if s.set_only_v6(false).is_ok() => (s, SocketAddr::from(([0u16; 8], port))),
-        _ => (
-            Socket::new(Domain::IPV4, Type::STREAM, Some(Protocol::TCP))?,
-            SocketAddr::from(([0, 0, 0, 0], port)),
-        ),
+/// The address to listen on: (family, high 64 bits, low 64 bits, port).
+/// family 0: all interfaces, IPv6 and IPv4 (dual stack, like dart:io
+/// `anyIPv6`). 4: the IPv4 address in the low 32 bits. 6: an IPv6 address.
+type Key = (i32, u64, u64, u16);
+
+fn socket_addr(key: Key) -> Option<SocketAddr> {
+    let (family, hi, lo, port) = key;
+    match family {
+        4 => Some(SocketAddr::from((Ipv4Addr::from(lo as u32), port))),
+        6 => Some(SocketAddr::from((
+            Ipv6Addr::from((u128::from(hi) << 64) | u128::from(lo)),
+            port,
+        ))),
+        _ => None,
+    }
+}
+
+fn bind_new(key: Key) -> std::io::Result<StdListener> {
+    let port = key.3;
+    let (socket, addr) = match socket_addr(key) {
+        Some(addr) => {
+            let s = Socket::new(Domain::for_address(addr), Type::STREAM, Some(Protocol::TCP))?;
+            if addr.is_ipv6() {
+                let _ = s.set_only_v6(false); // `::` also takes IPv4, like dart:io
+            }
+            (s, addr)
+        }
+        // dual stack like dart:io `anyIPv6`. IPv4 only when there is no IPv6.
+        None => match Socket::new(Domain::IPV6, Type::STREAM, Some(Protocol::TCP)) {
+            Ok(s) if s.set_only_v6(false).is_ok() => (s, SocketAddr::from(([0u16; 8], port))),
+            _ => (
+                Socket::new(Domain::IPV4, Type::STREAM, Some(Protocol::TCP))?,
+                SocketAddr::from(([0, 0, 0, 0], port)),
+            ),
+        },
     };
     #[cfg(unix)]
     socket.set_reuse_address(true)?;
@@ -172,40 +219,43 @@ fn bind_new(port: u16) -> std::io::Result<StdListener> {
     Ok(socket.into())
 }
 
-/// Listening sockets of this process by port, with a user count.
+/// Listening sockets of this process by address, with a user count.
 /// macOS does not spread connections over SO_REUSEPORT sockets (one gets
 /// all), so there every isolate gets a copy (dup) of one socket and they
 /// all accept from the same queue. Windows runs one isolate (see DoxServer).
 #[cfg(not(any(target_os = "linux", target_os = "android")))]
-static LISTENERS: Mutex<Vec<(u16, StdListener, usize)>> = Mutex::new(Vec::new());
+static LISTENERS: Mutex<Vec<(Key, StdListener, usize)>> = Mutex::new(Vec::new());
 
+/// Binds `key`. Returns the listener and the key with the real port.
 #[cfg(any(target_os = "linux", target_os = "android"))]
-fn bind(port: u16) -> std::io::Result<StdListener> {
-    bind_new(port)
+fn bind(key: Key) -> std::io::Result<(StdListener, Key)> {
+    let listener = bind_new(key)?;
+    let port = listener.local_addr()?.port();
+    Ok((listener, (key.0, key.1, key.2, port)))
 }
 
 #[cfg(any(target_os = "linux", target_os = "android"))]
-fn unbind(_port: u16) {}
+fn unbind(_key: Key) {}
 
 #[cfg(not(any(target_os = "linux", target_os = "android")))]
-fn bind(port: u16) -> std::io::Result<StdListener> {
+fn bind(key: Key) -> std::io::Result<(StdListener, Key)> {
     let mut all = LISTENERS.lock().unwrap();
-    if port != 0
-        && let Some(entry) = all.iter_mut().find(|e| e.0 == port)
+    if key.3 != 0
+        && let Some(entry) = all.iter_mut().find(|e| e.0 == key)
     {
         entry.2 += 1;
-        return entry.1.try_clone();
+        return Ok((entry.1.try_clone()?, key));
     }
-    let listener = bind_new(port)?;
-    let real = listener.local_addr()?.port();
+    let listener = bind_new(key)?;
+    let real = (key.0, key.1, key.2, listener.local_addr()?.port());
     all.push((real, listener.try_clone()?, 1));
-    Ok(listener)
+    Ok((listener, real))
 }
 
 #[cfg(not(any(target_os = "linux", target_os = "android")))]
-fn unbind(port: u16) {
+fn unbind(key: Key) {
     let mut all = LISTENERS.lock().unwrap();
-    if let Some(i) = all.iter().position(|e| e.0 == port) {
+    if let Some(i) = all.iter().position(|e| e.0 == key) {
         all[i].2 -= 1;
         if all[i].2 == 0 {
             all.swap_remove(i); // closes the last copy: the port is free
@@ -304,14 +354,17 @@ fn peer_bytes(addr: SocketAddr) -> [u8; 18] {
 }
 
 async fn serve(listener: StdListener, ctx: Rc<Ctx>, dart_port: i64) {
+    let key = ctx.server.key;
     let listener = tokio::net::TcpListener::from_std(listener).expect("listener");
     // every task of this server. Dropping it at the end closes them all,
     // also when other servers still run on the same thread.
     let mut tasks = JoinSet::new();
     tasks.spawn_local(flusher(ctx.clone(), dart_port));
     tasks.spawn_local(deliver(ctx.clone()));
+    // the connections, apart, so a shutdown can wait for them
+    let mut conns = JoinSet::new();
     let server = ctx.server.clone();
-    while !server.stopped.load(Ordering::Acquire) {
+    while !server.stopped.load(Ordering::Acquire) && !server.draining.load(Ordering::Acquire) {
         tokio::select! {
             biased;
             _ = server.stop.notified() => {}
@@ -327,41 +380,72 @@ async fn serve(listener: StdListener, ctx: Rc<Ctx>, dart_port: i64) {
                 let _ = stream.set_nodelay(true);
                 let peer = peer_bytes(addr);
                 let ctx = ctx.clone();
-                while tasks.try_join_next().is_some() {} // forget closed ones
-                tasks.spawn_local(async move {
-                    let ctx2 = ctx.clone();
-                    let svc = service_fn(move |req| handle(req, ctx.clone(), peer));
-                    // hyper answers 400 for a bad request and 431 when the
-                    // head is bigger than MAX_HEAD, then closes the connection.
-                    // Do not turn on pipeline_flush: then hyper drops that answer.
-                    let _ = http1::Builder::new()
-                        .timer(TokioTimer::new())
-                        .keep_alive(true)
-                        .half_close(true)
-                        .max_buf_size(MAX_HEAD)
-                        .serve_connection(TokioIo::new(Lingering(Some(stream), ctx2)), svc)
-                        .await;
-                });
+                while conns.try_join_next().is_some() {} // forget closed ones
+                conns.spawn_local(connection(stream, peer, ctx));
                 // let the accept loops of other servers on this thread take
                 // a turn. On macOS they all accept from one queue.
                 tokio::task::yield_now().await;
             }
         }
     }
+    // no new connections from here on. The port is free when the last
+    // server of this address stops.
+    drop(listener);
+    unbind(key);
+    if server.stopped.load(Ordering::Acquire) {
+        return;
+    }
+    // graceful shutdown: each connection closes after its current answer.
+    // Dart still answers the open requests. `dox_stop` ends the wait early.
+    ctx.closing.notify_waiters();
+    tokio::select! {
+        _ = async { while conns.join_next().await.is_some() {} } => {}
+        _ = server.wait_stopped() => {}
+    }
+    post(dart_port, &[1]); // tell Dart: all open requests are done
+    server.wait_stopped().await;
+}
+
+/// Serves one connection until the client closes it, or until a
+/// shutdown, after the request it is busy with.
+async fn connection(stream: TcpStream, peer: [u8; 18], ctx: Rc<Ctx>) {
+    // made before the check, so a shutdown between the two is not missed
+    let watch = ctx.clone();
+    let closing = watch.closing.notified();
+    let shut_down = ctx.server.draining.load(Ordering::Acquire);
+    let ctx2 = ctx.clone();
+    let svc = service_fn(move |req| handle(req, ctx2.clone(), peer));
+    // hyper answers 400 for a bad request and 431 when the
+    // head is bigger than MAX_HEAD, then closes the connection.
+    // Do not turn on pipeline_flush: then hyper drops that answer.
+    let conn = http1::Builder::new()
+        .timer(TokioTimer::new())
+        .keep_alive(true)
+        .half_close(true)
+        .max_buf_size(MAX_HEAD)
+        .serve_connection(TokioIo::new(Lingering(Some(stream), ctx)), svc);
+    let mut conn = std::pin::pin!(conn);
+    if !shut_down {
+        tokio::select! {
+            _ = conn.as_mut() => return,
+            _ = closing => {}
+        }
+    }
+    conn.as_mut().graceful_shutdown();
+    let _ = conn.await;
 }
 
 /// Runs one server until it stops, then frees its port.
 async fn run_server(listener: StdListener, server: Arc<Server>, dart_port: i64, max_body: usize) {
-    let port = server.port;
     let ctx = Rc::new(Ctx {
         server,
         pending: RefCell::new(Slab::with_capacity(1024)),
         batch: RefCell::new(Vec::with_capacity(1 << 16)),
         notify: Notify::new(),
         max_body,
+        closing: Notify::new(),
     });
     serve(listener, ctx, dart_port).await;
-    unbind(port);
 }
 
 fn new_runtime() -> tokio::runtime::Runtime {
@@ -658,19 +742,27 @@ pub unsafe extern "C" fn dox_init(data: *mut c_void) -> i32 {
 }
 
 /// Binds `port` and starts a server thread that posts to `send_port`.
+/// `family`, `addr_hi` and `addr_lo` are the host, see [Key]. Family 0 is
+/// all interfaces.
 /// Returns a handle (> 0), or < 0: -1 not initialized, -(1000 + errno)
 /// when the bind fails.
 #[unsafe(no_mangle)]
-pub extern "C" fn dox_start(port: i32, send_port: i64, max_body: i64) -> i64 {
+pub extern "C" fn dox_start(
+    port: i32,
+    send_port: i64,
+    max_body: i64,
+    family: i32,
+    addr_hi: u64,
+    addr_lo: u64,
+) -> i64 {
     if POST.get().is_none() {
         return -1;
     }
-    let listener = match bind(port as u16) {
+    let (listener, key) = match bind((family, addr_hi, addr_lo, port as u16)) {
         Ok(l) => l,
         Err(e) => return -(1000 + i64::from(e.raw_os_error().unwrap_or(0))),
     };
-    let port = listener.local_addr().map(|a| a.port()).unwrap_or(0);
-    let server = Arc::new(Server::new(port));
+    let server = Arc::new(Server::new(key));
     let max_body = max_body.max(0) as usize;
     if shared_thread() {
         if !start_shared(listener, server.clone(), send_port, max_body) {
@@ -702,6 +794,18 @@ pub extern "C" fn dox_start(port: i32, send_port: i64, max_body: i64) -> i64 {
 pub unsafe extern "C" fn dox_port(handle: i64) -> i32 {
     let server = unsafe { &*(handle as *const Server) };
     i32::from(server.port)
+}
+
+/// Starts a graceful shutdown: the server stops accepting connections at
+/// once. Each open connection closes after its current answer. When all
+/// are closed, Dart gets a message of one byte. Then call `dox_stop`.
+///
+/// # Safety
+/// `handle` must come from `dox_start` and not be stopped.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dox_shutdown(handle: i64) {
+    let server = unsafe { &*(handle as *const Server) };
+    server.drain();
 }
 
 /// Stops the server, closes its connections and frees the handle.
@@ -794,9 +898,9 @@ mod tests {
 
     /// a server with no Dart side. Only for answers that Rust gives itself.
     fn start_bare() -> u16 {
-        let listener = bind(0).unwrap();
-        let port = listener.local_addr().unwrap().port();
-        let server = Arc::new(Server::new(port));
+        let (listener, key) = bind((0, 0, 0, 0)).unwrap();
+        let port = key.3;
+        let server = Arc::new(Server::new(key));
         std::thread::spawn(move || {
             let rt = tokio::runtime::Builder::new_current_thread()
                 .enable_all()
@@ -809,6 +913,7 @@ mod tests {
                 batch: RefCell::new(Vec::new()),
                 notify: Notify::new(),
                 max_body: 10,
+                closing: Notify::new(),
             });
             local.block_on(&rt, serve(listener, ctx, 0));
         });
@@ -842,6 +947,16 @@ mod tests {
         );
         let body = b"POST / HTTP/1.1\r\nHost: a\r\nContent-Length: 11\r\nConnection: close\r\n\r\nhello world";
         assert!(send(port, body).starts_with("HTTP/1.1 413"), "413");
+    }
+
+    #[test]
+    fn binds_one_host_only() {
+        let lo = u64::from(u32::from(Ipv4Addr::LOCALHOST));
+        let (listener, key) = bind((4, 0, lo, 0)).unwrap();
+        let addr = listener.local_addr().unwrap();
+        assert_eq!(addr.ip(), IpAddr::V4(Ipv4Addr::LOCALHOST));
+        assert_eq!(key.3, addr.port());
+        unbind(key);
     }
 
     #[test]

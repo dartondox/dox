@@ -170,8 +170,9 @@ Source: `packages/dox-cli/lib/src/tools/openapi_generate.dart`.
 dox update
 ```
 
-Runs `dart pub global activate dox`. This installs the latest stable version of the CLI, not a preview.
-For a preview run `dart pub global activate dox 3.0.0-alpha.4` yourself.
+Installs the newest CLI with the same major version as the one you have. Pre-releases count.
+So a 3.x alpha CLI updates to the newest 3.x alpha, not to the old 2.x stable.
+It reads the version list from pub.dev, then runs `dart pub global activate dox <version>`.
 
 Source: `packages/dox-cli/lib/src/tools/update_dox.dart`.
 

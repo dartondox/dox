@@ -45,7 +45,7 @@ Migrating: 2023_07_16_131937700_create_users_table
 Migrated: 2023_07_16_131937700_create_users_table
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
-Server started at http://127.0.0.1:3000 with 8 isolate (native)
+Server started at http://[::]:3000 with 8 isolate (native)
 ```
 
 The migrations run again, because `DB_NAME=db/dox.sqlite` is a new file in `build/bundle`.

@@ -63,6 +63,8 @@ Route.delete('/blogs/{id}', controller.destroy);
     There are also `Route.options`, `Route.copy`, `Route.view`, `Route.link`, `Route.unlink`,
     `Route.purge`, `Route.lock`, `Route.unlock` and `Route.propfind`.
 
+A `HEAD` request runs the `GET` route of the same path. The answer has the status and headers of `GET`, with no body.
+
 ## The handler
 
 The second argument is the code that answers the request. It can be:

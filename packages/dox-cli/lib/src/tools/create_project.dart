@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox/dox.dart';
+import 'package:dox/src/utils/versions.dart';
 import 'package:dox/src/version.dart';
 
 Future<void> createProject(String projectName, [String? versionName]) async {
@@ -91,36 +92,14 @@ String? _latestTemplate() {
     '-s',
   ]);
   if (result.exitCode != 0) return null;
-  String major = version.split('.').first;
   List<String> tags = <String>[];
   try {
     List<dynamic> releases = jsonDecode(result.stdout);
     for (final release in releases) {
-      String tag = (release['tag_name'] as String).replaceFirst('v', '');
-      if (tag.startsWith('$major.')) tags.add(tag);
+      tags.add((release['tag_name'] as String).replaceFirst('v', ''));
     }
   } catch (_) {
     return null;
   }
-  if (tags.isEmpty) return null;
-  tags.sort(_compareVersions);
-  return tags.last;
-}
-
-/// Sorts `3.0.0-alpha.2 < 3.0.0-alpha.4 < 3.0.0 < 3.1.0`.
-int _compareVersions(String a, String b) {
-  List<int> key(String v) {
-    List<String> parts = v.split('-');
-    List<int> nums = parts.first.split('.').map(int.parse).toList();
-    // a stable version ranks above every pre-release of the same base
-    if (parts.length == 1) return [...nums, 1, 0];
-    Match? n = RegExp(r'\d+$').firstMatch(parts[1]);
-    return [...nums, 0, n == null ? 0 : int.parse(n.group(0)!)];
-  }
-
-  List<int> ka = key(a), kb = key(b);
-  for (int i = 0; i < ka.length && i < kb.length; i++) {
-    if (ka[i] != kb[i]) return ka[i].compareTo(kb[i]);
-  }
-  return ka.length.compareTo(kb.length);
+  return newestOfMajor(tags, version);
 }

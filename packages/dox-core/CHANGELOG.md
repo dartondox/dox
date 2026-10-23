@@ -6,6 +6,16 @@
 - `req.cookie()` returns `null` for an encrypted cookie that can not be decrypted.
 - Fix: `Hash.verify` returns `false` for a malformed hash. Before, it threw.
 - `AESEncryptor` and `DecryptException` are now exported from `package:dox_core/dox_core.dart`.
+- Fix: in `.env`, `KEY=value # note` gave the value `value # note`. A `#` after a space now starts a comment. A `#` inside quotes, or with no space before it, is kept.
+- Fix: the `.env` parser removed every quote character inside a value. Now only the quotes around the value are removed.
+- Fix: `HEAD` requests got 404, also `HEAD /docs`. A `HEAD` request now runs the `GET` route of the same path. The answer has the status and headers of `GET`, with no body.
+- New: Dox listens on `PORT` when `APP_PORT` is not set. Cloud Run, Fly, Render and Heroku set `PORT`. `APP_PORT` still wins.
+- New: `AppConfig.host` and the env var `APP_HOST` pick the network interface to listen on, like `127.0.0.1`. The default is the same as before: all interfaces (`::`, IPv6 and IPv4).
+- Fix: the start log always said `http://127.0.0.1:<port>`. It now shows the real host and port, like `http://[::]:3000`.
+- Removed the unused `sprintf` dependency.
+- New: graceful shutdown. On `SIGTERM` or `SIGINT` every isolate stops taking new connections and lets open requests finish, up to `AppConfig.shutdownTimeout` (default 8 seconds). Then Dox runs `DoxShutdown` services and exits with code 0. Before, open requests were cut. A second signal stops at once.
+- New: `DoxShutdown`. A service that also implements it gets `shutdown()` in every isolate on stop, to close connections.
+- New: `await Dox().stop()` stops the server gracefully in every isolate, without exit.
 
 ## 3.0.0-alpha.4
 

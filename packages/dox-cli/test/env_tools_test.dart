@@ -16,6 +16,8 @@ APP_DEBUG=true
 # no value means optional
 AWS_BUCKET=
 S3__X=1
+APP_TOTAL_ISOLATE=4 # one per core
+APP_MOTTO="a # b"
 ''');
       expect(out, contains('String get appName;'));
       expect(out, contains('String get appKey;'));
@@ -27,6 +29,8 @@ S3__X=1
         contains('  /// no value means optional\n  String? get awsBucket;'),
       );
       expect(out, contains("@EnvKey('S3__X')\n  int get s3X => 1;"));
+      expect(out, contains('int get appTotalIsolate => 4;'));
+      expect(out, contains('String get appMotto;'));
       expect(out, contains(r'return _$AppEnv.load(reader);'));
       expect(out, contains('final AppEnv env = AppEnv.load();'));
     });

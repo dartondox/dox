@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/isolate/isolate_interfaces.dart';
 import 'package:dox_core/server/dox_server.dart';
@@ -22,5 +24,18 @@ void isolateHandler(IsolateSpawnParameter param) async {
   /// starting server in new isolate
   DoxServer().setResponseHandler(param.config.responseHandler);
 
-  await DoxServer().listen(param.config.serverPort, isolateId: param.isolateId);
+  await DoxServer().listen(
+    DoxServer.portFor(appConfig.serverPort),
+    address: DoxServer.hostFor(appConfig.host),
+    isolateId: param.isolateId,
+  );
+
+  /// the main isolate sends a reply port here to stop this isolate
+  ReceivePort commands = ReceivePort();
+  commands.listen((dynamic reply) async {
+    commands.close();
+    await Dox().stopIsolate();
+    (reply as SendPort).send(true);
+  });
+  param.control?.send(commands.sendPort);
 }

@@ -17,6 +17,9 @@ void handle(HttpRequest req) async {
       List<int> body = <int>[for (List<int> c in await req.toList()) ...c];
       res.headers.contentType = ContentType.binary;
       res.add(body);
+    case '/slow':
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      res.write('slow done');
     case '/who':
       res.write(Isolate.current.debugName);
     case '/headers':
@@ -187,6 +190,87 @@ void main() {
     expect(back.length, body.length);
     expect(back, body);
     await big.close();
+  });
+
+  test('HEAD gets the headers with no body', () async {
+    String out = await raw(
+      port,
+      'HEAD / HTTP/1.1\r\nHost: a\r\nConnection: close\r\n\r\n',
+    );
+    expect(out, startsWith('HTTP/1.1 200'));
+    expect(out.toLowerCase(), contains('content-length: 11'));
+    expect(out, endsWith('\r\n\r\n'));
+  });
+
+  test('bind to one host only', () async {
+    NativeHttpServer local = await NativeHttpServer.bind(
+      0,
+      address: InternetAddress.loopbackIPv4,
+    );
+    local.listen(handle);
+    expect(local.address, InternetAddress.loopbackIPv4);
+    HttpClientResponse res = await (await client.get(
+      '127.0.0.1',
+      local.port,
+      '/',
+    )).close();
+    expect(res.statusCode, 200);
+    await res.drain<void>();
+    // not on the IPv6 loopback
+    await expectLater(
+      Socket.connect(InternetAddress.loopbackIPv6, local.port),
+      throwsA(isA<SocketException>()),
+    );
+    await local.close();
+
+    NativeHttpServer named = await NativeHttpServer.bind(
+      0,
+      address: 'localhost',
+    );
+    expect(named.address.isLoopback, isTrue);
+    await named.close();
+  });
+
+  test('close() lets open requests finish, then frees the port', () async {
+    NativeHttpServer a = await start(0);
+    int p = a.port;
+    HttpClient c = HttpClient();
+    Future<String> slow = c
+        .get('127.0.0.1', p, '/slow')
+        .then((HttpClientRequest r) => r.close())
+        .then((HttpClientResponse r) => utf8.decodeStream(r));
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    Stopwatch clock = Stopwatch()..start();
+    Future<void> closed = a.close();
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    // no new connections while it drains
+    await expectLater(
+      Socket.connect('127.0.0.1', p),
+      throwsA(isA<SocketException>()),
+    );
+    expect(await slow, 'slow done');
+    await closed;
+    expect(clock.elapsedMilliseconds, greaterThan(200));
+    c.close(force: true);
+    NativeHttpServer b = await start(p);
+    expect(b.port, p);
+    await b.close();
+  });
+
+  test('close(force: true) cuts open requests', () async {
+    NativeHttpServer a = await start(0);
+    HttpClient c = HttpClient();
+    Future<Object> slow = c
+        .get('127.0.0.1', a.port, '/slow')
+        .then((HttpClientRequest r) => r.close())
+        .then<Object>((HttpClientResponse r) => utf8.decodeStream(r))
+        .catchError((Object error) => error);
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    Future<void> graceful = a.close();
+    await a.close(force: true);
+    await graceful; // a waiting graceful close ends too
+    expect(await slow, isA<Exception>());
+    c.close(force: true);
   });
 
   test('close frees the port', () async {

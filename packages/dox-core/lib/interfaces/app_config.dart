@@ -24,7 +24,15 @@ enum ServerBackend {
 
 class AppConfig {
   final String appKey;
+
+  /// The port to listen on. Default 3000. When the env has no `APP_PORT`
+  /// but has `PORT` (Cloud Run, Fly, Render, Heroku set it), Dox listens
+  /// on `PORT` instead.
   final int serverPort;
+
+  /// The host (network interface) to listen on, like `127.0.0.1`.
+  /// Default: the env var `APP_HOST`, else all interfaces (IPv6 and IPv4).
+  final String? host;
   final int totalIsolate;
   final ResponseHandlerInterface? responseHandler;
   final Function(Object?, StackTrace) errorHandler;
@@ -79,9 +87,16 @@ class AppConfig {
   /// the native server, even for an app with WebSocket routes.
   final ServerBackend server;
 
+  /// On SIGTERM or SIGINT the server stops taking new connections, and
+  /// waits this long for open requests to finish. Then it closes the rest,
+  /// runs `DoxShutdown` services and exits. Default 8 seconds. Keep it
+  /// below the kill timeout of your platform (docker stop: 10 seconds).
+  final Duration shutdownTimeout;
+
   AppConfig({
     required this.appKey,
     this.serverPort = 3000,
+    this.host,
 
     /// isolates (threads) that serve http. Default: one per CPU core.
     int? totalIsolate,
@@ -109,6 +124,7 @@ class AppConfig {
     this.trustedProxies = const <String>[],
     this.compress = false,
     this.server = ServerBackend.native,
+    this.shutdownTimeout = const Duration(seconds: 8),
   }) : totalIsolate = totalIsolate ?? Platform.numberOfProcessors;
 }
 

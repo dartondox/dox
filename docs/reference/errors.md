@@ -12,7 +12,7 @@ A lookup table of the messages Dox prints or throws. Search this page for the te
 | --- | --- | --- |
 | `APP_KEY is not set. Run `dox key:generate` and put the key in .env` | `appKey` is empty. A warning, or a `StateError` that stops the app when `APP_ENV=production`. | Run `dox key:generate`, or set `APP_KEY` in the env. |
 | `[dox] warning: dox_http_native did not load, using the dart:io server (<reason>)` | The native HTTP library is missing or from another version. | See [Troubleshooting](troubleshooting.md#the-native-http-library-did-not-load). Or set `DOX_SERVER=dartio`. |
-| `Server started at http://127.0.0.1:<port> with <n> isolate (<backend>)` | Normal start. `<backend>` is `native` or `dart:io`. | Nothing. |
+| `Server started at http://<host>:<port> with <n> isolate (<backend>)` | Normal start. `<host>` is the address it listens on: `[::]` means all interfaces. `<backend>` is `native` or `dart:io`. | Nothing. |
 | `WebSocket or Socket.IO routes: using the dart:io server` | The app has WebSocket or Socket.IO. The native server can not upgrade yet. | Nothing. This is info. |
 | `Windows: the native server runs on one isolate` | Windows has no `SO_REUSEPORT`. | Nothing, or `DOX_SERVER=dartio` to use every core. |
 | `Socket.IO runs on <n> isolates: clients should use transports: ['websocket'] ...` | Socket.IO with more than one isolate and long-polling on. | Use a Redis adapter, and `transports: ['websocket']` in the client. |

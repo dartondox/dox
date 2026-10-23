@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
@@ -7,7 +8,6 @@ import 'package:dox_core/server/dox_server.dart';
 import 'package:dox_core/utils/logger.dart';
 import 'package:dox_http_native/dox_http_native.dart';
 import 'package:dox_socketio/dox_socketio.dart';
-import 'package:sprintf/sprintf.dart';
 
 IocContainer _ioc = IocContainer();
 
@@ -132,18 +132,90 @@ class Dox implements IDox {
 
     await startServices();
     DoxServer().setResponseHandler(config.responseHandler);
-    await DoxServer().listen(config.serverPort, isolateId: 1);
-
-    String backend = DoxServer().httpServer is NativeHttpServer
-        ? 'native'
-        : 'dart:io';
-    Logger.info(
-      sprintf(
-        'Server started at http://127.0.0.1:%s with $isolatesToSpawn isolate '
-        '($backend)',
-        <dynamic>[Dox().config.serverPort],
-      ),
+    HttpServer server = await DoxServer().listen(
+      DoxServer.portFor(config.serverPort),
+      address: DoxServer.hostFor(config.host),
+      isolateId: 1,
     );
+
+    String backend = server is NativeHttpServer ? 'native' : 'dart:io';
+    Logger.info(
+      'Server started at ${serverUrl(server)} with $isolatesToSpawn isolate '
+      '($backend)',
+    );
+    _watchSignals();
+  }
+
+  final List<StreamSubscription<ProcessSignal>> _signals =
+      <StreamSubscription<ProcessSignal>>[];
+
+  /// SIGTERM (docker stop, Kubernetes, Cloud Run) and SIGINT (Ctrl+C)
+  /// stop the server gracefully. A second signal stops it at once.
+  void _watchSignals() {
+    if (_signals.isNotEmpty) return;
+    List<ProcessSignal> signals = <ProcessSignal>[
+      ProcessSignal.sigint,
+      // Windows can not watch SIGTERM
+      if (!Platform.isWindows) ProcessSignal.sigterm,
+    ];
+    for (ProcessSignal signal in signals) {
+      _signals.add(signal.watch().listen(_onSignal));
+    }
+  }
+
+  Future<void> _onSignal(ProcessSignal signal) async {
+    // stop watching: the next signal does the default, it ends the process
+    _cancelSignals();
+    Logger.info('$signal: stopping, open requests can finish');
+    await stop();
+    exit(0);
+  }
+
+  void _cancelSignals() {
+    for (StreamSubscription<ProcessSignal> signal in _signals) {
+      signal.cancel();
+    }
+    _signals.clear();
+  }
+
+  /// Stop the server gracefully, in every isolate:
+  /// 1. stop taking new connections
+  /// 2. wait for open requests, up to `config.shutdownTimeout`
+  /// 3. run the `DoxShutdown` services (eg. close database connections)
+  ///
+  /// SIGTERM and SIGINT call this, then exit the process.
+  /// ```
+  /// await Dox().stop();
+  /// ```
+  Future<void> stop() async {
+    _cancelSignals();
+    await Future.wait(<Future<void>>[
+      DoxIsolate().stopAll(config.shutdownTimeout),
+      stopIsolate(),
+    ]);
+  }
+
+  /// [stop] for this isolate only. Internal: each isolate runs it.
+  Future<void> stopIsolate() async {
+    await DoxServer().shutdown(config.shutdownTimeout);
+    for (DoxService service in doxServices) {
+      if (service is! DoxShutdown) continue;
+      try {
+        await (service as DoxShutdown).shutdown();
+      } catch (error, stackTrace) {
+        config.errorHandler(error, stackTrace);
+      }
+    }
+  }
+
+  /// the real address of [server], like `http://127.0.0.1:3000` or
+  /// `http://[::]:3000` (all interfaces)
+  static String serverUrl(HttpServer server) {
+    InternetAddress address = server.address;
+    String host = address.type == InternetAddressType.IPv6
+        ? '[${address.address}]'
+        : address.address;
+    return 'http://$host:${server.port}';
   }
 
   /// stop at startup when `APP_KEY` is missing in production.

@@ -23,7 +23,7 @@ import 'package:dox_http_native/src/response.dart';
 /// Each isolate can bind the same port. The OS shares the connections
 /// between them (`SO_REUSEPORT` on Linux and macOS).
 class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
-  NativeHttpServer._(this._handle, this._receive, this.port);
+  NativeHttpServer._(this._handle, this._receive, this.port, this.address);
 
   static bool? _available;
   static String? _loadError;
@@ -57,31 +57,69 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
     }
   }
 
-  /// Listen on [port] on all interfaces (IPv6 and IPv4).
+  /// Listen on [port]. With no [address] it listens on all interfaces
+  /// (IPv6 and IPv4). [address] is an [InternetAddress] or a host name
+  /// like `127.0.0.1` or `localhost`, the same as `HttpServer.bind`.
   /// Bodies bigger than [maxBodySize] bytes get 413 from Rust.
   static Future<NativeHttpServer> bind(
     int port, {
+    Object? address,
     int maxBodySize = 100 * 1024 * 1024,
   }) async {
     if (!isAvailable) {
       throw UnsupportedError('dox_http_native is not available: $_loadError');
     }
+    InternetAddress? ip = await _resolve(address);
+    List<int> raw = ip?.rawAddress ?? const <int>[];
+    int family = ip == null ? 0 : (raw.length == 4 ? 4 : 6);
+    int hi = 0, lo = 0;
+    for (int i = 0; i < raw.length; i++) {
+      if (raw.length == 16 && i < 8) {
+        hi = (hi << 8) | raw[i];
+      } else {
+        lo = (lo << 8) | raw[i];
+      }
+    }
     late NativeHttpServer server;
     RawReceivePort receive = RawReceivePort((Object? msg) {
       server._onBatch(msg as Uint8List);
     }, 'dox_http_native');
-    int handle = doxStart(port, receive.sendPort.nativePort, maxBodySize);
+    int handle = doxStart(
+      port,
+      receive.sendPort.nativePort,
+      maxBodySize,
+      family,
+      hi,
+      lo,
+    );
     if (handle <= 0) {
       receive.close();
       int code = handle <= -1000 ? -(handle + 1000) : 0;
       throw SocketException(
         'dox_http_native: bind failed ($handle)',
         osError: OSError('', code),
+        address: ip,
         port: port,
       );
     }
-    server = NativeHttpServer._(handle, receive, doxPort(handle));
+    server = NativeHttpServer._(
+      handle,
+      receive,
+      doxPort(handle),
+      ip ?? InternetAddress.anyIPv6,
+    );
     return server;
+  }
+
+  /// null for all interfaces. A host name gives its first address.
+  static Future<InternetAddress?> _resolve(Object? address) async {
+    if (address == null) return null;
+    if (address is InternetAddress) return address;
+    String host = address.toString();
+    InternetAddress? ip = InternetAddress.tryParse(host);
+    if (ip != null) return ip;
+    List<InternetAddress> found = await InternetAddress.lookup(host);
+    return found.first;
   }
 
   int _handle;
@@ -94,7 +132,7 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
   final int port;
 
   @override
-  InternetAddress get address => InternetAddress.anyIPv6;
+  final InternetAddress address;
 
   @override
   bool autoCompress = false;
@@ -136,15 +174,36 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
     );
   }
 
-  /// Stop listening and close every connection.
+  Completer<void>? _drained;
+
+  /// Stop listening. Like `dart:io`, open requests still get their answer.
+  /// Each connection closes after its current answer, and the future
+  /// completes when all are closed. With [force] every connection closes
+  /// at once, also when a graceful close still waits.
   @override
   Future<void> close({bool force = false}) async {
+    if (_handle == 0) return;
+    if (!force) {
+      Completer<void>? drained = _drained;
+      if (drained == null) {
+        drained = _drained = Completer<void>();
+        doxShutdown(_handle);
+      }
+      await drained.future;
+    }
     if (_handle != 0) {
       doxStop(_handle);
       _handle = 0;
       _receive.close();
-      await _requests.close();
+      // not awaited: with no listener the close future never completes
+      unawaited(_requests.close());
+      _done();
     }
+  }
+
+  void _done() {
+    Completer<void>? drained = _drained;
+    if (drained != null && !drained.isCompleted) drained.complete();
   }
 
   // ---- requests from Rust ----
@@ -153,6 +212,7 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
 
   void _onBatch(Uint8List b) {
     if (b.isEmpty) return; // a probe from Rust: "is this isolate alive?"
+    if (b.length == 1) return _done(); // a graceful close is done
     ByteData d = ByteData.sublistView(b);
     int p = 0;
     _inBatch = true;

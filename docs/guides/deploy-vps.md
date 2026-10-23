@@ -144,8 +144,14 @@ systemctl status blog
 
 ## 6. Close the app port
 
-Dox listens on all network interfaces. It has no option to listen on `127.0.0.1` only.
-So block port `3000` from outside with a firewall. Only Caddy should reach it.
+Caddy runs on the same machine. So let Dox listen on `127.0.0.1` only. Add this line to `/etc/blog.env`:
+
+```ini title="/etc/blog.env"
+APP_HOST=127.0.0.1
+```
+
+Now only programs on this machine can reach port `3000`.
+Also turn on a firewall, so only SSH, HTTP and HTTPS are open:
 
 ```bash
 sudo ufw default deny incoming

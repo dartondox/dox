@@ -2,6 +2,8 @@ import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
 void main() {
+  parseTests();
+
   setUpAll(() {
     Env().load();
     Env().env['EMPTY_KEY'] = '';
@@ -52,5 +54,30 @@ void main() {
     Env().env['APP_ENV'] = 'development';
     expect(() => Dox().checkAppKey(), returnsNormally);
     Env().env.remove('APP_ENV');
+  });
+}
+
+void parseTests() {
+  test('.env: a # after a space is a comment', () {
+    Map<String, String> env = Env.parse('''
+# a comment line
+APP_PORT=3000 # dev port
+NAME=dox	# tab before the comment
+EMPTY= # nothing
+HASH=abc#def
+QUOTED="a # b" # note
+SINGLE='x#y'
+URL=postgres://u:p@h/db?a=b
+CRLF=yes\r
+''');
+    expect(env['APP_PORT'], '3000');
+    expect(env['NAME'], 'dox');
+    expect(env['EMPTY'], '');
+    expect(env['HASH'], 'abc#def');
+    expect(env['QUOTED'], 'a # b');
+    expect(env['SINGLE'], 'x#y');
+    expect(env['URL'], 'postgres://u:p@h/db?a=b');
+    expect(env['CRLF'], 'yes');
+    expect(env.containsKey('# a comment line'), isFalse);
   });
 }

@@ -158,7 +158,7 @@ class CommandRegistry {
       description: 'Update Dox framework',
       category: CommandCategory.system,
       function: (args) async {
-        updateDox();
+        await updateDox();
       },
     ),
 

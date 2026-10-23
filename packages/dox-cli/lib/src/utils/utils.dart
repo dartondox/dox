@@ -37,20 +37,6 @@ String toPascalWithFirstLetterLowerCase(String input) {
   return '${pascalString[0].toLowerCase()}${pascalString.substring(1)}';
 }
 
-Map<String, String> loadEnv() {
-  Map<String, String> data = {};
-  final file = File('${Directory.current.path}/.env');
-  final contents = file.readAsStringSync();
-  List list = contents.split('\n');
-  for (var d in list) {
-    List keyValue = d.toString().split('=');
-    if (keyValue[0].toString().isNotEmpty) {
-      data[keyValue[0].toString().trim()] = keyValue[1].toString().trim();
-    }
-  }
-  return data;
-}
-
 String parseName(String name) {
   DateTime now = DateTime.now();
   String uuid =

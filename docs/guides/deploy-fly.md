@@ -37,6 +37,8 @@ Replace the file with this one. Change `app` and `primary_region` to your values
 ```toml title="fly.toml"
 app = "blog-api"
 primary_region = "ams"
+# Dox waits up to 8 seconds for open requests on stop. Fly waits 5 by default.
+kill_timeout = 10
 
 [build]
   dockerfile = "Dockerfile"
@@ -74,9 +76,10 @@ primary_region = "ams"
   cpus = 1
 ```
 
-- `internal_port` is the port the app listens on. Dox reads it from `APP_PORT`. Keep the two the same.
+- `internal_port` is the port the app listens on. Dox reads it from `APP_PORT` (or `PORT` when `APP_PORT` is not set). Keep the two the same.
 - Values in `[env]` must be strings, so write `"3000"`, not `3000`.
 - `[[vm]]` wins over `fly scale vm`. Each `fly deploy` sets the machine to these values.
+- `kill_timeout` is how long Fly waits after `SIGINT` before it kills the app. Keep it above `shutdownTimeout` of `AppConfig` (8 seconds by default). See [Graceful shutdown](../digging-deeper/deployment.md#graceful-shutdown).
 
 ## 3. Set the secrets
 
@@ -152,7 +155,7 @@ The first log lines after a start:
 ```text
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
-{"level":"INFO","name":"dox","message":"Server started at http://127.0.0.1:3000 with 1 isolate (native)", ...}
+{"level":"INFO","name":"dox","message":"Server started at http://[::]:3000 with 1 isolate (native)", ...}
 ```
 
 ## HTTPS and the client IP

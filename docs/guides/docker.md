@@ -110,7 +110,7 @@ Delete the `public` lines when your app has no `public` folder.
 Check the start log in the container. It must end with `(native)`:
 
 ```text
-Server started at http://127.0.0.1:3000 with 8 isolate (native)
+Server started at http://[::]:3000 with 8 isolate (native)
 ```
 
 Without the `libgcc_s` lines, the native HTTP server does not load in a

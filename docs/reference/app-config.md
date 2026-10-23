@@ -10,12 +10,14 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
 | `appKey` | `String` | required | Encrypts cookies (`req.cookie()`, `DoxCookie`) and signs local storage URLs. In production the app stops at start when it is empty. Make one with `dox key:generate`. |
-| `serverPort` | `int` | `3000` | The port the HTTP server listens on. |
+| `serverPort` | `int` | `3000` | The port the HTTP server listens on. When the env has no `APP_PORT` but has `PORT`, Dox listens on `PORT` instead (Cloud Run, Fly, Render and Heroku set it). |
+| `host` | `String?` | `null`: `APP_HOST`, else all interfaces | The network interface to listen on, like `127.0.0.1`. `null` reads the env var `APP_HOST`. With neither, Dox listens on all interfaces, IPv6 and IPv4 (`::`). |
 | `totalIsolate` | `int?` | `Platform.numberOfProcessors` | Isolates (threads) that serve HTTP, all on the same port. On Windows the native server runs on one isolate. |
 | `server` | `ServerBackend` | `ServerBackend.native` | Which HTTP server runs: `native` (Rust, `dox_http_native`) or `dartIo`. The env var `DOX_SERVER` wins over this value. See [Native server](../digging-deeper/native-server.md). |
 | `compress` | `bool` | `false` | gzip responses in Dart (`HttpServer.autoCompress`). It costs CPU on every response. Let a proxy do it when you have one. |
 | `maxBodySize` | `int` | `10 * 1024 * 1024` (10 MB) | Biggest JSON or urlencoded body in bytes. Bigger gets `413`. |
 | `maxMultipartSize` | `int` | `100 * 1024 * 1024` (100 MB) | Biggest `multipart/form-data` body (file uploads) in bytes. Bigger gets `413`. |
+| `shutdownTimeout` | `Duration` | `Duration(seconds: 8)` | On `SIGTERM` or `SIGINT`, how long open requests may run before Dox closes them. Keep it below the kill timeout of your platform. See [Graceful shutdown](../digging-deeper/deployment.md#graceful-shutdown). |
 | `trustedProxies` | `List<String>` | `[]` | IPs or CIDR ranges of reverse proxies. Only when the direct client is in this list does Dox read `X-Forwarded-For` for `req.ip()` and `X-Forwarded-Proto` for `req.scheme()`. `['*']` trusts any client. |
 
 ## Routing and request handling
