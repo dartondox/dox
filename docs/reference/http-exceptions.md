@@ -15,7 +15,7 @@ abstract class IHttpException {
     if (message is Map) {
       return message;
     }
-    return message.toString();
+    return <String, dynamic>{'code': errorCode, 'message': message.toString()};
   }
 }
 ```
@@ -43,16 +43,15 @@ Source files: `packages/dox-core/lib/exception/*.dart` and `packages/dox-auth/li
 
 1. The status is set to `code`.
 2. The body is `toResponse()`.
-3. A `Map` body is sent as JSON with `Content-Type: application/json`.
-4. Any other body is sent as text, with the default `text/plain` content type.
+3. The body is sent as JSON with `Content-Type: application/json`.
 
-So the default exceptions answer with plain text:
+A text message gives a JSON body with the `errorCode` and the `message`:
 
 ```
 HTTP/1.1 404 Not Found
-content-type: text/plain; charset=utf-8
+content-type: application/json
 
-Not Found
+{"code":"not_found","message":"Not Found"}
 ```
 
 ```dart
@@ -61,12 +60,12 @@ throw NotFoundHttpException(message: 'Blog not found');
 
 ```
 HTTP/1.1 404 Not Found
-content-type: text/plain; charset=utf-8
+content-type: application/json
 
-Blog not found
+{"code":"not_found","message":"Blog not found"}
 ```
 
-A `Map` message gives JSON. `ValidationException` always has a map, one entry per field:
+A `Map` message is sent as it is, with no `code` key. `ValidationException` always has a map, one entry per field:
 
 ```
 HTTP/1.1 422 Unprocessable Entity
@@ -77,17 +76,13 @@ content-type: application/json
 
 A request for a path that has no route is not an exception. Dox answers `404` with the text `<METHOD> <path> not found`.
 
-To get a JSON body from any exception, pass a map:
+To send your own JSON shape from one exception, pass a map:
 
 ```dart
 throw NotFoundHttpException(
   message: <String, dynamic>{'error': 'not_found', 'message': 'Blog not found'},
 );
 ```
-
-!!! note "`errorCode` is not sent"
-    `errorCode` is stored on the exception, but `toResponse()` does not use it. The client only gets the status and the `message`.
-    Put the code in a map message, or in a `responseHandler`, when the client needs it.
 
 Other errors: any `Exception` or `Error` that is not an `IHttpException` gets `500` with `error.toString()` as text body. It is also passed to `errorHandler` in `AppConfig`. An `IHttpException` is not passed to `errorHandler`.
 

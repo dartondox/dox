@@ -139,7 +139,7 @@ curl -i http://localhost:3000/api/posts/99
 HTTP/1.1 404 Not Found
 ...
 
-Not Found
+{"code":"not_found","message":"Not Found"}
 ```
 
 ## Next

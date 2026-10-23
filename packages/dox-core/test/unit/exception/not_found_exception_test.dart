@@ -8,7 +8,20 @@ void main() {
     );
 
     dynamic res = exception.toResponse();
-    expect(res, '404 Not Found');
+    expect(res, <String, dynamic>{
+      'code': 'not_found',
+      'message': '404 Not Found',
+    });
     expect(exception.code, 404);
+  });
+
+  test('a map message is sent as it is', () {
+    Map<String, dynamic> body = <String, dynamic>{'error': 'gone'};
+    expect(NotFoundHttpException().toResponse(), <String, dynamic>{
+      'code': 'not_found',
+      'message': 'Not Found',
+    });
+    IHttpException e = ValidationException(message: body);
+    expect(e.toResponse(), body);
   });
 }

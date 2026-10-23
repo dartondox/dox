@@ -68,6 +68,9 @@ Each one takes `message:`, `errorCode:` and `code:`:
 throw NotFoundHttpException(message: 'Blog not found');
 ```
 
+The client gets `404` with `{"code":"not_found","message":"Blog not found"}`.
+`code` is the `errorCode`. A `Map` message is sent as it is.
+
 For another status, extend `IHttpException`:
 
 ```dart

@@ -48,7 +48,10 @@ See [Environment variables](../digging-deeper/env.md).
 
 ## dox_core: requests (what the client gets)
 
-| Status | Body text | When | What to do |
+An `IHttpException` with a text message answers `{"code":"<errorCode>","message":"<text>"}`.
+The table shows the `message` text.
+
+| Status | Message | When | What to do |
 | --- | --- | --- | --- |
 | `404` | `<METHOD> <path> not found` | No route matches. | Check the method, the path and the router `prefix`. |
 | `404` | `Not Found` | A typed path param does not fit, like `abc` for `int id`. | Send a valid value. |

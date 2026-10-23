@@ -333,7 +333,7 @@ curl -i -X POST http://localhost:3000/api/posts \
 HTTP/1.1 401 Unauthorized
 ...
 
-Authentication failed
+{"code":"unauthorized","message":"Authentication failed"}
 ```
 
 With the token it works:

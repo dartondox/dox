@@ -183,7 +183,13 @@ class OpenApiRouteReader {
         401,
         const ResponseDoc(
           description: 'Not logged in',
-          schema: <String, dynamic>{'type': 'string'},
+          schema: <String, dynamic>{
+            'type': 'object',
+            'properties': <String, dynamic>{
+              'code': <String, dynamic>{'type': 'string'},
+              'message': <String, dynamic>{'type': 'string'},
+            },
+          },
         ),
       );
     }

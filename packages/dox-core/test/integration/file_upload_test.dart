@@ -155,7 +155,10 @@ void main() {
       );
 
       expect(res.statusCode, 404);
-      expect(res.body, 'file not found');
+      expect(jsonDecode(res.body), <String, dynamic>{
+        'code': 'not_found',
+        'message': 'file not found',
+      });
     });
 
     test('handle file with response()', () async {

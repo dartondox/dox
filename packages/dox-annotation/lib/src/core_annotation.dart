@@ -57,11 +57,15 @@ abstract class IHttpException {
   String errorCode = 'server_error';
   dynamic message = 'Server Error';
 
+  /// the JSON body of the error answer:
+  /// `{"code": "not_found", "message": "Not Found"}`.
+  /// a `Map` message is sent as it is, so validation errors and
+  /// custom JSON keep their own shape.
   dynamic toResponse() {
     if (message is Map) {
       return message;
     }
-    return message.toString();
+    return <String, dynamic>{'code': errorCode, 'message': message.toString()};
   }
 }
 
