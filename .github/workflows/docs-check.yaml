@@ -36,8 +36,4 @@ jobs:
       - name: Spelling
         run: codespell docs --skip "*.svg,*.png,*.ico,*.css,*.js" --ignore-words .codespell-ignore
       - name: No content tabs
-        run: |
-          if rg -n '^=== "' docs; then
-            echo "::error::Content tabs are not used in these docs. Use one code block or sub-headings."
-            exit 1
-          fi
+        run: ci/check-no-tabs.sh
