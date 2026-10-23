@@ -33,9 +33,7 @@ void main() async {
       expect(found?.toJson().containsKey('created_at'), false);
       expect(found?.toJson().containsKey('updated_at'), false);
 
-      Setting created = await Setting().create(<String, dynamic>{
-        'name': 'x',
-      });
+      Setting created = await Setting().create(<String, dynamic>{'name': 'x'});
       expect(created.name, 'x');
     });
   });

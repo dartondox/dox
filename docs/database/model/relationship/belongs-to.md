@@ -117,15 +117,13 @@ SELECT "user".*, "comment"."id" as "_foreign_id" FROM "user"
 
 | Option | Default | What it is |
 |---|---|---|
-| `foreignKey` | `{related table}_id`, like `user_id` | The column in this table that points to the related model. |
+| `foreignKey` | `{related model}_id`, like `user_id` | The column in this table that points to the related model. |
 | `localKey` | the primary key of the related model | The column in the related table that `foreignKey` points to. |
 | `onQuery` | none | A static function that changes the query. |
 | `eager` | `false` | Load the relation on every query. |
 
-!!! warning "Custom table names"
-    The default `foreignKey` uses the table name of the related model, not its class name.
-    When `User` has `@DoxModel(table: 'users')`, the default is `users_id`.
-    Then set `foreignKey: 'user_id'` yourself.
+The default `foreignKey` uses the class name of the related model in snake_case, like Laravel.
+`User` gives `user_id`, also when the table is `users`.
 
 ### `foreignKey` and `localKey`
 

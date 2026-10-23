@@ -23,14 +23,16 @@ M? manyToMany<T, M>(
   localKey = localKey ?? local.primaryKey;
   relatedKey = relatedKey ?? related.primaryKey;
 
-  String localTable = local.tableName;
   String relatedTable = related.tableName;
 
-  // @todo: sort by alphabet to join table;
-  pivotTable = pivotTable ?? _sortTableByAlphabet(relatedTable, localTable);
+  /// the defaults use the model names, like Laravel:
+  /// Artist and Song give artist_song, artist_id and song_id
+  String localName = local.helper.tableNameOf(local.runtimeType);
+  String relatedName = related.helper.tableNameOf(related.runtimeType);
+  pivotTable = pivotTable ?? _sortTableByAlphabet(relatedName, localName);
 
-  pivotForeignKey = pivotForeignKey ?? '${localTable}_id';
-  pivotRelatedForeignKey = pivotRelatedForeignKey ?? '${relatedTable}_id';
+  pivotForeignKey = pivotForeignKey ?? local.foreignKeyName;
+  pivotRelatedForeignKey = pivotRelatedForeignKey ?? related.foreignKeyName;
 
   List<dynamic> ids = list
       .map((Model<T> i) => i.convertToMap(i)[localKey])
@@ -54,7 +56,7 @@ M? manyToMany<T, M>(
   return q as M;
 }
 
-/// sort two table alphabetically
+/// sort two names alphabetically
 /// blog and category , blog_category
 /// song and artist, artist_song
 String _sortTableByAlphabet(String firstTable, String secondTable) {

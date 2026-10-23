@@ -31,6 +31,11 @@ class Model<T> extends QueryBuilder<T> {
   @override
   String get tableName => helper.tableNameOf(runtimeType);
 
+  /// the default foreign key that points to this model: the class name
+  /// in snake case and `_id`, like Laravel. `User` gives `user_id`, also
+  /// when the table is `users`.
+  String get foreignKeyName => '${helper.tableNameOf(runtimeType)}_id';
+
   @override
   dynamic get self => this;
 
