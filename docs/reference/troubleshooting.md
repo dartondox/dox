@@ -124,31 +124,15 @@ dox create my_app --version 3.0.0-alpha.4
 
 ## A `.env` value with `#`
 
-**Symptom.** The app stops at start with
-
-```
-EnvException: the env is not valid
-  - APP_PORT must be an int, not "3000 # dev"
-```
-
-or, with `Env.get`:
-
-```
-Invalid argument(s): Env key "APP_PORT" is not a valid int: "3000 # dev"
-```
-
-Or a text value is longer than you expect, like a password with ` # prod` at the end.
-
-**Cause.** The `.env` parser (`packages/dox-core/lib/env/env.dart`) does not treat `#` as a comment. Everything after the first `=` is the value. Only `"`, `'` and `` ` `` are removed.
-
-**Fix.** Put comments on their own line:
+A `#` after a space starts a comment. The comment is not part of the value.
 
 ```ini
-# the dev port
-APP_PORT=3000
+APP_PORT=3000 # dev port   -> 3000
+DB_PASSWORD=abc#123        -> abc#123 (no space before the #)
+DB_PASSWORD="abc # 123"    -> abc # 123 (quotes keep the #)
 ```
 
-A value that must contain `#` (a password, a URL fragment) works as it is. Do not quote it, the quotes are removed anyway.
+When a value must have ` #` in it (a space, then `#`), put the value in quotes. The quotes are removed.
 
 ## `Hash.verify` throws on a bad hash
 

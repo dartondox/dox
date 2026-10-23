@@ -377,7 +377,7 @@ final AppEnv env = AppEnv.load();
 
 A new project has this class in `lib/config/env.dart`. Use `env.appPort` in code. After you add a getter, run `dart run build_runner build`.
 
-`Env.get<int>('APP_PORT', 3000)` is the low-level way. It reads a key by name. A real env var wins over `.env`. `#` is not a comment after a value.
+`Env.get<int>('APP_PORT', 3000)` is the low-level way. It reads a key by name. A real env var wins over `.env`. In `.env`, a `#` after a space starts a comment.
 
 See [Environment variables](../digging-deeper/env.md) and [Env reference](env.md).
 

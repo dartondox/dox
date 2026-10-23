@@ -107,9 +107,12 @@ DB_PORT=5432
 ```
 
 - One `KEY=value` per line.
-- Dox removes all `"`, `'` and `` ` `` characters from a value. So `APP_NAME="My app"` gives `My app`.
+- Quotes around a value are removed. So `APP_NAME="My app"` gives `My app`. Use `"`, `'` or `` ` ``.
 - A `=` inside the value is kept: `TOKEN=a=b` gives `a=b`.
-- Put a comment on its own line. A `#` after a value is part of the value.
+- A line that starts with `#` is a comment.
+- A `#` after a space starts a comment: `APP_PORT=3000 # dev` gives `3000`.
+- A `#` with no space before it is kept: `DB_PASSWORD=abc#123` gives `abc#123`.
+- A `#` inside quotes is kept: `DB_PASSWORD="abc # 123"` gives `abc # 123`.
 
 ## Commands
 

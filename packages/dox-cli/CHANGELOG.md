@@ -2,6 +2,7 @@
 
 - Fix: `dox create my_app` without `--version` crashed with a `RangeError`.
 - Fix: `dox create` picked the GitHub "latest" template release, which skips pre-releases. During the 3.x alpha that gave the old 2.x template. It now takes the newest template with the same major version as the CLI.
+- Fix: `dox env:generate` read `KEY=3000 # note` as text, not as an `int`. A `#` after a space is now a comment.
 
 ## 3.0.0-alpha.4
 

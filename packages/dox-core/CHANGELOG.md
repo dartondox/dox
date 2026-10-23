@@ -6,6 +6,8 @@
 - `req.cookie()` returns `null` for an encrypted cookie that can not be decrypted.
 - Fix: `Hash.verify` returns `false` for a malformed hash. Before, it threw.
 - `AESEncryptor` and `DecryptException` are now exported from `package:dox_core/dox_core.dart`.
+- Fix: in `.env`, `KEY=value # note` gave the value `value # note`. A `#` after a space now starts a comment. A `#` inside quotes, or with no space before it, is kept.
+- Fix: the `.env` parser removed every quote character inside a value. Now only the quotes around the value are removed.
 
 ## 3.0.0-alpha.4
 

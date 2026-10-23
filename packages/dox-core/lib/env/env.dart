@@ -77,36 +77,39 @@ class Env {
 
   /// load env from .env of project directory
   Map<String, String> _loadEnv({File? file}) {
-    Map<String, String> data = <String, String>{};
-
     File envFile = file ?? File('${Directory.current.path}/.env');
-    if (!envFile.existsSync()) return data;
-    String contents = envFile.readAsStringSync();
+    if (!envFile.existsSync()) return <String, String>{};
+    return parse(envFile.readAsStringSync());
+  }
 
-    // splitting with new line for each variables
-    List<String> list = contents.split('\n');
-
-    for (String d in list) {
-      // splitting with equal sign to get key and value
-      List<String> keyValue = d.toString().split('=');
-      if (keyValue.first.isNotEmpty) {
-        data[keyValue.first.trim()] = _getValue(keyValue);
-      }
+  /// Reads the text of a `.env` file.
+  /// - `KEY=value`, one per line. Lines that start with `#` are comments.
+  /// - `KEY=value # note`: a `#` after a space starts a comment.
+  /// - `KEY="a # b"`: quotes (`"`, `'` or `` ` ``) keep the value as it is,
+  ///   also a `#`. The quotes are removed.
+  /// - `KEY=abc#def` stays `abc#def` (no space before the `#`).
+  static Map<String, String> parse(String contents) {
+    Map<String, String> data = <String, String>{};
+    for (String line in contents.split('\n')) {
+      String text = line.trim();
+      if (text.isEmpty || text.startsWith('#')) continue;
+      int equal = text.indexOf('=');
+      if (equal < 1) continue;
+      data[text.substring(0, equal).trim()] = _value(text.substring(equal + 1));
     }
-
     return data;
   }
 
-  String _getValue(List<String> elements) {
-    if (elements.length > 1) {
-      List<String> elementsExceptFirst = elements.sublist(1);
-      String value = elementsExceptFirst.join('=');
-      return value
-          .replaceAll('"', '')
-          .replaceAll("'", '')
-          .replaceAll('`', '')
-          .trim();
+  static final RegExp _comment = RegExp(r'(^|\s)#');
+
+  static String _value(String raw) {
+    String value = raw.trim();
+    if (value.isNotEmpty && '"\'`'.contains(value[0])) {
+      int end = value.indexOf(value[0], 1);
+      if (end > 0) return value.substring(1, end);
     }
-    return '';
+    Match? comment = _comment.firstMatch(value);
+    if (comment != null) value = value.substring(0, comment.start);
+    return value.trim();
   }
 }
