@@ -17,6 +17,9 @@ void handle(HttpRequest req) async {
       List<int> body = <int>[for (List<int> c in await req.toList()) ...c];
       res.headers.contentType = ContentType.binary;
       res.add(body);
+    case '/slow':
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      res.write('slow done');
     case '/who':
       res.write(Isolate.current.debugName);
     case '/headers':
@@ -226,6 +229,48 @@ void main() {
     );
     expect(named.address.isLoopback, isTrue);
     await named.close();
+  });
+
+  test('close() lets open requests finish, then frees the port', () async {
+    NativeHttpServer a = await start(0);
+    int p = a.port;
+    HttpClient c = HttpClient();
+    Future<String> slow = c
+        .get('127.0.0.1', p, '/slow')
+        .then((HttpClientRequest r) => r.close())
+        .then((HttpClientResponse r) => utf8.decodeStream(r));
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    Stopwatch clock = Stopwatch()..start();
+    Future<void> closed = a.close();
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    // no new connections while it drains
+    await expectLater(
+      Socket.connect('127.0.0.1', p),
+      throwsA(isA<SocketException>()),
+    );
+    expect(await slow, 'slow done');
+    await closed;
+    expect(clock.elapsedMilliseconds, greaterThan(200));
+    c.close(force: true);
+    NativeHttpServer b = await start(p);
+    expect(b.port, p);
+    await b.close();
+  });
+
+  test('close(force: true) cuts open requests', () async {
+    NativeHttpServer a = await start(0);
+    HttpClient c = HttpClient();
+    Future<Object> slow = c
+        .get('127.0.0.1', a.port, '/slow')
+        .then((HttpClientRequest r) => r.close())
+        .then<Object>((HttpClientResponse r) => utf8.decodeStream(r))
+        .catchError((Object error) => error);
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    Future<void> graceful = a.close();
+    await a.close(force: true);
+    await graceful; // a waiting graceful close ends too
+    expect(await slow, isA<Exception>());
+    c.close(force: true);
   });
 
   test('close frees the port', () async {

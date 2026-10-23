@@ -211,6 +211,39 @@ Restart=always
 WantedBy=multi-user.target
 ```
 
+## Graceful shutdown
+
+On `SIGTERM` (docker stop, Kubernetes, Cloud Run, Fly, systemd) or `SIGINT` (Ctrl+C), Dox stops gracefully, in every isolate:
+
+1. It stops taking new connections at once.
+2. Open requests can finish. Each keep-alive connection closes after its current answer.
+3. After `shutdownTimeout` (default 8 seconds), it closes the connections that are still open.
+4. It runs `shutdown()` of each service that implements `DoxShutdown` (see [Services](services.md#clean-up-on-shutdown)).
+5. The process exits with code `0`.
+
+A second `SIGINT` or `SIGTERM` stops the process at once.
+
+Set the timeout in `lib/config/app.dart`:
+
+```dart
+AppConfig(
+  shutdownTimeout: Duration(seconds: 20),
+  ...
+)
+```
+
+Keep it shorter than the time your platform waits before it kills the process:
+
+| Platform | Waits | Change it with |
+| --- | --- | --- |
+| `docker stop` | 10 seconds | `docker stop -t 30`, or `stop_grace_period` in compose |
+| Kubernetes | 30 seconds | `terminationGracePeriodSeconds` |
+| Cloud Run | 10 seconds | can not be changed |
+| Fly.io | 5 seconds | `kill_timeout` in `fly.toml` |
+| systemd | 90 seconds | `TimeoutStopSec` |
+
+In code, `await Dox().stop()` does steps 1 to 4 and does not exit.
+
 ## Many processes or machines
 
 One Dox process already uses every core. You only need more processes to

@@ -87,6 +87,12 @@ class AppConfig {
   /// the native server, even for an app with WebSocket routes.
   final ServerBackend server;
 
+  /// On SIGTERM or SIGINT the server stops taking new connections, and
+  /// waits this long for open requests to finish. Then it closes the rest,
+  /// runs `DoxShutdown` services and exits. Default 8 seconds. Keep it
+  /// below the kill timeout of your platform (docker stop: 10 seconds).
+  final Duration shutdownTimeout;
+
   AppConfig({
     required this.appKey,
     this.serverPort = 3000,
@@ -118,6 +124,7 @@ class AppConfig {
     this.trustedProxies = const <String>[],
     this.compress = false,
     this.server = ServerBackend.native,
+    this.shutdownTimeout = const Duration(seconds: 8),
   }) : totalIsolate = totalIsolate ?? Platform.numberOfProcessors;
 }
 

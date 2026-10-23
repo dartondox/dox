@@ -66,6 +66,8 @@ and when the app has WebSocket or Socket.IO routes.
 - Each isolate can bind the same port (`SO_REUSEPORT` on Linux, one shared socket on macOS).
 - Each isolate has its own Rust network thread. `DOX_HTTP_THREAD=shared` puts them on one thread.
 - `400` for bad requests, `431` for headers over 16 KB, `413` for bodies over `maxBodySize`.
+- `bind(port, address: '127.0.0.1')` listens on one host. With no address it listens on all interfaces.
+- `close()` is graceful: no new connections, open requests get their answer, then it completes. `close(force: true)` closes every connection at once.
 - Not yet: WebSocket upgrade (`detachSocket`).
 - Not yet: streaming a response while it is written. The body is sent on `close`.
 

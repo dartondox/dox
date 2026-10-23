@@ -89,6 +89,30 @@ So routes can use what a service set up. For example, `Route.websocket()` needs 
 
 `dox openapi:generate` also runs `setup()` of every service, because it needs the routes.
 
+## Clean up on shutdown
+
+On `SIGTERM` or `SIGINT` Dox stops the server gracefully (see [Deployment](deployment.md#graceful-shutdown)).
+After the open requests are done, it runs `shutdown()` of each service that also implements `DoxShutdown`.
+It runs in every isolate. Use it to close connections or flush data.
+
+```dart title="lib/services/redis_service.dart"
+class RedisService implements DoxService, DoxShutdown {
+  late RedisConnection redis;
+
+  @override
+  Future<void> setup() async {
+    redis = await RedisConnection.open();
+  }
+
+  @override
+  Future<void> shutdown() async {
+    await redis.close();
+  }
+}
+```
+
+An error in `shutdown()` goes to `errorHandler`. The other services still run.
+
 ## Rules for a service
 
 - **Open connections in `setup()`, not in the constructor.** Dox copies the service object to each isolate. An open socket or database pool can not be copied, so the isolate fails to start.

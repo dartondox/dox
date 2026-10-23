@@ -14,6 +14,8 @@ class DoxIsolate {
 
   final Map<int, Isolate> _isolates = <int, Isolate>{};
   final Map<int, List<ReceivePort>> _receivePorts = <int, List<ReceivePort>>{};
+
+  /// isolate id -> the port to send the stop message to
   final Map<int, SendPort> _sendPorts = <int, SendPort>{};
   bool _stopped = false;
 
@@ -41,6 +43,28 @@ class DoxIsolate {
     }
   }
 
+  /// Stop every isolate gracefully: each stops taking connections, lets
+  /// open requests finish (up to [timeout]) and runs its `DoxShutdown`
+  /// services. Isolates still busy after that are killed.
+  Future<void> stopAll(Duration timeout) async {
+    _stopped = true;
+    List<Future<void>> waits = <Future<void>>[];
+    for (SendPort port in _sendPorts.values) {
+      ReceivePort reply = ReceivePort();
+      port.send(reply.sendPort);
+      waits.add(
+        reply.first
+            // ponytail: one extra second for the DoxShutdown services
+            .timeout(timeout + const Duration(seconds: 1), onTimeout: _no)
+            .whenComplete(reply.close),
+      );
+    }
+    await Future.wait(waits);
+    killAll();
+  }
+
+  static bool _no() => false;
+
   /// kill all the isolate
   void killAll() {
     _stopped = true;
@@ -55,6 +79,7 @@ class DoxIsolate {
     });
     _isolates.clear();
     _receivePorts.clear();
+    _sendPorts.clear();
   }
 
   /// create a thread.
@@ -65,7 +90,12 @@ class DoxIsolate {
   Future<void> _spawn(int isolateId) async {
     ReceivePort errorPort = ReceivePort();
     ReceivePort exitPort = ReceivePort();
-    _receivePorts[isolateId] = <ReceivePort>[errorPort, exitPort];
+    ReceivePort controlPort = ReceivePort();
+    _receivePorts[isolateId] = <ReceivePort>[errorPort, exitPort, controlPort];
+
+    controlPort.listen((dynamic port) {
+      _sendPorts[isolateId] = port as SendPort;
+    });
 
     errorPort.listen((dynamic message) {
       List<dynamic> error = message as List<dynamic>;
@@ -76,7 +106,9 @@ class DoxIsolate {
     exitPort.listen((dynamic _) async {
       errorPort.close();
       exitPort.close();
+      controlPort.close();
       _isolates.remove(isolateId);
+      _sendPorts.remove(isolateId);
       if (_stopped) return;
       stderr.writeln('[dox] isolate $isolateId exited, restarting');
       await Future<void>.delayed(restartDelay);
@@ -90,6 +122,7 @@ class DoxIsolate {
         Dox().config,
         Dox().doxServices,
         routes: _baseRoutes,
+        control: controlPort.sendPort,
       ),
       onError: errorPort.sendPort,
       onExit: exitPort.sendPort,

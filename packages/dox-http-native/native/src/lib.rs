@@ -115,6 +115,8 @@ struct Server {
     inbox: Mutex<Vec<(usize, Answer)>>,
     answered: Notify,
     stopped: AtomicBool,
+    /// `dox_shutdown` was called: stop accepting, let open requests finish
+    draining: AtomicBool,
     stop: Notify,
     port: u16,
     /// the address it listens on, for `unbind`
@@ -131,6 +133,7 @@ impl Server {
             inbox: Mutex::new(Vec::new()),
             answered: Notify::new(),
             stopped: AtomicBool::new(false),
+            draining: AtomicBool::new(false),
             stop: Notify::new(),
             port: key.3,
             key,
@@ -143,6 +146,18 @@ impl Server {
         self.stopped.store(true, Ordering::Release);
         self.stop.notify_one();
     }
+
+    fn drain(&self) {
+        self.draining.store(true, Ordering::Release);
+        self.stop.notify_one();
+    }
+
+    /// waits until `dox_stop` (or a dead isolate) stops the server
+    async fn wait_stopped(&self) {
+        while !self.stopped.load(Ordering::Acquire) {
+            self.stop.notified().await;
+        }
+    }
 }
 
 /// State of one server thread. Only that thread touches it.
@@ -153,6 +168,8 @@ struct Ctx {
     batch: RefCell<Vec<u8>>,
     notify: Notify,
     max_body: usize,
+    /// tells every open connection to close after its current request
+    closing: Notify,
 }
 
 /// The address to listen on: (family, high 64 bits, low 64 bits, port).
@@ -337,14 +354,17 @@ fn peer_bytes(addr: SocketAddr) -> [u8; 18] {
 }
 
 async fn serve(listener: StdListener, ctx: Rc<Ctx>, dart_port: i64) {
+    let key = ctx.server.key;
     let listener = tokio::net::TcpListener::from_std(listener).expect("listener");
     // every task of this server. Dropping it at the end closes them all,
     // also when other servers still run on the same thread.
     let mut tasks = JoinSet::new();
     tasks.spawn_local(flusher(ctx.clone(), dart_port));
     tasks.spawn_local(deliver(ctx.clone()));
+    // the connections, apart, so a shutdown can wait for them
+    let mut conns = JoinSet::new();
     let server = ctx.server.clone();
-    while !server.stopped.load(Ordering::Acquire) {
+    while !server.stopped.load(Ordering::Acquire) && !server.draining.load(Ordering::Acquire) {
         tokio::select! {
             biased;
             _ = server.stop.notified() => {}
@@ -360,41 +380,72 @@ async fn serve(listener: StdListener, ctx: Rc<Ctx>, dart_port: i64) {
                 let _ = stream.set_nodelay(true);
                 let peer = peer_bytes(addr);
                 let ctx = ctx.clone();
-                while tasks.try_join_next().is_some() {} // forget closed ones
-                tasks.spawn_local(async move {
-                    let ctx2 = ctx.clone();
-                    let svc = service_fn(move |req| handle(req, ctx.clone(), peer));
-                    // hyper answers 400 for a bad request and 431 when the
-                    // head is bigger than MAX_HEAD, then closes the connection.
-                    // Do not turn on pipeline_flush: then hyper drops that answer.
-                    let _ = http1::Builder::new()
-                        .timer(TokioTimer::new())
-                        .keep_alive(true)
-                        .half_close(true)
-                        .max_buf_size(MAX_HEAD)
-                        .serve_connection(TokioIo::new(Lingering(Some(stream), ctx2)), svc)
-                        .await;
-                });
+                while conns.try_join_next().is_some() {} // forget closed ones
+                conns.spawn_local(connection(stream, peer, ctx));
                 // let the accept loops of other servers on this thread take
                 // a turn. On macOS they all accept from one queue.
                 tokio::task::yield_now().await;
             }
         }
     }
+    // no new connections from here on. The port is free when the last
+    // server of this address stops.
+    drop(listener);
+    unbind(key);
+    if server.stopped.load(Ordering::Acquire) {
+        return;
+    }
+    // graceful shutdown: each connection closes after its current answer.
+    // Dart still answers the open requests. `dox_stop` ends the wait early.
+    ctx.closing.notify_waiters();
+    tokio::select! {
+        _ = async { while conns.join_next().await.is_some() {} } => {}
+        _ = server.wait_stopped() => {}
+    }
+    post(dart_port, &[1]); // tell Dart: all open requests are done
+    server.wait_stopped().await;
+}
+
+/// Serves one connection until the client closes it, or until a
+/// shutdown, after the request it is busy with.
+async fn connection(stream: TcpStream, peer: [u8; 18], ctx: Rc<Ctx>) {
+    // made before the check, so a shutdown between the two is not missed
+    let watch = ctx.clone();
+    let closing = watch.closing.notified();
+    let shut_down = ctx.server.draining.load(Ordering::Acquire);
+    let ctx2 = ctx.clone();
+    let svc = service_fn(move |req| handle(req, ctx2.clone(), peer));
+    // hyper answers 400 for a bad request and 431 when the
+    // head is bigger than MAX_HEAD, then closes the connection.
+    // Do not turn on pipeline_flush: then hyper drops that answer.
+    let conn = http1::Builder::new()
+        .timer(TokioTimer::new())
+        .keep_alive(true)
+        .half_close(true)
+        .max_buf_size(MAX_HEAD)
+        .serve_connection(TokioIo::new(Lingering(Some(stream), ctx)), svc);
+    let mut conn = std::pin::pin!(conn);
+    if !shut_down {
+        tokio::select! {
+            _ = conn.as_mut() => return,
+            _ = closing => {}
+        }
+    }
+    conn.as_mut().graceful_shutdown();
+    let _ = conn.await;
 }
 
 /// Runs one server until it stops, then frees its port.
 async fn run_server(listener: StdListener, server: Arc<Server>, dart_port: i64, max_body: usize) {
-    let key = server.key;
     let ctx = Rc::new(Ctx {
         server,
         pending: RefCell::new(Slab::with_capacity(1024)),
         batch: RefCell::new(Vec::with_capacity(1 << 16)),
         notify: Notify::new(),
         max_body,
+        closing: Notify::new(),
     });
     serve(listener, ctx, dart_port).await;
-    unbind(key);
 }
 
 fn new_runtime() -> tokio::runtime::Runtime {
@@ -745,6 +796,18 @@ pub unsafe extern "C" fn dox_port(handle: i64) -> i32 {
     i32::from(server.port)
 }
 
+/// Starts a graceful shutdown: the server stops accepting connections at
+/// once. Each open connection closes after its current answer. When all
+/// are closed, Dart gets a message of one byte. Then call `dox_stop`.
+///
+/// # Safety
+/// `handle` must come from `dox_start` and not be stopped.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dox_shutdown(handle: i64) {
+    let server = unsafe { &*(handle as *const Server) };
+    server.drain();
+}
+
 /// Stops the server, closes its connections and frees the handle.
 ///
 /// # Safety
@@ -850,6 +913,7 @@ mod tests {
                 batch: RefCell::new(Vec::new()),
                 notify: Notify::new(),
                 max_body: 10,
+                closing: Notify::new(),
             });
             local.block_on(&rt, serve(listener, ctx, 0));
         });

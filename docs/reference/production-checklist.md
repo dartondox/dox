@@ -76,7 +76,7 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | Check | How | Read more |
 | --- | --- | --- |
 | Health route | **Dox limit.** Dox has no built-in health route. Add one that asks the database: `Route.get('/health', healthController.check)` with `await QueryBuilder.query('select 1');`. | [Docker](../guides/docker.md) |
-| Graceful shutdown | **Dox limit.** Dox does not listen for `SIGTERM`. On stop, open requests are cut. `Dox().server.close()` closes the server of the main isolate only. Take the instance out of the proxy first, wait a few seconds, then stop it. | [Deployment](../digging-deeper/deployment.md) |
+| Graceful shutdown | On `SIGTERM` or `SIGINT`, Dox stops taking connections and lets open requests finish, in every isolate. Set `shutdownTimeout` below the kill timeout of your platform. Close connections in a `DoxShutdown` service. | [Deployment](../digging-deeper/deployment.md#graceful-shutdown) |
 | Zero downtime deploys | Run two processes (or machines) behind the proxy. Restart one at a time. | [Deployment](../digging-deeper/deployment.md) |
 
 ## Rate limit at the proxy

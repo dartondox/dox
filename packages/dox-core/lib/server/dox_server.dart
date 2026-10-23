@@ -115,6 +115,24 @@ class DoxServer {
     return server;
   }
 
+  /// Graceful stop: no new connections, open requests get [timeout] to
+  /// finish. Then every connection is closed.
+  Future<void> shutdown(Duration timeout) async {
+    HttpServer server = httpServer;
+    Stopwatch clock = Stopwatch()..start();
+    // native: completes when the open requests are done.
+    // dart:io: completes at once, so wait for the active connections.
+    await server.close().then(_ignore).timeout(timeout, onTimeout: _nothing);
+    while (server.connectionsInfo().active > 0 && clock.elapsed < timeout) {
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    }
+    await server.close(force: true);
+  }
+
+  static void _nothing() {}
+
+  static void _ignore(Object? _) {}
+
   /// close http server
   /// ```
   /// server.close();

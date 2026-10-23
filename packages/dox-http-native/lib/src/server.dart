@@ -174,16 +174,36 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
     );
   }
 
-  /// Stop listening and close every connection.
+  Completer<void>? _drained;
+
+  /// Stop listening. Like `dart:io`, open requests still get their answer.
+  /// Each connection closes after its current answer, and the future
+  /// completes when all are closed. With [force] every connection closes
+  /// at once, also when a graceful close still waits.
   @override
   Future<void> close({bool force = false}) async {
+    if (_handle == 0) return;
+    if (!force) {
+      Completer<void>? drained = _drained;
+      if (drained == null) {
+        drained = _drained = Completer<void>();
+        doxShutdown(_handle);
+      }
+      await drained.future;
+    }
     if (_handle != 0) {
       doxStop(_handle);
       _handle = 0;
       _receive.close();
       // not awaited: with no listener the close future never completes
       unawaited(_requests.close());
+      _done();
     }
+  }
+
+  void _done() {
+    Completer<void>? drained = _drained;
+    if (drained != null && !drained.isCompleted) drained.complete();
   }
 
   // ---- requests from Rust ----
@@ -192,6 +212,7 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
 
   void _onBatch(Uint8List b) {
     if (b.isEmpty) return; // a probe from Rust: "is this isolate alive?"
+    if (b.length == 1) return _done(); // a graceful close is done
     ByteData d = ByteData.sublistView(b);
     int p = 0;
     _inBatch = true;

@@ -28,6 +28,11 @@ external int doxStart(
 @Native<Int32 Function(Int64)>(symbol: 'dox_port', isLeaf: true)
 external int doxPort(int handle);
 
+/// Stop accepting. Open connections close after their current answer.
+/// Rust posts one byte to the port when they are all closed.
+@Native<Void Function(Int64)>(symbol: 'dox_shutdown')
+external void doxShutdown(int handle);
+
 @Native<Void Function(Int64)>(symbol: 'dox_stop')
 external void doxStop(int handle);
 
