@@ -10894,7 +10894,7 @@ After `AuthMiddleware`, `req.auth` holds the login.
 | `user<T>()` | the user after `attempt` or `login` |
 | `isLoggedIn()` | `true` when there is a user |
 
-`attempt` searches only by the fields in `identifierFields`.
+`attempt` searches only by the fields in `identifierFields`. It runs bcrypt also when no user is found, or when the user has no password, so the answer time does not tell whether an email has an account.
 It returns `null` when the password is not a `String`, when no identifier is given, or when the password does not match.
 
 ## Options
@@ -10911,7 +10911,7 @@ It returns `null` when the password is not a `String`, when no identifier is giv
 
 | Option | Default | What it does |
 | --- | --- | --- |
-| `secret` | required | the key that signs tokens, like `SecretKey(env.appKey)` |
+| `secret` | required | the key that signs tokens, like `SecretKey(env.appKey)`. An empty key throws `ArgumentError` |
 | `algorithm` | `JWTAlgorithm.HS256` | the signing algorithm |
 | `expiresIn` | `Duration(hours: 1)` | how long a token is valid |
 | `issuer` | `null` | the `iss` claim. When set, `verifyToken` also checks it |
@@ -16945,6 +16945,11 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_auth
 
+### Unreleased
+
+- Security: `JwtAuthDriver` throws `ArgumentError` when the `SecretKey` is empty. Before, an app with no `APP_KEY` signed tokens with an empty key, so anyone could make a token for any user.
+- Security: `attempt` runs bcrypt also when no user is found, or when the user has no password. Before, an unknown email answered much faster than a wrong password, so the time told which emails have an account.
+
 ### 3.0.0-alpha.6
 
 - Version bump only, to match the other packages.
@@ -17198,6 +17203,10 @@ What changed in each package, newest first. This page is made from the
 - `uuid` 4 and `mime` 2.
 
 ## dox_http_native
+
+### Unreleased
+
+- Security: response headers now refuse bad input with a `FormatException`, like `dart:io`. A header name must be a token. A header value must not hold a line break or other control byte. Before, a `\n` in a value (or a char like `\u010A`, written as its low byte) added one more header, eg. `Set-Cookie`, when an app put request input in a header. The same check now runs on `serverHeader` and on each cookie when the response closes, because `Cookie` does not check its domain.
 
 ### 3.0.0-alpha.6
 

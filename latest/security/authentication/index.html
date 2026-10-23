@@ -4327,7 +4327,7 @@ When the token is missing or not valid, the request stops with <code>401 Authent
 </tr>
 </tbody>
 </table>
-<p><code>attempt</code> searches only by the fields in <code>identifierFields</code>.
+<p><code>attempt</code> searches only by the fields in <code>identifierFields</code>. It runs bcrypt also when no user is found, or when the user has no password, so the answer time does not tell whether an email has an account.
 It returns <code>null</code> when the password is not a <code>String</code>, when no identifier is given, or when the password does not match.</p>
 <h2 id="options">Options</h2>
 <h3 id="authprovider"><code>AuthProvider</code></h3>
@@ -4370,7 +4370,7 @@ It returns <code>null</code> when the password is not a <code>String</code>, whe
 <tr>
 <td><code>secret</code></td>
 <td>required</td>
-<td>the key that signs tokens, like <code>SecretKey(env.appKey)</code></td>
+<td>the key that signs tokens, like <code>SecretKey(env.appKey)</code>. An empty key throws <code>ArgumentError</code></td>
 </tr>
 <tr>
 <td><code>algorithm</code></td>
