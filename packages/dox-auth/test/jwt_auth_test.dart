@@ -70,7 +70,29 @@ FakeRequest bearer(String? token) {
   return FakeRequest(<String, String>{'Authorization': 'Bearer $token'});
 }
 
-void init({Duration? expiresIn}) {
+/// Admins live in another table, so the `admin` guard uses its own store.
+final Map<int, FakeUser> admins = <int, FakeUser>{};
+
+class FakeAdmin extends FakeUser {
+  FakeAdmin([super.id, super.email, super.password]);
+
+  @override
+  Future<FakeUser?> find(dynamic arg1, [dynamic arg2]) async => admins[arg1];
+
+  @override
+  Future<FakeUser?> getFirst() async {
+    for (FakeUser u in admins.values) {
+      bool match = true;
+      _wheres.forEach((String key, dynamic value) {
+        if (u.convertToMap(u)[key] != value) match = false;
+      });
+      if (match) return u;
+    }
+    return null;
+  }
+}
+
+void init({Duration expiresIn = const Duration(hours: 1)}) {
   Auth.initialize(
     AuthConfig(
       defaultGuard: 'web',
@@ -82,6 +104,12 @@ void init({Duration? expiresIn}) {
           ),
           provider: AuthProvider(model: () => FakeUser()),
         ),
+
+        /// same secret on purpose: the guard name must still keep them apart
+        'admin': AuthGuard(
+          driver: JwtAuthDriver(secret: SecretKey(secret)),
+          provider: AuthProvider(model: () => FakeAdmin()),
+        ),
       },
     ),
   );
@@ -92,6 +120,9 @@ void main() {
     users
       ..clear()
       ..[1] = FakeUser(1, 'a@dox.dev', Hash.make('secret'));
+    admins
+      ..clear()
+      ..[1] = FakeAdmin(1, 'boss@dox.dev', Hash.make('admin-secret'));
     init();
   });
 
@@ -203,6 +234,83 @@ void main() {
         'password': 123,
       });
       expect(token, isNull);
+    });
+  });
+
+  group('JWT expiry |', () {
+    test('a token expires after 1 hour by default', () {
+      String token = Auth().login(users[1]!)!;
+      Map<String, dynamic> payload = JWT.decode(token).payload;
+      expect(payload['exp'] - payload['iat'], 3600);
+    });
+
+    test('expiresIn can be changed', () {
+      init(expiresIn: Duration(minutes: 5));
+      String token = Auth().login(users[1]!)!;
+      Map<String, dynamic> payload = JWT.decode(token).payload;
+      expect(payload['exp'] - payload['iat'], 300);
+    });
+  });
+
+  group('Named guards |', () {
+    test('attempt on a named guard uses its provider', () async {
+      Auth admin = Auth(guard: 'admin');
+      String? token = await admin.attempt(<String, dynamic>{
+        'email': 'boss@dox.dev',
+        'password': 'admin-secret',
+      });
+      expect(token, isNotNull);
+      expect(admin.user<FakeUser>()?.email, 'boss@dox.dev');
+
+      /// the default guard does not know this admin
+      expect(
+        await Auth().attempt(<String, dynamic>{
+          'email': 'boss@dox.dev',
+          'password': 'admin-secret',
+        }),
+        isNull,
+      );
+    });
+
+    test('a token of one guard does not work on another guard', () async {
+      String userToken = Auth().login(users[1]!)!;
+      String adminToken = Auth(guard: 'admin').login(admins[1]!)!;
+
+      Auth a1 = Auth(guard: 'admin');
+      await a1.verifyToken(bearer(userToken));
+      expect(a1.isLoggedIn(), isFalse);
+
+      Auth a2 = Auth();
+      await a2.verifyToken(bearer(adminToken));
+      expect(a2.isLoggedIn(), isFalse);
+
+      Auth a3 = Auth(guard: 'admin');
+      await a3.verifyToken(bearer(adminToken));
+      expect(a3.user<FakeUser>()?.email, 'boss@dox.dev');
+    });
+
+    test('a token with no guard audience is rejected', () async {
+      String token = JWT(<String, dynamic>{'id': 1}).sign(SecretKey(secret));
+      Auth auth = Auth();
+      await auth.verifyToken(bearer(token));
+      expect(auth.isLoggedIn(), isFalse);
+    });
+
+    test('AuthMiddleware uses its guard', () async {
+      String adminToken = Auth(guard: 'admin').login(admins[1]!)!;
+      FakeRequest req = bearer(adminToken);
+      await AuthMiddleware(guard: 'admin').handle(req);
+      Auth auth = req.merged[AUTH_REQUEST_KEY];
+      expect(auth.user<FakeUser>()?.email, 'boss@dox.dev');
+
+      expect(
+        () => AuthMiddleware().handle(bearer(adminToken)),
+        throwsA(isA<UnAuthorizedException>()),
+      );
+    });
+
+    test('an unknown guard throws', () {
+      expect(() => Auth(guard: 'nope').login(users[1]!), throwsArgumentError);
     });
   });
 

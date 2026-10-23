@@ -13,28 +13,24 @@ class JwtAuthDriver extends AuthDriver {
   /// JWT algorithm
   final JWTAlgorithm algorithm;
 
-  /// JWT token expire duration
-  final Duration? expiresIn;
-
-  /// get auth driver
-  AuthDriver get driver => AuthEngine().driver;
-
-  /// get auth provider
-  AuthProvider get provider => AuthEngine().provider;
+  /// How long a token is valid. Default: 1 hour.
+  final Duration expiresIn;
 
   /// constructor
   JwtAuthDriver({
     required this.secret,
     this.algorithm = JWTAlgorithm.HS256,
-    this.expiresIn,
+    this.expiresIn = const Duration(hours: 1),
     this.issuer,
   });
 
   /// verify token and get model from provider
   /// and get user data
   @override
-  Future<Model<dynamic>?> verifyToken(IDoxRequest req) async {
+  Future<Model<dynamic>?> verifyToken(IDoxRequest req, String guard) async {
     try {
+      AuthProvider provider = AuthEngine().guard(guard).provider;
+
       /// get token from header
       String? token = req.header('Authorization')?.replaceFirst('Bearer ', '');
 
@@ -44,7 +40,14 @@ class JwtAuthDriver extends AuthDriver {
       }
 
       /// verify token
-      JWT jwt = JWT.verify(token, secret);
+      /// the audience is the guard name, so a token of one guard
+      /// does not work for another guard.
+      JWT jwt = JWT.verify(
+        token,
+        secret,
+        audience: Audience.one(guard),
+        issuer: issuer,
+      );
 
       /// get the payload
       Map<String, dynamic> payload = jwt.payload;
@@ -73,7 +76,12 @@ class JwtAuthDriver extends AuthDriver {
   /// }
   ///```
   @override
-  Future<Model<dynamic>?> attempt(Map<String, dynamic> credentials) async {
+  Future<Model<dynamic>?> attempt(
+    Map<String, dynamic> credentials,
+    String guard,
+  ) async {
+    AuthProvider provider = AuthEngine().guard(guard).provider;
+
     /// password must be a string, otherwise login fails
     dynamic password = credentials[provider.passwordField];
     if (password is! String) {
@@ -124,9 +132,9 @@ class JwtAuthDriver extends AuthDriver {
   /// String token = auth.login(user);
   /// ```
   @override
-  String? createToken(Map<String, dynamic>? userPayload) {
+  String? createToken(Map<String, dynamic>? userPayload, String guard) {
     try {
-      JWT jwt = JWT(userPayload, issuer: issuer);
+      JWT jwt = JWT(userPayload, issuer: issuer, audience: Audience.one(guard));
       return jwt.sign(secret, algorithm: algorithm, expiresIn: expiresIn);
     } catch (error) {
       return null;

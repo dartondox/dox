@@ -18,7 +18,7 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 
 | Check | How | Read more |
 | --- | --- | --- |
-| JWT tokens expire | **Dox limit.** `JwtAuthDriver.expiresIn` is `null` by default, so tokens never expire. Set it: `JwtAuthDriver(secret: SecretKey(env.appKey), expiresIn: Duration(days: 7))`. | [Authentication](../security/authentication.md) |
+| JWT tokens expire | `JwtAuthDriver.expiresIn` is 1 hour by default. Pick a time that fits your app, like `JwtAuthDriver(secret: SecretKey(env.appKey), expiresIn: Duration(hours: 12))`. | [Authentication](../security/authentication.md) |
 | You can not revoke one token | **Dox limit.** There is no token list on the server. To log out everyone, change `APP_KEY`. | [Authentication](../security/authentication.md) |
 | Passwords are hashed | `user.password = Hash.make(input)` (bcrypt). Never store or encrypt a plain password. | [Hashing](../security/hashing.md) |
 | The hash is never sent | `List<String> get hidden => <String>['password'];` in the user model. The JWT payload is `user.toJson()`, and anyone can read it. | [Authentication](../security/authentication.md) |
