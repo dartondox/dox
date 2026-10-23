@@ -14,6 +14,16 @@ RouteData? httpRouteHandler(HttpRequest req) {
     req.headers.value(HttpHeaders.hostHeader),
   );
 
+  /// HEAD runs the GET route when there is no HEAD route.
+  /// the server sends the status and headers, with no body.
+  if (route == null && req.method == 'HEAD') {
+    route = _getMatchRoute(
+      req.uri.path,
+      'GET',
+      req.headers.value(HttpHeaders.hostHeader),
+    );
+  }
+
   if (route == null) {
     /// answer preflight OPTIONS with 204 and cors headers.
     /// use cors setting of the route the browser is asking about.
