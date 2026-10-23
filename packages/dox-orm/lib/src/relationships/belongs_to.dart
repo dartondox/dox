@@ -12,6 +12,7 @@ M? belongsTo<T, M>(
 
   Model<T> foreign = list.first;
   Model<M> owner = model().debug(foreign.shouldDebug);
+  owner.connection ??= foreign.connection;
   localKey = localKey ?? owner.primaryKey;
   foreignKey = foreignKey ?? "${owner.tableName}_id";
 

@@ -23,6 +23,7 @@ M? hasMany<T, M>(
       .toList();
 
   Model<M> m = model().debug(owner.shouldDebug);
+  m.connection ??= owner.connection;
 
   m.select('*, $foreignKey as _owner_id').whereIn(foreignKey, ids);
 

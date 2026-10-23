@@ -43,6 +43,19 @@ class Model<T> extends QueryBuilder<T> {
     return this;
   }
 
+  /// use a named connection. save(), delete() and the models this
+  /// query returns use it too.
+  ///
+  /// ```
+  /// Blog blog = Blog()..withConnection('mysql');
+  /// await blog.save();
+  /// ```
+  @override
+  Model<T> withConnection(String connectionName) {
+    super.withConnection(connectionName);
+    return this;
+  }
+
   /// create new record in table
   ///
   /// ```
@@ -94,10 +107,7 @@ class Model<T> extends QueryBuilder<T> {
         updatedAt = values[updatedAtColumn];
       }
 
-      Map<String, dynamic> res = await QueryBuilder.table(tableName)
-          .setPrimaryKey(primaryKey)
-          .debug(_debug)
-          .insert(values);
+      Map<String, dynamic> res = await _newQuery<dynamic>().insert(values);
 
       tempIdValue = res[primaryKey];
       _savedValues = <String, dynamic>{...values, primaryKey: tempIdValue};
@@ -119,11 +129,7 @@ class Model<T> extends QueryBuilder<T> {
         updatedAt = values[updatedAtColumn];
       }
 
-      await QueryBuilder.table(tableName, this)
-          .setPrimaryKey(primaryKey)
-          .debug(_debug)
-          .where(primaryKey, id)
-          .update(values);
+      await _newQuery<T>(this).where(primaryKey, id).update(values);
     }
   }
 
@@ -188,10 +194,18 @@ class Model<T> extends QueryBuilder<T> {
   /// a new query on this row only, so the query state of this model
   /// (where, values of an old query) is not used again
   QueryBuilder<T> _thisRecord() {
-    return QueryBuilder.table<T>(
+    return _newQuery<T>(this).where(primaryKey, tempIdValue);
+  }
+
+  /// a new query on the table of this model, on the same connection.
+  /// [self] is the model the query returns, null gives maps.
+  QueryBuilder<R> _newQuery<R>([dynamic self]) {
+    QueryBuilder<R> q = QueryBuilder.table<R>(
       tableName,
-      this,
-    ).setPrimaryKey(primaryKey).debug(_debug).where(primaryKey, tempIdValue);
+      self,
+    ).setPrimaryKey(primaryKey).debug(_debug);
+    q.connection = connection;
+    return q;
   }
 
   /// restore this soft deleted record. It fires restoring and restored.
@@ -489,6 +503,7 @@ class Model<T> extends QueryBuilder<T> {
     if (!_eventsOn) return await super.insert(data);
     Model<T> model = fromMap(_dateTimesToString(data)) as Model<T>;
     model.debug(_debug);
+    model.connection = connection;
     if (!await model.save()) return model as T;
     return await super.find(model.tempIdValue);
   }

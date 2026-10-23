@@ -18,6 +18,7 @@ M? manyToMany<T, M>(
 
   Model<T> local = list.first;
   Model<M> related = model();
+  related.connection ??= local.connection;
 
   localKey = localKey ?? local.primaryKey;
   relatedKey = relatedKey ?? related.primaryKey;
