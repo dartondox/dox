@@ -71,5 +71,6 @@ export 'storage/storage_config.dart';
 export 'validation/request_validator.dart';
 
 /// Utils
+export 'utils/aes_encryptor.dart';
 export 'utils/extensions.dart';
 export 'utils/hash.dart';

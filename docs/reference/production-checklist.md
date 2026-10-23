@@ -23,7 +23,6 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | Passwords are hashed | `user.password = Hash.make(input)` (bcrypt). Never store or encrypt a plain password. | [Hashing](../security/hashing.md) |
 | The hash is never sent | `List<String> get hidden => <String>['password'];` in the user model. The JWT payload is `user.toJson()`, and anyone can read it. | [Authentication](../security/authentication.md) |
 | Passwords have a max length | bcrypt throws on input over 72 bytes. Add `@MaxLength(72)` to the password field of the DTO. It counts characters, so non-ASCII text can still pass 72 bytes. | [Troubleshooting](troubleshooting.md) |
-| No sensitive data in `AESEncryptor` | It uses a fixed IV and no MAC. It is fine for cookies, not for tokens or personal data. | [Encryption](../security/encryption.md) |
 
 ## HTTP and network
 
