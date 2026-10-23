@@ -14,11 +14,19 @@ an entry names what it can not share, like one database
 one of its locks. So the tests that use the same database run one after
 the other, and the tests on other databases run next to them.
 
+Each entry runs in its own copy of the repo (no .git, no .dart_tool), made
+with `dart pub get --offline`. `dart test` writes shared files: the native
+assets list in .dart_tool/native_assets.yaml (only the assets of the
+package under test, so a run of another package at the same time loses
+its assets), the storage/ folder of a package, and the node_modules of the
+socket.io interop tests. With one copy per entry, nothing is shared.
+
 Each entry writes to its own log. When all are done, every log is printed
 in its own `::group::`, then a summary. Exit code 1 when any entry failed.
 """
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -27,6 +35,7 @@ import time
 entries = json.loads(os.environ['ENTRIES'])
 max_parallel = int(os.environ.get('MAX_PARALLEL') or os.cpu_count() or 2)
 log_dir = tempfile.mkdtemp(prefix='dox-tests-')
+repo = os.getcwd()
 
 pending = list(entries)
 running = {}  # Popen -> (entry, log file, start time)
@@ -48,8 +57,16 @@ def start(entry, index):
         # so this file prints the whole log in one group.
         NO_LOG_GROUPS='1',
     )
+    work = os.path.join(log_dir, f'repo-{index:02d}')
+    shutil.copytree(
+        repo, work, symlinks=True, ignore=shutil.ignore_patterns('.git', '.dart_tool')
+    )
     proc = subprocess.Popen(
-        ['ci/run-tests.sh'], env=env, stdout=log, stderr=subprocess.STDOUT
+        ['bash', '-c', 'dart pub get --offline && ci/run-tests.sh'],
+        cwd=work,
+        env=env,
+        stdout=log,
+        stderr=subprocess.STDOUT,
     )
     running[proc] = (entry, log, time.monotonic(), path)
     print(f'started: {entry["name"]}', flush=True)
@@ -88,4 +105,5 @@ failed = [e['name'] for e, code, *_ in results if code != 0]
 print(f'{len(results) - len(failed)} passed, {len(failed)} failed')
 for name in failed:
     print(f'::error::{name} failed. Open its log group above.')
+shutil.rmtree(log_dir, ignore_errors=True)
 sys.exit(1 if failed else 0)

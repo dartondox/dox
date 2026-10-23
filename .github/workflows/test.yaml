@@ -76,7 +76,8 @@ jobs:
   #
   # Few big jobs, not one job per entry: each job waits in the queue and
   # pays about 30s of setup. In a job, ci/run-group.py runs the entries in
-  # parallel. A group job is skipped when no entry of it is picked.
+  # parallel, each in its own copy of the repo, so they share no files.
+  # A group job is skipped when no entry of it is picked.
 
   # Entries with no database. Redis is started when an entry needs it.
   unit:

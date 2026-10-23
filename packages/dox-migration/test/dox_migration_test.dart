@@ -24,15 +24,24 @@ Map<String, Map<String, String>> drivers = <String, Map<String, String>>{
     'DB_USERNAME': 'dox',
     'DB_PASSWORD': 'password',
   },
-  // no server needed, the file is made in the system temp folder
+  // no server needed, the file is made in a new temp folder per run, so
+  // two test runs at the same time do not share it
   'sqlite': <String, String>{
     'DB_CONNECTION': 'sqlite',
-    'DB_DATABASE': '${Directory.systemTemp.path}/dox_migration_test.db',
+    'DB_DATABASE': '${sqliteDir.path}/dox_migration_test.db',
   },
 };
 
+final Directory sqliteDir = Directory.systemTemp.createTempSync(
+  'dox_migration_sqlite_',
+);
+
 void main() {
   Directory originalDir = Directory.current;
+
+  tearDownAll(() {
+    if (sqliteDir.existsSync()) sqliteDir.deleteSync(recursive: true);
+  });
 
   for (String driver in drivers.keys) {
     group(driver, () {
