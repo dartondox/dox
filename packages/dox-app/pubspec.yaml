@@ -8,15 +8,15 @@ resolution: workspace
 dependencies:
   postgres: ^3.5.20
   ioredis: ^2.0.0-alpha.2
-  dox_auth: ^3.0.0-alpha.5
-  dox_migration: ^3.0.0-alpha.5
-  dox_core: ^3.0.0-alpha.5
-  dox_websocket: ^3.0.0-alpha.5
-  dox_orm: ^3.0.0-alpha.5
-  dox_socketio: ^3.0.0-alpha.5
+  dox_auth: ^3.0.0-alpha.6
+  dox_migration: ^3.0.0-alpha.6
+  dox_core: ^3.0.0-alpha.6
+  dox_websocket: ^3.0.0-alpha.6
+  dox_orm: ^3.0.0-alpha.6
+  dox_socketio: ^3.0.0-alpha.6
 
 dev_dependencies:
-  dox_builder: ^3.0.0-alpha.5
+  dox_builder: ^3.0.0-alpha.6
   build_runner: ^2.17.1
   lints: ^6.1.0
   test: ^1.33.0

@@ -1,3 +1,7 @@
+## 3.0.0-alpha.6
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.5
 
 - New `timestamps` option on `@DoxModel`. `timestamps: false` turns off `created_at` and `updated_at`, like `$timestamps = false` in Laravel. `createdAt: null` or `updatedAt: null` turns off one of them.

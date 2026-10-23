@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.6
 
 - A `DB_HOST` that starts with `/` is a MySQL Unix socket file too (Postgres: the socket folder). `?socket=/path` works in a `mysql://` `DATABASE_URL`.
 

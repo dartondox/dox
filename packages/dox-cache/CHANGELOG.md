@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.6
 
 - New `CacheManager.close()`. It closes the connections of every store that was built. The Redis driver closes its connection and its pool connections, with no reconnect. Memory, file and null stores do nothing. It is safe to call twice. A store used after it is built again.
 - New `CacheDriver.close()`, for one driver. Custom drivers can override it. The default does nothing.
