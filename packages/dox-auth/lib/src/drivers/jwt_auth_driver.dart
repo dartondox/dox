@@ -22,7 +22,20 @@ class JwtAuthDriver extends AuthDriver {
     this.algorithm = JWTAlgorithm.HS256,
     this.expiresIn = const Duration(hours: 1),
     this.issuer,
-  });
+  }) {
+    /// with an empty key anyone can sign a token for any user
+    JWTKey key = secret;
+    if (key is SecretKey && key.key.trim().isEmpty) {
+      throw ArgumentError(
+        'The JWT secret is empty. Set APP_KEY (run `dox key:generate`).',
+        'secret',
+      );
+    }
+  }
+
+  /// checked when no user is found, so a login takes as long for an
+  /// unknown email as for a wrong password.
+  static final String _dummyHash = Hash.make('dox-no-user');
 
   /// verify token and get model from provider
   /// and get user data
@@ -114,15 +127,15 @@ class JwtAuthDriver extends AuthDriver {
     /// get first record
     Model<dynamic>? userData = await query.getFirst();
 
-    if (userData != null) {
-      /// convert to json to get password field
-      dynamic hashed = userData.toMap(original: true)[provider.passwordField];
+    /// the stored hash. null when there is no user or no password.
+    dynamic hashed = userData?.toMap(original: true)[provider.passwordField];
+    bool hasHash = hashed is String;
 
-      /// verify password
-      if (hashed is String && Hash.verify(password, hashed)) {
-        /// if password is verify login and get jwt token
-        return userData;
-      }
+    /// always run bcrypt, also when there is no user or no password,
+    /// so the answer time does not tell whether the account exists
+    bool matches = Hash.verify(password, hasHash ? hashed : _dummyHash);
+    if (userData != null && hasHash && matches) {
+      return userData;
     }
     return null;
   }

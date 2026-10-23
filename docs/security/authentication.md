@@ -163,7 +163,7 @@ After `AuthMiddleware`, `req.auth` holds the login.
 | `user<T>()` | the user after `attempt` or `login` |
 | `isLoggedIn()` | `true` when there is a user |
 
-`attempt` searches only by the fields in `identifierFields`.
+`attempt` searches only by the fields in `identifierFields`. It runs bcrypt also when no user is found, or when the user has no password, so the answer time does not tell whether an email has an account.
 It returns `null` when the password is not a `String`, when no identifier is given, or when the password does not match.
 
 ## Options
@@ -180,7 +180,7 @@ It returns `null` when the password is not a `String`, when no identifier is giv
 
 | Option | Default | What it does |
 | --- | --- | --- |
-| `secret` | required | the key that signs tokens, like `SecretKey(env.appKey)` |
+| `secret` | required | the key that signs tokens, like `SecretKey(env.appKey)`. An empty key throws `ArgumentError` |
 | `algorithm` | `JWTAlgorithm.HS256` | the signing algorithm |
 | `expiresIn` | `Duration(hours: 1)` | how long a token is valid |
 | `issuer` | `null` | the `iss` claim. When set, `verifyToken` also checks it |
