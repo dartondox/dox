@@ -130,6 +130,22 @@ void main() {
       expect(url is String, true);
     });
 
+    test('store uses the extension of the bytes, not a wrong name', () async {
+      Route.post('/image/store-renamed', (DoxRequest req) async {
+        RequestFile file = req.input('image');
+        return await file.store('images');
+      });
+
+      String dir = Directory.current.path;
+      File imageFile = File('$dir/test/integration/storage/dox.png');
+      String? url = await uploadImage(
+        '$baseUrl/image/store-renamed',
+        imageFile,
+        filename: 'dox.html',
+      );
+      expect(url, endsWith('.png'));
+    });
+
     test('put', () async {
       /// upload image
       Route.post('/image/put', (DoxRequest req) async {
