@@ -10,9 +10,9 @@ name: Native
 #
 # A tag like `dox_http_native-v3.0.0-alpha.2`: build the library for the 5
 # targets and upload them to a GitHub release of that tag, with SHA256SUMS.
-# Then copy the hashes into `_sha256` in packages/dox-http-native/hook/build.dart
-# before you publish the package. The hook downloads these files, so users
-# do not need Rust.
+# Then fill `_sha256` in packages/dox-http-native/hook/build.dart before you
+# publish the package: `dart run bin/native_hashes.dart <tag>`. The hook
+# downloads these files, so users do not need Rust.
 
 on:
   push:
@@ -112,8 +112,9 @@ jobs:
   #
   # A tag like `dox_postgres_native-v3.0.0-alpha.2`: build the library for
   # the 5 targets and upload them to a GitHub release of that tag, with
-  # SHA256SUMS. Then copy the hashes into `_sha256` in
-  # packages/dox-postgres-native/hook/build.dart before you publish.
+  # SHA256SUMS. Then fill `_sha256` in
+  # packages/dox-postgres-native/hook/build.dart before you publish:
+  # `dart run bin/native_hashes.dart <tag>`.
 
   postgres-test:
     runs-on: ubuntu-latest
@@ -216,8 +217,9 @@ jobs:
   #
   # A tag like `dox_mysql_native-v3.0.0-alpha.2`: build the library for the
   # 5 targets and upload them to a GitHub release of that tag, with
-  # SHA256SUMS. Then copy the hashes into `_sha256` in
-  # packages/dox-mysql-native/hook/build.dart before you publish.
+  # SHA256SUMS. Then fill `_sha256` in
+  # packages/dox-mysql-native/hook/build.dart before you publish:
+  # `dart run bin/native_hashes.dart <tag>`.
 
   mysql-test:
     runs-on: ubuntu-latest

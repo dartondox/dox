@@ -35,7 +35,8 @@ A build hook (`hook/build.dart`) gets the Rust library. It tries these in order:
 2. A ready-built library from the GitHub release, checked with sha256.
 3. A build from source with `cargo`. This needs [Rust](https://rustup.rs).
 
-In `3.0.0-alpha.4` the hook has no sha256 list for ready-built libraries yet.
+The hook has no sha256 list for ready-built libraries yet, because no `dox_mysql_native-v*` release exists yet.
+The release workflow builds them for macOS, Linux and Windows on such a tag.
 So step 2 is skipped, and you need Rust to get the native driver.
 Without Rust, the ORM uses the Dart `mysql_dart` driver and prints one warning line.
 

@@ -1,3 +1,7 @@
+## Unreleased
+
+- The hook comment says how to fill the sha256 list from a release: `dart run bin/native_hashes.dart <tag>`. The list stays empty until the first release.
+
 ## 3.0.0-alpha.4
 
 - Version bump only, to match the other packages.

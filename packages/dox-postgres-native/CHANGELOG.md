@@ -1,5 +1,6 @@
 ## Unreleased
 
+- The hook comment says how to fill the sha256 list from a release: `dart run bin/native_hashes.dart <tag>`. The list stays empty until the first release.
 - A `host` that starts with `/` is a Unix socket folder (eg. Cloud SQL `/cloudsql/project:region:instance`). A test checks it.
 
 ## 3.0.0-alpha.4
