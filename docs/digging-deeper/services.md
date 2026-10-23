@@ -19,10 +19,16 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart';
 import 'package:my_app/config/database.dart';
 
-class ORMService implements DoxService {
+class ORMService implements DoxService, DoxShutdown {
   @override
   Future<void> setup() async {
     SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
+  }
+
+  /// Close the database connections when the server stops.
+  @override
+  Future<void> shutdown() async {
+    await SqlQueryBuilder.close();
   }
 }
 ```
@@ -94,6 +100,9 @@ So routes can use what a service set up. For example, `Route.websocket()` needs 
 On `SIGTERM` or `SIGINT` Dox stops the server gracefully (see [Deployment](deployment.md#graceful-shutdown)).
 After the open requests are done, it runs `shutdown()` of each service that also implements `DoxShutdown`.
 It runs in every isolate. Use it to close connections or flush data.
+
+The `ORMService` of a new project already does this: its `shutdown()` calls `SqlQueryBuilder.close()`.
+Dox closes the cache stores (eg. Redis) by itself, after the services.
 
 ```dart title="lib/services/redis_service.dart"
 class RedisService implements DoxService, DoxShutdown {
