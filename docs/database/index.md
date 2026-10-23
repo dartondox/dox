@@ -162,7 +162,7 @@ DATABASE_URL=postgres://app:s%40cret@db.example.com:5432/blog?sslmode=require
 - No port: `5432` for Postgres, `3306` for MySQL.
 - `sslmode`: `disable`, `allow` and `prefer` mean no TLS. `verify-full` checks the server certificate. Other values, like `require`, turn TLS on. For MySQL, `ssl=true` works too.
 - The native Postgres driver has no TLS yet. With TLS on, Postgres uses the Dart driver.
-- `host=/cloudsql/project:region:instance` connects to a Postgres Unix socket. See [Unix socket](#unix-socket).
+- `host=/path` (or `socket=/path`) connects to a Unix socket, like `host=/cloudsql/project:region:instance`. See [Unix socket](#unix-socket).
 - Any other option goes to `extra`, like `?maxConnectionCount=20`. A number becomes an `int`, `true` and `false` a `bool`.
 
 The ORM reads `DATABASE_URL` from the real environment, not from `.env`.
@@ -182,7 +182,7 @@ To make one `ConnectionConfig` from a url, use `ConnectionConfig.fromUrl(url)`.
 
 ### Unix socket
 
-A Postgres host that starts with `/` is a Unix socket folder, like in libpq.
+A host that starts with `/` is a Unix socket.
 Google Cloud SQL on Cloud Run uses `/cloudsql/PROJECT:REGION:INSTANCE`.
 
 ```bash
@@ -191,9 +191,22 @@ DB_HOST=/cloudsql/my-project:europe-west1:blog
 DATABASE_URL=postgres://blog:secret@/blog?host=/cloudsql/my-project:europe-west1:blog
 ```
 
+**Postgres**: the host is the socket folder, like in libpq.
 Both the native and the Dart Postgres driver use the socket file `<folder>/.s.PGSQL.<port>`.
 A host that already ends with `/.s.PGSQL.5432` works too.
-MySQL sockets are not supported.
+
+**MySQL and MariaDB**: the host is the socket file itself. The port is not used.
+On Cloud SQL, the socket file is `/cloudsql/PROJECT:REGION:INSTANCE`.
+A local server often uses `/var/run/mysqld/mysqld.sock` or `/tmp/mysql.sock`.
+
+```bash
+DB_CONNECTION=mysql
+DB_HOST=/var/run/mysqld/mysqld.sock
+# or
+DATABASE_URL=mysql://app:secret@/app?socket=/var/run/mysqld/mysqld.sock
+```
+
+`?socket=` and `?host=` do the same thing. Both the native and the Dart MySQL driver use the socket.
 
 ### `extra` options
 

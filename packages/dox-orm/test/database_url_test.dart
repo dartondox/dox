@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dox_orm/dox_orm.dart';
 import 'package:postgres/postgres.dart' as postgres;
 import 'package:test/test.dart';
@@ -84,6 +86,29 @@ void main() {
       expect(c.isUnixSocket, isFalse);
       expect(c.postgresEndpoint.isUnixSocket, isFalse);
       expect(c.postgresEndpoint.host, 'h');
+    });
+
+    test('mysql Unix socket from ?socket= and ?host=', () {
+      for (String key in <String>['socket', 'host']) {
+        ConnectionConfig c = ConnectionConfig.fromUrl(
+          'mariadb://app:secret@/blog?$key=/var/run/mysqld/mysqld.sock',
+        );
+        expect(c.driver, Driver.mysql);
+        expect(c.host, '/var/run/mysqld/mysqld.sock');
+        expect(c.isUnixSocket, isTrue);
+        expect(c.database, 'blog');
+        expect(c.mysqlPort, 0);
+        InternetAddress a = c.mysqlHost as InternetAddress;
+        expect(a.type, InternetAddressType.unix);
+        expect(a.address, '/var/run/mysqld/mysqld.sock');
+      }
+    });
+
+    test('mysql tcp host is a plain host name', () {
+      ConnectionConfig c = ConnectionConfig.fromUrl('mysql://u@db/d');
+      expect(c.isUnixSocket, isFalse);
+      expect(c.mysqlHost, 'db');
+      expect(c.mysqlPort, 3306);
     });
 
     test('sqlite forms', () {

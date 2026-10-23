@@ -64,6 +64,10 @@ class MysqlNativePool {
 
   /// Makes a pool of up to [maxConnections] connections.
   ///
+  /// A [host] that starts with `/` is the path of a Unix socket file, eg.
+  /// `/var/run/mysqld/mysqld.sock` or `/cloudsql/project:region:instance`.
+  /// Then [port] is not used.
+  ///
   /// [threads] is the size of the Rust runtime of the whole process. Only
   /// the first pool sets it. One thread is the fastest for most apps.
   factory MysqlNativePool.open({
@@ -78,10 +82,11 @@ class MysqlNativePool {
     Duration maxConnectionAge = const Duration(hours: 12),
     int threads = 1,
   }) {
+    bool socket = host.startsWith('/');
     Uri url = Uri(
       scheme: 'mysql',
       userInfo: '${Uri.encodeComponent(user)}:${Uri.encodeComponent(password)}',
-      host: host,
+      host: socket ? 'localhost' : host,
       port: port,
       path: '/${Uri.encodeComponent(database)}',
       queryParameters: <String, String>{
@@ -95,13 +100,15 @@ class MysqlNativePool {
         'stmt_cache_size': '$statementCacheSize',
         'conn_ttl': '${maxConnectionAge.inSeconds}',
         if (secure) 'require_ssl': 'true',
+        if (socket) 'socket': host,
       },
     );
     return MysqlNativePool.fromUrl(url.toString(), threads: threads);
   }
 
   /// Makes a pool from a `mysql://user:password@host:port/database` URL.
-  /// It takes the URL options of mysql_async, like `?pool_max=20`.
+  /// It takes the URL options of mysql_async, like `?pool_max=20`, or
+  /// `?socket=/var/run/mysqld/mysqld.sock` for a Unix socket.
   factory MysqlNativePool.fromUrl(String url, {int threads = 1}) {
     if (!isAvailable) {
       throw UnsupportedError('dox_mysql_native is not available: $loadError');
