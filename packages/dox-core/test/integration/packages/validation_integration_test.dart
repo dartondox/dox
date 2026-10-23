@@ -97,17 +97,15 @@ void main() {
     await orm.Schema().create('tags', (orm.Table table) {
       table.id();
     });
-    await orm.QueryBuilder.table<dynamic>('members')
+    await orm.QueryBuilder.table('members')
         .insert(<String, dynamic>{'email': 'taken@dox.dev'});
-    await orm.QueryBuilder.table<dynamic>('members').insert(<String, dynamic>{
+    await orm.QueryBuilder.table('members').insert(<String, dynamic>{
       'email': 'gone@dox.dev',
       'deleted_at': '2024-01-01 00:00:00',
     });
-    await orm.QueryBuilder.table<dynamic>('teams')
-        .insert(<String, dynamic>{'id': 1});
+    await orm.QueryBuilder.table('teams').insert(<String, dynamic>{'id': 1});
     for (int id in <int>[1, 2]) {
-      await orm.QueryBuilder.table<dynamic>('tags')
-          .insert(<String, dynamic>{'id': id});
+      await orm.QueryBuilder.table('tags').insert(<String, dynamic>{'id': id});
     }
     Dox().initialize(config);
     await Dox().startServer();

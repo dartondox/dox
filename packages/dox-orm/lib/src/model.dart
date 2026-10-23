@@ -210,12 +210,12 @@ class Model<T> extends QueryBuilder<T> {
   /// a new query on the table of this model, on the same connection.
   /// [self] is the model the query returns, null gives maps.
   QueryBuilder<R> _newQuery<R>([dynamic self]) {
-    QueryBuilder<R> q = QueryBuilder.table<R>(
-      tableName,
-      self,
-    ).setPrimaryKey(primaryKey).debug(_debug);
-    q.connection = connection;
-    return q;
+    QueryBuilder<R> q = QueryBuilder<R>()
+      ..tableName = tableName
+      ..self = self
+      ..primaryKey = primaryKey
+      ..connection = connection;
+    return q.debug(_debug);
   }
 
   /// restore this soft deleted record. It fires restoring and restored.
@@ -478,25 +478,6 @@ class Model<T> extends QueryBuilder<T> {
     }
   }
 
-  /// get all records
-  /// ```
-  /// List<Blog> blogs = await Blog().all();
-  /// ```
-  @override
-  Future<List<T>> all() async {
-    return await super.all();
-  }
-
-  /// find the record
-  /// ```
-  /// Blog? blog = await Blog().find(1);
-  /// Blog? blog = await Blog().find('name', 'John');
-  /// ```
-  @override
-  Future<T?> find(dynamic arg1, [dynamic arg2]) {
-    return super.find(arg1, arg2) as Future<T?>;
-  }
-
   /// create a record
   /// ```
   /// Blog blog = await Blog().create({
@@ -515,7 +496,7 @@ class Model<T> extends QueryBuilder<T> {
     model.debug(_debug);
     model.connection = connection;
     if (!await model.save()) return model as T;
-    return await super.find(model.tempIdValue);
+    return (await super.find(model.tempIdValue)) as T;
   }
 
   /// fromMap() reads dates as strings, like rows from the database

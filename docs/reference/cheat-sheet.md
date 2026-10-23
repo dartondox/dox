@@ -228,7 +228,7 @@ class Blog extends BlogGenerator {
 | `await Blog().where('status', 'live').get()` | rows that match |
 | `await Blog().where('id', '>', 5).getFirst()` | first match or `null` |
 | `await Blog().count()` | `int` |
-| `await Blog().paginate(currentPage: 1, perPage: 20)` | `Pagination`, `getData<Blog>()` |
+| `await Blog().paginate(currentPage: 1, perPage: 20)` | `Pagination<Blog>`, rows in `data` |
 | `await Blog().create(<String, dynamic>{'title': 'a'})` | insert and return the model |
 | `blog.title = 'b'; await blog.save()` | insert or update |
 | `await blog.delete()` | soft delete when `softDelete: true` |

@@ -93,11 +93,11 @@ Returns one page of rows and the page info.
 It runs a `count()` query and a `get()` query.
 
 ```dart
-Pagination page = await Actor()
+Pagination<Actor> page = await Actor()
     .where('age', '>=', 18)
     .paginate(currentPage: 2, perPage: 10);
 
-List<Actor> actors = page.getData<Actor>();
+List<Actor> actors = page.data;
 print(page.total);    // rows that match
 print(page.lastPage); // number of pages
 ```
@@ -192,7 +192,7 @@ await Actor().select(<String>['id', 'name']).get();
 await Actor().select('id, name, age').get();
 
 // with a function
-await Actor().select('count(*) as total, name').groupBy('name').get();
+await QueryBuilder.table('actor').select('count(*) as total, name').groupBy('name').get();
 // SELECT count(*) as total,"name" FROM "actor" GROUP BY "name"
 
 // raw: nothing is quoted
@@ -236,15 +236,16 @@ await Actor().limit(10).offset(20).get();
 Takes one column, or a list of columns.
 
 ```dart
-List<Map<String, dynamic>> rows = await Actor()
+List<Map<String, dynamic>> rows = await QueryBuilder.table('actor')
     .select('count(*) as total, age')
     .groupBy('age')
     .get();
 ```
 
 !!! info
-    A query with `groupBy` returns maps, not models.
-    This is because a group row does not match a model row.
+    Use `QueryBuilder.table()` for `groupBy`. A group row is a map, not a model.
+    On a model, `get()` gives models (`List<Actor>`), so a `groupBy` there throws a `StateError`.
+    `count()` with `groupBy` works on a model too.
 
 ## Join
 

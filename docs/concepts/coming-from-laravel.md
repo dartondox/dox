@@ -197,7 +197,7 @@ Run `dox build_runner:build` after you change a model. See [Model](../database/m
 | `->select('id', 'name')` | `.select(<String>['id', 'name'])` |
 | `->orderBy('name', 'desc')->limit(10)->offset(20)` | `.orderBy('name', 'desc').limit(10).offset(20)` |
 | `->join('posts', 'posts.user_id', '=', 'users.id')` | `.join('posts', 'posts.user_id', 'users.id')` |
-| `->groupBy('age')` | `.groupBy('age')` (returns maps) |
+| `->groupBy('age')` | `.groupBy('age')` on `QueryBuilder.table()` (returns maps) |
 | `->count()` | `await ....count()` |
 | `->paginate(10)` | `.paginate(currentPage: 1, perPage: 10)` |
 | `->insert([...])` | `.insertMultiple(<Map<String, dynamic>>[...])` |

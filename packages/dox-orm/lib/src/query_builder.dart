@@ -98,14 +98,10 @@ class QueryBuilder<T>
   /// ```
   /// QueryBuilder.table('blog');
   /// ```
-  /// set table name [tableName] as first parameter
-  /// and model instance [type] in second parameter [type] is optional
-  /// this return QueryBuilder
-  static QueryBuilder<T> table<T>(String tableName, [dynamic type]) {
-    QueryBuilder<T> builder = QueryBuilder<T>();
-    builder.tableName = tableName;
-    builder.self = type;
-    return builder;
+  /// the rows are maps, so get() gives `List<Map<String, dynamic>>`
+  /// and getFirst() gives `Map<String, dynamic>?`.
+  static QueryBuilder<Map<String, dynamic>> table(String tableName) {
+    return QueryBuilder<Map<String, dynamic>>()..tableName = tableName;
   }
 
   /// set debug on or of
