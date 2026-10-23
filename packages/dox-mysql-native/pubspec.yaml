@@ -1,6 +1,6 @@
 name: dox_mysql_native
 description: Fast native MySQL and MariaDB client for Dart, the default MySQL driver of the Dox ORM. Rust (mysql_async) runs the pool and a prepared statement cache. Dart gets typed rows.
-version: 3.0.0-alpha.5
+version: 3.0.0-alpha.6
 repository: https://github.com/dartondox/dox
 homepage: https://dartondox.dev
 

@@ -57,11 +57,22 @@ class MysqlNativeDriver extends DBDriver {
     pool.close();
   }
 
+  /// the shared pool can stay open for other isolates after [close], so
+  /// this driver checks its own flag.
+  void _checkOpen() {
+    if (_closed) {
+      throw StateError(
+        'This MySQL connection is closed. Set up the ORM again to use it.',
+      );
+    }
+  }
+
   Future<MysqlNativeResult> _run(
     String sql,
     Map<String, dynamic>? values,
     bool rows,
   ) {
+    _checkOpen();
     var (String query, List<Object?> params) = toPositionalParams(
       sql,
       values,
@@ -105,6 +116,7 @@ class MysqlNativeDriver extends DBDriver {
   /// transaction right away, they can not be rolled back.
   @override
   Future<R> transaction<R>(Future<R> Function() callback) async {
+    _checkOpen();
     Map<MysqlNativePool, int>? open =
         Zone.current[_txKey] as Map<MysqlNativePool, int>?;
 

@@ -35,7 +35,7 @@ const Map<String, String> _sha256 = <String, String>{
   'dox_postgres_native-macos-x64.dylib':
       'b255087ea02462f18fd47d1bcf3ec153d9eb71a7c7365ba0dd1ffc4d0396ef10',
   'dox_postgres_native-windows-x64.dll':
-      '2b97c8dd8fabb83be6a56d532b6cfb426c2987b00583a7b35768b1156b1b3325',
+      '311534a6c7484450d18f6f64c9c6c9deda55991f447e7c09216140f4464951f6',
 };
 
 void main(List<String> args) async {
