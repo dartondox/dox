@@ -54,12 +54,28 @@ class DoxServer {
     return true;
   }
 
-  /// listen the request
+  /// The port to listen on. `APP_PORT` in the env means [configured] (the
+  /// app reads it into `serverPort`). With no `APP_PORT`, `PORT` wins:
+  /// Cloud Run, Fly, Render and Heroku tell the app its port with it.
+  static int portFor(int configured) {
+    if (Env.get<String?>('APP_PORT') != null) return configured;
+    return int.tryParse(Env.get<String>('PORT')) ?? configured;
+  }
+
+  /// The host to listen on: [configured], else `APP_HOST`, else null
+  /// (all interfaces).
+  static String? hostFor(String? configured) {
+    return configured ?? Env.get<String?>('APP_HOST');
+  }
+
+  /// listen the request. With no [address] it listens on all interfaces.
   /// ```
   /// DoxServer().listen(3000);
+  /// DoxServer().listen(3000, address: '127.0.0.1');
   /// ```
   Future<HttpServer> listen(
     int port, {
+    Object? address,
     Function? onError,
     int? isolateId,
   }) async {
@@ -70,11 +86,12 @@ class DoxServer {
       /// type is checked again in Dart, with the normal 413 answer.
       server = await NativeHttpServer.bind(
         port,
+        address: address,
         maxBodySize: max(config.maxBodySize, config.maxMultipartSize),
       );
     } else {
       server = await HttpServer.bind(
-        InternetAddress.anyIPv6,
+        address ?? InternetAddress.anyIPv6,
         port,
         shared: true,
       );

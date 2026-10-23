@@ -13,7 +13,7 @@ Real problems, with the text you see, the cause and the fix. The texts come from
 and the start line says `(dart:io)` instead of `(native)`:
 
 ```
-Server started at http://127.0.0.1:3000 with 8 isolate (dart:io)
+Server started at http://[::]:3000 with 8 isolate (dart:io)
 ```
 
 At build time (`dart pub get`, `dox serve` or `dox build`) you may also see one of these:

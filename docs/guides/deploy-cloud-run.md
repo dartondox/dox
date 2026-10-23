@@ -24,29 +24,14 @@ The image is small. For the blog API it is about 17 MB.
 
 Cloud Run sends requests to one port of the container. It puts that port in the `PORT` env variable. The default is `8080`.
 
-Dox does not read `PORT`. It reads `APP_PORT` (default `3000`), in `lib/config/app.dart`.
-So tell Cloud Run to use port 3000:
+Dox listens on `APP_PORT` when it is set. When `APP_PORT` is not set, Dox listens on `PORT`.
+So do not set `APP_PORT` on Cloud Run. The app then follows `PORT`, and you can leave out `--port`.
+
+If you do set `APP_PORT`, tell Cloud Run the same port:
 
 ```bash
 gcloud run deploy blog --port 3000 ...
 ```
-
-Then Cloud Run sends requests to 3000 and sets `PORT=3000`. The app listens on 3000. No code change.
-
-!!! note "Or read `PORT` in the app"
-    If you want the app to follow `PORT`, add a getter to `lib/config/env.dart`
-    and use it in `lib/config/app.dart`, then run `dart run build_runner build`:
-
-    ```dart title="lib/config/env.dart"
-      /// set by Cloud Run
-      int? get port;
-    ```
-
-    ```dart title="lib/config/app.dart"
-    serverPort: env.port ?? env.appPort,
-    ```
-
-    Then you can leave out `--port`.
 
 ## 1. Turn on the APIs
 
@@ -108,7 +93,7 @@ gcloud run deploy blog \
 
 | Flag | Why |
 | --- | --- |
-| `--port 3000` | the port Dox listens on (`APP_PORT`). See [the port](#the-port-port-and-app_port) |
+| `--port 3000` | the port Cloud Run sends requests to. It also sets `PORT=3000`, and Dox listens on `PORT`. See [the port](#the-port-port-and-app_port) |
 | `--min-instances 1` | keeps one instance warm, so the first request does not wait for a cold start. The default is `0`. An idle instance still costs money |
 | `--add-cloudsql-instances` | makes the Cloud SQL Unix socket in `/cloudsql/...` |
 | `--set-env-vars` | config that is not secret |
@@ -147,7 +132,7 @@ The first log lines after a start:
 ```text
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
-{"level":"INFO","name":"dox","message":"Server started at http://127.0.0.1:3000 with 1 isolate (native)", ...}
+{"level":"INFO","name":"dox","message":"Server started at http://[::]:3000 with 1 isolate (native)", ...}
 ```
 
 If the deploy fails with "the container did not listen on the port", the app listens on a different port than `--port`. Check `APP_PORT` and `--port`.

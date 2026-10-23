@@ -7,7 +7,6 @@ import 'package:dox_core/server/dox_server.dart';
 import 'package:dox_core/utils/logger.dart';
 import 'package:dox_http_native/dox_http_native.dart';
 import 'package:dox_socketio/dox_socketio.dart';
-import 'package:sprintf/sprintf.dart';
 
 IocContainer _ioc = IocContainer();
 
@@ -132,18 +131,27 @@ class Dox implements IDox {
 
     await startServices();
     DoxServer().setResponseHandler(config.responseHandler);
-    await DoxServer().listen(config.serverPort, isolateId: 1);
-
-    String backend = DoxServer().httpServer is NativeHttpServer
-        ? 'native'
-        : 'dart:io';
-    Logger.info(
-      sprintf(
-        'Server started at http://127.0.0.1:%s with $isolatesToSpawn isolate '
-        '($backend)',
-        <dynamic>[Dox().config.serverPort],
-      ),
+    HttpServer server = await DoxServer().listen(
+      DoxServer.portFor(config.serverPort),
+      address: DoxServer.hostFor(config.host),
+      isolateId: 1,
     );
+
+    String backend = server is NativeHttpServer ? 'native' : 'dart:io';
+    Logger.info(
+      'Server started at ${serverUrl(server)} with $isolatesToSpawn isolate '
+      '($backend)',
+    );
+  }
+
+  /// the real address of [server], like `http://127.0.0.1:3000` or
+  /// `http://[::]:3000` (all interfaces)
+  static String serverUrl(HttpServer server) {
+    InternetAddress address = server.address;
+    String host = address.type == InternetAddressType.IPv6
+        ? '[${address.address}]'
+        : address.address;
+    return 'http://$host:${server.port}';
   }
 
   /// stop at startup when `APP_KEY` is missing in production.

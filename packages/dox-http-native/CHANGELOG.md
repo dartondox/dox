@@ -1,3 +1,9 @@
+## Unreleased
+
+- New: `NativeHttpServer.bind(port, address: ...)` listens on one host, like `HttpServer.bind`. An `InternetAddress` or a host name. With no address it listens on all interfaces, as before. `server.address` is the real address.
+- Fix: `close()` never finished when nobody called `listen()` on the server.
+- Native ABI 3 (`dox_start` takes the host). Needs a new native library build. Until the next release, the build hook builds it with cargo.
+
 ## 3.0.0-alpha.4
 
 - Version bump only, to match the other packages.

@@ -61,9 +61,10 @@ The first start takes a little longer. It prints `Running build hooks...` while 
 The last line is:
 
 ```text
-Server started at http://127.0.0.1:3000 with 8 isolate (native)
+Server started at http://[::]:3000 with 8 isolate (native)
 ```
 
+`[::]` means the app listens on all network interfaces. Open it at `http://localhost:3000`.
 The number of isolates is the number of CPU cores on your machine.
 
 ## Check it

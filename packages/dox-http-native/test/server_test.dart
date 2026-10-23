@@ -189,6 +189,45 @@ void main() {
     await big.close();
   });
 
+  test('HEAD gets the headers with no body', () async {
+    String out = await raw(
+      port,
+      'HEAD / HTTP/1.1\r\nHost: a\r\nConnection: close\r\n\r\n',
+    );
+    expect(out, startsWith('HTTP/1.1 200'));
+    expect(out.toLowerCase(), contains('content-length: 11'));
+    expect(out, endsWith('\r\n\r\n'));
+  });
+
+  test('bind to one host only', () async {
+    NativeHttpServer local = await NativeHttpServer.bind(
+      0,
+      address: InternetAddress.loopbackIPv4,
+    );
+    local.listen(handle);
+    expect(local.address, InternetAddress.loopbackIPv4);
+    HttpClientResponse res = await (await client.get(
+      '127.0.0.1',
+      local.port,
+      '/',
+    )).close();
+    expect(res.statusCode, 200);
+    await res.drain<void>();
+    // not on the IPv6 loopback
+    await expectLater(
+      Socket.connect(InternetAddress.loopbackIPv6, local.port),
+      throwsA(isA<SocketException>()),
+    );
+    await local.close();
+
+    NativeHttpServer named = await NativeHttpServer.bind(
+      0,
+      address: 'localhost',
+    );
+    expect(named.address.isLoopback, isTrue);
+    await named.close();
+  });
+
   test('close frees the port', () async {
     NativeHttpServer a = await start(0);
     int p = a.port;
