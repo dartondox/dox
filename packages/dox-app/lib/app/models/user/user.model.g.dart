@@ -21,9 +21,9 @@ class UserGenerator extends Model<User> with SoftDeletes<User> {
   @override
   String get tableName => 'users';
 
-  int? get id => tempIdValue;
+  int? get id => tempIdValue as int?;
 
-  set id(dynamic val) => tempIdValue = val;
+  set id(int? val) => tempIdValue = val;
 
   User query() => User();
 
