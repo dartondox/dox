@@ -4211,14 +4211,12 @@ A secret with the same name as an <code>[env]</code> key wins.</p>
 </ul>
 <h3 id="postgres">Postgres</h3>
 <p>Create a Fly.io Managed Postgres cluster with <code>fly mpg create</code>.</p>
-<p><code>fly mpg attach</code> sets one secret, <code>DATABASE_URL</code>. Dox does not read <code>DATABASE_URL</code>. It reads <code>DB_HOST</code>, <code>DB_PORT</code>, <code>DB_NAME</code>, <code>DB_USERNAME</code> and <code>DB_PASSWORD</code>.
-So take the values from the connection string in the Managed Postgres dashboard, and set them yourself:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>fly<span class="w"> </span>secrets<span class="w"> </span><span class="nb">set</span><span class="w"> </span><span class="nv">DB_CONNECTION</span><span class="o">=</span>postgres<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nv">DB_HOST</span><span class="o">=</span>&lt;host&gt;<span class="w"> </span><span class="nv">DB_PORT</span><span class="o">=</span><span class="m">5432</span><span class="w"> </span><span class="nv">DB_NAME</span><span class="o">=</span>&lt;database&gt;<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nv">DB_USERNAME</span><span class="o">=</span>&lt;user&gt;<span class="w"> </span><span class="nv">DB_PASSWORD</span><span class="o">=</span>&lt;password&gt;
+<p>Attach it to the app:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>fly<span class="w"> </span>mpg<span class="w"> </span>attach<span class="w"> </span>&lt;cluster-id&gt;<span class="w"> </span>--app<span class="w"> </span>blog-api
 </span></code></pre></div>
+<p><code>fly mpg attach</code> sets one secret, <code>DATABASE_URL</code>. Dox reads it. When <code>DATABASE_URL</code> is set, it wins over <code>DB_CONNECTION</code> and the other <code>DB_*</code> keys. The app and the migrations both use it. See <a href="../../database/#database_url"><code>DATABASE_URL</code></a>.</p>
 <p>Then delete <code>DB_CONNECTION</code> and <code>DB_NAME</code> from <code>[env]</code>, and delete the <code>[mounts]</code> section.
-If the database asks for TLS, set <code>useSSL: true</code> on the <code>postgres</code> connection in <code>lib/config/database.dart</code>.</p>
+If the database asks for TLS, add <code>?sslmode=require</code> to the url with <code>fly secrets set DATABASE_URL=...</code>.</p>
 <h2 id="5-deploy">5. Deploy</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>fly<span class="w"> </span>deploy
 </span></code></pre></div>

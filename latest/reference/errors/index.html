@@ -4604,7 +4604,7 @@
 <tr>
 <td><code>Exception: Could not connect to database: &lt;error&gt;</code></td>
 <td>The migrator can not open the database.</td>
-<td>Check <code>DB_*</code> values. A <code>.env</code> file wins over the real env here. See <a href="../troubleshooting/#migrations-read-env-instead-of-the-real-environment">Troubleshooting</a>.</td>
+<td>Check <code>DATABASE_URL</code> or the <code>DB_*</code> values. A real env var wins over <code>.env</code>.</td>
 </tr>
 <tr>
 <td><code>Unknown migration command: &lt;cmd&gt; (use run, rollback, reset, refresh or status)</code></td>

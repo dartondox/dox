@@ -3916,7 +3916,7 @@
 <ul>
 <li><code>Env.get()</code> and <code>EnvReader</code> (<code>dox_core</code>): a real environment variable wins over the <code>.env</code> file.</li>
 <li><code>Platform.environment</code> straight: only the real environment, <code>.env</code> is not read.</li>
-<li><code>dox_migration</code> has its own <code>loadEnv()</code>: it reads <code>.env</code> when the file exists, else the real environment. See the note below.</li>
+<li><code>dox_migration</code> has its own <code>loadEnv()</code>: it reads <code>.env</code> and the real environment. A real environment variable wins, the same as <code>Env.get()</code>.</li>
 </ul>
 <h2 id="read-by-the-framework">Read by the framework</h2>
 <table>
@@ -3959,6 +3959,13 @@
 <td><code>DOX_DB_DRIVER=dart</code></td>
 </tr>
 <tr>
+<td><code>DATABASE_URL</code></td>
+<td><code>dox_orm</code> (<code>DatabaseConfig.url</code>), <code>dox_migration</code></td>
+<td>not set</td>
+<td>A database url. When it is set, it wins over <code>DB_CONNECTION</code> and the other <code>DB_*</code> keys. <code>dox_orm</code> reads it from the real environment only. See <a href="../../database/#database_url">Database url</a>.</td>
+<td><code>DATABASE_URL=postgres://app:secret@db:5432/blog?sslmode=require</code></td>
+</tr>
+<tr>
 <td><code>DB_CONNECTION</code></td>
 <td><code>dox_migration</code> (<code>DbConnection.open()</code>)</td>
 <td>postgres</td>
@@ -3969,7 +3976,7 @@
 <td><code>DB_HOST</code></td>
 <td><code>dox_migration</code></td>
 <td><code>localhost</code></td>
-<td>Database host.</td>
+<td>Database host. A path that starts with <code>/</code> is a Postgres Unix socket folder.</td>
 <td><code>DB_HOST=127.0.0.1</code></td>
 </tr>
 <tr>
@@ -4023,11 +4030,6 @@
 </tr>
 </tbody>
 </table>
-<div class="admonition note">
-<p class="admonition-title">Migrations and <code>.env</code></p>
-<p><code>dox_migration</code> reads <code>.env</code> when the file exists, and only then falls back to the real environment.
-So with a <code>.env</code> file in the folder, a real <code>DB_HOST</code> is ignored. See <a href="../troubleshooting/#migrations-read-env-instead-of-the-real-environment">Troubleshooting</a>.</p>
-</div>
 <p><code>DOX_SERVER</code>, <code>DOX_HTTP_THREAD</code> and <code>DOX_DB_DRIVER</code> are read with <code>Platform.environment</code> or <code>std::env::var</code>. They do not work from <code>.env</code>.</p>
 <h2 id="read-by-a-new-project">Read by a new project</h2>
 <p>A new project (<code>dox create</code>) reads these keys through its typed env class, <code>lib/config/env.dart</code>. The framework itself does not read them. In code, use the getter: <code>env.appPort</code>.</p>

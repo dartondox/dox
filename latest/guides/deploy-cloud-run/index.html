@@ -4102,12 +4102,15 @@ and use it in <code>lib/config/app.dart</code>, then run <code>dart run build_ru
 </span></code></pre></div>
 <h2 id="3-reach-cloud-sql">3. Reach Cloud SQL</h2>
 <p>Cloud Run has two ways to reach Cloud SQL: a Unix socket in <code>/cloudsql/...</code>, or the private IP over a VPC.</p>
-<p>Dox connects to Postgres over TCP only. It can not use the Unix socket. So use the <strong>private IP</strong>:</p>
+<p>Dox can use both. The Unix socket needs no VPC, so this guide uses it:</p>
 <ol>
-<li>Give the Cloud SQL instance a private IP on your VPC network (for example <code>default</code>).</li>
-<li>Deploy the service with Direct VPC egress (<code>--network</code>, <code>--subnet</code>, <code>--vpc-egress</code> in step 4).</li>
-<li>Use the private IP as <code>DB_HOST</code> and <code>5432</code> as <code>DB_PORT</code>.</li>
+<li>Find the connection name of the instance: <code>gcloud sql instances describe INSTANCE --format='value(connectionName)'</code>. It looks like <code>PROJECT_ID:europe-west1:INSTANCE</code>.</li>
+<li>Deploy with <code>--add-cloudsql-instances &lt;connection name&gt;</code> (step 4). Cloud Run then makes the socket in <code>/cloudsql/&lt;connection name&gt;</code>.</li>
+<li>Give the service account the <code>roles/cloudsql.client</code> role.</li>
+<li>Set <code>DB_HOST=/cloudsql/&lt;connection name&gt;</code>. A host that starts with <code>/</code> is a Unix socket folder. See <a href="../../database/#unix-socket">Unix socket</a>.</li>
 </ol>
+<p>The same with one url: <code>DATABASE_URL=postgres://blog:&lt;password&gt;@/blog?host=/cloudsql/&lt;connection name&gt;</code>.</p>
+<p>To use the <strong>private IP</strong> instead: give the instance a private IP on your VPC network, deploy with Direct VPC egress (<code>--network default --subnet default --vpc-egress private-ranges-only</code>), and use the private IP as <code>DB_HOST</code>.</p>
 <p>Do not use SQLite on Cloud Run. The file system of an instance is in memory, and each instance has its own. The data is lost when the instance stops.</p>
 <h2 id="4-deploy-from-source">4. Deploy from source</h2>
 <p><code>--source .</code> uploads the folder. Cloud Build builds the image with your <code>Dockerfile</code> and saves it in Artifact Registry (in a repository named <code>cloud-run-source-deploy</code>).</p>
@@ -4118,8 +4121,8 @@ and use it in <code>lib/config/app.dart</code>, then run <code>dart run build_ru
 </span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span>--allow-unauthenticated<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span>--cpu<span class="w"> </span><span class="m">1</span><span class="w"> </span>--memory<span class="w"> </span>512Mi<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span>--min-instances<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span>--network<span class="w"> </span>default<span class="w"> </span>--subnet<span class="w"> </span>default<span class="w"> </span>--vpc-egress<span class="w"> </span>private-ranges-only<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span>--set-env-vars<span class="w"> </span><span class="nv">APP_ENV</span><span class="o">=</span>production,APP_TOTAL_ISOLATE<span class="o">=</span><span class="m">1</span>,DB_CONNECTION<span class="o">=</span>postgres,DB_HOST<span class="o">=</span><span class="m">10</span>.20.0.3,DB_PORT<span class="o">=</span><span class="m">5432</span>,DB_NAME<span class="o">=</span>blog,DB_USERNAME<span class="o">=</span>blog<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span>--add-cloudsql-instances<span class="w"> </span>PROJECT_ID:europe-west1:INSTANCE<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span>--set-env-vars<span class="w"> </span><span class="nv">APP_ENV</span><span class="o">=</span>production,APP_TOTAL_ISOLATE<span class="o">=</span><span class="m">1</span>,DB_CONNECTION<span class="o">=</span>postgres,DB_HOST<span class="o">=</span>/cloudsql/PROJECT_ID:europe-west1:INSTANCE,DB_PORT<span class="o">=</span><span class="m">5432</span>,DB_NAME<span class="o">=</span>blog,DB_USERNAME<span class="o">=</span>blog<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span>--set-secrets<span class="w"> </span><span class="nv">APP_KEY</span><span class="o">=</span>blog-app-key:1,DB_PASSWORD<span class="o">=</span>blog-db-password:1
 </span></code></pre></div>
 <table>
@@ -4139,8 +4142,8 @@ and use it in <code>lib/config/app.dart</code>, then run <code>dart run build_ru
 <td>keeps one instance warm, so the first request does not wait for a cold start. The default is <code>0</code>. An idle instance still costs money</td>
 </tr>
 <tr>
-<td><code>--network</code>, <code>--subnet</code>, <code>--vpc-egress</code></td>
-<td>Direct VPC egress, to reach the private IP of Cloud SQL</td>
+<td><code>--add-cloudsql-instances</code></td>
+<td>makes the Cloud SQL Unix socket in <code>/cloudsql/...</code></td>
 </tr>
 <tr>
 <td><code>--set-env-vars</code></td>

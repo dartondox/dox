@@ -3798,6 +3798,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#database_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DATABASE_URL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unix-socket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unix socket
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#extra-options" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4039,6 +4061,66 @@ Each isolate runs the service, so each isolate gets its own pool.</p>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">DB_USERNAME</span><span class="o">=</span><span class="n">postgres</span>
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">DB_PASSWORD</span><span class="o">=</span><span class="n">postgres</span>
 </span></code></pre></div>
+<h3 id="database_url"><code>DATABASE_URL</code></h3>
+<p>Many hosts (Fly, Render, Heroku and others) give you one database url.
+Dox reads it from the <code>DATABASE_URL</code> environment variable.</p>
+<p>The rule: <strong>when <code>DATABASE_URL</code> is set, it wins.</strong>
+It replaces the config of the default connection (<code>DatabaseConfig.connection</code>).
+That config still gives <code>debug</code>, <code>printer</code> and <code>extra</code>.
+Other named connections do not change.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">DATABASE_URL</span><span class="o">=</span>postgres://app:s%40cret@db.example.com:5432/blog?sslmode<span class="o">=</span>require
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Form</th>
+<th>Database</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>postgres://user:pass@host:5432/db</code> or <code>postgresql://...</code></td>
+<td>Postgres</td>
+</tr>
+<tr>
+<td><code>mysql://user:pass@host:3306/db</code> or <code>mariadb://...</code></td>
+<td>MySQL, MariaDB</td>
+</tr>
+<tr>
+<td><code>sqlite:///abs/path.db</code>, <code>sqlite://db/dox.sqlite</code>, <code>sqlite::memory:</code>, <code>file:db/dox.sqlite</code></td>
+<td>SQLite</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>The user, password and database name are url-decoded. Write <code>@</code> in a password as <code>%40</code>.</li>
+<li>No port: <code>5432</code> for Postgres, <code>3306</code> for MySQL.</li>
+<li><code>sslmode</code>: <code>disable</code>, <code>allow</code> and <code>prefer</code> mean no TLS. <code>verify-full</code> checks the server certificate. Other values, like <code>require</code>, turn TLS on. For MySQL, <code>ssl=true</code> works too.</li>
+<li>The native Postgres driver has no TLS yet. With TLS on, Postgres uses the Dart driver.</li>
+<li><code>host=/cloudsql/project:region:instance</code> connects to a Postgres Unix socket. See <a href="#unix-socket">Unix socket</a>.</li>
+<li>Any other option goes to <code>extra</code>, like <code>?maxConnectionCount=20</code>. A number becomes an <code>int</code>, <code>true</code> and <code>false</code> a <code>bool</code>.</li>
+</ul>
+<p>The ORM reads <code>DATABASE_URL</code> from the real environment, not from <code>.env</code>.
+To use a url from <code>.env</code>, or any other url, give it yourself:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">DatabaseConfig</span><span class="p">(</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nl">connection:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nl">connections:</span><span class="w"> </span><span class="p">{...},</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nl">url:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">?&gt;</span><span class="p">(</span><span class="s1">'DATABASE_URL'</span><span class="p">),</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>An empty <code>url</code> (<code>url: ''</code>) turns <code>DATABASE_URL</code> off.
+To make one <code>ConnectionConfig</code> from a url, use <code>ConnectionConfig.fromUrl(url)</code>.
+<a href="migration/#database-settings">Migrations</a> read <code>DATABASE_URL</code> too, also from <code>.env</code>.</p>
+<h3 id="unix-socket">Unix socket</h3>
+<p>A Postgres host that starts with <code>/</code> is a Unix socket folder, like in libpq.
+Google Cloud SQL on Cloud Run uses <code>/cloudsql/PROJECT:REGION:INSTANCE</code>.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nv">DB_HOST</span><span class="o">=</span>/cloudsql/my-project:europe-west1:blog
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c1"># or</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nv">DATABASE_URL</span><span class="o">=</span>postgres://blog:secret@/blog?host<span class="o">=</span>/cloudsql/my-project:europe-west1:blog
+</span></code></pre></div>
+<p>Both the native and the Dart Postgres driver use the socket file <code>&lt;folder&gt;/.s.PGSQL.&lt;port&gt;</code>.
+A host that already ends with <code>/.s.PGSQL.5432</code> works too.
+MySQL sockets are not supported.</p>
 <h3 id="extra-options"><code>extra</code> options</h3>
 <p><code>extra</code> is a map in <code>ConnectionConfig</code> for driver options.</p>
 <table>
@@ -4127,16 +4209,16 @@ So names like <code>order</code> or <code>key</code> work.</p>
 <h3 id="raw-queries">Raw queries</h3>
 <p><code>QueryBuilder.query()</code> runs SQL on the default connection.
 Use <code>@name</code> for values. The values are sent as bound parameters.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="s1">'select * from blog where id = @id'</span><span class="p">,</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nl">substitutionValues:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'id'</span><span class="o">:</span><span class="w"> </span><span class="m">1</span><span class="p">},</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="s1">'select * from blog where id = @id'</span><span class="p">,</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nl">substitutionValues:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'id'</span><span class="o">:</span><span class="w"> </span><span class="m">1</span><span class="p">},</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="p">);</span>
 </span></code></pre></div>
 <h3 id="other-connections">Other connections</h3>
 <p>Use <code>withConnection()</code> with a connection name from the config.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'blog'</span><span class="p">)</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="p">.</span><span class="n">withConnection</span><span class="p">(</span><span class="s1">'mysql'</span><span class="p">)</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'blog'</span><span class="p">)</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="p">.</span><span class="n">withConnection</span><span class="p">(</span><span class="s1">'mysql'</span><span class="p">)</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
 </span></code></pre></div>
 <h2 id="mysql-and-mariadb">MySQL and MariaDB</h2>
 <ul>

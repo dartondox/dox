@@ -6451,6 +6451,63 @@ DB_USERNAME=postgres
 DB_PASSWORD=postgres
 ```
 
+### `DATABASE_URL`
+
+Many hosts (Fly, Render, Heroku and others) give you one database url.
+Dox reads it from the `DATABASE_URL` environment variable.
+
+The rule: **when `DATABASE_URL` is set, it wins.**
+It replaces the config of the default connection (`DatabaseConfig.connection`).
+That config still gives `debug`, `printer` and `extra`.
+Other named connections do not change.
+
+```bash
+DATABASE_URL=postgres://app:s%40cret@db.example.com:5432/blog?sslmode=require
+```
+
+| Form | Database |
+|---|---|
+| `postgres://user:pass@host:5432/db` or `postgresql://...` | Postgres |
+| `mysql://user:pass@host:3306/db` or `mariadb://...` | MySQL, MariaDB |
+| `sqlite:///abs/path.db`, `sqlite://db/dox.sqlite`, `sqlite::memory:`, `file:db/dox.sqlite` | SQLite |
+
+- The user, password and database name are url-decoded. Write `@` in a password as `%40`.
+- No port: `5432` for Postgres, `3306` for MySQL.
+- `sslmode`: `disable`, `allow` and `prefer` mean no TLS. `verify-full` checks the server certificate. Other values, like `require`, turn TLS on. For MySQL, `ssl=true` works too.
+- The native Postgres driver has no TLS yet. With TLS on, Postgres uses the Dart driver.
+- `host=/cloudsql/project:region:instance` connects to a Postgres Unix socket. See [Unix socket](#unix-socket).
+- Any other option goes to `extra`, like `?maxConnectionCount=20`. A number becomes an `int`, `true` and `false` a `bool`.
+
+The ORM reads `DATABASE_URL` from the real environment, not from `.env`.
+To use a url from `.env`, or any other url, give it yourself:
+
+```dart
+DatabaseConfig(
+  connection: 'postgres',
+  connections: {...},
+  url: Env.get<String?>('DATABASE_URL'),
+);
+```
+
+An empty `url` (`url: ''`) turns `DATABASE_URL` off.
+To make one `ConnectionConfig` from a url, use `ConnectionConfig.fromUrl(url)`.
+[Migrations](migration.md#database-settings) read `DATABASE_URL` too, also from `.env`.
+
+### Unix socket
+
+A Postgres host that starts with `/` is a Unix socket folder, like in libpq.
+Google Cloud SQL on Cloud Run uses `/cloudsql/PROJECT:REGION:INSTANCE`.
+
+```bash
+DB_HOST=/cloudsql/my-project:europe-west1:blog
+# or
+DATABASE_URL=postgres://blog:secret@/blog?host=/cloudsql/my-project:europe-west1:blog
+```
+
+Both the native and the Dart Postgres driver use the socket file `<folder>/.s.PGSQL.<port>`.
+A host that already ends with `/.s.PGSQL.5432` works too.
+MySQL sockets are not supported.
+
 ### `extra` options
 
 `extra` is a map in `ConnectionConfig` for driver options.
@@ -7201,8 +7258,10 @@ Keep the `db/migration` folder next to the binary if you also have `.sql` migrat
 
 ## Database settings
 
-The migrations use the `.env` file in your project.
-When there is no `.env` file (for example in Docker), they use the environment variables.
+The migrations read the `.env` file and the environment variables.
+A real environment variable wins over `.env`, the same as `Env.get()`.
+
+When `DATABASE_URL` is set, it wins over all `DB_*` keys. See [`DATABASE_URL`](index.md#database_url).
 
 ```bash title=".env"
 DB_CONNECTION=postgres # or mysql (also MariaDB), or sqlite
@@ -7223,8 +7282,9 @@ DB_NAME=storage/app.db # file path, made if missing
 - `DB_DATABASE` works too, in place of `DB_NAME`.
 - The default port is `5432` for Postgres and `3306` for MySQL.
 - One run uses one database connection.
-- Migrations do not use TLS. To migrate a database that needs TLS,
-  give your own connection: `Migrator(migrations: migrations, connection: myPool)`.
+- A `DB_HOST` that starts with `/` is a Postgres Unix socket folder, like `/cloudsql/project:region:instance`.
+- Migrations use TLS only with a `DATABASE_URL` that has `sslmode` (Postgres) or `ssl` (MySQL), like `?sslmode=require`.
+  You can also give your own connection: `Migrator(migrations: migrations, connection: myPool)`.
 
 ## Transactions
 
@@ -13753,6 +13813,7 @@ sudo chmod 600 /etc/blog.env
 systemd reads this file as `root`, before it starts the app as `dox`. So `dox` does not need to read it.
 
 For Postgres, set `DB_CONNECTION=postgres` and add `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` and `DB_NAME`.
+Or set one `DATABASE_URL`, like `postgres://app:secret@localhost:5432/blog`. It wins over the `DB_*` keys. See [`DATABASE_URL`](../database/index.md#database_url).
 See [Environments](environments.md) for all keys.
 
 !!! note "Which value wins"
@@ -14032,17 +14093,16 @@ fly volumes create blog_data --region ams --size 1
 
 Create a Fly.io Managed Postgres cluster with `fly mpg create`.
 
-`fly mpg attach` sets one secret, `DATABASE_URL`. Dox does not read `DATABASE_URL`. It reads `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USERNAME` and `DB_PASSWORD`.
-So take the values from the connection string in the Managed Postgres dashboard, and set them yourself:
+Attach it to the app:
 
 ```bash
-fly secrets set DB_CONNECTION=postgres \
-  DB_HOST=<host> DB_PORT=5432 DB_NAME=<database> \
-  DB_USERNAME=<user> DB_PASSWORD=<password>
+fly mpg attach <cluster-id> --app blog-api
 ```
 
+`fly mpg attach` sets one secret, `DATABASE_URL`. Dox reads it. When `DATABASE_URL` is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. The app and the migrations both use it. See [`DATABASE_URL`](../database/index.md#database_url).
+
 Then delete `DB_CONNECTION` and `DB_NAME` from `[env]`, and delete the `[mounts]` section.
-If the database asks for TLS, set `useSSL: true` on the `postgres` connection in `lib/config/database.dart`.
+If the database asks for TLS, add `?sslmode=require` to the url with `fly secrets set DATABASE_URL=...`.
 
 ## 5. Deploy
 
@@ -14214,11 +14274,16 @@ done
 
 Cloud Run has two ways to reach Cloud SQL: a Unix socket in `/cloudsql/...`, or the private IP over a VPC.
 
-Dox connects to Postgres over TCP only. It can not use the Unix socket. So use the **private IP**:
+Dox can use both. The Unix socket needs no VPC, so this guide uses it:
 
-1. Give the Cloud SQL instance a private IP on your VPC network (for example `default`).
-2. Deploy the service with Direct VPC egress (`--network`, `--subnet`, `--vpc-egress` in step 4).
-3. Use the private IP as `DB_HOST` and `5432` as `DB_PORT`.
+1. Find the connection name of the instance: `gcloud sql instances describe INSTANCE --format='value(connectionName)'`. It looks like `PROJECT_ID:europe-west1:INSTANCE`.
+2. Deploy with `--add-cloudsql-instances <connection name>` (step 4). Cloud Run then makes the socket in `/cloudsql/<connection name>`.
+3. Give the service account the `roles/cloudsql.client` role.
+4. Set `DB_HOST=/cloudsql/<connection name>`. A host that starts with `/` is a Unix socket folder. See [Unix socket](../database/index.md#unix-socket).
+
+The same with one url: `DATABASE_URL=postgres://blog:<password>@/blog?host=/cloudsql/<connection name>`.
+
+To use the **private IP** instead: give the instance a private IP on your VPC network, deploy with Direct VPC egress (`--network default --subnet default --vpc-egress private-ranges-only`), and use the private IP as `DB_HOST`.
 
 Do not use SQLite on Cloud Run. The file system of an instance is in memory, and each instance has its own. The data is lost when the instance stops.
 
@@ -14234,8 +14299,8 @@ gcloud run deploy blog \
   --allow-unauthenticated \
   --cpu 1 --memory 512Mi \
   --min-instances 1 \
-  --network default --subnet default --vpc-egress private-ranges-only \
-  --set-env-vars APP_ENV=production,APP_TOTAL_ISOLATE=1,DB_CONNECTION=postgres,DB_HOST=10.20.0.3,DB_PORT=5432,DB_NAME=blog,DB_USERNAME=blog \
+  --add-cloudsql-instances PROJECT_ID:europe-west1:INSTANCE \
+  --set-env-vars APP_ENV=production,APP_TOTAL_ISOLATE=1,DB_CONNECTION=postgres,DB_HOST=/cloudsql/PROJECT_ID:europe-west1:INSTANCE,DB_PORT=5432,DB_NAME=blog,DB_USERNAME=blog \
   --set-secrets APP_KEY=blog-app-key:1,DB_PASSWORD=blog-db-password:1
 ```
 
@@ -14243,7 +14308,7 @@ gcloud run deploy blog \
 | --- | --- |
 | `--port 3000` | the port Dox listens on (`APP_PORT`). See [the port](#the-port-port-and-app_port) |
 | `--min-instances 1` | keeps one instance warm, so the first request does not wait for a cold start. The default is `0`. An idle instance still costs money |
-| `--network`, `--subnet`, `--vpc-egress` | Direct VPC egress, to reach the private IP of Cloud SQL |
+| `--add-cloudsql-instances` | makes the Cloud SQL Unix socket in `/cloudsql/...` |
 | `--set-env-vars` | config that is not secret |
 | `--set-secrets` | `ENV_NAME=SECRET:VERSION`. Cloud Run reads the secret when an instance starts. Pin a version number, not `latest` |
 | `APP_TOTAL_ISOLATE=1` | one isolate per CPU. Set it to the `--cpu` value |
@@ -15725,7 +15790,7 @@ The code reads env vars in three ways:
 
 - `Env.get()` and `EnvReader` (`dox_core`): a real environment variable wins over the `.env` file.
 - `Platform.environment` straight: only the real environment, `.env` is not read.
-- `dox_migration` has its own `loadEnv()`: it reads `.env` when the file exists, else the real environment. See the note below.
+- `dox_migration` has its own `loadEnv()`: it reads `.env` and the real environment. A real environment variable wins, the same as `Env.get()`.
 
 ## Read by the framework
 
@@ -15735,8 +15800,9 @@ The code reads env vars in three ways:
 | `DOX_SERVER` | `dox_core` (`DoxServer.usesNative()`) | not set (uses `AppConfig.server`) | `dartio`, `dart_io` or `dart:io` forces the `dart:io` server. `native` forces the native server, also for an app with WebSocket routes. Real environment only. | `DOX_SERVER=dartio` |
 | `DOX_HTTP_THREAD` | `dox_http_native` (Rust, `shared_thread()`) | not set (one thread per isolate) | `shared` puts the servers of all isolates on one network thread. Off by default: on 2 cores it cut req/s by a quarter. Real environment only. | `DOX_HTTP_THREAD=shared` |
 | `DOX_DB_DRIVER` | `dox_orm` (`NativeDrivers.wanted()`) | not set (native driver) | `dart` uses the Dart `postgres` / `mysql_dart` driver instead of the native (Rust) one. Same as `extra: {'native': false}`. Real environment only. | `DOX_DB_DRIVER=dart` |
+| `DATABASE_URL` | `dox_orm` (`DatabaseConfig.url`), `dox_migration` | not set | A database url. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. `dox_orm` reads it from the real environment only. See [Database url](../database/index.md#database_url). | `DATABASE_URL=postgres://app:secret@db:5432/blog?sslmode=require` |
 | `DB_CONNECTION` | `dox_migration` (`DbConnection.open()`) | postgres | `postgres`, `mysql` or `sqlite`. Any other value means postgres. | `DB_CONNECTION=sqlite` |
-| `DB_HOST` | `dox_migration` | `localhost` | Database host. | `DB_HOST=127.0.0.1` |
+| `DB_HOST` | `dox_migration` | `localhost` | Database host. A path that starts with `/` is a Postgres Unix socket folder. | `DB_HOST=127.0.0.1` |
 | `DB_PORT` | `dox_migration` | `5432` (postgres), `3306` (mysql) | Database port. | `DB_PORT=5432` |
 | `DB_USERNAME` | `dox_migration` | `postgres` (postgres), `root` (mysql) | Database user. | `DB_USERNAME=app` |
 | `DB_PASSWORD` | `dox_migration` | `postgres` (postgres), empty (mysql) | Database password. | `DB_PASSWORD=secret` |
@@ -15744,10 +15810,6 @@ The code reads env vars in three ways:
 | `DB_NAME` | `dox_migration` | `dox` | Same as `DB_DATABASE`. `DB_DATABASE` wins when both are set. | `DB_NAME=dox` |
 | `HOME` / `USERPROFILE` | build hooks of `dox_http_native`, `dox_postgres_native`, `dox_mysql_native` | empty | Used to find `~/.cargo/bin/cargo` when the library must be built from source. | set by the OS |
 | `DART_VM_OPTIONS` | the Dart VM | not set | Flags for the VM. The AOT binary from `dox build` reads it. Dox never sets VM flags for you. See [Performance](../digging-deeper/performance.md#dart-vm-flags). | `DART_VM_OPTIONS=--new_gen_semi_max_size=64` |
-
-!!! note "Migrations and `.env`"
-    `dox_migration` reads `.env` when the file exists, and only then falls back to the real environment.
-    So with a `.env` file in the folder, a real `DB_HOST` is ignored. See [Troubleshooting](troubleshooting.md#migrations-read-env-instead-of-the-real-environment).
 
 `DOX_SERVER`, `DOX_HTTP_THREAD` and `DOX_DB_DRIVER` are read with `Platform.environment` or `std::env::var`. They do not work from `.env`.
 
@@ -16324,33 +16386,6 @@ Until then, pass the version by hand:
 dox create my_app --version 3.0.0-alpha.4
 ```
 
-## Migrations read `.env` instead of the real environment
-
-**Symptom.** `dox migration:run` (or `dart run bin/migrate.dart run`) in Docker or CI fails with
-
-```
-Exception: Could not connect to database: <driver error>
-```
-
-and the host, user or database in the error are the ones from your `.env`, not the ones you set in the environment.
-
-**Cause.** `dox_migration` has its own env loader (`packages/dox-migration/lib/src/utils/env.dart`). When a `.env` file exists in the current folder, it reads only that file. The real environment is used only when there is no `.env`. This is the opposite of `Env.get()` in `dox_core`, where the real environment wins.
-
-**Fix.** Pick one:
-
-- Do not ship a `.env` to the server. `dox build` copies `.env.example`, not `.env`. Set real env vars and leave `.env` out.
-- Put the right values in the `.env` of the server.
-- Open the connection yourself and give it to the migrator in `bin/migrate.dart`:
-
-    ```dart
-    exitCode = await Migrator(
-      migrations: migrations,
-      connection: myPostgresPool,
-    ).run(args);
-    ```
-
-The keys it reads are `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` and `DB_DATABASE` (or `DB_NAME`). See [Environment variables](env.md).
-
 ## A `.env` value with `#`
 
 **Symptom.** The app stops at start with
@@ -16617,7 +16652,7 @@ See [Environment variables](../digging-deeper/env.md).
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `Exception: Could not connect to database: <error>` | The migrator can not open the database. | Check `DB_*` values. A `.env` file wins over the real env here. See [Troubleshooting](troubleshooting.md#migrations-read-env-instead-of-the-real-environment). |
+| `Exception: Could not connect to database: <error>` | The migrator can not open the database. | Check `DATABASE_URL` or the `DB_*` values. A real env var wins over `.env`. |
 | `Unknown migration command: <cmd> (use run, rollback, reset, refresh or status)` | `dart run bin/migrate.dart <cmd>` with another command. | Use one of the five. |
 | `Invalid argument(s): Invalid option <x>, use --step=<count>` | `rollback` with a bad option. | Use `--step=2`. |
 | `Bad state: Migration <name> is both a Dart and a .sql migration` | Two files with the same name in `db/migration`. | Rename or delete one. |
@@ -17006,6 +17041,12 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_migration
 
+### Unreleased
+
+- `DATABASE_URL` support. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. Its `sslmode` (Postgres) or `ssl` (MySQL) option turns TLS on.
+- A `DB_HOST` that starts with `/` is a Postgres Unix socket folder, like `/cloudsql/project:region:instance` on Cloud Run.
+- Migrations read real environment variables too. Before, a `.env` file hid them. Now a real env var wins over `.env`, the same as `Env.get()` of dox_core. An empty value, or `null`, counts as missing.
+
 ### 3.0.0-alpha.4
 
 - Version bump only, to match the other packages.
@@ -17039,6 +17080,10 @@ What changed in each package, newest first. This page is made from the
 - Fix statement split: `;` inside quotes, comments or `$$` bodies does not split
 
 ## dox_mysql_native
+
+### Unreleased
+
+- The hook comment says how to fill the sha256 list from a release: `dart run bin/native_hashes.dart <tag>`. The list stays empty until the first release.
 
 ### 3.0.0-alpha.4
 
@@ -17092,6 +17137,12 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_orm
 
+### Unreleased
+
+- `DATABASE_URL` support. `ConnectionConfig.fromUrl()` reads `postgres://`, `postgresql://`, `mysql://`, `mariadb://`, `sqlite:` and `file:` urls: url-decoded user and password, host, port, database, `sslmode` and other options (they go to `extra`).
+- `DatabaseConfig` has a new `url`. It is `DATABASE_URL` from the environment when not given. When it is set, it wins: it replaces the default connection. Pass `url: ''` to turn it off.
+- Postgres Unix sockets. A host that starts with `/` is a socket folder, like `/cloudsql/project:region:instance` on Cloud Run. Works on the native and the Dart driver. Use `?host=/cloudsql/...` in a url.
+
 ### 3.0.0-alpha.4
 
 - Version bump only, to match the other packages.
@@ -17138,6 +17189,11 @@ What changed in each package, newest first. This page is made from the
 - Schema: `unique()` on a column that is already unique is skipped. Default values are escaped.
 
 ## dox_postgres_native
+
+### Unreleased
+
+- The hook comment says how to fill the sha256 list from a release: `dart run bin/native_hashes.dart <tag>`. The list stays empty until the first release.
+- A `host` that starts with `/` is a Unix socket folder (eg. Cloud SQL `/cloudsql/project:region:instance`). A test checks it.
 
 ### 3.0.0-alpha.4
 

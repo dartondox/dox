@@ -4189,6 +4189,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha4_7" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4259,6 +4270,17 @@
   
     <nav class="md-nav" aria-label="dox_mysql_native">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha4_8" class="md-nav__link">
@@ -4372,6 +4394,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha4_10" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4431,6 +4464,17 @@
   
     <nav class="md-nav" aria-label="dox_postgres_native">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha4_11" class="md-nav__link">
@@ -5307,6 +5351,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha4_7" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5377,6 +5432,17 @@
   
     <nav class="md-nav" aria-label="dox_mysql_native">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha4_8" class="md-nav__link">
@@ -5490,6 +5556,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha4_10" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5549,6 +5626,17 @@
   
     <nav class="md-nav" aria-label="dox_postgres_native">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha4_11" class="md-nav__link">
@@ -6151,6 +6239,12 @@
 <li>The build hook downloads a ready-built library. No Rust needed.</li>
 </ul>
 <h2 id="dox_migration">dox_migration</h2>
+<h3 id="unreleased_3">Unreleased</h3>
+<ul>
+<li><code>DATABASE_URL</code> support. When it is set, it wins over <code>DB_CONNECTION</code> and the other <code>DB_*</code> keys. Its <code>sslmode</code> (Postgres) or <code>ssl</code> (MySQL) option turns TLS on.</li>
+<li>A <code>DB_HOST</code> that starts with <code>/</code> is a Postgres Unix socket folder, like <code>/cloudsql/project:region:instance</code> on Cloud Run.</li>
+<li>Migrations read real environment variables too. Before, a <code>.env</code> file hid them. Now a real env var wins over <code>.env</code>, the same as <code>Env.get()</code> of dox_core. An empty value, or <code>null</code>, counts as missing.</li>
+</ul>
 <h3 id="300-alpha4_7">3.0.0-alpha.4</h3>
 <ul>
 <li>Version bump only, to match the other packages.</li>
@@ -6184,6 +6278,10 @@
 <li>Fix statement split: <code>;</code> inside quotes, comments or <code>$$</code> bodies does not split</li>
 </ul>
 <h2 id="dox_mysql_native">dox_mysql_native</h2>
+<h3 id="unreleased_4">Unreleased</h3>
+<ul>
+<li>The hook comment says how to fill the sha256 list from a release: <code>dart run bin/native_hashes.dart &lt;tag&gt;</code>. The list stays empty until the first release.</li>
+</ul>
 <h3 id="300-alpha4_8">3.0.0-alpha.4</h3>
 <ul>
 <li>Version bump only, to match the other packages.</li>
@@ -6234,6 +6332,12 @@
 <li>Output as JSON and YAML, write files, serve <code>/openapi.json</code>, <code>/openapi.yaml</code> and <code>/docs</code>.</li>
 </ul>
 <h2 id="dox_orm">dox_orm</h2>
+<h3 id="unreleased_5">Unreleased</h3>
+<ul>
+<li><code>DATABASE_URL</code> support. <code>ConnectionConfig.fromUrl()</code> reads <code>postgres://</code>, <code>postgresql://</code>, <code>mysql://</code>, <code>mariadb://</code>, <code>sqlite:</code> and <code>file:</code> urls: url-decoded user and password, host, port, database, <code>sslmode</code> and other options (they go to <code>extra</code>).</li>
+<li><code>DatabaseConfig</code> has a new <code>url</code>. It is <code>DATABASE_URL</code> from the environment when not given. When it is set, it wins: it replaces the default connection. Pass <code>url: ''</code> to turn it off.</li>
+<li>Postgres Unix sockets. A host that starts with <code>/</code> is a socket folder, like <code>/cloudsql/project:region:instance</code> on Cloud Run. Works on the native and the Dart driver. Use <code>?host=/cloudsql/...</code> in a url.</li>
+</ul>
 <h3 id="300-alpha4_10">3.0.0-alpha.4</h3>
 <ul>
 <li>Version bump only, to match the other packages.</li>
@@ -6280,6 +6384,11 @@
 <li>Schema: <code>unique()</code> on a column that is already unique is skipped. Default values are escaped.</li>
 </ul>
 <h2 id="dox_postgres_native">dox_postgres_native</h2>
+<h3 id="unreleased_6">Unreleased</h3>
+<ul>
+<li>The hook comment says how to fill the sha256 list from a release: <code>dart run bin/native_hashes.dart &lt;tag&gt;</code>. The list stays empty until the first release.</li>
+<li>A <code>host</code> that starts with <code>/</code> is a Unix socket folder (eg. Cloud SQL <code>/cloudsql/project:region:instance</code>). A test checks it.</li>
+</ul>
 <h3 id="300-alpha4_11">3.0.0-alpha.4</h3>
 <ul>
 <li>Less work per request. Rust copies a batch of requests once and keeps slices of it, instead of one copy of the SQL and of each parameter. A batch of plain queries uses one timeout timer, not one per query. Dart keeps waiting requests in a list, not a map.</li>
