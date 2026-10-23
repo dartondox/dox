@@ -10,7 +10,7 @@ import 'package:test/test.dart';
 import 'config/app_config.dart';
 import 'config/redis_env.dart';
 
-const int port = 3016;
+int get port => Dox().server.httpServer.port;
 
 class RoomEmitRouter implements Router {
   @override
@@ -110,7 +110,8 @@ void main() {
     Dox().initialize(
       AppConfig(
         appKey: appConfig.appKey,
-        serverPort: port,
+        // the OS picks a free port, so test files can run in parallel
+        serverPort: 0,
         totalIsolate: 1,
         responseHandler: appConfig.responseHandler,
         routers: <Router>[RoomEmitRouter()],
