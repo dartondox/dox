@@ -345,3 +345,99 @@
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 }
+
+/* ---------- Benchmark chart (Getting Started) ---------- */
+.dox-bench {
+  border: 1px solid var(--dox-line);
+  border-radius: 14px;
+  background: var(--dox-surface);
+  padding: 1.2rem 1.4rem 0.8rem;
+  margin: 0.4rem 0 1.6rem;
+}
+.md-typeset .dox-bench__title {
+  font-size: 1.5em;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0;
+  color: var(--md-default-fg-color);
+}
+.md-typeset .dox-bench__sub { color: var(--md-default-fg-color--light); margin: 0.3em 0 1em; }
+.dox-bench__grid {
+  display: grid;
+  grid-template-columns: 8rem minmax(0, 1fr) 5.2rem 3.8rem 3.4rem;
+  align-items: center;
+  column-gap: 0.9rem;
+  row-gap: 0.5rem;
+}
+.dox-bench__row { display: contents; }
+.dox-bench--simple .dox-bench__grid { grid-template-columns: 8rem minmax(0, 1fr) 5.2rem; }
+.dox-bench__head {
+  font: 500 0.58rem/1 var(--md-code-font-family);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--md-default-fg-color--light);
+  text-align: right;
+}
+.dox-bench__name { line-height: 1.25; }
+.dox-bench__name strong { display: block; color: var(--md-default-fg-color); }
+.dox-bench__name span { font: 0.6rem/1.3 var(--md-code-font-family); color: var(--md-default-fg-color--light); }
+.dox-bench__track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 1.7rem;
+  border-radius: 5px;
+  background: var(--dox-line);
+  overflow: hidden;
+}
+.dox-bench__bar {
+  height: 100%;
+  width: var(--w);
+  flex: none;
+  background: var(--md-default-fg-color--lighter);
+}
+.dox-bench__num,
+.dox-bench__p99,
+.dox-bench__ram {
+  font-family: var(--md-code-font-family);
+  text-align: right;
+  white-space: nowrap;
+  color: var(--md-default-fg-color--light);
+  font-size: 0.85em;
+}
+.dox-bench__num { font-size: 0.95em; }
+/* the winning row: accent bar, trophy, big number */
+[data-md-color-scheme="default"] .dox-bench { --dox-win: var(--dox-blue); }
+[data-md-color-scheme="slate"] .dox-bench { --dox-win: var(--dox-cyan); }
+.dox-bench__row--win .dox-bench__bar { background: var(--dox-win); }
+.dox-bench__vs {
+  display: block;
+  margin-top: 0.15rem;
+  font: 600 0.58rem/1 var(--md-code-font-family);
+  color: var(--md-default-fg-color--light);
+}
+.dox-bench__row--win .dox-bench__vs { color: var(--dox-win); }
+.dox-bench__row--win .dox-bench__vs::before { content: "🏆 "; }
+.dox-bench__row--win .dox-bench__name strong,
+.dox-bench__row--win .dox-bench__num,
+.dox-bench__row--win .dox-bench__p99 { color: var(--dox-win); font-weight: 750; }
+.dox-bench__row--win .dox-bench__num { font-size: 1.25em; }
+.md-typeset .dox-bench__foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid var(--dox-line);
+  margin: 0.9rem 0 0;
+  padding-top: 0.6rem;
+  font-size: 0.78em;
+  color: var(--md-default-fg-color--light);
+}
+.md-typeset .dox-bench__foot a { white-space: nowrap; }
+@media screen and (max-width: 44.9375em) {
+  .dox-bench { padding: 1rem 0.9rem 0.7rem; }
+  .dox-bench__grid,
+  .dox-bench--simple .dox-bench__grid { grid-template-columns: 5.4rem minmax(0, 1fr) 4.8rem; column-gap: 0.6rem; }
+  .dox-bench__p99, .dox-bench__ram, .dox-bench__head:nth-child(4), .dox-bench__head--ram { display: none; }
+  .md-typeset .dox-bench__foot { flex-direction: column; }
+}

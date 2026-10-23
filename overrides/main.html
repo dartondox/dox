@@ -1,0 +1,75 @@
+{#-
+  SEO for the Dox docs. Only <head> changes; the page design is Material's.
+  - <title>: "Page | Dox, the Dart backend framework", home: a full sentence.
+  - Open Graph and Twitter cards, so shared links show a preview.
+  - JSON-LD: the framework on the home page, a breadcrumb on every page.
+  The meta description comes from the page summary (hooks/docs_hooks.py).
+-#}
+{% extends "base.html" %}
+
+{% block htmltitle %}
+  {% if not page %}
+    <title>Page not found | Dox</title>
+  {% elif (page.file.src_uri == "index.md") %}
+    <title>Dox: fast web backend framework for Dart, like Laravel</title>
+  {% else %}
+    <title>{{ page.meta.title or page.title | striptags }} | Dox, the Dart backend framework</title>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+  {% if page %}
+  {% set title = "Dox: fast web backend framework for Dart" if (page.file.src_uri == "index.md") else (page.meta.title or page.title | striptags) ~ " | Dox" %}
+  {% set description = (page.meta.description if page.meta and page.meta.description else config.site_description) %}
+  {% set image = config.site_url ~ "assets/social-card.png" %}
+  <meta property="og:type" content="{{ 'website' if (page.file.src_uri == "index.md") else 'article' }}">
+  <meta property="og:site_name" content="Dox">
+  <meta property="og:title" content="{{ title }}">
+  <meta property="og:description" content="{{ description }}">
+  <meta property="og:url" content="{{ page.canonical_url }}">
+  <meta property="og:image" content="{{ image }}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Dox: fast web backend framework for Dart">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ title }}">
+  <meta name="twitter:description" content="{{ description }}">
+  <meta name="twitter:image" content="{{ image }}">
+  {% if (page.file.src_uri == "index.md") %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Dox",
+    "description": {{ config.site_description | tojson }},
+    "url": {{ config.site_url | tojson }},
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Linux, macOS, Windows",
+    "programmingLanguage": "Dart",
+    "license": "https://opensource.org/licenses/MIT",
+    "codeRepository": "https://github.com/dartondox/dox",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+  {% else %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Dox", "item": {{ config.site_url | tojson }} }
+      {%- set crumb = namespace(n=1) %}
+      {%- for ancestor in page.ancestors | reverse %}
+      {%- if ancestor.is_section and ancestor.children and ancestor.children[0].is_page and ancestor.children[0] != page %}
+      {%- set crumb.n = crumb.n + 1 %}
+      ,{ "@type": "ListItem", "position": {{ crumb.n }}, "name": {{ ancestor.title | striptags | tojson }}, "item": {{ ancestor.children[0].canonical_url | tojson }} }
+      {%- endif %}
+      {%- endfor %}
+      ,{ "@type": "ListItem", "position": {{ crumb.n + 1 }}, "name": {{ page.title | striptags | tojson }}, "item": {{ page.canonical_url | tojson }} }
+    ]
+  }
+  </script>
+  {% endif %}
+  {% endif %}
+{% endblock %}

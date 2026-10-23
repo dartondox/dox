@@ -13,6 +13,9 @@ on:
       - develop
     paths:
       - 'docs/**'
+      - 'hooks/**'
+      - 'overrides/**'
+      - 'packages/*/CHANGELOG.md'
       - 'mkdocs.yml'
       - '.github/workflows/docs.yaml'
   workflow_dispatch:
@@ -96,7 +99,7 @@ jobs:
           import json, os, shutil
 
           versions = json.load(open('versions.json'))
-          names = {'.git', '.nojekyll', 'CNAME', 'versions.json'}
+          names = {'.git', '.nojekyll', 'CNAME', 'versions.json', 'robots.txt'}
           for v in versions:
               names.add(v['version'])
               names.update(v['aliases'])
@@ -148,6 +151,16 @@ jobs:
                       '</body></html>' % home)
           with open('CNAME', 'w') as f:
               f.write('dartondox.dev\n')
+          # robots.txt must be at the site root. The sitemap is the one of
+          # /latest/, where canonical URLs point. Old 2.x docs stay online
+          # for links, but are not crawled.
+          with open('robots.txt', 'w') as f:
+              f.write('# Algolia-Crawler-Verif: 7556FC76DBDC63BA\n'
+                      'User-agent: *\n'
+                      'Allow: /\n'
+                      'Disallow: /2.x/\n'
+                      '\n'
+                      'Sitemap: https://dartondox.dev/latest/sitemap.xml\n')
           print('redirect pages:', len(pages))
           PY
           git add -A

@@ -23,9 +23,16 @@ def _pub_name(package: Path) -> str:
 
 
 def _sections(text: str):
-    """(version, body) for every `## version` part of a CHANGELOG."""
+    """(version, body) for every `## version` part of a CHANGELOG.
+
+    Old history written as `# version x` lines is cut off, and headings in
+    a body move down two levels, so the page keeps one H1.
+    """
+    text = re.split(r"^# ", text, flags=re.M)[0] if not text.startswith("# ") else text
     for part in re.split(r"^## +", text, flags=re.M)[1:]:
         head, _, body = part.partition("\n")
+        body = re.split(r"^# ", body, flags=re.M)[0]
+        body = re.sub(r"^(#{1,4}) ", r"##\1 ", body, flags=re.M)
         yield head.strip(), body.strip()
 
 
@@ -75,15 +82,50 @@ def on_nav(nav, config, files):
     return nav
 
 
+def _summary(markdown: str) -> str:
+    """The first paragraph after the H1, as plain text, at most ~160 chars."""
+    lines = markdown.split("\n")
+    start = next((i for i, l in enumerate(lines) if l.startswith("# ")), -1) + 1
+    para, in_code = [], False
+    for line in lines[start:]:
+        if line.startswith("```"):
+            in_code = not in_code
+            continue
+        if in_code:
+            continue
+        text = line.strip()
+        if not text:
+            if para:
+                break
+            continue
+        if text[0] in "<#!|-*>=" or text[0].isdigit() and ". " in text[:4]:
+            if para:
+                break
+            continue
+        para.append(text)
+    text = " ".join(para)
+    text = re.sub(r"!?\[([^\]]*)\]\([^)]*\)", r"\1", text)  # links, images
+    text = re.sub(r"[`*]", "", text)
+    text = re.sub(r"\{[^}]*\}", "", text)  # attr lists
+    text = re.sub(r"\s+", " ", text).strip()
+    if len(text) > 160:
+        text = text[:157].rsplit(" ", 1)[0].rstrip(",.:;") + "..."
+    return text
+
+
 def on_page_markdown(markdown, page, config, files):
     _MARKDOWN[page.file.src_uri] = markdown
+    if not page.meta.get("description"):
+        summary = _summary(markdown)
+        if summary:
+            page.meta["description"] = summary
     return markdown
 
 
 def on_post_build(config):
     site = Path(config["site_dir"])
-    # the docs of the newest version live under /latest/ (see mike in docs.yaml)
-    base = config["site_url"].rstrip("/") + "/latest/"
+    # site_url is https://dartondox.dev/latest/ (see mkdocs.yml)
+    base = config["site_url"]
     index = [
         "# Dox",
         "",

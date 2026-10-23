@@ -1,5 +1,6 @@
 ---
 title: Getting Started
+description: Dox is a fast web backend framework for Dart, like Laravel. Routing, an ORM, migrations, typed validation, auth and a CLI, on a Rust HTTP server.
 hide:
   - toc
 ---
@@ -61,6 +62,59 @@ class BlogController {
 
 </div>
 
+## How fast
+
+<div class="dox-bench" markdown>
+
+<p class="dox-bench__title">1.5× Bun. 2.3× Go. 7× plain Dart.</p>
+<p class="dox-bench__sub">A real route: read one row from Postgres and return JSON (<code>GET /db</code>). Requests per second on one CPU core, higher is better.</p>
+
+<div class="dox-bench__grid">
+  <span></span><span></span>
+  <span class="dox-bench__head">req/s</span>
+  <span class="dox-bench__head">p99</span>
+  <span class="dox-bench__head dox-bench__head--ram">RAM</span>
+
+  <div class="dox-bench__row dox-bench__row--win">
+    <span class="dox-bench__name"><strong>Dox</strong><span>native server + driver</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
+    <span class="dox-bench__num">85,381<span class="dox-bench__vs">fastest</span></span>
+    <span class="dox-bench__p99">5.7 ms</span>
+    <span class="dox-bench__ram">24 MB</span>
+  </div>
+  <div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>Bun</strong><span>Bun.serve + Bun.sql</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 67.5%"></span></span>
+    <span class="dox-bench__num">57,614<span class="dox-bench__vs">1.5× slower</span></span>
+    <span class="dox-bench__p99">6.1 ms</span>
+    <span class="dox-bench__ram">36 MB</span>
+  </div>
+  <div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>Go</strong><span>net/http + pgx</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 43%"></span></span>
+    <span class="dox-bench__num">36,706<span class="dox-bench__vs">2.3× slower</span></span>
+    <span class="dox-bench__p99">14.5 ms</span>
+    <span class="dox-bench__ram">18 MB</span>
+  </div>
+  <div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>dart:io</strong><span>+ package:postgres</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 14.2%"></span></span>
+    <span class="dox-bench__num">12,146<span class="dox-bench__vs">7× slower</span></span>
+    <span class="dox-bench__p99">47.6 ms</span>
+    <span class="dox-bench__ram">62 MB</span>
+  </div>
+</div>
+
+<p class="dox-bench__foot"><span>Dox 3.0.0-alpha.3 · Bun 1.4 · Go 1.27 · Dart 3.13 · Postgres 18 · 256 connections · wrk · median of 3 runs</span><a href="digging-deeper/performance/#app-benchmark">All results</a></p>
+
+</div>
+
+Dox also has the lowest p99 (the slowest 1% of requests). Your code is plain
+Dart. The speed comes from the Rust HTTP server and the Rust database drivers
+that Dox uses by default. On 2 cores Dox stays ahead on the database routes.
+Without a database (`GET /json`), Bun is faster.
+See [Performance](digging-deeper/performance.md) for every route and how to run the benchmark yourself.
+
 !!! warning "You are reading the 3.x docs (alpha)"
     `3.0.0-alpha.4` is a preview. Things can still change before the stable release.
 
@@ -104,23 +158,6 @@ at a time.
 | Coming from Laravel | [Coming from Laravel](concepts/coming-from-laravel.md) | [How Dox works](concepts/how-dox-works.md) |
 | Looking for one answer | [Guides](guides/index.md) (uploads, auth, Docker, pagination...) | [Reference](reference/index.md) |
 | Going to production | [Deployment](digging-deeper/deployment.md) | [Docker](guides/docker.md), [Troubleshooting](reference/troubleshooting.md) |
-
-## How fast
-
-A small app that reads one row from Postgres per request. One CPU core,
-256 connections, requests per second. Higher is better.
-
-| Server | `GET /db` req/s | `GET /json` req/s | Peak RAM |
-| --- | ---: | ---: | ---: |
-| **Dox** 3.0.0-alpha.3 (native server, native driver) | **85,381** | 157,036 | 24 MB |
-| Bun 1.4 (`Bun.serve` + `Bun.sql`) | 57,614 | 176,148 | 36 MB |
-| Go 1.27 (`net/http` + pgx) | 36,706 | 79,884 | 18 MB |
-| `dart:io` + `package:postgres` | 12,146 | 33,670 | 62 MB |
-
-Dox is the same Dart code on every row. The speed comes from the Rust HTTP
-server and the Rust database drivers that Dox uses by default.
-See [Performance](digging-deeper/performance.md) for the full tables, 2 cores,
-and how to run the benchmark yourself.
 
 ## What you get
 

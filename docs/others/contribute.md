@@ -4,15 +4,15 @@ This page shows how to work on Dox: set up the repo, run the tests, release pack
 
 To send a change, fork the repo and open a pull request.
 
-# Setting up local development
+## Setting up local development
 
-#### 1. Clone the repo
+### 1. Clone the repo
 
 ```bash
 git clone git@github.com:dartondox/dox.git
 ```
 
-#### 2. Install melos
+### 2. Install melos
 
 The repo is a [Dart pub workspace](https://dart.dev/tools/pub/workspaces).
 The melos config is in the root `pubspec.yaml` (under `melos:`). Use Dart 3.13 or newer.
@@ -21,7 +21,7 @@ The melos config is in the root `pubspec.yaml` (under `melos:`). Use Dart 3.13 o
 dart pub global activate melos
 ```
 
-#### 3. Run melos bootstrap
+### 3. Run melos bootstrap
 
 It runs one `dart pub get` at the root. All local packages are linked.
 There is one `pubspec.lock` for the whole repo.
@@ -30,7 +30,7 @@ There is one `pubspec.lock` for the whole repo.
 melos bs
 ```
 
-#### 4. Useful commands
+### 4. Useful commands
 
 ```bash
 # Run all tests (not dox_orm and not dox_mysql_native).
@@ -55,19 +55,19 @@ dart build cli --target bin/dox.dart --output build
 build/bundle/bin/dox --version
 ```
 
-#### If the project does not run
+### If the project does not run
 
 1. Remove `pubspec.lock` and `.dart_tool` at the root.
 2. Remove any old `pubspec_overrides.yaml` and `pubspec.lock` in `packages/*` (left from melos 3).
 3. Run `melos bs` again.
 
-# Release (maintainers)
+## Release (maintainers)
 
 The `Release` GitHub workflow (`.github/workflows/publish.yaml`) publishes all public packages to pub.dev.
 It runs when you push a tag like `v3.0.0-alpha.4`.
 It uses pub.dev automated publishing, so it needs no token or secret.
 
-#### Steps
+### Steps
 
 1. Set the new version in the root `pubspec.yaml`, for example `version: 3.0.0-alpha.4`.
 2. Run the script.
@@ -93,7 +93,7 @@ It uses pub.dev automated publishing, so it needs no token or secret.
    git push origin v3.0.0-alpha.4
    ```
 
-#### What the workflow does
+### What the workflow does
 
 1. It checks that the tag (without `v`) is the root version, and that every package has this version.
    If not, it stops. Run `bin/update_versions.sh` and try again.
@@ -114,13 +114,13 @@ python3 bin/publish_order.py
 A package is skipped when its version is already on pub.dev.
 So if a run fails halfway, fix the problem and click "Re-run jobs". It continues where it stopped.
 
-#### Dry run
+### Dry run
 
 Open Actions > Release > "Run workflow".
 It runs `dart pub publish --dry-run` for every package and publishes nothing.
 Warnings (for example a missing CHANGELOG entry) show as yellow warnings. They do not fail the run.
 
-#### One-time setup
+### One-time setup
 
 Do this once for each published package, and for every new package before its first tag.
 The list of packages is the output of `python3 bin/publish_order.py`.
@@ -139,7 +139,7 @@ The publish job runs in it.
 Optional: add yourself as a required reviewer, and allow only tags `v*`.
 The old `PUB_CREDENTIALS` secret is not used any more.
 
-# Docs
+## Docs
 
 The docs site is https://dartondox.dev. It is built with MkDocs Material and
 [mike](https://github.com/jimporter/mike). mike keeps one folder per version on the `gh-pages` branch.
@@ -152,7 +152,7 @@ The docs site is https://dartondox.dev. It is built with MkDocs Material and
 | `/` | redirects to `/latest/` |
 | old links like `/the-basic/routing/` | redirect to `/latest/the-basic/routing/` |
 
-#### Write and preview
+### Write and preview
 
 ```bash
 python3 -m venv .venv
@@ -161,7 +161,7 @@ python3 -m venv .venv
 .venv/bin/mkdocs build --strict  # the same check as CI. Broken links fail.
 ```
 
-#### Deploy
+### Deploy
 
 - 3.x deploys by itself. The `Docs` workflow (`.github/workflows/docs.yaml`) runs on every push
   to `develop` that changes `docs/`, `mkdocs.yml` or the workflow.
@@ -172,13 +172,13 @@ python3 -m venv .venv
   the root `index.html`, a `404.html` and the `CNAME` file. So `dartondox.dev` and old links keep working.
 - The workflow pushes with the built-in `GITHUB_TOKEN`. This works because `gh-pages` is not a protected branch.
 
-#### Why mike
+### Why mike
 
 - Old docs stay online at `/2.x/`, and readers switch with the version menu.
 - Each version is built once from its own branch. A new deploy does not touch the other versions.
 - Old links from before versioning are kept with redirect pages, so search results and blog posts still work.
 
-#### New major version
+### New major version
 
 When 4.x starts, deploy 4.x with `mike deploy --update-aliases 4.x latest`. Keep a `v3.x`
 branch, and add `3.x` to the workflow input, so 3.x can still be fixed.

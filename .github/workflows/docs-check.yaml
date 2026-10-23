@@ -9,6 +9,8 @@ on:
     paths:
       - 'docs/**'
       - 'hooks/**'
+      - 'overrides/**'
+      - 'packages/*/CHANGELOG.md'
       - 'mkdocs.yml'
       - '.github/workflows/docs-check.yaml'
 

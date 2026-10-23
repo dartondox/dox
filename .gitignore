@@ -22,3 +22,6 @@ build/
 # examples/ use the local packages through their pubspec_overrides.yaml
 !examples/*/pubspec_overrides.yaml
 examples/*/pubspec.lock
+
+# python cache of the docs hooks
+__pycache__/
