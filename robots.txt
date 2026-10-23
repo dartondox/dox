@@ -1,0 +1,6 @@
+# Algolia-Crawler-Verif: 7556FC76DBDC63BA
+User-agent: *
+Allow: /
+Disallow: /2.x/
+
+Sitemap: https://dartondox.dev/latest/sitemap.xml
