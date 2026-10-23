@@ -62,10 +62,10 @@ class StorageDiskFactory {
       case 's3':
         return S3Driver(
           S3DriverConfig(
-            bucket: options['bucket'] as String,
+            bucket: _required(name, options, 'bucket'),
             region: options['region'] as String? ?? 'us-east-1',
-            accessKeyId: options['key'] as String,
-            secretAccessKey: options['secret'] as String,
+            accessKeyId: _required(name, options, 'key'),
+            secretAccessKey: _required(name, options, 'secret'),
             sessionToken: _text(options['token']),
             endpoint: _text(options['endpoint']),
             forcePathStyle: options['path_style'] as bool? ?? false,
@@ -79,6 +79,18 @@ class StorageDiskFactory {
         return MemoryDriver();
     }
     throw ArgumentError('Storage disk "$name" has unknown driver "$type"');
+  }
+
+  /// a setting the driver can not work without.
+  /// a missing or empty value fails with a clear message.
+  String _required(String name, Map<String, dynamic> options, String key) {
+    String? value = _text(options[key]);
+    if (value == null) {
+      throw ArgumentError(
+        'Storage disk "$name" needs the "$key" setting. It is missing or empty.',
+      );
+    }
+    return value;
   }
 
   String? _text(Object? value) {
