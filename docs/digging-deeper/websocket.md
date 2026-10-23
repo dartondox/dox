@@ -143,9 +143,11 @@ Two events are built in:
 | Event | Direction | What it does |
 | --- | --- | --- |
 | `connected` | server to client | sent once after connect. `message` is `{"id": "<socket id>"}` |
-| `joinRoom` | client to server | joins the room. `message` is the room name |
+| `joinRoom` | client to server | joins the room. `message` is the room name, up to 255 chars. A name that starts with `room:` is ignored |
 
 Each client is also in a room for its route, so `emitter.emit()` with no room reaches all clients of the same route.
+
+Any client can join any other room by its name. Do not send private data to a room that a client can guess, like `user:42`. Send it with `emitToSender`, or on a route with auth middleware.
 
 ## Client examples
 

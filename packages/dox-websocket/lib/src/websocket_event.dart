@@ -66,7 +66,8 @@ class WebsocketEventHandler implements WebsocketEvent {
         /// join to the room and message is room name.
         /// store the plain name, so `emitter.room(name)` finds it.
         if (eventName == WEB_SOCKET_JOIN_ROOM_EVENT_NAME) {
-          _storage.addWebSocketIdToRoom(socketId, message.toString());
+          String room = message.toString();
+          if (_canJoin(room)) _storage.addWebSocketIdToRoom(socketId, room);
           return;
         }
 
@@ -98,6 +99,18 @@ class WebsocketEventHandler implements WebsocketEvent {
     /// return websocket, so that response controller
     /// do not close the connection
     return ws;
+  }
+
+  /// longest room name a client may join
+  static const int maxRoomLength = 255;
+
+  /// a client may not join the default room of a route (`room:...`).
+  /// that room gets every message of the route, and the route may have
+  /// auth middleware that this client did not pass.
+  bool _canJoin(String room) {
+    return room.isNotEmpty &&
+        room.length <= maxRoomLength &&
+        !room.startsWith('room:');
   }
 
   /// creating socket id with unique timestamp

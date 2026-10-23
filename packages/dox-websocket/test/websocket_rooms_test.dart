@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_websocket/dox_websocket.dart';
+import 'package:dox_websocket/src/websocket_storage.dart';
 import 'package:test/test.dart';
 
 import 'config/app_config.dart';
@@ -55,6 +56,11 @@ class RoomsRouter implements Router {
       event.on('others', c.others);
       event.on('me', c.me);
     });
+    Route.websocket('ws-admin', (WebsocketEvent event) {
+      event.on('secret', (WebsocketEmitter emitter, dynamic message) {
+        emitter.emit('secret', message);
+      });
+    });
   }
 }
 
@@ -81,8 +87,8 @@ class Client {
     });
   }
 
-  static Future<Client> connect([int p = port]) async {
-    Client c = Client(await WebSocket.connect('ws://localhost:$p/ws'));
+  static Future<Client> connect([int p = port, String path = 'ws']) async {
+    Client c = Client(await WebSocket.connect('ws://localhost:$p/$path'));
     Map<String, dynamic> m = await c.next('connected');
     c.id = m['message']['id'];
     return c;
@@ -220,6 +226,42 @@ void main() {
       a.send('toRoom', <String, String>{'room': 'bye', 'text': 'still here'});
       expect((await a.next('toRoom'))['message'], 'still here');
       await a.close();
+    });
+
+    test('a client can not join the room of another route', () async {
+      Client admin = await Client.connect(port, 'ws-admin');
+      Client other = await Client.connect();
+      String adminRoom = 'room:${base64.encode(utf8.encode('GET|/ws-admin'))}';
+      other.send('joinRoom', adminRoom);
+      await settle();
+
+      admin.send('secret', 'only admins');
+      expect((await admin.next('secret'))['message'], 'only admins');
+      expect(await other.none('secret'), isTrue);
+      await admin.close();
+      await other.close();
+    });
+
+    test('a too long room name is not joined', () async {
+      Client a = await Client.connect();
+      String name = 'x' * 256;
+      a.send('joinRoom', name);
+      await settle();
+      expect(WebsocketStorage().hasRoom(name), isFalse);
+      await a.close();
+    });
+
+    test('an empty room is removed', () async {
+      Client a = await Client.connect();
+      a.send('joinRoom', 'gone-soon');
+      await settle();
+      expect(WebsocketStorage().hasRoom('gone-soon'), isTrue);
+      a.send('joinRoom', 'next');
+      await settle();
+      expect(WebsocketStorage().hasRoom('gone-soon'), isFalse);
+      await a.close();
+      await settle();
+      expect(WebsocketStorage().hasRoom('next'), isFalse);
     });
 
     test(
