@@ -4163,7 +4163,7 @@ You do not call <code>preload</code>.</p>
 <tbody>
 <tr>
 <td><code>foreignKey</code></td>
-<td><code>{this table}_id</code>, like <code>user_id</code></td>
+<td><code>{this model}_id</code>, like <code>user_id</code></td>
 <td>The column in the related table that points to this model.</td>
 </tr>
 <tr>
@@ -4183,12 +4183,8 @@ You do not call <code>preload</code>.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition warning">
-<p class="admonition-title">Custom table names</p>
-<p>The default <code>foreignKey</code> uses the table name, not the class name.
-With <code>@DoxModel(table: 'users')</code>, the default is <code>users_id</code>.
-Then set <code>foreignKey: 'user_id'</code> yourself.</p>
-</div>
+<p>The default <code>foreignKey</code> uses the class name in snake_case, like Laravel.
+<code>User</code> gives <code>user_id</code>, also when the table is <code>users</code>.</p>
 <h3 id="foreignkey-and-localkey"><code>foreignKey</code> and <code>localKey</code></h3>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nd">@HasMany</span><span class="p">(</span><span class="n">Book</span><span class="p">,</span><span class="w"> </span><span class="nl">foreignKey:</span><span class="w"> </span><span class="s1">'author_code'</span><span class="p">,</span><span class="w"> </span><span class="nl">localKey:</span><span class="w"> </span><span class="s1">'code'</span><span class="p">)</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Book</span><span class="o">&gt;</span><span class="w"> </span><span class="n">books</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Book</span><span class="o">&gt;</span><span class="p">[];</span>

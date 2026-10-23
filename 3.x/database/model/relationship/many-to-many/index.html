@@ -4220,19 +4220,19 @@ Do not set <code>eager: true</code> on both sides. Each side would load the othe
 <tbody>
 <tr>
 <td><code>pivotTable</code></td>
-<td>the two table names in A-Z order, joined with <code>_</code></td>
+<td>the two model names in A-Z order, joined with <code>_</code></td>
 <td><code>artist_song</code></td>
 <td>The pivot table.</td>
 </tr>
 <tr>
 <td><code>pivotForeignKey</code></td>
-<td><code>{this table}_id</code></td>
+<td><code>{this model}_id</code></td>
 <td><code>artist_id</code></td>
 <td>The pivot column that points to this model.</td>
 </tr>
 <tr>
 <td><code>pivotRelatedForeignKey</code></td>
-<td><code>{related table}_id</code></td>
+<td><code>{related model}_id</code></td>
 <td><code>song_id</code></td>
 <td>The pivot column that points to the related model.</td>
 </tr>
@@ -4262,18 +4262,13 @@ Do not set <code>eager: true</code> on both sides. Each side would load the othe
 </tr>
 </tbody>
 </table>
-<p>Default pivot table names:</p>
+<p>The defaults use the class names in snake_case, not the table names, like Laravel.
+So <code>@DoxModel(table: 'artists')</code> does not change them.</p>
 <ul>
-<li><code>artist</code> and <code>song</code> give <code>artist_song</code>.</li>
-<li><code>blog</code> and <code>category</code> give <code>blog_category</code>.</li>
+<li><code>Artist</code> and <code>Song</code> give <code>artist_song</code>.</li>
+<li><code>Blog</code> and <code>Category</code> give <code>blog_category</code>.</li>
+<li><code>BlogPost</code> and <code>Tag</code> give <code>blog_post_tag</code>.</li>
 </ul>
-<div class="admonition warning">
-<p class="admonition-title">Custom table names</p>
-<p>The defaults use the table names, not the class names.
-With <code>@DoxModel(table: 'artists')</code>, the default pivot table is <code>artists_song</code>
-and the default <code>pivotForeignKey</code> is <code>artists_id</code>.
-Then set the options yourself.</p>
-</div>
 <h3 id="set-all-keys">Set all keys</h3>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nd">@ManyToMany</span><span class="p">(</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="n">Song</span><span class="p">,</span>

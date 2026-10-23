@@ -4490,6 +4490,10 @@ Run <code>dox build_runner:build</code> after you change a DTO. See <a href="../
 <td><code>@DoxModel(softDelete: true)</code></td>
 </tr>
 <tr>
+<td><code>public $timestamps = false;</code></td>
+<td><code>@DoxModel(timestamps: false)</code></td>
+</tr>
+<tr>
 <td><code>protected $hidden = ['password'];</code></td>
 <td><code>List&lt;String&gt; get hidden =&gt; &lt;String&gt;['password'];</code></td>
 </tr>
@@ -4646,7 +4650,7 @@ Run <code>dox build_runner:build</code> after you change a model. See <a href=".
 </tr>
 <tr>
 <td><code>-&gt;groupBy('age')</code></td>
-<td><code>.groupBy('age')</code> (returns maps)</td>
+<td><code>.groupBy('age')</code> on <code>QueryBuilder.table()</code> (returns maps)</td>
 </tr>
 <tr>
 <td><code>-&gt;count()</code></td>
