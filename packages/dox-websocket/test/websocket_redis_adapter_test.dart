@@ -8,7 +8,7 @@ import 'package:test/test.dart';
 import 'config/app_config.dart';
 import 'websocket_rooms_test.dart' show Client, RoomsRouter, roomId;
 
-const int port = 3006;
+int get port => Dox().server.httpServer.port;
 
 /// CI has redis on 6379. Locally set REDIS_PORT to use another port.
 final String redisHost = Platform.environment['REDIS_HOST'] ?? '127.0.0.1';
@@ -48,7 +48,8 @@ void main() async {
       Dox().initialize(
         AppConfig(
           appKey: appConfig.appKey,
-          serverPort: port,
+          // the OS picks a free port, so test files can run in parallel
+          serverPort: 0,
           totalIsolate: 1,
           responseHandler: appConfig.responseHandler,
           routers: <Router>[RoomsRouter()],

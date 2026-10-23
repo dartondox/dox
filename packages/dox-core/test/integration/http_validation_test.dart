@@ -11,7 +11,7 @@ import '../dtos/rules.dto.dart';
 import '../utils/start_http_server.dart';
 import 'requirements/config/app.dart';
 
-String baseUrl = 'http://localhost:${config.serverPort}';
+String get baseUrl => 'http://localhost:${Dox().server.httpServer.port}';
 
 const List<int> png = <int>[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0];
 

@@ -10,7 +10,8 @@ import 'requirements/handler.dart';
 
 AppConfig streamConfig = AppConfig(
   appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
-  serverPort: 50030,
+  // the OS picks a free port, so test files can run in parallel
+  serverPort: 0,
   totalIsolate: 1,
   responseHandler: ResponseHandler(),
   maxBodySize: 1024,
@@ -18,7 +19,7 @@ AppConfig streamConfig = AppConfig(
   trustedProxies: <String>['127.0.0.1', '::1'],
 );
 
-String baseUrl = 'http://localhost:${streamConfig.serverPort}';
+String get baseUrl => 'http://localhost:${Dox().server.httpServer.port}';
 const String boundary = 'doxtestboundary';
 
 /// a multipart body with one file field of [size] bytes

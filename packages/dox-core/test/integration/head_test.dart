@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 import '../utils/start_http_server.dart';
 
-const int port = 50091;
+int get port => Dox().server.httpServer.port;
 
 Future<HttpClientResponse> send(String method, String path) async {
   HttpClient client = HttpClient();
@@ -26,7 +26,8 @@ void main() {
     await startHttpServer(
       AppConfig(
         appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
-        serverPort: port,
+        // the OS picks a free port, so test files can run in parallel
+        serverPort: 0,
         totalIsolate: 1,
         openApi: const OpenApiConfig(enabled: true),
       ),

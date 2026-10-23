@@ -6,17 +6,17 @@ import 'package:dox_core/isolate/dox_isolate.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
+import '../utils/free_port.dart';
 import 'requirements/config/api_router.dart';
 import 'requirements/handler.dart';
 
-AppConfig isolateConfig = AppConfig(
+AppConfig isolateConfig(int port) => AppConfig(
   /// application key
   appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
 
-  /// own port: the isolates killed here can keep their native listener
-  /// until it gets a request. On Linux (SO_REUSEPORT) other test files on
-  /// the same port would then lose requests.
-  serverPort: 50077,
+  /// a free port, known before the start: all 5 isolates share it.
+  /// Port 0 would give each isolate its own port.
+  serverPort: port,
 
   /// total multi-thread isolate to run
   totalIsolate: 1,
@@ -28,7 +28,7 @@ AppConfig isolateConfig = AppConfig(
   routers: <Router>[ApiRouter()],
 );
 
-String baseUrl = 'http://localhost:${isolateConfig.serverPort}';
+late String baseUrl;
 
 class ExampleService implements DoxService {
   @override
@@ -38,7 +38,9 @@ class ExampleService implements DoxService {
 void main() {
   group('Isolate', () {
     setUpAll(() async {
-      Dox().initialize(isolateConfig);
+      int port = await freePort();
+      baseUrl = 'http://localhost:$port';
+      Dox().initialize(isolateConfig(port));
       Dox().addService(ExampleService());
       Dox().totalIsolate(5);
       await Dox().startServer();

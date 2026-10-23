@@ -8,7 +8,7 @@ import 'package:test/test.dart';
 
 import 'config/app_config.dart';
 
-const int port = 3005;
+int get port => Dox().server.httpServer.port;
 
 /// Default room of the `/ws` route (the room every connection is in).
 String roomId() => 'room:${base64.encode(utf8.encode('GET|/ws'))}';
@@ -81,8 +81,10 @@ class Client {
     });
   }
 
-  static Future<Client> connect([int p = port]) async {
-    Client c = Client(await WebSocket.connect('ws://localhost:$p/ws'));
+  static Future<Client> connect([int? p]) async {
+    Client c = Client(
+      await WebSocket.connect('ws://localhost:${p ?? port}/ws'),
+    );
     Map<String, dynamic> m = await c.next('connected');
     c.id = m['message']['id'];
     return c;
@@ -122,7 +124,8 @@ void main() {
       Dox().initialize(
         AppConfig(
           appKey: appConfig.appKey,
-          serverPort: port,
+          // the OS picks a free port, so test files can run in parallel
+          serverPort: 0,
           totalIsolate: 1,
           responseHandler: appConfig.responseHandler,
           routers: <Router>[RoomsRouter()],
