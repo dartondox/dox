@@ -50,8 +50,11 @@ class TrustedProxy {
   }
 
   /// is [ip] one of our proxies?
-  bool trusts(String ip) {
-    if (_any) return true;
+  bool trusts(String ip) => _any || _inRanges(ip);
+
+  /// is [ip] in one of the ip ranges? `*` is not a range.
+  bool _inRanges(String ip) {
+    if (_ranges.isEmpty) return false;
     InternetAddress? address = InternetAddress.tryParse(ip);
     if (address == null) return false;
     for (_Cidr range in _ranges) {
@@ -62,13 +65,15 @@ class TrustedProxy {
 
   /// real client ip. walk `X-Forwarded-For` from the right and skip our own
   /// proxies, so a fake value added by the client on the left is ignored.
+  /// `*` trusts only the direct peer, not the hops in the header: with it
+  /// the right-most hop (added by the proxy) is the client.
   String clientIp(String remote, String? forwardedFor) {
     if (forwardedFor == null || !trusts(remote)) return remote;
     List<String> hops = forwardedFor.split(',');
     for (int i = hops.length - 1; i >= 0; i--) {
       String hop = hops[i].trim();
       if (hop.isEmpty) continue;
-      if (!trusts(hop)) return normalize(hop);
+      if (!_inRanges(hop)) return normalize(hop);
       remote = hop;
     }
     return normalize(remote);

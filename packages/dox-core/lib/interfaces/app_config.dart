@@ -74,8 +74,9 @@ class AppConfig {
   /// IPs or CIDR ranges of reverse proxies (nginx, Caddy, load balancer)
   /// that Dox trusts. Only when the direct client is in this list does Dox
   /// read `X-Forwarded-For` for `req.ip()` and `X-Forwarded-Proto` for
-  /// `req.scheme()`. Use `['*']` to trust any client (only safe when the
-  /// app port is not reachable from outside). Empty by default.
+  /// `req.scheme()`. Use `['*']` to trust any direct client, but only the
+  /// last `X-Forwarded-For` hop (only safe when the app port is not
+  /// reachable from outside). Empty by default.
   final List<String> trustedProxies;
 
   /// gzip responses in Dart (`HttpServer.autoCompress`). Off by default.
