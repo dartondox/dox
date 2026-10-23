@@ -2,6 +2,7 @@
 
 - Security: `Storage().putRequestFile()` and `RequestFile.store()` no longer trust the client file name when the bytes are a known format that does not match it. Before, a valid png sent as `a.html` passed `@Image`/`@Mimes` and was saved as `.html`, so `Route.files()` served it as `text/html` on the app origin (stored XSS). Now it is saved with the extension of the bytes (`.png`).
 - Security: new upload file names use a random uuid (v4), not a time-based one (v1). A v1 name shows the upload time and the server, and the next name is easy to guess.
+- Security: an error that is not an `IHttpException` answers `500` with `{"code": "server_error", "message": "Server Error"}`. The error text is sent only when `APP_ENV` is `development` or `local`. Before, the client always got `error.toString()`, which can hold SQL, table names, file paths or database hosts. `errorHandler` still gets the full error.
 - Graceful shutdown closes the cache stores of `Cache()` (eg. Redis), in every isolate, after the `DoxShutdown` services. Your app needs no extra code.
 - The `ORMService` of a new project implements `DoxShutdown` and calls `SqlQueryBuilder.close()`, so the database connections close on shutdown too. In an older project, add this to `lib/services/orm_service.dart`:
   ```dart

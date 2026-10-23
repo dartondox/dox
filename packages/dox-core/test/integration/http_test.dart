@@ -113,6 +113,28 @@ void main() {
       http.Response response = await http.get(url);
 
       expect(response.statusCode, 500);
+      expect(jsonDecode(response.body), <String, dynamic>{
+        'code': 'server_error',
+        'message': 'Server Error',
+      });
+    });
+
+    test('error text is sent only in development', () async {
+      Route.get('/exception/dev', (DoxRequest req) {
+        throw Exception('select * from secret');
+      });
+      Uri url = Uri.parse('$baseUrl/exception/dev');
+
+      expect((await http.get(url)).body, isNot(contains('secret')));
+
+      Env().env['APP_ENV'] = 'development';
+      try {
+        http.Response response = await http.get(url);
+        expect(response.statusCode, 500);
+        expect(response.body, 'Exception: select * from secret');
+      } finally {
+        Env().env.remove('APP_ENV');
+      }
     });
 
     test('route not found', () async {
