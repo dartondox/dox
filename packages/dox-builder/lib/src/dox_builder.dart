@@ -294,7 +294,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         preloadRelations.add(key);
         toMapRelation +=
             """
-        if (preload.contains('${toSnakeCase(key)}')) {
+        if (preload.contains('$key')) {
           map['${toSnakeCase(key)}'] = toMap(instance.$key);
         }
         """;

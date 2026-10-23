@@ -38,14 +38,14 @@ class AuthorGenerator extends Model<Author> {
   @override
   Map<String, Function> get relationsResultMatcher => <String, Function>{
     'books': getBooks,
-    'book': getBook,
+    'firstBook': getFirstBook,
     'tags': getTags,
   };
 
   @override
   Map<String, Function> get relationsQueryMatcher => <String, Function>{
     'books': queryBooks,
-    'book': queryBook,
+    'firstBook': queryFirstBook,
     'tags': queryTags,
   };
 
@@ -67,16 +67,16 @@ class AuthorGenerator extends Model<Author> {
     );
   }
 
-  static Future<void> getBook(List<Model<Author>> list) async {
-    var result = await getHasOne<Author, Book>(queryBook(list), list);
+  static Future<void> getFirstBook(List<Model<Author>> list) async {
+    var result = await getHasOne<Author, Book>(queryFirstBook(list), list);
     for (dynamic i in list) {
       if (result[i.tempIdValue.toString()] != null) {
-        i.book = result[i.tempIdValue.toString()]!;
+        i.firstBook = result[i.tempIdValue.toString()]!;
       }
     }
   }
 
-  static Book? queryBook(List<Model<Author>> list) {
+  static Book? queryFirstBook(List<Model<Author>> list) {
     return hasOne<Author, Book>(
       list,
       () => Book(),
@@ -129,8 +129,8 @@ class AuthorGenerator extends Model<Author> {
     if (preload.contains('books')) {
       map['books'] = toMap(instance.books);
     }
-    if (preload.contains('book')) {
-      map['book'] = toMap(instance.book);
+    if (preload.contains('firstBook')) {
+      map['first_book'] = toMap(instance.firstBook);
     }
     if (preload.contains('tags')) {
       map['tags'] = toMap(instance.tags);

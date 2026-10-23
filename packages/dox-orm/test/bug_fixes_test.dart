@@ -134,7 +134,7 @@ void main() async {
 
       List<Author> authors = await Author()
           .preload('books')
-          .preload('book')
+          .preload('firstBook')
           .preload('tags')
           .orderBy('id')
           .get();
@@ -148,10 +148,14 @@ void main() async {
       Author a = authors.last;
       expect(a.code, 'A');
       expect(a.books.length, 2);
-      expect(a.book?.authorCode, 'A');
+      expect(a.firstBook?.authorCode, 'A');
       expect(a.tags.length, 1);
       expect(b.books.length, 0);
-      expect(b.book, null);
+      expect(b.firstBook, null);
+
+      /// a two word relation is in toJson() with a snake case key
+      expect(a.toJson()['first_book']['author_code'], 'A');
+      expect(a.toJson().containsKey('books'), true);
       expect(b.tags.length, 0);
     });
 

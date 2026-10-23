@@ -117,5 +117,19 @@ class Tag {
       expect(out, isNot(contains('setComputedValues')));
       expect(out, isNot(contains('hasModelHooks')));
     });
+
+    test('a two word relation is found in the preload list', () async {
+      String out = await _generate('''
+@DoxModel()
+class User {
+  @HasMany(User)
+  List<User> userInfos = <User>[];
+}
+''');
+
+      /// preload() keeps the field name, the json key is snake case
+      expect(out, contains("preload.contains('userInfos')"));
+      expect(out, contains("map['user_infos'] = toMap(instance.userInfos);"));
+    });
   });
 }

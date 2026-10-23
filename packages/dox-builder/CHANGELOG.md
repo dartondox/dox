@@ -1,3 +1,7 @@
+## Unreleased
+
+- Fix: a preloaded relation with a two word name (like `userInfo`) was missing from `toJson()`. The generator looked for `user_info` in the preload list, but the list has `userInfo`.
+
 ## 3.0.0-alpha.4
 
 - Version bump only, to match the other packages.
