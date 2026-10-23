@@ -112,11 +112,8 @@ Prints `<key> : Key have been updated successfully in .env!`.
 What it does with `.env`:
 
 - Reads `.env` in the current folder. The file must exist, else the command fails with a file error.
-- Keeps every `KEY=value` line. Replaces the value of `APP_KEY`.
+- Replaces the value of `APP_KEY`. Every other line stays as it is, in the same order. This keeps comments, blank lines, quotes and values with more than one `=` (like `DATABASE_URL=postgres://u:p@h/db?a=b`).
 - Adds `APP_KEY=<key>` as the first line when there is no `APP_KEY`.
-
-!!! warning
-    The rewrite only keeps lines with exactly one `=`. A line like `DATABASE_URL=postgres://u:p@h/db?a=b` has two `=` and is dropped from `.env`. Comment lines are dropped too. Back up `.env` first when it has such lines.
 
 Source: `packages/dox-cli/lib/src/tools/generate_key.dart`.
 
