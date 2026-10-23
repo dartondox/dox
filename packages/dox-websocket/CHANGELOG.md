@@ -1,3 +1,8 @@
+## Unreleased
+
+- Security: a client can not `joinRoom` a room that starts with `room:`. That is the default room of a route, so a client of a public route could join the room of a route with auth middleware and get all its messages.
+- Security: a room with no members is removed, and a room name longer than 255 chars is not joined. Before, every room name a client sent stayed in memory, so one client could fill the memory of the server.
+
 ## 3.0.0-alpha.6
 
 - Version bump only, to match the other packages.
