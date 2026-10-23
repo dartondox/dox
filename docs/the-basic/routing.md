@@ -149,15 +149,13 @@ Route.middleware(<dynamic>[AuthMiddleware()], () { // (4)!
 });
 ```
 
-1.  `/blogs` goes in front of every path in the callback. Start both parts with `/`.
-    The text is joined as it is.
+1.  `/blogs` goes in front of every path in the callback.
+    Dox puts one `/` between the parts. `'blogs'` and `'/blogs/'` work the same.
 2.  Makes `GET /blogs/{id}`. `{id}` is a route param. The controller asks for it as `int id`.
 3.  These routes match only when the `Host` header is `dartondox.com`. Other hosts get `404`.
 4.  `AuthMiddleware` runs before `me` and `logout`. It runs after the global and router middleware.
 
-!!! warning "Start group paths with `/`"
-    `Route.group` joins the text as it is. `Route.group('blogs', ...)` with `Route.get('all', ...)`
-    makes `blogsall`. Write `Route.group('/blogs', ...)` and `Route.get('/all', ...)`.
+Groups can be nested. `Route.group('blogs', ...)` with `Route.get('all', ...)` makes `/blogs/all`.
 
 To turn CORS on or off for some routes, see [CORS](../security/cors.md).
 

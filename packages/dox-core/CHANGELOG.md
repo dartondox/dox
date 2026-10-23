@@ -16,6 +16,7 @@
 - New: graceful shutdown. On `SIGTERM` or `SIGINT` every isolate stops taking new connections and lets open requests finish, up to `AppConfig.shutdownTimeout` (default 8 seconds). Then Dox runs `DoxShutdown` services and exits with code 0. Before, open requests were cut. A second signal stops at once.
 - New: `DoxShutdown`. A service that also implements it gets `shutdown()` in every isolate on stop, to close connections.
 - New: `await Dox().stop()` stops the server gracefully in every isolate, without exit.
+- Fix: `Route.group('blogs')` with `Route.get('all')` made `/blogsall`. Path parts now join with one `/`. This also works for nested groups, `Route.prefix` and `Route.resource`.
 
 ## 3.0.0-alpha.4
 

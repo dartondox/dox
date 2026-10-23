@@ -104,7 +104,7 @@ class RouteScanner extends RecursiveAstVisitor<void> {
       String? old = _prefix;
       Expression first = node.argumentList.arguments.first.argumentExpression;
       String? group = _path(first);
-      _prefix = old == null || group == null ? null : '$old$group';
+      _prefix = old == null || group == null ? null : '$old/$group';
       super.visitMethodInvocation(node);
       _prefix = old;
       return;
@@ -124,7 +124,7 @@ class RouteScanner extends RecursiveAstVisitor<void> {
     String? prefix = _prefix;
     String? path = written == null || prefix == null || prefix.isEmpty
         ? written
-        : '$prefix$written'.replaceAll(RegExp('/+'), '/');
+        : '$prefix/$written'.replaceAll(RegExp('/+'), '/');
     if (name == 'resource') {
       _addResource(path, args[1]);
     } else if (_methods.contains(name)) {

@@ -71,7 +71,7 @@ class ApiRouter extends Router {
 | `Route.get('/posts/{page?}', c.list)` | optional param. `list(int? page)` |
 | `Route.get('/docs/{path*}', c.page)` | rest of the path, with `/` |
 | `Route.get('/me', <dynamic>[AuthMiddleware(), c.me])` | middleware first, controller last |
-| `Route.group('/blogs', () { ... })` | prefix. Start it with `/`. |
+| `Route.group('/blogs', () { ... })` | prefix. Dox adds the `/` between parts. |
 | `Route.middleware(<dynamic>[M()], () { ... })` | middleware for a group |
 | `Route.domain('api.app.com', () { ... })` | match by `Host` |
 | `Route.resource('blogs', BlogController())` | `index`, `create`, `store`, `show`, `edit`, `update`, `destroy` |
