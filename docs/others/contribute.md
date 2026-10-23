@@ -1,37 +1,39 @@
-# Contribute 
+# Contribute
 
-Want to contribute? Great! Fork the repo and create PR to us.
+This page shows how to work on Dox: set up the repo, run the tests, release packages and update the docs.
 
-# Setting up local development
+To send a change, fork the repo and open a pull request.
 
-#### 1. Clone repo
+## Setting up local development
 
-```py
+### 1. Clone the repo
+
+```bash
 git clone git@github.com:dartondox/dox.git
 ```
 
-#### 2. Install melos if not installed 
+### 2. Install melos
 
 The repo is a [Dart pub workspace](https://dart.dev/tools/pub/workspaces).
 The melos config is in the root `pubspec.yaml` (under `melos:`). Use Dart 3.13 or newer.
 
-```py
+```bash
 dart pub global activate melos
 ```
 
-#### 3. Run melos bootstrap
+### 3. Run melos bootstrap
 
-It runs one `dart pub get` at the root. All local packages are linked, and there is
-one `pubspec.lock` for the whole repo.
+It runs one `dart pub get` at the root. All local packages are linked.
+There is one `pubspec.lock` for the whole repo.
 
-```py
+```bash
 melos bs
 ```
 
-#### 4. Other Useful Commands
+### 4. Useful commands
 
-```py
-# Run all tests (not dox_orm).
+```bash
+# Run all tests (not dox_orm and not dox_mysql_native).
 # Use `melos run test`. `melos test` is a built-in melos command.
 melos run test
 
@@ -53,57 +55,77 @@ dart build cli --target bin/dox.dart --output build
 build/bundle/bin/dox --version
 ```
 
-#### If failed to run the project
+### If the project does not run
 
-- remove `pubspec.lock` and `.dart_tool` at the root
-- remove any old `pubspec_overrides.yaml` and `pubspec.lock` in `packages/*` (from melos 3)
-- and run `melos bs` again
+1. Remove `pubspec.lock` and `.dart_tool` at the root.
+2. Remove any old `pubspec_overrides.yaml` and `pubspec.lock` in `packages/*` (left from melos 3).
+3. Run `melos bs` again.
 
-# Release (maintainers)
+## Release (maintainers)
 
-All public packages are published to pub.dev by the `Release` GitHub workflow
-(`.github/workflows/publish.yaml`). It runs when you push a tag like `v3.0.0-alpha.1`.
-It uses pub.dev automated publishing, so no token or secret is needed.
+The `Release` GitHub workflow (`.github/workflows/publish.yaml`) publishes all public packages to pub.dev.
+It runs when you push a tag like `v3.0.0-alpha.4`.
+It uses pub.dev automated publishing, so it needs no token or secret.
 
-#### Steps
+### Steps
 
-1. Set the new version in the root `pubspec.yaml`, for example `version: 3.0.0-alpha.1`.
-2. Run the script. It copies the version to every package, to every sibling
-   dependency (`^3.0.0-alpha.1`), and to the CLI version constant.
-   ```py
+1. Set the new version in the root `pubspec.yaml`, for example `version: 3.0.0-alpha.4`.
+2. Run the script.
+   ```bash
    bash bin/update_versions.sh
    ```
-3. Add a `## 3.0.0-alpha.1` entry to each package `CHANGELOG.md` (pub.dev warns if it is missing).
-4. Commit and push.
-   ```py
-   git commit -am "release 3.0.0-alpha.1"
+   It copies the version to every `packages/*/pubspec.yaml`.
+   It sets every sibling dependency to `^3.0.0-alpha.4`.
+   It also writes the CLI version constant in `packages/dox-cli/lib/src/version.dart`.
+3. Add a `## 3.0.0-alpha.4` entry to the `CHANGELOG.md` of each package. pub.dev warns when it is missing.
+4. **New package only:** turn on pub.dev automated publishing for it. See [One-time setup](#one-time-setup).
+   If you skip this, the Release workflow fails on this package.
+   A new package must first exist on pub.dev, so publish its first version by hand with `dart pub publish`.
+5. Commit and push.
+   ```bash
+   git commit -am "release 3.0.0-alpha.4"
    git push
    ```
-5. Wait until the `Test` workflow is green for this commit. The release workflow does not run the tests.
-6. Tag and push the tag. This starts the publish.
-   ```py
-   git tag v3.0.0-alpha.1
-   git push origin v3.0.0-alpha.1
+6. Wait until the `Test` workflow is green for this commit. The Release workflow does not run the tests.
+7. Tag and push the tag. This starts the publish.
+   ```bash
+   git tag v3.0.0-alpha.4
+   git push origin v3.0.0-alpha.4
    ```
 
-The workflow first checks that the tag matches the root version and every package version.
-Then it publishes in this order: `dox_annotation`, `dox_builder`, `dox_orm`,
-`dox_query_builder`, `dox_migration`, `dox_core`, `dox_auth`, `dox_websocket`,
-`dox_validation`, `dox_openapi`, `dox_storage`, `dox_cache`, `dox_socketio`, `dox`.
-A package is skipped when that version is already on pub.dev. So if a run fails halfway,
-fix the problem and click "Re-run jobs". It continues where it stopped.
+### What the workflow does
 
-#### Dry run
+1. It checks that the tag (without `v`) is the root version, and that every package has this version.
+   If not, it stops. Run `bin/update_versions.sh` and try again.
+2. It gets the publish order from `bin/publish_order.py`.
+   The script reads every `packages/*/pubspec.yaml`.
+   It puts each package after the sibling packages it depends on (`dependencies` and `dev_dependencies`).
+   Packages with `publish_to: none` (like `dox_app`) are left out.
+   A new package is picked up by itself.
+3. It publishes each package in this order.
+   After each one, it waits until `dart pub get` can find the new version. Then the next package can depend on it.
 
-Open Actions > Release > "Run workflow". It runs `dart pub publish --dry-run` for every
-package and publishes nothing. Warnings (for example a missing
-CHANGELOG entry) are shown as yellow warnings and do not fail the run.
+To see the order on your machine:
 
-#### One-time setup
+```bash
+python3 bin/publish_order.py
+```
 
-On pub.dev, for each package (`dox_annotation`, `dox_builder`, `dox_orm`,
-`dox_query_builder`, `dox_migration`, `dox_core`, `dox_auth`, `dox_websocket`,
-`dox_validation`, `dox_openapi`, `dox_storage`, `dox_cache`, `dox_socketio`, `dox`):
+A package is skipped when its version is already on pub.dev.
+So if a run fails halfway, fix the problem and click "Re-run jobs". It continues where it stopped.
+
+### Dry run
+
+Open Actions > Release > "Run workflow".
+It runs `dart pub publish --dry-run` for every package and publishes nothing.
+Warnings (for example a missing CHANGELOG entry) show as yellow warnings. They do not fail the run.
+
+### One-time setup
+
+Do this once for each published package, and for every new package before its first tag.
+The list of packages is the output of `python3 bin/publish_order.py`.
+
+On pub.dev:
 
 1. Open `https://pub.dev/packages/<name>/admin`.
 2. Under "Automated publishing", click "Enable publishing from GitHub Actions".
@@ -112,11 +134,12 @@ On pub.dev, for each package (`dox_annotation`, `dox_builder`, `dox_orm`,
 5. Tick "Require GitHub Actions environment" and set the environment to `pub.dev`.
 6. Save.
 
-On GitHub, in `dartondox/dox` > Settings > Environments, create an environment named `pub.dev`.
-Optional: add yourself as a required reviewer, and limit it to tags `v*`.
-The old `PUB_CREDENTIALS` secret is no longer used.
+On GitHub, in `dartondox/dox` > Settings > Environments, there must be an environment named `pub.dev`.
+The publish job runs in it.
+Optional: add yourself as a required reviewer, and allow only tags `v*`.
+The old `PUB_CREDENTIALS` secret is not used any more.
 
-# Docs
+## Docs
 
 The docs site is https://dartondox.dev. It is built with MkDocs Material and
 [mike](https://github.com/jimporter/mike). mike keeps one folder per version on the `gh-pages` branch.
@@ -129,16 +152,16 @@ The docs site is https://dartondox.dev. It is built with MkDocs Material and
 | `/` | redirects to `/latest/` |
 | old links like `/the-basic/routing/` | redirect to `/latest/the-basic/routing/` |
 
-#### Write and preview
+### Write and preview
 
-```py
+```bash
 python3 -m venv .venv
 .venv/bin/pip install mkdocs==1.6.1 mkdocs-material==9.7.7 mike==2.2.0
 .venv/bin/mkdocs serve           # live preview of this branch
 .venv/bin/mkdocs build --strict  # the same check as CI. Broken links fail.
 ```
 
-#### Deploy
+### Deploy
 
 - 3.x deploys by itself. The `Docs` workflow (`.github/workflows/docs.yaml`) runs on every push
   to `develop` that changes `docs/`, `mkdocs.yml` or the workflow.
@@ -147,16 +170,15 @@ python3 -m venv .venv
   It builds from the `v2.x` branch (change it with the `ref` input).
 - After each deploy, the workflow writes small redirect pages for the old root links,
   the root `index.html`, a `404.html` and the `CNAME` file. So `dartondox.dev` and old links keep working.
-- The workflow pushes with `GITHUB_TOKEN`. If `gh-pages` is a protected branch, add a
-  `PUSH_TO_PROTECTED_BRANCH` secret with a token that may push to it.
+- The workflow pushes with the built-in `GITHUB_TOKEN`. This works because `gh-pages` is not a protected branch.
 
-#### Why mike
+### Why mike
 
 - Old docs stay online at `/2.x/`, and readers switch with the version menu.
 - Each version is built once from its own branch. A new deploy does not touch the other versions.
 - Old links from before versioning are kept with redirect pages, so search results and blog posts still work.
 
-#### New major version
+### New major version
 
 When 4.x starts, deploy 4.x with `mike deploy --update-aliases 4.x latest`. Keep a `v3.x`
 branch, and add `3.x` to the workflow input, so 3.x can still be fixed.

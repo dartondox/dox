@@ -1,130 +1,166 @@
 # HasMany
 
-A "one-to-many" relationship is another essential type of database association. Let's illustrate this with an example where we have a `User` model associated with a `Post` model. To establish this connection, we define a method called `posts` within the `User` model. This `posts` method invokes the `HasMany` method and returns its output, representing that a user can have multiple posts in the database. This relationship allows us to easily retrieve all the posts associated with a specific user when needed.
+Use `HasMany` when one row of this table has many rows in another table.
+For example, a user has many posts.
+The other table keeps the foreign key (`post.user_id`).
 
-=== "HasMany Class Structure"
+## Define it
 
-    ```dart
-    class HasMany {
-        final Type model;
-        final String? foreignKey;
-        final String? localKey;
-        final Function? onQuery;
-        final bool? eager;
+Add a field with `@HasMany(...)` to the model.
+The field type is a list of the related model. Start it as an empty list.
 
-        const HasMany(this.model,
-            {this.foreignKey, this.localKey, this.onQuery, this.eager});
-    }
-    ```
+```dart title="lib/app/models/user/user.model.dart"
+import 'package:dox_orm/dox_orm.dart';
 
-#####
-=== "User Model"
+import '../post/post.model.dart';
 
-    ```dart
-    @DoxModel()
-    class User extends UserGenerator {
-        @Column()
-        String? name;
+part 'user.model.g.dart';
 
-        @HasMany(Post)
-        Post? posts;
-    }
-    ```
+@DoxModel()
+class User extends UserGenerator {
+  @Column()
+  String? name;
 
-=== "Post Model"
+  @HasMany(Post)
+  List<Post> posts = <Post>[];
+}
+```
 
-    ```dart
-    @DoxModel()
-    class Post extends PostGenerator {
-        @Column()
-        String? userId;
+```dart title="lib/app/models/post/post.model.dart"
+import 'package:dox_orm/dox_orm.dart';
 
-        @Column()
-        String? title;
+part 'post.model.g.dart';
 
-        @Column(name: 'desc')
-        String? description;
+@DoxModel()
+class Post extends PostGenerator {
+  @Column()
+  int? userId; // column user_id
 
-        @Column()
-        String? status;
-    }
-    ```
+  @Column()
+  String? title;
 
-## Usage
+  @Column()
+  String? status;
+}
+```
 
-#### `$getRelation`
+Run `dart run build_runner build` after you add a relationship.
+
+## Load it
+
+The relation is not loaded by default. Load it in one of these ways.
+Use the field name (`'posts'`) as the relation name.
+
+### `preload`
+
+Use it when you load the models with a query.
+
+```dart
+User? user = await User().preload('posts').find(1);
+print(user?.posts.length);
+
+List<User> users = await User().preload('posts').get();
+```
+
+`preload` works with `find`, `get`, `all` and `getFirst`.
+For a list of users, it runs one query for all of them.
+A user without posts gets an empty list.
+
+### `$getRelation`
+
+Use it when you already have the model.
 
 ```dart
 User? user = await User().find(1);
-await user?.$getRelation('blogs')
-
-List<Blog> blogs = user?.blogs;
+await user?.$getRelation('posts');
+print(user?.posts.length);
 ```
-!!! info
-    When `eager` is `true` the `$getRelation` do not need to call.
 
-#### `preload`
+### `related`
 
-```dart
-User? user = await User().preload('blogs').find(1);
-List<Blog> blogs = user?.blogs;
-```
-!!! info
-    When `eager` is `true` the `preload` do not need to call.
-
-#### `related`
+Use it when you need more conditions on the related rows.
 
 ```dart
 User? user = await User().find(1);
-List<Blog> activeBlogs = await user?.related<Blog>('blog')?.where('status', 'active').get();
+List<Post> activePosts = await user
+        ?.related<Post>('posts')
+        ?.where('status', 'active')
+        .orderBy('id', 'desc')
+        .get() ??
+    <Post>[];
+```
+
+`related` gives a query. You can add more conditions before you run it.
+It does not set `user.posts`.
+
+### `eager`
+
+Use it when every query of `User` should load the relation.
+
+```dart
+@HasMany(Post, eager: true)
+List<Post> posts = <Post>[];
+```
+
+With `eager: true`, every query of `User` loads the relation.
+You do not call `preload`.
+
+The load runs this SQL:
+
+```sql
+SELECT *, "user_id" as "_owner_id" FROM "post" WHERE "user_id" IN (@user_id_p0, ...)
 ```
 
 ## Options
 
-#### `model`
+| Option | Default | What it is |
+|---|---|---|
+| `foreignKey` | `{this table}_id`, like `user_id` | The column in the related table that points to this model. |
+| `localKey` | the primary key of this model | The column in this table that `foreignKey` points to. |
+| `onQuery` | none | A static function that changes the query. |
+| `eager` | `false` | Load the relation on every query. |
+
+!!! warning "Custom table names"
+    The default `foreignKey` uses the table name, not the class name.
+    With `@DoxModel(table: 'users')`, the default is `users_id`.
+    Then set `foreignKey: 'user_id'` yourself.
+
+### `foreignKey` and `localKey`
 
 ```dart
-@HasMany(Post)
-Post? posts;
-```
-#### `foreignKey`
-
-```dart
-@HasMany(Post, foreignKey: 'user_id')
-Post? posts;
+@HasMany(Book, foreignKey: 'author_code', localKey: 'code')
+List<Book> books = <Book>[];
 ```
 
-#### `localKey`
+### `onQuery`
 
-```dart
-@HasMany(Post, foreignKey: 'user_id', localKey: 'id')
-Post? posts;
-```
-
-#### `onQuery`
+`onQuery` is a static function in the same model class.
+It gets the query of the related model and returns it.
+You can have two fields on the same model with different queries.
 
 ```dart
 @DoxModel()
 class User extends UserGenerator {
-    @HasMany(Post)
-    Post? posts;
+  @HasMany(Post)
+  List<Post> posts = <Post>[];
 
-    @HasMany(Post, onQuery: activePostQuery)
-    Post? activePosts;
+  @HasMany(Post, onQuery: onlyActive)
+  List<Post> activePosts = <Post>[];
 
-    static QueryBuilder<Post> activePostQuery(Post q) {
-        return q.where('status', 'active');
-    }
+  static QueryBuilder<Post> onlyActive(Post q) {
+    return q.where('status', 'active').orderBy('id', 'desc');
+  }
 }
 ```
 
-!!! info
-    `onQuery` method must be a static method inside the model.
+## In JSON
 
-#### `eager`
+- A relation with `eager: true` is always in `toJson()`.
+- A relation loaded with `preload` is in `toJson()` of that query.
+- The JSON key is the field name in snake_case.
 
-```dart
-@HasMany(Post, eager: true)
-Post? posts;
-```
-
+!!! warning "Known issue: names with more than one word"
+    For a relation without `eager: true`, `toJson()` looks for the snake_case name in the preload list.
+    But `preload` needs the field name (`'activePosts'`).
+    So a preloaded `activePosts` is on the model, but it is not in `toJson()`.
+    Use a one word field name, or `eager: true`, when you need it in JSON.

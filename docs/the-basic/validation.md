@@ -1,31 +1,47 @@
 # Validation
 
+This page shows how to check request input with typed DTO classes.
+
 Write a class with `@Dto()`. Ask for it in your controller.
 Dox reads the request, checks it, and gives you a typed object.
 When the input is wrong, Dox answers `422` with the errors. Your controller does not run.
 
-```dart
+This is how a DTO goes from your code to a checked object:
+
+```mermaid
+flowchart LR
+    D["@Dto class<br>CreateUser"] --> B["build_runner"]
+    B --> G["Generated schema<br>$CreateUserDto"]
+    G --> L["dtos list<br>AppConfig(dtos: dtos)"]
+    Q["Request<br>body or query"] --> V["Check against the schema"]
+    L --> V
+    V -->|errors| E["422 with the errors"]
+    V -->|ok| T["Typed object<br>CreateUser"]
+    T --> C["Controller"]
+```
+
+```dart title="lib/app/http/dtos/create_user.dto.dart"
 import 'package:dox_core/dox_core.dart';
 
-part 'create_user.dto.g.dart';
+part 'create_user.dto.g.dart'; // (1)!
 
 enum Role { admin, user }
 
 @Dto()
 class CreateUser {
   @Length(min: 3, max: 50)
-  @Trim()
+  @Trim() // (2)!
   final String name;
 
   @Email()
   final String email;
 
   @Min(18)
-  final int? age; // nullable = optional
+  final int? age; // (3)!
 
-  final Role role; // must be "admin" or "user"
+  final Role role; // (4)!
 
-  @MaxItems(5)
+  @MaxItems(5) // (5)!
   final List<String> tags;
 
   const CreateUser({
@@ -36,11 +52,21 @@ class CreateUser {
     this.tags = const <String>[],
   });
 
-  static const DtoSchema<CreateUser> schema = $CreateUserDto;
+  static const DtoSchema<CreateUser> schema = $CreateUserDto; // (6)!
 }
 ```
 
-```dart
+1.  `build_runner` writes this file. It holds the checks and the code that builds the object.
+2.  Rules run from top to bottom. `@Trim()` cuts the spaces, then `@Length` checks the text.
+    After `@Trim()`, an empty string counts as missing.
+3.  A nullable field is optional. `@Min(18)` runs only when the client sends a value.
+4.  An enum matches the name exactly, so only `"admin"` or `"user"`.
+    `Role.user` is used when the key is missing.
+5.  `@MaxItems(5)` checks the list. A rule like `@Email()` on a list would check each item instead.
+6.  `$CreateUserDto` is the generated schema. The generator also puts it in the list in `lib/dtos.g.dart`.
+    Give that list to `AppConfig(dtos: dtos)`, so Dox can find the DTO when a controller asks for it.
+
+```dart title="lib/app/http/controllers/user.controller.dart"
 class UserController {
   Future<User> store(CreateUser body) async {
     // body is already checked. body.age is an int?, body.role is a Role.
@@ -56,7 +82,7 @@ class UserController {
 Then run the generator:
 
 ```bash
-dart run build_runner build
+dox build_runner:build   # or: dart run build_runner build
 ```
 
 ## Setup
@@ -71,7 +97,7 @@ You do this once per app.
    It writes a `.dto.g.dart` file next to each DTO and one list of all DTOs in `lib/dtos.g.dart`.
 4. Give that list to the app in `lib/config/app.dart`:
 
-```dart
+```dart title="lib/config/app.dart"
 import 'package:my_app/dtos.g.dart';
 
 AppConfig appConfig = AppConfig(
@@ -82,6 +108,7 @@ AppConfig appConfig = AppConfig(
 
 !!! info "Why the list?"
     Dox does not use `dart:mirrors`. So it can not find a class by its name at runtime.
+    Without the list, a controller that asks for a DTO stops the server at start, with a clear error.
     The generated list tells Dox which classes are DTOs. You never edit it by hand.
 
 **What the generator makes for each DTO** (no reflection, works with `dox build` AOT):
@@ -731,7 +758,7 @@ Options of both methods:
 
 `@Unique` and `@Exists` need a database. Use a test database, or test those fields in an integration test.
 
-## Not in 3.0
+## Not supported
 
 - A DTO can not extend another class, and can not be generic. The generator stops with an error.
 - An enum value is always its Dart name. Custom wire values (like `"ADMIN"` for `Role.admin`) are not supported.

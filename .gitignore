@@ -18,3 +18,10 @@ packages/*/pubspec.lock
 # `dart build cli` / `dox build` output
 build/
 .design-screenshots/
+
+# examples/ use the local packages through their pubspec_overrides.yaml
+!examples/*/pubspec_overrides.yaml
+examples/*/pubspec.lock
+
+# python cache of the docs hooks
+__pycache__/

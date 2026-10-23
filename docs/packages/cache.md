@@ -1,6 +1,8 @@
-# Cache (dox_cache)
+# Cache
 
-`dox_cache` is a cache like Laravel Cache. It has `remember`, tags, atomic locks and four drivers.
+This page shows the full API of `dox_cache`, the cache behind `Cache()` in Dox.
+
+It works like Laravel Cache. It has `remember`, tags, atomic locks and four drivers.
 
 !!! tip "Built into Dox"
     `dox_core` uses `dox_cache` for [`Cache()`](../digging-deeper/cache.md).
@@ -51,12 +53,16 @@ CacheStore store = cache.store();     // the default store
 await cache.store('file').get('a');   // a named store
 ```
 
-Redis options: `host`, `port`, `username`, `password`, `db`, `tls`, `prefix`, `pool_size`.
+| Driver | Options |
+| --- | --- |
+| every driver | `driver`, `prefix` (default `dox_cache:`) |
+| `memory` | `max_size`: the most items. When full, the least recently used item is removed. No limit when not set |
+| `file` | `path` (default `storage/cache`) |
+| `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db`, `tls`, `pool_size` |
 
-`pool_size` is the most Redis connections one store opens in one isolate (ioredis `maxConnection`). The default is 10.
-Most of the time a store uses only one connection. ioredis sends all commands on one shared connection and writes the commands of one event-loop turn together (auto-pipelining).
-It opens more connections only while a blocking command (like `BLPOP`) waits. The cache does not send blocking commands, so you rarely need to change `pool_size`.
-Each Dox isolate has its own connection, so the total is about one per isolate.
+`pool_size` is the most Redis connections one store opens in one isolate. The default is 10.
+In practice a store uses one connection, because the cache sends no blocking commands.
+So you rarely need to change it. Each Dox isolate has its own connection.
 
 ## Basic use
 
@@ -70,8 +76,8 @@ await store.forget('a');
 
 !!! info "No ttl means forever"
     `put` without a ttl keeps the value forever.
-    (The old `Cache()` in `dox_core` keeps it for 1 hour.)
     A zero or negative ttl removes the key.
+    `Cache()` in `dox_core` takes the ttl as a named argument: `Cache().put('a', 1, duration: Duration(minutes: 5))`.
 
 ## Remember
 
@@ -99,9 +105,9 @@ List<dynamic> posts = await store.remember('posts', Duration(minutes: 10), () as
 | `forever(key, value)` | store without expiry |
 | `remember(key, ttl, compute)` | see above |
 | `rememberForever(key, compute)` | the same, without expiry |
-| `pull(key)` | get it, then remove it |
+| `pull(key, [default])` | get it, then remove it |
 | `tags([...])` | a tagged view |
-| `lock(name, [ttl])` | an atomic lock |
+| `lock(name, [ttl, owner])` | an atomic lock |
 
 ## Values are JSON
 
@@ -137,7 +143,11 @@ if (await lock.get()) {
 bool got = await lock.block(Duration(seconds: 5)); // wait up to 5 seconds
 ```
 
-`memory` and `redis` support locks. The `memory` lock works inside one isolate only.
+- `get()` takes the lock and returns `true`, or returns `false` when someone else has it.
+- `block(timeout)` tries again every 50 ms until it gets the lock or the time is over.
+- The `ttl` frees the lock by itself if the worker crashes. Without a ttl, the lock stays until `release()`.
+- `release()` frees the lock only for the owner that took it.
+- `memory` and `redis` support locks. The `memory` lock works inside one isolate only. `file` and `null` throw `UnsupportedError`.
 
 ## Prefix
 
@@ -162,4 +172,5 @@ cache.extend('mine', MyDriverFactory()); // config: {'driver': 'mine'}
 cache.addStore('ready', MemoryDriver()); // or add a ready driver
 ```
 
-`MyDriver extends CacheDriver` and implements `get`, `put`, `add`, `increment`, `forget` and `flush`.
+`MyDriver extends CacheDriver`. It must implement `prefix`, `get`, `put`, `add`, `increment`, `forget` and `flush`.
+Override `lock` to support locks.

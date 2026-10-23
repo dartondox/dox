@@ -5,8 +5,8 @@ Dox runs on a native HTTP server by default. It comes from the package
 
 - Rust ([hyper](https://hyper.rs)) owns the sockets and parses HTTP.
 - All your code stays in Dart: routes, controllers, DTOs, middleware, ORM.
-- It is about 3 times faster than the `dart:io` server for small requests.
-  See [Performance](performance.md).
+- It is much faster than the `dart:io` server. In a hello world test on one
+  core it served about 5 times more requests. See [Performance](performance.md).
 
 You do not need Rust. The package downloads a ready-built library for your
 system when you build the app.
@@ -107,6 +107,10 @@ cd .. && dart test --concurrency=1
 ```
 
 To make a release of the libraries, push a tag like
-`dox_http_native-v3.0.0-alpha.2`. The `Native` workflow builds the 5
-libraries and uploads them with a `SHA256SUMS` file. Copy the hashes into
-`_sha256` in `hook/build.dart` before you publish the package.
+`dox_http_native-v3.0.0-alpha.4`. The version in the tag must be the
+`version` in `packages/dox-http-native/pubspec.yaml`, because the build hook
+downloads from the tag of its own version.
+
+The `Native` workflow builds the 5 libraries and uploads them with a
+`SHA256SUMS` file. Copy the hashes into `_sha256` in `hook/build.dart` before
+you publish the package.

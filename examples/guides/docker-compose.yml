@@ -1,0 +1,38 @@
+services:
+  app:
+    build: .
+    # secrets and config come from .env, never from the image
+    env_file: .env
+    environment:
+      APP_ENV: production
+      APP_PORT: 3000
+      DB_CONNECTION: postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+    ports:
+      - "3000:3000"
+    volumes:
+      # uploads survive a new image
+      - uploads:/app/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      POSTGRES_DB: ${DB_NAME:-dox}
+    volumes:
+      - postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-U", "${DB_USERNAME:-postgres}"]
+      interval: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  postgres:
+  uploads:

@@ -1,35 +1,58 @@
 # Request
 
+This page shows how to read input, files, headers and cookies from a request.
+
 ## Typed input (recommended)
 
 Ask for a [DTO](validation.md) in your controller. Dox reads the body (or the query for `GET`), checks it, and gives you a typed object.
 
 ```dart
-class ApiController {
-    Future<String> sayHello(HelloInput input) async {
-        return 'Hello ${input.name}';
-    }
+Route.put('/users/{id}', controller.update);
+
+class UserController {
+  Future<User?> update( // (1)!
+    int id, // (2)!
+    UpdateUser input, // (3)!
+  ) async {
+    User? user = await User().find(id);
+    user?.name = input.name;
+    await user?.save();
+    return user;
+  }
 }
 ```
+
+1.  The return value is the response. Dox waits for a `Future`.
+    A `String` is sent as text. A `Map` or a model is sent as JSON.
+2.  A path param. It is `{id}` from the route. `/users/abc` answers `404`, because `abc` is not an `int`.
+3.  A DTO. Dox reads the body, checks it, and builds the object before this method runs.
 
 Bad input gets `422` before your method runs. See [Validation](validation.md).
 
 ## Raw input
 
-You can still read the raw values from the request.
-`req.body['name']` and `req.input('name')` read the JSON body, the form data and the query string (`?foo=bar`).
-These values are not checked.
+Add a `DoxRequest` parameter to read the raw values. These values are **not** checked.
 
 ```dart
 class ApiController {
-    String sayHello(DoxRequest req) {
-        String name = req.input('name');
-        return 'Hello $name';
-    }
+  String sayHello(DoxRequest req) {
+    String? name = req.input('name');
+    return 'Hello $name';
+  }
 }
 ```
 
-## Route param
+| Code | Gives |
+| --- | --- |
+| `req.input('name')` | one value from the query string or the body. The body wins when both have the key. |
+| `req.all()` | all values from the query string and the body, as a `Map` |
+| `req.only(<String>['name', 'email'])` | only these keys |
+| `req.has('name')` | `true` when the key is there and not empty |
+| `req.body` | the body only (JSON, form data) |
+| `req.query` | the query string only |
+| `req.add('key', value)`, `req.merge({...})` | add values, for example in a middleware |
+
+## Route params
 
 Ask for a path param as a typed parameter. `int id` gets `42` from `/users/42`.
 
@@ -38,17 +61,18 @@ Route.get('/hello/{name}', controller.sayHello);
 Route.get('/users/{id}', controller.show);
 
 class ApiController {
-    String sayHello(String name) {
-        return 'Hello $name';
-    }
+  String sayHello(String name) {
+    return 'Hello $name';
+  }
 
-    Future<User?> show(int id) async {
-        return User().find(id);
-    }
+  Future<User?> show(int id) async {
+    return User().find(id);
+  }
 }
 ```
 
-The values are also in `req.param`. See [Controller: parameters](controller.md#parameters).
+The values are also in `req.param`, like `req.param['id']`.
+See [Controller: parameters](controller.md#parameters).
 
 ## Form data (File)
 
@@ -58,24 +82,24 @@ Put the file in a DTO, so Dox checks its type and size:
 ```dart
 @Dto()
 class UploadImage {
-    @Image()
-    @MaxSize('5MB')
-    final RequestFile image;
+  @Image()
+  @MaxSize('5MB')
+  final RequestFile image;
 
-    const UploadImage({required this.image});
+  const UploadImage({required this.image});
 
-    static const DtoSchema<UploadImage> schema = $UploadImageDto;
+  static const DtoSchema<UploadImage> schema = $UploadImageDto;
 }
 
 class ApiController {
-    Future<Map<String, String>> uploadImage(UploadImage input) async {
-        String uploadedPath = await input.image.store('images');
-        return <String, String>{'filename': uploadedPath};
-    }
+  Future<Map<String, String>> uploadImage(UploadImage input) async {
+    String uploadedPath = await input.image.store('images');
+    return <String, String>{'filename': uploadedPath};
+  }
 }
 ```
 
-Without a DTO, `req.input('image')` gives the `RequestFile`, not checked.
+Without a DTO, `req.input('image')` gives the `RequestFile`. It is not checked.
 
 ### `RequestFile`
 
@@ -94,16 +118,16 @@ await file.bytes;     // the whole file in memory. avoid for big files
 ```
 
 !!! warning "Save the file before you return"
-    A file up to 1 MB stays in memory. A bigger file is streamed to a temp file while it arrives.
+    A file up to 1 MB stays in memory. A bigger file is written to a temp file while it arrives.
     The temp file is **deleted when the response is sent**.
     So call `store`, `moveTo` or `stream` before your controller returns.
 
 ### Size limits
 
-A body that is too big gets `413 Payload Too Large`. Dox checks `Content-Length` first,
-and also counts the bytes while reading.
+A body that is too big gets `413 Payload Too Large`. Dox checks `Content-Length` first.
+It also counts the bytes while it reads the body.
 
-```dart
+```dart title="lib/config/app.dart"
 AppConfig(
   maxBodySize: 10 * 1024 * 1024,        // JSON and urlencoded, default 10 MB
   maxMultipartSize: 100 * 1024 * 1024,  // form-data uploads, default 100 MB
@@ -111,6 +135,21 @@ AppConfig(
 ```
 
 Set the same limit in your proxy, like `client_max_body_size` in nginx.
+
+## Headers
+
+```dart
+String? token = req.header('X-Token');
+Map<String, dynamic> all = req.headers;
+
+req.userAgent();  // User-Agent header
+req.host();       // Host header
+req.origin();     // Origin header, or null
+req.referer();    // Referer header, or null
+req.isJson();     // true for a JSON body
+req.isFormData(); // true for multipart/form-data
+req.locale;       // first language of Accept-Language, like 'th', or null
+```
 
 ## Cookies
 
@@ -129,4 +168,5 @@ req.scheme();   // http or https
 req.isSecure(); // true for https
 ```
 
-Behind a proxy, set `trustedProxies` so these show the real client. See [Deployment](../digging-deeper/deployment.md#https-put-a-proxy-in-front).
+Behind a proxy, `req.ip()` shows the proxy, not the client.
+Set `trustedProxies` in `AppConfig` to fix it. See [Deployment](../digging-deeper/deployment.md#https-put-a-proxy-in-front).

@@ -13,11 +13,15 @@ Route.post('/avatar', (DoxRequest req) async {
 
 ## Config
 
-`config/storage.dart`:
+Without a config, Dox has one disk: `local`, in the `storage` folder.
+To add disks, make `lib/config/storage.dart`:
 
-```dart
+```dart title="lib/config/storage.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:my_app/config/env.dart';
+
 StorageConfig storage = StorageConfig(
-  defaultDisk: Env.get('STORAGE_DISK', 'local'),
+  defaultDisk: env.storageDisk,
   disks: <String, Map<String, dynamic>>{
     'local': <String, dynamic>{
       'driver': 'local',
@@ -26,24 +30,43 @@ StorageConfig storage = StorageConfig(
     },
     's3': <String, dynamic>{
       'driver': 's3',
-      'bucket': Env.get('AWS_BUCKET'),
-      'region': Env.get('AWS_DEFAULT_REGION', 'us-east-1'),
-      'key': Env.get('AWS_ACCESS_KEY_ID'),
-      'secret': Env.get('AWS_SECRET_ACCESS_KEY'),
-      'endpoint': Env.get('AWS_ENDPOINT'), // R2, MinIO, Spaces
+      'bucket': env.awsBucket,
+      'region': env.awsDefaultRegion,
+      'key': env.awsAccessKeyId,
+      'secret': env.awsSecretAccessKey,
+      'endpoint': env.awsEndpoint, // R2, MinIO, Spaces
     },
     'memory': <String, dynamic>{'driver': 'memory'},
   },
 );
 ```
 
-Pass it to `AppConfig(storage: storage)`.
+The `s3` disk reads five keys that a new project does not have yet. Add them to
+`lib/config/env.dart` and run `dart run build_runner build`. They are nullable,
+so the app still starts without them when you do not use S3:
+
+```dart title="lib/config/env.dart"
+  String? get awsBucket;
+
+  String get awsDefaultRegion => 'us-east-1';
+
+  String? get awsAccessKeyId;
+
+  String? get awsSecretAccessKey;
+
+  /// R2, MinIO or Spaces. Null for AWS.
+  String? get awsEndpoint;
+```
+
+Then pass it to `AppConfig(storage: storage)` in `lib/config/app.dart`.
 
 | Driver | Options |
 | --- | --- |
 | `local` | `root` (default `storage`), `url`, `app_key` (default: your APP_KEY), `visibility` |
 | `s3` | `bucket`, `region`, `key`, `secret`, `token`, `endpoint`, `path_style` (MinIO), `url` (CDN), `visibility`, `acl`, `batch_delete` |
 | `memory` | none. For tests |
+
+The `s3` disk needs `bucket`, `key` and `secret`. When one is missing, the first use of the disk throws an error.
 
 ## Functions
 
@@ -88,9 +111,10 @@ A big file is never loaded into memory. A missing file answers `404`.
 ## Serve local signed URLs
 
 ```dart
-// routes/web.dart
+// lib/routes/web.dart
 Route.files('files');                    // GET /files/{key*}, signed URLs only
 Route.files('public', signed: false);    // any file of the disk
+Route.files('docs', disk: 'memory');     // another disk than the default
 ```
 
 ```dart
@@ -102,7 +126,7 @@ Set the disk `url` option to the full URL of the route (`https://app.test/files`
 
 ## Tests
 
-`Dox().storage` is the `DriveManager`. Swap a disk with an in-memory fake:
+`Dox().storage` is the `DriveManager` that `Storage()` uses. `fake(name)` swaps a disk with an empty memory disk:
 
 ```dart
 Disk fake = Dox().storage.fake('s3');
@@ -111,9 +135,11 @@ expect(await fake.exists('reports/2024.pdf'), isTrue);
 Dox().storage.restore('s3');
 ```
 
+`Disk` keys have no `/` at the start. See [Testing](testing.md).
+
 ## Your own driver
 
-Implement `DriverContract` from `dox_storage` and register it, for example in a service:
+Implement `DriverContract` from `package:dox_storage/dox_storage.dart`. Register it in a [service](services.md), so every isolate has it:
 
 ```dart
 Dox().storage.register('dropbox', DropboxDriver());

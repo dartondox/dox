@@ -41,10 +41,11 @@ Add it only to use `PgNativePool` without the ORM:
 dart pub add dox_postgres_native
 ```
 
-You do not need Rust when a ready-built library exists for your system
-(macOS arm64/x64, Linux x64/arm64, Windows x64). The build hook downloads
-it. When there is none yet, the hook builds the library with `cargo`, so
-then you need [Rust](https://rustup.rs).
+The build hook builds the Rust library with `cargo`, so you need
+[Rust](https://rustup.rs) installed. Ready-built libraries (like the ones
+`dox_http_native` has) are not published for this driver yet.
+Without Rust, the ORM still works: it uses the Dart driver and prints one
+warning line (see below).
 
 Use `dart run`, `dart test` or `dart build cli`. `dart compile exe` does not
 run build hooks.
@@ -55,7 +56,8 @@ You do not change any config. The ORM picks the driver like this:
 
 1. `driverFactory` is set: the ORM uses your driver. It wins over
    everything below.
-2. You ask for the Dart driver (see below): the ORM uses the Dart driver.
+2. You ask for the Dart driver (see below), or the connection uses TLS:
+   the ORM uses the Dart driver.
 3. The native library loads: the ORM uses the native driver.
 4. The native library does not load (no library for your system, no
    Rust to build it, or a load error): the ORM uses the Dart driver. It
@@ -65,7 +67,7 @@ You do not change any config. The ORM picks the driver like this:
 [dox] warning: dox_postgres_native did not load, using the Dart postgres driver (...)
 ```
 
-Named connections (`Model.connection('x')`, `withConnection('x')`) follow
+Named connections (`withConnection('x')`, `transaction(..., connection: 'x')`) follow
 the same rules.
 
 ## Use the Dart driver

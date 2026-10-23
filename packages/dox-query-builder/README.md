@@ -1,17 +1,29 @@
 # dox_query_builder
 
-This package is replaced by [dox_orm](https://pub.dev/packages/dox_orm).
+This package re-exports [dox_orm](https://pub.dev/packages/dox_orm).
+New projects should depend on `dox_orm` directly.
 
-It only re-exports `dox_orm`, so old code keeps working. Please move to `dox_orm`:
+[![pub package](https://img.shields.io/pub/v/dox_query_builder.svg)](https://pub.dev/packages/dox_query_builder)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/develop/LICENSE)
 
-1. In `pubspec.yaml`, change `dox_query_builder` to `dox_orm`.
-2. Change imports:
+Part of [Dox](https://dartondox.dev), a web backend framework for Dart, like Laravel.
+Source code: [github.com/dartondox/dox](https://github.com/dartondox/dox).
+
+## Install
+
+```bash
+dart pub add dox_orm
+```
 
 ```dart
-// old
-import 'package:dox_query_builder/dox_query_builder.dart';
-// new
 import 'package:dox_orm/dox_orm.dart';
 ```
 
-New features and fixes go to `dox_orm` only.
+## Documentation
+
+- [Database](https://dartondox.dev/latest/database/)
+- [Query builder](https://dartondox.dev/latest/database/query-builder/)
+
+## License
+
+MIT

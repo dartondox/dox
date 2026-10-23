@@ -4,7 +4,9 @@ Declare your env keys once, in a typed class. Then `env.appPort` is an `int`, yo
 
 ## The typed env class
 
-`lib/config/env.dart`:
+A new project already has `lib/config/env.dart`, with the keys the config files read. The list is in the [Env reference](../reference/env.md#read-by-a-new-project).
+
+This example class shows the kinds of getters you can write:
 
 ```dart
 import 'package:dox_core/dox_core.dart';
@@ -35,7 +37,7 @@ abstract class AppEnv {
 final AppEnv env = AppEnv.load();
 ```
 
-Run `dart run build_runner build` (or `dox build_runner:build`). It writes `env.g.dart`.
+Run `dart run build_runner build` (or `dox build_runner:build`) after each change to the class. It writes `env.g.dart`.
 
 Use it anywhere:
 
@@ -86,10 +88,28 @@ The `env` variable is made on first use. The config files use it, so this happen
 
 ## Where values come from
 
+Dox reads values from two places:
+
+1. Real environment variables (set in the shell, Docker or systemd).
+2. The `.env` file in the folder where you start the app.
+
 !!! info "The environment wins"
-    A real environment variable (set in the shell, Docker or systemd) wins over the `.env` file.
+    A real environment variable wins over the `.env` file.
     So you can keep `.env` for development and use real variables in production.
     The `.env` file is optional.
+
+### The `.env` file
+
+```ini title=".env"
+APP_NAME=dox
+APP_KEY=change-me
+DB_PORT=5432
+```
+
+- One `KEY=value` per line.
+- Dox removes all `"`, `'` and `` ` `` characters from a value. So `APP_NAME="My app"` gives `My app`.
+- A `=` inside the value is kept: `TOKEN=a=b` gives `a=b`.
+- Put a comment on its own line. A `#` after a value is part of the value.
 
 ## Commands
 
@@ -123,12 +143,12 @@ AppEnv env = AppEnv.load(
 );
 ```
 
-## Env.get: dynamic keys
+## Env.get: the low-level way
 
-`Env.get()` still works. Use it for a key you only know at run time. For normal config, use the typed class.
+`Env.get()` reads one key by name. Use it for a key you only know at run time. For normal config, use the typed class.
 
 ```dart
-Env.get('APP_KEY');                     // String, '' when missing
+Env.get<String>('APP_KEY');             // '' when missing
 Env.get('APP_KEY', 'default_value');
 Env.get<int>('APP_PORT', 3000);
 Env.get<bool>('SOCKETIO_ENABLED', false); // true, 1, yes, on
@@ -138,7 +158,7 @@ Env.get<String?>('AWS_BUCKET');          // null when it is not set
 A missing or empty key gives the default. With no default:
 
 - `String` gives an empty string `''`. It is never the text `"null"`.
-- `String?` and `dynamic` give `null`.
+- `String?` and `dynamic` give `null`. With no type, like `Env.get('KEY')`, the type is `dynamic`, so you get `null`.
 - `int`, `num`, `double` and `bool` throw an `ArgumentError` with the key name. A value that is not a number throws too.
 
 `Env.get()` looks up and converts the value on every call. Do not call it on a hot path.

@@ -1,0 +1,145 @@
+# HTTP exceptions
+
+An exception that extends `IHttpException` turns into an HTTP error answer.
+You can `throw` it or `return` it from a middleware or a controller.
+
+`IHttpException` is in `packages/dox-annotation/lib/src/core_annotation.dart`:
+
+```dart
+abstract class IHttpException {
+  int code = 500;
+  String errorCode = 'server_error';
+  dynamic message = 'Server Error';
+
+  dynamic toResponse() {
+    if (message is Map) {
+      return message;
+    }
+    return message.toString();
+  }
+}
+```
+
+## The classes
+
+Every class takes the named parameters `message`, `errorCode` and `code`. The table shows the defaults.
+
+| Class | Package | Status `code` | `errorCode` | Default `message` | Dox throws it when |
+| --- | --- | --- | --- | --- | --- |
+| `BadRequestException` | `dox_core` | `400` | `bad_request` | `Bad Request` | the body can not be read, like JSON that is not valid |
+| `UnAuthorizedException` | `dox_auth` | `401` | `unauthorized` | `Authentication failed` | `AuthMiddleware` finds no valid token |
+| `NotFoundHttpException` | `dox_core` | `404` | `not_found` | `Not Found` | a typed path param does not fit (`{id}` is not an `int`) |
+| `PayloadTooLargeException` | `dox_core` | `413` | `payload_too_large` | `Payload Too Large` | the body is bigger than `maxBodySize` or `maxMultipartSize` |
+| `UnsupportedMediaTypeException` | `dox_core` | `415` | `unsupported_media_type` | `Unsupported Media Type` | a DTO reads a body that is not JSON and not form data |
+| `ValidationException` | `dox_core` | `422` | `validation_failed` | `{}` (a `Map`) | a DTO or `req.validate()` finds bad input |
+| `InternalErrorException` | `dox_core` | `500` | `server_error` | `Server Error` | never by itself; for your own use |
+| `QueryException` | `dox_core` | `500` | `sql_query_error` | `Error in sql query` | never by itself; for your own use |
+
+Source files: `packages/dox-core/lib/exception/*.dart` and `packages/dox-auth/lib/src/auth_exception.dart`.
+
+## What the client gets
+
+`responseDataHandler` in `packages/dox-core/lib/http/http_response_handler.dart` sends the answer:
+
+1. The status is set to `code`.
+2. The body is `toResponse()`.
+3. A `Map` body is sent as JSON with `Content-Type: application/json`.
+4. Any other body is sent as text, with the default `text/plain` content type.
+
+So the default exceptions answer with plain text:
+
+```
+HTTP/1.1 404 Not Found
+content-type: text/plain; charset=utf-8
+
+Not Found
+```
+
+```dart
+throw NotFoundHttpException(message: 'Blog not found');
+```
+
+```
+HTTP/1.1 404 Not Found
+content-type: text/plain; charset=utf-8
+
+Blog not found
+```
+
+A `Map` message gives JSON. `ValidationException` always has a map, one entry per field:
+
+```
+HTTP/1.1 422 Unprocessable Entity
+content-type: application/json
+
+{"email":"The email is not a valid email","name":"The name is required"}
+```
+
+A request for a path that has no route is not an exception. Dox answers `404` with the text `<METHOD> <path> not found`.
+
+To get a JSON body from any exception, pass a map:
+
+```dart
+throw NotFoundHttpException(
+  message: <String, dynamic>{'error': 'not_found', 'message': 'Blog not found'},
+);
+```
+
+!!! note "`errorCode` is not sent"
+    `errorCode` is stored on the exception, but `toResponse()` does not use it. The client only gets the status and the `message`.
+    Put the code in a map message, or in a `responseHandler`, when the client needs it.
+
+Other errors: any `Exception` or `Error` that is not an `IHttpException` gets `500` with `error.toString()` as text body. It is also passed to `errorHandler` in `AppConfig`. An `IHttpException` is not passed to `errorHandler`.
+
+A `ValidationException` from `dox_validation` (thrown by `schema.parse()` in a controller) is turned into the `422` `ValidationException` of `dox_core` with the same errors.
+
+## Make your own
+
+Extend `IHttpException` and set the three fields in the constructor:
+
+```dart
+import 'dart:io';
+
+import 'package:dox_core/dox_core.dart';
+
+class ForbiddenException extends IHttpException {
+  ForbiddenException({
+    dynamic message = 'Forbidden',
+    String errorCode = 'forbidden',
+    int code = HttpStatus.forbidden,
+  }) {
+    super.code = code;
+    super.errorCode = errorCode;
+    super.message = message;
+  }
+}
+```
+
+Use it:
+
+```dart
+Future<dynamic> destroy(DoxRequest req, int id) async {
+  if (req.auth?.user<User>()?.id != id) {
+    throw ForbiddenException();
+  }
+}
+```
+
+Override `toResponse()` when every error of your app should have the same JSON shape:
+
+```dart
+class ApiException extends IHttpException {
+  ApiException(int code, String errorCode, String message) {
+    super.code = code;
+    super.errorCode = errorCode;
+    super.message = message;
+  }
+
+  @override
+  dynamic toResponse() {
+    return <String, dynamic>{'code': errorCode, 'message': message};
+  }
+}
+```
+
+More examples are on the [Response](../the-basic/response.md#errors) page.

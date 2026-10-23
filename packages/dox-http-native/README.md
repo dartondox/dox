@@ -1,13 +1,43 @@
 # dox_http_native
 
-A fast HTTP/1.1 server for Dart. Rust ([hyper](https://hyper.rs)) owns the
-sockets and parses HTTP. Your handlers stay in Dart.
+Native HTTP/1.1 server for Dart. It is the default HTTP server of Dox.
 
-It implements the `dart:io` `HttpServer`, `HttpRequest` and `HttpResponse`
-API, so code written for `dart:io` works unchanged.
+[![pub package](https://img.shields.io/pub/v/dox_http_native.svg)](https://pub.dev/packages/dox_http_native)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/develop/LICENSE)
 
-[Dox](https://dartondox.dev) uses it as its default server. You do not need
-to add it yourself when you use Dox.
+Part of [Dox](https://dartondox.dev), a web backend framework for Dart, like Laravel.
+Source code: [github.com/dartondox/dox](https://github.com/dartondox/dox).
+
+## Install
+
+You usually do not add this package. `dox_core` depends on it and uses it by default.
+Add it only to use the server without Dox:
+
+```bash
+dart pub add dox_http_native
+```
+
+Dox 3.x is in alpha (`3.0.0-alpha.4`). The API can still change before the stable release.
+
+## How it works
+
+- Rust ([hyper](https://hyper.rs)) owns the sockets and parses HTTP/1.1.
+- Your handlers stay in Dart.
+- It implements the `dart:io` `HttpServer`, `HttpRequest` and `HttpResponse` API. Code written for `dart:io` works unchanged.
+
+## The native library
+
+A build hook (`hook/build.dart`) gets the Rust library. It tries these in order:
+
+1. A path you set in your app `pubspec.yaml` (`hooks: user_defines: dox_http_native: lib_path: ...`).
+2. A ready-built library from the GitHub release, checked with sha256.
+   There are builds for macOS (arm64, x64), Linux (x64, arm64) and Windows (x64).
+3. A build from source with `cargo`, when Rust is installed.
+
+So on these systems you do not need Rust.
+Use `dart run`, `dart test` or `dart build cli`. `dart compile exe` does not run build hooks.
+
+## Use it
 
 ```dart
 import 'dart:io';
@@ -23,17 +53,27 @@ void main() async {
 }
 ```
 
-- No Rust needed: the build hook downloads a ready-built library
-  (macOS arm64/x64, Linux x64/arm64, Windows x64).
-- Use `dart run`, `dart test` or `dart build cli`. `dart compile exe` does
-  not run build hooks.
-- Each isolate can bind the same port (`SO_REUSEPORT` on Linux, one shared
-  socket on macOS).
-- Each isolate has its own `dox-http` thread. `DOX_HTTP_THREAD=shared`
-  puts them all on one thread (slower on 2 cores in our tests).
-- `400` for bad requests, `431` for headers over 16 KB, `413` for bodies
-  over `maxBodySize`.
-- Not yet: WebSocket upgrade (`detachSocket`), streaming a response while it
-  is written (the body is sent on `close`).
+## Turn it off in Dox
 
-More: [Native server](https://dartondox.dev/digging-deeper/native-server/).
+- Set `server: ServerBackend.dartIo` in `AppConfig`.
+- Or set the env var `DOX_SERVER=dartio`. The env var wins over the config.
+
+Dox also uses `dart:io` by itself when the native library does not load,
+and when the app has WebSocket or Socket.IO routes.
+
+## Features
+
+- Each isolate can bind the same port (`SO_REUSEPORT` on Linux, one shared socket on macOS).
+- Each isolate has its own Rust network thread. `DOX_HTTP_THREAD=shared` puts them on one thread.
+- `400` for bad requests, `431` for headers over 16 KB, `413` for bodies over `maxBodySize`.
+- Not yet: WebSocket upgrade (`detachSocket`).
+- Not yet: streaming a response while it is written. The body is sent on `close`.
+
+## Documentation
+
+- [Native server](https://dartondox.dev/latest/digging-deeper/native-server/)
+- [API reference](https://pub.dev/documentation/dox_http_native/latest/)
+
+## License
+
+MIT. See [LICENSE](https://github.com/dartondox/dox/blob/develop/LICENSE).

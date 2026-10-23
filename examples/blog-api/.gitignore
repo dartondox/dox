@@ -1,0 +1,10 @@
+.dart_tool/
+.DS_Store
+.env
+bin/server
+storage/
+build/
+*.sqlite
+*.sqlite-*
+# made by `dart run build_runner build`
+*.g.dart

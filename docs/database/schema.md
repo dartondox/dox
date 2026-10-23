@@ -1,6 +1,6 @@
 # Schema builder
 
-The schema builder creates, changes and drops tables.
+The schema builder creates, changes and drops tables with Dart code.
 The same code works on Postgres, MySQL, MariaDB and SQLite.
 You mostly use it inside a [migration](migration.md).
 
@@ -67,7 +67,7 @@ await schema.dropIfExists('posts');
 | `timestamp('c')` | `TIMESTAMP` | `TIMESTAMP` | `TIMESTAMP` |
 | `timestampTz('c')` | `TIMESTAMPTZ` | `TIMESTAMP` | `TIMESTAMP` |
 | `json('c')` / `jsonb('c')` | `JSONB` | `JSON` | `JSON` |
-| `uuid([uuid])` | `UUID` | `CHAR(36)` | `TEXT` |
+| `uuid(['uuid'])` | `UUID` | `CHAR(36)` | `TEXT` |
 | `binary('c')` | `BYTEA` | `BLOB` | `BLOB` |
 | `enumeration('c', ['a', 'b'])` | `VARCHAR(255)` + `CHECK` | `ENUM('a', 'b')` | `VARCHAR(255)` + `CHECK` |
 | `foreignId('user_id')` | `BIGINT` | `BIGINT UNSIGNED` | `INTEGER` |
@@ -76,9 +76,9 @@ await schema.dropIfExists('posts');
 Helpers:
 
 - `timestamps()`: nullable `created_at` and `updated_at` (`timestampTz`).
-- `softDeletes([deleted_at])`: nullable `deleted_at` (`timestampTz`), for `SoftDeletes` models.
+- `softDeletes(['deleted_at'])`: nullable `deleted_at` (`timestampTz`), for models with `softDelete: true`.
 - `rememberToken()`: nullable `remember_token` `VARCHAR(100)`.
-- `morphs('owner')`: `owner_id` (unsigned big integer), `owner_type` (string) and an index on both.
+- `morphs('owner')`: `owner_id` (unsigned big integer), `owner_type` (string) and one index on both columns.
 
 !!! info "JSON on SQLite"
     SQLite has no JSON type. The column is declared as `JSON`,

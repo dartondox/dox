@@ -139,11 +139,48 @@ jobs:
             echo "::endgroup::"
           done
 
+  # The apps in examples/ hold the code of docs/tutorial and docs/guides.
+  # They use the local packages (pubspec_overrides.yaml) and SQLite, so
+  # they need no database service. A broken docs example fails CI.
+  examples:
+    name: example (${{ matrix.example }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example: [blog-api, guides]
+    defaults:
+      run:
+        working-directory: examples/${{ matrix.example }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - uses: actions/cache@v6
+        with:
+          path: ~/.pub-cache
+          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: pub-${{ runner.os }}-
+      # The build hooks of the native packages may run `cargo build`.
+      # The example has its own .dart_tool, so the cargo folders are there.
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            packages/dox-http-native/native -> ../../../examples/${{ matrix.example }}/.dart_tool/hooks_runner/shared/dox_http_native/build/cargo
+            packages/dox-postgres-native/native -> ../../../examples/${{ matrix.example }}/.dart_tool/hooks_runner/shared/dox_postgres_native/build/cargo
+            packages/dox-mysql-native/native -> ../../../examples/${{ matrix.example }}/.dart_tool/hooks_runner/shared/dox_mysql_native/build/cargo
+      - run: cp .env.example .env
+      - run: dart pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
+      - run: dart analyze --fatal-infos
+      - run: dart test --concurrency=1
+
   # The required check on develop is named "test". This job keeps that name
   # and fails when any job above fails.
   test:
     if: always()
-    needs: [lint, tests]
+    needs: [lint, tests, examples]
     runs-on: ubuntu-latest
     steps:
       - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')

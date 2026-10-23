@@ -51,10 +51,11 @@ Add it only to use `MysqlNativePool` without the ORM:
 dart pub add dox_mysql_native
 ```
 
-You do not need Rust when a ready-built library exists for your system
-(macOS arm64/x64, Linux x64/arm64, Windows x64). The build hook downloads
-it. When there is none yet, the hook builds the library with `cargo`, so
-then you need [Rust](https://rustup.rs).
+The build hook builds the Rust library with `cargo`, so you need
+[Rust](https://rustup.rs) installed. Ready-built libraries (like the ones
+`dox_http_native` has) are not published for this driver yet.
+Without Rust, the ORM still works: it uses the Dart driver and prints one
+warning line (see below).
 
 Use `dart run`, `dart test` or `dart build cli`. `dart compile exe` does not
 run build hooks.
@@ -75,7 +76,7 @@ You do not change any config. The ORM picks the driver like this:
 [dox] warning: dox_mysql_native did not load, using the Dart mysql driver (...)
 ```
 
-Named connections (`Model.connection('x')`, `withConnection('x')`) follow
+Named connections (`withConnection('x')`, `transaction(..., connection: 'x')`) follow
 the same rules.
 
 ## Use the Dart driver

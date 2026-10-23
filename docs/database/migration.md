@@ -1,7 +1,7 @@
 # Migration
 
 A migration changes your database schema step by step: create a table, add a column, and so on.
-Each migration has an `up` (do the change) and a `down` (undo it).
+Each migration has an `up` method (make the change) and a `down` method (undo it).
 
 Write migrations in Dart with the [schema builder](schema.md).
 The same migration then works on Postgres, MySQL, MariaDB and SQLite.
@@ -9,13 +9,14 @@ Plain `.sql` migrations still work too.
 
 ## Create a migration
 
-```py
+```bash
 dox make:migration create_users_table
 ```
 
-This makes `db/migration/2026_10_21_120000_create_users_table.dart`:
+This makes `db/migration/2026_10_21_120000_create_users_table.dart`.
+The numbers are the date and time when you run the command.
 
-```dart
+```dart title="db/migration/2026_10_21_120000_create_users_table.dart"
 import 'package:dox_migration/dox_migration.dart';
 
 class CreateUsersTable extends Migration {
@@ -23,8 +24,6 @@ class CreateUsersTable extends Migration {
   Future<void> up(Schema schema) async {
     await schema.create('users', (Table table) {
       table.id();
-      table.string('email').unique();
-      table.string('password');
       table.timestamps();
     });
   }
@@ -36,15 +35,19 @@ class CreateUsersTable extends Migration {
 }
 ```
 
-The name gives the start of the file:
+Add your columns in `up`, for example `table.string('email').unique();`.
+See [Schema](schema.md) for all column types.
 
-| Name | File starts with |
+The name of the migration decides what the new file contains:
+
+| Name | The file has |
 |---|---|
-| `create_users_table` | `schema.create('users', ...)` and `dropIfExists('users')` |
-| `add_avatar_to_users_table` | `schema.table('users', ...)` in `up` and `down` |
+| `create_users_table` | `schema.create('users', ...)` in `up`, and `dropIfExists('users')` in `down` |
+| `add_avatar_to_users_table` (also `_from_`, `_in_`, `_on_`) | `schema.table('users', ...)` in `up` and `down` |
 | any other name | empty `up` and `down` |
 
-`create:migration` is the old name of the same command.
+- `create:migration` is the old name of the same command.
+- `dox create:model Blog -m` makes the model and a `create_blogs_table` migration.
 
 !!! info "Raw SQL and data in a Dart migration"
     `schema.driver` runs raw SQL on the same connection and transaction:
@@ -116,9 +119,12 @@ You can also run `dart run bin/migrate.dart run` (or `rollback --step=2`, `reset
 
 ### Run on server start
 
-The AOT server binary can run the migrations, because the registry is compiled in:
+The AOT server binary can run the migrations, because the registry is compiled in.
+The new app template already does this:
 
-```dart
+```dart title="bin/server.dart"
+import 'package:dox_app/config/app.dart';
+import 'package:dox_core/dox_core.dart';
 import 'package:dox_migration/dox_migration.dart';
 
 import '../db/migration/migrations.dart';
@@ -137,7 +143,7 @@ Keep the `db/migration` folder next to the binary if you also have `.sql` migrat
 The migrations use the `.env` file in your project.
 When there is no `.env` file (for example in Docker), they use the environment variables.
 
-```bash
+```bash title=".env"
 DB_CONNECTION=postgres # or mysql (also MariaDB), or sqlite
 DB_HOST=localhost
 DB_PORT=5432
@@ -148,14 +154,16 @@ DB_PASSWORD=password
 
 For SQLite, only two variables are needed:
 
-```bash
+```bash title=".env"
 DB_CONNECTION=sqlite
-DB_DATABASE=storage/app.db # file path, made if missing
+DB_NAME=storage/app.db # file path, made if missing
 ```
 
-!!! info
-    The default port is `5432` for postgres and `3306` for mysql.
-    One run uses one database connection.
+- `DB_DATABASE` works too, in place of `DB_NAME`.
+- The default port is `5432` for Postgres and `3306` for MySQL.
+- One run uses one database connection.
+- Migrations do not use TLS. To migrate a database that needs TLS,
+  give your own connection: `Migrator(migrations: migrations, connection: myPool)`.
 
 ## Transactions
 
@@ -173,7 +181,18 @@ To run a migration without a transaction (for example `CREATE INDEX CONCURRENTLY
 class AddSearchIndex extends Migration {
   @override
   bool get withinTransaction => false;
-  ...
+
+  @override
+  Future<void> up(Schema schema) async {
+    await schema.driver.execute(
+      'CREATE INDEX CONCURRENTLY posts_title_index ON posts (title)',
+    );
+  }
+
+  @override
+  Future<void> down(Schema schema) async {
+    await schema.driver.execute('DROP INDEX CONCURRENTLY posts_title_index');
+  }
 }
 ```
 
@@ -186,7 +205,7 @@ class AddSearchIndex extends Migration {
 
 A `.sql` migration is still fine. Use it for SQL that only one database understands.
 
-```py
+```bash
 dox make:migration create_blog_table --sql
 ```
 

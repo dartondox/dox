@@ -1,0 +1,34 @@
+# Use the Dox packages of this repo, not the ones on pub.dev.
+dependency_overrides:
+  dox_annotation:
+    path: ../../packages/dox-annotation
+  dox_auth:
+    path: ../../packages/dox-auth
+  dox_builder:
+    path: ../../packages/dox-builder
+  dox_cache:
+    path: ../../packages/dox-cache
+  dox_core:
+    path: ../../packages/dox-core
+  dox_http_native:
+    path: ../../packages/dox-http-native
+  dox_migration:
+    path: ../../packages/dox-migration
+  dox_mysql_native:
+    path: ../../packages/dox-mysql-native
+  dox_openapi:
+    path: ../../packages/dox-openapi
+  dox_orm:
+    path: ../../packages/dox-orm
+  dox_postgres_native:
+    path: ../../packages/dox-postgres-native
+  dox_query_builder:
+    path: ../../packages/dox-query-builder
+  dox_socketio:
+    path: ../../packages/dox-socketio
+  dox_storage:
+    path: ../../packages/dox-storage
+  dox_validation:
+    path: ../../packages/dox-validation
+  dox_websocket:
+    path: ../../packages/dox-websocket
