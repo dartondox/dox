@@ -5,6 +5,7 @@ class DoxModel {
   /// Dart type of the primary key, like `String` for a UUID key.
   /// The default is `int`.
   final Type primaryKeyType;
+
   /// column of the create time. null turns it off.
   final String? createdAt;
 
