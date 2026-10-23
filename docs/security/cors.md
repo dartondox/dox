@@ -39,21 +39,31 @@ An option that is `null` sends no header.
 | Option | Header | Value |
 | --- | --- | --- |
 | `enabled` | - | `true` adds the headers to every route. Default: `true` |
-| `origin` | `Access-Control-Allow-Origin` | one origin, or `'*'` for all |
+| `origin` | `Access-Control-Allow-Origin` | one origin, a `List<String>` of origins, or `'*'` for all |
 | `methods` | `Access-Control-Allow-Methods` | a `List<String>` or a text like `'GET,POST'`. `'*'` allows all |
 | `headers` | `Access-Control-Allow-Headers` | a `List<String>` or a text. `'*'` allows all |
 | `exposeHeaders` | `Access-Control-Expose-Headers` | the response headers the page may read |
 | `credentials` | `Access-Control-Allow-Credentials` | `true` lets the browser send cookies |
 | `maxAge` | `Access-Control-Max-Age` | how many seconds the browser keeps the preflight answer |
 
-A list is joined with commas.
-The value is sent as it is. Dox does not compare it with the `Origin` of the request.
+For `methods`, `headers` and `exposeHeaders`, a list is joined with commas.
 
-!!! warning "One origin only"
-    `Access-Control-Allow-Origin` accepts one origin or `*`.
-    If you set a list like `['https://a.com', 'https://b.com']`, Dox sends `https://a.com,https://b.com`.
-    Browsers reject this value.
-    So set one origin, or `'*'`.
+## More than one origin
+
+`Access-Control-Allow-Origin` accepts only one origin or `*`.
+So when `origin` is a list, Dox checks the `Origin` header of the request:
+
+- The origin is in the list: Dox sends back that one origin.
+- The origin is not in the list: Dox sends no `Access-Control-Allow-Origin` header. The browser blocks the call.
+- The list has `'*'`: Dox sends `*`.
+
+With a list, Dox also sends `Vary: Origin`. This tells caches that the answer depends on the origin.
+
+```dart
+CORSConfig cors = CORSConfig(
+  origin: <String>['https://my.app', 'https://admin.my.app'],
+);
+```
 
 !!! warning "`credentials` with `*`"
     Browsers do not send cookies when `origin` is `'*'`.

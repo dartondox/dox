@@ -1,3 +1,7 @@
+## Unreleased
+
+- Fix: CORS `origin` can be a list. Dox compares the request `Origin` with the list and sends back only the origin that matches, or no header. Before, it joined the list with commas, and browsers rejected it. A list also sends `Vary: Origin`.
+
 ## 3.0.0-alpha.4
 
 - Version bump only, to match the other packages.

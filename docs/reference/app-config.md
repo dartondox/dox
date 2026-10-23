@@ -50,7 +50,7 @@ A value can be a `String` (`'*'` or a comma list) or a `List<String>`. A `null` 
 | Field | Type | Default | Header |
 | --- | --- | --- | --- |
 | `enabled` | `bool` | `true` | Send CORS headers. A route can override it with its own `cors` setting. |
-| `origin` | `dynamic` | `null` | `Access-Control-Allow-Origin` |
+| `origin` | `dynamic` | `null` | `Access-Control-Allow-Origin`. One origin, `'*'`, or a list. With a list, Dox sends back only the request origin if it is in the list. |
 | `methods` | `dynamic` | `null` | `Access-Control-Allow-Methods` |
 | `headers` | `dynamic` | `null` | `Access-Control-Allow-Headers` |
 | `exposeHeaders` | `dynamic` | `null` | `Access-Control-Expose-Headers` |
@@ -451,10 +451,11 @@ CORSConfig cors = CORSConfig(
 
   /// Origin
   /// -------------------------------
-  /// Set a list of origins to be allowed for `Access-Control-Allow-Origin`.
+  /// Set the origins to be allowed for `Access-Control-Allow-Origin`.
   /// The value can be one of the following:
-  /// Array       : An array of allowed origins.
-  /// String      : Comma separated list of allowed origins.
+  /// List        : Allowed origins. Dox sends back only the request origin
+  ///               when it is in the list.
+  /// String      : One allowed origin.
   /// String (*)  : A wildcard (*) to allow all request origins.
   origin: '*',
 
