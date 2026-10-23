@@ -10,14 +10,20 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/develop' }}
 
 jobs:
+  # Picks the jobs to run (ci/changes.sh and ci/affected.py).
   # Docs-only changes (*.md, docs/, mkdocs.yml, overrides/) skip lint, tests
-  # and examples. The `test` job still runs and passes, so the required check
-  # is not stuck. A branch is compared with develop, so one docs-only push on
-  # top of code commits still runs every test.
+  # and examples. A change in packages/ or examples/ runs only the tests of
+  # the changed packages and of every package that depends on them. Any
+  # other change (ci/, .github/, root pubspec, ...) and tags run everything.
+  # Skipped jobs pass, so the required `test` check is not stuck. A branch
+  # is compared with develop, so one docs-only push on top of code commits
+  # still runs the tests of that code.
   changes:
     runs-on: ubuntu-latest
     outputs:
       code: ${{ steps.diff.outputs.code }}
+      tests: ${{ steps.diff.outputs.tests }}
+      examples: ${{ steps.diff.outputs.examples }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -49,41 +55,27 @@ jobs:
       - name: Check format
         run: dart format --output=none --set-exit-if-changed .
 
+  # The entries are in ci/test-matrix.json. Each entry has:
+  # - packages: folders under packages/ to run `dart test` in.
+  # - vars: env vars for `dart test`.
+  # - services: containers to start (postgres, mariadb, mysql84, redis, minio).
+  # Notes on the entries:
+  # - The default server is native (dox_http_native, built by its build
+  #   hook). DOX_SERVER=dartio runs dox_core on dart:io too.
+  # - The default database drivers are native (dox_postgres_native and
+  #   dox_mysql_native, built by their build hooks with cargo).
+  #   DOX_DB_DRIVER=dart runs the same tests on the Dart drivers.
+  # - sqlite3 v3 bundles SQLite with a build hook. No system library needed.
+  # - The migration tests run on postgres, mysql and sqlite in one run.
+  # An empty matrix is an error, so the job is skipped when no entry is left.
   tests:
     name: ${{ matrix.name }}
     needs: changes
-    if: needs.changes.outputs.code == 'true'
+    if: needs.changes.outputs.tests != '{"include":[]}'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        # packages: folders under packages/ to run `dart test` in.
-        # vars: env vars for `dart test`.
-        # services: containers to start (postgres, mariadb, mysql84, redis, minio).
-        include:
-          # the default server is native (dox_http_native, built by its
-          # build hook). DOX_SERVER=dartio runs dox_core on dart:io too.
-          - { name: 'core (native)', packages: dox-core }
-          - { name: 'core (dart:io)', packages: dox-core, vars: DOX_SERVER=dartio }
-          - { name: 'app', packages: dox-app, services: redis }
-          - { name: 'builder, cli', packages: 'dox-builder dox-cli' }
-          - { name: 'small packages', packages: 'dox-annotation dox-auth dox-openapi dox-validation dox-http-native' }
-          - { name: 'redis (cache, socketio, websocket)', packages: 'dox-cache dox-socketio dox-websocket', services: redis }
-          - { name: 'storage (minio)', packages: dox-storage, services: minio }
-          # the default database drivers are native (dox_postgres_native and
-          # dox_mysql_native, built by their build hooks with cargo).
-          # DOX_DB_DRIVER=dart runs the same tests on the Dart drivers.
-          - { name: 'orm (postgres)', packages: dox-orm dox-postgres-native, vars: DRIVER=postgres DB_PORT=5432, services: postgres }
-          - { name: 'orm (postgres, dart driver)', packages: dox-orm, vars: DRIVER=postgres DB_PORT=5432 DOX_DB_DRIVER=dart, services: postgres }
-          - { name: 'orm (mariadb)', packages: dox-orm dox-mysql-native, vars: DRIVER=mysql DB_USER=dox DB_PORT=3306, services: mariadb }
-          - { name: 'orm (mariadb, dart driver)', packages: dox-orm, vars: DRIVER=mysql DB_USER=dox DB_PORT=3306 DOX_DB_DRIVER=dart, services: mariadb }
-          - { name: 'orm (mysql 8.4)', packages: dox-orm dox-mysql-native, vars: DRIVER=mysql DB_USER=dox DB_PORT=3307, services: mysql84 }
-          - { name: 'orm (mysql 8.4, dart driver)', packages: dox-orm, vars: DRIVER=mysql DB_USER=dox DB_PORT=3307 DOX_DB_DRIVER=dart, services: mysql84 }
-          # sqlite3 v3 bundles SQLite with a build hook. No system library needed.
-          - { name: 'orm (sqlite)', packages: dox-orm, vars: DRIVER=sqlite }
-          # the migration tests run on postgres, mysql and sqlite in one run
-          - { name: 'migration (mariadb)', packages: dox-migration, services: postgres mariadb }
-          - { name: 'migration (mysql 8.4)', packages: dox-migration, vars: MYSQL_PORT=3307, services: postgres mysql84 }
+      matrix: ${{ fromJSON(needs.changes.outputs.tests) }}
     steps:
       - uses: actions/checkout@v7
       # Start the containers first. They boot while the next steps run.
@@ -131,12 +123,11 @@ jobs:
   examples:
     name: example (${{ matrix.example }})
     needs: changes
-    if: needs.changes.outputs.code == 'true'
+    if: needs.changes.outputs.examples != '{"include":[]}'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        example: [blog-api, guides]
+      matrix: ${{ fromJSON(needs.changes.outputs.examples) }}
     defaults:
       run:
         working-directory: examples/${{ matrix.example }}
@@ -166,7 +157,7 @@ jobs:
       - run: dart test --concurrency=1
 
   # The required check on develop is named "test". This job keeps that name
-  # and fails when any job above fails.
+  # and fails when any job above fails or is cancelled. Skipped jobs pass.
   test:
     if: always()
     needs: [changes, lint, tests, examples]
