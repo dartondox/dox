@@ -37,8 +37,14 @@ RouteData? httpRouteHandler(HttpRequest req) {
       req.response.statusCode = HttpStatus.noContent;
       responseDataHandler(null, req);
     } else {
-      req.response.statusCode = HttpStatus.notFound;
-      responseDataHandler('${req.method} ${req.uri.path} not found', req);
+      /// same path as a thrown 404, so the app responseHandler can
+      /// format it. the default body is JSON.
+      httpResponseHandler(
+        NotFoundHttpException(
+          message: '${req.method} ${req.uri.path} not found',
+        ),
+        req,
+      );
     }
   }
   return route;

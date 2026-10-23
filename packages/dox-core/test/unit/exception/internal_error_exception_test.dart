@@ -9,7 +9,10 @@ void main() {
     );
 
     dynamic res = exception.toResponse();
-    expect(res, 'something went wrong');
+    expect(res, <String, dynamic>{
+      'code': 'internal_error',
+      'message': 'something went wrong',
+    });
     expect(exception.code, 500);
   });
 }

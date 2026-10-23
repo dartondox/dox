@@ -2,6 +2,7 @@
 
 - New `timestamps` option on `@DoxModel`. `timestamps: false` turns off `created_at` and `updated_at`, like `$timestamps = false` in Laravel. `createdAt: null` or `updatedAt: null` turns off one of them.
 - New `primaryKeyType` option on `@DoxModel`. Use `primaryKeyType: String` for a UUID key. The default is `int`.
+- Fix: `IHttpException.toResponse()` now returns `{"code": errorCode, "message": message}` for a text message, so the client gets the `errorCode`. A `Map` message is returned as it is.
 
 ## 3.0.0-alpha.4
 

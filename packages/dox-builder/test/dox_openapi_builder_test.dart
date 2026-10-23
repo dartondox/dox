@@ -187,6 +187,9 @@ class ApiRoutes extends Router {
     Route.group('/teams', () {
       Route.get('/', TeamController().index);
     });
+    Route.group('blogs', () {
+      Route.get('all', TeamController().index);
+    });
   }
 }
 ''';
@@ -282,6 +285,15 @@ void main() {
         contains(
           _flat(
             "OpenApiRouteBinding('GET', 'api/teams/', 'TeamController.index')",
+          ),
+        ),
+      );
+      // a group without slashes still gets one between the parts
+      expect(
+        out,
+        contains(
+          _flat(
+            "OpenApiRouteBinding('GET', 'api/blogs/all', 'TeamController.index')",
           ),
         ),
       );

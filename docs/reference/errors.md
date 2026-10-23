@@ -48,7 +48,10 @@ See [Environment variables](../digging-deeper/env.md).
 
 ## dox_core: requests (what the client gets)
 
-| Status | Body text | When | What to do |
+An `IHttpException` with a text message answers `{"code":"<errorCode>","message":"<text>"}`.
+The table shows the `message` text.
+
+| Status | Message | When | What to do |
 | --- | --- | --- | --- |
 | `404` | `<METHOD> <path> not found` | No route matches. | Check the method, the path and the router `prefix`. |
 | `404` | `Not Found` | A typed path param does not fit, like `abc` for `int id`. | Send a valid value. |
@@ -67,7 +70,7 @@ See [Environment variables](../digging-deeper/env.md).
 | --- | --- | --- |
 | `Bad state: <T> is not a known DTO. Add @Dto() to it, run `dart run build_runner build` and set `dtos: dtos` (lib/dtos.g.dart) in AppConfig.` | `req.validate<T>()` can not find `T`. | Do what the text says. |
 | `Invalid argument(s): Storage disk "<name>" has unknown driver "<type>"` | A disk in `StorageConfig` has a `driver` other than `local`, `s3` or `memory`. | Fix the driver name. |
-| `type 'Null' is not a subtype of type 'String' in type cast` | An `s3` disk without `bucket`, `key` or `secret`, on its first use. | Set `AWS_BUCKET`, `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`. |
+| `Invalid argument(s): Storage disk "<name>" needs the "<setting>" setting. It is missing or empty.` | An `s3` disk without `bucket`, `key` or `secret`, on its first use. | Set `AWS_BUCKET`, `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`. |
 | `Invalid argument(s): invalid file` | `Storage().put()` with no `extension:`, and Dox can not find the type from the bytes. | Pass `extension: 'pdf'`. |
 | `403` `invalid or expired signature` | A `Route.files()` URL without a valid `signature`, or after `expires`. | Make a new link with `Storage().signedUrl()`. |
 | `404` `file not found` | `Storage().stream()` or `download()` of a missing file. | Check the path. |

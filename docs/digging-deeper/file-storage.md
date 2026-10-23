@@ -66,7 +66,7 @@ Then pass it to `AppConfig(storage: storage)` in `lib/config/app.dart`.
 | `s3` | `bucket`, `region`, `key`, `secret`, `token`, `endpoint`, `path_style` (MinIO), `url` (CDN), `visibility`, `acl`, `batch_delete` |
 | `memory` | none. For tests |
 
-The `s3` disk needs `bucket`, `key` and `secret`. When one is missing, the first use of the disk throws an error.
+The `s3` disk needs `bucket`, `key` and `secret`. When one is missing or empty, the first use of the disk throws an `ArgumentError` that names the setting, like `Storage disk "s3" needs the "bucket" setting. It is missing or empty.`
 
 ## Functions
 

@@ -6,7 +6,10 @@ void main() {
     QueryException exception = QueryException();
 
     dynamic res = exception.toResponse();
-    expect(res, 'Error in sql query');
+    expect(res, <String, dynamic>{
+      'code': 'sql_query_error',
+      'message': 'Error in sql query',
+    });
     expect(exception.code, 500);
   });
 }

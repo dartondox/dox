@@ -152,6 +152,9 @@ class LoggerConfig {
   final String name;
   final bool enabled;
   final bool prettyPrint;
+
+  /// lowest level to print: `debug`, `info`, `warn` or `error`.
+  /// `success` counts as `info`, `danger` as `error`.
   final String level;
 
   const LoggerConfig({

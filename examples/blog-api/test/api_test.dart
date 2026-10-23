@@ -87,7 +87,10 @@ void main() {
       'password': 'wrong',
     });
     expect(res.statusCode, 401);
-    expect(res.body, 'Wrong email or password');
+    expect(jsonDecode(res.body), <String, dynamic>{
+      'code': 'unauthorized',
+      'message': 'Wrong email or password',
+    });
 
     res = await post('/api/auth/login', <String, dynamic>{
       'email': email,
@@ -103,7 +106,10 @@ void main() {
       'body': 'Written with a token.',
     });
     expect(res.statusCode, 401);
-    expect(res.body, 'Authentication failed');
+    expect(jsonDecode(res.body), <String, dynamic>{
+      'code': 'unauthorized',
+      'message': 'Authentication failed',
+    });
   });
 
   test('step 4: bad input gets 422', () async {

@@ -134,6 +134,39 @@ void main() {
       expect(routes[3].method, 'POST');
     });
 
+    test('group joins parts with one slash', () {
+      Route.group('blogs', () {
+        Route.get('all', (DoxRequest req) {});
+        Route.get('', (DoxRequest req) {});
+        Route.group('/admin/', () {
+          Route.get('/users/', (DoxRequest req) {});
+          Route.resource('posts', AdminController());
+        });
+      });
+      Route.group('', () {
+        Route.get('', (DoxRequest req) {});
+      });
+      Route.prefix('api');
+      Route.get('ping', (DoxRequest req) {});
+      Route.prefix('');
+
+      List<String> paths = Route().routes.map((RouteData r) => r.path).toList();
+      expect(paths[0], '/blogs/all');
+      expect(paths[1], '/blogs');
+      expect(paths[2], '/blogs/admin/users');
+      expect(paths[3], '/blogs/admin/posts');
+      expect(paths[4], '/blogs/admin/posts/create');
+      expect(paths.reversed.elementAt(1), '/');
+      expect(paths.last, '/api/ping');
+    });
+
+    test('resource route does not hide errors', () {
+      expect(
+        () => Route.resource('broken', _BrokenController()),
+        throwsStateError,
+      );
+    });
+
     test('resource route', () {
       Route.resource('admins', AdminController());
 
@@ -208,4 +241,9 @@ void main() {
       expect(routes[1].domain, 'dartondox.dev');
     });
   });
+}
+
+/// `index` throws a real error, not a missing method
+class _BrokenController {
+  dynamic get index => throw StateError('broken');
 }

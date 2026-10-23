@@ -1,5 +1,3 @@
-// ignore_for_file: empty_catches
-
 import 'dart:io';
 
 import 'package:dox_core/constants/http_request_method.dart';
@@ -78,7 +76,7 @@ class Route {
     String originalPrefix = Route()._prefix;
 
     /// set new prefix
-    Route()._prefix = originalPrefix + prefix;
+    Route()._prefix = '$originalPrefix/$prefix';
     callback();
 
     /// restore original prefix
@@ -187,8 +185,12 @@ class Route {
   /// Route.prefix('blog');
   /// ```
   static void prefix(String prefix) {
-    Route()._prefix = '$prefix/';
+    Route()._prefix = prefix;
   }
+
+  /// join the prefix and [path] with one `/`.
+  /// `_addRoute` cleans double and edge slashes later.
+  String _join(String path) => '$_prefix/$path';
 
   /// add websocket route
   /// For this usage, you must use `dox-websocket` package.
@@ -207,7 +209,7 @@ class Route {
       throw Exception('websocket is not registered');
     }
     WebsocketEvent event = ws.create();
-    Route()._addRoute(HttpRequestMethod.GET, Route()._prefix + route, <dynamic>[
+    Route()._addRoute(HttpRequestMethod.GET, Route()._join(route), <dynamic>[
       ...middleware,
       event.handle,
     ]);
@@ -221,7 +223,7 @@ class Route {
   static Route get(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.GET,
-      Route()._prefix + route,
+      Route()._join(route),
       controller,
     );
   }
@@ -235,7 +237,7 @@ class Route {
   static Route post(String route, dynamic controller, {Object? body}) {
     return Route()._addRoute(
       HttpRequestMethod.POST,
-      Route()._prefix + route,
+      Route()._join(route),
       controller,
       body: body,
     );
@@ -248,7 +250,7 @@ class Route {
   static Route put(String route, dynamic controller, {Object? body}) {
     return Route()._addRoute(
       HttpRequestMethod.PUT,
-      Route()._prefix + route,
+      Route()._join(route),
       controller,
       body: body,
     );
@@ -261,7 +263,7 @@ class Route {
   static Route delete(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.DELETE,
-      Route()._prefix + route,
+      Route()._join(route),
       controller,
     );
   }
@@ -273,7 +275,7 @@ class Route {
   static Route purge(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.PURGE,
-      Route()._prefix + route,
+      Route()._join(route),
       controller,
     );
   }
@@ -285,7 +287,7 @@ class Route {
   static Route patch(String route, dynamic controller, {Object? body}) {
     return Route()._addRoute(
       HttpRequestMethod.PATCH,
-      Route()._prefix + route,
+      Route()._join(route),
       controller,
       body: body,
     );
@@ -298,7 +300,7 @@ class Route {
   static Route options(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.OPTIONS,
-      Route()._prefix + route,
+      Route()._join(route),
       controller,
     );
   }
@@ -310,7 +312,7 @@ class Route {
   static Route copy(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.COPY,
-      Route()._prefix + route,
+      Route()._join(route),
       controller,
     );
   }
@@ -322,7 +324,7 @@ class Route {
   static Route view(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.VIEW,
-      Route()._prefix + route,
+      Route()._join(route),
       controller,
     );
   }
@@ -334,7 +336,7 @@ class Route {
   static Route link(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.LINK,
-      Route()._prefix + route,
+      Route()._join(route),
       controller,
     );
   }
@@ -346,7 +348,7 @@ class Route {
   static Route unlink(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.UNLINK,
-      Route()._prefix + route,
+      Route()._join(route),
       controller,
     );
   }
@@ -358,7 +360,7 @@ class Route {
   static Route lock(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.LOCK,
-      Route()._prefix + route,
+      Route()._join(route),
       controller,
     );
   }
@@ -370,7 +372,7 @@ class Route {
   static Route unlock(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.UNLOCK,
-      Route()._prefix + route,
+      Route()._join(route),
       controller,
     );
   }
@@ -382,7 +384,7 @@ class Route {
   static Route propfind(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.PROPFIND,
-      Route()._prefix + route,
+      Route()._join(route),
       controller,
     );
   }
@@ -392,69 +394,57 @@ class Route {
   /// Route.resource('blog', BlogController());
   /// ```
   static Route resource(String route, dynamic controller) {
-    String prefix = '${Route()._prefix}/$route';
+    Route r = Route();
+    String path = r._join(route);
+    r._resourceRoute(HttpRequestMethod.GET, path, () => controller.index);
+    r._resourceRoute(
+      HttpRequestMethod.GET,
+      '$path/create',
+      () => controller.create,
+    );
+    r._resourceRoute(HttpRequestMethod.POST, path, () => controller.store);
+    r._resourceRoute(
+      HttpRequestMethod.GET,
+      '$path/{id}',
+      () => controller.show,
+    );
+    r._resourceRoute(
+      HttpRequestMethod.GET,
+      '$path/{id}/edit',
+      () => controller.edit,
+    );
+    r._resourceRoute(
+      HttpRequestMethod.PUT,
+      '$path/{id}',
+      () => controller.update,
+    );
+    r._resourceRoute(
+      HttpRequestMethod.PATCH,
+      '$path/{id}',
+      () => controller.update,
+    );
+    r._resourceRoute(
+      HttpRequestMethod.DELETE,
+      '$path/{id}',
+      () => controller.destroy,
+    );
+    return r;
+  }
 
-    /// GET /resource
+  /// add one route of [resource]. a controller without this method
+  /// (eg. no `store`) gets no route. any other error is not caught.
+  void _resourceRoute(
+    HttpRequestMethod method,
+    String path,
+    dynamic Function() readAction,
+  ) {
+    dynamic action;
     try {
-      Route()._addRoute(HttpRequestMethod.GET, prefix, controller.index);
-    } catch (error) {}
-
-    /// GET /resource/create
-    try {
-      Route()._addRoute(
-        HttpRequestMethod.GET,
-        '$prefix/create',
-        controller.create,
-      );
-    } catch (error) {}
-
-    /// POST /resource
-    try {
-      Route()._addRoute(HttpRequestMethod.POST, prefix, controller.store);
-    } catch (error) {}
-
-    /// GET /resource/{id}
-    try {
-      Route()._addRoute(HttpRequestMethod.GET, '$prefix/{id}', controller.show);
-    } catch (error) {}
-
-    /// GET /resource/{id}/edit
-    try {
-      Route()._addRoute(
-        HttpRequestMethod.GET,
-        '$prefix/{id}/edit',
-        controller.edit,
-      );
-    } catch (error) {}
-
-    /// PUT /resource/{id}
-    try {
-      Route()._addRoute(
-        HttpRequestMethod.PUT,
-        '$prefix/{id}',
-        controller.update,
-      );
-    } catch (error) {}
-
-    /// PATCH /resource/{id}
-    try {
-      Route()._addRoute(
-        HttpRequestMethod.PATCH,
-        '$prefix/{id}',
-        controller.update,
-      );
-    } catch (error) {}
-
-    /// DELETE /resource/{id}
-    try {
-      Route()._addRoute(
-        HttpRequestMethod.DELETE,
-        '$prefix/{id}',
-        controller.destroy,
-      );
-    } catch (error) {}
-
-    return Route();
+      action = readAction();
+    } on NoSuchMethodError {
+      return;
+    }
+    _addRoute(method, path, action);
   }
 
   Route _addRoute(
