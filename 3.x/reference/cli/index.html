@@ -4461,13 +4461,9 @@ Prints <code>&lt;key&gt; : Key have been updated successfully in .env!</code>.</
 <p>What it does with <code>.env</code>:</p>
 <ul>
 <li>Reads <code>.env</code> in the current folder. The file must exist, else the command fails with a file error.</li>
-<li>Keeps every <code>KEY=value</code> line. Replaces the value of <code>APP_KEY</code>.</li>
+<li>Replaces the value of <code>APP_KEY</code>. Every other line stays as it is, in the same order. This keeps comments, blank lines, quotes and values with more than one <code>=</code> (like <code>DATABASE_URL=postgres://u:p@h/db?a=b</code>).</li>
 <li>Adds <code>APP_KEY=&lt;key&gt;</code> as the first line when there is no <code>APP_KEY</code>.</li>
 </ul>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The rewrite only keeps lines with exactly one <code>=</code>. A line like <code>DATABASE_URL=postgres://u:p@h/db?a=b</code> has two <code>=</code> and is dropped from <code>.env</code>. Comment lines are dropped too. Back up <code>.env</code> first when it has such lines.</p>
-</div>
 <p>Source: <code>packages/dox-cli/lib/src/tools/generate_key.dart</code>.</p>
 <h3 id="dox-envgenerate"><code>dox env:generate</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>dox env:generate
