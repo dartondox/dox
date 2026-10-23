@@ -124,8 +124,10 @@ AppConfig(
   `req.isSecure()` is true for `https`.
 - `trustedProxies` is empty by default. Then Dox ignores those headers,
   because any client can send them.
-- `['*']` trusts everyone. Only use it when the app port is not reachable
-  from outside.
+- `['*']` trusts any direct client. Only use it when the app port is not
+  reachable from outside. With `*`, `req.ip()` is the right-most
+  `X-Forwarded-For` hop, the one your proxy added. If you have two proxies
+  in a row, list their IPs or ranges instead.
 
 ### Caddy
 
