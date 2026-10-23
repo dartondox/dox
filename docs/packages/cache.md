@@ -173,4 +173,12 @@ cache.addStore('ready', MemoryDriver()); // or add a ready driver
 ```
 
 `MyDriver extends CacheDriver`. It must implement `prefix`, `get`, `put`, `add`, `increment`, `forget` and `flush`.
-Override `lock` to support locks.
+Override `lock` to support locks, and `close` to close its connections.
+
+## Close
+
+`cache.close()` closes the connections of every store that was built, eg. the Redis connections.
+Memory, file and null stores have nothing to close. It is safe to call twice.
+A store used after it is built again.
+
+In a Dox app you do not call it. Dox closes `Cache()` stores on shutdown, in every isolate, after the open requests are done.

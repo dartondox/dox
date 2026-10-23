@@ -1,3 +1,18 @@
+## Unreleased
+
+- Graceful shutdown closes the cache stores of `Cache()` (eg. Redis), in every isolate, after the `DoxShutdown` services. Your app needs no extra code.
+- The `ORMService` of a new project implements `DoxShutdown` and calls `SqlQueryBuilder.close()`, so the database connections close on shutdown too. In an older project, add this to `lib/services/orm_service.dart`:
+  ```dart
+  class ORMService implements DoxService, DoxShutdown {
+    // setup() as before
+
+    @override
+    Future<void> shutdown() async {
+      await SqlQueryBuilder.close();
+    }
+  }
+  ```
+
 ## 3.0.0-alpha.5
 
 - Fix: CORS `origin` can be a list. Dox compares the request `Origin` with the list and sends back only the origin that matches, or no header. Before, it joined the list with commas, and browsers rejected it. A list also sends `Vary: Origin`.

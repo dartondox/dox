@@ -42,6 +42,19 @@ class MysqlDriver extends DBDriver {
     return pool;
   }
 
+  /// close the pool. a connect that failed has nothing to close.
+  @override
+  Future<void> close() async {
+    Object? c = conn;
+    conn = null;
+    try {
+      if (c is Future) c = await c;
+    } catch (_) {
+      return;
+    }
+    if (c is MySQLConnectionPool) await c.close();
+  }
+
   /// run [sql] in the open transaction if any, else on a free pooled
   /// connection
   Future<IResultSet> _run(String sql, Map<String, dynamic>? values) async {

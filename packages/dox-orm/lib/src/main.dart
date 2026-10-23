@@ -13,7 +13,20 @@ class SqlQueryBuilder {
 
   SqlQueryBuilder._internal();
 
-  late DBDriver dbDriver;
+  DBDriver? _dbDriver;
+
+  /// the driver of the default connection
+  DBDriver get dbDriver {
+    DBDriver? driver = _dbDriver;
+    if (driver == null) {
+      throw StateError(
+        'The ORM is not set up. Call SqlQueryBuilder.initialize first.',
+      );
+    }
+    return driver;
+  }
+
+  set dbDriver(DBDriver driver) => _dbDriver = driver;
 
   bool debug = true;
 
@@ -47,6 +60,26 @@ class SqlQueryBuilder {
       connection,
     );
     return _globalDrivers[connection] = connConfig.createDriver();
+  }
+
+  /// Close every open database connection of this isolate: the default
+  /// connection and all named connections. Running queries finish first.
+  /// It is safe to call it twice. Call `initialize` again to use the
+  /// database after it.
+  /// ```
+  /// await SqlQueryBuilder.close();
+  /// ```
+  static Future<void> close() async {
+    SqlQueryBuilder sql = SqlQueryBuilder();
+    Set<DBDriver> drivers = <DBDriver>{
+      ?sql._dbDriver,
+      ..._globalDrivers.values,
+    };
+    sql._dbDriver = null;
+    _globalDrivers.clear();
+    for (DBDriver driver in drivers) {
+      await driver.close();
+    }
   }
 
   /// initialize query builder

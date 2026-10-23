@@ -218,8 +218,9 @@ On `SIGTERM` (docker stop, Kubernetes, Cloud Run, Fly, systemd) or `SIGINT` (Ctr
 1. It stops taking new connections at once.
 2. Open requests can finish. Each keep-alive connection closes after its current answer.
 3. After `shutdownTimeout` (default 8 seconds), it closes the connections that are still open.
-4. It runs `shutdown()` of each service that implements `DoxShutdown` (see [Services](services.md#clean-up-on-shutdown)).
-5. The process exits with code `0`.
+4. It runs `shutdown()` of each service that implements `DoxShutdown` (see [Services](services.md#clean-up-on-shutdown)). The `ORMService` of a new project closes the database connections here.
+5. It closes the cache stores of `Cache()`, eg. the Redis connections.
+6. The process exits with code `0`.
 
 A second `SIGINT` or `SIGTERM` stops the process at once.
 

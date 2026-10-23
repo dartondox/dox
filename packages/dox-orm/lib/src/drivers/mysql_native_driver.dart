@@ -46,6 +46,17 @@ class MysqlNativeDriver extends DBDriver {
   int get _tx =>
       (Zone.current[_txKey] as Map<MysqlNativePool, int>?)?[pool] ?? 0;
 
+  bool _closed = false;
+
+  /// let go of the pool. isolates with the same settings share one pool,
+  /// and it closes when the last one lets go. running queries finish.
+  @override
+  Future<void> close() async {
+    if (_closed) return;
+    _closed = true;
+    pool.close();
+  }
+
   Future<MysqlNativeResult> _run(
     String sql,
     Map<String, dynamic>? values,

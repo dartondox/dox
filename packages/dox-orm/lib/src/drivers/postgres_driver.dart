@@ -61,6 +61,24 @@ class PostgresDriver extends DBDriver {
     return conn;
   }
 
+  /// close the connection or the pool. a connect that failed has nothing
+  /// to close.
+  @override
+  Future<void> close() async {
+    Object? c = conn;
+    conn = null;
+    try {
+      if (c is Future) c = await c;
+    } catch (_) {
+      return;
+    }
+    if (c is Pool) {
+      await c.close();
+    } else if (c is Connection) {
+      await c.close();
+    }
+  }
+
   /// run query and return map result
   @override
   Future<List<Map<String, dynamic>>> query(

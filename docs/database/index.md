@@ -115,12 +115,19 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 
 Start the ORM in a service.
 Each isolate runs the service, so each isolate gets its own pool.
+On shutdown, `SqlQueryBuilder.close()` closes every connection of the isolate.
 
 ```dart title="lib/services/orm_service.dart"
-class ORMService implements DoxService {
+class ORMService implements DoxService, DoxShutdown {
   @override
   Future<void> setup() async {
     SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
+  }
+
+  /// Close the database connections when the server stops.
+  @override
+  Future<void> shutdown() async {
+    await SqlQueryBuilder.close();
   }
 }
 ```

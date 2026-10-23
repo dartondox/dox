@@ -37,6 +37,14 @@ if redis.call('GET', KEYS[1]) == ARGV[1] then
 end
 return 0''';
 
+  /// Close the connection and the pool connections, with no reconnect.
+  /// It sends no command, so it works when Redis is down.
+  @override
+  Future<void> close() async {
+    redis.pool.destroyAll();
+    await redis.disconnect();
+  }
+
   @override
   Future<dynamic> get(String key) async {
     Object? reply = await redis.sendCommand(<String>['GET', prefix + key]);

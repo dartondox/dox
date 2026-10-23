@@ -37,6 +37,16 @@ void main() {
     await directory.delete(recursive: true);
   });
 
+  test('close() is safe for memory and file stores, also twice', () async {
+    await manager.store().put('a', 1);
+    await manager.store('file').put('a', 1);
+    CacheStore before = manager.store();
+    await manager.close();
+    await manager.close();
+    expect(identical(manager.store(), before), isFalse);
+    expect(await manager.store('file').get('a'), 1);
+  });
+
   test('default store is the configured one', () async {
     expect(manager.store().driver, isA<MemoryDriver>());
     expect((manager.store().driver as MemoryDriver).maxSize, 10);
