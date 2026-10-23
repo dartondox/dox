@@ -4564,6 +4564,8 @@ await Storage().disk('s3').put('reports', bytes, extension: 'pdf');
 
 `putRequestFile` on the local disk moves the upload temp file. It does not read it into memory.
 
+`putRequestFile` and `file.store()` take the extension from the file name. When the bytes are a known format (png, jpg, pdf, zip, ...) that does not match the name, the extension of the bytes is used. So a png sent as `a.html` is saved as `.png` and is never served as a web page.
+
 ### `stream` and `download`
 
 ```dart
@@ -5182,9 +5184,11 @@ Two events are built in:
 | Event | Direction | What it does |
 | --- | --- | --- |
 | `connected` | server to client | sent once after connect. `message` is `{"id": "<socket id>"}` |
-| `joinRoom` | client to server | joins the room. `message` is the room name |
+| `joinRoom` | client to server | joins the room. `message` is the room name, up to 255 chars. A name that starts with `room:` is ignored |
 
-Each client is also in a room for its route, so `emitter.emit()` with no room reaches all clients of the same route.
+A client starts in a room for its route, so `emitter.emit()` with no room reaches all clients of the same route. A client is in one room at a time. When it joins a room, it leaves the room it was in, also the route room.
+
+Any client can join any other room by its name. Do not send private data to a room that a client can guess, like `user:42`. Send it with `emitToSender`. Or use a route with auth middleware, and call `emitter.emit()` with no room, so only clients of that route get it.
 
 ## Client examples
 
@@ -17108,6 +17112,8 @@ What changed in each package, newest first. This page is made from the
 
 ### 3.0.0-alpha.6
 
+- Security: `Storage().putRequestFile()` and `RequestFile.store()` no longer trust the client file name when the bytes are a known format that does not match it. Before, a valid png sent as `a.html` passed `@Image`/`@Mimes` and was saved as `.html`, so `Route.files()` served it as `text/html` on the app origin (stored XSS). Now it is saved with the extension of the bytes (`.png`).
+- Security: new upload file names use a random uuid (v4), not a time-based one (v1). A v1 name shows the upload time and the server, and the next name is easy to guess.
 - Graceful shutdown closes the cache stores of `Cache()` (eg. Redis), in every isolate, after the `DoxShutdown` services. Your app needs no extra code.
 - The `ORMService` of a new project implements `DoxShutdown` and calls `SqlQueryBuilder.close()`, so the database connections close on shutdown too. In an older project, add this to `lib/services/orm_service.dart`:
   ```dart
@@ -17495,6 +17501,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_socketio
 
+### Unreleased
+
+- Security: a binary packet may have at most 10 attachments (`SocketDecoder(maxAttachments: ...)`). More closes the connection with a parse error. Before, a client could send `51000000-[...]` before any auth and the server kept every binary frame after it in memory.
+
 ### 3.0.0-alpha.6
 
 - Version bump only, to match the other packages.
@@ -17603,6 +17613,11 @@ What changed in each package, newest first. This page is made from the
 - Laravel style string rules with `v.fromRules()`.
 
 ## dox_websocket
+
+### Unreleased
+
+- Security: a client can not `joinRoom` a room that starts with `room:`. That is the default room of a route, so a client of a public route could join the room of a route with auth middleware and get all its messages.
+- Security: a room with no members is removed, and a room name longer than 255 chars is not joined. Before, every room name a client sent stayed in memory, so one client could fill the memory of the server.
 
 ### 3.0.0-alpha.6
 

@@ -4394,11 +4394,12 @@ The Redis adapter sends each message to all isolates and all servers.</p>
 <tr>
 <td><code>joinRoom</code></td>
 <td>client to server</td>
-<td>joins the room. <code>message</code> is the room name</td>
+<td>joins the room. <code>message</code> is the room name, up to 255 chars. A name that starts with <code>room:</code> is ignored</td>
 </tr>
 </tbody>
 </table>
-<p>Each client is also in a room for its route, so <code>emitter.emit()</code> with no room reaches all clients of the same route.</p>
+<p>A client starts in a room for its route, so <code>emitter.emit()</code> with no room reaches all clients of the same route. A client is in one room at a time. When it joins a room, it leaves the room it was in, also the route room.</p>
+<p>Any client can join any other room by its name. Do not send private data to a room that a client can guess, like <code>user:42</code>. Send it with <code>emitToSender</code>. Or use a route with auth middleware, and call <code>emitter.emit()</code> with no room, so only clients of that route get it.</p>
 <h2 id="client-examples">Client examples</h2>
 <h3 id="dart">Dart</h3>
 <p>Use <code>WebSocket</code> from <code>dart:io</code>.</p>
