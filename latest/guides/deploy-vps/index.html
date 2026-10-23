@@ -3536,6 +3536,8 @@
       
         
       
+        
+      
     
     
     
@@ -3900,6 +3902,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../others/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -4110,7 +4140,7 @@
 <p><code>dox build</code> makes a native binary for the system it runs on. A binary built on macOS does not run on Linux.
 So build it inside the <code>dart:stable</code> image (it is Debian):</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-v<span class="w"> </span><span class="s2">"</span><span class="nv">$PWD</span><span class="s2">"</span>:/app<span class="w"> </span>-w<span class="w"> </span>/app<span class="w"> </span>dart:stable<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="s1">'dart pub get &amp;&amp; dart pub global activate dox 3.0.0-alpha.4 &amp;&amp; /root/.pub-cache/bin/dox build'</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="s1">'dart pub get &amp;&amp; dart pub global activate dox ^3.0.0-alpha &amp;&amp; /root/.pub-cache/bin/dox build'</span>
 </span></code></pre></div>
 <p>The result is <code>build/bundle/</code>:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>build/bundle/

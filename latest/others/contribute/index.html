@@ -16,6 +16,8 @@
         <link rel="prev" href="../../reference/changelog/">
       
       
+        <link rel="next" href="../mascot/">
+      
       
         
       
@@ -3350,6 +3352,8 @@
       
         
       
+        
+      
     
     
     
@@ -3956,6 +3960,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -4255,31 +4287,19 @@ There is one <code>pubspec.lock</code> for the whole repo.</p>
 </ol>
 <h2 id="release-maintainers">Release (maintainers)</h2>
 <p>The <code>Release</code> GitHub workflow (<code>.github/workflows/publish.yaml</code>) publishes all public packages to pub.dev.
-It runs when you push a tag like <code>v3.0.0-alpha.4</code>.
+It runs when you push a tag like <code>v3.0.0-alpha.5</code>.
 It uses pub.dev automated publishing, so it needs no token or secret.</p>
 <h3 id="steps">Steps</h3>
+<p>The full guide is <a href="https://github.com/dartondox/dox/blob/develop/RELEASING.md">RELEASING.md</a> in the repo. In short:</p>
 <ol>
-<li>Set the new version in the root <code>pubspec.yaml</code>, for example <code>version: 3.0.0-alpha.4</code>.</li>
-<li>Run the script.
-   <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>bash<span class="w"> </span>bin/update_versions.sh
-</span></code></pre></div>
-   It copies the version to every <code>packages/*/pubspec.yaml</code>.
-   It sets every sibling dependency to <code>^3.0.0-alpha.4</code>.
-   It also writes the CLI version constant in <code>packages/dox-cli/lib/src/version.dart</code>.</li>
-<li>Add a <code>## 3.0.0-alpha.4</code> entry to the <code>CHANGELOG.md</code> of each package. pub.dev warns when it is missing.</li>
-<li><strong>New package only:</strong> turn on pub.dev automated publishing for it. See <a href="#one-time-setup">One-time setup</a>.
-   If you skip this, the Release workflow fails on this package.
-   A new package must first exist on pub.dev, so publish its first version by hand with <code>dart pub publish</code>.</li>
-<li>Commit and push.
-   <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git<span class="w"> </span>commit<span class="w"> </span>-am<span class="w"> </span><span class="s2">"release 3.0.0-alpha.4"</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>git<span class="w"> </span>push
-</span></code></pre></div></li>
-<li>Wait until the <code>Test</code> workflow is green for this commit. The Release workflow does not run the tests.</li>
-<li>Tag and push the tag. This starts the publish.
-   <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>git<span class="w"> </span>tag<span class="w"> </span>v3.0.0-alpha.4
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>v3.0.0-alpha.4
-</span></code></pre></div></li>
+<li>Bump every package with <code>bin/update_versions.sh</code>, and close the <code>## Unreleased</code> section of each <code>CHANGELOG.md</code>.</li>
+<li>Push one tag per native package (<code>dox_http_native-v&lt;version&gt;</code>, <code>dox_postgres_native-v&lt;version&gt;</code>, <code>dox_mysql_native-v&lt;version&gt;</code>). GitHub builds the libraries for 5 platforms.</li>
+<li>Write their hashes into the code with <code>dart run bin/native_hashes.dart &lt;tag&gt;</code>.</li>
+<li>Merge the release PR, then push the tag <code>v&lt;version&gt;</code>. This publishes to pub.dev.</li>
+<li>Release the matching <code>dox-sample</code> template.</li>
 </ol>
+<p><strong>New package only:</strong> turn on pub.dev automated publishing for it first. See <a href="#one-time-setup">One-time setup</a>.
+A new package must first exist on pub.dev, so publish its first version by hand with <code>dart pub publish</code>.</p>
 <h3 id="what-the-workflow-does">What the workflow does</h3>
 <ol>
 <li>It checks that the tag (without <code>v</code>) is the root version, and that every package has this version.
@@ -4293,7 +4313,7 @@ It uses pub.dev automated publishing, so it needs no token or secret.</p>
    After each one, it waits until <code>dart pub get</code> can find the new version. Then the next package can depend on it.</li>
 </ol>
 <p>To see the order on your machine:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3<span class="w"> </span>bin/publish_order.py
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3<span class="w"> </span>bin/publish_order.py
 </span></code></pre></div>
 <p>A package is skipped when its version is already on pub.dev.
 So if a run fails halfway, fix the problem and click "Re-run jobs". It continues where it stopped.</p>
@@ -4351,10 +4371,10 @@ The old <code>PUB_CREDENTIALS</code> secret is not used any more.</p>
 </tbody>
 </table>
 <h3 id="write-and-preview">Write and preview</h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>.venv/bin/pip<span class="w"> </span>install<span class="w"> </span><span class="nv">mkdocs</span><span class="o">==</span><span class="m">1</span>.6.1<span class="w"> </span>mkdocs-material<span class="o">==</span><span class="m">9</span>.7.7<span class="w"> </span><span class="nv">mike</span><span class="o">==</span><span class="m">2</span>.2.0
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>.venv/bin/mkdocs<span class="w"> </span>serve<span class="w">           </span><span class="c1"># live preview of this branch</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>.venv/bin/mkdocs<span class="w"> </span>build<span class="w"> </span>--strict<span class="w">  </span><span class="c1"># the same check as CI. Broken links fail.</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>.venv/bin/pip<span class="w"> </span>install<span class="w"> </span><span class="nv">mkdocs</span><span class="o">==</span><span class="m">1</span>.6.1<span class="w"> </span>mkdocs-material<span class="o">==</span><span class="m">9</span>.7.7<span class="w"> </span><span class="nv">mike</span><span class="o">==</span><span class="m">2</span>.2.0
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>.venv/bin/mkdocs<span class="w"> </span>serve<span class="w">           </span><span class="c1"># live preview of this branch</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>.venv/bin/mkdocs<span class="w"> </span>build<span class="w"> </span>--strict<span class="w">  </span><span class="c1"># the same check as CI. Broken links fail.</span>
 </span></code></pre></div>
 <h3 id="deploy">Deploy</h3>
 <ul>
@@ -4433,6 +4453,22 @@ branch, and add <code>3.x</code> to the workflow input, so 3.x can still be fixe
             </div>
           </a>
         
+        
+          
+          <a href="../mascot/" class="md-footer__link md-footer__link--next" aria-label="Next: Meet Doxie">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Meet Doxie
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
         
       </nav>
     

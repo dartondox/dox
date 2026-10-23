@@ -91,3 +91,4 @@ The full docs as one file: https://dartondox.dev/latest/3.xllms-full.txt
 - [Error index](https://dartondox.dev/latest/3.xreference/errors/)
 - [Changelog](https://dartondox.dev/latest/3.xreference/changelog/)
 - [Contribute](https://dartondox.dev/latest/3.xothers/contribute/)
+- [Meet Doxie](https://dartondox.dev/latest/3.xothers/mascot/)

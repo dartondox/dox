@@ -3352,6 +3352,8 @@
       
         
       
+        
+      
     
     
     
@@ -4007,6 +4009,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../others/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -4335,7 +4365,7 @@ The file templates are Dart strings inside <code>packages/dox-cli/lib/src/tools/
 <tbody>
 <tr>
 <td><code>--version &lt;v&gt;</code> (or <code>--v</code>)</td>
-<td>The release tag to clone, like <code>3.0.0-alpha.4</code> or <code>v3.0.0-alpha.4</code>. Without it, the newest <code>dox-sample</code> release with the same major version as the CLI is used (pre-releases included).</td>
+<td>The release tag to clone, like <code>3.0.0-alpha.5</code> or <code>v3.0.0-alpha.5</code>. Without it, the newest <code>dox-sample</code> release with the same major version as the CLI is used (pre-releases included).</td>
 </tr>
 </tbody>
 </table>
@@ -4348,12 +4378,6 @@ The file templates are Dart strings inside <code>packages/dox-cli/lib/src/tools/
 <li>Replaces <code>dox_sample</code> with your project name in every file, except files under <code>bin/dox</code>.</li>
 </ol>
 <p>Needs <code>curl</code> and <code>git</code> on the <code>PATH</code>.</p>
-<div class="admonition warning">
-<p class="admonition-title">Known bug: <code>dox create my_app</code> without <code>--version</code> throws <code>RangeError</code></p>
-<p>The command reads <code>args[1]</code> before it checks how many arguments there are.
-With only the project name you get <code>RangeError (index): Invalid value: Only valid value is 0: 1</code>.
-Workaround: always pass the version, <code>dox create my_app --version 3.0.0-alpha.4</code>.</p>
-</div>
 <p>Source: <code>packages/dox-cli/lib/src/tools/create_project.dart</code>.</p>
 <h3 id="dox-serve"><code>dox serve</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dox serve [--ignore-build-runner]
