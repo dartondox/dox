@@ -58,6 +58,10 @@ abstract class CacheDriver {
     }
   }
 
+  /// Close the connections of this driver. Safe to call twice. The
+  /// default does nothing (memory, file and null drivers).
+  Future<void> close() async {}
+
   /// An atomic lock. Drivers without lock support throw [UnsupportedError].
   CacheLock lock(String name, Duration? ttl, [String? owner]) {
     throw UnsupportedError('$runtimeType does not support locks');

@@ -186,6 +186,36 @@ Future<void> main() async {
       expect(await driver.getRaw('n'), isNull);
     });
 
+    test('close() disconnects, also when called twice', () async {
+      CacheManager manager = CacheManager(
+        CacheConfig(
+          defaultStore: 'redis',
+          stores: <String, Map<String, dynamic>>{
+            'redis': <String, dynamic>{
+              'driver': 'redis',
+              'host': RedisEnv.host,
+              'port': RedisEnv.port,
+              'prefix': 'dox_cache_close:${CacheLock.randomOwner()}:',
+            },
+          },
+        ),
+      );
+      CacheStore store = manager.store();
+      expect(await store.get('missing'), isNull);
+      Redis client = (store.driver as RedisDriver).redis;
+      expect(client.connection.status, RedisConnectionStatus.connected);
+
+      await manager.close();
+      await manager.close();
+      for (int i = 0; i < 50; i++) {
+        if (client.connection.status != RedisConnectionStatus.connected) break;
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+      }
+      expect(client.connection.status, RedisConnectionStatus.disconnected);
+      // a new store is built on the next use
+      expect(identical(manager.store(), store), isFalse);
+    });
+
     test('pool_size sets the ioredis max connections', () async {
       RedisDriver pooled = const RedisDriverFactory().create(<String, dynamic>{
         'host': RedisEnv.host,

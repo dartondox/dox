@@ -52,6 +52,19 @@ class CacheManager {
     _stores[name] = CacheStore(driver);
   }
 
+  /// Close the connections of every store that was built (eg. Redis).
+  /// A store used after this is built again. Safe to call twice.
+  /// ```
+  /// await cache.close();
+  /// ```
+  Future<void> close() async {
+    List<CacheStore> stores = _stores.values.toList();
+    _stores.clear();
+    for (CacheStore store in stores) {
+      await store.driver.close();
+    }
+  }
+
   CacheDriver _createDriver(String storeName) {
     Map<String, dynamic>? options = config.stores[storeName];
     if (options == null) {
