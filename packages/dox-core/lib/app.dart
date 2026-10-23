@@ -182,6 +182,7 @@ class Dox implements IDox {
   /// 1. stop taking new connections
   /// 2. wait for open requests, up to `config.shutdownTimeout`
   /// 3. run the `DoxShutdown` services (eg. close database connections)
+  /// 4. close the cache stores (eg. Redis connections)
   ///
   /// SIGTERM and SIGINT call this, then exit the process.
   /// ```
@@ -205,6 +206,12 @@ class Dox implements IDox {
       } catch (error, stackTrace) {
         config.errorHandler(error, stackTrace);
       }
+    }
+    // after the services: they may still use the cache
+    try {
+      await cache.close();
+    } catch (error, stackTrace) {
+      config.errorHandler(error, stackTrace);
     }
   }
 

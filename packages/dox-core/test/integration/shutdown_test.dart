@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dox_cache/dox_cache.dart' show MemoryDriver;
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_orm/dox_orm.dart';
 import 'package:test/test.dart';
 
 import '../utils/start_http_server.dart';
@@ -15,6 +17,37 @@ class Cleanup implements DoxService, DoxShutdown {
 
   @override
   void shutdown() => calls++;
+}
+
+/// the ORM service of an app: it closes the database on shutdown
+class OrmService implements DoxService, DoxShutdown {
+  @override
+  void setup() {
+    SqlQueryBuilder.initializeWithDatabaseConfig(
+      DatabaseConfig(
+        connection: 'sqlite',
+        url: '',
+        connections: <String, ConnectionConfig>{
+          'sqlite': ConnectionConfig(
+            driver: Driver.sqlite,
+            database: ':memory:',
+            debug: false,
+          ),
+        },
+      ),
+    );
+  }
+
+  @override
+  Future<void> shutdown() => SqlQueryBuilder.close();
+}
+
+/// a cache driver that counts close calls
+class SpyCacheDriver extends MemoryDriver {
+  int closed = 0;
+
+  @override
+  Future<void> close() async => closed++;
 }
 
 /// GET [path] and give the status and body, or the error
@@ -54,7 +87,7 @@ void main() {
             serverPort: port,
             totalIsolate: 1,
             server: backend,
-            services: <DoxService>[cleanup],
+            services: <DoxService>[cleanup, OrmService()],
             shutdownTimeout: const Duration(seconds: 2),
           ),
         );
@@ -69,6 +102,20 @@ void main() {
         expect(await open, '200 slow done');
         await stopped;
         expect(cleanup.calls, 1);
+      });
+
+      test('stop closes the database and the cache', () async {
+        SpyCacheDriver spy = SpyCacheDriver();
+        Dox().cache.addStore('spy', spy);
+        expect(
+          await SqlQueryBuilder().dbDriver.query('SELECT 1 AS n'),
+          <Map<String, dynamic>>[
+            <String, dynamic>{'n': 1},
+          ],
+        );
+        await Dox().stop();
+        expect(spy.closed, 1);
+        expect(() => SqlQueryBuilder().dbDriver, throwsStateError);
       });
 
       test('a request longer than shutdownTimeout is cut', () async {

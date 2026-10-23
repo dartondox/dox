@@ -7,10 +7,16 @@ import 'package:dox_orm/dox_orm.dart';
 /// Initializing to setup query builder so that this project can use ORM.
 /// If this project do not require database, you can simply delete this file
 /// and remove from config/services.dart list.
-class ORMService implements DoxService {
+class ORMService implements DoxService, DoxShutdown {
   @override
   Future<void> setup() async {
     /// Initialize Sql QueryBuilder
     SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
+  }
+
+  /// Close the database connections when the server stops.
+  @override
+  Future<void> shutdown() async {
+    await SqlQueryBuilder.close();
   }
 }
