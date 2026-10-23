@@ -1,3 +1,7 @@
+## Unreleased
+
+- Fix: `dox create` crashed with `Failed to decode data using encoding 'utf-8'` when the template had a binary file (for example `db/dox.sqlite-shm`). It now skips files that are not UTF-8 text. It only writes a file when its content changes.
+
 ## 3.0.0-alpha.5
 
 - Fix: `dox create my_app` without `--version` crashed with a `RangeError`.

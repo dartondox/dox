@@ -60,19 +60,7 @@ Future<void> createProject(String projectName, [String? versionName]) async {
   /// remove `.git` folder
   gitDirectory.deleteSync(recursive: true);
 
-  // Replace the project name in all files
-  final files = projectFolder.listSync(recursive: true);
-  for (final file in files) {
-    if (file is File) {
-      if (!file.path.contains('bin/dox')) {
-        final content = file.readAsStringSync().replaceAll(
-          'dox_sample',
-          projectName,
-        );
-        file.writeAsStringSync(content);
-      }
-    }
-  }
+  replaceProjectName(projectFolder, projectName);
 
   print('\x1B[32m✔\x1B[0m Done. Created at - ${projectFolder.path}');
   print('\x1B[32m✔\x1B[0m Now run:\n');
@@ -80,6 +68,24 @@ Future<void> createProject(String projectName, [String? versionName]) async {
   print('    ➢ dart pub get');
   print('    ➢ cp .env.example .env (modify .env variables)');
   print('    ➢ dox serve\n');
+}
+
+/// Replaces `dox_sample` with [projectName] in every text file of [folder].
+///
+/// Files that are not valid UTF-8 (a SQLite file, an image, a font) are
+/// skipped. A file is only written when its content changes.
+void replaceProjectName(Directory folder, String projectName) {
+  for (final entity in folder.listSync(recursive: true)) {
+    if (entity is! File || entity.path.contains('bin/dox')) continue;
+    String content;
+    try {
+      content = utf8.decode(entity.readAsBytesSync());
+    } on FormatException {
+      continue;
+    }
+    String replaced = content.replaceAll('dox_sample', projectName);
+    if (replaced != content) entity.writeAsStringSync(replaced);
+  }
 }
 
 /// The newest dox-sample release with the same major version as this CLI.
