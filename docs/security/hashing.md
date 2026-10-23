@@ -27,10 +27,7 @@ bool ok = Hash.verify('secret', user.password!);
 ```
 
 `Hash.verify(password, hashedPassword)` returns `true` when the password matches.
-
-!!! warning
-    `Hash.verify` from `dox_core` throws when `hashedPassword` is not a valid bcrypt hash, for example an empty string.
-    Check that the value is a real hash first, or catch the error.
+It returns `false` when the password does not match, or when `hashedPassword` is not a valid bcrypt hash (for example an empty string).
 
 ## With login
 

@@ -4,6 +4,7 @@
 - Breaking: `AESEncryptor` now uses AES-GCM with a random nonce for each message. Before, it used AES-CTR with an all-zero nonce and no message check. Old encrypted cookies and values can not be read.
 - Breaking: `AESEncryptor.decode` throws `DecryptException` (400) when the text was changed or the key is wrong. Before, it printed an error and returned `''`.
 - `req.cookie()` returns `null` for an encrypted cookie that can not be decrypted.
+- Fix: `Hash.verify` returns `false` for a malformed hash. Before, it threw.
 - `AESEncryptor` and `DecryptException` are now exported from `package:dox_core/dox_core.dart`.
 
 ## 3.0.0-alpha.4
