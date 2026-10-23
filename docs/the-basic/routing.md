@@ -178,6 +178,7 @@ Route.resource('blogs', BlogController());
 | `DELETE` | `/blogs/{id}` | `destroy` |
 
 A method that the controller does not have is skipped. No route is made for it.
+Any other error from the controller is not hidden. It stops the app at start, so you see it.
 See [Resource controller](controller.md#resource-controller) to make one with the CLI.
 
 ## Serve storage files

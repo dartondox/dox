@@ -160,6 +160,13 @@ void main() {
       expect(paths.last, '/api/ping');
     });
 
+    test('resource route does not hide errors', () {
+      expect(
+        () => Route.resource('broken', _BrokenController()),
+        throwsStateError,
+      );
+    });
+
     test('resource route', () {
       Route.resource('admins', AdminController());
 
@@ -234,4 +241,9 @@ void main() {
       expect(routes[1].domain, 'dartondox.dev');
     });
   });
+}
+
+/// `index` throws a real error, not a missing method
+class _BrokenController {
+  dynamic get index => throw StateError('broken');
 }

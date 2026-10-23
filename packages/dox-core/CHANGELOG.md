@@ -17,6 +17,7 @@
 - New: `DoxShutdown`. A service that also implements it gets `shutdown()` in every isolate on stop, to close connections.
 - New: `await Dox().stop()` stops the server gracefully in every isolate, without exit.
 - Fix: `Route.group('blogs')` with `Route.get('all')` made `/blogsall`. Path parts now join with one `/`. This also works for nested groups, `Route.prefix` and `Route.resource`.
+- Fix: `Route.resource` hid every error from the controller. Now it only skips methods the controller does not have.
 
 ## 3.0.0-alpha.4
 

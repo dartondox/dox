@@ -1,5 +1,3 @@
-// ignore_for_file: empty_catches
-
 import 'dart:io';
 
 import 'package:dox_core/constants/http_request_method.dart';
@@ -396,69 +394,57 @@ class Route {
   /// Route.resource('blog', BlogController());
   /// ```
   static Route resource(String route, dynamic controller) {
-    String prefix = Route()._join(route);
+    Route r = Route();
+    String path = r._join(route);
+    r._resourceRoute(HttpRequestMethod.GET, path, () => controller.index);
+    r._resourceRoute(
+      HttpRequestMethod.GET,
+      '$path/create',
+      () => controller.create,
+    );
+    r._resourceRoute(HttpRequestMethod.POST, path, () => controller.store);
+    r._resourceRoute(
+      HttpRequestMethod.GET,
+      '$path/{id}',
+      () => controller.show,
+    );
+    r._resourceRoute(
+      HttpRequestMethod.GET,
+      '$path/{id}/edit',
+      () => controller.edit,
+    );
+    r._resourceRoute(
+      HttpRequestMethod.PUT,
+      '$path/{id}',
+      () => controller.update,
+    );
+    r._resourceRoute(
+      HttpRequestMethod.PATCH,
+      '$path/{id}',
+      () => controller.update,
+    );
+    r._resourceRoute(
+      HttpRequestMethod.DELETE,
+      '$path/{id}',
+      () => controller.destroy,
+    );
+    return r;
+  }
 
-    /// GET /resource
+  /// add one route of [resource]. a controller without this method
+  /// (eg. no `store`) gets no route. any other error is not caught.
+  void _resourceRoute(
+    HttpRequestMethod method,
+    String path,
+    dynamic Function() readAction,
+  ) {
+    dynamic action;
     try {
-      Route()._addRoute(HttpRequestMethod.GET, prefix, controller.index);
-    } catch (error) {}
-
-    /// GET /resource/create
-    try {
-      Route()._addRoute(
-        HttpRequestMethod.GET,
-        '$prefix/create',
-        controller.create,
-      );
-    } catch (error) {}
-
-    /// POST /resource
-    try {
-      Route()._addRoute(HttpRequestMethod.POST, prefix, controller.store);
-    } catch (error) {}
-
-    /// GET /resource/{id}
-    try {
-      Route()._addRoute(HttpRequestMethod.GET, '$prefix/{id}', controller.show);
-    } catch (error) {}
-
-    /// GET /resource/{id}/edit
-    try {
-      Route()._addRoute(
-        HttpRequestMethod.GET,
-        '$prefix/{id}/edit',
-        controller.edit,
-      );
-    } catch (error) {}
-
-    /// PUT /resource/{id}
-    try {
-      Route()._addRoute(
-        HttpRequestMethod.PUT,
-        '$prefix/{id}',
-        controller.update,
-      );
-    } catch (error) {}
-
-    /// PATCH /resource/{id}
-    try {
-      Route()._addRoute(
-        HttpRequestMethod.PATCH,
-        '$prefix/{id}',
-        controller.update,
-      );
-    } catch (error) {}
-
-    /// DELETE /resource/{id}
-    try {
-      Route()._addRoute(
-        HttpRequestMethod.DELETE,
-        '$prefix/{id}',
-        controller.destroy,
-      );
-    } catch (error) {}
-
-    return Route();
+      action = readAction();
+    } on NoSuchMethodError {
+      return;
+    }
+    _addRoute(method, path, action);
   }
 
   Route _addRoute(
