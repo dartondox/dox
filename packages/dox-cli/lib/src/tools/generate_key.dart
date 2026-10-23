@@ -15,32 +15,24 @@ void generateKey() {
   overrideKey(secret);
 }
 
-void overrideKey(String secret) {
-  List<String> content = [];
-  final file = File('${Directory.current.path}/.env');
-  final contents = file.readAsStringSync();
-  List list = contents.split('\n');
-
-  List<String> keys = [];
-
-  for (var d in list) {
-    if (d.toString().trim().isEmpty) {
-      content.add('');
-    } else {
-      List keyValue = d.toString().split('=');
-      if (keyValue.length == 2) {
-        String key = keyValue[0];
-        String value = keyValue[1];
-        if (key == 'APP_KEY') {
-          value = secret;
-        }
-        keys.add(key);
-        content.add("$key=$value");
-      }
-    }
+/// Sets `APP_KEY` in `.env` to [secret].
+///
+/// Only the `APP_KEY` line changes. Every other line (comments, blank
+/// lines, quotes, values with more than one `=`) stays as it is, in order.
+/// When there is no `APP_KEY`, it is added as the first line.
+void overrideKey(String secret, [String? path]) {
+  final file = File(path ?? '${Directory.current.path}/.env');
+  List<String> lines = file.readAsStringSync().split('\n');
+  bool found = false;
+  for (int i = 0; i < lines.length; i++) {
+    String line = lines[i];
+    int eq = line.indexOf('=');
+    if (eq < 0 || line.substring(0, eq).trim() != 'APP_KEY') continue;
+    // Keep a Windows line end (\r) when the file has one.
+    String end = line.endsWith('\r') ? '\r' : '';
+    lines[i] = 'APP_KEY=$secret$end';
+    found = true;
   }
-  if (!keys.contains('APP_KEY')) {
-    content = ["APP_KEY=$secret", ...content];
-  }
-  file.writeAsStringSync(content.join("\n"));
+  if (!found) lines.insert(0, 'APP_KEY=$secret');
+  file.writeAsStringSync(lines.join('\n'));
 }
