@@ -15,7 +15,7 @@ class Author extends AuthorGenerator {
   List<Book> books = <Book>[];
 
   @HasOne(Book, localKey: 'code', foreignKey: 'author_code')
-  Book? book;
+  Book? firstBook;
 
   @ManyToMany(
     Tag,

@@ -117,5 +117,58 @@ class Tag {
       expect(out, isNot(contains('setComputedValues')));
       expect(out, isNot(contains('hasModelHooks')));
     });
+
+    test('a two word relation is found in the preload list', () async {
+      String out = await _generate('''
+@DoxModel()
+class User {
+  @HasMany(User)
+  List<User> userInfos = <User>[];
+}
+''');
+
+      /// preload() keeps the field name, the json key is snake case
+      expect(out, contains("preload.contains('userInfos')"));
+      expect(out, contains("map['user_infos'] = toMap(instance.userInfos);"));
+    });
+
+    test('the primary key type follows primaryKeyType', () async {
+      String out = await _generate('''
+@DoxModel(primaryKey: 'uuid', primaryKeyType: String)
+class Device {}
+''');
+      expect(out, contains('String? get uuid => tempIdValue as String?;'));
+      expect(out, contains('set uuid(String? val) => tempIdValue = val;'));
+      expect(out, contains("..uuid = m['uuid'] as String?"));
+    });
+
+    test('the primary key is int by default', () async {
+      String out = await _generate('''
+@DoxModel()
+class Device {}
+''');
+      expect(out, contains('int? get id => tempIdValue as int?;'));
+    });
+
+    test('timestamps: false leaves out created_at and updated_at', () async {
+      String out = await _generate('''
+@DoxModel(timestamps: false)
+class Setting {}
+''');
+      expect(out, contains("'created_at': null"));
+      expect(out, contains("'updated_at': null"));
+      expect(out, isNot(contains('..createdAt')));
+      expect(out, isNot(contains("'created_at' :")));
+    });
+
+    test('updatedAt: null turns off only updated_at', () async {
+      String out = await _generate('''
+@DoxModel(updatedAt: null)
+class Log {}
+''');
+      expect(out, contains("'created_at': 'created_at'"));
+      expect(out, contains("'updated_at': null"));
+      expect(out, isNot(contains('..updatedAt')));
+    });
   });
 }

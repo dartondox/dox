@@ -47,7 +47,7 @@ import 'package:my_app/app/models/user/user.model.dart';
 
 class UserController {
   /// GET /api/users?page=1&per_page=20
-  Future<Pagination> index(ListUsers query) async {
+  Future<Pagination<User>> index(ListUsers query) async {
     return User()
         .orderBy('id', 'desc')
         .paginate(currentPage: query.page, perPage: query.perPage);
@@ -117,16 +117,16 @@ curl 'http://localhost:3000/api/users?page=0&per_page=500'
 ## Change the shape of a row
 
 Return a serializer for each row, when the model has fields you do not want to send.
-`page.getData<User>()` gives the typed rows:
+`page.data` gives the typed rows (`List<User>`):
 
 ```dart
 Future<Map<String, dynamic>> index(ListUsers query) async {
-  Pagination page = await User()
+  Pagination<User> page = await User()
       .orderBy('id', 'desc')
       .paginate(currentPage: query.page, perPage: query.perPage);
   return <String, dynamic>{
     ...page.toJson(),
-    'data': UserSerializer(page.getData<User>()).toJson(),
+    'data': UserSerializer(page.data).toJson(),
   };
 }
 ```

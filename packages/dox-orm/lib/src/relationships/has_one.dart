@@ -15,7 +15,7 @@ M? hasOne<T, M>(
 
   Model<T> owner = list.first;
   localKey = localKey ?? owner.primaryKey;
-  foreignKey = foreignKey ?? "${owner.tableName}_id";
+  foreignKey = foreignKey ?? owner.foreignKeyName;
 
   List<dynamic> ids = list
       .map((Model<T> i) => i.convertToMap(i)[localKey])
@@ -23,6 +23,7 @@ M? hasOne<T, M>(
       .toList();
 
   Model<M> m = model().debug(owner.shouldDebug);
+  m.connection ??= owner.connection;
 
   m.select('*, $foreignKey as _owner_id').whereIn(foreignKey, ids);
 

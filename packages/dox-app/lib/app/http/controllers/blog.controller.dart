@@ -7,7 +7,7 @@ class BlogController {
   /// List blogs
   ///
   /// One page of blogs, oldest first.
-  Future<Pagination> index(ListBlogs query) async {
+  Future<Pagination<Blog>> index(ListBlogs query) async {
     return BlogService().listing(query);
   }
 

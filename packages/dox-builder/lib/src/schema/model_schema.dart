@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../openapi/annotation_reader.dart';
 import '../openapi/ast_finders.dart';
@@ -41,8 +42,14 @@ class ModelSchema {
     DartObject? options = annotations.first(model, 'DoxModel');
     String primaryKey =
         options?.getField('primaryKey')?.toStringValue() ?? 'id';
+    DartType? primaryKeyType = options
+        ?.getField('primaryKeyType')
+        ?.toTypeValue();
     Map<String, dynamic> properties = <String, dynamic>{
-      primaryKey: <String, dynamic>{'type': 'integer'},
+      primaryKey: primaryKeyType == null
+          ? <String, dynamic>{'type': 'integer'}
+          : await types.of(primaryKeyType) ??
+                <String, dynamic>{'type': 'integer'},
     };
     for (FieldElement field in model.fields) {
       if (field.isStatic || !field.isOriginDeclaration) continue;
@@ -56,8 +63,11 @@ class ModelSchema {
             );
       properties[key] = await types.of(field.type) ?? <String, dynamic>{};
     }
+    bool timestamps = options?.getField('timestamps')?.toBoolValue() ?? true;
     for (String name in <String>['createdAt', 'updatedAt']) {
-      String? key = options?.getField(name)?.toStringValue();
+      String? key = timestamps
+          ? options?.getField(name)?.toStringValue()
+          : null;
       if (key != null) properties[toSnakeCase(key)] = _timestamp;
     }
     for (GetterElement getter in model.getters) {

@@ -139,24 +139,20 @@ The examples are for `@ManyToMany(Song)` in the `Artist` model.
 
 | Option | Default | Example value | What it is |
 |---|---|---|---|
-| `pivotTable` | the two table names in A-Z order, joined with `_` | `artist_song` | The pivot table. |
-| `pivotForeignKey` | `{this table}_id` | `artist_id` | The pivot column that points to this model. |
-| `pivotRelatedForeignKey` | `{related table}_id` | `song_id` | The pivot column that points to the related model. |
+| `pivotTable` | the two model names in A-Z order, joined with `_` | `artist_song` | The pivot table. |
+| `pivotForeignKey` | `{this model}_id` | `artist_id` | The pivot column that points to this model. |
+| `pivotRelatedForeignKey` | `{related model}_id` | `song_id` | The pivot column that points to the related model. |
 | `localKey` | the primary key of this model | `id` | The column in `artist` that `pivotForeignKey` points to. |
 | `relatedKey` | the primary key of the related model | `id` | The column in `song` that `pivotRelatedForeignKey` points to. |
 | `onQuery` | none | | A static function that changes the query. |
 | `eager` | `false` | | Load the relation on every query. |
 
-Default pivot table names:
+The defaults use the class names in snake_case, not the table names, like Laravel.
+So `@DoxModel(table: 'artists')` does not change them.
 
-- `artist` and `song` give `artist_song`.
-- `blog` and `category` give `blog_category`.
-
-!!! warning "Custom table names"
-    The defaults use the table names, not the class names.
-    With `@DoxModel(table: 'artists')`, the default pivot table is `artists_song`
-    and the default `pivotForeignKey` is `artists_id`.
-    Then set the options yourself.
+- `Artist` and `Song` give `artist_song`.
+- `Blog` and `Category` give `blog_category`.
+- `BlogPost` and `Tag` give `blog_post_tag`.
 
 ### Set all keys
 

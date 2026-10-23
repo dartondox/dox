@@ -5,7 +5,7 @@ import 'package:dox_orm/dox_orm.dart';
 class BlogService {
   BlogService();
 
-  Future<Pagination> listing(ListBlogs query) async {
+  Future<Pagination<Blog>> listing(ListBlogs query) async {
     int offset = (query.page - 1) * query.limit;
     return Blog()
         .withTrash(query.withTrashed)

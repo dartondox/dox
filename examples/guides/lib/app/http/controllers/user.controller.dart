@@ -6,7 +6,7 @@ import 'package:my_app/app/models/user/user.model.dart';
 
 class UserController {
   /// GET /api/users?page=1&per_page=20
-  Future<Pagination> index(ListUsers query) async {
+  Future<Pagination<User>> index(ListUsers query) async {
     return User()
         .orderBy('id', 'desc')
         .paginate(currentPage: query.page, perPage: query.perPage);

@@ -246,6 +246,12 @@ List<Map<String, dynamic>> rows = await QueryBuilder.query(
 );
 ```
 
+Pass `connection` to run it on another connection.
+
+```dart
+await QueryBuilder.query('select 1', connection: 'mysql');
+```
+
 ### Other connections
 
 Use `withConnection()` with a connection name from the config.
@@ -254,6 +260,15 @@ Use `withConnection()` with a connection name from the config.
 List<Map<String, dynamic>> rows = await QueryBuilder.table('blog')
     .withConnection('mysql')
     .get();
+```
+
+A model keeps its connection. `save()` and `delete()` use it.
+Models that a query returns use the connection of the query.
+
+```dart
+Blog blog = Blog()..withConnection('mysql');
+blog.title = 'Hello';
+await blog.save(); // saved on 'mysql'
 ```
 
 ## MySQL and MariaDB

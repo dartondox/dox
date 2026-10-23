@@ -115,15 +115,13 @@ SELECT *, "user_id" as "_owner_id" FROM "post" WHERE "user_id" IN (@user_id_p0, 
 
 | Option | Default | What it is |
 |---|---|---|
-| `foreignKey` | `{this table}_id`, like `user_id` | The column in the related table that points to this model. |
+| `foreignKey` | `{this model}_id`, like `user_id` | The column in the related table that points to this model. |
 | `localKey` | the primary key of this model | The column in this table that `foreignKey` points to. |
 | `onQuery` | none | A static function that changes the query. |
 | `eager` | `false` | Load the relation on every query. |
 
-!!! warning "Custom table names"
-    The default `foreignKey` uses the table name, not the class name.
-    With `@DoxModel(table: 'users')`, the default is `users_id`.
-    Then set `foreignKey: 'user_id'` yourself.
+The default `foreignKey` uses the class name in snake_case, like Laravel.
+`User` gives `user_id`, also when the table is `users`.
 
 ### `foreignKey` and `localKey`
 

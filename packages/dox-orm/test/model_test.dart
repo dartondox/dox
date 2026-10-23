@@ -271,11 +271,11 @@ void main() async {
       blog.description = "something";
       await blog.save();
 
-      Blog findBlog = await Blog()
+      Blog? findBlog = await Blog()
           .select('*, title as something')
           .find(blog.uid);
 
-      Map<String, dynamic> data = findBlog.toMap(original: true);
+      Map<String, dynamic> data = findBlog!.toMap(original: true);
       expect(data['something'], blog.title);
     });
 

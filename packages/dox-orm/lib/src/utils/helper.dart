@@ -100,6 +100,9 @@ class QueryBuilderHelper<T> {
       for (Map<String, dynamic> e in result) {
         Model<dynamic> res = self.fromMap(e);
         res.originalMap = e;
+
+        /// so save() and delete() on this model use the same connection
+        res.connection = queryBuilder.connection;
         for (String preload in preloads) {
           res.preload(preload);
         }

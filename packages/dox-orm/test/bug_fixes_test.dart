@@ -134,7 +134,7 @@ void main() async {
 
       List<Author> authors = await Author()
           .preload('books')
-          .preload('book')
+          .preload('firstBook')
           .preload('tags')
           .orderBy('id')
           .get();
@@ -148,30 +148,34 @@ void main() async {
       Author a = authors.last;
       expect(a.code, 'A');
       expect(a.books.length, 2);
-      expect(a.book?.authorCode, 'A');
+      expect(a.firstBook?.authorCode, 'A');
       expect(a.tags.length, 1);
       expect(b.books.length, 0);
-      expect(b.book, null);
+      expect(b.firstBook, null);
+
+      /// a two word relation is in toJson() with a snake case key
+      expect(a.toJson()['first_book']['author_code'], 'A');
+      expect(a.toJson().containsKey('books'), true);
       expect(b.tags.length, 0);
     });
 
     test('json arrays are decoded and plain text is not', () async {
       await QueryBuilder.table('blog_info')
           .insert(<String, dynamic>{'info': '[1, 2]', 'blog_id': 1});
-      Map<String, dynamic> info = await QueryBuilder.table('blog_info')
+      Map<String, dynamic>? info = await QueryBuilder.table('blog_info')
           .getFirst();
-      expect(info['info'], <int>[1, 2]);
+      expect(info?['info'], <int>[1, 2]);
 
       await QueryBuilder.table('blog')
           .setPrimaryKey('uid')
           .insert(<String, dynamic>{'title': 't', 'body': '{"a": 1}'});
-      Map<String, dynamic> blog = await QueryBuilder.table('blog').getFirst();
+      Map<String, dynamic>? blog = await QueryBuilder.table('blog').getFirst();
 
       /// mariadb can not tell text from json, see docs
       if (await isMariaDb()) {
-        expect(blog['body'], <String, dynamic>{'a': 1});
+        expect(blog?['body'], <String, dynamic>{'a': 1});
       } else {
-        expect(blog['body'], '{"a": 1}');
+        expect(blog?['body'], '{"a": 1}');
       }
     });
 
@@ -301,10 +305,10 @@ void main() async {
         table.string('other').nullable().withDefault("o'k").change();
       });
       await QueryBuilder.table('schema_fix').insert(<String, dynamic>{'id': 1});
-      Map<String, dynamic> row = await QueryBuilder.table('schema_fix')
+      Map<String, dynamic>? row = await QueryBuilder.table('schema_fix')
           .getFirst();
-      expect(row['name'], "it's");
-      expect(row['other'], "o'k");
+      expect(row?['name'], "it's");
+      expect(row?['other'], "o'k");
     });
   });
 }

@@ -18,6 +18,13 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     String primaryKeySnakeCase =
         annotation.objectValue.getField('primaryKey')?.toStringValue() ?? 'id';
     String primaryKey = toCamelCase(primaryKeySnakeCase);
+    String primaryKeyType =
+        annotation.objectValue
+            .getField('primaryKeyType')
+            ?.toTypeValue()
+            ?.getDisplayString()
+            .replaceFirst('?', '') ??
+        'int';
     String? createdAt = annotation.objectValue
         .getField('createdAt')
         ?.toStringValue();
@@ -26,12 +33,16 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         ?.toStringValue();
     bool softDelete =
         annotation.objectValue.getField('softDelete')?.toBoolValue() ?? false;
+    if (annotation.objectValue.getField('timestamps')?.toBoolValue() == false) {
+      createdAt = null;
+      updatedAt = null;
+    }
 
     final visitor = ModelVisitor();
 
     visitor.columns.addAll({
       primaryKey: {
-        'type': 'int?',
+        'type': '$primaryKeyType?',
         'jsonKey': primaryKeySnakeCase,
         'beforeSave': null,
         'beforeGet': null,
@@ -92,7 +103,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
 
       ${_getTableNameSetter(tableName)}
 
-      ${_primaryKeySetterAndGetter(primaryKey)}
+      ${_primaryKeySetterAndGetter(primaryKey, primaryKeyType)}
 
       $className query() => $className();
 
@@ -224,11 +235,11 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         : '';
   }
 
-  String _primaryKeySetterAndGetter(String primaryKey) {
+  String _primaryKeySetterAndGetter(String primaryKey, String type) {
     return """
-      int? get $primaryKey => tempIdValue;
-      
-      set $primaryKey(dynamic val) => tempIdValue = val;
+      $type? get $primaryKey => tempIdValue as $type?;
+
+      set $primaryKey($type? val) => tempIdValue = val;
     """;
   }
 
@@ -294,7 +305,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         preloadRelations.add(key);
         toMapRelation +=
             """
-        if (preload.contains('${toSnakeCase(key)}')) {
+        if (preload.contains('$key')) {
           map['${toSnakeCase(key)}'] = toMap(instance.$key);
         }
         """;

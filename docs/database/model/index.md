@@ -73,8 +73,10 @@ All options go in `@DoxModel(...)`.
 |---|---|---|
 | `table` | class name in snake_case | The table name. |
 | `primaryKey` | `'id'` | The primary key column. |
+| `primaryKeyType` | `int` | The Dart type of the primary key, like `String` for a UUID. |
 | `createdAt` | `'created_at'` | The column that keeps the create time. |
 | `updatedAt` | `'updated_at'` | The column that keeps the last update time. |
+| `timestamps` | `true` | `false` turns off `createdAt` and `updatedAt`. |
 | `softDelete` | `false` | `delete()` sets `deleted_at` and keeps the row. |
 
 ### `table`
@@ -100,6 +102,26 @@ class Blog extends BlogGenerator {}
 
 The field name is the key in camelCase. With `primaryKey: 'blog_id'`, the field is `blogId`.
 
+### `primaryKeyType`
+
+The primary key field is `int?` by default.
+Use `primaryKeyType` for another type, like a UUID string.
+
+```dart
+@DoxModel(primaryKey: 'uuid', primaryKeyType: String)
+class Device extends DeviceGenerator {}
+```
+
+```dart
+Device device = Device();
+device.uuid = '0b6f2c1e-1a2b-4c3d-8e9f-001122334455';
+await device.save(); // insert
+```
+
+`save()` inserts a new model, also when you set the key yourself.
+It updates a model that was read from the table or saved before.
+`model.exists` tells which one it is.
+
 ### `createdAt` and `updatedAt`
 
 `save()` sets these columns to the current UTC time.
@@ -111,6 +133,17 @@ class Blog extends BlogGenerator {}
 ```
 
 Read the values with `blog.createdAt` and `blog.updatedAt`.
+
+### `timestamps`
+
+Set `timestamps: false` when the table has no `created_at` and `updated_at` columns.
+
+```dart
+@DoxModel(timestamps: false)
+class Setting extends SettingGenerator {}
+```
+
+To turn off only one of them, set it to `null`, like `@DoxModel(updatedAt: null)`.
 
 ### `softDelete`
 

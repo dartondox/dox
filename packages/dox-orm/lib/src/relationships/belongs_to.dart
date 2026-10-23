@@ -12,8 +12,9 @@ M? belongsTo<T, M>(
 
   Model<T> foreign = list.first;
   Model<M> owner = model().debug(foreign.shouldDebug);
+  owner.connection ??= foreign.connection;
   localKey = localKey ?? owner.primaryKey;
-  foreignKey = foreignKey ?? "${owner.tableName}_id";
+  foreignKey = foreignKey ?? owner.foreignKeyName;
 
   List<dynamic> ids = list
       .map((dynamic i) => i.convertToMap(i)[foreignKey])

@@ -98,11 +98,11 @@ void main() async {
       blog.description = 'Awesome blog body';
       await blog.save();
 
-      Map<String, dynamic> b = await QueryBuilder.table('blog')
+      Map<String, dynamic>? b = await QueryBuilder.table('blog')
           .where('title', 'Awesome blog')
           .getFirst();
 
-      expect(b['uid'], 1);
+      expect(b?['uid'], 1);
     });
 
     test('order by', () async {
@@ -145,7 +145,8 @@ void main() async {
       int total2 = await Blog().groupBy(<String>['status', 'title']).count();
       expect(total2, 2);
 
-      List<Map<String, dynamic>> data2 = await Blog()
+      /// groupBy() rows are maps, so use QueryBuilder.table()
+      List<Map<String, dynamic>> data2 = await QueryBuilder.table('blog')
           .select(<String>['title', 'count(*) as total'])
           .groupBy('title')
           .get();
@@ -163,14 +164,22 @@ void main() async {
       blog.description = 'Awesome blog body';
       await blog.save();
 
-      Map<String, dynamic> b = await Blog().rawQuery(
+      Map<String, dynamic>? b = await QueryBuilder.table('blog').rawQuery(
         "select * from blog where title = @title",
         <String, dynamic>{'title': 'Awesome blog'},
       ).getFirst();
 
-      expect(b['uid'], 1);
-      expect(b['title'], 'Awesome blog');
-      expect(b['body'], 'Awesome blog body');
+      expect(b?['uid'], 1);
+      expect(b?['title'], 'Awesome blog');
+      expect(b?['body'], 'Awesome blog body');
+
+      /// get() on a model gives models, so plain rows are an error
+      await expectLater(
+        Blog().rawQuery('select * from blog').get(),
+        throwsStateError,
+      );
+      List<Blog> blogs = await Blog().where('title', 'Awesome blog').get();
+      expect(blogs.first.title, 'Awesome blog');
     });
 
     test('where', () async {
@@ -380,7 +389,7 @@ void main() async {
 
       await Blog().insertMultiple(data);
 
-      Pagination pagination = await Blog().paginate(
+      Pagination<Blog> pagination = await Blog().paginate(
         currentPage: 1,
         perPage: 10,
       );
@@ -391,7 +400,7 @@ void main() async {
       expect(pagination.currentPage, 1);
       expect(pagination.data.length, 10);
 
-      Pagination pagination2 = await Blog().paginate(
+      Pagination<Blog> pagination2 = await Blog().paginate(
         currentPage: 5,
         perPage: 10,
       );
@@ -444,11 +453,11 @@ void main() async {
         <String, dynamic>{'title': 'title 1', 'body': 'body 1'},
         <String, dynamic>{'body': 'body 2', 'title': 'title 2'},
       ]);
-      Map<String, dynamic> row = await QueryBuilder.table('blog')
+      Map<String, dynamic>? row = await QueryBuilder.table('blog')
           .where('uid', 2)
           .getFirst();
-      expect(row['title'], 'title 2');
-      expect(row['body'], 'body 2');
+      expect(row?['title'], 'title 2');
+      expect(row?['body'], 'body 2');
     });
 
     test('insert null stores real null', () async {
@@ -507,7 +516,7 @@ void main() async {
         <String, dynamic>{'title': 'a', 'body': 'body'},
         <String, dynamic>{'title': 'a', 'body': 'body'},
       ]);
-      List<Map<String, dynamic>> rows = await Blog()
+      List<Map<String, dynamic>> rows = await QueryBuilder.table('blog')
           .select('title')
           .groupBy('title')
           .orderBy('title', 'desc')

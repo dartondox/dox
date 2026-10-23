@@ -1,5 +1,5 @@
 /// pagination result
-class Pagination {
+class Pagination<T> {
   /// total records
   final int total;
 
@@ -12,8 +12,7 @@ class Pagination {
   /// current page of pagination
   final int currentPage;
 
-  // ignore: always_specify_types
-  List data;
+  List<T> data;
 
   /// constructor
   Pagination({
@@ -25,8 +24,8 @@ class Pagination {
   });
 
   /// get list of data
-  List<T> getData<T>() {
-    return data as List<T>;
+  List<R> getData<R>() {
+    return data as List<R>;
   }
 
   /// support json encode

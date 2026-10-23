@@ -23,8 +23,18 @@ class Model<T> extends QueryBuilder<T> {
   /// values we last saved, so save() can tell when a field was set to null
   Map<String, dynamic>? _savedValues;
 
+  /// true when the row is in the table: the model was read from it, or
+  /// saved. save() inserts when it is false, so a model with a key you
+  /// set yourself (like a UUID) is inserted, not updated.
+  bool get exists => _savedValues != null || originalMap.isNotEmpty;
+
   @override
   String get tableName => helper.tableNameOf(runtimeType);
+
+  /// the default foreign key that points to this model: the class name
+  /// in snake case and `_id`, like Laravel. `User` gives `user_id`, also
+  /// when the table is `users`.
+  String get foreignKeyName => '${helper.tableNameOf(runtimeType)}_id';
 
   @override
   dynamic get self => this;
@@ -40,6 +50,19 @@ class Model<T> extends QueryBuilder<T> {
   Model<T> debug([bool? debug]) {
     _debug = debug ?? true;
     super.debug(debug);
+    return this;
+  }
+
+  /// use a named connection. save(), delete() and the models this
+  /// query returns use it too.
+  ///
+  /// ```
+  /// Blog blog = Blog()..withConnection('mysql');
+  /// await blog.save();
+  /// ```
+  @override
+  Model<T> withConnection(String connectionName) {
+    super.withConnection(connectionName);
     return this;
   }
 
@@ -59,7 +82,7 @@ class Model<T> extends QueryBuilder<T> {
       await _save();
       return true;
     }
-    bool isNew = tempIdValue == null;
+    bool isNew = !exists;
     try {
       await _fire(ModelEvent.saving);
       await _fire(isNew ? ModelEvent.creating : ModelEvent.updating);
@@ -81,7 +104,7 @@ class Model<T> extends QueryBuilder<T> {
 
     Map<String, dynamic> values = toMap(removeRelations: true);
     DateTime currentTime = now();
-    if (values[primaryKey] == null) {
+    if (!exists) {
       values.removeWhere((String key, dynamic value) => value == null);
 
       if (createdAtColumn != null) {
@@ -94,10 +117,7 @@ class Model<T> extends QueryBuilder<T> {
         updatedAt = values[updatedAtColumn];
       }
 
-      Map<String, dynamic> res = await QueryBuilder.table(tableName)
-          .setPrimaryKey(primaryKey)
-          .debug(_debug)
-          .insert(values);
+      Map<String, dynamic> res = await _newQuery<dynamic>().insert(values);
 
       tempIdValue = res[primaryKey];
       _savedValues = <String, dynamic>{...values, primaryKey: tempIdValue};
@@ -119,11 +139,7 @@ class Model<T> extends QueryBuilder<T> {
         updatedAt = values[updatedAtColumn];
       }
 
-      await QueryBuilder.table(tableName, this)
-          .setPrimaryKey(primaryKey)
-          .debug(_debug)
-          .where(primaryKey, id)
-          .update(values);
+      await _newQuery<T>(this).where(primaryKey, id).update(values);
     }
   }
 
@@ -188,10 +204,18 @@ class Model<T> extends QueryBuilder<T> {
   /// a new query on this row only, so the query state of this model
   /// (where, values of an old query) is not used again
   QueryBuilder<T> _thisRecord() {
-    return QueryBuilder.table<T>(
-      tableName,
-      this,
-    ).setPrimaryKey(primaryKey).debug(_debug).where(primaryKey, tempIdValue);
+    return _newQuery<T>(this).where(primaryKey, tempIdValue);
+  }
+
+  /// a new query on the table of this model, on the same connection.
+  /// [self] is the model the query returns, null gives maps.
+  QueryBuilder<R> _newQuery<R>([dynamic self]) {
+    QueryBuilder<R> q = QueryBuilder<R>()
+      ..tableName = tableName
+      ..self = self
+      ..primaryKey = primaryKey
+      ..connection = connection;
+    return q.debug(_debug);
   }
 
   /// restore this soft deleted record. It fires restoring and restored.
@@ -454,25 +478,6 @@ class Model<T> extends QueryBuilder<T> {
     }
   }
 
-  /// get all records
-  /// ```
-  /// List<Blog> blogs = await Blog().all();
-  /// ```
-  @override
-  Future<List<T>> all() async {
-    return await super.all();
-  }
-
-  /// find the record
-  /// ```
-  /// Blog? blog = await Blog().find(1);
-  /// Blog? blog = await Blog().find('name', 'John');
-  /// ```
-  @override
-  Future<T?> find(dynamic arg1, [dynamic arg2]) {
-    return super.find(arg1, arg2) as Future<T?>;
-  }
-
   /// create a record
   /// ```
   /// Blog blog = await Blog().create({
@@ -489,8 +494,9 @@ class Model<T> extends QueryBuilder<T> {
     if (!_eventsOn) return await super.insert(data);
     Model<T> model = fromMap(_dateTimesToString(data)) as Model<T>;
     model.debug(_debug);
+    model.connection = connection;
     if (!await model.save()) return model as T;
-    return await super.find(model.tempIdValue);
+    return (await super.find(model.tempIdValue)) as T;
   }
 
   /// fromMap() reads dates as strings, like rows from the database
