@@ -138,6 +138,63 @@ DB_USERNAME=postgres
 DB_PASSWORD=postgres
 ```
 
+### `DATABASE_URL`
+
+Many hosts (Fly, Render, Heroku and others) give you one database url.
+Dox reads it from the `DATABASE_URL` environment variable.
+
+The rule: **when `DATABASE_URL` is set, it wins.**
+It replaces the config of the default connection (`DatabaseConfig.connection`).
+That config still gives `debug`, `printer` and `extra`.
+Other named connections do not change.
+
+```bash
+DATABASE_URL=postgres://app:s%40cret@db.example.com:5432/blog?sslmode=require
+```
+
+| Form | Database |
+|---|---|
+| `postgres://user:pass@host:5432/db` or `postgresql://...` | Postgres |
+| `mysql://user:pass@host:3306/db` or `mariadb://...` | MySQL, MariaDB |
+| `sqlite:///abs/path.db`, `sqlite://db/dox.sqlite`, `sqlite::memory:`, `file:db/dox.sqlite` | SQLite |
+
+- The user, password and database name are url-decoded. Write `@` in a password as `%40`.
+- No port: `5432` for Postgres, `3306` for MySQL.
+- `sslmode`: `disable`, `allow` and `prefer` mean no TLS. `verify-full` checks the server certificate. Other values, like `require`, turn TLS on. For MySQL, `ssl=true` works too.
+- The native Postgres driver has no TLS yet. With TLS on, Postgres uses the Dart driver.
+- `host=/cloudsql/project:region:instance` connects to a Postgres Unix socket. See [Unix socket](#unix-socket).
+- Any other option goes to `extra`, like `?maxConnectionCount=20`. A number becomes an `int`, `true` and `false` a `bool`.
+
+The ORM reads `DATABASE_URL` from the real environment, not from `.env`.
+To use a url from `.env`, or any other url, give it yourself:
+
+```dart
+DatabaseConfig(
+  connection: 'postgres',
+  connections: {...},
+  url: Env.get<String?>('DATABASE_URL'),
+);
+```
+
+An empty `url` (`url: ''`) turns `DATABASE_URL` off.
+To make one `ConnectionConfig` from a url, use `ConnectionConfig.fromUrl(url)`.
+[Migrations](migration.md#database-settings) read `DATABASE_URL` too, also from `.env`.
+
+### Unix socket
+
+A Postgres host that starts with `/` is a Unix socket folder, like in libpq.
+Google Cloud SQL on Cloud Run uses `/cloudsql/PROJECT:REGION:INSTANCE`.
+
+```bash
+DB_HOST=/cloudsql/my-project:europe-west1:blog
+# or
+DATABASE_URL=postgres://blog:secret@/blog?host=/cloudsql/my-project:europe-west1:blog
+```
+
+Both the native and the Dart Postgres driver use the socket file `<folder>/.s.PGSQL.<port>`.
+A host that already ends with `/.s.PGSQL.5432` works too.
+MySQL sockets are not supported.
+
 ### `extra` options
 
 `extra` is a map in `ConnectionConfig` for driver options.

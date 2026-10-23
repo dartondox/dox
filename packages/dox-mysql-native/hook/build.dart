@@ -20,9 +20,13 @@ import 'package:hooks/hooks.dart';
 
 const String _releases = 'https://github.com/dartondox/dox/releases/download';
 
-/// sha256 of each release asset. Fill it from `SHA256SUMS` of the release
-/// (see .github/workflows/native.yaml) before publishing to pub.dev.
-/// Empty until the first release `dox_mysql_native-v3.0.0-alpha.2`.
+/// sha256 of each release asset. The release workflow
+/// (.github/workflows/native.yaml) builds the libraries on a
+/// `dox_mysql_native-v*` tag and uploads them with `SHA256SUMS`. Then fill
+/// this map before publishing to pub.dev:
+/// `dart run bin/native_hashes.dart dox_mysql_native-v<version>`
+// Empty on purpose: no `dox_mysql_native-v*` release exists yet. While it is
+// empty, the download step is skipped and the hook builds with cargo.
 const Map<String, String> _sha256 = <String, String>{};
 
 void main(List<String> args) async {

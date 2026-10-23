@@ -76,6 +76,9 @@ class PgNativePool {
 
   /// Makes a pool of up to [maxConnections] connections.
   ///
+  /// A [host] that starts with `/` is a Unix socket folder, like libpq.
+  /// Eg. `/cloudsql/project:region:instance` on Google Cloud Run.
+  ///
   /// [threads] is the size of the Rust runtime of the whole process. Only
   /// the first pool sets it. 0 runs one `current_thread` runtime on its own
   /// thread.

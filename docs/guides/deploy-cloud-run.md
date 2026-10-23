@@ -76,11 +76,16 @@ done
 
 Cloud Run has two ways to reach Cloud SQL: a Unix socket in `/cloudsql/...`, or the private IP over a VPC.
 
-Dox connects to Postgres over TCP only. It can not use the Unix socket. So use the **private IP**:
+Dox can use both. The Unix socket needs no VPC, so this guide uses it:
 
-1. Give the Cloud SQL instance a private IP on your VPC network (for example `default`).
-2. Deploy the service with Direct VPC egress (`--network`, `--subnet`, `--vpc-egress` in step 4).
-3. Use the private IP as `DB_HOST` and `5432` as `DB_PORT`.
+1. Find the connection name of the instance: `gcloud sql instances describe INSTANCE --format='value(connectionName)'`. It looks like `PROJECT_ID:europe-west1:INSTANCE`.
+2. Deploy with `--add-cloudsql-instances <connection name>` (step 4). Cloud Run then makes the socket in `/cloudsql/<connection name>`.
+3. Give the service account the `roles/cloudsql.client` role.
+4. Set `DB_HOST=/cloudsql/<connection name>`. A host that starts with `/` is a Unix socket folder. See [Unix socket](../database/index.md#unix-socket).
+
+The same with one url: `DATABASE_URL=postgres://blog:<password>@/blog?host=/cloudsql/<connection name>`.
+
+To use the **private IP** instead: give the instance a private IP on your VPC network, deploy with Direct VPC egress (`--network default --subnet default --vpc-egress private-ranges-only`), and use the private IP as `DB_HOST`.
 
 Do not use SQLite on Cloud Run. The file system of an instance is in memory, and each instance has its own. The data is lost when the instance stops.
 
@@ -96,8 +101,8 @@ gcloud run deploy blog \
   --allow-unauthenticated \
   --cpu 1 --memory 512Mi \
   --min-instances 1 \
-  --network default --subnet default --vpc-egress private-ranges-only \
-  --set-env-vars APP_ENV=production,APP_TOTAL_ISOLATE=1,DB_CONNECTION=postgres,DB_HOST=10.20.0.3,DB_PORT=5432,DB_NAME=blog,DB_USERNAME=blog \
+  --add-cloudsql-instances PROJECT_ID:europe-west1:INSTANCE \
+  --set-env-vars APP_ENV=production,APP_TOTAL_ISOLATE=1,DB_CONNECTION=postgres,DB_HOST=/cloudsql/PROJECT_ID:europe-west1:INSTANCE,DB_PORT=5432,DB_NAME=blog,DB_USERNAME=blog \
   --set-secrets APP_KEY=blog-app-key:1,DB_PASSWORD=blog-db-password:1
 ```
 
@@ -105,7 +110,7 @@ gcloud run deploy blog \
 | --- | --- |
 | `--port 3000` | the port Dox listens on (`APP_PORT`). See [the port](#the-port-port-and-app_port) |
 | `--min-instances 1` | keeps one instance warm, so the first request does not wait for a cold start. The default is `0`. An idle instance still costs money |
-| `--network`, `--subnet`, `--vpc-egress` | Direct VPC egress, to reach the private IP of Cloud SQL |
+| `--add-cloudsql-instances` | makes the Cloud SQL Unix socket in `/cloudsql/...` |
 | `--set-env-vars` | config that is not secret |
 | `--set-secrets` | `ENV_NAME=SECRET:VERSION`. Cloud Run reads the secret when an instance starts. Pin a version number, not `latest` |
 | `APP_TOTAL_ISOLATE=1` | one isolate per CPU. Set it to the `--cpu` value |

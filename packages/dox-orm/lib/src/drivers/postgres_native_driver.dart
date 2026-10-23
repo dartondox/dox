@@ -12,7 +12,8 @@ const Symbol _txKey = #doxPostgresNativeTransaction;
 class PostgresNativeDriver extends DBDriver {
   PostgresNativeDriver(this.pool);
 
-  /// Makes the pool from a Dox [ConnectionConfig]. Reads `maxConnectionCount`
+  /// Makes the pool from a Dox [ConnectionConfig]. A host that starts with
+  /// `/` is a Unix socket folder. Reads `maxConnectionCount`
   /// (default 10), `timeZone` (default UTC), `applicationName` and
   /// `threads` (default 1) from `extra`.
   factory PostgresNativeDriver.fromConfig(ConnectionConfig config) {
@@ -23,7 +24,9 @@ class PostgresNativeDriver extends DBDriver {
     Map<String, dynamic> extra = config.extra;
     return PostgresNativeDriver(
       PgNativePool.open(
-        host: config.host,
+        // a Unix socket is a folder, like libpq. Drop the file name when
+        // it is given, eg. `/cloudsql/p:r:i/.s.PGSQL.5432`.
+        host: config.host.replaceFirst(RegExp(r'/\.s\.PGSQL\.\d+$'), ''),
         port: config.port == 0 ? 5432 : config.port,
         user: config.user,
         password: config.password,

@@ -1,3 +1,4 @@
+import 'package:dox_orm/dox_orm.dart';
 import 'package:mysql_dart/mysql_dart.dart' as mysql;
 import 'package:postgres/postgres.dart' as postgres;
 import 'package:sqlite3/sqlite3.dart' as sqlite;
@@ -18,29 +19,59 @@ class DbConnection {
 
   bool get isSqlite => conn is sqlite.Database;
 
-  /// open connection using `DB_CONNECTION` (postgres, mysql or sqlite)
-  /// from env. for sqlite, `DB_DATABASE` (or `DB_NAME`) is the file path.
-  static Future<DbConnection> open(Map<String, String> env) async {
-    String host = env['DB_HOST'] ?? 'localhost';
+  /// The database config from [env].
+  ///
+  /// `DATABASE_URL` wins when it is set (see `ConnectionConfig.fromUrl`).
+  /// Else `DB_CONNECTION` (postgres, mysql or sqlite), `DB_HOST`,
+  /// `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` and `DB_DATABASE` (or
+  /// `DB_NAME`). For sqlite, the database is the file path. A host that
+  /// starts with `/` is a Postgres Unix socket folder.
+  static ConnectionConfig config(Map<String, String> env) {
+    String? url = env['DATABASE_URL']?.trim();
+    if (url != null && url.isNotEmpty) {
+      return ConnectionConfig.fromUrl(url);
+    }
     String database = env['DB_DATABASE'] ?? env['DB_NAME'] ?? 'dox';
+    Driver driver = switch (env['DB_CONNECTION']) {
+      'sqlite' => Driver.sqlite,
+      'mysql' => Driver.mysql,
+      _ => Driver.postgres,
+    };
+    bool isMysql = driver == Driver.mysql;
+    return ConnectionConfig(
+      driver: driver,
+      host: env['DB_HOST'] ?? 'localhost',
+      port: int.parse(env['DB_PORT'] ?? (isMysql ? '3306' : '5432')),
+      user: env['DB_USERNAME'] ?? (isMysql ? 'root' : 'postgres'),
+      password: env['DB_PASSWORD'] ?? (isMysql ? '' : 'postgres'),
+      database: database,
+      debug: false,
+    );
+  }
 
-    if (env['DB_CONNECTION'] == 'sqlite') {
-      sqlite.Database db = sqlite.sqlite3.open(database);
+  /// open one connection with the config from [env], see [config]
+  static Future<DbConnection> open(Map<String, String> env) async {
+    ConnectionConfig c = config(env);
+
+    if (c.driver == Driver.sqlite) {
+      sqlite.Database db = c.database == ':memory:'
+          ? sqlite.sqlite3.openInMemory()
+          : sqlite.sqlite3.open(c.database);
       db.execute('PRAGMA busy_timeout = 5000');
       db.execute('PRAGMA foreign_keys = ON');
       return DbConnection(db);
     }
 
-    if (env['DB_CONNECTION'] == 'mysql') {
+    if (c.driver == Driver.mysql) {
       // caching_sha2_password (mysql 8 default) without TLS needs the
       // server RSA key to send the password, so ask the server for it.
       mysql.MySQLConnection conn = await mysql.MySQLConnection.createConnection(
-        host: host,
-        port: int.parse(env['DB_PORT'] ?? '3306'),
-        userName: env['DB_USERNAME'] ?? 'root',
-        password: env['DB_PASSWORD'] ?? '',
-        databaseName: database,
-        secure: false,
+        host: c.host,
+        port: c.port,
+        userName: c.user,
+        password: c.password,
+        databaseName: c.database,
+        secure: c.useSSL,
         allowPublicKeyRetrieval: true,
       );
       await conn.connect();
@@ -49,15 +80,11 @@ class DbConnection {
 
     return DbConnection(
       await postgres.Connection.open(
-        postgres.Endpoint(
-          host: host,
-          port: int.parse(env['DB_PORT'] ?? '5432'),
-          database: database,
-          username: env['DB_USERNAME'] ?? 'postgres',
-          password: env['DB_PASSWORD'] ?? 'postgres',
-        ),
+        c.postgresEndpoint,
         settings: postgres.ConnectionSettings(
-          sslMode: postgres.SslMode.disable,
+          sslMode:
+              c.extra['sslMode'] as postgres.SslMode? ??
+              (c.useSSL ? postgres.SslMode.require : postgres.SslMode.disable),
         ),
       ),
     );

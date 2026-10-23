@@ -1,30 +1,33 @@
 import 'dart:io';
 
-/// values of the `.env` file. without the file (eg. in docker), use the
-/// environment variables.
-Map<String, String> loadEnv() {
+/// The env for migrations: the `.env` file and the real environment.
+///
+/// Same rule as `Env.get()` of dox_core: a real environment variable wins
+/// over the `.env` file. An empty value, or the text `null`, counts as
+/// missing. [environment] and [dir] are for tests.
+Map<String, String> loadEnv({Map<String, String>? environment, String? dir}) {
+  environment ??= Platform.environment;
   Map<String, String> data = <String, String>{};
 
-  File envFile = File('${Directory.current.path}/.env');
-
-  if (!envFile.existsSync()) {
-    return Platform.environment;
-  }
-
-  String contents = envFile.readAsStringSync();
-
-  // splitting with new line for each variables
-  List<String> list = contents.split('\n');
-
-  for (String d in list) {
-    // splitting with equal sign to get key and value
-    List<String> keyValue = d.toString().split('=');
-    if (keyValue.first.isNotEmpty) {
-      data[keyValue.first.trim()] = _getValue(keyValue);
+  File envFile = File('${dir ?? Directory.current.path}/.env');
+  if (envFile.existsSync()) {
+    for (String line in envFile.readAsLinesSync()) {
+      // splitting with equal sign to get key and value
+      List<String> keyValue = line.split('=');
+      String key = keyValue.first.trim();
+      if (key.isNotEmpty) {
+        data[key] = _getValue(keyValue);
+      }
     }
   }
-
+  data.addAll(environment);
+  data.removeWhere(_missing);
   return data;
+}
+
+bool _missing(String key, String value) {
+  String text = value.trim();
+  return text.isEmpty || text.toLowerCase() == 'null';
 }
 
 String _getValue(List<String> elements) {

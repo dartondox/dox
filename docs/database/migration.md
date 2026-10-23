@@ -140,8 +140,10 @@ Keep the `db/migration` folder next to the binary if you also have `.sql` migrat
 
 ## Database settings
 
-The migrations use the `.env` file in your project.
-When there is no `.env` file (for example in Docker), they use the environment variables.
+The migrations read the `.env` file and the environment variables.
+A real environment variable wins over `.env`, the same as `Env.get()`.
+
+When `DATABASE_URL` is set, it wins over all `DB_*` keys. See [`DATABASE_URL`](index.md#database_url).
 
 ```bash title=".env"
 DB_CONNECTION=postgres # or mysql (also MariaDB), or sqlite
@@ -162,8 +164,9 @@ DB_NAME=storage/app.db # file path, made if missing
 - `DB_DATABASE` works too, in place of `DB_NAME`.
 - The default port is `5432` for Postgres and `3306` for MySQL.
 - One run uses one database connection.
-- Migrations do not use TLS. To migrate a database that needs TLS,
-  give your own connection: `Migrator(migrations: migrations, connection: myPool)`.
+- A `DB_HOST` that starts with `/` is a Postgres Unix socket folder, like `/cloudsql/project:region:instance`.
+- Migrations use TLS only with a `DATABASE_URL` that has `sslmode` (Postgres) or `ssl` (MySQL), like `?sslmode=require`.
+  You can also give your own connection: `Migrator(migrations: migrations, connection: myPool)`.
 
 ## Transactions
 

@@ -94,6 +94,7 @@ sudo chmod 600 /etc/blog.env
 systemd reads this file as `root`, before it starts the app as `dox`. So `dox` does not need to read it.
 
 For Postgres, set `DB_CONNECTION=postgres` and add `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` and `DB_NAME`.
+Or set one `DATABASE_URL`, like `postgres://app:secret@localhost:5432/blog`. It wins over the `DB_*` keys. See [`DATABASE_URL`](../database/index.md#database_url).
 See [Environments](environments.md) for all keys.
 
 !!! note "Which value wins"
