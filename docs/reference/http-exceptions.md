@@ -74,7 +74,7 @@ content-type: application/json
 {"email":"The email is not a valid email","name":"The name is required"}
 ```
 
-A request for a path that has no route is not an exception. Dox answers `404` with the text `<METHOD> <path> not found`.
+A request for a path that has no route answers like a `NotFoundHttpException` with the message `<METHOD> <path> not found`: `{"code":"not_found","message":"GET /nothing not found"}`. Your `responseHandler` gets it too, so you can change its shape.
 
 To send your own JSON shape from one exception, pass a map:
 

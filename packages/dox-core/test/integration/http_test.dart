@@ -118,8 +118,14 @@ void main() {
     test('route not found', () async {
       Uri url = Uri.parse('$baseUrl/non/exist/route');
       http.Response response = await http.get(url);
-      expect(response.body, 'GET /non/exist/route not found');
       expect(response.statusCode, 404);
+      expect(jsonDecode(response.body), <String, dynamic>{
+        'code': 'not_found',
+        'message': 'GET /non/exist/route not found',
+      });
+      expect(response.headers['content-type'], contains('application/json'));
+      // the app responseHandler runs for a 404 too
+      expect(response.headers['x-error-handled'], 'yes');
     });
 
     test('OPTIONS route', () async {

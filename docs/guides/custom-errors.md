@@ -195,11 +195,9 @@ After `GET /api/boom`, the server prints one line:
 Remove the `/boom` route when you are done.
 
 !!! note "A URL with no route"
-    A URL that matches no route answers `404` with the text `GET /nothing not found`.
-    Dox answers this before the response handler runs, so it does not get the JSON shape.
-    To change it, add a catch-all route at the end of your last router:
-    `Route.get('/{path*}', (DoxRequest req) => throw NotFoundHttpException());`
-    Do the same for `Route.post` and the other methods you use.
+    A URL that matches no route is a `NotFoundHttpException` with the message `GET /nothing not found`.
+    It goes through the response handler too, so it gets the same JSON shape:
+    `{"error":{"code":"not_found","message":"GET /nothing not found"}}`.
 
 ## See also
 
