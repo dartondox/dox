@@ -66,9 +66,11 @@ Dox can use both. The Unix socket needs no VPC, so this guide uses it:
 1. Find the connection name of the instance: `gcloud sql instances describe INSTANCE --format='value(connectionName)'`. It looks like `PROJECT_ID:europe-west1:INSTANCE`.
 2. Deploy with `--add-cloudsql-instances <connection name>` (step 4). Cloud Run then makes the socket in `/cloudsql/<connection name>`.
 3. Give the service account the `roles/cloudsql.client` role.
-4. Set `DB_HOST=/cloudsql/<connection name>`. A host that starts with `/` is a Unix socket folder. See [Unix socket](../database/index.md#unix-socket).
+4. Set `DB_HOST=/cloudsql/<connection name>`. A host that starts with `/` is a Unix socket. See [Unix socket](../database/index.md#unix-socket).
 
 The same with one url: `DATABASE_URL=postgres://blog:<password>@/blog?host=/cloudsql/<connection name>`.
+
+For **Cloud SQL for MySQL**, use the same `DB_HOST` with `DB_CONNECTION=mysql`. Leave out `DB_PORT`. Or use one url: `DATABASE_URL=mysql://blog:<password>@/blog?socket=/cloudsql/<connection name>`.
 
 To use the **private IP** instead: give the instance a private IP on your VPC network, deploy with Direct VPC egress (`--network default --subnet default --vpc-egress private-ranges-only`), and use the private IP as `DB_HOST`.
 
