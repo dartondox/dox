@@ -131,5 +131,23 @@ class User {
       expect(out, contains("preload.contains('userInfos')"));
       expect(out, contains("map['user_infos'] = toMap(instance.userInfos);"));
     });
+
+    test('the primary key type follows primaryKeyType', () async {
+      String out = await _generate('''
+@DoxModel(primaryKey: 'uuid', primaryKeyType: String)
+class Device {}
+''');
+      expect(out, contains('String? get uuid => tempIdValue as String?;'));
+      expect(out, contains('set uuid(String? val) => tempIdValue = val;'));
+      expect(out, contains("..uuid = m['uuid'] as String?"));
+    });
+
+    test('the primary key is int by default', () async {
+      String out = await _generate('''
+@DoxModel()
+class Device {}
+''');
+      expect(out, contains('int? get id => tempIdValue as int?;'));
+    });
   });
 }

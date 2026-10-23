@@ -18,6 +18,13 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     String primaryKeySnakeCase =
         annotation.objectValue.getField('primaryKey')?.toStringValue() ?? 'id';
     String primaryKey = toCamelCase(primaryKeySnakeCase);
+    String primaryKeyType =
+        annotation.objectValue
+            .getField('primaryKeyType')
+            ?.toTypeValue()
+            ?.getDisplayString()
+            .replaceFirst('?', '') ??
+        'int';
     String? createdAt = annotation.objectValue
         .getField('createdAt')
         ?.toStringValue();
@@ -31,7 +38,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
 
     visitor.columns.addAll({
       primaryKey: {
-        'type': 'int?',
+        'type': '$primaryKeyType?',
         'jsonKey': primaryKeySnakeCase,
         'beforeSave': null,
         'beforeGet': null,
@@ -92,7 +99,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
 
       ${_getTableNameSetter(tableName)}
 
-      ${_primaryKeySetterAndGetter(primaryKey)}
+      ${_primaryKeySetterAndGetter(primaryKey, primaryKeyType)}
 
       $className query() => $className();
 
@@ -224,11 +231,11 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         : '';
   }
 
-  String _primaryKeySetterAndGetter(String primaryKey) {
+  String _primaryKeySetterAndGetter(String primaryKey, String type) {
     return """
-      int? get $primaryKey => tempIdValue;
-      
-      set $primaryKey(dynamic val) => tempIdValue = val;
+      $type? get $primaryKey => tempIdValue as $type?;
+
+      set $primaryKey($type? val) => tempIdValue = val;
     """;
   }
 

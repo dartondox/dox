@@ -23,6 +23,11 @@ class Model<T> extends QueryBuilder<T> {
   /// values we last saved, so save() can tell when a field was set to null
   Map<String, dynamic>? _savedValues;
 
+  /// true when the row is in the table: the model was read from it, or
+  /// saved. save() inserts when it is false, so a model with a key you
+  /// set yourself (like a UUID) is inserted, not updated.
+  bool get exists => _savedValues != null || originalMap.isNotEmpty;
+
   @override
   String get tableName => helper.tableNameOf(runtimeType);
 
@@ -72,7 +77,7 @@ class Model<T> extends QueryBuilder<T> {
       await _save();
       return true;
     }
-    bool isNew = tempIdValue == null;
+    bool isNew = !exists;
     try {
       await _fire(ModelEvent.saving);
       await _fire(isNew ? ModelEvent.creating : ModelEvent.updating);
@@ -94,7 +99,7 @@ class Model<T> extends QueryBuilder<T> {
 
     Map<String, dynamic> values = toMap(removeRelations: true);
     DateTime currentTime = now();
-    if (values[primaryKey] == null) {
+    if (!exists) {
       values.removeWhere((String key, dynamic value) => value == null);
 
       if (createdAtColumn != null) {

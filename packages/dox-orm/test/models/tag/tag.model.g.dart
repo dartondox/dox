@@ -18,9 +18,9 @@ class TagGenerator extends Model<Tag> {
     'updated_at': 'updated_at',
   };
 
-  int? get id => tempIdValue;
+  int? get id => tempIdValue as int?;
 
-  set id(dynamic val) => tempIdValue = val;
+  set id(int? val) => tempIdValue = val;
 
   Tag query() => Tag();
 

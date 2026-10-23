@@ -21,9 +21,9 @@ class EventPostGenerator extends Model<EventPost> with SoftDeletes<EventPost> {
   @override
   String get tableName => 'event_posts';
 
-  int? get id => tempIdValue;
+  int? get id => tempIdValue as int?;
 
-  set id(dynamic val) => tempIdValue = val;
+  set id(int? val) => tempIdValue = val;
 
   EventPost query() => EventPost();
 

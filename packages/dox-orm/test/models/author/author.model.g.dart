@@ -18,9 +18,9 @@ class AuthorGenerator extends Model<Author> {
     'updated_at': 'updated_at',
   };
 
-  int? get id => tempIdValue;
+  int? get id => tempIdValue as int?;
 
-  set id(dynamic val) => tempIdValue = val;
+  set id(int? val) => tempIdValue = val;
 
   Author query() => Author();
 

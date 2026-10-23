@@ -1,3 +1,7 @@
+## Unreleased
+
+- New `primaryKeyType` option on `@DoxModel`. Use `primaryKeyType: String` for a UUID key. The default is `int`.
+
 ## 3.0.0-alpha.4
 
 - Version bump only, to match the other packages.

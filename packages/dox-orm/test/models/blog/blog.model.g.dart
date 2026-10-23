@@ -18,9 +18,9 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
     'updated_at': 'updated_at',
   };
 
-  int? get uid => tempIdValue;
+  int? get uid => tempIdValue as int?;
 
-  set uid(dynamic val) => tempIdValue = val;
+  set uid(int? val) => tempIdValue = val;
 
   Blog query() => Blog();
 

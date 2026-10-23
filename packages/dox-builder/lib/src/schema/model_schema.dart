@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../openapi/annotation_reader.dart';
 import '../openapi/ast_finders.dart';
@@ -41,8 +42,14 @@ class ModelSchema {
     DartObject? options = annotations.first(model, 'DoxModel');
     String primaryKey =
         options?.getField('primaryKey')?.toStringValue() ?? 'id';
+    DartType? primaryKeyType = options
+        ?.getField('primaryKeyType')
+        ?.toTypeValue();
     Map<String, dynamic> properties = <String, dynamic>{
-      primaryKey: <String, dynamic>{'type': 'integer'},
+      primaryKey: primaryKeyType == null
+          ? <String, dynamic>{'type': 'integer'}
+          : await types.of(primaryKeyType) ??
+                <String, dynamic>{'type': 'integer'},
     };
     for (FieldElement field in model.fields) {
       if (field.isStatic || !field.isOriginDeclaration) continue;
