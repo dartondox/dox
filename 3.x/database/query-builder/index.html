@@ -6,9 +6,11 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
+        <meta name="description" content="The query builder makes SQL for you. You chain methods, and Dox runs the query with bound values. It works on Postgres, MySQL/MariaDB and SQLite.">
       
       
-        <link rel="canonical" href="https://dartondox.dev/3.x/database/query-builder/">
+      
+        <link rel="canonical" href="https://dartondox.dev/latest/3.x/database/query-builder/">
       
       
         <link rel="prev" href="../">
@@ -24,10 +26,10 @@
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
-      
-        <title>Query Builder - DOX</title>
-      
-    
+  
+    <title>Query Builder | Dox, the Dart backend framework</title>
+  
+
     
       <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
@@ -69,6 +71,39 @@
 
     
     
+  
+  
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Dox">
+  <meta property="og:title" content="Query Builder | Dox">
+  <meta property="og:description" content="The query builder makes SQL for you. You chain methods, and Dox runs the query with bound values. It works on Postgres, MySQL/MariaDB and SQLite.">
+  <meta property="og:url" content="https://dartondox.dev/latest/3.x/database/query-builder/">
+  <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Dox: fast web backend framework for Dart">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Query Builder | Dox">
+  <meta name="twitter:description" content="The query builder makes SQL for you. You chain methods, and Dox runs the query with bound values. It works on Postgres, MySQL/MariaDB and SQLite.">
+  <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Dox", "item": "https://dartondox.dev/latest/3.x" }
+      ,{ "@type": "ListItem", "position": 2, "name": "Database", "item": "https://dartondox.dev/latest/3.x/database/" }
+      ,{ "@type": "ListItem", "position": 3, "name": "Query Builder", "item": "https://dartondox.dev/latest/3.x/database/query-builder/" }
+    ]
+  }
+  </script>
+  
+  
+
   </head>
   
   
@@ -272,6 +307,28 @@
     
     
       <li class="md-tabs__item">
+        <a href="../../the-basic/routing/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  The basics
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
         <a href="../../digging-deeper/cache/" class="md-tabs__link">
           
   
@@ -362,13 +419,35 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../others/contribute/" class="md-tabs__link">
+        <a href="../../guides/" class="md-tabs__link">
           
   
   
     
   
-  Others
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reference
 
         </a>
       </li>
@@ -431,16 +510,6 @@
       
         
           
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
         
       
         
@@ -532,6 +601,554 @@
   
 
               
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../tutorial/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1_3" id="__nav_1_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorial
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/01-create-project/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 1: Create the project
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/02-model-and-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 2: Model and migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/03-routes-and-controller/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 3: Routes and controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/04-validation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 4: Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/05-auth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 5: Login with dox_auth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/06-test/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 6: Test
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/07-build-and-deploy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 7: Build and deploy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_4" id="__nav_1_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Concepts
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/how-dox-works/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How Dox works
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/coming-from-laravel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coming from Laravel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/dart-frameworks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dox and the other Dart backends
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/status-and-roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Status and roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The basics
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The basics
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
                 
@@ -782,10 +1399,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -803,8 +1420,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1174,7 +1791,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
           <div class="md-nav__link md-nav__container">
@@ -1196,14 +1813,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1282,10 +1899,237 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#create" class="md-nav__link">
+  <a href="#start-a-query" class="md-nav__link">
     <span class="md-ellipsis">
       
-        create
+        Start a query
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#read-rows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Read rows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Read rows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        all
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#find" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        find
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getfirst" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        getFirst
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#count" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        count
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#paginate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        paginate
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Where">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#where_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        where
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#orwhere" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        orWhere
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wherein-and-wherenotin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        whereIn and whereNotIn
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wherenull-and-wherenotnull" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        whereNull and whereNotNull
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#whereraw-and-orwhereraw" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        whereRaw and orWhereRaw
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#select" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Select
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#order-limit-and-group" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Order, limit and group
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Order, limit and group">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#orderby" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        orderBy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limit-take-and-offset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        limit, take and offset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#groupby" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        groupBy
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#join" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Join
       
     </span>
   </a>
@@ -1296,10 +2140,38 @@
   <a href="#insert" class="md-nav__link">
     <span class="md-ellipsis">
       
-        insert
+        Insert
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Insert">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-and-insert" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create and insert
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#insertmultiple" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        insertMultiple
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1307,73 +2179,7 @@
   <a href="#update" class="md-nav__link">
     <span class="md-ellipsis">
       
-        update
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#count" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        count
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#find" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        find
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#getfirst" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        getFirst
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#all" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        all
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#get" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tosql" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        toSql
+        Update
       
     </span>
   </a>
@@ -1384,14 +2190,26 @@
   <a href="#delete" class="md-nav__link">
     <span class="md-ellipsis">
       
+        Delete
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Delete">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#delete_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
         delete
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#forcedelete" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1401,8 +2219,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#withtrash" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1412,180 +2230,20 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#select" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#truncate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        select
+        truncate
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#wherein" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        whereIn
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#wherenull" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        whereNull
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#where" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        where
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#orwhere" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        orWhere
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#whereraw" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        whereRaw
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#orwhereraw" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        orWhereRaw
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#limit-take-offset" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        limit, take, offset
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#groupby" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        groupBy
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#orderby" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        orderBy
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#join" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        join
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#leftjoin" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        leftJoin
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rightjoin" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        rightJoin
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#joinraw" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        joinRaw
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#leftjoinraw" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        leftJoinRaw
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rightjoinraw" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        rightJoinRaw
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1593,10 +2251,38 @@
   <a href="#debug" class="md-nav__link">
     <span class="md-ellipsis">
       
+        Debug
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Debug">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tosql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        toSql
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debug_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
         debug
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1786,7 +2472,7 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_8" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_8" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -1808,14 +2494,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3_8" id="__nav_3_8_label" tabindex="">
+              <label class="md-nav__link " for="__nav_4_8" id="__nav_4_8_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_8">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1887,10 +2573,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_8_3" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_8_3" >
         
           
-          <label class="md-nav__link" for="__nav_3_8_3" id="__nav_3_8_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_8_3" id="__nav_4_8_3_label" tabindex="0">
             
   
   
@@ -1908,8 +2594,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_8_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_8_3">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_8_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_8_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2116,10 +2802,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
@@ -2137,8 +2823,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2162,7 +2848,7 @@
   <span class="md-ellipsis">
     
   
-    dox_validation
+    Validation
   
 
     
@@ -2218,7 +2904,7 @@
   <span class="md-ellipsis">
     
   
-    Storage (dox_storage)
+    Storage
   
 
     
@@ -2246,7 +2932,7 @@
   <span class="md-ellipsis">
     
   
-    Cache (dox_cache)
+    Cache
   
 
     
@@ -2327,10 +3013,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
             
   
   
@@ -2348,8 +3034,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2488,6 +3174,30 @@
     
       
         
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
       
         
       
@@ -2506,17 +3216,398 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
         
           
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+          <div class="md-nav__link md-nav__container">
+            <a href="../../guides/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/file-upload/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    File upload
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/pagination/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pagination
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/jwt-auth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JWT authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/custom-errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom errors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/background-work/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/static-files/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Static files and SPA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/cors-for-spa/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CORS for a browser front-end
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/environments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/testing-with-database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing with a database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/share-code-with-flutter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Share code with Flutter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/api-docs-with-openapi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API docs with OpenAPI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_13" id="__nav_7_13_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
     
   
-    Others
+    Deploy
   
 
     
@@ -2527,16 +3618,514 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_13">
             <span class="md-nav__icon md-icon"></span>
             
   
-    Others
+    Deploy
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/deploy-vps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploy to a Linux server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/deploy-fly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploy to Fly.io
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/deploy-cloud-run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploy to Google Cloud Run
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../reference/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/cheat-sheet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cheat sheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/app-config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    App config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/env/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environment variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/request-and-response/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Request and response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/http-exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP exceptions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/production-checklist/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production checklist
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error index
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -2561,160 +4150,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_6_2" id="__nav_6_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Releases
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Releases
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/releases/v3-release/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    3.x
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/releases/core-release/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Core
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/releases/query-builder-release/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Query builder
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -2754,10 +4189,237 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#create" class="md-nav__link">
+  <a href="#start-a-query" class="md-nav__link">
     <span class="md-ellipsis">
       
-        create
+        Start a query
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#read-rows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Read rows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Read rows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        all
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#find" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        find
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getfirst" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        getFirst
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#count" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        count
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#paginate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        paginate
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Where">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#where_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        where
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#orwhere" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        orWhere
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wherein-and-wherenotin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        whereIn and whereNotIn
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wherenull-and-wherenotnull" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        whereNull and whereNotNull
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#whereraw-and-orwhereraw" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        whereRaw and orWhereRaw
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#select" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Select
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#order-limit-and-group" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Order, limit and group
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Order, limit and group">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#orderby" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        orderBy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limit-take-and-offset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        limit, take and offset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#groupby" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        groupBy
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#join" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Join
       
     </span>
   </a>
@@ -2768,10 +4430,38 @@
   <a href="#insert" class="md-nav__link">
     <span class="md-ellipsis">
       
-        insert
+        Insert
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Insert">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-and-insert" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create and insert
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#insertmultiple" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        insertMultiple
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2779,73 +4469,7 @@
   <a href="#update" class="md-nav__link">
     <span class="md-ellipsis">
       
-        update
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#count" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        count
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#find" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        find
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#getfirst" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        getFirst
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#all" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        all
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#get" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tosql" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        toSql
+        Update
       
     </span>
   </a>
@@ -2856,14 +4480,26 @@
   <a href="#delete" class="md-nav__link">
     <span class="md-ellipsis">
       
+        Delete
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Delete">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#delete_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
         delete
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#forcedelete" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2873,8 +4509,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#withtrash" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2884,180 +4520,20 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#select" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#truncate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        select
+        truncate
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#wherein" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        whereIn
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#wherenull" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        whereNull
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#where" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        where
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#orwhere" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        orWhere
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#whereraw" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        whereRaw
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#orwhereraw" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        orWhereRaw
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#limit-take-offset" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        limit, take, offset
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#groupby" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        groupBy
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#orderby" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        orderBy
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#join" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        join
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#leftjoin" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        leftJoin
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rightjoin" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        rightJoin
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#joinraw" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        joinRaw
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#leftjoinraw" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        leftJoinRaw
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rightjoinraw" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        rightJoinRaw
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3065,10 +4541,38 @@
   <a href="#debug" class="md-nav__link">
     <span class="md-ellipsis">
       
+        Debug
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Debug">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tosql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        toSql
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debug_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
         debug
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3089,451 +4593,314 @@
 
 
   
+    <a href="https://github.com/dartondox/dox/edit/develop/docs/database/query-builder.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
   
 
 
 <h1 id="query-builder">Query Builder</h1>
-<p>The query builder makes SQL for you. You chain methods, and Dox runs the query with bound values.
+<p>The query builder makes SQL for you.
+You chain methods, and Dox runs the query with bound values.
 It works on Postgres, MySQL/MariaDB and SQLite.</p>
 <ul>
-<li>Set up the database first: see <a href="../">Database</a>.</li>
+<li>Set up the database first. See <a href="../">Database</a>.</li>
 <li>For transactions, see <a href="../transactions/">Transactions</a>.</li>
 </ul>
-<div class="admonition note">
-<p class="admonition-title">Good to know</p>
-<ul>
-<li>Table and column names are quoted. On Postgres, <code>userId</code> and <code>userid</code> are two names.</li>
-<li><code>orderBy</code> throws an <code>ArgumentError</code> when the direction is not <code>asc</code> or <code>desc</code>.</li>
-<li><code>toSql()</code> wraps the where part in brackets.</li>
-<li><code>count()</code> ignores <code>limit</code>, <code>offset</code> and <code>orderBy</code>. With <code>groupBy</code> it returns the number of groups.</li>
-</ul>
-</div>
-<h3 id="create"><code>create</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Create</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">create</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">,</span><span class="w"> </span><span class="s1">'age'</span><span class="o">:</span><span class="w"> </span><span class="m">60</span><span class="p">}</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">);</span>
+<h2 id="start-a-query">Start a query</h2>
+<p>There are two ways to start a query.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// with a model: the result is a list of Actor models</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Actor</span><span class="o">&gt;</span><span class="w"> </span><span class="n">actors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="s1">'&gt;='</span><span class="p">,</span><span class="w"> </span><span class="m">23</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1">// with a table name: the result is a list of maps, one map per row</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'actor'</span><span class="p">)</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="s1">'&gt;='</span><span class="p">,</span><span class="w"> </span><span class="m">23</span><span class="p">)</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
 </span></code></pre></div>
+<p>See <a href="../model/">Models</a> for the model way.</p>
+<p>The examples on this page use an <code>Actor</code> model on the table <code>actor</code>.
+The SQL in the examples is for Postgres. MySQL quotes names with <code>`</code> instead of <code>"</code>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Start each query with a new object</p>
+<p>A query object keeps its <code>where</code>, <code>orderBy</code> and other parts.
+Use <code>Actor()</code> (or <code>QueryBuilder.table(...)</code>) again for each new query.</p>
 </div>
-</div>
-</div>
-<h3 id="insert"><code>insert</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Insert</label><label for="__tabbed_2_2">Multiple insert</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">insert</span><span class="p">(</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">,</span><span class="w"> </span><span class="s1">'age'</span><span class="o">:</span><span class="w"> </span><span class="m">60</span><span class="p">}</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="p">);</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">insertMultiple</span><span class="p">([</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">,</span><span class="w"> </span><span class="s1">'age'</span><span class="o">:</span><span class="w"> </span><span class="m">60</span><span class="p">},</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'John Doe'</span><span class="p">,</span><span class="w"> </span><span class="s1">'age'</span><span class="o">:</span><span class="w"> </span><span class="m">25</span><span class="p">},</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">]);</span>
-</span></code></pre></div>
-</div>
-</div>
-</div>
-<div class="admonition info">
-<p class="admonition-title">Info</p>
-<p><code>insert</code> works with any primary key type, for example a uuid string.
-<code>insertMultiple</code> uses the keys from all rows. When a row does not have a key,
-that column gets its default value.</p>
-</div>
-<h3 id="update"><code>update</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="3:1"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Update rows</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">()</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="m">3</span><span class="p">)</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'active'</span><span class="p">)</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="p">.</span><span class="n">update</span><span class="p">({</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">        </span><span class="s2">"name"</span><span class="o">:</span><span class="w"> </span><span class="s2">"Updated AJ"</span><span class="p">,</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">        </span><span class="s2">"age"</span><span class="o">:</span><span class="w"> </span><span class="m">120</span><span class="p">,</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span><span class="p">});</span>
-</span></code></pre></div>
-</div>
-</div>
-</div>
-<h3 id="count"><code>count</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Count all</label><label for="__tabbed_4_2">Count with condition</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">count</span><span class="p">();</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="s1">'&gt;='</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="m">23</span><span class="p">).</span><span class="n">count</span><span class="p">();</span>
-</span></code></pre></div>
-</div>
-</div>
-</div>
-<div class="admonition info">
-<p class="admonition-title">Info</p>
-<p><code>count()</code> does not use <code>limit</code>, <code>offset</code> and <code>orderBy</code>.
-With <code>groupBy</code>, <code>count()</code> returns the number of groups.</p>
-</div>
-<h3 id="find"><code>find</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Find by id</label><label for="__tabbed_5_2">Find by custom column</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">);</span>
-</span></code></pre></div>
-</div>
-</div>
-</div>
-<h3 id="getfirst"><code>getFirst</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="6:1"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">Get first row</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">Actor</span><span class="w"> </span><span class="n">actor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">getFirst</span><span class="p">();</span><span class="w"> </span><span class="c1">// limit = 1</span>
-</span></code></pre></div>
-</div>
-</div>
-</div>
-<h3 id="all"><code>all</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="7:1"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">Ge all rows</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Actor</span><span class="o">&gt;</span><span class="w"> </span><span class="n">actors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">all</span><span class="p">();</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="k">for</span><span class="p">(</span><span class="n">Actor</span><span class="w"> </span><span class="n">actor</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">actors</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="n">print</span><span class="p">(</span><span class="n">actor</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="p">}</span>
-</span></code></pre></div>
-</div>
-</div>
-</div>
+<h2 id="read-rows">Read rows</h2>
 <h3 id="get"><code>get</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="8:1"><input checked="checked" id="__tabbed_8_1" name="__tabbed_8" type="radio" /><div class="tabbed-labels"><label for="__tabbed_8_1">Get</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Actor</span><span class="o">&gt;</span><span class="w"> </span><span class="n">actors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="n">Actor</span><span class="w"> </span><span class="n">actor</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">actors</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="n">print</span><span class="p">(</span><span class="n">actor</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="p">}</span>
+<p>Runs the query and returns all rows that match.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Actor</span><span class="o">&gt;</span><span class="w"> </span><span class="n">actors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1">// SELECT * FROM "actor" WHERE "name" = @name_p0</span>
 </span></code></pre></div>
-</div>
-</div>
-</div>
-<h3 id="tosql"><code>toSql</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="9:1"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio" /><div class="tabbed-labels"><label for="__tabbed_9_1">To SQL query</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="n">toSql</span><span class="p">();</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">print</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+<h3 id="all"><code>all</code></h3>
+<p>Returns all rows of the table.
+<code>all()</code> ignores <code>where</code>, <code>join</code>, <code>orderBy</code> and <code>limit</code>. Use <code>get()</code> for those.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Actor</span><span class="o">&gt;</span><span class="w"> </span><span class="n">actors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">all</span><span class="p">();</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1">// SELECT * FROM "actor"</span>
 </span></code></pre></div>
-</div>
-</div>
-</div>
-<h3 id="delete"><code>delete</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="10:1"><input checked="checked" id="__tabbed_10_1" name="__tabbed_10" type="radio" /><div class="tabbed-labels"><label for="__tabbed_10_1">Delete a row</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="n">delete</span><span class="p">();</span>
+<h3 id="find"><code>find</code></h3>
+<p>Returns one row, or <code>null</code> when there is no match.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// by primary key</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">Actor</span><span class="o">?</span><span class="w"> </span><span class="n">actor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1">// SELECT * FROM "actor" WHERE "id" = @id_p0 LIMIT 1</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1">// by another column</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">Actor</span><span class="o">?</span><span class="w"> </span><span class="n">byName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">);</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1">// SELECT * FROM "actor" WHERE "name" = @name_p0 LIMIT 1</span>
 </span></code></pre></div>
-</div>
-</div>
-</div>
-<h3 id="forcedelete"><code>forceDelete</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="11:1"><input checked="checked" id="__tabbed_11_1" name="__tabbed_11" type="radio" /><div class="tabbed-labels"><label for="__tabbed_11_1">Force delete</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="n">forceDelete</span><span class="p">();</span>
+<h3 id="getfirst"><code>getFirst</code></h3>
+<p>Returns the first row of the query, or <code>null</code>.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">Actor</span><span class="o">?</span><span class="w"> </span><span class="n">actor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="s1">'&gt;'</span><span class="p">,</span><span class="w"> </span><span class="m">60</span><span class="p">).</span><span class="n">orderBy</span><span class="p">(</span><span class="s1">'age'</span><span class="p">).</span><span class="n">getFirst</span><span class="p">();</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="c1">// SELECT * FROM "actor" WHERE "age" &gt; @age_p0 ORDER BY "age" LIMIT 1</span>
 </span></code></pre></div>
-</div>
-</div>
-</div>
-<div class="admonition info">
-<p class="admonition-title">Info</p>
-<p>This is for models with softDeletes. It also deletes rows that are already
-soft deleted, so you do not need <code>withTrash()</code>.</p>
-</div>
-<h3 id="withtrash"><code>withTrash</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="12:1"><input checked="checked" id="__tabbed_12_1" name="__tabbed_12" type="radio" /><div class="tabbed-labels"><label for="__tabbed_12_1">Get from trash</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">List</span><span class="w"> </span><span class="n">actors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="n">withTrash</span><span class="p">().</span><span class="kd">get</span><span class="p">();</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="k">for</span><span class="p">(</span><span class="n">Actor</span><span class="w"> </span><span class="n">actor</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">actors</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="n">print</span><span class="p">(</span><span class="n">actor</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="p">}</span>
+<h3 id="count"><code>count</code></h3>
+<p>Returns the number of rows as an <code>int</code>.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">count</span><span class="p">();</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kt">int</span><span class="w"> </span><span class="n">adults</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="s1">'&gt;='</span><span class="p">,</span><span class="w"> </span><span class="m">18</span><span class="p">).</span><span class="n">count</span><span class="p">();</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="c1">// SELECT count(*) as total FROM "actor" WHERE "age" &gt;= @age_p0</span>
 </span></code></pre></div>
-</div>
-</div>
-</div>
-<div class="admonition info">
-<p class="admonition-title">Info</p>
-<p>This work only with softDeletes. On a model without softDeletes it does nothing.</p>
-</div>
-<h3 id="select"><code>select</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="13:4"><input checked="checked" id="__tabbed_13_1" name="__tabbed_13" type="radio" /><input id="__tabbed_13_2" name="__tabbed_13" type="radio" /><input id="__tabbed_13_3" name="__tabbed_13" type="radio" /><input id="__tabbed_13_4" name="__tabbed_13" type="radio" /><div class="tabbed-labels"><label for="__tabbed_13_1">Multiple select</label><label for="__tabbed_13_2">Select with array of columns</label><label for="__tabbed_13_3">Select with comma separated columns</label><label for="__tabbed_13_4">Select raw</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">()</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span><span class="p">.</span><span class="n">select</span><span class="p">(</span><span class="s1">'id'</span><span class="p">)</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="p">.</span><span class="n">select</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+<ul>
+<li><code>count()</code> ignores <code>limit</code>, <code>offset</code> and <code>orderBy</code>.</li>
+<li>With <code>groupBy</code>, <code>count()</code> returns the number of groups.</li>
+</ul>
+<h3 id="paginate"><code>paginate</code></h3>
+<p>Returns one page of rows and the page info.
+It runs a <code>count()</code> query and a <code>get()</code> query.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">Pagination</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">()</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="s1">'&gt;='</span><span class="p">,</span><span class="w"> </span><span class="m">18</span><span class="p">)</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="p">.</span><span class="n">paginate</span><span class="p">(</span><span class="nl">currentPage:</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="nl">perPage:</span><span class="w"> </span><span class="m">10</span><span class="p">);</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Actor</span><span class="o">&gt;</span><span class="w"> </span><span class="n">actors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">page</span><span class="p">.</span><span class="n">getData</span><span class="o">&lt;</span><span class="n">Actor</span><span class="o">&gt;</span><span class="p">();</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="n">print</span><span class="p">(</span><span class="n">page</span><span class="p">.</span><span class="n">total</span><span class="p">);</span><span class="w">    </span><span class="c1">// rows that match</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="n">print</span><span class="p">(</span><span class="n">page</span><span class="p">.</span><span class="n">lastPage</span><span class="p">);</span><span class="w"> </span><span class="c1">// number of pages</span>
 </span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">()</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">    </span><span class="p">.</span><span class="n">select</span><span class="p">([</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'age'</span><span class="p">]).</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+<p><code>page.toJson()</code> gives <code>total</code>, <code>per_page</code>, <code>last_page</code>, <code>current_page</code> and <code>data</code>.
+So you can return a <code>Pagination</code> from a controller.</p>
+<h2 id="where">Where</h2>
+<h3 id="where_1"><code>where</code></h3>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">// equal</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="c1">// WHERE "name" = @name_p0</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="c1">// other operator</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="s1">'&gt;='</span><span class="p">,</span><span class="w"> </span><span class="m">23</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'!='</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'like'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John%'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="c1">// null</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'deleted_at'</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="c1">// WHERE "deleted_at" IS NULL</span>
 </span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">()</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">    </span><span class="p">.</span><span class="n">select</span><span class="p">(</span><span class="s1">'id, name, age'</span><span class="p">).</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1">// nothing is quoted</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">selectRaw</span><span class="p">(</span><span class="s1">'DISTINCT name'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-</div>
-</div>
-</div>
-<h3 id="wherein"><code>whereIn</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="14:3"><input checked="checked" id="__tabbed_14_1" name="__tabbed_14" type="radio" /><input id="__tabbed_14_2" name="__tabbed_14" type="radio" /><input id="__tabbed_14_3" name="__tabbed_14" type="radio" /><div class="tabbed-labels"><label for="__tabbed_14_1">Where in condition</label><label for="__tabbed_14_2">Where not in</label><label for="__tabbed_14_3">Or where in / not in</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">whereIn</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">'1'</span><span class="p">,</span><span class="w"> </span><span class="s1">'2'</span><span class="p">]).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">whereNotIn</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">]).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="m">60</span><span class="p">).</span><span class="n">orWhereIn</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">]).</span><span class="kd">get</span><span class="p">();</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="m">60</span><span class="p">).</span><span class="n">orWhereNotIn</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">]).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-</div>
-</div>
-</div>
-<div class="admonition info">
-<p class="admonition-title">Info</p>
-<p>Each value is sent as a bound parameter.
-An empty list matches no rows for <code>whereIn</code>, and all rows for <code>whereNotIn</code>.</p>
-</div>
-<h3 id="wherenull"><code>whereNull</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="15:2"><input checked="checked" id="__tabbed_15_1" name="__tabbed_15" type="radio" /><input id="__tabbed_15_2" name="__tabbed_15" type="radio" /><div class="tabbed-labels"><label for="__tabbed_15_1">Where null / not null</label><label for="__tabbed_15_2">Or where null / not null</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">whereNull</span><span class="p">(</span><span class="s1">'deleted_at'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">whereNotNull</span><span class="p">(</span><span class="s1">'deleted_at'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="m">60</span><span class="p">).</span><span class="n">orWhereNull</span><span class="p">(</span><span class="s1">'deleted_at'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="m">60</span><span class="p">).</span><span class="n">orWhereNotNull</span><span class="p">(</span><span class="s1">'deleted_at'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-</div>
-</div>
-</div>
-<h3 id="where"><code>where</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="16:3"><input checked="checked" id="__tabbed_16_1" name="__tabbed_16" type="radio" /><input id="__tabbed_16_2" name="__tabbed_16" type="radio" /><input id="__tabbed_16_3" name="__tabbed_16" type="radio" /><div class="tabbed-labels"><label for="__tabbed_16_1">where</label><label for="__tabbed_16_2">Where with custom condition</label><label for="__tabbed_16_3">Where null</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'='</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="s1">'&gt;='</span><span class="p">,</span><span class="w"> </span><span class="m">23</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="c1">// builds `deleted_at IS NULL`</span>
-</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'deleted_at'</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-</div>
-</div>
+<p>Many <code>where</code> calls are joined with <code>AND</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The operator is written into the SQL as it is.
+Do not pass user input as the operator or as the column name.</p>
 </div>
 <h3 id="orwhere"><code>orWhere</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="17:3"><input checked="checked" id="__tabbed_17_1" name="__tabbed_17" type="radio" /><input id="__tabbed_17_2" name="__tabbed_17" type="radio" /><input id="__tabbed_17_3" name="__tabbed_17" type="radio" /><div class="tabbed-labels"><label for="__tabbed_17_1">orWhere</label><label for="__tabbed_17_2">orWhere with custom condition</label><label for="__tabbed_17_3">where and orWhere</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">orWhere</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Doe'</span><span class="p">).</span><span class="n">orWhere</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="c1">// WHERE "name" = @name_p0 OR "name" = @name_p1</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="s1">'&lt;'</span><span class="p">,</span><span class="w"> </span><span class="m">18</span><span class="p">).</span><span class="n">orWhere</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="s1">'&gt;'</span><span class="p">,</span><span class="w"> </span><span class="m">60</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
 </span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">orWhere</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'='</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">orWhere</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="s1">'&gt;='</span><span class="p">,</span><span class="w"> </span><span class="m">23</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+<h3 id="wherein-and-wherenotin"><code>whereIn</code> and <code>whereNotIn</code></h3>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">whereIn</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">]).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="c1">// WHERE "id" IN (@id_p0,@id_p1)</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">whereNotIn</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">]).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="m">60</span><span class="p">).</span><span class="n">orWhereIn</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">]).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="m">60</span><span class="p">).</span><span class="n">orWhereNotIn</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">]).</span><span class="kd">get</span><span class="p">();</span>
 </span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">()</span>
-</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Doe'</span><span class="p">).</span><span class="n">orWhere</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+<ul>
+<li>Each value is sent as a bound parameter.</li>
+<li>An empty list matches no rows for <code>whereIn</code>, and all rows for <code>whereNotIn</code>.</li>
+</ul>
+<h3 id="wherenull-and-wherenotnull"><code>whereNull</code> and <code>whereNotNull</code></h3>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">whereNull</span><span class="p">(</span><span class="s1">'deleted_at'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">whereNotNull</span><span class="p">(</span><span class="s1">'deleted_at'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="m">60</span><span class="p">).</span><span class="n">orWhereNull</span><span class="p">(</span><span class="s1">'deleted_at'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="m">60</span><span class="p">).</span><span class="n">orWhereNotNull</span><span class="p">(</span><span class="s1">'deleted_at'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
 </span></code></pre></div>
-</div>
-</div>
-</div>
-<h3 id="whereraw"><code>whereRaw</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="18:1"><input checked="checked" id="__tabbed_18_1" name="__tabbed_18" type="radio" /><div class="tabbed-labels"><label for="__tabbed_18_1">whereRaw</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">whereRaw</span><span class="p">(</span><span class="s1">'name = @name'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">}).</span><span class="kd">get</span><span class="p">();</span>
+<h3 id="whereraw-and-orwhereraw"><code>whereRaw</code> and <code>orWhereRaw</code></h3>
+<p>Write the condition yourself. Put values in a map, and use <code>@key</code> in the SQL.
+The column names are not quoted.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">whereRaw</span><span class="p">(</span><span class="s1">'name = @name'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">}).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">()</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">    </span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="m">60</span><span class="p">)</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="p">.</span><span class="n">orWhereRaw</span><span class="p">(</span><span class="s1">'lower(name) = @name'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'john wick'</span><span class="p">})</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
 </span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Never put user input into the SQL text. Always send it in the map.</p>
 </div>
-</div>
-</div>
-<h3 id="orwhereraw"><code>orWhereRaw</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="19:1"><input checked="checked" id="__tabbed_19_1" name="__tabbed_19" type="radio" /><div class="tabbed-labels"><label for="__tabbed_19_1">Or where raw</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">orWhereRaw</span><span class="p">(</span><span class="s1">'name = @name'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">}).</span><span class="kd">get</span><span class="p">();</span>
+<h2 id="select">Select</h2>
+<p><code>select</code> sets the columns. Each call replaces the columns of the call before.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1">// a list</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">select</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'name'</span><span class="p">]).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="c1">// SELECT "id","name" FROM "actor"</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="c1">// comma separated</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">select</span><span class="p">(</span><span class="s1">'id, name, age'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="c1">// with a function</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">select</span><span class="p">(</span><span class="s1">'count(*) as total, name'</span><span class="p">).</span><span class="n">groupBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="c1">// SELECT count(*) as total,"name" FROM "actor" GROUP BY "name"</span>
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>
+</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="c1">// raw: nothing is quoted</span>
+</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">selectRaw</span><span class="p">(</span><span class="s1">'DISTINCT name'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
 </span></code></pre></div>
-</div>
-</div>
-</div>
-<h3 id="limit-take-offset"><code>limit</code>, <code>take</code>, <code>offset</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="20:3"><input checked="checked" id="__tabbed_20_1" name="__tabbed_20" type="radio" /><input id="__tabbed_20_2" name="__tabbed_20" type="radio" /><input id="__tabbed_20_3" name="__tabbed_20" type="radio" /><div class="tabbed-labels"><label for="__tabbed_20_1">Limit</label><label for="__tabbed_20_2">Take</label><label for="__tabbed_20_3">offset</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">limit</span><span class="p">(</span><span class="m">10</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">take</span><span class="p">(</span><span class="m">10</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">limit</span><span class="p">(</span><span class="m">10</span><span class="p">).</span><span class="n">offset</span><span class="p">(</span><span class="m">10</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-</div>
-</div>
-</div>
+<p>A part with <code>(</code> is kept as it is. Other parts are quoted.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
-<p>Limit and take are the same function.</p>
+<p>A model loaded with <code>select()</code> only has the selected fields.
+<code>save()</code> on it only updates the fields it has.</p>
 </div>
-<h3 id="groupby"><code>groupBy</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="21:1"><input checked="checked" id="__tabbed_21_1" name="__tabbed_21" type="radio" /><div class="tabbed-labels"><label for="__tabbed_21_1">Group by</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">()</span>
-</span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="w">    </span><span class="p">.</span><span class="n">select</span><span class="p">(</span><span class="s1">'count(*) as total, name'</span><span class="p">).</span><span class="n">groupBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-</div>
-</div>
-</div>
+<h2 id="order-limit-and-group">Order, limit and group</h2>
 <h3 id="orderby"><code>orderBy</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="22:4"><input checked="checked" id="__tabbed_22_1" name="__tabbed_22" type="radio" /><input id="__tabbed_22_2" name="__tabbed_22" type="radio" /><input id="__tabbed_22_3" name="__tabbed_22" type="radio" /><input id="__tabbed_22_4" name="__tabbed_22" type="radio" /><div class="tabbed-labels"><label for="__tabbed_22_1">default</label><label for="__tabbed_22_2">desc</label><label for="__tabbed_22_3">asc</label><label for="__tabbed_22_4">multiple columns</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">orderBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">orderBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">orderBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'desc'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">orderBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'asc'</span><span class="p">).</span><span class="n">orderBy</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'desc'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c1">// ORDER BY "name" asc,"id" desc</span>
 </span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">orderBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'desc'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+<ul>
+<li>The direction must be <code>asc</code> or <code>desc</code>. Any other value throws an <code>ArgumentError</code>.</li>
+<li>The column name is quoted, but a name with <code>(</code> is kept as it is.
+  Do not pass user input as the column name.</li>
+</ul>
+<h3 id="limit-take-and-offset"><code>limit</code>, <code>take</code> and <code>offset</code></h3>
+<p><code>limit</code> and <code>take</code> do the same thing.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">limit</span><span class="p">(</span><span class="m">10</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">take</span><span class="p">(</span><span class="m">10</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">limit</span><span class="p">(</span><span class="m">10</span><span class="p">).</span><span class="n">offset</span><span class="p">(</span><span class="m">20</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1">// LIMIT 10 OFFSET 20</span>
 </span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">orderBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'asc'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+<h3 id="groupby"><code>groupBy</code></h3>
+<p>Takes one column, or a list of columns.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">()</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span><span class="p">.</span><span class="n">select</span><span class="p">(</span><span class="s1">'count(*) as total, age'</span><span class="p">)</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="p">.</span><span class="n">groupBy</span><span class="p">(</span><span class="s1">'age'</span><span class="p">)</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
 </span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-39-1"><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">()</span>
-</span><span id="__span-39-2"><a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a><span class="w">    </span><span class="p">.</span><span class="n">orderBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'asc'</span><span class="p">)</span>
-</span><span id="__span-39-3"><a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a><span class="w">    </span><span class="p">.</span><span class="n">orderBy</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'desc'</span><span class="p">)</span>
-</span><span id="__span-39-4"><a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-</div>
-</div>
-</div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
-<p>The direction must be <code>asc</code> or <code>desc</code>. Any other value throws an <code>ArgumentError</code>.
-The column name is quoted, but a name with <code>(</code> is kept as it is.
-Do not pass user input as the column name.</p>
+<p>A query with <code>groupBy</code> returns maps, not models.
+This is because a group row does not match a model row.</p>
 </div>
-<h3 id="join"><code>join</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="23:1"><input checked="checked" id="__tabbed_23_1" name="__tabbed_23" type="radio" /><div class="tabbed-labels"><label for="__tabbed_23_1">Join</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-40-1"><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">()</span>
-</span><span id="__span-40-2"><a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="w">    </span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="s1">'actor_info'</span><span class="p">,</span><span class="w"> </span><span class="s1">'actor_info.admin_id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'admin.id'</span><span class="p">)</span>
-</span><span id="__span-40-3"><a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
+<h2 id="join">Join</h2>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">join</span><span class="p">(</span><span class="s1">'actor_info'</span><span class="p">,</span><span class="w"> </span><span class="s1">'actor_info.actor_id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'actor.id'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="c1">// JOIN "actor_info" on "actor_info"."actor_id" = "actor"."id"</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">leftJoin</span><span class="p">(</span><span class="s1">'actor_info'</span><span class="p">,</span><span class="w"> </span><span class="s1">'actor_info.actor_id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'actor.id'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">rightJoin</span><span class="p">(</span><span class="s1">'actor_info'</span><span class="p">,</span><span class="w"> </span><span class="s1">'actor_info.actor_id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'actor.id'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="c1">// with an operator</span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">join</span><span class="p">(</span><span class="s1">'actor_info'</span><span class="p">,</span><span class="w"> </span><span class="s1">'actor_info.actor_id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'='</span><span class="p">,</span><span class="w"> </span><span class="s1">'actor.id'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
 </span></code></pre></div>
-</div>
-</div>
-</div>
-<h3 id="leftjoin"><code>leftJoin</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="24:1"><input checked="checked" id="__tabbed_24_1" name="__tabbed_24" type="radio" /><div class="tabbed-labels"><label for="__tabbed_24_1">Left join</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-41-1"><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">()</span>
-</span><span id="__span-41-2"><a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a><span class="w">    </span><span class="p">.</span><span class="n">leftJoin</span><span class="p">(</span><span class="s1">'actor_info'</span><span class="p">,</span><span class="w"> </span><span class="s1">'actor_info.admin_id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'admin.id'</span><span class="p">)</span>
-</span><span id="__span-41-3"><a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
+<p>For a join condition that these methods can not build, use the raw methods.
+Nothing is quoted. Values go in the map, like in <code>whereRaw</code>.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">joinRaw</span><span class="p">(</span><span class="s1">'actor_info on actor_info.actor_id = actor.id'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">leftJoinRaw</span><span class="p">(</span><span class="s1">'actor_info on actor_info.actor_id = actor.id'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">rightJoinRaw</span><span class="p">(</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">  </span><span class="s1">'actor_info on actor_info.actor_id = actor.id and actor_info.type = @type'</span><span class="p">,</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">  </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'type'</span><span class="o">:</span><span class="w"> </span><span class="s1">'main'</span><span class="p">},</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
 </span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>SQLite before 3.39 has no <code>RIGHT JOIN</code>.</p>
 </div>
-</div>
-</div>
-<h3 id="rightjoin"><code>rightJoin</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="25:1"><input checked="checked" id="__tabbed_25_1" name="__tabbed_25" type="radio" /><div class="tabbed-labels"><label for="__tabbed_25_1">Right join</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">()</span>
-</span><span id="__span-42-2"><a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="w">    </span><span class="p">.</span><span class="n">rightJoin</span><span class="p">(</span><span class="s1">'actor_info'</span><span class="p">,</span><span class="w"> </span><span class="s1">'actor_info.admin_id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'admin.id'</span><span class="p">)</span>
-</span><span id="__span-42-3"><a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
+<h2 id="insert">Insert</h2>
+<h3 id="create-and-insert"><code>create</code> and <code>insert</code></h3>
+<p><code>create</code> and <code>insert</code> do the same thing.
+They insert one row, then read it back and return it.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">Actor</span><span class="w"> </span><span class="n">actor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">create</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">,</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span><span class="s1">'age'</span><span class="o">:</span><span class="w"> </span><span class="m">60</span><span class="p">,</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="p">});</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="n">print</span><span class="p">(</span><span class="n">actor</span><span class="p">.</span><span class="n">id</span><span class="p">);</span>
 </span></code></pre></div>
-</div>
-</div>
-</div>
-<h3 id="joinraw"><code>joinRaw</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="26:1"><input checked="checked" id="__tabbed_26_1" name="__tabbed_26" type="radio" /><div class="tabbed-labels"><label for="__tabbed_26_1">Join raw</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-43-1"><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">()</span>
-</span><span id="__span-43-2"><a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a><span class="w">    </span><span class="p">.</span><span class="n">joinRaw</span><span class="p">(</span><span class="s1">'actor_info on actor_info.admin_id = admin.id'</span><span class="p">)</span>
-</span><span id="__span-43-3"><a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
+<ul>
+<li>On a model, the result is the model. On <code>QueryBuilder.table(...)</code>, the result is a map.</li>
+<li>It works with any primary key type, for example a uuid string.</li>
+<li>On a model with <a href="../model/events/">events</a>, <code>create</code> calls <code>save()</code>, so the hooks run.</li>
+</ul>
+<h3 id="insertmultiple"><code>insertMultiple</code></h3>
+<p>Inserts many rows in one query.
+It does not return models.
+On Postgres it returns the new ids, like <code>[{id: 4}, {id: 5}]</code>.
+On MySQL it returns only one id.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">insertMultiple</span><span class="p">(</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="p">[</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">,</span><span class="w"> </span><span class="s1">'age'</span><span class="o">:</span><span class="w"> </span><span class="m">60</span><span class="p">},</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'John Doe'</span><span class="p">,</span><span class="w"> </span><span class="s1">'age'</span><span class="o">:</span><span class="w"> </span><span class="m">25</span><span class="p">},</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="p">]);</span>
 </span></code></pre></div>
-</div>
-</div>
-</div>
-<h3 id="leftjoinraw"><code>leftJoinRaw</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="27:1"><input checked="checked" id="__tabbed_27_1" name="__tabbed_27" type="radio" /><div class="tabbed-labels"><label for="__tabbed_27_1">Left join raw</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-44-1"><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">()</span>
-</span><span id="__span-44-2"><a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a><span class="w">    </span><span class="p">.</span><span class="n">leftJoinRaw</span><span class="p">(</span><span class="s1">'actor_info on actor_info.admin_id = admin.id'</span><span class="p">)</span>
-</span><span id="__span-44-3"><a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
+<p>The columns are the keys from all rows.
+When a row does not have a key, that column gets its default value.</p>
+<h2 id="update">Update</h2>
+<p>Updates all rows that match the <code>where</code> part.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">()</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">    </span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="m">3</span><span class="p">)</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">    </span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'active'</span><span class="p">)</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">    </span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Updated AJ'</span><span class="p">,</span><span class="w"> </span><span class="s1">'age'</span><span class="o">:</span><span class="w"> </span><span class="m">120</span><span class="p">});</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="c1">// UPDATE "actor" SET "name" = @name_p2,"age" = @age_p3</span>
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="c1">//   WHERE "id" = @id_p0 AND "status" = @status_p1</span>
 </span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code>update</code> without <code>where</code> changes every row of the table.
+A query <code>update</code> does not set <code>updated_at</code> and fires no <a href="../model/events/">model events</a>.
+To do that, load the model, change it and call <code>save()</code>.</p>
 </div>
-</div>
-</div>
-<h3 id="rightjoinraw"><code>rightJoinRaw</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="28:1"><input checked="checked" id="__tabbed_28_1" name="__tabbed_28" type="radio" /><div class="tabbed-labels"><label for="__tabbed_28_1">Right Join Raw</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-45-1"><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">()</span>
-</span><span id="__span-45-2"><a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a><span class="w">    </span><span class="p">.</span><span class="n">rightJoinRaw</span><span class="p">(</span><span class="s1">'actor_info on actor_info.admin_id = admin.id'</span><span class="p">)</span>
-</span><span id="__span-45-3"><a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
+<h2 id="delete">Delete</h2>
+<h3 id="delete_1"><code>delete</code></h3>
+<p>Deletes all rows that match the <code>where</code> part.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="n">delete</span><span class="p">();</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="c1">// DELETE FROM "actor" WHERE "name" = @name_p0</span>
 </span></code></pre></div>
-</div>
-</div>
-</div>
-<h3 id="debug"><code>debug</code></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="29:1"><input checked="checked" id="__tabbed_29_1" name="__tabbed_29" type="radio" /><div class="tabbed-labels"><label for="__tabbed_29_1">Debug</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-46-1"><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">debug</span><span class="p">(</span><span class="kc">true</span><span class="p">).</span><span class="n">all</span><span class="p">();</span>
+<p>On a model with <code>softDelete: true</code>, <code>delete</code> sets <code>deleted_at</code> and keeps the row.</p>
+<h3 id="forcedelete"><code>forceDelete</code></h3>
+<p>On a model with <code>softDelete: true</code>, <code>forceDelete</code> really deletes the rows.
+It also deletes rows that are already soft deleted, so you do not need <code>withTrash()</code>.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="n">forceDelete</span><span class="p">();</span>
 </span></code></pre></div>
-</div>
-</div>
-</div>
+<h3 id="withtrash"><code>withTrash</code></h3>
+<p>A model with <code>softDelete: true</code> hides soft deleted rows.
+<code>withTrash()</code> shows them too.
+On a model without soft deletes it does nothing.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Actor</span><span class="o">&gt;</span><span class="w"> </span><span class="n">actors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">withTrash</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span></code></pre></div>
+<h3 id="truncate"><code>truncate</code></h3>
+<p>Deletes all rows of the table and resets the id counter.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">truncate</span><span class="p">();</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">truncate</span><span class="p">(</span><span class="nl">resetId:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w"> </span><span class="c1">// keep the id counter on Postgres and SQLite</span>
+</span></code></pre></div>
+<p>On Postgres it runs <code>TRUNCATE TABLE ... RESTART IDENTITY CASCADE</code>.
+On SQLite it runs <code>DELETE FROM</code>.</p>
+<h2 id="debug">Debug</h2>
+<h3 id="tosql"><code>toSql</code></h3>
+<p>Returns the SQL of the query with the values filled in.
+The values are not quoted or escaped, so use it only to read the query.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">sql</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="n">toSql</span><span class="p">();</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="n">print</span><span class="p">(</span><span class="n">sql</span><span class="p">);</span><span class="w"> </span><span class="c1">// SELECT * FROM "actor" WHERE "name" = John Wick</span>
+</span></code></pre></div>
+<h3 id="debug_1"><code>debug</code></h3>
+<p>Prints the SQL and the values of the query when it runs.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">debug</span><span class="p">(</span><span class="kc">true</span><span class="p">).</span><span class="n">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span><span class="w"> </span><span class="m">60</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span></code></pre></div>
+<p>To print all queries, set <code>debug: true</code> in the <code>ConnectionConfig</code>.
+See <a href="../#config">Database</a>.</p>
 
 
 
 
 
 
+
+  
+  
 
 
 
@@ -3644,7 +5011,7 @@ Do not pass user input as the column name.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

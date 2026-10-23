@@ -6,9 +6,11 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
+        <meta name="description" content="This page shows how to connect Dox to a database. Dox works with Postgres, MySQL, MariaDB and SQLite through the dox_orm package.">
       
       
-        <link rel="canonical" href="https://dartondox.dev/3.x/database/">
+      
+        <link rel="canonical" href="https://dartondox.dev/latest/3.x/database/">
       
       
         <link rel="prev" href="../digging-deeper/testing/">
@@ -24,10 +26,10 @@
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
-      
-        <title>Database - DOX</title>
-      
-    
+  
+    <title>Database | Dox, the Dart backend framework</title>
+  
+
     
       <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
@@ -69,6 +71,38 @@
 
     
     
+  
+  
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Dox">
+  <meta property="og:title" content="Database | Dox">
+  <meta property="og:description" content="This page shows how to connect Dox to a database. Dox works with Postgres, MySQL, MariaDB and SQLite through the dox_orm package.">
+  <meta property="og:url" content="https://dartondox.dev/latest/3.x/database/">
+  <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Dox: fast web backend framework for Dart">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Database | Dox">
+  <meta name="twitter:description" content="This page shows how to connect Dox to a database. Dox works with Postgres, MySQL, MariaDB and SQLite through the dox_orm package.">
+  <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Dox", "item": "https://dartondox.dev/latest/3.x" }
+      ,{ "@type": "ListItem", "position": 2, "name": "Database", "item": "https://dartondox.dev/latest/3.x/database/" }
+    ]
+  }
+  </script>
+  
+  
+
   </head>
   
   
@@ -272,6 +306,28 @@
     
     
       <li class="md-tabs__item">
+        <a href="../the-basic/routing/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  The basics
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
         <a href="../digging-deeper/cache/" class="md-tabs__link">
           
   
@@ -362,13 +418,35 @@
     
     
       <li class="md-tabs__item">
-        <a href="../others/contribute/" class="md-tabs__link">
+        <a href="../guides/" class="md-tabs__link">
           
   
   
     
   
-  Others
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../reference/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reference
 
         </a>
       </li>
@@ -431,16 +509,6 @@
       
         
           
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
         
       
         
@@ -532,6 +600,554 @@
   
 
               
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../tutorial/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1_3" id="__nav_1_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorial
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/01-create-project/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 1: Create the project
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/02-model-and-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 2: Model and migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/03-routes-and-controller/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 3: Routes and controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/04-validation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 4: Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/05-auth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 5: Login with dox_auth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/06-test/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 6: Test
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/07-build-and-deploy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Step 7: Build and deploy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_4" id="__nav_1_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Concepts
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/how-dox-works/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How Dox works
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/coming-from-laravel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coming from Laravel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/dart-frameworks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dox and the other Dart backends
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/status-and-roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Status and roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The basics
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The basics
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
                 
@@ -782,10 +1398,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -803,8 +1419,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1174,7 +1790,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
           <div class="md-nav__link md-nav__container">
@@ -1196,14 +1812,14 @@
             </a>
             
               
-              <label class="md-nav__link md-nav__link--active" for="__nav_3" id="__nav_3_label" tabindex="">
+              <label class="md-nav__link md-nav__link--active" for="__nav_4" id="__nav_4_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1420,7 +2036,7 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_8" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_8" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -1442,14 +2058,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3_8" id="__nav_3_8_label" tabindex="">
+              <label class="md-nav__link " for="__nav_4_8" id="__nav_4_8_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_8">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1521,10 +2137,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_8_3" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_8_3" >
         
           
-          <label class="md-nav__link" for="__nav_3_8_3" id="__nav_3_8_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_8_3" id="__nav_4_8_3_label" tabindex="0">
             
   
   
@@ -1542,8 +2158,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_8_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_8_3">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_8_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_8_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1750,10 +2366,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
@@ -1771,8 +2387,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1796,7 +2412,7 @@
   <span class="md-ellipsis">
     
   
-    dox_validation
+    Validation
   
 
     
@@ -1852,7 +2468,7 @@
   <span class="md-ellipsis">
     
   
-    Storage (dox_storage)
+    Storage
   
 
     
@@ -1880,7 +2496,7 @@
   <span class="md-ellipsis">
     
   
-    Cache (dox_cache)
+    Cache
   
 
     
@@ -1961,10 +2577,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
             
   
   
@@ -1982,8 +2598,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2122,6 +2738,30 @@
     
       
         
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
       
         
       
@@ -2140,17 +2780,398 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
         
           
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+          <div class="md-nav__link md-nav__container">
+            <a href="../guides/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/file-upload/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    File upload
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/pagination/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pagination
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/jwt-auth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JWT authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/custom-errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom errors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/background-work/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/static-files/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Static files and SPA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/cors-for-spa/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CORS for a browser front-end
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/environments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/testing-with-database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing with a database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/share-code-with-flutter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Share code with Flutter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/api-docs-with-openapi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API docs with OpenAPI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_13" id="__nav_7_13_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
     
   
-    Others
+    Deploy
   
 
     
@@ -2161,16 +3182,514 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_13">
             <span class="md-nav__icon md-icon"></span>
             
   
-    Others
+    Deploy
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/deploy-vps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploy to a Linux server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/deploy-fly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploy to Fly.io
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/deploy-cloud-run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploy to Google Cloud Run
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../reference/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/cheat-sheet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cheat sheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/app-config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    App config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/env/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environment variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/request-and-response/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Request and response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/http-exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP exceptions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/production-checklist/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production checklist
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error index
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -2195,160 +3714,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_6_2" id="__nav_6_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Releases
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Releases
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../others/releases/v3-release/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    3.x
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../others/releases/core-release/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Core
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../others/releases/query-builder-release/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Query builder
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -2433,10 +3798,43 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#extra-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extra options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-and-column-names-are-quoted" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table and column names are quoted
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#raw-queries" class="md-nav__link">
     <span class="md-ellipsis">
       
         Raw queries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-connections" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other connections
       
     </span>
   </a>
@@ -2456,34 +3854,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="MySQL and MariaDB">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#mysql-json" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        MySQL JSON
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#mysql-types" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        MySQL types
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -2515,27 +3885,37 @@
 
 
   
+    <a href="https://github.com/dartondox/dox/edit/develop/docs/database/index.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
   
 
 
 <h1 id="database">Database</h1>
-<p>Dox talks to Postgres, MySQL/MariaDB and SQLite with the <code>dox_orm</code> package.</p>
+<p>This page shows how to connect Dox to a database.
+Dox works with Postgres, MySQL, MariaDB and SQLite through the <code>dox_orm</code> package.</p>
 <ul>
 <li><a href="query-builder/">Query builder</a>: build SQL with methods.</li>
 <li><a href="model/">Models</a>: one class per table.</li>
 <li><a href="transactions/">Transactions</a>: many queries that succeed or fail together.</li>
 <li><a href="migration/">Migration</a> and <a href="schema/">Schema</a>: create and change tables.</li>
 </ul>
+<p>This is how a query travels from your code to the database:</p>
+<pre class="mermaid"><code>flowchart LR
+    M["Model or QueryBuilder"] --&gt; S["SQL text&lt;br&gt;quoted names, @values"]
+    S --&gt; D{"Driver"}
+    D --&gt; N["Native Rust pool&lt;br&gt;dox_postgres_native, dox_mysql_native"]
+    D --&gt; T["Dart driver&lt;br&gt;postgres, mysql_dart, sqlite3"]
+    N --&gt; DB[("Database")]
+    T --&gt; DB</code></pre>
 <h2 id="install">Install</h2>
-<p>The query builder and models live in the <code>dox_orm</code> package.</p>
+<p>The query builder and the models are in the <code>dox_orm</code> package.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_orm
 </span></code></pre></div>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
 </span></code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p><code>dox_orm</code> was called <code>dox_query_builder</code> before 3.0. The old package only re-exports <code>dox_orm</code> now. Change your <code>pubspec.yaml</code> and imports to <code>dox_orm</code>.</p>
-</div>
 <h2 id="supported-databases">Supported databases</h2>
 <table>
 <thead>
@@ -2543,7 +3923,7 @@
 <th>Database</th>
 <th><code>Driver</code></th>
 <th>Default driver</th>
-<th>Dart driver</th>
+<th>Fallback Dart driver</th>
 <th>Pool</th>
 <th>Good for</th>
 </tr>
@@ -2569,58 +3949,81 @@
 <td>SQLite</td>
 <td><code>Driver.sqlite</code></td>
 <td><code>sqlite3</code></td>
-<td><code>sqlite3</code></td>
+<td>none</td>
 <td>No, one connection per isolate</td>
-<td>Dev, tests, small apps</td>
+<td>Development, tests, small apps</td>
 </tr>
 </tbody>
 </table>
 <div class="admonition info">
 <p class="admonition-title">Native drivers</p>
-<p>Postgres and MySQL use a native (Rust) driver by default. It is faster when many
-requests run at the same time. You do not change any config.
-If the native library can not load on your system, the ORM uses the Dart driver
-and prints one warning line.
-To always use the Dart driver, set <code>DOX_DB_DRIVER=dart</code>, or <code>extra: {'native': false}</code>
-on one connection. See the <a href="postgres-native/#use-the-dart-driver">Postgres</a> and
+<p>Postgres and MySQL use a native (Rust) driver by default.
+It is faster when many requests run at the same time.
+You do not change any config for it.</p>
+<p>The ORM uses the Dart driver in these cases:</p>
+<ul>
+<li>The native library can not load on your system. The ORM prints one warning line.</li>
+<li>Postgres uses TLS (<code>useSSL: true</code> or <code>extra['sslMode']</code>). The native Postgres driver has no TLS yet.</li>
+<li>You ask for it: set <code>DOX_DB_DRIVER=dart</code> for all connections,
+  or <code>extra: {'native': false}</code> for one connection.</li>
+</ul>
+<p>See the <a href="postgres-native/#use-the-dart-driver">Postgres</a> and
 <a href="mysql-native/#use-the-dart-driver">MySQL</a> pages.</p>
 </div>
+<p>Dox picks the driver of a connection like this:</p>
+<pre class="mermaid"><code>flowchart TD
+    A["Driver.postgres or Driver.mysql"] --&gt; B{"DOX_DB_DRIVER=dart&lt;br&gt;or extra native: false?"}
+    B --&gt;|yes| X["Dart driver"]
+    B --&gt;|no| C{"Postgres with TLS?&lt;br&gt;useSSL or sslMode"}
+    C --&gt;|yes| X
+    C --&gt;|no| L{"Native library loads?"}
+    L --&gt;|no| W["Dart driver&lt;br&gt;prints one warning"]
+    L --&gt;|yes| N["Native Rust driver"]
+    Q["Driver.sqlite"] --&gt; S["sqlite3&lt;br&gt;one connection per isolate"]</code></pre>
 <h2 id="config">Config</h2>
 <p>Put the connections in <code>lib/config/database.dart</code>.
 <code>connection</code> is the name of the default connection.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">DatabaseConfig</span><span class="w"> </span><span class="n">databaseConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DatabaseConfig</span><span class="p">(</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nl">connection:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'DB_CONNECTION'</span><span class="p">,</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">),</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nl">connections:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="s1">'postgres'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">postgres</span><span class="p">,</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">      </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">      </span><span class="nl">port:</span><span class="w"> </span><span class="m">5432</span><span class="p">,</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">      </span><span class="nl">user:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">      </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">      </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'maxConnectionCount'</span><span class="o">:</span><span class="w"> </span><span class="m">10</span><span class="p">},</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="p">),</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="s1">'mysql'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">mysql</span><span class="p">,</span><span class="w"> </span><span class="c1">// also for MariaDB</span>
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">      </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
-</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">      </span><span class="nl">port:</span><span class="w"> </span><span class="m">3306</span><span class="p">,</span>
-</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">      </span><span class="nl">user:</span><span class="w"> </span><span class="s1">'root'</span><span class="p">,</span>
-</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">      </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'password'</span><span class="p">,</span>
-</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'dox'</span><span class="p">,</span>
-</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">      </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'maxConnectionCount'</span><span class="o">:</span><span class="w"> </span><span class="m">10</span><span class="p">},</span>
-</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="w">    </span><span class="p">),</span>
-</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="w">    </span><span class="s1">'sqlite'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
-</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">sqlite</span><span class="p">,</span>
-</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'storage/app.db'</span><span class="p">,</span><span class="w"> </span><span class="c1">// file path, or ':memory:'</span>
-</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-</span><span id="__span-2-28"><a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="w">    </span><span class="p">),</span>
-</span><span id="__span-2-29"><a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-2-30"><a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="p">);</span>
+<div class="language-dart highlight"><span class="filename">lib/config/database.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">DatabaseConfig</span><span class="w"> </span><span class="n">databaseConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DatabaseConfig</span><span class="p">(</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nl">connection:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbConnection</span><span class="p">,</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="nl">connections:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="s1">'postgres'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">postgres</span><span class="p">,</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">      </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">      </span><span class="nl">port:</span><span class="w"> </span><span class="m">5432</span><span class="p">,</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">      </span><span class="nl">user:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">      </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">      </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'maxConnectionCount'</span><span class="o">:</span><span class="w"> </span><span class="m">10</span><span class="p">},</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">    </span><span class="p">),</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">    </span><span class="s1">'mysql'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">mysql</span><span class="p">,</span><span class="w"> </span><span class="c1">// also for MariaDB</span>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">      </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">      </span><span class="nl">port:</span><span class="w"> </span><span class="m">3306</span><span class="p">,</span>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">      </span><span class="nl">user:</span><span class="w"> </span><span class="s1">'root'</span><span class="p">,</span>
+</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">      </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'password'</span><span class="p">,</span>
+</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'dox'</span><span class="p">,</span>
+</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="w">      </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'maxConnectionCount'</span><span class="o">:</span><span class="w"> </span><span class="m">10</span><span class="p">},</span>
+</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="w">    </span><span class="p">),</span>
+</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="w">    </span><span class="s1">'sqlite'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
+</span><span id="__span-2-28"><a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">sqlite</span><span class="p">,</span>
+</span><span id="__span-2-29"><a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'storage/app.db'</span><span class="p">,</span><span class="w"> </span><span class="c1">// file path, or ':memory:'</span>
+</span><span id="__span-2-30"><a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-2-31"><a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="w">    </span><span class="p">),</span>
+</span><span id="__span-2-32"><a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-2-33"><a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>Start it in a service, so every isolate has its own pool.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ORMService</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">DoxService</span><span class="w"> </span><span class="p">{</span>
+<ul>
+<li><code>debug: true</code> prints each SQL query and its values.</li>
+<li><code>user</code>, <code>password</code>, <code>host</code> and <code>port</code> are not used by SQLite.</li>
+</ul>
+<p>Start the ORM in a service.
+Each isolate runs the service, so each isolate gets its own pool.</p>
+<div class="language-dart highlight"><span class="filename">lib/services/orm_service.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ORMService</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">DoxService</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nd">@override</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="n">SqlQueryBuilder</span><span class="p">.</span><span class="n">initializeWithDatabaseConfig</span><span class="p">(</span><span class="n">databaseConfig</span><span class="p">);</span>
@@ -2629,112 +4032,211 @@ on one connection. See the <a href="postgres-native/#use-the-dart-driver">Postgr
 </span></code></pre></div>
 <h3 id="env"><code>.env</code></h3>
 <p>The app config and the <a href="migration/">migration</a> commands read these values.</p>
-<div class="language-py highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">DB_CONNECTION</span><span class="o">=</span><span class="n">postgres</span> <span class="c1"># postgres, mysql or sqlite</span>
+<div class="language-py highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">DB_CONNECTION</span><span class="o">=</span><span class="n">postgres</span> <span class="c1"># postgres, mysql or sqlite</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">DB_HOST</span><span class="o">=</span><span class="n">localhost</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">DB_PORT</span><span class="o">=</span><span class="mi">5432</span>           <span class="c1"># 3306 for mysql</span>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">DB_NAME</span><span class="o">=</span><span class="n">dox</span>            <span class="c1"># for sqlite: the file path, like storage/app.db</span>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">DB_USERNAME</span><span class="o">=</span><span class="n">postgres</span>
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">DB_PASSWORD</span><span class="o">=</span><span class="n">postgres</span>
 </span></code></pre></div>
+<h3 id="extra-options"><code>extra</code> options</h3>
+<p><code>extra</code> is a map in <code>ConnectionConfig</code> for driver options.</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Database</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>maxConnectionCount</code></td>
+<td>Postgres, MySQL</td>
+<td><code>10</code></td>
+<td>Most connections in the pool.</td>
+</tr>
+<tr>
+<td><code>native</code></td>
+<td>Postgres, MySQL</td>
+<td><code>true</code></td>
+<td><code>false</code> uses the Dart driver for this connection.</td>
+</tr>
+<tr>
+<td><code>threads</code></td>
+<td>Postgres, MySQL</td>
+<td><code>1</code></td>
+<td>Rust threads of the native driver.</td>
+</tr>
+<tr>
+<td><code>maxConnectionAge</code></td>
+<td>MySQL</td>
+<td>12 hours</td>
+<td>A connection older than this is opened again.</td>
+</tr>
+<tr>
+<td><code>preparedStatementCacheSize</code></td>
+<td>MySQL, and the Dart Postgres and SQLite drivers</td>
+<td><code>100</code></td>
+<td>Prepared statements kept per connection.</td>
+</tr>
+<tr>
+<td><code>timeZone</code></td>
+<td>Postgres</td>
+<td><code>UTC</code></td>
+<td>Time zone of the session.</td>
+</tr>
+<tr>
+<td><code>applicationName</code></td>
+<td>Postgres</td>
+<td>none</td>
+<td>Name of the app in <code>pg_stat_activity</code>.</td>
+</tr>
+<tr>
+<td><code>busyTimeout</code></td>
+<td>SQLite</td>
+<td><code>5000</code></td>
+<td>Milliseconds a query waits for a lock.</td>
+</tr>
+</tbody>
+</table>
+<p>The Dart drivers read some more keys.
+The Dart Postgres driver reads the <code>PoolSettings</code> keys of the <code>postgres</code> package,
+like <code>sslMode</code>, <code>queryTimeout</code> and <code>connectTimeout</code>.
+The Dart MySQL driver reads <code>collation</code> (default <code>utf8mb4_general_ci</code>), <code>timeoutMs</code>,
+<code>timeZone</code>, <code>serverPublicKey</code> and <code>allowPublicKeyRetrieval</code>.</p>
 <div class="admonition info">
-<p class="admonition-title">MySQL <code>extra</code> options</p>
-<p><code>maxConnectionCount</code> (default 10) is the pool size.
-<code>maxConnectionAge</code>, <code>preparedStatementCacheSize</code> and <code>threads</code> are read by the native driver.
-The keys below are read only by the Dart driver (<code>native: false</code>).
-<code>collation</code> (default <code>utf8mb4_general_ci</code>), <code>timeoutMs</code> and <code>timeZone</code>
-are also read.
-The MySQL 8 default login (<code>caching_sha2_password</code>) works, also without TLS.
-Without TLS the driver asks the server for its RSA key to encrypt the password.
+<p class="admonition-title">MySQL 8 login without TLS</p>
+<p>The MySQL 8 default login (<code>caching_sha2_password</code>) works without TLS.
+The Dart driver then asks the server for its RSA key to encrypt the password.
 To not ask, give the key in <code>serverPublicKey</code>, or set <code>useSSL: true</code>.
 Set <code>allowPublicKeyRetrieval: false</code> to turn the asking off.</p>
 </div>
-<div class="admonition info">
-<p class="admonition-title">SQLite <code>extra</code> options</p>
-<p><code>busyTimeout</code> (default 5000 ms) is how long a query waits for a lock.</p>
-</div>
-<div class="admonition info">
-<p class="admonition-title">Table and column names are quoted</p>
+<h3 id="table-and-column-names-are-quoted">Table and column names are quoted</h3>
 <p>Table and column names you pass to <code>select</code>, <code>where</code>, <code>join</code>, <code>groupBy</code>, <code>orderBy</code>,
-<code>insert</code> and <code>update</code> are quoted: <code>"name"</code> on Postgres and SQLite, and <code>`name`</code> on MySQL.
-So names like <code>order</code> or <code>key</code> work.
-<code>table.column</code>, <code>*</code> and <code>column as alias</code> are handled.
-A value with <code>(</code> (for example <code>count(*) as total</code>) is kept as it is.
-For anything else, use the raw functions (<code>selectRaw</code>, <code>whereRaw</code>, <code>joinRaw</code>).
-On Postgres a quoted name is case sensitive, so <code>userId</code> is not the same as <code>userid</code>.</p>
-</div>
+<code>insert</code> and <code>update</code> are quoted.
+Postgres and SQLite use <code>"name"</code>. MySQL uses <code>`name`</code>.
+So names like <code>order</code> or <code>key</code> work.</p>
+<ul>
+<li><code>table.column</code>, <code>*</code> and <code>column as alias</code> are quoted in the right way.</li>
+<li>A value with <code>(</code> (for example <code>count(*) as total</code>) is kept as it is.</li>
+<li>For anything else, use the raw methods (<code>selectRaw</code>, <code>whereRaw</code>, <code>joinRaw</code>).</li>
+<li>On Postgres, a quoted name is case sensitive. <code>userId</code> is not the same column as <code>userid</code>.</li>
+</ul>
 <h3 id="raw-queries">Raw queries</h3>
+<p><code>QueryBuilder.query()</code> runs SQL on the default connection.
+Use <code>@name</code> for values. The values are sent as bound parameters.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="s1">'select * from blog where id = @id'</span><span class="p">,</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nl">substitutionValues:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'id'</span><span class="o">:</span><span class="w"> </span><span class="m">1</span><span class="p">},</span>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">);</span>
 </span></code></pre></div>
+<h3 id="other-connections">Other connections</h3>
+<p>Use <code>withConnection()</code> with a connection name from the config.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'blog'</span><span class="p">)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="p">.</span><span class="n">withConnection</span><span class="p">(</span><span class="s1">'mysql'</span><span class="p">)</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
+</span></code></pre></div>
 <h2 id="mysql-and-mariadb">MySQL and MariaDB</h2>
 <ul>
-<li>The driver is <code>mysql_dart</code>. MySQL 8 and 9 login (<code>caching_sha2_password</code>) works.</li>
-<li>It has a real connection pool and sends values as bound parameters.</li>
-<li><code>getDatabaseConnection()</code> returns a <code>MySQLConnectionPool</code>.</li>
-<li><code>CREATE</code>, <code>ALTER</code> and <code>DROP</code> save right away. A transaction can not undo them.</li>
+<li>The default driver is <a href="mysql-native/"><code>dox_mysql_native</code></a>.
+  The fallback Dart driver is <code>mysql_dart</code>.</li>
+<li>Both have a connection pool and send values as bound parameters.</li>
+<li>MySQL 8 and 9 login (<code>caching_sha2_password</code>) works.</li>
+<li><code>CREATE</code>, <code>ALTER</code> and <code>DROP</code> are saved right away. A transaction can not undo them.</li>
 </ul>
-<h3 id="mysql-json">MySQL JSON</h3>
+<p>MySQL values are converted by column type:</p>
+<table>
+<thead>
+<tr>
+<th>MySQL / MariaDB</th>
+<th>Dart</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Integer types</td>
+<td><code>int</code></td>
+</tr>
+<tr>
+<td><code>FLOAT</code>, <code>DOUBLE</code>, <code>DECIMAL</code></td>
+<td><code>double</code></td>
+</tr>
+<tr>
+<td><code>DATE</code>, <code>DATETIME</code>, <code>TIMESTAMP</code></td>
+<td><code>DateTime</code>, read as UTC</td>
+</tr>
+<tr>
+<td><code>boolean()</code> columns (<code>TINYINT(1)</code>)</td>
+<td><code>bool</code></td>
+</tr>
+<tr>
+<td><code>TIME</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>JSON</code></td>
+<td><code>Map</code> or <code>List</code></td>
+</tr>
+</tbody>
+</table>
 <div class="admonition info">
-<p class="admonition-title">Info</p>
-<p>On MySQL, JSON columns are decoded to <code>Map</code> or <code>List</code> when you read them.
-Other text columns are not decoded.
-MariaDB stores JSON as <code>LONGTEXT</code>, so the driver can not see the column type.
+<p class="admonition-title">JSON on MariaDB</p>
+<p>MariaDB stores JSON as <code>LONGTEXT</code>, so the driver can not see the column type.
 On MariaDB, text that starts with <code>{</code> or <code>[</code> and is valid JSON is decoded.
-<code>boolean()</code> columns (<code>TINYINT(1)</code>) are read as <code>bool</code>.</p>
-</div>
-<h3 id="mysql-types">MySQL types</h3>
-<div class="admonition info">
-<p class="admonition-title">Info</p>
-<p>MySQL values are converted by column type:
-integers to <code>int</code>, <code>FLOAT</code>, <code>DOUBLE</code> and <code>DECIMAL</code> to <code>double</code>,
-<code>DATE</code>, <code>DATETIME</code> and <code>TIMESTAMP</code> to <code>DateTime</code> (read as UTC),
-<code>boolean()</code> (<code>TINYINT(1)</code>) to <code>bool</code>. <code>TIME</code> stays a <code>String</code>.</p>
+Other text columns are not decoded.</p>
 </div>
 <h2 id="sqlite">SQLite</h2>
 <p>SQLite is good for development, tests and small apps.
 For a busy production app, use Postgres or MySQL.</p>
 <div class="admonition info">
 <p class="admonition-title">How it runs</p>
-<p>The <code>sqlite3</code> package calls SQLite directly (FFI). A query blocks the isolate while it runs.
-Each isolate has one connection. While a transaction is open, other queries of that isolate wait.
+<p>The <code>sqlite3</code> package calls SQLite directly (FFI).
+A query blocks the isolate while it runs.
+Each isolate has one connection.
+While a transaction is open, the other queries of that isolate wait.
 The database file uses WAL mode, so readers do not wait for the writer.
-<code>busy_timeout</code> makes a query wait for a lock from another isolate instead of failing.
+<code>busy_timeout</code> makes a query wait for a lock from another isolate, instead of failing.
 Foreign keys are turned on.</p>
 </div>
 <div class="admonition info">
 <p class="admonition-title">Types</p>
-<p>SQLite has no bool, JSON or date type.
-<code>boolean()</code> is saved as <code>0</code>/<code>1</code> and read back as <code>bool</code>.
-<code>json()</code> is saved as text and read back as <code>Map</code> or <code>List</code>.
-Dates are saved as ISO text in UTC and read back as <code>DateTime</code>.
-This uses the type in <code>CREATE TABLE</code>, so it works on tables made by <code>Schema</code> or by SQL
-with the same type names (<code>BOOLEAN</code>, <code>JSON</code>, <code>TIMESTAMP</code>, <code>DATE</code>, <code>DATETIME</code>).
-The driver finds the type by the table names in the query.
+<p>SQLite has no bool, JSON or date type. Dox converts them for you:</p>
+<ul>
+<li><code>boolean()</code> is saved as <code>0</code>/<code>1</code> and read back as <code>bool</code>.</li>
+<li><code>json()</code> is saved as text and read back as <code>Map</code> or <code>List</code>.</li>
+<li>Dates are saved as ISO text in UTC and read back as <code>DateTime</code>.</li>
+</ul>
+<p>The driver uses the column type in <code>CREATE TABLE</code>.
+It finds the table by the table names in the query.
+So it works on tables made by <code>Schema</code>, or by SQL with the same type names
+(<code>BOOLEAN</code>, <code>JSON</code>, <code>TIMESTAMP</code>, <code>DATE</code>, <code>DATETIME</code>).
 A column with an alias (<code>active as is_active</code>) is not converted.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Limits</p>
 <ul>
-<li><code>schema.table</code> with <code>.change()</code> changes a column (type, null, default) by making the table again
-  and copying the rows. It keeps the primary key, foreign keys, unique columns and indexes.
-  It throws for tables with <code>CHECK</code> constraints or generated columns.</li>
-<li><code>dropColumn</code> does not work on a primary key, unique or indexed column (SQLite limit).</li>
+<li><code>schema.table</code> with <code>.change()</code> makes the table again and copies the rows.
+  See <a href="schema/#sqlite-notes">SQLite notes</a>.</li>
+<li><code>dropColumn</code> does not work on a primary key, unique or indexed column.</li>
 <li>A new column with <code>NOT NULL</code> needs a default value.</li>
 <li><code>truncate()</code> runs <code>DELETE FROM</code> and resets the id counter.</li>
 <li><code>insertMultiple</code> with rows that have different keys inserts the rows one by one,
   because SQLite has no <code>DEFAULT</code> in <code>VALUES</code>.</li>
-<li>There is no <code>RIGHT JOIN</code> before SQLite 3.39.</li>
+<li>SQLite before 3.39 has no <code>RIGHT JOIN</code>.</li>
 </ul>
 </div>
 <div class="admonition info">
 <p class="admonition-title">Native library</p>
-<p>The <code>sqlite3</code> package (v3) bundles SQLite with a build hook. You do not install
-a system library. <code>dart run</code> and <code>dart test</code> run the hook by themselves.
-For the AOT binary use <code>dox build</code> (it runs <code>dart build cli</code>). It puts the library
-in <code>build/bundle/lib/</code>, next to <code>build/bundle/bin/server</code>. Keep the two folders together.
-<code>dart compile exe</code> does not work with build hooks. See <a href="../digging-deeper/deployment/">Deployment</a>.</p>
+<p>The <code>sqlite3</code> package (v3) bundles SQLite with a build hook.
+You do not install a system library.
+<code>dart run</code> and <code>dart test</code> run the hook by themselves.
+For the AOT binary, use <code>dox build</code> (it runs <code>dart build cli</code>).
+It puts the library in <code>build/bundle/lib/</code>, next to <code>build/bundle/bin/server</code>.
+Keep the two folders together.
+<code>dart compile exe</code> does not work with build hooks.
+See <a href="../digging-deeper/deployment/">Deployment</a>.</p>
 </div>
 
 
@@ -2742,6 +4244,9 @@ in <code>build/bundle/lib/</code>, next to <code>build/bundle/bin/server</code>.
 
 
 
+
+  
+  
 
 
 
@@ -2852,7 +4357,7 @@ in <code>build/bundle/lib/</code>, next to <code>build/bundle/bin/server</code>.
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
