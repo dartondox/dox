@@ -6,7 +6,8 @@ name: Native
 #
 # dox_http_native: the Rust HTTP library.
 #
-# Every push: build the library on Linux, run the Rust and Dart tests.
+# Every push that changes it: build the library on Linux, run the Rust and
+# Dart tests.
 #
 # A tag like `dox_http_native-v3.0.0-alpha.2`: build the library for the 5
 # targets and upload them to a GitHub release of that tag, with SHA256SUMS.
@@ -28,7 +29,25 @@ permissions:
   contents: read
 
 jobs:
+  # The test jobs run only when their package changed, or when a shared
+  # file changed (ci/, .github/, root pubspec, ...). Tags run them all.
+  # See ci/changes.sh and ci/affected.py.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: ci/changes.sh
+
   test:
+    needs: changes
+    if: contains(fromJSON(needs.changes.outputs.changed), 'dox-http-native')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -95,8 +114,8 @@ jobs:
 
   # ---- dox_postgres_native ---------------------------------------------
   #
-  # Every push: Rust checks, then the Dart tests on Postgres 16 (the pool
-  # tests and the dox_orm tests on the native driver).
+  # Every push that changes it: Rust checks, then the Dart tests on
+  # Postgres 16 (the pool tests and the dox_orm tests on the native driver).
   #
   # A tag like `dox_postgres_native-v3.0.0-alpha.2`: build the library for
   # the 5 targets and upload them to a GitHub release of that tag, with
@@ -105,6 +124,8 @@ jobs:
   # `dart run bin/native_hashes.dart <tag>`.
 
   postgres-test:
+    needs: changes
+    if: contains(fromJSON(needs.changes.outputs.changed), 'dox-postgres-native')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -178,7 +199,8 @@ jobs:
 
   # ---- dox_mysql_native ------------------------------------------------
   #
-  # Every push: Rust checks, then the Dart tests on MySQL 8.4 and MariaDB 11
+  # Every push that changes it: Rust checks, then the Dart tests on
+  # MySQL 8.4 and MariaDB 11
   # (the pool tests and the dox_orm tests on the native driver).
   #
   # A tag like `dox_mysql_native-v3.0.0-alpha.2`: build the library for the
@@ -188,6 +210,8 @@ jobs:
   # `dart run bin/native_hashes.dart <tag>`.
 
   mysql-test:
+    needs: changes
+    if: contains(fromJSON(needs.changes.outputs.changed), 'dox-mysql-native')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

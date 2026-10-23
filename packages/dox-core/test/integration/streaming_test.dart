@@ -68,11 +68,14 @@ Future<(int, String)> send(
 }
 
 void main() {
+  late Directory tempDir;
   late File bigFile;
 
   group('Streaming |', () {
     setUpAll(() async {
-      bigFile = File('${Directory.systemTemp.path}/dox-range-test.txt')
+      // A new folder per run: CI runs this file in two processes at once.
+      tempDir = Directory.systemTemp.createTempSync('dox-range-');
+      bigFile = File('${tempDir.path}/dox-range-test.txt')
         ..writeAsStringSync('0123456789abcdefghij');
       Route.post('/echo', (DoxRequest req) => req.all());
       Route.post('/upload', (DoxRequest req) async {
@@ -117,7 +120,7 @@ void main() {
         '${Directory.current.path}/storage/stream-test',
       );
       if (storage.existsSync()) storage.deleteSync(recursive: true);
-      if (bigFile.existsSync()) bigFile.deleteSync();
+      if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
     });
 
     test('json under the limit is parsed', () async {

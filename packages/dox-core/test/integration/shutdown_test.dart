@@ -65,7 +65,12 @@ Future<Object> fetch(int port, String path) async {
   }
 }
 
+/// completes when a `/slow` request reaches the handler. With one isolate
+/// the handler runs in the isolate of the test.
+Completer<void> slowStarted = Completer<void>();
+
 Future<String> slow(DoxRequest req) async {
+  if (!slowStarted.isCompleted) slowStarted.complete();
   int ms = int.parse(req.input('ms') as String);
   await Future<void>.delayed(Duration(milliseconds: ms));
   return 'slow done';
@@ -81,6 +86,7 @@ void main() {
 
       setUp(() async {
         cleanup = Cleanup();
+        slowStarted = Completer<void>();
         Route.get('/slow', slow);
         await startHttpServer(
           AppConfig(
@@ -98,10 +104,17 @@ void main() {
 
       test('open requests finish, new ones are refused', () async {
         Future<Object> open = fetch(port, '/slow?ms=500');
-        await Future<void>.delayed(const Duration(milliseconds: 100));
+        // stop only when the request is in the handler. A fixed delay is
+        // too short on a busy CI machine.
+        await slowStarted.future.timeout(const Duration(seconds: 10));
         Future<void> stopped = Dox().stop();
-        await Future<void>.delayed(const Duration(milliseconds: 50));
-        expect(await fetch(port, '/slow?ms=0'), isA<SocketException>());
+        // a new request is refused once the server stops listening
+        Object refused = await fetch(port, '/slow?ms=0');
+        for (int i = 0; i < 100 && refused is! SocketException; i++) {
+          await Future<void>.delayed(const Duration(milliseconds: 20));
+          refused = await fetch(port, '/slow?ms=0');
+        }
+        expect(refused, isA<SocketException>());
         expect(await open, '200 slow done');
         await stopped;
         expect(cleanup.calls, 1);
@@ -123,7 +136,7 @@ void main() {
 
       test('a request longer than shutdownTimeout is cut', () async {
         Future<Object> open = fetch(port, '/slow?ms=5000');
-        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await slowStarted.future.timeout(const Duration(seconds: 10));
         Stopwatch clock = Stopwatch()..start();
         await Dox().stop();
         expect(clock.elapsed, lessThan(const Duration(seconds: 4)));
@@ -149,21 +162,27 @@ void main() {
         ]);
         StringBuffer out = StringBuffer();
         Completer<void> ready = Completer<void>();
+        // all 6 requests are in a handler (the app prints `slow start`)
+        Completer<void> started = Completer<void>();
         app.stdout.transform(utf8.decoder).listen((String text) {
           out.write(text);
           if (out.toString().contains('ready') && !ready.isCompleted) {
             ready.complete();
           }
+          if ('slow start'.allMatches(out.toString()).length >= 6 &&
+              !started.isCompleted) {
+            started.complete();
+          }
         });
         app.stderr.transform(utf8.decoder).listen(out.write);
         try {
           await ready.future.timeout(const Duration(seconds: 60));
-          // wait until all 3 isolates serve
-          await Future<void>.delayed(const Duration(milliseconds: 500));
           List<Future<Object>> open = <Future<Object>>[
             for (int i = 0; i < 6; i++) fetch(port, '/slow'),
           ];
-          await Future<void>.delayed(const Duration(milliseconds: 200));
+          // SIGTERM only when every request is in a handler. A fixed delay
+          // is too short on a busy CI machine.
+          await started.future.timeout(const Duration(seconds: 30));
           app.kill(); // SIGTERM
           for (Object result in await Future.wait(open)) {
             expect(result, '200 slow done');
