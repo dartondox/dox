@@ -4161,9 +4161,12 @@ The <code>.env</code> file is optional.</p>
 </span></code></pre></div>
 <ul>
 <li>One <code>KEY=value</code> per line.</li>
-<li>Dox removes all <code>"</code>, <code>'</code> and <code>`</code> characters from a value. So <code>APP_NAME="My app"</code> gives <code>My app</code>.</li>
+<li>Quotes around a value are removed. So <code>APP_NAME="My app"</code> gives <code>My app</code>. Use <code>"</code>, <code>'</code> or <code>`</code>.</li>
 <li>A <code>=</code> inside the value is kept: <code>TOKEN=a=b</code> gives <code>a=b</code>.</li>
-<li>Put a comment on its own line. A <code>#</code> after a value is part of the value.</li>
+<li>A line that starts with <code>#</code> is a comment.</li>
+<li>A <code>#</code> after a space starts a comment: <code>APP_PORT=3000 # dev</code> gives <code>3000</code>.</li>
+<li>A <code>#</code> with no space before it is kept: <code>DB_PASSWORD=abc#123</code> gives <code>abc#123</code>.</li>
+<li>A <code>#</code> inside quotes is kept: <code>DB_PASSWORD="abc # 123"</code> gives <code>abc # 123</code>.</li>
 </ul>
 <h2 id="commands">Commands</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>dox<span class="w"> </span>env:generate<span class="w">   </span><span class="c1"># make lib/config/env.dart from .env.example</span>

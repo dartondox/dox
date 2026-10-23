@@ -4880,7 +4880,7 @@
 </span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="kd">final</span><span class="w"> </span><span class="n">AppEnv</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppEnv</span><span class="p">.</span><span class="n">load</span><span class="p">();</span>
 </span></code></pre></div>
 <p>A new project has this class in <code>lib/config/env.dart</code>. Use <code>env.appPort</code> in code. After you add a getter, run <code>dart run build_runner build</code>.</p>
-<p><code>Env.get&lt;int&gt;('APP_PORT', 3000)</code> is the low-level way. It reads a key by name. A real env var wins over <code>.env</code>. <code>#</code> is not a comment after a value.</p>
+<p><code>Env.get&lt;int&gt;('APP_PORT', 3000)</code> is the low-level way. It reads a key by name. A real env var wins over <code>.env</code>. In <code>.env</code>, a <code>#</code> after a space starts a comment.</p>
 <p>See <a href="../../digging-deeper/env/">Environment variables</a> and <a href="../env/">Env reference</a>.</p>
 <h2 id="auth">Auth</h2>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">Auth</span><span class="p">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">AuthConfig</span><span class="p">(</span>

@@ -1769,6 +1769,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#graceful-shutdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Graceful shutdown
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#many-processes-or-machines" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3953,6 +3964,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#graceful-shutdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Graceful shutdown
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#many-processes-or-machines" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4183,15 +4205,69 @@ real client:</p>
 </span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="k">[Install]</span>
 </span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="na">WantedBy</span><span class="o">=</span><span class="s">multi-user.target</span>
 </span></code></pre></div>
+<h2 id="graceful-shutdown">Graceful shutdown</h2>
+<p>On <code>SIGTERM</code> (docker stop, Kubernetes, Cloud Run, Fly, systemd) or <code>SIGINT</code> (Ctrl+C), Dox stops gracefully, in every isolate:</p>
+<ol>
+<li>It stops taking new connections at once.</li>
+<li>Open requests can finish. Each keep-alive connection closes after its current answer.</li>
+<li>After <code>shutdownTimeout</code> (default 8 seconds), it closes the connections that are still open.</li>
+<li>It runs <code>shutdown()</code> of each service that implements <code>DoxShutdown</code> (see <a href="../services/#clean-up-on-shutdown">Services</a>).</li>
+<li>The process exits with code <code>0</code>.</li>
+</ol>
+<p>A second <code>SIGINT</code> or <code>SIGTERM</code> stops the process at once.</p>
+<p>Set the timeout in <code>lib/config/app.dart</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nl">shutdownTimeout:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">20</span><span class="p">),</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="p">...</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="p">)</span>
+</span></code></pre></div>
+<p>Keep it shorter than the time your platform waits before it kills the process:</p>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Waits</th>
+<th>Change it with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>docker stop</code></td>
+<td>10 seconds</td>
+<td><code>docker stop -t 30</code>, or <code>stop_grace_period</code> in compose</td>
+</tr>
+<tr>
+<td>Kubernetes</td>
+<td>30 seconds</td>
+<td><code>terminationGracePeriodSeconds</code></td>
+</tr>
+<tr>
+<td>Cloud Run</td>
+<td>10 seconds</td>
+<td>can not be changed</td>
+</tr>
+<tr>
+<td>Fly.io</td>
+<td>5 seconds</td>
+<td><code>kill_timeout</code> in <code>fly.toml</code></td>
+</tr>
+<tr>
+<td>systemd</td>
+<td>90 seconds</td>
+<td><code>TimeoutStopSec</code></td>
+</tr>
+</tbody>
+</table>
+<p>In code, <code>await Dox().stop()</code> does steps 1 to 4 and does not exit.</p>
 <h2 id="many-processes-or-machines">Many processes or machines</h2>
 <p>One Dox process already uses every core. You only need more processes to
 run on more machines, or to restart one process without downtime.
 Run each one on its own port (or machine) and list them in the proxy:</p>
-<div class="language-nginx highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">upstream</span><span class="w"> </span><span class="s">dox</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="kn">server</span><span class="w"> </span><span class="n">10.0.0.11</span><span class="p">:</span><span class="mi">3000</span><span class="p">;</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="kn">server</span><span class="w"> </span><span class="n">10.0.0.12</span><span class="p">:</span><span class="mi">3000</span><span class="p">;</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="kn">keepalive</span><span class="w"> </span><span class="mi">64</span><span class="p">;</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="p">}</span>
+<div class="language-nginx highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">upstream</span><span class="w"> </span><span class="s">dox</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="kn">server</span><span class="w"> </span><span class="n">10.0.0.11</span><span class="p">:</span><span class="mi">3000</span><span class="p">;</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="kn">server</span><span class="w"> </span><span class="n">10.0.0.12</span><span class="p">:</span><span class="mi">3000</span><span class="p">;</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="kn">keepalive</span><span class="w"> </span><span class="mi">64</span><span class="p">;</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Websocket rooms then need a shared adapter (like Redis), because each
 process has its own memory.</p>

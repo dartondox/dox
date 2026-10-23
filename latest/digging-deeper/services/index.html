@@ -1668,6 +1668,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#clean-up-on-shutdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Clean up on shutdown
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#rules-for-a-service" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3919,6 +3930,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#clean-up-on-shutdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Clean up on shutdown
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#rules-for-a-service" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4020,6 +4042,25 @@
 </ol>
 <p>So routes can use what a service set up. For example, <code>Route.websocket()</code> needs the WebSocket service to run first.</p>
 <p><code>dox openapi:generate</code> also runs <code>setup()</code> of every service, because it needs the routes.</p>
+<h2 id="clean-up-on-shutdown">Clean up on shutdown</h2>
+<p>On <code>SIGTERM</code> or <code>SIGINT</code> Dox stops the server gracefully (see <a href="../deployment/#graceful-shutdown">Deployment</a>).
+After the open requests are done, it runs <code>shutdown()</code> of each service that also implements <code>DoxShutdown</code>.
+It runs in every isolate. Use it to close connections or flush data.</p>
+<div class="language-dart highlight"><span class="filename">lib/services/redis_service.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">RedisService</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">DoxService</span><span class="p">,</span><span class="w"> </span><span class="n">DoxShutdown</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="kd">late</span><span class="w"> </span><span class="n">RedisConnection</span><span class="w"> </span><span class="n">redis</span><span class="p">;</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="n">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">RedisConnection</span><span class="p">.</span><span class="n">open</span><span class="p">();</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">shutdown</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">redis</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>An error in <code>shutdown()</code> goes to <code>errorHandler</code>. The other services still run.</p>
 <h2 id="rules-for-a-service">Rules for a service</h2>
 <ul>
 <li><strong>Open connections in <code>setup()</code>, not in the constructor.</strong> Dox copies the service object to each isolate. An open socket or database pool can not be copied, so the isolate fails to start.</li>

@@ -4275,8 +4275,8 @@
 </tr>
 <tr>
 <td>Graceful shutdown</td>
-<td><strong>Dox limit.</strong> Dox does not listen for <code>SIGTERM</code>. On stop, open requests are cut. <code>Dox().server.close()</code> closes the server of the main isolate only. Take the instance out of the proxy first, wait a few seconds, then stop it.</td>
-<td><a href="../../digging-deeper/deployment/">Deployment</a></td>
+<td>On <code>SIGTERM</code> or <code>SIGINT</code>, Dox stops taking connections and lets open requests finish, in every isolate. Set <code>shutdownTimeout</code> below the kill timeout of your platform. Close connections in a <code>DoxShutdown</code> service.</td>
+<td><a href="../../digging-deeper/deployment/#graceful-shutdown">Deployment</a></td>
 </tr>
 <tr>
 <td>Zero downtime deploys</td>

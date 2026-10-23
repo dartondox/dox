@@ -3983,9 +3983,10 @@ If you set <code>DB_NAME=storage/blog.sqlite</code>, run <code>mkdir storage</co
 It restarts the server when you save a <code>.dart</code> file.
 The first start takes a little longer. It prints <code>Running build hooks...</code> while it compiles the SQLite library.</p>
 <p>The last line is:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Server started at http://127.0.0.1:3000 with 8 isolate (native)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Server started at http://[::]:3000 with 8 isolate (native)
 </span></code></pre></div>
-<p>The number of isolates is the number of CPU cores on your machine.</p>
+<p><code>[::]</code> means the app listens on all network interfaces. Open it at <code>http://localhost:3000</code>.
+The number of isolates is the number of CPU cores on your machine.</p>
 <h2 id="check-it">Check it</h2>
 <p>In a second terminal:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>curl<span class="w"> </span>-i<span class="w"> </span>http://localhost:3000/api/ping

@@ -4138,7 +4138,7 @@ The second one has only the Dart runtime files and the bundle. No SDK, no source
 </span></code></pre></div>
 <p>Delete the <code>public</code> lines when your app has no <code>public</code> folder.</p>
 <p>Check the start log in the container. It must end with <code>(native)</code>:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Server started at http://127.0.0.1:3000 with 8 isolate (native)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Server started at http://[::]:3000 with 8 isolate (native)
 </span></code></pre></div>
 <p>Without the <code>libgcc_s</code> lines, the native HTTP server does not load in a
 <code>scratch</code> image. Dox then prints <code>dox_http_native did not load, using the

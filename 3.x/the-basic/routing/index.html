@@ -4102,6 +4102,7 @@ The <code>prefix</code> of the router is added in front of all its routes.</p>
 <p>There are also <code>Route.options</code>, <code>Route.copy</code>, <code>Route.view</code>, <code>Route.link</code>, <code>Route.unlink</code>,
 <code>Route.purge</code>, <code>Route.lock</code>, <code>Route.unlock</code> and <code>Route.propfind</code>.</p>
 </div>
+<p>A <code>HEAD</code> request runs the <code>GET</code> route of the same path. The answer has the status and headers of <code>GET</code>, with no body.</p>
 <h2 id="the-handler">The handler</h2>
 <p>The second argument is the code that answers the request. It can be:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// a function</span>

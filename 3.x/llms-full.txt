@@ -530,9 +530,10 @@ The first start takes a little longer. It prints `Running build hooks...` while 
 The last line is:
 
 ```text
-Server started at http://127.0.0.1:3000 with 8 isolate (native)
+Server started at http://[::]:3000 with 8 isolate (native)
 ```
 
+`[::]` means the app listens on all network interfaces. Open it at `http://localhost:3000`.
 The number of isolates is the number of CPU cores on your machine.
 
 ## Check it
@@ -1546,7 +1547,7 @@ Migrating: 2023_07_16_131937700_create_users_table
 Migrated: 2023_07_16_131937700_create_users_table
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
-Server started at http://127.0.0.1:3000 with 8 isolate (native)
+Server started at http://[::]:3000 with 8 isolate (native)
 ```
 
 The migrations run again, because `DB_NAME=db/dox.sqlite` is a new file in `build/bundle`.
@@ -2494,6 +2495,8 @@ Route.delete('/blogs/{id}', controller.destroy);
 !!! info
     There are also `Route.options`, `Route.copy`, `Route.view`, `Route.link`, `Route.unlink`,
     `Route.purge`, `Route.lock`, `Route.unlock` and `Route.propfind`.
+
+A `HEAD` request runs the `GET` route of the same path. The answer has the status and headers of `GET`, with no body.
 
 ## The handler
 
@@ -4737,9 +4740,12 @@ DB_PORT=5432
 ```
 
 - One `KEY=value` per line.
-- Dox removes all `"`, `'` and `` ` `` characters from a value. So `APP_NAME="My app"` gives `My app`.
+- Quotes around a value are removed. So `APP_NAME="My app"` gives `My app`. Use `"`, `'` or `` ` ``.
 - A `=` inside the value is kept: `TOKEN=a=b` gives `a=b`.
-- Put a comment on its own line. A `#` after a value is part of the value.
+- A line that starts with `#` is a comment.
+- A `#` after a space starts a comment: `APP_PORT=3000 # dev` gives `3000`.
+- A `#` with no space before it is kept: `DB_PASSWORD=abc#123` gives `abc#123`.
+- A `#` inside quotes is kept: `DB_PASSWORD="abc # 123"` gives `abc # 123`.
 
 ## Commands
 
@@ -4986,6 +4992,30 @@ In each isolate, Dox does these steps in this order:
 So routes can use what a service set up. For example, `Route.websocket()` needs the WebSocket service to run first.
 
 `dox openapi:generate` also runs `setup()` of every service, because it needs the routes.
+
+## Clean up on shutdown
+
+On `SIGTERM` or `SIGINT` Dox stops the server gracefully (see [Deployment](deployment.md#graceful-shutdown)).
+After the open requests are done, it runs `shutdown()` of each service that also implements `DoxShutdown`.
+It runs in every isolate. Use it to close connections or flush data.
+
+```dart title="lib/services/redis_service.dart"
+class RedisService implements DoxService, DoxShutdown {
+  late RedisConnection redis;
+
+  @override
+  Future<void> setup() async {
+    redis = await RedisConnection.open();
+  }
+
+  @override
+  Future<void> shutdown() async {
+    await redis.close();
+  }
+}
+```
+
+An error in `shutdown()` goes to `errorHandler`. The other services still run.
 
 ## Rules for a service
 
@@ -5685,6 +5715,39 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 ```
+
+## Graceful shutdown
+
+On `SIGTERM` (docker stop, Kubernetes, Cloud Run, Fly, systemd) or `SIGINT` (Ctrl+C), Dox stops gracefully, in every isolate:
+
+1. It stops taking new connections at once.
+2. Open requests can finish. Each keep-alive connection closes after its current answer.
+3. After `shutdownTimeout` (default 8 seconds), it closes the connections that are still open.
+4. It runs `shutdown()` of each service that implements `DoxShutdown` (see [Services](services.md#clean-up-on-shutdown)).
+5. The process exits with code `0`.
+
+A second `SIGINT` or `SIGTERM` stops the process at once.
+
+Set the timeout in `lib/config/app.dart`:
+
+```dart
+AppConfig(
+  shutdownTimeout: Duration(seconds: 20),
+  ...
+)
+```
+
+Keep it shorter than the time your platform waits before it kills the process:
+
+| Platform | Waits | Change it with |
+| --- | --- | --- |
+| `docker stop` | 10 seconds | `docker stop -t 30`, or `stop_grace_period` in compose |
+| Kubernetes | 30 seconds | `terminationGracePeriodSeconds` |
+| Cloud Run | 10 seconds | can not be changed |
+| Fly.io | 5 seconds | `kill_timeout` in `fly.toml` |
+| systemd | 90 seconds | `TimeoutStopSec` |
+
+In code, `await Dox().stop()` does steps 1 to 4 and does not exit.
 
 ## Many processes or machines
 
@@ -13617,7 +13680,7 @@ Delete the `public` lines when your app has no `public` folder.
 Check the start log in the container. It must end with `(native)`:
 
 ```text
-Server started at http://127.0.0.1:3000 with 8 isolate (native)
+Server started at http://[::]:3000 with 8 isolate (native)
 ```
 
 Without the `libgcc_s` lines, the native HTTP server does not load in a
@@ -13903,8 +13966,14 @@ systemctl status blog
 
 ## 6. Close the app port
 
-Dox listens on all network interfaces. It has no option to listen on `127.0.0.1` only.
-So block port `3000` from outside with a firewall. Only Caddy should reach it.
+Caddy runs on the same machine. So let Dox listen on `127.0.0.1` only. Add this line to `/etc/blog.env`:
+
+```ini title="/etc/blog.env"
+APP_HOST=127.0.0.1
+```
+
+Now only programs on this machine can reach port `3000`.
+Also turn on a firewall, so only SSH, HTTP and HTTPS are open:
 
 ```bash
 sudo ufw default deny incoming
@@ -14066,6 +14135,8 @@ Replace the file with this one. Change `app` and `primary_region` to your values
 ```toml title="fly.toml"
 app = "blog-api"
 primary_region = "ams"
+# Dox waits up to 8 seconds for open requests on stop. Fly waits 5 by default.
+kill_timeout = 10
 
 [build]
   dockerfile = "Dockerfile"
@@ -14103,9 +14174,10 @@ primary_region = "ams"
   cpus = 1
 ```
 
-- `internal_port` is the port the app listens on. Dox reads it from `APP_PORT`. Keep the two the same.
+- `internal_port` is the port the app listens on. Dox reads it from `APP_PORT` (or `PORT` when `APP_PORT` is not set). Keep the two the same.
 - Values in `[env]` must be strings, so write `"3000"`, not `3000`.
 - `[[vm]]` wins over `fly scale vm`. Each `fly deploy` sets the machine to these values.
+- `kill_timeout` is how long Fly waits after `SIGINT` before it kills the app. Keep it above `shutdownTimeout` of `AppConfig` (8 seconds by default). See [Graceful shutdown](../digging-deeper/deployment.md#graceful-shutdown).
 
 ## 3. Set the secrets
 
@@ -14181,7 +14253,7 @@ The first log lines after a start:
 ```text
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
-{"level":"INFO","name":"dox","message":"Server started at http://127.0.0.1:3000 with 1 isolate (native)", ...}
+{"level":"INFO","name":"dox","message":"Server started at http://[::]:3000 with 1 isolate (native)", ...}
 ```
 
 ## HTTPS and the client IP
@@ -14262,29 +14334,14 @@ The image is small. For the blog API it is about 17 MB.
 
 Cloud Run sends requests to one port of the container. It puts that port in the `PORT` env variable. The default is `8080`.
 
-Dox does not read `PORT`. It reads `APP_PORT` (default `3000`), in `lib/config/app.dart`.
-So tell Cloud Run to use port 3000:
+Dox listens on `APP_PORT` when it is set. When `APP_PORT` is not set, Dox listens on `PORT`.
+So do not set `APP_PORT` on Cloud Run. The app then follows `PORT`, and you can leave out `--port`.
+
+If you do set `APP_PORT`, tell Cloud Run the same port:
 
 ```bash
 gcloud run deploy blog --port 3000 ...
 ```
-
-Then Cloud Run sends requests to 3000 and sets `PORT=3000`. The app listens on 3000. No code change.
-
-!!! note "Or read `PORT` in the app"
-    If you want the app to follow `PORT`, add a getter to `lib/config/env.dart`
-    and use it in `lib/config/app.dart`, then run `dart run build_runner build`:
-
-    ```dart title="lib/config/env.dart"
-      /// set by Cloud Run
-      int? get port;
-    ```
-
-    ```dart title="lib/config/app.dart"
-    serverPort: env.port ?? env.appPort,
-    ```
-
-    Then you can leave out `--port`.
 
 ## 1. Turn on the APIs
 
@@ -14346,7 +14403,7 @@ gcloud run deploy blog \
 
 | Flag | Why |
 | --- | --- |
-| `--port 3000` | the port Dox listens on (`APP_PORT`). See [the port](#the-port-port-and-app_port) |
+| `--port 3000` | the port Cloud Run sends requests to. It also sets `PORT=3000`, and Dox listens on `PORT`. See [the port](#the-port-port-and-app_port) |
 | `--min-instances 1` | keeps one instance warm, so the first request does not wait for a cold start. The default is `0`. An idle instance still costs money |
 | `--add-cloudsql-instances` | makes the Cloud SQL Unix socket in `/cloudsql/...` |
 | `--set-env-vars` | config that is not secret |
@@ -14385,7 +14442,7 @@ The first log lines after a start:
 ```text
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
-{"level":"INFO","name":"dox","message":"Server started at http://127.0.0.1:3000 with 1 isolate (native)", ...}
+{"level":"INFO","name":"dox","message":"Server started at http://[::]:3000 with 1 isolate (native)", ...}
 ```
 
 If the deploy fails with "the container did not listen on the port", the app listens on a different port than `--port`. Check `APP_PORT` and `--port`.
@@ -14831,7 +14888,7 @@ final AppEnv env = AppEnv.load();
 
 A new project has this class in `lib/config/env.dart`. Use `env.appPort` in code. After you add a getter, run `dart run build_runner build`.
 
-`Env.get<int>('APP_PORT', 3000)` is the low-level way. It reads a key by name. A real env var wins over `.env`. `#` is not a comment after a value.
+`Env.get<int>('APP_PORT', 3000)` is the low-level way. It reads a key by name. A real env var wins over `.env`. In `.env`, a `#` after a space starts a comment.
 
 See [Environment variables](../digging-deeper/env.md) and [Env reference](env.md).
 
@@ -14938,12 +14995,14 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
 | `appKey` | `String` | required | Encrypts cookies (`req.cookie()`, `DoxCookie`) and signs local storage URLs. In production the app stops at start when it is empty. Make one with `dox key:generate`. |
-| `serverPort` | `int` | `3000` | The port the HTTP server listens on. |
+| `serverPort` | `int` | `3000` | The port the HTTP server listens on. When the env has no `APP_PORT` but has `PORT`, Dox listens on `PORT` instead (Cloud Run, Fly, Render and Heroku set it). |
+| `host` | `String?` | `null`: `APP_HOST`, else all interfaces | The network interface to listen on, like `127.0.0.1`. `null` reads the env var `APP_HOST`. With neither, Dox listens on all interfaces, IPv6 and IPv4 (`::`). |
 | `totalIsolate` | `int?` | `Platform.numberOfProcessors` | Isolates (threads) that serve HTTP, all on the same port. On Windows the native server runs on one isolate. |
 | `server` | `ServerBackend` | `ServerBackend.native` | Which HTTP server runs: `native` (Rust, `dox_http_native`) or `dartIo`. The env var `DOX_SERVER` wins over this value. See [Native server](../digging-deeper/native-server.md). |
 | `compress` | `bool` | `false` | gzip responses in Dart (`HttpServer.autoCompress`). It costs CPU on every response. Let a proxy do it when you have one. |
 | `maxBodySize` | `int` | `10 * 1024 * 1024` (10 MB) | Biggest JSON or urlencoded body in bytes. Bigger gets `413`. |
 | `maxMultipartSize` | `int` | `100 * 1024 * 1024` (100 MB) | Biggest `multipart/form-data` body (file uploads) in bytes. Bigger gets `413`. |
+| `shutdownTimeout` | `Duration` | `Duration(seconds: 8)` | On `SIGTERM` or `SIGINT`, how long open requests may run before Dox closes them. Keep it below the kill timeout of your platform. See [Graceful shutdown](../digging-deeper/deployment.md#graceful-shutdown). |
 | `trustedProxies` | `List<String>` | `[]` | IPs or CIDR ranges of reverse proxies. Only when the direct client is in this list does Dox read `X-Forwarded-For` for `req.ip()` and `X-Forwarded-Proto` for `req.scheme()`. `['*']` trusts any client. |
 
 ## Routing and request handling
@@ -15643,8 +15702,9 @@ Source: `packages/dox-cli/lib/src/tools/openapi_generate.dart`.
 dox update
 ```
 
-Runs `dart pub global activate dox`. This installs the latest stable version of the CLI, not a preview.
-For a preview run `dart pub global activate dox 3.0.0-alpha.4` yourself.
+Installs the newest CLI with the same major version as the one you have. Pre-releases count.
+So a 3.x alpha CLI updates to the newest 3.x alpha, not to the old 2.x stable.
+It reads the version list from pub.dev, then runs `dart pub global activate dox <version>`.
 
 Source: `packages/dox-cli/lib/src/tools/update_dox.dart`.
 
@@ -15837,6 +15897,8 @@ The code reads env vars in three ways:
 | Variable | Who reads it | Default | Meaning | Example |
 | --- | --- | --- | --- | --- |
 | `APP_ENV` | `dox_core` (`Dox().checkAppKey()`, `OpenApiConfig.isEnabled`) | empty | `production` makes a missing `APP_KEY` a startup error. `development` or `local` turn the `/docs` routes on when `openApi.enabled` is `null`. Read with `Env.get`. | `APP_ENV=production` |
+| `PORT` | `dox_core` (`DoxServer.portFor()`) | not set | The port to listen on, when `APP_PORT` is not set. Cloud Run, Fly, Render and Heroku set it. `APP_PORT` wins when both are set. Read with `Env.get`. | `PORT=8080` |
+| `APP_HOST` | `dox_core` (`DoxServer.hostFor()`) | not set (all interfaces, `::`) | The host to listen on. `127.0.0.1` keeps the app off the network, for an app behind a proxy on the same machine. `AppConfig.host` wins over it. Read with `Env.get`. | `APP_HOST=127.0.0.1` |
 | `DOX_SERVER` | `dox_core` (`DoxServer.usesNative()`) | not set (uses `AppConfig.server`) | `dartio`, `dart_io` or `dart:io` forces the `dart:io` server. `native` forces the native server, also for an app with WebSocket routes. Real environment only. | `DOX_SERVER=dartio` |
 | `DOX_HTTP_THREAD` | `dox_http_native` (Rust, `shared_thread()`) | not set (one thread per isolate) | `shared` puts the servers of all isolates on one network thread. Off by default: on 2 cores it cut req/s by a quarter. Real environment only. | `DOX_HTTP_THREAD=shared` |
 | `DOX_DB_DRIVER` | `dox_orm` (`NativeDrivers.wanted()`) | not set (native driver) | `dart` uses the Dart `postgres` / `mysql_dart` driver instead of the native (Rust) one. Same as `extra: {'native': false}`. Real environment only. | `DOX_DB_DRIVER=dart` |
@@ -15861,7 +15923,7 @@ A new project (`dox create`) reads these keys through its typed env class, `lib/
 | --- | --- | --- | --- | --- |
 | `APP_NAME` | `appName` | `String` | `dox` | `LoggerConfig.name`. |
 | `APP_ENV` | `appEnv` | `String` | `development` | `development`, `staging` or `production`. `env.isDevelopment` is `true` for `development`. It turns on `prettyPrint` of the logger and the query log of the database. Also read by the framework (see above). |
-| `APP_PORT` | `appPort` | `int` | `3000` | `AppConfig.serverPort`. |
+| `APP_PORT` | `appPort` | `int` | `3000` | `AppConfig.serverPort`. When `APP_PORT` is not set, Dox listens on `PORT` if the env has it. |
 | `APP_KEY` | `appKey` | `String` | required | `AppConfig.appKey`. The app stops at start when it is missing. |
 | `APP_TOTAL_ISOLATE` | `appTotalIsolate` | `int?` | not set: one per CPU core | `AppConfig.totalIsolate`. |
 | `LOG_LEVEL` | `logLevel` | `String` | `info` | `LoggerConfig.level`. |
@@ -16259,7 +16321,7 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | Check | How | Read more |
 | --- | --- | --- |
 | Health route | **Dox limit.** Dox has no built-in health route. Add one that asks the database: `Route.get('/health', healthController.check)` with `await QueryBuilder.query('select 1');`. | [Docker](../guides/docker.md) |
-| Graceful shutdown | **Dox limit.** Dox does not listen for `SIGTERM`. On stop, open requests are cut. `Dox().server.close()` closes the server of the main isolate only. Take the instance out of the proxy first, wait a few seconds, then stop it. | [Deployment](../digging-deeper/deployment.md) |
+| Graceful shutdown | On `SIGTERM` or `SIGINT`, Dox stops taking connections and lets open requests finish, in every isolate. Set `shutdownTimeout` below the kill timeout of your platform. Close connections in a `DoxShutdown` service. | [Deployment](../digging-deeper/deployment.md#graceful-shutdown) |
 | Zero downtime deploys | Run two processes (or machines) behind the proxy. Restart one at a time. | [Deployment](../digging-deeper/deployment.md) |
 
 ## Rate limit at the proxy
@@ -16317,7 +16379,7 @@ Real problems, with the text you see, the cause and the fix. The texts come from
 and the start line says `(dart:io)` instead of `(native)`:
 
 ```
-Server started at http://127.0.0.1:3000 with 8 isolate (dart:io)
+Server started at http://[::]:3000 with 8 isolate (dart:io)
 ```
 
 At build time (`dart pub get`, `dox serve` or `dox build`) you may also see one of these:
@@ -16428,31 +16490,15 @@ dox create my_app --version 3.0.0-alpha.4
 
 ## A `.env` value with `#`
 
-**Symptom.** The app stops at start with
-
-```
-EnvException: the env is not valid
-  - APP_PORT must be an int, not "3000 # dev"
-```
-
-or, with `Env.get`:
-
-```
-Invalid argument(s): Env key "APP_PORT" is not a valid int: "3000 # dev"
-```
-
-Or a text value is longer than you expect, like a password with ` # prod` at the end.
-
-**Cause.** The `.env` parser (`packages/dox-core/lib/env/env.dart`) does not treat `#` as a comment. Everything after the first `=` is the value. Only `"`, `'` and `` ` `` are removed.
-
-**Fix.** Put comments on their own line:
+A `#` after a space starts a comment. The comment is not part of the value.
 
 ```ini
-# the dev port
-APP_PORT=3000
+APP_PORT=3000 # dev port   -> 3000
+DB_PASSWORD=abc#123        -> abc#123 (no space before the #)
+DB_PASSWORD="abc # 123"    -> abc # 123 (quotes keep the #)
 ```
 
-A value that must contain `#` (a password, a URL fragment) works as it is. Do not quote it, the quotes are removed anyway.
+When a value must have ` #` in it (a space, then `#`), put the value in quotes. The quotes are removed.
 
 ## `Hash.verify` throws on a bad hash
 
@@ -16588,7 +16634,7 @@ A lookup table of the messages Dox prints or throws. Search this page for the te
 | --- | --- | --- |
 | `APP_KEY is not set. Run `dox key:generate` and put the key in .env` | `appKey` is empty. A warning, or a `StateError` that stops the app when `APP_ENV=production`. | Run `dox key:generate`, or set `APP_KEY` in the env. |
 | `[dox] warning: dox_http_native did not load, using the dart:io server (<reason>)` | The native HTTP library is missing or from another version. | See [Troubleshooting](troubleshooting.md#the-native-http-library-did-not-load). Or set `DOX_SERVER=dartio`. |
-| `Server started at http://127.0.0.1:<port> with <n> isolate (<backend>)` | Normal start. `<backend>` is `native` or `dart:io`. | Nothing. |
+| `Server started at http://<host>:<port> with <n> isolate (<backend>)` | Normal start. `<host>` is the address it listens on: `[::]` means all interfaces. `<backend>` is `native` or `dart:io`. | Nothing. |
 | `WebSocket or Socket.IO routes: using the dart:io server` | The app has WebSocket or Socket.IO. The native server can not upgrade yet. | Nothing. This is info. |
 | `Windows: the native server runs on one isolate` | Windows has no `SO_REUSEPORT`. | Nothing, or `DOX_SERVER=dartio` to use every core. |
 | `Socket.IO runs on <n> isolates: clients should use transports: ['websocket'] ...` | Socket.IO with more than one isolate and long-polling on. | Use a Redis adapter, and `transports: ['websocket']` in the client. |
@@ -16969,6 +17015,8 @@ What changed in each package, newest first. This page is made from the
 
 - Fix: `dox create my_app` without `--version` crashed with a `RangeError`.
 - Fix: `dox create` picked the GitHub "latest" template release, which skips pre-releases. During the 3.x alpha that gave the old 2.x template. It now takes the newest template with the same major version as the CLI.
+- Fix: `dox env:generate` read `KEY=3000 # note` as text, not as an `int`. A `#` after a space is now a comment.
+- Fix: `dox update` ran a plain `dart pub global activate dox`, which skips pre-releases. During the 3.x alpha it installed the old 2.x CLI. It now installs the newest version with the same major version as the CLI, from the pub.dev version list.
 
 ### 3.0.0-alpha.4
 
@@ -17007,6 +17055,16 @@ What changed in each package, newest first. This page is made from the
 - `req.cookie()` returns `null` for an encrypted cookie that can not be decrypted.
 - Fix: `Hash.verify` returns `false` for a malformed hash. Before, it threw.
 - `AESEncryptor` and `DecryptException` are now exported from `package:dox_core/dox_core.dart`.
+- Fix: in `.env`, `KEY=value # note` gave the value `value # note`. A `#` after a space now starts a comment. A `#` inside quotes, or with no space before it, is kept.
+- Fix: the `.env` parser removed every quote character inside a value. Now only the quotes around the value are removed.
+- Fix: `HEAD` requests got 404, also `HEAD /docs`. A `HEAD` request now runs the `GET` route of the same path. The answer has the status and headers of `GET`, with no body.
+- New: Dox listens on `PORT` when `APP_PORT` is not set. Cloud Run, Fly, Render and Heroku set `PORT`. `APP_PORT` still wins.
+- New: `AppConfig.host` and the env var `APP_HOST` pick the network interface to listen on, like `127.0.0.1`. The default is the same as before: all interfaces (`::`, IPv6 and IPv4).
+- Fix: the start log always said `http://127.0.0.1:<port>`. It now shows the real host and port, like `http://[::]:3000`.
+- Removed the unused `sprintf` dependency.
+- New: graceful shutdown. On `SIGTERM` or `SIGINT` every isolate stops taking new connections and lets open requests finish, up to `AppConfig.shutdownTimeout` (default 8 seconds). Then Dox runs `DoxShutdown` services and exits with code 0. Before, open requests were cut. A second signal stops at once.
+- New: `DoxShutdown`. A service that also implements it gets `shutdown()` in every isolate on stop, to close connections.
+- New: `await Dox().stop()` stops the server gracefully in every isolate, without exit.
 
 ### 3.0.0-alpha.4
 
@@ -17065,6 +17123,13 @@ What changed in each package, newest first. This page is made from the
 - `uuid` 4 and `mime` 2.
 
 ## dox_http_native
+
+### Unreleased
+
+- New: `NativeHttpServer.bind(port, address: ...)` listens on one host, like `HttpServer.bind`. An `InternetAddress` or a host name. With no address it listens on all interfaces, as before. `server.address` is the real address.
+- Fix: `close()` never finished when nobody called `listen()` on the server.
+- Native ABI 3 (`dox_start` takes the host). Needs a new native library build. Until the next release, the build hook builds it with cargo.
+- New: `close()` is graceful, like `dart:io`. The server stops taking connections at once, each open connection closes after its current answer, and the future completes when all are closed. `close(force: true)` closes every connection at once.
 
 ### 3.0.0-alpha.4
 

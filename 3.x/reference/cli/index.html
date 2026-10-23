@@ -4471,8 +4471,9 @@ Stops with <code>bin/openapi.dart is missing.</code> (exit code 1) when the file
 <h3 id="dox-update"><code>dox update</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>dox update
 </span></code></pre></div>
-<p>Runs <code>dart pub global activate dox</code>. This installs the latest stable version of the CLI, not a preview.
-For a preview run <code>dart pub global activate dox 3.0.0-alpha.4</code> yourself.</p>
+<p>Installs the newest CLI with the same major version as the one you have. Pre-releases count.
+So a 3.x alpha CLI updates to the newest 3.x alpha, not to the old 2.x stable.
+It reads the version list from pub.dev, then runs <code>dart pub global activate dox &lt;version&gt;</code>.</p>
 <p>Source: <code>packages/dox-cli/lib/src/tools/update_dox.dart</code>.</p>
 <h3 id="dox-version"><code>dox version</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>dox version

@@ -4049,7 +4049,7 @@
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>[dox] warning: dox_http_native did not load, using the dart:io server (&lt;reason&gt;)
 </span></code></pre></div>
 <p>and the start line says <code>(dart:io)</code> instead of <code>(native)</code>:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Server started at http://127.0.0.1:3000 with 8 isolate (dart:io)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Server started at http://[::]:3000 with 8 isolate (dart:io)
 </span></code></pre></div>
 <p>At build time (<code>dart pub get</code>, <code>dox serve</code> or <code>dox build</code>) you may also see one of these:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dox_http_native: no native library for &lt;os&gt;-&lt;arch&gt;. Dox will use dart:io.
@@ -4121,29 +4121,21 @@
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>dox<span class="w"> </span>create<span class="w"> </span>my_app<span class="w"> </span>--version<span class="w"> </span><span class="m">3</span>.0.0-alpha.4
 </span></code></pre></div>
 <h2 id="a-env-value-with">A <code>.env</code> value with <code>#</code></h2>
-<p><strong>Symptom.</strong> The app stops at start with</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>EnvException: the env is not valid
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>  - APP_PORT must be an int, not "3000 # dev"
+<p>A <code>#</code> after a space starts a comment. The comment is not part of the value.</p>
+<div class="language-ini highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="na">APP_PORT</span><span class="o">=</span><span class="s">3000</span><span class="w"> </span><span class="c1"># dev port   -&gt; 3000</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="na">DB_PASSWORD</span><span class="o">=</span><span class="s">abc</span><span class="c1">#123        -&gt; abc#123 (no space before the #)</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="na">DB_PASSWORD</span><span class="o">=</span><span class="s">"abc # 123"</span><span class="w">    </span><span class="na">-&gt; abc # 123 (quotes keep the #)</span>
 </span></code></pre></div>
-<p>or, with <code>Env.get</code>:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>Invalid argument(s): Env key "APP_PORT" is not a valid int: "3000 # dev"
-</span></code></pre></div>
-<p>Or a text value is longer than you expect, like a password with <code># prod</code> at the end.</p>
-<p><strong>Cause.</strong> The <code>.env</code> parser (<code>packages/dox-core/lib/env/env.dart</code>) does not treat <code>#</code> as a comment. Everything after the first <code>=</code> is the value. Only <code>"</code>, <code>'</code> and <code>`</code> are removed.</p>
-<p><strong>Fix.</strong> Put comments on their own line:</p>
-<div class="language-ini highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># the dev port</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="na">APP_PORT</span><span class="o">=</span><span class="s">3000</span>
-</span></code></pre></div>
-<p>A value that must contain <code>#</code> (a password, a URL fragment) works as it is. Do not quote it, the quotes are removed anyway.</p>
+<p>When a value must have <code>#</code> in it (a space, then <code>#</code>), put the value in quotes. The quotes are removed.</p>
 <h2 id="hashverify-throws-on-a-bad-hash"><code>Hash.verify</code> throws on a bad hash</h2>
 <p><strong>Symptom.</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Invalid argument(s) (salt): Invalid salt length (The length should be greater than or equal to 28): "..."
+<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>Invalid argument(s) (salt): Invalid salt length (The length should be greater than or equal to 28): "..."
 </span></code></pre></div>
 <p>or</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>Invalid argument(s) (salt): Invalid salt version: "..."
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>Invalid argument(s) (salt): Invalid salt version: "..."
 </span></code></pre></div>
 <p>or, when the password is long:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>Invalid argument(s) (password): Password is too long (The length should be less than or equal to 72): "..."
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Invalid argument(s) (password): Password is too long (The length should be less than or equal to 72): "..."
 </span></code></pre></div>
 <p><strong>Cause.</strong> <code>Hash.verify(password, hash)</code> calls <code>BCrypt.checkpw</code> from the <code>bcrypt</code> package. It throws an <code>ArgumentError</code> when <code>hash</code> is not a bcrypt hash (it must start with <code>$2</code> and be at least 28 characters), for example when the column holds a plain password, an empty string or a hash from another algorithm. It also throws when the password is longer than 72 bytes.</p>
 <p><strong>Fix.</strong></p>
@@ -4151,7 +4143,7 @@
 <li>Make sure every stored password went through <code>Hash.make()</code>. A plain password in the column is a bug in the code that saved it.</li>
 <li>
 <p>Check the hash before you compare it, and treat a bad one as a failed login:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hash</span><span class="p">.</span><span class="n">startsWith</span><span class="p">(</span><span class="s1">r'$2'</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">verify</span><span class="p">(</span><span class="n">password</span><span class="p">,</span><span class="w"> </span><span class="n">hash</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hash</span><span class="p">.</span><span class="n">startsWith</span><span class="p">(</span><span class="s1">r'$2'</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">verify</span><span class="p">(</span><span class="n">password</span><span class="p">,</span><span class="w"> </span><span class="n">hash</span><span class="p">);</span>
 </span></code></pre></div>
 </li>
 <li>
@@ -4191,7 +4183,7 @@
 </tbody>
 </table>
 <p>As a last resort, change the user on the server:</p>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">USER</span><span class="w"> </span><span class="s1">'app'</span><span class="o">@</span><span class="s1">'%'</span><span class="w"> </span><span class="n">IDENTIFIED</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="n">mysql_native_password</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="s1">'secret'</span><span class="p">;</span>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">USER</span><span class="w"> </span><span class="s1">'app'</span><span class="o">@</span><span class="s1">'%'</span><span class="w"> </span><span class="n">IDENTIFIED</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="n">mysql_native_password</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="s1">'secret'</span><span class="p">;</span>
 </span></code></pre></div>
 <h2 id="sqlite-the-database-file">SQLite: the database file</h2>
 <p><strong>Symptom.</strong> An <code>SqliteException</code> with <code>unable to open database file</code>, or an empty database after <code>dox build</code>.</p>
@@ -4209,12 +4201,12 @@
 <p>Dox opens a file database with <code>journal_mode = WAL</code>, <code>synchronous = NORMAL</code>, <code>foreign_keys = ON</code> and <code>busy_timeout = 5000</code> (change it with <code>extra: {'busyTimeout': ...}</code>).</p>
 <h2 id="dox-command-not-found-after-dart-pub-global-activate"><code>dox: command not found</code> after <code>dart pub global activate</code></h2>
 <p><strong>Symptom.</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>zsh: command not found: dox
+<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>zsh: command not found: dox
 </span></code></pre></div>
 <p>right after <code>dart pub global activate dox 3.0.0-alpha.4</code>.</p>
 <p><strong>Cause.</strong> <code>dart pub global activate</code> puts the <code>dox</code> script in <code>$HOME/.pub-cache/bin</code>. That folder is not in your <code>PATH</code>.</p>
 <p><strong>Fix.</strong> Add it to your shell profile and open a new terminal:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$PATH</span><span class="s2">"</span>:<span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.pub-cache/bin"</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$PATH</span><span class="s2">"</span>:<span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.pub-cache/bin"</span>
 </span></code></pre></div>
 <p>On Windows the folder is <code>%LOCALAPPDATA%\Pub\Cache\bin</code>.</p>
 <h2 id="other-startup-errors">Other startup errors</h2>

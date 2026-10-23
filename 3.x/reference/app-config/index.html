@@ -4111,7 +4111,13 @@ This page lists every field, with its type, its default and what it does.</p>
 <td><code>serverPort</code></td>
 <td><code>int</code></td>
 <td><code>3000</code></td>
-<td>The port the HTTP server listens on.</td>
+<td>The port the HTTP server listens on. When the env has no <code>APP_PORT</code> but has <code>PORT</code>, Dox listens on <code>PORT</code> instead (Cloud Run, Fly, Render and Heroku set it).</td>
+</tr>
+<tr>
+<td><code>host</code></td>
+<td><code>String?</code></td>
+<td><code>null</code>: <code>APP_HOST</code>, else all interfaces</td>
+<td>The network interface to listen on, like <code>127.0.0.1</code>. <code>null</code> reads the env var <code>APP_HOST</code>. With neither, Dox listens on all interfaces, IPv6 and IPv4 (<code>::</code>).</td>
 </tr>
 <tr>
 <td><code>totalIsolate</code></td>
@@ -4142,6 +4148,12 @@ This page lists every field, with its type, its default and what it does.</p>
 <td><code>int</code></td>
 <td><code>100 * 1024 * 1024</code> (100 MB)</td>
 <td>Biggest <code>multipart/form-data</code> body (file uploads) in bytes. Bigger gets <code>413</code>.</td>
+</tr>
+<tr>
+<td><code>shutdownTimeout</code></td>
+<td><code>Duration</code></td>
+<td><code>Duration(seconds: 8)</code></td>
+<td>On <code>SIGTERM</code> or <code>SIGINT</code>, how long open requests may run before Dox closes them. Keep it below the kill timeout of your platform. See <a href="../../digging-deeper/deployment/#graceful-shutdown">Graceful shutdown</a>.</td>
 </tr>
 <tr>
 <td><code>trustedProxies</code></td>
