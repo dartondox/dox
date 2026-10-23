@@ -16881,7 +16881,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
-### Unreleased
+### 3.0.0-alpha.5
 
 - New `timestamps` option on `@DoxModel`. `timestamps: false` turns off `created_at` and `updated_at`, like `$timestamps = false` in Laravel. `createdAt: null` or `updatedAt: null` turns off one of them.
 - New `primaryKeyType` option on `@DoxModel`. Use `primaryKeyType: String` for a UUID key. The default is `int`.
@@ -16913,7 +16913,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_auth
 
-### Unreleased
+### 3.0.0-alpha.5
 
 - Breaking: `JwtAuthDriver.expiresIn` is 1 hour by default. Before, it was `null`, and tokens never expired.
 - New: named guards work. Use `Auth(guard: 'admin')` and `AuthMiddleware(guard: 'admin')`. Before, only `defaultGuard` was used.
@@ -16945,7 +16945,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_builder
 
-### Unreleased
+### 3.0.0-alpha.5
 
 - `@DoxModel(timestamps: false)` makes a model without `createdAt` and `updatedAt`. `createdAt: null` or `updatedAt: null` turns off only one.
 - The primary key field has the type of `@DoxModel(primaryKeyType: ...)`. It was always `int?`. The default is still `int`. The OpenAPI model schema uses the same type.
@@ -16983,6 +16983,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### 3.0.0-alpha.5
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.4
 
 - Version bump only, to match the other packages.
@@ -17011,7 +17015,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox
 
-### Unreleased
+### 3.0.0-alpha.5
 
 - Fix: `dox create my_app` without `--version` crashed with a `RangeError`.
 - Fix: `dox create` picked the GitHub "latest" template release, which skips pre-releases. During the 3.x alpha that gave the old 2.x template. It now takes the newest template with the same major version as the CLI.
@@ -17047,7 +17051,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_core
 
-### Unreleased
+### 3.0.0-alpha.5
 
 - Fix: CORS `origin` can be a list. Dox compares the request `Origin` with the list and sends back only the origin that matches, or no header. Before, it joined the list with commas, and browsers rejected it. A list also sends `Vary: Origin`.
 - Breaking: `AESEncryptor` now uses AES-GCM with a random nonce for each message. Before, it used AES-CTR with an all-zero nonce and no message check. Old encrypted cookies and values can not be read.
@@ -17130,7 +17134,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_http_native
 
-### Unreleased
+### 3.0.0-alpha.5
 
 - New: `NativeHttpServer.bind(port, address: ...)` listens on one host, like `HttpServer.bind`. An `InternetAddress` or a host name. With no address it listens on all interfaces, as before. `server.address` is the real address.
 - Fix: `close()` never finished when nobody called `listen()` on the server.
@@ -17163,7 +17167,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_migration
 
-### Unreleased
+### 3.0.0-alpha.5
 
 - `DATABASE_URL` support. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. Its `sslmode` (Postgres) or `ssl` (MySQL) option turns TLS on.
 - A `DB_HOST` that starts with `/` is a Postgres Unix socket folder, like `/cloudsql/project:region:instance` on Cloud Run.
@@ -17203,7 +17207,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_mysql_native
 
-### Unreleased
+### 3.0.0-alpha.5
 
 - The hook comment says how to fill the sha256 list from a release: `dart run bin/native_hashes.dart <tag>`. The list stays empty until the first release.
 
@@ -17226,6 +17230,10 @@ What changed in each package, newest first. This page is made from the
 - The build hook downloads a ready-built library. No Rust needed.
 
 ## dox_openapi
+
+### 3.0.0-alpha.5
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.4
 
@@ -17259,7 +17267,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_orm
 
-### Unreleased
+### 3.0.0-alpha.5
 
 - `DATABASE_URL` support. `ConnectionConfig.fromUrl()` reads `postgres://`, `postgresql://`, `mysql://`, `mariadb://`, `sqlite:` and `file:` urls: url-decoded user and password, host, port, database, `sslmode` and other options (they go to `extra`).
 - `DatabaseConfig` has a new `url`. It is `DATABASE_URL` from the environment when not given. When it is set, it wins: it replaces the default connection. Pass `url: ''` to turn it off.
@@ -17318,7 +17326,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_postgres_native
 
-### Unreleased
+### 3.0.0-alpha.5
 
 - The hook comment says how to fill the sha256 list from a release: `dart run bin/native_hashes.dart <tag>`. The list stays empty until the first release.
 - A `host` that starts with `/` is a Unix socket folder (eg. Cloud SQL `/cloudsql/project:region:instance`). A test checks it.
@@ -17356,6 +17364,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_query_builder
 
+### 3.0.0-alpha.5
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.4
 
 - Version bump only, to match the other packages.
@@ -17375,6 +17387,10 @@ What changed in each package, newest first. This page is made from the
 - Please depend on `dox_orm` and change your imports. See the README.
 
 ## dox_socketio
+
+### 3.0.0-alpha.5
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.4
 
@@ -17400,6 +17416,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_storage
 
+### 3.0.0-alpha.5
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.4
 
 - Version bump only, to match the other packages.
@@ -17422,6 +17442,10 @@ What changed in each package, newest first. This page is made from the
 - `DriveManager.fake()` for tests.
 
 ## dox_validation
+
+### 3.0.0-alpha.5
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.4
 
@@ -17460,6 +17484,10 @@ What changed in each package, newest first. This page is made from the
 - Laravel style string rules with `v.fromRules()`.
 
 ## dox_websocket
+
+### 3.0.0-alpha.5
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.4
 
