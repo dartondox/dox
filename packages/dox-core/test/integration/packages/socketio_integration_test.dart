@@ -11,8 +11,7 @@ import 'package:test/test.dart';
 // the namespace used by the dox_socketio interop tests
 import '../../../../dox-socketio/test/support/test_app.dart';
 
-const int port = 50023;
-const String baseUrl = 'http://localhost:$port';
+String get baseUrl => 'http://localhost:${Dox().server.httpServer.port}';
 
 /// the official socket.io-client scripts of dox_socketio
 final String interopDir = Directory('../dox-socketio/test/interop')
@@ -30,7 +29,8 @@ List<String> events = <String>[];
 
 AppConfig config = AppConfig(
   appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
-  serverPort: port,
+  // the OS picks a free port, so test files can run in parallel
+  serverPort: 0,
   totalIsolate: 1,
   routers: <Router>[PingRouter()],
   socketIo: SocketIoConfig(

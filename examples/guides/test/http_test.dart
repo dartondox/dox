@@ -13,7 +13,7 @@ import '../db/migration/migrations.dart';
 
 /// The "Check it" steps of docs/guides, as tests.
 /// Uses the database of `.env` (copy it from `.env.example`).
-String baseUrl = 'http://localhost:${appConfig.serverPort}';
+String get baseUrl => 'http://localhost:${Dox().server.httpServer.port}';
 
 /// a 1x1 PNG image
 List<int> png = base64Decode(
@@ -48,6 +48,10 @@ Future<void> deleteDbFile() async {
 
 void main() {
   setUpAll(() async {
+    // port 0: the OS picks a free port, so test files can run in parallel.
+    // Set it before the app reads its env.
+    Env().load();
+    Env().env['APP_PORT'] = '0';
     // start each run with an empty database
     await deleteDbFile();
     Dox().initialize(appConfig);

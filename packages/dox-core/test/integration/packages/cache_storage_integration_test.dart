@@ -5,8 +5,12 @@ import 'package:dox_core/dox_core.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
-const int port = 50022;
-const String baseUrl = 'http://localhost:$port';
+import '../../utils/free_port.dart';
+
+/// a free port, known before the start: the storage disk URL needs it.
+/// Set in setUpAll, before [config] is read.
+late int port;
+String get baseUrl => 'http://localhost:$port';
 const String root = 'storage/test-disk';
 
 class FileRouter extends Router {
@@ -25,6 +29,7 @@ class FileRouter extends Router {
 
 AppConfig config = AppConfig(
   appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+
   serverPort: port,
   totalIsolate: 1,
   routers: <Router>[FileRouter()],
@@ -50,6 +55,7 @@ AppConfig config = AppConfig(
 
 void main() {
   setUpAll(() async {
+    port = await freePort();
     Dox().initialize(config);
     await Dox().startServer();
   });
