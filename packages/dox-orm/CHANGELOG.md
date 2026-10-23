@@ -3,6 +3,7 @@
 - `DATABASE_URL` support. `ConnectionConfig.fromUrl()` reads `postgres://`, `postgresql://`, `mysql://`, `mariadb://`, `sqlite:` and `file:` urls: url-decoded user and password, host, port, database, `sslmode` and other options (they go to `extra`).
 - `DatabaseConfig` has a new `url`. It is `DATABASE_URL` from the environment when not given. When it is set, it wins: it replaces the default connection. Pass `url: ''` to turn it off.
 - Postgres Unix sockets. A host that starts with `/` is a socket folder, like `/cloudsql/project:region:instance` on Cloud Run. Works on the native and the Dart driver. Use `?host=/cloudsql/...` in a url.
+- `QueryBuilder.query()` has a new `connection` parameter, to run a raw query on a named connection.
 - Fix: `withConnection()` did not reach `save()`, `delete()`, `forceDelete()` and `restore()`. They used the default connection. Now they use the connection of the model. Models that a query returns keep the connection of the query, and relation queries use the connection of the parent model. `Model.withConnection()` returns the model, so `Blog()..withConnection('other')` works.
 
 ## 3.0.0-alpha.4

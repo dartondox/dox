@@ -104,4 +104,27 @@ void main() {
     await QueryBuilder.table('blog').withConnection('other').truncate();
     await QueryBuilder.table('blog_info').withConnection('other').truncate();
   });
+
+  test('QueryBuilder.query() runs on the given connection', () async {
+    await QueryBuilder.query(
+      'CREATE TABLE only_other (id INTEGER)',
+      connection: 'other',
+    );
+    await QueryBuilder.query(
+      'INSERT INTO only_other (id) VALUES (@id)',
+      substitutionValues: <String, dynamic>{'id': 7},
+      connection: 'other',
+    );
+    List<Map<String, dynamic>> rows = await QueryBuilder.query(
+      'SELECT id FROM only_other',
+      connection: 'other',
+    );
+    expect(rows.first['id'], 7);
+
+    /// the default connection does not have this table
+    await expectLater(
+      QueryBuilder.query('SELECT id FROM only_other'),
+      throwsA(anything),
+    );
+  });
 }

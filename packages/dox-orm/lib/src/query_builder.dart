@@ -185,17 +185,23 @@ class QueryBuilder<T>
     return SqlQueryBuilder().getDBDriver(connection).transaction(callback);
   }
 
-  /// /// Direct raw query to database
-  /// ```
-  /// var result = await QueryBuilder.query('select * from blog where id =  @id', {'id' : 1});
+  /// run a raw query. [connection] is a connection name, the default
+  /// connection is used when it is null.
   ///
+  /// ```
+  /// var rows = await QueryBuilder.query(
+  ///   'select * from blog where id = @id',
+  ///   substitutionValues: {'id': 1},
+  ///   connection: 'mysql',
+  /// );
+  /// ```
   static Future<List<Map<String, dynamic>>> query(
     String query, {
     Map<String, dynamic>? substitutionValues = const <String, dynamic>{},
+    String? connection,
   }) {
-    return SqlQueryBuilder().dbDriver.query(
-      query,
-      substitutionValues: substitutionValues,
-    );
+    return SqlQueryBuilder()
+        .getDBDriver(connection)
+        .query(query, substitutionValues: substitutionValues);
   }
 }
