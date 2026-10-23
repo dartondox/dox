@@ -10,7 +10,7 @@ class LogMiddleware implements IDoxMiddleware {
   final bool withHeader;
   final bool enabled;
 
-  /// a body field or header whose name (lowercase) contains one of these
+  /// a body field or header whose name contains one of these (any case)
   /// is logged as `[REDACTED]`, so passwords and tokens stay out of logs.
   final List<String> redact;
 
@@ -22,6 +22,7 @@ class LogMiddleware implements IDoxMiddleware {
     'authorization',
     'cookie',
     'api_key',
+    'api-key',
     'apikey',
   ];
 
@@ -74,7 +75,7 @@ class LogMiddleware implements IDoxMiddleware {
   bool _isSecret(String key) {
     String name = key.toLowerCase();
     for (String word in redact) {
-      if (name.contains(word)) return true;
+      if (name.contains(word.toLowerCase())) return true;
     }
     return false;
   }

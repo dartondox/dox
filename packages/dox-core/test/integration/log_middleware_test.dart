@@ -52,6 +52,7 @@ void main() {
     HttpClientRequest req = await client.post('localhost', port, '/log/login');
     req.headers.contentType = ContentType.json;
     req.headers.set('Authorization', 'Bearer abc.def');
+    req.headers.set('X-Api-Key', 'key-123');
     req.write(
       jsonEncode(<String, dynamic>{
         'email': 'a@dox.dev',
@@ -75,6 +76,8 @@ void main() {
       'name': 'A',
     });
     expect(payload['headers']['authorization'], '[REDACTED]');
+    expect(payload['headers']['x-api-key'], '[REDACTED]');
     expect(jsonEncode(logged), isNot(contains('hunter2')));
+    expect(jsonEncode(logged), isNot(contains('key-123')));
   });
 }
