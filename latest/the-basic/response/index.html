@@ -4072,6 +4072,8 @@
 <p>Each one takes <code>message:</code>, <code>errorCode:</code> and <code>code:</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">throw</span><span class="w"> </span><span class="n">NotFoundHttpException</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Blog not found'</span><span class="p">);</span>
 </span></code></pre></div>
+<p>The client gets <code>404</code> with <code>{"code":"not_found","message":"Blog not found"}</code>.
+<code>code</code> is the <code>errorCode</code>. A <code>Map</code> message is sent as it is.</p>
 <p>For another status, extend <code>IHttpException</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>

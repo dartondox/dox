@@ -4060,7 +4060,7 @@ so the app still starts without them when you do not use S3:</p>
 </tr>
 </tbody>
 </table>
-<p>The <code>s3</code> disk needs <code>bucket</code>, <code>key</code> and <code>secret</code>. When one is missing, the first use of the disk throws an error.</p>
+<p>The <code>s3</code> disk needs <code>bucket</code>, <code>key</code> and <code>secret</code>. When one is missing or empty, the first use of the disk throws an <code>ArgumentError</code> that names the setting, like <code>Storage disk "s3" needs the "bucket" setting. It is missing or empty.</code></p>
 <h2 id="functions">Functions</h2>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// save with a new uuid file name, returns '/images/&lt;uuid&gt;.png'</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kt">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">put</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="nl">extension:</span><span class="w"> </span><span class="s1">'png'</span><span class="p">);</span>

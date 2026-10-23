@@ -3901,7 +3901,7 @@ You can <code>throw</code> it or <code>return</code> it from a middleware or a c
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">message</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">Map</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">message</span><span class="p">;</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">message</span><span class="p">.</span><span class="n">toString</span><span class="p">();</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'code'</span><span class="o">:</span><span class="w"> </span><span class="n">errorCode</span><span class="p">,</span><span class="w"> </span><span class="s1">'message'</span><span class="o">:</span><span class="w"> </span><span class="n">message</span><span class="p">.</span><span class="n">toString</span><span class="p">()};</span>
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="p">}</span>
 </span></code></pre></div>
@@ -3991,39 +3991,33 @@ You can <code>throw</code> it or <code>return</code> it from a middleware or a c
 <ol>
 <li>The status is set to <code>code</code>.</li>
 <li>The body is <code>toResponse()</code>.</li>
-<li>A <code>Map</code> body is sent as JSON with <code>Content-Type: application/json</code>.</li>
-<li>Any other body is sent as text, with the default <code>text/plain</code> content type.</li>
+<li>The body is sent as JSON with <code>Content-Type: application/json</code>.</li>
 </ol>
-<p>So the default exceptions answer with plain text:</p>
+<p>A text message gives a JSON body with the <code>errorCode</code> and the <code>message</code>:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>HTTP/1.1 404 Not Found
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>content-type: text/plain; charset=utf-8
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>content-type: application/json
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>Not Found
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>{"code":"not_found","message":"Not Found"}
 </span></code></pre></div>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">throw</span><span class="w"> </span><span class="n">NotFoundHttpException</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Blog not found'</span><span class="p">);</span>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>HTTP/1.1 404 Not Found
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>content-type: text/plain; charset=utf-8
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>content-type: application/json
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>Blog not found
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>{"code":"not_found","message":"Blog not found"}
 </span></code></pre></div>
-<p>A <code>Map</code> message gives JSON. <code>ValidationException</code> always has a map, one entry per field:</p>
+<p>A <code>Map</code> message is sent as it is, with no <code>code</code> key. <code>ValidationException</code> always has a map, one entry per field:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>HTTP/1.1 422 Unprocessable Entity
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>content-type: application/json
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>{"email":"The email is not a valid email","name":"The name is required"}
 </span></code></pre></div>
-<p>A request for a path that has no route is not an exception. Dox answers <code>404</code> with the text <code>&lt;METHOD&gt; &lt;path&gt; not found</code>.</p>
-<p>To get a JSON body from any exception, pass a map:</p>
+<p>A request for a path that has no route answers like a <code>NotFoundHttpException</code> with the message <code>&lt;METHOD&gt; &lt;path&gt; not found</code>: <code>{"code":"not_found","message":"GET /nothing not found"}</code>. Your <code>responseHandler</code> gets it too, so you can change its shape.</p>
+<p>To send your own JSON shape from one exception, pass a map:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">throw</span><span class="w"> </span><span class="n">NotFoundHttpException</span><span class="p">(</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nl">message:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'error'</span><span class="o">:</span><span class="w"> </span><span class="s1">'not_found'</span><span class="p">,</span><span class="w"> </span><span class="s1">'message'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Blog not found'</span><span class="p">},</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="p">);</span>
 </span></code></pre></div>
-<div class="admonition note">
-<p class="admonition-title"><code>errorCode</code> is not sent</p>
-<p><code>errorCode</code> is stored on the exception, but <code>toResponse()</code> does not use it. The client only gets the status and the <code>message</code>.
-Put the code in a map message, or in a <code>responseHandler</code>, when the client needs it.</p>
-</div>
 <p>Other errors: any <code>Exception</code> or <code>Error</code> that is not an <code>IHttpException</code> gets <code>500</code> with <code>error.toString()</code> as text body. It is also passed to <code>errorHandler</code> in <code>AppConfig</code>. An <code>IHttpException</code> is not passed to <code>errorHandler</code>.</p>
 <p>A <code>ValidationException</code> from <code>dox_validation</code> (thrown by <code>schema.parse()</code> in a controller) is turned into the <code>422</code> <code>ValidationException</code> of <code>dox_core</code> with the same errors.</p>
 <h2 id="make-your-own">Make your own</h2>

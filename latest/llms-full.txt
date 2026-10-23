@@ -844,7 +844,7 @@ curl -i http://localhost:3000/api/posts/99
 HTTP/1.1 404 Not Found
 ...
 
-Not Found
+{"code":"not_found","message":"Not Found"}
 ```
 
 ## Next
@@ -1352,7 +1352,7 @@ curl -i -X POST http://localhost:3000/api/auth/login \
 HTTP/1.1 401 Unauthorized
 ...
 
-Wrong email or password
+{"code":"unauthorized","message":"Wrong email or password"}
 ```
 
 Log in and keep the token in a shell variable:
@@ -1377,7 +1377,7 @@ curl -i -X POST http://localhost:3000/api/posts \
 HTTP/1.1 401 Unauthorized
 ...
 
-Authentication failed
+{"code":"unauthorized","message":"Authentication failed"}
 ```
 
 With the token it works:
@@ -2582,15 +2582,13 @@ Route.middleware(<dynamic>[AuthMiddleware()], () { // (4)!
 });
 ```
 
-1.  `/blogs` goes in front of every path in the callback. Start both parts with `/`.
-    The text is joined as it is.
+1.  `/blogs` goes in front of every path in the callback.
+    Dox puts one `/` between the parts. `'blogs'` and `'/blogs/'` work the same.
 2.  Makes `GET /blogs/{id}`. `{id}` is a route param. The controller asks for it as `int id`.
 3.  These routes match only when the `Host` header is `dartondox.com`. Other hosts get `404`.
 4.  `AuthMiddleware` runs before `me` and `logout`. It runs after the global and router middleware.
 
-!!! warning "Start group paths with `/`"
-    `Route.group` joins the text as it is. `Route.group('blogs', ...)` with `Route.get('all', ...)`
-    makes `blogsall`. Write `Route.group('/blogs', ...)` and `Route.get('/all', ...)`.
+Groups can be nested. `Route.group('blogs', ...)` with `Route.get('all', ...)` makes `/blogs/all`.
 
 To turn CORS on or off for some routes, see [CORS](../security/cors.md).
 
@@ -2613,6 +2611,7 @@ Route.resource('blogs', BlogController());
 | `DELETE` | `/blogs/{id}` | `destroy` |
 
 A method that the controller does not have is skipped. No route is made for it.
+Any other error from the controller is not hidden. It stops the app at start, so you see it.
 See [Resource controller](controller.md#resource-controller) to make one with the CLI.
 
 ## Serve storage files
@@ -2893,6 +2892,9 @@ Each one takes `message:`, `errorCode:` and `code:`:
 ```dart
 throw NotFoundHttpException(message: 'Blog not found');
 ```
+
+The client gets `404` with `{"code":"not_found","message":"Blog not found"}`.
+`code` is the `errorCode`. A `Map` message is sent as it is.
 
 For another status, extend `IHttpException`:
 
@@ -4544,7 +4546,7 @@ Then pass it to `AppConfig(storage: storage)` in `lib/config/app.dart`.
 | `s3` | `bucket`, `region`, `key`, `secret`, `token`, `endpoint`, `path_style` (MinIO), `url` (CDN), `visibility`, `acl`, `batch_delete` |
 | `memory` | none. For tests |
 
-The `s3` disk needs `bucket`, `key` and `secret`. When one is missing, the first use of the disk throws an error.
+The `s3` disk needs `bucket`, `key` and `secret`. When one is missing or empty, the first use of the disk throws an `ArgumentError` that names the setting, like `Storage disk "s3" needs the "bucket" setting. It is missing or empty.`
 
 ## Functions
 
@@ -11991,11 +11993,9 @@ After `GET /api/boom`, the server prints one line:
 Remove the `/boom` route when you are done.
 
 !!! note "A URL with no route"
-    A URL that matches no route answers `404` with the text `GET /nothing not found`.
-    Dox answers this before the response handler runs, so it does not get the JSON shape.
-    To change it, add a catch-all route at the end of your last router:
-    `Route.get('/{path*}', (DoxRequest req) => throw NotFoundHttpException());`
-    Do the same for `Route.post` and the other methods you use.
+    A URL that matches no route is a `NotFoundHttpException` with the message `GET /nothing not found`.
+    It goes through the response handler too, so it gets the same JSON shape:
+    `{"error":{"code":"not_found","message":"GET /nothing not found"}}`.
 
 ## See also
 
@@ -14582,7 +14582,7 @@ class ApiRouter extends Router {
 | `Route.get('/posts/{page?}', c.list)` | optional param. `list(int? page)` |
 | `Route.get('/docs/{path*}', c.page)` | rest of the path, with `/` |
 | `Route.get('/me', <dynamic>[AuthMiddleware(), c.me])` | middleware first, controller last |
-| `Route.group('/blogs', () { ... })` | prefix. Start it with `/`. |
+| `Route.group('/blogs', () { ... })` | prefix. Dox adds the `/` between parts. |
 | `Route.middleware(<dynamic>[M()], () { ... })` | middleware for a group |
 | `Route.domain('api.app.com', () { ... })` | match by `Host` |
 | `Route.resource('blogs', BlogController())` | `index`, `create`, `store`, `show`, `edit`, `update`, `destroy` |
@@ -15054,7 +15054,7 @@ A value can be a `String` (`'*'` or a comma list) or a `List<String>`. A `null` 
 | `name` | `String` | `''` | The `name` field in each JSON log line. |
 | `enabled` | `bool` | `false` | Turn the `Logger` on. |
 | `prettyPrint` | `bool` | `false` | `true` prints colored text. `false` prints one JSON object per line (for log services). |
-| `level` | `String` | `'info'` | Stored, but not read by the logger in this version. |
+| `level` | `String` | `'info'` | The lowest level to print: `debug`, `info`, `warn` or `error`. `Logger.success` counts as `info`. `Logger.danger` counts as `error`. An unknown value prints every line. |
 
 ## CacheConfig
 
@@ -16107,7 +16107,7 @@ abstract class IHttpException {
     if (message is Map) {
       return message;
     }
-    return message.toString();
+    return <String, dynamic>{'code': errorCode, 'message': message.toString()};
   }
 }
 ```
@@ -16135,16 +16135,15 @@ Source files: `packages/dox-core/lib/exception/*.dart` and `packages/dox-auth/li
 
 1. The status is set to `code`.
 2. The body is `toResponse()`.
-3. A `Map` body is sent as JSON with `Content-Type: application/json`.
-4. Any other body is sent as text, with the default `text/plain` content type.
+3. The body is sent as JSON with `Content-Type: application/json`.
 
-So the default exceptions answer with plain text:
+A text message gives a JSON body with the `errorCode` and the `message`:
 
 ```
 HTTP/1.1 404 Not Found
-content-type: text/plain; charset=utf-8
+content-type: application/json
 
-Not Found
+{"code":"not_found","message":"Not Found"}
 ```
 
 ```dart
@@ -16153,12 +16152,12 @@ throw NotFoundHttpException(message: 'Blog not found');
 
 ```
 HTTP/1.1 404 Not Found
-content-type: text/plain; charset=utf-8
+content-type: application/json
 
-Blog not found
+{"code":"not_found","message":"Blog not found"}
 ```
 
-A `Map` message gives JSON. `ValidationException` always has a map, one entry per field:
+A `Map` message is sent as it is, with no `code` key. `ValidationException` always has a map, one entry per field:
 
 ```
 HTTP/1.1 422 Unprocessable Entity
@@ -16167,19 +16166,15 @@ content-type: application/json
 {"email":"The email is not a valid email","name":"The name is required"}
 ```
 
-A request for a path that has no route is not an exception. Dox answers `404` with the text `<METHOD> <path> not found`.
+A request for a path that has no route answers like a `NotFoundHttpException` with the message `<METHOD> <path> not found`: `{"code":"not_found","message":"GET /nothing not found"}`. Your `responseHandler` gets it too, so you can change its shape.
 
-To get a JSON body from any exception, pass a map:
+To send your own JSON shape from one exception, pass a map:
 
 ```dart
 throw NotFoundHttpException(
   message: <String, dynamic>{'error': 'not_found', 'message': 'Blog not found'},
 );
 ```
-
-!!! note "`errorCode` is not sent"
-    `errorCode` is stored on the exception, but `toResponse()` does not use it. The client only gets the status and the `message`.
-    Put the code in a map message, or in a `responseHandler`, when the client needs it.
 
 Other errors: any `Exception` or `Error` that is not an `IHttpException` gets `500` with `error.toString()` as text body. It is also passed to `errorHandler` in `AppConfig`. An `IHttpException` is not passed to `errorHandler`.
 
@@ -16312,7 +16307,7 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | Check | How | Read more |
 | --- | --- | --- |
 | JSON logs | `LoggerConfig(enabled: true, prettyPrint: false)`. The new project sets `prettyPrint` only when `APP_ENV=development`. | [App config](app-config.md) |
-| Log level | **Dox limit.** `LoggerConfig.level` is stored but not read. Every level is printed. | [App config](app-config.md) |
+| Log level | Set `LOG_LEVEL=warn` to print only warnings and errors. | [App config](app-config.md) |
 | Access logs in one place | `LogMiddleware` writes one line per request, every 20 ms. A hard kill can lose the last lines. Turn it off when the proxy already logs requests. | [Performance](../digging-deeper/performance.md) |
 | Errors go to your tracker | Set `AppConfig.errorHandler`. Any non-HTTP error is passed to it. The client gets `500` with the error text, so do not put secrets in exception messages. | [HTTP exceptions](http-exceptions.md) |
 
@@ -16670,7 +16665,10 @@ See [Environment variables](../digging-deeper/env.md).
 
 ## dox_core: requests (what the client gets)
 
-| Status | Body text | When | What to do |
+An `IHttpException` with a text message answers `{"code":"<errorCode>","message":"<text>"}`.
+The table shows the `message` text.
+
+| Status | Message | When | What to do |
 | --- | --- | --- | --- |
 | `404` | `<METHOD> <path> not found` | No route matches. | Check the method, the path and the router `prefix`. |
 | `404` | `Not Found` | A typed path param does not fit, like `abc` for `int id`. | Send a valid value. |
@@ -16689,7 +16687,7 @@ See [Environment variables](../digging-deeper/env.md).
 | --- | --- | --- |
 | `Bad state: <T> is not a known DTO. Add @Dto() to it, run `dart run build_runner build` and set `dtos: dtos` (lib/dtos.g.dart) in AppConfig.` | `req.validate<T>()` can not find `T`. | Do what the text says. |
 | `Invalid argument(s): Storage disk "<name>" has unknown driver "<type>"` | A disk in `StorageConfig` has a `driver` other than `local`, `s3` or `memory`. | Fix the driver name. |
-| `type 'Null' is not a subtype of type 'String' in type cast` | An `s3` disk without `bucket`, `key` or `secret`, on its first use. | Set `AWS_BUCKET`, `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`. |
+| `Invalid argument(s): Storage disk "<name>" needs the "<setting>" setting. It is missing or empty.` | An `s3` disk without `bucket`, `key` or `secret`, on its first use. | Set `AWS_BUCKET`, `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`. |
 | `Invalid argument(s): invalid file` | `Storage().put()` with no `extension:`, and Dox can not find the type from the bytes. | Pass `extension: 'pdf'`. |
 | `403` `invalid or expired signature` | A `Route.files()` URL without a valid `signature`, or after `expires`. | Make a new link with `Storage().signedUrl()`. |
 | `404` `file not found` | `Storage().stream()` or `download()` of a missing file. | Check the path. |
@@ -16887,6 +16885,7 @@ What changed in each package, newest first. This page is made from the
 
 - New `timestamps` option on `@DoxModel`. `timestamps: false` turns off `created_at` and `updated_at`, like `$timestamps = false` in Laravel. `createdAt: null` or `updatedAt: null` turns off one of them.
 - New `primaryKeyType` option on `@DoxModel`. Use `primaryKeyType: String` for a UUID key. The default is `int`.
+- Fix: `IHttpException.toResponse()` now returns `{"code": errorCode, "message": message}` for a text message, so the client gets the `errorCode`. A `Map` message is returned as it is.
 
 ### 3.0.0-alpha.4
 
@@ -16951,6 +16950,7 @@ What changed in each package, newest first. This page is made from the
 - `@DoxModel(timestamps: false)` makes a model without `createdAt` and `updatedAt`. `createdAt: null` or `updatedAt: null` turns off only one.
 - The primary key field has the type of `@DoxModel(primaryKeyType: ...)`. It was always `int?`. The default is still `int`. The OpenAPI model schema uses the same type.
 - Fix: a preloaded relation with a two word name (like `userInfo`) was missing from `toJson()`. The generator looked for `user_info` in the preload list, but the list has `userInfo`.
+- Fix: the OpenAPI route scanner now puts one `/` between a group and a route path, like the router does.
 
 ### 3.0.0-alpha.4
 
@@ -17065,6 +17065,12 @@ What changed in each package, newest first. This page is made from the
 - New: graceful shutdown. On `SIGTERM` or `SIGINT` every isolate stops taking new connections and lets open requests finish, up to `AppConfig.shutdownTimeout` (default 8 seconds). Then Dox runs `DoxShutdown` services and exits with code 0. Before, open requests were cut. A second signal stops at once.
 - New: `DoxShutdown`. A service that also implements it gets `shutdown()` in every isolate on stop, to close connections.
 - New: `await Dox().stop()` stops the server gracefully in every isolate, without exit.
+- Fix: an `s3` storage disk without `bucket`, `key` or `secret` failed with `Null is not a subtype of String`. Now it fails with a clear message that names the missing setting.
+- Fix: a URL with no route now answers like a thrown `NotFoundHttpException`. The body is JSON (`{"code": "not_found", "message": "GET /x not found"}`), and the app `responseHandler` runs for it, so apps can format it.
+- Fix: the error answer of an `IHttpException` now has its `errorCode`. A text message gives `{"code": "<errorCode>", "message": "<text>"}` as JSON. Before, the body was plain text and `errorCode` was never sent. A `Map` message (like validation errors) is still sent as it is.
+- Fix: the `Logger` now reads `LoggerConfig.level`. Lines below that level are not printed. Levels from low to high: `debug`, `info` (and `success`), `warn`, `error` (and `danger`).
+- Fix: `Route.group('blogs')` with `Route.get('all')` made `/blogsall`. Path parts now join with one `/`. This also works for nested groups, `Route.prefix` and `Route.resource`.
+- Fix: `Route.resource` hid every error from the controller. Now it only skips methods the controller does not have.
 
 ### 3.0.0-alpha.4
 

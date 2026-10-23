@@ -6072,6 +6072,7 @@
 <ul>
 <li>New <code>timestamps</code> option on <code>@DoxModel</code>. <code>timestamps: false</code> turns off <code>created_at</code> and <code>updated_at</code>, like <code>$timestamps = false</code> in Laravel. <code>createdAt: null</code> or <code>updatedAt: null</code> turns off one of them.</li>
 <li>New <code>primaryKeyType</code> option on <code>@DoxModel</code>. Use <code>primaryKeyType: String</code> for a UUID key. The default is <code>int</code>.</li>
+<li>Fix: <code>IHttpException.toResponse()</code> now returns <code>{"code": errorCode, "message": message}</code> for a text message, so the client gets the <code>errorCode</code>. A <code>Map</code> message is returned as it is.</li>
 </ul>
 <h3 id="300-alpha4">3.0.0-alpha.4</h3>
 <ul>
@@ -6134,6 +6135,7 @@
 <li><code>@DoxModel(timestamps: false)</code> makes a model without <code>createdAt</code> and <code>updatedAt</code>. <code>createdAt: null</code> or <code>updatedAt: null</code> turns off only one.</li>
 <li>The primary key field has the type of <code>@DoxModel(primaryKeyType: ...)</code>. It was always <code>int?</code>. The default is still <code>int</code>. The OpenAPI model schema uses the same type.</li>
 <li>Fix: a preloaded relation with a two word name (like <code>userInfo</code>) was missing from <code>toJson()</code>. The generator looked for <code>user_info</code> in the preload list, but the list has <code>userInfo</code>.</li>
+<li>Fix: the OpenAPI route scanner now puts one <code>/</code> between a group and a route path, like the router does.</li>
 </ul>
 <h3 id="300-alpha4_2">3.0.0-alpha.4</h3>
 <ul>
@@ -6245,6 +6247,12 @@
 <li>New: graceful shutdown. On <code>SIGTERM</code> or <code>SIGINT</code> every isolate stops taking new connections and lets open requests finish, up to <code>AppConfig.shutdownTimeout</code> (default 8 seconds). Then Dox runs <code>DoxShutdown</code> services and exits with code 0. Before, open requests were cut. A second signal stops at once.</li>
 <li>New: <code>DoxShutdown</code>. A service that also implements it gets <code>shutdown()</code> in every isolate on stop, to close connections.</li>
 <li>New: <code>await Dox().stop()</code> stops the server gracefully in every isolate, without exit.</li>
+<li>Fix: an <code>s3</code> storage disk without <code>bucket</code>, <code>key</code> or <code>secret</code> failed with <code>Null is not a subtype of String</code>. Now it fails with a clear message that names the missing setting.</li>
+<li>Fix: a URL with no route now answers like a thrown <code>NotFoundHttpException</code>. The body is JSON (<code>{"code": "not_found", "message": "GET /x not found"}</code>), and the app <code>responseHandler</code> runs for it, so apps can format it.</li>
+<li>Fix: the error answer of an <code>IHttpException</code> now has its <code>errorCode</code>. A text message gives <code>{"code": "&lt;errorCode&gt;", "message": "&lt;text&gt;"}</code> as JSON. Before, the body was plain text and <code>errorCode</code> was never sent. A <code>Map</code> message (like validation errors) is still sent as it is.</li>
+<li>Fix: the <code>Logger</code> now reads <code>LoggerConfig.level</code>. Lines below that level are not printed. Levels from low to high: <code>debug</code>, <code>info</code> (and <code>success</code>), <code>warn</code>, <code>error</code> (and <code>danger</code>).</li>
+<li>Fix: <code>Route.group('blogs')</code> with <code>Route.get('all')</code> made <code>/blogsall</code>. Path parts now join with one <code>/</code>. This also works for nested groups, <code>Route.prefix</code> and <code>Route.resource</code>.</li>
+<li>Fix: <code>Route.resource</code> hid every error from the controller. Now it only skips methods the controller does not have.</li>
 </ul>
 <h3 id="300-alpha4_5">3.0.0-alpha.4</h3>
 <ul>

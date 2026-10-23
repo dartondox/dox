@@ -4215,11 +4215,9 @@ Write one JSON line. A log collector reads it, or you send it to Sentry here.</p
 <p>Remove the <code>/boom</code> route when you are done.</p>
 <div class="admonition note">
 <p class="admonition-title">A URL with no route</p>
-<p>A URL that matches no route answers <code>404</code> with the text <code>GET /nothing not found</code>.
-Dox answers this before the response handler runs, so it does not get the JSON shape.
-To change it, add a catch-all route at the end of your last router:
-<code>Route.get('/{path*}', (DoxRequest req) =&gt; throw NotFoundHttpException());</code>
-Do the same for <code>Route.post</code> and the other methods you use.</p>
+<p>A URL that matches no route is a <code>NotFoundHttpException</code> with the message <code>GET /nothing not found</code>.
+It goes through the response handler too, so it gets the same JSON shape:
+<code>{"error":{"code":"not_found","message":"GET /nothing not found"}}</code>.</p>
 </div>
 <h2 id="see-also">See also</h2>
 <ul>

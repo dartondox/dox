@@ -4325,11 +4325,13 @@
 </table>
 <p>See <a href="../../digging-deeper/env/">Environment variables</a>.</p>
 <h2 id="dox_core-requests-what-the-client-gets">dox_core: requests (what the client gets)</h2>
+<p>An <code>IHttpException</code> with a text message answers <code>{"code":"&lt;errorCode&gt;","message":"&lt;text&gt;"}</code>.
+The table shows the <code>message</code> text.</p>
 <table>
 <thead>
 <tr>
 <th>Status</th>
-<th>Body text</th>
+<th>Message</th>
 <th>When</th>
 <th>What to do</th>
 </tr>
@@ -4418,7 +4420,7 @@
 <td>Fix the driver name.</td>
 </tr>
 <tr>
-<td><code>type 'Null' is not a subtype of type 'String' in type cast</code></td>
+<td><code>Invalid argument(s): Storage disk "&lt;name&gt;" needs the "&lt;setting&gt;" setting. It is missing or empty.</code></td>
 <td>An <code>s3</code> disk without <code>bucket</code>, <code>key</code> or <code>secret</code>, on its first use.</td>
 <td>Set <code>AWS_BUCKET</code>, <code>AWS_ACCESS_KEY_ID</code> and <code>AWS_SECRET_ACCESS_KEY</code>.</td>
 </tr>

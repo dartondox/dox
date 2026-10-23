@@ -4166,17 +4166,13 @@ See <a href="../controller/#parameters">Controller: parameters</a> for all the r
 </span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="p">});</span>
 </span></code></pre></div>
 <ol>
-<li><code>/blogs</code> goes in front of every path in the callback. Start both parts with <code>/</code>.
-    The text is joined as it is.</li>
+<li><code>/blogs</code> goes in front of every path in the callback.
+    Dox puts one <code>/</code> between the parts. <code>'blogs'</code> and <code>'/blogs/'</code> work the same.</li>
 <li>Makes <code>GET /blogs/{id}</code>. <code>{id}</code> is a route param. The controller asks for it as <code>int id</code>.</li>
 <li>These routes match only when the <code>Host</code> header is <code>dartondox.com</code>. Other hosts get <code>404</code>.</li>
 <li><code>AuthMiddleware</code> runs before <code>me</code> and <code>logout</code>. It runs after the global and router middleware.</li>
 </ol>
-<div class="admonition warning">
-<p class="admonition-title">Start group paths with <code>/</code></p>
-<p><code>Route.group</code> joins the text as it is. <code>Route.group('blogs', ...)</code> with <code>Route.get('all', ...)</code>
-makes <code>blogsall</code>. Write <code>Route.group('/blogs', ...)</code> and <code>Route.get('/all', ...)</code>.</p>
-</div>
+<p>Groups can be nested. <code>Route.group('blogs', ...)</code> with <code>Route.get('all', ...)</code> makes <code>/blogs/all</code>.</p>
 <p>To turn CORS on or off for some routes, see <a href="../../security/cors/">CORS</a>.</p>
 <h2 id="resource-routes">Resource routes</h2>
 <p>One line makes the usual CRUD routes for a controller.</p>
@@ -4229,6 +4225,7 @@ makes <code>blogsall</code>. Write <code>Route.group('/blogs', ...)</code> and <
 </tbody>
 </table>
 <p>A method that the controller does not have is skipped. No route is made for it.
+Any other error from the controller is not hidden. It stops the app at start, so you see it.
 See <a href="../controller/#resource-controller">Resource controller</a> to make one with the CLI.</p>
 <h2 id="serve-storage-files">Serve storage files</h2>
 <p><code>Route.files(path)</code> serves the files of a storage disk at <code>GET &lt;path&gt;/{key*}</code>.
