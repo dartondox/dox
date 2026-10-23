@@ -16909,6 +16909,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
+### 3.0.0-alpha.6
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.5
 
 - New `timestamps` option on `@DoxModel`. `timestamps: false` turns off `created_at` and `updated_at`, like `$timestamps = false` in Laravel. `createdAt: null` or `updatedAt: null` turns off one of them.
@@ -16941,6 +16945,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_auth
 
+### 3.0.0-alpha.6
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.5
 
 - Breaking: `JwtAuthDriver.expiresIn` is 1 hour by default. Before, it was `null`, and tokens never expired.
@@ -16972,6 +16980,10 @@ What changed in each package, newest first. This page is made from the
 - `dart_jsonwebtoken` 3.
 
 ## dox_builder
+
+### 3.0.0-alpha.6
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.5
 
@@ -17011,7 +17023,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
-### Unreleased
+### 3.0.0-alpha.6
 
 - New `CacheManager.close()`. It closes the connections of every store that was built. The Redis driver closes its connection and its pool connections, with no reconnect. Memory, file and null stores do nothing. It is safe to call twice. A store used after it is built again.
 - New `CacheDriver.close()`, for one driver. Custom drivers can override it. The default does nothing.
@@ -17048,7 +17060,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox
 
-### Unreleased
+### 3.0.0-alpha.6
 
 - Fix: `dox key:generate` dropped `.env` lines with more than one `=` (like `DATABASE_URL=postgres://u:p@h/db?sslmode=require`). It also dropped comment lines. Now it only changes the `APP_KEY` line. Every other line stays as it is.
 - Fix: `dox create` crashed with `Failed to decode data using encoding 'utf-8'` when the template had a binary file (for example `db/dox.sqlite-shm`). It now skips files that are not UTF-8 text. It only writes a file when its content changes.
@@ -17089,7 +17101,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_core
 
-### Unreleased
+### 3.0.0-alpha.6
 
 - Graceful shutdown closes the cache stores of `Cache()` (eg. Redis), in every isolate, after the `DoxShutdown` services. Your app needs no extra code.
 - The `ORMService` of a new project implements `DoxShutdown` and calls `SqlQueryBuilder.close()`, so the database connections close on shutdown too. In an older project, add this to `lib/services/orm_service.dart`:
@@ -17187,6 +17199,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_http_native
 
+### 3.0.0-alpha.6
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.5
 
 - New: `NativeHttpServer.bind(port, address: ...)` listens on one host, like `HttpServer.bind`. An `InternetAddress` or a host name. With no address it listens on all interfaces, as before. `server.address` is the real address.
@@ -17220,7 +17236,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_migration
 
-### Unreleased
+### 3.0.0-alpha.6
 
 - A `DB_HOST` that starts with `/` is a MySQL Unix socket file too (Postgres: the socket folder). `?socket=/path` works in a `mysql://` `DATABASE_URL`.
 
@@ -17264,7 +17280,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_mysql_native
 
-### Unreleased
+### 3.0.0-alpha.6
 
 - Unix sockets. In `MysqlNativePool.open()`, a `host` that starts with `/` is the socket file. `fromUrl()` takes `?socket=/path`.
 - `close()` is safe with many isolates. Isolates that open the same settings share one pool. Each `open` now counts, and only the last `close()` disconnects the pool. Before, the first `close()` closed it for every isolate.
@@ -17292,6 +17308,10 @@ What changed in each package, newest first. This page is made from the
 - The build hook downloads a ready-built library. No Rust needed.
 
 ## dox_openapi
+
+### 3.0.0-alpha.6
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.5
 
@@ -17329,12 +17349,13 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_orm
 
-### Unreleased
+### 3.0.0-alpha.6
 
 - MySQL and MariaDB Unix sockets. A host that starts with `/` is the socket file, like `/var/run/mysqld/mysqld.sock` or `/cloudsql/project:region:instance` on Cloud Run. Works on the native and the Dart driver. In a url, use `?socket=/path` or `?host=/path`.
 - New `SqlQueryBuilder.close()`. It closes every open database connection of the isolate: the default and all named connections, on every driver (native Postgres and MySQL, the Dart drivers and SQLite). It is safe to call twice. Call it on shutdown, eg. from a `DoxShutdown` service.
 - New `DBDriver.close()`, for one driver. Custom drivers can override it. The default does nothing.
 - `SqlQueryBuilder().dbDriver` throws a `StateError` with a clear message when the ORM is not set up (or after `close()`).
+- After `close()`, the native MySQL driver throws a `StateError` on a new query or transaction. Before, the query still ran when another isolate kept the shared pool open.
 
 ### 3.0.0-alpha.5
 
@@ -17395,6 +17416,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_postgres_native
 
+### 3.0.0-alpha.6
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.5
 
 - The hook comment says how to fill the sha256 list from a release: `dart run bin/native_hashes.dart <tag>`. The list stays empty until the first release.
@@ -17433,6 +17458,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_query_builder
 
+### 3.0.0-alpha.6
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.5
 
 - Version bump only, to match the other packages.
@@ -17456,6 +17485,10 @@ What changed in each package, newest first. This page is made from the
 - Please depend on `dox_orm` and change your imports. See the README.
 
 ## dox_socketio
+
+### 3.0.0-alpha.6
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.5
 
@@ -17485,6 +17518,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_storage
 
+### 3.0.0-alpha.6
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.5
 
 - Version bump only, to match the other packages.
@@ -17511,6 +17548,10 @@ What changed in each package, newest first. This page is made from the
 - `DriveManager.fake()` for tests.
 
 ## dox_validation
+
+### 3.0.0-alpha.6
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.5
 
@@ -17553,6 +17594,10 @@ What changed in each package, newest first. This page is made from the
 - Laravel style string rules with `v.fromRules()`.
 
 ## dox_websocket
+
+### 3.0.0-alpha.6
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.5
 
