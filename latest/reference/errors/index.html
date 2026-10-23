@@ -4448,9 +4448,9 @@
 <td>Use <code>asc</code> or <code>desc</code>.</td>
 </tr>
 <tr>
-<td><code>AESEncryption Error: &lt;error&gt;</code></td>
-<td><code>AESEncryptor.decode</code> got bad text or a wrong key, for example an old cookie after a new <code>APP_KEY</code>. It returns <code>''</code>.</td>
-<td>Nothing, or ask the user to log in again.</td>
+<td><code>400</code> <code>decrypt_failed</code></td>
+<td><code>AESEncryptor.decode</code> got changed text or a wrong key. It throws <code>DecryptException</code>. <code>req.cookie()</code> catches it and returns <code>null</code>.</td>
+<td>Check the key. For a cookie, ask the user to log in again.</td>
 </tr>
 </tbody>
 </table>

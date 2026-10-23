@@ -4014,8 +4014,8 @@
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1">/// `enabled` is true by default, so every route sends the headers.</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">CORSConfig</span><span class="w"> </span><span class="n">cors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CORSConfig</span><span class="p">(</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="c1">/// One origin only. A list is joined with commas, and browsers reject</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="c1">/// that value. Set CORS_ORIGIN to the real front-end URL in production.</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="c1">/// One origin, or a list of origins. Set CORS_ORIGIN to the real</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="c1">/// front-end URL in production.</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="nl">origin:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">corsOrigin</span><span class="p">,</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="nl">methods:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'GET'</span><span class="p">,</span><span class="w"> </span><span class="s1">'POST'</span><span class="p">,</span><span class="w"> </span><span class="s1">'PUT'</span><span class="p">,</span><span class="w"> </span><span class="s1">'PATCH'</span><span class="p">,</span><span class="w"> </span><span class="s1">'DELETE'</span><span class="p">],</span>
@@ -4077,12 +4077,11 @@ The origin is scheme, host and port. No path, no <code>/</code> at the end.</p>
 </tbody>
 </table>
 <p>Browsers do not send cookies when <code>origin</code> is <code>*</code>.</p>
-<div class="admonition warning">
-<p class="admonition-title">One origin only</p>
-<p><code>Access-Control-Allow-Origin</code> takes one origin or <code>*</code>.
-Dox sends the value of <code>origin</code> as it is. It does not compare it with the <code>Origin</code> header of the request.
-A list like <code>['https://a.com', 'https://b.com']</code> is joined to <code>https://a.com,https://b.com</code>. Browsers reject that.
-So set one origin per environment. For two front-ends, run two API hosts, or put a proxy in front that picks the header.</p>
+<div class="admonition note">
+<p class="admonition-title">Two or more front-ends</p>
+<p>Set <code>origin</code> to a list, like <code>['https://a.com', 'https://b.com']</code>.
+Dox compares the <code>Origin</code> header of the request with the list.
+It sends back only the origin that matches. If none matches, it sends no <code>Access-Control-Allow-Origin</code> header, and the browser blocks the call.</p>
 </div>
 <h2 id="check-it">Check it</h2>
 <p>The browser sends a preflight <code>OPTIONS</code> request before a <code>POST</code> with JSON or a custom header. Dox answers it by itself. You do not need an <code>OPTIONS</code> route.</p>
@@ -4120,7 +4119,7 @@ So set one origin per environment. For two front-ends, run two API hosts, or put
 </tr>
 <tr>
 <td><code>The value of ... header is 'a.com,b.com'</code></td>
-<td>More than one origin. Use one.</td>
+<td><code>origin</code> is one text with commas. Use a <code>List&lt;String&gt;</code> instead.</td>
 </tr>
 <tr>
 <td><code>Request header field x-foo is not allowed</code></td>

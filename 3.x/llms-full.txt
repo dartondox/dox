@@ -10689,6 +10689,7 @@ After `AuthMiddleware`, `req.auth` holds the login.
 | Method | What it does |
 | --- | --- |
 | `Auth.initialize(AuthConfig)` | sets the config. Call it once, in a service |
+| `Auth(guard: 'admin')` | uses another guard from `guards`. Without `guard`, it uses `defaultGuard` |
 | `await Auth().attempt(credentials)` | finds the user and checks the password. Gives a token, or `null` |
 | `Auth().login(user)` | gives a token for this user, with no password check |
 | `user<T>()` | the user after `attempt` or `login` |
@@ -10713,19 +10714,47 @@ It returns `null` when the password is not a `String`, when no identifier is giv
 | --- | --- | --- |
 | `secret` | required | the key that signs tokens, like `SecretKey(env.appKey)` |
 | `algorithm` | `JWTAlgorithm.HS256` | the signing algorithm |
-| `expiresIn` | `null` | how long a token is valid. `null` means it never expires |
-| `issuer` | `null` | the `iss` claim |
+| `expiresIn` | `Duration(hours: 1)` | how long a token is valid |
+| `issuer` | `null` | the `iss` claim. When set, `verifyToken` also checks it |
+
+## More than one guard
+
+Each guard has its own driver and its own user model.
+For example, users and admins in two tables:
+
+```dart
+AuthConfig(
+  defaultGuard: 'web',
+  guards: <String, AuthGuard>{
+    'web': AuthGuard(
+      driver: JwtAuthDriver(secret: SecretKey(env.appKey)),
+      provider: AuthProvider(model: () => User()),
+    ),
+    'admin': AuthGuard(
+      driver: JwtAuthDriver(secret: SecretKey(env.appKey)),
+      provider: AuthProvider(model: () => Admin()),
+    ),
+  },
+);
+```
+
+Pick the guard by name:
+
+```dart
+String? token = await Auth(guard: 'admin').attempt(credentials);
+
+Route.get('/admin', <dynamic>[AuthMiddleware(guard: 'admin'), adminController.index]);
+```
+
+The token keeps the guard name in its `aud` claim.
+So a token from the `web` guard does not work on the `admin` guard, even with the same secret.
+An unknown guard name throws an `ArgumentError`.
 
 ## Things to know
 
-!!! warning "Set `expiresIn`"
-    Without `expiresIn`, a token never expires.
-    A stolen token then works forever.
-    Set a duration, for example `Duration(days: 7)`.
 
 - **The token is not secret.** Its payload is `user.toJson()`. Anyone with the token can read it. Keep private columns in `hidden`.
 - **You can not cancel one token.** There is no token list on the server. A token works until it expires. If you change the `secret` (your `APP_KEY`), all tokens stop working.
-- **Only the default guard is used.** `Auth()` and `AuthMiddleware` always use `defaultGuard`. Other guards in `guards` are not read.
 - **The user is loaded on each request.** `AuthMiddleware` reads the user id from the token and runs `find(id)`. A deleted user can not log in, even with a valid token.
 - **Hash passwords** with `Hash.make()` before you save them. See [Hashing](hashing.md).
 
@@ -10777,21 +10806,31 @@ An option that is `null` sends no header.
 | Option | Header | Value |
 | --- | --- | --- |
 | `enabled` | - | `true` adds the headers to every route. Default: `true` |
-| `origin` | `Access-Control-Allow-Origin` | one origin, or `'*'` for all |
+| `origin` | `Access-Control-Allow-Origin` | one origin, a `List<String>` of origins, or `'*'` for all |
 | `methods` | `Access-Control-Allow-Methods` | a `List<String>` or a text like `'GET,POST'`. `'*'` allows all |
 | `headers` | `Access-Control-Allow-Headers` | a `List<String>` or a text. `'*'` allows all |
 | `exposeHeaders` | `Access-Control-Expose-Headers` | the response headers the page may read |
 | `credentials` | `Access-Control-Allow-Credentials` | `true` lets the browser send cookies |
 | `maxAge` | `Access-Control-Max-Age` | how many seconds the browser keeps the preflight answer |
 
-A list is joined with commas.
-The value is sent as it is. Dox does not compare it with the `Origin` of the request.
+For `methods`, `headers` and `exposeHeaders`, a list is joined with commas.
 
-!!! warning "One origin only"
-    `Access-Control-Allow-Origin` accepts one origin or `*`.
-    If you set a list like `['https://a.com', 'https://b.com']`, Dox sends `https://a.com,https://b.com`.
-    Browsers reject this value.
-    So set one origin, or `'*'`.
+## More than one origin
+
+`Access-Control-Allow-Origin` accepts only one origin or `*`.
+So when `origin` is a list, Dox checks the `Origin` header of the request:
+
+- The origin is in the list: Dox sends back that one origin.
+- The origin is not in the list: Dox sends no `Access-Control-Allow-Origin` header. The browser blocks the call.
+- The list has `'*'`: Dox sends `*`.
+
+With a list, Dox also sends `Vary: Origin`. This tells caches that the answer depends on the origin.
+
+```dart
+CORSConfig cors = CORSConfig(
+  origin: <String>['https://my.app', 'https://admin.my.app'],
+);
+```
 
 !!! warning "`credentials` with `*`"
     Browsers do not send cookies when `origin` is `'*'`.
@@ -10837,10 +10876,8 @@ You can also call it yourself.
 
 ## Encrypt and decrypt
 
-`AESEncryptor` is not exported by `package:dox_core/dox_core.dart`. Import it from its own file.
-
 ```dart
-import 'package:dox_core/utils/aes_encryptor.dart';
+import 'package:dox_core/dox_core.dart';
 
 String secret = env.appKey; // 32 characters
 
@@ -10849,7 +10886,8 @@ String decoded = AESEncryptor.decode(encoded, secret); // 'Hello world'
 ```
 
 - `encode` returns base64 text.
-- `decode` returns an empty string `''` when the text or the key is wrong. It does not throw.
+- The same text gives a different output each time.
+- `decode` throws `DecryptException` when the text was changed, or the key is wrong. It is a `400 Bad Request` error.
 - The secret must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256). Another length makes `encode` throw.
 
 Make a new 32-character `APP_KEY` with the CLI:
@@ -10871,19 +10909,15 @@ String? theme = req.cookie('theme');                    // decrypted
 String? raw = req.cookie('theme', decrypt: false);      // as sent
 ```
 
-If you change `APP_KEY`, old encrypted cookies read as `''`.
+`req.cookie(key)` returns `null` when the cookie was changed, or was made with another `APP_KEY`.
 
-## Limits
+## How it works
 
-!!! warning "Do not use it for sensitive data"
-    `AESEncryptor` uses AES in CTR mode with a fixed IV (all zeros).
-    It has no message check (no MAC).
+`AESEncryptor` uses AES-GCM.
 
-    - The same text with the same key always gives the same output. So a reader can see when two values are equal.
-    - Someone can change the encrypted text, and `decode` does not notice.
-
-    This keeps old cookies working. But it is not safe for passwords, tokens or personal data.
-    For those, use a library with an authenticated mode, like AES-GCM with a random nonce for each message.
+- Each message gets a new random 12-byte nonce.
+- The output is base64 of `nonce + encrypted text + tag`.
+- The 16-byte tag checks the message. If someone changes one byte, `decode` throws.
 
 To store passwords, do not encrypt them. Hash them. See [Hashing](hashing.md).
 
@@ -10923,10 +10957,7 @@ bool ok = Hash.verify('secret', user.password!);
 ```
 
 `Hash.verify(password, hashedPassword)` returns `true` when the password matches.
-
-!!! warning
-    `Hash.verify` from `dox_core` throws when `hashedPassword` is not a valid bcrypt hash, for example an empty string.
-    Check that the value is a real hash first, or catch the error.
+It returns `false` when the password does not match, or when `hashedPassword` is not a valid bcrypt hash (for example an empty string).
 
 ## With login
 
@@ -12179,8 +12210,8 @@ import 'package:my_app/config/env.dart';
 
 /// `enabled` is true by default, so every route sends the headers.
 CORSConfig cors = CORSConfig(
-  /// One origin only. A list is joined with commas, and browsers reject
-  /// that value. Set CORS_ORIGIN to the real front-end URL in production.
+  /// One origin, or a list of origins. Set CORS_ORIGIN to the real
+  /// front-end URL in production.
   origin: env.corsOrigin,
 
   methods: <String>['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
@@ -12235,11 +12266,10 @@ The origin is scheme, host and port. No path, no `/` at the end.
 
 Browsers do not send cookies when `origin` is `*`.
 
-!!! warning "One origin only"
-    `Access-Control-Allow-Origin` takes one origin or `*`.
-    Dox sends the value of `origin` as it is. It does not compare it with the `Origin` header of the request.
-    A list like `['https://a.com', 'https://b.com']` is joined to `https://a.com,https://b.com`. Browsers reject that.
-    So set one origin per environment. For two front-ends, run two API hosts, or put a proxy in front that picks the header.
+!!! note "Two or more front-ends"
+    Set `origin` to a list, like `['https://a.com', 'https://b.com']`.
+    Dox compares the `Origin` header of the request with the list.
+    It sends back only the origin that matches. If none matches, it sends no `Access-Control-Allow-Origin` header, and the browser blocks the call.
 
 ## Check it
 
@@ -12279,7 +12309,7 @@ In the browser, open the front-end and call the API with `fetch`. The console sh
 | The console says | The fix |
 | --- | --- |
 | `No 'Access-Control-Allow-Origin' header` | `CORS_ORIGIN` does not match the page origin exactly. Check `http` or `https`, and the port. |
-| `The value of ... header is 'a.com,b.com'` | More than one origin. Use one. |
+| `The value of ... header is 'a.com,b.com'` | `origin` is one text with commas. Use a `List<String>` instead. |
 | `Request header field x-foo is not allowed` | Add the header to `headers`. |
 | `credentials mode is 'include'` with `*` | Set `origin` to the front-end URL and `credentials: true`. |
 
@@ -14843,7 +14873,7 @@ A value can be a `String` (`'*'` or a comma list) or a `List<String>`. A `null` 
 | Field | Type | Default | Header |
 | --- | --- | --- | --- |
 | `enabled` | `bool` | `true` | Send CORS headers. A route can override it with its own `cors` setting. |
-| `origin` | `dynamic` | `null` | `Access-Control-Allow-Origin` |
+| `origin` | `dynamic` | `null` | `Access-Control-Allow-Origin`. One origin, `'*'`, or a list. With a list, Dox sends back only the request origin if it is in the list. |
 | `methods` | `dynamic` | `null` | `Access-Control-Allow-Methods` |
 | `headers` | `dynamic` | `null` | `Access-Control-Allow-Headers` |
 | `exposeHeaders` | `dynamic` | `null` | `Access-Control-Expose-Headers` |
@@ -15244,10 +15274,11 @@ CORSConfig cors = CORSConfig(
 
   /// Origin
   /// -------------------------------
-  /// Set a list of origins to be allowed for `Access-Control-Allow-Origin`.
+  /// Set the origins to be allowed for `Access-Control-Allow-Origin`.
   /// The value can be one of the following:
-  /// Array       : An array of allowed origins.
-  /// String      : Comma separated list of allowed origins.
+  /// List        : Allowed origins. Dox sends back only the request origin
+  ///               when it is in the list.
+  /// String      : One allowed origin.
   /// String (*)  : A wildcard (*) to allow all request origins.
   origin: '*',
 
@@ -16068,12 +16099,11 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 
 | Check | How | Read more |
 | --- | --- | --- |
-| JWT tokens expire | **Dox limit.** `JwtAuthDriver.expiresIn` is `null` by default, so tokens never expire. Set it: `JwtAuthDriver(secret: SecretKey(env.appKey), expiresIn: Duration(days: 7))`. | [Authentication](../security/authentication.md) |
+| JWT tokens expire | `JwtAuthDriver.expiresIn` is 1 hour by default. Pick a time that fits your app, like `JwtAuthDriver(secret: SecretKey(env.appKey), expiresIn: Duration(hours: 12))`. | [Authentication](../security/authentication.md) |
 | You can not revoke one token | **Dox limit.** There is no token list on the server. To log out everyone, change `APP_KEY`. | [Authentication](../security/authentication.md) |
 | Passwords are hashed | `user.password = Hash.make(input)` (bcrypt). Never store or encrypt a plain password. | [Hashing](../security/hashing.md) |
 | The hash is never sent | `List<String> get hidden => <String>['password'];` in the user model. The JWT payload is `user.toJson()`, and anyone can read it. | [Authentication](../security/authentication.md) |
 | Passwords have a max length | bcrypt throws on input over 72 bytes. Add `@MaxLength(72)` to the password field of the DTO. It counts characters, so non-ASCII text can still pass 72 bytes. | [Troubleshooting](troubleshooting.md) |
-| No sensitive data in `AESEncryptor` | It uses a fixed IV and no MAC. It is fine for cookies, not for tokens or personal data. | [Encryption](../security/encryption.md) |
 
 ## HTTP and network
 
@@ -16082,7 +16112,7 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | HTTPS at the proxy | Dox has no TLS server. Run Caddy or nginx in front. Keep the app port private. | [Deployment](../digging-deeper/deployment.md) |
 | `trustedProxies` is set behind a proxy | `AppConfig(trustedProxies: <String>['127.0.0.1', '::1'])`, or the proxy network, like `'172.16.0.0/12'`. Without it, `req.ip()` is the proxy and `req.scheme()` is `http`. Do not use `['*']` when the app port is public. | [App config](app-config.md) |
 | Body limits are on | Keep `maxBodySize` (10 MB) and `maxMultipartSize` (100 MB), or lower them. Set the same limit in the proxy: `client_max_body_size 100m;` | [Request](../the-basic/request.md) |
-| CORS has one real origin | `CORSConfig(origin: 'https://my.app')`. **Dox limit:** a list is joined into one header (`https://a.com,https://b.com`), and browsers reject it. Dox does not compare the list with the request `Origin`. For many origins, set the header in the proxy. | [CORS](../security/cors.md) |
+| CORS has real origins | `CORSConfig(origin: 'https://my.app')`, or a list like `<String>['https://my.app', 'https://admin.my.app']`. With a list, Dox sends back only the request origin when it is in the list. | [CORS](../security/cors.md) |
 | No `credentials: true` with `origin: '*'` | The new project's `cors.dart` has `origin: '*'` and `credentials: true` with `enabled: false`. When you turn CORS on, set a real origin first. | [CORS](../security/cors.md) |
 | Rate limiting | **Dox limit.** Dox has no rate limiter. Do it at the proxy. See [below](#rate-limit-at-the-proxy). | [Deployment](../digging-deeper/deployment.md) |
 | gzip at the proxy | Keep `compress: false`. Turn on gzip in Caddy (`encode gzip`) or nginx (`gzip on;`). | [Performance](../digging-deeper/performance.md) |
@@ -16544,7 +16574,7 @@ See [Environment variables](../digging-deeper/env.md).
 | `404` `file not found` | `Storage().stream()` or `download()` of a missing file. | Check the path. |
 | `Invalid argument (trustedProxies): not an ip or cidr: "<value>"` | A bad entry in `AppConfig.trustedProxies`. | Use an IP, a CIDR like `10.0.0.0/8`, or `*`. |
 | `Invalid argument (type): must be asc or desc: "<value>"` | `orderBy(column, type)` with another direction. | Use `asc` or `desc`. |
-| `AESEncryption Error: <error>` | `AESEncryptor.decode` got bad text or a wrong key, for example an old cookie after a new `APP_KEY`. It returns `''`. | Nothing, or ask the user to log in again. |
+| `400` `decrypt_failed` | `AESEncryptor.decode` got changed text or a wrong key. It throws `DecryptException`. `req.cookie()` catches it and returns `null`. | Check the key. For a cookie, ask the user to log in again. |
 
 ## dox_auth
 
@@ -16758,6 +16788,14 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_auth
 
+### Unreleased
+
+- Breaking: `JwtAuthDriver.expiresIn` is 1 hour by default. Before, it was `null`, and tokens never expired.
+- New: named guards work. Use `Auth(guard: 'admin')` and `AuthMiddleware(guard: 'admin')`. Before, only `defaultGuard` was used.
+- A token keeps its guard name in the `aud` claim. A token from one guard does not work on another guard.
+- `verifyToken` checks the `iss` claim when `issuer` is set.
+- Breaking: `AuthDriver` methods get the guard name as a new parameter. `AuthEngine().guard(name)` replaces `AuthEngine().driver` and `AuthEngine().provider`.
+
 ### 3.0.0-alpha.4
 
 - Version bump only, to match the other packages.
@@ -16874,6 +16912,15 @@ What changed in each package, newest first. This page is made from the
 - Generated models import `package:dox_orm/dox_orm.dart`.
 
 ## dox_core
+
+### Unreleased
+
+- Fix: CORS `origin` can be a list. Dox compares the request `Origin` with the list and sends back only the origin that matches, or no header. Before, it joined the list with commas, and browsers rejected it. A list also sends `Vary: Origin`.
+- Breaking: `AESEncryptor` now uses AES-GCM with a random nonce for each message. Before, it used AES-CTR with an all-zero nonce and no message check. Old encrypted cookies and values can not be read.
+- Breaking: `AESEncryptor.decode` throws `DecryptException` (400) when the text was changed or the key is wrong. Before, it printed an error and returned `''`.
+- `req.cookie()` returns `null` for an encrypted cookie that can not be decrypted.
+- Fix: `Hash.verify` returns `false` for a malformed hash. Before, it threw.
+- `AESEncryptor` and `DecryptException` are now exported from `package:dox_core/dox_core.dart`.
 
 ### 3.0.0-alpha.4
 

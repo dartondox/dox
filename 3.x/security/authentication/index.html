@@ -2800,6 +2800,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#more-than-one-guard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        More than one guard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#things-to-know" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4062,6 +4073,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#more-than-one-guard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        More than one guard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#things-to-know" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4254,6 +4276,10 @@ When the token is missing or not valid, the request stops with <code>401 Authent
 <td>sets the config. Call it once, in a service</td>
 </tr>
 <tr>
+<td><code>Auth(guard: 'admin')</code></td>
+<td>uses another guard from <code>guards</code>. Without <code>guard</code>, it uses <code>defaultGuard</code></td>
+</tr>
+<tr>
 <td><code>await Auth().attempt(credentials)</code></td>
 <td>finds the user and checks the password. Gives a token, or <code>null</code></td>
 </tr>
@@ -4323,27 +4349,45 @@ It returns <code>null</code> when the password is not a <code>String</code>, whe
 </tr>
 <tr>
 <td><code>expiresIn</code></td>
-<td><code>null</code></td>
-<td>how long a token is valid. <code>null</code> means it never expires</td>
+<td><code>Duration(hours: 1)</code></td>
+<td>how long a token is valid</td>
 </tr>
 <tr>
 <td><code>issuer</code></td>
 <td><code>null</code></td>
-<td>the <code>iss</code> claim</td>
+<td>the <code>iss</code> claim. When set, <code>verifyToken</code> also checks it</td>
 </tr>
 </tbody>
 </table>
+<h2 id="more-than-one-guard">More than one guard</h2>
+<p>Each guard has its own driver and its own user model.
+For example, users and admins in two tables:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">AuthConfig</span><span class="p">(</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nl">defaultGuard:</span><span class="w"> </span><span class="s1">'web'</span><span class="p">,</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nl">guards:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">AuthGuard</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="s1">'web'</span><span class="o">:</span><span class="w"> </span><span class="n">AuthGuard</span><span class="p">(</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">JwtAuthDriver</span><span class="p">(</span><span class="nl">secret:</span><span class="w"> </span><span class="n">SecretKey</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">appKey</span><span class="p">)),</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">      </span><span class="nl">provider:</span><span class="w"> </span><span class="n">AuthProvider</span><span class="p">(</span><span class="nl">model:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">User</span><span class="p">()),</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="p">),</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="s1">'admin'</span><span class="o">:</span><span class="w"> </span><span class="n">AuthGuard</span><span class="p">(</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">JwtAuthDriver</span><span class="p">(</span><span class="nl">secret:</span><span class="w"> </span><span class="n">SecretKey</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">appKey</span><span class="p">)),</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">      </span><span class="nl">provider:</span><span class="w"> </span><span class="n">AuthProvider</span><span class="p">(</span><span class="nl">model:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Admin</span><span class="p">()),</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">    </span><span class="p">),</span>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>Pick the guard by name:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Auth</span><span class="p">(</span><span class="nl">guard:</span><span class="w"> </span><span class="s1">'admin'</span><span class="p">).</span><span class="n">attempt</span><span class="p">(</span><span class="n">credentials</span><span class="p">);</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/admin'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">AuthMiddleware</span><span class="p">(</span><span class="nl">guard:</span><span class="w"> </span><span class="s1">'admin'</span><span class="p">),</span><span class="w"> </span><span class="n">adminController</span><span class="p">.</span><span class="n">index</span><span class="p">]);</span>
+</span></code></pre></div>
+<p>The token keeps the guard name in its <code>aud</code> claim.
+So a token from the <code>web</code> guard does not work on the <code>admin</code> guard, even with the same secret.
+An unknown guard name throws an <code>ArgumentError</code>.</p>
 <h2 id="things-to-know">Things to know</h2>
-<div class="admonition warning">
-<p class="admonition-title">Set <code>expiresIn</code></p>
-<p>Without <code>expiresIn</code>, a token never expires.
-A stolen token then works forever.
-Set a duration, for example <code>Duration(days: 7)</code>.</p>
-</div>
 <ul>
 <li><strong>The token is not secret.</strong> Its payload is <code>user.toJson()</code>. Anyone with the token can read it. Keep private columns in <code>hidden</code>.</li>
 <li><strong>You can not cancel one token.</strong> There is no token list on the server. A token works until it expires. If you change the <code>secret</code> (your <code>APP_KEY</code>), all tokens stop working.</li>
-<li><strong>Only the default guard is used.</strong> <code>Auth()</code> and <code>AuthMiddleware</code> always use <code>defaultGuard</code>. Other guards in <code>guards</code> are not read.</li>
 <li><strong>The user is loaded on each request.</strong> <code>AuthMiddleware</code> reads the user id from the token and runs <code>find(id)</code>. A deleted user can not log in, even with a valid token.</li>
 <li><strong>Hash passwords</strong> with <code>Hash.make()</code> before you save them. See <a href="../hashing/">Hashing</a>.</li>
 </ul>

@@ -4050,7 +4050,7 @@
 <tbody>
 <tr>
 <td>JWT tokens expire</td>
-<td><strong>Dox limit.</strong> <code>JwtAuthDriver.expiresIn</code> is <code>null</code> by default, so tokens never expire. Set it: <code>JwtAuthDriver(secret: SecretKey(env.appKey), expiresIn: Duration(days: 7))</code>.</td>
+<td><code>JwtAuthDriver.expiresIn</code> is 1 hour by default. Pick a time that fits your app, like <code>JwtAuthDriver(secret: SecretKey(env.appKey), expiresIn: Duration(hours: 12))</code>.</td>
 <td><a href="../../security/authentication/">Authentication</a></td>
 </tr>
 <tr>
@@ -4072,11 +4072,6 @@
 <td>Passwords have a max length</td>
 <td>bcrypt throws on input over 72 bytes. Add <code>@MaxLength(72)</code> to the password field of the DTO. It counts characters, so non-ASCII text can still pass 72 bytes.</td>
 <td><a href="../troubleshooting/">Troubleshooting</a></td>
-</tr>
-<tr>
-<td>No sensitive data in <code>AESEncryptor</code></td>
-<td>It uses a fixed IV and no MAC. It is fine for cookies, not for tokens or personal data.</td>
-<td><a href="../../security/encryption/">Encryption</a></td>
 </tr>
 </tbody>
 </table>
@@ -4106,8 +4101,8 @@
 <td><a href="../../the-basic/request/">Request</a></td>
 </tr>
 <tr>
-<td>CORS has one real origin</td>
-<td><code>CORSConfig(origin: 'https://my.app')</code>. <strong>Dox limit:</strong> a list is joined into one header (<code>https://a.com,https://b.com</code>), and browsers reject it. Dox does not compare the list with the request <code>Origin</code>. For many origins, set the header in the proxy.</td>
+<td>CORS has real origins</td>
+<td><code>CORSConfig(origin: 'https://my.app')</code>, or a list like <code>&lt;String&gt;['https://my.app', 'https://admin.my.app']</code>. With a list, Dox sends back only the request origin when it is in the list.</td>
 <td><a href="../../security/cors/">CORS</a></td>
 </tr>
 <tr>

@@ -2724,6 +2724,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#more-than-one-origin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        More than one origin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#preflight-requests" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3864,6 +3875,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#more-than-one-origin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        More than one origin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#preflight-requests" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3954,7 +3976,7 @@ An option that is <code>null</code> sends no header.</p>
 <tr>
 <td><code>origin</code></td>
 <td><code>Access-Control-Allow-Origin</code></td>
-<td>one origin, or <code>'*'</code> for all</td>
+<td>one origin, a <code>List&lt;String&gt;</code> of origins, or <code>'*'</code> for all</td>
 </tr>
 <tr>
 <td><code>methods</code></td>
@@ -3983,15 +4005,20 @@ An option that is <code>null</code> sends no header.</p>
 </tr>
 </tbody>
 </table>
-<p>A list is joined with commas.
-The value is sent as it is. Dox does not compare it with the <code>Origin</code> of the request.</p>
-<div class="admonition warning">
-<p class="admonition-title">One origin only</p>
-<p><code>Access-Control-Allow-Origin</code> accepts one origin or <code>*</code>.
-If you set a list like <code>['https://a.com', 'https://b.com']</code>, Dox sends <code>https://a.com,https://b.com</code>.
-Browsers reject this value.
-So set one origin, or <code>'*'</code>.</p>
-</div>
+<p>For <code>methods</code>, <code>headers</code> and <code>exposeHeaders</code>, a list is joined with commas.</p>
+<h2 id="more-than-one-origin">More than one origin</h2>
+<p><code>Access-Control-Allow-Origin</code> accepts only one origin or <code>*</code>.
+So when <code>origin</code> is a list, Dox checks the <code>Origin</code> header of the request:</p>
+<ul>
+<li>The origin is in the list: Dox sends back that one origin.</li>
+<li>The origin is not in the list: Dox sends no <code>Access-Control-Allow-Origin</code> header. The browser blocks the call.</li>
+<li>The list has <code>'*'</code>: Dox sends <code>*</code>.</li>
+</ul>
+<p>With a list, Dox also sends <code>Vary: Origin</code>. This tells caches that the answer depends on the origin.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">CORSConfig</span><span class="w"> </span><span class="n">cors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CORSConfig</span><span class="p">(</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nl">origin:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'https://my.app'</span><span class="p">,</span><span class="w"> </span><span class="s1">'https://admin.my.app'</span><span class="p">],</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="p">);</span>
+</span></code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title"><code>credentials</code> with <code>*</code></p>
 <p>Browsers do not send cookies when <code>origin</code> is <code>'*'</code>.
@@ -4005,15 +4032,15 @@ It uses the CORS setting of the route that the browser asks about.</p>
 <h2 id="turn-cors-on-or-off-for-some-routes">Turn CORS on or off for some routes</h2>
 <p><code>enabled</code> is the default for all routes.
 Change it for a group of routes:</p>
-<div class="language-dart highlight"><span class="filename">lib/routes/api.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// CORS headers only on these routes (use with enabled: false)</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">Route</span><span class="p">.</span><span class="n">enabledCors</span><span class="p">(()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/public/posts'</span><span class="p">,</span><span class="w"> </span><span class="n">postController</span><span class="p">.</span><span class="n">index</span><span class="p">);</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">});</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="c1">// no CORS headers on these routes</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">Route</span><span class="p">.</span><span class="n">disabledCors</span><span class="p">(()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="n">Route</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/webhooks/stripe'</span><span class="p">,</span><span class="w"> </span><span class="n">webhookController</span><span class="p">.</span><span class="n">handle</span><span class="p">);</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">});</span>
+<div class="language-dart highlight"><span class="filename">lib/routes/api.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// CORS headers only on these routes (use with enabled: false)</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">Route</span><span class="p">.</span><span class="n">enabledCors</span><span class="p">(()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/public/posts'</span><span class="p">,</span><span class="w"> </span><span class="n">postController</span><span class="p">.</span><span class="n">index</span><span class="p">);</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">});</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1">// no CORS headers on these routes</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">Route</span><span class="p">.</span><span class="n">disabledCors</span><span class="p">(()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="n">Route</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/webhooks/stripe'</span><span class="p">,</span><span class="w"> </span><span class="n">webhookController</span><span class="p">.</span><span class="n">handle</span><span class="p">);</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">});</span>
 </span></code></pre></div>
 
 

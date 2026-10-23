@@ -2752,10 +2752,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#limits" class="md-nav__link">
+  <a href="#how-it-works" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Limits
+        How it works
       
     </span>
   </a>
@@ -3853,10 +3853,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#limits" class="md-nav__link">
+  <a href="#how-it-works" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Limits
+        How it works
       
     </span>
   </a>
@@ -3893,8 +3893,7 @@
 <p>Dox uses <code>AESEncryptor</code> to encrypt cookies with your <code>APP_KEY</code>.
 You can also call it yourself.</p>
 <h2 id="encrypt-and-decrypt">Encrypt and decrypt</h2>
-<p><code>AESEncryptor</code> is not exported by <code>package:dox_core/dox_core.dart</code>. Import it from its own file.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/utils/aes_encryptor.dart'</span><span class="p">;</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kt">String</span><span class="w"> </span><span class="n">secret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appKey</span><span class="p">;</span><span class="w"> </span><span class="c1">// 32 characters</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
@@ -3903,7 +3902,8 @@ You can also call it yourself.</p>
 </span></code></pre></div>
 <ul>
 <li><code>encode</code> returns base64 text.</li>
-<li><code>decode</code> returns an empty string <code>''</code> when the text or the key is wrong. It does not throw.</li>
+<li>The same text gives a different output each time.</li>
+<li><code>decode</code> throws <code>DecryptException</code> when the text was changed, or the key is wrong. It is a <code>400 Bad Request</code> error.</li>
 <li>The secret must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256). Another length makes <code>encode</code> throw.</li>
 </ul>
 <p>Make a new 32-character <code>APP_KEY</code> with the CLI:</p>
@@ -3918,19 +3918,14 @@ You can also call it yourself.</p>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">theme</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">);</span><span class="w">                    </span><span class="c1">// decrypted</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="nl">decrypt:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">      </span><span class="c1">// as sent</span>
 </span></code></pre></div>
-<p>If you change <code>APP_KEY</code>, old encrypted cookies read as <code>''</code>.</p>
-<h2 id="limits">Limits</h2>
-<div class="admonition warning">
-<p class="admonition-title">Do not use it for sensitive data</p>
-<p><code>AESEncryptor</code> uses AES in CTR mode with a fixed IV (all zeros).
-It has no message check (no MAC).</p>
+<p><code>req.cookie(key)</code> returns <code>null</code> when the cookie was changed, or was made with another <code>APP_KEY</code>.</p>
+<h2 id="how-it-works">How it works</h2>
+<p><code>AESEncryptor</code> uses AES-GCM.</p>
 <ul>
-<li>The same text with the same key always gives the same output. So a reader can see when two values are equal.</li>
-<li>Someone can change the encrypted text, and <code>decode</code> does not notice.</li>
+<li>Each message gets a new random 12-byte nonce.</li>
+<li>The output is base64 of <code>nonce + encrypted text + tag</code>.</li>
+<li>The 16-byte tag checks the message. If someone changes one byte, <code>decode</code> throws.</li>
 </ul>
-<p>This keeps old cookies working. But it is not safe for passwords, tokens or personal data.
-For those, use a library with an authenticated mode, like AES-GCM with a random nonce for each message.</p>
-</div>
 <p>To store passwords, do not encrypt them. Hash them. See <a href="../hashing/">Hashing</a>.</p>
 
 
