@@ -66,7 +66,7 @@ await Dox().startServer();
 - Run, rollback (by batch or `--step`), reset, refresh and status.
 - Each migration runs in one transaction. On MySQL, `CREATE`, `ALTER` and `DROP` can not be undone.
 - The migration list is compiled in, so an AOT binary can migrate.
-- Reads the database settings from `.env` (`DB_CONNECTION`, `DB_HOST`, ...).
+- Reads the database settings from `DATABASE_URL`, or `DB_CONNECTION`, `DB_HOST`, ... A real env var wins over `.env`.
 
 ## Documentation
 

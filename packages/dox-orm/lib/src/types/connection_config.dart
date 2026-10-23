@@ -67,6 +67,131 @@ class ConnectionConfig {
     this.driverFactory,
   });
 
+  /// Makes a config from a database url, like `DATABASE_URL`.
+  ///
+  /// - `postgres://user:pass@host:5432/db` (also `postgresql://`)
+  /// - `mysql://user:pass@host:3306/db` (also `mariadb://`)
+  /// - `sqlite:///abs/path.db`, `sqlite://db/dox.sqlite`, `sqlite::memory:`
+  ///   or `file:db/dox.sqlite`
+  ///
+  /// The user, password and database name are url-decoded. A missing port
+  /// is 5432 for Postgres and 3306 for MySQL.
+  ///
+  /// Query options:
+  /// - `host=/cloudsql/project:region:instance`: a Postgres Unix socket
+  ///   folder. It wins over the host part of the url.
+  /// - `sslmode` (or `ssl`): `disable`, `allow`, `prefer`, `false` and `0`
+  ///   mean no TLS. `verify-full` checks the server certificate. Any other
+  ///   value (eg. `require`, `true`) turns TLS on.
+  /// - any other option goes to [extra]. `10` becomes an int, and `true` or
+  ///   `false` a bool. Eg. `?maxConnectionCount=20`.
+  ///
+  /// [extra] is the base, the url options win over it.
+  factory ConnectionConfig.fromUrl(
+    String url, {
+    bool debug = false,
+    QueryPrinter? printer,
+    Map<String, dynamic> extra = const <String, dynamic>{},
+  }) {
+    url = url.trim();
+    int colon = url.indexOf(':');
+    String scheme = colon < 0 ? '' : url.substring(0, colon).toLowerCase();
+
+    if (scheme == 'sqlite' || scheme == 'file') {
+      String path = url.substring(colon + 1);
+      if (path.startsWith('//')) path = path.substring(2);
+      int query = path.indexOf('?');
+      if (query >= 0) path = path.substring(0, query);
+      return ConnectionConfig(
+        driver: Driver.sqlite,
+        database: Uri.decodeComponent(path),
+        debug: debug,
+        printer: printer,
+        extra: extra,
+      );
+    }
+
+    Driver driver = switch (scheme) {
+      'postgres' || 'postgresql' => Driver.postgres,
+      'mysql' || 'mariadb' => Driver.mysql,
+      _ => throw FormatException(
+        'database url must start with postgres://, postgresql://, mysql://, '
+        'mariadb://, sqlite: or file:',
+        scheme,
+      ),
+    };
+    Uri uri = Uri.parse(url);
+    Map<String, dynamic> options = <String, dynamic>{...extra};
+    String host = Uri.decodeComponent(uri.host);
+    bool useSSL = false;
+    uri.queryParameters.forEach((String key, String value) {
+      switch (key) {
+        case 'host':
+          host = value;
+        case 'sslmode' || 'ssl':
+          String mode = value.toLowerCase();
+          useSSL = !<String>{
+            'disable',
+            'disabled',
+            'allow',
+            'prefer',
+            'preferred',
+            'false',
+            '0',
+          }.contains(mode);
+          if (driver == Driver.postgres && mode.startsWith('verify')) {
+            options['sslMode'] = postgres.SslMode.verifyFull;
+          }
+        default:
+          options[key] = int.tryParse(value) ?? bool.tryParse(value) ?? value;
+      }
+    });
+    List<String> userInfo = uri.userInfo.split(':');
+    String path = uri.path.startsWith('/') ? uri.path.substring(1) : uri.path;
+
+    return ConnectionConfig(
+      driver: driver,
+      host: host.isEmpty ? 'localhost' : host,
+      port: uri.hasPort
+          ? uri.port
+          : driver == Driver.postgres
+          ? 5432
+          : 3306,
+      user: Uri.decodeComponent(userInfo.first),
+      password: userInfo.length > 1
+          ? Uri.decodeComponent(userInfo.sublist(1).join(':'))
+          : '',
+      database: Uri.decodeComponent(path),
+      useSSL: useSSL,
+      debug: debug,
+      printer: printer,
+      extra: options,
+    );
+  }
+
+  /// true when [host] is a Unix socket: a path that starts with `/`.
+  /// For Postgres it is the folder of the socket, like libpq. Eg. Google
+  /// Cloud SQL uses `/cloudsql/project:region:instance`.
+  bool get isUnixSocket => host.startsWith('/');
+
+  /// the Postgres server of this config, for the Dart `postgres` package.
+  /// A socket folder gets the file name `.s.PGSQL.<port>`, like libpq.
+  postgres.Endpoint get postgresEndpoint {
+    int pgPort = port == 0 ? 5432 : port;
+    String pgHost = host;
+    if (isUnixSocket && !pgHost.contains('/.s.PGSQL.')) {
+      pgHost = '${pgHost.endsWith('/') ? pgHost : '$pgHost/'}.s.PGSQL.$pgPort';
+    }
+    return postgres.Endpoint(
+      host: pgHost,
+      port: pgPort,
+      username: user,
+      password: password,
+      database: database,
+      isUnixSocket: isUnixSocket,
+    );
+  }
+
   /// max prepared statements kept per connection (default 100).
   /// set it with `extra['preparedStatementCacheSize']`.
   int get statementCacheSize =>
@@ -154,15 +279,7 @@ class ConnectionConfig {
         : postgres.SslMode.disable;
 
     return postgres.Pool<dynamic>.withEndpoints(
-      <postgres.Endpoint>[
-        postgres.Endpoint(
-          host: host,
-          port: port,
-          username: user,
-          password: password,
-          database: database,
-        ),
-      ],
+      <postgres.Endpoint>[postgresEndpoint],
       settings: postgres.PoolSettings(
         sslMode: extra['sslMode'] ?? sslMode,
         maxConnectionCount: extra['maxConnectionCount'],

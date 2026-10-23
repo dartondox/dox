@@ -6,7 +6,7 @@ The code reads env vars in three ways:
 
 - `Env.get()` and `EnvReader` (`dox_core`): a real environment variable wins over the `.env` file.
 - `Platform.environment` straight: only the real environment, `.env` is not read.
-- `dox_migration` has its own `loadEnv()`: it reads `.env` when the file exists, else the real environment. See the note below.
+- `dox_migration` has its own `loadEnv()`: it reads `.env` and the real environment. A real environment variable wins, the same as `Env.get()`.
 
 ## Read by the framework
 
@@ -16,8 +16,9 @@ The code reads env vars in three ways:
 | `DOX_SERVER` | `dox_core` (`DoxServer.usesNative()`) | not set (uses `AppConfig.server`) | `dartio`, `dart_io` or `dart:io` forces the `dart:io` server. `native` forces the native server, also for an app with WebSocket routes. Real environment only. | `DOX_SERVER=dartio` |
 | `DOX_HTTP_THREAD` | `dox_http_native` (Rust, `shared_thread()`) | not set (one thread per isolate) | `shared` puts the servers of all isolates on one network thread. Off by default: on 2 cores it cut req/s by a quarter. Real environment only. | `DOX_HTTP_THREAD=shared` |
 | `DOX_DB_DRIVER` | `dox_orm` (`NativeDrivers.wanted()`) | not set (native driver) | `dart` uses the Dart `postgres` / `mysql_dart` driver instead of the native (Rust) one. Same as `extra: {'native': false}`. Real environment only. | `DOX_DB_DRIVER=dart` |
+| `DATABASE_URL` | `dox_orm` (`DatabaseConfig.url`), `dox_migration` | not set | A database url. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. `dox_orm` reads it from the real environment only. See [Database url](../database/index.md#database_url). | `DATABASE_URL=postgres://app:secret@db:5432/blog?sslmode=require` |
 | `DB_CONNECTION` | `dox_migration` (`DbConnection.open()`) | postgres | `postgres`, `mysql` or `sqlite`. Any other value means postgres. | `DB_CONNECTION=sqlite` |
-| `DB_HOST` | `dox_migration` | `localhost` | Database host. | `DB_HOST=127.0.0.1` |
+| `DB_HOST` | `dox_migration` | `localhost` | Database host. A path that starts with `/` is a Postgres Unix socket folder. | `DB_HOST=127.0.0.1` |
 | `DB_PORT` | `dox_migration` | `5432` (postgres), `3306` (mysql) | Database port. | `DB_PORT=5432` |
 | `DB_USERNAME` | `dox_migration` | `postgres` (postgres), `root` (mysql) | Database user. | `DB_USERNAME=app` |
 | `DB_PASSWORD` | `dox_migration` | `postgres` (postgres), empty (mysql) | Database password. | `DB_PASSWORD=secret` |
@@ -25,10 +26,6 @@ The code reads env vars in three ways:
 | `DB_NAME` | `dox_migration` | `dox` | Same as `DB_DATABASE`. `DB_DATABASE` wins when both are set. | `DB_NAME=dox` |
 | `HOME` / `USERPROFILE` | build hooks of `dox_http_native`, `dox_postgres_native`, `dox_mysql_native` | empty | Used to find `~/.cargo/bin/cargo` when the library must be built from source. | set by the OS |
 | `DART_VM_OPTIONS` | the Dart VM | not set | Flags for the VM. The AOT binary from `dox build` reads it. Dox never sets VM flags for you. See [Performance](../digging-deeper/performance.md#dart-vm-flags). | `DART_VM_OPTIONS=--new_gen_semi_max_size=64` |
-
-!!! note "Migrations and `.env`"
-    `dox_migration` reads `.env` when the file exists, and only then falls back to the real environment.
-    So with a `.env` file in the folder, a real `DB_HOST` is ignored. See [Troubleshooting](troubleshooting.md#migrations-read-env-instead-of-the-real-environment).
 
 `DOX_SERVER`, `DOX_HTTP_THREAD` and `DOX_DB_DRIVER` are read with `Platform.environment` or `std::env::var`. They do not work from `.env`.
 

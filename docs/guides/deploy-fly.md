@@ -104,17 +104,16 @@ fly volumes create blog_data --region ams --size 1
 
 Create a Fly.io Managed Postgres cluster with `fly mpg create`.
 
-`fly mpg attach` sets one secret, `DATABASE_URL`. Dox does not read `DATABASE_URL`. It reads `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USERNAME` and `DB_PASSWORD`.
-So take the values from the connection string in the Managed Postgres dashboard, and set them yourself:
+Attach it to the app:
 
 ```bash
-fly secrets set DB_CONNECTION=postgres \
-  DB_HOST=<host> DB_PORT=5432 DB_NAME=<database> \
-  DB_USERNAME=<user> DB_PASSWORD=<password>
+fly mpg attach <cluster-id> --app blog-api
 ```
 
+`fly mpg attach` sets one secret, `DATABASE_URL`. Dox reads it. When `DATABASE_URL` is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. The app and the migrations both use it. See [`DATABASE_URL`](../database/index.md#database_url).
+
 Then delete `DB_CONNECTION` and `DB_NAME` from `[env]`, and delete the `[mounts]` section.
-If the database asks for TLS, set `useSSL: true` on the `postgres` connection in `lib/config/database.dart`.
+If the database asks for TLS, add `?sslmode=require` to the url with `fly secrets set DATABASE_URL=...`.
 
 ## 5. Deploy
 

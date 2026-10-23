@@ -1,5 +1,7 @@
 ## Unreleased
 
+- `DATABASE_URL` support. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. Its `sslmode` (Postgres) or `ssl` (MySQL) option turns TLS on.
+- A `DB_HOST` that starts with `/` is a Postgres Unix socket folder, like `/cloudsql/project:region:instance` on Cloud Run.
 - Migrations read real environment variables too. Before, a `.env` file hid them. Now a real env var wins over `.env`, the same as `Env.get()` of dox_core. An empty value, or `null`, counts as missing.
 
 ## 3.0.0-alpha.4

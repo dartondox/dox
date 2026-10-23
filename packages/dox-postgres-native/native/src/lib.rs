@@ -904,6 +904,21 @@ mod tests {
         assert_eq!(&out[13..], b"boom");
     }
 
+    /// A host that starts with `/` is a Unix socket folder, like Google
+    /// Cloud SQL `/cloudsql/project:region:instance`. The Dart side sends
+    /// it quoted, in the libpq key=value form.
+    #[cfg(unix)]
+    #[test]
+    fn reads_a_unix_socket_host() {
+        use tokio_postgres::config::Host;
+        let cfg = "host='/cloudsql/proj:us-central1:db' port=5432 user='u' dbname='d'";
+        let pg = tokio_postgres::Config::from_str(cfg).unwrap();
+        assert_eq!(
+            pg.get_hosts(),
+            &[Host::Unix("/cloudsql/proj:us-central1:db".into())]
+        );
+    }
+
     /// Needs Postgres (PG_URL, eg. postgres://postgres:postgres@localhost/postgres).
     #[tokio::test]
     async fn runs_a_query() {
