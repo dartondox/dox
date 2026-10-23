@@ -9,6 +9,8 @@ hide:
 
 <div class="dox-hero__text" markdown>
 
+<img class="dox-hero__mascot" src="assets/mascot.png" alt="Doxie, the Dox mascot" width="140" height="137">
+
 # Fast backends<br>in Dart
 
 <p class="dox-hero__lead"><strong>Write in Dart. Serve with Rust.</strong></p>

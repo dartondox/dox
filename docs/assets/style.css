@@ -302,6 +302,7 @@
   align-items: center;
   margin: 0.4rem 0 2rem;
 }
+.md-typeset .dox-hero__mascot { display: block; width: 140px; height: auto; margin: 0 0 0.8rem; }
 .md-typeset .dox-hero h1 {
   font-size: 2.6rem;
   line-height: 1.08;
