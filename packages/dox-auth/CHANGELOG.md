@@ -1,3 +1,8 @@
+## Unreleased
+
+- Security: `JwtAuthDriver` throws `ArgumentError` when the `SecretKey` is empty. Before, an app with no `APP_KEY` signed tokens with an empty key, so anyone could make a token for any user.
+- Security: `attempt` runs bcrypt also when no user is found. Before, an unknown email answered much faster than a wrong password, so the time told which emails have an account.
+
 ## 3.0.0-alpha.5
 
 - Breaking: `JwtAuthDriver.expiresIn` is 1 hour by default. Before, it was `null`, and tokens never expired.

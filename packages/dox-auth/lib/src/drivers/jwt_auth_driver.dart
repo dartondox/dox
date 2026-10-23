@@ -22,7 +22,20 @@ class JwtAuthDriver extends AuthDriver {
     this.algorithm = JWTAlgorithm.HS256,
     this.expiresIn = const Duration(hours: 1),
     this.issuer,
-  });
+  }) {
+    /// with an empty key anyone can sign a token for any user
+    JWTKey key = secret;
+    if (key is SecretKey && key.key.trim().isEmpty) {
+      throw ArgumentError(
+        'The JWT secret is empty. Set APP_KEY (run `dox key:generate`).',
+        'secret',
+      );
+    }
+  }
+
+  /// checked when no user is found, so a login takes as long for an
+  /// unknown email as for a wrong password.
+  static final String _dummyHash = Hash.make('dox-no-user');
 
   /// verify token and get model from provider
   /// and get user data
@@ -123,6 +136,10 @@ class JwtAuthDriver extends AuthDriver {
         /// if password is verify login and get jwt token
         return userData;
       }
+    } else {
+      /// same work as a wrong password, so the time does not tell
+      /// whether the account exists
+      Hash.verify(password, _dummyHash);
     }
     return null;
   }
