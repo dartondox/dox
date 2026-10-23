@@ -1,6 +1,18 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+/// a header value is ASCII text or tab, like dart:io. The response record
+/// is split on `\n`, so a line break in a value would add a header.
+String checkHeaderValue(String value) {
+  for (int i = 0; i < value.length; i++) {
+    int c = value.codeUnitAt(i);
+    if ((c < 32 && c != 9) || c > 127) {
+      throw FormatException('Invalid HTTP header field value', value, i);
+    }
+  }
+  return value;
+}
+
 /// [HttpHeaders] for the native server.
 ///
 /// Request headers are read from the raw bytes from Rust, one name at a
@@ -138,17 +150,32 @@ class NativeHeaders implements HttpHeaders {
 
   @override
   void add(String name, Object value, {bool preserveHeaderCase = false}) {
-    name = name.toLowerCase();
+    name = _checkName(name.toLowerCase());
     if (_special(name, value)) return;
     Map<String, List<String>> map = _own();
     if (value is Iterable<Object?>) {
       for (Object? v in value) {
-        (map[name] ??= <String>[]).add(_text(v));
+        (map[name] ??= <String>[]).add(checkHeaderValue(_text(v)));
       }
     } else {
-      (map[name] ??= <String>[]).add(_text(value));
+      (map[name] ??= <String>[]).add(checkHeaderValue(_text(value)));
     }
   }
+
+  /// a name must be a token, like dart:io. Rust reads the record up to `:`.
+  static String _checkName(String name) {
+    for (int i = 0; i < name.length; i++) {
+      int c = name.codeUnitAt(i);
+      if (c <= 32 || c >= 127 || _separators.contains(c)) {
+        throw FormatException('Invalid HTTP header field name', name, i);
+      }
+    }
+    return name;
+  }
+
+  static const Set<int> _separators = <int>{
+    34, 40, 41, 44, 47, 58, 59, 60, 61, 62, 63, 64, 91, 92, 93, 123, 125, //
+  };
 
   @override
   void set(String name, Object value, {bool preserveHeaderCase = false}) {

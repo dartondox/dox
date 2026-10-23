@@ -131,6 +131,13 @@ class NativeResponse implements HttpResponse {
   @override
   Future<HttpResponse> close() {
     if (!_closed) {
+      // Cookie does not check its domain, so a line break there would add
+      // a header. Check before the response is marked closed.
+      if (hasCookies) {
+        for (Cookie cookie in cookies) {
+          checkHeaderValue(cookie.toString());
+        }
+      }
       _closed = true;
       _request.server.send(_request, this);
       _done?.complete(this);

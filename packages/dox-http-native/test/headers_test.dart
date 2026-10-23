@@ -37,6 +37,24 @@ void main() {
     h.set(HttpHeaders.contentTypeHeader, 'text/html');
     expect(h.contentType?.mimeType, 'text/html');
   });
+
+  test('response header values with a line break are refused', () {
+    NativeHeaders h = NativeHeaders.response(NativeHeaders.empty());
+    for (String value in <String>[
+      'a\nset-cookie: x=1',
+      'a\r\nset-cookie: x=1',
+      'a\u010Aset-cookie: x=1',
+      'a\u0000',
+    ]) {
+      expect(() => h.set('x-id', value), throwsFormatException);
+      expect(() => h.add('x-id', <String>['ok', value]), throwsFormatException);
+    }
+    for (String name in <String>['a b', 'a:b', 'a\nb', 'é']) {
+      expect(() => h.set(name, 'v'), throwsFormatException);
+    }
+    h.set('x-id', 'a\tb ~!');
+    expect(h.value('x-id'), 'a\tb ~!');
+  });
 }
 
 /// the header block like Rust writes it
