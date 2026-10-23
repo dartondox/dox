@@ -10,7 +10,46 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/develop' }}
 
 jobs:
+  # Docs-only changes (*.md, docs/, mkdocs.yml, overrides/) skip lint, tests
+  # and examples. The `test` job still runs and passes, so the required check
+  # is not stuck. A branch is compared with develop, so one docs-only push on
+  # top of code commits still runs every test.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.diff.outputs.code }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: diff
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            echo "code=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if [ "$GITHUB_REF" = "refs/heads/develop" ]; then
+            base="$BEFORE"
+          else
+            base=$(git merge-base origin/develop HEAD)
+          fi
+          # no usable base (new branch, force push): run everything
+          if ! git cat-file -e "$base^{commit}" 2>/dev/null; then
+            echo "code=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          files=$(git diff --name-only "$base" HEAD)
+          echo "$files"
+          if echo "$files" | grep -qvE '(\.md$|^docs/|^mkdocs\.yml$|^overrides/|^$)'; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Only docs changed. Tests are skipped."
+            echo "code=false" >> "$GITHUB_OUTPUT"
+          fi
+
   lint:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -32,6 +71,8 @@ jobs:
 
   tests:
     name: ${{ matrix.name }}
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -144,6 +185,8 @@ jobs:
   # they need no database service. A broken docs example fails CI.
   examples:
     name: example (${{ matrix.example }})
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -180,7 +223,7 @@ jobs:
   # and fails when any job above fails.
   test:
     if: always()
-    needs: [lint, tests, examples]
+    needs: [changes, lint, tests, examples]
     runs-on: ubuntu-latest
     steps:
       - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
