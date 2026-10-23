@@ -2667,6 +2667,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#close" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Close
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -4069,6 +4080,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#close" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Close
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -4335,7 +4357,12 @@ An empty prefix makes <code>flush</code> throw.</p>
 </span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="n">cache</span><span class="p">.</span><span class="n">addStore</span><span class="p">(</span><span class="s1">'ready'</span><span class="p">,</span><span class="w"> </span><span class="n">MemoryDriver</span><span class="p">());</span><span class="w"> </span><span class="c1">// or add a ready driver</span>
 </span></code></pre></div>
 <p><code>MyDriver extends CacheDriver</code>. It must implement <code>prefix</code>, <code>get</code>, <code>put</code>, <code>add</code>, <code>increment</code>, <code>forget</code> and <code>flush</code>.
-Override <code>lock</code> to support locks.</p>
+Override <code>lock</code> to support locks, and <code>close</code> to close its connections.</p>
+<h2 id="close">Close</h2>
+<p><code>cache.close()</code> closes the connections of every store that was built, eg. the Redis connections.
+Memory, file and null stores have nothing to close. It is safe to call twice.
+A store used after it is built again.</p>
+<p>In a Dox app you do not call it. Dox closes <code>Cache()</code> stores on shutdown, in every isolate, after the open requests are done.</p>
 
 
 

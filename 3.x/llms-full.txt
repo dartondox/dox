@@ -4921,10 +4921,16 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart';
 import 'package:my_app/config/database.dart';
 
-class ORMService implements DoxService {
+class ORMService implements DoxService, DoxShutdown {
   @override
   Future<void> setup() async {
     SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
+  }
+
+  /// Close the database connections when the server stops.
+  @override
+  Future<void> shutdown() async {
+    await SqlQueryBuilder.close();
   }
 }
 ```
@@ -4996,6 +5002,9 @@ So routes can use what a service set up. For example, `Route.websocket()` needs 
 On `SIGTERM` or `SIGINT` Dox stops the server gracefully (see [Deployment](deployment.md#graceful-shutdown)).
 After the open requests are done, it runs `shutdown()` of each service that also implements `DoxShutdown`.
 It runs in every isolate. Use it to close connections or flush data.
+
+The `ORMService` of a new project already does this: its `shutdown()` calls `SqlQueryBuilder.close()`.
+Dox closes the cache stores (eg. Redis) by itself, after the services.
 
 ```dart title="lib/services/redis_service.dart"
 class RedisService implements DoxService, DoxShutdown {
@@ -5721,8 +5730,9 @@ On `SIGTERM` (docker stop, Kubernetes, Cloud Run, Fly, systemd) or `SIGINT` (Ctr
 1. It stops taking new connections at once.
 2. Open requests can finish. Each keep-alive connection closes after its current answer.
 3. After `shutdownTimeout` (default 8 seconds), it closes the connections that are still open.
-4. It runs `shutdown()` of each service that implements `DoxShutdown` (see [Services](services.md#clean-up-on-shutdown)).
-5. The process exits with code `0`.
+4. It runs `shutdown()` of each service that implements `DoxShutdown` (see [Services](services.md#clean-up-on-shutdown)). The `ORMService` of a new project closes the database connections here.
+5. It closes the cache stores of `Cache()`, eg. the Redis connections.
+6. The process exits with code `0`.
 
 A second `SIGINT` or `SIGTERM` stops the process at once.
 
@@ -6490,12 +6500,19 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 
 Start the ORM in a service.
 Each isolate runs the service, so each isolate gets its own pool.
+On shutdown, `SqlQueryBuilder.close()` closes every connection of the isolate.
 
 ```dart title="lib/services/orm_service.dart"
-class ORMService implements DoxService {
+class ORMService implements DoxService, DoxShutdown {
   @override
   Future<void> setup() async {
     SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
+  }
+
+  /// Close the database connections when the server stops.
+  @override
+  Future<void> shutdown() async {
+    await SqlQueryBuilder.close();
   }
 }
 ```
@@ -10452,7 +10469,15 @@ cache.addStore('ready', MemoryDriver()); // or add a ready driver
 ```
 
 `MyDriver extends CacheDriver`. It must implement `prefix`, `get`, `put`, `add`, `increment`, `forget` and `flush`.
-Override `lock` to support locks.
+Override `lock` to support locks, and `close` to close its connections.
+
+## Close
+
+`cache.close()` closes the connections of every store that was built, eg. the Redis connections.
+Memory, file and null stores have nothing to close. It is safe to call twice.
+A store used after it is built again.
+
+In a Dox app you do not call it. Dox closes `Cache()` stores on shutdown, in every isolate, after the open requests are done.
 
 
 ---
@@ -15524,10 +15549,16 @@ import 'package:my_app/config/database.dart';
 /// Sets up the query builder, so this project can use the ORM.
 /// If this project does not need a database, delete this file
 /// and remove it from config/services.dart.
-class ORMService implements DoxService {
+class ORMService implements DoxService, DoxShutdown {
   @override
   Future<void> setup() async {
     SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
+  }
+
+  /// Close the database connections when the server stops.
+  @override
+  Future<void> shutdown() async {
+    await SqlQueryBuilder.close();
   }
 }
 ```
@@ -16319,7 +16350,7 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | Check | How | Read more |
 | --- | --- | --- |
 | Health route | **Dox limit.** Dox has no built-in health route. Add one that asks the database: `Route.get('/health', healthController.check)` with `await QueryBuilder.query('select 1');`. | [Docker](../guides/docker.md) |
-| Graceful shutdown | On `SIGTERM` or `SIGINT`, Dox stops taking connections and lets open requests finish, in every isolate. Set `shutdownTimeout` below the kill timeout of your platform. Close connections in a `DoxShutdown` service. | [Deployment](../digging-deeper/deployment.md#graceful-shutdown) |
+| Graceful shutdown | On `SIGTERM` or `SIGINT`, Dox stops taking connections and lets open requests finish, in every isolate. Set `shutdownTimeout` below the kill timeout of your platform. The `ORMService` closes the database in its `DoxShutdown` hook, and Dox closes the cache stores. Close your own connections in a `DoxShutdown` service. | [Deployment](../digging-deeper/deployment.md#graceful-shutdown) |
 | Zero downtime deploys | Run two processes (or machines) behind the proxy. Restart one at a time. | [Deployment](../digging-deeper/deployment.md) |
 
 ## Rate limit at the proxy
@@ -16980,6 +17011,11 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### Unreleased
+
+- New `CacheManager.close()`. It closes the connections of every store that was built. The Redis driver closes its connection and its pool connections, with no reconnect. Memory, file and null stores do nothing. It is safe to call twice. A store used after it is built again.
+- New `CacheDriver.close()`, for one driver. Custom drivers can override it. The default does nothing.
+
 ### 3.0.0-alpha.5
 
 - Version bump only, to match the other packages.
@@ -17052,6 +17088,21 @@ What changed in each package, newest first. This page is made from the
 - Generated models import `package:dox_orm/dox_orm.dart`.
 
 ## dox_core
+
+### Unreleased
+
+- Graceful shutdown closes the cache stores of `Cache()` (eg. Redis), in every isolate, after the `DoxShutdown` services. Your app needs no extra code.
+- The `ORMService` of a new project implements `DoxShutdown` and calls `SqlQueryBuilder.close()`, so the database connections close on shutdown too. In an older project, add this to `lib/services/orm_service.dart`:
+  ```dart
+  class ORMService implements DoxService, DoxShutdown {
+    // setup() as before
+
+    @override
+    Future<void> shutdown() async {
+      await SqlQueryBuilder.close();
+    }
+  }
+  ```
 
 ### 3.0.0-alpha.5
 
@@ -17216,6 +17267,7 @@ What changed in each package, newest first. This page is made from the
 ### Unreleased
 
 - Unix sockets. In `MysqlNativePool.open()`, a `host` that starts with `/` is the socket file. `fromUrl()` takes `?socket=/path`.
+- `close()` is safe with many isolates. Isolates that open the same settings share one pool. Each `open` now counts, and only the last `close()` disconnects the pool. Before, the first `close()` closed it for every isolate.
 
 ### 3.0.0-alpha.5
 
@@ -17280,6 +17332,9 @@ What changed in each package, newest first. This page is made from the
 ### Unreleased
 
 - MySQL and MariaDB Unix sockets. A host that starts with `/` is the socket file, like `/var/run/mysqld/mysqld.sock` or `/cloudsql/project:region:instance` on Cloud Run. Works on the native and the Dart driver. In a url, use `?socket=/path` or `?host=/path`.
+- New `SqlQueryBuilder.close()`. It closes every open database connection of the isolate: the default and all named connections, on every driver (native Postgres and MySQL, the Dart drivers and SQLite). It is safe to call twice. Call it on shutdown, eg. from a `DoxShutdown` service.
+- New `DBDriver.close()`, for one driver. Custom drivers can override it. The default does nothing.
+- `SqlQueryBuilder().dbDriver` throws a `StateError` with a clear message when the ORM is not set up (or after `close()`).
 
 ### 3.0.0-alpha.5
 

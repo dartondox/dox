@@ -4018,12 +4018,18 @@
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/database.dart'</span><span class="p">;</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ORMService</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">DoxService</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ORMService</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">DoxService</span><span class="p">,</span><span class="w"> </span><span class="n">DoxShutdown</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nd">@override</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="n">SqlQueryBuilder</span><span class="p">.</span><span class="n">initializeWithDatabaseConfig</span><span class="p">(</span><span class="n">databaseConfig</span><span class="p">);</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">}</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="c1">/// Close the database connections when the server stops.</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">shutdown</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">SqlQueryBuilder</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="register-it">Register it</h2>
 <p>Add an instance of the service to the list in <code>lib/config/services.dart</code>:</p>
@@ -4076,6 +4082,8 @@
 <p>On <code>SIGTERM</code> or <code>SIGINT</code> Dox stops the server gracefully (see <a href="../deployment/#graceful-shutdown">Deployment</a>).
 After the open requests are done, it runs <code>shutdown()</code> of each service that also implements <code>DoxShutdown</code>.
 It runs in every isolate. Use it to close connections or flush data.</p>
+<p>The <code>ORMService</code> of a new project already does this: its <code>shutdown()</code> calls <code>SqlQueryBuilder.close()</code>.
+Dox closes the cache stores (eg. Redis) by itself, after the services.</p>
 <div class="language-dart highlight"><span class="filename">lib/services/redis_service.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">RedisService</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">DoxService</span><span class="p">,</span><span class="w"> </span><span class="n">DoxShutdown</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="kd">late</span><span class="w"> </span><span class="n">RedisConnection</span><span class="w"> </span><span class="n">redis</span><span class="p">;</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>

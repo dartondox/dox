@@ -4241,7 +4241,8 @@ real client:</p>
 <li>It stops taking new connections at once.</li>
 <li>Open requests can finish. Each keep-alive connection closes after its current answer.</li>
 <li>After <code>shutdownTimeout</code> (default 8 seconds), it closes the connections that are still open.</li>
-<li>It runs <code>shutdown()</code> of each service that implements <code>DoxShutdown</code> (see <a href="../services/#clean-up-on-shutdown">Services</a>).</li>
+<li>It runs <code>shutdown()</code> of each service that implements <code>DoxShutdown</code> (see <a href="../services/#clean-up-on-shutdown">Services</a>). The <code>ORMService</code> of a new project closes the database connections here.</li>
+<li>It closes the cache stores of <code>Cache()</code>, eg. the Redis connections.</li>
 <li>The process exits with code <code>0</code>.</li>
 </ol>
 <p>A second <code>SIGINT</code> or <code>SIGTERM</code> stops the process at once.</p>

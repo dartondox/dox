@@ -4305,7 +4305,7 @@
 </tr>
 <tr>
 <td>Graceful shutdown</td>
-<td>On <code>SIGTERM</code> or <code>SIGINT</code>, Dox stops taking connections and lets open requests finish, in every isolate. Set <code>shutdownTimeout</code> below the kill timeout of your platform. Close connections in a <code>DoxShutdown</code> service.</td>
+<td>On <code>SIGTERM</code> or <code>SIGINT</code>, Dox stops taking connections and lets open requests finish, in every isolate. Set <code>shutdownTimeout</code> below the kill timeout of your platform. The <code>ORMService</code> closes the database in its <code>DoxShutdown</code> hook, and Dox closes the cache stores. Close your own connections in a <code>DoxShutdown</code> service.</td>
 <td><a href="../../digging-deeper/deployment/#graceful-shutdown">Deployment</a></td>
 </tr>
 <tr>
