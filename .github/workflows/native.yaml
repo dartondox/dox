@@ -16,6 +16,13 @@ name: Native
 
 on:
   push:
+    # docs-only pushes skip this. GitHub ignores paths on tag pushes,
+    # so release tags always build.
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'overrides/**'
 
 permissions:
   contents: read
