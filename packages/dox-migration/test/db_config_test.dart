@@ -16,6 +16,16 @@ void main() {
       expect(c.postgresEndpoint.host, '/cloudsql/p:r:i/.s.PGSQL.5432');
     });
 
+    test('mysql DB_HOST socket file', () {
+      ConnectionConfig c = DbConnection.config(<String, String>{
+        'DB_CONNECTION': 'mysql',
+        'DB_HOST': '/cloudsql/p:r:i',
+      });
+      expect(c.driver, Driver.mysql);
+      expect(c.isUnixSocket, isTrue);
+      expect(c.mysqlPort, 0);
+    });
+
     test('DB_* keys and their defaults', () {
       ConnectionConfig pg = DbConnection.config(<String, String>{});
       expect(pg.driver, Driver.postgres);

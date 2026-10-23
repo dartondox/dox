@@ -25,7 +25,8 @@ class DbConnection {
   /// Else `DB_CONNECTION` (postgres, mysql or sqlite), `DB_HOST`,
   /// `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` and `DB_DATABASE` (or
   /// `DB_NAME`). For sqlite, the database is the file path. A host that
-  /// starts with `/` is a Postgres Unix socket folder.
+  /// starts with `/` is a Unix socket: the socket folder for Postgres, the
+  /// socket file for MySQL.
   static ConnectionConfig config(Map<String, String> env) {
     String? url = env['DATABASE_URL']?.trim();
     if (url != null && url.isNotEmpty) {
@@ -66,8 +67,8 @@ class DbConnection {
       // caching_sha2_password (mysql 8 default) without TLS needs the
       // server RSA key to send the password, so ask the server for it.
       mysql.MySQLConnection conn = await mysql.MySQLConnection.createConnection(
-        host: c.host,
-        port: c.port,
+        host: c.mysqlHost,
+        port: c.mysqlPort,
         userName: c.user,
         password: c.password,
         databaseName: c.database,

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dox_orm/dox_orm.dart';
 import 'package:mysql_dart/mysql_dart.dart' as mysql;
 import 'package:postgres/postgres.dart' as postgres;
@@ -78,8 +80,10 @@ class ConnectionConfig {
   /// is 5432 for Postgres and 3306 for MySQL.
   ///
   /// Query options:
-  /// - `host=/cloudsql/project:region:instance`: a Postgres Unix socket
-  ///   folder. It wins over the host part of the url.
+  /// - `host=/path` (or `socket=/path`): a Unix socket. It wins over the
+  ///   host part of the url. For Postgres it is the socket folder, eg.
+  ///   `/cloudsql/project:region:instance`. For MySQL it is the socket
+  ///   file, eg. `/var/run/mysqld/mysqld.sock`.
   /// - `sslmode` (or `ssl`): `disable`, `allow`, `prefer`, `false` and `0`
   ///   mean no TLS. `verify-full` checks the server certificate. Any other
   ///   value (eg. `require`, `true`) turns TLS on.
@@ -126,7 +130,7 @@ class ConnectionConfig {
     bool useSSL = false;
     uri.queryParameters.forEach((String key, String value) {
       switch (key) {
-        case 'host':
+        case 'host' || 'socket':
           host = value;
         case 'sslmode' || 'ssl':
           String mode = value.toLowerCase();
@@ -170,8 +174,9 @@ class ConnectionConfig {
   }
 
   /// true when [host] is a Unix socket: a path that starts with `/`.
-  /// For Postgres it is the folder of the socket, like libpq. Eg. Google
-  /// Cloud SQL uses `/cloudsql/project:region:instance`.
+  /// For Postgres it is the folder of the socket, like libpq. For MySQL it
+  /// is the socket file. Eg. Google Cloud SQL uses
+  /// `/cloudsql/project:region:instance` for both.
   bool get isUnixSocket => host.startsWith('/');
 
   /// the Postgres server of this config, for the Dart `postgres` package.
@@ -191,6 +196,19 @@ class ConnectionConfig {
       isUnixSocket: isUnixSocket,
     );
   }
+
+  /// the MySQL server address for the Dart `mysql_dart` package: a unix
+  /// [InternetAddress] for a socket, else the host name.
+  Object get mysqlHost => isUnixSocket
+      ? InternetAddress(host, type: InternetAddressType.unix)
+      : host;
+
+  /// the MySQL port: 0 for a Unix socket, else [port] (default 3306).
+  int get mysqlPort => isUnixSocket
+      ? 0
+      : port == 0
+      ? 3306
+      : port;
 
   /// max prepared statements kept per connection (default 100).
   /// set it with `extra['preparedStatementCacheSize']`.
@@ -234,8 +252,8 @@ class ConnectionConfig {
   /// for the key, unless you give it in `serverPublicKey` (safer).
   mysql.MySQLConnectionPool _getMysqlPool() {
     return mysql.MySQLConnectionPool(
-      host: host,
-      port: port,
+      host: mysqlHost,
+      port: mysqlPort,
       userName: user,
       password: password,
       databaseName: database,

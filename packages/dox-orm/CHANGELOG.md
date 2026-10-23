@@ -1,3 +1,7 @@
+## Unreleased
+
+- MySQL and MariaDB Unix sockets. A host that starts with `/` is the socket file, like `/var/run/mysqld/mysqld.sock` or `/cloudsql/project:region:instance` on Cloud Run. Works on the native and the Dart driver. In a url, use `?socket=/path` or `?host=/path`.
+
 ## 3.0.0-alpha.5
 
 - `DATABASE_URL` support. `ConnectionConfig.fromUrl()` reads `postgres://`, `postgresql://`, `mysql://`, `mariadb://`, `sqlite:` and `file:` urls: url-decoded user and password, host, port, database, `sslmode` and other options (they go to `extra`).
