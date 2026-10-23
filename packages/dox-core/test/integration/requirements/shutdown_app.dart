@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:dox_core/dox_core.dart';
 
 /// a small app for the SIGTERM test. Args: port, isolates, backend.
-/// `/slow` answers after 700 ms. Prints `ready` when it serves and
-/// `cleanup <isolate>` when a DoxShutdown service runs.
+/// `/slow` prints `slow start` and answers after 700 ms. Prints `ready`
+/// when it serves and `cleanup <isolate>` when a DoxShutdown service runs.
 void main(List<String> args) async {
   Dox().initialize(
     AppConfig(
@@ -27,6 +27,7 @@ class SlowRouter extends Router {
   }
 
   static Future<String> slow(DoxRequest req) async {
+    stdout.writeln('slow start');
     await Future<void>.delayed(const Duration(milliseconds: 700));
     return 'slow done';
   }
