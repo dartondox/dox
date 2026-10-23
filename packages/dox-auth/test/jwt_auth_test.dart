@@ -247,6 +247,15 @@ void main() {
       expect(() => JwtAuthDriver(secret: SecretKey('  ')), throwsArgumentError);
     });
 
+    test('a user with no stored password cannot log in', () async {
+      users[2] = FakeUser(2, 'nopass@dox.dev');
+      String? token = await Auth().attempt(<String, dynamic>{
+        'email': 'nopass@dox.dev',
+        'password': 'dox-no-user',
+      });
+      expect(token, isNull);
+    });
+
     test('attempt without a password returns null', () async {
       String? token = await Auth().attempt(<String, dynamic>{
         'email': 'a@dox.dev',

@@ -163,7 +163,7 @@ After `AuthMiddleware`, `req.auth` holds the login.
 | `user<T>()` | the user after `attempt` or `login` |
 | `isLoggedIn()` | `true` when there is a user |
 
-`attempt` searches only by the fields in `identifierFields`. It runs bcrypt also when no user is found, so the answer time does not tell whether an email has an account.
+`attempt` searches only by the fields in `identifierFields`. It runs bcrypt also when no user is found, or when the user has no password, so the answer time does not tell whether an email has an account.
 It returns `null` when the password is not a `String`, when no identifier is given, or when the password does not match.
 
 ## Options

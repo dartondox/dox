@@ -127,19 +127,15 @@ class JwtAuthDriver extends AuthDriver {
     /// get first record
     Model<dynamic>? userData = await query.getFirst();
 
-    if (userData != null) {
-      /// convert to json to get password field
-      dynamic hashed = userData.toMap(original: true)[provider.passwordField];
+    /// the stored hash. null when there is no user or no password.
+    dynamic hashed = userData?.toMap(original: true)[provider.passwordField];
+    bool hasHash = hashed is String;
 
-      /// verify password
-      if (hashed is String && Hash.verify(password, hashed)) {
-        /// if password is verify login and get jwt token
-        return userData;
-      }
-    } else {
-      /// same work as a wrong password, so the time does not tell
-      /// whether the account exists
-      Hash.verify(password, _dummyHash);
+    /// always run bcrypt, also when there is no user or no password,
+    /// so the answer time does not tell whether the account exists
+    bool matches = Hash.verify(password, hasHash ? hashed : _dummyHash);
+    if (userData != null && hasHash && matches) {
+      return userData;
     }
     return null;
   }
