@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.5
 
 - New: `NativeHttpServer.bind(port, address: ...)` listens on one host, like `HttpServer.bind`. An `InternetAddress` or a host name. With no address it listens on all interfaces, as before. `server.address` is the real address.
 - Fix: `close()` never finished when nobody called `listen()` on the server.
