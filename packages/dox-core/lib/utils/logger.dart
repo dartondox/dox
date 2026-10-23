@@ -2,11 +2,32 @@
 library;
 
 import 'package:dox_core/app.dart';
+import 'package:dox_core/interfaces/app_config.dart';
 import 'package:dox_core/utils/json.dart';
 
 class Logger {
+  /// rank of each level. a line prints when its rank is at least
+  /// the rank of `LoggerConfig.level`.
+  static const Map<String, int> _ranks = <String, int>{
+    'debug': 0,
+    'info': 1,
+    'success': 1,
+    'warn': 2,
+    'warning': 2,
+    'danger': 3,
+    'error': 3,
+  };
+
+  /// true when a line of [level] passes the [minLevel] setting.
+  /// an unknown [minLevel] prints every line, so no log is lost.
+  static bool shouldLog(String level, String minLevel) {
+    int min = _ranks[minLevel.toLowerCase()] ?? 0;
+    return (_ranks[level] ?? 3) >= min;
+  }
+
   static void log(String level, dynamic message, [dynamic data]) {
-    if (Dox().config.logger.enabled == false) return;
+    LoggerConfig config = Dox().config.logger;
+    if (!config.enabled || !shouldLog(level, config.level)) return;
     Dox().config.logger.prettyPrint
         ? _prettyLog(level, message, data)
         : _log(level, message, data);

@@ -69,7 +69,7 @@ A value can be a `String` (`'*'` or a comma list) or a `List<String>`. A `null` 
 | `name` | `String` | `''` | The `name` field in each JSON log line. |
 | `enabled` | `bool` | `false` | Turn the `Logger` on. |
 | `prettyPrint` | `bool` | `false` | `true` prints colored text. `false` prints one JSON object per line (for log services). |
-| `level` | `String` | `'info'` | Stored, but not read by the logger in this version. |
+| `level` | `String` | `'info'` | The lowest level to print: `debug`, `info`, `warn` or `error`. `Logger.success` counts as `info`. `Logger.danger` counts as `error`. An unknown value prints every line. |
 
 ## CacheConfig
 
