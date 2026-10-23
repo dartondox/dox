@@ -1,3 +1,7 @@
+## 3.0.0-alpha.6
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.5
 
 - `@DoxModel(timestamps: false)` makes a model without `createdAt` and `updatedAt`. `createdAt: null` or `updatedAt: null` turns off only one.

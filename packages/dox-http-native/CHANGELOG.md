@@ -1,3 +1,7 @@
+## 3.0.0-alpha.6
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.5
 
 - New: `NativeHttpServer.bind(port, address: ...)` listens on one host, like `HttpServer.bind`. An `InternetAddress` or a host name. With no address it listens on all interfaces, as before. `server.address` is the real address.
