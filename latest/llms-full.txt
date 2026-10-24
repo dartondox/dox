@@ -4340,7 +4340,7 @@ Each store is made once per isolate, the first time you use it.
 | Driver | Options |
 | --- | --- |
 | `file` | `path` (default `storage/cache`), `prefix` |
-| `memory` | `max_size`: the most items. When it is full, the item that was used least recently is removed. No limit by default. Also `prefix`. |
+| `memory` | `max_size`: the most items. When it is full, the item that was used least recently is removed. No limit by default. Expired items are removed when read, and by a sweep every few thousand writes. Also `prefix`. |
 | `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db` (default `0`), `tls` (`true`/`false`), `pool_size`, `prefix` |
 
 The default `prefix` is `dox_cache:`.
@@ -4400,6 +4400,8 @@ if (json != null) {
 ```
 
 A missing key gives `null`. A stored `String` comes back as JSON, with its quotes: `"bar"`.
+
+The memory driver also keeps values as JSON text, so a caller can not change a cached value by mistake. This means `get` decodes the text on every hit, also in memory. For a big value that you send as is, `getRaw` skips this work.
 
 ### Another store
 
@@ -10993,6 +10995,8 @@ It returns `null` when the password is not a `String`, when no identifier is giv
 | `algorithm` | `JWTAlgorithm.HS256` | the signing algorithm |
 | `expiresIn` | `Duration(hours: 1)` | how long a token is valid |
 | `issuer` | `null` | the `iss` claim. When set, `verifyToken` also checks it |
+| `hashRounds` | `10` | the bcrypt cost of your stored hashes. Set it to the same value as `Hash.rounds`, so an unknown email takes as long as a wrong password |
+| `userCacheTtl` | `null` (off) | keep the user of a token in memory for this time, so a request does not load the user from the database. See below |
 
 ## More than one guard
 
@@ -11033,6 +11037,8 @@ An unknown guard name throws an `ArgumentError`.
 - **The token is not secret.** Its payload is `user.toJson()`. Anyone with the token can read it. Keep private columns in `hidden`.
 - **You can not cancel one token.** There is no token list on the server. A token works until it expires. If you change the `secret` (your `APP_KEY`), all tokens stop working.
 - **The user is loaded on each request.** `AuthMiddleware` reads the user id from the token and runs `find(id)`. A deleted user can not log in, even with a valid token.
+- **`userCacheTtl` skips that query.** With `userCacheTtl: Duration(seconds: 30)` the user is kept in memory for 30 seconds. A deleted or changed user is seen only after that time. Each server isolate has its own cache. Requests in that time get the same user object, so do not change it per request.
+- **Login does not block the server.** `attempt` runs bcrypt in another isolate, so other requests are served while a password is checked.
 - **Hash passwords** with `Hash.make()` before you save them. See [Hashing](hashing.md).
 
 
@@ -11236,6 +11242,28 @@ bool ok = Hash.verify('secret', user.password!);
 
 `Hash.verify(password, hashedPassword)` returns `true` when the password matches.
 It returns `false` when the password does not match, or when `hashedPassword` is not a valid bcrypt hash (for example an empty string).
+
+## Without blocking the server
+
+bcrypt takes many milliseconds of CPU. `Hash.make` and `Hash.verify` run on the request isolate, so that isolate can not answer other requests in the meantime.
+Use the async versions in a request handler. They run bcrypt in another isolate.
+
+```dart
+user.password = await Hash.makeAsync(body.password);
+bool ok = await Hash.verifyAsync('secret', user.password!);
+```
+
+## Cost
+
+`Hash.rounds` is the bcrypt cost for new hashes. The default is `10`. Each step up doubles the time.
+
+```dart
+Hash.rounds = 12;
+String hash = Hash.make('secret', rounds: 12); // or per call
+```
+
+Old hashes keep their own cost, so they still verify.
+If you change it, also set `hashRounds` on `JwtAuthDriver` to the same value. See [Authentication](authentication.md).
 
 ## With login
 
@@ -17029,6 +17057,10 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- Perf: `attempt` runs bcrypt in another isolate (`Isolate.run`). Before, each login blocked the server isolate for the whole hash.
+- Perf: the dummy hash for unknown users is made when the driver is created, in another isolate. Before, the first login paid for two hashes.
+- New: `JwtAuthDriver(hashRounds: 10)`. Set it to the bcrypt cost of your stored hashes.
+- New: `JwtAuthDriver(userCacheTtl: ...)`. Keeps the user of a token in memory for this time, so `verifyToken` does not run `find(id)` on every request. Off by default.
 - Security: `JwtAuthDriver` throws `ArgumentError` when the `SecretKey` is empty. Before, an app with no `APP_KEY` signed tokens with an empty key, so anyone could make a token for any user.
 - Security: `attempt` runs bcrypt also when no user is found, or when the user has no password. Before, an unknown email answered much faster than a wrong password, so the time told which emails have an account.
 
@@ -17109,6 +17141,14 @@ What changed in each package, newest first. This page is made from the
 - Works with analyzer 5 and 6.
 
 ## dox_cache
+
+### Unreleased
+
+- Perf: the memory driver removes expired items and expired locks in a sweep after many writes. Before, a key that was written once with a ttl and never read again stayed in memory forever.
+- Perf: the memory driver with no `max_size` does not reorder the map on every hit. The order is only needed for LRU.
+- Perf: a tagged cache reads all tag versions with one `many` call (one `MGET` on Redis). `tags(...).flush()` raises all tag versions at the same time. Before, each tag was one round trip after the other.
+- Perf: the Redis driver frees a lock with `EVALSHA`. It sends the full script only when Redis does not know it yet.
+- Perf: the file driver makes the cache folder only when it is missing. Before, it ran `create(recursive: true)` on every write. Lock tokens use one shared `Random.secure()`.
 
 ### 3.0.0-alpha.6
 
@@ -17195,6 +17235,9 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- Perf: `AESEncryptor` keeps the key bytes of the last secret and writes the output into one buffer. Decode reads the nonce and text without copies. The output format is the same.
+- New: `Hash.makeAsync()` and `Hash.verifyAsync()`. They run bcrypt in another isolate, so a request does not block the server.
+- New: `Hash.rounds` (default 10) sets the bcrypt cost. `Hash.make()` also takes `rounds:`.
 - Security: the app does not start when `APP_KEY` is empty, not exactly 32 characters, or one of the old public sample keys from `.env.example`. With such a key anyone can sign tokens and cookies. In `APP_ENV` `development`, `local` or `test` Dox only logs a warning. A longer key (eg. 48 or 64 characters) is refused too, because AES needs a key of 16, 24 or 32 bytes and every encrypted cookie failed with it. Before, only an empty key in `production` stopped the app. Run `dox key:generate` for a new key.
 - Security: a multipart part header with many backslashes (`name="\\\\...`) no longer blocks a server isolate for hours (ReDoS in the quoted string regex).
 - Security: a `StreamFile` response (`Storage().stream()`, `Route.files()`) with an html, xml, svg or javascript type is sent with `Content-Disposition: attachment` and `Content-Security-Policy: sandbox`. Every `StreamFile` gets `X-Content-Type-Options: nosniff`. Before, an uploaded `x.html` or `x.svg` was shown inline, and its script ran on the app origin (stored XSS).
@@ -17668,6 +17711,11 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_storage
 
+### Unreleased
+
+- Perf: the S3 driver keeps the SigV4 signing key for each day. Before, every request ran 4 extra HMACs to make it again.
+- Perf: the S3 driver hashes a body of 1 MiB or more (eg. an 8 MiB multipart part) in another isolate. Before, the sha256 blocked the event loop.
+
 ### 3.0.0-alpha.6
 
 - Version bump only, to match the other packages.
@@ -17701,6 +17749,7 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- Perf: object, list, map and union schemas work out `isAsync` once and keep the answer. Before, the whole schema tree was walked on every `validateSchema` call.
 - `url()` now allows only `http` and `https` links. Pass `schemes` to allow others.
 - File type checks now also need the file name extension to fit the bytes. A `.html` file with GIF bytes no longer passes `@Image`. Only another known type (like `.png` with GIF bytes) or a type the browser runs (`html`, `htm`, `xhtml`, `svg`, `xml`, `js`, `mjs`) is refused. A file with no or an unknown extension (like a canvas upload named `blob`) passes when the bytes match.
 

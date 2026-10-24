@@ -4250,7 +4250,7 @@ Each store is made once per isolate, the first time you use it.</p>
 </tr>
 <tr>
 <td><code>memory</code></td>
-<td><code>max_size</code>: the most items. When it is full, the item that was used least recently is removed. No limit by default. Also <code>prefix</code>.</td>
+<td><code>max_size</code>: the most items. When it is full, the item that was used least recently is removed. No limit by default. Expired items are removed when read, and by a sweep every few thousand writes. Also <code>prefix</code>.</td>
 </tr>
 <tr>
 <td><code>redis</code></td>
@@ -4296,6 +4296,7 @@ A <code>Map</code> comes back as <code>Map&lt;String, dynamic&gt;</code>. A <cod
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>A missing key gives <code>null</code>. A stored <code>String</code> comes back as JSON, with its quotes: <code>"bar"</code>.</p>
+<p>The memory driver also keeps values as JSON text, so a caller can not change a cached value by mistake. This means <code>get</code> decodes the text on every hit, also in memory. For a big value that you send as is, <code>getRaw</code> skips this work.</p>
 <h3 id="another-store">Another store</h3>
 <p><code>store(name)</code> uses a store from the config instead of the default store:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">store</span><span class="p">(</span><span class="s1">'redis'</span><span class="p">).</span><span class="n">put</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span><span class="w"> </span><span class="s1">'bar'</span><span class="p">);</span>

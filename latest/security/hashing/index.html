@@ -2780,6 +2780,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#without-blocking-the-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without blocking the server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cost
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#with-login" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3894,6 +3916,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#without-blocking-the-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without blocking the server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cost
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#with-login" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3958,6 +4002,19 @@ The same password gives a different hash each time.</p>
 </span></code></pre></div>
 <p><code>Hash.verify(password, hashedPassword)</code> returns <code>true</code> when the password matches.
 It returns <code>false</code> when the password does not match, or when <code>hashedPassword</code> is not a valid bcrypt hash (for example an empty string).</p>
+<h2 id="without-blocking-the-server">Without blocking the server</h2>
+<p>bcrypt takes many milliseconds of CPU. <code>Hash.make</code> and <code>Hash.verify</code> run on the request isolate, so that isolate can not answer other requests in the meantime.
+Use the async versions in a request handler. They run bcrypt in another isolate.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">user</span><span class="p">.</span><span class="n">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">makeAsync</span><span class="p">(</span><span class="n">body</span><span class="p">.</span><span class="n">password</span><span class="p">);</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">verifyAsync</span><span class="p">(</span><span class="s1">'secret'</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">password</span><span class="o">!</span><span class="p">);</span>
+</span></code></pre></div>
+<h2 id="cost">Cost</h2>
+<p><code>Hash.rounds</code> is the bcrypt cost for new hashes. The default is <code>10</code>. Each step up doubles the time.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">Hash</span><span class="p">.</span><span class="n">rounds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">12</span><span class="p">;</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kt">String</span><span class="w"> </span><span class="n">hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">make</span><span class="p">(</span><span class="s1">'secret'</span><span class="p">,</span><span class="w"> </span><span class="nl">rounds:</span><span class="w"> </span><span class="m">12</span><span class="p">);</span><span class="w"> </span><span class="c1">// or per call</span>
+</span></code></pre></div>
+<p>Old hashes keep their own cost, so they still verify.
+If you change it, also set <code>hashRounds</code> on <code>JwtAuthDriver</code> to the same value. See <a href="../authentication/">Authentication</a>.</p>
 <h2 id="with-login">With login</h2>
 <p>You do not need <code>Hash.verify</code> for normal login.
 <code>Auth().attempt()</code> from <code>dox_auth</code> finds the user and checks the password with bcrypt.
