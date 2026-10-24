@@ -105,6 +105,33 @@ void main() {
     });
   }
 
+  test('a big result (sent without a copy)', () async {
+    // over 64 KiB: Rust gives the bytes to Dart as external typed data
+    MysqlNativeResult r = await pool.query(
+      "SELECT n, REPEAT('x', 100) AS t FROM (WITH RECURSIVE s(n) AS "
+      '(SELECT 1 UNION ALL SELECT n + 1 FROM s WHERE n < 2000) '
+      'SELECT n FROM s) q',
+    );
+    expect(r.rows, hasLength(2000));
+    expect(r.rows.last, <String, dynamic>{'n': 2000, 't': 'x' * 100});
+  });
+
+  test('the same sql gets the new columns after ALTER TABLE', () async {
+    await pool.execute('DROP TABLE IF EXISTS mn_alter');
+    await pool.execute('CREATE TABLE mn_alter (a INT)');
+    await pool.execute('INSERT INTO mn_alter VALUES (1)');
+    String sql = 'SELECT * FROM mn_alter';
+    expect((await pool.query(sql)).rows.single, <String, dynamic>{'a': 1});
+    await pool.execute(
+      "ALTER TABLE mn_alter ADD COLUMN b VARCHAR(5) DEFAULT 'x'",
+    );
+    expect((await pool.query(sql)).rows.single, <String, dynamic>{
+      'a': 1,
+      'b': 'x',
+    });
+    await pool.execute('DROP TABLE mn_alter');
+  });
+
   test('null values', () async {
     await pool.execute(
       'INSERT INTO mn_types (i) VALUES (?)',
