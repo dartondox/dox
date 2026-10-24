@@ -131,21 +131,21 @@ Use `1` in tests. See [Isolate](../digging-deeper/isolate.md).
 
 ## Where the database pools live
 
-The ORM is started in a service (`ORMService`). Every isolate runs `setup()`, so every isolate opens its own pool.
+The ORM is started in a service (`ORMService`). Every isolate runs `setup()`, so every isolate opens a pool.
+The native drivers live in Rust. There, isolates that open the same settings get the same pool.
 
 | Driver | Per isolate | Per process |
 | --- | --- | --- |
-| Postgres native (`dox_postgres_native`) | one pool of `maxConnectionCount` connections | one Rust runtime, shared by all pools (`extra['threads']`, default `1`) |
-| MySQL native (`dox_mysql_native`) | one pool | one Rust runtime, shared by all pools |
-| Dart drivers (`postgres`, `mysql_dart`) | one pool | nothing shared |
+| Postgres native (`dox_postgres_native`) | nothing | one pool of `maxConnectionCount` connections per settings, and one Rust runtime (`extra['threads']`, default `1`) |
+| MySQL native (`dox_mysql_native`) | nothing | one pool of `maxConnectionCount` connections per settings, and one Rust runtime |
+| Dart drivers (`postgres`, `mysql_dart`) | one pool of `maxConnectionCount` connections | nothing shared |
 | SQLite | one connection | nothing shared |
 
-So the total number of connections is `isolates × maxConnectionCount`.
-With 8 cores and the default of 10, the app can open 80 connections. Set `maxConnectionCount` with this in mind.
+So with the native drivers, the app opens at most `maxConnectionCount` connections, for any number of isolates.
+With the Dart drivers, it is `isolates × maxConnectionCount`: with 8 cores and the default of 10, 80 connections.
+The pool size is always your choice. Set it below the `max_connections` of the database.
 
-!!! note "Share one native pool between isolates"
-    A native pool has a `handle` (an `int`). Give it to another isolate and use
-    `PostgresNativeDriver(PgNativePool.fromHandle(handle))` there. Then both isolates use one pool.
+The pool closes when the last isolate that uses it closes it.
     See [Native Postgres driver](../database/postgres-native.md#options).
 
 The native drivers are the default. When the native library does not load, the ORM uses the Dart driver and prints one warning line.

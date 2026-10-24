@@ -98,15 +98,22 @@ The driver reads these keys from `extra` of the `ConnectionConfig`:
 
 | Key | Default | What it does |
 |---|---|---|
-| `maxConnectionCount` | `10` | Most connections in the pool. |
+| `maxConnectionCount` | `10` | Most connections in the pool, for the whole process. |
 | `timeZone` | `UTC` | Time zone of the session, like the Dart driver. |
 | `applicationName` | none | Name of the app in `pg_stat_activity`. |
 | `threads` | `1` | Rust threads for all pools of the process. `0` is one thread with a single-thread runtime. Only the first pool sets it. |
 
-Each isolate that runs `setup()` makes its own pool. To share one pool
-between isolates, give `driver.pool.handle` (an `int`) to the other
-isolates and use `PostgresNativeDriver(PgNativePool.fromHandle(handle))`
-there. `PostgresNativeDriver` comes from `package:dox_orm/dox_orm.dart`.
+Isolates that open a pool with the same settings share one pool in Rust.
+So `maxConnectionCount` is for the whole process, not per isolate. The
+pool closes when the last isolate closes it. You can also give
+`driver.pool.handle` (an `int`) to another isolate and use
+`PostgresNativeDriver(PgNativePool.fromHandle(handle))` there.
+`PostgresNativeDriver` comes from `package:dox_orm/dox_orm.dart`.
+
+Each connection keeps up to 512 prepared statements. When it is full, it
+drops the one used longest ago. A request (pool slot, connect and query)
+fails after 300 s with no answer. A transaction that gets no request for
+300 s is rolled back.
 
 ## Use it without the ORM
 
