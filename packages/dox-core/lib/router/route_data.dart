@@ -4,7 +4,9 @@ class RouteData {
   final String method;
   String path;
   final dynamic controllers;
-  Map<String, dynamic> params = <String, dynamic>{};
+
+  /// set by [withParams]. made only when a plain route reads it.
+  late Map<String, dynamic> params = <String, dynamic>{};
 
   /// middleware from groups and routers (`Route.middleware`, global
   /// middleware). they are also the first items of [controllers].
@@ -15,6 +17,9 @@ class RouteData {
   Object? body;
 
   final String? domain;
+
+  /// [domain] in lower case, made once.
+  late final String? domainLower = domain?.toLowerCase();
   final bool? corsEnabled;
 
   ControllerPlan? _handler;
