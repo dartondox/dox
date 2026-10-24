@@ -17754,6 +17754,8 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- Performance: a broadcast builds the websocket text frame and its UTF-8 bytes once and shares them with every client (new `SharedText`). Before, each client built and encoded its own copy.
+- Performance: a broadcast with no `except` and at most one room goes over the room members directly. Before, it copied all socket ids into new sets each time.
 - Breaking: `SocketIoServer.listen()` starts a native server (`dox_http_native`), not a `dart:io` one. The websocket transport uses the native WebSocket upgrade. Long-polling works the same. `attach()` still takes any `HttpServer`, also a `dart:io` one.
 - Security: on the native server, a websocket message over `maxHttpBufferSize` bytes is closed with 1009 in Rust, before Dart reads it.
 - Security: a binary packet nested deeper than 32 levels is a parse error (`SocketDecoder(maxDepth: ...)`). Before, a deep packet overflowed the stack and could stop the server. Any decode error now closes only that one connection.
@@ -17888,6 +17890,8 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- Performance: an emit to a room makes the JSON and the UTF-8 bytes once, not once per member. The `exclude` list is checked as a set.
+- Performance: room members are a set, so a leave is fast and a rejoin does not add the socket twice.
 - Breaking: websockets run on the native server (`dox_http_native`), not on `dart:io`. Rust does the upgrade and the WebSocket protocol. The public API is the same: the socket is still a `dart:io` `WebSocket`.
 - Security: a message over `maxMessageSize` bytes is now closed with 1009 in Rust, before Dart reads it. Before, `dart:io` read the whole message into memory first.
 - Breaking: `joinRoom` is refused unless you set `WebsocketServer().authorizeJoin`. Before, any client could join any room, like `user:42`, and get its messages.

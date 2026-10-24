@@ -7640,6 +7640,8 @@
 <h2 id="dox_socketio">dox_socketio</h2>
 <h3 id="unreleased_11">Unreleased</h3>
 <ul>
+<li>Performance: a broadcast builds the websocket text frame and its UTF-8 bytes once and shares them with every client (new <code>SharedText</code>). Before, each client built and encoded its own copy.</li>
+<li>Performance: a broadcast with no <code>except</code> and at most one room goes over the room members directly. Before, it copied all socket ids into new sets each time.</li>
 <li>Breaking: <code>SocketIoServer.listen()</code> starts a native server (<code>dox_http_native</code>), not a <code>dart:io</code> one. The websocket transport uses the native WebSocket upgrade. Long-polling works the same. <code>attach()</code> still takes any <code>HttpServer</code>, also a <code>dart:io</code> one.</li>
 <li>Security: on the native server, a websocket message over <code>maxHttpBufferSize</code> bytes is closed with 1009 in Rust, before Dart reads it.</li>
 <li>Security: a binary packet nested deeper than 32 levels is a parse error (<code>SocketDecoder(maxDepth: ...)</code>). Before, a deep packet overflowed the stack and could stop the server. Any decode error now closes only that one connection.</li>
@@ -7774,6 +7776,8 @@
 <h2 id="dox_websocket">dox_websocket</h2>
 <h3 id="unreleased_14">Unreleased</h3>
 <ul>
+<li>Performance: an emit to a room makes the JSON and the UTF-8 bytes once, not once per member. The <code>exclude</code> list is checked as a set.</li>
+<li>Performance: room members are a set, so a leave is fast and a rejoin does not add the socket twice.</li>
 <li>Breaking: websockets run on the native server (<code>dox_http_native</code>), not on <code>dart:io</code>. Rust does the upgrade and the WebSocket protocol. The public API is the same: the socket is still a <code>dart:io</code> <code>WebSocket</code>.</li>
 <li>Security: a message over <code>maxMessageSize</code> bytes is now closed with 1009 in Rust, before Dart reads it. Before, <code>dart:io</code> read the whole message into memory first.</li>
 <li>Breaking: <code>joinRoom</code> is refused unless you set <code>WebsocketServer().authorizeJoin</code>. Before, any client could join any room, like <code>user:42</code>, and get its messages.</li>
