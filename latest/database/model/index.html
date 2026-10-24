@@ -4336,9 +4336,15 @@ The function gets a map and returns the value.</p>
 </span></code></pre></div>
 <ul>
 <li>On insert, <code>null</code> fields are not sent, so the database default is used.</li>
+<li>On update, only the fields that changed are sent.
+  A field is compared to its value from the last load or save.
+  A <code>Map</code> or <code>List</code> field is always sent, because it can change in place.</li>
+<li>When nothing changed, <code>save()</code> runs no query, and <code>updated_at</code> stays as it is.</li>
 <li>On update, a field is set to <code>NULL</code> only when it had a value before
   (loaded from the database, or saved).
   Fields that were not loaded, for example with <code>select()</code>, are not changed.</li>
+<li>On insert, <code>save()</code> runs one <code>INSERT</code>. It reads the new id from the
+  insert, so there is no <code>SELECT</code> after it.</li>
 <li><code>save()</code> returns <code>false</code> when a <a href="events/">model event</a> cancels it.</li>
 </ul>
 <h3 id="mass-assignment">Mass assignment</h3>

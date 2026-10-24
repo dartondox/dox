@@ -4745,6 +4745,9 @@ The column must be a plain name. Use <code>whereRaw</code> for expressions.</p>
 </span></code></pre></div>
 <ul>
 <li>Each value is sent as a bound parameter.</li>
+<li>On Postgres, a list of only <code>int</code> or only <code>String</code> values is sent as one array
+  parameter: <code>"id" = ANY(@id_p0)</code> (<code>&lt;&gt; ALL</code> for <code>whereNotIn</code>).
+  So a list of any size gives the same SQL, and Postgres reuses one prepared statement.</li>
 <li>An empty list matches no rows for <code>whereIn</code>, and all rows for <code>whereNotIn</code>.</li>
 </ul>
 <h3 id="wherenull-and-wherenotnull"><code>whereNull</code> and <code>whereNotNull</code></h3>
@@ -4808,8 +4811,10 @@ Anything else, like <code>count(*)</code>, throws an <code>ArgumentError</code>.
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">limit</span><span class="p">(</span><span class="m">10</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
 </span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">take</span><span class="p">(</span><span class="m">10</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
 </span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">limit</span><span class="p">(</span><span class="m">10</span><span class="p">).</span><span class="n">offset</span><span class="p">(</span><span class="m">20</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1">// LIMIT 10 OFFSET 20</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1">// LIMIT @dox_limit OFFSET @dox_offset</span>
 </span></code></pre></div>
+<p>The numbers are sent as bound parameters.
+So every page of <code>paginate()</code> has the same SQL, and the database reuses one prepared statement.</p>
 <h3 id="groupby"><code>groupBy</code></h3>
 <p>Takes one column, or a list of columns.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'actor'</span><span class="p">)</span>

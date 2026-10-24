@@ -4338,7 +4338,9 @@ Each isolate has one connection.
 While a transaction is open, the other queries of that isolate wait.
 The database file uses WAL mode, so readers do not wait for the writer.
 <code>busy_timeout</code> makes a query wait for a lock from another isolate, instead of failing.
-Foreign keys are turned on.</p>
+Foreign keys are turned on.
+Before each <code>SELECT</code>, the driver runs <code>PRAGMA schema_version</code> to see if a table changed.
+This is a small cost on every read. It is fine for development and tests.</p>
 </div>
 <div class="admonition info">
 <p class="admonition-title">Types</p>

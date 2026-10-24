@@ -6756,6 +6756,8 @@ For a busy production app, use Postgres or MySQL.
     The database file uses WAL mode, so readers do not wait for the writer.
     `busy_timeout` makes a query wait for a lock from another isolate, instead of failing.
     Foreign keys are turned on.
+    Before each `SELECT`, the driver runs `PRAGMA schema_version` to see if a table changed.
+    This is a small cost on every read. It is fine for development and tests.
 
 !!! info "Types"
     SQLite has no bool, JSON or date type. Dox converts them for you:
@@ -6951,6 +6953,9 @@ await Actor().where('age', 60).orWhereNotIn('id', <int>[1, 2]).get();
 ```
 
 - Each value is sent as a bound parameter.
+- On Postgres, a list of only `int` or only `String` values is sent as one array
+  parameter: `"id" = ANY(@id_p0)` (`<> ALL` for `whereNotIn`).
+  So a list of any size gives the same SQL, and Postgres reuses one prepared statement.
 - An empty list matches no rows for `whereIn`, and all rows for `whereNotIn`.
 
 ### `whereNull` and `whereNotNull`
@@ -7030,8 +7035,11 @@ await Actor().orderBy('name', 'asc').orderBy('id', 'desc').get();
 await Actor().limit(10).get();
 await Actor().take(10).get();
 await Actor().limit(10).offset(20).get();
-// LIMIT 10 OFFSET 20
+// LIMIT @dox_limit OFFSET @dox_offset
 ```
+
+The numbers are sent as bound parameters.
+So every page of `paginate()` has the same SQL, and the database reuses one prepared statement.
 
 ### `groupBy`
 
@@ -7259,6 +7267,9 @@ await QueryBuilder.transaction(() async {
 - A transaction uses one connection of the pool. Other queries use the other connections.
 - SQLite has one connection per isolate.
   While a transaction is open, the other queries of that isolate wait.
+- When a model has more than one relation to load (`preload` or `eager`),
+  the relation queries run at the same time outside a transaction.
+  Inside a transaction, they run one after another on its connection.
 - Values are always sent as bound parameters. They are never written into the SQL text.
 
 !!! note "Changed in 3.x"
@@ -8387,9 +8398,15 @@ Blog created = await Blog().create(<String, dynamic>{
 ```
 
 - On insert, `null` fields are not sent, so the database default is used.
+- On update, only the fields that changed are sent.
+  A field is compared to its value from the last load or save.
+  A `Map` or `List` field is always sent, because it can change in place.
+- When nothing changed, `save()` runs no query, and `updated_at` stays as it is.
 - On update, a field is set to `NULL` only when it had a value before
   (loaded from the database, or saved).
   Fields that were not loaded, for example with `select()`, are not changed.
+- On insert, `save()` runs one `INSERT`. It reads the new id from the
+  insert, so there is no `SELECT` after it.
 - `save()` returns `false` when a [model event](events.md) cancels it.
 
 ### Mass assignment
@@ -9151,10 +9168,12 @@ You do not call `preload`.
 The load runs this SQL:
 
 ```sql
-SELECT "user".*, "comment"."id" as "_foreign_id" FROM "user"
-  LEFT JOIN "comment" on "comment"."user_id" = "user"."id"
-  WHERE "comment"."user_id" IN (@commentuser_id_p0, ...)
+SELECT * FROM "user"
+  WHERE "user"."id" IN (@userid_p0, ...)
 ```
+
+Each user is read once, also when it has many comments.
+Comments of the same user get the same `User` object.
 
 ## Options
 
@@ -17100,6 +17119,14 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_builder
 
+### Unreleased
+
+- The generated `fromMap()` takes a `DateTime` from the driver as it is. It only parses a string.
+- New generated `columnsToMap()` with the columns only. `convertToMap()` adds the relations to it.
+- Models with no `beforeGet` hook get `readsRowDates => true`, so their rows skip the date to string step. A `beforeGet` hook still gets dates as strings.
+- `tableColumns`, `preloadList`, `timestampsColumn` and the relation matchers are `const`, so no new list or map is made on each call.
+- Run `dart run build_runner build` to get the new code.
+
 ### 3.0.0-alpha.6
 
 - Version bump only, to match the other packages.
@@ -17523,6 +17550,19 @@ What changed in each package, newest first. This page is made from the
 ## dox_orm
 
 ### Unreleased
+
+- Faster `belongsTo` load. It reads each owner once with `WHERE owner.id IN (...)`, with no join to the children. Before, a user with 10,000 blogs came back 10,000 times. Children of the same owner now get the same model object.
+- `save()` on a new model runs one `INSERT` and reads the id from it. There is no `SELECT` after it. `insert()` and `create()` use `RETURNING *` on Postgres and SQLite, so they also skip the `SELECT`. MySQL still reads the row with `find()`.
+- `save()` on an existing model sends only the columns that changed since the last load or save. A `Map` or `List` field is always sent. When nothing changed, `save()` runs no query and `updated_at` stays as it is. Before, it always ran an `UPDATE` with every column that had a value.
+- Fix: after `restore()`, a `save()` on the same model sent the old `deleted_at` again and deleted the row again. Now `deleted_at` is not sent, because it did not change.
+- `LIMIT` and `OFFSET` are bound parameters (`@dox_limit`, `@dox_offset`). Every page gives the same SQL, so the drivers reuse one prepared statement.
+- On Postgres, `whereIn` and `whereNotIn` with only `int` or only `String` values send one array parameter (`= ANY(@p)`, `<> ALL(@p)`). A list of any size gives the same SQL. Other lists keep one parameter per value.
+- Relations of one model (`preload` and `eager`) load at the same time outside a transaction, so the native drivers send them in one batch. Inside a transaction they still load one by one. New `DBDriver.inTransaction`.
+- Rows of a model made by the new generator skip the date to string step. `fromMap()` takes the `DateTime` of the driver as it is. `toMap(original: true)` still gives dates as ISO strings.
+- New `Model.columnsToMap()`: the columns only, without relations. `save()` uses it, so it no longer turns preloaded relations into JSON.
+- Less work per row: the where, join and order lists of a model are made only when used. `getPreload()` and the generated getters do not make a new list or map on each call.
+- The SQL text is no longer scanned for double spaces on each query. `orderBy()` without a direction no longer adds a space.
+- `QueryBuilderHelper.runQuery()` no longer has the `clean` parameter.
 
 - Breaking: column and table names in `select`, `where`, `orderBy`, `groupBy`, `join`, `insert` and `update` must be plain names (`name`, `table.name`, `table.*`, `*`, `name as alias`). Anything else, like `count(*)`, throws an `ArgumentError`. Before, a name with `(` went into the SQL as it is, so user input could add SQL. Use `selectRaw`, `whereRaw` or the new `orderByRaw` and `groupByRaw` for expressions.
 - Breaking: the operator of `where()` and `join()` must be one of `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `like`, `not like`, `ilike` (any case). Any other value throws an `ArgumentError`.

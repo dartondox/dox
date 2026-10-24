@@ -3948,6 +3948,9 @@ A rollback can not undo them.</p>
 <li>A transaction uses one connection of the pool. Other queries use the other connections.</li>
 <li>SQLite has one connection per isolate.
   While a transaction is open, the other queries of that isolate wait.</li>
+<li>When a model has more than one relation to load (<code>preload</code> or <code>eager</code>),
+  the relation queries run at the same time outside a transaction.
+  Inside a transaction, they run one after another on its connection.</li>
 <li>Values are always sent as bound parameters. They are never written into the SQL text.</li>
 </ul>
 <div class="admonition note">
