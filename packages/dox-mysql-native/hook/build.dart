@@ -109,7 +109,9 @@ Future<Uri?> _download(
   if (file.existsSync() && _sha(file.readAsBytesSync()) == hash) {
     return file.uri;
   }
-  HttpClient client = HttpClient();
+  // a stalled download must not hang the build forever
+  HttpClient client = HttpClient()
+    ..connectionTimeout = const Duration(seconds: 30);
   try {
     HttpClientRequest req = await client.getUrl(
       Uri.parse('$_releases/dox_mysql_native-v$version/$asset'),
@@ -120,7 +122,9 @@ Future<Uri?> _download(
       return null;
     }
     List<int> bytes = <int>[
-      for (List<int> chunk in await res.toList()) ...chunk,
+      for (List<int> chunk
+          in await res.timeout(const Duration(seconds: 60)).toList())
+        ...chunk,
     ];
     if (_sha(bytes) != hash) {
       stderr.writeln('dox_mysql_native: sha256 of $asset does not match');
@@ -129,7 +133,7 @@ Future<Uri?> _download(
     file.parent.createSync(recursive: true);
     file.writeAsBytesSync(bytes);
     return file.uri;
-  } on IOException catch (error) {
+  } on Exception catch (error) {
     stderr.writeln('dox_mysql_native: download $asset failed: $error');
     return null;
   } finally {
