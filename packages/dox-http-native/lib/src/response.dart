@@ -8,9 +8,10 @@ import 'package:dox_http_native/src/request.dart';
 
 /// [HttpResponse] for the native server.
 ///
-/// The body is kept in memory and sent to Rust in one piece on [close].
-// ponytail: no streaming to the socket yet. A big file is held in memory
-// until close. Add chunk records with flow control when that matters.
+/// A small body is kept in memory and sent to Rust in one piece on
+/// [close]. When [addStream] passes [streamAt] bytes, the answer starts and
+/// the body goes out in parts. At most [window] bytes wait in Rust, so a
+/// big file never sits in memory and the client gets data early.
 class NativeResponse implements HttpResponse {
   NativeResponse(this._request)
     : headers = NativeHeaders.response(_request.server.defaultResponseHeaders);
@@ -42,6 +43,19 @@ class NativeResponse implements HttpResponse {
 
   List<int>? _first;
   BytesBuilder? _more;
+  int _size = 0;
+
+  /// [addStream] starts a streamed answer from this many body bytes
+  static const int streamAt = 64 * 1024;
+
+  /// most bytes given to Rust and not yet sent to the client
+  static const int window = 1024 * 1024;
+
+  /// the stream id, once the body goes out in parts
+  int? _stream;
+  int _unsent = 0;
+  Completer<void>? _room;
+  bool _gone = false;
 
   /// true after [close]
   bool get isClosed => _closed;
@@ -49,8 +63,26 @@ class NativeResponse implements HttpResponse {
   /// the body, all chunks together
   List<int> takeBody() {
     BytesBuilder? more = _more;
-    if (more != null) return more.takeBytes();
-    return _first ?? const <int>[];
+    List<int> body = more != null ? more.takeBytes() : _first ?? const <int>[];
+    _first = null;
+    _more = null;
+    _size = 0;
+    return body;
+  }
+
+  /// Rust sent [bytes] of the streamed body to the client. -1: the client
+  /// is gone, stop sending.
+  void streamed(int bytes) {
+    if (bytes < 0) {
+      _gone = true;
+    } else {
+      _unsent -= bytes;
+    }
+    Completer<void>? room = _room;
+    if (room != null && (_gone || _unsent <= window)) {
+      _room = null;
+      room.complete();
+    }
   }
 
   /// Marks the response as sent: a WebSocket accept answers the request.
@@ -94,6 +126,14 @@ class NativeResponse implements HttpResponse {
   void add(List<int> data) {
     if (_closed) throw StateError('StreamSink is closed');
     if (data.isEmpty) return;
+    int? stream = _stream;
+    if (stream != null) {
+      if (_gone) return;
+      _request.server.sendPart(stream, data);
+      _unsent += data.length;
+      return;
+    }
+    _size += data.length;
     if (_first == null) {
       _first = data;
       return;
@@ -126,8 +166,40 @@ class NativeResponse implements HttpResponse {
 
   @override
   Future<void> addStream(Stream<List<int>> stream) async {
-    await for (List<int> chunk in stream) {
-      add(chunk);
+    try {
+      await for (List<int> chunk in stream) {
+        add(chunk);
+        if (_stream == null && _size >= streamAt) _startStream();
+        // wait while Rust holds a full window, so memory stays small
+        if (_unsent > window) await (_room = Completer<void>()).future;
+        if (_gone) break; // the client left: stop reading the source
+      }
+    } catch (_) {
+      int? id = _stream;
+      if (id != null && !_closed) {
+        // the head is sent: cut the connection, the body is not whole
+        _closed = true;
+        _request.server.endStream(id, ok: false);
+        _done?.complete(this);
+      }
+      rethrow;
+    }
+  }
+
+  /// Sends the head and the body so far. Later parts go out at once.
+  void _startStream() {
+    _checkCookies();
+    List<int> first = takeBody();
+    _stream = _request.server.startStream(_request, this, first);
+    _unsent += first.length;
+  }
+
+  /// Cookie does not check its domain, so a line break there would add a
+  /// header. Check before the head is sent.
+  void _checkCookies() {
+    if (!hasCookies) return;
+    for (Cookie cookie in cookies) {
+      checkHeaderValue(cookie.toString());
     }
   }
 
@@ -137,15 +209,15 @@ class NativeResponse implements HttpResponse {
   @override
   Future<HttpResponse> close() {
     if (!_closed) {
-      // Cookie does not check its domain, so a line break there would add
-      // a header. Check before the response is marked closed.
-      if (hasCookies) {
-        for (Cookie cookie in cookies) {
-          checkHeaderValue(cookie.toString());
-        }
-      }
+      int? stream = _stream;
+      // checked before the response is marked closed
+      if (stream == null) _checkCookies();
       _closed = true;
-      _request.server.send(_request, this);
+      if (stream == null) {
+        _request.server.send(_request, this);
+      } else {
+        _request.server.endStream(stream);
+      }
       _done?.complete(this);
     }
     return done;
