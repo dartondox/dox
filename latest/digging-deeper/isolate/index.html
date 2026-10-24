@@ -3970,7 +3970,6 @@
 <li>Native server on Linux: each isolate has its own socket (<code>SO_REUSEPORT</code>).</li>
 <li>Native server on macOS: the isolates share one socket.</li>
 <li>Native server on Windows: only one isolate serves HTTP.</li>
-<li><code>dart:io</code> server: <code>HttpServer.bind(..., shared: true)</code> on every system.</li>
 </ul>
 <p>With the native server, each isolate has its own Rust acceptor on the port:</p>
 <pre class="mermaid"><code>flowchart TD

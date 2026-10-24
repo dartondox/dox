@@ -4339,10 +4339,9 @@ It runs on the same port, works with the official Socket.IO clients, and has ack
 <code>dox_websocket</code> keeps working next to it.</p>
 </div>
 <div class="admonition info">
-<p class="admonition-title">WebSocket uses the <code>dart:io</code> server</p>
-<p>The native server can not upgrade a connection to WebSocket yet.
-So when your app has a WebSocket route, Dox uses the <code>dart:io</code> server by itself.
-See <a href="../native-server/#use-dartio-instead">Native server</a>.</p>
+<p class="admonition-title">WebSocket runs on the native server</p>
+<p>Rust does the upgrade and the WebSocket protocol. Your handlers stay in Dart.
+See <a href="../native-server/#websocket">Native server</a>.</p>
 </div>
 <h2 id="setup">Setup</h2>
 <h3 id="1-add-the-package">1. Add the package</h3>
@@ -4496,7 +4495,7 @@ The Redis adapter sends each message to all isolates and all servers.</p>
 <ul>
 <li>If you log users in with cookies, set <code>allowedOrigins</code>. Else any website can open a websocket as your user.</li>
 <li>A request with no <code>Origin</code> header (not a browser) is allowed.</li>
-<li>Compression is off. dart:io reads a whole message before Dox checks its size, so also set a size limit in your proxy.</li>
+<li>Compression is off. The native server checks the size of each message in Rust, before Dart reads it.</li>
 </ul>
 <h2 id="client-examples">Client examples</h2>
 <h3 id="dart">Dart</h3>

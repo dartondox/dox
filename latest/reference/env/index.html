@@ -3982,13 +3982,6 @@
 <td><code>APP_HOST=127.0.0.1</code></td>
 </tr>
 <tr>
-<td><code>DOX_SERVER</code></td>
-<td><code>dox_core</code> (<code>DoxServer.usesNative()</code>)</td>
-<td>not set (uses <code>AppConfig.server</code>)</td>
-<td><code>dartio</code>, <code>dart_io</code> or <code>dart:io</code> forces the <code>dart:io</code> server. <code>native</code> forces the native server, also for an app with WebSocket routes. Real environment only.</td>
-<td><code>DOX_SERVER=dartio</code></td>
-</tr>
-<tr>
 <td><code>DOX_HTTP_THREAD</code></td>
 <td><code>dox_http_native</code> (Rust, <code>shared_thread()</code>)</td>
 <td>not set (one thread per isolate)</td>
@@ -4074,7 +4067,7 @@
 </tr>
 </tbody>
 </table>
-<p><code>DOX_SERVER</code>, <code>DOX_HTTP_THREAD</code> and <code>DOX_DB_DRIVER</code> are read with <code>Platform.environment</code> or <code>std::env::var</code>. They do not work from <code>.env</code>.</p>
+<p><code>DOX_HTTP_THREAD</code> and <code>DOX_DB_DRIVER</code> are read with <code>Platform.environment</code> or <code>std::env::var</code>. They do not work from <code>.env</code>.</p>
 <h2 id="read-by-a-new-project">Read by a new project</h2>
 <p>A new project (<code>dox create</code>) reads these keys through its typed env class, <code>lib/config/env.dart</code>. The framework itself does not read them. In code, use the getter: <code>env.appPort</code>.</p>
 <table>

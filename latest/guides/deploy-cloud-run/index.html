@@ -4094,8 +4094,8 @@ The Docker image itself was built and run locally.</p>
 <div class="admonition note">
 <p class="admonition-title">Check for <code>(native)</code></p>
 <p>The project's <code>Dockerfile</code> copies <code>libgcc_s.so.1</code> into the image, so the
-native HTTP server loads. The start log ends with <code>(native)</code>. If it says
-<code>using the dart:io server</code>, see <a href="../docker/">Docker</a>.</p>
+native HTTP server loads. The start log ends with <code>(native)</code>. If the app
+stops with <code>dox_http_native did not load</code>, see <a href="../docker/">Docker</a>.</p>
 </div>
 <h2 id="the-port-port-and-app_port">The port: <code>PORT</code> and <code>APP_PORT</code></h2>
 <p>Cloud Run sends requests to one port of the container. It puts that port in the <code>PORT</code> env variable. The default is <code>8080</code>.</p>

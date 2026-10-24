@@ -4171,8 +4171,8 @@ The second one has only the Dart runtime files and the bundle. No SDK, no source
 <div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Server started at http://[::]:3000 with 8 isolate (native)
 </span></code></pre></div>
 <p>Without the <code>libgcc_s</code> lines, the native HTTP server does not load in a
-<code>scratch</code> image. Dox then prints <code>dox_http_native did not load, using the
-dart:io server</code> and runs on the slower <code>dart:io</code> server.</p>
+<code>scratch</code> image. Dox then stops at start with <code>dox_http_native did not
+load</code> and the reason.</p>
 <div class="admonition warning">
 <p class="admonition-title"><code>dox build</code>, not <code>dart compile exe</code></p>
 <p><code>dox_orm</code> bundles SQLite with a build hook. <code>dart compile exe</code> does not run build hooks and stops with an error.

@@ -7175,6 +7175,9 @@
 <h2 id="dox_core">dox_core</h2>
 <h3 id="unreleased_4">Unreleased</h3>
 <ul>
+<li>Breaking: the <code>dart:io</code> server is gone. Every app runs on the native server (<code>dox_http_native</code>), also an app with WebSocket or Socket.IO routes. <code>AppConfig.server</code>, the <code>ServerBackend</code> enum and the <code>DOX_SERVER</code> env var are removed. <code>DoxServer.usesNative()</code> and the <code>isolateId</code> option of <code>DoxServer.listen()</code> are removed.</li>
+<li>Breaking: when the native library does not load, Dox stops at start with an error. It says why (eg. an ABI mismatch) and how to fix it (install Rust so the build hook can build it, or rebuild your <code>lib_path</code> library). Before, Dox logged a warning and used <code>dart:io</code>.</li>
+<li>On a graceful stop (SIGTERM, <code>Dox().stop()</code>), open WebSockets get close code 1001.</li>
 <li>Perf: <code>AESEncryptor</code> keeps the key bytes of the last secret and writes the output into one buffer. Decode reads the nonce and text without copies. The output format is the same.</li>
 <li>New: <code>Hash.makeAsync()</code> and <code>Hash.verifyAsync()</code>. They run bcrypt in another isolate, so a request does not block the server.</li>
 <li>New: <code>Hash.rounds</code> (default 10) sets the bcrypt cost. <code>Hash.make()</code> also takes <code>rounds:</code>.</li>
@@ -7290,6 +7293,15 @@
 <h2 id="dox_http_native">dox_http_native</h2>
 <h3 id="unreleased_5">Unreleased</h3>
 <ul>
+<li>New: WebSocket upgrade on the native server. <code>NativeWebSocket.upgrade(request, protocol: ..., maxMessageSize: ...)</code> accepts it and gives a <code>dart:io</code> <code>WebSocket</code>. Rust (tokio-tungstenite) speaks the protocol: ping and pong, the close handshake, the UTF-8 check and the size limit (a bigger message closes with <code>1009</code>). Compression is never agreed. <code>NativeWebSocket.isUpgradeRequest(request)</code> tells if a request asks for one.</li>
+<li>On a graceful <code>close()</code>, open WebSockets get close code <code>1001</code>.</li>
+<li>WebSocket limits, so a slow client or a busy isolate can not make memory grow forever:</li>
+<li>Messages to a client wait in a queue. Over 4 times <code>maxMessageSize</code> (at least 1 MiB) the socket closes with <code>1008</code> (policy violation).</li>
+<li>A message that can not be sent in 30 seconds drops the socket (<code>1006</code>). The close handshake (our close frame and the answer) has 5 seconds in all, then the socket is dropped (<code>1006</code>).</li>
+<li>When Dart has more than 8 MiB of client messages not yet handled, Rust stops reading from WebSocket clients until it catches up. No message is lost. HTTP is not paused.</li>
+<li>New: <code>NativeHttpServer.ensureAvailable()</code> throws an error that says why the library did not load and how to fix it. <code>bind</code> throws the same error.</li>
+<li>Breaking: native ABI 5 (new WebSocket records, and an ack record from Dart). Needs a new native library build. The build hook builds it with cargo until the next release.</li>
+<li>Breaking: Dox has no <code>dart:io</code> server any more. When this library does not load, Dox stops at start with the reason.</li>
 <li>Security: a multipart form may be up to <code>maxMultipartSize</code> bytes (new <code>bind</code> option, default <code>maxBodySize</code>). Any other body, eg. JSON, raw or text, is limited to <code>maxBodySize</code>. Dox passes its own two limits, so a JSON body over 10 MB now gets <code>413</code> from Rust.</li>
 <li>Security: a body with a too big <code>Content-Length</code> and <code>Expect: 100-continue</code> gets <code>413</code> at once. Without <code>Expect</code>, Rust reads and drops the body (up to 64 MB more, no memory kept), then sends <code>413</code>, so the client sees the <code>413</code> and not a connection reset.</li>
 <li>Security: Rust no longer reserves memory from the client <code>Content-Length</code> (at most 64 KB up front).</li>
@@ -7628,6 +7640,8 @@
 <h2 id="dox_socketio">dox_socketio</h2>
 <h3 id="unreleased_11">Unreleased</h3>
 <ul>
+<li>Breaking: <code>SocketIoServer.listen()</code> starts a native server (<code>dox_http_native</code>), not a <code>dart:io</code> one. The websocket transport uses the native WebSocket upgrade. Long-polling works the same. <code>attach()</code> still takes any <code>HttpServer</code>, also a <code>dart:io</code> one.</li>
+<li>Security: on the native server, a websocket message over <code>maxHttpBufferSize</code> bytes is closed with 1009 in Rust, before Dart reads it.</li>
 <li>Security: a binary packet nested deeper than 32 levels is a parse error (<code>SocketDecoder(maxDepth: ...)</code>). Before, a deep packet overflowed the stack and could stop the server. Any decode error now closes only that one connection.</li>
 <li>Security: many CONNECT packets for one namespace at once make only one socket. Before, each one made a socket that stayed in memory.</li>
 <li>Security: websocket compression is off. A small compressed message could grow very big in memory.</li>
@@ -7760,6 +7774,8 @@
 <h2 id="dox_websocket">dox_websocket</h2>
 <h3 id="unreleased_14">Unreleased</h3>
 <ul>
+<li>Breaking: websockets run on the native server (<code>dox_http_native</code>), not on <code>dart:io</code>. Rust does the upgrade and the WebSocket protocol. The public API is the same: the socket is still a <code>dart:io</code> <code>WebSocket</code>.</li>
+<li>Security: a message over <code>maxMessageSize</code> bytes is now closed with 1009 in Rust, before Dart reads it. Before, <code>dart:io</code> read the whole message into memory first.</li>
 <li>Breaking: <code>joinRoom</code> is refused unless you set <code>WebsocketServer().authorizeJoin</code>. Before, any client could join any room, like <code>user:42</code>, and get its messages.</li>
 <li>Security: new <code>WebsocketServer().allowedOrigins</code>. When set, a websocket from another origin gets 403. When null (the default), any origin is allowed.</li>
 <li>

@@ -1722,11 +1722,11 @@ Dox starts one isolate per CPU core (`Platform.numberOfProcessors`). Every isola
 
 Every isolate runs its own HTTP server on the same port. The operating system spreads the connections.
 
-| System | Native server | `dart:io` server |
-| --- | --- | --- |
-| Linux | one socket per isolate (`SO_REUSEPORT`) | `HttpServer.bind(..., shared: true)` |
-| macOS | the isolates share one socket | `HttpServer.bind(..., shared: true)` |
-| Windows | only one isolate serves HTTP | `HttpServer.bind(..., shared: true)` |
+| System | Native server |
+| --- | --- |
+| Linux | one socket per isolate (`SO_REUSEPORT`) |
+| macOS | the isolates share one socket |
+| Windows | only one isolate serves HTTP |
 
 Each isolate also has its own Rust network thread. `DOX_HTTP_THREAD=shared` puts all isolates on one thread. Leave it off unless you measure a gain.
 
@@ -2242,7 +2242,6 @@ Dox 3.0 does not have these Laravel features. Check the [packages](../packages/v
 | Rate limiting middleware | not there. Write a middleware with the cache, or use a proxy. |
 | `php artisan route:list`, `tinker` | not there |
 | Savepoints in nested transactions | not there. A nested `transaction()` joins the outer one. |
-| WebSocket on the native server | not there yet. An app with WebSocket routes uses the `dart:io` server. |
 
 What is there, as separate packages: [validation](../packages/validation.md), [OpenAPI docs](../packages/openapi.md),
 [storage](../packages/storage.md), [cache](../packages/cache.md), [Socket.IO](../packages/socketio.md),
@@ -2293,7 +2292,7 @@ It lists facts only. Each project is good at different things.
 | CLI and code generation | `dox` CLI, `build_runner` for DTOs, models and OpenAPI | `dart_frog` CLI: `create`, `dev` (hot reload), `build` | `serverpod` CLI, generates server and client code | No CLI (`shelf_router_generator` for routes from annotations) | No CLI |
 | Native binary | `dox build` makes an AOT binary | `dart_frog build` makes a production build with a Dockerfile | Deploy to Serverpod Cloud, Docker or Terraform. Binary: see their docs. | Your app is plain Dart. Compile it like any Dart program. | Your app is plain Dart. Compile it like any Dart program. |
 | Multi-core | One isolate per CPU core by default | See their docs | One isolate per process. Scale with more processes and server roles. | `serve(..., shared: true)` and your own isolates | Yes, a multi-isolate mode is in their README |
-| HTTP server | Native server in Rust (hyper) by default, `dart:io` as fallback | Shelf on `dart:io` | Relic (their own) for the web server. API server: see their docs. | `dart:io` `HttpServer` (`shelf_io`) | `dart:io` |
+| HTTP server | Native server in Rust (hyper), also for WebSocket | Shelf on `dart:io` | Relic (their own) for the web server. API server: see their docs. | `dart:io` `HttpServer` (`shelf_io`) | `dart:io` |
 | Databases | Postgres, MySQL, MariaDB, SQLite | Not built in | Postgres, SQLite (also SQLite on the device). Redis for cache. | Not built in | Not built in |
 | Code sharing with Flutter | `@Dto` classes in a pure Dart package, see [Share code with Flutter](../guides/share-code-with-flutter.md) | Plain Dart packages. A generated client is marked "in progress" in their feature list. | Generated client package, and shared packages for models | Plain Dart packages | Plain Dart packages |
 | License | MIT | MIT | BSD-3 for most packages. The main `serverpod` package is SSPL. | BSD-3-Clause | MIT for the core. Some parts BSD. |
@@ -2355,7 +2354,7 @@ No package is marked "stable API" yet. That comes with 3.0 stable.
 
 | Package | What it does | State | Tests |
 | --- | --- | --- | --- |
-| `dox_core` | Routes, middleware, controllers, request and response, isolates, config | May change | 29 test files. CI runs them on the native server and on `dart:io`. |
+| `dox_core` | Routes, middleware, controllers, request and response, isolates, config | May change | 29 test files. CI runs them on the native server. |
 | `dox_orm` | Query builder, models, relations, transactions, drivers | May change | 16 test files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite, with the native and the Dart drivers. |
 | `dox_validation` | `@Dto` rules, fluent schemas, JSON Schema, Standard Schema | May change | 6 test files |
 | `dox_builder` | Code generator for models, DTOs, env classes and OpenAPI | May change | 4 test files |
@@ -2400,7 +2399,6 @@ These were checked by searching the code in `packages/*/lib` with `rg`.
 
 | Item | Source |
 | --- | --- |
-| WebSocket on the native server. Today an app with WebSocket routes uses the `dart:io` server. | `TODO(native)` in `dox_http_native/lib/src/response.dart` and `dox_core/lib/server/dox_server.dart` |
 | Stream big responses to the socket on the native server. Today a big file is held in memory. | `ponytail:` note in `dox_http_native/lib/src/response.dart` |
 | TLS for the native Postgres driver | `ponytail:` note in `dox_orm/lib/src/drivers/postgres_native_driver.dart` |
 | Savepoints for nested transactions. Today a nested `transaction()` joins the outer one. | `ponytail:` notes in the `dox_orm` drivers and in `dox_migration` |
@@ -4823,7 +4821,6 @@ Dox starts many isolates. Each one runs its own HTTP server on the same port. Th
 - Native server on Linux: each isolate has its own socket (`SO_REUSEPORT`).
 - Native server on macOS: the isolates share one socket.
 - Native server on Windows: only one isolate serves HTTP.
-- `dart:io` server: `HttpServer.bind(..., shared: true)` on every system.
 
 With the native server, each isolate has its own Rust acceptor on the port:
 
@@ -5052,10 +5049,9 @@ Source: https://dartondox.dev/latest/3.xdigging-deeper/websocket/
     It runs on the same port, works with the official Socket.IO clients, and has acks and namespaces.
     `dox_websocket` keeps working next to it.
 
-!!! info "WebSocket uses the `dart:io` server"
-    The native server can not upgrade a connection to WebSocket yet.
-    So when your app has a WebSocket route, Dox uses the `dart:io` server by itself.
-    See [Native server](native-server.md#use-dartio-instead).
+!!! info "WebSocket runs on the native server"
+    Rust does the upgrade and the WebSocket protocol. Your handlers stay in Dart.
+    See [Native server](native-server.md#websocket).
 
 ## Setup
 
@@ -5219,7 +5215,7 @@ Set these on `WebsocketServer` in your service:
 
 - If you log users in with cookies, set `allowedOrigins`. Else any website can open a websocket as your user.
 - A request with no `Origin` header (not a browser) is allowed.
-- Compression is off. dart:io reads a whole message before Dox checks its size, so also set a size limit in your proxy.
+- Compression is off. The native server checks the size of each message in Rust, before Dart reads it.
 
 ## Client examples
 
@@ -5820,8 +5816,9 @@ Source: https://dartondox.dev/latest/3.xdigging-deeper/native-server/
 
 # Native server
 
-Dox runs on a native HTTP server by default. It comes from the package
-`dox_http_native`. You do not need to set anything.
+Dox runs on a native HTTP server. It comes from the package
+`dox_http_native`. You do not need to set anything. Every app uses it, also
+an app with WebSocket or Socket.IO routes.
 
 - Rust ([hyper](https://hyper.rs)) owns the sockets and parses HTTP.
 - All your code stays in Dart: routes, controllers, DTOs, middleware, ORM.
@@ -5848,28 +5845,43 @@ Each isolate runs its own server on the same port:
 - macOS: the isolates share one socket.
 - Windows: only one isolate serves HTTP.
 
-## Use dart:io instead
+## When the library does not load
 
-Set `server` in `AppConfig`:
+Dox stops at start, before any isolate runs. The error says why and how to
+fix it:
 
-```dart
-AppConfig(
-  // ...
-  server: ServerBackend.dartIo,
-);
+```
+Unsupported operation: dox_http_native did not load: <reason>.
+Fix: install Rust (cargo, see https://rustup.rs), then run the app again ...
 ```
 
-Or set the env var `DOX_SERVER=dartio`. The env var wins over the config.
+`<reason>` is for example `native library ABI 4, expected 5`: the library on
+disk is from another version of the package. See
+[Troubleshooting](../reference/troubleshooting.md#the-native-http-library-did-not-load).
 
-Dox also uses `dart:io` by itself in these cases:
+## WebSocket
 
-- The native library did not load. Dox prints one warning line at start:
-  `[dox] warning: dox_http_native did not load, using the dart:io server (...)`.
-- The app has WebSocket or Socket.IO routes. The native server can not
-  upgrade a connection to WebSocket yet.
+Rust also does the WebSocket upgrade and the WebSocket protocol.
 
-`DOX_SERVER=native` forces the native server, also for an app with WebSocket
-routes. WebSocket upgrades then fail with 500. Socket.IO long-polling works.
+1. Rust marks a request that asks for an upgrade.
+2. Dart runs the route, the middleware and the `Origin` check, like for any
+   request. A normal answer (eg. `403`) refuses the upgrade.
+3. When Dart accepts, Rust sends the `101` answer. From then on Rust
+   answers pings, does the close handshake, checks that text is UTF-8 and
+   checks the size of each message.
+4. Dart gets whole messages, in the same batches as requests. It sends
+   messages back the same way as answers.
+
+- A message or frame over the size limit closes the socket with code `1009`.
+  Dart never reads it. `dox_websocket` uses `maxMessageSize`, Socket.IO uses
+  `maxHttpBufferSize`.
+- Compression (permessage-deflate) is never agreed. A small compressed
+  message could grow very big in memory.
+- On a graceful stop (SIGTERM), every open WebSocket gets close code `1001`.
+- In your own code, use `NativeWebSocket.upgrade(request)` from
+  `dox_http_native`. It gives a `dart:io` `WebSocket`.
+
+## Threads
 
 Each isolate has its own Rust network thread. `DOX_HTTP_THREAD=shared` puts
 all isolates on one thread. It is off by default: on 2 cores the one thread
@@ -5890,7 +5902,6 @@ a gain.
 - A response is sent when it is closed. It is kept in memory until then,
   also a big file. Use a proxy (nginx, Caddy) or a storage link for big
   downloads.
-- No WebSocket upgrade yet (see above).
 - `compress: true` works: Dart gzips the body.
 
 ## Where the library comes from
@@ -5914,7 +5925,8 @@ that works:
    Windows (x64).
 4. A build from source with `cargo`, when Rust is installed.
 
-When none works, the app still builds and runs on `dart:io`.
+When none works, the app still builds, but it stops at start with the
+error above. Install Rust and run it again, so step 4 works.
 
 !!! note "Use `dart build cli`"
     `dart compile exe` does not run build hooks. Use `dox build` or
@@ -5991,7 +6003,8 @@ How it was run:
 - Dart 3.13.6, Rust 1.99.1. Dox is built with `dart build cli` (this is
   what `dox build` does). The build hook of `dox_http_native` builds the
   Rust library with cargo.
-- `DOX_SERVER=dartio` runs the same Dox app on `dart:io`.
+- The `dart:io` row is the same Dox app on a `dart:io` `HttpServer`, from a
+  build that still had it. Dox now runs on the native server only.
 
 ## App benchmark
 
@@ -10721,8 +10734,9 @@ AppConfig appConfig = AppConfig(
 `io.listen(port)` opens its own port. Run it in its own small program, for example `bin/socket.dart`,
 next to the Dox HTTP server. Put both behind the same proxy.
 
-- `io.attach(httpServer)` uses a `dart:io` server you already have.
-- In your own `dart:io` server, call `io.handle(request)` when `io.matches(request)` is true.
+- `io.listen(port)` starts a native server (`dox_http_native`).
+- `io.attach(httpServer)` uses a server you already have: a `NativeHttpServer` or a `dart:io` one.
+- In your own server, call `io.handle(request)` when `io.matches(request)` is true.
 - The path is `/socket.io/` by default.
 
 ## Namespaces in a class
@@ -10814,7 +10828,7 @@ SocketIoServer(
 - `cors` with a list of origins: a websocket from another origin gets 403. A request with no `Origin` header (not a browser) is allowed.
 - `cors: null`, or `*` in `origins`: websockets from any origin are allowed. If you log users in with cookies, list your origins.
 - `*` together with `credentials: true` throws an `ArgumentError`. List your origins instead.
-- Websocket compression is off. dart:io reads a whole message before Dox checks its size, so also set a size limit in your proxy.
+- Websocket compression is off. On the native server, Rust checks the size of each message (`maxHttpBufferSize`) before Dart reads it. A bigger one closes with code 1009. On a plain `dart:io` server (`io.attach`), `dart:io` reads the whole message first, so also set a size limit in your proxy.
 
 ## Many servers: Redis adapter
 
@@ -13858,8 +13872,8 @@ Server started at http://[::]:3000 with 8 isolate (native)
 ```
 
 Without the `libgcc_s` lines, the native HTTP server does not load in a
-`scratch` image. Dox then prints `dox_http_native did not load, using the
-dart:io server` and runs on the slower `dart:io` server.
+`scratch` image. Dox then stops at start with `dox_http_native did not
+load` and the reason.
 
 !!! warning "`dox build`, not `dart compile exe`"
     `dox_orm` bundles SQLite with a build hook. `dart compile exe` does not run build hooks and stops with an error.
@@ -14222,7 +14236,7 @@ Migrated: 2026_10_22_205345_create_posts_table
 {"level":"INFO","name":"dox","message":"Server started at http://127.0.0.1:3000 with 2 isolate (native)", ...}
 ```
 
-`(native)` means the native HTTP server loaded. `(dart:io)` means it did not, and the line before it says why.
+`(native)` means the native HTTP server loaded. When it does not load, the app stops at start and the error says why.
 
 Check that the app port is closed. From your machine:
 
@@ -14288,8 +14302,8 @@ The image is small. For the blog API it is about 17 MB. Fly builds it for you on
 
 !!! note "Check for `(native)`"
     The project's `Dockerfile` copies `libgcc_s.so.1` into the image, so the
-    native HTTP server loads. The start log ends with `(native)`. If it says
-    `using the dart:io server`, see [Docker](docker.md).
+    native HTTP server loads. The start log ends with `(native)`. If the app
+    stops with `dox_http_native did not load`, see [Docker](docker.md).
 
 ## 1. Make the app on Fly.io
 
@@ -14501,8 +14515,8 @@ The image is small. For the blog API it is about 17 MB.
 
 !!! note "Check for `(native)`"
     The project's `Dockerfile` copies `libgcc_s.so.1` into the image, so the
-    native HTTP server loads. The start log ends with `(native)`. If it says
-    `using the dart:io server`, see [Docker](docker.md).
+    native HTTP server loads. The start log ends with `(native)`. If the app
+    stops with `dox_http_native did not load`, see [Docker](docker.md).
 
 ## The port: `PORT` and `APP_PORT`
 
@@ -15174,7 +15188,6 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `serverPort` | `int` | `3000` | The port the HTTP server listens on. When the env has no `APP_PORT` but has `PORT`, Dox listens on `PORT` instead (Cloud Run, Fly, Render and Heroku set it). |
 | `host` | `String?` | `null`: `APP_HOST`, else all interfaces | The network interface to listen on, like `127.0.0.1`. `null` reads the env var `APP_HOST`. With neither, Dox listens on all interfaces, IPv6 and IPv4 (`::`). |
 | `totalIsolate` | `int?` | `Platform.numberOfProcessors` | Isolates (threads) that serve HTTP, all on the same port. On Windows the native server runs on one isolate. |
-| `server` | `ServerBackend` | `ServerBackend.native` | Which HTTP server runs: `native` (Rust, `dox_http_native`) or `dartIo`. The env var `DOX_SERVER` wins over this value. See [Native server](../digging-deeper/native-server.md). |
 | `compress` | `bool` | `false` | gzip responses in Dart (`HttpServer.autoCompress`). It costs CPU on every response. Let a proxy do it when you have one. |
 | `maxBodySize` | `int` | `10 * 1024 * 1024` (10 MB) | Biggest JSON or urlencoded body in bytes. Bigger gets `413`. |
 | `maxMultipartSize` | `int` | `100 * 1024 * 1024` (100 MB) | Biggest `multipart/form-data` body (file uploads) in bytes. Bigger gets `413`. |
@@ -16076,7 +16089,6 @@ The code reads env vars in three ways:
 | `APP_ENV` | `dox_core` (`Dox().checkAppKey()`, `OpenApiConfig.isEnabled`) | empty | Any value except `development`, `local` or `test` (also empty) makes a bad `APP_KEY` a startup error: missing, not exactly 32 characters, or a public sample key. In `development`, `local` and `test` it is only a warning. `development` or `local` turn the `/docs` routes on when `openApi.enabled` is `null`. Read with `Env.get`. | `APP_ENV=production` |
 | `PORT` | `dox_core` (`DoxServer.portFor()`) | not set | The port to listen on, when `APP_PORT` is not set. Cloud Run, Fly, Render and Heroku set it. `APP_PORT` wins when both are set. Read with `Env.get`. | `PORT=8080` |
 | `APP_HOST` | `dox_core` (`DoxServer.hostFor()`) | not set (all interfaces, `::`) | The host to listen on. `127.0.0.1` keeps the app off the network, for an app behind a proxy on the same machine. `AppConfig.host` wins over it. Read with `Env.get`. | `APP_HOST=127.0.0.1` |
-| `DOX_SERVER` | `dox_core` (`DoxServer.usesNative()`) | not set (uses `AppConfig.server`) | `dartio`, `dart_io` or `dart:io` forces the `dart:io` server. `native` forces the native server, also for an app with WebSocket routes. Real environment only. | `DOX_SERVER=dartio` |
 | `DOX_HTTP_THREAD` | `dox_http_native` (Rust, `shared_thread()`) | not set (one thread per isolate) | `shared` puts the servers of all isolates on one network thread. Off by default: on 2 cores it cut req/s by a quarter. Real environment only. | `DOX_HTTP_THREAD=shared` |
 | `DOX_DB_DRIVER` | `dox_orm` (`NativeDrivers.wanted()`) | not set (native driver) | `dart` uses the Dart `postgres` / `mysql_dart` driver instead of the native (Rust) one. Same as `extra: {'native': false}`. Real environment only. | `DOX_DB_DRIVER=dart` |
 | `DATABASE_URL` | `dox_orm` (`DatabaseConfig.url`), `dox_migration` | not set | A database url. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. `dox_orm` reads it from the real environment only. See [Database url](../database/index.md#database_url). | `DATABASE_URL=postgres://app:secret@db:5432/blog?sslmode=require` |
@@ -16090,7 +16102,7 @@ The code reads env vars in three ways:
 | `HOME` / `USERPROFILE` | build hooks of `dox_http_native`, `dox_postgres_native`, `dox_mysql_native` | empty | Used to find `~/.cargo/bin/cargo` when the library must be built from source. | set by the OS |
 | `DART_VM_OPTIONS` | the Dart VM | not set | Flags for the VM. The AOT binary from `dox build` reads it. Dox never sets VM flags for you. See [Performance](../digging-deeper/performance.md#dart-vm-flags). | `DART_VM_OPTIONS=--new_gen_semi_max_size=64` |
 
-`DOX_SERVER`, `DOX_HTTP_THREAD` and `DOX_DB_DRIVER` are read with `Platform.environment` or `std::env::var`. They do not work from `.env`.
+`DOX_HTTP_THREAD` and `DOX_DB_DRIVER` are read with `Platform.environment` or `std::env::var`. They do not work from `.env`.
 
 ## Read by a new project
 
@@ -16459,7 +16471,7 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | Check | How | Read more |
 | --- | --- | --- |
 | AOT binary, not `dart run` | `dox build`, then run `build/bundle/bin/server`. Keep `bin/` and `lib/` together. Not `dart compile exe`. | [Deployment](../digging-deeper/deployment.md) |
-| Native server is on | The start line says `(native)`. When it says `(dart:io)`, look for the `[dox] warning: dox_http_native did not load` line. | [Native server](../digging-deeper/native-server.md) |
+| Native server loads | The app starts and the start line says `(native)`. When the library does not load, the app stops with `dox_http_native did not load` and the fix. | [Native server](../digging-deeper/native-server.md) |
 | Native database driver is on | No `[dox] warning: dox_postgres_native did not load` (or `mysql`) line at start. Do not set `DOX_DB_DRIVER=dart`. Postgres with TLS uses the Dart driver. | [Postgres native](../database/postgres-native.md) |
 | Isolates = cores | Keep the default `totalIsolate` (`Platform.numberOfProcessors`), or set `APP_TOTAL_ISOLATE` to the cores the container really gets. Use fewer when the database runs on the same machine. | [Isolate](../digging-deeper/isolate.md) |
 | Shared state across isolates | Cache: `redis`, not `memory`. WebSocket: `WebsocketRedisAdapter`. Socket.IO: a Redis adapter and `transports: ['websocket']`. | [Isolate](../digging-deeper/isolate.md) |
@@ -16542,22 +16554,17 @@ Real problems, with the text you see, the cause and the fix. The texts come from
 
 ## The native HTTP library did not load
 
-**Symptom.** One line at start, on stderr:
+**Symptom.** The app stops at start with this error:
 
 ```
-[dox] warning: dox_http_native did not load, using the dart:io server (<reason>)
-```
-
-and the start line says `(dart:io)` instead of `(native)`:
-
-```
-Server started at http://[::]:3000 with 8 isolate (dart:io)
+Unsupported operation: dox_http_native did not load: <reason>.
+Fix: install Rust (cargo, see https://rustup.rs), then run the app again ...
 ```
 
 At build time (`dart pub get`, `dox serve` or `dox build`) you may also see one of these:
 
 ```
-dox_http_native: no native library for <os>-<arch>. Dox will use dart:io.
+dox_http_native: no native library for <os>-<arch>. Install Rust (cargo) to build it from source.
 dox_http_native: download dox_http_native-<os>-<arch>.<ext>: 404
 dox_http_native: download dox_http_native-<os>-<arch>.<ext> failed: <error>
 dox_http_native: sha256 of dox_http_native-<os>-<arch>.<ext> does not match
@@ -16573,8 +16580,8 @@ dox_http_native: cargo build failed
 
 **Fix.** Pick one:
 
-1. Accept `dart:io`. The app works, only slower. To hide the warning set `DOX_SERVER=dartio` or `server: ServerBackend.dartIo` in `AppConfig`.
-2. Install Rust with [rustup](https://rustup.rs) and run `dart pub get` again. The hook builds the library with `cargo`.
+1. Install Rust with [rustup](https://rustup.rs) and run `dart pub get` again. The hook builds the library with `cargo`.
+2. When the reason is an ABI mismatch and you set `lib_path`, rebuild that library: `cargo build --release` in `packages/dox-http-native/native`.
 3. Download the library from the GitHub release `dox_http_native-v<version>` yourself and point to it in the root `pubspec.yaml`:
 
     ```yaml
@@ -16586,7 +16593,7 @@ dox_http_native: cargo build failed
 
 4. Build with `dox build` (it runs `dart build cli`), not with `dart compile exe`.
 
-The same applies to the native database drivers. The warning is then:
+The native database drivers find their library the same way. They do not stop the app. The warning is then:
 
 ```
 [dox] warning: dox_postgres_native did not load, using the Dart postgres driver (<reason>)
@@ -16599,17 +16606,13 @@ See [Native server](../digging-deeper/native-server.md), [Postgres native](../da
 
 ## Port already in use
 
-**Symptom.** With the `dart:io` server:
-
-```
-SocketException: Failed to create server socket (OS Error: Address already in use, errno = 48), address = ::, port = 3000
-```
-
-(`errno = 48` on macOS, `errno = 98` on Linux.) With the native server:
+**Symptom.** At start:
 
 ```
 SocketException: dox_http_native: bind failed (<code>), port = 3000
 ```
+
+`<code>` is `-1000` minus the OS error: `-1048` on macOS, `-1098` on Linux.
 
 **Cause.** Another process listens on the port. Often it is an old `bin/server.dart` that `dox serve` did not stop, or a second copy of the app.
 
@@ -16777,8 +16780,7 @@ On Windows the folder is `%LOCALAPPDATA%\Pub\Cache\bin`.
 | `db/migration has Dart migrations, but bin/migrate.dart is missing.` | `dox migration:*` found Dart migration files but no entry point. | Run `dox make:migration <name>` once. It writes `bin/migrate.dart`. |
 | `<name> not found` (an `Exception` from `DatabaseConfig`) | `DatabaseConfig.connection` names a key that is not in `connections`. | Fix `DB_CONNECTION` or the map. |
 | `Storage disk "<name>" has unknown driver "<type>"` | A disk in `StorageConfig` has a `driver` other than `local`, `s3` or `memory`. | Fix the driver name. |
-| `Windows: the native server runs on one isolate` | Windows has no `SO_REUSEPORT`. | Not an error. Use `DOX_SERVER=dartio` to use every core on Windows. |
-| `WebSocket or Socket.IO routes: using the dart:io server` | The native server can not upgrade to WebSocket yet. | Not an error. `DOX_SERVER=native` forces native, then WebSocket upgrades fail with `500`. |
+| `Windows: the native server runs on one isolate` | Windows has no `SO_REUSEPORT`. | Not an error. Run more instances behind a proxy to use every core. |
 
 
 ---
@@ -16800,15 +16802,13 @@ A lookup table of the messages Dox prints or throws. Search this page for the te
 | Text | When | What to do |
 | --- | --- | --- |
 | `APP_KEY is not set. Run `dox key:generate` and put the key in .env` | `appKey` is empty. A warning, or a `StateError` that stops the app when `APP_ENV=production`. | Run `dox key:generate`, or set `APP_KEY` in the env. |
-| `[dox] warning: dox_http_native did not load, using the dart:io server (<reason>)` | The native HTTP library is missing or from another version. | See [Troubleshooting](troubleshooting.md#the-native-http-library-did-not-load). Or set `DOX_SERVER=dartio`. |
-| `Server started at http://<host>:<port> with <n> isolate (<backend>)` | Normal start. `<host>` is the address it listens on: `[::]` means all interfaces. `<backend>` is `native` or `dart:io`. | Nothing. |
-| `WebSocket or Socket.IO routes: using the dart:io server` | The app has WebSocket or Socket.IO. The native server can not upgrade yet. | Nothing. This is info. |
-| `Windows: the native server runs on one isolate` | Windows has no `SO_REUSEPORT`. | Nothing, or `DOX_SERVER=dartio` to use every core. |
+| `Unsupported operation: dox_http_native did not load: <reason>. Fix: ...` | The native HTTP library is missing or from another version (`native library ABI <x>, expected <y>`). The app stops at start. | Do what the `Fix:` part says. See [Troubleshooting](troubleshooting.md#the-native-http-library-did-not-load). |
+| `Server started at http://<host>:<port> with <n> isolate (native)` | Normal start. `<host>` is the address it listens on: `[::]` means all interfaces. | Nothing. |
+| `Windows: the native server runs on one isolate` | Windows has no `SO_REUSEPORT`. | Nothing. |
 | `Socket.IO runs on <n> isolates: clients should use transports: ['websocket'] ...` | Socket.IO with more than one isolate and long-polling on. | Use a Redis adapter, and `transports: ['websocket']` in the client. |
 | `[dox] isolate <n> error: <error>` | An error killed a worker isolate. The stack is on the next line. | Fix the error. Dox restarts the isolate. |
 | `[dox] isolate <n> exited, restarting` | A worker isolate died. A new one starts after 1 second. | Look at the error line above it. |
-| `SocketException: Failed to create server socket (OS Error: Address already in use, ...)` | The port is in use (`dart:io` server). | See [Troubleshooting](troubleshooting.md#port-already-in-use). |
-| `SocketException: dox_http_native: bind failed (<code>), port = <port>` | The port is in use (native server). | Same as above. |
+| `SocketException: dox_http_native: bind failed (<code>), port = <port>` | The port is in use. | See [Troubleshooting](troubleshooting.md#port-already-in-use). |
 
 ## dox_core: routes and controllers
 
@@ -16991,16 +16991,19 @@ These stop `dart run build_runner build`.
 
 ## Native libraries (build hooks)
 
-Printed during `dart pub get`, `dox serve` or `dox build`. `<pkg>` is `dox_http_native`, `dox_postgres_native` or `dox_mysql_native`. The app still runs, on the Dart fallback.
+Printed during `dart pub get`, `dox serve` or `dox build`. `<pkg>` is `dox_http_native`, `dox_postgres_native` or `dox_mysql_native`.
+
+- `dox_postgres_native` and `dox_mysql_native`: the app still runs, on the Dart DB driver.
+- `dox_http_native`: there is no fallback. The app stops at start with an error that says why the library did not load and how to fix it.
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `<pkg>: no native library for <os>-<arch>.` | No ready build for this OS and CPU. | Install Rust, or accept the fallback. |
+| `<pkg>: no native library for <os>-<arch>.` | No ready build for this OS and CPU. | Install Rust. For a DB driver you may also accept the Dart fallback. |
 | `<pkg>: download <file>: <status>` / `<pkg>: download <file> failed: <error>` | The GitHub download failed. | Check the network, then `dart pub get` again. |
 | `<pkg>: sha256 of <file> does not match` | The downloaded file is not the expected one. | Delete `.dart_tool` and try again. |
 | `<pkg>: cargo build failed` | The build from source failed. | Read the cargo output below it. |
 | `Bad state: <pkg>: <path> does not exist` | The `lib_path` user define points to a missing file. | Fix the path in `pubspec.yaml`. |
-| `Unsupported operation: dox_http_native can not detach the socket` | `DOX_SERVER=native` with a WebSocket route. The upgrade fails with `500`. | Do not force native for WebSocket apps. |
+| `Unsupported operation: dox_http_native can not detach the socket. Use NativeWebSocket.upgrade for a WebSocket.` | Code called `detachSocket()` on a response. Rust owns the socket. | For a WebSocket use `NativeWebSocket.upgrade(request)`. |
 
 See [Native server](../digging-deeper/native-server.md).
 
@@ -17277,6 +17280,9 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- Breaking: the `dart:io` server is gone. Every app runs on the native server (`dox_http_native`), also an app with WebSocket or Socket.IO routes. `AppConfig.server`, the `ServerBackend` enum and the `DOX_SERVER` env var are removed. `DoxServer.usesNative()` and the `isolateId` option of `DoxServer.listen()` are removed.
+- Breaking: when the native library does not load, Dox stops at start with an error. It says why (eg. an ABI mismatch) and how to fix it (install Rust so the build hook can build it, or rebuild your `lib_path` library). Before, Dox logged a warning and used `dart:io`.
+- On a graceful stop (SIGTERM, `Dox().stop()`), open WebSockets get close code 1001.
 - Perf: `AESEncryptor` keeps the key bytes of the last secret and writes the output into one buffer. Decode reads the nonce and text without copies. The output format is the same.
 - New: `Hash.makeAsync()` and `Hash.verifyAsync()`. They run bcrypt in another isolate, so a request does not block the server.
 - New: `Hash.rounds` (default 10) sets the bcrypt cost. `Hash.make()` also takes `rounds:`.
@@ -17394,6 +17400,15 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- New: WebSocket upgrade on the native server. `NativeWebSocket.upgrade(request, protocol: ..., maxMessageSize: ...)` accepts it and gives a `dart:io` `WebSocket`. Rust (tokio-tungstenite) speaks the protocol: ping and pong, the close handshake, the UTF-8 check and the size limit (a bigger message closes with `1009`). Compression is never agreed. `NativeWebSocket.isUpgradeRequest(request)` tells if a request asks for one.
+- On a graceful `close()`, open WebSockets get close code `1001`.
+- WebSocket limits, so a slow client or a busy isolate can not make memory grow forever:
+  - Messages to a client wait in a queue. Over 4 times `maxMessageSize` (at least 1 MiB) the socket closes with `1008` (policy violation).
+  - A message that can not be sent in 30 seconds drops the socket (`1006`). The close handshake (our close frame and the answer) has 5 seconds in all, then the socket is dropped (`1006`).
+  - When Dart has more than 8 MiB of client messages not yet handled, Rust stops reading from WebSocket clients until it catches up. No message is lost. HTTP is not paused.
+- New: `NativeHttpServer.ensureAvailable()` throws an error that says why the library did not load and how to fix it. `bind` throws the same error.
+- Breaking: native ABI 5 (new WebSocket records, and an ack record from Dart). Needs a new native library build. The build hook builds it with cargo until the next release.
+- Breaking: Dox has no `dart:io` server any more. When this library does not load, Dox stops at start with the reason.
 - Security: a multipart form may be up to `maxMultipartSize` bytes (new `bind` option, default `maxBodySize`). Any other body, eg. JSON, raw or text, is limited to `maxBodySize`. Dox passes its own two limits, so a JSON body over 10 MB now gets `413` from Rust.
 - Security: a body with a too big `Content-Length` and `Expect: 100-continue` gets `413` at once. Without `Expect`, Rust reads and drops the body (up to 64 MB more, no memory kept), then sends `413`, so the client sees the `413` and not a connection reset.
 - Security: Rust no longer reserves memory from the client `Content-Length` (at most 64 KB up front).
@@ -17739,6 +17754,8 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- Breaking: `SocketIoServer.listen()` starts a native server (`dox_http_native`), not a `dart:io` one. The websocket transport uses the native WebSocket upgrade. Long-polling works the same. `attach()` still takes any `HttpServer`, also a `dart:io` one.
+- Security: on the native server, a websocket message over `maxHttpBufferSize` bytes is closed with 1009 in Rust, before Dart reads it.
 - Security: a binary packet nested deeper than 32 levels is a parse error (`SocketDecoder(maxDepth: ...)`). Before, a deep packet overflowed the stack and could stop the server. Any decode error now closes only that one connection.
 - Security: many CONNECT packets for one namespace at once make only one socket. Before, each one made a socket that stayed in memory.
 - Security: websocket compression is off. A small compressed message could grow very big in memory.
@@ -17871,6 +17888,8 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- Breaking: websockets run on the native server (`dox_http_native`), not on `dart:io`. Rust does the upgrade and the WebSocket protocol. The public API is the same: the socket is still a `dart:io` `WebSocket`.
+- Security: a message over `maxMessageSize` bytes is now closed with 1009 in Rust, before Dart reads it. Before, `dart:io` read the whole message into memory first.
 - Breaking: `joinRoom` is refused unless you set `WebsocketServer().authorizeJoin`. Before, any client could join any room, like `user:42`, and get its messages.
 - Security: new `WebsocketServer().allowedOrigins`. When set, a websocket from another origin gets 403. When null (the default), any origin is allowed.
 - Security: websocket compression is off, and a message bigger than `WebsocketServer().maxMessageSize` (default 1 MB) closes the connection with code 1009.

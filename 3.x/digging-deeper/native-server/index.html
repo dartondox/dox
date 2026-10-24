@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Dox runs on a native HTTP server by default. It comes from the package dox_http_native. You do not need to set anything.">
+        <meta name="description" content="Dox runs on a native HTTP server. It comes from the package dox_http_native. You do not need to set anything. Every app uses it, also an app with WebSocket...">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Native server | Dox">
-  <meta property="og:description" content="Dox runs on a native HTTP server by default. It comes from the package dox_http_native. You do not need to set anything.">
+  <meta property="og:description" content="Dox runs on a native HTTP server. It comes from the package dox_http_native. You do not need to set anything. Every app uses it, also an app with WebSocket...">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/digging-deeper/native-server/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Native server | Dox">
-  <meta name="twitter:description" content="Dox runs on a native HTTP server by default. It comes from the package dox_http_native. You do not need to set anything.">
+  <meta name="twitter:description" content="Dox runs on a native HTTP server. It comes from the package dox_http_native. You do not need to set anything. Every app uses it, also an app with WebSocket...">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -1736,10 +1736,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#use-dartio-instead" class="md-nav__link">
+  <a href="#when-the-library-does-not-load" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Use dart:io instead
+        When the library does not load
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#websocket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WebSocket
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#threads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Threads
       
     </span>
   </a>
@@ -3894,10 +3916,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#use-dartio-instead" class="md-nav__link">
+  <a href="#when-the-library-does-not-load" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Use dart:io instead
+        When the library does not load
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#websocket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WebSocket
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#threads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Threads
       
     </span>
   </a>
@@ -3963,8 +4007,9 @@
 
 
 <h1 id="native-server">Native server</h1>
-<p>Dox runs on a native HTTP server by default. It comes from the package
-<code>dox_http_native</code>. You do not need to set anything.</p>
+<p>Dox runs on a native HTTP server. It comes from the package
+<code>dox_http_native</code>. You do not need to set anything. Every app uses it, also
+an app with WebSocket or Socket.IO routes.</p>
 <ul>
 <li>Rust (<a href="https://hyper.rs">hyper</a>) owns the sockets and parses HTTP.</li>
 <li>All your code stays in Dart: routes, controllers, DTOs, middleware, ORM.</li>
@@ -3989,23 +4034,40 @@ system when you build the app.</p>
 <li>macOS: the isolates share one socket.</li>
 <li>Windows: only one isolate serves HTTP.</li>
 </ul>
-<h2 id="use-dartio-instead">Use dart:io instead</h2>
-<p>Set <code>server</code> in <code>AppConfig</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nl">server:</span><span class="w"> </span><span class="n">ServerBackend</span><span class="p">.</span><span class="n">dartIo</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">);</span>
+<h2 id="when-the-library-does-not-load">When the library does not load</h2>
+<p>Dox stops at start, before any isolate runs. The error says why and how to
+fix it:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Unsupported operation: dox_http_native did not load: &lt;reason&gt;.
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Fix: install Rust (cargo, see https://rustup.rs), then run the app again ...
 </span></code></pre></div>
-<p>Or set the env var <code>DOX_SERVER=dartio</code>. The env var wins over the config.</p>
-<p>Dox also uses <code>dart:io</code> by itself in these cases:</p>
-<ul>
-<li>The native library did not load. Dox prints one warning line at start:
-  <code>[dox] warning: dox_http_native did not load, using the dart:io server (...)</code>.</li>
-<li>The app has WebSocket or Socket.IO routes. The native server can not
-  upgrade a connection to WebSocket yet.</li>
-</ul>
-<p><code>DOX_SERVER=native</code> forces the native server, also for an app with WebSocket
-routes. WebSocket upgrades then fail with 500. Socket.IO long-polling works.</p>
+<p><code>&lt;reason&gt;</code> is for example <code>native library ABI 4, expected 5</code>: the library on
+disk is from another version of the package. See
+<a href="../../reference/troubleshooting/#the-native-http-library-did-not-load">Troubleshooting</a>.</p>
+<h2 id="websocket">WebSocket</h2>
+<p>Rust also does the WebSocket upgrade and the WebSocket protocol.</p>
+<ol>
+<li>Rust marks a request that asks for an upgrade.</li>
+<li>Dart runs the route, the middleware and the <code>Origin</code> check, like for any
+   request. A normal answer (eg. <code>403</code>) refuses the upgrade.</li>
+<li>When Dart accepts, Rust sends the <code>101</code> answer. From then on Rust
+   answers pings, does the close handshake, checks that text is UTF-8 and
+   checks the size of each message.</li>
+<li>
+<p>Dart gets whole messages, in the same batches as requests. It sends
+   messages back the same way as answers.</p>
+</li>
+<li>
+<p>A message or frame over the size limit closes the socket with code <code>1009</code>.
+  Dart never reads it. <code>dox_websocket</code> uses <code>maxMessageSize</code>, Socket.IO uses
+  <code>maxHttpBufferSize</code>.</p>
+</li>
+<li>Compression (permessage-deflate) is never agreed. A small compressed
+  message could grow very big in memory.</li>
+<li>On a graceful stop (SIGTERM), every open WebSocket gets close code <code>1001</code>.</li>
+<li>In your own code, use <code>NativeWebSocket.upgrade(request)</code> from
+  <code>dox_http_native</code>. It gives a <code>dart:io</code> <code>WebSocket</code>.</li>
+</ol>
+<h2 id="threads">Threads</h2>
 <p>Each isolate has its own Rust network thread. <code>DOX_HTTP_THREAD=shared</code> puts
 all isolates on one thread. It is off by default: on 2 cores the one thread
 was the limit and req/s fell by a quarter. Leave it off unless you measure
@@ -4024,7 +4086,6 @@ a gain.</p>
 <li>A response is sent when it is closed. It is kept in memory until then,
   also a big file. Use a proxy (nginx, Caddy) or a storage link for big
   downloads.</li>
-<li>No WebSocket upgrade yet (see above).</li>
 <li><code>compress: true</code> works: Dart gzips the body.</li>
 </ul>
 <h2 id="where-the-library-comes-from">Where the library comes from</h2>
@@ -4048,7 +4109,8 @@ that works:</p>
    Windows (x64).</li>
 <li>A build from source with <code>cargo</code>, when Rust is installed.</li>
 </ol>
-<p>When none works, the app still builds and runs on <code>dart:io</code>.</p>
+<p>When none works, the app still builds, but it stops at start with the
+error above. Install Rust and run it again, so step 4 works.</p>
 <div class="admonition note">
 <p class="admonition-title">Use <code>dart build cli</code></p>
 <p><code>dart compile exe</code> does not run build hooks. Use <code>dox build</code> or

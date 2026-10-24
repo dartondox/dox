@@ -4160,8 +4160,9 @@ The official clients connect to it with no changes: <code>socket.io-client</code
 <p><code>io.listen(port)</code> opens its own port. Run it in its own small program, for example <code>bin/socket.dart</code>,
 next to the Dox HTTP server. Put both behind the same proxy.</p>
 <ul>
-<li><code>io.attach(httpServer)</code> uses a <code>dart:io</code> server you already have.</li>
-<li>In your own <code>dart:io</code> server, call <code>io.handle(request)</code> when <code>io.matches(request)</code> is true.</li>
+<li><code>io.listen(port)</code> starts a native server (<code>dox_http_native</code>).</li>
+<li><code>io.attach(httpServer)</code> uses a server you already have: a <code>NativeHttpServer</code> or a <code>dart:io</code> one.</li>
+<li>In your own server, call <code>io.handle(request)</code> when <code>io.matches(request)</code> is true.</li>
 <li>The path is <code>/socket.io/</code> by default.</li>
 </ul>
 <h2 id="namespaces-in-a-class">Namespaces in a class</h2>
@@ -4329,7 +4330,7 @@ Any other error is written to stderr. The client only gets <code>{"message": "In
 <li><code>cors</code> with a list of origins: a websocket from another origin gets 403. A request with no <code>Origin</code> header (not a browser) is allowed.</li>
 <li><code>cors: null</code>, or <code>*</code> in <code>origins</code>: websockets from any origin are allowed. If you log users in with cookies, list your origins.</li>
 <li><code>*</code> together with <code>credentials: true</code> throws an <code>ArgumentError</code>. List your origins instead.</li>
-<li>Websocket compression is off. dart:io reads a whole message before Dox checks its size, so also set a size limit in your proxy.</li>
+<li>Websocket compression is off. On the native server, Rust checks the size of each message (<code>maxHttpBufferSize</code>) before Dart reads it. A bigger one closes with code 1009. On a plain <code>dart:io</code> server (<code>io.attach</code>), <code>dart:io</code> reads the whole message first, so also set a size limit in your proxy.</li>
 </ul>
 <h2 id="many-servers-redis-adapter">Many servers: Redis adapter</h2>
 <p>With more than one server process, use the Redis adapter.

@@ -4217,7 +4217,8 @@ It is 5x faster than Dox on <code>dart:io</code>.</p>
 <li>Dart 3.13.6, Rust 1.99.1. Dox is built with <code>dart build cli</code> (this is
   what <code>dox build</code> does). The build hook of <code>dox_http_native</code> builds the
   Rust library with cargo.</li>
-<li><code>DOX_SERVER=dartio</code> runs the same Dox app on <code>dart:io</code>.</li>
+<li>The <code>dart:io</code> row is the same Dox app on a <code>dart:io</code> <code>HttpServer</code>, from a
+  build that still had it. Dox now runs on the native server only.</li>
 </ul>
 <h2 id="app-benchmark">App benchmark</h2>
 <p>A small real app, the same in each language: <code>GET /json</code> returns a map,

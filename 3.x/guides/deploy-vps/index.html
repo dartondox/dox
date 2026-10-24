@@ -4315,7 +4315,7 @@ Build and copy again after this change (steps 1 and 3). See <a href="../../diggi
 </span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>Migrated: 2026_10_22_205345_create_posts_table
 </span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>{"level":"INFO","name":"dox","message":"Server started at http://127.0.0.1:3000 with 2 isolate (native)", ...}
 </span></code></pre></div>
-<p><code>(native)</code> means the native HTTP server loaded. <code>(dart:io)</code> means it did not, and the line before it says why.</p>
+<p><code>(native)</code> means the native HTTP server loaded. When it does not load, the app stops at start and the error says why.</p>
 <p>Check that the app port is closed. From your machine:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>curl<span class="w"> </span>-m<span class="w"> </span><span class="m">5</span><span class="w"> </span>http://api.example.com:3000/api/ping<span class="w">   </span><span class="c1"># must time out</span>
 </span></code></pre></div>

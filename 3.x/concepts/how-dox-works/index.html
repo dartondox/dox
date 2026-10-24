@@ -4207,24 +4207,20 @@ Dox starts one isolate per CPU core (<code>Platform.numberOfProcessors</code>). 
 <tr>
 <th>System</th>
 <th>Native server</th>
-<th><code>dart:io</code> server</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Linux</td>
 <td>one socket per isolate (<code>SO_REUSEPORT</code>)</td>
-<td><code>HttpServer.bind(..., shared: true)</code></td>
 </tr>
 <tr>
 <td>macOS</td>
 <td>the isolates share one socket</td>
-<td><code>HttpServer.bind(..., shared: true)</code></td>
 </tr>
 <tr>
 <td>Windows</td>
 <td>only one isolate serves HTTP</td>
-<td><code>HttpServer.bind(..., shared: true)</code></td>
 </tr>
 </tbody>
 </table>

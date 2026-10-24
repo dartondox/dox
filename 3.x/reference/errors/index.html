@@ -4227,24 +4227,19 @@
 <td>Run <code>dox key:generate</code>, or set <code>APP_KEY</code> in the env.</td>
 </tr>
 <tr>
-<td><code>[dox] warning: dox_http_native did not load, using the dart:io server (&lt;reason&gt;)</code></td>
-<td>The native HTTP library is missing or from another version.</td>
-<td>See <a href="../troubleshooting/#the-native-http-library-did-not-load">Troubleshooting</a>. Or set <code>DOX_SERVER=dartio</code>.</td>
+<td><code>Unsupported operation: dox_http_native did not load: &lt;reason&gt;. Fix: ...</code></td>
+<td>The native HTTP library is missing or from another version (<code>native library ABI &lt;x&gt;, expected &lt;y&gt;</code>). The app stops at start.</td>
+<td>Do what the <code>Fix:</code> part says. See <a href="../troubleshooting/#the-native-http-library-did-not-load">Troubleshooting</a>.</td>
 </tr>
 <tr>
-<td><code>Server started at http://&lt;host&gt;:&lt;port&gt; with &lt;n&gt; isolate (&lt;backend&gt;)</code></td>
-<td>Normal start. <code>&lt;host&gt;</code> is the address it listens on: <code>[::]</code> means all interfaces. <code>&lt;backend&gt;</code> is <code>native</code> or <code>dart:io</code>.</td>
+<td><code>Server started at http://&lt;host&gt;:&lt;port&gt; with &lt;n&gt; isolate (native)</code></td>
+<td>Normal start. <code>&lt;host&gt;</code> is the address it listens on: <code>[::]</code> means all interfaces.</td>
 <td>Nothing.</td>
-</tr>
-<tr>
-<td><code>WebSocket or Socket.IO routes: using the dart:io server</code></td>
-<td>The app has WebSocket or Socket.IO. The native server can not upgrade yet.</td>
-<td>Nothing. This is info.</td>
 </tr>
 <tr>
 <td><code>Windows: the native server runs on one isolate</code></td>
 <td>Windows has no <code>SO_REUSEPORT</code>.</td>
-<td>Nothing, or <code>DOX_SERVER=dartio</code> to use every core.</td>
+<td>Nothing.</td>
 </tr>
 <tr>
 <td><code>Socket.IO runs on &lt;n&gt; isolates: clients should use transports: ['websocket'] ...</code></td>
@@ -4262,14 +4257,9 @@
 <td>Look at the error line above it.</td>
 </tr>
 <tr>
-<td><code>SocketException: Failed to create server socket (OS Error: Address already in use, ...)</code></td>
-<td>The port is in use (<code>dart:io</code> server).</td>
-<td>See <a href="../troubleshooting/#port-already-in-use">Troubleshooting</a>.</td>
-</tr>
-<tr>
 <td><code>SocketException: dox_http_native: bind failed (&lt;code&gt;), port = &lt;port&gt;</code></td>
-<td>The port is in use (native server).</td>
-<td>Same as above.</td>
+<td>The port is in use.</td>
+<td>See <a href="../troubleshooting/#port-already-in-use">Troubleshooting</a>.</td>
 </tr>
 </tbody>
 </table>
@@ -4930,7 +4920,11 @@ The table shows the <code>message</code> text.</p>
 </tbody>
 </table>
 <h2 id="native-libraries-build-hooks">Native libraries (build hooks)</h2>
-<p>Printed during <code>dart pub get</code>, <code>dox serve</code> or <code>dox build</code>. <code>&lt;pkg&gt;</code> is <code>dox_http_native</code>, <code>dox_postgres_native</code> or <code>dox_mysql_native</code>. The app still runs, on the Dart fallback.</p>
+<p>Printed during <code>dart pub get</code>, <code>dox serve</code> or <code>dox build</code>. <code>&lt;pkg&gt;</code> is <code>dox_http_native</code>, <code>dox_postgres_native</code> or <code>dox_mysql_native</code>.</p>
+<ul>
+<li><code>dox_postgres_native</code> and <code>dox_mysql_native</code>: the app still runs, on the Dart DB driver.</li>
+<li><code>dox_http_native</code>: there is no fallback. The app stops at start with an error that says why the library did not load and how to fix it.</li>
+</ul>
 <table>
 <thead>
 <tr>
@@ -4943,7 +4937,7 @@ The table shows the <code>message</code> text.</p>
 <tr>
 <td><code>&lt;pkg&gt;: no native library for &lt;os&gt;-&lt;arch&gt;.</code></td>
 <td>No ready build for this OS and CPU.</td>
-<td>Install Rust, or accept the fallback.</td>
+<td>Install Rust. For a DB driver you may also accept the Dart fallback.</td>
 </tr>
 <tr>
 <td><code>&lt;pkg&gt;: download &lt;file&gt;: &lt;status&gt;</code> / <code>&lt;pkg&gt;: download &lt;file&gt; failed: &lt;error&gt;</code></td>
@@ -4966,9 +4960,9 @@ The table shows the <code>message</code> text.</p>
 <td>Fix the path in <code>pubspec.yaml</code>.</td>
 </tr>
 <tr>
-<td><code>Unsupported operation: dox_http_native can not detach the socket</code></td>
-<td><code>DOX_SERVER=native</code> with a WebSocket route. The upgrade fails with <code>500</code>.</td>
-<td>Do not force native for WebSocket apps.</td>
+<td><code>Unsupported operation: dox_http_native can not detach the socket. Use NativeWebSocket.upgrade for a WebSocket.</code></td>
+<td>Code called <code>detachSocket()</code> on a response. Rust owns the socket.</td>
+<td>For a WebSocket use <code>NativeWebSocket.upgrade(request)</code>.</td>
 </tr>
 </tbody>
 </table>

@@ -4075,18 +4075,16 @@
 <h1 id="troubleshooting">Troubleshooting</h1>
 <p>Real problems, with the text you see, the cause and the fix. The texts come from the source code.</p>
 <h2 id="the-native-http-library-did-not-load">The native HTTP library did not load</h2>
-<p><strong>Symptom.</strong> One line at start, on stderr:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>[dox] warning: dox_http_native did not load, using the dart:io server (&lt;reason&gt;)
-</span></code></pre></div>
-<p>and the start line says <code>(dart:io)</code> instead of <code>(native)</code>:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Server started at http://[::]:3000 with 8 isolate (dart:io)
+<p><strong>Symptom.</strong> The app stops at start with this error:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Unsupported operation: dox_http_native did not load: &lt;reason&gt;.
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Fix: install Rust (cargo, see https://rustup.rs), then run the app again ...
 </span></code></pre></div>
 <p>At build time (<code>dart pub get</code>, <code>dox serve</code> or <code>dox build</code>) you may also see one of these:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dox_http_native: no native library for &lt;os&gt;-&lt;arch&gt;. Dox will use dart:io.
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>dox_http_native: download dox_http_native-&lt;os&gt;-&lt;arch&gt;.&lt;ext&gt;: 404
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>dox_http_native: download dox_http_native-&lt;os&gt;-&lt;arch&gt;.&lt;ext&gt; failed: &lt;error&gt;
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>dox_http_native: sha256 of dox_http_native-&lt;os&gt;-&lt;arch&gt;.&lt;ext&gt; does not match
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>dox_http_native: cargo build failed
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dox_http_native: no native library for &lt;os&gt;-&lt;arch&gt;. Install Rust (cargo) to build it from source.
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>dox_http_native: download dox_http_native-&lt;os&gt;-&lt;arch&gt;.&lt;ext&gt;: 404
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>dox_http_native: download dox_http_native-&lt;os&gt;-&lt;arch&gt;.&lt;ext&gt; failed: &lt;error&gt;
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>dox_http_native: sha256 of dox_http_native-&lt;os&gt;-&lt;arch&gt;.&lt;ext&gt; does not match
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>dox_http_native: cargo build failed
 </span></code></pre></div>
 <p><strong>Cause.</strong> The build hook of <code>dox_http_native</code> (<code>packages/dox-http-native/hook/build.dart</code>) tries, in this order: the <code>lib_path</code> user define, a local <code>native/target/release</code> build, the GitHub release download, and <code>cargo build</code>. None worked. Common reasons:</p>
 <ul>
@@ -4097,72 +4095,70 @@
 </ul>
 <p><strong>Fix.</strong> Pick one:</p>
 <ol>
-<li>Accept <code>dart:io</code>. The app works, only slower. To hide the warning set <code>DOX_SERVER=dartio</code> or <code>server: ServerBackend.dartIo</code> in <code>AppConfig</code>.</li>
 <li>Install Rust with <a href="https://rustup.rs">rustup</a> and run <code>dart pub get</code> again. The hook builds the library with <code>cargo</code>.</li>
+<li>When the reason is an ABI mismatch and you set <code>lib_path</code>, rebuild that library: <code>cargo build --release</code> in <code>packages/dox-http-native/native</code>.</li>
 <li>
 <p>Download the library from the GitHub release <code>dox_http_native-v&lt;version&gt;</code> yourself and point to it in the root <code>pubspec.yaml</code>:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">hooks</span><span class="p">:</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">user_defines</span><span class="p">:</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">dox_http_native</span><span class="p">:</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">      </span><span class="nt">lib_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/libdox_http_native.so</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">hooks</span><span class="p">:</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">user_defines</span><span class="p">:</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">dox_http_native</span><span class="p">:</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">      </span><span class="nt">lib_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/libdox_http_native.so</span>
 </span></code></pre></div>
 </li>
 <li>
 <p>Build with <code>dox build</code> (it runs <code>dart build cli</code>), not with <code>dart compile exe</code>.</p>
 </li>
 </ol>
-<p>The same applies to the native database drivers. The warning is then:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>[dox] warning: dox_postgres_native did not load, using the Dart postgres driver (&lt;reason&gt;)
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>[dox] warning: dox_mysql_native did not load, using the Dart mysql driver (&lt;reason&gt;)
+<p>The native database drivers find their library the same way. They do not stop the app. The warning is then:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>[dox] warning: dox_postgres_native did not load, using the Dart postgres driver (&lt;reason&gt;)
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>[dox] warning: dox_mysql_native did not load, using the Dart mysql driver (&lt;reason&gt;)
 </span></code></pre></div>
 <p>The Dart driver is used. To choose it on purpose set <code>DOX_DB_DRIVER=dart</code> or <code>extra: {'native': false}</code> on the connection.</p>
 <p>See <a href="../../digging-deeper/native-server/">Native server</a>, <a href="../../database/postgres-native/">Postgres native</a> and <a href="../../database/mysql-native/">MySQL native</a>.</p>
 <h2 id="port-already-in-use">Port already in use</h2>
-<p><strong>Symptom.</strong> With the <code>dart:io</code> server:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>SocketException: Failed to create server socket (OS Error: Address already in use, errno = 48), address = ::, port = 3000
+<p><strong>Symptom.</strong> At start:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>SocketException: dox_http_native: bind failed (&lt;code&gt;), port = 3000
 </span></code></pre></div>
-<p>(<code>errno = 48</code> on macOS, <code>errno = 98</code> on Linux.) With the native server:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>SocketException: dox_http_native: bind failed (&lt;code&gt;), port = 3000
-</span></code></pre></div>
+<p><code>&lt;code&gt;</code> is <code>-1000</code> minus the OS error: <code>-1048</code> on macOS, <code>-1098</code> on Linux.</p>
 <p><strong>Cause.</strong> Another process listens on the port. Often it is an old <code>bin/server.dart</code> that <code>dox serve</code> did not stop, or a second copy of the app.</p>
 <p><strong>Fix.</strong> Find and stop the process, or use another port.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>lsof<span class="w"> </span>-i<span class="w"> </span>:3000<span class="w">          </span><span class="c1"># macOS and Linux: who has the port</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">kill</span><span class="w"> </span>&lt;pid&gt;
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>lsof<span class="w"> </span>-i<span class="w"> </span>:3000<span class="w">          </span><span class="c1"># macOS and Linux: who has the port</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">kill</span><span class="w"> </span>&lt;pid&gt;
 </span></code></pre></div>
 <p>Or set <code>APP_PORT=3001</code> in <code>.env</code> (a new project reads it into <code>serverPort</code>).</p>
 <h2 id="build_runner-conflicting-outputs">build_runner: conflicting outputs</h2>
 <p><strong>Symptom.</strong> <code>dox build_runner:build</code>, <code>dox serve</code> or <code>dox build</code> stops with a build_runner message that starts with <code>Conflicting outputs were detected</code>, and names files like <code>lib/dtos.g.dart</code> or <code>lib/app/models/user/user.model.g.dart</code>.</p>
 <p><strong>Cause.</strong> The generated <code>.g.dart</code> files are on disk, but <code>.dart_tool/build</code> does not know them. This happens after a <code>git clone</code> with committed <code>.g.dart</code> files, after deleting <code>.dart_tool</code>, or after a Dart SDK update.</p>
 <p><strong>Fix.</strong> Delete the build cache and build again:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>.dart_tool/build
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>.dart_tool/build
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build
 </span></code></pre></div>
 <p>If that is not enough, delete the named <code>.g.dart</code> files and build again. Older build_runner versions accept <code>dart run build_runner build --delete-conflicting-outputs</code>. Newer versions removed that flag, so the Dox CLI does not pass it.</p>
 <h2 id="dox-create-throws-rangeerror"><code>dox create</code> throws <code>RangeError</code></h2>
 <p><strong>Symptom.</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>dox create my_app
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>RangeError (index): Invalid value: Only valid value is 0: 1
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>dox create my_app
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>RangeError (index): Invalid value: Only valid value is 0: 1
 </span></code></pre></div>
 <p><strong>Cause.</strong> A bug in the <code>dox</code> CLI up to <code>3.0.0-alpha.4</code>: the <code>create</code> command read the <code>--version</code> flag before it checked that one was given. The same versions also downloaded an old project template.</p>
 <p><strong>Fix.</strong> Update the CLI. The fix is in <code>3.0.0-alpha.5</code>:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>global<span class="w"> </span>activate<span class="w"> </span>dox<span class="w"> </span>^3.0.0-alpha
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>global<span class="w"> </span>activate<span class="w"> </span>dox<span class="w"> </span>^3.0.0-alpha
 </span></code></pre></div>
 <h2 id="a-env-value-with">A <code>.env</code> value with <code>#</code></h2>
 <p>A <code>#</code> after a space starts a comment. The comment is not part of the value.</p>
-<div class="language-ini highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="na">APP_PORT</span><span class="o">=</span><span class="s">3000</span><span class="w"> </span><span class="c1"># dev port   -&gt; 3000</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="na">DB_PASSWORD</span><span class="o">=</span><span class="s">abc</span><span class="c1">#123        -&gt; abc#123 (no space before the #)</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="na">DB_PASSWORD</span><span class="o">=</span><span class="s">"abc # 123"</span><span class="w">    </span><span class="na">-&gt; abc # 123 (quotes keep the #)</span>
+<div class="language-ini highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="na">APP_PORT</span><span class="o">=</span><span class="s">3000</span><span class="w"> </span><span class="c1"># dev port   -&gt; 3000</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="na">DB_PASSWORD</span><span class="o">=</span><span class="s">abc</span><span class="c1">#123        -&gt; abc#123 (no space before the #)</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="na">DB_PASSWORD</span><span class="o">=</span><span class="s">"abc # 123"</span><span class="w">    </span><span class="na">-&gt; abc # 123 (quotes keep the #)</span>
 </span></code></pre></div>
 <p>When a value must have <code>#</code> in it (a space, then <code>#</code>), put the value in quotes. The quotes are removed.</p>
 <h2 id="hashverify-throws-on-a-bad-hash"><code>Hash.verify</code> throws on a bad hash</h2>
 <p><strong>Symptom.</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Invalid argument(s) (salt): Invalid salt length (The length should be greater than or equal to 28): "..."
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>Invalid argument(s) (salt): Invalid salt length (The length should be greater than or equal to 28): "..."
 </span></code></pre></div>
 <p>or</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>Invalid argument(s) (salt): Invalid salt version: "..."
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Invalid argument(s) (salt): Invalid salt version: "..."
 </span></code></pre></div>
 <p>or, when the password is long:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>Invalid argument(s) (password): Password is too long (The length should be less than or equal to 72): "..."
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Invalid argument(s) (password): Password is too long (The length should be less than or equal to 72): "..."
 </span></code></pre></div>
 <p><strong>Cause.</strong> <code>Hash.verify(password, hash)</code> calls <code>BCrypt.checkpw</code> from the <code>bcrypt</code> package. It throws an <code>ArgumentError</code> when <code>hash</code> is not a bcrypt hash (it must start with <code>$2</code> and be at least 28 characters), for example when the column holds a plain password, an empty string or a hash from another algorithm. It also throws when the password is longer than 72 bytes.</p>
 <p><strong>Fix.</strong></p>
@@ -4170,7 +4166,7 @@
 <li>Make sure every stored password went through <code>Hash.make()</code>. A plain password in the column is a bug in the code that saved it.</li>
 <li>
 <p>Check the hash before you compare it, and treat a bad one as a failed login:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hash</span><span class="p">.</span><span class="n">startsWith</span><span class="p">(</span><span class="s1">r'$2'</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">verify</span><span class="p">(</span><span class="n">password</span><span class="p">,</span><span class="w"> </span><span class="n">hash</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hash</span><span class="p">.</span><span class="n">startsWith</span><span class="p">(</span><span class="s1">r'$2'</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">verify</span><span class="p">(</span><span class="n">password</span><span class="p">,</span><span class="w"> </span><span class="n">hash</span><span class="p">);</span>
 </span></code></pre></div>
 </li>
 <li>
@@ -4214,7 +4210,7 @@
 </tbody>
 </table>
 <p>As a last resort, change the user on the server:</p>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">USER</span><span class="w"> </span><span class="s1">'app'</span><span class="o">@</span><span class="s1">'%'</span><span class="w"> </span><span class="n">IDENTIFIED</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="n">mysql_native_password</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="s1">'secret'</span><span class="p">;</span>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">USER</span><span class="w"> </span><span class="s1">'app'</span><span class="o">@</span><span class="s1">'%'</span><span class="w"> </span><span class="n">IDENTIFIED</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="n">mysql_native_password</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="s1">'secret'</span><span class="p">;</span>
 </span></code></pre></div>
 <h2 id="sqlite-the-database-file">SQLite: the database file</h2>
 <p><strong>Symptom.</strong> An <code>SqliteException</code> with <code>unable to open database file</code>, or an empty database after <code>dox build</code>.</p>
@@ -4232,12 +4228,12 @@
 <p>Dox opens a file database with <code>journal_mode = WAL</code>, <code>synchronous = NORMAL</code>, <code>foreign_keys = ON</code> and <code>busy_timeout = 5000</code> (change it with <code>extra: {'busyTimeout': ...}</code>).</p>
 <h2 id="dox-command-not-found-after-dart-pub-global-activate"><code>dox: command not found</code> after <code>dart pub global activate</code></h2>
 <p><strong>Symptom.</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>zsh: command not found: dox
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>zsh: command not found: dox
 </span></code></pre></div>
 <p>right after <code>dart pub global activate dox ^3.0.0-alpha</code>.</p>
 <p><strong>Cause.</strong> <code>dart pub global activate</code> puts the <code>dox</code> script in <code>$HOME/.pub-cache/bin</code>. That folder is not in your <code>PATH</code>.</p>
 <p><strong>Fix.</strong> Add it to your shell profile and open a new terminal:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$PATH</span><span class="s2">"</span>:<span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.pub-cache/bin"</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$PATH</span><span class="s2">"</span>:<span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.pub-cache/bin"</span>
 </span></code></pre></div>
 <p>On Windows the folder is <code>%LOCALAPPDATA%\Pub\Cache\bin</code>.</p>
 <h2 id="other-startup-errors">Other startup errors</h2>
@@ -4298,12 +4294,7 @@
 <tr>
 <td><code>Windows: the native server runs on one isolate</code></td>
 <td>Windows has no <code>SO_REUSEPORT</code>.</td>
-<td>Not an error. Use <code>DOX_SERVER=dartio</code> to use every core on Windows.</td>
-</tr>
-<tr>
-<td><code>WebSocket or Socket.IO routes: using the dart:io server</code></td>
-<td>The native server can not upgrade to WebSocket yet.</td>
-<td>Not an error. <code>DOX_SERVER=native</code> forces native, then WebSocket upgrades fail with <code>500</code>.</td>
+<td>Not an error. Run more instances behind a proxy to use every core.</td>
 </tr>
 </tbody>
 </table>
