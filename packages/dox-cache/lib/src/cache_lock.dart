@@ -44,9 +44,12 @@ abstract class CacheLock {
     }
   }
 
+  /// One secure random source for all tokens.
+  static final Random _random = Random.secure();
+
   /// A random hex token.
   static String randomOwner() {
-    Random random = Random.secure();
+    Random random = _random;
     StringBuffer buffer = StringBuffer();
     for (int i = 0; i < 16; i++) {
       buffer.write(random.nextInt(256).toRadixString(16).padLeft(2, '0'));

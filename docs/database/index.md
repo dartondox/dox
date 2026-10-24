@@ -331,6 +331,8 @@ For a busy production app, use Postgres or MySQL.
     The database file uses WAL mode, so readers do not wait for the writer.
     `busy_timeout` makes a query wait for a lock from another isolate, instead of failing.
     Foreign keys are turned on.
+    Before each `SELECT`, the driver runs `PRAGMA schema_version` to see if a table changed.
+    This is a small cost on every read. It is fine for development and tests.
 
 !!! info "Types"
     SQLite has no bool, JSON or date type. Dox converts them for you:

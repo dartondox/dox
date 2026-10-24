@@ -2,11 +2,13 @@ import 'query_builder.dart';
 import 'shared_mixin.dart';
 
 mixin OrderBy<T> implements SharedMixin<T> {
-  final List<String> _orderBy = <String>[];
+  /// made on the first orderBy(), most rows never need it
+  List<String>? _orderBy;
 
   String getOrderByQuery() {
-    if (_orderBy.isNotEmpty) {
-      return " ORDER BY ${_orderBy.join(',')}";
+    List<String>? orderBy = _orderBy;
+    if (orderBy != null) {
+      return " ORDER BY ${orderBy.join(',')}";
     }
     return "";
   }
@@ -23,9 +25,8 @@ mixin OrderBy<T> implements SharedMixin<T> {
         !<String>['asc', 'desc'].contains(type.toString().toLowerCase())) {
       throw ArgumentError.value(type, 'type', 'must be asc or desc');
     }
-    _orderBy.add(
-      '${helper.wrap(column.toString())} ${type == null ? '' : type.toString()}',
-    );
+    String name = helper.wrap(column.toString());
+    (_orderBy ??= <String>[]).add(type == null ? name : '$name $type');
     return queryBuilder;
   }
 
@@ -35,7 +36,7 @@ mixin OrderBy<T> implements SharedMixin<T> {
   /// List blogs = await Blog().orderByRaw('count(*) desc').get()
   /// ```
   QueryBuilder<T> orderByRaw(String query) {
-    _orderBy.add(query);
+    (_orderBy ??= <String>[]).add(query);
     return queryBuilder;
   }
 }

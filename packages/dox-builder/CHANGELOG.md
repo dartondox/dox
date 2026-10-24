@@ -1,3 +1,11 @@
+## Unreleased
+
+- The generated `fromMap()` takes a `DateTime` from the driver as it is. It only parses a string.
+- New generated `columnsToMap()` with the columns only. `convertToMap()` adds the relations to it.
+- Models with no `beforeGet` hook get `readsRowDates => true`, so their rows skip the date to string step. A `beforeGet` hook still gets dates as strings.
+- `tableColumns`, `preloadList`, `timestampsColumn` and the relation matchers are `const`, so no new list or map is made on each call.
+- Run `dart run build_runner build` to get the new code.
+
 ## 3.0.0-alpha.6
 
 - Version bump only, to match the other packages.

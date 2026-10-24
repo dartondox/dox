@@ -215,7 +215,7 @@ void main() {
     });
 
     test('an unknown email takes about as long as a wrong password', () async {
-      // warm up: the first call makes the dummy hash
+      // warm up the isolate code path
       await Auth().attempt(<String, dynamic>{
         'email': 'x@dox.dev',
         'password': 'x',
@@ -276,6 +276,87 @@ void main() {
         'password': 123,
       });
       expect(token, isNull);
+    });
+  });
+
+  group('User cache |', () {
+    void initCache(Duration? ttl) {
+      Auth.initialize(
+        AuthConfig(
+          defaultGuard: 'web',
+          guards: <String, AuthGuard>{
+            'web': AuthGuard(
+              driver: JwtAuthDriver(
+                secret: SecretKey(secret),
+                userCacheTtl: ttl,
+              ),
+              provider: AuthProvider(model: () => FakeUser()),
+            ),
+          },
+        ),
+      );
+    }
+
+    Future<FakeUser?> userOf(String token) async {
+      Auth auth = Auth();
+      await auth.verifyToken(bearer(token));
+      return auth.user<FakeUser>();
+    }
+
+    test('off by default: a deleted user is seen at once', () async {
+      initCache(null);
+      String token = Auth().login(users[1]!)!;
+      expect(await userOf(token), isNotNull);
+      users.clear();
+      expect(await userOf(token), isNull);
+    });
+
+    test('keeps the user for the ttl, then loads it again', () async {
+      initCache(Duration(milliseconds: 300));
+      String token = Auth().login(users[1]!)!;
+      FakeUser? first = await userOf(token);
+      users.clear();
+      expect(await userOf(token), same(first));
+      await Future<void>.delayed(Duration(milliseconds: 400));
+      expect(await userOf(token), isNull);
+    });
+
+    test('a bad token is still rejected', () async {
+      initCache(Duration(minutes: 1));
+      String token = Auth().login(users[1]!)!;
+      expect(await userOf(token), isNotNull);
+      expect(await userOf('$token-bad'), isNull);
+    });
+  });
+
+  group('Hash rounds |', () {
+    test('attempt works with a custom hashRounds', () async {
+      users[3] = FakeUser(3, 'low@dox.dev', Hash.make('pw', rounds: 4));
+      Auth.initialize(
+        AuthConfig(
+          defaultGuard: 'web',
+          guards: <String, AuthGuard>{
+            'web': AuthGuard(
+              driver: JwtAuthDriver(secret: SecretKey(secret), hashRounds: 4),
+              provider: AuthProvider(model: () => FakeUser()),
+            ),
+          },
+        ),
+      );
+      expect(
+        await Auth().attempt(<String, dynamic>{
+          'email': 'low@dox.dev',
+          'password': 'pw',
+        }),
+        isNotNull,
+      );
+      expect(
+        await Auth().attempt(<String, dynamic>{
+          'email': 'nobody@dox.dev',
+          'password': 'pw',
+        }),
+        isNull,
+      );
     });
   });
 

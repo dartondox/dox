@@ -30,6 +30,11 @@ class AESEncryptor {
   static const int _tagBits = 128;
   static final Random _random = Random.secure();
 
+  /// key bytes of the last secret. Apps use one secret, so this skips
+  /// the utf8 encode on every call.
+  static String? _lastSecret;
+  static Uint8List _lastKey = Uint8List(0);
+
   /// encode a message
   ///```
   /// AESEncryptor.encode('message', secret);
@@ -43,13 +48,17 @@ class AESEncryptor {
     for (int i = 0; i < _nonceLength; i++) {
       nonce[i] = _random.nextInt(256);
     }
-    Uint8List sealed = _cipher(
-      true,
-      secret,
-      nonce,
-      associatedData,
-    ).process(utf8.encode(content));
-    return base64.encode(<int>[...nonce, ...sealed]);
+    GCMBlockCipher cipher = _cipher(true, secret, nonce, associatedData);
+    Uint8List input = utf8.encode(content);
+
+    /// write nonce + ciphertext + tag into one buffer
+    Uint8List out = Uint8List(
+      _nonceLength + cipher.getOutputSize(input.length),
+    );
+    out.setAll(0, nonce);
+    int length = cipher.processBytes(input, 0, input.length, out, _nonceLength);
+    length += cipher.doFinal(out, _nonceLength + length);
+    return base64.encode(Uint8List.sublistView(out, 0, _nonceLength + length));
   }
 
   /// decode a message.
@@ -64,8 +73,8 @@ class AESEncryptor {
   }) {
     try {
       Uint8List data = base64.decode(content);
-      Uint8List nonce = data.sublist(0, _nonceLength);
-      Uint8List sealed = data.sublist(_nonceLength);
+      Uint8List nonce = Uint8List.sublistView(data, 0, _nonceLength);
+      Uint8List sealed = Uint8List.sublistView(data, _nonceLength);
       return utf8.decode(
         _cipher(false, secret, nonce, associatedData).process(sealed),
       );
@@ -83,11 +92,19 @@ class AESEncryptor {
     return GCMBlockCipher(AESEngine())..init(
       forEncryption,
       AEADParameters<KeyParameter>(
-        KeyParameter(utf8.encode(secret)),
+        KeyParameter(_key(secret)),
         _tagBits,
         nonce,
         utf8.encode(associatedData),
       ),
     );
+  }
+
+  static Uint8List _key(String secret) {
+    if (secret != _lastSecret) {
+      _lastKey = utf8.encode(secret);
+      _lastSecret = secret;
+    }
+    return _lastKey;
   }
 }

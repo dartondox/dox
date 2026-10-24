@@ -13,7 +13,7 @@ class OwnerGenerator extends Model<Owner> {
   String get primaryKey => 'id';
 
   @override
-  Map<String, dynamic> get timestampsColumn => <String, dynamic>{
+  Map<String, dynamic> get timestampsColumn => const <String, dynamic>{
     'created_at': null,
     'updated_at': null,
   };
@@ -28,20 +28,23 @@ class OwnerGenerator extends Model<Owner> {
   Owner query() => Owner();
 
   @override
-  List<String> get tableColumns => <String>['id', 'name'];
+  bool get readsRowDates => true;
 
   @override
-  List<String> get preloadList => <String>[];
+  List<String> get tableColumns => const <String>['id', 'name'];
 
   @override
-  Map<String, Function> get relationsResultMatcher => <String, Function>{
+  List<String> get preloadList => const <String>[];
+
+  @override
+  Map<String, Function> get relationsResultMatcher => const <String, Function>{
     'pets': getPets,
     'firstPet': getFirstPet,
     'clubs': getClubs,
   };
 
   @override
-  Map<String, Function> get relationsQueryMatcher => <String, Function>{
+  Map<String, Function> get relationsQueryMatcher => const <String, Function>{
     'pets': queryPets,
     'firstPet': queryFirstPet,
     'clubs': queryClubs,
@@ -90,14 +93,21 @@ class OwnerGenerator extends Model<Owner> {
   Owner fromMap(Map<String, dynamic> m) => Owner()
     ..id = m['id'] as int?
     ..name = m['name'] as String?;
-
   @override
-  Map<String, dynamic> convertToMap(dynamic i) {
-    Owner instance = i as Owner;
+  Map<String, dynamic> columnsToMap() {
+    Owner instance = this as Owner;
     Map<String, dynamic> map = <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
     };
+
+    return map;
+  }
+
+  @override
+  Map<String, dynamic> convertToMap(dynamic i) {
+    Owner instance = i as Owner;
+    Map<String, dynamic> map = instance.columnsToMap();
 
     List<String> preload = getPreload();
     if (preload.contains('pets')) {
@@ -121,7 +131,7 @@ class PetGenerator extends Model<Pet> {
   String get primaryKey => 'id';
 
   @override
-  Map<String, dynamic> get timestampsColumn => <String, dynamic>{
+  Map<String, dynamic> get timestampsColumn => const <String, dynamic>{
     'created_at': null,
     'updated_at': null,
   };
@@ -136,18 +146,21 @@ class PetGenerator extends Model<Pet> {
   Pet query() => Pet();
 
   @override
-  List<String> get tableColumns => <String>['id', 'name', 'owner_id'];
+  bool get readsRowDates => true;
 
   @override
-  List<String> get preloadList => <String>[];
+  List<String> get tableColumns => const <String>['id', 'name', 'owner_id'];
 
   @override
-  Map<String, Function> get relationsResultMatcher => <String, Function>{
+  List<String> get preloadList => const <String>[];
+
+  @override
+  Map<String, Function> get relationsResultMatcher => const <String, Function>{
     'owner': getOwner,
   };
 
   @override
-  Map<String, Function> get relationsQueryMatcher => <String, Function>{
+  Map<String, Function> get relationsQueryMatcher => const <String, Function>{
     'owner': queryOwner,
   };
 
@@ -169,15 +182,22 @@ class PetGenerator extends Model<Pet> {
     ..id = m['id'] as int?
     ..name = m['name'] as String?
     ..ownerId = m['owner_id'] as int?;
-
   @override
-  Map<String, dynamic> convertToMap(dynamic i) {
-    Pet instance = i as Pet;
+  Map<String, dynamic> columnsToMap() {
+    Pet instance = this as Pet;
     Map<String, dynamic> map = <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
       'owner_id': instance.ownerId,
     };
+
+    return map;
+  }
+
+  @override
+  Map<String, dynamic> convertToMap(dynamic i) {
+    Pet instance = i as Pet;
+    Map<String, dynamic> map = instance.columnsToMap();
 
     List<String> preload = getPreload();
     if (preload.contains('owner')) {
@@ -195,7 +215,7 @@ class ClubGenerator extends Model<Club> {
   String get primaryKey => 'id';
 
   @override
-  Map<String, dynamic> get timestampsColumn => <String, dynamic>{
+  Map<String, dynamic> get timestampsColumn => const <String, dynamic>{
     'created_at': null,
     'updated_at': null,
   };
@@ -210,29 +230,40 @@ class ClubGenerator extends Model<Club> {
   Club query() => Club();
 
   @override
-  List<String> get tableColumns => <String>['id', 'name'];
+  bool get readsRowDates => true;
 
   @override
-  List<String> get preloadList => <String>[];
+  List<String> get tableColumns => const <String>['id', 'name'];
 
   @override
-  Map<String, Function> get relationsResultMatcher => <String, Function>{};
+  List<String> get preloadList => const <String>[];
 
   @override
-  Map<String, Function> get relationsQueryMatcher => <String, Function>{};
+  Map<String, Function> get relationsResultMatcher =>
+      const <String, Function>{};
+
+  @override
+  Map<String, Function> get relationsQueryMatcher => const <String, Function>{};
 
   @override
   Club fromMap(Map<String, dynamic> m) => Club()
     ..id = m['id'] as int?
     ..name = m['name'] as String?;
-
   @override
-  Map<String, dynamic> convertToMap(dynamic i) {
-    Club instance = i as Club;
+  Map<String, dynamic> columnsToMap() {
+    Club instance = this as Club;
     Map<String, dynamic> map = <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
     };
+
+    return map;
+  }
+
+  @override
+  Map<String, dynamic> convertToMap(dynamic i) {
+    Club instance = i as Club;
+    Map<String, dynamic> map = instance.columnsToMap();
 
     return map;
   }

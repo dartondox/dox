@@ -1,5 +1,9 @@
 ## Unreleased
 
+- Perf: `attempt` runs bcrypt in another isolate (`Isolate.run`). Before, each login blocked the server isolate for the whole hash.
+- Perf: the dummy hash for unknown users is made when the driver is created, in another isolate. Before, the first login paid for two hashes.
+- New: `JwtAuthDriver(hashRounds: 10)`. Set it to the bcrypt cost of your stored hashes.
+- New: `JwtAuthDriver(userCacheTtl: ...)`. Keeps the user of a token in memory for this time, so `verifyToken` does not run `find(id)` on every request. Off by default.
 - Security: `JwtAuthDriver` throws `ArgumentError` when the `SecretKey` is empty. Before, an app with no `APP_KEY` signed tokens with an empty key, so anyone could make a token for any user.
 - Security: `attempt` runs bcrypt also when no user is found, or when the user has no password. Before, an unknown email answered much faster than a wrong password, so the time told which emails have an account.
 

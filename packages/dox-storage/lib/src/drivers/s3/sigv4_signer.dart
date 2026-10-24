@@ -213,14 +213,35 @@ class SigV4Signer {
   }
 
   String _signature(DateTime now, String stringToSign) {
+    List<int> key = _signingKey(_date(now));
+    return Hmac(sha256, key).convert(utf8.encode(stringToSign)).toString();
+  }
+
+  /// Signing keys by secret, date, region and service. The key changes
+  /// only once a day, so most requests skip 4 HMACs.
+  static final Map<String, List<int>> _signingKeys = <String, List<int>>{};
+
+  /// ponytail: cleared when full; a few disks and dates fit easily.
+  static const int _maxSigningKeys = 32;
+
+  List<int> _signingKey(String date) {
+    String id = '${credentials.secretAccessKey}\n$date\n$region\n$service';
+    List<int>? cached = _signingKeys[id];
+    if (cached != null) {
+      return cached;
+    }
     List<int> key = _hmac(
       utf8.encode('AWS4${credentials.secretAccessKey}'),
-      _date(now),
+      date,
     );
     key = _hmac(key, region);
     key = _hmac(key, service);
     key = _hmac(key, 'aws4_request');
-    return Hmac(sha256, key).convert(utf8.encode(stringToSign)).toString();
+    if (_signingKeys.length >= _maxSigningKeys) {
+      _signingKeys.clear();
+    }
+    _signingKeys[id] = key;
+    return key;
   }
 
   List<int> _hmac(List<int> key, String data) {
