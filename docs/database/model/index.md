@@ -256,6 +256,29 @@ Blog created = await Blog().create(<String, dynamic>{
   Fields that were not loaded, for example with `select()`, are not changed.
 - `save()` returns `false` when a [model event](events.md) cancels it.
 
+### Mass assignment
+
+`create()`, `insert()` and `update()` take any key of the map.
+So `User().create(req.body)` with `{"is_admin": 1}` makes an admin.
+Set `fillable` or `guarded` to stop this.
+
+```dart
+@DoxModel()
+class User extends UserGenerator {
+  // only these keys are taken from a map
+  @override
+  List<String> get fillable => <String>['name', 'email'];
+
+  // or: these keys are never taken from a map
+  @override
+  List<String> get guarded => <String>['is_admin'];
+}
+```
+
+- Keys that are not allowed are dropped. They do not throw.
+- Both lists are empty by default. Then every key is taken.
+- `save()` is not changed. Fields you set in code are always saved.
+
 ## Delete
 
 ```dart

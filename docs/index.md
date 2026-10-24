@@ -130,7 +130,6 @@ dart pub global activate dox ^3.0.0-alpha   # install the CLI
 dox create my_app                            # download the starter project
 cd my_app
 dart pub get
-cp .env.example .env
 dox s                                        # start the server
 ```
 

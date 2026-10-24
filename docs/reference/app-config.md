@@ -17,6 +17,7 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `compress` | `bool` | `false` | gzip responses in Dart (`HttpServer.autoCompress`). It costs CPU on every response. Let a proxy do it when you have one. |
 | `maxBodySize` | `int` | `10 * 1024 * 1024` (10 MB) | Biggest JSON or urlencoded body in bytes. Bigger gets `413`. |
 | `maxMultipartSize` | `int` | `100 * 1024 * 1024` (100 MB) | Biggest `multipart/form-data` body (file uploads) in bytes. Bigger gets `413`. |
+| `bodyTimeout` | `Duration` | `Duration(seconds: 120)` | A client that sends no body bytes for this long gets `408`. A slow but steady upload is fine. Native server only. |
 | `shutdownTimeout` | `Duration` | `Duration(seconds: 8)` | On `SIGTERM` or `SIGINT`, how long open requests may run before Dox closes them. Keep it below the kill timeout of your platform. See [Graceful shutdown](../digging-deeper/deployment.md#graceful-shutdown). |
 | `trustedProxies` | `List<String>` | `[]` | IPs or CIDR ranges of reverse proxies. Only when the direct client is in this list does Dox read `X-Forwarded-For` for `req.ip()` and `X-Forwarded-Proto` for `req.scheme()`. `['*']` trusts any direct client, and takes the right-most `X-Forwarded-For` hop (the one the proxy added) as the client. |
 
@@ -224,7 +225,7 @@ Keys of `extra`:
 | postgres | `sslMode` | postgres `SslMode` | none | Setting it uses the Dart driver. |
 | mysql | `collation` | `String` | `utf8mb4_general_ci` | Connection collation. |
 | mysql | `timeoutMs` | `int` | `10000` | Connect timeout. |
-| mysql | `allowPublicKeyRetrieval` | `bool` | `true` | Ask the server for its RSA key (needed for `caching_sha2_password` without TLS). |
+| mysql | `allowPublicKeyRetrieval` | `bool` | `false`, `true` with `useSSL` or a local host | Ask the server for its RSA key (needed for `caching_sha2_password` without TLS). A fake server can send its own key and read the password, so it is off by default. It is on with `useSSL: true`, on `localhost`, `127.0.0.1`, `::1` and on a Unix socket. Giving the key in `serverPublicKey` is safer. |
 | mysql | `serverPublicKey` | `String` | none | The server RSA key, so it is not asked for. |
 | mysql | `timeZone` | `String` | none | Session time zone. |
 | mysql | `maxConnectionAge` | `Duration` | 12 hours | Close and reopen a connection after this time. |

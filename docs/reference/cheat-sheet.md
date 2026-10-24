@@ -421,7 +421,7 @@ void intro(WebsocketEmitter emitter, dynamic message) {
 }
 ```
 
-Client sends `{"event": "joinRoom", "message": "chat"}`. Many isolates need `WebsocketRedisAdapter`.
+Client sends `{"event": "joinRoom", "message": "chat"}`. The join is refused unless you set `WebsocketServer().authorizeJoin`. Many isolates need `WebsocketRedisAdapter`.
 
 See [WebSocket](../digging-deeper/websocket.md).
 

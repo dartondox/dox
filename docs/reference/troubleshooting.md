@@ -172,12 +172,13 @@ For normal login use `Auth().attempt()` from `dox_auth`. See [Hashing](../securi
 **Fix.** Both Dox drivers handle this by default:
 
 - The native driver (`dox_mysql_native`) works with MySQL 8.4 `caching_sha2_password` and MariaDB 11.
-- The Dart driver asks the server for its RSA key (`allowPublicKeyRetrieval` is `true` by default), so it works without TLS. Migrations do the same.
+- The Dart driver asks the server for its RSA key only with `useSSL: true`, or on `localhost`, `127.0.0.1`, `::1` and a Unix socket. On a remote host without TLS it does not ask, because a fake server could read the password. Migrations do the same.
 
 So check these settings on the connection in `lib/config/database.dart`:
 
 | Setting | What to do |
 | --- | --- |
+| Remote host without TLS | Give the key in `extra: {'serverPublicKey': '...'}` (safer), turn on `useSSL: true`, or set `extra: {'allowPublicKeyRetrieval': true}`. |
 | `extra: {'allowPublicKeyRetrieval': false}` | Remove it, or give the key in `extra: {'serverPublicKey': '...'}`. |
 | `useSSL: true` | The server must have TLS on. |
 | `host`, `port`, `user`, `password` | A wrong value gives the same login error. `DB_PORT` is `3306` by default for MySQL. |

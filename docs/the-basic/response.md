@@ -158,8 +158,8 @@ DoxCookie token = DoxCookie(
   'token',
   'value',
   maxAge: Duration(days: 7), // sent as Max-Age in seconds. default 1 hour
-  httpOnly: true,
-  secure: true,
+  httpOnly: true, // default true: page scripts can not read it
+  secure: true,   // default: Secure only when the request came over https
   path: '/',
 );
 return response('ok').cookie(token);

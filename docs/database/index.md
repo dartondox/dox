@@ -167,7 +167,7 @@ DATABASE_URL=postgres://app:s%40cret@db.example.com:5432/blog?sslmode=require
 
 - The user, password and database name are url-decoded. Write `@` in a password as `%40`.
 - No port: `5432` for Postgres, `3306` for MySQL.
-- `sslmode`: `disable`, `allow` and `prefer` mean no TLS. `verify-full` checks the server certificate. Other values, like `require`, turn TLS on. For MySQL, `ssl=true` works too.
+- `sslmode`: `disable`, `allow` and `prefer` mean no TLS. Other values turn TLS on. For Postgres it works like libpq: `require` encrypts but does not check the server certificate (Heroku urls use it). `verify-ca` and `verify-full` check the certificate. Use `verify-full` when your host supports it. `useSSL: true` in code also checks the certificate. Add `verifyCertificate=false` to skip the check, only for a self-signed certificate in development. For MySQL, `ssl=true` works too, and it checks the certificate.
 - The native Postgres driver has no TLS yet. With TLS on, Postgres uses the Dart driver.
 - `host=/path` (or `socket=/path`) connects to a Unix socket, like `host=/cloudsql/project:region:instance`. See [Unix socket](#unix-socket).
 - Any other option goes to `extra`, like `?maxConnectionCount=20`. A number becomes an `int`, `true` and `false` a `bool`.
@@ -237,10 +237,12 @@ The Dart MySQL driver reads `collation` (default `utf8mb4_general_ci`), `timeout
 `timeZone`, `serverPublicKey` and `allowPublicKeyRetrieval`.
 
 !!! info "MySQL 8 login without TLS"
-    The MySQL 8 default login (`caching_sha2_password`) works without TLS.
-    The Dart driver then asks the server for its RSA key to encrypt the password.
-    To not ask, give the key in `serverPublicKey`, or set `useSSL: true`.
-    Set `allowPublicKeyRetrieval: false` to turn the asking off.
+    The MySQL 8 default login (`caching_sha2_password`) needs the server RSA key without TLS.
+    A fake server can send its own key and read the password.
+    So the Dart driver only asks the server for it with TLS on, or on `localhost`,
+    `127.0.0.1`, `::1` or a Unix socket.
+    Else give the key in `serverPublicKey` (safer), set `useSSL: true`,
+    or set `allowPublicKeyRetrieval: true`.
 
 ### Table and column names are quoted
 
@@ -249,9 +251,10 @@ Table and column names you pass to `select`, `where`, `join`, `groupBy`, `orderB
 Postgres and SQLite use `"name"`. MySQL uses `` `name` ``.
 So names like `order` or `key` work.
 
-- `table.column`, `*` and `column as alias` are quoted in the right way.
-- A value with `(` (for example `count(*) as total`) is kept as it is.
-- For anything else, use the raw methods (`selectRaw`, `whereRaw`, `joinRaw`).
+- `table.column`, `table.*`, `*` and `column as alias` are quoted in the right way.
+- Anything else (for example `count(*) as total`) throws an `ArgumentError`.
+  So user input can not add SQL.
+- For expressions, use the raw methods (`selectRaw`, `whereRaw`, `orderByRaw`, `groupByRaw`, `joinRaw`).
 - On Postgres, a quoted name is case sensitive. `userId` is not the same column as `userid`.
 
 ### Raw queries

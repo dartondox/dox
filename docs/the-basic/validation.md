@@ -436,7 +436,7 @@ class UploadAvatar {
 }
 ```
 
-- Dox reads the first bytes of the file to find its real type. The file name and the client content type are not trusted.
+- Dox reads the first bytes of the file to find its real type. The file name and the client content type are not trusted. The file name extension must still fit the real type.
 - `@Image()` allows `jpg`, `jpeg`, `png`, `gif`, `webp` and `bmp`. Not `svg`, because an SVG can hold scripts.
 - A text field sent where a file is expected gives the error `file`.
 - Save the file before you return. See [Request: form data](request.md#form-data-file).

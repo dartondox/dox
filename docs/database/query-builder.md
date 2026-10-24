@@ -126,9 +126,10 @@ await Actor().where('deleted_at', null).get();
 
 Many `where` calls are joined with `AND`.
 
-!!! warning
-    The operator is written into the SQL as it is.
-    Do not pass user input as the operator or as the column name.
+!!! info
+    The operator must be one of `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `like`,
+    `not like` or `ilike` (any case). Any other value throws an `ArgumentError`.
+    The column must be a plain name. Use `whereRaw` for expressions.
 
 ### `orWhere`
 
@@ -191,15 +192,16 @@ await Actor().select(<String>['id', 'name']).get();
 // comma separated
 await Actor().select('id, name, age').get();
 
-// with a function
-await QueryBuilder.table('actor').select('count(*) as total, name').groupBy('name').get();
-// SELECT count(*) as total,"name" FROM "actor" GROUP BY "name"
+// with an alias
+await Actor().select('name as actor_name').get();
 
 // raw: nothing is quoted
 await Actor().selectRaw('DISTINCT name').get();
+await QueryBuilder.table('actor').selectRaw('count(*) as total, name').groupBy('name').get();
 ```
 
-A part with `(` is kept as it is. Other parts are quoted.
+Each part must be a plain name: `name`, `table.name`, `table.*`, `*` or `name as alias`.
+Anything else, like `count(*)`, throws an `ArgumentError`. Use `selectRaw` for it.
 
 !!! info
     A model loaded with `select()` only has the selected fields.
@@ -217,8 +219,9 @@ await Actor().orderBy('name', 'asc').orderBy('id', 'desc').get();
 ```
 
 - The direction must be `asc` or `desc`. Any other value throws an `ArgumentError`.
-- The column name is quoted, but a name with `(` is kept as it is.
-  Do not pass user input as the column name.
+- The column must be a plain name. Anything else throws an `ArgumentError`.
+- For an expression, use `orderByRaw('count(*) desc')`. Nothing is quoted there,
+  so never put user input in it.
 
 ### `limit`, `take` and `offset`
 
@@ -237,10 +240,12 @@ Takes one column, or a list of columns.
 
 ```dart
 List<Map<String, dynamic>> rows = await QueryBuilder.table('actor')
-    .select('count(*) as total, age')
+    .selectRaw('count(*) as total, age')
     .groupBy('age')
     .get();
 ```
+
+For an expression, use `groupByRaw('date(created_at)')`. Nothing is quoted there.
 
 !!! info
     Use `QueryBuilder.table()` for `groupBy`. A group row is a map, not a model.

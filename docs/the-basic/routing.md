@@ -192,6 +192,9 @@ Route.files('files');
 Route.files('public', disk: 'local', signed: false);
 ```
 
+An html, svg, xml or javascript file is sent as a download (`Content-Disposition: attachment`) with `Content-Security-Policy: sandbox`.
+So a script in an uploaded file does not run on your site.
+
 ## Request body for the docs
 
 `post`, `put` and `patch` take a `body:` schema. It shows in the [OpenAPI docs](../packages/openapi.md).

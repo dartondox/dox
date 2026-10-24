@@ -34,6 +34,7 @@ What it does:
 3. Runs `git clone --depth 1 --branch v<version> https://github.com/dartondox/dox-sample.git <name>`.
 4. Deletes the `.git` folder.
 5. Replaces `dox_sample` with your project name in every file, except files under `bin/dox`.
+6. Copies `.env.example` to `.env` and writes a new random `APP_KEY` to it, like `dox key:generate`. It skips this step when `.env` is already there.
 
 Needs `curl` and `git` on the `PATH`.
 
