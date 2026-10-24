@@ -52,47 +52,36 @@ void main() {
       );
     });
 
-    for (ServerBackend backend in ServerBackend.values) {
-      test('APP_HOST=127.0.0.1 listens on IPv4 loopback only '
-          '(${backend.name})', () async {
-        Env().env['APP_HOST'] = '127.0.0.1';
-        int port = await freePort();
-        Env().env['PORT'] = '$port';
-        Route.get('/listen', (DoxRequest req) => 'ok');
-        await startHttpServer(
-          AppConfig(
-            appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
-            totalIsolate: 1,
-            server: backend,
-          ),
+    test('APP_HOST=127.0.0.1 listens on IPv4 loopback only', () async {
+      Env().env['APP_HOST'] = '127.0.0.1';
+      int port = await freePort();
+      Env().env['PORT'] = '$port';
+      Route.get('/listen', (DoxRequest req) => 'ok');
+      await startHttpServer(
+        AppConfig(appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt', totalIsolate: 1),
+      );
+      try {
+        HttpServer server = Dox().server.httpServer;
+        expect(server, isA<NativeHttpServer>());
+        expect(server.port, port);
+        expect(server.address, InternetAddress.loopbackIPv4);
+        HttpClient client = HttpClient();
+        HttpClientResponse res = await (await client.get(
+          '127.0.0.1',
+          port,
+          '/listen',
+        )).close();
+        expect(res.statusCode, 200);
+        await res.drain<void>();
+        client.close();
+        await expectLater(
+          Socket.connect(InternetAddress.loopbackIPv6, port),
+          throwsA(isA<SocketException>()),
         );
-        try {
-          HttpServer server = Dox().server.httpServer;
-          bool dartIo = Platform.environment['DOX_SERVER'] == 'dartio';
-          expect(
-            server is NativeHttpServer,
-            backend == ServerBackend.native && !dartIo,
-          );
-          expect(server.port, port);
-          expect(server.address, InternetAddress.loopbackIPv4);
-          HttpClient client = HttpClient();
-          HttpClientResponse res = await (await client.get(
-            '127.0.0.1',
-            port,
-            '/listen',
-          )).close();
-          expect(res.statusCode, 200);
-          await res.drain<void>();
-          client.close();
-          await expectLater(
-            Socket.connect(InternetAddress.loopbackIPv6, port),
-            throwsA(isA<SocketException>()),
-          );
-        } finally {
-          await Dox().server.close();
-        }
-      });
-    }
+      } finally {
+        await Dox().server.close();
+      }
+    });
   });
 }
 

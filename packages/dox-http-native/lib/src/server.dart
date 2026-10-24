@@ -38,6 +38,20 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
     return _loadError;
   }
 
+  /// Throws an [UnsupportedError] that says why the native library did not
+  /// load and how to fix it. Does nothing when it loaded.
+  static void ensureAvailable() {
+    if (isAvailable) return;
+    throw UnsupportedError(
+      'dox_http_native did not load: $_loadError.\n'
+      'Fix: install Rust (cargo, see https://rustup.rs), then run the app '
+      'again with `dart run` or `dart build cli`. The build hook then builds '
+      'the library from source. When you set `lib_path` in pubspec.yaml, '
+      'rebuild that library: `cargo build --release` in '
+      'packages/dox-http-native/native.',
+    );
+  }
+
   static bool _load() {
     try {
       int version = doxVersion();
@@ -76,9 +90,7 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
     int? maxMultipartSize,
     Duration bodyTimeout = const Duration(seconds: 120),
   }) async {
-    if (!isAvailable) {
-      throw UnsupportedError('dox_http_native is not available: $_loadError');
-    }
+    ensureAvailable();
     InternetAddress? ip = await _resolve(address);
     List<int> raw = ip?.rawAddress ?? const <int>[];
     int family = ip == null ? 0 : (raw.length == 4 ? 4 : 6);

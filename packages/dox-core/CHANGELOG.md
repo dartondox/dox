@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Breaking: the `dart:io` server is gone. Every app runs on the native server (`dox_http_native`), also an app with WebSocket or Socket.IO routes. `AppConfig.server`, the `ServerBackend` enum and the `DOX_SERVER` env var are removed. `DoxServer.usesNative()` and the `isolateId` option of `DoxServer.listen()` are removed.
+- Breaking: when the native library does not load, Dox stops at start with an error. It says why (eg. an ABI mismatch) and how to fix it (install Rust so the build hook can build it, or rebuild your `lib_path` library). Before, Dox logged a warning and used `dart:io`.
+- On a graceful stop (SIGTERM, `Dox().stop()`), open WebSockets get close code 1001.
 - Security: the app does not start when `APP_KEY` is empty, not exactly 32 characters, or one of the old public sample keys from `.env.example`. With such a key anyone can sign tokens and cookies. In `APP_ENV` `development`, `local` or `test` Dox only logs a warning. A longer key (eg. 48 or 64 characters) is refused too, because AES needs a key of 16, 24 or 32 bytes and every encrypted cookie failed with it. Before, only an empty key in `production` stopped the app. Run `dox key:generate` for a new key.
 - Security: a multipart part header with many backslashes (`name="\\\\...`) no longer blocks a server isolate for hours (ReDoS in the quoted string regex).
 - Security: a `StreamFile` response (`Storage().stream()`, `Route.files()`) with an html, xml, svg or javascript type is sent with `Content-Disposition: attachment` and `Content-Security-Policy: sandbox`. Every `StreamFile` gets `X-Content-Type-Options: nosniff`. Before, an uploaded `x.html` or `x.svg` was shown inline, and its script ran on the app origin (stored XSS).

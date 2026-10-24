@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 
-/// a small app for the SIGTERM test. Args: port, isolates, backend.
+/// a small app for the SIGTERM test. Args: port, isolates.
 /// `/slow` prints `slow start` and answers after 700 ms. Prints `ready`
 /// when it serves and `cleanup <isolate>` when a DoxShutdown service runs.
 void main(List<String> args) async {
@@ -11,7 +11,6 @@ void main(List<String> args) async {
       appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
       serverPort: int.parse(args[0]),
       totalIsolate: int.parse(args[1]),
-      server: ServerBackend.values.byName(args[2]),
       routers: <Router>[SlowRouter()],
       services: <DoxService>[CleanupService()],
     ),
