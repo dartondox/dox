@@ -30,6 +30,26 @@ void main() {
       expect(store.match(<String>{}, <String>{'a'}), <String>{'b', 'c'});
     });
 
+    test('members gives the same sockets as match', () {
+      List<Set<String>> cases = <Set<String>>[
+        <String>{},
+        <String>{'room1'},
+        <String>{'room1', 'room2'},
+        <String>{'none'},
+      ];
+      for (Set<String> rooms in cases) {
+        for (Set<String> except in <Set<String>>[
+          <String>{},
+          <String>{'vip'},
+        ]) {
+          expect(
+            store.members(rooms, except).toSet(),
+            store.match(rooms, except),
+          );
+        }
+      }
+    });
+
     test('unknown rooms match nobody', () {
       expect(store.match(<String>{'none'}, <String>{}), isEmpty);
     });

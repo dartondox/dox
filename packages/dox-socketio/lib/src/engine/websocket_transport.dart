@@ -73,7 +73,12 @@ class WebsocketTransport extends Transport {
   void send(List<EnginePacket> packets) {
     if (_closed) return;
     for (EnginePacket packet in packets) {
-      _socket.add(_parser.encodeForWebsocket(packet));
+      Object? data = packet.data;
+      if (data is SharedText) {
+        _socket.addUtf8Text(data.frame);
+      } else {
+        _socket.add(_parser.encodeForWebsocket(packet));
+      }
     }
   }
 
