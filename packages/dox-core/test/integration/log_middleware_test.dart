@@ -36,7 +36,13 @@ void main() {
         totalIsolate: 1,
         routers: <Router>[LogRouter()],
         globalMiddleware: <dynamic>[
-          LogMiddleware(enabled: true, withHeader: true, filter: saveLine),
+          LogMiddleware(
+            enabled: true,
+            withHeader: true,
+            filter: saveLine,
+            // an upper case word matches any case too
+            redact: <String>[...LogMiddleware.defaultRedact, 'PIN'],
+          ),
         ],
       ),
     );
@@ -57,6 +63,7 @@ void main() {
       jsonEncode(<String, dynamic>{
         'email': 'a@dox.dev',
         'password': 'hunter2',
+        'Pin_Code': '1234',
         'profile': <String, dynamic>{'api_key': 'k', 'name': 'A'},
         'refresh_token': 'r',
       }),
@@ -71,6 +78,7 @@ void main() {
     expect(body['email'], 'a@dox.dev');
     expect(body['password'], '[REDACTED]');
     expect(body['refresh_token'], '[REDACTED]');
+    expect(body['Pin_Code'], '[REDACTED]');
     expect(body['profile'], <String, dynamic>{
       'api_key': '[REDACTED]',
       'name': 'A',

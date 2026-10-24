@@ -17,7 +17,9 @@ AppConfig appConfig = AppConfig(
   appKey: env.appKey,
   serverPort: env.appPort,
   totalIsolate: env.appTotalIsolate ?? Platform.numberOfProcessors,
-  globalMiddleware: <dynamic>[LogMiddleware(enabled: true)],
+  globalMiddleware: <dynamic>[
+    LogMiddleware(enabled: env.appEnv != 'production'),
+  ],
 
   /// the SPA catch-all route is in WebRouter, so it comes last
   routers: <Router>[ApiRouter(), WebRouter()],

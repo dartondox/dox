@@ -1,4 +1,3 @@
-import 'package:dox_app/app/http/handler.dart';
 import 'package:dox_app/config/cache.dart';
 import 'package:dox_app/config/cors.dart';
 import 'package:dox_app/config/logger.dart';
@@ -46,15 +45,15 @@ AppConfig appConfig = AppConfig(
   /// -------------------------------
   /// By registering global middleware here,
   /// middleware will be applied to all the routes.
-  globalMiddleware: <dynamic>[LogMiddleware(enabled: true)],
+  globalMiddleware: <dynamic>[
+    /// one log line per request. off in production: the proxy logs there.
+    LogMiddleware(enabled: env.appEnv != 'production'),
+  ],
 
   /// Routers
   /// -------------------------------
   /// Register routers to create route to dox framework.
   routers: <Router>[WebRouter(), ApiRouter(), WebsocketRouter()],
-
-  /// Response handler
-  responseHandler: ResponseHandler(),
 
   /// Cache stores (config/cache.dart)
   cache: cache,
