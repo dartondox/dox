@@ -4464,6 +4464,7 @@
 <ul>
 <li><code>@MaxSize</code> units: <code>B</code>, <code>KB</code>, <code>MB</code>, <code>GB</code>. <code>1KB</code> = 1024 bytes. A bad size text stops the build.</li>
 <li><code>@Mimes</code> takes file extensions. Dox finds the real type from the first bytes of the file.
+  The file name extension must fit those bytes too. So <code>x.html</code> with GIF bytes does not pass.
   For types without a byte signature (like <code>txt</code> or <code>csv</code>), it uses the file name extension.</li>
 <li><code>@Image()</code> is <code>@Mimes(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'])</code>. No <code>svg</code>.</li>
 <li>The JSON Schema of a file is <code>{"type": "string", "format": "binary"}</code>, plus the keys above.</li>

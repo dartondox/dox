@@ -4132,7 +4132,7 @@ Other named connections do not change.</p>
 <ul>
 <li>The user, password and database name are url-decoded. Write <code>@</code> in a password as <code>%40</code>.</li>
 <li>No port: <code>5432</code> for Postgres, <code>3306</code> for MySQL.</li>
-<li><code>sslmode</code>: <code>disable</code>, <code>allow</code> and <code>prefer</code> mean no TLS. <code>verify-full</code> checks the server certificate. Other values, like <code>require</code>, turn TLS on. For MySQL, <code>ssl=true</code> works too.</li>
+<li><code>sslmode</code>: <code>disable</code>, <code>allow</code> and <code>prefer</code> mean no TLS. Other values turn TLS on. For Postgres it works like libpq: <code>require</code> encrypts but does not check the server certificate (Heroku urls use it). <code>verify-ca</code> and <code>verify-full</code> check the certificate. Use <code>verify-full</code> when your host supports it. <code>useSSL: true</code> in code also checks the certificate. Add <code>verifyCertificate=false</code> to skip the check, only for a self-signed certificate in development. For MySQL, <code>ssl=true</code> works too, and it checks the certificate.</li>
 <li>The native Postgres driver has no TLS yet. With TLS on, Postgres uses the Dart driver.</li>
 <li><code>host=/path</code> (or <code>socket=/path</code>) connects to a Unix socket, like <code>host=/cloudsql/project:region:instance</code>. See <a href="#unix-socket">Unix socket</a>.</li>
 <li>Any other option goes to <code>extra</code>, like <code>?maxConnectionCount=20</code>. A number becomes an <code>int</code>, <code>true</code> and <code>false</code> a <code>bool</code>.</li>
@@ -4236,10 +4236,12 @@ The Dart MySQL driver reads <code>collation</code> (default <code>utf8mb4_genera
 <code>timeZone</code>, <code>serverPublicKey</code> and <code>allowPublicKeyRetrieval</code>.</p>
 <div class="admonition info">
 <p class="admonition-title">MySQL 8 login without TLS</p>
-<p>The MySQL 8 default login (<code>caching_sha2_password</code>) works without TLS.
-The Dart driver then asks the server for its RSA key to encrypt the password.
-To not ask, give the key in <code>serverPublicKey</code>, or set <code>useSSL: true</code>.
-Set <code>allowPublicKeyRetrieval: false</code> to turn the asking off.</p>
+<p>The MySQL 8 default login (<code>caching_sha2_password</code>) needs the server RSA key without TLS.
+A fake server can send its own key and read the password.
+So the Dart driver only asks the server for it with TLS on, or on <code>localhost</code>,
+<code>127.0.0.1</code>, <code>::1</code> or a Unix socket.
+Else give the key in <code>serverPublicKey</code> (safer), set <code>useSSL: true</code>,
+or set <code>allowPublicKeyRetrieval: true</code>.</p>
 </div>
 <h3 id="table-and-column-names-are-quoted">Table and column names are quoted</h3>
 <p>Table and column names you pass to <code>select</code>, <code>where</code>, <code>join</code>, <code>groupBy</code>, <code>orderBy</code>,
@@ -4247,9 +4249,10 @@ Set <code>allowPublicKeyRetrieval: false</code> to turn the asking off.</p>
 Postgres and SQLite use <code>"name"</code>. MySQL uses <code>`name`</code>.
 So names like <code>order</code> or <code>key</code> work.</p>
 <ul>
-<li><code>table.column</code>, <code>*</code> and <code>column as alias</code> are quoted in the right way.</li>
-<li>A value with <code>(</code> (for example <code>count(*) as total</code>) is kept as it is.</li>
-<li>For anything else, use the raw methods (<code>selectRaw</code>, <code>whereRaw</code>, <code>joinRaw</code>).</li>
+<li><code>table.column</code>, <code>table.*</code>, <code>*</code> and <code>column as alias</code> are quoted in the right way.</li>
+<li>Anything else (for example <code>count(*) as total</code>) throws an <code>ArgumentError</code>.
+  So user input can not add SQL.</li>
+<li>For expressions, use the raw methods (<code>selectRaw</code>, <code>whereRaw</code>, <code>orderByRaw</code>, <code>groupByRaw</code>, <code>joinRaw</code>).</li>
 <li>On Postgres, a quoted name is case sensitive. <code>userId</code> is not the same column as <code>userid</code>.</li>
 </ul>
 <h3 id="raw-queries">Raw queries</h3>

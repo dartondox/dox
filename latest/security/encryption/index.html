@@ -3948,7 +3948,8 @@ You can also call it yourself.</p>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">theme</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">);</span><span class="w">                    </span><span class="c1">// decrypted</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="nl">decrypt:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">      </span><span class="c1">// as sent</span>
 </span></code></pre></div>
-<p><code>req.cookie(key)</code> returns <code>null</code> when the cookie was changed, or was made with another <code>APP_KEY</code>.</p>
+<p><code>req.cookie(key)</code> returns <code>null</code> when the cookie was changed, was made with another <code>APP_KEY</code>, or was made for another cookie name.
+The cookie name is bound to the encrypted value, so a value can not be copied from one cookie to another.</p>
 <h2 id="how-it-works">How it works</h2>
 <p><code>AESEncryptor</code> uses AES-GCM.</p>
 <ul>

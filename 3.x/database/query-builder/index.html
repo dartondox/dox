@@ -4723,10 +4723,11 @@ So you can return a <code>Pagination</code> from a controller.</p>
 </span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="c1">// WHERE "deleted_at" IS NULL</span>
 </span></code></pre></div>
 <p>Many <code>where</code> calls are joined with <code>AND</code>.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The operator is written into the SQL as it is.
-Do not pass user input as the operator or as the column name.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>The operator must be one of <code>=</code>, <code>!=</code>, <code>&lt;&gt;</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code>, <code>like</code>,
+<code>not like</code> or <code>ilike</code> (any case). Any other value throws an <code>ArgumentError</code>.
+The column must be a plain name. Use <code>whereRaw</code> for expressions.</p>
 </div>
 <h3 id="orwhere"><code>orWhere</code></h3>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Doe'</span><span class="p">).</span><span class="n">orWhere</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
@@ -4775,14 +4776,15 @@ The column names are not quoted.</p>
 </span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="c1">// comma separated</span>
 </span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">select</span><span class="p">(</span><span class="s1">'id, name, age'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
 </span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>
-</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="c1">// with a function</span>
-</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'actor'</span><span class="p">).</span><span class="n">select</span><span class="p">(</span><span class="s1">'count(*) as total, name'</span><span class="p">).</span><span class="n">groupBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="c1">// SELECT count(*) as total,"name" FROM "actor" GROUP BY "name"</span>
-</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>
-</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="c1">// raw: nothing is quoted</span>
-</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">selectRaw</span><span class="p">(</span><span class="s1">'DISTINCT name'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="c1">// with an alias</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">select</span><span class="p">(</span><span class="s1">'name as actor_name'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="c1">// raw: nothing is quoted</span>
+</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="kd">await</span><span class="w"> </span><span class="n">Actor</span><span class="p">().</span><span class="n">selectRaw</span><span class="p">(</span><span class="s1">'DISTINCT name'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'actor'</span><span class="p">).</span><span class="n">selectRaw</span><span class="p">(</span><span class="s1">'count(*) as total, name'</span><span class="p">).</span><span class="n">groupBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
 </span></code></pre></div>
-<p>A part with <code>(</code> is kept as it is. Other parts are quoted.</p>
+<p>Each part must be a plain name: <code>name</code>, <code>table.name</code>, <code>table.*</code>, <code>*</code> or <code>name as alias</code>.
+Anything else, like <code>count(*)</code>, throws an <code>ArgumentError</code>. Use <code>selectRaw</code> for it.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>A model loaded with <code>select()</code> only has the selected fields.
@@ -4797,8 +4799,9 @@ The column names are not quoted.</p>
 </span></code></pre></div>
 <ul>
 <li>The direction must be <code>asc</code> or <code>desc</code>. Any other value throws an <code>ArgumentError</code>.</li>
-<li>The column name is quoted, but a name with <code>(</code> is kept as it is.
-  Do not pass user input as the column name.</li>
+<li>The column must be a plain name. Anything else throws an <code>ArgumentError</code>.</li>
+<li>For an expression, use <code>orderByRaw('count(*) desc')</code>. Nothing is quoted there,
+  so never put user input in it.</li>
 </ul>
 <h3 id="limit-take-and-offset"><code>limit</code>, <code>take</code> and <code>offset</code></h3>
 <p><code>limit</code> and <code>take</code> do the same thing.</p>
@@ -4810,10 +4813,11 @@ The column names are not quoted.</p>
 <h3 id="groupby"><code>groupBy</code></h3>
 <p>Takes one column, or a list of columns.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'actor'</span><span class="p">)</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span><span class="p">.</span><span class="n">select</span><span class="p">(</span><span class="s1">'count(*) as total, age'</span><span class="p">)</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span><span class="p">.</span><span class="n">selectRaw</span><span class="p">(</span><span class="s1">'count(*) as total, age'</span><span class="p">)</span>
 </span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="p">.</span><span class="n">groupBy</span><span class="p">(</span><span class="s1">'age'</span><span class="p">)</span>
 </span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
 </span></code></pre></div>
+<p>For an expression, use <code>groupByRaw('date(created_at)')</code>. Nothing is quoted there.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>Use <code>QueryBuilder.table()</code> for <code>groupBy</code>. A group row is a map, not a model.

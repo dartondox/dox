@@ -3985,15 +3985,14 @@ So every import in this tutorial starts with <code>package:blog/</code>.</p>
 If the template has an older version, change it and run <code>dart pub get</code> again.</p>
 </div>
 <h2 id="2-use-sqlite">2. Use SQLite</h2>
-<p>Copy the example env file:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>cp<span class="w"> </span>.env.example<span class="w"> </span>.env
-</span></code></pre></div>
+<p><code>dox create</code> already made <code>.env</code> from <code>.env.example</code>. It also wrote a new
+random <code>APP_KEY</code>, so each project has its own secret key.</p>
 <p>The template already uses SQLite. These are the lines that matter:</p>
-<div class="language-ini highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="na">APP_PORT</span><span class="o">=</span><span class="s">3000</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="na">APP_KEY</span><span class="o">=</span><span class="s">KKep5qC6uHlAgrwaQTQewgMRSIqQnoj0</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="na">DB_CONNECTION</span><span class="o">=</span><span class="s">sqlite</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="na">DB_NAME</span><span class="o">=</span><span class="s">db/dox.sqlite</span>
+<div class="language-ini highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="na">APP_PORT</span><span class="o">=</span><span class="s">3000</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="na">APP_KEY</span><span class="o">=</span><span class="s">&lt;your new random key&gt;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="na">DB_CONNECTION</span><span class="o">=</span><span class="s">sqlite</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="na">DB_NAME</span><span class="o">=</span><span class="s">db/dox.sqlite</span>
 </span></code></pre></div>
 <p>Dox makes the file <code>db/dox.sqlite</code> at the first start. The <code>db</code> folder is
 in the template. The <code>DB_HOST</code>, <code>DB_PORT</code>, <code>DB_USERNAME</code> and <code>DB_PASSWORD</code>
@@ -4007,25 +4006,25 @@ the app at start. See <a href="../../digging-deeper/env/">Environment variables<
 If you set <code>DB_NAME=storage/blog.sqlite</code>, run <code>mkdir storage</code> first.</p>
 </div>
 <h2 id="3-start-the-server">3. Start the server</h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>dox<span class="w"> </span>s
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dox<span class="w"> </span>s
 </span></code></pre></div>
 <p><code>dox s</code> runs the code generator (<code>build_runner watch</code>) and <code>dart run bin/server.dart</code>.
 It restarts the server when you save a <code>.dart</code> file.
 The first start takes a little longer. It prints <code>Running build hooks...</code> while it compiles the SQLite library.</p>
 <p>The last line is:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Server started at http://[::]:3000 with 8 isolate (native)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Server started at http://[::]:3000 with 8 isolate (native)
 </span></code></pre></div>
 <p><code>[::]</code> means the app listens on all network interfaces. Open it at <code>http://localhost:3000</code>.
 The number of isolates is the number of CPU cores on your machine.</p>
 <h2 id="check-it">Check it</h2>
 <p>In a second terminal:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>curl<span class="w"> </span>-i<span class="w"> </span>http://localhost:3000/api/ping
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>curl<span class="w"> </span>-i<span class="w"> </span>http://localhost:3000/api/ping
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>HTTP/1.1 200 OK
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>content-type: text/plain; charset=utf-8
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>...
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>pong
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>HTTP/1.1 200 OK
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>content-type: text/plain; charset=utf-8
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>...
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>pong
 </span></code></pre></div>
 <p>The route is in <code>lib/routes/api.dart</code>. The <code>ApiRouter</code> has the prefix <code>api</code>, so <code>/ping</code> is served at <code>/api/ping</code>.</p>
 <h2 id="next">Next</h2>

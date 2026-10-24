@@ -4376,6 +4376,7 @@ The file templates are Dart strings inside <code>packages/dox-cli/lib/src/tools/
 <li>Runs <code>git clone --depth 1 --branch v&lt;version&gt; https://github.com/dartondox/dox-sample.git &lt;name&gt;</code>.</li>
 <li>Deletes the <code>.git</code> folder.</li>
 <li>Replaces <code>dox_sample</code> with your project name in every file, except files under <code>bin/dox</code>.</li>
+<li>Copies <code>.env.example</code> to <code>.env</code> and writes a new random <code>APP_KEY</code> to it, like <code>dox key:generate</code>. It skips this step when <code>.env</code> is already there.</li>
 </ol>
 <p>Needs <code>curl</code> and <code>git</code> on the <code>PATH</code>.</p>
 <p>Source: <code>packages/dox-cli/lib/src/tools/create_project.dart</code>.</p>

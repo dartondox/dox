@@ -134,7 +134,6 @@ dart pub global activate dox ^3.0.0-alpha   # install the CLI
 dox create my_app                            # download the starter project
 cd my_app
 dart pub get
-cp .env.example .env
 dox s                                        # start the server
 ```
 
@@ -263,12 +262,12 @@ dox create new_blog
 [dox-sample](https://github.com/dartondox/dox-sample), the starter project.
 To get one exact version, add `--version`, for example `dox create new_blog --version 3.0.0-alpha.5`.
 
-Then get the packages and make your `.env` file:
+It also makes your `.env` file from `.env.example`, with a new random `APP_KEY`.
+Then get the packages:
 
 ```bash
 cd new_blog
 dart pub get
-cp .env.example .env
 ```
 
 The starter project uses SQLite, so there is no database to install.
@@ -485,17 +484,14 @@ So every import in this tutorial starts with `package:blog/`.
 
 ## 2. Use SQLite
 
-Copy the example env file:
-
-```bash
-cp .env.example .env
-```
+`dox create` already made `.env` from `.env.example`. It also wrote a new
+random `APP_KEY`, so each project has its own secret key.
 
 The template already uses SQLite. These are the lines that matter:
 
 ```ini title=".env"
 APP_PORT=3000
-APP_KEY=KKep5qC6uHlAgrwaQTQewgMRSIqQnoj0
+APP_KEY=<your new random key>
 
 DB_CONNECTION=sqlite
 DB_NAME=db/dox.sqlite
@@ -2621,6 +2617,9 @@ Route.files('files');
 Route.files('public', disk: 'local', signed: false);
 ```
 
+An html, svg, xml or javascript file is sent as a download (`Content-Disposition: attachment`) with `Content-Security-Policy: sandbox`.
+So a script in an uploaded file does not run on your site.
+
 ## Request body for the docs
 
 `post`, `put` and `patch` take a `body:` schema. It shows in the [OpenAPI docs](../packages/openapi.md).
@@ -2979,8 +2978,8 @@ DoxCookie token = DoxCookie(
   'token',
   'value',
   maxAge: Duration(days: 7), // sent as Max-Age in seconds. default 1 hour
-  httpOnly: true,
-  secure: true,
+  httpOnly: true, // default true: page scripts can not read it
+  secure: true,   // default: Secure only when the request came over https
   path: '/',
 );
 return response('ok').cookie(token);
@@ -3756,7 +3755,7 @@ class UploadAvatar {
 }
 ```
 
-- Dox reads the first bytes of the file to find its real type. The file name and the client content type are not trusted.
+- Dox reads the first bytes of the file to find its real type. The file name and the client content type are not trusted. The file name extension must still fit the real type.
 - `@Image()` allows `jpg`, `jpeg`, `png`, `gif`, `webp` and `bmp`. Not `svg`, because an SVG can hold scripts.
 - A text field sent where a file is expected gives the error `file`.
 - Save the file before you return. See [Request: form data](request.md#form-data-file).
@@ -4230,6 +4229,7 @@ For `RequestFile` and `List<RequestFile>` fields.
 
 - `@MaxSize` units: `B`, `KB`, `MB`, `GB`. `1KB` = 1024 bytes. A bad size text stops the build.
 - `@Mimes` takes file extensions. Dox finds the real type from the first bytes of the file.
+  The file name extension must fit those bytes too. So `x.html` with GIF bytes does not pass.
   For types without a byte signature (like `txt` or `csv`), it uses the file name extension.
 - `@Image()` is `@Mimes(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'])`. No `svg`.
 - The JSON Schema of a file is `{"type": "string", "format": "binary"}`, plus the keys above.
@@ -5184,11 +5184,38 @@ Two events are built in:
 | Event | Direction | What it does |
 | --- | --- | --- |
 | `connected` | server to client | sent once after connect. `message` is `{"id": "<socket id>"}` |
-| `joinRoom` | client to server | joins the room. `message` is the room name, up to 255 chars. A name that starts with `room:` is ignored |
+| `joinRoom` | client to server | joins the room, if `authorizeJoin` allows it. `message` is the room name, up to 255 chars. A name that starts with `room:` is ignored |
 
 A client starts in a room for its route, so `emitter.emit()` with no room reaches all clients of the same route. A client is in one room at a time. When it joins a room, it leaves the room it was in, also the route room.
 
-Any client can join any other room by its name. Do not send private data to a room that a client can guess, like `user:42`. Send it with `emitToSender`. Or use a route with auth middleware, and call `emitter.emit()` with no room, so only clients of that route get it.
+### Allow joins with `authorizeJoin`
+
+`joinRoom` is refused unless you set `authorizeJoin`. It gets the request that opened the websocket and the room name. Return `true` to allow the join.
+
+```dart
+WebsocketServer io = WebsocketServer(Dox());
+io.authorizeJoin = (IDoxRequest req, String room) {
+  // public rooms are open. a `user:` room only for its own user.
+  if (room.startsWith('chat:')) return true;
+  return room == 'user:${userIdOf(req)}';
+};
+```
+
+It can also return a `Future<bool>`.
+
+## Security options
+
+Set these on `WebsocketServer` in your service:
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `authorizeJoin` | `null` | decides who may `joinRoom`. When null, every join is refused |
+| `allowedOrigins` | `null` | origins that may open a websocket, like `['https://my.app']`. Other origins get 403. When null, any origin is allowed |
+| `maxMessageSize` | 1 MB | the biggest message a client may send. A bigger one closes the connection with code 1009 |
+
+- If you log users in with cookies, set `allowedOrigins`. Else any website can open a websocket as your user.
+- A request with no `Origin` header (not a browser) is allowed.
+- Compression is off. dart:io reads a whole message before Dox checks its size, so also set a size limit in your proxy.
 
 ## Client examples
 
@@ -5849,8 +5876,13 @@ a gain.
 
 - Max size of the request line plus headers: 16 KB. Bigger gets `431`.
 - A bad request gets `400`.
-- A body over the bigger of `maxBodySize` and `maxMultipartSize` gets `413`
-  from Rust. Each body type is checked again in Dart with its own limit.
+- A multipart form over `maxMultipartSize`, or any other body over
+  `maxBodySize`, gets `413` from Rust. When `Content-Length` is too big and
+  the client sent `Expect: 100-continue`, the `413` comes before the body is
+  sent. Else Rust reads and drops the body first, so the client sees the
+  `413`. Dart checks the limits again.
+- A client that sends no body bytes for 120 seconds (idle time) gets `408`.
+  A slow but steady upload is fine.
 - A response is sent when it is closed. It is kept in memory until then,
   also a big file. Use a proxy (nginx, Caddy) or a storage link for big
   downloads.
@@ -6558,7 +6590,7 @@ DATABASE_URL=postgres://app:s%40cret@db.example.com:5432/blog?sslmode=require
 
 - The user, password and database name are url-decoded. Write `@` in a password as `%40`.
 - No port: `5432` for Postgres, `3306` for MySQL.
-- `sslmode`: `disable`, `allow` and `prefer` mean no TLS. `verify-full` checks the server certificate. Other values, like `require`, turn TLS on. For MySQL, `ssl=true` works too.
+- `sslmode`: `disable`, `allow` and `prefer` mean no TLS. Other values turn TLS on. For Postgres it works like libpq: `require` encrypts but does not check the server certificate (Heroku urls use it). `verify-ca` and `verify-full` check the certificate. Use `verify-full` when your host supports it. `useSSL: true` in code also checks the certificate. Add `verifyCertificate=false` to skip the check, only for a self-signed certificate in development. For MySQL, `ssl=true` works too, and it checks the certificate.
 - The native Postgres driver has no TLS yet. With TLS on, Postgres uses the Dart driver.
 - `host=/path` (or `socket=/path`) connects to a Unix socket, like `host=/cloudsql/project:region:instance`. See [Unix socket](#unix-socket).
 - Any other option goes to `extra`, like `?maxConnectionCount=20`. A number becomes an `int`, `true` and `false` a `bool`.
@@ -6628,10 +6660,12 @@ The Dart MySQL driver reads `collation` (default `utf8mb4_general_ci`), `timeout
 `timeZone`, `serverPublicKey` and `allowPublicKeyRetrieval`.
 
 !!! info "MySQL 8 login without TLS"
-    The MySQL 8 default login (`caching_sha2_password`) works without TLS.
-    The Dart driver then asks the server for its RSA key to encrypt the password.
-    To not ask, give the key in `serverPublicKey`, or set `useSSL: true`.
-    Set `allowPublicKeyRetrieval: false` to turn the asking off.
+    The MySQL 8 default login (`caching_sha2_password`) needs the server RSA key without TLS.
+    A fake server can send its own key and read the password.
+    So the Dart driver only asks the server for it with TLS on, or on `localhost`,
+    `127.0.0.1`, `::1` or a Unix socket.
+    Else give the key in `serverPublicKey` (safer), set `useSSL: true`,
+    or set `allowPublicKeyRetrieval: true`.
 
 ### Table and column names are quoted
 
@@ -6640,9 +6674,10 @@ Table and column names you pass to `select`, `where`, `join`, `groupBy`, `orderB
 Postgres and SQLite use `"name"`. MySQL uses `` `name` ``.
 So names like `order` or `key` work.
 
-- `table.column`, `*` and `column as alias` are quoted in the right way.
-- A value with `(` (for example `count(*) as total`) is kept as it is.
-- For anything else, use the raw methods (`selectRaw`, `whereRaw`, `joinRaw`).
+- `table.column`, `table.*`, `*` and `column as alias` are quoted in the right way.
+- Anything else (for example `count(*) as total`) throws an `ArgumentError`.
+  So user input can not add SQL.
+- For expressions, use the raw methods (`selectRaw`, `whereRaw`, `orderByRaw`, `groupByRaw`, `joinRaw`).
 - On Postgres, a quoted name is case sensitive. `userId` is not the same column as `userid`.
 
 ### Raw queries
@@ -6888,9 +6923,10 @@ await Actor().where('deleted_at', null).get();
 
 Many `where` calls are joined with `AND`.
 
-!!! warning
-    The operator is written into the SQL as it is.
-    Do not pass user input as the operator or as the column name.
+!!! info
+    The operator must be one of `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `like`,
+    `not like` or `ilike` (any case). Any other value throws an `ArgumentError`.
+    The column must be a plain name. Use `whereRaw` for expressions.
 
 ### `orWhere`
 
@@ -6953,15 +6989,16 @@ await Actor().select(<String>['id', 'name']).get();
 // comma separated
 await Actor().select('id, name, age').get();
 
-// with a function
-await QueryBuilder.table('actor').select('count(*) as total, name').groupBy('name').get();
-// SELECT count(*) as total,"name" FROM "actor" GROUP BY "name"
+// with an alias
+await Actor().select('name as actor_name').get();
 
 // raw: nothing is quoted
 await Actor().selectRaw('DISTINCT name').get();
+await QueryBuilder.table('actor').selectRaw('count(*) as total, name').groupBy('name').get();
 ```
 
-A part with `(` is kept as it is. Other parts are quoted.
+Each part must be a plain name: `name`, `table.name`, `table.*`, `*` or `name as alias`.
+Anything else, like `count(*)`, throws an `ArgumentError`. Use `selectRaw` for it.
 
 !!! info
     A model loaded with `select()` only has the selected fields.
@@ -6979,8 +7016,9 @@ await Actor().orderBy('name', 'asc').orderBy('id', 'desc').get();
 ```
 
 - The direction must be `asc` or `desc`. Any other value throws an `ArgumentError`.
-- The column name is quoted, but a name with `(` is kept as it is.
-  Do not pass user input as the column name.
+- The column must be a plain name. Anything else throws an `ArgumentError`.
+- For an expression, use `orderByRaw('count(*) desc')`. Nothing is quoted there,
+  so never put user input in it.
 
 ### `limit`, `take` and `offset`
 
@@ -6999,10 +7037,12 @@ Takes one column, or a list of columns.
 
 ```dart
 List<Map<String, dynamic>> rows = await QueryBuilder.table('actor')
-    .select('count(*) as total, age')
+    .selectRaw('count(*) as total, age')
     .groupBy('age')
     .get();
 ```
+
+For an expression, use `groupByRaw('date(created_at)')`. Nothing is quoted there.
 
 !!! info
     Use `QueryBuilder.table()` for `groupBy`. A group row is a map, not a model.
@@ -7397,7 +7437,7 @@ DB_NAME=storage/app.db # file path, made if missing
 - The default port is `5432` for Postgres and `3306` for MySQL.
 - One run uses one database connection.
 - A `DB_HOST` that starts with `/` is a Unix socket: the socket folder for Postgres, the socket file for MySQL. Eg. `/cloudsql/project:region:instance`.
-- Migrations use TLS only with a `DATABASE_URL` that has `sslmode` (Postgres) or `ssl` (MySQL), like `?sslmode=require`.
+- Migrations use TLS only with a `DATABASE_URL` that has `sslmode` (Postgres) or `ssl` (MySQL), like `?sslmode=require`. For Postgres, `require` encrypts but does not check the server certificate, and `verify-full` checks it. MySQL `ssl=true` checks it. Add `&verifyCertificate=false` only for a self-signed certificate in development.
   You can also give your own connection: `Migrator(migrations: migrations, connection: myPool)`.
 
 ## Transactions
@@ -8009,6 +8049,7 @@ The driver reads the normal fields of the `ConnectionConfig` (`host`,
 | `maxConnectionAge` | 12 hours | A connection older than this is closed and opened again. |
 | `preparedStatementCacheSize` | `100` | Prepared statements kept per connection. |
 | `threads` | `1` | Rust threads for all pools of the process. Only the first pool sets it. One thread is the fastest for most apps. |
+| `verifyCertificate` | `true` | With `useSSL`, TLS checks the server certificate. Set it to `false` only for a self-signed certificate in development. |
 
 Isolates that open a pool with the same settings share one pool in Rust.
 So `maxConnectionCount` is for the whole process, not per isolate. You can
@@ -8348,6 +8389,29 @@ Blog created = await Blog().create(<String, dynamic>{
   (loaded from the database, or saved).
   Fields that were not loaded, for example with `select()`, are not changed.
 - `save()` returns `false` when a [model event](events.md) cancels it.
+
+### Mass assignment
+
+`create()`, `insert()` and `update()` take any key of the map.
+So `User().create(req.body)` with `{"is_admin": 1}` makes an admin.
+Set `fillable` or `guarded` to stop this.
+
+```dart
+@DoxModel()
+class User extends UserGenerator {
+  // only these keys are taken from a map
+  @override
+  List<String> get fillable => <String>['name', 'email'];
+
+  // or: these keys are never taken from a map
+  @override
+  List<String> get guarded => <String>['is_admin'];
+}
+```
+
+- Keys that are not allowed are dropped. They do not throw.
+- Both lists are empty by default. Then every key is taken.
+- `save()` is not changed. Fields you set in code are always saved.
 
 ## Delete
 
@@ -10661,7 +10725,10 @@ class ChatNamespace extends NamespaceHandler {
 io.register(ChatNamespace(MessageService()));
 ```
 
-When a middleware throws, the client gets `connect_error` with the message and the data.
+When a middleware throws a `SocketIoException`, the client gets `connect_error` with the message and the data.
+Any other error is written to stderr. The client only gets `{"message": "Internal error"}`, so it can not see private text like SQL.
+
+A client that is refused is still closed after `connectTimeout`, unless it joins another namespace.
 
 ## Node.js to Dart
 
@@ -10704,10 +10771,15 @@ SocketIoServer(
 | `pingTimeout` | 20 s | how long to wait for the pong before the client is gone |
 | `upgradeTimeout` | 10 s | how long an upgrade from polling to websocket may take |
 | `connectTimeout` | 45 s | how long the client has to join a namespace |
-| `maxHttpBufferSize` | 1,000,000 bytes | the biggest message |
+| `maxHttpBufferSize` | 1,000,000 bytes | the biggest message. A bigger websocket message closes the connection |
 | `transports` | `['polling', 'websocket']` | allowed transports |
 | `allowUpgrades` | `true` | let polling clients move to websocket |
-| `cors` | `null` | CORS headers for polling requests |
+| `cors` | `null` | CORS headers for polling requests. It also checks the origin of websockets |
+
+- `cors` with a list of origins: a websocket from another origin gets 403. A request with no `Origin` header (not a browser) is allowed.
+- `cors: null`, or `*` in `origins`: websockets from any origin are allowed. If you log users in with cookies, list your origins.
+- `*` together with `credentials: true` throws an `ArgumentError`. List your origins instead.
+- Websocket compression is off. dart:io reads a whole message before Dox checks its size, so also set a size limit in your proxy.
 
 ## Many servers: Redis adapter
 
@@ -11114,7 +11186,8 @@ String? theme = req.cookie('theme');                    // decrypted
 String? raw = req.cookie('theme', decrypt: false);      // as sent
 ```
 
-`req.cookie(key)` returns `null` when the cookie was changed, or was made with another `APP_KEY`.
+`req.cookie(key)` returns `null` when the cookie was changed, was made with another `APP_KEY`, or was made for another cookie name.
+The cookie name is bound to the encrypted value, so a value can not be copied from one cookie to another.
 
 ## How it works
 
@@ -14974,7 +15047,7 @@ void intro(WebsocketEmitter emitter, dynamic message) {
 }
 ```
 
-Client sends `{"event": "joinRoom", "message": "chat"}`. Many isolates need `WebsocketRedisAdapter`.
+Client sends `{"event": "joinRoom", "message": "chat"}`. The join is refused unless you set `WebsocketServer().authorizeJoin`. Many isolates need `WebsocketRedisAdapter`.
 
 See [WebSocket](../digging-deeper/websocket.md).
 
@@ -15044,6 +15117,7 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `compress` | `bool` | `false` | gzip responses in Dart (`HttpServer.autoCompress`). It costs CPU on every response. Let a proxy do it when you have one. |
 | `maxBodySize` | `int` | `10 * 1024 * 1024` (10 MB) | Biggest JSON or urlencoded body in bytes. Bigger gets `413`. |
 | `maxMultipartSize` | `int` | `100 * 1024 * 1024` (100 MB) | Biggest `multipart/form-data` body (file uploads) in bytes. Bigger gets `413`. |
+| `bodyTimeout` | `Duration` | `Duration(seconds: 120)` | A client that sends no body bytes for this long gets `408`. A slow but steady upload is fine. Native server only. |
 | `shutdownTimeout` | `Duration` | `Duration(seconds: 8)` | On `SIGTERM` or `SIGINT`, how long open requests may run before Dox closes them. Keep it below the kill timeout of your platform. See [Graceful shutdown](../digging-deeper/deployment.md#graceful-shutdown). |
 | `trustedProxies` | `List<String>` | `[]` | IPs or CIDR ranges of reverse proxies. Only when the direct client is in this list does Dox read `X-Forwarded-For` for `req.ip()` and `X-Forwarded-Proto` for `req.scheme()`. `['*']` trusts any direct client, and takes the right-most `X-Forwarded-For` hop (the one the proxy added) as the client. |
 
@@ -15251,7 +15325,7 @@ Keys of `extra`:
 | postgres | `sslMode` | postgres `SslMode` | none | Setting it uses the Dart driver. |
 | mysql | `collation` | `String` | `utf8mb4_general_ci` | Connection collation. |
 | mysql | `timeoutMs` | `int` | `10000` | Connect timeout. |
-| mysql | `allowPublicKeyRetrieval` | `bool` | `true` | Ask the server for its RSA key (needed for `caching_sha2_password` without TLS). |
+| mysql | `allowPublicKeyRetrieval` | `bool` | `false`, `true` with `useSSL` or a local host | Ask the server for its RSA key (needed for `caching_sha2_password` without TLS). A fake server can send its own key and read the password, so it is off by default. It is on with `useSSL: true`, on `localhost`, `127.0.0.1`, `::1` and on a Unix socket. Giving the key in `serverPublicKey` is safer. |
 | mysql | `serverPublicKey` | `String` | none | The server RSA key, so it is not asked for. |
 | mysql | `timeZone` | `String` | none | Session time zone. |
 | mysql | `maxConnectionAge` | `Duration` | 12 hours | Close and reopen a connection after this time. |
@@ -15614,6 +15688,7 @@ What it does:
 3. Runs `git clone --depth 1 --branch v<version> https://github.com/dartondox/dox-sample.git <name>`.
 4. Deletes the `.git` folder.
 5. Replaces `dox_sample` with your project name in every file, except files under `bin/dox`.
+6. Copies `.env.example` to `.env` and writes a new random `APP_KEY` to it, like `dox key:generate`. It skips this step when `.env` is already there.
 
 Needs `curl` and `git` on the `PATH`.
 
@@ -15936,7 +16011,7 @@ The code reads env vars in three ways:
 
 | Variable | Who reads it | Default | Meaning | Example |
 | --- | --- | --- | --- | --- |
-| `APP_ENV` | `dox_core` (`Dox().checkAppKey()`, `OpenApiConfig.isEnabled`) | empty | `production` makes a missing `APP_KEY` a startup error. `development` or `local` turn the `/docs` routes on when `openApi.enabled` is `null`. Read with `Env.get`. | `APP_ENV=production` |
+| `APP_ENV` | `dox_core` (`Dox().checkAppKey()`, `OpenApiConfig.isEnabled`) | empty | Any value except `development`, `local` or `test` (also empty) makes a bad `APP_KEY` a startup error: missing, not exactly 32 characters, or a public sample key. In `development`, `local` and `test` it is only a warning. `development` or `local` turn the `/docs` routes on when `openApi.enabled` is `null`. Read with `Env.get`. | `APP_ENV=production` |
 | `PORT` | `dox_core` (`DoxServer.portFor()`) | not set | The port to listen on, when `APP_PORT` is not set. Cloud Run, Fly, Render and Heroku set it. `APP_PORT` wins when both are set. Read with `Env.get`. | `PORT=8080` |
 | `APP_HOST` | `dox_core` (`DoxServer.hostFor()`) | not set (all interfaces, `::`) | The host to listen on. `127.0.0.1` keeps the app off the network, for an app behind a proxy on the same machine. `AppConfig.host` wins over it. Read with `Env.get`. | `APP_HOST=127.0.0.1` |
 | `DOX_SERVER` | `dox_core` (`DoxServer.usesNative()`) | not set (uses `AppConfig.server`) | `dartio`, `dart_io` or `dart:io` forces the `dart:io` server. `native` forces the native server, also for an app with WebSocket routes. Real environment only. | `DOX_SERVER=dartio` |
@@ -15964,7 +16039,7 @@ A new project (`dox create`) reads these keys through its typed env class, `lib/
 | `APP_NAME` | `appName` | `String` | `dox` | `LoggerConfig.name`. |
 | `APP_ENV` | `appEnv` | `String` | `development` | `development`, `staging` or `production`. `env.isDevelopment` is `true` for `development`. It turns on `prettyPrint` of the logger and the query log of the database. Also read by the framework (see above). |
 | `APP_PORT` | `appPort` | `int` | `3000` | `AppConfig.serverPort`. When `APP_PORT` is not set, Dox listens on `PORT` if the env has it. |
-| `APP_KEY` | `appKey` | `String` | required | `AppConfig.appKey`. The app stops at start when it is missing. |
+| `APP_KEY` | `appKey` | `String` | required | `AppConfig.appKey`. It must be exactly 32 characters. Run `dox key:generate` for one. The app stops at start when it is missing, has another length, or is a public sample key (only a warning in `development`, `local` and `test`). |
 | `APP_TOTAL_ISOLATE` | `appTotalIsolate` | `int?` | not set: one per CPU core | `AppConfig.totalIsolate`. |
 | `LOG_LEVEL` | `logLevel` | `String` | `info` | `LoggerConfig.level`. |
 | `CACHE_STORE` | `cacheStore` | `String` | `file` | `CacheConfig.defaultStore`: `memory`, `file` or `redis`. |
@@ -15984,7 +16059,7 @@ The `.env.example` of a new project:
 APP_NAME=dox
 APP_ENV=development
 APP_PORT=3000
-APP_KEY=KKep5qC6uHlAgrwaQTQewgMRSIqQnoj0
+APP_KEY=
 
 CACHE_STORE=file
 STORAGE_DISK=local
@@ -16288,8 +16363,8 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 
 | Check | How | Read more |
 | --- | --- | --- |
-| `APP_KEY` is set, long and secret | `dox key:generate`, or a 32 character random value in the real env. It signs JWT tokens and encrypts cookies. Never use the value from `.env.example`. | [Encryption](../security/encryption.md) |
-| `APP_ENV=production` | With it, an empty `APP_KEY` stops the app at start (`StateError`). Without it, Dox only logs a warning and runs with an empty key. | [Env reference](env.md) |
+| `APP_KEY` is set, 32 characters and secret | `dox key:generate`, or a random value of exactly 32 characters in the real env. It signs JWT tokens and encrypts cookies. Never use the value from `.env.example`. | [Encryption](../security/encryption.md) |
+| `APP_ENV=production` | An empty `APP_KEY`, a key that is not exactly 32 characters, or an old sample key stops the app at start (`StateError`). Only `APP_ENV` `development`, `local` or `test` logs a warning instead. | [Env reference](env.md) |
 | The env is complete | Run `dox env:check` in CI or before the deploy. It exits with code 1 when a key is missing or bad. | [CLI](cli.md) |
 | No secrets in the image or in git | `.env` in `.dockerignore` and `.gitignore`. Pass values as env vars (`docker run -e`, `env_file:`, systemd `EnvironmentFile=`). `dox build` copies `.env.example` only. | [Docker](../guides/docker.md) |
 | No comments after values in `.env` | `KEY=abc # note` gives the value `abc # note`. Put comments on their own line. | [Troubleshooting](troubleshooting.md) |
@@ -16573,12 +16648,13 @@ For normal login use `Auth().attempt()` from `dox_auth`. See [Hashing](../securi
 **Fix.** Both Dox drivers handle this by default:
 
 - The native driver (`dox_mysql_native`) works with MySQL 8.4 `caching_sha2_password` and MariaDB 11.
-- The Dart driver asks the server for its RSA key (`allowPublicKeyRetrieval` is `true` by default), so it works without TLS. Migrations do the same.
+- The Dart driver asks the server for its RSA key only with `useSSL: true`, or on `localhost`, `127.0.0.1`, `::1` and a Unix socket. On a remote host without TLS it does not ask, because a fake server could read the password. Migrations do the same.
 
 So check these settings on the connection in `lib/config/database.dart`:
 
 | Setting | What to do |
 | --- | --- |
+| Remote host without TLS | Give the key in `extra: {'serverPublicKey': '...'}` (safer), turn on `useSSL: true`, or set `extra: {'allowPublicKeyRetrieval': true}`. |
 | `extra: {'allowPublicKeyRetrieval': false}` | Remove it, or give the key in `extra: {'serverPublicKey': '...'}`. |
 | `useSSL: true` | The server must have TLS on. |
 | `host`, `port`, `user`, `password` | A wrong value gives the same login error. `DB_PORT` is `3306` by default for MySQL. |
@@ -17071,6 +17147,11 @@ What changed in each package, newest first. This page is made from the
 
 ## dox
 
+### Unreleased
+
+- Security: `dox create` now copies `.env.example` to `.env` and writes a new random `APP_KEY`. Before, every new app used the same public key from the template. You no longer run `cp .env.example .env`.
+- The `.env.example` of the CLI has an empty `APP_KEY`. Run `dox key:generate` to set one.
+
 ### 3.0.0-alpha.6
 
 - Fix: `dox key:generate` dropped `.env` lines with more than one `=` (like `DATABASE_URL=postgres://u:p@h/db?sslmode=require`). It also dropped comment lines. Now it only changes the `APP_KEY` line. Every other line stays as it is.
@@ -17111,6 +17192,17 @@ What changed in each package, newest first. This page is made from the
 - Generated models import `package:dox_orm/dox_orm.dart`.
 
 ## dox_core
+
+### Unreleased
+
+- Security: the app does not start when `APP_KEY` is empty, not exactly 32 characters, or one of the old public sample keys from `.env.example`. With such a key anyone can sign tokens and cookies. In `APP_ENV` `development`, `local` or `test` Dox only logs a warning. A longer key (eg. 48 or 64 characters) is refused too, because AES needs a key of 16, 24 or 32 bytes and every encrypted cookie failed with it. Before, only an empty key in `production` stopped the app. Run `dox key:generate` for a new key.
+- Security: a multipart part header with many backslashes (`name="\\\\...`) no longer blocks a server isolate for hours (ReDoS in the quoted string regex).
+- Security: a `StreamFile` response (`Storage().stream()`, `Route.files()`) with an html, xml, svg or javascript type is sent with `Content-Disposition: attachment` and `Content-Security-Policy: sandbox`. Every `StreamFile` gets `X-Content-Type-Options: nosniff`. Before, an uploaded `x.html` or `x.svg` was shown inline, and its script ran on the app origin (stored XSS).
+- Security: a `Route.domain()` route only matches when the `Host` header matches. Before, a request with no `Host` matched every domain route. A `Host` with a port (`admin.app.com:8080`) now matches `Route.domain('admin.app.com')`.
+- Security: an encrypted cookie is bound to its name (AES-GCM associated data). A value made for `locale` gives `null` when it is sent as `user_id`. `AESEncryptor.encode()`/`decode()` take a new `associatedData` option. Encrypted cookies made by older versions no longer decrypt, so `req.cookie()` gives `null` for them once. Users may need to log in again.
+- Security: `DoxCookie` is `HttpOnly` by default. `secure` is `null` by default, which sets `Secure` when the request came over https (`req.scheme()`, see `trustedProxies`). Set `httpOnly: false` or `secure: false` to change it.
+- Security: the native server checks `maxBodySize` and `maxMultipartSize` on their own. Before, Rust let any body up to the bigger limit (100 MB) through, so a JSON body could take 100 MB of RAM before Dart said 413.
+- New `AppConfig.bodyTimeout` (default 120 seconds). On the native server, a client that does not send the whole body in this time gets 408. It stops slow clients that hold memory and connections.
 
 ### 3.0.0-alpha.6
 
@@ -17217,6 +17309,11 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- Security: a multipart form may be up to `maxMultipartSize` bytes (new `bind` option, default `maxBodySize`). Any other body, eg. JSON, raw or text, is limited to `maxBodySize`. Dox passes its own two limits, so a JSON body over 10 MB now gets `413` from Rust.
+- Security: a body with a too big `Content-Length` and `Expect: 100-continue` gets `413` at once. Without `Expect`, Rust reads and drops the body (up to 64 MB more, no memory kept), then sends `413`, so the client sees the `413` and not a connection reset.
+- Security: Rust no longer reserves memory from the client `Content-Length` (at most 64 KB up front).
+- Security: new `bind` option `bodyTimeout` (default 120 seconds). It is the idle time with no body bytes: a client that sends nothing for that long gets `408`. A slow but steady upload is fine.
+- Native ABI 4 (`dox_start` takes the multipart limit and the body timeout). Needs a new native library build.
 - Security: response headers now refuse bad input with a `FormatException`, like `dart:io`. A header name must be a token. A header value must not hold a line break or other control byte. Before, a `\n` in a value (or a char like `\u010A`, written as its low byte) added one more header, eg. `Set-Cookie`, when an app put request input in a header. The same check now runs on `serverHeader` and on each cookie when the response closes, because `Cookie` does not check its domain.
 
 ### 3.0.0-alpha.6
@@ -17255,6 +17352,11 @@ What changed in each package, newest first. This page is made from the
 - The build hook downloads a ready-built library. No Rust needed.
 
 ## dox_migration
+
+### Unreleased
+
+- TLS checks the server certificate, the same as dox_orm. Add `verifyCertificate=false` to `DATABASE_URL` to skip the check in development.
+- MySQL: the server RSA key is only asked for with TLS on or on a local host, the same as dox_orm.
 
 ### 3.0.0-alpha.6
 
@@ -17300,6 +17402,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_mysql_native
 
+### Unreleased
+
+- New `verifyCertificate` on `MysqlNativePool.open()`. It is true by default, so TLS checks the server certificate. Set it to false only for a self-signed certificate in development.
+
 ### 3.0.0-alpha.6
 
 - Unix sockets. In `MysqlNativePool.open()`, a `host` that starts with `/` is the socket file. `fromUrl()` takes `?socket=/path`.
@@ -17328,6 +17434,10 @@ What changed in each package, newest first. This page is made from the
 - The build hook downloads a ready-built library. No Rust needed.
 
 ## dox_openapi
+
+### Unreleased
+
+- The `/docs` page loads its CDN files with an `integrity` hash, so the browser refuses a changed file.
 
 ### 3.0.0-alpha.6
 
@@ -17368,6 +17478,14 @@ What changed in each package, newest first. This page is made from the
 - Output as JSON and YAML, write files, serve `/openapi.json`, `/openapi.yaml` and `/docs`.
 
 ## dox_orm
+
+### Unreleased
+
+- Breaking: column and table names in `select`, `where`, `orderBy`, `groupBy`, `join`, `insert` and `update` must be plain names (`name`, `table.name`, `table.*`, `*`, `name as alias`). Anything else, like `count(*)`, throws an `ArgumentError`. Before, a name with `(` went into the SQL as it is, so user input could add SQL. Use `selectRaw`, `whereRaw` or the new `orderByRaw` and `groupByRaw` for expressions.
+- Breaking: the operator of `where()` and `join()` must be one of `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `like`, `not like`, `ilike` (any case). Any other value throws an `ArgumentError`.
+- New `fillable` and `guarded` lists on `Model`. When set, `create()`, `insert()` and `update()` on the model drop the keys that are not allowed, so `User().create(req.body)` can not set `is_admin`. `insertMultiple()` on the model drops them from each row too. Both are empty by default, so nothing changes until you set them.
+- Breaking: TLS checks the server certificate. Postgres `useSSL` (and `sslmode=verify-ca` or `verify-full` in a url) now uses `SslMode.verifyFull`. `sslmode=require` in a url stays `SslMode.require` like libpq: it encrypts but does not check the certificate (eg. Heroku). The Dart MySQL driver no longer accepts a bad certificate. Set `extra['verifyCertificate']` to false (or `?verifyCertificate=false` in a url) to skip the check for a self-signed certificate in development.
+- Breaking: the Dart MySQL driver no longer asks the server for its RSA key by default. It still asks with TLS on, or on `localhost`, `127.0.0.1`, `::1` and a Unix socket. Give the key in `serverPublicKey`, or set `allowPublicKeyRetrieval: true`.
 
 ### 3.0.0-alpha.6
 
@@ -17508,6 +17626,14 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- Security: a binary packet nested deeper than 32 levels is a parse error (`SocketDecoder(maxDepth: ...)`). Before, a deep packet overflowed the stack and could stop the server. Any decode error now closes only that one connection.
+- Security: many CONNECT packets for one namespace at once make only one socket. Before, each one made a socket that stayed in memory.
+- Security: websocket compression is off. A small compressed message could grow very big in memory.
+- Security: when `CorsOptions.origins` lists origins, a websocket from another origin gets 403. With no `cors`, or with `*`, any origin is still allowed.
+- Breaking: `CorsOptions(origins: ['*'], credentials: true)` throws an `ArgumentError`. Before, it sent back any origin with credentials.
+- Security: a middleware error that is not a `SocketIoException` sends `{"message": "Internal error"}` to the client and writes the real error to stderr.
+- Security: a client whose CONNECT is refused is closed after `connectTimeout`. Before, it could stay connected forever.
+
 - Security: a binary packet may have at most 10 attachments (`SocketDecoder(maxAttachments: ...)`). More closes the connection with a parse error. Before, a client could send `51000000-[...]` before any auth and the server kept every binary frame after it in memory.
 
 ### 3.0.0-alpha.6
@@ -17573,6 +17699,11 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_validation
 
+### Unreleased
+
+- `url()` now allows only `http` and `https` links. Pass `schemes` to allow others.
+- File type checks now also need the file name extension to fit the bytes. A `.html` file with GIF bytes no longer passes `@Image`. Only another known type (like `.png` with GIF bytes) or a type the browser runs (`html`, `htm`, `xhtml`, `svg`, `xml`, `js`, `mjs`) is refused. A file with no or an unknown extension (like a canvas upload named `blob`) passes when the bytes match.
+
 ### 3.0.0-alpha.6
 
 - Version bump only, to match the other packages.
@@ -17620,6 +17751,10 @@ What changed in each package, newest first. This page is made from the
 ## dox_websocket
 
 ### Unreleased
+
+- Breaking: `joinRoom` is refused unless you set `WebsocketServer().authorizeJoin`. Before, any client could join any room, like `user:42`, and get its messages.
+- Security: new `WebsocketServer().allowedOrigins`. When set, a websocket from another origin gets 403. When null (the default), any origin is allowed.
+- Security: websocket compression is off, and a message bigger than `WebsocketServer().maxMessageSize` (default 1 MB) closes the connection with code 1009.
 
 - Security: a client can not `joinRoom` a room that starts with `room:`. That is the default room of a route, so a client of a public route could join the room of a route with auth middleware and get all its messages.
 - Security: a room with no members is removed, and a room name longer than 255 chars is not joined. Before, every room name a client sent stayed in memory, so one client could fill the memory of the server.

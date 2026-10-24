@@ -4264,6 +4264,8 @@ See <a href="../../digging-deeper/file-storage/#serve-local-signed-urls">File St
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">Route</span><span class="p">.</span><span class="n">files</span><span class="p">(</span><span class="s1">'files'</span><span class="p">);</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">Route</span><span class="p">.</span><span class="n">files</span><span class="p">(</span><span class="s1">'public'</span><span class="p">,</span><span class="w"> </span><span class="nl">disk:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span><span class="w"> </span><span class="nl">signed:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span>
 </span></code></pre></div>
+<p>An html, svg, xml or javascript file is sent as a download (<code>Content-Disposition: attachment</code>) with <code>Content-Security-Policy: sandbox</code>.
+So a script in an uploaded file does not run on your site.</p>
 <h2 id="request-body-for-the-docs">Request body for the docs</h2>
 <p><code>post</code>, <code>put</code> and <code>patch</code> take a <code>body:</code> schema. It shows in the <a href="../../packages/openapi/">OpenAPI docs</a>.
 It does <strong>not</strong> check the request. To check input, use a <a href="../validation/">DTO</a>.</p>

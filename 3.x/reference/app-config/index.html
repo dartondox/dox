@@ -4180,6 +4180,12 @@ This page lists every field, with its type, its default and what it does.</p>
 <td>Biggest <code>multipart/form-data</code> body (file uploads) in bytes. Bigger gets <code>413</code>.</td>
 </tr>
 <tr>
+<td><code>bodyTimeout</code></td>
+<td><code>Duration</code></td>
+<td><code>Duration(seconds: 120)</code></td>
+<td>A client that sends no body bytes for this long gets <code>408</code>. A slow but steady upload is fine. Native server only.</td>
+</tr>
+<tr>
 <td><code>shutdownTimeout</code></td>
 <td><code>Duration</code></td>
 <td><code>Duration(seconds: 8)</code></td>
@@ -5082,8 +5088,8 @@ Source: <code>packages/dox-orm/lib/src/types/database_config.dart</code> and <co
 <td>mysql</td>
 <td><code>allowPublicKeyRetrieval</code></td>
 <td><code>bool</code></td>
-<td><code>true</code></td>
-<td>Ask the server for its RSA key (needed for <code>caching_sha2_password</code> without TLS).</td>
+<td><code>false</code>, <code>true</code> with <code>useSSL</code> or a local host</td>
+<td>Ask the server for its RSA key (needed for <code>caching_sha2_password</code> without TLS). A fake server can send its own key and read the password, so it is off by default. It is on with <code>useSSL: true</code>, on <code>localhost</code>, <code>127.0.0.1</code>, <code>::1</code> and on a Unix socket. Giving the key in <code>serverPublicKey</code> is safer.</td>
 </tr>
 <tr>
 <td>mysql</td>

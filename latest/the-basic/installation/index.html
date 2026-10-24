@@ -4015,10 +4015,10 @@ Add this line to <code>~/.bashrc</code> or <code>~/.zshrc</code>, then open a ne
 <p><code>dox create</code> downloads the newest 3.x release of
 <a href="https://github.com/dartondox/dox-sample">dox-sample</a>, the starter project.
 To get one exact version, add <code>--version</code>, for example <code>dox create new_blog --version 3.0.0-alpha.5</code>.</p>
-<p>Then get the packages and make your <code>.env</code> file:</p>
+<p>It also makes your <code>.env</code> file from <code>.env.example</code>, with a new random <code>APP_KEY</code>.
+Then get the packages:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">cd</span><span class="w"> </span>new_blog
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>dart<span class="w"> </span>pub<span class="w"> </span>get
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>cp<span class="w"> </span>.env.example<span class="w"> </span>.env
 </span></code></pre></div>
 <p>The starter project uses SQLite, so there is no database to install.
 The file <code>db/dox.sqlite</code> is created at the first start.

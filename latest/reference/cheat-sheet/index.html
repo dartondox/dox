@@ -4944,7 +4944,7 @@
 </span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="w">  </span><span class="n">emitter</span><span class="p">.</span><span class="n">room</span><span class="p">(</span><span class="s1">'chat'</span><span class="p">).</span><span class="n">emitExceptSender</span><span class="p">(</span><span class="s1">'intro'</span><span class="p">,</span><span class="w"> </span><span class="n">message</span><span class="p">);</span>
 </span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Client sends <code>{"event": "joinRoom", "message": "chat"}</code>. Many isolates need <code>WebsocketRedisAdapter</code>.</p>
+<p>Client sends <code>{"event": "joinRoom", "message": "chat"}</code>. The join is refused unless you set <code>WebsocketServer().authorizeJoin</code>. Many isolates need <code>WebsocketRedisAdapter</code>.</p>
 <p>See <a href="../../digging-deeper/websocket/">WebSocket</a>.</p>
 <h2 id="openapi">OpenAPI</h2>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">OpenApiConfig</span><span class="w"> </span><span class="n">openApi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenApiConfig</span><span class="p">(</span>

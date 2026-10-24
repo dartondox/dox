@@ -5034,7 +5034,7 @@ Use <code>@In([...])</code> for a plain <code>String</code> or <code>int</code> 
 </span><span id="__span-17-14"><a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="p">}</span>
 </span></code></pre></div>
 <ul>
-<li>Dox reads the first bytes of the file to find its real type. The file name and the client content type are not trusted.</li>
+<li>Dox reads the first bytes of the file to find its real type. The file name and the client content type are not trusted. The file name extension must still fit the real type.</li>
 <li><code>@Image()</code> allows <code>jpg</code>, <code>jpeg</code>, <code>png</code>, <code>gif</code>, <code>webp</code> and <code>bmp</code>. Not <code>svg</code>, because an SVG can hold scripts.</li>
 <li>A text field sent where a file is expected gives the error <code>file</code>.</li>
 <li>Save the file before you return. See <a href="../request/#form-data-file">Request: form data</a>.</li>

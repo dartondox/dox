@@ -4195,7 +4195,9 @@ next to the Dox HTTP server. Put both behind the same proxy.</p>
 </span><span id="__span-8-27"><a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a>
 </span><span id="__span-8-28"><a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a><span class="n">io</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">ChatNamespace</span><span class="p">(</span><span class="n">MessageService</span><span class="p">()));</span>
 </span></code></pre></div>
-<p>When a middleware throws, the client gets <code>connect_error</code> with the message and the data.</p>
+<p>When a middleware throws a <code>SocketIoException</code>, the client gets <code>connect_error</code> with the message and the data.
+Any other error is written to stderr. The client only gets <code>{"message": "Internal error"}</code>, so it can not see private text like SQL.</p>
+<p>A client that is refused is still closed after <code>connectTimeout</code>, unless it joins another namespace.</p>
 <h2 id="nodejs-to-dart">Node.js to Dart</h2>
 <table>
 <thead>
@@ -4304,7 +4306,7 @@ next to the Dox HTTP server. Put both behind the same proxy.</p>
 <tr>
 <td><code>maxHttpBufferSize</code></td>
 <td>1,000,000 bytes</td>
-<td>the biggest message</td>
+<td>the biggest message. A bigger websocket message closes the connection</td>
 </tr>
 <tr>
 <td><code>transports</code></td>
@@ -4319,10 +4321,16 @@ next to the Dox HTTP server. Put both behind the same proxy.</p>
 <tr>
 <td><code>cors</code></td>
 <td><code>null</code></td>
-<td>CORS headers for polling requests</td>
+<td>CORS headers for polling requests. It also checks the origin of websockets</td>
 </tr>
 </tbody>
 </table>
+<ul>
+<li><code>cors</code> with a list of origins: a websocket from another origin gets 403. A request with no <code>Origin</code> header (not a browser) is allowed.</li>
+<li><code>cors: null</code>, or <code>*</code> in <code>origins</code>: websockets from any origin are allowed. If you log users in with cookies, list your origins.</li>
+<li><code>*</code> together with <code>credentials: true</code> throws an <code>ArgumentError</code>. List your origins instead.</li>
+<li>Websocket compression is off. dart:io reads a whole message before Dox checks its size, so also set a size limit in your proxy.</li>
+</ul>
 <h2 id="many-servers-redis-adapter">Many servers: Redis adapter</h2>
 <p>With more than one server process, use the Redis adapter.
 Then a broadcast on one server reaches the clients of all servers.</p>

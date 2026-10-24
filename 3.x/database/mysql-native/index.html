@@ -4197,6 +4197,11 @@ the same rules.</p>
 <td><code>1</code></td>
 <td>Rust threads for all pools of the process. Only the first pool sets it. One thread is the fastest for most apps.</td>
 </tr>
+<tr>
+<td><code>verifyCertificate</code></td>
+<td><code>true</code></td>
+<td>With <code>useSSL</code>, TLS checks the server certificate. Set it to <code>false</code> only for a self-signed certificate in development.</td>
+</tr>
 </tbody>
 </table>
 <p>Isolates that open a pool with the same settings share one pool in Rust.

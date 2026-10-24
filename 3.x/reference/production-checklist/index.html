@@ -4042,13 +4042,13 @@
 </thead>
 <tbody>
 <tr>
-<td><code>APP_KEY</code> is set, long and secret</td>
-<td><code>dox key:generate</code>, or a 32 character random value in the real env. It signs JWT tokens and encrypts cookies. Never use the value from <code>.env.example</code>.</td>
+<td><code>APP_KEY</code> is set, 32 characters and secret</td>
+<td><code>dox key:generate</code>, or a random value of exactly 32 characters in the real env. It signs JWT tokens and encrypts cookies. Never use the value from <code>.env.example</code>.</td>
 <td><a href="../../security/encryption/">Encryption</a></td>
 </tr>
 <tr>
 <td><code>APP_ENV=production</code></td>
-<td>With it, an empty <code>APP_KEY</code> stops the app at start (<code>StateError</code>). Without it, Dox only logs a warning and runs with an empty key.</td>
+<td>An empty <code>APP_KEY</code>, a key that is not exactly 32 characters, or an old sample key stops the app at start (<code>StateError</code>). Only <code>APP_ENV</code> <code>development</code>, <code>local</code> or <code>test</code> logs a warning instead.</td>
 <td><a href="../env/">Env reference</a></td>
 </tr>
 <tr>

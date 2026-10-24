@@ -4184,7 +4184,7 @@
 <p><strong>Fix.</strong> Both Dox drivers handle this by default:</p>
 <ul>
 <li>The native driver (<code>dox_mysql_native</code>) works with MySQL 8.4 <code>caching_sha2_password</code> and MariaDB 11.</li>
-<li>The Dart driver asks the server for its RSA key (<code>allowPublicKeyRetrieval</code> is <code>true</code> by default), so it works without TLS. Migrations do the same.</li>
+<li>The Dart driver asks the server for its RSA key only with <code>useSSL: true</code>, or on <code>localhost</code>, <code>127.0.0.1</code>, <code>::1</code> and a Unix socket. On a remote host without TLS it does not ask, because a fake server could read the password. Migrations do the same.</li>
 </ul>
 <p>So check these settings on the connection in <code>lib/config/database.dart</code>:</p>
 <table>
@@ -4195,6 +4195,10 @@
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>Remote host without TLS</td>
+<td>Give the key in <code>extra: {'serverPublicKey': '...'}</code> (safer), turn on <code>useSSL: true</code>, or set <code>extra: {'allowPublicKeyRetrieval': true}</code>.</td>
+</tr>
 <tr>
 <td><code>extra: {'allowPublicKeyRetrieval': false}</code></td>
 <td>Remove it, or give the key in <code>extra: {'serverPublicKey': '...'}</code>.</td>

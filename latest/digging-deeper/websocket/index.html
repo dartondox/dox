@@ -1749,6 +1749,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Messages">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#allow-joins-with-authorizejoin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Allow joins with authorizeJoin
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security options
+      
+    </span>
+  </a>
+  
 </li>
       
         <li class="md-nav__item">
@@ -4147,6 +4175,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Messages">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#allow-joins-with-authorizejoin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Allow joins with authorizeJoin
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security options
+      
+    </span>
+  </a>
+  
 </li>
       
         <li class="md-nav__item">
@@ -4394,75 +4450,117 @@ The Redis adapter sends each message to all isolates and all servers.</p>
 <tr>
 <td><code>joinRoom</code></td>
 <td>client to server</td>
-<td>joins the room. <code>message</code> is the room name, up to 255 chars. A name that starts with <code>room:</code> is ignored</td>
+<td>joins the room, if <code>authorizeJoin</code> allows it. <code>message</code> is the room name, up to 255 chars. A name that starts with <code>room:</code> is ignored</td>
 </tr>
 </tbody>
 </table>
 <p>A client starts in a room for its route, so <code>emitter.emit()</code> with no room reaches all clients of the same route. A client is in one room at a time. When it joins a room, it leaves the room it was in, also the route room.</p>
-<p>Any client can join any other room by its name. Do not send private data to a room that a client can guess, like <code>user:42</code>. Send it with <code>emitToSender</code>. Or use a route with auth middleware, and call <code>emitter.emit()</code> with no room, so only clients of that route get it.</p>
+<h3 id="allow-joins-with-authorizejoin">Allow joins with <code>authorizeJoin</code></h3>
+<p><code>joinRoom</code> is refused unless you set <code>authorizeJoin</code>. It gets the request that opened the websocket and the room name. Return <code>true</code> to allow the join.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">WebsocketServer</span><span class="w"> </span><span class="n">io</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">WebsocketServer</span><span class="p">(</span><span class="n">Dox</span><span class="p">());</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">io</span><span class="p">.</span><span class="n">authorizeJoin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">IDoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">room</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="c1">// public rooms are open. a `user:` room only for its own user.</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">room</span><span class="p">.</span><span class="n">startsWith</span><span class="p">(</span><span class="s1">'chat:'</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">room</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'user:</span><span class="si">${</span><span class="n">userIdOf</span><span class="p">(</span><span class="n">req</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">;</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="p">};</span>
+</span></code></pre></div>
+<p>It can also return a <code>Future&lt;bool&gt;</code>.</p>
+<h2 id="security-options">Security options</h2>
+<p>Set these on <code>WebsocketServer</code> in your service:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>authorizeJoin</code></td>
+<td><code>null</code></td>
+<td>decides who may <code>joinRoom</code>. When null, every join is refused</td>
+</tr>
+<tr>
+<td><code>allowedOrigins</code></td>
+<td><code>null</code></td>
+<td>origins that may open a websocket, like <code>['https://my.app']</code>. Other origins get 403. When null, any origin is allowed</td>
+</tr>
+<tr>
+<td><code>maxMessageSize</code></td>
+<td>1 MB</td>
+<td>the biggest message a client may send. A bigger one closes the connection with code 1009</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>If you log users in with cookies, set <code>allowedOrigins</code>. Else any website can open a websocket as your user.</li>
+<li>A request with no <code>Origin</code> header (not a browser) is allowed.</li>
+<li>Compression is off. dart:io reads a whole message before Dox checks its size, so also set a size limit in your proxy.</li>
+</ul>
 <h2 id="client-examples">Client examples</h2>
 <h3 id="dart">Dart</h3>
 <p>Use <code>WebSocket</code> from <code>dart:io</code>.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:convert'</span><span class="p">;</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="kt">void</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="n">WebSocket</span><span class="w"> </span><span class="n">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">WebSocket</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">'ws://localhost:3000/ws'</span><span class="p">);</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">  </span><span class="n">socket</span><span class="p">.</span><span class="n">listen</span><span class="p">((</span><span class="kt">dynamic</span><span class="w"> </span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jsonDecode</span><span class="p">(</span><span class="n">data</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">String</span><span class="p">);</span>
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">    </span><span class="n">print</span><span class="p">(</span><span class="s1">'</span><span class="si">${</span><span class="n">payload</span><span class="p">[</span><span class="s1">'event'</span><span class="p">]</span><span class="si">}</span><span class="s1">: </span><span class="si">${</span><span class="n">payload</span><span class="p">[</span><span class="s1">'message'</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
-</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">  </span><span class="p">});</span>
-</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>
-</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">  </span><span class="c1">// join the chat room</span>
-</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="w">  </span><span class="n">socket</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">jsonEncode</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">    </span><span class="s1">'event'</span><span class="o">:</span><span class="w"> </span><span class="s1">'joinRoom'</span><span class="p">,</span>
-</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="w">    </span><span class="s1">'message'</span><span class="o">:</span><span class="w"> </span><span class="s1">'chat'</span><span class="p">,</span>
-</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="w">  </span><span class="p">}));</span>
-</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>
-</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="w">  </span><span class="c1">// send the intro event</span>
-</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="w">  </span><span class="n">socket</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">jsonEncode</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="w">    </span><span class="s1">'event'</span><span class="o">:</span><span class="w"> </span><span class="s1">'intro'</span><span class="p">,</span>
-</span><span id="__span-9-21"><a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="w">    </span><span class="s1">'message'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Mingalaba!'</span><span class="p">,</span>
-</span><span id="__span-9-22"><a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="w">  </span><span class="p">}));</span>
-</span><span id="__span-9-23"><a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:convert'</span><span class="p">;</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="kt">void</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="n">WebSocket</span><span class="w"> </span><span class="n">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">WebSocket</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">'ws://localhost:3000/ws'</span><span class="p">);</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">  </span><span class="n">socket</span><span class="p">.</span><span class="n">listen</span><span class="p">((</span><span class="kt">dynamic</span><span class="w"> </span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">    </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jsonDecode</span><span class="p">(</span><span class="n">data</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">String</span><span class="p">);</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">    </span><span class="n">print</span><span class="p">(</span><span class="s1">'</span><span class="si">${</span><span class="n">payload</span><span class="p">[</span><span class="s1">'event'</span><span class="p">]</span><span class="si">}</span><span class="s1">: </span><span class="si">${</span><span class="n">payload</span><span class="p">[</span><span class="s1">'message'</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">  </span><span class="p">});</span>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">  </span><span class="c1">// join the chat room</span>
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="w">  </span><span class="n">socket</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">jsonEncode</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="w">    </span><span class="s1">'event'</span><span class="o">:</span><span class="w"> </span><span class="s1">'joinRoom'</span><span class="p">,</span>
+</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="w">    </span><span class="s1">'message'</span><span class="o">:</span><span class="w"> </span><span class="s1">'chat'</span><span class="p">,</span>
+</span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="w">  </span><span class="p">}));</span>
+</span><span id="__span-10-17"><a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>
+</span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="w">  </span><span class="c1">// send the intro event</span>
+</span><span id="__span-10-19"><a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="w">  </span><span class="n">socket</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">jsonEncode</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-10-20"><a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="w">    </span><span class="s1">'event'</span><span class="o">:</span><span class="w"> </span><span class="s1">'intro'</span><span class="p">,</span>
+</span><span id="__span-10-21"><a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="w">    </span><span class="s1">'message'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Mingalaba!'</span><span class="p">,</span>
+</span><span id="__span-10-22"><a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="w">  </span><span class="p">}));</span>
+</span><span id="__span-10-23"><a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a><span class="p">}</span>
 </span></code></pre></div>
 <h3 id="javascript">JavaScript</h3>
 <p>Use the browser <code>WebSocket</code>, or the client <a href="https://github.com/dartondox/dox-web-socket-client/"><code>@dartondox/websocket</code></a>:</p>
-<div class="language-js highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">import</span><span class="w"> </span><span class="nx">DoxWebsocket</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@dartondox/websocket'</span><span class="p">;</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">DoxWebsocket</span><span class="p">(</span><span class="s1">'ws://127.0.0.1:3000/ws'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="nx">maxRetries</span><span class="o">:</span><span class="w"> </span><span class="mf">18</span><span class="p">,</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="nx">retryAfter</span><span class="o">:</span><span class="w"> </span><span class="mf">2000</span><span class="p">,</span>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="p">});</span>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="nx">socket</span><span class="p">.</span><span class="nx">onConnected</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">socket</span><span class="p">.</span><span class="nx">id</span><span class="p">));</span>
-</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="nx">socket</span><span class="p">.</span><span class="nx">onError</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'socket error'</span><span class="p">));</span>
-</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="nx">socket</span><span class="p">.</span><span class="nx">onClose</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'socket closed'</span><span class="p">));</span>
-</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
-</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="c1">// listen for the intro event from the server</span>
-</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'intro'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">msg</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">msg</span><span class="p">));</span>
-</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>
-</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="c1">// send the intro event</span>
-</span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'intro'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Mingalaba!'</span><span class="p">);</span>
+<div class="language-js highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">import</span><span class="w"> </span><span class="nx">DoxWebsocket</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@dartondox/websocket'</span><span class="p">;</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">DoxWebsocket</span><span class="p">(</span><span class="s1">'ws://127.0.0.1:3000/ws'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nx">maxRetries</span><span class="o">:</span><span class="w"> </span><span class="mf">18</span><span class="p">,</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="nx">retryAfter</span><span class="o">:</span><span class="w"> </span><span class="mf">2000</span><span class="p">,</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="p">});</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="nx">socket</span><span class="p">.</span><span class="nx">onConnected</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">socket</span><span class="p">.</span><span class="nx">id</span><span class="p">));</span>
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="nx">socket</span><span class="p">.</span><span class="nx">onError</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'socket error'</span><span class="p">));</span>
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="nx">socket</span><span class="p">.</span><span class="nx">onClose</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'socket closed'</span><span class="p">));</span>
+</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>
+</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="c1">// listen for the intro event from the server</span>
+</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'intro'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">msg</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">msg</span><span class="p">));</span>
+</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>
+</span><span id="__span-11-15"><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="c1">// send the intro event</span>
+</span><span id="__span-11-16"><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'intro'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Mingalaba!'</span><span class="p">);</span>
 </span></code></pre></div>
 <h2 id="websocketemitter">WebsocketEmitter</h2>
 <h3 id="room"><code>room</code></h3>
 <p>Pick the room to send to. Use the same name the client sent with <code>joinRoom</code>.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">emitter</span><span class="p">.</span><span class="n">room</span><span class="p">(</span><span class="s1">'chat'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'event-name'</span><span class="p">,</span><span class="w"> </span><span class="n">message</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">emitter</span><span class="p">.</span><span class="n">room</span><span class="p">(</span><span class="s1">'chat'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'event-name'</span><span class="p">,</span><span class="w"> </span><span class="n">message</span><span class="p">);</span>
 </span></code></pre></div>
 <p><code>room()</code> returns a new emitter. The room does not stay set for later events.</p>
 <h3 id="emit"><code>emit</code></h3>
 <p>Send to every client in the room. Without <code>room()</code>, this is every client of the same route.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">emitter</span><span class="p">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">'event-name'</span><span class="p">,</span><span class="w"> </span><span class="n">message</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">emitter</span><span class="p">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">'event-name'</span><span class="p">,</span><span class="w"> </span><span class="n">message</span><span class="p">);</span>
 </span></code></pre></div>
 <h3 id="emitexceptsender"><code>emitExceptSender</code></h3>
 <p>Send to every client in the room, but not to the sender.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">emitter</span><span class="p">.</span><span class="n">emitExceptSender</span><span class="p">(</span><span class="s1">'event-name'</span><span class="p">,</span><span class="w"> </span><span class="n">message</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">emitter</span><span class="p">.</span><span class="n">emitExceptSender</span><span class="p">(</span><span class="s1">'event-name'</span><span class="p">,</span><span class="w"> </span><span class="n">message</span><span class="p">);</span>
 </span></code></pre></div>
 <h3 id="emittosender"><code>emitToSender</code></h3>
 <p>Send only to the client that sent the event.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">emitter</span><span class="p">.</span><span class="n">emitToSender</span><span class="p">(</span><span class="s1">'event-name'</span><span class="p">,</span><span class="w"> </span><span class="n">message</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">emitter</span><span class="p">.</span><span class="n">emitToSender</span><span class="p">(</span><span class="s1">'event-name'</span><span class="p">,</span><span class="w"> </span><span class="n">message</span><span class="p">);</span>
 </span></code></pre></div>
 
 

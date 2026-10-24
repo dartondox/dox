@@ -4014,8 +4014,13 @@ a gain.</p>
 <ul>
 <li>Max size of the request line plus headers: 16 KB. Bigger gets <code>431</code>.</li>
 <li>A bad request gets <code>400</code>.</li>
-<li>A body over the bigger of <code>maxBodySize</code> and <code>maxMultipartSize</code> gets <code>413</code>
-  from Rust. Each body type is checked again in Dart with its own limit.</li>
+<li>A multipart form over <code>maxMultipartSize</code>, or any other body over
+  <code>maxBodySize</code>, gets <code>413</code> from Rust. When <code>Content-Length</code> is too big and
+  the client sent <code>Expect: 100-continue</code>, the <code>413</code> comes before the body is
+  sent. Else Rust reads and drops the body first, so the client sees the
+  <code>413</code>. Dart checks the limits again.</li>
+<li>A client that sends no body bytes for 120 seconds (idle time) gets <code>408</code>.
+  A slow but steady upload is fine.</li>
 <li>A response is sent when it is closed. It is kept in memory until then,
   also a big file. Use a proxy (nginx, Caddy) or a storage link for big
   downloads.</li>
