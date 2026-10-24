@@ -48,6 +48,9 @@ dynamic corsAllowOrigin(dynamic origin, String? requestOrigin) {
   return null;
 }
 
+/// a config list joined once, eg. `GET,POST`. the config does not change.
+final Expando<String> _joined = Expando<String>();
+
 // set cors in header
 void _setCorsValue(HttpResponse res, String key, dynamic data) {
   if (data == null) {
@@ -56,7 +59,7 @@ void _setCorsValue(HttpResponse res, String key, dynamic data) {
 
   /// when data is list of string, eg. ['GET', 'POST']
   if (data is List<String> && data.isNotEmpty) {
-    res.headers.add(key, data.join(','));
+    res.headers.add(key, _joined[data] ??= data.join(','));
     return;
   }
 

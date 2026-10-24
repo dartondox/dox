@@ -20,8 +20,9 @@ class IocContainer {
   /// ioc.register<Foo>((i) => Foo(i.get<Bar>()));
   /// ```
   void register<T>(Function(IocContainer) callback) {
-    if (T.toString() != 'dynamic') {
-      _dependencies[T.toString()] = () => callback(this);
+    String name = T.toString();
+    if (name != 'dynamic') {
+      _dependencies[name] = () => callback(this);
     }
   }
 
@@ -31,8 +32,9 @@ class IocContainer {
   /// ```
   /// bar will create only once instance
   void registerSingleton<T>(Function(IocContainer) callback) {
-    if (T.toString() != 'dynamic') {
-      _singletonDependencies[T.toString()] = callback(this);
+    String name = T.toString();
+    if (name != 'dynamic') {
+      _singletonDependencies[name] = callback(this);
     }
   }
 
@@ -41,10 +43,12 @@ class IocContainer {
   /// Foo foo = ioc.get<Foo>();
   /// ```
   T get<T>() {
-    if (_haveInSingleton(T.toString())) {
-      return _singletonDependencies[T.toString()];
+    /// `T.toString()` makes a new string, so call it once
+    String name = T.toString();
+    if (_haveInSingleton(name)) {
+      return _singletonDependencies[name];
     }
-    return _dependencies[T.toString()]();
+    return _dependencies[name]();
   }
 
   /// get class

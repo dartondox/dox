@@ -1,5 +1,15 @@
 ## Unreleased
 
+- Perf: faster route matching. A plain route is found with one map lookup, also when a param route was added before it (as long as that param route can not match the same path). Param routes are grouped by their first path segment, so a request only tries the routes that can match. The first matching route still wins.
+- Perf: the request handler reads `Host` and `Content-Type` once per request. `Host` is read only when the app has a `Route.domain()` route. The WebSocket upgrade check runs only when WebSocket is set up. `HttpBody.read()` takes an optional `contentType`.
+- Perf: on the native server, a JSON or form body is used as it is, with no stream in between. The size limit is still checked.
+- Perf: JSON responses are encoded in 8 KB chunks, not 256 bytes.
+- Perf: fewer objects per request. `RouteData.params`, `DoxRequest.param` and `DoxRequest.method` are made on first use. `RouteData.domainLower` is made once. CORS header lists are joined once.
+- Perf: one Future less per async request (`then(onError:)` instead of `then().onError()`).
+- Perf: multipart parsing makes its regexes once, and no longer builds a `Future.any` per chunk.
+- Perf: `LogMiddleware` lowercases the `redact` words once, not per key.
+- Perf: an error response reads `APP_ENV` and lowercases it only when the value changed.
+- Perf: `IocContainer` calls `T.toString()` once per call.
 - Breaking: the `dart:io` server is gone. Every app runs on the native server (`dox_http_native`), also an app with WebSocket or Socket.IO routes. `AppConfig.server`, the `ServerBackend` enum and the `DOX_SERVER` env var are removed. `DoxServer.usesNative()` and the `isolateId` option of `DoxServer.listen()` are removed.
 - Breaking: when the native library does not load, Dox stops at start with an error. It says why (eg. an ABI mismatch) and how to fix it (install Rust so the build hook can build it, or rebuild your `lib_path` library). Before, Dox logged a warning and used `dart:io`.
 - On a graceful stop (SIGTERM, `Dox().stop()`), open WebSockets get close code 1001.

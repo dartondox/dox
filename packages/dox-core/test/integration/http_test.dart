@@ -75,6 +75,23 @@ void main() {
       expect(res.body, 'first');
     });
 
+    test('plain route after a param route of another path', () async {
+      Route.get('/fast_a/{id}', (DoxRequest req) => 'a ${req.param['id']}');
+      Route.get('/fast_b', (DoxRequest req) => 'b');
+      Route.get('/{fast_any}/c', (DoxRequest req) => 'any');
+      Route.get('/fast_a/c', (DoxRequest req) => 'never');
+
+      expect((await http.get(Uri.parse('$baseUrl/fast_b'))).body, 'b');
+      expect((await http.get(Uri.parse('$baseUrl/fast_a/5'))).body, 'a 5');
+
+      /// `/fast_a/{id}` comes first and matches, not the plain route
+      expect((await http.get(Uri.parse('$baseUrl/fast_a/c'))).body, 'a c');
+
+      /// a param in the first segment matches any first segment
+      expect((await http.get(Uri.parse('$baseUrl/zzz/c'))).body, 'any');
+      expect((await http.get(Uri.parse('$baseUrl/fast_b/c'))).body, 'any');
+    });
+
     test('async middleware, then sync controller', () async {
       Future<DoxRequest> slow(DoxRequest req) async {
         await Future<void>.delayed(Duration.zero);

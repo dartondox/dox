@@ -294,7 +294,12 @@ the isolate. So Dox collects log lines and writes them every 20 ms (or every
 64 KB) in one write. If the process is killed hard, the last 20 ms of request logs can
 be lost. Errors from `Logger` are still written right away.
 
-Turn `LogMiddleware` off when a proxy already writes access logs.
+Turn `LogMiddleware` off when a proxy already writes access logs. The new
+project does this for you: `enabled` is `false` when `APP_ENV` is
+`production`.
+
+Leave `responseHandler` unset when you do not need it. With no handler, a
+plain value (text, map, list) is sent without building a `DoxResponse`.
 
 ## What Dox does for you
 
