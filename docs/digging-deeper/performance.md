@@ -42,7 +42,8 @@ How it was run:
 - Dart 3.13.6, Rust 1.99.1. Dox is built with `dart build cli` (this is
   what `dox build` does). The build hook of `dox_http_native` builds the
   Rust library with cargo.
-- `DOX_SERVER=dartio` runs the same Dox app on `dart:io`.
+- The `dart:io` row is the same Dox app on a `dart:io` `HttpServer`, from a
+  build that still had it. Dox now runs on the native server only.
 
 ## App benchmark
 

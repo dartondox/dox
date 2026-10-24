@@ -12,8 +12,8 @@
 // 4. `cargo build` from source, when cargo is installed.
 // Outside the pub cache (this repo, or a path or git dependency), 4 comes
 // before 3, because the source may be newer than the release.
-// When none works, no asset is added. Dox then logs a warning and uses
-// dart:io instead. The build never fails because of this package.
+// When none works, no asset is added. Dox then stops at start and says
+// why. The build itself never fails because of this package.
 import 'dart:io';
 
 import 'package:code_assets/code_assets.dart';
@@ -62,7 +62,7 @@ void main(List<String> args) async {
     if (lib == null) {
       stderr.writeln(
         'dox_http_native: no native library for ${os.name}-${arch.name}. '
-        'Dox will use dart:io.',
+        'Install Rust (cargo) to build it from source.',
       );
       return;
     }

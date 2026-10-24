@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_annotation/dox_annotation.dart';
+import 'package:dox_http_native/dox_http_native.dart';
 import 'package:dox_websocket/src/utils/constant.dart';
 import 'package:dox_websocket/src/websocket.dart';
 import 'package:dox_websocket/src/websocket_emitter.dart';
@@ -43,11 +44,13 @@ class WebsocketEventHandler implements WebsocketEvent {
       throw _ForbiddenOriginException();
     }
 
-    /// compression is off. a small compressed message can grow
-    /// very big when dart:io inflates it.
-    WebSocket ws = await WebSocketTransformer.upgrade(
+    /// the native server never agrees to compression. a small
+    /// compressed message could grow very big in memory.
+    /// a message over maxMessageSize bytes is closed with 1009 in Rust,
+    /// before Dart reads it.
+    WebSocket ws = await NativeWebSocket.upgrade(
       req.httpRequest,
-      compression: CompressionOptions.compressionOff,
+      maxMessageSize: server.maxMessageSize,
     );
 
     /// create socket id for each client connection
@@ -72,8 +75,8 @@ class WebsocketEventHandler implements WebsocketEvent {
     /// listen for new message sent from client
     ws.listen(
       (dynamic data) async {
-        /// dart:io reads the whole message before this check,
-        /// so also set a limit in your proxy.
+        /// Rust already checks the size in bytes. this check stays for
+        /// a request of a plain dart:io server.
         if (data.length > server.maxMessageSize) {
           await ws.close(WebSocketStatus.messageTooBig);
           return;

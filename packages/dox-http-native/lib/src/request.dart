@@ -19,6 +19,7 @@ class NativeRequest extends Stream<Uint8List> implements HttpRequest {
     this._ip,
     this._remotePort, {
     required this._http10,
+    this.isWebSocketUpgrade = false,
   });
 
   final NativeHttpServer server;
@@ -35,6 +36,10 @@ class NativeRequest extends Stream<Uint8List> implements HttpRequest {
   final Uint8List _ip;
   final int _remotePort;
   final bool _http10;
+
+  /// true when Rust found a valid WebSocket upgrade request (GET,
+  /// HTTP/1.1, `Upgrade: websocket`, version 13, a key).
+  final bool isWebSocketUpgrade;
 
   @override
   late final NativeHeaders headers = NativeHeaders.request(

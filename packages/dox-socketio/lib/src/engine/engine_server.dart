@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:dox_http_native/dox_http_native.dart';
+
 import '../constants/engine_constants.dart';
 import '../utils/id_generator.dart';
 import 'engine_request.dart';
@@ -70,7 +72,7 @@ class EngineServer implements EngineSessionStore {
       return;
     }
     bool isWebsocket = transport == transportWebsocket;
-    if (isWebsocket && !WebSocketTransformer.isUpgradeRequest(request)) {
+    if (isWebsocket && !NativeWebSocket.isUpgradeRequest(request)) {
       _responder.error(response, EngineError.badRequest);
       return;
     }
@@ -145,12 +147,13 @@ class EngineServer implements EngineSessionStore {
     );
   }
 
-  /// Compression is off. A small compressed message can grow very big
-  /// when dart:io inflates it, before the size check can run.
+  /// Compression is off. A small compressed message could grow very big
+  /// in memory. On the native server, a message over maxHttpBufferSize
+  /// bytes is closed with 1009 in Rust, before Dart reads it.
   Future<WebSocket> _upgradeSocket(HttpRequest request) {
-    return WebSocketTransformer.upgrade(
+    return NativeWebSocket.upgrade(
       request,
-      compression: CompressionOptions.compressionOff,
+      maxMessageSize: options.maxHttpBufferSize,
     );
   }
 

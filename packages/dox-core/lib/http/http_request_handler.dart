@@ -10,6 +10,7 @@ import 'package:dox_core/http/http_route_handler.dart';
 import 'package:dox_core/http/http_websocket_handler.dart';
 import 'package:dox_core/http/request/http_request_body.dart';
 import 'package:dox_core/router/route_data.dart';
+import 'package:dox_http_native/dox_http_native.dart';
 
 /// this is a class which get matched routes and
 /// pass http request to route middleware and controllers
@@ -25,7 +26,7 @@ void httpRequestHandler(HttpRequest req) {
 
     httpCorsHandler(route.corsEnabled, req);
 
-    if (WebSocketTransformer.isUpgradeRequest(req)) {
+    if (NativeWebSocket.isUpgradeRequest(req)) {
       httpWebSocketHandler(req, route);
       return;
     }

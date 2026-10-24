@@ -27,7 +27,6 @@ void isolateHandler(IsolateSpawnParameter param) async {
   await DoxServer().listen(
     DoxServer.portFor(appConfig.serverPort),
     address: DoxServer.hostFor(appConfig.host),
-    isolateId: param.isolateId,
   );
 
   /// the main isolate sends a reply port here to stop this isolate

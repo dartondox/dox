@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Breaking: `SocketIoServer.listen()` starts a native server (`dox_http_native`), not a `dart:io` one. The websocket transport uses the native WebSocket upgrade. Long-polling works the same. `attach()` still takes any `HttpServer`, also a `dart:io` one.
+- Security: on the native server, a websocket message over `maxHttpBufferSize` bytes is closed with 1009 in Rust, before Dart reads it.
 - Security: a binary packet nested deeper than 32 levels is a parse error (`SocketDecoder(maxDepth: ...)`). Before, a deep packet overflowed the stack and could stop the server. Any decode error now closes only that one connection.
 - Security: many CONNECT packets for one namespace at once make only one socket. Before, each one made a socket that stayed in memory.
 - Security: websocket compression is off. A small compressed message could grow very big in memory.

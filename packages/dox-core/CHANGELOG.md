@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Breaking: the `dart:io` server is gone. Every app runs on the native server (`dox_http_native`), also an app with WebSocket or Socket.IO routes. `AppConfig.server`, the `ServerBackend` enum and the `DOX_SERVER` env var are removed. `DoxServer.usesNative()` and the `isolateId` option of `DoxServer.listen()` are removed.
+- Breaking: when the native library does not load, Dox stops at start with an error. It says why (eg. an ABI mismatch) and how to fix it (install Rust so the build hook can build it, or rebuild your `lib_path` library). Before, Dox logged a warning and used `dart:io`.
+- On a graceful stop (SIGTERM, `Dox().stop()`), open WebSockets get close code 1001.
 - Perf: `AESEncryptor` keeps the key bytes of the last secret and writes the output into one buffer. Decode reads the nonce and text without copies. The output format is the same.
 - New: `Hash.makeAsync()` and `Hash.verifyAsync()`. They run bcrypt in another isolate, so a request does not block the server.
 - New: `Hash.rounds` (default 10) sets the bcrypt cost. `Hash.make()` also takes `rounds:`.

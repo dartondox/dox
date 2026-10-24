@@ -16,8 +16,8 @@ The image is small. For the blog API it is about 17 MB. Fly builds it for you on
 
 !!! note "Check for `(native)`"
     The project's `Dockerfile` copies `libgcc_s.so.1` into the image, so the
-    native HTTP server loads. The start log ends with `(native)`. If it says
-    `using the dart:io server`, see [Docker](docker.md).
+    native HTTP server loads. The start log ends with `(native)`. If the app
+    stops with `dox_http_native did not load`, see [Docker](docker.md).
 
 ## 1. Make the app on Fly.io
 

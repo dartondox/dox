@@ -121,8 +121,12 @@ class Dox implements IDox {
     _totalIsolate ??= Dox().config.totalIsolate;
     int isolatesToSpawn = _totalIsolate!;
 
+    /// stop here, before any isolate starts, when the native server can
+    /// not run. The error says why and how to fix it.
+    NativeHttpServer.ensureAvailable();
+
     /// Windows has no SO_REUSEPORT: one isolate owns the native listener.
-    if (Platform.isWindows && isolatesToSpawn > 1 && DoxServer.usesNative()) {
+    if (Platform.isWindows && isolatesToSpawn > 1) {
       Logger.info('Windows: the native server runs on one isolate');
       isolatesToSpawn = 1;
     }
@@ -136,13 +140,11 @@ class Dox implements IDox {
     HttpServer server = await DoxServer().listen(
       DoxServer.portFor(config.serverPort),
       address: DoxServer.hostFor(config.host),
-      isolateId: 1,
     );
 
-    String backend = server is NativeHttpServer ? 'native' : 'dart:io';
     Logger.info(
       'Server started at ${serverUrl(server)} with $isolatesToSpawn isolate '
-      '($backend)',
+      '(native)',
     );
     _watchSignals();
   }

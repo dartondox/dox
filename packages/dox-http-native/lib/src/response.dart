@@ -53,6 +53,12 @@ class NativeResponse implements HttpResponse {
     return _first ?? const <int>[];
   }
 
+  /// Marks the response as sent: a WebSocket accept answers the request.
+  void upgraded() {
+    _closed = true;
+    _done?.complete(this);
+  }
+
   /// true when a cookie was added
   bool get hasCookies => _cookies?.isNotEmpty ?? false;
 
@@ -163,8 +169,10 @@ class NativeResponse implements HttpResponse {
 
   @override
   Future<Socket> detachSocket({bool writeHeaders = true}) {
-    // TODO(native): WebSocket upgrade. Dox uses dart:io for apps with
-    // WebSocket or Socket.IO routes until this works.
-    throw UnsupportedError('dox_http_native can not detach the socket');
+    // Rust owns the socket. For a WebSocket use `NativeWebSocket.upgrade`.
+    throw UnsupportedError(
+      'dox_http_native can not detach the socket. '
+      'Use NativeWebSocket.upgrade for a WebSocket.',
+    );
   }
 }

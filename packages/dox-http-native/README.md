@@ -53,13 +53,38 @@ void main() async {
 }
 ```
 
-## Turn it off in Dox
+Dox always runs on this server. When the native library does not load, Dox
+stops at start and prints why (eg. an ABI mismatch) and how to fix it.
 
-- Set `server: ServerBackend.dartIo` in `AppConfig`.
-- Or set the env var `DOX_SERVER=dartio`. The env var wins over the config.
+## WebSocket
 
-Dox also uses `dart:io` by itself when the native library does not load,
-and when the app has WebSocket or Socket.IO routes.
+```dart
+server.listen((HttpRequest req) async {
+  if (!NativeWebSocket.isUpgradeRequest(req)) return; // a normal request
+  WebSocket ws = await NativeWebSocket.upgrade(
+    req,
+    protocol: 'chat', // optional subprotocol
+    maxMessageSize: 1024 * 1024,
+  );
+  ws.listen((dynamic message) => ws.add('echo: $message'));
+});
+```
+
+How it works:
+
+- Rust marks a request that can upgrade. Your Dart code runs first, like
+  for any request: routing, middleware, the `Origin` check. Answer with a
+  normal response (eg. `403`) to refuse it.
+- `NativeWebSocket.upgrade` accepts it. Rust
+  ([tokio-tungstenite](https://github.com/snapview/tokio-tungstenite))
+  sends the `101` and speaks the WebSocket protocol: ping and pong, the
+  close handshake and the UTF-8 check of text.
+- A message or frame over `maxMessageSize` bytes closes the socket with
+  `1009`. Dart never gets it.
+- Compression (permessage-deflate) is never agreed.
+- Dart gets whole messages: a `String` for text, a `Uint8List` for binary.
+  They come in the same batches as requests.
+- `NativeWebSocket` implements the `dart:io` `WebSocket` API.
 
 ## Features
 
@@ -69,7 +94,8 @@ and when the app has WebSocket or Socket.IO routes.
 - `408` when the client sends no body bytes for `bodyTimeout` (idle time, default 120 seconds). A slow but steady upload is fine.
 - `bind(port, address: '127.0.0.1')` listens on one host. With no address it listens on all interfaces.
 - `close()` is graceful: no new connections, open requests get their answer, then it completes. `close(force: true)` closes every connection at once.
-- Not yet: WebSocket upgrade (`detachSocket`).
+- WebSocket upgrade with `NativeWebSocket.upgrade`, see above. `detachSocket` is not supported.
+- On a graceful `close()`, every open WebSocket gets close code `1001` (going away).
 - Not yet: streaming a response while it is written. The body is sent on `close`.
 
 ## Documentation

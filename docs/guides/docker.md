@@ -114,8 +114,8 @@ Server started at http://[::]:3000 with 8 isolate (native)
 ```
 
 Without the `libgcc_s` lines, the native HTTP server does not load in a
-`scratch` image. Dox then prints `dox_http_native did not load, using the
-dart:io server` and runs on the slower `dart:io` server.
+`scratch` image. Dox then stops at start with `dox_http_native did not
+load` and the reason.
 
 !!! warning "`dox build`, not `dart compile exe`"
     `dox_orm` bundles SQLite with a build hook. `dart compile exe` does not run build hooks and stops with an error.

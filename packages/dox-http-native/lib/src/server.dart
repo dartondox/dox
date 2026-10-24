@@ -8,6 +8,7 @@ import 'package:dox_http_native/src/bindings.dart';
 import 'package:dox_http_native/src/headers.dart';
 import 'package:dox_http_native/src/request.dart';
 import 'package:dox_http_native/src/response.dart';
+import 'package:dox_http_native/src/websocket.dart';
 
 /// An [HttpServer] where Rust (hyper) owns the sockets and parses HTTP.
 /// Handlers run in Dart, like with `dart:io`.
@@ -35,6 +36,20 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
   static String? get loadError {
     isAvailable;
     return _loadError;
+  }
+
+  /// Throws an [UnsupportedError] that says why the native library did not
+  /// load and how to fix it. Does nothing when it loaded.
+  static void ensureAvailable() {
+    if (isAvailable) return;
+    throw UnsupportedError(
+      'dox_http_native did not load: $_loadError.\n'
+      'Fix: install Rust (cargo, see https://rustup.rs), then run the app '
+      'again with `dart run` or `dart build cli`. The build hook then builds '
+      'the library from source. When you set `lib_path` in pubspec.yaml, '
+      'rebuild that library: `cargo build --release` in '
+      'packages/dox-http-native/native.',
+    );
   }
 
   static bool _load() {
@@ -75,9 +90,7 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
     int? maxMultipartSize,
     Duration bodyTimeout = const Duration(seconds: 120),
   }) async {
-    if (!isAvailable) {
-      throw UnsupportedError('dox_http_native is not available: $_loadError');
-    }
+    ensureAvailable();
     InternetAddress? ip = await _resolve(address);
     List<int> raw = ip?.rawAddress ?? const <int>[];
     int family = ip == null ? 0 : (raw.length == 4 ? 4 : 6);
@@ -135,6 +148,12 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
 
   int _handle;
   final RawReceivePort _receive;
+
+  /// open WebSockets of this server, by ws id
+  final Map<int, NativeWebSocket> sockets = <int, NativeWebSocket>{};
+
+  /// the id of the next WebSocket
+  int nextSocketId = 1;
   final StreamController<HttpRequest> _requests = StreamController<HttpRequest>(
     sync: true,
   );
@@ -214,6 +233,10 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
       _receive.close();
       // not awaited: with no listener the close future never completes
       unawaited(_requests.close());
+      // Rust is gone, so no close record comes any more
+      for (NativeWebSocket ws in List<NativeWebSocket>.of(sockets.values)) {
+        ws.closed(WebSocketStatus.abnormalClosure, '');
+      }
       _done();
     }
   }
@@ -232,6 +255,8 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
     if (b.length == 1) return _done(); // a graceful close is done
     ByteData d = ByteData.sublistView(b);
     int p = 0;
+    // bytes of WebSocket messages in this batch, acknowledged at the end
+    int wsBytes = 0;
     _inBatch = true;
     try {
       while (p + 28 <= b.length) {
@@ -253,6 +278,13 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
         q += hlen;
         Uint8List body = Uint8List.sublistView(b, q, q + blen);
         p = q + blen;
+        int kind = (flags >> 8) & 0xff;
+        if (kind != 0) {
+          // a WebSocket message or close. The port field is the close code.
+          if (kind != 3) wsBytes += blen;
+          sockets[id]?.receive(kind, remotePort, body);
+          continue;
+        }
         _requests.add(
           NativeRequest(
             this,
@@ -264,10 +296,15 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
             ip,
             remotePort,
             http10: flags & 1 == 1,
+            isWebSocketUpgrade: flags & 2 == 2,
           ),
         );
       }
     } finally {
+      // Rust stops reading WebSocket frames while Dart is too far behind
+      if (wsBytes > 0) {
+        sendWebSocket(wsBytes, NativeWebSocket.kindAck, 0, const <int>[]);
+      }
       _inBatch = false;
       _flush();
     }
@@ -371,6 +408,36 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
     _ensure(body.length);
     _out.setRange(_len, _len + body.length, body);
     _len += body.length;
+    _queueFlush();
+  }
+
+  /// Queue a WebSocket record for Rust: an accept of the request [id], or
+  /// a message for the WebSocket [id]. [kind] and [status] are the fields
+  /// of the response record, see `NativeWebSocket`.
+  void sendWebSocket(
+    int id,
+    int kind,
+    int status,
+    List<int> body, {
+    String? protocol,
+  }) {
+    if (_handle == 0) return;
+    _ensure(20);
+    int start = _len;
+    _outData.setUint64(start, id, Endian.little);
+    _outData.setUint16(start + 8, status, Endian.little);
+    _outData.setUint16(start + 10, kind, Endian.little);
+    _len += 20;
+    if (protocol != null) _line('sec-websocket-protocol', protocol);
+    _outData.setUint32(start + 12, _len - start - 20, Endian.little);
+    _outData.setUint32(start + 16, body.length, Endian.little);
+    _ensure(body.length);
+    _out.setRange(_len, _len + body.length, body);
+    _len += body.length;
+    _queueFlush();
+  }
+
+  void _queueFlush() {
     if (!_inBatch && !_flushQueued) {
       _flushQueued = true;
       scheduleMicrotask(_flush);

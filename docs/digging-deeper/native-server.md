@@ -1,7 +1,8 @@
 # Native server
 
-Dox runs on a native HTTP server by default. It comes from the package
-`dox_http_native`. You do not need to set anything.
+Dox runs on a native HTTP server. It comes from the package
+`dox_http_native`. You do not need to set anything. Every app uses it, also
+an app with WebSocket or Socket.IO routes.
 
 - Rust ([hyper](https://hyper.rs)) owns the sockets and parses HTTP.
 - All your code stays in Dart: routes, controllers, DTOs, middleware, ORM.
@@ -28,28 +29,43 @@ Each isolate runs its own server on the same port:
 - macOS: the isolates share one socket.
 - Windows: only one isolate serves HTTP.
 
-## Use dart:io instead
+## When the library does not load
 
-Set `server` in `AppConfig`:
+Dox stops at start, before any isolate runs. The error says why and how to
+fix it:
 
-```dart
-AppConfig(
-  // ...
-  server: ServerBackend.dartIo,
-);
+```
+Unsupported operation: dox_http_native did not load: <reason>.
+Fix: install Rust (cargo, see https://rustup.rs), then run the app again ...
 ```
 
-Or set the env var `DOX_SERVER=dartio`. The env var wins over the config.
+`<reason>` is for example `native library ABI 4, expected 5`: the library on
+disk is from another version of the package. See
+[Troubleshooting](../reference/troubleshooting.md#the-native-http-library-did-not-load).
 
-Dox also uses `dart:io` by itself in these cases:
+## WebSocket
 
-- The native library did not load. Dox prints one warning line at start:
-  `[dox] warning: dox_http_native did not load, using the dart:io server (...)`.
-- The app has WebSocket or Socket.IO routes. The native server can not
-  upgrade a connection to WebSocket yet.
+Rust also does the WebSocket upgrade and the WebSocket protocol.
 
-`DOX_SERVER=native` forces the native server, also for an app with WebSocket
-routes. WebSocket upgrades then fail with 500. Socket.IO long-polling works.
+1. Rust marks a request that asks for an upgrade.
+2. Dart runs the route, the middleware and the `Origin` check, like for any
+   request. A normal answer (eg. `403`) refuses the upgrade.
+3. When Dart accepts, Rust sends the `101` answer. From then on Rust
+   answers pings, does the close handshake, checks that text is UTF-8 and
+   checks the size of each message.
+4. Dart gets whole messages, in the same batches as requests. It sends
+   messages back the same way as answers.
+
+- A message or frame over the size limit closes the socket with code `1009`.
+  Dart never reads it. `dox_websocket` uses `maxMessageSize`, Socket.IO uses
+  `maxHttpBufferSize`.
+- Compression (permessage-deflate) is never agreed. A small compressed
+  message could grow very big in memory.
+- On a graceful stop (SIGTERM), every open WebSocket gets close code `1001`.
+- In your own code, use `NativeWebSocket.upgrade(request)` from
+  `dox_http_native`. It gives a `dart:io` `WebSocket`.
+
+## Threads
 
 Each isolate has its own Rust network thread. `DOX_HTTP_THREAD=shared` puts
 all isolates on one thread. It is off by default: on 2 cores the one thread
@@ -70,7 +86,6 @@ a gain.
 - A response is sent when it is closed. It is kept in memory until then,
   also a big file. Use a proxy (nginx, Caddy) or a storage link for big
   downloads.
-- No WebSocket upgrade yet (see above).
 - `compress: true` works: Dart gzips the body.
 
 ## Where the library comes from
@@ -94,7 +109,8 @@ that works:
    Windows (x64).
 4. A build from source with `cargo`, when Rust is installed.
 
-When none works, the app still builds and runs on `dart:io`.
+When none works, the app still builds, but it stops at start with the
+error above. Install Rust and run it again, so step 4 works.
 
 !!! note "Use `dart build cli`"
     `dart compile exe` does not run build hooks. Use `dox build` or

@@ -16,7 +16,7 @@ No package is marked "stable API" yet. That comes with 3.0 stable.
 
 | Package | What it does | State | Tests |
 | --- | --- | --- | --- |
-| `dox_core` | Routes, middleware, controllers, request and response, isolates, config | May change | 29 test files. CI runs them on the native server and on `dart:io`. |
+| `dox_core` | Routes, middleware, controllers, request and response, isolates, config | May change | 29 test files. CI runs them on the native server. |
 | `dox_orm` | Query builder, models, relations, transactions, drivers | May change | 16 test files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite, with the native and the Dart drivers. |
 | `dox_validation` | `@Dto` rules, fluent schemas, JSON Schema, Standard Schema | May change | 6 test files |
 | `dox_builder` | Code generator for models, DTOs, env classes and OpenAPI | May change | 4 test files |
@@ -61,7 +61,6 @@ These were checked by searching the code in `packages/*/lib` with `rg`.
 
 | Item | Source |
 | --- | --- |
-| WebSocket on the native server. Today an app with WebSocket routes uses the `dart:io` server. | `TODO(native)` in `dox_http_native/lib/src/response.dart` and `dox_core/lib/server/dox_server.dart` |
 | Stream big responses to the socket on the native server. Today a big file is held in memory. | `ponytail:` note in `dox_http_native/lib/src/response.dart` |
 | TLS for the native Postgres driver | `ponytail:` note in `dox_orm/lib/src/drivers/postgres_native_driver.dart` |
 | Savepoints for nested transactions. Today a nested `transaction()` joins the outer one. | `ponytail:` notes in the `dox_orm` drivers and in `dox_migration` |

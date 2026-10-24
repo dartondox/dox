@@ -58,7 +58,7 @@ The client sends JSON text like `{"event": "intro", "message": "hi"}` to `ws://1
 - `WebsocketRedisAdapter` sends each message to all isolates and all servers.
 - A JavaScript client: [`@dartondox/websocket`](https://github.com/dartondox/dox-web-socket-client/).
 
-An app with a WebSocket route runs on the `dart:io` server, because the native server can not upgrade connections yet.
+WebSockets run on the native server (`dox_http_native`). Rust does the upgrade and the protocol, your handlers stay in Dart.
 For the official Socket.IO clients, use `dox_socketio`.
 
 ## Documentation

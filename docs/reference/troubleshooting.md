@@ -4,22 +4,17 @@ Real problems, with the text you see, the cause and the fix. The texts come from
 
 ## The native HTTP library did not load
 
-**Symptom.** One line at start, on stderr:
+**Symptom.** The app stops at start with this error:
 
 ```
-[dox] warning: dox_http_native did not load, using the dart:io server (<reason>)
-```
-
-and the start line says `(dart:io)` instead of `(native)`:
-
-```
-Server started at http://[::]:3000 with 8 isolate (dart:io)
+Unsupported operation: dox_http_native did not load: <reason>.
+Fix: install Rust (cargo, see https://rustup.rs), then run the app again ...
 ```
 
 At build time (`dart pub get`, `dox serve` or `dox build`) you may also see one of these:
 
 ```
-dox_http_native: no native library for <os>-<arch>. Dox will use dart:io.
+dox_http_native: no native library for <os>-<arch>. Install Rust (cargo) to build it from source.
 dox_http_native: download dox_http_native-<os>-<arch>.<ext>: 404
 dox_http_native: download dox_http_native-<os>-<arch>.<ext> failed: <error>
 dox_http_native: sha256 of dox_http_native-<os>-<arch>.<ext> does not match
@@ -35,8 +30,8 @@ dox_http_native: cargo build failed
 
 **Fix.** Pick one:
 
-1. Accept `dart:io`. The app works, only slower. To hide the warning set `DOX_SERVER=dartio` or `server: ServerBackend.dartIo` in `AppConfig`.
-2. Install Rust with [rustup](https://rustup.rs) and run `dart pub get` again. The hook builds the library with `cargo`.
+1. Install Rust with [rustup](https://rustup.rs) and run `dart pub get` again. The hook builds the library with `cargo`.
+2. When the reason is an ABI mismatch and you set `lib_path`, rebuild that library: `cargo build --release` in `packages/dox-http-native/native`.
 3. Download the library from the GitHub release `dox_http_native-v<version>` yourself and point to it in the root `pubspec.yaml`:
 
     ```yaml
@@ -48,7 +43,7 @@ dox_http_native: cargo build failed
 
 4. Build with `dox build` (it runs `dart build cli`), not with `dart compile exe`.
 
-The same applies to the native database drivers. The warning is then:
+The native database drivers find their library the same way. They do not stop the app. The warning is then:
 
 ```
 [dox] warning: dox_postgres_native did not load, using the Dart postgres driver (<reason>)
@@ -61,17 +56,13 @@ See [Native server](../digging-deeper/native-server.md), [Postgres native](../da
 
 ## Port already in use
 
-**Symptom.** With the `dart:io` server:
-
-```
-SocketException: Failed to create server socket (OS Error: Address already in use, errno = 48), address = ::, port = 3000
-```
-
-(`errno = 48` on macOS, `errno = 98` on Linux.) With the native server:
+**Symptom.** At start:
 
 ```
 SocketException: dox_http_native: bind failed (<code>), port = 3000
 ```
+
+`<code>` is `-1000` minus the OS error: `-1048` on macOS, `-1098` on Linux.
 
 **Cause.** Another process listens on the port. Often it is an old `bin/server.dart` that `dox serve` did not stop, or a second copy of the app.
 
@@ -239,5 +230,4 @@ On Windows the folder is `%LOCALAPPDATA%\Pub\Cache\bin`.
 | `db/migration has Dart migrations, but bin/migrate.dart is missing.` | `dox migration:*` found Dart migration files but no entry point. | Run `dox make:migration <name>` once. It writes `bin/migrate.dart`. |
 | `<name> not found` (an `Exception` from `DatabaseConfig`) | `DatabaseConfig.connection` names a key that is not in `connections`. | Fix `DB_CONNECTION` or the map. |
 | `Storage disk "<name>" has unknown driver "<type>"` | A disk in `StorageConfig` has a `driver` other than `local`, `s3` or `memory`. | Fix the driver name. |
-| `Windows: the native server runs on one isolate` | Windows has no `SO_REUSEPORT`. | Not an error. Use `DOX_SERVER=dartio` to use every core on Windows. |
-| `WebSocket or Socket.IO routes: using the dart:io server` | The native server can not upgrade to WebSocket yet. | Not an error. `DOX_SERVER=native` forces native, then WebSocket upgrades fail with `500`. |
+| `Windows: the native server runs on one isolate` | Windows has no `SO_REUSEPORT`. | Not an error. Run more instances behind a proxy to use every core. |

@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_request_handler.dart';
-import 'package:dox_core/utils/logger.dart';
 import 'package:dox_http_native/dox_http_native.dart';
 
 class DoxServer {
@@ -12,46 +11,12 @@ class DoxServer {
   factory DoxServer() => _singleton;
   DoxServer._internal();
 
-  /// the http server. a `NativeHttpServer` (dox_http_native) or the
-  /// dart:io one. both have the same `HttpServer` API.
+  /// the http server, a `NativeHttpServer` (dox_http_native). Rust owns
+  /// the sockets and parses HTTP. It has the `dart:io` `HttpServer` API.
   late HttpServer httpServer;
 
   /// set responseHandler
   ResponseHandlerInterface? responseHandler;
-
-  /// true when [listen] will use the native server (dox_http_native).
-  /// [log] prints why it does not, once.
-  static bool usesNative({bool log = false}) {
-    String? env = Platform.environment['DOX_SERVER']?.toLowerCase();
-    ServerBackend backend = switch (env) {
-      'dartio' || 'dart_io' || 'dart:io' => ServerBackend.dartIo,
-      'native' => ServerBackend.native,
-      _ => Dox().config.server,
-    };
-    if (backend == ServerBackend.dartIo) return false;
-
-    // TODO(native): WebSocket upgrade in dox_http_native. Until then these
-    // apps stay on dart:io. `DOX_SERVER=native` forces native anyway (the
-    // WebSocket upgrade then fails, Socket.IO long-polling still works).
-    if (env != 'native' &&
-        (Dox().websocket != null || Route().mounts.isNotEmpty)) {
-      if (log) {
-        Logger.info('WebSocket or Socket.IO routes: using the dart:io server');
-      }
-      return false;
-    }
-    if (!NativeHttpServer.isAvailable) {
-      /// always shown, also when the logger is off
-      if (log) {
-        stderr.writeln(
-          '[dox] warning: dox_http_native did not load, using the dart:io '
-          'server (${NativeHttpServer.loadError})',
-        );
-      }
-      return false;
-    }
-    return true;
-  }
 
   /// The port to listen on. `APP_PORT` in the env means [configured] (the
   /// app reads it into `serverPort`). With no `APP_PORT`, `PORT` wins:
@@ -76,27 +41,18 @@ class DoxServer {
     int port, {
     Object? address,
     Function? onError,
-    int? isolateId,
   }) async {
     AppConfig config = Dox().config;
-    HttpServer server;
-    if (usesNative(log: (isolateId ?? 1) == 1)) {
-      /// Rust stops a multipart form over maxMultipartSize and any other
-      /// body over maxBodySize. Dart checks the limits again.
-      server = await NativeHttpServer.bind(
-        port,
-        address: address,
-        maxBodySize: config.maxBodySize,
-        maxMultipartSize: config.maxMultipartSize,
-        bodyTimeout: config.bodyTimeout,
-      );
-    } else {
-      server = await HttpServer.bind(
-        address ?? InternetAddress.anyIPv6,
-        port,
-        shared: true,
-      );
-    }
+
+    /// Rust stops a multipart form over maxMultipartSize and any other
+    /// body over maxBodySize. Dart checks the limits again.
+    HttpServer server = await NativeHttpServer.bind(
+      port,
+      address: address,
+      maxBodySize: config.maxBodySize,
+      maxMultipartSize: config.maxMultipartSize,
+      bodyTimeout: config.bodyTimeout,
+    );
     server.autoCompress = config.compress;
 
     /// a stray async error from app code (eg. an un-awaited future that
@@ -120,13 +76,8 @@ class DoxServer {
   /// finish. Then every connection is closed.
   Future<void> shutdown(Duration timeout) async {
     HttpServer server = httpServer;
-    Stopwatch clock = Stopwatch()..start();
-    // native: completes when the open requests are done.
-    // dart:io: completes at once, so wait for the active connections.
+    // completes when the open requests are done. WebSockets get 1001.
     await server.close().then(_ignore).timeout(timeout, onTimeout: _nothing);
-    while (server.connectionsInfo().active > 0 && clock.elapsed < timeout) {
-      await Future<void>.delayed(const Duration(milliseconds: 20));
-    }
     await server.close(force: true);
   }
 

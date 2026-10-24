@@ -382,7 +382,6 @@ Dox 3.0 does not have these Laravel features. Check the [packages](../packages/v
 | Rate limiting middleware | not there. Write a middleware with the cache, or use a proxy. |
 | `php artisan route:list`, `tinker` | not there |
 | Savepoints in nested transactions | not there. A nested `transaction()` joins the outer one. |
-| WebSocket on the native server | not there yet. An app with WebSocket routes uses the `dart:io` server. |
 
 What is there, as separate packages: [validation](../packages/validation.md), [OpenAPI docs](../packages/openapi.md),
 [storage](../packages/storage.md), [cache](../packages/cache.md), [Socket.IO](../packages/socketio.md),
