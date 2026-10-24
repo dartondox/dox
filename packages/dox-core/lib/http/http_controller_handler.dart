@@ -200,7 +200,7 @@ class ControllerPlan {
     List<dynamic> values,
   ) async {
     values[dtoIndex] = await Dox().validator.validateDto(req, dtoArg.dto!);
-    return await _apply(values);
+    return _apply(values);
   }
 
   dynamic _apply(List<dynamic> values) {

@@ -16,13 +16,15 @@ class FormDataVisitor {
   /// request body, already wrapped with the size limit
   final Stream<List<int>> body;
 
-  final RegExp _token = RegExp(r'[^()<>@,;:"\\/[\]?={} \t\x00-\x1F\x7F]+');
-  final RegExp _whitespace = RegExp(r'(?:(?:\r\n)?[ \t]+)*');
+  static final RegExp _token = RegExp(
+    r'[^()<>@,;:"\\/[\]?={} \t\x00-\x1F\x7F]+',
+  );
+  static final RegExp _whitespace = RegExp(r'(?:(?:\r\n)?[ \t]+)*');
 
   /// a backslash only matches the `\\.` branch. when both branches can
   /// take it, a long run of backslashes backtracks for hours (ReDoS).
-  final RegExp _quotedString = RegExp(r'"(?:[^"\\\x00-\x1F\x7F]|\\.)*"');
-  final RegExp _quotedPair = RegExp(r'\\(.)');
+  static final RegExp _quotedString = RegExp(r'"(?:[^"\\\x00-\x1F\x7F]|\\.)*"');
+  static final RegExp _quotedPair = RegExp(r'\\(.)');
 
   final Map<String, dynamic> inputs = <String, dynamic>{};
 
@@ -34,7 +36,10 @@ class FormDataVisitor {
   /// so a part reader must also watch this or it waits forever.
   final Completer<bool> _failed = Completer<bool>();
 
-  FormDataVisitor(this.request, this.body) {
+  /// the multipart boundary. read from the request when null.
+  final String? boundary;
+
+  FormDataVisitor(this.request, this.body, {this.boundary}) {
     _failed.future.ignore();
   }
 
@@ -42,7 +47,7 @@ class FormDataVisitor {
   /// next one arrives, so the whole body is never held in memory.
   Future<void> process() async {
     MimeMultipartTransformer transformer = MimeMultipartTransformer(
-      request.headers.contentType!.parameters['boundary']!,
+      boundary ?? request.headers.contentType!.parameters['boundary']!,
     );
 
     await for (MimeMultipart formItem in _watch(body).transform(transformer)) {
@@ -132,19 +137,31 @@ class FormDataVisitor {
     }
   }
 
-  /// read a part, but stop with the body error if the body fails
+  /// read a part, but stop with the body error if the body fails.
+  /// a body error cancels the iterator, which ends a waiting `moveNext`.
+  /// so there is no race per chunk.
   Stream<List<int>> _guard(Stream<List<int>> part) async* {
     StreamIterator<List<int>> iterator = StreamIterator<List<int>>(part);
+    Object? error;
+    StackTrace? stackTrace;
+    _failed.future
+        .then<void>(
+          (_) {},
+          onError: (Object e, StackTrace s) {
+            error = e;
+            stackTrace = s;
+            return iterator.cancel();
+          },
+        )
+        .ignore();
     try {
-      while (await Future.any(<Future<bool>>[
-        iterator.moveNext(),
-        _failed.future,
-      ])) {
+      while (await iterator.moveNext()) {
         yield iterator.current;
       }
     } finally {
       await iterator.cancel();
     }
+    if (error != null) Error.throwWithStackTrace(error!, stackTrace!);
   }
 
   void _deleteWhenDone(File file) {

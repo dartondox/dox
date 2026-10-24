@@ -26,23 +26,31 @@ void httpRequestHandler(HttpRequest req) {
 
     httpCorsHandler(route.corsEnabled, req);
 
-    if (NativeWebSocket.isUpgradeRequest(req)) {
+    /// only an app with WebSocket routes needs the upgrade check
+    if (Dox().websocket != null && NativeWebSocket.isUpgradeRequest(req)) {
       httpWebSocketHandler(req, route);
       return;
     }
 
     /// no Content-Type means no body to read. then the request is
     /// made at once, with no Future in between.
-    if (req.headers.contentType == null) {
-      _run(req, _doxRequest(req, route, RequestBody.empty()));
+    /// read the header once and pass it on.
+    ContentType? contentType = req.headers.contentType;
+    if (contentType == null) {
+      _run(req, _doxRequest(req, route, RequestBody.empty(), null));
     } else {
-      HttpBody.read(req)
-          .then((RequestBody body) {
-            _run(req, _doxRequest(req, route, body));
-          })
-          .onError((Object? error, StackTrace stackTrace) {
+      HttpBody.read(req, contentType).then(
+        (RequestBody body) {
+          try {
+            _run(req, _doxRequest(req, route, body, contentType));
+          } catch (error, stackTrace) {
             httpErrorHandler(req, error, stackTrace);
-          });
+          }
+        },
+        onError: (Object error, StackTrace stackTrace) {
+          httpErrorHandler(req, error, stackTrace);
+        },
+      );
     }
 
     /// form data do not support isolate or multithread
@@ -73,29 +81,47 @@ bool _mounted(HttpRequest req, Map<String, RawRequestHandler> mounts) {
 void _run(HttpRequest req, DoxRequest doxReq) {
   FutureOr<dynamic> result = runMiddlewareAndController(doxReq);
   if (result is Future<dynamic>) {
-    result
-        .then((dynamic value) {
-          httpResponseHandler(value, req);
-        })
-        .onError((Object? error, StackTrace stackTrace) {
-          httpErrorHandler(req, error, stackTrace);
-        });
+    /// one Future: `then` with `onError`, not `then().onError()`
+    result.then(
+      (dynamic value) {
+        _send(req, value);
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        httpErrorHandler(req, error, stackTrace);
+      },
+    );
   } else {
     httpResponseHandler(result, req);
   }
 }
 
-Future<DoxRequest> getDoxRequest(HttpRequest req, RouteData route) async {
-  return _doxRequest(req, route, await HttpBody.read(req));
+/// send the result. an error while sending gets the error response.
+void _send(HttpRequest req, dynamic value) {
+  try {
+    httpResponseHandler(value, req);
+  } catch (error, stackTrace) {
+    httpErrorHandler(req, error, stackTrace);
+  }
 }
 
-DoxRequest _doxRequest(HttpRequest req, RouteData route, RequestBody body) {
+Future<DoxRequest> getDoxRequest(HttpRequest req, RouteData route) async {
+  ContentType? contentType = req.headers.contentType;
+  RequestBody body = await HttpBody.read(req, contentType);
+  return _doxRequest(req, route, body, contentType);
+}
+
+DoxRequest _doxRequest(
+  HttpRequest req,
+  RouteData route,
+  RequestBody body,
+  ContentType? contentType,
+) {
   return DoxRequest(
     route: route,
     uri: req.uri,
     body: body.map,
     requestBody: body,
-    contentType: req.headers.contentType,
+    contentType: contentType,
     httpHeaders: req.headers,
     httpRequest: req,
     // the client ip needs a socket call, so it is read on first use only

@@ -34,11 +34,14 @@ class DoxRequest implements IDoxRequest {
 
   String get _scheme => _client.scheme;
 
+  /// made on first use
   @override
-  String method = 'GET';
+  late String method = route.method.toUpperCase();
 
-  Map<String, dynamic> body = <String, dynamic>{};
-  Map<String, dynamic> param = <String, dynamic>{};
+  Map<String, dynamic> body;
+
+  /// the route params, eg. `{'id': '5'}`
+  late Map<String, dynamic> param = route.params;
 
   /// the query string, read on first use
   late Map<String, dynamic> query = uri.queryParameters;
@@ -65,10 +68,7 @@ class DoxRequest implements IDoxRequest {
     this._readClient = false,
   }) : _givenIp = clientIp,
        _givenScheme = scheme,
-       requestBody = requestBody ?? RequestBody(body) {
-    method = route.method.toUpperCase();
-    param = route.params;
-  }
+       requestBody = requestBody ?? RequestBody(body);
 
   /// get route identifier
   @override

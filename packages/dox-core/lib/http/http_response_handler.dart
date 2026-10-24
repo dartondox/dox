@@ -62,8 +62,9 @@ void _guardActiveFile(HttpResponse res, ContentType type) {
   }
 }
 
-/// encodes json straight to utf8 bytes, without building a String first
-final JsonUtf8Encoder _jsonUtf8 = JsonUtf8Encoder(null, advanceEncode);
+/// encodes json straight to utf8 bytes, without building a String first.
+/// 8 KB chunks: most bodies fit in one, so there is no join.
+final JsonUtf8Encoder _jsonUtf8 = JsonUtf8Encoder(null, advanceEncode, 8192);
 
 /// Handle response for different types of data
 /// such as string, stream, file, Model, List, encodable.
@@ -146,9 +147,19 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
   res.close();
 }
 
+/// the APP_ENV value [_show] was made from. the answer is made again
+/// only when the value changes, so most errors skip the string work.
+String? _shownFor;
+bool _show = false;
+
 bool _showErrors() {
-  String env = Env.get<String>('APP_ENV').toLowerCase();
-  return env == 'development' || env == 'local';
+  String env = Env.get<String>('APP_ENV');
+  if (!identical(env, _shownFor)) {
+    String lower = env.toLowerCase();
+    _show = lower == 'development' || lower == 'local';
+    _shownFor = env;
+  }
+  return _show;
 }
 
 /// wait for a streamed body, then close the response.
