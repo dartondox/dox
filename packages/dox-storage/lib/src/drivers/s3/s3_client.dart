@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 
 import '../../clock.dart';
+import '../../constants/storage_constants.dart';
 import '../../exceptions.dart';
 import 's3_driver_config.dart';
 import 's3_xml.dart';
@@ -96,7 +98,9 @@ class S3Client {
     Uint8List? body,
   }) async {
     Uint8List payload = body ?? Uint8List(0);
-    String hash = SigV4Signer.sha256Hex(payload);
+    String hash = payload.length < StorageConstants.isolateHashBytes
+        ? SigV4Signer.sha256Hex(payload)
+        : await Isolate.run(() => SigV4Signer.sha256Hex(payload));
     Map<String, String> unsigned = <String, String>{
       ...headers,
       'x-amz-content-sha256': hash,
