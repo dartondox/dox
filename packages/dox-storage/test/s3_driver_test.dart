@@ -90,6 +90,16 @@ void main() {
       expect(request.body, 'hello');
     });
 
+    test('a big body is hashed right (in another isolate)', () async {
+      Uint8List big = Uint8List(StorageConstants.isolateHashBytes + 1);
+      big[0] = 7;
+      await diskWith(config()).put('big.bin', big);
+      expect(
+        s3.requests.single.headers['x-amz-content-sha256'],
+        sha256.convert(big).toString(),
+      );
+    });
+
     test('virtual host style puts the bucket in the host', () async {
       await diskWith(config(forcePathStyle: false)).put('k.txt', 'x');
       expect(

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:crypto/crypto.dart';
 import 'package:ioredis/ioredis.dart';
 
 import '../cache_driver.dart';
@@ -36,6 +37,11 @@ if redis.call('GET', KEYS[1]) == ARGV[1] then
   return redis.call('DEL', KEYS[1])
 end
 return 0''';
+
+  /// SHA1 of [_releaseScript], for EVALSHA.
+  static final String _releaseSha = sha1
+      .convert(utf8.encode(_releaseScript))
+      .toString();
 
   /// Close the connection and the pool connections, with no reconnect.
   /// It sends no command, so it works when Redis is down.
@@ -154,14 +160,27 @@ return 0''';
   }
 
   /// Lua check-and-delete, so only the owner frees the lock.
+  /// Sends only the script hash (EVALSHA). When Redis does not know the
+  /// script yet, it sends the full script once (EVAL).
   Future<bool> releaseLock(String name, String owner) async {
-    Object? reply = await redis.sendCommand(<String>[
-      'EVAL',
-      _releaseScript,
-      '1',
-      _lockKey(name),
-      owner,
-    ]);
+    List<String> args = <String>['1', _lockKey(name), owner];
+    Object? reply;
+    try {
+      reply = await redis.sendCommand(<String>[
+        'EVALSHA',
+        _releaseSha,
+        ...args,
+      ]);
+    } on RedisError catch (error) {
+      if (!error.message.startsWith('NOSCRIPT')) {
+        rethrow;
+      }
+      reply = await redis.sendCommand(<String>[
+        'EVAL',
+        _releaseScript,
+        ...args,
+      ]);
+    }
     return reply == 1;
   }
 

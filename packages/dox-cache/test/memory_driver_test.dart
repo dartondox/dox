@@ -76,4 +76,35 @@ void main() {
       expect(await two.get('a'), isNull);
     });
   });
+
+  group('memory sweep', () {
+    test('removes expired keys that are never read again', () async {
+      FakeClock clock = FakeClock();
+      MemoryDriver driver = MemoryDriver(clock: clock);
+      for (int i = 0; i < 10; i++) {
+        await driver.put('old$i', i, const Duration(seconds: 1));
+      }
+      await driver.lock('job', const Duration(seconds: 1)).get();
+      clock.advance(const Duration(seconds: 2));
+      for (int i = 0; i < 1000; i++) {
+        await driver.put('new$i', i, null);
+      }
+      expect(driver.length, 1000);
+      expect(await driver.get('new0'), 0);
+      expect(
+        await driver.lock('job', const Duration(seconds: 1)).get(),
+        isTrue,
+      );
+    });
+
+    test('keeps keys that are not expired', () async {
+      FakeClock clock = FakeClock();
+      MemoryDriver driver = MemoryDriver(clock: clock);
+      await driver.put('keep', 1, const Duration(hours: 1));
+      for (int i = 0; i < 1000; i++) {
+        await driver.put('k$i', i, null);
+      }
+      expect(await driver.get('keep'), 1);
+    });
+  });
 }

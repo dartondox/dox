@@ -16,12 +16,33 @@ class JwtAuthDriver extends AuthDriver {
   /// How long a token is valid. Default: 1 hour.
   final Duration expiresIn;
 
+  /// bcrypt cost of the stored password hashes. Default: 10.
+  /// Set it to the cost you use with `Hash.make`, so a login for an
+  /// unknown email takes as long as a wrong password.
+  final int hashRounds;
+
+  /// Keep the user of a token in memory for this long, so
+  /// `verifyToken` does not load the user from the database on every
+  /// request. Off (`null`) by default.
+  /// A change to the user (eg. delete or ban) is seen only after this
+  /// time. Each server isolate has its own cache. Requests in this
+  /// time share the same user object, so do not change it per request.
+  final Duration? userCacheTtl;
+
+  /// most users kept by [userCacheTtl]. When full, the cache is cleared.
+  static const int _userCacheSize = 1000;
+
+  final Map<String, (Model<dynamic>, DateTime)> _userCache =
+      <String, (Model<dynamic>, DateTime)>{};
+
   /// constructor
   JwtAuthDriver({
     required this.secret,
     this.algorithm = JWTAlgorithm.HS256,
     this.expiresIn = const Duration(hours: 1),
     this.issuer,
+    this.hashRounds = 10,
+    this.userCacheTtl,
   }) {
     /// with an empty key anyone can sign a token for any user
     JWTKey key = secret;
@@ -31,11 +52,17 @@ class JwtAuthDriver extends AuthDriver {
         'secret',
       );
     }
+
+    /// made now in another isolate, so the first login does not
+    /// pay for it. A bad cost fails on the first login, not here.
+    _dummyHashes.putIfAbsent(hashRounds, () {
+      return Hash.makeAsync('dox-no-user', rounds: hashRounds)..ignore();
+    });
   }
 
   /// checked when no user is found, so a login takes as long for an
-  /// unknown email as for a wrong password.
-  static final String _dummyHash = Hash.make('dox-no-user');
+  /// unknown email as for a wrong password. One per bcrypt cost.
+  static final Map<int, Future<String>> _dummyHashes = <int, Future<String>>{};
 
   /// verify token and get model from provider
   /// and get user data
@@ -71,10 +98,32 @@ class JwtAuthDriver extends AuthDriver {
       /// get id from payload
       dynamic id = payload[model.primaryKey];
 
-      if (id != null) {
+      if (id == null) {
+        return null;
+      }
+
+      Duration? ttl = userCacheTtl;
+      if (ttl == null) {
         /// by user by id
         return await model.find(id);
       }
+
+      String cacheKey = '$guard:$id';
+      DateTime now = DateTime.now();
+      (Model<dynamic>, DateTime)? cached = _userCache[cacheKey];
+      if (cached != null && now.isBefore(cached.$2)) {
+        return cached.$1;
+      }
+      Model<dynamic>? user = await model.find(id);
+      if (user == null) {
+        _userCache.remove(cacheKey);
+        return null;
+      }
+      if (_userCache.length >= _userCacheSize) {
+        _userCache.clear();
+      }
+      _userCache[cacheKey] = (user, now.add(ttl));
+      return user;
     } catch (ex) {
       /// ignore any errors
     }
@@ -133,7 +182,11 @@ class JwtAuthDriver extends AuthDriver {
 
     /// always run bcrypt, also when there is no user or no password,
     /// so the answer time does not tell whether the account exists
-    bool matches = Hash.verify(password, hasHash ? hashed : _dummyHash);
+    /// bcrypt runs in another isolate, so other requests are not blocked
+    bool matches = await Hash.verifyAsync(
+      password,
+      hasHash ? hashed : await _dummyHashes[hashRounds]!,
+    );
     if (userData != null && hasHash && matches) {
       return userData;
     }
