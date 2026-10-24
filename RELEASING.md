@@ -79,8 +79,11 @@ This fills the `_sha256` map in each `packages/dox-*-native/hook/build.dart`.
 Commit and push.
 
 If the hook needs a library with an empty map, it builds the library with cargo.
-Users without Rust then fall back to `dart:io` and the Dart DB drivers.
-So never publish with an empty map.
+Users without Rust then get no `dox_http_native` library, and the app does not start.
+(The DB drivers fall back to Dart, the server does not.)
+So refill the `_sha256` map in `packages/dox-http-native/hook/build.dart` (and the other two)
+from the new release before you publish.
+Never publish with an empty or old map: an old hash does not match the new files.
 
 ## 4. Merge the release PR
 

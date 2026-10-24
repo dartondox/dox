@@ -200,11 +200,14 @@ These stop `dart run build_runner build`.
 
 ## Native libraries (build hooks)
 
-Printed during `dart pub get`, `dox serve` or `dox build`. `<pkg>` is `dox_http_native`, `dox_postgres_native` or `dox_mysql_native`. The app still runs, on the Dart fallback.
+Printed during `dart pub get`, `dox serve` or `dox build`. `<pkg>` is `dox_http_native`, `dox_postgres_native` or `dox_mysql_native`.
+
+- `dox_postgres_native` and `dox_mysql_native`: the app still runs, on the Dart DB driver.
+- `dox_http_native`: there is no fallback. The app stops at start with an error that says why the library did not load and how to fix it.
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `<pkg>: no native library for <os>-<arch>.` | No ready build for this OS and CPU. | Install Rust, or accept the fallback. |
+| `<pkg>: no native library for <os>-<arch>.` | No ready build for this OS and CPU. | Install Rust. For a DB driver you may also accept the Dart fallback. |
 | `<pkg>: download <file>: <status>` / `<pkg>: download <file> failed: <error>` | The GitHub download failed. | Check the network, then `dart pub get` again. |
 | `<pkg>: sha256 of <file> does not match` | The downloaded file is not the expected one. | Delete `.dart_tool` and try again. |
 | `<pkg>: cargo build failed` | The build from source failed. | Read the cargo output below it. |
