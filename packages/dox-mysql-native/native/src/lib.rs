@@ -10,6 +10,8 @@
 //!   added to a batch and posted to the port with `Dart_PostCObject`.
 //!   Results that finish at about the same time share one post.
 //! - mysql_async keeps a prepared statement cache per connection.
+//! - Each request has [TIMEOUT]. A transaction that gets no request for
+//!   [TIMEOUT] is rolled back, so its connection goes back to the pool.
 //!
 //! Request record (little endian, 32 byte head): u64 id, u64 pool, u64 tx,
 //! u8 op, 3 bytes reserved, u32 sql_len. Then u32 param count, sql, params.
@@ -29,12 +31,14 @@
 use std::ffi::{CStr, c_char, c_int, c_void};
 use std::sync::atomic::{AtomicU8, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex, OnceLock};
+use std::time::Duration;
 
 use mysql_async::consts::{ColumnFlags, ColumnType};
 use mysql_async::prelude::*;
 use mysql_async::{Column, Conn, Opts, Params, Pool, QueryResult, Value};
 use slab::Slab;
 use tokio::runtime::Runtime;
+use tokio::time::Instant;
 
 /// Bump when the FFI functions or the record layout change.
 const ABI_VERSION: i32 = 1;
@@ -58,6 +62,21 @@ const T_LONG_TEXT: u8 = 8;
 /// charset id of binary data (BLOB, VARBINARY, BINARY)
 const BINARY: u16 = 63;
 
+/// Size of the head of a result record.
+const RES_HEAD: usize = 16;
+
+/// Longest wait for one request (pool slot, connect and query). Over it
+/// the request fails with a clear error, so Dart never waits forever. The
+/// same as the native Postgres driver.
+/// ponytail: fixed. Make it a pool option when an app needs another value.
+const TIMEOUT: Duration = Duration::from_secs(300);
+const TIMED_OUT: &str = "dox_mysql_native: timeout, no answer in 300 s";
+
+/// A batch of this size or more goes to Dart without a copy (external
+/// typed data). A smaller one is copied: for a few bytes a copy is cheaper
+/// than a finalizer.
+const EXTERNAL_MIN: usize = 64 * 1024;
+
 // ---- Dart API DL -------------------------------------------------------
 // `NativeApi.initializeApiDLData` points to this table. We only need
 // `Dart_PostCObject`, so we read it here instead of compiling dart_api_dl.c.
@@ -75,7 +94,10 @@ struct DartApi {
     functions: *const ApiEntry,
 }
 
-/// `Dart_CObject` for a `kTypedData` (Uint8) value. 64-bit layout.
+type Finalizer = unsafe extern "C" fn(*mut c_void, *mut c_void);
+
+/// `Dart_CObject` for a `kTypedData` or `kExternalTypedData` (Uint8)
+/// value. 64-bit layout.
 #[repr(C)]
 struct DartCObject {
     ty: i32,
@@ -84,14 +106,22 @@ struct DartCObject {
     _pad2: i32,
     length: isize,
     values: *const u8,
-    _rest: [u64; 2],
+    /// external typed data only: who owns the bytes, and who frees them
+    peer: *mut c_void,
+    callback: Option<Finalizer>,
 }
 
 type PostFn = unsafe extern "C" fn(i64, *mut DartCObject) -> bool;
 static POST: OnceLock<PostFn> = OnceLock::new();
 
-/// Posts bytes to a Dart port. Dart copies them. False when the port is closed.
-fn post(port: i64, data: &[u8]) -> bool {
+/// Dart calls it when the external bytes of a post are not used any more.
+unsafe extern "C" fn free_bytes(_: *mut c_void, peer: *mut c_void) {
+    drop(unsafe { Box::from_raw(peer as *mut Vec<u8>) });
+}
+
+/// Posts bytes to a Dart port. A big batch moves to Dart without a copy,
+/// a small one is copied. False when the port is closed.
+fn post(port: i64, data: Vec<u8>) -> bool {
     let Some(f) = POST.get() else { return false };
     let mut obj = DartCObject {
         ty: 7, // Dart_CObject_kTypedData
@@ -100,9 +130,23 @@ fn post(port: i64, data: &[u8]) -> bool {
         _pad2: 0,
         length: data.len() as isize,
         values: data.as_ptr(),
-        _rest: [0; 2],
+        peer: std::ptr::null_mut(),
+        callback: None,
     };
-    unsafe { f(port, &mut obj) }
+    if data.len() < EXTERNAL_MIN {
+        return unsafe { f(port, &mut obj) };
+    }
+    // the Vec moves into the box, its bytes stay where they are
+    let peer = Box::into_raw(Box::new(data));
+    obj.ty = 8; // Dart_CObject_kExternalTypedData
+    obj.peer = peer as *mut c_void;
+    obj.callback = Some(free_bytes);
+    let sent = unsafe { f(port, &mut obj) };
+    if !sent {
+        // not sent: the bytes are still ours to free
+        drop(unsafe { Box::from_raw(peer) });
+    }
+    sent
 }
 
 // ---- registries --------------------------------------------------------
@@ -142,6 +186,14 @@ struct Client {
 struct TxConn {
     conn: tokio::sync::Mutex<Conn>,
     maria: bool,
+    /// the last request, to find a transaction that Dart left open
+    used: Mutex<Instant>,
+}
+
+impl TxConn {
+    fn touch(&self) {
+        *self.used.lock().unwrap() = Instant::now();
+    }
 }
 
 type Tx = Arc<TxConn>;
@@ -269,8 +321,10 @@ async fn run(req: Request) -> Result<Vec<u8>, Fail> {
             let tx = Arc::new(TxConn {
                 conn: tokio::sync::Mutex::new(conn),
                 maria,
+                used: Mutex::new(Instant::now()),
             });
-            let key = TXS.lock().unwrap().insert(tx);
+            let key = TXS.lock().unwrap().insert(tx.clone());
+            tokio::spawn(watch(key, tx));
             Ok(ok_head(0, key as u64 + 1))
         }
         OP_COMMIT | OP_ROLLBACK => {
@@ -293,8 +347,11 @@ async fn run(req: Request) -> Result<Vec<u8>, Fail> {
             let rows = req.op == OP_QUERY;
             if req.tx != 0 {
                 let tx = get(&TXS, req.tx).ok_or(Fail::Client("transaction is closed".into()))?;
+                tx.touch();
                 let mut conn = tx.conn.lock().await;
-                exec(&mut conn, &req.sql, req.params, rows, tx.maria).await
+                let out = exec(&mut conn, &req.sql, req.params, rows, tx.maria).await;
+                tx.touch();
+                out
             } else {
                 let (pool, flag) = pool_of(req.pool)?;
                 let mut conn = pool.get_conn().await?;
@@ -303,6 +360,33 @@ async fn run(req: Request) -> Result<Vec<u8>, Fail> {
             }
         }
         op => Err(Fail::Client(format!("unknown op {op}"))),
+    }
+}
+
+/// Rolls back transaction `key` when Dart sends it no request for
+/// [TIMEOUT] (eg. its isolate is gone), so the pool does not run dry.
+async fn watch(key: usize, tx: Tx) {
+    loop {
+        let due = *tx.used.lock().unwrap() + TIMEOUT;
+        tokio::time::sleep_until(due).await;
+        let open = {
+            let mut txs = TXS.lock().unwrap();
+            let same = txs.get(key).is_some_and(|t| Arc::ptr_eq(t, &tx));
+            if same && tx.conn.try_lock().is_err() {
+                // a query runs right now, and it has its own timeout
+                tx.touch();
+                continue;
+            }
+            if same && *tx.used.lock().unwrap() + TIMEOUT > Instant::now() {
+                continue; // a request came meanwhile
+            }
+            same && txs.try_remove(key).is_some()
+        };
+        if open {
+            let mut conn = tx.conn.lock().await;
+            let _ = tokio::time::timeout(TIMEOUT, conn.query_drop("ROLLBACK")).await;
+        }
+        return;
     }
 }
 
@@ -324,8 +408,11 @@ async fn exec(
     }
 }
 
+/// The start of an ok record: room for the record head, then the ok body
+/// head. The rows are added after it, so the record is not copied later.
 fn ok_head(affected: u64, insert_id: u64) -> Vec<u8> {
     let mut out = Vec::with_capacity(256);
+    out.extend_from_slice(&[0; RES_HEAD]);
     out.extend_from_slice(&affected.to_le_bytes());
     out.extend_from_slice(&insert_id.to_le_bytes());
     out.extend_from_slice(&0u32.to_le_bytes());
@@ -350,8 +437,9 @@ async fn read<P: Protocol>(
         })
         .collect();
     let mut count: u32 = 0;
+    let b = RES_HEAD;
     if rows {
-        out[16..20].copy_from_slice(&(cols.len() as u32).to_le_bytes());
+        out[b + 16..b + 20].copy_from_slice(&(cols.len() as u32).to_le_bytes());
         for c in cols.iter() {
             let name = c.name_ref();
             out.extend_from_slice(&(name.len() as u16).to_le_bytes());
@@ -369,9 +457,9 @@ async fn read<P: Protocol>(
     let affected = res.affected_rows();
     let insert_id = res.last_insert_id().unwrap_or(0);
     res.drop_result().await?;
-    out[0..8].copy_from_slice(&affected.to_le_bytes());
-    out[8..16].copy_from_slice(&insert_id.to_le_bytes());
-    out[20..24].copy_from_slice(&count.to_le_bytes());
+    out[b..b + 8].copy_from_slice(&affected.to_le_bytes());
+    out[b + 8..b + 16].copy_from_slice(&insert_id.to_le_bytes());
+    out[b + 20..b + 24].copy_from_slice(&count.to_le_bytes());
     Ok(out)
 }
 
@@ -542,31 +630,32 @@ fn time_text(neg: bool, days: u32, h: u8, m: u8, s: u8, us: u32) -> String {
 
 // ---- results back to Dart ----------------------------------------------
 
+/// The whole result record. An ok body already has room for the head.
 fn record(id: u64, result: Result<Vec<u8>, Fail>) -> Vec<u8> {
-    let (status, body) = match result {
-        Ok(body) => (0u8, body),
+    let (status, mut out) = match result {
+        Ok(out) => (0u8, out),
         Err(fail) => {
             let (code, kind, state, msg) = match fail {
                 Fail::Server(e) => (e.code, 0u8, e.state, e.message),
                 Fail::Client(msg) => (0, 1, "HY000".to_string(), msg),
             };
-            let mut body = Vec::with_capacity(8 + msg.len());
-            body.extend_from_slice(&code.to_le_bytes());
-            body.push(kind);
+            let mut out = Vec::with_capacity(RES_HEAD + 8 + msg.len());
+            out.extend_from_slice(&[0; RES_HEAD]);
+            out.extend_from_slice(&code.to_le_bytes());
+            out.push(kind);
             let mut st = [b' '; 5];
             for (d, c) in st.iter_mut().zip(state.bytes()) {
                 *d = c;
             }
-            body.extend_from_slice(&st);
-            body.extend_from_slice(msg.as_bytes());
-            (1, body)
+            out.extend_from_slice(&st);
+            out.extend_from_slice(msg.as_bytes());
+            (1, out)
         }
     };
-    let mut out = Vec::with_capacity(16 + body.len());
-    out.extend_from_slice(&id.to_le_bytes());
-    out.extend_from_slice(&[status, 0, 0, 0]);
-    out.extend_from_slice(&(body.len() as u32).to_le_bytes());
-    out.extend_from_slice(&body);
+    let len = (out.len() - RES_HEAD) as u32;
+    out[0..8].copy_from_slice(&id.to_le_bytes());
+    out[8..12].copy_from_slice(&[status, 0, 0, 0]);
+    out[12..16].copy_from_slice(&len.to_le_bytes());
     out
 }
 
@@ -576,7 +665,11 @@ impl Client {
     async fn deliver(&self, rec: Vec<u8>) {
         let first = {
             let mut out = self.out.lock().unwrap();
-            out.0.extend_from_slice(&rec);
+            if out.0.is_empty() {
+                out.0 = rec; // the first result of a batch: no copy
+            } else {
+                out.0.extend_from_slice(&rec);
+            }
             !std::mem::replace(&mut out.1, true)
         };
         if !first {
@@ -588,7 +681,7 @@ impl Client {
             out.1 = false;
             std::mem::take(&mut out.0)
         };
-        post(self.port, &batch);
+        post(self.port, batch);
     }
 }
 
@@ -724,7 +817,9 @@ pub unsafe extern "C" fn dox_mysql_submit(client: i64, ptr: *const u8, len: i64)
         let client = client.clone();
         rt.spawn(async move {
             let id = req.id;
-            let result = run(req).await;
+            let result = tokio::time::timeout(TIMEOUT, run(req))
+                .await
+                .unwrap_or_else(|_| Err(Fail::Client(TIMED_OUT.into())));
             client.deliver(record(id, result)).await;
         });
     }
@@ -747,6 +842,19 @@ mod tests {
         assert!(!alive());
         // one more close does nothing
         dox_mysql_close(a);
+    }
+
+    #[test]
+    fn records_have_the_head_in_front() {
+        let ok = record(7, Ok(ok_head(3, 4)));
+        assert_eq!(u64::from_le_bytes(ok[0..8].try_into().unwrap()), 7);
+        assert_eq!(ok[8], 0);
+        assert_eq!(u32::from_le_bytes(ok[12..16].try_into().unwrap()), 24);
+        assert_eq!(u64::from_le_bytes(ok[16..24].try_into().unwrap()), 3);
+        let err = record(8, Err(Fail::Client("boom".into())));
+        assert_eq!(err[8], 1);
+        assert_eq!(u32::from_le_bytes(err[12..16].try_into().unwrap()), 12);
+        assert_eq!(&err[16 + 8..], b"boom");
     }
 
     #[test]

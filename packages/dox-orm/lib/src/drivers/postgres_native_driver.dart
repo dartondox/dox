@@ -15,7 +15,8 @@ class PostgresNativeDriver extends DBDriver {
   /// Makes the pool from a Dox [ConnectionConfig]. A host that starts with
   /// `/` is a Unix socket folder. Reads `maxConnectionCount`
   /// (default 10), `timeZone` (default UTC), `applicationName` and
-  /// `threads` (default 1) from `extra`.
+  /// `threads` (default 1) from `extra`. Isolates with the same settings
+  /// share one pool, so `maxConnectionCount` is for the whole process.
   factory PostgresNativeDriver.fromConfig(ConnectionConfig config) {
     if (config.useSSL) {
       // ponytail: no TLS yet. Add tokio-postgres-rustls when it is needed.
@@ -51,7 +52,8 @@ class PostgresNativeDriver extends DBDriver {
 
   bool _closed = false;
 
-  /// close the pool of this driver. running queries finish first.
+  /// let go of the pool. isolates with the same settings share one pool,
+  /// and it closes when the last one lets go. running queries finish.
   @override
   Future<void> close() async {
     if (_closed) return;
@@ -100,7 +102,11 @@ class PostgresNativeDriver extends DBDriver {
         },
       );
     } catch (_) {
-      await pool.rollback(tx);
+      try {
+        await pool.rollback(tx);
+      } catch (_) {
+        // keep the first error: it tells what went wrong
+      }
       rethrow;
     }
     await pool.commit(tx);

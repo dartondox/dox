@@ -5,6 +5,9 @@
 //! Rust runs them on a small tokio runtime and posts the results back in
 //! batches to a Dart `ReceivePort` with `Dart_PostCObject`.
 //!
+//! One pool per config and size, for the whole process: isolates that open
+//! the same settings share it. Each open needs one `dpg_close`.
+//!
 //! Values stay in the Postgres binary format. Dart decodes them, the same
 //! way the `postgres` Dart package does.
 //!
@@ -23,14 +26,15 @@
 //! - status 3 (transaction started): u64 transaction id.
 use std::collections::HashMap;
 use std::ffi::{CStr, c_char, c_int, c_void};
+use std::hash::{DefaultHasher, Hash, Hasher};
 use std::str::FromStr;
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex, OnceLock};
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use std::sync::{Arc, LazyLock, Mutex, OnceLock, Weak};
 use std::task::Poll;
 use std::time::Duration;
 
 use bytes::{Bytes, BytesMut};
-use deadpool_postgres::{Manager, ManagerConfig, Object, Pool, RecyclingMethod};
+use deadpool_postgres::{Manager, ManagerConfig, Object, Pool, RecyclingMethod, StatementCache};
 use futures_util::StreamExt;
 use futures_util::stream::FuturesUnordered;
 use tokio::runtime::Handle;
@@ -41,12 +45,16 @@ use tokio_postgres::types::{FromSql, IsNull, Kind, ToSql, Type, to_sql_checked};
 use tokio_postgres::{NoTls, Row, Statement};
 
 /// Bump when the FFI functions or the record layout change.
-const ABI_VERSION: i32 = 1;
+const ABI_VERSION: i32 = 2;
 const REQ_HEAD: usize = 32;
 const RES_HEAD: usize = 13;
-/// Statements kept per connection. Over this, the cache is cleared.
-/// ponytail: a simple clear, an LRU when apps use many different queries.
+/// Statements kept per connection. Over this, the one used longest ago is
+/// closed (LRU).
 const CACHE_MAX: usize = 512;
+/// A batch of this size or more goes to Dart without a copy (external
+/// typed data). A smaller one is copied: for a few bytes a copy is cheaper
+/// than a finalizer.
+const EXTERNAL_MIN: usize = 64 * 1024;
 /// Longest wait for one request (pool slot, connect and query), like the
 /// default `queryTimeout` of the `postgres` package. Over it the request
 /// fails with a clear error, so Dart never waits forever.
@@ -71,7 +79,10 @@ struct DartApi {
     functions: *const ApiEntry,
 }
 
-/// `Dart_CObject` for a `kTypedData` (Uint8) value. 64-bit layout.
+type Finalizer = unsafe extern "C" fn(*mut c_void, *mut c_void);
+
+/// `Dart_CObject` for a `kTypedData` or `kExternalTypedData` (Uint8)
+/// value. 64-bit layout.
 #[repr(C)]
 struct DartCObject {
     ty: i32,
@@ -80,14 +91,22 @@ struct DartCObject {
     _pad2: i32,
     length: isize,
     values: *const u8,
-    _rest: [u64; 2],
+    /// external typed data only: who owns the bytes, and who frees them
+    peer: *mut c_void,
+    callback: Option<Finalizer>,
 }
 
 type PostFn = unsafe extern "C" fn(i64, *mut DartCObject) -> bool;
 static POST: OnceLock<PostFn> = OnceLock::new();
 
-/// Posts bytes to a Dart port. Dart copies them. False when the port is closed.
-fn post(port: i64, data: &[u8]) -> bool {
+/// Dart calls it when the external bytes of a post are not used any more.
+unsafe extern "C" fn free_bytes(_: *mut c_void, peer: *mut c_void) {
+    drop(unsafe { Box::from_raw(peer as *mut Vec<u8>) });
+}
+
+/// Posts bytes to a Dart port. A big batch moves to Dart without a copy,
+/// a small one is copied. False when the port is closed.
+fn post(port: i64, data: Vec<u8>) -> bool {
     let Some(f) = POST.get() else { return false };
     let mut obj = DartCObject {
         ty: 7, // Dart_CObject_kTypedData
@@ -96,9 +115,23 @@ fn post(port: i64, data: &[u8]) -> bool {
         _pad2: 0,
         length: data.len() as isize,
         values: data.as_ptr(),
-        _rest: [0; 2],
+        peer: std::ptr::null_mut(),
+        callback: None,
     };
-    unsafe { f(port, &mut obj) }
+    if data.len() < EXTERNAL_MIN {
+        return unsafe { f(port, &mut obj) };
+    }
+    // the Vec moves into the box, its bytes stay where they are
+    let peer = Box::into_raw(Box::new(data));
+    obj.ty = 8; // Dart_CObject_kExternalTypedData
+    obj.peer = peer as *mut c_void;
+    obj.callback = Some(free_bytes);
+    let sent = unsafe { f(port, &mut obj) };
+    if !sent {
+        // not sent: the bytes are still ours to free
+        drop(unsafe { Box::from_raw(peer) });
+    }
+    sent
 }
 
 // ---- runtime and handles -----------------------------------------------
@@ -172,6 +205,10 @@ struct Shared {
     pool: Pool,
     /// the strong count of each, minus one, is its number of queries
     busy: Mutex<Vec<Arc<Object>>>,
+    /// the size and the config: the same key gives the same pool
+    key: String,
+    /// how many opens use this pool. The last close closes it.
+    refs: AtomicUsize,
 }
 
 impl Shared {
@@ -235,9 +272,11 @@ struct Sink {
 }
 
 impl Sink {
-    fn push(self: &Arc<Self>, record: &[u8]) {
+    /// Adds the answer to request `id`. It is written straight into the
+    /// buffer of the next post.
+    fn answer(self: &Arc<Self>, id: u64, answer: Answer) {
         let mut buf = self.buf.lock().unwrap();
-        buf.extend_from_slice(record);
+        answer.write(&mut buf, id);
         if !self.queued.swap(true, Ordering::AcqRel) {
             let sink = self.clone();
             RUNTIME.get().expect("runtime").spawn(async move {
@@ -255,36 +294,81 @@ impl Sink {
             std::mem::take(&mut *buf)
         };
         // false: the isolate is gone. Nobody waits for these results.
-        post(self.port, &out);
+        post(self.port, out);
     }
 }
 
-fn head(out: &mut Vec<u8>, id: u64, status: u8) {
+/// The answer to one request.
+enum Answer {
+    Rows(Statement, Vec<Row>),
+    /// no columns and no rows (commit, rollback)
+    Empty,
+    /// a transaction started, with this id
+    Begun(u64),
+    Db(tokio_postgres::Error),
+    Text(String),
+}
+
+impl Answer {
+    fn text(text: &str) -> Answer {
+        Answer::Text(text.to_string())
+    }
+
+    /// Adds the result record of request `id` to `out`.
+    fn write(&self, out: &mut Vec<u8>, id: u64) {
+        match self {
+            Answer::Rows(stmt, r) => rows(out, id, stmt, r),
+            Answer::Empty => {
+                let at = head(out, id, 0);
+                out.extend_from_slice(&[0; 6]);
+                done(out, at);
+            }
+            Answer::Begun(key) => {
+                let at = head(out, id, 3);
+                out.extend_from_slice(&key.to_le_bytes());
+                done(out, at);
+            }
+            Answer::Db(e) => error(out, id, e),
+            Answer::Text(text) => message(out, id, text),
+        }
+    }
+}
+
+impl From<deadpool_postgres::PoolError> for Answer {
+    fn from(e: deadpool_postgres::PoolError) -> Self {
+        match e {
+            deadpool_postgres::PoolError::Backend(e) => Answer::Db(e),
+            e => Answer::Text(e.to_string()),
+        }
+    }
+}
+
+/// Starts a record. Gives back where it starts, for [done].
+fn head(out: &mut Vec<u8>, id: u64, status: u8) -> usize {
+    let at = out.len();
     out.extend_from_slice(&id.to_le_bytes());
     out.push(status);
     out.extend_from_slice(&[0; 4]);
+    at
 }
 
-/// Writes the body length into the head.
-fn done(mut out: Vec<u8>) -> Vec<u8> {
-    let len = (out.len() - RES_HEAD) as u32;
-    out[9..13].copy_from_slice(&len.to_le_bytes());
-    out
+/// Writes the body length into the head of the record at `at`.
+fn done(out: &mut [u8], at: usize) {
+    let len = (out.len() - at - RES_HEAD) as u32;
+    out[at + 9..at + 13].copy_from_slice(&len.to_le_bytes());
 }
 
-fn message(id: u64, text: &str) -> Vec<u8> {
-    let mut out = Vec::with_capacity(RES_HEAD + text.len());
-    head(&mut out, id, 2);
+fn message(out: &mut Vec<u8>, id: u64, text: &str) {
+    let at = head(out, id, 2);
     out.extend_from_slice(text.as_bytes());
-    done(out)
+    done(out, at);
 }
 
-fn error(id: u64, e: &tokio_postgres::Error) -> Vec<u8> {
+fn error(out: &mut Vec<u8>, id: u64, e: &tokio_postgres::Error) {
     let Some(db) = e.as_db_error() else {
-        return message(id, &e.to_string());
+        return message(out, id, &e.to_string());
     };
-    let mut out = Vec::with_capacity(256);
-    head(&mut out, id, 1);
+    let at = head(out, id, 1);
     let line = db.line().map(|l| l.to_string());
     let severity = db.parsed_severity().map(|s| s.to_string());
     let (position, internal, query) = match db.position() {
@@ -325,14 +409,7 @@ fn error(id: u64, e: &tokio_postgres::Error) -> Vec<u8> {
         count += 1;
     }
     out[count_at] = count;
-    done(out)
-}
-
-fn pool_error(id: u64, e: deadpool_postgres::PoolError) -> Vec<u8> {
-    match e {
-        deadpool_postgres::PoolError::Backend(e) => error(id, &e),
-        e => message(id, &e.to_string()),
-    }
+    done(out, at);
 }
 
 /// Any column as its raw bytes (binary format).
@@ -350,10 +427,10 @@ impl<'a> FromSql<'a> for Raw<'a> {
     }
 }
 
-fn rows(id: u64, stmt: &Statement, rows: &[Row]) -> Vec<u8> {
+fn rows(out: &mut Vec<u8>, id: u64, stmt: &Statement, rows: &[Row]) {
     let cols = stmt.columns();
-    let mut out = Vec::with_capacity(64 + cols.len() * (16 + rows.len() * 16));
-    head(&mut out, id, 0);
+    out.reserve(64 + cols.len() * (16 + rows.len() * 16));
+    let at = head(out, id, 0);
     out.extend_from_slice(&(cols.len() as u16).to_le_bytes());
     for c in cols {
         out.extend_from_slice(&c.type_().oid().to_le_bytes());
@@ -372,7 +449,7 @@ fn rows(id: u64, stmt: &Statement, rows: &[Row]) -> Vec<u8> {
             }
         }
     }
-    done(out)
+    done(out, at);
 }
 
 // ---- queries -----------------------------------------------------------
@@ -429,9 +506,68 @@ fn stale(e: &tokio_postgres::Error) -> bool {
         || e.code() == Some(&SqlState::INVALID_SQL_STATEMENT_NAME)
 }
 
-async fn query(client: &Object, id: u64, sql: &[u8], params: &[Param]) -> Vec<u8> {
+/// Use order of the statements in the cache of one connection.
+#[derive(Default)]
+struct Lru {
+    tick: u64,
+    /// hash of (sql, types) to the last use, the sql and the types
+    used: HashMap<u64, (u64, Box<str>, Vec<Type>)>,
+}
+
+impl Lru {
+    /// Marks a statement as used. Gives back the one used longest ago when
+    /// more than `max` are kept.
+    // ponytail: a 64-bit hash as the key. Two statements with the same
+    // hash (about 1 in 2^64) only keep one statement more than `max`.
+    fn touch(&mut self, sql: &str, types: &[Type], max: usize) -> Option<(Box<str>, Vec<Type>)> {
+        let mut h = DefaultHasher::new();
+        (sql, types).hash(&mut h);
+        let key = h.finish();
+        self.tick += 1;
+        if let Some(e) = self.used.get_mut(&key) {
+            e.0 = self.tick;
+            return None;
+        }
+        self.used
+            .insert(key, (self.tick, sql.into(), types.to_vec()));
+        if self.used.len() <= max {
+            return None;
+        }
+        // ponytail: a scan of the cache, only for a new statement over the
+        // limit. That one costs a round trip to the server anyway.
+        let oldest = *self.used.iter().min_by_key(|(_, e)| e.0)?.0;
+        self.used
+            .remove(&oldest)
+            .map(|(_, sql, types)| (sql, types))
+    }
+}
+
+/// The [Lru] of each connection, by the address of its statement cache.
+/// The `Weak` keeps that address from being used again while it is here.
+type Lrus = HashMap<usize, (Weak<StatementCache>, Lru)>;
+static LRUS: LazyLock<Mutex<Lrus>> = LazyLock::new(Mutex::default);
+
+/// Marks a statement of `client` as used, and closes the one used longest
+/// ago when the cache is full.
+fn remember(client: &Object, sql: &str, types: &[Type]) {
+    let cache = &client.statement_cache;
+    let at = Arc::as_ptr(cache) as usize;
+    let mut all = LRUS.lock().unwrap();
+    if !all.contains_key(&at) {
+        // a new connection: forget the closed ones
+        all.retain(|_, (c, _)| c.strong_count() > 0);
+    }
+    let (_, lru) = all
+        .entry(at)
+        .or_insert_with(|| (Arc::downgrade(cache), Lru::default()));
+    if let Some((sql, types)) = lru.touch(sql, types, CACHE_MAX) {
+        cache.remove(&sql, &types);
+    }
+}
+
+async fn query(client: &Object, sql: &[u8], params: &[Param]) -> Answer {
     let Ok(sql) = std::str::from_utf8(sql) else {
-        return message(id, "dox_postgres_native: the sql is not UTF-8");
+        return Answer::text("dox_postgres_native: the sql is not UTF-8");
     };
     let types: Vec<Type> = if params.iter().any(|p| p.oid != 0) {
         params.iter().map(|p| param_type(p.oid)).collect()
@@ -439,9 +575,6 @@ async fn query(client: &Object, id: u64, sql: &[u8], params: &[Param]) -> Vec<u8
         Vec::new()
     };
     let refs: Vec<&(dyn ToSql + Sync)> = params.iter().map(|p| p as _).collect();
-    if client.statement_cache.size() > CACHE_MAX {
-        client.statement_cache.clear();
-    }
     let mut retried = false;
     loop {
         let stmt = if types.is_empty() {
@@ -451,24 +584,25 @@ async fn query(client: &Object, id: u64, sql: &[u8], params: &[Param]) -> Vec<u8
         };
         let stmt = match stmt {
             Ok(s) => s,
-            Err(e) => return error(id, &e),
+            Err(e) => return Answer::Db(e),
         };
+        remember(client, sql, &types);
         match client.query(&stmt, &refs).await {
-            Ok(r) => return rows(id, &stmt, &r),
+            Ok(r) => return Answer::Rows(stmt, r),
             Err(e) if !retried && stale(&e) => {
                 client.statement_cache.remove(sql, &types);
                 retried = true;
             }
-            Err(e) => return error(id, &e),
+            Err(e) => return Answer::Db(e),
         }
     }
 }
 
-/// Runs `work` for request `id`, or gives a timeout error after [TIMEOUT].
-async fn timed(id: u64, work: impl Future<Output = Vec<u8>>) -> Vec<u8> {
+/// Runs `work`, or gives a timeout error after [TIMEOUT].
+async fn timed(work: impl Future<Output = Answer>) -> Answer {
     tokio::time::timeout(TIMEOUT, work)
         .await
-        .unwrap_or_else(|_| message(id, TIMED_OUT))
+        .unwrap_or_else(|_| Answer::text(TIMED_OUT))
 }
 
 /// Work for the task that owns the connection of one transaction.
@@ -490,23 +624,20 @@ enum Job {
 /// other on that connection, in the order Dart sent them.
 async fn begin(id: u64, pool: Pool, sink: Arc<Sink>) {
     let start = async {
-        let client = pool.get().await.map_err(|e| pool_error(id, e))?;
+        let client = pool.get().await.map_err(Answer::from)?;
         match client.batch_execute("BEGIN").await {
             Ok(()) => Ok(client),
-            Err(e) => Err(error(id, &e)),
+            Err(e) => Err(Answer::Db(e)),
         }
     };
     let client = match tokio::time::timeout(TIMEOUT, start).await {
         Ok(Ok(c)) => c,
-        Ok(Err(out)) => return sink.push(&out),
-        Err(_) => return sink.push(&message(id, TIMED_OUT)),
+        Ok(Err(answer)) => return sink.answer(id, answer),
+        Err(_) => return sink.answer(id, Answer::text(TIMED_OUT)),
     };
     let (tx, mut rx) = mpsc::unbounded_channel();
     let key = with(&TXS, |r| r.insert(tx));
-    let mut out = Vec::with_capacity(RES_HEAD + 8);
-    head(&mut out, id, 3);
-    out.extend_from_slice(&key.to_le_bytes());
-    sink.push(&done(out));
+    sink.answer(id, Answer::Begun(key));
     loop {
         // Dart did not end it in time (eg. its isolate is gone): roll back
         // and give the connection back, so the pool does not run dry.
@@ -521,18 +652,18 @@ async fn begin(id: u64, pool: Pool, sink: Arc<Sink>) {
                 sql,
                 params,
                 sink,
-            } => sink.push(&timed(id, query(&client, id, &sql, &params)).await),
+            } => sink.answer(id, timed(query(&client, &sql, &params)).await),
             Job::End { id, commit, sink } => {
                 close(key, &mut rx);
                 let sql = if commit { "COMMIT" } else { "ROLLBACK" };
-                let out = timed(id, async {
+                let answer = timed(async {
                     match client.batch_execute(sql).await {
-                        Ok(()) => message_ok(id),
-                        Err(e) => error(id, &e),
+                        Ok(()) => Answer::Empty,
+                        Err(e) => Answer::Db(e),
                     }
                 })
                 .await;
-                return sink.push(&out);
+                return sink.answer(id, answer);
             }
         }
     }
@@ -545,16 +676,8 @@ fn close(key: u64, rx: &mut mpsc::UnboundedReceiver<Job>) {
     rx.close();
     while let Ok(job) = rx.try_recv() {
         let (Job::Query { id, sink, .. } | Job::End { id, sink, .. }) = job;
-        sink.push(&message(id, "the transaction is closed"));
+        sink.answer(id, Answer::text("the transaction is closed"));
     }
-}
-
-/// An empty result (no columns, no rows).
-fn message_ok(id: u64) -> Vec<u8> {
-    let mut out = Vec::with_capacity(RES_HEAD + 6);
-    head(&mut out, id, 0);
-    out.extend_from_slice(&[0; 6]);
-    done(out)
 }
 
 fn rd16(b: &[u8], p: usize) -> usize {
@@ -643,7 +766,7 @@ fn run(req: Request, sink: &Arc<Sink>, rt: &Handle) -> Option<Request> {
     } = req;
     if tx != 0 {
         let Some(sender) = with(&TXS, |r| r.get(tx)) else {
-            sink.push(&message(id, "the transaction is closed"));
+            sink.answer(id, Answer::text("the transaction is closed"));
             return None;
         };
         let job = match kind {
@@ -660,19 +783,19 @@ fn run(req: Request, sink: &Arc<Sink>, rt: &Handle) -> Option<Request> {
             },
         };
         if sender.send(job).is_err() {
-            sink.push(&message(id, "the transaction is closed"));
+            sink.answer(id, Answer::text("the transaction is closed"));
         }
         return None;
     }
     let Some(pool) = with(&POOLS, |r| r.get(pool)) else {
-        sink.push(&message(id, "the pool is closed"));
+        sink.answer(id, Answer::text("the pool is closed"));
         return None;
     };
     match kind {
         1 => {
             rt.spawn(begin(id, pool.pool.clone(), sink));
         }
-        _ => sink.push(&message(id, "no transaction to end")),
+        _ => sink.answer(id, Answer::text("no transaction to end")),
     }
     None
 }
@@ -692,13 +815,13 @@ fn run_plain(reqs: Vec<Request>, sink: Arc<Sink>, rt: &Handle) {
             .enumerate()
             .map(|(i, r)| async move {
                 let Some(pool) = with(&POOLS, |p| p.get(r.pool)) else {
-                    return (i, message(r.id, "the pool is closed"));
+                    return (i, Answer::text("the pool is closed"));
                 };
-                let out = match pool.lease().await {
-                    Ok(client) => query(&client, r.id, &r.sql, &r.params).await,
-                    Err(e) => pool_error(r.id, e),
+                let answer = match pool.lease().await {
+                    Ok(client) => query(&client, &r.sql, &r.params).await,
+                    Err(e) => Answer::from(e),
                 };
-                (i, out)
+                (i, answer)
             })
             .collect();
         let mut deadline = std::pin::pin!(tokio::time::sleep(TIMEOUT));
@@ -710,9 +833,9 @@ fn run_plain(reqs: Vec<Request>, sink: Arc<Sink>, rt: &Handle) {
             })
             .await;
             match next {
-                Some(Some((i, out))) => {
+                Some(Some((i, answer))) => {
                     answered[i] = true;
-                    sink.push(&out);
+                    sink.answer(ids[i], answer);
                 }
                 Some(None) => return,
                 None => break,
@@ -721,7 +844,7 @@ fn run_plain(reqs: Vec<Request>, sink: Arc<Sink>, rt: &Handle) {
         // dropping `running` stops the queries that are left
         for (id, done) in ids.iter().zip(answered) {
             if !done {
-                sink.push(&message(*id, TIMED_OUT));
+                sink.answer(*id, Answer::text(TIMED_OUT));
             }
         }
     });
@@ -764,8 +887,10 @@ pub unsafe extern "C" fn dpg_init(data: *mut c_void) -> i32 {
 }
 
 /// Makes a pool from a libpq style config (`host=... user=...` or a
-/// `postgres://` url). Connections open when they are needed.
-/// Returns a pool handle (> 0), or -1 when the config is bad.
+/// `postgres://` url). Connections open when they are needed. The same
+/// config and `max_size` give the same pool, so isolates share it: up to
+/// `max_size` connections for the whole process. Each open needs one
+/// [dpg_close]. Returns a pool handle (> 0), or -1 when the config is bad.
 ///
 /// # Safety
 /// `cfg` must point to `len` readable bytes.
@@ -778,32 +903,46 @@ pub unsafe extern "C" fn dpg_connect(cfg: *const u8, len: i64, max_size: i64, th
     let Ok(pg) = tokio_postgres::Config::from_str(cfg) else {
         return -1;
     };
-    let manager = Manager::from_config(
-        pg,
-        NoTls,
-        ManagerConfig {
-            recycling_method: RecyclingMethod::Fast,
-        },
-    );
-    let Ok(pool) = Pool::builder(manager)
-        .max_size(max_size.max(1) as usize)
-        .build()
-    else {
-        return -1;
-    };
+    let max_size = max_size.max(1) as usize;
+    let key = format!("{max_size} {cfg}");
     runtime(threads.max(0) as usize);
-    let shared = Shared {
-        pool,
-        busy: Mutex::new(Vec::new()),
-    };
-    with(&POOLS, |r| r.insert(Arc::new(shared))) as i64
+    with(&POOLS, |r| {
+        if let Some((handle, shared)) = r.map.iter().find(|(_, s)| s.key == key) {
+            shared.refs.fetch_add(1, Ordering::Relaxed);
+            return *handle as i64;
+        }
+        let manager = Manager::from_config(
+            pg,
+            NoTls,
+            ManagerConfig {
+                recycling_method: RecyclingMethod::Fast,
+            },
+        );
+        let Ok(pool) = Pool::builder(manager).max_size(max_size).build() else {
+            return -1;
+        };
+        r.insert(Arc::new(Shared {
+            pool,
+            busy: Mutex::new(Vec::new()),
+            key,
+            refs: AtomicUsize::new(1),
+        })) as i64
+    })
 }
 
-/// Closes the pool. Running queries finish, new ones fail.
+/// Gives back one open of a pool. The last one closes it for every
+/// isolate. Running queries finish, new ones fail.
 #[unsafe(no_mangle)]
 pub extern "C" fn dpg_close(pool: i64) {
-    if let Some(pool) = with(&POOLS, |r| r.map.remove(&(pool as u64))) {
-        pool.pool.close();
+    let closed = with(&POOLS, |r| {
+        let shared = r.map.get(&(pool as u64))?;
+        if shared.refs.fetch_sub(1, Ordering::Relaxed) > 1 {
+            return None;
+        }
+        r.map.remove(&(pool as u64))
+    });
+    if let Some(shared) = closed {
+        shared.pool.close();
     }
 }
 
@@ -897,11 +1036,51 @@ mod tests {
 
     #[test]
     fn writes_the_body_length() {
-        let out = message(9, "boom");
-        assert_eq!(rd64(&out, 0), 9);
+        let mut out = vec![1, 2, 3];
+        message(&mut out, 9, "boom");
+        Answer::Begun(5).write(&mut out, 10);
+        let out = &out[3..];
+        assert_eq!(rd64(out, 0), 9);
         assert_eq!(out[8], 2);
-        assert_eq!(rd32(&out, 9), 4);
-        assert_eq!(&out[13..], b"boom");
+        assert_eq!(rd32(out, 9), 4);
+        assert_eq!(&out[13..17], b"boom");
+        // the next record follows right after
+        assert_eq!((rd64(out, 17), out[25], rd32(out, 26)), (10, 3, 8));
+        assert_eq!(rd64(out, 30), 5);
+    }
+
+    #[test]
+    fn lru_drops_the_statement_used_longest_ago() {
+        let mut lru = Lru::default();
+        let int8 = [Type::INT8];
+        assert_eq!(lru.touch("a", &[], 2), None);
+        assert_eq!(lru.touch("b", &int8, 2), None);
+        // a is used again, so b is now the oldest
+        assert_eq!(lru.touch("a", &[], 2), None);
+        let out = lru.touch("c", &[], 2).unwrap();
+        assert_eq!((&*out.0, out.1), ("b", int8.to_vec()));
+        // the same sql with other types is another statement
+        let out = lru.touch("a", &int8, 2).unwrap();
+        assert_eq!((&*out.0, out.1.len()), ("a", 0));
+        assert_eq!(lru.used.len(), 2);
+    }
+
+    #[test]
+    fn same_config_shares_one_pool_until_the_last_close() {
+        let cfg = b"host=127.0.0.1 port=1 user=u dbname=close_test";
+        let open = |max| unsafe { dpg_connect(cfg.as_ptr(), cfg.len() as i64, max, 0) };
+        let (a, b, other) = (open(3), open(3), open(4));
+        assert_eq!(a, b);
+        assert_ne!(a, other);
+        let alive = |h: i64| with(&POOLS, |r| r.map.contains_key(&(h as u64)));
+        dpg_close(a);
+        assert!(alive(a));
+        dpg_close(b);
+        assert!(!alive(a));
+        assert!(alive(other));
+        dpg_close(other);
+        // one more close does nothing
+        dpg_close(a);
     }
 
     /// A host that starts with `/` is a Unix socket folder, like Google
@@ -934,14 +1113,20 @@ mod tests {
             binary: false,
             data: Some(Bytes::from_static(b"41")),
         }];
-        let out = query(&client, 5, b"select $1::int8 + 1 as n", &p).await;
+        let mut out = Vec::new();
+        query(&client, b"select $1::int8 + 1 as n", &p)
+            .await
+            .write(&mut out, 5);
         assert_eq!(out[8], 0, "{:?}", String::from_utf8_lossy(&out));
         // 1 column int8 named n, 1 row with 8 bytes
         assert_eq!(rd16(&out, 13), 1);
         assert_eq!(rd32(&out, 15), 20);
         let at = out.len() - 8;
         assert_eq!(i64::from_be_bytes(out[at..].try_into().unwrap()), 42);
-        let bad = query(&client, 6, b"select * from nope_missing", &[]).await;
+        let mut bad = Vec::new();
+        query(&client, b"select * from nope_missing", &[])
+            .await
+            .write(&mut bad, 6);
         assert_eq!(bad[8], 1);
     }
 }

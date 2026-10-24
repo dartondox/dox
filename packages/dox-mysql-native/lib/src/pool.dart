@@ -300,7 +300,7 @@ class _Link {
     List<Object?> params,
   ) {
     int id = _nextId++;
-    _Pending pending = _Pending();
+    _Pending pending = _Pending(sql);
     if (_pending.isEmpty) _port.keepIsolateAlive = true;
     _pending[id] = pending;
     int start = _len;
@@ -450,7 +450,7 @@ class _Link {
       if (pending == null) continue;
       _done(id);
       if (status == 0) {
-        pending.completer.complete(_rows(b, d, body));
+        pending.completer.complete(_rows(b, d, body, pending.sql));
       } else {
         pending.completer.completeError(_error(b, d, body, len));
       }
@@ -468,19 +468,41 @@ class _Link {
     return MySQLClientException(message);
   }
 
-  static MysqlNativeResult _rows(Uint8List b, ByteData d, int p) {
+  /// the column names of the last result of each sql, and the bytes they
+  /// came in. The same query gives the same columns, so most results skip
+  /// the decode. The same name strings also keep their hash code for the
+  /// row maps.
+  // ponytail: cleared when full, like the sql caches of the drivers
+  static final Map<String, (Uint8List, List<String>)> _columns =
+      <String, (Uint8List, List<String>)>{};
+
+  static MysqlNativeResult _rows(Uint8List b, ByteData d, int p, String sql) {
     int affected = d.getUint64(p, Endian.little);
     int insertId = d.getUint64(p + 8, Endian.little);
     int ncols = d.getUint32(p + 16, Endian.little);
     int nrows = d.getUint32(p + 20, Endian.little);
     p += 24;
-    List<String> names = List<String>.filled(ncols, '');
+    int start = p;
     for (int i = 0; i < ncols; i++) {
-      int len = d.getUint16(p, Endian.little);
-      p += 2;
-      names[i] = _text(b, p, len);
-      p += len;
+      p += 2 + d.getUint16(p, Endian.little);
     }
+    (Uint8List, List<String>)? known = _columns[sql];
+    // the bytes are checked: the columns change after eg. ALTER TABLE
+    if (known == null || !_same(known.$1, b, start, p)) {
+      List<String> names = List<String>.filled(ncols, '');
+      int at = start;
+      for (int i = 0; i < ncols; i++) {
+        int len = d.getUint16(at, Endian.little);
+        names[i] = _text(b, at + 2, len);
+        at += 2 + len;
+      }
+      if (_columns.length >= 1024) _columns.clear();
+      known = _columns[sql] = (
+        Uint8List.fromList(Uint8List.sublistView(b, start, p)),
+        List<String>.unmodifiable(names), // shared by results
+      );
+    }
+    List<String> names = known.$2;
     List<Map<String, dynamic>> rows = <Map<String, dynamic>>[];
     for (int r = 0; r < nrows; r++) {
       Map<String, dynamic> row = <String, dynamic>{};
@@ -526,6 +548,15 @@ class _Link {
     return MysqlNativeResult(names, rows, affected, insertId);
   }
 
+  /// true when [b] from [start] to [end] has the bytes of [head]
+  static bool _same(Uint8List head, Uint8List b, int start, int end) {
+    if (head.length != end - start) return false;
+    for (int i = 0; i < head.length; i++) {
+      if (head[i] != b[start + i]) return false;
+    }
+    return true;
+  }
+
   static String _text(Uint8List b, int at, int len) {
     return utf8.decode(Uint8List.sublistView(b, at, at + len));
   }
@@ -543,5 +574,9 @@ class _Link {
 }
 
 class _Pending {
+  _Pending(this.sql);
+
+  /// the sql of the request, to find the columns it had before
+  final String sql;
   final Completer<MysqlNativeResult> completer = Completer<MysqlNativeResult>();
 }

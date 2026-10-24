@@ -11,7 +11,7 @@ crate-type = ["cdylib"]
 # rustls + ring for TLS, flate2 in pure Rust: no system libraries needed
 mysql_async = { version = "0.37.1", default-features = false, features = ["default-rustls-ring"] }
 slab = "0.4.12"
-tokio = { version = "1.54.1", features = ["rt-multi-thread", "sync", "macros"] }
+tokio = { version = "1.54.1", features = ["rt-multi-thread", "sync", "macros", "time"] }
 
 [profile.release]
 opt-level = 3

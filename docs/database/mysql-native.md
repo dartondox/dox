@@ -113,10 +113,15 @@ The driver reads the normal fields of the `ConnectionConfig` (`host`,
 | `verifyCertificate` | `true` | With `useSSL`, TLS checks the server certificate. Set it to `false` only for a self-signed certificate in development. |
 
 Isolates that open a pool with the same settings share one pool in Rust.
-So `maxConnectionCount` is for the whole process, not per isolate. You can
+So `maxConnectionCount` is for the whole process, not per isolate. The
+native Postgres driver does the same. You can
 also give `driver.pool.handle` (an `int`) to another isolate and use
 `MysqlNativeDriver(MysqlNativePool.fromHandle(handle))` there.
 `MysqlNativeDriver` comes from `package:dox_orm/dox_orm.dart`.
+
+A request (pool slot, connect and query) fails after 300 s with no
+answer. A transaction that gets no request for 300 s is rolled back, so
+its connection goes back to the pool.
 
 ## Use it without the ORM
 
