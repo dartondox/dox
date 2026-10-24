@@ -68,7 +68,7 @@ class Model<T> extends QueryBuilder<T> {
   dynamic get self => this;
 
   // coverage:ignore-start
-  Map<String, dynamic> get timestampsColumn => <String, dynamic>{
+  Map<String, dynamic> get timestampsColumn => const <String, dynamic>{
     'created_at': 'created_at',
     'updated_at': 'updated_at',
   };
@@ -145,30 +145,47 @@ class Model<T> extends QueryBuilder<T> {
         updatedAt = values[updatedAtColumn];
       }
 
-      Map<String, dynamic> res = await _newQuery<dynamic>().insert(values);
+      /// only the new id is needed, so no select of the new row
+      List<Map<String, dynamic>> res = await _newQuery<dynamic>()
+          .insertMultiple(<Map<String, dynamic>>[values]);
 
-      tempIdValue = res[primaryKey];
+      /// mysql only returns auto increment ids, so use the given id if any
+      tempIdValue =
+          (res.isNotEmpty ? res.first[primaryKey] : null) ?? values[primaryKey];
       _savedValues = <String, dynamic>{...values, primaryKey: tempIdValue};
     } else {
       dynamic id = values[primaryKey];
       values.remove(primaryKey);
       values.remove(createdAtColumn);
 
-      /// only send null when the field had a value before (set to null).
-      /// a field we never loaded or saved is skipped, so a model loaded
-      /// with select() does not clear the other columns.
+      /// only send the columns that changed since the model was read or
+      /// saved. a field we never loaded or saved is skipped when it is
+      /// null, so a model loaded with select() does not clear the other
+      /// columns.
       Map<String, dynamic> saved = _savedValues ?? originalMap;
-      values.removeWhere(
-        (String key, dynamic value) => value == null && saved[key] == null,
-      );
-      _savedValues = <String, dynamic>{...saved, ...values};
+      values.removeWhere((String key, dynamic value) {
+        return key == updatedAtColumn || _same(value, saved[key]);
+      });
+
+      /// nothing changed: no query, and updated_at stays as it is
+      if (values.isEmpty) return;
       if (updatedAtColumn != null) {
         values[updatedAtColumn] = currentTime;
-        updatedAt = values[updatedAtColumn];
+        updatedAt = currentTime;
       }
+      _savedValues = <String, dynamic>{...saved, ...values};
 
       await _newQuery<T>(this).where(primaryKey, id).update(values);
     }
+  }
+
+  /// true when the model value [a] is the same as the saved value [b].
+  /// a map or a list is never the same, it can be changed in place.
+  static bool _same(dynamic a, dynamic b) {
+    if (a is Map || a is List || b is Map || b is List) return false;
+    if (a is DateTime) a = a.toIso8601String();
+    if (b is DateTime) b = b.toIso8601String();
+    return a == b;
   }
 
   /// delete this record (soft delete when the model use SoftDeletes)
@@ -408,13 +425,10 @@ class Model<T> extends QueryBuilder<T> {
     bool removeRelations = false,
   }) {
     if (removeRelations == true) {
-      List<String> columns = tableColumns;
-      Map<String, dynamic> data = convertToMap(this);
-      data.removeWhere((String key, _) => !columns.contains(key));
-      return data;
+      return columnsToMap();
     }
     if (original == true && originalMap.isNotEmpty) {
-      return originalMap;
+      return _originalWithDateStrings();
     }
     Map<String, dynamic> data = convertToMap(this);
     setComputedValues(data);
@@ -424,6 +438,36 @@ class Model<T> extends QueryBuilder<T> {
       }
     }
     return data;
+  }
+
+  /// the columns of this model, without relations.
+  /// the generator overrides it with a map of the columns only.
+  Map<String, dynamic> columnsToMap() {
+    Set<String> columns = tableColumns.toSet();
+    return convertToMap(this)
+      ..removeWhere((String key, _) => !columns.contains(key));
+  }
+
+  /// true when fromMap() takes the DateTime values of a row as they are.
+  /// The generator sets it when no column has beforeGet, so the rows of
+  /// this model skip the date to string step.
+  bool get readsRowDates => false;
+
+  /// the row this model was made from, with dates as iso strings like
+  /// before. a copy is made only when the row has a DateTime.
+  Map<String, dynamic> _originalWithDateStrings() {
+    Map<String, dynamic> row = originalMap;
+    for (dynamic value in row.values) {
+      if (value is DateTime) {
+        return <String, dynamic>{
+          for (MapEntry<String, dynamic> e in row.entries)
+            e.key: e.value is DateTime
+                ? (e.value as DateTime).toIso8601String()
+                : e.value,
+        };
+      }
+    }
+    return row;
   }
 
   /// adds the @Computed getters to [map].
@@ -499,16 +543,26 @@ class Model<T> extends QueryBuilder<T> {
   List<String> getPreload() {
     List<String> list = preloadList;
     List<String>? custom = _preloads;
-    if (custom == null && list.isEmpty) return const <String>[];
-    return <String>{...list, ...?custom}.toList();
+    if (custom == null) return list;
+    return <String>{...list, ...custom}.toList();
   }
 
   @override
   Future<void> initPreload(List<Model<T>> list) async {
     List<String> pList = getPreload();
-    for (String key in pList) {
-      await _getRelation(list, key);
+
+    /// in a transaction the queries run one by one on one connection.
+    /// outside, they run together, so the native drivers can send them
+    /// in one batch.
+    if (pList.length < 2 || DBDriver.inTransaction) {
+      for (String key in pList) {
+        await _getRelation(list, key);
+      }
+      return;
     }
+    await Future.wait(<Future<void>>[
+      for (String key in pList) _getRelation(list, key),
+    ]);
   }
 
   /// create a record

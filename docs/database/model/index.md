@@ -251,9 +251,15 @@ Blog created = await Blog().create(<String, dynamic>{
 ```
 
 - On insert, `null` fields are not sent, so the database default is used.
+- On update, only the fields that changed are sent.
+  A field is compared to its value from the last load or save.
+  A `Map` or `List` field is always sent, because it can change in place.
+- When nothing changed, `save()` runs no query, and `updated_at` stays as it is.
 - On update, a field is set to `NULL` only when it had a value before
   (loaded from the database, or saved).
   Fields that were not loaded, for example with `select()`, are not changed.
+- On insert, `save()` runs one `INSERT`. It reads the new id from the
+  insert, so there is no `SELECT` after it.
 - `save()` returns `false` when a [model event](events.md) cancels it.
 
 ### Mass assignment

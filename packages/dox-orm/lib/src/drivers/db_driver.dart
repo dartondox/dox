@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dox_orm/dox_orm.dart';
 import 'package:dox_orm/src/drivers/mysql_driver.dart';
 import 'package:dox_orm/src/drivers/sqlite_driver.dart';
@@ -32,6 +34,23 @@ abstract class DBDriver {
   /// close the connections of this driver. it is safe to call it twice.
   /// do not run queries on this driver after it.
   Future<void> close() async {}
+
+  /// zone keys the drivers use for an open transaction
+  static const List<Symbol> _transactionKeys = <Symbol>[
+    #doxPostgresTransaction,
+    #doxPostgresNativeTransaction,
+    #doxMysqlTransaction,
+    #doxMysqlNativeTransaction,
+    #doxSqliteTransaction,
+  ];
+
+  /// true when this code runs inside a transaction of any driver
+  static bool get inTransaction {
+    for (Symbol key in _transactionKeys) {
+      if (Zone.current[key] != null) return true;
+    }
+    return false;
+  }
 
   /// quote a table or column name, `"name"` on postgres and sqlite and
   /// `` `name` `` on mysql. it handles `table.column`, `table.*`, `*` and

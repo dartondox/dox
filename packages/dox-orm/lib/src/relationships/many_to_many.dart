@@ -1,5 +1,7 @@
 import 'package:dox_orm/dox_orm.dart';
 
+import 'keys.dart';
+
 /// local key used by each query, so the result can be matched to owners
 final Expando<String> _localKeys = Expando<String>();
 
@@ -34,10 +36,7 @@ M? manyToMany<T, M>(
   pivotForeignKey = pivotForeignKey ?? local.foreignKeyName;
   pivotRelatedForeignKey = pivotRelatedForeignKey ?? related.foreignKeyName;
 
-  List<dynamic> ids = list
-      .map((Model<T> i) => i.convertToMap(i)[localKey])
-      .where((dynamic id) => id != null)
-      .toList();
+  List<dynamic> ids = relationKeys(list, localKey);
 
   QueryBuilder<M> q = related
       .debug(local.shouldDebug)
@@ -78,8 +77,7 @@ Future<Map<String, List<M>>> getManyToMany<T, M>(
 
   /// filter matched values with local id value
   for (M r in results) {
-    Map<String, dynamic> map = (r as Model<M>).toMap(original: true);
-    String ownerId = map['_owner_id'].toString();
+    String ownerId = (r as Model<M>).originalMap['_owner_id'].toString();
     if (ret[ownerId] == null) {
       ret[ownerId] = <M>[];
     }
@@ -91,9 +89,7 @@ Future<Map<String, List<M>>> getManyToMany<T, M>(
   String? localKey = _localKeys[q];
   Map<String, List<M>> byOwner = <String, List<M>>{};
   for (Model<T> i in list) {
-    dynamic key = localKey == null
-        ? i.tempIdValue
-        : i.convertToMap(i)[localKey];
+    dynamic key = localKey == null ? i.tempIdValue : relationKey(i, localKey);
     byOwner[i.tempIdValue.toString()] = ret[key.toString()] ?? <M>[];
   }
   return byOwner;

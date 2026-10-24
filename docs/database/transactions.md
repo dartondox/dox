@@ -50,6 +50,9 @@ await QueryBuilder.transaction(() async {
 - A transaction uses one connection of the pool. Other queries use the other connections.
 - SQLite has one connection per isolate.
   While a transaction is open, the other queries of that isolate wait.
+- When a model has more than one relation to load (`preload` or `eager`),
+  the relation queries run at the same time outside a transaction.
+  Inside a transaction, they run one after another on its connection.
 - Values are always sent as bound parameters. They are never written into the SQL text.
 
 !!! note "Changed in 3.x"

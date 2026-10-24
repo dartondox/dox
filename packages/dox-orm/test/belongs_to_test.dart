@@ -41,6 +41,44 @@ void main() async {
       await Schema().dropIfExists('comment');
     });
 
+    test('belongs to loads each owner once, not once per child', () async {
+      Blog blog = Blog()
+        ..title = 'one'
+        ..description = 'b';
+      await blog.save();
+      Blog other = Blog()
+        ..title = 'two'
+        ..description = 'b';
+      await other.save();
+
+      /// many children of one blog, and one child of the other
+      for (int i = 0; i < 3; i++) {
+        await (BlogInfo()
+              ..info = <String, String>{'n': '$i'}
+              ..blogId = blog.uid)
+            .save();
+      }
+      await (BlogInfo()
+            ..info = <String, String>{'n': 'x'}
+            ..blogId = other.uid)
+          .save();
+
+      List<BlogInfo> infos = await BlogInfo().preload('blog').get();
+      expect(infos.length, 4);
+      expect(infos.map((BlogInfo i) => i.blog?.title), <String>[
+        'one',
+        'one',
+        'one',
+        'two',
+      ]);
+
+      /// the relation query finds two blogs, not one row per child
+      Blog? query = infos.first.related<Blog>('blog');
+      expect((await query!.get()).length, 1);
+      Blog? all = BlogInfoGenerator.queryBlog(infos);
+      expect((await all!.get()).length, 2);
+    });
+
     test('belongs To', () async {
       Blog blog = Blog();
       blog.title = 'Awesome blog';

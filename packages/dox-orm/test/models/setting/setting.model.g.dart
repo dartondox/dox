@@ -13,7 +13,7 @@ class SettingGenerator extends Model<Setting> {
   String get primaryKey => 'id';
 
   @override
-  Map<String, dynamic> get timestampsColumn => <String, dynamic>{
+  Map<String, dynamic> get timestampsColumn => const <String, dynamic>{
     'created_at': null,
     'updated_at': null,
   };
@@ -25,29 +25,40 @@ class SettingGenerator extends Model<Setting> {
   Setting query() => Setting();
 
   @override
-  List<String> get tableColumns => <String>['id', 'name'];
+  bool get readsRowDates => true;
 
   @override
-  List<String> get preloadList => <String>[];
+  List<String> get tableColumns => const <String>['id', 'name'];
 
   @override
-  Map<String, Function> get relationsResultMatcher => <String, Function>{};
+  List<String> get preloadList => const <String>[];
 
   @override
-  Map<String, Function> get relationsQueryMatcher => <String, Function>{};
+  Map<String, Function> get relationsResultMatcher =>
+      const <String, Function>{};
+
+  @override
+  Map<String, Function> get relationsQueryMatcher => const <String, Function>{};
 
   @override
   Setting fromMap(Map<String, dynamic> m) => Setting()
     ..id = m['id'] as int?
     ..name = m['name'] as String?;
-
   @override
-  Map<String, dynamic> convertToMap(dynamic i) {
-    Setting instance = i as Setting;
+  Map<String, dynamic> columnsToMap() {
+    Setting instance = this as Setting;
     Map<String, dynamic> map = <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
     };
+
+    return map;
+  }
+
+  @override
+  Map<String, dynamic> convertToMap(dynamic i) {
+    Setting instance = i as Setting;
+    Map<String, dynamic> map = instance.columnsToMap();
 
     return map;
   }

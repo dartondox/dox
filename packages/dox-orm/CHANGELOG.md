@@ -1,5 +1,18 @@
 ## Unreleased
 
+- Faster `belongsTo` load. It reads each owner once with `WHERE owner.id IN (...)`, with no join to the children. Before, a user with 10,000 blogs came back 10,000 times. Children of the same owner now get the same model object.
+- `save()` on a new model runs one `INSERT` and reads the id from it. There is no `SELECT` after it. `insert()` and `create()` use `RETURNING *` on Postgres and SQLite, so they also skip the `SELECT`. MySQL still reads the row with `find()`.
+- `save()` on an existing model sends only the columns that changed since the last load or save. A `Map` or `List` field is always sent. When nothing changed, `save()` runs no query and `updated_at` stays as it is. Before, it always ran an `UPDATE` with every column that had a value.
+- Fix: after `restore()`, a `save()` on the same model sent the old `deleted_at` again and deleted the row again. Now `deleted_at` is not sent, because it did not change.
+- `LIMIT` and `OFFSET` are bound parameters (`@dox_limit`, `@dox_offset`). Every page gives the same SQL, so the drivers reuse one prepared statement.
+- On Postgres, `whereIn` and `whereNotIn` with only `int` or only `String` values send one array parameter (`= ANY(@p)`, `<> ALL(@p)`). A list of any size gives the same SQL. Other lists keep one parameter per value.
+- Relations of one model (`preload` and `eager`) load at the same time outside a transaction, so the native drivers send them in one batch. Inside a transaction they still load one by one. New `DBDriver.inTransaction`.
+- Rows of a model made by the new generator skip the date to string step. `fromMap()` takes the `DateTime` of the driver as it is. `toMap(original: true)` still gives dates as ISO strings.
+- New `Model.columnsToMap()`: the columns only, without relations. `save()` uses it, so it no longer turns preloaded relations into JSON.
+- Less work per row: the where, join and order lists of a model are made only when used. `getPreload()` and the generated getters do not make a new list or map on each call.
+- The SQL text is no longer scanned for double spaces on each query. `orderBy()` without a direction no longer adds a space.
+- `QueryBuilderHelper.runQuery()` no longer has the `clean` parameter.
+
 - Breaking: column and table names in `select`, `where`, `orderBy`, `groupBy`, `join`, `insert` and `update` must be plain names (`name`, `table.name`, `table.*`, `*`, `name as alias`). Anything else, like `count(*)`, throws an `ArgumentError`. Before, a name with `(` went into the SQL as it is, so user input could add SQL. Use `selectRaw`, `whereRaw` or the new `orderByRaw` and `groupByRaw` for expressions.
 - Breaking: the operator of `where()` and `join()` must be one of `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `like`, `not like`, `ilike` (any case). Any other value throws an `ArgumentError`.
 - New `fillable` and `guarded` lists on `Model`. When set, `create()`, `insert()` and `update()` on the model drop the keys that are not allowed, so `User().create(req.body)` can not set `is_admin`. `insertMultiple()` on the model drops them from each row too. Both are empty by default, so nothing changes until you set them.

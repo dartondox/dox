@@ -13,7 +13,7 @@ class BlogInfoGenerator extends Model<BlogInfo> {
   String get primaryKey => 'id';
 
   @override
-  Map<String, dynamic> get timestampsColumn => <String, dynamic>{
+  Map<String, dynamic> get timestampsColumn => const <String, dynamic>{
     'created_at': 'created_at',
     'updated_at': 'updated_at',
   };
@@ -25,7 +25,10 @@ class BlogInfoGenerator extends Model<BlogInfo> {
   BlogInfo query() => BlogInfo();
 
   @override
-  List<String> get tableColumns => <String>[
+  bool get readsRowDates => true;
+
+  @override
+  List<String> get tableColumns => const <String>[
     'id',
     'info',
     'blog_id',
@@ -34,15 +37,15 @@ class BlogInfoGenerator extends Model<BlogInfo> {
   ];
 
   @override
-  List<String> get preloadList => <String>[];
+  List<String> get preloadList => const <String>[];
 
   @override
-  Map<String, Function> get relationsResultMatcher => <String, Function>{
+  Map<String, Function> get relationsResultMatcher => const <String, Function>{
     'blog': getBlog,
   };
 
   @override
-  Map<String, Function> get relationsQueryMatcher => <String, Function>{
+  Map<String, Function> get relationsQueryMatcher => const <String, Function>{
     'blog': queryBlog,
   };
 
@@ -68,16 +71,15 @@ class BlogInfoGenerator extends Model<BlogInfo> {
     ..id = m['id'] as int?
     ..info = m['info'] as Map<String, dynamic>?
     ..blogId = m['blog_id'] as int?
-    ..createdAt = m['created_at'] == null
-        ? null
+    ..createdAt = m['created_at'] is DateTime?
+        ? m['created_at'] as DateTime?
         : DateTime.parse(m['created_at'] as String)
-    ..updatedAt = m['updated_at'] == null
-        ? null
+    ..updatedAt = m['updated_at'] is DateTime?
+        ? m['updated_at'] as DateTime?
         : DateTime.parse(m['updated_at'] as String);
-
   @override
-  Map<String, dynamic> convertToMap(dynamic i) {
-    BlogInfo instance = i as BlogInfo;
+  Map<String, dynamic> columnsToMap() {
+    BlogInfo instance = this as BlogInfo;
     Map<String, dynamic> map = <String, dynamic>{
       'id': instance.id,
       'info': instance.info,
@@ -85,6 +87,14 @@ class BlogInfoGenerator extends Model<BlogInfo> {
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
     };
+
+    return map;
+  }
+
+  @override
+  Map<String, dynamic> convertToMap(dynamic i) {
+    BlogInfo instance = i as BlogInfo;
+    Map<String, dynamic> map = instance.columnsToMap();
 
     List<String> preload = getPreload();
     if (preload.contains('blog')) {
