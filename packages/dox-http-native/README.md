@@ -65,7 +65,8 @@ and when the app has WebSocket or Socket.IO routes.
 
 - Each isolate can bind the same port (`SO_REUSEPORT` on Linux, one shared socket on macOS).
 - Each isolate has its own Rust network thread. `DOX_HTTP_THREAD=shared` puts them on one thread.
-- `400` for bad requests, `431` for headers over 16 KB, `413` for bodies over `maxBodySize`.
+- `400` for bad requests, `431` for headers over 16 KB, `413` for bodies over `maxBodySize` (`maxMultipartSize` for a multipart form). A too big `Content-Length` with `Expect: 100-continue` gets `413` before the body is sent. Any other too big body is read and dropped first, so the client sees the `413`.
+- `408` when the client sends no body bytes for `bodyTimeout` (idle time, default 120 seconds). A slow but steady upload is fine.
 - `bind(port, address: '127.0.0.1')` listens on one host. With no address it listens on all interfaces.
 - `close()` is graceful: no new connections, open requests get their answer, then it completes. `close(force: true)` closes every connection at once.
 - Not yet: WebSocket upgrade (`detachSocket`).
