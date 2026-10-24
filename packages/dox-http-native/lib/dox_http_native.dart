@@ -6,3 +6,4 @@ export 'src/headers.dart' show NativeHeaders;
 export 'src/request.dart' show NativeRequest;
 export 'src/response.dart' show NativeResponse;
 export 'src/server.dart' show NativeHttpServer;
+export 'src/websocket.dart' show NativeWebSocket;
