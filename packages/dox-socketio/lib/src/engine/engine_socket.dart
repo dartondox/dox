@@ -91,7 +91,7 @@ class EngineSocket implements TransportListener {
     _schedulePing();
   }
 
-  /// Sends a message. [data] is a [String] or a [Uint8List].
+  /// Sends a message. [data] is a [String], a [SharedText] or a [Uint8List].
   void send(Object data) {
     _sendPacket(EnginePacket(EnginePacketType.message, data));
   }

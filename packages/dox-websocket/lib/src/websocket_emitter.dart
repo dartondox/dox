@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_websocket/dox_websocket.dart';
@@ -87,15 +88,19 @@ class WebsocketEmitter {
     adapter.emit(emitEvent);
   }
 
+  /// sends the event to every member of the room.
+  /// the payload is JSON and UTF-8 encoded once, not once per member.
   static void emitEventToSockets(WebsocketEmitEvent event) {
-    List<String> members = _storage.getWebSocketIdsOfTheRoom(event.roomId);
+    Set<String> members = _storage.getWebSocketIdsOfTheRoom(event.roomId);
+    if (members.isEmpty) return;
+    Set<dynamic> exclude = event.exclude.toSet();
+    List<int> payload = utf8.encode(event.toPayload());
     for (String socketId in members) {
-      if (!event.exclude.contains(socketId)) {
-        WebsocketInfo? info = _storage.getWebSocketInfo(socketId);
-        if (info != null) {
-          WebSocket websocket = info.websocket;
-          websocket.add(event.toPayload());
-        }
+      if (exclude.contains(socketId)) continue;
+      WebsocketInfo? info = _storage.getWebSocketInfo(socketId);
+      if (info != null) {
+        WebSocket websocket = info.websocket;
+        websocket.addUtf8Text(payload);
       }
     }
   }
