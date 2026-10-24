@@ -16,5 +16,23 @@ void main() {
       bool result = Hash.verify('password', hashedPassword);
       expect(result, false);
     });
+    test('makeAsync/verifyAsync run bcrypt in another isolate', () async {
+      String hashed = await Hash.makeAsync('secret');
+      expect(await Hash.verifyAsync('secret', hashed), true);
+      expect(await Hash.verifyAsync('wrong', hashed), false);
+      expect(await Hash.verifyAsync('secret', 'not-a-hash'), false);
+      expect(Hash.verify('secret', hashed), true);
+    });
+
+    test('rounds sets the bcrypt cost', () async {
+      expect(Hash.make('secret', rounds: 4), startsWith(r'$2a$04$'));
+      expect(await Hash.makeAsync('secret', rounds: 5), startsWith(r'$2a$05$'));
+      expect(Hash.make('secret'), startsWith(r'$2a$10$'));
+      Hash.rounds = 4;
+      addTearDown(() => Hash.rounds = 10);
+      String hashed = Hash.make('secret');
+      expect(hashed, startsWith(r'$2a$04$'));
+      expect(Hash.verify('secret', hashed), true);
+    });
   });
 }
