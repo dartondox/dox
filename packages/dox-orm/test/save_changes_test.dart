@@ -114,7 +114,9 @@ void main() async {
       expect(blog.updatedAt!.isAfter(updatedAt), true);
       Blog fresh = (await Blog().find(blog.uid))!;
       expect(fresh.title, 'b');
-      expect(fresh.updatedAt!.isAfter(updatedAt), true);
+      // MySQL keeps whole seconds, so the read-back time can be up to 1 s
+      // off the time in memory.
+      expect(fresh.updatedAt!.difference(blog.updatedAt!).inSeconds, 0);
     });
 
     test('soft delete, restore, then save keeps the row', () async {
@@ -168,10 +170,8 @@ void main() async {
         await info.save();
         BlogInfo fresh = (await BlogInfo().find(info.id))!;
         expect(fresh.createdAt, isA<DateTime>());
-        expect(
-          fresh.createdAt!.toIso8601String(),
-          info.createdAt!.toIso8601String(),
-        );
+        // MySQL keeps whole seconds
+        expect(fresh.createdAt!.difference(info.createdAt!).inSeconds, 0);
         expect(fresh.toMap(original: true)['created_at'], isA<String>());
       },
     );
