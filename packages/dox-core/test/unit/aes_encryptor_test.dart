@@ -13,6 +13,20 @@ void main() {
       expect(AESEncryptor.decode(encoded, secret), message);
     });
 
+    test('works when the secret changes between calls', () {
+      String other = 'abcdefghijklmnopqrstuvwxyz123456';
+      String a = AESEncryptor.encode(message, secret);
+      String b = AESEncryptor.encode('', other);
+      expect(AESEncryptor.decode(a, secret), message);
+      expect(AESEncryptor.decode(b, other), '');
+      expect(
+        () => AESEncryptor.decode(a, other),
+        throwsA(isA<DecryptException>()),
+      );
+      // nonce (12) + empty text + tag (16)
+      expect(base64.decode(b).length, 28);
+    });
+
     test('same text gives a different output each time', () {
       expect(
         AESEncryptor.encode(message, secret),
