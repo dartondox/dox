@@ -1,3 +1,7 @@
+## Unreleased
+
+- The `/docs` page loads its CDN files with `crossorigin="anonymous"`.
+
 ## 3.0.0-alpha.6
 
 - Version bump only, to match the other packages.

@@ -90,7 +90,7 @@ class OpenApiServer {
 </head>
 <body>
   <div id="app"></div>
-  <script src="$script"></script>
+  <script src="$script" crossorigin="anonymous"></script>
   <script>
     Scalar.createApiReference('#app', $config);
   </script>
@@ -112,11 +112,11 @@ class OpenApiServer {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${_title()}</title>
-  <link rel="stylesheet" href="$cdn/swagger-ui.css">
+  <link rel="stylesheet" href="$cdn/swagger-ui.css" crossorigin="anonymous">
 </head>
 <body>
   <div id="swagger-ui"></div>
-  <script src="$cdn/swagger-ui-bundle.js"></script>
+  <script src="$cdn/swagger-ui-bundle.js" crossorigin="anonymous"></script>
   <script>
     window.ui = SwaggerUIBundle({ url: $url, dom_id: '#swagger-ui' });
   </script>
