@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:dox_orm/dox_orm.dart';
 
+import '../limit.dart';
+
 final RegExp _notWord = RegExp(r'[^\w]');
-final RegExp _manySpaces = RegExp(' +');
 
 /// compare operators allowed in where() and join()
 const Set<String> _operators = <String>{
@@ -67,20 +68,18 @@ class QueryBuilderHelper<T> {
     if (!isCountQuery) {
       query += queryBuilder.getOrderByQuery();
       query += queryBuilder.getLimitQuery();
+    } else {
+      /// a count has no LIMIT, so it must not send its values
+      queryBuilder.substitutionValues
+        ..remove(Limit.limitKey)
+        ..remove(Limit.offsetKey);
     }
     return query;
   }
 
-  /// [clean] is true when [query] has no double spaces (eg. from a cache)
-  Future<List<Map<String, dynamic>>> runQuery(
-    String query, {
-    bool clean = false,
-  }) {
+  Future<List<Map<String, dynamic>>> runQuery(String query) {
     Map<String, dynamic> values = queryBuilder.substitutionValues;
     if (queryBuilder.shouldDebug) queryBuilder.logger.log(query, values);
-    if (!clean && query.contains('  ')) {
-      query = query.replaceAll(_manySpaces, ' ');
-    }
     return queryBuilder.dbDriver.query(
       query,
       substitutionValues: values,
@@ -107,39 +106,36 @@ class QueryBuilderHelper<T> {
   /// so the caller does not wait one more microtask.
   // ignore: always_specify_types
   FutureOr<List> formatResult(List<Map<String, dynamic>> queryResult) {
-    List<Map<String, dynamic>> result = getMapResult(queryResult);
-
-    if (queryBuilder.getRawQuery().isNotEmpty) {
-      return result;
-    }
-
-    if (queryBuilder.getGroupByQuery().isNotEmpty) {
-      return result;
-    }
-
     dynamic self = queryBuilder.self;
-    if (self is Model) {
-      List<String> preloads = self.customPreloadList;
-      List<T> ret = <T>[];
-      for (Map<String, dynamic> e in result) {
-        Model<dynamic> res = self.fromMap(e);
-        res.originalMap = e;
-
-        /// so save() and delete() on this model use the same connection
-        res.connection = queryBuilder.connection;
-        for (String preload in preloads) {
-          res.preload(preload);
-        }
-        ret.add(res as T);
-      }
-
-      /// no relations to load: skip the preload work
-      if (ret.isNotEmpty && queryBuilder.getPreload().isNotEmpty) {
-        return _preload(ret);
-      }
-      return ret;
+    if (self is! Model ||
+        queryBuilder.getRawQuery().isNotEmpty ||
+        queryBuilder.getGroupByQuery().isNotEmpty) {
+      return getMapResult(queryResult);
     }
-    return result;
+
+    /// a generated fromMap() reads the dates of the driver as they are
+    List<Map<String, dynamic>> result = self.readsRowDates
+        ? queryResult
+        : getMapResult(queryResult);
+    List<String> preloads = self.customPreloadList;
+    List<T> ret = <T>[];
+    for (Map<String, dynamic> e in result) {
+      Model<dynamic> res = self.fromMap(e);
+      res.originalMap = e;
+
+      /// so save() and delete() on this model use the same connection
+      res.connection = queryBuilder.connection;
+      for (String preload in preloads) {
+        res.preload(preload);
+      }
+      ret.add(res as T);
+    }
+
+    /// no relations to load: skip the preload work
+    if (ret.isNotEmpty && queryBuilder.getPreload().isNotEmpty) {
+      return _preload(ret);
+    }
+    return ret;
   }
 
   Future<List<T>> _preload(List<T> ret) async {

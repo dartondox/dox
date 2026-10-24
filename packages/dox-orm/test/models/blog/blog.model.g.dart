@@ -13,7 +13,7 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
   String get primaryKey => 'uid';
 
   @override
-  Map<String, dynamic> get timestampsColumn => <String, dynamic>{
+  Map<String, dynamic> get timestampsColumn => const <String, dynamic>{
     'created_at': 'created_at',
     'updated_at': 'updated_at',
   };
@@ -25,7 +25,7 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
   Blog query() => Blog();
 
   @override
-  List<String> get tableColumns => <String>[
+  List<String> get tableColumns => const <String>[
     'uid',
     'title',
     'status',
@@ -37,16 +37,16 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
   ];
 
   @override
-  List<String> get preloadList => <String>['blogInfo', 'blogInfos'];
+  List<String> get preloadList => const <String>['blogInfo', 'blogInfos'];
 
   @override
-  Map<String, Function> get relationsResultMatcher => <String, Function>{
+  Map<String, Function> get relationsResultMatcher => const <String, Function>{
     'blogInfo': getBlogInfo,
     'blogInfos': getBlogInfos,
   };
 
   @override
-  Map<String, Function> get relationsQueryMatcher => <String, Function>{
+  Map<String, Function> get relationsQueryMatcher => const <String, Function>{
     'blogInfo': queryBlogInfo,
     'blogInfos': queryBlogInfos,
   };
@@ -92,19 +92,18 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
     ..status = m['status'] as String?
     ..slug = m['slug'] as String?
     ..description = m['body'] as String?
-    ..deletedAt = m['deleted_at'] == null
-        ? null
+    ..deletedAt = m['deleted_at'] is DateTime?
+        ? m['deleted_at'] as DateTime?
         : DateTime.parse(m['deleted_at'] as String)
-    ..createdAt = m['created_at'] == null
-        ? null
+    ..createdAt = m['created_at'] is DateTime?
+        ? m['created_at'] as DateTime?
         : DateTime.parse(m['created_at'] as String)
-    ..updatedAt = m['updated_at'] == null
-        ? null
+    ..updatedAt = m['updated_at'] is DateTime?
+        ? m['updated_at'] as DateTime?
         : DateTime.parse(m['updated_at'] as String);
-
   @override
-  Map<String, dynamic> convertToMap(dynamic i) {
-    Blog instance = i as Blog;
+  Map<String, dynamic> columnsToMap() {
+    Blog instance = this as Blog;
     Map<String, dynamic> map = <String, dynamic>{
       'uid': instance.uid,
       'title': instance.title,
@@ -114,10 +113,18 @@ class BlogGenerator extends Model<Blog> with SoftDeletes<Blog> {
       'deleted_at': instance.deletedAt?.toIso8601String(),
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
-      'blog_info': toMap(instance.blogInfo),
-      'blog_infos': toMap(instance.blogInfos),
     };
     map['title'] = Blog.slugTitle(map);
+
+    return map;
+  }
+
+  @override
+  Map<String, dynamic> convertToMap(dynamic i) {
+    Blog instance = i as Blog;
+    Map<String, dynamic> map = instance.columnsToMap();
+    map['blog_info'] = toMap(instance.blogInfo);
+    map['blog_infos'] = toMap(instance.blogInfos);
 
     return map;
   }

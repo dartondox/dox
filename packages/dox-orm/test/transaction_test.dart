@@ -46,6 +46,27 @@ void main() async {
       expect(await Blog().count(), 2);
     });
 
+    test('relations load inside and outside a transaction', () async {
+      Blog blog = Blog()
+        ..title = 'title'
+        ..description = 'body';
+      await blog.save();
+      await QueryBuilder.table('blog_info')
+          .insert(<String, dynamic>{'info': '{}', 'blog_id': blog.uid});
+
+      /// Blog has two eager relations
+      Blog? outside = await Blog().find(blog.uid);
+      Blog? inside = await QueryBuilder.transaction(() {
+        expect(DBDriver.inTransaction, true);
+        return Blog().find(blog.uid);
+      });
+      expect(DBDriver.inTransaction, false);
+      for (Blog? b in <Blog?>[outside, inside]) {
+        expect(b?.blogInfo?.blogId, blog.uid);
+        expect(b?.blogInfos.length, 1);
+      }
+    });
+
     test('rollback on error', () async {
       Future<void> run() {
         return QueryBuilder.transaction(() async {
