@@ -115,6 +115,9 @@ jobs:
         run: |
           cp packages/dox-app/.env.example packages/dox-app/.env
           cp packages/dox-cli/.env.example packages/dox-cli/.env
+          # .env.example ships an empty APP_KEY, so CI makes its own.
+          key=$(openssl rand -hex 16)
+          sed -i "s/^APP_KEY=.*/APP_KEY=$key/" packages/dox-app/.env packages/dox-cli/.env
       - name: Wait for services
         if: needs.changes.outputs.unit_services != ''
         run: ci/wait-services.sh ${{ needs.changes.outputs.unit_services }}

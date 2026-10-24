@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox/dox.dart';
+import 'package:dox/src/tools/generate_key.dart';
 import 'package:dox/src/utils/versions.dart';
 import 'package:dox/src/version.dart';
 
@@ -61,13 +62,27 @@ Future<void> createProject(String projectName, [String? versionName]) async {
   gitDirectory.deleteSync(recursive: true);
 
   replaceProjectName(projectFolder, projectName);
+  createEnv(projectFolder);
 
   print('\x1B[32m✔\x1B[0m Done. Created at - ${projectFolder.path}');
+  print('\x1B[32m✔\x1B[0m .env created with a new APP_KEY');
   print('\x1B[32m✔\x1B[0m Now run:\n');
   print('    ➢ cd $projectName');
   print('    ➢ dart pub get');
-  print('    ➢ cp .env.example .env (modify .env variables)');
   print('    ➢ dox serve\n');
+}
+
+/// Copies `.env.example` to `.env` in [folder] and sets a new `APP_KEY`.
+///
+/// Each project gets its own secret key. The key in `.env.example` is
+/// public, so it must never be used. Does nothing when `.env` exists or
+/// there is no `.env.example`.
+void createEnv(Directory folder) {
+  File example = File('${folder.path}/.env.example');
+  File env = File('${folder.path}/.env');
+  if (env.existsSync() || !example.existsSync()) return;
+  example.copySync(env.path);
+  overrideKey(newKey(), env.path);
 }
 
 /// Replaces `dox_sample` with [projectName] in every text file of [folder].

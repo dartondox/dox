@@ -1,3 +1,8 @@
+## Unreleased
+
+- Security: `dox create` now copies `.env.example` to `.env` and writes a new random `APP_KEY`. Before, every new app used the same public key from the template. You no longer run `cp .env.example .env`.
+- The `.env.example` of the CLI has an empty `APP_KEY`. Run `dox key:generate` to set one.
+
 ## 3.0.0-alpha.6
 
 - Fix: `dox key:generate` dropped `.env` lines with more than one `=` (like `DATABASE_URL=postgres://u:p@h/db?sslmode=require`). It also dropped comment lines. Now it only changes the `APP_KEY` line. Every other line stays as it is.
