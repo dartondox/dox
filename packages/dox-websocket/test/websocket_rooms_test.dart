@@ -270,6 +270,20 @@ void main() {
       expect(WebsocketStorage().hasRoom('next'), isFalse);
     });
 
+    test('a rejoin of the same room gets each message once', () async {
+      Client a = await Client.connect();
+      Client b = await Client.connect();
+      b.send('joinRoom', 'twice');
+      b.send('joinRoom', 'twice');
+      await settle();
+      a.send('docsRoom', <String, String>{'room': 'twice', 'text': 'one'});
+      expect((await b.next('docsRoom'))['message'], 'one');
+      await settle();
+      expect(b.messages.where((m) => m['event'] == 'docsRoom'), hasLength(1));
+      await a.close();
+      await b.close();
+    });
+
     test(
       'room name from joinRoom works with emitter.room(name) as in docs',
       () async {

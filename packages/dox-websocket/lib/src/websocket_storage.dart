@@ -6,7 +6,7 @@ import 'package:dox_websocket/src/websocket_info.dart';
 final Map<String, WebsocketInfo> _socketConnections = <String, WebsocketInfo>{};
 
 /// active rooms with active users in the room
-final Map<String, List<String>> _rooms = <String, List<String>>{};
+final Map<String, Set<String>> _rooms = <String, Set<String>>{};
 
 class WebsocketStorage {
   static final WebsocketStorage _singleton = WebsocketStorage._internal();
@@ -44,10 +44,7 @@ class WebsocketStorage {
   /// add socket Id to the room
   /// this is use to join the room
   void addWebSocketIdToRoom(String socketId, String roomId) {
-    if (_rooms[roomId] == null) {
-      _rooms[roomId] = <String>[];
-    }
-    _rooms[roomId]?.add(socketId);
+    _rooms.putIfAbsent(roomId, _newSet).add(socketId);
     updateActiveRoomId(socketId, roomId);
   }
 
@@ -57,7 +54,8 @@ class WebsocketStorage {
   void updateActiveRoomId(String socketId, String roomId) {
     WebsocketInfo? info = getWebSocketInfo(socketId);
     if (info != null) {
-      if (info.previousRoom != null) {
+      /// a rejoin of the same room keeps the socket in it
+      if (info.previousRoom != null && info.previousRoom != roomId) {
         removeWebSocketIdFromRoom(socketId, info.previousRoom);
       }
       info.activeRoom = roomId;
@@ -65,17 +63,17 @@ class WebsocketStorage {
     }
   }
 
-  /// get list of socket id from the room
+  /// get socket ids of the room
   /// this is used when we want to emit message to specific room
-  List<String> getWebSocketIdsOfTheRoom(String roomId) {
-    return _rooms[roomId] ?? <String>[];
+  Set<String> getWebSocketIdsOfTheRoom(String roomId) {
+    return _rooms[roomId] ?? const <String>{};
   }
 
   /// remove websocketId from the room
   /// this is used when user leave the room
   /// an empty room is removed, so room names do not pile up in memory.
   void removeWebSocketIdFromRoom(String socketId, String? roomId) {
-    List<String>? members = _rooms[roomId];
+    Set<String>? members = _rooms[roomId];
     if (members == null) return;
     members.remove(socketId);
     if (members.isEmpty) _rooms.remove(roomId);
@@ -83,4 +81,6 @@ class WebsocketStorage {
 
   /// true when the room has members
   bool hasRoom(String roomId) => _rooms.containsKey(roomId);
+
+  static Set<String> _newSet() => <String>{};
 }
