@@ -10,6 +10,8 @@
 // 2. A local build in `native/target/release` (for dev, same OS and CPU).
 // 3. The ready-built library from the GitHub release, checked with sha256.
 // 4. `cargo build` from source, when cargo is installed.
+// Outside the pub cache (this repo, or a path or git dependency), 4 comes
+// before 3, because the source may be newer than the release.
 // When none works, no asset is added. Dox then logs a warning and uses
 // dart:io instead. The build never fails because of this package.
 import 'dart:io';
@@ -45,12 +47,17 @@ void main(List<String> args) async {
     String fileName = os.dylibFileName('dox_http_native');
     bool host = os == OS.current && arch == Architecture.current;
     Uri native = input.packageRoot.resolve('native/');
+    // From pub.dev the source matches the release, so download first. In the
+    // repo, or as a path or git dependency, the source may be newer than the
+    // release (eg. a new ABI), so build it with cargo first.
+    bool published = input.packageRoot.pathSegments.contains('hosted');
 
     Uri? lib =
         _given(input) ??
         (host ? _local(native, fileName) : null) ??
-        await _download(input, os, arch, fileName) ??
-        (host ? await _cargo(input, native, fileName, output) : null);
+        (published ? await _download(input, os, arch, fileName) : null) ??
+        (host ? await _cargo(input, native, fileName, output) : null) ??
+        (published ? null : await _download(input, os, arch, fileName));
 
     if (lib == null) {
       stderr.writeln(
