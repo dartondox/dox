@@ -20,17 +20,14 @@ So every import in this tutorial starts with `package:blog/`.
 
 ## 2. Use SQLite
 
-Copy the example env file:
-
-```bash
-cp .env.example .env
-```
+`dox create` already made `.env` from `.env.example`. It also wrote a new
+random `APP_KEY`, so each project has its own secret key.
 
 The template already uses SQLite. These are the lines that matter:
 
 ```ini title=".env"
 APP_PORT=3000
-APP_KEY=KKep5qC6uHlAgrwaQTQewgMRSIqQnoj0
+APP_KEY=<your new random key>
 
 DB_CONNECTION=sqlite
 DB_NAME=db/dox.sqlite

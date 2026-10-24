@@ -131,6 +131,7 @@ For `RequestFile` and `List<RequestFile>` fields.
 
 - `@MaxSize` units: `B`, `KB`, `MB`, `GB`. `1KB` = 1024 bytes. A bad size text stops the build.
 - `@Mimes` takes file extensions. Dox finds the real type from the first bytes of the file.
+  The file name extension must fit those bytes too. So `x.html` with GIF bytes does not pass.
   For types without a byte signature (like `txt` or `csv`), it uses the file name extension.
 - `@Image()` is `@Mimes(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'])`. No `svg`.
 - The JSON Schema of a file is `{"type": "string", "format": "binary"}`, plus the keys above.

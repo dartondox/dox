@@ -379,7 +379,7 @@ void main() {
         page.body,
         contains(
           'https://cdn.jsdelivr.net/npm/@scalar/api-reference@1.75.1'
-          '/dist/browser/standalone.js',
+          '/dist/browser/standalone.js" integrity="sha384-',
         ),
       );
       expect(
@@ -397,7 +397,13 @@ void main() {
     test('serves Swagger UI with DocsUi.swagger', () {
       OpenApiServer s = OpenApiServer(buildApi(), ui: DocsUi.swagger);
       String body = s.handle('/docs')!.body;
-      expect(body, contains('swagger-ui-dist@5.34.0/swagger-ui-bundle.js'));
+      expect(
+        body,
+        contains(
+          'swagger-ui-dist@5.34.0/swagger-ui-bundle.js" integrity="sha384-',
+        ),
+      );
+      expect(body, contains('swagger-ui.css" integrity="sha384-'));
       expect(body, contains('url: "/openapi.json"'));
       expect(body, isNot(contains('scalar')));
     });

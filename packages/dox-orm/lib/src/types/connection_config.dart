@@ -36,7 +36,9 @@ class ConnectionConfig {
   /// database connection port
   int port;
 
-  /// use ssl mode
+  /// use ssl mode. the server certificate is checked. set
+  /// `extra['verifyCertificate']` to false to skip the check, eg. for a
+  /// self-signed certificate in development.
   bool useSSL;
 
   /// extra configuration for the connection
@@ -85,8 +87,9 @@ class ConnectionConfig {
   ///   `/cloudsql/project:region:instance`. For MySQL it is the socket
   ///   file, eg. `/var/run/mysqld/mysqld.sock`.
   /// - `sslmode` (or `ssl`): `disable`, `allow`, `prefer`, `false` and `0`
-  ///   mean no TLS. `verify-full` checks the server certificate. Any other
-  ///   value (eg. `require`, `true`) turns TLS on.
+  ///   mean no TLS. Any other value (eg. `require`, `true`) turns TLS on.
+  ///   The server certificate is checked. Add `verifyCertificate=false` to
+  ///   skip the check (eg. a self-signed certificate in development).
   /// - any other option goes to [extra]. `10` becomes an int, and `true` or
   ///   `false` a bool. Eg. `?maxConnectionCount=20`.
   ///
@@ -143,7 +146,12 @@ class ConnectionConfig {
             'false',
             '0',
           }.contains(mode);
-          if (driver == Driver.postgres && mode.startsWith('verify')) {
+          // like libpq: `require` encrypts but does not check the
+          // certificate (eg. Heroku). `verify-ca` and `verify-full`
+          // check it.
+          if (driver == Driver.postgres && mode == 'require') {
+            options['sslMode'] = postgres.SslMode.require;
+          } else if (driver == Driver.postgres && mode.startsWith('verify')) {
             options['sslMode'] = postgres.SslMode.verifyFull;
           }
         default:
@@ -210,6 +218,42 @@ class ConnectionConfig {
       ? 3306
       : port;
 
+  /// false when `extra['verifyCertificate']` is false: TLS does not check
+  /// the server certificate. only use it for a self-signed certificate in
+  /// development. default true.
+  bool get verifyCertificate => extra['verifyCertificate'] as bool? ?? true;
+
+  /// the Postgres TLS mode: `extra['sslMode']` when set, else
+  /// verify-full with [useSSL] (require when [verifyCertificate] is
+  /// false), else disable.
+  postgres.SslMode get postgresSslMode =>
+      extra['sslMode'] as postgres.SslMode? ??
+      (!useSSL
+          ? postgres.SslMode.disable
+          : verifyCertificate
+          ? postgres.SslMode.verifyFull
+          : postgres.SslMode.require);
+
+  /// MySQL (Dart driver): ask the server for its RSA key to send the
+  /// password. A fake server can send its own key and read the password,
+  /// so it is off by default. It is on with [useSSL] or a local host.
+  /// Set `extra['allowPublicKeyRetrieval']`, or give the key in
+  /// `extra['serverPublicKey']` (safer).
+  bool get mysqlAllowPublicKeyRetrieval =>
+      extra['allowPublicKeyRetrieval'] as bool? ??
+      (useSSL || isUnixSocket || _localHosts.contains(host));
+
+  static const Set<String> _localHosts = <String>{
+    'localhost',
+    '127.0.0.1',
+    '::1',
+  };
+
+  /// MySQL (Dart driver): true accepts a bad server certificate. It is
+  /// only true when [verifyCertificate] is false.
+  bool mysqlAcceptBadCertificate(X509Certificate certificate) =>
+      !verifyCertificate;
+
   /// max prepared statements kept per connection (default 100).
   /// set it with `extra['preparedStatementCacheSize']`.
   int get statementCacheSize =>
@@ -248,8 +292,8 @@ class ConnectionConfig {
   /// get mysql connection pool.
   /// it opens up to `maxConnectionCount` connections (default 10) when
   /// needed. caching_sha2_password (mysql 8 default) works without TLS:
-  /// the password is encrypted with the server RSA key. it asks the server
-  /// for the key, unless you give it in `serverPublicKey` (safer).
+  /// the password is encrypted with the server RSA key. see
+  /// [mysqlAllowPublicKeyRetrieval] for when it asks the server for it.
   mysql.MySQLConnectionPool _getMysqlPool() {
     return mysql.MySQLConnectionPool(
       host: mysqlHost,
@@ -259,9 +303,10 @@ class ConnectionConfig {
       databaseName: database,
       maxConnections: extra['maxConnectionCount'] ?? 10,
       secure: useSSL,
+      onBadCertificate: mysqlAcceptBadCertificate,
       collation: extra['collation'] ?? 'utf8mb4_general_ci',
       timeoutMs: extra['timeoutMs'] ?? 10000,
-      allowPublicKeyRetrieval: extra['allowPublicKeyRetrieval'] ?? true,
+      allowPublicKeyRetrieval: mysqlAllowPublicKeyRetrieval,
       serverPublicKey: extra['serverPublicKey'],
       timeZone: extra['timeZone'],
       maxConnectionAge: extra['maxConnectionAge'] ?? const Duration(hours: 12),
@@ -292,14 +337,10 @@ class ConnectionConfig {
   /// get postgres connection pool.
   /// it opens up to `maxConnectionCount` connections when needed.
   Future<postgres.Pool<dynamic>> _getPostgresConnection() async {
-    postgres.SslMode sslMode = useSSL
-        ? postgres.SslMode.require
-        : postgres.SslMode.disable;
-
     return postgres.Pool<dynamic>.withEndpoints(
       <postgres.Endpoint>[postgresEndpoint],
       settings: postgres.PoolSettings(
-        sslMode: extra['sslMode'] ?? sslMode,
+        sslMode: postgresSslMode,
         maxConnectionCount: extra['maxConnectionCount'],
         maxConnectionAge: extra['maxConnectionAge'],
         maxSessionUse: extra['maxSessionUse'],

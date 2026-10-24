@@ -12,7 +12,7 @@ The code reads env vars in three ways:
 
 | Variable | Who reads it | Default | Meaning | Example |
 | --- | --- | --- | --- | --- |
-| `APP_ENV` | `dox_core` (`Dox().checkAppKey()`, `OpenApiConfig.isEnabled`) | empty | `production` makes a missing `APP_KEY` a startup error. `development` or `local` turn the `/docs` routes on when `openApi.enabled` is `null`. Read with `Env.get`. | `APP_ENV=production` |
+| `APP_ENV` | `dox_core` (`Dox().checkAppKey()`, `OpenApiConfig.isEnabled`) | empty | Any value except `development`, `local` or `test` (also empty) makes a bad `APP_KEY` a startup error: missing, not exactly 32 characters, or a public sample key. In `development`, `local` and `test` it is only a warning. `development` or `local` turn the `/docs` routes on when `openApi.enabled` is `null`. Read with `Env.get`. | `APP_ENV=production` |
 | `PORT` | `dox_core` (`DoxServer.portFor()`) | not set | The port to listen on, when `APP_PORT` is not set. Cloud Run, Fly, Render and Heroku set it. `APP_PORT` wins when both are set. Read with `Env.get`. | `PORT=8080` |
 | `APP_HOST` | `dox_core` (`DoxServer.hostFor()`) | not set (all interfaces, `::`) | The host to listen on. `127.0.0.1` keeps the app off the network, for an app behind a proxy on the same machine. `AppConfig.host` wins over it. Read with `Env.get`. | `APP_HOST=127.0.0.1` |
 | `DOX_SERVER` | `dox_core` (`DoxServer.usesNative()`) | not set (uses `AppConfig.server`) | `dartio`, `dart_io` or `dart:io` forces the `dart:io` server. `native` forces the native server, also for an app with WebSocket routes. Real environment only. | `DOX_SERVER=dartio` |
@@ -40,7 +40,7 @@ A new project (`dox create`) reads these keys through its typed env class, `lib/
 | `APP_NAME` | `appName` | `String` | `dox` | `LoggerConfig.name`. |
 | `APP_ENV` | `appEnv` | `String` | `development` | `development`, `staging` or `production`. `env.isDevelopment` is `true` for `development`. It turns on `prettyPrint` of the logger and the query log of the database. Also read by the framework (see above). |
 | `APP_PORT` | `appPort` | `int` | `3000` | `AppConfig.serverPort`. When `APP_PORT` is not set, Dox listens on `PORT` if the env has it. |
-| `APP_KEY` | `appKey` | `String` | required | `AppConfig.appKey`. The app stops at start when it is missing. |
+| `APP_KEY` | `appKey` | `String` | required | `AppConfig.appKey`. It must be exactly 32 characters. Run `dox key:generate` for one. The app stops at start when it is missing, has another length, or is a public sample key (only a warning in `development`, `local` and `test`). |
 | `APP_TOTAL_ISOLATE` | `appTotalIsolate` | `int?` | not set: one per CPU core | `AppConfig.totalIsolate`. |
 | `LOG_LEVEL` | `logLevel` | `String` | `info` | `LoggerConfig.level`. |
 | `CACHE_STORE` | `cacheStore` | `String` | `file` | `CacheConfig.defaultStore`: `memory`, `file` or `redis`. |
@@ -60,7 +60,7 @@ The `.env.example` of a new project:
 APP_NAME=dox
 APP_ENV=development
 APP_PORT=3000
-APP_KEY=KKep5qC6uHlAgrwaQTQewgMRSIqQnoj0
+APP_KEY=
 
 CACHE_STORE=file
 STORAGE_DISK=local

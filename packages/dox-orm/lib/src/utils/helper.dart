@@ -5,6 +5,20 @@ import 'package:dox_orm/dox_orm.dart';
 final RegExp _notWord = RegExp(r'[^\w]');
 final RegExp _manySpaces = RegExp(' +');
 
+/// compare operators allowed in where() and join()
+const Set<String> _operators = <String>{
+  '=',
+  '!=',
+  '<>',
+  '<',
+  '>',
+  '<=',
+  '>=',
+  'like',
+  'not like',
+  'ilike',
+};
+
 /// column name without the non word characters, made once
 final Map<String, String> _keyNames = <String, String>{};
 
@@ -33,6 +47,16 @@ class QueryBuilderHelper<T> {
 
   /// quote a table or column name for the current driver
   String wrap(String value) => queryBuilder.dbDriver.wrap(value);
+
+  /// [op] when it is a known compare operator, else it throws an
+  /// [ArgumentError], so user input can not add sql to a where or join
+  String operator(dynamic op) {
+    String value = op.toString().trim();
+    if (!_operators.contains(value.toLowerCase())) {
+      throw ArgumentError.value(op, 'operator', 'is not allowed');
+    }
+    return value;
+  }
 
   /// count query do not need order by, limit and offset
   String getCommonQuery({bool isCountQuery = false}) {

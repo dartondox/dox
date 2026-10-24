@@ -64,10 +64,13 @@ class RoomsRouter implements Router {
   }
 }
 
+/// the tests join rooms, so allow every join.
+bool allowJoin(IDoxRequest req, String room) => true;
+
 class LocalWebsocketService implements DoxService {
   @override
   void setup() {
-    WebsocketServer(Dox());
+    WebsocketServer(Dox()).authorizeJoin = allowJoin;
   }
 }
 
@@ -281,5 +284,59 @@ void main() {
         await b.close();
       },
     );
+
+    test('joinRoom is refused when authorizeJoin is not set', () async {
+      WebsocketServer().authorizeJoin = null;
+      Client a = await Client.connect();
+      a.send('joinRoom', 'user:42');
+      await settle();
+      expect(WebsocketStorage().hasRoom('user:42'), isFalse);
+      WebsocketServer().authorizeJoin = allowJoin;
+      await a.close();
+    });
+
+    test('websocket from an origin not in allowedOrigins gets 403', () async {
+      WebsocketServer().allowedOrigins = <String>['http://allowed.test'];
+      await expectLater(
+        WebSocket.connect(
+          'ws://localhost:$port/ws',
+          headers: <String, String>{'origin': 'http://evil.test'},
+        ),
+        throwsA(isA<WebSocketException>()),
+      );
+      WebSocket ok = await WebSocket.connect(
+        'ws://localhost:$port/ws',
+        headers: <String, String>{'origin': 'http://allowed.test'},
+      );
+      await ok.close();
+      WebsocketServer().allowedOrigins = null;
+    });
+
+    test('a message bigger than maxMessageSize closes the socket', () async {
+      WebsocketServer().maxMessageSize = 100;
+      Client a = await Client.connect();
+      a.send('me', 'x' * 200);
+      await a.socket.done.timeout(Duration(seconds: 3));
+      expect(a.socket.closeCode, WebSocketStatus.messageTooBig);
+      WebsocketServer().maxMessageSize = 1024 * 1024;
+    });
+
+    test('websocket compression is off', () async {
+      HttpClient client = HttpClient();
+      HttpClientRequest req = await client.getUrl(
+        Uri.parse('http://localhost:$port/ws'),
+      );
+      req.headers
+        ..set('connection', 'Upgrade')
+        ..set('upgrade', 'websocket')
+        ..set('sec-websocket-key', 'dGhlIHNhbXBsZSBub25jZQ==')
+        ..set('sec-websocket-version', '13')
+        ..set('sec-websocket-extensions', 'permessage-deflate');
+      HttpClientResponse res = await req.close();
+      expect(res.statusCode, HttpStatus.switchingProtocols);
+      expect(res.headers.value('sec-websocket-extensions'), isNull);
+      (await res.detachSocket()).destroy();
+      client.close(force: true);
+    });
   });
 }

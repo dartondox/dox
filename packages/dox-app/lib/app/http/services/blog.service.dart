@@ -8,7 +8,6 @@ class BlogService {
   Future<Pagination<Blog>> listing(ListBlogs query) async {
     int offset = (query.page - 1) * query.limit;
     return Blog()
-        .withTrash(query.withTrashed)
         .limit(query.limit)
         .offset(offset)
         .orderBy('id')

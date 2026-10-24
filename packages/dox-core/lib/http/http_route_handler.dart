@@ -102,12 +102,14 @@ RouteData? _getMatchRoute(String inputRoute, String method, String? domain) {
   RouteData? exact = group.exact[inputRoute];
   if (exact != null) return exact;
   String? host = domain?.toLowerCase();
+  String? hostName = host == null ? null : _withoutPort(host);
 
   for (RouteData route in candidates) {
-    if (host != null &&
-        route.domain != null &&
-        route.domain!.toLowerCase() != host) {
-      continue;
+    /// a domain route needs a matching Host. no Host means no match.
+    /// the route domain may have a port (`localhost:3000`) or not.
+    if (route.domain != null) {
+      String want = route.domain!.toLowerCase();
+      if (host == null || (want != host && want != hostName)) continue;
     }
 
     /// route without params, eg. /api/example
@@ -130,4 +132,11 @@ RouteData? _getMatchRoute(String inputRoute, String method, String? domain) {
     }
   }
   return null;
+}
+
+/// `example.com:3000` gives `example.com`, `[::1]:3000` gives `[::1]`.
+String _withoutPort(String host) {
+  int end = host.startsWith('[') ? host.indexOf(']') + 1 : 0;
+  int colon = host.indexOf(':', end);
+  return colon == -1 ? host : host.substring(0, colon);
 }

@@ -110,6 +110,7 @@ The driver reads the normal fields of the `ConnectionConfig` (`host`,
 | `maxConnectionAge` | 12 hours | A connection older than this is closed and opened again. |
 | `preparedStatementCacheSize` | `100` | Prepared statements kept per connection. |
 | `threads` | `1` | Rust threads for all pools of the process. Only the first pool sets it. One thread is the fastest for most apps. |
+| `verifyCertificate` | `true` | With `useSSL`, TLS checks the server certificate. Set it to `false` only for a self-signed certificate in development. |
 
 Isolates that open a pool with the same settings share one pool in Rust.
 So `maxConnectionCount` is for the whole process, not per isolate. You can

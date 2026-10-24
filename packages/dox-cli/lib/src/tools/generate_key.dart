@@ -2,17 +2,22 @@ import 'dart:io';
 import 'dart:math';
 
 void generateKey() {
+  String secret = newKey();
+  print("\x1B[34m$secret : Key have been updated successfully in .env!\x1B[0m");
+  overrideKey(secret);
+}
+
+/// A new random key of 32 characters (A-Z, a-z, 0-9).
+String newKey() {
   const chars =
       'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   final random = Random.secure();
-  var secret = String.fromCharCodes(
+  return String.fromCharCodes(
     Iterable.generate(
       32,
       (_) => chars.codeUnitAt(random.nextInt(chars.length)),
     ),
   );
-  print("\x1B[34m$secret : Key have been updated successfully in .env!\x1B[0m");
-  overrideKey(secret);
 }
 
 /// Sets `APP_KEY` in `.env` to [secret].

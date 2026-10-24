@@ -84,7 +84,11 @@ void main() {
         };
       });
 
-      String cookieValue = AESEncryptor.encode(authKeyValue, config.appKey);
+      String cookieValue = AESEncryptor.encode(
+        authKeyValue,
+        config.appKey,
+        associatedData: 'auth-key',
+      );
 
       http.Response res = await http.post(
         Uri.parse('$baseUrl/get_cookies'),

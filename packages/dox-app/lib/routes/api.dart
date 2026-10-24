@@ -19,7 +19,15 @@ class ApiRouter extends Router {
 
     Route.get('ping', <dynamic>[api.pong]);
 
-    Route.resource('blogs', blogController);
+    // Anyone can read blogs. Only a logged in user can change them.
+    Route.get('blogs', blogController.index);
+    Route.get('blogs/{id}', blogController.show);
+    Route.middleware(<dynamic>[AuthMiddleware()], () {
+      Route.post('blogs', blogController.store);
+      Route.put('blogs/{id}', blogController.update);
+      Route.patch('blogs/{id}', blogController.update);
+      Route.delete('blogs/{id}', blogController.destroy);
+    });
 
     Route.post('/auth/login', authController.login);
     Route.post('/auth/register', authController.register);

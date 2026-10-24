@@ -40,7 +40,8 @@ String? theme = req.cookie('theme');                    // decrypted
 String? raw = req.cookie('theme', decrypt: false);      // as sent
 ```
 
-`req.cookie(key)` returns `null` when the cookie was changed, or was made with another `APP_KEY`.
+`req.cookie(key)` returns `null` when the cookie was changed, was made with another `APP_KEY`, or was made for another cookie name.
+The cookie name is bound to the encrypted value, so a value can not be copied from one cookie to another.
 
 ## How it works
 

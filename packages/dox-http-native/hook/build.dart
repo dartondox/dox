@@ -10,6 +10,8 @@
 // 2. A local build in `native/target/release` (for dev, same OS and CPU).
 // 3. The ready-built library from the GitHub release, checked with sha256.
 // 4. `cargo build` from source, when cargo is installed.
+// Outside the pub cache (this repo, or a path or git dependency), 4 comes
+// before 3, because the source may be newer than the release.
 // When none works, no asset is added. Dox then logs a warning and uses
 // dart:io instead. The build never fails because of this package.
 import 'dart:io';
@@ -45,12 +47,17 @@ void main(List<String> args) async {
     String fileName = os.dylibFileName('dox_http_native');
     bool host = os == OS.current && arch == Architecture.current;
     Uri native = input.packageRoot.resolve('native/');
+    // From pub.dev the source matches the release, so download first. In the
+    // repo, or as a path or git dependency, the source may be newer than the
+    // release (eg. a new ABI), so build it with cargo first.
+    bool published = input.packageRoot.pathSegments.contains('hosted');
 
     Uri? lib =
         _given(input) ??
         (host ? _local(native, fileName) : null) ??
-        await _download(input, os, arch, fileName) ??
-        (host ? await _cargo(input, native, fileName, output) : null);
+        (published ? await _download(input, os, arch, fileName) : null) ??
+        (host ? await _cargo(input, native, fileName, output) : null) ??
+        (published ? null : await _download(input, os, arch, fileName));
 
     if (lib == null) {
       stderr.writeln(
@@ -108,7 +115,9 @@ Future<Uri?> _download(
   if (file.existsSync() && _sha(file.readAsBytesSync()) == hash) {
     return file.uri;
   }
-  HttpClient client = HttpClient();
+  // a stalled download must not hang the build forever
+  HttpClient client = HttpClient()
+    ..connectionTimeout = const Duration(seconds: 30);
   try {
     HttpClientRequest req = await client.getUrl(
       Uri.parse('$_releases/dox_http_native-v$version/$asset'),
@@ -119,7 +128,9 @@ Future<Uri?> _download(
       return null;
     }
     List<int> bytes = <int>[
-      for (List<int> chunk in await res.toList()) ...chunk,
+      for (List<int> chunk
+          in await res.timeout(const Duration(seconds: 60)).toList())
+        ...chunk,
     ];
     if (_sha(bytes) != hash) {
       stderr.writeln('dox_http_native: sha256 of $asset does not match');
@@ -128,7 +139,7 @@ Future<Uri?> _download(
     file.parent.createSync(recursive: true);
     file.writeAsBytesSync(bytes);
     return file.uri;
-  } on IOException catch (error) {
+  } on Exception catch (error) {
     stderr.writeln('dox_http_native: download $asset failed: $error');
     return null;
   } finally {

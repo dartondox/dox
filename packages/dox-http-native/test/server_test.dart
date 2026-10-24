@@ -193,6 +193,57 @@ void main() {
     expect((await chunked.close()).statusCode, 413);
   });
 
+  test('multipart limit, 413 and idle body timeout', () async {
+    NativeHttpServer small = await NativeHttpServer.bind(
+      0,
+      maxBodySize: 10,
+      maxMultipartSize: 100,
+      bodyTimeout: const Duration(milliseconds: 200),
+    );
+    small.listen(handle);
+    String body = 'a' * 50;
+    String post(String type, int length) =>
+        'POST /echo HTTP/1.1\r\nHost: a\r\nConnection: close\r\n'
+        'Content-Type: $type\r\nContent-Length: $length\r\n\r\n';
+    String form = await raw(
+      small.port,
+      '${post('multipart/form-data', 50)}$body',
+    );
+    expect(form, startsWith('HTTP/1.1 200'));
+    String json = await raw(small.port, '${post('application/json', 50)}$body');
+    expect(json, startsWith('HTTP/1.1 413'));
+    // "Expect: 100-continue": the 413 comes before the body is sent
+    String early = await raw(
+      small.port,
+      post(
+        'application/json',
+        1 << 30,
+      ).replaceFirst('Host: a\r\n', 'Host: a\r\nExpect: 100-continue\r\n'),
+    );
+    expect(early, startsWith('HTTP/1.1 413'));
+    // a full body over the limit with HttpClient: 413, not a reset
+    HttpClientRequest req = await client.post('127.0.0.1', small.port, '/');
+    req.add(List<int>.filled(1 << 20, 1));
+    expect((await req.close()).statusCode, 413);
+    // slow but steady: 500 ms in all, never 200 ms without bytes
+    Socket steady = await Socket.connect('127.0.0.1', small.port);
+    steady.write(post('text/plain', 5));
+    for (int i = 0; i < 5; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      steady.write('a');
+      await steady.flush();
+    }
+    String out = latin1.decode(<int>[
+      for (List<int> c in await steady.toList()) ...c,
+    ]);
+    steady.destroy();
+    expect(out, startsWith('HTTP/1.1 200'));
+    // stalled: no more bytes, 408 after 200 ms
+    String slow = await raw(small.port, '${post('text/plain', 5)}ab');
+    expect(slow, startsWith('HTTP/1.1 408'));
+    await small.close();
+  });
+
   test('a large body and response (5 MB)', () async {
     NativeHttpServer big = await start(0, maxBodySize: 10 << 20);
     List<int> body = List<int>.generate(5 << 20, (int i) => i % 251);

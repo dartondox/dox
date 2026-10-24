@@ -165,7 +165,7 @@ DB_NAME=storage/app.db # file path, made if missing
 - The default port is `5432` for Postgres and `3306` for MySQL.
 - One run uses one database connection.
 - A `DB_HOST` that starts with `/` is a Unix socket: the socket folder for Postgres, the socket file for MySQL. Eg. `/cloudsql/project:region:instance`.
-- Migrations use TLS only with a `DATABASE_URL` that has `sslmode` (Postgres) or `ssl` (MySQL), like `?sslmode=require`.
+- Migrations use TLS only with a `DATABASE_URL` that has `sslmode` (Postgres) or `ssl` (MySQL), like `?sslmode=require`. For Postgres, `require` encrypts but does not check the server certificate, and `verify-full` checks it. MySQL `ssl=true` checks it. Add `&verifyCertificate=false` only for a self-signed certificate in development.
   You can also give your own connection: `Migrator(migrations: migrations, connection: myPool)`.
 
 ## Transactions

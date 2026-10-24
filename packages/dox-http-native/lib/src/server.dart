@@ -60,11 +60,20 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
   /// Listen on [port]. With no [address] it listens on all interfaces
   /// (IPv6 and IPv4). [address] is an [InternetAddress] or a host name
   /// like `127.0.0.1` or `localhost`, the same as `HttpServer.bind`.
-  /// Bodies bigger than [maxBodySize] bytes get 413 from Rust.
+  /// Bodies bigger than [maxBodySize] bytes get 413 from Rust. A
+  /// multipart form (`multipart/form-data`) may be up to
+  /// [maxMultipartSize] bytes instead (default: [maxBodySize]). A body
+  /// with a bigger `Content-Length` and `Expect: 100-continue` gets 413
+  /// before it is sent. Any other too big body is read and dropped first,
+  /// so the client sees the 413 and not a reset.
+  /// A client that sends no body bytes for [bodyTimeout] (idle time) gets
+  /// 408. A slow but steady upload is fine.
   static Future<NativeHttpServer> bind(
     int port, {
     Object? address,
     int maxBodySize = 100 * 1024 * 1024,
+    int? maxMultipartSize,
+    Duration bodyTimeout = const Duration(seconds: 120),
   }) async {
     if (!isAvailable) {
       throw UnsupportedError('dox_http_native is not available: $_loadError');
@@ -88,6 +97,8 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
       port,
       receive.sendPort.nativePort,
       maxBodySize,
+      maxMultipartSize ?? maxBodySize,
+      bodyTimeout.inMilliseconds,
       family,
       hi,
       lo,

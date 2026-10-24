@@ -17,8 +17,9 @@ class MysqlNativeDriver extends DBDriver {
   /// Makes the pool from a Dox [ConnectionConfig]. Reads
   /// `maxConnectionCount` (default 10), `maxConnectionAge` (default 12
   /// hours), `preparedStatementCacheSize` (default 100) and `threads`
-  /// (default 1) from `extra`. `useSSL` turns on TLS. A host that starts
-  /// with `/` is a Unix socket file.
+  /// (default 1) from `extra`. `useSSL` turns on TLS, and the server
+  /// certificate is checked unless `extra['verifyCertificate']` is false.
+  /// A host that starts with `/` is a Unix socket file.
   factory MysqlNativeDriver.fromConfig(ConnectionConfig config) {
     Map<String, dynamic> extra = config.extra;
     return MysqlNativeDriver(
@@ -29,6 +30,7 @@ class MysqlNativeDriver extends DBDriver {
         password: config.password,
         database: config.database,
         secure: config.useSSL,
+        verifyCertificate: config.verifyCertificate,
         maxConnections: extra['maxConnectionCount'] as int? ?? 10,
         maxConnectionAge:
             extra['maxConnectionAge'] as Duration? ?? const Duration(hours: 12),

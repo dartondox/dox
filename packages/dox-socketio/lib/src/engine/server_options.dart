@@ -1,6 +1,9 @@
 import '../constants/engine_constants.dart';
 
 /// CORS settings for the HTTP long-polling requests.
+///
+/// When [origins] does not have `*`, a websocket from another origin is
+/// refused with 403.
 class CorsOptions {
   const CorsOptions({
     this.origins = const <String>['*'],
@@ -10,7 +13,8 @@ class CorsOptions {
     this.maxAge,
   });
 
-  /// Allowed origins. `*` allows any origin.
+  /// Allowed origins. `*` allows any origin. `*` can not be used with
+  /// [credentials].
   final List<String> origins;
 
   /// Send `Access-Control-Allow-Credentials: true`.
@@ -61,6 +65,9 @@ class ServerOptions {
   final Duration connectTimeout;
 
   /// Biggest message (in bytes) a client may send.
+  ///
+  /// A bigger websocket message closes the connection. dart:io reads the
+  /// whole message before this check, so also set a limit in your proxy.
   final int maxHttpBufferSize;
 
   /// Allowed transports.
@@ -69,6 +76,7 @@ class ServerOptions {
   /// Allow upgrades from polling to websocket.
   final bool allowUpgrades;
 
-  /// CORS settings. When null, no CORS headers are sent.
+  /// CORS settings. When null, no CORS headers are sent and websockets
+  /// from any origin are allowed.
   final CorsOptions? cors;
 }

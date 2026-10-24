@@ -22,4 +22,18 @@ void main() {
     expect(binary.readAsBytesSync(), bytes);
     expect(same.lastModifiedSync(), before);
   });
+
+  test('createEnv copies .env.example to .env with a new APP_KEY', () {
+    Directory dir = Directory.systemTemp.createTempSync('dox_create_');
+    addTearDown(() => dir.deleteSync(recursive: true));
+    File('${dir.path}/.env.example')
+        .writeAsStringSync('APP_NAME=dox\nAPP_KEY=\nAPP_PORT=3000\n');
+
+    createEnv(dir);
+
+    List<String> lines = File('${dir.path}/.env').readAsLinesSync();
+    expect(lines[0], 'APP_NAME=dox');
+    expect(lines[1], matches(RegExp(r'^APP_KEY=[A-Za-z0-9]{32}$')));
+    expect(lines[2], 'APP_PORT=3000');
+  });
 }

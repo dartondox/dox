@@ -37,7 +37,7 @@ use std::time::Duration;
 use bytes::Bytes;
 use http_body_util::{BodyExt, Full};
 use hyper::body::{Body, Incoming};
-use hyper::header::{CONTENT_LENGTH, EXPECT, HeaderName, HeaderValue};
+use hyper::header::{CONTENT_LENGTH, CONTENT_TYPE, EXPECT, HeaderName, HeaderValue};
 use hyper::server::conn::http1;
 use hyper::service::service_fn;
 use hyper::{Request, Response, StatusCode, Version};
@@ -50,12 +50,15 @@ use tokio::sync::{Notify, oneshot};
 use tokio::task::JoinSet;
 
 /// Bump when the FFI functions or the record layout change.
-const ABI_VERSION: i32 = 3;
+const ABI_VERSION: i32 = 4;
 /// Max size of the request line plus headers. Bigger gets 431.
 const MAX_HEAD: usize = 16 * 1024;
 const RES_HEAD: usize = 20;
 /// Bytes a too big body may still send before the connection is closed.
 const DRAIN_MAX: usize = 64 * 1024 * 1024;
+/// Most memory we reserve up front for a body. `Content-Length` comes from
+/// the client, so a bigger body grows the buffer only as bytes arrive.
+const MAX_RESERVE: u64 = 64 * 1024;
 
 // ---- Dart API DL -------------------------------------------------------
 // `NativeApi.initializeApiDLData` points to this table. We only need
@@ -167,9 +170,33 @@ struct Ctx {
     pending: RefCell<Slab<oneshot::Sender<Answer>>>,
     batch: RefCell<Vec<u8>>,
     notify: Notify,
-    max_body: usize,
+    limits: Limits,
     /// tells every open connection to close after its current request
     closing: Notify,
+}
+
+/// Body limits of one server.
+#[derive(Clone, Copy)]
+struct Limits {
+    /// max bytes of a body that is not a multipart form
+    body: usize,
+    /// max bytes of a multipart form (file uploads)
+    multipart: usize,
+    /// max idle time with no body bytes. Longer gets 408.
+    timeout: Duration,
+}
+
+impl Limits {
+    /// The max body size for a request with these headers. Only a
+    /// multipart form gets the bigger limit, the same check as Dart.
+    fn max_for(&self, headers: &hyper::HeaderMap) -> usize {
+        let form = headers
+            .get(CONTENT_TYPE)
+            .and_then(|v| v.to_str().ok())
+            .and_then(|v| v.split(';').next())
+            .is_some_and(|m| m.to_ascii_lowercase().contains("form-data"));
+        if form { self.multipart } else { self.body }
+    }
 }
 
 /// The address to listen on: (family, high 64 bits, low 64 bits, port).
@@ -436,13 +463,13 @@ async fn connection(stream: TcpStream, peer: [u8; 18], ctx: Rc<Ctx>) {
 }
 
 /// Runs one server until it stops, then frees its port.
-async fn run_server(listener: StdListener, server: Arc<Server>, dart_port: i64, max_body: usize) {
+async fn run_server(listener: StdListener, server: Arc<Server>, dart_port: i64, limits: Limits) {
     let ctx = Rc::new(Ctx {
         server,
         pending: RefCell::new(Slab::with_capacity(1024)),
         batch: RefCell::new(Vec::with_capacity(1 << 16)),
         notify: Notify::new(),
-        max_body,
+        limits,
         closing: Notify::new(),
     });
     serve(listener, ctx, dart_port).await;
@@ -479,13 +506,13 @@ fn start_shared(
     listener: StdListener,
     server: Arc<Server>,
     dart_port: i64,
-    max_body: usize,
+    limits: Limits,
 ) -> bool {
     let (done_tx, done_rx) = mpsc::channel();
     *server.done.lock().unwrap() = Some(done_rx);
     let job: Job = Box::new(move || {
         tokio::task::spawn_local(async move {
-            run_server(listener, server, dart_port, max_body).await;
+            run_server(listener, server, dart_port, limits).await;
             // also runs for a killed isolate, which never calls dox_stop
             leave_shared();
             let _ = done_tx.send(());
@@ -536,21 +563,28 @@ async fn handle(
     ctx: Rc<Ctx>,
     peer: [u8; 18],
 ) -> Result<Answer, Infallible> {
-    let declared = req
-        .headers()
+    let (parts, body) = req.into_parts();
+    let max = ctx.limits.max_for(&parts.headers);
+    let declared = parts
+        .headers
         .get(CONTENT_LENGTH)
         .and_then(|v| v.to_str().ok())
         .and_then(|v| v.parse::<u64>().ok());
-    if declared.is_some_and(|n| n > ctx.max_body as u64) && req.headers().contains_key(EXPECT) {
-        // the client waits for "100 Continue": say no before it sends the body
+    let waits = parts
+        .headers
+        .get(EXPECT)
+        .is_some_and(|v| v.as_bytes().eq_ignore_ascii_case(b"100-continue"));
+    if waits && declared.is_some_and(|n| n > max as u64) {
+        // too big, and the client waits for our go before it sends the
+        // body: say no at once. Any other client is already sending, so
+        // read_body drops its bytes first. Else it sees a reset, not 413.
         return Ok(simple(StatusCode::PAYLOAD_TOO_LARGE));
     }
-    let (parts, body) = req.into_parts();
     let body = if body.is_end_stream() {
         Vec::new()
     } else {
-        let hint = declared.unwrap_or(0).min(ctx.max_body as u64) as usize;
-        match read_body(body, ctx.max_body, hint).await {
+        let hint = declared.unwrap_or(0).min(MAX_RESERVE) as usize;
+        match read_body(body, max, hint, ctx.limits.timeout).await {
             Ok(b) => b,
             Err(code) => return Ok(simple(code)),
         }
@@ -578,10 +612,20 @@ async fn handle(
 /// Reads the whole body. Over `max` bytes it keeps reading (and drops the
 /// bytes) up to DRAIN_MAX more, so the client can finish sending and read
 /// the 413. Closing at once gives the client a broken pipe instead.
-async fn read_body(mut body: Incoming, max: usize, hint: usize) -> Result<Vec<u8>, StatusCode> {
+/// No new bytes for `idle` gives 408. A slow but steady upload is fine.
+async fn read_body(
+    mut body: Incoming,
+    max: usize,
+    hint: usize,
+    idle: Duration,
+) -> Result<Vec<u8>, StatusCode> {
     let mut buf = Vec::with_capacity(hint);
     let mut seen = 0usize;
-    while let Some(frame) = body.frame().await {
+    loop {
+        let Ok(frame) = tokio::time::timeout(idle, body.frame()).await else {
+            return Err(StatusCode::REQUEST_TIMEOUT);
+        };
+        let Some(frame) = frame else { break };
         let Ok(frame) = frame else {
             return Err(StatusCode::BAD_REQUEST);
         };
@@ -744,6 +788,8 @@ pub unsafe extern "C" fn dox_init(data: *mut c_void) -> i32 {
 /// Binds `port` and starts a server thread that posts to `send_port`.
 /// `family`, `addr_hi` and `addr_lo` are the host, see [Key]. Family 0 is
 /// all interfaces.
+/// Bodies over `max_body` bytes (`max_multipart` for a multipart form) get
+/// 413. A body with no new bytes for `body_timeout_ms` gets 408.
 /// Returns a handle (> 0), or < 0: -1 not initialized, -(1000 + errno)
 /// when the bind fails.
 #[unsafe(no_mangle)]
@@ -751,6 +797,8 @@ pub extern "C" fn dox_start(
     port: i32,
     send_port: i64,
     max_body: i64,
+    max_multipart: i64,
+    body_timeout_ms: i64,
     family: i32,
     addr_hi: u64,
     addr_lo: u64,
@@ -763,9 +811,13 @@ pub extern "C" fn dox_start(
         Err(e) => return -(1000 + i64::from(e.raw_os_error().unwrap_or(0))),
     };
     let server = Arc::new(Server::new(key));
-    let max_body = max_body.max(0) as usize;
+    let limits = Limits {
+        body: max_body.max(0) as usize,
+        multipart: max_multipart.max(0) as usize,
+        timeout: Duration::from_millis(body_timeout_ms.max(0) as u64),
+    };
     if shared_thread() {
-        if !start_shared(listener, server.clone(), send_port, max_body) {
+        if !start_shared(listener, server.clone(), send_port, limits) {
             return -2;
         }
         return Arc::into_raw(server) as i64;
@@ -776,7 +828,7 @@ pub extern "C" fn dox_start(
         .spawn(move || {
             let rt = new_runtime();
             let local = tokio::task::LocalSet::new();
-            local.block_on(&rt, run_server(listener, for_thread, send_port, max_body));
+            local.block_on(&rt, run_server(listener, for_thread, send_port, limits));
             drop(local); // closes what is left (lingering closes)
         });
     match thread {
@@ -912,7 +964,11 @@ mod tests {
                 pending: RefCell::new(Slab::new()),
                 batch: RefCell::new(Vec::new()),
                 notify: Notify::new(),
-                max_body: 10,
+                limits: Limits {
+                    body: 10,
+                    multipart: 20,
+                    timeout: Duration::from_millis(20), // below PROBE
+                },
                 closing: Notify::new(),
             });
             local.block_on(&rt, serve(listener, ctx, 0));
@@ -947,6 +1003,49 @@ mod tests {
         );
         let body = b"POST / HTTP/1.1\r\nHost: a\r\nContent-Length: 11\r\nConnection: close\r\n\r\nhello world";
         assert!(send(port, body).starts_with("HTTP/1.1 413"), "413");
+    }
+
+    /// Sends a 20 byte body (over the limit) in 2 byte parts, 4 ms apart.
+    fn slow_send(port: u16) -> String {
+        use std::io::{Read, Write};
+        let mut s = std::net::TcpStream::connect(("127.0.0.1", port)).unwrap();
+        s.set_read_timeout(Some(Duration::from_secs(3))).unwrap();
+        s.set_nodelay(true).unwrap();
+        s.write_all(b"POST / HTTP/1.1\r\nHost: a\r\nContent-Length: 20\r\n\r\n")
+            .unwrap();
+        for _ in 0..10 {
+            std::thread::sleep(Duration::from_millis(4));
+            s.write_all(b"ab").unwrap();
+        }
+        let mut out = Vec::new();
+        let _ = s.read_to_end(&mut out);
+        String::from_utf8_lossy(&out).into_owned()
+    }
+
+    #[test]
+    fn body_limits_and_timeout() {
+        // a new server each time: with no Dart side it stops after PROBE
+        // too big and the client waits for "100 Continue": 413 at once
+        let head = b"POST / HTTP/1.1\r\nHost: a\r\nExpect: 100-continue\r\nContent-Length: 1000000000\r\n\r\n";
+        assert!(
+            send(start_bare(), head).starts_with("HTTP/1.1 413"),
+            "early 413"
+        );
+        // too big, whole body sent: read and dropped, then 413 (no reset)
+        let full = b"POST / HTTP/1.1\r\nHost: a\r\nContent-Length: 15\r\n\r\n123456789012345";
+        assert!(send(start_bare(), full).starts_with("HTTP/1.1 413"), "413");
+        // slow but steady: 40 ms in all, but never 20 ms without bytes
+        let r = slow_send(start_bare());
+        assert!(r.starts_with("HTTP/1.1 413"), "steady {r:?}");
+        // a stalled body gets 408 after the idle timeout
+        let slow = b"POST / HTTP/1.1\r\nHost: a\r\nContent-Length: 5\r\n\r\nab";
+        assert!(send(start_bare(), slow).starts_with("HTTP/1.1 408"), "408");
+        // a multipart form may be bigger (15 > 10): no 413, it waits for the body
+        let form = b"POST / HTTP/1.1\r\nHost: a\r\nContent-Type: multipart/form-data; boundary=x\r\nContent-Length: 15\r\n\r\n";
+        assert!(
+            send(start_bare(), form).starts_with("HTTP/1.1 408"),
+            "multipart limit"
+        );
     }
 
     #[test]

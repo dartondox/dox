@@ -167,7 +167,10 @@ class ChatNamespace extends NamespaceHandler {
 io.register(ChatNamespace(MessageService()));
 ```
 
-When a middleware throws, the client gets `connect_error` with the message and the data.
+When a middleware throws a `SocketIoException`, the client gets `connect_error` with the message and the data.
+Any other error is written to stderr. The client only gets `{"message": "Internal error"}`, so it can not see private text like SQL.
+
+A client that is refused is still closed after `connectTimeout`, unless it joins another namespace.
 
 ## Node.js to Dart
 
@@ -210,10 +213,15 @@ SocketIoServer(
 | `pingTimeout` | 20 s | how long to wait for the pong before the client is gone |
 | `upgradeTimeout` | 10 s | how long an upgrade from polling to websocket may take |
 | `connectTimeout` | 45 s | how long the client has to join a namespace |
-| `maxHttpBufferSize` | 1,000,000 bytes | the biggest message |
+| `maxHttpBufferSize` | 1,000,000 bytes | the biggest message. A bigger websocket message closes the connection |
 | `transports` | `['polling', 'websocket']` | allowed transports |
 | `allowUpgrades` | `true` | let polling clients move to websocket |
-| `cors` | `null` | CORS headers for polling requests |
+| `cors` | `null` | CORS headers for polling requests. It also checks the origin of websockets |
+
+- `cors` with a list of origins: a websocket from another origin gets 403. A request with no `Origin` header (not a browser) is allowed.
+- `cors: null`, or `*` in `origins`: websockets from any origin are allowed. If you log users in with cookies, list your origins.
+- `*` together with `credentials: true` throws an `ArgumentError`. List your origins instead.
+- Websocket compression is off. dart:io reads a whole message before Dox checks its size, so also set a size limit in your proxy.
 
 ## Many servers: Redis adapter
 

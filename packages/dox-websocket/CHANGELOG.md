@@ -1,5 +1,9 @@
 ## Unreleased
 
+- Breaking: `joinRoom` is refused unless you set `WebsocketServer().authorizeJoin`. Before, any client could join any room, like `user:42`, and get its messages.
+- Security: new `WebsocketServer().allowedOrigins`. When set, a websocket from another origin gets 403. When null (the default), any origin is allowed.
+- Security: websocket compression is off, and a message bigger than `WebsocketServer().maxMessageSize` (default 1 MB) closes the connection with code 1009.
+
 - Security: a client can not `joinRoom` a room that starts with `room:`. That is the default room of a route, so a client of a public route could join the room of a route with auth middleware and get all its messages.
 - Security: a room with no members is removed, and a room name longer than 255 chars is not joined. Before, every room name a client sent stayed in memory, so one client could fill the memory of the server.
 

@@ -17,8 +17,10 @@ abstract class FileInput {
 /// Finds the real type of a file from its first bytes ("magic bytes").
 ///
 /// The file name and the content type from the client are not trusted.
-/// Only a type without a byte signature (like `txt` or `csv`) is matched
-/// by the file name extension.
+/// The file name extension must not be another known type or a type a
+/// browser runs, so `x.html` with GIF bytes is not a `gif`. An empty or
+/// unknown extension (like a `blob` upload) is fine when the bytes match. A type without a byte signature (like `txt` or
+/// `csv`) is matched by the file name extension only.
 class FileTypes {
   const FileTypes._();
 
@@ -96,11 +98,32 @@ class FileTypes {
       if (format == null) {
         // no byte signature: trust the name, but only for non-binary bytes
         if (found == null && name == ext) return true;
-      } else if (format == found) {
+      } else if (format == found && _nameFits(name, format)) {
         if (!_containers.contains(format) || name == ext) return true;
       }
     }
     return false;
+  }
+
+  /// Extensions a browser may run as a page or script.
+  static const Set<String> _active = <String>{
+    'html',
+    'htm',
+    'xhtml',
+    'svg',
+    'xml',
+    'js',
+    'mjs',
+  };
+
+  /// `false` when the client extension [name] is another known format, or
+  /// a type a browser runs, so `x.html` with GIF bytes does not pass as
+  /// `gif`. An empty or unknown extension is fine: browsers name canvas
+  /// and fetch uploads `blob`.
+  static bool _nameFits(String name, String format) {
+    String? named = _formats[name];
+    if (named != null) return named == format;
+    return !_active.contains(name);
   }
 
   /// The byte format of [head], like `png` or `zip`. `null` when unknown.

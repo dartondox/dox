@@ -65,7 +65,9 @@ class DbConnection {
 
     if (c.driver == Driver.mysql) {
       // caching_sha2_password (mysql 8 default) without TLS needs the
-      // server RSA key to send the password, so ask the server for it.
+      // server RSA key to send the password. see
+      // ConnectionConfig.mysqlAllowPublicKeyRetrieval for when we ask the
+      // server for it.
       mysql.MySQLConnection conn = await mysql.MySQLConnection.createConnection(
         host: c.mysqlHost,
         port: c.mysqlPort,
@@ -73,7 +75,9 @@ class DbConnection {
         password: c.password,
         databaseName: c.database,
         secure: c.useSSL,
-        allowPublicKeyRetrieval: true,
+        onBadCertificate: c.mysqlAcceptBadCertificate,
+        allowPublicKeyRetrieval: c.mysqlAllowPublicKeyRetrieval,
+        serverPublicKey: c.extra['serverPublicKey'],
       );
       await conn.connect();
       return DbConnection(conn);
@@ -82,11 +86,7 @@ class DbConnection {
     return DbConnection(
       await postgres.Connection.open(
         c.postgresEndpoint,
-        settings: postgres.ConnectionSettings(
-          sslMode:
-              c.extra['sslMode'] as postgres.SslMode? ??
-              (c.useSSL ? postgres.SslMode.require : postgres.SslMode.disable),
-        ),
+        settings: postgres.ConnectionSettings(sslMode: c.postgresSslMode),
       ),
     );
   }

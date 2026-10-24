@@ -35,12 +35,12 @@ dox create new_blog
 [dox-sample](https://github.com/dartondox/dox-sample), the starter project.
 To get one exact version, add `--version`, for example `dox create new_blog --version 3.0.0-alpha.5`.
 
-Then get the packages and make your `.env` file:
+It also makes your `.env` file from `.env.example`, with a new random `APP_KEY`.
+Then get the packages:
 
 ```bash
 cd new_blog
 dart pub get
-cp .env.example .env
 ```
 
 The starter project uses SQLite, so there is no database to install.

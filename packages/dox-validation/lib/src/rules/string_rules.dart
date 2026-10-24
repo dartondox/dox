@@ -131,18 +131,24 @@ class DateTimeStringRule extends BuiltInRule<String> {
 }
 
 /// Text must be a URL with a scheme and a host, like `https://x.dev`.
+///
+/// Only [schemes] are allowed. The default is `http` and `https`, so a
+/// `javascript:` link does not pass.
 class UrlRule extends BuiltInRule<String> {
-  UrlRule({super.message})
+  UrlRule({this.schemes = const <String>['http', 'https'], super.message})
     : super(
         IssueCodes.url,
         DefaultMessages.url,
         json: <String, dynamic>{'format': 'uri'},
       );
 
+  /// The allowed schemes, in lower case.
+  final List<String> schemes;
+
   @override
   bool check(String value, RuleContext context) {
     Uri? uri = Uri.tryParse(value);
-    return uri != null && uri.hasScheme && uri.hasAuthority;
+    return uri != null && schemes.contains(uri.scheme) && uri.host.isNotEmpty;
   }
 }
 

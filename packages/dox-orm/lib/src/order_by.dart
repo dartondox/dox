@@ -28,4 +28,14 @@ mixin OrderBy<T> implements SharedMixin<T> {
     );
     return queryBuilder;
   }
+
+  /// order by raw query, nothing is quoted. never put user input in it.
+  ///
+  /// ```
+  /// List blogs = await Blog().orderByRaw('count(*) desc').get()
+  /// ```
+  QueryBuilder<T> orderByRaw(String query) {
+    _orderBy.add(query);
+    return queryBuilder;
+  }
 }

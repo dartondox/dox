@@ -232,5 +232,54 @@ void main() {
         'attachment; filename="${data['url'].toString().split('/').last}"',
       );
     });
+
+    test('uploaded html is served as a sandboxed download', () async {
+      Route.post('/html/upload', (DoxRequest req) async {
+        RequestFile file = req.input('page');
+        return await Storage().putRequestFile('images', file);
+      });
+      Route.files('html-files', signed: false);
+
+      http.MultipartRequest upload =
+          http.MultipartRequest('POST', Uri.parse('$baseUrl/html/upload'))
+            ..files.add(
+              http.MultipartFile.fromString(
+                'page',
+                '<script>alert(1)</script>',
+                filename: 'x.html',
+              ),
+            );
+      String key = await (await upload.send()).stream.bytesToString();
+      expect(key, endsWith('.html'));
+
+      http.Response res = await http.get(Uri.parse('$baseUrl/html-files$key'));
+      expect(res.statusCode, 200);
+      expect(res.headers['content-disposition'], 'attachment');
+      expect(res.headers['content-security-policy'], 'sandbox');
+      expect(res.headers['x-content-type-options'], 'nosniff');
+    });
+
+    test(
+      'many backslashes in a part header do not freeze the server',
+      () async {
+        Route.post('/redos', (DoxRequest req) => 'ok');
+
+        String boundary = 'dox-boundary';
+        String body =
+            '--$boundary\r\n'
+            'Content-Disposition: form-data; name="${'\\' * 60}\r\n\r\n'
+            'x\r\n--$boundary--\r\n';
+        http.Response res = await http
+            .post(
+              Uri.parse('$baseUrl/redos'),
+              headers: <String, String>{
+                'content-type': 'multipart/form-data; boundary=$boundary',
+              },
+              body: body,
+            )
+            .timeout(const Duration(seconds: 5));
+        expect(res.statusCode, isNot(200));
+      },
+    );
   });
 }

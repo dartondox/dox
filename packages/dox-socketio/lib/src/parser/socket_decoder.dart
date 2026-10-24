@@ -10,9 +10,13 @@ import 'socket_packet.dart';
 class SocketDecoder {
   /// [maxAttachments] is the most binary parts one packet may have.
   /// The parts are kept in memory until the last one comes.
-  SocketDecoder({this.maxAttachments = 10});
+  ///
+  /// [maxDepth] is the deepest nesting of lists and maps in a binary
+  /// packet. Deeper data is refused, so it can not overflow the stack.
+  SocketDecoder({this.maxAttachments = 10, this.maxDepth = 32});
 
   final int maxAttachments;
+  final int maxDepth;
 
   SocketPacket? _pending;
   int _expected = 0;
@@ -48,7 +52,7 @@ class SocketDecoder {
 
   SocketPacket _finish() {
     SocketPacket packet = _pending!;
-    Object? data = _reconstruct(packet.data);
+    Object? data = _reconstruct(packet.data, 0);
     _pending = null;
     _buffers.clear();
     return SocketPacket(
@@ -59,8 +63,14 @@ class SocketDecoder {
     );
   }
 
-  Object? _reconstruct(Object? data) {
-    if (data is List) return data.map(_reconstruct).toList();
+  Object? _reconstruct(Object? data, int depth) {
+    if (data is! List && data is! Map) return data;
+    if (depth >= maxDepth) throw const FormatException('nested too deep');
+    if (data is List) {
+      return <Object?>[
+        for (Object? item in data) _reconstruct(item, depth + 1),
+      ];
+    }
     if (data is Map) {
       if (data[placeholderKey] == true) {
         Object? num = data['num'];
@@ -69,13 +79,12 @@ class SocketDecoder {
         }
         return _buffers[num];
       }
-      return data.map(_reconstructEntry);
+      return <String, Object?>{
+        for (MapEntry<dynamic, dynamic> entry in data.entries)
+          entry.key.toString(): _reconstruct(entry.value, depth + 1),
+      };
     }
     return data;
-  }
-
-  MapEntry<String, Object?> _reconstructEntry(Object? key, Object? value) {
-    return MapEntry<String, Object?>(key.toString(), _reconstruct(value));
   }
 
   /// Decodes the text part of a packet.

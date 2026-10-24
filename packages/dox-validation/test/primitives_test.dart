@@ -72,6 +72,18 @@ void main() {
       expect(v.string().url().safeParse('https://dartondox.dev').success, true);
       expect(v.string().url().safeParse('just text').success, false);
       expect(
+        v.string().url().safeParse('javascript://x.com/%0aalert(1)').success,
+        false,
+      );
+      expect(
+        v
+            .string()
+            .url(schemes: <String>['ftp'])
+            .safeParse('ftp://x.dev')
+            .success,
+        true,
+      );
+      expect(
         v
             .string()
             .uuid()
@@ -237,6 +249,25 @@ void main() {
         v.file().extensions(<String>['csv']).safeParse(FakeFile('csv')).success,
         true,
       );
+    });
+
+    test('file extension must fit the bytes', () {
+      // GIF bytes in a file named `.html` must not pass as an image
+      List<int> gif = 'GIF89a'.codeUnits;
+      expect(FileTypes.matches(FakeFile('html', gif), <String>['gif']), false);
+      expect(FileTypes.matches(FakeFile('gif', gif), <String>['gif']), true);
+      // another known type or a type the browser runs is refused
+      expect(FileTypes.matches(FakeFile('png', gif), <String>['gif']), false);
+      for (String name in <String>['htm', 'svg', 'xml', 'js', 'mjs']) {
+        expect(FileTypes.matches(FakeFile(name, gif), <String>['gif']), false);
+      }
+      // canvas and fetch uploads are named `blob`: no or unknown extension
+      // is fine when the bytes match
+      expect(FileTypes.matches(FakeFile('', gif), <String>['gif']), true);
+      expect(FileTypes.matches(FakeFile('blob', gif), <String>['gif']), true);
+      // aliases still work: a `.jpeg` file passes as `jpg`
+      List<int> jpg = <int>[0xFF, 0xD8, 0xFF, 0xE0];
+      expect(FileTypes.matches(FakeFile('jpeg', jpg), <String>['jpg']), true);
     });
   });
 

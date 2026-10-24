@@ -13,10 +13,7 @@ class ListBlogs {
   @Range(1, 100)
   final int limit;
 
-  /// Also list deleted blogs.
-  final bool withTrashed;
-
-  const ListBlogs({this.page = 1, this.limit = 20, this.withTrashed = false});
+  const ListBlogs({this.page = 1, this.limit = 20});
 
   static const DtoSchema<ListBlogs> schema = $ListBlogsDto;
 }

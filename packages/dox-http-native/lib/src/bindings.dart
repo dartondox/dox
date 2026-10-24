@@ -4,7 +4,7 @@ import 'dart:ffi';
 /// the library as the code asset of this file.
 
 /// The ABI version the Dart side expects. Must match `ABI_VERSION` in Rust.
-const int abiVersion = 3;
+const int abiVersion = 4;
 
 @Native<Int32 Function()>(symbol: 'dox_version', isLeaf: true)
 external int doxVersion();
@@ -13,13 +13,15 @@ external int doxVersion();
 external int doxInit(Pointer<Void> dlData);
 
 /// [family] 0 is all interfaces, 4 is IPv4 (in [addrLo]), 6 is IPv6.
-@Native<Int64 Function(Int32, Int64, Int64, Int32, Uint64, Uint64)>(
-  symbol: 'dox_start',
-)
+@Native<
+  Int64 Function(Int32, Int64, Int64, Int64, Int64, Int32, Uint64, Uint64)
+>(symbol: 'dox_start')
 external int doxStart(
   int port,
   int sendPort,
   int maxBody,
+  int maxMultipart,
+  int bodyTimeoutMs,
   int family,
   int addrHi,
   int addrLo,
