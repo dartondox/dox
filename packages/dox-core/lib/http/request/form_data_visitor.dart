@@ -18,7 +18,10 @@ class FormDataVisitor {
 
   final RegExp _token = RegExp(r'[^()<>@,;:"\\/[\]?={} \t\x00-\x1F\x7F]+');
   final RegExp _whitespace = RegExp(r'(?:(?:\r\n)?[ \t]+)*');
-  final RegExp _quotedString = RegExp(r'"(?:[^"\x00-\x1F\x7F]|\\.)*"');
+
+  /// a backslash only matches the `\\.` branch. when both branches can
+  /// take it, a long run of backslashes backtracks for hours (ReDoS).
+  final RegExp _quotedString = RegExp(r'"(?:[^"\\\x00-\x1F\x7F]|\\.)*"');
   final RegExp _quotedPair = RegExp(r'\\(.)');
 
   final Map<String, dynamic> inputs = <String, dynamic>{};

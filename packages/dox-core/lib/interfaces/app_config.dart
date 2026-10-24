@@ -71,6 +71,12 @@ class AppConfig {
   /// Bigger bodies get 413 Payload Too Large. Default 100 MB.
   final int maxMultipartSize;
 
+  /// Idle time with no body bytes. A client that sends no request body
+  /// bytes for this long gets 408 Request Timeout. A slow but steady
+  /// upload is fine. It stops clients that hold a connection open.
+  /// Native server only. Default 120 seconds.
+  final Duration bodyTimeout;
+
   /// IPs or CIDR ranges of reverse proxies (nginx, Caddy, load balancer)
   /// that Dox trusts. Only when the direct client is in this list does Dox
   /// read `X-Forwarded-For` for `req.ip()` and `X-Forwarded-Proto` for
@@ -122,6 +128,7 @@ class AppConfig {
     this.responseHandler,
     this.maxBodySize = 10 * 1024 * 1024,
     this.maxMultipartSize = 100 * 1024 * 1024,
+    this.bodyTimeout = const Duration(seconds: 120),
     this.trustedProxies = const <String>[],
     this.compress = false,
     this.server = ServerBackend.native,

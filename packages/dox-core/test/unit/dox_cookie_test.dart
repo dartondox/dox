@@ -9,19 +9,45 @@ void main() {
       Dox().config = config;
       DoxCookie cookie = DoxCookie('x-auth', 'Bearerxxxxxxxxx');
       String cookieValue = cookie.get();
-      RegExpMatch m = RegExp(r'^x-auth=(.+); Max-Age=3600$')
+      RegExpMatch m = RegExp(r'^x-auth=(.+); Max-Age=3600; HttpOnly$')
           .firstMatch(cookieValue)!;
       expect(
-        AESEncryptor.decode(m.group(1)!, config.appKey),
+        AESEncryptor.decode(
+          m.group(1)!,
+          config.appKey,
+          associatedData: 'x-auth',
+        ),
         'Bearerxxxxxxxxx',
       );
+    });
+
+    test('value made for one cookie name fails as another', () {
+      Dox().config = config;
+      String value = DoxCookie('locale', 'en').get().split(';').first;
+      expect(
+        () => AESEncryptor.decode(
+          value.substring('locale='.length),
+          config.appKey,
+          associatedData: 'user_id',
+        ),
+        throwsA(isA<DecryptException>()),
+      );
+    });
+
+    test('HttpOnly by default, Secure on https', () {
+      Dox().config = config;
+      DoxCookie cookie = DoxCookie('x', 'y', encrypt: false);
+      expect(cookie.get(), 'x=y; Max-Age=3600; HttpOnly');
+      expect(cookie.get(https: true), 'x=y; Max-Age=3600; Secure; HttpOnly');
+      cookie.secure = false;
+      expect(cookie.get(https: true), 'x=y; Max-Age=3600; HttpOnly');
     });
 
     test('expire', () {
       Dox().config = config;
       DoxCookie cookie = DoxCookie('x-auth', '');
       String cookieValue = cookie.expire();
-      expect(cookieValue, 'x-auth=; Max-Age=-1');
+      expect(cookieValue, 'x-auth=; Max-Age=-1; HttpOnly');
     });
   });
 }

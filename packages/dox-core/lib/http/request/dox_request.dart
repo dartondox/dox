@@ -211,8 +211,8 @@ class DoxRequest implements IDoxRequest {
   }
 
   /// get cookie value from header.
-  /// An encrypted cookie that was changed, or made with another key,
-  /// gives null.
+  /// An encrypted cookie that was changed, made with another key, or
+  /// made for another cookie name gives null.
   /// ```
   /// req.cookie('authKey');
   /// ```
@@ -221,7 +221,11 @@ class DoxRequest implements IDoxRequest {
     if (_cookies[key] == null) return null;
     if (!decrypt) return _cookies[key];
     try {
-      return AESEncryptor.decode(_cookies[key], Dox().config.appKey);
+      return AESEncryptor.decode(
+        _cookies[key],
+        Dox().config.appKey,
+        associatedData: key,
+      );
     } on DecryptException {
       return null;
     }

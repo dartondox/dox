@@ -1,3 +1,14 @@
+## Unreleased
+
+- Security: the app does not start when `APP_KEY` is empty, not exactly 32 characters, or one of the old public sample keys from `.env.example`. With such a key anyone can sign tokens and cookies. In `APP_ENV` `development`, `local` or `test` Dox only logs a warning. A longer key (eg. 48 or 64 characters) is refused too, because AES needs a key of 16, 24 or 32 bytes and every encrypted cookie failed with it. Before, only an empty key in `production` stopped the app. Run `dox key:generate` for a new key.
+- Security: a multipart part header with many backslashes (`name="\\\\...`) no longer blocks a server isolate for hours (ReDoS in the quoted string regex).
+- Security: a `StreamFile` response (`Storage().stream()`, `Route.files()`) with an html, xml, svg or javascript type is sent with `Content-Disposition: attachment` and `Content-Security-Policy: sandbox`. Every `StreamFile` gets `X-Content-Type-Options: nosniff`. Before, an uploaded `x.html` or `x.svg` was shown inline, and its script ran on the app origin (stored XSS).
+- Security: a `Route.domain()` route only matches when the `Host` header matches. Before, a request with no `Host` matched every domain route. A `Host` with a port (`admin.app.com:8080`) now matches `Route.domain('admin.app.com')`.
+- Security: an encrypted cookie is bound to its name (AES-GCM associated data). A value made for `locale` gives `null` when it is sent as `user_id`. `AESEncryptor.encode()`/`decode()` take a new `associatedData` option. Encrypted cookies made by older versions no longer decrypt, so `req.cookie()` gives `null` for them once. Users may need to log in again.
+- Security: `DoxCookie` is `HttpOnly` by default. `secure` is `null` by default, which sets `Secure` when the request came over https (`req.scheme()`, see `trustedProxies`). Set `httpOnly: false` or `secure: false` to change it.
+- Security: the native server checks `maxBodySize` and `maxMultipartSize` on their own. Before, Rust let any body up to the bigger limit (100 MB) through, so a JSON body could take 100 MB of RAM before Dart said 413.
+- New `AppConfig.bodyTimeout` (default 120 seconds). On the native server, a client that does not send the whole body in this time gets 408. It stops slow clients that hold memory and connections.
+
 ## 3.0.0-alpha.6
 
 - Security: `Storage().putRequestFile()` and `RequestFile.store()` no longer trust the client file name when the bytes are a known format that does not match it. Before, a valid png sent as `a.html` passed `@Image`/`@Mimes` and was saved as `.html`, so `Route.files()` served it as `text/html` on the app origin (stored XSS). Now it is saved with the extension of the bytes (`.png`).

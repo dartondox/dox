@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
@@ -225,14 +226,33 @@ class Dox implements IDox {
     return 'http://$host:${server.port}';
   }
 
-  /// stop at startup when `APP_KEY` is missing in production.
-  /// without a key, cookies and other encrypted data use an empty
-  /// (predictable) key. outside production it only logs a warning.
+  /// old sample keys from `.env.example` files. they are public on
+  /// GitHub, so anyone could sign tokens and cookies with them.
+  static const List<String> _publicKeys = <String>[
+    'ZrNbOZJAjC2MDzqehhsGV2DzFFI4pz5R',
+    'KKep5qC6uHlAgrwaQTQewgMRSIqQnoj0',
+  ];
+
+  /// stop at startup when `APP_KEY` is missing, not exactly 32
+  /// characters, or a public sample key. a short or public key is easy
+  /// to guess, so anyone can sign tokens and cookies. AES needs a key
+  /// of 16, 24 or 32 bytes, so a longer key breaks encrypted cookies.
+  /// in development, local and test it only logs a warning.
   void checkAppKey() {
-    if (config.appKey.trim().isNotEmpty) return;
-    String message =
-        'APP_KEY is not set. Run `dox key:generate` and put the key in .env';
-    if (Env.get<String>('APP_ENV').toLowerCase() == 'production') {
+    String key = config.appKey.trim();
+    String message;
+    if (key.isEmpty) {
+      message =
+          'APP_KEY is not set. Run `dox key:generate` and put the key in .env';
+    } else if (_publicKeys.contains(key)) {
+      message = 'APP_KEY is a public sample key. Run `dox key:generate` for a new one';
+    } else if (utf8.encode(key).length != 32) {
+      message = 'APP_KEY must be exactly 32 characters. Run `dox key:generate`';
+    } else {
+      return;
+    }
+    String env = Env.get<String>('APP_ENV').toLowerCase();
+    if (!<String>['development', 'local', 'test'].contains(env)) {
       throw StateError(message);
     }
     Logger.warn(message);

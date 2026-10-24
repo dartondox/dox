@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_request_handler.dart';
@@ -82,12 +81,14 @@ class DoxServer {
     AppConfig config = Dox().config;
     HttpServer server;
     if (usesNative(log: (isolateId ?? 1) == 1)) {
-      /// Rust stops bodies over the bigger limit. the limit of each body
-      /// type is checked again in Dart, with the normal 413 answer.
+      /// Rust stops a multipart form over maxMultipartSize and any other
+      /// body over maxBodySize. Dart checks the limits again.
       server = await NativeHttpServer.bind(
         port,
         address: address,
-        maxBodySize: max(config.maxBodySize, config.maxMultipartSize),
+        maxBodySize: config.maxBodySize,
+        maxMultipartSize: config.maxMultipartSize,
+        bodyTimeout: config.bodyTimeout,
       );
     } else {
       server = await HttpServer.bind(

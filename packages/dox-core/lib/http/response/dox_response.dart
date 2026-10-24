@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_response_handler.dart';
+import 'package:dox_core/http/request/trusted_proxy.dart';
 import 'package:mime/mime.dart';
 
 class DoxResponse {
@@ -13,7 +14,9 @@ class DoxResponse {
   int? _statusCode;
   ContentType? _contentType;
 
-  final List<String> _cookies = <String>[];
+  /// cookies and their expire flag. the header is made in [process],
+  /// when Dox knows if the request came over https.
+  final List<(DoxCookie, bool)> _cookies = <(DoxCookie, bool)>[];
 
   /// content can be anything
   /// String, int, Map, json serializable object, `Stream<List<int>>`, File
@@ -93,7 +96,7 @@ class DoxResponse {
   /// res.cookie(cookie);
   /// ```
   DoxResponse cookie(DoxCookie cookie, {bool setExpire = false}) {
-    _cookies.add(setExpire ? cookie.expire() : cookie.get());
+    _cookies.add((cookie, setExpire));
     return this;
   }
 
@@ -132,8 +135,20 @@ class DoxResponse {
     if (_contentType != null) {
       request.response.headers.contentType = _contentType;
     }
-    for (String cookie in _cookies) {
-      request.response.headers.add(HttpHeaders.setCookieHeader, cookie);
+    if (_cookies.isNotEmpty) {
+      bool https =
+          TrustedProxy.readClient(
+            request,
+            Dox().config.trustedProxies,
+          ).scheme ==
+          'https';
+      for ((DoxCookie, bool) item in _cookies) {
+        DoxCookie cookie = item.$1;
+        request.response.headers.add(
+          HttpHeaders.setCookieHeader,
+          item.$2 ? cookie.expire(https: https) : cookie.get(https: https),
+        );
+      }
     }
     return responseDataHandler(_contentData, request);
   }

@@ -45,6 +45,23 @@ dynamic httpResponseHandler(dynamic payload, HttpRequest request) {
   doxResponse.process(request);
 }
 
+/// A stored file can be html, svg, xml or js that a user uploaded.
+/// Shown inline, its script runs on the app origin (stored XSS).
+/// So such a file is sent as a download, in a sandbox.
+/// `nosniff` stops the browser from guessing html in other files.
+/// A `Content-Disposition` set by the app (eg. `inline`) is kept.
+void _guardActiveFile(HttpResponse res, ContentType type) {
+  res.headers.set('X-Content-Type-Options', 'nosniff');
+  if (res.headers.value(FILE_DOWNLOAD_HEADER) != null) return;
+  String mime = type.mimeType.toLowerCase();
+  if (mime.contains('html') ||
+      mime.contains('xml') ||
+      mime.contains('javascript')) {
+    res.headers.set(FILE_DOWNLOAD_HEADER, 'attachment');
+    res.headers.set('Content-Security-Policy', 'sandbox');
+  }
+}
+
 /// encodes json straight to utf8 bytes, without building a String first
 final JsonUtf8Encoder _jsonUtf8 = JsonUtf8Encoder(null, advanceEncode);
 
@@ -67,6 +84,7 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
   /// if payload is stream
   if (payload is StreamFile) {
     res.headers.contentType = payload.contentType;
+    _guardActiveFile(res, payload.contentType);
     if (payload.length != null) res.contentLength = payload.length!;
     _pipe(request, res.addStream(payload.stream));
     return;

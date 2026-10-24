@@ -237,6 +237,29 @@ void main() {
       expect(res.body, 'pong');
     });
 
+    test('domain route does not match a request with no Host', () async {
+      Route.domain('admin.example.com', () {
+        Route.get('/domain/admin', (DoxRequest req) => 'admin');
+      });
+
+      /// HTTP/1.0 allows a request with no Host header
+      Socket socket = await Socket.connect(
+        'localhost',
+        Dox().server.httpServer.port,
+      );
+      socket.write('GET /domain/admin HTTP/1.0\r\n\r\n');
+      String reply = await utf8.decoder.bind(socket).join();
+      socket.destroy();
+      expect(reply.split('\r\n').first, contains('404'));
+
+      /// the Host may have a port
+      http.Response res = await http.get(
+        Uri.parse('$baseUrl/domain/admin'),
+        headers: <String, String>{'host': 'admin.example.com:8080'},
+      );
+      expect(res.body, 'admin');
+    });
+
     test('custom status', () async {
       Route.get('/custom_status', (DoxRequest req) {
         return response('pong').statusCode(207);
@@ -288,9 +311,17 @@ void main() {
       expect(res.statusCode, 200);
       expect(res.body, 'pong');
       RegExpMatch m = RegExp(
-        r'^x-key=(.+); Max-Age=3600,x-key2=ABCD; Max-Age=3600$',
+        r'^x-key=(.+); Max-Age=3600; HttpOnly,'
+        r'x-key2=ABCD; Max-Age=3600; HttpOnly$',
       ).firstMatch(res.headers['set-cookie']!)!;
-      expect(AESEncryptor.decode(m.group(1)!, config.appKey), 'ABCD');
+      expect(
+        AESEncryptor.decode(
+          m.group(1)!,
+          config.appKey,
+          associatedData: 'x-key',
+        ),
+        'ABCD',
+      );
     });
 
     test('cors preflight without options route', () async {

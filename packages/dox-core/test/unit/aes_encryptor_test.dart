@@ -28,6 +28,22 @@ void main() {
       );
     });
 
+    test('decode with other associated data throws', () {
+      String encoded = AESEncryptor.encode(
+        message,
+        secret,
+        associatedData: 'locale',
+      );
+      expect(
+        AESEncryptor.decode(encoded, secret, associatedData: 'locale'),
+        message,
+      );
+      expect(
+        () => AESEncryptor.decode(encoded, secret, associatedData: 'user_id'),
+        throwsA(isA<DecryptException>()),
+      );
+    });
+
     test('decode of changed text throws', () {
       List<int> bytes = base64.decode(AESEncryptor.encode(message, secret));
       bytes[20] ^= 1;
