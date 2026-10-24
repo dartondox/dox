@@ -96,7 +96,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       String get primaryKey => '$primaryKeySnakeCase';
 
       @override
-      Map<String, dynamic> get timestampsColumn => <String, dynamic>{
+      Map<String, dynamic> get timestampsColumn => const <String, dynamic>{
         'created_at': $createdColumn,
         'updated_at': $updatedColumn,
       };
@@ -107,21 +107,26 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
 
       $className query() => $className();
 
+      ${visitor.columns.values.any((c) => c['beforeGet'] != null) ? '' : '''
       @override
-      List<String> get tableColumns => <String>[${map['tableColumns'].join(',')}];
+      bool get readsRowDates => true;
+      '''}
 
       @override
-      List<String> get preloadList => <String>[
+      List<String> get tableColumns => const <String>[${map['tableColumns'].join(',')}];
+
+      @override
+      List<String> get preloadList => const <String>[
         ${r['eagerLoad']}
       ];
 
       @override
-      Map<String, Function> get relationsResultMatcher => <String, Function>{
+      Map<String, Function> get relationsResultMatcher => const <String, Function>{
           ${r['mapResultContent']}
       };
 
       @override
-      Map<String, Function> get relationsQueryMatcher => <String, Function>{
+      Map<String, Function> get relationsQueryMatcher => const <String, Function>{
           ${r['mapQueryContent']}
       };
 
@@ -130,14 +135,21 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       @override
       $className fromMap(Map<String, dynamic> m) => $className()
         ${_getCodeForFromMap(visitor)}
-
       @override
-      Map<String, dynamic> convertToMap(dynamic i) {
-        $className instance = i as $className;
+      Map<String, dynamic> columnsToMap() {
+        $className instance = this as $className;
         Map<String, dynamic> map = <String, dynamic>{
           ${map['jsonMapper']}
         };
         ${map['parseContent']}
+        return map;
+      }
+
+      @override
+      Map<String, dynamic> convertToMap(dynamic i) {
+        $className instance = i as $className;
+        Map<String, dynamic> map = instance.columnsToMap();
+        ${map['relationContent']}
         return map;
       }
       $computedCode
@@ -254,8 +266,8 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
 
       if (values['type'] == 'DateTime?') {
         setValue =
-            """m['$jsonKey'] == null
-              ? null
+            """m['$jsonKey'] is DateTime?
+              ? m['$jsonKey'] as DateTime?
               : DateTime.parse(m['$jsonKey'] as String)
           """;
         if (beforeGet != null) {
@@ -275,6 +287,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
   Map<String, dynamic> _getCodeForToMap(ModelVisitor visitor) {
     String jsonMapper = '';
     String parseContent = '';
+    String relationContent = '';
     List<String> tableColumns = [];
     String className = visitor.className;
     visitor.columns.forEach((filedName, values) {
@@ -300,7 +313,8 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
 
     visitor.relations.forEach((key, value) {
       if (value['eager'] == true) {
-        jsonMapper += "'${toSnakeCase(key)}': toMap(instance.$key),\n";
+        relationContent +=
+            "map['${toSnakeCase(key)}'] = toMap(instance.$key);\n";
       } else {
         preloadRelations.add(key);
         toMapRelation +=
@@ -313,12 +327,13 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     });
 
     if (preloadRelations.isNotEmpty) {
-      parseContent += toMapRelation;
+      relationContent += toMapRelation;
     }
 
     return {
       'jsonMapper': jsonMapper,
       'parseContent': parseContent,
+      'relationContent': relationContent,
       'tableColumns': tableColumns,
     };
   }

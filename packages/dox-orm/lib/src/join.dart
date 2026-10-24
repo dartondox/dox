@@ -2,11 +2,13 @@ import 'query_builder.dart';
 import 'shared_mixin.dart';
 
 mixin Join<T> implements SharedMixin<T> {
-  final List<String> _joins = <String>[];
+  /// made on the first join, most rows never need it
+  List<String>? _joins;
 
   String getJoinQuery() {
-    if (_joins.isNotEmpty) {
-      return " ${_joins.join(' ')}";
+    List<String>? joins = _joins;
+    if (joins != null) {
+      return " ${joins.join(' ')}";
     }
     return '';
   }
@@ -90,14 +92,14 @@ mixin Join<T> implements SharedMixin<T> {
       condition = helper.operator(arg3);
       secondJoinColumn = arg4;
     }
-    _joins.add(
+    (_joins ??= <String>[]).add(
       "$type ${helper.wrap(joinTable)} on ${helper.wrap(firstJoinColumn)} $condition ${helper.wrap(secondJoinColumn)}",
     );
     return queryBuilder;
   }
 
   QueryBuilder<T> _rawQuery(String type, String rawQuery, [dynamic params]) {
-    _joins.add('$type $rawQuery');
+    (_joins ??= <String>[]).add('$type $rawQuery');
     if (params != null && params is Map<String, dynamic>) {
       params.forEach((String key, dynamic value) {
         addSubstitutionValues(key, value);

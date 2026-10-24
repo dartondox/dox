@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dox_orm/dox_orm.dart';
 
+import 'limit.dart';
 import 'shared_mixin.dart';
 
 mixin Get<T> implements SharedMixin<T> {
@@ -12,9 +13,6 @@ mixin Get<T> implements SharedMixin<T> {
     }
     String q = "SELECT $selectQueryString FROM ${helper.wrap(tableName)}";
     q += helper.getCommonQuery();
-    if (q.contains('  ')) {
-      q = q.replaceAll(RegExp(' +'), ' ');
-    }
     return q;
   }
 
@@ -49,7 +47,9 @@ mixin Get<T> implements SharedMixin<T> {
     if (hit == null) {
       qb.where(column, value);
       String sql = _buildQuery();
-      String key = substitutionValues.keys.single;
+
+      /// the where value is the first, the LIMIT value comes after it
+      String key = substitutionValues.keys.first;
 
       /// ponytail: cleared when full, column names are a small set
       if (sqls.length >= 100) sqls.clear();
@@ -57,6 +57,7 @@ mixin Get<T> implements SharedMixin<T> {
       return _first(sql);
     }
     substitutionValues[hit.$2] = value;
+    substitutionValues[Limit.limitKey] = 1;
     return _first(hit.$1);
   }
 
@@ -142,9 +143,7 @@ mixin Get<T> implements SharedMixin<T> {
   /// run [sql] and return the first row, or null
   Future<T?> _first(String sql) async {
     // ignore: always_specify_types
-    FutureOr<List> rows = helper.formatResult(
-      await helper.runQuery(sql, clean: queryBuilder.getRawQuery().isEmpty),
-    );
+    FutureOr<List> rows = helper.formatResult(await helper.runQuery(sql));
     // ignore: always_specify_types
     List result = rows is Future<List> ? await rows : rows;
     return result.isEmpty ? null : _typed(result).first;

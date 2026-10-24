@@ -93,4 +93,27 @@ void main() {
     expect(signed['host'], 'localhost:9000');
     expect(signed['authorization'], contains('x-amz-security-token'));
   });
+
+  test('the cached signing key is per secret and per date', () {
+    String sign(String secret, DateTime now) {
+      SigV4Signer signer = SigV4Signer(
+        credentials: AwsCredentials(accessKeyId: 'AK', secretAccessKey: secret),
+        region: 'us-east-1',
+      );
+      return signer.sign(
+        method: 'GET',
+        uri: Uri.parse('http://localhost:9000/bucket/key'),
+        now: now,
+      )['authorization']!;
+    }
+
+    DateTime day1 = DateTime.utc(2024, 1, 1, 10);
+    String first = sign('SK1', day1);
+    expect(sign('SK1', day1), first);
+    expect(sign('SK2', day1), isNot(first));
+    expect(sign('SK1', day1), first);
+    String day2 = sign('SK1', DateTime.utc(2024, 1, 2, 10));
+    expect(day2, isNot(first));
+    expect(day2, contains('/20240102/'));
+  });
 }

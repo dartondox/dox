@@ -118,6 +118,49 @@ class Tag {
       expect(out, isNot(contains('hasModelHooks')));
     });
 
+    test('fast getters, dates and a columns only map', () async {
+      String out = await _generate('''
+@DoxModel()
+class Tag {
+  @Column()
+  String? name;
+
+  @HasMany(Tag, eager: true)
+  List<Tag> children = <Tag>[];
+}
+''');
+
+      /// the getters give the same object each time
+      expect(out, contains('get tableColumns => const <String>['));
+      expect(out, contains('get relationsResultMatcher => const <String'));
+
+      /// a date from the driver is used as it is
+      expect(out, contains("m['created_at'] is DateTime?"));
+      expect(out, contains('bool get readsRowDates => true;'));
+
+      /// columnsToMap() has no relations, convertToMap() adds them
+      String columns = out.substring(
+        out.indexOf('columnsToMap() {'),
+        out.indexOf('convertToMap('),
+      );
+      expect(columns, contains("'name': instance.name"));
+      expect(columns, isNot(contains('children')));
+      expect(out, contains("map['children'] = toMap(instance.children);"));
+    });
+
+    test('a beforeGet hook keeps dates as strings', () async {
+      String out = await _generate('''
+@DoxModel()
+class Tag {
+  @Column(beforeGet: read)
+  String? name;
+
+  static String? read(Map<String, dynamic> m) => null;
+}
+''');
+      expect(out, isNot(contains('readsRowDates')));
+    });
+
     test('a two word relation is found in the preload list', () async {
       String out = await _generate('''
 @DoxModel()

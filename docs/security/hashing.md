@@ -29,6 +29,28 @@ bool ok = Hash.verify('secret', user.password!);
 `Hash.verify(password, hashedPassword)` returns `true` when the password matches.
 It returns `false` when the password does not match, or when `hashedPassword` is not a valid bcrypt hash (for example an empty string).
 
+## Without blocking the server
+
+bcrypt takes many milliseconds of CPU. `Hash.make` and `Hash.verify` run on the request isolate, so that isolate can not answer other requests in the meantime.
+Use the async versions in a request handler. They run bcrypt in another isolate.
+
+```dart
+user.password = await Hash.makeAsync(body.password);
+bool ok = await Hash.verifyAsync('secret', user.password!);
+```
+
+## Cost
+
+`Hash.rounds` is the bcrypt cost for new hashes. The default is `10`. Each step up doubles the time.
+
+```dart
+Hash.rounds = 12;
+String hash = Hash.make('secret', rounds: 12); // or per call
+```
+
+Old hashes keep their own cost, so they still verify.
+If you change it, also set `hashRounds` on `JwtAuthDriver` to the same value. See [Authentication](authentication.md).
+
 ## With login
 
 You do not need `Hash.verify` for normal login.

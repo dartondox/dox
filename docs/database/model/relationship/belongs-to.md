@@ -108,10 +108,12 @@ You do not call `preload`.
 The load runs this SQL:
 
 ```sql
-SELECT "user".*, "comment"."id" as "_foreign_id" FROM "user"
-  LEFT JOIN "comment" on "comment"."user_id" = "user"."id"
-  WHERE "comment"."user_id" IN (@commentuser_id_p0, ...)
+SELECT * FROM "user"
+  WHERE "user"."id" IN (@userid_p0, ...)
 ```
+
+Each user is read once, also when it has many comments.
+Comments of the same user get the same `User` object.
 
 ## Options
 

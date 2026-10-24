@@ -26,7 +26,19 @@ mixin Insert<T> implements SharedMixin<T> {
   /// ```
   // ignore: always_specify_types
   Future insert(Map<String, dynamic> data) async {
-    // ignore: always_specify_types
+    /// RETURNING * gives the new row, so no select after the insert
+    if (dbDriver.supportsReturning) {
+      List<Map<String, dynamic>> rows = await _insert(<Map<String, dynamic>>[
+        data,
+      ], '*');
+      resetSubstitutionValues();
+      if (rows.isNotEmpty) {
+        // ignore: always_specify_types
+        List result = await helper.formatResult(rows);
+        return result.first;
+      }
+      return <String, dynamic>{};
+    }
     List<Map<String, dynamic>> result = await insertMultiple(
       <Map<String, dynamic>>[data],
     );
@@ -54,6 +66,15 @@ mixin Insert<T> implements SharedMixin<T> {
   /// a row without a key uses the column default value.
   Future<List<Map<String, dynamic>>> insertMultiple(
     List<Map<String, dynamic>> list,
+  ) {
+    return _insert(list, helper.wrap(primaryKey));
+  }
+
+  /// insert [list] and return the [returning] columns of the new rows,
+  /// when the driver supports RETURNING
+  Future<List<Map<String, dynamic>>> _insert(
+    List<Map<String, dynamic>> list,
+    String returning,
   ) async {
     if (list.isEmpty) {
       return <Map<String, dynamic>>[];
@@ -69,7 +90,7 @@ mixin Insert<T> implements SharedMixin<T> {
         list.any((Map<String, dynamic> d) => d.length != columns.length)) {
       List<Map<String, dynamic>> result = <Map<String, dynamic>>[];
       for (Map<String, dynamic> data in list) {
-        result.addAll(await insertMultiple(<Map<String, dynamic>>[data]));
+        result.addAll(await _insert(<Map<String, dynamic>>[data], returning));
         resetSubstitutionValues();
       }
       return result;
@@ -95,7 +116,7 @@ mixin Insert<T> implements SharedMixin<T> {
     }
 
     String returningQuery = queryBuilder.dbDriver.supportsReturning
-        ? 'RETURNING ${helper.wrap(primaryKey)}'
+        ? 'RETURNING $returning'
         : '';
 
     String query =

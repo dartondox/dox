@@ -1,3 +1,11 @@
+## Unreleased
+
+- Perf: the memory driver removes expired items and expired locks in a sweep after many writes. Before, a key that was written once with a ttl and never read again stayed in memory forever.
+- Perf: the memory driver with no `max_size` does not reorder the map on every hit. The order is only needed for LRU.
+- Perf: a tagged cache reads all tag versions with one `many` call (one `MGET` on Redis). `tags(...).flush()` raises all tag versions at the same time. Before, each tag was one round trip after the other.
+- Perf: the Redis driver frees a lock with `EVALSHA`. It sends the full script only when Redis does not know it yet.
+- Perf: the file driver makes the cache folder only when it is missing. Before, it ran `create(recursive: true)` on every write. Lock tokens use one shared `Random.secure()`.
+
 ## 3.0.0-alpha.6
 
 - New `CacheManager.close()`. It closes the connections of every store that was built. The Redis driver closes its connection and its pool connections, with no reconnect. Memory, file and null stores do nothing. It is safe to call twice. A store used after it is built again.
