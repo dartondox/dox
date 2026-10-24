@@ -4507,7 +4507,11 @@ the file and send <code>Content-Length</code>.</p>
 the isolate. So Dox collects log lines and writes them every 20 ms (or every
 64 KB) in one write. If the process is killed hard, the last 20 ms of request logs can
 be lost. Errors from <code>Logger</code> are still written right away.</p>
-<p>Turn <code>LogMiddleware</code> off when a proxy already writes access logs.</p>
+<p>Turn <code>LogMiddleware</code> off when a proxy already writes access logs. The new
+project does this for you: <code>enabled</code> is <code>false</code> when <code>APP_ENV</code> is
+<code>production</code>.</p>
+<p>Leave <code>responseHandler</code> unset when you do not need it. With no handler, a
+plain value (text, map, list) is sent without building a <code>DoxResponse</code>.</p>
 <h2 id="what-dox-does-for-you">What Dox does for you</h2>
 <ul>
 <li>Routes are grouped by method. The regex of each route is built once, not

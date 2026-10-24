@@ -7175,6 +7175,16 @@
 <h2 id="dox_core">dox_core</h2>
 <h3 id="unreleased_4">Unreleased</h3>
 <ul>
+<li>Perf: faster route matching. A plain route is found with one map lookup, also when a param route was added before it (as long as that param route can not match the same path). Param routes are grouped by their first path segment, so a request only tries the routes that can match. The first matching route still wins.</li>
+<li>Perf: the request handler reads <code>Host</code> and <code>Content-Type</code> once per request. <code>Host</code> is read only when the app has a <code>Route.domain()</code> route. The WebSocket upgrade check runs only when WebSocket is set up. <code>HttpBody.read()</code> takes an optional <code>contentType</code>.</li>
+<li>Perf: on the native server, a JSON or form body is used as it is, with no stream in between. The size limit is still checked.</li>
+<li>Perf: JSON responses are encoded in 8 KB chunks, not 256 bytes.</li>
+<li>Perf: fewer objects per request. <code>RouteData.params</code>, <code>DoxRequest.param</code> and <code>DoxRequest.method</code> are made on first use. <code>RouteData.domainLower</code> is made once. CORS header lists are joined once.</li>
+<li>Perf: one Future less per async request (<code>then(onError:)</code> instead of <code>then().onError()</code>).</li>
+<li>Perf: multipart parsing makes its regexes once, and no longer builds a <code>Future.any</code> per chunk.</li>
+<li>Perf: <code>LogMiddleware</code> lowercases the <code>redact</code> words once, not per key.</li>
+<li>Perf: an error response reads <code>APP_ENV</code> and lowercases it only when the value changed.</li>
+<li>Perf: <code>IocContainer</code> calls <code>T.toString()</code> once per call.</li>
 <li>Breaking: the <code>dart:io</code> server is gone. Every app runs on the native server (<code>dox_http_native</code>), also an app with WebSocket or Socket.IO routes. <code>AppConfig.server</code>, the <code>ServerBackend</code> enum and the <code>DOX_SERVER</code> env var are removed. <code>DoxServer.usesNative()</code> and the <code>isolateId</code> option of <code>DoxServer.listen()</code> are removed.</li>
 <li>Breaking: when the native library does not load, Dox stops at start with an error. It says why (eg. an ABI mismatch) and how to fix it (install Rust so the build hook can build it, or rebuild your <code>lib_path</code> library). Before, Dox logged a warning and used <code>dart:io</code>.</li>
 <li>On a graceful stop (SIGTERM, <code>Dox().stop()</code>), open WebSockets get close code 1001.</li>

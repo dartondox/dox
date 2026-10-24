@@ -4066,9 +4066,11 @@ You can mix class and function middleware.</p>
 </span></code></pre></div>
 <p>For all routes, set <code>globalMiddleware</code> in the app config:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nl">globalMiddleware:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">LogMiddleware</span><span class="p">(</span><span class="nl">enabled:</span><span class="w"> </span><span class="kc">true</span><span class="p">)],</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="p">);</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nl">globalMiddleware:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="n">LogMiddleware</span><span class="p">(</span><span class="nl">enabled:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appEnv</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s1">'production'</span><span class="p">),</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="p">],</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">);</span>
 </span></code></pre></div>
 <p>The order is: global middleware, then router middleware, then group middleware, then route middleware.</p>
 <pre class="mermaid"><code>flowchart LR
@@ -4082,7 +4084,7 @@ You can mix class and function middleware.</p>
 <div class="admonition tip">
 <p class="admonition-title">Built-in middleware</p>
 <ul>
-<li><code>LogMiddleware</code> from <code>dox_core</code> writes one JSON log line per request. Body fields and headers whose name has <code>password</code>, <code>secret</code>, <code>token</code>, <code>authorization</code>, <code>cookie</code> or <code>api_key</code> in it (upper or lower case) are logged as <code>[REDACTED]</code>. Change the list with <code>redact:</code>.</li>
+<li><code>LogMiddleware</code> from <code>dox_core</code> writes one JSON log line per request. Body fields and headers whose name has <code>password</code>, <code>secret</code>, <code>token</code>, <code>authorization</code>, <code>cookie</code> or <code>api_key</code> in it (upper or lower case) are logged as <code>[REDACTED]</code>. Change the list with <code>redact:</code>. The new project turns it off when <code>APP_ENV</code> is <code>production</code>.</li>
 <li><code>AuthMiddleware</code> from <code>dox_auth</code> checks the JWT token. See <a href="../../security/authentication/">Authentication</a>.</li>
 </ul>
 </div>
