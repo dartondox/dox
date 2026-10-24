@@ -38,6 +38,29 @@ void main() {
     expect(h.contentType?.mimeType, 'text/html');
   });
 
+  test('defaults plus one content type stay shared until a change', () {
+    NativeHeaders defaults = NativeHeaders.empty()
+      ..set(HttpHeaders.contentTypeHeader, 'text/plain')
+      ..set('x-a', '1');
+    NativeHeaders h = NativeHeaders.response(defaults);
+    h.contentType = ContentType.json;
+    expect(h.isShared, isFalse);
+    expect(identical(h.sharedType, ContentType.json), isTrue);
+    expect(h.value(HttpHeaders.contentTypeHeader), ContentType.json.toString());
+    h.set('x-b', '2');
+    expect(h.sharedType, isNull);
+    Map<String, List<String>> all = <String, List<String>>{};
+    h.forEach((String name, List<String> values) => all[name] = values);
+    expect(all, <String, List<String>>{
+      'content-type': <String>[ContentType.json.toString()],
+      'x-a': <String>['1'],
+      'x-b': <String>['2'],
+    });
+    // the defaults did not change
+    expect(defaults.value(HttpHeaders.contentTypeHeader), 'text/plain');
+    expect(defaults['x-b'], isNull);
+  });
+
   test('response header values with a line break are refused', () {
     NativeHeaders h = NativeHeaders.response(NativeHeaders.empty());
     for (String value in <String>[

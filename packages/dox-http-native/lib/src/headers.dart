@@ -54,10 +54,26 @@ class NativeHeaders implements HttpHeaders {
   /// counts changes, so a cache of the encoded bytes knows when it is old
   int version = 0;
 
-  /// true while the headers are still the untouched server defaults
-  bool get isShared => _shared;
+  /// a content type set while the headers were still the defaults. They
+  /// stay shared: a response with only a new content type (eg. JSON)
+  /// copies nothing.
+  ContentType? _sharedType;
+  String? _sharedTypeText;
 
-  Map<String, List<String>> get _entries => _map ??= _parse(_raw!);
+  /// request headers: lookups done by scanning the raw bytes
+  int _scans = 0;
+
+  /// true while the headers are still the untouched server defaults
+  bool get isShared => _shared && _sharedType == null;
+
+  /// the content type, when the headers are the server defaults with only
+  /// this content type set. Else null.
+  ContentType? get sharedType => _shared ? _sharedType : null;
+
+  Map<String, List<String>> get _entries {
+    if (_sharedType != null) _unshare();
+    return _map ??= _parse(_raw!);
+  }
 
   // Raw request headers (from Rust): per header u16 name length, u16 value
   // length (little endian), the name (lowercase), the value.
@@ -77,9 +93,16 @@ class NativeHeaders implements HttpHeaders {
 
   /// the values of one header. A request reads only that name from the
   /// raw bytes, so a handler that asks for one or two headers parses no more.
+  /// The second lookup parses all headers into a map, as most handlers
+  /// read a few (host, content type, upgrade).
   List<String>? _get(String name) {
+    String? type = _sharedTypeText;
+    if (type != null && name == HttpHeaders.contentTypeHeader) {
+      return <String>[type];
+    }
     Map<String, List<String>>? map = _map;
     if (map != null) return map[name];
+    if (++_scans >= 2) return (_map = _parse(_raw!))[name];
     return _scan(_raw!, name);
   }
 
@@ -109,14 +132,21 @@ class NativeHeaders implements HttpHeaders {
   Map<String, List<String>> _own() {
     if (!_mutable) throw HttpException('HTTP headers are not mutable');
     version++;
-    if (_shared) {
-      _shared = false;
-      _map = <String, List<String>>{
-        for (MapEntry<String, List<String>> e in _entries.entries)
-          e.key: List<String>.of(e.value),
-      };
-    }
+    if (_shared) _unshare();
     return _entries;
+  }
+
+  /// Copies the shared defaults, so they can change.
+  void _unshare() {
+    String? type = _sharedTypeText;
+    _sharedType = null;
+    _sharedTypeText = null;
+    _shared = false;
+    _map = <String, List<String>>{
+      for (MapEntry<String, List<String>> e in _map!.entries)
+        e.key: List<String>.of(e.value),
+      if (type != null) HttpHeaders.contentTypeHeader: <String>[type],
+    };
   }
 
   /// every header line, for the response record. content-length and
@@ -280,10 +310,16 @@ class NativeHeaders implements HttpHeaders {
       _lastTypeText = type.toString();
     }
     String text = _lastTypeText!;
-    set(HttpHeaders.contentTypeHeader, text);
+    if (_shared) {
+      // no copy: send() uses cached bytes for defaults plus this type
+      _sharedType = type;
+      _sharedTypeText = text;
+    } else {
+      set(HttpHeaders.contentTypeHeader, text);
+    }
     // the getter (and so `encoding`) then needs no parse
     _contentType = type;
-    _contentTypeOf = _entries[HttpHeaders.contentTypeHeader]![0];
+    _contentTypeOf = text;
   }
 
   static ContentType? _lastType;

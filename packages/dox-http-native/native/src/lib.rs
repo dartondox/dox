@@ -14,15 +14,33 @@
 //! server thread once, not once per answer.
 //!
 //! Request record (little endian, 28 byte head): u64 id, u32 flags
-//! (bit 0: HTTP/1.0), u16 method_len, u16 target_len, u32 headers_len,
+//! (bit 0: HTTP/1.0, bit 2: the body is not in the batch, see below),
+//! u16 method_len, u16 target_len, u32 headers_len,
 //! u32 body_len, u16 remote_port, u16 reserved. Then 16 bytes remote ip
 //! (IPv6, IPv4 is mapped), method, target, headers, body. Each header is
 //! u16 name_len, u16 value_len, name (lowercase), value. With the lengths
 //! Dart finds one header without reading every byte.
 //!
+//! A body of [EXTERNAL_MIN] bytes or more is not copied into the batch.
+//! Then the message is an array: the batch, then each big body (external
+//! typed data, in the order of the records). Its record has flag bit 2 and
+//! body_len 0. Dart takes the next body of the array. Rust frees it when
+//! Dart is done with it.
+//!
 //! Response record (20 byte head): u64 id, u16 status, u16 kind,
 //! u32 headers_len, u32 body_len. Then header lines, body. Kind 0 is an
-//! HTTP answer. The other kinds are for WebSockets, see below.
+//! HTTP answer. Kind bit 8 (0x100) on it: Rust gzips the body, on another
+//! thread (Dart sets `content-encoding`). Kinds 1 to 5 are for WebSockets,
+//! see below.
+//!
+//! Streamed body: kind 6 is an HTTP answer whose body comes in parts. Its
+//! body is u64 stream id (Dart picks it), then the first part. Then kind 7
+//! records (id: the stream id, body: a part) and one kind 8 (status 0: the
+//! end, else: failed, the connection is cut). Rust tells Dart how many
+//! bytes it sent to the client: a request record with kind 4 in flags bits
+//! 8 to 15, the stream id and a u64 body. Dart keeps at most a window of
+//! bytes not sent yet, so memory stays small and the client gets the
+//! first bytes early. Kind 5: the client is gone, stop sending.
 //!
 //! WebSocket: a request that can upgrade (GET, HTTP/1.1, `Connection:
 //! upgrade`, `Upgrade: websocket`, version 13, a key) gets flag bit 1. Dart
@@ -68,8 +86,8 @@ use std::time::Duration;
 
 use bytes::Bytes;
 use futures_util::{SinkExt, StreamExt};
-use http_body_util::{BodyExt, Full};
-use hyper::body::{Body, Incoming};
+use http_body_util::BodyExt;
+use hyper::body::{Body, Frame, Incoming, SizeHint};
 use hyper::header::{
     CONNECTION, CONTENT_LENGTH, CONTENT_TYPE, EXPECT, HeaderName, HeaderValue,
     SEC_WEBSOCKET_ACCEPT, SEC_WEBSOCKET_KEY, SEC_WEBSOCKET_VERSION, UPGRADE,
@@ -92,7 +110,7 @@ use tokio_tungstenite::tungstenite::protocol::{CloseFrame, Role, WebSocketConfig
 use tokio_tungstenite::tungstenite::{Error as WsError, Message, Utf8Bytes};
 
 /// Bump when the FFI functions or the record layout change.
-const ABI_VERSION: i32 = 5;
+const ABI_VERSION: i32 = 6;
 /// Max size of the request line plus headers. Bigger gets 431.
 const MAX_HEAD: usize = 16 * 1024;
 const RES_HEAD: usize = 20;
@@ -105,6 +123,13 @@ const MAX_RESERVE: u64 = 64 * 1024;
 const WS_TEXT: u32 = 1;
 const WS_BINARY: u32 = 2;
 const WS_CLOSED: u32 = 3;
+/// Stream messages to Dart (flags bits 8 to 15): bytes sent, client gone
+const STREAM_SENT: u32 = 4;
+const STREAM_GONE: u32 = 5;
+/// A request body this big or bigger goes to Dart without a copy (external
+/// typed data). A smaller one is copied into the batch: for a few bytes a
+/// copy is cheaper than a finalizer.
+const EXTERNAL_MIN: usize = 64 * 1024;
 /// How long a closing WebSocket waits for the close frame of the peer.
 /// Same as dart:io.
 const CLOSE_WAIT: Duration = Duration::from_secs(5);
@@ -137,7 +162,10 @@ struct DartApi {
     functions: *const ApiEntry,
 }
 
-/// `Dart_CObject` for a `kTypedData` (Uint8) value. 64-bit layout.
+type Finalizer = unsafe extern "C" fn(*mut c_void, *mut c_void);
+
+/// `Dart_CObject` for a `kTypedData` or `kExternalTypedData` (Uint8)
+/// value. 64-bit layout.
 #[repr(C)]
 struct DartCObject {
     ty: i32,
@@ -146,40 +174,183 @@ struct DartCObject {
     _pad2: i32,
     length: isize,
     values: *const u8,
-    _rest: [u64; 2],
+    /// external typed data only: who owns the bytes, and who frees them
+    peer: *mut c_void,
+    callback: Option<Finalizer>,
+}
+
+/// `Dart_CObject` for a `kArray`. Same size as [DartCObject].
+#[repr(C)]
+struct DartArray {
+    ty: i32,
+    _pad: i32,
+    length: isize,
+    values: *mut *mut DartCObject,
+    _rest: [u64; 3],
 }
 
 type PostFn = unsafe extern "C" fn(i64, *mut DartCObject) -> bool;
 static POST: OnceLock<PostFn> = OnceLock::new();
 
-/// Posts bytes to a Dart port. Dart copies them. False when the port is closed.
-fn post(port: i64, data: &[u8]) -> bool {
-    let Some(f) = POST.get() else { return false };
-    let mut obj = DartCObject {
+fn typed(data: &[u8]) -> DartCObject {
+    DartCObject {
         ty: 7, // Dart_CObject_kTypedData
         _pad: 0,
         td_type: 2, // Dart_TypedData_kUint8
         _pad2: 0,
         length: data.len() as isize,
         values: data.as_ptr(),
-        _rest: [0; 2],
+        peer: std::ptr::null_mut(),
+        callback: None,
+    }
+}
+
+/// Posts bytes to a Dart port. Dart copies them. False when the port is closed.
+fn post(port: i64, data: &[u8]) -> bool {
+    let Some(f) = POST.get() else { return false };
+    unsafe { f(port, &mut typed(data)) }
+}
+
+/// Dart calls it when the external bytes of a post are not used any more.
+unsafe extern "C" fn free_bytes(_: *mut c_void, peer: *mut c_void) {
+    drop(unsafe { Box::from_raw(peer as *mut Vec<u8>) });
+}
+
+/// Posts a batch and its big bodies. The batch is copied, the bodies move
+/// to Dart without a copy. False when the port is closed.
+fn post_batch(port: i64, batch: &[u8], bodies: Vec<Vec<u8>>) -> bool {
+    if bodies.is_empty() {
+        return post(port, batch);
+    }
+    let Some(f) = POST.get() else { return false };
+    let mut objs = Vec::with_capacity(bodies.len() + 1);
+    objs.push(typed(batch));
+    for body in bodies {
+        let mut obj = typed(&body);
+        // the Vec moves into the box, its bytes stay where they are
+        obj.ty = 8; // Dart_CObject_kExternalTypedData
+        obj.peer = Box::into_raw(Box::new(body)) as *mut c_void;
+        obj.callback = Some(free_bytes);
+        objs.push(obj);
+    }
+    let mut ptrs: Vec<*mut DartCObject> = objs.iter_mut().map(|o| o as *mut _).collect();
+    let mut array = DartArray {
+        ty: 6, // Dart_CObject_kArray
+        _pad: 0,
+        length: ptrs.len() as isize,
+        values: ptrs.as_mut_ptr(),
+        _rest: [0; 3],
     };
-    unsafe { f(port, &mut obj) }
+    let sent = unsafe { f(port, (&raw mut array).cast()) };
+    if !sent {
+        // not sent: the bodies are still ours to free
+        for obj in &objs[1..] {
+            unsafe { free_bytes(std::ptr::null_mut(), obj.peer) };
+        }
+    }
+    sent
 }
 
 // ---- server ------------------------------------------------------------
 
-type Answer = Response<Full<Bytes>>;
+type Answer = Response<Payload>;
 
-/// What Dart sends back.
+/// The body of an answer: all bytes at once, or parts from Dart.
+enum Payload {
+    Full(Option<Bytes>),
+    Stream(Chunks),
+}
+
+/// A body that Dart sends in parts (a streamed response).
+struct Chunks {
+    /// the stream id
+    id: u64,
+    /// the parts. None: Dart failed, cut the connection.
+    rx: UnboundedReceiver<Option<Bytes>>,
+    ctx: Rc<Ctx>,
+    /// the last part came (or the failure)
+    done: bool,
+}
+
+impl Body for Payload {
+    type Data = Bytes;
+    type Error = std::io::Error;
+
+    fn poll_frame(
+        self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+    ) -> Poll<Option<Result<Frame<Bytes>, std::io::Error>>> {
+        let s = match self.get_mut() {
+            Payload::Full(b) => return Poll::Ready(b.take().map(|b| Ok(Frame::data(b)))),
+            Payload::Stream(s) => s,
+        };
+        match s.rx.poll_recv(cx) {
+            Poll::Pending => Poll::Pending,
+            Poll::Ready(Some(Some(part))) => {
+                // hyper asks for the next part only when it wrote most of
+                // the last ones. So Dart may send more now.
+                let n = part.len() as u64;
+                push_record(&s.ctx, s.id, STREAM_SENT, 0, &n.to_le_bytes());
+                Poll::Ready(Some(Ok(Frame::data(part))))
+            }
+            Poll::Ready(Some(None)) => {
+                s.done = true;
+                Poll::Ready(Some(Err(std::io::Error::other("stream failed"))))
+            }
+            Poll::Ready(None) => {
+                s.done = true;
+                Poll::Ready(None)
+            }
+        }
+    }
+
+    fn is_end_stream(&self) -> bool {
+        matches!(self, Payload::Full(b) if b.as_ref().is_none_or(Bytes::is_empty))
+    }
+
+    fn size_hint(&self) -> SizeHint {
+        match self {
+            Payload::Full(b) => SizeHint::with_exact(b.as_ref().map_or(0, |b| b.len() as u64)),
+            Payload::Stream(_) => SizeHint::default(),
+        }
+    }
+}
+
+impl Drop for Chunks {
+    fn drop(&mut self) {
+        if !self.done {
+            // the client left (or a HEAD request): tell Dart to stop
+            self.ctx.streams.borrow_mut().remove(&self.id);
+            push_record(&self.ctx, self.id, STREAM_GONE, 0, b"");
+        }
+    }
+}
+
+/// Marks an answer whose body Rust gzips.
+#[derive(Clone)]
+struct Gzip;
+
+/// What an HTTP answer from Dart is.
+enum Mode {
+    Plain,
+    /// accepts a WebSocket upgrade: (ws id, max message size)
+    Ws(u64, usize),
+    /// the body comes in parts: the stream id. The answer holds the first.
+    Stream(u64),
+}
+
+/// What Dart sends back. Made on the Dart thread, so it holds no `Rc`.
 enum Out {
-    /// request id, its answer, and (ws id, max message size) when it
-    /// accepts a WebSocket upgrade
-    Http(usize, Answer, Option<(u64, usize)>),
+    /// request id, its answer
+    Http(usize, Response<Bytes>, Mode),
     /// a message for the WebSocket with this id
     Ws(u64, Message),
     /// Dart handled this many bytes of WebSocket messages
     Ack(usize),
+    /// a part of the streamed body with this stream id
+    Chunk(u64, Bytes),
+    /// the end of a streamed body. false: Dart failed.
+    End(u64, bool),
 }
 
 /// A WebSocket upgrade that Dart accepted.
@@ -268,6 +439,10 @@ struct Ctx {
     /// requests that wait for an answer from Dart
     pending: RefCell<Slab<oneshot::Sender<Reply>>>,
     batch: RefCell<Vec<u8>>,
+    /// the big request bodies of the batch, see [EXTERNAL_MIN]
+    bodies: RefCell<Vec<Vec<u8>>>,
+    /// open streamed bodies by stream id: where their parts go
+    streams: RefCell<HashMap<u64, UnboundedSender<Option<Bytes>>>>,
     notify: Notify,
     limits: Limits,
     /// tells every open connection to close after its current request
@@ -288,6 +463,8 @@ impl Ctx {
             server,
             pending: RefCell::new(Slab::with_capacity(1024)),
             batch: RefCell::new(Vec::with_capacity(1 << 16)),
+            bodies: RefCell::new(Vec::new()),
+            streams: RefCell::new(HashMap::new()),
             notify: Notify::new(),
             limits,
             closing: Notify::new(),
@@ -565,7 +742,7 @@ async fn serve(listener: StdListener, ctx: Rc<Ctx>, dart_port: i64) {
         // the close records of the WebSockets first, then the done byte
         let last = std::mem::take(&mut *ctx.batch.borrow_mut());
         if !last.is_empty() {
-            post(dart_port, &last);
+            post_batch(dart_port, &last, ctx.bodies.take());
         }
         post(dart_port, &[1]); // tell Dart: all open requests are done
         server.wait_stopped().await;
@@ -741,11 +918,21 @@ async fn handle(
         target,
         &parts.headers,
         &peer,
-        &body,
+        body,
     );
     let Ok((mut answer, accepted)) = rx.await else {
         return Ok(simple(StatusCode::SERVICE_UNAVAILABLE));
     };
+    if answer.extensions_mut().remove::<Gzip>().is_some()
+        && let Payload::Full(Some(raw)) = answer.body_mut()
+    {
+        // off this thread, so other requests do not wait for it
+        let raw = std::mem::take(raw);
+        match tokio::task::spawn_blocking(move || gzip(&raw)).await {
+            Ok(zipped) => *answer.body_mut() = Payload::Full(Some(zipped.into())),
+            Err(_) => return Ok(simple(StatusCode::INTERNAL_SERVER_ERROR)),
+        }
+    }
     let Some(accepted) = accepted else {
         return Ok(answer);
     };
@@ -925,12 +1112,27 @@ where
     got.unwrap_or((1006, Bytes::new()))
 }
 
-/// Adds one WebSocket record (a message or the close) to the batch. The
-/// head is the same 44 bytes as a request record.
+/// Gzips `data` at the default level, like `dart:io` `gzip.encode`.
+fn gzip(data: &[u8]) -> Vec<u8> {
+    use flate2::{Compression, write::GzEncoder};
+    use std::io::Write;
+    let mut z = GzEncoder::new(Vec::with_capacity(data.len() / 2), Compression::default());
+    // writes to a Vec do not fail
+    let _ = z.write_all(data);
+    z.finish().unwrap_or_default()
+}
+
+/// Adds one WebSocket record (a message or the close) to the batch.
 fn enqueue_ws(ctx: &Ctx, id: u64, kind: u32, code: u16, data: &[u8]) {
     if kind != WS_CLOSED {
         ctx.ws_unacked.set(ctx.ws_unacked.get() + data.len());
     }
+    push_record(ctx, id, kind, code, data);
+}
+
+/// Adds one message record (WebSocket or stream) to the batch. The head is
+/// the same 44 bytes as a request record.
+fn push_record(ctx: &Ctx, id: u64, kind: u32, code: u16, data: &[u8]) {
     let mut b = ctx.batch.borrow_mut();
     let was_empty = b.is_empty();
     b.extend_from_slice(&id.to_le_bytes());
@@ -992,9 +1194,13 @@ fn enqueue(
     target: &str,
     headers: &hyper::HeaderMap,
     peer: &[u8; 18],
-    body: &[u8],
+    body: Vec<u8>,
 ) -> oneshot::Receiver<Reply> {
     let (tx, rx) = oneshot::channel();
+    // a big body goes to Dart apart, without a copy
+    let external = body.len() >= EXTERNAL_MIN;
+    let flags = flags | (u32::from(external) << 2);
+    let body_len = if external { 0 } else { body.len() };
     let id = ctx.pending.borrow_mut().insert(tx) as u64;
     let mut b = ctx.batch.borrow_mut();
     let was_empty = b.is_empty();
@@ -1005,7 +1211,7 @@ fn enqueue(
     b.extend_from_slice(&(target.len() as u16).to_le_bytes());
     let hlen_at = b.len();
     b.extend_from_slice(&0u32.to_le_bytes());
-    b.extend_from_slice(&(body.len() as u32).to_le_bytes());
+    b.extend_from_slice(&(body_len as u32).to_le_bytes());
     b.extend_from_slice(&peer[16..]);
     b.extend_from_slice(&[0, 0]);
     b.extend_from_slice(&peer[..16]);
@@ -1021,7 +1227,11 @@ fn enqueue(
     }
     let hlen = (b.len() - hstart) as u32;
     b[hlen_at..hlen_at + 4].copy_from_slice(&hlen.to_le_bytes());
-    b.extend_from_slice(body);
+    if external {
+        ctx.bodies.borrow_mut().push(body);
+    } else {
+        b.extend_from_slice(&body);
+    }
     if was_empty {
         ctx.notify.notify_one();
     }
@@ -1029,7 +1239,7 @@ fn enqueue(
 }
 
 fn simple(code: StatusCode) -> Answer {
-    let mut r = Response::new(Full::new(Bytes::new()));
+    let mut r = Response::new(Payload::Full(None));
     *r.status_mut() = code;
     r
 }
@@ -1050,14 +1260,16 @@ async fn flusher(ctx: Rc<Ctx>, port: i64) {
             _ = ctx.notify.notified() => false,
             _ = tokio::time::sleep(PROBE) => true,
         };
+        let mut bodies = Vec::new();
         if !probe {
             tokio::task::yield_now().await;
             std::mem::swap(&mut out, &mut *ctx.batch.borrow_mut());
+            bodies = ctx.bodies.take();
             if out.is_empty() {
                 continue;
             }
         }
-        if !post(port, &out) {
+        if !post_batch(port, &out, bodies) {
             // the isolate is gone (killed or closed). stop this server so
             // the port is free for a new isolate.
             ctx.server.shut_down();
@@ -1079,13 +1291,27 @@ async fn deliver(ctx: Rc<Ctx>) {
         let mut pending = ctx.pending.borrow_mut();
         for out in answers.drain(..) {
             match out {
-                Out::Http(id, r, ws) => {
+                Out::Http(id, head, mode) => {
                     let Some(tx) = pending.try_remove(id) else {
+                        if let Mode::Stream(sid) = mode {
+                            push_record(&ctx, sid, STREAM_GONE, 0, b"");
+                        }
                         continue;
                     };
-                    // the channel is made here, before later messages of
-                    // the same batch need it
-                    let accepted = ws.map(|(id, max)| add_socket(&ctx, id, max));
+                    // the channels are made here, before later messages of
+                    // the same batch need them
+                    let (r, accepted) = match mode {
+                        Mode::Plain => (head.map(|b| Payload::Full(Some(b))), None),
+                        Mode::Ws(id, max) => (
+                            head.map(|b| Payload::Full(Some(b))),
+                            Some(add_socket(&ctx, id, max)),
+                        ),
+                        Mode::Stream(sid) => {
+                            (head.map(|first| open_stream(&ctx, sid, first)), None)
+                        }
+                    };
+                    // a client that left drops the answer. A streamed body
+                    // then tells Dart (see Chunks::drop).
                     if let Err((_, Some(gone))) = tx.send((r, accepted)) {
                         // the client left before the answer
                         ctx.sockets.borrow_mut().remove(&gone.id);
@@ -1094,9 +1320,37 @@ async fn deliver(ctx: Rc<Ctx>) {
                 }
                 Out::Ws(id, m) => queue_ws(&ctx, id, m),
                 Out::Ack(n) => ack_ws(&ctx, n),
+                Out::Chunk(sid, part) => {
+                    if let Some(tx) = ctx.streams.borrow().get(&sid) {
+                        let _ = tx.send(Some(part));
+                    }
+                }
+                Out::End(sid, ok) => {
+                    let tx = ctx.streams.borrow_mut().remove(&sid);
+                    if let Some(tx) = tx
+                        && !ok
+                    {
+                        let _ = tx.send(None);
+                    }
+                }
             }
         }
     }
+}
+
+/// Makes the body of a streamed answer, with its first part.
+fn open_stream(ctx: &Rc<Ctx>, id: u64, first: Bytes) -> Payload {
+    let (tx, rx) = unbounded_channel();
+    if !first.is_empty() {
+        let _ = tx.send(Some(first));
+    }
+    ctx.streams.borrow_mut().insert(id, tx);
+    Payload::Stream(Chunks {
+        id,
+        rx,
+        ctx: ctx.clone(),
+        done: false,
+    })
 }
 
 /// Makes the queue of a WebSocket that Dart accepted.
@@ -1294,6 +1548,7 @@ pub unsafe extern "C" fn dox_respond_batch(handle: i64, ptr: *const u8, len: i64
     // it, so there is no copy or allocation per response for them.
     let all = Bytes::copy_from_slice(unsafe { std::slice::from_raw_parts(ptr, len as usize) });
     let b = &all[..];
+    let mut outs = Vec::new();
     let mut p = 0;
     while p + RES_HEAD <= b.len() {
         let id = u64::from_le_bytes(b[p..p + 8].try_into().unwrap());
@@ -1308,24 +1563,31 @@ pub unsafe extern "C" fn dox_respond_batch(handle: i64, ptr: *const u8, len: i64
         let body_at = h_at + hlen;
         p = body_at + blen;
         let body = all.slice(body_at..p);
-        let out = match kind {
-            0 | 1 => {
-                // an accept has no HTTP body
-                let http_body = if kind == 0 {
-                    body.clone()
-                } else {
-                    Bytes::new()
+        let gz = kind & 0x100 != 0;
+        let out = match kind & 0xff {
+            0 | 1 | 6 => {
+                let (http_body, mode) = match kind & 0xff {
+                    0 => (body, Mode::Plain),
+                    // an accept has no HTTP body. u64 ws id, u64 max size.
+                    1 if blen >= 16 => {
+                        let max = u64::from_le_bytes(body[8..16].try_into().unwrap());
+                        let ws = u64::from_le_bytes(body[..8].try_into().unwrap());
+                        let max = max.min(u64::from(u32::MAX)) as usize;
+                        (Bytes::new(), Mode::Ws(ws, max))
+                    }
+                    1 => (Bytes::new(), Mode::Plain),
+                    // u64 stream id, then the first part
+                    _ if blen >= 8 => {
+                        let sid = u64::from_le_bytes(body[..8].try_into().unwrap());
+                        (body.slice(8..), Mode::Stream(sid))
+                    }
+                    _ => continue,
                 };
-                let r = answer(&all, status, h_at, body_at, http_body);
-                // accept: u64 ws id, u64 max message size
-                let ws = (kind == 1 && blen >= 16).then(|| {
-                    let max = u64::from_le_bytes(body[8..16].try_into().unwrap());
-                    (
-                        u64::from_le_bytes(body[..8].try_into().unwrap()),
-                        max.min(u64::from(u32::MAX)) as usize,
-                    )
-                });
-                Out::Http(id as usize, r, ws)
+                let mut r = answer(&all, status, h_at, body_at, http_body);
+                if gz {
+                    r.extensions_mut().insert(Gzip);
+                }
+                Out::Http(id as usize, r, mode)
             }
             2 => match Utf8Bytes::try_from(body) {
                 Ok(text) => Out::Ws(id, Message::Text(text)),
@@ -1341,27 +1603,29 @@ pub unsafe extern "C" fn dox_respond_batch(handle: i64, ptr: *const u8, len: i64
                 });
                 Out::Ws(id, Message::Close(frame))
             }
+            7 => Out::Chunk(id, body),
+            8 => Out::End(id, status == 0),
             _ => continue,
         };
-        // Wake the server thread on the first answer, so it writes that one
-        // while we build the rest. Later ones join the same wake as long as
-        // it has not taken the inbox yet.
-        let was_empty = {
-            let mut inbox = server.inbox.lock().unwrap();
-            inbox.push(out);
-            inbox.len() == 1
-        };
-        if was_empty {
-            server.answered.notify_one();
-        }
+        outs.push(out);
+    }
+    // one lock and one wake for the whole batch
+    let was_empty = {
+        let mut inbox = server.inbox.lock().unwrap();
+        let was_empty = inbox.is_empty();
+        inbox.append(&mut outs);
+        was_empty
+    };
+    if was_empty {
+        server.answered.notify_one();
     }
 }
 
 /// Builds an HTTP answer from a response record. Header values are slices
 /// of `all`, not copies.
-fn answer(all: &Bytes, status: u16, h_at: usize, body_at: usize, body: Bytes) -> Answer {
+fn answer(all: &Bytes, status: u16, h_at: usize, body_at: usize, body: Bytes) -> Response<Bytes> {
     let b = &all[..];
-    let mut r = Response::new(Full::new(body));
+    let mut r = Response::new(body);
     *r.status_mut() = StatusCode::from_u16(status).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR);
     let mut at = h_at;
     for line in b[h_at..body_at].split(|&c| c == b'\n') {
@@ -1688,6 +1952,68 @@ mod tests {
             }
             assert_eq!(task.await.unwrap().0, 1008);
         });
+    }
+
+    /// (id, kind, body) of every record in the batch
+    fn all_records(ctx: &Ctx) -> Vec<(u64, u32, Vec<u8>)> {
+        let b = ctx.batch.borrow();
+        let mut out = Vec::new();
+        let mut p = 0;
+        while p + 44 <= b.len() {
+            let id = u64::from_le_bytes(b[p..p + 8].try_into().unwrap());
+            let kind = rd32(&b, p + 8) as u32 >> 8;
+            let len = rd32(&b, p + 20);
+            out.push((id, kind, b[p + 44..p + 44 + len].to_vec()));
+            p += 44 + len;
+        }
+        out
+    }
+
+    fn test_ctx() -> Rc<Ctx> {
+        Rc::new(Ctx::new(Arc::new(Server::new((0, 0, 0, 0))), test_limits()))
+    }
+
+    /// The parts of a streamed body reach the client in order. Dart hears
+    /// how many bytes went out, part by part.
+    #[test]
+    fn streamed_body_sends_parts_and_counts_them() {
+        local_test(async {
+            let ctx = test_ctx();
+            let body = open_stream(&ctx, 9, Bytes::from_static(b"ab"));
+            let tx = ctx.streams.borrow()[&9].clone();
+            tx.send(Some(Bytes::from_static(b"cde"))).unwrap();
+            drop(tx);
+            ctx.streams.borrow_mut().remove(&9); // the end record
+            let all = body.collect().await.unwrap().to_bytes();
+            assert_eq!(&all[..], b"abcde");
+            let sent = |n: u64| (9, STREAM_SENT, n.to_le_bytes().to_vec());
+            assert_eq!(all_records(&ctx), vec![sent(2), sent(3)]);
+        });
+    }
+
+    /// A streamed body dropped before its end (the client left) tells
+    /// Dart to stop, and later parts go nowhere.
+    #[test]
+    fn streamed_body_dropped_early_says_gone() {
+        local_test(async {
+            let ctx = test_ctx();
+            drop(open_stream(&ctx, 9, Bytes::new()));
+            assert!(ctx.streams.borrow().is_empty());
+            assert_eq!(all_records(&ctx), vec![(9, STREAM_GONE, vec![])]);
+        });
+    }
+
+    #[test]
+    fn gzip_round_trip() {
+        use std::io::Read;
+        let data = b"hello hello hello hello".repeat(50);
+        let zipped = gzip(&data);
+        assert!(zipped.len() < data.len());
+        let mut back = Vec::new();
+        flate2::read::GzDecoder::new(&zipped[..])
+            .read_to_end(&mut back)
+            .unwrap();
+        assert_eq!(back, data);
     }
 
     /// While Dart has too many bytes not acknowledged, Rust reads no frame.

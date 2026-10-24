@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
+import 'dart:typed_data';
 
 import 'package:dox_http_native/dox_http_native.dart';
 import 'package:test/test.dart';
@@ -22,6 +23,22 @@ void handle(HttpRequest req) async {
       res.write('slow done');
     case '/who':
       res.write(Isolate.current.debugName);
+    case '/json':
+      res.headers.contentType = ContentType.json;
+      res.write('{"a":1}');
+    case '/long':
+      res.write('a' * 1000);
+    case '/stream':
+      // 5 MiB in 64 KiB parts. ?length=1 sets the content length.
+      res.headers.contentType = ContentType.binary;
+      if (req.uri.queryParameters['length'] == '1') {
+        res.contentLength = 80 * 65536;
+      }
+      await res.addStream(parts(80));
+    case '/forever':
+      // never ends on its own: only a client that leaves stops it
+      await res.addStream(parts(null));
+      foreverDone.complete(sentParts);
     case '/headers':
       res.headers.contentType = ContentType.json;
       res.cookies.add(Cookie('a', 'b'));
@@ -50,6 +67,18 @@ void handle(HttpRequest req) async {
   }
   await res.close();
 }
+
+/// [count] parts of 64 KiB (null: no end). Part i holds the byte i % 256.
+Stream<List<int>> parts(int? count) async* {
+  sentParts = 0;
+  for (int i = 0; count == null || i < count; i++) {
+    sentParts++;
+    yield Uint8List(65536)..fillRange(0, 65536, i % 256);
+  }
+}
+
+int sentParts = 0;
+Completer<int> foreverDone = Completer<int>();
 
 Future<NativeHttpServer> start(int port, {int maxBodySize = 1024}) async {
   NativeHttpServer server = await NativeHttpServer.bind(
@@ -254,6 +283,63 @@ void main() {
     expect(back.length, body.length);
     expect(back, body);
     await big.close();
+  });
+
+  test('JSON answer keeps the default headers, one content type', () async {
+    HttpClientRequest req = await client.get('127.0.0.1', port, '/json');
+    HttpClientResponse res = await req.close();
+    expect(res.headers[HttpHeaders.contentTypeHeader], <String>[
+      'application/json; charset=utf-8',
+    ]);
+    expect(res.headers.value('x-frame-options'), 'SAMEORIGIN');
+    expect(await utf8.decodeStream(res), '{"a":1}');
+  });
+
+  test('a streamed body arrives whole, with and without a length', () async {
+    for (String path in <String>['/stream?length=1', '/stream']) {
+      HttpClientRequest req = await client.get('127.0.0.1', port, path);
+      HttpClientResponse res = await req.close();
+      expect(res.contentLength, path.endsWith('1') ? 80 * 65536 : -1);
+      int at = 0;
+      await for (List<int> chunk in res) {
+        for (int byte in chunk) {
+          expect(byte, (at ~/ 65536) % 256, reason: 'byte $at of $path');
+          at++;
+        }
+      }
+      expect(at, 80 * 65536, reason: path);
+    }
+  });
+
+  test('a streamed body stops when the client leaves', () async {
+    foreverDone = Completer<int>();
+    Socket socket = await Socket.connect('127.0.0.1', port);
+    socket.write('GET /forever HTTP/1.1\r\nHost: a\r\n\r\n');
+    int got = 0;
+    Completer<void> some = Completer<void>();
+    socket.listen((List<int> data) {
+      got += data.length;
+      if (got > 1 << 20 && !some.isCompleted) some.complete();
+    });
+    await some.future;
+    socket.destroy();
+    // the source is not read further: addStream ends
+    int sent = await foreverDone.future.timeout(const Duration(seconds: 5));
+    expect(sent, lessThan(10000));
+  });
+
+  test('compress: Rust gzips the body', () async {
+    NativeHttpServer zip = await start(0)
+      ..autoCompress = true;
+    HttpClientRequest req = await client.get('127.0.0.1', zip.port, '/long');
+    HttpClientResponse res = await req.close();
+    expect(res.headers.value(HttpHeaders.contentEncodingHeader), 'gzip');
+    expect(
+      res.compressionState,
+      HttpClientResponseCompressionState.decompressed,
+    );
+    expect(await utf8.decodeStream(res), 'a' * 1000);
+    await zip.close();
   });
 
   test('HEAD gets the headers with no body', () async {

@@ -48,7 +48,17 @@ class NativeRequest extends Stream<Uint8List> implements HttpRequest {
   );
 
   @override
-  late final Uri uri = Uri.parse(_target);
+  late final Uri uri = _uri(_target);
+
+  /// A plain path (no query) skips the full parse. Same result.
+  static Uri _uri(String target) {
+    bool plain =
+        target.startsWith('/') &&
+        !target.startsWith('//') &&
+        !target.contains('?') &&
+        !target.contains('#');
+    return plain ? Uri(path: target) : Uri.parse(target);
+  }
 
   @override
   late final NativeResponse response = NativeResponse(this);

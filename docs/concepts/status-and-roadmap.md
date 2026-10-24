@@ -29,7 +29,7 @@ No package is marked "stable API" yet. That comes with 3.0 stable.
 | `dox_openapi` | OpenAPI 3.1 document and a docs page | May change | 4 test files |
 | `dox_websocket` | WebSocket routes and events | May change | 4 test files, with Redis in CI |
 | `dox_socketio` | Socket.IO v4 server with a Redis adapter | May change | 6 test files, with the real `socket.io-client` in CI |
-| `dox_http_native` | Native HTTP/1.1 server (Rust hyper), the default server | Experimental | 2 Dart test files and Rust tests. No WebSocket yet. Big responses are held in memory. |
+| `dox_http_native` | Native HTTP/1.1 server (Rust hyper), the default server | Experimental | 2 Dart test files and Rust tests. No WebSocket yet. |
 | `dox_postgres_native` | Native Postgres client (Rust tokio-postgres), the default Postgres driver | Experimental | 1 Dart test file, plus the `dox_orm` tests. No TLS yet. |
 | `dox_mysql_native` | Native MySQL and MariaDB client (Rust mysql_async), the default MySQL driver | Experimental | 1 Dart test file, plus the `dox_orm` tests |
 
@@ -61,7 +61,6 @@ These were checked by searching the code in `packages/*/lib` with `rg`.
 
 | Item | Source |
 | --- | --- |
-| Stream big responses to the socket on the native server. Today a big file is held in memory. | `ponytail:` note in `dox_http_native/lib/src/response.dart` |
 | TLS for the native Postgres driver | `ponytail:` note in `dox_orm/lib/src/drivers/postgres_native_driver.dart` |
 | Savepoints for nested transactions. Today a nested `transaction()` joins the outer one. | `ponytail:` notes in the `dox_orm` drivers and in `dox_migration` |
 | A queue package (`dox_queue`) | Wanted by the owner. Not started. |
