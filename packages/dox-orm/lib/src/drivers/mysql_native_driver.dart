@@ -136,7 +136,11 @@ class MysqlNativeDriver extends DBDriver {
         },
       );
     } catch (_) {
-      await pool.rollback(tx);
+      try {
+        await pool.rollback(tx);
+      } catch (_) {
+        // keep the first error: it tells what went wrong
+      }
       rethrow;
     }
     await pool.commit(tx);
