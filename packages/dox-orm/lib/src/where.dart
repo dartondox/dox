@@ -1,24 +1,28 @@
+import 'drivers/db_driver.dart';
 import 'query_builder.dart';
 import 'shared_mixin.dart';
 
 mixin Where<T> implements SharedMixin<T> {
-  final List<String> _wheres = <String>[];
+  /// made on the first where, most rows never need it
+  List<String>? _wheres;
 
   /// true when a where condition was added
-  bool get hasWhere => _wheres.isNotEmpty;
+  bool get hasWhere => _wheres != null;
 
   String getWhereQuery() {
+    List<String>? wheres = _wheres;
+
     /// wrap user conditions in brackets so an OR can not skip the
     /// soft delete check.
     if (isSoftDeletes && !withTrashed) {
       String softDelete = "${helper.wrap('$tableName.deleted_at')} IS NULL";
-      if (_wheres.isEmpty) {
+      if (wheres == null) {
         return " WHERE $softDelete";
       }
-      return " WHERE (${_wheres.join(' ')}) AND $softDelete";
+      return " WHERE (${wheres.join(' ')}) AND $softDelete";
     }
-    if (_wheres.isNotEmpty) {
-      return " WHERE ${_wheres.join(' ')}";
+    if (wheres != null) {
+      return " WHERE ${wheres.join(' ')}";
     }
     return '';
   }
@@ -142,6 +146,16 @@ mixin Where<T> implements SharedMixin<T> {
     if (values.isEmpty) {
       return _rawQuery(type, not ? '1 = 1' : '1 = 0');
     }
+
+    /// postgres: one array param, so every list size gives the same sql
+    if (dbDriver.getName() == Driver.postgres && _sameType(values)) {
+      String columnKey = helper.parseColumnKey(column);
+      addSubstitutionValues(columnKey, values.toList());
+      return _rawQuery(
+        type,
+        "${helper.wrap(column)} ${not ? '<> ALL' : '= ANY'}($columnKey)",
+      );
+    }
     List<String> keys = <String>[];
     for (dynamic value in values) {
       String columnKey = helper.parseColumnKey(column);
@@ -154,6 +168,17 @@ mixin Where<T> implements SharedMixin<T> {
       "${helper.wrap(column)} $operator (${keys.join(',')})",
     );
   }
+
+  /// true when every value is an int, or every value is a String.
+  /// postgres reads these as an array of the column type. other lists
+  /// (mixed types, nulls) keep one param per value.
+  static bool _sameType(List<dynamic> values) {
+    return values.every(_isInt) || values.every(_isString);
+  }
+
+  static bool _isInt(dynamic value) => value is int;
+
+  static bool _isString(dynamic value) => value is String;
 
   QueryBuilder<T> _query(
     String type,
@@ -179,10 +204,11 @@ mixin Where<T> implements SharedMixin<T> {
   }
 
   QueryBuilder<T> _rawQuery(String type, String rawQuery, [dynamic params]) {
-    if (_wheres.isEmpty) {
-      _wheres.add(rawQuery);
+    List<String>? wheres = _wheres;
+    if (wheres == null) {
+      _wheres = <String>[rawQuery];
     } else {
-      _wheres.add("$type $rawQuery");
+      wheres.add("$type $rawQuery");
     }
     if (params is Map<String, dynamic>) {
       params.forEach((String key, dynamic value) {

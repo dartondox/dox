@@ -152,6 +152,9 @@ await Actor().where('age', 60).orWhereNotIn('id', <int>[1, 2]).get();
 ```
 
 - Each value is sent as a bound parameter.
+- On Postgres, a list of only `int` or only `String` values is sent as one array
+  parameter: `"id" = ANY(@id_p0)` (`<> ALL` for `whereNotIn`).
+  So a list of any size gives the same SQL, and Postgres reuses one prepared statement.
 - An empty list matches no rows for `whereIn`, and all rows for `whereNotIn`.
 
 ### `whereNull` and `whereNotNull`
@@ -231,8 +234,11 @@ await Actor().orderBy('name', 'asc').orderBy('id', 'desc').get();
 await Actor().limit(10).get();
 await Actor().take(10).get();
 await Actor().limit(10).offset(20).get();
-// LIMIT 10 OFFSET 20
+// LIMIT @dox_limit OFFSET @dox_offset
 ```
+
+The numbers are sent as bound parameters.
+So every page of `paginate()` has the same SQL, and the database reuses one prepared statement.
 
 ### `groupBy`
 

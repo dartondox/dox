@@ -650,9 +650,62 @@ void main() async {
           .toList();
       expect(selects.length, 3);
       for (String sql in selects) {
-        expect(sql, endsWith(' LIMIT ${sql.contains('LIMIT 2') ? 2 : 1}'));
+        expect(sql, contains(' LIMIT '));
         expect(sql.contains('OFFSET'), false);
       }
+    });
+
+    test(
+      'LIMIT and OFFSET are params, so every page has the same sql',
+      () async {
+        await Blog().insertMultiple(<Map<String, dynamic>>[
+          for (int i = 0; i < 5; i++)
+            <String, dynamic>{'title': 't$i', 'body': 'b'},
+        ]);
+        _SqlRecorder recorder = _SqlRecorder();
+        QueryPrinter old = SqlQueryBuilder().printer;
+        SqlQueryBuilder().printer = recorder;
+        Pagination<Blog> page2;
+        Pagination<Blog> page3;
+        try {
+          page2 = await Blog()
+              .debug(true)
+              .orderBy('uid')
+              .paginate(currentPage: 2, perPage: 2);
+          page3 = await Blog()
+              .debug(true)
+              .orderBy('uid')
+              .paginate(currentPage: 3, perPage: 2);
+        } finally {
+          SqlQueryBuilder().printer = old;
+        }
+        expect(page2.data.map((Blog b) => b.title), <String>['t2', 't3']);
+        expect(page3.data.map((Blog b) => b.title), <String>['t4']);
+        expect(page3.total, 5);
+        List<String> selects = recorder.queries
+            .where((String s) => s.startsWith('SELECT *'))
+            .toList();
+        expect(selects.length, 2);
+        expect(selects[0], selects[1]);
+      },
+    );
+
+    test('whereIn with many sizes finds the right rows', () async {
+      await Blog().insertMultiple(<Map<String, dynamic>>[
+        for (int i = 0; i < 4; i++)
+          <String, dynamic>{'title': 't$i', 'body': 'b'},
+      ]);
+      List<int> ids = (await Blog().all()).map((Blog b) => b.uid!).toList();
+      expect(await Blog().whereIn('uid', ids.sublist(0, 1)).count(), 1);
+      expect(await Blog().whereIn('uid', ids.sublist(0, 3)).count(), 3);
+      expect(await Blog().whereNotIn('uid', ids.sublist(0, 3)).count(), 1);
+      expect(await Blog().whereIn('title', <String>['t1', 't2']).count(), 2);
+
+      /// mixed types still work
+      expect(
+        await Blog().whereIn('uid', <dynamic>[ids.first, null]).count(),
+        1,
+      );
     });
 
     test('the same query gives the same param names', () async {
