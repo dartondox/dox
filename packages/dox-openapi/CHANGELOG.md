@@ -1,6 +1,6 @@
 ## Unreleased
 
-- The `/docs` page loads its CDN files with `crossorigin="anonymous"`.
+- The `/docs` page loads its CDN files with an `integrity` hash, so the browser refuses a changed file.
 
 ## 3.0.0-alpha.6
 
