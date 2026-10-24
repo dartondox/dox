@@ -106,14 +106,15 @@ void main() {
   }
 
   test('a big result (sent without a copy)', () async {
-    // over 64 KiB: Rust gives the bytes to Dart as external typed data
+    // over 64 KiB: Rust gives the bytes to Dart as external typed data.
+    // 1000 rows: MariaDB stops a recursive CTE after 1000 steps by default.
     MysqlNativeResult r = await pool.query(
       "SELECT n, REPEAT('x', 100) AS t FROM (WITH RECURSIVE s(n) AS "
-      '(SELECT 1 UNION ALL SELECT n + 1 FROM s WHERE n < 2000) '
+      '(SELECT 1 UNION ALL SELECT n + 1 FROM s WHERE n < 1000) '
       'SELECT n FROM s) q',
     );
-    expect(r.rows, hasLength(2000));
-    expect(r.rows.last, <String, dynamic>{'n': 2000, 't': 'x' * 100});
+    expect(r.rows, hasLength(1000));
+    expect(r.rows.last, <String, dynamic>{'n': 1000, 't': 'x' * 100});
   });
 
   test('the same sql gets the new columns after ALTER TABLE', () async {
