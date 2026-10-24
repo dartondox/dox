@@ -87,7 +87,7 @@ mixin Join<T> implements SharedMixin<T> {
     String firstJoinColumn = arg2;
     String secondJoinColumn = arg3;
     if (arg4 != null) {
-      condition = arg3;
+      condition = helper.operator(arg3);
       secondJoinColumn = arg4;
     }
     _joins.add(

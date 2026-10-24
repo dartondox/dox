@@ -13,6 +13,34 @@ class Model<T> extends QueryBuilder<T> {
   set hidden(List<String> value) => _hidden = value;
   List<String>? _hidden;
 
+  /// columns that create(), insert(), insertMultiple() and update() take
+  /// from a map.
+  /// empty means every column. set it to stop mass assignment, eg. so
+  /// `User().create(req.body)` can not set `is_admin`.
+  ///
+  /// ```
+  /// @override
+  /// List<String> get fillable => <String>['name', 'email'];
+  /// ```
+  List<String> get fillable => const <String>[];
+
+  /// columns that create(), insert(), insertMultiple() and update() never
+  /// take from a map
+  List<String> get guarded => const <String>[];
+
+  /// [data] without the keys that [fillable] and [guarded] do not allow
+  Map<String, dynamic> _onlyFillable(Map<String, dynamic> data) {
+    List<String> allowed = fillable;
+    List<String> blocked = guarded;
+    if (allowed.isEmpty && blocked.isEmpty) return data;
+    return <String, dynamic>{
+      for (MapEntry<String, dynamic> e in data.entries)
+        if ((allowed.isEmpty || allowed.contains(e.key)) &&
+            !blocked.contains(e.key))
+          e.key: e.value,
+    };
+  }
+
   /// the generator overrides it with the model columns
   List<String> get tableColumns => _tableColumns ??= <String>[];
   set tableColumns(List<String> value) => _tableColumns = value;
@@ -156,7 +184,12 @@ class Model<T> extends QueryBuilder<T> {
   Future<bool> delete() async {
     /// a query delete: Blog().where('id', 1).delete()
     if (tempIdValue == null) {
-      await super.delete();
+      if (isSoftDeletes) {
+        /// super.update(): deleted_at is not checked against fillable
+        await super.update(<String, dynamic>{'deleted_at': now()});
+      } else {
+        await super.delete();
+      }
       return true;
     }
     bool events = _eventsOn;
@@ -491,6 +524,7 @@ class Model<T> extends QueryBuilder<T> {
   /// then. When a hook cancels, it returns the unsaved model.
   @override
   Future<T> create(Map<String, dynamic> data) async {
+    data = _onlyFillable(data);
     if (!_eventsOn) return await super.insert(data);
     Model<T> model = fromMap(_dateTimesToString(data)) as Model<T>;
     model.debug(_debug);
@@ -519,5 +553,28 @@ class Model<T> extends QueryBuilder<T> {
   @override
   Future<T> insert(Map<String, dynamic> data) async {
     return await create(data);
+  }
+
+  /// update the rows of this query. keys that [fillable] and [guarded]
+  /// do not allow are dropped. nothing runs when no key is left.
+  /// ```
+  /// await User().where('id', 1).update(req.body);
+  /// ```
+  @override
+  Future<void> update(Map<String, dynamic> data) async {
+    data = _onlyFillable(data);
+    if (data.isEmpty) return;
+    await super.update(data);
+  }
+
+  /// insert many rows. keys that [fillable] and [guarded] do not allow
+  /// are dropped from each row.
+  @override
+  Future<List<Map<String, dynamic>>> insertMultiple(
+    List<Map<String, dynamic>> list,
+  ) async {
+    return await super.insertMultiple(<Map<String, dynamic>>[
+      for (Map<String, dynamic> data in list) _onlyFillable(data),
+    ]);
   }
 }

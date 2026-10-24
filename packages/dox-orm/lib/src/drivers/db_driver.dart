@@ -34,8 +34,10 @@ abstract class DBDriver {
   Future<void> close() async {}
 
   /// quote a table or column name, `"name"` on postgres and sqlite and
-  /// `` `name` `` on mysql. it handles `table.column`, `*` and `column as alias`.
-  /// a value with `(` is a raw expression and is not changed.
+  /// `` `name` `` on mysql. it handles `table.column`, `table.*`, `*` and
+  /// `column as alias`. anything else (eg. `count(*)`) throws an
+  /// [ArgumentError], so user input can not add sql. use the raw methods,
+  /// like `selectRaw()` or `orderByRaw()`, for expressions.
   String wrap(String value) {
     String? known = _wrapped[value];
     if (known != null) {
@@ -54,8 +56,8 @@ abstract class DBDriver {
 
   String _wrap(String value) {
     value = value.trim();
-    if (value.contains('(')) {
-      return value;
+    if (!_namePattern.hasMatch(value)) {
+      throw ArgumentError.value(value, 'name', 'is not a plain column name');
     }
     List<String> alias = value.split(_aliasPattern);
     if (alias.length == 2) {
@@ -63,6 +65,13 @@ abstract class DBDriver {
     }
     return value.split('.').map(_wrapPart).join('.');
   }
+
+  /// `name`, `table.name`, `table.*`, `*` and `name as alias`
+  static final RegExp _namePattern = RegExp(
+    r'^(?:[\p{L}\p{N}_$]+\.)*(?:[\p{L}\p{N}_$]+|\*)(?:\s+as\s+[\p{L}\p{N}_$]+)?$',
+    caseSensitive: false,
+    unicode: true,
+  );
 
   static final RegExp _aliasPattern = RegExp(r'\s+as\s+', caseSensitive: false);
 

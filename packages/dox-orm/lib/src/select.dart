@@ -14,38 +14,19 @@ mixin Select<T> implements SharedMixin<T> {
   /// await Blog().select('title, body').get();
   /// await Blog().select('title').select('body').get();
   /// await Blog().select(['title', 'body']).get();
-  /// await Blog().select(['title', 'count(*) as total']).get();
+  /// await Blog().select(['title', 'body as content']).get();
   /// ```
   /// [selection] can be string or array.
-  /// column names are quoted. a part with `(` is kept as it is.
-  /// use selectRaw() for anything else.
+  /// column names are quoted. it throws an [ArgumentError] when a part is
+  /// not a plain name. use selectRaw() for expressions like `count(*)`.
   QueryBuilder<T> select(dynamic selection) {
     if (selection is List<String>) {
       _select = selection.map(helper.wrap).join(',');
     }
     if (selection is String) {
-      _select = _splitColumns(selection).map(helper.wrap).join(',');
+      _select = selection.split(',').map(helper.wrap).join(',');
     }
     return queryBuilder;
-  }
-
-  /// split 'a, count(x, y) as b' into ['a', 'count(x, y) as b'].
-  /// commas inside brackets do not split.
-  List<String> _splitColumns(String selection) {
-    List<String> parts = <String>[];
-    int depth = 0;
-    int start = 0;
-    for (int i = 0; i < selection.length; i++) {
-      String char = selection[i];
-      if (char == '(') depth++;
-      if (char == ')') depth--;
-      if (char == ',' && depth == 0) {
-        parts.add(selection.substring(start, i));
-        start = i + 1;
-      }
-    }
-    parts.add(selection.substring(start));
-    return parts;
   }
 
   /// Select raw query, nothing is quoted

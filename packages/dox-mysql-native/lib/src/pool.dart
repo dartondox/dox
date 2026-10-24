@@ -68,6 +68,10 @@ class MysqlNativePool {
   /// `/var/run/mysqld/mysqld.sock` or `/cloudsql/project:region:instance`.
   /// Then [port] is not used.
   ///
+  /// [secure] turns on TLS. The server certificate is checked. Set
+  /// [verifyCertificate] to false to skip the check, only for a self-signed
+  /// certificate in development.
+  ///
   /// [threads] is the size of the Rust runtime of the whole process. Only
   /// the first pool sets it. One thread is the fastest for most apps.
   factory MysqlNativePool.open({
@@ -78,6 +82,7 @@ class MysqlNativePool {
     required String database,
     int maxConnections = 10,
     bool secure = false,
+    bool verifyCertificate = true,
     int statementCacheSize = 32,
     Duration maxConnectionAge = const Duration(hours: 12),
     int threads = 1,
@@ -100,6 +105,11 @@ class MysqlNativePool {
         'stmt_cache_size': '$statementCacheSize',
         'conn_ttl': '${maxConnectionAge.inSeconds}',
         if (secure) 'require_ssl': 'true',
+        // only for a self-signed certificate in development
+        if (secure && !verifyCertificate) ...<String, String>{
+          'verify_ca': 'false',
+          'verify_identity': 'false',
+        },
         if (socket) 'socket': host,
       },
     );

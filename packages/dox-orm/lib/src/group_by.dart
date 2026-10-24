@@ -12,7 +12,7 @@ mixin GroupBy<T> implements SharedMixin<T> {
   ///
   /// ```
   /// String query = await Blog()
-  ///   .select('count (*) as total, status')
+  ///   .selectRaw('count(*) as total, status')
   ///   .groupBy('status')
   ///   .get();
   /// ```
@@ -24,6 +24,16 @@ mixin GroupBy<T> implements SharedMixin<T> {
       _groupBy =
           ' GROUP BY ${column.map((dynamic c) => helper.wrap(c.toString())).join(',')}';
     }
+    return queryBuilder;
+  }
+
+  /// group by raw query, nothing is quoted. never put user input in it.
+  ///
+  /// ```
+  /// await QueryBuilder.table('blog').groupByRaw('date(created_at)').get();
+  /// ```
+  QueryBuilder<T> groupByRaw(String query) {
+    _groupBy = ' GROUP BY $query';
     return queryBuilder;
   }
 }

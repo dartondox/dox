@@ -165,7 +165,7 @@ mixin Where<T> implements SharedMixin<T> {
     String condition = '=';
     dynamic value = arg2;
     if (arg3 != null) {
-      condition = arg2;
+      condition = helper.operator(arg2);
       value = arg3;
     }
 

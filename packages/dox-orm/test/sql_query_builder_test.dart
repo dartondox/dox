@@ -147,7 +147,7 @@ void main() async {
 
       /// groupBy() rows are maps, so use QueryBuilder.table()
       List<Map<String, dynamic>> data2 = await QueryBuilder.table('blog')
-          .select(<String>['title', 'count(*) as total'])
+          .selectRaw('title, count(*) as total')
           .groupBy('title')
           .get();
 

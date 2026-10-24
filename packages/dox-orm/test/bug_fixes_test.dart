@@ -258,8 +258,9 @@ void main() async {
           .where('order.key', '!=', 'z')
           .orderBy('key')
           .get();
+      String group = SqlQueryBuilder().dbDriver.wrap('group');
       List<Map<String, dynamic>> groups = await QueryBuilder.table('order')
-          .select('group, count(*) as total')
+          .selectRaw('$group, count(*) as total')
           .groupBy('group')
           .get();
       int total = await QueryBuilder.table('order').groupBy('group').count();
