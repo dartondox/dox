@@ -10,6 +10,7 @@ To start a new project, use `dox create my_app` instead. See [Getting started](h
 ```bash
 dart pub get
 cp .env.example .env
+dox key:generate   # writes a new APP_KEY into .env
 dox migrate
 dox s
 ```
@@ -21,6 +22,7 @@ The app runs on the `APP_PORT` from `.env` (`3003` in `.env.example`).
 ```bash
 dart pub get
 cp .env.example .env
+dox key:generate
 dox build
 cd build/bundle && ./bin/server
 ```

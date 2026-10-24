@@ -37,10 +37,6 @@ class _$ListBlogsDto extends DtoSchema<ListBlogs> {
     Object? c1;
     c1 = s.integer(s.read(input, 'limit'), p, 'limit', _m);
     if (c1 == null) s.required(p, 'limit', _m);
-    // withTrashed: bool
-    Object? c2;
-    c2 = s.boolean(s.read(input, 'with_trashed'), p, 'with_trashed', _m);
-    if (c2 == null) s.required(p, 'with_trashed', _m);
     if (s.issues.length != e) return null;
     if (c0 is int) {
       if (!(c0 >= 1)) {
@@ -72,7 +68,6 @@ class _$ListBlogsDto extends DtoSchema<ListBlogs> {
     return ListBlogs(
       page: c0 is Undefined ? 1 : c0 as int,
       limit: c1 is Undefined ? 20 : c1 as int,
-      withTrashed: c2 is Undefined ? false : c2 as bool,
     );
   }
 
@@ -81,9 +76,6 @@ class _$ListBlogsDto extends DtoSchema<ListBlogs> {
     return ListBlogs(
       page: m.containsKey('page') ? (m['page'] as num).toInt() : 1,
       limit: m.containsKey('limit') ? (m['limit'] as num).toInt() : 20,
-      withTrashed: m.containsKey('with_trashed')
-          ? m['with_trashed'] as bool
-          : false,
     );
   }
 
@@ -91,8 +83,7 @@ class _$ListBlogsDto extends DtoSchema<ListBlogs> {
   Map<String, dynamic> toMap(ListBlogs o) {
     int f0 = o.page;
     int f1 = o.limit;
-    bool f2 = o.withTrashed;
-    return <String, dynamic>{'page': f0, 'limit': f1, 'with_trashed': f2};
+    return <String, dynamic>{'page': f0, 'limit': f1};
   }
 
   @override
@@ -113,11 +104,6 @@ class _$ListBlogsDto extends DtoSchema<ListBlogs> {
           'maximum': 100,
           'description': 'Blogs per page.',
           'default': 20,
-        },
-        'with_trashed': <String, dynamic>{
-          'type': 'boolean',
-          'description': 'Also list deleted blogs.',
-          'default': false,
         },
       },
     };

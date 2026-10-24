@@ -11,6 +11,10 @@ void main() {
     // Set it before the app reads its env.
     Env().load();
     Env().env['APP_PORT'] = '0';
+    // .env.example has no APP_KEY, so give the test one.
+    if ((Env().env['APP_KEY'] ?? '').isEmpty) {
+      Env().env['APP_KEY'] = 'test-key-for-the-app-tests-only1';
+    }
     Dox().initialize(appConfig);
     // one isolate: with port 0 each isolate gets its own port
     Dox().totalIsolate(1);

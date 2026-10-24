@@ -163,8 +163,8 @@ const OpenApiRegistry openApiRegistry = OpenApiRegistry(
   routes: <OpenApiRouteBinding>[
     OpenApiRouteBinding('GET', 'api/ping', 'ApiController.pong'),
     OpenApiRouteBinding('GET', 'api/blogs', 'BlogController.index'),
-    OpenApiRouteBinding('POST', 'api/blogs', 'BlogController.store'),
     OpenApiRouteBinding('GET', 'api/blogs/{id}', 'BlogController.show'),
+    OpenApiRouteBinding('POST', 'api/blogs', 'BlogController.store'),
     OpenApiRouteBinding('PUT', 'api/blogs/{id}', 'BlogController.update'),
     OpenApiRouteBinding('PATCH', 'api/blogs/{id}', 'BlogController.update'),
     OpenApiRouteBinding('DELETE', 'api/blogs/{id}', 'BlogController.destroy'),
@@ -190,11 +190,6 @@ const OpenApiRegistry openApiRegistry = OpenApiRegistry(
           'maximum': 100,
           'description': 'Blogs per page.',
           'default': 20,
-        },
-        'with_trashed': <String, dynamic>{
-          'type': 'boolean',
-          'description': 'Also list deleted blogs.',
-          'default': false,
         },
       },
     },

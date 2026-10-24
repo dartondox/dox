@@ -16,6 +16,11 @@ void main() {
 
   setUpAll(() async {
     Directory dir = await Directory.systemTemp.createTemp('dox_app_openapi');
+    // .env.example has no APP_KEY, so give the test one.
+    Env().load();
+    if ((Env().env['APP_KEY'] ?? '').isEmpty) {
+      Env().env['APP_KEY'] = 'test-key-for-the-app-tests-only1';
+    }
     Dox().initialize(appConfig);
     List<File> files = await Dox().writeOpenApi(dir.path);
     doc = jsonDecode(await files[0].readAsString());
@@ -34,7 +39,7 @@ void main() {
     expect(list['tags'], <String>['Blog']);
     expect(
       <dynamic>[for (dynamic p in list['parameters']) p['name']],
-      <String>['page', 'limit', 'with_trashed'],
+      <String>['page', 'limit'],
     );
     expect(
       list['responses']['200']['content']['application/json']['schema'],
@@ -68,6 +73,31 @@ void main() {
     ]);
     expect(user['responses'].keys, contains('401'));
     expect(doc['components']['securitySchemes'].keys, <String>['bearerAuth']);
+  });
+
+  test('blog writes need login, reads do not', () {
+    List<dynamic> bearer = <dynamic>[
+      <String, dynamic>{'bearerAuth': <dynamic>[]},
+    ];
+    Map<String, dynamic> blogs = doc['paths']['/api/blogs'];
+    Map<String, dynamic> blog = doc['paths']['/api/blogs/{id}'];
+    expect(blogs['get']['security'], isNull);
+    expect(blog['get']['security'], isNull);
+    expect(blogs['post']['security'], bearer);
+    expect(blog['put']['security'], bearer);
+    expect(blog['patch']['security'], bearer);
+    expect(blog['delete']['security'], bearer);
+  });
+
+  test('no open demo routes that read, write or delete files', () {
+    List<String> routes = <String>[
+      for (dynamic r in Route().routes) '${r.method} ${r.path}',
+    ];
+    expect(routes, contains('GET /ping'));
+    expect(routes, isNot(contains('GET /download')));
+    expect(routes, isNot(contains('DELETE /image')));
+    expect(routes, isNot(contains('DELETE /ping')));
+    expect(routes, isNot(contains('POST /ping')));
   });
 
   test('model schemas leave out hidden fields', () {
