@@ -4264,7 +4264,8 @@ Open these in <code>setup()</code>. See <a href="../../digging-deeper/services/"
 <p>Set <code>totalIsolate</code> in <code>AppConfig</code>, or <code>APP_TOTAL_ISOLATE</code> in <code>.env</code>. In code, <code>Dox().totalIsolate(2)</code> before <code>startServer()</code> wins over the config.
 Use <code>1</code> in tests. See <a href="../../digging-deeper/isolate/">Isolate</a>.</p>
 <h2 id="where-the-database-pools-live">Where the database pools live</h2>
-<p>The ORM is started in a service (<code>ORMService</code>). Every isolate runs <code>setup()</code>, so every isolate opens its own pool.</p>
+<p>The ORM is started in a service (<code>ORMService</code>). Every isolate runs <code>setup()</code>, so every isolate opens a pool.
+The native drivers live in Rust. There, isolates that open the same settings get the same pool.</p>
 <table>
 <thead>
 <tr>
@@ -4276,17 +4277,17 @@ Use <code>1</code> in tests. See <a href="../../digging-deeper/isolate/">Isolate
 <tbody>
 <tr>
 <td>Postgres native (<code>dox_postgres_native</code>)</td>
-<td>one pool of <code>maxConnectionCount</code> connections</td>
-<td>one Rust runtime, shared by all pools (<code>extra['threads']</code>, default <code>1</code>)</td>
+<td>nothing</td>
+<td>one pool of <code>maxConnectionCount</code> connections per settings, and one Rust runtime (<code>extra['threads']</code>, default <code>1</code>)</td>
 </tr>
 <tr>
 <td>MySQL native (<code>dox_mysql_native</code>)</td>
-<td>one pool</td>
-<td>one Rust runtime, shared by all pools</td>
+<td>nothing</td>
+<td>one pool of <code>maxConnectionCount</code> connections per settings, and one Rust runtime</td>
 </tr>
 <tr>
 <td>Dart drivers (<code>postgres</code>, <code>mysql_dart</code>)</td>
-<td>one pool</td>
+<td>one pool of <code>maxConnectionCount</code> connections</td>
 <td>nothing shared</td>
 </tr>
 <tr>
@@ -4296,14 +4297,11 @@ Use <code>1</code> in tests. See <a href="../../digging-deeper/isolate/">Isolate
 </tr>
 </tbody>
 </table>
-<p>So the total number of connections is <code>isolates × maxConnectionCount</code>.
-With 8 cores and the default of 10, the app can open 80 connections. Set <code>maxConnectionCount</code> with this in mind.</p>
-<div class="admonition note">
-<p class="admonition-title">Share one native pool between isolates</p>
-<p>A native pool has a <code>handle</code> (an <code>int</code>). Give it to another isolate and use
-<code>PostgresNativeDriver(PgNativePool.fromHandle(handle))</code> there. Then both isolates use one pool.
-See <a href="../../database/postgres-native/#options">Native Postgres driver</a>.</p>
-</div>
+<p>So with the native drivers, the app opens at most <code>maxConnectionCount</code> connections, for any number of isolates.
+With the Dart drivers, it is <code>isolates × maxConnectionCount</code>: with 8 cores and the default of 10, 80 connections.
+The pool size is always your choice. Set it below the <code>max_connections</code> of the database.</p>
+<p>The pool closes when the last isolate that uses it closes it.
+    See <a href="../../database/postgres-native/#options">Native Postgres driver</a>.</p>
 <p>The native drivers are the default. When the native library does not load, the ORM uses the Dart driver and prints one warning line.
 Set <code>DOX_DB_DRIVER=dart</code> to use the Dart drivers on purpose. See <a href="../../database/">Database</a>.</p>
 <h2 id="the-layout-of-a-dox-app">The layout of a Dox app</h2>

@@ -4754,6 +4754,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha6_11" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4909,7 +4920,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_10" class="md-nav__link">
+  <a href="#unreleased_11" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -5003,7 +5014,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_11" class="md-nav__link">
+  <a href="#unreleased_12" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -5097,7 +5108,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_12" class="md-nav__link">
+  <a href="#unreleased_13" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -5191,7 +5202,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_13" class="md-nav__link">
+  <a href="#unreleased_14" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -6395,6 +6406,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha6_11" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6550,7 +6572,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_10" class="md-nav__link">
+  <a href="#unreleased_11" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -6644,7 +6666,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_11" class="md-nav__link">
+  <a href="#unreleased_12" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -6738,7 +6760,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_12" class="md-nav__link">
+  <a href="#unreleased_13" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -6832,7 +6854,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_13" class="md-nav__link">
+  <a href="#unreleased_14" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -7361,6 +7383,10 @@
 <h2 id="dox_mysql_native">dox_mysql_native</h2>
 <h3 id="unreleased_7">Unreleased</h3>
 <ul>
+<li>Each request now has a timeout of 300 s (pool slot, connect and query), like <code>dox_postgres_native</code>. Before, a request could wait for a free connection forever.</li>
+<li>A transaction that gets no request for 300 s (eg. its isolate is gone) is rolled back, and its connection goes back to the pool. Before, it held the connection forever.</li>
+<li>Fewer copies of the result bytes. The record head is written in front of the rows, so the record is not copied again. The first result of a batch is moved into the post buffer, not copied. A batch of 64 KiB or more goes to Dart without a copy (external typed data).</li>
+<li>The column names are kept per SQL text. The next result of the same query does not decode them again.</li>
 <li>New <code>verifyCertificate</code> on <code>MysqlNativePool.open()</code>. It is true by default, so TLS checks the server certificate. Set it to false only for a self-signed certificate in development.</li>
 </ul>
 <h3 id="300-alpha6_8">3.0.0-alpha.6</h3>
@@ -7447,12 +7473,11 @@
 <li>New <code>Model.columnsToMap()</code>: the columns only, without relations. <code>save()</code> uses it, so it no longer turns preloaded relations into JSON.</li>
 <li>Less work per row: the where, join and order lists of a model are made only when used. <code>getPreload()</code> and the generated getters do not make a new list or map on each call.</li>
 <li>The SQL text is no longer scanned for double spaces on each query. <code>orderBy()</code> without a direction no longer adds a space.</li>
-<li>
-<p><code>QueryBuilderHelper.runQuery()</code> no longer has the <code>clean</code> parameter.</p>
-</li>
-<li>
-<p>Breaking: column and table names in <code>select</code>, <code>where</code>, <code>orderBy</code>, <code>groupBy</code>, <code>join</code>, <code>insert</code> and <code>update</code> must be plain names (<code>name</code>, <code>table.name</code>, <code>table.*</code>, <code>*</code>, <code>name as alias</code>). Anything else, like <code>count(*)</code>, throws an <code>ArgumentError</code>. Before, a name with <code>(</code> went into the SQL as it is, so user input could add SQL. Use <code>selectRaw</code>, <code>whereRaw</code> or the new <code>orderByRaw</code> and <code>groupByRaw</code> for expressions.</p>
-</li>
+<li><code>QueryBuilderHelper.runQuery()</code> no longer has the <code>clean</code> parameter.</li>
+<li>Fix: in a native Postgres or MySQL <code>transaction()</code>, when the rollback after an error also fails, the first error is thrown. Before, the rollback error replaced it.</li>
+<li>The native Postgres driver shares one pool for all isolates with the same settings, like the native MySQL driver. <code>maxConnectionCount</code> is for the whole process on both native drivers. The Dart drivers still have one pool per isolate.</li>
+<li>The Dart Postgres driver keeps its prepared statements after a session command like <code>SET</code>, <code>SHOW</code>, <code>BEGIN</code> or <code>COMMIT</code>. Before, any query that was not select/insert/update/delete dropped all of them.</li>
+<li>Breaking: column and table names in <code>select</code>, <code>where</code>, <code>orderBy</code>, <code>groupBy</code>, <code>join</code>, <code>insert</code> and <code>update</code> must be plain names (<code>name</code>, <code>table.name</code>, <code>table.*</code>, <code>*</code>, <code>name as alias</code>). Anything else, like <code>count(*)</code>, throws an <code>ArgumentError</code>. Before, a name with <code>(</code> went into the SQL as it is, so user input could add SQL. Use <code>selectRaw</code>, <code>whereRaw</code> or the new <code>orderByRaw</code> and <code>groupByRaw</code> for expressions.</li>
 <li>Breaking: the operator of <code>where()</code> and <code>join()</code> must be one of <code>=</code>, <code>!=</code>, <code>&lt;&gt;</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code>, <code>like</code>, <code>not like</code>, <code>ilike</code> (any case). Any other value throws an <code>ArgumentError</code>.</li>
 <li>New <code>fillable</code> and <code>guarded</code> lists on <code>Model</code>. When set, <code>create()</code>, <code>insert()</code> and <code>update()</code> on the model drop the keys that are not allowed, so <code>User().create(req.body)</code> can not set <code>is_admin</code>. <code>insertMultiple()</code> on the model drops them from each row too. Both are empty by default, so nothing changes until you set them.</li>
 <li>Breaking: TLS checks the server certificate. Postgres <code>useSSL</code> (and <code>sslmode=verify-ca</code> or <code>verify-full</code> in a url) now uses <code>SslMode.verifyFull</code>. <code>sslmode=require</code> in a url stays <code>SslMode.require</code> like libpq: it encrypts but does not check the certificate (eg. Heroku). The Dart MySQL driver no longer accepts a bad certificate. Set <code>extra['verifyCertificate']</code> to false (or <code>?verifyCertificate=false</code> in a url) to skip the check for a self-signed certificate in development.</li>
@@ -7524,6 +7549,15 @@
 <li>Schema: <code>unique()</code> on a column that is already unique is skipped. Default values are escaped.</li>
 </ul>
 <h2 id="dox_postgres_native">dox_postgres_native</h2>
+<h3 id="unreleased_10">Unreleased</h3>
+<ul>
+<li>Breaking: isolates that open the same settings (and the same <code>maxConnections</code>) now share one pool in Rust, like <code>dox_mysql_native</code>. So <code>maxConnections</code> is for the whole process, not per isolate. Before, 8 isolates with the default of 10 could open 80 connections. Each <code>open</code> counts, and only the last <code>close()</code> closes the pool. The native ABI version is now 2.</li>
+<li>The prepared statement cache of a connection drops the statement used longest ago when it is full (LRU, 512 statements). Before, it dropped all statements at once.</li>
+<li>Fewer copies of the result bytes. Rust writes each result straight into the buffer of the next post. A batch of 64 KiB or more goes to Dart without a copy (external typed data).</li>
+<li>Faster decode of <code>uuid</code>, <code>numeric</code>, <code>date</code>, <code>json</code> and <code>jsonb</code>, without the type registry of the <code>postgres</code> package. A negative <code>numeric</code> below 1 now has its leading zero: <code>-0.5</code>, not <code>-.5</code> like the <code>postgres</code> package.</li>
+<li>An <code>int</code> parameter is written as text straight into the request buffer, without a <code>String</code>. It still goes without a type, so the server picks it.</li>
+<li>The column names are kept per SQL text, not only for the last result. Queries that take turns no longer decode their column names again.</li>
+</ul>
 <h3 id="300-alpha6_11">3.0.0-alpha.6</h3>
 <ul>
 <li>Version bump only, to match the other packages.</li>
@@ -7592,7 +7626,7 @@
 <li>Please depend on <code>dox_orm</code> and change your imports. See the README.</li>
 </ul>
 <h2 id="dox_socketio">dox_socketio</h2>
-<h3 id="unreleased_10">Unreleased</h3>
+<h3 id="unreleased_11">Unreleased</h3>
 <ul>
 <li>Security: a binary packet nested deeper than 32 levels is a parse error (<code>SocketDecoder(maxDepth: ...)</code>). Before, a deep packet overflowed the stack and could stop the server. Any decode error now closes only that one connection.</li>
 <li>Security: many CONNECT packets for one namespace at once make only one socket. Before, each one made a socket that stayed in memory.</li>
@@ -7638,7 +7672,7 @@
 <li>In-memory adapter and Redis adapter.</li>
 </ul>
 <h2 id="dox_storage">dox_storage</h2>
-<h3 id="unreleased_11">Unreleased</h3>
+<h3 id="unreleased_12">Unreleased</h3>
 <ul>
 <li>Perf: the S3 driver keeps the SigV4 signing key for each day. Before, every request ran 4 extra HMACs to make it again.</li>
 <li>Perf: the S3 driver hashes a body of 1 MiB or more (eg. an 8 MiB multipart part) in another isolate. Before, the sha256 blocked the event loop.</li>
@@ -7673,7 +7707,7 @@
 <li><code>DriveManager.fake()</code> for tests.</li>
 </ul>
 <h2 id="dox_validation">dox_validation</h2>
-<h3 id="unreleased_12">Unreleased</h3>
+<h3 id="unreleased_13">Unreleased</h3>
 <ul>
 <li>Perf: object, list, map and union schemas work out <code>isAsync</code> once and keep the answer. Before, the whole schema tree was walked on every <code>validateSchema</code> call.</li>
 <li><code>url()</code> now allows only <code>http</code> and <code>https</code> links. Pass <code>schemes</code> to allow others.</li>
@@ -7724,7 +7758,7 @@
 <li>Laravel style string rules with <code>v.fromRules()</code>.</li>
 </ul>
 <h2 id="dox_websocket">dox_websocket</h2>
-<h3 id="unreleased_13">Unreleased</h3>
+<h3 id="unreleased_14">Unreleased</h3>
 <ul>
 <li>Breaking: <code>joinRoom</code> is refused unless you set <code>WebsocketServer().authorizeJoin</code>. Before, any client could join any room, like <code>user:42</code>, and get its messages.</li>
 <li>Security: new <code>WebsocketServer().allowedOrigins</code>. When set, a websocket from another origin gets 403. When null (the default), any origin is allowed.</li>

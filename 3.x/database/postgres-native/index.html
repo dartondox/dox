@@ -4160,7 +4160,7 @@ Dart driver, because the native driver has no TLS yet.</p>
 <tr>
 <td><code>maxConnectionCount</code></td>
 <td><code>10</code></td>
-<td>Most connections in the pool.</td>
+<td>Most connections in the pool, for the whole process.</td>
 </tr>
 <tr>
 <td><code>timeZone</code></td>
@@ -4179,10 +4179,16 @@ Dart driver, because the native driver has no TLS yet.</p>
 </tr>
 </tbody>
 </table>
-<p>Each isolate that runs <code>setup()</code> makes its own pool. To share one pool
-between isolates, give <code>driver.pool.handle</code> (an <code>int</code>) to the other
-isolates and use <code>PostgresNativeDriver(PgNativePool.fromHandle(handle))</code>
-there. <code>PostgresNativeDriver</code> comes from <code>package:dox_orm/dox_orm.dart</code>.</p>
+<p>Isolates that open a pool with the same settings share one pool in Rust.
+So <code>maxConnectionCount</code> is for the whole process, not per isolate. The
+pool closes when the last isolate closes it. You can also give
+<code>driver.pool.handle</code> (an <code>int</code>) to another isolate and use
+<code>PostgresNativeDriver(PgNativePool.fromHandle(handle))</code> there.
+<code>PostgresNativeDriver</code> comes from <code>package:dox_orm/dox_orm.dart</code>.</p>
+<p>Each connection keeps up to 512 prepared statements. When it is full, it
+drops the one used longest ago. A request (pool slot, connect and query)
+fails after 300 s with no answer. A transaction that gets no request for
+300 s is rolled back.</p>
 <h2 id="use-it-without-the-orm">Use it without the ORM</h2>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">PgNativePool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PgNativePool</span><span class="p">.</span><span class="n">open</span><span class="p">(</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>

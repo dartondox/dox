@@ -4241,7 +4241,7 @@
 </tr>
 <tr>
 <td>Pool size fits the database</td>
-<td><code>extra: {'maxConnectionCount': 10}</code> is per isolate. Total = isolates x pool size. Keep it under the database <code>max_connections</code>.</td>
+<td><code>extra: {'maxConnectionCount': 10}</code>. The native drivers (the default) share one pool per process, so the total is the pool size. The Dart drivers have one pool per isolate: total = isolates x pool size. Keep it under the database <code>max_connections</code>.</td>
 <td><a href="../../database/">Database</a></td>
 </tr>
 <tr>

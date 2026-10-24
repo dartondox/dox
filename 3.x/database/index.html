@@ -4074,7 +4074,7 @@ You do not change any config for it.</p>
 <li><code>user</code>, <code>password</code>, <code>host</code> and <code>port</code> are not used by SQLite.</li>
 </ul>
 <p>Start the ORM in a service.
-Each isolate runs the service, so each isolate gets its own pool.
+Each isolate runs the service. The native Postgres and MySQL drivers then share one pool per process (isolates with the same settings get the same pool), so <code>maxConnectionCount</code> is for the whole process. The Dart drivers make one pool per isolate.
 On shutdown, <code>SqlQueryBuilder.close()</code> closes every connection of the isolate.</p>
 <div class="language-dart highlight"><span class="filename">lib/services/orm_service.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ORMService</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">DoxService</span><span class="p">,</span><span class="w"> </span><span class="n">DoxShutdown</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nd">@override</span>

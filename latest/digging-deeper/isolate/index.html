@@ -3977,11 +3977,12 @@
     OS["Port 3000&lt;br&gt;the OS spreads the connections"] --&gt; A1["Rust acceptor"]
     OS --&gt; A2["Rust acceptor"]
     OS --&gt; A3["Rust acceptor"]
-    A1 --&gt; I1["Isolate 1, main&lt;br&gt;own DB pool, own memory cache"]
-    A2 --&gt; I2["Isolate 2&lt;br&gt;own DB pool, own memory cache"]
-    A3 --&gt; I3["Isolate N&lt;br&gt;own DB pool, own memory cache"]
+    A1 --&gt; I1["Isolate 1, main&lt;br&gt;own memory cache"]
+    A2 --&gt; I2["Isolate 2&lt;br&gt;own memory cache"]
+    A3 --&gt; I3["Isolate N&lt;br&gt;own memory cache"]
     I2 -. "crash: started again after 1 second" .-&gt; I2
     I1 -. "crash: the process exits" .-&gt; S["Supervisor restarts the process&lt;br&gt;Docker, systemd"]</code></pre>
+<p>With the native Postgres and MySQL drivers (the default), all isolates share one database pool in Rust. With the Dart drivers, each isolate has its own pool. See <a href="../../concepts/how-dox-works/#where-the-database-pools-live">How Dox works</a>.</p>
 <p>See <a href="../native-server/">Native server</a> for the two servers.</p>
 <h2 id="how-many-isolates">How many isolates</h2>
 <p>By default Dox starts one isolate per CPU core (<code>Platform.numberOfProcessors</code>). So one process uses the whole machine.</p>
@@ -4012,7 +4013,7 @@
 <h2 id="what-each-isolate-does-at-start">What each isolate does at start</h2>
 <p>Dox copies the <code>AppConfig</code>, the services and the routes you added before <code>startServer()</code> to each new isolate. Then every isolate:</p>
 <ol>
-<li>runs <code>setup()</code> of each service (for example, it opens its own database pool),</li>
+<li>runs <code>setup()</code> of each service (for example, it opens the database pool),</li>
 <li>registers the routes of your routers,</li>
 <li>reads the parameter types of each controller once,</li>
 <li>starts its HTTP server.</li>

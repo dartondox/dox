@@ -1771,21 +1771,21 @@ Use `1` in tests. See [Isolate](../digging-deeper/isolate.md).
 
 ## Where the database pools live
 
-The ORM is started in a service (`ORMService`). Every isolate runs `setup()`, so every isolate opens its own pool.
+The ORM is started in a service (`ORMService`). Every isolate runs `setup()`, so every isolate opens a pool.
+The native drivers live in Rust. There, isolates that open the same settings get the same pool.
 
 | Driver | Per isolate | Per process |
 | --- | --- | --- |
-| Postgres native (`dox_postgres_native`) | one pool of `maxConnectionCount` connections | one Rust runtime, shared by all pools (`extra['threads']`, default `1`) |
-| MySQL native (`dox_mysql_native`) | one pool | one Rust runtime, shared by all pools |
-| Dart drivers (`postgres`, `mysql_dart`) | one pool | nothing shared |
+| Postgres native (`dox_postgres_native`) | nothing | one pool of `maxConnectionCount` connections per settings, and one Rust runtime (`extra['threads']`, default `1`) |
+| MySQL native (`dox_mysql_native`) | nothing | one pool of `maxConnectionCount` connections per settings, and one Rust runtime |
+| Dart drivers (`postgres`, `mysql_dart`) | one pool of `maxConnectionCount` connections | nothing shared |
 | SQLite | one connection | nothing shared |
 
-So the total number of connections is `isolates × maxConnectionCount`.
-With 8 cores and the default of 10, the app can open 80 connections. Set `maxConnectionCount` with this in mind.
+So with the native drivers, the app opens at most `maxConnectionCount` connections, for any number of isolates.
+With the Dart drivers, it is `isolates × maxConnectionCount`: with 8 cores and the default of 10, 80 connections.
+The pool size is always your choice. Set it below the `max_connections` of the database.
 
-!!! note "Share one native pool between isolates"
-    A native pool has a `handle` (an `int`). Give it to another isolate and use
-    `PostgresNativeDriver(PgNativePool.fromHandle(handle))` there. Then both isolates use one pool.
+The pool closes when the last isolate that uses it closes it.
     See [Native Postgres driver](../database/postgres-native.md#options).
 
 The native drivers are the default. When the native library does not load, the ORM uses the Dart driver and prints one warning line.
@@ -4832,12 +4832,14 @@ flowchart TD
     OS["Port 3000<br>the OS spreads the connections"] --> A1["Rust acceptor"]
     OS --> A2["Rust acceptor"]
     OS --> A3["Rust acceptor"]
-    A1 --> I1["Isolate 1, main<br>own DB pool, own memory cache"]
-    A2 --> I2["Isolate 2<br>own DB pool, own memory cache"]
-    A3 --> I3["Isolate N<br>own DB pool, own memory cache"]
+    A1 --> I1["Isolate 1, main<br>own memory cache"]
+    A2 --> I2["Isolate 2<br>own memory cache"]
+    A3 --> I3["Isolate N<br>own memory cache"]
     I2 -. "crash: started again after 1 second" .-> I2
     I1 -. "crash: the process exits" .-> S["Supervisor restarts the process<br>Docker, systemd"]
 ```
+
+With the native Postgres and MySQL drivers (the default), all isolates share one database pool in Rust. With the Dart drivers, each isolate has its own pool. See [How Dox works](../concepts/how-dox-works.md#where-the-database-pools-live).
 
 See [Native server](native-server.md) for the two servers.
 
@@ -4881,7 +4883,7 @@ Isolates do not share memory. This has some effects on your code:
 
 Dox copies the `AppConfig`, the services and the routes you added before `startServer()` to each new isolate. Then every isolate:
 
-1. runs `setup()` of each service (for example, it opens its own database pool),
+1. runs `setup()` of each service (for example, it opens the database pool),
 2. registers the routes of your routers,
 3. reads the parameter types of each controller once,
 4. starts its HTTP server.
@@ -6539,7 +6541,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 - `user`, `password`, `host` and `port` are not used by SQLite.
 
 Start the ORM in a service.
-Each isolate runs the service, so each isolate gets its own pool.
+Each isolate runs the service. The native Postgres and MySQL drivers then share one pool per process (isolates with the same settings get the same pool), so `maxConnectionCount` is for the whole process. The Dart drivers make one pool per isolate.
 On shutdown, `SqlQueryBuilder.close()` closes every connection of the isolate.
 
 ```dart title="lib/services/orm_service.dart"
@@ -7872,15 +7874,22 @@ The driver reads these keys from `extra` of the `ConnectionConfig`:
 
 | Key | Default | What it does |
 |---|---|---|
-| `maxConnectionCount` | `10` | Most connections in the pool. |
+| `maxConnectionCount` | `10` | Most connections in the pool, for the whole process. |
 | `timeZone` | `UTC` | Time zone of the session, like the Dart driver. |
 | `applicationName` | none | Name of the app in `pg_stat_activity`. |
 | `threads` | `1` | Rust threads for all pools of the process. `0` is one thread with a single-thread runtime. Only the first pool sets it. |
 
-Each isolate that runs `setup()` makes its own pool. To share one pool
-between isolates, give `driver.pool.handle` (an `int`) to the other
-isolates and use `PostgresNativeDriver(PgNativePool.fromHandle(handle))`
-there. `PostgresNativeDriver` comes from `package:dox_orm/dox_orm.dart`.
+Isolates that open a pool with the same settings share one pool in Rust.
+So `maxConnectionCount` is for the whole process, not per isolate. The
+pool closes when the last isolate closes it. You can also give
+`driver.pool.handle` (an `int`) to another isolate and use
+`PostgresNativeDriver(PgNativePool.fromHandle(handle))` there.
+`PostgresNativeDriver` comes from `package:dox_orm/dox_orm.dart`.
+
+Each connection keeps up to 512 prepared statements. When it is full, it
+drops the one used longest ago. A request (pool slot, connect and query)
+fails after 300 s with no answer. A transaction that gets no request for
+300 s is rolled back.
 
 ## Use it without the ORM
 
@@ -8065,10 +8074,15 @@ The driver reads the normal fields of the `ConnectionConfig` (`host`,
 | `verifyCertificate` | `true` | With `useSSL`, TLS checks the server certificate. Set it to `false` only for a self-signed certificate in development. |
 
 Isolates that open a pool with the same settings share one pool in Rust.
-So `maxConnectionCount` is for the whole process, not per isolate. You can
+So `maxConnectionCount` is for the whole process, not per isolate. The
+native Postgres driver does the same. You can
 also give `driver.pool.handle` (an `int`) to another isolate and use
 `MysqlNativeDriver(MysqlNativePool.fromHandle(handle))` there.
 `MysqlNativeDriver` comes from `package:dox_orm/dox_orm.dart`.
+
+A request (pool slot, connect and query) fails after 300 s with no
+answer. A transaction that gets no request for 300 s is rolled back, so
+its connection goes back to the pool.
 
 ## Use it without the ORM
 
@@ -15367,7 +15381,7 @@ Keys of `extra`:
 | Driver | Key | Type | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | postgres, mysql | `native` | `bool` | `true` | `false` uses the Dart driver instead of the native (Rust) one. |
-| postgres, mysql | `maxConnectionCount` | `int` | `10` | Most open connections. |
+| postgres, mysql | `maxConnectionCount` | `int` | `10` | Most open connections. Native drivers: for the whole process. Dart drivers: per isolate. |
 | postgres, mysql | `preparedStatementCacheSize` | `int` | `100` | Prepared statements kept per connection. |
 | postgres | `sslMode` | postgres `SslMode` | none | Setting it uses the Dart driver. |
 | mysql | `collation` | `String` | `utf8mb4_general_ci` | Connection collation. |
@@ -15557,7 +15571,8 @@ DatabaseConfig databaseConfig = DatabaseConfig(
       password: env.dbPassword,
       database: env.dbName,
       extra: <String, dynamic>{
-        /// Each isolate has its own pool.
+        /// One pool for all isolates with the native driver.
+        /// One pool per isolate with the Dart driver.
         'maxConnectionCount': 10,
         'maxConnectionAge': Duration(hours: 1),
       },
@@ -16460,7 +16475,7 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | Migrations run once per deploy | The new project runs `Migrator(migrations: migrations).migrate()` in `bin/server.dart` before `startServer()`. Or run `dart run bin/migrate.dart run` (or `dox migrate`) in CI. Do one, not both at the same time on many machines. | [Migration](../database/migration.md) |
 | Migrations use the right database | `dox_migration` reads `.env` when the file exists, and ignores the real env then. Do not ship a `.env` next to the binary, or give `Migrator(connection: ...)` your own pool. | [Troubleshooting](troubleshooting.md) |
 | Small MySQL migrations | MySQL saves `CREATE`, `ALTER` and `DROP` at once. A failed migration can leave half the changes. One table change per migration. | [Migration](../database/migration.md) |
-| Pool size fits the database | `extra: {'maxConnectionCount': 10}` is per isolate. Total = isolates x pool size. Keep it under the database `max_connections`. | [Database](../database/index.md) |
+| Pool size fits the database | `extra: {'maxConnectionCount': 10}`. The native drivers (the default) share one pool per process, so the total is the pool size. The Dart drivers have one pool per isolate: total = isolates x pool size. Keep it under the database `max_connections`. | [Database](../database/index.md) |
 | Query logging is off | The new project's `database.dart` has `debug: true` on every connection, which prints every query. Set `debug: false` in production. | [Database](../database/index.md) |
 | Backups | **Dox limit.** Dox has no backup tool. Use `pg_dump`, `mysqldump`, managed database snapshots, or a copy of the SQLite file (with the `-wal` file, or `sqlite3 app.db ".backup x.db"`). Test a restore. | |
 
@@ -17474,6 +17489,10 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- Each request now has a timeout of 300 s (pool slot, connect and query), like `dox_postgres_native`. Before, a request could wait for a free connection forever.
+- A transaction that gets no request for 300 s (eg. its isolate is gone) is rolled back, and its connection goes back to the pool. Before, it held the connection forever.
+- Fewer copies of the result bytes. The record head is written in front of the rows, so the record is not copied again. The first result of a batch is moved into the post buffer, not copied. A batch of 64 KiB or more goes to Dart without a copy (external typed data).
+- The column names are kept per SQL text. The next result of the same query does not decode them again.
 - New `verifyCertificate` on `MysqlNativePool.open()`. It is true by default, so TLS checks the server certificate. Set it to false only for a self-signed certificate in development.
 
 ### 3.0.0-alpha.6
@@ -17563,7 +17582,9 @@ What changed in each package, newest first. This page is made from the
 - Less work per row: the where, join and order lists of a model are made only when used. `getPreload()` and the generated getters do not make a new list or map on each call.
 - The SQL text is no longer scanned for double spaces on each query. `orderBy()` without a direction no longer adds a space.
 - `QueryBuilderHelper.runQuery()` no longer has the `clean` parameter.
-
+- Fix: in a native Postgres or MySQL `transaction()`, when the rollback after an error also fails, the first error is thrown. Before, the rollback error replaced it.
+- The native Postgres driver shares one pool for all isolates with the same settings, like the native MySQL driver. `maxConnectionCount` is for the whole process on both native drivers. The Dart drivers still have one pool per isolate.
+- The Dart Postgres driver keeps its prepared statements after a session command like `SET`, `SHOW`, `BEGIN` or `COMMIT`. Before, any query that was not select/insert/update/delete dropped all of them.
 - Breaking: column and table names in `select`, `where`, `orderBy`, `groupBy`, `join`, `insert` and `update` must be plain names (`name`, `table.name`, `table.*`, `*`, `name as alias`). Anything else, like `count(*)`, throws an `ArgumentError`. Before, a name with `(` went into the SQL as it is, so user input could add SQL. Use `selectRaw`, `whereRaw` or the new `orderByRaw` and `groupByRaw` for expressions.
 - Breaking: the operator of `where()` and `join()` must be one of `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `like`, `not like`, `ilike` (any case). Any other value throws an `ArgumentError`.
 - New `fillable` and `guarded` lists on `Model`. When set, `create()`, `insert()` and `update()` on the model drop the keys that are not allowed, so `User().create(req.body)` can not set `is_admin`. `insertMultiple()` on the model drops them from each row too. Both are empty by default, so nothing changes until you set them.
@@ -17636,6 +17657,15 @@ What changed in each package, newest first. This page is made from the
 - Schema: `unique()` on a column that is already unique is skipped. Default values are escaped.
 
 ## dox_postgres_native
+
+### Unreleased
+
+- Breaking: isolates that open the same settings (and the same `maxConnections`) now share one pool in Rust, like `dox_mysql_native`. So `maxConnections` is for the whole process, not per isolate. Before, 8 isolates with the default of 10 could open 80 connections. Each `open` counts, and only the last `close()` closes the pool. The native ABI version is now 2.
+- The prepared statement cache of a connection drops the statement used longest ago when it is full (LRU, 512 statements). Before, it dropped all statements at once.
+- Fewer copies of the result bytes. Rust writes each result straight into the buffer of the next post. A batch of 64 KiB or more goes to Dart without a copy (external typed data).
+- Faster decode of `uuid`, `numeric`, `date`, `json` and `jsonb`, without the type registry of the `postgres` package. A negative `numeric` below 1 now has its leading zero: `-0.5`, not `-.5` like the `postgres` package.
+- An `int` parameter is written as text straight into the request buffer, without a `String`. It still goes without a type, so the server picks it.
+- The column names are kept per SQL text, not only for the last result. Queries that take turns no longer decode their column names again.
 
 ### 3.0.0-alpha.6
 
