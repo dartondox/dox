@@ -14,6 +14,11 @@ class LogMiddleware implements IDoxMiddleware {
   /// is logged as `[REDACTED]`, so passwords and tokens stay out of logs.
   final List<String> redact;
 
+  /// [redact] in lower case, made once
+  late final List<String> _redactLower = <String>[
+    for (String word in redact) word.toLowerCase(),
+  ];
+
   static const List<String> defaultRedact = <String>[
     'password',
     'passwd',
@@ -74,8 +79,8 @@ class LogMiddleware implements IDoxMiddleware {
 
   bool _isSecret(String key) {
     String name = key.toLowerCase();
-    for (String word in redact) {
-      if (name.contains(word.toLowerCase())) return true;
+    for (String word in _redactLower) {
+      if (name.contains(word)) return true;
     }
     return false;
   }

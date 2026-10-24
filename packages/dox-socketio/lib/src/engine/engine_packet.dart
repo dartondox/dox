@@ -19,6 +19,25 @@ class EnginePacket {
   String toString() => 'EnginePacket(${type.name}, $data)';
 }
 
+/// A text message sent to many clients.
+///
+/// Use it as the data of a message packet. The websocket frame (`4` and
+/// the text) is built and UTF-8 encoded once, on first use, and then
+/// shared by every client. Polling uses [text].
+class SharedText {
+  SharedText(this.text);
+
+  final String text;
+
+  /// UTF-8 bytes of the websocket text frame.
+  late final Uint8List frame = utf8.encode(
+    '${EnginePacketType.message.index}$text',
+  );
+
+  @override
+  String toString() => text;
+}
+
 /// Encodes and decodes Engine.IO v4 packets and polling payloads.
 class EngineParser {
   const EngineParser();
@@ -26,6 +45,7 @@ class EngineParser {
   /// Encodes a packet for a websocket frame.
   ///
   /// Returns a [String] for a text frame or a [Uint8List] for a binary frame.
+  /// A [SharedText] is sent with `addUtf8Text`, not with this.
   Object encodeForWebsocket(EnginePacket packet) {
     Object? data = packet.data;
     if (data is Uint8List) return data;
@@ -36,6 +56,7 @@ class EngineParser {
   String encodeForPolling(EnginePacket packet) {
     Object? data = packet.data;
     if (data is Uint8List) return '$pollingBinaryPrefix${base64.encode(data)}';
+    if (data is SharedText) return '${packet.type.index}${data.text}';
     return '${packet.type.index}${data ?? ''}';
   }
 

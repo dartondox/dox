@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/request/form_data_visitor.dart';
+import 'package:dox_http_native/dox_http_native.dart';
 
 /// What kind of body a request has.
 enum BodyKind {
@@ -55,8 +56,13 @@ class RequestBody {
 }
 
 class HttpBody {
-  static Future<RequestBody> read(HttpRequest request) async {
-    ContentType? contentType = request.headers.contentType;
+  /// [contentType] is the `Content-Type` of [request] when the caller
+  /// already read it. Else it is read here.
+  static Future<RequestBody> read(
+    HttpRequest request, [
+    ContentType? contentType,
+  ]) async {
+    contentType ??= request.headers.contentType;
 
     if (contentType == null) return RequestBody.empty();
 
@@ -80,7 +86,11 @@ class HttpBody {
     if (HttpBody.isFormData(contentType)) {
       int max = Dox().config.maxMultipartSize;
       _checkContentLength(request, max);
-      FormDataVisitor visitor = FormDataVisitor(request, limit(request, max));
+      FormDataVisitor visitor = FormDataVisitor(
+        request,
+        limit(request, max),
+        boundary: contentType.parameters['boundary'],
+      );
       await visitor.process();
       return RequestBody(
         visitor.inputs,
@@ -107,6 +117,12 @@ class HttpBody {
   /// read the whole body, but stop with 413 once it passes [max] bytes.
   static Future<Uint8List> readBytes(HttpRequest request, int max) async {
     _checkContentLength(request, max);
+
+    /// the native server already holds the whole body. no stream needed.
+    if (request is NativeRequest) {
+      if (request.body.length > max) throw PayloadTooLargeException();
+      return request.body;
+    }
     BytesBuilder builder = BytesBuilder(copy: false);
     await for (List<int> chunk in limit(request, max)) {
       builder.add(chunk);

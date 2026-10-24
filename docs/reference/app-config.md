@@ -253,7 +253,6 @@ This is the `lib/config/app.dart` of a new project. The sub configs live in thei
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
-import 'package:my_app/app/http/response_handler.dart';
 import 'package:my_app/config/cache.dart';
 import 'package:my_app/config/cors.dart';
 import 'package:my_app/config/logger.dart';
@@ -290,15 +289,14 @@ AppConfig appConfig = AppConfig(
   /// -------------------------------
   /// By registering global middleware here,
   /// middleware will be applied to all the routes.
-  globalMiddleware: <dynamic>[LogMiddleware(enabled: true)],
+  globalMiddleware: <dynamic>[
+    LogMiddleware(enabled: env.appEnv != 'production'),
+  ],
 
   /// Routers
   /// -------------------------------
   /// Register routers to create route to dox framework.
   routers: <Router>[WebRouter(), ApiRouter()],
-
-  /// Response handler
-  responseHandler: ResponseHandler(),
 
   /// Cache stores (config/cache.dart)
   cache: cache,

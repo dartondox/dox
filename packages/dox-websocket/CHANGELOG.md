@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Performance: an emit to a room makes the JSON and the UTF-8 bytes once, not once per member. The `exclude` list is checked as a set.
+- Performance: room members are a set, so a leave is fast and a rejoin does not add the socket twice.
 - Breaking: websockets run on the native server (`dox_http_native`), not on `dart:io`. Rust does the upgrade and the WebSocket protocol. The public API is the same: the socket is still a `dart:io` `WebSocket`.
 - Security: a message over `maxMessageSize` bytes is now closed with 1009 in Rust, before Dart reads it. Before, `dart:io` read the whole message into memory first.
 - Breaking: `joinRoom` is refused unless you set `WebsocketServer().authorizeJoin`. Before, any client could join any room, like `user:42`, and get its messages.

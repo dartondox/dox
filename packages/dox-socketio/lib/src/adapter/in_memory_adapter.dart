@@ -1,3 +1,4 @@
+import '../engine/engine_packet.dart';
 import '../parser/socket_encoder.dart';
 import '../parser/socket_packet.dart';
 import '../server/namespace.dart';
@@ -41,9 +42,11 @@ class InMemoryAdapter implements Adapter {
     SocketPacket packet,
     BroadcastOptions options,
   ) async {
-    Set<String> ids = socketIds(nsp, options);
+    Iterable<String> ids = _store(nsp).members(options.rooms, options.except);
     if (ids.isEmpty) return;
     List<Object> encoded = _encoder.encode(packet);
+    // Build the text frame once and share it with every socket.
+    encoded[0] = SharedText(encoded[0] as String);
     for (String id in ids) {
       Socket? socket = nsp.sockets[id];
       if (socket != null && socket.connected) {
@@ -95,6 +98,17 @@ class RoomStore {
         ? _sids.keys
         : <String>{for (String room in rooms) ...?_rooms[room]};
     return candidates.toSet().difference(skip);
+  }
+
+  /// Like [match], but with no copy when [except] is empty and there is at
+  /// most one room. The result is live: do not join or leave while you
+  /// go over it.
+  Iterable<String> members(Set<String> rooms, Set<String> except) {
+    if (except.isEmpty) {
+      if (rooms.isEmpty) return _sids.keys;
+      if (rooms.length == 1) return _rooms[rooms.first] ?? _empty;
+    }
+    return match(rooms, except);
   }
 
   static Set<String> _newSet() => <String>{};

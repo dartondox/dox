@@ -8,20 +8,15 @@ import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/utils.dart';
 
 RouteData? httpRouteHandler(HttpRequest req) {
-  RouteData? route = _getMatchRoute(
-    req.uri.path,
-    req.method,
-    req.headers.value(HttpHeaders.hostHeader),
-  );
+  /// read Host once. only domain routes need it.
+  _routeIndex();
+  String? host = _hasDomain ? req.headers.value(HttpHeaders.hostHeader) : null;
+  RouteData? route = _getMatchRoute(req.uri.path, req.method, host);
 
   /// HEAD runs the GET route when there is no HEAD route.
   /// the server sends the status and headers, with no body.
   if (route == null && req.method == 'HEAD') {
-    route = _getMatchRoute(
-      req.uri.path,
-      'GET',
-      req.headers.value(HttpHeaders.hostHeader),
-    );
+    route = _getMatchRoute(req.uri.path, 'GET', host);
   }
 
   if (route == null) {
@@ -31,7 +26,7 @@ RouteData? httpRouteHandler(HttpRequest req) {
       RouteData? target = _getMatchRoute(
         req.uri.path,
         req.headers.value('access-control-request-method') ?? '',
-        req.headers.value(HttpHeaders.hostHeader),
+        host,
       );
       httpCorsHandler(target?.corsEnabled, req);
       req.response.statusCode = HttpStatus.noContent;
@@ -56,35 +51,96 @@ Map<String, _MethodRoutes> _byMethod = <String, _MethodRoutes>{};
 List<RouteData>? _indexedList;
 int _indexedLength = -1;
 
+/// true when any route has a domain. else Host is never read.
+bool _hasDomain = false;
+
 /// the routes of one method, plus a map for plain paths (no params).
 class _MethodRoutes {
   final List<RouteData> list = <RouteData>[];
 
   /// path -> the first route with that exact path, when no route before
-  /// it can match the same url (no param route, no domain route before
-  /// it). then a map lookup gives the same answer as the scan.
+  /// it can match the same url (no param route or domain route before it
+  /// matches the path). then a map lookup gives the same answer as the
+  /// scan.
   final Map<String, RouteData> exact = <String, RouteData>{};
 
-  void buildExact() {
+  /// first path segment -> the routes that can match a url starting with
+  /// it, in order. a route whose first segment is a param is in every
+  /// list, and in [anyFirst].
+  final Map<String, List<RouteData>> byFirst = <String, List<RouteData>>{};
+
+  /// routes whose first segment is a param. used for a url whose first
+  /// segment has no list in [byFirst].
+  final List<RouteData> anyFirst = <RouteData>[];
+
+  void build() {
+    List<RouteData> before = <RouteData>[];
     for (RouteData route in list) {
-      if (route.pattern != null || route.domain != null) break;
-      exact.putIfAbsent(route.path.trim(), () => route);
+      String path = route.path.trim();
+      if (route.pattern == null && route.domain == null) {
+        if (!before.any((RouteData r) => _canMatch(r, path))) {
+          exact.putIfAbsent(path, () => route);
+        }
+      } else {
+        before.add(route);
+      }
+      String? first = _literalFirst(path);
+      if (first != null) byFirst[first] ??= <RouteData>[];
+    }
+    for (RouteData route in list) {
+      String? first = _literalFirst(route.path.trim());
+      if (first != null) {
+        byFirst[first]!.add(route);
+      } else {
+        anyFirst.add(route);
+        for (List<RouteData> routes in byFirst.values) {
+          routes.add(route);
+        }
+      }
     }
   }
+
+  /// the routes to scan for [path], in registration order.
+  List<RouteData> candidates(String path) {
+    return byFirst[_firstSegment(path)] ?? anyFirst;
+  }
+}
+
+/// true when [route] (a param or domain route) can match [path].
+bool _canMatch(RouteData route, String path) {
+  RegExp? pattern = route.pattern;
+  if (pattern == null) return route.path.trim() == path;
+  return pattern.hasMatch(path);
+}
+
+/// `/users/{id}` gives `users`. null when the first segment has a param.
+String? _literalFirst(String path) {
+  String first = _firstSegment(path);
+  return first.contains('{') ? null : first;
+}
+
+/// `/users/5` gives `users`, `/` gives an empty string.
+String _firstSegment(String path) {
+  int start = path.startsWith('/') ? 1 : 0;
+  int end = path.indexOf('/', start);
+  return path.substring(start, end == -1 ? path.length : end);
 }
 
 Map<String, _MethodRoutes> _routeIndex() {
   List<RouteData> routes = Route().routes;
   if (!identical(routes, _indexedList) || routes.length != _indexedLength) {
     Map<String, _MethodRoutes> index = <String, _MethodRoutes>{};
+    bool hasDomain = false;
     for (RouteData route in routes) {
       route.path = sanitizeRoutePath(route.path);
+      hasDomain = hasDomain || route.domain != null;
       (index[route.method.toUpperCase()] ??= _MethodRoutes()).list.add(route);
     }
     for (_MethodRoutes group in index.values) {
-      group.buildExact();
+      group.build();
     }
     _byMethod = index;
+    _hasDomain = hasDomain;
     _indexedList = routes;
     _indexedLength = routes.length;
   }
@@ -94,9 +150,11 @@ Map<String, _MethodRoutes> _routeIndex() {
 /// get matched route from the list
 /// method, domain, path
 RouteData? _getMatchRoute(String inputRoute, String method, String? domain) {
-  _MethodRoutes? group = _routeIndex()[method.toUpperCase()];
+  Map<String, _MethodRoutes> index = _routeIndex();
+
+  /// methods are almost always upper case already
+  _MethodRoutes? group = index[method] ?? index[method.toUpperCase()];
   if (group == null) return null;
-  List<RouteData> candidates = group.list;
 
   inputRoute = sanitizeRoutePath(inputRoute).trim();
   RouteData? exact = group.exact[inputRoute];
@@ -104,11 +162,11 @@ RouteData? _getMatchRoute(String inputRoute, String method, String? domain) {
   String? host = domain?.toLowerCase();
   String? hostName = host == null ? null : _withoutPort(host);
 
-  for (RouteData route in candidates) {
+  for (RouteData route in group.candidates(inputRoute)) {
     /// a domain route needs a matching Host. no Host means no match.
     /// the route domain may have a port (`localhost:3000`) or not.
-    if (route.domain != null) {
-      String want = route.domain!.toLowerCase();
+    String? want = route.domainLower;
+    if (want != null) {
       if (host == null || (want != host && want != hostName)) continue;
     }
 

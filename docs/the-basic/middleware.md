@@ -110,7 +110,9 @@ For all routes, set `globalMiddleware` in the app config:
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
-  globalMiddleware: <dynamic>[LogMiddleware(enabled: true)],
+  globalMiddleware: <dynamic>[
+    LogMiddleware(enabled: env.appEnv != 'production'),
+  ],
   // ...
 );
 ```
@@ -129,5 +131,5 @@ flowchart LR
 ```
 
 !!! tip "Built-in middleware"
-    - `LogMiddleware` from `dox_core` writes one JSON log line per request. Body fields and headers whose name has `password`, `secret`, `token`, `authorization`, `cookie` or `api_key` in it (upper or lower case) are logged as `[REDACTED]`. Change the list with `redact:`.
+    - `LogMiddleware` from `dox_core` writes one JSON log line per request. Body fields and headers whose name has `password`, `secret`, `token`, `authorization`, `cookie` or `api_key` in it (upper or lower case) are logged as `[REDACTED]`. Change the list with `redact:`. The new project turns it off when `APP_ENV` is `production`.
     - `AuthMiddleware` from `dox_auth` checks the JWT token. See [Authentication](../security/authentication.md).

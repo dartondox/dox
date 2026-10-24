@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:blog/app/http/response_handler.dart';
 import 'package:blog/config/cache.dart';
 import 'package:blog/config/cors.dart';
 import 'package:blog/config/env.dart';
@@ -39,7 +38,10 @@ AppConfig appConfig = AppConfig(
   /// -------------------------------
   /// By registering global middleware here,
   /// middleware will be applied to all the routes.
-  globalMiddleware: <dynamic>[LogMiddleware(enabled: true)],
+  globalMiddleware: <dynamic>[
+    /// one log line per request. off in production: the proxy logs there.
+    LogMiddleware(enabled: env.appEnv != 'production'),
+  ],
 
   /// Routers
   /// -------------------------------
@@ -48,9 +50,6 @@ AppConfig appConfig = AppConfig(
 
   /// DTOs (generated list in lib/dtos.g.dart)
   dtos: dtos,
-
-  /// Response handler
-  responseHandler: ResponseHandler(),
 
   /// Cache stores (config/cache.dart)
   cache: cache,

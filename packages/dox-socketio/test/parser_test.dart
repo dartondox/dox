@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dox_socketio/dox_socketio.dart';
@@ -13,6 +14,14 @@ void main() {
         '4hi',
       );
       expect(parser.encodeForPolling(EnginePacket(EnginePacketType.ping)), '2');
+    });
+
+    test('SharedText makes one websocket frame and works for polling', () {
+      SharedText shared = SharedText('2["hi","é"]');
+      expect(utf8.decode(shared.frame), '42["hi","é"]');
+      expect(identical(shared.frame, shared.frame), isTrue);
+      EnginePacket packet = EnginePacket(EnginePacketType.message, shared);
+      expect(parser.encodeForPolling(packet), '42["hi","é"]');
     });
 
     test('encodes binary for websocket and polling', () {
