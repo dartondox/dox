@@ -118,7 +118,8 @@ void main() {
         cache: appConfig.cache,
       ),
     );
-    WebsocketServer(Dox());
+    WebsocketServer(Dox()).authorizeJoin = (IDoxRequest req, String room) =>
+        true;
     await Dox().startServer();
   });
 

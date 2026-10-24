@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import '../adapter/adapter.dart';
 import '../constants/socket_constants.dart';
@@ -118,14 +119,19 @@ class Namespace {
       for (Middleware middleware in _middleware) {
         await middleware(socket);
       }
-    } catch (error) {
+    } catch (error, stack) {
+      // Only a SocketIoException goes to the client. Other errors can hold
+      // private text, like SQL or host names, so they are only logged.
+      if (error is! SocketIoException) {
+        stderr.writeln('dox_socketio: middleware error: $error\n$stack');
+      }
       client.sendPacket(
         SocketPacket(
           type: SocketPacketType.connectError,
           nsp: name,
           data: error is SocketIoException
               ? error.toJson()
-              : <String, Object>{'message': error.toString()},
+              : const <String, Object>{'message': 'Internal error'},
         ),
       );
       return;

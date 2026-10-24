@@ -23,7 +23,18 @@ class EngineServer implements EngineSessionStore {
     required this.connectionListener,
     IdGenerator? ids,
     this._responder = const HttpResponder(),
-  }) : _ids = ids ?? IdGenerator();
+  }) : _ids = ids ?? IdGenerator() {
+    CorsOptions? cors = options.cors;
+    if (cors != null && cors.credentials && cors.origins.contains('*')) {
+      // A browser does not allow `*` with credentials, so Dox would have to
+      // echo any origin. Then any site could read answers made with the
+      // cookies of the user.
+      throw ArgumentError(
+        'CorsOptions: list the allowed origins when credentials is true. '
+        '"*" is not allowed.',
+      );
+    }
+  }
 
   final ServerOptions options;
   final EngineConnectionListener connectionListener;
@@ -63,6 +74,10 @@ class EngineServer implements EngineSessionStore {
       _responder.error(response, EngineError.badRequest);
       return;
     }
+    if (isWebsocket && !_originAllowed(request, cors)) {
+      _responder.error(response, EngineError.forbidden);
+      return;
+    }
 
     String? sid = query['sid'];
     if (sid == null) {
@@ -94,7 +109,7 @@ class EngineServer implements EngineSessionStore {
     EngineRequest info = EngineRequest.fromHttpRequest(request);
     Transport transport;
     if (isWebsocket) {
-      WebSocket socket = await WebSocketTransformer.upgrade(request);
+      WebSocket socket = await _upgradeSocket(request);
       transport = WebsocketTransport(
         socket,
         maxHttpBufferSize: options.maxHttpBufferSize,
@@ -124,17 +139,34 @@ class EngineServer implements EngineSessionStore {
       _responder.error(request.response, EngineError.badRequest);
       return;
     }
-    WebSocket socket = await WebSocketTransformer.upgrade(request);
+    WebSocket socket = await _upgradeSocket(request);
     session.maybeUpgrade(
       WebsocketTransport(socket, maxHttpBufferSize: options.maxHttpBufferSize),
     );
+  }
+
+  /// Compression is off. A small compressed message can grow very big
+  /// when dart:io inflates it, before the size check can run.
+  Future<WebSocket> _upgradeSocket(HttpRequest request) {
+    return WebSocketTransformer.upgrade(
+      request,
+      compression: CompressionOptions.compressionOff,
+    );
+  }
+
+  /// CORS does not cover websockets. So when [cors] lists origins, a
+  /// websocket from another origin is refused. Browsers always send
+  /// `Origin`. A client that is not a browser may leave it out.
+  bool _originAllowed(HttpRequest request, CorsOptions? cors) {
+    String? origin = request.headers.value('origin');
+    return cors == null || origin == null || cors.allows(origin);
   }
 
   void _applyCors(HttpRequest request, CorsOptions cors) {
     String? origin = request.headers.value('origin');
     if (origin == null || !cors.allows(origin)) return;
     HttpHeaders headers = request.response.headers;
-    bool anyOrigin = cors.origins.contains('*') && !cors.credentials;
+    bool anyOrigin = cors.origins.contains('*');
     headers.set('Access-Control-Allow-Origin', anyOrigin ? '*' : origin);
     if (!anyOrigin) headers.add(HttpHeaders.varyHeader, 'Origin');
     if (cors.credentials) {

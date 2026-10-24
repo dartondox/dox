@@ -25,6 +25,9 @@ class Client implements EngineSocketListener {
   final SocketEncoder _encoder;
   final SocketDecoder _decoder = SocketDecoder();
   final Map<String, Socket> _sockets = <String, Socket>{};
+
+  /// Namespaces whose CONNECT still runs the middlewares.
+  final Set<String> _connecting = <String>{};
   Timer? _connectTimer;
 
   /// True while the connection is open.
@@ -42,7 +45,14 @@ class Client implements EngineSocketListener {
   }
 
   /// Adds a socket that passed the middlewares.
-  void addSocket(Socket socket) => _sockets[socket.nsp.name] = socket;
+  ///
+  /// The connect timer stops here, not on the first CONNECT.
+  /// So a client that only gets refused is still closed on time.
+  void addSocket(Socket socket) {
+    _connectTimer?.cancel();
+    _connectTimer = null;
+    _sockets[socket.nsp.name] = socket;
+  }
 
   /// Forgets a socket that left.
   void remove(Socket socket) {
@@ -62,7 +72,8 @@ class Client implements EngineSocketListener {
     SocketPacket? packet;
     try {
       packet = _decoder.add(data);
-    } on FormatException {
+    } catch (_) {
+      // Bad input from one client closes only that client.
       conn.close(CloseReason.parseError);
       return;
     }
@@ -87,9 +98,11 @@ class Client implements EngineSocketListener {
   }
 
   Future<void> _connect(SocketPacket packet) async {
-    _connectTimer?.cancel();
-    _connectTimer = null;
-    if (_sockets.containsKey(packet.nsp)) return;
+    // Skip a namespace that is joined or still in its middlewares.
+    // Else many CONNECT packets at once make many sockets.
+    if (_sockets.containsKey(packet.nsp) || _connecting.contains(packet.nsp)) {
+      return;
+    }
     Namespace? nsp = server.namespaceFor(packet.nsp);
     if (nsp == null) {
       sendPacket(
@@ -102,10 +115,15 @@ class Client implements EngineSocketListener {
       return;
     }
     Object? auth = packet.data;
-    await nsp.add(
-      this,
-      auth is Map ? auth.cast<String, dynamic>() : <String, dynamic>{},
-    );
+    _connecting.add(packet.nsp);
+    try {
+      await nsp.add(
+        this,
+        auth is Map ? auth.cast<String, dynamic>() : <String, dynamic>{},
+      );
+    } finally {
+      _connecting.remove(packet.nsp);
+    }
   }
 
   void _onConnectTimeout() {
