@@ -50,9 +50,13 @@ class StringSchema extends BaseSchema<String>
     return use(EmailRule(message: message));
   }
 
-  /// Must be a URL.
-  StringSchema url({String? message}) {
-    return use(UrlRule(message: message));
+  /// Must be a URL with a host. Only `http` and `https` pass, unless you
+  /// give other [schemes].
+  StringSchema url({
+    List<String> schemes = const <String>['http', 'https'],
+    String? message,
+  }) {
+    return use(UrlRule(schemes: schemes, message: message));
   }
 
   /// Must be a UUID.
