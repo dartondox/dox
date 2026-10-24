@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dox_http_native/dox_http_native.dart';
+
 import '../adapter/adapter.dart';
 import '../adapter/in_memory_adapter.dart';
 import '../constants/socket_constants.dart';
@@ -94,7 +96,7 @@ class SocketIoServer implements EngineConnectionListener {
         (base.endsWith('/') && path == base.substring(0, base.length - 1));
   }
 
-  /// Handles one HTTP request. Mount it on any `dart:io` server.
+  /// Handles one HTTP request. Mount it on a native or a `dart:io` server.
   Future<void> handle(HttpRequest request) async {
     try {
       await engine.handle(request);
@@ -104,9 +106,10 @@ class SocketIoServer implements EngineConnectionListener {
     }
   }
 
-  /// Starts a `dart:io` server on [port]. Use port 0 for a free port.
+  /// Starts a native server (`dox_http_native`) on [port]. Use port 0 for
+  /// a free port.
   Future<HttpServer> listen(int port, {Object address = '127.0.0.1'}) async {
-    HttpServer server = await HttpServer.bind(address, port);
+    HttpServer server = await NativeHttpServer.bind(port, address: address);
     attach(server);
     return server;
   }
