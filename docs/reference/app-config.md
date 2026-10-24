@@ -13,7 +13,7 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `serverPort` | `int` | `3000` | The port the HTTP server listens on. When the env has no `APP_PORT` but has `PORT`, Dox listens on `PORT` instead (Cloud Run, Fly, Render and Heroku set it). |
 | `host` | `String?` | `null`: `APP_HOST`, else all interfaces | The network interface to listen on, like `127.0.0.1`. `null` reads the env var `APP_HOST`. With neither, Dox listens on all interfaces, IPv6 and IPv4 (`::`). |
 | `totalIsolate` | `int?` | `Platform.numberOfProcessors` | Isolates (threads) that serve HTTP, all on the same port. On Windows the native server runs on one isolate. |
-| `compress` | `bool` | `false` | gzip responses in Dart (`HttpServer.autoCompress`). It costs CPU on every response. Let a proxy do it when you have one. |
+| `compress` | `bool` | `false` | gzip responses (`HttpServer.autoCompress`). Rust gzips on its own thread, not on the isolate. It still costs CPU on every response. Let a proxy do it when you have one. |
 | `maxBodySize` | `int` | `10 * 1024 * 1024` (10 MB) | Biggest JSON or urlencoded body in bytes. Bigger gets `413`. |
 | `maxMultipartSize` | `int` | `100 * 1024 * 1024` (100 MB) | Biggest `multipart/form-data` body (file uploads) in bytes. Bigger gets `413`. |
 | `bodyTimeout` | `Duration` | `Duration(seconds: 120)` | A client that sends no body bytes for this long gets `408`. A slow but steady upload is fine. Native server only. |
