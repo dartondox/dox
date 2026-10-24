@@ -6,6 +6,10 @@ import '../core/schema.dart';
 import '../core/sentinels.dart';
 import '../rules/collection_rules.dart';
 
+/// `isAsync` per schema. A schema does not change after it is built,
+/// so the tree is walked only once, not on every parse.
+final Expando<bool> _isAsyncCache = Expando<bool>('isAsync');
+
 /// Schema for a list where every item matches [item]. Made by `v.list()`.
 class ListSchema<T> extends BaseSchema<List<T>>
     with FluentSchema<ListSchema<T>, List<T>> {
@@ -16,7 +20,7 @@ class ListSchema<T> extends BaseSchema<List<T>>
 
   @override
   bool get isAsync {
-    return super.isAsync || item.isAsync;
+    return _isAsyncCache[this] ??= super.isAsync || item.isAsync;
   }
 
   /// At least [count] items.

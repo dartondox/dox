@@ -7,6 +7,10 @@ import '../core/schema.dart';
 import '../core/sentinels.dart';
 import 'wrapper_schemas.dart';
 
+/// `isAsync` per schema. A schema does not change after it is built,
+/// so the tree is walked only once, not on every parse.
+final Expando<bool> _isAsyncCache = Expando<bool>('isAsync');
+
 /// What an [ObjectSchema] does with keys that are not in its shape.
 enum UnknownKeys {
   /// Drop them from the output. This is the default.
@@ -36,6 +40,10 @@ class ObjectSchema extends BaseSchema<Map<String, dynamic>>
 
   @override
   bool get isAsync {
+    return _isAsyncCache[this] ??= _findAsync();
+  }
+
+  bool _findAsync() {
     if (super.isAsync) {
       return true;
     }

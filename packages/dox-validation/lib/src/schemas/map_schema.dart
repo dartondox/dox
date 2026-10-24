@@ -5,6 +5,10 @@ import '../core/parse_state.dart';
 import '../core/schema.dart';
 import '../core/sentinels.dart';
 
+/// `isAsync` per schema. A schema does not change after it is built,
+/// so the tree is walked only once, not on every parse.
+final Expando<bool> _isAsyncCache = Expando<bool>('isAsync');
+
 /// Schema for a map with any keys, where every value matches [values].
 /// Made by `v.map()`. Keys are checked with [keys] when given.
 class MapSchema<V> extends BaseSchema<Map<String, V>>
@@ -19,7 +23,8 @@ class MapSchema<V> extends BaseSchema<Map<String, V>>
 
   @override
   bool get isAsync {
-    return super.isAsync || values.isAsync || (keys?.isAsync ?? false);
+    return _isAsyncCache[this] ??=
+        super.isAsync || values.isAsync || (keys?.isAsync ?? false);
   }
 
   @override

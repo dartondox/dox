@@ -5,6 +5,10 @@ import '../core/parse_state.dart';
 import '../core/schema.dart';
 import '../core/sentinels.dart';
 
+/// `isAsync` per schema. A schema does not change after it is built,
+/// so the tree is walked only once, not on every parse.
+final Expando<bool> _isAsyncCache = Expando<bool>('isAsync');
+
 /// The value must match one of [options]. The first match wins.
 /// Made by `v.union()`.
 class UnionSchema<O> extends BaseSchema<O>
@@ -27,6 +31,10 @@ class UnionSchema<O> extends BaseSchema<O>
 
   @override
   bool get isAsync {
+    return _isAsyncCache[this] ??= _findAsync();
+  }
+
+  bool _findAsync() {
     if (super.isAsync) {
       return true;
     }

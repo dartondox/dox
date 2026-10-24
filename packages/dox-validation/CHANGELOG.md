@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Perf: object, list, map and union schemas work out `isAsync` once and keep the answer. Before, the whole schema tree was walked on every `validateSchema` call.
 - `url()` now allows only `http` and `https` links. Pass `schemes` to allow others.
 - File type checks now also need the file name extension to fit the bytes. A `.html` file with GIF bytes no longer passes `@Image`. Only another known type (like `.png` with GIF bytes) or a type the browser runs (`html`, `htm`, `xhtml`, `svg`, `xml`, `js`, `mjs`) is refused. A file with no or an unknown extension (like a canvas upload named `blob`) passes when the bytes match.
 

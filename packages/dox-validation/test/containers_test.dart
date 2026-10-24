@@ -187,4 +187,37 @@ void main() {
       );
     });
   });
+
+  group('isAsync cache |', () {
+    test('a copy with an async rule is async, the base stays sync', () async {
+      ObjectSchema base = v.object(<String, Schema<Object?>>{
+        'tags': v.list(v.string()),
+        'meta': v.map(v.string()),
+      });
+      expect(base.isAsync, false);
+      expect(base.isAsync, false);
+      ObjectSchema withAsync = base.refineAsync(
+        (Map<String, dynamic> value) async => true,
+      );
+      expect(withAsync.isAsync, true);
+      expect(base.isAsync, false);
+      expect(
+        base.safeParse(<String, dynamic>{
+          'tags': <String>['a'],
+          'meta': <String, String>{'k': 'v'},
+        }).success,
+        true,
+      );
+      expect(() => withAsync.safeParse(<String, dynamic>{}), throwsStateError);
+    });
+
+    test('an async child makes every parent async', () {
+      Schema<Object?> child = v.string().refineAsync((String s) async => true);
+      ObjectSchema root = v.object(<String, Schema<Object?>>{
+        'items': v.list(v.union(<Schema<Object?>>[v.int(), child])),
+      });
+      expect(root.isAsync, true);
+      expect(root.isAsync, true);
+    });
+  });
 }
