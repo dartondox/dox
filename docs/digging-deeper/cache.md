@@ -58,7 +58,7 @@ Each store is made once per isolate, the first time you use it.
 | Driver | Options |
 | --- | --- |
 | `file` | `path` (default `storage/cache`), `prefix` |
-| `memory` | `max_size`: the most items. When it is full, the item that was used least recently is removed. No limit by default. Also `prefix`. |
+| `memory` | `max_size`: the most items. When it is full, the item that was used least recently is removed. No limit by default. Expired items are removed when read, and by a sweep every few thousand writes. Also `prefix`. |
 | `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db` (default `0`), `tls` (`true`/`false`), `pool_size`, `prefix` |
 
 The default `prefix` is `dox_cache:`.
@@ -118,6 +118,8 @@ if (json != null) {
 ```
 
 A missing key gives `null`. A stored `String` comes back as JSON, with its quotes: `"bar"`.
+
+The memory driver also keeps values as JSON text, so a caller can not change a cached value by mistake. This means `get` decodes the text on every hit, also in memory. For a big value that you send as is, `getRaw` skips this work.
 
 ### Another store
 

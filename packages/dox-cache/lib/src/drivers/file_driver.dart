@@ -118,9 +118,14 @@ class FileDriver extends CacheDriver {
       CacheConstants.fileExpiresAtField: expiresAt,
     });
     File file = fileFor(key);
-    await directory.create(recursive: true);
     File temp = File('${file.path}.${CacheLock.randomOwner()}.tmp');
-    await temp.writeAsString(text, flush: true);
+    try {
+      await temp.writeAsString(text, flush: true);
+    } on PathNotFoundException {
+      /// make the folder only when it is missing, not on every write
+      await directory.create(recursive: true);
+      await temp.writeAsString(text, flush: true);
+    }
     await temp.rename(file.path);
   }
 

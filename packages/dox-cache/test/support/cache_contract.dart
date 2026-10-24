@@ -202,7 +202,27 @@ void runCacheContract(DriverHarness harness, {Object? skip}) {
       expect(await cache.get('plain'), 1);
     });
 
+    test('an item with two tags goes when either tag is flushed', () async {
+      List<String> both = <String>['users', 'posts'];
+      await cache.tags(both).put('k', 1);
+      expect(await cache.tags(both).get('k'), 1);
+      expect(await cache.tags(<String>['posts', 'users']).get('k'), isNull);
+      await cache.tags(<String>['posts']).flush();
+      expect(await cache.tags(both).get('k'), isNull);
+      await cache.tags(both).put('k', 2);
+      await cache.tags(both).flush();
+      expect(await cache.tags(both).get('k'), isNull);
+    });
+
     group('locks', () {
+      test('a lock can be released many times in a row', () async {
+        for (int i = 0; i < 3; i++) {
+          CacheLock lock = cache.lock('again', const Duration(seconds: 5));
+          expect(await lock.get(), isTrue);
+          expect(await lock.release(), isTrue);
+        }
+      });
+
       test('only one owner holds the lock', () async {
         CacheLock first = cache.lock('job', const Duration(seconds: 5));
         CacheLock second = cache.lock('job', const Duration(seconds: 5));

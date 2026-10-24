@@ -194,17 +194,19 @@ class TaggedCache extends CacheStore {
   /// Raise the version of every tag. Does not touch other items.
   @override
   Future<void> flush() async {
-    for (String name in names) {
-      await driver.increment(_tagKey(name), 1);
-    }
+    await Future.wait(<Future<int>>[
+      for (String name in names) driver.increment(_tagKey(name), 1),
+    ]);
   }
 
   @override
   Future<String> itemKey(String key) async {
+    /// one call for all tags (one MGET on Redis)
+    List<String> tagKeys = <String>[for (String name in names) _tagKey(name)];
+    Map<String, dynamic> found = await driver.many(tagKeys);
     List<String> versions = <String>[];
-    for (String name in names) {
-      dynamic version = await driver.get(_tagKey(name));
-      versions.add('$name=${version ?? 0}');
+    for (int i = 0; i < names.length; i++) {
+      versions.add('${names[i]}=${found[tagKeys[i]] ?? 0}');
     }
     String namespace = sha1.convert(utf8.encode(versions.join('|'))).toString();
     return '${CacheConstants.tagKeyPart}$namespace:$key';

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import '../cache_clock.dart';
 import '../cache_driver.dart';
@@ -8,8 +9,9 @@ import '../constants/cache_constants.dart';
 /// Keeps items in a map inside this isolate.
 ///
 /// Not shared: each Dox isolate has its own copy. Use Redis to share.
-/// Expired items are removed when read. With [maxSize], the least
-/// recently used item is removed when the map is full (LRU).
+/// Expired items are removed when read, and by a sweep that runs
+/// after many writes. With [maxSize], the least recently used item is
+/// removed when the map is full (LRU).
 class MemoryDriver extends CacheDriver {
   MemoryDriver({
     this.prefix = CacheConstants.defaultPrefix,
@@ -30,6 +32,13 @@ class MemoryDriver extends CacheDriver {
   final Map<String, MemoryEntry> _items = <String, MemoryEntry>{};
 
   final Map<String, MemoryEntry> _locks = <String, MemoryEntry>{};
+
+  /// Writes left until the next sweep of expired items and locks.
+  int _writesUntilSweep = _minSweepWrites;
+
+  /// A sweep runs at least this many writes apart. The gap grows with
+  /// the map size, so a sweep costs O(1) per write on average.
+  static const int _minSweepWrites = 1000;
 
   /// Number of stored items, expired ones included.
   int get length {
@@ -96,6 +105,7 @@ class MemoryDriver extends CacheDriver {
       return false;
     }
     _locks[name] = MemoryEntry(owner, _expiresAt(ttl));
+    _countWrite();
     return true;
   }
 
@@ -109,13 +119,21 @@ class MemoryDriver extends CacheDriver {
     return true;
   }
 
-  /// The entry when it exists and is not expired. Marks it as recently used.
+  /// The entry when it exists and is not expired. With [maxSize], marks
+  /// it as recently used. Without a limit the order does not matter.
   MemoryEntry? _live(String fullKey) {
-    MemoryEntry? entry = _items.remove(fullKey);
-    if (entry == null || entry.isExpired(_clock.now())) {
+    MemoryEntry? entry = _items[fullKey];
+    if (entry == null) {
       return null;
     }
-    _items[fullKey] = entry;
+    if (entry.isExpired(_clock.now())) {
+      _items.remove(fullKey);
+      return null;
+    }
+    if (maxSize != null) {
+      _items.remove(fullKey);
+      _items[fullKey] = entry;
+    }
     return entry;
   }
 
@@ -126,6 +144,19 @@ class MemoryDriver extends CacheDriver {
     while (limit != null && _items.length > limit) {
       _items.remove(_items.keys.first);
     }
+    _countWrite();
+  }
+
+  /// Remove expired items and locks once every so many writes, so keys
+  /// that are written once and never read again do not stay forever.
+  void _countWrite() {
+    if (--_writesUntilSweep > 0) {
+      return;
+    }
+    DateTime now = _clock.now();
+    _items.removeWhere((String key, MemoryEntry e) => e.isExpired(now));
+    _locks.removeWhere((String key, MemoryEntry e) => e.isExpired(now));
+    _writesUntilSweep = max(_minSweepWrites, _items.length + _locks.length);
   }
 
   DateTime? _expiresAt(Duration? ttl) {
