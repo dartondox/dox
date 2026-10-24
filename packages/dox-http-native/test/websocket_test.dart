@@ -6,7 +6,8 @@ import 'package:dox_http_native/dox_http_native.dart';
 import 'package:test/test.dart';
 
 /// `/ws` echoes every message, `/proto` answers with the subprotocol
-/// `chat`, `/bye` closes at once with 4000, `/no` refuses with 403.
+/// `chat`, `/bye` closes at once with 4000, `/no` refuses with 403,
+/// `/flood` sends 16 MiB at once.
 /// Anything else upgrades a request that may not be one.
 void main() {
   late NativeHttpServer server;
@@ -23,6 +24,12 @@ void main() {
         WebSocket ws = await NativeWebSocket.upgrade(req);
         accepted.add(ws);
         await ws.close(4000, 'bye');
+      case '/flood':
+        WebSocket ws = await NativeWebSocket.upgrade(req, maxMessageSize: 10);
+        accepted.add(ws);
+        for (int i = 0; i < 256; i++) {
+          ws.add(Uint8List(64 * 1024));
+        }
       default:
         WebSocket ws = await NativeWebSocket.upgrade(
           req,
@@ -126,5 +133,26 @@ void main() {
     await closing;
     expect(ws.closeCode, WebSocketStatus.goingAway);
     expect(accepted.single.closeCode, WebSocketStatus.goingAway);
+  });
+
+  test('a client that does not read closes with 1008', () async {
+    // a raw client: it sends the upgrade and then never reads
+    Socket client = await Socket.connect('127.0.0.1', server.port);
+    client.write(
+      'GET /flood HTTP/1.1\r\n'
+      'Host: 127.0.0.1\r\n'
+      'Connection: Upgrade\r\n'
+      'Upgrade: websocket\r\n'
+      'Sec-WebSocket-Version: 13\r\n'
+      'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n\r\n',
+    );
+    await client.flush();
+    while (accepted.isEmpty) {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    }
+    // 16 MiB is over the queue cap (1 MiB here)
+    await accepted.single.done.timeout(const Duration(seconds: 10));
+    expect(accepted.single.closeCode, WebSocketStatus.policyViolation);
+    client.destroy();
   });
 }

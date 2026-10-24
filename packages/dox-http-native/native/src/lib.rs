@@ -42,7 +42,18 @@
 //! reason. Rust sends exactly one kind 3 record per ws, when it ended.
 //! Messages from Dart are response records: kind 2 text, 3 binary, 4 close
 //! (status: the close code, 0 for none. body: the reason).
-use std::cell::RefCell;
+//!
+//! Limits, so a slow side can not make memory grow forever:
+//! - Dart to client: each socket has a queue of messages that Rust did not
+//!   send yet. Over 4 times the max message size (at least 1 MiB) the socket
+//!   closes with 1008 (policy violation). The client reads too slowly.
+//! - Client to Dart: Rust counts the message bytes it gave Dart. After each
+//!   batch Dart sends a kind 5 record (id: the message bytes of that batch).
+//!   While more than [WS_UNACKED] bytes are not acknowledged, Rust stops
+//!   reading WebSocket frames. No data is dropped. HTTP is not paused.
+//! - One send to the client may take [SEND_WAIT], a close frame plus the
+//!   wait for the answer [CLOSE_WAIT]. Then the socket is dropped (1006).
+use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
 use std::convert::Infallible;
 use std::ffi::{CStr, c_char, c_int, c_void};
@@ -97,6 +108,17 @@ const WS_CLOSED: u32 = 3;
 /// How long a closing WebSocket waits for the close frame of the peer.
 /// Same as dart:io.
 const CLOSE_WAIT: Duration = Duration::from_secs(5);
+/// How long one message to the client may take to send. After that the
+/// client counts as gone: the socket is dropped and Dart gets 1006.
+// ponytail: this is the time for the whole message, not idle time. A very
+// big message to a very slow client can hit it. Track write progress if
+// that matters.
+const SEND_WAIT: Duration = Duration::from_secs(30);
+/// The queue from Dart to one WebSocket holds at least this many bytes.
+const MIN_QUEUE: usize = 1 << 20;
+/// Client message bytes Dart may have unacknowledged before Rust stops
+/// reading WebSocket frames, for all sockets of the server together.
+const WS_UNACKED: usize = 8 << 20;
 
 // ---- Dart API DL -------------------------------------------------------
 // `NativeApi.initializeApiDLData` points to this table. We only need
@@ -156,6 +178,8 @@ enum Out {
     Http(usize, Answer, Option<(u64, usize)>),
     /// a message for the WebSocket with this id
     Ws(u64, Message),
+    /// Dart handled this many bytes of WebSocket messages
+    Ack(usize),
 }
 
 /// A WebSocket upgrade that Dart accepted.
@@ -164,6 +188,22 @@ struct Accepted {
     max: usize,
     /// the messages from Dart
     rx: UnboundedReceiver<Message>,
+    queue: Rc<WsQueue>,
+}
+
+/// Where messages from Dart to one WebSocket go, and their size.
+type WsLink = (UnboundedSender<Message>, Rc<WsQueue>);
+
+/// The size of the queue from Dart to one WebSocket.
+struct WsQueue {
+    /// bytes of the messages in the queue
+    bytes: Cell<usize>,
+    /// most bytes: 4 times the max message size, at least [MIN_QUEUE]
+    cap: usize,
+    /// the queue went over `cap`. The socket closes with 1008.
+    full: Cell<bool>,
+    /// wakes a send that waits for a client that does not read
+    overflow: Notify,
 }
 
 /// What a request gets from Dart: the answer, and the WebSocket when the
@@ -233,9 +273,13 @@ struct Ctx {
     /// tells every open connection to close after its current request
     closing: Notify,
     /// open WebSockets by ws id: where messages from Dart go
-    sockets: RefCell<HashMap<u64, UnboundedSender<Message>>>,
+    sockets: RefCell<HashMap<u64, WsLink>>,
     /// the WebSocket tasks. Aborted when the server stops.
     ws_tasks: RefCell<JoinSet<()>>,
+    /// client message bytes given to Dart and not acknowledged yet
+    ws_unacked: Cell<usize>,
+    /// wakes the sockets when `ws_unacked` went below [WS_UNACKED]
+    ws_resume: Notify,
 }
 
 impl Ctx {
@@ -249,6 +293,8 @@ impl Ctx {
             closing: Notify::new(),
             sockets: RefCell::new(HashMap::new()),
             ws_tasks: RefCell::new(JoinSet::new()),
+            ws_unacked: Cell::new(0),
+            ws_resume: Notify::new(),
         }
     }
 }
@@ -502,11 +548,17 @@ async fn serve(listener: StdListener, ctx: Rc<Ctx>, dart_port: i64) {
         // answer, each WebSocket with 1001 (going away). Dart still answers
         // the open requests. `dox_stop` ends the wait early.
         ctx.closing.notify_waiters();
-        let mut sockets = std::mem::take(&mut *ctx.ws_tasks.borrow_mut());
         tokio::select! {
             _ = async {
                 while conns.join_next().await.is_some() {}
-                while sockets.join_next().await.is_some() {}
+                // after the connections: one may still have upgraded
+                loop {
+                    let mut sockets = std::mem::take(&mut *ctx.ws_tasks.borrow_mut());
+                    if sockets.is_empty() {
+                        break;
+                    }
+                    while sockets.join_next().await.is_some() {}
+                }
             } => {}
             _ = server.wait_stopped() => {}
         }
@@ -739,9 +791,9 @@ fn ws_key<B>(req: &Request<B>) -> Option<HeaderValue> {
 
 /// Runs one accepted WebSocket, then tells Dart it closed.
 async fn websocket(on_upgrade: hyper::upgrade::OnUpgrade, accepted: Accepted, ctx: Rc<Ctx>) {
-    let Accepted { id, max, rx } = accepted;
+    let Accepted { id, max, rx, queue } = accepted;
     let (code, reason) = match on_upgrade.await {
-        Ok(io) => run_ws(TokioIo::new(io), id, max, rx, &ctx).await,
+        Ok(io) => run_ws(TokioIo::new(io), id, max, rx, &queue, &ctx).await,
         Err(_) => (1006, Bytes::new()),
     };
     ctx.sockets.borrow_mut().remove(&id);
@@ -756,6 +808,7 @@ async fn run_ws<S>(
     id: u64,
     max: usize,
     mut rx: UnboundedReceiver<Message>,
+    queue: &WsQueue,
     ctx: &Ctx,
 ) -> (u16, Bytes)
 where
@@ -774,8 +827,11 @@ where
     // the close frame of the client, once it came
     let mut peer = None;
     loop {
+        // Dart is behind: stop reading until it catches up
+        let paused = ctx.ws_unacked.get() > WS_UNACKED;
         tokio::select! {
-            msg = ws.next() => match msg {
+            _ = ctx.ws_resume.notified(), if paused => {}
+            msg = ws.next(), if !paused => match msg {
                 Some(Ok(Message::Text(t))) => enqueue_ws(ctx, id, WS_TEXT, 0, t.as_bytes()),
                 Some(Ok(Message::Binary(b))) => enqueue_ws(ctx, id, WS_BINARY, 0, &b),
                 // tungstenite answers it. The stream ends after that.
@@ -788,12 +844,32 @@ where
                 Some(Err(_)) => return (1006, Bytes::new()),
                 None => return peer.unwrap_or((1006, Bytes::new())),
             },
-            out = rx.recv() => match out {
-                Some(Message::Close(frame)) => return close_ws_with(ws, frame).await,
-                // a failed send also fails the next read, which ends the loop
-                Some(m) => { let _ = ws.send(m).await; }
-                None => return (1006, Bytes::new()),
-            },
+            out = rx.recv() => {
+                if queue.full.get() {
+                    return fail_ws(ws, CloseCode::Policy).await;
+                }
+                match out {
+                    Some(Message::Close(frame)) => return close_ws_with(ws, frame).await,
+                    Some(m) => {
+                        queue.bytes.set(queue.bytes.get().saturating_sub(m.len()));
+                        tokio::select! {
+                            sent = tokio::time::timeout(SEND_WAIT, ws.send(m)) => {
+                                // a failed send also fails the next read,
+                                // which ends the loop
+                                if sent.is_err() {
+                                    return (1006, Bytes::new());
+                                }
+                            }
+                            // the client does not read and Dart sent more
+                            // than the cap. Drop the socket.
+                            _ = queue.overflow.notified() => {
+                                return (u16::from(CloseCode::Policy), Bytes::new());
+                            }
+                        }
+                    }
+                    None => return (1006, Bytes::new()),
+                }
+            }
             _ = &mut closing => return close_ws(ws, CloseCode::Away).await,
         }
     }
@@ -815,7 +891,7 @@ where
         code,
         reason: Utf8Bytes::from_static(""),
     };
-    let _ = ws.send(Message::Close(Some(frame))).await;
+    let _ = tokio::time::timeout(CLOSE_WAIT, ws.send(Message::Close(Some(frame)))).await;
     (u16::from(code), Bytes::new())
 }
 
@@ -830,14 +906,14 @@ where
     close_ws_with(ws, Some(frame)).await
 }
 
-/// Sends a close frame and waits up to [CLOSE_WAIT] for the one of the
-/// client. Returns its code, like dart:io does.
+/// Sends a close frame and waits for the one of the client, both in
+/// [CLOSE_WAIT]. Returns its code, like dart:io does.
 async fn close_ws_with<S>(mut ws: WebSocketStream<S>, frame: Option<CloseFrame>) -> (u16, Bytes)
 where
     S: AsyncRead + AsyncWrite + Unpin,
 {
-    let _ = ws.send(Message::Close(frame)).await;
     let wait = async {
+        let _ = ws.send(Message::Close(frame)).await;
         while let Some(Ok(m)) = ws.next().await {
             if let Message::Close(f) = m {
                 return Some(close_parts(f));
@@ -852,6 +928,9 @@ where
 /// Adds one WebSocket record (a message or the close) to the batch. The
 /// head is the same 44 bytes as a request record.
 fn enqueue_ws(ctx: &Ctx, id: u64, kind: u32, code: u16, data: &[u8]) {
+    if kind != WS_CLOSED {
+        ctx.ws_unacked.set(ctx.ws_unacked.get() + data.len());
+    }
     let mut b = ctx.batch.borrow_mut();
     let was_empty = b.is_empty();
     b.extend_from_slice(&id.to_le_bytes());
@@ -1006,24 +1085,63 @@ async fn deliver(ctx: Rc<Ctx>) {
                     };
                     // the channel is made here, before later messages of
                     // the same batch need it
-                    let accepted = ws.map(|(id, max)| {
-                        let (wtx, rx) = unbounded_channel();
-                        ctx.sockets.borrow_mut().insert(id, wtx);
-                        Accepted { id, max, rx }
-                    });
+                    let accepted = ws.map(|(id, max)| add_socket(&ctx, id, max));
                     if let Err((_, Some(gone))) = tx.send((r, accepted)) {
                         // the client left before the answer
                         ctx.sockets.borrow_mut().remove(&gone.id);
                         enqueue_ws(&ctx, gone.id, WS_CLOSED, 1006, b"");
                     }
                 }
-                Out::Ws(id, m) => {
-                    if let Some(tx) = ctx.sockets.borrow().get(&id) {
-                        let _ = tx.send(m);
-                    }
-                }
+                Out::Ws(id, m) => queue_ws(&ctx, id, m),
+                Out::Ack(n) => ack_ws(&ctx, n),
             }
         }
+    }
+}
+
+/// Makes the queue of a WebSocket that Dart accepted.
+fn add_socket(ctx: &Ctx, id: u64, max: usize) -> Accepted {
+    let (tx, rx) = unbounded_channel();
+    let queue = Rc::new(WsQueue {
+        bytes: Cell::new(0),
+        cap: max.saturating_mul(4).max(MIN_QUEUE),
+        full: Cell::new(false),
+        overflow: Notify::new(),
+    });
+    ctx.sockets.borrow_mut().insert(id, (tx, queue.clone()));
+    Accepted { id, max, rx, queue }
+}
+
+/// Queues a message from Dart for the WebSocket `id`. Over the cap the
+/// socket closes with 1008 and later messages are dropped.
+fn queue_ws(ctx: &Ctx, id: u64, m: Message) {
+    let sockets = ctx.sockets.borrow();
+    let Some((tx, queue)) = sockets.get(&id) else {
+        return;
+    };
+    if queue.full.get() {
+        return;
+    }
+    let bytes = queue.bytes.get() + m.len();
+    if bytes > queue.cap {
+        queue.full.set(true);
+        queue.overflow.notify_one();
+        // wakes the socket when it waits for messages
+        let _ = tx.send(Message::Close(None));
+        return;
+    }
+    queue.bytes.set(bytes);
+    let _ = tx.send(m);
+}
+
+/// Dart handled `n` bytes of client messages. Wakes the paused sockets
+/// once Dart is no longer behind.
+fn ack_ws(ctx: &Ctx, n: usize) {
+    let was = ctx.ws_unacked.get();
+    let now = was.saturating_sub(n);
+    ctx.ws_unacked.set(now);
+    if was > WS_UNACKED && now <= WS_UNACKED {
+        ctx.ws_resume.notify_waiters();
     }
 }
 
@@ -1214,6 +1332,7 @@ pub unsafe extern "C" fn dox_respond_batch(handle: i64, ptr: *const u8, len: i64
                 Err(_) => continue, // Dart always sends UTF-8
             },
             3 => Out::Ws(id, Message::Binary(body)),
+            5 => Out::Ack(id as usize),
             4 => {
                 let frame = (status != 0).then(|| CloseFrame {
                     code: CloseCode::from(status),
@@ -1409,19 +1528,19 @@ mod tests {
 
     /// Runs `run_ws` (with a max message size of 8) against a client on
     /// an in-memory pipe.
+    /// Dart sends messages with `queue_ws(&ctx, 7, ..)`.
     async fn ws_pair() -> (
         WebSocketStream<tokio::io::DuplexStream>,
-        UnboundedSender<Message>,
         Rc<Ctx>,
         tokio::task::JoinHandle<(u16, Bytes)>,
     ) {
         let (a, b) = tokio::io::duplex(1 << 16);
         let ctx = Rc::new(Ctx::new(Arc::new(Server::new((0, 0, 0, 0))), test_limits()));
-        let (tx, rx) = unbounded_channel();
+        let Accepted { rx, queue, .. } = add_socket(&ctx, 7, 8);
         let c = ctx.clone();
-        let task = tokio::task::spawn_local(async move { run_ws(a, 7, 8, rx, &c).await });
+        let task = tokio::task::spawn_local(async move { run_ws(a, 7, 8, rx, &queue, &c).await });
         let client = WebSocketStream::from_raw_socket(b, Role::Client, None).await;
-        (client, tx, ctx, task)
+        (client, ctx, task)
     }
 
     /// (kind, code, body) of the WebSocket records in the batch
@@ -1447,18 +1566,19 @@ mod tests {
     #[test]
     fn websocket_messages_both_ways() {
         local_test(async {
-            let (mut client, tx, ctx, task) = ws_pair().await;
+            let (mut client, ctx, task) = ws_pair().await;
             client.send(Message::text("hi")).await.unwrap();
             client.send(Message::binary(vec![1, 2])).await.unwrap();
             client
                 .send(Message::Ping(Bytes::from_static(b"p")))
                 .await
                 .unwrap();
-            tx.send(Message::text("back")).unwrap();
             assert_eq!(
                 client.next().await.unwrap().unwrap(),
                 Message::Pong(Bytes::from_static(b"p"))
             );
+            // after the pong: the select picks a ready side at random
+            queue_ws(&ctx, 7, Message::text("back"));
             assert_eq!(client.next().await.unwrap().unwrap(), Message::text("back"));
             let frame = CloseFrame {
                 code: CloseCode::Normal,
@@ -1477,7 +1597,7 @@ mod tests {
     #[test]
     fn websocket_too_big_closes_with_1009() {
         local_test(async {
-            let (mut client, _tx, _ctx, task) = ws_pair().await;
+            let (mut client, _ctx, task) = ws_pair().await;
             client.send(Message::text("123456789")).await.unwrap();
             let Some(Ok(Message::Close(Some(frame)))) = client.next().await else {
                 panic!("no close frame");
@@ -1490,12 +1610,12 @@ mod tests {
     #[test]
     fn websocket_close_from_dart() {
         local_test(async {
-            let (mut client, tx, _ctx, task) = ws_pair().await;
-            tx.send(Message::Close(Some(CloseFrame {
+            let (mut client, ctx, task) = ws_pair().await;
+            let frame = CloseFrame {
                 code: CloseCode::from(4000),
                 reason: Utf8Bytes::from_static("done"),
-            })))
-            .unwrap();
+            };
+            queue_ws(&ctx, 7, Message::Close(Some(frame)));
             let Some(Ok(Message::Close(Some(frame)))) = client.next().await else {
                 panic!("no close frame");
             };
@@ -1503,6 +1623,87 @@ mod tests {
             // the client answers the close. Rust reports its code.
             assert!(client.next().await.is_none());
             assert_eq!(task.await.unwrap().0, 4000);
+        });
+    }
+
+    /// A client that never reads: Dart's message fills the pipe (64 KiB)
+    /// exactly, so the close frame can not be written. The close still ends
+    /// after CLOSE_WAIT, with 1006.
+    #[test]
+    fn websocket_close_ends_when_the_client_does_not_read() {
+        local_test(async {
+            tokio::time::pause();
+            let (_client, ctx, task) = ws_pair().await;
+            // 4 byte frame head + 65532 bytes = 64 KiB
+            queue_ws(&ctx, 7, Message::binary(vec![0u8; 65532]));
+            queue_ws(&ctx, 7, Message::Close(None));
+            let start = tokio::time::Instant::now();
+            assert_eq!(task.await.unwrap().0, 1006);
+            // paused time: only the timer moved it (1 ms steps)
+            assert!(start.elapsed() - CLOSE_WAIT < Duration::from_millis(10));
+        });
+    }
+
+    /// A send that never ends (the client does not read) drops the socket
+    /// after SEND_WAIT, with 1006.
+    #[test]
+    fn websocket_send_ends_when_the_client_does_not_read() {
+        local_test(async {
+            tokio::time::pause();
+            let (_client, ctx, task) = ws_pair().await;
+            queue_ws(&ctx, 7, Message::binary(vec![0u8; 200_000]));
+            let start = tokio::time::Instant::now();
+            assert_eq!(task.await.unwrap().0, 1006);
+            assert!(start.elapsed() - SEND_WAIT < Duration::from_millis(10));
+        });
+    }
+
+    /// Dart queues more than the cap (1 MiB here): the socket closes with
+    /// 1008, without sending the queued messages.
+    #[test]
+    fn websocket_queue_over_the_cap_closes_with_1008() {
+        local_test(async {
+            let (mut client, ctx, task) = ws_pair().await;
+            for _ in 0..20 {
+                queue_ws(&ctx, 7, Message::binary(vec![0u8; 100_000]));
+            }
+            let Some(Ok(Message::Close(Some(frame)))) = client.next().await else {
+                panic!("no close frame");
+            };
+            assert_eq!(frame.code, CloseCode::Policy);
+            assert_eq!(task.await.unwrap().0, 1008);
+        });
+    }
+
+    /// A client that never reads, while Dart keeps sending: the send in
+    /// progress stops once the queue is over the cap, with 1008.
+    #[test]
+    fn websocket_queue_over_the_cap_stops_a_waiting_send() {
+        local_test(async {
+            let (_client, ctx, task) = ws_pair().await;
+            queue_ws(&ctx, 7, Message::binary(vec![0u8; 200_000]));
+            tokio::task::yield_now().await; // the send starts and waits
+            for _ in 0..20 {
+                queue_ws(&ctx, 7, Message::binary(vec![0u8; 100_000]));
+            }
+            assert_eq!(task.await.unwrap().0, 1008);
+        });
+    }
+
+    /// While Dart has too many bytes not acknowledged, Rust reads no frame.
+    /// The ack starts reading again. Nothing is lost.
+    #[test]
+    fn websocket_pauses_until_dart_acknowledges() {
+        local_test(async {
+            let (mut client, ctx, _task) = ws_pair().await;
+            ctx.ws_unacked.set(WS_UNACKED + 1);
+            client.send(Message::text("hi")).await.unwrap();
+            tokio::time::sleep(Duration::from_millis(50)).await;
+            assert!(records(&ctx).is_empty(), "read while paused");
+            ack_ws(&ctx, WS_UNACKED + 1);
+            tokio::time::sleep(Duration::from_millis(50)).await;
+            assert_eq!(records(&ctx), vec![(WS_TEXT, 0, b"hi".to_vec())]);
+            assert_eq!(ctx.ws_unacked.get(), 2);
         });
     }
 }

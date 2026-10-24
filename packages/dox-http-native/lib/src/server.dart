@@ -255,6 +255,8 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
     if (b.length == 1) return _done(); // a graceful close is done
     ByteData d = ByteData.sublistView(b);
     int p = 0;
+    // bytes of WebSocket messages in this batch, acknowledged at the end
+    int wsBytes = 0;
     _inBatch = true;
     try {
       while (p + 28 <= b.length) {
@@ -279,6 +281,7 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
         int kind = (flags >> 8) & 0xff;
         if (kind != 0) {
           // a WebSocket message or close. The port field is the close code.
+          if (kind != 3) wsBytes += blen;
           sockets[id]?.receive(kind, remotePort, body);
           continue;
         }
@@ -298,6 +301,10 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
         );
       }
     } finally {
+      // Rust stops reading WebSocket frames while Dart is too far behind
+      if (wsBytes > 0) {
+        sendWebSocket(wsBytes, NativeWebSocket.kindAck, 0, const <int>[]);
+      }
       _inBatch = false;
       _flush();
     }

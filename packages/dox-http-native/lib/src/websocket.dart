@@ -19,7 +19,12 @@ import 'package:dox_http_native/src/server.dart';
 ///   `maxMessageSize` bytes closes the socket with 1009. Compression
 ///   (permessage-deflate) is never agreed.
 /// - Dart gets whole messages, through the same batches as requests: a
-///   [String] for text, a [Uint8List] for binary.
+///   [String] for text, a [Uint8List] for binary. While Dart is far behind
+///   (8 MiB of messages not handled), Rust stops reading from clients.
+/// - Messages to a client wait in a queue until it reads them. Over 4 times
+///   `maxMessageSize` (at least 1 MiB) the socket closes with 1008 (policy
+///   violation). A message that can not be sent in 30 seconds, or a close
+///   handshake that does not finish in 5 seconds, drops the socket (1006).
 ///
 /// It implements the `dart:io` [WebSocket] API, so code written for
 /// `WebSocketTransformer.upgrade` works the same.
@@ -95,6 +100,9 @@ class NativeWebSocket extends Stream<dynamic> implements WebSocket {
   static const int kindText = 2;
   static const int kindBinary = 3;
   static const int kindClose = 4;
+
+  /// Dart handled this many bytes (the id field) of client messages.
+  static const int kindAck = 5;
 
   final NativeHttpServer _server;
   final int _id;
