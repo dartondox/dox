@@ -220,7 +220,7 @@ Keys of `extra`:
 | Driver | Key | Type | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | postgres, mysql | `native` | `bool` | `true` | `false` uses the Dart driver instead of the native (Rust) one. |
-| postgres, mysql | `maxConnectionCount` | `int` | `10` | Most open connections. |
+| postgres, mysql | `maxConnectionCount` | `int` | `10` | Most open connections. Native drivers: for the whole process. Dart drivers: per isolate. |
 | postgres, mysql | `preparedStatementCacheSize` | `int` | `100` | Prepared statements kept per connection. |
 | postgres | `sslMode` | postgres `SslMode` | none | Setting it uses the Dart driver. |
 | mysql | `collation` | `String` | `utf8mb4_general_ci` | Connection collation. |
@@ -410,7 +410,8 @@ DatabaseConfig databaseConfig = DatabaseConfig(
       password: env.dbPassword,
       database: env.dbName,
       extra: <String, dynamic>{
-        /// Each isolate has its own pool.
+        /// One pool for all isolates with the native driver.
+        /// One pool per isolate with the Dart driver.
         'maxConnectionCount': 10,
         'maxConnectionAge': Duration(hours: 1),
       },

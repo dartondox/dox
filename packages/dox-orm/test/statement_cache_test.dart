@@ -122,6 +122,19 @@ void main() async {
       expect(c.misses, 1);
     });
 
+    test('SET keeps the statements, CREATE drops them', () async {
+      await driver.query('SELECT 1 AS n');
+      await driver.execute("SET application_name = 'cache_test'");
+      await driver.query('SELECT 1 AS n');
+      StatementCache<pg.Statement> c = (await cache())!;
+      expect(c.hits, 1);
+      await driver.execute('CREATE TEMP TABLE cache_set (id int)');
+      await driver.query('SELECT 1 AS n');
+      StatementCache<pg.Statement> fresh = (await cache())!;
+      expect(fresh, isNot(same(c)));
+      expect(fresh.misses, 1);
+    });
+
     test('a changed table gives the new columns', () async {
       await driver.execute('DROP TABLE IF EXISTS cache_t');
       await driver.execute('CREATE TABLE cache_t (id int)');

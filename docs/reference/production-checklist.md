@@ -58,7 +58,7 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | Migrations run once per deploy | The new project runs `Migrator(migrations: migrations).migrate()` in `bin/server.dart` before `startServer()`. Or run `dart run bin/migrate.dart run` (or `dox migrate`) in CI. Do one, not both at the same time on many machines. | [Migration](../database/migration.md) |
 | Migrations use the right database | `dox_migration` reads `.env` when the file exists, and ignores the real env then. Do not ship a `.env` next to the binary, or give `Migrator(connection: ...)` your own pool. | [Troubleshooting](troubleshooting.md) |
 | Small MySQL migrations | MySQL saves `CREATE`, `ALTER` and `DROP` at once. A failed migration can leave half the changes. One table change per migration. | [Migration](../database/migration.md) |
-| Pool size fits the database | `extra: {'maxConnectionCount': 10}` is per isolate. Total = isolates x pool size. Keep it under the database `max_connections`. | [Database](../database/index.md) |
+| Pool size fits the database | `extra: {'maxConnectionCount': 10}`. The native drivers (the default) share one pool per process, so the total is the pool size. The Dart drivers have one pool per isolate: total = isolates x pool size. Keep it under the database `max_connections`. | [Database](../database/index.md) |
 | Query logging is off | The new project's `database.dart` has `debug: true` on every connection, which prints every query. Set `debug: false` in production. | [Database](../database/index.md) |
 | Backups | **Dox limit.** Dox has no backup tool. Use `pg_dump`, `mysqldump`, managed database snapshots, or a copy of the SQLite file (with the `-wal` file, or `sqlite3 app.db ".backup x.db"`). Test a restore. | |
 

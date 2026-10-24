@@ -18,12 +18,14 @@ flowchart TD
     OS["Port 3000<br>the OS spreads the connections"] --> A1["Rust acceptor"]
     OS --> A2["Rust acceptor"]
     OS --> A3["Rust acceptor"]
-    A1 --> I1["Isolate 1, main<br>own DB pool, own memory cache"]
-    A2 --> I2["Isolate 2<br>own DB pool, own memory cache"]
-    A3 --> I3["Isolate N<br>own DB pool, own memory cache"]
+    A1 --> I1["Isolate 1, main<br>own memory cache"]
+    A2 --> I2["Isolate 2<br>own memory cache"]
+    A3 --> I3["Isolate N<br>own memory cache"]
     I2 -. "crash: started again after 1 second" .-> I2
     I1 -. "crash: the process exits" .-> S["Supervisor restarts the process<br>Docker, systemd"]
 ```
+
+With the native Postgres and MySQL drivers (the default), all isolates share one database pool in Rust. With the Dart drivers, each isolate has its own pool. See [How Dox works](../concepts/how-dox-works.md#where-the-database-pools-live).
 
 See [Native server](native-server.md) for the two servers.
 
@@ -67,7 +69,7 @@ Isolates do not share memory. This has some effects on your code:
 
 Dox copies the `AppConfig`, the services and the routes you added before `startServer()` to each new isolate. Then every isolate:
 
-1. runs `setup()` of each service (for example, it opens its own database pool),
+1. runs `setup()` of each service (for example, it opens the database pool),
 2. registers the routes of your routers,
 3. reads the parameter types of each controller once,
 4. starts its HTTP server.

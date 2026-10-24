@@ -114,7 +114,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 - `user`, `password`, `host` and `port` are not used by SQLite.
 
 Start the ORM in a service.
-Each isolate runs the service, so each isolate gets its own pool.
+Each isolate runs the service. The native Postgres and MySQL drivers then share one pool per process (isolates with the same settings get the same pool), so `maxConnectionCount` is for the whole process. The Dart drivers make one pool per isolate.
 On shutdown, `SqlQueryBuilder.close()` closes every connection of the isolate.
 
 ```dart title="lib/services/orm_service.dart"

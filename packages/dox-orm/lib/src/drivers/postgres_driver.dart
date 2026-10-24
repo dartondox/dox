@@ -33,7 +33,8 @@ class PostgresDriver extends DBDriver {
 
   /// goes up when this isolate runs a query that is not
   /// select/insert/update/delete (eg. create or alter table). old statements
-  /// may then have the wrong columns, so the caches start again.
+  /// may then have the wrong columns, so the caches start again. session
+  /// commands like SET or BEGIN do not change tables, so they keep them.
   static int _schemaVersion = 0;
 
   @override
@@ -152,7 +153,7 @@ class PostgresDriver extends DBDriver {
             ? await session.execute(Sql.named(query), parameters: values)
             : await session.execute(Sql(q.sql), parameters: params);
       } finally {
-        if (!q.dml) _schemaVersion++;
+        if (!q.dml && !q.session) _schemaVersion++;
       }
     }
     if (tx != null) {
@@ -270,13 +271,24 @@ class _PgQuery {
   /// select, insert, update, delete or with
   final bool dml;
 
-  _PgQuery(this.sql, this.names, this.dml);
+  /// a session command (eg. SET, SHOW, BEGIN) that does not change tables
+  final bool session;
+
+  _PgQuery(this.sql, this.names, this.dml)
+    : session = !dml && _sessionPattern.hasMatch(sql);
 
   /// ponytail: cleared when full, an LRU is not needed for sql texts
   static final Map<String, _PgQuery> _cache = <String, _PgQuery>{};
 
   static final RegExp _dmlPattern = RegExp(
     r'^\s*(select|insert|update|delete|with)\b',
+    caseSensitive: false,
+  );
+
+  /// not DISCARD: it drops the prepared statements on the server
+  static final RegExp _sessionPattern = RegExp(
+    r'^\s*(set|show|reset|begin|start|commit|rollback|end|savepoint|release|'
+    r'listen|unlisten|notify)\b',
     caseSensitive: false,
   );
 

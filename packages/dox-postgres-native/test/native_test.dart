@@ -175,6 +175,24 @@ void main() {
     await native.query('DROP TABLE pgn_alter');
   });
 
+  test('a big result (sent without a copy) and int params', () async {
+    // over 64 KiB: Rust gives the bytes to Dart as external typed data
+    PgNativeResult r = await native.query(
+      "SELECT g, repeat('x', 100) AS t FROM generate_series(1, 2000) g",
+    );
+    expect(r.rows, hasLength(2000));
+    expect(r.rows.last, <String, dynamic>{'g': 2000, 't': 'x' * 100});
+    PgNativeResult n = await native.query(
+      r'SELECT $1::int8 AS a, $2::int4 AS b, $3::text AS c',
+      parameters: <Object>[-9223372036854775808, -7, 1234567890],
+    );
+    expect(n.rows.single, <String, dynamic>{
+      'a': -9223372036854775808,
+      'b': -7,
+      'c': '1234567890',
+    });
+  });
+
   group('errors have the shape of the postgres package', () {
     Future<Object> fail(Future<Object?> Function() run) async {
       try {

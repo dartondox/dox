@@ -1,3 +1,12 @@
+## Unreleased
+
+- Breaking: isolates that open the same settings (and the same `maxConnections`) now share one pool in Rust, like `dox_mysql_native`. So `maxConnections` is for the whole process, not per isolate. Before, 8 isolates with the default of 10 could open 80 connections. Each `open` counts, and only the last `close()` closes the pool. The native ABI version is now 2.
+- The prepared statement cache of a connection drops the statement used longest ago when it is full (LRU, 512 statements). Before, it dropped all statements at once.
+- Fewer copies of the result bytes. Rust writes each result straight into the buffer of the next post. A batch of 64 KiB or more goes to Dart without a copy (external typed data).
+- Faster decode of `uuid`, `numeric`, `date`, `json` and `jsonb`, without the type registry of the `postgres` package. A negative `numeric` below 1 now has its leading zero: `-0.5`, not `-.5` like the `postgres` package.
+- An `int` parameter is written as text straight into the request buffer, without a `String`. It still goes without a type, so the server picks it.
+- The column names are kept per SQL text, not only for the last result. Queries that take turns no longer decode their column names again.
+
 ## 3.0.0-alpha.6
 
 - Version bump only, to match the other packages.
