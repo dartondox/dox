@@ -29,4 +29,17 @@ void main() {
     expect(fresh.handle, isNot(a.handle));
     fresh.close();
   });
+
+  test('a closed pool refuses new work, the shared pool stays open', () async {
+    PgNativePool a = open(5);
+    PgNativePool b = open(5);
+    a.close();
+    a.close(); // a second close does nothing
+    await expectLater(a.query('SELECT 1'), throwsStateError);
+    await expectLater(a.begin(), throwsStateError);
+    PgNativePool c = open(5);
+    expect(c.handle, b.handle);
+    c.close();
+    b.close();
+  });
 }

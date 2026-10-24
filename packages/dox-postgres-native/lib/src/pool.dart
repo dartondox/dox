@@ -44,6 +44,22 @@ class PgNativePool {
   /// the pool id in Rust. Works in every isolate of this process.
   final int handle;
 
+  /// true after [close]. The Rust pool can stay open for other users of
+  /// the same settings, so this object must refuse new work by itself.
+  bool _closed = false;
+
+  Future<T> _send<T>(
+    int transaction,
+    int kind,
+    Uint8List sql,
+    List<TypedValue<Object>> values,
+  ) {
+    if (_closed) {
+      return Future<T>.error(StateError('PgNativePool is closed'));
+    }
+    return _Link.instance.send<T>(handle, transaction, kind, sql, values);
+  }
+
   static bool? _available;
   static String? _loadError;
 
@@ -146,24 +162,12 @@ class PgNativePool {
         ? ParsedSql.direct(sql)
         : ParsedSql.named(sql);
     List<TypedValue<Object>> values = parsed.bind(parameters);
-    return _Link.instance.send<PgNativeResult>(
-      handle,
-      transaction,
-      0,
-      parsed.sql,
-      values,
-    );
+    return _send<PgNativeResult>(transaction, 0, parsed.sql, values);
   }
 
   /// Starts a transaction on one connection. Use its id as `transaction`
   /// of [query], then [commit] or [rollback] it.
-  Future<int> begin() => _Link.instance.send<int>(
-    handle,
-    0,
-    1,
-    _noSql,
-    const <TypedValue<Object>>[],
-  );
+  Future<int> begin() => _send<int>(0, 1, _noSql, const <TypedValue<Object>>[]);
 
   static final Uint8List _noSql = Uint8List(0);
 
@@ -173,20 +177,19 @@ class PgNativePool {
   /// Rolls the transaction back and gives its connection back to the pool.
   Future<void> rollback(int transaction) => _end(transaction, 3);
 
-  Future<void> _end(int transaction, int kind) => _Link.instance.send<void>(
-    handle,
-    transaction,
-    kind,
-    _noSql,
-    const <TypedValue<Object>>[],
-  );
+  Future<void> _end(int transaction, int kind) =>
+      _send<void>(transaction, kind, _noSql, const <TypedValue<Object>>[]);
 
   /// Gives back this open of the pool. Isolates that open the same
   /// settings share one pool, and the last [close] closes it for all of
   /// them. Running queries finish. Call it once per [PgNativePool.open];
   /// a pool from [PgNativePool.fromHandle] is closed by the isolate that
   /// opened it.
-  void close() => dpgClose(handle);
+  void close() {
+    if (_closed) return;
+    _closed = true;
+    dpgClose(handle);
+  }
 }
 
 final CodecContext _codec = CodecContext.withDefaults();
