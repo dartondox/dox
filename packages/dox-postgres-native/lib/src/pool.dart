@@ -34,8 +34,10 @@ class PgNativeResult {
 /// );
 /// ```
 ///
-/// Connections open when they are needed. Give [handle] to other isolates
-/// and use [PgNativePool.fromHandle] there: they all share one pool.
+/// Connections open when they are needed. Isolates that open the same
+/// settings share one pool in Rust, so `maxConnections` is for the whole
+/// process. Or give [handle] to another isolate and use
+/// [PgNativePool.fromHandle] there.
 class PgNativePool {
   PgNativePool.fromHandle(this.handle);
 
@@ -74,7 +76,8 @@ class PgNativePool {
     }
   }
 
-  /// Makes a pool of up to [maxConnections] connections.
+  /// Makes a pool of up to [maxConnections] connections. The same
+  /// settings in another isolate give the same pool.
   ///
   /// A [host] that starts with `/` is a Unix socket folder, like libpq.
   /// Eg. `/cloudsql/project:region:instance` on Google Cloud Run.
@@ -178,7 +181,11 @@ class PgNativePool {
     const <TypedValue<Object>>[],
   );
 
-  /// Closes the pool for every isolate. Running queries finish.
+  /// Gives back this open of the pool. Isolates that open the same
+  /// settings share one pool, and the last [close] closes it for all of
+  /// them. Running queries finish. Call it once per [PgNativePool.open];
+  /// a pool from [PgNativePool.fromHandle] is closed by the isolate that
+  /// opened it.
   void close() => dpgClose(handle);
 }
 
@@ -201,6 +208,9 @@ class _Link {
   /// The waiting requests. The id of a request is its slot here. Rust
   /// answers each id once, so a slot is free again after its answer.
   final List<Completer<Object?>?> _pending = <Completer<Object?>?>[];
+
+  /// the sql of each waiting request, to find the columns it had before
+  final List<Uint8List> _sqls = <Uint8List>[];
   final List<int> _free = <int>[];
   int _waiting = 0;
 
@@ -222,9 +232,11 @@ class _Link {
     _write(id, pool, tx, kind, sql, values);
     if (id == _pending.length) {
       _pending.add(done);
+      _sqls.add(sql);
     } else {
       _free.removeLast();
       _pending[id] = done;
+      _sqls[id] = sql;
     }
     if (_waiting++ == 0) _port.keepIsolateAlive = true;
     if (!_flushQueued) {
@@ -259,7 +271,7 @@ class _Link {
     Uint8List sql,
     List<TypedValue<Object>> values,
   ) {
-    List<(int, int, List<int>?)> params = <(int, int, List<int>?)>[
+    List<(int, int, Object?)> params = <(int, int, Object?)>[
       for (TypedValue<Object> v in values) _encode(v),
     ];
     int start = _len;
@@ -274,25 +286,60 @@ class _Link {
     d.setUint32(start + 28, sql.length, Endian.little);
     _len += 32;
     _bytes(sql);
-    for ((int, int, List<int>?) p in params) {
+    for ((int, int, Object?) p in params) {
       _ensure(9);
-      _outData.setUint32(_len, p.$1, Endian.little);
-      _outData.setUint8(_len + 4, p.$2);
-      _outData.setInt32(_len + 5, p.$3?.length ?? -1, Endian.little);
+      int at = _len;
+      _outData.setUint32(at, p.$1, Endian.little);
+      _outData.setUint8(at + 4, p.$2);
       _len += 9;
-      if (p.$3 != null) _bytes(p.$3!);
+      Object? data = p.$3;
+      if (data is int) {
+        _digits(data);
+      } else if (data is List<int>) {
+        _bytes(data);
+      }
+      _outData.setInt32(
+        at + 5,
+        data == null ? -1 : _len - at - 9,
+        Endian.little,
+      );
     }
   }
 
-  /// (type oid, format, bytes) of one parameter, the same bytes the
-  /// `postgres` package sends.
-  static (int, int, List<int>?) _encode(TypedValue<Object> v) {
+  /// Writes [v] as decimal text, without a String in between.
+  void _digits(int v) {
+    // the minus of the smallest int64 can not be flipped
+    if (v == -0x8000000000000000) return _bytes('$v'.codeUnits);
+    _ensure(20);
+    Uint8List o = _out;
+    int at = _len;
+    if (v < 0) {
+      o[at++] = 0x2d; // -
+      v = -v;
+    }
+    int n = 1;
+    for (int t = v; t >= 10; t ~/= 10) {
+      n++;
+    }
+    for (int i = at + n - 1; i >= at; i--) {
+      o[i] = 0x30 + v % 10;
+      v ~/= 10;
+    }
+    _len = at + n;
+  }
+
+  /// (type oid, format, value) of one parameter, the same bytes the
+  /// `postgres` package sends. The value is the bytes, an `int` to write
+  /// as text, or null for NULL.
+  static (int, int, Object?) _encode(TypedValue<Object> v) {
     if (v.isSqlNull) return (v.type.oid ?? 0, 0, null);
     Object? value = v.value;
     if (v.type == Type.unspecified) {
-      // the common ones without the type registry
+      // the common ones without the type registry. An int goes as text
+      // with no type, like the `postgres` package: the server then picks
+      // the type (eg. int4, or text for `WHERE name = $1`).
       if (value is String) return (0, 0, utf8.encode(value));
-      if (value is int) return (0, 0, '$value'.codeUnits);
+      if (value is int) return (0, 0, value);
     }
     Object? e = _codec.typeRegistry.encode(v, _codec);
     if (e is! EncodedValue) {
@@ -327,13 +374,15 @@ class _Link {
       Completer<Object?>? done = id < _pending.length ? _pending[id] : null;
       if (done == null) continue;
       _pending[id] = null;
+      Uint8List sql = _sqls[id];
+      _sqls[id] = PgNativePool._noSql;
       _free.add(id);
       _waiting--;
       // one bad record fails its own request, not the rest of the batch
       try {
         switch (status) {
           case 0:
-            done.complete(_rows(b, d, at));
+            done.complete(_rows(b, d, at, sql));
           case 1:
             done.completeError(serverException(_fields(b, d, at)));
           case 2:
@@ -365,21 +414,22 @@ class _Link {
     return fields;
   }
 
-  /// the column part of the last result, and its names and oids. The same
-  /// query gives the same columns, so most results skip the decode. The
-  /// same name strings also keep their hash code for the row maps.
-  static Uint8List _lastHead = Uint8List(0);
-  static List<String> _lastNames = const <String>[];
-  static List<int> _lastOids = const <int>[];
+  /// the columns of the last result of each sql (the `Uint8List` of
+  /// [ParsedSql], one per sql text). The same query gives the same columns,
+  /// so most results skip the decode. The same name strings also keep
+  /// their hash code for the row maps. It goes away with its sql.
+  static final Expando<_Columns> _columns = Expando<_Columns>();
 
-  static PgNativeResult _rows(Uint8List b, ByteData d, int at) {
+  static PgNativeResult _rows(Uint8List b, ByteData d, int at, Uint8List sql) {
     int count = d.getUint16(at, Endian.little);
     int start = at;
     at += 2;
     for (int c = 0; c < count; c++) {
       at += 6 + d.getUint16(at + 4, Endian.little);
     }
-    if (!_same(_lastHead, b, start, at)) {
+    _Columns? known = _columns[sql];
+    // the bytes are checked: the columns change after eg. ALTER TABLE
+    if (known == null || !_same(known.head, b, start, at)) {
       List<String> names = List<String>.filled(count, '');
       List<int> oids = List<int>.filled(count, 0);
       int p = start + 2;
@@ -389,12 +439,14 @@ class _Link {
         names[c] = utf8.decoder.convert(b, p + 6, p + 6 + len);
         p += 6 + len;
       }
-      _lastHead = Uint8List.fromList(Uint8List.sublistView(b, start, at));
-      _lastNames = List<String>.unmodifiable(names); // shared by results
-      _lastOids = oids;
+      known = _columns[sql] = _Columns(
+        Uint8List.fromList(Uint8List.sublistView(b, start, at)),
+        List<String>.unmodifiable(names), // shared by results
+        oids,
+      );
     }
-    List<String> names = _lastNames;
-    List<int> oids = _lastOids;
+    List<String> names = known.names;
+    List<int> oids = known.oids;
     int rowCount = d.getUint32(at, Endian.little);
     at += 4;
     List<Map<String, dynamic>> rows = List<Map<String, dynamic>>.generate(
@@ -428,7 +480,12 @@ class _Link {
   }
 
   static const int _y2kMicros = 946684800000000;
+  static const int _dayMicros = 86400000000;
   static const int _infinity = 0x7fffffffffffffff;
+  static final Converter<List<int>, Object?> _json = utf8.decoder.fuse(
+    json.decoder,
+  );
+  static const String _hex = '0123456789abcdef';
 
   /// One binary value. The common types here, the rest with the type
   /// registry of the `postgres` package.
@@ -456,6 +513,22 @@ class _Link {
             isUtc: true,
           );
         }
+      case 1082: // date
+        int days = d.getInt32(at);
+        if (days != 0x7fffffff && days != -0x80000000) {
+          return DateTime.fromMicrosecondsSinceEpoch(
+            _y2kMicros + days * _dayMicros,
+            isUtc: true,
+          );
+        }
+      case 2950 when len == 16: // uuid
+        return _uuid(b, at);
+      case 1700: // numeric
+        return _numeric(d, at);
+      case 114: // json
+        return _json.convert(Uint8List.sublistView(b, at, at + len));
+      case 3802 when len > 0 && b[at] == 1: // jsonb, version 1
+        return _json.convert(Uint8List.sublistView(b, at + 1, at + len));
     }
     // a copy: the value must not keep the whole batch alive
     Uint8List bytes = Uint8List.fromList(
@@ -466,4 +539,63 @@ class _Link {
       _codec,
     );
   }
+
+  /// `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`, lower case
+  static String _uuid(Uint8List b, int at) {
+    List<int> out = List<int>.filled(36, 0x2d); // -
+    int o = 0;
+    for (int i = 0; i < 16; i++) {
+      if (i == 4 || i == 6 || i == 8 || i == 10) o++;
+      int v = b[at + i];
+      out[o++] = _hex.codeUnitAt(v >> 4);
+      out[o++] = _hex.codeUnitAt(v & 15);
+    }
+    return String.fromCharCodes(out);
+  }
+
+  /// numeric as text, with all its digits. Postgres sends groups of 4
+  /// decimal digits: the first one times 10000^weight.
+  static String _numeric(ByteData d, int at) {
+    int count = d.getInt16(at);
+    int weight = d.getInt16(at + 2);
+    int sign = d.getUint16(at + 4);
+    int scale = d.getInt16(at + 6);
+    if (sign == 0xc000) return 'NaN';
+    if (sign == 0xd000) return 'Infinity';
+    if (sign == 0xf000) return '-Infinity';
+    int group(int i) => i >= 0 && i < count ? d.getInt16(at + 8 + 2 * i) : 0;
+    StringBuffer out = StringBuffer(sign == 0x4000 ? '-' : '');
+    if (weight < 0) {
+      out.write('0');
+    } else {
+      out.write(group(0)); // no leading zeros
+      for (int i = 1; i <= weight; i++) {
+        out.write(group(i).toString().padLeft(4, '0'));
+      }
+    }
+    if (scale > 0) {
+      StringBuffer fraction = StringBuffer();
+      for (int i = weight + 1; fraction.length < scale; i++) {
+        fraction.write(group(i).toString().padLeft(4, '0'));
+      }
+      out
+        ..write('.')
+        ..write(fraction.toString().substring(0, scale));
+    }
+    return out.toString();
+  }
 }
+
+/// The columns of one result: the bytes they came in, names and type oids.
+class _Columns {
+  _Columns(this.head, this.names, this.oids);
+
+  final Uint8List head;
+  final List<String> names;
+  final List<int> oids;
+}
+
+/// Decodes one binary value of type [oid] like a result row does. For
+/// tests.
+Object? decodeValue(int oid, Uint8List bytes) =>
+    _Link._decode(oid, bytes, ByteData.sublistView(bytes), 0, bytes.length);
