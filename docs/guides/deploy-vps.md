@@ -226,7 +226,7 @@ Migrated: 2026_10_22_205345_create_posts_table
 {"level":"INFO","name":"dox","message":"Server started at http://127.0.0.1:3000 with 2 isolate (native)", ...}
 ```
 
-`(native)` means the native HTTP server loaded. `(dart:io)` means it did not, and the line before it says why.
+`(native)` means the native HTTP server loaded. When it does not load, the app stops at start and the error says why.
 
 Check that the app port is closed. From your machine:
 

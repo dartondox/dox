@@ -11,15 +11,13 @@ A lookup table of the messages Dox prints or throws. Search this page for the te
 | Text | When | What to do |
 | --- | --- | --- |
 | `APP_KEY is not set. Run `dox key:generate` and put the key in .env` | `appKey` is empty. A warning, or a `StateError` that stops the app when `APP_ENV=production`. | Run `dox key:generate`, or set `APP_KEY` in the env. |
-| `[dox] warning: dox_http_native did not load, using the dart:io server (<reason>)` | The native HTTP library is missing or from another version. | See [Troubleshooting](troubleshooting.md#the-native-http-library-did-not-load). Or set `DOX_SERVER=dartio`. |
-| `Server started at http://<host>:<port> with <n> isolate (<backend>)` | Normal start. `<host>` is the address it listens on: `[::]` means all interfaces. `<backend>` is `native` or `dart:io`. | Nothing. |
-| `WebSocket or Socket.IO routes: using the dart:io server` | The app has WebSocket or Socket.IO. The native server can not upgrade yet. | Nothing. This is info. |
-| `Windows: the native server runs on one isolate` | Windows has no `SO_REUSEPORT`. | Nothing, or `DOX_SERVER=dartio` to use every core. |
+| `Unsupported operation: dox_http_native did not load: <reason>. Fix: ...` | The native HTTP library is missing or from another version (`native library ABI <x>, expected <y>`). The app stops at start. | Do what the `Fix:` part says. See [Troubleshooting](troubleshooting.md#the-native-http-library-did-not-load). |
+| `Server started at http://<host>:<port> with <n> isolate (native)` | Normal start. `<host>` is the address it listens on: `[::]` means all interfaces. | Nothing. |
+| `Windows: the native server runs on one isolate` | Windows has no `SO_REUSEPORT`. | Nothing. |
 | `Socket.IO runs on <n> isolates: clients should use transports: ['websocket'] ...` | Socket.IO with more than one isolate and long-polling on. | Use a Redis adapter, and `transports: ['websocket']` in the client. |
 | `[dox] isolate <n> error: <error>` | An error killed a worker isolate. The stack is on the next line. | Fix the error. Dox restarts the isolate. |
 | `[dox] isolate <n> exited, restarting` | A worker isolate died. A new one starts after 1 second. | Look at the error line above it. |
-| `SocketException: Failed to create server socket (OS Error: Address already in use, ...)` | The port is in use (`dart:io` server). | See [Troubleshooting](troubleshooting.md#port-already-in-use). |
-| `SocketException: dox_http_native: bind failed (<code>), port = <port>` | The port is in use (native server). | Same as above. |
+| `SocketException: dox_http_native: bind failed (<code>), port = <port>` | The port is in use. | See [Troubleshooting](troubleshooting.md#port-already-in-use). |
 
 ## dox_core: routes and controllers
 
@@ -211,7 +209,7 @@ Printed during `dart pub get`, `dox serve` or `dox build`. `<pkg>` is `dox_http_
 | `<pkg>: sha256 of <file> does not match` | The downloaded file is not the expected one. | Delete `.dart_tool` and try again. |
 | `<pkg>: cargo build failed` | The build from source failed. | Read the cargo output below it. |
 | `Bad state: <pkg>: <path> does not exist` | The `lib_path` user define points to a missing file. | Fix the path in `pubspec.yaml`. |
-| `Unsupported operation: dox_http_native can not detach the socket` | `DOX_SERVER=native` with a WebSocket route. The upgrade fails with `500`. | Do not force native for WebSocket apps. |
+| `Unsupported operation: dox_http_native can not detach the socket. Use NativeWebSocket.upgrade for a WebSocket.` | Code called `detachSocket()` on a response. Rust owns the socket. | For a WebSocket use `NativeWebSocket.upgrade(request)`. |
 
 See [Native server](../digging-deeper/native-server.md).
 

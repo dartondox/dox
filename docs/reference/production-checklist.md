@@ -42,7 +42,7 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | Check | How | Read more |
 | --- | --- | --- |
 | AOT binary, not `dart run` | `dox build`, then run `build/bundle/bin/server`. Keep `bin/` and `lib/` together. Not `dart compile exe`. | [Deployment](../digging-deeper/deployment.md) |
-| Native server is on | The start line says `(native)`. When it says `(dart:io)`, look for the `[dox] warning: dox_http_native did not load` line. | [Native server](../digging-deeper/native-server.md) |
+| Native server loads | The app starts and the start line says `(native)`. When the library does not load, the app stops with `dox_http_native did not load` and the fix. | [Native server](../digging-deeper/native-server.md) |
 | Native database driver is on | No `[dox] warning: dox_postgres_native did not load` (or `mysql`) line at start. Do not set `DOX_DB_DRIVER=dart`. Postgres with TLS uses the Dart driver. | [Postgres native](../database/postgres-native.md) |
 | Isolates = cores | Keep the default `totalIsolate` (`Platform.numberOfProcessors`), or set `APP_TOTAL_ISOLATE` to the cores the container really gets. Use fewer when the database runs on the same machine. | [Isolate](../digging-deeper/isolate.md) |
 | Shared state across isolates | Cache: `redis`, not `memory`. WebSocket: `WebsocketRedisAdapter`. Socket.IO: a Redis adapter and `transports: ['websocket']`. | [Isolate](../digging-deeper/isolate.md) |

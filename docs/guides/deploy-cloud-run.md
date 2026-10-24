@@ -17,8 +17,8 @@ The image is small. For the blog API it is about 17 MB.
 
 !!! note "Check for `(native)`"
     The project's `Dockerfile` copies `libgcc_s.so.1` into the image, so the
-    native HTTP server loads. The start log ends with `(native)`. If it says
-    `using the dart:io server`, see [Docker](docker.md).
+    native HTTP server loads. The start log ends with `(native)`. If the app
+    stops with `dox_http_native did not load`, see [Docker](docker.md).
 
 ## The port: `PORT` and `APP_PORT`
 

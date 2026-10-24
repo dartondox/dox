@@ -9,7 +9,6 @@ Dox starts many isolates. Each one runs its own HTTP server on the same port. Th
 - Native server on Linux: each isolate has its own socket (`SO_REUSEPORT`).
 - Native server on macOS: the isolates share one socket.
 - Native server on Windows: only one isolate serves HTTP.
-- `dart:io` server: `HttpServer.bind(..., shared: true)` on every system.
 
 With the native server, each isolate has its own Rust acceptor on the port:
 

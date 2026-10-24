@@ -2,6 +2,7 @@
 
 - New: WebSocket upgrade on the native server. `NativeWebSocket.upgrade(request, protocol: ..., maxMessageSize: ...)` accepts it and gives a `dart:io` `WebSocket`. Rust (tokio-tungstenite) speaks the protocol: ping and pong, the close handshake, the UTF-8 check and the size limit (a bigger message closes with `1009`). Compression is never agreed. `NativeWebSocket.isUpgradeRequest(request)` tells if a request asks for one.
 - On a graceful `close()`, open WebSockets get close code `1001`.
+- New: `NativeHttpServer.ensureAvailable()` throws an error that says why the library did not load and how to fix it. `bind` throws the same error.
 - Breaking: native ABI 5 (new WebSocket records). Needs a new native library build. The build hook builds it with cargo until the next release.
 - Breaking: Dox has no `dart:io` server any more. When this library does not load, Dox stops at start with the reason.
 - Security: a multipart form may be up to `maxMultipartSize` bytes (new `bind` option, default `maxBodySize`). Any other body, eg. JSON, raw or text, is limited to `maxBodySize`. Dox passes its own two limits, so a JSON body over 10 MB now gets `413` from Rust.

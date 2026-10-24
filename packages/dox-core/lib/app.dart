@@ -143,7 +143,8 @@ class Dox implements IDox {
     );
 
     Logger.info(
-      'Server started at ${serverUrl(server)} with $isolatesToSpawn isolate',
+      'Server started at ${serverUrl(server)} with $isolatesToSpawn isolate '
+      '(native)',
     );
     _watchSignals();
   }

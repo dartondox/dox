@@ -15,7 +15,6 @@ The code reads env vars in three ways:
 | `APP_ENV` | `dox_core` (`Dox().checkAppKey()`, `OpenApiConfig.isEnabled`) | empty | Any value except `development`, `local` or `test` (also empty) makes a bad `APP_KEY` a startup error: missing, not exactly 32 characters, or a public sample key. In `development`, `local` and `test` it is only a warning. `development` or `local` turn the `/docs` routes on when `openApi.enabled` is `null`. Read with `Env.get`. | `APP_ENV=production` |
 | `PORT` | `dox_core` (`DoxServer.portFor()`) | not set | The port to listen on, when `APP_PORT` is not set. Cloud Run, Fly, Render and Heroku set it. `APP_PORT` wins when both are set. Read with `Env.get`. | `PORT=8080` |
 | `APP_HOST` | `dox_core` (`DoxServer.hostFor()`) | not set (all interfaces, `::`) | The host to listen on. `127.0.0.1` keeps the app off the network, for an app behind a proxy on the same machine. `AppConfig.host` wins over it. Read with `Env.get`. | `APP_HOST=127.0.0.1` |
-| `DOX_SERVER` | `dox_core` (`DoxServer.usesNative()`) | not set (uses `AppConfig.server`) | `dartio`, `dart_io` or `dart:io` forces the `dart:io` server. `native` forces the native server, also for an app with WebSocket routes. Real environment only. | `DOX_SERVER=dartio` |
 | `DOX_HTTP_THREAD` | `dox_http_native` (Rust, `shared_thread()`) | not set (one thread per isolate) | `shared` puts the servers of all isolates on one network thread. Off by default: on 2 cores it cut req/s by a quarter. Real environment only. | `DOX_HTTP_THREAD=shared` |
 | `DOX_DB_DRIVER` | `dox_orm` (`NativeDrivers.wanted()`) | not set (native driver) | `dart` uses the Dart `postgres` / `mysql_dart` driver instead of the native (Rust) one. Same as `extra: {'native': false}`. Real environment only. | `DOX_DB_DRIVER=dart` |
 | `DATABASE_URL` | `dox_orm` (`DatabaseConfig.url`), `dox_migration` | not set | A database url. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. `dox_orm` reads it from the real environment only. See [Database url](../database/index.md#database_url). | `DATABASE_URL=postgres://app:secret@db:5432/blog?sslmode=require` |
@@ -29,7 +28,7 @@ The code reads env vars in three ways:
 | `HOME` / `USERPROFILE` | build hooks of `dox_http_native`, `dox_postgres_native`, `dox_mysql_native` | empty | Used to find `~/.cargo/bin/cargo` when the library must be built from source. | set by the OS |
 | `DART_VM_OPTIONS` | the Dart VM | not set | Flags for the VM. The AOT binary from `dox build` reads it. Dox never sets VM flags for you. See [Performance](../digging-deeper/performance.md#dart-vm-flags). | `DART_VM_OPTIONS=--new_gen_semi_max_size=64` |
 
-`DOX_SERVER`, `DOX_HTTP_THREAD` and `DOX_DB_DRIVER` are read with `Platform.environment` or `std::env::var`. They do not work from `.env`.
+`DOX_HTTP_THREAD` and `DOX_DB_DRIVER` are read with `Platform.environment` or `std::env::var`. They do not work from `.env`.
 
 ## Read by a new project
 

@@ -128,8 +128,9 @@ AppConfig appConfig = AppConfig(
 `io.listen(port)` opens its own port. Run it in its own small program, for example `bin/socket.dart`,
 next to the Dox HTTP server. Put both behind the same proxy.
 
-- `io.attach(httpServer)` uses a `dart:io` server you already have.
-- In your own `dart:io` server, call `io.handle(request)` when `io.matches(request)` is true.
+- `io.listen(port)` starts a native server (`dox_http_native`).
+- `io.attach(httpServer)` uses a server you already have: a `NativeHttpServer` or a `dart:io` one.
+- In your own server, call `io.handle(request)` when `io.matches(request)` is true.
 - The path is `/socket.io/` by default.
 
 ## Namespaces in a class
@@ -221,7 +222,7 @@ SocketIoServer(
 - `cors` with a list of origins: a websocket from another origin gets 403. A request with no `Origin` header (not a browser) is allowed.
 - `cors: null`, or `*` in `origins`: websockets from any origin are allowed. If you log users in with cookies, list your origins.
 - `*` together with `credentials: true` throws an `ArgumentError`. List your origins instead.
-- Websocket compression is off. dart:io reads a whole message before Dox checks its size, so also set a size limit in your proxy.
+- Websocket compression is off. On the native server, Rust checks the size of each message (`maxHttpBufferSize`) before Dart reads it. A bigger one closes with code 1009. On a plain `dart:io` server (`io.attach`), `dart:io` reads the whole message first, so also set a size limit in your proxy.
 
 ## Many servers: Redis adapter
 

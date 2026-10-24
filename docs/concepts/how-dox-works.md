@@ -82,11 +82,11 @@ Dox starts one isolate per CPU core (`Platform.numberOfProcessors`). Every isola
 
 Every isolate runs its own HTTP server on the same port. The operating system spreads the connections.
 
-| System | Native server | `dart:io` server |
-| --- | --- | --- |
-| Linux | one socket per isolate (`SO_REUSEPORT`) | `HttpServer.bind(..., shared: true)` |
-| macOS | the isolates share one socket | `HttpServer.bind(..., shared: true)` |
-| Windows | only one isolate serves HTTP | `HttpServer.bind(..., shared: true)` |
+| System | Native server |
+| --- | --- |
+| Linux | one socket per isolate (`SO_REUSEPORT`) |
+| macOS | the isolates share one socket |
+| Windows | only one isolate serves HTTP |
 
 Each isolate also has its own Rust network thread. `DOX_HTTP_THREAD=shared` puts all isolates on one thread. Leave it off unless you measure a gain.
 
