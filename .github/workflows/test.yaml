@@ -66,8 +66,8 @@ jobs:
   # - locks: what the entry can not share with another entry at the same
   #   time, like one database. See ci/run-group.py.
   # Notes on the entries:
-  # - The default server is native (dox_http_native, built by its build
-  #   hook). DOX_SERVER=dartio runs dox_core on dart:io too.
+  # - The server is native (dox_http_native, built by its build hook).
+  #   There is no dart:io server.
   # - The default database drivers are native (dox_postgres_native and
   #   dox_mysql_native, built by their build hooks with cargo).
   #   DOX_DB_DRIVER=dart runs the same tests on the Dart drivers.
