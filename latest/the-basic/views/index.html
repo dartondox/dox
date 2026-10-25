@@ -6496,7 +6496,7 @@ Numbers have <code>toStringAsFixed()</code>, <code>round()</code>, <code>floor()
 <li>The second argument is the props. In the component they are variables (<code>title</code>), and also <code>$props.title</code>.</li>
 <li><code>@slot('name') ... @end</code> fills a named slot. Everything else goes into <code>$slots.main</code>.</li>
 <li>A slot is HTML, so <code>{{ }}</code> does not escape it again.</li>
-<li>A component only sees its props, <code>$props</code>, <code>$slots</code> and the globals. It does not see the variables of the page.</li>
+<li>A component only sees its props, <code>$props</code>, <code>$slots</code>, the globals and the request helpers of <code>view()</code> (see <a href="#forms">Forms</a>). It does not see the variables of the page.</li>
 </ul>
 <p><code>@!component(...)</code> is a component with no body and no <code>@end</code>.</p>
 <h3 id="components-as-tags">Components as tags</h3>
@@ -6551,6 +6551,7 @@ Numbers have <code>toStringAsFixed()</code>, <code>round()</code>, <code>floor()
 </span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
 </span></code></pre></div>
 <p>Every template from <code>view()</code> also has <code>request.path</code>, <code>request.method</code> and <code>request.query</code>.</p>
+<p>Components and layouts see all of these too, so a layout can use <code>request.path</code> and a form component can use <code>csrfField()</code>.</p>
 <h2 id="globals">Globals</h2>
 <p>Globals are variables and functions that every template can use. <code>route()</code> is there by default.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">const</span><span class="w"> </span><span class="n">ViewConfig</span><span class="p">(</span><span class="nl">globals:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">{</span><span class="s1">'appName'</span><span class="o">:</span><span class="w"> </span><span class="s1">'My app'</span><span class="p">});</span>
