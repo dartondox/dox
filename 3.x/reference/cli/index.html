@@ -6510,7 +6510,8 @@
 <ol>
 <li>When <code>pubspec.yaml</code> contains <code>build_runner</code>: runs <code>dart run build_runner build</code>. Stops with exit code 1 when it fails.</li>
 <li>Runs <code>dart build cli --target bin/server.dart --output build</code>.</li>
-<li>Copies <code>db/</code> to <code>build/bundle/db</code> (migrations are read at start).</li>
+<li>When <code>bin/queue.dart</code> or <code>bin/schedule.dart</code> exists: builds it the same way, to <code>build/bundle/bin/queue</code> and <code>build/bundle/bin/schedule</code>.</li>
+<li>Copies <code>db/</code> to <code>build/bundle/db</code> (migrations are read at start). It leaves out SQLite files, so your local data does not go to production.</li>
 <li>Copies <code>.env.example</code> to <code>build/bundle/.env.example</code>.</li>
 <li>Prints <code>[Dox] Built build/bundle. Run it with: cd build/bundle &amp;&amp; ./bin/server</code>.</li>
 </ol>
@@ -6528,12 +6529,20 @@
 <td>the native binary, no Dart SDK needed</td>
 </tr>
 <tr>
+<td><code>build/bundle/bin/queue</code></td>
+<td>the queue worker, when <code>bin/queue.dart</code> exists</td>
+</tr>
+<tr>
+<td><code>build/bundle/bin/schedule</code></td>
+<td>the scheduler, when <code>bin/schedule.dart</code> exists</td>
+</tr>
+<tr>
 <td><code>build/bundle/lib/</code></td>
 <td>native libraries from build hooks (SQLite, <code>dox_http_native</code>, ...)</td>
 </tr>
 <tr>
 <td><code>build/bundle/db/</code></td>
-<td>your migrations</td>
+<td>your migrations. SQLite files (<code>*.sqlite</code>, <code>*.db</code>) are not copied.</td>
 </tr>
 <tr>
 <td><code>build/bundle/.env.example</code></td>

@@ -6772,14 +6772,19 @@ A second signal stops it at once.</p>
 <p>The worker keeps your code in memory. Restart it after each deploy, or it runs the old code.</p>
 </div>
 <h3 id="keep-it-running">Keep it running</h3>
-<p>Run the worker as its own process, next to the web server. For example with Docker Compose:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">services</span><span class="p">:</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nt">web</span><span class="p">:</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dart run bin/server.dart</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">  </span><span class="nt">worker</span><span class="p">:</span>
-</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.</span>
-</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dart run bin/queue.dart work --concurrency=4</span>
+<p>In production, run the binary, not <code>dart run</code>. <code>dox build</code> makes <code>build/bundle/bin/queue</code>, next to the server:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nb">cd</span><span class="w"> </span>build/bundle
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>./bin/queue<span class="w"> </span>work<span class="w"> </span>--concurrency<span class="o">=</span><span class="m">4</span>
+</span></code></pre></div>
+<p>It takes the same commands and flags as <code>dart run bin/queue.dart</code>.</p>
+<p>Run the worker as its own process, next to the web server. For example with Docker Compose and the image of the project <code>Dockerfile</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nt">services</span><span class="p">:</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nt">web</span><span class="p">:</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/app/bin/server</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">  </span><span class="nt">worker</span><span class="p">:</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/app/bin/queue work --concurrency=4</span>
 </span></code></pre></div>
 <p>Or with systemd, Supervisor or a second Fly.io process. Set it to restart when it stops.</p>
 <h2 id="retries-and-failed-jobs">Retries and failed jobs</h2>
@@ -6798,11 +6803,11 @@ Write jobs that are safe to run twice.</p>
 <p>When a worker crashes, its job stays reserved. After <code>retryAfter</code> another worker takes it.
 This counts as a try. When there are no tries left, the job fails with a message that the worker did not finish.</p>
 <p>Failed jobs are kept until you retry or delete them:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>dart<span class="w"> </span>run<span class="w"> </span>bin/queue.dart<span class="w"> </span>failed
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>dart<span class="w"> </span>run<span class="w"> </span>bin/queue.dart<span class="w"> </span>retry<span class="w"> </span>6f1c0e...
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>dart<span class="w"> </span>run<span class="w"> </span>bin/queue.dart<span class="w"> </span>retry<span class="w"> </span>all
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>dart<span class="w"> </span>run<span class="w"> </span>bin/queue.dart<span class="w"> </span>forget<span class="w"> </span>6f1c0e...
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>dart<span class="w"> </span>run<span class="w"> </span>bin/queue.dart<span class="w"> </span>flush
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>dart<span class="w"> </span>run<span class="w"> </span>bin/queue.dart<span class="w"> </span>failed
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>dart<span class="w"> </span>run<span class="w"> </span>bin/queue.dart<span class="w"> </span>retry<span class="w"> </span>6f1c0e...
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>dart<span class="w"> </span>run<span class="w"> </span>bin/queue.dart<span class="w"> </span>retry<span class="w"> </span>all
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>dart<span class="w"> </span>run<span class="w"> </span>bin/queue.dart<span class="w"> </span>forget<span class="w"> </span>6f1c0e...
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>dart<span class="w"> </span>run<span class="w"> </span>bin/queue.dart<span class="w"> </span>flush
 </span></code></pre></div>
 <h2 id="drivers">Drivers</h2>
 <table>
@@ -6839,11 +6844,11 @@ This counts as a try. When there are no tries left, the job fails with a message
 </ul>
 <p>Use another connection of <code>config/database.dart</code> with <code>QueueConfig(connection: 'postgres')</code>.</p>
 <h3 id="redis">Redis</h3>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">QueueConfig</span><span class="w"> </span><span class="n">queueConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">QueueConfig</span><span class="p">(</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nl">driver:</span><span class="w"> </span><span class="s1">'redis'</span><span class="p">,</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="nl">jobs:</span><span class="w"> </span><span class="n">jobRegistry</span><span class="p">,</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span><span class="nl">redis:</span><span class="w"> </span><span class="n">RedisOptions</span><span class="p">(</span><span class="nl">host:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">redisHost</span><span class="p">,</span><span class="w"> </span><span class="nl">port:</span><span class="w"> </span><span class="m">6379</span><span class="p">),</span>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">QueueConfig</span><span class="w"> </span><span class="n">queueConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">QueueConfig</span><span class="p">(</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="nl">driver:</span><span class="w"> </span><span class="s1">'redis'</span><span class="p">,</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="nl">jobs:</span><span class="w"> </span><span class="n">jobRegistry</span><span class="p">,</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="nl">redis:</span><span class="w"> </span><span class="n">RedisOptions</span><span class="p">(</span><span class="nl">host:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">redisHost</span><span class="p">,</span><span class="w"> </span><span class="nl">port:</span><span class="w"> </span><span class="m">6379</span><span class="p">),</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="p">);</span>
 </span></code></pre></div>
 <p>Each queue has a list of ready jobs, a sorted set of delayed jobs and a sorted set of reserved jobs.
 A Lua script takes a job, so two workers never get the same one. Failed jobs are in the hash <code>dox_queue:failed</code>.</p>
@@ -6853,11 +6858,11 @@ When the job throws, <code>failed()</code> runs and <code>dispatch()</code> thro
 Use it for tests and for local work.</p>
 <h2 id="small-apps-a-worker-in-the-web-server">Small apps: a worker in the web server</h2>
 <p>You can skip the worker process. Set <code>workInProcess: true</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">QueueConfig</span><span class="w"> </span><span class="n">queueConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">QueueConfig</span><span class="p">(</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="nl">driver:</span><span class="w"> </span><span class="s1">'database'</span><span class="p">,</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="nl">jobs:</span><span class="w"> </span><span class="n">jobRegistry</span><span class="p">,</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="nl">workInProcess:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">QueueConfig</span><span class="w"> </span><span class="n">queueConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">QueueConfig</span><span class="p">(</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span><span class="nl">driver:</span><span class="w"> </span><span class="s1">'database'</span><span class="p">,</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span><span class="nl">jobs:</span><span class="w"> </span><span class="n">jobRegistry</span><span class="p">,</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">  </span><span class="nl">workInProcess:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="p">);</span>
 </span></code></pre></div>
 <p>The first isolate of the web server then runs jobs too. When the server stops, it waits for the running jobs.</p>
 <div class="admonition warning">
@@ -6868,30 +6873,30 @@ Use a worker process when your jobs are heavy or many.</p>
 </div>
 <h2 id="testing">Testing</h2>
 <p>Use the <code>sync</code> driver. <code>dispatch()</code> then runs the job at once, so you can check the result right after.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_queue/dox_queue.dart'</span><span class="p">;</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_sample/generated/jobs.g.dart'</span><span class="p">;</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:test/test.dart'</span><span class="p">;</span>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="kt">void</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">  </span><span class="n">setUp</span><span class="p">(()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">    </span><span class="n">Queue</span><span class="p">.</span><span class="n">configure</span><span class="p">(</span><span class="n">QueueConfig</span><span class="p">(</span><span class="nl">driver:</span><span class="w"> </span><span class="s1">'sync'</span><span class="p">,</span><span class="w"> </span><span class="nl">jobs:</span><span class="w"> </span><span class="n">jobRegistry</span><span class="p">));</span>
-</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">  </span><span class="p">});</span>
-</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>
-</span><span id="__span-17-10"><a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="w">  </span><span class="n">test</span><span class="p">(</span><span class="s1">'sends the welcome email'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-17-11"><a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">SendWelcomeEmail</span><span class="p">(</span><span class="nl">userId:</span><span class="w"> </span><span class="m">1</span><span class="p">).</span><span class="n">dispatch</span><span class="p">();</span>
-</span><span id="__span-17-12"><a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a><span class="w">    </span><span class="c1">// check the email was sent</span>
-</span><span id="__span-17-13"><a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a><span class="w">  </span><span class="p">});</span>
-</span><span id="__span-17-14"><a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_queue/dox_queue.dart'</span><span class="p">;</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_sample/generated/jobs.g.dart'</span><span class="p">;</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:test/test.dart'</span><span class="p">;</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="kt">void</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">  </span><span class="n">setUp</span><span class="p">(()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">    </span><span class="n">Queue</span><span class="p">.</span><span class="n">configure</span><span class="p">(</span><span class="n">QueueConfig</span><span class="p">(</span><span class="nl">driver:</span><span class="w"> </span><span class="s1">'sync'</span><span class="p">,</span><span class="w"> </span><span class="nl">jobs:</span><span class="w"> </span><span class="n">jobRegistry</span><span class="p">));</span>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">  </span><span class="p">});</span>
+</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>
+</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">  </span><span class="n">test</span><span class="p">(</span><span class="s1">'sends the welcome email'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-18-11"><a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">SendWelcomeEmail</span><span class="p">(</span><span class="nl">userId:</span><span class="w"> </span><span class="m">1</span><span class="p">).</span><span class="n">dispatch</span><span class="p">();</span>
+</span><span id="__span-18-12"><a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="w">    </span><span class="c1">// check the email was sent</span>
+</span><span id="__span-18-13"><a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="w">  </span><span class="p">});</span>
+</span><span id="__span-18-14"><a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>To test a job alone, call <code>handle()</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">SendWelcomeEmail</span><span class="p">(</span><span class="nl">userId:</span><span class="w"> </span><span class="m">1</span><span class="p">).</span><span class="n">handle</span><span class="p">();</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">SendWelcomeEmail</span><span class="p">(</span><span class="nl">userId:</span><span class="w"> </span><span class="m">1</span><span class="p">).</span><span class="n">handle</span><span class="p">();</span>
 </span></code></pre></div>
 <p>To test the queue itself, use the <code>database</code> driver with SQLite <code>:memory:</code>, and run a worker that stops when the queue is empty:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Worker</span><span class="p">(</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Queue</span><span class="p">.</span><span class="n">driver</span><span class="p">,</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span><span class="nl">jobs:</span><span class="w"> </span><span class="n">jobRegistry</span><span class="p">,</span>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span><span class="nl">options:</span><span class="w"> </span><span class="n">WorkerOptions</span><span class="p">(</span><span class="nl">stopWhenEmpty:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="p">).</span><span class="n">run</span><span class="p">();</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Worker</span><span class="p">(</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">  </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Queue</span><span class="p">.</span><span class="n">driver</span><span class="p">,</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">  </span><span class="nl">jobs:</span><span class="w"> </span><span class="n">jobRegistry</span><span class="p">,</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">  </span><span class="nl">options:</span><span class="w"> </span><span class="n">WorkerOptions</span><span class="p">(</span><span class="nl">stopWhenEmpty:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="p">).</span><span class="n">run</span><span class="p">();</span>
 </span></code></pre></div>
 
 

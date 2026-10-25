@@ -6707,11 +6707,12 @@ On Ctrl+C or SIGTERM it starts no new task and waits for the running ones.
 A second signal stops it at once.</p>
 <h3 id="run">run</h3>
 <p><code>run</code> is for a system cron. Add one line to the crontab:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>/path/to/app<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>dart<span class="w"> </span>run<span class="w"> </span>bin/schedule.dart<span class="w"> </span>run
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>/path/to/app/build/bundle<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./bin/schedule<span class="w"> </span>run
 </span></code></pre></div>
 <p>It runs the tasks of this minute, waits for them, and exits.
 The exit code is 1 when a task failed.</p>
-<p>Use a compiled binary to start faster: <code>dart compile exe bin/schedule.dart -o build/schedule</code>.</p>
+<p><code>./bin/schedule</code> is the binary that <code>dox build</code> makes in <code>build/bundle</code>. It starts fast and needs no Dart SDK.
+Do not use <code>dart compile exe</code>. It can not build apps with native libraries, like SQLite.</p>
 <h3 id="list">list</h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Task     Schedule                   Next run
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>cleanup  0 2 * * *                  2026-10-26 02:00 UTC

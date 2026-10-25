@@ -1469,8 +1469,10 @@ Generated: /.../blog/build/bundle/bin/server
 | Path | What it is |
 | --- | --- |
 | `bin/server` | the binary, about 10 MB. It needs no Dart SDK. |
+| `bin/queue` | the [queue worker](../digging-deeper/queue.md). Run it as its own process. |
+| `bin/schedule` | the [scheduler](../digging-deeper/scheduler.md). Run it as its own process. |
 | `lib/` | native libraries from build hooks, like `libsqlite3`. Keep it next to `bin/`. |
-| `db/` | your migrations |
+| `db/` | your migrations. Your local SQLite file is not copied. |
 
 ## 2. Run the binary
 
@@ -1532,8 +1534,15 @@ RUN dart run build_runner build --delete-conflicting-outputs
 # build hooks. Native libraries go to build/bundle/lib.
 RUN dart build cli --target bin/server.dart --output build
 
+# The queue worker and the scheduler are binaries too. They run as their
+# own processes: `/app/bin/queue work` and `/app/bin/schedule work`.
+RUN dart build cli --target bin/queue.dart --output build/queue \
+  && cp build/queue/bundle/bin/queue build/bundle/bin/ \
+  && dart build cli --target bin/schedule.dart --output build/schedule \
+  && cp build/schedule/bundle/bin/schedule build/bundle/bin/
+
 # Lay out the final file tree:
-# /app/bin/server, /app/lib (native libraries), /app/db/migration,
+# /app/bin/server, /app/bin/queue, /app/bin/schedule, /app/lib (native libraries), /app/db/migration,
 # /app/storage and a writable /tmp (uploads bigger than 1 MB are
 # streamed to a temp file).
 RUN mkdir -p /out/app/storage /out/tmp \
@@ -1557,12 +1566,13 @@ EXPOSE 3000
 CMD ["/app/bin/server"]
 ```
 
-Build and run it. The image has no `.env` file, so pass the config as environment variables:
+Build and run it. The image has no `.env` file, so pass the config as environment variables.
+`APP_KEY` must be 32 characters. The app does not start with a shorter key.
 
 ```bash
 docker build -t blog .
 docker run -p 3000:3000 \
-  -e APP_KEY=change-me \
+  -e APP_KEY=$(openssl rand -hex 16) \
   -e DB_CONNECTION=sqlite \
   -e DB_NAME=storage/blog.sqlite \
   blog
@@ -5253,16 +5263,25 @@ A second signal stops it at once.
 
 ### Keep it running
 
-Run the worker as its own process, next to the web server. For example with Docker Compose:
+In production, run the binary, not `dart run`. `dox build` makes `build/bundle/bin/queue`, next to the server:
+
+```bash
+cd build/bundle
+./bin/queue work --concurrency=4
+```
+
+It takes the same commands and flags as `dart run bin/queue.dart`.
+
+Run the worker as its own process, next to the web server. For example with Docker Compose and the image of the project `Dockerfile`:
 
 ```yaml
 services:
   web:
     build: .
-    command: dart run bin/server.dart
+    command: /app/bin/server
   worker:
     build: .
-    command: dart run bin/queue.dart work --concurrency=4
+    command: /app/bin/queue work --concurrency=4
 ```
 
 Or with systemd, Supervisor or a second Fly.io process. Set it to restart when it stops.
@@ -5634,13 +5653,14 @@ A second signal stops it at once.
 `run` is for a system cron. Add one line to the crontab:
 
 ```bash
-* * * * * cd /path/to/app && dart run bin/schedule.dart run
+* * * * * cd /path/to/app/build/bundle && ./bin/schedule run
 ```
 
 It runs the tasks of this minute, waits for them, and exits.
 The exit code is 1 when a task failed.
 
-Use a compiled binary to start faster: `dart compile exe bin/schedule.dart -o build/schedule`.
+`./bin/schedule` is the binary that `dox build` makes in `build/bundle`. It starts fast and needs no Dart SDK.
+Do not use `dart compile exe`. It can not build apps with native libraries, like SQLite.
 
 ### list
 
@@ -5992,7 +6012,7 @@ Dox reads values from two places:
 
 ```ini title=".env"
 APP_NAME=dox
-APP_KEY=change-me
+APP_KEY=3f9a1c7e5b2d4f6a8c0e1b3d5f7a9c2e
 DB_PORT=5432
 ```
 
@@ -17396,17 +17416,20 @@ What it does:
 
 1. When `pubspec.yaml` contains `build_runner`: runs `dart run build_runner build`. Stops with exit code 1 when it fails.
 2. Runs `dart build cli --target bin/server.dart --output build`.
-3. Copies `db/` to `build/bundle/db` (migrations are read at start).
-4. Copies `.env.example` to `build/bundle/.env.example`.
-5. Prints `[Dox] Built build/bundle. Run it with: cd build/bundle && ./bin/server`.
+3. When `bin/queue.dart` or `bin/schedule.dart` exists: builds it the same way, to `build/bundle/bin/queue` and `build/bundle/bin/schedule`.
+4. Copies `db/` to `build/bundle/db` (migrations are read at start). It leaves out SQLite files, so your local data does not go to production.
+5. Copies `.env.example` to `build/bundle/.env.example`.
+6. Prints `[Dox] Built build/bundle. Run it with: cd build/bundle && ./bin/server`.
 
 Output:
 
 | Path | What |
 | --- | --- |
 | `build/bundle/bin/server` | the native binary, no Dart SDK needed |
+| `build/bundle/bin/queue` | the queue worker, when `bin/queue.dart` exists |
+| `build/bundle/bin/schedule` | the scheduler, when `bin/schedule.dart` exists |
 | `build/bundle/lib/` | native libraries from build hooks (SQLite, `dox_http_native`, ...) |
-| `build/bundle/db/` | your migrations |
+| `build/bundle/db/` | your migrations. SQLite files (`*.sqlite`, `*.db`) are not copied. |
 | `build/bundle/.env.example` | copy it to `.env` or set real env vars |
 
 `dart compile exe` can not build packages with build hooks, so the CLI uses `dart build cli`.
@@ -18944,6 +18967,12 @@ What changed in each package, newest first. This page is made from the
 - `remember`, `pull`, `add`, `increment`, `many`, tags and atomic locks.
 
 ## dox
+
+### Unreleased
+
+- `dox build` also builds `bin/queue.dart` and `bin/schedule.dart` when they exist, to `build/bundle/bin/queue` and `build/bundle/bin/schedule`. Before, the worker and the scheduler had no production binary.
+- Fix: `dox build` copied the local SQLite database (`db/dox.sqlite`, with its `-wal` and `-shm` files) into `build/bundle/db`, so dev data went to production. SQLite files are now left out.
+- `dox --help` and `dox -h` show the help, like `dox help`.
 
 ### 3.0.0-alpha.10
 
