@@ -1,5 +1,6 @@
-## Unreleased
+## 3.0.0-alpha.8
 
+- Uses dox_http_native 3.0.0-alpha.8: pipelined requests are about 2.8 times faster (1 core: 172k to 480k req/s). Normal requests are as fast as before.
 - Security: every file response (`File`, `Storage().stream()`, `Storage().download()`, `Route.files`) sends `X-Content-Type-Options: nosniff`. Before, a `File` response and a raw download did not.
 - New: `Route.files(path, download: true)` sends every file as a download (`Content-Disposition: attachment`). Use it for user uploads. html, svg, xml and javascript files are still always sent as a download in a sandbox.
 - Fix: a trusted proxy `X-Forwarded-For` hop with a port (`1.2.3.4:5678`, `[::1]:5678`) is now read without the port. Before, it was not a valid ip, so `req.ip()` could be wrong. A bare IPv6 like `::1` still works.

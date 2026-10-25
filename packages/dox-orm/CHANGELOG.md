@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.8
 
 - A `transaction()` inside another transaction now uses a savepoint (`SAVEPOINT sp_N`). When the inner function throws, only its work is undone, and the error is thrown again. If the caller catches the error, the outer transaction goes on and can commit. Before, the inner one joined the outer one, so an inner error always undid the outer work too. Works on Postgres, MySQL, MariaDB and SQLite. New `DBDriver.savepoint()`.
 - Postgres: new `extra['sslRootCert']`, the path of a PEM file with the CA certificates to trust for `verify-full`. `sslrootcert` in `DATABASE_URL` sets it. New `ConnectionConfig.postgresSslRootCert`. Needs the next `dox_postgres_native` release.

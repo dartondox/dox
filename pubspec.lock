@@ -237,10 +237,10 @@ packages:
     dependency: transitive
     description:
       name: dox_http_native
-      sha256: "7806fb0d1d6ce8ca946ed83ba555222d0b5bd8a99bad4437b522c5b5d572c83c"
+      sha256: "477b15548fad7cfd0bb7d9137b5b23f01421316b1893d9769392c2f14a3dcd90"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-alpha.7"
+    version: "3.0.0-alpha.8"
   dox_mysql_native:
     dependency: transitive
     description:

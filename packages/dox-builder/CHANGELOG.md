@@ -1,3 +1,7 @@
+## 3.0.0-alpha.8
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.7
 
 - The generated `fromMap()` takes a `DateTime` from the driver as it is. It only parses a string.

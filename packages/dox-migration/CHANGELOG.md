@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.8
 
 - A migration that runs inside a transaction you already opened (eg. with `Migrator(connection: ...)`) now uses a savepoint. A failed migration undoes only its own work.
 

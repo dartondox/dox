@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.8
 
 - Fix: `FileTypes.sniff` read any data that starts with `BM` as `bmp`, like the text "BMW...". Now it also checks the BMP header size at byte 14 (12, 40, 52, 56, 64, 108 or 124).
 

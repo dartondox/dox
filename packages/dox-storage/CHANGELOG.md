@@ -1,3 +1,7 @@
+## 3.0.0-alpha.8
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.7
 
 - Perf: the S3 driver keeps the SigV4 signing key for each day. Before, every request ran 4 extra HMACs to make it again.
