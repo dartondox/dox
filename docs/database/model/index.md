@@ -7,12 +7,12 @@ A model has all the [query builder](../query-builder.md) methods too.
 ## Create a model
 
 ```bash
-dox create:model Blog      # only the model
-dox create:model Blog -m   # the model and a migration for the table `blogs`
+dox make:model Blog      # only the model
+dox make:model Blog -m   # the model and a migration for the table `blogs`
 ```
 
 This makes `lib/app/models/blog/blog.model.dart`.
-`make:model` is another name for the same command.
+`create:model` is another name for the same command.
 
 The model code uses a generated class (`BlogGenerator`).
 Run the generator after you make or change a model:
@@ -88,7 +88,7 @@ class Blog extends BlogGenerator {}
 ```
 
 !!! info
-    `dox create:model Blog -m` sets `table: 'blogs'` for you,
+    `dox make:model Blog -m` sets `table: 'blogs'` for you,
     because the migration makes the plural table `blogs`.
 
 ### `primaryKey`

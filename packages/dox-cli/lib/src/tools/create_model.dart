@@ -18,7 +18,7 @@ class $className extends ${className}Generator {
 }
 
 /// [table] sets `@DoxModel(table: ...)`, so the model uses that table
-/// (`create:model X -m` makes the plural table, the model default is singular).
+/// (`make:model X -m` makes the plural table, the model default is singular).
 bool createModel(String filename, {String? table}) {
   filename = pascalToSnake(filename);
   String className = snakeToPascal(filename);

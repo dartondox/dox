@@ -36,8 +36,8 @@ CommandRegistry.addCommand(
 
 ### 2. Command Definition Properties
 
-- **command**: The main command name (e.g., 'create:controller')
-- **helpInfo**: Usage information shown in help (e.g., 'create:controller <name> [-r]')
+- **command**: The main command name (e.g., 'make:controller')
+- **helpInfo**: Usage information shown in help (e.g., 'make:controller <name> [-r]')
 - **description**: Help text for the command
 - **category**: CommandCategory enum value (e.g., CommandCategory.generation)
 - **minArgs**: Minimum number of arguments required
@@ -85,8 +85,8 @@ CommandDefinition(
 
 // Command with required arguments
 CommandDefinition(
-  command: 'create:model',
-  helpInfo: 'create:model <model_name>',
+  command: 'make:model',
+  helpInfo: 'make:model <model_name>',
   description: 'Create a new model',
   category: CommandCategory.generation,
   minArgs: 1,
@@ -98,8 +98,8 @@ CommandDefinition(
 
 // Command with optional arguments
 CommandDefinition(
-  command: 'create:controller',
-  helpInfo: 'create:controller <controller_name> [-r]',
+  command: 'make:controller',
+  helpInfo: 'make:controller <controller_name> [-r]',
   description: 'Create a new controller',
   category: CommandCategory.generation,
   minArgs: 1,
@@ -141,10 +141,10 @@ dox help
 ```
 Shows all commands organized by category:
 - **Project**: create commands
-- **Development**: serve, create:controller, create:middleware, create:request commands
+- **Development**: serve, make:controller, make:middleware, create:request commands
 - **Build**: build commands
 - **Build Runner**: build_runner commands
-- **Generation**: create:model, create:serializer, key:generate commands
+- **Generation**: make:model, make:serializer, key:generate commands
 - **Database**: migration commands
 - **System**: help, update, version commands
 
@@ -161,13 +161,13 @@ Shows detailed information about a specific command including:
 
 Example:
 ```bash
-dox help create:controller
+dox help make:controller
 ```
 
 Output:
 ```
-Command: create:controller
-Usage: dox create:controller <controller_name> [-r]
+Command: make:controller
+Usage: dox make:controller <controller_name> [-r]
 Description: Create a new controller
 Category: Generation
 Arguments: 1 to 2 arguments

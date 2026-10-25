@@ -1,3 +1,11 @@
+## Unreleased
+
+- `make:*` is now the main name of every generator: `make:controller`, `make:middleware`, `make:dto`, `make:serializer` and `make:model`, like `make:migration`, `make:factory` and `make:seeder`. The `create:*` names still work as aliases.
+- New `dox make:job <name>`: makes `lib/app/jobs/<name>.job.dart` and `bin/queue.dart` when it is missing. It prints a hint to add `dox_queue` and to run `build_runner`.
+- New `dox queue:work`, `queue:failed`, `queue:retry`, `queue:forget` and `queue:flush`: run `bin/queue.dart` with the same flags.
+- New `dox schedule:work`, `schedule:run`, `schedule:list` and `schedule:test <name>`: run `bin/schedule.dart`.
+- These commands pass the terminal through, send SIGINT and SIGTERM to the app script so a worker can stop by itself, and return its exit code. When the script is missing they print how to set it up.
+
 ## 3.0.0-alpha.9
 
 - `dox make:controller` (`create:controller`) writes `@Inject()` above the class, and no global controller instance. The file shows the typed route to use. The command says to run `build_runner`.

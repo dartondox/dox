@@ -17,7 +17,7 @@ A middleware can be `async`. Dox waits for it.
 Create one with the CLI. It writes `lib/app/http/middleware/logger.middleware.dart`.
 
 ```bash
-dox create:middleware Logger
+dox make:middleware Logger
 ```
 
 ```dart title="lib/app/http/middleware/logger.middleware.dart"

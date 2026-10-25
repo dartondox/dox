@@ -7,7 +7,7 @@ A controller holds the code that answers a route. It can be a class method, a st
 Make one with the CLI:
 
 ```bash
-dox create:controller Blog
+dox make:controller Blog
 ```
 
 It writes `lib/app/http/controllers/blog.controller.dart`.
@@ -59,7 +59,7 @@ A resource controller has the 7 methods that `Route.resource` uses.
 Make one with the CLI:
 
 ```bash
-dox create:controller Blog -r
+dox make:controller Blog -r
 ```
 
 ```dart title="lib/app/http/controllers/blog.controller.dart"

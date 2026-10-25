@@ -46,7 +46,7 @@ The name of the migration decides what the new file contains:
 | any other name | empty `up` and `down` |
 
 - `create:migration` does the same.
-- `dox create:model Blog -m` makes the model and a `create_blogs_table` migration.
+- `dox make:model Blog -m` makes the model and a `create_blogs_table` migration.
 
 !!! info "Raw SQL and data in a Dart migration"
     `schema.driver` runs raw SQL on the same connection and transaction:

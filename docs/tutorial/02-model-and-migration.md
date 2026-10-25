@@ -5,7 +5,7 @@ This step makes the `posts` table with a Dart migration and a `Post` model for i
 ## 1. Make the model and the migration
 
 ```bash
-dox create:model Post -m
+dox make:model Post -m
 ```
 
 This makes two files and updates one:

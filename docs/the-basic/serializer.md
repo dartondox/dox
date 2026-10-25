@@ -11,7 +11,7 @@ It works with any Dart type: a model, a plain class, or a map.
 ## Create a serializer
 
 ```bash
-dox create:serializer Blog
+dox make:serializer Blog
 ```
 
 This makes `lib/app/http/serializers/blog.serializer.dart`.
@@ -225,4 +225,4 @@ Future<SalesReportSerializer> remote(DoxRequest req) async {
 
 ## See also
 
-- [CLI: `dox create:serializer`](../reference/cli.md#dox-createserializer)
+- [CLI: `dox make:serializer`](../reference/cli.md#dox-makeserializer)

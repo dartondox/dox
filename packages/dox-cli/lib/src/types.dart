@@ -5,7 +5,9 @@ enum CommandCategory {
   buildRunner('Build Runner', 3),
   generation('Generation', 4),
   database('Database', 5),
-  system('System', 6);
+  queue('Queue', 6),
+  schedule('Schedule', 7),
+  system('System', 8);
 
   final String displayName;
   final int order;

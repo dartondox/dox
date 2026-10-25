@@ -300,7 +300,7 @@ void main() {
 
       // Verify order
       expect(categories.first.order, equals(0)); // project should be first
-      expect(categories.last.order, equals(6)); // system should be last
+      expect(categories.last.order, equals(8)); // system should be last
     });
 
     test('should display category names correctly', () {

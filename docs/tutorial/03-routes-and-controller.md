@@ -5,7 +5,7 @@ This step adds a resource controller and the routes to list, create and show pos
 ## 1. Make the controller
 
 ```bash
-dox create:controller Post -r
+dox make:controller Post -r
 ```
 
 `-r` makes a resource controller with the seven CRUD methods.
