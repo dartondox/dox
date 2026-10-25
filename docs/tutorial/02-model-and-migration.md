@@ -18,8 +18,6 @@ This makes two files and updates one:
 
 The template already has `bin/migrate.dart`. The `dox migration:*` commands run it.
 
-The numbers in the migration file name are the date and time when you ran the command.
-
 ## 2. Add the columns to the migration
 
 Open the new file in `db/migration`. Add `title` and `body`:
@@ -74,8 +72,7 @@ Every column field is nullable. A new `Post()` has no values yet.
 
 ## 4. Run the migrations on server start
 
-There is nothing to change here. The template's `bin/server.dart` already
-runs the list from `db/migration/migrations.dart` before the server starts:
+Nothing to change here. The template's `bin/server.dart` already runs the migrations before the server starts:
 
 ```dart title="bin/server.dart"
 import '../db/migration/migrations.dart';
@@ -92,7 +89,7 @@ void main() async {
 }
 ```
 
-So the server runs new migrations each time it starts. This also works in the native binary of [step 7](07-build-and-deploy.md).
+This also works in the native binary of [step 7](07-build-and-deploy.md).
 
 ## 5. Run the migration and the generator
 

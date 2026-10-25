@@ -1,8 +1,9 @@
 # Native server
 
-Dox runs on a native HTTP server. It comes from the package
-`dox_http_native`. You do not need to set anything. Every app uses it, also
-an app with WebSocket or Socket.IO routes.
+Dox runs on a native HTTP server from the package `dox_http_native`.
+
+You do not need to set anything. Every app uses it, also an app with
+WebSocket or Socket.IO routes.
 
 - Rust ([hyper](https://hyper.rs)) owns the sockets and parses HTTP.
 - All your code stays in Dart: routes, controllers, DTOs, middleware, ORM.
@@ -16,19 +17,13 @@ system when you build the app.
 
 1. Rust reads the requests from the sockets.
 2. It sends the requests to Dart in batches (one message per batch).
-3. Dart runs your handlers, like before.
+3. Dart runs your handlers.
 4. Dart sends all answers back to Rust in one call.
 
 The native server has the same API as the `dart:io` `HttpServer`. So
 `req.httpRequest`, `HttpResponse` and code written for `dart:io` keep working.
 
-Each isolate runs its own server on the same port:
-
-- Linux: one socket per isolate (`SO_REUSEPORT`). The kernel spreads the
-  connections.
-- macOS: the isolates share one socket.
-- Windows: only one isolate serves HTTP.
-
+Each isolate runs its own server on the same port. See [Isolate](isolate.md).
 The OS spreads connections, not requests. A keep-alive connection stays on
 one isolate. So a few busy connections (eg. from one proxy or a load test
 with few connections) can keep some isolates idle. Use more connections
@@ -132,23 +127,11 @@ error above. Install Rust and run it again, so step 4 works.
 The Rust code is in its `native` folder.
 
 ```bash
-git clone https://github.com/dartondox/dox-http-native
 cd dox-http-native/native
 cargo build --release   # the hook uses this build from now on
 cargo test
 cd .. && dart test --concurrency=1
 ```
 
-To use your local copy in the Dox repo, add it to the root
-`pubspec_overrides.yaml` of the Dox repo (git ignores this file), then run
-`dart pub get`:
-
-```yaml
-dependency_overrides:
-  dox_http_native:
-    path: ../dox-http-native
-```
-
-To release the package, push a `v<version>` tag in its repo. Its CI builds
-the libraries, uploads them, fills the hashes and publishes the package to
-pub.dev.
+To use your local copy in the Dox repo, or to release the package, see
+[Contribute](../community/contribute.md#native-packages).

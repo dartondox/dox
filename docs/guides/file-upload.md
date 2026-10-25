@@ -41,7 +41,7 @@ Then add `APP_URL=http://localhost:3000` to your `.env`.
 
 ## 2. Write the DTO
 
-The DTO checks the file before your controller runs. `@Image()` reads the first bytes of the file to find the real type. It does not trust the file name.
+The DTO checks the file before your controller runs.
 
 ```dart title="lib/app/http/dtos/upload_image.dto.dart"
 import 'package:dox_core/dox_core.dart';

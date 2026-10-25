@@ -137,7 +137,7 @@ Route.group('/blogs', () { // (1)!
   Route.get('/{id}', controller.show); // (2)!
 });
 
-// by domain: these routes match only when the Host header is dartondox.com
+// by domain
 Route.domain('dartondox.com', () { // (3)!
   Route.get('/ping', controller.ping);
 });
@@ -151,7 +151,7 @@ Route.middleware(<dynamic>[AuthMiddleware()], () { // (4)!
 
 1.  `/blogs` goes in front of every path in the callback.
     Dox puts one `/` between the parts. `'blogs'` and `'/blogs/'` work the same.
-2.  Makes `GET /blogs/{id}`. `{id}` is a route param. The controller asks for it as `int id`.
+2.  Makes `GET /blogs/{id}`.
 3.  These routes match only when the `Host` header is `dartondox.com`. Other hosts get `404`.
 4.  `AuthMiddleware` runs before `me` and `logout`. It runs after the global and router middleware.
 

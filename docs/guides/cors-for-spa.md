@@ -69,8 +69,6 @@ The origin is scheme, host and port. No path, no `/` at the end.
 | cookies (`fetch(url, {credentials: 'include'})`) | your front-end URL, never `*` | `true` |
 | nothing, a public API | `'*'` | `false` |
 
-Browsers do not send cookies when `origin` is `*`.
-
 !!! note "Two or more front-ends"
     Set `origin` to a list, like `['https://a.com', 'https://b.com']`.
     Dox compares the `Origin` header of the request with the list.

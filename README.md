@@ -45,7 +45,7 @@ Dox take the security of our framework seriously. If you identify any security v
 
 ## Contributing
 
-We welcome contributions from the community! If you'd like to contribute to the Dox framework, please fork the repo and PR to us. Please visit [contribution guide](/docs/others/contribute.md) for more information.
+We welcome contributions from the community! If you'd like to contribute to the Dox framework, please fork the repo and PR to us. Please visit [contribution guide](/docs/community/contribute.md) for more information.
 
 ## License
 

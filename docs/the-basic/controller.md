@@ -120,6 +120,7 @@ Rules:
 - Only positional parameters. Named and `[optional]` parameters are not supported.
 - A catch-all `{path*}` param is a `String`.
 - The same rules work for static methods and plain functions.
+- Dox reads the parameter types once, at start. It does not use `dart:mirrors`.
 
 **Path param types.** Dox converts the text from the URL:
 
@@ -133,10 +134,6 @@ Rules:
 
 - a parameter type is not in the list above, and not a `@Dto` (did you run `dart run build_runner build`?),
 - the method has more path-param parameters than the route has `{...}` params.
-
-!!! info "Why types, not names?"
-    Dox reads the parameter types of your method once, when the routes are registered at start. It needs no `dart:mirrors`.
-    So `update(int teamId, int id)` works by position, not by the names `teamId` and `id`.
 
 ## What to return
 

@@ -1,6 +1,6 @@
 # Transactions
 
-A transaction runs many queries as one unit. Either all of them are saved, or none of them.
+A transaction runs many queries as one unit, so either all of them are saved or none of them.
 
 `QueryBuilder.transaction()` takes a function:
 
@@ -87,8 +87,4 @@ This works on Postgres, MySQL, MariaDB and SQLite. You can nest many levels.
 - When a model has more than one relation to load (`preload` or `eager`),
   the relation queries run at the same time outside a transaction.
   Inside a transaction, they run one after another on its connection.
-- Values are always sent as bound parameters. They are never written into the SQL text.
-
-!!! note "Changed in 3.x"
-    Before 3.x, Postgres ran every query in its own transaction.
-    Now a query only runs in a transaction when you use `QueryBuilder.transaction()`.
+- A query runs in a transaction only when you use `QueryBuilder.transaction()`.

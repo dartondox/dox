@@ -1,6 +1,7 @@
 # HTTP exceptions
 
 An exception that extends `IHttpException` turns into an HTTP error answer.
+
 You can `throw` it or `return` it from a middleware or a controller.
 
 `IHttpException` is in `packages/dox-annotation/lib/src/core_annotation.dart`:
@@ -46,13 +47,6 @@ Source files: `packages/dox-core/lib/exception/*.dart` and `packages/dox-auth/li
 3. The body is sent as JSON with `Content-Type: application/json`.
 
 A text message gives a JSON body with the `errorCode` and the `message`:
-
-```
-HTTP/1.1 404 Not Found
-content-type: application/json
-
-{"code":"not_found","message":"Not Found"}
-```
 
 ```dart
 throw NotFoundHttpException(message: 'Blog not found');
@@ -110,31 +104,6 @@ class ForbiddenException extends IHttpException {
 }
 ```
 
-Use it:
-
-```dart
-Future<dynamic> destroy(DoxRequest req, int id) async {
-  if (req.auth?.user<User>()?.id != id) {
-    throw ForbiddenException();
-  }
-}
-```
-
-Override `toResponse()` when every error of your app should have the same JSON shape:
-
-```dart
-class ApiException extends IHttpException {
-  ApiException(int code, String errorCode, String message) {
-    super.code = code;
-    super.errorCode = errorCode;
-    super.message = message;
-  }
-
-  @override
-  dynamic toResponse() {
-    return <String, dynamic>{'code': errorCode, 'message': message};
-  }
-}
-```
+Override `toResponse()` to give every error of your app the same JSON shape.
 
 More examples are on the [Response](../the-basic/response.md#errors) page.

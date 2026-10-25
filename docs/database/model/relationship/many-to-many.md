@@ -108,7 +108,6 @@ List<Song> songs = await artist
     <Song>[];
 ```
 
-`related` gives a query. You can add more conditions before you run it.
 It does not set `artist.songs`.
 The query joins the pivot table, so write `table.column` for column names.
 
@@ -121,7 +120,6 @@ Use it when every query of `Artist` should load the relation.
 List<Song> songs = <Song>[];
 ```
 
-With `eager: true`, every query of `Artist` loads the relation.
 You do not call `preload`.
 Do not set `eager: true` on both sides. Each side would load the other side again and again.
 
@@ -147,7 +145,7 @@ The examples are for `@ManyToMany(Song)` in the `Artist` model.
 | `onQuery` | none | | A static function that changes the query. |
 | `eager` | `false` | | Load the relation on every query. |
 
-The defaults use the class names in snake_case, not the table names, like Laravel.
+The defaults use the class names in snake_case, not the table names.
 So `@DoxModel(table: 'artists')` does not change them.
 
 - `Artist` and `Song` give `artist_song`.

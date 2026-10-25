@@ -1,16 +1,10 @@
 # Native Postgres driver
 
-`dox_postgres_native` is the Postgres driver of the Dox ORM.
-Rust talks to the database. Your models, queries and transactions stay the
-same. You do not change any config.
+`dox_postgres_native` is the Postgres driver of the Dox ORM, written in Rust.
 
-- Rust ([tokio-postgres](https://docs.rs/tokio-postgres)) owns the
-  connections and the pool.
-- Dart sends many queries to Rust in one call. Rust sends many results back
-  in one message.
-- Each connection keeps its prepared statements. The same SQL is not parsed
-  again.
-- Server errors are `PgServerException`. Other errors are `PgException`.
+You use it through your models and queries. It needs no extra config.
+Rust ([tokio-postgres](https://docs.rs/tokio-postgres)) owns the connections and the pool.
+Each connection keeps its prepared statements.
 
 !!! warning "Alpha"
     This driver is new. If you see a problem, please
@@ -18,17 +12,7 @@ same. You do not change any config.
 
 ## Speed
 
-One find-by-id query (`SELECT ... WHERE id = @id`), AOT build
-(`dart build cli`), Postgres 14 on the same machine (Apple M-series),
-4 connections:
-
-| | Time |
-|---|---|
-| One query at a time | 60 µs |
-| 64 queries in flight, one isolate | 12.5 µs per query |
-| 4 isolates, 64 in flight each, 16 connections per pool | 64,000 queries/s |
-
-Many requests at the same time, like in a web server, get the most out of it.
+A find-by-id query takes about 60 µs alone, and about 12.5 µs each with 64 queries in flight (AOT build, local Postgres 14, Apple M-series). See [Performance: database drivers](../digging-deeper/performance.md#database-drivers).
 
 ## Install
 
@@ -40,14 +24,10 @@ dart pub add dox_postgres_native
 ```
 
 You do not need Rust. The build hook downloads a ready-built library for
-your system. When there is no library for your system and no Rust to build
-one, the app stops with a clear error (see below).
+your system.
 
 The package lives in its own repo:
 [dartondox/dox-postgres-native](https://github.com/dartondox/dox-postgres-native).
-
-Use `dart run`, `dart test` or `dart build cli`. `dart compile exe` does not
-run build hooks.
 
 ## When the library does not load
 

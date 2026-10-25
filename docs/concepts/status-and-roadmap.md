@@ -1,5 +1,7 @@
 # Status and roadmap
 
+This page shows what works in Dox today, what is missing and what is planned.
+
 Checked on 2026-10-25, for version `3.0.0-alpha.7`.
 
 Dox 3.0 is an **alpha**. You can build with it, but the API can still change between alpha versions.
@@ -54,7 +56,6 @@ These were checked by searching the code in `packages/*/lib` with `rg`.
 | Sessions and password reset | Not there | Auth uses JWT. `req.httpRequest.session` throws `UnsupportedError`. |
 | Policies and gates | Not there | Check the user in a middleware or in the controller. |
 | Database factories and seeders | Not there | Write a Dart script, or a migration with data. |
-| Savepoints | Not there | A nested `transaction()` joins the outer one. |
 | Localization | Not there | Keep your own message maps. |
 
 ## Planned
@@ -67,9 +68,7 @@ These were checked by searching the code in `packages/*/lib` with `rg`.
 
 | Item | Notes |
 | --- | --- |
-| Small fixes | `nosniff` and a `download` option for `Route.files`, a stricter BMP check, `maxAttachments` for Socket.IO, `X-Forwarded-For` hops with a port, a minimum JWT secret length, one `Hash` class. |
-| Savepoints for nested transactions | Today a nested `transaction()` joins the outer one (`ponytail:` notes in the `dox_orm` drivers). |
-| `sslRootCert` for Postgres | Trust a private CA, like AWS RDS. `dox_postgres_native` has it. `dox_orm` does not pass it on yet. |
+| `sslRootCert` for Postgres | Trust a private CA, like AWS RDS. `dox_orm` has it. It needs the next `dox_postgres_native` release. |
 | Named routes and route model binding | |
 | One exception handler | One place to turn every error into a response. |
 | ORM scopes, casts and `withCount` | |
@@ -96,4 +95,4 @@ The package CHANGELOGs have an `Unreleased` section when changes wait for the ne
 
 - Try the alpha and open an issue when something breaks or is missing.
 - Pick an item above and open an issue first, so the design can be discussed.
-- See [Contribute](../others/contribute.md) to set up the repo and run the tests.
+- See [Contribute](../community/contribute.md) to set up the repo and run the tests.

@@ -19,8 +19,7 @@ Generated: /.../blog/build/bundle/bin/server
 [Dox] Built build/bundle. Run it with: cd build/bundle && ./bin/server
 ```
 
-`dox build` runs the code generator, then `dart build cli --target bin/server.dart --output build`.
-The result is in `build/bundle`:
+`dox build` runs the code generator, then `dart build cli`. The result is in `build/bundle`:
 
 | Path | What it is |
 | --- | --- |
@@ -48,10 +47,9 @@ Migrated: 2026_10_22_205345_create_posts_table
 Server started at http://[::]:3000 with 8 isolate (native)
 ```
 
-The migrations run again, because `DB_NAME=db/dox.sqlite` is a new file in `build/bundle`.
-The registry in `db/migration/migrations.dart` is compiled into the binary, so this works without the source code.
-
-A real environment variable wins over `.env`. So on a server you can skip the `.env` file and set the values in the environment.
+The migrations run again, because `db/dox.sqlite` is a new file in `build/bundle`.
+The migration list is compiled into the binary, so no source code is needed.
+On a server you can skip `.env` and set real environment variables. They win over `.env`.
 
 ## Check it
 
@@ -71,7 +69,7 @@ The list is empty, because this is a new database file. Stop the server with `Ct
 
 ## 3. Docker
 
-The project has a `Dockerfile`. It builds the same bundle in a `dart:stable` image and copies it to an empty (`scratch`) image. The final image holds only the binary, the native libraries and the migrations:
+The project has a `Dockerfile`. It builds the same bundle and copies it to an empty (`scratch`) image:
 
 ```dockerfile title="Dockerfile"
 FROM dart:stable AS build
@@ -133,6 +131,7 @@ docker run -p 3000:3000 \
 ## Where to go next
 
 - [Deployment](../digging-deeper/deployment.md): HTTPS with a proxy, systemd, many machines.
-- [Model](../database/model/index.md): relationships, events, serializers.
+- [Model](../database/model/index.md): relationships and events.
+- [Serializer](../the-basic/serializer.md): change the JSON shape of a response.
 - [Authentication](../security/authentication.md): all options of `dox_auth`.
 - [OpenAPI](../packages/openapi.md): API docs from your routes and DTOs.

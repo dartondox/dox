@@ -1,37 +1,53 @@
 # Model events
 
-A model fires events when you save, delete or restore it.
-You can run your own code on these events.
-There are two ways: hooks in the model, and observer classes.
+A model fires events when you save, delete or restore it, and you can run your own code on them.
+
+There are two ways to listen:
+
+- **Hooks**: methods in the model class. Use them for code that belongs to the model, like filling a value.
+- **Observers**: separate classes. Use them for code that needs other services, like a mailer.
 
 ## Hooks in the model
 
 Override an `on...` method in the model. Then run `dart run build_runner build`.
 
-```dart
-@DoxModel(softDelete: true)
-class User extends UserGenerator {
+```dart title="lib/app/models/post/post.model.dart"
+@DoxModel()
+class Post extends PostGenerator {
   @Column()
-  String? email;
+  String? title;
+
+  @Column()
+  String? slug;
 
   @override
-  Future<void> onCreating() async {
-    email = email?.trim().toLowerCase();
-  }
-
-  @override
-  Future<void> onDeleted() async {
-    await AuditLog().create({'message': 'user $id deleted'});
+  Future<void> onSaving() async {
+    slug = title?.trim().toLowerCase().replaceAll(' ', '-');
   }
 }
 ```
 
-!!! info
-    The hook names start with `on` (`onCreating`, not `creating`).
-    This is because `created` and `deleted` are common column names.
-    Declare the hooks in the model class itself. The generator looks there.
+```dart
+Post post = Post()..title = 'Hello World';
+await post.save(); // onSaving runs first, so slug is 'hello-world'
+```
 
-## Events and order
+All hooks come in pairs: one runs before the query, one after it.
+
+| Before hook | After hook | Run on |
+| --- | --- | --- |
+| `onSaving` | `onSaved` | every `save()`: a new or a loaded model |
+| `onCreating` | `onCreated` | `save()` or `create()` on a new model (INSERT) |
+| `onUpdating` | `onUpdated` | `save()` on a loaded model (UPDATE) |
+| `onDeleting` | `onDeleted` | `delete()` |
+| `onForceDeleting` | `onForceDeleted` | `forceDelete()`: really removes a soft-deleted row |
+| `onRestoring` | `onRestored` | `restore()`: brings back a soft-deleted row |
+
+- A **before hook** runs before the query. The row is not written yet. You can change values, or [cancel](#stop-an-operation) the operation.
+- An **after hook** runs after the query. The row is written, and a new model has its `id`. Use it for side effects.
+- Declare the hooks in the model class itself. The generator looks there.
+
+## Order of events
 
 | Call | Events, in order |
 |------|------------------|
@@ -42,39 +58,95 @@ class User extends UserGenerator {
 | `forceDelete()` | `forceDeleting` → `deleting` → *DELETE* → `deleted` → `forceDeleted` |
 | `restore()` | `restoring` → *UPDATE deleted_at = NULL* → `restored` |
 
-The model hook runs first. Then the observers run, in the order you added them.
+- The model hook runs first. Then the observers run, in the order you added them.
+- When a model has events, `create({...})` saves only the `@Column` fields.
 
 !!! warning "Query updates and deletes fire no events"
-    Events fire only on a model instance.
-    `User().where('active', false).update({...})`, `User().where(...).delete()`
-    and `insertMultiple()` run one query and fire no events. This is the same as Laravel.
+    Events fire only on one model instance.
+    `Post().where('draft', true).update({...})`, `Post().where(...).delete()`
+    and `insertMultiple()` run one query and fire no events.
 
-## Cancel an operation
+## Examples
 
-Throw `CancelModelEvent` in a "before" event
-(`saving`, `creating`, `updating`, `deleting`, `forceDeleting`, `restoring`).
-The query does not run. `save()`, `delete()`, `forceDelete()` and `restore()` return `false`.
+### Set a value only on create
+
+`onCreating` runs only for a new row. Updates do not change the value again.
 
 ```dart
 @override
-Future<void> onDeleting() async {
-  if (isAdmin == true) throw CancelModelEvent('admins can not be deleted');
+Future<void> onCreating() async {
+  status ??= 'draft';
+  publicId = Uuid().v4(); // from package:uuid
 }
 ```
 
-```dart
-bool deleted = await user.delete(); // false
+### Stop an operation
+
+Throw `CancelModelEvent` in a before hook. The query does not run, and the call returns `false`.
+
+```dart title="lib/app/models/post/post.model.dart"
+@override
+Future<void> onDeleting() async {
+  if (status == 'published') {
+    throw CancelModelEvent('unpublish the post first');
+  }
+}
 ```
 
-`create({...})` returns the unsaved model (its `id` is `null`) when an event cancels it.
-Any other error from a hook is thrown to the caller.
+```dart title="lib/app/http/controllers/post.controller.dart"
+Future<Map<String, String>> destroy(DoxRequest req, int id) async {
+  Post? post = await Post().find(id);
+  if (post == null) throw NotFoundHttpException();
+
+  bool deleted = await post.delete();
+  if (!deleted) {
+    throw BadRequestException(message: 'Unpublish the post first');
+  }
+  return <String, String>{'message': 'deleted'};
+}
+```
+
+- `save()`, `delete()`, `forceDelete()` and `restore()` return `false` when a hook cancels.
+- `create({...})` returns the unsaved model. Its `id` is `null`.
+- Any other error from a hook is thrown to the caller.
+
+### Do something after a change
+
+After hooks are for side effects. The row is already in the database.
+
+```dart
+@override
+Future<void> onSaved() async {
+  await Cache().forget('post:$id'); // the next read gets the new data
+}
+
+@override
+Future<void> onDeleted() async {
+  if (coverPath != null) {
+    await Storage().delete(coverPath!); // remove the file of the post
+  }
+}
+```
 
 ## Observers
 
 An observer is a class that listens to one model.
-Override only the methods you need. Each method gets the model.
+Use it when the code needs other objects, like a mailer, or when you do not want it in the model.
 
-```dart
+The methods have the same names as the hooks. Each one gets the model. Override only the ones you need.
+
+| Before method | After method | Run on |
+| --- | --- | --- |
+| `onSaving(T model)` | `onSaved(T model)` | every `save()`: a new or a loaded model |
+| `onCreating(T model)` | `onCreated(T model)` | `save()` or `create()` on a new model (INSERT) |
+| `onUpdating(T model)` | `onUpdated(T model)` | `save()` on a loaded model (UPDATE) |
+| `onDeleting(T model)` | `onDeleted(T model)` | `delete()` |
+| `onForceDeleting(T model)` | `onForceDeleted(T model)` | `forceDelete()` |
+| `onRestoring(T model)` | `onRestored(T model)` | `restore()` |
+
+A before method can stop the operation with `CancelModelEvent`, like a before hook.
+
+```dart title="lib/app/observers/user.observer.dart"
 class UserObserver extends ModelObserver<User> {
   final Mailer mailer;
 
@@ -87,16 +159,26 @@ class UserObserver extends ModelObserver<User> {
 }
 ```
 
-Add it once, for example when the app starts:
+Add it in the `setup()` of a [service](../../digging-deeper/services.md).
+Observers live in memory, and each isolate has its own memory, so every isolate must add them.
 
-```dart
-Model.observe<User>(UserObserver(mailer));
+```dart title="lib/services/observer_service.dart"
+class ObserverService implements DoxService {
+  @override
+  void setup() {
+    Model.observe<User>(UserObserver(Mailer()));
+  }
+}
 ```
+
+Then add `ObserverService()` to the list in `lib/config/services.dart`.
 
 - You can add more than one observer to a model.
 - `Model.forgetObservers<User>()` removes the observers of `User`. `Model.forgetObservers()` removes all.
 
 ## Skip events
+
+Use this for imports, seed data or tests.
 
 ```dart
 await user.saveQuietly(); // save without events
@@ -109,11 +191,8 @@ await Model.withoutEvents(() async {
 
 ## Transactions
 
-Hooks run inside the transaction of the caller.
-`save()` does **not** start a transaction by itself.
-
-- If an "after" hook (`created`, `saved`, ...) throws, the row is already written.
-- To undo the row when a hook fails, wrap the call in [`QueryBuilder.transaction()`](../transactions.md):
+`save()` does **not** start a transaction. If an after hook throws, the row stays written.
+To undo the row when a hook fails, wrap the call in [`QueryBuilder.transaction()`](../transactions.md):
 
 ```dart
 await QueryBuilder.transaction(() async {
@@ -121,9 +200,4 @@ await QueryBuilder.transaction(() async {
 });
 ```
 
-## Performance
-
-- There is no reflection. The generator sets `hasModelHooks` only for models that declare a hook.
-- A model with no hooks and no observers does no event work. It is one `bool` check, plus one map lookup when some other model has observers.
-- When a model has events, `create({...})` fills a model with `fromMap()` and calls `save()`.
-  Only the `@Column` fields are saved then.
+A model with no hooks and no observers does no event work.

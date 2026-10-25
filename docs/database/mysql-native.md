@@ -1,19 +1,11 @@
 # Native MySQL driver
 
-`dox_mysql_native` is the MySQL and MariaDB driver of the Dox ORM.
-Rust talks to the database. Your models, queries and transactions stay the
-same. You do not change any config.
+`dox_mysql_native` is the MySQL and MariaDB driver of the Dox ORM, written in Rust.
 
-- Rust ([mysql_async](https://docs.rs/mysql_async)) owns the connections
-  and the pool.
-- Dart sends many queries to Rust in one call. Rust sends many results back
-  in one message.
-- Each connection keeps its prepared statements. The same SQL is not
-  prepared again.
-- Errors are `MysqlException`, with the MySQL error `code` and the
-  `sqlState`.
-- Works with MySQL 8.4 (the default `caching_sha2_password` login) and
-  MariaDB 11.
+You use it through your models and queries. It needs no extra config.
+Rust ([mysql_async](https://docs.rs/mysql_async)) owns the connections and the pool.
+Each connection keeps its prepared statements.
+It works with MySQL 8.4 (the default `caching_sha2_password` login) and MariaDB 11.
 
 !!! warning "Alpha"
     This driver is new. If you see a problem, please
@@ -21,24 +13,7 @@ same. You do not change any config.
 
 ## Speed
 
-One find-by-id query (`SELECT * FROM t WHERE id = @id`), AOT build
-(`dart build cli`), database on the same machine (Apple M-series),
-10 connections, one isolate:
-
-| | Time |
-|---|---|
-| MySQL 8.4, one query at a time | 67 µs |
-| MySQL 8.4, 32 queries in flight | 11 µs per query |
-| MySQL 8.4, CPU time of the app per query | 13.5 µs |
-| MariaDB 11, one query at a time | 63 µs |
-| MariaDB 11, 32 queries in flight | 9.7 µs per query |
-| MariaDB 11, CPU time of the app per query | 12.4 µs |
-
-The CPU time counts the Dart thread and the Rust thread. It is the limit
-on one CPU core: about 75,000 queries per second.
-
-One query at a time spends most of its time on the trip to the database.
-Many requests at the same time, like in a web server, get the most out of it.
+A find-by-id query takes about 65 µs alone, and about 10 µs each with 32 queries in flight (AOT build, local MySQL 8.4 or MariaDB 11, Apple M-series). See [Performance: database drivers](../digging-deeper/performance.md#database-drivers).
 
 ## Install
 
@@ -50,14 +25,10 @@ dart pub add dox_mysql_native
 ```
 
 You do not need Rust. The build hook downloads a ready-built library for
-your system. When there is no library for your system and no Rust to build
-one, the app stops with a clear error (see below).
+your system.
 
 The package lives in its own repo:
 [dartondox/dox-mysql-native](https://github.com/dartondox/dox-mysql-native).
-
-Use `dart run`, `dart test` or `dart build cli`. `dart compile exe` does not
-run build hooks.
 
 ## When the library does not load
 
@@ -97,8 +68,7 @@ The driver reads the normal fields of the `ConnectionConfig` (`host`,
 | `verifyCertificate` | `true` | With `useSSL`, TLS checks the server certificate. Set it to `false` only for a self-signed certificate in development. |
 
 Isolates that open a pool with the same settings share one pool in Rust.
-So `maxConnectionCount` is for the whole process, not per isolate. The
-native Postgres driver does the same. You can
+So `maxConnectionCount` is for the whole process, not per isolate. You can
 also give `driver.pool.handle` (an `int`) to another isolate and use
 `MysqlNativeDriver(MysqlNativePool.fromHandle(handle))` there.
 `MysqlNativeDriver` comes from `package:dox_orm/dox_orm.dart`.

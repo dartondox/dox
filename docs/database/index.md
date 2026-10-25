@@ -1,7 +1,6 @@
 # Database
 
-This page shows how to connect Dox to a database.
-Dox works with Postgres, MySQL, MariaDB and SQLite through the `dox_orm` package.
+Connect Dox to Postgres, MySQL, MariaDB or SQLite with the `dox_orm` package.
 
 - [Query builder](query-builder.md): build SQL with methods.
 - [Models](model/index.md): one class per table.
@@ -41,12 +40,8 @@ import 'package:dox_orm/dox_orm.dart';
 | SQLite | `Driver.sqlite` | `sqlite3` | No, one connection per isolate | Development, tests, small apps |
 
 !!! info "Native drivers"
-    Postgres and MySQL use a native (Rust) driver.
-    It is fast, most of all when many requests run at the same time.
-    You do not change any config for it.
-
-    There is no other driver for Postgres and MySQL.
-    When the native library can not load on your system, the app stops with an error that says why and how to fix it.
+    Postgres and MySQL use a native (Rust) driver. There is no other driver.
+    When the native library can not load, the app stops with an error.
     See the [Postgres](postgres-native.md#when-the-library-does-not-load) and
     [MySQL](mysql-native.md#when-the-library-does-not-load) pages.
 
@@ -94,9 +89,8 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 - `debug: true` prints each SQL query and its values.
 - `user`, `password`, `host` and `port` are not used by SQLite.
 
-Start the ORM in a service.
-Each isolate runs the service. The Postgres and MySQL drivers share one pool per process (isolates with the same settings get the same pool), so `maxConnectionCount` is for the whole process.
-On shutdown, `SqlQueryBuilder.close()` closes every connection of the isolate.
+Start the ORM in a service. Each isolate runs the service.
+Isolates with the same settings share one pool, so `maxConnectionCount` is for the whole process.
 
 ```dart title="lib/services/orm_service.dart"
 class ORMService implements DoxService, DoxShutdown {
@@ -148,7 +142,7 @@ DATABASE_URL=postgres://app:s%40cret@db.example.com:5432/blog?sslmode=require
 
 - The user, password and database name are url-decoded. Write `@` in a password as `%40`.
 - No port: `5432` for Postgres, `3306` for MySQL.
-- `sslmode`: `disable` means no TLS. For Postgres it works like libpq: `prefer` uses TLS when the server has it, `require` encrypts but does not check the server certificate (Heroku urls use it), and `verify-ca` and `verify-full` check the certificate. Use `verify-full` when your host supports it. `useSSL: true` in code is `require`. Set `extra['sslMode']` to `verify-full` to check the certificate. See [Postgres TLS](postgres-native.md#tls).
+- For Postgres, `sslmode` works like libpq (`disable`, `prefer`, `require`, `verify-ca`, `verify-full`). `require` does not check the certificate. Use `verify-full` when your host supports it. See [Postgres TLS](postgres-native.md#tls).
 - For MySQL, `ssl=true` (or `sslmode=require`) turns TLS on, and it checks the certificate. Add `verifyCertificate=false` to skip the check, only for a self-signed certificate in development.
 - `host=/path` (or `socket=/path`) connects to a Unix socket, like `host=/cloudsql/project:region:instance`. See [Unix socket](#unix-socket).
 - Any other option goes to `extra`, like `?maxConnectionCount=20`. A number becomes an `int`, `true` and `false` a `bool`.
@@ -265,26 +259,8 @@ await blog.save(); // saved on 'mysql'
 
 ## MySQL and MariaDB
 
-- The driver is [`dox_mysql_native`](mysql-native.md).
-- It has a connection pool and sends values as bound parameters.
-- MySQL 8 and 9 login (`caching_sha2_password`) works.
+- The driver is [`dox_mysql_native`](mysql-native.md). Its page lists how values are converted.
 - `CREATE`, `ALTER` and `DROP` are saved right away. A transaction can not undo them.
-
-MySQL values are converted by column type:
-
-| MySQL / MariaDB | Dart |
-|---|---|
-| Integer types | `int` |
-| `FLOAT`, `DOUBLE`, `DECIMAL` | `double` |
-| `DATE`, `DATETIME`, `TIMESTAMP` | `DateTime`, read as UTC |
-| `boolean()` columns (`TINYINT(1)`) | `bool` |
-| `TIME` | `String` |
-| `JSON` | `Map` or `List` |
-
-!!! info "JSON on MariaDB"
-    MariaDB stores JSON as `LONGTEXT`, so the driver can not see the column type.
-    On MariaDB, text that starts with `{` or `[` and is valid JSON is decoded.
-    Other text columns are not decoded.
 
 ## SQLite
 
@@ -292,15 +268,12 @@ SQLite is good for development, tests and small apps.
 For a busy production app, use Postgres or MySQL.
 
 !!! info "How it runs"
-    The `sqlite3` package calls SQLite directly (FFI).
-    A query blocks the isolate while it runs.
+    The `sqlite3` package calls SQLite directly (FFI). A query blocks the isolate while it runs.
     Each isolate has one connection.
-    While a transaction is open, the other queries of that isolate wait.
-    The database file uses WAL mode, so readers do not wait for the writer.
-    `busy_timeout` makes a query wait for a lock from another isolate, instead of failing.
-    Foreign keys are turned on.
-    Before each `SELECT`, the driver runs `PRAGMA schema_version` to see if a table changed.
-    This is a small cost on every read. It is fine for development and tests.
+    The file uses WAL mode, so readers do not wait for the writer.
+    `busyTimeout` makes a query wait for a lock from another isolate, instead of failing.
+    Foreign keys are on.
+    Before each `SELECT`, the driver checks `PRAGMA schema_version` to see if a table changed.
 
 !!! info "Types"
     SQLite has no bool, JSON or date type. Dox converts them for you:
@@ -316,11 +289,8 @@ For a busy production app, use Postgres or MySQL.
     A column with an alias (`active as is_active`) is not converted.
 
 !!! warning "Limits"
-    - `schema.table` with `.change()` makes the table again and copies the rows.
-      See [SQLite notes](schema.md#sqlite-notes).
-    - `dropColumn` does not work on a primary key, unique or indexed column.
-    - A new column with `NOT NULL` needs a default value.
-    - `truncate()` runs `DELETE FROM` and resets the id counter.
+    - Schema limits (`change()`, `dropColumn`, `NOT NULL` columns) are in [SQLite notes](schema.md#sqlite-notes).
+    - `dropColumn` does not work on a primary key column.
     - `insertMultiple` with rows that have different keys inserts the rows one by one,
       because SQLite has no `DEFAULT` in `VALUES`.
     - SQLite before 3.39 has no `RIGHT JOIN`.
@@ -328,9 +298,7 @@ For a busy production app, use Postgres or MySQL.
 !!! info "Native library"
     The `sqlite3` package (v3) bundles SQLite with a build hook.
     You do not install a system library.
-    `dart run` and `dart test` run the hook by themselves.
-    For the AOT binary, use `dox build` (it runs `dart build cli`).
-    It puts the library in `build/bundle/lib/`, next to `build/bundle/bin/server`.
-    Keep the two folders together.
+    For the AOT binary, use `dox build`. It puts the library in `build/bundle/lib/`,
+    next to `build/bundle/bin/server`. Keep the two folders together.
     `dart compile exe` does not work with build hooks.
     See [Deployment](../digging-deeper/deployment.md).

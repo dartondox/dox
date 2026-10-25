@@ -1,11 +1,10 @@
 # Migration
 
-A migration changes your database schema step by step: create a table, add a column, and so on.
-Each migration has an `up` method (make the change) and a `down` method (undo it).
+A migration changes your database schema step by step, with an `up` method that makes the change and a `down` method that undoes it.
 
 Write migrations in Dart with the [schema builder](schema.md).
 The same migration then works on Postgres, MySQL, MariaDB and SQLite.
-Plain `.sql` migrations still work too.
+Plain `.sql` migrations work too.
 
 ## Create a migration
 
@@ -46,7 +45,7 @@ The name of the migration decides what the new file contains:
 | `add_avatar_to_users_table` (also `_from_`, `_in_`, `_on_`) | `schema.table('users', ...)` in `up` and `down` |
 | any other name | empty `up` and `down` |
 
-- `create:migration` is the old name of the same command.
+- `create:migration` does the same.
 - `dox create:model Blog -m` makes the model and a `create_blogs_table` migration.
 
 !!! info "Raw SQL and data in a Dart migration"
@@ -56,7 +55,7 @@ The name of the migration decides what the new file contains:
 
 ## The registry
 
-Dart can not load a file at run time in an AOT build.
+An AOT build can not load a file at run time.
 So Dox keeps a list of your Dart migrations in `db/migration/migrations.dart`:
 
 ```dart
@@ -75,7 +74,7 @@ final List<MigrationEntry> migrations = <MigrationEntry>[
 
 - `dox make:migration` and every `dox migration:*` command write this file again.
   You do not edit it.
-- It finds each file named `YYYY_MM_DD_HHMMSS_name.dart` and its `class ... extends Migration`.
+- It lists each file named `YYYY_MM_DD_HHMMSS_name.dart` and its `class ... extends Migration`.
 - The name of a migration is its file name without `.dart`. The order is by name.
 
 The first `dox make:migration` also makes `bin/migrate.dart` in your app:
@@ -167,8 +166,8 @@ DB_NAME=storage/app.db # file path, made if missing
 - `DB_DATABASE` works too, in place of `DB_NAME`.
 - The default port is `5432` for Postgres and `3306` for MySQL.
 - One run opens one driver and closes it at the end. Each migration runs on one connection.
-- A `DB_HOST` that starts with `/` is a Unix socket: the socket folder for Postgres, the socket file for MySQL. Eg. `/cloudsql/project:region:instance`.
-- Migrations use TLS only with a `DATABASE_URL` that has `sslmode` (Postgres) or `ssl` (MySQL), like `?sslmode=require`. For Postgres, `require` encrypts but does not check the server certificate, and `verify-full` checks it. MySQL `ssl=true` checks it. Add `&verifyCertificate=false` only for a self-signed certificate in development.
+- A `DB_HOST` that starts with `/` is a [Unix socket](index.md#unix-socket).
+- Migrations use TLS only with a `DATABASE_URL` that has `sslmode` (Postgres) or `ssl` (MySQL), like `?sslmode=require`. The url options are on the [Database](index.md#database_url) page.
 
 You can also give the database yourself:
 
@@ -213,7 +212,7 @@ class AddSearchIndex extends Migration {
 
 ## SQL migrations
 
-A `.sql` migration is still fine. Use it for SQL that only one database understands.
+Use a `.sql` migration for SQL that only one database understands.
 
 ```bash
 dox make:migration create_blog_table --sql
@@ -245,5 +244,5 @@ Both kinds can live in `db/migration`. They run in file name order (the timestam
 
 - With `bin/migrate.dart`: the Migrator runs the Dart migrations from the registry
   and reads the `.sql` files from the folder, merged by name.
-- Without `bin/migrate.dart` (a project with only `.sql` files): `dox` runs the `.sql` files itself, like before.
+- Without `bin/migrate.dart` (a project with only `.sql` files): `dox` runs the `.sql` files itself.
 - A Dart and a `.sql` migration with the same name is an error.

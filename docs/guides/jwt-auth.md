@@ -35,8 +35,6 @@ class User extends UserGenerator {
 
 ## 2. Set up the auth service
 
-`APP_KEY` signs the tokens. `expiresIn` is how long a token works.
-
 ```dart title="lib/services/auth_service.dart"
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
@@ -260,13 +258,12 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:3000/api/auth/me
 Without the header, `/api/auth/me` gives `401 Authentication failed`.
 
 !!! note "The error shape"
-    The `401` body above is the plain message of the exception. With the response handler from
-    [Custom errors](custom-errors.md), it becomes `{"error":{"code":"unauthorized","message":"..."}}`.
+    The `{"error": ...}` shape comes from the response handler in [Custom errors](custom-errors.md).
+    Without it, the `401` body is only the message.
 
 ## Logout and expiry
 
-A JWT is checked by its signature, not by a list on the server. So the server can not cancel one token.
-This is what you can do:
+The server can not cancel one JWT. It checks only the signature. This is what you can do:
 
 | You want | Do this |
 | --- | --- |

@@ -1,12 +1,12 @@
 # Environment Variables
 
-Declare your env keys once, in a typed class. Then `env.appPort` is an `int`, your IDE suggests every key, and a missing key stops the app at startup.
+Declare your env keys once, in a typed class.
+
+Then `env.appPort` is an `int`, your IDE suggests every key, and a missing key stops the app at startup.
 
 ## The typed env class
 
-A new project already has `lib/config/env.dart`, with the keys the config files read. The list is in the [Env reference](../reference/env.md#read-by-a-new-project).
-
-This example class shows the kinds of getters you can write:
+A new project already has `lib/config/env.dart`. Its keys are listed in the [Env reference](../reference/env.md#read-by-a-new-project). This example shows the kinds of getters you can write:
 
 ```dart
 import 'package:dox_core/dox_core.dart';
@@ -37,9 +37,7 @@ abstract class AppEnv {
 final AppEnv env = AppEnv.load();
 ```
 
-Run `dart run build_runner build` (or `dox build_runner:build`) after each change to the class. It writes `env.g.dart`.
-
-Use it anywhere:
+Run `dart run build_runner build` after each change to the class. It writes `env.g.dart`. Then use `env` anywhere:
 
 ```dart
 import 'package:my_app/config/env.dart';
@@ -84,19 +82,18 @@ EnvException: the env is not valid
   - DB_PORT must be an int, not "abc"
 ```
 
-The `env` variable is made on first use. The config files use it, so this happens when the app starts. After that, `env.dbPort` is a plain field read. There is no lookup and no parsing on each request.
+This happens once, when the app starts. After that, `env.dbPort` is a plain field read.
 
 ## Where values come from
 
 Dox reads values from two places:
 
 1. Real environment variables (set in the shell, Docker or systemd).
-2. The `.env` file in the folder where you start the app.
+2. The `.env` file in the folder where you start the app. It is optional.
 
 !!! info "The environment wins"
     A real environment variable wins over the `.env` file.
     So you can keep `.env` for development and use real variables in production.
-    The `.env` file is optional.
 
 ### The `.env` file
 
@@ -131,20 +128,11 @@ dox env:check      # load the env and print every missing or bad key
 
 It does not overwrite an existing `lib/config/env.dart`. Run `dox build_runner:build` after it.
 
-`dox env:check` loads `AppEnv` from `lib/config/env.dart`, with the real environment and `.env`. It exits with code 1 when a key is missing or bad. Use it in CI or before a deploy.
+`dox env:check` exits with code 1 when a key is missing or bad. Use it in CI or before a deploy.
 
 ## Tests
 
-Pass your own values to `load()`. Nothing is read from the shell or `.env`:
-
-```dart
-AppEnv env = AppEnv.load(
-  EnvReader(
-    environment: <String, String>{'APP_KEY': 'test'},
-    dotEnv: <String, String>{'DB_PORT': '5433'},
-  ),
-);
-```
+To pass your own values in a test, see [Testing](testing.md#test-the-env).
 
 ## Env.get: the low-level way
 
@@ -167,5 +155,5 @@ A missing or empty key gives the default. With no default:
 `Env.get()` looks up and converts the value on every call. Do not call it on a hot path.
 
 !!! warning "APP_KEY"
-    When `APP_KEY` is empty and `APP_ENV=production`, `Dox().startServer()` stops with an error.
-    In other environments it logs a warning. Make a key with `dox key:generate`.
+    When `APP_KEY` is missing, not 32 characters, or a public sample key, `Dox().startServer()` stops with an error.
+    When `APP_ENV` is `development`, `local` or `test`, it only logs a warning. Make a key with `dox key:generate`.

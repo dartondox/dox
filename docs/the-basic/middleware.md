@@ -23,19 +23,14 @@ dox create:middleware Logger
 ```dart title="lib/app/http/middleware/logger.middleware.dart"
 import 'package:dox_core/dox_core.dart';
 
-class LoggerMiddleware implements IDoxMiddleware { // (1)!
+class LoggerMiddleware implements IDoxMiddleware {
   @override
-  dynamic handle(IDoxRequest req) { // (2)!
+  dynamic handle(IDoxRequest req) {
     print('${req.method} ${req.uri.path}');
-    return req; // (3)!
+    return req; // go on to the next middleware
   }
 }
 ```
-
-1.  `IDoxMiddleware` is the interface for a class middleware. Dox calls its `handle` method.
-2.  `handle` gets the request. It can be `async`. Dox waits for it.
-3.  Return the request to go on to the next middleware, then the controller.
-    Return anything else, like `response(...)`, and Dox sends that as the response.
 
 Then put it on a route:
 
@@ -44,7 +39,7 @@ Route.get('/ping', <dynamic>[LoggerMiddleware(), webController.pong]);
 ```
 
 !!! note
-    `handle` takes an `IDoxRequest`, not a `DoxRequest`. This is the type that `IDoxMiddleware` asks for.
+    `handle` takes an `IDoxRequest`, not a `DoxRequest`.
 
 ## Function based middleware
 

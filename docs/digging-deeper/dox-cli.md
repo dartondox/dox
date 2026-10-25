@@ -72,15 +72,8 @@ dox serve                         # or: dox s
 dox s --ignore-build-runner       # do not run build_runner watch
 ```
 
-`dox serve` runs `dart run bin/server.dart`. When a `.dart` file changes, it restarts the server.
+`dox serve` runs `dart run bin/server.dart` and restarts it when a `.dart` file changes.
 It also runs `build_runner watch`, so generated files stay up to date.
-
-### Run the code generator
-
-```bash
-dox build_runner:watch   # watch files and build again on each change
-dox build_runner:build   # build once
-```
 
 ### Build for production
 
@@ -90,83 +83,31 @@ cd build/bundle
 ./bin/server
 ```
 
-`dox build` does these steps:
-
-1. It runs `build_runner` (when your app uses it).
-2. It runs `dart build cli --target bin/server.dart --output build`.
-3. It copies `db/` and `.env.example` into `build/bundle`.
-
-When a step fails, it stops with exit code 1, so CI can stop too. See [Deployment](deployment.md).
-
-### Make an app key
-
-```bash
-dox key:generate
-```
-
-It writes a new `APP_KEY` to your `.env` file.
+See [Deployment](deployment.md#build).
 
 ## Create files
 
-### Controller
-
 ```bash
-dox create:controller Blog       # default controller
-dox create:controller Blog -r    # resource controller
-```
-
-- A controller goes to `lib/app/http/controllers/`.
-- `-r` adds the methods `index`, `create`, `store`, `show`, `edit`, `update` and `destroy`.
-
-!!! info "File and class names"
-    Word breaks are kept. `dox create:controller BlogPost` makes `blog_post.controller.dart`
-    with the class `BlogPostController`. The same is true for middleware, DTOs and serializers.
-
-### Middleware
-
-```bash
+dox create:controller Blog        # lib/app/http/controllers/blog.controller.dart
+dox create:controller Blog -r     # resource controller
 dox create:middleware Auth
-```
-
-### DTO
-
-```bash
-dox create:dto CreateBlog
-```
-
-It makes `lib/app/http/dtos/create_blog.dto.dart`. Then run `dox build_runner:build`.
-See [Validation](../the-basic/validation.md).
-
-### Serializer
-
-```bash
+dox create:dto CreateBlog         # lib/app/http/dtos/create_blog.dto.dart
 dox create:serializer Blog
-```
-
-### Model
-
-```bash
-dox create:model Blog
-dox create:model Blog -m   # also makes the create_blogs_table migration
-```
-
-- `-m` (or `--migration`) makes a Dart migration `create_<table>_table`.
-- The table name is the model name in plural snake case: `BlogPost` makes `blog_posts`.
-- The model gets `@DoxModel(table: 'blog_posts')`, so it uses the same table.
-- `make:model` is the same command.
-
-### Migration
-
-```bash
+dox create:model Blog -m          # model and its create_blogs_table migration
 dox make:migration create_blogs_table          # .dart file (default)
 dox make:migration create_blogs_table --sql    # .sql file
 ```
+
+- `-r` adds the methods `index`, `create`, `store`, `show`, `edit`, `update` and `destroy`.
+- Word breaks are kept. `BlogPost` makes `blog_post.controller.dart` with the class `BlogPostController`.
+- After `create:dto`, run `dox build_runner:build`. See [Validation](../the-basic/validation.md).
+- The table of a model is its name in plural snake case: `BlogPost` makes `blog_posts`. The model gets `@DoxModel(table: 'blog_posts')`.
 
 ## Migrations
 
 ### Database settings
 
-The migration commands read the database settings from the `.env` file:
+The migration commands read the database settings from the `.env` file and the real environment. A real environment variable wins.
 
 ```ini title=".env"
 # postgres, mysql or sqlite
@@ -179,26 +120,17 @@ DB_USERNAME=admin
 DB_PASSWORD=password
 ```
 
-- `DB_CONNECTION` is `postgres`, `mysql` or `sqlite`. The default is `postgres`.
-- The default port is `5432` for postgres and `3306` for mysql.
+- `DB_CONNECTION` defaults to `postgres`. The default port is `5432` for postgres and `3306` for mysql.
 - `DB_DATABASE` works too, in place of `DB_NAME`.
 - Put comments on their own line. A `#` after a value becomes part of the value.
 
-!!! warning "`.env` or environment, not both"
-    When a `.env` file exists, these commands read only the `.env` file.
-    They use the real environment variables only when there is no `.env` file.
-    This is different from `Env.get()`, where a real environment variable wins.
+All keys are in the [Env reference](../reference/env.md#read-by-the-framework).
 
-### Run migrations
+### Run and undo migrations
 
 ```bash
-dox migration:run    # or: dox migrate
+dox migration:run                # or: dox migrate
 dox migration:status
-```
-
-### Undo migrations
-
-```bash
 dox migration:rollback           # undo the last batch
 dox migration:rollback --step=2  # undo the last 2 migrations
 dox migration:reset              # undo all migrations
@@ -215,8 +147,4 @@ Add `--seed` to `migration:run`, `migration:refresh` or `migration:fresh` to run
 ## Update the CLI
 
 `dox update` installs the newest version with the same major version as your CLI, previews included.
-To pick the version yourself, run the install command:
-
-```bash
-dart pub global activate dox ^3.0.0-alpha
-```
+To pick the version yourself, run the install command again.

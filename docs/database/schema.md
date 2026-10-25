@@ -1,7 +1,7 @@
 # Schema builder
 
-The schema builder creates, changes and drops tables with Dart code.
-The same code works on Postgres, MySQL, MariaDB and SQLite.
+The schema builder creates, changes and drops tables with Dart code that works on Postgres, MySQL, MariaDB and SQLite.
+
 You mostly use it inside a [migration](migration.md).
 
 ```dart
@@ -92,7 +92,7 @@ Modifiers come after the column type. They can be chained:
 | Modifier | What it does | Notes |
 |---|---|---|
 | `nullable()` | Allow `NULL`. Columns are `NOT NULL` by default. | `nullable(false)` makes it `NOT NULL` again. |
-| `defaultTo(value)` | Default value. Strings are escaped, so any text is safe. | `bool`, numbers, `null`, `Map`/`List` (saved as JSON) and `DateTime` work too. `withDefault` is the old name. |
+| `defaultTo(value)` | Default value. Strings are escaped, so any text is safe. | `bool`, numbers, `null`, `Map`/`List` (saved as JSON) and `DateTime` work too. `withDefault` does the same. |
 | `defaultRaw('sql')` | Default as raw SQL. It is **not** escaped. | Put expressions in `( )`: `defaultRaw('(1 + 1)')`. MySQL and SQLite need it. |
 | `useCurrent()` | Default to the current time. | Same as `defaultRaw('CURRENT_TIMESTAMP')`. |
 | `useCurrentOnUpdate()` | Set the current time on each update. | MySQL only. Postgres and SQLite ignore it. Set the time in your code there. |
@@ -204,12 +204,7 @@ Other SQLite limits:
 
 | Feature | Postgres | MySQL / MariaDB | SQLite |
 |---|---|---|---|
-| `enumeration` | `CHECK (col IN (...))` | `ENUM(...)` | `CHECK (col IN (...))` |
-| `unsigned` | ignored | `UNSIGNED` | ignored |
 | `comment` | `COMMENT ON COLUMN` | inline `COMMENT` | ignored |
-| `after` | ignored | `AFTER col` | ignored |
-| `useCurrentOnUpdate` | ignored | `ON UPDATE CURRENT_TIMESTAMP` | ignored |
-| `change()` | `ALTER COLUMN` | `MODIFY COLUMN` | table rebuild |
 | add/drop foreign key on a table | `ALTER TABLE` | `ALTER TABLE` | table rebuild |
 | schema changes in a transaction | yes | no, saved right away | yes |
 | index name length | 63 | 64 | no limit |

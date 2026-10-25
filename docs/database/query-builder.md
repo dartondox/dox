@@ -1,11 +1,8 @@
 # Query Builder
 
-The query builder makes SQL for you.
-You chain methods, and Dox runs the query with bound values.
-It works on Postgres, MySQL/MariaDB and SQLite.
+The query builder makes SQL from chained methods and runs it with bound values on Postgres, MySQL, MariaDB and SQLite.
 
-- Set up the database first. See [Database](index.md).
-- For transactions, see [Transactions](transactions.md).
+Set up the database first. See [Database](index.md).
 
 ## Start a query
 
@@ -20,8 +17,6 @@ List<Map<String, dynamic>> rows = await QueryBuilder.table('actor')
     .where('age', '>=', 23)
     .get();
 ```
-
-See [Models](model/index.md) for the model way.
 
 The examples on this page use an `Actor` model on the table `actor`.
 The SQL in the examples is for Postgres. MySQL quotes names with `` ` `` instead of `"`.
@@ -151,10 +146,8 @@ await Actor().where('age', 60).orWhereIn('id', <int>[1, 2]).get();
 await Actor().where('age', 60).orWhereNotIn('id', <int>[1, 2]).get();
 ```
 
-- Each value is sent as a bound parameter.
 - On Postgres, a list of only `int` or only `String` values is sent as one array
   parameter: `"id" = ANY(@id_p0)` (`<> ALL` for `whereNotIn`).
-  So a list of any size gives the same SQL, and Postgres reuses one prepared statement.
 - An empty list matches no rows for `whereIn`, and all rows for `whereNotIn`.
 
 ### `whereNull` and `whereNotNull`
@@ -238,7 +231,6 @@ await Actor().limit(10).offset(20).get();
 ```
 
 The numbers are sent as bound parameters.
-So every page of `paginate()` has the same SQL, and the database reuses one prepared statement.
 
 ### `groupBy`
 
@@ -271,7 +263,7 @@ await Actor().rightJoin('actor_info', 'actor_info.actor_id', 'actor.id').get();
 await Actor().join('actor_info', 'actor_info.actor_id', '=', 'actor.id').get();
 ```
 
-For a join condition that these methods can not build, use the raw methods.
+For other join conditions, use the raw methods.
 Nothing is quoted. Values go in the map, like in `whereRaw`.
 
 ```dart

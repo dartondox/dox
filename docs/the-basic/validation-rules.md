@@ -164,6 +164,45 @@ See [Database rules](validation.md#database-rules-unique-and-exists).
 
 A `///` doc comment on a field becomes its `description` in the JSON Schema.
 
+## Types in detail
+
+How each field type reads input. The short table is in [Types](validation.md#types).
+
+- **JSON is strict.** In a JSON body, `"18"` is not an `int`. You get the error `integer`.
+- **Query and form data are text.** Dox turns the text into the field type first. If it can not, you get the type error.
+- `int` takes `18` or `18.0`, never a fraction. `"4.5"` or `4.5` gives `integer`.
+- `bool` in text takes `true`, `1`, `yes`, `on` and `false`, `0`, `no`, `off` (any case).
+- `DateTime` takes `2024-01-31` or `2024-01-31T10:00:00Z`. A value without a time zone is read as UTC.
+  The result is always UTC (`isUtc == true`). A number (timestamp) is not allowed.
+- An `enum` matches the Dart name exactly. `"Admin"` does not match `Role.admin`. Custom wire values (like `"ADMIN"`) are not supported.
+- `Object?`, `dynamic` and `Map<String, dynamic>` take any value. They are not checked.
+- In query and form data, one value for a `List<T>` field gives a list with one item.
+- In bracket keys, list indexes are sorted and packed: `items[3]` alone gives a list with one item.
+- A list can have at most 1000 items, and keys can nest at most 10 levels. More gives `422`.
+
+## Body types
+
+| Body | Result |
+| --- | --- |
+| `application/json` (or any `+json` type) | read with strict JSON types |
+| `application/x-www-form-urlencoded`, `multipart/form-data` | read as text, then converted |
+| any other content type | `415 Unsupported Media Type` |
+| JSON that is not valid | `400 Bad Request` |
+| JSON that is not an object (like `[1, 2]`) | `422` with the key `_root` |
+
+## The order of checks
+
+1. Read the input and convert types. Change text (`@Trim`, `@Lowercase`, `@Uppercase`). Find missing required fields.
+2. The field rules, top to bottom.
+3. The `validate()` method (nested DTOs first, then the parent).
+4. Async rules (`@Unique`, `@Exists`, your `AsyncRule`), one at a time, in field order.
+
+Each step runs only when the step before it had no errors. So the database is never asked about input that is already wrong.
+
+- Steps 1 and 2 run per DTO. So one answer can have a type error in `address` and a rule error in `items.1`.
+- Inside one step, Dox collects the errors of all fields.
+- A default value is not checked by the field rules. Async rules check the final value.
+
 ## What the generator checks
 
 The build stops with a clear error when:

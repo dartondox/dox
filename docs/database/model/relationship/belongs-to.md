@@ -90,7 +90,6 @@ User? activeUser = await comment
     .getFirst();
 ```
 
-`related` gives a query. You can add more conditions before you run it.
 It does not set `comment.user`.
 
 ### `eager`
@@ -102,7 +101,6 @@ Use it when every query of `Comment` should load the relation.
 User? user;
 ```
 
-With `eager: true`, every query of `Comment` loads the relation.
 You do not call `preload`.
 
 The load runs this SQL:
@@ -124,7 +122,7 @@ Comments of the same user get the same `User` object.
 | `onQuery` | none | A static function that changes the query. |
 | `eager` | `false` | Load the relation on every query. |
 
-The default `foreignKey` uses the class name of the related model in snake_case, like Laravel.
+The default `foreignKey` uses the class name of the related model in snake_case.
 `User` gives `user_id`, also when the table is `users`.
 
 ### `foreignKey` and `localKey`

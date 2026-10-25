@@ -1,6 +1,7 @@
 # File Storage
 
 `Storage()` saves and reads files on a disk: the local folder, AWS S3 (and R2, MinIO, Spaces), or memory.
+
 It runs on [`dox_storage`](../packages/storage.md), which is built into `dox_core`.
 
 ```dart
@@ -43,7 +44,7 @@ StorageConfig storage = StorageConfig(
 
 The `s3` disk reads five keys that a new project does not have yet. Add them to
 `lib/config/env.dart` and run `dart run build_runner build`. They are nullable,
-so the app still starts without them when you do not use S3:
+so the app starts without them:
 
 ```dart title="lib/config/env.dart"
   String? get awsBucket;
@@ -66,7 +67,7 @@ Then pass it to `AppConfig(storage: storage)` in `lib/config/app.dart`.
 | `s3` | `bucket`, `region`, `key`, `secret`, `token`, `endpoint`, `path_style` (MinIO), `url` (CDN), `visibility`, `acl`, `batch_delete` |
 | `memory` | none. For tests |
 
-The `s3` disk needs `bucket`, `key` and `secret`. When one is missing or empty, the first use of the disk throws an `ArgumentError` that names the setting, like `Storage disk "s3" needs the "bucket" setting. It is missing or empty.`
+The `s3` disk needs `bucket`, `key` and `secret`. When one is missing, the first use of the disk throws an `ArgumentError` that names the setting.
 
 ## Functions
 
@@ -132,16 +133,7 @@ Set the disk `url` option to the full URL of the route (`https://app.test/files`
 
 ## Tests
 
-`Dox().storage` is the `DriveManager` that `Storage()` uses. `fake(name)` swaps a disk with an empty memory disk:
-
-```dart
-Disk fake = Dox().storage.fake('s3');
-await uploadReport();
-expect(await fake.exists('reports/2024.pdf'), isTrue);
-Dox().storage.restore('s3');
-```
-
-`Disk` keys have no `/` at the start. See [Testing](testing.md).
+To swap a disk with a memory disk in tests, see [Testing](testing.md#test-file-storage).
 
 ## Your own driver
 

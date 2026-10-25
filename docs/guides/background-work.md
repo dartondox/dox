@@ -21,7 +21,7 @@ None of them survive a restart. See [When you need a real queue](#when-you-need-
 ## 1. Work after the response
 
 Start the future and return. `unawaited` tells the linter you did this on purpose.
-An error in the future goes to the `report` method of the `ExceptionHandler` in `AppConfig`. The isolate keeps running.
+An error in the future goes to the `report` method of the `ExceptionHandler` in `AppConfig`.
 
 ```dart title="lib/app/http/controllers/report.controller.dart"
 import 'dart:async';
@@ -73,17 +73,15 @@ ReportController reportController = ReportController();
 ```
 
 !!! warning "Do not block the event loop"
-    `_build` runs on the same thread as the HTTP requests of this isolate.
-    `await` on the database or on HTTP is fine. A long loop is not. Every request on this isolate waits for it.
+    `_build` shares the thread with the requests of this isolate. A long loop makes them all wait.
     Put a long loop in `Isolate.run`.
 
 ## 2. CPU work on another thread
 
-`Isolate.run` starts a new isolate, runs the function, and sends the result back.
-The function only gets what you pass in. It has no `Dox()`, no models and no `Storage()`.
-So pass plain data in (an `int`, a `String`, bytes), get plain data out, and save the result in the request isolate.
+`Isolate.run` runs the function on a new isolate and sends the result back.
+Pass plain data in (an `int`, a `String`, bytes) and get plain data out. Save the result in the request isolate.
 
-Both patterns are in the controller above: `primes` waits for the result. To not wait, combine them:
+`primes` above waits for the result. To not wait, combine both patterns:
 
 ```dart
 unawaited(Isolate.run(() => countPrimes(limit)).then(saveResult));
@@ -91,8 +89,7 @@ unawaited(Isolate.run(() => countPrimes(limit)).then(saveResult));
 
 ## 3. Work on a timer
 
-`setup()` of a service runs in **every** isolate. Dox starts one per CPU core.
-So start the timer on isolate 1 only. Otherwise 8 isolates run the same cleanup.
+`setup()` of a service runs in **every** isolate, and Dox starts one per CPU core. So start the timer on isolate 1 only.
 
 ```dart title="lib/services/cleanup_service.dart"
 import 'dart:async';
@@ -166,7 +163,7 @@ curl http://localhost:3000/api/primes/100000
 The work above is lost when the process stops, and it does not retry.
 When that is not OK (payments, emails that must arrive), save the job as a row in a table first.
 Then a `Timer.periodic` service, or a second small Dart program, reads the table, does the work, and marks the row as done.
-A failed row stays in the table, so you can retry it. This is a queue with one extra table and no new service.
+A failed row stays in the table, so you can retry it.
 
 ## See also
 

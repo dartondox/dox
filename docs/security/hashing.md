@@ -3,10 +3,7 @@
 This page shows how to hash passwords with `Hash` and check them later.
 
 A hash is one-way. You can not turn it back into the password.
-To check a login, hash the new input and compare. `Hash.verify` does this for you.
-`Hash` uses bcrypt with a new random salt each time.
-
-`Hash` is in `package:dox_core/dox_core.dart`.
+`Hash` uses bcrypt with a new random salt each time. It is in `package:dox_core/dox_core.dart`.
 
 ## Hash a password
 
@@ -31,8 +28,8 @@ It returns `false` when the password does not match, or when `hashedPassword` is
 
 ## Without blocking the server
 
-bcrypt takes many milliseconds of CPU. `Hash.make` and `Hash.verify` run on the request isolate, so that isolate can not answer other requests in the meantime.
-Use the async versions in a request handler. They run bcrypt in another isolate.
+`Hash.make` and `Hash.verify` block the request isolate while bcrypt runs.
+In a request handler, use the async versions. They run bcrypt in another isolate.
 
 ```dart
 user.password = await Hash.makeAsync(body.password);
@@ -59,6 +56,6 @@ See [Authentication](authentication.md).
 
 ## Things to know
 
-- Never store a plain password. Never encrypt a password. Hash it.
+- Never store or encrypt a plain password. Hash it.
 - Never send the hash to the client. Put the column in the model `hidden` list.
-- bcrypt is slow on purpose. This makes guessing many passwords slow too. Do not hash in a loop on hot paths.
+- bcrypt is slow on purpose, so guessing is slow too. Do not hash in a loop on hot paths.

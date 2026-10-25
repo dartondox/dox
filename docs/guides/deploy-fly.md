@@ -3,21 +3,12 @@
 Run the blog API on [Fly.io](https://fly.io) from the `Dockerfile` of your project, with SQLite on a volume or with Postgres.
 
 !!! note
-    These steps follow the Fly.io docs as of 2026-10-22 (checked on 2026-10-22). They were not run on Fly.io in CI.
-    The Docker image itself was built and run locally.
+    These steps follow the Fly.io docs as of 2026-10-22. They were not run on Fly.io in CI.
 
 ## What you need
 
 - A Fly.io account and the `fly` CLI (`fly auth login`).
-- The blog API from the [tutorial](../tutorial/01-create-project.md), or any Dox app, with the `Dockerfile` of a new Dox app.
-  See [Deployment: Docker](../digging-deeper/deployment.md#docker) for how that file works.
-
-The image is small. For the blog API it is about 17 MB. Fly builds it for you on `fly deploy`.
-
-!!! note "Check for `(native)`"
-    The project's `Dockerfile` copies `libgcc_s.so.1` into the image, so the
-    native HTTP server loads. The start log ends with `(native)`. If the app
-    stops with `dox_http_native did not load`, see [Docker](docker.md).
+- The blog API from the [tutorial](../tutorial/01-create-project.md), or any Dox app, with the `Dockerfile` of a new Dox app. See [Docker](docker.md) for how that file works.
 
 ## 1. Make the app on Fly.io
 
@@ -79,7 +70,7 @@ kill_timeout = 10
 - `internal_port` is the port the app listens on. Dox reads it from `APP_PORT` (or `PORT` when `APP_PORT` is not set). Keep the two the same.
 - Values in `[env]` must be strings, so write `"3000"`, not `3000`.
 - `[[vm]]` wins over `fly scale vm`. Each `fly deploy` sets the machine to these values.
-- `kill_timeout` is how long Fly waits after `SIGINT` before it kills the app. Keep it above `shutdownTimeout` of `AppConfig` (8 seconds by default). See [Graceful shutdown](../digging-deeper/deployment.md#graceful-shutdown).
+- `kill_timeout`: keep it above `shutdownTimeout` of `AppConfig`. See [Graceful shutdown](../digging-deeper/deployment.md#graceful-shutdown).
 
 ## 3. Set the secrets
 
@@ -105,15 +96,13 @@ fly volumes create blog_data --region ams --size 1
 
 ### Postgres
 
-Create a Fly.io Managed Postgres cluster with `fly mpg create`.
-
-Attach it to the app:
+Create a Managed Postgres cluster with `fly mpg create`, and attach it to the app:
 
 ```bash
 fly mpg attach <cluster-id> --app blog-api
 ```
 
-`fly mpg attach` sets one secret, `DATABASE_URL`. Dox reads it. When `DATABASE_URL` is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. The app and the migrations both use it. See [`DATABASE_URL`](../database/index.md#database_url).
+This sets the secret `DATABASE_URL`. It wins over the `DB_*` keys, for the app and the migrations. See [`DATABASE_URL`](../database/index.md#database_url).
 
 Then delete `DB_CONNECTION` and `DB_NAME` from `[env]`, and delete the `[mounts]` section.
 If the database asks for TLS, add `?sslmode=require` to the url with `fly secrets set DATABASE_URL=...`.
@@ -124,10 +113,7 @@ If the database asks for TLS, add `?sslmode=require` to the url with `fly secret
 fly deploy
 ```
 
-`fly deploy` builds the image from the `Dockerfile`, makes the machine and starts it.
-The app runs the migrations at start.
-
-Check that there is one machine:
+`fly deploy` builds the image, makes the machine and starts it. The app runs the migrations at start. Then check that there is one machine:
 
 ```bash
 fly scale show

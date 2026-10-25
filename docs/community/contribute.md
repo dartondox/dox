@@ -86,12 +86,10 @@ A new package must first exist on pub.dev, so publish its first version by hand 
 1. It checks that the tag (without `v`) is the root version, and that every package has this version.
    If not, it stops. Run `bin/update_versions.sh` and try again.
 2. It gets the publish order from `bin/publish_order.py`.
-   The script reads every `packages/*/pubspec.yaml`.
-   It puts each package after the sibling packages it depends on (`dependencies` and `dev_dependencies`).
-   Packages with `publish_to: none` (like `dox_app`) are left out.
-   A new package is picked up by itself.
+   Each package comes after the sibling packages it depends on (`dependencies` and `dev_dependencies`).
+   Packages with `publish_to: none` (like `dox_app`) are left out. New packages are picked up by themselves.
 3. It publishes each package in this order.
-   After each one, it waits until `dart pub get` can find the new version. Then the next package can depend on it.
+   After each one, it waits until `dart pub get` can find the new version.
 
 To see the order on your machine:
 
@@ -125,7 +123,6 @@ On pub.dev:
 On GitHub, in `dartondox/dox` > Settings > Environments, there must be an environment named `pub.dev`.
 The publish job runs in it.
 Optional: add yourself as a required reviewer, and allow only tags `v*`.
-The old `PUB_CREDENTIALS` secret is not used any more.
 
 ## Native packages
 
@@ -189,12 +186,6 @@ python3 -m venv .venv
 - After each deploy, the workflow writes small redirect pages for the old root links,
   the root `index.html`, a `404.html` and the `CNAME` file. So `dartondox.dev` and old links keep working.
 - The workflow pushes with the built-in `GITHUB_TOKEN`. This works because `gh-pages` is not a protected branch.
-
-### Why mike
-
-- Old docs stay online at `/2.x/`, and readers switch with the version menu.
-- Each version is built once from its own branch. A new deploy does not touch the other versions.
-- Old links from before versioning are kept with redirect pages, so search results and blog posts still work.
 
 ### New major version
 

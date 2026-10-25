@@ -1,6 +1,8 @@
 # Environment variables
 
-Every env var the framework and its packages read. How to read your own keys with the typed env class is on the [Environment Variables](../digging-deeper/env.md) page.
+Every env var the framework and its packages read.
+
+How to read your own keys with the typed env class is on the [Environment Variables](../digging-deeper/env.md) page.
 
 The code reads env vars in three ways:
 
@@ -15,7 +17,7 @@ The code reads env vars in three ways:
 | `APP_ENV` | `dox_core` (`Dox().checkAppKey()`, `OpenApiConfig.isEnabled`) | empty | Any value except `development`, `local` or `test` (also empty) makes a bad `APP_KEY` a startup error: missing, not exactly 32 characters, or a public sample key. In `development`, `local` and `test` it is only a warning. `development` or `local` turn the `/docs` routes on when `openApi.enabled` is `null`. Read with `Env.get`. | `APP_ENV=production` |
 | `PORT` | `dox_core` (`DoxServer.portFor()`) | not set | The port to listen on, when `APP_PORT` is not set. Cloud Run, Fly, Render and Heroku set it. `APP_PORT` wins when both are set. Read with `Env.get`. | `PORT=8080` |
 | `APP_HOST` | `dox_core` (`DoxServer.hostFor()`) | not set (all interfaces, `::`) | The host to listen on. `127.0.0.1` keeps the app off the network, for an app behind a proxy on the same machine. `AppConfig.host` wins over it. Read with `Env.get`. | `APP_HOST=127.0.0.1` |
-| `DOX_HTTP_THREAD` | `dox_http_native` (Rust, `shared_thread()`) | not set (one thread per isolate) | `shared` puts the servers of all isolates on one network thread. Off by default: on 2 cores it cut req/s by a quarter. Real environment only. | `DOX_HTTP_THREAD=shared` |
+| `DOX_HTTP_THREAD` | `dox_http_native` (Rust, `shared_thread()`) | not set (one thread per isolate) | `shared` puts the servers of all isolates on one network thread. Off by default: on 2 cores it cut req/s by a quarter. Real environment only (`std::env::var`), not `.env`. | `DOX_HTTP_THREAD=shared` |
 | `DATABASE_URL` | `dox_orm` (`DatabaseConfig.url`), `dox_migration` | not set | A database url. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. `dox_orm` reads it from the real environment only. See [Database url](../database/index.md#database_url). | `DATABASE_URL=postgres://app:secret@db:5432/blog?sslmode=require` |
 | `DB_CONNECTION` | `dox_migration` (`DbConnection.config()`) | postgres | `postgres`, `mysql` or `sqlite`. Any other value means postgres. | `DB_CONNECTION=sqlite` |
 | `DB_HOST` | `dox_migration` | `localhost` | Database host. A path that starts with `/` is a Unix socket: the folder for Postgres, the socket file for MySQL. | `DB_HOST=127.0.0.1` |
@@ -26,8 +28,6 @@ The code reads env vars in three ways:
 | `DB_NAME` | `dox_migration` | `dox` | Same as `DB_DATABASE`. `DB_DATABASE` wins when both are set. | `DB_NAME=dox` |
 | `HOME` / `USERPROFILE` | build hooks of `dox_http_native`, `dox_postgres_native`, `dox_mysql_native` | empty | Used to find `~/.cargo/bin/cargo` when the library must be built from source. | set by the OS |
 | `DART_VM_OPTIONS` | the Dart VM | not set | Flags for the VM. The AOT binary from `dox build` reads it. Dox never sets VM flags for you. See [Performance](../digging-deeper/performance.md#dart-vm-flags). | `DART_VM_OPTIONS=--new_gen_semi_max_size=64` |
-
-`DOX_HTTP_THREAD` is read with `std::env::var`. It does not work from `.env`.
 
 ## Read by a new project
 
@@ -76,11 +76,13 @@ DB_PASSWORD=postgres
 
 ## How `.env` is parsed
 
-`Env._loadEnv()` in `packages/dox-core/lib/env/env.dart`:
+`Env.parse()` in `packages/dox-core/lib/env/env.dart`:
 
-- One `KEY=value` per line. The key is trimmed.
+- One `KEY=value` per line. The key is trimmed. A line that starts with `#` is a comment.
 - The value is everything after the first `=`. A second `=` is kept.
-- Every `"`, `'` and `` ` `` character is removed from the value. Then it is trimmed.
-- `#` is not special. `KEY=abc # note` gives the value `abc # note`.
+- `#` after a space starts a comment: `KEY=abc # note` gives `abc`. `KEY=abc#def` stays `abc#def`.
+- A value in quotes (`"`, `'` or `` ` ``) is kept as it is, also a `#`. The quotes are removed.
 - An empty value, or the text `null`, counts as missing.
 - The file is read once per isolate, from the current working directory.
+
+`dox_migration` has its own simpler parser. It removes every quote character and does not strip `# note` comments. Keep comments on their own line.

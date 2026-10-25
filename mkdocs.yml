@@ -12,6 +12,16 @@ validation:
   unrecognized_links: warn
 hooks:
   - hooks/docs_hooks.py
+# `plugins:` turns off the default list, so `search` is named here.
+# redirect_maps keeps old links working when a page moves.
+plugins:
+  - search
+  - redirects:
+      redirect_maps:
+        database/model/serializer.md: the-basic/serializer.md
+        the-basic/installation.md: getting-started/installation.md
+        others/contribute.md: community/contribute.md
+        others/mascot.md: community/mascot.md
 extra_css:
   - assets/style.css
 extra_javascript:
@@ -105,7 +115,7 @@ markdown_extensions:
 nav:
   - Getting Started:
     - index.md
-    - the-basic/installation.md
+    - getting-started/installation.md
     - Tutorial:
       - tutorial/index.md
       - tutorial/01-create-project.md
@@ -120,10 +130,14 @@ nav:
       - concepts/coming-from-laravel.md
       - concepts/dart-frameworks.md
       - concepts/status-and-roadmap.md
+    - Community:
+      - community/contribute.md
+      - community/mascot.md
   - The basics:
     - the-basic/routing.md
     - the-basic/request.md
     - the-basic/response.md
+    - the-basic/serializer.md
     - the-basic/errors.md
     - the-basic/controller.md
     - the-basic/middleware.md
@@ -158,7 +172,6 @@ nav:
         - database/model/relationship/has-many.md
         - database/model/relationship/belongs-to.md
         - database/model/relationship/many-to-many.md
-      - database/model/serializer.md
   - Packages:
     - packages/validation.md
     - packages/openapi.md
@@ -200,5 +213,3 @@ nav:
     - reference/troubleshooting.md
     - reference/errors.md
     - reference/changelog.md
-    - others/contribute.md
-    - others/mascot.md

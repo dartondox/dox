@@ -184,8 +184,8 @@ It returns `null` when the password is not a `String`, when no identifier is giv
 | `algorithm` | `JWTAlgorithm.HS256` | the signing algorithm |
 | `expiresIn` | `Duration(hours: 1)` | how long a token is valid |
 | `issuer` | `null` | the `iss` claim. When set, `verifyToken` also checks it |
-| `hashRounds` | `10` | the bcrypt cost of your stored hashes. Set it to the same value as `Hash.rounds`, so an unknown email takes as long as a wrong password |
-| `userCacheTtl` | `null` (off) | keep the user of a token in memory for this time, so a request does not load the user from the database. See below |
+| `hashRounds` | `10` | the bcrypt cost of your stored hashes. Use the same value as `Hash.rounds` |
+| `userCacheTtl` | `null` (off) | keep the user of a token in memory for this time. See below |
 
 ## More than one guard
 
@@ -222,10 +222,9 @@ An unknown guard name throws an `ArgumentError`.
 
 ## Things to know
 
-
-- **The token is not secret.** Its payload is `user.toJson()`. Anyone with the token can read it. Keep private columns in `hidden`.
-- **You can not cancel one token.** There is no token list on the server. A token works until it expires. If you change the `secret` (your `APP_KEY`), all tokens stop working.
-- **The user is loaded on each request.** `AuthMiddleware` reads the user id from the token and runs `find(id)`. A deleted user can not log in, even with a valid token.
-- **`userCacheTtl` skips that query.** With `userCacheTtl: Duration(seconds: 30)` the user is kept in memory for 30 seconds. A deleted or changed user is seen only after that time. Each server isolate has its own cache. Requests in that time get the same user object, so do not change it per request.
-- **Login does not block the server.** `attempt` runs bcrypt in another isolate, so other requests are served while a password is checked.
-- **Hash passwords** with `Hash.make()` before you save them. See [Hashing](hashing.md).
+- **The token is not secret.** Anyone with the token can read `user.toJson()`. Keep private columns in `hidden`.
+- **You can not cancel one token.** A token works until it expires. If you change the `secret` (your `APP_KEY`), all tokens stop working.
+- **The user is loaded on each request**, by the id in the token. A deleted user can not log in, even with a valid token.
+- **`userCacheTtl` skips that query.** With `Duration(seconds: 30)`, a deleted or changed user is seen only after 30 seconds. Each isolate has its own cache. Requests in that time share one user object, so do not change it per request.
+- **Login does not block the server.** `attempt` runs bcrypt in another isolate.
+- **Hash passwords** before you save them. See [Hashing](hashing.md).

@@ -112,10 +112,9 @@ class BlogController {
 </div>
 
 Dox also has the lowest p99 (the slowest 1% of requests). Your code is plain
-Dart. The speed comes from the Rust HTTP server and the Rust database drivers
-that Dox uses by default. On 2 cores Dox stays ahead on the database routes.
+Dart. The speed comes from the Rust HTTP server and database drivers.
 Without a database (`GET /json`), Bun is faster.
-See [Performance](digging-deeper/performance.md) for every route and how to run the benchmark yourself.
+See [Performance](digging-deeper/performance.md) for every route.
 
 !!! warning "You are reading the 3.x docs (alpha)"
     `3.0.0-alpha.x` is a preview. Things can still change before the stable release.
@@ -149,7 +148,7 @@ at a time.
 
 !!! note "The CLI is not found?"
     `dart pub global activate` puts `dox` in `$HOME/.pub-cache/bin`.
-    Add that folder to your `PATH`. See [Installation](the-basic/installation.md).
+    Add that folder to your `PATH`. See [Installation](getting-started/installation.md).
 
 ## Pick your path
 
@@ -212,4 +211,4 @@ at a time.
 
 - Found a bug or have a question? Open an [issue on GitHub](https://github.com/dartondox/dox/issues).
 - Using an AI assistant? Give it [llms-full.txt](https://dartondox.dev/latest/llms-full.txt): all of these docs as one plain text file. [llms.txt](https://dartondox.dev/latest/llms.txt) is the page list.
-- Want to help? Read [Contribute](others/contribute.md).
+- Want to help? Read [Contribute](community/contribute.md).

@@ -10,7 +10,7 @@ Return the value from your controller. Dox turns it into the response.
 | --- | --- |
 | a `String` | the text |
 | a `Map` or a `List` | JSON |
-| a model, a list of models, a [serializer](../database/model/serializer.md) | JSON (from `toJson()`) |
+| a model, a list of models, a [serializer](serializer.md) | JSON (from `toJson()`) |
 | a `DateTime` | the ISO 8601 text |
 | an `IHttpException`, like `NotFoundHttpException()` | its status code and its message (text, or JSON for a `Map`) |
 | a `File` (from `dart:io`) | the file, streamed |
@@ -19,11 +19,6 @@ Return the value from your controller. Dox turns it into the response.
 | `response(...)` | full control: status, headers, cookies |
 
 ```dart
-// text
-String ping(DoxRequest req) {
-  return 'pong';
-}
-
 // JSON
 Map<String, String> hello(DoxRequest req) {
   return <String, String>{'message': 'hello world!'};
@@ -32,20 +27,6 @@ Map<String, String> hello(DoxRequest req) {
 // a model
 Future<Blog?> show(int id) async {
   return Blog().find(id);
-}
-
-// a list of models
-Future<List<Blog>> index(DoxRequest req) async {
-  return Blog().all();
-}
-
-// an error
-Future<Blog> showOrFail(int id) async {
-  Blog? blog = await Blog().find(id);
-  if (blog == null) {
-    throw NotFoundHttpException(); // 404 Not Found
-  }
-  return blog;
 }
 ```
 
@@ -166,10 +147,9 @@ return response('ok').cookie(token);
 
 // delete a cookie
 return response('ok').cookie(DoxCookie('token', ''), setExpire: true);
-
-// read a cookie
-String? value = req.cookie('token');
 ```
+
+To read a cookie, see [Request: cookies](request.md#cookies).
 
 !!! info "Encrypt and decrypt"
     By default, Dox encrypts the cookie value with `APP_KEY`, and decrypts it when you read it.

@@ -1,13 +1,8 @@
 # Share code with Flutter
 
-Your server and your Flutter app are both written in Dart. So they can use the same code.
-This guide puts a `@Dto` class in a shared package. The server checks requests with it.
-The Flutter app checks the form with it, with the same rules and the same error messages, before it sends the request.
+Put a `@Dto` class in a shared Dart package, so the Dox server and the Flutter app check input with the same rules and error messages.
 
-!!! note "This works, and it was tested"
-    The generated DTO code imports only `dox_validation`. It does not need `dox_core`.
-    `dox_validation` is pure Dart: it imports only `dart:async`. No `dart:io`, no `dart:mirrors`.
-    Tested on 2026-10-22 with Dart 3.13.6 and Dox `3.0.0-alpha.4`. See [What was tested](#what-was-tested).
+The generated DTO code imports only `dox_validation`, which is pure Dart (no `dart:io`, no `dart:mirrors`). So it runs in Flutter and on the web.
 
 ## The layout
 
@@ -97,7 +92,6 @@ Commit both files. Then the Flutter app does not need to run the generator.
 !!! warning "Rules that need the database stay on the server"
     `@Unique` and `@Exists` come from `dox_orm`. Do not use them in the shared package: the app can not import `dox_orm`.
     Check them on the server, in the service or in a server-only DTO.
-    A `validate()` method that is `async` also can not run with `safeParse`. Use `safeParseAsync` for it.
 
 ## 2. The Dox server
 
@@ -181,13 +175,10 @@ dependencies:
     path: ../packages/blog_shared
 ```
 
-The app does not depend on `dox_core`. It gets only `blog_shared` and `dox_validation`.
+The app does not depend on `dox_core`.
 
-One widget: it checks the form with `SaveBlog.schema.safeParse(...)`. It sends the request only when the input is good.
+The widget checks the form with `SaveBlog.schema.safeParse(...)` and sends the request only when the input is good.
 `result.errors` has the same shape as the server's `422` body, so one `_errors` map shows both.
-
-!!! note "Not run here"
-    The Flutter widget below was not run in a Flutter app. The same calls were run in a plain Dart program and in JavaScript (see below).
 
 ```dart title="app/lib/new_blog_form.dart"
 import 'dart:convert';
@@ -260,38 +251,6 @@ class _NewBlogFormState extends State<NewBlogForm> {
 }
 ```
 
-The API of the schema:
-
-| Call | Gives | On bad input |
-| --- | --- | --- |
-| `SaveBlog.schema.safeParse(map)` | `ParseResult<SaveBlog>` | `success` is `false`. `errors` has the first message per key. |
-| `SaveBlog.schema.parse(map)` | `SaveBlog` | throws `ValidationException` |
-| `SaveBlog.schema.toMap(blog)` | the JSON map, with the input keys (snake_case) | - |
-| `SaveBlog.schema.toJsonSchema()` | the JSON Schema of the DTO | - |
-
+The schema also has `parse` (throws `ValidationException`), `toMap` (the JSON map to send) and `toJsonSchema`.
 Use `safeParseAsync` or `parseAsync` when the DTO has an `async` `validate()` method.
-See [Validation](../the-basic/validation.md) and [dox_validation](../packages/validation.md) for all rules.
-
-## What was tested
-
-Three packages were made in a temp folder, with path dependencies to the Dox packages:
-
-1. `blog_shared` with the `SaveBlog` DTO above. `dart run build_runner build` wrote `save_blog.g.dart` and `dtos.g.dart`.
-   Both import only `package:dox_validation`. `dart analyze` found no issues.
-2. A plain Dart console app that depends on `blog_shared` only. Its dependency tree has `dox_validation` and nothing else from Dox.
-   `dart run` gave this output:
-
-    ```text
-    bad input ok? false
-    errors: {title: The title must be between 3 and 255 characters, description: The description must be at least 10 characters}
-    good input ok? true
-    title after trim: "Hello Dox"
-    json to send: {title: Hello Dox, description: A post about sharing code with Flutter.}
-    parse threw: ValidationException
-    ```
-
-    The same app compiled with `dart compile js` and run in Node gave the same output. So the code also runs on the web.
-3. A Dox server with `dox_core` and `blog_shared`, `dtos: shared.dtos`, and `Route.post('/blogs', BlogController().store)`.
-   A bad body got `422` with the errors shown above. A good body got `200 {"title":"Hello Dox","saved":true}` (the title was trimmed).
-
-Not tested here: the Flutter widget itself.
+See [Validation](../the-basic/validation.md) and [dox_validation](../packages/validation.md) for all rules and methods.

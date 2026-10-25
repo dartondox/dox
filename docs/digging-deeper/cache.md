@@ -1,6 +1,7 @@
 # Cache
 
 `Cache()` keeps data that is slow to make, so the next request can read it fast.
+
 It runs on [`dox_cache`](../packages/cache.md), which is built into `dox_core`.
 
 ## Drivers
@@ -59,16 +60,10 @@ Each store is made once per isolate, the first time you use it.
 | --- | --- |
 | `file` | `path` (default `storage/cache`), `prefix` |
 | `memory` | `max_size`: the most items. When it is full, the item that was used least recently is removed. No limit by default. Expired items are removed when read, and by a sweep every few thousand writes. Also `prefix`. |
-| `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db` (default `0`), `tls` (`true`/`false`), `pool_size`, `prefix` |
+| `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db` (default `0`), `tls` (`true`/`false`), `pool_size` (default 10), `prefix` |
 
 The default `prefix` is `dox_cache:`.
-
-### Redis `pool_size`
-
-`pool_size` is the most Redis connections that one store opens in one isolate. The default is 10.
-
-You rarely need to change it. A store sends all commands on one connection. It opens more connections only while a blocking command (like `BLPOP`) waits, and the cache does not send blocking commands.
-So each isolate uses about one connection: 4 isolates use about 4 connections.
+You rarely need `pool_size`: the cache sends no blocking commands, so each isolate uses about one Redis connection.
 
 ## Values are JSON
 
@@ -106,9 +101,7 @@ List<dynamic> posts = await Cache().remember(
 
 ### `getRaw`
 
-`get` decodes the stored JSON text into Dart values. If you then send the value as a JSON response, Dox must encode it again. That is double work.
-
-`getRaw` gives the stored JSON text as it is. You can send it with no decode and no encode:
+`getRaw` gives the stored JSON text as it is. Send it as a response with no decode and no encode:
 
 ```dart
 String? json = await Cache().getRaw('posts');
@@ -118,8 +111,7 @@ if (json != null) {
 ```
 
 A missing key gives `null`. A stored `String` comes back as JSON, with its quotes: `"bar"`.
-
-The memory driver also keeps values as JSON text, so a caller can not change a cached value by mistake. This means `get` decodes the text on every hit, also in memory. For a big value that you send as is, `getRaw` skips this work.
+The `memory` driver also keeps JSON text, so `get` decodes on every hit there too.
 
 ### Another store
 
@@ -174,15 +166,4 @@ See [dox_cache](../packages/cache.md) for custom drivers.
 
 ## Tests
 
-`Dox().cache` is the `CacheManager` that `Cache()` uses. Replace it in a test, so the test needs no files and no Redis:
-
-```dart
-Dox().cache = CacheManager(CacheConfig(
-  defaultStore: 'memory',
-  stores: <String, Map<String, dynamic>>{
-    'memory': <String, dynamic>{'driver': 'memory'},
-  },
-));
-```
-
-See [Testing](testing.md).
+To use a memory store in tests, see [Testing](testing.md#test-the-cache).

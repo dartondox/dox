@@ -33,7 +33,7 @@ Route.get('/health', healthController.check);
 
 ## 2. Add the health check binary
 
-The final image is `FROM scratch`. It has no shell and no `curl`. So the health check is a second small Dart binary.
+The final image has no shell and no `curl`. So the health check is a second small Dart binary.
 
 ```dart title="bin/health.dart"
 import 'dart:io';
@@ -58,8 +58,7 @@ Future<void> main() async {
 
 ## 3. Write the Dockerfile
 
-Two stages. The first one has the Dart SDK and the `dox` CLI, and builds the AOT bundle.
-The second one has only the Dart runtime files and the bundle. No SDK, no source, no shell.
+Two stages: the first builds the AOT bundle, the second holds only the Dart runtime and the bundle. For the blog API the final image is about 17 MB.
 
 ```dockerfile title="Dockerfile"
 # Stage 1: build the AOT bundle with the Dart SDK and the dox CLI.
@@ -113,9 +112,7 @@ Check the start log in the container. It must end with `(native)`:
 Server started at http://[::]:3000 with 8 isolate (native)
 ```
 
-Without the `libgcc_s` lines, the native HTTP server does not load in a
-`scratch` image. Dox then stops at start with `dox_http_native did not
-load` and the reason.
+Without the `libgcc_s` lines, the native HTTP server does not load. Dox then stops at start with `dox_http_native did not load` and the reason.
 
 !!! warning "`dox build`, not `dart compile exe`"
     `dox_orm` bundles SQLite with a build hook. `dart compile exe` does not run build hooks and stops with an error.
@@ -140,7 +137,7 @@ pubspec_overrides.yaml
 
 ## 4. Write the compose file
 
-The app reads its config from env variables. `env_file: .env` gives it your `.env`. The lines under `environment` win over the file, so the app always talks to the `postgres` service.
+`env_file: .env` gives the app your `.env`. The lines under `environment` win over the file, so the app always talks to the `postgres` service.
 
 ```yaml title="docker-compose.yml"
 services:

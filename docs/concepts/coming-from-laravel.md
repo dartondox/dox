@@ -1,10 +1,8 @@
 # Coming from Laravel
 
-This page is for developers who know Laravel. It shows the Laravel way and the Dox way side by side.
-The Dox code is real 3.x code. The Laravel code is Laravel 11.
+This page is for Laravel developers: it shows the Laravel way and the Dox way side by side.
 
-Dox follows the ideas of Laravel: routers, controllers, middleware, an ORM with models and relations, migrations, a CLI.
-But Dox is Dart. It has static types, no reflection at run time, and it compiles to one native binary.
+The Laravel code is Laravel 11. The biggest changes are in [What is different](#what-is-different).
 
 ## Routing
 
@@ -111,7 +109,7 @@ class CreateBlog {
 ```
 
 The rules are checked by generated Dart code, not by rule strings at run time.
-Run `dox build_runner:build` after you change a DTO. See [Validation](../the-basic/validation.md).
+See [Validation](../the-basic/validation.md).
 
 ## Responses
 
@@ -183,7 +181,7 @@ class Blog extends BlogGenerator {
 
 Every column field is nullable, because a new model has no values yet.
 Dox has no global scopes and no `$casts` list. Use the field type, `beforeSave` and `beforeGet`.
-Run `dox build_runner:build` after you change a model. See [Model](../database/model/index.md).
+See [Model](../database/model/index.md).
 
 ## Query builder
 
@@ -258,19 +256,13 @@ The server can run the migrations at start. See [Migration](../database/migratio
 | --- | --- |
 | `laravel new blog` | `dox create blog` |
 | `php artisan serve` | `dox serve` (or `dox s`), with hot restart and `build_runner watch` |
-| `php artisan make:controller` | `dox create:controller` |
-| `php artisan make:model Blog -m` | `dox create:model Blog -m` |
-| `php artisan make:request` | `dox create:dto` |
-| `php artisan make:middleware` | `dox create:middleware` |
 | `php artisan make:resource` | `dox create:serializer` |
-| `php artisan make:migration` | `dox make:migration` |
-| `php artisan migrate` | `dox migrate` |
 | `php artisan key:generate` | `dox key:generate` |
 | `php artisan route:list` | not there. Use the OpenAPI docs page at `/docs`. |
 | `php artisan tinker` | not there |
 | `php artisan optimize` | `dox build` (one native binary in `build/bundle`) |
 
-Two commands have no Laravel twin: `dox build_runner:build` makes the generated code, and `dox env:generate` makes the typed env class.
+The `make:*` and `migrate` commands are in the tables above. Two commands have no Laravel twin: `dox build_runner:build` makes the generated code, and `dox env:generate` makes the typed env class.
 See [Dox CLI](../digging-deeper/dox-cli.md).
 
 ## Auth
@@ -368,23 +360,18 @@ See [Testing](../digging-deeper/testing.md).
 
 ## What is missing today
 
-Dox 3.0 does not have these Laravel features. Check the [packages](../packages/validation.md) list for what is there.
+Dox does not have these Laravel features yet:
 
-| Laravel | Dox 3.0 |
-| --- | --- |
-| Queues and jobs (`dispatch(new Job)`) | not there. Use a database table, Redis or a separate worker process. |
-| Task scheduler (`schedule()->daily()`) | not there. Use cron or systemd timers to call a route or a Dart script. |
-| Events and listeners (`Event::dispatch`, `$listen`) | not there. Model events (hooks and observers) are there. |
-| Blade views, `view()` | not there. Dox is for APIs. Serve a front end from a CDN or a proxy. |
-| Mail (`Mail::to()`) | not there. Use a Dart mail package or an HTTP mail API. |
-| Notifications | not there |
-| Sessions and session cookies | not there. Auth uses a JWT. Encrypted cookies are there. |
-| Policies and gates | not there. Check the user in a middleware or in the controller. |
-| Global scopes, `$casts`, `$fillable` | not there. See [Eloquent vs Dox Model](#eloquent-vs-dox-model). |
-| Database seeders and factories | not there. Write a Dart script, or a migration with data. |
-| Rate limiting middleware | not there. Write a middleware with the cache, or use a proxy. |
-| `php artisan route:list`, `tinker` | not there |
-| Savepoints in nested transactions | not there. A nested `transaction()` joins the outer one. |
+- queues and jobs, and the task scheduler
+- events and listeners (model events are there)
+- Blade views, mail and notifications
+- sessions (auth uses a JWT; encrypted cookies are there)
+- policies and gates
+- seeders and factories
+- rate limiting middleware
+- savepoints in nested transactions (a nested `transaction()` joins the outer one)
+
+See [What Dox does not have yet](status-and-roadmap.md#what-dox-does-not-have-yet) for what to use today.
 
 What is there, as separate packages: [validation](../packages/validation.md), [OpenAPI docs](../packages/openapi.md),
 [storage](../packages/storage.md), [cache](../packages/cache.md), [Socket.IO](../packages/socketio.md)
