@@ -9,7 +9,7 @@ import 'package:glob/glob.dart';
 import '../openapi/annotation_reader.dart';
 
 /// How a class goes into the container.
-enum EntryKind { inject, router, service }
+enum EntryKind { inject, router, provider }
 
 /// One class that goes into the container.
 class ContainerEntry {
@@ -64,7 +64,7 @@ class ModelEntry {
 /// It reads every library in `lib/` and finds:
 /// - classes with `@Inject()`,
 /// - classes that extend `Router` (their routes are registered at start),
-/// - classes that implement `DoxService` (their `setup()` runs at start),
+/// - classes that extend `DoxProvider` (their `setup()` runs at start),
 /// - classes with `@DoxModel()` (route model binding).
 ///
 /// Constructor parameters come from the container, by type. The build
@@ -126,8 +126,8 @@ class DoxContainerBuilder implements Builder {
   ContainerEntry? _entry(ClassElement element, String library) {
     DartObject? inject = _annotations.first(element, 'Inject');
     bool router = _isA(element, 'Router');
-    bool service = _isA(element, 'DoxService');
-    if (inject == null && (element.isAbstract || (!router && !service))) {
+    bool provider = _isA(element, 'DoxProvider');
+    if (inject == null && (element.isAbstract || (!router && !provider))) {
       return null;
     }
     String name = element.displayName;
@@ -145,8 +145,8 @@ class DoxContainerBuilder implements Builder {
     }
     EntryKind kind = router
         ? EntryKind.router
-        : service
-        ? EntryKind.service
+        : provider
+        ? EntryKind.provider
         : EntryKind.inject;
     bool shared =
         kind != EntryKind.inject ||
@@ -304,7 +304,9 @@ class ContainerWriter {
     out
       ..writeln()
       ..writeln('/// Puts every class of the app into the container: the')
-      ..writeln('/// `@Inject()` classes, routers, services and model binders.')
+      ..writeln(
+        '/// `@Inject()` classes, routers, providers and model binders.',
+      )
       ..writeln('/// Use it in `AppConfig(container: registerContainer)`.')
       ..writeln('void registerContainer(IocContainer c) {');
     for (ContainerEntry entry in entries) {
@@ -321,7 +323,7 @@ class ContainerWriter {
     String type = typeOf(entry);
     String method = switch (entry.kind) {
       EntryKind.router => 'router',
-      EntryKind.service => 'service',
+      EntryKind.provider => 'provider',
       EntryKind.inject => entry.shared ? 'singleton' : 'factory',
     };
     List<String> values = <String>[

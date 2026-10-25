@@ -49,14 +49,14 @@ StorageConfig storageConfig = StorageConfig(
 Run `dart run build_runner build` to update `env.g.dart`.
 Then add `APP_URL=http://localhost:3000` to your `.env`.
 
-Add the service. It sets the disks in every isolate. The generated container finds it:
+Add the provider. It sets the disks in every isolate. The generated container finds it:
 
-```dart title="lib/services/storage_service.dart"
+```dart title="lib/providers/storage_provider.dart"
 import 'package:dox_storage/dox_storage.dart';
 import 'package:my_app/config/storage.dart';
 
-class AppStorageService extends StorageService {
-  AppStorageService() : super(storageConfig);
+class AppStorageProvider extends StorageProvider {
+  AppStorageProvider() : super(storageConfig);
 }
 ```
 

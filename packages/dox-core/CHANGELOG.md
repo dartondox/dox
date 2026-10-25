@@ -1,3 +1,7 @@
+## 3.0.0-alpha.15
+
+- Change: the startup hook is `DoxProvider`. Write `class X extends DoxProvider`. `setup()` runs once in every isolate at start. `shutdown()` is optional and runs once in every isolate when the app stops. List providers in `AppConfig.providers`, or add them with `Dox().addProvider()` and `Dox().addProviders()`. The container method is `c.provider<T>()`.
+
 ## 3.0.0-alpha.14
 
 - Fix: `AUTH_REQUEST_KEY` is now only in `dox_core`, so importing `dox_core` and `dox_auth` together no longer gives an "ambiguous import" error.

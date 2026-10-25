@@ -30,7 +30,7 @@ class ReportController {
 }
 
 /// Must be a top level or static function with plain arguments.
-/// The new isolate has no Dox, no database and no services.
+/// The new isolate has no Dox, no database and no providers.
 int countPrimes(int limit) {
   List<bool> sieve = List<bool>.filled(limit + 1, true);
   int count = 0;

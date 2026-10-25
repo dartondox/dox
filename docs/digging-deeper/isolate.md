@@ -68,14 +68,14 @@ Isolates do not share memory:
 
 ## What each isolate does at start
 
-Dox copies the `AppConfig`, the services and the routes you added before `startServer()` to each new isolate. Then every isolate:
+Dox copies the `AppConfig`, the providers and the routes you added before `startServer()` to each new isolate. Then every isolate:
 
-1. runs `setup()` of each service (for example, it opens the database pool),
+1. runs `setup()` of each provider (for example, it opens the database pool),
 2. registers the routes of your routers,
 3. reads the parameter types of each controller once,
 4. starts its HTTP server.
 
-Because the config and services are copied, they must not hold open sockets or database pools. Open these in `setup()`. See [Services](services.md).
+Because the config and providers are copied, they must not hold open sockets or database pools. Open these in `setup()`. See [Providers](providers.md).
 
 ## When an isolate crashes
 

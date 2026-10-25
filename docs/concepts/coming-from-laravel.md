@@ -275,7 +275,7 @@ See [Dox CLI](../digging-deeper/dox-cli.md).
 
 | Laravel | Dox |
 | --- | --- |
-| `config/auth.php` guards and providers | `Auth.initialize(AuthConfig(guards: ...))` in a service |
+| `config/auth.php` guards and providers | `Auth.initialize(AuthConfig(guards: ...))` in a provider |
 | `Auth::attempt(['email' => $e, 'password' => $p])` | `await Auth().attempt(<String, dynamic>{'email': e, 'password': p})` gives a JWT, or `null` |
 | `Auth::login($user)` | `Auth().login(user)` gives a JWT |
 | `Auth::user()` | `req.auth?.user<User>()` |
@@ -305,7 +305,7 @@ A value must be a JSON type. The `memory` store is per isolate. See [Cache](../d
 
 | Laravel | Dox |
 | --- | --- |
-| `config/filesystems.php` disks | `lib/config/storage.dart`, `StorageConfig(defaultDisk:, disks:)`, passed to a `StorageService` (`dox_storage`) |
+| `config/filesystems.php` disks | `lib/config/storage.dart`, `StorageConfig(defaultDisk:, disks:)`, passed to a `StorageProvider` (`dox_storage`) |
 | `Storage::put('a.txt', $bytes)` | `await Storage().put('files', bytes, extension: 'txt')` (a uuid file name) |
 | `$request->file('f')->store('avatars')` | `await file.store('avatars')` or `Storage().putRequestFile('avatars', file)` |
 | `Storage::get($path)` | `await Storage().get(path)` |
@@ -349,7 +349,7 @@ See [Testing](../digging-deeper/testing.md).
 ## What is different
 
 - **A generated container.** Like Laravel, Dox makes your controllers and injects what the constructor asks for.
-  You add `@Inject()` to the class. `build_runner` writes `lib/generated/container.g.dart` with every registration. There are no service providers to write.
+  You add `@Inject()` to the class. `build_runner` writes `lib/generated/container.g.dart` with every registration. You do not register classes by hand in a provider.
   A singleton is one instance per isolate, not one per request.
 - **Isolates, not PHP-FPM workers.** One process runs one isolate per CPU core. Each isolate runs your whole app and has its own memory.
   A static value or a singleton lives once per isolate. A PHP worker starts from zero on each request. A Dox isolate keeps its state between requests, so a memory leak stays.

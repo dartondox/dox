@@ -55,15 +55,15 @@ class DoxTestClient {
 
   /// Start the app of [config] in this isolate and give a client for it.
   ///
-  /// It runs the services (eg. the ORM service) and registers the routes,
+  /// It runs the providers (eg. the ORM provider) and registers the routes,
   /// like the real start. It always listens on `127.0.0.1` and a free
   /// port, and runs one isolate. `serverPort` and `totalIsolate` of
   /// [config] are not used.
   static Future<DoxTestClient> start(AppConfig config) async {
     Dox dox = Dox();
     dox.initialize(config);
-    dox.addServices(config.services);
-    await dox.startServices();
+    dox.addProviders(config.providers);
+    await dox.startProviders();
     DoxServer server = DoxServer();
     server.setResponseHandler(config.responseHandler);
     HttpServer http = await server.listen(
@@ -73,7 +73,7 @@ class DoxTestClient {
     return DoxTestClient(Uri.parse('http://127.0.0.1:${http.port}'));
   }
 
-  /// Stop the server of [start] (and its `DoxShutdown` services), and
+  /// Stop the server of [start] (and `shutdown()` of its providers), and
   /// close this client.
   Future<void> close() async {
     _http.close(force: true);

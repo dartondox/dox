@@ -79,7 +79,7 @@ class ApiRouter extends Router {
   }
 }
 
-class SetupService implements DoxService {
+class SetupProvider extends DoxProvider {
   bool ran = false;
 
   @override
@@ -101,7 +101,7 @@ void registerContainer(IocContainer c) {
   );
   c.factory<RequestCounter>((IocContainer c) => RequestCounter());
   c.router<ApiRouter>((IocContainer c) => ApiRouter(c.get<UserService>()));
-  c.service<SetupService>((IocContainer c) => SetupService());
+  c.provider<SetupProvider>((IocContainer c) => SetupProvider());
   c.bindModel<Post>((String id) {
     int? key = int.tryParse(id);
     if (key == null || key > 100) return null;

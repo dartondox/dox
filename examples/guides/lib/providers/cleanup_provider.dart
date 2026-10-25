@@ -5,7 +5,7 @@ import 'package:my_app/app/models/user/user.model.dart';
 
 /// Work on a timer. `setup()` runs in every isolate, so the timer is
 /// started on isolate 1 only. Otherwise 8 isolates do the same job.
-class CleanupService implements DoxService {
+class CleanupProvider extends DoxProvider {
   @override
   void setup() {
     if (Dox().isolateId != 1) return;

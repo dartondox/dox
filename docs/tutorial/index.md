@@ -67,7 +67,7 @@ blog/
 │   │   ├── database.dart
 │   │   └── env.dart              the .env keys, typed
 │   ├── routes/api.dart           *
-│   ├── services/
+│   ├── providers/
 │   │   ├── auth_service.dart     *
 │   │   └── orm_service.dart
 │   └── generated/

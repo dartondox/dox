@@ -4,7 +4,7 @@ import 'package:dox_core/dox_core.dart';
 
 /// a small app for the SIGTERM test. Args: port, isolates.
 /// `/slow` prints `slow start` and answers after 700 ms. Prints `ready`
-/// when it serves and `cleanup <isolate>` when a DoxShutdown service runs.
+/// when it serves and `cleanup <isolate>` when a provider shutdown runs.
 void main(List<String> args) async {
   Dox().initialize(
     AppConfig(
@@ -12,7 +12,7 @@ void main(List<String> args) async {
       serverPort: int.parse(args[0]),
       totalIsolate: int.parse(args[1]),
       routers: <Router>[SlowRouter()],
-      services: <DoxService>[CleanupService()],
+      providers: <DoxProvider>[CleanupProvider()],
     ),
   );
   await Dox().startServer();
@@ -32,7 +32,7 @@ class SlowRouter extends Router {
   }
 }
 
-class CleanupService implements DoxService, DoxShutdown {
+class CleanupProvider extends DoxProvider {
   @override
   void setup() {}
 

@@ -30,7 +30,7 @@ AppConfig isolateConfig(int port) => AppConfig(
 
 late String baseUrl;
 
-class ExampleService implements DoxService {
+class ExampleProvider extends DoxProvider {
   @override
   void setup() {}
 }
@@ -41,7 +41,7 @@ void main() {
       int port = await freePort();
       baseUrl = 'http://localhost:$port';
       Dox().initialize(isolateConfig(port));
-      Dox().addService(ExampleService());
+      Dox().addProvider(ExampleProvider());
       Dox().totalIsolate(5);
       await Dox().startServer();
     });

@@ -220,7 +220,7 @@ Future<void> main(List<String> args) async {
 }
 ```
 
-With `app`, the runner starts your app services first (like the database).
+With `app`, the runner starts your app providers first (like the database).
 It stops them at the end.
 
 | Command | What it does |
@@ -271,15 +271,15 @@ It does not check the schedule, the filters or the locks.
 ## Run inside the server
 
 You can run the schedule inside your Dox server instead of a `work` process.
-Add a service that extends `SchedulerService`:
+Add a provider that extends `SchedulerProvider`:
 
 ```dart
-// lib/services/schedule_service.dart
+// lib/providers/schedule_provider.dart
 import 'package:dox_scheduler/dox_scheduler.dart';
 import 'package:my_app/config/schedule.dart';
 
-class ScheduleService extends SchedulerService {
-  ScheduleService() : super(schedule: schedule, config: scheduleConfig);
+class ScheduleProvider extends SchedulerProvider {
+  ScheduleProvider() : super(schedule: schedule, config: scheduleConfig);
 }
 ```
 
@@ -289,7 +289,7 @@ Then turn it on in `lib/config/schedule.dart`:
 ScheduleConfig scheduleConfig = const ScheduleConfig(inProcess: true);
 ```
 
-Run `dart run build_runner build`. The generated container finds the service.
+Run `dart run build_runner build`. The generated container finds the provider.
 
 How it works:
 
@@ -303,7 +303,7 @@ Trade-offs:
 - A long task makes the server stop slower.
 - With a separate `work` process, you can deploy, scale and restart the scheduler on its own.
 
-Use `work` for heavy tasks. Use the in-process service for small apps.
+Use `work` for heavy tasks. Use the in-process provider for small apps.
 
 ## Testing
 

@@ -11,7 +11,7 @@ import 'package:my_app/generated/container.g.dart';
 import 'package:my_app/generated/dtos.g.dart';
 import 'package:my_app/routes/api.dart';
 import 'package:my_app/routes/web.dart';
-import 'package:my_app/services/orm_service.dart';
+import 'package:my_app/providers/orm_provider.dart';
 
 AppConfig appConfig = AppConfig(
   appKey: env.appKey,
@@ -24,7 +24,7 @@ AppConfig appConfig = AppConfig(
   /// the SPA catch-all route is in WebRouter, so it comes last
   routers: <Router>[ApiRouter(), WebRouter()],
 
-  /// every @Inject class, router and service, from lib/generated/container.g.dart
+  /// every @Inject class, router and provider, from lib/generated/container.g.dart
   container: registerContainer,
 
   /// every @Dto class, from lib/generated/dtos.g.dart
@@ -39,7 +39,7 @@ AppConfig appConfig = AppConfig(
   cache: cache,
   cors: cors,
 
-  /// the ORM first: the other services use the database
-  services: <DoxService>[ORMService()],
+  /// the ORM first: the other providers use the database
+  providers: <DoxProvider>[ORMProvider()],
   logger: logger,
 );

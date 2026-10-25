@@ -163,11 +163,11 @@ class UserObserver extends ModelObserver<User> {
 }
 ```
 
-Add it in the `setup()` of a [service](../../digging-deeper/services.md).
+Add it in the `setup()` of a [provider](../../digging-deeper/providers.md).
 Observers live in memory, and each isolate has its own memory, so every isolate must add them.
 
-```dart title="lib/services/observer_service.dart"
-class ObserverService implements DoxService {
+```dart title="lib/providers/observer_provider.dart"
+class ObserverProvider extends DoxProvider {
   @override
   void setup() {
     Model.observe<User>(UserObserver(Mailer()));
@@ -175,7 +175,7 @@ class ObserverService implements DoxService {
 }
 ```
 
-Dox finds `ObserverService` by itself, like every `DoxService`. Run `dart run build_runner build` after you add it.
+Dox finds `ObserverProvider` by itself, like every `DoxProvider`. Run `dart run build_runner build` after you add it.
 
 - You can add more than one observer to a model.
 - `Model.forgetObservers<User>()` removes the observers of `User`. `Model.forgetObservers()` removes all.

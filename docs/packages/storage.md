@@ -10,7 +10,7 @@ This page shows how to save and read files with `dox_storage`.
 
 !!! tip "In a Dox app"
     `dox_storage` gives your app [`Storage()`](../digging-deeper/file-storage.md).
-    Set the disks in `config/storage.dart` (a `StorageConfig`), register a `StorageService`, and use `Storage()`.
+    Set the disks in `config/storage.dart` (a `StorageConfig`), register a `StorageProvider`, and use `Storage()`.
     `Storage().use('s3')` gives the `Disk` of this page. `Storage.route('files')` serves local signed URLs.
     This page is for the full `Disk` API and for using `dox_storage` outside Dox.
 

@@ -51,7 +51,7 @@ socket.emit('chat', 'hi', (answer) => console.log(answer)); // 'ok'
 
 ## In a Dox app: same port as HTTP
 
-`SocketIoService` serves Socket.IO at `/socket.io/` on the app port.
+`SocketIoProvider` serves Socket.IO at `/socket.io/` on the app port.
 
 Add `dox_socketio`, and `ioredis` for the Redis adapter:
 
@@ -91,14 +91,14 @@ Add a getter for the `SOCKETIO_ENABLED` key to `lib/config/env.dart`, then run `
   bool get socketioEnabled => false;
 ```
 
-Then add the service. Put it in `lib/`, so the generated container finds it:
+Then add the provider. Put it in `lib/`, so the generated container finds it:
 
-```dart title="lib/services/socketio_service.dart"
+```dart title="lib/providers/socketio_provider.dart"
 import 'package:dox_socketio/dox_socketio.dart';
 import 'package:my_app/config/socketio.dart';
 
-class AppSocketIoService extends SocketIoService {
-  AppSocketIoService() : super(socketIoConfig);
+class AppSocketIoProvider extends SocketIoProvider {
+  AppSocketIoProvider() : super(socketIoConfig);
 }
 ```
 
@@ -110,8 +110,8 @@ class AppSocketIoService extends SocketIoService {
 | `adapter` | `null` (in-memory) | makes one adapter in each isolate |
 
 - Requests to `/socket.io/` go to Socket.IO before the router. Middleware and body reading are skipped.
-- With no service, or with `enabled: false`, there is no extra work per request.
-- `SocketIoService.server` is the server of this isolate: `SocketIoService.server?.to('room').emit('news', data)`.
+- With no provider, or with `enabled: false`, there is no extra work per request.
+- `SocketIoProvider.server` is the server of this isolate: `SocketIoProvider.server?.to('room').emit('news', data)`.
 - Need a plain WebSocket with no Socket.IO protocol? `Route.websocket(path, handler)` in `dox_core` gives you the raw socket.
 
 !!! warning "Many isolates"

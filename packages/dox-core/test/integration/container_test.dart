@@ -62,8 +62,8 @@ void main() {
     (await client.post('/api/blogs')).expectStatus(404);
   });
 
-  test('container services run at start', () {
-    expect(Dox().ioc.get<SetupService>().ran, isTrue);
-    expect(Dox().doxServices.whereType<SetupService>().length, 1);
+  test('container providers run at start', () {
+    expect(Dox().ioc.get<SetupProvider>().ran, isTrue);
+    expect(Dox().doxProviders.whereType<SetupProvider>().length, 1);
   });
 }

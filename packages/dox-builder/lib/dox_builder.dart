@@ -33,7 +33,7 @@ Builder buildDoxDtos(BuilderOptions options) => const DoxDtoRegistryBuilder();
 Builder buildDoxOpenApi(BuilderOptions options) => const DoxOpenApiBuilder();
 
 /// Writes `lib/generated/container.g.dart`: the `@Inject()` classes, routers,
-/// services and model binders of the app.
+/// providers and model binders of the app.
 Builder buildDoxContainer(BuilderOptions options) {
   return const DoxContainerBuilder();
 }

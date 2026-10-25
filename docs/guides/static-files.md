@@ -10,7 +10,7 @@ Serve a folder of files, or a single page app (React, Vue, Flutter web), from th
 
 - A Dox app.
 - A `public` folder with the built front-end (`index.html`, `assets/...`).
-- The `dox_storage` package, with its service. See [File storage](../digging-deeper/file-storage.md#config).
+- The `dox_storage` package, with its provider. See [File storage](../digging-deeper/file-storage.md#config).
 
 ## Serve a folder: one line
 

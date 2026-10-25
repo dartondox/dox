@@ -123,21 +123,21 @@ class LoginUser {
 }
 ```
 
-## 4. Set up the auth service
+## 4. Set up the auth provider
 
-A service runs once in every isolate at start. This one tells `dox_auth` which model to use and how to sign tokens:
+A provider runs once in every isolate at start. This one tells `dox_auth` which model to use and how to sign tokens:
 
-```dart title="lib/services/auth_service.dart"
+```dart title="lib/providers/auth_provider.dart"
 import 'package:blog/app/models/user/user.model.dart';
 import 'package:blog/config/env.dart';
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 
-/// Auth service
+/// Auth provider
 /// --------------------------
 /// Sets up JWT login with the User model.
 /// Tokens are signed with APP_KEY and last 7 days.
-class AuthService implements DoxService {
+class AppAuthProvider extends DoxProvider {
   @override
   void setup() {
     Auth.initialize(
@@ -158,7 +158,7 @@ class AuthService implements DoxService {
 }
 ```
 
-Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
+Dox finds the provider by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
 You do not add it to a list.
 
 ## 5. Write the auth controller

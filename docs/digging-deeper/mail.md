@@ -67,23 +67,23 @@ MAIL_PASSWORD=secret
 | `from` | none | the from address of a message that has none |
 | `replyTo` | none | the reply-to addresses of a message that has none |
 
-### 2. Service
+### 2. Provider
 
-The service sets up the mailers in every isolate. Put it in `lib/` so the generated container finds it.
+The provider sets up the mailers in every isolate. Put it in `lib/` so the generated container finds it.
 
-```dart title="lib/services/mail_service.dart"
+```dart title="lib/providers/mail_provider.dart"
 import 'package:dox_mailer/dox_mailer.dart';
 
 import '../config/mail.dart';
 
-/// Sets up the mailers. Dox finds every DoxService class,
+/// Sets up the mailers. Dox finds every DoxProvider class,
 /// see lib/generated/container.g.dart.
-class AppMailService extends MailService {
-  AppMailService() : super(mailConfig);
+class AppMailProvider extends MailProvider {
+  AppMailProvider() : super(mailConfig);
 }
 ```
 
-When the server stops, the service closes open SMTP connections and HTTP clients.
+When the server stops, the provider closes open SMTP connections and HTTP clients.
 
 ## Send an email
 
@@ -388,7 +388,7 @@ void main() {
 }
 ```
 
-`Mail.fake()` works with or without a config. Call it after the app has started, because `MailService` sets up the config again at start.
+`Mail.fake()` works with or without a config. Call it after the app has started, because `MailProvider` sets up the config again at start.
 
 `mail.clear()` forgets the sent emails.
 

@@ -40,7 +40,7 @@ class AppConfig {
 
   /// Fills the container: `registerContainer` from
   /// `lib/generated/container.g.dart`. Every isolate runs it, so each one has its
-  /// own instances. It also gives the routers, services and model
+  /// own instances. It also gives the routers, providers and model
   /// binders that `dox_builder` found.
   final void Function(IocContainer c)? container;
   final CORSConfig cors;
@@ -55,10 +55,10 @@ class AppConfig {
   /// session settings for `SessionMiddleware`. Cookie driver by default.
   final SessionConfig session;
 
-  /// Services to run at start, in every isolate. You can leave it empty:
-  /// every class that implements `DoxService` is in
-  /// `lib/generated/container.g.dart`. A service listed here runs first.
-  final List<DoxService> services;
+  /// Providers to run at start, in every isolate. You can leave it empty:
+  /// every class that extends `DoxProvider` is in
+  /// `lib/generated/container.g.dart`. A provider listed here runs first.
+  final List<DoxProvider> providers;
 
   /// Max size in bytes of a JSON or urlencoded body. Bigger bodies get
   /// 413 Payload Too Large. Default 10 MB.
@@ -89,7 +89,7 @@ class AppConfig {
 
   /// On SIGTERM or SIGINT the server stops taking new connections, and
   /// waits this long for open requests to finish. Then it closes the rest,
-  /// runs `DoxShutdown` services and exits. Default 8 seconds. Keep it
+  /// runs `shutdown()` of every provider and exits. Default 8 seconds. Keep it
   /// below the kill timeout of your platform (docker stop: 10 seconds).
   final Duration shutdownTimeout;
 
@@ -100,7 +100,7 @@ class AppConfig {
 
     /// isolates (threads) that serve http. Default: one per CPU core.
     int? totalIsolate,
-    this.services = const <DoxService>[],
+    this.providers = const <DoxProvider>[],
     this.dtos = const <DtoSchema<Object>>[],
     this.validationMessages,
     this.globalMiddleware = const <dynamic>[],

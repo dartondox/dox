@@ -20,7 +20,7 @@ One page to keep open while you work. Each section links to its full page.
 | `lib/app/http/middleware/` | `<name>.middleware.dart` |
 | `lib/app/http/serializers/` | `<name>.serializer.dart` |
 | `lib/app/models/<name>/` | `<name>.model.dart` |
-| `lib/services/` | `DoxService` classes: ORM, auth, websocket |
+| `lib/providers/` | `DoxProvider` classes: ORM, auth, websocket |
 | `lib/generated/container.g.dart`, `lib/generated/dtos.g.dart`, `lib/generated/openapi.g.dart` | made by `build_runner`. Do not edit. |
 | `db/migration/` | migrations and `migrations.dart` (the registry) |
 
@@ -106,7 +106,7 @@ Dox().ioc.get<PostService>();
 Dox().ioc.override<PostRepository>(FakePostRepository()); // tests
 ```
 
-Routers and `DoxService` classes are found without `@Inject()`. Run `dart run build_runner build` after a change.
+Routers and `DoxProvider` classes are found without `@Inject()`. Run `dart run build_runner build` after a change.
 See [Dependency injection](../the-basic/dependency-injection.md).
 
 Middleware order: `globalMiddleware`, router `middleware`, group, route.
@@ -452,7 +452,7 @@ class ChatNamespace extends NamespaceHandler {
 }
 ```
 
-Turn it on with a `SocketIoService` (extend it in `lib/`). Many isolates need the Redis adapter and `transports: ['websocket']` on the client.
+Turn it on with a `SocketIoProvider` (extend it in `lib/`). Many isolates need the Redis adapter and `transports: ['websocket']` on the client.
 
 See [Socket.IO](../packages/socketio.md).
 

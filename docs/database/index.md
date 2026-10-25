@@ -89,11 +89,11 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 - `debug: true` prints each SQL query and its values.
 - `user`, `password`, `host` and `port` are not used by SQLite.
 
-Start the ORM in a service. Each isolate runs the service.
+Start the ORM in a provider. Each isolate runs the provider.
 Isolates with the same settings share one pool, so `maxConnectionCount` is for the whole process.
 
-```dart title="lib/services/orm_service.dart"
-class ORMService implements DoxService, DoxShutdown {
+```dart title="lib/providers/orm_provider.dart"
+class ORMProvider extends DoxProvider {
   @override
   Future<void> setup() async {
     SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);

@@ -1,7 +1,7 @@
 import 'package:dox_storage/dox_storage.dart';
 import 'package:my_app/config/env.dart';
 
-/// The disks of `Storage()`. `AppStorageService` uses them.
+/// The disks of `Storage()`. `AppStorageProvider` uses them.
 StorageConfig storageConfig = StorageConfig(
   defaultDisk: env.storageDisk,
   disks: <String, Map<String, dynamic>>{

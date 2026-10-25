@@ -6,7 +6,7 @@ import 'package:dox_core/router/route_data.dart';
 class IsolateSpawnParameter {
   final int isolateId;
   final AppConfig config;
-  final List<DoxService> services;
+  final List<DoxProvider> providers;
   final List<RouteData> routes;
 
   /// binders from `Route.bind`
@@ -19,7 +19,7 @@ class IsolateSpawnParameter {
   const IsolateSpawnParameter(
     this.isolateId,
     this.config,
-    this.services, {
+    this.providers, {
     this.routes = const <RouteData>[],
     this.bindings = const <String, RouteBinding>{},
     this.control,
