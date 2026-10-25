@@ -103,7 +103,7 @@ Dox reads values from two places:
 
 ```ini title=".env"
 APP_NAME=dox
-APP_KEY=change-me
+APP_KEY=3f9a1c7e5b2d4f6a8c0e1b3d5f7a9c2e
 DB_PORT=5432
 ```
 

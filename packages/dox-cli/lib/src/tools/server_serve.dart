@@ -99,8 +99,10 @@ Future<void> buildBuilder() async {
 ///
 /// output (a `dart build cli` bundle):
 ///   build/bundle/bin/server     native binary (no Dart SDK needed to run)
+///   build/bundle/bin/queue      queue worker, when bin/queue.dart exists
+///   build/bundle/bin/schedule   scheduler, when bin/schedule.dart exists
 ///   build/bundle/lib/           native libraries from build hooks (eg. SQLite)
-///   build/bundle/db/            migrations, read at start
+///   build/bundle/db/            migrations, read at start (no SQLite files)
 ///   build/bundle/.env.example   copy it to .env or set env vars
 ///
 /// `dart compile exe` can not build packages with build hooks (sqlite3 v3),
@@ -128,6 +130,25 @@ Future<void> buildServer() async {
       0) {
     exitCode = 1;
     return;
+  }
+
+  // the worker and the scheduler run as their own processes in production
+  for (String name in <String>['queue', 'schedule']) {
+    if (!File('bin/$name.dart').existsSync()) continue;
+    if (await _run('dart', <String>[
+          'build',
+          'cli',
+          '--target',
+          'bin/$name.dart',
+          '--output',
+          'build/$name',
+        ]) !=
+        0) {
+      exitCode = 1;
+      return;
+    }
+    File('build/$name/bundle/bin/$name').copySync('build/bundle/bin/$name');
+    Directory('build/$name').deleteSync(recursive: true);
   }
 
   Directory oldDb = Directory('build/bundle/db');
@@ -160,8 +181,15 @@ void _copyDir(Directory from, String to) {
     if (entity is Directory) {
       Directory(target).createSync(recursive: true);
     } else if (entity is File) {
+      // never ship the local SQLite database (dev data) in the bundle
+      if (isSqliteFile(entity.path)) continue;
       File(target).parent.createSync(recursive: true);
       entity.copySync(target);
     }
   }
+}
+
+/// `dox.sqlite`, `dox.sqlite-wal`, `dox.sqlite-shm`, `app.db`, ...
+bool isSqliteFile(String file) {
+  return RegExp(r'\.(sqlite3?|db)(-wal|-shm|-journal)?$').hasMatch(file);
 }

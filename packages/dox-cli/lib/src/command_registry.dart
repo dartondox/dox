@@ -276,6 +276,7 @@ class CommandRegistry {
       helpInfo: 'help [command]',
       description: 'Show help information',
       category: CommandCategory.system,
+      aliases: ['--help', '-h'],
       minArgs: 0,
       maxArgs: 1,
       function: (args) async {

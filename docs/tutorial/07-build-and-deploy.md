@@ -28,8 +28,10 @@ Generated: /.../blog/build/bundle/bin/server
 | Path | What it is |
 | --- | --- |
 | `bin/server` | the binary, about 10 MB. It needs no Dart SDK. |
+| `bin/queue` | the [queue worker](../digging-deeper/queue.md). Run it as its own process. |
+| `bin/schedule` | the [scheduler](../digging-deeper/scheduler.md). Run it as its own process. |
 | `lib/` | native libraries from build hooks, like `libsqlite3`. Keep it next to `bin/`. |
-| `db/` | your migrations |
+| `db/` | your migrations. Your local SQLite file is not copied. |
 
 ## 2. Run the binary
 
@@ -91,6 +93,13 @@ RUN dart run build_runner build --delete-conflicting-outputs
 # build hooks. Native libraries go to build/bundle/lib.
 RUN dart build cli --target bin/server.dart --output build
 
+# The queue worker and the scheduler are binaries too. They run as their
+# own processes: `/app/bin/queue work` and `/app/bin/schedule work`.
+RUN dart build cli --target bin/queue.dart --output build/queue \
+  && cp build/queue/bundle/bin/queue build/bundle/bin/ \
+  && dart build cli --target bin/schedule.dart --output build/schedule \
+  && cp build/schedule/bundle/bin/schedule build/bundle/bin/
+
 # Lay out the final file tree:
 # /app/bin/server, /app/lib (native libraries), /app/db/migration,
 # /app/storage and a writable /tmp (uploads bigger than 1 MB are
@@ -116,12 +125,13 @@ EXPOSE 3000
 CMD ["/app/bin/server"]
 ```
 
-Build and run it. The image has no `.env` file, so pass the config as environment variables:
+Build and run it. The image has no `.env` file, so pass the config as environment variables.
+`APP_KEY` must be 32 characters. The app does not start with a shorter key.
 
 ```bash
 docker build -t blog .
 docker run -p 3000:3000 \
-  -e APP_KEY=change-me \
+  -e APP_KEY=$(openssl rand -hex 16) \
   -e DB_CONNECTION=sqlite \
   -e DB_NAME=storage/blog.sqlite \
   blog
