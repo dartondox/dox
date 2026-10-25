@@ -196,7 +196,7 @@ A component is a template with its own props and slots. Use one for the page lay
 - The second argument is the props. In the component they are variables (`title`), and also `$props.title`.
 - `@slot('name') ... @end` fills a named slot. Everything else goes into `$slots.main`.
 - A slot is HTML, so `{{ }}` does not escape it again.
-- A component only sees its props, `$props`, `$slots` and the globals. It does not see the variables of the page.
+- A component only sees its props, `$props`, `$slots`, the globals and the request helpers of `view()` (see [Forms](#forms)). It does not see the variables of the page.
 
 `@!component(...)` is a component with no body and no `@end`.
 
@@ -240,6 +240,8 @@ With `SessionMiddleware`, `view()` adds these to every template:
 ```
 
 Every template from `view()` also has `request.path`, `request.method` and `request.query`.
+
+Components and layouts see all of these too, so a layout can use `request.path` and a form component can use `csrfField()`.
 
 ## Globals
 
