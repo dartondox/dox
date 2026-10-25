@@ -13,9 +13,8 @@ group_end="::endgroup::"
 if [ "${NO_LOG_GROUPS:-}" = 1 ]; then group_start="== "; group_end=""; fi
 
 # Test files run in parallel. These packages run one file at a time:
-# - dox-orm, dox-migration: the test files create and drop the same tables in one database.
 # - dox-cli: the tests change the working folder. It is shared by all files.
-serial=" dox-orm dox-migration dox-cli "
+serial=" dox-cli "
 
 for p in $TEST_PACKAGES; do
   echo "$group_start$p"

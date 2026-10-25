@@ -19,8 +19,6 @@ dependencies:
   dox_cache: ^3.0.0-alpha.11
   dox_http_native: ^3.0.0-alpha.8
   dox_openapi: ^3.0.0-alpha.11
-  dox_socketio: ^3.0.0-alpha.11
-  dox_storage: ^3.0.0-alpha.11
   dox_validation: ^3.0.0-alpha.11
 
 dev_dependencies:

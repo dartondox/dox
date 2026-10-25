@@ -24,8 +24,6 @@ jobs:
       code: ${{ steps.diff.outputs.code }}
       unit: ${{ steps.diff.outputs.unit }}
       unit_services: ${{ steps.diff.outputs.unit_services }}
-      databases: ${{ steps.diff.outputs.databases }}
-      databases_services: ${{ steps.diff.outputs.databases_services }}
       examples: ${{ steps.diff.outputs.examples }}
     steps:
       - uses: actions/checkout@v7
@@ -61,26 +59,22 @@ jobs:
   # The test entries are in ci/test-matrix.json. Each entry has:
   # - packages: folders under packages/ to run `dart test` in.
   # - vars: env vars for `dart test`.
-  # - services: containers to start (postgres, mariadb, mysql84, redis, minio).
-  # - group: the job that runs it, `unit` or `databases`.
+  # - services: containers to start (redis).
+  # - group: the job that runs it (`unit`).
   # - locks: what the entry can not share with another entry at the same
-  #   time, like one database. See ci/run-group.py.
-  # Notes on the entries:
-  # - The server is native (dox_http_native). Its build hook downloads a
-  #   ready-built library.
-  #   There is no dart:io server.
-  # - The Postgres and MySQL drivers are native (dox_postgres_native and
-  #   dox_mysql_native). Their build hooks download ready-built libraries.
-  #   There are no Dart drivers for them.
-  # - sqlite3 v3 bundles SQLite with a build hook. No system library needed.
-  # - The migration tests run on postgres, mysql and sqlite in one run.
+  #   time. See ci/run-group.py.
+  # The server is native (dox_http_native). Its build hook downloads a
+  # ready-built library. There is no dart:io server.
+  # The database packages (dox_orm, dox_migration) and their database tests
+  # live in dartondox/dox-orm. dox_socketio and dox_storage have their own
+  # repos too.
   #
-  # Few big jobs, not one job per entry: each job waits in the queue and
-  # pays about 30s of setup. In a job, ci/run-group.py runs the entries in
-  # parallel, each in its own copy of the repo, so they share no files.
-  # A group job is skipped when no entry of it is picked.
+  # One job, not one job per entry: each job waits in the queue and pays
+  # about 30s of setup. ci/run-group.py runs the entries in parallel, each
+  # in its own copy of the repo, so they share no files.
+  # The job is skipped when no entry is picked.
 
-  # Entries with no database. Redis is started when an entry needs it.
+  # Redis is started when an entry needs it.
   unit:
     needs: changes
     if: needs.changes.outputs.unit != '[]'
@@ -90,10 +84,6 @@ jobs:
       - name: Start services
         if: needs.changes.outputs.unit_services != ''
         run: ci/start-services.sh ${{ needs.changes.outputs.unit_services }}
-      # dox_socketio interop tests run the real socket.io-client in node
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
@@ -117,44 +107,19 @@ jobs:
           ENTRIES: ${{ needs.changes.outputs.unit }}
         run: ci/run-group.py
 
-  # Entries on postgres, mariadb, mysql 8.4 and minio. Each service starts
-  # once. Entries on other databases run at the same time. Entries on the
-  # same database run one after the other (their `locks`).
-  databases:
-    needs: changes
-    if: needs.changes.outputs.databases != '[]'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      # Start the containers first. They boot while the next steps run.
-      - name: Start services
-        run: ci/start-services.sh ${{ needs.changes.outputs.databases_services }}
-      - uses: dart-lang/setup-dart@v1
-        with:
-          sdk: stable
-      - uses: actions/cache@v6
-        with:
-          path: ~/.pub-cache
-          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
-          restore-keys: pub-${{ runner.os }}-
-      - run: dart pub get
-      - name: Wait for services
-        run: ci/wait-services.sh ${{ needs.changes.outputs.databases_services }}
-      - name: Run tests
-        env:
-          ENTRIES: ${{ needs.changes.outputs.databases }}
-        run: ci/run-group.py
-
   # The apps in examples/ hold the code of docs/tutorial and docs/guides.
   # They use the local packages (pubspec_overrides.yaml) and SQLite, so
   # they need no database service. A broken docs example fails CI.
   # One job runs the picked examples one after the other.
+  # dox_orm, dox_migration, dox_socketio and dox_storage come from clones
+  # of their repos (main) next to this one.
   examples:
     needs: changes
     if: needs.changes.outputs.examples != ''
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - run: ci/clone-siblings.sh
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
@@ -170,12 +135,15 @@ jobs:
   # migrate, `dox build`, then the AOT server answers its routes.
   # It catches a change that breaks apps, the template, dox_queue or
   # dox_scheduler. See ci/smoke-template.sh.
+  # dox_orm, dox_migration, dox_socketio and dox_storage come from clones
+  # of their repos (main) next to this one.
   template:
     needs: changes
     if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - run: ci/clone-siblings.sh
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
@@ -192,7 +160,7 @@ jobs:
   # and fails when any job above fails or is cancelled. Skipped jobs pass.
   test:
     if: always()
-    needs: [changes, lint, unit, databases, examples, template]
+    needs: [changes, lint, unit, examples, template]
     runs-on: ubuntu-latest
     steps:
       - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')

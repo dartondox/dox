@@ -35,6 +35,23 @@ Dox is a powerful framework specifically developed for web application backend d
 - **CORS**: Dox includes Cross-Origin Resource Sharing (CORS) support, allowing developers to control and manage cross-origin requests for enhanced security.
 - **CLI (Command-Line Interface)**: Dox provides a command-line interface with useful commands to streamline development tasks, such as creating migrations, generating models, and more.
 
+## Repos
+
+This repo holds `dox_core`, `dox_auth`, `dox_cli` and the other core packages.
+Some packages live in their own repos:
+
+| Package | Repo |
+| --- | --- |
+| `dox_orm`, `dox_migration`, `dox_query_builder` | [dartondox/dox-orm](https://github.com/dartondox/dox-orm) |
+| `dox_socketio` | [dartondox/dox-socketio](https://github.com/dartondox/dox-socketio) |
+| `dox_storage` | [dartondox/dox-storage](https://github.com/dartondox/dox-storage) |
+| `dox_queue` | [dartondox/dox-queue](https://github.com/dartondox/dox-queue) |
+| `dox_scheduler` | [dartondox/dox-scheduler](https://github.com/dartondox/dox-scheduler) |
+| `dox_inertia` | [dartondox/dox-inertia](https://github.com/dartondox/dox-inertia) |
+| `dox_http_native` | [dartondox/dox-http-native](https://github.com/dartondox/dox-http-native) |
+| `dox_postgres_native` | [dartondox/dox-postgres-native](https://github.com/dartondox/dox-postgres-native) |
+| `dox_mysql_native` | [dartondox/dox-mysql-native](https://github.com/dartondox/dox-mysql-native) |
+
 ## Documentation
 
 For detailed information about the framework and its functionalities, refer to the [Dox Documentation](https://dartondox.dev).

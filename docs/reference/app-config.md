@@ -46,9 +46,7 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `logger` | `LoggerConfig` | `LoggerConfig()` | The `Logger` output. See [LoggerConfig](#loggerconfig). |
 | `cache` | `CacheConfig` | `file` store in `storage/cache`, plus a `memory` store | Cache stores for `Cache()`. See [CacheConfig](#cacheconfig). |
 | `session` | `SessionConfig` | `cookie` driver, cookie `dox_session`, 2 hours | Settings for `SessionMiddleware`. See [Session](../the-basic/session.md#config). |
-| `storage` | `StorageConfig` | `local` disk with root `storage` | Storage disks for `Storage()`. See [StorageConfig](#storageconfig). |
 | `openApi` | `OpenApiConfig` | `OpenApiConfig()` | `/docs`, `/openapi.json` and `/openapi.yaml`. See [OpenApiConfig](#openapiconfig). |
-| `socketIo` | `SocketIoConfig` | `SocketIoConfig()` (off) | Socket.IO on the HTTP port. See [SocketIoConfig](#socketioconfig). |
 
 ## CORSConfig
 
@@ -105,7 +103,8 @@ Options of each driver:
 
 ## StorageConfig
 
-Source: `packages/dox-core/lib/storage/storage_config.dart`.
+`StorageService` of the `dox_storage` package takes it. See [File storage](../digging-deeper/file-storage.md).
+Source: `lib/src/dox/storage_config.dart` in [dartondox/dox-storage](https://github.com/dartondox/dox-storage).
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
@@ -162,16 +161,17 @@ Source: `packages/dox-core/lib/openapi/openapi_config.dart`.
 
 ## SocketIoConfig
 
-Source: `packages/dox-core/lib/socketio/socket_io_config.dart`.
+`SocketIoService` of the `dox_socketio` package takes it. See [Socket.IO](../packages/socketio.md).
+Source: `lib/src/dox/socket_io_config.dart` in [dartondox/dox-socketio](https://github.com/dartondox/dox-socketio).
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `enabled` | `bool` | `false` | Mount Socket.IO on the HTTP port at `/socket.io/`. |
+| `enabled` | `bool` | `true` | Mount Socket.IO on the HTTP port at `/socket.io/`. |
 | `options` | `ServerOptions` | `ServerOptions()` | Engine options. See below. |
 | `namespaces` | `List<NamespaceHandler>` | `[]` | Namespaces to register, like `ChatNamespace()`. |
 | `adapter` | `SocketAdapterFactory?` | `null` (in memory) | Makes the adapter in each isolate. Use a Redis adapter with many isolates. |
 
-`ServerOptions` (`packages/dox-socketio/lib/src/engine/server_options.dart`). The defaults match the Node.js server.
+`ServerOptions` (`lib/src/engine/server_options.dart` in dox-socketio). The defaults match the Node.js server.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
@@ -198,7 +198,7 @@ Source: `packages/dox-core/lib/socketio/socket_io_config.dart`.
 ## DatabaseConfig
 
 The database is not a field of `AppConfig`. A service calls `SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig)` in its `setup()`.
-Source: `packages/dox-orm/lib/src/types/database_config.dart` and `connection_config.dart`.
+Source: `packages/dox-orm/lib/src/types/database_config.dart` and `connection_config.dart` in [dartondox/dox-orm](https://github.com/dartondox/dox-orm).
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
@@ -262,7 +262,6 @@ import 'package:dox_core/dox_core.dart';
 import 'package:my_app/config/cache.dart';
 import 'package:my_app/config/cors.dart';
 import 'package:my_app/config/logger.dart';
-import 'package:my_app/config/storage.dart';
 import 'package:my_app/config/env.dart';
 import 'package:my_app/generated/container.g.dart';
 
@@ -276,7 +275,6 @@ AppConfig appConfig = AppConfig(
   ],
   container: registerContainer,
   cache: cache,
-  storage: storage,
   cors: cors,
   logger: logger,
 );
@@ -293,18 +291,6 @@ CacheConfig cache = CacheConfig(
 
     /// one map per isolate, fast, not shared
     'memory': <String, dynamic>{'driver': 'memory', 'max_size': 10000},
-  },
-);
-```
-
-```dart title="lib/config/storage.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:my_app/config/env.dart';
-
-StorageConfig storage = StorageConfig(
-  defaultDisk: env.storageDisk,
-  disks: <String, Map<String, dynamic>>{
-    'local': <String, dynamic>{'driver': 'local', 'root': 'storage'},
   },
 );
 ```

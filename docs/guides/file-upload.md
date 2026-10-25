@@ -13,17 +13,23 @@ Accept an image from a form, check its size and type, save it to a disk, and ret
 
 ## 1. Set up the disk
 
+`Storage()` is in the `dox_storage` package. Add it:
+
+```bash
+dart pub add dox_storage
+```
+
 Give the `local` disk a `url`. `Storage().url()` uses it to build the public URL of a file.
 
 ```dart title="lib/config/storage.dart"
-import 'package:dox_core/dox_core.dart';
+import 'package:dox_storage/dox_storage.dart';
 import 'package:my_app/config/env.dart';
 
-StorageConfig storage = StorageConfig(
+StorageConfig storageConfig = StorageConfig(
   defaultDisk: env.storageDisk,
   disks: <String, Map<String, dynamic>>{
     /// uploads go to the `storage` folder.
-    /// `url` is the public address of `Route.files('files', ...)`.
+    /// `url` is the public address of `Storage.route('files', ...)`.
     'local': <String, dynamic>{
       'driver': 'local',
       'root': 'storage',
@@ -42,6 +48,17 @@ StorageConfig storage = StorageConfig(
 
 Run `dart run build_runner build` to update `env.g.dart`.
 Then add `APP_URL=http://localhost:3000` to your `.env`.
+
+Add the service. It sets the disks in every isolate. The generated container finds it:
+
+```dart title="lib/services/storage_service.dart"
+import 'package:dox_storage/dox_storage.dart';
+import 'package:my_app/config/storage.dart';
+
+class AppStorageService extends StorageService {
+  AppStorageService() : super(storageConfig);
+}
+```
 
 ## 2. Write the DTO
 
@@ -74,6 +91,7 @@ For other file types, use `@Mimes(<String>['pdf', 'docx'])` in place of `@Image(
 
 ```dart title="lib/app/http/controllers/upload.controller.dart"
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_storage/dox_storage.dart';
 import 'package:my_app/app/http/dtos/upload_image.dto.dart';
 
 @Inject()
@@ -95,7 +113,7 @@ class UploadController {
 
 ## 4. Add the routes
 
-One route takes the upload. `Route.files` serves the saved files at `GET /files/{key*}`.
+One route takes the upload. `Storage.route` serves the saved files at `GET /files/{key*}`.
 
 ```dart title="lib/routes/api.dart"
 import 'package:dox_core/dox_core.dart';
@@ -117,6 +135,7 @@ class ApiRouter extends Router {
 
 ```dart title="lib/routes/web.dart"
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_storage/dox_storage.dart';
 
 class WebRouter extends Router {
   @override
@@ -125,7 +144,7 @@ class WebRouter extends Router {
   @override
   void register() {
     // GET /files/{key*}, any file of the default disk
-    Route.files('files', signed: false);
+    Storage.route('files', signed: false);
   }
 }
 ```

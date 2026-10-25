@@ -8,10 +8,10 @@ This page shows how to save and read files with `dox_storage`.
 
 `dox_storage` gives one API for files in many places: local disk, AWS S3 and S3-compatible services.
 
-!!! tip "Built into Dox"
-    `dox_core` uses `dox_storage` for [`Storage()`](../digging-deeper/file-storage.md).
-    In a Dox app, set the disks in `config/storage.dart` (a `StorageConfig`), and use `Storage()`.
-    `Storage().use('s3')` gives the `Disk` of this page. `Route.files('files')` serves local signed URLs.
+!!! tip "In a Dox app"
+    `dox_storage` gives your app [`Storage()`](../digging-deeper/file-storage.md).
+    Set the disks in `config/storage.dart` (a `StorageConfig`), register a `StorageService`, and use `Storage()`.
+    `Storage().use('s3')` gives the `Disk` of this page. `Storage.route('files')` serves local signed URLs.
     This page is for the full `Disk` API and for using `dox_storage` outside Dox.
 
 ## Install
@@ -126,7 +126,7 @@ String upload = await disk.getSignedUploadUrl('avatars/2.png',
 
 ### Check a local signed URL
 
-In a Dox app, `Route.files('files')` does this for you.
+In a Dox app, `Storage.route('files')` does this for you.
 
 `LocalDriver.getSignedUrl` returns `<urlBase>/<key>?expires=...&signature=...`.
 Check it in the route that serves the file:

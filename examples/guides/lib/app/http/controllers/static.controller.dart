@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_storage/dox_storage.dart';
 
 @Inject()
 class StaticController {

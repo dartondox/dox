@@ -16,8 +16,6 @@ export 'package:dox_openapi/dox_openapi.dart'
         ScalarTheme,
         SecurityScheme,
         Server;
-export 'package:dox_storage/dox_storage.dart'
-    show Disk, DriveManager, FileNotFoundException, StorageException;
 export 'package:dox_validation/dox_validation.dart' hide ValidationException;
 
 export 'app.dart';
@@ -47,6 +45,7 @@ export 'http/request/request_file.dart';
 export 'http/response/dox_cookie.dart';
 export 'http/response/dox_response.dart';
 export 'http/response/serializer.dart';
+export 'http/response/stream_file.dart';
 
 /// interfaces
 export 'interfaces/app_config.dart';
@@ -55,10 +54,9 @@ export 'interfaces/next_middleware.dart';
 export 'interfaces/response_handler_interface.dart';
 export 'interfaces/router.dart';
 
-/// OpenAPI and Socket.IO
+/// OpenAPI
 export 'openapi/openapi_config.dart';
 export 'openapi/openapi_document.dart';
-export 'socketio/socket_io_config.dart';
 
 /// Tools
 export 'ioc/ioc_container.dart';
@@ -74,10 +72,6 @@ export 'router/route.dart';
 export 'session/session.dart';
 export 'session/session_config.dart';
 export 'session/session_middleware.dart';
-
-/// storage
-export 'storage/storage.dart';
-export 'storage/storage_config.dart';
 
 /// Validation
 export 'validation/request_validator.dart';

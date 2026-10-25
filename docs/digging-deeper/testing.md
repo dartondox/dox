@@ -138,7 +138,7 @@ A new `CacheManager` in `setUp` gives each test an empty cache. See [Cache](cach
 
 ## Test file storage
 
-`Dox().storage.fake(name)` swaps one disk with an empty memory disk. `restore(name)` puts the real disk back.
+`Storage.manager.fake(name)` (from `dox_storage`) swaps one disk with an empty memory disk. `restore(name)` puts the real disk back.
 
 ```dart
 setUpAll(() {
@@ -146,18 +146,18 @@ setUpAll(() {
 });
 
 test('saves the report', () async {
-  Disk fake = Dox().storage.fake('s3');
+  Disk fake = Storage.manager.fake('s3');
 
   String path = await Storage()
       .disk('s3')
       .put('reports', <int>[1, 2, 3], extension: 'pdf'); // '/reports/<uuid>.pdf'
 
   expect(await fake.exists(path.substring(1)), isTrue);
-  Dox().storage.restore('s3');
+  Storage.manager.restore('s3');
 });
 ```
 
-- Call `Dox().initialize()` first. The storage disks are made from `appConfig`.
+- Call `Dox().initialize()` first. Without the `StorageService` running, `Storage.manager` has only the `local` disk. Start the app, or set the disks yourself: `Storage.manager = StorageDiskFactory().create(storageConfig);`.
 - `Storage()` paths start with `/`. A `Disk` key does not, so remove the first `/` when you ask the `Disk` directly.
 
 See [File Storage](file-storage.md).

@@ -80,7 +80,7 @@ class ApiRouter extends Router {
 | `Route.middleware(<dynamic>[M()], () { ... })` | middleware for a group |
 | `Route.domain('api.app.com', () { ... })` | match by `Host` |
 | `Route.resource('blogs', BlogController)` | `index`, `create`, `store`, `show`, `edit`, `update`, `destroy` |
-| `Route.files('files')` | serve a storage disk, signed URLs only |
+| `Storage.route('files')` | serve a storage disk, signed URLs only (`dox_storage`) |
 | `Route.enabledCors(() { ... })` / `Route.disabledCors(...)` | CORS for some routes |
 | `Route.websocket('echo', (WebSocket s, DoxRequest req) { ... })` | a raw WebSocket. For rooms and acks, use Socket.IO. |
 
@@ -151,7 +151,7 @@ Files:
 ```dart
 RequestFile file = req.input('avatar');
 file.filename; file.extension; file.length;   // bytes
-String path = await file.store('avatars');    // save before you return
+String path = await file.store('avatars');    // save before you return (dox_storage)
 ```
 
 See [Request](../the-basic/request.md) and [Request and response](request-and-response.md).
@@ -452,7 +452,7 @@ class ChatNamespace extends NamespaceHandler {
 }
 ```
 
-Turn it on with `SocketIoConfig` in `AppConfig`. Many isolates need the Redis adapter and `transports: ['websocket']` on the client.
+Turn it on with a `SocketIoService` (extend it in `lib/`). Many isolates need the Redis adapter and `transports: ['websocket']` on the client.
 
 See [Socket.IO](../packages/socketio.md).
 
@@ -489,7 +489,7 @@ test('ping', () async {
 | Fake | Code |
 | --- | --- |
 | cache | `Dox().cache = CacheManager(CacheConfig(defaultStore: 'memory', stores: {...}))` |
-| storage | `Disk fake = Dox().storage.fake('s3');` then `Dox().storage.restore('s3')` |
+| storage | `Disk fake = Storage.manager.fake('s3');` then `Storage.manager.restore('s3')` |
 | env | `AppEnv.load(EnvReader(environment: {...}, dotEnv: {...}))` |
 | DTO | `await CreateBlog.schema.safeValidateMap(<String, dynamic>{...})` |
 

@@ -10,13 +10,14 @@ Serve a folder of files, or a single page app (React, Vue, Flutter web), from th
 
 - A Dox app.
 - A `public` folder with the built front-end (`index.html`, `assets/...`).
+- The `dox_storage` package, with its service. See [File storage](../digging-deeper/file-storage.md#config).
 
 ## Serve a folder: one line
 
-`Route.files` serves every file of a storage disk. Make a disk for the folder, and add the route.
+`Storage.route` serves every file of a storage disk. Make a disk for the folder, and add the route.
 
 ```dart title="lib/config/storage.dart"
-StorageConfig storage = StorageConfig(
+StorageConfig storageConfig = StorageConfig(
   defaultDisk: 'local',
   disks: <String, Map<String, dynamic>>{
     'local': <String, dynamic>{'driver': 'local', 'root': 'storage'},
@@ -28,7 +29,7 @@ StorageConfig storage = StorageConfig(
 ```
 
 ```dart title="lib/routes/web.dart"
-Route.files('static', disk: 'public', signed: false); // GET /static/{key*}
+Storage.route('static', disk: 'public', signed: false); // GET /static/{key*}
 ```
 
 `GET /static/app.js` sends `public/app.js`, streamed, with the right `Content-Type`. A missing file answers `404`.
@@ -49,6 +50,7 @@ An SPA needs two things:
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_storage/dox_storage.dart';
 
 @Inject()
 class StaticController {
@@ -118,7 +120,7 @@ npm run build && cp -r dist/. public/
 flutter build web && cp -r build/web/. public/
 ```
 
-Vite puts the files in `assets/`. Flutter web puts them next to `index.html`. For Flutter, change the asset route to match, or serve everything with `Route.files` and give `index.html` the catch-all.
+Vite puts the files in `assets/`. Flutter web puts them next to `index.html`. For Flutter, change the asset route to match, or serve everything with `Storage.route` and give `index.html` the catch-all.
 
 ## Check it
 

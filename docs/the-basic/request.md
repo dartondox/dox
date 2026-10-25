@@ -87,6 +87,8 @@ class ApiController {
 }
 ```
 
+`store()` comes from the [`dox_storage`](../packages/storage.md) package. Add it and import `package:dox_storage/dox_storage.dart`.
+
 Without a DTO, `req.input('image')` gives the `RequestFile`. It is not checked.
 
 ### `RequestFile`
@@ -100,7 +102,7 @@ file.extension;       // mp4
 file.length;          // size in bytes
 await file.size;      // size in KB
 file.stream();        // read it in chunks
-await file.store('videos');              // save to storage. returns the path
+await file.store('videos');              // save to storage (needs dox_storage). returns the path
 await file.moveTo('/data/videos/1.mp4'); // move it. returns the new File
 await file.bytes;     // the whole file in memory. avoid for big files
 ```

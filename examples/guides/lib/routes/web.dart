@@ -1,6 +1,7 @@
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/http/controllers/static.controller.dart';
 import 'package:dox_orm/dox_orm.dart';
+import 'package:dox_storage/dox_storage.dart';
 
 class WebRouter extends Router {
   @override
@@ -17,10 +18,10 @@ class WebRouter extends Router {
     );
 
     // uploads: GET /files/{key*}, any file of the default disk
-    Route.files('files', signed: false);
+    Storage.route('files', signed: false);
 
     // static files guide, "serve a folder": GET /static/{key*}
-    Route.files('static', disk: 'public', signed: false);
+    Storage.route('static', disk: 'public', signed: false);
 
     // the SPA: assets with a long cache, every other URL gets index.html
     Route.get('/assets/{path*}', (StaticController c) => c.asset);

@@ -95,7 +95,8 @@ void main() {
       Route.post('/store', (DoxRequest req) async {
         RequestFile file = req.input('file');
         String temp = file.file!.path;
-        String saved = await file.store('stream-test');
+        String saved = '/stream-test/upload.bin';
+        await file.moveTo('${Directory.current.path}/storage$saved');
         return <String, dynamic>{
           'saved': saved,
           'temp_exists': File(temp).existsSync(),
@@ -217,7 +218,7 @@ void main() {
       expect(temp.existsSync(), false);
     });
 
-    test('store() moves the temp file and bytes still work', () async {
+    test('moveTo() moves the temp file and bytes still work', () async {
       int size = 2 * 1024 * 1024;
       (int, String) res = await send(
         '/store',

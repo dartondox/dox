@@ -6,9 +6,15 @@ icon: lucide/hard-drive
 
 `Storage()` saves and reads files on a disk: the local folder, AWS S3 (and R2, MinIO, Spaces), or memory.
 
-It runs on [`dox_storage`](../packages/storage.md), which is built into `dox_core`.
+It is in the [`dox_storage`](../packages/storage.md) package. Add it to your app:
+
+```bash
+dart pub add dox_storage
+```
 
 ```dart
+import 'package:dox_storage/dox_storage.dart';
+
 Route.post('/avatar', (DoxRequest req) async {
   RequestFile file = req.input('avatar');
   String path = await Storage().putRequestFile('avatars', file);
@@ -18,14 +24,14 @@ Route.post('/avatar', (DoxRequest req) async {
 
 ## Config
 
-Without a config, Dox has one disk: `local`, in the `storage` folder.
+Without a config, `Storage()` has one disk: `local`, in the `storage` folder.
 To add disks, make `lib/config/storage.dart`:
 
 ```dart title="lib/config/storage.dart"
-import 'package:dox_core/dox_core.dart';
+import 'package:dox_storage/dox_storage.dart';
 import 'package:my_app/config/env.dart';
 
-StorageConfig storage = StorageConfig(
+StorageConfig storageConfig = StorageConfig(
   defaultDisk: env.storageDisk,
   disks: <String, Map<String, dynamic>>{
     'local': <String, dynamic>{
@@ -63,7 +69,16 @@ so the app starts without them:
   String? get awsEndpoint;
 ```
 
-Then pass it to `AppConfig(storage: storage)` in `lib/config/app.dart`.
+Then add the service. It sets the disks in every isolate. Put it in `lib/`, so the generated container finds it:
+
+```dart title="lib/services/storage_service.dart"
+import 'package:dox_storage/dox_storage.dart';
+import 'package:my_app/config/storage.dart';
+
+class AppStorageService extends StorageService {
+  AppStorageService() : super(storageConfig);
+}
+```
 
 | Driver | Options |
 | --- | --- |
@@ -119,10 +134,10 @@ A big file is never loaded into memory. A missing file answers `404`.
 
 ```dart
 // lib/routes/web.dart
-Route.files('files');                    // GET /files/{key*}, signed URLs only
-Route.files('public', signed: false);    // any file of the disk
-Route.files('docs', disk: 'memory');     // another disk than the default
-Route.files('uploads', download: true);  // every file is a download
+Storage.route('files');                    // GET /files/{key*}, signed URLs only
+Storage.route('public', signed: false);    // any file of the disk
+Storage.route('docs', disk: 'memory');     // another disk than the default
+Storage.route('uploads', download: true);  // every file is a download
 ```
 
 An html, svg, xml or javascript file is always sent as a download in a sandbox, so its script does not run on your site.
@@ -144,6 +159,6 @@ To swap a disk with a memory disk in tests, see [Testing](testing.md#test-file-s
 Implement `DriverContract` from `package:dox_storage/dox_storage.dart`. Register it in a [service](services.md), so every isolate has it:
 
 ```dart
-Dox().storage.register('dropbox', DropboxDriver());
+Storage.manager.register('dropbox', DropboxDriver());
 await Storage().disk('dropbox').put('notes', bytes, extension: 'txt');
 ```

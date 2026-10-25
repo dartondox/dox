@@ -2,12 +2,5 @@
   {"name": "core", "packages": "dox-core", "group": "unit"},
   {"name": "builder, cli", "packages": "dox-builder dox-cli", "group": "unit"},
   {"name": "small packages", "packages": "dox-annotation dox-auth dox-openapi dox-validation", "group": "unit"},
-  {"name": "redis (cache, socketio)", "packages": "dox-cache dox-socketio", "services": "redis", "group": "unit"},
-  {"name": "storage (minio)", "packages": "dox-storage", "services": "minio", "group": "databases", "locks": "minio"},
-  {"name": "orm (postgres)", "packages": "dox-orm", "vars": "DRIVER=postgres DB_PORT=5432", "services": "postgres", "group": "databases", "locks": "postgres"},
-  {"name": "orm (mariadb)", "packages": "dox-orm", "vars": "DRIVER=mysql DB_USER=dox DB_PORT=3306", "services": "mariadb", "group": "databases", "locks": "mariadb"},
-  {"name": "orm (mysql 8.4)", "packages": "dox-orm", "vars": "DRIVER=mysql DB_USER=dox DB_PORT=3307", "services": "mysql84", "group": "databases", "locks": "mysql84"},
-  {"name": "orm (sqlite)", "packages": "dox-orm", "vars": "DRIVER=sqlite", "group": "unit"},
-  {"name": "migration (mariadb)", "packages": "dox-migration", "services": "postgres mariadb", "group": "databases", "locks": "postgres mariadb"},
-  {"name": "migration (mysql 8.4)", "packages": "dox-migration", "vars": "MYSQL_PORT=3307", "services": "postgres mysql84", "group": "databases", "locks": "postgres mysql84"}
+  {"name": "redis (cache)", "packages": "dox-cache", "services": "redis", "group": "unit"}
 ]

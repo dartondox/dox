@@ -1,11 +1,12 @@
-import 'package:dox_core/dox_core.dart';
+import 'package:dox_storage/dox_storage.dart';
 import 'package:my_app/config/env.dart';
 
-StorageConfig storage = StorageConfig(
+/// The disks of `Storage()`. `AppStorageService` uses them.
+StorageConfig storageConfig = StorageConfig(
   defaultDisk: env.storageDisk,
   disks: <String, Map<String, dynamic>>{
     /// uploads go to the `storage` folder.
-    /// `url` is the public address of `Route.files('files', ...)`.
+    /// `url` is the public address of `Storage.route('files', ...)`.
     'local': <String, dynamic>{
       'driver': 'local',
       'root': 'storage',
