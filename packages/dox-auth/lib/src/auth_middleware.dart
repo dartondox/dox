@@ -2,7 +2,7 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:dox_auth/dox_auth.dart';
-import 'package:dox_orm/dox_orm.dart';
+import 'package:dox_core/dox_core.dart';
 
 const String AUTH_REQUEST_KEY = 'dox_authentication_instance';
 
@@ -14,10 +14,14 @@ class AuthMiddleware implements IDoxMiddleware {
   /// ```
   final String? guard;
 
-  AuthMiddleware({this.guard});
+  /// Send a guest to this page (like `/login`) instead of a 401.
+  /// For web pages. null gives the 401.
+  final String? redirectTo;
+
+  AuthMiddleware({this.guard, this.redirectTo});
 
   @override
-  Future<IDoxRequest> handle(IDoxRequest req) async {
+  Future<dynamic> handle(IDoxRequest req) async {
     Auth auth = Auth(guard: guard);
 
     // verify token from header and get user data from database
@@ -28,6 +32,8 @@ class AuthMiddleware implements IDoxMiddleware {
       req.merge(<String, dynamic>{AUTH_REQUEST_KEY: auth});
       return req;
     }
+    String? page = redirectTo;
+    if (page != null) return redirect(page);
     throw UnAuthorizedException();
   }
 }

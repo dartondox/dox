@@ -114,6 +114,8 @@ req.session.invalidate();
 
 Always call `regenerate()` after login. Then an id that someone saw before the login is of no use.
 
+`dox_auth` does this for you. See [Session login](../security/authentication.md#session-login-for-web-pages).
+
 ## Config
 
 Set `session` in the app config. All options have a default.

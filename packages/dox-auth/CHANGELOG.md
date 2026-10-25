@@ -1,3 +1,9 @@
+## Unreleased
+
+- New: `SessionAuthDriver` keeps the login in the session, for web pages. Use `Auth().attemptSession(req, credentials)`, `Auth().loginSession(req, user)` and `Auth().logout(req)`. Login and logout give the session a new id. Needs `SessionMiddleware`.
+- New: `AuthMiddleware(redirectTo: '/login')` sends a guest to that page instead of a 401.
+- Change: the password check of `attempt` moved to `AuthDriver.checkCredentials`, so all drivers share it.
+
 ## 3.0.0-alpha.11
 
 - Version bump only, to match the other packages.
