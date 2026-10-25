@@ -1,6 +1,6 @@
 name: dox_validation
 description: Typed input for Dart. DTO classes with generated checks, fluent schemas like Zod, JSON Schema export and the Standard Schema interface.
-version: 3.0.0-alpha.14
+version: 3.0.0-alpha.15
 repository: https://github.com/dartondox/dox
 homepage: https://dartondox.dev
 

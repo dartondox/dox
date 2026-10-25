@@ -1,3 +1,7 @@
+## 3.0.0-alpha.15
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.14
 
 - New: `OpenApiSecurity` and `OpenApiRegistry.security`: login schemes by middleware class name, from `@Security`.
