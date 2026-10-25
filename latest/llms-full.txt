@@ -19492,6 +19492,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
+### 3.0.0-alpha.13
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.12
 
 - Version bump only, to match the other packages.
@@ -19551,6 +19555,10 @@ What changed in each package, newest first. This page is made from the
 - See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
 
 ## dox_auth
+
+### 3.0.0-alpha.13
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.12
 
@@ -19620,6 +19628,10 @@ What changed in each package, newest first. This page is made from the
 - `dart_jsonwebtoken` 3.
 
 ## dox_builder
+
+### 3.0.0-alpha.13
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.12
 
@@ -19697,6 +19709,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### 3.0.0-alpha.13
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.12
 
 - Version bump only, to match the other packages.
@@ -19761,6 +19777,10 @@ What changed in each package, newest first. This page is made from the
 - `remember`, `pull`, `add`, `increment`, `many`, tags and atomic locks.
 
 ## dox
+
+### 3.0.0-alpha.13
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.12
 
@@ -19840,7 +19860,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_core
 
-### Unreleased
+### 3.0.0-alpha.13
 
 - New: `OpenApiConfig(include: ['/api/*'], exclude: ['/api/internal/*'])` picks which routes go in the OpenAPI docs by path. A `*` at the end matches the rest of the path.
 
@@ -20028,6 +20048,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_openapi
 
+### 3.0.0-alpha.13
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.12
 
 - Fix: two controllers with the same method name (like `login`) could swap their docs. `OpenApiRegistry.find` now takes `controller:`. When the route knows its controller class, only methods of that class match.
@@ -20091,6 +20115,10 @@ What changed in each package, newest first. This page is made from the
 - Output as JSON and YAML, write files, serve `/openapi.json`, `/openapi.yaml` and `/docs`.
 
 ## dox_validation
+
+### 3.0.0-alpha.13
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.12
 
