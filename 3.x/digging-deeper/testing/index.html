@@ -2535,7 +2535,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../services/" class="md-nav__link">
+      <a href="../providers/" class="md-nav__link">
         
   
   
@@ -2558,7 +2558,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6369,10 +6369,10 @@
 </span><span id="__span-2-28"><a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="p">}</span>
 </span></code></pre></div>
 <ul>
-<li><code>DoxTestClient.start(appConfig)</code> runs your services (like the ORM service) and adds your routes, the same as a real start.</li>
+<li><code>DoxTestClient.start(appConfig)</code> runs your providers (like the ORM provider) and adds your routes, the same as a real start.</li>
 <li>It listens on <code>127.0.0.1</code> and a free port that the OS picks. So it does not clash with <code>dox serve</code>, and many test files can run at the same time.</li>
 <li>It runs on one isolate. <code>serverPort</code> and <code>totalIsolate</code> of the config are not used.</li>
-<li><code>client.close()</code> stops the server and runs the <code>DoxShutdown</code> services (for example, it closes the database).</li>
+<li><code>client.close()</code> stops the server and runs <code>shutdown()</code> of every provider (for example, it closes the database).</li>
 <li>With one isolate, you can also add a route inside a test with <code>Route.get(...)</code>. It works right away.</li>
 </ul>
 <h3 id="send-requests">Send requests</h3>
@@ -6551,7 +6551,7 @@ Redirects are not followed, so you can check a <code>302</code> and its <code>Lo
 </span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="p">});</span>
 </span></code></pre></div>
 <ul>
-<li>Call <code>Dox().initialize()</code> first. Without the <code>StorageService</code> running, <code>Storage.manager</code> has only the <code>local</code> disk. Start the app, or set the disks yourself: <code>Storage.manager = StorageDiskFactory().create(storageConfig);</code>.</li>
+<li>Call <code>Dox().initialize()</code> first. Without the <code>StorageProvider</code> running, <code>Storage.manager</code> has only the <code>local</code> disk. Start the app, or set the disks yourself: <code>Storage.manager = StorageDiskFactory().create(storageConfig);</code>.</li>
 <li><code>Storage()</code> paths start with <code>/</code>. A <code>Disk</code> key does not, so remove the first <code>/</code> when you ask the <code>Disk</code> directly.</li>
 </ul>
 <p>See <a href="../file-storage/">File Storage</a>.</p>
@@ -6599,7 +6599,7 @@ Then empty the tables before each test with <code>refreshDatabase()</code> from 
 </span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="w">      </span><span class="nl">migrations:</span><span class="w"> </span><span class="n">migrations</span><span class="p">,</span>
 </span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="w">      </span><span class="nl">config:</span><span class="w"> </span><span class="n">databaseConfig</span><span class="p">.</span><span class="n">getConnectionConfig</span><span class="p">(),</span>
 </span><span id="__span-10-17"><a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="w">    </span><span class="p">).</span><span class="n">migrate</span><span class="p">();</span>
-</span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="w">    </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">DoxTestClient</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="n">appConfig</span><span class="p">);</span><span class="w"> </span><span class="c1">// runs the ORM service</span>
+</span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="w">    </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">DoxTestClient</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="n">appConfig</span><span class="p">);</span><span class="w"> </span><span class="c1">// runs the ORM provider</span>
 </span><span id="__span-10-19"><a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="w">  </span><span class="p">});</span>
 </span><span id="__span-10-20"><a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>
 </span><span id="__span-10-21"><a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="w">  </span><span class="c1">// every test starts with empty tables</span>

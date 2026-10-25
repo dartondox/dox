@@ -2532,7 +2532,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../digging-deeper/services/" class="md-nav__link">
+      <a href="../../digging-deeper/providers/" class="md-nav__link">
         
   
   
@@ -2555,7 +2555,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6533,7 +6533,7 @@
 </tr>
 <tr>
 <td>Graceful shutdown</td>
-<td>On <code>SIGTERM</code> or <code>SIGINT</code>, Dox stops taking connections and lets open requests finish, in every isolate. Set <code>shutdownTimeout</code> below the kill timeout of your platform. The <code>ORMService</code> closes the database in its <code>DoxShutdown</code> hook, and Dox closes the cache stores. Close your own connections in a <code>DoxShutdown</code> service.</td>
+<td>On <code>SIGTERM</code> or <code>SIGINT</code>, Dox stops taking connections and lets open requests finish, in every isolate. Set <code>shutdownTimeout</code> below the kill timeout of your platform. The <code>ORMProvider</code> closes the database in its <code>shutdown()</code>, and Dox closes the cache stores. Close your own connections in the <code>shutdown()</code> of a provider.</td>
 <td><a href="../../digging-deeper/deployment/#graceful-shutdown">Deployment</a></td>
 </tr>
 <tr>

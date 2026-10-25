@@ -2532,7 +2532,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../digging-deeper/services/" class="md-nav__link">
+      <a href="../../digging-deeper/providers/" class="md-nav__link">
         
   
   
@@ -2555,7 +2555,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6309,7 +6309,7 @@
 </tr>
 <tr>
 <td>work every N minutes (cleanup, sync)</td>
-<td><code>Timer.periodic</code> in a service</td>
+<td><code>Timer.periodic</code> in a provider</td>
 <td>one isolate of your choice</td>
 </tr>
 </tbody>
@@ -6350,7 +6350,7 @@ An error in the future goes to the <code>report</code> method of the <code>Excep
 </span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="p">}</span>
 </span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>
 </span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="c1">/// Must be a top level or static function with plain arguments.</span>
-</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="c1">/// The new isolate has no Dox, no database and no services.</span>
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="c1">/// The new isolate has no Dox, no database and no providers.</span>
 </span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="kt">int</span><span class="w"> </span><span class="n">countPrimes</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">limit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sieve</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="p">.</span><span class="n">filled</span><span class="p">(</span><span class="n">limit</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
 </span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">;</span>
@@ -6376,15 +6376,15 @@ Pass plain data in (an <code>int</code>, a <code>String</code>, bytes) and get p
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">unawaited</span><span class="p">(</span><span class="n">Isolate</span><span class="p">.</span><span class="n">run</span><span class="p">(()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">countPrimes</span><span class="p">(</span><span class="n">limit</span><span class="p">)).</span><span class="n">then</span><span class="p">(</span><span class="n">saveResult</span><span class="p">));</span>
 </span></code></pre></div>
 <h2 id="3-work-on-a-timer">3. Work on a timer</h2>
-<p><code>setup()</code> of a service runs in <strong>every</strong> isolate, and Dox starts one per CPU core. So start the timer on isolate 1 only.</p>
-<div class="language-dart highlight"><span class="filename">lib/services/cleanup_service.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:async'</span><span class="p">;</span>
+<p><code>setup()</code> of a provider runs in <strong>every</strong> isolate, and Dox starts one per CPU core. So start the timer on isolate 1 only.</p>
+<div class="language-dart highlight"><span class="filename">lib/providers/cleanup_provider.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:async'</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/user/user.model.dart'</span><span class="p">;</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="c1">/// Work on a timer. `setup()` runs in every isolate, so the timer is</span>
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1">/// started on isolate 1 only. Otherwise 8 isolates do the same job.</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="kd">class</span><span class="w"> </span><span class="nc">CleanupService</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">DoxService</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="kd">class</span><span class="w"> </span><span class="nc">CleanupProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="nd">@override</span>
 </span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Dox</span><span class="p">().</span><span class="n">isolateId</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
@@ -6404,10 +6404,10 @@ Pass plain data in (an <code>int</code>, a <code>String</code>, bytes) and get p
 </span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Dox finds <code>CleanupService</code> by itself. To be sure the database is ready first, list <code>ORMService</code> in <code>AppConfig</code>:</p>
+<p>Dox finds <code>CleanupProvider</code> by itself. To be sure the database is ready first, list <code>ORMProvider</code> in <code>AppConfig</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nl">container:</span><span class="w"> </span><span class="n">registerContainer</span><span class="p">,</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nl">services:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">DoxService</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ORMService</span><span class="p">()],</span><span class="w"> </span><span class="c1">// runs before CleanupService</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nl">providers:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">DoxProvider</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ORMProvider</span><span class="p">()],</span><span class="w"> </span><span class="c1">// runs before CleanupProvider</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="c1">// ...</span>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">);</span>
 </span></code></pre></div>
@@ -6430,12 +6430,12 @@ Pass plain data in (an <code>int</code>, a <code>String</code>, bytes) and get p
 <h2 id="when-you-need-a-real-queue">When you need a real queue</h2>
 <p>The work above is lost when the process stops, and it does not retry.
 When that is not OK (payments, emails that must arrive), save the job as a row in a table first.
-Then a <code>Timer.periodic</code> service, or a second small Dart program, reads the table, does the work, and marks the row as done.
+Then a <code>Timer.periodic</code> provider, or a second small Dart program, reads the table, does the work, and marks the row as done.
 A failed row stays in the table, so you can retry it.</p>
 <h2 id="see-also">See also</h2>
 <ul>
 <li><a href="../../digging-deeper/isolate/">Isolate</a> for what each isolate shares, and what it does not</li>
-<li><a href="../../digging-deeper/services/">Services</a></li>
+<li><a href="../../digging-deeper/providers/">Providers</a></li>
 <li><a href="../custom-errors/">Custom errors</a> for the <code>ExceptionHandler</code> that gets the errors of a future nobody awaits</li>
 </ul>
 

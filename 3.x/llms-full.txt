@@ -419,10 +419,10 @@ blog/
 │   ├── app/http/controllers/
 │   │   ├── auth.controller.dart  *
 │   │   └── post.controller.dart  *
-│   ├── app/http/dtos/
-│   │   ├── login_user.dto.dart   *
-│   │   ├── register_user.dto.dart *
-│   │   └── save_post.dto.dart    *
+│   ├── app/dtos/
+│   │   ├── login_user/login_user.dto.dart   *
+│   │   ├── register_user/register_user.dto.dart *
+│   │   └── save_post/save_post.dto.dart    *
 │   ├── app/models/
 │   │   ├── post/post.model.dart  *
 │   │   └── user/user.model.dart
@@ -431,9 +431,9 @@ blog/
 │   │   ├── database.dart
 │   │   └── env.dart              the .env keys, typed
 │   ├── routes/api.dart           *
-│   ├── services/
-│   │   ├── auth_service.dart     *
-│   │   └── orm_service.dart
+│   ├── providers/
+│   │   ├── auth_provider.dart    *
+│   │   └── orm_provider.dart
 │   └── generated/
 │       ├── container.g.dart      * generated
 │       └── dtos.g.dart           * generated
@@ -840,7 +840,7 @@ dox make:dto SavePost
 One class is enough for create and update, because both need the same fields.
 Replace the file with this:
 
-```dart title="lib/app/http/dtos/save_post.dto.dart"
+```dart title="lib/app/dtos/save_post/save_post.dto.dart"
 import 'package:dox_core/dox_core.dart';
 
 part 'save_post.dto.g.dart';
@@ -889,7 +889,7 @@ Ask for `SavePost` as a parameter. Dox checks the body and gives you a typed obj
 This also adds `update`, so `PUT /api/posts/{id}` works:
 
 ```dart title="lib/app/http/controllers/post.controller.dart"
-import 'package:blog/app/http/dtos/save_post.dto.dart';
+import 'package:blog/app/dtos/save_post/save_post.dto.dart';
 import 'package:blog/app/models/post/post.model.dart';
 import 'package:dox_core/dox_core.dart';
 
@@ -944,7 +944,7 @@ class PostController {
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-It writes `lib/app/http/dtos/save_post.dto.g.dart` and `lib/generated/dtos.g.dart`.
+It writes `lib/app/dtos/save_post/save_post.dto.g.dart` and `lib/generated/dtos.g.dart`.
 
 ## Check it
 
@@ -1077,7 +1077,7 @@ dox make:dto RegisterUser
 dox make:dto LoginUser
 ```
 
-```dart title="lib/app/http/dtos/register_user.dto.dart"
+```dart title="lib/app/dtos/register_user/register_user.dto.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart' hide Schema;
 
@@ -1111,7 +1111,7 @@ class RegisterUser {
 `@Unique` comes from `dox_orm`. It reads the database, so it runs after the other rules.
 `dox_orm` also has a class named `Schema`, so the import hides it.
 
-```dart title="lib/app/http/dtos/login_user.dto.dart"
+```dart title="lib/app/dtos/login_user/login_user.dto.dart"
 import 'package:dox_core/dox_core.dart';
 
 part 'login_user.dto.g.dart';
@@ -1131,21 +1131,21 @@ class LoginUser {
 }
 ```
 
-## 4. Set up the auth service
+## 4. Set up the auth provider
 
-A service runs once in every isolate at start. This one tells `dox_auth` which model to use and how to sign tokens:
+A provider runs once in every isolate at start. This one tells `dox_auth` which model to use and how to sign tokens:
 
-```dart title="lib/services/auth_service.dart"
+```dart title="lib/providers/auth_provider.dart"
 import 'package:blog/app/models/user/user.model.dart';
 import 'package:blog/config/env.dart';
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 
-/// Auth service
+/// Auth provider
 /// --------------------------
 /// Sets up JWT login with the User model.
 /// Tokens are signed with APP_KEY and last 7 days.
-class AuthService implements DoxService {
+class AppAuthProvider extends DoxProvider {
   @override
   void setup() {
     Auth.initialize(
@@ -1166,14 +1166,14 @@ class AuthService implements DoxService {
 }
 ```
 
-Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
+Dox finds the provider by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
 You do not add it to a list.
 
 ## 5. Write the auth controller
 
 ```dart title="lib/app/http/controllers/auth.controller.dart"
-import 'package:blog/app/http/dtos/login_user.dto.dart';
-import 'package:blog/app/http/dtos/register_user.dto.dart';
+import 'package:blog/app/dtos/login_user/login_user.dto.dart';
+import 'package:blog/app/dtos/register_user/register_user.dto.dart';
 import 'package:blog/app/models/user/user.model.dart';
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
@@ -1665,7 +1665,7 @@ sequenceDiagram
 | --- | --- | --- |
 | Route match | `lib/routes/*.dart`, `Route.get(...)` | which controller runs |
 | Middleware | `AppConfig(globalMiddleware:)`, `Router.middleware`, `Route.middleware(...)`, the route list | go on, or answer early |
-| Input | a `@Dto` class in `lib/app/http/dtos/` | what the controller gets, or `422` |
+| Input | a `@Dto` class in `lib/app/dtos/<name>/` | what the controller gets, or `422` |
 | Output | the return value, `response(...)`, `responseHandler` | status, headers, body |
 | Errors | `IHttpException`, `AppConfig(exceptionHandler:)` | the error response, logging |
 
@@ -1694,20 +1694,20 @@ Each isolate also has its own Rust network thread. `DOX_HTTP_THREAD=shared` puts
 Before it starts an isolate, Dox copies three things to it:
 
 - the `AppConfig`,
-- the list of services,
+- the list of providers,
 - the routes you added before `startServer()`.
 
 Then each isolate does this, once:
 
-1. It runs `setup()` of every service, in list order. This is where a database pool is opened.
+1. It runs `setup()` of every provider, in list order. This is where a database pool is opened.
 2. It registers the routes of your routers.
 3. It reads the parameter types of every controller.
 4. It starts its HTTP server.
 
 Nothing in this list runs per request.
 
-Because the config and the services are copied, they must not hold open sockets or pools.
-Open these in `setup()`. See [Services](../digging-deeper/services.md).
+Because the config and the providers are copied, they must not hold open sockets or pools.
+Open these in `setup()`. See [Providers](../digging-deeper/providers.md).
 
 ### Each isolate has its own memory
 
@@ -1730,7 +1730,7 @@ Use `1` in tests. See [Isolate](../digging-deeper/isolate.md).
 
 ## Where the database pools live
 
-The ORM is started in a service (`ORMService`). Every isolate runs `setup()`, so every isolate opens a pool.
+The ORM is started in a provider (`ORMProvider`). Every isolate runs `setup()`, so every isolate opens a pool.
 The native drivers live in Rust. There, isolates that open the same settings get the same pool.
 
 | Driver | Per isolate | Per process |
@@ -1759,9 +1759,9 @@ my_app/
 │   └── migration/           # migrations (.dart with a registry, or .sql)
 ├── lib/
 │   ├── app/
+│   │   ├── dtos/            # one folder per DTO, *.dto.dart, typed and checked input
 │   │   ├── http/
 │   │   │   ├── controllers/     # *.controller.dart
-│   │   │   ├── dtos/            # *.dto.dart, typed and checked input
 │   │   │   ├── middleware/      # *.middleware.dart
 │   │   │   ├── serializers/     # *.serializer.dart, custom JSON shapes
 │   │   │   └── response_handler.dart
@@ -1777,10 +1777,10 @@ my_app/
 │   ├── routes/
 │   │   ├── api.dart             # ApiRouter, prefix `api`
 │   │   └── web.dart             # WebRouter
-│   ├── services/
-│   │   └── orm_service.dart     # opens the database in every isolate
+│   ├── providers/
+│   │   └── orm_provider.dart    # opens the database in every isolate
 │   └── generated/               # made by build_runner, do not edit
-│       ├── container.g.dart     # @Inject classes, routers, services
+│       ├── container.g.dart     # @Inject classes, routers, providers
 │       ├── dtos.g.dart          # the list of DTOs
 │       └── openapi.g.dart       # the OpenAPI docs
 ├── storage/                     # local disk, file cache, uploads
@@ -1800,7 +1800,7 @@ my_app/
 | `lib/app/models/` | One folder per model. `build_runner` writes the `.g.dart` file next to it. |
 | `lib/config/` | One file per config object. `app.dart` puts them together in `AppConfig`. |
 | `lib/routes/` | One `Router` class per file. Dox finds each router by itself. |
-| `lib/services/` | Classes that implement `DoxService`. Their `setup()` runs in every isolate. |
+| `lib/providers/` | Classes that extend `DoxProvider`. Their `setup()` runs in every isolate. |
 | `lib/*.g.dart` | Generated files. Do not edit them. Run `dox build_runner:build` to make them again. |
 | `storage/` | Files the app writes: uploads, the file cache, SQLite files. |
 
@@ -1910,7 +1910,7 @@ Dox middleware runs before the controller only. There is no "after" step; use a 
 | `$request->user()` | `req.auth?.user<User>()` |
 | `422` with `{"errors": {...}}` | `422` with a flat map `{"email": "...", "items.1.quantity": "..."}` |
 
-```dart title="lib/app/http/dtos/create_blog.dto.dart"
+```dart title="lib/app/dtos/create_blog/create_blog.dto.dart"
 @Dto()
 class CreateBlog {
   @Length(min: 3, max: 50)
@@ -2086,7 +2086,7 @@ See [Dox CLI](../digging-deeper/dox-cli.md).
 
 | Laravel | Dox |
 | --- | --- |
-| `config/auth.php` guards and providers | `Auth.initialize(AuthConfig(guards: ...))` in a service |
+| `config/auth.php` guards and providers | `Auth.initialize(AuthConfig(guards: ...))` in a provider |
 | `Auth::attempt(['email' => $e, 'password' => $p])` | `await Auth().attempt(<String, dynamic>{'email': e, 'password': p})` gives a JWT, or `null` |
 | `Auth::login($user)` | `Auth().login(user)` gives a JWT |
 | `Auth::user()` | `req.auth?.user<User>()` |
@@ -2116,7 +2116,7 @@ A value must be a JSON type. The `memory` store is per isolate. See [Cache](../d
 
 | Laravel | Dox |
 | --- | --- |
-| `config/filesystems.php` disks | `lib/config/storage.dart`, `StorageConfig(defaultDisk:, disks:)`, passed to a `StorageService` (`dox_storage`) |
+| `config/filesystems.php` disks | `lib/config/storage.dart`, `StorageConfig(defaultDisk:, disks:)`, passed to a `StorageProvider` (`dox_storage`) |
 | `Storage::put('a.txt', $bytes)` | `await Storage().put('files', bytes, extension: 'txt')` (a uuid file name) |
 | `$request->file('f')->store('avatars')` | `await file.store('avatars')` or `Storage().putRequestFile('avatars', file)` |
 | `Storage::get($path)` | `await Storage().get(path)` |
@@ -2160,7 +2160,7 @@ See [Testing](../digging-deeper/testing.md).
 ## What is different
 
 - **A generated container.** Like Laravel, Dox makes your controllers and injects what the constructor asks for.
-  You add `@Inject()` to the class. `build_runner` writes `lib/generated/container.g.dart` with every registration. There are no service providers to write.
+  You add `@Inject()` to the class. `build_runner` writes `lib/generated/container.g.dart` with every registration. You do not register classes by hand in a provider.
   A singleton is one instance per isolate, not one per request.
 - **Isolates, not PHP-FPM workers.** One process runs one isolate per CPU core. Each isolate runs your whole app and has its own memory.
   A static value or a singleton lives once per isolate. A PHP worker starts from zero on each request. A Dox isolate keeps its state between requests, so a memory leak stays.
@@ -2695,7 +2695,7 @@ class ApiRouter extends Router {
 
 Dox finds every `Router` class by itself. It is in `lib/generated/container.g.dart` after `dart run build_runner build`.
 To pick the order of routers, list them in `routers:` of `AppConfig`.
-See [Dependency injection: routers and services](dependency-injection.md#routers-and-services).
+See [Dependency injection: routers and providers](dependency-injection.md#routers-and-providers).
 
 The leading `/` in a path is optional. `'ping'` and `'/ping'` are the same route.
 
@@ -3331,13 +3331,13 @@ The `dox_view` package has a template engine like Edge.js. Templates are `.dox.h
 dart pub add dox_view
 ```
 
-Add the service in `lib/`, so every isolate sets up the engine:
+Add the provider in `lib/`, so every isolate sets up the engine:
 
-```dart title="lib/services/view_service.dart"
+```dart title="lib/providers/view_provider.dart"
 import 'package:dox_view/dox_view.dart';
 
-class AppViewService extends ViewService {
-  AppViewService() : super(const ViewConfig());
+class AppViewProvider extends ViewProvider {
+  AppViewProvider() : super(const ViewConfig());
 }
 ```
 
@@ -3938,7 +3938,7 @@ The client always gets a response.
 ## Errors outside a request
 
 Some errors do not belong to a request.
-For example a future that nobody awaits, or an error in a service `shutdown()`.
+For example a future that nobody awaits, or an error in the `shutdown()` of a provider.
 Dox passes them to `report` too. The server keeps running.
 
 ## The response handler
@@ -4206,8 +4206,8 @@ import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/http/controllers/user.controller.dart' as i1;
 import 'package:my_app/app/repositories/user.repository.dart' as i2;
 import 'package:my_app/app/services/user.service.dart' as i3;
-import 'package:my_app/routes/api.dart' as i4;
-import 'package:my_app/services/orm_service.dart' as i5;
+import 'package:my_app/providers/orm_provider.dart' as i4;
+import 'package:my_app/routes/api.dart' as i5;
 import 'package:my_app/app/models/user/user.model.dart' as i6;
 
 void registerContainer(IocContainer c) {
@@ -4218,8 +4218,8 @@ void registerContainer(IocContainer c) {
   c.singleton<i3.UserService>(
     (IocContainer c) => i3.UserService(c.get<i2.UserRepository>()),
   );
-  c.router<i4.ApiRouter>((IocContainer c) => i4.ApiRouter());
-  c.service<i5.ORMService>((IocContainer c) => i5.ORMService());
+  c.provider<i4.ORMProvider>((IocContainer c) => i4.ORMProvider());
+  c.router<i5.ApiRouter>((IocContainer c) => i5.ApiRouter());
   c.bindModel<i6.User>((String id) {
     int? key = int.tryParse(id);
     if (key == null) return null;
@@ -4307,12 +4307,12 @@ class PostController {
 - A route without a parameter of the model type does not load the model.
 - A binder from `Route.bind` wins over this one. See [Routing: route model binding](routing.md#route-model-binding).
 
-## Routers and services
+## Routers and providers
 
 You do not need `@Inject()` on them.
 
 - Every class that extends `Router` is found. Its routes are registered at start.
-- Every class that implements `DoxService` is found. Its `setup()` runs at start, in every isolate.
+- Every class that extends `DoxProvider` is found. Its `setup()` runs at start, in every isolate.
 
 Their constructors get parameters from the container too.
 
@@ -4322,13 +4322,13 @@ To pick the order, list them in `AppConfig`:
 ```dart
 AppConfig appConfig = AppConfig(
   container: registerContainer,
-  services: <DoxService>[ORMService()], // runs first
+  providers: <DoxProvider>[ORMProvider()], // runs first
   routers: <Router>[ApiRouter()],       // registered first
 );
 ```
 
 A listed class comes first. The others follow. No class runs twice.
-A listed service is also the instance that the container gives.
+A listed provider is also the instance that the container gives.
 
 ## Use the container in code
 
@@ -4778,7 +4778,7 @@ Write a class with `@Dto()`. Ask for it in your controller.
 Dox reads the request, checks it, and gives you a typed object.
 When the input is wrong, Dox answers `422` with the errors. Your controller does not run.
 
-```dart title="lib/app/http/dtos/create_user.dto.dart"
+```dart title="lib/app/dtos/create_user/create_user.dto.dart"
 import 'package:dox_core/dox_core.dart';
 
 part 'create_user.dto.g.dart';
@@ -4818,7 +4818,7 @@ class UserController {
 
 You do this once per app.
 
-1. Make a DTO with `dox make:dto CreateUser`. It writes `lib/app/http/dtos/create_user.dto.dart`.
+1. Make a DTO with `dox make:dto CreateUser`. It writes `lib/app/dtos/create_user/create_user.dto.dart`.
 2. Run the generator: `dox build_runner:build` (or `dox build_runner:watch`).
    It writes a `.dto.g.dart` file next to each DTO, and one list of all DTOs in `lib/generated/dtos.g.dart`.
 3. Give that list to the app:
@@ -5617,19 +5617,19 @@ QueueConfig queueConfig = QueueConfig(
     `retryAfter` is how Dox finds the job of a crashed worker.
     A job that runs longer than `retryAfter` looks crashed, so a second worker runs it again.
 
-### 2. Service
+### 2. Provider
 
-The service sets up the queue in every isolate. Put it in `lib/` so the generated container finds it.
+The provider sets up the queue in every isolate. Put it in `lib/` so the generated container finds it.
 
-```dart title="lib/services/queue_service.dart"
+```dart title="lib/providers/queue_provider.dart"
 import 'package:dox_queue/dox_queue.dart';
 
 import '../config/queue.dart';
 
-/// Sets up the queue. Dox finds every DoxService class,
+/// Sets up the queue. Dox finds every DoxProvider class,
 /// see lib/generated/container.g.dart.
-class AppQueueService extends QueueService {
-  AppQueueService() : super(queueConfig);
+class AppQueueProvider extends QueueProvider {
+  AppQueueProvider() : super(queueConfig);
 }
 ```
 
@@ -5648,7 +5648,7 @@ Future<void> main(List<String> args) async {
 }
 ```
 
-The worker starts the services of your app (database, cache, queue). It does not start the HTTP server.
+The worker starts the providers of your app (database, cache, queue). It does not start the HTTP server.
 
 ### 4. Tables (database driver only)
 
@@ -6058,23 +6058,23 @@ MAIL_PASSWORD=secret
 | `from` | none | the from address of a message that has none |
 | `replyTo` | none | the reply-to addresses of a message that has none |
 
-### 2. Service
+### 2. Provider
 
-The service sets up the mailers in every isolate. Put it in `lib/` so the generated container finds it.
+The provider sets up the mailers in every isolate. Put it in `lib/` so the generated container finds it.
 
-```dart title="lib/services/mail_service.dart"
+```dart title="lib/providers/mail_provider.dart"
 import 'package:dox_mailer/dox_mailer.dart';
 
 import '../config/mail.dart';
 
-/// Sets up the mailers. Dox finds every DoxService class,
+/// Sets up the mailers. Dox finds every DoxProvider class,
 /// see lib/generated/container.g.dart.
-class AppMailService extends MailService {
-  AppMailService() : super(mailConfig);
+class AppMailProvider extends MailProvider {
+  AppMailProvider() : super(mailConfig);
 }
 ```
 
-When the server stops, the service closes open SMTP connections and HTTP clients.
+When the server stops, the provider closes open SMTP connections and HTTP clients.
 
 ## Send an email
 
@@ -6379,7 +6379,7 @@ void main() {
 }
 ```
 
-`Mail.fake()` works with or without a config. Call it after the app has started, because `MailService` sets up the config again at start.
+`Mail.fake()` works with or without a config. Call it after the app has started, because `MailProvider` sets up the config again at start.
 
 `mail.clear()` forgets the sent emails.
 
@@ -6626,7 +6626,7 @@ Future<void> main(List<String> args) async {
 }
 ```
 
-With `app`, the runner starts your app services first (like the database).
+With `app`, the runner starts your app providers first (like the database).
 It stops them at the end.
 
 | Command | What it does |
@@ -6677,15 +6677,15 @@ It does not check the schedule, the filters or the locks.
 ## Run inside the server
 
 You can run the schedule inside your Dox server instead of a `work` process.
-Add a service that extends `SchedulerService`:
+Add a provider that extends `SchedulerProvider`:
 
 ```dart
-// lib/services/schedule_service.dart
+// lib/providers/schedule_provider.dart
 import 'package:dox_scheduler/dox_scheduler.dart';
 import 'package:my_app/config/schedule.dart';
 
-class ScheduleService extends SchedulerService {
-  ScheduleService() : super(schedule: schedule, config: scheduleConfig);
+class ScheduleProvider extends SchedulerProvider {
+  ScheduleProvider() : super(schedule: schedule, config: scheduleConfig);
 }
 ```
 
@@ -6695,7 +6695,7 @@ Then turn it on in `lib/config/schedule.dart`:
 ScheduleConfig scheduleConfig = const ScheduleConfig(inProcess: true);
 ```
 
-Run `dart run build_runner build`. The generated container finds the service.
+Run `dart run build_runner build`. The generated container finds the provider.
 
 How it works:
 
@@ -6709,7 +6709,7 @@ Trade-offs:
 - A long task makes the server stop slower.
 - With a separate `work` process, you can deploy, scale and restart the scheduler on its own.
 
-Use `work` for heavy tasks. Use the in-process service for small apps.
+Use `work` for heavy tasks. Use the in-process provider for small apps.
 
 ## Testing
 
@@ -6821,14 +6821,14 @@ so the app starts without them:
   String? get awsEndpoint;
 ```
 
-Then add the service. It sets the disks in every isolate. Put it in `lib/`, so the generated container finds it:
+Then add the provider. It sets the disks in every isolate. Put it in `lib/`, so the generated container finds it:
 
-```dart title="lib/services/storage_service.dart"
+```dart title="lib/providers/storage_provider.dart"
 import 'package:dox_storage/dox_storage.dart';
 import 'package:my_app/config/storage.dart';
 
-class AppStorageService extends StorageService {
-  AppStorageService() : super(storageConfig);
+class AppStorageProvider extends StorageProvider {
+  AppStorageProvider() : super(storageConfig);
 }
 ```
 
@@ -6908,7 +6908,7 @@ To swap a disk with a memory disk in tests, see [Testing](testing.md#test-file-s
 
 ## Your own driver
 
-Implement `DriverContract` from `package:dox_storage/dox_storage.dart`. Register it in a [service](services.md), so every isolate has it:
+Implement `DriverContract` from `package:dox_storage/dox_storage.dart`. Register it in a [provider](providers.md), so every isolate has it:
 
 ```dart
 Storage.manager.register('dropbox', DropboxDriver());
@@ -7156,14 +7156,14 @@ Isolates do not share memory:
 
 ## What each isolate does at start
 
-Dox copies the `AppConfig`, the services and the routes you added before `startServer()` to each new isolate. Then every isolate:
+Dox copies the `AppConfig`, the providers and the routes you added before `startServer()` to each new isolate. Then every isolate:
 
-1. runs `setup()` of each service (for example, it opens the database pool),
+1. runs `setup()` of each provider (for example, it opens the database pool),
 2. registers the routes of your routers,
 3. reads the parameter types of each controller once,
 4. starts its HTTP server.
 
-Because the config and services are copied, they must not hold open sockets or database pools. Open these in `setup()`. See [Services](services.md).
+Because the config and providers are copied, they must not hold open sockets or database pools. Open these in `setup()`. See [Providers](providers.md).
 
 ## When an isolate crashes
 
@@ -7175,32 +7175,35 @@ Because the config and services are copied, they must not hold open sockets or d
 
 ---
 
-# Services
+# Providers
 
-Source: https://dartondox.dev/latest/3.xdigging-deeper/services/
+Source: https://dartondox.dev/latest/3.xdigging-deeper/providers/
 
-# Services
+# Providers
 
-A service is a class with a `setup()` method. Dox runs it at start, in every isolate.
+A provider is a class that sets up one part of your app when it starts. For example the database, auth or a Redis connection.
 
-Use it to set up things like the database or auth.
+A provider has two methods:
 
-## Why services
+- `setup()` runs when the app starts. You must write it.
+- `shutdown()` runs when the app stops. It is optional.
+
+## Why providers
 
 Dox runs your app on many [isolates](isolate.md), and they do not share memory.
 Code that you run once in `bin/server.dart` only sets up the first isolate. The others have, for example, no database connection.
-A service fixes this: each isolate runs `setup()` itself.
+A provider fixes this: each isolate runs `setup()` itself.
 
-## Create a service
+## Create a provider
 
-Implement `DoxService` and put your code in `setup()`. `setup()` can be `async`. Dox waits for it.
+Extend `DoxProvider` and put your code in `setup()`. `setup()` can be `async`. Dox waits for it.
 
-```dart title="lib/services/orm_service.dart"
+```dart title="lib/providers/orm_provider.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart';
 import 'package:my_app/config/database.dart';
 
-class ORMService implements DoxService, DoxShutdown {
+class ORMProvider extends DoxProvider {
   @override
   Future<void> setup() async {
     SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
@@ -7216,38 +7219,38 @@ class ORMService implements DoxService, DoxShutdown {
 
 ## Register it
 
-You do not need to. Dox finds every class that implements `DoxService`.
-Run `dart run build_runner build`. The service is then in `lib/generated/container.g.dart`.
+You do not need to. Dox finds every class that extends `DoxProvider`.
+Run `dart run build_runner build`. The provider is then in `lib/generated/container.g.dart`.
 Each isolate makes its own instance from the container. Its constructor can ask for other classes of the container.
-See [Dependency injection](../the-basic/dependency-injection.md#routers-and-services).
+See [Dependency injection](../the-basic/dependency-injection.md#routers-and-providers).
 
-Services run in the order of their file path. To run one first, list it in `AppConfig`:
+Providers run in the order of their file path. To run one first, list it in `AppConfig`:
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
   container: registerContainer,
-  services: <DoxService>[ORMService()], // runs before the others
+  providers: <DoxProvider>[ORMProvider()], // runs before the others
 );
 ```
 
-A listed service runs first. Then the others run. No service runs twice.
+A listed provider runs first. Then the others run. No provider runs twice.
 
-You can also add a service in code, before `startServer()`:
+You can also add a provider in code, before `startServer()`:
 
 ```dart title="bin/server.dart"
 Dox().initialize(appConfig);
-Dox().addService(MyService());
+Dox().addProvider(MyProvider());
 await Dox().startServer();
 ```
 
 ## Example: auth
 
-```dart title="lib/services/auth_service.dart"
+```dart title="lib/providers/auth_provider.dart"
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 
-class AuthService implements DoxService {
+class AppAuthProvider extends DoxProvider {
   @override
   void setup() {
     Auth.initialize(AuthConfig(
@@ -7263,27 +7266,29 @@ class AuthService implements DoxService {
 }
 ```
 
+The name is `AppAuthProvider`, because `dox_auth` already has a class named `AuthProvider` (it finds the user model).
 See [Authentication](../security/authentication.md).
 
 ## When `setup()` runs
 
-In each isolate, Dox runs `setup()` of each service, one after the other: the listed ones first, then the ones of the container.
-Then it registers the routes and starts the server, so routes can use what a service set up.
+In each isolate, Dox runs `setup()` of each provider, one after the other: the listed ones first, then the ones of the container.
+Then it registers the routes and starts the server, so routes can use what a provider set up.
 See [What each isolate does at start](isolate.md#what-each-isolate-does-at-start).
 
-`dox openapi:generate` also runs `setup()` of every service, because it needs the routes.
+`dox openapi:generate` also runs `setup()` of every provider, because it needs the routes.
 
 ## Clean up on shutdown
 
 On `SIGTERM` or `SIGINT` Dox stops the server gracefully (see [Deployment](deployment.md#graceful-shutdown)).
-After the open requests are done, it runs `shutdown()` of each service that also implements `DoxShutdown`.
+After the open requests are done, it runs `shutdown()` of every provider.
 It runs in every isolate. Use it to close connections or flush data.
+A provider that has nothing to close does not need to write `shutdown()`.
 
-The `ORMService` of a new project already does this: its `shutdown()` calls `SqlQueryBuilder.close()`.
-Dox closes the cache stores (eg. Redis) by itself, after the services.
+The `ORMProvider` of a new project already does this: its `shutdown()` calls `SqlQueryBuilder.close()`.
+Dox closes the cache stores (eg. Redis) by itself, after the providers.
 
-```dart title="lib/services/redis_service.dart"
-class RedisService implements DoxService, DoxShutdown {
+```dart title="lib/providers/redis_provider.dart"
+class RedisProvider extends DoxProvider {
   late RedisConnection redis;
 
   @override
@@ -7298,11 +7303,11 @@ class RedisService implements DoxService, DoxShutdown {
 }
 ```
 
-An error in `shutdown()` goes to the `report` method of the [exception handler](../the-basic/errors.md). The other services still run.
+An error in `shutdown()` goes to the `report` method of the [exception handler](../the-basic/errors.md). The other providers still run.
 
-## Rules for a service
+## Rules for a provider
 
-- **Open connections in `setup()`, not in the constructor.** A service listed in `AppConfig` is copied to each isolate. An open socket or database pool can not be copied, so the isolate fails to start.
+- **Open connections in `setup()`, not in the constructor.** A provider listed in `AppConfig` is copied to each isolate. An open socket or database pool can not be copied, so the isolate fails to start.
 - **Keep `setup()` short.** It runs once per isolate. Data you load in it is kept once per isolate, so 8 isolates keep 8 copies.
 
 
@@ -7416,7 +7421,7 @@ See [Deployment](deployment.md#build).
 dox make:controller Blog        # lib/app/http/controllers/blog.controller.dart
 dox make:controller Blog -r     # resource controller
 dox make:middleware Auth
-dox make:dto CreateBlog         # lib/app/http/dtos/create_blog.dto.dart
+dox make:dto CreateBlog         # lib/app/dtos/create_blog/create_blog.dto.dart
 dox make:serializer Blog
 dox make:model Blog -m          # model and its create_blogs_table migration
 dox make:migration create_blogs_table          # .dart file (default)
@@ -7691,7 +7696,7 @@ On `SIGTERM` (docker stop, Kubernetes, Cloud Run, Fly, systemd) or `SIGINT` (Ctr
 1. It stops taking new connections at once.
 2. Open requests can finish. Each keep-alive connection closes after its current answer.
 3. After `shutdownTimeout` (default 8 seconds), it closes the connections that are still open.
-4. It runs `shutdown()` of each service that implements `DoxShutdown` (see [Services](services.md#clean-up-on-shutdown)). The `ORMService` of a new project closes the database connections here.
+4. It runs `shutdown()` of every provider (see [Providers](providers.md#clean-up-on-shutdown)). The `ORMProvider` of a new project closes the database connections here.
 5. It closes the cache stores of `Cache()`, eg. the Redis connections.
 6. The process exits with code `0`.
 
@@ -8227,10 +8232,10 @@ void main() {
 }
 ```
 
-- `DoxTestClient.start(appConfig)` runs your services (like the ORM service) and adds your routes, the same as a real start.
+- `DoxTestClient.start(appConfig)` runs your providers (like the ORM provider) and adds your routes, the same as a real start.
 - It listens on `127.0.0.1` and a free port that the OS picks. So it does not clash with `dox serve`, and many test files can run at the same time.
 - It runs on one isolate. `serverPort` and `totalIsolate` of the config are not used.
-- `client.close()` stops the server and runs the `DoxShutdown` services (for example, it closes the database).
+- `client.close()` stops the server and runs `shutdown()` of every provider (for example, it closes the database).
 - With one isolate, you can also add a route inside a test with `Route.get(...)`. It works right away.
 
 ### Send requests
@@ -8360,7 +8365,7 @@ test('saves the report', () async {
 });
 ```
 
-- Call `Dox().initialize()` first. Without the `StorageService` running, `Storage.manager` has only the `local` disk. Start the app, or set the disks yourself: `Storage.manager = StorageDiskFactory().create(storageConfig);`.
+- Call `Dox().initialize()` first. Without the `StorageProvider` running, `Storage.manager` has only the `local` disk. Start the app, or set the disks yourself: `Storage.manager = StorageDiskFactory().create(storageConfig);`.
 - `Storage()` paths start with `/`. A `Disk` key does not, so remove the first `/` when you ask the `Disk` directly.
 
 See [File Storage](file-storage.md).
@@ -8421,7 +8426,7 @@ void main() {
       migrations: migrations,
       config: databaseConfig.getConnectionConfig(),
     ).migrate();
-    client = await DoxTestClient.start(appConfig); // runs the ORM service
+    client = await DoxTestClient.start(appConfig); // runs the ORM provider
   });
 
   // every test starts with empty tables
@@ -8644,11 +8649,11 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 - `debug: true` prints each SQL query and its values.
 - `user`, `password`, `host` and `port` are not used by SQLite.
 
-Start the ORM in a service. Each isolate runs the service.
+Start the ORM in a provider. Each isolate runs the provider.
 Isolates with the same settings share one pool, so `maxConnectionCount` is for the whole process.
 
-```dart title="lib/services/orm_service.dart"
-class ORMService implements DoxService, DoxShutdown {
+```dart title="lib/providers/orm_provider.dart"
+class ORMProvider extends DoxProvider {
   @override
   Future<void> setup() async {
     SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
@@ -11154,11 +11159,11 @@ class UserObserver extends ModelObserver<User> {
 }
 ```
 
-Add it in the `setup()` of a [service](../../digging-deeper/services.md).
+Add it in the `setup()` of a [provider](../../digging-deeper/providers.md).
 Observers live in memory, and each isolate has its own memory, so every isolate must add them.
 
-```dart title="lib/services/observer_service.dart"
-class ObserverService implements DoxService {
+```dart title="lib/providers/observer_provider.dart"
+class ObserverProvider extends DoxProvider {
   @override
   void setup() {
     Model.observe<User>(UserObserver(Mailer()));
@@ -11166,7 +11171,7 @@ class ObserverService implements DoxService {
 }
 ```
 
-Dox finds `ObserverService` by itself, like every `DoxService`. Run `dart run build_runner build` after you add it.
+Dox finds `ObserverProvider` by itself, like every `DoxProvider`. Run `dart run build_runner build` after you add it.
 
 - You can add more than one observer to a model.
 - `Model.forgetObservers<User>()` removes the observers of `User`. `Model.forgetObservers()` removes all.
@@ -12229,15 +12234,15 @@ class User extends UserGenerator {
 }
 ```
 
-## 2. Set up the auth service
+## 2. Set up the auth provider
 
-```dart title="lib/services/auth_service.dart"
+```dart title="lib/providers/auth_provider.dart"
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 import 'package:my_app/config/env.dart';
 
-class AuthService implements DoxService {
+class AppAuthProvider extends DoxProvider {
   @override
   void setup() {
     Auth.initialize(
@@ -12258,7 +12263,7 @@ class AuthService implements DoxService {
 }
 ```
 
-Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
+Dox finds the provider by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
 
 ## 3. Add the routes
 
@@ -12337,7 +12342,7 @@ After `AuthMiddleware`, `req.auth` holds the login.
 
 | Method | What it does |
 | --- | --- |
-| `Auth.initialize(AuthConfig)` | sets the config. Call it once, in a service |
+| `Auth.initialize(AuthConfig)` | sets the config. Call it once, in a provider |
 | `Auth(guard: 'admin')` | uses another guard from `guards`. Without `guard`, it uses `defaultGuard` |
 | `await Auth().attempt(credentials)` | finds the user and checks the password. Gives a token, or `null` |
 | `Auth().login(user)` | gives a token for this user, with no password check |
@@ -13617,7 +13622,7 @@ Future<void> main(List<String> args) async {
 }
 ```
 
-`writeOpenApi` runs your services and registers the routes. It does not start the server.
+`writeOpenApi` runs your providers and registers the routes. It does not start the server.
 
 ## Without Dox
 
@@ -13672,7 +13677,7 @@ This page shows how to save and read files with `dox_storage`.
 
 !!! tip "In a Dox app"
     `dox_storage` gives your app [`Storage()`](../digging-deeper/file-storage.md).
-    Set the disks in `config/storage.dart` (a `StorageConfig`), register a `StorageService`, and use `Storage()`.
+    Set the disks in `config/storage.dart` (a `StorageConfig`), register a `StorageProvider`, and use `Storage()`.
     `Storage().use('s3')` gives the `Disk` of this page. `Storage.route('files')` serves local signed URLs.
     This page is for the full `Disk` API and for using `dox_storage` outside Dox.
 
@@ -14155,7 +14160,7 @@ socket.emit('chat', 'hi', (answer) => console.log(answer)); // 'ok'
 
 ## In a Dox app: same port as HTTP
 
-`SocketIoService` serves Socket.IO at `/socket.io/` on the app port.
+`SocketIoProvider` serves Socket.IO at `/socket.io/` on the app port.
 
 Add `dox_socketio`, and `ioredis` for the Redis adapter:
 
@@ -14195,14 +14200,14 @@ Add a getter for the `SOCKETIO_ENABLED` key to `lib/config/env.dart`, then run `
   bool get socketioEnabled => false;
 ```
 
-Then add the service. Put it in `lib/`, so the generated container finds it:
+Then add the provider. Put it in `lib/`, so the generated container finds it:
 
-```dart title="lib/services/socketio_service.dart"
+```dart title="lib/providers/socketio_provider.dart"
 import 'package:dox_socketio/dox_socketio.dart';
 import 'package:my_app/config/socketio.dart';
 
-class AppSocketIoService extends SocketIoService {
-  AppSocketIoService() : super(socketIoConfig);
+class AppSocketIoProvider extends SocketIoProvider {
+  AppSocketIoProvider() : super(socketIoConfig);
 }
 ```
 
@@ -14214,8 +14219,8 @@ class AppSocketIoService extends SocketIoService {
 | `adapter` | `null` (in-memory) | makes one adapter in each isolate |
 
 - Requests to `/socket.io/` go to Socket.IO before the router. Middleware and body reading are skipped.
-- With no service, or with `enabled: false`, there is no extra work per request.
-- `SocketIoService.server` is the server of this isolate: `SocketIoService.server?.to('room').emit('news', data)`.
+- With no provider, or with `enabled: false`, there is no extra work per request.
+- `SocketIoProvider.server` is the server of this isolate: `SocketIoProvider.server?.to('room').emit('news', data)`.
 - Need a plain WebSocket with no Socket.IO protocol? `Route.websocket(path, handler)` in `dox_core` gives you the raw socket.
 
 !!! warning "Many isolates"
@@ -14533,14 +14538,14 @@ StorageConfig storageConfig = StorageConfig(
 Run `dart run build_runner build` to update `env.g.dart`.
 Then add `APP_URL=http://localhost:3000` to your `.env`.
 
-Add the service. It sets the disks in every isolate. The generated container finds it:
+Add the provider. It sets the disks in every isolate. The generated container finds it:
 
-```dart title="lib/services/storage_service.dart"
+```dart title="lib/providers/storage_provider.dart"
 import 'package:dox_storage/dox_storage.dart';
 import 'package:my_app/config/storage.dart';
 
-class AppStorageService extends StorageService {
-  AppStorageService() : super(storageConfig);
+class AppStorageProvider extends StorageProvider {
+  AppStorageProvider() : super(storageConfig);
 }
 ```
 
@@ -14548,7 +14553,7 @@ class AppStorageService extends StorageService {
 
 The DTO checks the file before your controller runs.
 
-```dart title="lib/app/http/dtos/upload_image.dto.dart"
+```dart title="lib/app/dtos/upload_image/upload_image.dto.dart"
 import 'package:dox_core/dox_core.dart';
 
 part 'upload_image.dto.g.dart';
@@ -14576,7 +14581,7 @@ For other file types, use `@Mimes(<String>['pdf', 'docx'])` in place of `@Image(
 ```dart title="lib/app/http/controllers/upload.controller.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_storage/dox_storage.dart';
-import 'package:my_app/app/http/dtos/upload_image.dto.dart';
+import 'package:my_app/app/dtos/upload_image/upload_image.dto.dart';
 
 @Inject()
 class UploadController {
@@ -14702,7 +14707,7 @@ Make a list route that takes `page` and `per_page` from the query string and ret
 A DTO with `source: Source.query` reads the query string, also for `POST`.
 The query key of `perPage` is `per_page`, because keys are snake_case by default.
 
-```dart title="lib/app/http/dtos/list_users.dto.dart"
+```dart title="lib/app/dtos/list_users/list_users.dto.dart"
 import 'package:dox_core/dox_core.dart';
 
 part 'list_users.dto.g.dart';
@@ -14732,7 +14737,7 @@ A controller can return it as it is. Dox sends `toJson()`.
 ```dart title="lib/app/http/controllers/user.controller.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart';
-import 'package:my_app/app/http/dtos/list_users.dto.dart';
+import 'package:my_app/app/dtos/list_users/list_users.dto.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 
 @Inject()
@@ -14868,15 +14873,15 @@ class User extends UserGenerator {
 }
 ```
 
-## 2. Set up the auth service
+## 2. Set up the auth provider
 
-```dart title="lib/services/auth_service.dart"
+```dart title="lib/providers/auth_provider.dart"
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 import 'package:my_app/config/env.dart';
 
-class AuthService implements DoxService {
+class AppAuthProvider extends DoxProvider {
   @override
   void setup() {
     Auth.initialize(
@@ -14899,13 +14904,13 @@ class AuthService implements DoxService {
 }
 ```
 
-Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
+Dox finds the provider by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
 
 ## 3. Write the DTOs
 
 `@Unique` makes sure the email is not taken. It comes from `dox_orm`, so hide its `Schema` class.
 
-```dart title="lib/app/http/dtos/register_user.dto.dart"
+```dart title="lib/app/dtos/register_user/register_user.dto.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart' hide Schema;
 
@@ -14936,7 +14941,7 @@ class RegisterUser {
 }
 ```
 
-```dart title="lib/app/http/dtos/login_user.dto.dart"
+```dart title="lib/app/dtos/login_user/login_user.dto.dart"
 import 'package:dox_core/dox_core.dart';
 
 part 'login_user.dto.g.dart';
@@ -14961,8 +14966,8 @@ class LoginUser {
 ```dart title="lib/app/http/controllers/auth.controller.dart"
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
-import 'package:my_app/app/http/dtos/login_user.dto.dart';
-import 'package:my_app/app/http/dtos/register_user.dto.dart';
+import 'package:my_app/app/dtos/login_user/login_user.dto.dart';
+import 'package:my_app/app/dtos/register_user/register_user.dto.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 
 @Inject()
@@ -15349,7 +15354,7 @@ Dox has no job queue. It has three building blocks from Dart itself:
 | --- | --- | --- |
 | I/O work after the response (send an email, call an API, write rows) | a `Future` you do not await | the same isolate, between requests |
 | CPU work (resize an image, parse a big file, compute) | `Isolate.run()` | a new thread |
-| work every N minutes (cleanup, sync) | `Timer.periodic` in a service | one isolate of your choice |
+| work every N minutes (cleanup, sync) | `Timer.periodic` in a provider | one isolate of your choice |
 
 None of them survive a restart. See [When you need a real queue](#when-you-need-a-real-queue).
 
@@ -15391,7 +15396,7 @@ class ReportController {
 }
 
 /// Must be a top level or static function with plain arguments.
-/// The new isolate has no Dox, no database and no services.
+/// The new isolate has no Dox, no database and no providers.
 int countPrimes(int limit) {
   List<bool> sieve = List<bool>.filled(limit + 1, true);
   int count = 0;
@@ -15423,9 +15428,9 @@ unawaited(Isolate.run(() => countPrimes(limit)).then(saveResult));
 
 ## 3. Work on a timer
 
-`setup()` of a service runs in **every** isolate, and Dox starts one per CPU core. So start the timer on isolate 1 only.
+`setup()` of a provider runs in **every** isolate, and Dox starts one per CPU core. So start the timer on isolate 1 only.
 
-```dart title="lib/services/cleanup_service.dart"
+```dart title="lib/providers/cleanup_provider.dart"
 import 'dart:async';
 
 import 'package:dox_core/dox_core.dart';
@@ -15433,7 +15438,7 @@ import 'package:my_app/app/models/user/user.model.dart';
 
 /// Work on a timer. `setup()` runs in every isolate, so the timer is
 /// started on isolate 1 only. Otherwise 8 isolates do the same job.
-class CleanupService implements DoxService {
+class CleanupProvider extends DoxProvider {
   @override
   void setup() {
     if (Dox().isolateId != 1) return;
@@ -15454,12 +15459,12 @@ class CleanupService implements DoxService {
 }
 ```
 
-Dox finds `CleanupService` by itself. To be sure the database is ready first, list `ORMService` in `AppConfig`:
+Dox finds `CleanupProvider` by itself. To be sure the database is ready first, list `ORMProvider` in `AppConfig`:
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
   container: registerContainer,
-  services: <DoxService>[ORMService()], // runs before CleanupService
+  providers: <DoxProvider>[ORMProvider()], // runs before CleanupProvider
   // ...
 );
 ```
@@ -15499,13 +15504,13 @@ curl http://localhost:3000/api/primes/100000
 
 The work above is lost when the process stops, and it does not retry.
 When that is not OK (payments, emails that must arrive), save the job as a row in a table first.
-Then a `Timer.periodic` service, or a second small Dart program, reads the table, does the work, and marks the row as done.
+Then a `Timer.periodic` provider, or a second small Dart program, reads the table, does the work, and marks the row as done.
 A failed row stays in the table, so you can retry it.
 
 ## See also
 
 - [Isolate](../digging-deeper/isolate.md) for what each isolate shares, and what it does not
-- [Services](../digging-deeper/services.md)
+- [Providers](../digging-deeper/providers.md)
 - [Custom errors](custom-errors.md) for the `ExceptionHandler` that gets the errors of a future nobody awaits
 
 
@@ -15523,7 +15528,7 @@ Serve a folder of files, or a single page app (React, Vue, Flutter web), from th
 
 - A Dox app.
 - A `public` folder with the built front-end (`index.html`, `assets/...`).
-- The `dox_storage` package, with its service. See [File storage](../digging-deeper/file-storage.md#config).
+- The `dox_storage` package, with its provider. See [File storage](../digging-deeper/file-storage.md#config).
 
 ## Serve a folder: one line
 
@@ -16267,7 +16272,7 @@ dart test --concurrency=1
 
 ## Test a route with the database
 
-`DoxTestClient` starts the app inside the test. It runs the services, so the ORM is set up by `ORMService` from `lib/config/database.dart`.
+`DoxTestClient` starts the app inside the test. It runs the providers, so the ORM is set up by `ORMProvider` from `lib/config/database.dart`.
 Set the database with env variables, so the app picks the test database:
 
 ```dart title="test/api_test.dart"
@@ -16712,7 +16717,7 @@ Where each part comes from:
 
 This is the `SavePost` DTO of the tutorial:
 
-```dart title="lib/app/http/dtos/save_post.dto.dart"
+```dart title="lib/app/dtos/save_post/save_post.dto.dart"
 @Dto()
 class SavePost {
   @Trim()
@@ -17781,11 +17786,11 @@ One page to keep open while you work. Each section links to its full page.
 | `lib/config/` | `app.dart` (`AppConfig`), `env.dart`, `database.dart`, `cors.dart`, `cache.dart`, `storage.dart`, `openapi.dart`, `logger.dart`, `socketio.dart` |
 | `lib/routes/` | `api.dart`, `web.dart`, `websocket.dart`: one `Router` class each |
 | `lib/app/http/controllers/` | `<name>.controller.dart` |
-| `lib/app/http/dtos/` | `<name>.dto.dart` |
+| `lib/app/dtos/<name>/` | `<name>.dto.dart` |
 | `lib/app/http/middleware/` | `<name>.middleware.dart` |
 | `lib/app/http/serializers/` | `<name>.serializer.dart` |
 | `lib/app/models/<name>/` | `<name>.model.dart` |
-| `lib/services/` | `DoxService` classes: ORM, auth, websocket |
+| `lib/providers/` | `DoxProvider` classes: ORM, auth, websocket |
 | `lib/generated/container.g.dart`, `lib/generated/dtos.g.dart`, `lib/generated/openapi.g.dart` | made by `build_runner`. Do not edit. |
 | `db/migration/` | migrations and `migrations.dart` (the registry) |
 
@@ -17871,7 +17876,7 @@ Dox().ioc.get<PostService>();
 Dox().ioc.override<PostRepository>(FakePostRepository()); // tests
 ```
 
-Routers and `DoxService` classes are found without `@Inject()`. Run `dart run build_runner build` after a change.
+Routers and `DoxProvider` classes are found without `@Inject()`. Run `dart run build_runner build` after a change.
 See [Dependency injection](../the-basic/dependency-injection.md).
 
 Middleware order: `globalMiddleware`, router `middleware`, group, route.
@@ -18217,7 +18222,7 @@ class ChatNamespace extends NamespaceHandler {
 }
 ```
 
-Turn it on with a `SocketIoService` (extend it in `lib/`). Many isolates need the Redis adapter and `transports: ['websocket']` on the client.
+Turn it on with a `SocketIoProvider` (extend it in `lib/`). Many isolates need the Redis adapter and `transports: ['websocket']` on the client.
 
 See [Socket.IO](../packages/socketio.md).
 
@@ -18296,14 +18301,14 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `container` | `void Function(IocContainer)?` | `null` | Fills the container: `registerContainer` from `lib/generated/container.g.dart`. Every isolate runs it. It also gives the routers, services and model binders. See [Dependency injection](../the-basic/dependency-injection.md). |
+| `container` | `void Function(IocContainer)?` | `null` | Fills the container: `registerContainer` from `lib/generated/container.g.dart`. Every isolate runs it. It also gives the routers, providers and model binders. See [Dependency injection](../the-basic/dependency-injection.md). |
 | `routers` | `List<Router>` | `[]` | Routers to register first, in this order. Every other `Router` class comes from `container`. |
 | `globalMiddleware` | `List<dynamic>` | `[]` | Middleware that runs on every route. A function or an `IDoxMiddleware`. |
 | `dtos` | `List<DtoSchema<Object>>` | `[]` | Every DTO of the app: `dtos` from `lib/generated/dtos.g.dart`. Dox finds the DTO of a controller parameter and of `req.validate<T>()` with it. |
 | `validationMessages` | `MessageResolver?` | `null` (English messages) | Messages for validation errors, for example in other languages. |
 | `responseHandler` | `ResponseHandlerInterface?` | `null` | A class with `DoxResponse handle(DoxResponse res)`. It sees every response before it is sent. |
 | `exceptionHandler` | `ExceptionHandler` | `ExceptionHandler()` | Reports every unhandled error and turns it into a response. The default logs the error with `Logger.warn` and the stack with `Logger.danger`. See [Error handling](../the-basic/errors.md). |
-| `services` | `List<DoxService>` | `[]` | Services to run first, in this order. Every other `DoxService` class comes from `container`. Dox runs them in every isolate at start. |
+| `providers` | `List<DoxProvider>` | `[]` | Providers to run first, in this order. Every other `DoxProvider` class comes from `container`. Dox runs them in every isolate at start. |
 
 ## Sub configs
 
@@ -18370,7 +18375,7 @@ Options of each driver:
 
 ## StorageConfig
 
-`StorageService` of the `dox_storage` package takes it. See [File storage](../digging-deeper/file-storage.md).
+`StorageProvider` of the `dox_storage` package takes it. See [File storage](../digging-deeper/file-storage.md).
 Source: `lib/src/dox/storage_config.dart` in [dartondox/dox-storage](https://github.com/dartondox/dox-storage).
 
 | Field | Type | Default | Meaning |
@@ -18430,7 +18435,7 @@ Source: `packages/dox-core/lib/openapi/openapi_config.dart`.
 
 ## SocketIoConfig
 
-`SocketIoService` of the `dox_socketio` package takes it. See [Socket.IO](../packages/socketio.md).
+`SocketIoProvider` of the `dox_socketio` package takes it. See [Socket.IO](../packages/socketio.md).
 Source: `lib/src/dox/socket_io_config.dart` in [dartondox/dox-socketio](https://github.com/dartondox/dox-socketio).
 
 | Field | Type | Default | Meaning |
@@ -18466,7 +18471,7 @@ Source: `lib/src/dox/socket_io_config.dart` in [dartondox/dox-socketio](https://
 
 ## DatabaseConfig
 
-The database is not a field of `AppConfig`. A service calls `SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig)` in its `setup()`.
+The database is not a field of `AppConfig`. A provider calls `SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig)` in its `setup()`.
 Source: `packages/dox-orm/lib/src/types/database_config.dart` and `connection_config.dart` in [dartondox/dox-orm](https://github.com/dartondox/dox-orm).
 
 | Field | Type | Default | Meaning |
@@ -18507,7 +18512,7 @@ Keys of `extra`:
 
 ## AuthConfig
 
-Auth is not a field of `AppConfig`. A service calls `Auth.initialize(AuthConfig(...))` in its `setup()`.
+Auth is not a field of `AppConfig`. A provider calls `Auth.initialize(AuthConfig(...))` in its `setup()`.
 Source: `packages/dox-auth/lib/src/interfaces.dart`.
 
 | Class | Field | Type | Default | Meaning |
@@ -18648,14 +18653,14 @@ CORSConfig cors = CORSConfig(
 );
 ```
 
-```dart title="lib/services/orm_service.dart"
+```dart title="lib/providers/orm_provider.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart';
 import 'package:my_app/config/database.dart';
 
 /// Dox finds it by itself and runs it in every isolate.
 /// No database? Delete this file.
-class ORMService implements DoxService, DoxShutdown {
+class ORMProvider extends DoxProvider {
   @override
   Future<void> setup() async {
     SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
@@ -18668,7 +18673,7 @@ class ORMService implements DoxService, DoxShutdown {
 }
 ```
 
-A new project has no `openapi.dart`, `socketio.dart` or auth service. You add them when you need them. See [OpenAPI](../packages/openapi.md), [Socket.IO](../packages/socketio.md) and [Authentication](../security/authentication.md).
+A new project has no `openapi.dart`, `socketio.dart` or auth provider. You add them when you need them. See [OpenAPI](../packages/openapi.md), [Socket.IO](../packages/socketio.md) and [Authentication](../security/authentication.md).
 
 
 ---
@@ -18912,8 +18917,8 @@ Template: `_getSample` in `packages/dox-cli/lib/src/tools/create_middleware.dart
 dox make:dto <name>
 ```
 
-Writes `lib/app/http/dtos/<name>.dto.dart`: a `@Dto()` class with one `name` field and `part '<name>.dto.g.dart';`.
-A trailing `Dto` in the name is removed. Prints `Run `dox build_runner:build` to make <name>.dto.g.dart.`
+Writes `lib/app/dtos/<name>/<name>.dto.dart`: a `@Dto()` class with one `name` field and `part '<name>.dto.g.dart';`.
+A trailing `Dto` in the name is removed. Prints `Run `dox build_runner:build` to make <name>/<name>.dto.g.dart.`
 
 Template: `_getSample` in `packages/dox-cli/lib/src/tools/create_dto.dart`.
 
@@ -19542,7 +19547,7 @@ If `APP_ENV` is not set, Dox treats the app as production: `/docs` is off and er
 | Check | How | Read more |
 | --- | --- | --- |
 | Health route | Add `Route.health('/health', checks: ...)` with a database check, so the load balancer knows when the app can not serve. | [Health check](../digging-deeper/health-check.md) |
-| Graceful shutdown | On `SIGTERM` or `SIGINT`, Dox stops taking connections and lets open requests finish, in every isolate. Set `shutdownTimeout` below the kill timeout of your platform. The `ORMService` closes the database in its `DoxShutdown` hook, and Dox closes the cache stores. Close your own connections in a `DoxShutdown` service. | [Deployment](../digging-deeper/deployment.md#graceful-shutdown) |
+| Graceful shutdown | On `SIGTERM` or `SIGINT`, Dox stops taking connections and lets open requests finish, in every isolate. Set `shutdownTimeout` below the kill timeout of your platform. The `ORMProvider` closes the database in its `shutdown()`, and Dox closes the cache stores. Close your own connections in the `shutdown()` of a provider. | [Deployment](../digging-deeper/deployment.md#graceful-shutdown) |
 | Zero downtime deploys | Run two processes (or machines) behind the proxy. Restart one at a time. | [Deployment](../digging-deeper/deployment.md) |
 
 ## Rate limit at the proxy
@@ -20146,6 +20151,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_auth
 
+### 3.0.0-alpha.15
+
+- Docs: the README and the example set up auth in an `AppAuthProvider` that extends `DoxProvider`.
+
 ### 3.0.0-alpha.14
 
 - New: `Auth().setUser(req, user)` sets the logged-in user on `req.auth`, with no token and no password check. Use it in your own auth middleware, like an API key check.
@@ -20224,6 +20233,10 @@ What changed in each package, newest first. This page is made from the
 - `dart_jsonwebtoken` 3.
 
 ## dox_builder
+
+### 3.0.0-alpha.15
+
+- Change: the container builder finds every class that extends `DoxProvider` and writes `c.provider<...>` for it.
 
 ### 3.0.0-alpha.14
 
@@ -20382,6 +20395,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox
 
+### 3.0.0-alpha.15
+
+- `dox make:dto CreateBlog` now writes `lib/app/http/dtos/create_blog/create_blog.dto.dart`. Each DTO has its own folder, like models. The `.dto.g.dart` file is made next to it.
+
 ### 3.0.0-alpha.14
 
 - Fix: `dox make:migration` run more than once in the same second gave files with the same timestamp. Then the run order depended only on the name, which could break foreign keys. Now each new migration (`.dart` or `.sql`) sorts after every file already in `db/migration`. When needed, it uses the newest time plus 1 second.
@@ -20467,6 +20484,10 @@ What changed in each package, newest first. This page is made from the
 - Generated models import `package:dox_orm/dox_orm.dart`.
 
 ## dox_core
+
+### 3.0.0-alpha.15
+
+- Change: the startup hook is `DoxProvider`. Write `class X extends DoxProvider`. `setup()` runs once in every isolate at start. `shutdown()` is optional and runs once in every isolate when the app stops. List providers in `AppConfig.providers`, or add them with `Dox().addProvider()` and `Dox().addProviders()`. The container method is `c.provider<T>()`.
 
 ### 3.0.0-alpha.14
 

@@ -2413,10 +2413,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-service" class="md-nav__link">
+  <a href="#2-provider" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Service
+        2. Provider
       
     </span>
   </a>
@@ -2869,7 +2869,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../services/" class="md-nav__link">
+      <a href="../providers/" class="md-nav__link">
         
   
   
@@ -2892,7 +2892,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6354,10 +6354,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-service" class="md-nav__link">
+  <a href="#2-provider" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Service
+        2. Provider
       
     </span>
   </a>
@@ -6688,19 +6688,19 @@
 </tr>
 </tbody>
 </table>
-<h3 id="2-service">2. Service</h3>
-<p>The service sets up the mailers in every isolate. Put it in <code>lib/</code> so the generated container finds it.</p>
-<div class="language-dart highlight"><span class="filename">lib/services/mail_service.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_mailer/dox_mailer.dart'</span><span class="p">;</span>
+<h3 id="2-provider">2. Provider</h3>
+<p>The provider sets up the mailers in every isolate. Put it in <code>lib/</code> so the generated container finds it.</p>
+<div class="language-dart highlight"><span class="filename">lib/providers/mail_provider.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_mailer/dox_mailer.dart'</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'../config/mail.dart'</span><span class="p">;</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1">/// Sets up the mailers. Dox finds every DoxService class,</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1">/// Sets up the mailers. Dox finds every DoxProvider class,</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1">/// see lib/generated/container.g.dart.</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppMailService</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">MailService</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="n">AppMailService</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">super</span><span class="p">(</span><span class="n">mailConfig</span><span class="p">);</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppMailProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">MailProvider</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="n">AppMailProvider</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">super</span><span class="p">(</span><span class="n">mailConfig</span><span class="p">);</span>
 </span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>When the server stops, the service closes open SMTP connections and HTTP clients.</p>
+<p>When the server stops, the provider closes open SMTP connections and HTTP clients.</p>
 <h2 id="send-an-email">Send an email</h2>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_mailer/dox_mailer.dart'</span><span class="p">;</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
@@ -7105,7 +7105,7 @@
 </span><span id="__span-21-22"><a id="__codelineno-21-22" name="__codelineno-21-22" href="#__codelineno-21-22"></a><span class="w">  </span><span class="p">});</span>
 </span><span id="__span-21-23"><a id="__codelineno-21-23" name="__codelineno-21-23" href="#__codelineno-21-23"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>Mail.fake()</code> works with or without a config. Call it after the app has started, because <code>MailService</code> sets up the config again at start.</p>
+<p><code>Mail.fake()</code> works with or without a config. Call it after the app has started, because <code>MailProvider</code> sets up the config again at start.</p>
 <p><code>mail.clear()</code> forgets the sent emails.</p>
 <h2 id="your-own-transport">Your own transport</h2>
 <p>Extend <code>Transport</code> and add it to <code>mailers</code>:</p>

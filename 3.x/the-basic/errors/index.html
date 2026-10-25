@@ -2654,7 +2654,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../digging-deeper/services/" class="md-nav__link">
+      <a href="../../digging-deeper/providers/" class="md-nav__link">
         
   
   
@@ -2677,7 +2677,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6271,7 +6271,7 @@ Use it to read headers, like <code>req.headers.value('accept')</code>.</p>
 The client always gets a response.</p>
 <h2 id="errors-outside-a-request">Errors outside a request</h2>
 <p>Some errors do not belong to a request.
-For example a future that nobody awaits, or an error in a service <code>shutdown()</code>.
+For example a future that nobody awaits, or an error in the <code>shutdown()</code> of a provider.
 Dox passes them to <code>report</code> too. The server keeps running.</p>
 <h2 id="the-response-handler">The response handler</h2>
 <p>The <code>responseHandler</code> of <code>AppConfig</code> still runs after <code>render</code>.

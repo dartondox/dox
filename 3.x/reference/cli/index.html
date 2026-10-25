@@ -2532,7 +2532,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../digging-deeper/services/" class="md-nav__link">
+      <a href="../../digging-deeper/providers/" class="md-nav__link">
         
   
   
@@ -2555,7 +2555,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6855,8 +6855,8 @@ A trailing <code>Middleware</code> in the name is removed.</p>
 <h3 id="dox-makedto"><code>dox make:dto</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>dox make:dto &lt;name&gt;
 </span></code></pre></div>
-<p>Writes <code>lib/app/http/dtos/&lt;name&gt;.dto.dart</code>: a <code>@Dto()</code> class with one <code>name</code> field and <code>part '&lt;name&gt;.dto.g.dart';</code>.
-A trailing <code>Dto</code> in the name is removed. Prints <code>Run</code>dox build_runner:build<code>to make &lt;name&gt;.dto.g.dart.</code></p>
+<p>Writes <code>lib/app/dtos/&lt;name&gt;/&lt;name&gt;.dto.dart</code>: a <code>@Dto()</code> class with one <code>name</code> field and <code>part '&lt;name&gt;.dto.g.dart';</code>.
+A trailing <code>Dto</code> in the name is removed. Prints <code>Run</code>dox build_runner:build<code>to make &lt;name&gt;/&lt;name&gt;.dto.g.dart.</code></p>
 <p>Template: <code>_getSample</code> in <code>packages/dox-cli/lib/src/tools/create_dto.dart</code>.</p>
 <h3 id="dox-makeserializer"><code>dox make:serializer</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>dox make:serializer &lt;name&gt;

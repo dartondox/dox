@@ -2532,7 +2532,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../digging-deeper/services/" class="md-nav__link">
+      <a href="../../digging-deeper/providers/" class="md-nav__link">
         
   
   
@@ -2555,7 +2555,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6429,7 +6429,7 @@
 <td><code>container</code></td>
 <td><code>void Function(IocContainer)?</code></td>
 <td><code>null</code></td>
-<td>Fills the container: <code>registerContainer</code> from <code>lib/generated/container.g.dart</code>. Every isolate runs it. It also gives the routers, services and model binders. See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</td>
+<td>Fills the container: <code>registerContainer</code> from <code>lib/generated/container.g.dart</code>. Every isolate runs it. It also gives the routers, providers and model binders. See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</td>
 </tr>
 <tr>
 <td><code>routers</code></td>
@@ -6468,10 +6468,10 @@
 <td>Reports every unhandled error and turns it into a response. The default logs the error with <code>Logger.warn</code> and the stack with <code>Logger.danger</code>. See <a href="../../the-basic/errors/">Error handling</a>.</td>
 </tr>
 <tr>
-<td><code>services</code></td>
-<td><code>List&lt;DoxService&gt;</code></td>
+<td><code>providers</code></td>
+<td><code>List&lt;DoxProvider&gt;</code></td>
 <td><code>[]</code></td>
-<td>Services to run first, in this order. Every other <code>DoxService</code> class comes from <code>container</code>. Dox runs them in every isolate at start.</td>
+<td>Providers to run first, in this order. Every other <code>DoxProvider</code> class comes from <code>container</code>. Dox runs them in every isolate at start.</td>
 </tr>
 </tbody>
 </table>
@@ -6734,7 +6734,7 @@
 </tbody>
 </table>
 <h2 id="storageconfig">StorageConfig</h2>
-<p><code>StorageService</code> of the <code>dox_storage</code> package takes it. See <a href="../../digging-deeper/file-storage/">File storage</a>.
+<p><code>StorageProvider</code> of the <code>dox_storage</code> package takes it. See <a href="../../digging-deeper/file-storage/">File storage</a>.
 Source: <code>lib/src/dox/storage_config.dart</code> in <a href="https://github.com/dartondox/dox-storage">dartondox/dox-storage</a>.</p>
 <table>
 <thead>
@@ -7005,7 +7005,7 @@ Source: <code>lib/src/dox/storage_config.dart</code> in <a href="https://github.
 </tbody>
 </table>
 <h2 id="socketioconfig">SocketIoConfig</h2>
-<p><code>SocketIoService</code> of the <code>dox_socketio</code> package takes it. See <a href="../../packages/socketio/">Socket.IO</a>.
+<p><code>SocketIoProvider</code> of the <code>dox_socketio</code> package takes it. See <a href="../../packages/socketio/">Socket.IO</a>.
 Source: <code>lib/src/dox/socket_io_config.dart</code> in <a href="https://github.com/dartondox/dox-socketio">dartondox/dox-socketio</a>.</p>
 <table>
 <thead>
@@ -7154,7 +7154,7 @@ Source: <code>lib/src/dox/socket_io_config.dart</code> in <a href="https://githu
 </tbody>
 </table>
 <h2 id="databaseconfig">DatabaseConfig</h2>
-<p>The database is not a field of <code>AppConfig</code>. A service calls <code>SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig)</code> in its <code>setup()</code>.
+<p>The database is not a field of <code>AppConfig</code>. A provider calls <code>SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig)</code> in its <code>setup()</code>.
 Source: <code>packages/dox-orm/lib/src/types/database_config.dart</code> and <code>connection_config.dart</code> in <a href="https://github.com/dartondox/dox-orm">dartondox/dox-orm</a>.</p>
 <table>
 <thead>
@@ -7344,7 +7344,7 @@ Source: <code>packages/dox-orm/lib/src/types/database_config.dart</code> and <co
 </tbody>
 </table>
 <h2 id="authconfig">AuthConfig</h2>
-<p>Auth is not a field of <code>AppConfig</code>. A service calls <code>Auth.initialize(AuthConfig(...))</code> in its <code>setup()</code>.
+<p>Auth is not a field of <code>AppConfig</code>. A provider calls <code>Auth.initialize(AuthConfig(...))</code> in its <code>setup()</code>.
 Source: <code>packages/dox-auth/lib/src/interfaces.dart</code>.</p>
 <table>
 <thead>
@@ -7524,13 +7524,13 @@ Source: <code>packages/dox-auth/lib/src/interfaces.dart</code>.</p>
 </span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">  </span><span class="nl">maxAge:</span><span class="w"> </span><span class="m">90</span><span class="p">,</span>
 </span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="p">);</span>
 </span></code></pre></div>
-<div class="language-dart highlight"><span class="filename">lib/services/orm_service.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+<div class="language-dart highlight"><span class="filename">lib/providers/orm_provider.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/database.dart'</span><span class="p">;</span>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="c1">/// Dox finds it by itself and runs it in every isolate.</span>
 </span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="c1">/// No database? Delete this file.</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ORMService</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">DoxService</span><span class="p">,</span><span class="w"> </span><span class="n">DoxShutdown</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ORMProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="nd">@override</span>
 </span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="n">SqlQueryBuilder</span><span class="p">.</span><span class="n">initializeWithDatabaseConfig</span><span class="p">(</span><span class="n">databaseConfig</span><span class="p">);</span>
@@ -7542,7 +7542,7 @@ Source: <code>packages/dox-auth/lib/src/interfaces.dart</code>.</p>
 </span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>A new project has no <code>openapi.dart</code>, <code>socketio.dart</code> or auth service. You add them when you need them. See <a href="../../packages/openapi/">OpenAPI</a>, <a href="../../packages/socketio/">Socket.IO</a> and <a href="../../security/authentication/">Authentication</a>.</p>
+<p>A new project has no <code>openapi.dart</code>, <code>socketio.dart</code> or auth provider. You add them when you need them. See <a href="../../packages/openapi/">OpenAPI</a>, <a href="../../packages/socketio/">Socket.IO</a> and <a href="../../security/authentication/">Authentication</a>.</p>
 
 
 

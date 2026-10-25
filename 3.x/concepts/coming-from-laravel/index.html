@@ -2786,7 +2786,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../digging-deeper/services/" class="md-nav__link">
+      <a href="../../digging-deeper/providers/" class="md-nav__link">
         
   
   
@@ -2809,7 +2809,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6656,7 +6656,7 @@ Dox middleware runs before the controller only. There is no "after" step; use a 
 </tr>
 </tbody>
 </table>
-<div class="language-dart highlight"><span class="filename">lib/app/http/dtos/create_blog.dto.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nd">@Dto</span><span class="p">()</span>
+<div class="language-dart highlight"><span class="filename">lib/app/dtos/create_blog/create_blog.dto.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nd">@Dto</span><span class="p">()</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">CreateBlog</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nd">@Length</span><span class="p">(</span><span class="nl">min:</span><span class="w"> </span><span class="m">3</span><span class="p">,</span><span class="w"> </span><span class="nl">max:</span><span class="w"> </span><span class="m">50</span><span class="p">)</span>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">title</span><span class="p">;</span>
@@ -7098,7 +7098,7 @@ See <a href="../../digging-deeper/dox-cli/">Dox CLI</a>.</p>
 <tbody>
 <tr>
 <td><code>config/auth.php</code> guards and providers</td>
-<td><code>Auth.initialize(AuthConfig(guards: ...))</code> in a service</td>
+<td><code>Auth.initialize(AuthConfig(guards: ...))</code> in a provider</td>
 </tr>
 <tr>
 <td><code>Auth::attempt(['email' =&gt; $e, 'password' =&gt; $p])</code></td>
@@ -7183,7 +7183,7 @@ See <a href="../../security/authentication/">Authentication</a>.</p>
 <tbody>
 <tr>
 <td><code>config/filesystems.php</code> disks</td>
-<td><code>lib/config/storage.dart</code>, <code>StorageConfig(defaultDisk:, disks:)</code>, passed to a <code>StorageService</code> (<code>dox_storage</code>)</td>
+<td><code>lib/config/storage.dart</code>, <code>StorageConfig(defaultDisk:, disks:)</code>, passed to a <code>StorageProvider</code> (<code>dox_storage</code>)</td>
 </tr>
 <tr>
 <td><code>Storage::put('a.txt', $bytes)</code></td>
@@ -7301,7 +7301,7 @@ See <a href="../../digging-deeper/testing/">Testing</a>.</p>
 <h2 id="what-is-different">What is different</h2>
 <ul>
 <li><strong>A generated container.</strong> Like Laravel, Dox makes your controllers and injects what the constructor asks for.
-  You add <code>@Inject()</code> to the class. <code>build_runner</code> writes <code>lib/generated/container.g.dart</code> with every registration. There are no service providers to write.
+  You add <code>@Inject()</code> to the class. <code>build_runner</code> writes <code>lib/generated/container.g.dart</code> with every registration. You do not register classes by hand in a provider.
   A singleton is one instance per isolate, not one per request.</li>
 <li><strong>Isolates, not PHP-FPM workers.</strong> One process runs one isolate per CPU core. Each isolate runs your whole app and has its own memory.
   A static value or a singleton lives once per isolate. A PHP worker starts from zero on each request. A Dox isolate keeps its state between requests, so a memory leak stays.

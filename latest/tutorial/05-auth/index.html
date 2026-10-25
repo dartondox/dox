@@ -1022,10 +1022,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-set-up-the-auth-service" class="md-nav__link">
+  <a href="#4-set-up-the-auth-provider" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Set up the auth service
+        4. Set up the auth provider
       
     </span>
   </a>
@@ -2707,7 +2707,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../digging-deeper/services/" class="md-nav__link">
+      <a href="../../digging-deeper/providers/" class="md-nav__link">
         
   
   
@@ -2730,7 +2730,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6191,10 +6191,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-set-up-the-auth-service" class="md-nav__link">
+  <a href="#4-set-up-the-auth-provider" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Set up the auth service
+        4. Set up the auth provider
       
     </span>
   </a>
@@ -6331,7 +6331,7 @@ server ran it at the first start in <a href="../01-create-project/">step 1</a>:<
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>dox<span class="w"> </span>make:dto<span class="w"> </span>RegisterUser
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>dox<span class="w"> </span>make:dto<span class="w"> </span>LoginUser
 </span></code></pre></div>
-<div class="language-dart highlight"><span class="filename">lib/app/http/dtos/register_user.dto.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+<div class="language-dart highlight"><span class="filename">lib/app/dtos/register_user/register_user.dto.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="w"> </span><span class="k">hide</span><span class="w"> </span><span class="n">Schema</span><span class="p">;</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="k">part</span><span class="w"> </span><span class="s1">'register_user.dto.g.dart'</span><span class="p">;</span>
@@ -6362,7 +6362,7 @@ server ran it at the first start in <a href="../01-create-project/">step 1</a>:<
 </span></code></pre></div>
 <p><code>@Unique</code> comes from <code>dox_orm</code>. It reads the database, so it runs after the other rules.
 <code>dox_orm</code> also has a class named <code>Schema</code>, so the import hides it.</p>
-<div class="language-dart highlight"><span class="filename">lib/app/http/dtos/login_user.dto.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+<div class="language-dart highlight"><span class="filename">lib/app/dtos/login_user/login_user.dto.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">part</span><span class="w"> </span><span class="s1">'login_user.dto.g.dart'</span><span class="p">;</span>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
@@ -6380,18 +6380,18 @@ server ran it at the first start in <a href="../01-create-project/">step 1</a>:<
 </span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">DtoSchema</span><span class="o">&lt;</span><span class="n">LoginUser</span><span class="o">&gt;</span><span class="w"> </span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">$LoginUserDto</span><span class="p">;</span>
 </span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="p">}</span>
 </span></code></pre></div>
-<h2 id="4-set-up-the-auth-service">4. Set up the auth service</h2>
-<p>A service runs once in every isolate at start. This one tells <code>dox_auth</code> which model to use and how to sign tokens:</p>
-<div class="language-dart highlight"><span class="filename">lib/services/auth_service.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/app/models/user/user.model.dart'</span><span class="p">;</span>
+<h2 id="4-set-up-the-auth-provider">4. Set up the auth provider</h2>
+<p>A provider runs once in every isolate at start. This one tells <code>dox_auth</code> which model to use and how to sign tokens:</p>
+<div class="language-dart highlight"><span class="filename">lib/providers/auth_provider.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/app/models/user/user.model.dart'</span><span class="p">;</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/config/env.dart'</span><span class="p">;</span>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_auth/dox_auth.dart'</span><span class="p">;</span>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="c1">/// Auth service</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="c1">/// Auth provider</span>
 </span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1">/// --------------------------</span>
 </span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="c1">/// Sets up JWT login with the User model.</span>
 </span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="c1">/// Tokens are signed with APP_KEY and last 7 days.</span>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AuthService</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">DoxService</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppAuthProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">  </span><span class="nd">@override</span>
 </span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="n">Auth</span><span class="p">.</span><span class="n">initialize</span><span class="p">(</span>
@@ -6411,11 +6411,11 @@ server ran it at the first start in <a href="../01-create-project/">step 1</a>:<
 </span><span id="__span-6-27"><a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-6-28"><a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Dox finds the service by itself. Run <code>dart run build_runner build</code> and it is in <code>lib/generated/container.g.dart</code>.
+<p>Dox finds the provider by itself. Run <code>dart run build_runner build</code> and it is in <code>lib/generated/container.g.dart</code>.
 You do not add it to a list.</p>
 <h2 id="5-write-the-auth-controller">5. Write the auth controller</h2>
-<div class="language-dart highlight"><span class="filename">lib/app/http/controllers/auth.controller.dart</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/app/http/dtos/login_user.dto.dart'</span><span class="p">;</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/app/http/dtos/register_user.dto.dart'</span><span class="p">;</span>
+<div class="language-dart highlight"><span class="filename">lib/app/http/controllers/auth.controller.dart</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/app/dtos/login_user/login_user.dto.dart'</span><span class="p">;</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/app/dtos/register_user/register_user.dto.dart'</span><span class="p">;</span>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/app/models/user/user.model.dart'</span><span class="p">;</span>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_auth/dox_auth.dart'</span><span class="p">;</span>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>

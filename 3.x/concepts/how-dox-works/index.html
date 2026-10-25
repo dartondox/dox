@@ -2741,7 +2741,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../digging-deeper/services/" class="md-nav__link">
+      <a href="../../digging-deeper/providers/" class="md-nav__link">
         
   
   
@@ -2764,7 +2764,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6415,7 +6415,7 @@ This is why <code>dox build</code> can make a native (AOT) binary.</p>
 </tr>
 <tr>
 <td>Input</td>
-<td>a <code>@Dto</code> class in <code>lib/app/http/dtos/</code></td>
+<td>a <code>@Dto</code> class in <code>lib/app/dtos/&lt;name&gt;/</code></td>
 <td>what the controller gets, or <code>422</code></td>
 </tr>
 <tr>
@@ -6464,19 +6464,19 @@ Dox starts one isolate per CPU core (<code>Platform.numberOfProcessors</code>). 
 <p>Before it starts an isolate, Dox copies three things to it:</p>
 <ul>
 <li>the <code>AppConfig</code>,</li>
-<li>the list of services,</li>
+<li>the list of providers,</li>
 <li>the routes you added before <code>startServer()</code>.</li>
 </ul>
 <p>Then each isolate does this, once:</p>
 <ol>
-<li>It runs <code>setup()</code> of every service, in list order. This is where a database pool is opened.</li>
+<li>It runs <code>setup()</code> of every provider, in list order. This is where a database pool is opened.</li>
 <li>It registers the routes of your routers.</li>
 <li>It reads the parameter types of every controller.</li>
 <li>It starts its HTTP server.</li>
 </ol>
 <p>Nothing in this list runs per request.</p>
-<p>Because the config and the services are copied, they must not hold open sockets or pools.
-Open these in <code>setup()</code>. See <a href="../../digging-deeper/services/">Services</a>.</p>
+<p>Because the config and the providers are copied, they must not hold open sockets or pools.
+Open these in <code>setup()</code>. See <a href="../../digging-deeper/providers/">Providers</a>.</p>
 <h3 id="each-isolate-has-its-own-memory">Each isolate has its own memory</h3>
 <ul>
 <li>A static value or a singleton exists once per isolate. A change in one isolate is not seen in the others.</li>
@@ -6495,7 +6495,7 @@ Open these in <code>setup()</code>. See <a href="../../digging-deeper/services/"
 <p>Set <code>totalIsolate</code> in <code>AppConfig</code>, or <code>APP_TOTAL_ISOLATE</code> in <code>.env</code>. In code, <code>Dox().totalIsolate(2)</code> before <code>startServer()</code> wins over the config.
 Use <code>1</code> in tests. See <a href="../../digging-deeper/isolate/">Isolate</a>.</p>
 <h2 id="where-the-database-pools-live">Where the database pools live</h2>
-<p>The ORM is started in a service (<code>ORMService</code>). Every isolate runs <code>setup()</code>, so every isolate opens a pool.
+<p>The ORM is started in a provider (<code>ORMProvider</code>). Every isolate runs <code>setup()</code>, so every isolate opens a pool.
 The native drivers live in Rust. There, isolates that open the same settings get the same pool.</p>
 <table>
 <thead>
@@ -6537,9 +6537,9 @@ See <a href="../../database/postgres-native/#options">Native Postgres driver</a>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   └── migration/           # migrations (.dart with a registry, or .sql)
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>├── lib/
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   ├── app/
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   │   ├── http/
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   │   │   ├── controllers/     # *.controller.dart
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│   │   │   ├── dtos/            # *.dto.dart, typed and checked input
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   │   ├── dtos/            # one folder per DTO, *.dto.dart, typed and checked input
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   │   ├── http/
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│   │   │   ├── controllers/     # *.controller.dart
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│   │   │   ├── middleware/      # *.middleware.dart
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│   │   │   ├── serializers/     # *.serializer.dart, custom JSON shapes
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│   │   │   └── response_handler.dart
@@ -6555,10 +6555,10 @@ See <a href="../../database/postgres-native/#options">Native Postgres driver</a>
 </span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>│   ├── routes/
 </span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>│   │   ├── api.dart             # ApiRouter, prefix `api`
 </span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>│   │   └── web.dart             # WebRouter
-</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>│   ├── services/
-</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>│   │   └── orm_service.dart     # opens the database in every isolate
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>│   ├── providers/
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>│   │   └── orm_provider.dart    # opens the database in every isolate
 </span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>│   └── generated/               # made by build_runner, do not edit
-</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>│       ├── container.g.dart     # @Inject classes, routers, services
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>│       ├── container.g.dart     # @Inject classes, routers, providers
 </span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>│       ├── dtos.g.dart          # the list of DTOs
 </span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>│       └── openapi.g.dart       # the OpenAPI docs
 </span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>├── storage/                     # local disk, file cache, uploads
@@ -6602,8 +6602,8 @@ See <a href="../../database/postgres-native/#options">Native Postgres driver</a>
 <td>One <code>Router</code> class per file. Dox finds each router by itself.</td>
 </tr>
 <tr>
-<td><code>lib/services/</code></td>
-<td>Classes that implement <code>DoxService</code>. Their <code>setup()</code> runs in every isolate.</td>
+<td><code>lib/providers/</code></td>
+<td>Classes that extend <code>DoxProvider</code>. Their <code>setup()</code> runs in every isolate.</td>
 </tr>
 <tr>
 <td><code>lib/*.g.dart</code></td>

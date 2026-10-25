@@ -2683,7 +2683,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../services/" class="md-nav__link">
+      <a href="../providers/" class="md-nav__link">
         
   
   
@@ -2706,7 +2706,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6294,12 +6294,12 @@ so the app starts without them:</p>
 </span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="c1">/// R2, MinIO or Spaces. Null for AWS.</span>
 </span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">awsEndpoint</span><span class="p">;</span>
 </span></code></pre></div>
-<p>Then add the service. It sets the disks in every isolate. Put it in <code>lib/</code>, so the generated container finds it:</p>
-<div class="language-dart highlight"><span class="filename">lib/services/storage_service.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_storage/dox_storage.dart'</span><span class="p">;</span>
+<p>Then add the provider. It sets the disks in every isolate. Put it in <code>lib/</code>, so the generated container finds it:</p>
+<div class="language-dart highlight"><span class="filename">lib/providers/storage_provider.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_storage/dox_storage.dart'</span><span class="p">;</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/storage.dart'</span><span class="p">;</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppStorageService</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">StorageService</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="n">AppStorageService</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">super</span><span class="p">(</span><span class="n">storageConfig</span><span class="p">);</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppStorageProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">StorageProvider</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="n">AppStorageProvider</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">super</span><span class="p">(</span><span class="n">storageConfig</span><span class="p">);</span>
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">}</span>
 </span></code></pre></div>
 <table>
@@ -6372,7 +6372,7 @@ Set the disk <code>url</code> option to the full URL of the route (<code>https:/
 <h2 id="tests">Tests</h2>
 <p>To swap a disk with a memory disk in tests, see <a href="../testing/#test-file-storage">Testing</a>.</p>
 <h2 id="your-own-driver">Your own driver</h2>
-<p>Implement <code>DriverContract</code> from <code>package:dox_storage/dox_storage.dart</code>. Register it in a <a href="../services/">service</a>, so every isolate has it:</p>
+<p>Implement <code>DriverContract</code> from <code>package:dox_storage/dox_storage.dart</code>. Register it in a <a href="../providers/">provider</a>, so every isolate has it:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">Storage</span><span class="p">.</span><span class="n">manager</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="s1">'dropbox'</span><span class="p">,</span><span class="w"> </span><span class="n">DropboxDriver</span><span class="p">());</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">disk</span><span class="p">(</span><span class="s1">'dropbox'</span><span class="p">).</span><span class="n">put</span><span class="p">(</span><span class="s1">'notes'</span><span class="p">,</span><span class="w"> </span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="nl">extension:</span><span class="w"> </span><span class="s1">'txt'</span><span class="p">);</span>
 </span></code></pre></div>

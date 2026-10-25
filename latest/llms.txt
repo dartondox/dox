@@ -43,7 +43,7 @@ The full docs as one file: https://dartondox.dev/latest/3.xllms-full.txt
 - [File Storage](https://dartondox.dev/latest/3.xdigging-deeper/file-storage/)
 - [Environment Variables](https://dartondox.dev/latest/3.xdigging-deeper/env/)
 - [Isolate](https://dartondox.dev/latest/3.xdigging-deeper/isolate/)
-- [Services](https://dartondox.dev/latest/3.xdigging-deeper/services/)
+- [Providers](https://dartondox.dev/latest/3.xdigging-deeper/providers/)
 - [Dox CLI](https://dartondox.dev/latest/3.xdigging-deeper/dox-cli/)
 - [Deployment](https://dartondox.dev/latest/3.xdigging-deeper/deployment/)
 - [Native server](https://dartondox.dev/latest/3.xdigging-deeper/native-server/)

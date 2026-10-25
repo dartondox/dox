@@ -2531,7 +2531,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../digging-deeper/services/" class="md-nav__link">
+      <a href="../../digging-deeper/providers/" class="md-nav__link">
         
   
   
@@ -2554,7 +2554,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -4028,10 +4028,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-set-up-the-auth-service" class="md-nav__link">
+  <a href="#2-set-up-the-auth-provider" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Set up the auth service
+        2. Set up the auth provider
       
     </span>
   </a>
@@ -6243,10 +6243,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-set-up-the-auth-service" class="md-nav__link">
+  <a href="#2-set-up-the-auth-provider" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Set up the auth service
+        2. Set up the auth provider
       
     </span>
   </a>
@@ -6449,13 +6449,13 @@ Put it in <code>hidden</code>:</p>
 </span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">password</span><span class="p">;</span>
 </span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="p">}</span>
 </span></code></pre></div>
-<h2 id="2-set-up-the-auth-service">2. Set up the auth service</h2>
-<div class="language-dart highlight"><span class="filename">lib/services/auth_service.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_auth/dox_auth.dart'</span><span class="p">;</span>
+<h2 id="2-set-up-the-auth-provider">2. Set up the auth provider</h2>
+<div class="language-dart highlight"><span class="filename">lib/providers/auth_provider.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_auth/dox_auth.dart'</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/user/user.model.dart'</span><span class="p">;</span>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AuthService</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">DoxService</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppAuthProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="nd">@override</span>
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="n">Auth</span><span class="p">.</span><span class="n">initialize</span><span class="p">(</span>
@@ -6475,7 +6475,7 @@ Put it in <code>hidden</code>:</p>
 </span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Dox finds the service by itself. Run <code>dart run build_runner build</code> and it is in <code>lib/generated/container.g.dart</code>.</p>
+<p>Dox finds the provider by itself. Run <code>dart run build_runner build</code> and it is in <code>lib/generated/container.g.dart</code>.</p>
 <h2 id="3-add-the-routes">3. Add the routes</h2>
 <p><code>AuthMiddleware</code> protects a route.
 When the token is missing or not valid, the request stops with <code>401 Authentication failed</code>.</p>
@@ -6565,7 +6565,7 @@ When the token is missing or not valid, the request stops with <code>401 Authent
 <tbody>
 <tr>
 <td><code>Auth.initialize(AuthConfig)</code></td>
-<td>sets the config. Call it once, in a service</td>
+<td>sets the config. Call it once, in a provider</td>
 </tr>
 <tr>
 <td><code>Auth(guard: 'admin')</code></td>

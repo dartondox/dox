@@ -6,11 +6,11 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A service is a class with a setup() method. Dox runs it at start, in every isolate.">
+        <meta name="description" content="A provider is a class that sets up one part of your app when it starts. For example the database, auth or a Redis connection.">
       
       
       
-        <link rel="canonical" href="https://dartondox.dev/latest/3.x/digging-deeper/services/">
+        <link rel="canonical" href="https://dartondox.dev/latest/3.x/digging-deeper/providers/">
       
       
         <link rel="prev" href="../isolate/">
@@ -27,7 +27,7 @@
     
     
   
-    <title>Services | Dox, the Dart backend framework</title>
+    <title>Providers | Dox, the Dart backend framework</title>
   
 
     
@@ -77,17 +77,17 @@
   
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
-  <meta property="og:title" content="Services | Dox">
-  <meta property="og:description" content="A service is a class with a setup() method. Dox runs it at start, in every isolate.">
-  <meta property="og:url" content="https://dartondox.dev/latest/3.x/digging-deeper/services/">
+  <meta property="og:title" content="Providers | Dox">
+  <meta property="og:description" content="A provider is a class that sets up one part of your app when it starts. For example the database, auth or a Redis connection.">
+  <meta property="og:url" content="https://dartondox.dev/latest/3.x/digging-deeper/providers/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Dox: fast web backend framework for Dart">
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Services | Dox">
-  <meta name="twitter:description" content="A service is a class with a setup() method. Dox runs it at start, in every isolate.">
+  <meta name="twitter:title" content="Providers | Dox">
+  <meta name="twitter:description" content="A provider is a class that sets up one part of your app when it starts. For example the database, auth or a Redis connection.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -97,7 +97,7 @@
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Dox", "item": "https://dartondox.dev/latest/3.x" }
       ,{ "@type": "ListItem", "position": 2, "name": "Digging deeper", "item": "https://dartondox.dev/latest/3.x/digging-deeper/cache/" }
-      ,{ "@type": "ListItem", "position": 3, "name": "Services", "item": "https://dartondox.dev/latest/3.x/digging-deeper/services/" }
+      ,{ "@type": "ListItem", "position": 3, "name": "Providers", "item": "https://dartondox.dev/latest/3.x/digging-deeper/providers/" }
     ]
   }
   </script>
@@ -123,7 +123,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#services" class="md-skip">
+        <a href="#providers" class="md-skip">
           Skip to content
         </a>
       
@@ -160,7 +160,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Services
+              Providers
             
           </span>
         </div>
@@ -2567,7 +2567,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -2601,7 +2601,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -2627,10 +2627,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#why-services" class="md-nav__link">
+  <a href="#why-providers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why services
+        Why providers
       
     </span>
   </a>
@@ -2638,10 +2638,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#create-a-service" class="md-nav__link">
+  <a href="#create-a-provider" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Create a service
+        Create a provider
       
     </span>
   </a>
@@ -2693,10 +2693,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#rules-for-a-service" class="md-nav__link">
+  <a href="#rules-for-a-provider" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Rules for a service
+        Rules for a provider
       
     </span>
   </a>
@@ -6126,10 +6126,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#why-services" class="md-nav__link">
+  <a href="#why-providers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why services
+        Why providers
       
     </span>
   </a>
@@ -6137,10 +6137,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#create-a-service" class="md-nav__link">
+  <a href="#create-a-provider" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Create a service
+        Create a provider
       
     </span>
   </a>
@@ -6192,10 +6192,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#rules-for-a-service" class="md-nav__link">
+  <a href="#rules-for-a-provider" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Rules for a service
+        Rules for a provider
       
     </span>
   </a>
@@ -6219,7 +6219,7 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/digging-deeper/services.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/dartondox/dox/edit/main/docs/digging-deeper/providers.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -6227,20 +6227,24 @@
   
 
 
-<h1 id="services">Services</h1>
-<p>A service is a class with a <code>setup()</code> method. Dox runs it at start, in every isolate.</p>
-<p>Use it to set up things like the database or auth.</p>
-<h2 id="why-services">Why services</h2>
+<h1 id="providers">Providers</h1>
+<p>A provider is a class that sets up one part of your app when it starts. For example the database, auth or a Redis connection.</p>
+<p>A provider has two methods:</p>
+<ul>
+<li><code>setup()</code> runs when the app starts. You must write it.</li>
+<li><code>shutdown()</code> runs when the app stops. It is optional.</li>
+</ul>
+<h2 id="why-providers">Why providers</h2>
 <p>Dox runs your app on many <a href="../isolate/">isolates</a>, and they do not share memory.
 Code that you run once in <code>bin/server.dart</code> only sets up the first isolate. The others have, for example, no database connection.
-A service fixes this: each isolate runs <code>setup()</code> itself.</p>
-<h2 id="create-a-service">Create a service</h2>
-<p>Implement <code>DoxService</code> and put your code in <code>setup()</code>. <code>setup()</code> can be <code>async</code>. Dox waits for it.</p>
-<div class="language-dart highlight"><span class="filename">lib/services/orm_service.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+A provider fixes this: each isolate runs <code>setup()</code> itself.</p>
+<h2 id="create-a-provider">Create a provider</h2>
+<p>Extend <code>DoxProvider</code> and put your code in <code>setup()</code>. <code>setup()</code> can be <code>async</code>. Dox waits for it.</p>
+<div class="language-dart highlight"><span class="filename">lib/providers/orm_provider.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/database.dart'</span><span class="p">;</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ORMService</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">DoxService</span><span class="p">,</span><span class="w"> </span><span class="n">DoxShutdown</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ORMProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nd">@override</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="n">SqlQueryBuilder</span><span class="p">.</span><span class="n">initializeWithDatabaseConfig</span><span class="p">(</span><span class="n">databaseConfig</span><span class="p">);</span>
@@ -6254,28 +6258,28 @@ A service fixes this: each isolate runs <code>setup()</code> itself.</p>
 </span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="register-it">Register it</h2>
-<p>You do not need to. Dox finds every class that implements <code>DoxService</code>.
-Run <code>dart run build_runner build</code>. The service is then in <code>lib/generated/container.g.dart</code>.
+<p>You do not need to. Dox finds every class that extends <code>DoxProvider</code>.
+Run <code>dart run build_runner build</code>. The provider is then in <code>lib/generated/container.g.dart</code>.
 Each isolate makes its own instance from the container. Its constructor can ask for other classes of the container.
-See <a href="../../the-basic/dependency-injection/#routers-and-services">Dependency injection</a>.</p>
-<p>Services run in the order of their file path. To run one first, list it in <code>AppConfig</code>:</p>
+See <a href="../../the-basic/dependency-injection/#routers-and-providers">Dependency injection</a>.</p>
+<p>Providers run in the order of their file path. To run one first, list it in <code>AppConfig</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nl">container:</span><span class="w"> </span><span class="n">registerContainer</span><span class="p">,</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nl">services:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">DoxService</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ORMService</span><span class="p">()],</span><span class="w"> </span><span class="c1">// runs before the others</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nl">providers:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">DoxProvider</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ORMProvider</span><span class="p">()],</span><span class="w"> </span><span class="c1">// runs before the others</span>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>A listed service runs first. Then the others run. No service runs twice.</p>
-<p>You can also add a service in code, before <code>startServer()</code>:</p>
+<p>A listed provider runs first. Then the others run. No provider runs twice.</p>
+<p>You can also add a provider in code, before <code>startServer()</code>:</p>
 <div class="language-dart highlight"><span class="filename">bin/server.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">Dox</span><span class="p">().</span><span class="n">initialize</span><span class="p">(</span><span class="n">appConfig</span><span class="p">);</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">Dox</span><span class="p">().</span><span class="n">addService</span><span class="p">(</span><span class="n">MyService</span><span class="p">());</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">Dox</span><span class="p">().</span><span class="n">addProvider</span><span class="p">(</span><span class="n">MyProvider</span><span class="p">());</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">Dox</span><span class="p">().</span><span class="n">startServer</span><span class="p">();</span>
 </span></code></pre></div>
 <h2 id="example-auth">Example: auth</h2>
-<div class="language-dart highlight"><span class="filename">lib/services/auth_service.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_auth/dox_auth.dart'</span><span class="p">;</span>
+<div class="language-dart highlight"><span class="filename">lib/providers/auth_provider.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_auth/dox_auth.dart'</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/user/user.model.dart'</span><span class="p">;</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AuthService</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">DoxService</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppAuthProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="nd">@override</span>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="n">Auth</span><span class="p">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">AuthConfig</span><span class="p">(</span>
@@ -6290,19 +6294,21 @@ See <a href="../../the-basic/dependency-injection/#routers-and-services">Depende
 </span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>See <a href="../../security/authentication/">Authentication</a>.</p>
+<p>The name is <code>AppAuthProvider</code>, because <code>dox_auth</code> already has a class named <code>AuthProvider</code> (it finds the user model).
+See <a href="../../security/authentication/">Authentication</a>.</p>
 <h2 id="when-setup-runs">When <code>setup()</code> runs</h2>
-<p>In each isolate, Dox runs <code>setup()</code> of each service, one after the other: the listed ones first, then the ones of the container.
-Then it registers the routes and starts the server, so routes can use what a service set up.
+<p>In each isolate, Dox runs <code>setup()</code> of each provider, one after the other: the listed ones first, then the ones of the container.
+Then it registers the routes and starts the server, so routes can use what a provider set up.
 See <a href="../isolate/#what-each-isolate-does-at-start">What each isolate does at start</a>.</p>
-<p><code>dox openapi:generate</code> also runs <code>setup()</code> of every service, because it needs the routes.</p>
+<p><code>dox openapi:generate</code> also runs <code>setup()</code> of every provider, because it needs the routes.</p>
 <h2 id="clean-up-on-shutdown">Clean up on shutdown</h2>
 <p>On <code>SIGTERM</code> or <code>SIGINT</code> Dox stops the server gracefully (see <a href="../deployment/#graceful-shutdown">Deployment</a>).
-After the open requests are done, it runs <code>shutdown()</code> of each service that also implements <code>DoxShutdown</code>.
-It runs in every isolate. Use it to close connections or flush data.</p>
-<p>The <code>ORMService</code> of a new project already does this: its <code>shutdown()</code> calls <code>SqlQueryBuilder.close()</code>.
-Dox closes the cache stores (eg. Redis) by itself, after the services.</p>
-<div class="language-dart highlight"><span class="filename">lib/services/redis_service.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">RedisService</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">DoxService</span><span class="p">,</span><span class="w"> </span><span class="n">DoxShutdown</span><span class="w"> </span><span class="p">{</span>
+After the open requests are done, it runs <code>shutdown()</code> of every provider.
+It runs in every isolate. Use it to close connections or flush data.
+A provider that has nothing to close does not need to write <code>shutdown()</code>.</p>
+<p>The <code>ORMProvider</code> of a new project already does this: its <code>shutdown()</code> calls <code>SqlQueryBuilder.close()</code>.
+Dox closes the cache stores (eg. Redis) by itself, after the providers.</p>
+<div class="language-dart highlight"><span class="filename">lib/providers/redis_provider.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">RedisProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="kd">late</span><span class="w"> </span><span class="n">RedisConnection</span><span class="w"> </span><span class="n">redis</span><span class="p">;</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nd">@override</span>
@@ -6316,10 +6322,10 @@ Dox closes the cache stores (eg. Redis) by itself, after the services.</p>
 </span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>An error in <code>shutdown()</code> goes to the <code>report</code> method of the <a href="../../the-basic/errors/">exception handler</a>. The other services still run.</p>
-<h2 id="rules-for-a-service">Rules for a service</h2>
+<p>An error in <code>shutdown()</code> goes to the <code>report</code> method of the <a href="../../the-basic/errors/">exception handler</a>. The other providers still run.</p>
+<h2 id="rules-for-a-provider">Rules for a provider</h2>
 <ul>
-<li><strong>Open connections in <code>setup()</code>, not in the constructor.</strong> A service listed in <code>AppConfig</code> is copied to each isolate. An open socket or database pool can not be copied, so the isolate fails to start.</li>
+<li><strong>Open connections in <code>setup()</code>, not in the constructor.</strong> A provider listed in <code>AppConfig</code> is copied to each isolate. An open socket or database pool can not be copied, so the isolate fails to start.</li>
 <li><strong>Keep <code>setup()</code> short.</strong> It runs once per isolate. Data you load in it is kept once per isolate, so 8 isolates keep 8 copies.</li>
 </ul>
 

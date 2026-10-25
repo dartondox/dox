@@ -2384,10 +2384,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-service" class="md-nav__link">
+  <a href="#2-provider" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Service
+        2. Provider
       
     </span>
   </a>
@@ -2868,7 +2868,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../services/" class="md-nav__link">
+      <a href="../providers/" class="md-nav__link">
         
   
   
@@ -2891,7 +2891,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6364,10 +6364,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-service" class="md-nav__link">
+  <a href="#2-provider" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Service
+        2. Provider
       
     </span>
   </a>
@@ -6699,16 +6699,16 @@ The <code>dox_queue</code> package gives you jobs, three drivers (Redis, databas
 <p><code>retryAfter</code> is how Dox finds the job of a crashed worker.
 A job that runs longer than <code>retryAfter</code> looks crashed, so a second worker runs it again.</p>
 </div>
-<h3 id="2-service">2. Service</h3>
-<p>The service sets up the queue in every isolate. Put it in <code>lib/</code> so the generated container finds it.</p>
-<div class="language-dart highlight"><span class="filename">lib/services/queue_service.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_queue/dox_queue.dart'</span><span class="p">;</span>
+<h3 id="2-provider">2. Provider</h3>
+<p>The provider sets up the queue in every isolate. Put it in <code>lib/</code> so the generated container finds it.</p>
+<div class="language-dart highlight"><span class="filename">lib/providers/queue_provider.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_queue/dox_queue.dart'</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'../config/queue.dart'</span><span class="p">;</span>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1">/// Sets up the queue. Dox finds every DoxService class,</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1">/// Sets up the queue. Dox finds every DoxProvider class,</span>
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="c1">/// see lib/generated/container.g.dart.</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppQueueService</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">QueueService</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="n">AppQueueService</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">super</span><span class="p">(</span><span class="n">queueConfig</span><span class="p">);</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppQueueProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">QueueProvider</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="n">AppQueueProvider</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">super</span><span class="p">(</span><span class="n">queueConfig</span><span class="p">);</span>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">}</span>
 </span></code></pre></div>
 <h3 id="3-worker-file">3. Worker file</h3>
@@ -6723,7 +6723,7 @@ A job that runs longer than <code>retryAfter</code> looks crashed, so a second w
 </span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="n">exitCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueueWorker</span><span class="p">(</span><span class="nl">app:</span><span class="w"> </span><span class="n">appConfig</span><span class="p">).</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
 </span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>The worker starts the services of your app (database, cache, queue). It does not start the HTTP server.</p>
+<p>The worker starts the providers of your app (database, cache, queue). It does not start the HTTP server.</p>
 <h3 id="4-tables-database-driver-only">4. Tables (database driver only)</h3>
 <p>Add a migration in <code>db/migration</code>. <code>QueueTables</code> makes the <code>jobs</code> and <code>failed_jobs</code> tables.</p>
 <div class="language-dart highlight"><span class="filename">db/migration/2026_10_25_000000000_create_queue_tables.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">// ignore_for_file: file_names</span>

@@ -2530,7 +2530,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../digging-deeper/services/" class="md-nav__link">
+      <a href="../../digging-deeper/providers/" class="md-nav__link">
         
   
   
@@ -2553,7 +2553,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6189,6 +6189,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#300-alpha15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.0.0-alpha.15
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha14_1" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6358,6 +6369,17 @@
   
     <nav class="md-nav" aria-label="dox_builder">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#300-alpha15_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.0.0-alpha.15
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha14_2" class="md-nav__link">
@@ -6702,6 +6724,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#300-alpha15_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.0.0-alpha.15
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha14_4" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6871,6 +6904,17 @@
   
     <nav class="md-nav" aria-label="dox_core">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#300-alpha15_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.0.0-alpha.15
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha14_5" class="md-nav__link">
@@ -7599,6 +7643,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#300-alpha15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.0.0-alpha.15
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha14_1" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7768,6 +7823,17 @@
   
     <nav class="md-nav" aria-label="dox_builder">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#300-alpha15_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.0.0-alpha.15
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha14_2" class="md-nav__link">
@@ -8112,6 +8178,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#300-alpha15_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.0.0-alpha.15
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha14_4" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8281,6 +8358,17 @@
   
     <nav class="md-nav" aria-label="dox_core">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#300-alpha15_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.0.0-alpha.15
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha14_5" class="md-nav__link">
@@ -8871,6 +8959,10 @@
 <li>See the <a href="https://github.com/dartondox/dox/pull/112">release notes</a> for all main changes.</li>
 </ul>
 <h2 id="dox_auth">dox_auth</h2>
+<h3 id="300-alpha15">3.0.0-alpha.15</h3>
+<ul>
+<li>Docs: the README and the example set up auth in an <code>AppAuthProvider</code> that extends <code>DoxProvider</code>.</li>
+</ul>
 <h3 id="300-alpha14_1">3.0.0-alpha.14</h3>
 <ul>
 <li>New: <code>Auth().setUser(req, user)</code> sets the logged-in user on <code>req.auth</code>, with no token and no password check. Use it in your own auth middleware, like an API key check.</li>
@@ -8949,6 +9041,10 @@
 <li><code>dart_jsonwebtoken</code> 3.</li>
 </ul>
 <h2 id="dox_builder">dox_builder</h2>
+<h3 id="300-alpha15_1">3.0.0-alpha.15</h3>
+<ul>
+<li>Change: the container builder finds every class that extends <code>DoxProvider</code> and writes <code>c.provider&lt;...&gt;</code> for it.</li>
+</ul>
 <h3 id="300-alpha14_2">3.0.0-alpha.14</h3>
 <ul>
 <li>New: the openapi builder reads <code>@Security</code> on middleware classes and writes them to <code>OpenApiRegistry.security</code>.</li>
@@ -9104,6 +9200,10 @@
 <li><code>remember</code>, <code>pull</code>, <code>add</code>, <code>increment</code>, <code>many</code>, tags and atomic locks.</li>
 </ul>
 <h2 id="dox">dox</h2>
+<h3 id="300-alpha15_2">3.0.0-alpha.15</h3>
+<ul>
+<li><code>dox make:dto CreateBlog</code> now writes <code>lib/app/http/dtos/create_blog/create_blog.dto.dart</code>. Each DTO has its own folder, like models. The <code>.dto.g.dart</code> file is made next to it.</li>
+</ul>
 <h3 id="300-alpha14_4">3.0.0-alpha.14</h3>
 <ul>
 <li>Fix: <code>dox make:migration</code> run more than once in the same second gave files with the same timestamp. Then the run order depended only on the name, which could break foreign keys. Now each new migration (<code>.dart</code> or <code>.sql</code>) sorts after every file already in <code>db/migration</code>. When needed, it uses the newest time plus 1 second.</li>
@@ -9189,6 +9289,10 @@
 <li>Generated models import <code>package:dox_orm/dox_orm.dart</code>.</li>
 </ul>
 <h2 id="dox_core">dox_core</h2>
+<h3 id="300-alpha15_3">3.0.0-alpha.15</h3>
+<ul>
+<li>Change: the startup hook is <code>DoxProvider</code>. Write <code>class X extends DoxProvider</code>. <code>setup()</code> runs once in every isolate at start. <code>shutdown()</code> is optional and runs once in every isolate when the app stops. List providers in <code>AppConfig.providers</code>, or add them with <code>Dox().addProvider()</code> and <code>Dox().addProviders()</code>. The container method is <code>c.provider&lt;T&gt;()</code>.</li>
+</ul>
 <h3 id="300-alpha14_5">3.0.0-alpha.14</h3>
 <ul>
 <li>Fix: <code>AUTH_REQUEST_KEY</code> is now only in <code>dox_core</code>, so importing <code>dox_core</code> and <code>dox_auth</code> together no longer gives an "ambiguous import" error.</li>

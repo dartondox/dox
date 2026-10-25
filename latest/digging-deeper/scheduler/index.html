@@ -2835,7 +2835,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../services/" class="md-nav__link">
+      <a href="../providers/" class="md-nav__link">
         
   
   
@@ -2858,7 +2858,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6865,7 +6865,7 @@ After the timeout, the run counts as failed and the hooks run, but the work may 
 </span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">  </span><span class="p">).</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
 </span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>With <code>app</code>, the runner starts your app services first (like the database).
+<p>With <code>app</code>, the runner starts your app providers first (like the database).
 It stops them at the end.</p>
 <table>
 <thead>
@@ -6918,19 +6918,19 @@ Do not use <code>dart compile exe</code>. It can not build apps with native libr
 It does not check the schedule, the filters or the locks.</p>
 <h2 id="run-inside-the-server">Run inside the server</h2>
 <p>You can run the schedule inside your Dox server instead of a <code>work</code> process.
-Add a service that extends <code>SchedulerService</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">// lib/services/schedule_service.dart</span>
+Add a provider that extends <code>SchedulerProvider</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">// lib/providers/schedule_provider.dart</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_scheduler/dox_scheduler.dart'</span><span class="p">;</span>
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/schedule.dart'</span><span class="p">;</span>
 </span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ScheduleService</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">SchedulerService</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="n">ScheduleService</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">super</span><span class="p">(</span><span class="nl">schedule:</span><span class="w"> </span><span class="n">schedule</span><span class="p">,</span><span class="w"> </span><span class="nl">config:</span><span class="w"> </span><span class="n">scheduleConfig</span><span class="p">);</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ScheduleProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">SchedulerProvider</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="n">ScheduleProvider</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">super</span><span class="p">(</span><span class="nl">schedule:</span><span class="w"> </span><span class="n">schedule</span><span class="p">,</span><span class="w"> </span><span class="nl">config:</span><span class="w"> </span><span class="n">scheduleConfig</span><span class="p">);</span>
 </span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Then turn it on in <code>lib/config/schedule.dart</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">ScheduleConfig</span><span class="w"> </span><span class="n">scheduleConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ScheduleConfig</span><span class="p">(</span><span class="nl">inProcess:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
 </span></code></pre></div>
-<p>Run <code>dart run build_runner build</code>. The generated container finds the service.</p>
+<p>Run <code>dart run build_runner build</code>. The generated container finds the provider.</p>
 <p>How it works:</p>
 <ul>
 <li>Only the first isolate runs the tasks. The other isolates only serve requests.</li>
@@ -6943,7 +6943,7 @@ Add a service that extends <code>SchedulerService</code>:</p>
 <li>A long task makes the server stop slower.</li>
 <li>With a separate <code>work</code> process, you can deploy, scale and restart the scheduler on its own.</li>
 </ul>
-<p>Use <code>work</code> for heavy tasks. Use the in-process service for small apps.</p>
+<p>Use <code>work</code> for heavy tasks. Use the in-process provider for small apps.</p>
 <h2 id="testing">Testing</h2>
 <p><code>Scheduler</code> runs the tasks. Give it a fake clock to test a schedule with no waiting:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_cache/dox_cache.dart'</span><span class="p">;</span>

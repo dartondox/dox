@@ -2532,7 +2532,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../digging-deeper/services/" class="md-nav__link">
+      <a href="../../digging-deeper/providers/" class="md-nav__link">
         
   
   
@@ -2555,7 +2555,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6531,7 +6531,7 @@
 <td><code>&lt;name&gt;.controller.dart</code></td>
 </tr>
 <tr>
-<td><code>lib/app/http/dtos/</code></td>
+<td><code>lib/app/dtos/&lt;name&gt;/</code></td>
 <td><code>&lt;name&gt;.dto.dart</code></td>
 </tr>
 <tr>
@@ -6547,8 +6547,8 @@
 <td><code>&lt;name&gt;.model.dart</code></td>
 </tr>
 <tr>
-<td><code>lib/services/</code></td>
-<td><code>DoxService</code> classes: ORM, auth, websocket</td>
+<td><code>lib/providers/</code></td>
+<td><code>DoxProvider</code> classes: ORM, auth, websocket</td>
 </tr>
 <tr>
 <td><code>lib/generated/container.g.dart</code>, <code>lib/generated/dtos.g.dart</code>, <code>lib/generated/openapi.g.dart</code></td>
@@ -6678,7 +6678,7 @@
 </span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="n">Dox</span><span class="p">().</span><span class="n">ioc</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="n">PostService</span><span class="o">&gt;</span><span class="p">();</span>
 </span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="n">Dox</span><span class="p">().</span><span class="n">ioc</span><span class="p">.</span><span class="n">override</span><span class="o">&lt;</span><span class="n">PostRepository</span><span class="o">&gt;</span><span class="p">(</span><span class="n">FakePostRepository</span><span class="p">());</span><span class="w"> </span><span class="c1">// tests</span>
 </span></code></pre></div>
-<p>Routers and <code>DoxService</code> classes are found without <code>@Inject()</code>. Run <code>dart run build_runner build</code> after a change.
+<p>Routers and <code>DoxProvider</code> classes are found without <code>@Inject()</code>. Run <code>dart run build_runner build</code> after a change.
 See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p>
 <p>Middleware order: <code>globalMiddleware</code>, router <code>middleware</code>, group, route.</p>
 <p>See <a href="../../the-basic/routing/">Routing</a>, <a href="../../the-basic/controller/">Controller</a>, <a href="../../the-basic/middleware/">Middleware</a>.</p>
@@ -7216,7 +7216,7 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 </span><span id="__span-15-14"><a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-15-15"><a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Turn it on with a <code>SocketIoService</code> (extend it in <code>lib/</code>). Many isolates need the Redis adapter and <code>transports: ['websocket']</code> on the client.</p>
+<p>Turn it on with a <code>SocketIoProvider</code> (extend it in <code>lib/</code>). Many isolates need the Redis adapter and <code>transports: ['websocket']</code> on the client.</p>
 <p>See <a href="../../packages/socketio/">Socket.IO</a>.</p>
 <h2 id="openapi">OpenAPI</h2>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">OpenApiConfig</span><span class="w"> </span><span class="n">openApi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenApiConfig</span><span class="p">(</span>

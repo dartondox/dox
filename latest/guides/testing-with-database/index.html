@@ -2532,7 +2532,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../digging-deeper/services/" class="md-nav__link">
+      <a href="../../digging-deeper/providers/" class="md-nav__link">
         
   
   
@@ -2555,7 +2555,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6432,7 +6432,7 @@ Either give each file its own SQLite file (<code>storage/test_users.sqlite</code
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>dart<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--concurrency<span class="o">=</span><span class="m">1</span>
 </span></code></pre></div>
 <h2 id="test-a-route-with-the-database">Test a route with the database</h2>
-<p><code>DoxTestClient</code> starts the app inside the test. It runs the services, so the ORM is set up by <code>ORMService</code> from <code>lib/config/database.dart</code>.
+<p><code>DoxTestClient</code> starts the app inside the test. It runs the providers, so the ORM is set up by <code>ORMProvider</code> from <code>lib/config/database.dart</code>.
 Set the database with env variables, so the app picks the test database:</p>
 <div class="language-dart highlight"><span class="filename">test/api_test.dart</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/testing.dart'</span><span class="p">;</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_migration/dox_migration.dart'</span><span class="p">;</span>

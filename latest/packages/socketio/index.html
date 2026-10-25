@@ -2532,7 +2532,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../digging-deeper/services/" class="md-nav__link">
+      <a href="../../digging-deeper/providers/" class="md-nav__link">
         
   
   
@@ -2555,7 +2555,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6368,7 +6368,7 @@ Socket.IO is the way to do realtime in Dox.</p>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'chat'</span><span class="p">,</span><span class="w"> </span><span class="s1">'hi'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">answer</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">answer</span><span class="p">));</span><span class="w"> </span><span class="c1">// 'ok'</span>
 </span></code></pre></div>
 <h2 id="in-a-dox-app-same-port-as-http">In a Dox app: same port as HTTP</h2>
-<p><code>SocketIoService</code> serves Socket.IO at <code>/socket.io/</code> on the app port.</p>
+<p><code>SocketIoProvider</code> serves Socket.IO at <code>/socket.io/</code> on the app port.</p>
 <p>Add <code>dox_socketio</code>, and <code>ioredis</code> for the Redis adapter:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_socketio<span class="w"> </span>ioredis
 </span></code></pre></div>
@@ -6399,12 +6399,12 @@ Socket.IO is the way to do realtime in Dox.</p>
 <div class="language-dart highlight"><span class="filename">lib/config/env.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="w">  </span><span class="c1">/// serve Socket.IO on the app port</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">socketioEnabled</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
 </span></code></pre></div>
-<p>Then add the service. Put it in <code>lib/</code>, so the generated container finds it:</p>
-<div class="language-dart highlight"><span class="filename">lib/services/socketio_service.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_socketio/dox_socketio.dart'</span><span class="p">;</span>
+<p>Then add the provider. Put it in <code>lib/</code>, so the generated container finds it:</p>
+<div class="language-dart highlight"><span class="filename">lib/providers/socketio_provider.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_socketio/dox_socketio.dart'</span><span class="p">;</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/socketio.dart'</span><span class="p">;</span>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppSocketIoService</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">SocketIoService</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="n">AppSocketIoService</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">super</span><span class="p">(</span><span class="n">socketIoConfig</span><span class="p">);</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppSocketIoProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">SocketIoProvider</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="n">AppSocketIoProvider</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">super</span><span class="p">(</span><span class="n">socketIoConfig</span><span class="p">);</span>
 </span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="p">}</span>
 </span></code></pre></div>
 <table>
@@ -6440,8 +6440,8 @@ Socket.IO is the way to do realtime in Dox.</p>
 </table>
 <ul>
 <li>Requests to <code>/socket.io/</code> go to Socket.IO before the router. Middleware and body reading are skipped.</li>
-<li>With no service, or with <code>enabled: false</code>, there is no extra work per request.</li>
-<li><code>SocketIoService.server</code> is the server of this isolate: <code>SocketIoService.server?.to('room').emit('news', data)</code>.</li>
+<li>With no provider, or with <code>enabled: false</code>, there is no extra work per request.</li>
+<li><code>SocketIoProvider.server</code> is the server of this isolate: <code>SocketIoProvider.server?.to('room').emit('news', data)</code>.</li>
 <li>Need a plain WebSocket with no Socket.IO protocol? <code>Route.websocket(path, handler)</code> in <code>dox_core</code> gives you the raw socket.</li>
 </ul>
 <div class="admonition warning">

@@ -2535,7 +2535,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../services/" class="md-nav__link">
+      <a href="../providers/" class="md-nav__link">
         
   
   
@@ -2558,7 +2558,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6453,7 +6453,7 @@ or <code>Restart=always</code> in systemd.</p>
 <li>It stops taking new connections at once.</li>
 <li>Open requests can finish. Each keep-alive connection closes after its current answer.</li>
 <li>After <code>shutdownTimeout</code> (default 8 seconds), it closes the connections that are still open.</li>
-<li>It runs <code>shutdown()</code> of each service that implements <code>DoxShutdown</code> (see <a href="../services/#clean-up-on-shutdown">Services</a>). The <code>ORMService</code> of a new project closes the database connections here.</li>
+<li>It runs <code>shutdown()</code> of every provider (see <a href="../providers/#clean-up-on-shutdown">Providers</a>). The <code>ORMProvider</code> of a new project closes the database connections here.</li>
 <li>It closes the cache stores of <code>Cache()</code>, eg. the Redis connections.</li>
 <li>The process exits with code <code>0</code>.</li>
 </ol>

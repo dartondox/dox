@@ -2044,10 +2044,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#routers-and-services" class="md-nav__link">
+  <a href="#routers-and-providers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Routers and services
+        Routers and providers
       
     </span>
   </a>
@@ -2734,7 +2734,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../digging-deeper/services/" class="md-nav__link">
+      <a href="../../digging-deeper/providers/" class="md-nav__link">
         
   
   
@@ -2757,7 +2757,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6262,10 +6262,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#routers-and-services" class="md-nav__link">
+  <a href="#routers-and-providers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Routers and services
+        Routers and providers
       
     </span>
   </a>
@@ -6415,8 +6415,8 @@ Dox does not use <code>dart:mirrors</code>. All the wiring is generated code.</p
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/http/controllers/user.controller.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i1</span><span class="p">;</span>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/repositories/user.repository.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i2</span><span class="p">;</span>
 </span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/services/user.service.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i3</span><span class="p">;</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/routes/api.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i4</span><span class="p">;</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/services/orm_service.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i5</span><span class="p">;</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/providers/orm_provider.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i4</span><span class="p">;</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/routes/api.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i5</span><span class="p">;</span>
 </span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/user/user.model.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i6</span><span class="p">;</span>
 </span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
 </span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="kt">void</span><span class="w"> </span><span class="n">registerContainer</span><span class="p">(</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -6427,8 +6427,8 @@ Dox does not use <code>dart:mirrors</code>. All the wiring is generated code.</p
 </span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="n">singleton</span><span class="o">&lt;</span><span class="n">i3</span><span class="p">.</span><span class="n">UserService</span><span class="o">&gt;</span><span class="p">(</span>
 </span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">    </span><span class="p">(</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">i3</span><span class="p">.</span><span class="n">UserService</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="n">i2</span><span class="p">.</span><span class="n">UserRepository</span><span class="o">&gt;</span><span class="p">()),</span>
 </span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">  </span><span class="p">);</span>
-</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="n">router</span><span class="o">&lt;</span><span class="n">i4</span><span class="p">.</span><span class="n">ApiRouter</span><span class="o">&gt;</span><span class="p">((</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">i4</span><span class="p">.</span><span class="n">ApiRouter</span><span class="p">());</span>
-</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="n">service</span><span class="o">&lt;</span><span class="n">i5</span><span class="p">.</span><span class="n">ORMService</span><span class="o">&gt;</span><span class="p">((</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">i5</span><span class="p">.</span><span class="n">ORMService</span><span class="p">());</span>
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="n">provider</span><span class="o">&lt;</span><span class="n">i4</span><span class="p">.</span><span class="n">ORMProvider</span><span class="o">&gt;</span><span class="p">((</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">i4</span><span class="p">.</span><span class="n">ORMProvider</span><span class="p">());</span>
+</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="n">router</span><span class="o">&lt;</span><span class="n">i5</span><span class="p">.</span><span class="n">ApiRouter</span><span class="o">&gt;</span><span class="p">((</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">i5</span><span class="p">.</span><span class="n">ApiRouter</span><span class="p">());</span>
 </span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="n">bindModel</span><span class="o">&lt;</span><span class="n">i6</span><span class="p">.</span><span class="n">User</span><span class="o">&gt;</span><span class="p">((</span><span class="kt">String</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-6-21"><a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="w">    </span><span class="kt">int</span><span class="o">?</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">int</span><span class="p">.</span><span class="n">tryParse</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
 </span><span id="__span-6-22"><a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">key</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
@@ -6493,23 +6493,23 @@ When a handler has a parameter of a model type, Dox loads the model by its prima
 <li>A route without a parameter of the model type does not load the model.</li>
 <li>A binder from <code>Route.bind</code> wins over this one. See <a href="../routing/#route-model-binding">Routing: route model binding</a>.</li>
 </ul>
-<h2 id="routers-and-services">Routers and services</h2>
+<h2 id="routers-and-providers">Routers and providers</h2>
 <p>You do not need <code>@Inject()</code> on them.</p>
 <ul>
 <li>Every class that extends <code>Router</code> is found. Its routes are registered at start.</li>
-<li>Every class that implements <code>DoxService</code> is found. Its <code>setup()</code> runs at start, in every isolate.</li>
+<li>Every class that extends <code>DoxProvider</code> is found. Its <code>setup()</code> runs at start, in every isolate.</li>
 </ul>
 <p>Their constructors get parameters from the container too.</p>
 <p>They run in the order of their file path, then the order in the file.
 To pick the order, list them in <code>AppConfig</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nl">container:</span><span class="w"> </span><span class="n">registerContainer</span><span class="p">,</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nl">services:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">DoxService</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ORMService</span><span class="p">()],</span><span class="w"> </span><span class="c1">// runs first</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nl">providers:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">DoxProvider</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ORMProvider</span><span class="p">()],</span><span class="w"> </span><span class="c1">// runs first</span>
 </span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nl">routers:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Router</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ApiRouter</span><span class="p">()],</span><span class="w">       </span><span class="c1">// registered first</span>
 </span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="p">);</span>
 </span></code></pre></div>
 <p>A listed class comes first. The others follow. No class runs twice.
-A listed service is also the instance that the container gives.</p>
+A listed provider is also the instance that the container gives.</p>
 <h2 id="use-the-container-in-code">Use the container in code</h2>
 <p><code>Dox().ioc</code> is the container of the current isolate.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">UserService</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dox</span><span class="p">().</span><span class="n">ioc</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="n">UserService</span><span class="o">&gt;</span><span class="p">();</span>

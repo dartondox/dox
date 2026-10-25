@@ -2736,7 +2736,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../digging-deeper/services/" class="md-nav__link">
+      <a href="../../digging-deeper/providers/" class="md-nav__link">
         
   
   
@@ -2759,7 +2759,7 @@
   <span class="md-ellipsis">
     
   
-    Services
+    Providers
   
 
     
@@ -6381,7 +6381,7 @@ The <code>prefix</code> of the router is added in front of all its routes.</p>
 </span></code></pre></div>
 <p>Dox finds every <code>Router</code> class by itself. It is in <code>lib/generated/container.g.dart</code> after <code>dart run build_runner build</code>.
 To pick the order of routers, list them in <code>routers:</code> of <code>AppConfig</code>.
-See <a href="../dependency-injection/#routers-and-services">Dependency injection: routers and services</a>.</p>
+See <a href="../dependency-injection/#routers-and-providers">Dependency injection: routers and providers</a>.</p>
 <p>The leading <code>/</code> in a path is optional. <code>'ping'</code> and <code>'/ping'</code> are the same route.</p>
 <h2 id="route-methods">Route methods</h2>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/blogs'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">BlogController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">index</span><span class="p">);</span>
