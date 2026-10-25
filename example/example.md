@@ -42,4 +42,3 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Community
 
-<a href="https://discord.gg/pBfWrsvBSV"><img src="https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white"></a>
