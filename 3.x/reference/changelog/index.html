@@ -1231,6 +1231,8 @@
       
         
       
+        
+      
     
     
     
@@ -1433,6 +1435,34 @@
     
   
     Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency injection
   
 
     
@@ -4102,6 +4132,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha8" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4312,7 +4353,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
+  <a href="#unreleased_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -4533,7 +4574,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_1" class="md-nav__link">
+  <a href="#unreleased_2" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -4649,7 +4690,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_2" class="md-nav__link">
+  <a href="#unreleased_3" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -4765,7 +4806,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_3" class="md-nav__link">
+  <a href="#unreleased_4" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -4997,7 +5038,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_4" class="md-nav__link">
+  <a href="#unreleased_5" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -5575,6 +5616,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha8" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5785,7 +5837,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
+  <a href="#unreleased_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -6006,7 +6058,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_1" class="md-nav__link">
+  <a href="#unreleased_2" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -6122,7 +6174,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_2" class="md-nav__link">
+  <a href="#unreleased_3" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -6238,7 +6290,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_3" class="md-nav__link">
+  <a href="#unreleased_4" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -6470,7 +6522,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_4" class="md-nav__link">
+  <a href="#unreleased_5" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -7014,6 +7066,10 @@
 <p>What changed in each package, newest first. This page is made from the
 <code>CHANGELOG.md</code> files in the repo when the docs are built.</p>
 <h2 id="dox_annotation">dox_annotation</h2>
+<h3 id="unreleased">Unreleased</h3>
+<ul>
+<li>New: <code>@Inject()</code>. Put it above a class and <code>dox_builder</code> adds the class to the Dox container. <code>@Inject(singleton: false)</code> makes a new instance each time.</li>
+</ul>
 <h3 id="300-alpha8">3.0.0-alpha.8</h3>
 <ul>
 <li>Version bump only, to match the other packages.</li>
@@ -7106,8 +7162,11 @@
 <li><code>dart_jsonwebtoken</code> 3.</li>
 </ul>
 <h2 id="dox_builder">dox_builder</h2>
-<h3 id="unreleased">Unreleased</h3>
+<h3 id="unreleased_1">Unreleased</h3>
 <ul>
+<li>New: <code>lib/container.g.dart</code> builder. It finds every <code>@Inject()</code> class, every class that extends <code>Router</code>, every class that implements <code>DoxService</code> and every <code>@DoxModel</code> in <code>lib/</code>. It writes <code>registerContainer(IocContainer c)</code>, which makes each class with its constructor. Constructor parameters come from the container by type. Optional parameters that the container can not give keep their default. Required nullable ones get <code>null</code>.</li>
+<li>The build stops with a clear message for a required parameter the container can not give, for a dependency cycle (it shows the chain, like <code>A -&gt; B -&gt; A</code>), and for an abstract or generic <code>@Inject()</code> class. Two classes with the same name work: every import has a prefix.</li>
+<li>OpenAPI: typed routes (<code>Route.get&lt;C&gt;(path, (C c) =&gt; c.method)</code>) and <code>Route.resource(path, ControllerClass)</code> are read too.</li>
 <li>Generates the query scopes: an extension with one method for each <code>@Scope()</code> method, and <code>globalScopes</code> for <code>@Scope(global: true)</code>.</li>
 <li>Generates the column casts: <code>fromMap()</code> and <code>columnsToMap()</code> use the <code>cast</code> of <code>@Column()</code>. <code>bool</code> and enum fields get a cast without <code>cast</code>.</li>
 <li>Run <code>dart run build_runner build</code> to get the new code.</li>
@@ -7213,8 +7272,9 @@
 <li><code>remember</code>, <code>pull</code>, <code>add</code>, <code>increment</code>, <code>many</code>, tags and atomic locks.</li>
 </ul>
 <h2 id="dox">dox</h2>
-<h3 id="unreleased_1">Unreleased</h3>
+<h3 id="unreleased_2">Unreleased</h3>
 <ul>
+<li><code>dox make:controller</code> (<code>create:controller</code>) writes <code>@Inject()</code> above the class, and no global controller instance. The file shows the typed route to use. The command says to run <code>build_runner</code>.</li>
 <li>New <code>dox make:factory &lt;model&gt;</code>: makes <code>db/factories/&lt;model&gt;.factory.dart</code>.</li>
 <li>New <code>dox make:seeder &lt;name&gt;</code>: makes <code>db/seeders/&lt;name&gt;.seeder.dart</code>, writes the seeder list <code>db/seeders/seeders.dart</code> and makes <code>bin/seed.dart</code> when it is missing.</li>
 <li>New <code>dox db:seed [--class=&lt;name&gt;]</code>: runs <code>bin/seed.dart</code>. The default seeder is <code>DatabaseSeeder</code>.</li>
@@ -7271,8 +7331,14 @@
 <li>Generated models import <code>package:dox_orm/dox_orm.dart</code>.</li>
 </ul>
 <h2 id="dox_core">dox_core</h2>
-<h3 id="unreleased_2">Unreleased</h3>
+<h3 id="unreleased_3">Unreleased</h3>
 <ul>
+<li>New: a real IoC container. <code>IocContainer</code> (<code>Dox().ioc</code>) has <code>get&lt;T&gt;()</code>, <code>has&lt;T&gt;()</code>, <code>singleton&lt;T&gt;()</code>, <code>factory&lt;T&gt;()</code>, <code>instance&lt;T&gt;()</code>, <code>override&lt;T&gt;()</code> and <code>clearOverrides()</code>. Each isolate has its own container: a singleton is one instance per isolate, made on first use.</li>
+<li>New: <code>AppConfig(container: registerContainer)</code> with the function from <code>lib/container.g.dart</code> (made by <code>dox_builder</code>). Every isolate runs it. The routers and services it finds are registered for you, so <code>AppConfig.routers</code> and <code>AppConfig.services</code> can stay empty. The ones you list there still work and come first.</li>
+<li>New: typed routes. <code>Route.get&lt;UserController&gt;('users', (UserController c) =&gt; c.index)</code> (also post, put, patch, delete and the others). The controller comes from the container, once per isolate, at start. <code>(UserController c) =&gt; c.index</code> without <code>&lt;UserController&gt;</code> works too. <code>Route.resource('users', UserController)</code> takes a controller class.</li>
+<li>New: a controller parameter whose type is in the container gets it from the container.</li>
+<li>New: route model binding for <code>@DoxModel</code> classes. A controller parameter of type <code>User</code> gets the <code>User</code> of the <code>{user}</code> param (or the next param), found by its primary key. No row answers 404. <code>Route.bind</code> still wins.</li>
+<li>Breaking: the old <code>IocContainer</code> methods <code>register</code>, <code>registerByName</code>, <code>registerSingleton</code> and <code>getByName</code> are removed. Use <code>factory</code>, <code>singleton</code> and <code>get</code>.</li>
 <li>New: named routes. <code>Route.get('/users/{id}', c).name('users.show')</code>, then <code>route('users.show', params: {'id': 5})</code> gives <code>/users/5</code>. <code>query:</code> adds a query string. <code>Route.group(..., name: 'admin.')</code> puts a prefix in front of the names inside. Resource routes are named <code>blogs.index</code> ... <code>blogs.destroy</code>; <code>Route.resource(..., name:)</code> picks another base name. A name used twice stops the app at start. An unknown name, a missing param or an extra param throws an <code>ArgumentError</code>.</li>
 <li>New: route model binding without <code>dart:mirrors</code>. <code>Route.bind&lt;User&gt;('user', (String id) =&gt; User().find(id))</code> runs before the controller of every route with a <code>{user}</code> param. The controller gets it as a <code>User user</code> parameter, or with <code>req.bound&lt;User&gt;('user')</code>. A binder that gives <code>null</code> answers 404.</li>
 <li>New: <code>ExceptionHandler</code>, the one place that turns an error into a response. Extend it and set <code>AppConfig(exceptionHandler: ...)</code>. <code>report(error, stackTrace)</code> logs, <code>render(error, req)</code> picks the response. The default answers are the same as before. A URL with no route goes through it too.</li>
@@ -7422,7 +7488,7 @@
 <li><code>uuid</code> 4 and <code>mime</code> 2.</li>
 </ul>
 <h2 id="dox_migration">dox_migration</h2>
-<h3 id="unreleased_3">Unreleased</h3>
+<h3 id="unreleased_4">Unreleased</h3>
 <ul>
 <li>New <code>Seeder</code> and <code>SeederRunner</code>. A seeder puts data in the database. <code>call()</code> runs other seeders. <code>SeederRunner(seeders: seeders).run(args)</code> runs <code>DatabaseSeeder</code>, or another one with <code>--class=&lt;name&gt;</code>, in one transaction. It reads the database from <code>.env</code>, the same as the migrations.</li>
 <li>New <code>Migrator.fresh()</code> and the <code>fresh</code> command of <code>Migrator.run()</code>. It drops every table of the database, then runs all migrations.</li>
@@ -7527,7 +7593,7 @@
 <li>Output as JSON and YAML, write files, serve <code>/openapi.json</code>, <code>/openapi.yaml</code> and <code>/docs</code>.</li>
 </ul>
 <h2 id="dox_orm">dox_orm</h2>
-<h3 id="unreleased_4">Unreleased</h3>
+<h3 id="unreleased_5">Unreleased</h3>
 <ul>
 <li>Breaking: the <code>ModelObserver</code> methods now have the same names as the model hooks: <code>onSaving</code>, <code>onSaved</code>, <code>onCreating</code>, <code>onCreated</code>, <code>onUpdating</code>, <code>onUpdated</code>, <code>onDeleting</code>, <code>onDeleted</code>, <code>onRestoring</code>, <code>onRestored</code>, <code>onForceDeleting</code> and <code>onForceDeleted</code>. Rename the methods in your observers, for example <code>created(User user)</code> to <code>onCreated(User user)</code>.</li>
 <li>New model factories: <code>import 'package:dox_orm/factory.dart';</code>. Extend <code>Factory&lt;User&gt;</code> and write <code>definition()</code>. Then use <code>count(n)</code>, <code>state()</code>, <code>sequence()</code>, <code>has()</code>, <code>make()</code>, <code>makeOne()</code>, <code>create()</code> and <code>createOne()</code>. See the Factories docs page.</li>

@@ -1233,6 +1233,8 @@
       
         
       
+        
+      
     
     
     
@@ -1435,6 +1437,34 @@
     
   
     Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency injection
   
 
     
@@ -4874,7 +4904,8 @@ It reads the version list from pub.dev, then runs <code>dart pub global activate
 </tr>
 </tbody>
 </table>
-<p>The plain and resource templates also make an instance: <code>&lt;Name&gt;Controller &lt;name&gt;Controller = &lt;Name&gt;Controller();</code>.</p>
+<p>The class has <code>@Inject()</code>, so the container makes it. A comment shows the route to add, like <code>Route.get&lt;BlogController&gt;('path', (BlogController c) =&gt; c.index);</code>.
+After the file is made, the CLI tells you to run <code>dart run build_runner build</code>. That adds the controller to <code>lib/container.g.dart</code>.</p>
 <h3 id="dox-createmiddleware"><code>dox create:middleware</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>dox create:middleware &lt;name&gt;
 </span></code></pre></div>

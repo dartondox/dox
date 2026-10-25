@@ -1234,6 +1234,8 @@
       
         
       
+        
+      
     
     
     
@@ -1436,6 +1438,34 @@
     
   
     Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../the-basic/dependency-injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency injection
   
 
     
@@ -4604,7 +4634,7 @@ Observers live in memory, and each isolate has its own memory, so every isolate 
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Then add <code>ObserverService()</code> to the list in <code>lib/config/services.dart</code>.</p>
+<p>Dox finds <code>ObserverService</code> by itself, like every <code>DoxService</code>. Run <code>dart run build_runner build</code> after you add it.</p>
 <ul>
 <li>You can add more than one observer to a model.</li>
 <li><code>Model.forgetObservers&lt;User&gt;()</code> removes the observers of <code>User</code>. <code>Model.forgetObservers()</code> removes all.</li>

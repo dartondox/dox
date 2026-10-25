@@ -429,12 +429,12 @@ blog/
 │   ├── config/
 │   │   ├── app.dart              * adds the DTO list
 │   │   ├── database.dart
-│   │   ├── env.dart              the .env keys, typed
-│   │   └── services.dart         * adds AuthService
+│   │   └── env.dart              the .env keys, typed
 │   ├── routes/api.dart           *
 │   ├── services/
 │   │   ├── auth_service.dart     *
 │   │   └── orm_service.dart
+│   ├── container.g.dart          * generated
 │   └── dtos.g.dart               * generated
 ├── test/http_test.dart           *
 ├── .env                          *
@@ -684,6 +684,7 @@ Replace the file with this. It keeps only `index`, `store` and `show`:
 import 'package:blog/app/models/post/post.model.dart';
 import 'package:dox_core/dox_core.dart';
 
+@Inject()
 class PostController {
   /// GET /api/posts
   Future<List<Post>> index(DoxRequest req) async {
@@ -708,12 +709,12 @@ class PostController {
     return post;
   }
 }
-
-PostController postController = PostController();
 ```
 
 How it works:
 
+- `@Inject()` puts the controller in the container. Dox makes it for you. `dox s` runs `build_runner`, which adds it to `lib/container.g.dart`.
+  A new project already has `container: registerContainer` in `lib/config/app.dart`, so you change nothing there.
 - A controller returns a model or a list of models. Dox sends it as JSON.
 - `response(post).statusCode(201)` sets the status code.
 - `show(int id)` gets the `{id}` from the URL. `/api/posts/abc` answers `404`, because `abc` is not an `int`.
@@ -735,12 +736,15 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    Route.get('/ping', apiController.pong);
+    Route.get<ApiController>('/ping', (ApiController c) => c.pong);
 
-    Route.resource('posts', postController);
+    Route.resource('posts', PostController);
   }
 }
 ```
+
+`PostController` is the class. Dox gets the controller from the container.
+You do not add the router to a list. Dox finds every `Router` class by itself.
 
 `Route.resource` makes one route for each method the controller has:
 
@@ -888,6 +892,7 @@ import 'package:blog/app/http/dtos/save_post.dto.dart';
 import 'package:blog/app/models/post/post.model.dart';
 import 'package:dox_core/dox_core.dart';
 
+@Inject()
 class PostController {
   /// GET /api/posts
   Future<List<Post>> index(DoxRequest req) async {
@@ -926,8 +931,6 @@ class PostController {
     return post;
   }
 }
-
-PostController postController = PostController();
 ```
 
 `Route.resource` in `lib/routes/api.dart` sees the new `update` method and adds `PUT` and `PATCH /api/posts/{id}`. You change nothing there.
@@ -1162,20 +1165,8 @@ class AuthService implements DoxService {
 }
 ```
 
-Add it to the service list:
-
-```dart title="lib/config/services.dart"
-import 'package:blog/services/auth_service.dart';
-import 'package:blog/services/orm_service.dart';
-import 'package:dox_core/dox_core.dart';
-
-/// Services to register on dox
-/// -------------------------------
-/// Since dox run on multi thread isolate, we need to register
-/// below extra services to dox so that dox can
-/// register again on new isolate.
-List<DoxService> services = <DoxService>[ORMService(), AuthService()];
-```
+Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/container.g.dart`.
+You do not add it to a list.
 
 ## 5. Write the auth controller
 
@@ -1186,6 +1177,7 @@ import 'package:blog/app/models/user/user.model.dart';
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 
+@Inject()
 class AuthController {
   /// POST /api/auth/register
   Future<DoxResponse> register(RegisterUser body) async {
@@ -1220,8 +1212,6 @@ class AuthController {
     return req.auth?.user<User>();
   }
 }
-
-AuthController authController = AuthController();
 ```
 
 - `Hash.make()` makes a bcrypt hash. Never save a plain password.
@@ -1248,21 +1238,21 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    Route.get('/ping', apiController.pong);
+    Route.get<ApiController>('/ping', (ApiController c) => c.pong);
 
     // Anyone can read posts.
-    Route.get('/posts', postController.index);
-    Route.get('/posts/{id}', postController.show);
+    Route.get<PostController>('/posts', (PostController c) => c.index);
+    Route.get<PostController>('/posts/{id}', (PostController c) => c.show);
 
     // Register and log in.
-    Route.post('/auth/register', authController.register);
-    Route.post('/auth/login', authController.login);
+    Route.post<AuthController>('/auth/register', (AuthController c) => c.register);
+    Route.post<AuthController>('/auth/login', (AuthController c) => c.login);
 
     // Only a logged in user can write posts.
     Route.middleware(<dynamic>[AuthMiddleware()], () {
-      Route.get('/auth/user', authController.user);
-      Route.post('/posts', postController.store);
-      Route.put('/posts/{id}', postController.update);
+      Route.get<AuthController>('/auth/user', (AuthController c) => c.user);
+      Route.post<PostController>('/posts', (PostController c) => c.store);
+      Route.put<PostController>('/posts/{id}', (PostController c) => c.update);
     });
   }
 }
@@ -1766,19 +1756,19 @@ my_app/
 │   │   │   └── response_handler.dart
 │   │   └── models/              # one folder per model, *.model.dart
 │   ├── config/
-│   │   ├── app.dart             # AppConfig: port, isolates, routers, middleware
+│   │   ├── app.dart             # AppConfig: port, isolates, middleware
 │   │   ├── cache.dart           # cache stores
 │   │   ├── cors.dart
 │   │   ├── database.dart        # DatabaseConfig: connections
 │   │   ├── env.dart             # typed env class (@DoxEnv), optional
 │   │   ├── logger.dart
-│   │   ├── services.dart        # the list of DoxService
 │   │   └── storage.dart         # storage disks
 │   ├── routes/
 │   │   ├── api.dart             # ApiRouter, prefix `api`
 │   │   └── web.dart             # WebRouter
 │   ├── services/
 │   │   └── orm_service.dart     # opens the database in every isolate
+│   ├── container.g.dart         # generated: @Inject classes, routers, services
 │   ├── dtos.g.dart              # generated: the list of DTOs
 │   └── openapi.g.dart           # generated: the OpenAPI docs
 ├── storage/                     # local disk, file cache, uploads
@@ -1797,7 +1787,7 @@ my_app/
 | `lib/app/http/` | Everything about HTTP: controllers, DTOs, middleware, serializers. |
 | `lib/app/models/` | One folder per model. `build_runner` writes the `.g.dart` file next to it. |
 | `lib/config/` | One file per config object. `app.dart` puts them together in `AppConfig`. |
-| `lib/routes/` | One `Router` class per file. Add each router to `routers` in `app.dart`. |
+| `lib/routes/` | One `Router` class per file. Dox finds each router by itself. |
 | `lib/services/` | Classes that implement `DoxService`. Their `setup()` runs in every isolate. |
 | `lib/*.g.dart` | Generated files. Do not edit them. Run `dox build_runner:build` to make them again. |
 | `storage/` | Files the app writes: uploads, the file cache, SQLite files. |
@@ -1822,17 +1812,17 @@ The Laravel code is Laravel 11. The biggest changes are in [What is different](#
 | Laravel | Dox |
 | --- | --- |
 | `Route::get('/ping', fn () => 'pong');` | `Route.get('/ping', (DoxRequest req) => 'pong');` |
-| `Route::post('/blogs', [BlogController::class, 'store']);` | `Route.post('/blogs', blogController.store);` |
+| `Route::post('/blogs', [BlogController::class, 'store']);` | `Route.post<BlogController>('/blogs', (BlogController c) => c.store);` |
 | `Route::get('/blogs/{id}', ...)` and `function show(int $id)` | `Route.get('/blogs/{id}', ...)` and `show(int id)` |
 | `Route::get('/posts/{page?}', ...)` | `Route.get('/posts/{page?}', (int? page) => ...)` |
 | `->where('path', '.*')` | `Route.get('/docs/{page*}', (String page) => ...)` |
 | `Route::prefix('blogs')->group(function () { ... });` | `Route.group('/blogs', () { ... });` |
 | `Route::middleware('auth')->group(...)` | `Route.middleware(<dynamic>[AuthMiddleware()], () { ... });` |
 | `Route::domain('admin.app.test')->group(...)` | `Route.domain('admin.app.test', () { ... });` |
-| `Route::resource('blogs', BlogController::class);` | `Route.resource('blogs', BlogController());` |
+| `Route::resource('blogs', BlogController::class);` | `Route.resource('blogs', BlogController);` |
 | `routes/api.php` with the `api` prefix | `lib/routes/api.dart`, a `Router` class with `prefix => 'api'` |
 
-In Dox, a controller is an object you make yourself. There is no `BlogController::class` string.
+In Dox, the container makes the controller. Put `@Inject()` above the class. The route picks the method with a typed function.
 
 ```dart title="lib/routes/api.dart"
 class ApiRouter extends Router {
@@ -1844,9 +1834,8 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    BlogController blogController = BlogController();
-    Route.get('/blogs', blogController.index);
-    Route.resource('users', UserController());
+    Route.get<BlogController>('/blogs', (BlogController c) => c.index);
+    Route.resource('users', UserController);
   }
 }
 ```
@@ -1859,9 +1848,12 @@ class ApiRouter extends Router {
 | `php artisan make:controller BlogController --resource` | `dox create:controller Blog -r` |
 | `public function show(Request $request, int $id)` | `Future<Blog?> show(DoxRequest req, int id)` |
 | `public function store(StoreBlogRequest $request)` | `Future<Blog> store(CreateBlog body)` |
-| injected by the service container | filled by type: `DoxRequest`, one `@Dto` class, path params |
+| constructor injection by the service container | constructor injection by the container: `@Inject()` above the class |
+| method injection | filled by type: `DoxRequest`, one `@Dto` class, path params, models, container classes |
+| implicit route model binding | the same: a `User user` parameter loads `{user}` by its key |
 
 Dox fills a parameter by its type, not by its name. Path params go by position.
+The container is generated code, not reflection. See [Dependency injection](../the-basic/dependency-injection.md).
 A controller can be a class method, a static method or a plain function.
 
 ## Middleware
@@ -2155,9 +2147,9 @@ See [Testing](../digging-deeper/testing.md).
 
 ## What is different
 
-- **No service container in the controller.** Laravel makes your controllers and injects what the constructor asks for.
-  In Dox you make the controller yourself (`BlogController()`) and pass what it needs. Dox fills only the method parameters: the request, one DTO and the path params.
-  `Dox().ioc` is a small registry (`register`, `registerSingleton`, `get`), but nothing is injected for you.
+- **A generated container.** Like Laravel, Dox makes your controllers and injects what the constructor asks for.
+  You add `@Inject()` to the class. `build_runner` writes `lib/container.g.dart` with every registration. There are no service providers to write.
+  A singleton is one instance per isolate, not one per request.
 - **Isolates, not PHP-FPM workers.** One process runs one isolate per CPU core. Each isolate runs your whole app and has its own memory.
   A static value or a singleton lives once per isolate. A PHP worker starts from zero on each request. A Dox isolate keeps its state between requests, so a memory leak stays.
   Anything that must be shared goes to the database, Redis or files. See [How Dox works](how-dox-works.md#isolates).
@@ -2662,25 +2654,20 @@ class ApiRouter extends Router {
 }
 ```
 
-Add each router to `routers` in `lib/config/app.dart`:
-
-```dart title="lib/config/app.dart"
-AppConfig appConfig = AppConfig(
-  routers: <Router>[WebRouter(), ApiRouter()],
-  // ...
-);
-```
+Dox finds every `Router` class by itself. It is in `lib/container.g.dart` after `dart run build_runner build`.
+To pick the order of routers, list them in `routers:` of `AppConfig`.
+See [Dependency injection: routers and services](dependency-injection.md#routers-and-services).
 
 The leading `/` in a path is optional. `'ping'` and `'/ping'` are the same route.
 
 ## Route methods
 
 ```dart
-Route.get('/blogs', controller.index);
-Route.post('/blogs', controller.store);
-Route.put('/blogs/{id}', controller.update);
-Route.patch('/blogs/{id}', controller.update);
-Route.delete('/blogs/{id}', controller.destroy);
+Route.get<BlogController>('/blogs', (BlogController c) => c.index);
+Route.post<BlogController>('/blogs', (BlogController c) => c.store);
+Route.put<BlogController>('/blogs/{id}', (BlogController c) => c.update);
+Route.patch<BlogController>('/blogs/{id}', (BlogController c) => c.update);
+Route.delete<BlogController>('/blogs/{id}', (BlogController c) => c.destroy);
 ```
 
 !!! info
@@ -2697,10 +2684,10 @@ The second argument is the code that answers the request. It can be:
 // a function
 Route.get('/ping', (DoxRequest req) => 'pong');
 
-// a controller method
-WebController webController = WebController();
-Route.get('/ping', webController.pong);
+// a controller method. The controller comes from the container.
+Route.get<WebController>('/ping', (WebController c) => c.pong);
 
+@Inject()
 class WebController {
   String pong(DoxRequest req) {
     return 'pong';
@@ -2708,10 +2695,15 @@ class WebController {
 }
 
 // a list: middleware first, the controller last
-Route.get('/ping', <dynamic>[LoggerMiddleware(), webController.pong]);
+Route.get<WebController>('/ping', <dynamic>[
+  LoggerMiddleware(),
+  (WebController c) => c.pong,
+]);
 ```
 
 In a list, the last item is the controller. The items before it are [middleware](middleware.md).
+`(WebController c) => c.pong` picks the method. Dox calls it once per isolate, at start.
+See [Dependency injection](dependency-injection.md).
 
 See [Controller](controller.md) for the parameters a handler can ask for.
 
@@ -2790,8 +2782,10 @@ To turn CORS on or off for some routes, see [CORS](../security/cors.md).
 One line makes the usual CRUD routes for a controller.
 
 ```dart
-Route.resource('blogs', BlogController());
+Route.resource('blogs', BlogController);
 ```
+
+`BlogController` is a class from the container. A controller object works too: `Route.resource('blogs', BlogController())`.
 
 | Method | Path | Controller method | Route name |
 | --- | --- | --- | --- |
@@ -2805,7 +2799,7 @@ Route.resource('blogs', BlogController());
 
 The name comes from the path: `/` becomes `.`, and `{params}` are left out.
 So `Route.resource('users/{user}/posts', ...)` gives `users.posts.index`.
-Pass `name:` to pick another one: `Route.resource('blogs', BlogController(), name: 'posts')`.
+Pass `name:` to pick another one: `Route.resource('blogs', BlogController, name: 'posts')`.
 
 A method that the controller does not have is skipped. No route is made for it.
 Any other error from the controller is not hidden. It stops the app at start, so you see it.
@@ -2873,6 +2867,10 @@ Route.get('/users/{user}/posts/{page}', (User user, int page) {
 ```
 
 The binder runs after the middleware, so an auth middleware can stop the request before any database call.
+
+A `@DoxModel` class does not need `Route.bind`. Dox makes a binder for it in `lib/container.g.dart`.
+See [Dependency injection: route model binding](dependency-injection.md#route-model-binding).
+`Route.bind` wins when both exist.
 
 ## Serve storage files
 
@@ -3616,6 +3614,7 @@ It writes `lib/app/http/controllers/blog.controller.dart`.
 ```dart title="lib/app/http/controllers/blog.controller.dart"
 import 'package:dox_core/dox_core.dart';
 
+@Inject()
 class BlogController {
   String index(DoxRequest req) {
     return 'all blogs';
@@ -3624,9 +3623,11 @@ class BlogController {
 ```
 
 ```dart title="lib/routes/api.dart"
-BlogController blogController = BlogController();
-Route.get('/blogs', blogController.index);
+Route.get<BlogController>('/blogs', (BlogController c) => c.index);
 ```
+
+`@Inject()` puts the controller in the container. Run `dart run build_runner build` after you add one.
+The constructor can ask for services and repositories. See [Dependency injection](dependency-injection.md).
 
 ### Static method
 
@@ -3663,6 +3664,7 @@ dox create:controller Blog -r
 ```dart title="lib/app/http/controllers/blog.controller.dart"
 import 'package:dox_core/dox_core.dart';
 
+@Inject()
 class BlogController {
   /// GET /resource
   Future<dynamic> index(DoxRequest req) async {}
@@ -3688,7 +3690,7 @@ class BlogController {
 ```
 
 ```dart title="lib/routes/api.dart"
-Route.resource('blogs', BlogController());
+Route.resource('blogs', BlogController);
 ```
 
 You can delete methods you do not need. `Route.resource` skips them.
@@ -3699,7 +3701,7 @@ See [Routing: resource routes](routing.md#resource-routes).
 A controller asks for what it needs by **type**. Dox fills each parameter.
 
 ```dart
-Route.put('/teams/{teamId}/users/{id}', controller.update);
+Route.put<UserController>('/teams/{teamId}/users/{id}', (UserController c) => c.update);
 
 class UserController {
   Future<User> update(int teamId, int id, UpdateUser body) async { ... }
@@ -3712,6 +3714,8 @@ class UserController {
 | a `@Dto` class | the checked body or query. See [Validation](validation.md). |
 | `String`, `int`, `double`, `num`, `bool` | the path params, in the order of the route |
 | the same types with `?` | an optional path param (`{id?}`). `null` when it is not in the URL. |
+| a `@DoxModel` class | the model, loaded by the route param. See [route model binding](dependency-injection.md#route-model-binding). |
+| an `@Inject()` class | the instance from the [container](dependency-injection.md#handler-parameters) |
 
 Rules:
 
@@ -3733,12 +3737,293 @@ Rules:
 
 **Checked at start.** The server does not start when:
 
-- a parameter type is not in the list above, and not a `@Dto` (did you run `dart run build_runner build`?),
+- a parameter type is not in the list above (did you run `dart run build_runner build`?),
 - the method has more path-param parameters than the route has `{...}` params.
 
 ## What to return
 
 Return a `String`, a `Map`, a model, a `File` and more. See [Response](response.md).
+
+
+---
+
+# Dependency injection
+
+Source: https://dartondox.dev/latest/3.xthe-basic/dependency-injection/
+
+# Dependency injection
+
+Dox has a container. It makes your classes and gives each constructor what it needs.
+You do not register classes by hand.
+Put `@Inject()` above a class, and `dox_builder` adds it to the container.
+Dox does not use `dart:mirrors`. All the wiring is generated code.
+
+## A full example
+
+A repository reads the database. A service holds the business logic. A controller answers the route.
+
+```dart title="lib/app/repositories/user.repository.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:my_app/app/models/user/user.model.dart';
+
+@Inject()
+class UserRepository {
+  Future<User?> find(int id) => User().find(id);
+}
+```
+
+```dart title="lib/app/services/user.service.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:my_app/app/models/user/user.model.dart';
+import 'package:my_app/app/repositories/user.repository.dart';
+
+@Inject()
+class UserService {
+  UserService(this.users);
+
+  final UserRepository users;
+
+  Future<User> show(int id) async {
+    User? user = await users.find(id);
+    if (user == null) throw NotFoundHttpException();
+    return user;
+  }
+}
+```
+
+```dart title="lib/app/http/controllers/user.controller.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:my_app/app/models/user/user.model.dart';
+import 'package:my_app/app/services/user.service.dart';
+
+@Inject()
+class UserController {
+  UserController(this.service);
+
+  final UserService service;
+
+  Future<User> show(int id) => service.show(id);
+}
+```
+
+```dart title="lib/routes/api.dart"
+class ApiRouter extends Router {
+  @override
+  String get prefix => 'api';
+
+  @override
+  void register() {
+    Route.get<UserController>('/users/{id}', (UserController c) => c.show);
+  }
+}
+```
+
+Run the builder:
+
+```bash
+dart run build_runner build
+```
+
+It writes `lib/container.g.dart`. Give it to the app once:
+
+```dart title="lib/config/app.dart"
+import 'package:my_app/container.g.dart';
+
+AppConfig appConfig = AppConfig(
+  container: registerContainer,
+  // ...
+);
+```
+
+That is all. `GET /api/users/5` makes the repository, the service and the controller, and calls `show(5)`.
+
+## The generated file
+
+`lib/container.g.dart` has one function. Each class gets a factory that calls its constructor.
+
+```dart title="lib/container.g.dart"
+// GENERATED CODE - DO NOT MODIFY BY HAND
+import 'package:dox_core/dox_core.dart';
+import 'package:my_app/app/http/controllers/user.controller.dart' as i1;
+import 'package:my_app/app/repositories/user.repository.dart' as i2;
+import 'package:my_app/app/services/user.service.dart' as i3;
+import 'package:my_app/routes/api.dart' as i4;
+import 'package:my_app/services/orm_service.dart' as i5;
+import 'package:my_app/app/models/user/user.model.dart' as i6;
+
+void registerContainer(IocContainer c) {
+  c.singleton<i1.UserController>(
+    (IocContainer c) => i1.UserController(c.get<i3.UserService>()),
+  );
+  c.singleton<i2.UserRepository>((IocContainer c) => i2.UserRepository());
+  c.singleton<i3.UserService>(
+    (IocContainer c) => i3.UserService(c.get<i2.UserRepository>()),
+  );
+  c.router<i4.ApiRouter>((IocContainer c) => i4.ApiRouter());
+  c.service<i5.ORMService>((IocContainer c) => i5.ORMService());
+  c.bindModel<i6.User>((String id) {
+    int? key = int.tryParse(id);
+    if (key == null) return null;
+    return i6.User().find(key);
+  });
+}
+```
+
+Do not edit it. Run the builder again after you add a class.
+
+## Lifetime
+
+- `@Inject()`: one instance per isolate. It is made on first use.
+- `@Inject(singleton: false)`: a new instance each time it is asked for.
+
+Dox runs one server per isolate. Isolates do not share objects.
+So each isolate runs `registerContainer` and has its own instances.
+Do not keep state in a singleton that all isolates must see. Use the cache or the database for that.
+
+## Constructor parameters
+
+Each constructor parameter is found by its type.
+
+- Positional and named parameters both work.
+- An optional parameter whose type is not in the container keeps its default value.
+- A nullable parameter whose type is not in the container gets `null`.
+- Any other parameter whose type is not in the container stops the build.
+
+## Routes to controller methods
+
+Give the controller type, then a function that picks the method:
+
+```dart
+Route.get<PostController>('/posts', (PostController c) => c.index);
+Route.post<PostController>('/posts', (PostController c) => c.store);
+Route.put<PostController>('/posts/{id}', (PostController c) => c.update);
+Route.delete<PostController>('/posts/{id}', (PostController c) => c.destroy);
+```
+
+The controller comes from the container. Dox gets it once per isolate, at start. A request does no extra work.
+`.name()`, groups and middleware lists work the same:
+
+```dart
+Route.get<PostController>('/posts/{id}', (PostController c) => c.show).name('posts.show');
+Route.get<AuthController>('/me', <dynamic>[AuthMiddleware(), (AuthController c) => c.me]);
+```
+
+You can leave out `<PostController>`. Dox then finds the controller by the parameter type: `Route.get('/posts', (PostController c) => c.index)`.
+
+For resource routes, pass the class:
+
+```dart
+Route.resource('posts', PostController);
+```
+
+The method still gets its parameters as usual: `DoxRequest`, a `@Dto`, path params and bound models.
+See [Controller: parameters](controller.md#parameters).
+
+## Handler parameters
+
+A controller method (or a plain route function) can ask for any class of the container:
+
+```dart
+Route.get('/stats', (StatsService stats) => stats.today());
+```
+
+A singleton is read once, at start. A `singleton: false` class is made on each request.
+
+## Route model binding
+
+Every `@DoxModel` class gets a binder in `lib/container.g.dart`.
+When a handler has a parameter of a model type, Dox loads the model by its primary key.
+
+```dart
+Route.get<PostController>('/posts/{post}', (PostController c) => c.show);
+
+@Inject()
+class PostController {
+  Post show(Post post) => post;
+}
+```
+
+- The route param with the name of the model is used: `{post}` for `Post`, `{blogPost}` for `BlogPost`.
+- When there is no such param, the next route param in order is used, like `{id}`.
+- A missing row answers `404`.
+- An `int` key that is not a number answers `404`, with no database call.
+- A route without a parameter of the model type does not load the model.
+- A binder from `Route.bind` wins over this one. See [Routing: route model binding](routing.md#route-model-binding).
+
+## Routers and services
+
+You do not need `@Inject()` on them.
+
+- Every class that extends `Router` is found. Its routes are registered at start.
+- Every class that implements `DoxService` is found. Its `setup()` runs at start, in every isolate.
+
+Their constructors get parameters from the container too.
+
+They run in the order of their file path, then the order in the file.
+To pick the order, list them in `AppConfig`:
+
+```dart
+AppConfig appConfig = AppConfig(
+  container: registerContainer,
+  services: <DoxService>[ORMService()], // runs first
+  routers: <Router>[ApiRouter()],       // registered first
+);
+```
+
+A listed class comes first. The others follow. No class runs twice.
+A listed service is also the instance that the container gives.
+
+## Use the container in code
+
+`Dox().ioc` is the container of the current isolate.
+
+```dart
+UserService users = Dox().ioc.get<UserService>();
+```
+
+| Method | What it does |
+| --- | --- |
+| `get<T>()` | the instance of `T`. Throws when `T` is not registered. |
+| `has<T>()` | `true` when `T` is registered |
+| `singleton<T>(factory)` | one instance per isolate, made on first use |
+| `factory<T>(factory)` | a new instance on each `get` |
+| `instance<T>(value)` | `value` is the instance, eg. a config object |
+| `override<T>(value)` | replace `T`, eg. with a fake in a test |
+| `clearOverrides()` | remove every override |
+
+## Tests
+
+Replace a class with a fake before the app starts:
+
+```dart
+setUpAll(() async {
+  Dox().ioc.override<UserRepository>(FakeUserRepository());
+  client = await DoxTestClient.start(appConfig);
+});
+
+tearDownAll(() async {
+  await client.close();
+  Dox().ioc.clearOverrides();
+});
+```
+
+An override stays when the app registers its classes again.
+Call it before `DoxTestClient.start`. Controllers get their objects once, at start.
+
+## Build errors
+
+The build stops with a clear message when:
+
+- a required parameter has a type that is not in the container,
+- classes need each other in a circle. The message shows the chain, like `A -> B -> C -> A`,
+- `@Inject()` is on an abstract class or a generic class,
+- a class has no unnamed constructor.
+
+## Limits
+
+- Dox finds classes in `lib/` only.
+- The container is keyed by the class. It does not map an interface to a class.
+- Two classes with the same name in two files both work. But use the typed route style (`Route.get<C>(...)`) for them. They can not be handler parameters, because Dox can not tell them apart by name.
 
 
 ---
@@ -3784,7 +4069,7 @@ class LoggerMiddleware implements IDoxMiddleware {
 Then put it on a route:
 
 ```dart title="lib/routes/api.dart"
-Route.get('/ping', <dynamic>[LoggerMiddleware(), webController.pong]);
+Route.get<WebController>('/ping', <dynamic>[LoggerMiddleware(), (WebController c) => c.pong]);
 ```
 
 !!! note
@@ -3806,7 +4091,7 @@ dynamic apiKeyMiddleware(DoxRequest req) {
 ```
 
 ```dart title="lib/routes/api.dart"
-Route.get('/ping', <dynamic>[apiKeyMiddleware, webController.pong]);
+Route.get<WebController>('/ping', <dynamic>[apiKeyMiddleware, (WebController c) => c.pong]);
 ```
 
 ## Many middleware on one route
@@ -3815,10 +4100,10 @@ Put them in the list before the controller. They run from left to right.
 You can mix class and function middleware.
 
 ```dart
-Route.get('/ping', <dynamic>[
+Route.get<WebController>('/ping', <dynamic>[
   LoggerMiddleware(),
   apiKeyMiddleware,
-  webController.pong, // the controller is always last
+  (WebController c) => c.pong, // the controller is always last
 ]);
 ```
 
@@ -5124,20 +5409,21 @@ class ORMService implements DoxService, DoxShutdown {
 
 ## Register it
 
-Add an instance of the service to the list in `lib/config/services.dart`:
+You do not need to. Dox finds every class that implements `DoxService`.
+Run `dart run build_runner build`. The service is then in `lib/container.g.dart`.
+Each isolate makes its own instance from the container. Its constructor can ask for other classes of the container.
+See [Dependency injection](../the-basic/dependency-injection.md#routers-and-services).
 
-```dart title="lib/config/services.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:my_app/services/auth_service.dart';
-import 'package:my_app/services/orm_service.dart';
+Services run in the order of their file path. To run one first, list it in `AppConfig`:
 
-List<DoxService> services = <DoxService>[
-  ORMService(),
-  AuthService(),
-];
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  container: registerContainer,
+  services: <DoxService>[ORMService()], // runs before the others
+);
 ```
 
-This list goes to `AppConfig(services: services)` in `lib/config/app.dart`.
+A listed service runs first. Then the others run. No service runs twice.
 
 You can also add a service in code, before `startServer()`:
 
@@ -5174,7 +5460,7 @@ See [Authentication](../security/authentication.md).
 
 ## When `setup()` runs
 
-In each isolate, Dox runs `setup()` of each service, one after the other, in list order.
+In each isolate, Dox runs `setup()` of each service, one after the other: the listed ones first, then the ones of the container.
 Then it registers the routes and starts the server, so routes can use what a service set up.
 See [What each isolate does at start](isolate.md#what-each-isolate-does-at-start).
 
@@ -5209,7 +5495,7 @@ An error in `shutdown()` goes to the `report` method of the [exception handler](
 
 ## Rules for a service
 
-- **Open connections in `setup()`, not in the constructor.** Dox copies the service object to each isolate. An open socket or database pool can not be copied, so the isolate fails to start.
+- **Open connections in `setup()`, not in the constructor.** A service listed in `AppConfig` is copied to each isolate. An open socket or database pool can not be copied, so the isolate fails to start.
 - **Keep `setup()` short.** It runs once per isolate. Data you load in it is kept once per isolate, so 8 isolates keep 8 copies.
 
 
@@ -9014,7 +9300,7 @@ class ObserverService implements DoxService {
 }
 ```
 
-Then add `ObserverService()` to the list in `lib/config/services.dart`.
+Dox finds `ObserverService` by itself, like every `DoxService`. Run `dart run build_runner build` after you add it.
 
 - You can add more than one observer to a model.
 - `Model.forgetObservers<User>()` removes the observers of `User`. `Model.forgetObservers()` removes all.
@@ -10386,7 +10672,7 @@ class BlogController {
 }
 
 // routes
-Route.get('/blogs/{id}', [AuthMiddleware(), blogController.show]);
+Route.get<BlogController>('/blogs/{id}', <dynamic>[AuthMiddleware(), (BlogController c) => c.show]);
 ```
 
 The generated docs for `GET /blogs/{id}`:
@@ -11449,13 +11735,7 @@ class AuthService implements DoxService {
 }
 ```
 
-Add the service to the list:
-
-```dart title="lib/config/services.dart"
-List<DoxService> services = <DoxService>[
-  AuthService(),
-];
-```
+Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/container.g.dart`.
 
 ## 3. Add the routes
 
@@ -11463,11 +11743,10 @@ List<DoxService> services = <DoxService>[
 When the token is missing or not valid, the request stops with `401 Authentication failed`.
 
 ```dart title="lib/routes/api.dart"
-AuthController authController = AuthController();
 
-Route.post('/auth/register', authController.register);
-Route.post('/auth/login', authController.login);
-Route.get('/auth/user', <dynamic>[AuthMiddleware(), authController.user]);
+Route.post<AuthController>('/auth/register', (AuthController c) => c.register);
+Route.post<AuthController>('/auth/login', (AuthController c) => c.login);
+Route.get<AuthController>('/auth/user', <dynamic>[AuthMiddleware(), (AuthController c) => c.user]);
 ```
 
 ## 4. Write the controller
@@ -11477,6 +11756,7 @@ import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 
+@Inject()
 class AuthController {
   /// Make an account and log in.
   Future<dynamic> register(RegisterUser body) async {
@@ -11591,7 +11871,7 @@ Pick the guard by name:
 ```dart
 String? token = await Auth(guard: 'admin').attempt(credentials);
 
-Route.get('/admin', <dynamic>[AuthMiddleware(guard: 'admin'), adminController.index]);
+Route.get<AdminController>('/admin', <dynamic>[AuthMiddleware(guard: 'admin'), (AdminController c) => c.index]);
 ```
 
 The token keeps the guard name in its `aud` claim.
@@ -11700,12 +11980,12 @@ Change it for a group of routes:
 ```dart title="lib/routes/api.dart"
 // CORS headers only on these routes (use with enabled: false)
 Route.enabledCors(() {
-  Route.get('/public/posts', postController.index);
+  Route.get<PostController>('/public/posts', (PostController c) => c.index);
 });
 
 // no CORS headers on these routes
 Route.disabledCors(() {
-  Route.post('/webhooks/stripe', webhookController.handle);
+  Route.post<WebhookController>('/webhooks/stripe', (WebhookController c) => c.handle);
 });
 ```
 
@@ -11855,9 +12135,9 @@ Use it on login, sign up and other routes that bots like to hammer.
 ## Limit a route
 
 ```dart title="lib/routes/api.dart"
-Route.post('/auth/login', <dynamic>[
+Route.post<AuthController>('/auth/login', <dynamic>[
   RateLimit(max: 5, per: Duration(minutes: 1)),
-  authController.login,
+  (AuthController c) => c.login,
 ]);
 ```
 
@@ -11914,13 +12194,13 @@ The key is any `String`, so you can also count by user id after your auth middle
 Two `RateLimit` with the same `max` and `per` share one counter. Give one a `name` to keep them apart:
 
 ```dart
-Route.post('/auth/login', <dynamic>[
+Route.post<AuthController>('/auth/login', <dynamic>[
   RateLimit(max: 5, name: 'login'),
-  authController.login,
+  (AuthController c) => c.login,
 ]);
-Route.post('/auth/register', <dynamic>[
+Route.post<AuthController>('/auth/register', <dynamic>[
   RateLimit(max: 5, name: 'register'),
-  authController.register,
+  (AuthController c) => c.register,
 ]);
 ```
 
@@ -12145,6 +12425,7 @@ For other file types, use `@Mimes(<String>['pdf', 'docx'])` in place of `@Image(
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/http/dtos/upload_image.dto.dart';
 
+@Inject()
 class UploadController {
   /// POST /api/upload (multipart/form-data, field `image`)
   Future<Map<String, String>> store(UploadImage body) async {
@@ -12154,8 +12435,6 @@ class UploadController {
     return <String, String>{'path': path, 'url': url};
   }
 }
-
-UploadController uploadController = UploadController();
 ```
 
 !!! warning "Save the file before you return"
@@ -12180,7 +12459,7 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    Route.post('/upload', uploadController.store);
+    Route.post<UploadController>('/upload', (UploadController c) => c.store);
   }
 }
 ```
@@ -12302,6 +12581,7 @@ import 'package:dox_orm/dox_orm.dart';
 import 'package:my_app/app/http/dtos/list_users.dto.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 
+@Inject()
 class UserController {
   /// GET /api/users?page=1&per_page=20
   Future<Pagination<User>> index(ListUsers query) async {
@@ -12310,8 +12590,6 @@ class UserController {
         .paginate(currentPage: query.page, perPage: query.perPage);
   }
 }
-
-UserController userController = UserController();
 ```
 
 Always add an `orderBy`. Without it, the database may return the rows in a different order on each page.
@@ -12321,7 +12599,7 @@ Add a `where` before `paginate` to filter: `User().where('role', 'admin').orderB
 ## 3. Add the route
 
 ```dart title="lib/routes/api.dart"
-Route.get('/users', userController.index);
+Route.get<UserController>('/users', (UserController c) => c.index);
 ```
 
 ## 4. Build and run
@@ -12467,16 +12745,7 @@ class AuthService implements DoxService {
 }
 ```
 
-```dart title="lib/config/services.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:my_app/services/auth_service.dart';
-import 'package:my_app/services/orm_service.dart';
-
-List<DoxService> services = <DoxService>[
-  ORMService(),
-  AuthService(),
-];
-```
+Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/container.g.dart`.
 
 ## 3. Write the DTOs
 
@@ -12542,6 +12811,7 @@ import 'package:my_app/app/http/dtos/login_user.dto.dart';
 import 'package:my_app/app/http/dtos/register_user.dto.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 
+@Inject()
 class AuthController {
   /// POST /api/auth/register
   Future<Map<String, dynamic>> register(RegisterUser body) async {
@@ -12580,8 +12850,6 @@ class AuthController {
     return <String, String>{'message': 'Delete the token on the client'};
   }
 }
-
-AuthController authController = AuthController();
 ```
 
 `Hash.make` makes a bcrypt hash. `auth.attempt` finds the user by `email` and checks the password against that hash.
@@ -12605,12 +12873,12 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    Route.post('/auth/register', authController.register);
-    Route.post('/auth/login', authController.login);
+    Route.post<AuthController>('/auth/register', (AuthController c) => c.register);
+    Route.post<AuthController>('/auth/login', (AuthController c) => c.login);
 
     Route.middleware(<dynamic>[AuthMiddleware()], () {
-      Route.get('/auth/me', authController.me);
-      Route.post('/auth/logout', authController.logout);
+      Route.get<AuthController>('/auth/me', (AuthController c) => c.me);
+      Route.post<AuthController>('/auth/logout', (AuthController c) => c.logout);
       // put every protected route here
     });
   }
@@ -12745,6 +13013,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/exceptions/app_exception.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 
+@Inject()
 class UserController {
   /// GET /api/users/{id}
   Future<User> show(int id) async {
@@ -12765,8 +13034,6 @@ class UserController {
     return <String, bool>{'deleted': true};
   }
 }
-
-UserController userController = UserController();
 ```
 
 ## 2. One JSON shape for every error
@@ -12943,6 +13210,7 @@ import 'dart:isolate';
 
 import 'package:dox_core/dox_core.dart';
 
+@Inject()
 class ReportController {
   /// POST /api/reports
   /// Answers at once. The work runs after the response, in this isolate.
@@ -12982,8 +13250,6 @@ int countPrimes(int limit) {
   }
   return count;
 }
-
-ReportController reportController = ReportController();
 ```
 
 !!! warning "Do not block the event loop"
@@ -13034,11 +13300,14 @@ class CleanupService implements DoxService {
 }
 ```
 
-```dart title="lib/config/services.dart"
-List<DoxService> services = <DoxService>[
-  ORMService(),
-  CleanupService(), // after ORMService, so the database is ready
-];
+Dox finds `CleanupService` by itself. To be sure the database is ready first, list `ORMService` in `AppConfig`:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  container: registerContainer,
+  services: <DoxService>[ORMService()], // runs before CleanupService
+  // ...
+);
 ```
 
 When you run more than one process (two machines), each process has an isolate 1. Then the job runs twice. Use a database lock, or run the job from one place only.
@@ -13046,8 +13315,8 @@ When you run more than one process (two machines), each process has an isolate 1
 ## 4. Add the routes
 
 ```dart title="lib/routes/api.dart"
-Route.post('/reports', reportController.store);
-Route.get('/primes/{limit}', reportController.primes);
+Route.post<ReportController>('/reports', (ReportController c) => c.store);
+Route.get<ReportController>('/primes/{limit}', (ReportController c) => c.primes);
 ```
 
 ## Check it
@@ -13140,6 +13409,7 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 
+@Inject()
 class StaticController {
   /// GET /assets/{path*}
   /// Built files have a hash in the name, so the browser may keep them
@@ -13160,8 +13430,6 @@ class StaticController {
     return response(File('public/index.html')).cache(Duration.zero);
   }
 }
-
-StaticController staticController = StaticController();
 ```
 
 `cache(duration)` sets `Cache-Control: max-age=<seconds>`. `Duration.zero` gives `max-age=0`, so the browser asks again each time.
@@ -13181,16 +13449,17 @@ class WebRouter extends Router {
   @override
   void register() {
     // the SPA: assets with a long cache, every other URL gets index.html
-    Route.get('/assets/{path*}', staticController.asset);
-    Route.get('/', staticController.index);
-    Route.get('/{path*}', staticController.index);
+    Route.get<StaticController>('/assets/{path*}', (StaticController c) => c.asset);
+    Route.get<StaticController>('/', (StaticController c) => c.index);
+    Route.get<StaticController>('/{path*}', (StaticController c) => c.index);
   }
 }
 ```
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
-  /// the SPA catch-all route is in WebRouter, so it comes last
+  /// the SPA catch-all route is in WebRouter, so it must come last.
+  /// Listed routers come first, in this order.
   routers: <Router>[ApiRouter(), WebRouter()],
   // ...
 );
@@ -13379,7 +13648,7 @@ Turn CORS off for such routes to send fewer headers:
 
 ```dart
 Route.disabledCors(() {
-  Route.post('/webhooks/stripe', webhookController.handle);
+  Route.post<WebhookController>('/webhooks/stripe', (WebhookController c) => c.handle);
 });
 ```
 
@@ -14034,6 +14303,7 @@ The controller asks for `SaveBlog` like any other DTO. Dox checks the body befor
 ```dart title="server/lib/app/http/controllers/blog.controller.dart"
 import 'package:blog_shared/blog_shared.dart' show SaveBlog;
 
+@Inject()
 class BlogController {
   Future<Map<String, dynamic>> store(SaveBlog body) async {
     // body.title is already trimmed and checked.
@@ -14043,7 +14313,7 @@ class BlogController {
 ```
 
 ```dart title="server/lib/routes/api.dart"
-Route.post('/blogs', BlogController().store);
+Route.post<BlogController>('/blogs', (BlogController c) => c.store);
 ```
 
 !!! note "Why `show SaveBlog`"
@@ -14336,6 +14606,7 @@ Write a `///` comment on a controller method. The first line is the summary. The
 Add `@Tags` and `@Response` (from `dox_core`) when the automatic result is not what you want.
 
 ```dart title="lib/app/http/controllers/post.controller.dart"
+@Inject()
 class PostController {
   /// List all posts
   ///
@@ -15351,7 +15622,7 @@ One page to keep open while you work. Each section links to its full page.
 | `bin/server.dart` | starts the app: `Dox().initialize()`, migrations, `startServer()` |
 | `bin/migrate.dart` | runs migrations for `dox migration:*` |
 | `bin/openapi.dart` | writes the OpenAPI files for `dox openapi:generate` |
-| `lib/config/` | `app.dart` (`AppConfig`), `env.dart`, `database.dart`, `cors.dart`, `cache.dart`, `storage.dart`, `openapi.dart`, `services.dart`, `logger.dart`, `socketio.dart` |
+| `lib/config/` | `app.dart` (`AppConfig`), `env.dart`, `database.dart`, `cors.dart`, `cache.dart`, `storage.dart`, `openapi.dart`, `logger.dart`, `socketio.dart` |
 | `lib/routes/` | `api.dart`, `web.dart`, `websocket.dart`: one `Router` class each |
 | `lib/app/http/controllers/` | `<name>.controller.dart` |
 | `lib/app/http/dtos/` | `<name>.dto.dart` |
@@ -15359,7 +15630,7 @@ One page to keep open while you work. Each section links to its full page.
 | `lib/app/http/serializers/` | `<name>.serializer.dart` |
 | `lib/app/models/<name>/` | `<name>.model.dart` |
 | `lib/services/` | `DoxService` classes: ORM, auth, websocket |
-| `lib/dtos.g.dart`, `lib/openapi.g.dart` | made by `build_runner`. Do not edit. |
+| `lib/container.g.dart`, `lib/dtos.g.dart`, `lib/openapi.g.dart` | made by `build_runner`. Do not edit. |
 | `db/migration/` | migrations and `migrations.dart` (the registry) |
 
 See [CLI](cli.md) and [App config](app-config.md).
@@ -15407,7 +15678,8 @@ class ApiRouter extends Router {
 
 | Code | Does |
 | --- | --- |
-| `Route.get('/blogs', c.index)` | also `post`, `put`, `patch`, `delete`, `options` |
+| `Route.get<C>('/blogs', (C c) => c.index)` | controller `C` from the container. Also `post`, `put`, `patch`, `delete`, `options` |
+| `Route.get('/blogs', listBlogs)` | a plain function |
 | `Route.post('/blogs', c.store, body: schema)` | `body:` is for the docs only. It checks nothing. |
 | `Route.get('/blogs/{id}', c.show)` | path param. `show(int id)` |
 | `Route.get('/posts/{page?}', c.list)` | optional param. `list(int? page)` |
@@ -15416,12 +15688,35 @@ class ApiRouter extends Router {
 | `Route.group('/blogs', () { ... })` | prefix. Dox adds the `/` between parts. |
 | `Route.middleware(<dynamic>[M()], () { ... })` | middleware for a group |
 | `Route.domain('api.app.com', () { ... })` | match by `Host` |
-| `Route.resource('blogs', BlogController())` | `index`, `create`, `store`, `show`, `edit`, `update`, `destroy` |
+| `Route.resource('blogs', BlogController)` | `index`, `create`, `store`, `show`, `edit`, `update`, `destroy` |
 | `Route.files('files')` | serve a storage disk, signed URLs only |
 | `Route.enabledCors(() { ... })` / `Route.disabledCors(...)` | CORS for some routes |
 | `Route.websocket('echo', (WebSocket s, DoxRequest req) { ... })` | a raw WebSocket. For rooms and acks, use Socket.IO. |
 
-Controller parameters, by type: `DoxRequest`, one `@Dto` class, `String`/`int`/`double`/`num`/`bool` for path params (by position). Only positional parameters.
+Controller parameters, by type: `DoxRequest`, one `@Dto` class, `String`/`int`/`double`/`num`/`bool` for path params (by position), a `@DoxModel` (loaded by its key), an `@Inject()` class. Only positional parameters.
+
+In the examples, `c.index` and the like are methods of a controller `C` from the container.
+
+## Dependency injection
+
+```dart
+@Inject()                       // one instance per isolate
+class PostService {
+  PostService(this.posts);      // from the container, by type
+  final PostRepository posts;
+}
+
+@Inject(singleton: false)       // a new instance each time
+class Clock {}
+
+AppConfig(container: registerContainer); // from lib/container.g.dart
+
+Dox().ioc.get<PostService>();
+Dox().ioc.override<PostRepository>(FakePostRepository()); // tests
+```
+
+Routers and `DoxService` classes are found without `@Inject()`. Run `dart run build_runner build` after a change.
+See [Dependency injection](../the-basic/dependency-injection.md).
 
 Middleware order: `globalMiddleware`, router `middleware`, group, route.
 
@@ -15845,13 +16140,14 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `routers` | `List<Router>` | `[]` | The router classes that register routes. |
+| `container` | `void Function(IocContainer)?` | `null` | Fills the container: `registerContainer` from `lib/container.g.dart`. Every isolate runs it. It also gives the routers, services and model binders. See [Dependency injection](../the-basic/dependency-injection.md). |
+| `routers` | `List<Router>` | `[]` | Routers to register first, in this order. Every other `Router` class comes from `container`. |
 | `globalMiddleware` | `List<dynamic>` | `[]` | Middleware that runs on every route. A function or an `IDoxMiddleware`. |
 | `dtos` | `List<DtoSchema<Object>>` | `[]` | Every DTO of the app: `dtos` from `lib/dtos.g.dart`. Dox finds the DTO of a controller parameter and of `req.validate<T>()` with it. |
 | `validationMessages` | `MessageResolver?` | `null` (English messages) | Messages for validation errors, for example in other languages. |
 | `responseHandler` | `ResponseHandlerInterface?` | `null` | A class with `DoxResponse handle(DoxResponse res)`. It sees every response before it is sent. |
 | `exceptionHandler` | `ExceptionHandler` | `ExceptionHandler()` | Reports every unhandled error and turns it into a response. The default logs the error with `Logger.warn` and the stack with `Logger.danger`. See [Error handling](../the-basic/errors.md). |
-| `services` | `List<DoxService>` | `[]` | Classes with a `setup()` method. Dox runs them in every isolate at start. The ORM and auth are set up here. |
+| `services` | `List<DoxService>` | `[]` | Services to run first, in this order. Every other `DoxService` class comes from `container`. Dox runs them in every isolate at start. |
 
 ## Sub configs
 
@@ -16076,11 +16372,9 @@ import 'package:dox_core/dox_core.dart';
 import 'package:my_app/config/cache.dart';
 import 'package:my_app/config/cors.dart';
 import 'package:my_app/config/logger.dart';
-import 'package:my_app/config/services.dart';
 import 'package:my_app/config/storage.dart';
-import 'package:my_app/routes/api.dart';
-import 'package:my_app/routes/web.dart';
 import 'package:my_app/config/env.dart';
+import 'package:my_app/container.g.dart';
 
 AppConfig appConfig = AppConfig(
   /// Changing the key makes old cookies and encrypted data unreadable.
@@ -16090,11 +16384,10 @@ AppConfig appConfig = AppConfig(
   globalMiddleware: <dynamic>[
     LogMiddleware(enabled: env.appEnv != 'production'),
   ],
-  routers: <Router>[WebRouter(), ApiRouter()],
+  container: registerContainer,
   cache: cache,
   storage: storage,
   cors: cors,
-  services: services,
   logger: logger,
 );
 ```
@@ -16210,20 +16503,13 @@ CORSConfig cors = CORSConfig(
 );
 ```
 
-```dart title="lib/config/services.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:my_app/services/orm_service.dart';
-
-/// Dox runs these again in every new isolate.
-List<DoxService> services = <DoxService>[ORMService()];
-```
-
 ```dart title="lib/services/orm_service.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart';
 import 'package:my_app/config/database.dart';
 
-/// No database? Delete this file and remove it from config/services.dart.
+/// Dox finds it by itself and runs it in every isolate.
+/// No database? Delete this file.
 class ORMService implements DoxService, DoxShutdown {
   @override
   Future<void> setup() async {
@@ -16455,7 +16741,8 @@ A trailing `Controller` in the name is removed: `UserController` and `User` give
 | plain | `lib/app/http/controllers/<name>.controller.dart` | `_getSample` in `packages/dox-cli/lib/src/tools/create_controller.dart` |
 | `-r` | `lib/app/http/controllers/<name>.controller.dart` | `_getResourceSample` in the same file |
 
-The plain and resource templates also make an instance: `<Name>Controller <name>Controller = <Name>Controller();`.
+The class has `@Inject()`, so the container makes it. A comment shows the route to add, like `Route.get<BlogController>('path', (BlogController c) => c.index);`.
+After the file is made, the CLI tells you to run `dart run build_runner build`. That adds the controller to `lib/container.g.dart`.
 
 ### `dox create:middleware`
 
@@ -17541,6 +17828,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
+### Unreleased
+
+- New: `@Inject()`. Put it above a class and `dox_builder` adds the class to the Dox container. `@Inject(singleton: false)` makes a new instance each time.
+
 ### 3.0.0-alpha.8
 
 - Version bump only, to match the other packages.
@@ -17637,6 +17928,9 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- New: `lib/container.g.dart` builder. It finds every `@Inject()` class, every class that extends `Router`, every class that implements `DoxService` and every `@DoxModel` in `lib/`. It writes `registerContainer(IocContainer c)`, which makes each class with its constructor. Constructor parameters come from the container by type. Optional parameters that the container can not give keep their default. Required nullable ones get `null`.
+- The build stops with a clear message for a required parameter the container can not give, for a dependency cycle (it shows the chain, like `A -> B -> A`), and for an abstract or generic `@Inject()` class. Two classes with the same name work: every import has a prefix.
+- OpenAPI: typed routes (`Route.get<C>(path, (C c) => c.method)`) and `Route.resource(path, ControllerClass)` are read too.
 - Generates the query scopes: an extension with one method for each `@Scope()` method, and `globalScopes` for `@Scope(global: true)`.
 - Generates the column casts: `fromMap()` and `columnsToMap()` use the `cast` of `@Column()`. `bool` and enum fields get a cast without `cast`.
 - Run `dart run build_runner build` to get the new code.
@@ -17746,6 +18040,7 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- `dox make:controller` (`create:controller`) writes `@Inject()` above the class, and no global controller instance. The file shows the typed route to use. The command says to run `build_runner`.
 - New `dox make:factory <model>`: makes `db/factories/<model>.factory.dart`.
 - New `dox make:seeder <name>`: makes `db/seeders/<name>.seeder.dart`, writes the seeder list `db/seeders/seeders.dart` and makes `bin/seed.dart` when it is missing.
 - New `dox db:seed [--class=<name>]`: runs `bin/seed.dart`. The default seeder is `DatabaseSeeder`.
@@ -17805,6 +18100,12 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- New: a real IoC container. `IocContainer` (`Dox().ioc`) has `get<T>()`, `has<T>()`, `singleton<T>()`, `factory<T>()`, `instance<T>()`, `override<T>()` and `clearOverrides()`. Each isolate has its own container: a singleton is one instance per isolate, made on first use.
+- New: `AppConfig(container: registerContainer)` with the function from `lib/container.g.dart` (made by `dox_builder`). Every isolate runs it. The routers and services it finds are registered for you, so `AppConfig.routers` and `AppConfig.services` can stay empty. The ones you list there still work and come first.
+- New: typed routes. `Route.get<UserController>('users', (UserController c) => c.index)` (also post, put, patch, delete and the others). The controller comes from the container, once per isolate, at start. `(UserController c) => c.index` without `<UserController>` works too. `Route.resource('users', UserController)` takes a controller class.
+- New: a controller parameter whose type is in the container gets it from the container.
+- New: route model binding for `@DoxModel` classes. A controller parameter of type `User` gets the `User` of the `{user}` param (or the next param), found by its primary key. No row answers 404. `Route.bind` still wins.
+- Breaking: the old `IocContainer` methods `register`, `registerByName`, `registerSingleton` and `getByName` are removed. Use `factory`, `singleton` and `get`.
 - New: named routes. `Route.get('/users/{id}', c).name('users.show')`, then `route('users.show', params: {'id': 5})` gives `/users/5`. `query:` adds a query string. `Route.group(..., name: 'admin.')` puts a prefix in front of the names inside. Resource routes are named `blogs.index` ... `blogs.destroy`; `Route.resource(..., name:)` picks another base name. A name used twice stops the app at start. An unknown name, a missing param or an extra param throws an `ArgumentError`.
 - New: route model binding without `dart:mirrors`. `Route.bind<User>('user', (String id) => User().find(id))` runs before the controller of every route with a `{user}` param. The controller gets it as a `User user` parameter, or with `req.bound<User>('user')`. A binder that gives `null` answers 404.
 - New: `ExceptionHandler`, the one place that turns an error into a response. Extend it and set `AppConfig(exceptionHandler: ...)`. `report(error, stackTrace)` logs, `render(error, req)` picks the response. The default answers are the same as before. A URL with no route goes through it too.

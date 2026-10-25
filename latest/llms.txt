@@ -30,6 +30,7 @@ The full docs as one file: https://dartondox.dev/latest/3.xllms-full.txt
 - [Serializer](https://dartondox.dev/latest/3.xthe-basic/serializer/)
 - [Error handling](https://dartondox.dev/latest/3.xthe-basic/errors/)
 - [Controller](https://dartondox.dev/latest/3.xthe-basic/controller/)
+- [Dependency injection](https://dartondox.dev/latest/3.xthe-basic/dependency-injection/)
 - [Middleware](https://dartondox.dev/latest/3.xthe-basic/middleware/)
 - [Validation](https://dartondox.dev/latest/3.xthe-basic/validation/)
 - [Validation rules](https://dartondox.dev/latest/3.xthe-basic/validation-rules/)

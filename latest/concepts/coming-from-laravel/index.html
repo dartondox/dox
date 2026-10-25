@@ -1469,6 +1469,8 @@
       
         
       
+        
+      
     
     
     
@@ -1671,6 +1673,34 @@
     
   
     Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency injection
   
 
     
@@ -4538,7 +4568,7 @@
 </tr>
 <tr>
 <td><code>Route::post('/blogs', [BlogController::class, 'store']);</code></td>
-<td><code>Route.post('/blogs', blogController.store);</code></td>
+<td><code>Route.post&lt;BlogController&gt;('/blogs', (BlogController c) =&gt; c.store);</code></td>
 </tr>
 <tr>
 <td><code>Route::get('/blogs/{id}', ...)</code> and <code>function show(int $id)</code></td>
@@ -4566,7 +4596,7 @@
 </tr>
 <tr>
 <td><code>Route::resource('blogs', BlogController::class);</code></td>
-<td><code>Route.resource('blogs', BlogController());</code></td>
+<td><code>Route.resource('blogs', BlogController);</code></td>
 </tr>
 <tr>
 <td><code>routes/api.php</code> with the <code>api</code> prefix</td>
@@ -4574,7 +4604,7 @@
 </tr>
 </tbody>
 </table>
-<p>In Dox, a controller is an object you make yourself. There is no <code>BlogController::class</code> string.</p>
+<p>In Dox, the container makes the controller. Put <code>@Inject()</code> above the class. The route picks the method with a typed function.</p>
 <div class="language-dart highlight"><span class="filename">lib/routes/api.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ApiRouter</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Router</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nd">@override</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">prefix</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'api'</span><span class="p">;</span>
@@ -4584,11 +4614,10 @@
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="nd">@override</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">register</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="n">BlogController</span><span class="w"> </span><span class="n">blogController</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BlogController</span><span class="p">();</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/blogs'</span><span class="p">,</span><span class="w"> </span><span class="n">blogController</span><span class="p">.</span><span class="n">index</span><span class="p">);</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="n">Route</span><span class="p">.</span><span class="n">resource</span><span class="p">(</span><span class="s1">'users'</span><span class="p">,</span><span class="w"> </span><span class="n">UserController</span><span class="p">());</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">}</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="n">BlogController</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'/blogs'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">BlogController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">index</span><span class="p">);</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="n">Route</span><span class="p">.</span><span class="n">resource</span><span class="p">(</span><span class="s1">'users'</span><span class="p">,</span><span class="w"> </span><span class="n">UserController</span><span class="p">);</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="controllers">Controllers</h2>
 <table>
@@ -4616,12 +4645,21 @@
 <td><code>Future&lt;Blog&gt; store(CreateBlog body)</code></td>
 </tr>
 <tr>
-<td>injected by the service container</td>
-<td>filled by type: <code>DoxRequest</code>, one <code>@Dto</code> class, path params</td>
+<td>constructor injection by the service container</td>
+<td>constructor injection by the container: <code>@Inject()</code> above the class</td>
+</tr>
+<tr>
+<td>method injection</td>
+<td>filled by type: <code>DoxRequest</code>, one <code>@Dto</code> class, path params, models, container classes</td>
+</tr>
+<tr>
+<td>implicit route model binding</td>
+<td>the same: a <code>User user</code> parameter loads <code>{user}</code> by its key</td>
 </tr>
 </tbody>
 </table>
 <p>Dox fills a parameter by its type, not by its name. Path params go by position.
+The container is generated code, not reflection. See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.
 A controller can be a class method, a static method or a plain function.</p>
 <h2 id="middleware">Middleware</h2>
 <table>
@@ -5375,9 +5413,9 @@ A missing key stops the app at start, with a list of every missing key. See <a h
 See <a href="../../digging-deeper/testing/">Testing</a>.</p>
 <h2 id="what-is-different">What is different</h2>
 <ul>
-<li><strong>No service container in the controller.</strong> Laravel makes your controllers and injects what the constructor asks for.
-  In Dox you make the controller yourself (<code>BlogController()</code>) and pass what it needs. Dox fills only the method parameters: the request, one DTO and the path params.
-  <code>Dox().ioc</code> is a small registry (<code>register</code>, <code>registerSingleton</code>, <code>get</code>), but nothing is injected for you.</li>
+<li><strong>A generated container.</strong> Like Laravel, Dox makes your controllers and injects what the constructor asks for.
+  You add <code>@Inject()</code> to the class. <code>build_runner</code> writes <code>lib/container.g.dart</code> with every registration. There are no service providers to write.
+  A singleton is one instance per isolate, not one per request.</li>
 <li><strong>Isolates, not PHP-FPM workers.</strong> One process runs one isolate per CPU core. Each isolate runs your whole app and has its own memory.
   A static value or a singleton lives once per isolate. A PHP worker starts from zero on each request. A Dox isolate keeps its state between requests, so a memory leak stays.
   Anything that must be shared goes to the database, Redis or files. See <a href="../how-dox-works/#isolates">How Dox works</a>.</li>
