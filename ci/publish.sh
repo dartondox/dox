@@ -94,6 +94,11 @@ for entry in $PACKAGES; do
   done
   echo "::group::Publish $name $VERSION"
   refresh_pub_token
-  (cd "packages/$dir" && dart pub publish --force)
+  # the API above can lag too: "already exists" means it is published
+  log=$(mktemp)
+  if ! (cd "packages/$dir" && dart pub publish --force) 2>&1 | tee "$log"; then
+    grep -q "already exists" "$log" || exit 1
+    echo "$name $VERSION was already published."
+  fi
   echo "::endgroup::"
 done
