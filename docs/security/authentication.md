@@ -267,6 +267,7 @@ Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), (PageCon
 | `Auth().logout(req)` | removes the login and all session data |
 
 - Login and logout give the session a new id and a new CSRF token. So an id that someone saw before the login is of no use.
+- With the default `cookie` session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout. If logout must really end old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
 - The session keeps only the user id. `AuthMiddleware` loads the user from the database on each request, so a deleted user is logged out.
 - These methods throw a `StateError` on a guard that does not use `SessionAuthDriver`.
 - `SessionAuthDriver` has one option, `hashRounds` (default `10`), like `JwtAuthDriver`.
