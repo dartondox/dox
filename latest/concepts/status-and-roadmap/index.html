@@ -1847,6 +1847,23 @@
         
   
   
+    <svg
+  class="lucide lucide-layout-template"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="18" height="7" x="3" y="3" rx="1" />
+  <rect width="9" height="7" x="3" y="14" rx="1" />
+  <rect width="5" height="7" x="16" y="14" rx="1" />
+</svg>
+  
   <span class="md-ellipsis">
     
   
@@ -2280,6 +2297,8 @@
       
         
       
+        
+      
     
     
     
@@ -2405,6 +2424,50 @@
     
   
     Queue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/mail/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-mail"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" />
+  <rect x="2" y="4" width="20" height="16" rx="2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Mail
   
 
     
@@ -6189,7 +6252,7 @@
 
 <h1 id="status-and-roadmap">Status and roadmap</h1>
 <p>This page shows what works in Dox today, what is missing and what is planned.</p>
-<p>Checked on 2026-10-25, for version <code>3.0.0-alpha.10</code>.</p>
+<p>Checked on 2026-10-25, for version <code>3.0.0-alpha.14</code>.</p>
 <p>Dox 3.0 is an <strong>alpha</strong>. Every feature planned for 3.0.0 is in. What is left before 3.0 stable is testing and small fixes.
 The API can still change between alpha versions.</p>
 <h2 id="packages">Packages</h2>
@@ -6199,7 +6262,7 @@ The API can still change between alpha versions.</p>
 <li><strong>May change</strong>: works and has tests. Names and options can still change before 3.0 is stable.</li>
 <li><strong>Experimental</strong>: new code. It changed in a breaking way during the alphas, or it has a known gap.</li>
 </ul>
-<p>The packages in the main repo share one version number. The native packages, <code>dox_queue</code> and <code>dox_scheduler</code> live in their own repos and have their own version numbers.</p>
+<p>The packages in the main repo share one version number. The other packages live in their own repos and have their own version numbers. See <a href="../../community/contribute/#packages-in-other-repos">Contribute</a>.</p>
 <table>
 <thead>
 <tr>
@@ -6212,9 +6275,9 @@ The API can still change between alpha versions.</p>
 <tbody>
 <tr>
 <td><code>dox_core</code></td>
-<td>Routes, middleware, controllers, request and response, isolates, config, the IoC container, exception handler, rate limit, security headers, health check, test client</td>
+<td>Routes, middleware, controllers, request and response, isolates, config, the IoC container, exception handler, sessions, CSRF, rate limit, security headers, health check, test client</td>
 <td>May change</td>
-<td>42 test files. CI runs them on the native server.</td>
+<td>44 test files. CI runs them on the native server.</td>
 </tr>
 <tr>
 <td><code>dox_orm</code></td>
@@ -6254,9 +6317,9 @@ The API can still change between alpha versions.</p>
 </tr>
 <tr>
 <td><code>dox_auth</code></td>
-<td>JWT auth guards and middleware</td>
-<td>Ready for stable</td>
-<td>2 test files</td>
+<td>JWT and session auth guards and middleware</td>
+<td>May change</td>
+<td>4 test files</td>
 </tr>
 <tr>
 <td><code>dox_cache</code></td>
@@ -6268,7 +6331,7 @@ The API can still change between alpha versions.</p>
 <td><code>dox_storage</code></td>
 <td>Local disk and S3 (and S3-compatible) storage</td>
 <td>Ready for stable</td>
-<td>7 test files, with MinIO in CI</td>
+<td>10 test files, with MinIO in CI</td>
 </tr>
 <tr>
 <td><code>dox_openapi</code></td>
@@ -6280,7 +6343,7 @@ The API can still change between alpha versions.</p>
 <td><code>dox_socketio</code></td>
 <td>Socket.IO v4 server with a Redis adapter</td>
 <td>May change. Has known gaps, see below.</td>
-<td>8 test files, with the real <code>socket.io-client</code> in CI</td>
+<td>9 test files, with the real <code>socket.io-client</code> in CI</td>
 </tr>
 <tr>
 <td><code>dox_queue</code></td>
@@ -6293,6 +6356,24 @@ The API can still change between alpha versions.</p>
 <td>Run tasks on a schedule</td>
 <td>Experimental</td>
 <td>6 test files</td>
+</tr>
+<tr>
+<td><code>dox_view</code></td>
+<td><a href="../../the-basic/views/">Views</a>: <code>.dox.html</code> templates with layouts and components</td>
+<td>Experimental</td>
+<td>2 test files</td>
+</tr>
+<tr>
+<td><code>dox_inertia</code></td>
+<td>Inertia.js server side: single page apps with React, Vue or Svelte and Dox controllers</td>
+<td>Experimental</td>
+<td>2 test files</td>
+</tr>
+<tr>
+<td><code>dox_mailer</code></td>
+<td>Email with SMTP, Amazon SES, Azure, Resend, Mailgun, Postmark and sendmail</td>
+<td>Experimental</td>
+<td>6 test files, with a fake SMTP server</td>
 </tr>
 <tr>
 <td><code>dox_http_native</code></td>
@@ -6356,11 +6437,6 @@ The CI setup is in <code>.github/workflows/test.yaml</code>. The packages in the
 </thead>
 <tbody>
 <tr>
-<td>Mail</td>
-<td>Not there</td>
-<td>Use a Dart mail package or an HTTP mail API. Send it from a <a href="../../digging-deeper/queue/">queue job</a>.</td>
-</tr>
-<tr>
 <td>Notifications</td>
 <td>Not there</td>
 <td>Send them from your own service class.</td>
@@ -6371,14 +6447,9 @@ The CI setup is in <code>.github/workflows/test.yaml</code>. The packages in the
 <td>Model events are there. See <a href="../../database/model/events/">Model events</a>.</td>
 </tr>
 <tr>
-<td>Views and templates</td>
+<td>Password reset</td>
 <td>Not there</td>
-<td>Dox is for APIs. Serve the front end on its own.</td>
-</tr>
-<tr>
-<td>Sessions and password reset</td>
-<td>Not there</td>
-<td>Auth uses JWT.</td>
+<td>Make a signed, short-lived token, send it with <a href="../../digging-deeper/mail/">Mail</a> and check it in a controller.</td>
 </tr>
 <tr>
 <td>Policies and gates</td>
@@ -6387,8 +6458,8 @@ The CI setup is in <code>.github/workflows/test.yaml</code>. The packages in the
 </tr>
 <tr>
 <td>Localization</td>
-<td>Not there</td>
-<td>Keep your own message maps.</td>
+<td>Partly</td>
+<td>Validation messages can follow the request locale (<code>req.locale</code>). There is no general translation helper. Keep your own message maps.</td>
 </tr>
 </tbody>
 </table>
@@ -6420,9 +6491,8 @@ There are no dates.</p>
 <h3 id="later-31-and-after">Later (3.1 and after)</h3>
 <ul>
 <li>Socket.IO actions across all servers (the known gaps above)</li>
-<li>Mail</li>
 <li>Notifications</li>
-<li>Sessions and password reset</li>
+<li>Password reset</li>
 <li>Gates and policies</li>
 <li>Localization</li>
 </ul>
