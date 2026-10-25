@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.14
 
 - Fix: `dox make:migration` run more than once in the same second gave files with the same timestamp. Then the run order depended only on the name, which could break foreign keys. Now each new migration (`.dart` or `.sql`) sorts after every file already in `db/migration`. When needed, it uses the newest time plus 1 second.
 
