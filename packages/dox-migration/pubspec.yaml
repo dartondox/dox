@@ -1,6 +1,6 @@
 name: dox_migration
 description: Database migration package for Postgres, MySQL, MariaDB and SQLite
-version: 3.0.0-alpha.9
+version: 3.0.0-alpha.10
 repository: https://github.com/dartondox/dox
 
 environment:
@@ -8,7 +8,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  dox_orm: ^3.0.0-alpha.9
+  dox_orm: ^3.0.0-alpha.10
   sqlite3: ^3.7.1
 
 dev_dependencies:

@@ -1,3 +1,7 @@
+## 3.0.0-alpha.10
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.9
 
 - New `Seeder` and `SeederRunner`. A seeder puts data in the database. `call()` runs other seeders. `SeederRunner(seeders: seeders).run(args)` runs `DatabaseSeeder`, or another one with `--class=<name>`, in one transaction. It reads the database from `.env`, the same as the migrations.
