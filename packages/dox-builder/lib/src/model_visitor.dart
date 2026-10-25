@@ -1,5 +1,7 @@
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/nullability_suffix.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 /// model hook methods, see Model.onSaving() in dox_orm
 const List<String> _hookNames = <String>[
@@ -37,6 +39,13 @@ class ModelVisitor {
   /// true when the class declares a model hook like onCreating()
   bool hasHooks = false;
 
+  /// field name => source of the `cast:` argument of its @Column.
+  /// the builder reads it from the source file before visitClass().
+  Map<String, String> castSources = {};
+
+  /// static methods with @Scope: name => (global, method)
+  Map<String, (bool, MethodElement)> scopes = {};
+
   void visitClass(ClassElement element) {
     className = element.displayName;
     hasHooks = element.methods.any(
@@ -46,6 +55,9 @@ class ModelVisitor {
       if (field.isOriginDeclaration && !field.isStatic) {
         _visitField(field);
       }
+    }
+    for (MethodElement method in element.methods) {
+      if (method.isStatic) _visitMethod(method);
     }
     for (GetterElement getter in element.getters) {
       if (getter.isOriginDeclaration && !getter.isStatic) {
@@ -66,6 +78,30 @@ class ModelVisitor {
         ?.getField('name')
         ?.toStringValue();
     computed[name] = key ?? name;
+  }
+
+  void _visitMethod(MethodElement element) {
+    ElementAnnotation? meta = _findAnnotation(element.metadata, <String>[
+      'Scope',
+    ]);
+    if (meta == null) return;
+    bool global =
+        meta.computeConstantValue()?.getField('global')?.toBoolValue() ?? false;
+    scopes[element.displayName] = (global, element);
+  }
+
+  /// the cast of a column: the `cast:` argument, or a default cast for
+  /// a bool or an enum field, or null
+  String? _castOf(FieldElement element) {
+    String? source = castSources[element.displayName];
+    if (source != null) return source;
+    DartType type = element.type;
+    if (type.isDartCoreBool) return 'BoolCast()';
+    Element? typeElement = type.element;
+    if (typeElement is EnumElement) {
+      return 'EnumCast(${typeElement.displayName}.values)';
+    }
+    return null;
   }
 
   void _visitField(FieldElement element) {
@@ -109,6 +145,8 @@ class ModelVisitor {
         'jsonKey': object?.getField('name')?.toStringValue() ?? name,
         'beforeSave': _functionName(object, 'beforeSave'),
         'beforeGet': _functionName(object, 'beforeGet'),
+        'cast': _castOf(element),
+        'nullable': element.type.nullabilitySuffix != NullabilitySuffix.none,
       };
     }
   }

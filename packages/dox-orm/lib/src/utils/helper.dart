@@ -33,6 +33,10 @@ class QueryBuilderHelper<T> {
   /// number of param keys made by this query
   int _paramCount = 0;
 
+  /// put before each param key. a subquery uses it, so its keys do not
+  /// clash with the keys of the main query.
+  String keyPrefix = '';
+
   /// a param key that is unique in this query. the same query gives the
   /// same keys every time, so the sql text is the same and the drivers can
   /// reuse their prepared statements.
@@ -43,7 +47,7 @@ class QueryBuilderHelper<T> {
       if (_keyNames.length >= 1000) _keyNames.clear();
       name = _keyNames[column] = column.replaceAll(_notWord, '');
     }
-    return '@${name}_p${_paramCount++}';
+    return '@$keyPrefix${name}_p${_paramCount++}';
   }
 
   /// quote a table or column name for the current driver
@@ -118,6 +122,7 @@ class QueryBuilderHelper<T> {
         ? queryResult
         : getMapResult(queryResult);
     List<String> preloads = self.customPreloadList;
+    List<String> aggregateKeys = queryBuilder.aggregateKeys;
     List<T> ret = <T>[];
     for (Map<String, dynamic> e in result) {
       Model<dynamic> res = self.fromMap(e);
@@ -127,6 +132,9 @@ class QueryBuilderHelper<T> {
       res.connection = queryBuilder.connection;
       for (String preload in preloads) {
         res.preload(preload);
+      }
+      for (String key in aggregateKeys) {
+        res.setAggregate(key, e[key]);
       }
       ret.add(res as T);
     }

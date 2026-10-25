@@ -2,6 +2,10 @@
 
 - Breaking: the `ModelObserver` methods now have the same names as the model hooks: `onSaving`, `onSaved`, `onCreating`, `onCreated`, `onUpdating`, `onUpdated`, `onDeleting`, `onDeleted`, `onRestoring`, `onRestored`, `onForceDeleting` and `onForceDeleted`. Rename the methods in your observers, for example `created(User user)` to `onCreated(User user)`.
 - New model factories: `import 'package:dox_orm/factory.dart';`. Extend `Factory<User>` and write `definition()`. Then use `count(n)`, `state()`, `sequence()`, `has()`, `make()`, `makeOne()`, `create()` and `createOne()`. See the Factories docs page.
+- New query scopes. `@Scope()` on a static model method adds it as a query method, like `User().isActive().get()`. `@Scope(global: true)` adds it to every query of the model. Remove it with `withoutGlobalScope('name')` or `withoutGlobalScopes()`.
+- New attribute casts with `@Column(cast: ...)`: `JsonCast`, `ListCast<E>`, `BoolCast`, `EnumCast<E>` (by name or by index), or your own `Cast<T>` class. `bool` fields get `BoolCast` and enum fields get `EnumCast` without `cast`.
+- New `withCount('posts')`, `withSum('posts', 'views')` and `withMax('posts', 'views')`. They add the value with a subquery, for `hasOne`, `hasMany` and `manyToMany` relations. Read it with `countOf('posts')` or `aggregate('posts_sum_views')`. `toJson()` has it too.
+- `all()` now uses the where conditions of the query, like `get()`. Before, it used only the soft delete check.
 
 ## 3.0.0-alpha.8
 

@@ -12,8 +12,17 @@ class Column {
   final String? name;
   final Function? beforeSave;
   final Function? beforeGet;
-  const Column({this.name, this.beforeSave, this.beforeGet});
+  final Object? cast;
+  const Column({this.name, this.beforeSave, this.beforeGet, this.cast});
 }
+class Scope {
+  final bool global;
+  const Scope({this.global = false});
+}
+class JsonCast {
+  const JsonCast();
+}
+enum Status { draft, live }
 class Computed {
   final String? name;
   const Computed({this.name});
@@ -212,6 +221,55 @@ class Log {}
       expect(out, contains("'created_at': 'created_at'"));
       expect(out, contains("'updated_at': null"));
       expect(out, isNot(contains('..updatedAt')));
+    });
+
+    test('casts: the cast argument, bool and enum fields', () async {
+      String out = await _generate('''
+@DoxModel()
+class Item {
+  @Column(cast: JsonCast())
+  Map<String, dynamic>? meta;
+
+  @Column()
+  bool done = false;
+
+  @Column()
+  Status? status;
+}
+''');
+      expect(out, contains('static const _metaCast = JsonCast();'));
+      expect(out, contains('static const _doneCast = BoolCast();'));
+      expect(
+        out,
+        contains('static const _statusCast = EnumCast(Status.values);'),
+      );
+      expect(out, contains("..meta = _metaCast.get(m['meta'])"));
+      expect(out, contains("..done = _doneCast.get(m['done']) as bool"));
+      expect(out, contains("'status': _statusCast.set(instance.status)"));
+    });
+
+    test('local and global scopes', () async {
+      String out = await _generate('''
+@DoxModel()
+class Post {
+  @Scope()
+  static dynamic popular(dynamic q, int views, {bool exact = false}) => q;
+
+  @Scope(global: true)
+  static dynamic visible(dynamic q) => q;
+}
+''');
+      String flat = out.replaceAll(RegExp(r'\s+'), ' ');
+      expect(flat, contains('extension PostScopes on QueryBuilder<Post>'));
+      expect(
+        flat,
+        contains(
+          'dynamic popular(int views, {bool exact = false}) => '
+          'Post.popular(this, views, exact: exact);',
+        ),
+      );
+      expect(flat, contains("const {'visible': Post.visible}"));
+      expect(flat, isNot(contains('dynamic visible(')));
     });
   });
 }

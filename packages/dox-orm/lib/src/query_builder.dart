@@ -15,6 +15,7 @@ import 'update.dart';
 import 'utils/helper.dart';
 import 'utils/logger.dart';
 import 'where.dart';
+import 'with_count.dart';
 
 class QueryBuilder<T>
     with
@@ -30,7 +31,8 @@ class QueryBuilder<T>
         Select<T>,
         Truncate<T>,
         Delete<T>,
-        Count<T> {
+        Count<T>,
+        WithCount<T> {
   /// made on the first use, a find() with a cached sql makes it once
   Map<String, dynamic>? _substitutionValues;
 
@@ -69,7 +71,7 @@ class QueryBuilder<T>
       _substitutionValues ??= <String, dynamic>{};
 
   @override
-  String get selectQueryString => getSelectQuery();
+  String get selectQueryString => getSelectQuery() + aggregateSelects();
 
   List<String> getPreload() => <String>[];
 
@@ -142,6 +144,56 @@ class QueryBuilder<T>
   QueryBuilder<T> withTrash([bool withTrashed = true]) {
     this.withTrashed = withTrashed;
     return queryBuilder;
+  }
+
+  /// **** global scopes
+
+  /// the global scopes of the model: name => scope method.
+  /// the generator overrides it for models with `@Scope(global: true)`.
+  /// an empty `Never` map fits every model type.
+  Map<String, QueryBuilder<T> Function(QueryBuilder<T>)> get globalScopes =>
+      const <String, Never>{};
+
+  /// true when the model has global scopes
+  bool get hasGlobalScopes => globalScopes.isNotEmpty;
+
+  bool _globalScopesDone = false;
+  bool _noGlobalScopes = false;
+  Set<String>? _skippedScopes;
+
+  /// leave out the global scope [name] in this query
+  ///
+  /// ```
+  /// await User().withoutGlobalScope('active').get();
+  /// ```
+  QueryBuilder<T> withoutGlobalScope(String name) {
+    (_skippedScopes ??= <String>{}).add(name);
+    return this;
+  }
+
+  /// leave out every global scope in this query
+  QueryBuilder<T> withoutGlobalScopes() {
+    _noGlobalScopes = true;
+    return this;
+  }
+
+  /// adds the global scopes to the where conditions, once, when the sql
+  /// is made. the conditions so far go in brackets, and each scope too,
+  /// so an OR in one part can not skip another part.
+  void applyGlobalScopes() {
+    if (_globalScopesDone) return;
+    _globalScopesDone = true;
+    Map<String, QueryBuilder<T> Function(QueryBuilder<T>)> scopes =
+        globalScopes;
+    if (_noGlobalScopes || scopes.isEmpty) return;
+    groupWheres(0);
+    for (MapEntry<String, QueryBuilder<T> Function(QueryBuilder<T>)> e
+        in scopes.entries) {
+      if (_skippedScopes?.contains(e.key) == true) continue;
+      int from = whereCount;
+      e.value(this);
+      groupWheres(from);
+    }
   }
 
   /// **** map

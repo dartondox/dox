@@ -45,8 +45,14 @@ M? manyToMany<T, M>(
         pivotTable,
         '$pivotTable.$pivotRelatedForeignKey',
         '$relatedTable.$relatedKey',
-      )
-      .whereIn('$pivotTable.$pivotForeignKey', ids);
+      );
+  if (relationSubquery) {
+    q.whereRaw(
+      subqueryMatch(related, '$pivotTable.$pivotForeignKey', local, localKey),
+    );
+  } else {
+    q.whereIn('$pivotTable.$pivotForeignKey', ids);
+  }
 
   if (onQuery != null) {
     q = onQuery(q);

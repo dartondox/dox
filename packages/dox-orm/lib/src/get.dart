@@ -78,7 +78,9 @@ mixin Get<T> implements SharedMixin<T> {
         qb.getGroupByQuery().isEmpty &&
         qb.getOrderByQuery().isEmpty &&
         qb.getLimitQuery().isEmpty &&
-        qb.getSelectQuery() == '*';
+        qb.getSelectQuery() == '*' &&
+        !qb.hasAggregates &&
+        !qb.hasGlobalScopes;
   }
 
   /// Get records
@@ -169,10 +171,10 @@ mixin Get<T> implements SharedMixin<T> {
   /// List<Blog> blogs = await Blog().all();
   /// ```
   Future<List<T>> all() async {
-    String query = "SELECT $selectQueryString FROM ${helper.wrap(tableName)}";
-    if (isSoftDeletes && !withTrashed) {
-      query += " WHERE ${helper.wrap('$tableName.deleted_at')} IS NULL";
-    }
+    /// the where part adds soft deletes and global scopes
+    String query =
+        "SELECT $selectQueryString FROM ${helper.wrap(tableName)}"
+        "${queryBuilder.getWhereQuery()}";
     return _typed(await helper.formatResult(await helper.runQuery(query)));
   }
 }
