@@ -107,7 +107,7 @@ class BlogController {
 }
 
 // routes
-Route.get<BlogController>('/blogs/{id}', <dynamic>[AuthMiddleware(), (BlogController c) => c.show]);
+Route.get('/blogs/{id}', <dynamic>[AuthMiddleware(), (BlogController c) => c.show]);
 ```
 
 The generated docs for `GET /blogs/{id}`:

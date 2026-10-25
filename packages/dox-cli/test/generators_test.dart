@@ -38,7 +38,7 @@ void main() {
       expect(
         c,
         contains(
-          "Route.get<BlogPostController>('path', (BlogPostController c) => "
+          "Route.get('path', (BlogPostController c) => "
           'c.index);',
         ),
       );

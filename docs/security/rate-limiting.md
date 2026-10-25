@@ -10,7 +10,7 @@ Use it on login, sign up and other routes that bots like to hammer.
 ## Limit a route
 
 ```dart title="lib/routes/api.dart"
-Route.post<AuthController>('/auth/login', <dynamic>[
+Route.post('/auth/login', <dynamic>[
   RateLimit(max: 5, per: Duration(minutes: 1)),
   (AuthController c) => c.login,
 ]);
@@ -69,11 +69,11 @@ The key is any `String`, so you can also count by user id after your auth middle
 Two `RateLimit` with the same `max` and `per` share one counter. Give one a `name` to keep them apart:
 
 ```dart
-Route.post<AuthController>('/auth/login', <dynamic>[
+Route.post('/auth/login', <dynamic>[
   RateLimit(max: 5, name: 'login'),
   (AuthController c) => c.login,
 ]);
-Route.post<AuthController>('/auth/register', <dynamic>[
+Route.post('/auth/register', <dynamic>[
   RateLimit(max: 5, name: 'register'),
   (AuthController c) => c.register,
 ]);

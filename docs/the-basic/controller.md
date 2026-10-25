@@ -28,7 +28,7 @@ class BlogController {
 ```
 
 ```dart title="lib/routes/api.dart"
-Route.get<BlogController>('/blogs', (BlogController c) => c.index);
+Route.get('/blogs', (BlogController c) => c.index);
 ```
 
 `@Inject()` puts the controller in the container. Run `dart run build_runner build` after you add one.
@@ -106,7 +106,7 @@ See [Routing: resource routes](routing.md#resource-routes).
 A controller asks for what it needs by **type**. Dox fills each parameter.
 
 ```dart
-Route.put<UserController>('/teams/{teamId}/users/{id}', (UserController c) => c.update);
+Route.put('/teams/{teamId}/users/{id}', (UserController c) => c.update);
 
 class UserController {
   Future<User> update(int teamId, int id, UpdateUser body) async { ... }

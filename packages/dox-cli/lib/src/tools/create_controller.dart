@@ -6,7 +6,7 @@ String _getSample(String className, String filename) {
   return '''
 import 'package:dox_core/dox_core.dart';
 
-/// Route: Route.get<${className}Controller>('path', (${className}Controller c) => c.index);
+/// Route: Route.get('path', (${className}Controller c) => c.index);
 @Inject()
 class ${className}Controller {
   Future<dynamic> index(DoxRequest req) async {

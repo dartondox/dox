@@ -84,9 +84,9 @@ When the token is missing or not valid, the request stops with `401 Authenticati
 
 ```dart title="lib/routes/api.dart"
 
-Route.post<AuthController>('/auth/register', (AuthController c) => c.register);
-Route.post<AuthController>('/auth/login', (AuthController c) => c.login);
-Route.get<AuthController>('/auth/user', <dynamic>[AuthMiddleware(), (AuthController c) => c.user]);
+Route.post('/auth/register', (AuthController c) => c.register);
+Route.post('/auth/login', (AuthController c) => c.login);
+Route.get('/auth/user', <dynamic>[AuthMiddleware(), (AuthController c) => c.user]);
 ```
 
 ## 4. Write the controller
@@ -211,7 +211,7 @@ Pick the guard by name:
 ```dart
 String? token = await Auth(guard: 'admin').attempt(credentials);
 
-Route.get<AdminController>('/admin', <dynamic>[AuthMiddleware(guard: 'admin'), (AdminController c) => c.index]);
+Route.get('/admin', <dynamic>[AuthMiddleware(guard: 'admin'), (AdminController c) => c.index]);
 ```
 
 The token keeps the guard name in its `aud` claim.

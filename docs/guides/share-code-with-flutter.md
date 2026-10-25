@@ -149,7 +149,7 @@ class BlogController {
 ```
 
 ```dart title="server/lib/routes/api.dart"
-Route.post<BlogController>('/blogs', (BlogController c) => c.store);
+Route.post('/blogs', (BlogController c) => c.store);
 ```
 
 !!! note "Why `show SaveBlog`"

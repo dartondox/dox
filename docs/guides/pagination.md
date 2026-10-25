@@ -67,7 +67,7 @@ Add a `where` before `paginate` to filter: `User().where('role', 'admin').orderB
 ## 3. Add the route
 
 ```dart title="lib/routes/api.dart"
-Route.get<UserController>('/users', (UserController c) => c.index);
+Route.get('/users', (UserController c) => c.index);
 ```
 
 ## 4. Build and run

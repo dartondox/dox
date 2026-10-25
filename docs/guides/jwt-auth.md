@@ -196,12 +196,12 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    Route.post<AuthController>('/auth/register', (AuthController c) => c.register);
-    Route.post<AuthController>('/auth/login', (AuthController c) => c.login);
+    Route.post('/auth/register', (AuthController c) => c.register);
+    Route.post('/auth/login', (AuthController c) => c.login);
 
     Route.middleware(<dynamic>[AuthMiddleware()], () {
-      Route.get<AuthController>('/auth/me', (AuthController c) => c.me);
-      Route.post<AuthController>('/auth/logout', (AuthController c) => c.logout);
+      Route.get('/auth/me', (AuthController c) => c.me);
+      Route.post('/auth/logout', (AuthController c) => c.logout);
       // put every protected route here
     });
   }
