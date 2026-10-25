@@ -9,7 +9,25 @@ mixin Where<T> implements SharedMixin<T> {
   /// true when a where condition was added
   bool get hasWhere => _wheres != null;
 
+  /// number of where conditions so far
+  int get whereCount => _wheres?.length ?? 0;
+
+  /// puts the conditions from index [from] to the end in one bracket,
+  /// joined to the ones before with AND
+  void groupWheres(int from) {
+    List<String>? wheres = _wheres;
+    if (wheres == null || wheres.length <= from) return;
+    List<String> added = wheres.sublist(from);
+    if (from > 0) added[0] = added[0].replaceFirst(_leadingType, '');
+    wheres.removeRange(from, wheres.length);
+    String group = '(${added.join(' ')})';
+    wheres.add(from == 0 ? group : 'AND $group');
+  }
+
+  static final RegExp _leadingType = RegExp(r'^(AND|OR) ');
+
   String getWhereQuery() {
+    queryBuilder.applyGlobalScopes();
     List<String>? wheres = _wheres;
 
     /// wrap user conditions in brackets so an OR can not skip the

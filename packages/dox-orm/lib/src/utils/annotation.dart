@@ -1,9 +1,34 @@
+import '../casts.dart';
+
 class Column {
   final String? name;
   final Function? beforeSave;
   final Function? beforeGet;
 
-  const Column({this.name, this.beforeSave, this.beforeGet});
+  /// changes the value between the database and Dart, see [Cast]
+  final Cast<dynamic>? cast;
+
+  const Column({this.name, this.beforeSave, this.beforeGet, this.cast});
+}
+
+/// Marks a static method of a model as a query scope.
+/// The method takes the query first, and can take more arguments.
+/// The generator adds it as a method on the query of the model.
+///
+/// ```
+/// @Scope()
+/// static QueryBuilder<User> active(QueryBuilder<User> q) =>
+///     q.where('active', true);
+///
+/// await User().active().get();
+/// ```
+///
+/// `global: true` adds it to every query of the model. Remove it with
+/// `withoutGlobalScope('name')` or `withoutGlobalScopes()`.
+class Scope {
+  final bool global;
+
+  const Scope({this.global = false});
 }
 
 /// Adds a getter to toJson() and toMap(). It is never a table column.

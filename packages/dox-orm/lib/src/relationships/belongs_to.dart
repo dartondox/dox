@@ -15,6 +15,11 @@ M? belongsTo<T, M>(
   dynamic onQuery,
 }) {
   if (list.isEmpty) return null;
+  if (relationSubquery) {
+    throw UnsupportedError(
+      'withCount() works with hasOne, hasMany and manyToMany relations.',
+    );
+  }
 
   Model<T> foreign = list.first;
   Model<M> owner = model().debug(foreign.shouldDebug);

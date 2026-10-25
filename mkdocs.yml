@@ -153,6 +153,9 @@ nav:
     - Model:
       - database/model/index.md
       - database/model/events.md
+      - database/model/scopes.md
+      - database/model/casts.md
+      - database/model/counting-relations.md
       - Relationship:
         - database/model/relationship/has-one.md
         - database/model/relationship/has-many.md

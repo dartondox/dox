@@ -16,3 +16,19 @@ List<dynamic> relationKeys(List<Model<dynamic>> list, String key) {
 }
 
 bool _notNull(dynamic value) => value != null;
+
+/// true while withCount() makes a relation query. the relation query
+/// then matches the parent row with a column compare (not with the ids
+/// of loaded models), so it can run as a subquery.
+bool relationSubquery = false;
+
+/// the condition `child.foreignKey = parent.localKey` of a subquery
+String subqueryMatch(
+  Model<dynamic> child,
+  String childColumn,
+  Model<dynamic> parent,
+  String parentColumn,
+) {
+  return '${child.helper.wrap(childColumn)} = '
+      '${child.helper.wrap('${parent.tableName}.$parentColumn')}';
+}

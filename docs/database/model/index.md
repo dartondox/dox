@@ -183,11 +183,12 @@ The field type tells Dox how to read the value.
 | `String?` | text, varchar |
 | `int?` | integer types |
 | `double?` | float, double. MySQL also gives `DECIMAL` as `double`. Postgres gives `numeric` as `String`. |
-| `bool?` | boolean |
+| `bool?` | boolean, or a number like `tinyint` (0 is false) |
 | `DateTime?` | date, datetime, timestamp |
 | `Map<String, dynamic>?` or `List<dynamic>?` | JSON |
+| an enum, like `Status?` | text with the enum name |
 
-For other conversions, use `beforeSave` and `beforeGet`.
+For other conversions, use a [cast](casts.md), or `beforeSave` and `beforeGet`.
 
 ### `beforeSave` and `beforeGet`
 

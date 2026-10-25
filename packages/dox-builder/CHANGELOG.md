@@ -1,3 +1,9 @@
+## Unreleased
+
+- Generates the query scopes: an extension with one method for each `@Scope()` method, and `globalScopes` for `@Scope(global: true)`.
+- Generates the column casts: `fromMap()` and `columnsToMap()` use the `cast` of `@Column()`. `bool` and enum fields get a cast without `cast`.
+- Run `dart run build_runner build` to get the new code.
+
 ## 3.0.0-alpha.8
 
 - Version bump only, to match the other packages.

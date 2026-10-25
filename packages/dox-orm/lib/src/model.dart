@@ -432,6 +432,8 @@ class Model<T> extends QueryBuilder<T> {
     }
     Map<String, dynamic> data = convertToMap(this);
     setComputedValues(data);
+    Map<String, dynamic>? aggregates = _aggregates;
+    if (aggregates != null) data.addAll(aggregates);
     if (removeHiddenField) {
       for (String h in hidden) {
         data.remove(h);
@@ -469,6 +471,32 @@ class Model<T> extends QueryBuilder<T> {
     }
     return row;
   }
+
+  /// values of withCount(), withSum() and withMax(), by result key
+  Map<String, dynamic>? _aggregates;
+
+  /// sets a value of withCount(), withSum() or withMax(). a number in a
+  /// text (like a MySQL decimal) becomes a number.
+  void setAggregate(String key, dynamic value) {
+    (_aggregates ??= <String, dynamic>{})[key] = value is String
+        ? num.tryParse(value) ?? value
+        : value;
+  }
+
+  /// the number of related rows from withCount([relation])
+  ///
+  /// ```
+  /// User? user = await User().withCount('posts').find(1);
+  /// int posts = user!.countOf('posts');
+  /// ```
+  int countOf(String relation) {
+    dynamic value = _aggregates?['${helper.toSnakeCase(relation)}_count'];
+    return value is num ? value.toInt() : 0;
+  }
+
+  /// a value of withCount(), withSum() or withMax() by its result key,
+  /// like `posts_count` or `posts_sum_views`
+  dynamic aggregate(String key) => _aggregates?[key];
 
   /// adds the @Computed getters to [map].
   /// the generator overrides it only for models that have them.

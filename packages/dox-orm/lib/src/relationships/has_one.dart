@@ -24,7 +24,11 @@ M? hasOne<T, M>(
   Model<M> m = model().debug(owner.shouldDebug);
   m.connection ??= owner.connection;
 
-  m.select('*, $foreignKey as _owner_id').whereIn(foreignKey, ids);
+  if (relationSubquery) {
+    m.whereRaw(subqueryMatch(m, '${m.tableName}.$foreignKey', owner, localKey));
+  } else {
+    m.select('*, $foreignKey as _owner_id').whereIn(foreignKey, ids);
+  }
 
   if (onQuery != null) {
     m = onQuery(m);

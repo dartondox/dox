@@ -1,3 +1,5 @@
+import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:dox_annotation/dox_annotation.dart';
@@ -7,11 +9,11 @@ import 'package:source_gen/source_gen.dart';
 
 class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
   @override
-  String generateForAnnotatedElement(
+  Future<String> generateForAnnotatedElement(
     Element element,
     ConstantReader annotation,
     BuildStep buildStep,
-  ) {
+  ) async {
     String? tableName = annotation.objectValue
         .getField('table')
         ?.toStringValue();
@@ -55,6 +57,10 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         element: element,
       );
     }
+    visitor.castSources = _castSources(
+      await buildStep.readAsString(buildStep.inputId),
+      element.displayName,
+    );
     visitor.visitClass(element);
 
     if (createdAt != null) {
@@ -131,6 +137,8 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       };
 
       ${r['content']}
+      ${_getCodeForCasts(visitor)}
+      ${_getCodeForGlobalScopes(visitor)}
 
       @override
       $className fromMap(Map<String, dynamic> m) => $className()
@@ -154,7 +162,108 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       }
       $computedCode
     }
+    ${_getCodeForScopeExtension(visitor)}
     """;
+  }
+
+  /// field name => source of the `cast:` argument of its @Column, read
+  /// from the source, so the generated code can make the same cast
+  Map<String, String> _castSources(String source, String className) {
+    Map<String, String> casts = {};
+    CompilationUnit unit = parseString(
+      content: source,
+      throwIfDiagnostics: false,
+    ).unit;
+    for (CompilationUnitMember c in unit.declarations) {
+      if (c is! ClassDeclaration || c.namePart.typeName.lexeme != className) {
+        continue;
+      }
+      for (ClassMember member in c.body.members) {
+        if (member is! FieldDeclaration) continue;
+        for (Annotation a in member.metadata) {
+          if (a.name.name != 'Column') continue;
+          for (Argument arg in a.arguments?.arguments ?? <Argument>[]) {
+            if (arg is NamedArgument && arg.name.lexeme == 'cast') {
+              for (VariableDeclaration v in member.fields.variables) {
+                casts[v.name.lexeme] = arg.argumentExpression.toSource();
+              }
+            }
+          }
+        }
+      }
+    }
+    return casts;
+  }
+
+  /// one static const cast object for each column with a cast
+  String _getCodeForCasts(ModelVisitor visitor) {
+    String content = '';
+    visitor.columns.forEach((field, values) {
+      if (values['cast'] != null && values['beforeGet'] == null) {
+        content += "static const _${field}Cast = ${values['cast']};\n";
+      }
+    });
+    return content;
+  }
+
+  String _getCodeForGlobalScopes(ModelVisitor visitor) {
+    String className = visitor.className;
+    String content = '';
+    visitor.scopes.forEach((name, scope) {
+      if (scope.$1) content += "'$name': $className.$name,";
+    });
+    if (content.isEmpty) return '';
+    return '''
+      @override
+      Map<String, QueryBuilder<$className> Function(QueryBuilder<$className>)>
+          get globalScopes => const {$content};
+    ''';
+  }
+
+  /// the local scopes as methods on the query of the model
+  String _getCodeForScopeExtension(ModelVisitor visitor) {
+    String className = visitor.className;
+    String content = '';
+    visitor.scopes.forEach((name, scope) {
+      if (scope.$1) return;
+      MethodElement method = scope.$2;
+      List<String> required = [];
+      List<String> optional = [];
+      List<String> named = [];
+      List<String> args = ['this'];
+      for (FormalParameterElement p in method.formalParameters.skip(1)) {
+        String type = p.type.getDisplayString();
+        String pName = p.displayName;
+        String value = p.defaultValueCode != null
+            ? ' = ${p.defaultValueCode}'
+            : '';
+        if (p.isNamed) {
+          String req = p.isRequiredNamed ? 'required ' : '';
+          named.add('$req$type $pName$value');
+          args.add('$pName: $pName');
+        } else if (p.isOptionalPositional) {
+          optional.add('$type $pName$value');
+          args.add(pName);
+        } else {
+          required.add('$type $pName');
+          args.add(pName);
+        }
+      }
+      List<String> params = [
+        ...required,
+        if (optional.isNotEmpty) '[${optional.join(', ')}]',
+        if (named.isNotEmpty) '{${named.join(', ')}}',
+      ];
+      content +=
+          '${method.returnType.getDisplayString()} $name(${params.join(', ')})'
+          ' => $className.$name(${args.join(', ')});\n';
+    });
+    if (content.isEmpty) return '';
+    return '''
+    extension ${className}Scopes on QueryBuilder<$className> {
+      $content
+    }
+    ''';
   }
 
   /// only models with @Computed getters get setComputedValues(), and only
@@ -264,20 +373,19 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       String? beforeGet = values['beforeGet'];
       String setValue = '';
 
-      if (values['type'] == 'DateTime?') {
+      if (beforeGet != null) {
+        setValue = "$className.$beforeGet(m)";
+      } else if (values['cast'] != null) {
+        String as = values['nullable'] == false ? " as ${values['type']}" : '';
+        setValue = "_${filedName}Cast.get(m['$jsonKey'])$as";
+      } else if (values['type'] == 'DateTime?') {
         setValue =
             """m['$jsonKey'] is DateTime?
               ? m['$jsonKey'] as DateTime?
               : DateTime.parse(m['$jsonKey'] as String)
           """;
-        if (beforeGet != null) {
-          setValue = "$className.$beforeGet(m)";
-        }
       } else {
         setValue = "m['$jsonKey'] as ${values['type']}";
-        if (beforeGet != null) {
-          setValue = "$className.$beforeGet(m)";
-        }
       }
       content += "..$filedName = $setValue\n";
     });
@@ -295,7 +403,9 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       String jsonKey = toSnakeCase(values['jsonKey']);
       String setValue = '';
 
-      if (values['type'] == 'DateTime?') {
+      if (values['cast'] != null && values['beforeGet'] == null) {
+        setValue = "_${filedName}Cast.set(instance.$filedName)";
+      } else if (values['type'] == 'DateTime?') {
         setValue = "instance.$filedName?.toIso8601String()";
       } else {
         setValue = "instance.$filedName";
