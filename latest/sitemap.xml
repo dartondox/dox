@@ -5,6 +5,14 @@
          <lastmod>2026-10-25</lastmod>
     </url>
     <url>
+         <loc>https://dartondox.dev/latest/3.x/community/contribute/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
+         <loc>https://dartondox.dev/latest/3.x/community/mascot/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
          <loc>https://dartondox.dev/latest/3.x/concepts/coming-from-laravel/</loc>
          <lastmod>2026-10-25</lastmod>
     </url>
@@ -65,10 +73,6 @@
          <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://dartondox.dev/latest/3.x/database/model/serializer/</loc>
-         <lastmod>2026-10-25</lastmod>
-    </url>
-    <url>
          <loc>https://dartondox.dev/latest/3.x/database/model/relationship/belongs-to/</loc>
          <lastmod>2026-10-25</lastmod>
     </url>
@@ -122,6 +126,10 @@
     </url>
     <url>
          <loc>https://dartondox.dev/latest/3.x/digging-deeper/testing/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
+         <loc>https://dartondox.dev/latest/3.x/getting-started/installation/</loc>
          <lastmod>2026-10-25</lastmod>
     </url>
     <url>
@@ -186,14 +194,6 @@
     </url>
     <url>
          <loc>https://dartondox.dev/latest/3.x/guides/testing-with-database/</loc>
-         <lastmod>2026-10-25</lastmod>
-    </url>
-    <url>
-         <loc>https://dartondox.dev/latest/3.x/others/contribute/</loc>
-         <lastmod>2026-10-25</lastmod>
-    </url>
-    <url>
-         <loc>https://dartondox.dev/latest/3.x/others/mascot/</loc>
          <lastmod>2026-10-25</lastmod>
     </url>
     <url>
@@ -281,10 +281,6 @@
          <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://dartondox.dev/latest/3.x/the-basic/installation/</loc>
-         <lastmod>2026-10-25</lastmod>
-    </url>
-    <url>
          <loc>https://dartondox.dev/latest/3.x/the-basic/middleware/</loc>
          <lastmod>2026-10-25</lastmod>
     </url>
@@ -298,6 +294,10 @@
     </url>
     <url>
          <loc>https://dartondox.dev/latest/3.x/the-basic/routing/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
+         <loc>https://dartondox.dev/latest/3.x/the-basic/serializer/</loc>
          <lastmod>2026-10-25</lastmod>
     </url>
     <url>

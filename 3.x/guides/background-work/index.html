@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
   
@@ -518,6 +518,8 @@
       
         
       
+        
+      
     
     
     
@@ -581,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/installation/" class="md-nav__link">
+      <a href="../../getting-started/installation/" class="md-nav__link">
         
   
   
@@ -1073,6 +1075,130 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1088,6 +1214,8 @@
   
     
     
+      
+        
       
         
       
@@ -1223,6 +1351,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/serializer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
   
 
     
@@ -2074,8 +2230,6 @@
       
         
       
-        
-      
     
     
     
@@ -2339,34 +2493,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../database/model/serializer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3560,10 +3686,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -3900,62 +4022,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/contribute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contribute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/mascot/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meet Doxie
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -4150,7 +4216,7 @@
 <p>None of them survive a restart. See <a href="#when-you-need-a-real-queue">When you need a real queue</a>.</p>
 <h2 id="1-work-after-the-response">1. Work after the response</h2>
 <p>Start the future and return. <code>unawaited</code> tells the linter you did this on purpose.
-An error in the future goes to the <code>report</code> method of the <code>ExceptionHandler</code> in <code>AppConfig</code>. The isolate keeps running.</p>
+An error in the future goes to the <code>report</code> method of the <code>ExceptionHandler</code> in <code>AppConfig</code>.</p>
 <div class="language-dart highlight"><span class="filename">lib/app/http/controllers/report.controller.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:async'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:isolate'</span><span class="p">;</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
@@ -4200,20 +4266,17 @@ An error in the future goes to the <code>report</code> method of the <code>Excep
 </span></code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Do not block the event loop</p>
-<p><code>_build</code> runs on the same thread as the HTTP requests of this isolate.
-<code>await</code> on the database or on HTTP is fine. A long loop is not. Every request on this isolate waits for it.
+<p><code>_build</code> shares the thread with the requests of this isolate. A long loop makes them all wait.
 Put a long loop in <code>Isolate.run</code>.</p>
 </div>
 <h2 id="2-cpu-work-on-another-thread">2. CPU work on another thread</h2>
-<p><code>Isolate.run</code> starts a new isolate, runs the function, and sends the result back.
-The function only gets what you pass in. It has no <code>Dox()</code>, no models and no <code>Storage()</code>.
-So pass plain data in (an <code>int</code>, a <code>String</code>, bytes), get plain data out, and save the result in the request isolate.</p>
-<p>Both patterns are in the controller above: <code>primes</code> waits for the result. To not wait, combine them:</p>
+<p><code>Isolate.run</code> runs the function on a new isolate and sends the result back.
+Pass plain data in (an <code>int</code>, a <code>String</code>, bytes) and get plain data out. Save the result in the request isolate.</p>
+<p><code>primes</code> above waits for the result. To not wait, combine both patterns:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">unawaited</span><span class="p">(</span><span class="n">Isolate</span><span class="p">.</span><span class="n">run</span><span class="p">(()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">countPrimes</span><span class="p">(</span><span class="n">limit</span><span class="p">)).</span><span class="n">then</span><span class="p">(</span><span class="n">saveResult</span><span class="p">));</span>
 </span></code></pre></div>
 <h2 id="3-work-on-a-timer">3. Work on a timer</h2>
-<p><code>setup()</code> of a service runs in <strong>every</strong> isolate. Dox starts one per CPU core.
-So start the timer on isolate 1 only. Otherwise 8 isolates run the same cleanup.</p>
+<p><code>setup()</code> of a service runs in <strong>every</strong> isolate, and Dox starts one per CPU core. So start the timer on isolate 1 only.</p>
 <div class="language-dart highlight"><span class="filename">lib/services/cleanup_service.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:async'</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
@@ -4266,7 +4329,7 @@ So start the timer on isolate 1 only. Otherwise 8 isolates run the same cleanup.
 <p>The work above is lost when the process stops, and it does not retry.
 When that is not OK (payments, emails that must arrive), save the job as a row in a table first.
 Then a <code>Timer.periodic</code> service, or a second small Dart program, reads the table, does the work, and marks the row as done.
-A failed row stays in the table, so you can retry it. This is a queue with one extra table and no new service.</p>
+A failed row stays in the table, so you can retry it.</p>
 <h2 id="see-also">See also</h2>
 <ul>
 <li><a href="../../digging-deeper/isolate/">Isolate</a> for what each isolate shares, and what it does not</li>

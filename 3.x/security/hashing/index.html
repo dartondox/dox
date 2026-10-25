@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
   
@@ -518,6 +518,8 @@
       
         
       
+        
+      
     
     
     
@@ -581,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/installation/" class="md-nav__link">
+      <a href="../../getting-started/installation/" class="md-nav__link">
         
   
   
@@ -1073,6 +1075,130 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1088,6 +1214,8 @@
   
     
     
+      
+        
       
         
       
@@ -1223,6 +1351,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/serializer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
   
 
     
@@ -2074,8 +2230,6 @@
       
         
       
-        
-      
     
     
     
@@ -2339,34 +2493,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../database/model/serializer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3524,10 +3650,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -3864,62 +3986,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/contribute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contribute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/mascot/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meet Doxie
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -4047,9 +4113,7 @@
 <h1 id="hashing">Hashing</h1>
 <p>This page shows how to hash passwords with <code>Hash</code> and check them later.</p>
 <p>A hash is one-way. You can not turn it back into the password.
-To check a login, hash the new input and compare. <code>Hash.verify</code> does this for you.
-<code>Hash</code> uses bcrypt with a new random salt each time.</p>
-<p><code>Hash</code> is in <code>package:dox_core/dox_core.dart</code>.</p>
+<code>Hash</code> uses bcrypt with a new random salt each time. It is in <code>package:dox_core/dox_core.dart</code>.</p>
 <h2 id="hash-a-password">Hash a password</h2>
 <p>Hash the password before you save it.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">user</span><span class="p">.</span><span class="n">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">make</span><span class="p">(</span><span class="n">body</span><span class="p">.</span><span class="n">password</span><span class="p">);</span>
@@ -4063,8 +4127,8 @@ The same password gives a different hash each time.</p>
 <p><code>Hash.verify(password, hashedPassword)</code> returns <code>true</code> when the password matches.
 It returns <code>false</code> when the password does not match, or when <code>hashedPassword</code> is not a valid bcrypt hash (for example an empty string).</p>
 <h2 id="without-blocking-the-server">Without blocking the server</h2>
-<p>bcrypt takes many milliseconds of CPU. <code>Hash.make</code> and <code>Hash.verify</code> run on the request isolate, so that isolate can not answer other requests in the meantime.
-Use the async versions in a request handler. They run bcrypt in another isolate.</p>
+<p><code>Hash.make</code> and <code>Hash.verify</code> block the request isolate while bcrypt runs.
+In a request handler, use the async versions. They run bcrypt in another isolate.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">user</span><span class="p">.</span><span class="n">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">makeAsync</span><span class="p">(</span><span class="n">body</span><span class="p">.</span><span class="n">password</span><span class="p">);</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">verifyAsync</span><span class="p">(</span><span class="s1">'secret'</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">password</span><span class="o">!</span><span class="p">);</span>
 </span></code></pre></div>
@@ -4081,9 +4145,9 @@ If you change it, also set <code>hashRounds</code> on <code>JwtAuthDriver</code>
 See <a href="../authentication/">Authentication</a>.</p>
 <h2 id="things-to-know">Things to know</h2>
 <ul>
-<li>Never store a plain password. Never encrypt a password. Hash it.</li>
+<li>Never store or encrypt a plain password. Hash it.</li>
 <li>Never send the hash to the client. Put the column in the model <code>hidden</code> list.</li>
-<li>bcrypt is slow on purpose. This makes guessing many passwords slow too. Do not hash in a loop on hot paths.</li>
+<li>bcrypt is slow on purpose, so guessing is slow too. Do not hash in a loop on hot paths.</li>
 </ul>
 
 

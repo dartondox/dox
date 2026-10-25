@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
   
@@ -518,6 +518,8 @@
       
         
       
+        
+      
     
     
     
@@ -581,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/installation/" class="md-nav__link">
+      <a href="../../getting-started/installation/" class="md-nav__link">
         
   
   
@@ -1073,6 +1075,130 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1088,6 +1214,8 @@
   
     
     
+      
+        
       
         
       
@@ -1223,6 +1351,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/serializer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
   
 
     
@@ -2074,8 +2230,6 @@
       
         
       
-        
-      
     
     
     
@@ -2339,34 +2493,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../database/model/serializer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3636,10 +3762,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -3976,62 +4098,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/contribute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contribute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/mascot/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meet Doxie
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -4350,27 +4416,17 @@ Run it again after you change routes, controllers, request classes or models.
 </tbody>
 </table>
 <h3 id="3-open-docs">3. Open <code>/docs</code></h3>
-<p>Start the app and open <code>http://localhost:3000/docs</code>.</p>
-<ul>
-<li><code>enabled</code> is <code>null</code> by default. The docs are on only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>.
-  So production is off unless you set <code>enabled: true</code>.</li>
-<li>When the docs are off, there is no extra work per request.</li>
-<li>The document is built and encoded on the first <code>/docs</code> request, then kept. It is built again only when routes are added.</li>
-</ul>
+<p>Start the app and open <code>http://localhost:3000/docs</code>.
+In production the docs are off, unless you set <code>enabled: true</code>.
+The document is built on the first <code>/docs</code> request, then kept.</p>
 <h3 id="the-docs-page">The docs page</h3>
-<p><code>/docs</code> uses <a href="https://github.com/scalar/scalar">Scalar</a> by default.
-The page loads Scalar from the jsDelivr CDN, at a fixed version, and reads <code>/openapi.json</code>.</p>
-<p>Change the look with <code>scalar:</code>:</p>
+<p>The page loads Scalar from the jsDelivr CDN, at a fixed version, and reads <code>/openapi.json</code>.
+Change the look with <code>scalar:</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">OpenApiConfig</span><span class="p">(</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nl">registry:</span><span class="w"> </span><span class="n">openApiRegistry</span><span class="p">,</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nl">pageTitle:</span><span class="w"> </span><span class="s1">'Blog API docs'</span><span class="p">,</span><span class="w">          </span><span class="c1">// default: info.title</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nl">scalar:</span><span class="w"> </span><span class="n">ScalarOptions</span><span class="p">(</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="nl">theme:</span><span class="w"> </span><span class="n">ScalarTheme</span><span class="p">.</span><span class="n">purple</span><span class="p">,</span><span class="w">         </span><span class="c1">// default: ScalarTheme.default_</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="nl">darkMode:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">                    </span><span class="c1">// start in dark mode (default: false)</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span><span class="nl">showDownloadButton:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">         </span><span class="c1">// hide "Download OpenAPI" (default: true)</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="nl">proxyUrl:</span><span class="w"> </span><span class="s1">'https://proxy.scalar.com'</span><span class="p">,</span><span class="w"> </span><span class="c1">// default: null, no proxy</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="p">),</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="p">);</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nl">pageTitle:</span><span class="w"> </span><span class="s1">'Blog API docs'</span><span class="p">,</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nl">scalar:</span><span class="w"> </span><span class="n">ScalarOptions</span><span class="p">(</span><span class="nl">theme:</span><span class="w"> </span><span class="n">ScalarTheme</span><span class="p">.</span><span class="n">purple</span><span class="p">,</span><span class="w"> </span><span class="nl">darkMode:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">);</span>
 </span></code></pre></div>
 <table>
 <thead>
@@ -4653,10 +4709,8 @@ They are all in <code>dox_core</code>.</p>
 </tbody>
 </table>
 <p>The <code>Type</code> of <code>@Response</code> can be a model, <code>List&lt;User&gt;</code>, a <code>@Dto</code>, a <code>Serializer</code> or a basic type like <code>String</code>.</p>
-<p>Lower case names work too: <code>@summary('Log in')</code>, <code>@description(...)</code>, <code>@tags(...)</code>,
-<code>@request(...)</code>, <code>@body(...)</code>, <code>@query(...)</code>, <code>@apiDeprecated()</code>, <code>@apiIgnore()</code>, <code>@doxController()</code>.
-The capital form is the normal Dart style. <code>@Response</code> has no lower case name,
-because <code>response()</code> is already the response helper of <code>dox_core</code>.</p>
+<p>Each annotation also has a lower case name, like <code>@summary('Log in')</code>.
+Only <code>@Response</code> has none, because <code>response()</code> is already a <code>dox_core</code> helper.</p>
 <h3 id="login-schemes">Login schemes</h3>
 <p>A middleware whose class name ends with <code>AuthMiddleware</code> adds <code>bearerAuth</code> (a JWT bearer token) by itself.
 For other middleware, or another scheme, set it in the config:</p>
@@ -4673,15 +4727,9 @@ For other middleware, or another scheme, set it in the config:</p>
 </span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="p">);</span>
 </span></code></pre></div>
 <h2 id="how-a-route-finds-its-docs">How a route finds its docs</h2>
-<p>Routes are added when the app starts, so the builder can not see the final route table.
-It writes two lists into <code>openapi.g.dart</code>:</p>
-<ul>
-<li>the docs of each controller method, by <code>Class.method</code>,</li>
-<li>each <code>Route.get(...)</code> / <code>Route.resource(...)</code> call it found, with its path and <code>Class.method</code>.</li>
-</ul>
-<p>At runtime, Dox reads the method name of each route handler.
-It picks the route call with the same HTTP method and the same end of path.
-If there is none, it picks the only method with that name and the same argument types.
+<p>The builder saves the docs of each controller method, and each <code>Route.get(...)</code> / <code>Route.resource(...)</code> call it finds.
+At runtime, Dox matches each route handler by its method name, HTTP method and the end of its path.
+If there is no match, it picks the only method with that name and the same argument types.
 Group prefixes (like <code>api/</code>) do not matter.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -4738,10 +4786,6 @@ Group prefixes (like <code>api/</code>) do not matter.</p>
 <p>A schema can be a JSON Schema <code>Map</code>, a <a href="../validation/"><code>dox_validation</code></a> schema, or any object with <code>toJsonSchema()</code>.
 Paths can use <code>{id}</code> or <code>:id</code>. Both become <code>{id}</code>.
 <code>DoxRouteAdapter().addTo(docs, routes)</code> adds a basic entry for each route you did not describe.</p>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>Do not serve <code>/docs</code> in production if your API is private.</p>
-</div>
 
 
 

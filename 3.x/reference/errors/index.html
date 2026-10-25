@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
   
@@ -518,6 +518,8 @@
       
         
       
+        
+      
     
     
     
@@ -581,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/installation/" class="md-nav__link">
+      <a href="../../getting-started/installation/" class="md-nav__link">
         
   
   
@@ -1073,6 +1075,130 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1088,6 +1214,8 @@
   
     
     
+      
+        
       
         
       
@@ -1223,6 +1351,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/serializer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
   
 
     
@@ -2074,8 +2230,6 @@
       
         
       
-        
-      
     
     
     
@@ -2339,34 +2493,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../database/model/serializer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3410,10 +3536,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -3961,62 +4083,6 @@
     
   
     Changelog
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/contribute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contribute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/mascot/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meet Doxie
   
 
     
@@ -5011,7 +5077,7 @@ The table shows the <code>message</code> text.</p>
 </table>
 <h2 id="native-libraries-build-hooks">Native libraries (build hooks)</h2>
 <p>Printed during <code>dart pub get</code>, <code>dox serve</code> or <code>dox build</code>. <code>&lt;pkg&gt;</code> is <code>dox_http_native</code>, <code>dox_postgres_native</code> or <code>dox_mysql_native</code>.</p>
-<p>None of them has a fallback. When the library is missing, the app stops with an error that says why the library did not load and how to fix it: at start for <code>dox_http_native</code>, when the ORM opens the database for <code>dox_postgres_native</code> and <code>dox_mysql_native</code>.</p>
+<p>There is no fallback. When a library is missing, the app stops with the reason and the fix. <code>dox_http_native</code> stops at start. The database drivers stop when the ORM opens the database.</p>
 <table>
 <thead>
 <tr>
@@ -5126,11 +5192,6 @@ The table shows the <code>message</code> text.</p>
 <td><code>Folder name "&lt;name&gt;" already exist</code></td>
 <td><code>dox create</code> into a folder that exists.</td>
 <td>Pick another name.</td>
-</tr>
-<tr>
-<td><code>RangeError (index): Invalid value: Only valid value is 0: 1</code></td>
-<td><code>dox create &lt;name&gt;</code> without <code>--version</code>, in <code>3.0.0-alpha.4</code> and older.</td>
-<td>Update the CLI: <code>dart pub global activate dox ^3.0.0-alpha</code>.</td>
 </tr>
 <tr>
 <td><code>Invalid option &lt;x&gt;, use -m or --migration</code></td>

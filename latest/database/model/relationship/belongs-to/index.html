@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
   
@@ -520,6 +520,8 @@
       
         
       
+        
+      
     
     
     
@@ -583,7 +585,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../the-basic/installation/" class="md-nav__link">
+      <a href="../../../../getting-started/installation/" class="md-nav__link">
         
   
   
@@ -1075,6 +1077,130 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../community/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../community/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1090,6 +1216,8 @@
   
     
     
+      
+        
       
         
       
@@ -1225,6 +1353,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../the-basic/serializer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
   
 
     
@@ -2081,8 +2237,6 @@
       
         
       
-        
-      
     
     
     
@@ -2516,34 +2670,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../serializer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3585,10 +3711,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -3925,62 +4047,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../others/contribute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contribute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../others/mascot/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meet Doxie
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -4227,15 +4293,13 @@ It runs one query for all comments, not one query per comment.</p>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="o">?</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'active'</span><span class="p">)</span>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="p">.</span><span class="n">getFirst</span><span class="p">();</span>
 </span></code></pre></div>
-<p><code>related</code> gives a query. You can add more conditions before you run it.
-It does not set <code>comment.user</code>.</p>
+<p>It does not set <code>comment.user</code>.</p>
 <h3 id="eager"><code>eager</code></h3>
 <p>Use it when every query of <code>Comment</code> should load the relation.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nd">@BelongsTo</span><span class="p">(</span><span class="n">User</span><span class="p">,</span><span class="w"> </span><span class="nl">eager:</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="p">;</span>
 </span></code></pre></div>
-<p>With <code>eager: true</code>, every query of <code>Comment</code> loads the relation.
-You do not call <code>preload</code>.</p>
+<p>You do not call <code>preload</code>.</p>
 <p>The load runs this SQL:</p>
 <div class="language-sql highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">"user"</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="k">WHERE</span><span class="w"> </span><span class="ss">"user"</span><span class="p">.</span><span class="ss">"id"</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="o">@</span><span class="n">userid_p0</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
@@ -4274,7 +4338,7 @@ Comments of the same user get the same <code>User</code> object.</p>
 </tr>
 </tbody>
 </table>
-<p>The default <code>foreignKey</code> uses the class name of the related model in snake_case, like Laravel.
+<p>The default <code>foreignKey</code> uses the class name of the related model in snake_case.
 <code>User</code> gives <code>user_id</code>, also when the table is <code>users</code>.</p>
 <h3 id="foreignkey-and-localkey"><code>foreignKey</code> and <code>localKey</code></h3>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nd">@BelongsTo</span><span class="p">(</span><span class="n">User</span><span class="p">,</span><span class="w"> </span><span class="nl">foreignKey:</span><span class="w"> </span><span class="s1">'author_id'</span><span class="p">,</span><span class="w"> </span><span class="nl">localKey:</span><span class="w"> </span><span class="s1">'id'</span><span class="p">)</span>

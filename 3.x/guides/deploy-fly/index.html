@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
   
@@ -519,6 +519,8 @@
       
         
       
+        
+      
     
     
     
@@ -582,7 +584,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/installation/" class="md-nav__link">
+      <a href="../../getting-started/installation/" class="md-nav__link">
         
   
   
@@ -1074,6 +1076,130 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1089,6 +1215,8 @@
   
     
     
+      
+        
       
         
       
@@ -1224,6 +1352,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/serializer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
   
 
     
@@ -2075,8 +2231,6 @@
       
         
       
-        
-      
     
     
     
@@ -2340,34 +2494,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../database/model/serializer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3611,10 +3737,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -3951,62 +4073,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/contribute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contribute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/mascot/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meet Doxie
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -4218,22 +4284,13 @@
 <p>Run the blog API on <a href="https://fly.io">Fly.io</a> from the <code>Dockerfile</code> of your project, with SQLite on a volume or with Postgres.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>These steps follow the Fly.io docs as of 2026-10-22 (checked on 2026-10-22). They were not run on Fly.io in CI.
-The Docker image itself was built and run locally.</p>
+<p>These steps follow the Fly.io docs as of 2026-10-22. They were not run on Fly.io in CI.</p>
 </div>
 <h2 id="what-you-need">What you need</h2>
 <ul>
 <li>A Fly.io account and the <code>fly</code> CLI (<code>fly auth login</code>).</li>
-<li>The blog API from the <a href="../../tutorial/01-create-project/">tutorial</a>, or any Dox app, with the <code>Dockerfile</code> of a new Dox app.
-  See <a href="../../digging-deeper/deployment/#docker">Deployment: Docker</a> for how that file works.</li>
+<li>The blog API from the <a href="../../tutorial/01-create-project/">tutorial</a>, or any Dox app, with the <code>Dockerfile</code> of a new Dox app. See <a href="../docker/">Docker</a> for how that file works.</li>
 </ul>
-<p>The image is small. For the blog API it is about 17 MB. Fly builds it for you on <code>fly deploy</code>.</p>
-<div class="admonition note">
-<p class="admonition-title">Check for <code>(native)</code></p>
-<p>The project's <code>Dockerfile</code> copies <code>libgcc_s.so.1</code> into the image, so the
-native HTTP server loads. The start log ends with <code>(native)</code>. If the app
-stops with <code>dox_http_native did not load</code>, see <a href="../docker/">Docker</a>.</p>
-</div>
 <h2 id="1-make-the-app-on-flyio">1. Make the app on Fly.io</h2>
 <p>In the project folder:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>fly<span class="w"> </span>launch<span class="w"> </span>--no-deploy
@@ -4286,7 +4343,7 @@ stops with <code>dox_http_native did not load</code>, see <a href="../docker/">D
 <li><code>internal_port</code> is the port the app listens on. Dox reads it from <code>APP_PORT</code> (or <code>PORT</code> when <code>APP_PORT</code> is not set). Keep the two the same.</li>
 <li>Values in <code>[env]</code> must be strings, so write <code>"3000"</code>, not <code>3000</code>.</li>
 <li><code>[[vm]]</code> wins over <code>fly scale vm</code>. Each <code>fly deploy</code> sets the machine to these values.</li>
-<li><code>kill_timeout</code> is how long Fly waits after <code>SIGINT</code> before it kills the app. Keep it above <code>shutdownTimeout</code> of <code>AppConfig</code> (8 seconds by default). See <a href="../../digging-deeper/deployment/#graceful-shutdown">Graceful shutdown</a>.</li>
+<li><code>kill_timeout</code>: keep it above <code>shutdownTimeout</code> of <code>AppConfig</code>. See <a href="../../digging-deeper/deployment/#graceful-shutdown">Graceful shutdown</a>.</li>
 </ul>
 <h2 id="3-set-the-secrets">3. Set the secrets</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>fly<span class="w"> </span>secrets<span class="w"> </span><span class="nb">set</span><span class="w"> </span><span class="nv">APP_KEY</span><span class="o">=</span>&lt;output<span class="w"> </span>of<span class="w"> </span>dox<span class="w"> </span>key:generate&gt;
@@ -4303,19 +4360,16 @@ A secret with the same name as an <code>[env]</code> key wins.</p>
 <li>So with SQLite, run exactly one machine.</li>
 </ul>
 <h3 id="postgres">Postgres</h3>
-<p>Create a Fly.io Managed Postgres cluster with <code>fly mpg create</code>.</p>
-<p>Attach it to the app:</p>
+<p>Create a Managed Postgres cluster with <code>fly mpg create</code>, and attach it to the app:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>fly<span class="w"> </span>mpg<span class="w"> </span>attach<span class="w"> </span>&lt;cluster-id&gt;<span class="w"> </span>--app<span class="w"> </span>blog-api
 </span></code></pre></div>
-<p><code>fly mpg attach</code> sets one secret, <code>DATABASE_URL</code>. Dox reads it. When <code>DATABASE_URL</code> is set, it wins over <code>DB_CONNECTION</code> and the other <code>DB_*</code> keys. The app and the migrations both use it. See <a href="../../database/#database_url"><code>DATABASE_URL</code></a>.</p>
+<p>This sets the secret <code>DATABASE_URL</code>. It wins over the <code>DB_*</code> keys, for the app and the migrations. See <a href="../../database/#database_url"><code>DATABASE_URL</code></a>.</p>
 <p>Then delete <code>DB_CONNECTION</code> and <code>DB_NAME</code> from <code>[env]</code>, and delete the <code>[mounts]</code> section.
 If the database asks for TLS, add <code>?sslmode=require</code> to the url with <code>fly secrets set DATABASE_URL=...</code>.</p>
 <h2 id="5-deploy">5. Deploy</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>fly<span class="w"> </span>deploy
 </span></code></pre></div>
-<p><code>fly deploy</code> builds the image from the <code>Dockerfile</code>, makes the machine and starts it.
-The app runs the migrations at start.</p>
-<p>Check that there is one machine:</p>
+<p><code>fly deploy</code> builds the image, makes the machine and starts it. The app runs the migrations at start. Then check that there is one machine:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>fly<span class="w"> </span>scale<span class="w"> </span>show
 </span></code></pre></div>
 <p>If the count is more than 1 and you use SQLite, run <code>fly scale count 1</code>.</p>

@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
   
@@ -518,6 +518,8 @@
       
         
       
+        
+      
     
     
     
@@ -581,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../installation/" class="md-nav__link">
+      <a href="../../getting-started/installation/" class="md-nav__link">
         
   
   
@@ -1073,6 +1075,130 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1090,6 +1216,8 @@
   
     
     
+      
+        
       
         
       
@@ -1226,6 +1354,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serializer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
   
 
     
@@ -2196,8 +2352,6 @@
       
         
       
-        
-      
     
     
     
@@ -2461,34 +2615,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../database/model/serializer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3530,10 +3656,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -3870,62 +3992,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/contribute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contribute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/mascot/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meet Doxie
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -4166,6 +4232,7 @@ See <a href="../routing/#resource-routes">Routing: resource routes</a>.</p>
 <li>Only positional parameters. Named and <code>[optional]</code> parameters are not supported.</li>
 <li>A catch-all <code>{path*}</code> param is a <code>String</code>.</li>
 <li>The same rules work for static methods and plain functions.</li>
+<li>Dox reads the parameter types once, at start. It does not use <code>dart:mirrors</code>.</li>
 </ul>
 <p><strong>Path param types.</strong> Dox converts the text from the URL:</p>
 <ul>
@@ -4180,11 +4247,6 @@ See <a href="../routing/#resource-routes">Routing: resource routes</a>.</p>
 <li>a parameter type is not in the list above, and not a <code>@Dto</code> (did you run <code>dart run build_runner build</code>?),</li>
 <li>the method has more path-param parameters than the route has <code>{...}</code> params.</li>
 </ul>
-<div class="admonition info">
-<p class="admonition-title">Why types, not names?</p>
-<p>Dox reads the parameter types of your method once, when the routes are registered at start. It needs no <code>dart:mirrors</code>.
-So <code>update(int teamId, int id)</code> works by position, not by the names <code>teamId</code> and <code>id</code>.</p>
-</div>
 <h2 id="what-to-return">What to return</h2>
 <p>Return a <code>String</code>, a <code>Map</code>, a model, a <code>File</code> and more. See <a href="../response/">Response</a>.</p>
 

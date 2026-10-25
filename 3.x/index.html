@@ -14,14 +14,14 @@
       
       
       
-        <link rel="next" href="the-basic/installation/">
+        <link rel="next" href="getting-started/installation/">
       
       
         
       
       
       <link rel="icon" href="assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
   
@@ -524,6 +524,8 @@
       
         
       
+        
+      
     
     
     
@@ -588,7 +590,7 @@
   
   
     <li class="md-nav__item">
-      <a href="the-basic/installation/" class="md-nav__link">
+      <a href="getting-started/installation/" class="md-nav__link">
         
   
   
@@ -1086,6 +1088,133 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="community/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="community/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1101,6 +1230,8 @@
   
     
     
+      
+        
       
         
       
@@ -1236,6 +1367,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="the-basic/serializer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
   
 
     
@@ -2087,8 +2246,6 @@
       
         
       
-        
-      
     
     
     
@@ -2352,34 +2509,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="database/model/serializer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3421,10 +3550,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -3761,62 +3886,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="others/contribute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contribute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="others/mascot/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meet Doxie
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -4023,10 +4092,9 @@ It runs one isolate per CPU core and builds to a small native binary.
 <p class="dox-bench__foot"><span>Dox 3.0.0-alpha.3 · Bun 1.4 · Go 1.27 · Dart 3.13 · Postgres 18 · 256 connections · wrk · median of 3 runs</span><a href="digging-deeper/performance/#app-benchmark">All results</a></p>
 </div>
 <p>Dox also has the lowest p99 (the slowest 1% of requests). Your code is plain
-Dart. The speed comes from the Rust HTTP server and the Rust database drivers
-that Dox uses by default. On 2 cores Dox stays ahead on the database routes.
+Dart. The speed comes from the Rust HTTP server and database drivers.
 Without a database (<code>GET /json</code>), Bun is faster.
-See <a href="digging-deeper/performance/">Performance</a> for every route and how to run the benchmark yourself.</p>
+See <a href="digging-deeper/performance/">Performance</a> for every route.</p>
 <div class="admonition warning">
 <p class="admonition-title">You are reading the 3.x docs (alpha)</p>
 <p><code>3.0.0-alpha.x</code> is a preview. Things can still change before the stable release.</p>
@@ -4051,7 +4119,7 @@ at a time.</p>
 <div class="admonition note">
 <p class="admonition-title">The CLI is not found?</p>
 <p><code>dart pub global activate</code> puts <code>dox</code> in <code>$HOME/.pub-cache/bin</code>.
-Add that folder to your <code>PATH</code>. See <a href="the-basic/installation/">Installation</a>.</p>
+Add that folder to your <code>PATH</code>. See <a href="getting-started/installation/">Installation</a>.</p>
 </div>
 <h2 id="pick-your-path">Pick your path</h2>
 <table>
@@ -4136,7 +4204,7 @@ See <a href="reference/cli/">CLI reference</a>.</p>
 <ul>
 <li>Found a bug or have a question? Open an <a href="https://github.com/dartondox/dox/issues">issue on GitHub</a>.</li>
 <li>Using an AI assistant? Give it <a href="https://dartondox.dev/latest/llms-full.txt">llms-full.txt</a>: all of these docs as one plain text file. <a href="https://dartondox.dev/latest/llms.txt">llms.txt</a> is the page list.</li>
-<li>Want to help? Read <a href="others/contribute/">Contribute</a>.</li>
+<li>Want to help? Read <a href="community/contribute/">Contribute</a>.</li>
 </ul>
 
 
@@ -4185,7 +4253,7 @@ See <a href="reference/cli/">CLI reference</a>.</p>
         
         
           
-          <a href="the-basic/installation/" class="md-footer__link md-footer__link--next" aria-label="Next: Installation">
+          <a href="getting-started/installation/" class="md-footer__link md-footer__link--next" aria-label="Next: Installation">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next

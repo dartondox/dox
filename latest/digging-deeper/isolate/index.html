@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
   
@@ -518,6 +518,8 @@
       
         
       
+        
+      
     
     
     
@@ -581,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/installation/" class="md-nav__link">
+      <a href="../../getting-started/installation/" class="md-nav__link">
         
   
   
@@ -1073,6 +1075,130 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1088,6 +1214,8 @@
   
     
     
+      
+        
       
         
       
@@ -1223,6 +1351,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/serializer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
   
 
     
@@ -2179,8 +2335,6 @@
       
         
       
-        
-      
     
     
     
@@ -2444,34 +2598,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../database/model/serializer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3513,10 +3639,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -3853,62 +3975,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/contribute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contribute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/mascot/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meet Doxie
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -4025,13 +4091,13 @@
 <h1 id="isolate">Isolate</h1>
 <p>This page explains how Dox runs your app on many isolates (threads), and what that means for your code.</p>
 <h2 id="how-it-works">How it works</h2>
-<p>Dox starts many isolates. Each one runs its own HTTP server on the same port. The operating system spreads the connections between them.</p>
+<p>Dox starts many isolates. Each one runs its own <a href="../native-server/">native server</a> on the same port. The operating system spreads the connections between them.</p>
 <ul>
-<li>Native server on Linux: each isolate has its own socket (<code>SO_REUSEPORT</code>).</li>
-<li>Native server on macOS: the isolates share one socket.</li>
-<li>Native server on Windows: only one isolate serves HTTP.</li>
+<li>Linux: each isolate has its own socket (<code>SO_REUSEPORT</code>).</li>
+<li>macOS: the isolates share one socket.</li>
+<li>Windows: only one isolate serves HTTP.</li>
 </ul>
-<p>With the native server, each isolate has its own Rust acceptor on the port:</p>
+<p>Each isolate has its own Rust acceptor on the port:</p>
 <pre class="mermaid"><code>flowchart TD
     OS["Port 3000&lt;br&gt;the OS spreads the connections"] --&gt; A1["Rust acceptor"]
     OS --&gt; A2["Rust acceptor"]
@@ -4042,9 +4108,8 @@
     I2 -. "crash: started again after 1 second" .-&gt; I2
     I1 -. "crash: the process exits" .-&gt; S["Supervisor restarts the process&lt;br&gt;Docker, systemd"]</code></pre>
 <p>With the Postgres and MySQL drivers, all isolates share one database pool in Rust. See <a href="../../concepts/how-dox-works/#where-the-database-pools-live">How Dox works</a>.</p>
-<p>See <a href="../native-server/">Native server</a> for the two servers.</p>
 <h2 id="how-many-isolates">How many isolates</h2>
-<p>By default Dox starts one isolate per CPU core (<code>Platform.numberOfProcessors</code>). So one process uses the whole machine.</p>
+<p>By default Dox starts one isolate per CPU core (<code>Platform.numberOfProcessors</code>).</p>
 <p>To change it, set <code>totalIsolate</code> in <code>lib/config/app.dart</code>. A new app reads it from <code>APP_TOTAL_ISOLATE</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="c1">// ...</span>
@@ -4062,10 +4127,10 @@
 <li>you use Socket.IO rooms without the Redis adapter. A room only reaches clients on the same isolate. Use <code>1</code>, or see <a href="../../packages/socketio/">Socket.IO</a>.</li>
 </ul>
 <h2 id="each-isolate-has-its-own-memory">Each isolate has its own memory</h2>
-<p>Isolates do not share memory. This has some effects on your code:</p>
+<p>Isolates do not share memory:</p>
 <ul>
 <li>A static value or a singleton exists once <strong>per isolate</strong>. When you change it in one isolate, the others do not see it.</li>
-<li>The <code>memory</code> cache store is per isolate. Use the <code>redis</code> store to share cache data. See <a href="../cache/">Cache</a>.</li>
+<li>The <code>memory</code> cache store is per isolate. See <a href="../cache/">Cache</a>.</li>
 <li>To share data between isolates or servers, use a database, Redis or files.</li>
 </ul>
 <p><code>Dox().isolateId</code> tells you which isolate runs the code. The first isolate is <code>1</code>.</p>
@@ -4077,7 +4142,6 @@
 <li>reads the parameter types of each controller once,</li>
 <li>starts its HTTP server.</li>
 </ol>
-<p>This happens once at start, not on each request.</p>
 <p>Because the config and services are copied, they must not hold open sockets or database pools. Open these in <code>setup()</code>. See <a href="../services/">Services</a>.</p>
 <h2 id="when-an-isolate-crashes">When an isolate crashes</h2>
 <ul>

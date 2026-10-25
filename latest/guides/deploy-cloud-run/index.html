@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
   
@@ -519,6 +519,8 @@
       
         
       
+        
+      
     
     
     
@@ -582,7 +584,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/installation/" class="md-nav__link">
+      <a href="../../getting-started/installation/" class="md-nav__link">
         
   
   
@@ -1074,6 +1076,130 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1089,6 +1215,8 @@
   
     
     
+      
+        
       
         
       
@@ -1224,6 +1352,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/serializer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
   
 
     
@@ -2075,8 +2231,6 @@
       
         
       
-        
-      
     
     
     
@@ -2340,34 +2494,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../database/model/serializer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3572,10 +3698,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -3912,62 +4034,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/contribute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contribute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/mascot/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meet Doxie
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -4140,48 +4206,35 @@
 <p>Run the blog API on <a href="https://cloud.google.com/run">Cloud Run</a> from the <code>Dockerfile</code> of your project, with Postgres on Cloud SQL and secrets in Secret Manager.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>These steps follow the Cloud Run docs as of 2026-10-22 (checked on 2026-10-22). They were not run on Cloud Run in CI.
-The Docker image itself was built and run locally.</p>
+<p>These steps follow the Cloud Run docs as of 2026-10-22. They were not run on Cloud Run in CI.</p>
 </div>
 <h2 id="what-you-need">What you need</h2>
 <ul>
 <li>A Google Cloud project with billing, and the <code>gcloud</code> CLI (<code>gcloud auth login</code>, <code>gcloud config set project PROJECT_ID</code>).</li>
-<li>The blog API from the <a href="../../tutorial/01-create-project/">tutorial</a>, or any Dox app, with the <code>Dockerfile</code> of a new Dox app.
-  See <a href="../../digging-deeper/deployment/#docker">Deployment: Docker</a> for how that file works.</li>
+<li>The blog API from the <a href="../../tutorial/01-create-project/">tutorial</a>, or any Dox app, with the <code>Dockerfile</code> of a new Dox app. See <a href="../docker/">Docker</a> for how that file works.</li>
 <li>A Cloud SQL for PostgreSQL instance with a database and a user. See step 3.</li>
 </ul>
-<p>The image is small. For the blog API it is about 17 MB.</p>
-<div class="admonition note">
-<p class="admonition-title">Check for <code>(native)</code></p>
-<p>The project's <code>Dockerfile</code> copies <code>libgcc_s.so.1</code> into the image, so the
-native HTTP server loads. The start log ends with <code>(native)</code>. If the app
-stops with <code>dox_http_native did not load</code>, see <a href="../docker/">Docker</a>.</p>
-</div>
 <h2 id="the-port-port-and-app_port">The port: <code>PORT</code> and <code>APP_PORT</code></h2>
-<p>Cloud Run sends requests to one port of the container. It puts that port in the <code>PORT</code> env variable. The default is <code>8080</code>.</p>
-<p>Dox listens on <code>APP_PORT</code> when it is set. When <code>APP_PORT</code> is not set, Dox listens on <code>PORT</code>.
-So do not set <code>APP_PORT</code> on Cloud Run. The app then follows <code>PORT</code>, and you can leave out <code>--port</code>.</p>
-<p>If you do set <code>APP_PORT</code>, tell Cloud Run the same port:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>gcloud<span class="w"> </span>run<span class="w"> </span>deploy<span class="w"> </span>blog<span class="w"> </span>--port<span class="w"> </span><span class="m">3000</span><span class="w"> </span>...
-</span></code></pre></div>
+<p>Cloud Run puts the port it sends requests to in the <code>PORT</code> env variable (default <code>8080</code>, or the <code>--port</code> value).
+Dox listens on <code>APP_PORT</code>, or on <code>PORT</code> when <code>APP_PORT</code> is not set. So do not set <code>APP_PORT</code> on Cloud Run.</p>
+<p>If you do set <code>APP_PORT</code>, pass the same port with <code>--port</code>.</p>
 <h2 id="1-turn-on-the-apis">1. Turn on the APIs</h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>gcloud<span class="w"> </span>services<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>run.googleapis.com<span class="w"> </span>cloudbuild.googleapis.com<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>artifactregistry.googleapis.com<span class="w"> </span>secretmanager.googleapis.com<span class="w"> </span>sqladmin.googleapis.com
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>gcloud<span class="w"> </span>services<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>run.googleapis.com<span class="w"> </span>cloudbuild.googleapis.com<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span>artifactregistry.googleapis.com<span class="w"> </span>secretmanager.googleapis.com<span class="w"> </span>sqladmin.googleapis.com
 </span></code></pre></div>
 <h2 id="2-save-the-secrets-in-secret-manager">2. Save the secrets in Secret Manager</h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tr<span class="w"> </span>-d<span class="w"> </span><span class="s1">'\n'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>gcloud<span class="w"> </span>secrets<span class="w"> </span>create<span class="w"> </span>blog-app-key<span class="w"> </span>--data-file<span class="o">=</span>-
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">'%s'</span><span class="w"> </span><span class="s1">'&lt;the database password&gt;'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>gcloud<span class="w"> </span>secrets<span class="w"> </span>create<span class="w"> </span>blog-db-password<span class="w"> </span>--data-file<span class="o">=</span>-
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tr<span class="w"> </span>-d<span class="w"> </span><span class="s1">'\n'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>gcloud<span class="w"> </span>secrets<span class="w"> </span>create<span class="w"> </span>blog-app-key<span class="w"> </span>--data-file<span class="o">=</span>-
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">'%s'</span><span class="w"> </span><span class="s1">'&lt;the database password&gt;'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>gcloud<span class="w"> </span>secrets<span class="w"> </span>create<span class="w"> </span>blog-db-password<span class="w"> </span>--data-file<span class="o">=</span>-
 </span></code></pre></div>
 <p>Let the Cloud Run service account read them. By default this is the Compute Engine service account, <code>PROJECT_NUMBER-compute@developer.gserviceaccount.com</code>:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">for</span><span class="w"> </span>s<span class="w"> </span><span class="k">in</span><span class="w"> </span>blog-app-key<span class="w"> </span>blog-db-password<span class="p">;</span><span class="w"> </span><span class="k">do</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span>gcloud<span class="w"> </span>secrets<span class="w"> </span>add-iam-policy-binding<span class="w"> </span><span class="s2">"</span><span class="nv">$s</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span>--member<span class="o">=</span><span class="s2">"serviceAccount:PROJECT_NUMBER-compute@developer.gserviceaccount.com"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span>--role<span class="o">=</span><span class="s2">"roles/secretmanager.secretAccessor"</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="k">done</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">for</span><span class="w"> </span>s<span class="w"> </span><span class="k">in</span><span class="w"> </span>blog-app-key<span class="w"> </span>blog-db-password<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span>gcloud<span class="w"> </span>secrets<span class="w"> </span>add-iam-policy-binding<span class="w"> </span><span class="s2">"</span><span class="nv">$s</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span>--member<span class="o">=</span><span class="s2">"serviceAccount:PROJECT_NUMBER-compute@developer.gserviceaccount.com"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span>--role<span class="o">=</span><span class="s2">"roles/secretmanager.secretAccessor"</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="k">done</span>
 </span></code></pre></div>
 <h2 id="3-reach-cloud-sql">3. Reach Cloud SQL</h2>
-<p>Cloud Run has two ways to reach Cloud SQL: a Unix socket in <code>/cloudsql/...</code>, or the private IP over a VPC.</p>
-<p>Dox can use both. The Unix socket needs no VPC, so this guide uses it:</p>
+<p>Cloud Run reaches Cloud SQL by a Unix socket in <code>/cloudsql/...</code> or by a private IP over a VPC. Dox can use both. This guide uses the socket, because it needs no VPC:</p>
 <ol>
 <li>Find the connection name of the instance: <code>gcloud sql instances describe INSTANCE --format='value(connectionName)'</code>. It looks like <code>PROJECT_ID:europe-west1:INSTANCE</code>.</li>
 <li>Deploy with <code>--add-cloudsql-instances &lt;connection name&gt;</code> (step 4). Cloud Run then makes the socket in <code>/cloudsql/&lt;connection name&gt;</code>.</li>
@@ -4193,17 +4246,17 @@ So do not set <code>APP_PORT</code> on Cloud Run. The app then follows <code>POR
 <p>To use the <strong>private IP</strong> instead: give the instance a private IP on your VPC network, deploy with Direct VPC egress (<code>--network default --subnet default --vpc-egress private-ranges-only</code>), and use the private IP as <code>DB_HOST</code>.</p>
 <p>Do not use SQLite on Cloud Run. The file system of an instance is in memory, and each instance has its own. The data is lost when the instance stops.</p>
 <h2 id="4-deploy-from-source">4. Deploy from source</h2>
-<p><code>--source .</code> uploads the folder. Cloud Build builds the image with your <code>Dockerfile</code> and saves it in Artifact Registry (in a repository named <code>cloud-run-source-deploy</code>).</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>gcloud<span class="w"> </span>run<span class="w"> </span>deploy<span class="w"> </span>blog<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span>--source<span class="w"> </span>.<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span>--region<span class="w"> </span>europe-west1<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span>--port<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span>--allow-unauthenticated<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span>--cpu<span class="w"> </span><span class="m">1</span><span class="w"> </span>--memory<span class="w"> </span>512Mi<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span>--min-instances<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span>--add-cloudsql-instances<span class="w"> </span>PROJECT_ID:europe-west1:INSTANCE<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span>--set-env-vars<span class="w"> </span><span class="nv">APP_ENV</span><span class="o">=</span>production,APP_TOTAL_ISOLATE<span class="o">=</span><span class="m">1</span>,DB_CONNECTION<span class="o">=</span>postgres,DB_HOST<span class="o">=</span>/cloudsql/PROJECT_ID:europe-west1:INSTANCE,DB_PORT<span class="o">=</span><span class="m">5432</span>,DB_NAME<span class="o">=</span>blog,DB_USERNAME<span class="o">=</span>blog<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span>--set-secrets<span class="w"> </span><span class="nv">APP_KEY</span><span class="o">=</span>blog-app-key:1,DB_PASSWORD<span class="o">=</span>blog-db-password:1
+<p><code>--source .</code> uploads the folder. Cloud Build builds the image with your <code>Dockerfile</code> and saves it in Artifact Registry (repository <code>cloud-run-source-deploy</code>).</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>gcloud<span class="w"> </span>run<span class="w"> </span>deploy<span class="w"> </span>blog<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span>--source<span class="w"> </span>.<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span>--region<span class="w"> </span>europe-west1<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span>--port<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span>--allow-unauthenticated<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span>--cpu<span class="w"> </span><span class="m">1</span><span class="w"> </span>--memory<span class="w"> </span>512Mi<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span>--min-instances<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span>--add-cloudsql-instances<span class="w"> </span>PROJECT_ID:europe-west1:INSTANCE<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span>--set-env-vars<span class="w"> </span><span class="nv">APP_ENV</span><span class="o">=</span>production,APP_TOTAL_ISOLATE<span class="o">=</span><span class="m">1</span>,DB_CONNECTION<span class="o">=</span>postgres,DB_HOST<span class="o">=</span>/cloudsql/PROJECT_ID:europe-west1:INSTANCE,DB_PORT<span class="o">=</span><span class="m">5432</span>,DB_NAME<span class="o">=</span>blog,DB_USERNAME<span class="o">=</span>blog<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span>--set-secrets<span class="w"> </span><span class="nv">APP_KEY</span><span class="o">=</span>blog-app-key:1,DB_PASSWORD<span class="o">=</span>blog-db-password:1
 </span></code></pre></div>
 <table>
 <thead>
@@ -4240,37 +4293,37 @@ So do not set <code>APP_PORT</code> on Cloud Run. The app then follows <code>POR
 </tbody>
 </table>
 <p>To build the image yourself instead, push it to Artifact Registry and deploy it with <code>--image</code>:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>docker<span class="w"> </span>build<span class="w"> </span>--platform<span class="w"> </span>linux/amd64<span class="w"> </span>-t<span class="w"> </span>europe-west1-docker.pkg.dev/PROJECT_ID/blog/api:1<span class="w"> </span>.
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>docker<span class="w"> </span>push<span class="w"> </span>europe-west1-docker.pkg.dev/PROJECT_ID/blog/api:1
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>gcloud<span class="w"> </span>run<span class="w"> </span>deploy<span class="w"> </span>blog<span class="w"> </span>--image<span class="w"> </span>europe-west1-docker.pkg.dev/PROJECT_ID/blog/api:1<span class="w"> </span>--region<span class="w"> </span>europe-west1<span class="w"> </span>--port<span class="w"> </span><span class="m">3000</span><span class="w"> </span>...
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>docker<span class="w"> </span>build<span class="w"> </span>--platform<span class="w"> </span>linux/amd64<span class="w"> </span>-t<span class="w"> </span>europe-west1-docker.pkg.dev/PROJECT_ID/blog/api:1<span class="w"> </span>.
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>docker<span class="w"> </span>push<span class="w"> </span>europe-west1-docker.pkg.dev/PROJECT_ID/blog/api:1
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>gcloud<span class="w"> </span>run<span class="w"> </span>deploy<span class="w"> </span>blog<span class="w"> </span>--image<span class="w"> </span>europe-west1-docker.pkg.dev/PROJECT_ID/blog/api:1<span class="w"> </span>--region<span class="w"> </span>europe-west1<span class="w"> </span>--port<span class="w"> </span><span class="m">3000</span><span class="w"> </span>...
 </span></code></pre></div>
 <p>Use the same other flags as above.</p>
 <h2 id="check-it">Check it</h2>
 <p><code>gcloud run deploy</code> prints the service URL at the end.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>curl<span class="w"> </span>https://blog-xxxxxxxx-ew.a.run.app/api/ping
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>curl<span class="w"> </span>https://blog-xxxxxxxx-ew.a.run.app/api/ping
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>pong
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pong
 </span></code></pre></div>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>gcloud<span class="w"> </span>run<span class="w"> </span>services<span class="w"> </span>logs<span class="w"> </span><span class="nb">read</span><span class="w"> </span>blog<span class="w"> </span>--region<span class="w"> </span>europe-west1<span class="w"> </span>--limit<span class="w"> </span><span class="m">20</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>gcloud<span class="w"> </span>beta<span class="w"> </span>run<span class="w"> </span>services<span class="w"> </span>logs<span class="w"> </span>tail<span class="w"> </span>blog<span class="w"> </span>--region<span class="w"> </span>europe-west1<span class="w">   </span><span class="c1"># live, needs the log-streaming component</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>gcloud<span class="w"> </span>run<span class="w"> </span>services<span class="w"> </span>logs<span class="w"> </span><span class="nb">read</span><span class="w"> </span>blog<span class="w"> </span>--region<span class="w"> </span>europe-west1<span class="w"> </span>--limit<span class="w"> </span><span class="m">20</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>gcloud<span class="w"> </span>beta<span class="w"> </span>run<span class="w"> </span>services<span class="w"> </span>logs<span class="w"> </span>tail<span class="w"> </span>blog<span class="w"> </span>--region<span class="w"> </span>europe-west1<span class="w">   </span><span class="c1"># live, needs the log-streaming component</span>
 </span></code></pre></div>
 <p>The first log lines after a start:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Migrating: 2026_10_22_205345_create_posts_table
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>Migrated: 2026_10_22_205345_create_posts_table
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>{"level":"INFO","name":"dox","message":"Server started at http://[::]:3000 with 1 isolate (native)", ...}
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Migrating: 2026_10_22_205345_create_posts_table
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>Migrated: 2026_10_22_205345_create_posts_table
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>{"level":"INFO","name":"dox","message":"Server started at http://[::]:3000 with 1 isolate (native)", ...}
 </span></code></pre></div>
 <p>If the deploy fails with "the container did not listen on the port", the app listens on a different port than <code>--port</code>. Check <code>APP_PORT</code> and <code>--port</code>.</p>
 <h2 id="https-and-the-client-ip">HTTPS and the client IP</h2>
 <p>Cloud Run ends TLS and sends plain HTTP to the container. Only the Cloud Run front end can reach the container port.
 So <code>['*']</code> in <code>trustedProxies</code> is safe, and <code>req.ip()</code> and <code>req.scheme()</code> then show the real client:</p>
-<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nl">trustedProxies:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'*'</span><span class="p">],</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="p">);</span>
+<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nl">trustedProxies:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'*'</span><span class="p">],</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="p">);</span>
 </span></code></pre></div>
 <p>See <a href="../../digging-deeper/deployment/#https-put-a-proxy-in-front">Deployment: HTTPS</a>.</p>
 <h2 id="update-the-app">Update the app</h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>gcloud<span class="w"> </span>run<span class="w"> </span>deploy<span class="w"> </span>blog<span class="w"> </span>--source<span class="w"> </span>.<span class="w"> </span>--region<span class="w"> </span>europe-west1
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>gcloud<span class="w"> </span>run<span class="w"> </span>deploy<span class="w"> </span>blog<span class="w"> </span>--source<span class="w"> </span>.<span class="w"> </span>--region<span class="w"> </span>europe-west1
 </span></code></pre></div>
 <ul>
 <li>Cloud Run keeps the flags of the last revision. You only pass what changes.</li>

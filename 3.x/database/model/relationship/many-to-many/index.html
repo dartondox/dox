@@ -16,14 +16,14 @@
         <link rel="prev" href="../belongs-to/">
       
       
-        <link rel="next" href="../../serializer/">
+        <link rel="next" href="../../../../packages/validation/">
       
       
         
       
       
       <link rel="icon" href="../../../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
   
@@ -520,6 +520,8 @@
       
         
       
+        
+      
     
     
     
@@ -583,7 +585,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../the-basic/installation/" class="md-nav__link">
+      <a href="../../../../getting-started/installation/" class="md-nav__link">
         
   
   
@@ -1075,6 +1077,130 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../community/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../community/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1090,6 +1216,8 @@
   
     
     
+      
+        
       
         
       
@@ -1225,6 +1353,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../the-basic/serializer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
   
 
     
@@ -2081,8 +2237,6 @@
       
         
       
-        
-      
     
     
     
@@ -2527,34 +2681,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../serializer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3596,10 +3722,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -3936,62 +4058,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../others/contribute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contribute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../others/mascot/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meet Doxie
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -4280,16 +4346,14 @@ A model without links gets an empty list.</p>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">        </span><span class="p">.</span><span class="kd">get</span><span class="p">()</span><span class="w"> </span><span class="o">??</span>
 </span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">[];</span>
 </span></code></pre></div>
-<p><code>related</code> gives a query. You can add more conditions before you run it.
-It does not set <code>artist.songs</code>.
+<p>It does not set <code>artist.songs</code>.
 The query joins the pivot table, so write <code>table.column</code> for column names.</p>
 <h3 id="eager"><code>eager</code></h3>
 <p>Use it when every query of <code>Artist</code> should load the relation.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nd">@ManyToMany</span><span class="p">(</span><span class="n">Song</span><span class="p">,</span><span class="w"> </span><span class="nl">eager:</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">songs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">[];</span>
 </span></code></pre></div>
-<p>With <code>eager: true</code>, every query of <code>Artist</code> loads the relation.
-You do not call <code>preload</code>.
+<p>You do not call <code>preload</code>.
 Do not set <code>eager: true</code> on both sides. Each side would load the other side again and again.</p>
 <p>The load runs this SQL:</p>
 <div class="language-sql highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="ss">"song"</span><span class="p">.</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="ss">"artist_song"</span><span class="p">.</span><span class="ss">"artist_id"</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="ss">"_owner_id"</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">"song"</span>
@@ -4352,7 +4416,7 @@ Do not set <code>eager: true</code> on both sides. Each side would load the othe
 </tr>
 </tbody>
 </table>
-<p>The defaults use the class names in snake_case, not the table names, like Laravel.
+<p>The defaults use the class names in snake_case, not the table names.
 So <code>@DoxModel(table: 'artists')</code> does not change them.</p>
 <ul>
 <li><code>Artist</code> and <code>Song</code> give <code>artist_song</code>.</li>
@@ -4455,13 +4519,13 @@ Use a one word field name, or <code>eager: true</code>, when you need it in JSON
         
         
           
-          <a href="../../serializer/" class="md-footer__link md-footer__link--next" aria-label="Next: Serializer">
+          <a href="../../../../packages/validation/" class="md-footer__link md-footer__link--next" aria-label="Next: Validation">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Serializer
+                Validation
               </div>
             </div>
             <div class="md-footer__button md-icon">

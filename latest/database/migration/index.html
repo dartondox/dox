@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A migration changes your database schema step by step: create a table, add a column, and so on. Each migration has an up method (make the change) and a down...">
+        <meta name="description" content="A migration changes your database schema step by step, with an up method that makes the change and a down method that undoes it.">
       
       
       
@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
   
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Migration | Dox">
-  <meta property="og:description" content="A migration changes your database schema step by step: create a table, add a column, and so on. Each migration has an up method (make the change) and a down...">
+  <meta property="og:description" content="A migration changes your database schema step by step, with an up method that makes the change and a down method that undoes it.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/database/migration/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Migration | Dox">
-  <meta name="twitter:description" content="A migration changes your database schema step by step: create a table, add a column, and so on. Each migration has an up method (make the change) and a down...">
+  <meta name="twitter:description" content="A migration changes your database schema step by step, with an up method that makes the change and a down method that undoes it.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -518,6 +518,8 @@
       
         
       
+        
+      
     
     
     
@@ -581,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/installation/" class="md-nav__link">
+      <a href="../../getting-started/installation/" class="md-nav__link">
         
   
   
@@ -1073,6 +1075,130 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1088,6 +1214,8 @@
   
     
     
+      
+        
       
         
       
@@ -1223,6 +1351,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/serializer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
   
 
     
@@ -2224,8 +2380,6 @@
       
         
       
-        
-      
     
     
     
@@ -2492,34 +2646,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../model/serializer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3561,10 +3687,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -3901,62 +4023,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/contribute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contribute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/mascot/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meet Doxie
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -4116,11 +4182,10 @@
 
 
 <h1 id="migration">Migration</h1>
-<p>A migration changes your database schema step by step: create a table, add a column, and so on.
-Each migration has an <code>up</code> method (make the change) and a <code>down</code> method (undo it).</p>
+<p>A migration changes your database schema step by step, with an <code>up</code> method that makes the change and a <code>down</code> method that undoes it.</p>
 <p>Write migrations in Dart with the <a href="../schema/">schema builder</a>.
 The same migration then works on Postgres, MySQL, MariaDB and SQLite.
-Plain <code>.sql</code> migrations still work too.</p>
+Plain <code>.sql</code> migrations work too.</p>
 <h2 id="create-a-migration">Create a migration</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>make:migration<span class="w"> </span>create_users_table
 </span></code></pre></div>
@@ -4169,7 +4234,7 @@ See <a href="../schema/">Schema</a> for all column types.</p>
 </tbody>
 </table>
 <ul>
-<li><code>create:migration</code> is the old name of the same command.</li>
+<li><code>create:migration</code> does the same.</li>
 <li><code>dox create:model Blog -m</code> makes the model and a <code>create_blogs_table</code> migration.</li>
 </ul>
 <div class="admonition info">
@@ -4179,7 +4244,7 @@ See <a href="../schema/">Schema</a> for all column types.</p>
 Do not use models or <code>QueryBuilder</code> in a migration. They use another connection.</p>
 </div>
 <h2 id="the-registry">The registry</h2>
-<p>Dart can not load a file at run time in an AOT build.
+<p>An AOT build can not load a file at run time.
 So Dox keeps a list of your Dart migrations in <code>db/migration/migrations.dart</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// Made by `dox make:migration` and the `dox migration:*` commands.</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_migration/dox_migration.dart'</span><span class="p">;</span>
@@ -4196,7 +4261,7 @@ So Dox keeps a list of your Dart migrations in <code>db/migration/migrations.dar
 <ul>
 <li><code>dox make:migration</code> and every <code>dox migration:*</code> command write this file again.
   You do not edit it.</li>
-<li>It finds each file named <code>YYYY_MM_DD_HHMMSS_name.dart</code> and its <code>class ... extends Migration</code>.</li>
+<li>It lists each file named <code>YYYY_MM_DD_HHMMSS_name.dart</code> and its <code>class ... extends Migration</code>.</li>
 <li>The name of a migration is its file name without <code>.dart</code>. The order is by name.</li>
 </ul>
 <p>The first <code>dox make:migration</code> also makes <code>bin/migrate.dart</code> in your app:</p>
@@ -4294,8 +4359,8 @@ A real environment variable wins over <code>.env</code>, the same as <code>Env.g
 <li><code>DB_DATABASE</code> works too, in place of <code>DB_NAME</code>.</li>
 <li>The default port is <code>5432</code> for Postgres and <code>3306</code> for MySQL.</li>
 <li>One run opens one driver and closes it at the end. Each migration runs on one connection.</li>
-<li>A <code>DB_HOST</code> that starts with <code>/</code> is a Unix socket: the socket folder for Postgres, the socket file for MySQL. Eg. <code>/cloudsql/project:region:instance</code>.</li>
-<li>Migrations use TLS only with a <code>DATABASE_URL</code> that has <code>sslmode</code> (Postgres) or <code>ssl</code> (MySQL), like <code>?sslmode=require</code>. For Postgres, <code>require</code> encrypts but does not check the server certificate, and <code>verify-full</code> checks it. MySQL <code>ssl=true</code> checks it. Add <code>&amp;verifyCertificate=false</code> only for a self-signed certificate in development.</li>
+<li>A <code>DB_HOST</code> that starts with <code>/</code> is a <a href="../#unix-socket">Unix socket</a>.</li>
+<li>Migrations use TLS only with a <code>DATABASE_URL</code> that has <code>sslmode</code> (Postgres) or <code>ssl</code> (MySQL), like <code>?sslmode=require</code>. The url options are on the <a href="../#database_url">Database</a> page.</li>
 </ul>
 <p>You can also give the database yourself:</p>
 <ul>
@@ -4336,7 +4401,7 @@ This lets Dox make a table again (see <a href="../schema/#sqlite-notes">SQLite n
 Before the end, Dox checks all foreign keys. The migration fails if one is broken.</p>
 </div>
 <h2 id="sql-migrations">SQL migrations</h2>
-<p>A <code>.sql</code> migration is still fine. Use it for SQL that only one database understands.</p>
+<p>Use a <code>.sql</code> migration for SQL that only one database understands.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>dox<span class="w"> </span>make:migration<span class="w"> </span>create_blog_table<span class="w"> </span>--sql
 </span></code></pre></div>
 <div class="language-sql highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1">-- up</span>
@@ -4364,7 +4429,7 @@ Use <code>id INTEGER PRIMARY KEY AUTOINCREMENT</code> for SQLite. <code>table.id
 <ul>
 <li>With <code>bin/migrate.dart</code>: the Migrator runs the Dart migrations from the registry
   and reads the <code>.sql</code> files from the folder, merged by name.</li>
-<li>Without <code>bin/migrate.dart</code> (a project with only <code>.sql</code> files): <code>dox</code> runs the <code>.sql</code> files itself, like before.</li>
+<li>Without <code>bin/migrate.dart</code> (a project with only <code>.sql</code> files): <code>dox</code> runs the <code>.sql</code> files itself.</li>
 <li>A Dart and a <code>.sql</code> migration with the same name is an error.</li>
 </ul>
 

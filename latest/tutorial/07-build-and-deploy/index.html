@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
   
@@ -521,6 +521,8 @@
       
         
       
+        
+      
     
     
     
@@ -585,7 +587,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/installation/" class="md-nav__link">
+      <a href="../../getting-started/installation/" class="md-nav__link">
         
   
   
@@ -1185,6 +1187,133 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1200,6 +1329,8 @@
   
     
     
+      
+        
       
         
       
@@ -1335,6 +1466,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/serializer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
   
 
     
@@ -2186,8 +2345,6 @@
       
         
       
-        
-      
     
     
     
@@ -2451,34 +2608,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../database/model/serializer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3520,10 +3649,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -3860,62 +3985,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/contribute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contribute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/mascot/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meet Doxie
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -4044,8 +4113,7 @@ Build a native (AOT) binary for production.</p>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>Generated: /.../blog/build/bundle/bin/server
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>[Dox] Built build/bundle. Run it with: cd build/bundle &amp;&amp; ./bin/server
 </span></code></pre></div>
-<p><code>dox build</code> runs the code generator, then <code>dart build cli --target bin/server.dart --output build</code>.
-The result is in <code>build/bundle</code>:</p>
+<p><code>dox build</code> runs the code generator, then <code>dart build cli</code>. The result is in <code>build/bundle</code>:</p>
 <table>
 <thead>
 <tr>
@@ -4082,9 +4150,9 @@ and make the <code>db</code> folder for the SQLite file:</p>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>Migrated: 2026_10_22_205345_create_posts_table
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>Server started at http://[::]:3000 with 8 isolate (native)
 </span></code></pre></div>
-<p>The migrations run again, because <code>DB_NAME=db/dox.sqlite</code> is a new file in <code>build/bundle</code>.
-The registry in <code>db/migration/migrations.dart</code> is compiled into the binary, so this works without the source code.</p>
-<p>A real environment variable wins over <code>.env</code>. So on a server you can skip the <code>.env</code> file and set the values in the environment.</p>
+<p>The migrations run again, because <code>db/dox.sqlite</code> is a new file in <code>build/bundle</code>.
+The migration list is compiled into the binary, so no source code is needed.
+On a server you can skip <code>.env</code> and set real environment variables. They win over <code>.env</code>.</p>
 <h2 id="check-it">Check it</h2>
 <p>In a second terminal:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>curl<span class="w"> </span>http://localhost:3000/api/ping
@@ -4095,7 +4163,7 @@ The registry in <code>db/migration/migrations.dart</code> is compiled into the b
 </span></code></pre></div>
 <p>The list is empty, because this is a new database file. Stop the server with <code>Ctrl+C</code>.</p>
 <h2 id="3-docker">3. Docker</h2>
-<p>The project has a <code>Dockerfile</code>. It builds the same bundle in a <code>dart:stable</code> image and copies it to an empty (<code>scratch</code>) image. The final image holds only the binary, the native libraries and the migrations:</p>
+<p>The project has a <code>Dockerfile</code>. It builds the same bundle and copies it to an empty (<code>scratch</code>) image:</p>
 <div class="language-dockerfile highlight"><span class="filename">Dockerfile</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">FROM</span><span class="w"> </span><span class="s">dart:stable</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">build</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c"># Resolve dependencies first, so this layer is cached.</span>
@@ -4152,7 +4220,8 @@ For a busy app, use Postgres or MySQL. See <a href="../../database/">Database</a
 <h2 id="where-to-go-next">Where to go next</h2>
 <ul>
 <li><a href="../../digging-deeper/deployment/">Deployment</a>: HTTPS with a proxy, systemd, many machines.</li>
-<li><a href="../../database/model/">Model</a>: relationships, events, serializers.</li>
+<li><a href="../../database/model/">Model</a>: relationships and events.</li>
+<li><a href="../../the-basic/serializer/">Serializer</a>: change the JSON shape of a response.</li>
 <li><a href="../../security/authentication/">Authentication</a>: all options of <code>dox_auth</code>.</li>
 <li><a href="../../packages/openapi/">OpenAPI</a>: API docs from your routes and DTOs.</li>
 </ul>

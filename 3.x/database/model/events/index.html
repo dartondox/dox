@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A model fires events when you save, delete or restore it. You can run your own code on these events. There are two ways: hooks in the model, and observer...">
+        <meta name="description" content="A model fires events when you save, delete or restore it, and you can run your own code on them.">
       
       
       
@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
   
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Model events | Dox">
-  <meta property="og:description" content="A model fires events when you save, delete or restore it. You can run your own code on these events. There are two ways: hooks in the model, and observer...">
+  <meta property="og:description" content="A model fires events when you save, delete or restore it, and you can run your own code on them.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/database/model/events/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Model events | Dox">
-  <meta name="twitter:description" content="A model fires events when you save, delete or restore it. You can run your own code on these events. There are two ways: hooks in the model, and observer...">
+  <meta name="twitter:description" content="A model fires events when you save, delete or restore it, and you can run your own code on them.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -519,6 +519,8 @@
       
         
       
+        
+      
     
     
     
@@ -582,7 +584,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../the-basic/installation/" class="md-nav__link">
+      <a href="../../../getting-started/installation/" class="md-nav__link">
         
   
   
@@ -1074,6 +1076,130 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../community/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../community/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1089,6 +1215,8 @@
   
     
     
+      
+        
       
         
       
@@ -1224,6 +1352,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../the-basic/serializer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
   
 
     
@@ -2080,8 +2236,6 @@
       
         
       
-        
-      
     
     
     
@@ -2217,10 +2371,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#events-and-order" class="md-nav__link">
+  <a href="#order-of-events" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Events and order
+        Order of events
       
     </span>
   </a>
@@ -2228,13 +2382,52 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cancel-an-operation" class="md-nav__link">
+  <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Cancel an operation
+        Examples
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#set-a-value-only-on-create" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Set a value only on create
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stop-an-operation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stop an operation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#do-something-after-a-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Do something after a change
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2265,17 +2458,6 @@
     <span class="md-ellipsis">
       
         Transactions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#performance" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Performance
       
     </span>
   </a>
@@ -2470,34 +2652,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../serializer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3539,10 +3693,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -3879,62 +4029,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../others/contribute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contribute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../others/mascot/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meet Doxie
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -3980,10 +4074,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#events-and-order" class="md-nav__link">
+  <a href="#order-of-events" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Events and order
+        Order of events
       
     </span>
   </a>
@@ -3991,13 +4085,52 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cancel-an-operation" class="md-nav__link">
+  <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Cancel an operation
+        Examples
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#set-a-value-only-on-create" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Set a value only on create
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stop-an-operation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stop an operation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#do-something-after-a-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Do something after a change
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -4034,17 +4167,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#performance" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Performance
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -4071,34 +4193,79 @@
 
 
 <h1 id="model-events">Model events</h1>
-<p>A model fires events when you save, delete or restore it.
-You can run your own code on these events.
-There are two ways: hooks in the model, and observer classes.</p>
+<p>A model fires events when you save, delete or restore it, and you can run your own code on them.</p>
+<p>There are two ways to listen:</p>
+<ul>
+<li><strong>Hooks</strong>: methods in the model class. Use them for code that belongs to the model, like filling a value.</li>
+<li><strong>Observers</strong>: separate classes. Use them for code that needs other services, like a mailer.</li>
+</ul>
 <h2 id="hooks-in-the-model">Hooks in the model</h2>
 <p>Override an <code>on...</code> method in the model. Then run <code>dart run build_runner build</code>.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nd">@DoxModel</span><span class="p">(</span><span class="nl">softDelete:</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">User</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">UserGenerator</span><span class="w"> </span><span class="p">{</span>
+<div class="language-dart highlight"><span class="filename">lib/app/models/post/post.model.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nd">@DoxModel</span><span class="p">()</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Post</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">PostGenerator</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">()</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">email</span><span class="p">;</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">title</span><span class="p">;</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">onCreating</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="n">email</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">email</span><span class="o">?</span><span class="p">.</span><span class="n">trim</span><span class="p">().</span><span class="n">toLowerCase</span><span class="p">();</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">onDeleted</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">AuditLog</span><span class="p">().</span><span class="n">create</span><span class="p">({</span><span class="s1">'message'</span><span class="o">:</span><span class="w"> </span><span class="s1">'user </span><span class="si">$</span><span class="n">id</span><span class="s1"> deleted'</span><span class="p">});</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">}</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">()</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">slug</span><span class="p">;</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">onSaving</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="n">slug</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">title</span><span class="o">?</span><span class="p">.</span><span class="n">trim</span><span class="p">().</span><span class="n">toLowerCase</span><span class="p">().</span><span class="n">replaceAll</span><span class="p">(</span><span class="s1">' '</span><span class="p">,</span><span class="w"> </span><span class="s1">'-'</span><span class="p">);</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="p">}</span>
 </span></code></pre></div>
-<div class="admonition info">
-<p class="admonition-title">Info</p>
-<p>The hook names start with <code>on</code> (<code>onCreating</code>, not <code>creating</code>).
-This is because <code>created</code> and <code>deleted</code> are common column names.
-Declare the hooks in the model class itself. The generator looks there.</p>
-</div>
-<h2 id="events-and-order">Events and order</h2>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Post</span><span class="p">()..</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'Hello World'</span><span class="p">;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">save</span><span class="p">();</span><span class="w"> </span><span class="c1">// onSaving runs first, so slug is 'hello-world'</span>
+</span></code></pre></div>
+<p>All hooks come in pairs: one runs before the query, one after it.</p>
+<table>
+<thead>
+<tr>
+<th>Before hook</th>
+<th>After hook</th>
+<th>Run on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>onSaving</code></td>
+<td><code>onSaved</code></td>
+<td>every <code>save()</code>: a new or a loaded model</td>
+</tr>
+<tr>
+<td><code>onCreating</code></td>
+<td><code>onCreated</code></td>
+<td><code>save()</code> or <code>create()</code> on a new model (INSERT)</td>
+</tr>
+<tr>
+<td><code>onUpdating</code></td>
+<td><code>onUpdated</code></td>
+<td><code>save()</code> on a loaded model (UPDATE)</td>
+</tr>
+<tr>
+<td><code>onDeleting</code></td>
+<td><code>onDeleted</code></td>
+<td><code>delete()</code></td>
+</tr>
+<tr>
+<td><code>onForceDeleting</code></td>
+<td><code>onForceDeleted</code></td>
+<td><code>forceDelete()</code>: really removes a soft-deleted row</td>
+</tr>
+<tr>
+<td><code>onRestoring</code></td>
+<td><code>onRestored</code></td>
+<td><code>restore()</code>: brings back a soft-deleted row</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>A <strong>before hook</strong> runs before the query. The row is not written yet. You can change values, or <a href="#stop-an-operation">cancel</a> the operation.</li>
+<li>An <strong>after hook</strong> runs after the query. The row is written, and a new model has its <code>id</code>. Use it for side effects.</li>
+<li>Declare the hooks in the model class itself. The generator looks there.</li>
+</ul>
+<h2 id="order-of-events">Order of events</h2>
 <table>
 <thead>
 <tr>
@@ -4133,73 +4300,152 @@ Declare the hooks in the model class itself. The generator looks there.</p>
 </tr>
 </tbody>
 </table>
-<p>The model hook runs first. Then the observers run, in the order you added them.</p>
+<ul>
+<li>The model hook runs first. Then the observers run, in the order you added them.</li>
+<li>When a model has events, <code>create({...})</code> saves only the <code>@Column</code> fields.</li>
+</ul>
 <div class="admonition warning">
 <p class="admonition-title">Query updates and deletes fire no events</p>
-<p>Events fire only on a model instance.
-<code>User().where('active', false).update({...})</code>, <code>User().where(...).delete()</code>
-and <code>insertMultiple()</code> run one query and fire no events. This is the same as Laravel.</p>
+<p>Events fire only on one model instance.
+<code>Post().where('draft', true).update({...})</code>, <code>Post().where(...).delete()</code>
+and <code>insertMultiple()</code> run one query and fire no events.</p>
 </div>
-<h2 id="cancel-an-operation">Cancel an operation</h2>
-<p>Throw <code>CancelModelEvent</code> in a "before" event
-(<code>saving</code>, <code>creating</code>, <code>updating</code>, <code>deleting</code>, <code>forceDeleting</code>, <code>restoring</code>).
-The query does not run. <code>save()</code>, <code>delete()</code>, <code>forceDelete()</code> and <code>restore()</code> return <code>false</code>.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nd">@override</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">onDeleting</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">isAdmin</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="n">CancelModelEvent</span><span class="p">(</span><span class="s1">'admins can not be deleted'</span><span class="p">);</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">}</span>
+<h2 id="examples">Examples</h2>
+<h3 id="set-a-value-only-on-create">Set a value only on create</h3>
+<p><code>onCreating</code> runs only for a new row. Updates do not change the value again.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nd">@override</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">onCreating</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="n">status</span><span class="w"> </span><span class="o">??=</span><span class="w"> </span><span class="s1">'draft'</span><span class="p">;</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="n">publicId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Uuid</span><span class="p">().</span><span class="n">v4</span><span class="p">();</span><span class="w"> </span><span class="c1">// from package:uuid</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">}</span>
 </span></code></pre></div>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">deleted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">delete</span><span class="p">();</span><span class="w"> </span><span class="c1">// false</span>
+<h3 id="stop-an-operation">Stop an operation</h3>
+<p>Throw <code>CancelModelEvent</code> in a before hook. The query does not run, and the call returns <code>false</code>.</p>
+<div class="language-dart highlight"><span class="filename">lib/app/models/post/post.model.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nd">@override</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">onDeleting</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'published'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="n">CancelModelEvent</span><span class="p">(</span><span class="s1">'unpublish the post first'</span><span class="p">);</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>create({...})</code> returns the unsaved model (its <code>id</code> is <code>null</code>) when an event cancels it.
-Any other error from a hook is thrown to the caller.</p>
+<div class="language-dart highlight"><span class="filename">lib/app/http/controllers/post.controller.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">destroy</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="n">Post</span><span class="o">?</span><span class="w"> </span><span class="n">post</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Post</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">post</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="n">NotFoundHttpException</span><span class="p">();</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">deleted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">delete</span><span class="p">();</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">deleted</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="n">BadRequestException</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Unpublish the post first'</span><span class="p">);</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'message'</span><span class="o">:</span><span class="w"> </span><span class="s1">'deleted'</span><span class="p">};</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li><code>save()</code>, <code>delete()</code>, <code>forceDelete()</code> and <code>restore()</code> return <code>false</code> when a hook cancels.</li>
+<li><code>create({...})</code> returns the unsaved model. Its <code>id</code> is <code>null</code>.</li>
+<li>Any other error from a hook is thrown to the caller.</li>
+</ul>
+<h3 id="do-something-after-a-change">Do something after a change</h3>
+<p>After hooks are for side effects. The row is already in the database.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nd">@override</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">onSaved</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">forget</span><span class="p">(</span><span class="s1">'post:</span><span class="si">$</span><span class="n">id</span><span class="s1">'</span><span class="p">);</span><span class="w"> </span><span class="c1">// the next read gets the new data</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">}</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="nd">@override</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">onDeleted</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">coverPath</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">delete</span><span class="p">(</span><span class="n">coverPath</span><span class="o">!</span><span class="p">);</span><span class="w"> </span><span class="c1">// remove the file of the post</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="p">}</span>
+</span></code></pre></div>
 <h2 id="observers">Observers</h2>
 <p>An observer is a class that listens to one model.
-Override only the methods you need. Each method gets the model.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">UserObserver</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ModelObserver</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">Mailer</span><span class="w"> </span><span class="n">mailer</span><span class="p">;</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="n">UserObserver</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">mailer</span><span class="p">);</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">onCreated</span><span class="p">(</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">mailer</span><span class="p">.</span><span class="n">sendWelcome</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">email</span><span class="o">!</span><span class="p">);</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="p">}</span>
+Use it when the code needs other objects, like a mailer, or when you do not want it in the model.</p>
+<p>The methods have the same names as the hooks. Each one gets the model. Override only the ones you need.</p>
+<table>
+<thead>
+<tr>
+<th>Before method</th>
+<th>After method</th>
+<th>Run on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>onSaving(T model)</code></td>
+<td><code>onSaved(T model)</code></td>
+<td>every <code>save()</code>: a new or a loaded model</td>
+</tr>
+<tr>
+<td><code>onCreating(T model)</code></td>
+<td><code>onCreated(T model)</code></td>
+<td><code>save()</code> or <code>create()</code> on a new model (INSERT)</td>
+</tr>
+<tr>
+<td><code>onUpdating(T model)</code></td>
+<td><code>onUpdated(T model)</code></td>
+<td><code>save()</code> on a loaded model (UPDATE)</td>
+</tr>
+<tr>
+<td><code>onDeleting(T model)</code></td>
+<td><code>onDeleted(T model)</code></td>
+<td><code>delete()</code></td>
+</tr>
+<tr>
+<td><code>onForceDeleting(T model)</code></td>
+<td><code>onForceDeleted(T model)</code></td>
+<td><code>forceDelete()</code></td>
+</tr>
+<tr>
+<td><code>onRestoring(T model)</code></td>
+<td><code>onRestored(T model)</code></td>
+<td><code>restore()</code></td>
+</tr>
+</tbody>
+</table>
+<p>A before method can stop the operation with <code>CancelModelEvent</code>, like a before hook.</p>
+<div class="language-dart highlight"><span class="filename">lib/app/observers/user.observer.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">UserObserver</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ModelObserver</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">Mailer</span><span class="w"> </span><span class="n">mailer</span><span class="p">;</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="n">UserObserver</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">mailer</span><span class="p">);</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">onCreated</span><span class="p">(</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">mailer</span><span class="p">.</span><span class="n">sendWelcome</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">email</span><span class="o">!</span><span class="p">);</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Add it once, for example when the app starts:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">Model</span><span class="p">.</span><span class="n">observe</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="p">(</span><span class="n">UserObserver</span><span class="p">(</span><span class="n">mailer</span><span class="p">));</span>
+<p>Add it in the <code>setup()</code> of a <a href="../../../digging-deeper/services/">service</a>.
+Observers live in memory, and each isolate has its own memory, so every isolate must add them.</p>
+<div class="language-dart highlight"><span class="filename">lib/services/observer_service.dart</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ObserverService</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">DoxService</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="n">Model</span><span class="p">.</span><span class="n">observe</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="p">(</span><span class="n">UserObserver</span><span class="p">(</span><span class="n">Mailer</span><span class="p">()));</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="p">}</span>
 </span></code></pre></div>
+<p>Then add <code>ObserverService()</code> to the list in <code>lib/config/services.dart</code>.</p>
 <ul>
 <li>You can add more than one observer to a model.</li>
 <li><code>Model.forgetObservers&lt;User&gt;()</code> removes the observers of <code>User</code>. <code>Model.forgetObservers()</code> removes all.</li>
 </ul>
 <h2 id="skip-events">Skip events</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">saveQuietly</span><span class="p">();</span><span class="w"> </span><span class="c1">// save without events</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">Model</span><span class="p">.</span><span class="n">withoutEvents</span><span class="p">(()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">delete</span><span class="p">();</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="p">});</span>
+<p>Use this for imports, seed data or tests.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">saveQuietly</span><span class="p">();</span><span class="w"> </span><span class="c1">// save without events</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">Model</span><span class="p">.</span><span class="n">withoutEvents</span><span class="p">(()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">delete</span><span class="p">();</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">});</span>
 </span></code></pre></div>
 <h2 id="transactions">Transactions</h2>
-<p>Hooks run inside the transaction of the caller.
-<code>save()</code> does <strong>not</strong> start a transaction by itself.</p>
-<ul>
-<li>If an "after" hook (<code>created</code>, <code>saved</code>, ...) throws, the row is already written.</li>
-<li>To undo the row when a hook fails, wrap the call in <a href="../../transactions/"><code>QueryBuilder.transaction()</code></a>:</li>
-</ul>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">transaction</span><span class="p">(()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">save</span><span class="p">();</span><span class="w"> </span><span class="c1">// if onCreated() throws, the INSERT is rolled back</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="p">});</span>
+<p><code>save()</code> does <strong>not</strong> start a transaction. If an after hook throws, the row stays written.
+To undo the row when a hook fails, wrap the call in <a href="../../transactions/"><code>QueryBuilder.transaction()</code></a>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">transaction</span><span class="p">(()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">save</span><span class="p">();</span><span class="w"> </span><span class="c1">// if onCreated() throws, the INSERT is rolled back</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="p">});</span>
 </span></code></pre></div>
-<h2 id="performance">Performance</h2>
-<ul>
-<li>There is no reflection. The generator sets <code>hasModelHooks</code> only for models that declare a hook.</li>
-<li>A model with no hooks and no observers does no event work. It is one <code>bool</code> check, plus one map lookup when some other model has observers.</li>
-<li>When a model has events, <code>create({...})</code> fills a model with <code>fromMap()</code> and calls <code>save()</code>.
-  Only the <code>@Column</code> fields are saved then.</li>
-</ul>
+<p>A model with no hooks and no observers does no event work.</p>
 
 
 

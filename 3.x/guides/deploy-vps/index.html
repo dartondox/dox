@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
   
@@ -519,6 +519,8 @@
       
         
       
+        
+      
     
     
     
@@ -582,7 +584,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/installation/" class="md-nav__link">
+      <a href="../../getting-started/installation/" class="md-nav__link">
         
   
   
@@ -1074,6 +1076,130 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1089,6 +1215,8 @@
   
     
     
+      
+        
       
         
       
@@ -1224,6 +1352,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/serializer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
   
 
     
@@ -2075,8 +2231,6 @@
       
         
       
-        
-      
     
     
     
@@ -2340,34 +2494,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../database/model/serializer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3594,10 +3720,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -3934,62 +4056,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/contribute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contribute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/mascot/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meet Doxie
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -4210,10 +4276,8 @@ So build it inside the <code>dart:stable</code> image (it is Debian):</p>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>  db/                                the migrations
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>  .env.example
 </span></code></pre></div>
-<p>The container shares your project folder. It writes Linux paths into <code>.dart_tool/</code>.
-So run <code>dart pub get</code> on your machine again before you use <code>dox serve</code>.</p>
-<p>Keep <code>bin/</code> and <code>lib/</code> together. The binary loads the libraries from <code>../lib</code>.
-See <a href="../../digging-deeper/deployment/#build">Deployment</a> for more about the bundle.</p>
+<p>The container writes Linux paths into your <code>.dart_tool/</code>. So run <code>dart pub get</code> on your machine again before you use <code>dox serve</code>.</p>
+<p>Keep <code>bin/</code> and <code>lib/</code> together. The binary loads the libraries from <code>../lib</code>. See <a href="../../digging-deeper/deployment/#build">Deployment</a>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Match the CPU of the server</p>
 <p>Docker builds for the CPU of your machine. On a Mac with Apple silicon that is <code>arm64</code>.
@@ -4279,8 +4343,7 @@ Or set one <code>DATABASE_URL</code>, like <code>postgres://app:secret@localhost
 See <a href="../environments/">Environments</a> for all keys.</p>
 <div class="admonition note">
 <p class="admonition-title">Which value wins</p>
-<p><code>Env.get()</code> reads a real environment variable first. It reads the <code>.env</code> file in the working folder only when the variable is not set.
-systemd gives the app the lines of <code>EnvironmentFile</code> as real environment variables.
+<p>systemd passes <code>EnvironmentFile</code> as real environment variables, and those win over a <code>.env</code> file.
 So <code>/etc/blog.env</code> wins over a <code>/opt/blog/.env</code>. Do not put a <code>.env</code> in <code>/opt/blog</code>, so there is only one place to look.</p>
 </div>
 <h2 id="5-write-the-systemd-unit">5. Write the systemd unit</h2>
@@ -4323,8 +4386,7 @@ So <code>/etc/blog.env</code> wins over a <code>/opt/blog/.env</code>. Do not pu
 <p>Caddy runs on the same machine. So let Dox listen on <code>127.0.0.1</code> only. Add this line to <code>/etc/blog.env</code>:</p>
 <div class="language-ini highlight"><span class="filename">/etc/blog.env</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="na">APP_HOST</span><span class="o">=</span><span class="s">127.0.0.1</span>
 </span></code></pre></div>
-<p>Now only programs on this machine can reach port <code>3000</code>.
-Also turn on a firewall, so only SSH, HTTP and HTTPS are open:</p>
+<p>Now only programs on this machine can reach port <code>3000</code>. Also turn on a firewall, so only SSH, HTTP and HTTPS are open:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>sudo<span class="w"> </span>ufw<span class="w"> </span>default<span class="w"> </span>deny<span class="w"> </span>incoming
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>sudo<span class="w"> </span>ufw<span class="w"> </span>allow<span class="w"> </span>OpenSSH
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>sudo<span class="w"> </span>ufw<span class="w"> </span>allow<span class="w"> </span><span class="m">80</span>/tcp
@@ -4401,8 +4463,7 @@ Build and copy again after this change (steps 1 and 3). See <a href="../../diggi
 <p>To go back: copy <code>/opt/blog.prev</code> to <code>/opt/blog</code> and restart. A migration that already ran is not undone.</p>
 <div class="admonition note">
 <p class="admonition-title">A restart is short, but not zero</p>
-<p>A restart takes about one second. Dox does not wait for open requests when it stops, so a request that is running at that moment fails.
-New requests do not fail: <code>lb_try_duration</code> makes Caddy wait for the app to come back.
+<p>A restart takes about one second. New requests do not fail: <code>lb_try_duration</code> makes Caddy wait for the app to come back.
 For a real zero-downtime update, run two copies on two ports and list both in Caddy. See <a href="../../digging-deeper/deployment/#many-processes-or-machines">Deployment: many processes</a>.</p>
 </div>
 <h2 id="see-also">See also</h2>

@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
   
@@ -517,6 +517,8 @@
       
         
       
+        
+      
     
     
     
@@ -580,7 +582,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/installation/" class="md-nav__link">
+      <a href="../../getting-started/installation/" class="md-nav__link">
         
   
   
@@ -1072,6 +1074,130 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1087,6 +1213,8 @@
   
     
     
+      
+        
       
         
       
@@ -1222,6 +1350,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/serializer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
   
 
     
@@ -2073,8 +2229,6 @@
       
         
       
-        
-      
     
     
     
@@ -2338,34 +2492,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../database/model/serializer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3606,10 +3732,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -3933,62 +4055,6 @@
     
   
     Changelog
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/contribute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contribute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/mascot/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meet Doxie
   
 
     
@@ -4450,12 +4516,12 @@ It returns <code>null</code> when the password is not a <code>String</code>, whe
 <tr>
 <td><code>hashRounds</code></td>
 <td><code>10</code></td>
-<td>the bcrypt cost of your stored hashes. Set it to the same value as <code>Hash.rounds</code>, so an unknown email takes as long as a wrong password</td>
+<td>the bcrypt cost of your stored hashes. Use the same value as <code>Hash.rounds</code></td>
 </tr>
 <tr>
 <td><code>userCacheTtl</code></td>
 <td><code>null</code> (off)</td>
-<td>keep the user of a token in memory for this time, so a request does not load the user from the database. See below</td>
+<td>keep the user of a token in memory for this time. See below</td>
 </tr>
 </tbody>
 </table>
@@ -4486,12 +4552,12 @@ So a token from the <code>web</code> guard does not work on the <code>admin</cod
 An unknown guard name throws an <code>ArgumentError</code>.</p>
 <h2 id="things-to-know">Things to know</h2>
 <ul>
-<li><strong>The token is not secret.</strong> Its payload is <code>user.toJson()</code>. Anyone with the token can read it. Keep private columns in <code>hidden</code>.</li>
-<li><strong>You can not cancel one token.</strong> There is no token list on the server. A token works until it expires. If you change the <code>secret</code> (your <code>APP_KEY</code>), all tokens stop working.</li>
-<li><strong>The user is loaded on each request.</strong> <code>AuthMiddleware</code> reads the user id from the token and runs <code>find(id)</code>. A deleted user can not log in, even with a valid token.</li>
-<li><strong><code>userCacheTtl</code> skips that query.</strong> With <code>userCacheTtl: Duration(seconds: 30)</code> the user is kept in memory for 30 seconds. A deleted or changed user is seen only after that time. Each server isolate has its own cache. Requests in that time get the same user object, so do not change it per request.</li>
-<li><strong>Login does not block the server.</strong> <code>attempt</code> runs bcrypt in another isolate, so other requests are served while a password is checked.</li>
-<li><strong>Hash passwords</strong> with <code>Hash.make()</code> before you save them. See <a href="../hashing/">Hashing</a>.</li>
+<li><strong>The token is not secret.</strong> Anyone with the token can read <code>user.toJson()</code>. Keep private columns in <code>hidden</code>.</li>
+<li><strong>You can not cancel one token.</strong> A token works until it expires. If you change the <code>secret</code> (your <code>APP_KEY</code>), all tokens stop working.</li>
+<li><strong>The user is loaded on each request</strong>, by the id in the token. A deleted user can not log in, even with a valid token.</li>
+<li><strong><code>userCacheTtl</code> skips that query.</strong> With <code>Duration(seconds: 30)</code>, a deleted or changed user is seen only after 30 seconds. Each isolate has its own cache. Requests in that time share one user object, so do not change it per request.</li>
+<li><strong>Login does not block the server.</strong> <code>attempt</code> runs bcrypt in another isolate.</li>
+<li><strong>Hash passwords</strong> before you save them. See <a href="../hashing/">Hashing</a>.</li>
 </ul>
 
 

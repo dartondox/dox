@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
   
@@ -518,6 +518,8 @@
       
         
       
+        
+      
     
     
     
@@ -581,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/installation/" class="md-nav__link">
+      <a href="../../getting-started/installation/" class="md-nav__link">
         
   
   
@@ -1073,6 +1075,130 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1088,6 +1214,8 @@
   
     
     
+      
+        
       
         
       
@@ -1223,6 +1351,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/serializer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
   
 
     
@@ -2218,8 +2374,6 @@
       
         
       
-        
-      
     
     
     
@@ -2483,34 +2637,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../database/model/serializer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3552,10 +3678,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -3892,62 +4014,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/contribute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contribute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/mascot/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meet Doxie
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -4110,7 +4176,6 @@ instead of 16 MB) and starts slower. Always build an AOT binary for
 production.</p>
 </div>
 <h2 id="build">Build</h2>
-<p>Compile the app to a native binary (AOT).</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>build
 </span></code></pre></div>
 <p>This makes a <code>build/bundle/</code> folder:</p>
@@ -4140,7 +4205,7 @@ production.</p>
 </tr>
 </tbody>
 </table>
-<p><code>dox build</code> runs <code>build_runner</code> first (when your app uses it). Then it runs
+<p><code>dox build</code> runs <code>build_runner</code> (when your app uses it), then
 <code>dart build cli --target bin/server.dart --output build</code>. It exits with code 1
 when a step fails, so CI can stop.</p>
 <div class="admonition warning">
@@ -4150,7 +4215,7 @@ when a step fails, so CI can stop.</p>
 <code>dart build cli</code> is the same AOT compiler and runs the hooks.
 Keep <code>bin/</code> and <code>lib/</code> together: the binary loads the libraries from <code>../lib</code>.</p>
 </div>
-<p>Start the application.</p>
+<p>Start it:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">cd</span><span class="w"> </span>build/bundle
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>./bin/server
 </span></code></pre></div>
@@ -4159,14 +4224,7 @@ A real environment variable wins over the <code>.env</code> file.</p>
 <p>A new Dox app runs the migrations in <code>bin/server.dart</code>, before the server starts.
 So the database is up to date when the first request comes in.</p>
 <h2 id="docker">Docker</h2>
-<p>The <code>Dockerfile</code> in a new Dox app is a multi-stage build:</p>
-<ol>
-<li>The <code>dart:stable</code> image builds the AOT bundle with
-   <code>dart build cli --target bin/server.dart --output build</code>.</li>
-<li>The final image is <code>FROM scratch</code>. It holds only the Dart AOT runtime
-   files (<code>/runtime/</code> from the dart image), the bundle (<code>/app/bin/server</code> and
-   <code>/app/lib/</code>), <code>db/</code> and an empty <code>/tmp</code>.</li>
-</ol>
+<p>A new Dox app has this multi-stage <code>Dockerfile</code>. The final image is <code>FROM scratch</code>: only the Dart AOT runtime, the bundle, <code>db/</code> and an empty <code>/tmp</code>.</p>
 <div class="language-dockerfile highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">FROM</span><span class="w"> </span><span class="s">dart:stable</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">build</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">COPY</span><span class="w"> </span>pubspec.*<span class="w"> </span>./
@@ -4188,7 +4246,7 @@ So the database is up to date when the first request comes in.</p>
 </span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">"/app/bin/server"</span><span class="p">]</span>
 </span></code></pre></div>
 <p>The image has no <code>.env</code> file, so secrets stay out of it. Pass config as
-environment variables.</p>
+environment variables:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>my-app<span class="w"> </span>.
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>docker<span class="w"> </span>run<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span>:3000<span class="w"> </span>-e<span class="w"> </span><span class="nv">APP_PORT</span><span class="o">=</span><span class="m">3000</span><span class="w"> </span>-e<span class="w"> </span><span class="nv">APP_KEY</span><span class="o">=</span>...<span class="w"> </span>-e<span class="w"> </span><span class="nv">DB_HOST</span><span class="o">=</span>...<span class="w"> </span>my-app
 </span></code></pre></div>
@@ -4198,7 +4256,6 @@ environment variables.</p>
 Dart SDK issue). Dox has no <code>bindSecure</code>.</p>
 <p>Run Dox on plain HTTP on a private port. Put <a href="https://caddyserver.com">Caddy</a>
 or nginx in front of it. The proxy does TLS, HTTP/2 and gzip.</p>
-<p>The whole setup looks like this:</p>
 <pre class="mermaid"><code>flowchart LR
     C["Client"] --&gt;|HTTPS| X["Caddy or nginx&lt;br&gt;TLS, HTTP/2, gzip, body size limit"]
     X --&gt;|"plain HTTP on 127.0.0.1:3000"| D["Dox binary&lt;br&gt;bin/server, one isolate per core"]
@@ -4280,13 +4337,10 @@ real client:</p>
 </span><span id="__span-6-46"><a id="__codelineno-6-46" name="__codelineno-6-46" href="#__codelineno-6-46"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="keep-it-running">Keep it running</h2>
-<p>Dox uses all CPU cores by default (see <a href="../isolate/">Isolate</a>).</p>
-<ul>
-<li>When a worker isolate dies, Dox prints the error and starts it again.</li>
-<li>When the main isolate dies, the process exits with a non-zero code.
-  Let a supervisor restart it: <code>restart: unless-stopped</code> in Docker compose,
-  or <code>Restart=always</code> in systemd.</li>
-</ul>
+<p>When a worker isolate dies, Dox starts it again. When the main isolate dies,
+the process exits with a non-zero code (see <a href="../isolate/#when-an-isolate-crashes">Isolate</a>).
+Let a supervisor restart it: <code>restart: unless-stopped</code> in Docker compose,
+or <code>Restart=always</code> in systemd.</p>
 <div class="language-ini highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># /etc/systemd/system/dox.service</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">[Service]</span>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="na">WorkingDirectory</span><span class="o">=</span><span class="s">/srv/app/build/bundle</span>

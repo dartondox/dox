@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
   
@@ -518,6 +518,8 @@
       
         
       
+        
+      
     
     
     
@@ -581,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/installation/" class="md-nav__link">
+      <a href="../../getting-started/installation/" class="md-nav__link">
         
   
   
@@ -1073,6 +1075,130 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/mascot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meet Doxie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1088,6 +1214,8 @@
   
     
     
+      
+        
       
         
       
@@ -1223,6 +1351,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/serializer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
   
 
     
@@ -2074,8 +2230,6 @@
       
         
       
-        
-      
     
     
     
@@ -2339,34 +2493,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../database/model/serializer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3557,10 +3683,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -3884,62 +4006,6 @@
     
   
     Changelog
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/contribute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contribute
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../others/mascot/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meet Doxie
   
 
     
@@ -4407,7 +4473,8 @@ Any other error is written to stderr. The client only gets <code>{"message": "In
 <li><code>cors</code> with a list of origins: a websocket from another origin gets 403. A request with no <code>Origin</code> header (not a browser) is allowed.</li>
 <li><code>cors: null</code>, or <code>*</code> in <code>origins</code>: websockets from any origin are allowed. If you log users in with cookies, list your origins.</li>
 <li><code>*</code> together with <code>credentials: true</code> throws an <code>ArgumentError</code>. List your origins instead.</li>
-<li>Websocket compression is off. On the native server, Rust checks the size of each message (<code>maxHttpBufferSize</code>) before Dart reads it. A bigger one closes with code 1009. On a plain <code>dart:io</code> server (<code>io.attach</code>), <code>dart:io</code> reads the whole message first, so also set a size limit in your proxy.</li>
+<li>Websocket compression is off. A message bigger than <code>maxHttpBufferSize</code> closes with code 1009.</li>
+<li>On a plain <code>dart:io</code> server (<code>io.attach</code>), the whole message is read before the size check. Also set a size limit in your proxy.</li>
 </ul>
 <h2 id="many-servers-redis-adapter">Many servers: Redis adapter</h2>
 <p>With more than one server process, use the Redis adapter.
@@ -4428,8 +4495,7 @@ Then a broadcast on one server reaches the clients of all servers.</p>
   To act on all servers, use an <a href="#emit-from-other-programs">emitter</a>.</li>
 <li>Broadcast acks from other servers: Dox clients get the event, but their acks are not sent back.</li>
 <li><code>serverSideEmit</code> from other servers is ignored.</li>
-<li>Long-polling needs sticky sessions when many servers share one port.
-  If you can not have them, use <code>transports: ['websocket']</code> on the client.</li>
+<li>Long-polling needs sticky sessions, the same as with <a href="#in-a-dox-app-same-port-as-http">many isolates</a>. Or use <code>transports: ['websocket']</code> on the client.</li>
 </ul>
 <h2 id="emit-from-other-programs">Emit from other programs</h2>
 <p>An emitter sends events to your clients without a Socket.IO server.
