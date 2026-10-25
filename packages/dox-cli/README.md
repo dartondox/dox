@@ -35,9 +35,12 @@ dox s                        # dev server, restarts when a file changes
 | `dox create <name>` | create a new project |
 | `dox serve` (or `dox s`) | start the dev server with `build_runner watch` |
 | `dox build` | build the native (AOT) bundle into `build/bundle` |
-| `dox create:controller <name> [-r]` | create a controller |
-| `dox create:model <name> [-m]` | create a model, and with `-m` its migration |
-| `dox create:dto <name>` | create a DTO (typed, checked input) |
+| `dox make:controller <name> [-r]` | create a controller |
+| `dox make:model <name> [-m]` | create a model, and with `-m` its migration |
+| `dox make:dto <name>` | create a DTO (typed, checked input) |
+| `dox make:job <name>` | create a queue job |
+| `dox queue:work` | run the queue worker (also `queue:failed`, `queue:retry`, `queue:forget`, `queue:flush`) |
+| `dox schedule:work` | run the scheduler (also `schedule:run`, `schedule:list`, `schedule:test`) |
 | `dox make:migration <name> [--sql]` | create a Dart or SQL migration |
 | `dox migration:run` (or `dox migrate`) | run new migrations |
 | `dox migration:rollback [--step=N]` | undo the last batch, or the last N migrations |

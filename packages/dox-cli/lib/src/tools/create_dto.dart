@@ -21,7 +21,7 @@ class $className {
 ''';
 }
 
-/// `dox create:dto CreateBlog` makes
+/// `dox make:dto CreateBlog` makes
 /// `lib/app/http/dtos/create_blog.dto.dart`.
 bool createDto(String filename) {
   filename = pascalToSnake(filename).replaceAll(RegExp(r'_?dto$'), '');

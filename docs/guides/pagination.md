@@ -4,7 +4,7 @@ Make a list route that takes `page` and `per_page` from the query string and ret
 
 ## What you need
 
-- A Dox app with a database and a `User` model (`dox create:model User -m`).
+- A Dox app with a database and a `User` model (`dox make:model User -m`).
 - `build_runner` for the DTO.
 
 ## 1. Write the query DTO

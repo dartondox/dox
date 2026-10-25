@@ -240,9 +240,9 @@ Printed to stderr. The connection or the request fails, the app keeps running.
 | `Could not find a command named "<name>". Run `dox help` for more information.` | Unknown command. | Check the spelling. |
 | `Invalid number of arguments for command "<name>".` | Too few or too many arguments. | Run `dox help <name>`. |
 | `Command "<name>" not found.` | `dox help <name>` with an unknown command. | Run `dox help`. |
-| `<name> already exists` | A `create:*` file is already there. | Pick another name, or delete the file. |
+| `<name> already exists` | A `make:*` file is already there. | Pick another name, or delete the file. |
 | `Folder name "<name>" already exist` | `dox create` into a folder that exists. | Pick another name. |
-| `Invalid option <x>, use -m or --migration` | `dox create:model` with another option. | Use `-m`. |
+| `Invalid option <x>, use -m or --migration` | `dox make:model` with another option. | Use `-m`. |
 | `Invalid option <x>, use --step=<count>` | `dox migration:rollback` with another option. | Use `--step=2`. |
 | `db/migration has Dart migrations, but bin/migrate.dart is missing. ...` | Dart migrations but no entry file. | Run `dox make:migration <name>` once. |
 | `Skip <file>: no class that extends Migration.` | A Dart file in `db/migration` has no migration class. | Add `class X extends Migration`, or move the file. |

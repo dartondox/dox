@@ -5,7 +5,7 @@ This step checks the input of create and update with a `@Dto` class. Bad input g
 ## 1. Make the DTO
 
 ```bash
-dox create:dto SavePost
+dox make:dto SavePost
 ```
 
 One class is enough for create and update, because both need the same fields.

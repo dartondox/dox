@@ -12,7 +12,8 @@ Rules that apply to every command:
 - An unknown command prints `Could not find a command named "<name>".`
 - Too few or too many arguments prints `Invalid number of arguments for command "<name>".` with the expected count.
 - A name you pass is turned into `snake_case` for the file and `PascalCase` for the class. `BlogPost` and `blog_post` give the same result.
-- A `create:*` command does not overwrite. When the file exists it prints `<name> already exists` and stops.
+- Every `make:*` command also answers to its `create:*` name, like `create:model`. `dox help <command>` shows the aliases.
+- A `make:*` command does not overwrite. When the file exists it prints `<name> already exists` and stops.
 
 ## Project
 
@@ -190,11 +191,13 @@ Without a command: lists every command by category. With a command: prints its u
 
 ## Create files
 
-### `dox create:controller`
+### `dox make:controller`
 
 ```
-dox create:controller <name> [-r]
+dox make:controller <name> [-r]
 ```
+
+Alias: `create:controller`. The other `make:*` commands below have the same kind of alias.
 
 | Option | Meaning |
 | --- | --- |
@@ -210,10 +213,10 @@ A trailing `Controller` in the name is removed: `UserController` and `User` give
 The class has `@Inject()`, so the container makes it. A comment shows the route to add, like `Route.get<BlogController>('path', (BlogController c) => c.index);`.
 After the file is made, the CLI tells you to run `dart run build_runner build`. That adds the controller to `lib/container.g.dart`.
 
-### `dox create:middleware`
+### `dox make:middleware`
 
 ```
-dox create:middleware <name>
+dox make:middleware <name>
 ```
 
 Writes `lib/app/http/middleware/<name>.middleware.dart`: a class `<Name>Middleware extends IDoxMiddleware` with a `handle(IDoxRequest req)` that returns `req`.
@@ -221,10 +224,10 @@ A trailing `Middleware` in the name is removed.
 
 Template: `_getSample` in `packages/dox-cli/lib/src/tools/create_middleware.dart`.
 
-### `dox create:dto`
+### `dox make:dto`
 
 ```
-dox create:dto <name>
+dox make:dto <name>
 ```
 
 Writes `lib/app/http/dtos/<name>.dto.dart`: a `@Dto()` class with one `name` field and `part '<name>.dto.g.dart';`.
@@ -232,10 +235,10 @@ A trailing `Dto` in the name is removed. Prints `Run `dox build_runner:build` to
 
 Template: `_getSample` in `packages/dox-cli/lib/src/tools/create_dto.dart`.
 
-### `dox create:serializer`
+### `dox make:serializer`
 
 ```
-dox create:serializer <name>
+dox make:serializer <name>
 ```
 
 Writes `lib/app/http/serializers/<name>.serializer.dart`: a class `<Name>Serializer extends Serializer<<Name>>`. It imports the model from `lib/app/models/<name>/<name>.model.dart`.
@@ -243,11 +246,11 @@ A trailing `Serializer` in the name is removed.
 
 Template: `_getSample` in `packages/dox-cli/lib/src/tools/create_serializer.dart`.
 
-### `dox create:model`
+### `dox make:model`
 
 ```
-dox create:model <name> [-m|--migration]
 dox make:model <name> [-m|--migration]
+dox create:model <name> [-m|--migration]
 ```
 
 Writes `lib/app/models/<name>/<name>.model.dart`: a `@DoxModel()` class with `part '<name>.model.g.dart';`.
@@ -320,20 +323,99 @@ A failed run prints the error and sets exit code 1.
 
 Templates: `createFactory` in `packages/dox-cli/lib/src/tools/create_factory.dart`, and `createSeeder` and `seedEntrySource` in `packages/dox-cli/lib/src/tools/create_seeder.dart`.
 
+## Queue
+
+These commands run the app script `bin/queue.dart` with `dart run`. The script comes from the `dox_queue` package. `dox make:job` makes it when it is missing.
+Input, output and errors go straight to your terminal. `Ctrl+C` (SIGINT) and SIGTERM are sent on to the script, so a worker can finish its job and stop. The exit code of the script is the exit code of `dox`.
+When `bin/queue.dart` is missing, the command prints how to set it up and exits with code 1.
+
+| Command | Runs | What it does |
+| --- | --- | --- |
+| `dox make:job <name>` | | Make `lib/app/jobs/<name>.job.dart` with a `@Job()` class that extends `DoxJob`. Make `bin/queue.dart` when it is missing. Print a hint to add `dox_queue` to `pubspec.yaml` and to run `dox build_runner:build`. |
+| `dox queue:work [flags]` | `bin/queue.dart work [flags]` | Run the worker. |
+| `dox queue:failed` | `bin/queue.dart failed` | List the failed jobs. |
+| `dox queue:retry <id\|all>` | `bin/queue.dart retry <id\|all>` | Put one failed job, or all of them, back on the queue. |
+| `dox queue:forget <id>` | `bin/queue.dart forget <id>` | Delete one failed job. |
+| `dox queue:flush` | `bin/queue.dart flush` | Delete all failed jobs. |
+
+Flags of `queue:work`, passed on as they are:
+
+| Flag | Meaning |
+| --- | --- |
+| `--queue=a,b` | The queues to read, in this order. |
+| `--concurrency=N` | How many jobs run at the same time. |
+| `--once` | Run one job, then stop. |
+| `--tries=N` | How many times a job may run before it is marked as failed. |
+| `--timeout=S` | Seconds a job may run. |
+| `--sleep=S` | Seconds to wait when the queue is empty. |
+| `--stop-when-empty` | Stop when the queue is empty. |
+
+The `bin/queue.dart` that `make:job` writes (`<app>` is the `name` in `pubspec.yaml`):
+
+```dart
+import 'dart:io';
+
+import 'package:dox_queue/dox_queue.dart';
+import 'package:<app>/config/app.dart';
+import 'package:<app>/jobs.g.dart';
+
+Future<void> main(List<String> args) async {
+  exitCode = await QueueWorker(jobs: jobRegistry, app: appConfig).run(args);
+}
+```
+
+Templates: `createJob` and `queueEntrySource` in `packages/dox-cli/lib/src/tools/create_job.dart`.
+
+## Schedule
+
+These commands run the app script `bin/schedule.dart` with `dart run`. They pass the signals, the terminal and the exit code the same way as the queue commands.
+When `bin/schedule.dart` is missing, the command prints how to set it up and exits with code 1.
+
+| Command | Runs | What it does |
+| --- | --- | --- |
+| `dox schedule:work` | `bin/schedule.dart work` | Run the scheduler and keep it running. |
+| `dox schedule:run` | `bin/schedule.dart run` | Run the tasks that are due now, once. |
+| `dox schedule:list` | `bin/schedule.dart list` | List the scheduled tasks. |
+| `dox schedule:test <name>` | `bin/schedule.dart test <name>` | Run one task now. |
+
+To set it up, add `dox_scheduler` to `pubspec.yaml`, then make two small files.
+The exact names come from the `dox_scheduler` package. This is the shape:
+
+```dart
+// lib/config/schedule.dart
+import 'package:dox_scheduler/dox_scheduler.dart';
+
+final Schedule schedule = Schedule()
+  ..call('report', () async {/* your task */}).dailyAt('02:00');
+```
+
+```dart
+// bin/schedule.dart
+import 'dart:io';
+
+import 'package:dox_scheduler/dox_scheduler.dart';
+import 'package:<app>/config/app.dart';
+import 'package:<app>/config/schedule.dart';
+
+Future<void> main(List<String> args) async {
+  exitCode = await ScheduleRunner(schedule: schedule, app: appConfig).run(args);
+}
+```
+
 ## Command list
 
 | Command | Aliases | Category |
 | --- | --- | --- |
 | `create` | | Project |
 | `serve` | `server`, `s` | Development |
-| `create:controller` | | Development |
-| `create:middleware` | | Development |
-| `create:dto` | | Development |
+| `make:controller` | `create:controller` | Development |
+| `make:middleware` | `create:middleware` | Development |
+| `make:dto` | `create:dto` | Development |
 | `build` | | Build |
 | `build_runner:build` | | Build Runner |
 | `build_runner:watch` | | Build Runner |
-| `create:model` | `make:model` | Generation |
-| `create:serializer` | | Generation |
+| `make:model` | `create:model` | Generation |
+| `make:serializer` | `create:serializer` | Generation |
 | `key:generate` | | Generation |
 | `env:generate` | | Generation |
 | `openapi:generate` | | Generation |
@@ -346,6 +428,16 @@ Templates: `createFactory` in `packages/dox-cli/lib/src/tools/create_factory.dar
 | `make:migration` | `create:migration` | Database |
 | `make:factory` | `create:factory` | Database |
 | `make:seeder` | `create:seeder` | Database |
+| `make:job` | | Queue |
+| `queue:work` | | Queue |
+| `queue:failed` | | Queue |
+| `queue:retry` | | Queue |
+| `queue:forget` | | Queue |
+| `queue:flush` | | Queue |
+| `schedule:work` | | Schedule |
+| `schedule:run` | | Schedule |
+| `schedule:list` | | Schedule |
+| `schedule:test` | | Schedule |
 | `db:seed` | | Database |
 | `version` | `--version`, `-version`, `v`, `-v`, `--v` | System |
 | `update` | | System |

@@ -5,7 +5,9 @@ import 'package:dox/src/tools/create_middleware.dart';
 import 'package:dox/src/tools/create_migration.dart';
 import 'package:dox/src/tools/create_model.dart';
 import 'package:dox/src/tools/create_project.dart';
+import 'package:dox/src/tools/app_scripts.dart';
 import 'package:dox/src/tools/create_dto.dart';
+import 'package:dox/src/tools/create_job.dart';
 import 'package:dox/src/tools/create_factory.dart';
 import 'package:dox/src/tools/create_seeder.dart';
 import 'package:dox/src/tools/create_serializer.dart';
@@ -15,6 +17,7 @@ import 'package:dox/src/tools/help.dart';
 import 'package:dox/src/tools/openapi_generate.dart';
 import 'package:dox/src/tools/server_serve.dart';
 import 'package:dox/src/tools/update_dox.dart';
+import 'package:dox/src/utils/run_script.dart';
 import 'package:dox/src/utils/utils.dart';
 import 'package:dox/src/version.dart';
 import 'package:dox_migration/dox_migration.dart';
@@ -74,12 +77,12 @@ class CommandRegistry {
 
     // Create model
     CommandDefinition(
-      command: 'create:model',
-      helpInfo: 'create:model <model_name> [-m|--migration]',
+      command: 'make:model',
+      helpInfo: 'make:model <model_name> [-m|--migration]',
       description:
           'Create a new model, and with -m a create_<table>_table migration',
       category: CommandCategory.generation,
-      aliases: ['make:model'],
+      aliases: ['create:model'],
       minArgs: 1,
       maxArgs: 2,
       function: (args) async {
@@ -166,8 +169,9 @@ class CommandRegistry {
 
     // Create controller commands
     CommandDefinition(
-      command: 'create:controller',
-      helpInfo: 'create:controller <controller_name> [-r]',
+      command: 'make:controller',
+      aliases: ['create:controller'],
+      helpInfo: 'make:controller <controller_name> [-r]',
       description: 'Create a new controller',
       category: CommandCategory.development,
       minArgs: 1,
@@ -181,8 +185,9 @@ class CommandRegistry {
 
     // Create middleware command
     CommandDefinition(
-      command: 'create:middleware',
-      helpInfo: 'create:middleware <middleware_name>',
+      command: 'make:middleware',
+      aliases: ['create:middleware'],
+      helpInfo: 'make:middleware <middleware_name>',
       description: 'Create a new middleware',
       category: CommandCategory.development,
       minArgs: 1,
@@ -194,8 +199,9 @@ class CommandRegistry {
 
     // Create DTO command
     CommandDefinition(
-      command: 'create:dto',
-      helpInfo: 'create:dto <dto_name>',
+      command: 'make:dto',
+      aliases: ['create:dto'],
+      helpInfo: 'make:dto <dto_name>',
       description: 'Create a new DTO (typed, checked input)',
       category: CommandCategory.development,
       minArgs: 1,
@@ -207,8 +213,9 @@ class CommandRegistry {
 
     // Create serializer command
     CommandDefinition(
-      command: 'create:serializer',
-      helpInfo: 'create:serializer <serializer_name>',
+      command: 'make:serializer',
+      aliases: ['create:serializer'],
+      helpInfo: 'make:serializer <serializer_name>',
       description: 'Create a new serializer',
       category: CommandCategory.generation,
       minArgs: 1,
@@ -416,6 +423,120 @@ class CommandRegistry {
         await _seed(args);
       },
     ),
+    CommandDefinition(
+      command: 'make:job',
+      helpInfo: 'make:job <job_name>',
+      description: 'Create a queue job in lib/app/jobs (and bin/queue.dart)',
+      category: CommandCategory.queue,
+      minArgs: 1,
+      maxArgs: 1,
+      function: (args) async {
+        createJob(args[0]);
+      },
+    ),
+
+    CommandDefinition(
+      command: 'queue:work',
+      helpInfo: 'queue:work [flags]',
+      description:
+          'Run the queue worker. Flags: --queue, --concurrency, --once, '
+          '--tries, --timeout, --sleep, --stop-when-empty',
+      category: CommandCategory.queue,
+      function: (args) async {
+        await runQueue('work', args);
+      },
+    ),
+
+    CommandDefinition(
+      command: 'queue:failed',
+      helpInfo: 'queue:failed',
+      description: 'List the failed jobs',
+      category: CommandCategory.queue,
+      maxArgs: 0,
+      function: (args) async {
+        await runQueue('failed', args);
+      },
+    ),
+
+    CommandDefinition(
+      command: 'queue:retry',
+      helpInfo: 'queue:retry <id|all>',
+      description: 'Put a failed job (or all of them) back on the queue',
+      category: CommandCategory.queue,
+      minArgs: 1,
+      maxArgs: 1,
+      function: (args) async {
+        await runQueue('retry', args);
+      },
+    ),
+
+    CommandDefinition(
+      command: 'queue:forget',
+      helpInfo: 'queue:forget <id>',
+      description: 'Delete one failed job',
+      category: CommandCategory.queue,
+      minArgs: 1,
+      maxArgs: 1,
+      function: (args) async {
+        await runQueue('forget', args);
+      },
+    ),
+
+    CommandDefinition(
+      command: 'queue:flush',
+      helpInfo: 'queue:flush',
+      description: 'Delete all failed jobs',
+      category: CommandCategory.queue,
+      maxArgs: 0,
+      function: (args) async {
+        await runQueue('flush', args);
+      },
+    ),
+
+    CommandDefinition(
+      command: 'schedule:work',
+      helpInfo: 'schedule:work',
+      description: 'Run the scheduler and keep it running',
+      category: CommandCategory.schedule,
+      maxArgs: 0,
+      function: (args) async {
+        await runSchedule('work', args);
+      },
+    ),
+
+    CommandDefinition(
+      command: 'schedule:run',
+      helpInfo: 'schedule:run',
+      description: 'Run the tasks that are due now, once',
+      category: CommandCategory.schedule,
+      maxArgs: 0,
+      function: (args) async {
+        await runSchedule('run', args);
+      },
+    ),
+
+    CommandDefinition(
+      command: 'schedule:list',
+      helpInfo: 'schedule:list',
+      description: 'List the scheduled tasks',
+      category: CommandCategory.schedule,
+      maxArgs: 0,
+      function: (args) async {
+        await runSchedule('list', args);
+      },
+    ),
+
+    CommandDefinition(
+      command: 'schedule:test',
+      helpInfo: 'schedule:test <name>',
+      description: 'Run one scheduled task now',
+      category: CommandCategory.schedule,
+      minArgs: 1,
+      maxArgs: 1,
+      function: (args) async {
+        await runSchedule('test', args);
+      },
+    ),
   ];
 
   static CommandDefinition? findCommand(String command) {
@@ -451,7 +572,7 @@ Future<void> _migration(
   args = args.where((String a) => a != '--seed').toList();
   if (migrateEntryFile().existsSync()) {
     writeMigrationRegistry();
-    int code = await _runScript('bin/migrate.dart', <String>[command, ...args]);
+    int code = await runScript('bin/migrate.dart', <String>[command, ...args]);
     if (code != 0) {
       exitCode = code;
       return;
@@ -487,20 +608,6 @@ Future<void> _seed(List<String> args) async {
     return;
   }
   writeSeederRegistry();
-  int code = await _runScript('bin/seed.dart', args);
+  int code = await runScript('bin/seed.dart', args);
   if (code != 0) exitCode = code;
-}
-
-/// `dart run <script> <args>` in the app, with the output on this terminal
-Future<int> _runScript(String script, List<String> args) async {
-  String exe = Platform.resolvedExecutable;
-  String dart = exe.split(Platform.pathSeparator).last.startsWith('dart')
-      ? exe
-      : 'dart';
-  Process process = await Process.start(dart, [
-    'run',
-    script,
-    ...args,
-  ], mode: ProcessStartMode.inheritStdio);
-  return process.exitCode;
 }

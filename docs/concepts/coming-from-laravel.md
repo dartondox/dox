@@ -41,8 +41,8 @@ class ApiRouter extends Router {
 
 | Laravel | Dox |
 | --- | --- |
-| `php artisan make:controller BlogController` | `dox create:controller Blog` |
-| `php artisan make:controller BlogController --resource` | `dox create:controller Blog -r` |
+| `php artisan make:controller BlogController` | `dox make:controller Blog` |
+| `php artisan make:controller BlogController --resource` | `dox make:controller Blog -r` |
 | `public function show(Request $request, int $id)` | `Future<Blog?> show(DoxRequest req, int id)` |
 | `public function store(StoreBlogRequest $request)` | `Future<Blog> store(CreateBlog body)` |
 | constructor injection by the service container | constructor injection by the container: `@Inject()` above the class |
@@ -57,7 +57,7 @@ A controller can be a class method, a static method or a plain function.
 
 | Laravel | Dox |
 | --- | --- |
-| `php artisan make:middleware Logger` | `dox create:middleware Logger` |
+| `php artisan make:middleware Logger` | `dox make:middleware Logger` |
 | `public function handle(Request $request, Closure $next)` | `dynamic handle(IDoxRequest req)` |
 | `return $next($request);` | `return req;` |
 | `return response('no', 401);` | `return response('no').statusCode(401);` |
@@ -81,7 +81,7 @@ Dox middleware runs before the controller only. There is no "after" step; use a 
 
 | Laravel | Dox |
 | --- | --- |
-| `php artisan make:request StoreBlogRequest` | `dox create:dto CreateBlog` |
+| `php artisan make:request StoreBlogRequest` | `dox make:dto CreateBlog` |
 | `class StoreBlogRequest extends FormRequest` with `rules()` | `@Dto() class CreateBlog` with annotations on `final` fields |
 | `'title' => ['required', 'string', 'max:50']` | `@MaxLength(50) final String title;` |
 | `'age' => ['nullable', 'integer', 'min:18']` | `@Min(18) final int? age;` |
@@ -132,7 +132,7 @@ See [Validation](../the-basic/validation.md).
 
 | Laravel | Dox |
 | --- | --- |
-| `php artisan make:model Blog -m` | `dox create:model Blog -m` |
+| `php artisan make:model Blog -m` | `dox make:model Blog -m` |
 | `class Blog extends Model` | `@DoxModel() class Blog extends BlogGenerator` |
 | `protected $table = 'blogs';` | `@DoxModel(table: 'blogs')` |
 | `protected $primaryKey = 'uid';` | `@DoxModel(primaryKey: 'uid')` |
@@ -258,7 +258,7 @@ The server can run the migrations at start. See [Migration](../database/migratio
 | --- | --- |
 | `laravel new blog` | `dox create blog` |
 | `php artisan serve` | `dox serve` (or `dox s`), with hot restart and `build_runner watch` |
-| `php artisan make:resource` | `dox create:serializer` |
+| `php artisan make:resource` | `dox make:serializer` |
 | `php artisan key:generate` | `dox key:generate` |
 | `php artisan route:list` | not there. Use the OpenAPI docs page at `/docs`. |
 | `php artisan tinker` | not there |

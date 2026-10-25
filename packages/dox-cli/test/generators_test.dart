@@ -145,8 +145,8 @@ void main() {
 
     test('make:model and --migration work too', () async {
       expect(
-        CommandRegistry.findCommand('make:model')?.command,
-        'create:model',
+        CommandRegistry.findCommand('create:model')?.command,
+        'make:model',
       );
       await CommandRegistry.findCommand('make:model')!
           .function(<String>['Category', '--migration']);
@@ -378,7 +378,7 @@ void main() {
       ProcessResult r = await Process.run(Platform.resolvedExecutable, <String>[
         'run',
         bin,
-        'create:model',
+        'make:model',
         'Post',
       ], workingDirectory: tempDir.path);
       expect(r.exitCode, 0, reason: '${r.stdout}${r.stderr}');

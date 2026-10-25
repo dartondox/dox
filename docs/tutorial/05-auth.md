@@ -61,8 +61,8 @@ class CreateUsersTable extends Migration {
 ## 3. Make the DTOs
 
 ```bash
-dox create:dto RegisterUser
-dox create:dto LoginUser
+dox make:dto RegisterUser
+dox make:dto LoginUser
 ```
 
 ```dart title="lib/app/http/dtos/register_user.dto.dart"
