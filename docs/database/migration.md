@@ -125,7 +125,7 @@ The AOT server binary can run the migrations, because the registry is compiled i
 The new app template already does this:
 
 ```dart title="bin/server.dart"
-import 'package:dox_app/config/app.dart';
+import 'package:my_app/config/app.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_migration/dox_migration.dart';
 
