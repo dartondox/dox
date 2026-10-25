@@ -6890,6 +6890,18 @@ Source: <code>lib/src/dox/storage_config.dart</code> in <a href="https://github.
 <td><code>null</code> (uses <code>info.title</code>)</td>
 <td>Title of the <code>/docs</code> page.</td>
 </tr>
+<tr>
+<td><code>include</code></td>
+<td><code>List&lt;String&gt;</code></td>
+<td><code>[]</code> (all routes)</td>
+<td>Only routes with these paths are in the docs, like <code>['/api/*']</code>. A <code>*</code> at the end matches the rest of the path.</td>
+</tr>
+<tr>
+<td><code>exclude</code></td>
+<td><code>List&lt;String&gt;</code></td>
+<td><code>[]</code></td>
+<td>Routes with these paths are left out. Checked after <code>include</code>.</td>
+</tr>
 </tbody>
 </table>
 <p><code>ScalarOptions</code> (<code>packages/dox-openapi/lib/src/docs_ui.dart</code>):</p>

@@ -6445,6 +6445,16 @@ Run it again after you change routes, controllers, request classes or models.
 <td><code>info.title</code></td>
 <td>title of the <code>/docs</code> page</td>
 </tr>
+<tr>
+<td><code>include</code></td>
+<td><code>[]</code> (all routes)</td>
+<td>only these paths go in the docs, like <code>['/api/*']</code></td>
+</tr>
+<tr>
+<td><code>exclude</code></td>
+<td><code>[]</code></td>
+<td>these paths are left out, like <code>['/api/internal/*']</code></td>
+</tr>
 </tbody>
 </table>
 <h3 id="3-open-docs">3. Open <code>/docs</code></h3>
@@ -6732,7 +6742,7 @@ They are all in <code>dox_core</code>.</p>
 </tr>
 <tr>
 <td><code>@ApiIgnore()</code></td>
-<td>leaves the method (or the whole class) out of the docs</td>
+<td>leaves the method (or the whole class) out of the docs. To leave out routes by path, use <code>include</code> and <code>exclude</code> in <code>OpenApiConfig</code></td>
 </tr>
 <tr>
 <td><code>@DoxController(tag: 'Users')</code></td>
