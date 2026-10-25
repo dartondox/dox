@@ -25,6 +25,17 @@ void main() {
       expect(proxy.scheme('10.1.2.3', 'HTTPS, http'), 'https');
     });
 
+    test('a hop with a port is read without the port', () {
+      TrustedProxy proxy = TrustedProxy(<String>['10.0.0.0/8', '::1']);
+      expect(proxy.clientIp('10.1.2.3', '1.2.3.4:5678'), '1.2.3.4');
+      expect(proxy.clientIp('10.1.2.3', '[2001:db8::1]:5678'), '2001:db8::1');
+      expect(proxy.clientIp('10.1.2.3', '2001:db8::1'), '2001:db8::1');
+      expect(proxy.clientIp('10.1.2.3', '1.2.3.4, 10.0.0.5:80'), '1.2.3.4');
+      expect(proxy.clientIp('10.1.2.3', '1.2.3.4, [::1]:80'), '1.2.3.4');
+      expect(proxy.clientIp('10.1.2.3', '1.2.3.4, ::1'), '1.2.3.4');
+      expect(TrustedProxy.stripPort('[::1]'), '::1');
+    });
+
     test('wildcard trusts only the direct peer, not the hops', () {
       TrustedProxy proxy = TrustedProxy(<String>['*']);
       // the client sent `X-Forwarded-For: 6.6.6.6`, the proxy added its ip

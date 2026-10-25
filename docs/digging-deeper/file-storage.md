@@ -117,7 +117,11 @@ A big file is never loaded into memory. A missing file answers `404`.
 Route.files('files');                    // GET /files/{key*}, signed URLs only
 Route.files('public', signed: false);    // any file of the disk
 Route.files('docs', disk: 'memory');     // another disk than the default
+Route.files('uploads', download: true);  // every file is a download
 ```
+
+An html, svg, xml or javascript file is always sent as a download in a sandbox, so its script does not run on your site.
+Every file has `X-Content-Type-Options: nosniff`.
 
 ```dart
 String url = await Storage().signedUrl('invoices/1.pdf'); // https://app.test/files/invoices/1.pdf?expires=...&signature=...

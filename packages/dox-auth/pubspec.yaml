@@ -11,6 +11,7 @@ dependencies:
   bcrypt: ^1.2.0
   dart_jsonwebtoken: ^3.4.1
   dox_annotation: ^3.0.0-alpha.7
+  dox_core: ^3.0.0-alpha.7
   dox_orm: ^3.0.0-alpha.7
 
 dev_dependencies:

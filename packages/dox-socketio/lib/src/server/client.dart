@@ -12,7 +12,8 @@ import 'socket_io_server.dart';
 
 /// One Engine.IO connection. It can hold sockets of many namespaces.
 class Client implements EngineSocketListener {
-  Client(this.server, this.conn, {this._encoder = const SocketEncoder()}) {
+  Client(this.server, this.conn, {this._encoder = const SocketEncoder()})
+    : _decoder = SocketDecoder(maxAttachments: server.options.maxAttachments) {
     conn.listener = this;
     _connectTimer = Timer(server.options.connectTimeout, _onConnectTimeout);
   }
@@ -23,7 +24,7 @@ class Client implements EngineSocketListener {
   final EngineSocket conn;
 
   final SocketEncoder _encoder;
-  final SocketDecoder _decoder = SocketDecoder();
+  final SocketDecoder _decoder;
   final Map<String, Socket> _sockets = <String, Socket>{};
 
   /// Namespaces whose CONNECT still runs the middlewares.

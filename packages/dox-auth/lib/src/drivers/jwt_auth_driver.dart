@@ -1,6 +1,9 @@
 // ignore_for_file: depend_on_referenced_packages
+import 'dart:convert';
+
 import 'package:dox_auth/dox_auth.dart';
-import 'package:dox_auth/src/hash.dart';
+import 'package:dox_core/env/env.dart';
+import 'package:dox_core/utils/hash.dart';
 import 'package:dox_orm/dox_orm.dart';
 
 class JwtAuthDriver extends AuthDriver {
@@ -52,12 +55,32 @@ class JwtAuthDriver extends AuthDriver {
         'secret',
       );
     }
+    if (key is SecretKey) _checkSecretLength(key.key);
 
     /// made now in another isolate, so the first login does not
     /// pay for it. A bad cost fails on the first login, not here.
     _dummyHashes.putIfAbsent(hashRounds, () {
       return Hash.makeAsync('dox-no-user', rounds: hashRounds)..ignore();
     });
+  }
+
+  /// fewest bytes of an HMAC secret. A shorter one is easy to guess.
+  static const int minSecretBytes = 32;
+
+  /// A short secret stops the app in production, and only warns in
+  /// development, local and test (like the APP_KEY check of dox_core).
+  static void _checkSecretLength(String secret) {
+    int length = utf8.encode(secret).length;
+    if (length >= minSecretBytes) return;
+    String message =
+        'The JWT secret is $length bytes. It must be at least '
+        '$minSecretBytes bytes. Run `dox key:generate` for APP_KEY, '
+        'or make a secret with `openssl rand -hex 32`.';
+    String env = Env.get<String>('APP_ENV').toLowerCase();
+    if (!<String>['development', 'local', 'test'].contains(env)) {
+      throw ArgumentError(message, 'secret');
+    }
+    print('[dox] warning: $message');
   }
 
   /// checked when no user is found, so a login takes as long for an

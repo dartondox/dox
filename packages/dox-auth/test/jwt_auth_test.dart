@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_auth/src/hash.dart';
+import 'package:dox_core/env/env.dart';
 import 'package:dox_orm/dox_orm.dart';
 import 'package:test/test.dart';
 
@@ -245,6 +246,27 @@ void main() {
     test('an empty secret is refused', () {
       expect(() => JwtAuthDriver(secret: SecretKey('')), throwsArgumentError);
       expect(() => JwtAuthDriver(secret: SecretKey('  ')), throwsArgumentError);
+    });
+
+    test('a short secret stops production and warns in development', () {
+      Env().env['APP_ENV'] = 'production';
+      expect(
+        () => JwtAuthDriver(secret: SecretKey('short')),
+        throwsA(
+          isA<ArgumentError>().having(
+            (ArgumentError e) => e.message,
+            'message',
+            allOf(contains('at least 32 bytes'), contains('openssl rand')),
+          ),
+        ),
+      );
+      Env().env['APP_ENV'] = 'development';
+      expect(
+        () => JwtAuthDriver(secret: SecretKey('short')),
+        prints(contains('[dox] warning: The JWT secret is 5 bytes')),
+      );
+      expect(() => JwtAuthDriver(secret: SecretKey(secret)), prints(isEmpty));
+      Env().env.remove('APP_ENV');
     });
 
     test('a user with no stored password cannot log in', () async {

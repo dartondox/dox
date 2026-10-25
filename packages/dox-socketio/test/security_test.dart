@@ -45,6 +45,24 @@ void main() {
     );
   });
 
+  test('maxAttachments in ServerOptions limits binary parts', () async {
+    expect(const ServerOptions().maxAttachments, 10);
+    await start(ServerOptions(maxAttachments: 1));
+    WebSocket ws = await WebSocket.connect(wsUrl());
+    StreamIterator<dynamic> frames = await open(ws);
+    ws.add('40');
+    await frames.moveNext(); // CONNECT answer
+    ws.add(
+      '452-["e",{"_placeholder":true,"num":0},{"_placeholder":true,"num":1}]',
+    );
+    // The stream ends when the server closes the socket.
+    bool closed = await Future<bool>(() async {
+      while (await frames.moveNext()) {}
+      return true;
+    }).timeout(Duration(seconds: 2), onTimeout: () => false);
+    expect(closed, isTrue);
+  });
+
   test('many CONNECT packets at once make one socket', () async {
     await start(
       ServerOptions(),

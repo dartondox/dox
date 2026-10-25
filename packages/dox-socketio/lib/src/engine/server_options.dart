@@ -44,6 +44,7 @@ class ServerOptions {
     this.upgradeTimeout = defaultUpgradeTimeout,
     this.connectTimeout = defaultConnectTimeout,
     this.maxHttpBufferSize = defaultMaxHttpBufferSize,
+    this.maxAttachments = defaultMaxAttachments,
     this.transports = const <String>[transportPolling, transportWebsocket],
     this.allowUpgrades = true,
     this.cors,
@@ -69,6 +70,10 @@ class ServerOptions {
   /// A bigger websocket message closes the connection. dart:io reads the
   /// whole message before this check, so also set a limit in your proxy.
   final int maxHttpBufferSize;
+
+  /// Most binary attachments one Socket.IO packet may have.
+  /// A packet with more is a parse error and closes that client.
+  final int maxAttachments;
 
   /// Allowed transports.
   final List<String> transports;

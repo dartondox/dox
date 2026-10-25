@@ -77,11 +77,25 @@ class Route {
   /// with [signed] (default) only URLs from `Storage().signedUrl()` work,
   /// others get 403. set the disk `url` option to the full url of [path].
   /// ```
+  /// html, svg, xml and javascript files are always sent as a download in
+  /// a sandbox, so an uploaded file can not run script on the app origin.
+  /// with [download] every file is sent as a download
+  /// (`Content-Disposition: attachment`). use it for user uploads.
+  /// ```
   /// Route.files('files'); // GET /files/{key*}
+  /// Route.files('uploads', download: true);
   /// String url = await Storage().signedUrl('images/a.png');
   /// ```
-  static Route files(String path, {String? disk, bool signed = true}) {
-    return get('$path/{key*}', StorageFileController(disk, signed).serve);
+  static Route files(
+    String path, {
+    String? disk,
+    bool signed = true,
+    bool download = false,
+  }) {
+    return get(
+      '$path/{key*}',
+      StorageFileController(disk, signed, download: download).serve,
+    );
   }
 
   // set route list

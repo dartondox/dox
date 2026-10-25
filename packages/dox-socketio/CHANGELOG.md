@@ -1,3 +1,7 @@
+## Unreleased
+
+- New: `ServerOptions(maxAttachments: 10)`. It is the most binary attachments one packet may have. The default is the same as before (10). A packet with more closes that client.
+
 ## 3.0.0-alpha.7
 
 - Uses `ioredis` 2.0.0-alpha.3, which can send and get binary messages. `RedisAdapter` and `SocketIoEmitter` take `ioredis` clients.
