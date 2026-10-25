@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Checked on 2026-10-22, for version 3.0.0-alpha.4.">
+        <meta name="description" content="Checked on 2026-10-25, for version 3.0.0-alpha.7.">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Status and roadmap | Dox">
-  <meta property="og:description" content="Checked on 2026-10-22, for version 3.0.0-alpha.4.">
+  <meta property="og:description" content="Checked on 2026-10-25, for version 3.0.0-alpha.7.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/concepts/status-and-roadmap/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Status and roadmap | Dox">
-  <meta name="twitter:description" content="Checked on 2026-10-22, for version 3.0.0-alpha.4.">
+  <meta name="twitter:description" content="Checked on 2026-10-25, for version 3.0.0-alpha.7.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -1143,6 +1143,34 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Planned">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#for-300" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For 3.0.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#later-31-and-after" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Later (3.1 and after)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3879,6 +3907,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Planned">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#for-300" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For 3.0.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#later-31-and-after" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Later (3.1 and after)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3918,7 +3974,7 @@
 
 
 <h1 id="status-and-roadmap">Status and roadmap</h1>
-<p>Checked on 2026-10-22, for version <code>3.0.0-alpha.4</code>.</p>
+<p>Checked on 2026-10-25, for version <code>3.0.0-alpha.7</code>.</p>
 <p>Dox 3.0 is an <strong>alpha</strong>. You can build with it, but the API can still change between alpha versions.
 All packages share one version number.</p>
 <h2 id="packages">Packages</h2>
@@ -3942,13 +3998,13 @@ All packages share one version number.</p>
 <td><code>dox_core</code></td>
 <td>Routes, middleware, controllers, request and response, isolates, config</td>
 <td>May change</td>
-<td>29 test files. CI runs them on the native server.</td>
+<td>36 test files. CI runs them on the native server.</td>
 </tr>
 <tr>
 <td><code>dox_orm</code></td>
 <td>Query builder, models, relations, transactions, drivers</td>
 <td>May change</td>
-<td>16 test files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite.</td>
+<td>26 test files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite.</td>
 </tr>
 <tr>
 <td><code>dox_validation</code></td>
@@ -3972,17 +4028,17 @@ All packages share one version number.</p>
 <td><code>dox</code> (CLI)</td>
 <td><code>dox create</code>, <code>dox serve</code>, <code>dox build</code>, <code>make:*</code>, <code>migration:*</code></td>
 <td>May change</td>
-<td>5 test files</td>
+<td>8 test files</td>
 </tr>
 <tr>
 <td><code>dox_migration</code></td>
 <td>Migrations for Postgres, MySQL, MariaDB and SQLite</td>
 <td>May change</td>
-<td>2 test files. CI runs them on each database.</td>
+<td>4 test files. CI runs them on each database.</td>
 </tr>
 <tr>
 <td><code>dox_auth</code></td>
-<td>JWT auth guard and middleware, password hashing</td>
+<td>JWT auth guard and middleware</td>
 <td>May change</td>
 <td>2 test files</td>
 </tr>
@@ -4008,28 +4064,29 @@ All packages share one version number.</p>
 <td><code>dox_socketio</code></td>
 <td>Socket.IO v4 server with a Redis adapter</td>
 <td>May change</td>
-<td>6 test files, with the real <code>socket.io-client</code> in CI</td>
+<td>8 test files, with the real <code>socket.io-client</code> in CI</td>
 </tr>
 <tr>
 <td><code>dox_http_native</code></td>
-<td>Native HTTP/1.1 server (Rust hyper), the default server</td>
+<td>Native HTTP/1.1 and WebSocket server (Rust hyper). Dox has no other server.</td>
 <td>Experimental</td>
-<td>2 Dart test files and Rust tests. No WebSocket yet.</td>
+<td>3 Dart test files and Rust tests</td>
 </tr>
 <tr>
 <td><code>dox_postgres_native</code></td>
-<td>Native Postgres client (Rust tokio-postgres), the Postgres driver</td>
+<td>Native Postgres client (Rust tokio-postgres), the Postgres driver. Has TLS (<code>sslmode</code>).</td>
 <td>Experimental</td>
-<td>Dart tests, plus the <code>dox_orm</code> tests</td>
+<td>5 Dart test files, plus the <code>dox_orm</code> tests</td>
 </tr>
 <tr>
 <td><code>dox_mysql_native</code></td>
-<td>Native MySQL and MariaDB client (Rust mysql_async), the MySQL driver</td>
+<td>Native MySQL and MariaDB client (Rust mysql_async), the MySQL driver. Has TLS.</td>
 <td>Experimental</td>
 <td>1 Dart test file, plus the <code>dox_orm</code> tests</td>
 </tr>
 </tbody>
 </table>
+<p><code>Hash</code> (bcrypt password hashing) is in <code>dox_core</code>.</p>
 <div class="admonition note">
 <p class="admonition-title">About test coverage</p>
 <p>The repo does not measure line coverage. The "Tests" column counts test files and says where CI runs them.
@@ -4062,6 +4119,11 @@ The CI setup is in <code>.github/workflows/test.yaml</code>. The three native pa
 <td>Use a Dart mail package or an HTTP mail API.</td>
 </tr>
 <tr>
+<td>Notifications</td>
+<td>Not there</td>
+<td>Send them from your own service class.</td>
+</tr>
+<tr>
 <td>Events and listeners</td>
 <td>Not there</td>
 <td>Model events are there. See <a href="../../database/model/events/">Model events</a>.</td>
@@ -4077,9 +4139,9 @@ The CI setup is in <code>.github/workflows/test.yaml</code>. The three native pa
 <td>Write a middleware with the cache, or use a proxy.</td>
 </tr>
 <tr>
-<td>Sessions</td>
+<td>Sessions and password reset</td>
 <td>Not there</td>
-<td>Auth uses JWT. On the native server, <code>req.httpRequest.session</code> throws <code>UnsupportedError</code>.</td>
+<td>Auth uses JWT. <code>req.httpRequest.session</code> throws <code>UnsupportedError</code>.</td>
 </tr>
 <tr>
 <td>Policies and gates</td>
@@ -4087,41 +4149,88 @@ The CI setup is in <code>.github/workflows/test.yaml</code>. The three native pa
 <td>Check the user in a middleware or in the controller.</td>
 </tr>
 <tr>
-<td>Database seeders</td>
+<td>Database factories and seeders</td>
 <td>Not there</td>
 <td>Write a Dart script, or a migration with data.</td>
+</tr>
+<tr>
+<td>Savepoints</td>
+<td>Not there</td>
+<td>A nested <code>transaction()</code> joins the outer one.</td>
+</tr>
+<tr>
+<td>Localization</td>
+<td>Not there</td>
+<td>Keep your own message maps.</td>
 </tr>
 </tbody>
 </table>
 <h2 id="planned">Planned</h2>
 <div class="admonition warning">
 <p class="admonition-title">This is a plan, not a promise. Open an issue to discuss.</p>
-<p>Items come from the code (<code>TODO</code> and <code>ponytail:</code> notes in <code>packages/*/lib</code>) and from the owner.
+<p>Items come from the code (<code>ponytail:</code> notes in <code>packages/*/lib</code>) and from the owner.
 There are no dates.</p>
 </div>
+<h3 id="for-300">For 3.0.0</h3>
 <table>
 <thead>
 <tr>
 <th>Item</th>
-<th>Source</th>
+<th>Notes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>TLS for the native Postgres driver</td>
-<td><code>ponytail:</code> note in <code>dox_orm/lib/src/drivers/postgres_native_driver.dart</code></td>
+<td>Small fixes</td>
+<td><code>nosniff</code> and a <code>download</code> option for <code>Route.files</code>, a stricter BMP check, <code>maxAttachments</code> for Socket.IO, <code>X-Forwarded-For</code> hops with a port, a minimum JWT secret length, one <code>Hash</code> class.</td>
 </tr>
 <tr>
-<td>Savepoints for nested transactions. Today a nested <code>transaction()</code> joins the outer one.</td>
-<td><code>ponytail:</code> notes in the <code>dox_orm</code> drivers and in <code>dox_migration</code></td>
+<td>Savepoints for nested transactions</td>
+<td>Today a nested <code>transaction()</code> joins the outer one (<code>ponytail:</code> notes in the <code>dox_orm</code> drivers).</td>
 </tr>
 <tr>
-<td>A queue package (<code>dox_queue</code>)</td>
-<td>Wanted by the owner. Not started.</td>
+<td><code>sslRootCert</code> for Postgres</td>
+<td>Trust a private CA, like AWS RDS. <code>dox_postgres_native</code> has it. <code>dox_orm</code> does not pass it on yet.</td>
 </tr>
 <tr>
-<td>A mail package (<code>dox_mail</code>)</td>
-<td>Wanted by the owner. Not started.</td>
+<td>Named routes and route model binding</td>
+<td></td>
+</tr>
+<tr>
+<td>One exception handler</td>
+<td>One place to turn every error into a response.</td>
+</tr>
+<tr>
+<td>ORM scopes, casts and <code>withCount</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Model factories and seeders</td>
+<td></td>
+</tr>
+<tr>
+<td>HTTP test client and database refresh</td>
+<td>For app tests.</td>
+</tr>
+<tr>
+<td>Rate limiting</td>
+<td></td>
+</tr>
+<tr>
+<td>Security headers</td>
+<td></td>
+</tr>
+<tr>
+<td>Health check route</td>
+<td></td>
+</tr>
+<tr>
+<td><code>dox_queue</code></td>
+<td>Queues and jobs. New package: <a href="https://github.com/dartondox/dox-queue">github.com/dartondox/dox-queue</a>.</td>
+</tr>
+<tr>
+<td><code>dox_scheduler</code></td>
+<td>Run tasks on a schedule. New package: <a href="https://github.com/dartondox/dox-scheduler">github.com/dartondox/dox-scheduler</a>.</td>
 </tr>
 <tr>
 <td>3.0 stable</td>
@@ -4129,7 +4238,15 @@ There are no dates.</p>
 </tr>
 </tbody>
 </table>
-<p>The package CHANGELOGs have no <code>Unreleased</code> section today. When one is added, it lists the next changes.</p>
+<h3 id="later-31-and-after">Later (3.1 and after)</h3>
+<ul>
+<li>Mail</li>
+<li>Notifications</li>
+<li>Sessions and password reset</li>
+<li>Gates and policies</li>
+<li>Localization</li>
+</ul>
+<p>The package CHANGELOGs have an <code>Unreleased</code> section when changes wait for the next version.</p>
 <h2 id="how-to-help">How to help</h2>
 <ul>
 <li>Try the alpha and open an issue when something breaks or is missing.</li>

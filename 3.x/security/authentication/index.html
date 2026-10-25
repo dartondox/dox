@@ -4340,7 +4340,7 @@ It returns <code>null</code> when the password is not a <code>String</code>, whe
 <tr>
 <td><code>secret</code></td>
 <td>required</td>
-<td>the key that signs tokens, like <code>SecretKey(env.appKey)</code>. An empty key throws <code>ArgumentError</code></td>
+<td>the key that signs tokens, like <code>SecretKey(env.appKey)</code>. An empty key throws <code>ArgumentError</code>. A key shorter than 32 bytes also throws in production, and prints a warning in development, local and test. Make one with <code>dox key:generate</code> or <code>openssl rand -hex 32</code></td>
 </tr>
 <tr>
 <td><code>algorithm</code></td>

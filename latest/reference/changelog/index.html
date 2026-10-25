@@ -3806,6 +3806,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha7_1" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4180,6 +4191,17 @@
   
     <nav class="md-nav" aria-label="dox_core">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha7_5" class="md-nav__link">
@@ -4663,6 +4685,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha7_10" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4849,6 +4882,17 @@
   
     <nav class="md-nav" aria-label="dox_validation">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha7_12" class="md-nav__link">
@@ -5137,6 +5181,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha7_1" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5511,6 +5566,17 @@
   
     <nav class="md-nav" aria-label="dox_core">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha7_5" class="md-nav__link">
@@ -5994,6 +6060,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha7_10" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6182,6 +6259,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha7_12" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6323,6 +6411,11 @@
 <li>See the <a href="https://github.com/dartondox/dox/pull/112">release notes</a> for all main changes.</li>
 </ul>
 <h2 id="dox_auth">dox_auth</h2>
+<h3 id="unreleased">Unreleased</h3>
+<ul>
+<li>Security: a JWT secret (<code>SecretKey</code>) shorter than 32 bytes stops the app with an <code>ArgumentError</code> when <code>APP_ENV</code> is not <code>development</code>, <code>local</code> or <code>test</code>. In those envs it prints one warning line. Make a key with <code>dox key:generate</code> or <code>openssl rand -hex 32</code>.</li>
+<li><code>Hash</code> now comes from <code>dox_core</code>. dox_auth had its own copy. <code>package:dox_auth/src/hash.dart</code> re-exports it. No change in behaviour. dox_auth now depends on dox_core.</li>
+</ul>
 <h3 id="300-alpha7_1">3.0.0-alpha.7</h3>
 <ul>
 <li>Perf: <code>attempt</code> runs bcrypt in another isolate (<code>Isolate.run</code>). Before, each login blocked the server isolate for the whole hash.</li>
@@ -6506,6 +6599,12 @@
 <li>Generated models import <code>package:dox_orm/dox_orm.dart</code>.</li>
 </ul>
 <h2 id="dox_core">dox_core</h2>
+<h3 id="unreleased_1">Unreleased</h3>
+<ul>
+<li>Security: every file response (<code>File</code>, <code>Storage().stream()</code>, <code>Storage().download()</code>, <code>Route.files</code>) sends <code>X-Content-Type-Options: nosniff</code>. Before, a <code>File</code> response and a raw download did not.</li>
+<li>New: <code>Route.files(path, download: true)</code> sends every file as a download (<code>Content-Disposition: attachment</code>). Use it for user uploads. html, svg, xml and javascript files are still always sent as a download in a sandbox.</li>
+<li>Fix: a trusted proxy <code>X-Forwarded-For</code> hop with a port (<code>1.2.3.4:5678</code>, <code>[::1]:5678</code>) is now read without the port. Before, it was not a valid ip, so <code>req.ip()</code> could be wrong. A bare IPv6 like <code>::1</code> still works.</li>
+</ul>
 <h3 id="300-alpha7_5">3.0.0-alpha.7</h3>
 <ul>
 <li>Breaking: <code>dox_websocket</code> is gone. Use <code>dox_socketio</code> for realtime. <code>Dox().websocket</code> and <code>Dox().setWebsocket()</code> are removed.</li>
@@ -6857,6 +6956,10 @@
 <li>Please depend on <code>dox_orm</code> and change your imports. See the README.</li>
 </ul>
 <h2 id="dox_socketio">dox_socketio</h2>
+<h3 id="unreleased_2">Unreleased</h3>
+<ul>
+<li>New: <code>ServerOptions(maxAttachments: 10)</code>. It is the most binary attachments one packet may have. The default is the same as before (10). A packet with more closes that client.</li>
+</ul>
 <h3 id="300-alpha7_10">3.0.0-alpha.7</h3>
 <ul>
 <li>Uses <code>ioredis</code> 2.0.0-alpha.3, which can send and get binary messages. <code>RedisAdapter</code> and <code>SocketIoEmitter</code> take <code>ioredis</code> clients.</li>
@@ -6949,6 +7052,10 @@
 <li><code>DriveManager.fake()</code> for tests.</li>
 </ul>
 <h2 id="dox_validation">dox_validation</h2>
+<h3 id="unreleased_3">Unreleased</h3>
+<ul>
+<li>Fix: <code>FileTypes.sniff</code> read any data that starts with <code>BM</code> as <code>bmp</code>, like the text "BMW...". Now it also checks the BMP header size at byte 14 (12, 40, 52, 56, 64, 108 or 124).</li>
+</ul>
 <h3 id="300-alpha7_12">3.0.0-alpha.7</h3>
 <ul>
 <li>Perf: object, list, map and union schemas work out <code>isAsync</code> once and keep the answer. Before, the whole schema tree was walked on every <code>validateSchema</code> call.</li>
