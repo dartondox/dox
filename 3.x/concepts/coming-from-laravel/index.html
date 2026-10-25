@@ -7090,7 +7090,7 @@ See <a href="../../security/authentication/">Authentication</a>.</p>
 <tbody>
 <tr>
 <td><code>config/filesystems.php</code> disks</td>
-<td><code>lib/config/storage.dart</code>, <code>StorageConfig(defaultDisk:, disks:)</code></td>
+<td><code>lib/config/storage.dart</code>, <code>StorageConfig(defaultDisk:, disks:)</code>, passed to a <code>StorageService</code> (<code>dox_storage</code>)</td>
 </tr>
 <tr>
 <td><code>Storage::put('a.txt', $bytes)</code></td>
@@ -7191,7 +7191,7 @@ A missing key stops the app at start, with a list of every missing key. See <a h
 </tr>
 <tr>
 <td><code>Storage::fake('s3')</code></td>
-<td><code>Dox().storage.fake('s3')</code></td>
+<td><code>Storage.manager.fake('s3')</code></td>
 </tr>
 <tr>
 <td><code>Cache::fake()</code></td>

@@ -6555,8 +6555,8 @@
 <td><code>index</code>, <code>create</code>, <code>store</code>, <code>show</code>, <code>edit</code>, <code>update</code>, <code>destroy</code></td>
 </tr>
 <tr>
-<td><code>Route.files('files')</code></td>
-<td>serve a storage disk, signed URLs only</td>
+<td><code>Storage.route('files')</code></td>
+<td>serve a storage disk, signed URLs only (<code>dox_storage</code>)</td>
 </tr>
 <tr>
 <td><code>Route.enabledCors(() { ... })</code> / <code>Route.disabledCors(...)</code></td>
@@ -6663,7 +6663,7 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 <p>Files:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">RequestFile</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'avatar'</span><span class="p">);</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">file</span><span class="p">.</span><span class="n">filename</span><span class="p">;</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">extension</span><span class="p">;</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">length</span><span class="p">;</span><span class="w">   </span><span class="c1">// bytes</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kt">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="s1">'avatars'</span><span class="p">);</span><span class="w">    </span><span class="c1">// save before you return</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kt">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="s1">'avatars'</span><span class="p">);</span><span class="w">    </span><span class="c1">// save before you return (dox_storage)</span>
 </span></code></pre></div>
 <p>See <a href="../../the-basic/request/">Request</a> and <a href="../request-and-response/">Request and response</a>.</p>
 <h2 id="response">Response</h2>
@@ -7123,7 +7123,7 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 </span><span id="__span-15-14"><a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-15-15"><a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Turn it on with <code>SocketIoConfig</code> in <code>AppConfig</code>. Many isolates need the Redis adapter and <code>transports: ['websocket']</code> on the client.</p>
+<p>Turn it on with a <code>SocketIoService</code> (extend it in <code>lib/</code>). Many isolates need the Redis adapter and <code>transports: ['websocket']</code> on the client.</p>
 <p>See <a href="../../packages/socketio/">Socket.IO</a>.</p>
 <h2 id="openapi">OpenAPI</h2>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">OpenApiConfig</span><span class="w"> </span><span class="n">openApi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenApiConfig</span><span class="p">(</span>
@@ -7161,7 +7161,7 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 </tr>
 <tr>
 <td>storage</td>
-<td><code>Disk fake = Dox().storage.fake('s3');</code> then <code>Dox().storage.restore('s3')</code></td>
+<td><code>Disk fake = Storage.manager.fake('s3');</code> then <code>Storage.manager.restore('s3')</code></td>
 </tr>
 <tr>
 <td>env</td>

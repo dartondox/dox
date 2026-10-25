@@ -2116,7 +2116,7 @@ A value must be a JSON type. The `memory` store is per isolate. See [Cache](../d
 
 | Laravel | Dox |
 | --- | --- |
-| `config/filesystems.php` disks | `lib/config/storage.dart`, `StorageConfig(defaultDisk:, disks:)` |
+| `config/filesystems.php` disks | `lib/config/storage.dart`, `StorageConfig(defaultDisk:, disks:)`, passed to a `StorageService` (`dox_storage`) |
 | `Storage::put('a.txt', $bytes)` | `await Storage().put('files', bytes, extension: 'txt')` (a uuid file name) |
 | `$request->file('f')->store('avatars')` | `await file.store('avatars')` or `Storage().putRequestFile('avatars', file)` |
 | `Storage::get($path)` | `await Storage().get(path)` |
@@ -2150,7 +2150,7 @@ A missing key stops the app at start, with a list of every missing key. See [Env
 | `php artisan test` | `dart test` |
 | `$this->get('/api/ping')->assertStatus(200)` | `(await client.get('/api/ping')).expectStatus(200)` with `DoxTestClient` |
 | `RefreshDatabase` | run the migrations in `setUpAll`, then `setUp(refreshDatabase)` from `package:dox_orm/testing.dart` |
-| `Storage::fake('s3')` | `Dox().storage.fake('s3')` |
+| `Storage::fake('s3')` | `Storage.manager.fake('s3')` |
 | `Cache::fake()` | `Dox().cache = CacheManager(CacheConfig(...))` with a `memory` store |
 | `$this->actingAs($user)` | `client.withToken(token)` with the JWT from `Auth().login(user)` |
 
@@ -2421,18 +2421,13 @@ melos bs
 ### 4. Useful commands
 
 ```bash
-# Run all tests (not dox_orm).
+# Run all tests.
 # Use `melos run test`. `melos test` is a built-in melos command.
 melos run test
 
 # Analyze and check format (same as CI)
 melos run analyze
 melos run format_check
-
-# Run tests for dox_orm with postgres, mysql or sqlite
-DB_PORT=5432 melos run test_pg
-DB_USER=dox DB_PORT=3306 melos run test_mysql
-melos run test_sqlite
 
 # Build the dox cli executable (AOT).
 # `dart compile exe` does not work: sqlite3 has a build hook. Use `dart build cli`.
@@ -2465,6 +2460,8 @@ The full guide is [RELEASING.md](https://github.com/dartondox/dox/blob/main/RELE
 
 The native packages (`dox_http_native`, `dox_postgres_native`, `dox_mysql_native`) are not in this repo.
 See [Native packages](#native-packages) below.
+`dox_orm`, `dox_migration`, `dox_query_builder`, `dox_socketio` and `dox_storage` are not in this repo either.
+See [Packages in other repos](#packages-in-other-repos).
 
 **New package only:** turn on pub.dev automated publishing for it first. See [One-time setup](#one-time-setup).
 A new package must first exist on pub.dev, so publish its first version by hand with `dart pub publish`.
@@ -2511,6 +2508,39 @@ On pub.dev:
 On GitHub, in `dartondox/dox` > Settings > Environments, there must be an environment named `pub.dev`.
 The publish job runs in it.
 Optional: add yourself as a required reviewer, and allow only tags `v*`.
+
+## Packages in other repos
+
+| Package | Repo |
+| --- | --- |
+| `dox_orm`, `dox_migration`, `dox_query_builder` | [dartondox/dox-orm](https://github.com/dartondox/dox-orm) |
+| `dox_socketio` | [dartondox/dox-socketio](https://github.com/dartondox/dox-socketio) |
+| `dox_storage` | [dartondox/dox-storage](https://github.com/dartondox/dox-storage) |
+| `dox_queue` | [dartondox/dox-queue](https://github.com/dartondox/dox-queue) |
+| `dox_scheduler` | [dartondox/dox-scheduler](https://github.com/dartondox/dox-scheduler) |
+
+The packages here use them from pub.dev. The database tests (Postgres, MySQL, SQLite) run in `dox-orm`.
+
+To work on one of them and Dox together:
+
+1. Clone the repos next to the Dox repo: `../dox-orm`, `../dox-socketio`, `../dox-storage`.
+   `ci/clone-siblings.sh` does this.
+2. Add them to the root `pubspec_overrides.yaml` of the Dox repo. Git ignores this file.
+
+    ```yaml
+    dependency_overrides:
+      dox_orm:
+        path: ../dox-orm/packages/dox-orm
+      dox_migration:
+        path: ../dox-orm/packages/dox-migration
+    ```
+
+3. Run `dart pub get`.
+
+The apps in `examples/` already use these clones (their `pubspec_overrides.yaml`), so clone them before you run an example.
+In the other repo, a `pubspec_overrides.yaml` that points to `../dox/packages/...` uses your local Dox packages.
+
+Each repo has its own version. Push a `v<version>` tag in that repo to release it.
 
 ## Native packages
 
@@ -2891,13 +2921,13 @@ See [Dependency injection: route model binding](dependency-injection.md#route-mo
 
 ## Serve storage files
 
-`Route.files(path)` serves the files of a storage disk at `GET <path>/{key*}`.
+`Storage.route(path)` from the [`dox_storage`](../packages/storage.md) package serves the files of a storage disk at `GET <path>/{key*}`.
 By default only signed URLs work. Other requests get `403`.
 See [File Storage](../digging-deeper/file-storage.md#serve-local-signed-urls).
 
 ```dart
-Route.files('files');
-Route.files('public', disk: 'local', signed: false);
+Storage.route('files');
+Storage.route('public', disk: 'local', signed: false);
 ```
 
 An html, svg, xml or javascript file is sent as a download (`Content-Disposition: attachment`) with `Content-Security-Policy: sandbox`.
@@ -2907,7 +2937,7 @@ Every file response also has `X-Content-Type-Options: nosniff`, so the browser d
 For user uploads, `download: true` sends every file as a download, also images and PDFs:
 
 ```dart
-Route.files('uploads', download: true);
+Storage.route('uploads', download: true);
 ```
 
 ## Request body for the docs
@@ -3013,6 +3043,8 @@ class ApiController {
 }
 ```
 
+`store()` comes from the [`dox_storage`](../packages/storage.md) package. Add it and import `package:dox_storage/dox_storage.dart`.
+
 Without a DTO, `req.input('image')` gives the `RequestFile`. It is not checked.
 
 ### `RequestFile`
@@ -3026,7 +3058,7 @@ file.extension;       // mp4
 file.length;          // size in bytes
 await file.size;      // size in KB
 file.stream();        // read it in chunks
-await file.store('videos');              // save to storage. returns the path
+await file.store('videos');              // save to storage (needs dox_storage). returns the path
 await file.moveTo('/data/videos/1.mp4'); // move it. returns the new File
 await file.bytes;     // the whole file in memory. avoid for big files
 ```
@@ -3109,7 +3141,7 @@ Return the value from your controller. Dox turns it into the response.
 | an `IHttpException`, like `NotFoundHttpException()` | its status code and its message (text, or JSON for a `Map`) |
 | a `File` (from `dart:io`) | the file, streamed |
 | a `Stream<List<int>>` | the bytes, streamed |
-| `StreamFile`, `DownloadableFile` from `Storage()` | the file, streamed |
+| `StreamFile`, `DownloadableFile` (also from `Storage()` of `dox_storage`) | the file, streamed |
 | `response(...)` | full control: status, headers, cookies |
 
 ```dart
@@ -6012,9 +6044,15 @@ Source: https://dartondox.dev/latest/3.xdigging-deeper/file-storage/
 
 `Storage()` saves and reads files on a disk: the local folder, AWS S3 (and R2, MinIO, Spaces), or memory.
 
-It runs on [`dox_storage`](../packages/storage.md), which is built into `dox_core`.
+It is in the [`dox_storage`](../packages/storage.md) package. Add it to your app:
+
+```bash
+dart pub add dox_storage
+```
 
 ```dart
+import 'package:dox_storage/dox_storage.dart';
+
 Route.post('/avatar', (DoxRequest req) async {
   RequestFile file = req.input('avatar');
   String path = await Storage().putRequestFile('avatars', file);
@@ -6024,14 +6062,14 @@ Route.post('/avatar', (DoxRequest req) async {
 
 ## Config
 
-Without a config, Dox has one disk: `local`, in the `storage` folder.
+Without a config, `Storage()` has one disk: `local`, in the `storage` folder.
 To add disks, make `lib/config/storage.dart`:
 
 ```dart title="lib/config/storage.dart"
-import 'package:dox_core/dox_core.dart';
+import 'package:dox_storage/dox_storage.dart';
 import 'package:my_app/config/env.dart';
 
-StorageConfig storage = StorageConfig(
+StorageConfig storageConfig = StorageConfig(
   defaultDisk: env.storageDisk,
   disks: <String, Map<String, dynamic>>{
     'local': <String, dynamic>{
@@ -6069,7 +6107,16 @@ so the app starts without them:
   String? get awsEndpoint;
 ```
 
-Then pass it to `AppConfig(storage: storage)` in `lib/config/app.dart`.
+Then add the service. It sets the disks in every isolate. Put it in `lib/`, so the generated container finds it:
+
+```dart title="lib/services/storage_service.dart"
+import 'package:dox_storage/dox_storage.dart';
+import 'package:my_app/config/storage.dart';
+
+class AppStorageService extends StorageService {
+  AppStorageService() : super(storageConfig);
+}
+```
 
 | Driver | Options |
 | --- | --- |
@@ -6125,10 +6172,10 @@ A big file is never loaded into memory. A missing file answers `404`.
 
 ```dart
 // lib/routes/web.dart
-Route.files('files');                    // GET /files/{key*}, signed URLs only
-Route.files('public', signed: false);    // any file of the disk
-Route.files('docs', disk: 'memory');     // another disk than the default
-Route.files('uploads', download: true);  // every file is a download
+Storage.route('files');                    // GET /files/{key*}, signed URLs only
+Storage.route('public', signed: false);    // any file of the disk
+Storage.route('docs', disk: 'memory');     // another disk than the default
+Storage.route('uploads', download: true);  // every file is a download
 ```
 
 An html, svg, xml or javascript file is always sent as a download in a sandbox, so its script does not run on your site.
@@ -6150,7 +6197,7 @@ To swap a disk with a memory disk in tests, see [Testing](testing.md#test-file-s
 Implement `DriverContract` from `package:dox_storage/dox_storage.dart`. Register it in a [service](services.md), so every isolate has it:
 
 ```dart
-Dox().storage.register('dropbox', DropboxDriver());
+Storage.manager.register('dropbox', DropboxDriver());
 await Storage().disk('dropbox').put('notes', bytes, extension: 'txt');
 ```
 
@@ -7548,7 +7595,7 @@ A new `CacheManager` in `setUp` gives each test an empty cache. See [Cache](cach
 
 ## Test file storage
 
-`Dox().storage.fake(name)` swaps one disk with an empty memory disk. `restore(name)` puts the real disk back.
+`Storage.manager.fake(name)` (from `dox_storage`) swaps one disk with an empty memory disk. `restore(name)` puts the real disk back.
 
 ```dart
 setUpAll(() {
@@ -7556,18 +7603,18 @@ setUpAll(() {
 });
 
 test('saves the report', () async {
-  Disk fake = Dox().storage.fake('s3');
+  Disk fake = Storage.manager.fake('s3');
 
   String path = await Storage()
       .disk('s3')
       .put('reports', <int>[1, 2, 3], extension: 'pdf'); // '/reports/<uuid>.pdf'
 
   expect(await fake.exists(path.substring(1)), isTrue);
-  Dox().storage.restore('s3');
+  Storage.manager.restore('s3');
 });
 ```
 
-- Call `Dox().initialize()` first. The storage disks are made from `appConfig`.
+- Call `Dox().initialize()` first. Without the `StorageService` running, `Storage.manager` has only the `local` disk. Start the app, or set the disks yourself: `Storage.manager = StorageDiskFactory().create(storageConfig);`.
 - `Storage()` paths start with `/`. A `Disk` key does not, so remove the first `/` when you ask the `Disk` directly.
 
 See [File Storage](file-storage.md).
@@ -12779,10 +12826,10 @@ This page shows how to save and read files with `dox_storage`.
 
 `dox_storage` gives one API for files in many places: local disk, AWS S3 and S3-compatible services.
 
-!!! tip "Built into Dox"
-    `dox_core` uses `dox_storage` for [`Storage()`](../digging-deeper/file-storage.md).
-    In a Dox app, set the disks in `config/storage.dart` (a `StorageConfig`), and use `Storage()`.
-    `Storage().use('s3')` gives the `Disk` of this page. `Route.files('files')` serves local signed URLs.
+!!! tip "In a Dox app"
+    `dox_storage` gives your app [`Storage()`](../digging-deeper/file-storage.md).
+    Set the disks in `config/storage.dart` (a `StorageConfig`), register a `StorageService`, and use `Storage()`.
+    `Storage().use('s3')` gives the `Disk` of this page. `Storage.route('files')` serves local signed URLs.
     This page is for the full `Disk` API and for using `dox_storage` outside Dox.
 
 ## Install
@@ -12897,7 +12944,7 @@ String upload = await disk.getSignedUploadUrl('avatars/2.png',
 
 ### Check a local signed URL
 
-In a Dox app, `Route.files('files')` does this for you.
+In a Dox app, `Storage.route('files')` does this for you.
 
 `LocalDriver.getSignedUrl` returns `<urlBase>/<key>?expires=...&signature=...`.
 Check it in the route that serves the file:
@@ -13264,16 +13311,15 @@ socket.emit('chat', 'hi', (answer) => console.log(answer)); // 'ok'
 
 ## In a Dox app: same port as HTTP
 
-`dox_core` can serve Socket.IO at `/socket.io/` on the app port. It is off by default.
+`SocketIoService` serves Socket.IO at `/socket.io/` on the app port.
 
-`dox_core` does not export `dox_socketio`. Add it, and `ioredis` for the Redis adapter:
+Add `dox_socketio`, and `ioredis` for the Redis adapter:
 
 ```bash
 dart pub add dox_socketio ioredis
 ```
 
 ```dart title="lib/config/socketio.dart"
-import 'package:dox_core/dox_core.dart';
 import 'package:dox_socketio/dox_socketio.dart';
 import 'package:ioredis/ioredis.dart';
 import 'package:my_app/app/socket/chat.namespace.dart';
@@ -13281,7 +13327,7 @@ import 'package:my_app/config/env.dart';
 
 Redis redis = Redis(RedisOptions(host: '127.0.0.1', port: 6379));
 
-SocketIoConfig socketIo = SocketIoConfig(
+SocketIoConfig socketIoConfig = SocketIoConfig(
   enabled: env.socketioEnabled,
   namespaces: <NamespaceHandler>[ChatNamespace(MessageService())],
   adapter: const RedisSocketAdapterFactory(), // shares broadcasts between isolates
@@ -13305,23 +13351,27 @@ Add a getter for the `SOCKETIO_ENABLED` key to `lib/config/env.dart`, then run `
   bool get socketioEnabled => false;
 ```
 
-```dart title="lib/config/app.dart"
-AppConfig appConfig = AppConfig(
-  socketIo: socketIo,
-  // ...
-);
+Then add the service. Put it in `lib/`, so the generated container finds it:
+
+```dart title="lib/services/socketio_service.dart"
+import 'package:dox_socketio/dox_socketio.dart';
+import 'package:my_app/config/socketio.dart';
+
+class AppSocketIoService extends SocketIoService {
+  AppSocketIoService() : super(socketIoConfig);
+}
 ```
 
 | `SocketIoConfig` option | Default | What it does |
 | --- | --- | --- |
-| `enabled` | `false` | serve Socket.IO at `options.path` |
+| `enabled` | `true` | serve Socket.IO at `options.path` |
 | `options` | `ServerOptions()` | see [Options](#options) |
 | `namespaces` | `[]` | `NamespaceHandler` classes to register |
 | `adapter` | `null` (in-memory) | makes one adapter in each isolate |
 
 - Requests to `/socket.io/` go to Socket.IO before the router. Middleware and body reading are skipped.
-- When it is off, there is no extra work per request.
-- `Dox().socketIo` is the server of this isolate: `Dox().socketIo?.to('room').emit('news', data)`.
+- With no service, or with `enabled: false`, there is no extra work per request.
+- `SocketIoService.server` is the server of this isolate: `SocketIoService.server?.to('room').emit('news', data)`.
 - Need a plain WebSocket with no Socket.IO protocol? `Route.websocket(path, handler)` in `dox_core` gives you the raw socket.
 
 !!! warning "Many isolates"
@@ -13560,17 +13610,23 @@ Accept an image from a form, check its size and type, save it to a disk, and ret
 
 ## 1. Set up the disk
 
+`Storage()` is in the `dox_storage` package. Add it:
+
+```bash
+dart pub add dox_storage
+```
+
 Give the `local` disk a `url`. `Storage().url()` uses it to build the public URL of a file.
 
 ```dart title="lib/config/storage.dart"
-import 'package:dox_core/dox_core.dart';
+import 'package:dox_storage/dox_storage.dart';
 import 'package:my_app/config/env.dart';
 
-StorageConfig storage = StorageConfig(
+StorageConfig storageConfig = StorageConfig(
   defaultDisk: env.storageDisk,
   disks: <String, Map<String, dynamic>>{
     /// uploads go to the `storage` folder.
-    /// `url` is the public address of `Route.files('files', ...)`.
+    /// `url` is the public address of `Storage.route('files', ...)`.
     'local': <String, dynamic>{
       'driver': 'local',
       'root': 'storage',
@@ -13589,6 +13645,17 @@ StorageConfig storage = StorageConfig(
 
 Run `dart run build_runner build` to update `env.g.dart`.
 Then add `APP_URL=http://localhost:3000` to your `.env`.
+
+Add the service. It sets the disks in every isolate. The generated container finds it:
+
+```dart title="lib/services/storage_service.dart"
+import 'package:dox_storage/dox_storage.dart';
+import 'package:my_app/config/storage.dart';
+
+class AppStorageService extends StorageService {
+  AppStorageService() : super(storageConfig);
+}
+```
 
 ## 2. Write the DTO
 
@@ -13621,6 +13688,7 @@ For other file types, use `@Mimes(<String>['pdf', 'docx'])` in place of `@Image(
 
 ```dart title="lib/app/http/controllers/upload.controller.dart"
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_storage/dox_storage.dart';
 import 'package:my_app/app/http/dtos/upload_image.dto.dart';
 
 @Inject()
@@ -13642,7 +13710,7 @@ class UploadController {
 
 ## 4. Add the routes
 
-One route takes the upload. `Route.files` serves the saved files at `GET /files/{key*}`.
+One route takes the upload. `Storage.route` serves the saved files at `GET /files/{key*}`.
 
 ```dart title="lib/routes/api.dart"
 import 'package:dox_core/dox_core.dart';
@@ -13664,6 +13732,7 @@ class ApiRouter extends Router {
 
 ```dart title="lib/routes/web.dart"
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_storage/dox_storage.dart';
 
 class WebRouter extends Router {
   @override
@@ -13672,7 +13741,7 @@ class WebRouter extends Router {
   @override
   void register() {
     // GET /files/{key*}, any file of the default disk
-    Route.files('files', signed: false);
+    Storage.route('files', signed: false);
   }
 }
 ```
@@ -14567,13 +14636,14 @@ Serve a folder of files, or a single page app (React, Vue, Flutter web), from th
 
 - A Dox app.
 - A `public` folder with the built front-end (`index.html`, `assets/...`).
+- The `dox_storage` package, with its service. See [File storage](../digging-deeper/file-storage.md#config).
 
 ## Serve a folder: one line
 
-`Route.files` serves every file of a storage disk. Make a disk for the folder, and add the route.
+`Storage.route` serves every file of a storage disk. Make a disk for the folder, and add the route.
 
 ```dart title="lib/config/storage.dart"
-StorageConfig storage = StorageConfig(
+StorageConfig storageConfig = StorageConfig(
   defaultDisk: 'local',
   disks: <String, Map<String, dynamic>>{
     'local': <String, dynamic>{'driver': 'local', 'root': 'storage'},
@@ -14585,7 +14655,7 @@ StorageConfig storage = StorageConfig(
 ```
 
 ```dart title="lib/routes/web.dart"
-Route.files('static', disk: 'public', signed: false); // GET /static/{key*}
+Storage.route('static', disk: 'public', signed: false); // GET /static/{key*}
 ```
 
 `GET /static/app.js` sends `public/app.js`, streamed, with the right `Content-Type`. A missing file answers `404`.
@@ -14606,6 +14676,7 @@ An SPA needs two things:
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_storage/dox_storage.dart';
 
 @Inject()
 class StaticController {
@@ -14675,7 +14746,7 @@ npm run build && cp -r dist/. public/
 flutter build web && cp -r build/web/. public/
 ```
 
-Vite puts the files in `assets/`. Flutter web puts them next to `index.html`. For Flutter, change the asset route to match, or serve everything with `Route.files` and give `index.html` the catch-all.
+Vite puts the files in `assets/`. Flutter web puts them next to `index.html`. For Flutter, change the asset route to match, or serve everything with `Storage.route` and give `index.html` the catch-all.
 
 ## Check it
 
@@ -16887,7 +16958,7 @@ class ApiRouter extends Router {
 | `Route.middleware(<dynamic>[M()], () { ... })` | middleware for a group |
 | `Route.domain('api.app.com', () { ... })` | match by `Host` |
 | `Route.resource('blogs', BlogController)` | `index`, `create`, `store`, `show`, `edit`, `update`, `destroy` |
-| `Route.files('files')` | serve a storage disk, signed URLs only |
+| `Storage.route('files')` | serve a storage disk, signed URLs only (`dox_storage`) |
 | `Route.enabledCors(() { ... })` / `Route.disabledCors(...)` | CORS for some routes |
 | `Route.websocket('echo', (WebSocket s, DoxRequest req) { ... })` | a raw WebSocket. For rooms and acks, use Socket.IO. |
 
@@ -16958,7 +17029,7 @@ Files:
 ```dart
 RequestFile file = req.input('avatar');
 file.filename; file.extension; file.length;   // bytes
-String path = await file.store('avatars');    // save before you return
+String path = await file.store('avatars');    // save before you return (dox_storage)
 ```
 
 See [Request](../the-basic/request.md) and [Request and response](request-and-response.md).
@@ -17259,7 +17330,7 @@ class ChatNamespace extends NamespaceHandler {
 }
 ```
 
-Turn it on with `SocketIoConfig` in `AppConfig`. Many isolates need the Redis adapter and `transports: ['websocket']` on the client.
+Turn it on with a `SocketIoService` (extend it in `lib/`). Many isolates need the Redis adapter and `transports: ['websocket']` on the client.
 
 See [Socket.IO](../packages/socketio.md).
 
@@ -17296,7 +17367,7 @@ test('ping', () async {
 | Fake | Code |
 | --- | --- |
 | cache | `Dox().cache = CacheManager(CacheConfig(defaultStore: 'memory', stores: {...}))` |
-| storage | `Disk fake = Dox().storage.fake('s3');` then `Dox().storage.restore('s3')` |
+| storage | `Disk fake = Storage.manager.fake('s3');` then `Storage.manager.restore('s3')` |
 | env | `AppEnv.load(EnvReader(environment: {...}, dotEnv: {...}))` |
 | DTO | `await CreateBlog.schema.safeValidateMap(<String, dynamic>{...})` |
 
@@ -17355,9 +17426,7 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `logger` | `LoggerConfig` | `LoggerConfig()` | The `Logger` output. See [LoggerConfig](#loggerconfig). |
 | `cache` | `CacheConfig` | `file` store in `storage/cache`, plus a `memory` store | Cache stores for `Cache()`. See [CacheConfig](#cacheconfig). |
 | `session` | `SessionConfig` | `cookie` driver, cookie `dox_session`, 2 hours | Settings for `SessionMiddleware`. See [Session](../the-basic/session.md#config). |
-| `storage` | `StorageConfig` | `local` disk with root `storage` | Storage disks for `Storage()`. See [StorageConfig](#storageconfig). |
 | `openApi` | `OpenApiConfig` | `OpenApiConfig()` | `/docs`, `/openapi.json` and `/openapi.yaml`. See [OpenApiConfig](#openapiconfig). |
-| `socketIo` | `SocketIoConfig` | `SocketIoConfig()` (off) | Socket.IO on the HTTP port. See [SocketIoConfig](#socketioconfig). |
 
 ## CORSConfig
 
@@ -17414,7 +17483,8 @@ Options of each driver:
 
 ## StorageConfig
 
-Source: `packages/dox-core/lib/storage/storage_config.dart`.
+`StorageService` of the `dox_storage` package takes it. See [File storage](../digging-deeper/file-storage.md).
+Source: `lib/src/dox/storage_config.dart` in [dartondox/dox-storage](https://github.com/dartondox/dox-storage).
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
@@ -17471,16 +17541,17 @@ Source: `packages/dox-core/lib/openapi/openapi_config.dart`.
 
 ## SocketIoConfig
 
-Source: `packages/dox-core/lib/socketio/socket_io_config.dart`.
+`SocketIoService` of the `dox_socketio` package takes it. See [Socket.IO](../packages/socketio.md).
+Source: `lib/src/dox/socket_io_config.dart` in [dartondox/dox-socketio](https://github.com/dartondox/dox-socketio).
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `enabled` | `bool` | `false` | Mount Socket.IO on the HTTP port at `/socket.io/`. |
+| `enabled` | `bool` | `true` | Mount Socket.IO on the HTTP port at `/socket.io/`. |
 | `options` | `ServerOptions` | `ServerOptions()` | Engine options. See below. |
 | `namespaces` | `List<NamespaceHandler>` | `[]` | Namespaces to register, like `ChatNamespace()`. |
 | `adapter` | `SocketAdapterFactory?` | `null` (in memory) | Makes the adapter in each isolate. Use a Redis adapter with many isolates. |
 
-`ServerOptions` (`packages/dox-socketio/lib/src/engine/server_options.dart`). The defaults match the Node.js server.
+`ServerOptions` (`lib/src/engine/server_options.dart` in dox-socketio). The defaults match the Node.js server.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
@@ -17507,7 +17578,7 @@ Source: `packages/dox-core/lib/socketio/socket_io_config.dart`.
 ## DatabaseConfig
 
 The database is not a field of `AppConfig`. A service calls `SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig)` in its `setup()`.
-Source: `packages/dox-orm/lib/src/types/database_config.dart` and `connection_config.dart`.
+Source: `packages/dox-orm/lib/src/types/database_config.dart` and `connection_config.dart` in [dartondox/dox-orm](https://github.com/dartondox/dox-orm).
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
@@ -17571,7 +17642,6 @@ import 'package:dox_core/dox_core.dart';
 import 'package:my_app/config/cache.dart';
 import 'package:my_app/config/cors.dart';
 import 'package:my_app/config/logger.dart';
-import 'package:my_app/config/storage.dart';
 import 'package:my_app/config/env.dart';
 import 'package:my_app/generated/container.g.dart';
 
@@ -17585,7 +17655,6 @@ AppConfig appConfig = AppConfig(
   ],
   container: registerContainer,
   cache: cache,
-  storage: storage,
   cors: cors,
   logger: logger,
 );
@@ -17602,18 +17671,6 @@ CacheConfig cache = CacheConfig(
 
     /// one map per isolate, fast, not shared
     'memory': <String, dynamic>{'driver': 'memory', 'max_size': 10000},
-  },
-);
-```
-
-```dart title="lib/config/storage.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:my_app/config/env.dart';
-
-StorageConfig storage = StorageConfig(
-  defaultDisk: env.storageDisk,
-  disks: <String, Map<String, dynamic>>{
-    'local': <String, dynamic>{'driver': 'local', 'root': 'storage'},
   },
 );
 ```
@@ -18931,7 +18988,7 @@ The table shows the `message` text.
 | `Invalid argument(s): Storage disk "<name>" has unknown driver "<type>"` | A disk in `StorageConfig` has a `driver` other than `local`, `s3` or `memory`. | Fix the driver name. |
 | `Invalid argument(s): Storage disk "<name>" needs the "<setting>" setting. It is missing or empty.` | An `s3` disk without `bucket`, `key` or `secret`, on its first use. | Set `AWS_BUCKET`, `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`. |
 | `Invalid argument(s): invalid file` | `Storage().put()` with no `extension:`, and Dox can not find the type from the bytes. | Pass `extension: 'pdf'`. |
-| `403` `invalid or expired signature` | A `Route.files()` URL without a valid `signature`, or after `expires`. | Make a new link with `Storage().signedUrl()`. |
+| `403` `invalid or expired signature` | A `Storage.route()` URL without a valid `signature`, or after `expires`. | Make a new link with `Storage().signedUrl()`. |
 | `404` `file not found` | `Storage().stream()` or `download()` of a missing file. | Check the path. |
 | `Invalid argument (trustedProxies): not an ip or cidr: "<value>"` | A bad entry in `AppConfig.trustedProxies`. | Use an IP, a CIDR like `10.0.0.0/8`, or `*`. |
 | `Invalid argument (type): must be asc or desc: "<value>"` | `orderBy(column, type)` with another direction. | Use `asc` or `desc`. |
@@ -19457,6 +19514,14 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_core
 
+### Unreleased
+
+- Breaking: `dox_core` no longer depends on `dox_storage` and `dox_socketio`. Add the package you use to your app.
+  - Storage: `Storage()`, `StorageConfig` and `StorageDiskFactory` moved to `dox_storage`. `AppConfig.storage` is removed: extend `StorageService` from `dox_storage` (`class AppStorageService extends StorageService { AppStorageService() : super(storageConfig); }`). `Route.files()` is now `Storage.route()`. `Dox().storage` is now `Storage.manager`. `RequestFile.store()` needs `import 'package:dox_storage/dox_storage.dart'`.
+  - Socket.IO: `SocketIoConfig` moved to `dox_socketio`. `AppConfig.socketIo` is removed: extend `SocketIoService` from `dox_socketio`. `Dox().socketIo` is now `SocketIoService.server`.
+  - `dox_core` no longer exports `Disk`, `DriveManager`, `FileNotFoundException` and `StorageException`. Import them from `dox_storage`.
+  - `StreamFile` and `DownloadableFile` stay in `dox_core`.
+
 ### 3.0.0-alpha.11
 
 - New: middleware that runs after the controller. Implement `IDoxNextMiddleware` (`handle(DoxRequest req, Next next)`), or use a function `(DoxRequest req, Next next)`. `await next()` runs the rest of the middleware and the controller and gives a `DoxResponse`, so the code after it can change the status, headers and cookies. A thrown error comes back as its error response, so the after part still runs. Before-only middleware work as before. A route with no `next` middleware takes the same fast path as before.
@@ -19629,73 +19694,6 @@ What changed in each package, newest first. This page is made from the
 - Faster: streamed bodies, all CPU cores, faster router.
 - `uuid` 4 and `mime` 2.
 
-## dox_migration
-
-### 3.0.0-alpha.11
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.10
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.9
-
-- New `Seeder` and `SeederRunner`. A seeder puts data in the database. `call()` runs other seeders. `SeederRunner(seeders: seeders).run(args)` runs `DatabaseSeeder`, or another one with `--class=<name>`, in one transaction. It reads the database from `.env`, the same as the migrations.
-- New `Migrator.fresh()` and the `fresh` command of `Migrator.run()`. It drops every table of the database, then runs all migrations.
-
-### 3.0.0-alpha.8
-
-- A migration that runs inside a transaction you already opened (eg. with `Migrator(connection: ...)`) now uses a savepoint. A failed migration undoes only its own work.
-
-### 3.0.0-alpha.7
-
-- Breaking: migrations run on the dox_orm drivers: the native Postgres and MySQL drivers, and SQLite. The `postgres` and `mysql_dart` packages are gone. When the native library does not load, the migration stops with an error that says why.
-- Breaking: `Migrator(connection: ...)` takes a dox_orm `DBDriver` now, eg. `SqlQueryBuilder().dbDriver`. The migrator does not close it. New `Migrator(config: ...)` takes a `ConnectionConfig`, eg. `databaseConfig.getConnectionConfig()`, and closes it at the end.
-- TLS works the same as dox_orm. For Postgres, `sslmode=require` encrypts and `verify-full` also checks the certificate. For MySQL the certificate is checked. Add `verifyCertificate=false` to `DATABASE_URL` to skip the MySQL check in development.
-
-### 3.0.0-alpha.6
-
-- A `DB_HOST` that starts with `/` is a MySQL Unix socket file too (Postgres: the socket folder). `?socket=/path` works in a `mysql://` `DATABASE_URL`.
-
-### 3.0.0-alpha.5
-
-- `DATABASE_URL` support. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. Its `sslmode` (Postgres) or `ssl` (MySQL) option turns TLS on.
-- A `DB_HOST` that starts with `/` is a Postgres Unix socket folder, like `/cloudsql/project:region:instance` on Cloud Run.
-- Migrations read real environment variables too. Before, a `.env` file hid them. Now a real env var wins over `.env`, the same as `Env.get()` of dox_core. An empty value, or `null`, counts as missing.
-
-### 3.0.0-alpha.4
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.3
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.2
-
-- Needs Dart 3.13 or newer.
-- All dependencies updated to their latest versions.
-- `sqlite3` 3 (SQLite is bundled, no system library needed).
-
-### 3.0.0-alpha.1
-
-- Removed the `dox_migration` executable from pubspec (its script was removed before). Use the `dox` CLI.
-- Added SQLite: `DB_CONNECTION=sqlite` and `DB_DATABASE=<file path>`.
-- MySQL driver is now `mysql_dart` (was `mysql1`). The MySQL 8 default login (`caching_sha2_password`) works.
-- `migrate()` and the other commands also take a pool (postgres `Pool`, mysql `MySQLConnectionPool`). Each file runs in one transaction on one connection.
-- Breaking: a passed mysql connection must be a `mysql_dart` `MySQLConnection` or `MySQLConnectionPool` (not `mysql1`).
-- Needs Dart 3.6 or newer.
-
-### 3.0.0
-
-- Support MySQL. Set `DB_CONNECTION=mysql` in `.env` (default is `postgres`)
-- Run each statement of a `.sql` migration one by one, inside a transaction
-- Rollback undoes only the last batch, newest first. Add `step`, `reset()` and `refresh()`
-- Stop at the first failed migration
-- Fix `.sql` parsing: a `-` in the sql no longer cuts the `up` or `down` part
-- Fix statement split: `;` inside quotes, comments or `$$` bodies does not split
-
 ## dox_openapi
 
 ### 3.0.0-alpha.11
@@ -19755,298 +19753,6 @@ What changed in each package, newest first. This page is made from the
 - Build an OpenAPI 3.1 document with `OpenApi` and `ApiDoc`.
 - Add undocumented Dox routes with `DoxRouteAdapter`.
 - Output as JSON and YAML, write files, serve `/openapi.json`, `/openapi.yaml` and `/docs`.
-
-## dox_orm
-
-### 3.0.0-alpha.11
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.10
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.9
-
-- Breaking: the `ModelObserver` methods now have the same names as the model hooks: `onSaving`, `onSaved`, `onCreating`, `onCreated`, `onUpdating`, `onUpdated`, `onDeleting`, `onDeleted`, `onRestoring`, `onRestored`, `onForceDeleting` and `onForceDeleted`. Rename the methods in your observers, for example `created(User user)` to `onCreated(User user)`.
-- New model factories: `import 'package:dox_orm/factory.dart';`. Extend `Factory<User>` and write `definition()`. Then use `count(n)`, `state()`, `sequence()`, `has()`, `make()`, `makeOne()`, `create()` and `createOne()`. See the Factories docs page.
-- New query scopes. `@Scope()` on a static model method adds it as a query method, like `User().isActive().get()`. `@Scope(global: true)` adds it to every query of the model. Remove it with `withoutGlobalScope('name')` or `withoutGlobalScopes()`.
-- New attribute casts with `@Column(cast: ...)`: `JsonCast`, `ListCast<E>`, `BoolCast`, `EnumCast<E>` (by name or by index), or your own `Cast<T>` class. `bool` fields get `BoolCast` and enum fields get `EnumCast` without `cast`.
-- New `withCount('posts')`, `withSum('posts', 'views')` and `withMax('posts', 'views')`. They add the value with a subquery, for `hasOne`, `hasMany` and `manyToMany` relations. Read it with `countOf('posts')` or `aggregate('posts_sum_views')`. `toJson()` has it too.
-- `all()` now uses the where conditions of the query, like `get()`. Before, it used only the soft delete check.
-- New: `package:dox_orm/testing.dart` with `refreshDatabase()`. Use `setUp(refreshDatabase)` in tests: it empties every table and starts the ids at 1 again, on Postgres, MySQL, MariaDB and SQLite. The migrations table keeps its rows. `keep:` keeps more tables.
-
-### 3.0.0-alpha.8
-
-- A `transaction()` inside another transaction now uses a savepoint (`SAVEPOINT sp_N`). When the inner function throws, only its work is undone, and the error is thrown again. If the caller catches the error, the outer transaction goes on and can commit. Before, the inner one joined the outer one, so an inner error always undid the outer work too. Works on Postgres, MySQL, MariaDB and SQLite. New `DBDriver.savepoint()`.
-- Postgres: new `extra['sslRootCert']`, the path of a PEM file with the CA certificates to trust for `verify-full`. `sslrootcert` in `DATABASE_URL` sets it. New `ConnectionConfig.postgresSslRootCert`. Needs the next `dox_postgres_native` release.
-
-### 3.0.0-alpha.7
-
-- Breaking: Postgres and MySQL use only the native drivers. The Dart drivers (`postgres` and `mysql_dart` packages) are gone. So are `PostgresDriver`, `MysqlDriver`, `DOX_DB_DRIVER=dart` and `extra['native']`.
-- Breaking: when the native library does not load, `createDriver()` and `SqlQueryBuilder.initializeWithDatabaseConfig()` throw an `UnsupportedError`. It says why the library did not load and how to fix it. Before, the ORM used the Dart driver and printed a warning.
-- Postgres has TLS now. `useSSL: true` is mode `require` (no certificate check, like libpq). `extra['sslMode']` is a `String`: `disable`, `prefer`, `require` or `verify-full`. `sslmode` in `DATABASE_URL` sets it. `prefer` and `allow` in the url now mean "TLS when the server has it".
-- Breaking: errors are `PgServerException` and `PgException` for Postgres, and `MysqlException` for MySQL. `dox_orm` exports them. The `ServerException` classes of the `postgres` package and `MySQLServerException` are gone.
-- Breaking: `ConnectionConfig` loses `getDatabaseConnection()`, `postgresEndpoint`, `mysqlHost`, `mysqlPort`, `mysqlAllowPublicKeyRetrieval` and `mysqlAcceptBadCertificate`. `postgresSslMode` is now a `String`. The `collation`, `timeoutMs`, `timeZone` (MySQL), `serverPublicKey`, `allowPublicKeyRetrieval` and the `postgres` package pool keys of `extra` are no longer read.
-- Breaking: `getDatabaseDriver()` and `SqlQueryBuilder.initialize()` take a `PgNativePool` for Postgres and a `MysqlNativePool` for MySQL.
-- On Postgres, a `List` in `insert()` or `update()` is sent as json text, so it fits a json column. New `DBDriver.columnValue()`.
-- `dox_postgres_native` and `dox_mysql_native` now live in their own repos (dartondox/dox-postgres-native, dartondox/dox-mysql-native). Dox uses them from pub.dev (`^3.0.0-alpha.7`). Their build hooks download ready-built libraries, so you do not need Rust.
-- Faster `belongsTo` load. It reads each owner once with `WHERE owner.id IN (...)`, with no join to the children. Before, a user with 10,000 blogs came back 10,000 times. Children of the same owner now get the same model object.
-- `save()` on a new model runs one `INSERT` and reads the id from it. There is no `SELECT` after it. `insert()` and `create()` use `RETURNING *` on Postgres and SQLite, so they also skip the `SELECT`. MySQL still reads the row with `find()`.
-- `save()` on an existing model sends only the columns that changed since the last load or save. A `Map` or `List` field is always sent. When nothing changed, `save()` runs no query and `updated_at` stays as it is. Before, it always ran an `UPDATE` with every column that had a value.
-- Fix: after `restore()`, a `save()` on the same model sent the old `deleted_at` again and deleted the row again. Now `deleted_at` is not sent, because it did not change.
-- `LIMIT` and `OFFSET` are bound parameters (`@dox_limit`, `@dox_offset`). Every page gives the same SQL, so the drivers reuse one prepared statement.
-- On Postgres, `whereIn` and `whereNotIn` with only `int` or only `String` values send one array parameter (`= ANY(@p)`, `<> ALL(@p)`). A list of any size gives the same SQL. Other lists keep one parameter per value.
-- Relations of one model (`preload` and `eager`) load at the same time outside a transaction, so the native drivers send them in one batch. Inside a transaction they still load one by one. New `DBDriver.inTransaction`.
-- Rows of a model made by the new generator skip the date to string step. `fromMap()` takes the `DateTime` of the driver as it is. `toMap(original: true)` still gives dates as ISO strings.
-- New `Model.columnsToMap()`: the columns only, without relations. `save()` uses it, so it no longer turns preloaded relations into JSON.
-- Less work per row: the where, join and order lists of a model are made only when used. `getPreload()` and the generated getters do not make a new list or map on each call.
-- The SQL text is no longer scanned for double spaces on each query. `orderBy()` without a direction no longer adds a space.
-- `QueryBuilderHelper.runQuery()` no longer has the `clean` parameter.
-- Fix: in a native Postgres or MySQL `transaction()`, when the rollback after an error also fails, the first error is thrown. Before, the rollback error replaced it.
-- The native Postgres driver shares one pool for all isolates with the same settings, like the native MySQL driver. `maxConnectionCount` is for the whole process on both native drivers.
-- The Dart Postgres driver keeps its prepared statements after a session command like `SET`, `SHOW`, `BEGIN` or `COMMIT`. Before, any query that was not select/insert/update/delete dropped all of them.
-- Breaking: column and table names in `select`, `where`, `orderBy`, `groupBy`, `join`, `insert` and `update` must be plain names (`name`, `table.name`, `table.*`, `*`, `name as alias`). Anything else, like `count(*)`, throws an `ArgumentError`. Before, a name with `(` went into the SQL as it is, so user input could add SQL. Use `selectRaw`, `whereRaw` or the new `orderByRaw` and `groupByRaw` for expressions.
-- Breaking: the operator of `where()` and `join()` must be one of `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `like`, `not like`, `ilike` (any case). Any other value throws an `ArgumentError`.
-- New `fillable` and `guarded` lists on `Model`. When set, `create()`, `insert()` and `update()` on the model drop the keys that are not allowed, so `User().create(req.body)` can not set `is_admin`. `insertMultiple()` on the model drops them from each row too. Both are empty by default, so nothing changes until you set them.
-- Breaking: TLS checks the server certificate. Postgres `useSSL` (and `sslmode=verify-ca` or `verify-full` in a url) now uses `SslMode.verifyFull`. `sslmode=require` in a url stays `SslMode.require` like libpq: it encrypts but does not check the certificate (eg. Heroku). The Dart MySQL driver no longer accepts a bad certificate. Set `extra['verifyCertificate']` to false (or `?verifyCertificate=false` in a url) to skip the check for a self-signed certificate in development.
-- Breaking: the Dart MySQL driver no longer asks the server for its RSA key by default. It still asks with TLS on, or on `localhost`, `127.0.0.1`, `::1` and a Unix socket. Give the key in `serverPublicKey`, or set `allowPublicKeyRetrieval: true`.
-
-### 3.0.0-alpha.6
-
-- MySQL and MariaDB Unix sockets. A host that starts with `/` is the socket file, like `/var/run/mysqld/mysqld.sock` or `/cloudsql/project:region:instance` on Cloud Run. Works on the native and the Dart driver. In a url, use `?socket=/path` or `?host=/path`.
-- New `SqlQueryBuilder.close()`. It closes every open database connection of the isolate: the default and all named connections, on every driver (native Postgres and MySQL, the Dart drivers and SQLite). It is safe to call twice. Call it on shutdown, eg. from a `DoxShutdown` service.
-- New `DBDriver.close()`, for one driver. Custom drivers can override it. The default does nothing.
-- `SqlQueryBuilder().dbDriver` throws a `StateError` with a clear message when the ORM is not set up (or after `close()`).
-- After `close()`, the native MySQL driver throws a `StateError` on a new query or transaction. Before, the query still ran when another isolate kept the shared pool open.
-
-### 3.0.0-alpha.5
-
-- `DATABASE_URL` support. `ConnectionConfig.fromUrl()` reads `postgres://`, `postgresql://`, `mysql://`, `mariadb://`, `sqlite:` and `file:` urls: url-decoded user and password, host, port, database, `sslmode` and other options (they go to `extra`).
-- `DatabaseConfig` has a new `url`. It is `DATABASE_URL` from the environment when not given. When it is set, it wins: it replaces the default connection. Pass `url: ''` to turn it off.
-- Postgres Unix sockets. A host that starts with `/` is a socket folder, like `/cloudsql/project:region:instance` on Cloud Run. Works on the native and the Dart driver. Use `?host=/cloudsql/...` in a url.
-- Breaking: the finders are typed. On a model, `get()` and `all()` give `Future<List<T>>`, `find()` and `getFirst()` give `Future<T?>`, and `paginate()` gives `Future<Pagination<T>>` (`page.data` is a `List<T>`). `QueryBuilder.table()` gives maps: `get()` is `Future<List<Map<String, dynamic>>>` and `getFirst()` is `Future<Map<String, dynamic>?>`. `QueryBuilder.table()` has no type argument and no second argument any more.
-- Breaking: `groupBy()` and `rawQuery()` rows are maps, so use them on `QueryBuilder.table()`. On a model, `get()` throws a `StateError` for them. `count()` with `groupBy()` still works on a model.
-- Breaking: the default foreign keys use the model name, like Laravel. A `User` model with `table: 'users'` gives `user_id`, not `users_id`. The default pivot table of `@ManyToMany` also uses the model names (`artist_song`). Keys you set yourself work as before. New `Model.foreignKeyName` gives the default key of a model.
-- Breaking: `save()` inserts when the model is new and updates when the row is in the table (`model.exists`). Before, it updated when the primary key was set. So a new model with a key you set yourself, like a UUID, is now inserted.
-- `QueryBuilder.query()` has a new `connection` parameter, to run a raw query on a named connection.
-- Fix: `withConnection()` did not reach `save()`, `delete()`, `forceDelete()` and `restore()`. They used the default connection. Now they use the connection of the model. Models that a query returns keep the connection of the query, and relation queries use the connection of the parent model. `Model.withConnection()` returns the model, so `Blog()..withConnection('other')` works.
-
-### 3.0.0-alpha.4
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.3
-
-- Postgres and MySQL/MariaDB now use the native drivers by default (`dox_postgres_native` and `dox_mysql_native`). You do not change any config. If the native library does not load, the ORM uses the Dart driver and prints one warning line. Set `DOX_DB_DRIVER=dart`, or `extra: {'native': false}` on one connection, to use the Dart driver. `driverFactory` still wins over all of this.
-- Breaking: `PostgresNativeDriver` and `MysqlNativeDriver` moved into `dox_orm`. Import them from `package:dox_orm/dox_orm.dart`.
-- `PostgresNativeDriver.query` does one less async step per query.
-- Faster queries on all databases. Each connection keeps its prepared statements (LRU, 100 by default, `extra['preparedStatementCacheSize']`). The same query now has the same sql text, so the statements are reused. `find()` no longer sends `LIMIT 1 OFFSET 0`: LIMIT and OFFSET are only sent when set, and never `OFFSET 0`. Less work per row when models are built. A find by id on SQLite went from 23 µs to 6 µs.
-- Less Dart work per query. A plain `find()` builds its SQL once per driver, table and column, and reuses it. A model makes its maps and lists only when they are used. Rows become models without one more `await` when there is nothing to preload. ORM work per `World().find(id)` went from 2.6 µs to 1.0 µs (no database, AOT).
-- New `ConnectionConfig.driverFactory`: plug in your own driver class with one line. The default and the named connections use it.
-
-### 3.0.0-alpha.2
-
-- Needs Dart 3.13 or newer.
-- All dependencies updated to their latest versions.
-- `sqlite3` 3. SQLite is now bundled by a build hook, so no system `libsqlite3` is needed.
-- Breaking: `dart compile exe` does not work with build hooks. Use `dart build cli` (or `dox build`).
-- SQLite: set `busy_timeout` before `journal_mode = WAL`. Before, many isolates that opened the same file at start could fail with "database is locked".
-- New DTO rules `@Unique('users', column: 'email', ignoreParam: 'id')` and `@Exists('teams')`. They run after all other checks. A `List` field is checked with one `WHERE IN` query. Soft-deleted rows count too.
-
-### 3.0.0-alpha.1
-
-- Renamed from `dox_query_builder` to `dox_orm`. Change `package:dox_query_builder/dox_query_builder.dart` to `package:dox_orm/dox_orm.dart`. The old package still works for now: it only re-exports this one.
-- Added SQLite (`Driver.sqlite`, package `sqlite3`). `database` is a file path or `:memory:`. Uses WAL, `busy_timeout` and foreign keys. One connection per isolate. See the docs for limits.
-- MySQL driver is now `mysql_dart` (was `mysql1`). The MySQL 8 default login (`caching_sha2_password`) works. It uses a real connection pool (`maxConnectionCount`, default 10), prepared statements with bound values, and one pooled connection per transaction.
-- Breaking: `extra['characterSet']` (a `mysql1` type) is no longer read. Use `extra['collation']` (default `utf8mb4_general_ci`). `getDatabaseConnection()` for MySQL now returns a `MySQLConnectionPool`.
-- Breaking: MySQL `TIME` columns are now a `String` (was a `Duration`). `BLOB` columns are `Uint8List` (was text).
-- `ConnectionConfig`: `user`, `password` and `port` are optional (not used by SQLite).
-- Needs Dart 3.6 or newer.
-- Added `whereNull`, `whereNotNull`, `orWhereNull`, `orWhereNotNull`, `whereNotIn`, `orWhereIn`, `orWhereNotIn` and `selectRaw`.
-- Added `QueryBuilder.transaction()`. Postgres now uses a real connection pool (`maxConnectionCount`) and no longer runs each query in its own transaction.
-- Added `boolean()` schema column (Postgres `BOOLEAN`, MySQL `TINYINT(1)`, read as `bool`).
-- Table and column names are now quoted (`"name"` on Postgres, `` `name` `` on MySQL). On Postgres, quoted names are case sensitive. Use `selectRaw`/`whereRaw` for raw SQL.
-- `count()` ignores `limit`, `offset` and `orderBy`. With `groupBy` it now returns the number of groups (before: the size of the first group).
-- `save()` can set a field to null on update.
-- `insert()` works with any primary key type (uuid strings too).
-- `model.delete()` and `model.forceDelete()` only delete that record. Before, they had no where condition.
-- `forceDelete()` also deletes soft deleted rows. `withTrash(false)` on a model without soft deletes no longer adds a `deleted_at` filter.
-- hasOne, hasMany and manyToMany work with a custom `localKey`.
-- `insertMultiple()` uses keys from all rows. Missing keys use the column default.
-- MySQL: only JSON columns are decoded (arrays too). MariaDB keeps decoding JSON-like text, because it stores JSON as text.
-- Schema: `unique()` on a column that is already unique is skipped. Default values are escaped.
-
-## dox_query_builder
-
-### 3.0.0-alpha.11
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.10
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.9
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.8
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.7
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.6
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.5
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.4
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.3
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.2
-
-- Needs Dart 3.13 or newer.
-- All dependencies updated to their latest versions.
-
-### 3.0.0-alpha.1
-
-- This package is renamed to `dox_orm`. It now only re-exports `package:dox_orm/dox_orm.dart`.
-- Please depend on `dox_orm` and change your imports. See the README.
-
-## dox_socketio
-
-### 3.0.0-alpha.11
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.10
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.9
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.8
-
-- New: `ServerOptions(maxAttachments: 10)`. It is the most binary attachments one packet may have. The default is the same as before (10). A packet with more closes that client.
-
-### 3.0.0-alpha.7
-
-- Uses `ioredis` 2.0.0-alpha.3, which can send and get binary messages. `RedisAdapter` and `SocketIoEmitter` take `ioredis` clients.
-- `RedisAdapter` reads msgpack and JSON messages. Before, it read only JSON, so the Socket.IO emitters (Node.js, PHP, Python, Go) did not work. They use msgpack.
-- Breaking: `RedisAdapter` writes msgpack by default, like `@socket.io/redis-adapter`. Use `format: RedisFormat.json` for Node.js servers with a JSON parser.
-- Fix: binary data in JSON Redis messages is written as a Node.js Buffer (`{"type":"Buffer","data":[...]}`). Before, it was written as a plain list of numbers.
-- `RedisAdapter` handles the requests on `socket.io-request#<nsp>#`: `socketsJoin`, `socketsLeave` and `disconnectSockets` from emitters and other servers. It answers `fetchSockets`, `allRooms` and broadcasts with acks from Node.js servers, so they do not wait for a timeout.
-- New `SocketIoEmitter(redis)`: sends events, `socketsJoin`, `socketsLeave` and `disconnectSockets` through Redis without a Socket.IO server. Same format as `@socket.io/redis-emitter`.
-- New `MsgPack` encoder and decoder.
-- Performance: a broadcast builds the websocket text frame and its UTF-8 bytes once and shares them with every client (new `SharedText`). Before, each client built and encoded its own copy.
-- Performance: a broadcast with no `except` and at most one room goes over the room members directly. Before, it copied all socket ids into new sets each time.
-- Breaking: `SocketIoServer.listen()` starts a native server (`dox_http_native`), not a `dart:io` one. The websocket transport uses the native WebSocket upgrade. Long-polling works the same. `attach()` still takes any `HttpServer`, also a `dart:io` one.
-- Security: on the native server, a websocket message over `maxHttpBufferSize` bytes is closed with 1009 in Rust, before Dart reads it.
-- Security: a binary packet nested deeper than 32 levels is a parse error (`SocketDecoder(maxDepth: ...)`). Before, a deep packet overflowed the stack and could stop the server. Any decode error now closes only that one connection.
-- Security: many CONNECT packets for one namespace at once make only one socket. Before, each one made a socket that stayed in memory.
-- Security: websocket compression is off. A small compressed message could grow very big in memory.
-- Security: when `CorsOptions.origins` lists origins, a websocket from another origin gets 403. With no `cors`, or with `*`, any origin is still allowed.
-- Breaking: `CorsOptions(origins: ['*'], credentials: true)` throws an `ArgumentError`. Before, it sent back any origin with credentials.
-- Security: a middleware error that is not a `SocketIoException` sends `{"message": "Internal error"}` to the client and writes the real error to stderr.
-- Security: a client whose CONNECT is refused is closed after `connectTimeout`. Before, it could stay connected forever.
-
-- Security: a binary packet may have at most 10 attachments (`SocketDecoder(maxAttachments: ...)`). More closes the connection with a parse error. Before, a client could send `51000000-[...]` before any auth and the server kept every binary frame after it in memory.
-
-### 3.0.0-alpha.6
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.5
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.4
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.3
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.2
-
-- Needs Dart 3.13 or newer.
-- All dependencies updated to their latest versions.
-
-### 3.0.0-alpha.1
-
-- Uses `ioredis` 2.
-- `RedisAdapter` listens with `PSUBSCRIBE`, so it also gets the room channels that the Node.js redis adapter uses for one room. `onRedisMessage` now takes `(pattern, channel, message)`.
-- First version. Socket.IO v4 server (Engine.IO v4, Socket.IO protocol v5).
-- Polling and websocket transports, upgrade, heartbeat, CORS.
-- Namespaces, middleware, rooms, broadcast, acks, binary.
-- In-memory adapter and Redis adapter.
-
-## dox_storage
-
-### 3.0.0-alpha.11
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.10
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.9
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.8
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.7
-
-- Perf: the S3 driver keeps the SigV4 signing key for each day. Before, every request ran 4 extra HMACs to make it again.
-- Perf: the S3 driver hashes a body of 1 MiB or more (eg. an 8 MiB multipart part) in another isolate. Before, the sha256 blocked the event loop.
-
-### 3.0.0-alpha.6
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.5
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.4
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.3
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.2
-
-- Needs Dart 3.13 or newer.
-- All dependencies updated to their latest versions.
-
-### 3.0.0-alpha.1
-
-- Initial version.
-- `DriveManager` and `Disk` with a FlyDrive-like API.
-- Drivers: `LocalDriver`, `S3Driver` (AWS S3, R2, MinIO, Spaces, GCS interop), `MemoryDriver`.
-- AWS Signature V4 signing, presigned download and upload URLs, multipart upload.
-- `DriveManager.fake()` for tests.
 
 ## dox_validation
 

@@ -6495,17 +6495,17 @@ The binder gets the raw text from the URL. It returns the value, or <code>null</
 See <a href="../dependency-injection/#route-model-binding">Dependency injection: route model binding</a>.
 <code>Route.bind</code> wins when both exist.</p>
 <h2 id="serve-storage-files">Serve storage files</h2>
-<p><code>Route.files(path)</code> serves the files of a storage disk at <code>GET &lt;path&gt;/{key*}</code>.
+<p><code>Storage.route(path)</code> from the <a href="../../packages/storage/"><code>dox_storage</code></a> package serves the files of a storage disk at <code>GET &lt;path&gt;/{key*}</code>.
 By default only signed URLs work. Other requests get <code>403</code>.
 See <a href="../../digging-deeper/file-storage/#serve-local-signed-urls">File Storage</a>.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">Route</span><span class="p">.</span><span class="n">files</span><span class="p">(</span><span class="s1">'files'</span><span class="p">);</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">Route</span><span class="p">.</span><span class="n">files</span><span class="p">(</span><span class="s1">'public'</span><span class="p">,</span><span class="w"> </span><span class="nl">disk:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span><span class="w"> </span><span class="nl">signed:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'files'</span><span class="p">);</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'public'</span><span class="p">,</span><span class="w"> </span><span class="nl">disk:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span><span class="w"> </span><span class="nl">signed:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span>
 </span></code></pre></div>
 <p>An html, svg, xml or javascript file is sent as a download (<code>Content-Disposition: attachment</code>) with <code>Content-Security-Policy: sandbox</code>.
 So a script in an uploaded file does not run on your site.
 Every file response also has <code>X-Content-Type-Options: nosniff</code>, so the browser does not guess another type.</p>
 <p>For user uploads, <code>download: true</code> sends every file as a download, also images and PDFs:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">Route</span><span class="p">.</span><span class="n">files</span><span class="p">(</span><span class="s1">'uploads'</span><span class="p">,</span><span class="w"> </span><span class="nl">download:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'uploads'</span><span class="p">,</span><span class="w"> </span><span class="nl">download:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
 </span></code></pre></div>
 <h2 id="request-body-for-the-docs">Request body for the docs</h2>
 <p><code>post</code>, <code>put</code> and <code>patch</code> take a <code>body:</code> schema. It shows in the <a href="../../packages/openapi/">OpenAPI docs</a>.
