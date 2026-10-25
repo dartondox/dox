@@ -69,7 +69,7 @@ sequenceDiagram
 | --- | --- | --- |
 | Route match | `lib/routes/*.dart`, `Route.get(...)` | which controller runs |
 | Middleware | `AppConfig(globalMiddleware:)`, `Router.middleware`, `Route.middleware(...)`, the route list | go on, or answer early |
-| Input | a `@Dto` class in `lib/app/http/dtos/<name>/` | what the controller gets, or `422` |
+| Input | a `@Dto` class in `lib/app/dtos/<name>/` | what the controller gets, or `422` |
 | Output | the return value, `response(...)`, `responseHandler` | status, headers, body |
 | Errors | `IHttpException`, `AppConfig(exceptionHandler:)` | the error response, logging |
 
@@ -163,9 +163,9 @@ my_app/
 │   └── migration/           # migrations (.dart with a registry, or .sql)
 ├── lib/
 │   ├── app/
+│   │   ├── dtos/            # one folder per DTO, *.dto.dart, typed and checked input
 │   │   ├── http/
 │   │   │   ├── controllers/     # *.controller.dart
-│   │   │   ├── dtos/            # one folder per DTO, *.dto.dart, typed and checked input
 │   │   │   ├── middleware/      # *.middleware.dart
 │   │   │   ├── serializers/     # *.serializer.dart, custom JSON shapes
 │   │   │   └── response_handler.dart
@@ -182,7 +182,7 @@ my_app/
 │   │   ├── api.dart             # ApiRouter, prefix `api`
 │   │   └── web.dart             # WebRouter
 │   ├── providers/
-│   │   └── orm_service.dart     # opens the database in every isolate
+│   │   └── orm_provider.dart    # opens the database in every isolate
 │   └── generated/               # made by build_runner, do not edit
 │       ├── container.g.dart     # @Inject classes, routers, providers
 │       ├── dtos.g.dart          # the list of DTOs

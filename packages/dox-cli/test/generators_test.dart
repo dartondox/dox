@@ -67,7 +67,7 @@ void main() {
     test('dto', () {
       expect(createDto('CreateBlogPost'), isTrue);
       String c = read(
-        'lib/app/http/dtos/create_blog_post/create_blog_post.dto.dart',
+        'lib/app/dtos/create_blog_post/create_blog_post.dto.dart',
       );
       expect(c, contains('@Dto()'));
       expect(c, contains('class CreateBlogPost {'));

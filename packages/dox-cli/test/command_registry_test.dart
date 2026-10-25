@@ -131,7 +131,7 @@ void main() {
       Directory('lib/app/models').createSync(recursive: true);
       Directory('lib/app/http/controllers').createSync(recursive: true);
       Directory('lib/app/http/middleware').createSync(recursive: true);
-      Directory('lib/app/http/dtos').createSync(recursive: true);
+      Directory('lib/app/dtos').createSync(recursive: true);
       Directory('lib/app/http/serializers').createSync(recursive: true);
       Directory('lib/app/ws/controllers').createSync(recursive: true);
       Directory('db/migration').createSync(recursive: true);
@@ -226,9 +226,7 @@ void main() {
 
       expect(() => command!.function(['CreateUser']), returnsNormally);
 
-      final dtoFile = File(
-        'lib/app/http/dtos/create_user/create_user.dto.dart',
-      );
+      final dtoFile = File('lib/app/dtos/create_user/create_user.dto.dart');
       expect(dtoFile.existsSync(), isTrue);
 
       final content = dtoFile.readAsStringSync();

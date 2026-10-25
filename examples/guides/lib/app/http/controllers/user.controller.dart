@@ -1,7 +1,7 @@
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart';
 import 'package:my_app/app/exceptions/app_exception.dart';
-import 'package:my_app/app/http/dtos/list_users/list_users.dto.dart';
+import 'package:my_app/app/dtos/list_users/list_users.dto.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 
 @Inject()

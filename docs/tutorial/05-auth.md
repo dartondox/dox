@@ -69,7 +69,7 @@ dox make:dto RegisterUser
 dox make:dto LoginUser
 ```
 
-```dart title="lib/app/http/dtos/register_user/register_user.dto.dart"
+```dart title="lib/app/dtos/register_user/register_user.dto.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart' hide Schema;
 
@@ -103,7 +103,7 @@ class RegisterUser {
 `@Unique` comes from `dox_orm`. It reads the database, so it runs after the other rules.
 `dox_orm` also has a class named `Schema`, so the import hides it.
 
-```dart title="lib/app/http/dtos/login_user/login_user.dto.dart"
+```dart title="lib/app/dtos/login_user/login_user.dto.dart"
 import 'package:dox_core/dox_core.dart';
 
 part 'login_user.dto.g.dart';
@@ -164,8 +164,8 @@ You do not add it to a list.
 ## 5. Write the auth controller
 
 ```dart title="lib/app/http/controllers/auth.controller.dart"
-import 'package:blog/app/http/dtos/login_user/login_user.dto.dart';
-import 'package:blog/app/http/dtos/register_user/register_user.dto.dart';
+import 'package:blog/app/dtos/login_user/login_user.dto.dart';
+import 'package:blog/app/dtos/register_user/register_user.dto.dart';
 import 'package:blog/app/models/user/user.model.dart';
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';

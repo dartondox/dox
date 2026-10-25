@@ -16,7 +16,7 @@ Make a list route that takes `page` and `per_page` from the query string and ret
 A DTO with `source: Source.query` reads the query string, also for `POST`.
 The query key of `perPage` is `per_page`, because keys are snake_case by default.
 
-```dart title="lib/app/http/dtos/list_users/list_users.dto.dart"
+```dart title="lib/app/dtos/list_users/list_users.dto.dart"
 import 'package:dox_core/dox_core.dart';
 
 part 'list_users.dto.g.dart';
@@ -46,7 +46,7 @@ A controller can return it as it is. Dox sends `toJson()`.
 ```dart title="lib/app/http/controllers/user.controller.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart';
-import 'package:my_app/app/http/dtos/list_users/list_users.dto.dart';
+import 'package:my_app/app/dtos/list_users/list_users.dto.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 
 @Inject()

@@ -1,6 +1,6 @@
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_storage/dox_storage.dart';
-import 'package:my_app/app/http/dtos/upload_image/upload_image.dto.dart';
+import 'package:my_app/app/dtos/upload_image/upload_image.dto.dart';
 
 @Inject()
 class UploadController {
