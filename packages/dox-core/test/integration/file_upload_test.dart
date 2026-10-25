@@ -259,6 +259,53 @@ void main() {
       expect(res.headers['x-content-type-options'], 'nosniff');
     });
 
+    test('uploaded svg is sandboxed, download: true attaches any file', () async {
+      Route.post('/svg/upload', (DoxRequest req) async {
+        RequestFile file = req.input('page');
+        return await Storage().putRequestFile('images', file);
+      });
+      Route.files('svg-files', signed: false);
+      Route.files('svg-downloads', signed: false, download: true);
+
+      http.MultipartRequest
+      upload = http.MultipartRequest('POST', Uri.parse('$baseUrl/svg/upload'))
+        ..files.add(
+          http.MultipartFile.fromString(
+            'page',
+            '<svg xmlns="http://www.w3.org/2000/svg"><script>1</script></svg>',
+            filename: 'x.svg',
+          ),
+        );
+      String key = await (await upload.send()).stream.bytesToString();
+      expect(key, endsWith('.svg'));
+
+      http.Response res = await http.get(Uri.parse('$baseUrl/svg-files$key'));
+      expect(res.statusCode, 200);
+      expect(res.headers['content-disposition'], 'attachment');
+      expect(res.headers['content-security-policy'], 'sandbox');
+      expect(res.headers['x-content-type-options'], 'nosniff');
+
+      http.Response res2 = await http.get(
+        Uri.parse('$baseUrl/svg-downloads$key'),
+      );
+      expect(res2.statusCode, 200);
+      expect(
+        res2.headers['content-disposition'],
+        'attachment; filename="${key.split('/').last}"',
+      );
+      expect(res2.headers['x-content-type-options'], 'nosniff');
+    });
+
+    test('a File response sends nosniff', () async {
+      String dir = Directory.current.path;
+      Route.get('/file/raw', (DoxRequest req) {
+        return File('$dir/test/integration/storage/dox.png');
+      });
+      http.Response res = await http.get(Uri.parse('$baseUrl/file/raw'));
+      expect(res.statusCode, 200);
+      expect(res.headers['x-content-type-options'], 'nosniff');
+    });
+
     test(
       'many backslashes in a part header do not freeze the server',
       () async {

@@ -1,6 +1,6 @@
 # Status and roadmap
 
-Checked on 2026-10-22, for version `3.0.0-alpha.4`.
+Checked on 2026-10-25, for version `3.0.0-alpha.7`.
 
 Dox 3.0 is an **alpha**. You can build with it, but the API can still change between alpha versions.
 All packages share one version number.
@@ -16,21 +16,23 @@ No package is marked "stable API" yet. That comes with 3.0 stable.
 
 | Package | What it does | State | Tests |
 | --- | --- | --- | --- |
-| `dox_core` | Routes, middleware, controllers, request and response, isolates, config | May change | 29 test files. CI runs them on the native server. |
-| `dox_orm` | Query builder, models, relations, transactions, drivers | May change | 16 test files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite. |
+| `dox_core` | Routes, middleware, controllers, request and response, isolates, config | May change | 36 test files. CI runs them on the native server. |
+| `dox_orm` | Query builder, models, relations, transactions, drivers | May change | 26 test files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite. |
 | `dox_validation` | `@Dto` rules, fluent schemas, JSON Schema, Standard Schema | May change | 6 test files |
 | `dox_builder` | Code generator for models, DTOs, env classes and OpenAPI | May change | 4 test files |
 | `dox_annotation` | Annotations used by the generator | May change | 1 small test file. Mostly tested through `dox_builder`. |
-| `dox` (CLI) | `dox create`, `dox serve`, `dox build`, `make:*`, `migration:*` | May change | 5 test files |
-| `dox_migration` | Migrations for Postgres, MySQL, MariaDB and SQLite | May change | 2 test files. CI runs them on each database. |
-| `dox_auth` | JWT auth guard and middleware, password hashing | May change | 2 test files |
+| `dox` (CLI) | `dox create`, `dox serve`, `dox build`, `make:*`, `migration:*` | May change | 8 test files |
+| `dox_migration` | Migrations for Postgres, MySQL, MariaDB and SQLite | May change | 4 test files. CI runs them on each database. |
+| `dox_auth` | JWT auth guard and middleware | May change | 2 test files |
 | `dox_cache` | Memory, file and Redis cache, tags, locks | May change | 4 test files, with Redis in CI |
 | `dox_storage` | Local disk and S3 (and S3-compatible) storage | May change | 7 test files, with MinIO in CI |
 | `dox_openapi` | OpenAPI 3.1 document and a docs page | May change | 4 test files |
-| `dox_socketio` | Socket.IO v4 server with a Redis adapter | May change | 6 test files, with the real `socket.io-client` in CI |
-| `dox_http_native` | Native HTTP/1.1 server (Rust hyper), the default server | Experimental | 2 Dart test files and Rust tests. No WebSocket yet. |
-| `dox_postgres_native` | Native Postgres client (Rust tokio-postgres), the Postgres driver | Experimental | Dart tests, plus the `dox_orm` tests |
-| `dox_mysql_native` | Native MySQL and MariaDB client (Rust mysql_async), the MySQL driver | Experimental | 1 Dart test file, plus the `dox_orm` tests |
+| `dox_socketio` | Socket.IO v4 server with a Redis adapter | May change | 8 test files, with the real `socket.io-client` in CI |
+| `dox_http_native` | Native HTTP/1.1 and WebSocket server (Rust hyper). Dox has no other server. | Experimental | 3 Dart test files and Rust tests |
+| `dox_postgres_native` | Native Postgres client (Rust tokio-postgres), the Postgres driver. Has TLS (`sslmode`). | Experimental | 5 Dart test files, plus the `dox_orm` tests |
+| `dox_mysql_native` | Native MySQL and MariaDB client (Rust mysql_async), the MySQL driver. Has TLS. | Experimental | 1 Dart test file, plus the `dox_orm` tests |
+
+`Hash` (bcrypt password hashing) is in `dox_core`.
 
 !!! note "About test coverage"
     The repo does not measure line coverage. The "Tests" column counts test files and says where CI runs them.
@@ -45,28 +47,50 @@ These were checked by searching the code in `packages/*/lib` with `rg`.
 | Queues and jobs | Not there | Use a database table, Redis or a separate worker process. See [Background work](../guides/background-work.md). |
 | Task scheduler | Not there | Use cron or a systemd timer to call a route or a Dart script. |
 | Mail | Not there | Use a Dart mail package or an HTTP mail API. |
+| Notifications | Not there | Send them from your own service class. |
 | Events and listeners | Not there | Model events are there. See [Model events](../database/model/events.md). |
 | Views and templates | Not there | Dox is for APIs. Serve the front end on its own. |
 | Rate limiting | Not there | Write a middleware with the cache, or use a proxy. |
-| Sessions | Not there | Auth uses JWT. On the native server, `req.httpRequest.session` throws `UnsupportedError`. |
+| Sessions and password reset | Not there | Auth uses JWT. `req.httpRequest.session` throws `UnsupportedError`. |
 | Policies and gates | Not there | Check the user in a middleware or in the controller. |
-| Database seeders | Not there | Write a Dart script, or a migration with data. |
+| Database factories and seeders | Not there | Write a Dart script, or a migration with data. |
+| Savepoints | Not there | A nested `transaction()` joins the outer one. |
+| Localization | Not there | Keep your own message maps. |
 
 ## Planned
 
 !!! warning "This is a plan, not a promise. Open an issue to discuss."
-    Items come from the code (`TODO` and `ponytail:` notes in `packages/*/lib`) and from the owner.
+    Items come from the code (`ponytail:` notes in `packages/*/lib`) and from the owner.
     There are no dates.
 
-| Item | Source |
+### For 3.0.0
+
+| Item | Notes |
 | --- | --- |
-| TLS for the native Postgres driver | `ponytail:` note in `dox_orm/lib/src/drivers/postgres_native_driver.dart` |
-| Savepoints for nested transactions. Today a nested `transaction()` joins the outer one. | `ponytail:` notes in the `dox_orm` drivers and in `dox_migration` |
-| A queue package (`dox_queue`) | Wanted by the owner. Not started. |
-| A mail package (`dox_mail`) | Wanted by the owner. Not started. |
+| Small fixes | `nosniff` and a `download` option for `Route.files`, a stricter BMP check, `maxAttachments` for Socket.IO, `X-Forwarded-For` hops with a port, a minimum JWT secret length, one `Hash` class. |
+| Savepoints for nested transactions | Today a nested `transaction()` joins the outer one (`ponytail:` notes in the `dox_orm` drivers). |
+| `sslRootCert` for Postgres | Trust a private CA, like AWS RDS. `dox_postgres_native` has it. `dox_orm` does not pass it on yet. |
+| Named routes and route model binding | |
+| One exception handler | One place to turn every error into a response. |
+| ORM scopes, casts and `withCount` | |
+| Model factories and seeders | |
+| HTTP test client and database refresh | For app tests. |
+| Rate limiting | |
+| Security headers | |
+| Health check route | |
+| `dox_queue` | Queues and jobs. New package: [github.com/dartondox/dox-queue](https://github.com/dartondox/dox-queue). |
+| `dox_scheduler` | Run tasks on a schedule. New package: [github.com/dartondox/dox-scheduler](https://github.com/dartondox/dox-scheduler). |
 | 3.0 stable | After the alpha API settles |
 
-The package CHANGELOGs have no `Unreleased` section today. When one is added, it lists the next changes.
+### Later (3.1 and after)
+
+- Mail
+- Notifications
+- Sessions and password reset
+- Gates and policies
+- Localization
+
+The package CHANGELOGs have an `Unreleased` section when changes wait for the next version.
 
 ## How to help
 

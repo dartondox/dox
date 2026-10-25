@@ -139,7 +139,7 @@ class FileTypes {
       if (_ascii(head, 8, 'AVI ')) return 'avi';
       return null;
     }
-    if (_ascii(head, 0, 'BM') && head.length >= 14) return 'bmp';
+    if (_ascii(head, 0, 'BM') && _bmpHeader(head)) return 'bmp';
     if (_ascii(head, 0, '%PDF-')) return 'pdf';
     if (_starts(head, const <int>[0x50, 0x4B, 0x03, 0x04]) ||
         _starts(head, const <int>[0x50, 0x4B, 0x05, 0x06])) {
@@ -173,6 +173,17 @@ class FileTypes {
     if (_ascii(head, 0, 'wOF2')) return 'woff2';
     if (_starts(head, const <int>[0x00, 0x61, 0x73, 0x6D])) return 'wasm';
     return null;
+  }
+
+  /// sizes of the known BMP DIB headers (BITMAPCOREHEADER to V5)
+  static const Set<int> _bmpDibSizes = <int>{12, 40, 52, 56, 64, 108, 124};
+
+  /// `BM` alone is also text like "BMW". A real BMP has a known DIB
+  /// header size (little endian) at byte 14.
+  static bool _bmpHeader(List<int> head) {
+    if (head.length < 18) return false;
+    int size = head[14] | head[15] << 8 | head[16] << 16 | head[17] << 24;
+    return _bmpDibSizes.contains(size);
   }
 
   static bool _starts(List<int> head, List<int> bytes) {

@@ -1,3 +1,7 @@
+## Unreleased
+
+- Fix: `FileTypes.sniff` read any data that starts with `BM` as `bmp`, like the text "BMW...". Now it also checks the BMP header size at byte 14 (12, 40, 52, 56, 64, 108 or 124).
+
 ## 3.0.0-alpha.7
 
 - Perf: object, list, map and union schemas work out `isAsync` once and keep the answer. Before, the whole schema tree was walked on every `validateSchema` call.

@@ -49,6 +49,20 @@ class TrustedProxy {
     return ip;
   }
 
+  /// a hop can carry a port: `1.2.3.4:5678` and `[::1]:5678` become
+  /// `1.2.3.4` and `::1`. A bare IPv6 like `::1` has many `:`, so it stays.
+  static String stripPort(String hop) {
+    if (hop.startsWith('[')) {
+      int end = hop.indexOf(']');
+      return end > 0 ? hop.substring(1, end) : hop;
+    }
+    int colon = hop.indexOf(':');
+    if (colon > 0 && colon == hop.lastIndexOf(':')) {
+      return hop.substring(0, colon);
+    }
+    return hop;
+  }
+
   /// is [ip] one of our proxies?
   bool trusts(String ip) => _any || _inRanges(ip);
 
@@ -71,7 +85,7 @@ class TrustedProxy {
     if (forwardedFor == null || !trusts(remote)) return remote;
     List<String> hops = forwardedFor.split(',');
     for (int i = hops.length - 1; i >= 0; i--) {
-      String hop = hops[i].trim();
+      String hop = stripPort(hops[i].trim());
       if (hop.isEmpty) continue;
       if (!_inRanges(hop)) return normalize(hop);
       remote = hop;

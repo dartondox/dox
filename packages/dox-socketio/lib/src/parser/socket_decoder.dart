@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import '../constants/engine_constants.dart';
 import '../constants/socket_constants.dart';
 import 'socket_packet.dart';
 
@@ -13,7 +14,10 @@ class SocketDecoder {
   ///
   /// [maxDepth] is the deepest nesting of lists and maps in a binary
   /// packet. Deeper data is refused, so it can not overflow the stack.
-  SocketDecoder({this.maxAttachments = 10, this.maxDepth = 32});
+  SocketDecoder({
+    this.maxAttachments = defaultMaxAttachments,
+    this.maxDepth = 32,
+  });
 
   final int maxAttachments;
   final int maxDepth;

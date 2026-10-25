@@ -45,13 +45,16 @@ dynamic httpResponseHandler(dynamic payload, HttpRequest request) {
   doxResponse.process(request);
 }
 
+/// sent on every file response, so the browser never guesses the type
+const String _noSniffHeader = 'X-Content-Type-Options';
+
 /// A stored file can be html, svg, xml or js that a user uploaded.
 /// Shown inline, its script runs on the app origin (stored XSS).
 /// So such a file is sent as a download, in a sandbox.
 /// `nosniff` stops the browser from guessing html in other files.
 /// A `Content-Disposition` set by the app (eg. `inline`) is kept.
 void _guardActiveFile(HttpResponse res, ContentType type) {
-  res.headers.set('X-Content-Type-Options', 'nosniff');
+  res.headers.set(_noSniffHeader, 'nosniff');
   if (res.headers.value(FILE_DOWNLOAD_HEADER) != null) return;
   String mime = type.mimeType.toLowerCase();
   if (mime.contains('html') ||
@@ -78,6 +81,7 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
 
   /// file on disk: streamed, with Content-Length and Range support
   if (payload is File) {
+    res.headers.set(_noSniffHeader, 'nosniff');
     _pipe(request, _sendFile(payload, request));
     return;
   }
@@ -96,6 +100,7 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
   if (payload is DownloadableFile) {
     res.headers.contentType = payload.contentType;
     res.headers.add(FILE_DOWNLOAD_HEADER, payload.contentDisposition);
+    res.headers.set(_noSniffHeader, 'nosniff');
     if (payload.length != null) res.contentLength = payload.length!;
     _pipe(request, res.addStream(payload.stream));
     return;

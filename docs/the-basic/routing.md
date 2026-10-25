@@ -194,6 +194,13 @@ Route.files('public', disk: 'local', signed: false);
 
 An html, svg, xml or javascript file is sent as a download (`Content-Disposition: attachment`) with `Content-Security-Policy: sandbox`.
 So a script in an uploaded file does not run on your site.
+Every file response also has `X-Content-Type-Options: nosniff`, so the browser does not guess another type.
+
+For user uploads, `download: true` sends every file as a download, also images and PDFs:
+
+```dart
+Route.files('uploads', download: true);
+```
 
 ## Request body for the docs
 

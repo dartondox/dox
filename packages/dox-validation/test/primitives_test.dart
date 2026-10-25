@@ -269,6 +269,20 @@ void main() {
       List<int> jpg = <int>[0xFF, 0xD8, 0xFF, 0xE0];
       expect(FileTypes.matches(FakeFile('jpeg', jpg), <String>['jpg']), true);
     });
+
+    test('bmp needs a real BMP header, not only `BM`', () {
+      List<int> bmp = <int>[
+        ...'BM'.codeUnits,
+        ...List<int>.filled(12, 0),
+        40, 0, 0, 0, // BITMAPINFOHEADER size
+      ];
+      expect(FileTypes.sniff(bmp), 'bmp');
+      expect(
+        FileTypes.sniff('BMW is a car brand, not a bitmap'.codeUnits),
+        null,
+      );
+      expect(FileTypes.sniff('BM'.codeUnits), null);
+    });
   });
 
   group('coerce |', () {

@@ -1,3 +1,8 @@
+## Unreleased
+
+- Security: a JWT secret (`SecretKey`) shorter than 32 bytes stops the app with an `ArgumentError` when `APP_ENV` is not `development`, `local` or `test`. In those envs it prints one warning line. Make a key with `dox key:generate` or `openssl rand -hex 32`.
+- `Hash` now comes from `dox_core`. dox_auth had its own copy. `package:dox_auth/src/hash.dart` re-exports it. No change in behaviour. dox_auth now depends on dox_core.
+
 ## 3.0.0-alpha.7
 
 - Perf: `attempt` runs bcrypt in another isolate (`Isolate.run`). Before, each login blocked the server isolate for the whole hash.

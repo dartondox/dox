@@ -20,6 +20,7 @@ const Duration defaultPingTimeout = Duration(milliseconds: 20000);
 const Duration defaultUpgradeTimeout = Duration(milliseconds: 10000);
 const Duration defaultConnectTimeout = Duration(milliseconds: 45000);
 const int defaultMaxHttpBufferSize = 1000000;
+const int defaultMaxAttachments = 10;
 const String defaultPath = '/socket.io/';
 
 /// How often a pending poll is released with a noop while upgrading.
