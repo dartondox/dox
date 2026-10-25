@@ -168,7 +168,7 @@ class DocsRouter extends Router {
       Route.post('/login', (AuthController c) => c.login);
     });
     Route.group('/web-auth', () {
-      Route.post<WebAuthController>('/login', (c) => c.login);
+      Route.post<WebAuthController>('/login', (WebAuthController c) => c.login);
     });
     Route.put(
       '/posts/{id}',
