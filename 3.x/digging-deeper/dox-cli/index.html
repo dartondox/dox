@@ -4456,7 +4456,8 @@
 
 <h1 id="dox-cli">Dox CLI</h1>
 <p>The <code>dox</code> CLI creates projects and files, runs the dev server, builds for production and runs migrations.</p>
-<p>Run <code>dox help</code> to see all commands. Run <code>dox help &lt;command&gt;</code> for one command.</p>
+<p>Every <code>make:*</code> command also answers to its <code>create:*</code> name.
+Run <code>dox help</code> to see all commands. Run <code>dox help &lt;command&gt;</code> for one command.</p>
 <h2 id="installation">Installation</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>global<span class="w"> </span>activate<span class="w"> </span>dox<span class="w"> </span>^3.0.0-alpha
 </span></code></pre></div>
@@ -4495,27 +4496,27 @@
 <td>run the code generator</td>
 </tr>
 <tr>
-<td><code>dox create:controller &lt;name&gt; [-r]</code></td>
+<td><code>dox make:controller &lt;name&gt; [-r]</code></td>
 <td>create a controller</td>
 </tr>
 <tr>
-<td><code>dox create:middleware &lt;name&gt;</code></td>
+<td><code>dox make:middleware &lt;name&gt;</code></td>
 <td>create a middleware</td>
 </tr>
 <tr>
-<td><code>dox create:dto &lt;name&gt;</code></td>
+<td><code>dox make:dto &lt;name&gt;</code></td>
 <td>create a DTO (typed, checked input)</td>
 </tr>
 <tr>
-<td><code>dox create:serializer &lt;name&gt;</code></td>
+<td><code>dox make:serializer &lt;name&gt;</code></td>
 <td>create a serializer</td>
 </tr>
 <tr>
-<td><code>dox create:model &lt;name&gt; [-m]</code> (or <code>make:model</code>)</td>
+<td><code>dox make:model &lt;name&gt; [-m]</code> (old name <code>create:model</code>)</td>
 <td>create a model, and with <code>-m</code> its migration</td>
 </tr>
 <tr>
-<td><code>dox make:migration &lt;name&gt; [--sql]</code> (or <code>create:migration</code>)</td>
+<td><code>dox make:migration &lt;name&gt; [--sql]</code> (old name <code>create:migration</code>)</td>
 <td>create a Dart migration, or a <code>.sql</code> one with <code>--sql</code></td>
 </tr>
 <tr>
@@ -4553,6 +4554,46 @@
 <tr>
 <td><code>dox db:seed [--class=&lt;name&gt;]</code></td>
 <td>run <code>DatabaseSeeder</code>, or another seeder</td>
+</tr>
+<tr>
+<td><code>dox make:job &lt;name&gt;</code></td>
+<td>create a queue job in <code>lib/app/jobs</code> (and <code>bin/queue.dart</code>)</td>
+</tr>
+<tr>
+<td><code>dox queue:work [--queue=a,b] [--concurrency=N] [--once] [--tries=N] [--timeout=S] [--sleep=S] [--stop-when-empty]</code></td>
+<td>run the queue worker</td>
+</tr>
+<tr>
+<td><code>dox queue:failed</code></td>
+<td>list the failed jobs</td>
+</tr>
+<tr>
+<td><code>dox queue:retry &lt;id\|all&gt;</code></td>
+<td>put a failed job (or all) back on the queue</td>
+</tr>
+<tr>
+<td><code>dox queue:forget &lt;id&gt;</code></td>
+<td>delete one failed job</td>
+</tr>
+<tr>
+<td><code>dox queue:flush</code></td>
+<td>delete all failed jobs</td>
+</tr>
+<tr>
+<td><code>dox schedule:work</code></td>
+<td>run the scheduler and keep it running</td>
+</tr>
+<tr>
+<td><code>dox schedule:run</code></td>
+<td>run the tasks that are due now, once</td>
+</tr>
+<tr>
+<td><code>dox schedule:list</code></td>
+<td>list the scheduled tasks</td>
+</tr>
+<tr>
+<td><code>dox schedule:test &lt;name&gt;</code></td>
+<td>run one scheduled task now</td>
 </tr>
 <tr>
 <td><code>dox key:generate</code></td>
@@ -4603,19 +4644,19 @@ It also runs <code>build_runner watch</code>, so generated files stay up to date
 </span></code></pre></div>
 <p>See <a href="../deployment/#build">Deployment</a>.</p>
 <h2 id="create-files">Create files</h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>dox<span class="w"> </span>create:controller<span class="w"> </span>Blog<span class="w">        </span><span class="c1"># lib/app/http/controllers/blog.controller.dart</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>dox<span class="w"> </span>create:controller<span class="w"> </span>Blog<span class="w"> </span>-r<span class="w">     </span><span class="c1"># resource controller</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>dox<span class="w"> </span>create:middleware<span class="w"> </span>Auth
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>dox<span class="w"> </span>create:dto<span class="w"> </span>CreateBlog<span class="w">         </span><span class="c1"># lib/app/http/dtos/create_blog.dto.dart</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>dox<span class="w"> </span>create:serializer<span class="w"> </span>Blog
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>dox<span class="w"> </span>create:model<span class="w"> </span>Blog<span class="w"> </span>-m<span class="w">          </span><span class="c1"># model and its create_blogs_table migration</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>dox<span class="w"> </span>make:controller<span class="w"> </span>Blog<span class="w">        </span><span class="c1"># lib/app/http/controllers/blog.controller.dart</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>dox<span class="w"> </span>make:controller<span class="w"> </span>Blog<span class="w"> </span>-r<span class="w">     </span><span class="c1"># resource controller</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>dox<span class="w"> </span>make:middleware<span class="w"> </span>Auth
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>dox<span class="w"> </span>make:dto<span class="w"> </span>CreateBlog<span class="w">         </span><span class="c1"># lib/app/http/dtos/create_blog.dto.dart</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>dox<span class="w"> </span>make:serializer<span class="w"> </span>Blog
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>dox<span class="w"> </span>make:model<span class="w"> </span>Blog<span class="w"> </span>-m<span class="w">          </span><span class="c1"># model and its create_blogs_table migration</span>
 </span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>dox<span class="w"> </span>make:migration<span class="w"> </span>create_blogs_table<span class="w">          </span><span class="c1"># .dart file (default)</span>
 </span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>dox<span class="w"> </span>make:migration<span class="w"> </span>create_blogs_table<span class="w"> </span>--sql<span class="w">    </span><span class="c1"># .sql file</span>
 </span></code></pre></div>
 <ul>
 <li><code>-r</code> adds the methods <code>index</code>, <code>create</code>, <code>store</code>, <code>show</code>, <code>edit</code>, <code>update</code> and <code>destroy</code>.</li>
 <li>Word breaks are kept. <code>BlogPost</code> makes <code>blog_post.controller.dart</code> with the class <code>BlogPostController</code>.</li>
-<li>After <code>create:dto</code>, run <code>dox build_runner:build</code>. See <a href="../../the-basic/validation/">Validation</a>.</li>
+<li>After <code>make:dto</code>, run <code>dox build_runner:build</code>. See <a href="../../the-basic/validation/">Validation</a>.</li>
 <li>The table of a model is its name in plural snake case: <code>BlogPost</code> makes <code>blog_posts</code>. The model gets <code>@DoxModel(table: 'blog_posts')</code>.</li>
 </ul>
 <h2 id="migrations">Migrations</h2>

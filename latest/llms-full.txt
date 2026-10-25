@@ -541,7 +541,7 @@ This step makes the `posts` table with a Dart migration and a `Post` model for i
 ## 1. Make the model and the migration
 
 ```bash
-dox create:model Post -m
+dox make:model Post -m
 ```
 
 This makes two files and updates one:
@@ -674,7 +674,7 @@ This step adds a resource controller and the routes to list, create and show pos
 ## 1. Make the controller
 
 ```bash
-dox create:controller Post -r
+dox make:controller Post -r
 ```
 
 `-r` makes a resource controller with the seven CRUD methods.
@@ -833,7 +833,7 @@ This step checks the input of create and update with a `@Dto` class. Bad input g
 ## 1. Make the DTO
 
 ```bash
-dox create:dto SavePost
+dox make:dto SavePost
 ```
 
 One class is enough for create and update, because both need the same fields.
@@ -1072,8 +1072,8 @@ class CreateUsersTable extends Migration {
 ## 3. Make the DTOs
 
 ```bash
-dox create:dto RegisterUser
-dox create:dto LoginUser
+dox make:dto RegisterUser
+dox make:dto LoginUser
 ```
 
 ```dart title="lib/app/http/dtos/register_user.dto.dart"
@@ -1844,8 +1844,8 @@ class ApiRouter extends Router {
 
 | Laravel | Dox |
 | --- | --- |
-| `php artisan make:controller BlogController` | `dox create:controller Blog` |
-| `php artisan make:controller BlogController --resource` | `dox create:controller Blog -r` |
+| `php artisan make:controller BlogController` | `dox make:controller Blog` |
+| `php artisan make:controller BlogController --resource` | `dox make:controller Blog -r` |
 | `public function show(Request $request, int $id)` | `Future<Blog?> show(DoxRequest req, int id)` |
 | `public function store(StoreBlogRequest $request)` | `Future<Blog> store(CreateBlog body)` |
 | constructor injection by the service container | constructor injection by the container: `@Inject()` above the class |
@@ -1860,7 +1860,7 @@ A controller can be a class method, a static method or a plain function.
 
 | Laravel | Dox |
 | --- | --- |
-| `php artisan make:middleware Logger` | `dox create:middleware Logger` |
+| `php artisan make:middleware Logger` | `dox make:middleware Logger` |
 | `public function handle(Request $request, Closure $next)` | `dynamic handle(IDoxRequest req)` |
 | `return $next($request);` | `return req;` |
 | `return response('no', 401);` | `return response('no').statusCode(401);` |
@@ -1884,7 +1884,7 @@ Dox middleware runs before the controller only. There is no "after" step; use a 
 
 | Laravel | Dox |
 | --- | --- |
-| `php artisan make:request StoreBlogRequest` | `dox create:dto CreateBlog` |
+| `php artisan make:request StoreBlogRequest` | `dox make:dto CreateBlog` |
 | `class StoreBlogRequest extends FormRequest` with `rules()` | `@Dto() class CreateBlog` with annotations on `final` fields |
 | `'title' => ['required', 'string', 'max:50']` | `@MaxLength(50) final String title;` |
 | `'age' => ['nullable', 'integer', 'min:18']` | `@Min(18) final int? age;` |
@@ -1935,7 +1935,7 @@ See [Validation](../the-basic/validation.md).
 
 | Laravel | Dox |
 | --- | --- |
-| `php artisan make:model Blog -m` | `dox create:model Blog -m` |
+| `php artisan make:model Blog -m` | `dox make:model Blog -m` |
 | `class Blog extends Model` | `@DoxModel() class Blog extends BlogGenerator` |
 | `protected $table = 'blogs';` | `@DoxModel(table: 'blogs')` |
 | `protected $primaryKey = 'uid';` | `@DoxModel(primaryKey: 'uid')` |
@@ -2061,7 +2061,7 @@ The server can run the migrations at start. See [Migration](../database/migratio
 | --- | --- |
 | `laravel new blog` | `dox create blog` |
 | `php artisan serve` | `dox serve` (or `dox s`), with hot restart and `build_runner watch` |
-| `php artisan make:resource` | `dox create:serializer` |
+| `php artisan make:resource` | `dox make:serializer` |
 | `php artisan key:generate` | `dox key:generate` |
 | `php artisan route:list` | not there. Use the OpenAPI docs page at `/docs`. |
 | `php artisan tinker` | not there |
@@ -3275,7 +3275,7 @@ It works with any Dart type: a model, a plain class, or a map.
 ## Create a serializer
 
 ```bash
-dox create:serializer Blog
+dox make:serializer Blog
 ```
 
 This makes `lib/app/http/serializers/blog.serializer.dart`.
@@ -3489,7 +3489,7 @@ Future<SalesReportSerializer> remote(DoxRequest req) async {
 
 ## See also
 
-- [CLI: `dox create:serializer`](../reference/cli.md#dox-createserializer)
+- [CLI: `dox make:serializer`](../reference/cli.md#dox-makeserializer)
 
 
 ---
@@ -3606,7 +3606,7 @@ A controller holds the code that answers a route. It can be a class method, a st
 Make one with the CLI:
 
 ```bash
-dox create:controller Blog
+dox make:controller Blog
 ```
 
 It writes `lib/app/http/controllers/blog.controller.dart`.
@@ -3658,7 +3658,7 @@ A resource controller has the 7 methods that `Route.resource` uses.
 Make one with the CLI:
 
 ```bash
-dox create:controller Blog -r
+dox make:controller Blog -r
 ```
 
 ```dart title="lib/app/http/controllers/blog.controller.dart"
@@ -4051,7 +4051,7 @@ A middleware can be `async`. Dox waits for it.
 Create one with the CLI. It writes `lib/app/http/middleware/logger.middleware.dart`.
 
 ```bash
-dox create:middleware Logger
+dox make:middleware Logger
 ```
 
 ```dart title="lib/app/http/middleware/logger.middleware.dart"
@@ -4220,7 +4220,7 @@ class UserController {
 
 You do this once per app.
 
-1. Make a DTO with `dox create:dto CreateUser`. It writes `lib/app/http/dtos/create_user.dto.dart`.
+1. Make a DTO with `dox make:dto CreateUser`. It writes `lib/app/http/dtos/create_user.dto.dart`.
 2. Run the generator: `dox build_runner:build` (or `dox build_runner:watch`).
    It writes a `.dto.g.dart` file next to each DTO, and one list of all DTOs in `lib/dtos.g.dart`.
 3. Give that list to the app:
@@ -5509,6 +5509,7 @@ Source: https://dartondox.dev/latest/3.xdigging-deeper/dox-cli/
 
 The `dox` CLI creates projects and files, runs the dev server, builds for production and runs migrations.
 
+Every `make:*` command also answers to its `create:*` name.
 Run `dox help` to see all commands. Run `dox help <command>` for one command.
 
 ## Installation
@@ -5538,12 +5539,12 @@ dart pub global deactivate dox
 | `dox serve` (or `dox s`) | start the dev server with build_runner watch |
 | `dox build` | build the native (AOT) bundle into `build/bundle` |
 | `dox build_runner:watch` / `dox build_runner:build` | run the code generator |
-| `dox create:controller <name> [-r]` | create a controller |
-| `dox create:middleware <name>` | create a middleware |
-| `dox create:dto <name>` | create a DTO (typed, checked input) |
-| `dox create:serializer <name>` | create a serializer |
-| `dox create:model <name> [-m]` (or `make:model`) | create a model, and with `-m` its migration |
-| `dox make:migration <name> [--sql]` (or `create:migration`) | create a Dart migration, or a `.sql` one with `--sql` |
+| `dox make:controller <name> [-r]` | create a controller |
+| `dox make:middleware <name>` | create a middleware |
+| `dox make:dto <name>` | create a DTO (typed, checked input) |
+| `dox make:serializer <name>` | create a serializer |
+| `dox make:model <name> [-m]` (old name `create:model`) | create a model, and with `-m` its migration |
+| `dox make:migration <name> [--sql]` (old name `create:migration`) | create a Dart migration, or a `.sql` one with `--sql` |
 | `dox migration:run` (or `dox migrate`) | run new migrations |
 | `dox migration:rollback [--step=N]` | undo the last batch, or the last N migrations |
 | `dox migration:reset` | undo all migrations |
@@ -5553,6 +5554,16 @@ dart pub global deactivate dox
 | `dox make:factory <model>` | create a model factory in `db/factories`, see [Factories](../database/factories.md) |
 | `dox make:seeder <name>` | create a seeder in `db/seeders`, see [Seeders](../database/seeders.md) |
 | `dox db:seed [--class=<name>]` | run `DatabaseSeeder`, or another seeder |
+| `dox make:job <name>` | create a queue job in `lib/app/jobs` (and `bin/queue.dart`) |
+| `dox queue:work [--queue=a,b] [--concurrency=N] [--once] [--tries=N] [--timeout=S] [--sleep=S] [--stop-when-empty]` | run the queue worker |
+| `dox queue:failed` | list the failed jobs |
+| `dox queue:retry <id\|all>` | put a failed job (or all) back on the queue |
+| `dox queue:forget <id>` | delete one failed job |
+| `dox queue:flush` | delete all failed jobs |
+| `dox schedule:work` | run the scheduler and keep it running |
+| `dox schedule:run` | run the tasks that are due now, once |
+| `dox schedule:list` | list the scheduled tasks |
+| `dox schedule:test <name>` | run one scheduled task now |
 | `dox key:generate` | make a new `APP_KEY` |
 | `dox env:generate` | make `lib/config/env.dart` (the typed env class) from `.env.example`, see [Environment Variables](env.md) |
 | `dox env:check` | check the env against `lib/config/env.dart`. Prints every missing or bad key (exit code 1) |
@@ -5595,19 +5606,19 @@ See [Deployment](deployment.md#build).
 ## Create files
 
 ```bash
-dox create:controller Blog        # lib/app/http/controllers/blog.controller.dart
-dox create:controller Blog -r     # resource controller
-dox create:middleware Auth
-dox create:dto CreateBlog         # lib/app/http/dtos/create_blog.dto.dart
-dox create:serializer Blog
-dox create:model Blog -m          # model and its create_blogs_table migration
+dox make:controller Blog        # lib/app/http/controllers/blog.controller.dart
+dox make:controller Blog -r     # resource controller
+dox make:middleware Auth
+dox make:dto CreateBlog         # lib/app/http/dtos/create_blog.dto.dart
+dox make:serializer Blog
+dox make:model Blog -m          # model and its create_blogs_table migration
 dox make:migration create_blogs_table          # .dart file (default)
 dox make:migration create_blogs_table --sql    # .sql file
 ```
 
 - `-r` adds the methods `index`, `create`, `store`, `show`, `edit`, `update` and `destroy`.
 - Word breaks are kept. `BlogPost` makes `blog_post.controller.dart` with the class `BlogPostController`.
-- After `create:dto`, run `dox build_runner:build`. See [Validation](../the-basic/validation.md).
+- After `make:dto`, run `dox build_runner:build`. See [Validation](../the-basic/validation.md).
 - The table of a model is its name in plural snake case: `BlogPost` makes `blog_posts`. The model gets `@DoxModel(table: 'blog_posts')`.
 
 ## Migrations
@@ -7553,7 +7564,7 @@ The name of the migration decides what the new file contains:
 | any other name | empty `up` and `down` |
 
 - `create:migration` does the same.
-- `dox create:model Blog -m` makes the model and a `create_blogs_table` migration.
+- `dox make:model Blog -m` makes the model and a `create_blogs_table` migration.
 
 !!! info "Raw SQL and data in a Dart migration"
     `schema.driver` runs raw SQL on the same connection and transaction:
@@ -8713,12 +8724,12 @@ A model has all the [query builder](../query-builder.md) methods too.
 ## Create a model
 
 ```bash
-dox create:model Blog      # only the model
-dox create:model Blog -m   # the model and a migration for the table `blogs`
+dox make:model Blog      # only the model
+dox make:model Blog -m   # the model and a migration for the table `blogs`
 ```
 
 This makes `lib/app/models/blog/blog.model.dart`.
-`make:model` is another name for the same command.
+`create:model` is another name for the same command.
 
 The model code uses a generated class (`BlogGenerator`).
 Run the generator after you make or change a model:
@@ -8794,7 +8805,7 @@ class Blog extends BlogGenerator {}
 ```
 
 !!! info
-    `dox create:model Blog -m` sets `table: 'blogs'` for you,
+    `dox make:model Blog -m` sets `table: 'blogs'` for you,
     because the migration makes the plural table `blogs`.
 
 ### `primaryKey`
@@ -12540,7 +12551,7 @@ Make a list route that takes `page` and `per_page` from the query string and ret
 
 ## What you need
 
-- A Dox app with a database and a `User` model (`dox create:model User -m`).
+- A Dox app with a database and a `User` model (`dox make:model User -m`).
 - `build_runner` for the DTO.
 
 ## 1. Write the query DTO
@@ -15645,11 +15656,11 @@ dox build_runner:build             # make .g.dart files
 dox key:generate                   # APP_KEY in .env
 dox env:generate                   # lib/config/env.dart from .env.example
 dox env:check                      # check the env, exit 1 when bad
-dox create:controller Blog [-r]
-dox create:middleware Auth
-dox create:dto CreateBlog
-dox create:serializer Blog
-dox create:model Blog -m           # model + migration
+dox make:controller Blog [-r]
+dox make:middleware Auth
+dox make:dto CreateBlog
+dox make:serializer Blog
+dox make:model Blog -m           # model + migration
 dox make:migration create_blogs_table [--sql]
 dox migrate                        # migration:run
 dox migration:rollback --step=1
@@ -16546,7 +16557,8 @@ Rules that apply to every command:
 - An unknown command prints `Could not find a command named "<name>".`
 - Too few or too many arguments prints `Invalid number of arguments for command "<name>".` with the expected count.
 - A name you pass is turned into `snake_case` for the file and `PascalCase` for the class. `BlogPost` and `blog_post` give the same result.
-- A `create:*` command does not overwrite. When the file exists it prints `<name> already exists` and stops.
+- Every `make:*` command also answers to its `create:*` name, like `create:model`. `dox help <command>` shows the aliases.
+- A `make:*` command does not overwrite. When the file exists it prints `<name> already exists` and stops.
 
 ## Project
 
@@ -16724,11 +16736,13 @@ Without a command: lists every command by category. With a command: prints its u
 
 ## Create files
 
-### `dox create:controller`
+### `dox make:controller`
 
 ```
-dox create:controller <name> [-r]
+dox make:controller <name> [-r]
 ```
+
+Alias: `create:controller`. The other `make:*` commands below have the same kind of alias.
 
 | Option | Meaning |
 | --- | --- |
@@ -16744,10 +16758,10 @@ A trailing `Controller` in the name is removed: `UserController` and `User` give
 The class has `@Inject()`, so the container makes it. A comment shows the route to add, like `Route.get<BlogController>('path', (BlogController c) => c.index);`.
 After the file is made, the CLI tells you to run `dart run build_runner build`. That adds the controller to `lib/container.g.dart`.
 
-### `dox create:middleware`
+### `dox make:middleware`
 
 ```
-dox create:middleware <name>
+dox make:middleware <name>
 ```
 
 Writes `lib/app/http/middleware/<name>.middleware.dart`: a class `<Name>Middleware extends IDoxMiddleware` with a `handle(IDoxRequest req)` that returns `req`.
@@ -16755,10 +16769,10 @@ A trailing `Middleware` in the name is removed.
 
 Template: `_getSample` in `packages/dox-cli/lib/src/tools/create_middleware.dart`.
 
-### `dox create:dto`
+### `dox make:dto`
 
 ```
-dox create:dto <name>
+dox make:dto <name>
 ```
 
 Writes `lib/app/http/dtos/<name>.dto.dart`: a `@Dto()` class with one `name` field and `part '<name>.dto.g.dart';`.
@@ -16766,10 +16780,10 @@ A trailing `Dto` in the name is removed. Prints `Run `dox build_runner:build` to
 
 Template: `_getSample` in `packages/dox-cli/lib/src/tools/create_dto.dart`.
 
-### `dox create:serializer`
+### `dox make:serializer`
 
 ```
-dox create:serializer <name>
+dox make:serializer <name>
 ```
 
 Writes `lib/app/http/serializers/<name>.serializer.dart`: a class `<Name>Serializer extends Serializer<<Name>>`. It imports the model from `lib/app/models/<name>/<name>.model.dart`.
@@ -16777,11 +16791,11 @@ A trailing `Serializer` in the name is removed.
 
 Template: `_getSample` in `packages/dox-cli/lib/src/tools/create_serializer.dart`.
 
-### `dox create:model`
+### `dox make:model`
 
 ```
-dox create:model <name> [-m|--migration]
 dox make:model <name> [-m|--migration]
+dox create:model <name> [-m|--migration]
 ```
 
 Writes `lib/app/models/<name>/<name>.model.dart`: a `@DoxModel()` class with `part '<name>.model.g.dart';`.
@@ -16854,20 +16868,99 @@ A failed run prints the error and sets exit code 1.
 
 Templates: `createFactory` in `packages/dox-cli/lib/src/tools/create_factory.dart`, and `createSeeder` and `seedEntrySource` in `packages/dox-cli/lib/src/tools/create_seeder.dart`.
 
+## Queue
+
+These commands run the app script `bin/queue.dart` with `dart run`. The script comes from the `dox_queue` package. `dox make:job` makes it when it is missing.
+Input, output and errors go straight to your terminal. `Ctrl+C` (SIGINT) and SIGTERM are sent on to the script, so a worker can finish its job and stop. The exit code of the script is the exit code of `dox`.
+When `bin/queue.dart` is missing, the command prints how to set it up and exits with code 1.
+
+| Command | Runs | What it does |
+| --- | --- | --- |
+| `dox make:job <name>` | | Make `lib/app/jobs/<name>.job.dart` with a `@Job()` class that extends `DoxJob`. Make `bin/queue.dart` when it is missing. Print a hint to add `dox_queue` to `pubspec.yaml` and to run `dox build_runner:build`. |
+| `dox queue:work [flags]` | `bin/queue.dart work [flags]` | Run the worker. |
+| `dox queue:failed` | `bin/queue.dart failed` | List the failed jobs. |
+| `dox queue:retry <id\|all>` | `bin/queue.dart retry <id\|all>` | Put one failed job, or all of them, back on the queue. |
+| `dox queue:forget <id>` | `bin/queue.dart forget <id>` | Delete one failed job. |
+| `dox queue:flush` | `bin/queue.dart flush` | Delete all failed jobs. |
+
+Flags of `queue:work`, passed on as they are:
+
+| Flag | Meaning |
+| --- | --- |
+| `--queue=a,b` | The queues to read, in this order. |
+| `--concurrency=N` | How many jobs run at the same time. |
+| `--once` | Run one job, then stop. |
+| `--tries=N` | How many times a job may run before it is marked as failed. |
+| `--timeout=S` | Seconds a job may run. |
+| `--sleep=S` | Seconds to wait when the queue is empty. |
+| `--stop-when-empty` | Stop when the queue is empty. |
+
+The `bin/queue.dart` that `make:job` writes (`<app>` is the `name` in `pubspec.yaml`):
+
+```dart
+import 'dart:io';
+
+import 'package:dox_queue/dox_queue.dart';
+import 'package:<app>/config/app.dart';
+import 'package:<app>/jobs.g.dart';
+
+Future<void> main(List<String> args) async {
+  exitCode = await QueueWorker(jobs: jobRegistry, app: appConfig).run(args);
+}
+```
+
+Templates: `createJob` and `queueEntrySource` in `packages/dox-cli/lib/src/tools/create_job.dart`.
+
+## Schedule
+
+These commands run the app script `bin/schedule.dart` with `dart run`. They pass the signals, the terminal and the exit code the same way as the queue commands.
+When `bin/schedule.dart` is missing, the command prints how to set it up and exits with code 1.
+
+| Command | Runs | What it does |
+| --- | --- | --- |
+| `dox schedule:work` | `bin/schedule.dart work` | Run the scheduler and keep it running. |
+| `dox schedule:run` | `bin/schedule.dart run` | Run the tasks that are due now, once. |
+| `dox schedule:list` | `bin/schedule.dart list` | List the scheduled tasks. |
+| `dox schedule:test <name>` | `bin/schedule.dart test <name>` | Run one task now. |
+
+To set it up, add `dox_scheduler` to `pubspec.yaml`, then make two small files.
+The exact names come from the `dox_scheduler` package. This is the shape:
+
+```dart
+// lib/config/schedule.dart
+import 'package:dox_scheduler/dox_scheduler.dart';
+
+final Schedule schedule = Schedule()
+  ..call('report', () async {/* your task */}).dailyAt('02:00');
+```
+
+```dart
+// bin/schedule.dart
+import 'dart:io';
+
+import 'package:dox_scheduler/dox_scheduler.dart';
+import 'package:<app>/config/app.dart';
+import 'package:<app>/config/schedule.dart';
+
+Future<void> main(List<String> args) async {
+  exitCode = await ScheduleRunner(schedule: schedule, app: appConfig).run(args);
+}
+```
+
 ## Command list
 
 | Command | Aliases | Category |
 | --- | --- | --- |
 | `create` | | Project |
 | `serve` | `server`, `s` | Development |
-| `create:controller` | | Development |
-| `create:middleware` | | Development |
-| `create:dto` | | Development |
+| `make:controller` | `create:controller` | Development |
+| `make:middleware` | `create:middleware` | Development |
+| `make:dto` | `create:dto` | Development |
 | `build` | | Build |
 | `build_runner:build` | | Build Runner |
 | `build_runner:watch` | | Build Runner |
-| `create:model` | `make:model` | Generation |
-| `create:serializer` | | Generation |
+| `make:model` | `create:model` | Generation |
+| `make:serializer` | `create:serializer` | Generation |
 | `key:generate` | | Generation |
 | `env:generate` | | Generation |
 | `openapi:generate` | | Generation |
@@ -16880,6 +16973,16 @@ Templates: `createFactory` in `packages/dox-cli/lib/src/tools/create_factory.dar
 | `make:migration` | `create:migration` | Database |
 | `make:factory` | `create:factory` | Database |
 | `make:seeder` | `create:seeder` | Database |
+| `make:job` | | Queue |
+| `queue:work` | | Queue |
+| `queue:failed` | | Queue |
+| `queue:retry` | | Queue |
+| `queue:forget` | | Queue |
+| `queue:flush` | | Queue |
+| `schedule:work` | | Schedule |
+| `schedule:run` | | Schedule |
+| `schedule:list` | | Schedule |
+| `schedule:test` | | Schedule |
 | `db:seed` | | Database |
 | `version` | `--version`, `-version`, `v`, `-v`, `--v` | System |
 | `update` | | System |
@@ -17799,9 +17902,9 @@ Printed to stderr. The connection or the request fails, the app keeps running.
 | `Could not find a command named "<name>". Run `dox help` for more information.` | Unknown command. | Check the spelling. |
 | `Invalid number of arguments for command "<name>".` | Too few or too many arguments. | Run `dox help <name>`. |
 | `Command "<name>" not found.` | `dox help <name>` with an unknown command. | Run `dox help`. |
-| `<name> already exists` | A `create:*` file is already there. | Pick another name, or delete the file. |
+| `<name> already exists` | A `make:*` file is already there. | Pick another name, or delete the file. |
 | `Folder name "<name>" already exist` | `dox create` into a folder that exists. | Pick another name. |
-| `Invalid option <x>, use -m or --migration` | `dox create:model` with another option. | Use `-m`. |
+| `Invalid option <x>, use -m or --migration` | `dox make:model` with another option. | Use `-m`. |
 | `Invalid option <x>, use --step=<count>` | `dox migration:rollback` with another option. | Use `--step=2`. |
 | `db/migration has Dart migrations, but bin/migrate.dart is missing. ...` | Dart migrations but no entry file. | Run `dox make:migration <name>` once. |
 | `Skip <file>: no class that extends Migration.` | A Dart file in `db/migration` has no migration class. | Add `class X extends Migration`, or move the file. |
@@ -18045,6 +18148,14 @@ What changed in each package, newest first. This page is made from the
 - `remember`, `pull`, `add`, `increment`, `many`, tags and atomic locks.
 
 ## dox
+
+### Unreleased
+
+- `make:*` is now the main name of every generator: `make:controller`, `make:middleware`, `make:dto`, `make:serializer` and `make:model`, like `make:migration`, `make:factory` and `make:seeder`. The `create:*` names still work as aliases.
+- New `dox make:job <name>`: makes `lib/app/jobs/<name>.job.dart` and `bin/queue.dart` when it is missing. It prints a hint to add `dox_queue` and to run `build_runner`.
+- New `dox queue:work`, `queue:failed`, `queue:retry`, `queue:forget` and `queue:flush`: run `bin/queue.dart` with the same flags.
+- New `dox schedule:work`, `schedule:run`, `schedule:list` and `schedule:test <name>`: run `bin/schedule.dart`.
+- These commands pass the terminal through, send SIGINT and SIGTERM to the app script so a worker can stop by itself, and return its exit code. When the script is missing they print how to set it up.
 
 ### 3.0.0-alpha.9
 

@@ -4630,11 +4630,11 @@
 <tbody>
 <tr>
 <td><code>php artisan make:controller BlogController</code></td>
-<td><code>dox create:controller Blog</code></td>
+<td><code>dox make:controller Blog</code></td>
 </tr>
 <tr>
 <td><code>php artisan make:controller BlogController --resource</code></td>
-<td><code>dox create:controller Blog -r</code></td>
+<td><code>dox make:controller Blog -r</code></td>
 </tr>
 <tr>
 <td><code>public function show(Request $request, int $id)</code></td>
@@ -4672,7 +4672,7 @@ A controller can be a class method, a static method or a plain function.</p>
 <tbody>
 <tr>
 <td><code>php artisan make:middleware Logger</code></td>
-<td><code>dox create:middleware Logger</code></td>
+<td><code>dox make:middleware Logger</code></td>
 </tr>
 <tr>
 <td><code>public function handle(Request $request, Closure $next)</code></td>
@@ -4717,7 +4717,7 @@ Dox middleware runs before the controller only. There is no "after" step; use a 
 <tbody>
 <tr>
 <td><code>php artisan make:request StoreBlogRequest</code></td>
-<td><code>dox create:dto CreateBlog</code></td>
+<td><code>dox make:dto CreateBlog</code></td>
 </tr>
 <tr>
 <td><code>class StoreBlogRequest extends FormRequest</code> with <code>rules()</code></td>
@@ -4846,7 +4846,7 @@ See <a href="../../the-basic/validation/">Validation</a>.</p>
 <tbody>
 <tr>
 <td><code>php artisan make:model Blog -m</code></td>
-<td><code>dox create:model Blog -m</code></td>
+<td><code>dox make:model Blog -m</code></td>
 </tr>
 <tr>
 <td><code>class Blog extends Model</code></td>
@@ -5178,7 +5178,7 @@ The server can run the migrations at start. See <a href="../../database/migratio
 </tr>
 <tr>
 <td><code>php artisan make:resource</code></td>
-<td><code>dox create:serializer</code></td>
+<td><code>dox make:serializer</code></td>
 </tr>
 <tr>
 <td><code>php artisan key:generate</code></td>

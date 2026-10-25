@@ -4443,8 +4443,8 @@ server ran it at the first start in <a href="../01-create-project/">step 1</a>:<
 <p><code>table.softDeletes()</code> makes the <code>deleted_at</code> column that <code>softDelete: true</code> needs.
 <code>email</code> is unique, so a second register with the same email fails.</p>
 <h2 id="3-make-the-dtos">3. Make the DTOs</h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>dox<span class="w"> </span>create:dto<span class="w"> </span>RegisterUser
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>dox<span class="w"> </span>create:dto<span class="w"> </span>LoginUser
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>dox<span class="w"> </span>make:dto<span class="w"> </span>RegisterUser
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>dox<span class="w"> </span>make:dto<span class="w"> </span>LoginUser
 </span></code></pre></div>
 <div class="language-dart highlight"><span class="filename">lib/app/http/dtos/register_user.dto.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="w"> </span><span class="k">hide</span><span class="w"> </span><span class="n">Schema</span><span class="p">;</span>

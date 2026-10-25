@@ -4336,7 +4336,7 @@
 <p>A controller holds the code that answers a route. It can be a class method, a static method or a plain function.</p>
 <h2 id="class-based-controller">Class based controller</h2>
 <p>Make one with the CLI:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>create:controller<span class="w"> </span>Blog
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>make:controller<span class="w"> </span>Blog
 </span></code></pre></div>
 <p>It writes <code>lib/app/http/controllers/blog.controller.dart</code>.</p>
 <div class="language-dart highlight"><span class="filename">lib/app/http/controllers/blog.controller.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
@@ -4371,7 +4371,7 @@ The constructor can ask for services and repositories. See <a href="../dependenc
 <h2 id="resource-controller">Resource controller</h2>
 <p>A resource controller has the 7 methods that <code>Route.resource</code> uses.</p>
 <p>Make one with the CLI:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>dox<span class="w"> </span>create:controller<span class="w"> </span>Blog<span class="w"> </span>-r
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>dox<span class="w"> </span>make:controller<span class="w"> </span>Blog<span class="w"> </span>-r
 </span></code></pre></div>
 <div class="language-dart highlight"><span class="filename">lib/app/http/controllers/blog.controller.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>

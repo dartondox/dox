@@ -4076,10 +4076,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#dox-createcontroller" class="md-nav__link">
+  <a href="#dox-makecontroller" class="md-nav__link">
     <span class="md-ellipsis">
       
-        dox create:controller
+        dox make:controller
       
     </span>
   </a>
@@ -4087,10 +4087,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#dox-createmiddleware" class="md-nav__link">
+  <a href="#dox-makemiddleware" class="md-nav__link">
     <span class="md-ellipsis">
       
-        dox create:middleware
+        dox make:middleware
       
     </span>
   </a>
@@ -4098,10 +4098,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#dox-createdto" class="md-nav__link">
+  <a href="#dox-makedto" class="md-nav__link">
     <span class="md-ellipsis">
       
-        dox create:dto
+        dox make:dto
       
     </span>
   </a>
@@ -4109,10 +4109,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#dox-createserializer" class="md-nav__link">
+  <a href="#dox-makeserializer" class="md-nav__link">
     <span class="md-ellipsis">
       
-        dox create:serializer
+        dox make:serializer
       
     </span>
   </a>
@@ -4120,10 +4120,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#dox-createmodel" class="md-nav__link">
+  <a href="#dox-makemodel" class="md-nav__link">
     <span class="md-ellipsis">
       
-        dox create:model
+        dox make:model
       
     </span>
   </a>
@@ -4162,6 +4162,28 @@
     <span class="md-ellipsis">
       
         Factories and seeders
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#queue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Queue
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#schedule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Schedule
       
     </span>
   </a>
@@ -4568,10 +4590,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#dox-createcontroller" class="md-nav__link">
+  <a href="#dox-makecontroller" class="md-nav__link">
     <span class="md-ellipsis">
       
-        dox create:controller
+        dox make:controller
       
     </span>
   </a>
@@ -4579,10 +4601,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#dox-createmiddleware" class="md-nav__link">
+  <a href="#dox-makemiddleware" class="md-nav__link">
     <span class="md-ellipsis">
       
-        dox create:middleware
+        dox make:middleware
       
     </span>
   </a>
@@ -4590,10 +4612,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#dox-createdto" class="md-nav__link">
+  <a href="#dox-makedto" class="md-nav__link">
     <span class="md-ellipsis">
       
-        dox create:dto
+        dox make:dto
       
     </span>
   </a>
@@ -4601,10 +4623,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#dox-createserializer" class="md-nav__link">
+  <a href="#dox-makeserializer" class="md-nav__link">
     <span class="md-ellipsis">
       
-        dox create:serializer
+        dox make:serializer
       
     </span>
   </a>
@@ -4612,10 +4634,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#dox-createmodel" class="md-nav__link">
+  <a href="#dox-makemodel" class="md-nav__link">
     <span class="md-ellipsis">
       
-        dox create:model
+        dox make:model
       
     </span>
   </a>
@@ -4654,6 +4676,28 @@
     <span class="md-ellipsis">
       
         Factories and seeders
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#queue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Queue
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#schedule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Schedule
       
     </span>
   </a>
@@ -4706,7 +4750,8 @@
 <li>An unknown command prints <code>Could not find a command named "&lt;name&gt;".</code></li>
 <li>Too few or too many arguments prints <code>Invalid number of arguments for command "&lt;name&gt;".</code> with the expected count.</li>
 <li>A name you pass is turned into <code>snake_case</code> for the file and <code>PascalCase</code> for the class. <code>BlogPost</code> and <code>blog_post</code> give the same result.</li>
-<li>A <code>create:*</code> command does not overwrite. When the file exists it prints <code>&lt;name&gt; already exists</code> and stops.</li>
+<li>Every <code>make:*</code> command also answers to its <code>create:*</code> name, like <code>create:model</code>. <code>dox help &lt;command&gt;</code> shows the aliases.</li>
+<li>A <code>make:*</code> command does not overwrite. When the file exists it prints <code>&lt;name&gt; already exists</code> and stops.</li>
 </ul>
 <h2 id="project">Project</h2>
 <h3 id="dox-create"><code>dox create</code></h3>
@@ -4865,9 +4910,10 @@ It reads the version list from pub.dev, then runs <code>dart pub global activate
 </span></code></pre></div>
 <p>Without a command: lists every command by category. With a command: prints its usage, description, category, aliases and argument count.</p>
 <h2 id="create-files">Create files</h2>
-<h3 id="dox-createcontroller"><code>dox create:controller</code></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>dox create:controller &lt;name&gt; [-r]
+<h3 id="dox-makecontroller"><code>dox make:controller</code></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>dox make:controller &lt;name&gt; [-r]
 </span></code></pre></div>
+<p>Alias: <code>create:controller</code>. The other <code>make:*</code> commands below have the same kind of alias.</p>
 <table>
 <thead>
 <tr>
@@ -4906,27 +4952,27 @@ It reads the version list from pub.dev, then runs <code>dart pub global activate
 </table>
 <p>The class has <code>@Inject()</code>, so the container makes it. A comment shows the route to add, like <code>Route.get&lt;BlogController&gt;('path', (BlogController c) =&gt; c.index);</code>.
 After the file is made, the CLI tells you to run <code>dart run build_runner build</code>. That adds the controller to <code>lib/container.g.dart</code>.</p>
-<h3 id="dox-createmiddleware"><code>dox create:middleware</code></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>dox create:middleware &lt;name&gt;
+<h3 id="dox-makemiddleware"><code>dox make:middleware</code></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>dox make:middleware &lt;name&gt;
 </span></code></pre></div>
 <p>Writes <code>lib/app/http/middleware/&lt;name&gt;.middleware.dart</code>: a class <code>&lt;Name&gt;Middleware extends IDoxMiddleware</code> with a <code>handle(IDoxRequest req)</code> that returns <code>req</code>.
 A trailing <code>Middleware</code> in the name is removed.</p>
 <p>Template: <code>_getSample</code> in <code>packages/dox-cli/lib/src/tools/create_middleware.dart</code>.</p>
-<h3 id="dox-createdto"><code>dox create:dto</code></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>dox create:dto &lt;name&gt;
+<h3 id="dox-makedto"><code>dox make:dto</code></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>dox make:dto &lt;name&gt;
 </span></code></pre></div>
 <p>Writes <code>lib/app/http/dtos/&lt;name&gt;.dto.dart</code>: a <code>@Dto()</code> class with one <code>name</code> field and <code>part '&lt;name&gt;.dto.g.dart';</code>.
 A trailing <code>Dto</code> in the name is removed. Prints <code>Run</code>dox build_runner:build<code>to make &lt;name&gt;.dto.g.dart.</code></p>
 <p>Template: <code>_getSample</code> in <code>packages/dox-cli/lib/src/tools/create_dto.dart</code>.</p>
-<h3 id="dox-createserializer"><code>dox create:serializer</code></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>dox create:serializer &lt;name&gt;
+<h3 id="dox-makeserializer"><code>dox make:serializer</code></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>dox make:serializer &lt;name&gt;
 </span></code></pre></div>
 <p>Writes <code>lib/app/http/serializers/&lt;name&gt;.serializer.dart</code>: a class <code>&lt;Name&gt;Serializer extends Serializer&lt;&lt;Name&gt;&gt;</code>. It imports the model from <code>lib/app/models/&lt;name&gt;/&lt;name&gt;.model.dart</code>.
 A trailing <code>Serializer</code> in the name is removed.</p>
 <p>Template: <code>_getSample</code> in <code>packages/dox-cli/lib/src/tools/create_serializer.dart</code>.</p>
-<h3 id="dox-createmodel"><code>dox create:model</code></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>dox create:model &lt;name&gt; [-m|--migration]
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>dox make:model &lt;name&gt; [-m|--migration]
+<h3 id="dox-makemodel"><code>dox make:model</code></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>dox make:model &lt;name&gt; [-m|--migration]
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>dox create:model &lt;name&gt; [-m|--migration]
 </span></code></pre></div>
 <p>Writes <code>lib/app/models/&lt;name&gt;/&lt;name&gt;.model.dart</code>: a <code>@DoxModel()</code> class with <code>part '&lt;name&gt;.model.g.dart';</code>.</p>
 <table>
@@ -5076,6 +5122,155 @@ A failed run prints the error and sets exit code 1.</p>
 </tbody>
 </table>
 <p>Templates: <code>createFactory</code> in <code>packages/dox-cli/lib/src/tools/create_factory.dart</code>, and <code>createSeeder</code> and <code>seedEntrySource</code> in <code>packages/dox-cli/lib/src/tools/create_seeder.dart</code>.</p>
+<h2 id="queue">Queue</h2>
+<p>These commands run the app script <code>bin/queue.dart</code> with <code>dart run</code>. The script comes from the <code>dox_queue</code> package. <code>dox make:job</code> makes it when it is missing.
+Input, output and errors go straight to your terminal. <code>Ctrl+C</code> (SIGINT) and SIGTERM are sent on to the script, so a worker can finish its job and stop. The exit code of the script is the exit code of <code>dox</code>.
+When <code>bin/queue.dart</code> is missing, the command prints how to set it up and exits with code 1.</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Runs</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dox make:job &lt;name&gt;</code></td>
+<td></td>
+<td>Make <code>lib/app/jobs/&lt;name&gt;.job.dart</code> with a <code>@Job()</code> class that extends <code>DoxJob</code>. Make <code>bin/queue.dart</code> when it is missing. Print a hint to add <code>dox_queue</code> to <code>pubspec.yaml</code> and to run <code>dox build_runner:build</code>.</td>
+</tr>
+<tr>
+<td><code>dox queue:work [flags]</code></td>
+<td><code>bin/queue.dart work [flags]</code></td>
+<td>Run the worker.</td>
+</tr>
+<tr>
+<td><code>dox queue:failed</code></td>
+<td><code>bin/queue.dart failed</code></td>
+<td>List the failed jobs.</td>
+</tr>
+<tr>
+<td><code>dox queue:retry &lt;id\|all&gt;</code></td>
+<td><code>bin/queue.dart retry &lt;id\|all&gt;</code></td>
+<td>Put one failed job, or all of them, back on the queue.</td>
+</tr>
+<tr>
+<td><code>dox queue:forget &lt;id&gt;</code></td>
+<td><code>bin/queue.dart forget &lt;id&gt;</code></td>
+<td>Delete one failed job.</td>
+</tr>
+<tr>
+<td><code>dox queue:flush</code></td>
+<td><code>bin/queue.dart flush</code></td>
+<td>Delete all failed jobs.</td>
+</tr>
+</tbody>
+</table>
+<p>Flags of <code>queue:work</code>, passed on as they are:</p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--queue=a,b</code></td>
+<td>The queues to read, in this order.</td>
+</tr>
+<tr>
+<td><code>--concurrency=N</code></td>
+<td>How many jobs run at the same time.</td>
+</tr>
+<tr>
+<td><code>--once</code></td>
+<td>Run one job, then stop.</td>
+</tr>
+<tr>
+<td><code>--tries=N</code></td>
+<td>How many times a job may run before it is marked as failed.</td>
+</tr>
+<tr>
+<td><code>--timeout=S</code></td>
+<td>Seconds a job may run.</td>
+</tr>
+<tr>
+<td><code>--sleep=S</code></td>
+<td>Seconds to wait when the queue is empty.</td>
+</tr>
+<tr>
+<td><code>--stop-when-empty</code></td>
+<td>Stop when the queue is empty.</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>bin/queue.dart</code> that <code>make:job</code> writes (<code>&lt;app&gt;</code> is the <code>name</code> in <code>pubspec.yaml</code>):</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_queue/dox_queue.dart'</span><span class="p">;</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:&lt;app&gt;/config/app.dart'</span><span class="p">;</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:&lt;app&gt;/jobs.g.dart'</span><span class="p">;</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">  </span><span class="n">exitCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueueWorker</span><span class="p">(</span><span class="nl">jobs:</span><span class="w"> </span><span class="n">jobRegistry</span><span class="p">,</span><span class="w"> </span><span class="nl">app:</span><span class="w"> </span><span class="n">appConfig</span><span class="p">).</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Templates: <code>createJob</code> and <code>queueEntrySource</code> in <code>packages/dox-cli/lib/src/tools/create_job.dart</code>.</p>
+<h2 id="schedule">Schedule</h2>
+<p>These commands run the app script <code>bin/schedule.dart</code> with <code>dart run</code>. They pass the signals, the terminal and the exit code the same way as the queue commands.
+When <code>bin/schedule.dart</code> is missing, the command prints how to set it up and exits with code 1.</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Runs</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dox schedule:work</code></td>
+<td><code>bin/schedule.dart work</code></td>
+<td>Run the scheduler and keep it running.</td>
+</tr>
+<tr>
+<td><code>dox schedule:run</code></td>
+<td><code>bin/schedule.dart run</code></td>
+<td>Run the tasks that are due now, once.</td>
+</tr>
+<tr>
+<td><code>dox schedule:list</code></td>
+<td><code>bin/schedule.dart list</code></td>
+<td>List the scheduled tasks.</td>
+</tr>
+<tr>
+<td><code>dox schedule:test &lt;name&gt;</code></td>
+<td><code>bin/schedule.dart test &lt;name&gt;</code></td>
+<td>Run one task now.</td>
+</tr>
+</tbody>
+</table>
+<p>To set it up, add <code>dox_scheduler</code> to <code>pubspec.yaml</code>, then make two small files.
+The exact names come from the <code>dox_scheduler</code> package. This is the shape:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1">// lib/config/schedule.dart</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_scheduler/dox_scheduler.dart'</span><span class="p">;</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="kd">final</span><span class="w"> </span><span class="n">Schedule</span><span class="w"> </span><span class="n">schedule</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Schedule</span><span class="p">()</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">  </span><span class="p">..</span><span class="n">call</span><span class="p">(</span><span class="s1">'report'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span><span class="cm">/* your task */</span><span class="p">}).</span><span class="n">dailyAt</span><span class="p">(</span><span class="s1">'02:00'</span><span class="p">);</span>
+</span></code></pre></div>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1">// bin/schedule.dart</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_scheduler/dox_scheduler.dart'</span><span class="p">;</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:&lt;app&gt;/config/app.dart'</span><span class="p">;</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:&lt;app&gt;/config/schedule.dart'</span><span class="p">;</span>
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>
+</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="w">  </span><span class="n">exitCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">ScheduleRunner</span><span class="p">(</span><span class="nl">schedule:</span><span class="w"> </span><span class="n">schedule</span><span class="p">,</span><span class="w"> </span><span class="nl">app:</span><span class="w"> </span><span class="n">appConfig</span><span class="p">).</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
+</span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="p">}</span>
+</span></code></pre></div>
 <h2 id="command-list">Command list</h2>
 <table>
 <thead>
@@ -5097,18 +5292,18 @@ A failed run prints the error and sets exit code 1.</p>
 <td>Development</td>
 </tr>
 <tr>
+<td><code>make:controller</code></td>
 <td><code>create:controller</code></td>
-<td></td>
 <td>Development</td>
 </tr>
 <tr>
+<td><code>make:middleware</code></td>
 <td><code>create:middleware</code></td>
-<td></td>
 <td>Development</td>
 </tr>
 <tr>
+<td><code>make:dto</code></td>
 <td><code>create:dto</code></td>
-<td></td>
 <td>Development</td>
 </tr>
 <tr>
@@ -5127,13 +5322,13 @@ A failed run prints the error and sets exit code 1.</p>
 <td>Build Runner</td>
 </tr>
 <tr>
-<td><code>create:model</code></td>
 <td><code>make:model</code></td>
+<td><code>create:model</code></td>
 <td>Generation</td>
 </tr>
 <tr>
+<td><code>make:serializer</code></td>
 <td><code>create:serializer</code></td>
-<td></td>
 <td>Generation</td>
 </tr>
 <tr>
@@ -5195,6 +5390,56 @@ A failed run prints the error and sets exit code 1.</p>
 <td><code>make:seeder</code></td>
 <td><code>create:seeder</code></td>
 <td>Database</td>
+</tr>
+<tr>
+<td><code>make:job</code></td>
+<td></td>
+<td>Queue</td>
+</tr>
+<tr>
+<td><code>queue:work</code></td>
+<td></td>
+<td>Queue</td>
+</tr>
+<tr>
+<td><code>queue:failed</code></td>
+<td></td>
+<td>Queue</td>
+</tr>
+<tr>
+<td><code>queue:retry</code></td>
+<td></td>
+<td>Queue</td>
+</tr>
+<tr>
+<td><code>queue:forget</code></td>
+<td></td>
+<td>Queue</td>
+</tr>
+<tr>
+<td><code>queue:flush</code></td>
+<td></td>
+<td>Queue</td>
+</tr>
+<tr>
+<td><code>schedule:work</code></td>
+<td></td>
+<td>Schedule</td>
+</tr>
+<tr>
+<td><code>schedule:run</code></td>
+<td></td>
+<td>Schedule</td>
+</tr>
+<tr>
+<td><code>schedule:list</code></td>
+<td></td>
+<td>Schedule</td>
+</tr>
+<tr>
+<td><code>schedule:test</code></td>
+<td></td>
+<td>Schedule</td>
 </tr>
 <tr>
 <td><code>db:seed</code></td>

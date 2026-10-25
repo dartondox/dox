@@ -4333,7 +4333,7 @@
 <h1 id="step-4-validation">Step 4: Validation</h1>
 <p>This step checks the input of create and update with a <code>@Dto</code> class. Bad input gets a <code>422</code> answer, and the controller does not run.</p>
 <h2 id="1-make-the-dto">1. Make the DTO</h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>create:dto<span class="w"> </span>SavePost
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>make:dto<span class="w"> </span>SavePost
 </span></code></pre></div>
 <p>One class is enough for create and update, because both need the same fields.
 Replace the file with this:</p>

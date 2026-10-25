@@ -4403,11 +4403,11 @@
 <p>A model is a Dart class for one database table, used to read, create, change and delete its rows.</p>
 <p>A model has all the <a href="../query-builder/">query builder</a> methods too.</p>
 <h2 id="create-a-model">Create a model</h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>create:model<span class="w"> </span>Blog<span class="w">      </span><span class="c1"># only the model</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>dox<span class="w"> </span>create:model<span class="w"> </span>Blog<span class="w"> </span>-m<span class="w">   </span><span class="c1"># the model and a migration for the table `blogs`</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>make:model<span class="w"> </span>Blog<span class="w">      </span><span class="c1"># only the model</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>dox<span class="w"> </span>make:model<span class="w"> </span>Blog<span class="w"> </span>-m<span class="w">   </span><span class="c1"># the model and a migration for the table `blogs`</span>
 </span></code></pre></div>
 <p>This makes <code>lib/app/models/blog/blog.model.dart</code>.
-<code>make:model</code> is another name for the same command.</p>
+<code>create:model</code> is another name for the same command.</p>
 <p>The model code uses a generated class (<code>BlogGenerator</code>).
 Run the generator after you make or change a model:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build
@@ -4506,7 +4506,7 @@ Run the generator after you make or change a model:</p>
 </span></code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
-<p><code>dox create:model Blog -m</code> sets <code>table: 'blogs'</code> for you,
+<p><code>dox make:model Blog -m</code> sets <code>table: 'blogs'</code> for you,
 because the migration makes the plural table <code>blogs</code>.</p>
 </div>
 <h3 id="primarykey"><code>primaryKey</code></h3>

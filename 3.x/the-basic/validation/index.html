@@ -4614,7 +4614,7 @@ When the input is wrong, Dox answers <code>422</code> with the errors. Your cont
 <h2 id="setup">Setup</h2>
 <p>You do this once per app.</p>
 <ol>
-<li>Make a DTO with <code>dox create:dto CreateUser</code>. It writes <code>lib/app/http/dtos/create_user.dto.dart</code>.</li>
+<li>Make a DTO with <code>dox make:dto CreateUser</code>. It writes <code>lib/app/http/dtos/create_user.dto.dart</code>.</li>
 <li>Run the generator: <code>dox build_runner:build</code> (or <code>dox build_runner:watch</code>).
    It writes a <code>.dto.g.dart</code> file next to each DTO, and one list of all DTOs in <code>lib/dtos.g.dart</code>.</li>
 <li>Give that list to the app:</li>
