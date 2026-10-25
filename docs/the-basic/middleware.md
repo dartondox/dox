@@ -128,3 +128,5 @@ flowchart LR
 !!! tip "Built-in middleware"
     - `LogMiddleware` from `dox_core` writes one JSON log line per request. Body fields and headers whose name has `password`, `secret`, `token`, `authorization`, `cookie` or `api_key` in it (upper or lower case) are logged as `[REDACTED]`. Change the list with `redact:`. The new project turns it off when `APP_ENV` is `production`.
     - `AuthMiddleware` from `dox_auth` checks the JWT token. See [Authentication](../security/authentication.md).
+    - `RateLimit` from `dox_core` answers `429` when a client sends too many requests. See [Rate limiting](../security/rate-limiting.md).
+    - `SecurityHeaders` from `dox_core` adds safe headers like `X-Frame-Options` to every answer. See [Security headers](../security/security-headers.md).

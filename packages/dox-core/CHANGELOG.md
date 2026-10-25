@@ -5,6 +5,11 @@
 - New: `ExceptionHandler`, the one place that turns an error into a response. Extend it and set `AppConfig(exceptionHandler: ...)`. `report(error, stackTrace)` logs, `render(error, req)` picks the response. The default answers are the same as before. A URL with no route goes through it too.
 - Breaking: `AppConfig.errorHandler` and `defaultErrorHandler` are removed. Override `ExceptionHandler.report` instead. It gets the same errors: every error that is not an `IHttpException`, also errors outside a request. A thrown value that is not an `Exception` or `Error` (like a `String`) is now reported too.
 - `responseHandler` still works and still runs after `render`.
+- New: `RateLimit` middleware. `RateLimit(max: 60, per: Duration(minutes: 1), key: (DoxRequest req) => req.ip())`. One request too many gets `429` with `Retry-After`. Every answer has `X-RateLimit-Limit` and `X-RateLimit-Remaining`. The counts live in Redis when the default cache store is Redis (shared by all isolates and servers), else in memory. Fixed window. New `TooManyRequestsException`.
+- New: `SecurityHeaders` middleware. It adds `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy` and `Cross-Origin-Opener-Policy`, and `Strict-Transport-Security` on https requests only. Each one can be changed or turned off with `null`. `Content-Security-Policy` is off by default.
+- New: `Route.health('/health', checks: {...})`. It answers 200 `{"status": "ok"}`, or 503 when a check throws, returns `false` or times out. `HealthCheck.cache()` checks the cache. The error text is in the answer only in `development` and `local`.
+- New: `package:dox_core/testing.dart` with `DoxTestClient`. `DoxTestClient.start(appConfig)` runs the app in the test on a free port. `get`, `post`, `put`, `patch`, `delete`, `send`, `withHeaders` and `withToken`. `TestResponse` has `status`, `body`, `json`, `headers` and `expectStatus`, `expectJson`, `expectBody`, `expectHeader`.
+- dox_core now depends on `matcher` (for the `expect` methods of `TestResponse`).
 
 ## 3.0.0-alpha.8
 

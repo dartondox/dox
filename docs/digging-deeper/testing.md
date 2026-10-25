@@ -4,10 +4,10 @@ This page shows how to test a Dox app with the `test` package: HTTP routes, cach
 
 ## Setup
 
-Add the test packages as dev dependencies:
+Add the test package as a dev dependency:
 
 ```bash
-dart pub add dev:test dev:http
+dart pub add dev:test
 ```
 
 Put your tests in the `test/` folder. Run them with:
@@ -18,39 +18,97 @@ dart test
 
 ## Test HTTP routes
 
-Start the real server once for the whole file. Then send requests to it with `package:http`.
+`DoxTestClient` from `package:dox_core/testing.dart` starts your app inside the test and sends requests to it.
 
 ```dart title="test/http_test.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:http/http.dart' as http;
+import 'package:dox_core/testing.dart';
 import 'package:my_app/config/app.dart';
 import 'package:test/test.dart';
 
-String baseUrl = 'http://localhost:${appConfig.serverPort}';
-
 void main() {
+  late DoxTestClient client;
+
   setUpAll(() async {
-    Dox().initialize(appConfig);
-    Dox().totalIsolate(1);
-    await Dox().startServer();
+    client = await DoxTestClient.start(appConfig);
   });
 
   tearDownAll(() async {
-    await Dox().server.close();
+    await client.close();
   });
 
   test('GET /api/ping', () async {
-    http.Response response = await http.get(Uri.parse('$baseUrl/api/ping'));
-    expect(response.statusCode, 200);
-    expect(response.body, 'pong');
+    TestResponse res = await client.get('/api/ping');
+    res.expectStatus(200).expectBody('pong');
+  });
+
+  test('POST /api/posts', () async {
+    TestResponse res = await client.post(
+      '/api/posts',
+      body: <String, dynamic>{'title': 'Hello', 'body': 'My first post.'},
+    );
+    res.expectStatus(201).expectJson(containsPair('title', 'Hello'));
   });
 }
 ```
 
-- `startServer()` returns when the server listens. You do not need to wait after it.
-- `Dox().totalIsolate(1)` runs the server on one isolate. By default Dox starts one isolate per CPU core. A test does not need them, and they make the start slower.
+- `DoxTestClient.start(appConfig)` runs your services (like the ORM service) and adds your routes, the same as a real start.
+- It listens on `127.0.0.1` and a free port that the OS picks. So it does not clash with `dox serve`, and many test files can run at the same time.
+- It runs on one isolate. `serverPort` and `totalIsolate` of the config are not used.
+- `client.close()` stops the server and runs the `DoxShutdown` services (for example, it closes the database).
 - With one isolate, you can also add a route inside a test with `Route.get(...)`. It works right away.
-- Do not run `dox serve` on the same port while you test. The test can fail to start, or send its requests to the dev server. Stop `dox serve`, or use another `APP_PORT` for tests.
+
+### Send requests
+
+| Method | What it does |
+| --- | --- |
+| `get(path)` | `GET`. The path can have a query: `'/api/users?page=2'`. |
+| `post(path, body: ...)` | `POST`. Also `put`, `patch` and `delete`. |
+| `send('OPTIONS', path)` | any other method |
+| `headers: {...}` | extra headers for one request |
+| `withHeaders({...})` | a copy of the client that sends these headers on every request |
+| `withToken(token)` | a copy of the client that sends `Authorization: Bearer <token>` |
+
+A `Map` or `List` body is sent as JSON. A `String` or `List<int>` body is sent as it is.
+Redirects are not followed, so you can check a `302` and its `Location` header.
+
+### Check the response
+
+| Member | What it gives |
+| --- | --- |
+| `res.status` | the status code, like `200` |
+| `res.body` | the body as text |
+| `res.json` | the body read as JSON |
+| `res.header('content-type')` | one header (any case) |
+| `res.headers` | all headers, with lower case names |
+
+The `expect` methods fail the test when the response is not right. They return the response, so you can chain them:
+
+```dart
+res
+    .expectStatus(422)
+    .expectHeader('content-type', contains('application/json'))
+    .expectJson(<String, dynamic>{'title': 'The title is required'});
+```
+
+| Method | Fails when |
+| --- | --- |
+| `expectStatus(200)` | the status is another one. The message shows the body. |
+| `expectJson(value or matcher)` | the JSON body does not match. Use a `Map`, or a matcher like `containsPair('id', 1)`. |
+| `expectBody(value or matcher)` | the text body does not match |
+| `expectHeader(name, value or matcher)` | the header does not match. Use `isNull` for "not there". |
+
+### Log in as a user
+
+Make a token, then send it with `withToken`:
+
+```dart
+TestResponse login = await client.post(
+  '/api/auth/login',
+  body: <String, dynamic>{'email': 'ann@example.com', 'password': 'secret123'},
+);
+DoxTestClient ann = client.withToken(login.json['token'] as String);
+(await ann.get('/api/auth/me')).expectStatus(200);
+```
 
 ## Test the cache
 
@@ -118,40 +176,58 @@ A missing or bad key throws an `EnvException`. So you can also test that your ap
 
 ## Test the database
 
-A test that uses models needs a real database. Run the migrations and the ORM service once, before the tests:
+A test that uses models needs a real database. Run the migrations once in `setUpAll`.
+Then empty the tables before each test with `refreshDatabase()` from `package:dox_orm/testing.dart`:
 
-```dart title="test/db_test.dart"
-import 'package:dox_core/dox_core.dart';
+```dart title="test/user_test.dart"
+import 'package:dox_core/testing.dart';
 import 'package:dox_migration/dox_migration.dart';
-import 'package:my_app/app/models/user/user.model.dart';
+import 'package:dox_orm/testing.dart';
 import 'package:my_app/config/app.dart';
 import 'package:my_app/config/database.dart';
-import 'package:my_app/services/orm_service.dart';
 import 'package:test/test.dart';
 
+import '../db/migration/migrations.dart';
+
 void main() {
+  late DoxTestClient client;
+
   setUpAll(() async {
-    Dox().initialize(appConfig);
     await Migrator(
+      migrations: migrations,
       config: databaseConfig.getConnectionConfig(),
     ).migrate();
-    await ORMService().setup();
+    client = await DoxTestClient.start(appConfig); // runs the ORM service
   });
 
-  test('saves a user', () async {
-    User user = User()
-      ..name = 'Dox'
-      ..email = 'test-${DateTime.now().microsecondsSinceEpoch}@dox.dev'
-      ..password = 'secret';
-    await user.save();
-    expect(user.id, isNotNull);
+  // every test starts with empty tables
+  setUp(refreshDatabase);
+
+  tearDownAll(() async {
+    await client.close();
+  });
+
+  test('register makes a user', () async {
+    TestResponse res = await client.post(
+      '/api/auth/register',
+      body: <String, dynamic>{
+        'name': 'Ann',
+        'email': 'ann@example.com',
+        'password': 'secret123',
+      },
+    );
+    res.expectStatus(201);
   });
 }
 ```
 
-- Use a separate test database. Set its name in the env of the test run, for example `DB_NAME=app_test dart test`.
-- Make each test data unique (like the email above), or delete it at the end of the test. Then tests do not break each other.
-- `ORMService().setup()` runs the same code as at server start. See [Services](services.md).
+- `refreshDatabase()` empties every table and starts the ids at 1 again. The tables stay. It keeps the rows of the migrations table (`dox_db_migration`).
+- It works on Postgres, MySQL, MariaDB and SQLite. Foreign keys are not checked while it empties the tables.
+- `refreshDatabase(keep: <String>['dox_db_migration', 'countries'])` keeps the rows of more tables.
+- Use a separate test database. Set its name in the env of the test run, for example `DB_NAME=app_test dart test`. Never run it on a database with real data.
+- A test without the server can start the ORM with `SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig)`.
+
+See [Testing with a database](../guides/testing-with-database.md) for a full example with SQLite.
 
 !!! tip "Run test files one by one"
-    `dart test` runs test files at the same time. When two files start the server on the same port, or use the same tables, run them one by one: `dart test --concurrency=1`.
+    `dart test` runs test files at the same time. When two files use the same tables, run them one by one: `dart test --concurrency=1`.

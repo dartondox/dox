@@ -1,6 +1,6 @@
 import 'package:dox_core/dox_core.dart';
-import 'package:my_app/app/http/controllers/health.controller.dart';
 import 'package:my_app/app/http/controllers/static.controller.dart';
+import 'package:dox_orm/dox_orm.dart';
 
 class WebRouter extends Router {
   @override
@@ -8,8 +8,13 @@ class WebRouter extends Router {
 
   @override
   void register() {
-    // docker health check
-    Route.get('/health', healthController.check);
+    // docker health check: 503 when the database does not answer
+    Route.health(
+      '/health',
+      checks: <String, HealthCheckFunction>{
+        'database': () => QueryBuilder.query('select 1'),
+      },
+    );
 
     // uploads: GET /files/{key*}, any file of the default disk
     Route.files('files', signed: false);

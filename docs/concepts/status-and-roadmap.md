@@ -52,7 +52,6 @@ These were checked by searching the code in `packages/*/lib` with `rg`.
 | Notifications | Not there | Send them from your own service class. |
 | Events and listeners | Not there | Model events are there. See [Model events](../database/model/events.md). |
 | Views and templates | Not there | Dox is for APIs. Serve the front end on its own. |
-| Rate limiting | Not there | Write a middleware with the cache, or use a proxy. |
 | Sessions and password reset | Not there | Auth uses JWT. `req.httpRequest.session` throws `UnsupportedError`. |
 | Policies and gates | Not there | Check the user in a middleware or in the controller. |
 | Database factories and seeders | Not there | Write a Dart script, or a migration with data. |
@@ -73,10 +72,6 @@ These were checked by searching the code in `packages/*/lib` with `rg`.
 | One exception handler | One place to turn every error into a response. |
 | ORM scopes, casts and `withCount` | |
 | Model factories and seeders | |
-| HTTP test client and database refresh | For app tests. |
-| Rate limiting | |
-| Security headers | |
-| Health check route | |
 | `dox_queue` | Queues and jobs. New package: [github.com/dartondox/dox-queue](https://github.com/dartondox/dox-queue). |
 | `dox_scheduler` | Run tasks on a schedule. New package: [github.com/dartondox/dox-scheduler](https://github.com/dartondox/dox-scheduler). |
 | 3.0 stable | After the alpha API settles |

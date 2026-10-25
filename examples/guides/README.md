@@ -10,7 +10,7 @@ Dox is a new web framework for Dart. Each guide adds a few files to this app.
 | [JWT authentication](../../docs/guides/jwt-auth.md) | `auth.controller.dart`, `services/auth_service.dart`, the DTOs |
 | [Custom errors](../../docs/guides/custom-errors.md) | `exceptions/app_exception.dart`, `response_handler.dart`, `error_handler.dart` |
 | [Background work](../../docs/guides/background-work.md) | `report.controller.dart`, `services/cleanup_service.dart` |
-| [Docker](../../docs/guides/docker.md) | `health.controller.dart`, `bin/health.dart`, `Dockerfile`, `docker-compose.yml` |
+| [Docker](../../docs/guides/docker.md) | `Route.health` in `routes/web.dart`, `bin/health.dart`, `Dockerfile`, `docker-compose.yml` |
 | [Testing with a database](../../docs/guides/testing-with-database.md) | `test/user_test.dart`, the migration |
 | [Static files and SPA](../../docs/guides/static-files.md) | `static.controller.dart`, `routes/web.dart`, `public/` |
 | [CORS for a browser front-end](../../docs/guides/cors-for-spa.md) | `config/cors.dart` |

@@ -33,7 +33,8 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | Body limits are on | Keep `maxBodySize` (10 MB) and `maxMultipartSize` (100 MB), or lower them. Set the same limit in the proxy: `client_max_body_size 100m;` | [Request](../the-basic/request.md) |
 | CORS has real origins | `CORSConfig(origin: 'https://my.app')`, or a list like `<String>['https://my.app', 'https://admin.my.app']`. With a list, Dox sends back only the request origin when it is in the list. | [CORS](../security/cors.md) |
 | No `credentials: true` with `origin: '*'` | The new project's `cors.dart` has `origin: '*'` and `credentials: true` with `enabled: false`. When you turn CORS on, set a real origin first. | [CORS](../security/cors.md) |
-| Rate limiting | **Dox limit.** Dox has no rate limiter. Do it at the proxy. See [below](#rate-limit-at-the-proxy). | [Deployment](../digging-deeper/deployment.md) |
+| Rate limiting | Add `RateLimit(...)` to login and other busy routes. Use a Redis cache store, so all servers share the counts. Or limit at the proxy, see [below](#rate-limit-at-the-proxy). | [Rate limiting](../security/rate-limiting.md) |
+| Security headers | Add `const SecurityHeaders()` to `globalMiddleware`. | [Security headers](../security/security-headers.md) |
 | gzip at the proxy | Keep `compress: false`. Turn on gzip in Caddy (`encode gzip`) or nginx (`gzip on;`). | [Performance](../digging-deeper/performance.md) |
 | OpenAPI docs | Off in production by default (on only for `APP_ENV` `development` or `local`). Do not set `enabled: true` for a private API. | [OpenAPI](../packages/openapi.md) |
 
@@ -75,13 +76,13 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 
 | Check | How | Read more |
 | --- | --- | --- |
-| Health route | **Dox limit.** Dox has no built-in health route. Add one that asks the database: `Route.get('/health', healthController.check)` with `await QueryBuilder.query('select 1');`. | [Docker](../guides/docker.md) |
+| Health route | Add `Route.health('/health', checks: ...)` with a database check, so the load balancer knows when the app can not serve. | [Health check](../digging-deeper/health-check.md) |
 | Graceful shutdown | On `SIGTERM` or `SIGINT`, Dox stops taking connections and lets open requests finish, in every isolate. Set `shutdownTimeout` below the kill timeout of your platform. The `ORMService` closes the database in its `DoxShutdown` hook, and Dox closes the cache stores. Close your own connections in a `DoxShutdown` service. | [Deployment](../digging-deeper/deployment.md#graceful-shutdown) |
 | Zero downtime deploys | Run two processes (or machines) behind the proxy. Restart one at a time. | [Deployment](../digging-deeper/deployment.md) |
 
 ## Rate limit at the proxy
 
-Dox has no rate limiter. Add one in the proxy.
+You can also limit at the proxy. Then bad clients never reach the app.
 
 nginx:
 
