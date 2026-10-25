@@ -1,3 +1,7 @@
+## 3.0.0-alpha.12
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.11
 
 - `dox build` also builds `bin/queue.dart` and `bin/schedule.dart` when they exist, to `build/bundle/bin/queue` and `build/bundle/bin/schedule`. Before, the worker and the scheduler had no production binary.

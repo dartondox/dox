@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.12
 
 - Breaking: `dox_core` no longer depends on `dox_storage` and `dox_socketio`. Add the package you use to your app.
   - Storage: `Storage()`, `StorageConfig` and `StorageDiskFactory` moved to `dox_storage`. `AppConfig.storage` is removed: extend `StorageService` from `dox_storage` (`class AppStorageService extends StorageService { AppStorageService() : super(storageConfig); }`). `Route.files()` is now `Storage.route()`. `Dox().storage` is now `Storage.manager`. `RequestFile.store()` needs `import 'package:dox_storage/dox_storage.dart'`.
