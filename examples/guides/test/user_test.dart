@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_migration/dox_migration.dart';
 import 'package:dox_orm/dox_orm.dart';
+import 'package:dox_orm/testing.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 import 'package:test/test.dart';
 
@@ -39,10 +40,8 @@ void main() {
     SqlQueryBuilder.initializeWithDatabaseConfig(testDatabase);
   });
 
-  // every test starts with an empty table
-  setUp(() async {
-    await User().truncate();
-  });
+  // every test starts with empty tables
+  setUp(refreshDatabase);
 
   tearDownAll(() async {
     await deleteDbFile();
@@ -61,7 +60,7 @@ void main() {
     expect(Hash.verify('secret123', found!.password!), isTrue);
   });
 
-  test('the table is empty again', () async {
+  test('the tables are empty again', () async {
     expect(await User().count(), 0);
   });
 }

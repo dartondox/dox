@@ -331,13 +331,13 @@ A missing key stops the app at start, with a list of every missing key. See [Env
 | Laravel | Dox |
 | --- | --- |
 | `php artisan test` | `dart test` |
-| `$this->get('/api/ping')->assertStatus(200)` | start the server once, then `http.get(Uri.parse('$baseUrl/api/ping'))` |
-| `RefreshDatabase` | run the migrations in `setUpAll`, or use SQLite `:memory:` |
+| `$this->get('/api/ping')->assertStatus(200)` | `(await client.get('/api/ping')).expectStatus(200)` with `DoxTestClient` |
+| `RefreshDatabase` | run the migrations in `setUpAll`, then `setUp(refreshDatabase)` from `package:dox_orm/testing.dart` |
 | `Storage::fake('s3')` | `Dox().storage.fake('s3')` |
 | `Cache::fake()` | `Dox().cache = CacheManager(CacheConfig(...))` with a `memory` store |
-| `$this->actingAs($user)` | send the JWT from `Auth().login(user)` in the `Authorization` header |
+| `$this->actingAs($user)` | `client.withToken(token)` with the JWT from `Auth().login(user)` |
 
-Dox has no fake HTTP kernel. A test starts the real server with `Dox().totalIsolate(1)` and sends real requests.
+Dox has no fake HTTP kernel. `DoxTestClient.start(appConfig)` starts the real server inside the test, on a free port, and sends real requests.
 See [Testing](../digging-deeper/testing.md).
 
 ## What is different
@@ -367,9 +367,6 @@ Dox does not have these Laravel features yet:
 - Blade views, mail and notifications
 - sessions (auth uses a JWT; encrypted cookies are there)
 - policies and gates
-- seeders and factories
-- rate limiting middleware
-- savepoints in nested transactions (a nested `transaction()` joins the outer one)
 
 See [What Dox does not have yet](status-and-roadmap.md#what-dox-does-not-have-yet) for what to use today.
 

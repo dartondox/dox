@@ -444,16 +444,17 @@ See [OpenAPI](../packages/openapi.md).
 ## Testing
 
 ```dart
-setUpAll(() async {
-  Dox().initialize(appConfig);
-  Dox().totalIsolate(1);
-  await Dox().startServer();
-});
-tearDownAll(() async => Dox().server.close());
+import 'package:dox_core/testing.dart';
+import 'package:dox_orm/testing.dart';
+
+late DoxTestClient client;
+setUpAll(() async => client = await DoxTestClient.start(appConfig));
+setUp(refreshDatabase); // empty every table before each test
+tearDownAll(() async => client.close());
 
 test('ping', () async {
-  http.Response res = await http.get(Uri.parse('http://localhost:3000/api/ping'));
-  expect(res.statusCode, 200);
+  (await client.get('/api/ping')).expectStatus(200).expectBody('pong');
+  (await client.withToken(token).post('/api/posts', body: {...})).expectStatus(201);
 });
 ```
 

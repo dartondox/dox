@@ -1,6 +1,7 @@
 # Testing with a database
 
-Run model tests against a real database, SQLite or a test Postgres, with migrations run once and an empty table for every test.
+Run model tests against a real database: SQLite for fast local tests, or a test Postgres for the real thing.
+Migrations run once, and every test starts with empty tables.
 
 ## What you need
 
@@ -51,6 +52,7 @@ import 'dart:io';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_migration/dox_migration.dart';
 import 'package:dox_orm/dox_orm.dart';
+import 'package:dox_orm/testing.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 import 'package:test/test.dart';
 
@@ -87,10 +89,8 @@ void main() {
     SqlQueryBuilder.initializeWithDatabaseConfig(testDatabase);
   });
 
-  // every test starts with an empty table
-  setUp(() async {
-    await User().truncate();
-  });
+  // every test starts with empty tables
+  setUp(refreshDatabase);
 
   tearDownAll(() async {
     await deleteDbFile();
@@ -109,7 +109,7 @@ void main() {
     expect(Hash.verify('secret123', found!.password!), isTrue);
   });
 
-  test('the table is empty again', () async {
+  test('the tables are empty again', () async {
     expect(await User().count(), 0);
   });
 }
@@ -118,7 +118,7 @@ void main() {
 What happens:
 
 1. `setUpAll` deletes an old database file, runs the migrations, and starts the ORM on the same file.
-2. `setUp` empties the table before each test. `truncate()` also resets the id counter.
+2. `setUp` runs `refreshDatabase()` before each test. It empties every table (not the migrations table) and starts the ids at 1 again.
 3. `tearDownAll` deletes the file.
 
 !!! note "A file, not `:memory:`"
@@ -139,7 +139,7 @@ dart test test/user_test.dart
 Migrating: 2026_10_22_000000_create_users_table
 Migrated: 2026_10_22_000000_create_users_table
 00:00 +1: saves and finds a user
-00:00 +2: the table is empty again
+00:00 +2: the tables are empty again
 00:00 +2: All tests passed!
 ```
 
@@ -187,14 +187,47 @@ dart test --concurrency=1
 
 ## Test a route with the database
 
-Start the server in `setUpAll` and send real requests. The server runs the services, so the ORM is set up by `ORMService`.
-Set the database with env variables, so `lib/config/database.dart` picks the test database:
+`DoxTestClient` starts the app inside the test. It runs the services, so the ORM is set up by `ORMService` from `lib/config/database.dart`.
+Set the database with env variables, so the app picks the test database:
 
-```bash
-DB_CONNECTION=sqlite DB_NAME=storage/test.sqlite APP_PORT=3999 dart test test/api_test.dart
+```dart title="test/api_test.dart"
+import 'package:dox_core/testing.dart';
+import 'package:dox_migration/dox_migration.dart';
+import 'package:dox_orm/testing.dart';
+import 'package:my_app/config/app.dart';
+import 'package:my_app/config/database.dart';
+import 'package:test/test.dart';
+
+import '../db/migration/migrations.dart';
+
+void main() {
+  late DoxTestClient client;
+
+  setUpAll(() async {
+    await Migrator(
+      migrations: migrations,
+      config: databaseConfig.getConnectionConfig(),
+    ).migrate();
+    client = await DoxTestClient.start(appConfig);
+  });
+
+  setUp(refreshDatabase);
+
+  tearDownAll(() async {
+    await client.close();
+  });
+
+  test('GET /api/users is empty', () async {
+    (await client.get('/api/users')).expectStatus(200).expectJson(isEmpty);
+  });
+}
 ```
 
-See [Testing: test HTTP routes](../digging-deeper/testing.md#test-http-routes) for the server setup.
+```bash
+DB_CONNECTION=sqlite DB_NAME=storage/test.sqlite dart test test/api_test.dart
+```
+
+See [Testing: test HTTP routes](../digging-deeper/testing.md#test-http-routes) for all client methods.
 
 ## See also
 

@@ -7,49 +7,39 @@ This step writes one HTTP test for the list route and runs it.
 The template has `test/http_test.dart`. Replace it with this:
 
 ```dart title="test/http_test.dart"
-import 'dart:convert';
-
 import 'package:blog/config/app.dart';
 import 'package:blog/config/database.dart';
-import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/testing.dart';
 import 'package:dox_migration/dox_migration.dart';
-import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 import '../db/migration/migrations.dart';
 
-String baseUrl = 'http://localhost:${appConfig.serverPort}';
-
 void main() {
+  late DoxTestClient client;
+
   setUpAll(() async {
-    Dox().initialize(appConfig);
-    Dox().totalIsolate(1);
     await Migrator(
       migrations: migrations,
       config: databaseConfig.getConnectionConfig(),
     ).migrate();
-    await Dox().startServer();
+    client = await DoxTestClient.start(appConfig);
   });
 
   tearDownAll(() async {
-    await Dox().server.close();
+    await client.close();
   });
 
   test('GET /api/posts gives a list', () async {
-    http.Response response = await http.get(Uri.parse('$baseUrl/api/posts'));
-    expect(response.statusCode, 200);
-    expect(jsonDecode(response.body), isA<List<dynamic>>());
+    TestResponse res = await client.get('/api/posts');
+    res.expectStatus(200).expectJson(isA<List<dynamic>>());
   });
 }
 ```
 
-- The test starts the real server once, on one isolate. One isolate starts faster.
+- `DoxTestClient.start` runs the app inside the test, on a free port. It does not clash with `dox s`.
 - It runs the migrations first, so the test also works on an empty database.
-- `package:test` and `package:http` are already in `dev_dependencies` of the template.
-
-## 2. Stop the dev server
-
-The test listens on the same port as `dox s`. Stop `dox s` with `Ctrl+C` first.
+- `package:test` is already in `dev_dependencies` of the template.
 
 ## Check it
 

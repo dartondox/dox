@@ -35,6 +35,7 @@ export 'exception/internal_error_exception.dart';
 export 'exception/not_found_exception.dart';
 export 'exception/payload_too_large_exception.dart';
 export 'exception/query_exception.dart';
+export 'exception/too_many_requests_exception.dart';
 export 'exception/validation_exception.dart';
 
 /// Request
@@ -59,7 +60,10 @@ export 'socketio/socket_io_config.dart';
 
 /// Tools
 export 'ioc/ioc_container.dart';
+export 'middleware/health_check.dart';
 export 'middleware/log_middleware.dart';
+export 'middleware/rate_limit.dart';
+export 'middleware/security_headers.dart';
 
 /// Router
 export 'router/route.dart';

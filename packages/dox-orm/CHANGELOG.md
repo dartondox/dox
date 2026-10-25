@@ -6,6 +6,7 @@
 - New attribute casts with `@Column(cast: ...)`: `JsonCast`, `ListCast<E>`, `BoolCast`, `EnumCast<E>` (by name or by index), or your own `Cast<T>` class. `bool` fields get `BoolCast` and enum fields get `EnumCast` without `cast`.
 - New `withCount('posts')`, `withSum('posts', 'views')` and `withMax('posts', 'views')`. They add the value with a subquery, for `hasOne`, `hasMany` and `manyToMany` relations. Read it with `countOf('posts')` or `aggregate('posts_sum_views')`. `toJson()` has it too.
 - `all()` now uses the where conditions of the query, like `get()`. Before, it used only the soft delete check.
+- New: `package:dox_orm/testing.dart` with `refreshDatabase()`. Use `setUp(refreshDatabase)` in tests: it empties every table and starts the ids at 1 again, on Postgres, MySQL, MariaDB and SQLite. The migrations table keeps its rows. `keep:` keeps more tables.
 
 ## 3.0.0-alpha.8
 

@@ -9,27 +9,18 @@ Build a small production image with `dox build`, and run it with Postgres in Doc
 
 ## 1. Add a health route
 
-The health check asks this route. It fails when the database does not answer.
-
-```dart title="lib/app/http/controllers/health.controller.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:dox_orm/dox_orm.dart';
-
-class HealthController {
-  /// GET /health. 200 when the app and the database answer.
-  /// Any database error becomes a 500, so the health check fails.
-  Future<Map<String, String>> check(DoxRequest req) async {
-    await QueryBuilder.query('select 1');
-    return <String, String>{'status': 'ok'};
-  }
-}
-
-HealthController healthController = HealthController();
-```
+The health check asks this route. It answers 503 when the database does not answer.
 
 ```dart title="lib/routes/web.dart"
-Route.get('/health', healthController.check);
+Route.health(
+  '/health',
+  checks: <String, HealthCheckFunction>{
+    'database': () => QueryBuilder.query('select 1'),
+  },
+);
 ```
+
+See [Health check](../digging-deeper/health-check.md) for more checks.
 
 ## 2. Add the health check binary
 

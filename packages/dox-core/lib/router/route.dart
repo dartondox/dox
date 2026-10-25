@@ -124,6 +124,23 @@ class Route {
     );
   }
 
+  /// health check route: `GET <path>` answers 200 `{"status": "ok"}`,
+  /// or 503 when one of the [checks] fails. See [HealthCheck].
+  /// ```
+  /// Route.health('/health', checks: <String, HealthCheckFunction>{
+  ///   'database': () => QueryBuilder.query('select 1'),
+  ///   'cache': HealthCheck.cache(),
+  /// });
+  /// ```
+  static Route health(
+    String path, {
+    Map<String, HealthCheckFunction> checks =
+        const <String, HealthCheckFunction>{},
+    Duration timeout = const Duration(seconds: 5),
+  }) {
+    return get(path, HealthCheck(checks: checks, timeout: timeout).handle);
+  }
+
   // set route list
   void setRoutes(List<RouteData> routeList) {
     _routes = routeList;

@@ -154,6 +154,7 @@ nav:
     - digging-deeper/native-server.md
     - digging-deeper/performance.md
     - digging-deeper/testing.md
+    - digging-deeper/health-check.md
   - Database:
     - database/index.md
     - database/query-builder.md
@@ -186,6 +187,8 @@ nav:
     - security/cors.md
     - security/encryption.md
     - security/hashing.md
+    - security/rate-limiting.md
+    - security/security-headers.md
   - Guides:
     - guides/index.md
     - guides/file-upload.md
