@@ -9007,6 +9007,8 @@
 <h3 id="unreleased_2">Unreleased</h3>
 <ul>
 <li>Fix: <code>AUTH_REQUEST_KEY</code> is now only in <code>dox_core</code>, so importing <code>dox_core</code> and <code>dox_auth</code> together no longer gives an "ambiguous import" error.</li>
+<li>Fix: <code>response(x).header('Content-Type', 'image/svg+xml')</code> failed with "More than one value for header content-type". The default <code>text/plain</code> stayed next to the new type. Now <code>header()</code> replaces the content type, the same as <code>contentType()</code>. The name can be in any case.</li>
+<li>Fix: when sending the error answer failed too, the client got no answer and waited until the timeout. Now Dox reports the error and sends a plain 500. When the head is already sent, it closes the response.</li>
 </ul>
 <h3 id="300-alpha13_5">3.0.0-alpha.13</h3>
 <ul>
