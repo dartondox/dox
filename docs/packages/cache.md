@@ -2,7 +2,7 @@
 
 This page shows the full API of `dox_cache`, the cache behind `Cache()` in Dox.
 
-It works like Laravel Cache. It has `remember`, tags, atomic locks and four drivers.
+It has `remember`, tags, atomic locks and four drivers.
 
 !!! tip "Built into Dox"
     `dox_core` uses `dox_cache` for [`Cache()`](../digging-deeper/cache.md).
@@ -60,9 +60,7 @@ await cache.store('file').get('a');   // a named store
 | `file` | `path` (default `storage/cache`) |
 | `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db`, `tls`, `pool_size` |
 
-`pool_size` is the most Redis connections one store opens in one isolate. The default is 10.
-In practice a store uses one connection, because the cache sends no blocking commands.
-So you rarely need to change it. Each Dox isolate has its own connection.
+`pool_size` is the most Redis connections one store opens in one isolate (default 10). A store uses about one, so you rarely change it.
 
 ## Basic use
 

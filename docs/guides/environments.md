@@ -16,9 +16,7 @@ So: use `.env` on your machine. Use real environment variables on a server. The 
 
 ## 1. The typed env class
 
-A new project already has `lib/config/env.dart`. Its `AppEnv` class lists every key, its type and its default. A missing required key stops the app at start, with a list of all problems.
-
-This is the file of the guides app. The last two getters, `corsOrigin` and `appUrl`, are keys this app added. The rest comes with a new project.
+A new project already has `lib/config/env.dart`. Its `AppEnv` class lists every key, its type and its default. In this file of the guides app, `corsOrigin` and `appUrl` are added keys. The rest comes with a new project.
 
 ```dart title="lib/config/env.dart"
 import 'package:dox_core/dox_core.dart';
@@ -93,7 +91,7 @@ The key is the getter name in UPPER_SNAKE case: `dbPort` reads `DB_PORT`.
 - A nullable getter with no body is optional: `int? get dbPort;` is `null` when the key is not set.
 - Any other getter with no body is required: `String get appKey;`.
 
-The part file `env.g.dart` is made by `build_runner`. It is in `.gitignore`.
+A missing required key stops the app at start, with a list of all problems. The part file `env.g.dart` is made by `build_runner` and is in `.gitignore`.
 
 ## 2. Add a key
 
@@ -114,7 +112,7 @@ Now `env.mailHost` reads `MAIL_HOST`. Add `MAIL_HOST` to `.env.example` too.
 
 ## 3. Use it in the config files
 
-The config files read the typed getters. Things that differ per environment become one `if` or one `bool`.
+The config files read the typed getters. A setting that differs per environment becomes one `bool`.
 
 ```dart title="lib/config/logger.dart"
 import 'package:dox_core/dox_core.dart';

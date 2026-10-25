@@ -220,7 +220,8 @@ SocketIoServer(
 - `cors` with a list of origins: a websocket from another origin gets 403. A request with no `Origin` header (not a browser) is allowed.
 - `cors: null`, or `*` in `origins`: websockets from any origin are allowed. If you log users in with cookies, list your origins.
 - `*` together with `credentials: true` throws an `ArgumentError`. List your origins instead.
-- Websocket compression is off. On the native server, Rust checks the size of each message (`maxHttpBufferSize`) before Dart reads it. A bigger one closes with code 1009. On a plain `dart:io` server (`io.attach`), `dart:io` reads the whole message first, so also set a size limit in your proxy.
+- Websocket compression is off. A message bigger than `maxHttpBufferSize` closes with code 1009.
+- On a plain `dart:io` server (`io.attach`), the whole message is read before the size check. Also set a size limit in your proxy.
 
 ## Many servers: Redis adapter
 
@@ -244,8 +245,7 @@ SocketIoServer io = SocketIoServer(
   To act on all servers, use an [emitter](#emit-from-other-programs).
 - Broadcast acks from other servers: Dox clients get the event, but their acks are not sent back.
 - `serverSideEmit` from other servers is ignored.
-- Long-polling needs sticky sessions when many servers share one port.
-  If you can not have them, use `transports: ['websocket']` on the client.
+- Long-polling needs sticky sessions, the same as with [many isolates](#in-a-dox-app-same-port-as-http). Or use `transports: ['websocket']` on the client.
 
 ## Emit from other programs
 

@@ -1,18 +1,15 @@
 # API docs with OpenAPI
 
-Your API gets docs for free. Turn on OpenAPI for the blog API, open the docs page, and make the docs better with a few comments and annotations.
+Turn on OpenAPI docs for the blog API, open the docs page, and make the docs better with comments and annotations.
 
 ## What you need
 
 - The blog API from the [tutorial](../tutorial/01-create-project.md), or any Dox app.
-- `build_runner` and `dox_builder`. A new app has both.
-
-You do not add a package. `dox_core` already has `dox_openapi` in it.
+- `build_runner` and `dox_builder`. A new app has both. `dox_core` already has `dox_openapi`, so you add no package.
 
 ## 1. Write the config
 
-`dox_builder` already writes `lib/openapi.g.dart` when you run `build_runner`. It holds `openApiRegistry`: what the builder found in your routes, controllers, DTOs and models.
-Pass it to an `OpenApiConfig`:
+`build_runner` writes `lib/openapi.g.dart`. Its `openApiRegistry` holds what the builder found in your routes, controllers, DTOs and models. Pass it to an `OpenApiConfig`:
 
 ```dart title="lib/config/openapi.dart"
 import 'package:dox_core/dox_core.dart';
@@ -47,8 +44,7 @@ dox serve
 
 ## 3. Open the docs page
 
-Open `http://localhost:3000/docs` in a browser. It is a [Scalar](https://github.com/scalar/scalar) page.
-It lists every route, with "Try it" buttons. It loads Scalar from the jsDelivr CDN and reads `/openapi.json`.
+Open `http://localhost:3000/docs`. It is a [Scalar](https://github.com/scalar/scalar) page with every route and "Try it" buttons. It loads Scalar from the jsDelivr CDN.
 
 The app now has three new routes:
 
@@ -169,12 +165,12 @@ And this is its schema in `/openapi.json`:
 A model becomes a schema too. `Post` has `id`, the `@Column` fields `title` and `body`, and `created_at` and `updated_at`.
 Keys in `hidden` are left out. That is why `User` has no `password`.
 
-The docs and the validation come from the same DTO. When you change a rule, run `build_runner` again, and the docs change with it.
+When you change a rule, run `build_runner` again, and the docs change with it.
 
 ## 6. Make the docs better
 
 Write a `///` comment on a controller method. The first line is the summary. The rest is the description.
-Add `@Tags` and `@Response` when the automatic result is not what you want. They come from `dox_core`, so there is no new import.
+Add `@Tags` and `@Response` (from `dox_core`) when the automatic result is not what you want.
 
 ```dart title="lib/app/http/controllers/post.controller.dart"
 class PostController {
@@ -234,9 +230,7 @@ See [OpenAPI: change the docs](../packages/openapi.md#change-the-docs-optional) 
 
 ## 7. Turn it off in production
 
-You do not need to do anything. `enabled` is `null` by default. Then the docs routes are on only when `APP_ENV` is `development` or `local`.
-
-With `APP_ENV=production` all three routes give `404`:
+This is the default. `enabled` is `null`, so the docs routes are on only when `APP_ENV` is `development` or `local`. With `APP_ENV=production` all three routes give `404`:
 
 ```bash
 curl -o /dev/null -w '%{http_code}\n' http://localhost:3000/docs           # 404

@@ -54,24 +54,8 @@ class ApiController {
 
 ## Route params
 
-Ask for a path param as a typed parameter. `int id` gets `42` from `/users/42`.
-
-```dart
-Route.get('/hello/{name}', controller.sayHello);
-Route.get('/users/{id}', controller.show);
-
-class ApiController {
-  String sayHello(String name) {
-    return 'Hello $name';
-  }
-
-  Future<User?> show(int id) async {
-    return User().find(id);
-  }
-}
-```
-
-The values are also in `req.param`, like `req.param['id']`.
+Ask for a path param as a typed parameter, like `int id` in the example above.
+The raw text values are also in `req.param`, like `req.param['id']`.
 See [Controller: parameters](controller.md#parameters).
 
 ## Form data (File)

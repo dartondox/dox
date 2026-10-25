@@ -81,7 +81,6 @@ UserInfo? info = await user
     .getFirst();
 ```
 
-`related` gives a query. You can add more conditions before you run it.
 It does not set `user.userInfo`.
 
 ### `eager`
@@ -93,7 +92,6 @@ Use it when every query of `User` should load the relation.
 UserInfo? userInfo;
 ```
 
-With `eager: true`, every query of `User` loads the relation.
 You do not call `preload`.
 
 The load runs this SQL:
@@ -111,7 +109,7 @@ SELECT *, "user_id" as "_owner_id" FROM "user_info" WHERE "user_id" IN (@user_id
 | `onQuery` | none | A static function that changes the query. |
 | `eager` | `false` | Load the relation on every query. |
 
-The default `foreignKey` uses the class name in snake_case, like Laravel.
+The default `foreignKey` uses the class name in snake_case.
 `User` gives `user_id`, also when the table is `users`.
 
 ### `foreignKey` and `localKey`

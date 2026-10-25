@@ -1,6 +1,8 @@
 # Request and response
 
-A compact list of the members. Examples and explanations are on the [Request](../the-basic/request.md) and [Response](../the-basic/response.md) pages.
+A compact list of the members of `DoxRequest` and `DoxResponse`.
+
+Examples and explanations are on the [Request](../the-basic/request.md) and [Response](../the-basic/response.md) pages.
 
 ## `DoxRequest`
 

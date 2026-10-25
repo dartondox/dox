@@ -1,6 +1,6 @@
 # Reference
 
-Short lookup pages. Every value on these pages comes from the source code of the latest `3.0.0-alpha.x` version.
+Short lookup pages, with values taken from the Dox source code.
 
 | Page | What is on it |
 | --- | --- |

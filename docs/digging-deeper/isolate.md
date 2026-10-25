@@ -4,13 +4,13 @@ This page explains how Dox runs your app on many isolates (threads), and what th
 
 ## How it works
 
-Dox starts many isolates. Each one runs its own HTTP server on the same port. The operating system spreads the connections between them.
+Dox starts many isolates. Each one runs its own [native server](native-server.md) on the same port. The operating system spreads the connections between them.
 
-- Native server on Linux: each isolate has its own socket (`SO_REUSEPORT`).
-- Native server on macOS: the isolates share one socket.
-- Native server on Windows: only one isolate serves HTTP.
+- Linux: each isolate has its own socket (`SO_REUSEPORT`).
+- macOS: the isolates share one socket.
+- Windows: only one isolate serves HTTP.
 
-With the native server, each isolate has its own Rust acceptor on the port:
+Each isolate has its own Rust acceptor on the port:
 
 ```mermaid
 flowchart TD
@@ -26,11 +26,9 @@ flowchart TD
 
 With the Postgres and MySQL drivers, all isolates share one database pool in Rust. See [How Dox works](../concepts/how-dox-works.md#where-the-database-pools-live).
 
-See [Native server](native-server.md) for the two servers.
-
 ## How many isolates
 
-By default Dox starts one isolate per CPU core (`Platform.numberOfProcessors`). So one process uses the whole machine.
+By default Dox starts one isolate per CPU core (`Platform.numberOfProcessors`).
 
 To change it, set `totalIsolate` in `lib/config/app.dart`. A new app reads it from `APP_TOTAL_ISOLATE`:
 
@@ -56,10 +54,10 @@ Use fewer isolates when:
 
 ## Each isolate has its own memory
 
-Isolates do not share memory. This has some effects on your code:
+Isolates do not share memory:
 
 - A static value or a singleton exists once **per isolate**. When you change it in one isolate, the others do not see it.
-- The `memory` cache store is per isolate. Use the `redis` store to share cache data. See [Cache](cache.md).
+- The `memory` cache store is per isolate. See [Cache](cache.md).
 - To share data between isolates or servers, use a database, Redis or files.
 
 `Dox().isolateId` tells you which isolate runs the code. The first isolate is `1`.
@@ -72,8 +70,6 @@ Dox copies the `AppConfig`, the services and the routes you added before `startS
 2. registers the routes of your routers,
 3. reads the parameter types of each controller once,
 4. starts its HTTP server.
-
-This happens once at start, not on each request.
 
 Because the config and services are copied, they must not hold open sockets or database pools. Open these in `setup()`. See [Services](services.md).
 

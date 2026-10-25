@@ -1,14 +1,14 @@
 # Services
 
-A service is a class with a `setup()` method. Dox runs it at start, in every isolate. Use it to set up things like the database or auth.
+A service is a class with a `setup()` method. Dox runs it at start, in every isolate.
+
+Use it to set up things like the database or auth.
 
 ## Why services
 
-Dox runs your app on many isolates (see [Isolate](isolate.md)). Each isolate has its own memory.
-
-So code that you run once in `bin/server.dart` only sets up the first isolate. The other isolates do not see it. For example, they have no database connection.
-
-A service fixes this. Dox sends the list of services to each isolate, and each isolate runs `setup()` itself.
+Dox runs your app on many [isolates](isolate.md), and they do not share memory.
+Code that you run once in `bin/server.dart` only sets up the first isolate. The others have, for example, no database connection.
+A service fixes this: each isolate runs `setup()` itself.
 
 ## Create a service
 
@@ -85,13 +85,9 @@ See [Authentication](../security/authentication.md).
 
 ## When `setup()` runs
 
-In each isolate, Dox does these steps in this order:
-
-1. It runs `setup()` of each service, one after the other, in list order.
-2. It registers the routes of your routers.
-3. It starts the HTTP server.
-
-So routes can use what a service set up.
+In each isolate, Dox runs `setup()` of each service, one after the other, in list order.
+Then it registers the routes and starts the server, so routes can use what a service set up.
+See [What each isolate does at start](isolate.md#what-each-isolate-does-at-start).
 
 `dox openapi:generate` also runs `setup()` of every service, because it needs the routes.
 
@@ -126,4 +122,3 @@ An error in `shutdown()` goes to the `report` method of the [exception handler](
 
 - **Open connections in `setup()`, not in the constructor.** Dox copies the service object to each isolate. An open socket or database pool can not be copied, so the isolate fails to start.
 - **Keep `setup()` short.** It runs once per isolate. Data you load in it is kept once per isolate, so 8 isolates keep 8 copies.
-- **Do not depend on another isolate.** Each isolate has its own static values and singletons. To share data between isolates, use a database, Redis or the [cache](cache.md) with the `redis` driver.

@@ -1,7 +1,6 @@
 # How Dox works
 
-This page explains what happens inside Dox when a request comes in.
-It also explains how Dox uses isolates, where the database pools live, and what each folder of an app is for.
+This page explains what happens inside Dox when a request comes in, how isolates work and what each folder of an app is for.
 
 ## The life of a request
 
@@ -144,7 +143,7 @@ So for Postgres and MySQL, the app opens at most `maxConnectionCount` connection
 The pool size is always your choice. Set it below the `max_connections` of the database.
 
 The pool closes when the last isolate that uses it closes it.
-    See [Native Postgres driver](../database/postgres-native.md#options).
+See [Native Postgres driver](../database/postgres-native.md#options).
 
 Postgres and MySQL have only the native drivers. When the native library does not load, the app stops with an error that says why and how to fix it. See [Database](../database/index.md).
 
@@ -204,5 +203,4 @@ my_app/
 | `lib/*.g.dart` | Generated files. Do not edit them. Run `dox build_runner:build` to make them again. |
 | `storage/` | Files the app writes: uploads, the file cache, SQLite files. |
 
-Generated code comes from `build_runner` with the `dox_builder` package. It makes the model classes, the DTO checks, the typed env class and the OpenAPI docs.
-Run `dox build_runner:build` after you change a model, a DTO or the env class. `dox serve` runs it in watch mode for you.
+`build_runner` with `dox_builder` makes the model classes, the DTO checks, the typed env class and the OpenAPI docs.

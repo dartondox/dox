@@ -270,7 +270,7 @@ dox migration:run
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-`dox s` runs the migration and the generator for you when it restarts.
+`dox s` runs both for you when it restarts.
 
 ## Check it
 

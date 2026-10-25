@@ -1,6 +1,8 @@
 # Troubleshooting
 
-Real problems, with the text you see, the cause and the fix. The texts come from the source code.
+Real problems, with the text you see, the cause and the fix.
+
+The texts come from the source code.
 
 ## The native HTTP library did not load
 
@@ -88,23 +90,19 @@ rm -rf .dart_tool/build
 dart run build_runner build
 ```
 
-If that is not enough, delete the named `.g.dart` files and build again. Older build_runner versions accept `dart run build_runner build --delete-conflicting-outputs`. Newer versions removed that flag, so the Dox CLI does not pass it.
+If that is not enough, delete the named `.g.dart` files and build again. New build_runner versions have no `--delete-conflicting-outputs` flag, so the Dox CLI does not pass it.
 
-## `dox create` throws `RangeError`
+## Ambiguous import: `Uuid`, `Name` or `Schema`
 
-**Symptom.**
+**Symptom.** The analyzer or the build says a name like `Uuid`, `Name`, `Range`, `Image` or `Schema` is an "ambiguous import".
 
-```
-dox create my_app
-RangeError (index): Invalid value: Only valid value is 0: 1
-```
+**Cause.** `dox_core` exports the validation rule names (`Uuid`, `Name`, `Range`, `Image`, ...). Another import has a class with the same name, like `package:uuid`. `dox_orm` also has a `Schema` class.
 
-**Cause.** A bug in the `dox` CLI up to `3.0.0-alpha.4`: the `create` command read the `--version` flag before it checked that one was given. The same versions also downloaded an old project template.
+**Fix.** Hide the name you do not use in that file:
 
-**Fix.** Update the CLI. The fix is in `3.0.0-alpha.5`:
-
-```bash
-dart pub global activate dox ^3.0.0-alpha
+```dart
+import 'package:dox_core/dox_core.dart' hide Uuid;
+import 'package:dox_orm/dox_orm.dart' hide Schema;
 ```
 
 ## A `.env` value with `#`
@@ -160,9 +158,7 @@ For normal login use `Auth().attempt()` from `dox_auth`. See [Hashing](../securi
 
 **Cause.** `caching_sha2_password` needs either TLS or the server RSA public key to send the password. A client that has neither can not log in.
 
-**Fix.** The Dox MySQL driver (`dox_mysql_native`) works with MySQL 8.4 `caching_sha2_password` and MariaDB 11 by default.
-
-So check these settings on the connection in `lib/config/database.dart`:
+**Fix.** The Dox MySQL driver (`dox_mysql_native`) supports `caching_sha2_password` (MySQL 8.4) and MariaDB 11. Check these settings on the connection in `lib/config/database.dart`:
 
 | Setting | What to do |
 | --- | --- |
@@ -215,15 +211,4 @@ On Windows the folder is `%LOCALAPPDATA%\Pub\Cache\bin`.
 
 ## Other startup errors
 
-| Text | Cause | Fix |
-| --- | --- | --- |
-| `APP_KEY is not set. Run `dox key:generate` and put the key in .env` | `appKey` is empty. A warning in development, a `StateError` that stops the app when `APP_ENV=production`. | Run `dox key:generate`, or set `APP_KEY` in the environment. |
-| `Env key "<KEY>" is not set and has no default` | `Env.get<int>()`, `<num>`, `<double>` or `<bool>` with no value and no default. | Set the key, or pass a default. |
-| `<T> is not a known DTO. Add @Dto() to it, run `dart run build_runner build` and set `dtos: dtos` (lib/dtos.g.dart) in AppConfig.` | `req.validate<T>()` can not find the DTO. | Do what the text says. |
-| `Route <METHOD> <path>: the controller parameter type <T> is not known. ...` | A controller parameter is not `DoxRequest`, a DTO, or `String`, `int`, `double`, `num`, `bool`. | Change the type, or add the DTO to `AppConfig.dtos`. |
-| `Route <METHOD> <path>: a controller can have one @Dto only.` | Two DTO parameters on one controller. | Merge them into one DTO. |
-| `Route <METHOD> <path>: only positional parameters are supported, not named or [optional] ones` | The controller has named or `[optional]` parameters. | Use positional parameters. |
-| `db/migration has Dart migrations, but bin/migrate.dart is missing.` | `dox migration:*` found Dart migration files but no entry point. | Run `dox make:migration <name>` once. It writes `bin/migrate.dart`. |
-| `<name> not found` (an `Exception` from `DatabaseConfig`) | `DatabaseConfig.connection` names a key that is not in `connections`. | Fix `DB_CONNECTION` or the map. |
-| `Storage disk "<name>" has unknown driver "<type>"` | A disk in `StorageConfig` has a `driver` other than `local`, `s3` or `memory`. | Fix the driver name. |
-| `Windows: the native server runs on one isolate` | Windows has no `SO_REUSEPORT`. | Not an error. Run more instances behind a proxy to use every core. |
+Short errors, like a bad route, a missing DTO or a bad env key, are in the [Error index](errors.md).

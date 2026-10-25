@@ -1,7 +1,6 @@
 # Testing with a database
 
-Run model tests against a real database: SQLite for fast local tests, or a test Postgres for the real thing.
-Migrations run once, and every test starts with an empty table.
+Run model tests against a real database, SQLite or a test Postgres, with migrations run once and an empty table for every test.
 
 ## What you need
 

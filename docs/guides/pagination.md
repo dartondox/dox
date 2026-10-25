@@ -135,4 +135,4 @@ Future<Map<String, dynamic>> index(ListUsers query) async {
 
 - [Query builder: paginate](../database/query-builder.md#paginate)
 - [Validation: where the data comes from](../the-basic/validation.md#where-the-data-comes-from)
-- [Serializer](../database/model/serializer.md)
+- [Serializer](../the-basic/serializer.md)

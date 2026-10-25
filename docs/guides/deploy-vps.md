@@ -39,11 +39,9 @@ build/bundle/
   .env.example
 ```
 
-The container shares your project folder. It writes Linux paths into `.dart_tool/`.
-So run `dart pub get` on your machine again before you use `dox serve`.
+The container writes Linux paths into your `.dart_tool/`. So run `dart pub get` on your machine again before you use `dox serve`.
 
-Keep `bin/` and `lib/` together. The binary loads the libraries from `../lib`.
-See [Deployment](../digging-deeper/deployment.md#build) for more about the bundle.
+Keep `bin/` and `lib/` together. The binary loads the libraries from `../lib`. See [Deployment](../digging-deeper/deployment.md#build).
 
 !!! warning "Match the CPU of the server"
     Docker builds for the CPU of your machine. On a Mac with Apple silicon that is `arm64`.
@@ -98,8 +96,7 @@ Or set one `DATABASE_URL`, like `postgres://app:secret@localhost:5432/blog`. It 
 See [Environments](environments.md) for all keys.
 
 !!! note "Which value wins"
-    `Env.get()` reads a real environment variable first. It reads the `.env` file in the working folder only when the variable is not set.
-    systemd gives the app the lines of `EnvironmentFile` as real environment variables.
+    systemd passes `EnvironmentFile` as real environment variables, and those win over a `.env` file.
     So `/etc/blog.env` wins over a `/opt/blog/.env`. Do not put a `.env` in `/opt/blog`, so there is only one place to look.
 
 ## 5. Write the systemd unit
@@ -150,8 +147,7 @@ Caddy runs on the same machine. So let Dox listen on `127.0.0.1` only. Add this 
 APP_HOST=127.0.0.1
 ```
 
-Now only programs on this machine can reach port `3000`.
-Also turn on a firewall, so only SSH, HTTP and HTTPS are open:
+Now only programs on this machine can reach port `3000`. Also turn on a firewall, so only SSH, HTTP and HTTPS are open:
 
 ```bash
 sudo ufw default deny incoming
@@ -256,8 +252,7 @@ curl -m 5 http://api.example.com:3000/api/ping   # must time out
 To go back: copy `/opt/blog.prev` to `/opt/blog` and restart. A migration that already ran is not undone.
 
 !!! note "A restart is short, but not zero"
-    A restart takes about one second. Dox does not wait for open requests when it stops, so a request that is running at that moment fails.
-    New requests do not fail: `lb_try_duration` makes Caddy wait for the app to come back.
+    A restart takes about one second. New requests do not fail: `lb_try_duration` makes Caddy wait for the app to come back.
     For a real zero-downtime update, run two copies on two ports and list both in Caddy. See [Deployment: many processes](../digging-deeper/deployment.md#many-processes-or-machines).
 
 ## See also

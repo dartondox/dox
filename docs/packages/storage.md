@@ -3,7 +3,6 @@
 This page shows how to save and read files with `dox_storage`.
 
 `dox_storage` gives one API for files in many places: local disk, AWS S3 and S3-compatible services.
-The API follows [FlyDrive](https://flydrive.dev) and Laravel Filesystem.
 
 !!! tip "Built into Dox"
     `dox_core` uses `dox_storage` for [`Storage()`](../digging-deeper/file-storage.md).

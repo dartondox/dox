@@ -42,8 +42,8 @@ How it was run:
 - Dart 3.13.6, Rust 1.99.1. Dox is built with `dart build cli` (this is
   what `dox build` does). The build hook of `dox_http_native` builds the
   Rust library with cargo.
-- The `dart:io` row is the same Dox app on a `dart:io` `HttpServer`, from a
-  build that still had it. Dox now runs on the native server only.
+- The `dart:io` row is the same Dox app on a `dart:io` `HttpServer`, for
+  comparison.
 
 ## App benchmark
 
@@ -218,59 +218,27 @@ and memory did not move. So there is no flag to set. Dox never sets VM
 flags for you. `DART_VM_OPTIONS` is read by the AOT binary from
 `dox build`, so you can try your own.
 
-## Request body limits
+## Database drivers
 
-Dox reads a body while it streams in, and stops once it is too big.
-It answers `413 Payload Too Large`. It checks `Content-Length` first, so a
-big upload is refused before one byte is read. It also counts bytes while
-reading, so a client that sends no `Content-Length` (chunked) is stopped too.
+One find-by-id query, AOT build (`dart build cli`), database on the same machine (Apple M-series), one isolate:
 
-```dart
-AppConfig(
-  maxBodySize: 10 * 1024 * 1024,        // JSON and urlencoded, default 10 MB
-  maxMultipartSize: 100 * 1024 * 1024,  // form-data uploads, default 100 MB
-);
-```
+| Database | One query at a time | Many queries in flight | App CPU time per query |
+| --- | --- | --- | --- |
+| Postgres 14 (4 connections) | 60 µs | 12.5 µs each (64 in flight) | |
+| MySQL 8.4 (10 connections) | 67 µs | 11 µs each (32 in flight) | 13.5 µs |
+| MariaDB 11 (10 connections) | 63 µs | 9.7 µs each (32 in flight) | 12.4 µs |
 
-Set the same limit in the proxy (`client_max_body_size` in nginx).
+- The CPU time counts the Dart thread and the Rust thread. For MySQL, it is about 75,000 queries per second on one core.
+- Dart sends many queries to Rust in one call. Rust sends many results back in one message.
+- One query alone spends most of its time on the trip to the database. Many requests at the same time, like in a web server, get the most out of the driver.
 
-## File uploads
+## Bodies, uploads and big responses
 
-- A file up to 1 MB stays in memory.
-- A bigger file is written to a temp file while it arrives. So a big upload
-  does not fill the memory.
-- The temp file is deleted when the response is done. So save it before you
-  return from the controller.
+These are on by default. You only need to keep them:
 
-```dart
-RequestFile file = req.input('video');
-
-file.length;          // size in bytes
-await file.size;      // size in KB
-file.stream();        // read it in chunks
-await file.store('videos');           // to storage (a cheap move on local disk)
-await file.moveTo('/data/videos/1.mp4');
-await file.bytes;     // whole file in memory. avoid for big files
-```
-
-## Big responses
-
-Return a `Stream<List<int>>` or a `File`. Dox pipes it to the client and does
-not load it all into memory.
-
-```dart
-Route.get('/video', (DoxRequest req) => File('storage/video.mp4'));
-```
-
-A `File` response sets `Content-Type` (from the file name),
-`Content-Length` and `Accept-Ranges`. It answers `Range: bytes=...` with
-`206 Partial Content`, so video players can seek and downloads can resume.
-
-`Storage().stream()` and `Storage().download()` on the local disk also stream
-the file and send `Content-Length`.
-
-JSON and text responses are encoded once, straight to bytes, with
-`Content-Length` set.
+- A body over `maxBodySize` or `maxMultipartSize` gets `413` before it is all read. Set the same limit in the proxy. See [Size limits](../the-basic/request.md#size-limits).
+- An upload over 1 MB streams to a temp file, so it does not fill the memory. See [Request](../the-basic/request.md#requestfile).
+- A `File` or `Stream` response is streamed, not loaded into memory. See [Files and big responses](../the-basic/response.md#files-and-big-responses).
 
 ## gzip
 
@@ -280,12 +248,12 @@ gzip in Dart is off by default.
 AppConfig(compress: true);
 ```
 
-- It saves bandwidth, but costs CPU on every response, in the same isolate
-  that serves requests.
+- It saves bandwidth, but costs CPU on every response. The native server
+  gzips on a Rust thread. Streamed responses are not compressed.
 - A proxy (Caddy, nginx) does it better. Turn it on in Dart only when there
   is no proxy.
 - With `compress: true`, text and JSON responses are sent chunked, without
-  `Content-Length`, because `dart:io` only gzips when the length is not set.
+  `Content-Length`.
 
 ## Logging
 
@@ -307,3 +275,5 @@ plain value (text, map, list) is sent without building a `DoxResponse`.
   on every request.
 - The argument types of each controller are read once at start, not on
   every request.
+- JSON and text responses are encoded once, straight to bytes, with
+  `Content-Length` set.

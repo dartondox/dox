@@ -10,8 +10,6 @@ This page shows how to build a Dox app for production and run it safely.
 
 ## Build
 
-Compile the app to a native binary (AOT).
-
 ```bash
 dox build
 ```
@@ -25,7 +23,7 @@ This makes a `build/bundle/` folder:
 | `build/bundle/db/`          | your migrations                                  |
 | `build/bundle/.env.example` | copy it to `build/bundle/.env`, or use env variables |
 
-`dox build` runs `build_runner` first (when your app uses it). Then it runs
+`dox build` runs `build_runner` (when your app uses it), then
 `dart build cli --target bin/server.dart --output build`. It exits with code 1
 when a step fails, so CI can stop.
 
@@ -35,7 +33,7 @@ when a step fails, so CI can stop.
     `dart build cli` is the same AOT compiler and runs the hooks.
     Keep `bin/` and `lib/` together: the binary loads the libraries from `../lib`.
 
-Start the application.
+Start it:
 
 ```bash
 cd build/bundle
@@ -50,13 +48,7 @@ So the database is up to date when the first request comes in.
 
 ## Docker
 
-The `Dockerfile` in a new Dox app is a multi-stage build:
-
-1. The `dart:stable` image builds the AOT bundle with
-   `dart build cli --target bin/server.dart --output build`.
-2. The final image is `FROM scratch`. It holds only the Dart AOT runtime
-   files (`/runtime/` from the dart image), the bundle (`/app/bin/server` and
-   `/app/lib/`), `db/` and an empty `/tmp`.
+A new Dox app has this multi-stage `Dockerfile`. The final image is `FROM scratch`: only the Dart AOT runtime, the bundle, `db/` and an empty `/tmp`.
 
 ```dockerfile
 FROM dart:stable AS build
@@ -81,7 +73,7 @@ CMD ["/app/bin/server"]
 ```
 
 The image has no `.env` file, so secrets stay out of it. Pass config as
-environment variables.
+environment variables:
 
 ```bash
 docker build -t my-app .
@@ -97,8 +89,6 @@ Dart SDK issue). Dox has no `bindSecure`.
 
 Run Dox on plain HTTP on a private port. Put [Caddy](https://caddyserver.com)
 or nginx in front of it. The proxy does TLS, HTTP/2 and gzip.
-
-The whole setup looks like this:
 
 ```mermaid
 flowchart LR
@@ -194,12 +184,10 @@ server {
 
 ## Keep it running
 
-Dox uses all CPU cores by default (see [Isolate](isolate.md)).
-
-- When a worker isolate dies, Dox prints the error and starts it again.
-- When the main isolate dies, the process exits with a non-zero code.
-  Let a supervisor restart it: `restart: unless-stopped` in Docker compose,
-  or `Restart=always` in systemd.
+When a worker isolate dies, Dox starts it again. When the main isolate dies,
+the process exits with a non-zero code (see [Isolate](isolate.md#when-an-isolate-crashes)).
+Let a supervisor restart it: `restart: unless-stopped` in Docker compose,
+or `Restart=always` in systemd.
 
 ```ini
 # /etc/systemd/system/dox.service

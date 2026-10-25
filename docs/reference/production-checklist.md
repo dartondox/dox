@@ -1,6 +1,6 @@
 # Production checklist
 
-Check each item before you deploy. Each item says what to check, how to do it, and where to read more.
+Check each item before you deploy.
 
 Items marked **Dox limit** are things Dox does not do for you. You must handle them outside Dox.
 
@@ -12,7 +12,7 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | `APP_ENV=production` | An empty `APP_KEY`, a key that is not exactly 32 characters, or an old sample key stops the app at start (`StateError`). Only `APP_ENV` `development`, `local` or `test` logs a warning instead. | [Env reference](env.md) |
 | The env is complete | Run `dox env:check` in CI or before the deploy. It exits with code 1 when a key is missing or bad. | [CLI](cli.md) |
 | No secrets in the image or in git | `.env` in `.dockerignore` and `.gitignore`. Pass values as env vars (`docker run -e`, `env_file:`, systemd `EnvironmentFile=`). `dox build` copies `.env.example` only. | [Docker](../guides/docker.md) |
-| No comments after values in `.env` | `KEY=abc # note` gives the value `abc # note`. Put comments on their own line. | [Troubleshooting](troubleshooting.md) |
+| No comments after values in `.env` | The app strips `# note`, but migrations keep it in the value. Put comments on their own line. | [Env reference](env.md) |
 
 ## Auth and passwords
 
@@ -56,10 +56,10 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | --- | --- | --- |
 | Postgres or MySQL for a busy app | SQLite has one connection per isolate, and a query blocks the isolate. Use it for small apps only. With SQLite use an absolute file path, never `:memory:` with many isolates. | [Database](../database/index.md) |
 | Migrations run once per deploy | The new project runs `Migrator(migrations: migrations).migrate()` in `bin/server.dart` before `startServer()`. Or run `dart run bin/migrate.dart run` (or `dox migrate`) in CI. Do one, not both at the same time on many machines. | [Migration](../database/migration.md) |
-| Migrations use the right database | `dox_migration` reads `.env` when the file exists, and ignores the real env then. Do not ship a `.env` next to the binary, or give `Migrator(config: ...)` your own config. | [Troubleshooting](troubleshooting.md) |
+| Migrations use the right database | `dox_migration` reads `.env` and the real env. A real env var wins, but a key that is only in an old `.env` is still used. Do not ship a `.env` next to the binary, or give `Migrator(config: ...)` your own config. | [Migration](../database/migration.md) |
 | Small MySQL migrations | MySQL saves `CREATE`, `ALTER` and `DROP` at once. A failed migration can leave half the changes. One table change per migration. | [Migration](../database/migration.md) |
 | Pool size fits the database | `extra: {'maxConnectionCount': 10}`. The Postgres and MySQL drivers share one pool per process, so the total is the pool size, not isolates x pool size. Keep it under the database `max_connections`. | [Database](../database/index.md) |
-| Query logging is off | The new project's `database.dart` has `debug: true` on every connection, which prints every query. Set `debug: false` in production. | [Database](../database/index.md) |
+| Query logging is off | `debug: true` prints every query. The new project's `database.dart` sets `debug` only when `APP_ENV=development`. | [Database](../database/index.md) |
 | Backups | **Dox limit.** Dox has no backup tool. Use `pg_dump`, `mysqldump`, managed database snapshots, or a copy of the SQLite file (with the `-wal` file, or `sqlite3 app.db ".backup x.db"`). Test a restore. | |
 
 ## Logs and errors

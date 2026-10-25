@@ -136,7 +136,6 @@ The last `if` matters. Without it, a `500` sends `error.toString()` to the clien
 ## 3. Log unexpected errors
 
 The `report` method of the exception handler runs for every `500`, and for errors outside a request (a future nobody awaited, a timer).
-Write one JSON line. A log collector reads it, or you send it to Sentry here.
 
 ```dart title="lib/app/error_handler.dart"
 import 'dart:convert';

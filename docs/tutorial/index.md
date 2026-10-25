@@ -20,15 +20,6 @@ A JSON API for blog posts.
 | `POST` | `/api/auth/login` | anyone | log in, get a token |
 | `GET` | `/api/auth/user` | logged in user | the user of the token |
 
-You will use these parts of Dox:
-
-- a model and a Dart migration (`dox_orm`, `dox_migration`),
-- a controller and routes,
-- a `@Dto` class for checked input,
-- JWT login with `dox_auth`,
-- one HTTP test,
-- `dox build` for a native binary, and the `Dockerfile`.
-
 ## What you need
 
 - Dart **3.13** or newer: `dart --version`.

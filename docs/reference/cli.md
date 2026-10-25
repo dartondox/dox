@@ -1,7 +1,8 @@
 # CLI
 
-Every `dox` command, from the command registry in `packages/dox-cli/lib/src/command_registry.dart`.
-The file templates are Dart strings inside `packages/dox-cli/lib/src/tools/`. The path of each template is given below.
+Every `dox` command, with its options and the files it writes.
+
+The commands come from `packages/dox-cli/lib/src/command_registry.dart`. The file templates are Dart strings inside `packages/dox-cli/lib/src/tools/`. The path of each template is given below.
 
 How to install the CLI is on the [Dox CLI](../digging-deeper/dox-cli.md) page.
 
@@ -30,7 +31,7 @@ Makes a new project from the [dox-sample](https://github.com/dartondox/dox-sampl
 What it does:
 
 1. Turns the name into `snake_case`. Stops with `Folder name "<name>" already exist` when the folder is there.
-2. Reads the release list of `dartondox/dox-sample` and takes the newest release with the same major version as the CLI.
+2. Picks the release (see `--version` above) from the release list of `dartondox/dox-sample`.
 3. Runs `git clone --depth 1 --branch v<version> https://github.com/dartondox/dox-sample.git <name>`.
 4. Deletes the `.git` folder.
 5. Replaces `dox_sample` with your project name in every file, except files under `bin/dox`.
@@ -164,7 +165,6 @@ dox update
 ```
 
 Installs the newest CLI with the same major version as the one you have. Pre-releases count.
-So a 3.x alpha CLI updates to the newest 3.x alpha, not to the old 2.x stable.
 It reads the version list from pub.dev, then runs `dart pub global activate dox <version>`.
 
 Source: `packages/dox-cli/lib/src/tools/update_dox.dart`.

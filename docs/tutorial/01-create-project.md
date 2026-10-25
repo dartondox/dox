@@ -20,10 +20,7 @@ So every import in this tutorial starts with `package:blog/`.
 
 ## 2. Use SQLite
 
-`dox create` already made `.env` from `.env.example`. It also wrote a new
-random `APP_KEY`, so each project has its own secret key.
-
-The template already uses SQLite. These are the lines that matter:
+`dox create` already made `.env` with a new random `APP_KEY`. The template already uses SQLite:
 
 ```ini title=".env"
 APP_PORT=3000
@@ -33,13 +30,8 @@ DB_CONNECTION=sqlite
 DB_NAME=db/dox.sqlite
 ```
 
-Dox makes the file `db/dox.sqlite` at the first start. The `db` folder is
-in the template. The `DB_HOST`, `DB_PORT`, `DB_USERNAME` and `DB_PASSWORD`
-lines are for Postgres and MySQL. SQLite does not read them.
-
-The app reads these keys through `lib/config/env.dart`. It is a typed class,
-so `env.appPort` is an `int` and reads `APP_PORT`. A missing `APP_KEY` stops
-the app at start. See [Environment variables](../digging-deeper/env.md).
+Dox makes the file `db/dox.sqlite` at the first start. SQLite does not read the other `DB_*` lines.
+The app reads these keys through the typed class in `lib/config/env.dart`. See [Environment variables](../digging-deeper/env.md).
 
 !!! note "The folder must exist"
     Dox makes the database file when it is missing, but not its folder.
@@ -51,18 +43,14 @@ the app at start. See [Environment variables](../digging-deeper/env.md).
 dox s
 ```
 
-`dox s` runs the code generator (`build_runner watch`) and `dart run bin/server.dart`.
-It restarts the server when you save a `.dart` file.
-The first start takes a little longer. It prints `Running build hooks...` while it compiles the SQLite library.
-
-The last line is:
+`dox s` runs the code generator and the server. It restarts the server when you save a `.dart` file.
+The first start is slower, because it compiles the SQLite library. The last line is:
 
 ```text
 Server started at http://[::]:3000 with 8 isolate (native)
 ```
 
-`[::]` means the app listens on all network interfaces. Open it at `http://localhost:3000`.
-The number of isolates is the number of CPU cores on your machine.
+Open it at `http://localhost:3000`. The number of isolates is the number of CPU cores.
 
 ## Check it
 

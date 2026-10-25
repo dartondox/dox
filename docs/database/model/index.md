@@ -1,7 +1,7 @@
 # Model
 
-A model is a Dart class for one database table.
-You read, create, change and delete rows through the model.
+A model is a Dart class for one database table, used to read, create, change and delete its rows.
+
 A model has all the [query builder](../query-builder.md) methods too.
 
 ## Create a model
@@ -61,9 +61,7 @@ class Blog extends BlogGenerator { // (3)!
 5.  `beforeSave` runs this static function before a save. It gets all values and returns the value for this column.
 6.  `name` sets the column name when it is not the snake_case of the field. `description` reads and writes `body`.
 
-- The model gets an `id` field, and `createdAt` and `updatedAt` fields. You do not declare them.
-- Each `@Column()` field is one table column.
-- Make every column field nullable (`String?`, `int?`). A new model has no values yet.
+Make every column field nullable (`String?`, `int?`). A new model has no values yet.
 
 ## Model options
 
@@ -161,19 +159,6 @@ The table needs a nullable `deleted_at` column. In a migration, add `table.softD
 
 ## Columns
 
-### Column name
-
-The default column name is the field name in snake_case.
-Use `name` when the column has another name.
-
-```dart
-@Column()
-String? userId; // column: user_id
-
-@Column(name: 'body')
-String? description; // column: body
-```
-
 ### Field types
 
 The field type tells Dox how to read the value.
@@ -258,8 +243,6 @@ Blog created = await Blog().create(<String, dynamic>{
 - On update, a field is set to `NULL` only when it had a value before
   (loaded from the database, or saved).
   Fields that were not loaded, for example with `select()`, are not changed.
-- On insert, `save()` runs one `INSERT`. It reads the new id from the
-  insert, so there is no `SELECT` after it.
 - `save()` returns `false` when a [model event](events.md) cancels it.
 
 ### Mass assignment
@@ -332,9 +315,7 @@ class User extends UserGenerator {
 ### Computed values
 
 A computed value is a getter that is added to `toJson()` and `toMap()`.
-It is like `$appends` with an accessor in Laravel.
-
-Add `@Computed()` to a getter in the model, then run `dart run build_runner build`.
+Add `@Computed()` to the getter, then run `dart run build_runner build`.
 
 ```dart
 @DoxModel()
@@ -366,10 +347,6 @@ print(user?.toJson());
 - Computed values of loaded relations are in the nested JSON too.
 - `toMap(original: true)` returns the raw database row, so it has no computed values.
 - A getter runs each time `toJson()` or `toMap()` is called, so keep it fast.
-
-!!! info "No reflection"
-    `build_runner` makes the code. There is no reflection at run time.
-    A model without `@Computed()` does no extra work in `toJson()`.
 
 ## New query
 

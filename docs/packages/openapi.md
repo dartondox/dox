@@ -54,29 +54,19 @@ AppConfig appConfig = AppConfig(
 ### 3. Open `/docs`
 
 Start the app and open `http://localhost:3000/docs`.
-
-- `enabled` is `null` by default. The docs are on only when `APP_ENV` is `development` or `local`.
-  So production is off unless you set `enabled: true`.
-- When the docs are off, there is no extra work per request.
-- The document is built and encoded on the first `/docs` request, then kept. It is built again only when routes are added.
+In production the docs are off, unless you set `enabled: true`.
+The document is built on the first `/docs` request, then kept.
 
 ### The docs page
 
-`/docs` uses [Scalar](https://github.com/scalar/scalar) by default.
 The page loads Scalar from the jsDelivr CDN, at a fixed version, and reads `/openapi.json`.
-
 Change the look with `scalar:`:
 
 ```dart
 OpenApiConfig(
   registry: openApiRegistry,
-  pageTitle: 'Blog API docs',          // default: info.title
-  scalar: ScalarOptions(
-    theme: ScalarTheme.purple,         // default: ScalarTheme.default_
-    darkMode: true,                    // start in dark mode (default: false)
-    showDownloadButton: false,         // hide "Download OpenAPI" (default: true)
-    proxyUrl: 'https://proxy.scalar.com', // default: null, no proxy
-  ),
+  pageTitle: 'Blog API docs',
+  scalar: ScalarOptions(theme: ScalarTheme.purple, darkMode: true),
 );
 ```
 
@@ -256,10 +246,8 @@ Future<dynamic> login(DoxRequest req) async { ... }
 
 The `Type` of `@Response` can be a model, `List<User>`, a `@Dto`, a `Serializer` or a basic type like `String`.
 
-Lower case names work too: `@summary('Log in')`, `@description(...)`, `@tags(...)`,
-`@request(...)`, `@body(...)`, `@query(...)`, `@apiDeprecated()`, `@apiIgnore()`, `@doxController()`.
-The capital form is the normal Dart style. `@Response` has no lower case name,
-because `response()` is already the response helper of `dox_core`.
+Each annotation also has a lower case name, like `@summary('Log in')`.
+Only `@Response` has none, because `response()` is already a `dox_core` helper.
 
 ### Login schemes
 
@@ -282,15 +270,9 @@ OpenApiConfig(
 
 ## How a route finds its docs
 
-Routes are added when the app starts, so the builder can not see the final route table.
-It writes two lists into `openapi.g.dart`:
-
-- the docs of each controller method, by `Class.method`,
-- each `Route.get(...)` / `Route.resource(...)` call it found, with its path and `Class.method`.
-
-At runtime, Dox reads the method name of each route handler.
-It picks the route call with the same HTTP method and the same end of path.
-If there is none, it picks the only method with that name and the same argument types.
+The builder saves the docs of each controller method, and each `Route.get(...)` / `Route.resource(...)` call it finds.
+At runtime, Dox matches each route handler by its method name, HTTP method and the end of its path.
+If there is no match, it picks the only method with that name and the same argument types.
 Group prefixes (like `api/`) do not matter.
 
 !!! tip
@@ -358,6 +340,3 @@ if (page != null) {
 A schema can be a JSON Schema `Map`, a [`dox_validation`](validation.md) schema, or any object with `toJsonSchema()`.
 Paths can use `{id}` or `:id`. Both become `{id}`.
 `DoxRouteAdapter().addTo(docs, routes)` adds a basic entry for each route you did not describe.
-
-!!! tip
-    Do not serve `/docs` in production if your API is private.

@@ -3,35 +3,20 @@
 Run the blog API on [Cloud Run](https://cloud.google.com/run) from the `Dockerfile` of your project, with Postgres on Cloud SQL and secrets in Secret Manager.
 
 !!! note
-    These steps follow the Cloud Run docs as of 2026-10-22 (checked on 2026-10-22). They were not run on Cloud Run in CI.
-    The Docker image itself was built and run locally.
+    These steps follow the Cloud Run docs as of 2026-10-22. They were not run on Cloud Run in CI.
 
 ## What you need
 
 - A Google Cloud project with billing, and the `gcloud` CLI (`gcloud auth login`, `gcloud config set project PROJECT_ID`).
-- The blog API from the [tutorial](../tutorial/01-create-project.md), or any Dox app, with the `Dockerfile` of a new Dox app.
-  See [Deployment: Docker](../digging-deeper/deployment.md#docker) for how that file works.
+- The blog API from the [tutorial](../tutorial/01-create-project.md), or any Dox app, with the `Dockerfile` of a new Dox app. See [Docker](docker.md) for how that file works.
 - A Cloud SQL for PostgreSQL instance with a database and a user. See step 3.
-
-The image is small. For the blog API it is about 17 MB.
-
-!!! note "Check for `(native)`"
-    The project's `Dockerfile` copies `libgcc_s.so.1` into the image, so the
-    native HTTP server loads. The start log ends with `(native)`. If the app
-    stops with `dox_http_native did not load`, see [Docker](docker.md).
 
 ## The port: `PORT` and `APP_PORT`
 
-Cloud Run sends requests to one port of the container. It puts that port in the `PORT` env variable. The default is `8080`.
+Cloud Run puts the port it sends requests to in the `PORT` env variable (default `8080`, or the `--port` value).
+Dox listens on `APP_PORT`, or on `PORT` when `APP_PORT` is not set. So do not set `APP_PORT` on Cloud Run.
 
-Dox listens on `APP_PORT` when it is set. When `APP_PORT` is not set, Dox listens on `PORT`.
-So do not set `APP_PORT` on Cloud Run. The app then follows `PORT`, and you can leave out `--port`.
-
-If you do set `APP_PORT`, tell Cloud Run the same port:
-
-```bash
-gcloud run deploy blog --port 3000 ...
-```
+If you do set `APP_PORT`, pass the same port with `--port`.
 
 ## 1. Turn on the APIs
 
@@ -59,9 +44,7 @@ done
 
 ## 3. Reach Cloud SQL
 
-Cloud Run has two ways to reach Cloud SQL: a Unix socket in `/cloudsql/...`, or the private IP over a VPC.
-
-Dox can use both. The Unix socket needs no VPC, so this guide uses it:
+Cloud Run reaches Cloud SQL by a Unix socket in `/cloudsql/...` or by a private IP over a VPC. Dox can use both. This guide uses the socket, because it needs no VPC:
 
 1. Find the connection name of the instance: `gcloud sql instances describe INSTANCE --format='value(connectionName)'`. It looks like `PROJECT_ID:europe-west1:INSTANCE`.
 2. Deploy with `--add-cloudsql-instances <connection name>` (step 4). Cloud Run then makes the socket in `/cloudsql/<connection name>`.
@@ -78,7 +61,7 @@ Do not use SQLite on Cloud Run. The file system of an instance is in memory, and
 
 ## 4. Deploy from source
 
-`--source .` uploads the folder. Cloud Build builds the image with your `Dockerfile` and saves it in Artifact Registry (in a repository named `cloud-run-source-deploy`).
+`--source .` uploads the folder. Cloud Build builds the image with your `Dockerfile` and saves it in Artifact Registry (repository `cloud-run-source-deploy`).
 
 ```bash
 gcloud run deploy blog \
