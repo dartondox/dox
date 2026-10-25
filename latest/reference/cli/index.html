@@ -6841,6 +6841,7 @@ A trailing <code>Serializer</code> in the name is removed.</p>
 </tbody>
 </table>
 <p>Writes <code>db/migration/&lt;yyyy&gt;_&lt;mm&gt;_&lt;dd&gt;_&lt;hhmmss&gt;_&lt;name&gt;.dart</code> (or <code>.sql</code>). Characters that are not letters, digits or <code>_</code> are removed from the name.</p>
+<p>Migrations run sorted by file name. So the new file always sorts after every file already in <code>db/migration</code>. When the current time is not later than the newest file (for example, two migrations in the same second), it uses the newest time plus 1 second.</p>
 <p>For a Dart migration it also:</p>
 <ul>
 <li>writes <code>db/migration/migrations.dart</code>, the registry of every Dart migration in the folder, sorted by name;</li>
