@@ -36,12 +36,46 @@ await QueryBuilder.transaction(() async {
 
 - All queries and models inside the function use the transaction.
   You do not pass a transaction object around.
-- A transaction inside another transaction joins the outer one.
-  There are no savepoints. If the inner one throws, the whole outer transaction rolls back.
+- A transaction inside another transaction uses a savepoint.
+  See [Nested transactions](#nested-transactions).
 
 !!! warning "MySQL"
     On MySQL and MariaDB, `CREATE`, `ALTER` and `DROP TABLE` are saved right away.
     A rollback can not undo them.
+
+## Nested transactions
+
+A transaction inside another transaction uses a savepoint.
+It runs on the same connection as the outer one.
+
+- When the inner function ends, its work stays in the outer transaction.
+  It is saved when the outer one commits.
+- When the inner function throws, only its work is undone. Then the error is thrown again.
+- If you catch that error, the outer transaction goes on and can still commit.
+- If you do not catch it, the outer transaction rolls back too.
+- When the outer transaction rolls back, the inner work is undone too.
+
+```dart
+await QueryBuilder.transaction(() async {
+  await Actor().create(<String, dynamic>{'name': 'John Wick'});
+  try {
+    await QueryBuilder.transaction(() async {
+      await Actor().create(<String, dynamic>{'name': 'Bad row'});
+      throw StateError('stop');
+    });
+  } on StateError {
+    // only 'Bad row' is undone
+  }
+});
+// 'John Wick' is saved
+```
+
+This works on Postgres, MySQL, MariaDB and SQLite. You can nest many levels.
+
+- Run nested transactions one after another, not at the same time (for example in `Future.wait`).
+  They share one connection.
+- On MySQL and MariaDB, a `CREATE`, `ALTER` or `DROP TABLE` inside a nested transaction
+  saves the outer work and ends the savepoint. Do not change the schema there.
 
 ## Connections
 

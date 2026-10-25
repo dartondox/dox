@@ -97,9 +97,9 @@ class PostgresNativeDriver extends DBDriver {
     Map<PgNativePool, int>? open =
         Zone.current[_txKey] as Map<PgNativePool, int>?;
 
-    /// ponytail: a nested transaction joins the outer one (no savepoint)
+    /// a nested transaction uses a savepoint on the same connection
     if (open?[pool] != null) {
-      return await callback();
+      return savepoint(callback);
     }
     int tx = await pool.begin();
     R result;

@@ -199,4 +199,3 @@ try {
 ## Not yet
 
 - `maxConnectionAge` and `queryTimeout` are not read.
-- A nested `transaction()` joins the outer one (no savepoints).
