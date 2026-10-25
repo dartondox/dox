@@ -9,7 +9,6 @@ environment:
 # and writes one pubspec.lock.
 workspace:
   - packages/dox-annotation
-  - packages/dox-app
   - packages/dox-auth
   - packages/dox-builder
   - packages/dox-cache

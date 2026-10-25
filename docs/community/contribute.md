@@ -87,7 +87,7 @@ A new package must first exist on pub.dev, so publish its first version by hand 
    If not, it stops. Run `bin/update_versions.sh` and try again.
 2. It gets the publish order from `bin/publish_order.py`.
    Each package comes after the sibling packages it depends on (`dependencies` and `dev_dependencies`).
-   Packages with `publish_to: none` (like `dox_app`) are left out. New packages are picked up by themselves.
+   Packages with `publish_to: none` are left out. New packages are picked up by themselves.
 3. It publishes each package in this order.
    After each one, it waits until `dart pub get` can find the new version.
 

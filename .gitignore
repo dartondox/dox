@@ -4,13 +4,11 @@
 .DS_Store
 bin/server
 .docker
-packages/dox-app/storage
 pubspec_overrides.yaml
 .idea
 site
 .env
 pubspec.yaml.backup
-packages/dox-app/bin/dox
 
 # Pub workspace: one pubspec.lock at the root. No lock files in packages.
 packages/*/pubspec.lock
