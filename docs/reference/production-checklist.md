@@ -40,7 +40,7 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | Rate limiting | Add `RateLimit(...)` to login and other busy routes. Use a Redis cache store, so all servers share the counts. Or limit at the proxy, see [below](#rate-limit-at-the-proxy). | [Rate limiting](../security/rate-limiting.md) |
 | Security headers | Add `const SecurityHeaders()` to `globalMiddleware`. | [Security headers](../security/security-headers.md) |
 | gzip at the proxy | Keep `compress: false`. Turn on gzip in Caddy (`encode gzip`) or nginx (`gzip on;`). | [Performance](../digging-deeper/performance.md) |
-| OpenAPI docs | Off in production by default (on only for `APP_ENV` `development` or `local`). Do not set `enabled: true` for a private API. | [OpenAPI](../packages/openapi.md) |
+| OpenAPI docs | Off when `APP_ENV=production` (on for `development`, `local` or an empty `APP_ENV`). Do not set `enabled: true` for a private API. | [OpenAPI](../packages/openapi.md) |
 
 ## Build and run
 

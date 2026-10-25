@@ -5,6 +5,9 @@
 - Fix: when sending the error answer failed too, the client got no answer and waited until the timeout. Now Dox reports the error and sends a plain 500. When the head is already sent, it closes the response.
 - New: `.env.testing`. When the app runs its tests (`dart test`, or a real `APP_ENV=testing`), Dox reads `.env.testing` on top of `.env`. Its keys win over `.env`. A real environment variable still wins over both. It works for `Env.get()` and the typed `AppEnv.load()`. Use it for a test database: `DB_NAME=my_app_test`. New `Env.isTesting`, and `Env().load(testing: true)`.
 - New: `DoxTestClient.withSession()` gives a test client that works like a browser. It keeps the cookies of every response, removes deleted or expired ones, and sends the `XSRF-TOKEN` cookie back in `X-XSRF-TOKEN` on `POST`, `PUT`, `PATCH` and `DELETE`. It does not follow redirects. `client.cookies` gives the kept cookies. The normal client does not change.
+- Fix: `OpenApiConfig(enabled: null)` now treats an empty `APP_ENV` as `development`, the same default as `appEnv` of the typed env. Before, `/docs` was off when `APP_ENV` was not set (for example in CI). Set `APP_ENV=production` in production.
+- New: `@Security` on a middleware class sets the login scheme of its routes in the OpenAPI docs. `OpenApiConfig.securityByMiddleware` still wins over it.
+- Change: a middleware class name that ends with `AuthMiddleware` (and has no `@Security`) now gets a `bearerAuth` scheme with no `bearerFormat`. Before, the docs called every such token a JWT.
 
 ## 3.0.0-alpha.13
 

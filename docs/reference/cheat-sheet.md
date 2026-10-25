@@ -465,7 +465,7 @@ OpenApiConfig openApi = OpenApiConfig(
 );
 ```
 
-Docs at `/docs`, `/openapi.json`, `/openapi.yaml`. On only when `APP_ENV` is `development` or `local`, unless `enabled: true`. Change one route with `@Summary`, `@Tags`, `@Request(T)`, `@Response(200, T)`, `@ApiIgnore()`.
+Docs at `/docs`, `/openapi.json`, `/openapi.yaml`. On only when `APP_ENV` is `development`, `local` or not set, unless `enabled` is set. `@Security.bearer(format: 'API key')` above a middleware class shows its login scheme. Change one route with `@Summary`, `@Tags`, `@Request(T)`, `@Response(200, T)`, `@ApiIgnore()`.
 
 See [OpenAPI](../packages/openapi.md).
 

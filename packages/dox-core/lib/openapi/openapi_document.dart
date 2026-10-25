@@ -51,14 +51,12 @@ class OpenApiDocument {
     if (reader.usesValidationError) {
       docs.schema(OpenApiRouteReader.validationError, _validationErrorSchema);
     }
-    Map<String, SecurityScheme> schemes = config.securitySchemes;
-    if (reader.usesBearerAuth &&
-        !schemes.containsKey(OpenApiRouteReader.bearerAuth)) {
-      schemes = <String, SecurityScheme>{
-        ...schemes,
-        OpenApiRouteReader.bearerAuth: SecurityScheme.bearer(),
-      };
-    }
+
+    /// a scheme in the config wins over one found in the code
+    Map<String, SecurityScheme> schemes = <String, SecurityScheme>{
+      ...reader.usedSchemes,
+      ...config.securitySchemes,
+    };
     return OpenApi(
       info: config.info,
       servers: config.servers,

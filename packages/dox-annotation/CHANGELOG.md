@@ -1,3 +1,7 @@
+## Unreleased
+
+- New: `@Security.bearer(format: 'API key')` and `@Security.apiKey(header: 'X-API-Key')`. Put it above a middleware class to show its login scheme in the OpenAPI docs.
+
 ## 3.0.0-alpha.13
 
 - Version bump only, to match the other packages.

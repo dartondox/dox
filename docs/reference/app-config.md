@@ -140,11 +140,11 @@ Source: `packages/dox-core/lib/openapi/openapi_config.dart`.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `enabled` | `bool?` | `null` | Serve the docs routes. `null` means: on only when `APP_ENV` is `development` or `local`. |
+| `enabled` | `bool?` | `null` | Serve the docs routes. `null` means: on only when `APP_ENV` is `development` or `local`. An empty `APP_ENV` counts as `development`. |
 | `info` | `Info` | `Info(title: 'Dox API', version: '1.0.0')` | Title and version of the API. |
 | `servers` | `List<Server>` | `[]` | Base URLs of the API. |
 | `securitySchemes` | `Map<String, SecurityScheme>` | `{}` | Ways to log in, like `{'bearerAuth': SecurityScheme.bearer()}`. |
-| `securityByMiddleware` | `Map<String, List<Map<String, List<String>>>>` | `{}` | Security for routes that use a middleware class with this name. `AuthMiddleware` gets `bearerAuth` when it is not in the map. |
+| `securityByMiddleware` | `Map<String, List<Map<String, List<String>>>>` | `{}` | Security for routes that use a middleware class with this name. It wins over `@Security` on the class. A class name that ends with `AuthMiddleware` gets `bearerAuth` when it has neither. |
 | `registry` | `OpenApiRegistry` | `OpenApiRegistry()` (empty) | What `dox_builder` found in the code. Pass `openApiRegistry` from `lib/generated/openapi.g.dart`. |
 | `ui` | `DocsUi` | `DocsUi.scalar` | `scalar` or `swagger`. |
 | `scalar` | `ScalarOptions` | `ScalarOptions()` | Options of the Scalar page. See below. |

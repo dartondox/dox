@@ -1,3 +1,7 @@
+## Unreleased
+
+- New: the openapi builder reads `@Security` on middleware classes and writes them to `OpenApiRegistry.security`.
+
 ## 3.0.0-alpha.13
 
 - Version bump only, to match the other packages.
