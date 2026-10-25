@@ -1429,8 +1429,8 @@ dart test test/http_test.dart
 
 !!! tip "Use another database for tests"
     The test uses the `.env` file, so it reads and writes `db/dox.sqlite`.
-    To keep test data out of it, set another file for the test run:
-    `DB_NAME=test.sqlite dart test test/http_test.dart`.
+    To keep test data out of it, make a `.env.testing` file with `DB_NAME=test.sqlite`.
+    `dart test` reads it on top of `.env`.
 
 ## Next
 
@@ -4761,12 +4761,15 @@ if (req.hasSession) {
 
 ## Tests
 
-`DoxTestClient` does not keep cookies by itself. Each `TestResponse` has `cookies`, and `withCookies` sends them back:
+`client.withSession()` gives a test client that keeps cookies like a browser. It also sends the `XSRF-TOKEN` cookie back in `X-XSRF-TOKEN`, so `CsrfMiddleware` lets its posts in:
 
 ```dart
-TestResponse first = await client.get('/cart/add?id=1');
-TestResponse second = await client.withCookies(first.cookies).get('/cart');
+DoxTestClient browser = client.withSession();
+await browser.get('/cart/add?id=1');
+(await browser.get('/cart')).expectJson(isNotEmpty);
 ```
+
+See [Testing: keep a session](../digging-deeper/testing.md#keep-a-session-cookies-and-csrf).
 
 
 ---
@@ -6600,10 +6603,11 @@ This happens once, when the app starts. After that, `env.dbPort` is a plain fiel
 
 ## Where values come from
 
-Dox reads values from two places:
+Dox reads values from these places:
 
 1. Real environment variables (set in the shell, Docker or systemd).
-2. The `.env` file in the folder where you start the app. It is optional.
+2. In tests only: the `.env.testing` file. See [Testing: a test database](testing.md#use-a-test-database-with-envtesting).
+3. The `.env` file in the folder where you start the app. It is optional.
 
 !!! info "The environment wins"
     A real environment variable wins over the `.env` file.
@@ -7832,6 +7836,7 @@ void main() {
 | `headers: {...}` | extra headers for one request |
 | `withHeaders({...})` | a copy of the client that sends these headers on every request |
 | `withToken(token)` | a copy of the client that sends `Authorization: Bearer <token>` |
+| `withSession()` | a copy of the client that keeps cookies and sends the CSRF token, like a browser. See [Keep a session](#keep-a-session-cookies-and-csrf). |
 
 A `Map` or `List` body is sent as JSON. A `String` or `List<int>` body is sent as it is.
 Redirects are not followed, so you can check a `302` and its `Location` header.
@@ -7861,6 +7866,36 @@ res
 | `expectJson(value or matcher)` | the JSON body does not match. Use a `Map`, or a matcher like `containsPair('id', 1)`. |
 | `expectBody(value or matcher)` | the text body does not match |
 | `expectHeader(name, value or matcher)` | the header does not match. Use `isNull` for "not there". |
+
+### Keep a session (cookies and CSRF)
+
+`client.withSession()` gives a client that works like a browser:
+
+- It keeps the cookies of every response and sends them back.
+- It removes a cookie when the response deletes it (an empty value, `Max-Age=0` or an old `Expires`).
+- On `POST`, `PUT`, `PATCH` and `DELETE` it sends the `XSRF-TOKEN` cookie in the `X-XSRF-TOKEN` header, like axios and Inertia. So `CsrfMiddleware` lets the request in.
+- It does not follow redirects, so you can check a `302` or `303`.
+
+```dart
+test('log in with a form', () async {
+  DoxTestClient browser = client.withSession();
+
+  // the first page gives the session and XSRF-TOKEN cookies
+  (await browser.get('/login')).expectStatus(200);
+
+  (await browser.post(
+    '/login',
+    body: <String, dynamic>{'email': 'ann@example.com', 'password': 'secret123'},
+  )).expectStatus(303).expectHeader('location', '/dashboard');
+
+  (await browser.get('/dashboard')).expectStatus(200);
+});
+```
+
+- Each `withSession()` call gives a new browser with no cookies.
+- `browser.cookies` has the kept cookies (name to raw value). You can read and change them.
+- A copy made from it (for example with `withHeaders`) shares its cookies.
+- The normal client keeps no cookies. To send cookies once, use `withCookies(res.cookies)`.
 
 ### Log in as a user
 
@@ -7922,6 +7957,23 @@ test('saves the report', () async {
 - `Storage()` paths start with `/`. A `Disk` key does not, so remove the first `/` when you ask the `Disk` directly.
 
 See [File Storage](file-storage.md).
+
+## Use a test database with `.env.testing`
+
+Put the values for tests in a `.env.testing` file, next to `.env`:
+
+```ini title=".env.testing"
+DB_NAME=my_app_test
+LOG_REQUESTS=false
+```
+
+When the app runs its tests, Dox reads `.env` first and then `.env.testing`.
+A key in `.env.testing` wins over the same key in `.env`. Keys that are only in `.env` stay.
+
+- "Runs its tests" means `dart test`, or a real `APP_ENV=testing` environment variable.
+- A real environment variable still wins over both files. So CI can run `DB_NAME=ci_test dart test`.
+- It works for `Env.get()` and for the typed `AppEnv.load()`.
+- Outside tests, `.env.testing` is never read.
 
 ## Test the env
 
@@ -7989,7 +8041,7 @@ void main() {
 - `refreshDatabase()` empties every table and starts the ids at 1 again. The tables stay. It keeps the rows of the migrations table (`dox_db_migration`).
 - It works on Postgres, MySQL, MariaDB and SQLite. Foreign keys are not checked while it empties the tables.
 - `refreshDatabase(keep: <String>['dox_db_migration', 'countries'])` keeps the rows of more tables.
-- Use a separate test database. Set its name in the env of the test run, for example `DB_NAME=app_test dart test`. Never run it on a database with real data.
+- Use a separate test database. Set its name in [`.env.testing`](#use-a-test-database-with-envtesting), or in the env of the test run (`DB_NAME=app_test dart test`). Never run it on a database with real data.
 - A test without the server can start the ORM with `SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig)`.
 
 See [Testing with a database](../guides/testing-with-database.md) for a full example with SQLite.
@@ -19928,6 +19980,8 @@ What changed in each package, newest first. This page is made from the
 - Fix: `AUTH_REQUEST_KEY` is now only in `dox_core`, so importing `dox_core` and `dox_auth` together no longer gives an "ambiguous import" error.
 - Fix: `response(x).header('Content-Type', 'image/svg+xml')` failed with "More than one value for header content-type". The default `text/plain` stayed next to the new type. Now `header()` replaces the content type, the same as `contentType()`. The name can be in any case.
 - Fix: when sending the error answer failed too, the client got no answer and waited until the timeout. Now Dox reports the error and sends a plain 500. When the head is already sent, it closes the response.
+- New: `.env.testing`. When the app runs its tests (`dart test`, or a real `APP_ENV=testing`), Dox reads `.env.testing` on top of `.env`. Its keys win over `.env`. A real environment variable still wins over both. It works for `Env.get()` and the typed `AppEnv.load()`. Use it for a test database: `DB_NAME=my_app_test`. New `Env.isTesting`, and `Env().load(testing: true)`.
+- New: `DoxTestClient.withSession()` gives a test client that works like a browser. It keeps the cookies of every response, removes deleted or expired ones, and sends the `XSRF-TOKEN` cookie back in `X-XSRF-TOKEN` on `POST`, `PUT`, `PATCH` and `DELETE`. It does not follow redirects. `client.cookies` gives the kept cookies. The normal client does not change.
 
 ### 3.0.0-alpha.13
 

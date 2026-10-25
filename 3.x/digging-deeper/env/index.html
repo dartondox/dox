@@ -6340,9 +6340,10 @@
 </span></code></pre></div>
 <p>This happens once, when the app starts. After that, <code>env.dbPort</code> is a plain field read.</p>
 <h2 id="where-values-come-from">Where values come from</h2>
-<p>Dox reads values from two places:</p>
+<p>Dox reads values from these places:</p>
 <ol>
 <li>Real environment variables (set in the shell, Docker or systemd).</li>
+<li>In tests only: the <code>.env.testing</code> file. See <a href="../testing/#use-a-test-database-with-envtesting">Testing: a test database</a>.</li>
 <li>The <code>.env</code> file in the folder where you start the app. It is optional.</li>
 </ol>
 <div class="admonition info">

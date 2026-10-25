@@ -9009,6 +9009,8 @@
 <li>Fix: <code>AUTH_REQUEST_KEY</code> is now only in <code>dox_core</code>, so importing <code>dox_core</code> and <code>dox_auth</code> together no longer gives an "ambiguous import" error.</li>
 <li>Fix: <code>response(x).header('Content-Type', 'image/svg+xml')</code> failed with "More than one value for header content-type". The default <code>text/plain</code> stayed next to the new type. Now <code>header()</code> replaces the content type, the same as <code>contentType()</code>. The name can be in any case.</li>
 <li>Fix: when sending the error answer failed too, the client got no answer and waited until the timeout. Now Dox reports the error and sends a plain 500. When the head is already sent, it closes the response.</li>
+<li>New: <code>.env.testing</code>. When the app runs its tests (<code>dart test</code>, or a real <code>APP_ENV=testing</code>), Dox reads <code>.env.testing</code> on top of <code>.env</code>. Its keys win over <code>.env</code>. A real environment variable still wins over both. It works for <code>Env.get()</code> and the typed <code>AppEnv.load()</code>. Use it for a test database: <code>DB_NAME=my_app_test</code>. New <code>Env.isTesting</code>, and <code>Env().load(testing: true)</code>.</li>
+<li>New: <code>DoxTestClient.withSession()</code> gives a test client that works like a browser. It keeps the cookies of every response, removes deleted or expired ones, and sends the <code>XSRF-TOKEN</code> cookie back in <code>X-XSRF-TOKEN</code> on <code>POST</code>, <code>PUT</code>, <code>PATCH</code> and <code>DELETE</code>. It does not follow redirects. <code>client.cookies</code> gives the kept cookies. The normal client does not change.</li>
 </ul>
 <h3 id="300-alpha13_5">3.0.0-alpha.13</h3>
 <ul>

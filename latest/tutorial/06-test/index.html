@@ -6133,8 +6133,8 @@
 <div class="admonition tip">
 <p class="admonition-title">Use another database for tests</p>
 <p>The test uses the <code>.env</code> file, so it reads and writes <code>db/dox.sqlite</code>.
-To keep test data out of it, set another file for the test run:
-<code>DB_NAME=test.sqlite dart test test/http_test.dart</code>.</p>
+To keep test data out of it, make a <code>.env.testing</code> file with <code>DB_NAME=test.sqlite</code>.
+<code>dart test</code> reads it on top of <code>.env</code>.</p>
 </div>
 <h2 id="next">Next</h2>
 <p><a href="../07-build-and-deploy/">Step 7: Build and deploy</a></p>
