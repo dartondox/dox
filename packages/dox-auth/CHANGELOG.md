@@ -1,3 +1,9 @@
+## Unreleased
+
+- New: `Auth().setUser(req, user)` sets the logged-in user on `req.auth`, with no token and no password check. Use it in your own auth middleware, like an API key check.
+- Docs: how to write a custom guard. Extend `AuthDriver`, return the user from `verifyToken`, and use `AuthMiddleware(guard: 'api')`. The README and the authentication page show an API key example.
+- Fix: importing `dox_auth` and `dox_core` together gave an "ambiguous import" error for `AUTH_REQUEST_KEY`. `dox_auth` no longer has its own copy. The one in `dox_core` is used.
+
 ## 3.0.0-alpha.13
 
 - Version bump only, to match the other packages.

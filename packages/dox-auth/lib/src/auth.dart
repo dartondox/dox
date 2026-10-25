@@ -51,6 +51,18 @@ class Auth implements IAuth {
     return _createToken();
   }
 
+  /// Set [user] as the logged-in user of [req], with no token and no
+  /// password check. For your own auth middleware, like an API key check.
+  /// `req.auth` then gives this user.
+  /// ```
+  /// Auth(guard: 'api').setUser(req, user);
+  /// req.auth?.user<User>();
+  /// ```
+  void setUser(IDoxRequest req, Model<dynamic> user) {
+    _userData = user;
+    req.merge(<String, dynamic>{AUTH_REQUEST_KEY: this});
+  }
+
   /// Check the credentials and keep the login in the session.
   /// true when it worked. Needs a guard with `SessionAuthDriver`.
   /// ```

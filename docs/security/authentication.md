@@ -158,6 +158,7 @@ After `AuthMiddleware`, `req.auth` holds the login.
 | `Auth(guard: 'admin')` | uses another guard from `guards`. Without `guard`, it uses `defaultGuard` |
 | `await Auth().attempt(credentials)` | finds the user and checks the password. Gives a token, or `null` |
 | `Auth().login(user)` | gives a token for this user, with no password check |
+| `Auth().setUser(req, user)` | sets this user on `req.auth`, with no token and no password check. For your own auth middleware |
 | `user<T>()` | the user after `attempt` or `login` |
 | `isLoggedIn()` | `true` when there is a user |
 
@@ -217,6 +218,56 @@ Route.get('/admin', <dynamic>[AuthMiddleware(guard: 'admin'), (AdminController c
 The token keeps the guard name in its `aud` claim.
 So a token from the `web` guard does not work on the `admin` guard, even with the same secret.
 An unknown guard name throws an `ArgumentError`.
+
+## Custom guard (API key)
+
+You can check the user in your own way, like an API key in the header.
+Write a driver: extend `AuthDriver` and return the user from `verifyToken`.
+`AuthMiddleware` and `req.auth` then work as with the other drivers.
+
+```dart
+/// `Authorization: Bearer <api key>` gives the user with this key.
+class ApiKeyAuthDriver extends AuthDriver {
+  @override
+  Future<Model<dynamic>?> verifyToken(IDoxRequest req, String guard) async {
+    String header = req.header('Authorization') ?? '';
+    if (!header.startsWith('Bearer ')) return null;
+    Model<dynamic> model = AuthEngine().guard(guard).provider.model();
+    return await model.where('api_key', header.substring(7).trim()).getFirst();
+  }
+
+  /// no password login for this guard
+  @override
+  Future<Model<dynamic>?> attempt(Map<String, dynamic> credentials, String guard) async => null;
+
+  /// no token to make: the key is the token
+  @override
+  String? createToken(Map<String, dynamic>? userPayload, String guard) => null;
+}
+```
+
+Add it as a guard, and use the guard in the route:
+
+```dart
+'api': AuthGuard(
+  driver: ApiKeyAuthDriver(),
+  provider: AuthProvider(model: () => User()),
+),
+
+Route.get('/api/me', <dynamic>[AuthMiddleware(guard: 'api'), (DoxRequest req) => req.auth?.user<User>()]);
+```
+
+Store a hash of the key, not the key itself, and compare the hash.
+
+If you already have your own middleware, set the user with `Auth().setUser(req, user)`.
+It needs no token and no password check. `req.auth` then gives this user:
+
+```dart
+User? user = await keys.userForKey(key);
+if (user == null) throw UnAuthorizedException();
+Auth(guard: 'api').setUser(req, user);
+return req;
+```
 
 ## Session login for web pages
 

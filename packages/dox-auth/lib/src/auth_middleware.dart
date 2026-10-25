@@ -1,10 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
-// ignore_for_file: constant_identifier_names
 
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
-
-const String AUTH_REQUEST_KEY = 'dox_authentication_instance';
 
 class AuthMiddleware implements IDoxMiddleware {
   /// The guard name from `AuthConfig.guards`.
