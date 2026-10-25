@@ -737,7 +737,7 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    Route.get<ApiController>('/ping', (ApiController c) => c.pong);
+    Route.get('/ping', (ApiController c) => c.pong);
 
     Route.resource('posts', PostController);
   }
@@ -1239,21 +1239,21 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    Route.get<ApiController>('/ping', (ApiController c) => c.pong);
+    Route.get('/ping', (ApiController c) => c.pong);
 
     // Anyone can read posts.
-    Route.get<PostController>('/posts', (PostController c) => c.index);
-    Route.get<PostController>('/posts/{id}', (PostController c) => c.show);
+    Route.get('/posts', (PostController c) => c.index);
+    Route.get('/posts/{id}', (PostController c) => c.show);
 
     // Register and log in.
-    Route.post<AuthController>('/auth/register', (AuthController c) => c.register);
-    Route.post<AuthController>('/auth/login', (AuthController c) => c.login);
+    Route.post('/auth/register', (AuthController c) => c.register);
+    Route.post('/auth/login', (AuthController c) => c.login);
 
     // Only a logged in user can write posts.
     Route.middleware(<dynamic>[AuthMiddleware()], () {
-      Route.get<AuthController>('/auth/user', (AuthController c) => c.user);
-      Route.post<PostController>('/posts', (PostController c) => c.store);
-      Route.put<PostController>('/posts/{id}', (PostController c) => c.update);
+      Route.get('/auth/user', (AuthController c) => c.user);
+      Route.post('/posts', (PostController c) => c.store);
+      Route.put('/posts/{id}', (PostController c) => c.update);
     });
   }
 }
@@ -1824,7 +1824,7 @@ The Laravel code is Laravel 11. The biggest changes are in [What is different](#
 | Laravel | Dox |
 | --- | --- |
 | `Route::get('/ping', fn () => 'pong');` | `Route.get('/ping', (DoxRequest req) => 'pong');` |
-| `Route::post('/blogs', [BlogController::class, 'store']);` | `Route.post<BlogController>('/blogs', (BlogController c) => c.store);` |
+| `Route::post('/blogs', [BlogController::class, 'store']);` | `Route.post('/blogs', (BlogController c) => c.store);` |
 | `Route::get('/blogs/{id}', ...)` and `function show(int $id)` | `Route.get('/blogs/{id}', ...)` and `show(int id)` |
 | `Route::get('/posts/{page?}', ...)` | `Route.get('/posts/{page?}', (int? page) => ...)` |
 | `->where('path', '.*')` | `Route.get('/docs/{page*}', (String page) => ...)` |
@@ -1846,7 +1846,7 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    Route.get<BlogController>('/blogs', (BlogController c) => c.index);
+    Route.get('/blogs', (BlogController c) => c.index);
     Route.resource('users', UserController);
   }
 }
@@ -2680,11 +2680,11 @@ The leading `/` in a path is optional. `'ping'` and `'/ping'` are the same route
 ## Route methods
 
 ```dart
-Route.get<BlogController>('/blogs', (BlogController c) => c.index);
-Route.post<BlogController>('/blogs', (BlogController c) => c.store);
-Route.put<BlogController>('/blogs/{id}', (BlogController c) => c.update);
-Route.patch<BlogController>('/blogs/{id}', (BlogController c) => c.update);
-Route.delete<BlogController>('/blogs/{id}', (BlogController c) => c.destroy);
+Route.get('/blogs', (BlogController c) => c.index);
+Route.post('/blogs', (BlogController c) => c.store);
+Route.put('/blogs/{id}', (BlogController c) => c.update);
+Route.patch('/blogs/{id}', (BlogController c) => c.update);
+Route.delete('/blogs/{id}', (BlogController c) => c.destroy);
 ```
 
 !!! info
@@ -2702,7 +2702,7 @@ The second argument is the code that answers the request. It can be:
 Route.get('/ping', (DoxRequest req) => 'pong');
 
 // a controller method. The controller comes from the container.
-Route.get<WebController>('/ping', (WebController c) => c.pong);
+Route.get('/ping', (WebController c) => c.pong);
 
 @Inject()
 class WebController {
@@ -2712,7 +2712,7 @@ class WebController {
 }
 
 // a list: middleware first, the controller last
-Route.get<WebController>('/ping', <dynamic>[
+Route.get('/ping', <dynamic>[
   LoggerMiddleware(),
   (WebController c) => c.pong,
 ]);
@@ -3656,7 +3656,7 @@ class BlogController {
 ```
 
 ```dart title="lib/routes/api.dart"
-Route.get<BlogController>('/blogs', (BlogController c) => c.index);
+Route.get('/blogs', (BlogController c) => c.index);
 ```
 
 `@Inject()` puts the controller in the container. Run `dart run build_runner build` after you add one.
@@ -3734,7 +3734,7 @@ See [Routing: resource routes](routing.md#resource-routes).
 A controller asks for what it needs by **type**. Dox fills each parameter.
 
 ```dart
-Route.put<UserController>('/teams/{teamId}/users/{id}', (UserController c) => c.update);
+Route.put('/teams/{teamId}/users/{id}', (UserController c) => c.update);
 
 class UserController {
   Future<User> update(int teamId, int id, UpdateUser body) async { ... }
@@ -3846,7 +3846,7 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    Route.get<UserController>('/users/{id}', (UserController c) => c.show);
+    Route.get('/users/{id}', (UserController c) => c.show);
   }
 }
 ```
@@ -3924,24 +3924,22 @@ Each constructor parameter is found by its type.
 
 ## Routes to controller methods
 
-Give the controller type, then a function that picks the method:
+Pass a function that picks the method. Dox finds the controller by the parameter type:
 
 ```dart
-Route.get<PostController>('/posts', (PostController c) => c.index);
-Route.post<PostController>('/posts', (PostController c) => c.store);
-Route.put<PostController>('/posts/{id}', (PostController c) => c.update);
-Route.delete<PostController>('/posts/{id}', (PostController c) => c.destroy);
+Route.get('/posts', (PostController c) => c.index);
+Route.post('/posts', (PostController c) => c.store);
+Route.put('/posts/{id}', (PostController c) => c.update);
+Route.delete('/posts/{id}', (PostController c) => c.destroy);
 ```
 
 The controller comes from the container. Dox gets it once per isolate, at start. A request does no extra work.
 `.name()`, groups and middleware lists work the same:
 
 ```dart
-Route.get<PostController>('/posts/{id}', (PostController c) => c.show).name('posts.show');
-Route.get<AuthController>('/me', <dynamic>[AuthMiddleware(), (AuthController c) => c.me]);
+Route.get('/posts/{id}', (PostController c) => c.show).name('posts.show');
+Route.get('/me', <dynamic>[AuthMiddleware(), (AuthController c) => c.me]);
 ```
-
-You can leave out `<PostController>`. Dox then finds the controller by the parameter type: `Route.get('/posts', (PostController c) => c.index)`.
 
 For resource routes, pass the class:
 
@@ -3968,7 +3966,7 @@ Every `@DoxModel` class gets a binder in `lib/generated/container.g.dart`.
 When a handler has a parameter of a model type, Dox loads the model by its primary key.
 
 ```dart
-Route.get<PostController>('/posts/{post}', (PostController c) => c.show);
+Route.get('/posts/{post}', (PostController c) => c.show);
 
 @Inject()
 class PostController {
@@ -4102,7 +4100,7 @@ class LoggerMiddleware implements IDoxMiddleware {
 Then put it on a route:
 
 ```dart title="lib/routes/api.dart"
-Route.get<WebController>('/ping', <dynamic>[LoggerMiddleware(), (WebController c) => c.pong]);
+Route.get('/ping', <dynamic>[LoggerMiddleware(), (WebController c) => c.pong]);
 ```
 
 !!! note
@@ -4124,7 +4122,7 @@ dynamic apiKeyMiddleware(DoxRequest req) {
 ```
 
 ```dart title="lib/routes/api.dart"
-Route.get<WebController>('/ping', <dynamic>[apiKeyMiddleware, (WebController c) => c.pong]);
+Route.get('/ping', <dynamic>[apiKeyMiddleware, (WebController c) => c.pong]);
 ```
 
 ## Run code after the controller
@@ -4178,7 +4176,7 @@ Put them in the list before the controller. They run from left to right.
 You can mix class and function middleware, with or without `next`.
 
 ```dart
-Route.get<WebController>('/ping', <dynamic>[
+Route.get('/ping', <dynamic>[
   LoggerMiddleware(),
   apiKeyMiddleware,
   (WebController c) => c.pong, // the controller is always last
@@ -11457,9 +11455,9 @@ When the token is missing or not valid, the request stops with `401 Authenticati
 
 ```dart title="lib/routes/api.dart"
 
-Route.post<AuthController>('/auth/register', (AuthController c) => c.register);
-Route.post<AuthController>('/auth/login', (AuthController c) => c.login);
-Route.get<AuthController>('/auth/user', <dynamic>[AuthMiddleware(), (AuthController c) => c.user]);
+Route.post('/auth/register', (AuthController c) => c.register);
+Route.post('/auth/login', (AuthController c) => c.login);
+Route.get('/auth/user', <dynamic>[AuthMiddleware(), (AuthController c) => c.user]);
 ```
 
 ## 4. Write the controller
@@ -11584,7 +11582,7 @@ Pick the guard by name:
 ```dart
 String? token = await Auth(guard: 'admin').attempt(credentials);
 
-Route.get<AdminController>('/admin', <dynamic>[AuthMiddleware(guard: 'admin'), (AdminController c) => c.index]);
+Route.get('/admin', <dynamic>[AuthMiddleware(guard: 'admin'), (AdminController c) => c.index]);
 ```
 
 The token keeps the guard name in its `aud` claim.
@@ -11693,12 +11691,12 @@ Change it for a group of routes:
 ```dart title="lib/routes/api.dart"
 // CORS headers only on these routes (use with enabled: false)
 Route.enabledCors(() {
-  Route.get<PostController>('/public/posts', (PostController c) => c.index);
+  Route.get('/public/posts', (PostController c) => c.index);
 });
 
 // no CORS headers on these routes
 Route.disabledCors(() {
-  Route.post<WebhookController>('/webhooks/stripe', (WebhookController c) => c.handle);
+  Route.post('/webhooks/stripe', (WebhookController c) => c.handle);
 });
 ```
 
@@ -11937,7 +11935,7 @@ Use it on login, sign up and other routes that bots like to hammer.
 ## Limit a route
 
 ```dart title="lib/routes/api.dart"
-Route.post<AuthController>('/auth/login', <dynamic>[
+Route.post('/auth/login', <dynamic>[
   RateLimit(max: 5, per: Duration(minutes: 1)),
   (AuthController c) => c.login,
 ]);
@@ -11996,11 +11994,11 @@ The key is any `String`, so you can also count by user id after your auth middle
 Two `RateLimit` with the same `max` and `per` share one counter. Give one a `name` to keep them apart:
 
 ```dart
-Route.post<AuthController>('/auth/login', <dynamic>[
+Route.post('/auth/login', <dynamic>[
   RateLimit(max: 5, name: 'login'),
   (AuthController c) => c.login,
 ]);
-Route.post<AuthController>('/auth/register', <dynamic>[
+Route.post('/auth/register', <dynamic>[
   RateLimit(max: 5, name: 'register'),
   (AuthController c) => c.register,
 ]);
@@ -12475,7 +12473,7 @@ class BlogController {
 }
 
 // routes
-Route.get<BlogController>('/blogs/{id}', <dynamic>[AuthMiddleware(), (BlogController c) => c.show]);
+Route.get('/blogs/{id}', <dynamic>[AuthMiddleware(), (BlogController c) => c.show]);
 ```
 
 The generated docs for `GET /blogs/{id}`:
@@ -13604,7 +13602,7 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    Route.post<UploadController>('/upload', (UploadController c) => c.store);
+    Route.post('/upload', (UploadController c) => c.store);
   }
 }
 ```
@@ -13744,7 +13742,7 @@ Add a `where` before `paginate` to filter: `User().where('role', 'admin').orderB
 ## 3. Add the route
 
 ```dart title="lib/routes/api.dart"
-Route.get<UserController>('/users', (UserController c) => c.index);
+Route.get('/users', (UserController c) => c.index);
 ```
 
 ## 4. Build and run
@@ -14018,12 +14016,12 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    Route.post<AuthController>('/auth/register', (AuthController c) => c.register);
-    Route.post<AuthController>('/auth/login', (AuthController c) => c.login);
+    Route.post('/auth/register', (AuthController c) => c.register);
+    Route.post('/auth/login', (AuthController c) => c.login);
 
     Route.middleware(<dynamic>[AuthMiddleware()], () {
-      Route.get<AuthController>('/auth/me', (AuthController c) => c.me);
-      Route.post<AuthController>('/auth/logout', (AuthController c) => c.logout);
+      Route.get('/auth/me', (AuthController c) => c.me);
+      Route.post('/auth/logout', (AuthController c) => c.logout);
       // put every protected route here
     });
   }
@@ -14460,8 +14458,8 @@ When you run more than one process (two machines), each process has an isolate 1
 ## 4. Add the routes
 
 ```dart title="lib/routes/api.dart"
-Route.post<ReportController>('/reports', (ReportController c) => c.store);
-Route.get<ReportController>('/primes/{limit}', (ReportController c) => c.primes);
+Route.post('/reports', (ReportController c) => c.store);
+Route.get('/primes/{limit}', (ReportController c) => c.primes);
 ```
 
 ## Check it
@@ -14594,9 +14592,9 @@ class WebRouter extends Router {
   @override
   void register() {
     // the SPA: assets with a long cache, every other URL gets index.html
-    Route.get<StaticController>('/assets/{path*}', (StaticController c) => c.asset);
-    Route.get<StaticController>('/', (StaticController c) => c.index);
-    Route.get<StaticController>('/{path*}', (StaticController c) => c.index);
+    Route.get('/assets/{path*}', (StaticController c) => c.asset);
+    Route.get('/', (StaticController c) => c.index);
+    Route.get('/{path*}', (StaticController c) => c.index);
   }
 }
 ```
@@ -14793,7 +14791,7 @@ Turn CORS off for such routes to send fewer headers:
 
 ```dart
 Route.disabledCors(() {
-  Route.post<WebhookController>('/webhooks/stripe', (WebhookController c) => c.handle);
+  Route.post('/webhooks/stripe', (WebhookController c) => c.handle);
 });
 ```
 
@@ -15458,7 +15456,7 @@ class BlogController {
 ```
 
 ```dart title="server/lib/routes/api.dart"
-Route.post<BlogController>('/blogs', (BlogController c) => c.store);
+Route.post('/blogs', (BlogController c) => c.store);
 ```
 
 !!! note "Why `show SaveBlog`"
@@ -16823,7 +16821,7 @@ class ApiRouter extends Router {
 
 | Code | Does |
 | --- | --- |
-| `Route.get<C>('/blogs', (C c) => c.index)` | controller `C` from the container. Also `post`, `put`, `patch`, `delete`, `options` |
+| `Route.get('/blogs', (C c) => c.index)` | controller `C` from the container. Also `post`, `put`, `patch`, `delete`, `options` |
 | `Route.get('/blogs', listBlogs)` | a plain function |
 | `Route.post('/blogs', c.store, body: schema)` | `body:` is for the docs only. It checks nothing. |
 | `Route.get('/blogs/{id}', c.show)` | path param. `show(int id)` |
@@ -17893,7 +17891,7 @@ A trailing `Controller` in the name is removed: `UserController` and `User` give
 | plain | `lib/app/http/controllers/<name>.controller.dart` | `_getSample` in `packages/dox-cli/lib/src/tools/create_controller.dart` |
 | `-r` | `lib/app/http/controllers/<name>.controller.dart` | `_getResourceSample` in the same file |
 
-The class has `@Inject()`, so the container makes it. A comment shows the route to add, like `Route.get<BlogController>('path', (BlogController c) => c.index);`.
+The class has `@Inject()`, so the container makes it. A comment shows the route to add, like `Route.get('path', (BlogController c) => c.index);`.
 After the file is made, the CLI tells you to run `dart run build_runner build`. That adds the controller to `lib/generated/container.g.dart`.
 
 ### `dox make:middleware`
