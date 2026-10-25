@@ -1,6 +1,6 @@
 name: dox_storage
 description: File storage for the dox framework. One API for local disk, AWS S3 and S3-compatible services (R2, MinIO, Spaces), with swappable drivers.
-version: 3.0.0-alpha.9
+version: 3.0.0-alpha.10
 repository: https://github.com/dartondox/dox
 
 environment:

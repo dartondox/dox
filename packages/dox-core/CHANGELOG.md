@@ -1,3 +1,7 @@
+## 3.0.0-alpha.10
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.9
 
 - New: a real IoC container. `IocContainer` (`Dox().ioc`) has `get<T>()`, `has<T>()`, `singleton<T>()`, `factory<T>()`, `instance<T>()`, `override<T>()` and `clearOverrides()`. Each isolate has its own container: a singleton is one instance per isolate, made on first use.
