@@ -2235,6 +2235,12 @@
       
         
       
+        
+      
+        
+      
+        
+      
     
     
     
@@ -2326,6 +2332,90 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="scopes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query scopes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="casts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attribute casts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="counting-relations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Counting relations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
       
@@ -2352,10 +2442,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10_3" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10_6" >
         
           
-          <label class="md-nav__link" for="__nav_4_10_3" id="__nav_4_10_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10_6" id="__nav_4_10_6_label" tabindex="0">
             
   
   
@@ -2373,8 +2463,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_10_3">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4366,7 +4456,7 @@ Use the options when your columns have other names.</p>
 </tr>
 <tr>
 <td><code>bool?</code></td>
-<td>boolean</td>
+<td>boolean, or a number like <code>tinyint</code> (0 is false)</td>
 </tr>
 <tr>
 <td><code>DateTime?</code></td>
@@ -4376,9 +4466,13 @@ Use the options when your columns have other names.</p>
 <td><code>Map&lt;String, dynamic&gt;?</code> or <code>List&lt;dynamic&gt;?</code></td>
 <td>JSON</td>
 </tr>
+<tr>
+<td>an enum, like <code>Status?</code></td>
+<td>text with the enum name</td>
+</tr>
 </tbody>
 </table>
-<p>For other conversions, use <code>beforeSave</code> and <code>beforeGet</code>.</p>
+<p>For other conversions, use a <a href="casts/">cast</a>, or <code>beforeSave</code> and <code>beforeGet</code>.</p>
 <h3 id="beforesave-and-beforeget"><code>beforeSave</code> and <code>beforeGet</code></h3>
 <p>These options take a static function of the model class.
 The function gets a map and returns the value.</p>

@@ -8438,11 +8438,12 @@ The field type tells Dox how to read the value.
 | `String?` | text, varchar |
 | `int?` | integer types |
 | `double?` | float, double. MySQL also gives `DECIMAL` as `double`. Postgres gives `numeric` as `String`. |
-| `bool?` | boolean |
+| `bool?` | boolean, or a number like `tinyint` (0 is false) |
 | `DateTime?` | date, datetime, timestamp |
 | `Map<String, dynamic>?` or `List<dynamic>?` | JSON |
+| an enum, like `Status?` | text with the enum name |
 
-For other conversions, use `beforeSave` and `beforeGet`.
+For other conversions, use a [cast](casts.md), or `beforeSave` and `beforeGet`.
 
 ### `beforeSave` and `beforeGet`
 
@@ -8893,6 +8894,283 @@ await QueryBuilder.transaction(() async {
 ```
 
 A model with no hooks and no observers does no event work.
+
+
+---
+
+# Query scopes
+
+Source: https://dartondox.dev/latest/3.xdatabase/model/scopes/
+
+# Query scopes
+
+A scope is a query part that you use again and again, like "only active users".
+You write it once in the model. Then you call it like a query method.
+
+## Local scopes
+
+Add a static method with `@Scope()` to the model.
+It takes the query first and returns the query.
+Then run `dart run build_runner build`.
+
+```dart
+@DoxModel()
+class User extends UserGenerator {
+  @Column()
+  bool? active;
+
+  @Column()
+  int? age;
+
+  @Scope()
+  static QueryBuilder<User> isActive(QueryBuilder<User> q) {
+    return q.where('active', true);
+  }
+
+  @Scope()
+  static QueryBuilder<User> olderThan(QueryBuilder<User> q, int age) {
+    return q.where('age', '>', age);
+  }
+}
+```
+
+The generator adds each scope as a method on the query of the model:
+
+```dart
+List<User> users = await User().isActive().get();
+
+List<User> adults = await User()
+    .where('name', 'like', 'a%')
+    .isActive()
+    .olderThan(18)
+    .get();
+```
+
+A scope can take more arguments: required, optional (`[...]`) and named (`{...}`).
+The generated method takes the same arguments, without the query.
+
+!!! warning "Pick a free name"
+    The scope name must not be a field or a method of the model.
+    For example, a scope `active` next to a field `active` does not work.
+    Use `isActive`. A scope named like a query method (`count`, `get`) is never called.
+
+## Global scopes
+
+`@Scope(global: true)` adds the scope to every query of the model.
+This includes `get()`, `find()`, `all()`, `count()`, `paginate()`,
+query updates and deletes, and relation queries.
+
+```dart
+@DoxModel()
+class Post extends PostGenerator {
+  @Column()
+  bool? archived;
+
+  /// every query leaves out archived posts
+  @Scope(global: true)
+  static QueryBuilder<Post> notArchived(QueryBuilder<Post> q) {
+    return q.where('archived', false);
+  }
+}
+
+await Post().get(); // ... WHERE ("archived" = false)
+```
+
+The global scope goes in brackets, and your own conditions too.
+So an `orWhere()` in your query can not skip the scope.
+
+Remove a global scope for one query with `withoutGlobalScope()`,
+or remove all of them with `withoutGlobalScopes()`:
+
+```dart
+await Post().withoutGlobalScope('notArchived').get();
+await Post().withoutGlobalScopes().find(1);
+```
+
+The name of a global scope is the method name.
+
+!!! info
+    `save()`, `delete()` and `restore()` on a model instance work on that one row.
+    They do not use the global scopes.
+    Soft deletes are not a global scope. Use `withTrash()` for them.
+
+
+---
+
+# Attribute casts
+
+Source: https://dartondox.dev/latest/3.xdatabase/model/casts/
+
+# Attribute casts
+
+A cast changes a column value between the database and Dart.
+For example, it reads JSON text as a map, or saves an enum by its name.
+Casts work the same on Postgres, MySQL, MariaDB and SQLite.
+
+Set a cast with `cast` on `@Column()`. Then run `dart run build_runner build`.
+
+```dart
+enum Status { draft, live }
+
+enum Level { low, mid, high }
+
+@DoxModel()
+class Item extends ItemGenerator {
+  @Column(cast: JsonCast())
+  Map<String, dynamic>? meta;
+
+  @Column(cast: ListCast<String>())
+  List<String>? tags;
+
+  @Column()
+  bool? active; // gets BoolCast()
+
+  @Column()
+  Status? status; // gets EnumCast(Status.values)
+
+  @Column(cast: EnumCast<Level>(Level.values, byIndex: true))
+  Level? level;
+}
+```
+
+The cast runs when a row is read (`get()`, `find()` and others),
+when the model is saved, and in `toJson()`.
+
+## Built-in casts
+
+| Cast | Dart value | Database value |
+|---|---|---|
+| `JsonCast()` | a map or a list | JSON, or JSON in a text column |
+| `ListCast<E>()` | a typed list, like `List<String>` | JSON, or JSON in a text column |
+| `BoolCast()` | `bool` | boolean, or a number like `tinyint` (0 is false), or the text `1`, `0`, `true`, `false`, `t`, `f` |
+| `EnumCast<E>(E.values)` | an enum | text with the enum name |
+| `EnumCast<E>(E.values, byIndex: true)` | an enum | a number, the enum index |
+
+You do not need `cast` for two field types:
+
+- A `bool` field gets `BoolCast()`.
+- An enum field gets `EnumCast(values)`, so it is saved by its name.
+
+`DateTime` fields need no cast either. Dox reads them on every database.
+
+!!! info
+    A cast changes the values of a model. It does not change a `where()` value.
+    Use the database value there, like `where('status', Status.live.name)`.
+
+## Your own cast
+
+Extend `Cast<T>`. `get()` gets the database value and returns the Dart value.
+`set()` gets the Dart value and returns the value to save.
+The class needs a const constructor.
+
+```dart
+class Money {
+  final int cents;
+  const Money(this.cents);
+}
+
+class MoneyCast extends Cast<Money> {
+  const MoneyCast();
+
+  @override
+  Money? get(dynamic value) => value == null ? null : Money(value as int);
+
+  @override
+  dynamic set(Money? value) => value?.cents;
+}
+
+@DoxModel()
+class Product extends ProductGenerator {
+  @Column(cast: MoneyCast())
+  Money? price;
+}
+```
+
+A cast can take const arguments, like `EnumCast` does.
+The generator copies the `cast` code into the generated file,
+so the names in it must be imported in the model file.
+
+A column with `beforeGet` does not use its cast.
+
+
+---
+
+# Counting relations
+
+Source: https://dartondox.dev/latest/3.xdatabase/model/counting-relations/
+
+# Counting relations
+
+`withCount()` adds the number of related rows to each model.
+It does not load the rows. It adds a subquery to the select,
+so you get the counts with the same query.
+
+It works with `hasOne`, `hasMany` and `manyToMany` relations.
+
+```dart
+@DoxModel()
+class User extends UserGenerator {
+  @HasMany(Post)
+  List<Post> posts = <Post>[];
+}
+
+List<User> users = await User().withCount('posts').get();
+
+users.first.countOf('posts'); // 3
+users.first.toJson();         // {..., "posts_count": 3}
+```
+
+The key is the relation name in snake_case and `_count`, like `posts_count`.
+Use the relation name (the field name) in `withCount()` and `countOf()`.
+
+## Count only some rows
+
+Give a function to add conditions to the related rows.
+Use `as` to give the count its own key.
+
+```dart
+List<User> users = await User()
+    .withCount('posts')
+    .withCount('posts as published_count', (QueryBuilder<dynamic> q) {
+      q.where('published', true);
+    })
+    .get();
+
+users.first.countOf('posts');               // all posts
+users.first.aggregate('published_count');   // published posts
+```
+
+The global scopes and soft deletes of the related model are used in the count.
+
+## With other query methods
+
+`withCount()` works with `where()`, `orderBy()`, `find()`, `getFirst()`,
+`paginate()` and with `preload()` or eager relations:
+
+```dart
+User? user = await User().preload('posts').withCount('posts').find(1);
+user?.posts;              // the posts
+user?.countOf('posts');   // the number of posts
+```
+
+## Sum and max
+
+`withSum()` and `withMax()` work the same way, on one column of the related rows.
+The value is null when there is no related row.
+
+```dart
+User? user = await User()
+    .withSum('posts', 'views')
+    .withMax('posts', 'views')
+    .find(1);
+
+user?.aggregate('posts_sum_views');
+user?.aggregate('posts_max_views');
+```
+
+!!! info
+    `withCount()` is not for `belongsTo` relations. It throws an `UnsupportedError`.
+    A relation from a table to the same table is not supported.
 
 
 ---
@@ -16988,6 +17266,12 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_builder
 
+### Unreleased
+
+- Generates the query scopes: an extension with one method for each `@Scope()` method, and `globalScopes` for `@Scope(global: true)`.
+- Generates the column casts: `fromMap()` and `columnsToMap()` use the `cast` of `@Column()`. `bool` and enum fields get a cast without `cast`.
+- Run `dart run build_runner build` to get the new code.
+
 ### 3.0.0-alpha.8
 
 - Version bump only, to match the other packages.
@@ -17409,6 +17693,10 @@ What changed in each package, newest first. This page is made from the
 
 - Breaking: the `ModelObserver` methods now have the same names as the model hooks: `onSaving`, `onSaved`, `onCreating`, `onCreated`, `onUpdating`, `onUpdated`, `onDeleting`, `onDeleted`, `onRestoring`, `onRestored`, `onForceDeleting` and `onForceDeleted`. Rename the methods in your observers, for example `created(User user)` to `onCreated(User user)`.
 - New model factories: `import 'package:dox_orm/factory.dart';`. Extend `Factory<User>` and write `definition()`. Then use `count(n)`, `state()`, `sequence()`, `has()`, `make()`, `makeOne()`, `create()` and `createOne()`. See the Factories docs page.
+- New query scopes. `@Scope()` on a static model method adds it as a query method, like `User().isActive().get()`. `@Scope(global: true)` adds it to every query of the model. Remove it with `withoutGlobalScope('name')` or `withoutGlobalScopes()`.
+- New attribute casts with `@Column(cast: ...)`: `JsonCast`, `ListCast<E>`, `BoolCast`, `EnumCast<E>` (by name or by index), or your own `Cast<T>` class. `bool` fields get `BoolCast` and enum fields get `EnumCast` without `cast`.
+- New `withCount('posts')`, `withSum('posts', 'views')` and `withMax('posts', 'views')`. They add the value with a subquery, for `hasOne`, `hasMany` and `manyToMany` relations. Read it with `countOf('posts')` or `aggregate('posts_sum_views')`. `toJson()` has it too.
+- `all()` now uses the where conditions of the query, like `get()`. Before, it used only the soft delete check.
 
 ### 3.0.0-alpha.8
 

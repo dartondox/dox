@@ -69,7 +69,19 @@
          <lastmod>2026-10-25</lastmod>
     </url>
     <url>
+         <loc>https://dartondox.dev/latest/3.x/database/model/casts/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
+         <loc>https://dartondox.dev/latest/3.x/database/model/counting-relations/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
          <loc>https://dartondox.dev/latest/3.x/database/model/events/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
+         <loc>https://dartondox.dev/latest/3.x/database/model/scopes/</loc>
          <lastmod>2026-10-25</lastmod>
     </url>
     <url>
