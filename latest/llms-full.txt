@@ -4959,6 +4959,774 @@ To use a memory store in tests, see [Testing](testing.md#test-the-cache).
 
 ---
 
+# Queue
+
+Source: https://dartondox.dev/latest/3.xdigging-deeper/queue/
+
+# Queue
+
+A queue runs slow work in the background. The request answers at once. A worker process does the work later.
+
+Use it to send emails, call slow APIs, make reports or resize images.
+The `dox_queue` package gives you jobs, three drivers (Redis, database and sync), retries, delays and a worker.
+
+## Install
+
+```bash
+dart pub add dox_queue
+```
+
+`dox_queue` has a builder. Your app already runs `build_runner` for `dox_builder`, so nothing else is needed.
+
+## How it works
+
+1. You write a job class with `@Job()`.
+2. `dart run build_runner build` writes `lib/jobs.g.dart`. It knows how to save and load each job.
+3. Your code calls `dispatch()`. The job is saved in Redis or in the database.
+4. A worker (`dart run bin/queue.dart`) takes the job and runs its `handle()` method.
+
+## Set up
+
+### 1. Config
+
+```dart title="lib/config/queue.dart"
+import 'package:dox_queue/dox_queue.dart';
+
+import '../jobs.g.dart';
+
+QueueConfig queueConfig = QueueConfig(
+  /// sync, database or redis
+  driver: 'database',
+
+  /// every @Job class, from lib/jobs.g.dart
+  jobs: jobRegistry,
+);
+```
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `driver` | `sync` | `sync`, `database` or `redis` |
+| `jobs` | empty | `jobRegistry` from `lib/jobs.g.dart` |
+| `redis` | localhost:6379 | `RedisOptions(host: ..., port: ..., password: ...)` for the `redis` driver |
+| `prefix` | `dox_queue:` | the start of every Redis key |
+| `connection` | default | the dox_orm connection name, for the `database` driver |
+| `retryAfter` | 90 seconds | when a worker does not finish a job in this time, another worker can take it |
+| `workInProcess` | `false` | run a worker inside the web server, see [Small apps](#small-apps-a-worker-in-the-web-server) |
+| `workerQueues` | `['default']` | the queues of the in-process worker |
+| `workerConcurrency` | `1` | jobs at once in the in-process worker |
+
+!!! warning "Keep `retryAfter` bigger than your longest job"
+    `retryAfter` is how Dox finds the job of a crashed worker.
+    A job that runs longer than `retryAfter` looks crashed, so a second worker runs it again.
+
+### 2. Service
+
+The service sets up the queue in every isolate. Put it in `lib/` so the generated container finds it.
+
+```dart title="lib/services/queue_service.dart"
+import 'package:dox_queue/dox_queue.dart';
+
+import '../config/queue.dart';
+
+/// Sets up the queue. Dox finds every DoxService class,
+/// see lib/container.g.dart.
+class AppQueueService extends QueueService {
+  AppQueueService() : super(queueConfig);
+}
+```
+
+### 3. Worker file
+
+```dart title="bin/queue.dart"
+import 'dart:io';
+
+import 'package:dox_queue/dox_queue.dart';
+import 'package:dox_sample/config/app.dart';
+
+/// run queued jobs: `dart run bin/queue.dart [work] [flags]`.
+/// the `dox` CLI runs this file for its queue commands.
+Future<void> main(List<String> args) async {
+  exitCode = await QueueWorker(app: appConfig).run(args);
+}
+```
+
+The worker starts the services of your app (database, cache, queue). It does not start the HTTP server.
+
+### 4. Tables (database driver only)
+
+Add a migration in `db/migration`. `QueueTables` makes the `jobs` and `failed_jobs` tables.
+
+```dart title="db/migration/2026_10_25_000000000_create_queue_tables.dart"
+// ignore_for_file: file_names
+import 'package:dox_migration/dox_migration.dart';
+import 'package:dox_queue/dox_queue.dart';
+
+/// The jobs and failed_jobs tables of dox_queue.
+class CreateQueueTables extends Migration {
+  @override
+  Future<void> up(Schema schema) async {
+    await QueueTables.up(schema);
+  }
+
+  @override
+  Future<void> down(Schema schema) async {
+    await QueueTables.down(schema);
+  }
+}
+```
+
+Then run `dox migrate`.
+
+## Write a job
+
+```dart title="lib/app/jobs/send_welcome_email.job.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_queue/dox_queue.dart';
+
+@Job()
+class SendWelcomeEmail extends DoxJob {
+  SendWelcomeEmail({required this.userId});
+
+  final int userId;
+
+  /// run up to 3 times
+  @override
+  int get tries => 3;
+
+  /// wait 10 seconds before the 2nd try, 60 seconds before the 3rd
+  @override
+  List<Duration> get backoff => const <Duration>[
+    Duration(seconds: 10),
+    Duration(seconds: 60),
+  ];
+
+  /// stop a try after 30 seconds
+  @override
+  Duration? get timeout => const Duration(seconds: 30);
+
+  /// the queue of this job
+  @override
+  String get queue => 'emails';
+
+  @override
+  Future<void> handle() async {
+    MailService mail = Dox().ioc.get<MailService>();
+    await mail.sendWelcome(userId);
+  }
+
+  /// runs once, after the last try failed
+  @override
+  Future<void> failed(Object error, StackTrace stack) async {
+    // tell someone, or clean up
+  }
+}
+```
+
+Run `dart run build_runner build` after you add or change a job.
+
+All the settings are optional:
+
+| Setting | Default | What it does |
+| --- | --- | --- |
+| `tries` | the worker `--tries` (1) | how many times to run the job before it fails |
+| `backoff` | none (retry at once) | the wait before each retry. The last entry is used for the rest |
+| `timeout` | the worker `--timeout` (60 seconds) | the max run time of one try |
+| `queue` | `default` | the queue to put the job on |
+| `failed()` | does nothing | runs once, after the last try failed |
+
+### What is saved
+
+The parameters of the unnamed constructor are saved with the job.
+Each parameter needs a field or getter with the same name.
+
+These types work:
+
+- `int`, `double`, `num`, `String`, `bool`
+- `DateTime`
+- enums (saved by name)
+- `List` and `Map<String, ...>` of these, also nested
+- `dynamic` and `Object` (the value must be JSON)
+- nullable versions of all of them
+
+Any other type stops the build with a clear message.
+
+!!! tip "Save an id, not an object"
+    Do not save a `User`. Save the `userId`, and load the user in `handle()`.
+    The user may change between dispatch and run. The id gives you fresh data.
+
+### Services in a job
+
+A job is made again from its saved data, so it can not get services in its constructor.
+Get them in `handle()` from the Dox container:
+
+```dart
+UserService users = Dox().ioc.get<UserService>();
+```
+
+The worker runs `registerContainer`, so every `@Inject()` class of your app is there.
+
+### Job names
+
+The class name is saved with each job. When you rename a class, queued jobs of the old name can not be found.
+Keep the old name with `@Job(name: 'SendWelcomeEmail')`.
+
+## Dispatch a job
+
+```dart
+await SendWelcomeEmail(userId: user.id).dispatch();
+```
+
+Both ways do the same:
+
+```dart
+await Queue.dispatch(SendWelcomeEmail(userId: user.id));
+```
+
+A delay, another queue:
+
+```dart
+await SendWelcomeEmail(userId: 1).dispatch(
+  delay: Duration(minutes: 10),
+  queue: 'emails',
+);
+```
+
+`dispatch()` returns the job id.
+
+Run a job now, in this process, with no queue:
+
+```dart
+await SendWelcomeEmail(userId: 1).dispatchSync();
+```
+
+## Run the worker
+
+```bash
+dart run bin/queue.dart
+```
+
+Commands:
+
+| Command | What it does |
+| --- | --- |
+| `work` | run jobs. This is the default |
+| `failed` | list the failed jobs |
+| `retry <id>` | put one failed job back on its queue |
+| `retry all` | put all failed jobs back |
+| `forget <id>` | delete one failed job |
+| `flush` | delete all failed jobs |
+
+Flags of `work`:
+
+| Flag | Default | What it does |
+| --- | --- | --- |
+| `--queue=high,default` | `default` | the queues to work. The first one goes first |
+| `--concurrency=4` | `1` | jobs at once in this process |
+| `--once` | off | run one job, then stop |
+| `--tries=3` | `1` | tries of a job that does not set `tries` |
+| `--timeout=60` | `60` | max run time in seconds of a job that does not set `timeout` |
+| `--sleep=3` | `3` | seconds to wait when the queues are empty |
+| `--stop-when-empty` | off | stop when the queues are empty |
+
+```bash
+dart run bin/queue.dart work --queue=emails,default --concurrency=4
+```
+
+`--concurrency` runs jobs as async tasks on one thread. It helps for jobs that wait (email, HTTP, database).
+For CPU heavy jobs, run more worker processes.
+
+### Stop the worker
+
+Press Ctrl+C, or send SIGTERM (`docker stop` does it).
+The worker takes no new job. It waits for the running jobs, then it stops.
+A second signal stops it at once.
+
+!!! warning "Restart the worker after a deploy"
+    The worker keeps your code in memory. Restart it after each deploy, or it runs the old code.
+
+### Keep it running
+
+Run the worker as its own process, next to the web server. For example with Docker Compose:
+
+```yaml
+services:
+  web:
+    build: .
+    command: dart run bin/server.dart
+  worker:
+    build: .
+    command: dart run bin/queue.dart work --concurrency=4
+```
+
+Or with systemd, Supervisor or a second Fly.io process. Set it to restart when it stops.
+
+## Retries and failed jobs
+
+When `handle()` throws:
+
+1. The worker waits the `backoff` time and tries again, up to `tries` times.
+2. After the last try, the job goes to the failed jobs, and `failed()` runs.
+
+A timeout counts as a failed try.
+
+!!! info "A timeout does not stop the code"
+    Dart can not stop a running `Future`.
+    After a timeout the try counts as failed, but `handle()` keeps running in the background until it ends.
+    Write jobs that are safe to run twice.
+
+When a worker crashes, its job stays reserved. After `retryAfter` another worker takes it.
+This counts as a try. When there are no tries left, the job fails with a message that the worker did not finish.
+
+Failed jobs are kept until you retry or delete them:
+
+```bash
+dart run bin/queue.dart failed
+dart run bin/queue.dart retry 6f1c0e...
+dart run bin/queue.dart retry all
+dart run bin/queue.dart forget 6f1c0e...
+dart run bin/queue.dart flush
+```
+
+## Drivers
+
+| Driver | Where jobs are | Needs |
+| --- | --- | --- |
+| `sync` | nowhere: `dispatch()` runs the job at once | nothing |
+| `database` | the `jobs` and `failed_jobs` tables | Postgres, MySQL 8+, MariaDB 10.6+ or SQLite |
+| `redis` | Redis lists and sorted sets | Redis |
+
+### Database
+
+Jobs are rows in the `jobs` table. Failed jobs are rows in `failed_jobs`.
+
+- On Postgres, MySQL and MariaDB a worker takes a job with `SELECT ... FOR UPDATE SKIP LOCKED`. Many workers do not wait on each other.
+- On SQLite a worker takes a job with one `UPDATE ... RETURNING`. SQLite runs one write at a time, so this is safe. It is good for small apps.
+
+Use another connection of `config/database.dart` with `QueueConfig(connection: 'postgres')`.
+
+### Redis
+
+```dart
+QueueConfig queueConfig = QueueConfig(
+  driver: 'redis',
+  jobs: jobRegistry,
+  redis: RedisOptions(host: env.redisHost, port: 6379),
+);
+```
+
+Each queue has a list of ready jobs, a sorted set of delayed jobs and a sorted set of reserved jobs.
+A Lua script takes a job, so two workers never get the same one. Failed jobs are in the hash `dox_queue:failed`.
+
+### Sync
+
+`dispatch()` runs the job at once and waits for it. There is no worker, no retry and no delay.
+When the job throws, `failed()` runs and `dispatch()` throws the error.
+Use it for tests and for local work.
+
+## Small apps: a worker in the web server
+
+You can skip the worker process. Set `workInProcess: true`:
+
+```dart
+QueueConfig queueConfig = QueueConfig(
+  driver: 'database',
+  jobs: jobRegistry,
+  workInProcess: true,
+);
+```
+
+The first isolate of the web server then runs jobs too. When the server stops, it waits for the running jobs.
+
+!!! warning "Heavy jobs slow down your API"
+    The jobs share the isolate with web requests.
+    A long or CPU heavy job makes requests on that isolate slow.
+    Use a worker process when your jobs are heavy or many.
+
+## Testing
+
+Use the `sync` driver. `dispatch()` then runs the job at once, so you can check the result right after.
+
+```dart
+import 'package:dox_queue/dox_queue.dart';
+import 'package:dox_sample/jobs.g.dart';
+import 'package:test/test.dart';
+
+void main() {
+  setUp(() {
+    Queue.configure(QueueConfig(driver: 'sync', jobs: jobRegistry));
+  });
+
+  test('sends the welcome email', () async {
+    await SendWelcomeEmail(userId: 1).dispatch();
+    // check the email was sent
+  });
+}
+```
+
+To test a job alone, call `handle()`:
+
+```dart
+await SendWelcomeEmail(userId: 1).handle();
+```
+
+To test the queue itself, use the `database` driver with SQLite `:memory:`, and run a worker that stops when the queue is empty:
+
+```dart
+await Worker(
+  driver: Queue.driver,
+  jobs: jobRegistry,
+  options: WorkerOptions(stopWhenEmpty: true),
+).run();
+```
+
+
+---
+
+# Scheduler
+
+Source: https://dartondox.dev/latest/3.xdigging-deeper/scheduler/
+
+# Scheduler
+
+`dox_scheduler` runs your tasks on a schedule, like cron.
+
+You write the schedule in Dart, in one file.
+Each task is a plain function.
+A task runs once per tick, even when many isolates or servers run the schedule.
+
+## Install
+
+```bash
+dart pub add dox_scheduler
+```
+
+## Define tasks
+
+Put the tasks in `lib/config/schedule.dart`.
+
+```dart
+import 'package:dox_scheduler/dox_scheduler.dart';
+
+ScheduleConfig scheduleConfig = const ScheduleConfig();
+
+void schedule(Schedule s) {
+  s.call('cleanup', cleanup).dailyAt('02:00');
+  s.call('report', sendReport).hourly();
+  s.call('ping', ping).cron('*/5 * * * *').timezone('Asia/Yangon');
+}
+
+Future<void> cleanup() async {
+  // delete old rows, files, ...
+}
+```
+
+`s.call(name, function)` adds a task.
+The name must be unique. It shows in the logs and in the lock keys.
+A task with no frequency runs every minute.
+
+### Queue jobs
+
+The scheduler does not know about queues. Wrap the job in a function:
+
+```dart
+s.call('report', () => SendReport().dispatch()).hourly();
+```
+
+The task only puts the job on the queue. A queue worker runs it.
+
+## Frequencies
+
+| Method | Runs |
+| --- | --- |
+| `everyMinute()` | every minute (the default) |
+| `everyTwoMinutes()` | every 2 minutes |
+| `everyFiveMinutes()` | every 5 minutes |
+| `everyTenMinutes()` | every 10 minutes |
+| `everyFifteenMinutes()` | every 15 minutes |
+| `everyThirtyMinutes()` | at minute 0 and 30 |
+| `hourly()` | at minute 0 of every hour |
+| `hourlyAt(17)` | at minute 17 of every hour |
+| `daily()` | every day at 00:00 |
+| `dailyAt('13:00')` | every day at 13:00 |
+| `twiceDaily(1, 13)` | every day at 01:00 and 13:00 |
+| `weekly()` | every Sunday at 00:00 |
+| `weeklyOn(DateTime.monday, '08:00')` | every Monday at 08:00 |
+| `monthly()` | the 1st of every month at 00:00 |
+| `monthlyOn(15, '12:00')` | the 15th of every month at 12:00 |
+| `yearly()` | January 1st at 00:00 |
+| `cron('*/5 9-17 * * 1-5')` | any 5 field cron expression |
+
+You can limit the days. The order of the calls does not matter.
+
+| Method | Runs |
+| --- | --- |
+| `weekdays()` | Monday to Friday |
+| `weekends()` | Saturday and Sunday |
+| `days(<int>[DateTime.monday, DateTime.friday])` | only on these days |
+
+```dart
+s.call('standup', remind).weekdays().dailyAt('09:00');
+```
+
+### Cron expressions
+
+`cron()` takes the standard 5 fields: `minute hour day-of-month month day-of-week`.
+
+| Field | Values |
+| --- | --- |
+| minute | 0-59 |
+| hour | 0-23 |
+| day of month | 1-31 |
+| month | 1-12 or `JAN`-`DEC` |
+| day of week | 0-7 or `SUN`-`SAT` (0 and 7 are Sunday) |
+
+Each field takes `*`, a number `5`, a range `1-5`, a list `1,15`, and a step `*/15` or `0-30/10`.
+
+When both day fields are set, a day matches when **either** field matches.
+This is the standard cron rule. `0 0 1 * MON` runs on the 1st of the month and on every Monday.
+When one day field starts with `*`, both must match.
+
+## Time zones
+
+The schedule uses UTC by default.
+Use `timezone()` to read the time in another zone:
+
+```dart
+s.call('report', sendReport).dailyAt('08:00').timezone('Asia/Yangon');
+```
+
+The name is an IANA name, like `Europe/London` or `America/New_York`.
+The zone data comes from the `timezone` package.
+
+With summer time (DST):
+
+- A time that does not exist that day (it is skipped when the clock goes forward) does not run that day.
+- A time that happens twice (when the clock goes back) runs once.
+- `hourly()` and other "every" frequencies keep running every real hour.
+
+## Filters
+
+```dart
+s.call('sync', sync).everyFiveMinutes().between('09:00', '17:00');
+s.call('night', night).hourly().between('22:00', '06:00'); // crosses midnight
+s.call('promo', promo).daily().when(isPromoOn);
+s.call('backup', backup).daily().skip(isHoliday);
+```
+
+| Method | What it does |
+| --- | --- |
+| `between('09:00', '17:00')` | runs only in this time of day, both ends included, in the task zone |
+| `when(function)` | runs only when the function gives `true` |
+| `skip(function)` | does not run when the function gives `true` |
+
+`when` and `skip` take a function that gives a `bool` or a `Future<bool>`.
+
+## Options
+
+| Method | What it does |
+| --- | --- |
+| `withoutOverlapping()` | does not start while the last run still runs |
+| `onOneServer()` | runs once per tick across isolates and servers. **On by default** |
+| `onEveryServer()` | runs on every process that runs the schedule |
+| `runInBackground()` | the next task of the same minute does not wait for this one |
+| `timeout(Duration(minutes: 5))` | counts the run as failed when it takes longer |
+
+### withoutOverlapping
+
+A lock is held while the task runs.
+When the next minute comes and the lock is still held, the task is skipped.
+The lock expires after 24 hours, in case the process dies.
+Pass another expiry like this: `withoutOverlapping(Duration(hours: 1))`.
+
+### Once per tick
+
+Before a task runs, the scheduler takes a lock named after the task and the minute.
+The first process to take it runs the task. The others skip it.
+The lock is not released, so a late server can not run the same minute again.
+
+The locks use a [cache](cache.md) store.
+
+!!! warning "Many servers need Redis"
+    A `memory` store lives inside one process.
+    It works for one `work` process, or for many isolates of one server.
+    When many servers run the schedule, set a Redis store:
+    `ScheduleConfig(store: 'redis')`.
+
+When the store has no locks (`file`, `null`), the scheduler uses a memory store.
+
+### Timeout
+
+Dart can not stop a running function.
+After the timeout, the run counts as failed and the hooks run, but the work may go on.
+
+## Hooks
+
+```dart
+s
+    .call('report', sendReport)
+    .daily()
+    .before(logStart)
+    .onSuccess(logDone)
+    .onFailure(alertTeam)
+    .after(cleanUp);
+
+Future<void> alertTeam(Object error, StackTrace stack) async {
+  await notifyTeam('report failed: $error');
+}
+```
+
+| Hook | Runs |
+| --- | --- |
+| `before` | before the task. When it throws, the task does not run and counts as failed |
+| `onSuccess` | after the task worked |
+| `onFailure` | after the task threw or timed out. It gets the error and the stack trace |
+| `after` | after the task, always |
+
+An error in a task is logged and the next task still runs.
+
+## Run the schedule
+
+`bin/schedule.dart` runs the schedule:
+
+```dart
+import 'dart:io';
+
+import 'package:my_app/config/app.dart';
+import 'package:my_app/config/schedule.dart';
+import 'package:dox_scheduler/dox_scheduler.dart';
+
+Future<void> main(List<String> args) async {
+  exitCode = await SchedulerRunner(
+    schedule: schedule,
+    app: appConfig,
+    config: scheduleConfig,
+  ).run(args);
+}
+```
+
+With `app`, the runner starts your app services first (like the database).
+It stops them at the end.
+
+| Command | What it does |
+| --- | --- |
+| `dart run bin/schedule.dart work` | runs due tasks at every minute until you stop it. The default |
+| `dart run bin/schedule.dart run` | runs the tasks due this minute once, then exits |
+| `dart run bin/schedule.dart list` | shows each task, its schedule and its next run time |
+| `dart run bin/schedule.dart test cleanup` | runs one task now |
+
+### work
+
+`work` is a long running process. Run it next to your server, with the same deploy tool (systemd, Docker, Kubernetes).
+
+It wakes at each full minute and runs the due tasks.
+On Ctrl+C or SIGTERM it starts no new task and waits for the running ones.
+A second signal stops it at once.
+
+### run
+
+`run` is for a system cron. Add one line to the crontab:
+
+```bash
+* * * * * cd /path/to/app && dart run bin/schedule.dart run
+```
+
+It runs the tasks of this minute, waits for them, and exits.
+The exit code is 1 when a task failed.
+
+Use a compiled binary to start faster: `dart compile exe bin/schedule.dart -o build/schedule`.
+
+### list
+
+```
+Task     Schedule                   Next run
+cleanup  0 2 * * *                  2026-10-26 02:00 UTC
+report   0 * * * *                  2026-10-25 14:00 UTC
+ping     */5 * * * * Asia/Yangon    2026-10-25 20:35 Asia/Yangon
+```
+
+The next run time checks the frequency and `between()`. It does not check `when()` and `skip()`.
+
+### test
+
+`test <name>` runs one task now, with its hooks.
+It does not check the schedule, the filters or the locks.
+
+## Run inside the server
+
+You can run the schedule inside your Dox server instead of a `work` process.
+Add a service that extends `SchedulerService`:
+
+```dart
+// lib/services/schedule_service.dart
+import 'package:dox_scheduler/dox_scheduler.dart';
+import 'package:my_app/config/schedule.dart';
+
+class ScheduleService extends SchedulerService {
+  ScheduleService() : super(schedule: schedule, config: scheduleConfig);
+}
+```
+
+Then turn it on in `lib/config/schedule.dart`:
+
+```dart
+ScheduleConfig scheduleConfig = const ScheduleConfig(inProcess: true);
+```
+
+Run `dart run build_runner build`. The generated container finds the service.
+
+How it works:
+
+- Only the first isolate runs the tasks. The other isolates only serve requests.
+- With many servers, each server runs the loop. The once-per-tick lock makes each task run once. Use a Redis store for this.
+- When the server stops, it waits for the running tasks.
+
+Trade-offs:
+
+- Tasks use the CPU of the server, so they can slow down requests on the first isolate.
+- A long task makes the server stop slower.
+- With a separate `work` process, you can deploy, scale and restart the scheduler on its own.
+
+Use `work` for heavy tasks. Use the in-process service for small apps.
+
+## Testing
+
+`Scheduler` runs the tasks. Give it a fake clock to test a schedule with no waiting:
+
+```dart
+import 'package:dox_cache/dox_cache.dart';
+import 'package:dox_scheduler/dox_scheduler.dart';
+import 'package:my_app/config/schedule.dart';
+import 'package:test/test.dart';
+
+class FakeClock extends ScheduleClock {
+  FakeClock(this.time);
+
+  DateTime time;
+
+  @override
+  DateTime now() {
+    return time;
+  }
+}
+
+test('cleanup runs at 02:00', () async {
+  Schedule s = Schedule();
+  schedule(s);
+  Scheduler scheduler = Scheduler(
+    tasks: s.tasks,
+    store: CacheStore(MemoryDriver()),
+    clock: FakeClock(DateTime.utc(2026, 10, 25, 2)),
+  );
+  Map<String, TaskOutcome> outcomes = await scheduler.runDue();
+  expect(outcomes['cleanup'], TaskOutcome.ran);
+});
+```
+
+`ScheduledTask.isDue(time)` and `ScheduledTask.nextRun(time)` check a schedule with no run at all.
+
+
+---
+
 # File Storage
 
 Source: https://dartondox.dev/latest/3.xdigging-deeper/file-storage/

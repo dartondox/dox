@@ -35,6 +35,8 @@ The full docs as one file: https://dartondox.dev/latest/3.xllms-full.txt
 - [Validation](https://dartondox.dev/latest/3.xthe-basic/validation/)
 - [Validation rules](https://dartondox.dev/latest/3.xthe-basic/validation-rules/)
 - [Cache](https://dartondox.dev/latest/3.xdigging-deeper/cache/)
+- [Queue](https://dartondox.dev/latest/3.xdigging-deeper/queue/)
+- [Scheduler](https://dartondox.dev/latest/3.xdigging-deeper/scheduler/)
 - [File Storage](https://dartondox.dev/latest/3.xdigging-deeper/file-storage/)
 - [Environment Variables](https://dartondox.dev/latest/3.xdigging-deeper/env/)
 - [Isolate](https://dartondox.dev/latest/3.xdigging-deeper/isolate/)
