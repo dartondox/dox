@@ -48,6 +48,8 @@ Some packages live in their own repos:
 | `dox_queue` | [dartondox/dox-queue](https://github.com/dartondox/dox-queue) |
 | `dox_scheduler` | [dartondox/dox-scheduler](https://github.com/dartondox/dox-scheduler) |
 | `dox_inertia` | [dartondox/dox-inertia](https://github.com/dartondox/dox-inertia) |
+| `dox_view` | [dartondox/dox-view](https://github.com/dartondox/dox-view) |
+| `dox_mailer` | [dartondox/dox-mailer](https://github.com/dartondox/dox-mailer) |
 | `dox_http_native` | [dartondox/dox-http-native](https://github.com/dartondox/dox-http-native) |
 | `dox_postgres_native` | [dartondox/dox-postgres-native](https://github.com/dartondox/dox-postgres-native) |
 | `dox_mysql_native` | [dartondox/dox-mysql-native](https://github.com/dartondox/dox-mysql-native) |

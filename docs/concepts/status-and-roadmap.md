@@ -34,7 +34,7 @@ The packages in the main repo share one version number. The other packages live 
 | `dox_cache` | Memory, file and Redis cache, tags, locks | Ready for stable | 4 test files, with Redis in CI |
 | `dox_storage` | Local disk and S3 (and S3-compatible) storage | Ready for stable | 10 test files, with MinIO in CI |
 | `dox_openapi` | OpenAPI 3.1 document and a docs page | Ready for stable | 4 test files |
-| `dox_socketio` | Socket.IO v4 server with a Redis adapter | May change. Has known gaps, see below. | 9 test files, with the real `socket.io-client` in CI |
+| `dox_socketio` | Socket.IO v4 server with a Redis adapter | May change | 10 test files, with the real `socket.io-client` in CI |
 | `dox_queue` | Queues and jobs | Experimental | 5 test files |
 | `dox_scheduler` | Run tasks on a schedule | Experimental | 6 test files |
 | `dox_view` | [Views](../the-basic/views.md): `.dox.html` templates with layouts and components | Experimental | 2 test files |
@@ -49,16 +49,6 @@ The packages in the main repo share one version number. The other packages live 
 !!! note "About test coverage"
     The repo does not measure line coverage. The "Tests" column counts test files and says where CI runs them.
     The CI setup is in `.github/workflows/test.yaml`. The packages in their own repos have their own CI.
-
-## Known gaps
-
-These are known and wait for 3.1. They do not block 3.0 stable.
-
-| Gap | What to do today |
-| --- | --- |
-| With many servers and the Redis adapter, `fetchSockets`, `socketsJoin`, `socketsLeave` and `disconnectSockets` only act on the sockets of the server that calls them. | Use an [emitter](../packages/socketio.md#emit-from-other-programs). It acts on all servers. |
-| `serverSideEmit` from other servers is ignored. | Send the message through Redis pub/sub yourself, or use the queue. |
-| Broadcast acks from other servers are not sent back. | Ask the client to send a normal event back. |
 
 ## What Dox does not have yet
 
@@ -87,7 +77,6 @@ These were checked by searching the code with `rg`.
 
 ### Later (3.1 and after)
 
-- Socket.IO actions across all servers (the known gaps above)
 - Notifications
 - Password reset
 - Gates and policies

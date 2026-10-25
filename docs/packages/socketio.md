@@ -192,7 +192,10 @@ A client that is refused is still closed after `connectTimeout`, unless it joins
 | `io.of('/chat')`, `io.use(fn)` | the same |
 | `socket.handshake` | `.headers`, `.query`, `.auth`, `.address` |
 | `socket.data` | `socket.data` (a `Map`) |
-| `io.in(r).fetchSockets()` | `io.to(r).fetchSockets()` (this server only) |
+| `await io.in(r).fetchSockets()` | `await io.to(r).fetchSockets()` (all servers) |
+| `await io.timeout(5000).emitWithAck('e', a)` | `await io.timeout(Duration(seconds: 5)).emitWithAck('e', a)` |
+| `io.serverSideEmit('e', a)` | `await io.serverSideEmit('e', [a])` |
+| `io.on('e', (a, cb) => ...)` (from other servers) | `io.onServerSideEmit('e', (ServerSideEvent e) => ...)`, then `e.data`, `e.ack(x)` |
 
 - `disconnecting` and `disconnect` give the reason in `event.data`, like `transport close` or `ping timeout`.
 - Binary data: send a `Uint8List`. It can be anywhere in lists and maps.
@@ -247,12 +250,52 @@ SocketIoServer io = SocketIoServer(
 - It uses the format of `@socket.io/redis-adapter`. Node.js servers with that adapter can share one Redis with Dox servers.
 - It reads messages in msgpack and in JSON. It writes msgpack, like the Node.js adapter.
   If your Node.js servers use a JSON parser, set `format: RedisFormat.json`.
-- Other servers can ask a Dox server for `fetchSockets`, `allRooms`, `socketsJoin`, `socketsLeave` and `disconnectSockets`. It answers.
-- On a Dox server, `fetchSockets`, `socketsJoin`, `socketsLeave` and `disconnectSockets` only act on its own sockets.
-  To act on all servers, use an [emitter](#emit-from-other-programs).
-- Broadcast acks from other servers: Dox clients get the event, but their acks are not sent back.
-- `serverSideEmit` from other servers is ignored.
+- `fetchSockets`, `socketsJoin`, `socketsLeave` and `disconnectSockets` act on the sockets of all servers.
+- Broadcasts with an ack get the acks of clients on all servers.
+- Servers can send events to each other with `serverSideEmit`. Clients do not get them.
+- A request waits at most `requestsTimeout` for the other servers (5 seconds by default, like Node.js).
 - Long-polling needs sticky sessions, the same as with [many isolates](#in-a-dox-app-same-port-as-http). Or use `transports: ['websocket']` on the client.
+
+### Act on all servers
+
+```dart
+// sockets of every server. Sockets of this server are `Socket`s.
+List<RemoteSocket> sockets = await io.to('room1').fetchSockets();
+for (RemoteSocket socket in sockets) {
+  socket.emit('hello', socket.data['name']);
+}
+
+await io.to('room1').socketsJoin('room2');
+await io.to('banned').disconnectSockets();
+
+// one ack per client, from all servers. A timeout is needed.
+List<Object?> answers = await io
+    .timeout(const Duration(seconds: 5))
+    .emitWithAck('ping', 'are you there?');
+```
+
+`fetchSockets` throws a `TimeoutException` when a server does not answer in time.
+
+### Events between servers
+
+`serverSideEmit` sends an event to the other servers. Clients do not get it.
+
+```dart
+// on every server
+io.onServerSideEmit('reload-config', (ServerSideEvent event) {
+  reloadConfig(event.data);
+  event.ack('done'); // only when the sender waits for an answer
+});
+
+// on one server
+await io.serverSideEmit('reload-config', ['v2']);
+
+// wait for one answer from each other server
+List<Object?> answers = await io.serverSideEmitWithAck('reload-config', ['v2']);
+```
+
+When a server does not answer in time, `serverSideEmitWithAck` throws an `AckTimeoutException`. Its `responses` holds the answers that came back.
+`onServerSideEmit` is also on namespaces: `io.of('/chat').onServerSideEmit(...)`.
 
 ## Emit from other programs
 
