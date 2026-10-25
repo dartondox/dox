@@ -19,7 +19,7 @@ Then raise its constraint (like `dox_http_native: ^3.0.0-alpha.7`) in the Dox pa
 
 ## Before you start
 
-- `develop` has every change you want to ship, and CI is green.
+- `main` has every change you want to ship, and CI is green.
 - Each package with changes has a `## Unreleased` section at the top of its `CHANGELOG.md`.
 - A package that was never published by the Release workflow needs automated publishing on pub.dev.
   Go to pub.dev → the package → Admin → Automated publishing → GitHub Actions.
@@ -31,7 +31,7 @@ In the steps below, replace `3.0.0-alpha.5` with the new version.
 ## 1. Bump the versions
 
 ```sh
-git checkout -b release-3.0.0-alpha.5 origin/develop
+git checkout -b release-3.0.0-alpha.5 origin/main
 ```
 
 1. Set `version: 3.0.0-alpha.5` in the root `pubspec.yaml`.
@@ -45,15 +45,15 @@ git checkout -b release-3.0.0-alpha.5 origin/develop
 
 ## 2. Merge the release PR
 
-Open a PR from `release-3.0.0-alpha.5` into `develop`.
+Open a PR from `release-3.0.0-alpha.5` into `main`.
 Wait for CI, then squash merge it.
 
 ## 3. Publish to pub.dev
 
-Tag the merge commit on `develop`:
+Tag the merge commit on `main`:
 
 ```sh
-git checkout develop && git pull
+git checkout main && git pull
 git tag v3.0.0-alpha.5
 git push origin v3.0.0-alpha.5
 ```
@@ -104,5 +104,5 @@ In `dox-sample`:
 ## 5. Check
 
 - Every package shows the new version on pub.dev.
-- The docs deploy from `develop` passed (the "Docs" workflow).
+- The docs deploy from `main` passed (the "Docs" workflow).
 - `dox create` makes a project with the new version.

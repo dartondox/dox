@@ -3,7 +3,7 @@
 Code generator for Dox apps. It runs with `build_runner`.
 
 [![pub package](https://img.shields.io/pub/v/dox_builder.svg)](https://pub.dev/packages/dox_builder)
-[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/develop/LICENSE)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/main/LICENSE)
 
 Part of [Dox](https://dartondox.dev), a web backend framework for Dart, like Laravel.
 Source code: [github.com/dartondox/dox](https://github.com/dartondox/dox).
@@ -47,4 +47,4 @@ A bad DTO (a field that is not final, a type that is not supported, a bad regex)
 
 ## License
 
-MIT. See [LICENSE](https://github.com/dartondox/dox/blob/develop/LICENSE).
+MIT. See [LICENSE](https://github.com/dartondox/dox/blob/main/LICENSE).

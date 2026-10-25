@@ -3,7 +3,7 @@
 Annotations and interfaces that the Dox packages share.
 
 [![pub package](https://img.shields.io/pub/v/dox_annotation.svg)](https://pub.dev/packages/dox_annotation)
-[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/develop/LICENSE)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/main/LICENSE)
 
 Part of [Dox](https://dartondox.dev), a web backend framework for Dart, like Laravel.
 Source code: [github.com/dartondox/dox](https://github.com/dartondox/dox).
@@ -32,4 +32,4 @@ Dox 3.x is in alpha (`3.0.0-alpha.x`).
 
 ## License
 
-MIT. See [LICENSE](https://github.com/dartondox/dox/blob/develop/LICENSE).
+MIT. See [LICENSE](https://github.com/dartondox/dox/blob/main/LICENSE).

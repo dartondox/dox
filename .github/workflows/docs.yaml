@@ -2,7 +2,7 @@ name: Docs
 
 # Versioned docs with mike (https://github.com/jimporter/mike).
 # Each version lives in its own folder on the gh-pages branch:
-#   /3.x/  docs from develop (alias /latest/, the default)
+#   /3.x/  docs from main (alias /latest/, the default)
 #   /2.x/  old docs, deployed by hand from the v2.x branch
 # Old links like /the-basic/routing/ are kept as small redirect pages.
 # See docs/others/contribute.md, section "Docs".
@@ -10,7 +10,7 @@ name: Docs
 on:
   push:
     branches:
-      - develop
+      - main
     paths:
       - 'docs/**'
       - 'hooks/**'

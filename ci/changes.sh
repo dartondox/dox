@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Finds the files a push changes, then lets ci/affected.py pick the jobs to
 # run. Writes code, tests and examples to $GITHUB_OUTPUT (see
-# ci/affected.py). A branch is compared with develop, so one docs-only push
+# ci/affected.py). A branch is compared with main, so one docs-only push
 # on top of code commits still runs the tests of that code. Tags, and
 # pushes with no usable base (new branch, force push), run everything.
 #
@@ -15,10 +15,10 @@ files=""
 if [ "$GITHUB_REF_TYPE" = "tag" ]; then
   all=1
 else
-  if [ "$GITHUB_REF" = "refs/heads/develop" ]; then
+  if [ "$GITHUB_REF" = "refs/heads/main" ]; then
     base="$BEFORE"
   else
-    base=$(git merge-base origin/develop HEAD || true)
+    base=$(git merge-base origin/main HEAD || true)
   fi
   if git cat-file -e "$base^{commit}" 2>/dev/null; then
     files=$(git diff --name-only "$base" HEAD)

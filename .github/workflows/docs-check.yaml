@@ -2,7 +2,7 @@ name: Docs check
 
 # Every pull request that touches the docs: the strict build must pass
 # (broken links and anchors fail it) and the text has no known typos.
-# Deploys happen in docs.yaml, on push to develop.
+# Deploys happen in docs.yaml, on push to main.
 
 on:
   pull_request:

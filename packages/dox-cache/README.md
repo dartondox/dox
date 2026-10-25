@@ -3,7 +3,7 @@
 Cache for Dart with memory, file and Redis drivers. It works like Laravel Cache.
 
 [![pub package](https://img.shields.io/pub/v/dox_cache.svg)](https://pub.dev/packages/dox_cache)
-[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/develop/LICENSE)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/main/LICENSE)
 
 Part of [Dox](https://dartondox.dev), a web backend framework for Dart, like Laravel.
 Source code: [github.com/dartondox/dox](https://github.com/dartondox/dox).
@@ -64,4 +64,4 @@ The `memory` store lives in one isolate. Use `redis` when isolates or servers mu
 
 ## License
 
-MIT. See [LICENSE](https://github.com/dartondox/dox/blob/develop/LICENSE).
+MIT. See [LICENSE](https://github.com/dartondox/dox/blob/main/LICENSE).

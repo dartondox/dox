@@ -3,7 +3,7 @@
 Socket.IO v4 server for Dart. It works with the Dox framework and with plain `dart:io`.
 
 [![pub package](https://img.shields.io/pub/v/dox_socketio.svg)](https://pub.dev/packages/dox_socketio)
-[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/develop/LICENSE)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/main/LICENSE)
 
 Part of [Dox](https://dartondox.dev), a web backend framework for Dart, like Laravel.
 Source code: [github.com/dartondox/dox](https://github.com/dartondox/dox).
@@ -58,4 +58,4 @@ In a Dox app, turn it on with `AppConfig(socketIo: SocketIoConfig(enabled: true)
 
 ## License
 
-MIT. See [LICENSE](https://github.com/dartondox/dox/blob/develop/LICENSE).
+MIT. See [LICENSE](https://github.com/dartondox/dox/blob/main/LICENSE).
