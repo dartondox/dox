@@ -19186,6 +19186,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
+### 3.0.0-alpha.12
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.11
 
 - Version bump only, to match the other packages.
@@ -19242,7 +19246,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_auth
 
-### Unreleased
+### 3.0.0-alpha.12
 
 - New: `SessionAuthDriver` keeps the login in the session, for web pages. Use `Auth().attemptSession(req, credentials)`, `Auth().loginSession(req, user)` and `Auth().logout(req)`. Login and logout give the session a new id. Needs `SessionMiddleware`.
 - New: `AuthMiddleware(redirectTo: '/login')` sends a guest to that page instead of a 401.
@@ -19311,7 +19315,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_builder
 
-### Unreleased
+### 3.0.0-alpha.12
 
 - Fix: a route inside `Route.group('/web-auth', registerWebAuth)` lost the group prefix when the callback was a method or function, not a closure. The builder now reads that method with the prefix, also for nested groups. The route call in `openapi.g.dart` now has the full path, like `/web-auth/login`.
 
@@ -19387,6 +19391,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### 3.0.0-alpha.12
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.11
 
 - Version bump only, to match the other packages.
@@ -19447,6 +19455,10 @@ What changed in each package, newest first. This page is made from the
 - `remember`, `pull`, `add`, `increment`, `many`, tags and atomic locks.
 
 ## dox
+
+### 3.0.0-alpha.12
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.11
 
@@ -19522,7 +19534,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_core
 
-### Unreleased
+### 3.0.0-alpha.12
 
 - Breaking: `dox_core` no longer depends on `dox_storage` and `dox_socketio`. Add the package you use to your app.
   - Storage: `Storage()`, `StorageConfig` and `StorageDiskFactory` moved to `dox_storage`. `AppConfig.storage` is removed: extend `StorageService` from `dox_storage` (`class AppStorageService extends StorageService { AppStorageService() : super(storageConfig); }`). `Route.files()` is now `Storage.route()`. `Dox().storage` is now `Storage.manager`. `RequestFile.store()` needs `import 'package:dox_storage/dox_storage.dart'`.
@@ -19706,7 +19718,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_openapi
 
-### Unreleased
+### 3.0.0-alpha.12
 
 - Fix: two controllers with the same method name (like `login`) could swap their docs. `OpenApiRegistry.find` now takes `controller:`. When the route knows its controller class, only methods of that class match.
 
@@ -19769,6 +19781,10 @@ What changed in each package, newest first. This page is made from the
 - Output as JSON and YAML, write files, serve `/openapi.json`, `/openapi.yaml` and `/docs`.
 
 ## dox_validation
+
+### 3.0.0-alpha.12
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.11
 
