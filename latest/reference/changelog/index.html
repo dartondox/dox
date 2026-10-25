@@ -7303,7 +7303,18 @@
 <h2 id="dox_http_native">dox_http_native</h2>
 <h3 id="unreleased_5">Unreleased</h3>
 <ul>
-<li>New: WebSocket upgrade on the native server. <code>NativeWebSocket.upgrade(request, protocol: ..., maxMessageSize: ...)</code> accepts it and gives a <code>dart:io</code> <code>WebSocket</code>. Rust (tokio-tungstenite) speaks the protocol: ping and pong, the close handshake, the UTF-8 check and the size limit (a bigger message closes with <code>1009</code>). Compression is never agreed. <code>NativeWebSocket.isUpgradeRequest(request)</code> tells if a request asks for one.</li>
+<li>New: a streamed response (<code>addStream</code>, eg. a file or a download) over 64 KB goes out in parts. Before, the whole body was kept in memory until <code>close()</code>, and the client got nothing until then. Now the client gets the first bytes early, and at most 1 MB waits in Rust. Dart reads more only when the client has read what was sent. When the client leaves, <code>addStream</code> stops reading the source. A small response still goes out in one piece. A streamed response with <code>contentLength</code> set sends <code>Content-Length</code>, else it is chunked.</li>
+<li>Perf: a request body of 64 KB or more goes to Dart without a copy (external typed data). Before, it was copied 3 times.</li>
+<li>Perf: <code>compress: true</code> gzips on a Rust thread, not on the isolate. Same output (gzip, default level). A streamed response is not compressed.</li>
+<li>Perf: a response with the default headers and one content type (eg. JSON) copies no headers, and its header bytes are cached.</li>
+<li>Perf: request headers are parsed into a map on the second lookup, not scanned again and again.</li>
+<li>Perf: a request path with no query skips the full <code>Uri.parse</code>. Rust takes the lock of the answers once per batch.</li>
+<li>
+<p>Breaking: native ABI 6 (streamed body records, gzip flag, big bodies as their own part of the message). Needs a new native library build. The build hook builds it with cargo until the next release.</p>
+</li>
+<li>
+<p>New: WebSocket upgrade on the native server. <code>NativeWebSocket.upgrade(request, protocol: ..., maxMessageSize: ...)</code> accepts it and gives a <code>dart:io</code> <code>WebSocket</code>. Rust (tokio-tungstenite) speaks the protocol: ping and pong, the close handshake, the UTF-8 check and the size limit (a bigger message closes with <code>1009</code>). Compression is never agreed. <code>NativeWebSocket.isUpgradeRequest(request)</code> tells if a request asks for one.</p>
+</li>
 <li>On a graceful <code>close()</code>, open WebSockets get close code <code>1001</code>.</li>
 <li>WebSocket limits, so a slow client or a busy isolate can not make memory grow forever:</li>
 <li>Messages to a client wait in a queue. Over 4 times <code>maxMessageSize</code> (at least 1 MiB) the socket closes with <code>1008</code> (policy violation).</li>

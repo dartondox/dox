@@ -4034,6 +4034,10 @@ system when you build the app.</p>
 <li>macOS: the isolates share one socket.</li>
 <li>Windows: only one isolate serves HTTP.</li>
 </ul>
+<p>The OS spreads connections, not requests. A keep-alive connection stays on
+one isolate. So a few busy connections (eg. from one proxy or a load test
+with few connections) can keep some isolates idle. Use more connections
+than isolates.</p>
 <h2 id="when-the-library-does-not-load">When the library does not load</h2>
 <p>Dox stops at start, before any isolate runs. The error says why and how to
 fix it:</p>
@@ -4083,10 +4087,14 @@ a gain.</p>
   <code>413</code>. Dart checks the limits again.</li>
 <li>A client that sends no body bytes for 120 seconds (idle time) gets <code>408</code>.
   A slow but steady upload is fine.</li>
-<li>A response is sent when it is closed. It is kept in memory until then,
-  also a big file. Use a proxy (nginx, Caddy) or a storage link for big
-  downloads.</li>
-<li><code>compress: true</code> works: Dart gzips the body.</li>
+<li>A small response is sent in one piece when it is closed. A streamed
+  response (a file, a download, any <code>Stream</code>) over 64 KB goes out in
+  parts: the client gets the first bytes early. At most 1 MB of it waits
+  in memory. Dart reads more of the file only when the client has read
+  what was sent. When the client leaves, Dart stops reading.</li>
+<li>A request body of 64 KB or more goes to Dart without a copy.</li>
+<li><code>compress: true</code> works: Rust gzips the body on another thread, so the
+  isolate does not wait. A streamed response is not compressed.</li>
 </ul>
 <h2 id="where-the-library-comes-from">Where the library comes from</h2>
 <p>The build hook of <code>dox_http_native</code> (<code>hook/build.dart</code>) picks the first one

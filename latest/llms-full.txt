@@ -2367,7 +2367,7 @@ No package is marked "stable API" yet. That comes with 3.0 stable.
 | `dox_openapi` | OpenAPI 3.1 document and a docs page | May change | 4 test files |
 | `dox_websocket` | WebSocket routes and events | May change | 4 test files, with Redis in CI |
 | `dox_socketio` | Socket.IO v4 server with a Redis adapter | May change | 6 test files, with the real `socket.io-client` in CI |
-| `dox_http_native` | Native HTTP/1.1 server (Rust hyper), the default server | Experimental | 2 Dart test files and Rust tests. No WebSocket yet. Big responses are held in memory. |
+| `dox_http_native` | Native HTTP/1.1 server (Rust hyper), the default server | Experimental | 2 Dart test files and Rust tests. No WebSocket yet. |
 | `dox_postgres_native` | Native Postgres client (Rust tokio-postgres), the default Postgres driver | Experimental | 1 Dart test file, plus the `dox_orm` tests. No TLS yet. |
 | `dox_mysql_native` | Native MySQL and MariaDB client (Rust mysql_async), the default MySQL driver | Experimental | 1 Dart test file, plus the `dox_orm` tests |
 
@@ -2399,7 +2399,6 @@ These were checked by searching the code in `packages/*/lib` with `rg`.
 
 | Item | Source |
 | --- | --- |
-| Stream big responses to the socket on the native server. Today a big file is held in memory. | `ponytail:` note in `dox_http_native/lib/src/response.dart` |
 | TLS for the native Postgres driver | `ponytail:` note in `dox_orm/lib/src/drivers/postgres_native_driver.dart` |
 | Savepoints for nested transactions. Today a nested `transaction()` joins the outer one. | `ponytail:` notes in the `dox_orm` drivers and in `dox_migration` |
 | A queue package (`dox_queue`) | Wanted by the owner. Not started. |
@@ -5847,6 +5846,11 @@ Each isolate runs its own server on the same port:
 - macOS: the isolates share one socket.
 - Windows: only one isolate serves HTTP.
 
+The OS spreads connections, not requests. A keep-alive connection stays on
+one isolate. So a few busy connections (eg. from one proxy or a load test
+with few connections) can keep some isolates idle. Use more connections
+than isolates.
+
 ## When the library does not load
 
 Dox stops at start, before any isolate runs. The error says why and how to
@@ -5901,10 +5905,14 @@ a gain.
   `413`. Dart checks the limits again.
 - A client that sends no body bytes for 120 seconds (idle time) gets `408`.
   A slow but steady upload is fine.
-- A response is sent when it is closed. It is kept in memory until then,
-  also a big file. Use a proxy (nginx, Caddy) or a storage link for big
-  downloads.
-- `compress: true` works: Dart gzips the body.
+- A small response is sent in one piece when it is closed. A streamed
+  response (a file, a download, any `Stream`) over 64 KB goes out in
+  parts: the client gets the first bytes early. At most 1 MB of it waits
+  in memory. Dart reads more of the file only when the client has read
+  what was sent. When the client leaves, Dart stops reading.
+- A request body of 64 KB or more goes to Dart without a copy.
+- `compress: true` works: Rust gzips the body on another thread, so the
+  isolate does not wait. A streamed response is not compressed.
 
 ## Where the library comes from
 
@@ -15195,7 +15203,7 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `serverPort` | `int` | `3000` | The port the HTTP server listens on. When the env has no `APP_PORT` but has `PORT`, Dox listens on `PORT` instead (Cloud Run, Fly, Render and Heroku set it). |
 | `host` | `String?` | `null`: `APP_HOST`, else all interfaces | The network interface to listen on, like `127.0.0.1`. `null` reads the env var `APP_HOST`. With neither, Dox listens on all interfaces, IPv6 and IPv4 (`::`). |
 | `totalIsolate` | `int?` | `Platform.numberOfProcessors` | Isolates (threads) that serve HTTP, all on the same port. On Windows the native server runs on one isolate. |
-| `compress` | `bool` | `false` | gzip responses in Dart (`HttpServer.autoCompress`). It costs CPU on every response. Let a proxy do it when you have one. |
+| `compress` | `bool` | `false` | gzip responses (`HttpServer.autoCompress`). Rust gzips on its own thread, not on the isolate. It still costs CPU on every response. Let a proxy do it when you have one. |
 | `maxBodySize` | `int` | `10 * 1024 * 1024` (10 MB) | Biggest JSON or urlencoded body in bytes. Bigger gets `413`. |
 | `maxMultipartSize` | `int` | `100 * 1024 * 1024` (100 MB) | Biggest `multipart/form-data` body (file uploads) in bytes. Bigger gets `413`. |
 | `bodyTimeout` | `Duration` | `Duration(seconds: 120)` | A client that sends no body bytes for this long gets `408`. A slow but steady upload is fine. Native server only. |
@@ -17414,6 +17422,14 @@ What changed in each package, newest first. This page is made from the
 ## dox_http_native
 
 ### Unreleased
+
+- New: a streamed response (`addStream`, eg. a file or a download) over 64 KB goes out in parts. Before, the whole body was kept in memory until `close()`, and the client got nothing until then. Now the client gets the first bytes early, and at most 1 MB waits in Rust. Dart reads more only when the client has read what was sent. When the client leaves, `addStream` stops reading the source. A small response still goes out in one piece. A streamed response with `contentLength` set sends `Content-Length`, else it is chunked.
+- Perf: a request body of 64 KB or more goes to Dart without a copy (external typed data). Before, it was copied 3 times.
+- Perf: `compress: true` gzips on a Rust thread, not on the isolate. Same output (gzip, default level). A streamed response is not compressed.
+- Perf: a response with the default headers and one content type (eg. JSON) copies no headers, and its header bytes are cached.
+- Perf: request headers are parsed into a map on the second lookup, not scanned again and again.
+- Perf: a request path with no query skips the full `Uri.parse`. Rust takes the lock of the answers once per batch.
+- Breaking: native ABI 6 (streamed body records, gzip flag, big bodies as their own part of the message). Needs a new native library build. The build hook builds it with cargo until the next release.
 
 - New: WebSocket upgrade on the native server. `NativeWebSocket.upgrade(request, protocol: ..., maxMessageSize: ...)` accepts it and gives a `dart:io` `WebSocket`. Rust (tokio-tungstenite) speaks the protocol: ping and pong, the close handshake, the UTF-8 check and the size limit (a bigger message closes with `1009`). Compression is never agreed. `NativeWebSocket.isUpgradeRequest(request)` tells if a request asks for one.
 - On a graceful `close()`, open WebSockets get close code `1001`.

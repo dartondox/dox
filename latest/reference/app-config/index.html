@@ -4159,7 +4159,7 @@ This page lists every field, with its type, its default and what it does.</p>
 <td><code>compress</code></td>
 <td><code>bool</code></td>
 <td><code>false</code></td>
-<td>gzip responses in Dart (<code>HttpServer.autoCompress</code>). It costs CPU on every response. Let a proxy do it when you have one.</td>
+<td>gzip responses (<code>HttpServer.autoCompress</code>). Rust gzips on its own thread, not on the isolate. It still costs CPU on every response. Let a proxy do it when you have one.</td>
 </tr>
 <tr>
 <td><code>maxBodySize</code></td>
