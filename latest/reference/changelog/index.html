@@ -5955,6 +5955,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha13" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6115,7 +6126,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
+  <a href="#unreleased_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -6284,6 +6295,17 @@
   
     <nav class="md-nav" aria-label="dox_builder">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha13_2" class="md-nav__link">
@@ -6606,7 +6628,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_1" class="md-nav__link">
+  <a href="#unreleased_3" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -6777,7 +6799,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_2" class="md-nav__link">
+  <a href="#unreleased_4" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -6946,6 +6968,17 @@
   
     <nav class="md-nav" aria-label="dox_openapi">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha13_6" class="md-nav__link">
@@ -7310,6 +7343,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha13" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7470,7 +7514,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
+  <a href="#unreleased_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -7639,6 +7683,17 @@
   
     <nav class="md-nav" aria-label="dox_builder">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha13_2" class="md-nav__link">
@@ -7961,7 +8016,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_1" class="md-nav__link">
+  <a href="#unreleased_3" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -8132,7 +8187,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased_2" class="md-nav__link">
+  <a href="#unreleased_4" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -8301,6 +8356,17 @@
   
     <nav class="md-nav" aria-label="dox_openapi">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha13_6" class="md-nav__link">
@@ -8631,6 +8697,10 @@
 <p>What changed in each package, newest first. This page is made from the
 <code>CHANGELOG.md</code> files in the repo when the docs are built.</p>
 <h2 id="dox_annotation">dox_annotation</h2>
+<h3 id="unreleased">Unreleased</h3>
+<ul>
+<li>New: <code>@Security.bearer(format: 'API key')</code> and <code>@Security.apiKey(header: 'X-API-Key')</code>. Put it above a middleware class to show its login scheme in the OpenAPI docs.</li>
+</ul>
 <h3 id="300-alpha13">3.0.0-alpha.13</h3>
 <ul>
 <li>Version bump only, to match the other packages.</li>
@@ -8694,7 +8764,7 @@
 <li>See the <a href="https://github.com/dartondox/dox/pull/112">release notes</a> for all main changes.</li>
 </ul>
 <h2 id="dox_auth">dox_auth</h2>
-<h3 id="unreleased">Unreleased</h3>
+<h3 id="unreleased_1">Unreleased</h3>
 <ul>
 <li>New: <code>Auth().setUser(req, user)</code> sets the logged-in user on <code>req.auth</code>, with no token and no password check. Use it in your own auth middleware, like an API key check.</li>
 <li>Docs: how to write a custom guard. Extend <code>AuthDriver</code>, return the user from <code>verifyToken</code>, and use <code>AuthMiddleware(guard: 'api')</code>. The README and the authentication page show an API key example.</li>
@@ -8772,6 +8842,10 @@
 <li><code>dart_jsonwebtoken</code> 3.</li>
 </ul>
 <h2 id="dox_builder">dox_builder</h2>
+<h3 id="unreleased_2">Unreleased</h3>
+<ul>
+<li>New: the openapi builder reads <code>@Security</code> on middleware classes and writes them to <code>OpenApiRegistry.security</code>.</li>
+</ul>
 <h3 id="300-alpha13_2">3.0.0-alpha.13</h3>
 <ul>
 <li>Version bump only, to match the other packages.</li>
@@ -8919,7 +8993,7 @@
 <li><code>remember</code>, <code>pull</code>, <code>add</code>, <code>increment</code>, <code>many</code>, tags and atomic locks.</li>
 </ul>
 <h2 id="dox">dox</h2>
-<h3 id="unreleased_1">Unreleased</h3>
+<h3 id="unreleased_3">Unreleased</h3>
 <ul>
 <li>Fix: <code>dox make:migration</code> run more than once in the same second gave files with the same timestamp. Then the run order depended only on the name, which could break foreign keys. Now each new migration (<code>.dart</code> or <code>.sql</code>) sorts after every file already in <code>db/migration</code>. When needed, it uses the newest time plus 1 second.</li>
 </ul>
@@ -9004,13 +9078,17 @@
 <li>Generated models import <code>package:dox_orm/dox_orm.dart</code>.</li>
 </ul>
 <h2 id="dox_core">dox_core</h2>
-<h3 id="unreleased_2">Unreleased</h3>
+<h3 id="unreleased_4">Unreleased</h3>
 <ul>
 <li>Fix: <code>AUTH_REQUEST_KEY</code> is now only in <code>dox_core</code>, so importing <code>dox_core</code> and <code>dox_auth</code> together no longer gives an "ambiguous import" error.</li>
 <li>Fix: <code>response(x).header('Content-Type', 'image/svg+xml')</code> failed with "More than one value for header content-type". The default <code>text/plain</code> stayed next to the new type. Now <code>header()</code> replaces the content type, the same as <code>contentType()</code>. The name can be in any case.</li>
 <li>Fix: when sending the error answer failed too, the client got no answer and waited until the timeout. Now Dox reports the error and sends a plain 500. When the head is already sent, it closes the response.</li>
 <li>New: <code>.env.testing</code>. When the app runs its tests (<code>dart test</code>, or a real <code>APP_ENV=testing</code>), Dox reads <code>.env.testing</code> on top of <code>.env</code>. Its keys win over <code>.env</code>. A real environment variable still wins over both. It works for <code>Env.get()</code> and the typed <code>AppEnv.load()</code>. Use it for a test database: <code>DB_NAME=my_app_test</code>. New <code>Env.isTesting</code>, and <code>Env().load(testing: true)</code>.</li>
 <li>New: <code>DoxTestClient.withSession()</code> gives a test client that works like a browser. It keeps the cookies of every response, removes deleted or expired ones, and sends the <code>XSRF-TOKEN</code> cookie back in <code>X-XSRF-TOKEN</code> on <code>POST</code>, <code>PUT</code>, <code>PATCH</code> and <code>DELETE</code>. It does not follow redirects. <code>client.cookies</code> gives the kept cookies. The normal client does not change.</li>
+<li>Fix: <code>OpenApiConfig(enabled: null)</code> now treats an empty <code>APP_ENV</code> as <code>development</code>, the same default as <code>appEnv</code> of the typed env. Before, <code>/docs</code> was off when <code>APP_ENV</code> was not set (for example in CI). Set <code>APP_ENV=production</code> in production.</li>
+<li>Change: an empty <code>APP_ENV</code> means production everywhere in Dox: <code>/docs</code> is off, the 500 error text is hidden and a bad <code>APP_KEY</code> stops the app. Set <code>APP_ENV=development</code> in your <code>.env</code> and in CI. The <code>appEnv</code> default of the typed env in the docs and examples is now <code>production</code> too (was <code>development</code>).</li>
+<li>New: <code>@Security</code> on a middleware class sets the login scheme of its routes in the OpenAPI docs. <code>OpenApiConfig.securityByMiddleware</code> still wins over it.</li>
+<li>Change: a middleware class name that ends with <code>AuthMiddleware</code> (and has no <code>@Security</code>) now gets a <code>bearerAuth</code> scheme with no <code>bearerFormat</code>. Before, the docs called every such token a JWT.</li>
 </ul>
 <h3 id="300-alpha13_5">3.0.0-alpha.13</h3>
 <ul>
@@ -9198,6 +9276,10 @@
 <li><code>uuid</code> 4 and <code>mime</code> 2.</li>
 </ul>
 <h2 id="dox_openapi">dox_openapi</h2>
+<h3 id="unreleased_5">Unreleased</h3>
+<ul>
+<li>New: <code>OpenApiSecurity</code> and <code>OpenApiRegistry.security</code>: login schemes by middleware class name, from <code>@Security</code>.</li>
+</ul>
 <h3 id="300-alpha13_6">3.0.0-alpha.13</h3>
 <ul>
 <li>Version bump only, to match the other packages.</li>

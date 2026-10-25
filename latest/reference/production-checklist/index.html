@@ -6191,6 +6191,7 @@
 <p>Check each item before you deploy.</p>
 <p>Items marked <strong>Dox limit</strong> are things Dox does not do for you. You must handle them outside Dox.</p>
 <h2 id="secrets-and-config">Secrets and config</h2>
+<p>If <code>APP_ENV</code> is not set, Dox treats the app as production: <code>/docs</code> is off and error details are hidden. Set <code>APP_ENV=development</code> in your <code>.env</code> and in CI.</p>
 <table>
 <thead>
 <tr>
@@ -6316,7 +6317,7 @@
 </tr>
 <tr>
 <td>OpenAPI docs</td>
-<td>Off in production by default (on only for <code>APP_ENV</code> <code>development</code> or <code>local</code>). Do not set <code>enabled: true</code> for a private API.</td>
+<td>Off unless <code>APP_ENV</code> is <code>development</code> or <code>local</code>. Do not set <code>enabled: true</code> for a private API.</td>
 <td><a href="../../packages/openapi/">OpenAPI</a></td>
 </tr>
 </tbody>

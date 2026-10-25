@@ -12933,6 +12933,8 @@ AppConfig appConfig = AppConfig(
 | `include` | `[]` (all routes) | only these paths go in the docs, like `['/api/*']` |
 | `exclude` | `[]` | these paths are left out, like `['/api/internal/*']` |
 
+If `APP_ENV` is not set, Dox treats the app as production: `/docs` is off and error details are hidden. Set `APP_ENV=development` in your `.env` and in CI.
+
 ### 3. Open `/docs`
 
 Start the app and open `http://localhost:3000/docs`.
@@ -13034,7 +13036,7 @@ Blog:
 | description | the rest of the `///` comment |
 | request | see [Request](#request) below |
 | 200 answer | the return type, see [Response](#response) below |
-| `401` and `bearerAuth` | a middleware whose class name ends with `AuthMiddleware` |
+| `401` and a login scheme | `@Security` on a middleware class, or a middleware whose class name ends with `AuthMiddleware`. See [Login schemes](#login-schemes) |
 | `404` | the path has a `{param}` |
 | `422` | the route has a request class. The body is `{field: message}` |
 | `500` | every route |
@@ -13133,8 +13135,32 @@ Only `@Response` has none, because `response()` is already a `dox_core` helper.
 
 ### Login schemes
 
-A middleware whose class name ends with `AuthMiddleware` adds `bearerAuth` (a JWT bearer token) by itself.
-For other middleware, or another scheme, set it in the config:
+Put `@Security` above a middleware class. Every route with this middleware gets the scheme in the docs.
+Run `dart run build_runner build` after you add it.
+
+```dart
+/// `Authorization: Bearer <api key>`. Not a JWT.
+@Security.bearer(format: 'API key')
+class ApiKeyAuthMiddleware implements IDoxMiddleware { ... }
+
+/// `X-API-Key: <key>`
+@Security.apiKey(header: 'X-API-Key')
+class HeaderKeyMiddleware implements IDoxMiddleware { ... }
+```
+
+| Annotation | Scheme in the docs |
+| --- | --- |
+| `@Security.bearer()` | `type: http`, `scheme: bearer`, no format |
+| `@Security.bearer(format: 'JWT')` | the same, with `bearerFormat: JWT` |
+| `@Security.apiKey(header: 'X-API-Key')` | `type: apiKey`, `in: header`, `name: X-API-Key`. The default header is `X-API-Key` |
+
+The scheme name is the class name without `Middleware`, with a small first letter: `ApiKeyAuthMiddleware` gives `apiKeyAuth`.
+Use `scheme: 'myName'` to pick another name.
+
+A middleware without `@Security` whose class name ends with `AuthMiddleware` gets `bearerAuth`: a bearer token with no format, because Dox can not know if it is a JWT.
+
+For a key in the query or a cookie, or to change a scheme without the builder, set it in the config.
+The config wins over `@Security`:
 
 ```dart
 OpenApiConfig(
@@ -13158,8 +13184,9 @@ If there is no match, it picks the only method with that name and the same argum
 Group prefixes (like `api/`) do not matter.
 
 !!! tip
-    If two controllers have a method with the same name, register the routes with
-    `Route.get('path', controller.method)` so the builder can see them.
+    Two controllers can have a method with the same name, like `index`.
+    When the route names the class, like `(LinkController c) => c.index` or `Route.get<LinkController>(...)`,
+    only methods of that class match. With a plain `links.index`, the path of the route call decides.
 
 ### Write the files: `dox openapi:generate`
 
@@ -15383,8 +15410,8 @@ abstract class AppEnv {
 
   String get appName => 'dox';
 
-  /// development, staging or production
-  String get appEnv => 'development';
+  /// development, staging or production. Not set: production.
+  String get appEnv => 'production';
 
   bool get isDevelopment => appEnv == 'development';
 
@@ -17753,7 +17780,7 @@ OpenApiConfig openApi = OpenApiConfig(
 );
 ```
 
-Docs at `/docs`, `/openapi.json`, `/openapi.yaml`. On only when `APP_ENV` is `development` or `local`, unless `enabled: true`. Change one route with `@Summary`, `@Tags`, `@Request(T)`, `@Response(200, T)`, `@ApiIgnore()`.
+Docs at `/docs`, `/openapi.json`, `/openapi.yaml`. On only when `APP_ENV` is `development` or `local`, unless `enabled` is set. Not set means production. `@Security.bearer(format: 'API key')` above a middleware class shows its login scheme. Change one route with `@Summary`, `@Tags`, `@Request(T)`, `@Response(200, T)`, `@ApiIgnore()`.
 
 See [OpenAPI](../packages/openapi.md).
 
@@ -17930,11 +17957,11 @@ Source: `packages/dox-core/lib/openapi/openapi_config.dart`.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `enabled` | `bool?` | `null` | Serve the docs routes. `null` means: on only when `APP_ENV` is `development` or `local`. |
+| `enabled` | `bool?` | `null` | Serve the docs routes. `null` means: on only when `APP_ENV` is `development` or `local`. An empty `APP_ENV` counts as production. |
 | `info` | `Info` | `Info(title: 'Dox API', version: '1.0.0')` | Title and version of the API. |
 | `servers` | `List<Server>` | `[]` | Base URLs of the API. |
 | `securitySchemes` | `Map<String, SecurityScheme>` | `{}` | Ways to log in, like `{'bearerAuth': SecurityScheme.bearer()}`. |
-| `securityByMiddleware` | `Map<String, List<Map<String, List<String>>>>` | `{}` | Security for routes that use a middleware class with this name. `AuthMiddleware` gets `bearerAuth` when it is not in the map. |
+| `securityByMiddleware` | `Map<String, List<Map<String, List<String>>>>` | `{}` | Security for routes that use a middleware class with this name. It wins over `@Security` on the class. A class name that ends with `AuthMiddleware` gets `bearerAuth` when it has neither. |
 | `registry` | `OpenApiRegistry` | `OpenApiRegistry()` (empty) | What `dox_builder` found in the code. Pass `openApiRegistry` from `lib/generated/openapi.g.dart`. |
 | `ui` | `DocsUi` | `DocsUi.scalar` | `scalar` or `swagger`. |
 | `scalar` | `ScalarOptions` | `ScalarOptions()` | Options of the Scalar page. See below. |
@@ -18676,6 +18703,8 @@ The code reads env vars in three ways:
 
 ## Read by the framework
 
+If `APP_ENV` is not set, Dox treats the app as production: `/docs` is off and error details are hidden. Set `APP_ENV=development` in your `.env` and in CI.
+
 | Variable | Who reads it | Default | Meaning | Example |
 | --- | --- | --- | --- | --- |
 | `APP_ENV` | `dox_core` (`Dox().checkAppKey()`, `OpenApiConfig.isEnabled`) | empty | Any value except `development`, `local` or `test` (also empty) makes a bad `APP_KEY` a startup error: missing, not exactly 32 characters, or a public sample key. In `development`, `local` and `test` it is only a warning. `development` or `local` turn the `/docs` routes on when `openApi.enabled` is `null`. Read with `Env.get`. | `APP_ENV=production` |
@@ -18700,7 +18729,7 @@ A new project (`dox create`) reads these keys through its typed env class, `lib/
 | Variable | Getter | Type | Default | Used for |
 | --- | --- | --- | --- | --- |
 | `APP_NAME` | `appName` | `String` | `dox` | `LoggerConfig.name`. |
-| `APP_ENV` | `appEnv` | `String` | `development` | `development`, `staging` or `production`. `env.isDevelopment` is `true` for `development`. It turns on `prettyPrint` of the logger and the query log of the database. Also read by the framework (see above). |
+| `APP_ENV` | `appEnv` | `String` | `production` | `development`, `staging` or `production`. `env.isDevelopment` is `true` for `development`. It turns on `prettyPrint` of the logger and the query log of the database. Also read by the framework (see above). |
 | `APP_PORT` | `appPort` | `int` | `3000` | `AppConfig.serverPort`. When `APP_PORT` is not set, Dox listens on `PORT` if the env has it. |
 | `APP_KEY` | `appKey` | `String` | required | `AppConfig.appKey`. It must be exactly 32 characters. Run `dox key:generate` for one. The app stops at start when it is missing, has another length, or is a public sample key (only a warning in `development`, `local` and `test`). |
 | `APP_TOTAL_ISOLATE` | `appTotalIsolate` | `int?` | not set: one per CPU core | `AppConfig.totalIsolate`. |
@@ -18990,6 +19019,8 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 
 ## Secrets and config
 
+If `APP_ENV` is not set, Dox treats the app as production: `/docs` is off and error details are hidden. Set `APP_ENV=development` in your `.env` and in CI.
+
 | Check | How | Read more |
 | --- | --- | --- |
 | `APP_KEY` is set, 32 characters and secret | `dox key:generate`, or a random value of exactly 32 characters in the real env. It signs JWT tokens and encrypts cookies. Never use the value from `.env.example`. | [Encryption](../security/encryption.md) |
@@ -19020,7 +19051,7 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | Rate limiting | Add `RateLimit(...)` to login and other busy routes. Use a Redis cache store, so all servers share the counts. Or limit at the proxy, see [below](#rate-limit-at-the-proxy). | [Rate limiting](../security/rate-limiting.md) |
 | Security headers | Add `const SecurityHeaders()` to `globalMiddleware`. | [Security headers](../security/security-headers.md) |
 | gzip at the proxy | Keep `compress: false`. Turn on gzip in Caddy (`encode gzip`) or nginx (`gzip on;`). | [Performance](../digging-deeper/performance.md) |
-| OpenAPI docs | Off in production by default (on only for `APP_ENV` `development` or `local`). Do not set `enabled: true` for a private API. | [OpenAPI](../packages/openapi.md) |
+| OpenAPI docs | Off unless `APP_ENV` is `development` or `local`. Do not set `enabled: true` for a private API. | [OpenAPI](../packages/openapi.md) |
 
 ## Build and run
 
@@ -19597,6 +19628,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
+### Unreleased
+
+- New: `@Security.bearer(format: 'API key')` and `@Security.apiKey(header: 'X-API-Key')`. Put it above a middleware class to show its login scheme in the OpenAPI docs.
+
 ### 3.0.0-alpha.13
 
 - Version bump only, to match the other packages.
@@ -19739,6 +19774,10 @@ What changed in each package, newest first. This page is made from the
 - `dart_jsonwebtoken` 3.
 
 ## dox_builder
+
+### Unreleased
+
+- New: the openapi builder reads `@Security` on middleware classes and writes them to `OpenApiRegistry.security`.
 
 ### 3.0.0-alpha.13
 
@@ -19982,6 +20021,10 @@ What changed in each package, newest first. This page is made from the
 - Fix: when sending the error answer failed too, the client got no answer and waited until the timeout. Now Dox reports the error and sends a plain 500. When the head is already sent, it closes the response.
 - New: `.env.testing`. When the app runs its tests (`dart test`, or a real `APP_ENV=testing`), Dox reads `.env.testing` on top of `.env`. Its keys win over `.env`. A real environment variable still wins over both. It works for `Env.get()` and the typed `AppEnv.load()`. Use it for a test database: `DB_NAME=my_app_test`. New `Env.isTesting`, and `Env().load(testing: true)`.
 - New: `DoxTestClient.withSession()` gives a test client that works like a browser. It keeps the cookies of every response, removes deleted or expired ones, and sends the `XSRF-TOKEN` cookie back in `X-XSRF-TOKEN` on `POST`, `PUT`, `PATCH` and `DELETE`. It does not follow redirects. `client.cookies` gives the kept cookies. The normal client does not change.
+- Fix: `OpenApiConfig(enabled: null)` now treats an empty `APP_ENV` as `development`, the same default as `appEnv` of the typed env. Before, `/docs` was off when `APP_ENV` was not set (for example in CI). Set `APP_ENV=production` in production.
+- Change: an empty `APP_ENV` means production everywhere in Dox: `/docs` is off, the 500 error text is hidden and a bad `APP_KEY` stops the app. Set `APP_ENV=development` in your `.env` and in CI. The `appEnv` default of the typed env in the docs and examples is now `production` too (was `development`).
+- New: `@Security` on a middleware class sets the login scheme of its routes in the OpenAPI docs. `OpenApiConfig.securityByMiddleware` still wins over it.
+- Change: a middleware class name that ends with `AuthMiddleware` (and has no `@Security`) now gets a `bearerAuth` scheme with no `bearerFormat`. Before, the docs called every such token a JWT.
 
 ### 3.0.0-alpha.13
 
@@ -20170,6 +20213,10 @@ What changed in each package, newest first. This page is made from the
 - `uuid` 4 and `mime` 2.
 
 ## dox_openapi
+
+### Unreleased
+
+- New: `OpenApiSecurity` and `OpenApiRegistry.security`: login schemes by middleware class name, from `@Security`.
 
 ### 3.0.0-alpha.13
 

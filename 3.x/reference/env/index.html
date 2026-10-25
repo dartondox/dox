@@ -6089,6 +6089,7 @@
 <li><code>dox_migration</code> has its own <code>loadEnv()</code>: it reads <code>.env</code> and the real environment. A real environment variable wins, the same as <code>Env.get()</code>.</li>
 </ul>
 <h2 id="read-by-the-framework">Read by the framework</h2>
+<p>If <code>APP_ENV</code> is not set, Dox treats the app as production: <code>/docs</code> is off and error details are hidden. Set <code>APP_ENV=development</code> in your <code>.env</code> and in CI.</p>
 <table>
 <thead>
 <tr>
@@ -6224,7 +6225,7 @@
 <td><code>APP_ENV</code></td>
 <td><code>appEnv</code></td>
 <td><code>String</code></td>
-<td><code>development</code></td>
+<td><code>production</code></td>
 <td><code>development</code>, <code>staging</code> or <code>production</code>. <code>env.isDevelopment</code> is <code>true</code> for <code>development</code>. It turns on <code>prettyPrint</code> of the logger and the query log of the database. Also read by the framework (see above).</td>
 </tr>
 <tr>
