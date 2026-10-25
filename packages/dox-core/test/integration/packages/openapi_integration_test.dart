@@ -311,6 +311,17 @@ void main() {
     ]);
   });
 
+  test('include and exclude pick the routes by path', () {
+    Map<String, dynamic> doc = OpenApiDocument(
+      const OpenApiConfig(
+        registry: registry,
+        include: <String>['/api/*', '/web-auth/*'],
+        exclude: <String>['/web-auth/login'],
+      ),
+    ).build(Route().routes).toJson();
+    expect(doc['paths'].keys, <String>['/api/auth/login']);
+  });
+
   test('YAML and JSON give the same document', () async {
     http.Response json = await http.get(Uri.parse('$baseUrl/openapi.json'));
     http.Response yaml = await http.get(Uri.parse('$baseUrl/openapi.yaml'));

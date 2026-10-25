@@ -1,4 +1,5 @@
 import 'package:dox_core/env/env.dart';
+import 'package:dox_core/utils/path_pattern.dart';
 import 'package:dox_openapi/dox_openapi.dart';
 
 /// OpenAPI docs for the app: `/docs`, `/openapi.json` and `/openapi.yaml`.
@@ -47,6 +48,15 @@ class OpenApiConfig {
   /// Title of the `/docs` page. Uses [Info.title] when null.
   final String? pageTitle;
 
+  /// Only routes with these paths are in the docs, like
+  /// `<String>['/api/*']`. A `*` at the end matches the rest of the
+  /// path. When empty, all routes are in the docs.
+  final List<String> include;
+
+  /// Routes with these paths are left out of the docs, like
+  /// `<String>['/api/internal/*']`. Checked after [include].
+  final List<String> exclude;
+
   const OpenApiConfig({
     this.enabled,
     this.info = const Info(title: 'Dox API', version: '1.0.0'),
@@ -58,7 +68,15 @@ class OpenApiConfig {
     this.ui = DocsUi.scalar,
     this.scalar = const ScalarOptions(),
     this.pageTitle,
+    this.include = const <String>[],
+    this.exclude = const <String>[],
   });
+
+  /// true when the route at [path] goes in the docs
+  bool documents(String path) {
+    if (include.isNotEmpty && !PathPattern.any(include, path)) return false;
+    return !PathPattern.any(exclude, path);
+  }
 
   /// true when the docs routes are served
   bool get isEnabled {

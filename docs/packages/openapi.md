@@ -54,6 +54,8 @@ AppConfig appConfig = AppConfig(
 | `ui` | `DocsUi.scalar` | the docs page: `DocsUi.scalar` or `DocsUi.swagger` |
 | `scalar` | `ScalarOptions()` | see [The docs page](#the-docs-page) |
 | `pageTitle` | `info.title` | title of the `/docs` page |
+| `include` | `[]` (all routes) | only these paths go in the docs, like `['/api/*']` |
+| `exclude` | `[]` | these paths are left out, like `['/api/internal/*']` |
 
 ### 3. Open `/docs`
 
@@ -245,7 +247,7 @@ Future<dynamic> login(DoxRequest req) async { ... }
 | `@Query(T)` | the request class, always the query |
 | `@Response(status, Type, description: '')` | one answer. Add more than one for more codes. With a `2xx` one, the return type is not used |
 | `@ApiDeprecated()` | marks the route as deprecated. Dart `@Deprecated` works too |
-| `@ApiIgnore()` | leaves the method (or the whole class) out of the docs |
+| `@ApiIgnore()` | leaves the method (or the whole class) out of the docs. To leave out routes by path, use `include` and `exclude` in `OpenApiConfig` |
 | `@DoxController(tag: 'Users')` | for a class that the builder can not see in a `Route.get(...)` call |
 
 The `Type` of `@Response` can be a model, `List<User>`, a `@Dto`, a `Serializer` or a basic type like `String`.

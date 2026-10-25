@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/utils/path_pattern.dart';
 
 /// Gives each request a session (`req.session`) and saves it after the
 /// controller. Settings come from `AppConfig.session`.
@@ -174,17 +175,7 @@ class CsrfMiddleware implements IDoxNextMiddleware {
     return res;
   }
 
-  bool _excluded(String path) {
-    for (String pattern in except) {
-      String rule = pattern.startsWith('/') ? pattern : '/$pattern';
-      if (rule.endsWith('*')) {
-        if (path.startsWith(rule.substring(0, rule.length - 1))) return true;
-      } else if (path == rule) {
-        return true;
-      }
-    }
-    return false;
-  }
+  bool _excluded(String path) => PathPattern.any(except, path);
 
   static String? _given(DoxRequest req) {
     Object? field = req.input('_token');
