@@ -17828,7 +17828,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
-### Unreleased
+### 3.0.0-alpha.9
 
 - New: `@Inject()`. Put it above a class and `dox_builder` adds the class to the Dox container. `@Inject(singleton: false)` makes a new instance each time.
 
@@ -17875,6 +17875,10 @@ What changed in each package, newest first. This page is made from the
 - See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
 
 ## dox_auth
+
+### 3.0.0-alpha.9
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.8
 
@@ -17926,7 +17930,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_builder
 
-### Unreleased
+### 3.0.0-alpha.9
 
 - New: `lib/container.g.dart` builder. It finds every `@Inject()` class, every class that extends `Router`, every class that implements `DoxService` and every `@DoxModel` in `lib/`. It writes `registerContainer(IocContainer c)`, which makes each class with its constructor. Constructor parameters come from the container by type. Optional parameters that the container can not give keep their default. Required nullable ones get `null`.
 - The build stops with a clear message for a required parameter the container can not give, for a dependency cycle (it shows the chain, like `A -> B -> A`), and for an abstract or generic `@Inject()` class. Two classes with the same name work: every import has a prefix.
@@ -17989,6 +17993,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### 3.0.0-alpha.9
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.8
 
 - Version bump only, to match the other packages.
@@ -18038,7 +18046,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox
 
-### Unreleased
+### 3.0.0-alpha.9
 
 - `dox make:controller` (`create:controller`) writes `@Inject()` above the class, and no global controller instance. The file shows the typed route to use. The command says to run `build_runner`.
 - New `dox make:factory <model>`: makes `db/factories/<model>.factory.dart`.
@@ -18098,7 +18106,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_core
 
-### Unreleased
+### 3.0.0-alpha.9
 
 - New: a real IoC container. `IocContainer` (`Dox().ioc`) has `get<T>()`, `has<T>()`, `singleton<T>()`, `factory<T>()`, `instance<T>()`, `override<T>()` and `clearOverrides()`. Each isolate has its own container: a singleton is one instance per isolate, made on first use.
 - New: `AppConfig(container: registerContainer)` with the function from `lib/container.g.dart` (made by `dox_builder`). Every isolate runs it. The routers and services it finds are registered for you, so `AppConfig.routers` and `AppConfig.services` can stay empty. The ones you list there still work and come first.
@@ -18257,7 +18265,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_migration
 
-### Unreleased
+### 3.0.0-alpha.9
 
 - New `Seeder` and `SeederRunner`. A seeder puts data in the database. `call()` runs other seeders. `SeederRunner(seeders: seeders).run(args)` runs `DatabaseSeeder`, or another one with `--class=<name>`, in one transaction. It reads the database from `.env`, the same as the migrations.
 - New `Migrator.fresh()` and the `fresh` command of `Migrator.run()`. It drops every table of the database, then runs all migrations.
@@ -18316,6 +18324,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_openapi
 
+### 3.0.0-alpha.9
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.8
 
 - Version bump only, to match the other packages.
@@ -18364,7 +18376,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_orm
 
-### Unreleased
+### 3.0.0-alpha.9
 
 - Breaking: the `ModelObserver` methods now have the same names as the model hooks: `onSaving`, `onSaved`, `onCreating`, `onCreated`, `onUpdating`, `onUpdated`, `onDeleting`, `onDeleted`, `onRestoring`, `onRestored`, `onForceDeleting` and `onForceDeleted`. Rename the methods in your observers, for example `created(User user)` to `onCreated(User user)`.
 - New model factories: `import 'package:dox_orm/factory.dart';`. Extend `Factory<User>` and write `definition()`. Then use `count(n)`, `state()`, `sequence()`, `has()`, `make()`, `makeOne()`, `create()` and `createOne()`. See the Factories docs page.
@@ -18477,6 +18489,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_query_builder
 
+### 3.0.0-alpha.9
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.8
 
 - Version bump only, to match the other packages.
@@ -18512,6 +18528,10 @@ What changed in each package, newest first. This page is made from the
 - Please depend on `dox_orm` and change your imports. See the README.
 
 ## dox_socketio
+
+### 3.0.0-alpha.9
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.8
 
@@ -18572,6 +18592,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_storage
 
+### 3.0.0-alpha.9
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.8
 
 - Version bump only, to match the other packages.
@@ -18611,6 +18635,10 @@ What changed in each package, newest first. This page is made from the
 - `DriveManager.fake()` for tests.
 
 ## dox_validation
+
+### 3.0.0-alpha.9
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.8
 
