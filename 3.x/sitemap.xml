@@ -289,6 +289,10 @@
          <lastmod>2026-10-25</lastmod>
     </url>
     <url>
+         <loc>https://dartondox.dev/latest/3.x/security/csrf/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
          <loc>https://dartondox.dev/latest/3.x/security/encryption/</loc>
          <lastmod>2026-10-25</lastmod>
     </url>
@@ -334,6 +338,10 @@
     </url>
     <url>
          <loc>https://dartondox.dev/latest/3.x/the-basic/serializer/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
+         <loc>https://dartondox.dev/latest/3.x/the-basic/session/</loc>
          <lastmod>2026-10-25</lastmod>
     </url>
     <url>

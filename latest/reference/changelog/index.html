@@ -1488,6 +1488,8 @@
       
         
       
+        
+      
     
     
     
@@ -1886,6 +1888,57 @@
     
   
     Middleware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/session/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-fingerprint"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
+  <path d="M2 12a10 10 0 0 1 18-6" />
+  <path d="M2 16h.01" />
+  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
+  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
+  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Session
   
 
     
@@ -3704,6 +3757,8 @@
       
         
       
+        
+      
     
     
     
@@ -3830,6 +3885,51 @@
     
   
     CORS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/csrf/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-octagon-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 16h.01" />
+  <path d="M12 8v4" />
+  <path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    CSRF protection
   
 
     
@@ -6471,6 +6571,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha10_5" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8186,6 +8297,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha10_5" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -9525,6 +9647,17 @@
 <li>Generated models import <code>package:dox_orm/dox_orm.dart</code>.</li>
 </ul>
 <h2 id="dox_core">dox_core</h2>
+<h3 id="unreleased_1">Unreleased</h3>
+<ul>
+<li>New: middleware that runs after the controller. Implement <code>IDoxNextMiddleware</code> (<code>handle(DoxRequest req, Next next)</code>), or use a function <code>(DoxRequest req, Next next)</code>. <code>await next()</code> runs the rest of the middleware and the controller and gives a <code>DoxResponse</code>, so the code after it can change the status, headers and cookies. A thrown error comes back as its error response, so the after part still runs. Before-only middleware work as before. A route with no <code>next</code> middleware takes the same fast path as before.</li>
+<li>New: <code>DoxResponse.status</code> and <code>DoxResponse.headers</code> getters.</li>
+<li>New: <code>redirect(url, status: 302)</code> and <code>back(req, fallback: '/')</code> helpers.</li>
+<li>New: sessions. <code>SessionMiddleware</code> gives each request <code>req.session</code> with <code>get</code>, <code>put</code>, <code>has</code>, <code>forget</code>, <code>all</code>, <code>flush</code>, <code>pull</code>, <code>flash</code>, <code>reflash</code>, <code>keep</code>, <code>regenerate</code>, <code>invalidate</code> and <code>token</code>. <code>AppConfig(session: SessionConfig(...))</code> picks the <code>cookie</code> driver (all data in a cookie, encrypted with AES-GCM, 4 KB limit) or the <code>cache</code> driver (a random id in the cookie, the data in a <code>dox_cache</code> store like <code>redis</code>). The cookie is <code>HttpOnly</code> and <code>SameSite=Lax</code> by default. The cookie driver reads the session on first use. The session is saved, and the cookie sent, only when it changed.</li>
+<li>New: <code>CsrfMiddleware</code>. <code>POST</code>, <code>PUT</code>, <code>PATCH</code> and <code>DELETE</code> requests must send the session token in <code>_token</code>, <code>X-CSRF-TOKEN</code> or <code>X-XSRF-TOKEN</code>, else <code>419</code> (<code>TokenMismatchException</code>). It sets an <code>XSRF-TOKEN</code> cookie that axios and Inertia send back for you. <code>except:</code> skips paths like <code>/api/*</code>.</li>
+<li>New: a validation error on a request with a session that does not want JSON (a form post, an Inertia request) flashes <code>errors</code> and the old input (never password fields), and redirects back. JSON requests still get <code>422</code>. Read them with <code>req.session.errors</code> and <code>req.session.old('email')</code>. <code>req.session.flashErrors(...)</code> does the same by hand. New <code>req.expectsJson()</code> and <code>req.hasSession</code>.</li>
+<li>New: <code>DoxCookie(sameSite: SameSite.lax)</code>.</li>
+<li>New: <code>TestResponse.cookies</code> and <code>DoxTestClient.withCookies(...)</code>, to go on with a session in tests.</li>
+</ul>
 <h3 id="300-alpha10_5">3.0.0-alpha.10</h3>
 <ul>
 <li>Version bump only, to match the other packages.</li>

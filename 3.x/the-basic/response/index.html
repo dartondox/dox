@@ -1492,6 +1492,8 @@
       
         
       
+        
+      
     
     
     
@@ -1775,6 +1777,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#redirect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Redirect
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#cookie" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2021,6 +2034,57 @@
     
   
     Middleware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../session/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-fingerprint"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
+  <path d="M2 12a10 10 0 0 1 18-6" />
+  <path d="M2 16h.01" />
+  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
+  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
+  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Session
   
 
     
@@ -3839,6 +3903,8 @@
       
         
       
+        
+      
     
     
     
@@ -3965,6 +4031,51 @@
     
   
     CORS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/csrf/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-octagon-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 16h.01" />
+  <path d="M12 8v4" />
+  <path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    CSRF protection
   
 
     
@@ -5967,6 +6078,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#redirect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Redirect
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#cookie" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6208,24 +6330,36 @@ All methods return the response, so you can chain them.</p>
 </tr>
 </tbody>
 </table>
+<h2 id="redirect">Redirect</h2>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">// 302 to a path</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">return</span><span class="w"> </span><span class="n">redirect</span><span class="p">(</span><span class="s1">'/login'</span><span class="p">);</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1">// another status</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="k">return</span><span class="w"> </span><span class="n">redirect</span><span class="p">(</span><span class="s1">'/posts'</span><span class="p">,</span><span class="w"> </span><span class="nl">status:</span><span class="w"> </span><span class="m">301</span><span class="p">);</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="c1">// back to the page the request came from (Referer), or '/'</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="k">return</span><span class="w"> </span><span class="n">back</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
+</span></code></pre></div>
+<p>See <a href="../session/#redirect-back-with-errors">Session</a> for flash messages and errors with a redirect.</p>
 <h2 id="cookie">Cookie</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">// set a cookie</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">DoxCookie</span><span class="w"> </span><span class="n">cookie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DoxCookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="s1">'dark'</span><span class="p">);</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="s1">'ok'</span><span class="p">).</span><span class="n">cookie</span><span class="p">(</span><span class="n">cookie</span><span class="p">);</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="c1">// set a cookie with options</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="n">DoxCookie</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DoxCookie</span><span class="p">(</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="s1">'token'</span><span class="p">,</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="s1">'value'</span><span class="p">,</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="nl">maxAge:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">days:</span><span class="w"> </span><span class="m">7</span><span class="p">),</span><span class="w"> </span><span class="c1">// sent as Max-Age in seconds. default 1 hour</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">  </span><span class="nl">httpOnly:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="c1">// default true: page scripts can not read it</span>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">  </span><span class="nl">secure:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">   </span><span class="c1">// default: Secure only when the request came over https</span>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">  </span><span class="nl">path:</span><span class="w"> </span><span class="s1">'/'</span><span class="p">,</span>
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="p">);</span>
-</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="s1">'ok'</span><span class="p">).</span><span class="n">cookie</span><span class="p">(</span><span class="n">token</span><span class="p">);</span>
-</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
-</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="c1">// delete a cookie</span>
-</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="s1">'ok'</span><span class="p">).</span><span class="n">cookie</span><span class="p">(</span><span class="n">DoxCookie</span><span class="p">(</span><span class="s1">'token'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">),</span><span class="w"> </span><span class="nl">setExpire:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// set a cookie</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">DoxCookie</span><span class="w"> </span><span class="n">cookie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DoxCookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="s1">'dark'</span><span class="p">);</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="s1">'ok'</span><span class="p">).</span><span class="n">cookie</span><span class="p">(</span><span class="n">cookie</span><span class="p">);</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="c1">// set a cookie with options</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="n">DoxCookie</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DoxCookie</span><span class="p">(</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="s1">'token'</span><span class="p">,</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="s1">'value'</span><span class="p">,</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span><span class="nl">maxAge:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">days:</span><span class="w"> </span><span class="m">7</span><span class="p">),</span><span class="w"> </span><span class="c1">// sent as Max-Age in seconds. default 1 hour</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span><span class="nl">httpOnly:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="c1">// default true: page scripts can not read it</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">  </span><span class="nl">secure:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">   </span><span class="c1">// default: Secure only when the request came over https</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">  </span><span class="nl">path:</span><span class="w"> </span><span class="s1">'/'</span><span class="p">,</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">  </span><span class="nl">sameSite:</span><span class="w"> </span><span class="n">SameSite</span><span class="p">.</span><span class="n">lax</span><span class="p">,</span><span class="w"> </span><span class="c1">// from dart:io. default: none sent</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="p">);</span>
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="s1">'ok'</span><span class="p">).</span><span class="n">cookie</span><span class="p">(</span><span class="n">token</span><span class="p">);</span>
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="c1">// delete a cookie</span>
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="s1">'ok'</span><span class="p">).</span><span class="n">cookie</span><span class="p">(</span><span class="n">DoxCookie</span><span class="p">(</span><span class="s1">'token'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">),</span><span class="w"> </span><span class="nl">setExpire:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
 </span></code></pre></div>
 <p>To read a cookie, see <a href="../request/#cookies">Request: cookies</a>.</p>
 <div class="admonition info">
@@ -6236,19 +6370,19 @@ and <code>req.cookie(key, decrypt: false)</code> to read it.</p>
 </div>
 <h2 id="change-every-response">Change every response</h2>
 <p>To change every response in one place (for example, to add a header), set a <code>responseHandler</code> in <code>AppConfig</code>.</p>
-<div class="language-dart highlight"><span class="filename">lib/app/http/handler.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ResponseHandler</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ResponseHandlerInterface</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="n">DoxResponse</span><span class="w"> </span><span class="n">handle</span><span class="p">(</span><span class="n">DoxResponse</span><span class="w"> </span><span class="n">res</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">res</span><span class="p">.</span><span class="n">header</span><span class="p">(</span><span class="s1">'X-Powered-By'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Dox'</span><span class="p">);</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="p">}</span>
+<div class="language-dart highlight"><span class="filename">lib/app/http/handler.dart</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ResponseHandler</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ResponseHandlerInterface</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="n">DoxResponse</span><span class="w"> </span><span class="n">handle</span><span class="p">(</span><span class="n">DoxResponse</span><span class="w"> </span><span class="n">res</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">res</span><span class="p">.</span><span class="n">header</span><span class="p">(</span><span class="s1">'X-Powered-By'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Dox'</span><span class="p">);</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="p">}</span>
 </span></code></pre></div>
-<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nl">responseHandler:</span><span class="w"> </span><span class="n">ResponseHandler</span><span class="p">(),</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="p">);</span>
+<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nl">responseHandler:</span><span class="w"> </span><span class="n">ResponseHandler</span><span class="p">(),</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="p">);</span>
 </span></code></pre></div>
 
 

@@ -3221,6 +3221,21 @@ DoxResponse store(DoxRequest req) {
 | `content(value)` | changes the body |
 | `stream(byteStream)` | sends a `Stream<List<int>>` as the body |
 
+## Redirect
+
+```dart
+// 302 to a path
+return redirect('/login');
+
+// another status
+return redirect('/posts', status: 301);
+
+// back to the page the request came from (Referer), or '/'
+return back(req);
+```
+
+See [Session](session.md#redirect-back-with-errors) for flash messages and errors with a redirect.
+
 ## Cookie
 
 ```dart
@@ -3236,6 +3251,7 @@ DoxCookie token = DoxCookie(
   httpOnly: true, // default true: page scripts can not read it
   secure: true,   // default: Secure only when the request came over https
   path: '/',
+  sameSite: SameSite.lax, // from dart:io. default: none sent
 );
 return response('ok').cookie(token);
 
@@ -4051,7 +4067,7 @@ Source: https://dartondox.dev/latest/3.xthe-basic/middleware/
 
 # Middleware
 
-Middleware is code that runs before the controller. Use it for checks like login, logging or rate limits.
+Middleware is code that runs before the controller, and if you want, after it too. Use it for checks like login, logging or rate limits, or to change the response.
 
 ## How it works
 
@@ -4111,10 +4127,55 @@ dynamic apiKeyMiddleware(DoxRequest req) {
 Route.get<WebController>('/ping', <dynamic>[apiKeyMiddleware, (WebController c) => c.pong]);
 ```
 
+## Run code after the controller
+
+A middleware can also get a `next` function. `await next()` runs the rest of the middleware and the controller, and gives the response.
+Code after that line runs after the controller. Change the response, then return it.
+
+```dart title="lib/app/http/middleware/see_other.middleware.dart"
+import 'package:dox_core/dox_core.dart';
+
+/// a redirect after a form post becomes 303, so the browser does a GET
+class SeeOtherMiddleware implements IDoxNextMiddleware {
+  @override
+  Future<DoxResponse> handle(DoxRequest req, Next next) async {
+    // before the controller
+    DoxResponse res = await next();
+    // after the controller
+    if (res.status == 302 && req.httpRequest.method != 'GET') {
+      res.statusCode(303);
+    }
+    return res;
+  }
+}
+```
+
+The response from `next()` is always a `DoxResponse`, so you can use all its methods:
+`statusCode(...)`, `header(...)`, `cookie(...)`, `content(...)`.
+Read the status with `res.status` (`null` means 200) and the headers with `res.headers`.
+
+When the controller (or a later middleware) throws an error, `next()` does not throw.
+It gives the error response from the [ExceptionHandler](errors.md), like a `404` or a `422`. So the code after `next()` always runs.
+
+A function works too. It takes the request and `next`:
+
+```dart
+Future<DoxResponse> timerMiddleware(DoxRequest req, Next next) async {
+  Stopwatch watch = Stopwatch()..start();
+  DoxResponse res = await next();
+  return res.header('X-Time', '${watch.elapsedMilliseconds}ms');
+}
+```
+
+To stop early, return a response and do not call `next()`.
+
+!!! note "Speed"
+    A route with no `next` middleware runs exactly as before. Only routes that have one pay for the extra step.
+
 ## Many middleware on one route
 
 Put them in the list before the controller. They run from left to right.
-You can mix class and function middleware.
+You can mix class and function middleware, with or without `next`.
 
 ```dart
 Route.get<WebController>('/ping', <dynamic>[
@@ -4181,6 +4242,195 @@ flowchart LR
     - `AuthMiddleware` from `dox_auth` checks the JWT token. See [Authentication](../security/authentication.md).
     - `RateLimit` from `dox_core` answers `429` when a client sends too many requests. See [Rate limiting](../security/rate-limiting.md).
     - `SecurityHeaders` from `dox_core` adds safe headers like `X-Frame-Options` to every answer. See [Security headers](../security/security-headers.md).
+    - `SessionMiddleware` from `dox_core` gives each request a session. See [Session](session.md).
+    - `CsrfMiddleware` from `dox_core` stops cross site request forgery. See [CSRF protection](../security/csrf.md).
+
+
+---
+
+# Session
+
+Source: https://dartondox.dev/latest/3.xthe-basic/session/
+
+# Session
+
+A session keeps data for one browser between requests. Use it for web pages: the logged in user, a cart, a "Saved" message after a form post.
+
+An API with tokens does not need a session.
+
+## Turn it on
+
+Add `SessionMiddleware` to `globalMiddleware`, or to the routers or routes that need it.
+Add `CsrfMiddleware` after it. See [CSRF protection](../security/csrf.md).
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  globalMiddleware: <dynamic>[
+    const SessionMiddleware(),
+    const CsrfMiddleware(except: <String>['/api/*']),
+  ],
+  // ...
+);
+```
+
+Now every request has `req.session`. Using `req.session` on a route without the middleware throws an error.
+
+## Use the session
+
+```dart
+// store a value
+req.session.put('cart', <int>[1, 2]);
+
+// read a value, with a default
+List<dynamic> cart = req.session.get('cart', <int>[]);
+
+// is it there (and not null)?
+bool hasCart = req.session.has('cart');
+
+// read and remove
+dynamic cart = req.session.pull('cart');
+
+// remove one value, or all of them
+req.session.forget('cart');
+req.session.flush();
+
+// all values, as a copy
+Map<String, dynamic> all = req.session.all();
+```
+
+Values must be JSON types: `Map`, `List`, `String`, `num`, `bool` or `null`.
+
+## Flash data
+
+Flash data lives for this request and the next one. Use it for a message after a redirect.
+
+```dart
+Route.post('/posts', (DoxRequest req) async {
+  // ... save the post
+  req.session.flash('message', 'The post is saved');
+  return redirect('/posts');
+});
+
+Route.get('/posts', (DoxRequest req) {
+  String? message = req.session.get('message'); // 'The post is saved'
+  // ...
+});
+```
+
+"The next request" means the next request that uses the session. A request that never reads the session (like an image) does not remove it.
+
+To keep flash data for one more request, call `req.session.reflash()`, or `req.session.keep(['message'])` for some keys only.
+
+## Redirect back with errors
+
+`back(req)` redirects to the page the request came from (the `Referer` header), or to `/` when there is none.
+`redirect('/path')` redirects to any path.
+
+When a form post fails validation, Dox does this for you on a route with a session:
+
+1. It flashes the errors as `errors`, like `{'email': 'The email is not valid'}`.
+2. It flashes the old input. Password fields (`password`, `password_confirmation`, `current_password`) and files are never kept.
+3. It redirects back with `302`.
+
+The next page reads them:
+
+```dart
+Route.get('/register', (DoxRequest req) {
+  Map<String, dynamic> errors = req.session.errors; // empty when there are none
+  String? email = req.session.old('email');
+  // ...
+});
+```
+
+A request that wants JSON still gets the normal `422` JSON answer. A request wants JSON when it has an `Accept` header with `json`, a JSON body, or `X-Requested-With: XMLHttpRequest`.
+An Inertia request (it has the `X-Inertia` header) is redirected like a form post.
+
+You can do the same by hand:
+
+```dart
+req.session.flashErrors(<String, String>{'email': 'The email is taken'}, input: req.all());
+return back(req);
+```
+
+## After login and logout
+
+```dart
+// after login: a new session id and a new CSRF token, the data stays
+req.session.regenerate();
+
+// on logout: remove all data and get a new session id
+req.session.invalidate();
+```
+
+Always call `regenerate()` after login. Then an id that someone saw before the login is of no use.
+
+## Config
+
+Set `session` in the app config. All options have a default.
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  session: const SessionConfig(
+    driver: 'cache',
+    store: 'redis',
+    lifetime: Duration(hours: 2),
+  ),
+  // ...
+);
+```
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `driver` | `cookie` | `cookie` or `cache`. See below. |
+| `store` | `null` | The cache store for the `cache` driver, like `redis`, `memory` or `file`. `null` uses the default store of `AppConfig.cache`. |
+| `cookie` | `dox_session` | The name of the session cookie. |
+| `lifetime` | 2 hours | The session ends after this long with no use. |
+| `path` | `/` | `Path` of the cookie. |
+| `domain` | `null` | `Domain` of the cookie. `null` means only the host that set it. |
+| `httpOnly` | `true` | Page scripts can not read the cookie. |
+| `secure` | `null` | `null` sets `Secure` when the request came over https. |
+| `sameSite` | `SameSite.lax` | `SameSite` of the cookie (from `dart:io`). |
+
+You can also give a config to one middleware: `SessionMiddleware(SessionConfig(...))`.
+
+### The cookie driver
+
+All session data is in the cookie, encrypted with AES-GCM and your `APP_KEY`. The browser can not read or change it.
+There is nothing to store on the server.
+
+A cookie can hold about 4 KB. A session that is too big gives an error. Keep the data small (an id, not a whole object), or use the `cache` driver.
+
+### The cache driver
+
+The cookie only has a random session id (encrypted too). The data lives in a cache store.
+Use `redis` when you run more than one isolate or more than one server: then all of them see the same sessions.
+A `memory` store is good for tests. It is not shared between isolates.
+
+## When the session is read and saved
+
+- **The cookie driver reads the session on first use.** A request that never uses `req.session` does not decrypt anything.
+- **The cache driver reads the store before the controller**, but only when the request has a session cookie. A new visitor costs nothing.
+- **The session is saved only when it changed.** Only then is the cookie sent. A session that is used but not changed is saved again after half of its `lifetime`, so it does not end while the user is active.
+
+## Read the session from a package
+
+Other packages (like an Inertia adapter) can read the same data:
+
+```dart
+if (req.hasSession) {
+  Map<String, dynamic> errors = req.session.errors;
+  dynamic message = req.session.get('message');
+}
+```
+
+## Tests
+
+`DoxTestClient` does not keep cookies by itself. Each `TestResponse` has `cookies`, and `withCookies` sends them back:
+
+```dart
+TestResponse first = await client.get('/cart/add?id=1');
+TestResponse second = await client.withCookies(first.cookies).get('/cart');
+```
 
 
 ---
@@ -11455,6 +11705,95 @@ Route.disabledCors(() {
 
 ---
 
+# CSRF protection
+
+Source: https://dartondox.dev/latest/3.xsecurity/csrf/
+
+# CSRF protection
+
+Cross site request forgery (CSRF) is an attack. Another site makes the browser of your user send a form to your app. The browser sends your session cookie with it, so the request looks real.
+
+`CsrfMiddleware` stops it. Each session has a secret token. A request that changes data must send it back. Another site can not read the token, so it can not send it.
+
+## Turn it on
+
+It needs a session, so put it after `SessionMiddleware`:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  globalMiddleware: <dynamic>[
+    const SessionMiddleware(),
+    const CsrfMiddleware(except: <String>['/api/*', '/webhooks/stripe']),
+  ],
+  // ...
+);
+```
+
+Now every `POST`, `PUT`, `PATCH` and `DELETE` request must send the token. A request with no token, or a wrong one, gets `419` with `{"code": "csrf_token_mismatch", "message": "CSRF token mismatch"}`.
+
+`GET`, `HEAD` and `OPTIONS` requests are not checked. Do not change data in a `GET` route.
+
+## Send the token
+
+Dox reads the token from one of these places:
+
+- the `_token` field of the body
+- the `X-CSRF-TOKEN` header
+- the `X-XSRF-TOKEN` header
+
+The token is `req.session.token`.
+
+### HTML forms
+
+Put the token in a hidden field:
+
+```html
+<form method="POST" action="/posts">
+  <input type="hidden" name="_token" value="{{ token }}">
+  ...
+</form>
+```
+
+### axios and Inertia
+
+Dox also sets an `XSRF-TOKEN` cookie with the token. It is not `HttpOnly`, so page scripts can read it.
+axios reads this cookie and sends it in the `X-XSRF-TOKEN` header by itself. Inertia uses axios, so it works with no code.
+
+With `fetch`, read the cookie and send the header yourself:
+
+```js
+const token = document.cookie
+  .split('; ')
+  .find((c) => c.startsWith('XSRF-TOKEN='))
+  ?.split('=')[1];
+
+fetch('/posts', {
+  method: 'POST',
+  headers: { 'X-XSRF-TOKEN': token, 'Content-Type': 'application/json' },
+  body: JSON.stringify({ title: 'Hi' }),
+});
+```
+
+## Skip some paths
+
+Routes that other servers call (webhooks) or token based APIs can not send the token. List them in `except`:
+
+```dart
+const CsrfMiddleware(except: <String>['/api/*', '/webhooks/stripe']);
+```
+
+- A path that ends with `*` matches everything that starts with it: `/api/*` matches `/api/posts` and `/api/users/5`.
+- Any other path must match exactly.
+
+An excluded path is not checked and gets no `XSRF-TOKEN` cookie.
+
+## After login
+
+`req.session.regenerate()` also makes a new token. Dox sends the new `XSRF-TOKEN` cookie with the same response.
+
+
+---
+
 # Encryption
 
 Source: https://dartondox.dev/latest/3.xsecurity/encryption/
@@ -16962,6 +17301,7 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `cors` | `CORSConfig` | `CORSConfig()` | CORS headers. See [CORSConfig](#corsconfig). |
 | `logger` | `LoggerConfig` | `LoggerConfig()` | The `Logger` output. See [LoggerConfig](#loggerconfig). |
 | `cache` | `CacheConfig` | `file` store in `storage/cache`, plus a `memory` store | Cache stores for `Cache()`. See [CacheConfig](#cacheconfig). |
+| `session` | `SessionConfig` | `cookie` driver, cookie `dox_session`, 2 hours | Settings for `SessionMiddleware`. See [Session](../the-basic/session.md#config). |
 | `storage` | `StorageConfig` | `local` disk with root `storage` | Storage disks for `Storage()`. See [StorageConfig](#storageconfig). |
 | `openApi` | `OpenApiConfig` | `OpenApiConfig()` | `/docs`, `/openapi.json` and `/openapi.yaml`. See [OpenApiConfig](#openapiconfig). |
 | `socketIo` | `SocketIoConfig` | `SocketIoConfig()` (off) | Socket.IO on the HTTP port. See [SocketIoConfig](#socketioconfig). |
@@ -19041,6 +19381,17 @@ What changed in each package, newest first. This page is made from the
 - Generated models import `package:dox_orm/dox_orm.dart`.
 
 ## dox_core
+
+### Unreleased
+
+- New: middleware that runs after the controller. Implement `IDoxNextMiddleware` (`handle(DoxRequest req, Next next)`), or use a function `(DoxRequest req, Next next)`. `await next()` runs the rest of the middleware and the controller and gives a `DoxResponse`, so the code after it can change the status, headers and cookies. A thrown error comes back as its error response, so the after part still runs. Before-only middleware work as before. A route with no `next` middleware takes the same fast path as before.
+- New: `DoxResponse.status` and `DoxResponse.headers` getters.
+- New: `redirect(url, status: 302)` and `back(req, fallback: '/')` helpers.
+- New: sessions. `SessionMiddleware` gives each request `req.session` with `get`, `put`, `has`, `forget`, `all`, `flush`, `pull`, `flash`, `reflash`, `keep`, `regenerate`, `invalidate` and `token`. `AppConfig(session: SessionConfig(...))` picks the `cookie` driver (all data in a cookie, encrypted with AES-GCM, 4 KB limit) or the `cache` driver (a random id in the cookie, the data in a `dox_cache` store like `redis`). The cookie is `HttpOnly` and `SameSite=Lax` by default. The cookie driver reads the session on first use. The session is saved, and the cookie sent, only when it changed.
+- New: `CsrfMiddleware`. `POST`, `PUT`, `PATCH` and `DELETE` requests must send the session token in `_token`, `X-CSRF-TOKEN` or `X-XSRF-TOKEN`, else `419` (`TokenMismatchException`). It sets an `XSRF-TOKEN` cookie that axios and Inertia send back for you. `except:` skips paths like `/api/*`.
+- New: a validation error on a request with a session that does not want JSON (a form post, an Inertia request) flashes `errors` and the old input (never password fields), and redirects back. JSON requests still get `422`. Read them with `req.session.errors` and `req.session.old('email')`. `req.session.flashErrors(...)` does the same by hand. New `req.expectsJson()` and `req.hasSession`.
+- New: `DoxCookie(sameSite: SameSite.lax)`.
+- New: `TestResponse.cookies` and `DoxTestClient.withCookies(...)`, to go on with a session in tests.
 
 ### 3.0.0-alpha.10
 
