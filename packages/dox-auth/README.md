@@ -73,6 +73,7 @@ Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), pageCont
 - Session driver (`SessionAuthDriver`) for web pages. Login and logout give the session a new id.
 - `Auth().attempt(credentials)` finds the user and checks the bcrypt hash.
 - `Auth().login(user)` gives a token with no password check.
+- Custom drivers, like an API key guard. `Auth().setUser(req, user)` sets the user from your own middleware.
 - `AuthMiddleware` answers `401` when the user is not logged in. With `redirectTo`, it sends the user to that page instead.
 - More than one guard, like `web` and `admin`, each with its own driver and user model.
 - The user is loaded from the database on each request with `dox_orm`.
@@ -81,6 +82,56 @@ Things to know: a token expires after 1 hour by default. Change it with `expires
 There is no server list of tokens, so you can not cancel one token.
 A session login ends with `Auth().logout(req)`.
 With the default `cookie` session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout. If logout must really end old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
+
+## Custom guard (API key)
+
+You can check the user in your own way, like an API key in the header.
+Write a driver: extend `AuthDriver` and return the user from `verifyToken`.
+`AuthMiddleware` and `req.auth` then work as with the other drivers.
+
+```dart
+/// `Authorization: Bearer <api key>` gives the user with this key.
+class ApiKeyAuthDriver extends AuthDriver {
+  @override
+  Future<Model<dynamic>?> verifyToken(IDoxRequest req, String guard) async {
+    String header = req.header('Authorization') ?? '';
+    if (!header.startsWith('Bearer ')) return null;
+    Model<dynamic> model = AuthEngine().guard(guard).provider.model();
+    return await model.where('api_key', header.substring(7).trim()).getFirst();
+  }
+
+  /// no password login for this guard
+  @override
+  Future<Model<dynamic>?> attempt(Map<String, dynamic> credentials, String guard) async => null;
+
+  /// no token to make: the key is the token
+  @override
+  String? createToken(Map<String, dynamic>? userPayload, String guard) => null;
+}
+```
+
+Add it as a guard, and use the guard in the route:
+
+```dart
+'api': AuthGuard(
+  driver: ApiKeyAuthDriver(),
+  provider: AuthProvider(model: () => User()),
+),
+
+Route.get('/api/me', <dynamic>[AuthMiddleware(guard: 'api'), (DoxRequest req) => req.auth?.user<User>()]);
+```
+
+Store a hash of the key, not the key itself, and compare the hash.
+
+If you already have your own middleware, set the user with `Auth().setUser(req, user)`.
+It needs no token and no password check. `req.auth` then gives this user:
+
+```dart
+User? user = await keys.userForKey(key);
+if (user == null) throw UnAuthorizedException();
+Auth(guard: 'api').setUser(req, user);
+return req;
+```
 
 ## Documentation
 

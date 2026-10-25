@@ -1,3 +1,7 @@
+## Unreleased
+
+- Fix: `AUTH_REQUEST_KEY` is now only in `dox_core`, so importing `dox_core` and `dox_auth` together no longer gives an "ambiguous import" error.
+
 ## 3.0.0-alpha.13
 
 - New: `OpenApiConfig(include: ['/api/*'], exclude: ['/api/internal/*'])` picks which routes go in the OpenAPI docs by path. A `*` at the end matches the rest of the path.
