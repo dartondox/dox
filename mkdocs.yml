@@ -146,6 +146,8 @@ nav:
     - the-basic/validation-rules.md
   - Digging deeper:
     - digging-deeper/cache.md
+    - digging-deeper/queue.md
+    - digging-deeper/scheduler.md
     - digging-deeper/file-storage.md
     - digging-deeper/env.md
     - digging-deeper/isolate.md
