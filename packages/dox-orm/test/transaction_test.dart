@@ -79,13 +79,114 @@ void main() async {
       expect(await Blog().count(), 0);
     });
 
-    test('nested transaction joins the outer one', () async {
+    Future<void> add(String title) =>
+        Blog().create(<String, dynamic>{'title': title, 'body': 'b'});
+
+    Future<List<String>> titles() async {
+      List<Map<String, dynamic>> rows = await QueryBuilder.table('blog')
+          .select('title')
+          .orderBy('title')
+          .get();
+      return <String>[for (Map<String, dynamic> r in rows) '${r['title']}'];
+    }
+
+    test('nested error that is caught keeps the outer work', () async {
+      await QueryBuilder.transaction(() async {
+        await add('outer');
+        try {
+          await QueryBuilder.transaction(() async {
+            await add('inner');
+            throw StateError('stop');
+          });
+        } on StateError {
+          // the caller goes on
+        }
+        await add('outer 2');
+      });
+      expect(await titles(), <String>['outer', 'outer 2']);
+    });
+
+    /// postgres stops a transaction after a failed query, the savepoint
+    /// rollback makes it usable again
+    test('nested sql error that is caught keeps the outer work', () async {
+      await QueryBuilder.transaction(() async {
+        await add('outer');
+        try {
+          await QueryBuilder.transaction(() async {
+            await add('inner');
+            await QueryBuilder.table('x')
+                .rawQuery('SELECT * FROM no_such_table')
+                .get();
+          });
+        } catch (_) {
+          // the caller goes on
+        }
+        await add('outer 2');
+      });
+      expect(await titles(), <String>['outer', 'outer 2']);
+    });
+
+    test('nested success keeps both', () async {
+      String result = await QueryBuilder.transaction(() async {
+        await add('outer');
+        return QueryBuilder.transaction(() async {
+          await add('inner');
+          return 'done';
+        });
+      });
+      expect(result, 'done');
+      expect(await titles(), <String>['inner', 'outer']);
+    });
+
+    test('outer rollback drops the nested work too', () async {
       Future<void> run() {
         return QueryBuilder.transaction(() async {
-          await QueryBuilder.transaction(() async {
-            await Blog().create(<String, dynamic>{'title': 't', 'body': 'b'});
-          });
+          await add('outer');
+          await QueryBuilder.transaction(() => add('inner'));
           throw StateError('stop');
+        });
+      }
+
+      await expectLater(run(), throwsStateError);
+      expect(await Blog().count(), 0);
+    });
+
+    test('three levels deep', () async {
+      await QueryBuilder.transaction(() async {
+        await add('a');
+        await QueryBuilder.transaction(() async {
+          await add('b');
+          try {
+            await QueryBuilder.transaction(() async {
+              await add('c');
+              throw StateError('stop');
+            });
+          } on StateError {
+            // only level 3 is undone
+          }
+          await QueryBuilder.transaction(() => add('d'));
+        });
+        try {
+          await QueryBuilder.transaction(() async {
+            await add('e');
+            await QueryBuilder.transaction(() => add('f'));
+            throw StateError('stop');
+          });
+        } on StateError {
+          // level 2 is undone with its level 3
+        }
+      });
+      expect(await titles(), <String>['a', 'b', 'd']);
+    });
+
+    test('nested error that is not caught rolls back all', () async {
+      Future<void> run() {
+        return QueryBuilder.transaction(() async {
+          await add('outer');
+          await QueryBuilder.transaction(() async {
+            await add('inner');
+            throw StateError('stop');
+          });
         });
       }
 

@@ -1,3 +1,7 @@
+## Unreleased
+
+- A migration that runs inside a transaction you already opened (eg. with `Migrator(connection: ...)`) now uses a savepoint. A failed migration undoes only its own work.
+
 ## 3.0.0-alpha.7
 
 - Breaking: migrations run on the dox_orm drivers: the native Postgres and MySQL drivers, and SQLite. The `postgres` and `mysql_dart` packages are gone. When the native library does not load, the migration stops with an error that says why.

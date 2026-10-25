@@ -179,9 +179,9 @@ class SqliteDriver extends DBDriver {
   Future<R> transaction<R>(Future<R> Function() callback) async {
     Database db = await _getConnection();
 
-    /// ponytail: a nested transaction joins the outer one (no savepoint)
+    /// a nested transaction uses a savepoint
     if (_inTransaction(db)) {
-      return await callback();
+      return savepoint(callback);
     }
 
     /// another transaction can start while we wait, so check again

@@ -34,7 +34,41 @@ abstract class DBDriver {
   /// run [callback] in one database transaction.
   /// commit when it ends, rollback when it throws.
   /// all queries inside [callback] (models too) use the transaction.
+  /// inside another transaction it uses a savepoint, see [savepoint].
   Future<R> transaction<R>(Future<R> Function() callback);
+
+  /// zone key for how deep the savepoints are
+  static const Symbol _savepointKey = #doxSavepointDepth;
+
+  /// run [callback] in a savepoint of the open transaction. the drivers
+  /// call it for a nested [transaction]. when [callback] throws, only its
+  /// work is undone and the error is thrown again. the outer transaction
+  /// stays open, so the caller can catch the error and go on.
+  ///
+  /// ponytail: one savepoint at a time per transaction. two nested
+  /// transactions that run at the same time (eg. in `Future.wait`) mix up
+  /// their savepoints, the same as any queries on one connection.
+  Future<R> savepoint<R>(Future<R> Function() callback) async {
+    int depth = (Zone.current[_savepointKey] as int? ?? 0) + 1;
+    String name = 'sp_$depth';
+    await execute('SAVEPOINT $name');
+    R result;
+    try {
+      result = await runZoned(
+        callback,
+        zoneValues: <Symbol, dynamic>{_savepointKey: depth},
+      );
+    } catch (_) {
+      try {
+        await execute('ROLLBACK TO SAVEPOINT $name');
+      } catch (_) {
+        // keep the first error: it tells what went wrong
+      }
+      rethrow;
+    }
+    await execute('RELEASE SAVEPOINT $name');
+    return result;
+  }
 
   /// close the connections of this driver. it is safe to call it twice.
   /// do not run queries on this driver after it.

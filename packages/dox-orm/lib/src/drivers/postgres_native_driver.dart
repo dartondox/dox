@@ -16,7 +16,8 @@ class PostgresNativeDriver extends DBDriver {
 
   /// Makes the pool from a Dox [ConnectionConfig]. A host that starts with
   /// `/` is a Unix socket folder. The TLS mode is
-  /// [ConnectionConfig.postgresSslMode]. Reads `maxConnectionCount`
+  /// [ConnectionConfig.postgresSslMode]. The CA file for `verify-full` is
+  /// [ConnectionConfig.postgresSslRootCert]. Reads `maxConnectionCount`
   /// (default 10), `timeZone` (default UTC), `applicationName` and
   /// `threads` (default 1) from `extra`. Isolates with the same settings
   /// share one pool, so `maxConnectionCount` is for the whole process.
@@ -34,6 +35,7 @@ class PostgresNativeDriver extends DBDriver {
         password: config.password,
         database: config.database,
         sslMode: config.postgresSslMode,
+        sslRootCert: config.postgresSslRootCert,
         maxConnections: extra['maxConnectionCount'] as int? ?? 10,
         timeZone: extra['timeZone'] as String? ?? 'UTC',
         applicationName: extra['applicationName'] as String?,
@@ -97,9 +99,9 @@ class PostgresNativeDriver extends DBDriver {
     Map<PgNativePool, int>? open =
         Zone.current[_txKey] as Map<PgNativePool, int>?;
 
-    /// ponytail: a nested transaction joins the outer one (no savepoint)
+    /// a nested transaction uses a savepoint on the same connection
     if (open?[pool] != null) {
-      return await callback();
+      return savepoint(callback);
     }
     int tx = await pool.begin();
     R result;

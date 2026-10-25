@@ -222,6 +222,7 @@ Keys of `extra`:
 | postgres, mysql | `threads` | `int` | `1` | Rust threads of the native driver. Only the first pool sets it. |
 | mysql, sqlite | `preparedStatementCacheSize` | `int` | `100` | Prepared statements kept per connection. |
 | postgres | `sslMode` | `String` | `require` with `useSSL`, else `disable` | TLS mode: `disable`, `prefer`, `require` or `verify-full`. |
+| postgres | `sslRootCert` | `String` | none | Path of a PEM file with the CA certificates to trust for `verify-full`. `sslrootcert` in `DATABASE_URL`. |
 | postgres | `timeZone` | `String` | `UTC` | Session time zone. |
 | postgres | `applicationName` | `String` | none | Name of the app in `pg_stat_activity`. |
 | mysql | `verifyCertificate` | `bool` | `true` | `false` skips the TLS certificate check. Only for a self-signed certificate in development. |

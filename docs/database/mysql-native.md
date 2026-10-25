@@ -178,4 +178,3 @@ try {
   not read. The connection uses `utf8mb4`.
 - A login with `sha256_password` (not the default) does not work. The
   default `caching_sha2_password` and `mysql_native_password` work.
-- A nested `transaction()` joins the outer one (no savepoints).

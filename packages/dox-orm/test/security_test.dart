@@ -113,7 +113,7 @@ void main() async {
         ConnectionConfig.fromUrl(
           'postgres://u:p@db.example.com/app?sslmode=verify-ca',
         ).postgresSslMode,
-        'verify-full',
+        'verify-ca',
       );
 
       /// like libpq: require encrypts but does not check the certificate,
@@ -155,6 +155,28 @@ void main() async {
       expect(dev.useSSL, true);
       expect(dev.verifyCertificate, false);
       expect(pg.verifyCertificate, true);
+    });
+
+    test('postgres ca file', () {
+      ConnectionConfig url = ConnectionConfig.fromUrl(
+        'postgres://u:p@db.example.com/app?sslmode=verify-full'
+        '&sslrootcert=%2Fetc%2Fssl%2Frds-ca.pem',
+      );
+      expect(url.postgresSslRootCert, '/etc/ssl/rds-ca.pem');
+      expect(url.extra.containsKey('sslrootcert'), false);
+      expect(
+        ConnectionConfig(
+          driver: Driver.postgres,
+          database: 'app',
+          extra: <String, dynamic>{'sslRootCert': 'certs/ca.pem'},
+          debug: false,
+        ).postgresSslRootCert,
+        'certs/ca.pem',
+      );
+      expect(
+        ConnectionConfig.fromUrl('postgres://u:p@h/app').postgresSslRootCert,
+        null,
+      );
     });
   });
 }
