@@ -23,3 +23,9 @@ examples/*/pubspec.lock
 
 # python cache of the docs hooks
 __pycache__/
+
+# IDE project files (IntelliJ / melos)
+*.iml
+
+# test coverage output
+coverage/
