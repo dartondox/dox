@@ -1,3 +1,7 @@
+---
+icon: lucide/layout-template
+---
+
 # Views
 
 Views are HTML templates. Dox fills them with your data and sends them as the response.

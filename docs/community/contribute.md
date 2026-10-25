@@ -134,6 +134,9 @@ Optional: add yourself as a required reviewer, and allow only tags `v*`.
 | `dox_storage` | [dartondox/dox-storage](https://github.com/dartondox/dox-storage) |
 | `dox_queue` | [dartondox/dox-queue](https://github.com/dartondox/dox-queue) |
 | `dox_scheduler` | [dartondox/dox-scheduler](https://github.com/dartondox/dox-scheduler) |
+| `dox_inertia` | [dartondox/dox-inertia](https://github.com/dartondox/dox-inertia) |
+| `dox_view` | [dartondox/dox-view](https://github.com/dartondox/dox-view) |
+| `dox_mailer` | [dartondox/dox-mailer](https://github.com/dartondox/dox-mailer) |
 
 The packages here use them from pub.dev. The database tests (Postgres, MySQL, SQLite) run in `dox-orm`.
 
