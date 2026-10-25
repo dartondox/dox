@@ -4394,7 +4394,7 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/develop/docs/digging-deeper/services.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/dartondox/dox/edit/main/docs/digging-deeper/services.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -4430,7 +4430,7 @@ A service fixes this: each isolate runs <code>setup()</code> itself.</p>
 </span></code></pre></div>
 <h2 id="register-it">Register it</h2>
 <p>You do not need to. Dox finds every class that implements <code>DoxService</code>.
-Run <code>dart run build_runner build</code>. The service is then in <code>lib/container.g.dart</code>.
+Run <code>dart run build_runner build</code>. The service is then in <code>lib/generated/container.g.dart</code>.
 Each isolate makes its own instance from the container. Its constructor can ask for other classes of the container.
 See <a href="../../the-basic/dependency-injection/#routers-and-services">Dependency injection</a>.</p>
 <p>Services run in the order of their file path. To run one first, list it in <code>AppConfig</code>:</p>

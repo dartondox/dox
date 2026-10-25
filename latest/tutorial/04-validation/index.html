@@ -4382,7 +4382,7 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/develop/docs/tutorial/04-validation.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/dartondox/dox/edit/main/docs/tutorial/04-validation.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -4423,13 +4423,13 @@ Replace the file with this:</p>
 <li>See <a href="../../the-basic/validation/">Validation</a> for all rules.</li>
 </ul>
 <h2 id="2-give-the-dto-list-to-the-app">2. Give the DTO list to the app</h2>
-<p>The generator writes a list of all DTOs to <code>lib/dtos.g.dart</code>.
+<p>The generator writes a list of all DTOs to <code>lib/generated/dtos.g.dart</code>.
 Dox needs this list, because it does not use reflection.
 Add two lines to <code>lib/config/app.dart</code>:</p>
-<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/dtos.g.dart'</span><span class="p">;</span>
+<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/generated/dtos.g.dart'</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="c1">/// DTOs (generated list in lib/dtos.g.dart)</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="c1">/// DTOs (generated list in lib/generated/dtos.g.dart)</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nl">dtos:</span><span class="w"> </span><span class="n">dtos</span><span class="p">,</span>
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="c1">// ... the rest stays the same</span>
@@ -4487,7 +4487,7 @@ This also adds <code>update</code>, so <code>PUT /api/posts/{id}</code> works:</
 <p><code>dox s</code> runs it for you. Without <code>dox s</code>:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build<span class="w"> </span>--delete-conflicting-outputs
 </span></code></pre></div>
-<p>It writes <code>lib/app/http/dtos/save_post.dto.g.dart</code> and <code>lib/dtos.g.dart</code>.</p>
+<p>It writes <code>lib/app/http/dtos/save_post.dto.g.dart</code> and <code>lib/generated/dtos.g.dart</code>.</p>
 <h2 id="check-it">Check it</h2>
 <p>A title that is too short, and a body that is too short:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>curl<span class="w"> </span>-i<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:3000/api/posts<span class="w"> </span><span class="se">\</span>

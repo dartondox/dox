@@ -367,7 +367,7 @@ Source: https://dartondox.dev/latest/3.xtutorial/
 This tutorial takes you from an empty folder to a small blog API that runs as one native binary.
 Every step has the full code and a `curl` command to check it.
 
-The finished project is on GitHub: [examples/blog-api](https://github.com/dartondox/dox/tree/develop/examples/blog-api).
+The finished project is on GitHub: [examples/blog-api](https://github.com/dartondox/dox/tree/main/examples/blog-api).
 CI builds it and runs its tests on every push, so the code on these pages keeps working.
 
 ## What you will build
@@ -434,8 +434,9 @@ blog/
 │   ├── services/
 │   │   ├── auth_service.dart     *
 │   │   └── orm_service.dart
-│   ├── container.g.dart          * generated
-│   └── dtos.g.dart               * generated
+│   └── generated/
+│       ├── container.g.dart      * generated
+│       └── dtos.g.dart           * generated
 ├── test/http_test.dart           *
 ├── .env                          *
 ├── Dockerfile
@@ -713,7 +714,7 @@ class PostController {
 
 How it works:
 
-- `@Inject()` puts the controller in the container. Dox makes it for you. `dox s` runs `build_runner`, which adds it to `lib/container.g.dart`.
+- `@Inject()` puts the controller in the container. Dox makes it for you. `dox s` runs `build_runner`, which adds it to `lib/generated/container.g.dart`.
   A new project already has `container: registerContainer` in `lib/config/app.dart`, so you change nothing there.
 - A controller returns a model or a list of models. Dox sends it as JSON.
 - `response(post).statusCode(201)` sets the status code.
@@ -867,15 +868,15 @@ class SavePost {
 
 ## 2. Give the DTO list to the app
 
-The generator writes a list of all DTOs to `lib/dtos.g.dart`.
+The generator writes a list of all DTOs to `lib/generated/dtos.g.dart`.
 Dox needs this list, because it does not use reflection.
 Add two lines to `lib/config/app.dart`:
 
 ```dart title="lib/config/app.dart"
-import 'package:blog/dtos.g.dart';
+import 'package:blog/generated/dtos.g.dart';
 
 AppConfig appConfig = AppConfig(
-  /// DTOs (generated list in lib/dtos.g.dart)
+  /// DTOs (generated list in lib/generated/dtos.g.dart)
   dtos: dtos,
 
   // ... the rest stays the same
@@ -943,7 +944,7 @@ class PostController {
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-It writes `lib/app/http/dtos/save_post.dto.g.dart` and `lib/dtos.g.dart`.
+It writes `lib/app/http/dtos/save_post.dto.g.dart` and `lib/generated/dtos.g.dart`.
 
 ## Check it
 
@@ -1165,7 +1166,7 @@ class AuthService implements DoxService {
 }
 ```
 
-Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/container.g.dart`.
+Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
 You do not add it to a list.
 
 ## 5. Write the auth controller
@@ -1645,7 +1646,7 @@ sequenceDiagram
 
 !!! note "No reflection"
     Dox reads the parameter types of every controller once, at start.
-    It does not use `dart:mirrors`. DTOs come from a generated list (`lib/dtos.g.dart`).
+    It does not use `dart:mirrors`. DTOs come from a generated list (`lib/generated/dtos.g.dart`).
     This is why `dox build` can make a native (AOT) binary.
 
 ### Where things are decided
@@ -1768,9 +1769,10 @@ my_app/
 │   │   └── web.dart             # WebRouter
 │   ├── services/
 │   │   └── orm_service.dart     # opens the database in every isolate
-│   ├── container.g.dart         # generated: @Inject classes, routers, services
-│   ├── dtos.g.dart              # generated: the list of DTOs
-│   └── openapi.g.dart           # generated: the OpenAPI docs
+│   └── generated/               # made by build_runner, do not edit
+│       ├── container.g.dart     # @Inject classes, routers, services
+│       ├── dtos.g.dart          # the list of DTOs
+│       └── openapi.g.dart       # the OpenAPI docs
 ├── storage/                     # local disk, file cache, uploads
 ├── test/
 ├── .env                         # local settings, not in git
@@ -2148,7 +2150,7 @@ See [Testing](../digging-deeper/testing.md).
 ## What is different
 
 - **A generated container.** Like Laravel, Dox makes your controllers and injects what the constructor asks for.
-  You add `@Inject()` to the class. `build_runner` writes `lib/container.g.dart` with every registration. There are no service providers to write.
+  You add `@Inject()` to the class. `build_runner` writes `lib/generated/container.g.dart` with every registration. There are no service providers to write.
   A singleton is one instance per isolate, not one per request.
 - **Isolates, not PHP-FPM workers.** One process runs one isolate per CPU core. Each isolate runs your whole app and has its own memory.
   A static value or a singleton lives once per isolate. A PHP worker starts from zero on each request. A Dox isolate keeps its state between requests, so a memory leak stays.
@@ -2440,7 +2442,7 @@ It uses pub.dev automated publishing, so it needs no token or secret.
 
 ### Steps
 
-The full guide is [RELEASING.md](https://github.com/dartondox/dox/blob/develop/RELEASING.md) in the repo. In short:
+The full guide is [RELEASING.md](https://github.com/dartondox/dox/blob/main/RELEASING.md) in the repo. In short:
 
 1. Bump every package with `bin/update_versions.sh`, and close the `## Unreleased` section of each `CHANGELOG.md`.
 2. Merge the release PR, then push the tag `v<version>`. This publishes to pub.dev.
@@ -2532,7 +2534,7 @@ The docs site is https://dartondox.dev. It is built with MkDocs Material and
 
 | URL | What it is |
 | --- | --- |
-| `/3.x/...` | 3.x docs, built from `develop` |
+| `/3.x/...` | 3.x docs, built from `main` |
 | `/latest/...` | a copy of the newest version (now 3.x) |
 | `/2.x/...` | the old 2.x docs, built from the `v2.x` branch |
 | `/` | redirects to `/latest/` |
@@ -2550,7 +2552,7 @@ python3 -m venv .venv
 ### Deploy
 
 - 3.x deploys by itself. The `Docs` workflow (`.github/workflows/docs.yaml`) runs on every push
-  to `develop` that changes `docs/`, `mkdocs.yml` or the workflow.
+  to `main` that changes `docs/`, `mkdocs.yml` or the workflow.
   It runs `mike deploy --update-aliases 3.x latest`.
 - 2.x deploys by hand. Open Actions > Docs > "Run workflow", pick version `2.x`.
   It builds from the `v2.x` branch (change it with the `ref` input).
@@ -2654,7 +2656,7 @@ class ApiRouter extends Router {
 }
 ```
 
-Dox finds every `Router` class by itself. It is in `lib/container.g.dart` after `dart run build_runner build`.
+Dox finds every `Router` class by itself. It is in `lib/generated/container.g.dart` after `dart run build_runner build`.
 To pick the order of routers, list them in `routers:` of `AppConfig`.
 See [Dependency injection: routers and services](dependency-injection.md#routers-and-services).
 
@@ -2868,7 +2870,7 @@ Route.get('/users/{user}/posts/{page}', (User user, int page) {
 
 The binder runs after the middleware, so an auth middleware can stop the request before any database call.
 
-A `@DoxModel` class does not need `Route.bind`. Dox makes a binder for it in `lib/container.g.dart`.
+A `@DoxModel` class does not need `Route.bind`. Dox makes a binder for it in `lib/generated/container.g.dart`.
 See [Dependency injection: route model binding](dependency-injection.md#route-model-binding).
 `Route.bind` wins when both exist.
 
@@ -3824,10 +3826,10 @@ Run the builder:
 dart run build_runner build
 ```
 
-It writes `lib/container.g.dart`. Give it to the app once:
+It writes `lib/generated/container.g.dart`. Give it to the app once:
 
 ```dart title="lib/config/app.dart"
-import 'package:my_app/container.g.dart';
+import 'package:my_app/generated/container.g.dart';
 
 AppConfig appConfig = AppConfig(
   container: registerContainer,
@@ -3839,9 +3841,9 @@ That is all. `GET /api/users/5` makes the repository, the service and the contro
 
 ## The generated file
 
-`lib/container.g.dart` has one function. Each class gets a factory that calls its constructor.
+`lib/generated/container.g.dart` has one function. Each class gets a factory that calls its constructor.
 
-```dart title="lib/container.g.dart"
+```dart title="lib/generated/container.g.dart"
 // GENERATED CODE - DO NOT MODIFY BY HAND
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/http/controllers/user.controller.dart' as i1;
@@ -3931,7 +3933,7 @@ A singleton is read once, at start. A `singleton: false` class is made on each r
 
 ## Route model binding
 
-Every `@DoxModel` class gets a binder in `lib/container.g.dart`.
+Every `@DoxModel` class gets a binder in `lib/generated/container.g.dart`.
 When a handler has a parameter of a model type, Dox loads the model by its primary key.
 
 ```dart
@@ -4222,14 +4224,14 @@ You do this once per app.
 
 1. Make a DTO with `dox make:dto CreateUser`. It writes `lib/app/http/dtos/create_user.dto.dart`.
 2. Run the generator: `dox build_runner:build` (or `dox build_runner:watch`).
-   It writes a `.dto.g.dart` file next to each DTO, and one list of all DTOs in `lib/dtos.g.dart`.
+   It writes a `.dto.g.dart` file next to each DTO, and one list of all DTOs in `lib/generated/dtos.g.dart`.
 3. Give that list to the app:
 
 ```dart title="lib/config/app.dart"
-import 'package:my_app/dtos.g.dart';
+import 'package:my_app/generated/dtos.g.dart';
 
 AppConfig appConfig = AppConfig(
-  dtos: dtos, // from lib/dtos.g.dart
+  dtos: dtos, // from lib/generated/dtos.g.dart
   // ...
 );
 ```
@@ -4981,7 +4983,7 @@ dart pub add dox_queue
 ## How it works
 
 1. You write a job class with `@Job()`.
-2. `dart run build_runner build` writes `lib/jobs.g.dart`. It knows how to save and load each job.
+2. `dart run build_runner build` writes `lib/generated/jobs.g.dart`. It knows how to save and load each job.
 3. Your code calls `dispatch()`. The job is saved in Redis or in the database.
 4. A worker (`dart run bin/queue.dart`) takes the job and runs its `handle()` method.
 
@@ -4992,13 +4994,13 @@ dart pub add dox_queue
 ```dart title="lib/config/queue.dart"
 import 'package:dox_queue/dox_queue.dart';
 
-import '../jobs.g.dart';
+import '../generated/jobs.g.dart';
 
 QueueConfig queueConfig = QueueConfig(
   /// sync, database or redis
   driver: 'database',
 
-  /// every @Job class, from lib/jobs.g.dart
+  /// every @Job class, from lib/generated/jobs.g.dart
   jobs: jobRegistry,
 );
 ```
@@ -5006,7 +5008,7 @@ QueueConfig queueConfig = QueueConfig(
 | Option | Default | What it does |
 | --- | --- | --- |
 | `driver` | `sync` | `sync`, `database` or `redis` |
-| `jobs` | empty | `jobRegistry` from `lib/jobs.g.dart` |
+| `jobs` | empty | `jobRegistry` from `lib/generated/jobs.g.dart` |
 | `redis` | localhost:6379 | `RedisOptions(host: ..., port: ..., password: ...)` for the `redis` driver |
 | `prefix` | `dox_queue:` | the start of every Redis key |
 | `connection` | default | the dox_orm connection name, for the `database` driver |
@@ -5029,7 +5031,7 @@ import 'package:dox_queue/dox_queue.dart';
 import '../config/queue.dart';
 
 /// Sets up the queue. Dox finds every DoxService class,
-/// see lib/container.g.dart.
+/// see lib/generated/container.g.dart.
 class AppQueueService extends QueueService {
   AppQueueService() : super(queueConfig);
 }
@@ -5348,7 +5350,7 @@ Use the `sync` driver. `dispatch()` then runs the job at once, so you can check 
 
 ```dart
 import 'package:dox_queue/dox_queue.dart';
-import 'package:dox_sample/jobs.g.dart';
+import 'package:dox_sample/generated/jobs.g.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -6178,7 +6180,7 @@ class ORMService implements DoxService, DoxShutdown {
 ## Register it
 
 You do not need to. Dox finds every class that implements `DoxService`.
-Run `dart run build_runner build`. The service is then in `lib/container.g.dart`.
+Run `dart run build_runner build`. The service is then in `lib/generated/container.g.dart`.
 Each isolate makes its own instance from the container. Its constructor can ask for other classes of the container.
 See [Dependency injection](../the-basic/dependency-injection.md#routers-and-services).
 
@@ -11171,7 +11173,7 @@ class AuthService implements DoxService {
 }
 ```
 
-Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/container.g.dart`.
+Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
 
 ## 3. Add the routes
 
@@ -11812,7 +11814,7 @@ The generator makes, for each `@Dto` class:
 | Name | What it is |
 | --- | --- |
 | `$CreateUserDto` | a `const` `DtoSchema<CreateUser>`: the checks, the converter and the JSON Schema |
-| `lib/dtos.g.dart` | `const List<DtoSchema<Object>> dtos`: every DTO in `lib/`. Dox uses it to find DTOs by type. |
+| `lib/generated/dtos.g.dart` | `const List<DtoSchema<Object>> dtos`: every DTO in `lib/`. Dox uses it to find DTOs by type. |
 
 The `static const ... schema = $CreateUserDto;` line is how you reach the schema: `CreateUser.schema`.
 
@@ -12023,7 +12025,7 @@ The docs come from three places:
 dart run build_runner build      # or: dox build_runner:build
 ```
 
-`dox_builder` reads your code and writes `lib/openapi.g.dart`.
+`dox_builder` reads your code and writes `lib/generated/openapi.g.dart`.
 Run it again after you change routes, controllers, request classes or models.
 `dox build_runner:watch` does it for you while you work.
 
@@ -12031,7 +12033,7 @@ Run it again after you change routes, controllers, request classes or models.
 
 ```dart title="lib/config/openapi.dart"
 import 'package:dox_core/dox_core.dart';
-import 'package:my_app/openapi.g.dart';
+import 'package:my_app/generated/openapi.g.dart';
 
 OpenApiConfig openApi = OpenApiConfig(
   info: Info(title: 'Blog API', version: '1.0.0'),
@@ -12051,7 +12053,7 @@ AppConfig appConfig = AppConfig(
 | `enabled` | `null` | `true` or `false` turns the docs routes on or off. `null`: on only when `APP_ENV` is `development` or `local` |
 | `info` | `Info(title: 'Dox API', version: '1.0.0')` | title and version of the API |
 | `servers` | `[]` | base URLs, like `[Server('https://api.my.app')]` |
-| `registry` | empty | `openApiRegistry` from `lib/openapi.g.dart` |
+| `registry` | empty | `openApiRegistry` from `lib/generated/openapi.g.dart` |
 | `securitySchemes`, `securityByMiddleware` | `{}` | see [Login schemes](#login-schemes) |
 | `ui` | `DocsUi.scalar` | the docs page: `DocsUi.scalar` or `DocsUi.swagger` |
 | `scalar` | `ScalarOptions()` | see [The docs page](#the-docs-page) |
@@ -13104,7 +13106,7 @@ Source: https://dartondox.dev/latest/3.xguides/
 Each guide solves one job from start to end. Copy the files, run the commands, and check the result.
 The reference pages explain each part in more detail. The guides link to them.
 
-The code of all guides is in one app on GitHub: [examples/guides](https://github.com/dartondox/dox/tree/develop/examples/guides).
+The code of all guides is in one app on GitHub: [examples/guides](https://github.com/dartondox/dox/tree/main/examples/guides).
 CI builds it and runs its tests on every push, so the code on these pages keeps working.
 
 | Guide | What you get |
@@ -13267,7 +13269,7 @@ dart run build_runner build --delete-conflicting-outputs
 dox serve
 ```
 
-Make sure `lib/config/app.dart` has `dtos: dtos` from `lib/dtos.g.dart`. See [Validation: setup](../the-basic/validation.md#setup).
+Make sure `lib/config/app.dart` has `dtos: dtos` from `lib/generated/dtos.g.dart`. See [Validation: setup](../the-basic/validation.md#setup).
 
 ## Check it
 
@@ -13524,7 +13526,7 @@ class AuthService implements DoxService {
 }
 ```
 
-Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/container.g.dart`.
+Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
 
 ## 3. Write the DTOs
 
@@ -15032,7 +15034,7 @@ dart run build_runner build
 This writes two files:
 
 - `lib/src/save_blog.g.dart`: the checks, the converter and the JSON Schema of `SaveBlog`.
-- `lib/dtos.g.dart`: the list of every DTO in this package. The server uses it.
+- `lib/generated/dtos.g.dart`: the list of every DTO in this package. The server uses it.
 
 Commit both files. Then the Flutter app does not need to run the generator.
 
@@ -15061,13 +15063,13 @@ dev_dependencies:
   dox_builder: ^3.0.0-alpha
 ```
 
-Dox finds a DTO in the `dtos` list of `AppConfig`. The server's own `lib/dtos.g.dart` lists only the DTOs in the server.
+Dox finds a DTO in the `dtos` list of `AppConfig`. The server's own `lib/generated/dtos.g.dart` lists only the DTOs in the server.
 So add the list of the shared package too:
 
 ```dart title="server/lib/config/app.dart"
-import 'package:blog_shared/dtos.g.dart' as shared;
+import 'package:blog_shared/generated/dtos.g.dart' as shared;
 import 'package:dox_core/dox_core.dart';
-import 'package:server/dtos.g.dart';
+import 'package:server/generated/dtos.g.dart';
 
 AppConfig appConfig = AppConfig(
   // ...
@@ -15075,7 +15077,7 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
-When the server has no DTOs of its own, there is no `server/lib/dtos.g.dart`. Then use `dtos: shared.dtos`.
+When the server has no DTOs of its own, there is no `server/lib/generated/dtos.g.dart`. Then use `dtos: shared.dtos`.
 
 The controller asks for `SaveBlog` like any other DTO. Dox checks the body before the method runs. Bad input gets `422`.
 
@@ -15221,11 +15223,11 @@ Turn on OpenAPI docs for the blog API, open the docs page, and make the docs bet
 
 ## 1. Write the config
 
-`build_runner` writes `lib/openapi.g.dart`. Its `openApiRegistry` holds what the builder found in your routes, controllers, DTOs and models. Pass it to an `OpenApiConfig`:
+`build_runner` writes `lib/generated/openapi.g.dart`. Its `openApiRegistry` holds what the builder found in your routes, controllers, DTOs and models. Pass it to an `OpenApiConfig`:
 
 ```dart title="lib/config/openapi.dart"
 import 'package:dox_core/dox_core.dart';
-import 'package:blog/openapi.g.dart';
+import 'package:blog/generated/openapi.g.dart';
 
 OpenApiConfig openApi = OpenApiConfig(
   info: Info(title: 'Blog API', version: '1.0.0'),
@@ -16409,7 +16411,7 @@ One page to keep open while you work. Each section links to its full page.
 | `lib/app/http/serializers/` | `<name>.serializer.dart` |
 | `lib/app/models/<name>/` | `<name>.model.dart` |
 | `lib/services/` | `DoxService` classes: ORM, auth, websocket |
-| `lib/container.g.dart`, `lib/dtos.g.dart`, `lib/openapi.g.dart` | made by `build_runner`. Do not edit. |
+| `lib/generated/container.g.dart`, `lib/generated/dtos.g.dart`, `lib/generated/openapi.g.dart` | made by `build_runner`. Do not edit. |
 | `db/migration/` | migrations and `migrations.dart` (the registry) |
 
 See [CLI](cli.md) and [App config](app-config.md).
@@ -16488,7 +16490,7 @@ class PostService {
 @Inject(singleton: false)       // a new instance each time
 class Clock {}
 
-AppConfig(container: registerContainer); // from lib/container.g.dart
+AppConfig(container: registerContainer); // from lib/generated/container.g.dart
 
 Dox().ioc.get<PostService>();
 Dox().ioc.override<PostRepository>(FakePostRepository()); // tests
@@ -16849,7 +16851,7 @@ See [Socket.IO](../packages/socketio.md).
 ```dart
 OpenApiConfig openApi = OpenApiConfig(
   info: Info(title: 'Blog API', version: '1.0.0'),
-  registry: openApiRegistry, // lib/openapi.g.dart
+  registry: openApiRegistry, // lib/generated/openapi.g.dart
 );
 ```
 
@@ -16919,10 +16921,10 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `container` | `void Function(IocContainer)?` | `null` | Fills the container: `registerContainer` from `lib/container.g.dart`. Every isolate runs it. It also gives the routers, services and model binders. See [Dependency injection](../the-basic/dependency-injection.md). |
+| `container` | `void Function(IocContainer)?` | `null` | Fills the container: `registerContainer` from `lib/generated/container.g.dart`. Every isolate runs it. It also gives the routers, services and model binders. See [Dependency injection](../the-basic/dependency-injection.md). |
 | `routers` | `List<Router>` | `[]` | Routers to register first, in this order. Every other `Router` class comes from `container`. |
 | `globalMiddleware` | `List<dynamic>` | `[]` | Middleware that runs on every route. A function or an `IDoxMiddleware`. |
-| `dtos` | `List<DtoSchema<Object>>` | `[]` | Every DTO of the app: `dtos` from `lib/dtos.g.dart`. Dox finds the DTO of a controller parameter and of `req.validate<T>()` with it. |
+| `dtos` | `List<DtoSchema<Object>>` | `[]` | Every DTO of the app: `dtos` from `lib/generated/dtos.g.dart`. Dox finds the DTO of a controller parameter and of `req.validate<T>()` with it. |
 | `validationMessages` | `MessageResolver?` | `null` (English messages) | Messages for validation errors, for example in other languages. |
 | `responseHandler` | `ResponseHandlerInterface?` | `null` | A class with `DoxResponse handle(DoxResponse res)`. It sees every response before it is sent. |
 | `exceptionHandler` | `ExceptionHandler` | `ExceptionHandler()` | Reports every unhandled error and turns it into a response. The default logs the error with `Logger.warn` and the stack with `Logger.danger`. See [Error handling](../the-basic/errors.md). |
@@ -17035,7 +17037,7 @@ Source: `packages/dox-core/lib/openapi/openapi_config.dart`.
 | `servers` | `List<Server>` | `[]` | Base URLs of the API. |
 | `securitySchemes` | `Map<String, SecurityScheme>` | `{}` | Ways to log in, like `{'bearerAuth': SecurityScheme.bearer()}`. |
 | `securityByMiddleware` | `Map<String, List<Map<String, List<String>>>>` | `{}` | Security for routes that use a middleware class with this name. `AuthMiddleware` gets `bearerAuth` when it is not in the map. |
-| `registry` | `OpenApiRegistry` | `OpenApiRegistry()` (empty) | What `dox_builder` found in the code. Pass `openApiRegistry` from `lib/openapi.g.dart`. |
+| `registry` | `OpenApiRegistry` | `OpenApiRegistry()` (empty) | What `dox_builder` found in the code. Pass `openApiRegistry` from `lib/generated/openapi.g.dart`. |
 | `ui` | `DocsUi` | `DocsUi.scalar` | `scalar` or `swagger`. |
 | `scalar` | `ScalarOptions` | `ScalarOptions()` | Options of the Scalar page. See below. |
 | `pageTitle` | `String?` | `null` (uses `info.title`) | Title of the `/docs` page. |
@@ -17153,7 +17155,7 @@ import 'package:my_app/config/cors.dart';
 import 'package:my_app/config/logger.dart';
 import 'package:my_app/config/storage.dart';
 import 'package:my_app/config/env.dart';
-import 'package:my_app/container.g.dart';
+import 'package:my_app/generated/container.g.dart';
 
 AppConfig appConfig = AppConfig(
   /// Changing the key makes old cookies and encrypted data unreadable.
@@ -17524,7 +17526,7 @@ A trailing `Controller` in the name is removed: `UserController` and `User` give
 | `-r` | `lib/app/http/controllers/<name>.controller.dart` | `_getResourceSample` in the same file |
 
 The class has `@Inject()`, so the container makes it. A comment shows the route to add, like `Route.get<BlogController>('path', (BlogController c) => c.index);`.
-After the file is made, the CLI tells you to run `dart run build_runner build`. That adds the controller to `lib/container.g.dart`.
+After the file is made, the CLI tells you to run `dart run build_runner build`. That adds the controller to `lib/generated/container.g.dart`.
 
 ### `dox make:middleware`
 
@@ -17670,7 +17672,7 @@ import 'dart:io';
 
 import 'package:dox_queue/dox_queue.dart';
 import 'package:<app>/config/app.dart';
-import 'package:<app>/jobs.g.dart';
+import 'package:<app>/generated/jobs.g.dart';
 
 Future<void> main(List<String> args) async {
   exitCode = await QueueWorker(jobs: jobRegistry, app: appConfig).run(args);
@@ -18291,7 +18293,7 @@ Or set `APP_PORT=3001` in `.env` (a new project reads it into `serverPort`).
 
 ## build_runner: conflicting outputs
 
-**Symptom.** `dox build_runner:build`, `dox serve` or `dox build` stops with a build_runner message that starts with `Conflicting outputs were detected`, and names files like `lib/dtos.g.dart` or `lib/app/models/user/user.model.g.dart`.
+**Symptom.** `dox build_runner:build`, `dox serve` or `dox build` stops with a build_runner message that starts with `Conflicting outputs were detected`, and names files like `lib/generated/dtos.g.dart` or `lib/app/models/user/user.model.g.dart`.
 
 **Cause.** The generated `.g.dart` files are on disk, but `.dart_tool/build` does not know them. This happens after a `git clone` with committed `.g.dart` files, after deleting `.dart_tool`, or after a Dart SDK update.
 
@@ -18504,7 +18506,7 @@ The table shows the `message` text.
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `Bad state: <T> is not a known DTO. Add @Dto() to it, run `dart run build_runner build` and set `dtos: dtos` (lib/dtos.g.dart) in AppConfig.` | `req.validate<T>()` can not find `T`. | Do what the text says. |
+| `Bad state: <T> is not a known DTO. Add @Dto() to it, run `dart run build_runner build` and set `dtos: dtos` (lib/generated/dtos.g.dart) in AppConfig.` | `req.validate<T>()` can not find `T`. | Do what the text says. |
 | `Invalid argument(s): Storage disk "<name>" has unknown driver "<type>"` | A disk in `StorageConfig` has a `driver` other than `local`, `s3` or `memory`. | Fix the driver name. |
 | `Invalid argument(s): Storage disk "<name>" needs the "<setting>" setting. It is missing or empty.` | An `s3` disk without `bucket`, `key` or `secret`, on its first use. | Set `AWS_BUCKET`, `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`. |
 | `Invalid argument(s): invalid file` | `Storage().put()` with no `extension:`, and Dox can not find the type from the bytes. | Pass `extension: 'pdf'`. |
@@ -18804,6 +18806,11 @@ What changed in each package, newest first. This page is made from the
 - `dart_jsonwebtoken` 3.
 
 ## dox_builder
+
+### Unreleased
+
+- The app-wide files are now written to `lib/generated/`: `lib/generated/container.g.dart`, `lib/generated/dtos.g.dart` and `lib/generated/openapi.g.dart`. This keeps them out of the top of `lib/`. Import them from `package:<app>/generated/...`. Delete the old files in `lib/` after you run `dart run build_runner build`.
+- Model part files (like `user.model.g.dart`) still sit next to their source file.
 
 ### 3.0.0-alpha.9
 

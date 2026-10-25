@@ -4463,7 +4463,7 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/develop/docs/guides/api-docs-with-openapi.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/dartondox/dox/edit/main/docs/guides/api-docs-with-openapi.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -4479,9 +4479,9 @@
 <li><code>build_runner</code> and <code>dox_builder</code>. A new app has both. <code>dox_core</code> already has <code>dox_openapi</code>, so you add no package.</li>
 </ul>
 <h2 id="1-write-the-config">1. Write the config</h2>
-<p><code>build_runner</code> writes <code>lib/openapi.g.dart</code>. Its <code>openApiRegistry</code> holds what the builder found in your routes, controllers, DTOs and models. Pass it to an <code>OpenApiConfig</code>:</p>
+<p><code>build_runner</code> writes <code>lib/generated/openapi.g.dart</code>. Its <code>openApiRegistry</code> holds what the builder found in your routes, controllers, DTOs and models. Pass it to an <code>OpenApiConfig</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/openapi.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/openapi.g.dart'</span><span class="p">;</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/generated/openapi.g.dart'</span><span class="p">;</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">OpenApiConfig</span><span class="w"> </span><span class="n">openApi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenApiConfig</span><span class="p">(</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nl">info:</span><span class="w"> </span><span class="n">Info</span><span class="p">(</span><span class="nl">title:</span><span class="w"> </span><span class="s1">'Blog API'</span><span class="p">,</span><span class="w"> </span><span class="nl">version:</span><span class="w"> </span><span class="s1">'1.0.0'</span><span class="p">),</span>

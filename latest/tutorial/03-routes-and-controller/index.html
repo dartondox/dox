@@ -4360,7 +4360,7 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/develop/docs/tutorial/03-routes-and-controller.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/dartondox/dox/edit/main/docs/tutorial/03-routes-and-controller.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -4406,7 +4406,7 @@ Replace the file with this. It keeps only <code>index</code>, <code>store</code>
 </span></code></pre></div>
 <p>How it works:</p>
 <ul>
-<li><code>@Inject()</code> puts the controller in the container. Dox makes it for you. <code>dox s</code> runs <code>build_runner</code>, which adds it to <code>lib/container.g.dart</code>.
+<li><code>@Inject()</code> puts the controller in the container. Dox makes it for you. <code>dox s</code> runs <code>build_runner</code>, which adds it to <code>lib/generated/container.g.dart</code>.
   A new project already has <code>container: registerContainer</code> in <code>lib/config/app.dart</code>, so you change nothing there.</li>
 <li>A controller returns a model or a list of models. Dox sends it as JSON.</li>
 <li><code>response(post).statusCode(201)</code> sets the status code.</li>

@@ -4463,7 +4463,7 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/develop/docs/guides/jwt-auth.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/dartondox/dox/edit/main/docs/guides/jwt-auth.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -4528,7 +4528,7 @@
 </span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Dox finds the service by itself. Run <code>dart run build_runner build</code> and it is in <code>lib/container.g.dart</code>.</p>
+<p>Dox finds the service by itself. Run <code>dart run build_runner build</code> and it is in <code>lib/generated/container.g.dart</code>.</p>
 <h2 id="3-write-the-dtos">3. Write the DTOs</h2>
 <p><code>@Unique</code> makes sure the email is not taken. It comes from <code>dox_orm</code>, so hide its <code>Schema</code> class.</p>
 <div class="language-dart highlight"><span class="filename">lib/app/http/dtos/register_user.dto.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>

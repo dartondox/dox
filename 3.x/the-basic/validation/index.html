@@ -4626,7 +4626,7 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/develop/docs/the-basic/validation.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/dartondox/dox/edit/main/docs/the-basic/validation.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -4676,13 +4676,13 @@ When the input is wrong, Dox answers <code>422</code> with the errors. Your cont
 <ol>
 <li>Make a DTO with <code>dox make:dto CreateUser</code>. It writes <code>lib/app/http/dtos/create_user.dto.dart</code>.</li>
 <li>Run the generator: <code>dox build_runner:build</code> (or <code>dox build_runner:watch</code>).
-   It writes a <code>.dto.g.dart</code> file next to each DTO, and one list of all DTOs in <code>lib/dtos.g.dart</code>.</li>
+   It writes a <code>.dto.g.dart</code> file next to each DTO, and one list of all DTOs in <code>lib/generated/dtos.g.dart</code>.</li>
 <li>Give that list to the app:</li>
 </ol>
-<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/dtos.g.dart'</span><span class="p">;</span>
+<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/generated/dtos.g.dart'</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nl">dtos:</span><span class="w"> </span><span class="n">dtos</span><span class="p">,</span><span class="w"> </span><span class="c1">// from lib/dtos.g.dart</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nl">dtos:</span><span class="w"> </span><span class="n">dtos</span><span class="p">,</span><span class="w"> </span><span class="c1">// from lib/generated/dtos.g.dart</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="c1">// ...</span>
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">);</span>
 </span></code></pre></div>

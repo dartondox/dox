@@ -4331,7 +4331,7 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/develop/docs/guides/share-code-with-flutter.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/dartondox/dox/edit/main/docs/guides/share-code-with-flutter.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -4404,7 +4404,7 @@
 <p>This writes two files:</p>
 <ul>
 <li><code>lib/src/save_blog.g.dart</code>: the checks, the converter and the JSON Schema of <code>SaveBlog</code>.</li>
-<li><code>lib/dtos.g.dart</code>: the list of every DTO in this package. The server uses it.</li>
+<li><code>lib/generated/dtos.g.dart</code>: the list of every DTO in this package. The server uses it.</li>
 </ul>
 <p>Commit both files. Then the Flutter app does not need to run the generator.</p>
 <div class="admonition warning">
@@ -4429,18 +4429,18 @@ Check them on the server, in the service or in a server-only DTO.</p>
 </span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">  </span><span class="nt">build_runner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^2.17.1</span>
 </span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">  </span><span class="nt">dox_builder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^3.0.0-alpha</span>
 </span></code></pre></div>
-<p>Dox finds a DTO in the <code>dtos</code> list of <code>AppConfig</code>. The server's own <code>lib/dtos.g.dart</code> lists only the DTOs in the server.
+<p>Dox finds a DTO in the <code>dtos</code> list of <code>AppConfig</code>. The server's own <code>lib/generated/dtos.g.dart</code> lists only the DTOs in the server.
 So add the list of the shared package too:</p>
-<div class="language-dart highlight"><span class="filename">server/lib/config/app.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog_shared/dtos.g.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">shared</span><span class="p">;</span>
+<div class="language-dart highlight"><span class="filename">server/lib/config/app.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog_shared/generated/dtos.g.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">shared</span><span class="p">;</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:server/dtos.g.dart'</span><span class="p">;</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:server/generated/dtos.g.dart'</span><span class="p">;</span>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
 </span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="c1">// ...</span>
 </span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="nl">dtos:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">DtoSchema</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">&gt;&gt;</span><span class="p">[...</span><span class="n">dtos</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="n">shared</span><span class="p">.</span><span class="n">dtos</span><span class="p">],</span>
 </span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>When the server has no DTOs of its own, there is no <code>server/lib/dtos.g.dart</code>. Then use <code>dtos: shared.dtos</code>.</p>
+<p>When the server has no DTOs of its own, there is no <code>server/lib/generated/dtos.g.dart</code>. Then use <code>dtos: shared.dtos</code>.</p>
 <p>The controller asks for <code>SaveBlog</code> like any other DTO. Dox checks the body before the method runs. Bad input gets <code>422</code>.</p>
 <div class="language-dart highlight"><span class="filename">server/lib/app/http/controllers/blog.controller.dart</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog_shared/blog_shared.dart'</span><span class="w"> </span><span class="k">show</span><span class="w"> </span><span class="n">SaveBlog</span><span class="p">;</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>

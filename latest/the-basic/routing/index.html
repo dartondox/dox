@@ -4515,7 +4515,7 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/develop/docs/the-basic/routing.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/dartondox/dox/edit/main/docs/the-basic/routing.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -4553,7 +4553,7 @@ The <code>prefix</code> of the router is added in front of all its routes.</p>
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Dox finds every <code>Router</code> class by itself. It is in <code>lib/container.g.dart</code> after <code>dart run build_runner build</code>.
+<p>Dox finds every <code>Router</code> class by itself. It is in <code>lib/generated/container.g.dart</code> after <code>dart run build_runner build</code>.
 To pick the order of routers, list them in <code>routers:</code> of <code>AppConfig</code>.
 See <a href="../dependency-injection/#routers-and-services">Dependency injection: routers and services</a>.</p>
 <p>The leading <code>/</code> in a path is optional. <code>'ping'</code> and <code>'/ping'</code> are the same route.</p>
@@ -4758,7 +4758,7 @@ The binder gets the raw text from the URL. It returns the value, or <code>null</
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="p">});</span>
 </span></code></pre></div>
 <p>The binder runs after the middleware, so an auth middleware can stop the request before any database call.</p>
-<p>A <code>@DoxModel</code> class does not need <code>Route.bind</code>. Dox makes a binder for it in <code>lib/container.g.dart</code>.
+<p>A <code>@DoxModel</code> class does not need <code>Route.bind</code>. Dox makes a binder for it in <code>lib/generated/container.g.dart</code>.
 See <a href="../dependency-injection/#route-model-binding">Dependency injection: route model binding</a>.
 <code>Route.bind</code> wins when both exist.</p>
 <h2 id="serve-storage-files">Serve storage files</h2>

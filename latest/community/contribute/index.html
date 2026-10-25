@@ -4637,7 +4637,7 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/develop/docs/community/contribute.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/dartondox/dox/edit/main/docs/community/contribute.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -4695,7 +4695,7 @@ There is one <code>pubspec.lock</code> for the whole repo.</p>
 It runs when you push a tag like <code>v3.0.0-alpha.5</code>.
 It uses pub.dev automated publishing, so it needs no token or secret.</p>
 <h3 id="steps">Steps</h3>
-<p>The full guide is <a href="https://github.com/dartondox/dox/blob/develop/RELEASING.md">RELEASING.md</a> in the repo. In short:</p>
+<p>The full guide is <a href="https://github.com/dartondox/dox/blob/main/RELEASING.md">RELEASING.md</a> in the repo. In short:</p>
 <ol>
 <li>Bump every package with <code>bin/update_versions.sh</code>, and close the <code>## Unreleased</code> section of each <code>CHANGELOG.md</code>.</li>
 <li>Merge the release PR, then push the tag <code>v&lt;version&gt;</code>. This publishes to pub.dev.</li>
@@ -4795,7 +4795,7 @@ Then raise the version constraint in the Dox packages that use it.</p>
 <tbody>
 <tr>
 <td><code>/3.x/...</code></td>
-<td>3.x docs, built from <code>develop</code></td>
+<td>3.x docs, built from <code>main</code></td>
 </tr>
 <tr>
 <td><code>/latest/...</code></td>
@@ -4824,7 +4824,7 @@ Then raise the version constraint in the Dox packages that use it.</p>
 <h3 id="deploy">Deploy</h3>
 <ul>
 <li>3.x deploys by itself. The <code>Docs</code> workflow (<code>.github/workflows/docs.yaml</code>) runs on every push
-  to <code>develop</code> that changes <code>docs/</code>, <code>mkdocs.yml</code> or the workflow.
+  to <code>main</code> that changes <code>docs/</code>, <code>mkdocs.yml</code> or the workflow.
   It runs <code>mike deploy --update-aliases 3.x latest</code>.</li>
 <li>2.x deploys by hand. Open Actions &gt; Docs &gt; "Run workflow", pick version <code>2.x</code>.
   It builds from the <code>v2.x</code> branch (change it with the <code>ref</code> input).</li>

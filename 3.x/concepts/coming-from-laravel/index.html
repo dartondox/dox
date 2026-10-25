@@ -4602,7 +4602,7 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/develop/docs/concepts/coming-from-laravel.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/dartondox/dox/edit/main/docs/concepts/coming-from-laravel.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -5474,7 +5474,7 @@ See <a href="../../digging-deeper/testing/">Testing</a>.</p>
 <h2 id="what-is-different">What is different</h2>
 <ul>
 <li><strong>A generated container.</strong> Like Laravel, Dox makes your controllers and injects what the constructor asks for.
-  You add <code>@Inject()</code> to the class. <code>build_runner</code> writes <code>lib/container.g.dart</code> with every registration. There are no service providers to write.
+  You add <code>@Inject()</code> to the class. <code>build_runner</code> writes <code>lib/generated/container.g.dart</code> with every registration. There are no service providers to write.
   A singleton is one instance per isolate, not one per request.</li>
 <li><strong>Isolates, not PHP-FPM workers.</strong> One process runs one isolate per CPU core. Each isolate runs your whole app and has its own memory.
   A static value or a singleton lives once per isolate. A PHP worker starts from zero on each request. A Dox isolate keeps its state between requests, so a memory leak stays.

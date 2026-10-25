@@ -4246,7 +4246,7 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/develop/docs/tutorial/index.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/dartondox/dox/edit/main/docs/tutorial/index.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -4257,7 +4257,7 @@
 <h1 id="build-a-blog-api">Build a blog API</h1>
 <p>This tutorial takes you from an empty folder to a small blog API that runs as one native binary.
 Every step has the full code and a <code>curl</code> command to check it.</p>
-<p>The finished project is on GitHub: <a href="https://github.com/dartondox/dox/tree/develop/examples/blog-api">examples/blog-api</a>.
+<p>The finished project is on GitHub: <a href="https://github.com/dartondox/dox/tree/main/examples/blog-api">examples/blog-api</a>.
 CI builds it and runs its tests on every push, so the code on these pages keeps working.</p>
 <h2 id="what-you-will-build">What you will build</h2>
 <p>A JSON API for blog posts.</p>
@@ -4361,12 +4361,13 @@ CI builds it and runs its tests on every push, so the code on these pages keeps 
 </span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>│   ├── services/
 </span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>│   │   ├── auth_service.dart     *
 </span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>│   │   └── orm_service.dart
-</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>│   ├── container.g.dart          * generated
-</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>│   └── dtos.g.dart               * generated
-</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>├── test/http_test.dart           *
-</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>├── .env                          *
-</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>├── Dockerfile
-</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>└── pubspec.yaml                  * adds dox_auth
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>│   └── generated/
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>│       ├── container.g.dart      * generated
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>│       └── dtos.g.dart           * generated
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>├── test/http_test.dart           *
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>├── .env                          *
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>├── Dockerfile
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>└── pubspec.yaml                  * adds dox_auth
 </span></code></pre></div>
 <p>Start with <a href="01-create-project/">step 1: create the project</a>.</p>
 

@@ -4792,7 +4792,7 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/develop/docs/reference/cli.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/dartondox/dox/edit/main/docs/reference/cli.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -5011,7 +5011,7 @@ It reads the version list from pub.dev, then runs <code>dart pub global activate
 </tbody>
 </table>
 <p>The class has <code>@Inject()</code>, so the container makes it. A comment shows the route to add, like <code>Route.get&lt;BlogController&gt;('path', (BlogController c) =&gt; c.index);</code>.
-After the file is made, the CLI tells you to run <code>dart run build_runner build</code>. That adds the controller to <code>lib/container.g.dart</code>.</p>
+After the file is made, the CLI tells you to run <code>dart run build_runner build</code>. That adds the controller to <code>lib/generated/container.g.dart</code>.</p>
 <h3 id="dox-makemiddleware"><code>dox make:middleware</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>dox make:middleware &lt;name&gt;
 </span></code></pre></div>
@@ -5271,7 +5271,7 @@ When <code>bin/queue.dart</code> is missing, the command prints how to set it up
 </span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
 </span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_queue/dox_queue.dart'</span><span class="p">;</span>
 </span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:&lt;app&gt;/config/app.dart'</span><span class="p">;</span>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:&lt;app&gt;/jobs.g.dart'</span><span class="p">;</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:&lt;app&gt;/generated/jobs.g.dart'</span><span class="p">;</span>
 </span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>
 </span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">  </span><span class="n">exitCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueueWorker</span><span class="p">(</span><span class="nl">jobs:</span><span class="w"> </span><span class="n">jobRegistry</span><span class="p">,</span><span class="w"> </span><span class="nl">app:</span><span class="w"> </span><span class="n">appConfig</span><span class="p">).</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>

@@ -4658,7 +4658,7 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/develop/docs/reference/cheat-sheet.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/dartondox/dox/edit/main/docs/reference/cheat-sheet.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -4722,7 +4722,7 @@
 <td><code>DoxService</code> classes: ORM, auth, websocket</td>
 </tr>
 <tr>
-<td><code>lib/container.g.dart</code>, <code>lib/dtos.g.dart</code>, <code>lib/openapi.g.dart</code></td>
+<td><code>lib/generated/container.g.dart</code>, <code>lib/generated/dtos.g.dart</code>, <code>lib/generated/openapi.g.dart</code></td>
 <td>made by <code>build_runner</code>. Do not edit.</td>
 </tr>
 <tr>
@@ -4844,7 +4844,7 @@
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="nd">@Inject</span><span class="p">(</span><span class="nl">singleton:</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w">       </span><span class="c1">// a new instance each time</span>
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Clock</span><span class="w"> </span><span class="p">{}</span>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">AppConfig</span><span class="p">(</span><span class="nl">container:</span><span class="w"> </span><span class="n">registerContainer</span><span class="p">);</span><span class="w"> </span><span class="c1">// from lib/container.g.dart</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">AppConfig</span><span class="p">(</span><span class="nl">container:</span><span class="w"> </span><span class="n">registerContainer</span><span class="p">);</span><span class="w"> </span><span class="c1">// from lib/generated/container.g.dart</span>
 </span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
 </span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="n">Dox</span><span class="p">().</span><span class="n">ioc</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="n">PostService</span><span class="o">&gt;</span><span class="p">();</span>
 </span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="n">Dox</span><span class="p">().</span><span class="n">ioc</span><span class="p">.</span><span class="n">override</span><span class="o">&lt;</span><span class="n">PostRepository</span><span class="o">&gt;</span><span class="p">(</span><span class="n">FakePostRepository</span><span class="p">());</span><span class="w"> </span><span class="c1">// tests</span>
@@ -5392,7 +5392,7 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 <h2 id="openapi">OpenAPI</h2>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">OpenApiConfig</span><span class="w"> </span><span class="n">openApi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenApiConfig</span><span class="p">(</span>
 </span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="nl">info:</span><span class="w"> </span><span class="n">Info</span><span class="p">(</span><span class="nl">title:</span><span class="w"> </span><span class="s1">'Blog API'</span><span class="p">,</span><span class="w"> </span><span class="nl">version:</span><span class="w"> </span><span class="s1">'1.0.0'</span><span class="p">),</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="nl">registry:</span><span class="w"> </span><span class="n">openApiRegistry</span><span class="p">,</span><span class="w"> </span><span class="c1">// lib/openapi.g.dart</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="nl">registry:</span><span class="w"> </span><span class="n">openApiRegistry</span><span class="p">,</span><span class="w"> </span><span class="c1">// lib/generated/openapi.g.dart</span>
 </span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="p">);</span>
 </span></code></pre></div>
 <p>Docs at <code>/docs</code>, <code>/openapi.json</code>, <code>/openapi.yaml</code>. On only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>, unless <code>enabled: true</code>. Change one route with <code>@Summary</code>, <code>@Tags</code>, <code>@Request(T)</code>, <code>@Response(200, T)</code>, <code>@ApiIgnore()</code>.</p>

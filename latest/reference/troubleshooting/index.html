@@ -4460,7 +4460,7 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/develop/docs/reference/troubleshooting.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/dartondox/dox/edit/main/docs/reference/troubleshooting.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -4524,7 +4524,7 @@
 </span></code></pre></div>
 <p>Or set <code>APP_PORT=3001</code> in <code>.env</code> (a new project reads it into <code>serverPort</code>).</p>
 <h2 id="build_runner-conflicting-outputs">build_runner: conflicting outputs</h2>
-<p><strong>Symptom.</strong> <code>dox build_runner:build</code>, <code>dox serve</code> or <code>dox build</code> stops with a build_runner message that starts with <code>Conflicting outputs were detected</code>, and names files like <code>lib/dtos.g.dart</code> or <code>lib/app/models/user/user.model.g.dart</code>.</p>
+<p><strong>Symptom.</strong> <code>dox build_runner:build</code>, <code>dox serve</code> or <code>dox build</code> stops with a build_runner message that starts with <code>Conflicting outputs were detected</code>, and names files like <code>lib/generated/dtos.g.dart</code> or <code>lib/app/models/user/user.model.g.dart</code>.</p>
 <p><strong>Cause.</strong> The generated <code>.g.dart</code> files are on disk, but <code>.dart_tool/build</code> does not know them. This happens after a <code>git clone</code> with committed <code>.g.dart</code> files, after deleting <code>.dart_tool</code>, or after a Dart SDK update.</p>
 <p><strong>Fix.</strong> Delete the build cache and build again:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>.dart_tool/build

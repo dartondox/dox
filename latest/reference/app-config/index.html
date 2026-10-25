@@ -4504,7 +4504,7 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/develop/docs/reference/app-config.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/dartondox/dox/edit/main/docs/reference/app-config.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -4604,7 +4604,7 @@
 <td><code>container</code></td>
 <td><code>void Function(IocContainer)?</code></td>
 <td><code>null</code></td>
-<td>Fills the container: <code>registerContainer</code> from <code>lib/container.g.dart</code>. Every isolate runs it. It also gives the routers, services and model binders. See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</td>
+<td>Fills the container: <code>registerContainer</code> from <code>lib/generated/container.g.dart</code>. Every isolate runs it. It also gives the routers, services and model binders. See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</td>
 </tr>
 <tr>
 <td><code>routers</code></td>
@@ -4622,7 +4622,7 @@
 <td><code>dtos</code></td>
 <td><code>List&lt;DtoSchema&lt;Object&gt;&gt;</code></td>
 <td><code>[]</code></td>
-<td>Every DTO of the app: <code>dtos</code> from <code>lib/dtos.g.dart</code>. Dox finds the DTO of a controller parameter and of <code>req.validate&lt;T&gt;()</code> with it.</td>
+<td>Every DTO of the app: <code>dtos</code> from <code>lib/generated/dtos.g.dart</code>. Dox finds the DTO of a controller parameter and of <code>req.validate&lt;T&gt;()</code> with it.</td>
 </tr>
 <tr>
 <td><code>validationMessages</code></td>
@@ -5113,7 +5113,7 @@
 <td><code>registry</code></td>
 <td><code>OpenApiRegistry</code></td>
 <td><code>OpenApiRegistry()</code> (empty)</td>
-<td>What <code>dox_builder</code> found in the code. Pass <code>openApiRegistry</code> from <code>lib/openapi.g.dart</code>.</td>
+<td>What <code>dox_builder</code> found in the code. Pass <code>openApiRegistry</code> from <code>lib/generated/openapi.g.dart</code>.</td>
 </tr>
 <tr>
 <td><code>ui</code></td>
@@ -5585,7 +5585,7 @@ Source: <code>packages/dox-auth/lib/src/interfaces.dart</code>.</p>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/logger.dart'</span><span class="p">;</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/storage.dart'</span><span class="p">;</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/container.g.dart'</span><span class="p">;</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/generated/container.g.dart'</span><span class="p">;</span>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="c1">/// Changing the key makes old cookies and encrypted data unreadable.</span>
