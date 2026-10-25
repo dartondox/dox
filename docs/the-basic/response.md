@@ -19,7 +19,7 @@ Return the value from your controller. Dox turns it into the response.
 | an `IHttpException`, like `NotFoundHttpException()` | its status code and its message (text, or JSON for a `Map`) |
 | a `File` (from `dart:io`) | the file, streamed |
 | a `Stream<List<int>>` | the bytes, streamed |
-| `StreamFile`, `DownloadableFile` from `Storage()` | the file, streamed |
+| `StreamFile`, `DownloadableFile` (also from `Storage()` of `dox_storage`) | the file, streamed |
 | `response(...)` | full control: status, headers, cookies |
 
 ```dart

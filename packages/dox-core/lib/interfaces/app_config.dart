@@ -48,14 +48,8 @@ class AppConfig {
   /// cache stores for `Cache()`, see `dox_cache`
   final CacheConfig cache;
 
-  /// storage disks for `Storage()`, see `dox_storage`
-  final StorageConfig storage;
-
   /// `/docs`, `/openapi.json` and `/openapi.yaml`, see `dox_openapi`
   final OpenApiConfig openApi;
-
-  /// Socket.IO on the http port, see `dox_socketio`. Off by default.
-  final SocketIoConfig socketIo;
   final LoggerConfig logger;
 
   /// session settings for `SessionMiddleware`. Cookie driver by default.
@@ -121,10 +115,8 @@ class AppConfig {
         'memory': <String, dynamic>{'driver': 'memory'},
       },
     ),
-    this.storage = const StorageConfig(),
     this.session = const SessionConfig(),
     this.openApi = const OpenApiConfig(),
-    this.socketIo = const SocketIoConfig(),
     this.exceptionHandler = const ExceptionHandler(),
     this.responseHandler,
     this.maxBodySize = 10 * 1024 * 1024,

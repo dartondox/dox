@@ -4,7 +4,6 @@ import 'package:blog/config/cache.dart';
 import 'package:blog/config/cors.dart';
 import 'package:blog/config/env.dart';
 import 'package:blog/config/logger.dart';
-import 'package:blog/config/storage.dart';
 import 'package:blog/generated/container.g.dart';
 import 'package:blog/generated/dtos.g.dart';
 import 'package:dox_core/dox_core.dart';
@@ -52,9 +51,6 @@ AppConfig appConfig = AppConfig(
 
   /// Cache stores (config/cache.dart)
   cache: cache,
-
-  /// Storage disks (config/storage.dart)
-  storage: storage,
 
   /// Cors configuration
   cors: cors,

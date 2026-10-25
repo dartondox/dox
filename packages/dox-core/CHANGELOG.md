@@ -1,3 +1,11 @@
+## Unreleased
+
+- Breaking: `dox_core` no longer depends on `dox_storage` and `dox_socketio`. Add the package you use to your app.
+  - Storage: `Storage()`, `StorageConfig` and `StorageDiskFactory` moved to `dox_storage`. `AppConfig.storage` is removed: extend `StorageService` from `dox_storage` (`class AppStorageService extends StorageService { AppStorageService() : super(storageConfig); }`). `Route.files()` is now `Storage.route()`. `Dox().storage` is now `Storage.manager`. `RequestFile.store()` needs `import 'package:dox_storage/dox_storage.dart'`.
+  - Socket.IO: `SocketIoConfig` moved to `dox_socketio`. `AppConfig.socketIo` is removed: extend `SocketIoService` from `dox_socketio`. `Dox().socketIo` is now `SocketIoService.server`.
+  - `dox_core` no longer exports `Disk`, `DriveManager`, `FileNotFoundException` and `StorageException`. Import them from `dox_storage`.
+  - `StreamFile` and `DownloadableFile` stay in `dox_core`.
+
 ## 3.0.0-alpha.11
 
 - New: middleware that runs after the controller. Implement `IDoxNextMiddleware` (`handle(DoxRequest req, Next next)`), or use a function `(DoxRequest req, Next next)`. `await next()` runs the rest of the middleware and the controller and gives a `DoxResponse`, so the code after it can change the status, headers and cookies. A thrown error comes back as its error response, so the after part still runs. Before-only middleware work as before. A route with no `next` middleware takes the same fast path as before.

@@ -262,13 +262,13 @@ See [Dependency injection: route model binding](dependency-injection.md#route-mo
 
 ## Serve storage files
 
-`Route.files(path)` serves the files of a storage disk at `GET <path>/{key*}`.
+`Storage.route(path)` from the [`dox_storage`](../packages/storage.md) package serves the files of a storage disk at `GET <path>/{key*}`.
 By default only signed URLs work. Other requests get `403`.
 See [File Storage](../digging-deeper/file-storage.md#serve-local-signed-urls).
 
 ```dart
-Route.files('files');
-Route.files('public', disk: 'local', signed: false);
+Storage.route('files');
+Storage.route('public', disk: 'local', signed: false);
 ```
 
 An html, svg, xml or javascript file is sent as a download (`Content-Disposition: attachment`) with `Content-Security-Policy: sandbox`.
@@ -278,7 +278,7 @@ Every file response also has `X-Content-Type-Options: nosniff`, so the browser d
 For user uploads, `download: true` sends every file as a download, also images and PDFs:
 
 ```dart
-Route.files('uploads', download: true);
+Storage.route('uploads', download: true);
 ```
 
 ## Request body for the docs

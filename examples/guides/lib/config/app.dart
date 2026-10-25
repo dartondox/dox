@@ -7,7 +7,6 @@ import 'package:my_app/config/cache.dart';
 import 'package:my_app/config/cors.dart';
 import 'package:my_app/config/env.dart';
 import 'package:my_app/config/logger.dart';
-import 'package:my_app/config/storage.dart';
 import 'package:my_app/generated/container.g.dart';
 import 'package:my_app/generated/dtos.g.dart';
 import 'package:my_app/routes/api.dart';
@@ -38,7 +37,6 @@ AppConfig appConfig = AppConfig(
   exceptionHandler: const AppExceptionHandler(),
 
   cache: cache,
-  storage: storage,
   cors: cors,
 
   /// the ORM first: the other services use the database

@@ -37,18 +37,13 @@ melos bs
 ### 4. Useful commands
 
 ```bash
-# Run all tests (not dox_orm).
+# Run all tests.
 # Use `melos run test`. `melos test` is a built-in melos command.
 melos run test
 
 # Analyze and check format (same as CI)
 melos run analyze
 melos run format_check
-
-# Run tests for dox_orm with postgres, mysql or sqlite
-DB_PORT=5432 melos run test_pg
-DB_USER=dox DB_PORT=3306 melos run test_mysql
-melos run test_sqlite
 
 # Build the dox cli executable (AOT).
 # `dart compile exe` does not work: sqlite3 has a build hook. Use `dart build cli`.
@@ -81,6 +76,8 @@ The full guide is [RELEASING.md](https://github.com/dartondox/dox/blob/main/RELE
 
 The native packages (`dox_http_native`, `dox_postgres_native`, `dox_mysql_native`) are not in this repo.
 See [Native packages](#native-packages) below.
+`dox_orm`, `dox_migration`, `dox_query_builder`, `dox_socketio` and `dox_storage` are not in this repo either.
+See [Packages in other repos](#packages-in-other-repos).
 
 **New package only:** turn on pub.dev automated publishing for it first. See [One-time setup](#one-time-setup).
 A new package must first exist on pub.dev, so publish its first version by hand with `dart pub publish`.
@@ -127,6 +124,39 @@ On pub.dev:
 On GitHub, in `dartondox/dox` > Settings > Environments, there must be an environment named `pub.dev`.
 The publish job runs in it.
 Optional: add yourself as a required reviewer, and allow only tags `v*`.
+
+## Packages in other repos
+
+| Package | Repo |
+| --- | --- |
+| `dox_orm`, `dox_migration`, `dox_query_builder` | [dartondox/dox-orm](https://github.com/dartondox/dox-orm) |
+| `dox_socketio` | [dartondox/dox-socketio](https://github.com/dartondox/dox-socketio) |
+| `dox_storage` | [dartondox/dox-storage](https://github.com/dartondox/dox-storage) |
+| `dox_queue` | [dartondox/dox-queue](https://github.com/dartondox/dox-queue) |
+| `dox_scheduler` | [dartondox/dox-scheduler](https://github.com/dartondox/dox-scheduler) |
+
+The packages here use them from pub.dev. The database tests (Postgres, MySQL, SQLite) run in `dox-orm`.
+
+To work on one of them and Dox together:
+
+1. Clone the repos next to the Dox repo: `../dox-orm`, `../dox-socketio`, `../dox-storage`.
+   `ci/clone-siblings.sh` does this.
+2. Add them to the root `pubspec_overrides.yaml` of the Dox repo. Git ignores this file.
+
+    ```yaml
+    dependency_overrides:
+      dox_orm:
+        path: ../dox-orm/packages/dox-orm
+      dox_migration:
+        path: ../dox-orm/packages/dox-migration
+    ```
+
+3. Run `dart pub get`.
+
+The apps in `examples/` already use these clones (their `pubspec_overrides.yaml`), so clone them before you run an example.
+In the other repo, a `pubspec_overrides.yaml` that points to `../dox/packages/...` uses your local Dox packages.
+
+Each repo has its own version. Push a `v<version>` tag in that repo to release it.
 
 ## Native packages
 

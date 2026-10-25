@@ -9,6 +9,7 @@ dependencies:
   dox_orm: ^3.0.0-alpha
   dox_migration: ^3.0.0-alpha
   dox_auth: ^3.0.0-alpha
+  dox_storage: ^3.0.0-alpha
 
 dev_dependencies:
   dox_builder: ^3.0.0-alpha

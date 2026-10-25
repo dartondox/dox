@@ -17,6 +17,23 @@ Its CI builds the libraries, uploads them, fills the hashes and publishes the pa
 When a Dox release needs a new native version, release the native package first.
 Then raise its constraint (like `dox_http_native: ^3.0.0-alpha.7`) in the Dox packages that use it.
 
+## Packages in other repos
+
+These packages are not released from this repo either:
+
+- `dox_orm`, `dox_migration` and `dox_query_builder`: [dartondox/dox-orm](https://github.com/dartondox/dox-orm). The three share one version.
+- `dox_socketio`: [dartondox/dox-socketio](https://github.com/dartondox/dox-socketio)
+- `dox_storage`: [dartondox/dox-storage](https://github.com/dartondox/dox-storage)
+- `dox_queue`: [dartondox/dox-queue](https://github.com/dartondox/dox-queue)
+- `dox_scheduler`: [dartondox/dox-scheduler](https://github.com/dartondox/dox-scheduler)
+
+Each repo has its own version. To release, push a `v<version>` tag in that repo.
+Its Release workflow publishes to pub.dev.
+
+`dox_socketio` and `dox_storage` depend on `dox_core`. When they need a new `dox_core`, release this repo first.
+`dox_auth`, `dox_cli` and `dox_core` (dev) depend on `dox_orm` or `dox_migration` from pub.dev.
+When they need a new one, release `dox-orm` first, then raise the constraint here.
+
 ## Before you start
 
 - `main` has every change you want to ship, and CI is green.
@@ -25,6 +42,7 @@ Then raise its constraint (like `dox_http_native: ^3.0.0-alpha.7`) in the Dox pa
   Go to pub.dev → the package → Admin → Automated publishing → GitHub Actions.
   Use repo `dartondox/dox`, tag pattern `v{{version}}` and environment `pub.dev`.
   Without it, the Release workflow fails on that package.
+  A package in another repo uses that repo name, like `dartondox/dox-orm`.
 
 In the steps below, replace `3.0.0-alpha.5` with the new version.
 

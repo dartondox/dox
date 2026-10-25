@@ -115,14 +115,4 @@ class RequestFile implements FileInput {
     _isTemp = false;
     return _file!;
   }
-
-  /// this function will store the file in your project storage folder
-  ///
-  /// ```
-  /// RequestFile image = req.input('image');
-  /// String filename = await image.store();
-  /// ```
-  Future<String> store(String folder) async {
-    return Storage().putRequestFile(folder, this);
-  }
 }

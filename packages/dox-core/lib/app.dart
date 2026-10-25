@@ -8,7 +8,6 @@ import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/server/dox_server.dart';
 import 'package:dox_core/utils/logger.dart';
 import 'package:dox_http_native/dox_http_native.dart';
-import 'package:dox_socketio/dox_socketio.dart';
 
 IocContainer _ioc = IocContainer();
 
@@ -62,17 +61,6 @@ class Dox {
   /// cache stores from `config.cache`, made on first use in each isolate.
   /// `Cache()` uses it. replace it in tests.
   late CacheManager cache = CacheManager(config.cache);
-
-  /// storage disks from `config.storage`, made on first use in each
-  /// isolate. `Storage()` uses it. replace it in tests.
-  late DriveManager storage = StorageDiskFactory(appKey: config.appKey)
-      .create(config.storage);
-
-  /// Socket.IO server of this isolate, when `config.socketIo` is enabled.
-  /// ```
-  /// Dox().socketIo?.to('room').emit('news', data);
-  /// ```
-  SocketIoServer? socketIo;
 
   /// total isolate to spawn
   int? _totalIsolate;
@@ -271,7 +259,6 @@ class Dox {
     }
     _registerRoute();
     _resolveControllers();
-    _mountSocketIo();
     if (config.openApi.isEnabled) OpenApiDocument(config.openApi).register();
   }
 
@@ -289,30 +276,6 @@ class Dox {
     }
     _registerRoute();
     return OpenApiDocument(config.openApi).write(dir);
-  }
-
-  /// Socket.IO gets the raw requests of its path, before the router.
-  void _mountSocketIo() {
-    SocketIoConfig settings = config.socketIo;
-    if (!settings.enabled) return;
-    SocketIoServer io = SocketIoServer(
-      options: settings.options,
-      adapter: settings.adapter?.create(),
-    );
-    for (NamespaceHandler handler in settings.namespaces) {
-      io.register(handler);
-    }
-    socketIo = io;
-    Route.mount(settings.options.path, io.handle);
-    if (isolateId == 1 &&
-        config.totalIsolate > 1 &&
-        settings.options.transports.contains('polling')) {
-      Logger.info(
-        'Socket.IO runs on ${config.totalIsolate} isolates: '
-        "clients should use transports: ['websocket'] (long-polling needs "
-        'one isolate or sticky sessions), with a Redis adapter.',
-      );
-    }
   }
 
   /// ################ end ###########

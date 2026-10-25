@@ -2,15 +2,14 @@
 """Runs a group of test entries from ci/test-matrix.json in parallel, in one
 CI job. Run from the repo root.
 
-Env: ENTRIES: JSON list of entries (the `unit` or `databases` output of
-     ci/affected.py). Each entry runs ci/run-tests.sh with its `packages`
+Env: ENTRIES: JSON list of entries (the `unit` output of ci/affected.py). Each entry runs ci/run-tests.sh with its `packages`
      and `vars`.
      MAX_PARALLEL: how many entries run at the same time. Default: the
      number of CPUs.
 
 Entries run at the same time, except when they share a lock. `locks` of
 an entry names what it can not share, like one database
-("postgres mariadb"). An entry starts only when no running entry holds
+("postgres"). An entry starts only when no running entry holds
 one of its locks. So the tests that use the same database run one after
 the other, and the tests on other databases run next to them.
 
@@ -18,8 +17,8 @@ Each entry runs in its own copy of the repo (no .git, no .dart_tool), made
 with `dart pub get --offline`. `dart test` writes shared files: the native
 assets list in .dart_tool/native_assets.yaml (only the assets of the
 package under test, so a run of another package at the same time loses
-its assets), the storage/ folder of a package, and the node_modules of the
-socket.io interop tests. With one copy per entry, nothing is shared.
+its assets) and the storage/ folder of a package. With one copy per
+entry, nothing is shared.
 
 Each entry writes to its own log. When all are done, every log is printed
 in its own `::group::`, then a summary. Exit code 1 when any entry failed.
