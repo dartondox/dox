@@ -15,17 +15,13 @@ workspace:
   - packages/dox-cache
   - packages/dox-cli
   - packages/dox-core
-  - packages/dox-http-native
   - packages/dox-migration
-  - packages/dox-mysql-native
   - packages/dox-openapi
   - packages/dox-orm
-  - packages/dox-postgres-native
   - packages/dox-query-builder
   - packages/dox-socketio
   - packages/dox-storage
   - packages/dox-validation
-  - packages/dox-websocket
 
 dev_dependencies:
   melos: ^8.9.0
@@ -55,8 +51,6 @@ melos:
         dirExists: test
         ignore:
           - dox_orm
-          # needs MySQL or MariaDB, see .github/workflows/native.yaml
-          - dox_mysql_native
 
     test_pg:
       exec: DRIVER=postgres dart test --concurrency=1

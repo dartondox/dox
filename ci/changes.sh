@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Finds the files a push changes, then lets ci/affected.py pick the jobs to
-# run. Writes code, changed, tests and examples to $GITHUB_OUTPUT (see
+# run. Writes code, tests and examples to $GITHUB_OUTPUT (see
 # ci/affected.py). A branch is compared with develop, so one docs-only push
 # on top of code commits still runs the tests of that code. Tags, and
 # pushes with no usable base (new branch, force push), run everything.

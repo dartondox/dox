@@ -5,8 +5,6 @@ Reads the changed files from stdin, one per line. With ALL=1 in the env,
 everything runs. Prints `key=value` lines for $GITHUB_OUTPUT:
 
   code      true when any file other than docs changed
-  changed   JSON list of package folders to treat as changed. Native
-            tests use it.
   unit, databases
             JSON list of the ci/test-matrix.json entries to run in that
             group (the `group` field of an entry), for ci/run-group.py
@@ -99,7 +97,6 @@ examples = [
 
 print(f'code={"true" if run_all or code_files else "false"}')
 # Compact JSON: the workflow skips a group job when its list is [].
-print('changed=' + json.dumps(sorted(changed_pkgs), separators=(',', ':')))
 for group in ('unit', 'databases'):
     picked = [e for e in tests if e['group'] == group]
     services = sorted({s for e in picked for s in e.get('services', '').split()})

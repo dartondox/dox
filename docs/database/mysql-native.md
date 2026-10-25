@@ -1,6 +1,6 @@
 # Native MySQL driver
 
-`dox_mysql_native` is the default MySQL and MariaDB driver of the Dox ORM.
+`dox_mysql_native` is the MySQL and MariaDB driver of the Dox ORM.
 Rust talks to the database. Your models, queries and transactions stay the
 same. You do not change any config.
 
@@ -10,14 +10,14 @@ same. You do not change any config.
   in one message.
 - Each connection keeps its prepared statements. The same SQL is not
   prepared again.
-- Values have the same Dart types as with the Dart driver (`mysql_dart`).
-  Errors are the same `MySQLServerException` class.
+- Errors are `MysqlException`, with the MySQL error `code` and the
+  `sqlState`.
 - Works with MySQL 8.4 (the default `caching_sha2_password` login) and
   MariaDB 11.
 
 !!! warning "Alpha"
-    This driver is new. If you see a problem, [use the Dart driver](#use-the-dart-driver)
-    and tell us.
+    This driver is new. If you see a problem, please
+    [open an issue](https://github.com/dartondox/dox-mysql-native/issues).
 
 ## Speed
 
@@ -25,22 +25,20 @@ One find-by-id query (`SELECT * FROM t WHERE id = @id`), AOT build
 (`dart build cli`), database on the same machine (Apple M-series),
 10 connections, one isolate:
 
-| | Dart driver | Native driver |
-|---|---|---|
-| MySQL 8.4, one query at a time | 61 µs | 67 µs |
-| MySQL 8.4, 32 queries in flight | 25 µs per query | 11 µs per query |
-| MySQL 8.4, CPU time of the app per query | 32 µs | 13.5 µs |
-| MariaDB 11, one query at a time | 59 µs | 63 µs |
-| MariaDB 11, 32 queries in flight | 25.5 µs per query | 9.7 µs per query |
-| MariaDB 11, CPU time of the app per query | 32.5 µs | 12.4 µs |
+| | Time |
+|---|---|
+| MySQL 8.4, one query at a time | 67 µs |
+| MySQL 8.4, 32 queries in flight | 11 µs per query |
+| MySQL 8.4, CPU time of the app per query | 13.5 µs |
+| MariaDB 11, one query at a time | 63 µs |
+| MariaDB 11, 32 queries in flight | 9.7 µs per query |
+| MariaDB 11, CPU time of the app per query | 12.4 µs |
 
 The CPU time counts the Dart thread and the Rust thread. It is the limit
-on one CPU core: about 31,000 queries per second with the Dart driver and
-about 75,000 with the native driver.
+on one CPU core: about 75,000 queries per second.
 
-One query at a time is about the same speed: most of the time is the trip
-to the database. The gain is big when many requests run at the same time,
-like in a web server.
+One query at a time spends most of its time on the trip to the database.
+Many requests at the same time, like in a web server, get the most out of it.
 
 ## Install
 
@@ -51,52 +49,38 @@ Add it only to use `MysqlNativePool` without the ORM:
 dart pub add dox_mysql_native
 ```
 
-The build hook builds the Rust library with `cargo`, so you need
-[Rust](https://rustup.rs) installed. Ready-built libraries (like the ones
-`dox_http_native` has) are not published for this driver yet.
-Without Rust, the ORM still works: it uses the Dart driver and prints one
-warning line (see below).
+You do not need Rust. The build hook downloads a ready-built library for
+your system. When there is no library for your system and no Rust to build
+one, the app stops with a clear error (see below).
+
+The package lives in its own repo:
+[dartondox/dox-mysql-native](https://github.com/dartondox/dox-mysql-native).
 
 Use `dart run`, `dart test` or `dart build cli`. `dart compile exe` does not
 run build hooks.
 
-## Native is the default
+## When the library does not load
 
-You do not change any config. The ORM picks the driver like this:
-
-1. `driverFactory` is set: the ORM uses your driver. It wins over
-   everything below.
-2. You ask for the Dart driver (see below): the ORM uses the Dart driver.
-3. The native library loads: the ORM uses the native driver.
-4. The native library does not load (no library for your system, no
-   Rust to build it, or a load error): the ORM uses the Dart driver. It
-   prints one warning line to stderr, like this:
+MySQL has no other driver in Dox. When the native library does not load,
+`SqlQueryBuilder.initializeWithDatabaseConfig` (and every other place that
+opens a MySQL connection) throws an `UnsupportedError` like this:
 
 ```text
-[dox] warning: dox_mysql_native did not load, using the Dart mysql driver (...)
+dox_mysql_native did not load: <reason>.
+Dox needs it to talk to MySQL. Fix: run the app with `dart run` or `dart build cli`. ...
 ```
 
-Named connections (`withConnection('x')`, `transaction(..., connection: 'x')`) follow
-the same rules.
+To fix it:
 
-## Use the Dart driver
+- Run the app with `dart run`, `dart test` or `dart build cli`. They run the
+  build hook. `dart compile exe` does not.
+- Or install [Rust](https://rustup.rs). The build hook then builds the
+  library from source.
+- When you set `lib_path` in `pubspec.yaml`, check that the file is there
+  and is built for your system.
 
-For all connections, set the env var:
-
-```bash
-DOX_DB_DRIVER=dart dart run bin/server.dart
-```
-
-For one connection, set `native: false` in `extra`:
-
-```dart
-ConnectionConfig(
-  driver: Driver.mysql,
-  // ... host, user, password, database as before
-  extra: <String, dynamic>{'native': false},
-  debug: false,
-),
-```
+A `driverFactory` on the connection wins over all of this: the ORM uses your
+driver.
 
 ## Options
 
@@ -158,8 +142,6 @@ await pool.commit(tx); // or pool.rollback(tx)
 
 ## Types
 
-The same as the Dox ORM on the Dart driver:
-
 | MySQL / MariaDB | Dart |
 |---|---|
 | `TINYINT(1)` (`boolean()`) | `bool` |
@@ -173,20 +155,27 @@ The same as the Dox ORM on the Dart driver:
 | `NULL` | `null` |
 
 MariaDB keeps `JSON` columns as `LONGTEXT`. So on MariaDB, `TEXT` that is a
-JSON object or array comes back decoded. The Dart driver does the same.
+JSON object or array comes back decoded.
 
 ## Errors
 
-A server error throws the same exception as the Dart driver:
-`MySQLServerException`, with the same `errorCode` (eg. `1062` for a
-duplicate key) and `message`. Other errors (eg. the server is down) throw
-`MySQLClientException`.
+Every error throws `MysqlException`. For an error from the server, `code`
+is the MySQL error number (eg. `1062` for a duplicate key) and `sqlState`
+is the 5 letter SQLSTATE. For other errors (eg. the server is down) both
+are null. `MysqlException` comes from `package:dox_orm/dox_orm.dart`.
+
+```dart
+try {
+  await QueryBuilder.table('users').insert(<String, dynamic>{'email': email});
+} on MysqlException catch (error) {
+  if (error.code == 1062) print('taken');
+}
+```
 
 ## Not yet
 
-- The `timeZone`, `collation`, `serverPublicKey` and `timeoutMs` keys of the
-  Dart driver are not read. The connection uses `utf8mb4`.
+- The `timeZone`, `collation`, `serverPublicKey` and `timeoutMs` keys are
+  not read. The connection uses `utf8mb4`.
 - A login with `sha256_password` (not the default) does not work. The
   default `caching_sha2_password` and `mysql_native_password` work.
-- A nested `transaction()` joins the outer one, like the Dart driver
-  (no savepoints).
+- A nested `transaction()` joins the outer one (no savepoints).

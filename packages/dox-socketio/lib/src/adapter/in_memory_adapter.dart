@@ -32,6 +32,9 @@ class InMemoryAdapter implements Adapter {
   Set<String> socketRooms(Namespace nsp, String id) =>
       _store(nsp).socketRooms(id);
 
+  /// Names of all rooms of [nsp] on this server.
+  Set<String> rooms(Namespace nsp) => _store(nsp).rooms;
+
   @override
   Set<String> socketIds(Namespace nsp, BroadcastOptions options) =>
       _store(nsp).match(options.rooms, options.except);
@@ -88,6 +91,8 @@ class RoomStore {
       if (members != null && members.isEmpty) _rooms.remove(room);
     }
   }
+
+  Set<String> get rooms => _rooms.keys.toSet();
 
   Set<String> socketRooms(String id) => Set<String>.of(_sids[id] ?? _empty);
 

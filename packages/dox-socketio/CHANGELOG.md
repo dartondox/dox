@@ -1,5 +1,12 @@
 ## Unreleased
 
+- Uses `ioredis` 2.0.0-alpha.3, which can send and get binary messages. `RedisAdapter` and `SocketIoEmitter` take `ioredis` clients.
+- `RedisAdapter` reads msgpack and JSON messages. Before, it read only JSON, so the Socket.IO emitters (Node.js, PHP, Python, Go) did not work. They use msgpack.
+- Breaking: `RedisAdapter` writes msgpack by default, like `@socket.io/redis-adapter`. Use `format: RedisFormat.json` for Node.js servers with a JSON parser.
+- Fix: binary data in JSON Redis messages is written as a Node.js Buffer (`{"type":"Buffer","data":[...]}`). Before, it was written as a plain list of numbers.
+- `RedisAdapter` handles the requests on `socket.io-request#<nsp>#`: `socketsJoin`, `socketsLeave` and `disconnectSockets` from emitters and other servers. It answers `fetchSockets`, `allRooms` and broadcasts with acks from Node.js servers, so they do not wait for a timeout.
+- New `SocketIoEmitter(redis)`: sends events, `socketsJoin`, `socketsLeave` and `disconnectSockets` through Redis without a Socket.IO server. Same format as `@socket.io/redis-emitter`.
+- New `MsgPack` encoder and decoder.
 - Performance: a broadcast builds the websocket text frame and its UTF-8 bytes once and shares them with every client (new `SharedText`). Before, each client built and encoded its own copy.
 - Performance: a broadcast with no `except` and at most one room goes over the room members directly. Before, it copied all socket ids into new sets each time.
 - Breaking: `SocketIoServer.listen()` starts a native server (`dox_http_native`), not a `dart:io` one. The websocket transport uses the native WebSocket upgrade. Long-polling works the same. `attach()` still takes any `HttpServer`, also a `dart:io` one.

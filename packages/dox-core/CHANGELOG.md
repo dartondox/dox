@@ -1,7 +1,10 @@
 ## Unreleased
 
+- Breaking: `dox_websocket` is gone. Use `dox_socketio` for realtime. `Dox().websocket` and `Dox().setWebsocket()` are removed.
+- Breaking: `Route.websocket(path, handler)` is now a raw WebSocket route. `handler` gets the open `WebSocket` and the `DoxRequest`. Middleware runs first. A request that is not a WebSocket upgrade gets 400.
+- `dox_http_native` now lives in its own repo (dartondox/dox-http-native). Dox uses it from pub.dev (`^3.0.0-alpha.7`). Its build hook downloads a ready-built library, so you do not need Rust.
 - Perf: faster route matching. A plain route is found with one map lookup, also when a param route was added before it (as long as that param route can not match the same path). Param routes are grouped by their first path segment, so a request only tries the routes that can match. The first matching route still wins.
-- Perf: the request handler reads `Host` and `Content-Type` once per request. `Host` is read only when the app has a `Route.domain()` route. The WebSocket upgrade check runs only when WebSocket is set up. `HttpBody.read()` takes an optional `contentType`.
+- Perf: the request handler reads `Host` and `Content-Type` once per request. `Host` is read only when the app has a `Route.domain()` route. `HttpBody.read()` takes an optional `contentType`.
 - Perf: on the native server, a JSON or form body is used as it is, with no stream in between. The size limit is still checked.
 - Perf: JSON responses are encoded in 8 KB chunks, not 256 bytes.
 - Perf: fewer objects per request. `RouteData.params`, `DoxRequest.param` and `DoxRequest.method` are made on first use. `RouteData.domainLower` is made once. CORS header lists are joined once.

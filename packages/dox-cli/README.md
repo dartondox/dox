@@ -35,7 +35,7 @@ dox s                        # dev server, restarts when a file changes
 | `dox create <name>` | create a new project |
 | `dox serve` (or `dox s`) | start the dev server with `build_runner watch` |
 | `dox build` | build the native (AOT) bundle into `build/bundle` |
-| `dox create:controller <name> [-r] [-ws]` | create a controller |
+| `dox create:controller <name> [-r]` | create a controller |
 | `dox create:model <name> [-m]` | create a model, and with `-m` its migration |
 | `dox create:dto <name>` | create a DTO (typed, checked input) |
 | `dox make:migration <name> [--sql]` | create a Dart or SQL migration |

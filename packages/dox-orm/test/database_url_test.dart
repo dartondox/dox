@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:dox_orm/dox_orm.dart';
-import 'package:postgres/postgres.dart' as postgres;
 import 'package:test/test.dart';
 
 void main() {
@@ -41,19 +38,28 @@ void main() {
         'postgres://u@h/d?sslmode=verify-full',
       );
       expect(full.useSSL, isTrue);
-      expect(full.extra['sslMode'], postgres.SslMode.verifyFull);
+      expect(full.extra['sslMode'], 'verify-full');
+      ConnectionConfig prefer = ConnectionConfig.fromUrl(
+        'postgres://u@h/d?sslmode=prefer',
+      );
+      expect(prefer.useSSL, isFalse);
+      expect(prefer.postgresSslMode, 'prefer');
+      expect(
+        ConnectionConfig.fromUrl('mysql://u@h/d?sslmode=require').extra,
+        isEmpty,
+      );
       expect(ConnectionConfig.fromUrl('mysql://u@h/d?ssl=true').useSSL, isTrue);
     });
 
     test('other options go to extra, base extra is kept', () {
       ConnectionConfig c = ConnectionConfig.fromUrl(
-        'postgres://u@h/d?maxConnectionCount=20&native=false&applicationName=x',
+        'postgres://u@h/d?maxConnectionCount=20&threads=2&applicationName=x',
         extra: <String, dynamic>{'timeZone': 'UTC', 'maxConnectionCount': 5},
       );
       expect(c.extra, <String, dynamic>{
         'timeZone': 'UTC',
         'maxConnectionCount': 20,
-        'native': false,
+        'threads': 2,
         'applicationName': 'x',
       });
     });
@@ -65,27 +71,11 @@ void main() {
       expect(c.host, '/cloudsql/proj:us-central1:db');
       expect(c.isUnixSocket, isTrue);
       expect(c.database, 'blog');
-      postgres.Endpoint e = c.postgresEndpoint;
-      expect(e.isUnixSocket, isTrue);
-      expect(e.host, '/cloudsql/proj:us-central1:db/.s.PGSQL.5432');
-    });
-
-    test('socket file path is kept as it is', () {
-      ConnectionConfig c = ConnectionConfig(
-        driver: Driver.postgres,
-        host: '/var/run/postgresql/.s.PGSQL.5433',
-        port: 5433,
-        database: 'd',
-        debug: false,
-      );
-      expect(c.postgresEndpoint.host, '/var/run/postgresql/.s.PGSQL.5433');
     });
 
     test('tcp host is not a socket', () {
       ConnectionConfig c = ConnectionConfig.fromUrl('postgres://u@h/d');
       expect(c.isUnixSocket, isFalse);
-      expect(c.postgresEndpoint.isUnixSocket, isFalse);
-      expect(c.postgresEndpoint.host, 'h');
     });
 
     test('mysql Unix socket from ?socket= and ?host=', () {
@@ -97,18 +87,14 @@ void main() {
         expect(c.host, '/var/run/mysqld/mysqld.sock');
         expect(c.isUnixSocket, isTrue);
         expect(c.database, 'blog');
-        expect(c.mysqlPort, 0);
-        InternetAddress a = c.mysqlHost as InternetAddress;
-        expect(a.type, InternetAddressType.unix);
-        expect(a.address, '/var/run/mysqld/mysqld.sock');
       }
     });
 
     test('mysql tcp host is a plain host name', () {
       ConnectionConfig c = ConnectionConfig.fromUrl('mysql://u@db/d');
       expect(c.isUnixSocket, isFalse);
-      expect(c.mysqlHost, 'db');
-      expect(c.mysqlPort, 3306);
+      expect(c.host, 'db');
+      expect(c.port, 3306);
     });
 
     test('sqlite forms', () {

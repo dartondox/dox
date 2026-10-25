@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Breaking: `create:controller` no longer takes `-ws`. Dox uses Socket.IO for realtime now. See the Socket.IO docs for a namespace class.
 - Security: `dox create` now copies `.env.example` to `.env` and writes a new random `APP_KEY`. Before, every new app used the same public key from the template. You no longer run `cp .env.example .env`.
 - The `.env.example` of the CLI has an empty `APP_KEY`. Run `dox key:generate` to set one.
 

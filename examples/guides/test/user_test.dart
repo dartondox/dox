@@ -34,9 +34,7 @@ void main() {
     await deleteDbFile();
     await Migrator(
       migrations: migrations,
-      connection: await testDatabase
-          .getConnectionConfig()
-          .getDatabaseConnection(),
+      config: testDatabase.getConnectionConfig(),
     ).migrate();
     SqlQueryBuilder.initializeWithDatabaseConfig(testDatabase);
   });

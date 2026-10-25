@@ -138,18 +138,15 @@ The native drivers live in Rust. There, isolates that open the same settings get
 | --- | --- | --- |
 | Postgres native (`dox_postgres_native`) | nothing | one pool of `maxConnectionCount` connections per settings, and one Rust runtime (`extra['threads']`, default `1`) |
 | MySQL native (`dox_mysql_native`) | nothing | one pool of `maxConnectionCount` connections per settings, and one Rust runtime |
-| Dart drivers (`postgres`, `mysql_dart`) | one pool of `maxConnectionCount` connections | nothing shared |
 | SQLite | one connection | nothing shared |
 
-So with the native drivers, the app opens at most `maxConnectionCount` connections, for any number of isolates.
-With the Dart drivers, it is `isolates × maxConnectionCount`: with 8 cores and the default of 10, 80 connections.
+So for Postgres and MySQL, the app opens at most `maxConnectionCount` connections, for any number of isolates.
 The pool size is always your choice. Set it below the `max_connections` of the database.
 
 The pool closes when the last isolate that uses it closes it.
     See [Native Postgres driver](../database/postgres-native.md#options).
 
-The native drivers are the default. When the native library does not load, the ORM uses the Dart driver and prints one warning line.
-Set `DOX_DB_DRIVER=dart` to use the Dart drivers on purpose. See [Database](../database/index.md).
+Postgres and MySQL have only the native drivers. When the native library does not load, the app stops with an error that says why and how to fix it. See [Database](../database/index.md).
 
 ## The layout of a Dox app
 
@@ -169,8 +166,7 @@ my_app/
 │   │   │   ├── middleware/      # *.middleware.dart
 │   │   │   ├── serializers/     # *.serializer.dart, custom JSON shapes
 │   │   │   └── response_handler.dart
-│   │   ├── models/              # one folder per model, *.model.dart
-│   │   └── ws/controllers/      # WebSocket controllers (dox_websocket)
+│   │   └── models/              # one folder per model, *.model.dart
 │   ├── config/
 │   │   ├── app.dart             # AppConfig: port, isolates, routers, middleware
 │   │   ├── cache.dart           # cache stores

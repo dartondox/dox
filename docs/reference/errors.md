@@ -31,7 +31,6 @@ These stop the app at start, so a bad route never reaches a request.
 | `Route <where>: only positional parameters are supported, not named or [optional] ones (<type>).` | Named or `[optional]` parameters. | Use positional parameters. Use `int?` with `{id?}` for an optional param. |
 | `Route <where>: a controller can not be generic.` | The handler has type parameters. | Remove them. |
 | `Route <where>: can not read the controller type <type>.` | Dox can not read the function type of the handler. | Use a plain method or function. |
-| `Exception: websocket is not registered` | `Route.websocket()` runs before a `WebsocketServer(Dox())` exists. | Add the WebSocket service to `services`. See [WebSocket](../digging-deeper/websocket.md). |
 
 ## dox_core: env
 
@@ -90,8 +89,10 @@ The table shows the `message` text.
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `[dox] warning: dox_postgres_native did not load, using the Dart postgres driver (<reason>)` | The native Postgres library did not load. | See [Postgres native](../database/postgres-native.md). Or set `DOX_DB_DRIVER=dart`. |
-| `[dox] warning: dox_mysql_native did not load, using the Dart mysql driver (<reason>)` | The native MySQL library did not load. | See [MySQL native](../database/mysql-native.md). |
+| `Unsupported operation: dox_postgres_native did not load: <reason>. Dox needs it to talk to Postgres. Fix: ...` | The native Postgres library did not load. The app stops. | Follow the fix in the message. See [Postgres native](../database/postgres-native.md#when-the-library-does-not-load). |
+| `Unsupported operation: dox_mysql_native did not load: <reason>. Dox needs it to talk to MySQL. Fix: ...` | The native MySQL library did not load. The app stops. | Follow the fix in the message. See [MySQL native](../database/mysql-native.md#when-the-library-does-not-load). |
+| `PgServerException(<code>): <message>` | The Postgres server said no, eg. code `23505` for a unique violation. | Read `code`, `detail` and `constraint` on the exception. |
+| `MysqlException(<code>, <sqlState>): <message>` | An error from MySQL, eg. code `1062` for a duplicate key. | Read `code` and `sqlState` on the exception. |
 | `Exception: <name> not found` | `DatabaseConfig.connection` (or `withConnection()`) names a connection that is not in `connections`. | Fix `DB_CONNECTION` or the map. |
 | `Exception: Invalid driver or not supported` | A `ConnectionConfig.driver` Dox can not open. | Use `Driver.postgres`, `Driver.mysql` or `Driver.sqlite`. |
 | `Invalid argument(s): dox_postgres_native: bad connection config` | The native driver can not read the connection values. | Check `host`, `port`, `user`, `database`. |
@@ -202,12 +203,11 @@ These stop `dart run build_runner build`.
 
 Printed during `dart pub get`, `dox serve` or `dox build`. `<pkg>` is `dox_http_native`, `dox_postgres_native` or `dox_mysql_native`.
 
-- `dox_postgres_native` and `dox_mysql_native`: the app still runs, on the Dart DB driver.
-- `dox_http_native`: there is no fallback. The app stops at start with an error that says why the library did not load and how to fix it.
+None of them has a fallback. When the library is missing, the app stops with an error that says why the library did not load and how to fix it: at start for `dox_http_native`, when the ORM opens the database for `dox_postgres_native` and `dox_mysql_native`.
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `<pkg>: no native library for <os>-<arch>.` | No ready build for this OS and CPU. | Install Rust. For a DB driver you may also accept the Dart fallback. |
+| `<pkg>: no native library for <os>-<arch>.` | No ready build for this OS and CPU. | Install Rust. |
 | `<pkg>: download <file>: <status>` / `<pkg>: download <file> failed: <error>` | The GitHub download failed. | Check the network, then `dart pub get` again. |
 | `<pkg>: sha256 of <file> does not match` | The downloaded file is not the expected one. | Delete `.dart_tool` and try again. |
 | `<pkg>: cargo build failed` | The build from source failed. | Read the cargo output below it. |

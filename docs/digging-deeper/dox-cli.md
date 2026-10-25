@@ -31,7 +31,7 @@ dart pub global deactivate dox
 | `dox serve` (or `dox s`) | start the dev server with build_runner watch |
 | `dox build` | build the native (AOT) bundle into `build/bundle` |
 | `dox build_runner:watch` / `dox build_runner:build` | run the code generator |
-| `dox create:controller <name> [-r] [-ws]` | create a controller |
+| `dox create:controller <name> [-r]` | create a controller |
 | `dox create:middleware <name>` | create a middleware |
 | `dox create:dto <name>` | create a DTO (typed, checked input) |
 | `dox create:serializer <name>` | create a serializer |
@@ -109,11 +109,9 @@ It writes a new `APP_KEY` to your `.env` file.
 ```bash
 dox create:controller Blog       # default controller
 dox create:controller Blog -r    # resource controller
-dox create:controller Chat -ws   # WebSocket controller
 ```
 
-- A default or resource controller goes to `lib/app/http/controllers/`.
-- A WebSocket controller goes to `lib/app/ws/controllers/`. See [WebSocket](websocket.md).
+- A controller goes to `lib/app/http/controllers/`.
 - `-r` adds the methods `index`, `create`, `store`, `show`, `edit`, `update` and `destroy`.
 
 !!! info "File and class names"

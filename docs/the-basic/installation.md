@@ -120,7 +120,6 @@ All Dox packages use the same version.
 | `dox_orm` | query builder and models |
 | `dox_migration` | database migrations |
 | `dox_auth` | JWT authentication |
-| `dox_websocket` | WebSocket server |
 | `dox_builder`, `dox_annotation` | code generation for models and DTOs |
 | `dox_validation` | [typed validation schemas](../packages/validation.md) |
 | `dox_openapi` | [OpenAPI docs](../packages/openapi.md) |

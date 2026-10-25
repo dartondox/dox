@@ -358,7 +358,7 @@ See [Testing](../digging-deeper/testing.md).
   Run `dox build_runner:build` after a change, or let `dox serve` watch for you.
 - **One native binary.** `dox build` makes an AOT binary in `build/bundle`. There is no interpreter, no `vendor/` folder and no `composer install` on the server.
   The Docker image is about 11 MB.
-- **A native HTTP server and native database drivers.** Rust parses HTTP and talks to Postgres and MySQL. Your code stays in Dart. The HTTP server comes ready-built. The database drivers need Rust (`cargo`) to build; without it, Dox uses the Dart drivers.
+- **A native HTTP server and native database drivers.** Rust parses HTTP and talks to Postgres and MySQL. Your code stays in Dart. They come ready-built, so you do not need Rust.
 - **Types everywhere.** A DTO is a class with typed fields. A path param is an `int`. A model field is a `String?`. The compiler finds many mistakes before you run the app.
 - **Async is explicit.** Database calls return a `Future`. You write `await`. One isolate serves many requests at the same time while it waits for the database.
 - **JSON API first.** Dox returns text, JSON, files and streams. It has no view layer.
@@ -384,5 +384,5 @@ Dox 3.0 does not have these Laravel features. Check the [packages](../packages/v
 | Savepoints in nested transactions | not there. A nested `transaction()` joins the outer one. |
 
 What is there, as separate packages: [validation](../packages/validation.md), [OpenAPI docs](../packages/openapi.md),
-[storage](../packages/storage.md), [cache](../packages/cache.md), [Socket.IO](../packages/socketio.md),
-[WebSocket](../digging-deeper/websocket.md) and [auth](../security/authentication.md).
+[storage](../packages/storage.md), [cache](../packages/cache.md), [Socket.IO](../packages/socketio.md)
+and [auth](../security/authentication.md).

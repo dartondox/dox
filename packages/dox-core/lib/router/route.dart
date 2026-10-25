@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dox_core/constants/http_request_method.dart';
@@ -5,6 +6,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/storage/storage_file_controller.dart';
 import 'package:dox_core/utils/utils.dart';
+import 'package:dox_http_native/dox_http_native.dart';
 
 /// list of routes registered
 List<RouteData> _routes = <RouteData>[];
@@ -14,6 +16,28 @@ typedef RawRequestHandler = Future<void> Function(HttpRequest request);
 
 /// prefix => handler. empty unless something is mounted.
 final Map<String, RawRequestHandler> _mounts = <String, RawRequestHandler>{};
+
+/// gets the open socket of a [Route.websocket] request
+typedef WebSocketHandler = FutureOr<void> Function(
+  WebSocket socket,
+  DoxRequest req,
+);
+
+/// upgrades the request, then gives the socket to the handler
+class _WebSocketRoute {
+  _WebSocketRoute(this.handler);
+
+  final WebSocketHandler handler;
+
+  Future<WebSocket> call(DoxRequest req) async {
+    if (!NativeWebSocket.isUpgradeRequest(req.httpRequest)) {
+      throw BadRequestException(message: 'WebSocket upgrade required');
+    }
+    WebSocket socket = await NativeWebSocket.upgrade(req.httpRequest);
+    await handler(socket, req);
+    return socket;
+  }
+}
 
 class Route {
   /// register as singleton
@@ -192,28 +216,24 @@ class Route {
   /// `_addRoute` cleans double and edge slashes later.
   String _join(String path) => '$_prefix/$path';
 
-  /// add websocket route
-  /// For this usage, you must use `dox-websocket` package.
+  /// raw WebSocket route. [handler] gets the open socket.
+  /// Middleware runs first, so it can check auth.
+  /// For rooms, acks and the socket.io clients, use `dox_socketio`.
   /// ```
-  /// Route.websocket('ws', (socket) {
-  ///   socket.on('intro', controller);
+  /// Route.websocket('echo', (WebSocket socket, DoxRequest req) {
+  ///   socket.listen(socket.add);
   /// });
   /// ```
-  static void websocket(
+  static Route websocket(
     String route,
-    Function(WebsocketEvent) callback, {
+    WebSocketHandler handler, {
     List<dynamic> middleware = const <dynamic>[],
   }) {
-    IDoxWebsocket? ws = Dox().websocket;
-    if (ws == null) {
-      throw Exception('websocket is not registered');
-    }
-    WebsocketEvent event = ws.create();
-    Route()._addRoute(HttpRequestMethod.GET, Route()._join(route), <dynamic>[
-      ...middleware,
-      event.handle,
-    ]);
-    callback(event);
+    return Route()._addRoute(
+      HttpRequestMethod.GET,
+      Route()._join(route),
+      <dynamic>[...middleware, _WebSocketRoute(handler).call],
+    );
   }
 
   /// get route

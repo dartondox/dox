@@ -51,4 +51,32 @@ void main() {
     expect(await ws.first, 'hi');
     await ws.close();
   });
+
+  test('Route.websocket gives the open socket after middleware', () async {
+    Route.websocket('/ws-echo', (WebSocket socket, DoxRequest req) {
+      socket.listen((dynamic data) => socket.add('${req.input('who')}:$data'));
+    }, middleware: <dynamic>[addWho]);
+    await startHttpServer(nativeConfig());
+    int port = Dox().server.httpServer.port;
+
+    WebSocket ws = await WebSocket.connect('ws://127.0.0.1:$port/ws-echo');
+    ws.add('hi');
+    expect(await ws.first, 'mw:hi');
+    await ws.close();
+
+    // a plain GET is not an upgrade
+    HttpClient client = HttpClient();
+    HttpClientResponse res = await (await client.get(
+      '127.0.0.1',
+      port,
+      '/ws-echo',
+    )).close();
+    expect(res.statusCode, 400);
+    client.close();
+  });
+}
+
+DoxRequest addWho(DoxRequest req) {
+  req.add('who', 'mw');
+  return req;
 }

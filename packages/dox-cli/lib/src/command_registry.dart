@@ -165,7 +165,7 @@ class CommandRegistry {
     // Create controller commands
     CommandDefinition(
       command: 'create:controller',
-      helpInfo: 'create:controller <controller_name> [-r] [-ws]',
+      helpInfo: 'create:controller <controller_name> [-r]',
       description: 'Create a new controller',
       category: CommandCategory.development,
       minArgs: 1,
@@ -173,13 +173,7 @@ class CommandRegistry {
       function: (args) async {
         final controllerName = args[0];
         final isResource = args.length >= 2 && args[1] == '-r';
-        final isWebSocket = args.length >= 2 && args[1] == '-ws';
-
-        if (isWebSocket) {
-          createWsController(controllerName);
-        } else {
-          createController(controllerName, isResource);
-        }
+        createController(controllerName, isResource);
       },
     ),
 

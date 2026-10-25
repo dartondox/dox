@@ -194,7 +194,7 @@ at a time.
 
 -   :material-access-point: **Real time**
 
-    [WebSocket](digging-deeper/websocket.md) or [Socket.IO](packages/socketio.md), with Redis for many servers.
+    [Socket.IO](packages/socketio.md), with Redis for many servers.
 
 -   :material-shield-lock-outline: **Security**
 

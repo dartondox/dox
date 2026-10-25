@@ -96,6 +96,7 @@ mixin Insert<T> implements SharedMixin<T> {
       return result;
     }
     List<String> values = <String>[];
+    DBDriver driver = queryBuilder.dbDriver;
 
     // creating values to insert (value1, val2);
     for (Map<String, dynamic> data in list) {
@@ -110,7 +111,7 @@ mixin Insert<T> implements SharedMixin<T> {
         }
         String columnKey = helper.parseColumnKey(key);
         ret.add(columnKey);
-        addSubstitutionValues(columnKey, data[key]);
+        addSubstitutionValues(columnKey, driver.columnValue(data[key]));
       }
       values.add("(${ret.join(',')})");
     }

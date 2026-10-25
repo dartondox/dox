@@ -11,7 +11,16 @@ class CountingDriver extends DBDriver {
   int queries = 0;
 
   CountingDriver(ConnectionConfig config, this.name)
-    : inner = getDatabaseDriver(config.driver, config.getDatabaseConnection());
+    : inner = ConnectionConfig(
+        driver: config.driver,
+        host: config.host,
+        port: config.port,
+        user: config.user,
+        password: config.password,
+        database: config.database,
+        extra: config.extra,
+        debug: false,
+      ).createDriver();
 
   @override
   Driver getName() => inner.getName();

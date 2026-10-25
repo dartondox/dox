@@ -9,9 +9,7 @@ resolution: workspace
 
 dependencies:
   dox_orm: ^3.0.0-alpha.6
-  mysql_dart: ^3.0.1
   sqlite3: ^3.7.1
-  postgres: ^3.5.20
 
 dev_dependencies:
   lints: ^6.1.0

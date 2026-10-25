@@ -30,7 +30,7 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `validationMessages` | `MessageResolver?` | `null` (English messages) | Messages for validation errors, for example in other languages. |
 | `responseHandler` | `ResponseHandlerInterface?` | `null` | A class with `DoxResponse handle(DoxResponse res)`. It sees every response before it is sent. |
 | `errorHandler` | `Function(Object?, StackTrace)` | `defaultErrorHandler` | Called for every unhandled error. The default logs the error with `Logger.warn` and the stack with `Logger.danger`. |
-| `services` | `List<DoxService>` | `[]` | Classes with a `setup()` method. Dox runs them in every isolate at start. The ORM, auth and WebSocket are set up here. |
+| `services` | `List<DoxService>` | `[]` | Classes with a `setup()` method. Dox runs them in every isolate at start. The ORM and auth are set up here. |
 
 ## Sub configs
 
@@ -208,7 +208,7 @@ Source: `packages/dox-orm/lib/src/types/database_config.dart` and `connection_co
 | `user` | `String` | `''` | Database user. Not used by sqlite. |
 | `password` | `String` | `''` | Database password. Not used by sqlite. |
 | `database` | `String` | required | Database name. For sqlite: the file path, or `:memory:`. |
-| `useSSL` | `bool` | `false` | Use TLS. Postgres with TLS uses the Dart driver, not the native one. |
+| `useSSL` | `bool` | `false` | Use TLS. Postgres: mode `require` (no certificate check), set `extra['sslMode']` to change it. MySQL: the certificate is checked. |
 | `debug` | `bool` | required | Print every query with `printer`. |
 | `printer` | `QueryPrinter?` | `null` | `ConsoleQueryPrinter()`, `PrettyQueryPrinter()`, `FileQueryPrinter()` or your own. |
 | `extra` | `Map<String, dynamic>` | `{}` | Driver options. See below. |
@@ -218,15 +218,13 @@ Keys of `extra`:
 
 | Driver | Key | Type | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| postgres, mysql | `native` | `bool` | `true` | `false` uses the Dart driver instead of the native (Rust) one. |
-| postgres, mysql | `maxConnectionCount` | `int` | `10` | Most open connections. Native drivers: for the whole process. Dart drivers: per isolate. |
-| postgres, mysql | `preparedStatementCacheSize` | `int` | `100` | Prepared statements kept per connection. |
-| postgres | `sslMode` | postgres `SslMode` | none | Setting it uses the Dart driver. |
-| mysql | `collation` | `String` | `utf8mb4_general_ci` | Connection collation. |
-| mysql | `timeoutMs` | `int` | `10000` | Connect timeout. |
-| mysql | `allowPublicKeyRetrieval` | `bool` | `false`, `true` with `useSSL` or a local host | Ask the server for its RSA key (needed for `caching_sha2_password` without TLS). A fake server can send its own key and read the password, so it is off by default. It is on with `useSSL: true`, on `localhost`, `127.0.0.1`, `::1` and on a Unix socket. Giving the key in `serverPublicKey` is safer. |
-| mysql | `serverPublicKey` | `String` | none | The server RSA key, so it is not asked for. |
-| mysql | `timeZone` | `String` | none | Session time zone. |
+| postgres, mysql | `maxConnectionCount` | `int` | `10` | Most open connections, for the whole process. |
+| postgres, mysql | `threads` | `int` | `1` | Rust threads of the native driver. Only the first pool sets it. |
+| mysql, sqlite | `preparedStatementCacheSize` | `int` | `100` | Prepared statements kept per connection. |
+| postgres | `sslMode` | `String` | `require` with `useSSL`, else `disable` | TLS mode: `disable`, `prefer`, `require` or `verify-full`. |
+| postgres | `timeZone` | `String` | `UTC` | Session time zone. |
+| postgres | `applicationName` | `String` | none | Name of the app in `pg_stat_activity`. |
+| mysql | `verifyCertificate` | `bool` | `true` | `false` skips the TLS certificate check. Only for a self-signed certificate in development. |
 | mysql | `maxConnectionAge` | `Duration` | 12 hours | Close and reopen a connection after this time. |
 | sqlite | `busyTimeout` | `int` | `5000` | `PRAGMA busy_timeout` in milliseconds. |
 
@@ -407,8 +405,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
       password: env.dbPassword,
       database: env.dbName,
       extra: <String, dynamic>{
-        /// One pool for all isolates with the native driver.
-        /// One pool per isolate with the Dart driver.
+        /// One pool for all isolates.
         'maxConnectionCount': 10,
         'maxConnectionAge': Duration(hours: 1),
       },

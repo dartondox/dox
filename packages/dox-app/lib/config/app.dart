@@ -8,7 +8,6 @@ import 'package:dox_app/config/storage.dart';
 import 'package:dox_app/dtos.g.dart';
 import 'package:dox_app/routes/api.dart';
 import 'package:dox_app/routes/web.dart';
-import 'package:dox_app/routes/websocket.dart';
 import 'package:dox_app/config/env.dart';
 import 'package:dox_core/dox_core.dart';
 
@@ -53,7 +52,7 @@ AppConfig appConfig = AppConfig(
   /// Routers
   /// -------------------------------
   /// Register routers to create route to dox framework.
-  routers: <Router>[WebRouter(), ApiRouter(), WebsocketRouter()],
+  routers: <Router>[WebRouter(), ApiRouter()],
 
   /// Cache stores (config/cache.dart)
   cache: cache,

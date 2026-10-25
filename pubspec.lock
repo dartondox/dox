@@ -57,14 +57,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
-  buffer:
-    dependency: transitive
-    description:
-      name: buffer
-      sha256: "389da2ec2c16283c8787e0adaede82b1842102f8c8aae2f49003a766c5c6b3d1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.3"
   build:
     dependency: transitive
     description:
@@ -241,6 +233,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.14"
+  dox_http_native:
+    dependency: transitive
+    description:
+      name: dox_http_native
+      sha256: "7806fb0d1d6ce8ca946ed83ba555222d0b5bd8a99bad4437b522c5b5d572c83c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0-alpha.7"
+  dox_mysql_native:
+    dependency: transitive
+    description:
+      name: dox_mysql_native
+      sha256: "0263fe0ddf13256597a4b05c3426b1840e65c5e0c9d2d39f70ddd112d887b399"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0-alpha.7"
+  dox_postgres_native:
+    dependency: transitive
+    description:
+      name: dox_postgres_native
+      sha256: "8c7898d1cbab823c48131e02a2899c462de72d34b2d96e003701f785ce203c6a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0-alpha.7"
   ffi:
     dependency: transitive
     description:
@@ -341,10 +357,10 @@ packages:
     dependency: transitive
     description:
       name: ioredis
-      sha256: "2456b59d72f287682a18b4ab924cd189da1114ddc7270668046991e27e3a32e8"
+      sha256: "47203df8f0b71b0f19f184e25fd91541426d1a154c322e2cb7a67c79e6754215"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.0-alpha.2"
+    version: "2.0.0-alpha.3"
   json_annotation:
     dependency: transitive
     description:
@@ -409,14 +425,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.6"
-  mysql_dart:
-    dependency: transitive
-    description:
-      name: mysql_dart
-      sha256: "39cd9ca5c7a0127251f15a5d5b9a8b2145f1553f16d029fff28d02f7139d8d7c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.1"
   native_toolchain_c:
     dependency: transitive
     description:
@@ -481,14 +489,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.3"
-  postgres:
-    dependency: transitive
-    description:
-      name: postgres
-      sha256: f2571f6f4256e94d87334d7189fcf28407500c34cd0ebcb74cff21fab5f4e988
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.5.20"
   process:
     dependency: transitive
     description:

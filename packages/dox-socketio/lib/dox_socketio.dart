@@ -3,7 +3,9 @@ library;
 
 export 'src/adapter/adapter.dart';
 export 'src/adapter/in_memory_adapter.dart';
+export 'src/adapter/msgpack.dart';
 export 'src/adapter/redis_adapter.dart';
+export 'src/adapter/socket_io_emitter.dart';
 export 'src/constants/engine_constants.dart'
     show CloseReason, EnginePacketType, EngineError;
 export 'src/constants/socket_constants.dart' show SocketPacketType;

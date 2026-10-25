@@ -1,7 +1,8 @@
 ## Unreleased
 
-- TLS checks the server certificate, the same as dox_orm. Add `verifyCertificate=false` to `DATABASE_URL` to skip the check in development.
-- MySQL: the server RSA key is only asked for with TLS on or on a local host, the same as dox_orm.
+- Breaking: migrations run on the dox_orm drivers: the native Postgres and MySQL drivers, and SQLite. The `postgres` and `mysql_dart` packages are gone. When the native library does not load, the migration stops with an error that says why.
+- Breaking: `Migrator(connection: ...)` takes a dox_orm `DBDriver` now, eg. `SqlQueryBuilder().dbDriver`. The migrator does not close it. New `Migrator(config: ...)` takes a `ConnectionConfig`, eg. `databaseConfig.getConnectionConfig()`, and closes it at the end.
+- TLS works the same as dox_orm. For Postgres, `sslmode=require` encrypts and `verify-full` also checks the certificate. For MySQL the certificate is checked. Add `verifyCertificate=false` to `DATABASE_URL` to skip the MySQL check in development.
 
 ## 3.0.0-alpha.6
 

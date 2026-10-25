@@ -16,7 +16,10 @@ mixin Update<T> implements SharedMixin<T> {
     data.forEach((String column, dynamic value) {
       String columnKey = helper.parseColumnKey(column);
       columnToUpdate.add("${helper.wrap(column)} = $columnKey");
-      addSubstitutionValues(columnKey, value);
+      addSubstitutionValues(
+        columnKey,
+        queryBuilder.dbDriver.columnValue(value),
+      );
     });
     q += columnToUpdate.join(',');
     q += helper.getCommonQuery();

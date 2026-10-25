@@ -134,7 +134,6 @@ nav:
     - digging-deeper/env.md
     - digging-deeper/isolate.md
     - digging-deeper/services.md
-    - digging-deeper/websocket.md
     - digging-deeper/dox-cli.md
     - digging-deeper/deployment.md
     - digging-deeper/native-server.md

@@ -13,7 +13,6 @@ void main() {
       expect(c.driver, Driver.postgres);
       expect(c.password, 's@cret');
       expect(c.host, '/cloudsql/p:r:i');
-      expect(c.postgresEndpoint.host, '/cloudsql/p:r:i/.s.PGSQL.5432');
     });
 
     test('mysql DB_HOST socket file', () {
@@ -23,7 +22,6 @@ void main() {
       });
       expect(c.driver, Driver.mysql);
       expect(c.isUnixSocket, isTrue);
-      expect(c.mysqlPort, 0);
     });
 
     test('DB_* keys and their defaults', () {
