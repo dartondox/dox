@@ -177,12 +177,6 @@ nav:
         - database/model/relationship/has-many.md
         - database/model/relationship/belongs-to.md
         - database/model/relationship/many-to-many.md
-  - Packages:
-    - packages/validation.md
-    - packages/openapi.md
-    - packages/storage.md
-    - packages/cache.md
-    - packages/socketio.md
   - Security:
     - security/authentication.md
     - security/cors.md
@@ -190,6 +184,12 @@ nav:
     - security/hashing.md
     - security/rate-limiting.md
     - security/security-headers.md
+  - Packages:
+    - packages/validation.md
+    - packages/openapi.md
+    - packages/storage.md
+    - packages/cache.md
+    - packages/socketio.md
   - Guides:
     - guides/index.md
     - guides/file-upload.md
