@@ -90,10 +90,11 @@ This happens once, when the app starts. After that, `env.dbPort` is a plain fiel
 
 ## Where values come from
 
-Dox reads values from two places:
+Dox reads values from these places:
 
 1. Real environment variables (set in the shell, Docker or systemd).
-2. The `.env` file in the folder where you start the app. It is optional.
+2. In tests only: the `.env.testing` file. See [Testing: a test database](testing.md#use-a-test-database-with-envtesting).
+3. The `.env` file in the folder where you start the app. It is optional.
 
 !!! info "The environment wins"
     A real environment variable wins over the `.env` file.

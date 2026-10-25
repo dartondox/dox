@@ -33,9 +33,10 @@ class DoxTestClient {
     : headers = Map<String, String>.unmodifiable(
         headers ?? const <String, String>{},
       ),
-      _http = HttpClient();
+      _http = HttpClient(),
+      _jar = null;
 
-  DoxTestClient._copy(this.baseUri, this.headers, this._http);
+  DoxTestClient._copy(this.baseUri, this.headers, this._http, this._jar);
 
   /// the url of the server, eg. `http://127.0.0.1:53211`
   final Uri baseUri;
@@ -44,6 +45,13 @@ class DoxTestClient {
   final Map<String, String> headers;
 
   final HttpClient _http;
+
+  /// the cookies of a [withSession] client, else null
+  final Map<String, String>? _jar;
+
+  /// the cookies this client keeps (name to raw value). Empty when it is
+  /// not a [withSession] client. You can change them.
+  Map<String, String> get cookies => _jar ?? <String, String>{};
 
   /// Start the app of [config] in this isolate and give a client for it.
   ///
@@ -78,6 +86,7 @@ class DoxTestClient {
       baseUri,
       Map<String, String>.unmodifiable(<String, String>{...headers, ...values}),
       _http,
+      _jar,
     );
   }
 
@@ -104,6 +113,27 @@ class DoxTestClient {
           '${c.key}=${c.value}',
       ].join('; '),
     });
+  }
+
+  /// A copy of this client that works like a browser with a session:
+  /// - it keeps the cookies of every response (`Set-Cookie`) and sends
+  ///   them back. A cookie with an empty value, `Max-Age=0` or an old
+  ///   `Expires` date is removed.
+  /// - on `POST`, `PUT`, `PATCH` and `DELETE` it sends the `XSRF-TOKEN`
+  ///   cookie in the `X-XSRF-TOKEN` header, like axios and Inertia. So
+  ///   `CsrfMiddleware` lets the request in.
+  ///
+  /// Each call gives a new browser with no cookies. Copies made from it
+  /// (eg. with [withHeaders]) share its cookies.
+  /// ```
+  /// DoxTestClient browser = client.withSession();
+  /// await browser.get('/login'); // gets the session and XSRF-TOKEN cookies
+  /// TestResponse res = await browser.post('/login', body: form);
+  /// res.expectStatus(302).expectHeader('location', '/dashboard');
+  /// (await browser.get('/dashboard')).expectStatus(200);
+  /// ```
+  DoxTestClient withSession() {
+    return DoxTestClient._copy(baseUri, headers, _http, <String, String>{});
   }
 
   Future<TestResponse> get(String path, {Map<String, String>? headers}) {
@@ -168,6 +198,8 @@ class DoxTestClient {
       request.headers.contentType = ContentType.json;
     }
     Map<String, String> all = <String, String>{...this.headers, ...?headers};
+    Map<String, String>? jar = _jar;
+    if (jar != null) _addJar(jar, method, all);
     for (MapEntry<String, String> header in all.entries) {
       request.headers.set(header.key, header.value);
     }
@@ -180,6 +212,7 @@ class DoxTestClient {
     await for (List<int> chunk in response) {
       data.add(chunk);
     }
+    if (jar != null) _keep(jar, response.cookies);
     Map<String, String> found = <String, String>{};
     response.headers.forEach((String name, List<String> values) {
       found[name.toLowerCase()] = values.join(', ');
@@ -192,5 +225,43 @@ class DoxTestClient {
         for (Cookie cookie in response.cookies) cookie.name: cookie.value,
       },
     );
+  }
+
+  static const Set<String> _unsafe = <String>{'POST', 'PUT', 'PATCH', 'DELETE'};
+
+  /// adds the cookies of [jar] (and the XSRF header) to [all]
+  static void _addJar(
+    Map<String, String> jar,
+    String method,
+    Map<String, String> all,
+  ) {
+    if (jar.isEmpty) return;
+    String? own = all[HttpHeaders.cookieHeader];
+    all[HttpHeaders.cookieHeader] = <String>[
+      for (MapEntry<String, String> c in jar.entries) '${c.key}=${c.value}',
+      ?own,
+    ].join('; ');
+    String? token = jar['XSRF-TOKEN'];
+    if (token != null && _unsafe.contains(method.toUpperCase())) {
+      all.putIfAbsent('X-XSRF-TOKEN', () => Uri.decodeComponent(token));
+    }
+  }
+
+  /// saves the [found] cookies in [jar], and removes deleted ones
+  static void _keep(Map<String, String> jar, List<Cookie> found) {
+    DateTime now = DateTime.now();
+    for (Cookie cookie in found) {
+      int? maxAge = cookie.maxAge;
+      DateTime? expires = cookie.expires;
+      bool gone =
+          cookie.value.isEmpty ||
+          (maxAge != null && maxAge <= 0) ||
+          (maxAge == null && expires != null && !expires.isAfter(now));
+      if (gone) {
+        jar.remove(cookie.name);
+      } else {
+        jar[cookie.name] = cookie.value;
+      }
+    }
   }
 }
