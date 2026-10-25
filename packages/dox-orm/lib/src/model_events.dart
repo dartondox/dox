@@ -41,7 +41,7 @@ class CancelModelEvent implements Exception {
 /// ```
 /// class UserObserver extends ModelObserver<User> {
 ///   @override
-///   Future<void> creating(User user) async {
+///   Future<void> onCreating(User user) async {
 ///     user.name = user.name?.trim();
 ///   }
 /// }
@@ -49,46 +49,46 @@ class CancelModelEvent implements Exception {
 /// Model.observe<User>(UserObserver());
 /// ```
 abstract class ModelObserver<T> {
-  FutureOr<void> saving(T model) {}
-  FutureOr<void> saved(T model) {}
-  FutureOr<void> creating(T model) {}
-  FutureOr<void> created(T model) {}
-  FutureOr<void> updating(T model) {}
-  FutureOr<void> updated(T model) {}
-  FutureOr<void> deleting(T model) {}
-  FutureOr<void> deleted(T model) {}
-  FutureOr<void> restoring(T model) {}
-  FutureOr<void> restored(T model) {}
-  FutureOr<void> forceDeleting(T model) {}
-  FutureOr<void> forceDeleted(T model) {}
+  FutureOr<void> onSaving(T model) {}
+  FutureOr<void> onSaved(T model) {}
+  FutureOr<void> onCreating(T model) {}
+  FutureOr<void> onCreated(T model) {}
+  FutureOr<void> onUpdating(T model) {}
+  FutureOr<void> onUpdated(T model) {}
+  FutureOr<void> onDeleting(T model) {}
+  FutureOr<void> onDeleted(T model) {}
+  FutureOr<void> onRestoring(T model) {}
+  FutureOr<void> onRestored(T model) {}
+  FutureOr<void> onForceDeleting(T model) {}
+  FutureOr<void> onForceDeleted(T model) {}
 
   /// calls the method for [event]
   FutureOr<void> handle(ModelEvent event, T model) {
     switch (event) {
       case ModelEvent.saving:
-        return saving(model);
+        return onSaving(model);
       case ModelEvent.saved:
-        return saved(model);
+        return onSaved(model);
       case ModelEvent.creating:
-        return creating(model);
+        return onCreating(model);
       case ModelEvent.created:
-        return created(model);
+        return onCreated(model);
       case ModelEvent.updating:
-        return updating(model);
+        return onUpdating(model);
       case ModelEvent.updated:
-        return updated(model);
+        return onUpdated(model);
       case ModelEvent.deleting:
-        return deleting(model);
+        return onDeleting(model);
       case ModelEvent.deleted:
-        return deleted(model);
+        return onDeleted(model);
       case ModelEvent.restoring:
-        return restoring(model);
+        return onRestoring(model);
       case ModelEvent.restored:
-        return restored(model);
+        return onRestored(model);
       case ModelEvent.forceDeleting:
-        return forceDeleting(model);
+        return onForceDeleting(model);
       case ModelEvent.forceDeleted:
-        return forceDeleted(model);
+        return onForceDeleted(model);
     }
   }
 }
