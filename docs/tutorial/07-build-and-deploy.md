@@ -101,7 +101,7 @@ RUN dart build cli --target bin/queue.dart --output build/queue \
   && cp build/schedule/bundle/bin/schedule build/bundle/bin/
 
 # Lay out the final file tree:
-# /app/bin/server, /app/lib (native libraries), /app/db/migration,
+# /app/bin/server, /app/bin/queue, /app/bin/schedule, /app/lib (native libraries), /app/db/migration,
 # /app/storage and a writable /tmp (uploads bigger than 1 MB are
 # streamed to a temp file).
 RUN mkdir -p /out/app/storage /out/tmp \
