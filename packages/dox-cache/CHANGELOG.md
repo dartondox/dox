@@ -1,3 +1,7 @@
+## 3.0.0-alpha.8
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.7
 
 - Perf: the memory driver removes expired items and expired locks in a sweep after many writes. Before, a key that was written once with a ttl and never read again stayed in memory forever.

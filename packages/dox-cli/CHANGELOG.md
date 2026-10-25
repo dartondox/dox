@@ -1,3 +1,7 @@
+## 3.0.0-alpha.8
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.7
 
 - Breaking: `create:controller` no longer takes `-ws`. Dox uses Socket.IO for realtime now. See the Socket.IO docs for a namespace class.
