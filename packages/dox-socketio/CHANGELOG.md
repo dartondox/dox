@@ -1,3 +1,7 @@
+## 3.0.0-alpha.9
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.8
 
 - New: `ServerOptions(maxAttachments: 10)`. It is the most binary attachments one packet may have. The default is the same as before (10). A packet with more closes that client.

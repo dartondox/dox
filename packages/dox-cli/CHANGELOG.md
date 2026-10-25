@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.9
 
 - `dox make:controller` (`create:controller`) writes `@Inject()` above the class, and no global controller instance. The file shows the typed route to use. The command says to run `build_runner`.
 - New `dox make:factory <model>`: makes `db/factories/<model>.factory.dart`.

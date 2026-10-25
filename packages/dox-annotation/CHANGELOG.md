@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.9
 
 - New: `@Inject()`. Put it above a class and `dox_builder` adds the class to the Dox container. `@Inject(singleton: false)` makes a new instance each time.
 

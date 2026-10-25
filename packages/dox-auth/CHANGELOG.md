@@ -1,3 +1,7 @@
+## 3.0.0-alpha.9
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.8
 
 - Security: a JWT secret (`SecretKey`) shorter than 32 bytes stops the app with an `ArgumentError` when `APP_ENV` is not `development`, `local` or `test`. In those envs it prints one warning line. Make a key with `dox key:generate` or `openssl rand -hex 32`.
