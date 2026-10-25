@@ -201,34 +201,6 @@ void main() {
       expect(content, contains('destroy(DoxRequest req, int id)'));
     });
 
-    test('create:controller with websocket flag should generate websocket controller', () {
-      final command = CommandRegistry.findCommand('create:controller');
-      expect(command, isNotNull);
-
-      expect(
-        () => command!.function(['UserController', '-ws']),
-        returnsNormally,
-      );
-
-      // Check if file was created
-      final controllerFile = File(
-        'lib/app/ws/controllers/user.controller.dart',
-      );
-      expect(controllerFile.existsSync(), isTrue);
-
-      // Check file content for websocket methods
-      final content = controllerFile.readAsStringSync();
-      expect(content, contains('class UserController'));
-      expect(
-        content,
-        contains('index(WebsocketEmitter emitter, dynamic message)'),
-      );
-      expect(
-        content,
-        contains('import \'package:dox_websocket/dox_websocket.dart\''),
-      );
-    });
-
     test('create:middleware should generate middleware file', () {
       final command = CommandRegistry.findCommand('create:middleware');
       expect(command, isNotNull);

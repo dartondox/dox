@@ -1,6 +1,6 @@
 # Services
 
-A service is a class with a `setup()` method. Dox runs it at start, in every isolate. Use it to set up things like the database, auth or WebSocket.
+A service is a class with a `setup()` method. Dox runs it at start, in every isolate. Use it to set up things like the database or auth.
 
 ## Why services
 
@@ -91,7 +91,7 @@ In each isolate, Dox does these steps in this order:
 2. It registers the routes of your routers.
 3. It starts the HTTP server.
 
-So routes can use what a service set up. For example, `Route.websocket()` needs the WebSocket service to run first.
+So routes can use what a service set up.
 
 `dox openapi:generate` also runs `setup()` of every service, because it needs the routes.
 

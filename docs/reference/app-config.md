@@ -30,7 +30,7 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `validationMessages` | `MessageResolver?` | `null` (English messages) | Messages for validation errors, for example in other languages. |
 | `responseHandler` | `ResponseHandlerInterface?` | `null` | A class with `DoxResponse handle(DoxResponse res)`. It sees every response before it is sent. |
 | `errorHandler` | `Function(Object?, StackTrace)` | `defaultErrorHandler` | Called for every unhandled error. The default logs the error with `Logger.warn` and the stack with `Logger.danger`. |
-| `services` | `List<DoxService>` | `[]` | Classes with a `setup()` method. Dox runs them in every isolate at start. The ORM, auth and WebSocket are set up here. |
+| `services` | `List<DoxService>` | `[]` | Classes with a `setup()` method. Dox runs them in every isolate at start. The ORM and auth are set up here. |
 
 ## Sub configs
 

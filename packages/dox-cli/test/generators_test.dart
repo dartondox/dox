@@ -35,12 +35,6 @@ void main() {
       expect(c, contains('BlogPostController blogPostController ='));
     });
 
-    test('websocket controller', () {
-      expect(createWsController('ChatRoomController'), isTrue);
-      String c = read('lib/app/ws/controllers/chat_room.controller.dart');
-      expect(c, contains('class ChatRoomController {'));
-    });
-
     test('model', () {
       expect(createModel('BlogPost'), isTrue);
       String c = read('lib/app/models/blog_post/blog_post.model.dart');

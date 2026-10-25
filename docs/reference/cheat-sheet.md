@@ -32,7 +32,7 @@ dox build_runner:build             # make .g.dart files
 dox key:generate                   # APP_KEY in .env
 dox env:generate                   # lib/config/env.dart from .env.example
 dox env:check                      # check the env, exit 1 when bad
-dox create:controller Blog [-r] [-ws]
+dox create:controller Blog [-r]
 dox create:middleware Auth
 dox create:dto CreateBlog
 dox create:serializer Blog
@@ -77,7 +77,7 @@ class ApiRouter extends Router {
 | `Route.resource('blogs', BlogController())` | `index`, `create`, `store`, `show`, `edit`, `update`, `destroy` |
 | `Route.files('files')` | serve a storage disk, signed URLs only |
 | `Route.enabledCors(() { ... })` / `Route.disabledCors(...)` | CORS for some routes |
-| `Route.websocket('ws', (WebsocketEvent e) { ... })` | needs `dox_websocket` |
+| `Route.websocket('echo', (WebSocket s, DoxRequest req) { ... })` | a raw WebSocket. For rooms and acks, use Socket.IO. |
 
 Controller parameters, by type: `DoxRequest`, one `@Dto` class, `String`/`int`/`double`/`num`/`bool` for path params (by position). Only positional parameters.
 
@@ -404,26 +404,29 @@ Protect a route with `AuthMiddleware()`. Client sends `Authorization: Bearer <to
 
 See [Authentication](../security/authentication.md) and [Hashing](../security/hashing.md).
 
-## WebSocket
+## Socket.IO
 
 ```dart
-// a service
-WebsocketServer(Dox());
+class ChatNamespace extends NamespaceHandler {
+  @override
+  String get path => '/chat';
 
-// a route
-Route.websocket('ws', (WebsocketEvent event) {
-  event.on('intro', chat.intro);
-});
+  @override
+  void onConnection(Socket socket) {
+    socket.join('lobby');
+    socket.on('chat', onChat);
+  }
 
-// a controller method
-void intro(WebsocketEmitter emitter, dynamic message) {
-  emitter.room('chat').emitExceptSender('intro', message);
+  void onChat(SocketEvent event) {
+    event.socket.to('lobby').emit('chat', event.data);
+    event.ack('ok');
+  }
 }
 ```
 
-Client sends `{"event": "joinRoom", "message": "chat"}`. The join is refused unless you set `WebsocketServer().authorizeJoin`. Many isolates need `WebsocketRedisAdapter`.
+Turn it on with `SocketIoConfig` in `AppConfig`. Many isolates need the Redis adapter and `transports: ['websocket']` on the client.
 
-See [WebSocket](../digging-deeper/websocket.md).
+See [Socket.IO](../packages/socketio.md).
 
 ## OpenAPI
 

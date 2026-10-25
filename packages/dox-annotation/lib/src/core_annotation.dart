@@ -2,10 +2,6 @@ import 'dart:io';
 
 import 'package:dox_annotation/dox_annotation.dart';
 
-abstract class IDox {
-  void setWebsocket(IDoxWebsocket ws);
-}
-
 abstract class IDoxRequest {
   late Uri uri;
   String method = 'GET';

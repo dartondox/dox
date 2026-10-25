@@ -21,6 +21,6 @@ class RedisSocketAdapterFactory extends SocketAdapterFactory {
 
   @override
   Adapter create() {
-    return RedisAdapter(subscriber: redis.duplicate(), publisher: redis);
+    return RedisAdapter(redis: redis.option);
   }
 }

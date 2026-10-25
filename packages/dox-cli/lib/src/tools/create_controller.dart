@@ -16,18 +16,6 @@ ${className}Controller ${toPascalWithFirstLetterLowerCase(className)}Controller 
 ''';
 }
 
-String _getWsSample(String className, String filename) {
-  return '''
-import 'package:dox_websocket/dox_websocket.dart';
-
-class ${className}Controller {
-  void index(WebsocketEmitter emitter, dynamic message) async {
-    /// write your logic here
-  }
-}
-''';
-}
-
 String _getResourceSample(String className, String filename) {
   return '''
 import 'package:dox_core/dox_core.dart';
@@ -74,26 +62,6 @@ bool createController(String filename, bool resource) {
   String sample = resource
       ? _getResourceSample(className, filename)
       : _getSample(className, filename);
-
-  file.createSync(recursive: true);
-  file.writeAsStringSync(sample, mode: FileMode.write);
-  print('\x1B[32m$controllerName created successfully.\x1B[0m');
-  return true;
-}
-
-bool createWsController(String filename) {
-  filename = pascalToSnake(filename).replaceAll(RegExp(r'_?controller$'), '');
-  String className = snakeToPascal(filename);
-  String path = '${Directory.current.path}/lib/app/ws/controllers/';
-  String controllerName = '$filename.controller';
-  final file = File('$path$filename.controller.dart');
-
-  if (file.existsSync()) {
-    print('\x1B[32m$controllerName already exists\x1B[0m');
-    return false;
-  }
-
-  String sample = _getWsSample(className, filename);
 
   file.createSync(recursive: true);
   file.writeAsStringSync(sample, mode: FileMode.write);

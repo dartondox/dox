@@ -4,10 +4,8 @@ This page shows how to run a Socket.IO server with `dox_socketio`, inside Dox or
 
 `dox_socketio` is a Socket.IO v4 server for Dart.
 The official clients connect to it with no changes: `socket.io-client` (JavaScript v4) and the Dart `socket_io_client` package.
-
-!!! tip "Socket.IO or WebSocket?"
-    - [WebSocket](../digging-deeper/websocket.md) (`dox_websocket`) runs inside the Dox HTTP server. It uses its own small JSON format.
-    - Socket.IO (this page) works with the Socket.IO clients. It has acks, namespaces, binary data and long-polling.
+It has acks, rooms, namespaces, binary data and long-polling.
+Socket.IO is the way to do realtime in Dox.
 
 ## Install
 
@@ -64,7 +62,7 @@ import 'package:ioredis/ioredis.dart';
 import 'package:my_app/app/socket/chat.namespace.dart';
 import 'package:my_app/config/env.dart';
 
-Redis redis = Redis(RedisOptions(host: '127.0.0.1', port: 6379));
+RedisOptions redis = RedisOptions(host: '127.0.0.1', port: 6379);
 
 SocketIoConfig socketIo = SocketIoConfig(
   enabled: env.socketioEnabled,
@@ -78,7 +76,7 @@ class RedisSocketAdapterFactory extends SocketAdapterFactory {
 
   @override
   Adapter create() {
-    return RedisAdapter(subscriber: redis.duplicate(), publisher: redis);
+    return RedisAdapter(redis: redis);
   }
 }
 ```
@@ -107,7 +105,7 @@ AppConfig appConfig = AppConfig(
 - Requests to `/socket.io/` go to Socket.IO before the router. Middleware and body reading are skipped.
 - When it is off, there is no extra work per request.
 - `Dox().socketIo` is the server of this isolate: `Dox().socketIo?.to('room').emit('news', data)`.
-- `dox_websocket` (`Route.websocket`) still works next to it.
+- Need a plain WebSocket with no Socket.IO protocol? `Route.websocket(path, handler)` in `dox_core` gives you the raw socket.
 
 !!! warning "Many isolates"
     Dox runs one isolate per CPU core, and each isolate has its own Socket.IO server.
@@ -230,15 +228,68 @@ With more than one server process, use the Redis adapter.
 Then a broadcast on one server reaches the clients of all servers.
 
 ```dart
-Redis redis = Redis(RedisOptions(host: '127.0.0.1', port: 6379));
 SocketIoServer io = SocketIoServer(
-  adapter: RedisAdapter(subscriber: redis.duplicate(), publisher: redis),
+  adapter: RedisAdapter(redis: RedisOptions(host: '127.0.0.1', port: 6379)),
 );
 ```
 
-The subscriber needs its own connection. A Redis connection in subscribe mode can not run other commands.
-
-- It uses the message format of `@socket.io/redis-adapter`. A Node.js server can share broadcasts with it, when Node uses a JSON parser.
-- `fetchSockets`, `socketsJoin` and broadcast acks only work on the local server.
+- `RedisOptions` comes from the `ioredis` package. Host, port, user, password, `db`, TLS and the retry delay are used.
+- The adapter opens two Redis connections of its own: one to publish and one to subscribe.
+- It uses the format of `@socket.io/redis-adapter`. Node.js servers with that adapter can share one Redis with Dox servers.
+- It reads messages in msgpack and in JSON. It writes msgpack, like the Node.js adapter.
+  If your Node.js servers use a JSON parser, set `format: RedisFormat.json`.
+- Other servers can ask a Dox server for `fetchSockets`, `allRooms`, `socketsJoin`, `socketsLeave` and `disconnectSockets`. It answers.
+- On a Dox server, `fetchSockets`, `socketsJoin`, `socketsLeave` and `disconnectSockets` only act on its own sockets.
+  To act on all servers, use an [emitter](#emit-from-other-programs).
+- Broadcast acks from other servers: Dox clients get the event, but their acks are not sent back.
+- `serverSideEmit` from other servers is ignored.
 - Long-polling needs sticky sessions when many servers share one port.
   If you can not have them, use `transports: ['websocket']` on the client.
+
+## Emit from other programs
+
+An emitter sends events to your clients without a Socket.IO server.
+Use it in a queue worker, a cron job or a service in another language.
+It writes to Redis, and every server with the Redis adapter sends the event to its clients.
+
+Dart (for example in a Dox queue job or a CLI command):
+
+```dart
+import 'package:dox_socketio/dox_socketio.dart';
+import 'package:ioredis/ioredis.dart';
+
+Future<void> main() async {
+  SocketIoEmitter emitter = SocketIoEmitter(
+    redis: RedisOptions(host: '127.0.0.1', port: 6379),
+  );
+
+  await emitter.emit('news', {'title': 'hello'}); // all clients of `/`
+  await emitter.to('room1').except('room2').emit('news', 'hi room1');
+  await emitter.of('/chat').to('vip').emit('notice', 'for vip');
+
+  await emitter.to('room1').socketsJoin('room3'); // sockets in room1 join room3
+  await emitter.to('room3').socketsLeave('room1');
+  await emitter.to('banned').disconnectSockets();
+
+  await emitter.close();
+}
+```
+
+Node.js, with [`@socket.io/redis-emitter`](https://www.npmjs.com/package/@socket.io/redis-emitter):
+
+```js
+import { Emitter } from '@socket.io/redis-emitter';
+import { createClient } from 'redis';
+
+const redis = createClient({ url: 'redis://127.0.0.1:6379' });
+await redis.connect();
+
+const emitter = new Emitter(redis);
+emitter.to('room1').emit('news', { title: 'hello' });
+emitter.of('/chat').emit('notice', 'for everyone in /chat');
+```
+
+- The emitters of other languages (PHP, Python, Go) use the same format, so they work too.
+- Binary data (`Uint8List` in Dart, `Buffer` in Node.js) arrives as binary.
+- The emitter does not wait for an answer. It can not know if a client got the event.
+- `key` must be the same as the `key` of the adapter. Both default to `socket.io`.

@@ -31,7 +31,7 @@ It lists facts only. Each project is good at different things.
 | ORM and relations | `dox_orm`: models, has one, has many, belongs to, many to many | Not built in | Built in: filters, joins, one-to-one, one-to-many, many-to-many | Not built in | Not built in |
 | Migrations | `dox migrate` (SQL or Dart files) | Not built in | Built in, versioned migrations | Not built in | Not built in |
 | Auth | `dox_auth`: JWT guard, password hashing | `dart_frog_auth`: Basic, Bearer and Cookie middleware | Built in: email and password, Google, Apple, GitHub, passkeys and more | Not built in | See their docs |
-| WebSocket | `dox_websocket` and a Socket.IO v4 server (`dox_socketio`) | `dart_frog_web_socket` (`webSocketHandler`) | Streaming methods over a managed WebSocket | `shelf_web_socket` | Built in |
+| WebSocket | A Socket.IO v4 server (`dox_socketio`) and raw `Route.websocket` | `dart_frog_web_socket` (`webSocketHandler`) | Streaming methods over a managed WebSocket | `shelf_web_socket` | Built in |
 | OpenAPI | Generated OpenAPI 3.1 (JSON, YAML) and a docs page | On their roadmap, not done | See their docs | See their docs | See their docs |
 | CLI and code generation | `dox` CLI, `build_runner` for DTOs, models and OpenAPI | `dart_frog` CLI: `create`, `dev` (hot reload), `build` | `serverpod` CLI, generates server and client code | No CLI (`shelf_router_generator` for routes from annotations) | No CLI |
 | Native binary | `dox build` makes an AOT binary | `dart_frog build` makes a production build with a Dockerfile | Deploy to Serverpod Cloud, Docker or Terraform. Binary: see their docs. | Your app is plain Dart. Compile it like any Dart program. | Your app is plain Dart. Compile it like any Dart program. |

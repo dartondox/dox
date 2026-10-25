@@ -1,3 +1,7 @@
+## Unreleased
+
+- Breaking: `IDox`, `IDoxWebsocket` and `WebsocketEvent` are removed. They were only used by `dox_websocket`.
+
 ## 3.0.0-alpha.6
 
 - Version bump only, to match the other packages.

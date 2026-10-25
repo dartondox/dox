@@ -7,10 +7,8 @@ import 'package:dox_core/http/http_cors_handler.dart';
 import 'package:dox_core/http/http_error_handler.dart';
 import 'package:dox_core/http/http_response_handler.dart';
 import 'package:dox_core/http/http_route_handler.dart';
-import 'package:dox_core/http/http_websocket_handler.dart';
 import 'package:dox_core/http/request/http_request_body.dart';
 import 'package:dox_core/router/route_data.dart';
-import 'package:dox_http_native/dox_http_native.dart';
 
 /// this is a class which get matched routes and
 /// pass http request to route middleware and controllers
@@ -25,12 +23,6 @@ void httpRequestHandler(HttpRequest req) {
     if (route == null) return;
 
     httpCorsHandler(route.corsEnabled, req);
-
-    /// only an app with WebSocket routes needs the upgrade check
-    if (Dox().websocket != null && NativeWebSocket.isUpgradeRequest(req)) {
-      httpWebSocketHandler(req, route);
-      return;
-    }
 
     /// no Content-Type means no body to read. then the request is
     /// made at once, with no Future in between.

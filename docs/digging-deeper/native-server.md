@@ -62,7 +62,7 @@ Rust also does the WebSocket upgrade and the WebSocket protocol.
    messages back the same way as answers.
 
 - A message or frame over the size limit closes the socket with code `1009`.
-  Dart never reads it. `dox_websocket` uses `maxMessageSize`, Socket.IO uses
+  Dart never reads it. `NativeWebSocket.upgrade` takes `maxMessageSize`. Socket.IO uses
   `maxHttpBufferSize`.
 - Compression (permessage-deflate) is never agreed. A small compressed
   message could grow very big in memory.

@@ -27,7 +27,6 @@ No package is marked "stable API" yet. That comes with 3.0 stable.
 | `dox_cache` | Memory, file and Redis cache, tags, locks | May change | 4 test files, with Redis in CI |
 | `dox_storage` | Local disk and S3 (and S3-compatible) storage | May change | 7 test files, with MinIO in CI |
 | `dox_openapi` | OpenAPI 3.1 document and a docs page | May change | 4 test files |
-| `dox_websocket` | WebSocket routes and events | May change | 4 test files, with Redis in CI |
 | `dox_socketio` | Socket.IO v4 server with a Redis adapter | May change | 6 test files, with the real `socket.io-client` in CI |
 | `dox_http_native` | Native HTTP/1.1 server (Rust hyper), the default server | Experimental | 2 Dart test files and Rust tests. No WebSocket yet. |
 | `dox_postgres_native` | Native Postgres client (Rust tokio-postgres), the default Postgres driver | Experimental | 1 Dart test file, plus the `dox_orm` tests. No TLS yet. |

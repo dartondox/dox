@@ -3,7 +3,7 @@
   {"name": "app", "packages": "dox-app", "services": "redis", "group": "unit"},
   {"name": "builder, cli", "packages": "dox-builder dox-cli", "group": "unit"},
   {"name": "small packages", "packages": "dox-annotation dox-auth dox-openapi dox-validation", "group": "unit"},
-  {"name": "redis (cache, socketio, websocket)", "packages": "dox-cache dox-socketio dox-websocket", "services": "redis", "group": "unit"},
+  {"name": "redis (cache, socketio)", "packages": "dox-cache dox-socketio", "services": "redis", "group": "unit"},
   {"name": "storage (minio)", "packages": "dox-storage", "services": "minio", "group": "databases", "locks": "minio"},
   {"name": "orm (postgres)", "packages": "dox-orm", "vars": "DRIVER=postgres DB_PORT=5432", "services": "postgres", "group": "databases", "locks": "postgres"},
   {"name": "orm (postgres, dart driver)", "packages": "dox-orm", "vars": "DRIVER=postgres DB_PORT=5432 DOX_DB_DRIVER=dart", "services": "postgres", "group": "databases", "locks": "postgres"},
