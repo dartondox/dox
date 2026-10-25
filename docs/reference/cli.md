@@ -283,6 +283,8 @@ dox create:migration <name> [--sql]
 
 Writes `db/migration/<yyyy>_<mm>_<dd>_<hhmmss>_<name>.dart` (or `.sql`). Characters that are not letters, digits or `_` are removed from the name.
 
+Migrations run sorted by file name. So the new file always sorts after every file already in `db/migration`. When the current time is not later than the newest file (for example, two migrations in the same second), it uses the newest time plus 1 second.
+
 For a Dart migration it also:
 
 - writes `db/migration/migrations.dart`, the registry of every Dart migration in the folder, sorted by name;
