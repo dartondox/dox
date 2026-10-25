@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.7
 
 - Perf: object, list, map and union schemas work out `isAsync` once and keep the answer. Before, the whole schema tree was walked on every `validateSchema` call.
 - `url()` now allows only `http` and `https` links. Pass `schemes` to allow others.

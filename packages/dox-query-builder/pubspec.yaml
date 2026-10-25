@@ -1,6 +1,6 @@
 name: dox_query_builder
 description: Replaced by dox_orm. This package only re-exports dox_orm, so old imports keep working.
-version: 3.0.0-alpha.6
+version: 3.0.0-alpha.7
 repository: https://github.com/dartondox/dox
 homepage: https://dartondox.dev
 
@@ -9,7 +9,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  dox_orm: ^3.0.0-alpha.6
+  dox_orm: ^3.0.0-alpha.7
 
 dev_dependencies:
   lints: ^6.1.0

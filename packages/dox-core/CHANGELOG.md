@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.7
 
 - Breaking: `dox_websocket` is gone. Use `dox_socketio` for realtime. `Dox().websocket` and `Dox().setWebsocket()` are removed.
 - Breaking: `Route.websocket(path, handler)` is now a raw WebSocket route. `handler` gets the open `WebSocket` and the `DoxRequest`. Middleware runs first. A request that is not a WebSocket upgrade gets 400.

@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.7
 
 - The generated `fromMap()` takes a `DateTime` from the driver as it is. It only parses a string.
 - New generated `columnsToMap()` with the columns only. `convertToMap()` adds the relations to it.

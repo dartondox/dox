@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.7
 
 - Breaking: Postgres and MySQL use only the native drivers. The Dart drivers (`postgres` and `mysql_dart` packages) are gone. So are `PostgresDriver`, `MysqlDriver`, `DOX_DB_DRIVER=dart` and `extra['native']`.
 - Breaking: when the native library does not load, `createDriver()` and `SqlQueryBuilder.initializeWithDatabaseConfig()` throw an `UnsupportedError`. It says why the library did not load and how to fix it. Before, the ORM used the Dart driver and printed a warning.

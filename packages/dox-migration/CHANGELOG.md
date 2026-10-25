@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.7
 
 - Breaking: migrations run on the dox_orm drivers: the native Postgres and MySQL drivers, and SQLite. The `postgres` and `mysql_dart` packages are gone. When the native library does not load, the migration stops with an error that says why.
 - Breaking: `Migrator(connection: ...)` takes a dox_orm `DBDriver` now, eg. `SqlQueryBuilder().dbDriver`. The migrator does not close it. New `Migrator(config: ...)` takes a `ConnectionConfig`, eg. `databaseConfig.getConnectionConfig()`, and closes it at the end.

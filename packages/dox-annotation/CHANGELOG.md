@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.7
 
 - Breaking: `IDox`, `IDoxWebsocket` and `WebsocketEvent` are removed. They were only used by `dox_websocket`.
 
