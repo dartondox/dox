@@ -304,7 +304,20 @@ A failed run prints the error and sets exit code 1.
 | `dox migration:rollback [--step=<count>]` | `dox migrate:rollback` | Undo the last batch, or the last `<count>` migrations. Any other option prints `Invalid option <x>, use --step=<count>` (exit code 1). |
 | `dox migration:reset` | `dox migrate:reset` | Undo every migration. |
 | `dox migration:refresh` | `dox migrate:refresh` | Undo every migration, then run them all again. |
+| `dox migration:fresh` | `dox migrate:fresh` | Drop every table, then run all migrations. |
 | `dox migration:status` | `dox migrate:status` | Print which migrations ran, and their batch. |
+
+`--seed` after `migration:run`, `migration:refresh` or `migration:fresh` runs `dox db:seed` when the migrations end well.
+
+## Factories and seeders
+
+| Command | Aliases | What it does |
+| --- | --- | --- |
+| `dox make:factory <model>` | `dox create:factory` | Make `db/factories/<model>.factory.dart`. It imports the model with the package name of `pubspec.yaml`. |
+| `dox make:seeder <name>` | `dox create:seeder` | Make `db/seeders/<name>.seeder.dart`. It writes `db/seeders/seeders.dart` again, and makes `bin/seed.dart` when it is missing. |
+| `dox db:seed [--class=<name>]` | | Write `db/seeders/seeders.dart` again, then run `dart run bin/seed.dart`. Default seeder: `DatabaseSeeder`. |
+
+Templates: `createFactory` in `packages/dox-cli/lib/src/tools/create_factory.dart`, and `createSeeder` and `seedEntrySource` in `packages/dox-cli/lib/src/tools/create_seeder.dart`.
 
 ## Command list
 
@@ -327,8 +340,12 @@ A failed run prints the error and sets exit code 1.
 | `migration:rollback` | `migrate:rollback` | Database |
 | `migration:reset` | `migrate:reset` | Database |
 | `migration:refresh` | `migrate:refresh` | Database |
+| `migration:fresh` | `migrate:fresh` | Database |
 | `migration:status` | `migrate:status` | Database |
 | `make:migration` | `create:migration` | Database |
+| `make:factory` | `create:factory` | Database |
+| `make:seeder` | `create:seeder` | Database |
+| `db:seed` | | Database |
 | `version` | `--version`, `-version`, `v`, `-v`, `--v` | System |
 | `update` | | System |
 | `env:check` | | System |

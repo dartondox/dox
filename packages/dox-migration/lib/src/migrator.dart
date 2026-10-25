@@ -77,12 +77,22 @@ class Migrator {
     });
   }
 
+  /// drop every table of the database, then run all migrations.
+  /// it also drops tables that no migration made.
+  Future<void> fresh() {
+    return _withDriver((DbConnection d) async {
+      await _dropAllTables(d);
+      await createMigrationTableIfNotExist(d);
+      await _migrate(d);
+    });
+  }
+
   /// every known migration with its batch (null when it did not run)
   Future<List<MigrationStatus>> status() => _withDriver(_status);
 
   /// run a command from the command line and give the exit code:
   /// `run` (or `migrate`), `rollback [--step=<n>]`, `reset`, `refresh`,
-  /// `status`. `migration:` or `migrate:` in front is fine too.
+  /// `fresh`, `status`. `migration:` or `migrate:` in front is fine too.
   Future<int> run(List<String> args) async {
     String command = args.isEmpty
         ? 'run'
@@ -98,12 +108,14 @@ class Migrator {
           await reset();
         case 'refresh':
           await refresh();
+        case 'fresh':
+          await fresh();
         case 'status':
           printStatus(await status());
         default:
           Logger.danger(
             'Unknown migration command: $command '
-            '(use run, rollback, reset, refresh or status)',
+            '(use run, rollback, reset, refresh, fresh or status)',
           );
           return 1;
       }
@@ -284,6 +296,52 @@ class Migrator {
       if (sqliteFk) await d.execute('PRAGMA foreign_keys = ON');
     }
     Logger.info('${up ? 'Migrated' : 'Rolled back'}: $name');
+  }
+
+  /// drop all tables, with the foreign key checks off
+  Future<void> _dropAllTables(DbConnection d) async {
+    String query = switch (d.driver.getName()) {
+      Driver.sqlite =>
+        "SELECT name FROM sqlite_master WHERE type = 'table' "
+            "AND name NOT LIKE 'sqlite_%'",
+      Driver.mysql =>
+        'SELECT table_name AS name FROM information_schema.tables '
+            "WHERE table_schema = DATABASE() AND table_type = 'BASE TABLE'",
+      Driver.postgres =>
+        'SELECT tablename AS name FROM pg_tables '
+            'WHERE schemaname = current_schema()',
+    };
+    List<String> tables = <String>[
+      for (Map<String, dynamic> row in await d.execute(query))
+        row.values.first.toString(),
+    ];
+    if (tables.isEmpty) return;
+    Logger.info('Dropping all tables');
+    if (d.isSqlite) {
+      await d.execute('PRAGMA foreign_keys = OFF');
+      try {
+        for (String table in tables) {
+          await d.execute('DROP TABLE IF EXISTS "$table"');
+        }
+      } finally {
+        await d.execute('PRAGMA foreign_keys = ON');
+      }
+    } else if (d.isMysql) {
+      /// one connection, so the session setting is used by the drops
+      await d.transaction(() async {
+        await d.execute('SET FOREIGN_KEY_CHECKS = 0');
+        try {
+          for (String table in tables) {
+            await d.execute('DROP TABLE IF EXISTS `$table`');
+          }
+        } finally {
+          await d.execute('SET FOREIGN_KEY_CHECKS = 1');
+        }
+      });
+    } else {
+      String list = tables.map((String t) => '"$t"').join(', ');
+      await d.execute('DROP TABLE IF EXISTS $list CASCADE');
+    }
   }
 
   Future<void> _checkSqliteForeignKeys(DbConnection d) async {

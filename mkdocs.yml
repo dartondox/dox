@@ -145,6 +145,8 @@ nav:
     - database/query-builder.md
     - database/transactions.md
     - database/migration.md
+    - database/factories.md
+    - database/seeders.md
     - database/schema.md
     - database/postgres-native.md
     - database/mysql-native.md

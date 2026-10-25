@@ -41,6 +41,9 @@ dox s                        # dev server, restarts when a file changes
 | `dox make:migration <name> [--sql]` | create a Dart or SQL migration |
 | `dox migration:run` (or `dox migrate`) | run new migrations |
 | `dox migration:rollback [--step=N]` | undo the last batch, or the last N migrations |
+| `dox migration:fresh [--seed]` | drop all tables, then run all migrations |
+| `dox make:factory <model>` / `dox make:seeder <name>` | create a model factory or a seeder |
+| `dox db:seed [--class=<name>]` | run the seeders |
 | `dox key:generate` | make a new `APP_KEY` |
 | `dox env:generate` / `dox env:check` | make or check the typed env class |
 | `dox openapi:generate [dir]` | write `openapi.json` and `openapi.yaml` |

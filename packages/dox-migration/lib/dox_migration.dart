@@ -11,3 +11,4 @@ export 'package:dox_orm/dox_orm.dart'
 
 export 'src/migration.dart';
 export 'src/migrator.dart';
+export 'src/seeder.dart';

@@ -1,3 +1,8 @@
+## Unreleased
+
+- New `Seeder` and `SeederRunner`. A seeder puts data in the database. `call()` runs other seeders. `SeederRunner(seeders: seeders).run(args)` runs `DatabaseSeeder`, or another one with `--class=<name>`, in one transaction. It reads the database from `.env`, the same as the migrations.
+- New `Migrator.fresh()` and the `fresh` command of `Migrator.run()`. It drops every table of the database, then runs all migrations.
+
 ## 3.0.0-alpha.8
 
 - A migration that runs inside a transaction you already opened (eg. with `Migrator(connection: ...)`) now uses a savepoint. A failed migration undoes only its own work.

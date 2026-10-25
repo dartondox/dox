@@ -227,6 +227,9 @@ Values are always bound parameters. Names you pass are quoted. Do not pass user 
 | `php artisan migrate` | `dox migrate` (or `dox migration:run`) |
 | `php artisan migrate:rollback --step=2` | `dox migration:rollback --step=2` |
 | `php artisan migrate:reset`, `migrate:refresh`, `migrate:status` | `dox migration:reset`, `migration:refresh`, `migration:status` |
+| `php artisan migrate:fresh --seed` | `dox migrate:fresh --seed` |
+| `php artisan db:seed --class=UserSeeder` | `dox db:seed --class=UserSeeder` |
+| `php artisan make:factory`, `make:seeder` | `dox make:factory`, `dox make:seeder` |
 
 ```dart title="db/migration/2026_10_21_120000_create_users_table.dart"
 class CreateUsersTable extends Migration {

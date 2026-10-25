@@ -5,6 +5,8 @@ import 'package:dox/src/tools/create_controller.dart';
 import 'package:dox/src/tools/create_middleware.dart';
 import 'package:dox/src/tools/create_model.dart';
 import 'package:dox/src/tools/create_dto.dart';
+import 'package:dox/src/tools/create_factory.dart';
+import 'package:dox/src/tools/create_seeder.dart';
 import 'package:dox/src/tools/create_serializer.dart';
 import 'package:test/test.dart';
 
@@ -258,6 +260,108 @@ void main() {
       expect(Directory('db').existsSync(), isFalse);
       await run(<String>['first']);
       expect(Directory('db/migration').existsSync(), isTrue);
+    });
+  });
+
+  group('make:factory and make:seeder', () {
+    test('factory imports the model with the app package name', () {
+      File('pubspec.yaml').writeAsStringSync('name: my_app\n');
+      expect(createFactory('BlogPostFactory'), isTrue);
+      String c = read('db/factories/blog_post.factory.dart');
+      expect(c, contains("import 'package:dox_orm/factory.dart';"));
+      expect(
+        c,
+        contains(
+          "import 'package:my_app/app/models/blog_post/blog_post.model.dart';",
+        ),
+      );
+      expect(c, contains('class BlogPostFactory extends Factory<BlogPost> {'));
+      expect(c, contains('BlogPost definition() {'));
+      expect(c, contains('BlogPost blogPost = BlogPost();'));
+      expect(createFactory('BlogPost'), isFalse);
+    });
+
+    test('factory needs a pubspec name', () {
+      expect(createFactory('User'), isFalse);
+      exitCode = 0;
+      expect(Directory('db').existsSync(), isFalse);
+    });
+
+    test('seeder, registry and bin/seed.dart', () {
+      expect(createSeeder('DatabaseSeeder'), isTrue);
+      expect(createSeeder('user'), isTrue);
+      expect(createSeeder('UserSeeder'), isFalse);
+      String c = read('db/seeders/user.seeder.dart');
+      expect(c, contains("import 'package:dox_migration/dox_migration.dart';"));
+      expect(c, contains('class UserSeeder extends Seeder {'));
+      expect(c, contains('Future<void> run() async {'));
+
+      String registry = read('db/seeders/seeders.dart');
+      expect(registry, contains("import 'database.seeder.dart';"));
+      expect(registry, contains("import 'user.seeder.dart';"));
+      expect(registry, contains('<Seeder>[DatabaseSeeder(), UserSeeder()];'));
+      expect(registry, isNot(contains("import 'seeders.dart'")));
+
+      expect(
+        read('bin/seed.dart'),
+        contains('SeederRunner(seeders: seeders).run(args)'),
+      );
+      File('bin/seed.dart').writeAsStringSync('// mine');
+      createSeeder('Post');
+      expect(read('bin/seed.dart'), '// mine');
+    });
+
+    test('registry finds every seeder class of the folder', () {
+      Directory('db/seeders').createSync(recursive: true);
+      File('db/seeders/extra.dart').writeAsStringSync(
+        'class A extends Seeder {}\nclass B extends Seeder {}\nclass C {}',
+      );
+      writeSeederRegistry();
+      String registry = read('db/seeders/seeders.dart');
+      expect(registry, contains("import 'extra.dart';"));
+      expect(registry, contains('<Seeder>[A(), B()];'));
+      expect(registry, isNot(contains('C()')));
+    });
+
+    test('a long registry list has one seeder per line', () {
+      Directory('db/seeders').createSync(recursive: true);
+      File('db/seeders/many.dart').writeAsStringSync(
+        <String>[
+          for (int i = 0; i < 6; i++)
+            'class LongNameSeeder$i extends Seeder {}',
+        ].join('\n'),
+      );
+      writeSeederRegistry();
+      expect(
+        read('db/seeders/seeders.dart'),
+        contains('<Seeder>[\n  LongNameSeeder0(),\n  LongNameSeeder1(),\n'),
+      );
+    });
+
+    test('db:seed without bin/seed.dart fails', () async {
+      await CommandRegistry.findCommand('db:seed')!.function(<String>[]);
+      expect(exitCode, 1);
+      exitCode = 0;
+    });
+
+    test('aliases', () {
+      expect(
+        CommandRegistry.findCommand('create:factory')?.command,
+        'make:factory',
+      );
+      expect(
+        CommandRegistry.findCommand('create:seeder')?.command,
+        'make:seeder',
+      );
+      expect(
+        CommandRegistry.findCommand('migrate:fresh')?.command,
+        'migration:fresh',
+      );
+      expect(
+        CommandRegistry.findCommand('db:seed')!
+            .validateArgs(<String>['--class=UserSeeder']),
+        isTrue,
+      );
     });
   });
 
