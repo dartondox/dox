@@ -35,6 +35,15 @@ class TagController {
   dynamic index(DoxRequest req) => <dynamic>[];
 }
 
+/// two controllers with the same method name
+class AuthController {
+  dynamic login(DoxRequest req) => 'token';
+}
+
+class WebAuthController {
+  dynamic login(DoxRequest req) => 'session';
+}
+
 /// what dox_builder writes into lib/generated/openapi.g.dart for PostController
 const OpenApiRegistry registry = OpenApiRegistry(
   operations: <OpenApiOperation>[
@@ -85,8 +94,23 @@ const OpenApiRegistry registry = OpenApiRegistry(
       argumentTypes: <String>['DoxRequest'],
       ignore: true,
     ),
+    OpenApiOperation(
+      controller: 'AuthController',
+      method: 'login',
+      argumentTypes: <String>['DoxRequest'],
+      summary: 'Token login',
+    ),
+    OpenApiOperation(
+      controller: 'WebAuthController',
+      method: 'login',
+      argumentTypes: <String>['DoxRequest'],
+      summary: 'Session login',
+    ),
   ],
   routes: <OpenApiRouteBinding>[
+    // `/login` ends both live paths, so only the controller tells them apart
+    OpenApiRouteBinding('POST', 'api/login', 'AuthController.login'),
+    OpenApiRouteBinding('POST', '/login', 'WebAuthController.login'),
     OpenApiRouteBinding('GET', 'posts/{id}/full', 'PostController.show'),
     // the builder writes the full path, with the group prefix
     OpenApiRouteBinding('GET', '/users/', 'UserController.index'),
@@ -140,6 +164,12 @@ class DocsRouter extends Router {
     Route.get('/search', PostController().search);
     Route.get('/secret', PostController().secret);
     Route.post('/upload', PostController().upload);
+    Route.group('/api/auth', () {
+      Route.post('/login', (AuthController c) => c.login);
+    });
+    Route.group('/web-auth', () {
+      Route.post<WebAuthController>('/login', (WebAuthController c) => c.login);
+    });
     Route.put(
       '/posts/{id}',
       (DoxRequest req, String id) => id,
@@ -154,6 +184,10 @@ AppConfig config = AppConfig(
   serverPort: 0,
   totalIsolate: 1,
   routers: <Router>[DocsRouter()],
+  container: (IocContainer c) {
+    c.singleton<AuthController>((IocContainer c) => AuthController());
+    c.singleton<WebAuthController>((IocContainer c) => WebAuthController());
+  },
   openApi: OpenApiConfig(
     enabled: true,
     info: Info(title: 'Test API', version: '2.0.0'),
@@ -245,6 +279,10 @@ void main() {
     /// `'/'` routes in groups each find their own docs
     expect(doc['paths']['/users']['get']['summary'], 'List users');
     expect(doc['paths']['/tags']['get']['summary'], 'List tags');
+
+    /// two controllers with a `login` method each get their own docs
+    expect(doc['paths']['/api/auth/login']['post']['summary'], 'Token login');
+    expect(doc['paths']['/web-auth/login']['post']['summary'], 'Session login');
   });
 
   test('a body with a file field uses multipart/form-data', () {

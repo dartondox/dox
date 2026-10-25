@@ -5,6 +5,8 @@
   - Socket.IO: `SocketIoConfig` moved to `dox_socketio`. `AppConfig.socketIo` is removed: extend `SocketIoService` from `dox_socketio`. `Dox().socketIo` is now `SocketIoService.server`.
   - `dox_core` no longer exports `Disk`, `DriveManager`, `FileNotFoundException` and `StorageException`. Import them from `dox_storage`.
   - `StreamFile` and `DownloadableFile` stay in `dox_core`.
+- Fix: the OpenAPI docs could give a route the docs of another controller with the same method name. The docs now pass the controller class of `(C c) => c.method` and `Route.get<C>` routes to the registry.
+- New: `ControllerAction.controller` gives the controller class.
 
 ## 3.0.0-alpha.11
 

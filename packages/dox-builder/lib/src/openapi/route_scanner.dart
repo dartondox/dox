@@ -27,12 +27,78 @@ class RouteCall {
 /// `prefix` getter of a `Router` class, when they are plain strings,
 /// the same way the router joins them at runtime. So two `'/'` routes in
 /// two groups get two full paths.
+///
+/// The group callback can be a closure or a method or function of the
+/// same file, like `Route.group('/auth', registerAuth)`. A method used
+/// this way is read at the group, with the prefix, and not on its own.
 class RouteScanner extends RecursiveAstVisitor<void> {
   final List<RouteCall> calls = <RouteCall>[];
 
   /// the prefix of the current router class and groups, or null when one
   /// of them is not a plain string
   String? _prefix = '';
+
+  /// methods and functions of the current file, by element
+  final Map<Element, FunctionBody> _bodies = <Element, FunctionBody>{};
+
+  /// methods and functions of the current file used as a group callback
+  final Set<Element> _groupCallbacks = <Element>{};
+
+  /// group callbacks being read now, so a callback that groups itself
+  /// does not loop
+  final Set<Element> _reading = <Element>{};
+
+  @override
+  void visitCompilationUnit(CompilationUnit node) {
+    _bodies.clear();
+    _groupCallbacks.clear();
+    for (CompilationUnitMember member in node.declarations) {
+      if (member is FunctionDeclaration) {
+        _addBody(
+          member.declaredFragment?.element,
+          member.functionExpression.body,
+        );
+      } else if (member is ClassDeclaration) {
+        for (ClassMember inner in member.body.members) {
+          if (inner is MethodDeclaration) {
+            _addBody(inner.declaredFragment?.element, inner.body);
+          }
+        }
+      }
+    }
+    node.accept(_GroupCallbackFinder(this));
+    super.visitCompilationUnit(node);
+  }
+
+  void _addBody(Element? element, FunctionBody body) {
+    if (element != null) _bodies[element] = body;
+  }
+
+  @override
+  void visitMethodDeclaration(MethodDeclaration node) {
+    // ponytail: a group callback that is also called on its own is only
+    // read with the group prefix. Rare in route files.
+    if (_groupCallbacks.contains(node.declaredFragment?.element)) return;
+    super.visitMethodDeclaration(node);
+  }
+
+  @override
+  void visitFunctionDeclaration(FunctionDeclaration node) {
+    if (_groupCallbacks.contains(node.declaredFragment?.element)) return;
+    super.visitFunctionDeclaration(node);
+  }
+
+  /// the method or function a group callback points to, when it is in
+  /// this file
+  Element? _groupCallback(MethodInvocation node) {
+    List<Expression> args = <Expression>[
+      for (Argument arg in node.argumentList.arguments)
+        if (arg is! NamedArgument) arg.argumentExpression,
+    ];
+    if (args.length < 2) return null;
+    Element? element = _element(args[1].unParenthesized);
+    return _bodies.containsKey(element) ? element : null;
+  }
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {
@@ -106,6 +172,11 @@ class RouteScanner extends RecursiveAstVisitor<void> {
       String? group = _path(first);
       _prefix = old == null || group == null ? null : '$old/$group';
       super.visitMethodInvocation(node);
+      Element? callback = _groupCallback(node);
+      if (callback != null && _reading.add(callback)) {
+        _bodies[callback]!.accept(this);
+        _reading.remove(callback);
+      }
       _prefix = old;
       return;
     }
@@ -224,5 +295,22 @@ class RouteScanner extends RecursiveAstVisitor<void> {
 
   String? _path(Expression node) {
     return node is StringLiteral ? node.stringValue : null;
+  }
+}
+
+/// Finds the group callbacks of a file before the routes are read, so a
+/// method above its `Route.group` call is also read with the prefix.
+class _GroupCallbackFinder extends RecursiveAstVisitor<void> {
+  _GroupCallbackFinder(this.scanner);
+
+  final RouteScanner scanner;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (scanner._isGroup(node)) {
+      Element? callback = scanner._groupCallback(node);
+      if (callback != null) scanner._groupCallbacks.add(callback);
+    }
+    super.visitMethodInvocation(node);
   }
 }

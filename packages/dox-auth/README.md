@@ -80,6 +80,7 @@ Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), pageCont
 Things to know: a token expires after 1 hour by default. Change it with `expiresIn`.
 There is no server list of tokens, so you can not cancel one token.
 A session login ends with `Auth().logout(req)`.
+With the default `cookie` session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout. If logout must really end old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
 
 ## Documentation
 
