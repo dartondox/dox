@@ -18705,6 +18705,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
+### 3.0.0-alpha.10
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.9
 
 - New: `@Inject()`. Put it above a class and `dox_builder` adds the class to the Dox container. `@Inject(singleton: false)` makes a new instance each time.
@@ -18752,6 +18756,10 @@ What changed in each package, newest first. This page is made from the
 - See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
 
 ## dox_auth
+
+### 3.0.0-alpha.10
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.9
 
@@ -18807,7 +18815,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_builder
 
-### Unreleased
+### 3.0.0-alpha.10
 
 - The app-wide files are now written to `lib/generated/`: `lib/generated/container.g.dart`, `lib/generated/dtos.g.dart` and `lib/generated/openapi.g.dart`. This keeps them out of the top of `lib/`. Import them from `package:<app>/generated/...`. Delete the old files in `lib/` after you run `dart run build_runner build`.
 - Model part files (like `user.model.g.dart`) still sit next to their source file.
@@ -18875,6 +18883,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### 3.0.0-alpha.10
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.9
 
 - Version bump only, to match the other packages.
@@ -18928,7 +18940,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox
 
-### Unreleased
+### 3.0.0-alpha.10
 
 - `make:*` is now the main name of every generator: `make:controller`, `make:middleware`, `make:dto`, `make:serializer` and `make:model`, like `make:migration`, `make:factory` and `make:seeder`. The `create:*` names still work as aliases.
 - New `dox make:job <name>`: makes `lib/app/jobs/<name>.job.dart` and `bin/queue.dart` when it is missing. It prints a hint to add `dox_queue` and to run `build_runner`.
@@ -18995,6 +19007,10 @@ What changed in each package, newest first. This page is made from the
 - Generated models import `package:dox_orm/dox_orm.dart`.
 
 ## dox_core
+
+### 3.0.0-alpha.10
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.9
 
@@ -19155,6 +19171,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_migration
 
+### 3.0.0-alpha.10
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.9
 
 - New `Seeder` and `SeederRunner`. A seeder puts data in the database. `call()` runs other seeders. `SeederRunner(seeders: seeders).run(args)` runs `DatabaseSeeder`, or another one with `--class=<name>`, in one transaction. It reads the database from `.env`, the same as the migrations.
@@ -19214,6 +19234,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_openapi
 
+### 3.0.0-alpha.10
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.9
 
 - Version bump only, to match the other packages.
@@ -19265,6 +19289,10 @@ What changed in each package, newest first. This page is made from the
 - Output as JSON and YAML, write files, serve `/openapi.json`, `/openapi.yaml` and `/docs`.
 
 ## dox_orm
+
+### 3.0.0-alpha.10
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.9
 
@@ -19379,6 +19407,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_query_builder
 
+### 3.0.0-alpha.10
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.9
 
 - Version bump only, to match the other packages.
@@ -19418,6 +19450,10 @@ What changed in each package, newest first. This page is made from the
 - Please depend on `dox_orm` and change your imports. See the README.
 
 ## dox_socketio
+
+### 3.0.0-alpha.10
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.9
 
@@ -19482,6 +19518,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_storage
 
+### 3.0.0-alpha.10
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.9
 
 - Version bump only, to match the other packages.
@@ -19525,6 +19565,10 @@ What changed in each package, newest first. This page is made from the
 - `DriveManager.fake()` for tests.
 
 ## dox_validation
+
+### 3.0.0-alpha.10
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.9
 
