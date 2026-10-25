@@ -1,3 +1,7 @@
+---
+icon: lucide/file-code
+---
+
 # API docs with OpenAPI
 
 Turn on OpenAPI docs for the blog API, open the docs page, and make the docs better with comments and annotations.

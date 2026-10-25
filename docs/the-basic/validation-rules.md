@@ -1,3 +1,7 @@
+---
+icon: lucide/ruler
+---
+
 # Validation rules
 
 This page lists every annotation you can put on a `@Dto` field. See [Validation](validation.md) for how DTOs work.

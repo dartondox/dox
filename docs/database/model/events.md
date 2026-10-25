@@ -1,3 +1,7 @@
+---
+icon: lucide/bell
+---
+
 # Model events
 
 A model fires events when you save, delete or restore it, and you can run your own code on them.

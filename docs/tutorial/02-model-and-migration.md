@@ -1,3 +1,7 @@
+---
+icon: lucide/database
+---
+
 # Step 2: Model and migration
 
 This step makes the `posts` table with a Dart migration and a `Post` model for it.

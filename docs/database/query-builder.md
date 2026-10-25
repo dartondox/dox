@@ -1,3 +1,7 @@
+---
+icon: lucide/search-code
+---
+
 # Query Builder
 
 The query builder makes SQL from chained methods and runs it with bound values on Postgres, MySQL, MariaDB and SQLite.

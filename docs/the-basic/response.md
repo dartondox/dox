@@ -1,3 +1,7 @@
+---
+icon: lucide/arrow-up-from-line
+---
+
 # Response
 
 This page shows what a controller can return, and how to set the status, headers and cookies.

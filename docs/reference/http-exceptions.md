@@ -1,3 +1,7 @@
+---
+icon: lucide/circle-x
+---
+
 # HTTP exceptions
 
 An exception that extends `IHttpException` turns into an HTTP error answer.

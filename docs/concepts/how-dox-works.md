@@ -1,3 +1,7 @@
+---
+icon: lucide/cog
+---
+
 # How Dox works
 
 This page explains what happens inside Dox when a request comes in, how isolates work and what each folder of an app is for.

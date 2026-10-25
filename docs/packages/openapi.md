@@ -1,3 +1,7 @@
+---
+icon: lucide/book-open
+---
+
 # OpenAPI
 
 This page shows how Dox makes OpenAPI 3.1 docs for your API, and how to change them.

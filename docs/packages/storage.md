@@ -1,3 +1,7 @@
+---
+icon: lucide/hard-drive
+---
+
 # Storage
 
 This page shows how to save and read files with `dox_storage`.

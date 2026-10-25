@@ -1,3 +1,7 @@
+---
+icon: lucide/workflow
+---
+
 # ManyToMany
 
 Use `ManyToMany` when rows on both sides can have many rows on the other side.

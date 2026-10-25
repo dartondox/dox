@@ -1,3 +1,7 @@
+---
+icon: lucide/square-terminal
+---
+
 # Dox CLI
 
 The `dox` CLI creates projects and files, runs the dev server, builds for production and runs migrations.

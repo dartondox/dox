@@ -1,3 +1,7 @@
+---
+icon: lucide/clipboard-check
+---
+
 # Production checklist
 
 Check each item before you deploy.

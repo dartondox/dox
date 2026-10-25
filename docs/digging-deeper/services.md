@@ -1,3 +1,7 @@
+---
+icon: lucide/blocks
+---
+
 # Services
 
 A service is a class with a `setup()` method. Dox runs it at start, in every isolate.

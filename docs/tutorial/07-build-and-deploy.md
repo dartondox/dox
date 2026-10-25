@@ -1,3 +1,7 @@
+---
+icon: lucide/package
+---
+
 # Step 7: Build and deploy
 
 This step compiles the app to one native binary, runs it, and shows the `Dockerfile` of the project.

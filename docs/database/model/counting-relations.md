@@ -1,3 +1,7 @@
+---
+icon: lucide/hash
+---
+
 # Counting relations
 
 `withCount()` adds the number of related rows to each model.

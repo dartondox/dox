@@ -1,3 +1,7 @@
+---
+icon: lucide/notebook-pen
+---
+
 # Cheat sheet
 
 One page to keep open while you work. Each section links to its full page.

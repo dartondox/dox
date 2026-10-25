@@ -1,3 +1,7 @@
+---
+icon: lucide/gauge
+---
+
 # Performance
 
 This page shows how fast Dox is, and how to keep your app fast in production.

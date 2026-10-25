@@ -1,3 +1,7 @@
+---
+icon: lucide/file-image
+---
+
 # Static files and SPA
 
 Serve a folder of files, or a single page app (React, Vue, Flutter web), from the Dox app, with the right cache headers.

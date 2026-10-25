@@ -1,3 +1,7 @@
+---
+icon: lucide/scale
+---
+
 # Dox and the other Dart backends
 
 This page compares Dox with four other ways to build a backend in Dart: Dart Frog, Serverpod, Shelf (with `shelf_router`) and Alfred.

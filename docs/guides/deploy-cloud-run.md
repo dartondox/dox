@@ -1,3 +1,7 @@
+---
+icon: lucide/cloud
+---
+
 # Deploy to Google Cloud Run
 
 Run the blog API on [Cloud Run](https://cloud.google.com/run) from the `Dockerfile` of your project, with Postgres on Cloud SQL and secrets in Secret Manager.

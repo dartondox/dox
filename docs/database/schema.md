@@ -1,3 +1,7 @@
+---
+icon: lucide/table
+---
+
 # Schema builder
 
 The schema builder creates, changes and drops tables with Dart code that works on Postgres, MySQL, MariaDB and SQLite.

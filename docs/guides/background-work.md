@@ -1,3 +1,7 @@
+---
+icon: lucide/loader
+---
+
 # Background work
 
 Answer the request now and do the slow work after. Use another thread for CPU work. Run a job on a timer.

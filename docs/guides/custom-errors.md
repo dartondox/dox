@@ -1,3 +1,7 @@
+---
+icon: lucide/octagon-alert
+---
+
 # Custom errors
 
 Give your app its own exception classes, send every error in one JSON shape, and log the unexpected ones.

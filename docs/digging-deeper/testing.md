@@ -1,3 +1,7 @@
+---
+icon: lucide/test-tube
+---
+
 # Testing
 
 This page shows how to test a Dox app with the `test` package: HTTP routes, cache, storage, env and the database.

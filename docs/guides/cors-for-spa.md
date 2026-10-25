@@ -1,3 +1,7 @@
+---
+icon: lucide/app-window
+---
+
 # CORS for a browser front-end
 
 Let a web app on another origin (`http://localhost:5173` in development, `https://my.app` in production) call your API.

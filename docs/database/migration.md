@@ -1,3 +1,7 @@
+---
+icon: lucide/git-compare-arrows
+---
+
 # Migration
 
 A migration changes your database schema step by step, with an `up` method that makes the change and a `down` method that undoes it.

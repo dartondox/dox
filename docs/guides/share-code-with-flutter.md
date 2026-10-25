@@ -1,3 +1,7 @@
+---
+icon: lucide/share-2
+---
+
 # Share code with Flutter
 
 Put a `@Dto` class in a shared Dart package, so the Dox server and the Flutter app check input with the same rules and error messages.

@@ -1,3 +1,7 @@
+---
+icon: lucide/git-pull-request-arrow
+---
+
 # Contribute
 
 This page shows how to work on Dox: set up the repo, run the tests, release packages and update the docs.

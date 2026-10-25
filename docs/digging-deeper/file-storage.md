@@ -1,3 +1,7 @@
+---
+icon: lucide/hard-drive
+---
+
 # File Storage
 
 `Storage()` saves and reads files on a disk: the local folder, AWS S3 (and R2, MinIO, Spaces), or memory.

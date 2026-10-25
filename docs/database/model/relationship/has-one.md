@@ -1,3 +1,7 @@
+---
+icon: lucide/link
+---
+
 # HasOne
 
 Use `HasOne` when one row of this table has one row in another table.

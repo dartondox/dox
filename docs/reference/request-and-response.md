@@ -1,3 +1,7 @@
+---
+icon: lucide/arrow-down-up
+---
+
 # Request and response
 
 A compact list of the members of `DoxRequest` and `DoxResponse`.

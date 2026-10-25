@@ -1,3 +1,7 @@
+---
+icon: lucide/arrow-right-left
+---
+
 # Coming from Laravel
 
 This page is for Laravel developers: it shows the Laravel way and the Dox way side by side.

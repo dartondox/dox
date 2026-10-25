@@ -1,4 +1,5 @@
 ---
+icon: lucide/dog
 title: Meet Doxie
 description: Doxie, the blue dachshund, is the official mascot of Dox.
 ---

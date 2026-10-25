@@ -1,3 +1,7 @@
+---
+icon: lucide/corner-left-up
+---
+
 # BelongsTo
 
 Use `BelongsTo` when this table keeps the foreign key to another table.

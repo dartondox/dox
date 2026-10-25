@@ -1,3 +1,7 @@
+---
+icon: lucide/list-checks
+---
+
 # Validation
 
 `dox_validation` checks input and gives you typed Dart objects.

@@ -1,3 +1,7 @@
+---
+icon: lucide/route
+---
+
 # Step 3: Routes and controller
 
 This step adds a resource controller and the routes to list, create and show posts.

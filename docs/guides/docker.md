@@ -1,3 +1,7 @@
+---
+icon: lucide/container
+---
+
 # Docker
 
 Build a small production image with `dox build`, and run it with Postgres in Docker Compose, with a health check.

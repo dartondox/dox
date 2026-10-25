@@ -1,3 +1,7 @@
+---
+icon: lucide/file-key
+---
+
 # Environment variables
 
 Every env var the framework and its packages read.

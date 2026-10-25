@@ -1,3 +1,7 @@
+---
+icon: lucide/user-lock
+---
+
 # Authentication
 
 This page shows how to log users in with `dox_auth` and protect routes with a JWT token.

@@ -1,3 +1,7 @@
+---
+icon: lucide/book-open-text
+---
+
 # Pagination
 
 Make a list route that takes `page` and `per_page` from the query string and returns one page of rows.

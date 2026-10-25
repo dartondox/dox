@@ -1,3 +1,7 @@
+---
+icon: lucide/arrow-left-right
+---
+
 # Transactions
 
 A transaction runs many queries as one unit, so either all of them are saved or none of them.

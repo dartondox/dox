@@ -1,3 +1,7 @@
+---
+icon: lucide/heart-pulse
+---
+
 # Health check
 
 A health route tells a load balancer, Docker or Kubernetes if the app can serve requests.

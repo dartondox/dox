@@ -1,3 +1,7 @@
+---
+icon: lucide/gamepad-2
+---
+
 # Controller
 
 A controller holds the code that answers a route. It can be a class method, a static method or a plain function.

@@ -1,3 +1,7 @@
+---
+icon: lucide/map
+---
+
 # Status and roadmap
 
 This page shows what works in Dox today, what is missing and what is planned.

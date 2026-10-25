@@ -1,3 +1,7 @@
+---
+icon: lucide/terminal
+---
+
 # CLI
 
 Every `dox` command, with its options and the files it writes.

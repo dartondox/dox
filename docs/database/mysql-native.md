@@ -1,3 +1,7 @@
+---
+icon: lucide/database-zap
+---
+
 # Native MySQL driver
 
 `dox_mysql_native` is the MySQL and MariaDB driver of the Dox ORM, written in Rust.

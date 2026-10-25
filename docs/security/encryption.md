@@ -1,3 +1,7 @@
+---
+icon: lucide/lock-keyhole
+---
+
 # Encryption
 
 This page shows how to encrypt and decrypt text with `AESEncryptor`.

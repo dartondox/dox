@@ -1,3 +1,7 @@
+---
+icon: lucide/toggle-left
+---
+
 # Environments
 
 Run the same app in development, staging and production with different config, and keep secrets out of git and out of the image.
