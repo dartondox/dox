@@ -20083,6 +20083,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
+### 3.0.0-alpha.15
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.14
 
 - New: `@Security.bearer(format: 'API key')` and `@Security.apiKey(header: 'X-API-Key')`. Put it above a middleware class to show its login scheme in the OpenAPI docs.
@@ -20321,6 +20325,10 @@ What changed in each package, newest first. This page is made from the
 - Works with analyzer 5 and 6.
 
 ## dox_cache
+
+### 3.0.0-alpha.15
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.14
 
@@ -20689,6 +20697,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_openapi
 
+### 3.0.0-alpha.15
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.14
 
 - New: `OpenApiSecurity` and `OpenApiRegistry.security`: login schemes by middleware class name, from `@Security`.
@@ -20760,6 +20772,10 @@ What changed in each package, newest first. This page is made from the
 - Output as JSON and YAML, write files, serve `/openapi.json`, `/openapi.yaml` and `/docs`.
 
 ## dox_validation
+
+### 3.0.0-alpha.15
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.14
 
