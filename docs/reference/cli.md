@@ -193,13 +193,12 @@ Without a command: lists every command by category. With a command: prints its u
 ### `dox create:controller`
 
 ```
-dox create:controller <name> [-r] [-ws]
+dox create:controller <name> [-r]
 ```
 
 | Option | Meaning |
 | --- | --- |
 | `-r` | A resource controller with `index`, `create`, `store`, `show`, `edit`, `update`, `destroy`. |
-| `-ws` | A WebSocket controller. |
 
 A trailing `Controller` in the name is removed: `UserController` and `User` give the same file.
 
@@ -207,7 +206,6 @@ A trailing `Controller` in the name is removed: `UserController` and `User` give
 | --- | --- | --- |
 | plain | `lib/app/http/controllers/<name>.controller.dart` | `_getSample` in `packages/dox-cli/lib/src/tools/create_controller.dart` |
 | `-r` | `lib/app/http/controllers/<name>.controller.dart` | `_getResourceSample` in the same file |
-| `-ws` | `lib/app/ws/controllers/<name>.controller.dart` | `_getWsSample` in the same file |
 
 The plain and resource templates also make an instance: `<Name>Controller <name>Controller = <Name>Controller();`.
 

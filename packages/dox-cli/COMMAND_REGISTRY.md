@@ -99,7 +99,7 @@ CommandDefinition(
 // Command with optional arguments
 CommandDefinition(
   command: 'create:controller',
-  helpInfo: 'create:controller <controller_name> [-r] [-ws]',
+  helpInfo: 'create:controller <controller_name> [-r]',
   description: 'Create a new controller',
   category: CommandCategory.generation,
   minArgs: 1,
@@ -167,7 +167,7 @@ dox help create:controller
 Output:
 ```
 Command: create:controller
-Usage: dox create:controller <controller_name> [-r] [-ws]
+Usage: dox create:controller <controller_name> [-r]
 Description: Create a new controller
 Category: Generation
 Arguments: 1 to 2 arguments

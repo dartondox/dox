@@ -52,7 +52,7 @@ await Dox().startServer();
 Use fewer isolates when:
 
 - the machine also runs the database or other heavy work, or
-- you use WebSocket rooms without the Redis adapter. A room only reaches clients on the same isolate. Use `1`, or see [WebSocket](websocket.md).
+- you use Socket.IO rooms without the Redis adapter. A room only reaches clients on the same isolate. Use `1`, or see [Socket.IO](../packages/socketio.md).
 
 ## Each isolate has its own memory
 

@@ -183,7 +183,7 @@ Dox starts one isolate per CPU core it sees. On `cpus = 1` that is one isolate.
 | more machines | use Postgres, then `fly scale count 2`. With SQLite, stay at one machine |
 | a fixed number of isolates | set `APP_TOTAL_ISOLATE` in `[env]` |
 
-Each machine is its own process. WebSocket rooms and the memory cache are not shared between machines.
+Each machine is its own process. Socket.IO rooms and the memory cache are not shared between machines.
 
 ## Update the app
 

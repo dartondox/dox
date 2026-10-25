@@ -31,7 +31,6 @@ These stop the app at start, so a bad route never reaches a request.
 | `Route <where>: only positional parameters are supported, not named or [optional] ones (<type>).` | Named or `[optional]` parameters. | Use positional parameters. Use `int?` with `{id?}` for an optional param. |
 | `Route <where>: a controller can not be generic.` | The handler has type parameters. | Remove them. |
 | `Route <where>: can not read the controller type <type>.` | Dox can not read the function type of the handler. | Use a plain method or function. |
-| `Exception: websocket is not registered` | `Route.websocket()` runs before a `WebsocketServer(Dox())` exists. | Add the WebSocket service to `services`. See [WebSocket](../digging-deeper/websocket.md). |
 
 ## dox_core: env
 

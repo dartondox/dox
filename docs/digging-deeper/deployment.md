@@ -261,5 +261,5 @@ upstream dox {
 }
 ```
 
-Websocket rooms then need a shared adapter (like Redis), because each
+Socket.IO rooms then need a shared adapter (like Redis), because each
 process has its own memory.

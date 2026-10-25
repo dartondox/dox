@@ -45,7 +45,7 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | Native server loads | The app starts and the start line says `(native)`. When the library does not load, the app stops with `dox_http_native did not load` and the fix. | [Native server](../digging-deeper/native-server.md) |
 | Native database driver loads | The app starts and the database works. When the library does not load, the app stops with `dox_postgres_native did not load` (or `mysql`) and the fix. | [Postgres native](../database/postgres-native.md) |
 | Isolates = cores | Keep the default `totalIsolate` (`Platform.numberOfProcessors`), or set `APP_TOTAL_ISOLATE` to the cores the container really gets. Use fewer when the database runs on the same machine. | [Isolate](../digging-deeper/isolate.md) |
-| Shared state across isolates | Cache: `redis`, not `memory`. WebSocket: `WebsocketRedisAdapter`. Socket.IO: a Redis adapter and `transports: ['websocket']`. | [Isolate](../digging-deeper/isolate.md) |
+| Shared state across isolates | Cache: `redis`, not `memory`. Socket.IO: a Redis adapter and `transports: ['websocket']`. | [Isolate](../digging-deeper/isolate.md) |
 | A supervisor restarts the process | Docker `restart: unless-stopped`, or systemd `Restart=always`. Dox restarts a dead worker isolate, but not the main isolate. | [Deployment](../digging-deeper/deployment.md) |
 | Writable temp folder | Uploads over 1 MB go to a temp file. A `FROM scratch` image needs `/tmp` with mode `1777`. | [Docker](../guides/docker.md) |
 | Uploads live on a volume or S3 | The `local` disk writes to `storage/`. Mount it as a volume, or use the `s3` disk. | [File storage](../digging-deeper/file-storage.md) |

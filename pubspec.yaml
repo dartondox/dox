@@ -22,7 +22,6 @@ workspace:
   - packages/dox-socketio
   - packages/dox-storage
   - packages/dox-validation
-  - packages/dox-websocket
 
 dev_dependencies:
   melos: ^8.9.0

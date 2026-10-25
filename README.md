@@ -26,7 +26,7 @@ Dox is a powerful framework specifically developed for web application backend d
 - **ORM and Query Builder** (`dox_orm`): Models, relations and a query builder for PostgreSQL, MySQL, MariaDB and SQLite. MySQL uses a real connection pool.
 - **Validation of Request Data**: Dox includes built-in validation capabilities, allowing developers to validate incoming request data easily and ensure data integrity.
 - **Database Migration**: The framework offers database migration support, allowing developers to manage and apply database schema changes seamlessly.
-- **Web Socket**: Dox provides WebSocket support, enabling real-time communication and bidirectional data exchange between the server and clients.
+- **Real time**: a Socket.IO server that works with the official Socket.IO clients.
 - **Socket.IO** (`dox_socketio`): A Socket.IO v4 server, with a Redis adapter.
 - **Cache** (`dox_cache`): Memory, file and Redis drivers, with locks and tags.
 - **Storage** (`dox_storage`): One API for local disk, AWS S3 and S3-compatible services.

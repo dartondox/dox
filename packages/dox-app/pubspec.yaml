@@ -6,11 +6,10 @@ environment:
 resolution: workspace
 
 dependencies:
-  ioredis: ^2.0.0-alpha.2
+  ioredis: ^2.0.0-alpha.3
   dox_auth: ^3.0.0-alpha.6
   dox_migration: ^3.0.0-alpha.6
   dox_core: ^3.0.0-alpha.6
-  dox_websocket: ^3.0.0-alpha.6
   dox_orm: ^3.0.0-alpha.6
   dox_socketio: ^3.0.0-alpha.6
 

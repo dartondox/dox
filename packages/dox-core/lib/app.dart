@@ -12,7 +12,7 @@ import 'package:dox_socketio/dox_socketio.dart';
 
 IocContainer _ioc = IocContainer();
 
-class Dox implements IDox {
+class Dox {
   /// setup singleton
   static Dox? _singleton;
 
@@ -37,9 +37,6 @@ class Dox implements IDox {
 
   /// isolate Id
   int isolateId = 1;
-
-  /// websocket
-  IDoxWebsocket? websocket;
 
   /// checks DTOs and schemas for `req.validate<T>()` and controller
   /// parameters.
@@ -99,16 +96,6 @@ class Dox implements IDox {
   /// default is one per CPU core
   void totalIsolate(int value) {
     _totalIsolate = value;
-  }
-
-  /// set websocket
-  /// ```
-  /// Dox().initialize(config)
-  /// Dox().setWebsocket(DoxWebsocket())
-  /// ```
-  @override
-  void setWebsocket(IDoxWebsocket ws) {
-    websocket = ws;
   }
 
   /// start dox server

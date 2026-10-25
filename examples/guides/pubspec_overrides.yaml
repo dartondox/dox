@@ -24,5 +24,3 @@ dependency_overrides:
     path: ../../packages/dox-storage
   dox_validation:
     path: ../../packages/dox-validation
-  dox_websocket:
-    path: ../../packages/dox-websocket

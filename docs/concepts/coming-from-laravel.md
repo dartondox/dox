@@ -384,5 +384,5 @@ Dox 3.0 does not have these Laravel features. Check the [packages](../packages/v
 | Savepoints in nested transactions | not there. A nested `transaction()` joins the outer one. |
 
 What is there, as separate packages: [validation](../packages/validation.md), [OpenAPI docs](../packages/openapi.md),
-[storage](../packages/storage.md), [cache](../packages/cache.md), [Socket.IO](../packages/socketio.md),
-[WebSocket](../digging-deeper/websocket.md) and [auth](../security/authentication.md).
+[storage](../packages/storage.md), [cache](../packages/cache.md), [Socket.IO](../packages/socketio.md)
+and [auth](../security/authentication.md).

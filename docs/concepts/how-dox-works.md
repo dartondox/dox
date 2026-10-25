@@ -166,8 +166,7 @@ my_app/
 │   │   │   ├── middleware/      # *.middleware.dart
 │   │   │   ├── serializers/     # *.serializer.dart, custom JSON shapes
 │   │   │   └── response_handler.dart
-│   │   ├── models/              # one folder per model, *.model.dart
-│   │   └── ws/controllers/      # WebSocket controllers (dox_websocket)
+│   │   └── models/              # one folder per model, *.model.dart
 │   ├── config/
 │   │   ├── app.dart             # AppConfig: port, isolates, routers, middleware
 │   │   ├── cache.dart           # cache stores
