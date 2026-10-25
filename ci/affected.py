@@ -13,7 +13,7 @@ everything runs. Prints `key=value` lines for $GITHUB_OUTPUT:
   examples  the examples/ apps to run, space separated
 
 Rules:
-- Docs files (*.md, docs/, mkdocs.yml, overrides/) are ignored.
+- Docs files (*.md, docs/, mkdocs.yml, requirements-docs.txt, overrides/) are ignored.
 - A file under packages/<folder>/ changes that package. A file under
   examples/<folder>/ changes that example.
 - Any other file (root pubspec, ci/, .github/, bin/, ...) runs everything.
@@ -28,7 +28,7 @@ import os
 import re
 import sys
 
-DOCS = re.compile(r'(\.md$|^docs/|^mkdocs\.yml$|^overrides/)')
+DOCS = re.compile(r'(\.md$|^docs/|^mkdocs\.yml$|^requirements-docs\.txt$|^overrides/)')
 
 
 def read_pubspecs(pattern):

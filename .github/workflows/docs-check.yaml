@@ -12,14 +12,11 @@ on:
       - 'overrides/**'
       - 'packages/*/CHANGELOG.md'
       - 'mkdocs.yml'
+      - 'requirements-docs.txt'
       - '.github/workflows/docs-check.yaml'
 
 permissions:
   contents: read
-
-env:
-  MKDOCS_VERSION: '1.6.1'
-  MATERIAL_VERSION: '9.7.7'
 
 jobs:
   build:
@@ -30,7 +27,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install mkdocs and material
-        run: pip install "mkdocs==$MKDOCS_VERSION" "mkdocs-material==$MATERIAL_VERSION" codespell
+        run: pip install -r requirements-docs.txt codespell
       - name: Strict build
         run: mkdocs build --strict
       - name: Spelling

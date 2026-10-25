@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   # Picks the jobs to run (ci/changes.sh and ci/affected.py).
-  # Docs-only changes (*.md, docs/, mkdocs.yml, overrides/) skip lint, tests
+  # Docs-only changes (*.md, docs/, mkdocs.yml, requirements-docs.txt, overrides/) skip lint, tests
   # and examples. A change in packages/ or examples/ runs only the tests of
   # the changed packages and of every package that depends on them. Any
   # other change (ci/, .github/, root pubspec, ...) and tags run everything.

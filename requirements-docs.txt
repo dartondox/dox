@@ -1,0 +1,6 @@
+# Docs tools. CI (docs.yaml, docs-check.yaml) installs from this file.
+# Keep mkdocs on 1.x: MkDocs 2.0 breaks Material, plugins and overrides.
+# Local: pip install -r requirements-docs.txt && mkdocs serve
+mkdocs==1.6.1
+mkdocs-material==9.7.7
+mike==2.2.0
