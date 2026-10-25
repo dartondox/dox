@@ -10,18 +10,12 @@ dependency_overrides:
     path: ../../packages/dox-cache
   dox_core:
     path: ../../packages/dox-core
-  dox_http_native:
-    path: ../../packages/dox-http-native
   dox_migration:
     path: ../../packages/dox-migration
-  dox_mysql_native:
-    path: ../../packages/dox-mysql-native
   dox_openapi:
     path: ../../packages/dox-openapi
   dox_orm:
     path: ../../packages/dox-orm
-  dox_postgres_native:
-    path: ../../packages/dox-postgres-native
   dox_query_builder:
     path: ../../packages/dox-query-builder
   dox_socketio:

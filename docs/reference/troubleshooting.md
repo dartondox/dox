@@ -21,7 +21,7 @@ dox_http_native: sha256 of dox_http_native-<os>-<arch>.<ext> does not match
 dox_http_native: cargo build failed
 ```
 
-**Cause.** The build hook of `dox_http_native` (`packages/dox-http-native/hook/build.dart`) tries, in this order: the `lib_path` user define, a local `native/target/release` build, the GitHub release download, and `cargo build`. None worked. Common reasons:
+**Cause.** The build hook of `dox_http_native` (`hook/build.dart` in [its repo](https://github.com/dartondox/dox-http-native)) tries, in this order: the `lib_path` user define, a local `native/target/release` build, the GitHub release download, and `cargo build`. None worked. Common reasons:
 
 - No internet during `dart pub get`, or the release has no build for your OS and CPU (there are builds for macOS arm64 and x64, Linux x64 and arm64, Windows x64).
 - Rust is not installed, so the fallback `cargo build` can not run.
@@ -31,8 +31,8 @@ dox_http_native: cargo build failed
 **Fix.** Pick one:
 
 1. Install Rust with [rustup](https://rustup.rs) and run `dart pub get` again. The hook builds the library with `cargo`.
-2. When the reason is an ABI mismatch and you set `lib_path`, rebuild that library: `cargo build --release` in `packages/dox-http-native/native`.
-3. Download the library from the GitHub release `dox_http_native-v<version>` yourself and point to it in the root `pubspec.yaml`:
+2. When the reason is an ABI mismatch and you set `lib_path`, rebuild that library: `cargo build --release` in the `native` folder of the `dox-http-native` repo.
+3. Download the library from the GitHub release `v<version>` of [dartondox/dox-http-native](https://github.com/dartondox/dox-http-native/releases) yourself and point to it in the root `pubspec.yaml`:
 
     ```yaml
     hooks:

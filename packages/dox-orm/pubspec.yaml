@@ -14,8 +14,8 @@ dependencies:
   sqlite3: ^3.7.1
   dox_annotation: ^3.0.0-alpha.6
   dox_validation: ^3.0.0-alpha.6
-  dox_postgres_native: ^3.0.0-alpha.6
-  dox_mysql_native: ^3.0.0-alpha.6
+  dox_postgres_native: ^3.0.0-alpha.7
+  dox_mysql_native: ^3.0.0-alpha.7
   
 dev_dependencies:
   lints: ^6.1.0

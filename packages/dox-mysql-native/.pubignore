@@ -1,4 +1,0 @@
-native/target/
-bench/
-# runs the dox_orm tests from the repo, it does not work outside of it
-test/orm_test.dart

@@ -41,11 +41,13 @@ Add it only to use `PgNativePool` without the ORM:
 dart pub add dox_postgres_native
 ```
 
-The build hook builds the Rust library with `cargo`, so you need
-[Rust](https://rustup.rs) installed. Ready-built libraries (like the ones
-`dox_http_native` has) are not published for this driver yet.
-Without Rust, the ORM still works: it uses the Dart driver and prints one
-warning line (see below).
+You do not need Rust. The build hook downloads a ready-built library for
+your system. When there is no library for your system and no Rust to build
+one, the ORM still works: it uses the Dart driver and prints one warning
+line (see below).
+
+The package lives in its own repo:
+[dartondox/dox-postgres-native](https://github.com/dartondox/dox-postgres-native).
 
 Use `dart run`, `dart test` or `dart build cli`. `dart compile exe` does not
 run build hooks.

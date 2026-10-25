@@ -33,7 +33,7 @@ melos bs
 ### 4. Useful commands
 
 ```bash
-# Run all tests (not dox_orm and not dox_mysql_native).
+# Run all tests (not dox_orm).
 # Use `melos run test`. `melos test` is a built-in melos command.
 melos run test
 
@@ -72,10 +72,11 @@ It uses pub.dev automated publishing, so it needs no token or secret.
 The full guide is [RELEASING.md](https://github.com/dartondox/dox/blob/develop/RELEASING.md) in the repo. In short:
 
 1. Bump every package with `bin/update_versions.sh`, and close the `## Unreleased` section of each `CHANGELOG.md`.
-2. Push one tag per native package (`dox_http_native-v<version>`, `dox_postgres_native-v<version>`, `dox_mysql_native-v<version>`). GitHub builds the libraries for 5 platforms.
-3. Write their hashes into the code with `dart run bin/native_hashes.dart <tag>`.
-4. Merge the release PR, then push the tag `v<version>`. This publishes to pub.dev.
-5. Release the matching `dox-sample` template.
+2. Merge the release PR, then push the tag `v<version>`. This publishes to pub.dev.
+3. Release the matching `dox-sample` template.
+
+The native packages (`dox_http_native`, `dox_postgres_native`, `dox_mysql_native`) are not in this repo.
+See [Native packages](#native-packages) below.
 
 **New package only:** turn on pub.dev automated publishing for it first. See [One-time setup](#one-time-setup).
 A new package must first exist on pub.dev, so publish its first version by hand with `dart pub publish`.
@@ -125,6 +126,36 @@ On GitHub, in `dartondox/dox` > Settings > Environments, there must be an enviro
 The publish job runs in it.
 Optional: add yourself as a required reviewer, and allow only tags `v*`.
 The old `PUB_CREDENTIALS` secret is not used any more.
+
+## Native packages
+
+The three native packages live in their own repos:
+
+| Package | Repo |
+| --- | --- |
+| `dox_http_native` | [dartondox/dox-http-native](https://github.com/dartondox/dox-http-native) |
+| `dox_postgres_native` | [dartondox/dox-postgres-native](https://github.com/dartondox/dox-postgres-native) |
+| `dox_mysql_native` | [dartondox/dox-mysql-native](https://github.com/dartondox/dox-mysql-native) |
+
+Dox uses them from pub.dev. Their build hooks download ready-built libraries, so you do not need Rust to work on Dox.
+
+To work on a native package and Dox together:
+
+1. Clone the package next to the Dox repo, like `../dox-http-native`.
+2. Add it to the root `pubspec_overrides.yaml` of the Dox repo. Git ignores this file.
+
+    ```yaml
+    dependency_overrides:
+      dox_http_native:
+        path: ../dox-http-native
+    ```
+
+3. Run `dart pub get`.
+
+Each native package is released from its own repo, with its own version.
+Push a `v<version>` tag in that repo.
+Its CI builds the libraries, uploads them, fills the hashes and publishes the package to pub.dev.
+Then raise the version constraint in the Dox packages that use it.
 
 ## Docs
 

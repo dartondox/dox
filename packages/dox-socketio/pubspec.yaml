@@ -8,7 +8,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  dox_http_native: ^3.0.0-alpha.6
+  dox_http_native: ^3.0.0-alpha.7
   ioredis: ^2.0.0-alpha.2
 
 dev_dependencies:

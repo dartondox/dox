@@ -35,7 +35,7 @@ No package is marked "stable API" yet. That comes with 3.0 stable.
 
 !!! note "About test coverage"
     The repo does not measure line coverage. The "Tests" column counts test files and says where CI runs them.
-    The CI setup is in `.github/workflows/test.yaml` and `native.yaml`.
+    The CI setup is in `.github/workflows/test.yaml`. The three native packages live in their own repos, with their own CI.
 
 ## What Dox does not have yet
 

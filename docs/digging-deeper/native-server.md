@@ -112,7 +112,7 @@ that works:
     ```
 
 2. A local build in `native/target/release` of the package (for work on
-   Dox itself).
+   the package itself).
 3. The ready-built library from the GitHub release, checked with sha256.
    There are builds for macOS (arm64, x64), Linux (x64, arm64) and
    Windows (x64).
@@ -127,20 +127,28 @@ error above. Install Rust and run it again, so step 4 works.
 
 ## Work on the native code
 
-The Rust code is in `packages/dox-http-native/native`.
+`dox_http_native` lives in its own repo:
+[dartondox/dox-http-native](https://github.com/dartondox/dox-http-native).
+The Rust code is in its `native` folder.
 
 ```bash
-cd packages/dox-http-native/native
+git clone https://github.com/dartondox/dox-http-native
+cd dox-http-native/native
 cargo build --release   # the hook uses this build from now on
 cargo test
 cd .. && dart test --concurrency=1
 ```
 
-To make a release of the libraries, push a tag like
-`dox_http_native-v3.0.0-alpha.4`. The version in the tag must be the
-`version` in `packages/dox-http-native/pubspec.yaml`, because the build hook
-downloads from the tag of its own version.
+To use your local copy in the Dox repo, add it to the root
+`pubspec_overrides.yaml` of the Dox repo (git ignores this file), then run
+`dart pub get`:
 
-The `Native` workflow builds the 5 libraries and uploads them with a
-`SHA256SUMS` file. Copy the hashes into `_sha256` in `hook/build.dart` before
-you publish the package.
+```yaml
+dependency_overrides:
+  dox_http_native:
+    path: ../dox-http-native
+```
+
+To release the package, push a `v<version>` tag in its repo. Its CI builds
+the libraries, uploads them, fills the hashes and publishes the package to
+pub.dev.

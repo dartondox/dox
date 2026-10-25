@@ -75,13 +75,6 @@ DB_USERNAME=postgres
 DB_PASSWORD=postgres
 ```
 
-## Only for work on Dox itself
-
-| Variable | Who reads it | Meaning |
-| --- | --- | --- |
-| `PG_URL` | Rust tests of `dox_postgres_native` | A Postgres URL. The test is skipped when it is not set. |
-| `DB_HOST`, `DB_PORT`, `THREADS` | `packages/dox-postgres-native/tool/stress.dart` | The stress tool. |
-
 ## How `.env` is parsed
 
 `Env._loadEnv()` in `packages/dox-core/lib/env/env.dart`:

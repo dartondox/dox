@@ -3,22 +3,19 @@
 This guide shows how to release a new Dox version to pub.dev.
 All packages in `packages/` share one version, for example `3.0.0-alpha.5`.
 
-## Why there are several tags
+## Native packages
 
-Three packages ship ready-built Rust libraries:
+The native packages are not released from this repo:
 
-- `dox_http_native` (the HTTP server)
-- `dox_postgres_native` (the Postgres driver)
-- `dox_mysql_native` (the MySQL driver)
+- `dox_http_native` (the HTTP server): [dartondox/dox-http-native](https://github.com/dartondox/dox-http-native)
+- `dox_postgres_native` (the Postgres driver): [dartondox/dox-postgres-native](https://github.com/dartondox/dox-postgres-native)
+- `dox_mysql_native` (the MySQL driver): [dartondox/dox-mysql-native](https://github.com/dartondox/dox-mysql-native)
 
-Each published package checks the library it downloads with a sha256 hash.
-The hash only exists after the library is built.
-A version on pub.dev can never change.
-So the order is always:
+Each one has its own version. To release one, push a `v<version>` tag in its repo.
+Its CI builds the libraries, uploads them, fills the hashes and publishes the package to pub.dev.
 
-1. Build the libraries (one tag per native package).
-2. Write their hashes into the code.
-3. Publish to pub.dev (the `v<version>` tag).
+When a Dox release needs a new native version, release the native package first.
+Then raise its constraint (like `dox_http_native: ^3.0.0-alpha.7`) in the Dox packages that use it.
 
 ## Before you start
 
@@ -46,51 +43,12 @@ git checkout -b release-3.0.0-alpha.5 origin/develop
 4. Run `dart pub get` and `dart analyze --fatal-infos packages`.
 5. Commit and push the branch.
 
-## 2. Build the native libraries
-
-Tag the release commit once for each native package:
-
-```sh
-for p in dox_http_native dox_postgres_native dox_mysql_native; do
-  git tag $p-v3.0.0-alpha.5
-  git push origin $p-v3.0.0-alpha.5
-done
-```
-
-Each tag starts `.github/workflows/native.yaml`.
-It builds macOS (arm64, x64), Linux (x64, arm64) and Windows (x64).
-It uploads the 5 libraries and a `SHA256SUMS` file to a GitHub release with the tag name.
-
-Wait until all three runs pass:
-
-```sh
-gh run list --workflow native.yaml --limit 3
-```
-
-## 3. Write the hashes into the code
-
-```sh
-for p in dox_http_native dox_postgres_native dox_mysql_native; do
-  dart run bin/native_hashes.dart $p-v3.0.0-alpha.5
-done
-```
-
-This fills the `_sha256` map in each `packages/dox-*-native/hook/build.dart`.
-Commit and push.
-
-If the hook needs a library with an empty map, it builds the library with cargo.
-Users without Rust then get no `dox_http_native` library, and the app does not start.
-(The DB drivers fall back to Dart, the server does not.)
-So refill the `_sha256` map in `packages/dox-http-native/hook/build.dart` (and the other two)
-from the new release before you publish.
-Never publish with an empty or old map: an old hash does not match the new files.
-
-## 4. Merge the release PR
+## 2. Merge the release PR
 
 Open a PR from `release-3.0.0-alpha.5` into `develop`.
 Wait for CI, then squash merge it.
 
-## 5. Publish to pub.dev
+## 3. Publish to pub.dev
 
 Tag the merge commit on `develop`:
 
@@ -114,7 +72,7 @@ Packages that are already published are skipped.
 To test without publishing, run the Release workflow by hand (workflow_dispatch).
 That is a dry run only.
 
-## 6. Release the project template
+## 4. Release the project template
 
 `dox create` copies a GitHub release of `dartondox/dox-sample` (branch `v3.x`).
 It takes the newest release with the same major version as the CLI.
@@ -143,7 +101,7 @@ In `dox-sample`:
    curl localhost:3000/ping   # pong
    ```
 
-## 7. Check
+## 5. Check
 
 - Every package shows the new version on pub.dev.
 - The docs deploy from `develop` passed (the "Docs" workflow).
