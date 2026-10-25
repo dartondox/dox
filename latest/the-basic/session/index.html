@@ -6322,6 +6322,7 @@ An Inertia request (it has the <code>X-Inertia</code> header) is redirected like
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">invalidate</span><span class="p">();</span>
 </span></code></pre></div>
 <p>Always call <code>regenerate()</code> after login. Then an id that someone saw before the login is of no use.</p>
+<p>With the default <code>cookie</code> session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout. If logout must really end old cookies, use the <code>cache</code> session driver, like <code>SessionConfig(driver: 'cache', store: 'redis')</code>.</p>
 <p><code>dox_auth</code> does this for you. See <a href="../../security/authentication/#session-login-for-web-pages">Session login</a>.</p>
 <h2 id="config">Config</h2>
 <p>Set <code>session</code> in the app config. All options have a default.</p>

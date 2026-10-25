@@ -4394,6 +4394,8 @@ req.session.invalidate();
 
 Always call `regenerate()` after login. Then an id that someone saw before the login is of no use.
 
+With the default `cookie` session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout. If logout must really end old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
+
 `dox_auth` does this for you. See [Session login](../security/authentication.md#session-login-for-web-pages).
 
 ## Config
@@ -11687,6 +11689,7 @@ Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), (PageCon
 | `Auth().logout(req)` | removes the login and all session data |
 
 - Login and logout give the session a new id and a new CSRF token. So an id that someone saw before the login is of no use.
+- With the default `cookie` session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout. If logout must really end old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
 - The session keeps only the user id. `AuthMiddleware` loads the user from the database on each request, so a deleted user is logged out.
 - These methods throw a `StateError` on a guard that does not use `SessionAuthDriver`.
 - `SessionAuthDriver` has one option, `hashRounds` (default `10`), like `JwtAuthDriver`.
@@ -19243,6 +19246,7 @@ What changed in each package, newest first. This page is made from the
 
 - New: `SessionAuthDriver` keeps the login in the session, for web pages. Use `Auth().attemptSession(req, credentials)`, `Auth().loginSession(req, user)` and `Auth().logout(req)`. Login and logout give the session a new id. Needs `SessionMiddleware`.
 - New: `AuthMiddleware(redirectTo: '/login')` sends a guest to that page instead of a 401.
+- Docs: with the default `cookie` session driver, an old copy of the cookie still works after logout. The README now says to use the `cache` driver when logout must end old cookies.
 - Change: the password check of `attempt` moved to `AuthDriver.checkCredentials`, so all drivers share it.
 
 ### 3.0.0-alpha.11
@@ -19306,6 +19310,10 @@ What changed in each package, newest first. This page is made from the
 - `dart_jsonwebtoken` 3.
 
 ## dox_builder
+
+### Unreleased
+
+- Fix: a route inside `Route.group('/web-auth', registerWebAuth)` lost the group prefix when the callback was a method or function, not a closure. The builder now reads that method with the prefix, also for nested groups. The route call in `openapi.g.dart` now has the full path, like `/web-auth/login`.
 
 ### 3.0.0-alpha.11
 
@@ -19521,6 +19529,8 @@ What changed in each package, newest first. This page is made from the
   - Socket.IO: `SocketIoConfig` moved to `dox_socketio`. `AppConfig.socketIo` is removed: extend `SocketIoService` from `dox_socketio`. `Dox().socketIo` is now `SocketIoService.server`.
   - `dox_core` no longer exports `Disk`, `DriveManager`, `FileNotFoundException` and `StorageException`. Import them from `dox_storage`.
   - `StreamFile` and `DownloadableFile` stay in `dox_core`.
+- Fix: the OpenAPI docs could give a route the docs of another controller with the same method name. The docs now pass the controller class of `(C c) => c.method` and `Route.get<C>` routes to the registry.
+- New: `ControllerAction.controller` gives the controller class.
 
 ### 3.0.0-alpha.11
 
@@ -19695,6 +19705,10 @@ What changed in each package, newest first. This page is made from the
 - `uuid` 4 and `mime` 2.
 
 ## dox_openapi
+
+### Unreleased
+
+- Fix: two controllers with the same method name (like `login`) could swap their docs. `OpenApiRegistry.find` now takes `controller:`. When the route knows its controller class, only methods of that class match.
 
 ### 3.0.0-alpha.11
 

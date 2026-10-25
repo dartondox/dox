@@ -6626,6 +6626,7 @@ It needs <code>SessionMiddleware</code> and <code>CsrfMiddleware</code>. See <a 
 </table>
 <ul>
 <li>Login and logout give the session a new id and a new CSRF token. So an id that someone saw before the login is of no use.</li>
+<li>With the default <code>cookie</code> session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout. If logout must really end old cookies, use the <code>cache</code> session driver, like <code>SessionConfig(driver: 'cache', store: 'redis')</code>.</li>
 <li>The session keeps only the user id. <code>AuthMiddleware</code> loads the user from the database on each request, so a deleted user is logged out.</li>
 <li>These methods throw a <code>StateError</code> on a guard that does not use <code>SessionAuthDriver</code>.</li>
 <li><code>SessionAuthDriver</code> has one option, <code>hashRounds</code> (default <code>10</code>), like <code>JwtAuthDriver</code>.</li>
