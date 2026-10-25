@@ -8,8 +8,39 @@ import 'package:dox_validation/dox_validation.dart' as dv;
 /// Every error of a request comes here. The `ExceptionHandler` of
 /// `AppConfig` reports it and decides the response.
 void httpErrorHandler(HttpRequest req, Object error, StackTrace stackTrace) {
-  httpResponseHandler(renderError(req, error, stackTrace), req);
+  try {
+    httpResponseHandler(renderError(req, error, stackTrace), req);
+  } catch (sendError, sendStack) {
+    /// the error answer failed too (eg. a bad header). report it and
+    /// send a plain 500, so the client never waits for a timeout.
+    try {
+      Dox().config.exceptionHandler.report(sendError, sendStack);
+    } catch (_) {
+      Logger.danger('Sending the error failed: $sendError\n$sendStack');
+    }
+    _plainError(req.response);
+  }
 }
+
+/// a bare 500 with none of the headers set so far. When the head is
+/// already sent, it only closes the response.
+void _plainError(HttpResponse res) {
+  try {
+    res.headers.clear();
+    res.statusCode = HttpStatus.internalServerError;
+    res.headers.contentType = ContentType.text;
+    res.add(_plainErrorBody);
+  } catch (_) {
+    /// the head is already sent
+  }
+  try {
+    res.close();
+  } catch (_) {
+    /// client already gone
+  }
+}
+
+final List<int> _plainErrorBody = 'Internal Server Error'.codeUnits;
 
 /// Report [error] and give the response for it, from the
 /// `ExceptionHandler` of `AppConfig`. It is not sent yet.

@@ -1,6 +1,8 @@
 ## Unreleased
 
 - Fix: `AUTH_REQUEST_KEY` is now only in `dox_core`, so importing `dox_core` and `dox_auth` together no longer gives an "ambiguous import" error.
+- Fix: `response(x).header('Content-Type', 'image/svg+xml')` failed with "More than one value for header content-type". The default `text/plain` stayed next to the new type. Now `header()` replaces the content type, the same as `contentType()`. The name can be in any case.
+- Fix: when sending the error answer failed too, the client got no answer and waited until the timeout. Now Dox reports the error and sends a plain 500. When the head is already sent, it closes the response.
 
 ## 3.0.0-alpha.13
 

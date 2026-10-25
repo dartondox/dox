@@ -128,8 +128,17 @@ class DoxResponse {
   dynamic process(HttpRequest request) {
     /// a WebSocket route behind a `next` middleware: the socket is open
     if (_contentData is WebSocket) return null;
+    HttpHeaders headers = request.response.headers;
     _headers.forEach((String key, dynamic value) {
-      request.response.headers.add(key, value);
+      /// Content-Type has one value. `add` would keep the default
+      /// `text/plain` too, and the response fails with
+      /// "More than one value for header content-type".
+      if (key.length == 12 &&
+          key.toLowerCase() == HttpHeaders.contentTypeHeader) {
+        headers.set(key, value);
+      } else {
+        headers.add(key, value);
+      }
     });
     if (_statusCode != null) {
       request.response.statusCode = _statusCode!;
