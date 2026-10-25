@@ -1382,8 +1382,6 @@
       
         
       
-        
-      
     
     
     
@@ -1558,34 +1556,6 @@
     
   
     Services
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../digging-deeper/websocket/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WebSocket
   
 
     
@@ -4178,8 +4148,8 @@
 <td><a href="../../digging-deeper/native-server/">Native server</a></td>
 </tr>
 <tr>
-<td>Native database driver is on</td>
-<td>No <code>[dox] warning: dox_postgres_native did not load</code> (or <code>mysql</code>) line at start. Do not set <code>DOX_DB_DRIVER=dart</code>. Postgres with TLS uses the Dart driver.</td>
+<td>Native database driver loads</td>
+<td>The app starts and the database works. When the library does not load, the app stops with <code>dox_postgres_native did not load</code> (or <code>mysql</code>) and the fix.</td>
 <td><a href="../../database/postgres-native/">Postgres native</a></td>
 </tr>
 <tr>
@@ -4189,7 +4159,7 @@
 </tr>
 <tr>
 <td>Shared state across isolates</td>
-<td>Cache: <code>redis</code>, not <code>memory</code>. WebSocket: <code>WebsocketRedisAdapter</code>. Socket.IO: a Redis adapter and <code>transports: ['websocket']</code>.</td>
+<td>Cache: <code>redis</code>, not <code>memory</code>. Socket.IO: a Redis adapter and <code>transports: ['websocket']</code>.</td>
 <td><a href="../../digging-deeper/isolate/">Isolate</a></td>
 </tr>
 <tr>
@@ -4231,7 +4201,7 @@
 </tr>
 <tr>
 <td>Migrations use the right database</td>
-<td><code>dox_migration</code> reads <code>.env</code> when the file exists, and ignores the real env then. Do not ship a <code>.env</code> next to the binary, or give <code>Migrator(connection: ...)</code> your own pool.</td>
+<td><code>dox_migration</code> reads <code>.env</code> when the file exists, and ignores the real env then. Do not ship a <code>.env</code> next to the binary, or give <code>Migrator(config: ...)</code> your own config.</td>
 <td><a href="../troubleshooting/">Troubleshooting</a></td>
 </tr>
 <tr>
@@ -4241,7 +4211,7 @@
 </tr>
 <tr>
 <td>Pool size fits the database</td>
-<td><code>extra: {'maxConnectionCount': 10}</code>. The native drivers (the default) share one pool per process, so the total is the pool size. The Dart drivers have one pool per isolate: total = isolates x pool size. Keep it under the database <code>max_connections</code>.</td>
+<td><code>extra: {'maxConnectionCount': 10}</code>. The Postgres and MySQL drivers share one pool per process, so the total is the pool size, not isolates x pool size. Keep it under the database <code>max_connections</code>.</td>
 <td><a href="../../database/">Database</a></td>
 </tr>
 <tr>

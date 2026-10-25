@@ -1382,8 +1382,6 @@
       
         
       
-        
-      
     
     
     
@@ -1558,34 +1556,6 @@
     
   
     Services
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../digging-deeper/websocket/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WebSocket
   
 
     
@@ -4244,7 +4214,7 @@ This page lists every field, with its type, its default and what it does.</p>
 <td><code>services</code></td>
 <td><code>List&lt;DoxService&gt;</code></td>
 <td><code>[]</code></td>
-<td>Classes with a <code>setup()</code> method. Dox runs them in every isolate at start. The ORM, auth and WebSocket are set up here.</td>
+<td>Classes with a <code>setup()</code> method. Dox runs them in every isolate at start. The ORM and auth are set up here.</td>
 </tr>
 </tbody>
 </table>
@@ -4996,7 +4966,7 @@ Source: <code>packages/dox-orm/lib/src/types/database_config.dart</code> and <co
 <td><code>useSSL</code></td>
 <td><code>bool</code></td>
 <td><code>false</code></td>
-<td>Use TLS. Postgres with TLS uses the Dart driver, not the native one.</td>
+<td>Use TLS. Postgres: mode <code>require</code> (no certificate check), set <code>extra['sslMode']</code> to change it. MySQL: the certificate is checked.</td>
 </tr>
 <tr>
 <td><code>debug</code></td>
@@ -5038,20 +5008,20 @@ Source: <code>packages/dox-orm/lib/src/types/database_config.dart</code> and <co
 <tbody>
 <tr>
 <td>postgres, mysql</td>
-<td><code>native</code></td>
-<td><code>bool</code></td>
-<td><code>true</code></td>
-<td><code>false</code> uses the Dart driver instead of the native (Rust) one.</td>
-</tr>
-<tr>
-<td>postgres, mysql</td>
 <td><code>maxConnectionCount</code></td>
 <td><code>int</code></td>
 <td><code>10</code></td>
-<td>Most open connections. Native drivers: for the whole process. Dart drivers: per isolate.</td>
+<td>Most open connections, for the whole process.</td>
 </tr>
 <tr>
 <td>postgres, mysql</td>
+<td><code>threads</code></td>
+<td><code>int</code></td>
+<td><code>1</code></td>
+<td>Rust threads of the native driver. Only the first pool sets it.</td>
+</tr>
+<tr>
+<td>mysql, sqlite</td>
 <td><code>preparedStatementCacheSize</code></td>
 <td><code>int</code></td>
 <td><code>100</code></td>
@@ -5060,44 +5030,30 @@ Source: <code>packages/dox-orm/lib/src/types/database_config.dart</code> and <co
 <tr>
 <td>postgres</td>
 <td><code>sslMode</code></td>
-<td>postgres <code>SslMode</code></td>
-<td>none</td>
-<td>Setting it uses the Dart driver.</td>
-</tr>
-<tr>
-<td>mysql</td>
-<td><code>collation</code></td>
 <td><code>String</code></td>
-<td><code>utf8mb4_general_ci</code></td>
-<td>Connection collation.</td>
+<td><code>require</code> with <code>useSSL</code>, else <code>disable</code></td>
+<td>TLS mode: <code>disable</code>, <code>prefer</code>, <code>require</code> or <code>verify-full</code>.</td>
 </tr>
 <tr>
-<td>mysql</td>
-<td><code>timeoutMs</code></td>
-<td><code>int</code></td>
-<td><code>10000</code></td>
-<td>Connect timeout.</td>
-</tr>
-<tr>
-<td>mysql</td>
-<td><code>allowPublicKeyRetrieval</code></td>
-<td><code>bool</code></td>
-<td><code>false</code>, <code>true</code> with <code>useSSL</code> or a local host</td>
-<td>Ask the server for its RSA key (needed for <code>caching_sha2_password</code> without TLS). A fake server can send its own key and read the password, so it is off by default. It is on with <code>useSSL: true</code>, on <code>localhost</code>, <code>127.0.0.1</code>, <code>::1</code> and on a Unix socket. Giving the key in <code>serverPublicKey</code> is safer.</td>
-</tr>
-<tr>
-<td>mysql</td>
-<td><code>serverPublicKey</code></td>
-<td><code>String</code></td>
-<td>none</td>
-<td>The server RSA key, so it is not asked for.</td>
-</tr>
-<tr>
-<td>mysql</td>
+<td>postgres</td>
 <td><code>timeZone</code></td>
 <td><code>String</code></td>
-<td>none</td>
+<td><code>UTC</code></td>
 <td>Session time zone.</td>
+</tr>
+<tr>
+<td>postgres</td>
+<td><code>applicationName</code></td>
+<td><code>String</code></td>
+<td>none</td>
+<td>Name of the app in <code>pg_stat_activity</code>.</td>
+</tr>
+<tr>
+<td>mysql</td>
+<td><code>verifyCertificate</code></td>
+<td><code>bool</code></td>
+<td><code>true</code></td>
+<td><code>false</code> skips the TLS certificate check. Only for a self-signed certificate in development.</td>
 </tr>
 <tr>
 <td>mysql</td>
@@ -5329,37 +5285,36 @@ Source: <code>packages/dox-auth/lib/src/interfaces.dart</code>.</p>
 </span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="w">      </span><span class="nl">password:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPassword</span><span class="p">,</span>
 </span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbName</span><span class="p">,</span>
 </span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="w">      </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="w">        </span><span class="c1">/// One pool for all isolates with the native driver.</span>
-</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="w">        </span><span class="c1">/// One pool per isolate with the Dart driver.</span>
-</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="w">        </span><span class="s1">'maxConnectionCount'</span><span class="o">:</span><span class="w"> </span><span class="m">10</span><span class="p">,</span>
-</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="w">        </span><span class="s1">'maxConnectionAge'</span><span class="o">:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">hours:</span><span class="w"> </span><span class="m">1</span><span class="p">),</span>
-</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="w">      </span><span class="p">},</span>
-</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="n">_debug</span><span class="p">,</span>
-</span><span id="__span-4-30"><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="w">      </span><span class="nl">printer:</span><span class="w"> </span><span class="n">PrettyQueryPrinter</span><span class="p">(),</span>
-</span><span id="__span-4-31"><a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a><span class="w">    </span><span class="p">),</span>
-</span><span id="__span-4-32"><a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a>
-</span><span id="__span-4-33"><a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a><span class="w">    </span><span class="c1">/// MySQL and MariaDB</span>
-</span><span id="__span-4-34"><a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a><span class="w">    </span><span class="s1">'mysql'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
-</span><span id="__span-4-35"><a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">mysql</span><span class="p">,</span>
-</span><span id="__span-4-36"><a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a><span class="w">      </span><span class="nl">host:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbHost</span><span class="p">,</span>
-</span><span id="__span-4-37"><a id="__codelineno-4-37" name="__codelineno-4-37" href="#__codelineno-4-37"></a><span class="w">      </span><span class="nl">port:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPort</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="m">3306</span><span class="p">,</span>
-</span><span id="__span-4-38"><a id="__codelineno-4-38" name="__codelineno-4-38" href="#__codelineno-4-38"></a><span class="w">      </span><span class="nl">user:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbUsername</span><span class="p">,</span>
-</span><span id="__span-4-39"><a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a><span class="w">      </span><span class="nl">password:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPassword</span><span class="p">,</span>
-</span><span id="__span-4-40"><a id="__codelineno-4-40" name="__codelineno-4-40" href="#__codelineno-4-40"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbName</span><span class="p">,</span>
-</span><span id="__span-4-41"><a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a><span class="w">      </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'collation'</span><span class="o">:</span><span class="w"> </span><span class="s1">'utf8mb4_general_ci'</span><span class="p">},</span>
-</span><span id="__span-4-42"><a id="__codelineno-4-42" name="__codelineno-4-42" href="#__codelineno-4-42"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="n">_debug</span><span class="p">,</span>
-</span><span id="__span-4-43"><a id="__codelineno-4-43" name="__codelineno-4-43" href="#__codelineno-4-43"></a><span class="w">      </span><span class="nl">printer:</span><span class="w"> </span><span class="n">PrettyQueryPrinter</span><span class="p">(),</span>
-</span><span id="__span-4-44"><a id="__codelineno-4-44" name="__codelineno-4-44" href="#__codelineno-4-44"></a><span class="w">    </span><span class="p">),</span>
-</span><span id="__span-4-45"><a id="__codelineno-4-45" name="__codelineno-4-45" href="#__codelineno-4-45"></a>
-</span><span id="__span-4-46"><a id="__codelineno-4-46" name="__codelineno-4-46" href="#__codelineno-4-46"></a><span class="w">    </span><span class="c1">/// SQLite. `DB_NAME` is a file path, or `:memory:`.</span>
-</span><span id="__span-4-47"><a id="__codelineno-4-47" name="__codelineno-4-47" href="#__codelineno-4-47"></a><span class="w">    </span><span class="s1">'sqlite'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
-</span><span id="__span-4-48"><a id="__codelineno-4-48" name="__codelineno-4-48" href="#__codelineno-4-48"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">sqlite</span><span class="p">,</span>
-</span><span id="__span-4-49"><a id="__codelineno-4-49" name="__codelineno-4-49" href="#__codelineno-4-49"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbName</span><span class="p">,</span>
-</span><span id="__span-4-50"><a id="__codelineno-4-50" name="__codelineno-4-50" href="#__codelineno-4-50"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="n">_debug</span><span class="p">,</span>
-</span><span id="__span-4-51"><a id="__codelineno-4-51" name="__codelineno-4-51" href="#__codelineno-4-51"></a><span class="w">      </span><span class="nl">printer:</span><span class="w"> </span><span class="n">PrettyQueryPrinter</span><span class="p">(),</span>
-</span><span id="__span-4-52"><a id="__codelineno-4-52" name="__codelineno-4-52" href="#__codelineno-4-52"></a><span class="w">    </span><span class="p">),</span>
-</span><span id="__span-4-53"><a id="__codelineno-4-53" name="__codelineno-4-53" href="#__codelineno-4-53"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-4-54"><a id="__codelineno-4-54" name="__codelineno-4-54" href="#__codelineno-4-54"></a><span class="p">);</span>
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="w">        </span><span class="c1">/// One pool for all isolates.</span>
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="w">        </span><span class="s1">'maxConnectionCount'</span><span class="o">:</span><span class="w"> </span><span class="m">10</span><span class="p">,</span>
+</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="w">        </span><span class="s1">'maxConnectionAge'</span><span class="o">:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">hours:</span><span class="w"> </span><span class="m">1</span><span class="p">),</span>
+</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="w">      </span><span class="p">},</span>
+</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="n">_debug</span><span class="p">,</span>
+</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="w">      </span><span class="nl">printer:</span><span class="w"> </span><span class="n">PrettyQueryPrinter</span><span class="p">(),</span>
+</span><span id="__span-4-30"><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="w">    </span><span class="p">),</span>
+</span><span id="__span-4-31"><a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a>
+</span><span id="__span-4-32"><a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a><span class="w">    </span><span class="c1">/// MySQL and MariaDB</span>
+</span><span id="__span-4-33"><a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a><span class="w">    </span><span class="s1">'mysql'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
+</span><span id="__span-4-34"><a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">mysql</span><span class="p">,</span>
+</span><span id="__span-4-35"><a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a><span class="w">      </span><span class="nl">host:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbHost</span><span class="p">,</span>
+</span><span id="__span-4-36"><a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a><span class="w">      </span><span class="nl">port:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPort</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="m">3306</span><span class="p">,</span>
+</span><span id="__span-4-37"><a id="__codelineno-4-37" name="__codelineno-4-37" href="#__codelineno-4-37"></a><span class="w">      </span><span class="nl">user:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbUsername</span><span class="p">,</span>
+</span><span id="__span-4-38"><a id="__codelineno-4-38" name="__codelineno-4-38" href="#__codelineno-4-38"></a><span class="w">      </span><span class="nl">password:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPassword</span><span class="p">,</span>
+</span><span id="__span-4-39"><a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbName</span><span class="p">,</span>
+</span><span id="__span-4-40"><a id="__codelineno-4-40" name="__codelineno-4-40" href="#__codelineno-4-40"></a><span class="w">      </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'collation'</span><span class="o">:</span><span class="w"> </span><span class="s1">'utf8mb4_general_ci'</span><span class="p">},</span>
+</span><span id="__span-4-41"><a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="n">_debug</span><span class="p">,</span>
+</span><span id="__span-4-42"><a id="__codelineno-4-42" name="__codelineno-4-42" href="#__codelineno-4-42"></a><span class="w">      </span><span class="nl">printer:</span><span class="w"> </span><span class="n">PrettyQueryPrinter</span><span class="p">(),</span>
+</span><span id="__span-4-43"><a id="__codelineno-4-43" name="__codelineno-4-43" href="#__codelineno-4-43"></a><span class="w">    </span><span class="p">),</span>
+</span><span id="__span-4-44"><a id="__codelineno-4-44" name="__codelineno-4-44" href="#__codelineno-4-44"></a>
+</span><span id="__span-4-45"><a id="__codelineno-4-45" name="__codelineno-4-45" href="#__codelineno-4-45"></a><span class="w">    </span><span class="c1">/// SQLite. `DB_NAME` is a file path, or `:memory:`.</span>
+</span><span id="__span-4-46"><a id="__codelineno-4-46" name="__codelineno-4-46" href="#__codelineno-4-46"></a><span class="w">    </span><span class="s1">'sqlite'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
+</span><span id="__span-4-47"><a id="__codelineno-4-47" name="__codelineno-4-47" href="#__codelineno-4-47"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">sqlite</span><span class="p">,</span>
+</span><span id="__span-4-48"><a id="__codelineno-4-48" name="__codelineno-4-48" href="#__codelineno-4-48"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbName</span><span class="p">,</span>
+</span><span id="__span-4-49"><a id="__codelineno-4-49" name="__codelineno-4-49" href="#__codelineno-4-49"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="n">_debug</span><span class="p">,</span>
+</span><span id="__span-4-50"><a id="__codelineno-4-50" name="__codelineno-4-50" href="#__codelineno-4-50"></a><span class="w">      </span><span class="nl">printer:</span><span class="w"> </span><span class="n">PrettyQueryPrinter</span><span class="p">(),</span>
+</span><span id="__span-4-51"><a id="__codelineno-4-51" name="__codelineno-4-51" href="#__codelineno-4-51"></a><span class="w">    </span><span class="p">),</span>
+</span><span id="__span-4-52"><a id="__codelineno-4-52" name="__codelineno-4-52" href="#__codelineno-4-52"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-4-53"><a id="__codelineno-4-53" name="__codelineno-4-53" href="#__codelineno-4-53"></a><span class="p">);</span>
 </span></code></pre></div>
 <div class="language-dart highlight"><span class="filename">lib/config/cors.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>

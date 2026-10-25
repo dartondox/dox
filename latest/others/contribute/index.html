@@ -1382,8 +1382,6 @@
       
         
       
-        
-      
     
     
     
@@ -1558,34 +1556,6 @@
     
   
     Services
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../digging-deeper/websocket/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WebSocket
   
 
     
@@ -3891,6 +3861,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#native-packages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Native packages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#docs" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4155,6 +4136,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#native-packages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Native packages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#docs" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4258,7 +4250,7 @@ There is one <code>pubspec.lock</code> for the whole repo.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>melos<span class="w"> </span>bs
 </span></code></pre></div>
 <h3 id="4-useful-commands">4. Useful commands</h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Run all tests (not dox_orm and not dox_mysql_native).</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Run all tests (not dox_orm).</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># Use `melos run test`. `melos test` is a built-in melos command.</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>melos<span class="w"> </span>run<span class="w"> </span><span class="nb">test</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
@@ -4293,11 +4285,11 @@ It uses pub.dev automated publishing, so it needs no token or secret.</p>
 <p>The full guide is <a href="https://github.com/dartondox/dox/blob/develop/RELEASING.md">RELEASING.md</a> in the repo. In short:</p>
 <ol>
 <li>Bump every package with <code>bin/update_versions.sh</code>, and close the <code>## Unreleased</code> section of each <code>CHANGELOG.md</code>.</li>
-<li>Push one tag per native package (<code>dox_http_native-v&lt;version&gt;</code>, <code>dox_postgres_native-v&lt;version&gt;</code>, <code>dox_mysql_native-v&lt;version&gt;</code>). GitHub builds the libraries for 5 platforms.</li>
-<li>Write their hashes into the code with <code>dart run bin/native_hashes.dart &lt;tag&gt;</code>.</li>
 <li>Merge the release PR, then push the tag <code>v&lt;version&gt;</code>. This publishes to pub.dev.</li>
 <li>Release the matching <code>dox-sample</code> template.</li>
 </ol>
+<p>The native packages (<code>dox_http_native</code>, <code>dox_postgres_native</code>, <code>dox_mysql_native</code>) are not in this repo.
+See <a href="#native-packages">Native packages</a> below.</p>
 <p><strong>New package only:</strong> turn on pub.dev automated publishing for it first. See <a href="#one-time-setup">One-time setup</a>.
 A new package must first exist on pub.dev, so publish its first version by hand with <code>dart pub publish</code>.</p>
 <h3 id="what-the-workflow-does">What the workflow does</h3>
@@ -4337,6 +4329,49 @@ The list of packages is the output of <code>python3 bin/publish_order.py</code>.
 The publish job runs in it.
 Optional: add yourself as a required reviewer, and allow only tags <code>v*</code>.
 The old <code>PUB_CREDENTIALS</code> secret is not used any more.</p>
+<h2 id="native-packages">Native packages</h2>
+<p>The three native packages live in their own repos:</p>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Repo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dox_http_native</code></td>
+<td><a href="https://github.com/dartondox/dox-http-native">dartondox/dox-http-native</a></td>
+</tr>
+<tr>
+<td><code>dox_postgres_native</code></td>
+<td><a href="https://github.com/dartondox/dox-postgres-native">dartondox/dox-postgres-native</a></td>
+</tr>
+<tr>
+<td><code>dox_mysql_native</code></td>
+<td><a href="https://github.com/dartondox/dox-mysql-native">dartondox/dox-mysql-native</a></td>
+</tr>
+</tbody>
+</table>
+<p>Dox uses them from pub.dev. Their build hooks download ready-built libraries, so you do not need Rust to work on Dox.</p>
+<p>To work on a native package and Dox together:</p>
+<ol>
+<li>Clone the package next to the Dox repo, like <code>../dox-http-native</code>.</li>
+<li>
+<p>Add it to the root <code>pubspec_overrides.yaml</code> of the Dox repo. Git ignores this file.</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">dependency_overrides</span><span class="p">:</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">dox_http_native</span><span class="p">:</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../dox-http-native</span>
+</span></code></pre></div>
+</li>
+<li>
+<p>Run <code>dart pub get</code>.</p>
+</li>
+</ol>
+<p>Each native package is released from its own repo, with its own version.
+Push a <code>v&lt;version&gt;</code> tag in that repo.
+Its CI builds the libraries, uploads them, fills the hashes and publishes the package to pub.dev.
+Then raise the version constraint in the Dox packages that use it.</p>
 <h2 id="docs">Docs</h2>
 <p>The docs site is https://dartondox.dev. It is built with MkDocs Material and
 <a href="https://github.com/jimporter/mike">mike</a>. mike keeps one folder per version on the <code>gh-pages</code> branch.</p>
@@ -4371,10 +4406,10 @@ The old <code>PUB_CREDENTIALS</code> secret is not used any more.</p>
 </tbody>
 </table>
 <h3 id="write-and-preview">Write and preview</h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>.venv/bin/pip<span class="w"> </span>install<span class="w"> </span><span class="nv">mkdocs</span><span class="o">==</span><span class="m">1</span>.6.1<span class="w"> </span>mkdocs-material<span class="o">==</span><span class="m">9</span>.7.7<span class="w"> </span><span class="nv">mike</span><span class="o">==</span><span class="m">2</span>.2.0
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>.venv/bin/mkdocs<span class="w"> </span>serve<span class="w">           </span><span class="c1"># live preview of this branch</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>.venv/bin/mkdocs<span class="w"> </span>build<span class="w"> </span>--strict<span class="w">  </span><span class="c1"># the same check as CI. Broken links fail.</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>.venv/bin/pip<span class="w"> </span>install<span class="w"> </span><span class="nv">mkdocs</span><span class="o">==</span><span class="m">1</span>.6.1<span class="w"> </span>mkdocs-material<span class="o">==</span><span class="m">9</span>.7.7<span class="w"> </span><span class="nv">mike</span><span class="o">==</span><span class="m">2</span>.2.0
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>.venv/bin/mkdocs<span class="w"> </span>serve<span class="w">           </span><span class="c1"># live preview of this branch</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>.venv/bin/mkdocs<span class="w"> </span>build<span class="w"> </span>--strict<span class="w">  </span><span class="c1"># the same check as CI. Broken links fail.</span>
 </span></code></pre></div>
 <h3 id="deploy">Deploy</h3>
 <ul>

@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A service is a class with a setup() method. Dox runs it at start, in every isolate. Use it to set up things like the database, auth or WebSocket.">
+        <meta name="description" content="A service is a class with a setup() method. Dox runs it at start, in every isolate. Use it to set up things like the database or auth.">
       
       
       
@@ -16,7 +16,7 @@
         <link rel="prev" href="../isolate/">
       
       
-        <link rel="next" href="../websocket/">
+        <link rel="next" href="../dox-cli/">
       
       
         
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Services | Dox">
-  <meta property="og:description" content="A service is a class with a setup() method. Dox runs it at start, in every isolate. Use it to set up things like the database, auth or WebSocket.">
+  <meta property="og:description" content="A service is a class with a setup() method. Dox runs it at start, in every isolate. Use it to set up things like the database or auth.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/digging-deeper/services/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Services | Dox">
-  <meta name="twitter:description" content="A service is a class with a setup() method. Dox runs it at start, in every isolate. Use it to set up things like the database, auth or WebSocket.">
+  <meta name="twitter:description" content="A service is a class with a setup() method. Dox runs it at start, in every isolate. Use it to set up things like the database or auth.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -1384,8 +1384,6 @@
       
         
       
-        
-      
     
     
     
@@ -1693,34 +1691,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../websocket/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WebSocket
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -4007,7 +3977,7 @@
 
 
 <h1 id="services">Services</h1>
-<p>A service is a class with a <code>setup()</code> method. Dox runs it at start, in every isolate. Use it to set up things like the database, auth or WebSocket.</p>
+<p>A service is a class with a <code>setup()</code> method. Dox runs it at start, in every isolate. Use it to set up things like the database or auth.</p>
 <h2 id="why-services">Why services</h2>
 <p>Dox runs your app on many isolates (see <a href="../isolate/">Isolate</a>). Each isolate has its own memory.</p>
 <p>So code that you run once in <code>bin/server.dart</code> only sets up the first isolate. The other isolates do not see it. For example, they have no database connection.</p>
@@ -4076,7 +4046,7 @@
 <li>It registers the routes of your routers.</li>
 <li>It starts the HTTP server.</li>
 </ol>
-<p>So routes can use what a service set up. For example, <code>Route.websocket()</code> needs the WebSocket service to run first.</p>
+<p>So routes can use what a service set up.</p>
 <p><code>dox openapi:generate</code> also runs <code>setup()</code> of every service, because it needs the routes.</p>
 <h2 id="clean-up-on-shutdown">Clean up on shutdown</h2>
 <p>On <code>SIGTERM</code> or <code>SIGINT</code> Dox stops the server gracefully (see <a href="../deployment/#graceful-shutdown">Deployment</a>).
@@ -4164,13 +4134,13 @@ Dox closes the cache stores (eg. Redis) by itself, after the services.</p>
         
         
           
-          <a href="../websocket/" class="md-footer__link md-footer__link--next" aria-label="Next: WebSocket">
+          <a href="../dox-cli/" class="md-footer__link md-footer__link--next" aria-label="Next: Dox CLI">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                WebSocket
+                Dox CLI
               </div>
             </div>
             <div class="md-footer__button md-icon">

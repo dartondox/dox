@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="dox_mysql_native is the default MySQL and MariaDB driver of the Dox ORM. Rust talks to the database. Your models, queries and transactions stay the same...">
+        <meta name="description" content="dox_mysql_native is the MySQL and MariaDB driver of the Dox ORM. Rust talks to the database. Your models, queries and transactions stay the same. You do not...">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Native MySQL driver | Dox">
-  <meta property="og:description" content="dox_mysql_native is the default MySQL and MariaDB driver of the Dox ORM. Rust talks to the database. Your models, queries and transactions stay the same...">
+  <meta property="og:description" content="dox_mysql_native is the MySQL and MariaDB driver of the Dox ORM. Rust talks to the database. Your models, queries and transactions stay the same. You do not...">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/database/mysql-native/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Native MySQL driver | Dox">
-  <meta name="twitter:description" content="dox_mysql_native is the default MySQL and MariaDB driver of the Dox ORM. Rust talks to the database. Your models, queries and transactions stay the same...">
+  <meta name="twitter:description" content="dox_mysql_native is the MySQL and MariaDB driver of the Dox ORM. Rust talks to the database. Your models, queries and transactions stay the same. You do not...">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -1382,8 +1382,6 @@
       
         
       
-        
-      
     
     
     
@@ -1558,34 +1556,6 @@
     
   
     Services
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../digging-deeper/websocket/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WebSocket
   
 
     
@@ -2061,21 +2031,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#native-is-the-default" class="md-nav__link">
+  <a href="#when-the-library-does-not-load" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Native is the default
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#use-the-dart-driver" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use the Dart driver
+        When the library does not load
       
     </span>
   </a>
@@ -3952,21 +3911,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#native-is-the-default" class="md-nav__link">
+  <a href="#when-the-library-does-not-load" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Native is the default
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#use-the-dart-driver" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use the Dart driver
+        When the library does not load
       
     </span>
   </a>
@@ -4054,7 +4002,7 @@
 
 
 <h1 id="native-mysql-driver">Native MySQL driver</h1>
-<p><code>dox_mysql_native</code> is the default MySQL and MariaDB driver of the Dox ORM.
+<p><code>dox_mysql_native</code> is the MySQL and MariaDB driver of the Dox ORM.
 Rust talks to the database. Your models, queries and transactions stay the
 same. You do not change any config.</p>
 <ul>
@@ -4064,15 +4012,15 @@ same. You do not change any config.</p>
   in one message.</li>
 <li>Each connection keeps its prepared statements. The same SQL is not
   prepared again.</li>
-<li>Values have the same Dart types as with the Dart driver (<code>mysql_dart</code>).
-  Errors are the same <code>MySQLServerException</code> class.</li>
+<li>Errors are <code>MysqlException</code>, with the MySQL error <code>code</code> and the
+  <code>sqlState</code>.</li>
 <li>Works with MySQL 8.4 (the default <code>caching_sha2_password</code> login) and
   MariaDB 11.</li>
 </ul>
 <div class="admonition warning">
 <p class="admonition-title">Alpha</p>
-<p>This driver is new. If you see a problem, <a href="#use-the-dart-driver">use the Dart driver</a>
-and tell us.</p>
+<p>This driver is new. If you see a problem, please
+<a href="https://github.com/dartondox/dox-mysql-native/issues">open an issue</a>.</p>
 </div>
 <h2 id="speed">Speed</h2>
 <p>One find-by-id query (<code>SELECT * FROM t WHERE id = @id</code>), AOT build
@@ -4082,88 +4030,70 @@ and tell us.</p>
 <thead>
 <tr>
 <th></th>
-<th>Dart driver</th>
-<th>Native driver</th>
+<th>Time</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>MySQL 8.4, one query at a time</td>
-<td>61 µs</td>
 <td>67 µs</td>
 </tr>
 <tr>
 <td>MySQL 8.4, 32 queries in flight</td>
-<td>25 µs per query</td>
 <td>11 µs per query</td>
 </tr>
 <tr>
 <td>MySQL 8.4, CPU time of the app per query</td>
-<td>32 µs</td>
 <td>13.5 µs</td>
 </tr>
 <tr>
 <td>MariaDB 11, one query at a time</td>
-<td>59 µs</td>
 <td>63 µs</td>
 </tr>
 <tr>
 <td>MariaDB 11, 32 queries in flight</td>
-<td>25.5 µs per query</td>
 <td>9.7 µs per query</td>
 </tr>
 <tr>
 <td>MariaDB 11, CPU time of the app per query</td>
-<td>32.5 µs</td>
 <td>12.4 µs</td>
 </tr>
 </tbody>
 </table>
 <p>The CPU time counts the Dart thread and the Rust thread. It is the limit
-on one CPU core: about 31,000 queries per second with the Dart driver and
-about 75,000 with the native driver.</p>
-<p>One query at a time is about the same speed: most of the time is the trip
-to the database. The gain is big when many requests run at the same time,
-like in a web server.</p>
+on one CPU core: about 75,000 queries per second.</p>
+<p>One query at a time spends most of its time on the trip to the database.
+Many requests at the same time, like in a web server, get the most out of it.</p>
 <h2 id="install">Install</h2>
 <p><code>dox_orm</code> depends on <code>dox_mysql_native</code>. You do not add it yourself.
 Add it only to use <code>MysqlNativePool</code> without the ORM:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_mysql_native
 </span></code></pre></div>
-<p>The build hook builds the Rust library with <code>cargo</code>, so you need
-<a href="https://rustup.rs">Rust</a> installed. Ready-built libraries (like the ones
-<code>dox_http_native</code> has) are not published for this driver yet.
-Without Rust, the ORM still works: it uses the Dart driver and prints one
-warning line (see below).</p>
+<p>You do not need Rust. The build hook downloads a ready-built library for
+your system. When there is no library for your system and no Rust to build
+one, the app stops with a clear error (see below).</p>
+<p>The package lives in its own repo:
+<a href="https://github.com/dartondox/dox-mysql-native">dartondox/dox-mysql-native</a>.</p>
 <p>Use <code>dart run</code>, <code>dart test</code> or <code>dart build cli</code>. <code>dart compile exe</code> does not
 run build hooks.</p>
-<h2 id="native-is-the-default">Native is the default</h2>
-<p>You do not change any config. The ORM picks the driver like this:</p>
-<ol>
-<li><code>driverFactory</code> is set: the ORM uses your driver. It wins over
-   everything below.</li>
-<li>You ask for the Dart driver (see below): the ORM uses the Dart driver.</li>
-<li>The native library loads: the ORM uses the native driver.</li>
-<li>The native library does not load (no library for your system, no
-   Rust to build it, or a load error): the ORM uses the Dart driver. It
-   prints one warning line to stderr, like this:</li>
-</ol>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>[dox] warning: dox_mysql_native did not load, using the Dart mysql driver (...)
+<h2 id="when-the-library-does-not-load">When the library does not load</h2>
+<p>MySQL has no other driver in Dox. When the native library does not load,
+<code>SqlQueryBuilder.initializeWithDatabaseConfig</code> (and every other place that
+opens a MySQL connection) throws an <code>UnsupportedError</code> like this:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dox_mysql_native did not load: &lt;reason&gt;.
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Dox needs it to talk to MySQL. Fix: run the app with `dart run` or `dart build cli`. ...
 </span></code></pre></div>
-<p>Named connections (<code>withConnection('x')</code>, <code>transaction(..., connection: 'x')</code>) follow
-the same rules.</p>
-<h2 id="use-the-dart-driver">Use the Dart driver</h2>
-<p>For all connections, set the env var:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">DOX_DB_DRIVER</span><span class="o">=</span>dart<span class="w"> </span>dart<span class="w"> </span>run<span class="w"> </span>bin/server.dart
-</span></code></pre></div>
-<p>For one connection, set <code>native: false</code> in <code>extra</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">ConnectionConfig</span><span class="p">(</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">mysql</span><span class="p">,</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="c1">// ... host, user, password, database as before</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'native'</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="p">},</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nl">debug:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">),</span>
-</span></code></pre></div>
+<p>To fix it:</p>
+<ul>
+<li>Run the app with <code>dart run</code>, <code>dart test</code> or <code>dart build cli</code>. They run the
+  build hook. <code>dart compile exe</code> does not.</li>
+<li>Or install <a href="https://rustup.rs">Rust</a>. The build hook then builds the
+  library from source.</li>
+<li>When you set <code>lib_path</code> in <code>pubspec.yaml</code>, check that the file is there
+  and is built for your system.</li>
+</ul>
+<p>A <code>driverFactory</code> on the connection wins over all of this: the ORM uses your
+driver.</p>
 <h2 id="options">Options</h2>
 <p>The driver reads the normal fields of the <code>ConnectionConfig</code> (<code>host</code>,
 <code>port</code>, <code>user</code>, <code>password</code>, <code>database</code>, <code>useSSL</code>) and these keys from
@@ -4214,29 +4144,29 @@ also give <code>driver.pool.handle</code> (an <code>int</code>) to another isola
 answer. A transaction that gets no request for 300 s is rolled back, so
 its connection goes back to the pool.</p>
 <h2 id="use-it-without-the-orm">Use it without the ORM</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">MysqlNativePool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MysqlNativePool</span><span class="p">.</span><span class="n">open</span><span class="p">(</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nl">user:</span><span class="w"> </span><span class="s1">'root'</span><span class="p">,</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'password'</span><span class="p">,</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'app'</span><span class="p">,</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">);</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">MysqlNativeResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="s1">'SELECT id, name FROM users WHERE id = ?'</span><span class="p">,</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">],</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="p">);</span>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">rows</span><span class="p">);</span><span class="w"> </span><span class="c1">// [{id: 1, name: Ada}]</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="n">MysqlNativeResult</span><span class="w"> </span><span class="n">insert</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">  </span><span class="s1">'INSERT INTO users (name) VALUES (@name)'</span><span class="p">,</span>
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">  </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Bob'</span><span class="p">},</span>
-</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="p">);</span>
-</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="n">print</span><span class="p">(</span><span class="n">insert</span><span class="p">.</span><span class="n">insertId</span><span class="p">);</span><span class="w"> </span><span class="c1">// the new AUTO_INCREMENT id</span>
-</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="n">print</span><span class="p">(</span><span class="n">insert</span><span class="p">.</span><span class="n">affectedRows</span><span class="p">);</span><span class="w"> </span><span class="c1">// 1</span>
-</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>
-</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="kt">int</span><span class="w"> </span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span>
-</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'UPDATE users SET name = ?'</span><span class="p">,</span><span class="w"> </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">[</span><span class="s1">'Cy'</span><span class="p">],</span><span class="w"> </span><span class="nl">transaction:</span><span class="w"> </span><span class="n">tx</span><span class="p">);</span>
-</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">commit</span><span class="p">(</span><span class="n">tx</span><span class="p">);</span><span class="w"> </span><span class="c1">// or pool.rollback(tx)</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">MysqlNativePool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MysqlNativePool</span><span class="p">.</span><span class="n">open</span><span class="p">(</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nl">user:</span><span class="w"> </span><span class="s1">'root'</span><span class="p">,</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'password'</span><span class="p">,</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'app'</span><span class="p">,</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">);</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="n">MysqlNativeResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="s1">'SELECT id, name FROM users WHERE id = ?'</span><span class="p">,</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">  </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">],</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="p">);</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">rows</span><span class="p">);</span><span class="w"> </span><span class="c1">// [{id: 1, name: Ada}]</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="n">MysqlNativeResult</span><span class="w"> </span><span class="n">insert</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">  </span><span class="s1">'INSERT INTO users (name) VALUES (@name)'</span><span class="p">,</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">  </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Bob'</span><span class="p">},</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="p">);</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="n">print</span><span class="p">(</span><span class="n">insert</span><span class="p">.</span><span class="n">insertId</span><span class="p">);</span><span class="w"> </span><span class="c1">// the new AUTO_INCREMENT id</span>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="n">print</span><span class="p">(</span><span class="n">insert</span><span class="p">.</span><span class="n">affectedRows</span><span class="p">);</span><span class="w"> </span><span class="c1">// 1</span>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="kt">int</span><span class="w"> </span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span>
+</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'UPDATE users SET name = ?'</span><span class="p">,</span><span class="w"> </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">[</span><span class="s1">'Cy'</span><span class="p">],</span><span class="w"> </span><span class="nl">transaction:</span><span class="w"> </span><span class="n">tx</span><span class="p">);</span>
+</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">commit</span><span class="p">(</span><span class="n">tx</span><span class="p">);</span><span class="w"> </span><span class="c1">// or pool.rollback(tx)</span>
 </span></code></pre></div>
 <ul>
 <li><code>parameters</code> is a list for <code>?</code>, or a map for <code>@name</code>.</li>
@@ -4245,7 +4175,6 @@ its connection goes back to the pool.</p>
   send them.</li>
 </ul>
 <h2 id="types">Types</h2>
-<p>The same as the Dox ORM on the Dart driver:</p>
 <table>
 <thead>
 <tr>
@@ -4293,20 +4222,25 @@ its connection goes back to the pool.</p>
 </tbody>
 </table>
 <p>MariaDB keeps <code>JSON</code> columns as <code>LONGTEXT</code>. So on MariaDB, <code>TEXT</code> that is a
-JSON object or array comes back decoded. The Dart driver does the same.</p>
+JSON object or array comes back decoded.</p>
 <h2 id="errors">Errors</h2>
-<p>A server error throws the same exception as the Dart driver:
-<code>MySQLServerException</code>, with the same <code>errorCode</code> (eg. <code>1062</code> for a
-duplicate key) and <code>message</code>. Other errors (eg. the server is down) throw
-<code>MySQLClientException</code>.</p>
+<p>Every error throws <code>MysqlException</code>. For an error from the server, <code>code</code>
+is the MySQL error number (eg. <code>1062</code> for a duplicate key) and <code>sqlState</code>
+is the 5 letter SQLSTATE. For other errors (eg. the server is down) both
+are null. <code>MysqlException</code> comes from <code>package:dox_orm/dox_orm.dart</code>.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'users'</span><span class="p">).</span><span class="n">insert</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="n">email</span><span class="p">});</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="p">}</span><span class="w"> </span><span class="kd">on</span><span class="w"> </span><span class="n">MysqlException</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">error</span><span class="p">.</span><span class="n">code</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">1062</span><span class="p">)</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="s1">'taken'</span><span class="p">);</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">}</span>
+</span></code></pre></div>
 <h2 id="not-yet">Not yet</h2>
 <ul>
-<li>The <code>timeZone</code>, <code>collation</code>, <code>serverPublicKey</code> and <code>timeoutMs</code> keys of the
-  Dart driver are not read. The connection uses <code>utf8mb4</code>.</li>
+<li>The <code>timeZone</code>, <code>collation</code>, <code>serverPublicKey</code> and <code>timeoutMs</code> keys are
+  not read. The connection uses <code>utf8mb4</code>.</li>
 <li>A login with <code>sha256_password</code> (not the default) does not work. The
   default <code>caching_sha2_password</code> and <code>mysql_native_password</code> work.</li>
-<li>A nested <code>transaction()</code> joins the outer one, like the Dart driver
-  (no savepoints).</li>
+<li>A nested <code>transaction()</code> joins the outer one (no savepoints).</li>
 </ul>
 
 

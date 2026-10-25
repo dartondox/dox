@@ -1384,8 +1384,6 @@
       
         
       
-        
-      
     
     
     
@@ -1561,34 +1559,6 @@
     
   
     Services
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../websocket/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WebSocket
   
 
     
@@ -4142,7 +4112,7 @@ or nginx in front of it. The proxy does TLS, HTTP/2 and gzip.</p>
 <pre class="mermaid"><code>flowchart LR
     C["Client"] --&gt;|HTTPS| X["Caddy or nginx&lt;br&gt;TLS, HTTP/2, gzip, body size limit"]
     X --&gt;|"plain HTTP on 127.0.0.1:3000"| D["Dox binary&lt;br&gt;bin/server, one isolate per core"]
-    D --&gt;|"one pool per isolate"| DB[("Database")]
+    D --&gt;|"one shared pool"| DB[("Database")]
     M["Migrations&lt;br&gt;bin/server.dart runs them once, before the server starts"] --&gt; DB</code></pre>
 <p>Then tell Dox to trust the proxy, so <code>req.ip()</code> and <code>req.scheme()</code> show the
 real client:</p>
@@ -4302,7 +4272,7 @@ Run each one on its own port (or machine) and list them in the proxy:</p>
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="kn">keepalive</span><span class="w"> </span><span class="mi">64</span><span class="p">;</span>
 </span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Websocket rooms then need a shared adapter (like Redis), because each
+<p>Socket.IO rooms then need a shared adapter (like Redis), because each
 process has its own memory.</p>
 
 

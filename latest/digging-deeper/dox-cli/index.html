@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://dartondox.dev/latest/3.x/digging-deeper/dox-cli/">
       
       
-        <link rel="prev" href="../websocket/">
+        <link rel="prev" href="../services/">
       
       
         <link rel="next" href="../deployment/">
@@ -1384,8 +1384,6 @@
       
         
       
-        
-      
     
     
     
@@ -1561,34 +1559,6 @@
     
   
     Services
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../websocket/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WebSocket
   
 
     
@@ -4369,7 +4339,7 @@
 <td>run the code generator</td>
 </tr>
 <tr>
-<td><code>dox create:controller &lt;name&gt; [-r] [-ws]</code></td>
+<td><code>dox create:controller &lt;name&gt; [-r]</code></td>
 <td>create a controller</td>
 </tr>
 <tr>
@@ -4478,11 +4448,9 @@ It also runs <code>build_runner watch</code>, so generated files stay up to date
 <h3 id="controller">Controller</h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>dox<span class="w"> </span>create:controller<span class="w"> </span>Blog<span class="w">       </span><span class="c1"># default controller</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>dox<span class="w"> </span>create:controller<span class="w"> </span>Blog<span class="w"> </span>-r<span class="w">    </span><span class="c1"># resource controller</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>dox<span class="w"> </span>create:controller<span class="w"> </span>Chat<span class="w"> </span>-ws<span class="w">   </span><span class="c1"># WebSocket controller</span>
 </span></code></pre></div>
 <ul>
-<li>A default or resource controller goes to <code>lib/app/http/controllers/</code>.</li>
-<li>A WebSocket controller goes to <code>lib/app/ws/controllers/</code>. See <a href="../websocket/">WebSocket</a>.</li>
+<li>A controller goes to <code>lib/app/http/controllers/</code>.</li>
 <li><code>-r</code> adds the methods <code>index</code>, <code>create</code>, <code>store</code>, <code>show</code>, <code>edit</code>, <code>update</code> and <code>destroy</code>.</li>
 </ul>
 <div class="admonition info">
@@ -4601,7 +4569,7 @@ To pick the version yourself, run the install command:</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../websocket/" class="md-footer__link md-footer__link--prev" aria-label="Previous: WebSocket">
+          <a href="../services/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Services">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -4611,7 +4579,7 @@ To pick the version yourself, run the install command:</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                WebSocket
+                Services
               </div>
             </div>
           </a>

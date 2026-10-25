@@ -1382,8 +1382,6 @@
       
         
       
-        
-      
     
     
     
@@ -1558,34 +1556,6 @@
     
   
     Services
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../digging-deeper/websocket/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WebSocket
   
 
     
@@ -4086,7 +4056,7 @@
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>dox_http_native: sha256 of dox_http_native-&lt;os&gt;-&lt;arch&gt;.&lt;ext&gt; does not match
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>dox_http_native: cargo build failed
 </span></code></pre></div>
-<p><strong>Cause.</strong> The build hook of <code>dox_http_native</code> (<code>packages/dox-http-native/hook/build.dart</code>) tries, in this order: the <code>lib_path</code> user define, a local <code>native/target/release</code> build, the GitHub release download, and <code>cargo build</code>. None worked. Common reasons:</p>
+<p><strong>Cause.</strong> The build hook of <code>dox_http_native</code> (<code>hook/build.dart</code> in <a href="https://github.com/dartondox/dox-http-native">its repo</a>) tries, in this order: the <code>lib_path</code> user define, a local <code>native/target/release</code> build, the GitHub release download, and <code>cargo build</code>. None worked. Common reasons:</p>
 <ul>
 <li>No internet during <code>dart pub get</code>, or the release has no build for your OS and CPU (there are builds for macOS arm64 and x64, Linux x64 and arm64, Windows x64).</li>
 <li>Rust is not installed, so the fallback <code>cargo build</code> can not run.</li>
@@ -4096,9 +4066,9 @@
 <p><strong>Fix.</strong> Pick one:</p>
 <ol>
 <li>Install Rust with <a href="https://rustup.rs">rustup</a> and run <code>dart pub get</code> again. The hook builds the library with <code>cargo</code>.</li>
-<li>When the reason is an ABI mismatch and you set <code>lib_path</code>, rebuild that library: <code>cargo build --release</code> in <code>packages/dox-http-native/native</code>.</li>
+<li>When the reason is an ABI mismatch and you set <code>lib_path</code>, rebuild that library: <code>cargo build --release</code> in the <code>native</code> folder of the <code>dox-http-native</code> repo.</li>
 <li>
-<p>Download the library from the GitHub release <code>dox_http_native-v&lt;version&gt;</code> yourself and point to it in the root <code>pubspec.yaml</code>:</p>
+<p>Download the library from the GitHub release <code>v&lt;version&gt;</code> of <a href="https://github.com/dartondox/dox-http-native/releases">dartondox/dox-http-native</a> yourself and point to it in the root <code>pubspec.yaml</code>:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">hooks</span><span class="p">:</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">user_defines</span><span class="p">:</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">dox_http_native</span><span class="p">:</span>
@@ -4109,11 +4079,11 @@
 <p>Build with <code>dox build</code> (it runs <code>dart build cli</code>), not with <code>dart compile exe</code>.</p>
 </li>
 </ol>
-<p>The native database drivers find their library the same way. They do not stop the app. The warning is then:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>[dox] warning: dox_postgres_native did not load, using the Dart postgres driver (&lt;reason&gt;)
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>[dox] warning: dox_mysql_native did not load, using the Dart mysql driver (&lt;reason&gt;)
+<p>The native database drivers find their library the same way. When it does not load, the app stops too, with:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>dox_postgres_native did not load: &lt;reason&gt;.
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>dox_mysql_native did not load: &lt;reason&gt;.
 </span></code></pre></div>
-<p>The Dart driver is used. To choose it on purpose set <code>DOX_DB_DRIVER=dart</code> or <code>extra: {'native': false}</code> on the connection.</p>
+<p>The fix is the same as above, with the <code>dox-postgres-native</code> or <code>dox-mysql-native</code> repo.</p>
 <p>See <a href="../../digging-deeper/native-server/">Native server</a>, <a href="../../database/postgres-native/">Postgres native</a> and <a href="../../database/mysql-native/">MySQL native</a>.</p>
 <h2 id="port-already-in-use">Port already in use</h2>
 <p><strong>Symptom.</strong> At start:</p>
@@ -4177,11 +4147,7 @@
 <h2 id="mysql-8-login-fails">MySQL 8 login fails</h2>
 <p><strong>Symptom.</strong> The connection to MySQL 8 is refused at login, while the same user works from the <code>mysql</code> client. Often the user was made with the default <code>caching_sha2_password</code> plugin.</p>
 <p><strong>Cause.</strong> <code>caching_sha2_password</code> needs either TLS or the server RSA public key to send the password. A client that has neither can not log in.</p>
-<p><strong>Fix.</strong> Both Dox drivers handle this by default:</p>
-<ul>
-<li>The native driver (<code>dox_mysql_native</code>) works with MySQL 8.4 <code>caching_sha2_password</code> and MariaDB 11.</li>
-<li>The Dart driver asks the server for its RSA key only with <code>useSSL: true</code>, or on <code>localhost</code>, <code>127.0.0.1</code>, <code>::1</code> and a Unix socket. On a remote host without TLS it does not ask, because a fake server could read the password. Migrations do the same.</li>
-</ul>
+<p><strong>Fix.</strong> The Dox MySQL driver (<code>dox_mysql_native</code>) works with MySQL 8.4 <code>caching_sha2_password</code> and MariaDB 11 by default.</p>
 <p>So check these settings on the connection in <code>lib/config/database.dart</code>:</p>
 <table>
 <thead>
@@ -4193,11 +4159,7 @@
 <tbody>
 <tr>
 <td>Remote host without TLS</td>
-<td>Give the key in <code>extra: {'serverPublicKey': '...'}</code> (safer), turn on <code>useSSL: true</code>, or set <code>extra: {'allowPublicKeyRetrieval': true}</code>.</td>
-</tr>
-<tr>
-<td><code>extra: {'allowPublicKeyRetrieval': false}</code></td>
-<td>Remove it, or give the key in <code>extra: {'serverPublicKey': '...'}</code>.</td>
+<td>Turn on <code>useSSL: true</code>.</td>
 </tr>
 <tr>
 <td><code>useSSL: true</code></td>

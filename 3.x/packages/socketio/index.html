@@ -1382,8 +1382,6 @@
       
         
       
-        
-      
     
     
     
@@ -1558,34 +1556,6 @@
     
   
     Services
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../digging-deeper/websocket/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WebSocket
   
 
     
@@ -2656,6 +2626,17 @@
     <span class="md-ellipsis">
       
         Many servers: Redis adapter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#emit-from-other-programs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Emit from other programs
       
     </span>
   </a>
@@ -4003,6 +3984,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#emit-from-other-programs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Emit from other programs
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -4031,14 +4023,9 @@
 <h1 id="socketio">Socket.IO</h1>
 <p>This page shows how to run a Socket.IO server with <code>dox_socketio</code>, inside Dox or on its own.</p>
 <p><code>dox_socketio</code> is a Socket.IO v4 server for Dart.
-The official clients connect to it with no changes: <code>socket.io-client</code> (JavaScript v4) and the Dart <code>socket_io_client</code> package.</p>
-<div class="admonition tip">
-<p class="admonition-title">Socket.IO or WebSocket?</p>
-<ul>
-<li><a href="../../digging-deeper/websocket/">WebSocket</a> (<code>dox_websocket</code>) runs inside the Dox HTTP server. It uses its own small JSON format.</li>
-<li>Socket.IO (this page) works with the Socket.IO clients. It has acks, namespaces, binary data and long-polling.</li>
-</ul>
-</div>
+The official clients connect to it with no changes: <code>socket.io-client</code> (JavaScript v4) and the Dart <code>socket_io_client</code> package.
+It has acks, rooms, namespaces, binary data and long-polling.
+Socket.IO is the way to do realtime in Dox.</p>
 <h2 id="install">Install</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_socketio
 </span></code></pre></div>
@@ -4141,7 +4128,7 @@ The official clients connect to it with no changes: <code>socket.io-client</code
 <li>Requests to <code>/socket.io/</code> go to Socket.IO before the router. Middleware and body reading are skipped.</li>
 <li>When it is off, there is no extra work per request.</li>
 <li><code>Dox().socketIo</code> is the server of this isolate: <code>Dox().socketIo?.to('room').emit('news', data)</code>.</li>
-<li><code>dox_websocket</code> (<code>Route.websocket</code>) still works next to it.</li>
+<li>Need a plain WebSocket with no Socket.IO protocol? <code>Route.websocket(path, handler)</code> in <code>dox_core</code> gives you the raw socket.</li>
 </ul>
 <div class="admonition warning">
 <p class="admonition-title">Many isolates</p>
@@ -4340,12 +4327,59 @@ Then a broadcast on one server reaches the clients of all servers.</p>
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nl">adapter:</span><span class="w"> </span><span class="n">RedisAdapter</span><span class="p">(</span><span class="nl">subscriber:</span><span class="w"> </span><span class="n">redis</span><span class="p">.</span><span class="n">duplicate</span><span class="p">(),</span><span class="w"> </span><span class="nl">publisher:</span><span class="w"> </span><span class="n">redis</span><span class="p">),</span>
 </span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>The subscriber needs its own connection. A Redis connection in subscribe mode can not run other commands.</p>
 <ul>
-<li>It uses the message format of <code>@socket.io/redis-adapter</code>. A Node.js server can share broadcasts with it, when Node uses a JSON parser.</li>
-<li><code>fetchSockets</code>, <code>socketsJoin</code> and broadcast acks only work on the local server.</li>
+<li><code>Redis</code> comes from the <code>ioredis</code> package (<code>^2.0.0-alpha.3</code>).</li>
+<li>The subscriber needs its own connection. A Redis connection in subscribe mode can not run other commands.</li>
+<li>It uses the format of <code>@socket.io/redis-adapter</code>. Node.js servers with that adapter can share one Redis with Dox servers.</li>
+<li>It reads messages in msgpack and in JSON. It writes msgpack, like the Node.js adapter.
+  If your Node.js servers use a JSON parser, set <code>format: RedisFormat.json</code>.</li>
+<li>Other servers can ask a Dox server for <code>fetchSockets</code>, <code>allRooms</code>, <code>socketsJoin</code>, <code>socketsLeave</code> and <code>disconnectSockets</code>. It answers.</li>
+<li>On a Dox server, <code>fetchSockets</code>, <code>socketsJoin</code>, <code>socketsLeave</code> and <code>disconnectSockets</code> only act on its own sockets.
+  To act on all servers, use an <a href="#emit-from-other-programs">emitter</a>.</li>
+<li>Broadcast acks from other servers: Dox clients get the event, but their acks are not sent back.</li>
+<li><code>serverSideEmit</code> from other servers is ignored.</li>
 <li>Long-polling needs sticky sessions when many servers share one port.
   If you can not have them, use <code>transports: ['websocket']</code> on the client.</li>
+</ul>
+<h2 id="emit-from-other-programs">Emit from other programs</h2>
+<p>An emitter sends events to your clients without a Socket.IO server.
+Use it in a queue worker, a cron job or a service in another language.
+It writes to Redis, and every server with the Redis adapter sends the event to its clients.</p>
+<p>Dart (for example in a Dox queue job or a CLI command):</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_socketio/dox_socketio.dart'</span><span class="p">;</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:ioredis/ioredis.dart'</span><span class="p">;</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="n">Redis</span><span class="w"> </span><span class="n">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Redis</span><span class="p">(</span><span class="n">RedisOptions</span><span class="p">(</span><span class="nl">host:</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">,</span><span class="w"> </span><span class="nl">port:</span><span class="w"> </span><span class="m">6379</span><span class="p">));</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="n">SocketIoEmitter</span><span class="w"> </span><span class="n">emitter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoEmitter</span><span class="p">(</span><span class="n">redis</span><span class="p">);</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="s1">'title'</span><span class="o">:</span><span class="w"> </span><span class="s1">'hello'</span><span class="p">});</span><span class="w"> </span><span class="c1">// all clients of `/`</span>
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="n">except</span><span class="p">(</span><span class="s1">'room2'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="s1">'hi room1'</span><span class="p">);</span>
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">of</span><span class="p">(</span><span class="s1">'/chat'</span><span class="p">).</span><span class="n">to</span><span class="p">(</span><span class="s1">'vip'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'notice'</span><span class="p">,</span><span class="w"> </span><span class="s1">'for vip'</span><span class="p">);</span>
+</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>
+</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="n">socketsJoin</span><span class="p">(</span><span class="s1">'room3'</span><span class="p">);</span><span class="w"> </span><span class="c1">// sockets in room1 join room3</span>
+</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room3'</span><span class="p">).</span><span class="n">socketsLeave</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">);</span>
+</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'banned'</span><span class="p">).</span><span class="n">disconnectSockets</span><span class="p">();</span>
+</span><span id="__span-11-15"><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>
+</span><span id="__span-11-16"><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">redis</span><span class="p">.</span><span class="n">disconnect</span><span class="p">();</span>
+</span><span id="__span-11-17"><a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Node.js, with <a href="https://www.npmjs.com/package/@socket.io/redis-emitter"><code>@socket.io/redis-emitter</code></a>:</p>
+<div class="language-js highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Emitter</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@socket.io/redis-emitter'</span><span class="p">;</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">createClient</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'redis'</span><span class="p">;</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">createClient</span><span class="p">({</span><span class="w"> </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="s1">'redis://127.0.0.1:6379'</span><span class="w"> </span><span class="p">});</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="k">await</span><span class="w"> </span><span class="nx">redis</span><span class="p">.</span><span class="nx">connect</span><span class="p">();</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="kd">const</span><span class="w"> </span><span class="nx">emitter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Emitter</span><span class="p">(</span><span class="nx">redis</span><span class="p">);</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="nx">emitter</span><span class="p">.</span><span class="nx">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="s1">'hello'</span><span class="w"> </span><span class="p">});</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="nx">emitter</span><span class="p">.</span><span class="k">of</span><span class="p">(</span><span class="s1">'/chat'</span><span class="p">).</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'notice'</span><span class="p">,</span><span class="w"> </span><span class="s1">'for everyone in /chat'</span><span class="p">);</span>
+</span></code></pre></div>
+<ul>
+<li>The emitters of other languages (PHP, Python, Go) use the same format, so they work too.</li>
+<li>Binary data (<code>Uint8List</code> in Dart, <code>Buffer</code> in Node.js) arrives as binary.</li>
+<li>The emitter does not wait for an answer. It can not know if a client got the event.</li>
+<li><code>key</code> must be the same as the <code>key</code> of the adapter. Both default to <code>socket.io</code>.</li>
 </ul>
 
 

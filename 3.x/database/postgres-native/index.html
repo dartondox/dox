@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="dox_postgres_native is the default Postgres driver of the Dox ORM. Rust talks to the database. Your models, queries and transactions stay the same. You do...">
+        <meta name="description" content="dox_postgres_native is the Postgres driver of the Dox ORM. Rust talks to the database. Your models, queries and transactions stay the same. You do not...">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Native Postgres driver | Dox">
-  <meta property="og:description" content="dox_postgres_native is the default Postgres driver of the Dox ORM. Rust talks to the database. Your models, queries and transactions stay the same. You do...">
+  <meta property="og:description" content="dox_postgres_native is the Postgres driver of the Dox ORM. Rust talks to the database. Your models, queries and transactions stay the same. You do not...">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/database/postgres-native/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Native Postgres driver | Dox">
-  <meta name="twitter:description" content="dox_postgres_native is the default Postgres driver of the Dox ORM. Rust talks to the database. Your models, queries and transactions stay the same. You do...">
+  <meta name="twitter:description" content="dox_postgres_native is the Postgres driver of the Dox ORM. Rust talks to the database. Your models, queries and transactions stay the same. You do not...">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -1382,8 +1382,6 @@
       
         
       
-        
-      
     
     
     
@@ -1558,34 +1556,6 @@
     
   
     Services
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../digging-deeper/websocket/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WebSocket
   
 
     
@@ -2033,10 +2003,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#native-is-the-default" class="md-nav__link">
+  <a href="#when-the-library-does-not-load" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Native is the default
+        When the library does not load
       
     </span>
   </a>
@@ -2044,10 +2014,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#use-the-dart-driver" class="md-nav__link">
+  <a href="#tls" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Use the Dart driver
+        TLS
       
     </span>
   </a>
@@ -2070,6 +2040,17 @@
     <span class="md-ellipsis">
       
         Use it without the ORM
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Values
       
     </span>
   </a>
@@ -3952,10 +3933,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#native-is-the-default" class="md-nav__link">
+  <a href="#when-the-library-does-not-load" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Native is the default
+        When the library does not load
       
     </span>
   </a>
@@ -3963,10 +3944,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#use-the-dart-driver" class="md-nav__link">
+  <a href="#tls" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Use the Dart driver
+        TLS
       
     </span>
   </a>
@@ -3989,6 +3970,17 @@
     <span class="md-ellipsis">
       
         Use it without the ORM
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Values
       
     </span>
   </a>
@@ -4054,7 +4046,7 @@
 
 
 <h1 id="native-postgres-driver">Native Postgres driver</h1>
-<p><code>dox_postgres_native</code> is the default Postgres driver of the Dox ORM.
+<p><code>dox_postgres_native</code> is the Postgres driver of the Dox ORM.
 Rust talks to the database. Your models, queries and transactions stay the
 same. You do not change any config.</p>
 <ul>
@@ -4064,13 +4056,12 @@ same. You do not change any config.</p>
   in one message.</li>
 <li>Each connection keeps its prepared statements. The same SQL is not parsed
   again.</li>
-<li>Values have the same Dart types as with the <code>postgres</code> package. Errors
-  are the same <code>ServerException</code> classes.</li>
+<li>Server errors are <code>PgServerException</code>. Other errors are <code>PgException</code>.</li>
 </ul>
 <div class="admonition warning">
 <p class="admonition-title">Alpha</p>
-<p>This driver is new. If you see a problem, <a href="#use-the-dart-driver">use the Dart driver</a>
-and tell us.</p>
+<p>This driver is new. If you see a problem, please
+<a href="https://github.com/dartondox/dox-postgres-native/issues">open an issue</a>.</p>
 </div>
 <h2 id="speed">Speed</h2>
 <p>One find-by-id query (<code>SELECT ... WHERE id = @id</code>), AOT build
@@ -4080,72 +4071,93 @@ and tell us.</p>
 <thead>
 <tr>
 <th></th>
-<th>Dart driver</th>
-<th>Native driver</th>
+<th>Time</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>One query at a time</td>
-<td>95 µs</td>
 <td>60 µs</td>
 </tr>
 <tr>
 <td>64 queries in flight, one isolate</td>
-<td>45 µs per query</td>
 <td>12.5 µs per query</td>
 </tr>
 <tr>
 <td>4 isolates, 64 in flight each, 16 connections per pool</td>
-<td>39,500 queries/s</td>
 <td>64,000 queries/s</td>
 </tr>
 </tbody>
 </table>
-<p>The gain is biggest when many requests run at the same time, like in a web
-server.</p>
+<p>Many requests at the same time, like in a web server, get the most out of it.</p>
 <h2 id="install">Install</h2>
 <p><code>dox_orm</code> depends on <code>dox_postgres_native</code>. You do not add it yourself.
 Add it only to use <code>PgNativePool</code> without the ORM:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_postgres_native
 </span></code></pre></div>
-<p>The build hook builds the Rust library with <code>cargo</code>, so you need
-<a href="https://rustup.rs">Rust</a> installed. Ready-built libraries (like the ones
-<code>dox_http_native</code> has) are not published for this driver yet.
-Without Rust, the ORM still works: it uses the Dart driver and prints one
-warning line (see below).</p>
+<p>You do not need Rust. The build hook downloads a ready-built library for
+your system. When there is no library for your system and no Rust to build
+one, the app stops with a clear error (see below).</p>
+<p>The package lives in its own repo:
+<a href="https://github.com/dartondox/dox-postgres-native">dartondox/dox-postgres-native</a>.</p>
 <p>Use <code>dart run</code>, <code>dart test</code> or <code>dart build cli</code>. <code>dart compile exe</code> does not
 run build hooks.</p>
-<h2 id="native-is-the-default">Native is the default</h2>
-<p>You do not change any config. The ORM picks the driver like this:</p>
-<ol>
-<li><code>driverFactory</code> is set: the ORM uses your driver. It wins over
-   everything below.</li>
-<li>You ask for the Dart driver (see below), or the connection uses TLS:
-   the ORM uses the Dart driver.</li>
-<li>The native library loads: the ORM uses the native driver.</li>
-<li>The native library does not load (no library for your system, no
-   Rust to build it, or a load error): the ORM uses the Dart driver. It
-   prints one warning line to stderr, like this:</li>
-</ol>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>[dox] warning: dox_postgres_native did not load, using the Dart postgres driver (...)
+<h2 id="when-the-library-does-not-load">When the library does not load</h2>
+<p>Postgres has no other driver in Dox. When the native library does not load,
+<code>SqlQueryBuilder.initializeWithDatabaseConfig</code> (and every other place that
+opens a Postgres connection) throws an <code>UnsupportedError</code> like this:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dox_postgres_native did not load: &lt;reason&gt;.
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Dox needs it to talk to Postgres. Fix: run the app with `dart run` or `dart build cli`. ...
 </span></code></pre></div>
-<p>Named connections (<code>withConnection('x')</code>, <code>transaction(..., connection: 'x')</code>) follow
-the same rules.</p>
-<h2 id="use-the-dart-driver">Use the Dart driver</h2>
-<p>For all connections, set the env var:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">DOX_DB_DRIVER</span><span class="o">=</span>dart<span class="w"> </span>dart<span class="w"> </span>run<span class="w"> </span>bin/server.dart
+<p>The reason tells what went wrong, for example no library for your system.
+To fix it:</p>
+<ul>
+<li>Run the app with <code>dart run</code>, <code>dart test</code> or <code>dart build cli</code>. They run the
+  build hook. <code>dart compile exe</code> does not.</li>
+<li>Or install <a href="https://rustup.rs">Rust</a>. The build hook then builds the
+  library from source.</li>
+<li>When you set <code>lib_path</code> in <code>pubspec.yaml</code>, check that the file is there
+  and is built for your system.</li>
+</ul>
+<p>A <code>driverFactory</code> on the connection wins over all of this: the ORM uses your
+driver.</p>
+<h2 id="tls">TLS</h2>
+<p>Set the TLS mode with <code>useSSL</code> or <code>extra['sslMode']</code>, or with <code>sslmode</code> in
+the <code>DATABASE_URL</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>disable</code></td>
+<td>No TLS. The default.</td>
+</tr>
+<tr>
+<td><code>prefer</code></td>
+<td>TLS when the server has it. No certificate check.</td>
+</tr>
+<tr>
+<td><code>require</code></td>
+<td>TLS. No certificate check, like libpq. <code>useSSL: true</code> gives this mode.</td>
+</tr>
+<tr>
+<td><code>verify-full</code></td>
+<td>TLS. The certificate and the host name are checked. It uses the Mozilla roots and the roots of the system.</td>
+</tr>
+</tbody>
+</table>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">ConnectionConfig</span><span class="p">(</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">postgres</span><span class="p">,</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="c1">// ... host, user, password, database as before</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'sslMode'</span><span class="o">:</span><span class="w"> </span><span class="s1">'verify-full'</span><span class="p">},</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nl">debug:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">),</span>
 </span></code></pre></div>
-<p>For one connection, set <code>native: false</code> in <code>extra</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">ConnectionConfig</span><span class="p">(</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">postgres</span><span class="p">,</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="c1">// ... host, user, password, database as before</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'native'</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="p">},</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nl">debug:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">),</span>
-</span></code></pre></div>
-<p>Postgres with TLS (<code>useSSL: true</code> or <code>extra['sslMode']</code>) always uses the
-Dart driver, because the native driver has no TLS yet.</p>
+<p>In a url, <code>sslmode=verify-ca</code> is read as <code>verify-full</code>.</p>
 <h2 id="options">Options</h2>
 <p>The driver reads these keys from <code>extra</code> of the <code>ConnectionConfig</code>:</p>
 <table>
@@ -4163,9 +4175,14 @@ Dart driver, because the native driver has no TLS yet.</p>
 <td>Most connections in the pool, for the whole process.</td>
 </tr>
 <tr>
+<td><code>sslMode</code></td>
+<td><code>disable</code></td>
+<td>TLS mode, see <a href="#tls">TLS</a>.</td>
+</tr>
+<tr>
 <td><code>timeZone</code></td>
 <td><code>UTC</code></td>
-<td>Time zone of the session, like the Dart driver.</td>
+<td>Time zone of the session.</td>
 </tr>
 <tr>
 <td><code>applicationName</code></td>
@@ -4190,30 +4207,42 @@ drops the one used longest ago. A request (pool slot, connect and query)
 fails after 300 s with no answer. A transaction that gets no request for
 300 s is rolled back.</p>
 <h2 id="use-it-without-the-orm">Use it without the ORM</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">PgNativePool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PgNativePool</span><span class="p">.</span><span class="n">open</span><span class="p">(</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nl">user:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">);</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">PgNativeResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="s1">'SELECT id, name FROM users WHERE id = @id'</span><span class="p">,</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'id'</span><span class="o">:</span><span class="w"> </span><span class="m">1</span><span class="p">},</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="p">);</span>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">rows</span><span class="p">);</span><span class="w"> </span><span class="c1">// [{id: 1, name: Ada}]</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="kt">int</span><span class="w"> </span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span>
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="s1">'UPDATE users SET name = @n'</span><span class="p">,</span><span class="w"> </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'n'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Bob'</span><span class="p">},</span><span class="w"> </span><span class="nl">transaction:</span><span class="w"> </span><span class="n">tx</span><span class="p">);</span>
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">commit</span><span class="p">(</span><span class="n">tx</span><span class="p">);</span><span class="w"> </span><span class="c1">// or pool.rollback(tx)</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">PgNativePool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PgNativePool</span><span class="p">.</span><span class="n">open</span><span class="p">(</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nl">user:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">);</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">PgNativeResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="s1">'SELECT id, name FROM users WHERE id = @id'</span><span class="p">,</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'id'</span><span class="o">:</span><span class="w"> </span><span class="m">1</span><span class="p">},</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="p">);</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">rows</span><span class="p">);</span><span class="w"> </span><span class="c1">// [{id: 1, name: Ada}]</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="kt">int</span><span class="w"> </span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="s1">'UPDATE users SET name = @n'</span><span class="p">,</span><span class="w"> </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'n'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Bob'</span><span class="p">},</span><span class="w"> </span><span class="nl">transaction:</span><span class="w"> </span><span class="n">tx</span><span class="p">);</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">commit</span><span class="p">(</span><span class="n">tx</span><span class="p">);</span><span class="w"> </span><span class="c1">// or pool.rollback(tx)</span>
 </span></code></pre></div>
 <ul>
 <li><code>parameters</code> is a map for <code>@name</code>, or a list for <code>$1, $2</code>.</li>
 <li>A transaction runs on one connection. Its queries run in the order you
   send them.</li>
+<li><code>PgNativePool.fromUrl('postgres://user:pass@host:5432/db?sslmode=require')</code>
+  makes a pool from a url.</li>
+</ul>
+<h2 id="values">Values</h2>
+<p>You send plain Dart values: <code>null</code>, <code>bool</code>, <code>int</code>, <code>double</code>, <code>String</code>,
+<code>DateTime</code>, <code>Duration</code> (an interval), <code>Uint8List</code> (bytea), <code>Map</code> (json) and
+<code>List</code> (an array, eg. for <code>int4[]</code>).</p>
+<ul>
+<li>The server picks the type. When it can not, add a cast in the SQL, eg.
+  <code>@id::int8</code>.</li>
+<li>A <code>List</code> is an array, not json. On insert and update the ORM sends a
+  <code>List</code> as json text, so a <code>List</code> in a json column works. With the pool
+  alone, send <code>jsonEncode(list)</code> for a json column.</li>
 </ul>
 <h2 id="types">Types</h2>
-<p>The same as the <code>postgres</code> package:</p>
 <table>
 <thead>
 <tr>
@@ -4247,6 +4276,18 @@ fails after 300 s with no answer. A transaction that gets no request for
 <td><code>DateTime</code> in UTC</td>
 </tr>
 <tr>
+<td><code>infinity</code> dates</td>
+<td>the text <code>'infinity'</code> or <code>'-infinity'</code></td>
+</tr>
+<tr>
+<td><code>time</code></td>
+<td><code>String</code>, eg. <code>'13:45:01.5'</code></td>
+</tr>
+<tr>
+<td><code>interval</code></td>
+<td><code>Duration</code> (a month is 30 days)</td>
+</tr>
+<tr>
 <td><code>json</code>, <code>jsonb</code></td>
 <td>the decoded JSON value</td>
 </tr>
@@ -4268,20 +4309,23 @@ fails after 300 s with no answer. A transaction that gets no request for
 </tr>
 </tbody>
 </table>
-<p>Other types decode with the type registry of the <code>postgres</code> package.</p>
+<p>Other types come back as <code>Uint8List</code>.</p>
 <h2 id="errors">Errors</h2>
-<p>A server error throws the same exception as the Dart driver:
-<code>ServerException</code>, or <code>UniqueViolationException</code> and
-<code>ForeignKeyViolationException</code>, with the same <code>code</code>, <code>detail</code>,
-<code>constraintName</code> and other fields. Other errors (eg. the server is down)
-throw <code>PgException</code>.</p>
+<p>A server error throws <code>PgServerException</code>. It has <code>code</code> (the SQLSTATE, eg.
+<code>23505</code> for a unique violation), <code>severity</code>, <code>message</code>, and <code>detail</code>, <code>hint</code>,
+<code>schema</code>, <code>table</code>, <code>column</code> and <code>constraint</code> when the server sends them.
+Other errors (eg. the server is down, a TLS error, a timeout) throw
+<code>PgException</code>. Both come from <code>package:dox_orm/dox_orm.dart</code>.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'users'</span><span class="p">).</span><span class="n">insert</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="n">email</span><span class="p">});</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="p">}</span><span class="w"> </span><span class="kd">on</span><span class="w"> </span><span class="n">PgServerException</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">error</span><span class="p">.</span><span class="n">code</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'23505'</span><span class="p">)</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="s1">'taken: </span><span class="si">${</span><span class="n">error</span><span class="p">.</span><span class="n">constraint</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">}</span>
+</span></code></pre></div>
 <h2 id="not-yet">Not yet</h2>
 <ul>
-<li>SSL. A connection with <code>useSSL: true</code> uses the Dart driver.</li>
-<li><code>maxConnectionAge</code>, <code>queryTimeout</code> and the other <code>extra</code> keys of the Dart
-  driver are not read.</li>
-<li>A nested <code>transaction()</code> joins the outer one, like the Dart driver
-  (no savepoints).</li>
+<li><code>maxConnectionAge</code> and <code>queryTimeout</code> are not read.</li>
+<li>A nested <code>transaction()</code> joins the outer one (no savepoints).</li>
 </ul>
 
 

@@ -1382,8 +1382,6 @@
       
         
       
-        
-      
     
     
     
@@ -1558,34 +1556,6 @@
     
   
     Services
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../digging-deeper/websocket/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WebSocket
   
 
     
@@ -4304,11 +4274,6 @@
 <td>Dox can not read the function type of the handler.</td>
 <td>Use a plain method or function.</td>
 </tr>
-<tr>
-<td><code>Exception: websocket is not registered</code></td>
-<td><code>Route.websocket()</code> runs before a <code>WebsocketServer(Dox())</code> exists.</td>
-<td>Add the WebSocket service to <code>services</code>. See <a href="../../digging-deeper/websocket/">WebSocket</a>.</td>
-</tr>
 </tbody>
 </table>
 <h2 id="dox_core-env">dox_core: env</h2>
@@ -4515,14 +4480,24 @@ The table shows the <code>message</code> text.</p>
 </thead>
 <tbody>
 <tr>
-<td><code>[dox] warning: dox_postgres_native did not load, using the Dart postgres driver (&lt;reason&gt;)</code></td>
-<td>The native Postgres library did not load.</td>
-<td>See <a href="../../database/postgres-native/">Postgres native</a>. Or set <code>DOX_DB_DRIVER=dart</code>.</td>
+<td><code>Unsupported operation: dox_postgres_native did not load: &lt;reason&gt;. Dox needs it to talk to Postgres. Fix: ...</code></td>
+<td>The native Postgres library did not load. The app stops.</td>
+<td>Follow the fix in the message. See <a href="../../database/postgres-native/#when-the-library-does-not-load">Postgres native</a>.</td>
 </tr>
 <tr>
-<td><code>[dox] warning: dox_mysql_native did not load, using the Dart mysql driver (&lt;reason&gt;)</code></td>
-<td>The native MySQL library did not load.</td>
-<td>See <a href="../../database/mysql-native/">MySQL native</a>.</td>
+<td><code>Unsupported operation: dox_mysql_native did not load: &lt;reason&gt;. Dox needs it to talk to MySQL. Fix: ...</code></td>
+<td>The native MySQL library did not load. The app stops.</td>
+<td>Follow the fix in the message. See <a href="../../database/mysql-native/#when-the-library-does-not-load">MySQL native</a>.</td>
+</tr>
+<tr>
+<td><code>PgServerException(&lt;code&gt;): &lt;message&gt;</code></td>
+<td>The Postgres server said no, eg. code <code>23505</code> for a unique violation.</td>
+<td>Read <code>code</code>, <code>detail</code> and <code>constraint</code> on the exception.</td>
+</tr>
+<tr>
+<td><code>MysqlException(&lt;code&gt;, &lt;sqlState&gt;): &lt;message&gt;</code></td>
+<td>An error from MySQL, eg. code <code>1062</code> for a duplicate key.</td>
+<td>Read <code>code</code> and <code>sqlState</code> on the exception.</td>
 </tr>
 <tr>
 <td><code>Exception: &lt;name&gt; not found</code></td>
@@ -4921,10 +4896,7 @@ The table shows the <code>message</code> text.</p>
 </table>
 <h2 id="native-libraries-build-hooks">Native libraries (build hooks)</h2>
 <p>Printed during <code>dart pub get</code>, <code>dox serve</code> or <code>dox build</code>. <code>&lt;pkg&gt;</code> is <code>dox_http_native</code>, <code>dox_postgres_native</code> or <code>dox_mysql_native</code>.</p>
-<ul>
-<li><code>dox_postgres_native</code> and <code>dox_mysql_native</code>: the app still runs, on the Dart DB driver.</li>
-<li><code>dox_http_native</code>: there is no fallback. The app stops at start with an error that says why the library did not load and how to fix it.</li>
-</ul>
+<p>None of them has a fallback. When the library is missing, the app stops with an error that says why the library did not load and how to fix it: at start for <code>dox_http_native</code>, when the ORM opens the database for <code>dox_postgres_native</code> and <code>dox_mysql_native</code>.</p>
 <table>
 <thead>
 <tr>
@@ -4937,7 +4909,7 @@ The table shows the <code>message</code> text.</p>
 <tr>
 <td><code>&lt;pkg&gt;: no native library for &lt;os&gt;-&lt;arch&gt;.</code></td>
 <td>No ready build for this OS and CPU.</td>
-<td>Install Rust. For a DB driver you may also accept the Dart fallback.</td>
+<td>Install Rust.</td>
 </tr>
 <tr>
 <td><code>&lt;pkg&gt;: download &lt;file&gt;: &lt;status&gt;</code> / <code>&lt;pkg&gt;: download &lt;file&gt; failed: &lt;error&gt;</code></td>

@@ -1615,8 +1615,6 @@
       
         
       
-        
-      
     
     
     
@@ -1791,34 +1789,6 @@
     
   
     Services
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../digging-deeper/websocket/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WebSocket
   
 
     
@@ -5091,7 +5061,7 @@ See <a href="../../digging-deeper/testing/">Testing</a>.</p>
   Run <code>dox build_runner:build</code> after a change, or let <code>dox serve</code> watch for you.</li>
 <li><strong>One native binary.</strong> <code>dox build</code> makes an AOT binary in <code>build/bundle</code>. There is no interpreter, no <code>vendor/</code> folder and no <code>composer install</code> on the server.
   The Docker image is about 11 MB.</li>
-<li><strong>A native HTTP server and native database drivers.</strong> Rust parses HTTP and talks to Postgres and MySQL. Your code stays in Dart. The HTTP server comes ready-built. The database drivers need Rust (<code>cargo</code>) to build; without it, Dox uses the Dart drivers.</li>
+<li><strong>A native HTTP server and native database drivers.</strong> Rust parses HTTP and talks to Postgres and MySQL. Your code stays in Dart. They come ready-built, so you do not need Rust.</li>
 <li><strong>Types everywhere.</strong> A DTO is a class with typed fields. A path param is an <code>int</code>. A model field is a <code>String?</code>. The compiler finds many mistakes before you run the app.</li>
 <li><strong>Async is explicit.</strong> Database calls return a <code>Future</code>. You write <code>await</code>. One isolate serves many requests at the same time while it waits for the database.</li>
 <li><strong>JSON API first.</strong> Dox returns text, JSON, files and streams. It has no view layer.</li>
@@ -5161,8 +5131,8 @@ See <a href="../../digging-deeper/testing/">Testing</a>.</p>
 </tbody>
 </table>
 <p>What is there, as separate packages: <a href="../../packages/validation/">validation</a>, <a href="../../packages/openapi/">OpenAPI docs</a>,
-<a href="../../packages/storage/">storage</a>, <a href="../../packages/cache/">cache</a>, <a href="../../packages/socketio/">Socket.IO</a>,
-<a href="../../digging-deeper/websocket/">WebSocket</a> and <a href="../../security/authentication/">auth</a>.</p>
+<a href="../../packages/storage/">storage</a>, <a href="../../packages/cache/">cache</a>, <a href="../../packages/socketio/">Socket.IO</a>
+and <a href="../../security/authentication/">auth</a>.</p>
 
 
 

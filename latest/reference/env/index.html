@@ -1382,8 +1382,6 @@
       
         
       
-        
-      
     
     
     
@@ -1558,34 +1556,6 @@
     
   
     Services
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../digging-deeper/websocket/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WebSocket
   
 
     
@@ -3584,17 +3554,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#only-for-work-on-dox-itself" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Only for work on Dox itself
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#how-env-is-parsed" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3894,17 +3853,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#only-for-work-on-dox-itself" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Only for work on Dox itself
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#how-env-is-parsed" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3989,13 +3937,6 @@
 <td><code>DOX_HTTP_THREAD=shared</code></td>
 </tr>
 <tr>
-<td><code>DOX_DB_DRIVER</code></td>
-<td><code>dox_orm</code> (<code>NativeDrivers.wanted()</code>)</td>
-<td>not set (native driver)</td>
-<td><code>dart</code> uses the Dart <code>postgres</code> / <code>mysql_dart</code> driver instead of the native (Rust) one. Same as <code>extra: {'native': false}</code>. Real environment only.</td>
-<td><code>DOX_DB_DRIVER=dart</code></td>
-</tr>
-<tr>
 <td><code>DATABASE_URL</code></td>
 <td><code>dox_orm</code> (<code>DatabaseConfig.url</code>), <code>dox_migration</code></td>
 <td>not set</td>
@@ -4004,7 +3945,7 @@
 </tr>
 <tr>
 <td><code>DB_CONNECTION</code></td>
-<td><code>dox_migration</code> (<code>DbConnection.open()</code>)</td>
+<td><code>dox_migration</code> (<code>DbConnection.config()</code>)</td>
 <td>postgres</td>
 <td><code>postgres</code>, <code>mysql</code> or <code>sqlite</code>. Any other value means postgres.</td>
 <td><code>DB_CONNECTION=sqlite</code></td>
@@ -4067,7 +4008,7 @@
 </tr>
 </tbody>
 </table>
-<p><code>DOX_HTTP_THREAD</code> and <code>DOX_DB_DRIVER</code> are read with <code>Platform.environment</code> or <code>std::env::var</code>. They do not work from <code>.env</code>.</p>
+<p><code>DOX_HTTP_THREAD</code> is read with <code>std::env::var</code>. It does not work from <code>.env</code>.</p>
 <h2 id="read-by-a-new-project">Read by a new project</h2>
 <p>A new project (<code>dox create</code>) reads these keys through its typed env class, <code>lib/config/env.dart</code>. The framework itself does not read them. In code, use the getter: <code>env.appPort</code>.</p>
 <table>
@@ -4201,28 +4142,6 @@
 </span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="na">DB_USERNAME</span><span class="o">=</span><span class="s">postgres</span>
 </span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="na">DB_PASSWORD</span><span class="o">=</span><span class="s">postgres</span>
 </span></code></pre></div>
-<h2 id="only-for-work-on-dox-itself">Only for work on Dox itself</h2>
-<table>
-<thead>
-<tr>
-<th>Variable</th>
-<th>Who reads it</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>PG_URL</code></td>
-<td>Rust tests of <code>dox_postgres_native</code></td>
-<td>A Postgres URL. The test is skipped when it is not set.</td>
-</tr>
-<tr>
-<td><code>DB_HOST</code>, <code>DB_PORT</code>, <code>THREADS</code></td>
-<td><code>packages/dox-postgres-native/tool/stress.dart</code></td>
-<td>The stress tool.</td>
-</tr>
-</tbody>
-</table>
 <h2 id="how-env-is-parsed">How <code>.env</code> is parsed</h2>
 <p><code>Env._loadEnv()</code> in <code>packages/dox-core/lib/env/env.dart</code>:</p>
 <ul>

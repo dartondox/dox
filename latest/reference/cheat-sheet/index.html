@@ -1382,8 +1382,6 @@
       
         
       
-        
-      
     
     
     
@@ -1558,34 +1556,6 @@
     
   
     Services
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../digging-deeper/websocket/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WebSocket
   
 
     
@@ -3643,10 +3613,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#websocket" class="md-nav__link">
+  <a href="#socketio" class="md-nav__link">
     <span class="md-ellipsis">
       
-        WebSocket
+        Socket.IO
       
     </span>
   </a>
@@ -4191,10 +4161,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#websocket" class="md-nav__link">
+  <a href="#socketio" class="md-nav__link">
     <span class="md-ellipsis">
       
-        WebSocket
+        Socket.IO
       
     </span>
   </a>
@@ -4322,7 +4292,7 @@
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>dox<span class="w"> </span>key:generate<span class="w">                   </span><span class="c1"># APP_KEY in .env</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>dox<span class="w"> </span>env:generate<span class="w">                   </span><span class="c1"># lib/config/env.dart from .env.example</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>dox<span class="w"> </span>env:check<span class="w">                      </span><span class="c1"># check the env, exit 1 when bad</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>dox<span class="w"> </span>create:controller<span class="w"> </span>Blog<span class="w"> </span><span class="o">[</span>-r<span class="o">]</span><span class="w"> </span><span class="o">[</span>-ws<span class="o">]</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>dox<span class="w"> </span>create:controller<span class="w"> </span>Blog<span class="w"> </span><span class="o">[</span>-r<span class="o">]</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>dox<span class="w"> </span>create:middleware<span class="w"> </span>Auth
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>dox<span class="w"> </span>create:dto<span class="w"> </span>CreateBlog
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>dox<span class="w"> </span>create:serializer<span class="w"> </span>Blog
@@ -4405,8 +4375,8 @@
 <td>CORS for some routes</td>
 </tr>
 <tr>
-<td><code>Route.websocket('ws', (WebsocketEvent e) { ... })</code></td>
-<td>needs <code>dox_websocket</code></td>
+<td><code>Route.websocket('echo', (WebSocket s, DoxRequest req) { ... })</code></td>
+<td>a raw WebSocket. For rooms and acks, use Socket.IO.</td>
 </tr>
 </tbody>
 </table>
@@ -4930,22 +4900,25 @@
 </span></code></pre></div>
 <p>Protect a route with <code>AuthMiddleware()</code>. Client sends <code>Authorization: Bearer &lt;token&gt;</code>.</p>
 <p>See <a href="../../security/authentication/">Authentication</a> and <a href="../../security/hashing/">Hashing</a>.</p>
-<h2 id="websocket">WebSocket</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1">// a service</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">WebsocketServer</span><span class="p">(</span><span class="n">Dox</span><span class="p">());</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1">// a route</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="n">Route</span><span class="p">.</span><span class="n">websocket</span><span class="p">(</span><span class="s1">'ws'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">WebsocketEvent</span><span class="w"> </span><span class="n">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">  </span><span class="n">event</span><span class="p">.</span><span class="kd">on</span><span class="p">(</span><span class="s1">'intro'</span><span class="p">,</span><span class="w"> </span><span class="n">chat</span><span class="p">.</span><span class="n">intro</span><span class="p">);</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="p">});</span>
-</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>
-</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="c1">// a controller method</span>
-</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="kt">void</span><span class="w"> </span><span class="n">intro</span><span class="p">(</span><span class="n">WebsocketEmitter</span><span class="w"> </span><span class="n">emitter</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="w">  </span><span class="n">emitter</span><span class="p">.</span><span class="n">room</span><span class="p">(</span><span class="s1">'chat'</span><span class="p">).</span><span class="n">emitExceptSender</span><span class="p">(</span><span class="s1">'intro'</span><span class="p">,</span><span class="w"> </span><span class="n">message</span><span class="p">);</span>
-</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="p">}</span>
+<h2 id="socketio">Socket.IO</h2>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ChatNamespace</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">NamespaceHandler</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'/chat'</span><span class="p">;</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">onConnection</span><span class="p">(</span><span class="n">Socket</span><span class="w"> </span><span class="n">socket</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">    </span><span class="n">socket</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="s1">'lobby'</span><span class="p">);</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">    </span><span class="n">socket</span><span class="p">.</span><span class="kd">on</span><span class="p">(</span><span class="s1">'chat'</span><span class="p">,</span><span class="w"> </span><span class="n">onChat</span><span class="p">);</span>
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>
+</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">onChat</span><span class="p">(</span><span class="n">SocketEvent</span><span class="w"> </span><span class="n">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="w">    </span><span class="n">event</span><span class="p">.</span><span class="n">socket</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'lobby'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'chat'</span><span class="p">,</span><span class="w"> </span><span class="n">event</span><span class="p">.</span><span class="n">data</span><span class="p">);</span>
+</span><span id="__span-14-13"><a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="w">    </span><span class="n">event</span><span class="p">.</span><span class="n">ack</span><span class="p">(</span><span class="s1">'ok'</span><span class="p">);</span>
+</span><span id="__span-14-14"><a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-14-15"><a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Client sends <code>{"event": "joinRoom", "message": "chat"}</code>. The join is refused unless you set <code>WebsocketServer().authorizeJoin</code>. Many isolates need <code>WebsocketRedisAdapter</code>.</p>
-<p>See <a href="../../digging-deeper/websocket/">WebSocket</a>.</p>
+<p>Turn it on with <code>SocketIoConfig</code> in <code>AppConfig</code>. Many isolates need the Redis adapter and <code>transports: ['websocket']</code> on the client.</p>
+<p>See <a href="../../packages/socketio/">Socket.IO</a>.</p>
 <h2 id="openapi">OpenAPI</h2>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">OpenApiConfig</span><span class="w"> </span><span class="n">openApi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenApiConfig</span><span class="p">(</span>
 </span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nl">info:</span><span class="w"> </span><span class="n">Info</span><span class="p">(</span><span class="nl">title:</span><span class="w"> </span><span class="s1">'Blog API'</span><span class="p">,</span><span class="w"> </span><span class="nl">version:</span><span class="w"> </span><span class="s1">'1.0.0'</span><span class="p">),</span>

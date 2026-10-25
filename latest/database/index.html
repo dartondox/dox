@@ -1381,8 +1381,6 @@
       
         
       
-        
-      
     
     
     
@@ -1557,34 +1555,6 @@
     
   
     Services
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../digging-deeper/websocket/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WebSocket
   
 
     
@@ -3959,7 +3929,7 @@ Dox works with Postgres, MySQL, MariaDB and SQLite through the <code>dox_orm</co
     M["Model or QueryBuilder"] --&gt; S["SQL text&lt;br&gt;quoted names, @values"]
     S --&gt; D{"Driver"}
     D --&gt; N["Native Rust pool&lt;br&gt;dox_postgres_native, dox_mysql_native"]
-    D --&gt; T["Dart driver&lt;br&gt;postgres, mysql_dart, sqlite3"]
+    D --&gt; T["sqlite3"]
     N --&gt; DB[("Database")]
     T --&gt; DB</code></pre>
 <h2 id="install">Install</h2>
@@ -3974,8 +3944,7 @@ Dox works with Postgres, MySQL, MariaDB and SQLite through the <code>dox_orm</co
 <tr>
 <th>Database</th>
 <th><code>Driver</code></th>
-<th>Default driver</th>
-<th>Fallback Dart driver</th>
+<th>Driver</th>
 <th>Pool</th>
 <th>Good for</th>
 </tr>
@@ -3985,7 +3954,6 @@ Dox works with Postgres, MySQL, MariaDB and SQLite through the <code>dox_orm</co
 <td>Postgres</td>
 <td><code>Driver.postgres</code></td>
 <td><a href="postgres-native/"><code>dox_postgres_native</code></a></td>
-<td><code>postgres</code></td>
 <td>Yes</td>
 <td>Production</td>
 </tr>
@@ -3993,7 +3961,6 @@ Dox works with Postgres, MySQL, MariaDB and SQLite through the <code>dox_orm</co
 <td>MySQL 8+ and MariaDB</td>
 <td><code>Driver.mysql</code></td>
 <td><a href="mysql-native/"><code>dox_mysql_native</code></a></td>
-<td><code>mysql_dart</code></td>
 <td>Yes</td>
 <td>Production</td>
 </tr>
@@ -4001,7 +3968,6 @@ Dox works with Postgres, MySQL, MariaDB and SQLite through the <code>dox_orm</co
 <td>SQLite</td>
 <td><code>Driver.sqlite</code></td>
 <td><code>sqlite3</code></td>
-<td>none</td>
 <td>No, one connection per isolate</td>
 <td>Development, tests, small apps</td>
 </tr>
@@ -4009,29 +3975,14 @@ Dox works with Postgres, MySQL, MariaDB and SQLite through the <code>dox_orm</co
 </table>
 <div class="admonition info">
 <p class="admonition-title">Native drivers</p>
-<p>Postgres and MySQL use a native (Rust) driver by default.
-It is faster when many requests run at the same time.
+<p>Postgres and MySQL use a native (Rust) driver.
+It is fast, most of all when many requests run at the same time.
 You do not change any config for it.</p>
-<p>The ORM uses the Dart driver in these cases:</p>
-<ul>
-<li>The native library can not load on your system. The ORM prints one warning line.</li>
-<li>Postgres uses TLS (<code>useSSL: true</code> or <code>extra['sslMode']</code>). The native Postgres driver has no TLS yet.</li>
-<li>You ask for it: set <code>DOX_DB_DRIVER=dart</code> for all connections,
-  or <code>extra: {'native': false}</code> for one connection.</li>
-</ul>
-<p>See the <a href="postgres-native/#use-the-dart-driver">Postgres</a> and
-<a href="mysql-native/#use-the-dart-driver">MySQL</a> pages.</p>
+<p>There is no other driver for Postgres and MySQL.
+When the native library can not load on your system, the app stops with an error that says why and how to fix it.
+See the <a href="postgres-native/#when-the-library-does-not-load">Postgres</a> and
+<a href="mysql-native/#when-the-library-does-not-load">MySQL</a> pages.</p>
 </div>
-<p>Dox picks the driver of a connection like this:</p>
-<pre class="mermaid"><code>flowchart TD
-    A["Driver.postgres or Driver.mysql"] --&gt; B{"DOX_DB_DRIVER=dart&lt;br&gt;or extra native: false?"}
-    B --&gt;|yes| X["Dart driver"]
-    B --&gt;|no| C{"Postgres with TLS?&lt;br&gt;useSSL or sslMode"}
-    C --&gt;|yes| X
-    C --&gt;|no| L{"Native library loads?"}
-    L --&gt;|no| W["Dart driver&lt;br&gt;prints one warning"]
-    L --&gt;|yes| N["Native Rust driver"]
-    Q["Driver.sqlite"] --&gt; S["sqlite3&lt;br&gt;one connection per isolate"]</code></pre>
 <h2 id="config">Config</h2>
 <p>Put the connections in <code>lib/config/database.dart</code>.
 <code>connection</code> is the name of the default connection.</p>
@@ -4074,7 +4025,7 @@ You do not change any config for it.</p>
 <li><code>user</code>, <code>password</code>, <code>host</code> and <code>port</code> are not used by SQLite.</li>
 </ul>
 <p>Start the ORM in a service.
-Each isolate runs the service. The native Postgres and MySQL drivers then share one pool per process (isolates with the same settings get the same pool), so <code>maxConnectionCount</code> is for the whole process. The Dart drivers make one pool per isolate.
+Each isolate runs the service. The Postgres and MySQL drivers share one pool per process (isolates with the same settings get the same pool), so <code>maxConnectionCount</code> is for the whole process.
 On shutdown, <code>SqlQueryBuilder.close()</code> closes every connection of the isolate.</p>
 <div class="language-dart highlight"><span class="filename">lib/services/orm_service.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ORMService</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">DoxService</span><span class="p">,</span><span class="w"> </span><span class="n">DoxShutdown</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nd">@override</span>
@@ -4132,8 +4083,8 @@ Other named connections do not change.</p>
 <ul>
 <li>The user, password and database name are url-decoded. Write <code>@</code> in a password as <code>%40</code>.</li>
 <li>No port: <code>5432</code> for Postgres, <code>3306</code> for MySQL.</li>
-<li><code>sslmode</code>: <code>disable</code>, <code>allow</code> and <code>prefer</code> mean no TLS. Other values turn TLS on. For Postgres it works like libpq: <code>require</code> encrypts but does not check the server certificate (Heroku urls use it). <code>verify-ca</code> and <code>verify-full</code> check the certificate. Use <code>verify-full</code> when your host supports it. <code>useSSL: true</code> in code also checks the certificate. Add <code>verifyCertificate=false</code> to skip the check, only for a self-signed certificate in development. For MySQL, <code>ssl=true</code> works too, and it checks the certificate.</li>
-<li>The native Postgres driver has no TLS yet. With TLS on, Postgres uses the Dart driver.</li>
+<li><code>sslmode</code>: <code>disable</code> means no TLS. For Postgres it works like libpq: <code>prefer</code> uses TLS when the server has it, <code>require</code> encrypts but does not check the server certificate (Heroku urls use it), and <code>verify-ca</code> and <code>verify-full</code> check the certificate. Use <code>verify-full</code> when your host supports it. <code>useSSL: true</code> in code is <code>require</code>. Set <code>extra['sslMode']</code> to <code>verify-full</code> to check the certificate. See <a href="postgres-native/#tls">Postgres TLS</a>.</li>
+<li>For MySQL, <code>ssl=true</code> (or <code>sslmode=require</code>) turns TLS on, and it checks the certificate. Add <code>verifyCertificate=false</code> to skip the check, only for a self-signed certificate in development.</li>
 <li><code>host=/path</code> (or <code>socket=/path</code>) connects to a Unix socket, like <code>host=/cloudsql/project:region:instance</code>. See <a href="#unix-socket">Unix socket</a>.</li>
 <li>Any other option goes to <code>extra</code>, like <code>?maxConnectionCount=20</code>. A number becomes an <code>int</code>, <code>true</code> and <code>false</code> a <code>bool</code>.</li>
 </ul>
@@ -4156,7 +4107,7 @@ Google Cloud SQL on Cloud Run uses <code>/cloudsql/PROJECT:REGION:INSTANCE</code
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nv">DATABASE_URL</span><span class="o">=</span>postgres://blog:secret@/blog?host<span class="o">=</span>/cloudsql/my-project:europe-west1:blog
 </span></code></pre></div>
 <p><strong>Postgres</strong>: the host is the socket folder, like in libpq.
-Both the native and the Dart Postgres driver use the socket file <code>&lt;folder&gt;/.s.PGSQL.&lt;port&gt;</code>.
+The driver uses the socket file <code>&lt;folder&gt;/.s.PGSQL.&lt;port&gt;</code>.
 A host that already ends with <code>/.s.PGSQL.5432</code> works too.</p>
 <p><strong>MySQL and MariaDB</strong>: the host is the socket file itself. The port is not used.
 On Cloud SQL, the socket file is <code>/cloudsql/PROJECT:REGION:INSTANCE</code>.
@@ -4166,7 +4117,7 @@ A local server often uses <code>/var/run/mysqld/mysqld.sock</code> or <code>/tmp
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="c1"># or</span>
 </span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="nv">DATABASE_URL</span><span class="o">=</span>mysql://app:secret@/app?socket<span class="o">=</span>/var/run/mysqld/mysqld.sock
 </span></code></pre></div>
-<p><code>?socket=</code> and <code>?host=</code> do the same thing. Both the native and the Dart MySQL driver use the socket.</p>
+<p><code>?socket=</code> and <code>?host=</code> do the same thing.</p>
 <h3 id="extra-options"><code>extra</code> options</h3>
 <p><code>extra</code> is a map in <code>ConnectionConfig</code> for driver options.</p>
 <table>
@@ -4186,12 +4137,6 @@ A local server often uses <code>/var/run/mysqld/mysqld.sock</code> or <code>/tmp
 <td>Most connections in the pool.</td>
 </tr>
 <tr>
-<td><code>native</code></td>
-<td>Postgres, MySQL</td>
-<td><code>true</code></td>
-<td><code>false</code> uses the Dart driver for this connection.</td>
-</tr>
-<tr>
 <td><code>threads</code></td>
 <td>Postgres, MySQL</td>
 <td><code>1</code></td>
@@ -4205,9 +4150,21 @@ A local server often uses <code>/var/run/mysqld/mysqld.sock</code> or <code>/tmp
 </tr>
 <tr>
 <td><code>preparedStatementCacheSize</code></td>
-<td>MySQL, and the Dart Postgres and SQLite drivers</td>
+<td>MySQL, SQLite</td>
 <td><code>100</code></td>
 <td>Prepared statements kept per connection.</td>
+</tr>
+<tr>
+<td><code>sslMode</code></td>
+<td>Postgres</td>
+<td><code>disable</code></td>
+<td>TLS mode: <code>disable</code>, <code>prefer</code>, <code>require</code> or <code>verify-full</code>.</td>
+</tr>
+<tr>
+<td><code>verifyCertificate</code></td>
+<td>MySQL</td>
+<td><code>true</code></td>
+<td><code>false</code> skips the TLS certificate check. Only for development.</td>
 </tr>
 <tr>
 <td><code>timeZone</code></td>
@@ -4229,20 +4186,6 @@ A local server often uses <code>/var/run/mysqld/mysqld.sock</code> or <code>/tmp
 </tr>
 </tbody>
 </table>
-<p>The Dart drivers read some more keys.
-The Dart Postgres driver reads the <code>PoolSettings</code> keys of the <code>postgres</code> package,
-like <code>sslMode</code>, <code>queryTimeout</code> and <code>connectTimeout</code>.
-The Dart MySQL driver reads <code>collation</code> (default <code>utf8mb4_general_ci</code>), <code>timeoutMs</code>,
-<code>timeZone</code>, <code>serverPublicKey</code> and <code>allowPublicKeyRetrieval</code>.</p>
-<div class="admonition info">
-<p class="admonition-title">MySQL 8 login without TLS</p>
-<p>The MySQL 8 default login (<code>caching_sha2_password</code>) needs the server RSA key without TLS.
-A fake server can send its own key and read the password.
-So the Dart driver only asks the server for it with TLS on, or on <code>localhost</code>,
-<code>127.0.0.1</code>, <code>::1</code> or a Unix socket.
-Else give the key in <code>serverPublicKey</code> (safer), set <code>useSSL: true</code>,
-or set <code>allowPublicKeyRetrieval: true</code>.</p>
-</div>
 <h3 id="table-and-column-names-are-quoted">Table and column names are quoted</h3>
 <p>Table and column names you pass to <code>select</code>, <code>where</code>, <code>join</code>, <code>groupBy</code>, <code>orderBy</code>,
 <code>insert</code> and <code>update</code> are quoted.
@@ -4280,9 +4223,8 @@ Models that a query returns use the connection of the query.</p>
 </span></code></pre></div>
 <h2 id="mysql-and-mariadb">MySQL and MariaDB</h2>
 <ul>
-<li>The default driver is <a href="mysql-native/"><code>dox_mysql_native</code></a>.
-  The fallback Dart driver is <code>mysql_dart</code>.</li>
-<li>Both have a connection pool and send values as bound parameters.</li>
+<li>The driver is <a href="mysql-native/"><code>dox_mysql_native</code></a>.</li>
+<li>It has a connection pool and sends values as bound parameters.</li>
 <li>MySQL 8 and 9 login (<code>caching_sha2_password</code>) works.</li>
 <li><code>CREATE</code>, <code>ALTER</code> and <code>DROP</code> are saved right away. A transaction can not undo them.</li>
 </ul>

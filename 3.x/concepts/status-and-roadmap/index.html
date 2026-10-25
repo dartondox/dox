@@ -1483,8 +1483,6 @@
       
         
       
-        
-      
     
     
     
@@ -1659,34 +1657,6 @@
     
   
     Services
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../digging-deeper/websocket/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WebSocket
   
 
     
@@ -3978,7 +3948,7 @@ All packages share one version number.</p>
 <td><code>dox_orm</code></td>
 <td>Query builder, models, relations, transactions, drivers</td>
 <td>May change</td>
-<td>16 test files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite, with the native and the Dart drivers.</td>
+<td>16 test files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite.</td>
 </tr>
 <tr>
 <td><code>dox_validation</code></td>
@@ -4035,12 +4005,6 @@ All packages share one version number.</p>
 <td>4 test files</td>
 </tr>
 <tr>
-<td><code>dox_websocket</code></td>
-<td>WebSocket routes and events</td>
-<td>May change</td>
-<td>4 test files, with Redis in CI</td>
-</tr>
-<tr>
 <td><code>dox_socketio</code></td>
 <td>Socket.IO v4 server with a Redis adapter</td>
 <td>May change</td>
@@ -4054,13 +4018,13 @@ All packages share one version number.</p>
 </tr>
 <tr>
 <td><code>dox_postgres_native</code></td>
-<td>Native Postgres client (Rust tokio-postgres), the default Postgres driver</td>
+<td>Native Postgres client (Rust tokio-postgres), the Postgres driver</td>
 <td>Experimental</td>
-<td>1 Dart test file, plus the <code>dox_orm</code> tests. No TLS yet.</td>
+<td>Dart tests, plus the <code>dox_orm</code> tests</td>
 </tr>
 <tr>
 <td><code>dox_mysql_native</code></td>
-<td>Native MySQL and MariaDB client (Rust mysql_async), the default MySQL driver</td>
+<td>Native MySQL and MariaDB client (Rust mysql_async), the MySQL driver</td>
 <td>Experimental</td>
 <td>1 Dart test file, plus the <code>dox_orm</code> tests</td>
 </tr>
@@ -4069,7 +4033,7 @@ All packages share one version number.</p>
 <div class="admonition note">
 <p class="admonition-title">About test coverage</p>
 <p>The repo does not measure line coverage. The "Tests" column counts test files and says where CI runs them.
-The CI setup is in <code>.github/workflows/test.yaml</code> and <code>native.yaml</code>.</p>
+The CI setup is in <code>.github/workflows/test.yaml</code>. The three native packages live in their own repos, with their own CI.</p>
 </div>
 <h2 id="what-dox-does-not-have-yet">What Dox does not have yet</h2>
 <p>These were checked by searching the code in <code>packages/*/lib</code> with <code>rg</code>.</p>

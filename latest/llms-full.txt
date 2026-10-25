@@ -198,7 +198,7 @@ at a time.
 
 -   :material-access-point: **Real time**
 
-    [WebSocket](digging-deeper/websocket.md) or [Socket.IO](packages/socketio.md), with Redis for many servers.
+    [Socket.IO](packages/socketio.md), with Redis for many servers.
 
 -   :material-shield-lock-outline: **Security**
 
@@ -347,7 +347,6 @@ All Dox packages use the same version.
 | `dox_orm` | query builder and models |
 | `dox_migration` | database migrations |
 | `dox_auth` | JWT authentication |
-| `dox_websocket` | WebSocket server |
 | `dox_builder`, `dox_annotation` | code generation for models and DTOs |
 | `dox_validation` | [typed validation schemas](../packages/validation.md) |
 | `dox_openapi` | [OpenAPI docs](../packages/openapi.md) |
@@ -644,9 +643,7 @@ void main() async {
 
   await Migrator(
     migrations: migrations,
-    connection: await databaseConfig
-        .getConnectionConfig()
-        .getDatabaseConnection(),
+    config: databaseConfig.getConnectionConfig(),
   ).migrate();
 
   await Dox().startServer();
@@ -1439,9 +1436,7 @@ void main() {
     Dox().totalIsolate(1);
     await Migrator(
       migrations: migrations,
-      connection: await databaseConfig
-          .getConnectionConfig()
-          .getDatabaseConnection(),
+      config: databaseConfig.getConnectionConfig(),
     ).migrate();
     await Dox().startServer();
   });
@@ -1778,18 +1773,15 @@ The native drivers live in Rust. There, isolates that open the same settings get
 | --- | --- | --- |
 | Postgres native (`dox_postgres_native`) | nothing | one pool of `maxConnectionCount` connections per settings, and one Rust runtime (`extra['threads']`, default `1`) |
 | MySQL native (`dox_mysql_native`) | nothing | one pool of `maxConnectionCount` connections per settings, and one Rust runtime |
-| Dart drivers (`postgres`, `mysql_dart`) | one pool of `maxConnectionCount` connections | nothing shared |
 | SQLite | one connection | nothing shared |
 
-So with the native drivers, the app opens at most `maxConnectionCount` connections, for any number of isolates.
-With the Dart drivers, it is `isolates × maxConnectionCount`: with 8 cores and the default of 10, 80 connections.
+So for Postgres and MySQL, the app opens at most `maxConnectionCount` connections, for any number of isolates.
 The pool size is always your choice. Set it below the `max_connections` of the database.
 
 The pool closes when the last isolate that uses it closes it.
     See [Native Postgres driver](../database/postgres-native.md#options).
 
-The native drivers are the default. When the native library does not load, the ORM uses the Dart driver and prints one warning line.
-Set `DOX_DB_DRIVER=dart` to use the Dart drivers on purpose. See [Database](../database/index.md).
+Postgres and MySQL have only the native drivers. When the native library does not load, the app stops with an error that says why and how to fix it. See [Database](../database/index.md).
 
 ## The layout of a Dox app
 
@@ -1809,8 +1801,7 @@ my_app/
 │   │   │   ├── middleware/      # *.middleware.dart
 │   │   │   ├── serializers/     # *.serializer.dart, custom JSON shapes
 │   │   │   └── response_handler.dart
-│   │   ├── models/              # one folder per model, *.model.dart
-│   │   └── ws/controllers/      # WebSocket controllers (dox_websocket)
+│   │   └── models/              # one folder per model, *.model.dart
 │   ├── config/
 │   │   ├── app.dart             # AppConfig: port, isolates, routers, middleware
 │   │   ├── cache.dart           # cache stores
@@ -2218,7 +2209,7 @@ See [Testing](../digging-deeper/testing.md).
   Run `dox build_runner:build` after a change, or let `dox serve` watch for you.
 - **One native binary.** `dox build` makes an AOT binary in `build/bundle`. There is no interpreter, no `vendor/` folder and no `composer install` on the server.
   The Docker image is about 11 MB.
-- **A native HTTP server and native database drivers.** Rust parses HTTP and talks to Postgres and MySQL. Your code stays in Dart. The HTTP server comes ready-built. The database drivers need Rust (`cargo`) to build; without it, Dox uses the Dart drivers.
+- **A native HTTP server and native database drivers.** Rust parses HTTP and talks to Postgres and MySQL. Your code stays in Dart. They come ready-built, so you do not need Rust.
 - **Types everywhere.** A DTO is a class with typed fields. A path param is an `int`. A model field is a `String?`. The compiler finds many mistakes before you run the app.
 - **Async is explicit.** Database calls return a `Future`. You write `await`. One isolate serves many requests at the same time while it waits for the database.
 - **JSON API first.** Dox returns text, JSON, files and streams. It has no view layer.
@@ -2244,8 +2235,8 @@ Dox 3.0 does not have these Laravel features. Check the [packages](../packages/v
 | Savepoints in nested transactions | not there. A nested `transaction()` joins the outer one. |
 
 What is there, as separate packages: [validation](../packages/validation.md), [OpenAPI docs](../packages/openapi.md),
-[storage](../packages/storage.md), [cache](../packages/cache.md), [Socket.IO](../packages/socketio.md),
-[WebSocket](../digging-deeper/websocket.md) and [auth](../security/authentication.md).
+[storage](../packages/storage.md), [cache](../packages/cache.md), [Socket.IO](../packages/socketio.md)
+and [auth](../security/authentication.md).
 
 
 ---
@@ -2287,7 +2278,7 @@ It lists facts only. Each project is good at different things.
 | ORM and relations | `dox_orm`: models, has one, has many, belongs to, many to many | Not built in | Built in: filters, joins, one-to-one, one-to-many, many-to-many | Not built in | Not built in |
 | Migrations | `dox migrate` (SQL or Dart files) | Not built in | Built in, versioned migrations | Not built in | Not built in |
 | Auth | `dox_auth`: JWT guard, password hashing | `dart_frog_auth`: Basic, Bearer and Cookie middleware | Built in: email and password, Google, Apple, GitHub, passkeys and more | Not built in | See their docs |
-| WebSocket | `dox_websocket` and a Socket.IO v4 server (`dox_socketio`) | `dart_frog_web_socket` (`webSocketHandler`) | Streaming methods over a managed WebSocket | `shelf_web_socket` | Built in |
+| WebSocket | A Socket.IO v4 server (`dox_socketio`) and raw `Route.websocket` | `dart_frog_web_socket` (`webSocketHandler`) | Streaming methods over a managed WebSocket | `shelf_web_socket` | Built in |
 | OpenAPI | Generated OpenAPI 3.1 (JSON, YAML) and a docs page | On their roadmap, not done | See their docs | See their docs | See their docs |
 | CLI and code generation | `dox` CLI, `build_runner` for DTOs, models and OpenAPI | `dart_frog` CLI: `create`, `dev` (hot reload), `build` | `serverpod` CLI, generates server and client code | No CLI (`shelf_router_generator` for routes from annotations) | No CLI |
 | Native binary | `dox build` makes an AOT binary | `dart_frog build` makes a production build with a Dockerfile | Deploy to Serverpod Cloud, Docker or Terraform. Binary: see their docs. | Your app is plain Dart. Compile it like any Dart program. | Your app is plain Dart. Compile it like any Dart program. |
@@ -2355,7 +2346,7 @@ No package is marked "stable API" yet. That comes with 3.0 stable.
 | Package | What it does | State | Tests |
 | --- | --- | --- | --- |
 | `dox_core` | Routes, middleware, controllers, request and response, isolates, config | May change | 29 test files. CI runs them on the native server. |
-| `dox_orm` | Query builder, models, relations, transactions, drivers | May change | 16 test files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite, with the native and the Dart drivers. |
+| `dox_orm` | Query builder, models, relations, transactions, drivers | May change | 16 test files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite. |
 | `dox_validation` | `@Dto` rules, fluent schemas, JSON Schema, Standard Schema | May change | 6 test files |
 | `dox_builder` | Code generator for models, DTOs, env classes and OpenAPI | May change | 4 test files |
 | `dox_annotation` | Annotations used by the generator | May change | 1 small test file. Mostly tested through `dox_builder`. |
@@ -2365,15 +2356,14 @@ No package is marked "stable API" yet. That comes with 3.0 stable.
 | `dox_cache` | Memory, file and Redis cache, tags, locks | May change | 4 test files, with Redis in CI |
 | `dox_storage` | Local disk and S3 (and S3-compatible) storage | May change | 7 test files, with MinIO in CI |
 | `dox_openapi` | OpenAPI 3.1 document and a docs page | May change | 4 test files |
-| `dox_websocket` | WebSocket routes and events | May change | 4 test files, with Redis in CI |
 | `dox_socketio` | Socket.IO v4 server with a Redis adapter | May change | 6 test files, with the real `socket.io-client` in CI |
 | `dox_http_native` | Native HTTP/1.1 server (Rust hyper), the default server | Experimental | 2 Dart test files and Rust tests. No WebSocket yet. |
-| `dox_postgres_native` | Native Postgres client (Rust tokio-postgres), the default Postgres driver | Experimental | 1 Dart test file, plus the `dox_orm` tests. No TLS yet. |
-| `dox_mysql_native` | Native MySQL and MariaDB client (Rust mysql_async), the default MySQL driver | Experimental | 1 Dart test file, plus the `dox_orm` tests |
+| `dox_postgres_native` | Native Postgres client (Rust tokio-postgres), the Postgres driver | Experimental | Dart tests, plus the `dox_orm` tests |
+| `dox_mysql_native` | Native MySQL and MariaDB client (Rust mysql_async), the MySQL driver | Experimental | 1 Dart test file, plus the `dox_orm` tests |
 
 !!! note "About test coverage"
     The repo does not measure line coverage. The "Tests" column counts test files and says where CI runs them.
-    The CI setup is in `.github/workflows/test.yaml` and `native.yaml`.
+    The CI setup is in `.github/workflows/test.yaml`. The three native packages live in their own repos, with their own CI.
 
 ## What Dox does not have yet
 
@@ -4837,7 +4827,7 @@ flowchart TD
     I1 -. "crash: the process exits" .-> S["Supervisor restarts the process<br>Docker, systemd"]
 ```
 
-With the native Postgres and MySQL drivers (the default), all isolates share one database pool in Rust. With the Dart drivers, each isolate has its own pool. See [How Dox works](../concepts/how-dox-works.md#where-the-database-pools-live).
+With the Postgres and MySQL drivers, all isolates share one database pool in Rust. See [How Dox works](../concepts/how-dox-works.md#where-the-database-pools-live).
 
 See [Native server](native-server.md) for the two servers.
 
@@ -4865,7 +4855,7 @@ await Dox().startServer();
 Use fewer isolates when:
 
 - the machine also runs the database or other heavy work, or
-- you use WebSocket rooms without the Redis adapter. A room only reaches clients on the same isolate. Use `1`, or see [WebSocket](websocket.md).
+- you use Socket.IO rooms without the Redis adapter. A room only reaches clients on the same isolate. Use `1`, or see [Socket.IO](../packages/socketio.md).
 
 ## Each isolate has its own memory
 
@@ -4906,7 +4896,7 @@ Source: https://dartondox.dev/latest/3.xdigging-deeper/services/
 
 # Services
 
-A service is a class with a `setup()` method. Dox runs it at start, in every isolate. Use it to set up things like the database, auth or WebSocket.
+A service is a class with a `setup()` method. Dox runs it at start, in every isolate. Use it to set up things like the database or auth.
 
 ## Why services
 
@@ -4997,7 +4987,7 @@ In each isolate, Dox does these steps in this order:
 2. It registers the routes of your routers.
 3. It starts the HTTP server.
 
-So routes can use what a service set up. For example, `Route.websocket()` needs the WebSocket service to run first.
+So routes can use what a service set up.
 
 `dox openapi:generate` also runs `setup()` of every service, because it needs the routes.
 
@@ -5033,281 +5023,6 @@ An error in `shutdown()` goes to `errorHandler`. The other services still run.
 - **Open connections in `setup()`, not in the constructor.** Dox copies the service object to each isolate. An open socket or database pool can not be copied, so the isolate fails to start.
 - **Keep `setup()` short.** It runs once per isolate. Data you load in it is kept once per isolate, so 8 isolates keep 8 copies.
 - **Do not depend on another isolate.** Each isolate has its own static values and singletons. To share data between isolates, use a database, Redis or the [cache](cache.md) with the `redis` driver.
-
-
----
-
-# WebSocket
-
-Source: https://dartondox.dev/latest/3.xdigging-deeper/websocket/
-
-# WebSocket
-
-`dox_websocket` adds WebSocket routes to a Dox app. Use it for live chat, notifications and other real-time updates.
-
-!!! tip "Want Socket.IO clients?"
-    Use [Socket.IO](../packages/socketio.md#in-a-dox-app-same-port-as-http). Turn it on with `AppConfig(socketIo: SocketIoConfig(enabled: true))`.
-    It runs on the same port, works with the official Socket.IO clients, and has acks and namespaces.
-    `dox_websocket` keeps working next to it.
-
-!!! info "WebSocket runs on the native server"
-    Rust does the upgrade and the WebSocket protocol. Your handlers stay in Dart.
-    See [Native server](native-server.md#websocket).
-
-## Setup
-
-### 1. Add the package
-
-```bash
-dart pub add dox_websocket:^3.0.0-alpha
-```
-
-### 2. Create a WebSocket service
-
-The service creates the WebSocket server in every isolate. See [Services](services.md).
-
-#### Many isolates (Redis)
-
-Pick this for production. It works with more than one isolate and more than one server.
-
-```dart title="lib/services/websocket_service.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:dox_websocket/dox_websocket.dart';
-import 'package:ioredis/ioredis.dart';
-
-class WebsocketService implements DoxService {
-  @override
-  void setup() {
-    Redis sub = Redis(RedisOptions(host: env.redisHost));
-    Redis pub = sub.duplicate();
-
-    WebsocketServer io = WebsocketServer(Dox());
-    io.adapter(WebsocketRedisAdapter(subscriber: sub, publisher: pub));
-  }
-}
-```
-
-Add [`ioredis`](https://pub.dev/packages/ioredis) `^2.0.0-alpha.2` to your `pubspec.yaml`.
-
-#### One isolate
-
-Pick this for a small app or for local work, when you do not want Redis.
-
-```dart title="lib/services/websocket_service.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:dox_websocket/dox_websocket.dart';
-
-class WebsocketService implements DoxService {
-  @override
-  void setup() {
-    WebsocketServer(Dox());
-  }
-}
-```
-
-Set `totalIsolate: 1` in `lib/config/app.dart` (or `APP_TOTAL_ISOLATE=1`).
-
-!!! warning "Many isolates need Redis"
-    Dox runs one isolate per CPU core by default. Each isolate has its own memory.
-    Without an adapter, a message only reaches clients on the same isolate.
-    The Redis adapter sends each message to all isolates and all servers.
-
-### 3. Register the service
-
-```dart title="lib/config/services.dart"
-List<DoxService> services = <DoxService>[
-  // ... other services
-  WebsocketService(),
-];
-```
-
-### 4. Create a controller
-
-```bash
-dox create:controller Chat -ws
-```
-
-This makes `lib/app/ws/controllers/chat.controller.dart`. Each method gets the `WebsocketEmitter` and the message from the client:
-
-```dart title="lib/app/ws/controllers/chat.controller.dart"
-import 'package:dox_websocket/dox_websocket.dart';
-
-class ChatController {
-  void intro(WebsocketEmitter emitter, dynamic message) {
-    // send to the 'chat' room, but not to the sender
-    emitter.room('chat').emitExceptSender('intro', message);
-  }
-
-  void noti(WebsocketEmitter emitter, dynamic message) {
-    // send to the 'chat' room, also to the sender
-    emitter.room('chat').emit('noti', message);
-  }
-}
-```
-
-A WebSocket connection stays open. So a controller method does not need to return a value.
-
-### 5. Add the route
-
-Use `Route.websocket(path, callback)`. In the callback, map each event name to a controller method:
-
-```dart title="lib/routes/web.dart"
-ChatController chat = ChatController();
-
-Route.websocket('ws', (WebsocketEvent event) {
-  // the client sends event `intro`: run chat.intro
-  event.on('intro', chat.intro);
-  event.on('noti', chat.noti);
-});
-```
-
-The URL is `ws://127.0.0.1:{port}/ws`. You can add more WebSocket routes on other paths.
-`Route.websocket` also takes `middleware:`, like other routes.
-
-## Messages
-
-Client and server send JSON text.
-
-The client sends `event` and `message`:
-
-```json
-{"event": "intro", "message": "Mingalaba!"}
-```
-
-The server sends `event`, `message`, `sender` (the socket id of the sender) and `room`:
-
-```json
-{"event": "intro", "message": "Mingalaba!", "sender": "ws:4f1c...", "room": "chat"}
-```
-
-Two events are built in:
-
-| Event | Direction | What it does |
-| --- | --- | --- |
-| `connected` | server to client | sent once after connect. `message` is `{"id": "<socket id>"}` |
-| `joinRoom` | client to server | joins the room, if `authorizeJoin` allows it. `message` is the room name, up to 255 chars. A name that starts with `room:` is ignored |
-
-A client starts in a room for its route, so `emitter.emit()` with no room reaches all clients of the same route. A client is in one room at a time. When it joins a room, it leaves the room it was in, also the route room.
-
-### Allow joins with `authorizeJoin`
-
-`joinRoom` is refused unless you set `authorizeJoin`. It gets the request that opened the websocket and the room name. Return `true` to allow the join.
-
-```dart
-WebsocketServer io = WebsocketServer(Dox());
-io.authorizeJoin = (IDoxRequest req, String room) {
-  // public rooms are open. a `user:` room only for its own user.
-  if (room.startsWith('chat:')) return true;
-  return room == 'user:${userIdOf(req)}';
-};
-```
-
-It can also return a `Future<bool>`.
-
-## Security options
-
-Set these on `WebsocketServer` in your service:
-
-| Option | Default | What it does |
-| --- | --- | --- |
-| `authorizeJoin` | `null` | decides who may `joinRoom`. When null, every join is refused |
-| `allowedOrigins` | `null` | origins that may open a websocket, like `['https://my.app']`. Other origins get 403. When null, any origin is allowed |
-| `maxMessageSize` | 1 MB | the biggest message a client may send. A bigger one closes the connection with code 1009 |
-
-- If you log users in with cookies, set `allowedOrigins`. Else any website can open a websocket as your user.
-- A request with no `Origin` header (not a browser) is allowed.
-- Compression is off. The native server checks the size of each message in Rust, before Dart reads it.
-
-## Client examples
-
-### Dart
-
-Use `WebSocket` from `dart:io`.
-
-```dart
-import 'dart:convert';
-import 'dart:io';
-
-void main() async {
-  WebSocket socket = await WebSocket.connect('ws://localhost:3000/ws');
-
-  socket.listen((dynamic data) {
-    Map<String, dynamic> payload = jsonDecode(data as String);
-    print('${payload['event']}: ${payload['message']}');
-  });
-
-  // join the chat room
-  socket.add(jsonEncode(<String, dynamic>{
-    'event': 'joinRoom',
-    'message': 'chat',
-  }));
-
-  // send the intro event
-  socket.add(jsonEncode(<String, dynamic>{
-    'event': 'intro',
-    'message': 'Mingalaba!',
-  }));
-}
-```
-
-### JavaScript
-
-Use the browser `WebSocket`, or the client [`@dartondox/websocket`](https://github.com/dartondox/dox-web-socket-client/):
-
-```js
-import DoxWebsocket from '@dartondox/websocket';
-
-const socket = DoxWebsocket('ws://127.0.0.1:3000/ws', {
-  maxRetries: 18,
-  retryAfter: 2000,
-});
-
-socket.onConnected(() => console.log(socket.id));
-socket.onError(() => console.log('socket error'));
-socket.onClose(() => console.log('socket closed'));
-
-// listen for the intro event from the server
-socket.on('intro', (msg) => console.log(msg));
-
-// send the intro event
-socket.emit('intro', 'Mingalaba!');
-```
-
-## WebsocketEmitter
-
-### `room`
-
-Pick the room to send to. Use the same name the client sent with `joinRoom`.
-
-```dart
-emitter.room('chat').emit('event-name', message);
-```
-
-`room()` returns a new emitter. The room does not stay set for later events.
-
-### `emit`
-
-Send to every client in the room. Without `room()`, this is every client of the same route.
-
-```dart
-emitter.emit('event-name', message);
-```
-
-### `emitExceptSender`
-
-Send to every client in the room, but not to the sender.
-
-```dart
-emitter.emitExceptSender('event-name', message);
-```
-
-### `emitToSender`
-
-Send only to the client that sent the event.
-
-```dart
-emitter.emitToSender('event-name', message);
-```
 
 
 ---
@@ -5349,7 +5064,7 @@ dart pub global deactivate dox
 | `dox serve` (or `dox s`) | start the dev server with build_runner watch |
 | `dox build` | build the native (AOT) bundle into `build/bundle` |
 | `dox build_runner:watch` / `dox build_runner:build` | run the code generator |
-| `dox create:controller <name> [-r] [-ws]` | create a controller |
+| `dox create:controller <name> [-r]` | create a controller |
 | `dox create:middleware <name>` | create a middleware |
 | `dox create:dto <name>` | create a DTO (typed, checked input) |
 | `dox create:serializer <name>` | create a serializer |
@@ -5427,11 +5142,9 @@ It writes a new `APP_KEY` to your `.env` file.
 ```bash
 dox create:controller Blog       # default controller
 dox create:controller Blog -r    # resource controller
-dox create:controller Chat -ws   # WebSocket controller
 ```
 
-- A default or resource controller goes to `lib/app/http/controllers/`.
-- A WebSocket controller goes to `lib/app/ws/controllers/`. See [WebSocket](websocket.md).
+- A controller goes to `lib/app/http/controllers/`.
 - `-r` adds the methods `index`, `create`, `store`, `show`, `edit`, `update` and `destroy`.
 
 !!! info "File and class names"
@@ -5648,7 +5361,7 @@ The whole setup looks like this:
 flowchart LR
     C["Client"] -->|HTTPS| X["Caddy or nginx<br>TLS, HTTP/2, gzip, body size limit"]
     X -->|"plain HTTP on 127.0.0.1:3000"| D["Dox binary<br>bin/server, one isolate per core"]
-    D -->|"one pool per isolate"| DB[("Database")]
+    D -->|"one shared pool"| DB[("Database")]
     M["Migrations<br>bin/server.dart runs them once, before the server starts"] --> DB
 ```
 
@@ -5805,7 +5518,7 @@ upstream dox {
 }
 ```
 
-Websocket rooms then need a shared adapter (like Redis), because each
+Socket.IO rooms then need a shared adapter (like Redis), because each
 process has its own memory.
 
 
@@ -5879,7 +5592,7 @@ Rust also does the WebSocket upgrade and the WebSocket protocol.
    messages back the same way as answers.
 
 - A message or frame over the size limit closes the socket with code `1009`.
-  Dart never reads it. `dox_websocket` uses `maxMessageSize`, Socket.IO uses
+  Dart never reads it. `NativeWebSocket.upgrade` takes `maxMessageSize`. Socket.IO uses
   `maxHttpBufferSize`.
 - Compression (permessage-deflate) is never agreed. A small compressed
   message could grow very big in memory.
@@ -5929,7 +5642,7 @@ that works:
     ```
 
 2. A local build in `native/target/release` of the package (for work on
-   Dox itself).
+   the package itself).
 3. The ready-built library from the GitHub release, checked with sha256.
    There are builds for macOS (arm64, x64), Linux (x64, arm64) and
    Windows (x64).
@@ -5944,23 +5657,31 @@ error above. Install Rust and run it again, so step 4 works.
 
 ## Work on the native code
 
-The Rust code is in `packages/dox-http-native/native`.
+`dox_http_native` lives in its own repo:
+[dartondox/dox-http-native](https://github.com/dartondox/dox-http-native).
+The Rust code is in its `native` folder.
 
 ```bash
-cd packages/dox-http-native/native
+git clone https://github.com/dartondox/dox-http-native
+cd dox-http-native/native
 cargo build --release   # the hook uses this build from now on
 cargo test
 cd .. && dart test --concurrency=1
 ```
 
-To make a release of the libraries, push a tag like
-`dox_http_native-v3.0.0-alpha.4`. The version in the tag must be the
-`version` in `packages/dox-http-native/pubspec.yaml`, because the build hook
-downloads from the tag of its own version.
+To use your local copy in the Dox repo, add it to the root
+`pubspec_overrides.yaml` of the Dox repo (git ignores this file), then run
+`dart pub get`:
 
-The `Native` workflow builds the 5 libraries and uploads them with a
-`SHA256SUMS` file. Copy the hashes into `_sha256` in `hook/build.dart` before
-you publish the package.
+```yaml
+dependency_overrides:
+  dox_http_native:
+    path: ../dox-http-native
+```
+
+To release the package, push a `v<version>` tag in its repo. Its CI builds
+the libraries, uploads them, fills the hashes and publishes the package to
+pub.dev.
 
 
 ---
@@ -6421,9 +6142,7 @@ void main() {
   setUpAll(() async {
     Dox().initialize(appConfig);
     await Migrator(
-      connection: await databaseConfig
-          .getConnectionConfig()
-          .getDatabaseConnection(),
+      config: databaseConfig.getConnectionConfig(),
     ).migrate();
     await ORMService().setup();
   });
@@ -6470,7 +6189,7 @@ flowchart LR
     M["Model or QueryBuilder"] --> S["SQL text<br>quoted names, @values"]
     S --> D{"Driver"}
     D --> N["Native Rust pool<br>dox_postgres_native, dox_mysql_native"]
-    D --> T["Dart driver<br>postgres, mysql_dart, sqlite3"]
+    D --> T["sqlite3"]
     N --> DB[("Database")]
     T --> DB
 ```
@@ -6489,40 +6208,21 @@ import 'package:dox_orm/dox_orm.dart';
 
 ## Supported databases
 
-| Database | `Driver` | Default driver | Fallback Dart driver | Pool | Good for |
-|---|---|---|---|---|---|
-| Postgres | `Driver.postgres` | [`dox_postgres_native`](postgres-native.md) | `postgres` | Yes | Production |
-| MySQL 8+ and MariaDB | `Driver.mysql` | [`dox_mysql_native`](mysql-native.md) | `mysql_dart` | Yes | Production |
-| SQLite | `Driver.sqlite` | `sqlite3` | none | No, one connection per isolate | Development, tests, small apps |
+| Database | `Driver` | Driver | Pool | Good for |
+|---|---|---|---|---|
+| Postgres | `Driver.postgres` | [`dox_postgres_native`](postgres-native.md) | Yes | Production |
+| MySQL 8+ and MariaDB | `Driver.mysql` | [`dox_mysql_native`](mysql-native.md) | Yes | Production |
+| SQLite | `Driver.sqlite` | `sqlite3` | No, one connection per isolate | Development, tests, small apps |
 
 !!! info "Native drivers"
-    Postgres and MySQL use a native (Rust) driver by default.
-    It is faster when many requests run at the same time.
+    Postgres and MySQL use a native (Rust) driver.
+    It is fast, most of all when many requests run at the same time.
     You do not change any config for it.
 
-    The ORM uses the Dart driver in these cases:
-
-    - The native library can not load on your system. The ORM prints one warning line.
-    - Postgres uses TLS (`useSSL: true` or `extra['sslMode']`). The native Postgres driver has no TLS yet.
-    - You ask for it: set `DOX_DB_DRIVER=dart` for all connections,
-      or `extra: {'native': false}` for one connection.
-
-    See the [Postgres](postgres-native.md#use-the-dart-driver) and
-    [MySQL](mysql-native.md#use-the-dart-driver) pages.
-
-Dox picks the driver of a connection like this:
-
-```mermaid
-flowchart TD
-    A["Driver.postgres or Driver.mysql"] --> B{"DOX_DB_DRIVER=dart<br>or extra native: false?"}
-    B -->|yes| X["Dart driver"]
-    B -->|no| C{"Postgres with TLS?<br>useSSL or sslMode"}
-    C -->|yes| X
-    C -->|no| L{"Native library loads?"}
-    L -->|no| W["Dart driver<br>prints one warning"]
-    L -->|yes| N["Native Rust driver"]
-    Q["Driver.sqlite"] --> S["sqlite3<br>one connection per isolate"]
-```
+    There is no other driver for Postgres and MySQL.
+    When the native library can not load on your system, the app stops with an error that says why and how to fix it.
+    See the [Postgres](postgres-native.md#when-the-library-does-not-load) and
+    [MySQL](mysql-native.md#when-the-library-does-not-load) pages.
 
 ## Config
 
@@ -6569,7 +6269,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 - `user`, `password`, `host` and `port` are not used by SQLite.
 
 Start the ORM in a service.
-Each isolate runs the service. The native Postgres and MySQL drivers then share one pool per process (isolates with the same settings get the same pool), so `maxConnectionCount` is for the whole process. The Dart drivers make one pool per isolate.
+Each isolate runs the service. The Postgres and MySQL drivers share one pool per process (isolates with the same settings get the same pool), so `maxConnectionCount` is for the whole process.
 On shutdown, `SqlQueryBuilder.close()` closes every connection of the isolate.
 
 ```dart title="lib/services/orm_service.dart"
@@ -6622,8 +6322,8 @@ DATABASE_URL=postgres://app:s%40cret@db.example.com:5432/blog?sslmode=require
 
 - The user, password and database name are url-decoded. Write `@` in a password as `%40`.
 - No port: `5432` for Postgres, `3306` for MySQL.
-- `sslmode`: `disable`, `allow` and `prefer` mean no TLS. Other values turn TLS on. For Postgres it works like libpq: `require` encrypts but does not check the server certificate (Heroku urls use it). `verify-ca` and `verify-full` check the certificate. Use `verify-full` when your host supports it. `useSSL: true` in code also checks the certificate. Add `verifyCertificate=false` to skip the check, only for a self-signed certificate in development. For MySQL, `ssl=true` works too, and it checks the certificate.
-- The native Postgres driver has no TLS yet. With TLS on, Postgres uses the Dart driver.
+- `sslmode`: `disable` means no TLS. For Postgres it works like libpq: `prefer` uses TLS when the server has it, `require` encrypts but does not check the server certificate (Heroku urls use it), and `verify-ca` and `verify-full` check the certificate. Use `verify-full` when your host supports it. `useSSL: true` in code is `require`. Set `extra['sslMode']` to `verify-full` to check the certificate. See [Postgres TLS](postgres-native.md#tls).
+- For MySQL, `ssl=true` (or `sslmode=require`) turns TLS on, and it checks the certificate. Add `verifyCertificate=false` to skip the check, only for a self-signed certificate in development.
 - `host=/path` (or `socket=/path`) connects to a Unix socket, like `host=/cloudsql/project:region:instance`. See [Unix socket](#unix-socket).
 - Any other option goes to `extra`, like `?maxConnectionCount=20`. A number becomes an `int`, `true` and `false` a `bool`.
 
@@ -6654,7 +6354,7 @@ DATABASE_URL=postgres://blog:secret@/blog?host=/cloudsql/my-project:europe-west1
 ```
 
 **Postgres**: the host is the socket folder, like in libpq.
-Both the native and the Dart Postgres driver use the socket file `<folder>/.s.PGSQL.<port>`.
+The driver uses the socket file `<folder>/.s.PGSQL.<port>`.
 A host that already ends with `/.s.PGSQL.5432` works too.
 
 **MySQL and MariaDB**: the host is the socket file itself. The port is not used.
@@ -6668,7 +6368,7 @@ DB_HOST=/var/run/mysqld/mysqld.sock
 DATABASE_URL=mysql://app:secret@/app?socket=/var/run/mysqld/mysqld.sock
 ```
 
-`?socket=` and `?host=` do the same thing. Both the native and the Dart MySQL driver use the socket.
+`?socket=` and `?host=` do the same thing.
 
 ### `extra` options
 
@@ -6677,27 +6377,14 @@ DATABASE_URL=mysql://app:secret@/app?socket=/var/run/mysqld/mysqld.sock
 | Key | Database | Default | What it does |
 |---|---|---|---|
 | `maxConnectionCount` | Postgres, MySQL | `10` | Most connections in the pool. |
-| `native` | Postgres, MySQL | `true` | `false` uses the Dart driver for this connection. |
 | `threads` | Postgres, MySQL | `1` | Rust threads of the native driver. |
 | `maxConnectionAge` | MySQL | 12 hours | A connection older than this is opened again. |
-| `preparedStatementCacheSize` | MySQL, and the Dart Postgres and SQLite drivers | `100` | Prepared statements kept per connection. |
+| `preparedStatementCacheSize` | MySQL, SQLite | `100` | Prepared statements kept per connection. |
+| `sslMode` | Postgres | `disable` | TLS mode: `disable`, `prefer`, `require` or `verify-full`. |
+| `verifyCertificate` | MySQL | `true` | `false` skips the TLS certificate check. Only for development. |
 | `timeZone` | Postgres | `UTC` | Time zone of the session. |
 | `applicationName` | Postgres | none | Name of the app in `pg_stat_activity`. |
 | `busyTimeout` | SQLite | `5000` | Milliseconds a query waits for a lock. |
-
-The Dart drivers read some more keys.
-The Dart Postgres driver reads the `PoolSettings` keys of the `postgres` package,
-like `sslMode`, `queryTimeout` and `connectTimeout`.
-The Dart MySQL driver reads `collation` (default `utf8mb4_general_ci`), `timeoutMs`,
-`timeZone`, `serverPublicKey` and `allowPublicKeyRetrieval`.
-
-!!! info "MySQL 8 login without TLS"
-    The MySQL 8 default login (`caching_sha2_password`) needs the server RSA key without TLS.
-    A fake server can send its own key and read the password.
-    So the Dart driver only asks the server for it with TLS on, or on `localhost`,
-    `127.0.0.1`, `::1` or a Unix socket.
-    Else give the key in `serverPublicKey` (safer), set `useSSL: true`,
-    or set `allowPublicKeyRetrieval: true`.
 
 ### Table and column names are quoted
 
@@ -6751,9 +6438,8 @@ await blog.save(); // saved on 'mysql'
 
 ## MySQL and MariaDB
 
-- The default driver is [`dox_mysql_native`](mysql-native.md).
-  The fallback Dart driver is `mysql_dart`.
-- Both have a connection pool and send values as bound parameters.
+- The driver is [`dox_mysql_native`](mysql-native.md).
+- It has a connection pool and sends values as bound parameters.
 - MySQL 8 and 9 login (`caching_sha2_password`) works.
 - `CREATE`, `ALTER` and `DROP` are saved right away. A transaction can not undo them.
 
@@ -7478,10 +7164,14 @@ DB_NAME=storage/app.db # file path, made if missing
 
 - `DB_DATABASE` works too, in place of `DB_NAME`.
 - The default port is `5432` for Postgres and `3306` for MySQL.
-- One run uses one database connection.
+- One run opens one driver and closes it at the end. Each migration runs on one connection.
 - A `DB_HOST` that starts with `/` is a Unix socket: the socket folder for Postgres, the socket file for MySQL. Eg. `/cloudsql/project:region:instance`.
 - Migrations use TLS only with a `DATABASE_URL` that has `sslmode` (Postgres) or `ssl` (MySQL), like `?sslmode=require`. For Postgres, `require` encrypts but does not check the server certificate, and `verify-full` checks it. MySQL `ssl=true` checks it. Add `&verifyCertificate=false` only for a self-signed certificate in development.
-  You can also give your own connection: `Migrator(migrations: migrations, connection: myPool)`.
+
+You can also give the database yourself:
+
+- `Migrator(migrations: migrations, config: databaseConfig.getConnectionConfig())` opens this config, and closes it at the end.
+- `Migrator(migrations: migrations, connection: SqlQueryBuilder().dbDriver)` runs on a driver that is already open. The migrator does not close it.
 
 ## Transactions
 
@@ -7804,7 +7494,7 @@ Source: https://dartondox.dev/latest/3.xdatabase/postgres-native/
 
 # Native Postgres driver
 
-`dox_postgres_native` is the default Postgres driver of the Dox ORM.
+`dox_postgres_native` is the Postgres driver of the Dox ORM.
 Rust talks to the database. Your models, queries and transactions stay the
 same. You do not change any config.
 
@@ -7814,12 +7504,11 @@ same. You do not change any config.
   in one message.
 - Each connection keeps its prepared statements. The same SQL is not parsed
   again.
-- Values have the same Dart types as with the `postgres` package. Errors
-  are the same `ServerException` classes.
+- Server errors are `PgServerException`. Other errors are `PgException`.
 
 !!! warning "Alpha"
-    This driver is new. If you see a problem, [use the Dart driver](#use-the-dart-driver)
-    and tell us.
+    This driver is new. If you see a problem, please
+    [open an issue](https://github.com/dartondox/dox-postgres-native/issues).
 
 ## Speed
 
@@ -7827,14 +7516,13 @@ One find-by-id query (`SELECT ... WHERE id = @id`), AOT build
 (`dart build cli`), Postgres 14 on the same machine (Apple M-series),
 4 connections:
 
-| | Dart driver | Native driver |
-|---|---|---|
-| One query at a time | 95 µs | 60 µs |
-| 64 queries in flight, one isolate | 45 µs per query | 12.5 µs per query |
-| 4 isolates, 64 in flight each, 16 connections per pool | 39,500 queries/s | 64,000 queries/s |
+| | Time |
+|---|---|
+| One query at a time | 60 µs |
+| 64 queries in flight, one isolate | 12.5 µs per query |
+| 4 isolates, 64 in flight each, 16 connections per pool | 64,000 queries/s |
 
-The gain is biggest when many requests run at the same time, like in a web
-server.
+Many requests at the same time, like in a web server, get the most out of it.
 
 ## Install
 
@@ -7845,56 +7533,62 @@ Add it only to use `PgNativePool` without the ORM:
 dart pub add dox_postgres_native
 ```
 
-The build hook builds the Rust library with `cargo`, so you need
-[Rust](https://rustup.rs) installed. Ready-built libraries (like the ones
-`dox_http_native` has) are not published for this driver yet.
-Without Rust, the ORM still works: it uses the Dart driver and prints one
-warning line (see below).
+You do not need Rust. The build hook downloads a ready-built library for
+your system. When there is no library for your system and no Rust to build
+one, the app stops with a clear error (see below).
+
+The package lives in its own repo:
+[dartondox/dox-postgres-native](https://github.com/dartondox/dox-postgres-native).
 
 Use `dart run`, `dart test` or `dart build cli`. `dart compile exe` does not
 run build hooks.
 
-## Native is the default
+## When the library does not load
 
-You do not change any config. The ORM picks the driver like this:
-
-1. `driverFactory` is set: the ORM uses your driver. It wins over
-   everything below.
-2. You ask for the Dart driver (see below), or the connection uses TLS:
-   the ORM uses the Dart driver.
-3. The native library loads: the ORM uses the native driver.
-4. The native library does not load (no library for your system, no
-   Rust to build it, or a load error): the ORM uses the Dart driver. It
-   prints one warning line to stderr, like this:
+Postgres has no other driver in Dox. When the native library does not load,
+`SqlQueryBuilder.initializeWithDatabaseConfig` (and every other place that
+opens a Postgres connection) throws an `UnsupportedError` like this:
 
 ```text
-[dox] warning: dox_postgres_native did not load, using the Dart postgres driver (...)
+dox_postgres_native did not load: <reason>.
+Dox needs it to talk to Postgres. Fix: run the app with `dart run` or `dart build cli`. ...
 ```
 
-Named connections (`withConnection('x')`, `transaction(..., connection: 'x')`) follow
-the same rules.
+The reason tells what went wrong, for example no library for your system.
+To fix it:
 
-## Use the Dart driver
+- Run the app with `dart run`, `dart test` or `dart build cli`. They run the
+  build hook. `dart compile exe` does not.
+- Or install [Rust](https://rustup.rs). The build hook then builds the
+  library from source.
+- When you set `lib_path` in `pubspec.yaml`, check that the file is there
+  and is built for your system.
 
-For all connections, set the env var:
+A `driverFactory` on the connection wins over all of this: the ORM uses your
+driver.
 
-```bash
-DOX_DB_DRIVER=dart dart run bin/server.dart
-```
+## TLS
 
-For one connection, set `native: false` in `extra`:
+Set the TLS mode with `useSSL` or `extra['sslMode']`, or with `sslmode` in
+the `DATABASE_URL`:
+
+| Mode | What it does |
+|---|---|
+| `disable` | No TLS. The default. |
+| `prefer` | TLS when the server has it. No certificate check. |
+| `require` | TLS. No certificate check, like libpq. `useSSL: true` gives this mode. |
+| `verify-full` | TLS. The certificate and the host name are checked. It uses the Mozilla roots and the roots of the system. |
 
 ```dart
 ConnectionConfig(
   driver: Driver.postgres,
   // ... host, user, password, database as before
-  extra: <String, dynamic>{'native': false},
+  extra: <String, dynamic>{'sslMode': 'verify-full'},
   debug: false,
 ),
 ```
 
-Postgres with TLS (`useSSL: true` or `extra['sslMode']`) always uses the
-Dart driver, because the native driver has no TLS yet.
+In a url, `sslmode=verify-ca` is read as `verify-full`.
 
 ## Options
 
@@ -7903,7 +7597,8 @@ The driver reads these keys from `extra` of the `ConnectionConfig`:
 | Key | Default | What it does |
 |---|---|---|
 | `maxConnectionCount` | `10` | Most connections in the pool, for the whole process. |
-| `timeZone` | `UTC` | Time zone of the session, like the Dart driver. |
+| `sslMode` | `disable` | TLS mode, see [TLS](#tls). |
+| `timeZone` | `UTC` | Time zone of the session. |
 | `applicationName` | none | Name of the app in `pg_stat_activity`. |
 | `threads` | `1` | Rust threads for all pools of the process. `0` is one thread with a single-thread runtime. Only the first pool sets it. |
 
@@ -7943,10 +7638,22 @@ await pool.commit(tx); // or pool.rollback(tx)
 - `parameters` is a map for `@name`, or a list for `$1, $2`.
 - A transaction runs on one connection. Its queries run in the order you
   send them.
+- `PgNativePool.fromUrl('postgres://user:pass@host:5432/db?sslmode=require')`
+  makes a pool from a url.
+
+## Values
+
+You send plain Dart values: `null`, `bool`, `int`, `double`, `String`,
+`DateTime`, `Duration` (an interval), `Uint8List` (bytea), `Map` (json) and
+`List` (an array, eg. for `int4[]`).
+
+- The server picks the type. When it can not, add a cast in the SQL, eg.
+  `@id::int8`.
+- A `List` is an array, not json. On insert and update the ORM sends a
+  `List` as json text, so a `List` in a json column works. With the pool
+  alone, send `jsonEncode(list)` for a json column.
 
 ## Types
-
-The same as the `postgres` package:
 
 | Postgres | Dart |
 |---|---|
@@ -7956,29 +7663,37 @@ The same as the `postgres` package:
 | `text`, `varchar`, `char` | `String` |
 | `bool` | `bool` |
 | `timestamp`, `timestamptz`, `date` | `DateTime` in UTC |
+| `infinity` dates | the text `'infinity'` or `'-infinity'` |
+| `time` | `String`, eg. `'13:45:01.5'` |
+| `interval` | `Duration` (a month is 30 days) |
 | `json`, `jsonb` | the decoded JSON value |
 | `uuid` | `String` |
 | `bytea` | `Uint8List` |
 | arrays of most types above | `List` |
 | `NULL` | `null` |
 
-Other types decode with the type registry of the `postgres` package.
+Other types come back as `Uint8List`.
 
 ## Errors
 
-A server error throws the same exception as the Dart driver:
-`ServerException`, or `UniqueViolationException` and
-`ForeignKeyViolationException`, with the same `code`, `detail`,
-`constraintName` and other fields. Other errors (eg. the server is down)
-throw `PgException`.
+A server error throws `PgServerException`. It has `code` (the SQLSTATE, eg.
+`23505` for a unique violation), `severity`, `message`, and `detail`, `hint`,
+`schema`, `table`, `column` and `constraint` when the server sends them.
+Other errors (eg. the server is down, a TLS error, a timeout) throw
+`PgException`. Both come from `package:dox_orm/dox_orm.dart`.
+
+```dart
+try {
+  await QueryBuilder.table('users').insert(<String, dynamic>{'email': email});
+} on PgServerException catch (error) {
+  if (error.code == '23505') print('taken: ${error.constraint}');
+}
+```
 
 ## Not yet
 
-- SSL. A connection with `useSSL: true` uses the Dart driver.
-- `maxConnectionAge`, `queryTimeout` and the other `extra` keys of the Dart
-  driver are not read.
-- A nested `transaction()` joins the outer one, like the Dart driver
-  (no savepoints).
+- `maxConnectionAge` and `queryTimeout` are not read.
+- A nested `transaction()` joins the outer one (no savepoints).
 
 
 ---
@@ -7989,7 +7704,7 @@ Source: https://dartondox.dev/latest/3.xdatabase/mysql-native/
 
 # Native MySQL driver
 
-`dox_mysql_native` is the default MySQL and MariaDB driver of the Dox ORM.
+`dox_mysql_native` is the MySQL and MariaDB driver of the Dox ORM.
 Rust talks to the database. Your models, queries and transactions stay the
 same. You do not change any config.
 
@@ -7999,14 +7714,14 @@ same. You do not change any config.
   in one message.
 - Each connection keeps its prepared statements. The same SQL is not
   prepared again.
-- Values have the same Dart types as with the Dart driver (`mysql_dart`).
-  Errors are the same `MySQLServerException` class.
+- Errors are `MysqlException`, with the MySQL error `code` and the
+  `sqlState`.
 - Works with MySQL 8.4 (the default `caching_sha2_password` login) and
   MariaDB 11.
 
 !!! warning "Alpha"
-    This driver is new. If you see a problem, [use the Dart driver](#use-the-dart-driver)
-    and tell us.
+    This driver is new. If you see a problem, please
+    [open an issue](https://github.com/dartondox/dox-mysql-native/issues).
 
 ## Speed
 
@@ -8014,22 +7729,20 @@ One find-by-id query (`SELECT * FROM t WHERE id = @id`), AOT build
 (`dart build cli`), database on the same machine (Apple M-series),
 10 connections, one isolate:
 
-| | Dart driver | Native driver |
-|---|---|---|
-| MySQL 8.4, one query at a time | 61 µs | 67 µs |
-| MySQL 8.4, 32 queries in flight | 25 µs per query | 11 µs per query |
-| MySQL 8.4, CPU time of the app per query | 32 µs | 13.5 µs |
-| MariaDB 11, one query at a time | 59 µs | 63 µs |
-| MariaDB 11, 32 queries in flight | 25.5 µs per query | 9.7 µs per query |
-| MariaDB 11, CPU time of the app per query | 32.5 µs | 12.4 µs |
+| | Time |
+|---|---|
+| MySQL 8.4, one query at a time | 67 µs |
+| MySQL 8.4, 32 queries in flight | 11 µs per query |
+| MySQL 8.4, CPU time of the app per query | 13.5 µs |
+| MariaDB 11, one query at a time | 63 µs |
+| MariaDB 11, 32 queries in flight | 9.7 µs per query |
+| MariaDB 11, CPU time of the app per query | 12.4 µs |
 
 The CPU time counts the Dart thread and the Rust thread. It is the limit
-on one CPU core: about 31,000 queries per second with the Dart driver and
-about 75,000 with the native driver.
+on one CPU core: about 75,000 queries per second.
 
-One query at a time is about the same speed: most of the time is the trip
-to the database. The gain is big when many requests run at the same time,
-like in a web server.
+One query at a time spends most of its time on the trip to the database.
+Many requests at the same time, like in a web server, get the most out of it.
 
 ## Install
 
@@ -8040,52 +7753,38 @@ Add it only to use `MysqlNativePool` without the ORM:
 dart pub add dox_mysql_native
 ```
 
-The build hook builds the Rust library with `cargo`, so you need
-[Rust](https://rustup.rs) installed. Ready-built libraries (like the ones
-`dox_http_native` has) are not published for this driver yet.
-Without Rust, the ORM still works: it uses the Dart driver and prints one
-warning line (see below).
+You do not need Rust. The build hook downloads a ready-built library for
+your system. When there is no library for your system and no Rust to build
+one, the app stops with a clear error (see below).
+
+The package lives in its own repo:
+[dartondox/dox-mysql-native](https://github.com/dartondox/dox-mysql-native).
 
 Use `dart run`, `dart test` or `dart build cli`. `dart compile exe` does not
 run build hooks.
 
-## Native is the default
+## When the library does not load
 
-You do not change any config. The ORM picks the driver like this:
-
-1. `driverFactory` is set: the ORM uses your driver. It wins over
-   everything below.
-2. You ask for the Dart driver (see below): the ORM uses the Dart driver.
-3. The native library loads: the ORM uses the native driver.
-4. The native library does not load (no library for your system, no
-   Rust to build it, or a load error): the ORM uses the Dart driver. It
-   prints one warning line to stderr, like this:
+MySQL has no other driver in Dox. When the native library does not load,
+`SqlQueryBuilder.initializeWithDatabaseConfig` (and every other place that
+opens a MySQL connection) throws an `UnsupportedError` like this:
 
 ```text
-[dox] warning: dox_mysql_native did not load, using the Dart mysql driver (...)
+dox_mysql_native did not load: <reason>.
+Dox needs it to talk to MySQL. Fix: run the app with `dart run` or `dart build cli`. ...
 ```
 
-Named connections (`withConnection('x')`, `transaction(..., connection: 'x')`) follow
-the same rules.
+To fix it:
 
-## Use the Dart driver
+- Run the app with `dart run`, `dart test` or `dart build cli`. They run the
+  build hook. `dart compile exe` does not.
+- Or install [Rust](https://rustup.rs). The build hook then builds the
+  library from source.
+- When you set `lib_path` in `pubspec.yaml`, check that the file is there
+  and is built for your system.
 
-For all connections, set the env var:
-
-```bash
-DOX_DB_DRIVER=dart dart run bin/server.dart
-```
-
-For one connection, set `native: false` in `extra`:
-
-```dart
-ConnectionConfig(
-  driver: Driver.mysql,
-  // ... host, user, password, database as before
-  extra: <String, dynamic>{'native': false},
-  debug: false,
-),
-```
+A `driverFactory` on the connection wins over all of this: the ORM uses your
+driver.
 
 ## Options
 
@@ -8147,8 +7846,6 @@ await pool.commit(tx); // or pool.rollback(tx)
 
 ## Types
 
-The same as the Dox ORM on the Dart driver:
-
 | MySQL / MariaDB | Dart |
 |---|---|
 | `TINYINT(1)` (`boolean()`) | `bool` |
@@ -8162,23 +7859,30 @@ The same as the Dox ORM on the Dart driver:
 | `NULL` | `null` |
 
 MariaDB keeps `JSON` columns as `LONGTEXT`. So on MariaDB, `TEXT` that is a
-JSON object or array comes back decoded. The Dart driver does the same.
+JSON object or array comes back decoded.
 
 ## Errors
 
-A server error throws the same exception as the Dart driver:
-`MySQLServerException`, with the same `errorCode` (eg. `1062` for a
-duplicate key) and `message`. Other errors (eg. the server is down) throw
-`MySQLClientException`.
+Every error throws `MysqlException`. For an error from the server, `code`
+is the MySQL error number (eg. `1062` for a duplicate key) and `sqlState`
+is the 5 letter SQLSTATE. For other errors (eg. the server is down) both
+are null. `MysqlException` comes from `package:dox_orm/dox_orm.dart`.
+
+```dart
+try {
+  await QueryBuilder.table('users').insert(<String, dynamic>{'email': email});
+} on MysqlException catch (error) {
+  if (error.code == 1062) print('taken');
+}
+```
 
 ## Not yet
 
-- The `timeZone`, `collation`, `serverPublicKey` and `timeoutMs` keys of the
-  Dart driver are not read. The connection uses `utf8mb4`.
+- The `timeZone`, `collation`, `serverPublicKey` and `timeoutMs` keys are
+  not read. The connection uses `utf8mb4`.
 - A login with `sha256_password` (not the default) does not work. The
   default `caching_sha2_password` and `mysql_native_password` work.
-- A nested `transaction()` joins the outer one, like the Dart driver
-  (no savepoints).
+- A nested `transaction()` joins the outer one (no savepoints).
 
 
 ---
@@ -10625,10 +10329,8 @@ This page shows how to run a Socket.IO server with `dox_socketio`, inside Dox or
 
 `dox_socketio` is a Socket.IO v4 server for Dart.
 The official clients connect to it with no changes: `socket.io-client` (JavaScript v4) and the Dart `socket_io_client` package.
-
-!!! tip "Socket.IO or WebSocket?"
-    - [WebSocket](../digging-deeper/websocket.md) (`dox_websocket`) runs inside the Dox HTTP server. It uses its own small JSON format.
-    - Socket.IO (this page) works with the Socket.IO clients. It has acks, namespaces, binary data and long-polling.
+It has acks, rooms, namespaces, binary data and long-polling.
+Socket.IO is the way to do realtime in Dox.
 
 ## Install
 
@@ -10728,7 +10430,7 @@ AppConfig appConfig = AppConfig(
 - Requests to `/socket.io/` go to Socket.IO before the router. Middleware and body reading are skipped.
 - When it is off, there is no extra work per request.
 - `Dox().socketIo` is the server of this isolate: `Dox().socketIo?.to('room').emit('news', data)`.
-- `dox_websocket` (`Route.websocket`) still works next to it.
+- Need a plain WebSocket with no Socket.IO protocol? `Route.websocket(path, handler)` in `dox_core` gives you the raw socket.
 
 !!! warning "Many isolates"
     Dox runs one isolate per CPU core, and each isolate has its own Socket.IO server.
@@ -10857,12 +10559,65 @@ SocketIoServer io = SocketIoServer(
 );
 ```
 
-The subscriber needs its own connection. A Redis connection in subscribe mode can not run other commands.
-
-- It uses the message format of `@socket.io/redis-adapter`. A Node.js server can share broadcasts with it, when Node uses a JSON parser.
-- `fetchSockets`, `socketsJoin` and broadcast acks only work on the local server.
+- `Redis` comes from the `ioredis` package (`^2.0.0-alpha.3`).
+- The subscriber needs its own connection. A Redis connection in subscribe mode can not run other commands.
+- It uses the format of `@socket.io/redis-adapter`. Node.js servers with that adapter can share one Redis with Dox servers.
+- It reads messages in msgpack and in JSON. It writes msgpack, like the Node.js adapter.
+  If your Node.js servers use a JSON parser, set `format: RedisFormat.json`.
+- Other servers can ask a Dox server for `fetchSockets`, `allRooms`, `socketsJoin`, `socketsLeave` and `disconnectSockets`. It answers.
+- On a Dox server, `fetchSockets`, `socketsJoin`, `socketsLeave` and `disconnectSockets` only act on its own sockets.
+  To act on all servers, use an [emitter](#emit-from-other-programs).
+- Broadcast acks from other servers: Dox clients get the event, but their acks are not sent back.
+- `serverSideEmit` from other servers is ignored.
 - Long-polling needs sticky sessions when many servers share one port.
   If you can not have them, use `transports: ['websocket']` on the client.
+
+## Emit from other programs
+
+An emitter sends events to your clients without a Socket.IO server.
+Use it in a queue worker, a cron job or a service in another language.
+It writes to Redis, and every server with the Redis adapter sends the event to its clients.
+
+Dart (for example in a Dox queue job or a CLI command):
+
+```dart
+import 'package:dox_socketio/dox_socketio.dart';
+import 'package:ioredis/ioredis.dart';
+
+Future<void> main() async {
+  Redis redis = Redis(RedisOptions(host: '127.0.0.1', port: 6379));
+  SocketIoEmitter emitter = SocketIoEmitter(redis);
+
+  await emitter.emit('news', {'title': 'hello'}); // all clients of `/`
+  await emitter.to('room1').except('room2').emit('news', 'hi room1');
+  await emitter.of('/chat').to('vip').emit('notice', 'for vip');
+
+  await emitter.to('room1').socketsJoin('room3'); // sockets in room1 join room3
+  await emitter.to('room3').socketsLeave('room1');
+  await emitter.to('banned').disconnectSockets();
+
+  await redis.disconnect();
+}
+```
+
+Node.js, with [`@socket.io/redis-emitter`](https://www.npmjs.com/package/@socket.io/redis-emitter):
+
+```js
+import { Emitter } from '@socket.io/redis-emitter';
+import { createClient } from 'redis';
+
+const redis = createClient({ url: 'redis://127.0.0.1:6379' });
+await redis.connect();
+
+const emitter = new Emitter(redis);
+emitter.to('room1').emit('news', { title: 'hello' });
+emitter.of('/chat').emit('notice', 'for everyone in /chat');
+```
+
+- The emitters of other languages (PHP, Python, Go) use the same format, so they work too.
+- Binary data (`Uint8List` in Dart, `Buffer` in Node.js) arrives as binary.
+- The emitter does not wait for an answer. It can not know if a client got the event.
+- `key` must be the same as the `key` of the adapter. Both default to `socket.io`.
 
 
 ---
@@ -13047,9 +12802,7 @@ void main() {
     await deleteDbFile();
     await Migrator(
       migrations: migrations,
-      connection: await testDatabase
-          .getConnectionConfig()
-          .getDatabaseConnection(),
+      config: testDatabase.getConnectionConfig(),
     ).migrate();
     SqlQueryBuilder.initializeWithDatabaseConfig(testDatabase);
   });
@@ -14484,7 +14237,7 @@ Dox starts one isolate per CPU core it sees. On `cpus = 1` that is one isolate.
 | more machines | use Postgres, then `fly scale count 2`. With SQLite, stay at one machine |
 | a fixed number of isolates | set `APP_TOTAL_ISOLATE` in `[env]` |
 
-Each machine is its own process. WebSocket rooms and the memory cache are not shared between machines.
+Each machine is its own process. Socket.IO rooms and the memory cache are not shared between machines.
 
 ## Update the app
 
@@ -14748,7 +14501,7 @@ dox build_runner:build             # make .g.dart files
 dox key:generate                   # APP_KEY in .env
 dox env:generate                   # lib/config/env.dart from .env.example
 dox env:check                      # check the env, exit 1 when bad
-dox create:controller Blog [-r] [-ws]
+dox create:controller Blog [-r]
 dox create:middleware Auth
 dox create:dto CreateBlog
 dox create:serializer Blog
@@ -14793,7 +14546,7 @@ class ApiRouter extends Router {
 | `Route.resource('blogs', BlogController())` | `index`, `create`, `store`, `show`, `edit`, `update`, `destroy` |
 | `Route.files('files')` | serve a storage disk, signed URLs only |
 | `Route.enabledCors(() { ... })` / `Route.disabledCors(...)` | CORS for some routes |
-| `Route.websocket('ws', (WebsocketEvent e) { ... })` | needs `dox_websocket` |
+| `Route.websocket('echo', (WebSocket s, DoxRequest req) { ... })` | a raw WebSocket. For rooms and acks, use Socket.IO. |
 
 Controller parameters, by type: `DoxRequest`, one `@Dto` class, `String`/`int`/`double`/`num`/`bool` for path params (by position). Only positional parameters.
 
@@ -15120,26 +14873,29 @@ Protect a route with `AuthMiddleware()`. Client sends `Authorization: Bearer <to
 
 See [Authentication](../security/authentication.md) and [Hashing](../security/hashing.md).
 
-## WebSocket
+## Socket.IO
 
 ```dart
-// a service
-WebsocketServer(Dox());
+class ChatNamespace extends NamespaceHandler {
+  @override
+  String get path => '/chat';
 
-// a route
-Route.websocket('ws', (WebsocketEvent event) {
-  event.on('intro', chat.intro);
-});
+  @override
+  void onConnection(Socket socket) {
+    socket.join('lobby');
+    socket.on('chat', onChat);
+  }
 
-// a controller method
-void intro(WebsocketEmitter emitter, dynamic message) {
-  emitter.room('chat').emitExceptSender('intro', message);
+  void onChat(SocketEvent event) {
+    event.socket.to('lobby').emit('chat', event.data);
+    event.ack('ok');
+  }
 }
 ```
 
-Client sends `{"event": "joinRoom", "message": "chat"}`. The join is refused unless you set `WebsocketServer().authorizeJoin`. Many isolates need `WebsocketRedisAdapter`.
+Turn it on with `SocketIoConfig` in `AppConfig`. Many isolates need the Redis adapter and `transports: ['websocket']` on the client.
 
-See [WebSocket](../digging-deeper/websocket.md).
+See [Socket.IO](../packages/socketio.md).
 
 ## OpenAPI
 
@@ -15220,7 +14976,7 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `validationMessages` | `MessageResolver?` | `null` (English messages) | Messages for validation errors, for example in other languages. |
 | `responseHandler` | `ResponseHandlerInterface?` | `null` | A class with `DoxResponse handle(DoxResponse res)`. It sees every response before it is sent. |
 | `errorHandler` | `Function(Object?, StackTrace)` | `defaultErrorHandler` | Called for every unhandled error. The default logs the error with `Logger.warn` and the stack with `Logger.danger`. |
-| `services` | `List<DoxService>` | `[]` | Classes with a `setup()` method. Dox runs them in every isolate at start. The ORM, auth and WebSocket are set up here. |
+| `services` | `List<DoxService>` | `[]` | Classes with a `setup()` method. Dox runs them in every isolate at start. The ORM and auth are set up here. |
 
 ## Sub configs
 
@@ -15398,7 +15154,7 @@ Source: `packages/dox-orm/lib/src/types/database_config.dart` and `connection_co
 | `user` | `String` | `''` | Database user. Not used by sqlite. |
 | `password` | `String` | `''` | Database password. Not used by sqlite. |
 | `database` | `String` | required | Database name. For sqlite: the file path, or `:memory:`. |
-| `useSSL` | `bool` | `false` | Use TLS. Postgres with TLS uses the Dart driver, not the native one. |
+| `useSSL` | `bool` | `false` | Use TLS. Postgres: mode `require` (no certificate check), set `extra['sslMode']` to change it. MySQL: the certificate is checked. |
 | `debug` | `bool` | required | Print every query with `printer`. |
 | `printer` | `QueryPrinter?` | `null` | `ConsoleQueryPrinter()`, `PrettyQueryPrinter()`, `FileQueryPrinter()` or your own. |
 | `extra` | `Map<String, dynamic>` | `{}` | Driver options. See below. |
@@ -15408,15 +15164,13 @@ Keys of `extra`:
 
 | Driver | Key | Type | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| postgres, mysql | `native` | `bool` | `true` | `false` uses the Dart driver instead of the native (Rust) one. |
-| postgres, mysql | `maxConnectionCount` | `int` | `10` | Most open connections. Native drivers: for the whole process. Dart drivers: per isolate. |
-| postgres, mysql | `preparedStatementCacheSize` | `int` | `100` | Prepared statements kept per connection. |
-| postgres | `sslMode` | postgres `SslMode` | none | Setting it uses the Dart driver. |
-| mysql | `collation` | `String` | `utf8mb4_general_ci` | Connection collation. |
-| mysql | `timeoutMs` | `int` | `10000` | Connect timeout. |
-| mysql | `allowPublicKeyRetrieval` | `bool` | `false`, `true` with `useSSL` or a local host | Ask the server for its RSA key (needed for `caching_sha2_password` without TLS). A fake server can send its own key and read the password, so it is off by default. It is on with `useSSL: true`, on `localhost`, `127.0.0.1`, `::1` and on a Unix socket. Giving the key in `serverPublicKey` is safer. |
-| mysql | `serverPublicKey` | `String` | none | The server RSA key, so it is not asked for. |
-| mysql | `timeZone` | `String` | none | Session time zone. |
+| postgres, mysql | `maxConnectionCount` | `int` | `10` | Most open connections, for the whole process. |
+| postgres, mysql | `threads` | `int` | `1` | Rust threads of the native driver. Only the first pool sets it. |
+| mysql, sqlite | `preparedStatementCacheSize` | `int` | `100` | Prepared statements kept per connection. |
+| postgres | `sslMode` | `String` | `require` with `useSSL`, else `disable` | TLS mode: `disable`, `prefer`, `require` or `verify-full`. |
+| postgres | `timeZone` | `String` | `UTC` | Session time zone. |
+| postgres | `applicationName` | `String` | none | Name of the app in `pg_stat_activity`. |
+| mysql | `verifyCertificate` | `bool` | `true` | `false` skips the TLS certificate check. Only for a self-signed certificate in development. |
 | mysql | `maxConnectionAge` | `Duration` | 12 hours | Close and reopen a connection after this time. |
 | sqlite | `busyTimeout` | `int` | `5000` | `PRAGMA busy_timeout` in milliseconds. |
 
@@ -15597,8 +15351,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
       password: env.dbPassword,
       database: env.dbName,
       extra: <String, dynamic>{
-        /// One pool for all isolates with the native driver.
-        /// One pool per isolate with the Dart driver.
+        /// One pool for all isolates.
         'maxConnectionCount': 10,
         'maxConnectionAge': Duration(hours: 1),
       },
@@ -15935,13 +15688,12 @@ Without a command: lists every command by category. With a command: prints its u
 ### `dox create:controller`
 
 ```
-dox create:controller <name> [-r] [-ws]
+dox create:controller <name> [-r]
 ```
 
 | Option | Meaning |
 | --- | --- |
 | `-r` | A resource controller with `index`, `create`, `store`, `show`, `edit`, `update`, `destroy`. |
-| `-ws` | A WebSocket controller. |
 
 A trailing `Controller` in the name is removed: `UserController` and `User` give the same file.
 
@@ -15949,7 +15701,6 @@ A trailing `Controller` in the name is removed: `UserController` and `User` give
 | --- | --- | --- |
 | plain | `lib/app/http/controllers/<name>.controller.dart` | `_getSample` in `packages/dox-cli/lib/src/tools/create_controller.dart` |
 | `-r` | `lib/app/http/controllers/<name>.controller.dart` | `_getResourceSample` in the same file |
-| `-ws` | `lib/app/ws/controllers/<name>.controller.dart` | `_getWsSample` in the same file |
 
 The plain and resource templates also make an instance: `<Name>Controller <name>Controller = <Name>Controller();`.
 
@@ -16103,9 +15854,8 @@ The code reads env vars in three ways:
 | `PORT` | `dox_core` (`DoxServer.portFor()`) | not set | The port to listen on, when `APP_PORT` is not set. Cloud Run, Fly, Render and Heroku set it. `APP_PORT` wins when both are set. Read with `Env.get`. | `PORT=8080` |
 | `APP_HOST` | `dox_core` (`DoxServer.hostFor()`) | not set (all interfaces, `::`) | The host to listen on. `127.0.0.1` keeps the app off the network, for an app behind a proxy on the same machine. `AppConfig.host` wins over it. Read with `Env.get`. | `APP_HOST=127.0.0.1` |
 | `DOX_HTTP_THREAD` | `dox_http_native` (Rust, `shared_thread()`) | not set (one thread per isolate) | `shared` puts the servers of all isolates on one network thread. Off by default: on 2 cores it cut req/s by a quarter. Real environment only. | `DOX_HTTP_THREAD=shared` |
-| `DOX_DB_DRIVER` | `dox_orm` (`NativeDrivers.wanted()`) | not set (native driver) | `dart` uses the Dart `postgres` / `mysql_dart` driver instead of the native (Rust) one. Same as `extra: {'native': false}`. Real environment only. | `DOX_DB_DRIVER=dart` |
 | `DATABASE_URL` | `dox_orm` (`DatabaseConfig.url`), `dox_migration` | not set | A database url. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. `dox_orm` reads it from the real environment only. See [Database url](../database/index.md#database_url). | `DATABASE_URL=postgres://app:secret@db:5432/blog?sslmode=require` |
-| `DB_CONNECTION` | `dox_migration` (`DbConnection.open()`) | postgres | `postgres`, `mysql` or `sqlite`. Any other value means postgres. | `DB_CONNECTION=sqlite` |
+| `DB_CONNECTION` | `dox_migration` (`DbConnection.config()`) | postgres | `postgres`, `mysql` or `sqlite`. Any other value means postgres. | `DB_CONNECTION=sqlite` |
 | `DB_HOST` | `dox_migration` | `localhost` | Database host. A path that starts with `/` is a Unix socket: the folder for Postgres, the socket file for MySQL. | `DB_HOST=127.0.0.1` |
 | `DB_PORT` | `dox_migration` | `5432` (postgres), `3306` (mysql) | Database port. | `DB_PORT=5432` |
 | `DB_USERNAME` | `dox_migration` | `postgres` (postgres), `root` (mysql) | Database user. | `DB_USERNAME=app` |
@@ -16115,7 +15865,7 @@ The code reads env vars in three ways:
 | `HOME` / `USERPROFILE` | build hooks of `dox_http_native`, `dox_postgres_native`, `dox_mysql_native` | empty | Used to find `~/.cargo/bin/cargo` when the library must be built from source. | set by the OS |
 | `DART_VM_OPTIONS` | the Dart VM | not set | Flags for the VM. The AOT binary from `dox build` reads it. Dox never sets VM flags for you. See [Performance](../digging-deeper/performance.md#dart-vm-flags). | `DART_VM_OPTIONS=--new_gen_semi_max_size=64` |
 
-`DOX_HTTP_THREAD` and `DOX_DB_DRIVER` are read with `Platform.environment` or `std::env::var`. They do not work from `.env`.
+`DOX_HTTP_THREAD` is read with `std::env::var`. It does not work from `.env`.
 
 ## Read by a new project
 
@@ -16161,13 +15911,6 @@ DB_PORT=5432
 DB_USERNAME=postgres
 DB_PASSWORD=postgres
 ```
-
-## Only for work on Dox itself
-
-| Variable | Who reads it | Meaning |
-| --- | --- | --- |
-| `PG_URL` | Rust tests of `dox_postgres_native` | A Postgres URL. The test is skipped when it is not set. |
-| `DB_HOST`, `DB_PORT`, `THREADS` | `packages/dox-postgres-native/tool/stress.dart` | The stress tool. |
 
 ## How `.env` is parsed
 
@@ -16485,9 +16228,9 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | --- | --- | --- |
 | AOT binary, not `dart run` | `dox build`, then run `build/bundle/bin/server`. Keep `bin/` and `lib/` together. Not `dart compile exe`. | [Deployment](../digging-deeper/deployment.md) |
 | Native server loads | The app starts and the start line says `(native)`. When the library does not load, the app stops with `dox_http_native did not load` and the fix. | [Native server](../digging-deeper/native-server.md) |
-| Native database driver is on | No `[dox] warning: dox_postgres_native did not load` (or `mysql`) line at start. Do not set `DOX_DB_DRIVER=dart`. Postgres with TLS uses the Dart driver. | [Postgres native](../database/postgres-native.md) |
+| Native database driver loads | The app starts and the database works. When the library does not load, the app stops with `dox_postgres_native did not load` (or `mysql`) and the fix. | [Postgres native](../database/postgres-native.md) |
 | Isolates = cores | Keep the default `totalIsolate` (`Platform.numberOfProcessors`), or set `APP_TOTAL_ISOLATE` to the cores the container really gets. Use fewer when the database runs on the same machine. | [Isolate](../digging-deeper/isolate.md) |
-| Shared state across isolates | Cache: `redis`, not `memory`. WebSocket: `WebsocketRedisAdapter`. Socket.IO: a Redis adapter and `transports: ['websocket']`. | [Isolate](../digging-deeper/isolate.md) |
+| Shared state across isolates | Cache: `redis`, not `memory`. Socket.IO: a Redis adapter and `transports: ['websocket']`. | [Isolate](../digging-deeper/isolate.md) |
 | A supervisor restarts the process | Docker `restart: unless-stopped`, or systemd `Restart=always`. Dox restarts a dead worker isolate, but not the main isolate. | [Deployment](../digging-deeper/deployment.md) |
 | Writable temp folder | Uploads over 1 MB go to a temp file. A `FROM scratch` image needs `/tmp` with mode `1777`. | [Docker](../guides/docker.md) |
 | Uploads live on a volume or S3 | The `local` disk writes to `storage/`. Mount it as a volume, or use the `s3` disk. | [File storage](../digging-deeper/file-storage.md) |
@@ -16498,9 +16241,9 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | --- | --- | --- |
 | Postgres or MySQL for a busy app | SQLite has one connection per isolate, and a query blocks the isolate. Use it for small apps only. With SQLite use an absolute file path, never `:memory:` with many isolates. | [Database](../database/index.md) |
 | Migrations run once per deploy | The new project runs `Migrator(migrations: migrations).migrate()` in `bin/server.dart` before `startServer()`. Or run `dart run bin/migrate.dart run` (or `dox migrate`) in CI. Do one, not both at the same time on many machines. | [Migration](../database/migration.md) |
-| Migrations use the right database | `dox_migration` reads `.env` when the file exists, and ignores the real env then. Do not ship a `.env` next to the binary, or give `Migrator(connection: ...)` your own pool. | [Troubleshooting](troubleshooting.md) |
+| Migrations use the right database | `dox_migration` reads `.env` when the file exists, and ignores the real env then. Do not ship a `.env` next to the binary, or give `Migrator(config: ...)` your own config. | [Troubleshooting](troubleshooting.md) |
 | Small MySQL migrations | MySQL saves `CREATE`, `ALTER` and `DROP` at once. A failed migration can leave half the changes. One table change per migration. | [Migration](../database/migration.md) |
-| Pool size fits the database | `extra: {'maxConnectionCount': 10}`. The native drivers (the default) share one pool per process, so the total is the pool size. The Dart drivers have one pool per isolate: total = isolates x pool size. Keep it under the database `max_connections`. | [Database](../database/index.md) |
+| Pool size fits the database | `extra: {'maxConnectionCount': 10}`. The Postgres and MySQL drivers share one pool per process, so the total is the pool size, not isolates x pool size. Keep it under the database `max_connections`. | [Database](../database/index.md) |
 | Query logging is off | The new project's `database.dart` has `debug: true` on every connection, which prints every query. Set `debug: false` in production. | [Database](../database/index.md) |
 | Backups | **Dox limit.** Dox has no backup tool. Use `pg_dump`, `mysqldump`, managed database snapshots, or a copy of the SQLite file (with the `-wal` file, or `sqlite3 app.db ".backup x.db"`). Test a restore. | |
 
@@ -16584,7 +16327,7 @@ dox_http_native: sha256 of dox_http_native-<os>-<arch>.<ext> does not match
 dox_http_native: cargo build failed
 ```
 
-**Cause.** The build hook of `dox_http_native` (`packages/dox-http-native/hook/build.dart`) tries, in this order: the `lib_path` user define, a local `native/target/release` build, the GitHub release download, and `cargo build`. None worked. Common reasons:
+**Cause.** The build hook of `dox_http_native` (`hook/build.dart` in [its repo](https://github.com/dartondox/dox-http-native)) tries, in this order: the `lib_path` user define, a local `native/target/release` build, the GitHub release download, and `cargo build`. None worked. Common reasons:
 
 - No internet during `dart pub get`, or the release has no build for your OS and CPU (there are builds for macOS arm64 and x64, Linux x64 and arm64, Windows x64).
 - Rust is not installed, so the fallback `cargo build` can not run.
@@ -16594,8 +16337,8 @@ dox_http_native: cargo build failed
 **Fix.** Pick one:
 
 1. Install Rust with [rustup](https://rustup.rs) and run `dart pub get` again. The hook builds the library with `cargo`.
-2. When the reason is an ABI mismatch and you set `lib_path`, rebuild that library: `cargo build --release` in `packages/dox-http-native/native`.
-3. Download the library from the GitHub release `dox_http_native-v<version>` yourself and point to it in the root `pubspec.yaml`:
+2. When the reason is an ABI mismatch and you set `lib_path`, rebuild that library: `cargo build --release` in the `native` folder of the `dox-http-native` repo.
+3. Download the library from the GitHub release `v<version>` of [dartondox/dox-http-native](https://github.com/dartondox/dox-http-native/releases) yourself and point to it in the root `pubspec.yaml`:
 
     ```yaml
     hooks:
@@ -16606,14 +16349,14 @@ dox_http_native: cargo build failed
 
 4. Build with `dox build` (it runs `dart build cli`), not with `dart compile exe`.
 
-The native database drivers find their library the same way. They do not stop the app. The warning is then:
+The native database drivers find their library the same way. When it does not load, the app stops too, with:
 
 ```
-[dox] warning: dox_postgres_native did not load, using the Dart postgres driver (<reason>)
-[dox] warning: dox_mysql_native did not load, using the Dart mysql driver (<reason>)
+dox_postgres_native did not load: <reason>.
+dox_mysql_native did not load: <reason>.
 ```
 
-The Dart driver is used. To choose it on purpose set `DOX_DB_DRIVER=dart` or `extra: {'native': false}` on the connection.
+The fix is the same as above, with the `dox-postgres-native` or `dox-mysql-native` repo.
 
 See [Native server](../digging-deeper/native-server.md), [Postgres native](../database/postgres-native.md) and [MySQL native](../database/mysql-native.md).
 
@@ -16723,17 +16466,13 @@ For normal login use `Auth().attempt()` from `dox_auth`. See [Hashing](../securi
 
 **Cause.** `caching_sha2_password` needs either TLS or the server RSA public key to send the password. A client that has neither can not log in.
 
-**Fix.** Both Dox drivers handle this by default:
-
-- The native driver (`dox_mysql_native`) works with MySQL 8.4 `caching_sha2_password` and MariaDB 11.
-- The Dart driver asks the server for its RSA key only with `useSSL: true`, or on `localhost`, `127.0.0.1`, `::1` and a Unix socket. On a remote host without TLS it does not ask, because a fake server could read the password. Migrations do the same.
+**Fix.** The Dox MySQL driver (`dox_mysql_native`) works with MySQL 8.4 `caching_sha2_password` and MariaDB 11 by default.
 
 So check these settings on the connection in `lib/config/database.dart`:
 
 | Setting | What to do |
 | --- | --- |
-| Remote host without TLS | Give the key in `extra: {'serverPublicKey': '...'}` (safer), turn on `useSSL: true`, or set `extra: {'allowPublicKeyRetrieval': true}`. |
-| `extra: {'allowPublicKeyRetrieval': false}` | Remove it, or give the key in `extra: {'serverPublicKey': '...'}`. |
+| Remote host without TLS | Turn on `useSSL: true`. |
 | `useSSL: true` | The server must have TLS on. |
 | `host`, `port`, `user`, `password` | A wrong value gives the same login error. `DB_PORT` is `3306` by default for MySQL. |
 
@@ -16835,7 +16574,6 @@ These stop the app at start, so a bad route never reaches a request.
 | `Route <where>: only positional parameters are supported, not named or [optional] ones (<type>).` | Named or `[optional]` parameters. | Use positional parameters. Use `int?` with `{id?}` for an optional param. |
 | `Route <where>: a controller can not be generic.` | The handler has type parameters. | Remove them. |
 | `Route <where>: can not read the controller type <type>.` | Dox can not read the function type of the handler. | Use a plain method or function. |
-| `Exception: websocket is not registered` | `Route.websocket()` runs before a `WebsocketServer(Dox())` exists. | Add the WebSocket service to `services`. See [WebSocket](../digging-deeper/websocket.md). |
 
 ## dox_core: env
 
@@ -16894,8 +16632,10 @@ The table shows the `message` text.
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `[dox] warning: dox_postgres_native did not load, using the Dart postgres driver (<reason>)` | The native Postgres library did not load. | See [Postgres native](../database/postgres-native.md). Or set `DOX_DB_DRIVER=dart`. |
-| `[dox] warning: dox_mysql_native did not load, using the Dart mysql driver (<reason>)` | The native MySQL library did not load. | See [MySQL native](../database/mysql-native.md). |
+| `Unsupported operation: dox_postgres_native did not load: <reason>. Dox needs it to talk to Postgres. Fix: ...` | The native Postgres library did not load. The app stops. | Follow the fix in the message. See [Postgres native](../database/postgres-native.md#when-the-library-does-not-load). |
+| `Unsupported operation: dox_mysql_native did not load: <reason>. Dox needs it to talk to MySQL. Fix: ...` | The native MySQL library did not load. The app stops. | Follow the fix in the message. See [MySQL native](../database/mysql-native.md#when-the-library-does-not-load). |
+| `PgServerException(<code>): <message>` | The Postgres server said no, eg. code `23505` for a unique violation. | Read `code`, `detail` and `constraint` on the exception. |
+| `MysqlException(<code>, <sqlState>): <message>` | An error from MySQL, eg. code `1062` for a duplicate key. | Read `code` and `sqlState` on the exception. |
 | `Exception: <name> not found` | `DatabaseConfig.connection` (or `withConnection()`) names a connection that is not in `connections`. | Fix `DB_CONNECTION` or the map. |
 | `Exception: Invalid driver or not supported` | A `ConnectionConfig.driver` Dox can not open. | Use `Driver.postgres`, `Driver.mysql` or `Driver.sqlite`. |
 | `Invalid argument(s): dox_postgres_native: bad connection config` | The native driver can not read the connection values. | Check `host`, `port`, `user`, `database`. |
@@ -17006,12 +16746,11 @@ These stop `dart run build_runner build`.
 
 Printed during `dart pub get`, `dox serve` or `dox build`. `<pkg>` is `dox_http_native`, `dox_postgres_native` or `dox_mysql_native`.
 
-- `dox_postgres_native` and `dox_mysql_native`: the app still runs, on the Dart DB driver.
-- `dox_http_native`: there is no fallback. The app stops at start with an error that says why the library did not load and how to fix it.
+None of them has a fallback. When the library is missing, the app stops with an error that says why the library did not load and how to fix it: at start for `dox_http_native`, when the ORM opens the database for `dox_postgres_native` and `dox_mysql_native`.
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `<pkg>: no native library for <os>-<arch>.` | No ready build for this OS and CPU. | Install Rust. For a DB driver you may also accept the Dart fallback. |
+| `<pkg>: no native library for <os>-<arch>.` | No ready build for this OS and CPU. | Install Rust. |
 | `<pkg>: download <file>: <status>` / `<pkg>: download <file> failed: <error>` | The GitHub download failed. | Check the network, then `dart pub get` again. |
 | `<pkg>: sha256 of <file> does not match` | The downloaded file is not the expected one. | Delete `.dart_tool` and try again. |
 | `<pkg>: cargo build failed` | The build from source failed. | Read the cargo output below it. |
@@ -17068,6 +16807,10 @@ What changed in each package, newest first. This page is made from the
 `CHANGELOG.md` files in the repo when the docs are built.
 
 ## dox_annotation
+
+### Unreleased
+
+- Breaking: `IDox`, `IDoxWebsocket` and `WebsocketEvent` are removed. They were only used by `dox_websocket`.
 
 ### 3.0.0-alpha.6
 
@@ -17247,6 +16990,7 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- Breaking: `create:controller` no longer takes `-ws`. Dox uses Socket.IO for realtime now. See the Socket.IO docs for a namespace class.
 - Security: `dox create` now copies `.env.example` to `.env` and writes a new random `APP_KEY`. Before, every new app used the same public key from the template. You no longer run `cp .env.example .env`.
 - The `.env.example` of the CLI has an empty `APP_KEY`. Run `dox key:generate` to set one.
 
@@ -17293,8 +17037,11 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- Breaking: `dox_websocket` is gone. Use `dox_socketio` for realtime. `Dox().websocket` and `Dox().setWebsocket()` are removed.
+- Breaking: `Route.websocket(path, handler)` is now a raw WebSocket route. `handler` gets the open `WebSocket` and the `DoxRequest`. Middleware runs first. A request that is not a WebSocket upgrade gets 400.
+- `dox_http_native` now lives in its own repo (dartondox/dox-http-native). Dox uses it from pub.dev (`^3.0.0-alpha.7`). Its build hook downloads a ready-built library, so you do not need Rust.
 - Perf: faster route matching. A plain route is found with one map lookup, also when a param route was added before it (as long as that param route can not match the same path). Param routes are grouped by their first path segment, so a request only tries the routes that can match. The first matching route still wins.
-- Perf: the request handler reads `Host` and `Content-Type` once per request. `Host` is read only when the app has a `Route.domain()` route. The WebSocket upgrade check runs only when WebSocket is set up. `HttpBody.read()` takes an optional `contentType`.
+- Perf: the request handler reads `Host` and `Content-Type` once per request. `Host` is read only when the app has a `Route.domain()` route. `HttpBody.read()` takes an optional `contentType`.
 - Perf: on the native server, a JSON or form body is used as it is, with no stream in between. The size limit is still checked.
 - Perf: JSON responses are encoded in 8 KB chunks, not 256 bytes.
 - Perf: fewer objects per request. `RouteData.params`, `DoxRequest.param` and `DoxRequest.method` are made on first use. `RouteData.domainLower` is made once. CORS header lists are joined once.
@@ -17419,75 +17166,13 @@ What changed in each package, newest first. This page is made from the
 - Faster: streamed bodies, all CPU cores, faster router.
 - `uuid` 4 and `mime` 2.
 
-## dox_http_native
-
-### Unreleased
-
-- New: a streamed response (`addStream`, eg. a file or a download) over 64 KB goes out in parts. Before, the whole body was kept in memory until `close()`, and the client got nothing until then. Now the client gets the first bytes early, and at most 1 MB waits in Rust. Dart reads more only when the client has read what was sent. When the client leaves, `addStream` stops reading the source. A small response still goes out in one piece. A streamed response with `contentLength` set sends `Content-Length`, else it is chunked.
-- Perf: a request body of 64 KB or more goes to Dart without a copy (external typed data). Before, it was copied 3 times.
-- Perf: `compress: true` gzips on a Rust thread, not on the isolate. Same output (gzip, default level). A streamed response is not compressed.
-- Perf: a response with the default headers and one content type (eg. JSON) copies no headers, and its header bytes are cached.
-- Perf: request headers are parsed into a map on the second lookup, not scanned again and again.
-- Perf: a request path with no query skips the full `Uri.parse`. Rust takes the lock of the answers once per batch.
-- Breaking: native ABI 6 (streamed body records, gzip flag, big bodies as their own part of the message). Needs a new native library build. The build hook builds it with cargo until the next release.
-
-- New: WebSocket upgrade on the native server. `NativeWebSocket.upgrade(request, protocol: ..., maxMessageSize: ...)` accepts it and gives a `dart:io` `WebSocket`. Rust (tokio-tungstenite) speaks the protocol: ping and pong, the close handshake, the UTF-8 check and the size limit (a bigger message closes with `1009`). Compression is never agreed. `NativeWebSocket.isUpgradeRequest(request)` tells if a request asks for one.
-- On a graceful `close()`, open WebSockets get close code `1001`.
-- WebSocket limits, so a slow client or a busy isolate can not make memory grow forever:
-  - Messages to a client wait in a queue. Over 4 times `maxMessageSize` (at least 1 MiB) the socket closes with `1008` (policy violation).
-  - A message that can not be sent in 30 seconds drops the socket (`1006`). The close handshake (our close frame and the answer) has 5 seconds in all, then the socket is dropped (`1006`).
-  - When Dart has more than 8 MiB of client messages not yet handled, Rust stops reading from WebSocket clients until it catches up. No message is lost. HTTP is not paused.
-- New: `NativeHttpServer.ensureAvailable()` throws an error that says why the library did not load and how to fix it. `bind` throws the same error.
-- Breaking: native ABI 5 (new WebSocket records, and an ack record from Dart). Needs a new native library build. The build hook builds it with cargo until the next release.
-- Breaking: Dox has no `dart:io` server any more. When this library does not load, Dox stops at start with the reason.
-- Security: a multipart form may be up to `maxMultipartSize` bytes (new `bind` option, default `maxBodySize`). Any other body, eg. JSON, raw or text, is limited to `maxBodySize`. Dox passes its own two limits, so a JSON body over 10 MB now gets `413` from Rust.
-- Security: a body with a too big `Content-Length` and `Expect: 100-continue` gets `413` at once. Without `Expect`, Rust reads and drops the body (up to 64 MB more, no memory kept), then sends `413`, so the client sees the `413` and not a connection reset.
-- Security: Rust no longer reserves memory from the client `Content-Length` (at most 64 KB up front).
-- Security: new `bind` option `bodyTimeout` (default 120 seconds). It is the idle time with no body bytes: a client that sends nothing for that long gets `408`. A slow but steady upload is fine.
-- Native ABI 4 (`dox_start` takes the multipart limit and the body timeout). Needs a new native library build.
-- Security: response headers now refuse bad input with a `FormatException`, like `dart:io`. A header name must be a token. A header value must not hold a line break or other control byte. Before, a `\n` in a value (or a char like `\u010A`, written as its low byte) added one more header, eg. `Set-Cookie`, when an app put request input in a header. The same check now runs on `serverHeader` and on each cookie when the response closes, because `Cookie` does not check its domain.
-
-### 3.0.0-alpha.6
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.5
-
-- New: `NativeHttpServer.bind(port, address: ...)` listens on one host, like `HttpServer.bind`. An `InternetAddress` or a host name. With no address it listens on all interfaces, as before. `server.address` is the real address.
-- Fix: `close()` never finished when nobody called `listen()` on the server.
-- Native ABI 3 (`dox_start` takes the host). Needs a new native library build. Until the next release, the build hook builds it with cargo.
-- New: `close()` is graceful, like `dart:io`. The server stops taking connections at once, each open connection closes after its current answer, and the future completes when all are closed. `close(force: true)` closes every connection at once.
-
-### 3.0.0-alpha.4
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.3
-
-- `DOX_HTTP_THREAD=shared` runs one `dox-http` thread for all isolates.
-  Default is still one thread per isolate, which measured faster.
-- Less work per request: request headers are read one name at a time,
-  answers are not copied again in Rust, one wake per answer batch.
-- Native ABI 2 (new header layout in the request record). Needs a new
-  native library build.
-
-### 3.0.0-alpha.2
-
-- First release.
-- Native HTTP/1.1 server: Rust (hyper, tokio) owns the sockets and parses
-  HTTP. Handlers stay in Dart.
-- Implements the `dart:io` `HttpServer`, `HttpRequest` and `HttpResponse`
-  API, so code written for `dart:io` works unchanged.
-- One server per isolate on the same port (`SO_REUSEPORT` on Linux and macOS).
-- 400 for bad requests, 431 for big headers, 413 for big bodies.
-- The build hook downloads a ready-built library. No Rust needed.
-
 ## dox_migration
 
 ### Unreleased
 
-- TLS checks the server certificate, the same as dox_orm. Add `verifyCertificate=false` to `DATABASE_URL` to skip the check in development.
-- MySQL: the server RSA key is only asked for with TLS on or on a local host, the same as dox_orm.
+- Breaking: migrations run on the dox_orm drivers: the native Postgres and MySQL drivers, and SQLite. The `postgres` and `mysql_dart` packages are gone. When the native library does not load, the migration stops with an error that says why.
+- Breaking: `Migrator(connection: ...)` takes a dox_orm `DBDriver` now, eg. `SqlQueryBuilder().dbDriver`. The migrator does not close it. New `Migrator(config: ...)` takes a `ConnectionConfig`, eg. `databaseConfig.getConnectionConfig()`, and closes it at the end.
+- TLS works the same as dox_orm. For Postgres, `sslmode=require` encrypts and `verify-full` also checks the certificate. For MySQL the certificate is checked. Add `verifyCertificate=false` to `DATABASE_URL` to skip the MySQL check in development.
 
 ### 3.0.0-alpha.6
 
@@ -17530,43 +17215,6 @@ What changed in each package, newest first. This page is made from the
 - Stop at the first failed migration
 - Fix `.sql` parsing: a `-` in the sql no longer cuts the `up` or `down` part
 - Fix statement split: `;` inside quotes, comments or `$$` bodies does not split
-
-## dox_mysql_native
-
-### Unreleased
-
-- Each request now has a timeout of 300 s (pool slot, connect and query), like `dox_postgres_native`. Before, a request could wait for a free connection forever.
-- A transaction that gets no request for 300 s (eg. its isolate is gone) is rolled back, and its connection goes back to the pool. Before, it held the connection forever.
-- Fewer copies of the result bytes. The record head is written in front of the rows, so the record is not copied again. The first result of a batch is moved into the post buffer, not copied. A batch of 64 KiB or more goes to Dart without a copy (external typed data).
-- The column names are kept per SQL text. The next result of the same query does not decode them again.
-- New `verifyCertificate` on `MysqlNativePool.open()`. It is true by default, so TLS checks the server certificate. Set it to false only for a self-signed certificate in development.
-
-### 3.0.0-alpha.6
-
-- Unix sockets. In `MysqlNativePool.open()`, a `host` that starts with `/` is the socket file. `fromUrl()` takes `?socket=/path`.
-- `close()` is safe with many isolates. Isolates that open the same settings share one pool. Each `open` now counts, and only the last `close()` disconnects the pool. Before, the first `close()` closed it for every isolate.
-
-### 3.0.0-alpha.5
-
-- The hook comment says how to fill the sha256 list from a release: `dart run bin/native_hashes.dart <tag>`. The list stays empty until the first release.
-
-### 3.0.0-alpha.4
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.3
-
-- Breaking: this package no longer depends on `dox_orm`. `MysqlNativeDriver` moved into `dox_orm`, which now uses it as its default MySQL driver. This package keeps `MysqlNativePool`, with the same API.
-
-### 3.0.0-alpha.2
-
-- First release.
-- Native MySQL and MariaDB driver: Rust (mysql_async, tokio) runs the pool
-  and a prepared statement cache per connection. Dart gets typed rows.
-- `MysqlNativeDriver` plugs into the Dox ORM. The ORM gets the same types
-  as with the Dart driver (mysql_dart).
-- Works with MySQL 8.4 (caching_sha2_password) and MariaDB 11.
-- The build hook downloads a ready-built library. No Rust needed.
 
 ## dox_openapi
 
@@ -17616,6 +17264,14 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- Breaking: Postgres and MySQL use only the native drivers. The Dart drivers (`postgres` and `mysql_dart` packages) are gone. So are `PostgresDriver`, `MysqlDriver`, `DOX_DB_DRIVER=dart` and `extra['native']`.
+- Breaking: when the native library does not load, `createDriver()` and `SqlQueryBuilder.initializeWithDatabaseConfig()` throw an `UnsupportedError`. It says why the library did not load and how to fix it. Before, the ORM used the Dart driver and printed a warning.
+- Postgres has TLS now. `useSSL: true` is mode `require` (no certificate check, like libpq). `extra['sslMode']` is a `String`: `disable`, `prefer`, `require` or `verify-full`. `sslmode` in `DATABASE_URL` sets it. `prefer` and `allow` in the url now mean "TLS when the server has it".
+- Breaking: errors are `PgServerException` and `PgException` for Postgres, and `MysqlException` for MySQL. `dox_orm` exports them. The `ServerException` classes of the `postgres` package and `MySQLServerException` are gone.
+- Breaking: `ConnectionConfig` loses `getDatabaseConnection()`, `postgresEndpoint`, `mysqlHost`, `mysqlPort`, `mysqlAllowPublicKeyRetrieval` and `mysqlAcceptBadCertificate`. `postgresSslMode` is now a `String`. The `collation`, `timeoutMs`, `timeZone` (MySQL), `serverPublicKey`, `allowPublicKeyRetrieval` and the `postgres` package pool keys of `extra` are no longer read.
+- Breaking: `getDatabaseDriver()` and `SqlQueryBuilder.initialize()` take a `PgNativePool` for Postgres and a `MysqlNativePool` for MySQL.
+- On Postgres, a `List` in `insert()` or `update()` is sent as json text, so it fits a json column. New `DBDriver.columnValue()`.
+- `dox_postgres_native` and `dox_mysql_native` now live in their own repos (dartondox/dox-postgres-native, dartondox/dox-mysql-native). Dox uses them from pub.dev (`^3.0.0-alpha.7`). Their build hooks download ready-built libraries, so you do not need Rust.
 - Faster `belongsTo` load. It reads each owner once with `WHERE owner.id IN (...)`, with no join to the children. Before, a user with 10,000 blogs came back 10,000 times. Children of the same owner now get the same model object.
 - `save()` on a new model runs one `INSERT` and reads the id from it. There is no `SELECT` after it. `insert()` and `create()` use `RETURNING *` on Postgres and SQLite, so they also skip the `SELECT`. MySQL still reads the row with `find()`.
 - `save()` on an existing model sends only the columns that changed since the last load or save. A `Map` or `List` field is always sent. When nothing changed, `save()` runs no query and `updated_at` stays as it is. Before, it always ran an `UPDATE` with every column that had a value.
@@ -17629,7 +17285,7 @@ What changed in each package, newest first. This page is made from the
 - The SQL text is no longer scanned for double spaces on each query. `orderBy()` without a direction no longer adds a space.
 - `QueryBuilderHelper.runQuery()` no longer has the `clean` parameter.
 - Fix: in a native Postgres or MySQL `transaction()`, when the rollback after an error also fails, the first error is thrown. Before, the rollback error replaced it.
-- The native Postgres driver shares one pool for all isolates with the same settings, like the native MySQL driver. `maxConnectionCount` is for the whole process on both native drivers. The Dart drivers still have one pool per isolate.
+- The native Postgres driver shares one pool for all isolates with the same settings, like the native MySQL driver. `maxConnectionCount` is for the whole process on both native drivers.
 - The Dart Postgres driver keeps its prepared statements after a session command like `SET`, `SHOW`, `BEGIN` or `COMMIT`. Before, any query that was not select/insert/update/delete dropped all of them.
 - Breaking: column and table names in `select`, `where`, `orderBy`, `groupBy`, `join`, `insert` and `update` must be plain names (`name`, `table.name`, `table.*`, `*`, `name as alias`). Anything else, like `count(*)`, throws an `ArgumentError`. Before, a name with `(` went into the SQL as it is, so user input could add SQL. Use `selectRaw`, `whereRaw` or the new `orderByRaw` and `groupByRaw` for expressions.
 - Breaking: the operator of `where()` and `join()` must be one of `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `like`, `not like`, `ilike` (any case). Any other value throws an `ArgumentError`.
@@ -17702,57 +17358,6 @@ What changed in each package, newest first. This page is made from the
 - MySQL: only JSON columns are decoded (arrays too). MariaDB keeps decoding JSON-like text, because it stores JSON as text.
 - Schema: `unique()` on a column that is already unique is skipped. Default values are escaped.
 
-## dox_postgres_native
-
-### Unreleased
-
-- Breaking: isolates that open the same settings (and the same `maxConnections`) now share one pool in Rust, like `dox_mysql_native`. So `maxConnections` is for the whole process, not per isolate. Before, 8 isolates with the default of 10 could open 80 connections. Each `open` counts, and only the last `close()` closes the pool. The native ABI version is now 2.
-- The prepared statement cache of a connection drops the statement used longest ago when it is full (LRU, 512 statements). Before, it dropped all statements at once.
-- Fewer copies of the result bytes. Rust writes each result straight into the buffer of the next post. A batch of 64 KiB or more goes to Dart without a copy (external typed data).
-- Faster decode of `uuid`, `numeric`, `date`, `json` and `jsonb`, without the type registry of the `postgres` package. A negative `numeric` below 1 now has its leading zero: `-0.5`, not `-.5` like the `postgres` package.
-- An `int` parameter is written as text straight into the request buffer, without a `String`. It still goes without a type, so the server picks it.
-- The column names are kept per SQL text, not only for the last result. Queries that take turns no longer decode their column names again.
-
-### 3.0.0-alpha.6
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.5
-
-- The hook comment says how to fill the sha256 list from a release: `dart run bin/native_hashes.dart <tag>`. The list stays empty until the first release.
-- A `host` that starts with `/` is a Unix socket folder (eg. Cloud SQL `/cloudsql/project:region:instance`). A test checks it.
-
-### 3.0.0-alpha.4
-
-- Less work per request. Rust copies a batch of requests once and keeps slices of it, instead of one copy of the SQL and of each parameter. A batch of plain queries uses one timeout timer, not one per query. Dart keeps waiting requests in a list, not a map.
-
-### 3.0.0-alpha.3
-
-- Column names and types are decoded once per result shape. The next result with the same columns reuses them.
-- Breaking: this package no longer depends on `dox_orm`. `PostgresNativeDriver` moved into `dox_orm`, which now uses it as its default Postgres driver. This package keeps `PgNativePool`.
-- Fix: a request never got an answer in two cases. A value that Dart can
-  not decode (eg. a timestamp out of the `DateTime` range) lost every other
-  result of the same batch. A request sent to a transaction after its end
-  (eg. a second rollback) was dropped. Both now fail with a clear error.
-- A request that gets no answer in 5 minutes fails with a timeout error
-  (like `queryTimeout` of the `postgres` package). Connect timeout is 15 s.
-  A transaction that Dart does not end in 5 minutes is rolled back, so its
-  connection goes back to the pool.
-- `tool/stress.dart`: a stress test that finds requests that never finish.
-- Faster queries. Plain queries now share connections: tokio-postgres
-  sends the queries of one connection together (pipelining). One tokio task
-  runs each batch from Dart, not one task per query. The SQL bytes are
-  cached, and binding named parameters builds no extra `Set`.
-
-### 3.0.0-alpha.2
-
-- First release.
-- Native Postgres driver: Rust (tokio-postgres, deadpool-postgres) owns the
-  connections. Your code stays in Dart.
-- `PostgresNativeDriver` for the Dox ORM. Same types and exceptions as the
-  `postgres` package.
-- `PgNativePool`: queries, transactions, one pool for many isolates.
-
 ## dox_query_builder
 
 ### 3.0.0-alpha.6
@@ -17785,6 +17390,13 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- Uses `ioredis` 2.0.0-alpha.3, which can send and get binary messages. `RedisAdapter` and `SocketIoEmitter` take `ioredis` clients.
+- `RedisAdapter` reads msgpack and JSON messages. Before, it read only JSON, so the Socket.IO emitters (Node.js, PHP, Python, Go) did not work. They use msgpack.
+- Breaking: `RedisAdapter` writes msgpack by default, like `@socket.io/redis-adapter`. Use `format: RedisFormat.json` for Node.js servers with a JSON parser.
+- Fix: binary data in JSON Redis messages is written as a Node.js Buffer (`{"type":"Buffer","data":[...]}`). Before, it was written as a plain list of numbers.
+- `RedisAdapter` handles the requests on `socket.io-request#<nsp>#`: `socketsJoin`, `socketsLeave` and `disconnectSockets` from emitters and other servers. It answers `fetchSockets`, `allRooms` and broadcasts with acks from Node.js servers, so they do not wait for a timeout.
+- New `SocketIoEmitter(redis)`: sends events, `socketsJoin`, `socketsLeave` and `disconnectSockets` through Redis without a Socket.IO server. Same format as `@socket.io/redis-emitter`.
+- New `MsgPack` encoder and decoder.
 - Performance: a broadcast builds the websocket text frame and its UTF-8 bytes once and shares them with every client (new `SharedText`). Before, each client built and encoded its own copy.
 - Performance: a broadcast with no `except` and at most one room goes over the room members directly. Before, it copied all socket ids into new sets each time.
 - Breaking: `SocketIoServer.listen()` starts a native server (`dox_http_native`), not a `dart:io` one. The websocket transport uses the native WebSocket upgrade. Long-polling works the same. `attach()` still takes any `HttpServer`, also a `dart:io` one.
@@ -17917,50 +17529,6 @@ What changed in each package, newest first. This page is made from the
 - Custom `Rule` classes and a global `MessageResolver`.
 - Laravel style string rules with `v.fromRules()`.
 
-## dox_websocket
-
-### Unreleased
-
-- Performance: an emit to a room makes the JSON and the UTF-8 bytes once, not once per member. The `exclude` list is checked as a set.
-- Performance: room members are a set, so a leave is fast and a rejoin does not add the socket twice.
-- Breaking: websockets run on the native server (`dox_http_native`), not on `dart:io`. Rust does the upgrade and the WebSocket protocol. The public API is the same: the socket is still a `dart:io` `WebSocket`.
-- Security: a message over `maxMessageSize` bytes is now closed with 1009 in Rust, before Dart reads it. Before, `dart:io` read the whole message into memory first.
-- Breaking: `joinRoom` is refused unless you set `WebsocketServer().authorizeJoin`. Before, any client could join any room, like `user:42`, and get its messages.
-- Security: new `WebsocketServer().allowedOrigins`. When set, a websocket from another origin gets 403. When null (the default), any origin is allowed.
-- Security: websocket compression is off, and a message bigger than `WebsocketServer().maxMessageSize` (default 1 MB) closes the connection with code 1009.
-
-- Security: a client can not `joinRoom` a room that starts with `room:`. That is the default room of a route, so a client of a public route could join the room of a route with auth middleware and get all its messages.
-- Security: a room with no members is removed, and a room name longer than 255 chars is not joined. Before, every room name a client sent stayed in memory, so one client could fill the memory of the server.
-
-### 3.0.0-alpha.6
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.5
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.4
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.3
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.2
-
-- Needs Dart 3.13 or newer.
-- All dependencies updated to their latest versions.
-- `WebsocketAdapterInterface.emit` now has a `void` return type.
-
-### 3.0.0-alpha.1
-
-- Version 3 of Dox. All Dox packages now share one version.
-- Needs Dart 3.6 or newer.
-- See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
-- `uuid` 4 and `ioredis` 2.
-
 
 ---
 
@@ -18003,7 +17571,7 @@ melos bs
 ### 4. Useful commands
 
 ```bash
-# Run all tests (not dox_orm and not dox_mysql_native).
+# Run all tests (not dox_orm).
 # Use `melos run test`. `melos test` is a built-in melos command.
 melos run test
 
@@ -18042,10 +17610,11 @@ It uses pub.dev automated publishing, so it needs no token or secret.
 The full guide is [RELEASING.md](https://github.com/dartondox/dox/blob/develop/RELEASING.md) in the repo. In short:
 
 1. Bump every package with `bin/update_versions.sh`, and close the `## Unreleased` section of each `CHANGELOG.md`.
-2. Push one tag per native package (`dox_http_native-v<version>`, `dox_postgres_native-v<version>`, `dox_mysql_native-v<version>`). GitHub builds the libraries for 5 platforms.
-3. Write their hashes into the code with `dart run bin/native_hashes.dart <tag>`.
-4. Merge the release PR, then push the tag `v<version>`. This publishes to pub.dev.
-5. Release the matching `dox-sample` template.
+2. Merge the release PR, then push the tag `v<version>`. This publishes to pub.dev.
+3. Release the matching `dox-sample` template.
+
+The native packages (`dox_http_native`, `dox_postgres_native`, `dox_mysql_native`) are not in this repo.
+See [Native packages](#native-packages) below.
 
 **New package only:** turn on pub.dev automated publishing for it first. See [One-time setup](#one-time-setup).
 A new package must first exist on pub.dev, so publish its first version by hand with `dart pub publish`.
@@ -18095,6 +17664,36 @@ On GitHub, in `dartondox/dox` > Settings > Environments, there must be an enviro
 The publish job runs in it.
 Optional: add yourself as a required reviewer, and allow only tags `v*`.
 The old `PUB_CREDENTIALS` secret is not used any more.
+
+## Native packages
+
+The three native packages live in their own repos:
+
+| Package | Repo |
+| --- | --- |
+| `dox_http_native` | [dartondox/dox-http-native](https://github.com/dartondox/dox-http-native) |
+| `dox_postgres_native` | [dartondox/dox-postgres-native](https://github.com/dartondox/dox-postgres-native) |
+| `dox_mysql_native` | [dartondox/dox-mysql-native](https://github.com/dartondox/dox-mysql-native) |
+
+Dox uses them from pub.dev. Their build hooks download ready-built libraries, so you do not need Rust to work on Dox.
+
+To work on a native package and Dox together:
+
+1. Clone the package next to the Dox repo, like `../dox-http-native`.
+2. Add it to the root `pubspec_overrides.yaml` of the Dox repo. Git ignores this file.
+
+    ```yaml
+    dependency_overrides:
+      dox_http_native:
+        path: ../dox-http-native
+    ```
+
+3. Run `dart pub get`.
+
+Each native package is released from its own repo, with its own version.
+Push a `v<version>` tag in that repo.
+Its CI builds the libraries, uploads them, fills the hashes and publishes the package to pub.dev.
+Then raise the version constraint in the Dox packages that use it.
 
 ## Docs
 

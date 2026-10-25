@@ -1384,8 +1384,6 @@
       
         
       
-        
-      
     
     
     
@@ -1561,34 +1559,6 @@
     
   
     Services
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../websocket/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WebSocket
   
 
     
@@ -4062,7 +4032,7 @@ disk is from another version of the package. See
 </li>
 <li>
 <p>A message or frame over the size limit closes the socket with code <code>1009</code>.
-  Dart never reads it. <code>dox_websocket</code> uses <code>maxMessageSize</code>, Socket.IO uses
+  Dart never reads it. <code>NativeWebSocket.upgrade</code> takes <code>maxMessageSize</code>. Socket.IO uses
   <code>maxHttpBufferSize</code>.</p>
 </li>
 <li>Compression (permessage-deflate) is never agreed. A small compressed
@@ -4110,7 +4080,7 @@ that works:</p>
 </li>
 <li>
 <p>A local build in <code>native/target/release</code> of the package (for work on
-   Dox itself).</p>
+   the package itself).</p>
 </li>
 <li>The ready-built library from the GitHub release, checked with sha256.
    There are builds for macOS (arm64, x64), Linux (x64, arm64) and
@@ -4125,19 +4095,25 @@ error above. Install Rust and run it again, so step 4 works.</p>
 <code>dart build cli</code>. See <a href="../deployment/">Deployment</a>.</p>
 </div>
 <h2 id="work-on-the-native-code">Work on the native code</h2>
-<p>The Rust code is in <code>packages/dox-http-native/native</code>.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">cd</span><span class="w"> </span>packages/dox-http-native/native
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>cargo<span class="w"> </span>build<span class="w"> </span>--release<span class="w">   </span><span class="c1"># the hook uses this build from now on</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>cargo<span class="w"> </span><span class="nb">test</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nb">cd</span><span class="w"> </span>..<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>dart<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--concurrency<span class="o">=</span><span class="m">1</span>
+<p><code>dox_http_native</code> lives in its own repo:
+<a href="https://github.com/dartondox/dox-http-native">dartondox/dox-http-native</a>.
+The Rust code is in its <code>native</code> folder.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/dartondox/dox-http-native
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">cd</span><span class="w"> </span>dox-http-native/native
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>cargo<span class="w"> </span>build<span class="w"> </span>--release<span class="w">   </span><span class="c1"># the hook uses this build from now on</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>cargo<span class="w"> </span><span class="nb">test</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nb">cd</span><span class="w"> </span>..<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>dart<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--concurrency<span class="o">=</span><span class="m">1</span>
 </span></code></pre></div>
-<p>To make a release of the libraries, push a tag like
-<code>dox_http_native-v3.0.0-alpha.4</code>. The version in the tag must be the
-<code>version</code> in <code>packages/dox-http-native/pubspec.yaml</code>, because the build hook
-downloads from the tag of its own version.</p>
-<p>The <code>Native</code> workflow builds the 5 libraries and uploads them with a
-<code>SHA256SUMS</code> file. Copy the hashes into <code>_sha256</code> in <code>hook/build.dart</code> before
-you publish the package.</p>
+<p>To use your local copy in the Dox repo, add it to the root
+<code>pubspec_overrides.yaml</code> of the Dox repo (git ignores this file), then run
+<code>dart pub get</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">dependency_overrides</span><span class="p">:</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">dox_http_native</span><span class="p">:</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../dox-http-native</span>
+</span></code></pre></div>
+<p>To release the package, push a <code>v&lt;version&gt;</code> tag in its repo. Its CI builds
+the libraries, uploads them, fills the hashes and publishes the package to
+pub.dev.</p>
 
 
 

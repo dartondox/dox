@@ -1384,8 +1384,6 @@
       
         
       
-        
-      
     
     
     
@@ -1663,34 +1661,6 @@
     
   
     Services
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../websocket/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WebSocket
   
 
     
@@ -3981,7 +3951,7 @@
     A3 --&gt; I3["Isolate N&lt;br&gt;own memory cache"]
     I2 -. "crash: started again after 1 second" .-&gt; I2
     I1 -. "crash: the process exits" .-&gt; S["Supervisor restarts the process&lt;br&gt;Docker, systemd"]</code></pre>
-<p>With the native Postgres and MySQL drivers (the default), all isolates share one database pool in Rust. With the Dart drivers, each isolate has its own pool. See <a href="../../concepts/how-dox-works/#where-the-database-pools-live">How Dox works</a>.</p>
+<p>With the Postgres and MySQL drivers, all isolates share one database pool in Rust. See <a href="../../concepts/how-dox-works/#where-the-database-pools-live">How Dox works</a>.</p>
 <p>See <a href="../native-server/">Native server</a> for the two servers.</p>
 <h2 id="how-many-isolates">How many isolates</h2>
 <p>By default Dox starts one isolate per CPU core (<code>Platform.numberOfProcessors</code>). So one process uses the whole machine.</p>
@@ -3999,7 +3969,7 @@
 <p>Use fewer isolates when:</p>
 <ul>
 <li>the machine also runs the database or other heavy work, or</li>
-<li>you use WebSocket rooms without the Redis adapter. A room only reaches clients on the same isolate. Use <code>1</code>, or see <a href="../websocket/">WebSocket</a>.</li>
+<li>you use Socket.IO rooms without the Redis adapter. A room only reaches clients on the same isolate. Use <code>1</code>, or see <a href="../../packages/socketio/">Socket.IO</a>.</li>
 </ul>
 <h2 id="each-isolate-has-its-own-memory">Each isolate has its own memory</h2>
 <p>Isolates do not share memory. This has some effects on your code:</p>
