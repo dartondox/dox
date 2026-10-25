@@ -4,8 +4,8 @@ import 'package:dox_app/config/logger.dart';
 import 'package:dox_app/config/openapi.dart';
 import 'package:dox_app/config/socketio.dart';
 import 'package:dox_app/config/storage.dart';
-import 'package:dox_app/container.g.dart';
-import 'package:dox_app/dtos.g.dart';
+import 'package:dox_app/generated/container.g.dart';
+import 'package:dox_app/generated/dtos.g.dart';
 import 'package:dox_app/config/env.dart';
 import 'package:dox_core/dox_core.dart';
 
@@ -34,7 +34,7 @@ AppConfig appConfig = AppConfig(
 
   /// DTOs
   /// -------------------------------
-  /// Every @Dto class of the app, from lib/dtos.g.dart.
+  /// Every @Dto class of the app, from lib/generated/dtos.g.dart.
   /// Run `dox build_runner:build` after you add one.
   dtos: dtos,
 
@@ -50,7 +50,7 @@ AppConfig appConfig = AppConfig(
   /// Container
   /// -------------------------------
   /// Every @Inject class, router (extends Router) and service
-  /// (implements DoxService) of the app, from lib/container.g.dart.
+  /// (implements DoxService) of the app, from lib/generated/container.g.dart.
   /// Run `dart run build_runner build` after you add one.
   container: registerContainer,
 

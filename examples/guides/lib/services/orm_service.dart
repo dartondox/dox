@@ -6,7 +6,7 @@ import 'package:my_app/config/database.dart';
 /// --------------------------
 /// Sets up the query builder, so this project can use the ORM.
 /// If this project does not need a database, delete this file
-/// (Dox finds every DoxService class, see lib/container.g.dart).
+/// (Dox finds every DoxService class, see lib/generated/container.g.dart).
 class ORMService implements DoxService, DoxShutdown {
   @override
   Future<void> setup() async {

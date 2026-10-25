@@ -135,7 +135,7 @@ dart run build_runner build --delete-conflicting-outputs
 dox serve
 ```
 
-Make sure `lib/config/app.dart` has `dtos: dtos` from `lib/dtos.g.dart`. See [Validation: setup](../the-basic/validation.md#setup).
+Make sure `lib/config/app.dart` has `dtos: dtos` from `lib/generated/dtos.g.dart`. See [Validation: setup](../the-basic/validation.md#setup).
 
 ## Check it
 

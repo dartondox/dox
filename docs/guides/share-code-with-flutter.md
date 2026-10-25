@@ -85,7 +85,7 @@ dart run build_runner build
 This writes two files:
 
 - `lib/src/save_blog.g.dart`: the checks, the converter and the JSON Schema of `SaveBlog`.
-- `lib/dtos.g.dart`: the list of every DTO in this package. The server uses it.
+- `lib/generated/dtos.g.dart`: the list of every DTO in this package. The server uses it.
 
 Commit both files. Then the Flutter app does not need to run the generator.
 
@@ -114,13 +114,13 @@ dev_dependencies:
   dox_builder: ^3.0.0-alpha
 ```
 
-Dox finds a DTO in the `dtos` list of `AppConfig`. The server's own `lib/dtos.g.dart` lists only the DTOs in the server.
+Dox finds a DTO in the `dtos` list of `AppConfig`. The server's own `lib/generated/dtos.g.dart` lists only the DTOs in the server.
 So add the list of the shared package too:
 
 ```dart title="server/lib/config/app.dart"
-import 'package:blog_shared/dtos.g.dart' as shared;
+import 'package:blog_shared/generated/dtos.g.dart' as shared;
 import 'package:dox_core/dox_core.dart';
-import 'package:server/dtos.g.dart';
+import 'package:server/generated/dtos.g.dart';
 
 AppConfig appConfig = AppConfig(
   // ...
@@ -128,7 +128,7 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
-When the server has no DTOs of its own, there is no `server/lib/dtos.g.dart`. Then use `dtos: shared.dtos`.
+When the server has no DTOs of its own, there is no `server/lib/generated/dtos.g.dart`. Then use `dtos: shared.dtos`.
 
 The controller asks for `SaveBlog` like any other DTO. Dox checks the body before the method runs. Bad input gets `422`.
 

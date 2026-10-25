@@ -79,7 +79,7 @@ Or set `APP_PORT=3001` in `.env` (a new project reads it into `serverPort`).
 
 ## build_runner: conflicting outputs
 
-**Symptom.** `dox build_runner:build`, `dox serve` or `dox build` stops with a build_runner message that starts with `Conflicting outputs were detected`, and names files like `lib/dtos.g.dart` or `lib/app/models/user/user.model.g.dart`.
+**Symptom.** `dox build_runner:build`, `dox serve` or `dox build` stops with a build_runner message that starts with `Conflicting outputs were detected`, and names files like `lib/generated/dtos.g.dart` or `lib/app/models/user/user.model.g.dart`.
 
 **Cause.** The generated `.g.dart` files are on disk, but `.dart_tool/build` does not know them. This happens after a `git clone` with committed `.g.dart` files, after deleting `.dart_tool`, or after a Dart SDK update.
 

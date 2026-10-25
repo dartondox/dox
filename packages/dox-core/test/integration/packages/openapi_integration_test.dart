@@ -35,7 +35,7 @@ class TagController {
   dynamic index(DoxRequest req) => <dynamic>[];
 }
 
-/// what dox_builder writes into lib/openapi.g.dart for PostController
+/// what dox_builder writes into lib/generated/openapi.g.dart for PostController
 const OpenApiRegistry registry = OpenApiRegistry(
   operations: <OpenApiOperation>[
     OpenApiOperation(

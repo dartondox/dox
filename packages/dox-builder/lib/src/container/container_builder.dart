@@ -57,7 +57,7 @@ class ModelEntry {
   String get name => element.displayName;
 }
 
-/// Writes `lib/container.g.dart`: one function that puts every class of
+/// Writes `lib/generated/container.g.dart`: one function that puts every class of
 /// the app into the Dox container. Give it to the app:
 /// `AppConfig(container: registerContainer)`.
 ///
@@ -75,14 +75,14 @@ class ModelEntry {
 class DoxContainerBuilder implements Builder {
   const DoxContainerBuilder();
 
-  static const String output = 'lib/container.g.dart';
+  static const String output = 'lib/generated/container.g.dart';
 
   static const AnnotationReader _annotations = AnnotationReader();
 
   @override
   Map<String, List<String>> get buildExtensions {
     return const <String, List<String>>{
-      r'$lib$': <String>['container.g.dart'],
+      r'$lib$': <String>['generated/container.g.dart'],
     };
   }
 
@@ -270,7 +270,7 @@ class DoxContainerBuilder implements Builder {
   }
 }
 
-/// Writes the code of `lib/container.g.dart`.
+/// Writes the code of `lib/generated/container.g.dart`.
 class ContainerWriter {
   ContainerWriter(this.entries, this.models);
 

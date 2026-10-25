@@ -9,11 +9,11 @@ Turn on OpenAPI docs for the blog API, open the docs page, and make the docs bet
 
 ## 1. Write the config
 
-`build_runner` writes `lib/openapi.g.dart`. Its `openApiRegistry` holds what the builder found in your routes, controllers, DTOs and models. Pass it to an `OpenApiConfig`:
+`build_runner` writes `lib/generated/openapi.g.dart`. Its `openApiRegistry` holds what the builder found in your routes, controllers, DTOs and models. Pass it to an `OpenApiConfig`:
 
 ```dart title="lib/config/openapi.dart"
 import 'package:dox_core/dox_core.dart';
-import 'package:blog/openapi.g.dart';
+import 'package:blog/generated/openapi.g.dart';
 
 OpenApiConfig openApi = OpenApiConfig(
   info: Info(title: 'Blog API', version: '1.0.0'),

@@ -1,6 +1,6 @@
 import 'package:dox_core/dox_core.dart';
 
-/// a small app wired like `lib/container.g.dart` wires a real one
+/// a small app wired like `lib/generated/container.g.dart` wires a real one
 
 class UserRepository {
   String find(int id) => 'user $id';

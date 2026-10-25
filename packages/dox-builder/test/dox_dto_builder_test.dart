@@ -310,7 +310,7 @@ class A {
   });
 
   group('DTO registry |', () {
-    test('lib/dtos.g.dart lists every DTO', () async {
+    test('lib/generated/dtos.g.dart lists every DTO', () async {
       String output = '';
       await testBuilder(
         buildDoxDtos(BuilderOptions.empty),
@@ -330,7 +330,7 @@ class NotADto {}
         },
         rootPackage: 'a',
         outputs: <String, Object>{
-          'a|lib/dtos.g.dart': decodedMatches(
+          'a|lib/generated/dtos.g.dart': decodedMatches(
             predicate<String>((String s) {
               output = s;
               return true;

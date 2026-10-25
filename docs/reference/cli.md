@@ -211,7 +211,7 @@ A trailing `Controller` in the name is removed: `UserController` and `User` give
 | `-r` | `lib/app/http/controllers/<name>.controller.dart` | `_getResourceSample` in the same file |
 
 The class has `@Inject()`, so the container makes it. A comment shows the route to add, like `Route.get<BlogController>('path', (BlogController c) => c.index);`.
-After the file is made, the CLI tells you to run `dart run build_runner build`. That adds the controller to `lib/container.g.dart`.
+After the file is made, the CLI tells you to run `dart run build_runner build`. That adds the controller to `lib/generated/container.g.dart`.
 
 ### `dox make:middleware`
 
@@ -357,7 +357,7 @@ import 'dart:io';
 
 import 'package:dox_queue/dox_queue.dart';
 import 'package:<app>/config/app.dart';
-import 'package:<app>/jobs.g.dart';
+import 'package:<app>/generated/jobs.g.dart';
 
 Future<void> main(List<String> args) async {
   exitCode = await QueueWorker(jobs: jobRegistry, app: appConfig).run(args);

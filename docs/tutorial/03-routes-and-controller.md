@@ -44,7 +44,7 @@ class PostController {
 
 How it works:
 
-- `@Inject()` puts the controller in the container. Dox makes it for you. `dox s` runs `build_runner`, which adds it to `lib/container.g.dart`.
+- `@Inject()` puts the controller in the container. Dox makes it for you. `dox s` runs `build_runner`, which adds it to `lib/generated/container.g.dart`.
   A new project already has `container: registerContainer` in `lib/config/app.dart`, so you change nothing there.
 - A controller returns a model or a list of models. Dox sends it as JSON.
 - `response(post).statusCode(201)` sets the status code.

@@ -56,7 +56,7 @@ sequenceDiagram
 
 !!! note "No reflection"
     Dox reads the parameter types of every controller once, at start.
-    It does not use `dart:mirrors`. DTOs come from a generated list (`lib/dtos.g.dart`).
+    It does not use `dart:mirrors`. DTOs come from a generated list (`lib/generated/dtos.g.dart`).
     This is why `dox build` can make a native (AOT) binary.
 
 ### Where things are decided
@@ -179,9 +179,10 @@ my_app/
 │   │   └── web.dart             # WebRouter
 │   ├── services/
 │   │   └── orm_service.dart     # opens the database in every isolate
-│   ├── container.g.dart         # generated: @Inject classes, routers, services
-│   ├── dtos.g.dart              # generated: the list of DTOs
-│   └── openapi.g.dart           # generated: the OpenAPI docs
+│   └── generated/               # made by build_runner, do not edit
+│       ├── container.g.dart     # @Inject classes, routers, services
+│       ├── dtos.g.dart          # the list of DTOs
+│       └── openapi.g.dart       # the OpenAPI docs
 ├── storage/                     # local disk, file cache, uploads
 ├── test/
 ├── .env                         # local settings, not in git

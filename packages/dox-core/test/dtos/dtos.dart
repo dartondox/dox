@@ -6,7 +6,7 @@ import 'files.dto.dart';
 import 'nested.dto.dart';
 import 'rules.dto.dart';
 
-/// Every test DTO, like `lib/dtos.g.dart` in an app.
+/// Every test DTO, like `lib/generated/dtos.g.dart` in an app.
 const List<DtoSchema<Object>> testDtos = <DtoSchema<Object>>[
   $CreateUserDto,
   $TextRulesDto,

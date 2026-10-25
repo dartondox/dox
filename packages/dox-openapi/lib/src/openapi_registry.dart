@@ -2,7 +2,7 @@ import 'route_doc.dart';
 
 /// Docs of one controller method, made at build time by `dox_builder`.
 ///
-/// The generated `lib/openapi.g.dart` holds a list of these. They are
+/// The generated `lib/generated/openapi.g.dart` holds a list of these. They are
 /// matched to the live routes by the method name, see [OpenApiRegistry].
 class OpenApiOperation {
   /// Class name, for example `BlogController`.

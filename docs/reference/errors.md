@@ -70,7 +70,7 @@ The table shows the `message` text.
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `Bad state: <T> is not a known DTO. Add @Dto() to it, run `dart run build_runner build` and set `dtos: dtos` (lib/dtos.g.dart) in AppConfig.` | `req.validate<T>()` can not find `T`. | Do what the text says. |
+| `Bad state: <T> is not a known DTO. Add @Dto() to it, run `dart run build_runner build` and set `dtos: dtos` (lib/generated/dtos.g.dart) in AppConfig.` | `req.validate<T>()` can not find `T`. | Do what the text says. |
 | `Invalid argument(s): Storage disk "<name>" has unknown driver "<type>"` | A disk in `StorageConfig` has a `driver` other than `local`, `s3` or `memory`. | Fix the driver name. |
 | `Invalid argument(s): Storage disk "<name>" needs the "<setting>" setting. It is missing or empty.` | An `s3` disk without `bucket`, `key` or `secret`, on its first use. | Set `AWS_BUCKET`, `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`. |
 | `Invalid argument(s): invalid file` | `Storage().put()` with no `extension:`, and Dox can not find the type from the bytes. | Pass `extension: 'pdf'`. |

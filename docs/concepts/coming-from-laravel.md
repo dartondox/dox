@@ -345,7 +345,7 @@ See [Testing](../digging-deeper/testing.md).
 ## What is different
 
 - **A generated container.** Like Laravel, Dox makes your controllers and injects what the constructor asks for.
-  You add `@Inject()` to the class. `build_runner` writes `lib/container.g.dart` with every registration. There are no service providers to write.
+  You add `@Inject()` to the class. `build_runner` writes `lib/generated/container.g.dart` with every registration. There are no service providers to write.
   A singleton is one instance per isolate, not one per request.
 - **Isolates, not PHP-FPM workers.** One process runs one isolate per CPU core. Each isolate runs your whole app and has its own memory.
   A static value or a singleton lives once per isolate. A PHP worker starts from zero on each request. A Dox isolate keeps its state between requests, so a memory leak stays.

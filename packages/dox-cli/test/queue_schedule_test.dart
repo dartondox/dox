@@ -141,7 +141,7 @@ void main(List<String> args) {
       expect(job, contains('  SendWelcomeEmail();'));
       String entry = File('bin/queue.dart').readAsStringSync();
       expect(entry, contains("import 'package:my_app/config/app.dart';"));
-      expect(entry, contains("import 'package:my_app/jobs.g.dart';"));
+      expect(entry, contains("import 'package:my_app/generated/jobs.g.dart';"));
       expect(entry, contains('QueueWorker(jobs: jobRegistry, app: appConfig)'));
     });
 

@@ -32,8 +32,9 @@ It writes:
 - The `.g.dart` part of each `@DoxModel` model (the `<Name>Generator` class).
 - The `.g.dart` part of each `@Dto` class (`$<Name>Dto`, the checks and the JSON Schema).
 - The `.g.dart` part of the `@DoxEnv` env class.
-- `lib/dtos.g.dart`: every DTO of the app, for `AppConfig(dtos: dtos)`.
-- `lib/openapi.g.dart`: the OpenAPI docs, read from the routes, controllers, DTOs and models.
+- `lib/generated/container.g.dart`: every `@Inject()` class, router, service and model binder, for `AppConfig(container: registerContainer)`.
+- `lib/generated/dtos.g.dart`: every DTO of the app, for `AppConfig(dtos: dtos)`.
+- `lib/generated/openapi.g.dart`: the OpenAPI docs, read from the routes, controllers, DTOs and models.
 
 A bad DTO (a field that is not final, a type that is not supported, a bad regex) stops the build with a clear error.
 

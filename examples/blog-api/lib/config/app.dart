@@ -5,8 +5,8 @@ import 'package:blog/config/cors.dart';
 import 'package:blog/config/env.dart';
 import 'package:blog/config/logger.dart';
 import 'package:blog/config/storage.dart';
-import 'package:blog/container.g.dart';
-import 'package:blog/dtos.g.dart';
+import 'package:blog/generated/container.g.dart';
+import 'package:blog/generated/dtos.g.dart';
 import 'package:dox_core/dox_core.dart';
 
 AppConfig appConfig = AppConfig(
@@ -44,10 +44,10 @@ AppConfig appConfig = AppConfig(
   /// Container
   /// -------------------------------
   /// Every @Inject class, router and service of the app,
-  /// from lib/container.g.dart (made by build_runner).
+  /// from lib/generated/container.g.dart (made by build_runner).
   container: registerContainer,
 
-  /// DTOs (generated list in lib/dtos.g.dart)
+  /// DTOs (generated list in lib/generated/dtos.g.dart)
   dtos: dtos,
 
   /// Cache stores (config/cache.dart)

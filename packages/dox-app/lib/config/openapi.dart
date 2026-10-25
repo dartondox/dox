@@ -1,4 +1,4 @@
-import 'package:dox_app/openapi.g.dart';
+import 'package:dox_app/generated/openapi.g.dart';
 import 'package:dox_app/config/env.dart';
 import 'package:dox_core/dox_core.dart';
 
@@ -9,7 +9,7 @@ import 'package:dox_core/dox_core.dart';
 /// `dox openapi:generate` writes the files to storage/openapi.
 ///
 /// The docs come from the routes, the controllers and the models.
-/// `dart run build_runner build` makes `lib/openapi.g.dart`.
+/// `dart run build_runner build` makes `lib/generated/openapi.g.dart`.
 ///
 /// `/docs` uses Scalar. Use `ui: DocsUi.swagger` for Swagger UI, and
 /// `scalar: ScalarOptions(...)` for the theme and dark mode.

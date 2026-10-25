@@ -64,7 +64,7 @@ class AuthService implements DoxService {
 }
 ```
 
-Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/container.g.dart`.
+Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
 
 ## 3. Write the DTOs
 

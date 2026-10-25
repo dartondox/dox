@@ -39,15 +39,15 @@ class SavePost {
 
 ## 2. Give the DTO list to the app
 
-The generator writes a list of all DTOs to `lib/dtos.g.dart`.
+The generator writes a list of all DTOs to `lib/generated/dtos.g.dart`.
 Dox needs this list, because it does not use reflection.
 Add two lines to `lib/config/app.dart`:
 
 ```dart title="lib/config/app.dart"
-import 'package:blog/dtos.g.dart';
+import 'package:blog/generated/dtos.g.dart';
 
 AppConfig appConfig = AppConfig(
-  /// DTOs (generated list in lib/dtos.g.dart)
+  /// DTOs (generated list in lib/generated/dtos.g.dart)
   dtos: dtos,
 
   // ... the rest stays the same
@@ -115,7 +115,7 @@ class PostController {
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-It writes `lib/app/http/dtos/save_post.dto.g.dart` and `lib/dtos.g.dart`.
+It writes `lib/app/http/dtos/save_post.dto.g.dart` and `lib/generated/dtos.g.dart`.
 
 ## Check it
 
