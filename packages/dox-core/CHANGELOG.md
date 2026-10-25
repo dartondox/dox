@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.13
 
 - New: `OpenApiConfig(include: ['/api/*'], exclude: ['/api/internal/*'])` picks which routes go in the OpenAPI docs by path. A `*` at the end matches the rest of the path.
 
