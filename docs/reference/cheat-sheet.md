@@ -69,7 +69,7 @@ class ApiRouter extends Router {
 
 | Code | Does |
 | --- | --- |
-| `Route.get<C>('/blogs', (C c) => c.index)` | controller `C` from the container. Also `post`, `put`, `patch`, `delete`, `options` |
+| `Route.get('/blogs', (C c) => c.index)` | controller `C` from the container. Also `post`, `put`, `patch`, `delete`, `options` |
 | `Route.get('/blogs', listBlogs)` | a plain function |
 | `Route.post('/blogs', c.store, body: schema)` | `body:` is for the docs only. It checks nothing. |
 | `Route.get('/blogs/{id}', c.show)` | path param. `show(int id)` |

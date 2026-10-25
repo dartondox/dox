@@ -138,8 +138,8 @@ When you run more than one process (two machines), each process has an isolate 1
 ## 4. Add the routes
 
 ```dart title="lib/routes/api.dart"
-Route.post<ReportController>('/reports', (ReportController c) => c.store);
-Route.get<ReportController>('/primes/{limit}', (ReportController c) => c.primes);
+Route.post('/reports', (ReportController c) => c.store);
+Route.get('/primes/{limit}', (ReportController c) => c.primes);
 ```
 
 ## Check it

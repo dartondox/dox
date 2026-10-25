@@ -90,9 +90,9 @@ class WebRouter extends Router {
   @override
   void register() {
     // the SPA: assets with a long cache, every other URL gets index.html
-    Route.get<StaticController>('/assets/{path*}', (StaticController c) => c.asset);
-    Route.get<StaticController>('/', (StaticController c) => c.index);
-    Route.get<StaticController>('/{path*}', (StaticController c) => c.index);
+    Route.get('/assets/{path*}', (StaticController c) => c.asset);
+    Route.get('/', (StaticController c) => c.index);
+    Route.get('/{path*}', (StaticController c) => c.index);
   }
 }
 ```

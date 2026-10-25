@@ -13,7 +13,7 @@ The Laravel code is Laravel 11. The biggest changes are in [What is different](#
 | Laravel | Dox |
 | --- | --- |
 | `Route::get('/ping', fn () => 'pong');` | `Route.get('/ping', (DoxRequest req) => 'pong');` |
-| `Route::post('/blogs', [BlogController::class, 'store']);` | `Route.post<BlogController>('/blogs', (BlogController c) => c.store);` |
+| `Route::post('/blogs', [BlogController::class, 'store']);` | `Route.post('/blogs', (BlogController c) => c.store);` |
 | `Route::get('/blogs/{id}', ...)` and `function show(int $id)` | `Route.get('/blogs/{id}', ...)` and `show(int id)` |
 | `Route::get('/posts/{page?}', ...)` | `Route.get('/posts/{page?}', (int? page) => ...)` |
 | `->where('path', '.*')` | `Route.get('/docs/{page*}', (String page) => ...)` |
@@ -35,7 +35,7 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    Route.get<BlogController>('/blogs', (BlogController c) => c.index);
+    Route.get('/blogs', (BlogController c) => c.index);
     Route.resource('users', UserController);
   }
 }

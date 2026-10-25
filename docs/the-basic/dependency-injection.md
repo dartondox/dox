@@ -64,7 +64,7 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    Route.get<UserController>('/users/{id}', (UserController c) => c.show);
+    Route.get('/users/{id}', (UserController c) => c.show);
   }
 }
 ```
@@ -142,24 +142,22 @@ Each constructor parameter is found by its type.
 
 ## Routes to controller methods
 
-Give the controller type, then a function that picks the method:
+Pass a function that picks the method. Dox finds the controller by the parameter type:
 
 ```dart
-Route.get<PostController>('/posts', (PostController c) => c.index);
-Route.post<PostController>('/posts', (PostController c) => c.store);
-Route.put<PostController>('/posts/{id}', (PostController c) => c.update);
-Route.delete<PostController>('/posts/{id}', (PostController c) => c.destroy);
+Route.get('/posts', (PostController c) => c.index);
+Route.post('/posts', (PostController c) => c.store);
+Route.put('/posts/{id}', (PostController c) => c.update);
+Route.delete('/posts/{id}', (PostController c) => c.destroy);
 ```
 
 The controller comes from the container. Dox gets it once per isolate, at start. A request does no extra work.
 `.name()`, groups and middleware lists work the same:
 
 ```dart
-Route.get<PostController>('/posts/{id}', (PostController c) => c.show).name('posts.show');
-Route.get<AuthController>('/me', <dynamic>[AuthMiddleware(), (AuthController c) => c.me]);
+Route.get('/posts/{id}', (PostController c) => c.show).name('posts.show');
+Route.get('/me', <dynamic>[AuthMiddleware(), (AuthController c) => c.me]);
 ```
-
-You can leave out `<PostController>`. Dox then finds the controller by the parameter type: `Route.get('/posts', (PostController c) => c.index)`.
 
 For resource routes, pass the class:
 
@@ -186,7 +184,7 @@ Every `@DoxModel` class gets a binder in `lib/generated/container.g.dart`.
 When a handler has a parameter of a model type, Dox loads the model by its primary key.
 
 ```dart
-Route.get<PostController>('/posts/{post}', (PostController c) => c.show);
+Route.get('/posts/{post}', (PostController c) => c.show);
 
 @Inject()
 class PostController {

@@ -51,11 +51,11 @@ The leading `/` in a path is optional. `'ping'` and `'/ping'` are the same route
 ## Route methods
 
 ```dart
-Route.get<BlogController>('/blogs', (BlogController c) => c.index);
-Route.post<BlogController>('/blogs', (BlogController c) => c.store);
-Route.put<BlogController>('/blogs/{id}', (BlogController c) => c.update);
-Route.patch<BlogController>('/blogs/{id}', (BlogController c) => c.update);
-Route.delete<BlogController>('/blogs/{id}', (BlogController c) => c.destroy);
+Route.get('/blogs', (BlogController c) => c.index);
+Route.post('/blogs', (BlogController c) => c.store);
+Route.put('/blogs/{id}', (BlogController c) => c.update);
+Route.patch('/blogs/{id}', (BlogController c) => c.update);
+Route.delete('/blogs/{id}', (BlogController c) => c.destroy);
 ```
 
 !!! info
@@ -73,7 +73,7 @@ The second argument is the code that answers the request. It can be:
 Route.get('/ping', (DoxRequest req) => 'pong');
 
 // a controller method. The controller comes from the container.
-Route.get<WebController>('/ping', (WebController c) => c.pong);
+Route.get('/ping', (WebController c) => c.pong);
 
 @Inject()
 class WebController {
@@ -83,7 +83,7 @@ class WebController {
 }
 
 // a list: middleware first, the controller last
-Route.get<WebController>('/ping', <dynamic>[
+Route.get('/ping', <dynamic>[
   LoggerMiddleware(),
   (WebController c) => c.pong,
 ]);

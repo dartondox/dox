@@ -39,7 +39,7 @@ class LoggerMiddleware implements IDoxMiddleware {
 Then put it on a route:
 
 ```dart title="lib/routes/api.dart"
-Route.get<WebController>('/ping', <dynamic>[LoggerMiddleware(), (WebController c) => c.pong]);
+Route.get('/ping', <dynamic>[LoggerMiddleware(), (WebController c) => c.pong]);
 ```
 
 !!! note
@@ -61,7 +61,7 @@ dynamic apiKeyMiddleware(DoxRequest req) {
 ```
 
 ```dart title="lib/routes/api.dart"
-Route.get<WebController>('/ping', <dynamic>[apiKeyMiddleware, (WebController c) => c.pong]);
+Route.get('/ping', <dynamic>[apiKeyMiddleware, (WebController c) => c.pong]);
 ```
 
 ## Run code after the controller
@@ -115,7 +115,7 @@ Put them in the list before the controller. They run from left to right.
 You can mix class and function middleware, with or without `next`.
 
 ```dart
-Route.get<WebController>('/ping', <dynamic>[
+Route.get('/ping', <dynamic>[
   LoggerMiddleware(),
   apiKeyMiddleware,
   (WebController c) => c.pong, // the controller is always last

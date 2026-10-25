@@ -110,7 +110,7 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    Route.post<UploadController>('/upload', (UploadController c) => c.store);
+    Route.post('/upload', (UploadController c) => c.store);
   }
 }
 ```
