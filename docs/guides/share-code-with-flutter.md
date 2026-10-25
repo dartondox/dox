@@ -135,6 +135,7 @@ The controller asks for `SaveBlog` like any other DTO. Dox checks the body befor
 ```dart title="server/lib/app/http/controllers/blog.controller.dart"
 import 'package:blog_shared/blog_shared.dart' show SaveBlog;
 
+@Inject()
 class BlogController {
   Future<Map<String, dynamic>> store(SaveBlog body) async {
     // body.title is already trimmed and checked.
@@ -144,7 +145,7 @@ class BlogController {
 ```
 
 ```dart title="server/lib/routes/api.dart"
-Route.post('/blogs', BlogController().store);
+Route.post<BlogController>('/blogs', (BlogController c) => c.store);
 ```
 
 !!! note "Why `show SaveBlog`"

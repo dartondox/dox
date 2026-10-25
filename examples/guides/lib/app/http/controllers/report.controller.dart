@@ -3,6 +3,7 @@ import 'dart:isolate';
 
 import 'package:dox_core/dox_core.dart';
 
+@Inject()
 class ReportController {
   /// POST /api/reports
   /// Answers at once. The work runs after the response, in this isolate.
@@ -42,5 +43,3 @@ int countPrimes(int limit) {
   }
   return count;
 }
-
-ReportController reportController = ReportController();

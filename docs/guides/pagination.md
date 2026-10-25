@@ -45,6 +45,7 @@ import 'package:dox_orm/dox_orm.dart';
 import 'package:my_app/app/http/dtos/list_users.dto.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 
+@Inject()
 class UserController {
   /// GET /api/users?page=1&per_page=20
   Future<Pagination<User>> index(ListUsers query) async {
@@ -53,8 +54,6 @@ class UserController {
         .paginate(currentPage: query.page, perPage: query.perPage);
   }
 }
-
-UserController userController = UserController();
 ```
 
 Always add an `orderBy`. Without it, the database may return the rows in a different order on each page.
@@ -64,7 +63,7 @@ Add a `where` before `paginate` to filter: `User().where('role', 'admin').orderB
 ## 3. Add the route
 
 ```dart title="lib/routes/api.dart"
-Route.get('/users', userController.index);
+Route.get<UserController>('/users', (UserController c) => c.index);
 ```
 
 ## 4. Build and run

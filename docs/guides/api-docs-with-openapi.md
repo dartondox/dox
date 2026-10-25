@@ -173,6 +173,7 @@ Write a `///` comment on a controller method. The first line is the summary. The
 Add `@Tags` and `@Response` (from `dox_core`) when the automatic result is not what you want.
 
 ```dart title="lib/app/http/controllers/post.controller.dart"
+@Inject()
 class PostController {
   /// List all posts
   ///

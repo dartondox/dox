@@ -128,18 +128,43 @@ class RouteScanner extends RecursiveAstVisitor<void> {
     if (name == 'resource') {
       _addResource(path, args[1]);
     } else if (_methods.contains(name)) {
-      _addRoute(name.toUpperCase(), path, args[1]);
+      _addRoute(name.toUpperCase(), path, args[1], _typeArgument(node));
     }
   }
 
-  void _addRoute(String method, String? path, Expression handler) {
+  /// `C` of `Route.get<C>(...)`, or null
+  ClassElement? _typeArgument(MethodInvocation node) {
+    NodeList<TypeAnnotation>? types = node.typeArguments?.arguments;
+    if (types == null || types.length != 1) return null;
+    DartType? type = types.first.type;
+    if (type is! InterfaceType) return null;
+    InterfaceElement element = type.element;
+    return element is ClassElement ? element : null;
+  }
+
+  void _addRoute(
+    String method,
+    String? path,
+    Expression handler,
+    ClassElement? typed,
+  ) {
     Expression plain = handler.unParenthesized;
     if (plain is ListLiteral && plain.elements.isNotEmpty) {
       CollectionElement last = plain.elements.last;
       if (last is! Expression) return;
       plain = last.unParenthesized;
     }
+    // `(UserController c) => c.index`: the method it picks
+    if (plain is FunctionExpression) {
+      FunctionBody body = plain.body;
+      if (body is! ExpressionFunctionBody) return;
+      plain = body.expression.unParenthesized;
+    }
     Element? element = _element(plain);
+    if (element is! MethodElement && typed != null) {
+      String? name = _memberName(plain);
+      element = name == null ? null : typed.getMethod(name);
+    }
     if (element is! MethodElement || element.isStatic) return;
     Element? owner = element.enclosingElement;
     if (owner is! ClassElement) return;
@@ -147,9 +172,18 @@ class RouteScanner extends RecursiveAstVisitor<void> {
   }
 
   void _addResource(String? path, Expression controller) {
-    DartType? type = controller.staticType;
-    if (type is! InterfaceType) return;
-    InterfaceElement element = type.element;
+    // `Route.resource('blogs', BlogController)`: a class from the container
+    Element? literal = controller is TypeLiteral
+        ? controller.type.element
+        : _element(controller);
+    InterfaceElement? element;
+    if (literal is ClassElement) {
+      element = literal;
+    } else {
+      DartType? type = controller.staticType;
+      if (type is! InterfaceType) return;
+      element = type.element;
+    }
     if (element is! ClassElement) return;
     for (MethodElement method in element.methods) {
       List<List<String>>? routes = _resource[method.displayName];
@@ -179,6 +213,12 @@ class RouteScanner extends RecursiveAstVisitor<void> {
     if (node is SimpleIdentifier) return node.element;
     if (node is PrefixedIdentifier) return node.identifier.element;
     if (node is PropertyAccess) return node.propertyName.element;
+    return null;
+  }
+
+  String? _memberName(Expression node) {
+    if (node is PrefixedIdentifier) return node.identifier.name;
+    if (node is PropertyAccess) return node.propertyName.name;
     return null;
   }
 

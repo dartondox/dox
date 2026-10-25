@@ -13,21 +13,24 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    Route.get('/ping', apiController.pong);
+    Route.get<ApiController>('/ping', (ApiController c) => c.pong);
 
     // Anyone can read posts.
-    Route.get('/posts', postController.index);
-    Route.get('/posts/{id}', postController.show);
+    Route.get<PostController>('/posts', (PostController c) => c.index);
+    Route.get<PostController>('/posts/{id}', (PostController c) => c.show);
 
     // Register and log in.
-    Route.post('/auth/register', authController.register);
-    Route.post('/auth/login', authController.login);
+    Route.post<AuthController>(
+      '/auth/register',
+      (AuthController c) => c.register,
+    );
+    Route.post<AuthController>('/auth/login', (AuthController c) => c.login);
 
     // Only a logged in user can write posts.
     Route.middleware(<dynamic>[AuthMiddleware()], () {
-      Route.get('/auth/user', authController.user);
-      Route.post('/posts', postController.store);
-      Route.put('/posts/{id}', postController.update);
+      Route.get<AuthController>('/auth/user', (AuthController c) => c.user);
+      Route.post<PostController>('/posts', (PostController c) => c.store);
+      Route.put<PostController>('/posts/{id}', (PostController c) => c.update);
     });
   }
 }

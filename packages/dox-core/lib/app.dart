@@ -90,6 +90,8 @@ class Dox {
     config = appConfig;
     _initialized = true;
     _dtos = null;
+    ioc.clear();
+    appConfig.container?.call(ioc);
   }
 
   /// override total isolate from config
@@ -263,6 +265,7 @@ class Dox {
   /// this is internal core use only
   /// your app do not need to call this function
   Future<void> startServices() async {
+    _addContainerServices();
     for (DoxService service in doxServices) {
       await service.setup();
     }
@@ -280,6 +283,7 @@ class Dox {
   /// ```
   Future<List<File>> writeOpenApi(String dir) async {
     addServices(config.services);
+    _addContainerServices();
     for (DoxService service in doxServices) {
       await service.setup();
     }
@@ -321,10 +325,33 @@ class Dox {
     }
   }
 
+  /// add the services of the container that are not in [doxServices]
+  /// yet. a listed service of a container type becomes the container
+  /// instance, so both are the same object.
+  void _addContainerServices() {
+    Set<Type> listed = <Type>{};
+    for (DoxService service in doxServices) {
+      listed.add(service.runtimeType);
+      ioc.adopt(service);
+    }
+    for (DoxService service in ioc.services) {
+      if (listed.add(service.runtimeType)) doxServices.add(service);
+    }
+  }
+
+  /// the routers of the app config, then the ones of the container
+  List<Router> _routers() {
+    List<Router> routers = List<Router>.of(config.routers);
+    Set<Type> listed = <Type>{for (Router r in routers) r.runtimeType};
+    for (Router router in ioc.routers) {
+      if (listed.add(router.runtimeType)) routers.add(router);
+    }
+    return routers;
+  }
+
   /// register routes assign in app config
   void _registerRoute() {
-    List<Router> routers = config.routers;
-    for (Router router in routers) {
+    for (Router router in _routers()) {
       Route.prefix(router.prefix);
       Route.resetWithNewMiddleware(<dynamic>[
         ...config.globalMiddleware,

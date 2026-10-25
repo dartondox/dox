@@ -71,13 +71,7 @@ class AuthService implements DoxService {
 }
 ```
 
-Add the service to the list:
-
-```dart title="lib/config/services.dart"
-List<DoxService> services = <DoxService>[
-  AuthService(),
-];
-```
+Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/container.g.dart`.
 
 ## 3. Add the routes
 
@@ -85,11 +79,10 @@ List<DoxService> services = <DoxService>[
 When the token is missing or not valid, the request stops with `401 Authentication failed`.
 
 ```dart title="lib/routes/api.dart"
-AuthController authController = AuthController();
 
-Route.post('/auth/register', authController.register);
-Route.post('/auth/login', authController.login);
-Route.get('/auth/user', <dynamic>[AuthMiddleware(), authController.user]);
+Route.post<AuthController>('/auth/register', (AuthController c) => c.register);
+Route.post<AuthController>('/auth/login', (AuthController c) => c.login);
+Route.get<AuthController>('/auth/user', <dynamic>[AuthMiddleware(), (AuthController c) => c.user]);
 ```
 
 ## 4. Write the controller
@@ -99,6 +92,7 @@ import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 
+@Inject()
 class AuthController {
   /// Make an account and log in.
   Future<dynamic> register(RegisterUser body) async {
@@ -213,7 +207,7 @@ Pick the guard by name:
 ```dart
 String? token = await Auth(guard: 'admin').attempt(credentials);
 
-Route.get('/admin', <dynamic>[AuthMiddleware(guard: 'admin'), adminController.index]);
+Route.get<AdminController>('/admin', <dynamic>[AuthMiddleware(guard: 'admin'), (AdminController c) => c.index]);
 ```
 
 The token keeps the guard name in its `aud` claim.

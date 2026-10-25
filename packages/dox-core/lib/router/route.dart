@@ -61,6 +61,36 @@ class _WebSocketRoute {
   }
 }
 
+/// A route action that points to a method of a controller from the
+/// container. The controller is made once per isolate, at start.
+/// ```
+/// Route.get<UserController>('users', (UserController c) => c.index);
+/// ```
+class ControllerAction<T extends Object> {
+  const ControllerAction(this.select);
+
+  /// gets the controller, gives the method that handles the request
+  final Function select;
+
+  /// the controller method, with the controller from [ioc]
+  Function resolve(IocContainer ioc, String where) {
+    Object? method;
+    try {
+      method = (select as dynamic)(ioc.get<T>());
+    } on NoSuchMethodError {
+      method = null;
+    }
+    if (method is! Function) {
+      throw StateError(
+        'Route $where: the action of Route.<method><$T> must take the '
+        'controller and give one of its methods, like '
+        '($T c) => c.index.',
+      );
+    }
+    return method;
+  }
+}
+
 class Route {
   /// register as singleton
   static final Route _singleton = Route._internal();
@@ -292,8 +322,6 @@ class Route {
   /// Route.bind<User>('user', (String id) => User().find(id));
   /// Route.get('users/{user}', (DoxRequest req, User user) => user);
   /// ```
-  // ponytail: explicit binders only. binding by type alone needs a
-  // generated IoC, add it with that.
   static void bind<T extends Object>(String param, RouteBinder<T> resolve) {
     _bindings[param] = RouteBinding(T.toString(), resolve);
   }
@@ -427,15 +455,18 @@ class Route {
     );
   }
 
-  /// get route
+  /// get route. [controller] is a function, or with a type `T` a
+  /// function that picks the method of a controller from the container.
   /// ```
-  /// Route.get('path', controller);
+  /// Route.get<UserController>('users', (UserController c) => c.index);
+  /// Route.get('ping', (DoxRequest req) => 'pong');
   /// ```
-  static Route get(String route, dynamic controller) {
+  /// The other methods (post, put, patch, delete, ...) work the same.
+  static Route get<T extends Object>(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.GET,
       Route()._join(route),
-      controller,
+      _action<T>(controller),
     );
   }
 
@@ -445,11 +476,15 @@ class Route {
   ///
   /// [body] is the request body schema for the OpenAPI docs
   /// (eg. a `dox_validation` schema).
-  static Route post(String route, dynamic controller, {Object? body}) {
+  static Route post<T extends Object>(
+    String route,
+    dynamic controller, {
+    Object? body,
+  }) {
     return Route()._addRoute(
       HttpRequestMethod.POST,
       Route()._join(route),
-      controller,
+      _action<T>(controller),
       body: body,
     );
   }
@@ -458,11 +493,15 @@ class Route {
   /// ```
   /// Route.put('path', controller);
   ///
-  static Route put(String route, dynamic controller, {Object? body}) {
+  static Route put<T extends Object>(
+    String route,
+    dynamic controller, {
+    Object? body,
+  }) {
     return Route()._addRoute(
       HttpRequestMethod.PUT,
       Route()._join(route),
-      controller,
+      _action<T>(controller),
       body: body,
     );
   }
@@ -471,11 +510,11 @@ class Route {
   /// ```
   /// Route.delete('path', controller);
   ///
-  static Route delete(String route, dynamic controller) {
+  static Route delete<T extends Object>(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.DELETE,
       Route()._join(route),
-      controller,
+      _action<T>(controller),
     );
   }
 
@@ -483,11 +522,11 @@ class Route {
   /// ```
   /// Route.purge('path', controller);
   ///
-  static Route purge(String route, dynamic controller) {
+  static Route purge<T extends Object>(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.PURGE,
       Route()._join(route),
-      controller,
+      _action<T>(controller),
     );
   }
 
@@ -495,11 +534,15 @@ class Route {
   /// ```
   /// Route.patch('path', controller);
   ///
-  static Route patch(String route, dynamic controller, {Object? body}) {
+  static Route patch<T extends Object>(
+    String route,
+    dynamic controller, {
+    Object? body,
+  }) {
     return Route()._addRoute(
       HttpRequestMethod.PATCH,
       Route()._join(route),
-      controller,
+      _action<T>(controller),
       body: body,
     );
   }
@@ -508,11 +551,11 @@ class Route {
   /// ```
   /// Route.options('path', controller);
   ///
-  static Route options(String route, dynamic controller) {
+  static Route options<T extends Object>(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.OPTIONS,
       Route()._join(route),
-      controller,
+      _action<T>(controller),
     );
   }
 
@@ -520,11 +563,11 @@ class Route {
   /// ```
   /// Route.copy('path', controller);
   ///
-  static Route copy(String route, dynamic controller) {
+  static Route copy<T extends Object>(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.COPY,
       Route()._join(route),
-      controller,
+      _action<T>(controller),
     );
   }
 
@@ -532,11 +575,11 @@ class Route {
   /// ```
   /// Route.view('path', controller);
   ///
-  static Route view(String route, dynamic controller) {
+  static Route view<T extends Object>(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.VIEW,
       Route()._join(route),
-      controller,
+      _action<T>(controller),
     );
   }
 
@@ -544,11 +587,11 @@ class Route {
   /// ```
   /// Route.link('path', controller);
   ///
-  static Route link(String route, dynamic controller) {
+  static Route link<T extends Object>(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.LINK,
       Route()._join(route),
-      controller,
+      _action<T>(controller),
     );
   }
 
@@ -556,11 +599,11 @@ class Route {
   /// ```
   /// Route.unlink('path', controller);
   ///
-  static Route unlink(String route, dynamic controller) {
+  static Route unlink<T extends Object>(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.UNLINK,
       Route()._join(route),
-      controller,
+      _action<T>(controller),
     );
   }
 
@@ -568,11 +611,11 @@ class Route {
   /// ```
   /// Route.lock('path', controller);
   ///
-  static Route lock(String route, dynamic controller) {
+  static Route lock<T extends Object>(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.LOCK,
       Route()._join(route),
-      controller,
+      _action<T>(controller),
     );
   }
 
@@ -580,11 +623,11 @@ class Route {
   /// ```
   /// Route.unlock('path', controller);
   ///
-  static Route unlock(String route, dynamic controller) {
+  static Route unlock<T extends Object>(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.UNLOCK,
       Route()._join(route),
-      controller,
+      _action<T>(controller),
     );
   }
 
@@ -592,16 +635,18 @@ class Route {
   /// ```
   /// Route.propfind('path', controller);
   ///
-  static Route propfind(String route, dynamic controller) {
+  static Route propfind<T extends Object>(String route, dynamic controller) {
     return Route()._addRoute(
       HttpRequestMethod.PROPFIND,
       Route()._join(route),
-      controller,
+      _action<T>(controller),
     );
   }
 
-  /// resource route
+  /// resource route. [controller] is a controller class (a [Type]) from
+  /// the container, or a controller object.
   /// ```
+  /// Route.resource('blog', BlogController);
   /// Route.resource('blog', BlogController());
   /// ```
   /// the routes are named `blog.index`, `blog.create`, `blog.store`,
@@ -612,6 +657,7 @@ class Route {
   /// Route.resource('blog', BlogController());
   /// ```
   static Route resource(String route, dynamic controller, {String? name}) {
+    if (controller is Type) controller = Dox().ioc.getByType(controller);
     Route r = Route();
     String path = r._join(route);
     String base = name ?? route.split('/').where(_isNamePart).join('.');
@@ -666,6 +712,19 @@ class Route {
     return r;
   }
 
+  /// with a type [T], [controller] picks a method of the [T] from the
+  /// container. it is read at start, see [ControllerAction].
+  static dynamic _action<T extends Object>(dynamic controller) {
+    if (T == Object) return controller;
+    if (controller is List && controller.isNotEmpty) {
+      return <dynamic>[
+        ...controller.sublist(0, controller.length - 1),
+        ControllerAction<T>(controller.last as Function),
+      ];
+    }
+    return ControllerAction<T>(controller as Function);
+  }
+
   static bool _isNamePart(String part) {
     return part.isNotEmpty && !part.startsWith('{');
   }
@@ -697,7 +756,7 @@ class Route {
     path = sanitizeRoutePath(path);
     List<dynamic> controllers = <dynamic>[];
     controllers.addAll(_preMiddleware);
-    if (controller is Function) {
+    if (controller is Function || controller is ControllerAction) {
       controllers.add(controller);
     }
     if (controller is List) {

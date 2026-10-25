@@ -2,9 +2,8 @@ import 'package:dox_app/app/http/dtos/blog.dto.dart';
 import 'package:dox_app/app/models/blog/blog.model.dart';
 import 'package:dox_orm/dox_orm.dart';
 
+@Inject()
 class BlogService {
-  BlogService();
-
   Future<Pagination<Blog>> listing(ListBlogs query) async {
     int offset = (query.page - 1) * query.limit;
     return Blog()

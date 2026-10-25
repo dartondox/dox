@@ -2,6 +2,7 @@ import 'package:blog/app/http/dtos/save_post.dto.dart';
 import 'package:blog/app/models/post/post.model.dart';
 import 'package:dox_core/dox_core.dart';
 
+@Inject()
 class PostController {
   /// GET /api/posts
   Future<List<Post>> index(DoxRequest req) async {
@@ -40,5 +41,3 @@ class PostController {
     return post;
   }
 }
-
-PostController postController = PostController();

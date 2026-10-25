@@ -15,6 +15,7 @@ It writes `lib/app/http/controllers/blog.controller.dart`.
 ```dart title="lib/app/http/controllers/blog.controller.dart"
 import 'package:dox_core/dox_core.dart';
 
+@Inject()
 class BlogController {
   String index(DoxRequest req) {
     return 'all blogs';
@@ -23,9 +24,11 @@ class BlogController {
 ```
 
 ```dart title="lib/routes/api.dart"
-BlogController blogController = BlogController();
-Route.get('/blogs', blogController.index);
+Route.get<BlogController>('/blogs', (BlogController c) => c.index);
 ```
+
+`@Inject()` puts the controller in the container. Run `dart run build_runner build` after you add one.
+The constructor can ask for services and repositories. See [Dependency injection](dependency-injection.md).
 
 ### Static method
 
@@ -62,6 +65,7 @@ dox create:controller Blog -r
 ```dart title="lib/app/http/controllers/blog.controller.dart"
 import 'package:dox_core/dox_core.dart';
 
+@Inject()
 class BlogController {
   /// GET /resource
   Future<dynamic> index(DoxRequest req) async {}
@@ -87,7 +91,7 @@ class BlogController {
 ```
 
 ```dart title="lib/routes/api.dart"
-Route.resource('blogs', BlogController());
+Route.resource('blogs', BlogController);
 ```
 
 You can delete methods you do not need. `Route.resource` skips them.
@@ -98,7 +102,7 @@ See [Routing: resource routes](routing.md#resource-routes).
 A controller asks for what it needs by **type**. Dox fills each parameter.
 
 ```dart
-Route.put('/teams/{teamId}/users/{id}', controller.update);
+Route.put<UserController>('/teams/{teamId}/users/{id}', (UserController c) => c.update);
 
 class UserController {
   Future<User> update(int teamId, int id, UpdateUser body) async { ... }
@@ -111,6 +115,8 @@ class UserController {
 | a `@Dto` class | the checked body or query. See [Validation](validation.md). |
 | `String`, `int`, `double`, `num`, `bool` | the path params, in the order of the route |
 | the same types with `?` | an optional path param (`{id?}`). `null` when it is not in the URL. |
+| a `@DoxModel` class | the model, loaded by the route param. See [route model binding](dependency-injection.md#route-model-binding). |
+| an `@Inject()` class | the instance from the [container](dependency-injection.md#handler-parameters) |
 
 Rules:
 
@@ -132,7 +138,7 @@ Rules:
 
 **Checked at start.** The server does not start when:
 
-- a parameter type is not in the list above, and not a `@Dto` (did you run `dart run build_runner build`?),
+- a parameter type is not in the list above (did you run `dart run build_runner build`?),
 - the method has more path-param parameters than the route has `{...}` params.
 
 ## What to return

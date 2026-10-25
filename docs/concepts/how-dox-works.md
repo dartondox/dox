@@ -167,19 +167,19 @@ my_app/
 │   │   │   └── response_handler.dart
 │   │   └── models/              # one folder per model, *.model.dart
 │   ├── config/
-│   │   ├── app.dart             # AppConfig: port, isolates, routers, middleware
+│   │   ├── app.dart             # AppConfig: port, isolates, middleware
 │   │   ├── cache.dart           # cache stores
 │   │   ├── cors.dart
 │   │   ├── database.dart        # DatabaseConfig: connections
 │   │   ├── env.dart             # typed env class (@DoxEnv), optional
 │   │   ├── logger.dart
-│   │   ├── services.dart        # the list of DoxService
 │   │   └── storage.dart         # storage disks
 │   ├── routes/
 │   │   ├── api.dart             # ApiRouter, prefix `api`
 │   │   └── web.dart             # WebRouter
 │   ├── services/
 │   │   └── orm_service.dart     # opens the database in every isolate
+│   ├── container.g.dart         # generated: @Inject classes, routers, services
 │   ├── dtos.g.dart              # generated: the list of DTOs
 │   └── openapi.g.dart           # generated: the OpenAPI docs
 ├── storage/                     # local disk, file cache, uploads
@@ -198,7 +198,7 @@ my_app/
 | `lib/app/http/` | Everything about HTTP: controllers, DTOs, middleware, serializers. |
 | `lib/app/models/` | One folder per model. `build_runner` writes the `.g.dart` file next to it. |
 | `lib/config/` | One file per config object. `app.dart` puts them together in `AppConfig`. |
-| `lib/routes/` | One `Router` class per file. Add each router to `routers` in `app.dart`. |
+| `lib/routes/` | One `Router` class per file. Dox finds each router by itself. |
 | `lib/services/` | Classes that implement `DoxService`. Their `setup()` runs in every isolate. |
 | `lib/*.g.dart` | Generated files. Do not edit them. Run `dox build_runner:build` to make them again. |
 | `storage/` | Files the app writes: uploads, the file cache, SQLite files. |

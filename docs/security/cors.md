@@ -84,11 +84,11 @@ Change it for a group of routes:
 ```dart title="lib/routes/api.dart"
 // CORS headers only on these routes (use with enabled: false)
 Route.enabledCors(() {
-  Route.get('/public/posts', postController.index);
+  Route.get<PostController>('/public/posts', (PostController c) => c.index);
 });
 
 // no CORS headers on these routes
 Route.disabledCors(() {
-  Route.post('/webhooks/stripe', webhookController.handle);
+  Route.post<WebhookController>('/webhooks/stripe', (WebhookController c) => c.handle);
 });
 ```

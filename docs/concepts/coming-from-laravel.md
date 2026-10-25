@@ -9,17 +9,17 @@ The Laravel code is Laravel 11. The biggest changes are in [What is different](#
 | Laravel | Dox |
 | --- | --- |
 | `Route::get('/ping', fn () => 'pong');` | `Route.get('/ping', (DoxRequest req) => 'pong');` |
-| `Route::post('/blogs', [BlogController::class, 'store']);` | `Route.post('/blogs', blogController.store);` |
+| `Route::post('/blogs', [BlogController::class, 'store']);` | `Route.post<BlogController>('/blogs', (BlogController c) => c.store);` |
 | `Route::get('/blogs/{id}', ...)` and `function show(int $id)` | `Route.get('/blogs/{id}', ...)` and `show(int id)` |
 | `Route::get('/posts/{page?}', ...)` | `Route.get('/posts/{page?}', (int? page) => ...)` |
 | `->where('path', '.*')` | `Route.get('/docs/{page*}', (String page) => ...)` |
 | `Route::prefix('blogs')->group(function () { ... });` | `Route.group('/blogs', () { ... });` |
 | `Route::middleware('auth')->group(...)` | `Route.middleware(<dynamic>[AuthMiddleware()], () { ... });` |
 | `Route::domain('admin.app.test')->group(...)` | `Route.domain('admin.app.test', () { ... });` |
-| `Route::resource('blogs', BlogController::class);` | `Route.resource('blogs', BlogController());` |
+| `Route::resource('blogs', BlogController::class);` | `Route.resource('blogs', BlogController);` |
 | `routes/api.php` with the `api` prefix | `lib/routes/api.dart`, a `Router` class with `prefix => 'api'` |
 
-In Dox, a controller is an object you make yourself. There is no `BlogController::class` string.
+In Dox, the container makes the controller. Put `@Inject()` above the class. The route picks the method with a typed function.
 
 ```dart title="lib/routes/api.dart"
 class ApiRouter extends Router {
@@ -31,9 +31,8 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    BlogController blogController = BlogController();
-    Route.get('/blogs', blogController.index);
-    Route.resource('users', UserController());
+    Route.get<BlogController>('/blogs', (BlogController c) => c.index);
+    Route.resource('users', UserController);
   }
 }
 ```
@@ -46,9 +45,12 @@ class ApiRouter extends Router {
 | `php artisan make:controller BlogController --resource` | `dox create:controller Blog -r` |
 | `public function show(Request $request, int $id)` | `Future<Blog?> show(DoxRequest req, int id)` |
 | `public function store(StoreBlogRequest $request)` | `Future<Blog> store(CreateBlog body)` |
-| injected by the service container | filled by type: `DoxRequest`, one `@Dto` class, path params |
+| constructor injection by the service container | constructor injection by the container: `@Inject()` above the class |
+| method injection | filled by type: `DoxRequest`, one `@Dto` class, path params, models, container classes |
+| implicit route model binding | the same: a `User user` parameter loads `{user}` by its key |
 
 Dox fills a parameter by its type, not by its name. Path params go by position.
+The container is generated code, not reflection. See [Dependency injection](../the-basic/dependency-injection.md).
 A controller can be a class method, a static method or a plain function.
 
 ## Middleware
@@ -342,9 +344,9 @@ See [Testing](../digging-deeper/testing.md).
 
 ## What is different
 
-- **No service container in the controller.** Laravel makes your controllers and injects what the constructor asks for.
-  In Dox you make the controller yourself (`BlogController()`) and pass what it needs. Dox fills only the method parameters: the request, one DTO and the path params.
-  `Dox().ioc` is a small registry (`register`, `registerSingleton`, `get`), but nothing is injected for you.
+- **A generated container.** Like Laravel, Dox makes your controllers and injects what the constructor asks for.
+  You add `@Inject()` to the class. `build_runner` writes `lib/container.g.dart` with every registration. There are no service providers to write.
+  A singleton is one instance per isolate, not one per request.
 - **Isolates, not PHP-FPM workers.** One process runs one isolate per CPU core. Each isolate runs your whole app and has its own memory.
   A static value or a singleton lives once per isolate. A PHP worker starts from zero on each request. A Dox isolate keeps its state between requests, so a memory leak stays.
   Anything that must be shared goes to the database, Redis or files. See [How Dox works](how-dox-works.md#isolates).

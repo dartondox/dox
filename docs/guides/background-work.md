@@ -29,6 +29,7 @@ import 'dart:isolate';
 
 import 'package:dox_core/dox_core.dart';
 
+@Inject()
 class ReportController {
   /// POST /api/reports
   /// Answers at once. The work runs after the response, in this isolate.
@@ -68,8 +69,6 @@ int countPrimes(int limit) {
   }
   return count;
 }
-
-ReportController reportController = ReportController();
 ```
 
 !!! warning "Do not block the event loop"
@@ -120,11 +119,14 @@ class CleanupService implements DoxService {
 }
 ```
 
-```dart title="lib/config/services.dart"
-List<DoxService> services = <DoxService>[
-  ORMService(),
-  CleanupService(), // after ORMService, so the database is ready
-];
+Dox finds `CleanupService` by itself. To be sure the database is ready first, list `ORMService` in `AppConfig`:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  container: registerContainer,
+  services: <DoxService>[ORMService()], // runs before CleanupService
+  // ...
+);
 ```
 
 When you run more than one process (two machines), each process has an isolate 1. Then the job runs twice. Use a database lock, or run the job from one place only.
@@ -132,8 +134,8 @@ When you run more than one process (two machines), each process has an isolate 1
 ## 4. Add the routes
 
 ```dart title="lib/routes/api.dart"
-Route.post('/reports', reportController.store);
-Route.get('/primes/{limit}', reportController.primes);
+Route.post<ReportController>('/reports', (ReportController c) => c.store);
+Route.get<ReportController>('/primes/{limit}', (ReportController c) => c.primes);
 ```
 
 ## Check it

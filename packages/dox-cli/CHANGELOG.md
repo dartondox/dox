@@ -1,5 +1,6 @@
 ## Unreleased
 
+- `dox make:controller` (`create:controller`) writes `@Inject()` above the class, and no global controller instance. The file shows the typed route to use. The command says to run `build_runner`.
 - New `dox make:factory <model>`: makes `db/factories/<model>.factory.dart`.
 - New `dox make:seeder <name>`: makes `db/seeders/<name>.seeder.dart`, writes the seeder list `db/seeders/seeders.dart` and makes `bin/seed.dart` when it is missing.
 - New `dox db:seed [--class=<name>]`: runs `bin/seed.dart`. The default seeder is `DatabaseSeeder`.

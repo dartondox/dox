@@ -33,8 +33,15 @@ void main() {
     test('controller', () {
       expect(createController('BlogPostController', false), isTrue);
       String c = read('lib/app/http/controllers/blog_post.controller.dart');
-      expect(c, contains('class BlogPostController {'));
-      expect(c, contains('BlogPostController blogPostController ='));
+      expect(c, contains('@Inject()\nclass BlogPostController {'));
+      expect(c, isNot(contains('BlogPostController blogPostController =')));
+      expect(
+        c,
+        contains(
+          "Route.get<BlogPostController>('path', (BlogPostController c) => "
+          'c.index);',
+        ),
+      );
     });
 
     test('model', () {

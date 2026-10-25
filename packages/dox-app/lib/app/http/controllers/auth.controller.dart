@@ -5,6 +5,7 @@ import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/logger.dart';
 
+@Inject()
 class AuthController {
   /// Log in
   ///

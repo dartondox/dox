@@ -64,16 +64,7 @@ class AuthService implements DoxService {
 }
 ```
 
-```dart title="lib/config/services.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:my_app/services/auth_service.dart';
-import 'package:my_app/services/orm_service.dart';
-
-List<DoxService> services = <DoxService>[
-  ORMService(),
-  AuthService(),
-];
-```
+Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/container.g.dart`.
 
 ## 3. Write the DTOs
 
@@ -139,6 +130,7 @@ import 'package:my_app/app/http/dtos/login_user.dto.dart';
 import 'package:my_app/app/http/dtos/register_user.dto.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 
+@Inject()
 class AuthController {
   /// POST /api/auth/register
   Future<Map<String, dynamic>> register(RegisterUser body) async {
@@ -177,8 +169,6 @@ class AuthController {
     return <String, String>{'message': 'Delete the token on the client'};
   }
 }
-
-AuthController authController = AuthController();
 ```
 
 `Hash.make` makes a bcrypt hash. `auth.attempt` finds the user by `email` and checks the password against that hash.
@@ -202,12 +192,12 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    Route.post('/auth/register', authController.register);
-    Route.post('/auth/login', authController.login);
+    Route.post<AuthController>('/auth/register', (AuthController c) => c.register);
+    Route.post<AuthController>('/auth/login', (AuthController c) => c.login);
 
     Route.middleware(<dynamic>[AuthMiddleware()], () {
-      Route.get('/auth/me', authController.me);
-      Route.post('/auth/logout', authController.logout);
+      Route.get<AuthController>('/auth/me', (AuthController c) => c.me);
+      Route.post<AuthController>('/auth/logout', (AuthController c) => c.logout);
       // put every protected route here
     });
   }

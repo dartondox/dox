@@ -7,8 +7,7 @@ class WebRouter extends Router {
 
   @override
   void register() {
-    WebController webController = WebController();
-    Route.get('/redis', webController.testRedis);
+    Route.get<WebController>('/redis', (WebController c) => c.testRedis);
 
     Route.get('/ping', (DoxRequest req) async {
       return 'pong';

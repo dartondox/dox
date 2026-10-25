@@ -65,12 +65,12 @@ blog/
 │   ├── config/
 │   │   ├── app.dart              * adds the DTO list
 │   │   ├── database.dart
-│   │   ├── env.dart              the .env keys, typed
-│   │   └── services.dart         * adds AuthService
+│   │   └── env.dart              the .env keys, typed
 │   ├── routes/api.dart           *
 │   ├── services/
 │   │   ├── auth_service.dart     *
 │   │   └── orm_service.dart
+│   ├── container.g.dart          * generated
 │   └── dtos.g.dart               * generated
 ├── test/http_test.dart           *
 ├── .env                          *

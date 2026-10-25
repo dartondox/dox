@@ -35,20 +35,21 @@ class ORMService implements DoxService, DoxShutdown {
 
 ## Register it
 
-Add an instance of the service to the list in `lib/config/services.dart`:
+You do not need to. Dox finds every class that implements `DoxService`.
+Run `dart run build_runner build`. The service is then in `lib/container.g.dart`.
+Each isolate makes its own instance from the container. Its constructor can ask for other classes of the container.
+See [Dependency injection](../the-basic/dependency-injection.md#routers-and-services).
 
-```dart title="lib/config/services.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:my_app/services/auth_service.dart';
-import 'package:my_app/services/orm_service.dart';
+Services run in the order of their file path. To run one first, list it in `AppConfig`:
 
-List<DoxService> services = <DoxService>[
-  ORMService(),
-  AuthService(),
-];
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  container: registerContainer,
+  services: <DoxService>[ORMService()], // runs before the others
+);
 ```
 
-This list goes to `AppConfig(services: services)` in `lib/config/app.dart`.
+A listed service runs first. Then the others run. No service runs twice.
 
 You can also add a service in code, before `startServer()`:
 
@@ -85,7 +86,7 @@ See [Authentication](../security/authentication.md).
 
 ## When `setup()` runs
 
-In each isolate, Dox runs `setup()` of each service, one after the other, in list order.
+In each isolate, Dox runs `setup()` of each service, one after the other: the listed ones first, then the ones of the container.
 Then it registers the routes and starts the server, so routes can use what a service set up.
 See [What each isolate does at start](isolate.md#what-each-isolate-does-at-start).
 
@@ -120,5 +121,5 @@ An error in `shutdown()` goes to the `report` method of the [exception handler](
 
 ## Rules for a service
 
-- **Open connections in `setup()`, not in the constructor.** Dox copies the service object to each isolate. An open socket or database pool can not be copied, so the isolate fails to start.
+- **Open connections in `setup()`, not in the constructor.** A service listed in `AppConfig` is copied to each isolate. An open socket or database pool can not be copied, so the isolate fails to start.
 - **Keep `setup()` short.** It runs once per isolate. Data you load in it is kept once per isolate, so 8 isolates keep 8 copies.

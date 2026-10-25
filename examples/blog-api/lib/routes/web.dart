@@ -7,6 +7,6 @@ class WebRouter extends Router {
 
   @override
   void register() {
-    Route.get('/ping', webController.pong);
+    Route.get<WebController>('/ping', (WebController c) => c.pong);
   }
 }

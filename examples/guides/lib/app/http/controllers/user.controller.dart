@@ -4,6 +4,7 @@ import 'package:my_app/app/exceptions/app_exception.dart';
 import 'package:my_app/app/http/dtos/list_users.dto.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 
+@Inject()
 class UserController {
   /// GET /api/users?page=1&per_page=20
   Future<Pagination<User>> index(ListUsers query) async {
@@ -31,5 +32,3 @@ class UserController {
     return <String, bool>{'deleted': true};
   }
 }
-
-UserController userController = UserController();

@@ -53,6 +53,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/exceptions/app_exception.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 
+@Inject()
 class UserController {
   /// GET /api/users/{id}
   Future<User> show(int id) async {
@@ -73,8 +74,6 @@ class UserController {
     return <String, bool>{'deleted': true};
   }
 }
-
-UserController userController = UserController();
 ```
 
 ## 2. One JSON shape for every error

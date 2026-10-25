@@ -9,7 +9,7 @@ One page to keep open while you work. Each section links to its full page.
 | `bin/server.dart` | starts the app: `Dox().initialize()`, migrations, `startServer()` |
 | `bin/migrate.dart` | runs migrations for `dox migration:*` |
 | `bin/openapi.dart` | writes the OpenAPI files for `dox openapi:generate` |
-| `lib/config/` | `app.dart` (`AppConfig`), `env.dart`, `database.dart`, `cors.dart`, `cache.dart`, `storage.dart`, `openapi.dart`, `services.dart`, `logger.dart`, `socketio.dart` |
+| `lib/config/` | `app.dart` (`AppConfig`), `env.dart`, `database.dart`, `cors.dart`, `cache.dart`, `storage.dart`, `openapi.dart`, `logger.dart`, `socketio.dart` |
 | `lib/routes/` | `api.dart`, `web.dart`, `websocket.dart`: one `Router` class each |
 | `lib/app/http/controllers/` | `<name>.controller.dart` |
 | `lib/app/http/dtos/` | `<name>.dto.dart` |
@@ -17,7 +17,7 @@ One page to keep open while you work. Each section links to its full page.
 | `lib/app/http/serializers/` | `<name>.serializer.dart` |
 | `lib/app/models/<name>/` | `<name>.model.dart` |
 | `lib/services/` | `DoxService` classes: ORM, auth, websocket |
-| `lib/dtos.g.dart`, `lib/openapi.g.dart` | made by `build_runner`. Do not edit. |
+| `lib/container.g.dart`, `lib/dtos.g.dart`, `lib/openapi.g.dart` | made by `build_runner`. Do not edit. |
 | `db/migration/` | migrations and `migrations.dart` (the registry) |
 
 See [CLI](cli.md) and [App config](app-config.md).
@@ -65,7 +65,8 @@ class ApiRouter extends Router {
 
 | Code | Does |
 | --- | --- |
-| `Route.get('/blogs', c.index)` | also `post`, `put`, `patch`, `delete`, `options` |
+| `Route.get<C>('/blogs', (C c) => c.index)` | controller `C` from the container. Also `post`, `put`, `patch`, `delete`, `options` |
+| `Route.get('/blogs', listBlogs)` | a plain function |
 | `Route.post('/blogs', c.store, body: schema)` | `body:` is for the docs only. It checks nothing. |
 | `Route.get('/blogs/{id}', c.show)` | path param. `show(int id)` |
 | `Route.get('/posts/{page?}', c.list)` | optional param. `list(int? page)` |
@@ -74,12 +75,35 @@ class ApiRouter extends Router {
 | `Route.group('/blogs', () { ... })` | prefix. Dox adds the `/` between parts. |
 | `Route.middleware(<dynamic>[M()], () { ... })` | middleware for a group |
 | `Route.domain('api.app.com', () { ... })` | match by `Host` |
-| `Route.resource('blogs', BlogController())` | `index`, `create`, `store`, `show`, `edit`, `update`, `destroy` |
+| `Route.resource('blogs', BlogController)` | `index`, `create`, `store`, `show`, `edit`, `update`, `destroy` |
 | `Route.files('files')` | serve a storage disk, signed URLs only |
 | `Route.enabledCors(() { ... })` / `Route.disabledCors(...)` | CORS for some routes |
 | `Route.websocket('echo', (WebSocket s, DoxRequest req) { ... })` | a raw WebSocket. For rooms and acks, use Socket.IO. |
 
-Controller parameters, by type: `DoxRequest`, one `@Dto` class, `String`/`int`/`double`/`num`/`bool` for path params (by position). Only positional parameters.
+Controller parameters, by type: `DoxRequest`, one `@Dto` class, `String`/`int`/`double`/`num`/`bool` for path params (by position), a `@DoxModel` (loaded by its key), an `@Inject()` class. Only positional parameters.
+
+In the examples, `c.index` and the like are methods of a controller `C` from the container.
+
+## Dependency injection
+
+```dart
+@Inject()                       // one instance per isolate
+class PostService {
+  PostService(this.posts);      // from the container, by type
+  final PostRepository posts;
+}
+
+@Inject(singleton: false)       // a new instance each time
+class Clock {}
+
+AppConfig(container: registerContainer); // from lib/container.g.dart
+
+Dox().ioc.get<PostService>();
+Dox().ioc.override<PostRepository>(FakePostRepository()); // tests
+```
+
+Routers and `DoxService` classes are found without `@Inject()`. Run `dart run build_runner build` after a change.
+See [Dependency injection](../the-basic/dependency-injection.md).
 
 Middleware order: `globalMiddleware`, router `middleware`, group, route.
 

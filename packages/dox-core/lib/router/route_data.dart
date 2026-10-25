@@ -1,3 +1,4 @@
+import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_controller_handler.dart';
 
 class RouteData {
@@ -33,14 +34,36 @@ class RouteData {
   /// Throws a [StateError] when a parameter type is not known.
   ControllerPlan? get handler {
     if (!_handlerRead) {
+      Function? fn = action;
+      _handler = fn == null ? null : ControllerPlan.of(fn, this);
+      _handlerRead = true;
+    }
+    return _handler;
+  }
+
+  Function? _action;
+  bool _actionRead = false;
+
+  /// The function that handles the request, read once: the last function
+  /// of [controllers], or the controller method that a
+  /// [ControllerAction] (`Route.get<C>(path, (C c) => c.index)`) or a
+  /// `(C c) => c.index` function picks. The controller comes from the
+  /// container. Null when the route has no controller function.
+  Function? get action {
+    if (!_actionRead) {
       Object? list = controllers;
       Object? last = list is List<dynamic> && list.isNotEmpty
           ? list.last
           : null;
-      _handler = last is Function ? ControllerPlan.of(last, this) : null;
-      _handlerRead = true;
+      String where = '$method $path';
+      if (last is ControllerAction) {
+        _action = last.resolve(Dox().ioc, where);
+      } else if (last is Function) {
+        _action = ControllerTypes.select(last, Dox().ioc, where) ?? last;
+      }
+      _actionRead = true;
     }
-    return _handler;
+    return _action;
   }
 
   RouteData({
@@ -115,6 +138,8 @@ class RouteData {
       ..name = name
       .._handler = handler
       .._handlerRead = true
+      .._action = _action
+      .._actionRead = _actionRead
       .._pattern = _pattern
       .._paramNames = _paramNames
       .._compiledFor = _compiledFor;
