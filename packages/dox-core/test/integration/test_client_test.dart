@@ -27,6 +27,47 @@ class ClientRouter extends Router {
   }
 }
 
+class WebRouter extends Router {
+  @override
+  String get prefix => 'web';
+
+  @override
+  List<dynamic> get middleware => <dynamic>[
+    const SessionMiddleware(),
+    const CsrfMiddleware(),
+  ];
+
+  @override
+  void register() {
+    Route.get('login', (DoxRequest req) => 'form');
+    Route.post('login', (DoxRequest req) {
+      req.session.regenerate();
+      req.session.put('user', req.input('email'));
+      return redirect('/web/me', status: 303);
+    });
+    Route.get('me', (DoxRequest req) {
+      return req.session.get('user') ?? response('guest').statusCode(401);
+    });
+    Route.post('logout', (DoxRequest req) {
+      req.session.invalidate();
+      return redirect('/web/login');
+    });
+    Route.get('flavor', (DoxRequest req) {
+      return response('ok').cookie(DoxCookie('flavor', 'x', encrypt: false));
+    });
+    Route.get('flavor/max-age', (DoxRequest req) {
+      return response('ok')
+          .cookie(DoxCookie('flavor', 'x', encrypt: false), setExpire: true);
+    });
+    Route.get('flavor/expires', (DoxRequest req) {
+      return response(
+        'ok',
+      ).header('Set-Cookie', 'flavor=x; Expires=Sat, 01 Jan 2000 00:00:00 GMT');
+    });
+    Route.put('save', (DoxRequest req) => 'saved');
+  }
+}
+
 void main() {
   late DoxTestClient client;
 
@@ -34,7 +75,7 @@ void main() {
     client = await DoxTestClient.start(
       AppConfig(
         appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
-        routers: <Router>[ClientRouter()],
+        routers: <Router>[ClientRouter(), WebRouter()],
       ),
     );
   });
@@ -99,5 +140,61 @@ void main() {
     TestResponse res = await client.get('/nothing');
     expect(res.status, 404);
     expect(() => res.expectStatus(200), throwsA(isA<TestFailure>()));
+  });
+
+  group('withSession', () {
+    test('log in and out with a session and CSRF', () async {
+      DoxTestClient browser = client.withSession();
+      Map<String, String> form = <String, String>{'email': 'ann@example.com'};
+
+      // no XSRF-TOKEN cookie yet: the post has no token
+      (await browser.post('/web/login', body: form)).expectStatus(419);
+
+      (await browser.get('/web/login')).expectStatus(200);
+      expect(
+        browser.cookies.keys,
+        containsAll(<String>['dox_session', 'XSRF-TOKEN']),
+      );
+
+      (await browser.post(
+        '/web/login',
+        body: form,
+      )).expectStatus(303).expectHeader('location', '/web/me');
+      (await browser.get('/web/me')).expectBody('ann@example.com');
+
+      // another browser and the plain client have no session
+      (await client.withSession().get('/web/me')).expectStatus(401);
+      (await client.get('/web/me')).expectStatus(401);
+
+      (await browser.post('/web/logout')).expectStatus(302);
+      (await browser.get('/web/me')).expectStatus(401);
+    });
+
+    test('sends X-XSRF-TOKEN on PUT, not on GET', () async {
+      DoxTestClient browser = client.withSession();
+      await browser.get('/web/login');
+      (await browser.put('/web/save')).expectStatus(200).expectBody('saved');
+      (await client.put('/web/save')).expectStatus(419);
+    });
+
+    test('removes a cookie on Max-Age=0 or an old Expires', () async {
+      DoxTestClient browser = client.withSession();
+      await browser.get('/web/flavor');
+      expect(browser.cookies['flavor'], 'x');
+      await browser.get('/web/flavor/max-age');
+      expect(browser.cookies, isNot(contains('flavor')));
+      await browser.get('/web/flavor');
+      await browser.get('/web/flavor/expires');
+      expect(browser.cookies, isNot(contains('flavor')));
+    });
+
+    test('copies share the cookies, the plain client keeps none', () async {
+      DoxTestClient browser = client.withSession();
+      DoxTestClient copy = browser.withHeaders(<String, String>{'X-Test': 'a'});
+      await copy.get('/web/flavor');
+      expect(browser.cookies['flavor'], 'x');
+      await client.get('/web/flavor');
+      expect(client.cookies, isEmpty);
+    });
   });
 }

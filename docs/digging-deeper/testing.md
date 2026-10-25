@@ -71,6 +71,7 @@ void main() {
 | `headers: {...}` | extra headers for one request |
 | `withHeaders({...})` | a copy of the client that sends these headers on every request |
 | `withToken(token)` | a copy of the client that sends `Authorization: Bearer <token>` |
+| `withSession()` | a copy of the client that keeps cookies and sends the CSRF token, like a browser. See [Keep a session](#keep-a-session-cookies-and-csrf). |
 
 A `Map` or `List` body is sent as JSON. A `String` or `List<int>` body is sent as it is.
 Redirects are not followed, so you can check a `302` and its `Location` header.
@@ -100,6 +101,36 @@ res
 | `expectJson(value or matcher)` | the JSON body does not match. Use a `Map`, or a matcher like `containsPair('id', 1)`. |
 | `expectBody(value or matcher)` | the text body does not match |
 | `expectHeader(name, value or matcher)` | the header does not match. Use `isNull` for "not there". |
+
+### Keep a session (cookies and CSRF)
+
+`client.withSession()` gives a client that works like a browser:
+
+- It keeps the cookies of every response and sends them back.
+- It removes a cookie when the response deletes it (an empty value, `Max-Age=0` or an old `Expires`).
+- On `POST`, `PUT`, `PATCH` and `DELETE` it sends the `XSRF-TOKEN` cookie in the `X-XSRF-TOKEN` header, like axios and Inertia. So `CsrfMiddleware` lets the request in.
+- It does not follow redirects, so you can check a `302` or `303`.
+
+```dart
+test('log in with a form', () async {
+  DoxTestClient browser = client.withSession();
+
+  // the first page gives the session and XSRF-TOKEN cookies
+  (await browser.get('/login')).expectStatus(200);
+
+  (await browser.post(
+    '/login',
+    body: <String, dynamic>{'email': 'ann@example.com', 'password': 'secret123'},
+  )).expectStatus(303).expectHeader('location', '/dashboard');
+
+  (await browser.get('/dashboard')).expectStatus(200);
+});
+```
+
+- Each `withSession()` call gives a new browser with no cookies.
+- `browser.cookies` has the kept cookies (name to raw value). You can read and change them.
+- A copy made from it (for example with `withHeaders`) shares its cookies.
+- The normal client keeps no cookies. To send cookies once, use `withCookies(res.cookies)`.
 
 ### Log in as a user
 

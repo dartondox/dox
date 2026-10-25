@@ -179,9 +179,12 @@ if (req.hasSession) {
 
 ## Tests
 
-`DoxTestClient` does not keep cookies by itself. Each `TestResponse` has `cookies`, and `withCookies` sends them back:
+`client.withSession()` gives a test client that keeps cookies like a browser. It also sends the `XSRF-TOKEN` cookie back in `X-XSRF-TOKEN`, so `CsrfMiddleware` lets its posts in:
 
 ```dart
-TestResponse first = await client.get('/cart/add?id=1');
-TestResponse second = await client.withCookies(first.cookies).get('/cart');
+DoxTestClient browser = client.withSession();
+await browser.get('/cart/add?id=1');
+(await browser.get('/cart')).expectJson(isNotEmpty);
 ```
+
+See [Testing: keep a session](../digging-deeper/testing.md#keep-a-session-cookies-and-csrf).

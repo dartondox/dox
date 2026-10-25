@@ -110,34 +110,6 @@ class NoSessionRouter extends Router {
   }
 }
 
-/// a client that keeps the cookies of every answer, like a browser
-class Browser {
-  Browser(this.client);
-
-  final DoxTestClient client;
-  final Map<String, String> cookies = <String, String>{};
-
-  Future<TestResponse> get(String path, {Map<String, String>? headers}) {
-    return _keep(client.withCookies(cookies).get(path, headers: headers));
-  }
-
-  Future<TestResponse> post(
-    String path, {
-    Object? body,
-    Map<String, String>? headers,
-  }) {
-    return _keep(
-      client.withCookies(cookies).post(path, body: body, headers: headers),
-    );
-  }
-
-  Future<TestResponse> _keep(Future<TestResponse> pending) async {
-    TestResponse res = await pending;
-    cookies.addAll(res.cookies);
-    return res;
-  }
-}
-
 void main() {
   late DoxTestClient client;
 
@@ -164,7 +136,7 @@ void main() {
 
     group('$driver driver', () {
       test('put and get across requests', () async {
-        Browser browser = Browser(client);
+        DoxTestClient browser = client.withSession();
         TestResponse put = await browser.get('$prefix/put?name=Ann');
         put.expectStatus(200);
         expect(put.cookies[cookie], isNotNull);
@@ -176,12 +148,12 @@ void main() {
           'has': true,
         });
         // another browser has its own session
-        (await Browser(client).get('$prefix/get'))
+        (await client.withSession().get('$prefix/get'))
             .expectJson(containsPair('name', null));
       });
 
       test('no cookie when the session is not used or not changed', () async {
-        Browser browser = Browser(client);
+        DoxTestClient browser = client.withSession();
         TestResponse first = await browser.get('$prefix/untouched');
         expect(first.cookies, isEmpty);
         expect(first.header('set-cookie'), isNull);
@@ -191,7 +163,7 @@ void main() {
       });
 
       test('flash lives for one request', () async {
-        Browser browser = Browser(client);
+        DoxTestClient browser = client.withSession();
         await browser.get('$prefix/flash');
         (await browser.get('$prefix/get'))
             .expectJson(containsPair('message', 'Saved'));
@@ -200,7 +172,7 @@ void main() {
       });
 
       test('forget, pull and invalidate', () async {
-        Browser browser = Browser(client);
+        DoxTestClient browser = client.withSession();
         await browser.get('$prefix/put?name=Ann');
         (await browser.get('$prefix/pull'))
             .expectJson(<String, dynamic>{'value': 'Ann', 'after': null});
@@ -214,7 +186,7 @@ void main() {
       });
 
       test('regenerate gives a new id and token, and keeps the data', () async {
-        Browser browser = Browser(client);
+        DoxTestClient browser = client.withSession();
         await browser.get('$prefix/put?name=Ann');
         String oldCookie = browser.cookies[cookie]!;
         String oldToken = (await browser.get('$prefix/id')).body;
@@ -259,7 +231,7 @@ void main() {
     });
 
     test('the token in the body or a header passes', () async {
-      Browser browser = Browser(client);
+      DoxTestClient browser = client.withSession();
       TestResponse page = await browser.get('/form');
       String token = page.cookies[CsrfMiddleware.cookieName]!;
       // page scripts must read it: no HttpOnly
@@ -301,14 +273,14 @@ void main() {
   });
 
   group('validation errors', () {
-    Future<(Browser, String)> start() async {
-      Browser browser = Browser(client);
+    Future<(DoxTestClient, String)> start() async {
+      DoxTestClient browser = client.withSession();
       TestResponse page = await browser.get('/form');
       return (browser, page.cookies[CsrfMiddleware.cookieName]!);
     }
 
     test('a form post redirects back with errors and old input', () async {
-      var (Browser browser, String token) = await start();
+      var (DoxTestClient browser, String token) = await start();
       TestResponse res = await browser.post(
         '/form',
         body: '_token=$token&email=nope&password=short',
@@ -329,7 +301,7 @@ void main() {
     });
 
     test('back() goes to / with no Referer', () async {
-      var (Browser browser, String token) = await start();
+      var (DoxTestClient browser, String token) = await start();
       (await browser.post(
         '/form',
         body: '_token=$token&email=nope',
@@ -340,7 +312,7 @@ void main() {
     });
 
     test('a JSON request still gets 422 JSON', () async {
-      var (Browser browser, String token) = await start();
+      var (DoxTestClient browser, String token) = await start();
       (await browser.post(
         '/form',
         body: <String, dynamic>{'email': 'nope', 'password': 'short'},
@@ -349,7 +321,7 @@ void main() {
     });
 
     test('an Inertia request is redirected', () async {
-      var (Browser browser, String token) = await start();
+      var (DoxTestClient browser, String token) = await start();
       (await browser.post(
         '/form',
         body: <String, dynamic>{'email': 'nope', 'password': 'short'},

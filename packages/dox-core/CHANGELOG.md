@@ -3,6 +3,8 @@
 - Fix: `AUTH_REQUEST_KEY` is now only in `dox_core`, so importing `dox_core` and `dox_auth` together no longer gives an "ambiguous import" error.
 - Fix: `response(x).header('Content-Type', 'image/svg+xml')` failed with "More than one value for header content-type". The default `text/plain` stayed next to the new type. Now `header()` replaces the content type, the same as `contentType()`. The name can be in any case.
 - Fix: when sending the error answer failed too, the client got no answer and waited until the timeout. Now Dox reports the error and sends a plain 500. When the head is already sent, it closes the response.
+- New: `.env.testing`. When the app runs its tests (`dart test`, or a real `APP_ENV=testing`), Dox reads `.env.testing` on top of `.env`. Its keys win over `.env`. A real environment variable still wins over both. It works for `Env.get()` and the typed `AppEnv.load()`. Use it for a test database: `DB_NAME=my_app_test`. New `Env.isTesting`, and `Env().load(testing: true)`.
+- New: `DoxTestClient.withSession()` gives a test client that works like a browser. It keeps the cookies of every response, removes deleted or expired ones, and sends the `XSRF-TOKEN` cookie back in `X-XSRF-TOKEN` on `POST`, `PUT`, `PATCH` and `DELETE`. It does not follow redirects. `client.cookies` gives the kept cookies. The normal client does not change.
 
 ## 3.0.0-alpha.13
 
