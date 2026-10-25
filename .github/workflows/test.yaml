@@ -69,9 +69,9 @@ jobs:
   # - The server is native (dox_http_native). Its build hook downloads a
   #   ready-built library.
   #   There is no dart:io server.
-  # - The default database drivers are native (dox_postgres_native and
+  # - The Postgres and MySQL drivers are native (dox_postgres_native and
   #   dox_mysql_native). Their build hooks download ready-built libraries.
-  #   DOX_DB_DRIVER=dart runs the same tests on the Dart drivers.
+  #   There are no Dart drivers for them.
   # - sqlite3 v3 bundles SQLite with a build hook. No system library needed.
   # - The migration tests run on postgres, mysql and sqlite in one run.
   #

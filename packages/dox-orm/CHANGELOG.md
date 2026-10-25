@@ -1,5 +1,12 @@
 ## Unreleased
 
+- Breaking: Postgres and MySQL use only the native drivers. The Dart drivers (`postgres` and `mysql_dart` packages) are gone. So are `PostgresDriver`, `MysqlDriver`, `DOX_DB_DRIVER=dart` and `extra['native']`.
+- Breaking: when the native library does not load, `createDriver()` and `SqlQueryBuilder.initializeWithDatabaseConfig()` throw an `UnsupportedError`. It says why the library did not load and how to fix it. Before, the ORM used the Dart driver and printed a warning.
+- Postgres has TLS now. `useSSL: true` is mode `require` (no certificate check, like libpq). `extra['sslMode']` is a `String`: `disable`, `prefer`, `require` or `verify-full`. `sslmode` in `DATABASE_URL` sets it. `prefer` and `allow` in the url now mean "TLS when the server has it".
+- Breaking: errors are `PgServerException` and `PgException` for Postgres, and `MysqlException` for MySQL. `dox_orm` exports them. The `ServerException` classes of the `postgres` package and `MySQLServerException` are gone.
+- Breaking: `ConnectionConfig` loses `getDatabaseConnection()`, `postgresEndpoint`, `mysqlHost`, `mysqlPort`, `mysqlAllowPublicKeyRetrieval` and `mysqlAcceptBadCertificate`. `postgresSslMode` is now a `String`. The `collation`, `timeoutMs`, `timeZone` (MySQL), `serverPublicKey`, `allowPublicKeyRetrieval` and the `postgres` package pool keys of `extra` are no longer read.
+- Breaking: `getDatabaseDriver()` and `SqlQueryBuilder.initialize()` take a `PgNativePool` for Postgres and a `MysqlNativePool` for MySQL.
+- On Postgres, a `List` in `insert()` or `update()` is sent as json text, so it fits a json column. New `DBDriver.columnValue()`.
 - `dox_postgres_native` and `dox_mysql_native` now live in their own repos (dartondox/dox-postgres-native, dartondox/dox-mysql-native). Dox uses them from pub.dev (`^3.0.0-alpha.7`). Their build hooks download ready-built libraries, so you do not need Rust.
 - Faster `belongsTo` load. It reads each owner once with `WHERE owner.id IN (...)`, with no join to the children. Before, a user with 10,000 blogs came back 10,000 times. Children of the same owner now get the same model object.
 - `save()` on a new model runs one `INSERT` and reads the id from it. There is no `SELECT` after it. `insert()` and `create()` use `RETURNING *` on Postgres and SQLite, so they also skip the `SELECT`. MySQL still reads the row with `find()`.
@@ -14,7 +21,7 @@
 - The SQL text is no longer scanned for double spaces on each query. `orderBy()` without a direction no longer adds a space.
 - `QueryBuilderHelper.runQuery()` no longer has the `clean` parameter.
 - Fix: in a native Postgres or MySQL `transaction()`, when the rollback after an error also fails, the first error is thrown. Before, the rollback error replaced it.
-- The native Postgres driver shares one pool for all isolates with the same settings, like the native MySQL driver. `maxConnectionCount` is for the whole process on both native drivers. The Dart drivers still have one pool per isolate.
+- The native Postgres driver shares one pool for all isolates with the same settings, like the native MySQL driver. `maxConnectionCount` is for the whole process on both native drivers.
 - The Dart Postgres driver keeps its prepared statements after a session command like `SET`, `SHOW`, `BEGIN` or `COMMIT`. Before, any query that was not select/insert/update/delete dropped all of them.
 - Breaking: column and table names in `select`, `where`, `orderBy`, `groupBy`, `join`, `insert` and `update` must be plain names (`name`, `table.name`, `table.*`, `*`, `name as alias`). Anything else, like `count(*)`, throws an `ArgumentError`. Before, a name with `(` went into the SQL as it is, so user input could add SQL. Use `selectRaw`, `whereRaw` or the new `orderByRaw` and `groupByRaw` for expressions.
 - Breaking: the operator of `where()` and `join()` must be one of `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `like`, `not like`, `ilike` (any case). Any other value throws an `ArgumentError`.

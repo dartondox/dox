@@ -7,7 +7,7 @@ import 'connection.dart';
 
 /// `SqlQueryBuilder.close()` closes the default and the named
 /// connections. The first test uses the connection of the CI job
-/// (Postgres, MySQL or SQLite, native or Dart driver).
+/// (Postgres, MySQL or SQLite).
 void main() {
   test('close() closes the connection of this job', () async {
     SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);

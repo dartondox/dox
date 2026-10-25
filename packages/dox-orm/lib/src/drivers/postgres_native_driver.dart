@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:dox_orm/dox_orm.dart';
 import 'package:dox_postgres_native/dox_postgres_native.dart';
@@ -6,22 +8,21 @@ import 'package:dox_postgres_native/dox_postgres_native.dart';
 /// zone key to find the open transaction of a pool
 const Symbol _txKey = #doxPostgresNativeTransaction;
 
-/// The default Dox ORM driver for Postgres, on [PgNativePool]
-/// (dox_postgres_native). It acts like the Dart postgres driver: the same
-/// SQL, values and exceptions.
+/// The Dox ORM driver for Postgres, on [PgNativePool]
+/// (dox_postgres_native). Errors from the server are [PgServerException],
+/// other errors are [PgException].
 class PostgresNativeDriver extends DBDriver {
   PostgresNativeDriver(this.pool);
 
   /// Makes the pool from a Dox [ConnectionConfig]. A host that starts with
-  /// `/` is a Unix socket folder. Reads `maxConnectionCount`
+  /// `/` is a Unix socket folder. The TLS mode is
+  /// [ConnectionConfig.postgresSslMode]. Reads `maxConnectionCount`
   /// (default 10), `timeZone` (default UTC), `applicationName` and
   /// `threads` (default 1) from `extra`. Isolates with the same settings
   /// share one pool, so `maxConnectionCount` is for the whole process.
+  /// Throws an [UnsupportedError] when the native library does not load.
   factory PostgresNativeDriver.fromConfig(ConnectionConfig config) {
-    if (config.useSSL) {
-      // ponytail: no TLS yet. Add tokio-postgres-rustls when it is needed.
-      throw UnsupportedError('dox_postgres_native does not support SSL yet');
-    }
+    NativeDrivers.ensureAvailable(Driver.postgres);
     Map<String, dynamic> extra = config.extra;
     return PostgresNativeDriver(
       PgNativePool.open(
@@ -32,6 +33,7 @@ class PostgresNativeDriver extends DBDriver {
         user: config.user,
         password: config.password,
         database: config.database,
+        sslMode: config.postgresSslMode,
         maxConnections: extra['maxConnectionCount'] as int? ?? 10,
         timeZone: extra['timeZone'] as String? ?? 'UTC',
         applicationName: extra['applicationName'] as String?,
@@ -47,6 +49,13 @@ class PostgresNativeDriver extends DBDriver {
 
   @override
   bool get supportsReturning => true;
+
+  /// a list goes into a json column, so it is sent as json text. bytes
+  /// (Uint8List) stay bytes. where-in lists do not come here, they are
+  /// arrays.
+  @override
+  Object? columnValue(dynamic value) =>
+      value is List && value is! Uint8List ? jsonEncode(value) : value;
 
   int get _tx => (Zone.current[_txKey] as Map<PgNativePool, int>?)?[pool] ?? 0;
 

@@ -10,13 +10,11 @@ void main() async {
   Dox().initialize(appConfig);
 
   /// Run the migrations from db/migration/migrations.dart once, before
-  /// the server starts. We pass a connection from config/database.dart,
+  /// the server starts. We pass the config from config/database.dart,
   /// so this also works with env variables and no `.env` file.
   await Migrator(
     migrations: migrations,
-    connection: await databaseConfig
-        .getConnectionConfig()
-        .getDatabaseConnection(),
+    config: databaseConfig.getConnectionConfig(),
   ).migrate();
 
   /// Start dox http server

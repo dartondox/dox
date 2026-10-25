@@ -43,7 +43,7 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | --- | --- | --- |
 | AOT binary, not `dart run` | `dox build`, then run `build/bundle/bin/server`. Keep `bin/` and `lib/` together. Not `dart compile exe`. | [Deployment](../digging-deeper/deployment.md) |
 | Native server loads | The app starts and the start line says `(native)`. When the library does not load, the app stops with `dox_http_native did not load` and the fix. | [Native server](../digging-deeper/native-server.md) |
-| Native database driver is on | No `[dox] warning: dox_postgres_native did not load` (or `mysql`) line at start. Do not set `DOX_DB_DRIVER=dart`. Postgres with TLS uses the Dart driver. | [Postgres native](../database/postgres-native.md) |
+| Native database driver loads | The app starts and the database works. When the library does not load, the app stops with `dox_postgres_native did not load` (or `mysql`) and the fix. | [Postgres native](../database/postgres-native.md) |
 | Isolates = cores | Keep the default `totalIsolate` (`Platform.numberOfProcessors`), or set `APP_TOTAL_ISOLATE` to the cores the container really gets. Use fewer when the database runs on the same machine. | [Isolate](../digging-deeper/isolate.md) |
 | Shared state across isolates | Cache: `redis`, not `memory`. WebSocket: `WebsocketRedisAdapter`. Socket.IO: a Redis adapter and `transports: ['websocket']`. | [Isolate](../digging-deeper/isolate.md) |
 | A supervisor restarts the process | Docker `restart: unless-stopped`, or systemd `Restart=always`. Dox restarts a dead worker isolate, but not the main isolate. | [Deployment](../digging-deeper/deployment.md) |
@@ -56,9 +56,9 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | --- | --- | --- |
 | Postgres or MySQL for a busy app | SQLite has one connection per isolate, and a query blocks the isolate. Use it for small apps only. With SQLite use an absolute file path, never `:memory:` with many isolates. | [Database](../database/index.md) |
 | Migrations run once per deploy | The new project runs `Migrator(migrations: migrations).migrate()` in `bin/server.dart` before `startServer()`. Or run `dart run bin/migrate.dart run` (or `dox migrate`) in CI. Do one, not both at the same time on many machines. | [Migration](../database/migration.md) |
-| Migrations use the right database | `dox_migration` reads `.env` when the file exists, and ignores the real env then. Do not ship a `.env` next to the binary, or give `Migrator(connection: ...)` your own pool. | [Troubleshooting](troubleshooting.md) |
+| Migrations use the right database | `dox_migration` reads `.env` when the file exists, and ignores the real env then. Do not ship a `.env` next to the binary, or give `Migrator(config: ...)` your own config. | [Troubleshooting](troubleshooting.md) |
 | Small MySQL migrations | MySQL saves `CREATE`, `ALTER` and `DROP` at once. A failed migration can leave half the changes. One table change per migration. | [Migration](../database/migration.md) |
-| Pool size fits the database | `extra: {'maxConnectionCount': 10}`. The native drivers (the default) share one pool per process, so the total is the pool size. The Dart drivers have one pool per isolate: total = isolates x pool size. Keep it under the database `max_connections`. | [Database](../database/index.md) |
+| Pool size fits the database | `extra: {'maxConnectionCount': 10}`. The Postgres and MySQL drivers share one pool per process, so the total is the pool size, not isolates x pool size. Keep it under the database `max_connections`. | [Database](../database/index.md) |
 | Query logging is off | The new project's `database.dart` has `debug: true` on every connection, which prints every query. Set `debug: false` in production. | [Database](../database/index.md) |
 | Backups | **Dox limit.** Dox has no backup tool. Use `pg_dump`, `mysqldump`, managed database snapshots, or a copy of the SQLite file (with the `-wal` file, or `sqlite3 app.db ".backup x.db"`). Test a restore. | |
 

@@ -1,6 +1,6 @@
 # Native Postgres driver
 
-`dox_postgres_native` is the default Postgres driver of the Dox ORM.
+`dox_postgres_native` is the Postgres driver of the Dox ORM.
 Rust talks to the database. Your models, queries and transactions stay the
 same. You do not change any config.
 
@@ -10,12 +10,11 @@ same. You do not change any config.
   in one message.
 - Each connection keeps its prepared statements. The same SQL is not parsed
   again.
-- Values have the same Dart types as with the `postgres` package. Errors
-  are the same `ServerException` classes.
+- Server errors are `PgServerException`. Other errors are `PgException`.
 
 !!! warning "Alpha"
-    This driver is new. If you see a problem, [use the Dart driver](#use-the-dart-driver)
-    and tell us.
+    This driver is new. If you see a problem, please
+    [open an issue](https://github.com/dartondox/dox-postgres-native/issues).
 
 ## Speed
 
@@ -23,14 +22,13 @@ One find-by-id query (`SELECT ... WHERE id = @id`), AOT build
 (`dart build cli`), Postgres 14 on the same machine (Apple M-series),
 4 connections:
 
-| | Dart driver | Native driver |
-|---|---|---|
-| One query at a time | 95 µs | 60 µs |
-| 64 queries in flight, one isolate | 45 µs per query | 12.5 µs per query |
-| 4 isolates, 64 in flight each, 16 connections per pool | 39,500 queries/s | 64,000 queries/s |
+| | Time |
+|---|---|
+| One query at a time | 60 µs |
+| 64 queries in flight, one isolate | 12.5 µs per query |
+| 4 isolates, 64 in flight each, 16 connections per pool | 64,000 queries/s |
 
-The gain is biggest when many requests run at the same time, like in a web
-server.
+Many requests at the same time, like in a web server, get the most out of it.
 
 ## Install
 
@@ -43,8 +41,7 @@ dart pub add dox_postgres_native
 
 You do not need Rust. The build hook downloads a ready-built library for
 your system. When there is no library for your system and no Rust to build
-one, the ORM still works: it uses the Dart driver and prints one warning
-line (see below).
+one, the app stops with a clear error (see below).
 
 The package lives in its own repo:
 [dartondox/dox-postgres-native](https://github.com/dartondox/dox-postgres-native).
@@ -52,47 +49,52 @@ The package lives in its own repo:
 Use `dart run`, `dart test` or `dart build cli`. `dart compile exe` does not
 run build hooks.
 
-## Native is the default
+## When the library does not load
 
-You do not change any config. The ORM picks the driver like this:
-
-1. `driverFactory` is set: the ORM uses your driver. It wins over
-   everything below.
-2. You ask for the Dart driver (see below), or the connection uses TLS:
-   the ORM uses the Dart driver.
-3. The native library loads: the ORM uses the native driver.
-4. The native library does not load (no library for your system, no
-   Rust to build it, or a load error): the ORM uses the Dart driver. It
-   prints one warning line to stderr, like this:
+Postgres has no other driver in Dox. When the native library does not load,
+`SqlQueryBuilder.initializeWithDatabaseConfig` (and every other place that
+opens a Postgres connection) throws an `UnsupportedError` like this:
 
 ```text
-[dox] warning: dox_postgres_native did not load, using the Dart postgres driver (...)
+dox_postgres_native did not load: <reason>.
+Dox needs it to talk to Postgres. Fix: run the app with `dart run` or `dart build cli`. ...
 ```
 
-Named connections (`withConnection('x')`, `transaction(..., connection: 'x')`) follow
-the same rules.
+The reason tells what went wrong, for example no library for your system.
+To fix it:
 
-## Use the Dart driver
+- Run the app with `dart run`, `dart test` or `dart build cli`. They run the
+  build hook. `dart compile exe` does not.
+- Or install [Rust](https://rustup.rs). The build hook then builds the
+  library from source.
+- When you set `lib_path` in `pubspec.yaml`, check that the file is there
+  and is built for your system.
 
-For all connections, set the env var:
+A `driverFactory` on the connection wins over all of this: the ORM uses your
+driver.
 
-```bash
-DOX_DB_DRIVER=dart dart run bin/server.dart
-```
+## TLS
 
-For one connection, set `native: false` in `extra`:
+Set the TLS mode with `useSSL` or `extra['sslMode']`, or with `sslmode` in
+the `DATABASE_URL`:
+
+| Mode | What it does |
+|---|---|
+| `disable` | No TLS. The default. |
+| `prefer` | TLS when the server has it. No certificate check. |
+| `require` | TLS. No certificate check, like libpq. `useSSL: true` gives this mode. |
+| `verify-full` | TLS. The certificate and the host name are checked. It uses the Mozilla roots and the roots of the system. |
 
 ```dart
 ConnectionConfig(
   driver: Driver.postgres,
   // ... host, user, password, database as before
-  extra: <String, dynamic>{'native': false},
+  extra: <String, dynamic>{'sslMode': 'verify-full'},
   debug: false,
 ),
 ```
 
-Postgres with TLS (`useSSL: true` or `extra['sslMode']`) always uses the
-Dart driver, because the native driver has no TLS yet.
+In a url, `sslmode=verify-ca` is read as `verify-full`.
 
 ## Options
 
@@ -101,7 +103,8 @@ The driver reads these keys from `extra` of the `ConnectionConfig`:
 | Key | Default | What it does |
 |---|---|---|
 | `maxConnectionCount` | `10` | Most connections in the pool, for the whole process. |
-| `timeZone` | `UTC` | Time zone of the session, like the Dart driver. |
+| `sslMode` | `disable` | TLS mode, see [TLS](#tls). |
+| `timeZone` | `UTC` | Time zone of the session. |
 | `applicationName` | none | Name of the app in `pg_stat_activity`. |
 | `threads` | `1` | Rust threads for all pools of the process. `0` is one thread with a single-thread runtime. Only the first pool sets it. |
 
@@ -141,10 +144,22 @@ await pool.commit(tx); // or pool.rollback(tx)
 - `parameters` is a map for `@name`, or a list for `$1, $2`.
 - A transaction runs on one connection. Its queries run in the order you
   send them.
+- `PgNativePool.fromUrl('postgres://user:pass@host:5432/db?sslmode=require')`
+  makes a pool from a url.
+
+## Values
+
+You send plain Dart values: `null`, `bool`, `int`, `double`, `String`,
+`DateTime`, `Duration` (an interval), `Uint8List` (bytea), `Map` (json) and
+`List` (an array, eg. for `int4[]`).
+
+- The server picks the type. When it can not, add a cast in the SQL, eg.
+  `@id::int8`.
+- A `List` is an array, not json. On insert and update the ORM sends a
+  `List` as json text, so a `List` in a json column works. With the pool
+  alone, send `jsonEncode(list)` for a json column.
 
 ## Types
-
-The same as the `postgres` package:
 
 | Postgres | Dart |
 |---|---|
@@ -154,26 +169,34 @@ The same as the `postgres` package:
 | `text`, `varchar`, `char` | `String` |
 | `bool` | `bool` |
 | `timestamp`, `timestamptz`, `date` | `DateTime` in UTC |
+| `infinity` dates | the text `'infinity'` or `'-infinity'` |
+| `time` | `String`, eg. `'13:45:01.5'` |
+| `interval` | `Duration` (a month is 30 days) |
 | `json`, `jsonb` | the decoded JSON value |
 | `uuid` | `String` |
 | `bytea` | `Uint8List` |
 | arrays of most types above | `List` |
 | `NULL` | `null` |
 
-Other types decode with the type registry of the `postgres` package.
+Other types come back as `Uint8List`.
 
 ## Errors
 
-A server error throws the same exception as the Dart driver:
-`ServerException`, or `UniqueViolationException` and
-`ForeignKeyViolationException`, with the same `code`, `detail`,
-`constraintName` and other fields. Other errors (eg. the server is down)
-throw `PgException`.
+A server error throws `PgServerException`. It has `code` (the SQLSTATE, eg.
+`23505` for a unique violation), `severity`, `message`, and `detail`, `hint`,
+`schema`, `table`, `column` and `constraint` when the server sends them.
+Other errors (eg. the server is down, a TLS error, a timeout) throw
+`PgException`. Both come from `package:dox_orm/dox_orm.dart`.
+
+```dart
+try {
+  await QueryBuilder.table('users').insert(<String, dynamic>{'email': email});
+} on PgServerException catch (error) {
+  if (error.code == '23505') print('taken: ${error.constraint}');
+}
+```
 
 ## Not yet
 
-- SSL. A connection with `useSSL: true` uses the Dart driver.
-- `maxConnectionAge`, `queryTimeout` and the other `extra` keys of the Dart
-  driver are not read.
-- A nested `transaction()` joins the outer one, like the Dart driver
-  (no savepoints).
+- `maxConnectionAge` and `queryTimeout` are not read.
+- A nested `transaction()` joins the outer one (no savepoints).

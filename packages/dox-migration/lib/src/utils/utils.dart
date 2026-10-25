@@ -39,17 +39,17 @@ Future<void> saveMigratedRecord(
       INSERT INTO dox_db_migration 
       (migration,batch) 
       VALUES 
-      (?, ?)
+      (@name, @batch)
     ''';
-    await conn.execute(query, <Object>[name, batch]);
+    await conn.execute(query, <String, dynamic>{'name': name, 'batch': batch});
     return;
   }
 
   String query = '''
       DELETE from dox_db_migration 
-      WHERE migration = ?
+      WHERE migration = @name
     ''';
-  await conn.execute(query, <Object>[name]);
+  await conn.execute(query, <String, dynamic>{'name': name});
   return;
 }
 

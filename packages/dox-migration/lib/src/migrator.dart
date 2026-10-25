@@ -8,7 +8,6 @@ import 'utils/db_connection.dart';
 import 'utils/env.dart';
 import 'utils/file_extension.dart';
 import 'utils/logger.dart';
-import 'utils/migration_driver.dart';
 import 'utils/utils.dart';
 
 /// state of one migration, from [Migrator.status]
@@ -37,10 +36,15 @@ class Migrator {
   /// the Dart migrations, eg. from `db/migration/migrations.dart`
   final List<MigrationEntry> migrations;
 
-  /// postgres `Connection`/`Pool`, mysql `MySQLConnection`/
-  /// `MySQLConnectionPool` or sqlite `Database`.
-  /// null: open one from `.env` (or the environment variables).
-  final dynamic connection;
+  /// a dox_orm driver to run on, eg. `SqlQueryBuilder().dbDriver`.
+  /// it belongs to the caller, the migrator does not close it.
+  final DBDriver? connection;
+
+  /// the database to open when [connection] is null, eg.
+  /// `databaseConfig.getConnectionConfig()`. the migrator closes it when
+  /// it is done. null: the config from `.env` (or the environment
+  /// variables).
+  final ConnectionConfig? config;
 
   /// folder of the `.sql` migrations, default `db/migration`
   final Directory? directory;
@@ -48,6 +52,7 @@ class Migrator {
   const Migrator({
     this.migrations = const <MigrationEntry>[],
     this.connection,
+    this.config,
     this.directory,
   });
 
@@ -56,17 +61,17 @@ class Migrator {
 
   /// undo the last batch, or the last [step] migrations, newest first
   Future<void> rollback({int? step}) {
-    return _withDriver((MigrationDriver d) => _rollback(d, step: step));
+    return _withDriver((DbConnection d) => _rollback(d, step: step));
   }
 
   /// undo all migrations, newest first
   Future<void> reset() {
-    return _withDriver((MigrationDriver d) => _rollback(d, all: true));
+    return _withDriver((DbConnection d) => _rollback(d, all: true));
   }
 
   /// undo all migrations, then run them again
   Future<void> refresh() {
-    return _withDriver((MigrationDriver d) async {
+    return _withDriver((DbConnection d) async {
       await _rollback(d, all: true);
       await _migrate(d);
     });
@@ -142,26 +147,18 @@ class Migrator {
     return step;
   }
 
-  /// one connection for the whole run
-  Future<T> _withDriver<T>(Future<T> Function(MigrationDriver d) task) async {
-    DbConnection conn = connection != null
-        ? DbConnection(connection)
-        : await _open();
+  /// one driver for the whole run
+  Future<T> _withDriver<T>(Future<T> Function(DbConnection d) task) async {
+    DBDriver? given = connection;
+    DbConnection conn = DbConnection(
+      given ?? (config ?? DbConnection.config(loadEnv())).createDriver(),
+    );
     try {
-      MigrationDriver driver = MigrationDriver(conn);
       await createMigrationTableIfNotExist(conn);
-      return await task(driver);
+      return await task(conn);
     } finally {
-      /// a given connection belongs to the caller
-      if (connection == null) await conn.close();
-    }
-  }
-
-  Future<DbConnection> _open() async {
-    try {
-      return await DbConnection.open(loadEnv());
-    } catch (e) {
-      throw Exception('Could not connect to database: $e');
+      /// a given driver belongs to the caller
+      if (given == null) await conn.close();
     }
   }
 
@@ -185,8 +182,8 @@ class Migrator {
     return <String, Object>{for (String name in names) name: all[name]!};
   }
 
-  Future<Map<String, int>> _ran(MigrationDriver d) async {
-    List<Map<String, dynamic>> rows = await d.conn.execute(
+  Future<Map<String, int>> _ran(DbConnection d) async {
+    List<Map<String, dynamic>> rows = await d.execute(
       'SELECT migration, batch FROM dox_db_migration ORDER BY id',
     );
     return <String, int>{
@@ -195,9 +192,9 @@ class Migrator {
     };
   }
 
-  Future<void> _migrate(MigrationDriver d) async {
+  Future<void> _migrate(DbConnection d) async {
     Map<String, int> ran = await _ran(d);
-    int batch = await getNextBatchNumber(d.conn);
+    int batch = await getNextBatchNumber(d);
     int count = 0;
     for (MapEntry<String, Object> m in _all().entries) {
       if (ran.containsKey(m.key)) continue;
@@ -209,11 +206,7 @@ class Migrator {
     }
   }
 
-  Future<void> _rollback(
-    MigrationDriver d, {
-    int? step,
-    bool all = false,
-  }) async {
+  Future<void> _rollback(DbConnection d, {int? step, bool all = false}) async {
     String query = 'SELECT migration FROM dox_db_migration';
     if (step != null && !all) {
       query += ' ORDER BY id DESC LIMIT $step';
@@ -224,7 +217,7 @@ class Migrator {
     } else {
       query += ' ORDER BY id DESC';
     }
-    List<Map<String, dynamic>> rows = await d.conn.execute(query);
+    List<Map<String, dynamic>> rows = await d.execute(query);
     Map<String, Object> known = _all();
     for (Map<String, dynamic> row in rows) {
       String name = row['migration'].toString();
@@ -239,7 +232,7 @@ class Migrator {
     }
   }
 
-  Future<List<MigrationStatus>> _status(MigrationDriver d) async {
+  Future<List<MigrationStatus>> _status(DbConnection d) async {
     Map<String, int> ran = await _ran(d);
     Map<String, Object> known = _all();
     List<String> names = <String>{...known.keys, ...ran.keys}.toList()..sort();
@@ -252,7 +245,7 @@ class Migrator {
   /// run one migration (a [Migration] or a `.sql` [File]) and save it.
   /// it runs in one transaction, unless the migration says no.
   Future<void> _runOne(
-    MigrationDriver d,
+    DbConnection d,
     String name,
     Object migration,
     MigrationType type,
@@ -264,37 +257,37 @@ class Migrator {
     /// sqlite: foreign keys are off while it runs, so a table rebuild can
     /// drop a table that others point to. they are checked before commit.
     bool sqliteFk =
-        d.conn.isSqlite &&
-        (await d.conn.execute('PRAGMA foreign_keys')).first.values.first == 1;
+        d.isSqlite &&
+        (await d.execute('PRAGMA foreign_keys')).first.values.first == 1;
 
     Future<void> body() async {
       if (migration is Migration) {
-        Schema schema = Schema(d);
+        Schema schema = Schema(d.driver);
         up ? await migration.up(schema) : await migration.down(schema);
       } else {
-        await SqlExtMigration(migration as File).run(d.conn, type);
+        await SqlExtMigration(migration as File).run(d, type);
       }
       if (sqliteFk) await _checkSqliteForeignKeys(d);
-      await saveMigratedRecord(d.conn, name, batch, type);
+      await saveMigratedRecord(d, name, batch, type);
     }
 
     bool transaction = migration is Migration
         ? migration.withinTransaction
         : true;
 
-    if (sqliteFk) await d.conn.execute('PRAGMA foreign_keys = OFF');
+    if (sqliteFk) await d.execute('PRAGMA foreign_keys = OFF');
     try {
       transaction ? await d.transaction(body) : await body();
     } catch (error) {
       throw MigrationException(name, error);
     } finally {
-      if (sqliteFk) await d.conn.execute('PRAGMA foreign_keys = ON');
+      if (sqliteFk) await d.execute('PRAGMA foreign_keys = ON');
     }
     Logger.info('${up ? 'Migrated' : 'Rolled back'}: $name');
   }
 
-  Future<void> _checkSqliteForeignKeys(MigrationDriver d) async {
-    List<Map<String, dynamic>> broken = await d.conn.execute(
+  Future<void> _checkSqliteForeignKeys(DbConnection d) async {
+    List<Map<String, dynamic>> broken = await d.execute(
       'PRAGMA foreign_key_check',
     );
     if (broken.isNotEmpty) {

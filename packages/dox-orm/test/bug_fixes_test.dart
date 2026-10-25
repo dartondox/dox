@@ -179,6 +179,21 @@ void main() async {
       }
     });
 
+    test('a Dart list goes into a json column', () async {
+      await QueryBuilder.table('blog_info').insert(<String, dynamic>{
+        'info': <int>[1, 2],
+        'blog_id': 1,
+      });
+      await QueryBuilder.table('blog_info')
+          .where('blog_id', 1)
+          .update(<String, dynamic>{
+            'info': <dynamic>['a', 3],
+          });
+      Map<String, dynamic>? info = await QueryBuilder.table('blog_info')
+          .getFirst();
+      expect(info?['info'], <dynamic>['a', 3]);
+    });
+
     test('withTrash(false) on a model without soft deletes', () async {
       await QueryBuilder.table('blog_info')
           .insert(<String, dynamic>{'info': '{}', 'blog_id': 1});

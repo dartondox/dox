@@ -1,5 +1,4 @@
 import 'package:dox_orm/dox_orm.dart';
-import 'package:postgres/postgres.dart' as postgres;
 import 'package:test/test.dart';
 
 import 'connection.dart';
@@ -105,25 +104,16 @@ void main() async {
       ]);
     });
 
-    test('tls checks the server certificate by default', () {
+    test('tls modes', () {
       ConnectionConfig pg = ConnectionConfig.fromUrl(
         'postgres://u:p@db.example.com/app?sslmode=verify-full',
       );
-      expect(pg.postgresSslMode, postgres.SslMode.verifyFull);
+      expect(pg.postgresSslMode, 'verify-full');
       expect(
         ConnectionConfig.fromUrl(
           'postgres://u:p@db.example.com/app?sslmode=verify-ca',
         ).postgresSslMode,
-        postgres.SslMode.verifyFull,
-      );
-      expect(
-        ConnectionConfig(
-          driver: Driver.postgres,
-          database: 'app',
-          useSSL: true,
-          debug: false,
-        ).postgresSslMode,
-        postgres.SslMode.verifyFull,
+        'verify-full',
       );
 
       /// like libpq: require encrypts but does not check the certificate,
@@ -132,25 +122,39 @@ void main() async {
         ConnectionConfig.fromUrl(
           'postgres://u:p@db.example.com/app?sslmode=require',
         ).postgresSslMode,
-        postgres.SslMode.require,
+        'require',
       );
-
-      ConnectionConfig dev = ConnectionConfig.fromUrl(
-        'postgres://u:p@db.example.com/app?sslmode=require&verifyCertificate=false',
-      );
-      expect(dev.postgresSslMode, postgres.SslMode.require);
-
-      ConnectionConfig mysql = ConnectionConfig.fromUrl(
-        'mysql://u:p@db.example.com/app',
-      );
-      expect(mysql.mysqlAllowPublicKeyRetrieval, false);
       expect(
-        ConnectionConfig.fromUrl('mysql://u:p@db.example.com/app?ssl=true')
-            .mysqlAllowPublicKeyRetrieval,
-        true,
+        ConnectionConfig(
+          driver: Driver.postgres,
+          database: 'app',
+          useSSL: true,
+          debug: false,
+        ).postgresSslMode,
+        'require',
       );
-      expect(pg.verifyCertificate, true);
+      expect(
+        ConnectionConfig(
+          driver: Driver.postgres,
+          database: 'app',
+          useSSL: true,
+          extra: <String, dynamic>{'sslMode': 'verify-full'},
+          debug: false,
+        ).postgresSslMode,
+        'verify-full',
+      );
+      expect(
+        ConnectionConfig.fromUrl('postgres://u:p@h/app').postgresSslMode,
+        'disable',
+      );
+
+      /// mysql checks the certificate unless verifyCertificate=false
+      ConnectionConfig dev = ConnectionConfig.fromUrl(
+        'mysql://u:p@db.example.com/app?ssl=true&verifyCertificate=false',
+      );
+      expect(dev.useSSL, true);
       expect(dev.verifyCertificate, false);
+      expect(pg.verifyCertificate, true);
     });
   });
 }

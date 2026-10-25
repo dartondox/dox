@@ -79,10 +79,7 @@ void main() {
             database: 'postgres',
             debug: false,
           );
-    orm.SqlQueryBuilder.initialize(
-      database: connection.getDatabaseConnection(),
-      driver: connection.driver,
-    );
+    orm.SqlQueryBuilder().dbDriver = connection.createDriver();
     for (String table in <String>['members', 'teams', 'tags']) {
       await orm.Schema().dropIfExists(table);
     }
