@@ -11,29 +11,30 @@ class PostObserver extends ModelObserver<EventPost> {
   PostObserver(this.name);
 
   @override
-  void creating(EventPost model) => EventPost.log.add('$name:creating');
+  void onCreating(EventPost model) => EventPost.log.add('$name:creating');
 
   @override
-  Future<void> saved(EventPost model) async => EventPost.log.add('$name:saved');
+  Future<void> onSaved(EventPost model) async =>
+      EventPost.log.add('$name:saved');
 }
 
 class UserObserver extends ModelObserver<User> {
   List<String> log = <String>[];
 
   @override
-  void creating(User model) {
+  void onCreating(User model) {
     log.add('creating');
     model.name = model.name?.toUpperCase();
   }
 
   @override
-  void updating(User model) {
+  void onUpdating(User model) {
     log.add('updating');
     if (model.name == 'stop') throw CancelModelEvent();
   }
 
   @override
-  void deleted(User model) => log.add('deleted');
+  void onDeleted(User model) => log.add('deleted');
 }
 
 Future<int> _count() async {
