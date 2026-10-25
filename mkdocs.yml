@@ -137,6 +137,7 @@ nav:
     - the-basic/routing.md
     - the-basic/request.md
     - the-basic/response.md
+    - the-basic/views.md
     - the-basic/serializer.md
     - the-basic/errors.md
     - the-basic/controller.md
