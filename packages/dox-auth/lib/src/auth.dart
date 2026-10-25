@@ -1,6 +1,8 @@
 // ignore_for_file: depend_on_referenced_packages
 import 'package:dox_auth/src/auth_engine.dart';
+import 'package:dox_auth/src/drivers/session_auth_driver.dart';
 import 'package:dox_auth/src/interfaces.dart';
+import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart';
 
 class Auth implements IAuth {
@@ -47,6 +49,48 @@ class Auth implements IAuth {
   String? login(Model<dynamic> user) {
     _userData = user;
     return _createToken();
+  }
+
+  /// Check the credentials and keep the login in the session.
+  /// true when it worked. Needs a guard with `SessionAuthDriver`.
+  /// ```
+  /// if (!await Auth().attemptSession(req, credentials)) {
+  ///   req.session.flashErrors({'email': 'Wrong email or password'});
+  ///   return back(req);
+  /// }
+  /// ```
+  Future<bool> attemptSession(
+    DoxRequest req,
+    Map<String, dynamic> credentials,
+  ) async {
+    SessionAuthDriver driver = _sessionDriver;
+    _userData = await driver.attempt(credentials, _guard);
+    Model<dynamic>? user = _userData;
+    if (user == null) return false;
+    driver.login(req, user, _guard);
+    return true;
+  }
+
+  /// Keep [user] in the session, with no password check.
+  /// Needs a guard with `SessionAuthDriver`.
+  void loginSession(DoxRequest req, Model<dynamic> user) {
+    _userData = user;
+    _sessionDriver.login(req, user, _guard);
+  }
+
+  /// End the session login. All session data is removed.
+  void logout(DoxRequest req) {
+    _userData = null;
+    _sessionDriver.logout(req);
+  }
+
+  SessionAuthDriver get _sessionDriver {
+    AuthDriver driver = _driver;
+    if (driver is SessionAuthDriver) return driver;
+    throw StateError(
+      "The auth guard '$_guard' does not use SessionAuthDriver. "
+      'Use attempt() and login() for a token.',
+    );
   }
 
   @override

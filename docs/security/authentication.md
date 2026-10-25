@@ -4,7 +4,7 @@ icon: lucide/user-lock
 
 # Authentication
 
-This page shows how to log users in with `dox_auth` and protect routes with a JWT token.
+This page shows how to log users in with `dox_auth` and protect routes with a JWT token or a session.
 
 `dox_auth` checks an email and a password against your user table.
 It gives back a JWT token.
@@ -217,6 +217,59 @@ Route.get('/admin', <dynamic>[AuthMiddleware(guard: 'admin'), (AdminController c
 The token keeps the guard name in its `aud` claim.
 So a token from the `web` guard does not work on the `admin` guard, even with the same secret.
 An unknown guard name throws an `ArgumentError`.
+
+## Session login for web pages
+
+For web pages, keep the login in the session instead of a token.
+The browser sends the session cookie, so the client does nothing.
+It needs `SessionMiddleware` and `CsrfMiddleware`. See [Session](../the-basic/session.md).
+
+Use `SessionAuthDriver` in the guard:
+
+```dart
+'web': AuthGuard(
+  driver: SessionAuthDriver(),
+  provider: AuthProvider(model: () => User()),
+),
+```
+
+Log in and log out with the request:
+
+```dart
+Future<dynamic> login(DoxRequest req, LoginUser body) async {
+  bool ok = await Auth().attemptSession(req, <String, dynamic>{
+    'email': body.email,
+    'password': body.password,
+  });
+  if (!ok) {
+    req.session.flashErrors(<String, dynamic>{'email': 'Wrong email or password'});
+    return back(req);
+  }
+  return redirect('/dashboard');
+}
+
+DoxResponse logout(DoxRequest req) {
+  Auth().logout(req);
+  return redirect('/');
+}
+```
+
+Send guests to the login page instead of a `401`:
+
+```dart
+Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), (PageController c) => c.dashboard]);
+```
+
+| Method | What it does |
+| --- | --- |
+| `await Auth().attemptSession(req, credentials)` | checks the password like `attempt`, and keeps the user id in the session. Gives `true` or `false` |
+| `Auth().loginSession(req, user)` | keeps this user in the session, with no password check |
+| `Auth().logout(req)` | removes the login and all session data |
+
+- Login and logout give the session a new id and a new CSRF token. So an id that someone saw before the login is of no use.
+- The session keeps only the user id. `AuthMiddleware` loads the user from the database on each request, so a deleted user is logged out.
+- These methods throw a `StateError` on a guard that does not use `SessionAuthDriver`.
+- `SessionAuthDriver` has one option, `hashRounds` (default `10`), like `JwtAuthDriver`.
 
 ## Things to know
 
