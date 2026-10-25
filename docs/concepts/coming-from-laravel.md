@@ -99,7 +99,7 @@ Dox middleware runs before the controller only. There is no "after" step; use a 
 | `$request->user()` | `req.auth?.user<User>()` |
 | `422` with `{"errors": {...}}` | `422` with a flat map `{"email": "...", "items.1.quantity": "..."}` |
 
-```dart title="lib/app/http/dtos/create_blog.dto.dart"
+```dart title="lib/app/http/dtos/create_blog/create_blog.dto.dart"
 @Dto()
 class CreateBlog {
   @Length(min: 3, max: 50)

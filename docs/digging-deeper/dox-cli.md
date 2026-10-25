@@ -106,7 +106,7 @@ See [Deployment](deployment.md#build).
 dox make:controller Blog        # lib/app/http/controllers/blog.controller.dart
 dox make:controller Blog -r     # resource controller
 dox make:middleware Auth
-dox make:dto CreateBlog         # lib/app/http/dtos/create_blog.dto.dart
+dox make:dto CreateBlog         # lib/app/http/dtos/create_blog/create_blog.dto.dart
 dox make:serializer Blog
 dox make:model Blog -m          # model and its create_blogs_table migration
 dox make:migration create_blogs_table          # .dart file (default)

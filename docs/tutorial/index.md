@@ -56,9 +56,9 @@ blog/
 │   │   ├── auth.controller.dart  *
 │   │   └── post.controller.dart  *
 │   ├── app/http/dtos/
-│   │   ├── login_user.dto.dart   *
-│   │   ├── register_user.dto.dart *
-│   │   └── save_post.dto.dart    *
+│   │   ├── login_user/login_user.dto.dart   *
+│   │   ├── register_user/register_user.dto.dart *
+│   │   └── save_post/save_post.dto.dart    *
 │   ├── app/models/
 │   │   ├── post/post.model.dart  *
 │   │   └── user/user.model.dart

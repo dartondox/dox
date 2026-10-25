@@ -22,11 +22,11 @@ class $className {
 }
 
 /// `dox make:dto CreateBlog` makes
-/// `lib/app/http/dtos/create_blog.dto.dart`.
+/// `lib/app/http/dtos/create_blog/create_blog.dto.dart`.
 bool createDto(String filename) {
   filename = pascalToSnake(filename).replaceAll(RegExp(r'_?dto$'), '');
   String className = snakeToPascal(filename);
-  String path = '${Directory.current.path}/lib/app/http/dtos/';
+  String path = '${Directory.current.path}/lib/app/http/dtos/$filename/';
   String dtoName = '$filename.dto';
   File file = File('$path$filename.dto.dart');
 
@@ -38,6 +38,6 @@ bool createDto(String filename) {
   file.createSync(recursive: true);
   file.writeAsStringSync(_getSample(className, filename), mode: FileMode.write);
   print('\x1B[32m$dtoName created successfully.\x1B[0m');
-  print('Run `dox build_runner:build` to make $filename.dto.g.dart.');
+  print('Run `dox build_runner:build` to make $filename/$filename.dto.g.dart.');
   return true;
 }

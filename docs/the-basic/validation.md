@@ -10,7 +10,7 @@ Write a class with `@Dto()`. Ask for it in your controller.
 Dox reads the request, checks it, and gives you a typed object.
 When the input is wrong, Dox answers `422` with the errors. Your controller does not run.
 
-```dart title="lib/app/http/dtos/create_user.dto.dart"
+```dart title="lib/app/http/dtos/create_user/create_user.dto.dart"
 import 'package:dox_core/dox_core.dart';
 
 part 'create_user.dto.g.dart';
@@ -50,7 +50,7 @@ class UserController {
 
 You do this once per app.
 
-1. Make a DTO with `dox make:dto CreateUser`. It writes `lib/app/http/dtos/create_user.dto.dart`.
+1. Make a DTO with `dox make:dto CreateUser`. It writes `lib/app/http/dtos/create_user/create_user.dto.dart`.
 2. Run the generator: `dox build_runner:build` (or `dox build_runner:watch`).
    It writes a `.dto.g.dart` file next to each DTO, and one list of all DTOs in `lib/generated/dtos.g.dart`.
 3. Give that list to the app:

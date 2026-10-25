@@ -16,7 +16,7 @@ One page to keep open while you work. Each section links to its full page.
 | `lib/config/` | `app.dart` (`AppConfig`), `env.dart`, `database.dart`, `cors.dart`, `cache.dart`, `storage.dart`, `openapi.dart`, `logger.dart`, `socketio.dart` |
 | `lib/routes/` | `api.dart`, `web.dart`, `websocket.dart`: one `Router` class each |
 | `lib/app/http/controllers/` | `<name>.controller.dart` |
-| `lib/app/http/dtos/` | `<name>.dto.dart` |
+| `lib/app/http/dtos/<name>/` | `<name>.dto.dart` |
 | `lib/app/http/middleware/` | `<name>.middleware.dart` |
 | `lib/app/http/serializers/` | `<name>.serializer.dart` |
 | `lib/app/models/<name>/` | `<name>.model.dart` |

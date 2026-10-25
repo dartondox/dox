@@ -127,7 +127,7 @@ Where each part comes from:
 
 This is the `SavePost` DTO of the tutorial:
 
-```dart title="lib/app/http/dtos/save_post.dto.dart"
+```dart title="lib/app/http/dtos/save_post/save_post.dto.dart"
 @Dto()
 class SavePost {
   @Trim()

@@ -69,7 +69,7 @@ sequenceDiagram
 | --- | --- | --- |
 | Route match | `lib/routes/*.dart`, `Route.get(...)` | which controller runs |
 | Middleware | `AppConfig(globalMiddleware:)`, `Router.middleware`, `Route.middleware(...)`, the route list | go on, or answer early |
-| Input | a `@Dto` class in `lib/app/http/dtos/` | what the controller gets, or `422` |
+| Input | a `@Dto` class in `lib/app/http/dtos/<name>/` | what the controller gets, or `422` |
 | Output | the return value, `response(...)`, `responseHandler` | status, headers, body |
 | Errors | `IHttpException`, `AppConfig(exceptionHandler:)` | the error response, logging |
 
@@ -165,7 +165,7 @@ my_app/
 │   ├── app/
 │   │   ├── http/
 │   │   │   ├── controllers/     # *.controller.dart
-│   │   │   ├── dtos/            # *.dto.dart, typed and checked input
+│   │   │   ├── dtos/            # one folder per DTO, *.dto.dart, typed and checked input
 │   │   │   ├── middleware/      # *.middleware.dart
 │   │   │   ├── serializers/     # *.serializer.dart, custom JSON shapes
 │   │   │   └── response_handler.dart

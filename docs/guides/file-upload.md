@@ -64,7 +64,7 @@ class AppStorageProvider extends StorageProvider {
 
 The DTO checks the file before your controller runs.
 
-```dart title="lib/app/http/dtos/upload_image.dto.dart"
+```dart title="lib/app/http/dtos/upload_image/upload_image.dto.dart"
 import 'package:dox_core/dox_core.dart';
 
 part 'upload_image.dto.g.dart';
@@ -92,7 +92,7 @@ For other file types, use `@Mimes(<String>['pdf', 'docx'])` in place of `@Image(
 ```dart title="lib/app/http/controllers/upload.controller.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_storage/dox_storage.dart';
-import 'package:my_app/app/http/dtos/upload_image.dto.dart';
+import 'package:my_app/app/http/dtos/upload_image/upload_image.dto.dart';
 
 @Inject()
 class UploadController {

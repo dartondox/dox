@@ -1,7 +1,7 @@
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
-import 'package:my_app/app/http/dtos/login_user.dto.dart';
-import 'package:my_app/app/http/dtos/register_user.dto.dart';
+import 'package:my_app/app/http/dtos/login_user/login_user.dto.dart';
+import 'package:my_app/app/http/dtos/register_user/register_user.dto.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 
 @Inject()

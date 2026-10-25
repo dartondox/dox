@@ -226,7 +226,9 @@ void main() {
 
       expect(() => command!.function(['CreateUser']), returnsNormally);
 
-      final dtoFile = File('lib/app/http/dtos/create_user.dto.dart');
+      final dtoFile = File(
+        'lib/app/http/dtos/create_user/create_user.dto.dart',
+      );
       expect(dtoFile.existsSync(), isTrue);
 
       final content = dtoFile.readAsStringSync();
