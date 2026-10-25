@@ -140,7 +140,7 @@ Source: `packages/dox-core/lib/openapi/openapi_config.dart`.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `enabled` | `bool?` | `null` | Serve the docs routes. `null` means: on only when `APP_ENV` is `development` or `local`. An empty `APP_ENV` counts as `development`. |
+| `enabled` | `bool?` | `null` | Serve the docs routes. `null` means: on only when `APP_ENV` is `development` or `local`. An empty `APP_ENV` counts as production. |
 | `info` | `Info` | `Info(title: 'Dox API', version: '1.0.0')` | Title and version of the API. |
 | `servers` | `List<Server>` | `[]` | Base URLs of the API. |
 | `securitySchemes` | `Map<String, SecurityScheme>` | `{}` | Ways to log in, like `{'bearerAuth': SecurityScheme.bearer()}`. |

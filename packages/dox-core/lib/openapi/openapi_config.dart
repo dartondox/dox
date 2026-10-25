@@ -18,8 +18,7 @@ import 'package:dox_openapi/dox_openapi.dart';
 class OpenApiConfig {
   /// Serve the docs routes. When null, they are on only when `APP_ENV`
   /// is `development` or `local`. An empty `APP_ENV` counts as
-  /// `development`, the same default as `appEnv` of the typed env.
-  /// So set `APP_ENV=production` in production.
+  /// production, so the docs are off.
   final bool? enabled;
 
   /// Title and version of the API.
@@ -85,7 +84,7 @@ class OpenApiConfig {
   bool get isEnabled {
     bool? value = enabled;
     if (value != null) return value;
-    String env = Env.get<String>('APP_ENV', 'development').toLowerCase();
+    String env = Env.get<String>('APP_ENV').toLowerCase();
     return env == 'development' || env == 'local';
   }
 }

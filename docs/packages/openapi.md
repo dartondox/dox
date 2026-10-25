@@ -46,7 +46,7 @@ AppConfig appConfig = AppConfig(
 
 | Option | Default | What it does |
 | --- | --- | --- |
-| `enabled` | `null` | `true` or `false` turns the docs routes on or off. `null`: on only when `APP_ENV` is `development` or `local`. An empty `APP_ENV` counts as `development`, like the typed env. So set `APP_ENV=production` in production |
+| `enabled` | `null` | `true` or `false` turns the docs routes on or off. `null`: on only when `APP_ENV` is `development` or `local` |
 | `info` | `Info(title: 'Dox API', version: '1.0.0')` | title and version of the API |
 | `servers` | `[]` | base URLs, like `[Server('https://api.my.app')]` |
 | `registry` | empty | `openApiRegistry` from `lib/generated/openapi.g.dart` |
@@ -56,6 +56,8 @@ AppConfig appConfig = AppConfig(
 | `pageTitle` | `info.title` | title of the `/docs` page |
 | `include` | `[]` (all routes) | only these paths go in the docs, like `['/api/*']` |
 | `exclude` | `[]` | these paths are left out, like `['/api/internal/*']` |
+
+If `APP_ENV` is not set, Dox treats the app as production: `/docs` is off and error details are hidden. Set `APP_ENV=development` in your `.env` and in CI.
 
 ### 3. Open `/docs`
 

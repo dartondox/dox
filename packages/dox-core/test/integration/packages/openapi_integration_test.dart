@@ -476,17 +476,17 @@ void main() {
     await dir.delete(recursive: true);
   });
 
-  test('docs are on in development and when APP_ENV is not set', () {
+  test('docs are on only in development, off when APP_ENV is not set', () {
     expect(const OpenApiConfig(enabled: false).isEnabled, isFalse);
     Env().env['APP_ENV'] = 'production';
     expect(const OpenApiConfig().isEnabled, isFalse);
     Env().env['APP_ENV'] = 'development';
     expect(const OpenApiConfig().isEnabled, isTrue);
 
-    /// not set: the same default as `appEnv` of the typed env
+    /// not set: production, so the docs are off
     Env().env.remove('APP_ENV');
     if (Platform.environment['APP_ENV'] == null) {
-      expect(const OpenApiConfig().isEnabled, isTrue);
+      expect(const OpenApiConfig().isEnabled, isFalse);
     }
   });
 }
