@@ -31,10 +31,14 @@ wait_resolvable() {
       rm -rf "$probe"
       return 0
     fi
-    # a sibling it needs is not on pub.dev: waiting will not help
+    # a sibling it needs comes later in the publish order: waiting will
+    # not help. A sibling that comes earlier was published already, and
+    # pub.dev may just not show it yet (CDN lag), so keep waiting then.
+    later=0
     for other in $PACKAGES; do
       sib=${other##*:}
-      if [ "$sib" != "$1" ] && grep -qw "$sib" "$probe/log" \
+      if [ "$sib" = "$1" ]; then later=1; continue; fi
+      if [ "$later" = 1 ] && grep -qw "$sib" "$probe/log" \
         && grep -q "doesn't match any versions" "$probe/log" \
         && ! has_version "$sib"; then
         cat "$probe/log"
