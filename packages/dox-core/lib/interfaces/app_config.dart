@@ -74,8 +74,9 @@ class AppConfig {
   /// reachable from outside). Empty by default.
   final List<String> trustedProxies;
 
-  /// gzip responses in Dart (`HttpServer.autoCompress`). Off by default.
-  /// It costs CPU on every response. Let the proxy do it when you have one.
+  /// gzip responses on a Rust thread of the native server. Off by default.
+  /// Streamed responses are not compressed. It costs CPU on every response.
+  /// Let the proxy do it when you have one.
   final bool compress;
 
   /// On SIGTERM or SIGINT the server stops taking new connections, and

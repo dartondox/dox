@@ -29,6 +29,11 @@ Each isolate runs its own server on the same port:
 - macOS: the isolates share one socket.
 - Windows: only one isolate serves HTTP.
 
+The OS spreads connections, not requests. A keep-alive connection stays on
+one isolate. So a few busy connections (eg. from one proxy or a load test
+with few connections) can keep some isolates idle. Use more connections
+than isolates.
+
 ## When the library does not load
 
 Dox stops at start, before any isolate runs. The error says why and how to
@@ -83,10 +88,14 @@ a gain.
   `413`. Dart checks the limits again.
 - A client that sends no body bytes for 120 seconds (idle time) gets `408`.
   A slow but steady upload is fine.
-- A response is sent when it is closed. It is kept in memory until then,
-  also a big file. Use a proxy (nginx, Caddy) or a storage link for big
-  downloads.
-- `compress: true` works: Dart gzips the body.
+- A small response is sent in one piece when it is closed. A streamed
+  response (a file, a download, any `Stream`) over 64 KB goes out in
+  parts: the client gets the first bytes early. At most 1 MB of it waits
+  in memory. Dart reads more of the file only when the client has read
+  what was sent. When the client leaves, Dart stops reading.
+- A request body of 64 KB or more goes to Dart without a copy.
+- `compress: true` works: Rust gzips the body on another thread, so the
+  isolate does not wait. A streamed response is not compressed.
 
 ## Where the library comes from
 

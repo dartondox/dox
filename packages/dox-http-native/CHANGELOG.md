@@ -1,5 +1,13 @@
 ## Unreleased
 
+- New: a streamed response (`addStream`, eg. a file or a download) over 64 KB goes out in parts. Before, the whole body was kept in memory until `close()`, and the client got nothing until then. Now the client gets the first bytes early, and at most 1 MB waits in Rust. Dart reads more only when the client has read what was sent. When the client leaves, `addStream` stops reading the source. A small response still goes out in one piece. A streamed response with `contentLength` set sends `Content-Length`, else it is chunked.
+- Perf: a request body of 64 KB or more goes to Dart without a copy (external typed data). Before, it was copied 3 times.
+- Perf: `compress: true` gzips on a Rust thread, not on the isolate. Same output (gzip, default level). A streamed response is not compressed.
+- Perf: a response with the default headers and one content type (eg. JSON) copies no headers, and its header bytes are cached.
+- Perf: request headers are parsed into a map on the second lookup, not scanned again and again.
+- Perf: a request path with no query skips the full `Uri.parse`. Rust takes the lock of the answers once per batch.
+- Breaking: native ABI 6 (streamed body records, gzip flag, big bodies as their own part of the message). Needs a new native library build. The build hook builds it with cargo until the next release.
+
 - New: WebSocket upgrade on the native server. `NativeWebSocket.upgrade(request, protocol: ..., maxMessageSize: ...)` accepts it and gives a `dart:io` `WebSocket`. Rust (tokio-tungstenite) speaks the protocol: ping and pong, the close handshake, the UTF-8 check and the size limit (a bigger message closes with `1009`). Compression is never agreed. `NativeWebSocket.isUpgradeRequest(request)` tells if a request asks for one.
 - On a graceful `close()`, open WebSockets get close code `1001`.
 - WebSocket limits, so a slow client or a busy isolate can not make memory grow forever:

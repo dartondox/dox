@@ -104,7 +104,10 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
     }
     late NativeHttpServer server;
     RawReceivePort receive = RawReceivePort((Object? msg) {
-      server._onBatch(msg as Uint8List);
+      if (msg is Uint8List) return server._onBatch(msg, const <Object?>[]);
+      // a batch with big bodies: [batch, body, body, ...]
+      List<Object?> parts = msg as List<Object?>;
+      server._onBatch(parts[0] as Uint8List, parts);
     }, 'dox_http_native');
     int handle = doxStart(
       port,
@@ -154,6 +157,10 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
 
   /// the id of the next WebSocket
   int nextSocketId = 1;
+
+  /// responses that send their body in parts, by stream id
+  final Map<int, NativeResponse> streams = <int, NativeResponse>{};
+  int _nextStreamId = 1;
   final StreamController<HttpRequest> _requests = StreamController<HttpRequest>(
     sync: true,
   );
@@ -237,6 +244,11 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
       for (NativeWebSocket ws in List<NativeWebSocket>.of(sockets.values)) {
         ws.closed(WebSocketStatus.abnormalClosure, '');
       }
+      // and no stream gets room to send any more
+      for (NativeResponse res in List<NativeResponse>.of(streams.values)) {
+        res.streamed(-1);
+      }
+      streams.clear();
       _done();
     }
   }
@@ -250,11 +262,14 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
 
   bool _inBatch = false;
 
-  void _onBatch(Uint8List b) {
+  /// [parts] holds the big bodies from index 1, in the order of the
+  /// records that have flag bit 2.
+  void _onBatch(Uint8List b, List<Object?> parts) {
     if (b.isEmpty) return; // a probe from Rust: "is this isolate alive?"
     if (b.length == 1) return _done(); // a graceful close is done
     ByteData d = ByteData.sublistView(b);
     int p = 0;
+    int nextPart = 1;
     // bytes of WebSocket messages in this batch, acknowledged at the end
     int wsBytes = 0;
     _inBatch = true;
@@ -276,9 +291,18 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
         q += tlen;
         Uint8List headers = Uint8List.sublistView(b, q, q + hlen);
         q += hlen;
-        Uint8List body = Uint8List.sublistView(b, q, q + blen);
+        Uint8List body = flags & 4 == 4
+            ? parts[nextPart++] as Uint8List
+            : Uint8List.sublistView(b, q, q + blen);
         p = q + blen;
         int kind = (flags >> 8) & 0xff;
+        if (kind == 4 || kind == 5) {
+          // a streamed body: bytes sent to the client, or the client left
+          NativeResponse? res = streams[id];
+          if (kind == 5) streams.remove(id);
+          res?.streamed(kind == 4 ? d.getUint64(q, Endian.little) : -1);
+          continue;
+        }
         if (kind != 0) {
           // a WebSocket message or close. The port field is the close code.
           if (kind != 3) wsBytes += blen;
@@ -375,21 +399,63 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
     return _defaultLines;
   }
 
-  /// Queue the response of [req]. Sent at the end of the batch, or in a
-  /// microtask when the handler answered later.
-  void send(NativeRequest req, NativeResponse res) {
-    if (_handle == 0) return;
-    List<int> body = res.takeBody();
-    if (autoCompress && body.length > 256) body = _gzip(req, res, body);
+  ContentType? _typedFor;
+  Uint8List _typedLines = Uint8List(0);
+  int _typedVersion = -1;
+
+  /// the default header lines with another content type. Cached for the
+  /// last type, as most apps answer with one type (eg. JSON).
+  Uint8List _typed(ContentType type) {
+    NativeHeaders h = defaultResponseHeaders;
+    if (!identical(type, _typedFor) || h.version != _typedVersion) {
+      BytesBuilder sb = BytesBuilder();
+      h.forEachLine((String name, String value) {
+        if (name == HttpHeaders.contentTypeHeader) return;
+        sb.add('$name: $value\r\n'.codeUnits);
+      });
+      sb.add('${HttpHeaders.contentTypeHeader}: $type\r\n'.codeUnits);
+      _typedLines = sb.takeBytes();
+      _typedFor = type;
+      _typedVersion = h.version;
+    }
+    return _typedLines;
+  }
+
+  /// Starts a record: the 20 byte head. Header lines may follow, then
+  /// [_endRecord] adds the body.
+  int _startRecord(int id, int status, int kind) {
     _ensure(20);
     int start = _len;
-    _outData.setUint64(start, req.id, Endian.little);
-    _outData.setUint16(start + 8, res.statusCode, Endian.little);
-    _outData.setUint16(start + 10, 0, Endian.little);
+    _outData.setUint64(start, id, Endian.little);
+    _outData.setUint16(start + 8, status, Endian.little);
+    _outData.setUint16(start + 10, kind, Endian.little);
     _len += 20;
+    return start;
+  }
+
+  /// Ends the record that starts at [start]. [streamId] goes before the
+  /// body (a streamed answer).
+  void _endRecord(int start, List<int> body, [int? streamId]) {
+    int extra = streamId == null ? 0 : 8;
+    _outData.setUint32(start + 12, _len - start - 20, Endian.little);
+    _outData.setUint32(start + 16, body.length + extra, Endian.little);
+    _ensure(body.length + extra);
+    if (streamId != null) {
+      _outData.setUint64(_len, streamId, Endian.little);
+      _len += 8;
+    }
+    _out.setRange(_len, _len + body.length, body);
+    _len += body.length;
+    _queueFlush();
+  }
+
+  void _headerLines(NativeResponse res) {
     NativeHeaders headers = res.headers;
-    if (headers.isShared) {
-      Uint8List lines = _defaults();
+    ContentType? type = headers.sharedType;
+    Uint8List? lines = headers.isShared
+        ? _defaults()
+        : (type == null ? null : _typed(type));
+    if (lines != null) {
       _ensure(lines.length);
       _out.setRange(_len, _len + lines.length, lines);
       _len += lines.length;
@@ -403,12 +469,56 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
         _line(HttpHeaders.setCookieHeader, cookie.toString());
       }
     }
-    _outData.setUint32(start + 12, _len - start - 20, Endian.little);
-    _outData.setUint32(start + 16, body.length, Endian.little);
-    _ensure(body.length);
-    _out.setRange(_len, _len + body.length, body);
-    _len += body.length;
-    _queueFlush();
+  }
+
+  /// Queue the response of [req]. Sent at the end of the batch, or in a
+  /// microtask when the handler answered later.
+  void send(NativeRequest req, NativeResponse res) {
+    if (_handle == 0) return;
+    List<int> body = res.takeBody();
+    // kind bit 8: Rust gzips the body, off this isolate
+    bool zip = autoCompress && body.length > 256 && _gzip(req, res);
+    int start = _startRecord(req.id, res.statusCode, zip ? 0x100 : 0);
+    _headerLines(res);
+    _endRecord(start, body);
+  }
+
+  /// Starts the answer of [req] with a body in parts. [first] is the first
+  /// part. Returns the stream id for [sendPart] and [endStream].
+  int startStream(NativeRequest req, NativeResponse res, List<int> first) {
+    int id = _nextStreamId++;
+    if (_handle == 0) return id;
+    streams[id] = res;
+    int start = _startRecord(req.id, res.statusCode, 6);
+    _headerLines(res);
+    // Rust drops the content-length line of a full body. Here it is the
+    // only way the client knows the length up front.
+    int length = res.headers.contentLength;
+    if (length >= 0) _lengthLine(length);
+    _endRecord(start, first, id);
+    return id;
+  }
+
+  void _lengthLine(int length) {
+    List<int> line =
+        '${HttpHeaders.contentLengthHeader}: $length\r\n'.codeUnits;
+    _ensure(line.length);
+    _out.setRange(_len, _len + line.length, line);
+    _len += line.length;
+  }
+
+  /// Queue one part of the streamed body [id].
+  void sendPart(int id, List<int> data) {
+    if (_handle == 0 || data.isEmpty) return;
+    _endRecord(_startRecord(id, 0, 7), data);
+  }
+
+  /// Ends the streamed body [id]. When not [ok], Rust cuts the connection,
+  /// so the client sees the body is not whole.
+  void endStream(int id, {bool ok = true}) {
+    streams.remove(id);
+    if (_handle == 0) return;
+    _endRecord(_startRecord(id, ok ? 0 : 1, 8), const <int>[]);
   }
 
   /// Queue a WebSocket record for Rust: an accept of the request [id], or
@@ -422,19 +532,9 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
     String? protocol,
   }) {
     if (_handle == 0) return;
-    _ensure(20);
-    int start = _len;
-    _outData.setUint64(start, id, Endian.little);
-    _outData.setUint16(start + 8, status, Endian.little);
-    _outData.setUint16(start + 10, kind, Endian.little);
-    _len += 20;
+    int start = _startRecord(id, status, kind);
     if (protocol != null) _line('sec-websocket-protocol', protocol);
-    _outData.setUint32(start + 12, _len - start - 20, Endian.little);
-    _outData.setUint32(start + 16, body.length, Endian.little);
-    _ensure(body.length);
-    _out.setRange(_len, _len + body.length, body);
-    _len += body.length;
-    _queueFlush();
+    _endRecord(start, body);
   }
 
   void _queueFlush() {
@@ -444,14 +544,16 @@ class NativeHttpServer extends Stream<HttpRequest> implements HttpServer {
     }
   }
 
-  List<int> _gzip(NativeRequest req, NativeResponse res, List<int> body) {
+  /// true when the client takes gzip and the body is not encoded yet.
+  /// Then it sets `content-encoding` and Rust gzips the body.
+  bool _gzip(NativeRequest req, NativeResponse res) {
     String? accept = req.headers.value(HttpHeaders.acceptEncodingHeader);
-    if (accept == null || !accept.contains('gzip')) return body;
+    if (accept == null || !accept.contains('gzip')) return false;
     if (res.headers.value(HttpHeaders.contentEncodingHeader) != null) {
-      return body;
+      return false;
     }
     res.headers.set(HttpHeaders.contentEncodingHeader, 'gzip');
-    return gzip.encode(body);
+    return true;
   }
 
   void _flush() {
