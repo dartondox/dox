@@ -17,6 +17,7 @@ on:
       - 'overrides/**'
       - 'packages/*/CHANGELOG.md'
       - 'mkdocs.yml'
+      - 'requirements-docs.txt'
       - '.github/workflows/docs.yaml'
   workflow_dispatch:
     inputs:
@@ -38,11 +39,6 @@ permissions:
 concurrency:
   group: docs-deploy
   cancel-in-progress: false
-
-env:
-  MKDOCS_VERSION: '1.6.1'
-  MATERIAL_VERSION: '9.7.7'
-  MIKE_VERSION: '2.2.0'
 
 jobs:
   deploy:
@@ -73,7 +69,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install mkdocs, material and mike
-        run: pip install "mkdocs==$MKDOCS_VERSION" "mkdocs-material==$MATERIAL_VERSION" "mike==$MIKE_VERSION"
+        run: pip install -r requirements-docs.txt
 
       - name: Git config
         run: .ci/ci/docs-git-config.sh
