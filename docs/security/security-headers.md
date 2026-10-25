@@ -1,3 +1,7 @@
+---
+icon: lucide/shield-check
+---
+
 # Security headers
 
 `SecurityHeaders` is a middleware that adds safe HTTP headers to every answer.

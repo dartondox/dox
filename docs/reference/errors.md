@@ -1,3 +1,7 @@
+---
+icon: lucide/circle-alert
+---
+
 # Error index
 
 A lookup table of the messages Dox prints or throws. Search this page for the text you see.

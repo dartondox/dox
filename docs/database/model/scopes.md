@@ -1,3 +1,7 @@
+---
+icon: lucide/filter
+---
+
 # Query scopes
 
 A scope is a query part that you use again and again, like "only active users".

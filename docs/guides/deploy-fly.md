@@ -1,3 +1,7 @@
+---
+icon: lucide/plane
+---
+
 # Deploy to Fly.io
 
 Run the blog API on [Fly.io](https://fly.io) from the `Dockerfile` of your project, with SQLite on a volume or with Postgres.

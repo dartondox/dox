@@ -1,3 +1,7 @@
+---
+icon: lucide/server
+---
+
 # Native server
 
 Dox runs on a native HTTP server from the package `dox_http_native`.

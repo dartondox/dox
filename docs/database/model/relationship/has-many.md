@@ -1,3 +1,7 @@
+---
+icon: lucide/network
+---
+
 # HasMany
 
 Use `HasMany` when one row of this table has many rows in another table.

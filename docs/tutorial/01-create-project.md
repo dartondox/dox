@@ -1,3 +1,7 @@
+---
+icon: lucide/folder-plus
+---
+
 # Step 1: Create the project
 
 This step makes a new Dox project, points it at SQLite, starts the dev server and calls the first route.

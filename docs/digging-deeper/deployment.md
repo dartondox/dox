@@ -1,3 +1,7 @@
+---
+icon: lucide/cloud-upload
+---
+
 # Deployment
 
 This page shows how to build a Dox app for production and run it safely.

@@ -1,3 +1,7 @@
+---
+icon: lucide/radio-tower
+---
+
 # Socket.IO
 
 This page shows how to run a Socket.IO server with `dox_socketio`, inside Dox or on its own.

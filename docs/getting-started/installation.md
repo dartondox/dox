@@ -1,3 +1,7 @@
+---
+icon: lucide/download
+---
+
 # Installation
 
 This page shows how to install the Dox CLI, make a new project and start the server.

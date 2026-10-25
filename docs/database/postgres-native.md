@@ -1,3 +1,7 @@
+---
+icon: lucide/database-zap
+---
+
 # Native Postgres driver
 
 `dox_postgres_native` is the Postgres driver of the Dox ORM, written in Rust.

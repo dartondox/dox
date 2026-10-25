@@ -1,3 +1,7 @@
+---
+icon: lucide/zap
+---
+
 # Cache
 
 This page shows the full API of `dox_cache`, the cache behind `Cache()` in Dox.

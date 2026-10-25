@@ -1,3 +1,7 @@
+---
+icon: lucide/cpu
+---
+
 # Isolate
 
 This page explains how Dox runs your app on many isolates (threads), and what that means for your code.

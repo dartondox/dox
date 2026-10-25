@@ -1,3 +1,7 @@
+---
+icon: lucide/settings
+---
+
 # App config
 
 Every field of `AppConfig`, with its type, its default and what it does.

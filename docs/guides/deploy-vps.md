@@ -1,3 +1,7 @@
+---
+icon: lucide/server-cog
+---
+
 # Deploy to a Linux server
 
 Run the blog API on your own Linux server (a VPS), with systemd to keep it running and Caddy in front for HTTPS.

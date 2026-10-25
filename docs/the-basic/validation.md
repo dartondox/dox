@@ -1,3 +1,7 @@
+---
+icon: lucide/list-checks
+---
+
 # Validation
 
 This page shows how to check request input with typed DTO classes.

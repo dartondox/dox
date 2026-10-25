@@ -1,3 +1,7 @@
+---
+icon: lucide/fingerprint
+---
+
 # Hashing
 
 This page shows how to hash passwords with `Hash` and check them later.

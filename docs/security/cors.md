@@ -1,3 +1,7 @@
+---
+icon: lucide/globe-lock
+---
+
 # CORS
 
 This page shows how to let a web page on another domain call your API.

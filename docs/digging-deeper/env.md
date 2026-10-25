@@ -1,3 +1,7 @@
+---
+icon: lucide/file-cog
+---
+
 # Environment Variables
 
 Declare your env keys once, in a typed class.

@@ -1,3 +1,7 @@
+---
+icon: lucide/zap
+---
+
 # Cache
 
 `Cache()` keeps data that is slow to make, so the next request can read it fast.

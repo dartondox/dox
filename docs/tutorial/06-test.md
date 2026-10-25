@@ -1,3 +1,7 @@
+---
+icon: lucide/flask-conical
+---
+
 # Step 6: Test
 
 This step writes one HTTP test for the list route and runs it.

@@ -1,3 +1,7 @@
+---
+icon: lucide/list-ordered
+---
+
 # Queue
 
 A queue runs slow work in the background. The request answers at once. A worker process does the work later.

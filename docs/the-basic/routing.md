@@ -1,3 +1,7 @@
+---
+icon: lucide/signpost
+---
+
 # Routing
 
 A route connects a URL and an HTTP method to the code that answers it.

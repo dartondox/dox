@@ -1,3 +1,7 @@
+---
+icon: lucide/replace
+---
+
 # Attribute casts
 
 A cast changes a column value between the database and Dart.

@@ -1,3 +1,7 @@
+---
+icon: lucide/arrow-down-to-line
+---
+
 # Request
 
 This page shows how to read input, files, headers and cookies from a request.

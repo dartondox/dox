@@ -1,3 +1,7 @@
+---
+icon: lucide/key-square
+---
+
 # JWT authentication
 
 Let users register and log in, give them a JWT token, protect routes with it, and read the user in a controller.

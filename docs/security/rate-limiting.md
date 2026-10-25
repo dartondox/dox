@@ -1,3 +1,7 @@
+---
+icon: lucide/timer
+---
+
 # Rate limiting
 
 `RateLimit` is a middleware that stops a client that sends too many requests.

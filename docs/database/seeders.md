@@ -1,3 +1,7 @@
+---
+icon: lucide/sprout
+---
+
 # Seeders
 
 A seeder puts data in your database.

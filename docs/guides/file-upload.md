@@ -1,3 +1,7 @@
+---
+icon: lucide/upload
+---
+
 # File upload
 
 Accept an image from a form, check its size and type, save it to a disk, and return its URL.

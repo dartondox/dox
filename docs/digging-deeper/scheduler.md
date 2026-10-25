@@ -1,3 +1,7 @@
+---
+icon: lucide/calendar-clock
+---
+
 # Scheduler
 
 `dox_scheduler` runs your tasks on a schedule, like cron.

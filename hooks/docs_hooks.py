@@ -38,6 +38,10 @@ def _sections(text: str):
 
 def _changelog() -> str:
     out = [
+        "---",
+        "icon: lucide/history",
+        "---",
+        "",
         "# Changelog",
         "",
         "What changed in each package, newest first. This page is made from the",

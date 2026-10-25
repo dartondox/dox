@@ -1,3 +1,7 @@
+---
+icon: lucide/syringe
+---
+
 # Dependency injection
 
 Dox has a container. It makes your classes and gives each constructor what it needs.

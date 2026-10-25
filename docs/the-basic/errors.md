@@ -1,3 +1,7 @@
+---
+icon: lucide/triangle-alert
+---
+
 # Error handling
 
 Every error that a route throws goes to one place: the exception handler.

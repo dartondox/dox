@@ -1,3 +1,7 @@
+---
+icon: lucide/factory
+---
+
 # Factories
 
 A factory makes models with sample data.

@@ -1,3 +1,7 @@
+---
+icon: lucide/bug
+---
+
 # Troubleshooting
 
 Real problems, with the text you see, the cause and the fix.
