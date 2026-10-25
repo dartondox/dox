@@ -162,6 +162,23 @@ test('saves the report', () async {
 
 See [File Storage](file-storage.md).
 
+## Use a test database with `.env.testing`
+
+Put the values for tests in a `.env.testing` file, next to `.env`:
+
+```ini title=".env.testing"
+DB_NAME=my_app_test
+LOG_REQUESTS=false
+```
+
+When the app runs its tests, Dox reads `.env` first and then `.env.testing`.
+A key in `.env.testing` wins over the same key in `.env`. Keys that are only in `.env` stay.
+
+- "Runs its tests" means `dart test`, or a real `APP_ENV=testing` environment variable.
+- A real environment variable still wins over both files. So CI can run `DB_NAME=ci_test dart test`.
+- It works for `Env.get()` and for the typed `AppEnv.load()`.
+- Outside tests, `.env.testing` is never read.
+
 ## Test the env
 
 Pass your own values to `AppEnv.load()`. Then nothing is read from the shell or the `.env` file:
@@ -228,7 +245,7 @@ void main() {
 - `refreshDatabase()` empties every table and starts the ids at 1 again. The tables stay. It keeps the rows of the migrations table (`dox_db_migration`).
 - It works on Postgres, MySQL, MariaDB and SQLite. Foreign keys are not checked while it empties the tables.
 - `refreshDatabase(keep: <String>['dox_db_migration', 'countries'])` keeps the rows of more tables.
-- Use a separate test database. Set its name in the env of the test run, for example `DB_NAME=app_test dart test`. Never run it on a database with real data.
+- Use a separate test database. Set its name in [`.env.testing`](#use-a-test-database-with-envtesting), or in the env of the test run (`DB_NAME=app_test dart test`). Never run it on a database with real data.
 - A test without the server can start the ORM with `SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig)`.
 
 See [Testing with a database](../guides/testing-with-database.md) for a full example with SQLite.

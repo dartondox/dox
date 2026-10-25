@@ -11,10 +11,25 @@ class Env {
 
   Env._internal();
 
-  void load({File? file}) {
+  /// Reads the `.env` file once.
+  ///
+  /// When the app runs its tests, it also reads `.env.testing` (next to
+  /// `.env`). Its keys win over the keys of `.env`. A real environment
+  /// variable still wins over both. [testing] is [isTesting] by default.
+  void load({File? file, bool? testing}) {
     if (env.isEmpty) {
-      env = _loadEnv(file: file);
+      env = _loadEnv(file: file, testing: testing ?? isTesting);
     }
+  }
+
+  /// True when `APP_ENV=testing` is a real environment variable, or the
+  /// code runs under `dart test`.
+  static bool get isTesting {
+    if (Platform.environment['APP_ENV'] == 'testing') return true;
+    // ponytail: `dart test` runs a bootstrap from a `dart_test.*` temp
+    // folder. Use APP_ENV=testing if a test runner ever changes this.
+    String script = Platform.script.path;
+    return script.contains('/dart_test.') || script.endsWith('_test.dart');
   }
 
   /// get env value
@@ -75,11 +90,20 @@ class Env {
     return null;
   }
 
-  /// load env from .env of project directory
-  Map<String, String> _loadEnv({File? file}) {
+  /// load env from .env of project directory, and .env.testing on top
+  /// of it when [testing]
+  Map<String, String> _loadEnv({File? file, bool testing = false}) {
     File envFile = file ?? File('${Directory.current.path}/.env');
-    if (!envFile.existsSync()) return <String, String>{};
-    return parse(envFile.readAsStringSync());
+    Map<String, String> data = _read(envFile);
+    if (testing) {
+      data.addAll(_read(File('${envFile.parent.path}/.env.testing')));
+    }
+    return data;
+  }
+
+  static Map<String, String> _read(File file) {
+    if (!file.existsSync()) return <String, String>{};
+    return parse(file.readAsStringSync());
   }
 
   /// Reads the text of a `.env` file.

@@ -57,8 +57,8 @@ dart test test/http_test.dart
 
 !!! tip "Use another database for tests"
     The test uses the `.env` file, so it reads and writes `db/dox.sqlite`.
-    To keep test data out of it, set another file for the test run:
-    `DB_NAME=test.sqlite dart test test/http_test.dart`.
+    To keep test data out of it, make a `.env.testing` file with `DB_NAME=test.sqlite`.
+    `dart test` reads it on top of `.env`.
 
 ## Next
 
