@@ -193,6 +193,37 @@ class ApiRoutes extends Router {
     Route.get<TeamController>('typed', (TeamController c) => c.index);
     Route.get<TeamController>('untyped', (c) => c.index);
     Route.resource('teams', TeamController);
+    Route.group('/auth', registerAuth);
+  }
+
+  void registerAuth() {
+    Route.post('/login', (AuthController c) => c.login);
+  }
+}
+
+class AuthController {
+  /// Token login
+  Map<String, dynamic> login(DoxRequest req) => <String, dynamic>{};
+}
+
+class WebAuthController {
+  /// Session login
+  Map<String, dynamic> login(DoxRequest req) => <String, dynamic>{};
+}
+
+/// The callback is above its group call, and has a group of its own.
+void registerWebAuth() {
+  Route.post('/login', (WebAuthController c) => c.login);
+  Route.group('v2', registerWebAuthV2);
+}
+
+void registerWebAuthV2() {
+  Route.post('login', (WebAuthController c) => c.login);
+}
+
+class WebRoutes extends Router {
+  void register() {
+    Route.group('/web-auth', registerWebAuth);
   }
 }
 ''';
@@ -325,6 +356,38 @@ void main() {
           ),
         ),
       );
+    });
+
+    test('a group callback that is a method or function gets the prefix', () {
+      expect(
+        out,
+        contains(
+          _flat(
+            "OpenApiRouteBinding('POST', 'api/auth/login', 'AuthController.login')",
+          ),
+        ),
+      );
+      expect(
+        out,
+        contains(
+          _flat(
+            "OpenApiRouteBinding('POST', '/web-auth/login', "
+            "'WebAuthController.login')",
+          ),
+        ),
+      );
+      expect(
+        out,
+        contains(
+          _flat(
+            "OpenApiRouteBinding('POST', '/web-auth/v2/login', "
+            "'WebAuthController.login')",
+          ),
+        ),
+      );
+      // no binding without the group prefix
+      expect(out, isNot(contains(_flat("'POST', '/login'"))));
+      expect(out, isNot(contains(_flat("'POST', 'api/login'"))));
     });
 
     test('doc comment gives summary and description, class gives tag', () {

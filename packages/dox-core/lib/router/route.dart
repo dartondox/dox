@@ -71,6 +71,9 @@ class ControllerAction<T extends Object> {
   /// gets the controller, gives the method that handles the request
   final Function select;
 
+  /// The controller class, used by the OpenAPI docs.
+  Type get controller => T;
+
   /// the controller method, with the controller from [ioc]
   Function resolve(IocContainer ioc, String where) {
     Object? method;

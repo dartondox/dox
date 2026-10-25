@@ -65,5 +65,52 @@ void main() {
     test('two methods with the same name and no route call: none', () {
       expect(registry.find('POST', '/blogs', 'index', request), isNull);
     });
+
+    test('two controllers with the same method name never mix', () {
+      // `/login` ends both live paths. Without the controller, the docs
+      // of WebAuthController.login went to POST /api/auth/login.
+      const OpenApiRegistry logins = OpenApiRegistry(
+        operations: <OpenApiOperation>[
+          OpenApiOperation(
+            controller: 'AuthController',
+            method: 'login',
+            argumentTypes: <String>['DoxRequest'],
+          ),
+          OpenApiOperation(
+            controller: 'WebAuthController',
+            method: 'login',
+            argumentTypes: <String>['DoxRequest'],
+          ),
+        ],
+        routes: <OpenApiRouteBinding>[
+          OpenApiRouteBinding('POST', 'api/login', 'AuthController.login'),
+          OpenApiRouteBinding('POST', '/login', 'WebAuthController.login'),
+        ],
+      );
+      expect(
+        logins
+            .find(
+              'POST',
+              '/api/auth/login',
+              'login',
+              request,
+              controller: 'AuthController',
+            )
+            ?.id,
+        'AuthController.login',
+      );
+      expect(
+        logins
+            .find(
+              'POST',
+              '/web-auth/login',
+              'login',
+              request,
+              controller: 'WebAuthController',
+            )
+            ?.id,
+        'WebAuthController.login',
+      );
+    });
   });
 }

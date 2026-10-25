@@ -90,7 +90,29 @@ class OpenApiRouteReader {
     } catch (_) {
       types = const <String>[];
     }
-    return config.registry.find(route.method, route.path, name, types);
+    return config.registry.find(
+      route.method,
+      route.path,
+      name,
+      types,
+      controller: _controller(route, handler),
+    );
+  }
+
+  /// The class name of the controller, when the route tells it:
+  /// `Route.get<C>(...)` or `(C c) => c.index`. Null for a plain method
+  /// like `users.index`, because a Dart function does not know its class.
+  String? _controller(RouteData route, Object handler) {
+    Object? list = route.controllers;
+    Object? last = list is List<dynamic> && list.isNotEmpty ? list.last : null;
+    if (last is ControllerAction) return last.controller.toString();
+    if (last is! Function || identical(last, handler)) return null;
+    try {
+      List<String> types = ControllerTypes.parameters(last, route.path);
+      return types.length == 1 ? types.first : null;
+    } catch (_) {
+      return null;
+    }
   }
 
   String _operationId(OpenApiOperation? op, String method, String path) {

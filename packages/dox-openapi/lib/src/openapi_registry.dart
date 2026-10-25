@@ -73,8 +73,8 @@ class OpenApiRouteBinding {
   /// HTTP method in upper case, for example `GET`.
   final String method;
 
-  /// The path as written in the route call, without group prefixes.
-  /// Null when the path is not a plain string.
+  /// The full path: the router prefix, the `Route.group` prefixes and
+  /// the path of the route call. Null when one part is not a plain string.
   final String? path;
 
   /// The operation id, `Class.method`.
@@ -106,6 +106,10 @@ class OpenApiRegistry {
   /// Finds the docs for one live route.
   ///
   /// [functionName] and [argumentTypes] come from the route handler.
+  /// [controller] is the class name of the handler, when the route knows
+  /// it (`(C c) => c.index` or `Route.get<C>`). Then only methods of that
+  /// class match, so two controllers with the same method name never mix.
+  ///
   /// A route call with the same HTTP method, a path that ends the same
   /// way and the same method name wins. Else a single method with the
   /// same name and argument types wins. Else it returns null.
@@ -113,14 +117,16 @@ class OpenApiRegistry {
     String httpMethod,
     String path,
     String functionName,
-    List<String> argumentTypes,
-  ) {
+    List<String> argumentTypes, {
+    String? controller,
+  }) {
     String method = httpMethod.toUpperCase();
     String openApiPath = PathConverter.path(path);
     OpenApiRouteBinding? best;
     int bestLength = 0;
     for (OpenApiRouteBinding binding in routes) {
-      if (binding.method != method || !_sameName(binding, functionName)) {
+      if (binding.method != method ||
+          !_sameName(binding, functionName, controller)) {
         continue;
       }
       String? raw = binding.path;
@@ -143,13 +149,21 @@ class OpenApiRegistry {
       if (op.method != functionName || !_sameTypes(op, argumentTypes)) {
         continue;
       }
+      if (controller != null && op.controller != controller) continue;
       if (found != null) return null;
       found = op;
     }
     return found;
   }
 
-  bool _sameName(OpenApiRouteBinding binding, String functionName) {
+  bool _sameName(
+    OpenApiRouteBinding binding,
+    String functionName,
+    String? controller,
+  ) {
+    if (controller != null) {
+      return binding.operation == '$controller.$functionName';
+    }
     return binding.operation.endsWith('.$functionName');
   }
 
