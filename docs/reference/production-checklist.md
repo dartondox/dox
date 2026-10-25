@@ -69,7 +69,7 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | JSON logs | `LoggerConfig(enabled: true, prettyPrint: false)`. The new project sets `prettyPrint` only when `APP_ENV=development`. | [App config](app-config.md) |
 | Log level | Set `LOG_LEVEL=warn` to print only warnings and errors. | [App config](app-config.md) |
 | Access logs in one place | `LogMiddleware` writes one line per request, every 20 ms. A hard kill can lose the last lines. Turn it off when the proxy already logs requests. | [Performance](../digging-deeper/performance.md) |
-| Errors go to your tracker | Set `AppConfig.errorHandler`. Any non-HTTP error is passed to it. The client gets `500` with `server_error`. The error text is sent only when `APP_ENV` is `development` or `local`. | [HTTP exceptions](http-exceptions.md) |
+| Errors go to your tracker | Extend `ExceptionHandler` and set `AppConfig.exceptionHandler`. Any non-HTTP error is passed to its `report` method. The client gets `500` with `server_error`. The error text is sent only when `APP_ENV` is `development` or `local`. | [Error handling](../the-basic/errors.md) |
 
 ## Health and shutdown
 

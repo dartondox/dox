@@ -47,7 +47,7 @@ AppConfig config = AppConfig(
   totalIsolate: 1,
   routers: <Router>[ValidationRouter()],
   dtos: testDtos,
-  errorHandler: (Object? error, StackTrace stackTrace) {},
+  exceptionHandler: const _QuietExceptionHandler(),
 );
 
 Future<http.Response> send(String method, String path, Object body) async {
@@ -189,4 +189,12 @@ void main() {
     expect(res.statusCode, 422);
     expect(json(res).keys, <String>['title']);
   });
+}
+
+/// does not log the errors the tests cause on purpose
+class _QuietExceptionHandler extends ExceptionHandler {
+  const _QuietExceptionHandler();
+
+  @override
+  void report(Object error, StackTrace stackTrace) {}
 }

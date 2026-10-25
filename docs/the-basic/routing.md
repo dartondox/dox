@@ -157,6 +157,8 @@ Route.middleware(<dynamic>[AuthMiddleware()], () { // (4)!
 
 Groups can be nested. `Route.group('blogs', ...)` with `Route.get('all', ...)` makes `/blogs/all`.
 
+A group can also add a prefix to the [route names](#named-routes) inside it, with `name:`.
+
 To turn CORS on or off for some routes, see [CORS](../security/cors.md).
 
 ## Resource routes
@@ -167,19 +169,86 @@ One line makes the usual CRUD routes for a controller.
 Route.resource('blogs', BlogController());
 ```
 
-| Method | Path | Controller method |
-| --- | --- | --- |
-| `GET` | `/blogs` | `index` |
-| `GET` | `/blogs/create` | `create` |
-| `POST` | `/blogs` | `store` |
-| `GET` | `/blogs/{id}` | `show` |
-| `GET` | `/blogs/{id}/edit` | `edit` |
-| `PUT`, `PATCH` | `/blogs/{id}` | `update` |
-| `DELETE` | `/blogs/{id}` | `destroy` |
+| Method | Path | Controller method | Route name |
+| --- | --- | --- | --- |
+| `GET` | `/blogs` | `index` | `blogs.index` |
+| `GET` | `/blogs/create` | `create` | `blogs.create` |
+| `POST` | `/blogs` | `store` | `blogs.store` |
+| `GET` | `/blogs/{id}` | `show` | `blogs.show` |
+| `GET` | `/blogs/{id}/edit` | `edit` | `blogs.edit` |
+| `PUT`, `PATCH` | `/blogs/{id}` | `update` | `blogs.update` |
+| `DELETE` | `/blogs/{id}` | `destroy` | `blogs.destroy` |
+
+The name comes from the path: `/` becomes `.`, and `{params}` are left out.
+So `Route.resource('users/{user}/posts', ...)` gives `users.posts.index`.
+Pass `name:` to pick another one: `Route.resource('blogs', BlogController(), name: 'posts')`.
 
 A method that the controller does not have is skipped. No route is made for it.
 Any other error from the controller is not hidden. It stops the app at start, so you see it.
 See [Resource controller](controller.md#resource-controller) to make one with the CLI.
+
+## Named routes
+
+Give a route a name with `.name()`. Then build its URL from the name, so a path lives in one place.
+
+```dart
+Route.get('/users/{id}', controller.show).name('users.show');
+
+route('users.show', params: <String, Object>{'id': 5});
+// /users/5
+
+route('users.show', params: <String, Object>{'id': 5}, query: <String, Object>{'tab': 'posts'});
+// /users/5?tab=posts
+```
+
+`route()` gives the path. `Route.url()` does the same.
+Param values are URL encoded. A missing `{name?}` param is left out.
+
+A group can put a prefix in front of the names inside it:
+
+```dart
+Route.group('admin', () {
+  Route.get('users', controller.index).name('users'); // admin.users
+}, name: 'admin.');
+```
+
+Dox stops with a clear error when:
+
+- two routes have the same name (at start),
+- `route()` gets a name that no route has,
+- a `{param}` of the path has no value, or `params` has a key the path does not have.
+
+## Route model binding
+
+A binder turns a route param into a value before the controller runs, for example a model from the database.
+Add it with `Route.bind`, before the routes that use it.
+
+```dart
+Route.bind<User>('user', (String id) => User().find(id));
+
+Route.get('/users/{user}', (DoxRequest req, User user) {
+  return user;
+});
+```
+
+Every route with a `{user}` param now runs the binder first.
+The binder gets the raw text from the URL. It returns the value, or `null` when there is none.
+`null` answers `404`, the same way as a thrown `NotFoundHttpException`.
+
+There are two ways to read the value:
+
+- Ask for a parameter of the bound type, like `User user`. Dox matches it by type, so it can be at any place in the parameter list.
+- Read it from the request: `req.bound<User>('user')`. This also works in a controller that only takes `DoxRequest`.
+
+Other path params still work next to it:
+
+```dart
+Route.get('/users/{user}/posts/{page}', (User user, int page) {
+  return user.posts(page);
+});
+```
+
+The binder runs after the middleware, so an auth middleware can stop the request before any database call.
 
 ## Serve storage files
 

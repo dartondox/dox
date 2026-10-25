@@ -194,14 +194,14 @@ class Dox {
       try {
         await (service as DoxShutdown).shutdown();
       } catch (error, stackTrace) {
-        config.errorHandler(error, stackTrace);
+        config.exceptionHandler.report(error, stackTrace);
       }
     }
     // after the services: they may still use the cache
     try {
       await cache.close();
     } catch (error, stackTrace) {
-      config.errorHandler(error, stackTrace);
+      config.exceptionHandler.report(error, stackTrace);
     }
   }
 

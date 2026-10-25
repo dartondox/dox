@@ -65,7 +65,7 @@ class DoxServer {
         );
       },
       (Object error, StackTrace stackTrace) {
-        Dox().config.errorHandler(error, stackTrace);
+        Dox().config.exceptionHandler.report(error, stackTrace);
       },
     );
     httpServer = server;

@@ -120,7 +120,7 @@ class RedisService implements DoxService, DoxShutdown {
 }
 ```
 
-An error in `shutdown()` goes to `errorHandler`. The other services still run.
+An error in `shutdown()` goes to the `report` method of the [exception handler](../the-basic/errors.md). The other services still run.
 
 ## Rules for a service
 

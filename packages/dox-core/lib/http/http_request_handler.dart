@@ -60,7 +60,7 @@ bool _mounted(HttpRequest req, Map<String, RawRequestHandler> mounts) {
         (prefix.endsWith('/') &&
             path == prefix.substring(0, prefix.length - 1))) {
       mount.value(req).catchError((Object error, StackTrace stackTrace) {
-        Dox().config.errorHandler(error, stackTrace);
+        Dox().config.exceptionHandler.report(error, stackTrace);
       });
       return true;
     }

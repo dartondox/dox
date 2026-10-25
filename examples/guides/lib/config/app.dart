@@ -31,7 +31,7 @@ AppConfig appConfig = AppConfig(
   responseHandler: ResponseHandler(),
 
   /// log unexpected errors (custom errors guide)
-  errorHandler: reportError,
+  exceptionHandler: const AppExceptionHandler(),
 
   cache: cache,
   storage: storage,

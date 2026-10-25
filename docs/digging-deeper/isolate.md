@@ -80,6 +80,6 @@ Because the config and services are copied, they must not hold open sockets or d
 ## When an isolate crashes
 
 - An error in a request is caught. Dox sends a `500` and keeps going.
-- An async error outside a request (for example a future that nobody awaits) is caught and passed to `errorHandler`. The isolate keeps running.
+- An async error outside a request (for example a future that nobody awaits) is caught and passed to the `report` method of the [exception handler](../the-basic/errors.md). The isolate keeps running.
 - If a worker isolate still dies, Dox prints `[dox] isolate N exited, restarting` to stderr. It starts a new isolate after 1 second.
 - If the first (main) isolate dies, the process exits with a non-zero code. Let a supervisor start it again, like Docker `restart:` or systemd `Restart=always`. See [Deployment](deployment.md#keep-it-running).
