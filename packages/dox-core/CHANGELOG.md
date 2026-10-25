@@ -1,3 +1,7 @@
+## Unreleased
+
+- New: `OpenApiConfig(include: ['/api/*'], exclude: ['/api/internal/*'])` picks which routes go in the OpenAPI docs by path. A `*` at the end matches the rest of the path.
+
 ## 3.0.0-alpha.12
 
 - Breaking: `dox_core` no longer depends on `dox_storage` and `dox_socketio`. Add the package you use to your app.

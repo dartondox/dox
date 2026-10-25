@@ -149,6 +149,8 @@ Source: `packages/dox-core/lib/openapi/openapi_config.dart`.
 | `ui` | `DocsUi` | `DocsUi.scalar` | `scalar` or `swagger`. |
 | `scalar` | `ScalarOptions` | `ScalarOptions()` | Options of the Scalar page. See below. |
 | `pageTitle` | `String?` | `null` (uses `info.title`) | Title of the `/docs` page. |
+| `include` | `List<String>` | `[]` (all routes) | Only routes with these paths are in the docs, like `['/api/*']`. A `*` at the end matches the rest of the path. |
+| `exclude` | `List<String>` | `[]` | Routes with these paths are left out. Checked after `include`. |
 
 `ScalarOptions` (`packages/dox-openapi/lib/src/docs_ui.dart`):
 

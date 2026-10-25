@@ -37,7 +37,8 @@ class OpenApiDocument {
     ApiDoc docs = ApiDoc();
     for (RouteData route in routes) {
       if (_paths.contains(route.path) ||
-          !PathConverter.isSupportedMethod(route.method)) {
+          !PathConverter.isSupportedMethod(route.method) ||
+          !config.documents(route.path)) {
         continue;
       }
       RouteDoc? doc = reader.read(route);
