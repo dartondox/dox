@@ -3,7 +3,7 @@
 Make an OpenAPI 3.1 document (JSON and YAML) and serve it with a Scalar or Swagger UI docs page.
 
 [![pub package](https://img.shields.io/pub/v/dox_openapi.svg)](https://pub.dev/packages/dox_openapi)
-[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/develop/LICENSE)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/main/LICENSE)
 
 Part of [Dox](https://dartondox.dev), a web backend framework for Dart, like Laravel.
 Source code: [github.com/dartondox/dox](https://github.com/dartondox/dox).
@@ -63,4 +63,4 @@ void main() async {
 
 ## License
 
-MIT. See [LICENSE](https://github.com/dartondox/dox/blob/develop/LICENSE).
+MIT. See [LICENSE](https://github.com/dartondox/dox/blob/main/LICENSE).

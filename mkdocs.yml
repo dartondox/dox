@@ -1,7 +1,7 @@
 site_name: "DOX"
 site_description: "Dox is a fast web backend framework for Dart, like Laravel: routing, an ORM, migrations, typed validation, auth and a CLI, on a Rust HTTP server."
 repo_url: https://github.com/dartondox/dox
-edit_uri: edit/develop/docs/
+edit_uri: edit/main/docs/
 # /latest/ is where the newest docs live (mike). Canonical URLs and the
 # sitemap use it, so search engines index the real pages, not the redirects.
 site_url: https://dartondox.dev/latest/

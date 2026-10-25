@@ -3,7 +3,7 @@
 File storage for Dart. One API for local disk, AWS S3 and S3-compatible services.
 
 [![pub package](https://img.shields.io/pub/v/dox_storage.svg)](https://pub.dev/packages/dox_storage)
-[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/develop/LICENSE)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/main/LICENSE)
 
 Part of [Dox](https://dartondox.dev), a web backend framework for Dart, like Laravel.
 Source code: [github.com/dartondox/dox](https://github.com/dartondox/dox).
@@ -65,4 +65,4 @@ In a Dox app, set the disks in `config/storage.dart` and use `Storage()`.
 
 ## License
 
-MIT. See [LICENSE](https://github.com/dartondox/dox/blob/develop/LICENSE).
+MIT. See [LICENSE](https://github.com/dartondox/dox/blob/main/LICENSE).

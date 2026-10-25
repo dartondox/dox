@@ -4,10 +4,10 @@ on:
   push:
 
 # A new push to a branch cancels the old run of that branch.
-# Runs on develop are never cancelled.
+# Runs on main are never cancelled.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/develop' }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   # Picks the jobs to run (ci/changes.sh and ci/affected.py).
@@ -16,7 +16,7 @@ jobs:
   # the changed packages and of every package that depends on them. Any
   # other change (ci/, .github/, root pubspec, ...) and tags run everything.
   # Skipped jobs pass, so the required `test` check is not stuck. A branch
-  # is compared with develop, so one docs-only push on top of code commits
+  # is compared with main, so one docs-only push on top of code commits
   # still runs the tests of that code.
   changes:
     runs-on: ubuntu-latest
@@ -166,7 +166,7 @@ jobs:
           restore-keys: pub-${{ runner.os }}-
       - run: ci/run-examples.sh ${{ needs.changes.outputs.examples }}
 
-  # The required check on develop is named "test". This job keeps that name
+  # The required check on main is named "test". This job keeps that name
   # and fails when any job above fails or is cancelled. Skipped jobs pass.
   test:
     if: always()

@@ -69,7 +69,7 @@ It uses pub.dev automated publishing, so it needs no token or secret.
 
 ### Steps
 
-The full guide is [RELEASING.md](https://github.com/dartondox/dox/blob/develop/RELEASING.md) in the repo. In short:
+The full guide is [RELEASING.md](https://github.com/dartondox/dox/blob/main/RELEASING.md) in the repo. In short:
 
 1. Bump every package with `bin/update_versions.sh`, and close the `## Unreleased` section of each `CHANGELOG.md`.
 2. Merge the release PR, then push the tag `v<version>`. This publishes to pub.dev.
@@ -161,7 +161,7 @@ The docs site is https://dartondox.dev. It is built with MkDocs Material and
 
 | URL | What it is |
 | --- | --- |
-| `/3.x/...` | 3.x docs, built from `develop` |
+| `/3.x/...` | 3.x docs, built from `main` |
 | `/latest/...` | a copy of the newest version (now 3.x) |
 | `/2.x/...` | the old 2.x docs, built from the `v2.x` branch |
 | `/` | redirects to `/latest/` |
@@ -179,7 +179,7 @@ python3 -m venv .venv
 ### Deploy
 
 - 3.x deploys by itself. The `Docs` workflow (`.github/workflows/docs.yaml`) runs on every push
-  to `develop` that changes `docs/`, `mkdocs.yml` or the workflow.
+  to `main` that changes `docs/`, `mkdocs.yml` or the workflow.
   It runs `mike deploy --update-aliases 3.x latest`.
 - 2.x deploys by hand. Open Actions > Docs > "Run workflow", pick version `2.x`.
   It builds from the `v2.x` branch (change it with the `ref` input).
