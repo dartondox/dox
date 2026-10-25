@@ -1,6 +1,6 @@
 name: dox_socketio
 description: Socket.IO v4 server (Engine.IO v4, Socket.IO protocol v5) for the Dox framework and plain dart:io.
-version: 3.0.0-alpha.8
+version: 3.0.0-alpha.9
 repository: https://github.com/dartondox/dox
 
 environment:
