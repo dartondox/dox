@@ -1,6 +1,6 @@
 # dox_auth
 
-Login for Dox apps. It checks an email and a password and gives back a JWT token.
+Login for Dox apps. It checks an email and a password. It gives back a JWT token for an API, or keeps the login in the session for web pages.
 
 [![pub package](https://img.shields.io/pub/v/dox_auth.svg)](https://pub.dev/packages/dox_auth)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/main/LICENSE)
@@ -58,21 +58,33 @@ Route.get('/auth/user', <dynamic>[AuthMiddleware(), authController.user]);
 
 After `AuthMiddleware`, `req.auth?.user<User>()` is the logged in user.
 
+For web pages, use `SessionAuthDriver()` in the guard. It needs `SessionMiddleware`:
+
+```dart
+bool ok = await Auth().attemptSession(req, credentials); // false when wrong
+Auth().logout(req);
+
+Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), pageController.dashboard]);
+```
+
 ## Features
 
 - JWT driver (`JwtAuthDriver`) with a secret, algorithm, expiry and issuer.
+- Session driver (`SessionAuthDriver`) for web pages. Login and logout give the session a new id.
 - `Auth().attempt(credentials)` finds the user and checks the bcrypt hash.
 - `Auth().login(user)` gives a token with no password check.
-- `AuthMiddleware` answers `401` when the token is missing or not valid.
+- `AuthMiddleware` answers `401` when the user is not logged in. With `redirectTo`, it sends the user to that page instead.
+- More than one guard, like `web` and `admin`, each with its own driver and user model.
 - The user is loaded from the database on each request with `dox_orm`.
 
-Things to know: set `expiresIn`, or a token never expires.
+Things to know: a token expires after 1 hour by default. Change it with `expiresIn`.
 There is no server list of tokens, so you can not cancel one token.
-Only the default guard is used.
+A session login ends with `Auth().logout(req)`.
 
 ## Documentation
 
 - [Authentication](https://dartondox.dev/latest/security/authentication/)
+- [Session](https://dartondox.dev/latest/the-basic/session/)
 - [Guide: JWT auth](https://dartondox.dev/latest/guides/jwt-auth/)
 - [API reference](https://pub.dev/documentation/dox_auth/latest/)
 

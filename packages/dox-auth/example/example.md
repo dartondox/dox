@@ -32,16 +32,14 @@ class AuthService implements DoxService {
 }
 ```
 
-Add `AuthService()` to the list in `lib/config/services.dart`.
+Dox finds the service by itself. Run `dart run build_runner build`.
 The `User` model must hide its password: `List<String> get hidden => <String>['password'];`.
 
 ## 2. Routes
 
 ```dart title="lib/routes/api.dart"
-AuthController authController = AuthController();
-
-Route.post('/auth/login', authController.login);
-Route.get('/auth/user', <dynamic>[AuthMiddleware(), authController.user]);
+Route.post('/auth/login', (AuthController c) => c.login);
+Route.get('/auth/user', <dynamic>[AuthMiddleware(), (AuthController c) => c.user]);
 ```
 
 ## 3. Controller
@@ -51,6 +49,7 @@ import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 
+@Inject()
 class AuthController {
   Future<dynamic> login(LoginUser body) async {
     Auth auth = Auth();
@@ -72,3 +71,36 @@ class AuthController {
 
 `LoginUser` is a `@Dto` class with `email` and `password`.
 Send the token as `Authorization: Bearer <token>`.
+
+## Session login for web pages
+
+Use `SessionAuthDriver()` instead of `JwtAuthDriver` in the guard.
+Add `SessionMiddleware()` and `CsrfMiddleware()` to `globalMiddleware`.
+
+```dart title="lib/app/http/controllers/login.controller.dart"
+@Inject()
+class LoginController {
+  Future<dynamic> login(DoxRequest req, LoginUser body) async {
+    bool ok = await Auth().attemptSession(req, <String, dynamic>{
+      'email': body.email,
+      'password': body.password,
+    });
+    if (!ok) {
+      req.session.flashErrors(<String, dynamic>{'email': 'Wrong email or password'});
+      return back(req);
+    }
+    return redirect('/dashboard');
+  }
+
+  DoxResponse logout(DoxRequest req) {
+    Auth().logout(req);
+    return redirect('/');
+  }
+}
+```
+
+```dart title="lib/routes/web.dart"
+Route.post('/login', (LoginController c) => c.login);
+Route.post('/logout', (LoginController c) => c.logout);
+Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), (PageController c) => c.dashboard]);
+```
