@@ -19628,7 +19628,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
-### Unreleased
+### 3.0.0-alpha.14
 
 - New: `@Security.bearer(format: 'API key')` and `@Security.apiKey(header: 'X-API-Key')`. Put it above a middleware class to show its login scheme in the OpenAPI docs.
 
@@ -19696,7 +19696,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_auth
 
-### Unreleased
+### 3.0.0-alpha.14
 
 - New: `Auth().setUser(req, user)` sets the logged-in user on `req.auth`, with no token and no password check. Use it in your own auth middleware, like an API key check.
 - Docs: how to write a custom guard. Extend `AuthDriver`, return the user from `verifyToken`, and use `AuthMiddleware(guard: 'api')`. The README and the authentication page show an API key example.
@@ -19775,7 +19775,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_builder
 
-### Unreleased
+### 3.0.0-alpha.14
 
 - New: the openapi builder reads `@Security` on middleware classes and writes them to `OpenApiRegistry.security`.
 
@@ -19859,6 +19859,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### 3.0.0-alpha.14
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.13
 
 - Version bump only, to match the other packages.
@@ -19928,7 +19932,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox
 
-### Unreleased
+### 3.0.0-alpha.14
 
 - Fix: `dox make:migration` run more than once in the same second gave files with the same timestamp. Then the run order depended only on the name, which could break foreign keys. Now each new migration (`.dart` or `.sql`) sorts after every file already in `db/migration`. When needed, it uses the newest time plus 1 second.
 
@@ -20014,7 +20018,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_core
 
-### Unreleased
+### 3.0.0-alpha.14
 
 - Fix: `AUTH_REQUEST_KEY` is now only in `dox_core`, so importing `dox_core` and `dox_auth` together no longer gives an "ambiguous import" error.
 - Fix: `response(x).header('Content-Type', 'image/svg+xml')` failed with "More than one value for header content-type". The default `text/plain` stayed next to the new type. Now `header()` replaces the content type, the same as `contentType()`. The name can be in any case.
@@ -20214,7 +20218,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_openapi
 
-### Unreleased
+### 3.0.0-alpha.14
 
 - New: `OpenApiSecurity` and `OpenApiRegistry.security`: login schemes by middleware class name, from `@Security`.
 
@@ -20285,6 +20289,10 @@ What changed in each package, newest first. This page is made from the
 - Output as JSON and YAML, write files, serve `/openapi.json`, `/openapi.yaml` and `/docs`.
 
 ## dox_validation
+
+### 3.0.0-alpha.14
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.13
 
