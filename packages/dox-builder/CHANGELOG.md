@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.14
 
 - New: the openapi builder reads `@Security` on middleware classes and writes them to `OpenApiRegistry.security`.
 

@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.14
 
 - New: `@Security.bearer(format: 'API key')` and `@Security.apiKey(header: 'X-API-Key')`. Put it above a middleware class to show its login scheme in the OpenAPI docs.
 

@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.14
 
 - New: `OpenApiSecurity` and `OpenApiRegistry.security`: login schemes by middleware class name, from `@Security`.
 
