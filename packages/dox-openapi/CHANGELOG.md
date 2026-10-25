@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.7
 
 - The `/docs` page loads its CDN files with an `integrity` hash, so the browser refuses a changed file.
 

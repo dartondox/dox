@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.7
 
 - Uses `ioredis` 2.0.0-alpha.3, which can send and get binary messages. `RedisAdapter` and `SocketIoEmitter` take `ioredis` clients.
 - `RedisAdapter` reads msgpack and JSON messages. Before, it read only JSON, so the Socket.IO emitters (Node.js, PHP, Python, Go) did not work. They use msgpack.

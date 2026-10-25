@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.7
 
 - Perf: `attempt` runs bcrypt in another isolate (`Isolate.run`). Before, each login blocked the server isolate for the whole hash.
 - Perf: the dummy hash for unknown users is made when the driver is created, in another isolate. Before, the first login paid for two hashes.
