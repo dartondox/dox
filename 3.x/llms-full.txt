@@ -19073,6 +19073,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
+### 3.0.0-alpha.11
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.10
 
 - Version bump only, to match the other packages.
@@ -19124,6 +19128,10 @@ What changed in each package, newest first. This page is made from the
 - See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
 
 ## dox_auth
+
+### 3.0.0-alpha.11
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.10
 
@@ -19182,6 +19190,10 @@ What changed in each package, newest first. This page is made from the
 - `dart_jsonwebtoken` 3.
 
 ## dox_builder
+
+### 3.0.0-alpha.11
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.10
 
@@ -19251,6 +19263,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### 3.0.0-alpha.11
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.10
 
 - Version bump only, to match the other packages.
@@ -19308,7 +19324,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox
 
-### Unreleased
+### 3.0.0-alpha.11
 
 - `dox build` also builds `bin/queue.dart` and `bin/schedule.dart` when they exist, to `build/bundle/bin/queue` and `build/bundle/bin/schedule`. Before, the worker and the scheduler had no production binary.
 - Fix: `dox build` copied the local SQLite database (`db/dox.sqlite`, with its `-wal` and `-shm` files) into `build/bundle/db`, so dev data went to production. SQLite files are now left out.
@@ -19382,7 +19398,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_core
 
-### Unreleased
+### 3.0.0-alpha.11
 
 - New: middleware that runs after the controller. Implement `IDoxNextMiddleware` (`handle(DoxRequest req, Next next)`), or use a function `(DoxRequest req, Next next)`. `await next()` runs the rest of the middleware and the controller and gives a `DoxResponse`, so the code after it can change the status, headers and cookies. A thrown error comes back as its error response, so the after part still runs. Before-only middleware work as before. A route with no `next` middleware takes the same fast path as before.
 - New: `DoxResponse.status` and `DoxResponse.headers` getters.
@@ -19556,6 +19572,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_migration
 
+### 3.0.0-alpha.11
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.10
 
 - Version bump only, to match the other packages.
@@ -19619,6 +19639,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_openapi
 
+### 3.0.0-alpha.11
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.10
 
 - Version bump only, to match the other packages.
@@ -19674,6 +19698,10 @@ What changed in each package, newest first. This page is made from the
 - Output as JSON and YAML, write files, serve `/openapi.json`, `/openapi.yaml` and `/docs`.
 
 ## dox_orm
+
+### 3.0.0-alpha.11
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.10
 
@@ -19792,6 +19820,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_query_builder
 
+### 3.0.0-alpha.11
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.10
 
 - Version bump only, to match the other packages.
@@ -19835,6 +19867,10 @@ What changed in each package, newest first. This page is made from the
 - Please depend on `dox_orm` and change your imports. See the README.
 
 ## dox_socketio
+
+### 3.0.0-alpha.11
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.10
 
@@ -19903,6 +19939,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_storage
 
+### 3.0.0-alpha.11
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.10
 
 - Version bump only, to match the other packages.
@@ -19950,6 +19990,10 @@ What changed in each package, newest first. This page is made from the
 - `DriveManager.fake()` for tests.
 
 ## dox_validation
+
+### 3.0.0-alpha.11
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.10
 
