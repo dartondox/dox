@@ -36,6 +36,7 @@ void main() {
       final command = CommandRegistry.findCommand('v');
       expect(command, isNotNull);
       expect(command!.command, equals('version'));
+      expect(CommandRegistry.findCommand('--help')?.command, 'help');
     });
 
     test('should validate command arguments correctly', () {

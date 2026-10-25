@@ -285,16 +285,25 @@ A second signal stops it at once.
 
 ### Keep it running
 
-Run the worker as its own process, next to the web server. For example with Docker Compose:
+In production, run the binary, not `dart run`. `dox build` makes `build/bundle/bin/queue`, next to the server:
+
+```bash
+cd build/bundle
+./bin/queue work --concurrency=4
+```
+
+It takes the same commands and flags as `dart run bin/queue.dart`.
+
+Run the worker as its own process, next to the web server. For example with Docker Compose and the image of the project `Dockerfile`:
 
 ```yaml
 services:
   web:
     build: .
-    command: dart run bin/server.dart
+    command: /app/bin/server
   worker:
     build: .
-    command: dart run bin/queue.dart work --concurrency=4
+    command: /app/bin/queue work --concurrency=4
 ```
 
 Or with systemd, Supervisor or a second Fly.io process. Set it to restart when it stops.

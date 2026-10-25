@@ -80,17 +80,20 @@ What it does:
 
 1. When `pubspec.yaml` contains `build_runner`: runs `dart run build_runner build`. Stops with exit code 1 when it fails.
 2. Runs `dart build cli --target bin/server.dart --output build`.
-3. Copies `db/` to `build/bundle/db` (migrations are read at start).
-4. Copies `.env.example` to `build/bundle/.env.example`.
-5. Prints `[Dox] Built build/bundle. Run it with: cd build/bundle && ./bin/server`.
+3. When `bin/queue.dart` or `bin/schedule.dart` exists: builds it the same way, to `build/bundle/bin/queue` and `build/bundle/bin/schedule`.
+4. Copies `db/` to `build/bundle/db` (migrations are read at start). It leaves out SQLite files, so your local data does not go to production.
+5. Copies `.env.example` to `build/bundle/.env.example`.
+6. Prints `[Dox] Built build/bundle. Run it with: cd build/bundle && ./bin/server`.
 
 Output:
 
 | Path | What |
 | --- | --- |
 | `build/bundle/bin/server` | the native binary, no Dart SDK needed |
+| `build/bundle/bin/queue` | the queue worker, when `bin/queue.dart` exists |
+| `build/bundle/bin/schedule` | the scheduler, when `bin/schedule.dart` exists |
 | `build/bundle/lib/` | native libraries from build hooks (SQLite, `dox_http_native`, ...) |
-| `build/bundle/db/` | your migrations |
+| `build/bundle/db/` | your migrations. SQLite files (`*.sqlite`, `*.db`) are not copied. |
 | `build/bundle/.env.example` | copy it to `.env` or set real env vars |
 
 `dart compile exe` can not build packages with build hooks, so the CLI uses `dart build cli`.

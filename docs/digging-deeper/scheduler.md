@@ -243,13 +243,14 @@ A second signal stops it at once.
 `run` is for a system cron. Add one line to the crontab:
 
 ```bash
-* * * * * cd /path/to/app && dart run bin/schedule.dart run
+* * * * * cd /path/to/app/build/bundle && ./bin/schedule run
 ```
 
 It runs the tasks of this minute, waits for them, and exits.
 The exit code is 1 when a task failed.
 
-Use a compiled binary to start faster: `dart compile exe bin/schedule.dart -o build/schedule`.
+`./bin/schedule` is the binary that `dox build` makes in `build/bundle`. It starts fast and needs no Dart SDK.
+Do not use `dart compile exe`. It can not build apps with native libraries, like SQLite.
 
 ### list
 

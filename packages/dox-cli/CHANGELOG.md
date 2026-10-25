@@ -1,3 +1,9 @@
+## Unreleased
+
+- `dox build` also builds `bin/queue.dart` and `bin/schedule.dart` when they exist, to `build/bundle/bin/queue` and `build/bundle/bin/schedule`. Before, the worker and the scheduler had no production binary.
+- Fix: `dox build` copied the local SQLite database (`db/dox.sqlite`, with its `-wal` and `-shm` files) into `build/bundle/db`, so dev data went to production. SQLite files are now left out.
+- `dox --help` and `dox -h` show the help, like `dox help`.
+
 ## 3.0.0-alpha.10
 
 - `make:*` is now the main name of every generator: `make:controller`, `make:middleware`, `make:dto`, `make:serializer` and `make:model`, like `make:migration`, `make:factory` and `make:seeder`. The `create:*` names still work as aliases.
