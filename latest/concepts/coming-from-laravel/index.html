@@ -2006,6 +2006,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -2153,6 +2157,62 @@
   
   
     <li class="md-nav__item">
+      <a href="../../database/factories/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Factories
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../database/seeders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seeders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../database/schema/" class="md-nav__link">
         
   
@@ -2264,7 +2324,7 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_8" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -2286,14 +2346,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2365,10 +2425,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_8_3" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10_3" >
         
           
-          <label class="md-nav__link" for="__nav_4_8_3" id="__nav_4_8_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10_3" id="__nav_4_10_3_label" tabindex="0">
             
   
   
@@ -2386,8 +2446,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_8_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8_3">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4781,6 +4841,18 @@ Run <code>dox build_runner:build</code> after you change a model. See <a href=".
 <tr>
 <td><code>php artisan migrate:reset</code>, <code>migrate:refresh</code>, <code>migrate:status</code></td>
 <td><code>dox migration:reset</code>, <code>migration:refresh</code>, <code>migration:status</code></td>
+</tr>
+<tr>
+<td><code>php artisan migrate:fresh --seed</code></td>
+<td><code>dox migrate:fresh --seed</code></td>
+</tr>
+<tr>
+<td><code>php artisan db:seed --class=UserSeeder</code></td>
+<td><code>dox db:seed --class=UserSeeder</code></td>
+</tr>
+<tr>
+<td><code>php artisan make:factory</code>, <code>make:seeder</code></td>
+<td><code>dox make:factory</code>, <code>dox make:seeder</code></td>
 </tr>
 </tbody>
 </table>

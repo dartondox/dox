@@ -25,6 +25,10 @@
          <lastmod>2026-10-25</lastmod>
     </url>
     <url>
+         <loc>https://dartondox.dev/latest/3.x/database/factories/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
          <loc>https://dartondox.dev/latest/3.x/database/migration/</loc>
          <lastmod>2026-10-25</lastmod>
     </url>
@@ -42,6 +46,10 @@
     </url>
     <url>
          <loc>https://dartondox.dev/latest/3.x/database/schema/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
+         <loc>https://dartondox.dev/latest/3.x/database/seeders/</loc>
          <lastmod>2026-10-25</lastmod>
     </url>
     <url>

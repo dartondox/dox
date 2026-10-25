@@ -2078,6 +2078,9 @@ Values are always bound parameters. Names you pass are quoted. Do not pass user 
 | `php artisan migrate` | `dox migrate` (or `dox migration:run`) |
 | `php artisan migrate:rollback --step=2` | `dox migration:rollback --step=2` |
 | `php artisan migrate:reset`, `migrate:refresh`, `migrate:status` | `dox migration:reset`, `migration:refresh`, `migration:status` |
+| `php artisan migrate:fresh --seed` | `dox migrate:fresh --seed` |
+| `php artisan db:seed --class=UserSeeder` | `dox db:seed --class=UserSeeder` |
+| `php artisan make:factory`, `make:seeder` | `dox make:factory`, `dox make:seeder` |
 
 ```dart title="db/migration/2026_10_21_120000_create_users_table.dart"
 class CreateUsersTable extends Migration {
@@ -5277,7 +5280,11 @@ dart pub global deactivate dox
 | `dox migration:rollback [--step=N]` | undo the last batch, or the last N migrations |
 | `dox migration:reset` | undo all migrations |
 | `dox migration:refresh` | undo all, then run all again |
+| `dox migration:fresh` (or `migrate:fresh`) | drop all tables, then run all migrations |
 | `dox migration:status` | show which migrations ran, and their batch |
+| `dox make:factory <model>` | create a model factory in `db/factories`, see [Factories](../database/factories.md) |
+| `dox make:seeder <name>` | create a seeder in `db/seeders`, see [Seeders](../database/seeders.md) |
+| `dox db:seed [--class=<name>]` | run `DatabaseSeeder`, or another seeder |
 | `dox key:generate` | make a new `APP_KEY` |
 | `dox env:generate` | make `lib/config/env.dart` (the typed env class) from `.env.example`, see [Environment Variables](env.md) |
 | `dox env:check` | check the env against `lib/config/env.dart`. Prints every missing or bad key (exit code 1) |
@@ -5435,9 +5442,11 @@ dox migration:rollback           # undo the last batch
 dox migration:rollback --step=2  # undo the last 2 migrations
 dox migration:reset              # undo all migrations
 dox migration:refresh            # undo all migrations, then run them again
+dox migration:fresh              # drop all tables, then run all migrations
 ```
 
-`migrate:rollback`, `migrate:reset`, `migrate:refresh` and `migrate:status` also work.
+`migrate:rollback`, `migrate:reset`, `migrate:refresh`, `migrate:fresh` and `migrate:status` also work.
+Add `--seed` to `migration:run`, `migration:refresh` or `migration:fresh` to run the seeders after it.
 
 - A failed migration stops the run, and the CLI exits with code 1.
 - On MySQL, statements like `CREATE`, `ALTER` and `DROP` save right away. So when a migration fails half way, these changes are not undone.
@@ -7343,9 +7352,12 @@ So your migrations run as part of your app code.
 | `dox migration:rollback --step=2` | Undo the last 2 migrations, even across batches. |
 | `dox migration:reset` | Undo all migrations. |
 | `dox migration:refresh` | Undo all migrations, then run them again. |
+| `dox migration:fresh` | Drop all tables, then run all migrations. It also drops tables that no migration made. |
 | `dox migration:status` | Show each migration, its batch, and if it ran. |
 
-`migrate:rollback`, `migrate:reset`, `migrate:refresh` and `migrate:status` are short names.
+`migrate:rollback`, `migrate:reset`, `migrate:refresh`, `migrate:fresh` and `migrate:status` are short names.
+
+Add `--seed` to `migration:run`, `migration:refresh` or `migration:fresh` to run the [seeders](seeders.md) after it.
 
 A batch is the group of migrations that ran in one `migration:run`.
 Migrations are undone newest first.
@@ -7483,6 +7495,349 @@ Both kinds can live in `db/migration`. They run in file name order (the timestam
   and reads the `.sql` files from the folder, merged by name.
 - Without `bin/migrate.dart` (a project with only `.sql` files): `dox` runs the `.sql` files itself, like before.
 - A Dart and a `.sql` migration with the same name is an error.
+
+
+---
+
+# Factories
+
+Source: https://dartondox.dev/latest/3.xdatabase/factories/
+
+# Factories
+
+A factory makes models with sample data.
+Use it in tests and in [seeders](seeders.md).
+
+## Create a factory
+
+```bash
+dox make:factory User
+```
+
+This makes `db/factories/user.factory.dart`:
+
+```dart title="db/factories/user.factory.dart"
+import 'package:dox_orm/factory.dart';
+import 'package:my_app/app/models/user/user.model.dart';
+
+class UserFactory extends Factory<User> {
+  @override
+  User definition() {
+    User user = User();
+    user.name = 'Jane';
+    user.email = 'jane@example.com';
+    return user;
+  }
+}
+```
+
+`definition()` gives one new model with the default values.
+It runs once for each model, so random values are new each time.
+
+## Make and create
+
+| Method | What it gives |
+| --- | --- |
+| `make()` | a list of models. They are not saved. |
+| `makeOne()` | one model. It is not saved. |
+| `create()` | a list of models, saved with `save()`. |
+| `createOne()` | one model, saved with `save()`. |
+
+`count(n)` sets how many models `make()` and `create()` give. The default is 1.
+
+```dart
+List<User> users = await UserFactory().count(10).create();
+
+User user = UserFactory().makeOne();
+```
+
+`create()` saves the models one by one with `save()`.
+So [model events](model/events.md) run, and each model gets its id.
+
+## State
+
+`state()` changes each model after `definition()`.
+
+```dart
+User admin = await UserFactory()
+    .state((User u) => u..isAdmin = true)
+    .createOne();
+```
+
+You can add more than one state. They run in the order you add them.
+
+A factory method makes a state easy to use again:
+
+```dart
+class UserFactory extends Factory<User> {
+  @override
+  User definition() => User()..name = 'Jane';
+
+  UserFactory admin() {
+    state((User u) => u..isAdmin = true);
+    return this;
+  }
+}
+
+List<User> admins = await UserFactory().admin().count(3).create();
+```
+
+Call your own methods first. `count()` and `state()` return a `Factory<User>`, not a `UserFactory`.
+
+## Sequence
+
+`sequence()` is a state that also gets the index of the model: 0, 1, 2 and so on.
+
+```dart
+List<User> users = await UserFactory()
+    .count(3)
+    .sequence((User u, int i) => u..email = 'user$i@example.com')
+    .create();
+// user0@example.com, user1@example.com, user2@example.com
+```
+
+To switch between a few values, use the index:
+
+```dart
+List<String> roles = <String>['admin', 'editor'];
+await UserFactory()
+    .count(4)
+    .sequence((User u, int i) => u..role = roles[i % roles.length])
+    .create();
+```
+
+## Relations
+
+### Belongs to
+
+Set the parent key with a state:
+
+```dart
+User user = await UserFactory().createOne();
+
+await PostFactory()
+    .count(3)
+    .state((Post p) => p..userId = user.id)
+    .create();
+```
+
+### Has many
+
+`has()` creates child models for each saved model.
+The second argument sets the parent on each child.
+
+```dart
+List<User> users = await UserFactory()
+    .count(2)
+    .has(PostFactory().count(3), (Post p, User u) => p..userId = u.id)
+    .create();
+// 2 users, each with 3 posts
+```
+
+`has()` only works with `create()` and `createOne()`. `make()` saves nothing, so it makes no children.
+
+## Fake data
+
+Dox has no fake data generator.
+The [faker](https://pub.dev/packages/faker) package works well with factories:
+
+```bash
+dart pub add faker
+```
+
+```dart title="db/factories/user.factory.dart"
+import 'package:dox_orm/factory.dart';
+import 'package:faker/faker.dart';
+import 'package:my_app/app/models/user/user.model.dart';
+
+class UserFactory extends Factory<User> {
+  @override
+  User definition() {
+    return User()
+      ..name = faker.person.name()
+      ..email = faker.internet.email();
+  }
+}
+```
+
+## Use in tests
+
+A factory needs the ORM. Set it up first, the same as in your app.
+
+```dart
+import 'package:test/test.dart';
+
+import '../db/factories/user.factory.dart';
+
+void main() {
+  test('lists users', () async {
+    await UserFactory().count(3).create();
+    // call your route and check the result
+  });
+}
+```
+
+See [Testing with a database](../guides/testing-with-database.md).
+
+## Notes
+
+- Each call like `count()` or `state()` changes the factory and returns it.
+  Make a new factory for each set of models.
+- Import factories from `package:dox_orm/factory.dart`. The main `dox_orm` import does not include them.
+
+
+---
+
+# Seeders
+
+Source: https://dartondox.dev/latest/3.xdatabase/seeders/
+
+# Seeders
+
+A seeder puts data in your database.
+Use it for sample data in development, or for data your app needs, like a list of countries.
+
+## Create a seeder
+
+```bash
+dox make:seeder UserSeeder
+```
+
+This makes three files:
+
+| File | What it is |
+| --- | --- |
+| `db/seeders/user.seeder.dart` | the new seeder |
+| `db/seeders/seeders.dart` | the list of all seeders. Dox writes it again on each `make:seeder` and `db:seed`. Do not edit it. |
+| `bin/seed.dart` | the script that runs a seeder. It is made only when it is missing. |
+
+```dart title="db/seeders/user.seeder.dart"
+import 'package:dox_migration/dox_migration.dart';
+
+import '../factories/user.factory.dart';
+
+class UserSeeder extends Seeder {
+  @override
+  Future<void> run() async {
+    await UserFactory().count(10).create();
+  }
+}
+```
+
+Use [factories](factories.md), models or the [query builder](query-builder.md) in `run()`.
+
+## DatabaseSeeder
+
+`dox db:seed` runs `DatabaseSeeder` by default.
+Use it to call your other seeders.
+
+```bash
+dox make:seeder DatabaseSeeder
+```
+
+```dart title="db/seeders/database.seeder.dart"
+import 'package:dox_migration/dox_migration.dart';
+
+import 'post.seeder.dart';
+import 'user.seeder.dart';
+
+class DatabaseSeeder extends Seeder {
+  @override
+  Future<void> run() async {
+    await call(<Seeder>[UserSeeder(), PostSeeder()]);
+  }
+}
+```
+
+`call()` runs the seeders one after another, in the list order.
+
+## Run seeders
+
+| Command | What it does |
+| --- | --- |
+| `dox db:seed` | Run `DatabaseSeeder`. |
+| `dox db:seed --class=UserSeeder` | Run one seeder. |
+| `dox migration:fresh --seed` | Drop all tables, run all migrations, then run `DatabaseSeeder`. |
+| `dox migration:refresh --seed` | Undo all migrations, run them again, then run `DatabaseSeeder`. |
+| `dox migration:run --seed` | Run new migrations, then run `DatabaseSeeder`. |
+
+`migrate:fresh` and `migrate:refresh` are short names, so `dox migrate:fresh --seed` works too.
+
+The database comes from `.env`, the same as the migrations:
+`DATABASE_URL`, or `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` and `DB_NAME`.
+
+!!! warning
+    `migration:fresh` drops every table of the database, also tables that no migration made.
+    Do not run it on a production database.
+
+## Transactions
+
+A seed runs in one transaction.
+When a seeder throws an error, nothing is saved, and the command exits with code 1.
+
+On MySQL and MariaDB, `CREATE`, `ALTER` and `DROP TABLE` save right away.
+A rollback can not undo them. Keep schema changes in migrations.
+
+A very large seed can turn the transaction off:
+
+```dart
+class BigSeeder extends Seeder {
+  @override
+  bool get withinTransaction => false;
+
+  @override
+  Future<void> run() async {
+    // ...
+  }
+}
+```
+
+Only the seeder you run says if there is a transaction.
+For `dox db:seed` it is `DatabaseSeeder`.
+
+## bin/seed.dart
+
+`dox db:seed` runs `dart run bin/seed.dart`.
+You can run it yourself too, for example in a deploy script:
+
+```bash
+dart run bin/seed.dart
+dart run bin/seed.dart --class=UserSeeder
+```
+
+```dart title="bin/seed.dart"
+import 'dart:io';
+
+import 'package:dox_migration/dox_migration.dart';
+
+import '../db/seeders/seeders.dart';
+
+Future<void> main(List<String> args) async {
+  exitCode = await SeederRunner(seeders: seeders).run(args);
+}
+```
+
+`SeederRunner` sets up the ORM, runs the seeder and closes the ORM.
+Pass `config:` to use your app's database config instead of `.env`:
+
+```dart
+import 'package:my_app/config/database.dart';
+
+Future<void> main(List<String> args) async {
+  exitCode = await SeederRunner(
+    seeders: seeders,
+    config: databaseConfig,
+  ).run(args);
+}
+```
+
+## Use in tests
+
+A seeder is a normal class. Call `run()` after you set up the ORM:
+
+```dart
+await DatabaseSeeder().run();
+```
 
 
 ---
@@ -16063,7 +16418,20 @@ A failed run prints the error and sets exit code 1.
 | `dox migration:rollback [--step=<count>]` | `dox migrate:rollback` | Undo the last batch, or the last `<count>` migrations. Any other option prints `Invalid option <x>, use --step=<count>` (exit code 1). |
 | `dox migration:reset` | `dox migrate:reset` | Undo every migration. |
 | `dox migration:refresh` | `dox migrate:refresh` | Undo every migration, then run them all again. |
+| `dox migration:fresh` | `dox migrate:fresh` | Drop every table, then run all migrations. |
 | `dox migration:status` | `dox migrate:status` | Print which migrations ran, and their batch. |
+
+`--seed` after `migration:run`, `migration:refresh` or `migration:fresh` runs `dox db:seed` when the migrations end well.
+
+## Factories and seeders
+
+| Command | Aliases | What it does |
+| --- | --- | --- |
+| `dox make:factory <model>` | `dox create:factory` | Make `db/factories/<model>.factory.dart`. It imports the model with the package name of `pubspec.yaml`. |
+| `dox make:seeder <name>` | `dox create:seeder` | Make `db/seeders/<name>.seeder.dart`. It writes `db/seeders/seeders.dart` again, and makes `bin/seed.dart` when it is missing. |
+| `dox db:seed [--class=<name>]` | | Write `db/seeders/seeders.dart` again, then run `dart run bin/seed.dart`. Default seeder: `DatabaseSeeder`. |
+
+Templates: `createFactory` in `packages/dox-cli/lib/src/tools/create_factory.dart`, and `createSeeder` and `seedEntrySource` in `packages/dox-cli/lib/src/tools/create_seeder.dart`.
 
 ## Command list
 
@@ -16086,8 +16454,12 @@ A failed run prints the error and sets exit code 1.
 | `migration:rollback` | `migrate:rollback` | Database |
 | `migration:reset` | `migrate:reset` | Database |
 | `migration:refresh` | `migrate:refresh` | Database |
+| `migration:fresh` | `migrate:fresh` | Database |
 | `migration:status` | `migrate:status` | Database |
 | `make:migration` | `create:migration` | Database |
+| `make:factory` | `create:factory` | Database |
+| `make:seeder` | `create:seeder` | Database |
+| `db:seed` | | Database |
 | `version` | `--version`, `-version`, `v`, `-v`, `--v` | System |
 | `update` | | System |
 | `env:check` | | System |
@@ -17274,6 +17646,14 @@ What changed in each package, newest first. This page is made from the
 
 ## dox
 
+### Unreleased
+
+- New `dox make:factory <model>`: makes `db/factories/<model>.factory.dart`.
+- New `dox make:seeder <name>`: makes `db/seeders/<name>.seeder.dart`, writes the seeder list `db/seeders/seeders.dart` and makes `bin/seed.dart` when it is missing.
+- New `dox db:seed [--class=<name>]`: runs `bin/seed.dart`. The default seeder is `DatabaseSeeder`.
+- New `dox migration:fresh` (or `migrate:fresh`): drops all tables, then runs all migrations.
+- `--seed` after `migration:run`, `migration:refresh` or `migration:fresh` runs the seeders when the migrations end well.
+
 ### 3.0.0-alpha.8
 
 - Version bump only, to match the other packages.
@@ -17473,6 +17853,11 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_migration
 
+### Unreleased
+
+- New `Seeder` and `SeederRunner`. A seeder puts data in the database. `call()` runs other seeders. `SeederRunner(seeders: seeders).run(args)` runs `DatabaseSeeder`, or another one with `--class=<name>`, in one transaction. It reads the database from `.env`, the same as the migrations.
+- New `Migrator.fresh()` and the `fresh` command of `Migrator.run()`. It drops every table of the database, then runs all migrations.
+
 ### 3.0.0-alpha.8
 
 - A migration that runs inside a transaction you already opened (eg. with `Migrator(connection: ...)`) now uses a savepoint. A failed migration undoes only its own work.
@@ -17578,6 +17963,7 @@ What changed in each package, newest first. This page is made from the
 ### Unreleased
 
 - Breaking: the `ModelObserver` methods now have the same names as the model hooks: `onSaving`, `onSaved`, `onCreating`, `onCreated`, `onUpdating`, `onUpdated`, `onDeleting`, `onDeleted`, `onRestoring`, `onRestored`, `onForceDeleting` and `onForceDeleted`. Rename the methods in your observers, for example `created(User user)` to `onCreated(User user)`.
+- New model factories: `import 'package:dox_orm/factory.dart';`. Extend `Factory<User>` and write `definition()`. Then use `count(n)`, `state()`, `sequence()`, `has()`, `make()`, `makeOne()`, `create()` and `createOne()`. See the Factories docs page.
 
 ### 3.0.0-alpha.8
 

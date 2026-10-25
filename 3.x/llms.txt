@@ -44,6 +44,8 @@ The full docs as one file: https://dartondox.dev/latest/3.xllms-full.txt
 - [Query Builder](https://dartondox.dev/latest/3.xdatabase/query-builder/)
 - [Transactions](https://dartondox.dev/latest/3.xdatabase/transactions/)
 - [Migration](https://dartondox.dev/latest/3.xdatabase/migration/)
+- [Factories](https://dartondox.dev/latest/3.xdatabase/factories/)
+- [Seeders](https://dartondox.dev/latest/3.xdatabase/seeders/)
 - [Schema builder](https://dartondox.dev/latest/3.xdatabase/schema/)
 - [Native Postgres driver](https://dartondox.dev/latest/3.xdatabase/postgres-native/)
 - [Native MySQL driver](https://dartondox.dev/latest/3.xdatabase/mysql-native/)

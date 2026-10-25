@@ -16,7 +16,7 @@
         <link rel="prev" href="../transactions/">
       
       
-        <link rel="next" href="../schema/">
+        <link rel="next" href="../factories/">
       
       
         
@@ -1775,6 +1775,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -2070,6 +2074,62 @@
   
   
     <li class="md-nav__item">
+      <a href="../factories/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Factories
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../seeders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seeders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../schema/" class="md-nav__link">
         
   
@@ -2184,7 +2244,7 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_8" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -2206,14 +2266,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_8" id="__nav_4_8_label" tabindex="">
+              <label class="md-nav__link " for="__nav_4_10" id="__nav_4_10_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2285,10 +2345,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_8_3" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10_3" >
         
           
-          <label class="md-nav__link" for="__nav_4_8_3" id="__nav_4_8_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10_3" id="__nav_4_10_3_label" tabindex="0">
             
   
   
@@ -2306,8 +2366,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_8_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8_3">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4182,12 +4242,17 @@ So your migrations run as part of your app code.</p>
 <td>Undo all migrations, then run them again.</td>
 </tr>
 <tr>
+<td><code>dox migration:fresh</code></td>
+<td>Drop all tables, then run all migrations. It also drops tables that no migration made.</td>
+</tr>
+<tr>
 <td><code>dox migration:status</code></td>
 <td>Show each migration, its batch, and if it ran.</td>
 </tr>
 </tbody>
 </table>
-<p><code>migrate:rollback</code>, <code>migrate:reset</code>, <code>migrate:refresh</code> and <code>migrate:status</code> are short names.</p>
+<p><code>migrate:rollback</code>, <code>migrate:reset</code>, <code>migrate:refresh</code>, <code>migrate:fresh</code> and <code>migrate:status</code> are short names.</p>
+<p>Add <code>--seed</code> to <code>migration:run</code>, <code>migration:refresh</code> or <code>migration:fresh</code> to run the <a href="../seeders/">seeders</a> after it.</p>
 <p>A batch is the group of migrations that ran in one <code>migration:run</code>.
 Migrations are undone newest first.
 The ran migrations are saved in the <code>dox_db_migration</code> table.</p>
@@ -4361,13 +4426,13 @@ Use <code>id INTEGER PRIMARY KEY AUTOINCREMENT</code> for SQLite. <code>table.id
         
         
           
-          <a href="../schema/" class="md-footer__link md-footer__link--next" aria-label="Next: Schema builder">
+          <a href="../factories/" class="md-footer__link md-footer__link--next" aria-label="Next: Factories">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Schema builder
+                Factories
               </div>
             </div>
             <div class="md-footer__button md-icon">

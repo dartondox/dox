@@ -2061,6 +2061,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -2208,6 +2212,62 @@
   
   
     <li class="md-nav__item">
+      <a href="../../database/factories/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Factories
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../database/seeders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seeders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../database/schema/" class="md-nav__link">
         
   
@@ -2319,7 +2379,7 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_8" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -2341,14 +2401,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2420,10 +2480,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_8_3" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10_3" >
         
           
-          <label class="md-nav__link" for="__nav_4_8_3" id="__nav_4_8_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10_3" id="__nav_4_10_3_label" tabindex="0">
             
   
   
@@ -2441,8 +2501,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_8_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8_3">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4409,8 +4469,24 @@
 <td>undo all, then run all again</td>
 </tr>
 <tr>
+<td><code>dox migration:fresh</code> (or <code>migrate:fresh</code>)</td>
+<td>drop all tables, then run all migrations</td>
+</tr>
+<tr>
 <td><code>dox migration:status</code></td>
 <td>show which migrations ran, and their batch</td>
+</tr>
+<tr>
+<td><code>dox make:factory &lt;model&gt;</code></td>
+<td>create a model factory in <code>db/factories</code>, see <a href="../../database/factories/">Factories</a></td>
+</tr>
+<tr>
+<td><code>dox make:seeder &lt;name&gt;</code></td>
+<td>create a seeder in <code>db/seeders</code>, see <a href="../../database/seeders/">Seeders</a></td>
+</tr>
+<tr>
+<td><code>dox db:seed [--class=&lt;name&gt;]</code></td>
+<td>run <code>DatabaseSeeder</code>, or another seeder</td>
 </tr>
 <tr>
 <td><code>dox key:generate</code></td>
@@ -4546,8 +4622,10 @@ This is different from <code>Env.get()</code>, where a real environment variable
 </span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>dox<span class="w"> </span>migration:rollback<span class="w"> </span>--step<span class="o">=</span><span class="m">2</span><span class="w">  </span><span class="c1"># undo the last 2 migrations</span>
 </span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>dox<span class="w"> </span>migration:reset<span class="w">              </span><span class="c1"># undo all migrations</span>
 </span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>dox<span class="w"> </span>migration:refresh<span class="w">            </span><span class="c1"># undo all migrations, then run them again</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>dox<span class="w"> </span>migration:fresh<span class="w">              </span><span class="c1"># drop all tables, then run all migrations</span>
 </span></code></pre></div>
-<p><code>migrate:rollback</code>, <code>migrate:reset</code>, <code>migrate:refresh</code> and <code>migrate:status</code> also work.</p>
+<p><code>migrate:rollback</code>, <code>migrate:reset</code>, <code>migrate:refresh</code>, <code>migrate:fresh</code> and <code>migrate:status</code> also work.
+Add <code>--seed</code> to <code>migration:run</code>, <code>migration:refresh</code> or <code>migration:fresh</code> to run the seeders after it.</p>
 <ul>
 <li>A failed migration stops the run, and the CLI exits with code 1.</li>
 <li>On MySQL, statements like <code>CREATE</code>, <code>ALTER</code> and <code>DROP</code> save right away. So when a migration fails half way, these changes are not undone.</li>

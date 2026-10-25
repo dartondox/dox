@@ -1773,6 +1773,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -1920,6 +1924,62 @@
   
   
     <li class="md-nav__item">
+      <a href="../../database/factories/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Factories
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../database/seeders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seeders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../database/schema/" class="md-nav__link">
         
   
@@ -2031,7 +2091,7 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_8" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -2053,14 +2113,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2132,10 +2192,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_8_3" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10_3" >
         
           
-          <label class="md-nav__link" for="__nav_4_8_3" id="__nav_4_8_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10_3" id="__nav_4_10_3_label" tabindex="0">
             
   
   
@@ -2153,8 +2213,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_8_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8_3">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3766,6 +3826,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#factories-and-seeders" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Factories and seeders
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#command-list" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4303,6 +4374,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#factories-and-seeders" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Factories and seeders
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#command-list" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4678,12 +4760,46 @@ A failed run prints the error and sets exit code 1.</p>
 <td>Undo every migration, then run them all again.</td>
 </tr>
 <tr>
+<td><code>dox migration:fresh</code></td>
+<td><code>dox migrate:fresh</code></td>
+<td>Drop every table, then run all migrations.</td>
+</tr>
+<tr>
 <td><code>dox migration:status</code></td>
 <td><code>dox migrate:status</code></td>
 <td>Print which migrations ran, and their batch.</td>
 </tr>
 </tbody>
 </table>
+<p><code>--seed</code> after <code>migration:run</code>, <code>migration:refresh</code> or <code>migration:fresh</code> runs <code>dox db:seed</code> when the migrations end well.</p>
+<h2 id="factories-and-seeders">Factories and seeders</h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Aliases</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dox make:factory &lt;model&gt;</code></td>
+<td><code>dox create:factory</code></td>
+<td>Make <code>db/factories/&lt;model&gt;.factory.dart</code>. It imports the model with the package name of <code>pubspec.yaml</code>.</td>
+</tr>
+<tr>
+<td><code>dox make:seeder &lt;name&gt;</code></td>
+<td><code>dox create:seeder</code></td>
+<td>Make <code>db/seeders/&lt;name&gt;.seeder.dart</code>. It writes <code>db/seeders/seeders.dart</code> again, and makes <code>bin/seed.dart</code> when it is missing.</td>
+</tr>
+<tr>
+<td><code>dox db:seed [--class=&lt;name&gt;]</code></td>
+<td></td>
+<td>Write <code>db/seeders/seeders.dart</code> again, then run <code>dart run bin/seed.dart</code>. Default seeder: <code>DatabaseSeeder</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Templates: <code>createFactory</code> in <code>packages/dox-cli/lib/src/tools/create_factory.dart</code>, and <code>createSeeder</code> and <code>seedEntrySource</code> in <code>packages/dox-cli/lib/src/tools/create_seeder.dart</code>.</p>
 <h2 id="command-list">Command list</h2>
 <table>
 <thead>
@@ -4780,6 +4896,11 @@ A failed run prints the error and sets exit code 1.</p>
 <td>Database</td>
 </tr>
 <tr>
+<td><code>migration:fresh</code></td>
+<td><code>migrate:fresh</code></td>
+<td>Database</td>
+</tr>
+<tr>
 <td><code>migration:status</code></td>
 <td><code>migrate:status</code></td>
 <td>Database</td>
@@ -4787,6 +4908,21 @@ A failed run prints the error and sets exit code 1.</p>
 <tr>
 <td><code>make:migration</code></td>
 <td><code>create:migration</code></td>
+<td>Database</td>
+</tr>
+<tr>
+<td><code>make:factory</code></td>
+<td><code>create:factory</code></td>
+<td>Database</td>
+</tr>
+<tr>
+<td><code>make:seeder</code></td>
+<td><code>create:seeder</code></td>
+<td>Database</td>
+</tr>
+<tr>
+<td><code>db:seed</code></td>
+<td></td>
 <td>Database</td>
 </tr>
 <tr>
