@@ -104,9 +104,12 @@ So your migrations run as part of your app code.
 | `dox migration:rollback --step=2` | Undo the last 2 migrations, even across batches. |
 | `dox migration:reset` | Undo all migrations. |
 | `dox migration:refresh` | Undo all migrations, then run them again. |
+| `dox migration:fresh` | Drop all tables, then run all migrations. It also drops tables that no migration made. |
 | `dox migration:status` | Show each migration, its batch, and if it ran. |
 
-`migrate:rollback`, `migrate:reset`, `migrate:refresh` and `migrate:status` are short names.
+`migrate:rollback`, `migrate:reset`, `migrate:refresh`, `migrate:fresh` and `migrate:status` are short names.
+
+Add `--seed` to `migration:run`, `migration:refresh` or `migration:fresh` to run the [seeders](seeders.md) after it.
 
 A batch is the group of migrations that ran in one `migration:run`.
 Migrations are undone newest first.

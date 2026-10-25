@@ -1,3 +1,11 @@
+## Unreleased
+
+- New `dox make:factory <model>`: makes `db/factories/<model>.factory.dart`.
+- New `dox make:seeder <name>`: makes `db/seeders/<name>.seeder.dart`, writes the seeder list `db/seeders/seeders.dart` and makes `bin/seed.dart` when it is missing.
+- New `dox db:seed [--class=<name>]`: runs `bin/seed.dart`. The default seeder is `DatabaseSeeder`.
+- New `dox migration:fresh` (or `migrate:fresh`): drops all tables, then runs all migrations.
+- `--seed` after `migration:run`, `migration:refresh` or `migration:fresh` runs the seeders when the migrations end well.
+
 ## 3.0.0-alpha.8
 
 - Version bump only, to match the other packages.

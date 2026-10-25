@@ -41,7 +41,11 @@ dart pub global deactivate dox
 | `dox migration:rollback [--step=N]` | undo the last batch, or the last N migrations |
 | `dox migration:reset` | undo all migrations |
 | `dox migration:refresh` | undo all, then run all again |
+| `dox migration:fresh` (or `migrate:fresh`) | drop all tables, then run all migrations |
 | `dox migration:status` | show which migrations ran, and their batch |
+| `dox make:factory <model>` | create a model factory in `db/factories`, see [Factories](../database/factories.md) |
+| `dox make:seeder <name>` | create a seeder in `db/seeders`, see [Seeders](../database/seeders.md) |
+| `dox db:seed [--class=<name>]` | run `DatabaseSeeder`, or another seeder |
 | `dox key:generate` | make a new `APP_KEY` |
 | `dox env:generate` | make `lib/config/env.dart` (the typed env class) from `.env.example`, see [Environment Variables](env.md) |
 | `dox env:check` | check the env against `lib/config/env.dart`. Prints every missing or bad key (exit code 1) |
@@ -199,9 +203,11 @@ dox migration:rollback           # undo the last batch
 dox migration:rollback --step=2  # undo the last 2 migrations
 dox migration:reset              # undo all migrations
 dox migration:refresh            # undo all migrations, then run them again
+dox migration:fresh              # drop all tables, then run all migrations
 ```
 
-`migrate:rollback`, `migrate:reset`, `migrate:refresh` and `migrate:status` also work.
+`migrate:rollback`, `migrate:reset`, `migrate:refresh`, `migrate:fresh` and `migrate:status` also work.
+Add `--seed` to `migration:run`, `migration:refresh` or `migration:fresh` to run the seeders after it.
 
 - A failed migration stops the run, and the CLI exits with code 1.
 - On MySQL, statements like `CREATE`, `ALTER` and `DROP` save right away. So when a migration fails half way, these changes are not undone.

@@ -6,6 +6,8 @@ import 'package:dox/src/tools/create_migration.dart';
 import 'package:dox/src/tools/create_model.dart';
 import 'package:dox/src/tools/create_project.dart';
 import 'package:dox/src/tools/create_dto.dart';
+import 'package:dox/src/tools/create_factory.dart';
+import 'package:dox/src/tools/create_seeder.dart';
 import 'package:dox/src/tools/create_serializer.dart';
 import 'package:dox/src/tools/env_tools.dart';
 import 'package:dox/src/tools/generate_key.dart';
@@ -281,8 +283,8 @@ class CommandRegistry {
     // Migration commands
     CommandDefinition(
       command: 'migration:run',
-      helpInfo: 'migration:run',
-      description: 'Run pending migrations',
+      helpInfo: 'migration:run [--seed]',
+      description: 'Run pending migrations, then the seeders with --seed',
       category: CommandCategory.database,
       aliases: ['migrate'],
       function: (args) async {
@@ -329,12 +331,23 @@ class CommandRegistry {
 
     CommandDefinition(
       command: 'migration:refresh',
-      helpInfo: 'migration:refresh',
+      helpInfo: 'migration:refresh [--seed]',
       description: 'Rollback all migrations and run them again',
       category: CommandCategory.database,
       aliases: ['migrate:refresh'],
       function: (args) async {
         await _migration('refresh', args, () => Migrator().refresh());
+      },
+    ),
+
+    CommandDefinition(
+      command: 'migration:fresh',
+      helpInfo: 'migration:fresh [--seed]',
+      description: 'Drop all tables and run all migrations again',
+      category: CommandCategory.database,
+      aliases: ['migrate:fresh'],
+      function: (args) async {
+        await _migration('fresh', args, () => Migrator().fresh());
       },
     ),
 
@@ -366,6 +379,43 @@ class CommandRegistry {
         createMigration(args[0], sql: args.length >= 2 && args[1] == '--sql');
       },
     ),
+
+    CommandDefinition(
+      command: 'make:factory',
+      helpInfo: 'make:factory <model_name>',
+      description: 'Create a model factory in db/factories',
+      category: CommandCategory.database,
+      aliases: ['create:factory'],
+      minArgs: 1,
+      maxArgs: 1,
+      function: (args) async {
+        createFactory(args[0]);
+      },
+    ),
+
+    CommandDefinition(
+      command: 'make:seeder',
+      helpInfo: 'make:seeder <seeder_name>',
+      description: 'Create a seeder in db/seeders (and bin/seed.dart)',
+      category: CommandCategory.database,
+      aliases: ['create:seeder'],
+      minArgs: 1,
+      maxArgs: 1,
+      function: (args) async {
+        createSeeder(args[0]);
+      },
+    ),
+
+    CommandDefinition(
+      command: 'db:seed',
+      helpInfo: 'db:seed [--class=<name>]',
+      description: 'Run DatabaseSeeder, or another seeder with --class',
+      category: CommandCategory.database,
+      maxArgs: 1,
+      function: (args) async {
+        await _seed(args);
+      },
+    ),
   ];
 
   static CommandDefinition? findCommand(String command) {
@@ -389,6 +439,7 @@ class CommandRegistry {
 /// - with `bin/migrate.dart` (Dart migrations): make the registry again,
 ///   then run `dart run bin/migrate.dart <command>`, so the app code runs.
 /// - without it: run the `.sql` migrations here with [direct].
+/// `--seed` in [args] runs the seeders after it, see [_seed].
 /// print the error and set exit code 1 when it fails,
 /// so scripts and CI see the failure.
 Future<void> _migration(
@@ -396,34 +447,60 @@ Future<void> _migration(
   List<String> args,
   Future<void> Function() direct,
 ) async {
+  bool seed = args.contains('--seed');
+  args = args.where((String a) => a != '--seed').toList();
   if (migrateEntryFile().existsSync()) {
     writeMigrationRegistry();
-    String exe = Platform.resolvedExecutable;
-    String dart = exe.split(Platform.pathSeparator).last.startsWith('dart')
-        ? exe
-        : 'dart';
-    Process process = await Process.start(dart, [
-      'run',
-      'bin/migrate.dart',
-      command,
-      ...args,
-    ], mode: ProcessStartMode.inheritStdio);
-    int code = await process.exitCode;
-    if (code != 0) exitCode = code;
-    return;
-  }
-  if (hasDartMigrations()) {
+    int code = await _runScript('bin/migrate.dart', <String>[command, ...args]);
+    if (code != 0) {
+      exitCode = code;
+      return;
+    }
+  } else if (hasDartMigrations()) {
     print(
       'db/migration has Dart migrations, but bin/migrate.dart is missing. '
       'Run `dox make:migration <name>` once to make it, or see the docs.',
     );
     exitCode = 1;
     return;
+  } else {
+    try {
+      await direct();
+    } catch (error) {
+      print(error);
+      exitCode = 1;
+      return;
+    }
   }
-  try {
-    await direct();
-  } catch (error) {
-    print(error);
+  if (seed) await _seed(<String>[]);
+}
+
+/// `dox db:seed`: make `db/seeders/seeders.dart` again, then run
+/// `dart run bin/seed.dart [--class=<name>]`
+Future<void> _seed(List<String> args) async {
+  if (!seedEntryFile().existsSync()) {
+    print(
+      'bin/seed.dart is missing. '
+      'Run `dox make:seeder DatabaseSeeder` once to make it, or see the docs.',
+    );
     exitCode = 1;
+    return;
   }
+  writeSeederRegistry();
+  int code = await _runScript('bin/seed.dart', args);
+  if (code != 0) exitCode = code;
+}
+
+/// `dart run <script> <args>` in the app, with the output on this terminal
+Future<int> _runScript(String script, List<String> args) async {
+  String exe = Platform.resolvedExecutable;
+  String dart = exe.split(Platform.pathSeparator).last.startsWith('dart')
+      ? exe
+      : 'dart';
+  Process process = await Process.start(dart, [
+    'run',
+    script,
+    ...args,
+  ], mode: ProcessStartMode.inheritStdio);
+  return process.exitCode;
 }
