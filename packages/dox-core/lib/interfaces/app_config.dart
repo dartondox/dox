@@ -32,7 +32,17 @@ class AppConfig {
   /// Default: the English messages.
   final MessageResolver? validationMessages;
   final List<dynamic> globalMiddleware;
+
+  /// Routers to register. You can leave it empty: every class that
+  /// extends `Router` is in `lib/container.g.dart`. A router listed here
+  /// comes first, in this order.
   final List<Router> routers;
+
+  /// Fills the container: `registerContainer` from
+  /// `lib/container.g.dart`. Every isolate runs it, so each one has its
+  /// own instances. It also gives the routers, services and model
+  /// binders that `dox_builder` found.
+  final void Function(IocContainer c)? container;
   final CORSConfig cors;
 
   /// cache stores for `Cache()`, see `dox_cache`
@@ -47,6 +57,10 @@ class AppConfig {
   /// Socket.IO on the http port, see `dox_socketio`. Off by default.
   final SocketIoConfig socketIo;
   final LoggerConfig logger;
+
+  /// Services to run at start, in every isolate. You can leave it empty:
+  /// every class that implements `DoxService` is in
+  /// `lib/container.g.dart`. A service listed here runs first.
   final List<DoxService> services;
 
   /// Max size in bytes of a JSON or urlencoded body. Bigger bodies get
@@ -94,6 +108,7 @@ class AppConfig {
     this.validationMessages,
     this.globalMiddleware = const <dynamic>[],
     this.routers = const <Router>[],
+    this.container,
     this.cors = const CORSConfig(),
     this.logger = const LoggerConfig(),
     this.cache = const CacheConfig(

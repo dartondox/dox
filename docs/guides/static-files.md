@@ -46,6 +46,7 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 
+@Inject()
 class StaticController {
   /// GET /assets/{path*}
   /// Built files have a hash in the name, so the browser may keep them
@@ -66,8 +67,6 @@ class StaticController {
     return response(File('public/index.html')).cache(Duration.zero);
   }
 }
-
-StaticController staticController = StaticController();
 ```
 
 `cache(duration)` sets `Cache-Control: max-age=<seconds>`. `Duration.zero` gives `max-age=0`, so the browser asks again each time.
@@ -87,16 +86,17 @@ class WebRouter extends Router {
   @override
   void register() {
     // the SPA: assets with a long cache, every other URL gets index.html
-    Route.get('/assets/{path*}', staticController.asset);
-    Route.get('/', staticController.index);
-    Route.get('/{path*}', staticController.index);
+    Route.get<StaticController>('/assets/{path*}', (StaticController c) => c.asset);
+    Route.get<StaticController>('/', (StaticController c) => c.index);
+    Route.get<StaticController>('/{path*}', (StaticController c) => c.index);
   }
 }
 ```
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
-  /// the SPA catch-all route is in WebRouter, so it comes last
+  /// the SPA catch-all route is in WebRouter, so it must come last.
+  /// Listed routers come first, in this order.
   routers: <Router>[ApiRouter(), WebRouter()],
   // ...
 );

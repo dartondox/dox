@@ -1,6 +1,7 @@
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/http/dtos/upload_image.dto.dart';
 
+@Inject()
 class UploadController {
   /// POST /api/upload (multipart/form-data, field `image`)
   Future<Map<String, String>> store(UploadImage body) async {
@@ -10,5 +11,3 @@ class UploadController {
     return <String, String>{'path': path, 'url': url};
   }
 }
-
-UploadController uploadController = UploadController();

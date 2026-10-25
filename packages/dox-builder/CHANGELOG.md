@@ -1,5 +1,8 @@
 ## Unreleased
 
+- New: `lib/container.g.dart` builder. It finds every `@Inject()` class, every class that extends `Router`, every class that implements `DoxService` and every `@DoxModel` in `lib/`. It writes `registerContainer(IocContainer c)`, which makes each class with its constructor. Constructor parameters come from the container by type. Optional parameters that the container can not give keep their default. Required nullable ones get `null`.
+- The build stops with a clear message for a required parameter the container can not give, for a dependency cycle (it shows the chain, like `A -> B -> A`), and for an abstract or generic `@Inject()` class. Two classes with the same name work: every import has a prefix.
+- OpenAPI: typed routes (`Route.get<C>(path, (C c) => c.method)`) and `Route.resource(path, ControllerClass)` are read too.
 - Generates the query scopes: an extension with one method for each `@Scope()` method, and `globalScopes` for `@Scope(global: true)`.
 - Generates the column casts: `fromMap()` and `columnsToMap()` use the `cast` of `@Column()`. `bool` and enum fields get a cast without `cast`.
 - Run `dart run build_runner build` to get the new code.

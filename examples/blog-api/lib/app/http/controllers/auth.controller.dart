@@ -4,6 +4,7 @@ import 'package:blog/app/models/user/user.model.dart';
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 
+@Inject()
 class AuthController {
   /// POST /api/auth/register
   Future<DoxResponse> register(RegisterUser body) async {
@@ -36,5 +37,3 @@ class AuthController {
     return req.auth?.user<User>();
   }
 }
-
-AuthController authController = AuthController();

@@ -22,7 +22,7 @@ FutureOr<dynamic> _runFrom(DoxRequest doxReq, int start, dynamic result) {
 
   for (int i = start; i <= last; i++) {
     dynamic fn = controllers[i];
-    if (fn is Function) {
+    if (fn is Function || fn is ControllerAction) {
       /// the last function is the controller
       if (i == last) return route.handler!.call(doxReq);
 
@@ -55,7 +55,7 @@ Future<dynamic> _resume(Future<dynamic> pending, int next) async {
 }
 
 /// What Dox gives to one parameter of a controller.
-enum ArgKind { request, dto, path, bound }
+enum ArgKind { request, dto, path, bound, inject }
 
 /// The type of a path param parameter.
 enum PathType { string, integer, decimal, number, boolean }
@@ -68,6 +68,8 @@ class ControllerArg {
     this.pathType = PathType.string,
     this.nullable = false,
     this.param = '',
+    this.value,
+    this.type,
   });
 
   final ArgKind kind;
@@ -83,6 +85,22 @@ class ControllerArg {
 
   /// the name of the path param, also for [ArgKind.bound]
   final String param;
+
+  /// [ArgKind.inject]: the instance from the container, made at start.
+  /// null for a `singleton: false` class: then [type] is made each time.
+  final Object? value;
+
+  /// [ArgKind.inject]: the container type
+  final Type? type;
+}
+
+/// One route param that a binder turns into a value before the
+/// controller runs.
+class RouteParamBinder {
+  const RouteParamBinder(this.param, this.resolve);
+
+  final String param;
+  final RouteBinder<Object> resolve;
 }
 
 /// How to call one controller: what goes in each parameter.
@@ -92,13 +110,23 @@ class ControllerArg {
 /// `AppConfig(dtos: dtos)`. Each request only fills the list and calls
 /// the function.
 class ControllerPlan {
-  ControllerPlan(this.fn, this.args, [this.bindings = const <String>[]]);
+  ControllerPlan(
+    this.fn,
+    this.args, [
+    this.binders = const <RouteParamBinder>[],
+  ]);
 
   final Function fn;
   final List<ControllerArg> args;
 
-  /// route params with a `Route.bind` binder. resolved before [fn] runs.
-  final List<String> bindings;
+  /// route params with a binder (`Route.bind`, or a `@DoxModel` from the
+  /// container). resolved before [fn] runs.
+  final List<RouteParamBinder> binders;
+
+  /// the names of the params in [binders]
+  List<String> get bindings {
+    return <String>[for (RouteParamBinder b in binders) b.param];
+  }
 
   static const Map<String, PathType> _pathTypes = <String, PathType>{
     'String': PathType.string,
@@ -113,21 +141,42 @@ class ControllerPlan {
   static ControllerPlan of(Function fn, RouteData route) {
     String where = '${route.method} ${route.path}';
     List<String> types = ControllerTypes.parameters(fn, where);
-    Map<String, RouteBinding> binders = Route().bindings;
-    List<String> bound = <String>[
+    IocContainer ioc = Dox().ioc;
+    Map<String, RouteBinding> explicit = Route().bindings;
+    List<RouteParamBinder> binders = <RouteParamBinder>[
       for (String param in route.paramNames)
-        if (binders.containsKey(param)) param,
+        if (explicit.containsKey(param))
+          RouteParamBinder(param, explicit[param]!.resolve),
     ];
     // a parameter of a bound type takes its param, the others take the
     // rest of the params in order
     Map<int, String> boundArgs = <int, String>{};
     for (int i = 0; i < types.length; i++) {
       String name = _withoutNull(types[i]);
-      for (String param in bound) {
-        if (binders[param]!.type == name && !boundArgs.containsValue(param)) {
+      for (RouteParamBinder binder in binders) {
+        String param = binder.param;
+        if (explicit[param]!.type == name && !boundArgs.containsValue(param)) {
           boundArgs[i] = param;
           break;
         }
+      }
+    }
+    // a parameter of a @DoxModel type takes the param with its name
+    // (`{user}` for `User`), else the next param in order
+    Map<int, RouteBinder<Object>> models = <int, RouteBinder<Object>>{};
+    for (int i = 0; i < types.length; i++) {
+      if (boundArgs.containsKey(i)) continue;
+      String name = _withoutNull(types[i]);
+      if (_pathTypes.containsKey(name) || name == 'dynamic') continue;
+      RouteBinder<Object>? find = ioc.modelBinderNamed(name);
+      if (find == null) continue;
+      models[i] = find;
+      String param = name[0].toLowerCase() + name.substring(1);
+      if (route.paramNames.contains(param) &&
+          !explicit.containsKey(param) &&
+          !boundArgs.containsValue(param)) {
+        boundArgs[i] = param;
+        binders.add(RouteParamBinder(param, find));
       }
     }
     List<String> params = <String>[
@@ -158,39 +207,63 @@ class ControllerPlan {
       PathType? pathType = name == 'dynamic' || name == 'Object'
           ? PathType.string
           : _pathTypes[name];
-      if (pathType != null) {
+      RouteBinder<Object>? model = models[i];
+      if (pathType != null || model != null) {
         if (paths >= params.length) {
           throw StateError(
             'Route $where: the controller has more path params than the '
             'route has {...} params (${params.length}).',
           );
         }
+        String param = params[paths++];
+        if (model != null) {
+          if (!explicit.containsKey(param)) {
+            binders.add(RouteParamBinder(param, model));
+          }
+          args.add(ControllerArg(ArgKind.bound, param: param));
+          continue;
+        }
         args.add(
           ControllerArg(
             ArgKind.path,
-            pathType: pathType,
+            pathType: pathType!,
             nullable: nullable || name == 'dynamic',
-            param: params[paths++],
+            param: param,
           ),
         );
         continue;
       }
       DtoSchema<Object>? dto = Dox().dtos.ofName(name);
-      if (dto == null) {
-        throw StateError(
-          'Route $where: the controller parameter type $type is not known. '
-          'Use DoxRequest, a @Dto class, a type from Route.bind, or String, '
-          'int, double, num, bool for path params. For a DTO: did you run '
-          '`dart run build_runner build` and set `dtos: dtos` in AppConfig?',
+      if (dto != null) {
+        if (hasDto) {
+          throw StateError(
+            'Route $where: a controller can have one @Dto only.',
+          );
+        }
+        hasDto = true;
+        args.add(ControllerArg(ArgKind.dto, dto: dto));
+        continue;
+      }
+      Type? injected = ioc.typeNamed(name);
+      if (injected != null) {
+        args.add(
+          ControllerArg(
+            ArgKind.inject,
+            type: injected,
+            value: ioc.isShared(injected) ? ioc.getByType(injected) : null,
+          ),
         );
+        continue;
       }
-      if (hasDto) {
-        throw StateError('Route $where: a controller can have one @Dto only.');
-      }
-      hasDto = true;
-      args.add(ControllerArg(ArgKind.dto, dto: dto));
+      throw StateError(
+        'Route $where: the controller parameter type $type is not known. '
+        'Use DoxRequest, a @Dto class, an @Inject class, a @DoxModel, a '
+        'type from Route.bind, or String, int, double, num, bool for path '
+        'params. Did you run `dart run build_runner build` and set '
+        '`dtos: dtos` and `container: registerContainer` in AppConfig?',
+      );
     }
-    return ControllerPlan(fn, args, bound);
+    return ControllerPlan(fn, args, binders);
   }
 
   static String _withoutNull(String type) {
@@ -202,20 +275,19 @@ class ControllerPlan {
   /// Without a DTO or a binder it is sync and gives what the controller
   /// gives.
   FutureOr<dynamic> call(DoxRequest req) {
-    if (bindings.isNotEmpty) return _bindThenCall(req);
+    if (binders.isNotEmpty) return _bindThenCall(req);
     return _call(req);
   }
 
-  /// run the `Route.bind` binders of the route, then the controller.
+  /// run the binders of the route, then the controller.
   /// a binder that gives null answers 404.
   Future<dynamic> _bindThenCall(DoxRequest req) async {
-    Map<String, RouteBinding> binders = Route().bindings;
-    for (String param in bindings) {
-      Object? raw = req.param[param];
+    for (RouteParamBinder binder in binders) {
+      Object? raw = req.param[binder.param];
       if (raw == null) continue; // an optional `{param?}` that is not set
-      Object? value = await binders[param]!.resolve('$raw');
+      Object? value = await binder.resolve('$raw');
       if (value == null) throw NotFoundHttpException();
-      req.boundValues[param] = value;
+      req.boundValues[binder.param] = value;
     }
     return await _call(req);
   }
@@ -237,6 +309,8 @@ class ControllerPlan {
           values[i] = _path(arg, req.param[arg.param]);
         case ArgKind.bound:
           values[i] = req.boundValues[arg.param];
+        case ArgKind.inject:
+          values[i] = arg.value ?? Dox().ioc.getByType(arg.type!);
         case ArgKind.dto:
           dtoArg = arg;
           dtoIndex = i;
@@ -324,6 +398,32 @@ class ControllerTypes {
       );
     }
     return _split(inside);
+  }
+
+  /// For a function like `(UserController c) => c.index`, the method it
+  /// picks, with the controller from [ioc]. Null for a normal controller.
+  /// Dox sees it from the type: the function gives a function.
+  static Function? select(Function fn, IocContainer ioc, String where) {
+    String text = fn.runtimeType.toString();
+    int start = text.indexOf('(');
+    int end = _closing(text, start);
+    if (start != 0 || end < 0) return null;
+    String result = text.substring(end + 1).trim();
+    if (!result.startsWith('=>')) return null;
+    result = result.substring(2).trim();
+    if (!result.startsWith('(') && !result.startsWith('<')) return null;
+    List<String> types = parameters(fn, where);
+    Type? type = types.length == 1 ? ioc.typeNamed(types.first) : null;
+    if (type == null) {
+      throw StateError(
+        'Route $where: the action gives a function. Give it one '
+        'controller parameter from the container, like '
+        '(UserController c) => c.index. Is the controller class marked '
+        'with @Inject()?',
+      );
+    }
+    Object? method = (fn as dynamic)(ioc.getByType(type));
+    return method as Function;
   }
 
   static int _closing(String text, int start) {

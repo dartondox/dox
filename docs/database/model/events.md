@@ -171,7 +171,7 @@ class ObserverService implements DoxService {
 }
 ```
 
-Then add `ObserverService()` to the list in `lib/config/services.dart`.
+Dox finds `ObserverService` by itself, like every `DoxService`. Run `dart run build_runner build` after you add it.
 
 - You can add more than one observer to a model.
 - `Model.forgetObservers<User>()` removes the observers of `User`. `Model.forgetObservers()` removes all.

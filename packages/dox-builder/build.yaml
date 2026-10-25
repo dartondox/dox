@@ -29,3 +29,12 @@ builders:
     build_extensions: { "$lib$": ["dtos.g.dart"] }
     auto_apply: dependents
     build_to: source
+
+  # lib/container.g.dart: @Inject classes, routers, services and model
+  # binders, for AppConfig(container: registerContainer)
+  container:
+    import: "package:dox_builder/dox_builder.dart"
+    builder_factories: ["buildDoxContainer"]
+    build_extensions: { "$lib$": ["container.g.dart"] }
+    auto_apply: dependents
+    build_to: source

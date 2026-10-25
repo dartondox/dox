@@ -140,6 +140,7 @@ nav:
     - the-basic/serializer.md
     - the-basic/errors.md
     - the-basic/controller.md
+    - the-basic/dependency-injection.md
     - the-basic/middleware.md
     - the-basic/validation.md
     - the-basic/validation-rules.md

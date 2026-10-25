@@ -17,24 +17,36 @@ class ApiRouter extends Router {
     Route.get('/ping', (DoxRequest req) => 'pong');
 
     // file upload
-    Route.post('/upload', uploadController.store);
+    Route.post<UploadController>('/upload', (UploadController c) => c.store);
 
     // pagination
-    Route.get('/users', userController.index);
-    Route.get('/users/{id}', userController.show);
-    Route.delete('/users/{id}', userController.destroy);
+    Route.get<UserController>('/users', (UserController c) => c.index);
+    Route.get<UserController>('/users/{id}', (UserController c) => c.show);
+    Route.delete<UserController>(
+      '/users/{id}',
+      (UserController c) => c.destroy,
+    );
 
     // jwt auth
-    Route.post('/auth/register', authController.register);
-    Route.post('/auth/login', authController.login);
+    Route.post<AuthController>(
+      '/auth/register',
+      (AuthController c) => c.register,
+    );
+    Route.post<AuthController>('/auth/login', (AuthController c) => c.login);
     Route.middleware(<dynamic>[AuthMiddleware()], () {
-      Route.get('/auth/me', authController.me);
-      Route.post('/auth/logout', authController.logout);
+      Route.get<AuthController>('/auth/me', (AuthController c) => c.me);
+      Route.post<AuthController>(
+        '/auth/logout',
+        (AuthController c) => c.logout,
+      );
     });
 
     // background work
-    Route.post('/reports', reportController.store);
-    Route.get('/primes/{limit}', reportController.primes);
+    Route.post<ReportController>('/reports', (ReportController c) => c.store);
+    Route.get<ReportController>(
+      '/primes/{limit}',
+      (ReportController c) => c.primes,
+    );
 
     // custom errors: remove after the check
     Route.get('/boom', (DoxRequest req) => throw StateError('boom'));

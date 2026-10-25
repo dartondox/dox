@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 
+@Inject()
 class StaticController {
   /// GET /assets/{path*}
   /// Built files have a hash in the name, so the browser may keep them
@@ -22,5 +23,3 @@ class StaticController {
     return response(File('public/index.html')).cache(Duration.zero);
   }
 }
-
-StaticController staticController = StaticController();

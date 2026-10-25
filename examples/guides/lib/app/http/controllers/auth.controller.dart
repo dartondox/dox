@@ -4,6 +4,7 @@ import 'package:my_app/app/http/dtos/login_user.dto.dart';
 import 'package:my_app/app/http/dtos/register_user.dto.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 
+@Inject()
 class AuthController {
   /// POST /api/auth/register
   Future<Map<String, dynamic>> register(RegisterUser body) async {
@@ -42,5 +43,3 @@ class AuthController {
     return <String, String>{'message': 'Delete the token on the client'};
   }
 }
-
-AuthController authController = AuthController();

@@ -38,25 +38,20 @@ class ApiRouter extends Router {
 }
 ```
 
-Add each router to `routers` in `lib/config/app.dart`:
-
-```dart title="lib/config/app.dart"
-AppConfig appConfig = AppConfig(
-  routers: <Router>[WebRouter(), ApiRouter()],
-  // ...
-);
-```
+Dox finds every `Router` class by itself. It is in `lib/container.g.dart` after `dart run build_runner build`.
+To pick the order of routers, list them in `routers:` of `AppConfig`.
+See [Dependency injection: routers and services](dependency-injection.md#routers-and-services).
 
 The leading `/` in a path is optional. `'ping'` and `'/ping'` are the same route.
 
 ## Route methods
 
 ```dart
-Route.get('/blogs', controller.index);
-Route.post('/blogs', controller.store);
-Route.put('/blogs/{id}', controller.update);
-Route.patch('/blogs/{id}', controller.update);
-Route.delete('/blogs/{id}', controller.destroy);
+Route.get<BlogController>('/blogs', (BlogController c) => c.index);
+Route.post<BlogController>('/blogs', (BlogController c) => c.store);
+Route.put<BlogController>('/blogs/{id}', (BlogController c) => c.update);
+Route.patch<BlogController>('/blogs/{id}', (BlogController c) => c.update);
+Route.delete<BlogController>('/blogs/{id}', (BlogController c) => c.destroy);
 ```
 
 !!! info
@@ -73,10 +68,10 @@ The second argument is the code that answers the request. It can be:
 // a function
 Route.get('/ping', (DoxRequest req) => 'pong');
 
-// a controller method
-WebController webController = WebController();
-Route.get('/ping', webController.pong);
+// a controller method. The controller comes from the container.
+Route.get<WebController>('/ping', (WebController c) => c.pong);
 
+@Inject()
 class WebController {
   String pong(DoxRequest req) {
     return 'pong';
@@ -84,10 +79,15 @@ class WebController {
 }
 
 // a list: middleware first, the controller last
-Route.get('/ping', <dynamic>[LoggerMiddleware(), webController.pong]);
+Route.get<WebController>('/ping', <dynamic>[
+  LoggerMiddleware(),
+  (WebController c) => c.pong,
+]);
 ```
 
 In a list, the last item is the controller. The items before it are [middleware](middleware.md).
+`(WebController c) => c.pong` picks the method. Dox calls it once per isolate, at start.
+See [Dependency injection](dependency-injection.md).
 
 See [Controller](controller.md) for the parameters a handler can ask for.
 
@@ -166,8 +166,10 @@ To turn CORS on or off for some routes, see [CORS](../security/cors.md).
 One line makes the usual CRUD routes for a controller.
 
 ```dart
-Route.resource('blogs', BlogController());
+Route.resource('blogs', BlogController);
 ```
+
+`BlogController` is a class from the container. A controller object works too: `Route.resource('blogs', BlogController())`.
 
 | Method | Path | Controller method | Route name |
 | --- | --- | --- | --- |
@@ -181,7 +183,7 @@ Route.resource('blogs', BlogController());
 
 The name comes from the path: `/` becomes `.`, and `{params}` are left out.
 So `Route.resource('users/{user}/posts', ...)` gives `users.posts.index`.
-Pass `name:` to pick another one: `Route.resource('blogs', BlogController(), name: 'posts')`.
+Pass `name:` to pick another one: `Route.resource('blogs', BlogController, name: 'posts')`.
 
 A method that the controller does not have is skipped. No route is made for it.
 Any other error from the controller is not hidden. It stops the app at start, so you see it.
@@ -249,6 +251,10 @@ Route.get('/users/{user}/posts/{page}', (User user, int page) {
 ```
 
 The binder runs after the middleware, so an auth middleware can stop the request before any database call.
+
+A `@DoxModel` class does not need `Route.bind`. Dox makes a binder for it in `lib/container.g.dart`.
+See [Dependency injection: route model binding](dependency-injection.md#route-model-binding).
+`Route.bind` wins when both exist.
 
 ## Serve storage files
 

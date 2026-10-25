@@ -23,8 +23,11 @@ class WebRouter extends Router {
     Route.files('static', disk: 'public', signed: false);
 
     // the SPA: assets with a long cache, every other URL gets index.html
-    Route.get('/assets/{path*}', staticController.asset);
-    Route.get('/', staticController.index);
-    Route.get('/{path*}', staticController.index);
+    Route.get<StaticController>(
+      '/assets/{path*}',
+      (StaticController c) => c.asset,
+    );
+    Route.get<StaticController>('/', (StaticController c) => c.index);
+    Route.get<StaticController>('/{path*}', (StaticController c) => c.index);
   }
 }

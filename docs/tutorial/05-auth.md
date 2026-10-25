@@ -154,20 +154,8 @@ class AuthService implements DoxService {
 }
 ```
 
-Add it to the service list:
-
-```dart title="lib/config/services.dart"
-import 'package:blog/services/auth_service.dart';
-import 'package:blog/services/orm_service.dart';
-import 'package:dox_core/dox_core.dart';
-
-/// Services to register on dox
-/// -------------------------------
-/// Since dox run on multi thread isolate, we need to register
-/// below extra services to dox so that dox can
-/// register again on new isolate.
-List<DoxService> services = <DoxService>[ORMService(), AuthService()];
-```
+Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/container.g.dart`.
+You do not add it to a list.
 
 ## 5. Write the auth controller
 
@@ -178,6 +166,7 @@ import 'package:blog/app/models/user/user.model.dart';
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 
+@Inject()
 class AuthController {
   /// POST /api/auth/register
   Future<DoxResponse> register(RegisterUser body) async {
@@ -212,8 +201,6 @@ class AuthController {
     return req.auth?.user<User>();
   }
 }
-
-AuthController authController = AuthController();
 ```
 
 - `Hash.make()` makes a bcrypt hash. Never save a plain password.
@@ -240,21 +227,21 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    Route.get('/ping', apiController.pong);
+    Route.get<ApiController>('/ping', (ApiController c) => c.pong);
 
     // Anyone can read posts.
-    Route.get('/posts', postController.index);
-    Route.get('/posts/{id}', postController.show);
+    Route.get<PostController>('/posts', (PostController c) => c.index);
+    Route.get<PostController>('/posts/{id}', (PostController c) => c.show);
 
     // Register and log in.
-    Route.post('/auth/register', authController.register);
-    Route.post('/auth/login', authController.login);
+    Route.post<AuthController>('/auth/register', (AuthController c) => c.register);
+    Route.post<AuthController>('/auth/login', (AuthController c) => c.login);
 
     // Only a logged in user can write posts.
     Route.middleware(<dynamic>[AuthMiddleware()], () {
-      Route.get('/auth/user', authController.user);
-      Route.post('/posts', postController.store);
-      Route.put('/posts/{id}', postController.update);
+      Route.get<AuthController>('/auth/user', (AuthController c) => c.user);
+      Route.post<PostController>('/posts', (PostController c) => c.store);
+      Route.put<PostController>('/posts/{id}', (PostController c) => c.update);
     });
   }
 }

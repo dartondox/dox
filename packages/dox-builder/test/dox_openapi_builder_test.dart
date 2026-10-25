@@ -35,7 +35,7 @@ class BelongsTo {
 class Router {}
 class Route {
   static void group(String prefix, Function() callback) {}
-  static Route get(String path, dynamic c) => Route();
+  static Route get<T extends Object>(String path, dynamic c) => Route();
   static Route post(String path, dynamic c, {Object? body}) => Route();
   static Route resource(String path, dynamic c) => Route();
 }
@@ -190,6 +190,9 @@ class ApiRoutes extends Router {
     Route.group('blogs', () {
       Route.get('all', TeamController().index);
     });
+    Route.get<TeamController>('typed', (TeamController c) => c.index);
+    Route.get<TeamController>('untyped', (c) => c.index);
+    Route.resource('teams', TeamController);
   }
 }
 ''';
@@ -285,6 +288,31 @@ void main() {
         contains(
           _flat(
             "OpenApiRouteBinding('GET', 'api/teams/', 'TeamController.index')",
+          ),
+        ),
+      );
+      // typed routes and a resource of a controller class
+      expect(
+        out,
+        contains(
+          _flat(
+            "OpenApiRouteBinding('GET', 'api/typed', 'TeamController.index')",
+          ),
+        ),
+      );
+      expect(
+        out,
+        contains(
+          _flat(
+            "OpenApiRouteBinding('GET', 'api/untyped', 'TeamController.index')",
+          ),
+        ),
+      );
+      expect(
+        out,
+        contains(
+          _flat(
+            "OpenApiRouteBinding('GET', 'api/teams', 'TeamController.index')",
           ),
         ),
       );

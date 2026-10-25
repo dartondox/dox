@@ -15,6 +15,7 @@ Replace the file with this. It keeps only `index`, `store` and `show`:
 import 'package:blog/app/models/post/post.model.dart';
 import 'package:dox_core/dox_core.dart';
 
+@Inject()
 class PostController {
   /// GET /api/posts
   Future<List<Post>> index(DoxRequest req) async {
@@ -39,12 +40,12 @@ class PostController {
     return post;
   }
 }
-
-PostController postController = PostController();
 ```
 
 How it works:
 
+- `@Inject()` puts the controller in the container. Dox makes it for you. `dox s` runs `build_runner`, which adds it to `lib/container.g.dart`.
+  A new project already has `container: registerContainer` in `lib/config/app.dart`, so you change nothing there.
 - A controller returns a model or a list of models. Dox sends it as JSON.
 - `response(post).statusCode(201)` sets the status code.
 - `show(int id)` gets the `{id}` from the URL. `/api/posts/abc` answers `404`, because `abc` is not an `int`.
@@ -66,12 +67,15 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    Route.get('/ping', apiController.pong);
+    Route.get<ApiController>('/ping', (ApiController c) => c.pong);
 
-    Route.resource('posts', postController);
+    Route.resource('posts', PostController);
   }
 }
 ```
+
+`PostController` is the class. Dox gets the controller from the container.
+You do not add the router to a list. Dox finds every `Router` class by itself.
 
 `Route.resource` makes one route for each method the controller has:
 

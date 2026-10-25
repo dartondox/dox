@@ -25,13 +25,14 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `routers` | `List<Router>` | `[]` | The router classes that register routes. |
+| `container` | `void Function(IocContainer)?` | `null` | Fills the container: `registerContainer` from `lib/container.g.dart`. Every isolate runs it. It also gives the routers, services and model binders. See [Dependency injection](../the-basic/dependency-injection.md). |
+| `routers` | `List<Router>` | `[]` | Routers to register first, in this order. Every other `Router` class comes from `container`. |
 | `globalMiddleware` | `List<dynamic>` | `[]` | Middleware that runs on every route. A function or an `IDoxMiddleware`. |
 | `dtos` | `List<DtoSchema<Object>>` | `[]` | Every DTO of the app: `dtos` from `lib/dtos.g.dart`. Dox finds the DTO of a controller parameter and of `req.validate<T>()` with it. |
 | `validationMessages` | `MessageResolver?` | `null` (English messages) | Messages for validation errors, for example in other languages. |
 | `responseHandler` | `ResponseHandlerInterface?` | `null` | A class with `DoxResponse handle(DoxResponse res)`. It sees every response before it is sent. |
 | `exceptionHandler` | `ExceptionHandler` | `ExceptionHandler()` | Reports every unhandled error and turns it into a response. The default logs the error with `Logger.warn` and the stack with `Logger.danger`. See [Error handling](../the-basic/errors.md). |
-| `services` | `List<DoxService>` | `[]` | Classes with a `setup()` method. Dox runs them in every isolate at start. The ORM and auth are set up here. |
+| `services` | `List<DoxService>` | `[]` | Services to run first, in this order. Every other `DoxService` class comes from `container`. Dox runs them in every isolate at start. |
 
 ## Sub configs
 
@@ -256,11 +257,9 @@ import 'package:dox_core/dox_core.dart';
 import 'package:my_app/config/cache.dart';
 import 'package:my_app/config/cors.dart';
 import 'package:my_app/config/logger.dart';
-import 'package:my_app/config/services.dart';
 import 'package:my_app/config/storage.dart';
-import 'package:my_app/routes/api.dart';
-import 'package:my_app/routes/web.dart';
 import 'package:my_app/config/env.dart';
+import 'package:my_app/container.g.dart';
 
 AppConfig appConfig = AppConfig(
   /// Changing the key makes old cookies and encrypted data unreadable.
@@ -270,11 +269,10 @@ AppConfig appConfig = AppConfig(
   globalMiddleware: <dynamic>[
     LogMiddleware(enabled: env.appEnv != 'production'),
   ],
-  routers: <Router>[WebRouter(), ApiRouter()],
+  container: registerContainer,
   cache: cache,
   storage: storage,
   cors: cors,
-  services: services,
   logger: logger,
 );
 ```
@@ -390,20 +388,13 @@ CORSConfig cors = CORSConfig(
 );
 ```
 
-```dart title="lib/config/services.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:my_app/services/orm_service.dart';
-
-/// Dox runs these again in every new isolate.
-List<DoxService> services = <DoxService>[ORMService()];
-```
-
 ```dart title="lib/services/orm_service.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart';
 import 'package:my_app/config/database.dart';
 
-/// No database? Delete this file and remove it from config/services.dart.
+/// Dox finds it by itself and runs it in every isolate.
+/// No database? Delete this file.
 class ORMService implements DoxService, DoxShutdown {
   @override
   Future<void> setup() async {

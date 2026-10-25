@@ -6,13 +6,13 @@ String _getSample(String className, String filename) {
   return '''
 import 'package:dox_core/dox_core.dart';
 
+/// Route: Route.get<${className}Controller>('path', (${className}Controller c) => c.index);
+@Inject()
 class ${className}Controller {
   Future<dynamic> index(DoxRequest req) async {
     /// write your logic here
   }
 }
-
-${className}Controller ${toPascalWithFirstLetterLowerCase(className)}Controller = ${className}Controller();
 ''';
 }
 
@@ -20,6 +20,8 @@ String _getResourceSample(String className, String filename) {
   return '''
 import 'package:dox_core/dox_core.dart';
 
+/// Route: Route.resource('path', ${className}Controller);
+@Inject()
 class ${className}Controller {
   /// GET /resource
   Future<dynamic> index(DoxRequest req) async {}
@@ -42,8 +44,6 @@ class ${className}Controller {
   /// DELETE /resource/{id}
   Future<dynamic> destroy(DoxRequest req, int id) async {}
 }
-
-${className}Controller ${toPascalWithFirstLetterLowerCase(className)}Controller = ${className}Controller();
 ''';
 }
 
@@ -66,5 +66,6 @@ bool createController(String filename, bool resource) {
   file.createSync(recursive: true);
   file.writeAsStringSync(sample, mode: FileMode.write);
   print('\x1B[32m$controllerName created successfully.\x1B[0m');
+  print('Run `dart run build_runner build` to add it to the container.');
   return true;
 }

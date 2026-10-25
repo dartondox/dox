@@ -13,24 +13,29 @@ class ApiRouter extends Router {
 
   @override
   void register() {
-    ApiController api = ApiController();
-    BlogController blogController = BlogController();
-    AuthController authController = AuthController();
-
-    Route.get('ping', <dynamic>[api.pong]);
+    Route.get<ApiController>('ping', (ApiController c) => c.pong);
 
     // Anyone can read blogs. Only a logged in user can change them.
-    Route.get('blogs', blogController.index);
-    Route.get('blogs/{id}', blogController.show);
+    Route.get<BlogController>('blogs', (BlogController c) => c.index);
+    Route.get<BlogController>('blogs/{id}', (BlogController c) => c.show);
     Route.middleware(<dynamic>[AuthMiddleware()], () {
-      Route.post('blogs', blogController.store);
-      Route.put('blogs/{id}', blogController.update);
-      Route.patch('blogs/{id}', blogController.update);
-      Route.delete('blogs/{id}', blogController.destroy);
+      Route.post<BlogController>('blogs', (BlogController c) => c.store);
+      Route.put<BlogController>('blogs/{id}', (BlogController c) => c.update);
+      Route.patch<BlogController>('blogs/{id}', (BlogController c) => c.update);
+      Route.delete<BlogController>(
+        'blogs/{id}',
+        (BlogController c) => c.destroy,
+      );
     });
 
-    Route.post('/auth/login', authController.login);
-    Route.post('/auth/register', authController.register);
-    Route.get('/auth/user', <dynamic>[AuthMiddleware(), authController.user]);
+    Route.post<AuthController>('/auth/login', (AuthController c) => c.login);
+    Route.post<AuthController>(
+      '/auth/register',
+      (AuthController c) => c.register,
+    );
+    Route.get<AuthController>('/auth/user', <dynamic>[
+      AuthMiddleware(),
+      (AuthController c) => c.user,
+    ]);
   }
 }

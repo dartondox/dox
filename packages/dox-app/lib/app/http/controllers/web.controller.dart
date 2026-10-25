@@ -1,6 +1,7 @@
 import 'package:dox_app/config/redis.dart';
 import 'package:dox_core/dox_core.dart';
 
+@Inject()
 class WebController {
   String pong(DoxRequest req) {
     return 'pong';

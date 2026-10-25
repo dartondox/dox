@@ -74,12 +74,10 @@ class OpenApiRouteReader {
     );
   }
 
-  /// the controller of the route: the last item, when it is a function
+  /// the controller of the route: the last function, or the controller
+  /// method of a typed route
   Object? _handler(RouteData route) {
-    Object? controllers = route.controllers;
-    if (controllers is! List || controllers.isEmpty) return null;
-    Object? last = controllers.last;
-    return last is Function ? last : null;
+    return route.action;
   }
 
   OpenApiOperation? _find(RouteData route, Object handler) {

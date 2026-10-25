@@ -123,7 +123,7 @@ Turn CORS off for such routes to send fewer headers:
 
 ```dart
 Route.disabledCors(() {
-  Route.post('/webhooks/stripe', webhookController.handle);
+  Route.post<WebhookController>('/webhooks/stripe', (WebhookController c) => c.handle);
 });
 ```
 
