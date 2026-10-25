@@ -35,6 +35,7 @@ export 'exception/internal_error_exception.dart';
 export 'exception/not_found_exception.dart';
 export 'exception/payload_too_large_exception.dart';
 export 'exception/query_exception.dart';
+export 'exception/token_mismatch_exception.dart';
 export 'exception/too_many_requests_exception.dart';
 export 'exception/validation_exception.dart';
 
@@ -50,6 +51,7 @@ export 'http/response/serializer.dart';
 /// interfaces
 export 'interfaces/app_config.dart';
 export 'interfaces/dox_service.dart';
+export 'interfaces/next_middleware.dart';
 export 'interfaces/response_handler_interface.dart';
 export 'interfaces/router.dart';
 
@@ -67,6 +69,11 @@ export 'middleware/security_headers.dart';
 
 /// Router
 export 'router/route.dart';
+
+/// session
+export 'session/session.dart';
+export 'session/session_config.dart';
+export 'session/session_middleware.dart';
 
 /// storage
 export 'storage/storage.dart';

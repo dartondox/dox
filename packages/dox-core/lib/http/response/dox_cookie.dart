@@ -20,6 +20,9 @@ class DoxCookie {
   DateTime? expires;
   Duration maxAge;
 
+  /// `SameSite` of the cookie, like `SameSite.lax`. null sends none.
+  SameSite? sameSite;
+
   DoxCookie(
     this.key,
     this.value, {
@@ -30,6 +33,7 @@ class DoxCookie {
     this.secure,
     this.expires,
     this.maxAge = const Duration(hours: 1),
+    this.sameSite,
   });
 
   /// set expire the cookie
@@ -45,6 +49,7 @@ class DoxCookie {
     cookie.httpOnly = httpOnly;
     cookie.secure = secure ?? https;
     cookie.expires = expires;
+    cookie.sameSite = sameSite;
     return cookie.toString();
   }
 
@@ -67,6 +72,7 @@ class DoxCookie {
     cookie.httpOnly = httpOnly;
     cookie.secure = secure ?? https;
     cookie.expires = expires;
+    cookie.sameSite = sameSite;
     return cookie.toString();
   }
 }

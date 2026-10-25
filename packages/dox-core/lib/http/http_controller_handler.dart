@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/http/http_error_handler.dart';
 import 'package:dox_core/router/route_data.dart';
 
 /// Handle middleware and controllers
@@ -12,6 +13,9 @@ Future<dynamic> middlewareAndControllerHandler(DoxRequest doxReq) async {
 /// a plain value, so a simple route needs no Future. At the first Future
 /// it waits, then goes on with the next item.
 FutureOr<dynamic> runMiddlewareAndController(DoxRequest doxReq) {
+  /// a route with a `next` middleware takes the slower async chain.
+  /// other routes never pay for it.
+  if (doxReq.route.usesNext) return _chain(doxReq, 0);
   return _runFrom(doxReq, 0, null);
 }
 
@@ -52,6 +56,57 @@ Future<dynamic> _resume(Future<dynamic> pending, int next) async {
   dynamic result = await pending;
   if (result is DoxRequest) return await _runFrom(result, next, result);
   return result;
+}
+
+/// Run the items from [start] for a route with a `next` middleware
+/// ([IDoxNextMiddleware] or a [NextMiddlewareFunction]). Before-only
+/// middleware run like in [_runFrom]. A next middleware gets a [Next]
+/// that runs the items after it. The result is always a [DoxResponse],
+/// so the middleware can change its status and headers. An error is
+/// turned into its response here, so the middleware sees that too.
+Future<DoxResponse> _chain(DoxRequest req, int start) async {
+  try {
+    RouteData route = req.route;
+    List<dynamic> items = route.controllers;
+    int last = items.length - 1;
+    for (int i = start; i <= last; i++) {
+      dynamic fn = items[i];
+      int after = i + 1;
+      dynamic result;
+      if (fn is IDoxNextMiddleware) {
+        DoxRequest current = req;
+        result = await fn.handle(req, () => _chain(current, after));
+        return asResponse(result);
+      }
+      if (i < last && fn is NextMiddlewareFunction) {
+        DoxRequest current = req;
+        result = await fn(req, () => _chain(current, after));
+        return asResponse(result);
+      }
+      if (fn is Function || fn is ControllerAction) {
+        if (i == last) return asResponse(await route.handler!.call(req));
+        result = fn(req);
+      } else if (fn is IDoxMiddleware) {
+        result = fn.handle(req);
+      }
+      if (result is Future<dynamic>) result = await result;
+      if (result is! DoxRequest) return asResponse(result);
+      req = result;
+    }
+    return asResponse(null);
+  } catch (error, stackTrace) {
+    return asResponse(renderError(req.httpRequest, error, stackTrace));
+  }
+}
+
+/// [value] as a [DoxResponse]. An http exception becomes its JSON body
+/// with its status, so a middleware can still change the status.
+DoxResponse asResponse(dynamic value) {
+  if (value is DoxResponse) return value;
+  if (value is IHttpException) {
+    return DoxResponse(value.toResponse()).statusCode(value.code);
+  }
+  return DoxResponse(value);
 }
 
 /// What Dox gives to one parameter of a controller.

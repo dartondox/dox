@@ -58,6 +58,9 @@ class AppConfig {
   final SocketIoConfig socketIo;
   final LoggerConfig logger;
 
+  /// session settings for `SessionMiddleware`. Cookie driver by default.
+  final SessionConfig session;
+
   /// Services to run at start, in every isolate. You can leave it empty:
   /// every class that implements `DoxService` is in
   /// `lib/generated/container.g.dart`. A service listed here runs first.
@@ -119,6 +122,7 @@ class AppConfig {
       },
     ),
     this.storage = const StorageConfig(),
+    this.session = const SessionConfig(),
     this.openApi = const OpenApiConfig(),
     this.socketIo = const SocketIoConfig(),
     this.exceptionHandler = const ExceptionHandler(),

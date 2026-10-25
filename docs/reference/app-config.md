@@ -45,6 +45,7 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `cors` | `CORSConfig` | `CORSConfig()` | CORS headers. See [CORSConfig](#corsconfig). |
 | `logger` | `LoggerConfig` | `LoggerConfig()` | The `Logger` output. See [LoggerConfig](#loggerconfig). |
 | `cache` | `CacheConfig` | `file` store in `storage/cache`, plus a `memory` store | Cache stores for `Cache()`. See [CacheConfig](#cacheconfig). |
+| `session` | `SessionConfig` | `cookie` driver, cookie `dox_session`, 2 hours | Settings for `SessionMiddleware`. See [Session](../the-basic/session.md#config). |
 | `storage` | `StorageConfig` | `local` disk with root `storage` | Storage disks for `Storage()`. See [StorageConfig](#storageconfig). |
 | `openApi` | `OpenApiConfig` | `OpenApiConfig()` | `/docs`, `/openapi.json` and `/openapi.yaml`. See [OpenApiConfig](#openapiconfig). |
 | `socketIo` | `SocketIoConfig` | `SocketIoConfig()` (off) | Socket.IO on the HTTP port. See [SocketIoConfig](#socketioconfig). |

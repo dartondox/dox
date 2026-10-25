@@ -1,3 +1,14 @@
+## Unreleased
+
+- New: middleware that runs after the controller. Implement `IDoxNextMiddleware` (`handle(DoxRequest req, Next next)`), or use a function `(DoxRequest req, Next next)`. `await next()` runs the rest of the middleware and the controller and gives a `DoxResponse`, so the code after it can change the status, headers and cookies. A thrown error comes back as its error response, so the after part still runs. Before-only middleware work as before. A route with no `next` middleware takes the same fast path as before.
+- New: `DoxResponse.status` and `DoxResponse.headers` getters.
+- New: `redirect(url, status: 302)` and `back(req, fallback: '/')` helpers.
+- New: sessions. `SessionMiddleware` gives each request `req.session` with `get`, `put`, `has`, `forget`, `all`, `flush`, `pull`, `flash`, `reflash`, `keep`, `regenerate`, `invalidate` and `token`. `AppConfig(session: SessionConfig(...))` picks the `cookie` driver (all data in a cookie, encrypted with AES-GCM, 4 KB limit) or the `cache` driver (a random id in the cookie, the data in a `dox_cache` store like `redis`). The cookie is `HttpOnly` and `SameSite=Lax` by default. The cookie driver reads the session on first use. The session is saved, and the cookie sent, only when it changed.
+- New: `CsrfMiddleware`. `POST`, `PUT`, `PATCH` and `DELETE` requests must send the session token in `_token`, `X-CSRF-TOKEN` or `X-XSRF-TOKEN`, else `419` (`TokenMismatchException`). It sets an `XSRF-TOKEN` cookie that axios and Inertia send back for you. `except:` skips paths like `/api/*`.
+- New: a validation error on a request with a session that does not want JSON (a form post, an Inertia request) flashes `errors` and the old input (never password fields), and redirects back. JSON requests still get `422`. Read them with `req.session.errors` and `req.session.old('email')`. `req.session.flashErrors(...)` does the same by hand. New `req.expectsJson()` and `req.hasSession`.
+- New: `DoxCookie(sameSite: SameSite.lax)`.
+- New: `TestResponse.cookies` and `DoxTestClient.withCookies(...)`, to go on with a session in tests.
+
 ## 3.0.0-alpha.10
 
 - Version bump only, to match the other packages.
