@@ -29,8 +29,15 @@ class OpenApiRouteReader {
   /// true when a route needs the [validationError] schema
   bool usesValidationError = false;
 
-  /// true when a route got [bearerAuth] by default
-  bool usesBearerAuth = false;
+  /// login schemes the routes use, from `@Security` and the
+  /// `...AuthMiddleware` name rule
+  final Map<String, SecurityScheme> usedSchemes = <String, SecurityScheme>{};
+
+  /// [bearerAuth] of the name rule. It says nothing about the token
+  /// format, because the middleware may not use JWT.
+  static const SecurityScheme _plainBearer = SecurityScheme.raw(
+    <String, dynamic>{'type': 'http', 'scheme': 'bearer'},
+  );
 
   final Set<String> _operationIds = <String>{};
 
@@ -169,15 +176,22 @@ class OpenApiRouteReader {
     return schema;
   }
 
+  /// security of the route, from its middleware classes. First
+  /// [OpenApiConfig.securityByMiddleware], then `@Security` on the class,
+  /// then a class name that ends with `AuthMiddleware` gets [bearerAuth].
   List<Map<String, List<String>>>? _security(List<String> middleware) {
     List<Map<String, List<String>>> list = <Map<String, List<String>>>[];
     for (String name in middleware) {
       List<Map<String, List<String>>>? custom =
           config.securityByMiddleware[name];
+      OpenApiSecurity? annotated = config.registry.security[name];
       if (custom != null) {
         list.addAll(custom);
+      } else if (annotated != null) {
+        usedSchemes[annotated.name] = SecurityScheme.raw(annotated.scheme);
+        list.add(<String, List<String>>{annotated.name: <String>[]});
       } else if (name.endsWith('AuthMiddleware')) {
-        usesBearerAuth = true;
+        usedSchemes[bearerAuth] = _plainBearer;
         list.add(<String, List<String>>{bearerAuth: <String>[]});
       }
     }

@@ -11,6 +11,7 @@ export 'package:dox_openapi/dox_openapi.dart'
         OpenApiOperation,
         OpenApiRegistry,
         OpenApiRouteBinding,
+        OpenApiSecurity,
         ResponseDoc,
         ScalarOptions,
         ScalarTheme,

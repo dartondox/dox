@@ -16,6 +16,8 @@ The code reads env vars in three ways:
 
 ## Read by the framework
 
+If `APP_ENV` is not set, Dox treats the app as production: `/docs` is off and error details are hidden. Set `APP_ENV=development` in your `.env` and in CI.
+
 | Variable | Who reads it | Default | Meaning | Example |
 | --- | --- | --- | --- | --- |
 | `APP_ENV` | `dox_core` (`Dox().checkAppKey()`, `OpenApiConfig.isEnabled`) | empty | Any value except `development`, `local` or `test` (also empty) makes a bad `APP_KEY` a startup error: missing, not exactly 32 characters, or a public sample key. In `development`, `local` and `test` it is only a warning. `development` or `local` turn the `/docs` routes on when `openApi.enabled` is `null`. Read with `Env.get`. | `APP_ENV=production` |
@@ -40,7 +42,7 @@ A new project (`dox create`) reads these keys through its typed env class, `lib/
 | Variable | Getter | Type | Default | Used for |
 | --- | --- | --- | --- | --- |
 | `APP_NAME` | `appName` | `String` | `dox` | `LoggerConfig.name`. |
-| `APP_ENV` | `appEnv` | `String` | `development` | `development`, `staging` or `production`. `env.isDevelopment` is `true` for `development`. It turns on `prettyPrint` of the logger and the query log of the database. Also read by the framework (see above). |
+| `APP_ENV` | `appEnv` | `String` | `production` | `development`, `staging` or `production`. `env.isDevelopment` is `true` for `development`. It turns on `prettyPrint` of the logger and the query log of the database. Also read by the framework (see above). |
 | `APP_PORT` | `appPort` | `int` | `3000` | `AppConfig.serverPort`. When `APP_PORT` is not set, Dox listens on `PORT` if the env has it. |
 | `APP_KEY` | `appKey` | `String` | required | `AppConfig.appKey`. It must be exactly 32 characters. Run `dox key:generate` for one. The app stops at start when it is missing, has another length, or is a public sample key (only a warning in `development`, `local` and `test`). |
 | `APP_TOTAL_ISOLATE` | `appTotalIsolate` | `int?` | not set: one per CPU core | `AppConfig.totalIsolate`. |

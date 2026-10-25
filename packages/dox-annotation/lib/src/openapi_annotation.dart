@@ -92,6 +92,46 @@ class ApiIgnore {
   const ApiIgnore();
 }
 
+/// How to log in to the routes that use this middleware class.
+///
+/// Put it above the middleware class. Every route with this middleware
+/// gets the scheme in the docs.
+///
+/// ```
+/// @Security.bearer(format: 'API key')
+/// class ApiKeyAuthMiddleware implements IDoxMiddleware { ... }
+///
+/// @Security.apiKey(header: 'X-API-Key')
+/// class HeaderKeyMiddleware implements IDoxMiddleware { ... }
+/// ```
+/// [scheme] is the name under `components/securitySchemes`. The default
+/// is the class name without `Middleware`, with a small first letter:
+/// `ApiKeyAuthMiddleware` gives `apiKeyAuth`.
+class Security {
+  /// `bearer` or `apiKey`.
+  final String type;
+
+  /// For [Security.bearer]: what the token is, like `JWT` or `API key`.
+  final String? format;
+
+  /// For [Security.apiKey]: the header that holds the key.
+  final String? header;
+
+  /// Name of the scheme in the docs.
+  final String? scheme;
+
+  /// A token in `Authorization: Bearer <token>`. Leave [format] out when
+  /// the token has no known format.
+  const Security.bearer({this.format, this.scheme})
+    : type = 'bearer',
+      header = null;
+
+  /// A key in its own header, like `X-API-Key: <key>`.
+  const Security.apiKey({String this.header = 'X-API-Key', this.scheme})
+    : type = 'apiKey',
+      format = null;
+}
+
 // Lower case names for the same annotations, so `@summary('Get users')`
 // works. `response` is not here: it is the `response()` helper of
 // dox_core, so use `@Response(...)`.

@@ -15,6 +15,32 @@ class AuthMiddleware implements IDoxMiddleware {
   dynamic handle(IDoxRequest req) => req;
 }
 
+/// a bearer API key, not a JWT. `@Security` wins over the name rule.
+@Security.bearer(format: 'API key')
+class ApiKeyAuthMiddleware implements IDoxMiddleware {
+  @override
+  dynamic handle(IDoxRequest req) => req;
+}
+
+class LoginGuard implements IDoxMiddleware {
+  @override
+  dynamic handle(IDoxRequest req) => req;
+}
+
+/// like the your-qr app: two controllers with the same method names and
+/// the same paths, one under `api`
+class LinkApiController {
+  dynamic index(DoxRequest req) => <dynamic>[];
+
+  dynamic show(DoxRequest req, String id) => id;
+}
+
+class LinkPageController {
+  dynamic index(DoxRequest req) => <dynamic>[];
+
+  dynamic show(DoxRequest req, String id) => id;
+}
+
 class PostController {
   dynamic store(DoxRequest req) => 'ok';
 
@@ -106,6 +132,30 @@ const OpenApiRegistry registry = OpenApiRegistry(
       argumentTypes: <String>['DoxRequest'],
       summary: 'Session login',
     ),
+    OpenApiOperation(
+      controller: 'LinkApiController',
+      method: 'index',
+      argumentTypes: <String>['DoxRequest'],
+      summary: 'API links',
+    ),
+    OpenApiOperation(
+      controller: 'LinkApiController',
+      method: 'show',
+      argumentTypes: <String>['DoxRequest', 'String'],
+      summary: 'API link',
+    ),
+    OpenApiOperation(
+      controller: 'LinkPageController',
+      method: 'index',
+      argumentTypes: <String>['DoxRequest'],
+      summary: 'Page links',
+    ),
+    OpenApiOperation(
+      controller: 'LinkPageController',
+      method: 'show',
+      argumentTypes: <String>['DoxRequest', 'String'],
+      summary: 'Page link',
+    ),
   ],
   routes: <OpenApiRouteBinding>[
     // `/login` ends both live paths, so only the controller tells them apart
@@ -116,6 +166,10 @@ const OpenApiRegistry registry = OpenApiRegistry(
     OpenApiRouteBinding('GET', '/users/', 'UserController.index'),
     OpenApiRouteBinding('GET', '/tags/', 'TagController.index'),
     OpenApiRouteBinding('POST', '/upload', 'PostController.upload'),
+    OpenApiRouteBinding('GET', 'api/links', 'LinkApiController.index'),
+    OpenApiRouteBinding('GET', 'api/links/{id}', 'LinkApiController.show'),
+    OpenApiRouteBinding('GET', '/links', 'LinkPageController.index'),
+    OpenApiRouteBinding('GET', '/links/{id}', 'LinkPageController.show'),
   ],
   schemas: <String, Map<String, dynamic>>{
     'Post': <String, dynamic>{
@@ -139,7 +193,40 @@ const OpenApiRegistry registry = OpenApiRegistry(
       },
     },
   },
+  security: <String, OpenApiSecurity>{
+    'ApiKeyAuthMiddleware': OpenApiSecurity('apiKeyAuth', <String, dynamic>{
+      'type': 'http',
+      'scheme': 'bearer',
+      'bearerFormat': 'API key',
+    }),
+  },
 );
+
+class ApiRouter extends Router {
+  @override
+  String get prefix => 'api';
+
+  @override
+  List<dynamic> get middleware => <dynamic>[ApiKeyAuthMiddleware()];
+
+  @override
+  void register() {
+    Route.get('/links', (LinkApiController c) => c.index);
+    Route.get('/links/{id}', (LinkApiController c) => c.show);
+  }
+}
+
+class WebRouter extends Router {
+  @override
+  void register() {
+    Route.middleware(<dynamic>[LoginGuard()], registerDashboard);
+  }
+
+  void registerDashboard() {
+    Route.get('/links', (LinkPageController c) => c.index);
+    Route.get('/links/{id}', (LinkPageController c) => c.show);
+  }
+}
 
 class DocsRouter extends Router {
   @override
@@ -183,8 +270,10 @@ AppConfig config = AppConfig(
   // the OS picks a free port, so test files can run in parallel
   serverPort: 0,
   totalIsolate: 1,
-  routers: <Router>[DocsRouter()],
+  routers: <Router>[DocsRouter(), ApiRouter(), WebRouter()],
   container: (IocContainer c) {
+    c.singleton<LinkApiController>((IocContainer c) => LinkApiController());
+    c.singleton<LinkPageController>((IocContainer c) => LinkPageController());
     c.singleton<AuthController>((IocContainer c) => AuthController());
     c.singleton<WebAuthController>((IocContainer c) => WebAuthController());
   },
@@ -283,6 +372,31 @@ void main() {
     /// two controllers with a `login` method each get their own docs
     expect(doc['paths']['/api/auth/login']['post']['summary'], 'Token login');
     expect(doc['paths']['/web-auth/login']['post']['summary'], 'Session login');
+
+    /// the your-qr routes: same paths and method names, two controllers
+    expect(doc['paths']['/api/links']['get']['summary'], 'API links');
+    expect(doc['paths']['/api/links/{id}']['get']['summary'], 'API link');
+    expect(doc['paths']['/links']['get']['summary'], 'Page links');
+    expect(doc['paths']['/links/{id}']['get']['summary'], 'Page link');
+  });
+
+  test('@Security on a middleware class gives its own scheme', () {
+    Map<String, dynamic> doc = OpenApiDocument(
+      const OpenApiConfig(registry: registry),
+    ).build(Route().routes).toJson();
+    expect(OpenApiChecker().check(doc), isEmpty);
+    expect(
+      doc['components']['securitySchemes']['apiKeyAuth'],
+      <String, dynamic>{
+        'type': 'http',
+        'scheme': 'bearer',
+        'bearerFormat': 'API key',
+      },
+    );
+    expect(doc['paths']['/api/links']['get']['security'], <dynamic>[
+      <String, dynamic>{'apiKeyAuth': <dynamic>[]},
+    ]);
+    expect(doc['paths']['/links']['get'].containsKey('security'), isFalse);
   });
 
   test('a body with a file field uses multipart/form-data', () {
@@ -302,9 +416,11 @@ void main() {
       const OpenApiConfig(registry: registry),
     ).build(Route().routes).toJson();
     expect(OpenApiChecker().check(doc), isEmpty);
+
+    /// the name rule does not know the token format, so no `JWT`
     expect(
-      doc['components']['securitySchemes']['bearerAuth']['scheme'],
-      'bearer',
+      doc['components']['securitySchemes']['bearerAuth'],
+      <String, dynamic>{'type': 'http', 'scheme': 'bearer'},
     );
     expect(doc['paths']['/search']['get']['security'], <dynamic>[
       <String, dynamic>{'bearerAuth': <dynamic>[]},
@@ -315,7 +431,7 @@ void main() {
     Map<String, dynamic> doc = OpenApiDocument(
       const OpenApiConfig(
         registry: registry,
-        include: <String>['/api/*', '/web-auth/*'],
+        include: <String>['/api/auth/*', '/web-auth/*'],
         exclude: <String>['/web-auth/login'],
       ),
     ).build(Route().routes).toJson();
@@ -360,12 +476,17 @@ void main() {
     await dir.delete(recursive: true);
   });
 
-  test('docs are off by default outside development', () {
+  test('docs are on only in development, off when APP_ENV is not set', () {
     expect(const OpenApiConfig(enabled: false).isEnabled, isFalse);
     Env().env['APP_ENV'] = 'production';
     expect(const OpenApiConfig().isEnabled, isFalse);
     Env().env['APP_ENV'] = 'development';
     expect(const OpenApiConfig().isEnabled, isTrue);
+
+    /// not set: production, so the docs are off
     Env().env.remove('APP_ENV');
+    if (Platform.environment['APP_ENV'] == null) {
+      expect(const OpenApiConfig().isEnabled, isFalse);
+    }
   });
 }

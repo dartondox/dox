@@ -84,8 +84,21 @@ class OpenApiRouteBinding {
   const OpenApiRouteBinding(this.method, this.path, this.operation);
 }
 
+/// A login scheme from `@Security` on a middleware class.
+class OpenApiSecurity {
+  /// Name under `components/securitySchemes`, like `apiKeyAuth`.
+  final String name;
+
+  /// The OpenAPI security scheme object.
+  final Map<String, dynamic> scheme;
+
+  /// Creates a login scheme.
+  const OpenApiSecurity(this.name, this.scheme);
+}
+
 /// Everything `dox_builder` found in the app: controller methods,
-/// route calls and model schemas. The generated file makes one.
+/// route calls, model schemas and login schemes. The generated file
+/// makes one.
 class OpenApiRegistry {
   /// Docs of the controller methods.
   final List<OpenApiOperation> operations;
@@ -96,11 +109,15 @@ class OpenApiRegistry {
   /// Named schemas (models), placed under `components/schemas`.
   final Map<String, Map<String, dynamic>> schemas;
 
+  /// Login schemes by middleware class name, from `@Security`.
+  final Map<String, OpenApiSecurity> security;
+
   /// Creates a registry. The default is empty.
   const OpenApiRegistry({
     this.operations = const <OpenApiOperation>[],
     this.routes = const <OpenApiRouteBinding>[],
     this.schemas = const <String, Map<String, dynamic>>{},
+    this.security = const <String, OpenApiSecurity>{},
   });
 
   /// Finds the docs for one live route.

@@ -38,6 +38,8 @@ class Route {
   static Route get<T extends Object>(String path, dynamic c) => Route();
   static Route post(String path, dynamic c, {Object? body}) => Route();
   static Route resource(String path, dynamic c) => Route();
+  static Route delete(String path, dynamic c) => Route();
+  static void middleware(List<dynamic> m, Function() callback) {}
 }
 ''';
 
@@ -224,6 +226,55 @@ void registerWebAuthV2() {
 class WebRoutes extends Router {
   void register() {
     Route.group('/web-auth', registerWebAuth);
+  }
+}
+''';
+
+/// like the your-qr app: an `api` router and a web router with the
+/// same paths and the same method names on two controllers, and a
+/// bearer API key middleware
+const String _qrApp = '''
+import 'package:dox_core/dox_core.dart';
+
+@Security.bearer(format: 'API key')
+class ApiKeyAuthMiddleware {}
+
+@Security.apiKey(header: 'X-Key', scheme: 'keyHeader')
+class HeaderKeyMiddleware {}
+
+class LinkApiController {
+  /// API links
+  List<String> index(DoxRequest req) => <String>[];
+
+  /// API delete
+  void destroy(DoxRequest req, String id) {}
+}
+
+class LinkPageController {
+  /// Page links
+  List<String> index(DoxRequest req) => <String>[];
+
+  /// Page delete
+  void destroy(DoxRequest req, String id) {}
+}
+
+class ApiRouter extends Router {
+  String get prefix => 'api';
+
+  void register() {
+    Route.get('/links', (LinkApiController c) => c.index);
+    Route.delete('/links/{id}', (LinkApiController c) => c.destroy);
+  }
+}
+
+class WebRouter extends Router {
+  void register() {
+    Route.middleware(<dynamic>[Object()], registerDashboard);
+  }
+
+  void registerDashboard() {
+    Route.get('/links', (LinkPageController c) => c.index);
+    Route.delete('/links/{id}', (LinkPageController c) => c.destroy);
   }
 }
 ''';
@@ -543,6 +594,38 @@ tags: <String>['User'],'''),
 'items': <String, dynamic>{'\\\$ref': '#/components/schemas/Address'},
 'minItems': 1, 'maxItems': 3}},
 'required': <dynamic>['name', 'email', 'host', 'addresses']}'''),
+        ),
+      );
+    });
+
+    test(
+      'the your-qr routes: same paths and method names stay apart',
+      () async {
+        String qr = await _generate(<String, String>{'a|lib/qr.dart': _qrApp});
+        for (String binding in <String>[
+          "OpenApiRouteBinding('GET', 'api/links', 'LinkApiController.index')",
+          "OpenApiRouteBinding('DELETE', 'api/links/{id}', "
+              "'LinkApiController.destroy')",
+          "OpenApiRouteBinding('GET', '/links', 'LinkPageController.index')",
+          "OpenApiRouteBinding('DELETE', '/links/{id}', "
+              "'LinkPageController.destroy')",
+        ]) {
+          expect(qr, contains(_flat(binding)));
+        }
+      },
+    );
+
+    test('@Security on a middleware class gives a login scheme', () async {
+      String qr = await _generate(<String, String>{'a|lib/qr.dart': _qrApp});
+      expect(
+        qr,
+        contains(
+          _flat('''
+security: <String, OpenApiSecurity>{
+'ApiKeyAuthMiddleware': OpenApiSecurity('apiKeyAuth', <String, dynamic>{
+'type': 'http', 'scheme': 'bearer', 'bearerFormat': 'API key'}),
+'HeaderKeyMiddleware': OpenApiSecurity('keyHeader', <String, dynamic>{
+'type': 'apiKey', 'name': 'X-Key', 'in': 'header'})}'''),
         ),
       );
     });

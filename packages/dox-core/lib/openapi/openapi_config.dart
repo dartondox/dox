@@ -17,7 +17,8 @@ import 'package:dox_openapi/dox_openapi.dart';
 /// Swagger UI.
 class OpenApiConfig {
   /// Serve the docs routes. When null, they are on only when `APP_ENV`
-  /// is `development` or `local`, so production is off by default.
+  /// is `development` or `local`. An empty `APP_ENV` counts as
+  /// production, so the docs are off.
   final bool? enabled;
 
   /// Title and version of the API.
@@ -30,7 +31,8 @@ class OpenApiConfig {
   final Map<String, SecurityScheme> securitySchemes;
 
   /// Security for routes that use a middleware class with this name.
-  /// `AuthMiddleware` gets `bearerAuth` when it is not in this map.
+  /// It wins over `@Security` on the class. A class name that ends with
+  /// `AuthMiddleware` gets `bearerAuth` when it has neither.
   final Map<String, List<Map<String, List<String>>>> securityByMiddleware;
 
   /// What `dox_builder` found in the code: controller docs, route calls

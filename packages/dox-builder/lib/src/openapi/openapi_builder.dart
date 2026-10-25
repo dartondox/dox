@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
@@ -9,6 +10,7 @@ import 'annotation_reader.dart';
 import 'controller_reader.dart';
 import 'registry_writer.dart';
 import 'route_scanner.dart';
+import 'security_data.dart';
 
 /// Writes `lib/generated/openapi.g.dart` with the OpenAPI docs of the app.
 ///
@@ -16,9 +18,11 @@ import 'route_scanner.dart';
 /// - `Route.get(...)` and `Route.resource(...)` calls give the
 ///   controller classes and which method each route calls,
 /// - classes with `@DoxController()` are added too,
-/// - each controller method gives one operation.
+/// - each controller method gives one operation,
+/// - classes with `@Security(...)` (middleware) give login schemes.
 ///
-/// Nothing is written when the package has no controllers.
+/// Nothing is written when the package has no controllers and no
+/// `@Security` classes.
 class DoxOpenApiBuilder implements Builder {
   const DoxOpenApiBuilder();
 
@@ -37,6 +41,7 @@ class DoxOpenApiBuilder implements Builder {
     RouteScanner scanner = RouteScanner();
     AnnotationReader annotations = const AnnotationReader();
     List<ClassElement> controllers = <ClassElement>[];
+    Map<String, SecurityData> security = <String, SecurityData>{};
     await for (AssetId id in buildStep.findAssets(Glob('lib/**.dart'))) {
       if (id.path == output || !await resolver.isLibrary(id)) continue;
       LibraryElement library = await resolver.libraryFor(id);
@@ -48,6 +53,13 @@ class DoxOpenApiBuilder implements Builder {
         if (annotations.has(element, 'DoxController')) {
           controllers.add(element);
         }
+        DartObject? secured = annotations.first(element, 'Security');
+        if (secured != null) {
+          security[element.displayName] = SecurityData.read(
+            element.displayName,
+            secured,
+          );
+        }
       }
     }
     for (RouteCall call in scanner.calls) {
@@ -55,7 +67,7 @@ class DoxOpenApiBuilder implements Builder {
         controllers.add(call.controller);
       }
     }
-    if (controllers.isEmpty) return;
+    if (controllers.isEmpty && security.isEmpty) return;
 
     JsonSchemaReader types = JsonSchemaReader(AstLoader(resolver));
     ControllerReader reader = ControllerReader(types);
@@ -67,6 +79,7 @@ class DoxOpenApiBuilder implements Builder {
       operations,
       scanner.calls,
       types.components,
+      security,
     );
     DartFormatter formatter = DartFormatter(
       languageVersion: DartFormatter.latestLanguageVersion,

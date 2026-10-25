@@ -57,6 +57,8 @@ AppConfig appConfig = AppConfig(
 | `include` | `[]` (all routes) | only these paths go in the docs, like `['/api/*']` |
 | `exclude` | `[]` | these paths are left out, like `['/api/internal/*']` |
 
+If `APP_ENV` is not set, Dox treats the app as production: `/docs` is off and error details are hidden. Set `APP_ENV=development` in your `.env` and in CI.
+
 ### 3. Open `/docs`
 
 Start the app and open `http://localhost:3000/docs`.
@@ -158,7 +160,7 @@ Blog:
 | description | the rest of the `///` comment |
 | request | see [Request](#request) below |
 | 200 answer | the return type, see [Response](#response) below |
-| `401` and `bearerAuth` | a middleware whose class name ends with `AuthMiddleware` |
+| `401` and a login scheme | `@Security` on a middleware class, or a middleware whose class name ends with `AuthMiddleware`. See [Login schemes](#login-schemes) |
 | `404` | the path has a `{param}` |
 | `422` | the route has a request class. The body is `{field: message}` |
 | `500` | every route |
@@ -257,8 +259,32 @@ Only `@Response` has none, because `response()` is already a `dox_core` helper.
 
 ### Login schemes
 
-A middleware whose class name ends with `AuthMiddleware` adds `bearerAuth` (a JWT bearer token) by itself.
-For other middleware, or another scheme, set it in the config:
+Put `@Security` above a middleware class. Every route with this middleware gets the scheme in the docs.
+Run `dart run build_runner build` after you add it.
+
+```dart
+/// `Authorization: Bearer <api key>`. Not a JWT.
+@Security.bearer(format: 'API key')
+class ApiKeyAuthMiddleware implements IDoxMiddleware { ... }
+
+/// `X-API-Key: <key>`
+@Security.apiKey(header: 'X-API-Key')
+class HeaderKeyMiddleware implements IDoxMiddleware { ... }
+```
+
+| Annotation | Scheme in the docs |
+| --- | --- |
+| `@Security.bearer()` | `type: http`, `scheme: bearer`, no format |
+| `@Security.bearer(format: 'JWT')` | the same, with `bearerFormat: JWT` |
+| `@Security.apiKey(header: 'X-API-Key')` | `type: apiKey`, `in: header`, `name: X-API-Key`. The default header is `X-API-Key` |
+
+The scheme name is the class name without `Middleware`, with a small first letter: `ApiKeyAuthMiddleware` gives `apiKeyAuth`.
+Use `scheme: 'myName'` to pick another name.
+
+A middleware without `@Security` whose class name ends with `AuthMiddleware` gets `bearerAuth`: a bearer token with no format, because Dox can not know if it is a JWT.
+
+For a key in the query or a cookie, or to change a scheme without the builder, set it in the config.
+The config wins over `@Security`:
 
 ```dart
 OpenApiConfig(
@@ -282,8 +308,9 @@ If there is no match, it picks the only method with that name and the same argum
 Group prefixes (like `api/`) do not matter.
 
 !!! tip
-    If two controllers have a method with the same name, register the routes with
-    `Route.get('path', controller.method)` so the builder can see them.
+    Two controllers can have a method with the same name, like `index`.
+    When the route names the class, like `(LinkController c) => c.index` or `Route.get<LinkController>(...)`,
+    only methods of that class match. With a plain `links.index`, the path of the route call decides.
 
 ### Write the files: `dox openapi:generate`
 
