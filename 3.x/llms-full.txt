@@ -16896,6 +16896,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
+### 3.0.0-alpha.8
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.7
 
 - Breaking: `IDox`, `IDoxWebsocket` and `WebsocketEvent` are removed. They were only used by `dox_websocket`.
@@ -16936,7 +16940,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_auth
 
-### Unreleased
+### 3.0.0-alpha.8
 
 - Security: a JWT secret (`SecretKey`) shorter than 32 bytes stops the app with an `ArgumentError` when `APP_ENV` is not `development`, `local` or `test`. In those envs it prints one warning line. Make a key with `dox key:generate` or `openssl rand -hex 32`.
 - `Hash` now comes from `dox_core`. dox_auth had its own copy. `package:dox_auth/src/hash.dart` re-exports it. No change in behaviour. dox_auth now depends on dox_core.
@@ -16985,6 +16989,10 @@ What changed in each package, newest first. This page is made from the
 - `dart_jsonwebtoken` 3.
 
 ## dox_builder
+
+### 3.0.0-alpha.8
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.7
 
@@ -17036,6 +17044,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### 3.0.0-alpha.8
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.7
 
 - Perf: the memory driver removes expired items and expired locks in a sweep after many writes. Before, a key that was written once with a ttl and never read again stayed in memory forever.
@@ -17080,6 +17092,10 @@ What changed in each package, newest first. This page is made from the
 - `remember`, `pull`, `add`, `increment`, `many`, tags and atomic locks.
 
 ## dox
+
+### 3.0.0-alpha.8
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.7
 
@@ -17128,8 +17144,9 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_core
 
-### Unreleased
+### 3.0.0-alpha.8
 
+- Uses dox_http_native 3.0.0-alpha.8: pipelined requests are about 2.8 times faster (1 core: 172k to 480k req/s). Normal requests are as fast as before.
 - Security: every file response (`File`, `Storage().stream()`, `Storage().download()`, `Route.files`) sends `X-Content-Type-Options: nosniff`. Before, a `File` response and a raw download did not.
 - New: `Route.files(path, download: true)` sends every file as a download (`Content-Disposition: attachment`). Use it for user uploads. html, svg, xml and javascript files are still always sent as a download in a sandbox.
 - Fix: a trusted proxy `X-Forwarded-For` hop with a port (`1.2.3.4:5678`, `[::1]:5678`) is now read without the port. Before, it was not a valid ip, so `req.ip()` could be wrong. A bare IPv6 like `::1` still works.
@@ -17267,7 +17284,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_migration
 
-### Unreleased
+### 3.0.0-alpha.8
 
 - A migration that runs inside a transaction you already opened (eg. with `Migrator(connection: ...)`) now uses a savepoint. A failed migration undoes only its own work.
 
@@ -17321,6 +17338,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_openapi
 
+### 3.0.0-alpha.8
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.7
 
 - The `/docs` page loads its CDN files with an `integrity` hash, so the browser refuses a changed file.
@@ -17365,7 +17386,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_orm
 
-### Unreleased
+### 3.0.0-alpha.8
 
 - A `transaction()` inside another transaction now uses a savepoint (`SAVEPOINT sp_N`). When the inner function throws, only its work is undone, and the error is thrown again. If the caller catches the error, the outer transaction goes on and can commit. Before, the inner one joined the outer one, so an inner error always undid the outer work too. Works on Postgres, MySQL, MariaDB and SQLite. New `DBDriver.savepoint()`.
 - Postgres: new `extra['sslRootCert']`, the path of a PEM file with the CA certificates to trust for `verify-full`. `sslrootcert` in `DATABASE_URL` sets it. New `ConnectionConfig.postgresSslRootCert`. Needs the next `dox_postgres_native` release.
@@ -17468,6 +17489,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_query_builder
 
+### 3.0.0-alpha.8
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.7
 
 - Version bump only, to match the other packages.
@@ -17500,7 +17525,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_socketio
 
-### Unreleased
+### 3.0.0-alpha.8
 
 - New: `ServerOptions(maxAttachments: 10)`. It is the most binary attachments one packet may have. The default is the same as before (10). A packet with more closes that client.
 
@@ -17559,6 +17584,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_storage
 
+### 3.0.0-alpha.8
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.7
 
 - Perf: the S3 driver keeps the SigV4 signing key for each day. Before, every request ran 4 extra HMACs to make it again.
@@ -17595,7 +17624,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_validation
 
-### Unreleased
+### 3.0.0-alpha.8
 
 - Fix: `FileTypes.sniff` read any data that starts with `BM` as `bmp`, like the text "BMW...". Now it also checks the BMP header size at byte 14 (12, 40, 52, 56, 64, 108 or 124).
 
