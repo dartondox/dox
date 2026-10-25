@@ -1804,6 +1804,8 @@
       
         
       
+        
+      
     
     
     
@@ -2118,6 +2120,34 @@
     
   
     Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/health-check/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Health check
   
 
     
@@ -3069,6 +3099,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -3215,6 +3249,62 @@
     
   
     Hashing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/rate-limiting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rate limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/security-headers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security headers
   
 
     
@@ -5261,11 +5351,11 @@ A missing key stops the app at start, with a list of every missing key. See <a h
 </tr>
 <tr>
 <td><code>$this-&gt;get('/api/ping')-&gt;assertStatus(200)</code></td>
-<td>start the server once, then <code>http.get(Uri.parse('$baseUrl/api/ping'))</code></td>
+<td><code>(await client.get('/api/ping')).expectStatus(200)</code> with <code>DoxTestClient</code></td>
 </tr>
 <tr>
 <td><code>RefreshDatabase</code></td>
-<td>run the migrations in <code>setUpAll</code>, or use SQLite <code>:memory:</code></td>
+<td>run the migrations in <code>setUpAll</code>, then <code>setUp(refreshDatabase)</code> from <code>package:dox_orm/testing.dart</code></td>
 </tr>
 <tr>
 <td><code>Storage::fake('s3')</code></td>
@@ -5277,11 +5367,11 @@ A missing key stops the app at start, with a list of every missing key. See <a h
 </tr>
 <tr>
 <td><code>$this-&gt;actingAs($user)</code></td>
-<td>send the JWT from <code>Auth().login(user)</code> in the <code>Authorization</code> header</td>
+<td><code>client.withToken(token)</code> with the JWT from <code>Auth().login(user)</code></td>
 </tr>
 </tbody>
 </table>
-<p>Dox has no fake HTTP kernel. A test starts the real server with <code>Dox().totalIsolate(1)</code> and sends real requests.
+<p>Dox has no fake HTTP kernel. <code>DoxTestClient.start(appConfig)</code> starts the real server inside the test, on a free port, and sends real requests.
 See <a href="../../digging-deeper/testing/">Testing</a>.</p>
 <h2 id="what-is-different">What is different</h2>
 <ul>
@@ -5309,9 +5399,6 @@ See <a href="../../digging-deeper/testing/">Testing</a>.</p>
 <li>Blade views, mail and notifications</li>
 <li>sessions (auth uses a JWT; encrypted cookies are there)</li>
 <li>policies and gates</li>
-<li>seeders and factories</li>
-<li>rate limiting middleware</li>
-<li>savepoints in nested transactions (a nested <code>transaction()</code> joins the outer one)</li>
 </ul>
 <p>See <a href="../status-and-roadmap/#what-dox-does-not-have-yet">What Dox does not have yet</a> for what to use today.</p>
 <p>What is there, as separate packages: <a href="../../packages/validation/">validation</a>, <a href="../../packages/openapi/">OpenAPI docs</a>,

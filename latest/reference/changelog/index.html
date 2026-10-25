@@ -1566,6 +1566,8 @@
       
         
       
+        
+      
     
     
     
@@ -1880,6 +1882,34 @@
     
   
     Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/health-check/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Health check
   
 
     
@@ -2831,6 +2861,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -2977,6 +3011,62 @@
     
   
     Hashing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/rate-limiting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rate limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/security-headers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security headers
   
 
     
@@ -7188,6 +7278,11 @@
 <li>New: <code>ExceptionHandler</code>, the one place that turns an error into a response. Extend it and set <code>AppConfig(exceptionHandler: ...)</code>. <code>report(error, stackTrace)</code> logs, <code>render(error, req)</code> picks the response. The default answers are the same as before. A URL with no route goes through it too.</li>
 <li>Breaking: <code>AppConfig.errorHandler</code> and <code>defaultErrorHandler</code> are removed. Override <code>ExceptionHandler.report</code> instead. It gets the same errors: every error that is not an <code>IHttpException</code>, also errors outside a request. A thrown value that is not an <code>Exception</code> or <code>Error</code> (like a <code>String</code>) is now reported too.</li>
 <li><code>responseHandler</code> still works and still runs after <code>render</code>.</li>
+<li>New: <code>RateLimit</code> middleware. <code>RateLimit(max: 60, per: Duration(minutes: 1), key: (DoxRequest req) =&gt; req.ip())</code>. One request too many gets <code>429</code> with <code>Retry-After</code>. Every answer has <code>X-RateLimit-Limit</code> and <code>X-RateLimit-Remaining</code>. The counts live in Redis when the default cache store is Redis (shared by all isolates and servers), else in memory. Fixed window. New <code>TooManyRequestsException</code>.</li>
+<li>New: <code>SecurityHeaders</code> middleware. It adds <code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>, <code>Referrer-Policy</code>, <code>Permissions-Policy</code> and <code>Cross-Origin-Opener-Policy</code>, and <code>Strict-Transport-Security</code> on https requests only. Each one can be changed or turned off with <code>null</code>. <code>Content-Security-Policy</code> is off by default.</li>
+<li>New: <code>Route.health('/health', checks: {...})</code>. It answers 200 <code>{"status": "ok"}</code>, or 503 when a check throws, returns <code>false</code> or times out. <code>HealthCheck.cache()</code> checks the cache. The error text is in the answer only in <code>development</code> and <code>local</code>.</li>
+<li>New: <code>package:dox_core/testing.dart</code> with <code>DoxTestClient</code>. <code>DoxTestClient.start(appConfig)</code> runs the app in the test on a free port. <code>get</code>, <code>post</code>, <code>put</code>, <code>patch</code>, <code>delete</code>, <code>send</code>, <code>withHeaders</code> and <code>withToken</code>. <code>TestResponse</code> has <code>status</code>, <code>body</code>, <code>json</code>, <code>headers</code> and <code>expectStatus</code>, <code>expectJson</code>, <code>expectBody</code>, <code>expectHeader</code>.</li>
+<li>dox_core now depends on <code>matcher</code> (for the <code>expect</code> methods of <code>TestResponse</code>).</li>
 </ul>
 <h3 id="300-alpha8_5">3.0.0-alpha.8</h3>
 <ul>
@@ -7440,6 +7535,7 @@
 <li>New attribute casts with <code>@Column(cast: ...)</code>: <code>JsonCast</code>, <code>ListCast&lt;E&gt;</code>, <code>BoolCast</code>, <code>EnumCast&lt;E&gt;</code> (by name or by index), or your own <code>Cast&lt;T&gt;</code> class. <code>bool</code> fields get <code>BoolCast</code> and enum fields get <code>EnumCast</code> without <code>cast</code>.</li>
 <li>New <code>withCount('posts')</code>, <code>withSum('posts', 'views')</code> and <code>withMax('posts', 'views')</code>. They add the value with a subquery, for <code>hasOne</code>, <code>hasMany</code> and <code>manyToMany</code> relations. Read it with <code>countOf('posts')</code> or <code>aggregate('posts_sum_views')</code>. <code>toJson()</code> has it too.</li>
 <li><code>all()</code> now uses the where conditions of the query, like <code>get()</code>. Before, it used only the soft delete check.</li>
+<li>New: <code>package:dox_orm/testing.dart</code> with <code>refreshDatabase()</code>. Use <code>setUp(refreshDatabase)</code> in tests: it empties every table and starts the ids at 1 again, on Postgres, MySQL, MariaDB and SQLite. The migrations table keeps its rows. <code>keep:</code> keeps more tables.</li>
 </ul>
 <h3 id="300-alpha8_8">3.0.0-alpha.8</h3>
 <ul>

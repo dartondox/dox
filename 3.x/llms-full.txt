@@ -1392,49 +1392,39 @@ This step writes one HTTP test for the list route and runs it.
 The template has `test/http_test.dart`. Replace it with this:
 
 ```dart title="test/http_test.dart"
-import 'dart:convert';
-
 import 'package:blog/config/app.dart';
 import 'package:blog/config/database.dart';
-import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/testing.dart';
 import 'package:dox_migration/dox_migration.dart';
-import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 import '../db/migration/migrations.dart';
 
-String baseUrl = 'http://localhost:${appConfig.serverPort}';
-
 void main() {
+  late DoxTestClient client;
+
   setUpAll(() async {
-    Dox().initialize(appConfig);
-    Dox().totalIsolate(1);
     await Migrator(
       migrations: migrations,
       config: databaseConfig.getConnectionConfig(),
     ).migrate();
-    await Dox().startServer();
+    client = await DoxTestClient.start(appConfig);
   });
 
   tearDownAll(() async {
-    await Dox().server.close();
+    await client.close();
   });
 
   test('GET /api/posts gives a list', () async {
-    http.Response response = await http.get(Uri.parse('$baseUrl/api/posts'));
-    expect(response.statusCode, 200);
-    expect(jsonDecode(response.body), isA<List<dynamic>>());
+    TestResponse res = await client.get('/api/posts');
+    res.expectStatus(200).expectJson(isA<List<dynamic>>());
   });
 }
 ```
 
-- The test starts the real server once, on one isolate. One isolate starts faster.
+- `DoxTestClient.start` runs the app inside the test, on a free port. It does not clash with `dox s`.
 - It runs the migrations first, so the test also works on an empty database.
-- `package:test` and `package:http` are already in `dev_dependencies` of the template.
-
-## 2. Stop the dev server
-
-The test listens on the same port as `dox s`. Stop `dox s` with `Ctrl+C` first.
+- `package:test` is already in `dev_dependencies` of the template.
 
 ## Check it
 
@@ -2154,13 +2144,13 @@ A missing key stops the app at start, with a list of every missing key. See [Env
 | Laravel | Dox |
 | --- | --- |
 | `php artisan test` | `dart test` |
-| `$this->get('/api/ping')->assertStatus(200)` | start the server once, then `http.get(Uri.parse('$baseUrl/api/ping'))` |
-| `RefreshDatabase` | run the migrations in `setUpAll`, or use SQLite `:memory:` |
+| `$this->get('/api/ping')->assertStatus(200)` | `(await client.get('/api/ping')).expectStatus(200)` with `DoxTestClient` |
+| `RefreshDatabase` | run the migrations in `setUpAll`, then `setUp(refreshDatabase)` from `package:dox_orm/testing.dart` |
 | `Storage::fake('s3')` | `Dox().storage.fake('s3')` |
 | `Cache::fake()` | `Dox().cache = CacheManager(CacheConfig(...))` with a `memory` store |
-| `$this->actingAs($user)` | send the JWT from `Auth().login(user)` in the `Authorization` header |
+| `$this->actingAs($user)` | `client.withToken(token)` with the JWT from `Auth().login(user)` |
 
-Dox has no fake HTTP kernel. A test starts the real server with `Dox().totalIsolate(1)` and sends real requests.
+Dox has no fake HTTP kernel. `DoxTestClient.start(appConfig)` starts the real server inside the test, on a free port, and sends real requests.
 See [Testing](../digging-deeper/testing.md).
 
 ## What is different
@@ -2190,9 +2180,6 @@ Dox does not have these Laravel features yet:
 - Blade views, mail and notifications
 - sessions (auth uses a JWT; encrypted cookies are there)
 - policies and gates
-- seeders and factories
-- rate limiting middleware
-- savepoints in nested transactions (a nested `transaction()` joins the outer one)
 
 See [What Dox does not have yet](status-and-roadmap.md#what-dox-does-not-have-yet) for what to use today.
 
@@ -2343,7 +2330,6 @@ These were checked by searching the code in `packages/*/lib` with `rg`.
 | Notifications | Not there | Send them from your own service class. |
 | Events and listeners | Not there | Model events are there. See [Model events](../database/model/events.md). |
 | Views and templates | Not there | Dox is for APIs. Serve the front end on its own. |
-| Rate limiting | Not there | Write a middleware with the cache, or use a proxy. |
 | Sessions and password reset | Not there | Auth uses JWT. `req.httpRequest.session` throws `UnsupportedError`. |
 | Policies and gates | Not there | Check the user in a middleware or in the controller. |
 | Database factories and seeders | Not there | Write a Dart script, or a migration with data. |
@@ -2364,10 +2350,6 @@ These were checked by searching the code in `packages/*/lib` with `rg`.
 | One exception handler | One place to turn every error into a response. |
 | ORM scopes, casts and `withCount` | |
 | Model factories and seeders | |
-| HTTP test client and database refresh | For app tests. |
-| Rate limiting | |
-| Security headers | |
-| Health check route | |
 | `dox_queue` | Queues and jobs. New package: [github.com/dartondox/dox-queue](https://github.com/dartondox/dox-queue). |
 | `dox_scheduler` | Run tasks on a schedule. New package: [github.com/dartondox/dox-scheduler](https://github.com/dartondox/dox-scheduler). |
 | 3.0 stable | After the alpha API settles |
@@ -3895,6 +3877,8 @@ flowchart LR
 !!! tip "Built-in middleware"
     - `LogMiddleware` from `dox_core` writes one JSON log line per request. Body fields and headers whose name has `password`, `secret`, `token`, `authorization`, `cookie` or `api_key` in it (upper or lower case) are logged as `[REDACTED]`. Change the list with `redact:`. The new project turns it off when `APP_ENV` is `production`.
     - `AuthMiddleware` from `dox_auth` checks the JWT token. See [Authentication](../security/authentication.md).
+    - `RateLimit` from `dox_core` answers `429` when a client sends too many requests. See [Rate limiting](../security/rate-limiting.md).
+    - `SecurityHeaders` from `dox_core` adds safe headers like `X-Frame-Options` to every answer. See [Security headers](../security/security-headers.md).
 
 
 ---
@@ -6092,10 +6076,10 @@ This page shows how to test a Dox app with the `test` package: HTTP routes, cach
 
 ## Setup
 
-Add the test packages as dev dependencies:
+Add the test package as a dev dependency:
 
 ```bash
-dart pub add dev:test dev:http
+dart pub add dev:test
 ```
 
 Put your tests in the `test/` folder. Run them with:
@@ -6106,39 +6090,97 @@ dart test
 
 ## Test HTTP routes
 
-Start the real server once for the whole file. Then send requests to it with `package:http`.
+`DoxTestClient` from `package:dox_core/testing.dart` starts your app inside the test and sends requests to it.
 
 ```dart title="test/http_test.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:http/http.dart' as http;
+import 'package:dox_core/testing.dart';
 import 'package:my_app/config/app.dart';
 import 'package:test/test.dart';
 
-String baseUrl = 'http://localhost:${appConfig.serverPort}';
-
 void main() {
+  late DoxTestClient client;
+
   setUpAll(() async {
-    Dox().initialize(appConfig);
-    Dox().totalIsolate(1);
-    await Dox().startServer();
+    client = await DoxTestClient.start(appConfig);
   });
 
   tearDownAll(() async {
-    await Dox().server.close();
+    await client.close();
   });
 
   test('GET /api/ping', () async {
-    http.Response response = await http.get(Uri.parse('$baseUrl/api/ping'));
-    expect(response.statusCode, 200);
-    expect(response.body, 'pong');
+    TestResponse res = await client.get('/api/ping');
+    res.expectStatus(200).expectBody('pong');
+  });
+
+  test('POST /api/posts', () async {
+    TestResponse res = await client.post(
+      '/api/posts',
+      body: <String, dynamic>{'title': 'Hello', 'body': 'My first post.'},
+    );
+    res.expectStatus(201).expectJson(containsPair('title', 'Hello'));
   });
 }
 ```
 
-- `startServer()` returns when the server listens. You do not need to wait after it.
-- `Dox().totalIsolate(1)` runs the server on one isolate. By default Dox starts one isolate per CPU core. A test does not need them, and they make the start slower.
+- `DoxTestClient.start(appConfig)` runs your services (like the ORM service) and adds your routes, the same as a real start.
+- It listens on `127.0.0.1` and a free port that the OS picks. So it does not clash with `dox serve`, and many test files can run at the same time.
+- It runs on one isolate. `serverPort` and `totalIsolate` of the config are not used.
+- `client.close()` stops the server and runs the `DoxShutdown` services (for example, it closes the database).
 - With one isolate, you can also add a route inside a test with `Route.get(...)`. It works right away.
-- Do not run `dox serve` on the same port while you test. The test can fail to start, or send its requests to the dev server. Stop `dox serve`, or use another `APP_PORT` for tests.
+
+### Send requests
+
+| Method | What it does |
+| --- | --- |
+| `get(path)` | `GET`. The path can have a query: `'/api/users?page=2'`. |
+| `post(path, body: ...)` | `POST`. Also `put`, `patch` and `delete`. |
+| `send('OPTIONS', path)` | any other method |
+| `headers: {...}` | extra headers for one request |
+| `withHeaders({...})` | a copy of the client that sends these headers on every request |
+| `withToken(token)` | a copy of the client that sends `Authorization: Bearer <token>` |
+
+A `Map` or `List` body is sent as JSON. A `String` or `List<int>` body is sent as it is.
+Redirects are not followed, so you can check a `302` and its `Location` header.
+
+### Check the response
+
+| Member | What it gives |
+| --- | --- |
+| `res.status` | the status code, like `200` |
+| `res.body` | the body as text |
+| `res.json` | the body read as JSON |
+| `res.header('content-type')` | one header (any case) |
+| `res.headers` | all headers, with lower case names |
+
+The `expect` methods fail the test when the response is not right. They return the response, so you can chain them:
+
+```dart
+res
+    .expectStatus(422)
+    .expectHeader('content-type', contains('application/json'))
+    .expectJson(<String, dynamic>{'title': 'The title is required'});
+```
+
+| Method | Fails when |
+| --- | --- |
+| `expectStatus(200)` | the status is another one. The message shows the body. |
+| `expectJson(value or matcher)` | the JSON body does not match. Use a `Map`, or a matcher like `containsPair('id', 1)`. |
+| `expectBody(value or matcher)` | the text body does not match |
+| `expectHeader(name, value or matcher)` | the header does not match. Use `isNull` for "not there". |
+
+### Log in as a user
+
+Make a token, then send it with `withToken`:
+
+```dart
+TestResponse login = await client.post(
+  '/api/auth/login',
+  body: <String, dynamic>{'email': 'ann@example.com', 'password': 'secret123'},
+);
+DoxTestClient ann = client.withToken(login.json['token'] as String);
+(await ann.get('/api/auth/me')).expectStatus(200);
+```
 
 ## Test the cache
 
@@ -6206,43 +6248,151 @@ A missing or bad key throws an `EnvException`. So you can also test that your ap
 
 ## Test the database
 
-A test that uses models needs a real database. Run the migrations and the ORM service once, before the tests:
+A test that uses models needs a real database. Run the migrations once in `setUpAll`.
+Then empty the tables before each test with `refreshDatabase()` from `package:dox_orm/testing.dart`:
 
-```dart title="test/db_test.dart"
-import 'package:dox_core/dox_core.dart';
+```dart title="test/user_test.dart"
+import 'package:dox_core/testing.dart';
 import 'package:dox_migration/dox_migration.dart';
-import 'package:my_app/app/models/user/user.model.dart';
+import 'package:dox_orm/testing.dart';
 import 'package:my_app/config/app.dart';
 import 'package:my_app/config/database.dart';
-import 'package:my_app/services/orm_service.dart';
 import 'package:test/test.dart';
 
+import '../db/migration/migrations.dart';
+
 void main() {
+  late DoxTestClient client;
+
   setUpAll(() async {
-    Dox().initialize(appConfig);
     await Migrator(
+      migrations: migrations,
       config: databaseConfig.getConnectionConfig(),
     ).migrate();
-    await ORMService().setup();
+    client = await DoxTestClient.start(appConfig); // runs the ORM service
   });
 
-  test('saves a user', () async {
-    User user = User()
-      ..name = 'Dox'
-      ..email = 'test-${DateTime.now().microsecondsSinceEpoch}@dox.dev'
-      ..password = 'secret';
-    await user.save();
-    expect(user.id, isNotNull);
+  // every test starts with empty tables
+  setUp(refreshDatabase);
+
+  tearDownAll(() async {
+    await client.close();
+  });
+
+  test('register makes a user', () async {
+    TestResponse res = await client.post(
+      '/api/auth/register',
+      body: <String, dynamic>{
+        'name': 'Ann',
+        'email': 'ann@example.com',
+        'password': 'secret123',
+      },
+    );
+    res.expectStatus(201);
   });
 }
 ```
 
-- Use a separate test database. Set its name in the env of the test run, for example `DB_NAME=app_test dart test`.
-- Make each test data unique (like the email above), or delete it at the end of the test. Then tests do not break each other.
-- `ORMService().setup()` runs the same code as at server start. See [Services](services.md).
+- `refreshDatabase()` empties every table and starts the ids at 1 again. The tables stay. It keeps the rows of the migrations table (`dox_db_migration`).
+- It works on Postgres, MySQL, MariaDB and SQLite. Foreign keys are not checked while it empties the tables.
+- `refreshDatabase(keep: <String>['dox_db_migration', 'countries'])` keeps the rows of more tables.
+- Use a separate test database. Set its name in the env of the test run, for example `DB_NAME=app_test dart test`. Never run it on a database with real data.
+- A test without the server can start the ORM with `SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig)`.
+
+See [Testing with a database](../guides/testing-with-database.md) for a full example with SQLite.
 
 !!! tip "Run test files one by one"
-    `dart test` runs test files at the same time. When two files start the server on the same port, or use the same tables, run them one by one: `dart test --concurrency=1`.
+    `dart test` runs test files at the same time. When two files use the same tables, run them one by one: `dart test --concurrency=1`.
+
+
+---
+
+# Health check
+
+Source: https://dartondox.dev/latest/3.xdigging-deeper/health-check/
+
+# Health check
+
+A health route tells a load balancer, Docker or Kubernetes if the app can serve requests.
+
+## Add the route
+
+```dart title="lib/routes/web.dart"
+Route.health('/health');
+```
+
+`GET /health` answers `200` with:
+
+```json
+{"status": "ok"}
+```
+
+## Check the database and the cache
+
+Give named checks. Each check is a function:
+
+```dart title="lib/routes/web.dart"
+import 'package:dox_orm/dox_orm.dart';
+
+Route.health(
+  '/health',
+  checks: <String, HealthCheckFunction>{
+    'database': () => QueryBuilder.query('select 1'),
+    'cache': HealthCheck.cache(),
+  },
+);
+```
+
+When all checks pass, the answer is `200`:
+
+```json
+{"status": "ok", "checks": {"database": "ok", "cache": "ok"}}
+```
+
+When one check fails, the answer is `503 Service Unavailable`:
+
+```json
+{"status": "fail", "checks": {"database": "fail", "cache": "ok"}}
+```
+
+A check fails when it:
+
+- throws an error,
+- returns `false`,
+- or takes longer than `timeout` (default 5 seconds).
+
+The checks run at the same time.
+
+- `HealthCheck.cache()` writes a key to the default cache store and reads it back. `HealthCheck.cache('redis')` checks the store with that name.
+- Any other check is your own function, like a call to another API.
+
+## Error details
+
+The error of a failed check is passed to `exceptionHandler.report()`, so you see it in your logs.
+
+The answer has the error text (in `errors`) only when `APP_ENV` is `development` or `local`.
+In other envs the text is left out, because it can show hosts or user names.
+
+## Change the timeout
+
+```dart
+Route.health(
+  '/health',
+  timeout: Duration(seconds: 2),
+  checks: <String, HealthCheckFunction>{
+    'database': () => QueryBuilder.query('select 1'),
+  },
+);
+```
+
+!!! tip
+    A route in a router gets the middleware of that router and the global middleware.
+    Put `Route.health` in a router with no auth middleware, or the health check gets `401`.
+
+## See also
+
+- [Docker](../guides/docker.md) for a health check in the image
+- [Deployment](deployment.md)
 
 
 ---
@@ -11693,6 +11843,199 @@ See [Authentication](authentication.md).
 
 ---
 
+# Rate limiting
+
+Source: https://dartondox.dev/latest/3.xsecurity/rate-limiting/
+
+# Rate limiting
+
+`RateLimit` is a middleware that stops a client that sends too many requests.
+Use it on login, sign up and other routes that bots like to hammer.
+
+## Limit a route
+
+```dart title="lib/routes/api.dart"
+Route.post('/auth/login', <dynamic>[
+  RateLimit(max: 5, per: Duration(minutes: 1)),
+  authController.login,
+]);
+```
+
+Each client (by ip) can now send 5 login requests per minute. The 6th request gets:
+
+```text
+HTTP/1.1 429 Too Many Requests
+Retry-After: 42
+X-RateLimit-Limit: 5
+X-RateLimit-Remaining: 0
+
+{"code":"too_many_requests","message":"Too Many Requests"}
+```
+
+- `Retry-After` is the number of seconds until the client can try again.
+- Every answer, also a normal one, has `X-RateLimit-Limit` and `X-RateLimit-Remaining`.
+- The error goes through your `exceptionHandler` and `responseHandler`, like any other error. So it has the same JSON shape as your other errors.
+
+The defaults are `max: 60` and `per: Duration(minutes: 1)`.
+
+## Limit every route
+
+Put it in `globalMiddleware`:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  globalMiddleware: <dynamic>[
+    RateLimit(max: 120),
+  ],
+  // ...
+);
+```
+
+## Count by API key, not by ip
+
+`key` picks who is counted. The default is `req.ip()`.
+
+```dart
+RateLimit(
+  max: 100,
+  key: (DoxRequest req) => req.header('X-Api-Key') ?? req.ip(),
+)
+```
+
+The key is any `String`, so you can also count by user id after your auth middleware.
+
+!!! warning "Behind a proxy"
+    Behind Caddy, nginx or a load balancer, every request comes from the proxy ip.
+    Then all clients share one count. Add the proxy to `AppConfig.trustedProxies`, so `req.ip()` is the real client ip.
+    See [App config](../reference/app-config.md).
+
+## Two limits on the same key
+
+Two `RateLimit` with the same `max` and `per` share one counter. Give one a `name` to keep them apart:
+
+```dart
+Route.post('/auth/login', <dynamic>[
+  RateLimit(max: 5, name: 'login'),
+  authController.login,
+]);
+Route.post('/auth/register', <dynamic>[
+  RateLimit(max: 5, name: 'register'),
+  authController.register,
+]);
+```
+
+## Where the counts live
+
+The counts are kept in the [cache](../digging-deeper/cache.md):
+
+- When the default cache store is **Redis**, the counts are in Redis. All isolates and all servers share them. Use this in production.
+- Else the counts are in **memory**. Each isolate has its own counts. With 4 isolates a client can send up to 4 x `max` requests.
+
+To use one store by name, pass `store`:
+
+```dart
+RateLimit(max: 10, store: 'redis')
+```
+
+## How it counts
+
+It is a fixed window. With `per: Duration(minutes: 1)` the count starts at 0 at the start of each minute.
+So a client can send `max` requests at the end of one minute and `max` more at the start of the next.
+That is fine for most apps. For a hard limit, use a smaller window.
+
+## See also
+
+- [Middleware](../the-basic/middleware.md)
+- [Security headers](security-headers.md)
+- [Production checklist](../reference/production-checklist.md)
+
+
+---
+
+# Security headers
+
+Source: https://dartondox.dev/latest/3.xsecurity/security-headers/
+
+# Security headers
+
+`SecurityHeaders` is a middleware that adds safe HTTP headers to every answer.
+The browser reads them and blocks some common attacks, like showing your page in a frame on another site.
+
+## Turn it on
+
+Put it in `globalMiddleware`:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  globalMiddleware: <dynamic>[
+    const SecurityHeaders(),
+  ],
+  // ...
+);
+```
+
+Every answer now has these headers:
+
+| Header | Default value | What it does |
+| --- | --- | --- |
+| `X-Content-Type-Options` | `nosniff` | The browser does not guess the file type. |
+| `X-Frame-Options` | `DENY` | No site can show your page in a frame. |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | Other sites only see your domain, not the full url. |
+| `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` | The page can not use the camera, the microphone or the location. |
+| `Cross-Origin-Opener-Policy` | `same-origin` | A page of another site that opens yours can not reach it. |
+| `Strict-Transport-Security` | `max-age=31536000; includeSubDomains` | The browser uses only https for one year. Sent only on https requests. |
+
+`Content-Security-Policy` is off by default. A good policy depends on your pages.
+
+## Change or turn off a header
+
+Each header has an option. Give a new value to change it, or `null` to turn it off:
+
+```dart
+const SecurityHeaders(
+  frameOptions: 'SAMEORIGIN', // allow frames from your own site
+  permissionsPolicy: null, // do not send this header
+  contentSecurityPolicy: "frame-ancestors 'none'",
+  extra: <String, String>{'Cross-Origin-Resource-Policy': 'same-origin'},
+)
+```
+
+| Option | Header |
+| --- | --- |
+| `contentTypeOptions` | `X-Content-Type-Options` |
+| `frameOptions` | `X-Frame-Options` |
+| `referrerPolicy` | `Referrer-Policy` |
+| `permissionsPolicy` | `Permissions-Policy` |
+| `crossOriginOpenerPolicy` | `Cross-Origin-Opener-Policy` |
+| `strictTransportSecurity` | `Strict-Transport-Security` |
+| `contentSecurityPolicy` | `Content-Security-Policy` |
+| `extra` | any other headers, name to value |
+
+## HSTS behind a proxy
+
+Dox serves plain http. The https part is done by a proxy (Caddy, nginx, a load balancer).
+Dox sends `Strict-Transport-Security` only when the request came in over https.
+It knows that from the `X-Forwarded-Proto: https` header, and it only believes this header from a trusted proxy.
+So add your proxy to `AppConfig.trustedProxies`:
+
+```dart
+AppConfig(trustedProxies: <String>['127.0.0.1', '::1']);
+```
+
+Without it, Dox never sends HSTS. See [App config](../reference/app-config.md).
+
+!!! note
+    Middleware runs only for routes that exist. A `404` for an unknown url does not get these headers.
+
+## See also
+
+- [Middleware](../the-basic/middleware.md)
+- [CORS](cors.md)
+- [Rate limiting](rate-limiting.md)
+
+
+---
+
 # Guides
 
 Source: https://dartondox.dev/latest/3.xguides/
@@ -13312,7 +13655,8 @@ Source: https://dartondox.dev/latest/3.xguides/testing-with-database/
 
 # Testing with a database
 
-Run model tests against a real database, SQLite or a test Postgres, with migrations run once and an empty table for every test.
+Run model tests against a real database: SQLite for fast local tests, or a test Postgres for the real thing.
+Migrations run once, and every test starts with empty tables.
 
 ## What you need
 
@@ -13363,6 +13707,7 @@ import 'dart:io';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_migration/dox_migration.dart';
 import 'package:dox_orm/dox_orm.dart';
+import 'package:dox_orm/testing.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 import 'package:test/test.dart';
 
@@ -13399,10 +13744,8 @@ void main() {
     SqlQueryBuilder.initializeWithDatabaseConfig(testDatabase);
   });
 
-  // every test starts with an empty table
-  setUp(() async {
-    await User().truncate();
-  });
+  // every test starts with empty tables
+  setUp(refreshDatabase);
 
   tearDownAll(() async {
     await deleteDbFile();
@@ -13421,7 +13764,7 @@ void main() {
     expect(Hash.verify('secret123', found!.password!), isTrue);
   });
 
-  test('the table is empty again', () async {
+  test('the tables are empty again', () async {
     expect(await User().count(), 0);
   });
 }
@@ -13430,7 +13773,7 @@ void main() {
 What happens:
 
 1. `setUpAll` deletes an old database file, runs the migrations, and starts the ORM on the same file.
-2. `setUp` empties the table before each test. `truncate()` also resets the id counter.
+2. `setUp` runs `refreshDatabase()` before each test. It empties every table (not the migrations table) and starts the ids at 1 again.
 3. `tearDownAll` deletes the file.
 
 !!! note "A file, not `:memory:`"
@@ -13451,7 +13794,7 @@ dart test test/user_test.dart
 Migrating: 2026_10_22_000000_create_users_table
 Migrated: 2026_10_22_000000_create_users_table
 00:00 +1: saves and finds a user
-00:00 +2: the table is empty again
+00:00 +2: the tables are empty again
 00:00 +2: All tests passed!
 ```
 
@@ -13499,14 +13842,47 @@ dart test --concurrency=1
 
 ## Test a route with the database
 
-Start the server in `setUpAll` and send real requests. The server runs the services, so the ORM is set up by `ORMService`.
-Set the database with env variables, so `lib/config/database.dart` picks the test database:
+`DoxTestClient` starts the app inside the test. It runs the services, so the ORM is set up by `ORMService` from `lib/config/database.dart`.
+Set the database with env variables, so the app picks the test database:
 
-```bash
-DB_CONNECTION=sqlite DB_NAME=storage/test.sqlite APP_PORT=3999 dart test test/api_test.dart
+```dart title="test/api_test.dart"
+import 'package:dox_core/testing.dart';
+import 'package:dox_migration/dox_migration.dart';
+import 'package:dox_orm/testing.dart';
+import 'package:my_app/config/app.dart';
+import 'package:my_app/config/database.dart';
+import 'package:test/test.dart';
+
+import '../db/migration/migrations.dart';
+
+void main() {
+  late DoxTestClient client;
+
+  setUpAll(() async {
+    await Migrator(
+      migrations: migrations,
+      config: databaseConfig.getConnectionConfig(),
+    ).migrate();
+    client = await DoxTestClient.start(appConfig);
+  });
+
+  setUp(refreshDatabase);
+
+  tearDownAll(() async {
+    await client.close();
+  });
+
+  test('GET /api/users is empty', () async {
+    (await client.get('/api/users')).expectStatus(200).expectJson(isEmpty);
+  });
+}
 ```
 
-See [Testing: test HTTP routes](../digging-deeper/testing.md#test-http-routes) for the server setup.
+```bash
+DB_CONNECTION=sqlite DB_NAME=storage/test.sqlite dart test test/api_test.dart
+```
+
+See [Testing: test HTTP routes](../digging-deeper/testing.md#test-http-routes) for all client methods.
 
 ## See also
 
@@ -14080,27 +14456,18 @@ Build a small production image with `dox build`, and run it with Postgres in Doc
 
 ## 1. Add a health route
 
-The health check asks this route. It fails when the database does not answer.
-
-```dart title="lib/app/http/controllers/health.controller.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:dox_orm/dox_orm.dart';
-
-class HealthController {
-  /// GET /health. 200 when the app and the database answer.
-  /// Any database error becomes a 500, so the health check fails.
-  Future<Map<String, String>> check(DoxRequest req) async {
-    await QueryBuilder.query('select 1');
-    return <String, String>{'status': 'ok'};
-  }
-}
-
-HealthController healthController = HealthController();
-```
+The health check asks this route. It answers 503 when the database does not answer.
 
 ```dart title="lib/routes/web.dart"
-Route.get('/health', healthController.check);
+Route.health(
+  '/health',
+  checks: <String, HealthCheckFunction>{
+    'database': () => QueryBuilder.query('select 1'),
+  },
+);
 ```
+
+See [Health check](../digging-deeper/health-check.md) for more checks.
 
 ## 2. Add the health check binary
 
@@ -15419,16 +15786,17 @@ See [OpenAPI](../packages/openapi.md).
 ## Testing
 
 ```dart
-setUpAll(() async {
-  Dox().initialize(appConfig);
-  Dox().totalIsolate(1);
-  await Dox().startServer();
-});
-tearDownAll(() async => Dox().server.close());
+import 'package:dox_core/testing.dart';
+import 'package:dox_orm/testing.dart';
+
+late DoxTestClient client;
+setUpAll(() async => client = await DoxTestClient.start(appConfig));
+setUp(refreshDatabase); // empty every table before each test
+tearDownAll(() async => client.close());
 
 test('ping', () async {
-  http.Response res = await http.get(Uri.parse('http://localhost:3000/api/ping'));
-  expect(res.statusCode, 200);
+  (await client.get('/api/ping')).expectStatus(200).expectBody('pong');
+  (await client.withToken(token).post('/api/posts', body: {...})).expectStatus(201);
 });
 ```
 
@@ -16593,7 +16961,8 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | Body limits are on | Keep `maxBodySize` (10 MB) and `maxMultipartSize` (100 MB), or lower them. Set the same limit in the proxy: `client_max_body_size 100m;` | [Request](../the-basic/request.md) |
 | CORS has real origins | `CORSConfig(origin: 'https://my.app')`, or a list like `<String>['https://my.app', 'https://admin.my.app']`. With a list, Dox sends back only the request origin when it is in the list. | [CORS](../security/cors.md) |
 | No `credentials: true` with `origin: '*'` | The new project's `cors.dart` has `origin: '*'` and `credentials: true` with `enabled: false`. When you turn CORS on, set a real origin first. | [CORS](../security/cors.md) |
-| Rate limiting | **Dox limit.** Dox has no rate limiter. Do it at the proxy. See [below](#rate-limit-at-the-proxy). | [Deployment](../digging-deeper/deployment.md) |
+| Rate limiting | Add `RateLimit(...)` to login and other busy routes. Use a Redis cache store, so all servers share the counts. Or limit at the proxy, see [below](#rate-limit-at-the-proxy). | [Rate limiting](../security/rate-limiting.md) |
+| Security headers | Add `const SecurityHeaders()` to `globalMiddleware`. | [Security headers](../security/security-headers.md) |
 | gzip at the proxy | Keep `compress: false`. Turn on gzip in Caddy (`encode gzip`) or nginx (`gzip on;`). | [Performance](../digging-deeper/performance.md) |
 | OpenAPI docs | Off in production by default (on only for `APP_ENV` `development` or `local`). Do not set `enabled: true` for a private API. | [OpenAPI](../packages/openapi.md) |
 
@@ -16635,13 +17004,13 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 
 | Check | How | Read more |
 | --- | --- | --- |
-| Health route | **Dox limit.** Dox has no built-in health route. Add one that asks the database: `Route.get('/health', healthController.check)` with `await QueryBuilder.query('select 1');`. | [Docker](../guides/docker.md) |
+| Health route | Add `Route.health('/health', checks: ...)` with a database check, so the load balancer knows when the app can not serve. | [Health check](../digging-deeper/health-check.md) |
 | Graceful shutdown | On `SIGTERM` or `SIGINT`, Dox stops taking connections and lets open requests finish, in every isolate. Set `shutdownTimeout` below the kill timeout of your platform. The `ORMService` closes the database in its `DoxShutdown` hook, and Dox closes the cache stores. Close your own connections in a `DoxShutdown` service. | [Deployment](../digging-deeper/deployment.md#graceful-shutdown) |
 | Zero downtime deploys | Run two processes (or machines) behind the proxy. Restart one at a time. | [Deployment](../digging-deeper/deployment.md) |
 
 ## Rate limit at the proxy
 
-Dox has no rate limiter. Add one in the proxy.
+You can also limit at the proxy. Then bad clients never reach the app.
 
 nginx:
 
@@ -17441,6 +17810,11 @@ What changed in each package, newest first. This page is made from the
 - New: `ExceptionHandler`, the one place that turns an error into a response. Extend it and set `AppConfig(exceptionHandler: ...)`. `report(error, stackTrace)` logs, `render(error, req)` picks the response. The default answers are the same as before. A URL with no route goes through it too.
 - Breaking: `AppConfig.errorHandler` and `defaultErrorHandler` are removed. Override `ExceptionHandler.report` instead. It gets the same errors: every error that is not an `IHttpException`, also errors outside a request. A thrown value that is not an `Exception` or `Error` (like a `String`) is now reported too.
 - `responseHandler` still works and still runs after `render`.
+- New: `RateLimit` middleware. `RateLimit(max: 60, per: Duration(minutes: 1), key: (DoxRequest req) => req.ip())`. One request too many gets `429` with `Retry-After`. Every answer has `X-RateLimit-Limit` and `X-RateLimit-Remaining`. The counts live in Redis when the default cache store is Redis (shared by all isolates and servers), else in memory. Fixed window. New `TooManyRequestsException`.
+- New: `SecurityHeaders` middleware. It adds `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy` and `Cross-Origin-Opener-Policy`, and `Strict-Transport-Security` on https requests only. Each one can be changed or turned off with `null`. `Content-Security-Policy` is off by default.
+- New: `Route.health('/health', checks: {...})`. It answers 200 `{"status": "ok"}`, or 503 when a check throws, returns `false` or times out. `HealthCheck.cache()` checks the cache. The error text is in the answer only in `development` and `local`.
+- New: `package:dox_core/testing.dart` with `DoxTestClient`. `DoxTestClient.start(appConfig)` runs the app in the test on a free port. `get`, `post`, `put`, `patch`, `delete`, `send`, `withHeaders` and `withToken`. `TestResponse` has `status`, `body`, `json`, `headers` and `expectStatus`, `expectJson`, `expectBody`, `expectHeader`.
+- dox_core now depends on `matcher` (for the `expect` methods of `TestResponse`).
 
 ### 3.0.0-alpha.8
 
@@ -17697,6 +18071,7 @@ What changed in each package, newest first. This page is made from the
 - New attribute casts with `@Column(cast: ...)`: `JsonCast`, `ListCast<E>`, `BoolCast`, `EnumCast<E>` (by name or by index), or your own `Cast<T>` class. `bool` fields get `BoolCast` and enum fields get `EnumCast` without `cast`.
 - New `withCount('posts')`, `withSum('posts', 'views')` and `withMax('posts', 'views')`. They add the value with a subquery, for `hasOne`, `hasMany` and `manyToMany` relations. Read it with `countOf('posts')` or `aggregate('posts_sum_views')`. `toJson()` has it too.
 - `all()` now uses the where conditions of the query, like `get()`. Before, it used only the soft delete check.
+- New: `package:dox_orm/testing.dart` with `refreshDatabase()`. Use `setUp(refreshDatabase)` in tests: it empties every table and starts the ids at 1 again, on Postgres, MySQL, MariaDB and SQLite. The migrations table keeps its rows. `keep:` keeps more tables.
 
 ### 3.0.0-alpha.8
 

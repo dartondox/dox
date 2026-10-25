@@ -121,6 +121,10 @@
          <lastmod>2026-10-25</lastmod>
     </url>
     <url>
+         <loc>https://dartondox.dev/latest/3.x/digging-deeper/health-check/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
          <loc>https://dartondox.dev/latest/3.x/digging-deeper/isolate/</loc>
          <lastmod>2026-10-25</lastmod>
     </url>
@@ -282,6 +286,14 @@
     </url>
     <url>
          <loc>https://dartondox.dev/latest/3.x/security/hashing/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
+         <loc>https://dartondox.dev/latest/3.x/security/rate-limiting/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
+         <loc>https://dartondox.dev/latest/3.x/security/security-headers/</loc>
          <lastmod>2026-10-25</lastmod>
     </url>
     <url>

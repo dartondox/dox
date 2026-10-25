@@ -1684,6 +1684,8 @@
       
         
       
+        
+      
     
     
     
@@ -1998,6 +2000,34 @@
     
   
     Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/health-check/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Health check
   
 
     
@@ -2949,6 +2979,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -3095,6 +3129,62 @@
     
   
     Hashing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/rate-limiting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rate limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/security-headers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security headers
   
 
     
@@ -4296,6 +4386,8 @@ You can mix class and function middleware.</p>
 <ul>
 <li><code>LogMiddleware</code> from <code>dox_core</code> writes one JSON log line per request. Body fields and headers whose name has <code>password</code>, <code>secret</code>, <code>token</code>, <code>authorization</code>, <code>cookie</code> or <code>api_key</code> in it (upper or lower case) are logged as <code>[REDACTED]</code>. Change the list with <code>redact:</code>. The new project turns it off when <code>APP_ENV</code> is <code>production</code>.</li>
 <li><code>AuthMiddleware</code> from <code>dox_auth</code> checks the JWT token. See <a href="../../security/authentication/">Authentication</a>.</li>
+<li><code>RateLimit</code> from <code>dox_core</code> answers <code>429</code> when a client sends too many requests. See <a href="../../security/rate-limiting/">Rate limiting</a>.</li>
+<li><code>SecurityHeaders</code> from <code>dox_core</code> adds safe headers like <code>X-Frame-Options</code> to every answer. See <a href="../../security/security-headers/">Security headers</a>.</li>
 </ul>
 </div>
 

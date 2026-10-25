@@ -1568,6 +1568,8 @@
       
         
       
+        
+      
     
     
     
@@ -1882,6 +1884,34 @@
     
   
     Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/health-check/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Health check
   
 
     
@@ -2833,6 +2863,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -2979,6 +3013,62 @@
     
   
     Hashing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/rate-limiting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rate limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/security-headers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security headers
   
 
     
@@ -4358,8 +4448,13 @@
 </tr>
 <tr>
 <td>Rate limiting</td>
-<td><strong>Dox limit.</strong> Dox has no rate limiter. Do it at the proxy. See <a href="#rate-limit-at-the-proxy">below</a>.</td>
-<td><a href="../../digging-deeper/deployment/">Deployment</a></td>
+<td>Add <code>RateLimit(...)</code> to login and other busy routes. Use a Redis cache store, so all servers share the counts. Or limit at the proxy, see <a href="#rate-limit-at-the-proxy">below</a>.</td>
+<td><a href="../../security/rate-limiting/">Rate limiting</a></td>
+</tr>
+<tr>
+<td>Security headers</td>
+<td>Add <code>const SecurityHeaders()</code> to <code>globalMiddleware</code>.</td>
+<td><a href="../../security/security-headers/">Security headers</a></td>
 </tr>
 <tr>
 <td>gzip at the proxy</td>
@@ -4516,8 +4611,8 @@
 <tbody>
 <tr>
 <td>Health route</td>
-<td><strong>Dox limit.</strong> Dox has no built-in health route. Add one that asks the database: <code>Route.get('/health', healthController.check)</code> with <code>await QueryBuilder.query('select 1');</code>.</td>
-<td><a href="../../guides/docker/">Docker</a></td>
+<td>Add <code>Route.health('/health', checks: ...)</code> with a database check, so the load balancer knows when the app can not serve.</td>
+<td><a href="../../digging-deeper/health-check/">Health check</a></td>
 </tr>
 <tr>
 <td>Graceful shutdown</td>
@@ -4532,7 +4627,7 @@
 </tbody>
 </table>
 <h2 id="rate-limit-at-the-proxy">Rate limit at the proxy</h2>
-<p>Dox has no rate limiter. Add one in the proxy.</p>
+<p>You can also limit at the proxy. Then bad clients never reach the app.</p>
 <p>nginx:</p>
 <div class="language-nginx highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># in http { }</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">limit_req_zone</span><span class="w"> </span><span class="nv">$binary_remote_addr</span><span class="w"> </span><span class="s">zone=api:10m</span><span class="w"> </span><span class="s">rate=10r/s</span><span class="p">;</span>
