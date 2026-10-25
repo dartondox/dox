@@ -142,6 +142,7 @@ nav:
     - the-basic/controller.md
     - the-basic/dependency-injection.md
     - the-basic/middleware.md
+    - the-basic/session.md
     - the-basic/validation.md
     - the-basic/validation-rules.md
   - Digging deeper:
@@ -182,6 +183,7 @@ nav:
   - Security:
     - security/authentication.md
     - security/cors.md
+    - security/csrf.md
     - security/encryption.md
     - security/hashing.md
     - security/rate-limiting.md

@@ -91,6 +91,21 @@ class DoxTestClient {
     });
   }
 
+  /// a copy of this client that sends [values] as cookies. Use the
+  /// `cookies` of a response to go on with its session.
+  /// ```
+  /// TestResponse login = await client.post('/login', body: form);
+  /// DoxTestClient user = client.withCookies(login.cookies);
+  /// ```
+  DoxTestClient withCookies(Map<String, String> values) {
+    return withHeaders(<String, String>{
+      HttpHeaders.cookieHeader: <String>[
+        for (MapEntry<String, String> c in values.entries)
+          '${c.key}=${c.value}',
+      ].join('; '),
+    });
+  }
+
   Future<TestResponse> get(String path, {Map<String, String>? headers}) {
     return send('GET', path, headers: headers);
   }
@@ -169,6 +184,13 @@ class DoxTestClient {
     response.headers.forEach((String name, List<String> values) {
       found[name.toLowerCase()] = values.join(', ');
     });
-    return TestResponse(response.statusCode, found, data.takeBytes());
+    return TestResponse(
+      response.statusCode,
+      found,
+      data.takeBytes(),
+      cookies: <String, String>{
+        for (Cookie cookie in response.cookies) cookie.name: cookie.value,
+      },
+    );
   }
 }

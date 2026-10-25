@@ -46,6 +46,12 @@ class DoxResponse {
     return this;
   }
 
+  /// The status set with [statusCode], or null (200).
+  int? get status => _statusCode;
+
+  /// The headers set with [header], by name.
+  Map<String, dynamic> get headers => _headers;
+
   /// Set response status code default 200
   /// ```
   /// res.setContent({"foo": "bar"});
@@ -120,6 +126,8 @@ class DoxResponse {
 
   /// This function is for internal use only
   dynamic process(HttpRequest request) {
+    /// a WebSocket route behind a `next` middleware: the socket is open
+    if (_contentData is WebSocket) return null;
     _headers.forEach((String key, dynamic value) {
       request.response.headers.add(key, value);
     });
@@ -158,4 +166,24 @@ class DoxResponse {
 /// String, int, Map, json serializable object, `Stream<List<int>>`, File
 DoxResponse response([dynamic content]) {
   return DoxResponse(content);
+}
+
+/// A redirect to [url]. 302 by default.
+/// ```
+/// return redirect('/login');
+/// ```
+DoxResponse redirect(String url, {int status = HttpStatus.found}) {
+  return DoxResponse(null)
+      .statusCode(status)
+      .header(HttpHeaders.locationHeader, url);
+}
+
+/// A 302 redirect to the page the request came from (the `Referer`
+/// header), or to [fallback] when there is none.
+/// ```
+/// req.session.flash('message', 'Saved');
+/// return back(req);
+/// ```
+DoxResponse back(DoxRequest req, {String fallback = '/'}) {
+  return redirect(req.referer() ?? fallback);
 }

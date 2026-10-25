@@ -4,7 +4,7 @@ icon: lucide/layers
 
 # Middleware
 
-Middleware is code that runs before the controller. Use it for checks like login, logging or rate limits.
+Middleware is code that runs before the controller, and if you want, after it too. Use it for checks like login, logging or rate limits, or to change the response.
 
 ## How it works
 
@@ -64,10 +64,55 @@ dynamic apiKeyMiddleware(DoxRequest req) {
 Route.get<WebController>('/ping', <dynamic>[apiKeyMiddleware, (WebController c) => c.pong]);
 ```
 
+## Run code after the controller
+
+A middleware can also get a `next` function. `await next()` runs the rest of the middleware and the controller, and gives the response.
+Code after that line runs after the controller. Change the response, then return it.
+
+```dart title="lib/app/http/middleware/see_other.middleware.dart"
+import 'package:dox_core/dox_core.dart';
+
+/// a redirect after a form post becomes 303, so the browser does a GET
+class SeeOtherMiddleware implements IDoxNextMiddleware {
+  @override
+  Future<DoxResponse> handle(DoxRequest req, Next next) async {
+    // before the controller
+    DoxResponse res = await next();
+    // after the controller
+    if (res.status == 302 && req.httpRequest.method != 'GET') {
+      res.statusCode(303);
+    }
+    return res;
+  }
+}
+```
+
+The response from `next()` is always a `DoxResponse`, so you can use all its methods:
+`statusCode(...)`, `header(...)`, `cookie(...)`, `content(...)`.
+Read the status with `res.status` (`null` means 200) and the headers with `res.headers`.
+
+When the controller (or a later middleware) throws an error, `next()` does not throw.
+It gives the error response from the [ExceptionHandler](errors.md), like a `404` or a `422`. So the code after `next()` always runs.
+
+A function works too. It takes the request and `next`:
+
+```dart
+Future<DoxResponse> timerMiddleware(DoxRequest req, Next next) async {
+  Stopwatch watch = Stopwatch()..start();
+  DoxResponse res = await next();
+  return res.header('X-Time', '${watch.elapsedMilliseconds}ms');
+}
+```
+
+To stop early, return a response and do not call `next()`.
+
+!!! note "Speed"
+    A route with no `next` middleware runs exactly as before. Only routes that have one pay for the extra step.
+
 ## Many middleware on one route
 
 Put them in the list before the controller. They run from left to right.
-You can mix class and function middleware.
+You can mix class and function middleware, with or without `next`.
 
 ```dart
 Route.get<WebController>('/ping', <dynamic>[
@@ -134,3 +179,5 @@ flowchart LR
     - `AuthMiddleware` from `dox_auth` checks the JWT token. See [Authentication](../security/authentication.md).
     - `RateLimit` from `dox_core` answers `429` when a client sends too many requests. See [Rate limiting](../security/rate-limiting.md).
     - `SecurityHeaders` from `dox_core` adds safe headers like `X-Frame-Options` to every answer. See [Security headers](../security/security-headers.md).
+    - `SessionMiddleware` from `dox_core` gives each request a session. See [Session](session.md).
+    - `CsrfMiddleware` from `dox_core` stops cross site request forgery. See [CSRF protection](../security/csrf.md).

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/logger.dart';
 
 /// The one place that turns a thrown error into a response.
@@ -39,6 +40,10 @@ class ExceptionHandler {
   ///
   /// - an `IHttpException` gets its own status and
   ///   `{"code": ..., "message": ...}`. Validation errors get 422.
+  /// - a validation error on a request with a session
+  ///   (`SessionMiddleware`) that does not want JSON (a form post, an
+  ///   Inertia request) flashes the `errors` and the old input, and
+  ///   redirects back. See `Session.flashErrors`.
   /// - any other error gets 500 with
   ///   `{"code": "server_error", "message": "Server Error"}`. When
   ///   `APP_ENV` is `development` or `local`, the error text is sent
@@ -46,6 +51,13 @@ class ExceptionHandler {
   ///
   /// The `responseHandler` of `AppConfig` still runs after it.
   dynamic render(Object error, HttpRequest req) {
+    if (error is ValidationException) {
+      DoxRequest? doxReq = SessionMiddleware.requestOf(req);
+      if (doxReq != null && !doxReq.expectsJson()) {
+        doxReq.session.flashErrors(error.message, input: doxReq.all());
+        return back(doxReq);
+      }
+    }
     return error;
   }
 }

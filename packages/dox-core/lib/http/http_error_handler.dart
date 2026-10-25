@@ -8,6 +8,12 @@ import 'package:dox_validation/dox_validation.dart' as dv;
 /// Every error of a request comes here. The `ExceptionHandler` of
 /// `AppConfig` reports it and decides the response.
 void httpErrorHandler(HttpRequest req, Object error, StackTrace stackTrace) {
+  httpResponseHandler(renderError(req, error, stackTrace), req);
+}
+
+/// Report [error] and give the response for it, from the
+/// `ExceptionHandler` of `AppConfig`. It is not sent yet.
+dynamic renderError(HttpRequest req, Object error, StackTrace stackTrace) {
   /// `schema.parse()` in a controller: answer 422 like `req.validate()`
   if (error is dv.ValidationException) {
     error = ValidationException(message: error.errors);
@@ -22,5 +28,5 @@ void httpErrorHandler(HttpRequest req, Object error, StackTrace stackTrace) {
     /// send the default answer for the first error.
     Logger.danger('ExceptionHandler failed: $handlerError\n$handlerStack');
   }
-  httpResponseHandler(payload, req);
+  return payload;
 }

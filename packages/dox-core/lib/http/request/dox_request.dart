@@ -59,6 +59,37 @@ class DoxRequest implements IDoxRequest {
     );
   }
 
+  Session? _session;
+
+  /// The session of the request. Needs `SessionMiddleware` on the route.
+  /// ```
+  /// req.session.put('cart', <int>[1, 2]);
+  /// ```
+  Session get session {
+    Session? session = _session;
+    if (session != null) return session;
+    throw StateError(
+      'This request has no session. Add SessionMiddleware() to '
+      'globalMiddleware or to the route.',
+    );
+  }
+
+  /// set by `SessionMiddleware`
+  set session(Session value) => _session = value;
+
+  /// True when the request has a session, see [session].
+  bool get hasSession => _session != null;
+
+  /// True when the client wants a JSON answer, not a page: an `Accept`
+  /// header with json, a JSON body, or an `X-Requested-With:
+  /// XMLHttpRequest` header. An Inertia request (`X-Inertia`) is not.
+  bool expectsJson() {
+    if (header('x-inertia') != null) return false;
+    String accept = header(HttpHeaders.acceptHeader) ?? '';
+    if (accept.contains('/json') || accept.contains('+json')) return true;
+    return isJson() || header('x-requested-with') == 'XMLHttpRequest';
+  }
+
   /// the query string, read on first use
   late Map<String, dynamic> query = uri.queryParameters;
 

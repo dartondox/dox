@@ -10,13 +10,22 @@ import 'package:matcher/expect.dart';
 /// (await client.get('/api/ping')).expectStatus(200).expectBody('pong');
 /// ```
 class TestResponse {
-  TestResponse(this.status, this.headers, this.bodyBytes);
+  TestResponse(
+    this.status,
+    this.headers,
+    this.bodyBytes, {
+    this.cookies = const <String, String>{},
+  });
 
   /// the http status code, eg. 200
   final int status;
 
   /// the headers, with lower case names. Many values are joined by `, `.
   final Map<String, String> headers;
+
+  /// the cookies from `Set-Cookie`, name to value (the raw value, so an
+  /// encrypted cookie stays encrypted)
+  final Map<String, String> cookies;
 
   /// the raw body
   final List<int> bodyBytes;

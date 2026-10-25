@@ -41,6 +41,25 @@ class RouteData {
     return _handler;
   }
 
+  bool? _usesNext;
+
+  /// True when a middleware of this route takes a `next`
+  /// ([IDoxNextMiddleware] or a [NextMiddlewareFunction]). Read once.
+  bool get usesNext {
+    return _usesNext ??= _findNext();
+  }
+
+  bool _findNext() {
+    Object? list = controllers;
+    if (list is! List<dynamic>) return false;
+    for (int i = 0; i < list.length; i++) {
+      Object? item = list[i];
+      if (item is IDoxNextMiddleware) return true;
+      if (i < list.length - 1 && item is NextMiddlewareFunction) return true;
+    }
+    return false;
+  }
+
   Function? _action;
   bool _actionRead = false;
 
@@ -140,6 +159,7 @@ class RouteData {
       .._handlerRead = true
       .._action = _action
       .._actionRead = _actionRead
+      .._usesNext = usesNext
       .._pattern = _pattern
       .._paramNames = _paramNames
       .._compiledFor = _compiledFor;

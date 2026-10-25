@@ -131,6 +131,21 @@ DoxResponse store(DoxRequest req) {
 | `content(value)` | changes the body |
 | `stream(byteStream)` | sends a `Stream<List<int>>` as the body |
 
+## Redirect
+
+```dart
+// 302 to a path
+return redirect('/login');
+
+// another status
+return redirect('/posts', status: 301);
+
+// back to the page the request came from (Referer), or '/'
+return back(req);
+```
+
+See [Session](session.md#redirect-back-with-errors) for flash messages and errors with a redirect.
+
 ## Cookie
 
 ```dart
@@ -146,6 +161,7 @@ DoxCookie token = DoxCookie(
   httpOnly: true, // default true: page scripts can not read it
   secure: true,   // default: Secure only when the request came over https
   path: '/',
+  sameSite: SameSite.lax, // from dart:io. default: none sent
 );
 return response('ok').cookie(token);
 
