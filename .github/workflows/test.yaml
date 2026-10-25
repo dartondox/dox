@@ -165,11 +165,34 @@ jobs:
           restore-keys: pub-${{ runner.os }}-
       - run: ci/run-examples.sh ${{ needs.changes.outputs.examples }}
 
+  # A new app made with `dox create` from the template branch v3.x, on the
+  # packages of this commit: build_runner, analyze, the template tests,
+  # migrate, `dox build`, then the AOT server answers its routes.
+  # It catches a change that breaks apps, the template, dox_queue or
+  # dox_scheduler. See ci/smoke-template.sh.
+  template:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - uses: actions/cache@v6
+        with:
+          path: ~/.pub-cache
+          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: pub-${{ runner.os }}-
+      - run: ci/smoke-template.sh
+        env:
+          TEMPLATE_VERSION: v3.x
+
   # The required check on main is named "test". This job keeps that name
   # and fails when any job above fails or is cancelled. Skipped jobs pass.
   test:
     if: always()
-    needs: [changes, lint, unit, databases, examples]
+    needs: [changes, lint, unit, databases, examples, template]
     runs-on: ubuntu-latest
     steps:
       - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
