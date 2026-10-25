@@ -25,6 +25,7 @@ The full docs as one file: https://dartondox.dev/latest/3.xllms-full.txt
 - [Routing](https://dartondox.dev/latest/3.xthe-basic/routing/)
 - [Request](https://dartondox.dev/latest/3.xthe-basic/request/)
 - [Response](https://dartondox.dev/latest/3.xthe-basic/response/)
+- [Error handling](https://dartondox.dev/latest/3.xthe-basic/errors/)
 - [Controller](https://dartondox.dev/latest/3.xthe-basic/controller/)
 - [Middleware](https://dartondox.dev/latest/3.xthe-basic/middleware/)
 - [Validation](https://dartondox.dev/latest/3.xthe-basic/validation/)

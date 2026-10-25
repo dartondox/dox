@@ -1103,6 +1103,8 @@
       
         
       
+        
+      
     
     
     
@@ -1221,6 +1223,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error handling
   
 
     
@@ -4021,21 +4051,21 @@
 <tr>
 <td>an <code>IHttpException</code>, like <code>NotFoundHttpException</code></td>
 <td>its <code>code</code></td>
-<td>sends its <code>message</code>. Does <strong>not</strong> call <code>errorHandler</code></td>
+<td>sends its <code>message</code>. Does <strong>not</strong> call <code>report</code></td>
 </tr>
 <tr>
 <td>a validation error (bad DTO input)</td>
 <td><code>422</code></td>
-<td>sends the field errors. Does not call <code>errorHandler</code></td>
+<td>sends the field errors. Does not call <code>report</code></td>
 </tr>
 <tr>
 <td>any other <code>Exception</code> or <code>Error</code></td>
 <td><code>500</code></td>
-<td>sends <code>error.toString()</code>. Calls <code>errorHandler</code></td>
+<td>sends <code>Server Error</code> (the error text only in development). Calls <code>report</code></td>
 </tr>
 </tbody>
 </table>
-<p>The response goes through the <code>responseHandler</code> of <code>AppConfig</code> last. That is where you set the shape.</p>
+<p><code>report</code> is a method of the <a href="../../the-basic/errors/">exception handler</a>. The response goes through the <code>responseHandler</code> of <code>AppConfig</code> last. This guide sets the shape there.</p>
 <h2 id="1-write-your-own-exceptions">1. Write your own exceptions</h2>
 <p>Extend <code>IHttpException</code>. Set <code>code</code> (the HTTP status), <code>errorCode</code> (a short text for the client) and <code>message</code>.</p>
 <div class="language-dart highlight"><span class="filename">lib/app/exceptions/app_exception.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
@@ -4140,24 +4170,31 @@ Turn it into your shape here.</p>
 </span></code></pre></div>
 <p>The last <code>if</code> matters. Without it, a <code>500</code> sends <code>error.toString()</code> to the client. That can show a SQL query or a file path.</p>
 <h2 id="3-log-unexpected-errors">3. Log unexpected errors</h2>
-<p><code>errorHandler</code> runs for every <code>500</code>, and for errors outside a request (a future nobody awaited, a timer).
+<p>The <code>report</code> method of the exception handler runs for every <code>500</code>, and for errors outside a request (a future nobody awaited, a timer).
 Write one JSON line. A log collector reads it, or you send it to Sentry here.</p>
 <div class="language-dart highlight"><span class="filename">lib/app/error_handler.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:convert'</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1">/// Dox calls this for every unexpected error (a `500`, or an error</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1">/// outside a request). It does not run for `IHttpException` errors</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1">/// like `404` or `422`, because those are expected.</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1">/// One JSON line per error. Send it to Sentry or Datadog from here.</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="kt">void</span><span class="w"> </span><span class="n">reportError</span><span class="p">(</span><span class="kt">Object</span><span class="o">?</span><span class="w"> </span><span class="n">error</span><span class="p">,</span><span class="w"> </span><span class="n">StackTrace</span><span class="w"> </span><span class="n">stackTrace</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="n">print</span><span class="p">(</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="n">jsonEncode</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">      </span><span class="s1">'level'</span><span class="o">:</span><span class="w"> </span><span class="s1">'ERROR'</span><span class="p">,</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">      </span><span class="s1">'message'</span><span class="o">:</span><span class="w"> </span><span class="n">error</span><span class="p">.</span><span class="n">toString</span><span class="p">(),</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">      </span><span class="s1">'stack'</span><span class="o">:</span><span class="w"> </span><span class="n">stackTrace</span><span class="p">.</span><span class="n">toString</span><span class="p">(),</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">      </span><span class="s1">'timestamp'</span><span class="o">:</span><span class="w"> </span><span class="n">DateTime</span><span class="p">.</span><span class="n">now</span><span class="p">().</span><span class="n">toIso8601String</span><span class="p">(),</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">    </span><span class="p">}),</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">  </span><span class="p">);</span>
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="p">}</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1">/// Dox calls [report] for every unexpected error (a `500`, or an error</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1">/// outside a request). It does not run for `IHttpException` errors</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1">/// like `404` or `422`, because those are expected.</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c1">/// One JSON line per error. Send it to Sentry or Datadog from here.</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppExceptionHandler</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ExceptionHandler</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">AppExceptionHandler</span><span class="p">();</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">report</span><span class="p">(</span><span class="kt">Object</span><span class="w"> </span><span class="n">error</span><span class="p">,</span><span class="w"> </span><span class="n">StackTrace</span><span class="w"> </span><span class="n">stackTrace</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">    </span><span class="n">print</span><span class="p">(</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">      </span><span class="n">jsonEncode</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">        </span><span class="s1">'level'</span><span class="o">:</span><span class="w"> </span><span class="s1">'ERROR'</span><span class="p">,</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">        </span><span class="s1">'message'</span><span class="o">:</span><span class="w"> </span><span class="n">error</span><span class="p">.</span><span class="n">toString</span><span class="p">(),</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="w">        </span><span class="s1">'stack'</span><span class="o">:</span><span class="w"> </span><span class="n">stackTrace</span><span class="p">.</span><span class="n">toString</span><span class="p">(),</span>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="w">        </span><span class="s1">'timestamp'</span><span class="o">:</span><span class="w"> </span><span class="n">DateTime</span><span class="p">.</span><span class="n">now</span><span class="p">().</span><span class="n">toIso8601String</span><span class="p">(),</span>
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="w">      </span><span class="p">}),</span>
+</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="w">    </span><span class="p">);</span>
+</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="4-register-both">4. Register both</h2>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/error_handler.dart'</span><span class="p">;</span>
@@ -4165,7 +4202,7 @@ Write one JSON line. A log collector reads it, or you send it to Sentry here.</p
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nl">responseHandler:</span><span class="w"> </span><span class="n">ResponseHandler</span><span class="p">(),</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="nl">errorHandler:</span><span class="w"> </span><span class="n">reportError</span><span class="p">,</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="nl">exceptionHandler:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">AppExceptionHandler</span><span class="p">(),</span>
 </span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span><span class="c1">// ...</span>
 </span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="p">);</span>
 </span></code></pre></div>
@@ -4221,6 +4258,7 @@ It goes through the response handler too, so it gets the same JSON shape:
 </div>
 <h2 id="see-also">See also</h2>
 <ul>
+<li><a href="../../the-basic/errors/">Error handling</a> for <code>report</code> and <code>render</code></li>
 <li><a href="../../the-basic/response/#errors">Response: errors</a> for the built-in exceptions</li>
 <li><a href="../../the-basic/response/#change-every-response">Response: change every response</a></li>
 <li><a href="../../the-basic/validation/#the-error-response">Validation: the error response</a></li>

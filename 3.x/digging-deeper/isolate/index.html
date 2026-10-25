@@ -1103,6 +1103,8 @@
       
         
       
+        
+      
     
     
     
@@ -1221,6 +1223,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error handling
   
 
     
@@ -3992,7 +4022,7 @@
 <h2 id="when-an-isolate-crashes">When an isolate crashes</h2>
 <ul>
 <li>An error in a request is caught. Dox sends a <code>500</code> and keeps going.</li>
-<li>An async error outside a request (for example a future that nobody awaits) is caught and passed to <code>errorHandler</code>. The isolate keeps running.</li>
+<li>An async error outside a request (for example a future that nobody awaits) is caught and passed to the <code>report</code> method of the <a href="../../the-basic/errors/">exception handler</a>. The isolate keeps running.</li>
 <li>If a worker isolate still dies, Dox prints <code>[dox] isolate N exited, restarting</code> to stderr. It starts a new isolate after 1 second.</li>
 <li>If the first (main) isolate dies, the process exits with a non-zero code. Let a supervisor start it again, like Docker <code>restart:</code> or systemd <code>Restart=always</code>. See <a href="../deployment/#keep-it-running">Deployment</a>.</li>
 </ul>

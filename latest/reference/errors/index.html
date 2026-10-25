@@ -1103,6 +1103,8 @@
       
         
       
+        
+      
     
     
     
@@ -1221,6 +1223,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error handling
   
 
     
@@ -4245,9 +4275,34 @@
 </thead>
 <tbody>
 <tr>
-<td><code>Route &lt;where&gt;: the controller parameter type &lt;T&gt; is not known. Use DoxRequest, a @Dto class, or String, int, double, num, bool for path params. ...</code></td>
-<td>A controller parameter has another type, or the DTO is not in <code>AppConfig.dtos</code>.</td>
-<td>Change the type, or run <code>dart run build_runner build</code> and set <code>dtos: dtos</code>.</td>
+<td><code>Route &lt;where&gt;: the controller parameter type &lt;T&gt; is not known. Use DoxRequest, a @Dto class, a type from Route.bind, or String, int, double, num, bool for path params. ...</code></td>
+<td>A controller parameter has another type, the DTO is not in <code>AppConfig.dtos</code>, or there is no <code>Route.bind&lt;T&gt;</code> for a <code>{param}</code> of the route.</td>
+<td>Change the type, add the binder, or run <code>dart run build_runner build</code> and set <code>dtos: dtos</code>.</td>
+</tr>
+<tr>
+<td><code>Route name "&lt;name&gt;" is used twice: &lt;method&gt; &lt;path&gt; and &lt;method&gt; &lt;path&gt;.</code></td>
+<td>Two routes have the same name.</td>
+<td>Give one of them another name.</td>
+</tr>
+<tr>
+<td><code>Invalid argument (name): No route has this name: "&lt;name&gt;"</code></td>
+<td><code>route()</code> or <code>Route.url()</code> with a name that no route has.</td>
+<td>Check the name and the group <code>name:</code> prefix.</td>
+</tr>
+<tr>
+<td><code>Invalid argument(s): Route "&lt;name&gt;" (&lt;path&gt;) needs the param "&lt;param&gt;".</code></td>
+<td><code>route()</code> without a value for a <code>{param}</code>.</td>
+<td>Pass it in <code>params:</code>.</td>
+</tr>
+<tr>
+<td><code>Invalid argument(s): Route "&lt;name&gt;" (&lt;path&gt;) has no param "&lt;key&gt;". ...</code></td>
+<td><code>route()</code> with a param the path does not have.</td>
+<td>Remove it, or pass it in <code>query:</code>.</td>
+</tr>
+<tr>
+<td><code>Bad state: No bound value of type &lt;T&gt; for the route param "&lt;param&gt;". ...</code></td>
+<td><code>req.bound&lt;T&gt;()</code> for a param with no <code>Route.bind</code>, or of another type.</td>
+<td>Add <code>Route.bind&lt;T&gt;('&lt;param&gt;', ...)</code>.</td>
 </tr>
 <tr>
 <td><code>Route &lt;where&gt;: the controller has more path params than the route has {...} params (&lt;n&gt;).</code></td>
@@ -4379,7 +4434,7 @@ The table shows the <code>message</code> text.</p>
 <tr>
 <td><code>500</code></td>
 <td><code>Server Error</code>, code <code>server_error</code>. When <code>APP_ENV</code> is <code>development</code> or <code>local</code>, the body is <code>&lt;error&gt;.toString()</code> as plain text.</td>
-<td>Any error that is not an <code>IHttpException</code>. It also goes to <code>errorHandler</code>.</td>
+<td>Any error that is not an <code>IHttpException</code>. It also goes to the <code>report</code> method of the <code>ExceptionHandler</code>.</td>
 <td>Look at the server log.</td>
 </tr>
 </tbody>

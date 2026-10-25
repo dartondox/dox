@@ -1103,6 +1103,8 @@
       
         
       
+        
+      
     
     
     
@@ -1221,6 +1223,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error handling
   
 
     
@@ -4205,10 +4235,10 @@ This page lists every field, with its type, its default and what it does.</p>
 <td>A class with <code>DoxResponse handle(DoxResponse res)</code>. It sees every response before it is sent.</td>
 </tr>
 <tr>
-<td><code>errorHandler</code></td>
-<td><code>Function(Object?, StackTrace)</code></td>
-<td><code>defaultErrorHandler</code></td>
-<td>Called for every unhandled error. The default logs the error with <code>Logger.warn</code> and the stack with <code>Logger.danger</code>.</td>
+<td><code>exceptionHandler</code></td>
+<td><code>ExceptionHandler</code></td>
+<td><code>ExceptionHandler()</code></td>
+<td>Reports every unhandled error and turns it into a response. The default logs the error with <code>Logger.warn</code> and the stack with <code>Logger.danger</code>. See <a href="../../the-basic/errors/">Error handling</a>.</td>
 </tr>
 <tr>
 <td><code>services</code></td>

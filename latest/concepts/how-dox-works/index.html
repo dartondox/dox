@@ -1281,6 +1281,8 @@
       
         
       
+        
+      
     
     
     
@@ -1399,6 +1401,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error handling
   
 
     
@@ -4101,7 +4131,7 @@ It also explains how Dox uses isolates, where the database pools live, and what 
 <li>Dart sends the answers of the batch back to Rust in one call. Rust writes the bytes to the socket.</li>
 </ol>
 <p>When a step throws, Dox catches the error. An <code>IHttpException</code> (like <code>NotFoundHttpException</code>) gives its own status.
-Any other error gives <code>500</code> and goes to the <code>errorHandler</code> of <code>AppConfig</code>.</p>
+Any other error gives <code>500</code> and goes to the <code>report</code> method of the <code>ExceptionHandler</code> in <code>AppConfig</code>.</p>
 <pre class="mermaid"><code>sequenceDiagram
     participant C as Client
     participant R as Rust (dox_http_native)
@@ -4160,7 +4190,7 @@ This is why <code>dox build</code> can make a native (AOT) binary.</p>
 </tr>
 <tr>
 <td>Errors</td>
-<td><code>IHttpException</code>, <code>AppConfig(errorHandler:)</code></td>
+<td><code>IHttpException</code>, <code>AppConfig(exceptionHandler:)</code></td>
 <td>the error response, logging</td>
 </tr>
 </tbody>
@@ -4222,7 +4252,7 @@ Open these in <code>setup()</code>. See <a href="../../digging-deeper/services/"
 <h3 id="when-an-isolate-crashes">When an isolate crashes</h3>
 <ul>
 <li>An error in a request is caught. Dox answers <code>500</code> and keeps going.</li>
-<li>An async error outside a request is caught and passed to <code>errorHandler</code>. The isolate keeps running.</li>
+<li>An async error outside a request is caught and passed to the <code>ExceptionHandler</code>. The isolate keeps running.</li>
 <li>When a worker isolate still dies, Dox prints <code>[dox] isolate N exited, restarting</code> and starts a new one after 1 second.</li>
 <li>When the first (main) isolate dies, the process exits with a non-zero code. A supervisor (Docker <code>restart:</code>, systemd <code>Restart=always</code>) must start it again.</li>
 </ul>

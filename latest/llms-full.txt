@@ -1665,7 +1665,7 @@ A request goes through these steps:
 11. Dart sends the answers of the batch back to Rust in one call. Rust writes the bytes to the socket.
 
 When a step throws, Dox catches the error. An `IHttpException` (like `NotFoundHttpException`) gives its own status.
-Any other error gives `500` and goes to the `errorHandler` of `AppConfig`.
+Any other error gives `500` and goes to the `report` method of the `ExceptionHandler` in `AppConfig`.
 
 ```mermaid
 sequenceDiagram
@@ -1703,7 +1703,7 @@ sequenceDiagram
 | Middleware | `AppConfig(globalMiddleware:)`, `Router.middleware`, `Route.middleware(...)`, the route list | go on, or answer early |
 | Input | a `@Dto` class in `lib/app/http/dtos/` | what the controller gets, or `422` |
 | Output | the return value, `response(...)`, `responseHandler` | status, headers, body |
-| Errors | `IHttpException`, `AppConfig(errorHandler:)` | the error response, logging |
+| Errors | `IHttpException`, `AppConfig(exceptionHandler:)` | the error response, logging |
 
 See [Routing](../the-basic/routing.md), [Middleware](../the-basic/middleware.md),
 [Validation](../the-basic/validation.md) and [Response](../the-basic/response.md).
@@ -1755,7 +1755,7 @@ Open these in `setup()`. See [Services](../digging-deeper/services.md).
 ### When an isolate crashes
 
 - An error in a request is caught. Dox answers `500` and keeps going.
-- An async error outside a request is caught and passed to `errorHandler`. The isolate keeps running.
+- An async error outside a request is caught and passed to the `ExceptionHandler`. The isolate keeps running.
 - When a worker isolate still dies, Dox prints `[dox] isolate N exited, restarting` and starts a new one after 1 second.
 - When the first (main) isolate dies, the process exits with a non-zero code. A supervisor (Docker `restart:`, systemd `Restart=always`) must start it again.
 
@@ -2593,6 +2593,8 @@ Route.middleware(<dynamic>[AuthMiddleware()], () { // (4)!
 
 Groups can be nested. `Route.group('blogs', ...)` with `Route.get('all', ...)` makes `/blogs/all`.
 
+A group can also add a prefix to the [route names](#named-routes) inside it, with `name:`.
+
 To turn CORS on or off for some routes, see [CORS](../security/cors.md).
 
 ## Resource routes
@@ -2603,19 +2605,86 @@ One line makes the usual CRUD routes for a controller.
 Route.resource('blogs', BlogController());
 ```
 
-| Method | Path | Controller method |
-| --- | --- | --- |
-| `GET` | `/blogs` | `index` |
-| `GET` | `/blogs/create` | `create` |
-| `POST` | `/blogs` | `store` |
-| `GET` | `/blogs/{id}` | `show` |
-| `GET` | `/blogs/{id}/edit` | `edit` |
-| `PUT`, `PATCH` | `/blogs/{id}` | `update` |
-| `DELETE` | `/blogs/{id}` | `destroy` |
+| Method | Path | Controller method | Route name |
+| --- | --- | --- | --- |
+| `GET` | `/blogs` | `index` | `blogs.index` |
+| `GET` | `/blogs/create` | `create` | `blogs.create` |
+| `POST` | `/blogs` | `store` | `blogs.store` |
+| `GET` | `/blogs/{id}` | `show` | `blogs.show` |
+| `GET` | `/blogs/{id}/edit` | `edit` | `blogs.edit` |
+| `PUT`, `PATCH` | `/blogs/{id}` | `update` | `blogs.update` |
+| `DELETE` | `/blogs/{id}` | `destroy` | `blogs.destroy` |
+
+The name comes from the path: `/` becomes `.`, and `{params}` are left out.
+So `Route.resource('users/{user}/posts', ...)` gives `users.posts.index`.
+Pass `name:` to pick another one: `Route.resource('blogs', BlogController(), name: 'posts')`.
 
 A method that the controller does not have is skipped. No route is made for it.
 Any other error from the controller is not hidden. It stops the app at start, so you see it.
 See [Resource controller](controller.md#resource-controller) to make one with the CLI.
+
+## Named routes
+
+Give a route a name with `.name()`. Then build its URL from the name, so a path lives in one place.
+
+```dart
+Route.get('/users/{id}', controller.show).name('users.show');
+
+route('users.show', params: <String, Object>{'id': 5});
+// /users/5
+
+route('users.show', params: <String, Object>{'id': 5}, query: <String, Object>{'tab': 'posts'});
+// /users/5?tab=posts
+```
+
+`route()` gives the path. `Route.url()` does the same.
+Param values are URL encoded. A missing `{name?}` param is left out.
+
+A group can put a prefix in front of the names inside it:
+
+```dart
+Route.group('admin', () {
+  Route.get('users', controller.index).name('users'); // admin.users
+}, name: 'admin.');
+```
+
+Dox stops with a clear error when:
+
+- two routes have the same name (at start),
+- `route()` gets a name that no route has,
+- a `{param}` of the path has no value, or `params` has a key the path does not have.
+
+## Route model binding
+
+A binder turns a route param into a value before the controller runs, for example a model from the database.
+Add it with `Route.bind`, before the routes that use it.
+
+```dart
+Route.bind<User>('user', (String id) => User().find(id));
+
+Route.get('/users/{user}', (DoxRequest req, User user) {
+  return user;
+});
+```
+
+Every route with a `{user}` param now runs the binder first.
+The binder gets the raw text from the URL. It returns the value, or `null` when there is none.
+`null` answers `404`, the same way as a thrown `NotFoundHttpException`.
+
+There are two ways to read the value:
+
+- Ask for a parameter of the bound type, like `User user`. Dox matches it by type, so it can be at any place in the parameter list.
+- Read it from the request: `req.bound<User>('user')`. This also works in a controller that only takes `DoxRequest`.
+
+Other path params still work next to it:
+
+```dart
+Route.get('/users/{user}/posts/{page}', (User user, int page) {
+  return user.posts(page);
+});
+```
+
+The binder runs after the middleware, so an auth middleware can stop the request before any database call.
 
 ## Serve storage files
 
@@ -2925,7 +2994,7 @@ class ForbiddenException extends IHttpException {
 }
 ```
 
-Any other error gets `500`. It is also passed to the `errorHandler` in `AppConfig`.
+Any other error gets `500`. It is also passed to the [exception handler](errors.md).
 
 ## Files and big responses
 
@@ -3035,6 +3104,105 @@ AppConfig appConfig = AppConfig(
   // ...
 );
 ```
+
+
+---
+
+# Error handling
+
+Source: https://dartondox.dev/latest/3.xthe-basic/errors/
+
+# Error handling
+
+Every error that a route throws goes to one place: the exception handler.
+It does two things:
+
+- `report(error, stackTrace)` logs the error.
+- `render(error, req)` decides what the client gets.
+
+## The default answer
+
+You do not need to set anything. With the default handler:
+
+| Error | Status | Body |
+| --- | --- | --- |
+| an `IHttpException`, like `NotFoundHttpException` | its `code` | `{"code": "not_found", "message": "Not Found"}` |
+| a `ValidationException` (bad input) | `422` | the field errors, like `{"name": "The name is required"}` |
+| a URL with no route | `404` | `{"code": "not_found", "message": "GET /x not found"}` |
+| any other error | `500` | `{"code": "server_error", "message": "Server Error"}` |
+
+For a `500`, the error text is sent only when `APP_ENV` is `development` or `local`.
+In production the client never sees it, because it can hold SQL, file paths or hosts.
+
+`report` is called for every error that is not an `IHttpException`.
+An `IHttpException` is a normal answer (like `404`), so it is not logged.
+The default `report` prints the error and the stack with the logger.
+
+See [HTTP exceptions](../reference/http-exceptions.md) for the built-in exception classes.
+
+## Your own handler
+
+Extend `ExceptionHandler`. Override one method or both.
+
+```dart title="lib/app/exception_handler.dart"
+import 'dart:io';
+
+import 'package:dox_core/dox_core.dart';
+
+class AppExceptionHandler extends ExceptionHandler {
+  const AppExceptionHandler();
+
+  @override
+  void report(Object error, StackTrace stackTrace) {
+    // send it to your error tracker
+    print('ERROR $error\n$stackTrace');
+  }
+
+  @override
+  dynamic render(Object error, HttpRequest req) {
+    if (error is PaymentRequiredException) {
+      return response(<String, String>{'message': 'Please pay'})
+          .statusCode(402);
+    }
+    // everything else: the default answer
+    return super.render(error, req);
+  }
+}
+```
+
+Set it in `AppConfig`:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  exceptionHandler: const AppExceptionHandler(),
+  // ...
+);
+```
+
+## What render can return
+
+`render` returns anything a controller can return: a `DoxResponse`, a map, a string.
+Return the error itself (this is what `super.render` does) to get the default answer.
+
+`req` is the raw `HttpRequest`. It is there even when the error came before Dox read the body.
+Use it to read headers, like `req.headers.value('accept')`.
+
+If `render` itself throws, Dox logs that error and sends the default answer.
+The client always gets a response.
+
+## Errors outside a request
+
+Some errors do not belong to a request.
+For example a future that nobody awaits, or an error in a service `shutdown()`.
+Dox passes them to `report` too. The server keeps running.
+
+## The response handler
+
+The `responseHandler` of `AppConfig` still runs after `render`.
+It sees every response, also error responses.
+Use `render` to change errors, and `responseHandler` to change all responses (for example, to add a header).
+
+See [Custom errors](../guides/custom-errors.md) for a full example with your own exception classes.
 
 
 ---
@@ -4918,7 +5086,7 @@ Because the config and services are copied, they must not hold open sockets or d
 ## When an isolate crashes
 
 - An error in a request is caught. Dox sends a `500` and keeps going.
-- An async error outside a request (for example a future that nobody awaits) is caught and passed to `errorHandler`. The isolate keeps running.
+- An async error outside a request (for example a future that nobody awaits) is caught and passed to the `report` method of the [exception handler](../the-basic/errors.md). The isolate keeps running.
 - If a worker isolate still dies, Dox prints `[dox] isolate N exited, restarting` to stderr. It starts a new isolate after 1 second.
 - If the first (main) isolate dies, the process exits with a non-zero code. Let a supervisor start it again, like Docker `restart:` or systemd `Restart=always`. See [Deployment](deployment.md#keep-it-running).
 
@@ -5051,7 +5219,7 @@ class RedisService implements DoxService, DoxShutdown {
 }
 ```
 
-An error in `shutdown()` goes to `errorHandler`. The other services still run.
+An error in `shutdown()` goes to the `report` method of the [exception handler](../the-basic/errors.md). The other services still run.
 
 ## Rules for a service
 
@@ -11855,11 +12023,11 @@ When a controller or a middleware throws:
 
 | Error | Status | What Dox does |
 | --- | --- | --- |
-| an `IHttpException`, like `NotFoundHttpException` | its `code` | sends its `message`. Does **not** call `errorHandler` |
-| a validation error (bad DTO input) | `422` | sends the field errors. Does not call `errorHandler` |
-| any other `Exception` or `Error` | `500` | sends `error.toString()`. Calls `errorHandler` |
+| an `IHttpException`, like `NotFoundHttpException` | its `code` | sends its `message`. Does **not** call `report` |
+| a validation error (bad DTO input) | `422` | sends the field errors. Does not call `report` |
+| any other `Exception` or `Error` | `500` | sends `Server Error` (the error text only in development). Calls `report` |
 
-The response goes through the `responseHandler` of `AppConfig` last. That is where you set the shape.
+`report` is a method of the [exception handler](../the-basic/errors.md). The response goes through the `responseHandler` of `AppConfig` last. This guide sets the shape there.
 
 ## 1. Write your own exceptions
 
@@ -11978,25 +12146,32 @@ The last `if` matters. Without it, a `500` sends `error.toString()` to the clien
 
 ## 3. Log unexpected errors
 
-`errorHandler` runs for every `500`, and for errors outside a request (a future nobody awaited, a timer).
+The `report` method of the exception handler runs for every `500`, and for errors outside a request (a future nobody awaited, a timer).
 Write one JSON line. A log collector reads it, or you send it to Sentry here.
 
 ```dart title="lib/app/error_handler.dart"
 import 'dart:convert';
 
-/// Dox calls this for every unexpected error (a `500`, or an error
+import 'package:dox_core/dox_core.dart';
+
+/// Dox calls [report] for every unexpected error (a `500`, or an error
 /// outside a request). It does not run for `IHttpException` errors
 /// like `404` or `422`, because those are expected.
 /// One JSON line per error. Send it to Sentry or Datadog from here.
-void reportError(Object? error, StackTrace stackTrace) {
-  print(
-    jsonEncode(<String, String>{
-      'level': 'ERROR',
-      'message': error.toString(),
-      'stack': stackTrace.toString(),
-      'timestamp': DateTime.now().toIso8601String(),
-    }),
-  );
+class AppExceptionHandler extends ExceptionHandler {
+  const AppExceptionHandler();
+
+  @override
+  void report(Object error, StackTrace stackTrace) {
+    print(
+      jsonEncode(<String, String>{
+        'level': 'ERROR',
+        'message': error.toString(),
+        'stack': stackTrace.toString(),
+        'timestamp': DateTime.now().toIso8601String(),
+      }),
+    );
+  }
 }
 ```
 
@@ -12008,7 +12183,7 @@ import 'package:my_app/app/http/response_handler.dart';
 
 AppConfig appConfig = AppConfig(
   responseHandler: ResponseHandler(),
-  errorHandler: reportError,
+  exceptionHandler: const AppExceptionHandler(),
   // ...
 );
 ```
@@ -12044,6 +12219,7 @@ Remove the `/boom` route when you are done.
 
 ## See also
 
+- [Error handling](../the-basic/errors.md) for `report` and `render`
 - [Response: errors](../the-basic/response.md#errors) for the built-in exceptions
 - [Response: change every response](../the-basic/response.md#change-every-response)
 - [Validation: the error response](../the-basic/validation.md#the-error-response)
@@ -12079,7 +12255,7 @@ None of them survive a restart. See [When you need a real queue](#when-you-need-
 ## 1. Work after the response
 
 Start the future and return. `unawaited` tells the linter you did this on purpose.
-An error in the future goes to the `errorHandler` of `AppConfig`. The isolate keeps running.
+An error in the future goes to the `report` method of the `ExceptionHandler` in `AppConfig`. The isolate keeps running.
 
 ```dart title="lib/app/http/controllers/report.controller.dart"
 import 'dart:async';
@@ -12230,7 +12406,7 @@ A failed row stays in the table, so you can retry it. This is a queue with one e
 
 - [Isolate](../digging-deeper/isolate.md) for what each isolate shares, and what it does not
 - [Services](../digging-deeper/services.md)
-- [Custom errors](custom-errors.md) for the `errorHandler` that gets the errors of a future nobody awaits
+- [Custom errors](custom-errors.md) for the `ExceptionHandler` that gets the errors of a future nobody awaits
 
 
 ---
@@ -15062,7 +15238,7 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `dtos` | `List<DtoSchema<Object>>` | `[]` | Every DTO of the app: `dtos` from `lib/dtos.g.dart`. Dox finds the DTO of a controller parameter and of `req.validate<T>()` with it. |
 | `validationMessages` | `MessageResolver?` | `null` (English messages) | Messages for validation errors, for example in other languages. |
 | `responseHandler` | `ResponseHandlerInterface?` | `null` | A class with `DoxResponse handle(DoxResponse res)`. It sees every response before it is sent. |
-| `errorHandler` | `Function(Object?, StackTrace)` | `defaultErrorHandler` | Called for every unhandled error. The default logs the error with `Logger.warn` and the stack with `Logger.danger`. |
+| `exceptionHandler` | `ExceptionHandler` | `ExceptionHandler()` | Reports every unhandled error and turns it into a response. The default logs the error with `Logger.warn` and the stack with `Logger.danger`. See [Error handling](../the-basic/errors.md). |
 | `services` | `List<DoxService>` | `[]` | Classes with a `setup()` method. Dox runs them in every isolate at start. The ORM and auth are set up here. |
 
 ## Sub configs
@@ -16209,7 +16385,7 @@ throw NotFoundHttpException(
 );
 ```
 
-Other errors: any `Exception` or `Error` that is not an `IHttpException` gets `500` with `{"code": "server_error", "message": "Server Error"}`. When `APP_ENV` is `development` or `local`, the body is `error.toString()` as text instead. It is also passed to `errorHandler` in `AppConfig`. An `IHttpException` is not passed to `errorHandler`.
+Other errors: any `Exception` or `Error` that is not an `IHttpException` gets `500` with `{"code": "server_error", "message": "Server Error"}`. When `APP_ENV` is `development` or `local`, the body is `error.toString()` as text instead. It is also passed to the `report` method of the [exception handler](../the-basic/errors.md). An `IHttpException` is not reported.
 
 A `ValidationException` from `dox_validation` (thrown by `schema.parse()` in a controller) is turned into the `422` `ValidationException` of `dox_core` with the same errors.
 
@@ -16342,7 +16518,7 @@ Items marked **Dox limit** are things Dox does not do for you. You must handle t
 | JSON logs | `LoggerConfig(enabled: true, prettyPrint: false)`. The new project sets `prettyPrint` only when `APP_ENV=development`. | [App config](app-config.md) |
 | Log level | Set `LOG_LEVEL=warn` to print only warnings and errors. | [App config](app-config.md) |
 | Access logs in one place | `LogMiddleware` writes one line per request, every 20 ms. A hard kill can lose the last lines. Turn it off when the proxy already logs requests. | [Performance](../digging-deeper/performance.md) |
-| Errors go to your tracker | Set `AppConfig.errorHandler`. Any non-HTTP error is passed to it. The client gets `500` with `server_error`. The error text is sent only when `APP_ENV` is `development` or `local`. | [HTTP exceptions](http-exceptions.md) |
+| Errors go to your tracker | Extend `ExceptionHandler` and set `AppConfig.exceptionHandler`. Any non-HTTP error is passed to its `report` method. The client gets `500` with `server_error`. The error text is sent only when `APP_ENV` is `development` or `local`. | [Error handling](../the-basic/errors.md) |
 
 ## Health and shutdown
 
@@ -16656,7 +16832,12 @@ These stop the app at start, so a bad route never reaches a request.
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `Route <where>: the controller parameter type <T> is not known. Use DoxRequest, a @Dto class, or String, int, double, num, bool for path params. ...` | A controller parameter has another type, or the DTO is not in `AppConfig.dtos`. | Change the type, or run `dart run build_runner build` and set `dtos: dtos`. |
+| `Route <where>: the controller parameter type <T> is not known. Use DoxRequest, a @Dto class, a type from Route.bind, or String, int, double, num, bool for path params. ...` | A controller parameter has another type, the DTO is not in `AppConfig.dtos`, or there is no `Route.bind<T>` for a `{param}` of the route. | Change the type, add the binder, or run `dart run build_runner build` and set `dtos: dtos`. |
+| `Route name "<name>" is used twice: <method> <path> and <method> <path>.` | Two routes have the same name. | Give one of them another name. |
+| `Invalid argument (name): No route has this name: "<name>"` | `route()` or `Route.url()` with a name that no route has. | Check the name and the group `name:` prefix. |
+| `Invalid argument(s): Route "<name>" (<path>) needs the param "<param>".` | `route()` without a value for a `{param}`. | Pass it in `params:`. |
+| `Invalid argument(s): Route "<name>" (<path>) has no param "<key>". ...` | `route()` with a param the path does not have. | Remove it, or pass it in `query:`. |
+| `Bad state: No bound value of type <T> for the route param "<param>". ...` | `req.bound<T>()` for a param with no `Route.bind`, or of another type. | Add `Route.bind<T>('<param>', ...)`. |
 | `Route <where>: the controller has more path params than the route has {...} params (<n>).` | The method asks for more path params than the path has. | Add the `{param}` to the path, or remove the parameter. |
 | `Route <where>: a controller can have one @Dto only.` | Two DTO parameters. | Merge them into one DTO. |
 | `Route <where>: only positional parameters are supported, not named or [optional] ones (<type>).` | Named or `[optional]` parameters. | Use positional parameters. Use `int?` with `{id?}` for an optional param. |
@@ -16690,7 +16871,7 @@ The table shows the `message` text.
 | `422` | `{"_root":"The input has too many items (max 1000) or levels (max 10)"}` | Form or query keys with more than 1000 list items or 10 levels. | Send less nested data. |
 | `422` | `{"<field>":"<message>"}` | A DTO check failed. | See [Validation rules](../the-basic/validation-rules.md). |
 | `431` | (no text) | Native server: request line plus headers over 16 KB. | Send smaller headers or cookies. |
-| `500` | `Server Error`, code `server_error`. When `APP_ENV` is `development` or `local`, the body is `<error>.toString()` as plain text. | Any error that is not an `IHttpException`. It also goes to `errorHandler`. | Look at the server log. |
+| `500` | `Server Error`, code `server_error`. When `APP_ENV` is `development` or `local`, the body is `<error>.toString()` as plain text. | Any error that is not an `IHttpException`. It also goes to the `report` method of the `ExceptionHandler`. | Look at the server log. |
 
 ## dox_core: DTOs, storage and config
 
@@ -17143,6 +17324,14 @@ What changed in each package, newest first. This page is made from the
 - Generated models import `package:dox_orm/dox_orm.dart`.
 
 ## dox_core
+
+### Unreleased
+
+- New: named routes. `Route.get('/users/{id}', c).name('users.show')`, then `route('users.show', params: {'id': 5})` gives `/users/5`. `query:` adds a query string. `Route.group(..., name: 'admin.')` puts a prefix in front of the names inside. Resource routes are named `blogs.index` ... `blogs.destroy`; `Route.resource(..., name:)` picks another base name. A name used twice stops the app at start. An unknown name, a missing param or an extra param throws an `ArgumentError`.
+- New: route model binding without `dart:mirrors`. `Route.bind<User>('user', (String id) => User().find(id))` runs before the controller of every route with a `{user}` param. The controller gets it as a `User user` parameter, or with `req.bound<User>('user')`. A binder that gives `null` answers 404.
+- New: `ExceptionHandler`, the one place that turns an error into a response. Extend it and set `AppConfig(exceptionHandler: ...)`. `report(error, stackTrace)` logs, `render(error, req)` picks the response. The default answers are the same as before. A URL with no route goes through it too.
+- Breaking: `AppConfig.errorHandler` and `defaultErrorHandler` are removed. Override `ExceptionHandler.report` instead. It gets the same errors: every error that is not an `IHttpException`, also errors outside a request. A thrown value that is not an `Exception` or `Error` (like a `String`) is now reported too.
+- `responseHandler` still works and still runs after `render`.
 
 ### 3.0.0-alpha.8
 

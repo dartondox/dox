@@ -1103,6 +1103,8 @@
       
         
       
+        
+      
     
     
     
@@ -1221,6 +1223,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error handling
   
 
     
@@ -4068,7 +4098,7 @@ Dox closes the cache stores (eg. Redis) by itself, after the services.</p>
 </span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>An error in <code>shutdown()</code> goes to <code>errorHandler</code>. The other services still run.</p>
+<p>An error in <code>shutdown()</code> goes to the <code>report</code> method of the <a href="../../the-basic/errors/">exception handler</a>. The other services still run.</p>
 <h2 id="rules-for-a-service">Rules for a service</h2>
 <ul>
 <li><strong>Open connections in <code>setup()</code>, not in the constructor.</strong> Dox copies the service object to each isolate. An open socket or database pool can not be copied, so the isolate fails to start.</li>

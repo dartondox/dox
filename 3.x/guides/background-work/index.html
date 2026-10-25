@@ -1103,6 +1103,8 @@
       
         
       
+        
+      
     
     
     
@@ -1221,6 +1223,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error handling
   
 
     
@@ -4060,7 +4090,7 @@
 <p>None of them survive a restart. See <a href="#when-you-need-a-real-queue">When you need a real queue</a>.</p>
 <h2 id="1-work-after-the-response">1. Work after the response</h2>
 <p>Start the future and return. <code>unawaited</code> tells the linter you did this on purpose.
-An error in the future goes to the <code>errorHandler</code> of <code>AppConfig</code>. The isolate keeps running.</p>
+An error in the future goes to the <code>report</code> method of the <code>ExceptionHandler</code> in <code>AppConfig</code>. The isolate keeps running.</p>
 <div class="language-dart highlight"><span class="filename">lib/app/http/controllers/report.controller.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:async'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:isolate'</span><span class="p">;</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
@@ -4181,7 +4211,7 @@ A failed row stays in the table, so you can retry it. This is a queue with one e
 <ul>
 <li><a href="../../digging-deeper/isolate/">Isolate</a> for what each isolate shares, and what it does not</li>
 <li><a href="../../digging-deeper/services/">Services</a></li>
-<li><a href="../custom-errors/">Custom errors</a> for the <code>errorHandler</code> that gets the errors of a future nobody awaits</li>
+<li><a href="../custom-errors/">Custom errors</a> for the <code>ExceptionHandler</code> that gets the errors of a future nobody awaits</li>
 </ul>
 
 

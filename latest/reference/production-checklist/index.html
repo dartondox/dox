@@ -1103,6 +1103,8 @@
       
         
       
+        
+      
     
     
     
@@ -1221,6 +1223,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error handling
   
 
     
@@ -4253,8 +4283,8 @@
 </tr>
 <tr>
 <td>Errors go to your tracker</td>
-<td>Set <code>AppConfig.errorHandler</code>. Any non-HTTP error is passed to it. The client gets <code>500</code> with <code>server_error</code>. The error text is sent only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>.</td>
-<td><a href="../http-exceptions/">HTTP exceptions</a></td>
+<td>Extend <code>ExceptionHandler</code> and set <code>AppConfig.exceptionHandler</code>. Any non-HTTP error is passed to its <code>report</code> method. The client gets <code>500</code> with <code>server_error</code>. The error text is sent only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>.</td>
+<td><a href="../../the-basic/errors/">Error handling</a></td>
 </tr>
 </tbody>
 </table>

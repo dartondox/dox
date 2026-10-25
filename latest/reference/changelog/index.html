@@ -1103,6 +1103,8 @@
       
         
       
+        
+      
     
     
     
@@ -1221,6 +1223,34 @@
     
   
     Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error handling
   
 
     
@@ -4237,6 +4267,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha8_5" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4563,7 +4604,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
+  <a href="#unreleased_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -5722,6 +5763,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha8_5" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6048,7 +6100,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
+  <a href="#unreleased_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Unreleased
@@ -6835,6 +6887,14 @@
 <li>Generated models import <code>package:dox_orm/dox_orm.dart</code>.</li>
 </ul>
 <h2 id="dox_core">dox_core</h2>
+<h3 id="unreleased">Unreleased</h3>
+<ul>
+<li>New: named routes. <code>Route.get('/users/{id}', c).name('users.show')</code>, then <code>route('users.show', params: {'id': 5})</code> gives <code>/users/5</code>. <code>query:</code> adds a query string. <code>Route.group(..., name: 'admin.')</code> puts a prefix in front of the names inside. Resource routes are named <code>blogs.index</code> ... <code>blogs.destroy</code>; <code>Route.resource(..., name:)</code> picks another base name. A name used twice stops the app at start. An unknown name, a missing param or an extra param throws an <code>ArgumentError</code>.</li>
+<li>New: route model binding without <code>dart:mirrors</code>. <code>Route.bind&lt;User&gt;('user', (String id) =&gt; User().find(id))</code> runs before the controller of every route with a <code>{user}</code> param. The controller gets it as a <code>User user</code> parameter, or with <code>req.bound&lt;User&gt;('user')</code>. A binder that gives <code>null</code> answers 404.</li>
+<li>New: <code>ExceptionHandler</code>, the one place that turns an error into a response. Extend it and set <code>AppConfig(exceptionHandler: ...)</code>. <code>report(error, stackTrace)</code> logs, <code>render(error, req)</code> picks the response. The default answers are the same as before. A URL with no route goes through it too.</li>
+<li>Breaking: <code>AppConfig.errorHandler</code> and <code>defaultErrorHandler</code> are removed. Override <code>ExceptionHandler.report</code> instead. It gets the same errors: every error that is not an <code>IHttpException</code>, also errors outside a request. A thrown value that is not an <code>Exception</code> or <code>Error</code> (like a <code>String</code>) is now reported too.</li>
+<li><code>responseHandler</code> still works and still runs after <code>render</code>.</li>
+</ul>
 <h3 id="300-alpha8_5">3.0.0-alpha.8</h3>
 <ul>
 <li>Uses dox_http_native 3.0.0-alpha.8: pipelined requests are about 2.8 times faster (1 core: 172k to 480k req/s). Normal requests are as fast as before.</li>
@@ -7073,7 +7133,7 @@
 <li>Output as JSON and YAML, write files, serve <code>/openapi.json</code>, <code>/openapi.yaml</code> and <code>/docs</code>.</li>
 </ul>
 <h2 id="dox_orm">dox_orm</h2>
-<h3 id="unreleased">Unreleased</h3>
+<h3 id="unreleased_1">Unreleased</h3>
 <ul>
 <li>Breaking: the <code>ModelObserver</code> methods now have the same names as the model hooks: <code>onSaving</code>, <code>onSaved</code>, <code>onCreating</code>, <code>onCreated</code>, <code>onUpdating</code>, <code>onUpdated</code>, <code>onDeleting</code>, <code>onDeleted</code>, <code>onRestoring</code>, <code>onRestored</code>, <code>onForceDeleting</code> and <code>onForceDeleted</code>. Rename the methods in your observers, for example <code>created(User user)</code> to <code>onCreated(User user)</code>.</li>
 </ul>
