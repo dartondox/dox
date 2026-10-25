@@ -7,7 +7,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dox_socketio/dox_socketio.dart';
-import 'package:ioredis/ioredis.dart' show RedisOptions;
+import 'package:ioredis/ioredis.dart';
 import 'package:socket_io_client/socket_io_client.dart' as sio;
 import 'package:test/test.dart';
 
@@ -41,7 +41,12 @@ String? redisSkipReason() {
 }
 
 RedisAdapter newAdapter([RedisFormat format = RedisFormat.msgpack]) {
-  return RedisAdapter(redis: redisOptions, format: format);
+  Redis subscriber = Redis(redisOptions);
+  return RedisAdapter(
+    subscriber: subscriber,
+    publisher: subscriber.duplicate(),
+    format: format,
+  );
 }
 
 Future<sio.Socket> connectClient(
@@ -157,16 +162,17 @@ void main() {
     });
 
     test('messages use the Node.js redis adapter format', () async {
-      RedisPubSubConnection listener = RedisPubSubConnection(redisOptions);
+      Redis listener = Redis(redisOptions);
       List<Uint8List> messages = <Uint8List>[];
-      listener.onMessage = (String? p, String channel, Uint8List message) {
-        messages.add(message);
-      };
-      await listener.psubscribe('socket.io#/#*');
+      RedisSubscriber subscription = await listener.psubscribe('socket.io#/#*');
+      subscription.onPatternMessageBytes =
+          (String p, String channel, Uint8List message) {
+            messages.add(message);
+          };
       await serverA.io.to('r').except('x').emit('hello', 'world');
       await serverB.io.to('r').except('x').emit('hello', 'world');
       await settle();
-      await listener.close();
+      await listener.disconnect();
       expect(messages, hasLength(2));
       List<Object?> packed = MsgPack.decode(messages[0]) as List<Object?>;
       expect(messages[1][0], 0x5b, reason: 'server B writes JSON');
@@ -194,9 +200,9 @@ void main() {
       List<Object?> skippedGot = collect(skipped, 'news');
       Completer<List<dynamic>> got = Completer<List<dynamic>>();
       inRoom.on('news', (dynamic data) => got.complete(data as List<dynamic>));
-      RedisPubSubConnection redis = RedisPubSubConnection(redisOptions);
+      Redis redis = Redis(redisOptions);
       await redis.publish('socket.io#/#r1#', hex(emitterFixture));
-      await redis.close();
+      await redis.disconnect();
       // socket_io_client gives all arguments as a list.
       List<dynamic> args = await got.future.timeout(Duration(seconds: 5));
       expect(args[0], <String, dynamic>{
@@ -214,17 +220,19 @@ void main() {
   group('SocketIoEmitter', () {
     late TestApp server;
     late SocketIoEmitter emitter;
+    late Redis emitterRedis;
 
     setUp(() async {
       RedisAdapter adapter = newAdapter();
       server = TestApp(adapter: adapter);
       await server.start();
       await adapter.ready();
-      emitter = SocketIoEmitter(redis: redisOptions);
+      emitterRedis = Redis(redisOptions);
+      emitter = SocketIoEmitter(emitterRedis);
     });
 
     tearDown(() async {
-      await emitter.close();
+      await emitterRedis.disconnect();
       await server.stop();
     });
 

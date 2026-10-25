@@ -1,10 +1,9 @@
-import 'package:ioredis/ioredis.dart' show RedisOptions;
+import 'package:ioredis/ioredis.dart';
 
 import '../constants/socket_constants.dart';
 import '../parser/socket_packet.dart';
 import 'adapter.dart';
 import 'redis_adapter.dart';
-import 'redis_connection.dart';
 
 /// Sends Socket.IO events through Redis, with no Socket.IO server.
 ///
@@ -13,26 +12,20 @@ import 'redis_connection.dart';
 /// events to their clients. It works like `@socket.io/redis-emitter`.
 ///
 /// ```dart
-/// SocketIoEmitter emitter = SocketIoEmitter(redis: RedisOptions());
+/// SocketIoEmitter emitter = SocketIoEmitter(Redis(RedisOptions()));
 /// await emitter.to('room1').emit('news', {'title': 'hi'});
 /// await emitter.of('/admin').socketsJoin('vip');
-/// await emitter.close();
 /// ```
 class SocketIoEmitter extends SocketIoEmitterOperator {
-  /// Opens one Redis connection for publish.
-  SocketIoEmitter({
-    RedisOptions? redis,
+  /// Publishes with [redis]. Do not use a connection in subscribe mode.
+  SocketIoEmitter(
+    Redis redis, {
     String key = defaultRedisKey,
     RedisFormat format = RedisFormat.msgpack,
-  }) : this._(
-         RedisPubSubConnection(redis ?? RedisOptions()),
-         key,
-         format,
-         defaultNamespace,
-       );
+  }) : this._(redis, key, format, defaultNamespace);
 
   SocketIoEmitter._(
-    RedisPubSubConnection connection,
+    Redis connection,
     String key,
     RedisFormat format,
     String nsp,
@@ -47,9 +40,6 @@ class SocketIoEmitter extends SocketIoEmitterOperator {
       nsp.startsWith('/') ? nsp : '/$nsp',
     );
   }
-
-  /// Closes the Redis connection.
-  Future<void> close() => _connection.close();
 }
 
 /// Picks rooms and sends to them. Each method returns a new operator.
@@ -65,7 +55,7 @@ class SocketIoEmitterOperator {
   /// The `uid` of messages from an emitter, like in Node.js.
   static const String emitterUid = 'emitter';
 
-  final RedisPubSubConnection _connection;
+  final Redis _connection;
   final String _key;
   final RedisFormat _format;
   final String _nsp;

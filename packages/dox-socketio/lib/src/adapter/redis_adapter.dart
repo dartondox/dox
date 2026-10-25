@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:ioredis/ioredis.dart' show RedisOptions;
+import 'package:ioredis/ioredis.dart';
 
 import '../constants/socket_constants.dart';
 import '../parser/socket_packet.dart';
@@ -14,7 +14,6 @@ import '../utils/id_generator.dart';
 import 'adapter.dart';
 import 'in_memory_adapter.dart';
 import 'msgpack.dart';
-import 'redis_connection.dart';
 
 /// How messages are written to Redis.
 enum RedisFormat {
@@ -108,21 +107,18 @@ class RedisRequestType {
 /// It reads msgpack and JSON. It writes [format].
 class RedisAdapter extends InMemoryAdapter {
   RedisAdapter({
-    RedisOptions? redis,
+    required this.publisher,
+    required this.subscriber,
     this.key = defaultRedisKey,
     this.format = RedisFormat.msgpack,
     IdGenerator? ids,
-  }) : publisher = RedisPubSubConnection(redis ?? RedisOptions()),
-       subscriber = RedisPubSubConnection(redis ?? RedisOptions()),
-       uid = (ids ?? IdGenerator()).next() {
-    subscriber.onMessage = onRedisMessage;
-  }
+  }) : uid = (ids ?? IdGenerator()).next();
 
-  /// Connection used to publish.
-  final RedisPubSubConnection publisher;
+  /// Connection used to publish. Do not use it for subscribe.
+  final Redis publisher;
 
-  /// Connection used to subscribe.
-  final RedisPubSubConnection subscriber;
+  /// Connection used to subscribe. Do not use it for other commands.
+  final Redis subscriber;
 
   /// Channel prefix.
   final String key;
@@ -156,9 +152,18 @@ class RedisAdapter extends InMemoryAdapter {
   }
 
   Future<void> _subscribe(Namespace nsp) async {
-    await subscriber.psubscribe('${_escapeGlob(channelOf(nsp))}*');
-    await subscriber.subscribe(requestChannelOf(nsp));
+    RedisSubscriber broadcasts = await subscriber.psubscribe(
+      '${_escapeGlob(channelOf(nsp))}*',
+    );
+    broadcasts.onPatternMessageBytes = onRedisMessage;
+    RedisSubscriber requests = await subscriber.subscribe(
+      requestChannelOf(nsp),
+    );
+    requests.onMessageBytes = _onRequestMessage;
   }
+
+  void _onRequestMessage(String channel, Uint8List message) =>
+      onRedisMessage(null, channel, message);
 
   /// Escape glob characters, so a namespace name is matched as plain text.
   static String _escapeGlob(String text) =>
@@ -328,10 +333,5 @@ class RedisAdapter extends InMemoryAdapter {
     unawaited(
       _publish(responseChannelOf(nsp), RedisFormat.json.encode(response)),
     );
-  }
-
-  @override
-  Future<void> close() async {
-    await Future.wait(<Future<void>>[publisher.close(), subscriber.close()]);
   }
 }

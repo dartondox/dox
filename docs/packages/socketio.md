@@ -62,7 +62,7 @@ import 'package:ioredis/ioredis.dart';
 import 'package:my_app/app/socket/chat.namespace.dart';
 import 'package:my_app/config/env.dart';
 
-RedisOptions redis = RedisOptions(host: '127.0.0.1', port: 6379);
+Redis redis = Redis(RedisOptions(host: '127.0.0.1', port: 6379));
 
 SocketIoConfig socketIo = SocketIoConfig(
   enabled: env.socketioEnabled,
@@ -76,7 +76,7 @@ class RedisSocketAdapterFactory extends SocketAdapterFactory {
 
   @override
   Adapter create() {
-    return RedisAdapter(redis: redis);
+    return RedisAdapter(subscriber: redis.duplicate(), publisher: redis);
   }
 }
 ```
@@ -228,13 +228,14 @@ With more than one server process, use the Redis adapter.
 Then a broadcast on one server reaches the clients of all servers.
 
 ```dart
+Redis redis = Redis(RedisOptions(host: '127.0.0.1', port: 6379));
 SocketIoServer io = SocketIoServer(
-  adapter: RedisAdapter(redis: RedisOptions(host: '127.0.0.1', port: 6379)),
+  adapter: RedisAdapter(subscriber: redis.duplicate(), publisher: redis),
 );
 ```
 
-- `RedisOptions` comes from the `ioredis` package. Host, port, user, password, `db`, TLS and the retry delay are used.
-- The adapter opens two Redis connections of its own: one to publish and one to subscribe.
+- `Redis` comes from the `ioredis` package (`^2.0.0-alpha.3`).
+- The subscriber needs its own connection. A Redis connection in subscribe mode can not run other commands.
 - It uses the format of `@socket.io/redis-adapter`. Node.js servers with that adapter can share one Redis with Dox servers.
 - It reads messages in msgpack and in JSON. It writes msgpack, like the Node.js adapter.
   If your Node.js servers use a JSON parser, set `format: RedisFormat.json`.
@@ -259,9 +260,8 @@ import 'package:dox_socketio/dox_socketio.dart';
 import 'package:ioredis/ioredis.dart';
 
 Future<void> main() async {
-  SocketIoEmitter emitter = SocketIoEmitter(
-    redis: RedisOptions(host: '127.0.0.1', port: 6379),
-  );
+  Redis redis = Redis(RedisOptions(host: '127.0.0.1', port: 6379));
+  SocketIoEmitter emitter = SocketIoEmitter(redis);
 
   await emitter.emit('news', {'title': 'hello'}); // all clients of `/`
   await emitter.to('room1').except('room2').emit('news', 'hi room1');
@@ -271,7 +271,7 @@ Future<void> main() async {
   await emitter.to('room3').socketsLeave('room1');
   await emitter.to('banned').disconnectSockets();
 
-  await emitter.close();
+  await redis.disconnect();
 }
 ```
 
