@@ -17,7 +17,7 @@ One page to keep open while you work. Each section links to its full page.
 | `lib/app/http/serializers/` | `<name>.serializer.dart` |
 | `lib/app/models/<name>/` | `<name>.model.dart` |
 | `lib/services/` | `DoxService` classes: ORM, auth, websocket |
-| `lib/container.g.dart`, `lib/dtos.g.dart`, `lib/openapi.g.dart` | made by `build_runner`. Do not edit. |
+| `lib/generated/container.g.dart`, `lib/generated/dtos.g.dart`, `lib/generated/openapi.g.dart` | made by `build_runner`. Do not edit. |
 | `db/migration/` | migrations and `migrations.dart` (the registry) |
 
 See [CLI](cli.md) and [App config](app-config.md).
@@ -96,7 +96,7 @@ class PostService {
 @Inject(singleton: false)       // a new instance each time
 class Clock {}
 
-AppConfig(container: registerContainer); // from lib/container.g.dart
+AppConfig(container: registerContainer); // from lib/generated/container.g.dart
 
 Dox().ioc.get<PostService>();
 Dox().ioc.override<PostRepository>(FakePostRepository()); // tests
@@ -457,7 +457,7 @@ See [Socket.IO](../packages/socketio.md).
 ```dart
 OpenApiConfig openApi = OpenApiConfig(
   info: Info(title: 'Blog API', version: '1.0.0'),
-  registry: openApiRegistry, // lib/openapi.g.dart
+  registry: openApiRegistry, // lib/generated/openapi.g.dart
 );
 ```
 

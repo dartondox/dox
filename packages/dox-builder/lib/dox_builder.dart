@@ -26,13 +26,13 @@ Builder buildDoxModel(BuilderOptions options) => SharedPartBuilder(<Generator>[
   DoxEnvBuilder(),
 ], 'dox_model_generator');
 
-/// Writes `lib/dtos.g.dart` with every DTO of the app.
+/// Writes `lib/generated/dtos.g.dart` with every DTO of the app.
 Builder buildDoxDtos(BuilderOptions options) => const DoxDtoRegistryBuilder();
 
-/// Writes `lib/openapi.g.dart` from the routes, controllers and models.
+/// Writes `lib/generated/openapi.g.dart` from the routes, controllers and models.
 Builder buildDoxOpenApi(BuilderOptions options) => const DoxOpenApiBuilder();
 
-/// Writes `lib/container.g.dart`: the `@Inject()` classes, routers,
+/// Writes `lib/generated/container.g.dart`: the `@Inject()` classes, routers,
 /// services and model binders of the app.
 Builder buildDoxContainer(BuilderOptions options) {
   return const DoxContainerBuilder();

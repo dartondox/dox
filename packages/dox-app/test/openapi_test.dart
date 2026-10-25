@@ -8,7 +8,7 @@ import 'package:yaml/yaml.dart';
 
 import '../../dox-openapi/test/support/openapi_checker.dart';
 
-/// the files of `dox openapi:generate`, made from lib/openapi.g.dart
+/// the files of `dox openapi:generate`, made from lib/generated/openapi.g.dart
 /// (dart run build_runner build) and the live routes of the app
 void main() {
   late Map<String, dynamic> doc;

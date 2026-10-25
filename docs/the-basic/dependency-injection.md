@@ -71,10 +71,10 @@ Run the builder:
 dart run build_runner build
 ```
 
-It writes `lib/container.g.dart`. Give it to the app once:
+It writes `lib/generated/container.g.dart`. Give it to the app once:
 
 ```dart title="lib/config/app.dart"
-import 'package:my_app/container.g.dart';
+import 'package:my_app/generated/container.g.dart';
 
 AppConfig appConfig = AppConfig(
   container: registerContainer,
@@ -86,9 +86,9 @@ That is all. `GET /api/users/5` makes the repository, the service and the contro
 
 ## The generated file
 
-`lib/container.g.dart` has one function. Each class gets a factory that calls its constructor.
+`lib/generated/container.g.dart` has one function. Each class gets a factory that calls its constructor.
 
-```dart title="lib/container.g.dart"
+```dart title="lib/generated/container.g.dart"
 // GENERATED CODE - DO NOT MODIFY BY HAND
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/http/controllers/user.controller.dart' as i1;
@@ -178,7 +178,7 @@ A singleton is read once, at start. A `singleton: false` class is made on each r
 
 ## Route model binding
 
-Every `@DoxModel` class gets a binder in `lib/container.g.dart`.
+Every `@DoxModel` class gets a binder in `lib/generated/container.g.dart`.
 When a handler has a parameter of a model type, Dox loads the model by its primary key.
 
 ```dart

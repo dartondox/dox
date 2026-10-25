@@ -1,3 +1,8 @@
+## Unreleased
+
+- The app-wide files are now written to `lib/generated/`: `lib/generated/container.g.dart`, `lib/generated/dtos.g.dart` and `lib/generated/openapi.g.dart`. This keeps them out of the top of `lib/`. Import them from `package:<app>/generated/...`. Delete the old files in `lib/` after you run `dart run build_runner build`.
+- Model part files (like `user.model.g.dart`) still sit next to their source file.
+
 ## 3.0.0-alpha.9
 
 - New: `lib/container.g.dart` builder. It finds every `@Inject()` class, every class that extends `Router`, every class that implements `DoxService` and every `@DoxModel` in `lib/`. It writes `registerContainer(IocContainer c)`, which makes each class with its constructor. Constructor parameters come from the container by type. Optional parameters that the container can not give keep their default. Required nullable ones get `null`.

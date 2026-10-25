@@ -48,14 +48,14 @@ You do this once per app.
 
 1. Make a DTO with `dox make:dto CreateUser`. It writes `lib/app/http/dtos/create_user.dto.dart`.
 2. Run the generator: `dox build_runner:build` (or `dox build_runner:watch`).
-   It writes a `.dto.g.dart` file next to each DTO, and one list of all DTOs in `lib/dtos.g.dart`.
+   It writes a `.dto.g.dart` file next to each DTO, and one list of all DTOs in `lib/generated/dtos.g.dart`.
 3. Give that list to the app:
 
 ```dart title="lib/config/app.dart"
-import 'package:my_app/dtos.g.dart';
+import 'package:my_app/generated/dtos.g.dart';
 
 AppConfig appConfig = AppConfig(
-  dtos: dtos, // from lib/dtos.g.dart
+  dtos: dtos, // from lib/generated/dtos.g.dart
   // ...
 );
 ```

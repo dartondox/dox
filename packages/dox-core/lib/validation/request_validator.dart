@@ -4,7 +4,7 @@ import 'package:dox_core/http/request/http_request_body.dart';
 
 /// Finds a DTO schema by its type or class name.
 ///
-/// It is made from `AppConfig(dtos: dtos)` (the list in `lib/dtos.g.dart`).
+/// It is made from `AppConfig(dtos: dtos)` (the list in `lib/generated/dtos.g.dart`).
 /// Dox does not use `dart:mirrors`, so this list is how it knows the DTOs.
 class DtoRegistry {
   DtoRegistry(List<DtoSchema<Object>> dtos) {

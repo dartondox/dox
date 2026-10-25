@@ -224,7 +224,7 @@ export 'src/openapi_annotation.dart';
     },
     rootPackage: 'a',
     outputs: <String, Object>{
-      'a|lib/openapi.g.dart': decodedMatches(
+      'a|lib/generated/openapi.g.dart': decodedMatches(
         predicate<String>((String s) {
           output = s;
           return true;

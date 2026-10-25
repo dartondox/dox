@@ -38,7 +38,7 @@ class ApiRouter extends Router {
 }
 ```
 
-Dox finds every `Router` class by itself. It is in `lib/container.g.dart` after `dart run build_runner build`.
+Dox finds every `Router` class by itself. It is in `lib/generated/container.g.dart` after `dart run build_runner build`.
 To pick the order of routers, list them in `routers:` of `AppConfig`.
 See [Dependency injection: routers and services](dependency-injection.md#routers-and-services).
 
@@ -252,7 +252,7 @@ Route.get('/users/{user}/posts/{page}', (User user, int page) {
 
 The binder runs after the middleware, so an auth middleware can stop the request before any database call.
 
-A `@DoxModel` class does not need `Route.bind`. Dox makes a binder for it in `lib/container.g.dart`.
+A `@DoxModel` class does not need `Route.bind`. Dox makes a binder for it in `lib/generated/container.g.dart`.
 See [Dependency injection: route model binding](dependency-injection.md#route-model-binding).
 `Route.bind` wins when both exist.
 

@@ -4,7 +4,7 @@ import 'package:dox_openapi/dox_openapi.dart';
 /// OpenAPI docs for the app: `/docs`, `/openapi.json` and `/openapi.yaml`.
 ///
 /// ```
-/// import 'package:my_app/openapi.g.dart';
+/// import 'package:my_app/generated/openapi.g.dart';
 ///
 /// OpenApiConfig(
 ///   info: Info(title: 'Blog API', version: '1.0.0'),
@@ -34,7 +34,7 @@ class OpenApiConfig {
 
   /// What `dox_builder` found in the code: controller docs, route calls
   /// and model schemas. Pass `openApiRegistry` from the generated
-  /// `lib/openapi.g.dart`. Run `dart run build_runner build` to make it.
+  /// `lib/generated/openapi.g.dart`. Run `dart run build_runner build` to make it.
   final OpenApiRegistry registry;
 
   /// The UI of the `/docs` page. Scalar by default.

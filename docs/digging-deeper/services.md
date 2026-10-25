@@ -36,7 +36,7 @@ class ORMService implements DoxService, DoxShutdown {
 ## Register it
 
 You do not need to. Dox finds every class that implements `DoxService`.
-Run `dart run build_runner build`. The service is then in `lib/container.g.dart`.
+Run `dart run build_runner build`. The service is then in `lib/generated/container.g.dart`.
 Each isolate makes its own instance from the container. Its constructor can ask for other classes of the container.
 See [Dependency injection](../the-basic/dependency-injection.md#routers-and-services).
 

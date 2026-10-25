@@ -295,7 +295,7 @@ class DoxRequest implements IDoxRequest {
       throw StateError(
         '$T is not a known DTO. Add @Dto() to it, run '
         '`dart run build_runner build` and set `dtos: dtos` '
-        '(lib/dtos.g.dart) in AppConfig.',
+        '(lib/generated/dtos.g.dart) in AppConfig.',
       );
     }
     return await Dox().validator.validateDto(this, schema, source: source) as T;

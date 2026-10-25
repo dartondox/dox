@@ -20,7 +20,7 @@ class _Binding {
 ///
 /// You do not fill it by hand. Put `@Inject()` above a class, run
 /// `dart run build_runner build`, and set
-/// `AppConfig(container: registerContainer)` from `lib/container.g.dart`.
+/// `AppConfig(container: registerContainer)` from `lib/generated/container.g.dart`.
 ///
 /// Each isolate has its own container (`Dox().ioc`), so a singleton is
 /// one instance per isolate. It is made on first use.
@@ -101,7 +101,7 @@ class IocContainer {
   }
 
   /// [T] is a router. Dox registers its routes at start.
-  /// `lib/container.g.dart` calls this for every class that extends
+  /// `lib/generated/container.g.dart` calls this for every class that extends
   /// `Router`.
   void router<T extends Router>(IocFactory<T> make) {
     singleton<T>(make);
@@ -109,7 +109,7 @@ class IocContainer {
   }
 
   /// [T] is a service. Dox runs its `setup()` at start, in every
-  /// isolate. `lib/container.g.dart` calls this for every class that
+  /// isolate. `lib/generated/container.g.dart` calls this for every class that
   /// implements `DoxService`.
   void service<T extends DoxService>(IocFactory<T> make) {
     singleton<T>(make);
@@ -117,7 +117,7 @@ class IocContainer {
   }
 
   /// A route param for a controller parameter of type [T] is turned into
-  /// a [T] with [find]. `lib/container.g.dart` calls this for every
+  /// a [T] with [find]. `lib/generated/container.g.dart` calls this for every
   /// `@DoxModel`. `Route.bind` wins over it.
   void bindModel<T extends Object>(RouteBinder<T> find) {
     _modelBinders[T] = find;

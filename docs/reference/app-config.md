@@ -25,10 +25,10 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `container` | `void Function(IocContainer)?` | `null` | Fills the container: `registerContainer` from `lib/container.g.dart`. Every isolate runs it. It also gives the routers, services and model binders. See [Dependency injection](../the-basic/dependency-injection.md). |
+| `container` | `void Function(IocContainer)?` | `null` | Fills the container: `registerContainer` from `lib/generated/container.g.dart`. Every isolate runs it. It also gives the routers, services and model binders. See [Dependency injection](../the-basic/dependency-injection.md). |
 | `routers` | `List<Router>` | `[]` | Routers to register first, in this order. Every other `Router` class comes from `container`. |
 | `globalMiddleware` | `List<dynamic>` | `[]` | Middleware that runs on every route. A function or an `IDoxMiddleware`. |
-| `dtos` | `List<DtoSchema<Object>>` | `[]` | Every DTO of the app: `dtos` from `lib/dtos.g.dart`. Dox finds the DTO of a controller parameter and of `req.validate<T>()` with it. |
+| `dtos` | `List<DtoSchema<Object>>` | `[]` | Every DTO of the app: `dtos` from `lib/generated/dtos.g.dart`. Dox finds the DTO of a controller parameter and of `req.validate<T>()` with it. |
 | `validationMessages` | `MessageResolver?` | `null` (English messages) | Messages for validation errors, for example in other languages. |
 | `responseHandler` | `ResponseHandlerInterface?` | `null` | A class with `DoxResponse handle(DoxResponse res)`. It sees every response before it is sent. |
 | `exceptionHandler` | `ExceptionHandler` | `ExceptionHandler()` | Reports every unhandled error and turns it into a response. The default logs the error with `Logger.warn` and the stack with `Logger.danger`. See [Error handling](../the-basic/errors.md). |
@@ -141,7 +141,7 @@ Source: `packages/dox-core/lib/openapi/openapi_config.dart`.
 | `servers` | `List<Server>` | `[]` | Base URLs of the API. |
 | `securitySchemes` | `Map<String, SecurityScheme>` | `{}` | Ways to log in, like `{'bearerAuth': SecurityScheme.bearer()}`. |
 | `securityByMiddleware` | `Map<String, List<Map<String, List<String>>>>` | `{}` | Security for routes that use a middleware class with this name. `AuthMiddleware` gets `bearerAuth` when it is not in the map. |
-| `registry` | `OpenApiRegistry` | `OpenApiRegistry()` (empty) | What `dox_builder` found in the code. Pass `openApiRegistry` from `lib/openapi.g.dart`. |
+| `registry` | `OpenApiRegistry` | `OpenApiRegistry()` (empty) | What `dox_builder` found in the code. Pass `openApiRegistry` from `lib/generated/openapi.g.dart`. |
 | `ui` | `DocsUi` | `DocsUi.scalar` | `scalar` or `swagger`. |
 | `scalar` | `ScalarOptions` | `ScalarOptions()` | Options of the Scalar page. See below. |
 | `pageTitle` | `String?` | `null` (uses `info.title`) | Title of the `/docs` page. |
@@ -259,7 +259,7 @@ import 'package:my_app/config/cors.dart';
 import 'package:my_app/config/logger.dart';
 import 'package:my_app/config/storage.dart';
 import 'package:my_app/config/env.dart';
-import 'package:my_app/container.g.dart';
+import 'package:my_app/generated/container.g.dart';
 
 AppConfig appConfig = AppConfig(
   /// Changing the key makes old cookies and encrypted data unreadable.

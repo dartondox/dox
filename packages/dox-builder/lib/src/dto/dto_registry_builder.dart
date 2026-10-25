@@ -5,7 +5,7 @@ import 'package:glob/glob.dart';
 
 import 'dto_model.dart';
 
-/// Writes `lib/dtos.g.dart`: one list of every `@Dto` in `lib/`.
+/// Writes `lib/generated/dtos.g.dart`: one list of every `@Dto` in `lib/`.
 /// Give it to the app: `AppConfig(dtos: dtos)`. Dox finds a DTO by its
 /// type with it (no `dart:mirrors`).
 ///
@@ -15,12 +15,12 @@ class DoxDtoRegistryBuilder implements Builder {
 
   final DtoReader reader;
 
-  static const String output = 'lib/dtos.g.dart';
+  static const String output = 'lib/generated/dtos.g.dart';
 
   @override
   Map<String, List<String>> get buildExtensions {
     return const <String, List<String>>{
-      r'$lib$': <String>['dtos.g.dart'],
+      r'$lib$': <String>['generated/dtos.g.dart'],
     };
   }
 

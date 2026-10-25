@@ -3,7 +3,7 @@ import 'dart_literal.dart';
 import 'request_reader.dart';
 import 'route_scanner.dart';
 
-/// Writes the Dart code of `lib/openapi.g.dart`: one const
+/// Writes the Dart code of `lib/generated/openapi.g.dart`: one const
 /// `openApiRegistry` with the operations, route calls and schemas.
 class RegistryWriter {
   const RegistryWriter({this.literal = const DartLiteral()});

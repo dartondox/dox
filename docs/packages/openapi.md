@@ -17,7 +17,7 @@ The docs come from three places:
 dart run build_runner build      # or: dox build_runner:build
 ```
 
-`dox_builder` reads your code and writes `lib/openapi.g.dart`.
+`dox_builder` reads your code and writes `lib/generated/openapi.g.dart`.
 Run it again after you change routes, controllers, request classes or models.
 `dox build_runner:watch` does it for you while you work.
 
@@ -25,7 +25,7 @@ Run it again after you change routes, controllers, request classes or models.
 
 ```dart title="lib/config/openapi.dart"
 import 'package:dox_core/dox_core.dart';
-import 'package:my_app/openapi.g.dart';
+import 'package:my_app/generated/openapi.g.dart';
 
 OpenApiConfig openApi = OpenApiConfig(
   info: Info(title: 'Blog API', version: '1.0.0'),
@@ -45,7 +45,7 @@ AppConfig appConfig = AppConfig(
 | `enabled` | `null` | `true` or `false` turns the docs routes on or off. `null`: on only when `APP_ENV` is `development` or `local` |
 | `info` | `Info(title: 'Dox API', version: '1.0.0')` | title and version of the API |
 | `servers` | `[]` | base URLs, like `[Server('https://api.my.app')]` |
-| `registry` | empty | `openApiRegistry` from `lib/openapi.g.dart` |
+| `registry` | empty | `openApiRegistry` from `lib/generated/openapi.g.dart` |
 | `securitySchemes`, `securityByMiddleware` | `{}` | see [Login schemes](#login-schemes) |
 | `ui` | `DocsUi.scalar` | the docs page: `DocsUi.scalar` or `DocsUi.swagger` |
 | `scalar` | `ScalarOptions()` | see [The docs page](#the-docs-page) |

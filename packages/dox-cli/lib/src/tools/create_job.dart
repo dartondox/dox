@@ -28,7 +28,7 @@ import 'dart:io';
 
 import 'package:dox_queue/dox_queue.dart';
 import 'package:$package/config/app.dart';
-import 'package:$package/jobs.g.dart';
+import 'package:$package/generated/jobs.g.dart';
 
 /// Runs the queue worker: `dox queue:work`, or
 /// `dart run bin/queue.dart work [--queue=default] [--concurrency=1]`.
@@ -74,6 +74,6 @@ bool createJob(String name) {
   ).hasMatch(pubspec.readAsStringSync())) {
     print('Add dox_queue to pubspec.yaml: `dart pub add dox_queue`');
   }
-  print('Run `dox build_runner:build` to make lib/jobs.g.dart.');
+  print('Run `dox build_runner:build` to make lib/generated/jobs.g.dart.');
   return true;
 }

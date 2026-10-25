@@ -50,7 +50,7 @@ Future<String> _generate(Map<String, String> app) async {
     _sources(app),
     rootPackage: 'a',
     outputs: <String, Object>{
-      'a|lib/container.g.dart': decodedMatches(
+      'a|lib/generated/container.g.dart': decodedMatches(
         predicate<String>((String s) {
           output = s;
           return true;

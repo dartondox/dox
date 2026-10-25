@@ -10,7 +10,7 @@ import 'controller_reader.dart';
 import 'registry_writer.dart';
 import 'route_scanner.dart';
 
-/// Writes `lib/openapi.g.dart` with the OpenAPI docs of the app.
+/// Writes `lib/generated/openapi.g.dart` with the OpenAPI docs of the app.
 ///
 /// It reads every library in `lib/`:
 /// - `Route.get(...)` and `Route.resource(...)` calls give the
@@ -22,12 +22,12 @@ import 'route_scanner.dart';
 class DoxOpenApiBuilder implements Builder {
   const DoxOpenApiBuilder();
 
-  static const String output = 'lib/openapi.g.dart';
+  static const String output = 'lib/generated/openapi.g.dart';
 
   @override
   Map<String, List<String>> get buildExtensions {
     return const <String, List<String>>{
-      r'$lib$': <String>['openapi.g.dart'],
+      r'$lib$': <String>['generated/openapi.g.dart'],
     };
   }
 

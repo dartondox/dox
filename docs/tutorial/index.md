@@ -70,8 +70,9 @@ blog/
 │   ├── services/
 │   │   ├── auth_service.dart     *
 │   │   └── orm_service.dart
-│   ├── container.g.dart          * generated
-│   └── dtos.g.dart               * generated
+│   └── generated/
+│       ├── container.g.dart      * generated
+│       └── dtos.g.dart           * generated
 ├── test/http_test.dart           *
 ├── .env                          *
 ├── Dockerfile

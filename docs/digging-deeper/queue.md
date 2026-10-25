@@ -16,7 +16,7 @@ dart pub add dox_queue
 ## How it works
 
 1. You write a job class with `@Job()`.
-2. `dart run build_runner build` writes `lib/jobs.g.dart`. It knows how to save and load each job.
+2. `dart run build_runner build` writes `lib/generated/jobs.g.dart`. It knows how to save and load each job.
 3. Your code calls `dispatch()`. The job is saved in Redis or in the database.
 4. A worker (`dart run bin/queue.dart`) takes the job and runs its `handle()` method.
 
@@ -27,13 +27,13 @@ dart pub add dox_queue
 ```dart title="lib/config/queue.dart"
 import 'package:dox_queue/dox_queue.dart';
 
-import '../jobs.g.dart';
+import '../generated/jobs.g.dart';
 
 QueueConfig queueConfig = QueueConfig(
   /// sync, database or redis
   driver: 'database',
 
-  /// every @Job class, from lib/jobs.g.dart
+  /// every @Job class, from lib/generated/jobs.g.dart
   jobs: jobRegistry,
 );
 ```
@@ -41,7 +41,7 @@ QueueConfig queueConfig = QueueConfig(
 | Option | Default | What it does |
 | --- | --- | --- |
 | `driver` | `sync` | `sync`, `database` or `redis` |
-| `jobs` | empty | `jobRegistry` from `lib/jobs.g.dart` |
+| `jobs` | empty | `jobRegistry` from `lib/generated/jobs.g.dart` |
 | `redis` | localhost:6379 | `RedisOptions(host: ..., port: ..., password: ...)` for the `redis` driver |
 | `prefix` | `dox_queue:` | the start of every Redis key |
 | `connection` | default | the dox_orm connection name, for the `database` driver |
@@ -64,7 +64,7 @@ import 'package:dox_queue/dox_queue.dart';
 import '../config/queue.dart';
 
 /// Sets up the queue. Dox finds every DoxService class,
-/// see lib/container.g.dart.
+/// see lib/generated/container.g.dart.
 class AppQueueService extends QueueService {
   AppQueueService() : super(queueConfig);
 }
@@ -383,7 +383,7 @@ Use the `sync` driver. `dispatch()` then runs the job at once, so you can check 
 
 ```dart
 import 'package:dox_queue/dox_queue.dart';
-import 'package:dox_sample/jobs.g.dart';
+import 'package:dox_sample/generated/jobs.g.dart';
 import 'package:test/test.dart';
 
 void main() {

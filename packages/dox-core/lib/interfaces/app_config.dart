@@ -23,7 +23,7 @@ class AppConfig {
   /// Extend `ExceptionHandler` to log to a tracker or change the answer.
   final ExceptionHandler exceptionHandler;
 
-  /// Every DTO of the app: `dtos` from `lib/dtos.g.dart`.
+  /// Every DTO of the app: `dtos` from `lib/generated/dtos.g.dart`.
   /// Dox finds the DTO of a controller parameter and of
   /// `req.validate<T>()` with it.
   final List<DtoSchema<Object>> dtos;
@@ -34,12 +34,12 @@ class AppConfig {
   final List<dynamic> globalMiddleware;
 
   /// Routers to register. You can leave it empty: every class that
-  /// extends `Router` is in `lib/container.g.dart`. A router listed here
+  /// extends `Router` is in `lib/generated/container.g.dart`. A router listed here
   /// comes first, in this order.
   final List<Router> routers;
 
   /// Fills the container: `registerContainer` from
-  /// `lib/container.g.dart`. Every isolate runs it, so each one has its
+  /// `lib/generated/container.g.dart`. Every isolate runs it, so each one has its
   /// own instances. It also gives the routers, services and model
   /// binders that `dox_builder` found.
   final void Function(IocContainer c)? container;
@@ -60,7 +60,7 @@ class AppConfig {
 
   /// Services to run at start, in every isolate. You can leave it empty:
   /// every class that implements `DoxService` is in
-  /// `lib/container.g.dart`. A service listed here runs first.
+  /// `lib/generated/container.g.dart`. A service listed here runs first.
   final List<DoxService> services;
 
   /// Max size in bytes of a JSON or urlencoded body. Bigger bodies get
