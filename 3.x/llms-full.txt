@@ -16808,7 +16808,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
-### Unreleased
+### 3.0.0-alpha.7
 
 - Breaking: `IDox`, `IDoxWebsocket` and `WebsocketEvent` are removed. They were only used by `dox_websocket`.
 
@@ -16848,7 +16848,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_auth
 
-### Unreleased
+### 3.0.0-alpha.7
 
 - Perf: `attempt` runs bcrypt in another isolate (`Isolate.run`). Before, each login blocked the server isolate for the whole hash.
 - Perf: the dummy hash for unknown users is made when the driver is created, in another isolate. Before, the first login paid for two hashes.
@@ -16893,7 +16893,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_builder
 
-### Unreleased
+### 3.0.0-alpha.7
 
 - The generated `fromMap()` takes a `DateTime` from the driver as it is. It only parses a string.
 - New generated `columnsToMap()` with the columns only. `convertToMap()` adds the relations to it.
@@ -16943,7 +16943,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
-### Unreleased
+### 3.0.0-alpha.7
 
 - Perf: the memory driver removes expired items and expired locks in a sweep after many writes. Before, a key that was written once with a ttl and never read again stayed in memory forever.
 - Perf: the memory driver with no `max_size` does not reorder the map on every hit. The order is only needed for LRU.
@@ -16988,7 +16988,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox
 
-### Unreleased
+### 3.0.0-alpha.7
 
 - Breaking: `create:controller` no longer takes `-ws`. Dox uses Socket.IO for realtime now. See the Socket.IO docs for a namespace class.
 - Security: `dox create` now copies `.env.example` to `.env` and writes a new random `APP_KEY`. Before, every new app used the same public key from the template. You no longer run `cp .env.example .env`.
@@ -17035,7 +17035,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_core
 
-### Unreleased
+### 3.0.0-alpha.7
 
 - Breaking: `dox_websocket` is gone. Use `dox_socketio` for realtime. `Dox().websocket` and `Dox().setWebsocket()` are removed.
 - Breaking: `Route.websocket(path, handler)` is now a raw WebSocket route. `handler` gets the open `WebSocket` and the `DoxRequest`. Middleware runs first. A request that is not a WebSocket upgrade gets 400.
@@ -17168,7 +17168,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_migration
 
-### Unreleased
+### 3.0.0-alpha.7
 
 - Breaking: migrations run on the dox_orm drivers: the native Postgres and MySQL drivers, and SQLite. The `postgres` and `mysql_dart` packages are gone. When the native library does not load, the migration stops with an error that says why.
 - Breaking: `Migrator(connection: ...)` takes a dox_orm `DBDriver` now, eg. `SqlQueryBuilder().dbDriver`. The migrator does not close it. New `Migrator(config: ...)` takes a `ConnectionConfig`, eg. `databaseConfig.getConnectionConfig()`, and closes it at the end.
@@ -17218,7 +17218,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_openapi
 
-### Unreleased
+### 3.0.0-alpha.7
 
 - The `/docs` page loads its CDN files with an `integrity` hash, so the browser refuses a changed file.
 
@@ -17262,7 +17262,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_orm
 
-### Unreleased
+### 3.0.0-alpha.7
 
 - Breaking: Postgres and MySQL use only the native drivers. The Dart drivers (`postgres` and `mysql_dart` packages) are gone. So are `PostgresDriver`, `MysqlDriver`, `DOX_DB_DRIVER=dart` and `extra['native']`.
 - Breaking: when the native library does not load, `createDriver()` and `SqlQueryBuilder.initializeWithDatabaseConfig()` throw an `UnsupportedError`. It says why the library did not load and how to fix it. Before, the ORM used the Dart driver and printed a warning.
@@ -17360,6 +17360,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_query_builder
 
+### 3.0.0-alpha.7
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.6
 
 - Version bump only, to match the other packages.
@@ -17388,7 +17392,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_socketio
 
-### Unreleased
+### 3.0.0-alpha.7
 
 - Uses `ioredis` 2.0.0-alpha.3, which can send and get binary messages. `RedisAdapter` and `SocketIoEmitter` take `ioredis` clients.
 - `RedisAdapter` reads msgpack and JSON messages. Before, it read only JSON, so the Socket.IO emitters (Node.js, PHP, Python, Go) did not work. They use msgpack.
@@ -17443,7 +17447,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_storage
 
-### Unreleased
+### 3.0.0-alpha.7
 
 - Perf: the S3 driver keeps the SigV4 signing key for each day. Before, every request ran 4 extra HMACs to make it again.
 - Perf: the S3 driver hashes a body of 1 MiB or more (eg. an 8 MiB multipart part) in another isolate. Before, the sha256 blocked the event loop.
@@ -17479,7 +17483,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_validation
 
-### Unreleased
+### 3.0.0-alpha.7
 
 - Perf: object, list, map and union schemas work out `isAsync` once and keep the answer. Before, the whole schema tree was walked on every `validateSchema` call.
 - `url()` now allows only `http` and `https` links. Pass `schemes` to allow others.
