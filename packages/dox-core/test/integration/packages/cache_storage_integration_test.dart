@@ -50,7 +50,7 @@ AppConfig config = AppConfig(
       'memory': <String, dynamic>{'driver': 'memory'},
     },
   ),
-  errorHandler: (Object? error, StackTrace stackTrace) {},
+  exceptionHandler: const _QuietExceptionHandler(),
 );
 
 void main() {
@@ -194,4 +194,12 @@ void main() {
       expect(open.body, 'top');
     });
   });
+}
+
+/// does not log the errors the tests cause on purpose
+class _QuietExceptionHandler extends ExceptionHandler {
+  const _QuietExceptionHandler();
+
+  @override
+  void report(Object error, StackTrace stackTrace) {}
 }

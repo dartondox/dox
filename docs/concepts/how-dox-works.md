@@ -30,7 +30,7 @@ A request goes through these steps:
 11. Dart sends the answers of the batch back to Rust in one call. Rust writes the bytes to the socket.
 
 When a step throws, Dox catches the error. An `IHttpException` (like `NotFoundHttpException`) gives its own status.
-Any other error gives `500` and goes to the `errorHandler` of `AppConfig`.
+Any other error gives `500` and goes to the `report` method of the `ExceptionHandler` in `AppConfig`.
 
 ```mermaid
 sequenceDiagram
@@ -68,7 +68,7 @@ sequenceDiagram
 | Middleware | `AppConfig(globalMiddleware:)`, `Router.middleware`, `Route.middleware(...)`, the route list | go on, or answer early |
 | Input | a `@Dto` class in `lib/app/http/dtos/` | what the controller gets, or `422` |
 | Output | the return value, `response(...)`, `responseHandler` | status, headers, body |
-| Errors | `IHttpException`, `AppConfig(errorHandler:)` | the error response, logging |
+| Errors | `IHttpException`, `AppConfig(exceptionHandler:)` | the error response, logging |
 
 See [Routing](../the-basic/routing.md), [Middleware](../the-basic/middleware.md),
 [Validation](../the-basic/validation.md) and [Response](../the-basic/response.md).
@@ -120,7 +120,7 @@ Open these in `setup()`. See [Services](../digging-deeper/services.md).
 ### When an isolate crashes
 
 - An error in a request is caught. Dox answers `500` and keeps going.
-- An async error outside a request is caught and passed to `errorHandler`. The isolate keeps running.
+- An async error outside a request is caught and passed to the `ExceptionHandler`. The isolate keeps running.
 - When a worker isolate still dies, Dox prints `[dox] isolate N exited, restarting` and starts a new one after 1 second.
 - When the first (main) isolate dies, the process exits with a non-zero code. A supervisor (Docker `restart:`, systemd `Restart=always`) must start it again.
 

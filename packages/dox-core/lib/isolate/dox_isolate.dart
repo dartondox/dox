@@ -122,6 +122,7 @@ class DoxIsolate {
         Dox().config,
         Dox().doxServices,
         routes: _baseRoutes,
+        bindings: Route().bindings,
         control: controlPort.sendPort,
       ),
       onError: errorPort.sendPort,

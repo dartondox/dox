@@ -55,7 +55,7 @@ Future<dynamic> _resume(Future<dynamic> pending, int next) async {
 }
 
 /// What Dox gives to one parameter of a controller.
-enum ArgKind { request, dto, path }
+enum ArgKind { request, dto, path, bound }
 
 /// The type of a path param parameter.
 enum PathType { string, integer, decimal, number, boolean }
@@ -81,7 +81,7 @@ class ControllerArg {
   /// `int?`: the param may be missing (`{id?}`)
   final bool nullable;
 
-  /// the name of the path param
+  /// the name of the path param, also for [ArgKind.bound]
   final String param;
 }
 
@@ -92,10 +92,13 @@ class ControllerArg {
 /// `AppConfig(dtos: dtos)`. Each request only fills the list and calls
 /// the function.
 class ControllerPlan {
-  ControllerPlan(this.fn, this.args);
+  ControllerPlan(this.fn, this.args, [this.bindings = const <String>[]]);
 
   final Function fn;
   final List<ControllerArg> args;
+
+  /// route params with a `Route.bind` binder. resolved before [fn] runs.
+  final List<String> bindings;
 
   static const Map<String, PathType> _pathTypes = <String, PathType>{
     'String': PathType.string,
@@ -110,14 +113,39 @@ class ControllerPlan {
   static ControllerPlan of(Function fn, RouteData route) {
     String where = '${route.method} ${route.path}';
     List<String> types = ControllerTypes.parameters(fn, where);
-    List<String> params = route.paramNames;
+    Map<String, RouteBinding> binders = Route().bindings;
+    List<String> bound = <String>[
+      for (String param in route.paramNames)
+        if (binders.containsKey(param)) param,
+    ];
+    // a parameter of a bound type takes its param, the others take the
+    // rest of the params in order
+    Map<int, String> boundArgs = <int, String>{};
+    for (int i = 0; i < types.length; i++) {
+      String name = _withoutNull(types[i]);
+      for (String param in bound) {
+        if (binders[param]!.type == name && !boundArgs.containsValue(param)) {
+          boundArgs[i] = param;
+          break;
+        }
+      }
+    }
+    List<String> params = <String>[
+      for (String param in route.paramNames)
+        if (!boundArgs.containsValue(param)) param,
+    ];
     List<ControllerArg> args = <ControllerArg>[];
     int paths = 0;
     bool hasDto = false;
     for (int i = 0; i < types.length; i++) {
       String type = types[i];
       bool nullable = type.endsWith('?');
-      String name = nullable ? type.substring(0, type.length - 1) : type;
+      String name = _withoutNull(type);
+      String? boundParam = boundArgs[i];
+      if (boundParam != null) {
+        args.add(ControllerArg(ArgKind.bound, param: boundParam));
+        continue;
+      }
       if (name == 'DoxRequest' || name == 'IDoxRequest') {
         args.add(const ControllerArg(ArgKind.request));
         continue;
@@ -151,8 +179,8 @@ class ControllerPlan {
       if (dto == null) {
         throw StateError(
           'Route $where: the controller parameter type $type is not known. '
-          'Use DoxRequest, a @Dto class, or String, int, double, num, bool '
-          'for path params. For a DTO: did you run '
+          'Use DoxRequest, a @Dto class, a type from Route.bind, or String, '
+          'int, double, num, bool for path params. For a DTO: did you run '
           '`dart run build_runner build` and set `dtos: dtos` in AppConfig?',
         );
       }
@@ -162,13 +190,37 @@ class ControllerPlan {
       hasDto = true;
       args.add(ControllerArg(ArgKind.dto, dto: dto));
     }
-    return ControllerPlan(fn, args);
+    return ControllerPlan(fn, args, bound);
+  }
+
+  static String _withoutNull(String type) {
+    return type.endsWith('?') ? type.substring(0, type.length - 1) : type;
   }
 
   /// Fill the parameters for [req] and call the controller.
   /// A path param that does not fit its type answers 404.
-  /// Without a DTO it is sync and gives what the controller gives.
+  /// Without a DTO or a binder it is sync and gives what the controller
+  /// gives.
   FutureOr<dynamic> call(DoxRequest req) {
+    if (bindings.isNotEmpty) return _bindThenCall(req);
+    return _call(req);
+  }
+
+  /// run the `Route.bind` binders of the route, then the controller.
+  /// a binder that gives null answers 404.
+  Future<dynamic> _bindThenCall(DoxRequest req) async {
+    Map<String, RouteBinding> binders = Route().bindings;
+    for (String param in bindings) {
+      Object? raw = req.param[param];
+      if (raw == null) continue; // an optional `{param?}` that is not set
+      Object? value = await binders[param]!.resolve('$raw');
+      if (value == null) throw NotFoundHttpException();
+      req.boundValues[param] = value;
+    }
+    return await _call(req);
+  }
+
+  FutureOr<dynamic> _call(DoxRequest req) {
     int count = args.length;
     if (count == 1 && args[0].kind == ArgKind.request) {
       return fn(req);
@@ -183,6 +235,8 @@ class ControllerPlan {
           values[i] = req;
         case ArgKind.path:
           values[i] = _path(arg, req.param[arg.param]);
+        case ArgKind.bound:
+          values[i] = req.boundValues[arg.param];
         case ArgKind.dto:
           dtoArg = arg;
           dtoIndex = i;

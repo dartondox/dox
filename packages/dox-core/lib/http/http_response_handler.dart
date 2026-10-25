@@ -121,7 +121,7 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
   }
 
   /// the text of an error can hold SQL, file paths or hosts. send it only
-  /// in development. it is logged by `errorHandler` in every env.
+  /// in development. it is reported by the `ExceptionHandler` in every env.
   if (payload is Exception || payload is Error) {
     res.statusCode = HttpStatus.internalServerError;
     payload = _showErrors()
@@ -175,7 +175,7 @@ Future<void> _pipe(HttpRequest request, Future<dynamic> body) async {
   try {
     await body;
   } catch (error, stackTrace) {
-    Dox().config.errorHandler(error, stackTrace);
+    Dox().config.exceptionHandler.report(error, stackTrace);
   }
   try {
     await res.close();

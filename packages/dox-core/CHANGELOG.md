@@ -1,3 +1,11 @@
+## Unreleased
+
+- New: named routes. `Route.get('/users/{id}', c).name('users.show')`, then `route('users.show', params: {'id': 5})` gives `/users/5`. `query:` adds a query string. `Route.group(..., name: 'admin.')` puts a prefix in front of the names inside. Resource routes are named `blogs.index` ... `blogs.destroy`; `Route.resource(..., name:)` picks another base name. A name used twice stops the app at start. An unknown name, a missing param or an extra param throws an `ArgumentError`.
+- New: route model binding without `dart:mirrors`. `Route.bind<User>('user', (String id) => User().find(id))` runs before the controller of every route with a `{user}` param. The controller gets it as a `User user` parameter, or with `req.bound<User>('user')`. A binder that gives `null` answers 404.
+- New: `ExceptionHandler`, the one place that turns an error into a response. Extend it and set `AppConfig(exceptionHandler: ...)`. `report(error, stackTrace)` logs, `render(error, req)` picks the response. The default answers are the same as before. A URL with no route goes through it too.
+- Breaking: `AppConfig.errorHandler` and `defaultErrorHandler` are removed. Override `ExceptionHandler.report` instead. It gets the same errors: every error that is not an `IHttpException`, also errors outside a request. A thrown value that is not an `Exception` or `Error` (like a `String`) is now reported too.
+- `responseHandler` still works and still runs after `render`.
+
 ## 3.0.0-alpha.8
 
 - Uses dox_http_native 3.0.0-alpha.8: pipelined requests are about 2.8 times faster (1 core: 172k to 480k req/s). Normal requests are as fast as before.

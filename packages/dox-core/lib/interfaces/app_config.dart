@@ -4,12 +4,6 @@ library;
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/utils/logger.dart';
-
-void defaultErrorHandler(Object? error, StackTrace stackTrace) {
-  Logger.warn(error);
-  Logger.danger(stackTrace.toString());
-}
 
 class AppConfig {
   final String appKey;
@@ -24,7 +18,10 @@ class AppConfig {
   final String? host;
   final int totalIsolate;
   final ResponseHandlerInterface? responseHandler;
-  final Function(Object?, StackTrace) errorHandler;
+
+  /// Reports every error and turns it into a response.
+  /// Extend `ExceptionHandler` to log to a tracker or change the answer.
+  final ExceptionHandler exceptionHandler;
 
   /// Every DTO of the app: `dtos` from `lib/dtos.g.dart`.
   /// Dox finds the DTO of a controller parameter and of
@@ -109,7 +106,7 @@ class AppConfig {
     this.storage = const StorageConfig(),
     this.openApi = const OpenApiConfig(),
     this.socketIo = const SocketIoConfig(),
-    this.errorHandler = defaultErrorHandler,
+    this.exceptionHandler = const ExceptionHandler(),
     this.responseHandler,
     this.maxBodySize = 10 * 1024 * 1024,
     this.maxMultipartSize = 100 * 1024 * 1024,

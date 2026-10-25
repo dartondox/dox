@@ -11,6 +11,28 @@ import 'package:dox_http_native/dox_http_native.dart';
 /// list of routes registered
 List<RouteData> _routes = <RouteData>[];
 
+/// param name => binder, see [Route.bind]
+Map<String, RouteBinding> _bindings = <String, RouteBinding>{};
+
+/// name => route, made on first [Route.url] call
+Map<String, RouteData>? _named;
+List<RouteData>? _namedFor;
+int _namedLength = -1;
+
+/// turns the raw text of a route param into a value, like a model.
+/// null means not found: the request gets 404.
+typedef RouteBinder<T> = FutureOr<T?> Function(String value);
+
+/// one binder added with [Route.bind]
+class RouteBinding {
+  const RouteBinding(this.type, this.resolve);
+
+  /// the type name, like `User`. a controller parameter of this type
+  /// gets the bound value.
+  final String type;
+  final RouteBinder<Object> resolve;
+}
+
 /// raw handler for every request under a path prefix, see [Route.mount]
 typedef RawRequestHandler = Future<void> Function(HttpRequest request);
 
@@ -46,7 +68,11 @@ class Route {
   Route._internal();
 
   String _prefix = '';
+  String _namePrefix = '';
   String? _domain;
+
+  /// the last added route, for [name]
+  RouteData? _last;
   bool? _corsEnabled;
 
   List<dynamic> _preMiddleware = <dynamic>[];
@@ -103,22 +129,156 @@ class Route {
     _routes = routeList;
   }
 
-  /// group route
+  /// binders added with [bind]
+  Map<String, RouteBinding> get bindings => _bindings;
+
+  /// set the binders, eg. in a new isolate
+  void setBindings(Map<String, RouteBinding> bindings) {
+    _bindings = bindings;
+  }
+
+  /// group route. [name] is put in front of the route names inside.
   /// ```
   /// Route.group('blog', () {
-  ///   Route.get('all', controller);
+  ///   Route.get('all', controller).name('all'); // blog.all
   ///   Route.put('{id}/activate', controller);
-  /// });
+  /// }, name: 'blog.');
   /// ```
-  static void group(String prefix, Function() callback) {
-    String originalPrefix = Route()._prefix;
+  static void group(String prefix, Function() callback, {String name = ''}) {
+    Route r = Route();
+    String originalPrefix = r._prefix;
+    String originalName = r._namePrefix;
 
     /// set new prefix
-    Route()._prefix = '$originalPrefix/$prefix';
+    r._prefix = '$originalPrefix/$prefix';
+    r._namePrefix = '$originalName$name';
     callback();
 
     /// restore original prefix
-    Route()._prefix = originalPrefix;
+    r._prefix = originalPrefix;
+    r._namePrefix = originalName;
+  }
+
+  /// name the route added last. a group `name:` is put in front.
+  /// the same name twice throws a [StateError] at start.
+  /// ```
+  /// Route.get('users/{id}', controller).name('users.show');
+  /// route('users.show', params: <String, Object>{'id': 5}); // /users/5
+  /// ```
+  Route name(String name) {
+    RouteData? last = _last;
+    if (last == null) {
+      throw StateError('Route.name("$name"): there is no route to name.');
+    }
+    _setName(last, '$_namePrefix$name');
+    return this;
+  }
+
+  void _setName(RouteData data, String name) {
+    for (RouteData other in _routes) {
+      if (other.name == name && !identical(other, data)) {
+        throw StateError(
+          'Route name "$name" is used twice: ${other.method} ${other.path} '
+          'and ${data.method} ${data.path}.',
+        );
+      }
+    }
+    data.name = name;
+    _named = null;
+  }
+
+  /// the path of the route named [name], with its `{params}` filled in.
+  /// a param value is url encoded. [query] is added as the query string.
+  /// an unknown name or a missing param throws an [ArgumentError].
+  /// ```
+  /// Route.url('users.show', params: <String, Object>{'id': 5});
+  /// // /users/5
+  /// ```
+  static String url(
+    String name, {
+    Map<String, Object?> params = const <String, Object?>{},
+    Map<String, Object?> query = const <String, Object?>{},
+  }) {
+    RouteData? data = Route()._byName()[name];
+    if (data == null) {
+      throw ArgumentError.value(name, 'name', 'No route has this name');
+    }
+    Set<String> used = <String>{};
+    List<String> parts = <String>[];
+    for (String part in data.path.split('/')) {
+      if (!part.startsWith('{') || !part.endsWith('}')) {
+        parts.add(part);
+        continue;
+      }
+      bool rest = part.endsWith('*}');
+      bool optional = part.endsWith('?}');
+      String param = part
+          .substring(1, part.length - 1)
+          .replaceAll('*', '')
+          .replaceAll('?', '');
+      Object? value = params[param];
+      used.add(param);
+      if (value == null) {
+        if (optional) continue;
+        throw ArgumentError(
+          'Route "$name" (${data.path}) needs the param "$param".',
+        );
+      }
+      parts.add(
+        rest
+            ? '$value'.split('/').map(Uri.encodeComponent).join('/')
+            : Uri.encodeComponent('$value'),
+      );
+    }
+    for (String key in params.keys) {
+      if (!used.contains(key)) {
+        throw ArgumentError(
+          'Route "$name" (${data.path}) has no param "$key". '
+          'Use query: for the query string.',
+        );
+      }
+    }
+    String path = parts.join('/');
+    if (path.isEmpty) path = '/';
+    if (query.isEmpty) return path;
+    Map<String, String> values = <String, String>{
+      for (MapEntry<String, Object?> entry in query.entries)
+        if (entry.value != null) entry.key: '${entry.value}',
+    };
+    if (values.isEmpty) return path;
+    return '$path?${Uri(queryParameters: values).query}';
+  }
+
+  Map<String, RouteData> _byName() {
+    Map<String, RouteData>? named = _named;
+    if (named != null &&
+        identical(_namedFor, _routes) &&
+        _namedLength == _routes.length) {
+      return named;
+    }
+    named = <String, RouteData>{
+      for (RouteData data in _routes)
+        if (data.name != null) data.name!: data,
+    };
+    _named = named;
+    _namedFor = _routes;
+    _namedLength = _routes.length;
+    return named;
+  }
+
+  /// turn the route param [param] into a value before the controller
+  /// runs. [resolve] gets the raw text and gives the value, or null
+  /// when there is none: then the request gets 404.
+  /// read it with `req.bound<T>(param)`, or add a controller parameter
+  /// of type [T]. call it before the server starts.
+  /// ```
+  /// Route.bind<User>('user', (String id) => User().find(id));
+  /// Route.get('users/{user}', (DoxRequest req, User user) => user);
+  /// ```
+  // ponytail: explicit binders only. binding by type alone needs a
+  // generated IoC, add it with that.
+  static void bind<T extends Object>(String param, RouteBinder<T> resolve) {
+    _bindings[param] = RouteBinding(T.toString(), resolve);
   }
 
   /// domain route
@@ -427,42 +587,70 @@ class Route {
   /// ```
   /// Route.resource('blog', BlogController());
   /// ```
-  static Route resource(String route, dynamic controller) {
+  /// the routes are named `blog.index`, `blog.create`, `blog.store`,
+  /// `blog.show`, `blog.edit`, `blog.update` and `blog.destroy`.
+  /// the name is the path with `.` for `/`, without `{params}`.
+  /// set [name] to use another one. a group `name:` is put in front.
+  /// ```
+  /// Route.resource('blog', BlogController());
+  /// ```
+  static Route resource(String route, dynamic controller, {String? name}) {
     Route r = Route();
     String path = r._join(route);
-    r._resourceRoute(HttpRequestMethod.GET, path, () => controller.index);
+    String base = name ?? route.split('/').where(_isNamePart).join('.');
+    r._resourceRoute(
+      HttpRequestMethod.GET,
+      path,
+      () => controller.index,
+      '$base.index',
+    );
     r._resourceRoute(
       HttpRequestMethod.GET,
       '$path/create',
       () => controller.create,
+      '$base.create',
     );
-    r._resourceRoute(HttpRequestMethod.POST, path, () => controller.store);
+    r._resourceRoute(
+      HttpRequestMethod.POST,
+      path,
+      () => controller.store,
+      '$base.store',
+    );
     r._resourceRoute(
       HttpRequestMethod.GET,
       '$path/{id}',
       () => controller.show,
+      '$base.show',
     );
     r._resourceRoute(
       HttpRequestMethod.GET,
       '$path/{id}/edit',
       () => controller.edit,
+      '$base.edit',
     );
     r._resourceRoute(
       HttpRequestMethod.PUT,
       '$path/{id}',
       () => controller.update,
+      '$base.update',
     );
     r._resourceRoute(
       HttpRequestMethod.PATCH,
       '$path/{id}',
       () => controller.update,
+      null,
     );
     r._resourceRoute(
       HttpRequestMethod.DELETE,
       '$path/{id}',
       () => controller.destroy,
+      '$base.destroy',
     );
     return r;
+  }
+
+  static bool _isNamePart(String part) {
+    return part.isNotEmpty && !part.startsWith('{');
   }
 
   /// add one route of [resource]. a controller without this method
@@ -471,6 +659,7 @@ class Route {
     HttpRequestMethod method,
     String path,
     dynamic Function() readAction,
+    String? name,
   ) {
     dynamic action;
     try {
@@ -479,6 +668,7 @@ class Route {
       return;
     }
     _addRoute(method, path, action);
+    if (name != null) _setName(_last!, '$_namePrefix$name');
   }
 
   Route _addRoute(
@@ -496,17 +686,29 @@ class Route {
     if (controller is List) {
       controllers.addAll(controller);
     }
-    _routes.add(
-      RouteData(
-        method: method.name,
-        path: path,
-        controllers: controllers,
-        domain: _domain,
-        corsEnabled: _corsEnabled,
-        preMiddleware: List<dynamic>.unmodifiable(_preMiddleware),
-        body: body,
-      ),
+    RouteData data = RouteData(
+      method: method.name,
+      path: path,
+      controllers: controllers,
+      domain: _domain,
+      corsEnabled: _corsEnabled,
+      preMiddleware: List<dynamic>.unmodifiable(_preMiddleware),
+      body: body,
     );
+    _routes.add(data);
+    _last = data;
     return this;
   }
+}
+
+/// the path of the route named [name], see [Route.url].
+/// ```
+/// route('users.show', params: <String, Object>{'id': 5}); // /users/5
+/// ```
+String route(
+  String name, {
+  Map<String, Object?> params = const <String, Object?>{},
+  Map<String, Object?> query = const <String, Object?>{},
+}) {
+  return Route.url(name, params: params, query: query);
 }

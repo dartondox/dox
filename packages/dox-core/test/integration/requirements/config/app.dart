@@ -1,5 +1,4 @@
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/utils/logger.dart';
 
 import '../handler.dart';
 import '../middleware/custom_middleware.dart';
@@ -35,11 +34,6 @@ AppConfig config = AppConfig(
 
   /// routers
   routers: <Router>[ApiRouter()],
-
-  /// error handler
-  errorHandler: (Object? error, StackTrace stackTrace) {
-    Logger.danger(error);
-  },
 
   /// cache driver configuration
   cache: CacheConfig(

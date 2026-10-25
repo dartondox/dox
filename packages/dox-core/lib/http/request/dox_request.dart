@@ -43,6 +43,22 @@ class DoxRequest implements IDoxRequest {
   /// the route params, eg. `{'id': '5'}`
   late Map<String, dynamic> param = route.params;
 
+  /// values from `Route.bind`, set before the controller runs
+  late final Map<String, Object> boundValues = <String, Object>{};
+
+  /// the value `Route.bind` made for the route param [param].
+  /// ```
+  /// User user = req.bound<User>('user');
+  /// ```
+  T bound<T>(String param) {
+    Object? value = boundValues[param];
+    if (value is T) return value;
+    throw StateError(
+      'No bound value of type $T for the route param "$param". '
+      'Add Route.bind<$T>(\'$param\', ...) and a {$param} in the route.',
+    );
+  }
+
   /// the query string, read on first use
   late Map<String, dynamic> query = uri.queryParameters;
 

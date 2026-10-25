@@ -17,6 +17,7 @@ void isolateHandler(IsolateSpawnParameter param) async {
 
   /// register routes
   Route().setRoutes(param.routes);
+  Route().setBindings(Map<String, RouteBinding>.of(param.bindings));
 
   /// starting registered services in new isolate;
   await Dox().startServices();

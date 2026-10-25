@@ -12,11 +12,11 @@ When a controller or a middleware throws:
 
 | Error | Status | What Dox does |
 | --- | --- | --- |
-| an `IHttpException`, like `NotFoundHttpException` | its `code` | sends its `message`. Does **not** call `errorHandler` |
-| a validation error (bad DTO input) | `422` | sends the field errors. Does not call `errorHandler` |
-| any other `Exception` or `Error` | `500` | sends `error.toString()`. Calls `errorHandler` |
+| an `IHttpException`, like `NotFoundHttpException` | its `code` | sends its `message`. Does **not** call `report` |
+| a validation error (bad DTO input) | `422` | sends the field errors. Does not call `report` |
+| any other `Exception` or `Error` | `500` | sends `Server Error` (the error text only in development). Calls `report` |
 
-The response goes through the `responseHandler` of `AppConfig` last. That is where you set the shape.
+`report` is a method of the [exception handler](../the-basic/errors.md). The response goes through the `responseHandler` of `AppConfig` last. This guide sets the shape there.
 
 ## 1. Write your own exceptions
 
@@ -135,25 +135,32 @@ The last `if` matters. Without it, a `500` sends `error.toString()` to the clien
 
 ## 3. Log unexpected errors
 
-`errorHandler` runs for every `500`, and for errors outside a request (a future nobody awaited, a timer).
+The `report` method of the exception handler runs for every `500`, and for errors outside a request (a future nobody awaited, a timer).
 Write one JSON line. A log collector reads it, or you send it to Sentry here.
 
 ```dart title="lib/app/error_handler.dart"
 import 'dart:convert';
 
-/// Dox calls this for every unexpected error (a `500`, or an error
+import 'package:dox_core/dox_core.dart';
+
+/// Dox calls [report] for every unexpected error (a `500`, or an error
 /// outside a request). It does not run for `IHttpException` errors
 /// like `404` or `422`, because those are expected.
 /// One JSON line per error. Send it to Sentry or Datadog from here.
-void reportError(Object? error, StackTrace stackTrace) {
-  print(
-    jsonEncode(<String, String>{
-      'level': 'ERROR',
-      'message': error.toString(),
-      'stack': stackTrace.toString(),
-      'timestamp': DateTime.now().toIso8601String(),
-    }),
-  );
+class AppExceptionHandler extends ExceptionHandler {
+  const AppExceptionHandler();
+
+  @override
+  void report(Object error, StackTrace stackTrace) {
+    print(
+      jsonEncode(<String, String>{
+        'level': 'ERROR',
+        'message': error.toString(),
+        'stack': stackTrace.toString(),
+        'timestamp': DateTime.now().toIso8601String(),
+      }),
+    );
+  }
 }
 ```
 
@@ -165,7 +172,7 @@ import 'package:my_app/app/http/response_handler.dart';
 
 AppConfig appConfig = AppConfig(
   responseHandler: ResponseHandler(),
-  errorHandler: reportError,
+  exceptionHandler: const AppExceptionHandler(),
   // ...
 );
 ```
@@ -201,6 +208,7 @@ Remove the `/boom` route when you are done.
 
 ## See also
 
+- [Error handling](../the-basic/errors.md) for `report` and `render`
 - [Response: errors](../the-basic/response.md#errors) for the built-in exceptions
 - [Response: change every response](../the-basic/response.md#change-every-response)
 - [Validation: the error response](../the-basic/validation.md#the-error-response)

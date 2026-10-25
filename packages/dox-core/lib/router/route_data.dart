@@ -5,6 +5,9 @@ class RouteData {
   String path;
   final dynamic controllers;
 
+  /// set by `Route.get(...).name('users.show')`, see `Route.url`
+  String? name;
+
   /// set by [withParams]. made only when a plain route reads it.
   late Map<String, dynamic> params = <String, dynamic>{};
 
@@ -109,6 +112,7 @@ class RouteData {
         body: body,
       )
       ..params = values
+      ..name = name
       .._handler = handler
       .._handlerRead = true
       .._pattern = _pattern

@@ -87,7 +87,7 @@ class ForbiddenException extends IHttpException {
 }
 ```
 
-Any other error gets `500`. It is also passed to the `errorHandler` in `AppConfig`.
+Any other error gets `500`. It is also passed to the [exception handler](errors.md).
 
 ## Files and big responses
 

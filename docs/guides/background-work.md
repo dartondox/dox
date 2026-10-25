@@ -21,7 +21,7 @@ None of them survive a restart. See [When you need a real queue](#when-you-need-
 ## 1. Work after the response
 
 Start the future and return. `unawaited` tells the linter you did this on purpose.
-An error in the future goes to the `errorHandler` of `AppConfig`. The isolate keeps running.
+An error in the future goes to the `report` method of the `ExceptionHandler` in `AppConfig`. The isolate keeps running.
 
 ```dart title="lib/app/http/controllers/report.controller.dart"
 import 'dart:async';
@@ -172,4 +172,4 @@ A failed row stays in the table, so you can retry it. This is a queue with one e
 
 - [Isolate](../digging-deeper/isolate.md) for what each isolate shares, and what it does not
 - [Services](../digging-deeper/services.md)
-- [Custom errors](custom-errors.md) for the `errorHandler` that gets the errors of a future nobody awaits
+- [Custom errors](custom-errors.md) for the `ExceptionHandler` that gets the errors of a future nobody awaits

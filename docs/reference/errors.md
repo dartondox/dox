@@ -25,7 +25,12 @@ These stop the app at start, so a bad route never reaches a request.
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `Route <where>: the controller parameter type <T> is not known. Use DoxRequest, a @Dto class, or String, int, double, num, bool for path params. ...` | A controller parameter has another type, or the DTO is not in `AppConfig.dtos`. | Change the type, or run `dart run build_runner build` and set `dtos: dtos`. |
+| `Route <where>: the controller parameter type <T> is not known. Use DoxRequest, a @Dto class, a type from Route.bind, or String, int, double, num, bool for path params. ...` | A controller parameter has another type, the DTO is not in `AppConfig.dtos`, or there is no `Route.bind<T>` for a `{param}` of the route. | Change the type, add the binder, or run `dart run build_runner build` and set `dtos: dtos`. |
+| `Route name "<name>" is used twice: <method> <path> and <method> <path>.` | Two routes have the same name. | Give one of them another name. |
+| `Invalid argument (name): No route has this name: "<name>"` | `route()` or `Route.url()` with a name that no route has. | Check the name and the group `name:` prefix. |
+| `Invalid argument(s): Route "<name>" (<path>) needs the param "<param>".` | `route()` without a value for a `{param}`. | Pass it in `params:`. |
+| `Invalid argument(s): Route "<name>" (<path>) has no param "<key>". ...` | `route()` with a param the path does not have. | Remove it, or pass it in `query:`. |
+| `Bad state: No bound value of type <T> for the route param "<param>". ...` | `req.bound<T>()` for a param with no `Route.bind`, or of another type. | Add `Route.bind<T>('<param>', ...)`. |
 | `Route <where>: the controller has more path params than the route has {...} params (<n>).` | The method asks for more path params than the path has. | Add the `{param}` to the path, or remove the parameter. |
 | `Route <where>: a controller can have one @Dto only.` | Two DTO parameters. | Merge them into one DTO. |
 | `Route <where>: only positional parameters are supported, not named or [optional] ones (<type>).` | Named or `[optional]` parameters. | Use positional parameters. Use `int?` with `{id?}` for an optional param. |
@@ -59,7 +64,7 @@ The table shows the `message` text.
 | `422` | `{"_root":"The input has too many items (max 1000) or levels (max 10)"}` | Form or query keys with more than 1000 list items or 10 levels. | Send less nested data. |
 | `422` | `{"<field>":"<message>"}` | A DTO check failed. | See [Validation rules](../the-basic/validation-rules.md). |
 | `431` | (no text) | Native server: request line plus headers over 16 KB. | Send smaller headers or cookies. |
-| `500` | `Server Error`, code `server_error`. When `APP_ENV` is `development` or `local`, the body is `<error>.toString()` as plain text. | Any error that is not an `IHttpException`. It also goes to `errorHandler`. | Look at the server log. |
+| `500` | `Server Error`, code `server_error`. When `APP_ENV` is `development` or `local`, the body is `<error>.toString()` as plain text. | Any error that is not an `IHttpException`. It also goes to the `report` method of the `ExceptionHandler`. | Look at the server log. |
 
 ## dox_core: DTOs, storage and config
 

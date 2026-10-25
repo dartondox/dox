@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dox_core/constants/http_request_method.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_cors_handler.dart';
+import 'package:dox_core/http/http_error_handler.dart';
 import 'package:dox_core/http/http_response_handler.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/utils.dart';
@@ -32,13 +33,14 @@ RouteData? httpRouteHandler(HttpRequest req) {
       req.response.statusCode = HttpStatus.noContent;
       responseDataHandler(null, req);
     } else {
-      /// same path as a thrown 404, so the app responseHandler can
-      /// format it. the default body is JSON.
-      httpResponseHandler(
+      /// same path as a thrown 404, so the app ExceptionHandler and
+      /// responseHandler can format it. the default body is JSON.
+      httpErrorHandler(
+        req,
         NotFoundHttpException(
           message: '${req.method} ${req.uri.path} not found',
         ),
-        req,
+        StackTrace.empty,
       );
     }
   }

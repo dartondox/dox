@@ -9,6 +9,9 @@ class IsolateSpawnParameter {
   final List<DoxService> services;
   final List<RouteData> routes;
 
+  /// binders from `Route.bind`
+  final Map<String, RouteBinding> bindings;
+
   /// the isolate sends its own [SendPort] here once it serves requests.
   /// The main isolate sends a stop message to it on shutdown.
   final SendPort? control;
@@ -18,6 +21,7 @@ class IsolateSpawnParameter {
     this.config,
     this.services, {
     this.routes = const <RouteData>[],
+    this.bindings = const <String, RouteBinding>{},
     this.control,
   });
 }
