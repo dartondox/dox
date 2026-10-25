@@ -93,6 +93,8 @@ class ConnectionConfig {
   ///   libpq), `verify-ca` and `verify-full` check it. For MySQL the
   ///   certificate is checked, add `verifyCertificate=false` to skip the
   ///   check (eg. a self-signed certificate in development).
+  /// - `sslrootcert=/path/ca.pem` (Postgres): the CA certificates to trust
+  ///   for `verify-full`. See [postgresSslRootCert].
   /// - any other option goes to [extra]. `10` becomes an int, and `true` or
   ///   `false` a bool. Eg. `?maxConnectionCount=20`.
   ///
@@ -150,6 +152,8 @@ class ConnectionConfig {
           // certificate (eg. Heroku). `verify-ca` and `verify-full`
           // check it.
           if (driver == Driver.postgres) options['sslMode'] = mode;
+        case 'sslrootcert' when driver == Driver.postgres:
+          options['sslRootCert'] = value;
         default:
           options[key] = int.tryParse(value) ?? bool.tryParse(value) ?? value;
       }
@@ -193,6 +197,12 @@ class ConnectionConfig {
   /// with [useSSL], else `disable`.
   String get postgresSslMode =>
       extra['sslMode'] as String? ?? (useSSL ? 'require' : 'disable');
+
+  /// the path of a PEM file with the CA certificates that Postgres TLS
+  /// trusts for `verify-full`, eg. the CA of a cloud database. it is
+  /// `extra['sslRootCert']` (`sslrootcert` in a url). when it is not set,
+  /// the system certificates are used.
+  String? get postgresSslRootCert => extra['sslRootCert'] as String?;
 
   /// max prepared statements kept per connection (default 100).
   /// set it with `extra['preparedStatementCacheSize']`.

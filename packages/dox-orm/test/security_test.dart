@@ -156,5 +156,27 @@ void main() async {
       expect(dev.verifyCertificate, false);
       expect(pg.verifyCertificate, true);
     });
+
+    test('postgres ca file', () {
+      ConnectionConfig url = ConnectionConfig.fromUrl(
+        'postgres://u:p@db.example.com/app?sslmode=verify-full'
+        '&sslrootcert=%2Fetc%2Fssl%2Frds-ca.pem',
+      );
+      expect(url.postgresSslRootCert, '/etc/ssl/rds-ca.pem');
+      expect(url.extra.containsKey('sslrootcert'), false);
+      expect(
+        ConnectionConfig(
+          driver: Driver.postgres,
+          database: 'app',
+          extra: <String, dynamic>{'sslRootCert': 'certs/ca.pem'},
+          debug: false,
+        ).postgresSslRootCert,
+        'certs/ca.pem',
+      );
+      expect(
+        ConnectionConfig.fromUrl('postgres://u:p@h/app').postgresSslRootCert,
+        null,
+      );
+    });
   });
 }

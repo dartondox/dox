@@ -207,6 +207,7 @@ DATABASE_URL=mysql://app:secret@/app?socket=/var/run/mysqld/mysqld.sock
 | `maxConnectionAge` | MySQL | 12 hours | A connection older than this is opened again. |
 | `preparedStatementCacheSize` | MySQL, SQLite | `100` | Prepared statements kept per connection. |
 | `sslMode` | Postgres | `disable` | TLS mode: `disable`, `prefer`, `require` or `verify-full`. |
+| `sslRootCert` | Postgres | none | Path of a PEM file with the CA certificates to trust for `verify-full`. |
 | `verifyCertificate` | MySQL | `true` | `false` skips the TLS certificate check. Only for development. |
 | `timeZone` | Postgres | `UTC` | Time zone of the session. |
 | `applicationName` | Postgres | none | Name of the app in `pg_stat_activity`. |
