@@ -8506,7 +8506,7 @@ class UserObserver extends ModelObserver<User> {
   UserObserver(this.mailer);
 
   @override
-  Future<void> created(User user) async {
+  Future<void> onCreated(User user) async {
     await mailer.sendWelcome(user.email!);
   }
 }
@@ -17385,6 +17385,10 @@ What changed in each package, newest first. This page is made from the
 - Output as JSON and YAML, write files, serve `/openapi.json`, `/openapi.yaml` and `/docs`.
 
 ## dox_orm
+
+### Unreleased
+
+- Breaking: the `ModelObserver` methods now have the same names as the model hooks: `onSaving`, `onSaved`, `onCreating`, `onCreated`, `onUpdating`, `onUpdated`, `onDeleting`, `onDeleted`, `onRestoring`, `onRestored`, `onForceDeleting` and `onForceDeleted`. Rename the methods in your observers, for example `created(User user)` to `onCreated(User user)`.
 
 ### 3.0.0-alpha.8
 
