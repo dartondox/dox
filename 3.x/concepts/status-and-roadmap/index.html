@@ -1361,17 +1361,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#known-gaps" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Known gaps
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#what-dox-does-not-have-yet" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6154,17 +6143,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#known-gaps" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Known gaps
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#what-dox-does-not-have-yet" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6342,8 +6320,8 @@ The API can still change between alpha versions.</p>
 <tr>
 <td><code>dox_socketio</code></td>
 <td>Socket.IO v4 server with a Redis adapter</td>
-<td>May change. Has known gaps, see below.</td>
-<td>9 test files, with the real <code>socket.io-client</code> in CI</td>
+<td>May change</td>
+<td>10 test files, with the real <code>socket.io-client</code> in CI</td>
 </tr>
 <tr>
 <td><code>dox_queue</code></td>
@@ -6401,30 +6379,6 @@ The API can still change between alpha versions.</p>
 <p>The repo does not measure line coverage. The "Tests" column counts test files and says where CI runs them.
 The CI setup is in <code>.github/workflows/test.yaml</code>. The packages in their own repos have their own CI.</p>
 </div>
-<h2 id="known-gaps">Known gaps</h2>
-<p>These are known and wait for 3.1. They do not block 3.0 stable.</p>
-<table>
-<thead>
-<tr>
-<th>Gap</th>
-<th>What to do today</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>With many servers and the Redis adapter, <code>fetchSockets</code>, <code>socketsJoin</code>, <code>socketsLeave</code> and <code>disconnectSockets</code> only act on the sockets of the server that calls them.</td>
-<td>Use an <a href="../../packages/socketio/#emit-from-other-programs">emitter</a>. It acts on all servers.</td>
-</tr>
-<tr>
-<td><code>serverSideEmit</code> from other servers is ignored.</td>
-<td>Send the message through Redis pub/sub yourself, or use the queue.</td>
-</tr>
-<tr>
-<td>Broadcast acks from other servers are not sent back.</td>
-<td>Ask the client to send a normal event back.</td>
-</tr>
-</tbody>
-</table>
 <h2 id="what-dox-does-not-have-yet">What Dox does not have yet</h2>
 <p>These were checked by searching the code with <code>rg</code>.</p>
 <table>
@@ -6490,7 +6444,6 @@ There are no dates.</p>
 </table>
 <h3 id="later-31-and-after">Later (3.1 and after)</h3>
 <ul>
-<li>Socket.IO actions across all servers (the known gaps above)</li>
 <li>Notifications</li>
 <li>Password reset</li>
 <li>Gates and policies</li>

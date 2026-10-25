@@ -4673,6 +4673,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Many servers: Redis adapter">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#act-on-all-servers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Act on all servers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#events-between-servers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Events between servers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -6238,6 +6266,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Many servers: Redis adapter">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#act-on-all-servers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Act on all servers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#events-between-servers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Events between servers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -6494,8 +6550,20 @@ Any other error is written to stderr. The client only gets <code>{"message": "In
 <td><code>socket.data</code> (a <code>Map</code>)</td>
 </tr>
 <tr>
-<td><code>io.in(r).fetchSockets()</code></td>
-<td><code>io.to(r).fetchSockets()</code> (this server only)</td>
+<td><code>await io.in(r).fetchSockets()</code></td>
+<td><code>await io.to(r).fetchSockets()</code> (all servers)</td>
+</tr>
+<tr>
+<td><code>await io.timeout(5000).emitWithAck('e', a)</code></td>
+<td><code>await io.timeout(Duration(seconds: 5)).emitWithAck('e', a)</code></td>
+</tr>
+<tr>
+<td><code>io.serverSideEmit('e', a)</code></td>
+<td><code>await io.serverSideEmit('e', [a])</code></td>
+</tr>
+<tr>
+<td><code>io.on('e', (a, cb) =&gt; ...)</code> (from other servers)</td>
+<td><code>io.onServerSideEmit('e', (ServerSideEvent e) =&gt; ...)</code>, then <code>e.data</code>, <code>e.ack(x)</code></td>
 </tr>
 </tbody>
 </table>
@@ -6592,46 +6660,77 @@ Then a broadcast on one server reaches the clients of all servers.</p>
 <li>It uses the format of <code>@socket.io/redis-adapter</code>. Node.js servers with that adapter can share one Redis with Dox servers.</li>
 <li>It reads messages in msgpack and in JSON. It writes msgpack, like the Node.js adapter.
   If your Node.js servers use a JSON parser, set <code>format: RedisFormat.json</code>.</li>
-<li>Other servers can ask a Dox server for <code>fetchSockets</code>, <code>allRooms</code>, <code>socketsJoin</code>, <code>socketsLeave</code> and <code>disconnectSockets</code>. It answers.</li>
-<li>On a Dox server, <code>fetchSockets</code>, <code>socketsJoin</code>, <code>socketsLeave</code> and <code>disconnectSockets</code> only act on its own sockets.
-  To act on all servers, use an <a href="#emit-from-other-programs">emitter</a>.</li>
-<li>Broadcast acks from other servers: Dox clients get the event, but their acks are not sent back.</li>
-<li><code>serverSideEmit</code> from other servers is ignored.</li>
+<li><code>fetchSockets</code>, <code>socketsJoin</code>, <code>socketsLeave</code> and <code>disconnectSockets</code> act on the sockets of all servers.</li>
+<li>Broadcasts with an ack get the acks of clients on all servers.</li>
+<li>Servers can send events to each other with <code>serverSideEmit</code>. Clients do not get them.</li>
+<li>A request waits at most <code>requestsTimeout</code> for the other servers (5 seconds by default, like Node.js).</li>
 <li>Long-polling needs sticky sessions, the same as with <a href="#in-a-dox-app-same-port-as-http">many isolates</a>. Or use <code>transports: ['websocket']</code> on the client.</li>
 </ul>
+<h3 id="act-on-all-servers">Act on all servers</h3>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1">// sockets of every server. Sockets of this server are `Socket`s.</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">RemoteSocket</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sockets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="n">fetchSockets</span><span class="p">();</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">RemoteSocket</span><span class="w"> </span><span class="n">socket</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">sockets</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="n">socket</span><span class="p">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">'hello'</span><span class="p">,</span><span class="w"> </span><span class="n">socket</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]);</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">}</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="n">socketsJoin</span><span class="p">(</span><span class="s1">'room2'</span><span class="p">);</span>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'banned'</span><span class="p">).</span><span class="n">disconnectSockets</span><span class="p">();</span>
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="c1">// one ack per client, from all servers. A timeout is needed.</span>
+</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">answers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">io</span>
+</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">    </span><span class="p">.</span><span class="n">timeout</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">5</span><span class="p">))</span>
+</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">    </span><span class="p">.</span><span class="n">emitWithAck</span><span class="p">(</span><span class="s1">'ping'</span><span class="p">,</span><span class="w"> </span><span class="s1">'are you there?'</span><span class="p">);</span>
+</span></code></pre></div>
+<p><code>fetchSockets</code> throws a <code>TimeoutException</code> when a server does not answer in time.</p>
+<h3 id="events-between-servers">Events between servers</h3>
+<p><code>serverSideEmit</code> sends an event to the other servers. Clients do not get it.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1">// on every server</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">io</span><span class="p">.</span><span class="n">onServerSideEmit</span><span class="p">(</span><span class="s1">'reload-config'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">ServerSideEvent</span><span class="w"> </span><span class="n">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="n">reloadConfig</span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="n">data</span><span class="p">);</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="n">event</span><span class="p">.</span><span class="n">ack</span><span class="p">(</span><span class="s1">'done'</span><span class="p">);</span><span class="w"> </span><span class="c1">// only when the sender waits for an answer</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="p">});</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="c1">// on one server</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">serverSideEmit</span><span class="p">(</span><span class="s1">'reload-config'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">'v2'</span><span class="p">]);</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="c1">// wait for one answer from each other server</span>
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">answers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">serverSideEmitWithAck</span><span class="p">(</span><span class="s1">'reload-config'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">'v2'</span><span class="p">]);</span>
+</span></code></pre></div>
+<p>When a server does not answer in time, <code>serverSideEmitWithAck</code> throws an <code>AckTimeoutException</code>. Its <code>responses</code> holds the answers that came back.
+<code>onServerSideEmit</code> is also on namespaces: <code>io.of('/chat').onServerSideEmit(...)</code>.</p>
 <h2 id="emit-from-other-programs">Emit from other programs</h2>
 <p>An emitter sends events to your clients without a Socket.IO server.
 Use it in a queue worker, a cron job or a service in another language.
 It writes to Redis, and every server with the Redis adapter sends the event to its clients.</p>
 <p>Dart (for example in a Dox queue job or a CLI command):</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_socketio/dox_socketio.dart'</span><span class="p">;</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:ioredis/ioredis.dart'</span><span class="p">;</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="n">Redis</span><span class="w"> </span><span class="n">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Redis</span><span class="p">(</span><span class="n">RedisOptions</span><span class="p">(</span><span class="nl">host:</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">,</span><span class="w"> </span><span class="nl">port:</span><span class="w"> </span><span class="m">6379</span><span class="p">));</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="n">SocketIoEmitter</span><span class="w"> </span><span class="n">emitter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoEmitter</span><span class="p">(</span><span class="n">redis</span><span class="p">);</span>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>
-</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="s1">'title'</span><span class="o">:</span><span class="w"> </span><span class="s1">'hello'</span><span class="p">});</span><span class="w"> </span><span class="c1">// all clients of `/`</span>
-</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="n">except</span><span class="p">(</span><span class="s1">'room2'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="s1">'hi room1'</span><span class="p">);</span>
-</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">of</span><span class="p">(</span><span class="s1">'/chat'</span><span class="p">).</span><span class="n">to</span><span class="p">(</span><span class="s1">'vip'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'notice'</span><span class="p">,</span><span class="w"> </span><span class="s1">'for vip'</span><span class="p">);</span>
-</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>
-</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="n">socketsJoin</span><span class="p">(</span><span class="s1">'room3'</span><span class="p">);</span><span class="w"> </span><span class="c1">// sockets in room1 join room3</span>
-</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room3'</span><span class="p">).</span><span class="n">socketsLeave</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">);</span>
-</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'banned'</span><span class="p">).</span><span class="n">disconnectSockets</span><span class="p">();</span>
-</span><span id="__span-11-15"><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>
-</span><span id="__span-11-16"><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">redis</span><span class="p">.</span><span class="n">disconnect</span><span class="p">();</span>
-</span><span id="__span-11-17"><a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_socketio/dox_socketio.dart'</span><span class="p">;</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:ioredis/ioredis.dart'</span><span class="p">;</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">  </span><span class="n">Redis</span><span class="w"> </span><span class="n">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Redis</span><span class="p">(</span><span class="n">RedisOptions</span><span class="p">(</span><span class="nl">host:</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">,</span><span class="w"> </span><span class="nl">port:</span><span class="w"> </span><span class="m">6379</span><span class="p">));</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">  </span><span class="n">SocketIoEmitter</span><span class="w"> </span><span class="n">emitter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoEmitter</span><span class="p">(</span><span class="n">redis</span><span class="p">);</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="s1">'title'</span><span class="o">:</span><span class="w"> </span><span class="s1">'hello'</span><span class="p">});</span><span class="w"> </span><span class="c1">// all clients of `/`</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="n">except</span><span class="p">(</span><span class="s1">'room2'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="s1">'hi room1'</span><span class="p">);</span>
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">of</span><span class="p">(</span><span class="s1">'/chat'</span><span class="p">).</span><span class="n">to</span><span class="p">(</span><span class="s1">'vip'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'notice'</span><span class="p">,</span><span class="w"> </span><span class="s1">'for vip'</span><span class="p">);</span>
+</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>
+</span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="n">socketsJoin</span><span class="p">(</span><span class="s1">'room3'</span><span class="p">);</span><span class="w"> </span><span class="c1">// sockets in room1 join room3</span>
+</span><span id="__span-13-13"><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room3'</span><span class="p">).</span><span class="n">socketsLeave</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">);</span>
+</span><span id="__span-13-14"><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'banned'</span><span class="p">).</span><span class="n">disconnectSockets</span><span class="p">();</span>
+</span><span id="__span-13-15"><a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a>
+</span><span id="__span-13-16"><a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">redis</span><span class="p">.</span><span class="n">disconnect</span><span class="p">();</span>
+</span><span id="__span-13-17"><a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Node.js, with <a href="https://www.npmjs.com/package/@socket.io/redis-emitter"><code>@socket.io/redis-emitter</code></a>:</p>
-<div class="language-js highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Emitter</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@socket.io/redis-emitter'</span><span class="p">;</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">createClient</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'redis'</span><span class="p">;</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">createClient</span><span class="p">({</span><span class="w"> </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="s1">'redis://127.0.0.1:6379'</span><span class="w"> </span><span class="p">});</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="k">await</span><span class="w"> </span><span class="nx">redis</span><span class="p">.</span><span class="nx">connect</span><span class="p">();</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="kd">const</span><span class="w"> </span><span class="nx">emitter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Emitter</span><span class="p">(</span><span class="nx">redis</span><span class="p">);</span>
-</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="nx">emitter</span><span class="p">.</span><span class="nx">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="s1">'hello'</span><span class="w"> </span><span class="p">});</span>
-</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="nx">emitter</span><span class="p">.</span><span class="k">of</span><span class="p">(</span><span class="s1">'/chat'</span><span class="p">).</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'notice'</span><span class="p">,</span><span class="w"> </span><span class="s1">'for everyone in /chat'</span><span class="p">);</span>
+<div class="language-js highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Emitter</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@socket.io/redis-emitter'</span><span class="p">;</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">createClient</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'redis'</span><span class="p">;</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">createClient</span><span class="p">({</span><span class="w"> </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="s1">'redis://127.0.0.1:6379'</span><span class="w"> </span><span class="p">});</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="k">await</span><span class="w"> </span><span class="nx">redis</span><span class="p">.</span><span class="nx">connect</span><span class="p">();</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="kd">const</span><span class="w"> </span><span class="nx">emitter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Emitter</span><span class="p">(</span><span class="nx">redis</span><span class="p">);</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="nx">emitter</span><span class="p">.</span><span class="nx">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="s1">'hello'</span><span class="w"> </span><span class="p">});</span>
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="nx">emitter</span><span class="p">.</span><span class="k">of</span><span class="p">(</span><span class="s1">'/chat'</span><span class="p">).</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'notice'</span><span class="p">,</span><span class="w"> </span><span class="s1">'for everyone in /chat'</span><span class="p">);</span>
 </span></code></pre></div>
 <ul>
 <li>The emitters of other languages (PHP, Python, Go) use the same format, so they work too.</li>
