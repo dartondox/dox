@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.11
 
 - New: middleware that runs after the controller. Implement `IDoxNextMiddleware` (`handle(DoxRequest req, Next next)`), or use a function `(DoxRequest req, Next next)`. `await next()` runs the rest of the middleware and the controller and gives a `DoxResponse`, so the code after it can change the status, headers and cookies. A thrown error comes back as its error response, so the after part still runs. Before-only middleware work as before. A route with no `next` middleware takes the same fast path as before.
 - New: `DoxResponse.status` and `DoxResponse.headers` getters.

@@ -1,3 +1,7 @@
+## 3.0.0-alpha.11
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.10
 
 - The app-wide files are now written to `lib/generated/`: `lib/generated/container.g.dart`, `lib/generated/dtos.g.dart` and `lib/generated/openapi.g.dart`. This keeps them out of the top of `lib/`. Import them from `package:<app>/generated/...`. Delete the old files in `lib/` after you run `dart run build_runner build`.

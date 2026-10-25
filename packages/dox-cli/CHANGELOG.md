@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-alpha.11
 
 - `dox build` also builds `bin/queue.dart` and `bin/schedule.dart` when they exist, to `build/bundle/bin/queue` and `build/bundle/bin/schedule`. Before, the worker and the scheduler had no production binary.
 - Fix: `dox build` copied the local SQLite database (`db/dox.sqlite`, with its `-wal` and `-shm` files) into `build/bundle/db`, so dev data went to production. SQLite files are now left out.
