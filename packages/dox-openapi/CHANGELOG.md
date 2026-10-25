@@ -1,3 +1,7 @@
+## 3.0.0-alpha.13
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.12
 
 - Fix: two controllers with the same method name (like `login`) could swap their docs. `OpenApiRegistry.find` now takes `controller:`. When the route knows its controller class, only methods of that class match.

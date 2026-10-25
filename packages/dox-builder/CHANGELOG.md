@@ -1,3 +1,7 @@
+## 3.0.0-alpha.13
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.12
 
 - Fix: a route inside `Route.group('/web-auth', registerWebAuth)` lost the group prefix when the callback was a method or function, not a closure. The builder now reads that method with the prefix, also for nested groups. The route call in `openapi.g.dart` now has the full path, like `/web-auth/login`.

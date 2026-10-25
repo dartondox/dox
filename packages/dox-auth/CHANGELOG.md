@@ -1,3 +1,7 @@
+## 3.0.0-alpha.13
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.12
 
 - New: `SessionAuthDriver` keeps the login in the session, for web pages. Use `Auth().attemptSession(req, credentials)`, `Auth().loginSession(req, user)` and `Auth().logout(req)`. Login and logout give the session a new id. Needs `SessionMiddleware`.
