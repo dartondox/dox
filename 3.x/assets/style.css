@@ -211,6 +211,22 @@
   font-weight: 700;
 }
 .md-nav__link--active { font-weight: 600; }
+/* Page icons (`icon: lucide/...` in front matter, files in
+   overrides/.icons/lucide). Lucide draws lines, so use stroke, not fill.
+   Only the side menu shows them: in the top tabs only some tabs have one. */
+svg.lucide {
+  fill: none !important;
+  stroke: currentcolor;
+  stroke-width: 1.6;
+}
+.md-tabs svg.lucide { display: none; }
+.md-nav__link svg.lucide {
+  width: 1.15em;
+  height: 1.15em;
+  margin-top: 0;
+  margin-right: 0.15em;
+  opacity: 0.75;
+}
 
 /* ---------- Admonitions ---------- */
 .md-typeset .admonition,
