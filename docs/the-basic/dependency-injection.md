@@ -98,8 +98,8 @@ import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/http/controllers/user.controller.dart' as i1;
 import 'package:my_app/app/repositories/user.repository.dart' as i2;
 import 'package:my_app/app/services/user.service.dart' as i3;
-import 'package:my_app/routes/api.dart' as i4;
-import 'package:my_app/services/orm_service.dart' as i5;
+import 'package:my_app/providers/orm_provider.dart' as i4;
+import 'package:my_app/routes/api.dart' as i5;
 import 'package:my_app/app/models/user/user.model.dart' as i6;
 
 void registerContainer(IocContainer c) {
@@ -110,8 +110,8 @@ void registerContainer(IocContainer c) {
   c.singleton<i3.UserService>(
     (IocContainer c) => i3.UserService(c.get<i2.UserRepository>()),
   );
-  c.router<i4.ApiRouter>((IocContainer c) => i4.ApiRouter());
-  c.service<i5.ORMService>((IocContainer c) => i5.ORMService());
+  c.provider<i4.ORMProvider>((IocContainer c) => i4.ORMProvider());
+  c.router<i5.ApiRouter>((IocContainer c) => i5.ApiRouter());
   c.bindModel<i6.User>((String id) {
     int? key = int.tryParse(id);
     if (key == null) return null;
@@ -199,12 +199,12 @@ class PostController {
 - A route without a parameter of the model type does not load the model.
 - A binder from `Route.bind` wins over this one. See [Routing: route model binding](routing.md#route-model-binding).
 
-## Routers and services
+## Routers and providers
 
 You do not need `@Inject()` on them.
 
 - Every class that extends `Router` is found. Its routes are registered at start.
-- Every class that implements `DoxService` is found. Its `setup()` runs at start, in every isolate.
+- Every class that extends `DoxProvider` is found. Its `setup()` runs at start, in every isolate.
 
 Their constructors get parameters from the container too.
 
@@ -214,13 +214,13 @@ To pick the order, list them in `AppConfig`:
 ```dart
 AppConfig appConfig = AppConfig(
   container: registerContainer,
-  services: <DoxService>[ORMService()], // runs first
+  providers: <DoxProvider>[ORMProvider()], // runs first
   routers: <Router>[ApiRouter()],       // registered first
 );
 ```
 
 A listed class comes first. The others follow. No class runs twice.
-A listed service is also the instance that the container gives.
+A listed provider is also the instance that the container gives.
 
 ## Use the container in code
 

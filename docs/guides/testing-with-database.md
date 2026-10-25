@@ -191,7 +191,7 @@ dart test --concurrency=1
 
 ## Test a route with the database
 
-`DoxTestClient` starts the app inside the test. It runs the services, so the ORM is set up by `ORMService` from `lib/config/database.dart`.
+`DoxTestClient` starts the app inside the test. It runs the providers, so the ORM is set up by `ORMProvider` from `lib/config/database.dart`.
 Set the database with env variables, so the app picks the test database:
 
 ```dart title="test/api_test.dart"

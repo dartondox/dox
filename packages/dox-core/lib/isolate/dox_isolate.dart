@@ -44,8 +44,8 @@ class DoxIsolate {
   }
 
   /// Stop every isolate gracefully: each stops taking connections, lets
-  /// open requests finish (up to [timeout]) and runs its `DoxShutdown`
-  /// services. Isolates still busy after that are killed.
+  /// open requests finish (up to [timeout]) and runs `shutdown()` of its
+  /// providers. Isolates still busy after that are killed.
   Future<void> stopAll(Duration timeout) async {
     _stopped = true;
     List<Future<void>> waits = <Future<void>>[];
@@ -54,7 +54,7 @@ class DoxIsolate {
       port.send(reply.sendPort);
       waits.add(
         reply.first
-            // ponytail: one extra second for the DoxShutdown services
+            // ponytail: one extra second for the provider shutdowns
             .timeout(timeout + const Duration(seconds: 1), onTimeout: _no)
             .whenComplete(reply.close),
       );
@@ -120,7 +120,7 @@ class DoxIsolate {
       IsolateSpawnParameter(
         isolateId,
         Dox().config,
-        Dox().doxServices,
+        Dox().doxProviders,
         routes: _baseRoutes,
         bindings: Route().bindings,
         control: controlPort.sendPort,

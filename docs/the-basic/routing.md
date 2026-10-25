@@ -44,7 +44,7 @@ class ApiRouter extends Router {
 
 Dox finds every `Router` class by itself. It is in `lib/generated/container.g.dart` after `dart run build_runner build`.
 To pick the order of routers, list them in `routers:` of `AppConfig`.
-See [Dependency injection: routers and services](dependency-injection.md#routers-and-services).
+See [Dependency injection: routers and providers](dependency-injection.md#routers-and-providers).
 
 The leading `/` in a path is optional. `'ping'` and `'/ping'` are the same route.
 

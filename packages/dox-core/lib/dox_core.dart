@@ -50,7 +50,7 @@ export 'http/response/stream_file.dart';
 
 /// interfaces
 export 'interfaces/app_config.dart';
-export 'interfaces/dox_service.dart';
+export 'interfaces/dox_provider.dart';
 export 'interfaces/next_middleware.dart';
 export 'interfaces/response_handler_interface.dart';
 export 'interfaces/router.dart';

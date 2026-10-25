@@ -1,3 +1,7 @@
+## 3.0.0-alpha.15
+
+- Docs: the README and the example set up auth in an `AppAuthProvider` that extends `DoxProvider`.
+
 ## 3.0.0-alpha.14
 
 - New: `Auth().setUser(req, user)` sets the logged-in user on `req.auth`, with no token and no password check. Use it in your own auth middleware, like an API key check.

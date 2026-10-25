@@ -35,7 +35,7 @@ class Api extends Router {
   void register() {}
 }
 
-class Setup implements DoxService {
+class Setup extends DoxProvider {
   @override
   void setup() {}
 }
@@ -135,21 +135,21 @@ void main() {
       expect(c.get<Repo>().name(), 'fake');
     });
 
-    test('routers, services and model binders', () async {
+    test('routers, providers and model binders', () async {
       IocContainer c = IocContainer();
       c.router<Api>((IocContainer c) => Api());
-      c.service<Setup>((IocContainer c) => Setup());
+      c.provider<Setup>((IocContainer c) => Setup());
       c.bindModel<Config>((String id) => Config(id));
       expect(c.routers.single, same(c.get<Api>()));
-      expect(c.services.single, same(c.get<Setup>()));
+      expect(c.providers.single, same(c.get<Setup>()));
       Object? found = await c.modelBinderNamed('Config')!('db');
       expect((found as Config).host, 'db');
       expect(c.modelBinderNamed('Repo'), isNull);
     });
 
-    test('adopt puts a listed service in place of its type', () {
+    test('adopt puts a listed provider in place of its type', () {
       IocContainer c = IocContainer();
-      c.service<Setup>((IocContainer c) => Setup());
+      c.provider<Setup>((IocContainer c) => Setup());
       Setup listed = Setup();
       c.adopt(listed);
       expect(c.get<Setup>(), same(listed));

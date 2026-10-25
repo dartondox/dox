@@ -69,7 +69,7 @@ sequenceDiagram
 | --- | --- | --- |
 | Route match | `lib/routes/*.dart`, `Route.get(...)` | which controller runs |
 | Middleware | `AppConfig(globalMiddleware:)`, `Router.middleware`, `Route.middleware(...)`, the route list | go on, or answer early |
-| Input | a `@Dto` class in `lib/app/http/dtos/` | what the controller gets, or `422` |
+| Input | a `@Dto` class in `lib/app/dtos/<name>/` | what the controller gets, or `422` |
 | Output | the return value, `response(...)`, `responseHandler` | status, headers, body |
 | Errors | `IHttpException`, `AppConfig(exceptionHandler:)` | the error response, logging |
 
@@ -98,20 +98,20 @@ Each isolate also has its own Rust network thread. `DOX_HTTP_THREAD=shared` puts
 Before it starts an isolate, Dox copies three things to it:
 
 - the `AppConfig`,
-- the list of services,
+- the list of providers,
 - the routes you added before `startServer()`.
 
 Then each isolate does this, once:
 
-1. It runs `setup()` of every service, in list order. This is where a database pool is opened.
+1. It runs `setup()` of every provider, in list order. This is where a database pool is opened.
 2. It registers the routes of your routers.
 3. It reads the parameter types of every controller.
 4. It starts its HTTP server.
 
 Nothing in this list runs per request.
 
-Because the config and the services are copied, they must not hold open sockets or pools.
-Open these in `setup()`. See [Services](../digging-deeper/services.md).
+Because the config and the providers are copied, they must not hold open sockets or pools.
+Open these in `setup()`. See [Providers](../digging-deeper/providers.md).
 
 ### Each isolate has its own memory
 
@@ -134,7 +134,7 @@ Use `1` in tests. See [Isolate](../digging-deeper/isolate.md).
 
 ## Where the database pools live
 
-The ORM is started in a service (`ORMService`). Every isolate runs `setup()`, so every isolate opens a pool.
+The ORM is started in a provider (`ORMProvider`). Every isolate runs `setup()`, so every isolate opens a pool.
 The native drivers live in Rust. There, isolates that open the same settings get the same pool.
 
 | Driver | Per isolate | Per process |
@@ -163,9 +163,9 @@ my_app/
 │   └── migration/           # migrations (.dart with a registry, or .sql)
 ├── lib/
 │   ├── app/
+│   │   ├── dtos/            # one folder per DTO, *.dto.dart, typed and checked input
 │   │   ├── http/
 │   │   │   ├── controllers/     # *.controller.dart
-│   │   │   ├── dtos/            # *.dto.dart, typed and checked input
 │   │   │   ├── middleware/      # *.middleware.dart
 │   │   │   ├── serializers/     # *.serializer.dart, custom JSON shapes
 │   │   │   └── response_handler.dart
@@ -181,10 +181,10 @@ my_app/
 │   ├── routes/
 │   │   ├── api.dart             # ApiRouter, prefix `api`
 │   │   └── web.dart             # WebRouter
-│   ├── services/
-│   │   └── orm_service.dart     # opens the database in every isolate
+│   ├── providers/
+│   │   └── orm_provider.dart    # opens the database in every isolate
 │   └── generated/               # made by build_runner, do not edit
-│       ├── container.g.dart     # @Inject classes, routers, services
+│       ├── container.g.dart     # @Inject classes, routers, providers
 │       ├── dtos.g.dart          # the list of DTOs
 │       └── openapi.g.dart       # the OpenAPI docs
 ├── storage/                     # local disk, file cache, uploads
@@ -204,7 +204,7 @@ my_app/
 | `lib/app/models/` | One folder per model. `build_runner` writes the `.g.dart` file next to it. |
 | `lib/config/` | One file per config object. `app.dart` puts them together in `AppConfig`. |
 | `lib/routes/` | One `Router` class per file. Dox finds each router by itself. |
-| `lib/services/` | Classes that implement `DoxService`. Their `setup()` runs in every isolate. |
+| `lib/providers/` | Classes that extend `DoxProvider`. Their `setup()` runs in every isolate. |
 | `lib/*.g.dart` | Generated files. Do not edit them. Run `dox build_runner:build` to make them again. |
 | `storage/` | Files the app writes: uploads, the file cache, SQLite files. |
 

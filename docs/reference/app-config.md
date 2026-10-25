@@ -29,14 +29,14 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `container` | `void Function(IocContainer)?` | `null` | Fills the container: `registerContainer` from `lib/generated/container.g.dart`. Every isolate runs it. It also gives the routers, services and model binders. See [Dependency injection](../the-basic/dependency-injection.md). |
+| `container` | `void Function(IocContainer)?` | `null` | Fills the container: `registerContainer` from `lib/generated/container.g.dart`. Every isolate runs it. It also gives the routers, providers and model binders. See [Dependency injection](../the-basic/dependency-injection.md). |
 | `routers` | `List<Router>` | `[]` | Routers to register first, in this order. Every other `Router` class comes from `container`. |
 | `globalMiddleware` | `List<dynamic>` | `[]` | Middleware that runs on every route. A function or an `IDoxMiddleware`. |
 | `dtos` | `List<DtoSchema<Object>>` | `[]` | Every DTO of the app: `dtos` from `lib/generated/dtos.g.dart`. Dox finds the DTO of a controller parameter and of `req.validate<T>()` with it. |
 | `validationMessages` | `MessageResolver?` | `null` (English messages) | Messages for validation errors, for example in other languages. |
 | `responseHandler` | `ResponseHandlerInterface?` | `null` | A class with `DoxResponse handle(DoxResponse res)`. It sees every response before it is sent. |
 | `exceptionHandler` | `ExceptionHandler` | `ExceptionHandler()` | Reports every unhandled error and turns it into a response. The default logs the error with `Logger.warn` and the stack with `Logger.danger`. See [Error handling](../the-basic/errors.md). |
-| `services` | `List<DoxService>` | `[]` | Services to run first, in this order. Every other `DoxService` class comes from `container`. Dox runs them in every isolate at start. |
+| `providers` | `List<DoxProvider>` | `[]` | Providers to run first, in this order. Every other `DoxProvider` class comes from `container`. Dox runs them in every isolate at start. |
 
 ## Sub configs
 
@@ -103,7 +103,7 @@ Options of each driver:
 
 ## StorageConfig
 
-`StorageService` of the `dox_storage` package takes it. See [File storage](../digging-deeper/file-storage.md).
+`StorageProvider` of the `dox_storage` package takes it. See [File storage](../digging-deeper/file-storage.md).
 Source: `lib/src/dox/storage_config.dart` in [dartondox/dox-storage](https://github.com/dartondox/dox-storage).
 
 | Field | Type | Default | Meaning |
@@ -163,7 +163,7 @@ Source: `packages/dox-core/lib/openapi/openapi_config.dart`.
 
 ## SocketIoConfig
 
-`SocketIoService` of the `dox_socketio` package takes it. See [Socket.IO](../packages/socketio.md).
+`SocketIoProvider` of the `dox_socketio` package takes it. See [Socket.IO](../packages/socketio.md).
 Source: `lib/src/dox/socket_io_config.dart` in [dartondox/dox-socketio](https://github.com/dartondox/dox-socketio).
 
 | Field | Type | Default | Meaning |
@@ -199,7 +199,7 @@ Source: `lib/src/dox/socket_io_config.dart` in [dartondox/dox-socketio](https://
 
 ## DatabaseConfig
 
-The database is not a field of `AppConfig`. A service calls `SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig)` in its `setup()`.
+The database is not a field of `AppConfig`. A provider calls `SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig)` in its `setup()`.
 Source: `packages/dox-orm/lib/src/types/database_config.dart` and `connection_config.dart` in [dartondox/dox-orm](https://github.com/dartondox/dox-orm).
 
 | Field | Type | Default | Meaning |
@@ -240,7 +240,7 @@ Keys of `extra`:
 
 ## AuthConfig
 
-Auth is not a field of `AppConfig`. A service calls `Auth.initialize(AuthConfig(...))` in its `setup()`.
+Auth is not a field of `AppConfig`. A provider calls `Auth.initialize(AuthConfig(...))` in its `setup()`.
 Source: `packages/dox-auth/lib/src/interfaces.dart`.
 
 | Class | Field | Type | Default | Meaning |
@@ -381,14 +381,14 @@ CORSConfig cors = CORSConfig(
 );
 ```
 
-```dart title="lib/services/orm_service.dart"
+```dart title="lib/providers/orm_provider.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart';
 import 'package:my_app/config/database.dart';
 
 /// Dox finds it by itself and runs it in every isolate.
 /// No database? Delete this file.
-class ORMService implements DoxService, DoxShutdown {
+class ORMProvider extends DoxProvider {
   @override
   Future<void> setup() async {
     SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
@@ -401,4 +401,4 @@ class ORMService implements DoxService, DoxShutdown {
 }
 ```
 
-A new project has no `openapi.dart`, `socketio.dart` or auth service. You add them when you need them. See [OpenAPI](../packages/openapi.md), [Socket.IO](../packages/socketio.md) and [Authentication](../security/authentication.md).
+A new project has no `openapi.dart`, `socketio.dart` or auth provider. You add them when you need them. See [OpenAPI](../packages/openapi.md), [Socket.IO](../packages/socketio.md) and [Authentication](../security/authentication.md).

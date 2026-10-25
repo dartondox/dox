@@ -49,14 +49,14 @@ StorageConfig storageConfig = StorageConfig(
 Run `dart run build_runner build` to update `env.g.dart`.
 Then add `APP_URL=http://localhost:3000` to your `.env`.
 
-Add the service. It sets the disks in every isolate. The generated container finds it:
+Add the provider. It sets the disks in every isolate. The generated container finds it:
 
-```dart title="lib/services/storage_service.dart"
+```dart title="lib/providers/storage_provider.dart"
 import 'package:dox_storage/dox_storage.dart';
 import 'package:my_app/config/storage.dart';
 
-class AppStorageService extends StorageService {
-  AppStorageService() : super(storageConfig);
+class AppStorageProvider extends StorageProvider {
+  AppStorageProvider() : super(storageConfig);
 }
 ```
 
@@ -64,7 +64,7 @@ class AppStorageService extends StorageService {
 
 The DTO checks the file before your controller runs.
 
-```dart title="lib/app/http/dtos/upload_image.dto.dart"
+```dart title="lib/app/dtos/upload_image/upload_image.dto.dart"
 import 'package:dox_core/dox_core.dart';
 
 part 'upload_image.dto.g.dart';
@@ -92,7 +92,7 @@ For other file types, use `@Mimes(<String>['pdf', 'docx'])` in place of `@Image(
 ```dart title="lib/app/http/controllers/upload.controller.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_storage/dox_storage.dart';
-import 'package:my_app/app/http/dtos/upload_image.dto.dart';
+import 'package:my_app/app/dtos/upload_image/upload_image.dto.dart';
 
 @Inject()
 class UploadController {

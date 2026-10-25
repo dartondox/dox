@@ -83,7 +83,7 @@ The client always gets a response.
 ## Errors outside a request
 
 Some errors do not belong to a request.
-For example a future that nobody awaits, or an error in a service `shutdown()`.
+For example a future that nobody awaits, or an error in the `shutdown()` of a provider.
 Dox passes them to `report` too. The server keeps running.
 
 ## The response handler

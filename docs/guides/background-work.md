@@ -18,7 +18,7 @@ Dox has no job queue. It has three building blocks from Dart itself:
 | --- | --- | --- |
 | I/O work after the response (send an email, call an API, write rows) | a `Future` you do not await | the same isolate, between requests |
 | CPU work (resize an image, parse a big file, compute) | `Isolate.run()` | a new thread |
-| work every N minutes (cleanup, sync) | `Timer.periodic` in a service | one isolate of your choice |
+| work every N minutes (cleanup, sync) | `Timer.periodic` in a provider | one isolate of your choice |
 
 None of them survive a restart. See [When you need a real queue](#when-you-need-a-real-queue).
 
@@ -60,7 +60,7 @@ class ReportController {
 }
 
 /// Must be a top level or static function with plain arguments.
-/// The new isolate has no Dox, no database and no services.
+/// The new isolate has no Dox, no database and no providers.
 int countPrimes(int limit) {
   List<bool> sieve = List<bool>.filled(limit + 1, true);
   int count = 0;
@@ -92,9 +92,9 @@ unawaited(Isolate.run(() => countPrimes(limit)).then(saveResult));
 
 ## 3. Work on a timer
 
-`setup()` of a service runs in **every** isolate, and Dox starts one per CPU core. So start the timer on isolate 1 only.
+`setup()` of a provider runs in **every** isolate, and Dox starts one per CPU core. So start the timer on isolate 1 only.
 
-```dart title="lib/services/cleanup_service.dart"
+```dart title="lib/providers/cleanup_provider.dart"
 import 'dart:async';
 
 import 'package:dox_core/dox_core.dart';
@@ -102,7 +102,7 @@ import 'package:my_app/app/models/user/user.model.dart';
 
 /// Work on a timer. `setup()` runs in every isolate, so the timer is
 /// started on isolate 1 only. Otherwise 8 isolates do the same job.
-class CleanupService implements DoxService {
+class CleanupProvider extends DoxProvider {
   @override
   void setup() {
     if (Dox().isolateId != 1) return;
@@ -123,12 +123,12 @@ class CleanupService implements DoxService {
 }
 ```
 
-Dox finds `CleanupService` by itself. To be sure the database is ready first, list `ORMService` in `AppConfig`:
+Dox finds `CleanupProvider` by itself. To be sure the database is ready first, list `ORMProvider` in `AppConfig`:
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
   container: registerContainer,
-  services: <DoxService>[ORMService()], // runs before CleanupService
+  providers: <DoxProvider>[ORMProvider()], // runs before CleanupProvider
   // ...
 );
 ```
@@ -168,11 +168,11 @@ curl http://localhost:3000/api/primes/100000
 
 The work above is lost when the process stops, and it does not retry.
 When that is not OK (payments, emails that must arrive), save the job as a row in a table first.
-Then a `Timer.periodic` service, or a second small Dart program, reads the table, does the work, and marks the row as done.
+Then a `Timer.periodic` provider, or a second small Dart program, reads the table, does the work, and marks the row as done.
 A failed row stays in the table, so you can retry it.
 
 ## See also
 
 - [Isolate](../digging-deeper/isolate.md) for what each isolate shares, and what it does not
-- [Services](../digging-deeper/services.md)
+- [Providers](../digging-deeper/providers.md)
 - [Custom errors](custom-errors.md) for the `ExceptionHandler` that gets the errors of a future nobody awaits

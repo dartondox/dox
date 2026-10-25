@@ -4,9 +4,10 @@
 # template, dox_queue or dox_scheduler before it is merged.
 #
 # Steps: `dox create` (local CLI), override all Dox packages with this
-# repo (and with ../dox-orm, ../dox-socketio, ../dox-storage when they are
-# there, see ci/clone-siblings.sh), build_runner, analyze, the template
-# tests, migrate, `dox build`, then start the AOT server and call its routes.
+# repo (and with ../dox-orm, ../dox-socketio, ../dox-storage, ../dox-queue,
+# ../dox-scheduler when they are there, see ci/clone-siblings.sh),
+# build_runner, analyze, the template tests, migrate, `dox build`, then
+# start the AOT server and call its routes.
 #
 # Env: TEMPLATE_VERSION (optional) is passed to `dox create --version`.
 # Without it, `dox create` picks the newest template of this major.
@@ -30,7 +31,8 @@ sed -i.bak "s/^APP_PORT=.*/APP_PORT=$port/" .env && rm .env.bak
   echo "# the Dox packages of this commit, not the ones on pub.dev"
   echo "dependency_overrides:"
   for dir in "$root"/packages/*/ "$root"/../dox-orm/packages/*/ \
-    "$root"/../dox-socketio/ "$root"/../dox-storage/; do
+    "$root"/../dox-socketio/ "$root"/../dox-storage/ \
+    "$root"/../dox-queue/ "$root"/../dox-scheduler/; do
     [ -f "$dir/pubspec.yaml" ] || continue
     [ "$(basename "$dir")" = dox-cli ] && continue
     name=$(sed -nE 's/^name:[[:space:]]*([a-z0-9_]+).*/\1/p' "$dir/pubspec.yaml")

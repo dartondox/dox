@@ -111,8 +111,9 @@ jobs:
   # They use the local packages (pubspec_overrides.yaml) and SQLite, so
   # they need no database service. A broken docs example fails CI.
   # One job runs the picked examples one after the other.
-  # dox_orm, dox_migration, dox_socketio and dox_storage come from clones
-  # of their repos (main) next to this one.
+  # dox_orm, dox_migration, dox_socketio, dox_storage, dox_queue and
+  # dox_scheduler come from clones of their repos next to this one (main, or
+  # the branch with the same name as this PR, see ci/clone-siblings.sh).
   examples:
     needs: changes
     if: needs.changes.outputs.examples != ''
@@ -135,8 +136,9 @@ jobs:
   # migrate, `dox build`, then the AOT server answers its routes.
   # It catches a change that breaks apps, the template, dox_queue or
   # dox_scheduler. See ci/smoke-template.sh.
-  # dox_orm, dox_migration, dox_socketio and dox_storage come from clones
-  # of their repos (main) next to this one.
+  # dox_orm, dox_migration, dox_socketio, dox_storage, dox_queue and
+  # dox_scheduler come from clones of their repos next to this one (main, or
+  # the branch with the same name as this PR, see ci/clone-siblings.sh).
   template:
     needs: changes
     if: needs.changes.outputs.code == 'true'

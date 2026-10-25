@@ -10,7 +10,7 @@ import 'package:test/test.dart';
 import '../utils/free_port.dart';
 import '../utils/start_http_server.dart';
 
-class Cleanup implements DoxService, DoxShutdown {
+class Cleanup extends DoxProvider {
   int calls = 0;
 
   @override
@@ -20,8 +20,8 @@ class Cleanup implements DoxService, DoxShutdown {
   void shutdown() => calls++;
 }
 
-/// the ORM service of an app: it closes the database on shutdown
-class OrmService implements DoxService, DoxShutdown {
+/// the ORM provider of an app: it closes the database on shutdown
+class OrmProvider extends DoxProvider {
   @override
   void setup() {
     SqlQueryBuilder.initializeWithDatabaseConfig(
@@ -91,7 +91,7 @@ void main() {
           // the OS picks a free port, so test files can run in parallel
           serverPort: 0,
           totalIsolate: 1,
-          services: <DoxService>[cleanup, OrmService()],
+          providers: <DoxProvider>[cleanup, OrmProvider()],
           shutdownTimeout: const Duration(seconds: 2),
         ),
       );
@@ -180,7 +180,7 @@ void main() {
         }
         int code = await app.exitCode.timeout(const Duration(seconds: 15));
         expect(code, 0, reason: '$out');
-        // the DoxShutdown service ran in every isolate
+        // the provider shutdown ran in every isolate
         for (int id = 1; id <= 3; id++) {
           expect(out.toString(), contains('cleanup $id'));
         }

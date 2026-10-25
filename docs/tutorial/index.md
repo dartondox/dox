@@ -55,10 +55,10 @@ blog/
 │   ├── app/http/controllers/
 │   │   ├── auth.controller.dart  *
 │   │   └── post.controller.dart  *
-│   ├── app/http/dtos/
-│   │   ├── login_user.dto.dart   *
-│   │   ├── register_user.dto.dart *
-│   │   └── save_post.dto.dart    *
+│   ├── app/dtos/
+│   │   ├── login_user/login_user.dto.dart   *
+│   │   ├── register_user/register_user.dto.dart *
+│   │   └── save_post/save_post.dto.dart    *
 │   ├── app/models/
 │   │   ├── post/post.model.dart  *
 │   │   └── user/user.model.dart
@@ -67,9 +67,9 @@ blog/
 │   │   ├── database.dart
 │   │   └── env.dart              the .env keys, typed
 │   ├── routes/api.dart           *
-│   ├── services/
-│   │   ├── auth_service.dart     *
-│   │   └── orm_service.dart
+│   ├── providers/
+│   │   ├── auth_provider.dart    *
+│   │   └── orm_provider.dart
 │   └── generated/
 │       ├── container.g.dart      * generated
 │       └── dtos.g.dart           * generated

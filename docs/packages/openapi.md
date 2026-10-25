@@ -334,7 +334,7 @@ Future<void> main(List<String> args) async {
 }
 ```
 
-`writeOpenApi` runs your services and registers the routes. It does not start the server.
+`writeOpenApi` runs your providers and registers the routes. It does not start the server.
 
 ## Without Dox
 

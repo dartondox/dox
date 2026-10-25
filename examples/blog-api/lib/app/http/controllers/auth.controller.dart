@@ -1,5 +1,5 @@
-import 'package:blog/app/http/dtos/login_user.dto.dart';
-import 'package:blog/app/http/dtos/register_user.dto.dart';
+import 'package:blog/app/dtos/login_user/login_user.dto.dart';
+import 'package:blog/app/dtos/register_user/register_user.dto.dart';
 import 'package:blog/app/models/user/user.model.dart';
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';

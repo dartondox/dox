@@ -69,14 +69,14 @@ so the app starts without them:
   String? get awsEndpoint;
 ```
 
-Then add the service. It sets the disks in every isolate. Put it in `lib/`, so the generated container finds it:
+Then add the provider. It sets the disks in every isolate. Put it in `lib/`, so the generated container finds it:
 
-```dart title="lib/services/storage_service.dart"
+```dart title="lib/providers/storage_provider.dart"
 import 'package:dox_storage/dox_storage.dart';
 import 'package:my_app/config/storage.dart';
 
-class AppStorageService extends StorageService {
-  AppStorageService() : super(storageConfig);
+class AppStorageProvider extends StorageProvider {
+  AppStorageProvider() : super(storageConfig);
 }
 ```
 
@@ -156,7 +156,7 @@ To swap a disk with a memory disk in tests, see [Testing](testing.md#test-file-s
 
 ## Your own driver
 
-Implement `DriverContract` from `package:dox_storage/dox_storage.dart`. Register it in a [service](services.md), so every isolate has it:
+Implement `DriverContract` from `package:dox_storage/dox_storage.dart`. Register it in a [provider](providers.md), so every isolate has it:
 
 ```dart
 Storage.manager.register('dropbox', DropboxDriver());

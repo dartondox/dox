@@ -154,7 +154,7 @@ nav:
     - digging-deeper/file-storage.md
     - digging-deeper/env.md
     - digging-deeper/isolate.md
-    - digging-deeper/services.md
+    - digging-deeper/providers.md
     - digging-deeper/dox-cli.md
     - digging-deeper/deployment.md
     - digging-deeper/native-server.md

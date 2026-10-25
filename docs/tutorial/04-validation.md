@@ -15,7 +15,7 @@ dox make:dto SavePost
 One class is enough for create and update, because both need the same fields.
 Replace the file with this:
 
-```dart title="lib/app/http/dtos/save_post.dto.dart"
+```dart title="lib/app/dtos/save_post/save_post.dto.dart"
 import 'package:dox_core/dox_core.dart';
 
 part 'save_post.dto.g.dart';
@@ -64,7 +64,7 @@ Ask for `SavePost` as a parameter. Dox checks the body and gives you a typed obj
 This also adds `update`, so `PUT /api/posts/{id}` works:
 
 ```dart title="lib/app/http/controllers/post.controller.dart"
-import 'package:blog/app/http/dtos/save_post.dto.dart';
+import 'package:blog/app/dtos/save_post/save_post.dto.dart';
 import 'package:blog/app/models/post/post.model.dart';
 import 'package:dox_core/dox_core.dart';
 
@@ -119,7 +119,7 @@ class PostController {
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-It writes `lib/app/http/dtos/save_post.dto.g.dart` and `lib/generated/dtos.g.dart`.
+It writes `lib/app/dtos/save_post/save_post.dto.g.dart` and `lib/generated/dtos.g.dart`.
 
 ## Check it
 

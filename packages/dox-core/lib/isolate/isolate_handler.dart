@@ -8,19 +8,19 @@ import 'package:dox_core/server/dox_server.dart';
 void isolateHandler(IsolateSpawnParameter param) async {
   /// send port of main isolate
   AppConfig appConfig = param.config;
-  List<DoxService> services = param.services;
+  List<DoxProvider> providers = param.providers;
 
   /// creating dox in new isolate;
   Dox().isolateId = param.isolateId;
   Dox().initialize(appConfig);
-  Dox().addServices(services);
+  Dox().addProviders(providers);
 
   /// register routes
   Route().setRoutes(param.routes);
   Route().setBindings(Map<String, RouteBinding>.of(param.bindings));
 
-  /// starting registered services in new isolate;
-  await Dox().startServices();
+  /// starting registered providers in new isolate;
+  await Dox().startProviders();
 
   /// starting server in new isolate
   DoxServer().setResponseHandler(param.config.responseHandler);

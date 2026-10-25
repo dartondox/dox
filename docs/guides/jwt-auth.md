@@ -37,15 +37,15 @@ class User extends UserGenerator {
 }
 ```
 
-## 2. Set up the auth service
+## 2. Set up the auth provider
 
-```dart title="lib/services/auth_service.dart"
+```dart title="lib/providers/auth_provider.dart"
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 import 'package:my_app/config/env.dart';
 
-class AuthService implements DoxService {
+class AppAuthProvider extends DoxProvider {
   @override
   void setup() {
     Auth.initialize(
@@ -68,13 +68,13 @@ class AuthService implements DoxService {
 }
 ```
 
-Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
+Dox finds the provider by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
 
 ## 3. Write the DTOs
 
 `@Unique` makes sure the email is not taken. It comes from `dox_orm`, so hide its `Schema` class.
 
-```dart title="lib/app/http/dtos/register_user.dto.dart"
+```dart title="lib/app/dtos/register_user/register_user.dto.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart' hide Schema;
 
@@ -105,7 +105,7 @@ class RegisterUser {
 }
 ```
 
-```dart title="lib/app/http/dtos/login_user.dto.dart"
+```dart title="lib/app/dtos/login_user/login_user.dto.dart"
 import 'package:dox_core/dox_core.dart';
 
 part 'login_user.dto.g.dart';
@@ -130,8 +130,8 @@ class LoginUser {
 ```dart title="lib/app/http/controllers/auth.controller.dart"
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
-import 'package:my_app/app/http/dtos/login_user.dto.dart';
-import 'package:my_app/app/http/dtos/register_user.dto.dart';
+import 'package:my_app/app/dtos/login_user/login_user.dto.dart';
+import 'package:my_app/app/dtos/register_user/register_user.dto.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 
 @Inject()

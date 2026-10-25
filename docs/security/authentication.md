@@ -46,15 +46,15 @@ class User extends UserGenerator {
 }
 ```
 
-## 2. Set up the auth service
+## 2. Set up the auth provider
 
-```dart title="lib/services/auth_service.dart"
+```dart title="lib/providers/auth_provider.dart"
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 import 'package:my_app/config/env.dart';
 
-class AuthService implements DoxService {
+class AppAuthProvider extends DoxProvider {
   @override
   void setup() {
     Auth.initialize(
@@ -75,7 +75,7 @@ class AuthService implements DoxService {
 }
 ```
 
-Dox finds the service by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
+Dox finds the provider by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
 
 ## 3. Add the routes
 
@@ -154,7 +154,7 @@ After `AuthMiddleware`, `req.auth` holds the login.
 
 | Method | What it does |
 | --- | --- |
-| `Auth.initialize(AuthConfig)` | sets the config. Call it once, in a service |
+| `Auth.initialize(AuthConfig)` | sets the config. Call it once, in a provider |
 | `Auth(guard: 'admin')` | uses another guard from `guards`. Without `guard`, it uses `defaultGuard` |
 | `await Auth().attempt(credentials)` | finds the user and checks the password. Gives a token, or `null` |
 | `Auth().login(user)` | gives a token for this user, with no password check |

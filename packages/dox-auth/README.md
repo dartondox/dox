@@ -20,13 +20,13 @@ A new app made with `dox create` already has it.
 
 ## Use it
 
-Set it up in a service:
+Set it up in a provider:
 
 ```dart
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 
-class AuthService implements DoxService {
+class AppAuthProvider extends DoxProvider {
   @override
   void setup() {
     Auth.initialize(AuthConfig(

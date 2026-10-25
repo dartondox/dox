@@ -65,9 +65,8 @@ class Dox {
   /// total isolate to spawn
   int? _totalIsolate;
 
-  /// list of services that need to run when
-  /// creating isolate
-  List<DoxService> doxServices = <DoxService>[];
+  /// providers that run in every isolate when it starts
+  List<DoxProvider> doxProviders = <DoxProvider>[];
 
   /// initialize dox application
   /// it load env and set config
@@ -94,7 +93,7 @@ class Dox {
   /// ```
   Future<void> startServer() async {
     checkAppKey();
-    addServices(config.services);
+    addProviders(config.providers);
     _totalIsolate ??= Dox().config.totalIsolate;
     int isolatesToSpawn = _totalIsolate!;
 
@@ -112,7 +111,7 @@ class Dox {
       await DoxIsolate().spawn(isolatesToSpawn);
     }
 
-    await startServices();
+    await startProviders();
     DoxServer().setResponseHandler(config.responseHandler);
     HttpServer server = await DoxServer().listen(
       DoxServer.portFor(config.serverPort),
@@ -161,7 +160,7 @@ class Dox {
   /// Stop the server gracefully, in every isolate:
   /// 1. stop taking new connections
   /// 2. wait for open requests, up to `config.shutdownTimeout`
-  /// 3. run the `DoxShutdown` services (eg. close database connections)
+  /// 3. run `shutdown()` of every provider (eg. close database connections)
   /// 4. close the cache stores (eg. Redis connections)
   ///
   /// SIGTERM and SIGINT call this, then exit the process.
@@ -179,15 +178,14 @@ class Dox {
   /// [stop] for this isolate only. Internal: each isolate runs it.
   Future<void> stopIsolate() async {
     await DoxServer().shutdown(config.shutdownTimeout);
-    for (DoxService service in doxServices) {
-      if (service is! DoxShutdown) continue;
+    for (DoxProvider provider in doxProviders) {
       try {
-        await (service as DoxShutdown).shutdown();
+        await provider.shutdown();
       } catch (error, stackTrace) {
         config.exceptionHandler.report(error, stackTrace);
       }
     }
-    // after the services: they may still use the cache
+    // after the providers: they may still use the cache
     try {
       await cache.close();
     } catch (error, stackTrace) {
@@ -239,23 +237,23 @@ class Dox {
 
   /// ####### functions need to run on isolate #######
 
-  /// add services that need to run on isolate spawn
-  void addServices(List<DoxService> services) {
-    doxServices.addAll(services);
+  /// add providers that run in every isolate when it starts
+  void addProviders(List<DoxProvider> providers) {
+    doxProviders.addAll(providers);
   }
 
-  /// add service that need to run on isolate spawn
-  void addService(DoxService service) {
-    doxServices.add(service);
+  /// add a provider that runs in every isolate when it starts
+  void addProvider(DoxProvider provider) {
+    doxProviders.add(provider);
   }
 
-  /// start service registered to dox
+  /// run `setup()` of every provider, then register the routes
   /// this is internal core use only
   /// your app do not need to call this function
-  Future<void> startServices() async {
-    _addContainerServices();
-    for (DoxService service in doxServices) {
-      await service.setup();
+  Future<void> startProviders() async {
+    _addContainerProviders();
+    for (DoxProvider provider in doxProviders) {
+      await provider.setup();
     }
     _registerRoute();
     _resolveControllers();
@@ -269,10 +267,10 @@ class Dox {
   /// await Dox().writeOpenApi('storage/openapi');
   /// ```
   Future<List<File>> writeOpenApi(String dir) async {
-    addServices(config.services);
-    _addContainerServices();
-    for (DoxService service in doxServices) {
-      await service.setup();
+    addProviders(config.providers);
+    _addContainerProviders();
+    for (DoxProvider provider in doxProviders) {
+      await provider.setup();
     }
     _registerRoute();
     return OpenApiDocument(config.openApi).write(dir);
@@ -288,17 +286,17 @@ class Dox {
     }
   }
 
-  /// add the services of the container that are not in [doxServices]
-  /// yet. a listed service of a container type becomes the container
+  /// add the providers of the container that are not in [doxProviders]
+  /// yet. a listed provider of a container type becomes the container
   /// instance, so both are the same object.
-  void _addContainerServices() {
+  void _addContainerProviders() {
     Set<Type> listed = <Type>{};
-    for (DoxService service in doxServices) {
-      listed.add(service.runtimeType);
-      ioc.adopt(service);
+    for (DoxProvider provider in doxProviders) {
+      listed.add(provider.runtimeType);
+      ioc.adopt(provider);
     }
-    for (DoxService service in ioc.services) {
-      if (listed.add(service.runtimeType)) doxServices.add(service);
+    for (DoxProvider provider in ioc.providers) {
+      if (listed.add(provider.runtimeType)) doxProviders.add(provider);
     }
   }
 

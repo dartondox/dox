@@ -55,10 +55,10 @@ void main() {
 }
 ```
 
-- `DoxTestClient.start(appConfig)` runs your services (like the ORM service) and adds your routes, the same as a real start.
+- `DoxTestClient.start(appConfig)` runs your providers (like the ORM provider) and adds your routes, the same as a real start.
 - It listens on `127.0.0.1` and a free port that the OS picks. So it does not clash with `dox serve`, and many test files can run at the same time.
 - It runs on one isolate. `serverPort` and `totalIsolate` of the config are not used.
-- `client.close()` stops the server and runs the `DoxShutdown` services (for example, it closes the database).
+- `client.close()` stops the server and runs `shutdown()` of every provider (for example, it closes the database).
 - With one isolate, you can also add a route inside a test with `Route.get(...)`. It works right away.
 
 ### Send requests
@@ -188,7 +188,7 @@ test('saves the report', () async {
 });
 ```
 
-- Call `Dox().initialize()` first. Without the `StorageService` running, `Storage.manager` has only the `local` disk. Start the app, or set the disks yourself: `Storage.manager = StorageDiskFactory().create(storageConfig);`.
+- Call `Dox().initialize()` first. Without the `StorageProvider` running, `Storage.manager` has only the `local` disk. Start the app, or set the disks yourself: `Storage.manager = StorageDiskFactory().create(storageConfig);`.
 - `Storage()` paths start with `/`. A `Disk` key does not, so remove the first `/` when you ask the `Disk` directly.
 
 See [File Storage](file-storage.md).
@@ -249,7 +249,7 @@ void main() {
       migrations: migrations,
       config: databaseConfig.getConnectionConfig(),
     ).migrate();
-    client = await DoxTestClient.start(appConfig); // runs the ORM service
+    client = await DoxTestClient.start(appConfig); // runs the ORM provider
   });
 
   // every test starts with empty tables

@@ -5,7 +5,7 @@ import 'package:build_test/build_test.dart';
 import 'package:dox_builder/dox_builder.dart';
 import 'package:test/test.dart';
 
-/// a small copy of dox_core: the builder finds Router and DoxService by
+/// a small copy of dox_core: the builder finds Router and DoxProvider by
 /// name, in a dox_core library.
 const String _core = '''
 export 'package:dox_annotation/dox_annotation.dart';
@@ -13,8 +13,9 @@ export 'package:dox_annotation/dox_annotation.dart';
 abstract class Router {
   void register();
 }
-abstract class DoxService {
-  dynamic setup() {}
+abstract class DoxProvider {
+  dynamic setup();
+  dynamic shutdown() {}
 }
 class IocContainer {}
 ''';
@@ -218,7 +219,7 @@ class C {
       expect(generic, contains('a generic class can not be in the container'));
     });
 
-    test('routers and services are found without @Inject', () async {
+    test('routers and providers are found without @Inject', () async {
       String out = await _generate(<String, String>{
         'a|lib/a.dart':
             '''
@@ -231,7 +232,7 @@ class ApiRouter extends Router {
   void register() {}
 }
 abstract class BaseRouter extends Router {}
-class OrmService implements DoxService {
+class OrmProvider extends DoxProvider {
   dynamic setup() {}
 }
 ''',
@@ -249,7 +250,7 @@ class OrmService implements DoxService {
         out,
         contains(
           _flat(
-            'c.service<i1.OrmService>((IocContainer c) => i1.OrmService());',
+            'c.provider<i1.OrmProvider>((IocContainer c) => i1.OrmProvider());',
           ),
         ),
       );

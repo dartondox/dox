@@ -3,7 +3,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 import 'package:my_app/config/env.dart';
 
-class AuthService implements DoxService {
+class AppAuthProvider extends DoxProvider {
   @override
   void setup() {
     Auth.initialize(

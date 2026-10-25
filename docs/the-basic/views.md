@@ -14,13 +14,13 @@ The `dox_view` package has a template engine like Edge.js. Templates are `.dox.h
 dart pub add dox_view
 ```
 
-Add the service in `lib/`, so every isolate sets up the engine:
+Add the provider in `lib/`, so every isolate sets up the engine:
 
-```dart title="lib/services/view_service.dart"
+```dart title="lib/providers/view_provider.dart"
 import 'package:dox_view/dox_view.dart';
 
-class AppViewService extends ViewService {
-  AppViewService() : super(const ViewConfig());
+class AppViewProvider extends ViewProvider {
+  AppViewProvider() : super(const ViewConfig());
 }
 ```
 

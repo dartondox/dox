@@ -237,8 +237,8 @@ Template: `_getSample` in `packages/dox-cli/lib/src/tools/create_middleware.dart
 dox make:dto <name>
 ```
 
-Writes `lib/app/http/dtos/<name>.dto.dart`: a `@Dto()` class with one `name` field and `part '<name>.dto.g.dart';`.
-A trailing `Dto` in the name is removed. Prints `Run `dox build_runner:build` to make <name>.dto.g.dart.`
+Writes `lib/app/dtos/<name>/<name>.dto.dart`: a `@Dto()` class with one `name` field and `part '<name>.dto.g.dart';`.
+A trailing `Dto` in the name is removed. Prints `Run `dox build_runner:build` to make <name>/<name>.dto.g.dart.`
 
 Template: `_getSample` in `packages/dox-cli/lib/src/tools/create_dto.dart`.
 

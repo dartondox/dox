@@ -1,3 +1,7 @@
+## 3.0.0-alpha.15
+
+- Change: the container builder finds every class that extends `DoxProvider` and writes `c.provider<...>` for it.
+
 ## 3.0.0-alpha.14
 
 - New: the openapi builder reads `@Security` on middleware classes and writes them to `OpenApiRegistry.security`.

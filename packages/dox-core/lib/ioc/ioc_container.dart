@@ -38,7 +38,7 @@ class IocContainer {
   final List<Type> _making = <Type>[];
 
   final List<Type> _routers = <Type>[];
-  final List<Type> _services = <Type>[];
+  final List<Type> _providers = <Type>[];
   final Map<Type, RouteBinder<Object>> _modelBinders =
       <Type, RouteBinder<Object>>{};
 
@@ -108,12 +108,12 @@ class IocContainer {
     if (!_routers.contains(T)) _routers.add(T);
   }
 
-  /// [T] is a service. Dox runs its `setup()` at start, in every
+  /// [T] is a provider. Dox runs its `setup()` at start, in every
   /// isolate. `lib/generated/container.g.dart` calls this for every class that
-  /// implements `DoxService`.
-  void service<T extends DoxService>(IocFactory<T> make) {
+  /// extends `DoxProvider`.
+  void provider<T extends DoxProvider>(IocFactory<T> make) {
     singleton<T>(make);
-    if (!_services.contains(T)) _services.add(T);
+    if (!_providers.contains(T)) _providers.add(T);
   }
 
   /// A route param for a controller parameter of type [T] is turned into
@@ -128,10 +128,10 @@ class IocContainer {
     return <Router>[for (Type type in _routers) getByType(type) as Router];
   }
 
-  /// The services, made from the container, in the order they were added.
-  List<DoxService> get services {
-    return <DoxService>[
-      for (Type type in _services) getByType(type) as DoxService,
+  /// The providers, made from the container, in the order they were added.
+  List<DoxProvider> get providers {
+    return <DoxProvider>[
+      for (Type type in _providers) getByType(type) as DoxProvider,
     ];
   }
 
@@ -140,7 +140,7 @@ class IocContainer {
   void clear() {
     _bindings.removeWhere(_notOverridden);
     _routers.clear();
-    _services.clear();
+    _providers.clear();
     _modelBinders.clear();
   }
 
@@ -190,8 +190,8 @@ class IocContainer {
   }
 
   /// Put [value] in the place of its type, when that type is
-  /// registered and not overridden. Dox calls it for the services of
-  /// `AppConfig.services`, so the container gives the same instance.
+  /// registered and not overridden. Dox calls it for the providers of
+  /// `AppConfig.providers`, so the container gives the same instance.
   void adopt(Object value) {
     Type type = value.runtimeType;
     _Binding? binding = _bindings[type];
