@@ -144,10 +144,11 @@ class ConnectionConfig {
           String mode = switch (value.toLowerCase()) {
             'disable' || 'disabled' || 'false' || '0' => 'disable',
             'allow' || 'prefer' || 'preferred' => 'prefer',
+            'verify-ca' => 'verify-ca',
             String m when m.startsWith('verify') => 'verify-full',
             _ => 'require',
           };
-          useSSL = mode == 'require' || mode == 'verify-full';
+          useSSL = mode == 'require' || mode.startsWith('verify');
           // like libpq: `require` encrypts but does not check the
           // certificate (eg. Heroku). `verify-ca` and `verify-full`
           // check it.
@@ -192,14 +193,14 @@ class ConnectionConfig {
   /// certificate in development. default true.
   bool get verifyCertificate => extra['verifyCertificate'] as bool? ?? true;
 
-  /// the Postgres TLS mode: `disable`, `prefer`, `require` or
-  /// `verify-full`. it is `extra['sslMode']` when set, else `require`
+  /// the Postgres TLS mode: `disable`, `prefer`, `require`, `verify-ca`
+  /// (checks the certificate, not the host name) or `verify-full`. it is `extra['sslMode']` when set, else `require`
   /// with [useSSL], else `disable`.
   String get postgresSslMode =>
       extra['sslMode'] as String? ?? (useSSL ? 'require' : 'disable');
 
   /// the path of a PEM file with the CA certificates that Postgres TLS
-  /// trusts for `verify-full`, eg. the CA of a cloud database. it is
+  /// trusts for `verify-ca` and `verify-full`, eg. the CA of a cloud database. it is
   /// `extra['sslRootCert']` (`sslrootcert` in a url). when it is not set,
   /// the system certificates are used.
   String? get postgresSslRootCert => extra['sslRootCert'] as String?;

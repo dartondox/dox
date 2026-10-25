@@ -253,10 +253,10 @@ packages:
     dependency: transitive
     description:
       name: dox_postgres_native
-      sha256: "8c7898d1cbab823c48131e02a2899c462de72d34b2d96e003701f785ce203c6a"
+      sha256: f779d340507a30f0c3ac7563dda17350d451f3fbe68fd67f6a3e74ce4f8dd669
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-alpha.7"
+    version: "3.0.0-alpha.8"
   ffi:
     dependency: transitive
     description:

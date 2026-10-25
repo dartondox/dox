@@ -113,7 +113,7 @@ void main() async {
         ConnectionConfig.fromUrl(
           'postgres://u:p@db.example.com/app?sslmode=verify-ca',
         ).postgresSslMode,
-        'verify-full',
+        'verify-ca',
       );
 
       /// like libpq: require encrypts but does not check the certificate,

@@ -83,6 +83,7 @@ the `DATABASE_URL`:
 | `disable` | No TLS. The default. |
 | `prefer` | TLS when the server has it. No certificate check. |
 | `require` | TLS. No certificate check, like libpq. `useSSL: true` gives this mode. |
+| `verify-ca` | TLS. The certificate is checked, the host name is not. |
 | `verify-full` | TLS. The certificate and the host name are checked. It uses the Mozilla roots and the roots of the system. |
 
 ```dart
@@ -93,8 +94,6 @@ ConnectionConfig(
   debug: false,
 ),
 ```
-
-In a url, `sslmode=verify-ca` is read as `verify-full`.
 
 To trust your own CA (for example the CA bundle of your cloud database, or a
 self-signed CA in development), give the path of a PEM file in
