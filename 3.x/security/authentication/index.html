@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="This page shows how to log users in with dox_auth and protect routes with a JWT token.">
+        <meta name="description" content="This page shows how to log users in with dox_auth and protect routes with a JWT token or a session.">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Authentication | Dox">
-  <meta property="og:description" content="This page shows how to log users in with dox_auth and protect routes with a JWT token.">
+  <meta property="og:description" content="This page shows how to log users in with dox_auth and protect routes with a JWT token or a session.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/security/authentication/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Authentication | Dox">
-  <meta name="twitter:description" content="This page shows how to log users in with dox_auth and protect routes with a JWT token.">
+  <meta name="twitter:description" content="This page shows how to log users in with dox_auth and protect routes with a JWT token or a session.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -4051,6 +4051,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#session-login-for-web-pages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Session login for web pages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#things-to-know" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6244,6 +6255,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#session-login-for-web-pages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Session login for web pages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#things-to-know" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6280,7 +6302,7 @@
 
 
 <h1 id="authentication">Authentication</h1>
-<p>This page shows how to log users in with <code>dox_auth</code> and protect routes with a JWT token.</p>
+<p>This page shows how to log users in with <code>dox_auth</code> and protect routes with a JWT token or a session.</p>
 <p><code>dox_auth</code> checks an email and a password against your user table.
 It gives back a JWT token.
 The client sends this token in the <code>Authorization</code> header.
@@ -6549,6 +6571,65 @@ For example, users and admins in two tables:</p>
 <p>The token keeps the guard name in its <code>aud</code> claim.
 So a token from the <code>web</code> guard does not work on the <code>admin</code> guard, even with the same secret.
 An unknown guard name throws an <code>ArgumentError</code>.</p>
+<h2 id="session-login-for-web-pages">Session login for web pages</h2>
+<p>For web pages, keep the login in the session instead of a token.
+The browser sends the session cookie, so the client does nothing.
+It needs <code>SessionMiddleware</code> and <code>CsrfMiddleware</code>. See <a href="../../the-basic/session/">Session</a>.</p>
+<p>Use <code>SessionAuthDriver</code> in the guard:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="s1">'web'</span><span class="o">:</span><span class="w"> </span><span class="n">AuthGuard</span><span class="p">(</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nl">driver:</span><span class="w"> </span><span class="n">SessionAuthDriver</span><span class="p">(),</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nl">provider:</span><span class="w"> </span><span class="n">AuthProvider</span><span class="p">(</span><span class="nl">model:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">User</span><span class="p">()),</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="p">),</span>
+</span></code></pre></div>
+<p>Log in and log out with the request:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">login</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">LoginUser</span><span class="w"> </span><span class="n">body</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Auth</span><span class="p">().</span><span class="n">attemptSession</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">email</span><span class="p">,</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="s1">'password'</span><span class="o">:</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">password</span><span class="p">,</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="p">});</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">ok</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">flashErrors</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Wrong email or password'</span><span class="p">});</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">back</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">redirect</span><span class="p">(</span><span class="s1">'/dashboard'</span><span class="p">);</span>
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="p">}</span>
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>
+</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="n">DoxResponse</span><span class="w"> </span><span class="n">logout</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">  </span><span class="n">Auth</span><span class="p">().</span><span class="n">logout</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
+</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">redirect</span><span class="p">(</span><span class="s1">'/'</span><span class="p">);</span>
+</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Send guests to the login page instead of a <code>401</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/dashboard'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">AuthMiddleware</span><span class="p">(</span><span class="nl">redirectTo:</span><span class="w"> </span><span class="s1">'/login'</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="n">PageController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">dashboard</span><span class="p">]);</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>await Auth().attemptSession(req, credentials)</code></td>
+<td>checks the password like <code>attempt</code>, and keeps the user id in the session. Gives <code>true</code> or <code>false</code></td>
+</tr>
+<tr>
+<td><code>Auth().loginSession(req, user)</code></td>
+<td>keeps this user in the session, with no password check</td>
+</tr>
+<tr>
+<td><code>Auth().logout(req)</code></td>
+<td>removes the login and all session data</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Login and logout give the session a new id and a new CSRF token. So an id that someone saw before the login is of no use.</li>
+<li>The session keeps only the user id. <code>AuthMiddleware</code> loads the user from the database on each request, so a deleted user is logged out.</li>
+<li>These methods throw a <code>StateError</code> on a guard that does not use <code>SessionAuthDriver</code>.</li>
+<li><code>SessionAuthDriver</code> has one option, <code>hashRounds</code> (default <code>10</code>), like <code>JwtAuthDriver</code>.</li>
+</ul>
 <h2 id="things-to-know">Things to know</h2>
 <ul>
 <li><strong>The token is not secret.</strong> Anyone with the token can read <code>user.toJson()</code>. Keep private columns in <code>hidden</code>.</li>

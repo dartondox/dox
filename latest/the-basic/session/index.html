@@ -6322,6 +6322,7 @@ An Inertia request (it has the <code>X-Inertia</code> header) is redirected like
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">invalidate</span><span class="p">();</span>
 </span></code></pre></div>
 <p>Always call <code>regenerate()</code> after login. Then an id that someone saw before the login is of no use.</p>
+<p><code>dox_auth</code> does this for you. See <a href="../../security/authentication/#session-login-for-web-pages">Session login</a>.</p>
 <h2 id="config">Config</h2>
 <p>Set <code>session</code> in the app config. All options have a default.</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
