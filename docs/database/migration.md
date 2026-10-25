@@ -163,10 +163,14 @@ DB_NAME=storage/app.db # file path, made if missing
 
 - `DB_DATABASE` works too, in place of `DB_NAME`.
 - The default port is `5432` for Postgres and `3306` for MySQL.
-- One run uses one database connection.
+- One run opens one driver and closes it at the end. Each migration runs on one connection.
 - A `DB_HOST` that starts with `/` is a Unix socket: the socket folder for Postgres, the socket file for MySQL. Eg. `/cloudsql/project:region:instance`.
 - Migrations use TLS only with a `DATABASE_URL` that has `sslmode` (Postgres) or `ssl` (MySQL), like `?sslmode=require`. For Postgres, `require` encrypts but does not check the server certificate, and `verify-full` checks it. MySQL `ssl=true` checks it. Add `&verifyCertificate=false` only for a self-signed certificate in development.
-  You can also give your own connection: `Migrator(migrations: migrations, connection: myPool)`.
+
+You can also give the database yourself:
+
+- `Migrator(migrations: migrations, config: databaseConfig.getConnectionConfig())` opens this config, and closes it at the end.
+- `Migrator(migrations: migrations, connection: SqlQueryBuilder().dbDriver)` runs on a driver that is already open. The migrator does not close it.
 
 ## Transactions
 

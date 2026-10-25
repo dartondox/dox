@@ -43,14 +43,14 @@ dox_http_native: cargo build failed
 
 4. Build with `dox build` (it runs `dart build cli`), not with `dart compile exe`.
 
-The native database drivers find their library the same way. They do not stop the app. The warning is then:
+The native database drivers find their library the same way. When it does not load, the app stops too, with:
 
 ```
-[dox] warning: dox_postgres_native did not load, using the Dart postgres driver (<reason>)
-[dox] warning: dox_mysql_native did not load, using the Dart mysql driver (<reason>)
+dox_postgres_native did not load: <reason>.
+dox_mysql_native did not load: <reason>.
 ```
 
-The Dart driver is used. To choose it on purpose set `DOX_DB_DRIVER=dart` or `extra: {'native': false}` on the connection.
+The fix is the same as above, with the `dox-postgres-native` or `dox-mysql-native` repo.
 
 See [Native server](../digging-deeper/native-server.md), [Postgres native](../database/postgres-native.md) and [MySQL native](../database/mysql-native.md).
 
@@ -160,17 +160,13 @@ For normal login use `Auth().attempt()` from `dox_auth`. See [Hashing](../securi
 
 **Cause.** `caching_sha2_password` needs either TLS or the server RSA public key to send the password. A client that has neither can not log in.
 
-**Fix.** Both Dox drivers handle this by default:
-
-- The native driver (`dox_mysql_native`) works with MySQL 8.4 `caching_sha2_password` and MariaDB 11.
-- The Dart driver asks the server for its RSA key only with `useSSL: true`, or on `localhost`, `127.0.0.1`, `::1` and a Unix socket. On a remote host without TLS it does not ask, because a fake server could read the password. Migrations do the same.
+**Fix.** The Dox MySQL driver (`dox_mysql_native`) works with MySQL 8.4 `caching_sha2_password` and MariaDB 11 by default.
 
 So check these settings on the connection in `lib/config/database.dart`:
 
 | Setting | What to do |
 | --- | --- |
-| Remote host without TLS | Give the key in `extra: {'serverPublicKey': '...'}` (safer), turn on `useSSL: true`, or set `extra: {'allowPublicKeyRetrieval': true}`. |
-| `extra: {'allowPublicKeyRetrieval': false}` | Remove it, or give the key in `extra: {'serverPublicKey': '...'}`. |
+| Remote host without TLS | Turn on `useSSL: true`. |
 | `useSSL: true` | The server must have TLS on. |
 | `host`, `port`, `user`, `password` | A wrong value gives the same login error. `DB_PORT` is `3306` by default for MySQL. |
 

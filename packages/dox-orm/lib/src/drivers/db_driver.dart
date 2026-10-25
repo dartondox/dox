@@ -1,8 +1,9 @@
 import 'dart:async';
 
+import 'package:dox_mysql_native/dox_mysql_native.dart';
 import 'package:dox_orm/dox_orm.dart';
-import 'package:dox_orm/src/drivers/mysql_driver.dart';
 import 'package:dox_orm/src/drivers/sqlite_driver.dart';
+import 'package:dox_postgres_native/dox_postgres_native.dart';
 
 enum Driver { postgres, mysql, sqlite }
 
@@ -12,6 +13,10 @@ abstract class DBDriver {
 
   /// true when insert can use `RETURNING` to get the new id
   bool get supportsReturning => false;
+
+  /// [value] as it goes into a column on insert or update. postgres
+  /// changes a [List] to json text, because it sends a list as an array.
+  Object? columnValue(dynamic value) => value;
 
   /// run query and return map result
   Future<List<Map<String, dynamic>>> query(
@@ -37,9 +42,7 @@ abstract class DBDriver {
 
   /// zone keys the drivers use for an open transaction
   static const List<Symbol> _transactionKeys = <Symbol>[
-    #doxPostgresTransaction,
     #doxPostgresNativeTransaction,
-    #doxMysqlTransaction,
     #doxMysqlNativeTransaction,
     #doxSqliteTransaction,
   ];
@@ -103,20 +106,19 @@ abstract class DBDriver {
   }
 }
 
-/// get database driver to run queries.
-/// [statementCacheSize] is the max prepared statements kept per connection.
+/// get database driver to run queries on [database]: a [PgNativePool] for
+/// postgres, a [MysqlNativePool] for mysql, or a sqlite `Database` (or a
+/// `Future` of it) for sqlite.
+/// [statementCacheSize] is the max prepared statements kept (sqlite).
 DBDriver getDatabaseDriver(
   Driver driver,
   dynamic database, {
   int statementCacheSize = defaultStatementCacheSize,
 }) {
   if (driver == Driver.postgres) {
-    return PostgresDriver(
-      conn: database,
-      statementCacheSize: statementCacheSize,
-    );
+    return PostgresNativeDriver(database as PgNativePool);
   } else if (driver == Driver.mysql) {
-    return MysqlDriver(conn: database);
+    return MysqlNativeDriver(database as MysqlNativePool);
   } else if (driver == Driver.sqlite) {
     return SqliteDriver(conn: database, statementCacheSize: statementCacheSize);
   }

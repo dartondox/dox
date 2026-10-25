@@ -6,7 +6,6 @@ environment:
 resolution: workspace
 
 dependencies:
-  postgres: ^3.5.20
   ioredis: ^2.0.0-alpha.2
   dox_auth: ^3.0.0-alpha.6
   dox_migration: ^3.0.0-alpha.6

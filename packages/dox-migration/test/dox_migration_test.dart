@@ -2,8 +2,6 @@ import 'dart:io';
 
 import 'package:dox_migration/dox_migration.dart';
 import 'package:dox_migration/src/utils/db_connection.dart';
-import 'package:mysql_dart/mysql_dart.dart' as mysql;
-import 'package:postgres/postgres.dart' as postgres;
 import 'package:test/test.dart';
 
 /// env for each driver, defaults match the services in .github/workflows
@@ -238,37 +236,12 @@ DROP TABLE mig_blog
         expect(await tableExists('mig_blog'), false);
       });
 
-      /// the query builder gives a pool (not one connection), the migration
-      /// must still run each file in one transaction on one connection
-      test('migrate with a pool', () async {
-        dynamic pool;
-        if (driver == 'postgres') {
-          pool = postgres.Pool<dynamic>.withEndpoints(
-            <postgres.Endpoint>[
-              postgres.Endpoint(
-                host: env['DB_HOST']!,
-                port: int.parse(env['DB_PORT']!),
-                database: env['DB_NAME']!,
-                username: env['DB_USERNAME'],
-                password: env['DB_PASSWORD'],
-              ),
-            ],
-            settings: postgres.PoolSettings(sslMode: postgres.SslMode.disable),
-          );
-        } else if (driver == 'mysql') {
-          pool = mysql.MySQLConnectionPool(
-            host: env['DB_HOST'],
-            port: int.parse(env['DB_PORT']!),
-            userName: env['DB_USERNAME']!,
-            password: env['DB_PASSWORD'],
-            databaseName: env['DB_NAME'],
-            maxConnections: 5,
-            secure: false,
-            allowPublicKeyRetrieval: true,
-          );
-        } else {
-          return;
-        }
+      /// a driver from the app (eg. `SqlQueryBuilder().dbDriver`): the
+      /// migration still runs each file in one transaction, and the driver
+      /// stays open for the app
+      test('migrate with a given driver', () async {
+        DBDriver driver = DbConnection.config(env).createDriver();
+        addTearDown(driver.close);
         writeMigration('2023_01_01_000000_create_blog', '''
 -- up
 CREATE TABLE mig_blog (id INTEGER PRIMARY KEY);
@@ -277,9 +250,23 @@ INSERT INTO mig_blog (id) VALUES (1)
 -- down
 DROP TABLE mig_blog
 ''');
-        await Migrator(connection: pool).migrate();
+        await Migrator(connection: driver).migrate();
         expect(await tableExists('mig_blog'), true);
         expect((await migrations()).length, 1);
+        List<Map<String, dynamic>> rows = await driver.query(
+          'SELECT id FROM mig_blog',
+        );
+        expect(rows.single['id'], 1);
+      });
+
+      test('migrate with a config', () async {
+        await Migrator(
+          migrations: <MigrationEntry>[
+            MigrationEntry('2023_01_01_000000_user', CreateUserTable()),
+          ],
+          config: DbConnection.config(env),
+        ).migrate();
+        expect(await tableExists('mig_user'), true);
       });
 
       test('failed migration is not recorded', () async {
@@ -462,7 +449,9 @@ DROP TABLE IF EXISTS mig_tag
       test('status shows a missing file', () async {
         await Migrator(migrations: dartMigrations).migrate();
         List<MigrationStatus> status = await Migrator(
-          migrations: dartMigrations.sublist(0, 1),
+          migrations: <MigrationEntry>[
+            MigrationEntry('2023_01_01_000000_user', CreateUserTable()),
+          ],
         ).status();
         expect(status.last.exists, false);
         expect(status.last.ran, true);

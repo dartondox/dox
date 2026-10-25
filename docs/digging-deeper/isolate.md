@@ -24,7 +24,7 @@ flowchart TD
     I1 -. "crash: the process exits" .-> S["Supervisor restarts the process<br>Docker, systemd"]
 ```
 
-With the native Postgres and MySQL drivers (the default), all isolates share one database pool in Rust. With the Dart drivers, each isolate has its own pool. See [How Dox works](../concepts/how-dox-works.md#where-the-database-pools-live).
+With the Postgres and MySQL drivers, all isolates share one database pool in Rust. See [How Dox works](../concepts/how-dox-works.md#where-the-database-pools-live).
 
 See [Native server](native-server.md) for the two servers.
 

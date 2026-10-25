@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:dox_orm/dox_orm.dart';
-import 'package:mysql_dart/mysql_dart.dart' as mysql;
-import 'package:postgres/postgres.dart' as postgres;
+import 'package:dox_orm/src/drivers/sqlite_driver.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite;
 
 class ConnectionConfig {
@@ -36,15 +33,18 @@ class ConnectionConfig {
   /// database connection port
   int port;
 
-  /// use ssl mode. the server certificate is checked. set
-  /// `extra['verifyCertificate']` to false to skip the check, eg. for a
-  /// self-signed certificate in development.
+  /// use TLS.
+  /// - mysql: the server certificate is checked. set
+  ///   `extra['verifyCertificate']` to false to skip the check, eg. for a
+  ///   self-signed certificate in development.
+  /// - postgres: TLS mode `require` (encrypt, no certificate check, like
+  ///   libpq). set `extra['sslMode']` to `verify-full` to also check the
+  ///   certificate. see [postgresSslMode].
   bool useSSL;
 
   /// extra configuration for the connection
   /// eg. `maxConnectionCount` for postgres and mysql,
-  /// `busyTimeout` for sqlite.
-  /// `native: false` uses the Dart driver instead of the native one.
+  /// `sslMode` for postgres, `busyTimeout` for sqlite.
   Map<String, dynamic> extra;
 
   /// use your own driver class instead of the built-in one.
@@ -86,10 +86,13 @@ class ConnectionConfig {
   ///   host part of the url. For Postgres it is the socket folder, eg.
   ///   `/cloudsql/project:region:instance`. For MySQL it is the socket
   ///   file, eg. `/var/run/mysqld/mysqld.sock`.
-  /// - `sslmode` (or `ssl`): `disable`, `allow`, `prefer`, `false` and `0`
-  ///   mean no TLS. Any other value (eg. `require`, `true`) turns TLS on.
-  ///   The server certificate is checked. Add `verifyCertificate=false` to
-  ///   skip the check (eg. a self-signed certificate in development).
+  /// - `sslmode` (or `ssl`): `disable`, `false` and `0` mean no TLS.
+  ///   `allow` and `prefer` use TLS only when the server has it (Postgres)
+  ///   and set no [useSSL]. Any other value (eg. `require`, `true`) turns
+  ///   TLS on. For Postgres, `require` does not check the certificate (like
+  ///   libpq), `verify-ca` and `verify-full` check it. For MySQL the
+  ///   certificate is checked, add `verifyCertificate=false` to skip the
+  ///   check (eg. a self-signed certificate in development).
   /// - any other option goes to [extra]. `10` becomes an int, and `true` or
   ///   `false` a bool. Eg. `?maxConnectionCount=20`.
   ///
@@ -136,24 +139,17 @@ class ConnectionConfig {
         case 'host' || 'socket':
           host = value;
         case 'sslmode' || 'ssl':
-          String mode = value.toLowerCase();
-          useSSL = !<String>{
-            'disable',
-            'disabled',
-            'allow',
-            'prefer',
-            'preferred',
-            'false',
-            '0',
-          }.contains(mode);
+          String mode = switch (value.toLowerCase()) {
+            'disable' || 'disabled' || 'false' || '0' => 'disable',
+            'allow' || 'prefer' || 'preferred' => 'prefer',
+            String m when m.startsWith('verify') => 'verify-full',
+            _ => 'require',
+          };
+          useSSL = mode == 'require' || mode == 'verify-full';
           // like libpq: `require` encrypts but does not check the
           // certificate (eg. Heroku). `verify-ca` and `verify-full`
           // check it.
-          if (driver == Driver.postgres && mode == 'require') {
-            options['sslMode'] = postgres.SslMode.require;
-          } else if (driver == Driver.postgres && mode.startsWith('verify')) {
-            options['sslMode'] = postgres.SslMode.verifyFull;
-          }
+          if (driver == Driver.postgres) options['sslMode'] = mode;
         default:
           options[key] = int.tryParse(value) ?? bool.tryParse(value) ?? value;
       }
@@ -187,72 +183,16 @@ class ConnectionConfig {
   /// `/cloudsql/project:region:instance` for both.
   bool get isUnixSocket => host.startsWith('/');
 
-  /// the Postgres server of this config, for the Dart `postgres` package.
-  /// A socket folder gets the file name `.s.PGSQL.<port>`, like libpq.
-  postgres.Endpoint get postgresEndpoint {
-    int pgPort = port == 0 ? 5432 : port;
-    String pgHost = host;
-    if (isUnixSocket && !pgHost.contains('/.s.PGSQL.')) {
-      pgHost = '${pgHost.endsWith('/') ? pgHost : '$pgHost/'}.s.PGSQL.$pgPort';
-    }
-    return postgres.Endpoint(
-      host: pgHost,
-      port: pgPort,
-      username: user,
-      password: password,
-      database: database,
-      isUnixSocket: isUnixSocket,
-    );
-  }
-
-  /// the MySQL server address for the Dart `mysql_dart` package: a unix
-  /// [InternetAddress] for a socket, else the host name.
-  Object get mysqlHost => isUnixSocket
-      ? InternetAddress(host, type: InternetAddressType.unix)
-      : host;
-
-  /// the MySQL port: 0 for a Unix socket, else [port] (default 3306).
-  int get mysqlPort => isUnixSocket
-      ? 0
-      : port == 0
-      ? 3306
-      : port;
-
-  /// false when `extra['verifyCertificate']` is false: TLS does not check
-  /// the server certificate. only use it for a self-signed certificate in
-  /// development. default true.
+  /// false when `extra['verifyCertificate']` is false: MySQL TLS does
+  /// not check the server certificate. only use it for a self-signed
+  /// certificate in development. default true.
   bool get verifyCertificate => extra['verifyCertificate'] as bool? ?? true;
 
-  /// the Postgres TLS mode: `extra['sslMode']` when set, else
-  /// verify-full with [useSSL] (require when [verifyCertificate] is
-  /// false), else disable.
-  postgres.SslMode get postgresSslMode =>
-      extra['sslMode'] as postgres.SslMode? ??
-      (!useSSL
-          ? postgres.SslMode.disable
-          : verifyCertificate
-          ? postgres.SslMode.verifyFull
-          : postgres.SslMode.require);
-
-  /// MySQL (Dart driver): ask the server for its RSA key to send the
-  /// password. A fake server can send its own key and read the password,
-  /// so it is off by default. It is on with [useSSL] or a local host.
-  /// Set `extra['allowPublicKeyRetrieval']`, or give the key in
-  /// `extra['serverPublicKey']` (safer).
-  bool get mysqlAllowPublicKeyRetrieval =>
-      extra['allowPublicKeyRetrieval'] as bool? ??
-      (useSSL || isUnixSocket || _localHosts.contains(host));
-
-  static const Set<String> _localHosts = <String>{
-    'localhost',
-    '127.0.0.1',
-    '::1',
-  };
-
-  /// MySQL (Dart driver): true accepts a bad server certificate. It is
-  /// only true when [verifyCertificate] is false.
-  bool mysqlAcceptBadCertificate(X509Certificate certificate) =>
-      !verifyCertificate;
+  /// the Postgres TLS mode: `disable`, `prefer`, `require` or
+  /// `verify-full`. it is `extra['sslMode']` when set, else `require`
+  /// with [useSSL], else `disable`.
+  String get postgresSslMode =>
+      extra['sslMode'] as String? ?? (useSSL ? 'require' : 'disable');
 
   /// max prepared statements kept per connection (default 100).
   /// set it with `extra['preparedStatementCacheSize']`.
@@ -260,58 +200,21 @@ class ConnectionConfig {
       extra['preparedStatementCacheSize'] as int? ?? defaultStatementCacheSize;
 
   /// make the driver of this connection: [driverFactory] when it is set,
-  /// else the native driver for postgres and mysql (see [NativeDrivers]),
-  /// else the Dart driver for [driver]
+  /// else the native driver for postgres and mysql, else the sqlite
+  /// driver. postgres and mysql throw an [UnsupportedError] when their
+  /// native library does not load (see [NativeDrivers.ensureAvailable]).
   DBDriver createDriver() {
     if (driverFactory != null) {
       return driverFactory!(this);
     }
-    DBDriver? native = NativeDrivers.create(this);
-    if (native != null) {
-      return native;
-    }
-    return getDatabaseDriver(
-      driver,
-      getDatabaseConnection(),
-      statementCacheSize: statementCacheSize,
-    );
-  }
-
-  /// get database connection: postgres `Pool`, mysql `MySQLConnectionPool`
-  /// or sqlite `Database`
-  Future<dynamic> getDatabaseConnection() {
-    if (driver == Driver.mysql) {
-      return Future<dynamic>.value(_getMysqlPool());
-    }
-    if (driver == Driver.sqlite) {
-      return Future<dynamic>.value(_openSqlite());
-    }
-    return _getPostgresConnection();
-  }
-
-  /// get mysql connection pool.
-  /// it opens up to `maxConnectionCount` connections (default 10) when
-  /// needed. caching_sha2_password (mysql 8 default) works without TLS:
-  /// the password is encrypted with the server RSA key. see
-  /// [mysqlAllowPublicKeyRetrieval] for when it asks the server for it.
-  mysql.MySQLConnectionPool _getMysqlPool() {
-    return mysql.MySQLConnectionPool(
-      host: mysqlHost,
-      port: mysqlPort,
-      userName: user,
-      password: password,
-      databaseName: database,
-      maxConnections: extra['maxConnectionCount'] ?? 10,
-      secure: useSSL,
-      onBadCertificate: mysqlAcceptBadCertificate,
-      collation: extra['collation'] ?? 'utf8mb4_general_ci',
-      timeoutMs: extra['timeoutMs'] ?? 10000,
-      allowPublicKeyRetrieval: mysqlAllowPublicKeyRetrieval,
-      serverPublicKey: extra['serverPublicKey'],
-      timeZone: extra['timeZone'],
-      maxConnectionAge: extra['maxConnectionAge'] ?? const Duration(hours: 12),
-      autoPreparedStatementCacheCapacity: statementCacheSize,
-    );
+    return switch (driver) {
+      Driver.postgres => PostgresNativeDriver.fromConfig(this),
+      Driver.mysql => MysqlNativeDriver.fromConfig(this),
+      Driver.sqlite => SqliteDriver(
+        conn: _openSqlite(),
+        statementCacheSize: statementCacheSize,
+      ),
+    };
   }
 
   /// open sqlite database file (made if missing), or `:memory:`.
@@ -332,29 +235,5 @@ class ConnectionConfig {
     }
     db.execute('PRAGMA foreign_keys = ON');
     return db;
-  }
-
-  /// get postgres connection pool.
-  /// it opens up to `maxConnectionCount` connections when needed.
-  Future<postgres.Pool<dynamic>> _getPostgresConnection() async {
-    return postgres.Pool<dynamic>.withEndpoints(
-      <postgres.Endpoint>[postgresEndpoint],
-      settings: postgres.PoolSettings(
-        sslMode: postgresSslMode,
-        maxConnectionCount: extra['maxConnectionCount'],
-        maxConnectionAge: extra['maxConnectionAge'],
-        maxSessionUse: extra['maxSessionUse'],
-        maxQueryCount: extra['maxQueryCount'],
-        applicationName: extra['applicationName'],
-        connectTimeout: extra['connectTimeout'],
-        encoding: extra['encoding'],
-        timeZone: extra['timeZone'],
-        replicationMode: extra['replicationMode'],
-        transformer: extra['transformer'],
-        queryTimeout: extra['queryTimeout'],
-        queryMode: extra['queryMode'],
-        ignoreSuperfluousParameters: extra['ignoreSuperfluousParameters'],
-      ),
-    );
   }
 }

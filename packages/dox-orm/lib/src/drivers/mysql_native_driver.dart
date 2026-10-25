@@ -8,9 +8,8 @@ import 'package:dox_orm/dox_orm.dart';
 /// zone key to find the open transaction of a pool
 const Symbol _txKey = #doxMysqlNativeTransaction;
 
-/// The default Dox ORM driver for MySQL and MariaDB, on [MysqlNativePool]
-/// (dox_mysql_native). It acts like the Dart mysql driver (mysql_dart):
-/// the same SQL, values and exceptions.
+/// The Dox ORM driver for MySQL and MariaDB, on [MysqlNativePool]
+/// (dox_mysql_native). Errors are [MysqlException].
 class MysqlNativeDriver extends DBDriver {
   MysqlNativeDriver(this.pool);
 
@@ -20,7 +19,9 @@ class MysqlNativeDriver extends DBDriver {
   /// (default 1) from `extra`. `useSSL` turns on TLS, and the server
   /// certificate is checked unless `extra['verifyCertificate']` is false.
   /// A host that starts with `/` is a Unix socket file.
+  /// Throws an [UnsupportedError] when the native library does not load.
   factory MysqlNativeDriver.fromConfig(ConnectionConfig config) {
+    NativeDrivers.ensureAvailable(Driver.mysql);
     Map<String, dynamic> extra = config.extra;
     return MysqlNativeDriver(
       MysqlNativePool.open(
@@ -147,7 +148,7 @@ class MysqlNativeDriver extends DBDriver {
     return result;
   }
 
-  /// same as the mysql_dart driver of dox_orm
+  /// a Dox value as a MySQL parameter
   static Object? _toMysqlValue(dynamic value) {
     if (value == null ||
         value is int ||

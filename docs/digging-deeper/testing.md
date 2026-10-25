@@ -133,9 +133,7 @@ void main() {
   setUpAll(() async {
     Dox().initialize(appConfig);
     await Migrator(
-      connection: await databaseConfig
-          .getConnectionConfig()
-          .getDatabaseConnection(),
+      config: databaseConfig.getConnectionConfig(),
     ).migrate();
     await ORMService().setup();
   });

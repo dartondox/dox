@@ -15,7 +15,7 @@ flowchart LR
     M["Model or QueryBuilder"] --> S["SQL text<br>quoted names, @values"]
     S --> D{"Driver"}
     D --> N["Native Rust pool<br>dox_postgres_native, dox_mysql_native"]
-    D --> T["Dart driver<br>postgres, mysql_dart, sqlite3"]
+    D --> T["sqlite3"]
     N --> DB[("Database")]
     T --> DB
 ```
@@ -34,40 +34,21 @@ import 'package:dox_orm/dox_orm.dart';
 
 ## Supported databases
 
-| Database | `Driver` | Default driver | Fallback Dart driver | Pool | Good for |
-|---|---|---|---|---|---|
-| Postgres | `Driver.postgres` | [`dox_postgres_native`](postgres-native.md) | `postgres` | Yes | Production |
-| MySQL 8+ and MariaDB | `Driver.mysql` | [`dox_mysql_native`](mysql-native.md) | `mysql_dart` | Yes | Production |
-| SQLite | `Driver.sqlite` | `sqlite3` | none | No, one connection per isolate | Development, tests, small apps |
+| Database | `Driver` | Driver | Pool | Good for |
+|---|---|---|---|---|
+| Postgres | `Driver.postgres` | [`dox_postgres_native`](postgres-native.md) | Yes | Production |
+| MySQL 8+ and MariaDB | `Driver.mysql` | [`dox_mysql_native`](mysql-native.md) | Yes | Production |
+| SQLite | `Driver.sqlite` | `sqlite3` | No, one connection per isolate | Development, tests, small apps |
 
 !!! info "Native drivers"
-    Postgres and MySQL use a native (Rust) driver by default.
-    It is faster when many requests run at the same time.
+    Postgres and MySQL use a native (Rust) driver.
+    It is fast, most of all when many requests run at the same time.
     You do not change any config for it.
 
-    The ORM uses the Dart driver in these cases:
-
-    - The native library can not load on your system. The ORM prints one warning line.
-    - Postgres uses TLS (`useSSL: true` or `extra['sslMode']`). The native Postgres driver has no TLS yet.
-    - You ask for it: set `DOX_DB_DRIVER=dart` for all connections,
-      or `extra: {'native': false}` for one connection.
-
-    See the [Postgres](postgres-native.md#use-the-dart-driver) and
-    [MySQL](mysql-native.md#use-the-dart-driver) pages.
-
-Dox picks the driver of a connection like this:
-
-```mermaid
-flowchart TD
-    A["Driver.postgres or Driver.mysql"] --> B{"DOX_DB_DRIVER=dart<br>or extra native: false?"}
-    B -->|yes| X["Dart driver"]
-    B -->|no| C{"Postgres with TLS?<br>useSSL or sslMode"}
-    C -->|yes| X
-    C -->|no| L{"Native library loads?"}
-    L -->|no| W["Dart driver<br>prints one warning"]
-    L -->|yes| N["Native Rust driver"]
-    Q["Driver.sqlite"] --> S["sqlite3<br>one connection per isolate"]
-```
+    There is no other driver for Postgres and MySQL.
+    When the native library can not load on your system, the app stops with an error that says why and how to fix it.
+    See the [Postgres](postgres-native.md#when-the-library-does-not-load) and
+    [MySQL](mysql-native.md#when-the-library-does-not-load) pages.
 
 ## Config
 
@@ -114,7 +95,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 - `user`, `password`, `host` and `port` are not used by SQLite.
 
 Start the ORM in a service.
-Each isolate runs the service. The native Postgres and MySQL drivers then share one pool per process (isolates with the same settings get the same pool), so `maxConnectionCount` is for the whole process. The Dart drivers make one pool per isolate.
+Each isolate runs the service. The Postgres and MySQL drivers share one pool per process (isolates with the same settings get the same pool), so `maxConnectionCount` is for the whole process.
 On shutdown, `SqlQueryBuilder.close()` closes every connection of the isolate.
 
 ```dart title="lib/services/orm_service.dart"
@@ -167,8 +148,8 @@ DATABASE_URL=postgres://app:s%40cret@db.example.com:5432/blog?sslmode=require
 
 - The user, password and database name are url-decoded. Write `@` in a password as `%40`.
 - No port: `5432` for Postgres, `3306` for MySQL.
-- `sslmode`: `disable`, `allow` and `prefer` mean no TLS. Other values turn TLS on. For Postgres it works like libpq: `require` encrypts but does not check the server certificate (Heroku urls use it). `verify-ca` and `verify-full` check the certificate. Use `verify-full` when your host supports it. `useSSL: true` in code also checks the certificate. Add `verifyCertificate=false` to skip the check, only for a self-signed certificate in development. For MySQL, `ssl=true` works too, and it checks the certificate.
-- The native Postgres driver has no TLS yet. With TLS on, Postgres uses the Dart driver.
+- `sslmode`: `disable` means no TLS. For Postgres it works like libpq: `prefer` uses TLS when the server has it, `require` encrypts but does not check the server certificate (Heroku urls use it), and `verify-ca` and `verify-full` check the certificate. Use `verify-full` when your host supports it. `useSSL: true` in code is `require`. Set `extra['sslMode']` to `verify-full` to check the certificate. See [Postgres TLS](postgres-native.md#tls).
+- For MySQL, `ssl=true` (or `sslmode=require`) turns TLS on, and it checks the certificate. Add `verifyCertificate=false` to skip the check, only for a self-signed certificate in development.
 - `host=/path` (or `socket=/path`) connects to a Unix socket, like `host=/cloudsql/project:region:instance`. See [Unix socket](#unix-socket).
 - Any other option goes to `extra`, like `?maxConnectionCount=20`. A number becomes an `int`, `true` and `false` a `bool`.
 
@@ -199,7 +180,7 @@ DATABASE_URL=postgres://blog:secret@/blog?host=/cloudsql/my-project:europe-west1
 ```
 
 **Postgres**: the host is the socket folder, like in libpq.
-Both the native and the Dart Postgres driver use the socket file `<folder>/.s.PGSQL.<port>`.
+The driver uses the socket file `<folder>/.s.PGSQL.<port>`.
 A host that already ends with `/.s.PGSQL.5432` works too.
 
 **MySQL and MariaDB**: the host is the socket file itself. The port is not used.
@@ -213,7 +194,7 @@ DB_HOST=/var/run/mysqld/mysqld.sock
 DATABASE_URL=mysql://app:secret@/app?socket=/var/run/mysqld/mysqld.sock
 ```
 
-`?socket=` and `?host=` do the same thing. Both the native and the Dart MySQL driver use the socket.
+`?socket=` and `?host=` do the same thing.
 
 ### `extra` options
 
@@ -222,27 +203,14 @@ DATABASE_URL=mysql://app:secret@/app?socket=/var/run/mysqld/mysqld.sock
 | Key | Database | Default | What it does |
 |---|---|---|---|
 | `maxConnectionCount` | Postgres, MySQL | `10` | Most connections in the pool. |
-| `native` | Postgres, MySQL | `true` | `false` uses the Dart driver for this connection. |
 | `threads` | Postgres, MySQL | `1` | Rust threads of the native driver. |
 | `maxConnectionAge` | MySQL | 12 hours | A connection older than this is opened again. |
-| `preparedStatementCacheSize` | MySQL, and the Dart Postgres and SQLite drivers | `100` | Prepared statements kept per connection. |
+| `preparedStatementCacheSize` | MySQL, SQLite | `100` | Prepared statements kept per connection. |
+| `sslMode` | Postgres | `disable` | TLS mode: `disable`, `prefer`, `require` or `verify-full`. |
+| `verifyCertificate` | MySQL | `true` | `false` skips the TLS certificate check. Only for development. |
 | `timeZone` | Postgres | `UTC` | Time zone of the session. |
 | `applicationName` | Postgres | none | Name of the app in `pg_stat_activity`. |
 | `busyTimeout` | SQLite | `5000` | Milliseconds a query waits for a lock. |
-
-The Dart drivers read some more keys.
-The Dart Postgres driver reads the `PoolSettings` keys of the `postgres` package,
-like `sslMode`, `queryTimeout` and `connectTimeout`.
-The Dart MySQL driver reads `collation` (default `utf8mb4_general_ci`), `timeoutMs`,
-`timeZone`, `serverPublicKey` and `allowPublicKeyRetrieval`.
-
-!!! info "MySQL 8 login without TLS"
-    The MySQL 8 default login (`caching_sha2_password`) needs the server RSA key without TLS.
-    A fake server can send its own key and read the password.
-    So the Dart driver only asks the server for it with TLS on, or on `localhost`,
-    `127.0.0.1`, `::1` or a Unix socket.
-    Else give the key in `serverPublicKey` (safer), set `useSSL: true`,
-    or set `allowPublicKeyRetrieval: true`.
 
 ### Table and column names are quoted
 
@@ -296,9 +264,8 @@ await blog.save(); // saved on 'mysql'
 
 ## MySQL and MariaDB
 
-- The default driver is [`dox_mysql_native`](mysql-native.md).
-  The fallback Dart driver is `mysql_dart`.
-- Both have a connection pool and send values as bound parameters.
+- The driver is [`dox_mysql_native`](mysql-native.md).
+- It has a connection pool and sends values as bound parameters.
 - MySQL 8 and 9 login (`caching_sha2_password`) works.
 - `CREATE`, `ALTER` and `DROP` are saved right away. A transaction can not undo them.
 

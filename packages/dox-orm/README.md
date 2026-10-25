@@ -72,7 +72,7 @@ In a Dox app, start the ORM in a `DoxService`, so each isolate gets its own pool
 ## Features
 
 - One API for Postgres, MySQL 8+, MariaDB and SQLite.
-- Postgres and MySQL use the native Rust drivers (`dox_postgres_native`, `dox_mysql_native`) when the native library loads. Else the ORM uses the Dart driver and prints one warning line.
+- Postgres and MySQL use the native Rust drivers (`dox_postgres_native`, `dox_mysql_native`). When the native library does not load, the app stops with an error that says why and how to fix it.
 - Models with `@Column`, timestamps, soft deletes, events and `hidden` fields.
 - Relations: `@HasOne`, `@HasMany`, `@BelongsTo`, `@ManyToMany`, with eager loading.
 - Query builder: `where`, `whereIn`, `join`, `groupBy`, `paginate`, raw SQL with bound values.

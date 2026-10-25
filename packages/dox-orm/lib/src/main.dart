@@ -34,8 +34,10 @@ class SqlQueryBuilder {
 
   DatabaseConfig? databaseConfig;
 
-  /// initialize with DatabaseConfig class
-  static void initializeWithDatabaseConfig(DatabaseConfig config) async {
+  /// initialize with DatabaseConfig class.
+  /// postgres and mysql throw an [UnsupportedError] when their native
+  /// library does not load.
+  static void initializeWithDatabaseConfig(DatabaseConfig config) {
     SqlQueryBuilder sql = SqlQueryBuilder();
     sql.databaseConfig = config;
     ConnectionConfig connConfig = config.getConnectionConfig();
@@ -82,12 +84,13 @@ class SqlQueryBuilder {
     }
   }
 
-  /// initialize query builder
+  /// initialize query builder with your own [database]: a `PgNativePool`
+  /// for postgres, a `MysqlNativePool` for mysql or a sqlite `Database`.
   /// ```
   ///  SqlQueryBuilder.initialize(
   ///   database: db,
+  ///   driver: Driver.sqlite,
   ///   debug: true,
-  ///   prettyPrint: true
   /// );
   /// ```
   static void initialize({

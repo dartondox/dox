@@ -26,9 +26,7 @@ void main() {
     Dox().totalIsolate(1);
     await Migrator(
       migrations: migrations,
-      connection: await databaseConfig
-          .getConnectionConfig()
-          .getDatabaseConnection(),
+      config: databaseConfig.getConnectionConfig(),
     ).migrate();
     await Dox().startServer();
   });

@@ -1,82 +1,55 @@
-import 'dart:io';
-
 import 'package:dox_orm/dox_orm.dart';
 import 'package:test/test.dart';
 
 import 'connection.dart';
 
-ConnectionConfig copy(ConnectionConfig c, {Map<String, dynamic>? extra}) {
-  return ConnectionConfig(
-    driver: c.driver,
-    host: c.host,
-    port: c.port,
-    user: c.user,
-    password: c.password,
-    database: c.database,
-    extra: extra ?? c.extra,
-    debug: false,
-  );
-}
-
 void main() {
   ConnectionConfig base = databaseConfig.getConnectionConfig();
-  bool dartForced = Platform.environment['DOX_DB_DRIVER'] == 'dart';
-  bool sqlite = base.driver == Driver.sqlite;
 
-  Type nativeType = base.driver == Driver.postgres
-      ? PostgresNativeDriver
-      : MysqlNativeDriver;
-
-  test('the default driver is native, unless DOX_DB_DRIVER=dart', () {
+  test('postgres and mysql use the native driver', () async {
     DBDriver driver = base.createDriver();
-    if (sqlite || dartForced) {
-      expect(driver, isNot(isA<PostgresNativeDriver>()));
-      expect(driver, isNot(isA<MysqlNativeDriver>()));
-    } else {
-      expect(driver.runtimeType, nativeType);
-    }
+    addTearDown(driver.close);
+    expect(driver, switch (base.driver) {
+      Driver.postgres => isA<PostgresNativeDriver>(),
+      Driver.mysql => isA<MysqlNativeDriver>(),
+      Driver.sqlite => isNot(isA<PostgresNativeDriver>()),
+    });
   });
 
-  test('named connections use the same default', () {
+  test('named connections use the same driver', () {
     SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig);
     DBDriver named = SqlQueryBuilder().getDBDriver(databaseConfig.connection);
     expect(named.runtimeType, SqlQueryBuilder().dbDriver.runtimeType);
   });
 
-  test("extra['native'] = false uses the Dart driver", () {
-    DBDriver driver = copy(
-      base,
-      extra: <String, dynamic>{...base.extra, 'native': false},
-    ).createDriver();
-    expect(driver.runtimeType, isNot(nativeType));
-  });
-
-  test('a library that does not load falls back to Dart, warns once', () async {
-    StringBuffer out = StringBuffer();
+  test('a native library that does not load stops with a clear error', () {
     String? Function(Driver) real = NativeDrivers.loadError;
-    StringSink realSink = NativeDrivers.warnings;
     NativeDrivers.loadError = (Driver d) => 'no library (test)';
-    NativeDrivers.warnings = out;
-    addTearDown(() {
-      NativeDrivers.loadError = real;
-      NativeDrivers.warnings = realSink;
-    });
+    addTearDown(() => NativeDrivers.loadError = real);
 
-    DBDriver first = copy(base).createDriver();
-    DBDriver second = copy(base).createDriver();
-    expect(first.runtimeType, isNot(nativeType));
-    expect(second.runtimeType, first.runtimeType);
-    if (sqlite || dartForced) {
-      expect(out.toString(), isEmpty);
-      return;
+    for (Driver driver in <Driver>[Driver.postgres, Driver.mysql]) {
+      ConnectionConfig config = ConnectionConfig(
+        driver: driver,
+        database: 'app',
+        debug: false,
+      );
+      expect(
+        config.createDriver,
+        throwsA(
+          isA<UnsupportedError>().having(
+            (UnsupportedError e) => e.message,
+            'message',
+            allOf(
+              contains('dox_${driver.name}_native did not load'),
+              contains('no library (test)'),
+              contains('Fix:'),
+            ),
+          ),
+        ),
+      );
     }
-    expect(out.toString().trim().split('\n'), <String>[
-      '[dox] warning: dox_${base.driver.name}_native did not load, using '
-          'the Dart ${base.driver.name} driver (no library (test))',
-    ]);
 
-    /// the Dart driver works
-    List<Map<String, dynamic>> rows = await first.query('SELECT 1 AS one');
-    expect(rows.first['one'], 1);
+    /// sqlite needs no native library of Dox
+    NativeDrivers.ensureAvailable(Driver.sqlite);
   });
 }

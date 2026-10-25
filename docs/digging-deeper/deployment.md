@@ -104,7 +104,7 @@ The whole setup looks like this:
 flowchart LR
     C["Client"] -->|HTTPS| X["Caddy or nginx<br>TLS, HTTP/2, gzip, body size limit"]
     X -->|"plain HTTP on 127.0.0.1:3000"| D["Dox binary<br>bin/server, one isolate per core"]
-    D -->|"one pool per isolate"| DB[("Database")]
+    D -->|"one shared pool"| DB[("Database")]
     M["Migrations<br>bin/server.dart runs them once, before the server starts"] --> DB
 ```
 
