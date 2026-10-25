@@ -16,8 +16,9 @@ File migrateEntryFile() => File('${Directory.current.path}/bin/migrate.dart');
 /// [sql] makes the old `.sql` file with `-- up` and `-- down`.
 String createMigration(String name, {bool sql = false}) {
   String snake = pascalToSnake(name.replaceAll(RegExp(r'[^\w]'), ''));
-  String fileName = '${_timestamp(DateTime.now())}_$snake';
   Directory dir = migrationDirectory();
+  String fileName =
+      '${_timestamp(nextMigrationTime(dir, DateTime.now()))}_$snake';
   File file = File('${dir.path}/$fileName.${sql ? 'sql' : 'dart'}');
   file.createSync(recursive: true);
   file.writeAsStringSync(sql ? _sampleSql : dartMigrationSource(snake));
@@ -32,6 +33,34 @@ String createMigration(String name, {bool sql = false}) {
   }
   print('\x1B[32m$fileName migration created successfully.\x1B[0m');
   return file.path;
+}
+
+final RegExp _stamp = RegExp(
+  r'^(\d{4})_(\d{2})_(\d{2})_(\d{2})(\d{2})(\d{2})_',
+);
+
+/// the time for a new migration in [dir]. Migrations run sorted by file
+/// name, so the new file must sort after every file already there. When
+/// [now] is not later than the newest file (same second, or a file with a
+/// future date), use the newest time + 1 second.
+DateTime nextMigrationTime(Directory dir, DateTime now) {
+  DateTime time = DateTime(
+    now.year,
+    now.month,
+    now.day,
+    now.hour,
+    now.minute,
+    now.second,
+  );
+  if (!dir.existsSync()) return time;
+  for (File f in dir.listSync().whereType<File>()) {
+    RegExpMatch? m = _stamp.firstMatch(f.uri.pathSegments.last);
+    if (m == null) continue;
+    List<int> p = List<int>.generate(6, (int i) => int.parse(m.group(i + 1)!));
+    DateTime last = DateTime(p[0], p[1], p[2], p[3], p[4], p[5]);
+    if (!time.isAfter(last)) time = last.add(const Duration(seconds: 1));
+  }
+  return time;
 }
 
 /// `2026_10_21_120000`

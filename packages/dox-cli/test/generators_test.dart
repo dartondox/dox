@@ -263,6 +263,36 @@ void main() {
       );
     });
 
+    test('three migrations in the same second sort in order', () async {
+      await run(<String>['create_c_table']);
+      await run(<String>['create_b_table']);
+      List<File> files = await run(<String>['create_a_table', '--sql']);
+      List<String> names = files
+          .map(fileName)
+          .where((String n) => n != 'migrations.dart')
+          .toList();
+      expect(names, hasLength(3));
+      expect(names[0], endsWith('_create_c_table.dart'));
+      expect(names[1], endsWith('_create_b_table.dart'));
+      expect(names[2], endsWith('_create_a_table.sql'));
+      Set<String> stamps = names.map((String n) => n.substring(0, 17)).toSet();
+      expect(stamps, hasLength(3));
+    });
+
+    test('a future-dated file still gets a later one', () async {
+      Directory('db/migration').createSync(recursive: true);
+      File('db/migration/2999_12_31_235959_future.sql').writeAsStringSync('');
+      List<File> files = await run(<String>['create_x_table']);
+      List<String> names = files
+          .map(fileName)
+          .where((String n) => n != 'migrations.dart')
+          .toList();
+      expect(names, <String>[
+        '2999_12_31_235959_future.sql',
+        '3000_01_01_000000_create_x_table.dart',
+      ]);
+    });
+
     test('creates the db/migration folder when missing', () async {
       expect(Directory('db').existsSync(), isFalse);
       await run(<String>['first']);
