@@ -46,18 +46,26 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
-## Count by API key, not by ip
+## Count by user, not by ip
 
 `key` picks who is counted. The default is `req.ip()`.
+The key is any `String`. For example, count by user id after `AuthMiddleware`:
 
 ```dart
-RateLimit(
-  max: 100,
-  key: (DoxRequest req) => req.header('X-Api-Key') ?? req.ip(),
-)
+Route.get('/reports', <dynamic>[
+  AuthMiddleware(),
+  RateLimit(
+    max: 100,
+    key: (DoxRequest req) => '${req.auth?.user<User>()?.id ?? req.ip()}',
+  ),
+  (ReportController c) => c.index,
+]);
 ```
 
-The key is any `String`, so you can also count by user id after your auth middleware.
+!!! warning "Use a key the client can not choose"
+    Do not count by a raw header, like `req.header('X-Api-Key')`.
+    A client can send a new value with each request and get a new count each time.
+    Count by a value that you checked first, like the id of the logged in user.
 
 !!! warning "Behind a proxy"
     Behind Caddy, nginx or a load balancer, every request comes from the proxy ip.
@@ -66,7 +74,7 @@ The key is any `String`, so you can also count by user id after your auth middle
 
 ## Two limits on the same key
 
-Two `RateLimit` with the same `max` and `per` share one counter. Give one a `name` to keep them apart:
+Two `RateLimit` with the same `max` and `per` share one counter for the same key. Give each one a `name` to keep them apart:
 
 ```dart
 Route.post('/auth/login', <dynamic>[
@@ -85,6 +93,7 @@ The counts are kept in the [cache](../digging-deeper/cache.md):
 
 - When the default cache store is **Redis**, the counts are in Redis. All isolates and all servers share them. Use this in production.
 - Else the counts are in **memory**. Each isolate has its own counts. With 4 isolates a client can send up to 4 x `max` requests.
+  This is also true for the default `file` store of a new app.
 
 To use one store by name, pass `store`:
 
