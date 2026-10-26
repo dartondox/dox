@@ -1,3 +1,7 @@
+## 3.0.0
+
+- The first stable release.
+
 ## 3.0.0-rc.1
 
 - Needs `ioredis` 3.0.1. It fixes a crash on disconnect when the Redis host is a name like `localhost` or `redis`.

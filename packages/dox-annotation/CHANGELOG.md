@@ -1,3 +1,7 @@
+## 3.0.0
+
+- The first stable release.
+
 ## 3.0.0-rc.1
 
 - `IDoxRequest.auth` is now a field (getter and setter), not only a getter. The auth is kept apart from the input.

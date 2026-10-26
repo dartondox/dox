@@ -12,7 +12,7 @@ Checked on 2026-10-26.
 
 What the states mean:
 
-- **Ready for stable**: works, has tests and has not changed in a breaking way for a while. Only bug fixes are planned.
+- **Stable**: works, has tests and has not changed in a breaking way for a while.
 - **May change**: works and has tests. Names and options can still change.
 - **Experimental**: new code. It changed in a breaking way recently, or it has a known gap.
 
@@ -22,15 +22,15 @@ The packages in the main repo share one version number. The other packages live 
 | --- | --- | --- | --- |
 | `dox_core` | Routes, middleware, controllers, request and response, isolates, config, the IoC container, exception handler, sessions, CSRF, rate limit, security headers, health check, test client | May change | 334 tests in 44 files. CI runs them on the native server. |
 | `dox_orm` | Query builder, models, relations, `whereHas`, scopes, casts, `withCount`, transactions, row locks, factories, seeders | May change | 355 tests in 37 files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite. |
-| `dox_validation` | `@Dto` rules, fluent schemas, JSON Schema, Standard Schema | Ready for stable | 90 tests in 6 files |
+| `dox_validation` | `@Dto` rules, fluent schemas, JSON Schema, Standard Schema | Stable | 90 tests in 6 files |
 | `dox_builder` | Code generator for models, DTOs, env classes, the container and OpenAPI | May change | 59 tests in 5 files |
 | `dox_annotation` | Annotations used by the generator | May change | 1 test in 1 file. Mostly tested through `dox_builder`. |
 | `dox` (CLI) | `dox create`, `dox serve`, `dox build`, `make:*`, `migration:*`, `db:seed`, `queue:*`, `schedule:*` | May change | 73 tests in 9 files |
-| `dox_migration` | Migrations for Postgres, MySQL, MariaDB and SQLite | Ready for stable | 31 tests in 5 files. CI runs them on each database. |
+| `dox_migration` | Migrations for Postgres, MySQL, MariaDB and SQLite | Stable | 31 tests in 5 files. CI runs them on each database. |
 | `dox_auth` | JWT and session auth guards and middleware | May change | 43 tests in 4 files |
-| `dox_cache` | Memory, file and Redis cache, tags, locks | Ready for stable | 63 tests in 4 files, with Redis in CI |
-| `dox_storage` | Local disk and S3 (and S3-compatible) storage | Ready for stable | 119 tests in 10 files, with MinIO in CI |
-| `dox_openapi` | OpenAPI 3.1 document and a docs page | Ready for stable | 56 tests in 4 files |
+| `dox_cache` | Memory, file and Redis cache, tags, locks | Stable | 63 tests in 4 files, with Redis in CI |
+| `dox_storage` | Local disk and S3 (and S3-compatible) storage | Stable | 119 tests in 10 files, with MinIO in CI |
+| `dox_openapi` | OpenAPI 3.1 document and a docs page | Stable | 56 tests in 4 files |
 | `dox_socketio` | Socket.IO v4 server with a Redis adapter | May change | 85 tests in 10 files, with Redis and the real `socket.io-client` in CI |
 | `dox_queue` | Queues and jobs | Experimental | 43 tests in 5 files, with Postgres, MariaDB and Redis in CI |
 | `dox_scheduler` | Run tasks on a schedule | Experimental | 74 tests in 6 files, with Redis in CI |
