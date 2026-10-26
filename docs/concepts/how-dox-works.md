@@ -99,7 +99,7 @@ Before it starts an isolate, Dox copies three things to it:
 
 - the `AppConfig`,
 - the list of providers,
-- the routes you added before `startServer()`.
+- the routes and route binders (`Route.bind`) you added before `startServer()`.
 
 Then each isolate does this, once:
 
@@ -158,54 +158,71 @@ Postgres and MySQL have only the native drivers. When the native library does no
 ```text
 my_app/
 ├── bin/
-│   └── server.dart          # starts the app
+│   ├── server.dart          # starts the app
+│   ├── migrate.dart         # runs the migrations (dox migration:*)
+│   ├── seed.dart            # runs the seeders (dox db:seed)
+│   ├── queue.dart           # the queue worker (dox queue:*)
+│   └── schedule.dart        # the scheduler (dox schedule:*)
 ├── db/
-│   └── migration/           # migrations (.dart with a registry, or .sql)
+│   ├── factories/           # model factories, *.factory.dart
+│   ├── migration/           # migrations (.dart with a registry, or .sql)
+│   └── seeders/             # seeders, *.seeder.dart
 ├── lib/
 │   ├── app/
-│   │   ├── dtos/            # one folder per DTO, *.dto.dart, typed and checked input
 │   │   ├── http/
-│   │   │   ├── controllers/     # *.controller.dart
-│   │   │   ├── middleware/      # *.middleware.dart
-│   │   │   ├── serializers/     # *.serializer.dart, custom JSON shapes
-│   │   │   └── response_handler.dart
+│   │   │   └── controllers/     # *.controller.dart
+│   │   ├── jobs/                # queue jobs, *.job.dart
 │   │   └── models/              # one folder per model, *.model.dart
 │   ├── config/
 │   │   ├── app.dart             # AppConfig: port, isolates, middleware
 │   │   ├── cache.dart           # cache stores
 │   │   ├── cors.dart
 │   │   ├── database.dart        # DatabaseConfig: connections
-│   │   ├── env.dart             # typed env class (@DoxEnv), optional
+│   │   ├── env.dart             # typed env class (@DoxEnv)
 │   │   ├── logger.dart
+│   │   ├── queue.dart           # QueueConfig
+│   │   ├── schedule.dart        # ScheduleConfig and your tasks
 │   │   └── storage.dart         # storage disks
 │   ├── routes/
 │   │   ├── api.dart             # ApiRouter, prefix `api`
 │   │   └── web.dart             # WebRouter
-│   ├── providers/
-│   │   └── orm_provider.dart    # opens the database in every isolate
+│   ├── providers/               # one DoxProvider per file, runs in every isolate
+│   │   ├── orm_provider.dart        # opens the database
+│   │   ├── queue_provider.dart
+│   │   ├── schedule_provider.dart
+│   │   └── storage_provider.dart
 │   └── generated/               # made by build_runner, do not edit
 │       ├── container.g.dart     # @Inject classes, routers, providers
-│       ├── dtos.g.dart          # the list of DTOs
+│       ├── jobs.g.dart          # the list of queue jobs
 │       └── openapi.g.dart       # the OpenAPI docs
-├── storage/                     # local disk, file cache, uploads
 ├── test/
-├── .env                         # local settings, not in git
+├── .env                         # local settings, not in git. `dox create` makes it
 ├── .env.example
 ├── Dockerfile
 ├── docker-compose.yml
 └── pubspec.yaml
 ```
 
+The `dox make:*` commands add more folders when you need them:
+
+- `dox make:dto` adds `lib/app/dtos/<name>/<name>.dto.dart`. Then `build_runner` writes `lib/generated/dtos.g.dart`, the list of DTOs.
+- `dox make:middleware` adds `lib/app/http/middleware/`.
+- `dox make:serializer` adds `lib/app/http/serializers/`.
+
+The app makes `storage/` when it writes files (the local disk, the file cache, uploads).
+
 | Folder | What goes there |
 | --- | --- |
-| `bin/` | `server.dart` calls `Dox().initialize(appConfig)`, runs the migrations, then `Dox().startServer()`. `dox make:migration` adds `migrate.dart`. |
-| `db/migration/` | Your migrations. Dart migrations are listed in `migrations.dart`, which the CLI writes. |
-| `lib/app/http/` | Everything about HTTP: controllers, DTOs, middleware, serializers. |
+| `bin/` | `server.dart` calls `Dox().initialize(appConfig)`, runs the migrations, then `Dox().startServer()`. The other files are the entry points that the `dox migration:*`, `db:seed`, `queue:*` and `schedule:*` commands run. |
+| `db/` | Your migrations, factories and seeders. Dart migrations are listed in `db/migration/migrations.dart`, which the CLI writes. |
+| `lib/app/http/` | Everything about HTTP: controllers, middleware, serializers. |
+| `lib/app/dtos/` | One folder per DTO: typed and checked input. |
+| `lib/app/jobs/` | Queue jobs. |
 | `lib/app/models/` | One folder per model. `build_runner` writes the `.g.dart` file next to it. |
 | `lib/config/` | One file per config object. `app.dart` puts them together in `AppConfig`. |
 | `lib/routes/` | One `Router` class per file. Dox finds each router by itself. |
-| `lib/providers/` | Classes that extend `DoxProvider`. Their `setup()` runs in every isolate. |
-| `lib/*.g.dart` | Generated files. Do not edit them. Run `dox build_runner:build` to make them again. |
+| `lib/providers/` | Classes that extend `DoxProvider`. Their `setup()` runs in every isolate. Dox finds each provider by itself. |
+| `lib/generated/` | Generated files. Do not edit them. Run `dox build_runner:build` to make them again. |
 | `storage/` | Files the app writes: uploads, the file cache, SQLite files. |
 
 `build_runner` with `dox_builder` makes the model classes, the DTO checks, the typed env class and the OpenAPI docs.

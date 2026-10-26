@@ -81,11 +81,18 @@ Dox finds the provider by itself. Run `dart run build_runner build` and it is in
 
 `AuthMiddleware` protects a route.
 When the token is missing or not valid, the request stops with `401 Authentication failed`.
+Put these routes in `register()` of the `ApiRouter`. Its prefix is `api`, so the paths start with `/api`.
+A [rate limit](rate-limiting.md) on login and register slows down password guessing.
 
 ```dart title="lib/routes/api.dart"
-
-Route.post('/auth/register', (AuthController c) => c.register);
-Route.post('/auth/login', (AuthController c) => c.login);
+Route.post('/auth/register', <dynamic>[
+  RateLimit(max: 5, name: 'register'),
+  (AuthController c) => c.register,
+]);
+Route.post('/auth/login', <dynamic>[
+  RateLimit(max: 5, name: 'login'),
+  (AuthController c) => c.login,
+]);
 Route.get('/auth/user', <dynamic>[AuthMiddleware(), (AuthController c) => c.user]);
 ```
 
@@ -103,7 +110,7 @@ class AuthController {
     User user = User();
     user.name = body.name;
     user.email = body.email;
-    user.password = Hash.make(body.password);
+    user.password = await Hash.makeAsync(body.password);
     await user.save();
 
     String? token = Auth().login(user);
@@ -135,7 +142,7 @@ class AuthController {
 ## 5. Send the token from the client
 
 ```http
-GET /auth/user
+GET /api/auth/user
 Authorization: Bearer <token>
 ```
 
@@ -179,7 +186,7 @@ It returns `null` when the password is not a `String`, when no identifier is giv
 
 | Option | Default | What it does |
 | --- | --- | --- |
-| `secret` | required | the key that signs tokens, like `SecretKey(env.appKey)`. An empty key throws `ArgumentError`. A key shorter than 32 bytes also throws in production, and prints a warning in development, local and test. Make one with `dox key:generate` or `openssl rand -hex 32` |
+| `secret` | required | the key that signs tokens, like `SecretKey(env.appKey)`. An empty key throws `ArgumentError`. A key shorter than 32 bytes also throws in production, and prints a warning in development, local and test. Make one with `dox key:generate`. For a separate JWT secret (not `APP_KEY`), `openssl rand -hex 32` also works |
 | `algorithm` | `JWTAlgorithm.HS256` | the signing algorithm |
 | `expiresIn` | `Duration(hours: 1)` | how long a token is valid |
 | `issuer` | `null` | the `iss` claim. When set, `verifyToken` also checks it |
@@ -225,15 +232,28 @@ You can check the user in your own way, like an API key in the header.
 Write a driver: extend `AuthDriver` and return the user from `verifyToken`.
 `AuthMiddleware` and `req.auth` then work as with the other drivers.
 
+The table stores a SHA-256 hash of each key in an `api_key_hash` column, not the key itself.
+So a leak of the table does not leak the keys.
+The example uses the `crypto` package (`dart pub add crypto`).
+
 ```dart
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
+import 'package:dox_auth/dox_auth.dart';
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_orm/dox_orm.dart';
+
 /// `Authorization: Bearer <api key>` gives the user with this key.
 class ApiKeyAuthDriver extends AuthDriver {
   @override
   Future<Model<dynamic>?> verifyToken(IDoxRequest req, String guard) async {
     String header = req.header('Authorization') ?? '';
     if (!header.startsWith('Bearer ')) return null;
+    String key = header.substring(7).trim();
+    String hash = sha256.convert(utf8.encode(key)).toString();
     Model<dynamic> model = AuthEngine().guard(guard).provider.model();
-    return await model.where('api_key', header.substring(7).trim()).getFirst();
+    return await model.where('api_key_hash', hash).getFirst();
   }
 
   /// no password login for this guard
@@ -254,10 +274,10 @@ Add it as a guard, and use the guard in the route:
   provider: AuthProvider(model: () => User()),
 ),
 
-Route.get('/api/me', <dynamic>[AuthMiddleware(guard: 'api'), (DoxRequest req) => req.auth?.user<User>()]);
+Route.get('/me', <dynamic>[AuthMiddleware(guard: 'api'), (DoxRequest req) => req.auth?.user<User>()]);
 ```
 
-Store a hash of the key, not the key itself, and compare the hash.
+Make each key long and random, like `openssl rand -hex 32`. Then a fast hash like SHA-256 is safe. Do not use bcrypt here: you can not search by a bcrypt hash.
 
 If you already have your own middleware, set the user with `Auth().setUser(req, user)`.
 It needs no token and no password check. `req.auth` then gives this user:
@@ -318,7 +338,7 @@ Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), (PageCon
 | `Auth().logout(req)` | removes the login and all session data |
 
 - Login and logout give the session a new id and a new CSRF token. So an id that someone saw before the login is of no use.
-- With the default `cookie` session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout. If logout must really end old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
+- With the default `cookie` session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout. The server also does not check its age, so a copied cookie works until `APP_KEY` changes. If logout must really end old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
 - The session keeps only the user id. `AuthMiddleware` loads the user from the database on each request, so a deleted user is logged out.
 - These methods throw a `StateError` on a guard that does not use `SessionAuthDriver`.
 - `SessionAuthDriver` has one option, `hashRounds` (default `10`), like `JwtAuthDriver`.

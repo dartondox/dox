@@ -8,8 +8,14 @@ A health route tells a load balancer, Docker or Kubernetes if the app can serve 
 
 ## Add the route
 
+Add it in `register()` of a router:
+
 ```dart title="lib/routes/web.dart"
-Route.health('/health');
+@override
+void register() {
+  Route.get('/ping', (WebController c) => c.pong);
+  Route.health('/health');
+}
 ```
 
 `GET /health` answers `200` with:
@@ -20,7 +26,7 @@ Route.health('/health');
 
 ## Check the database and the cache
 
-Give named checks. Each check is a function:
+Give named checks. Each check is a function. Put the `Route.health` call in `register()`, as above:
 
 ```dart title="lib/routes/web.dart"
 import 'package:dox_orm/dox_orm.dart';

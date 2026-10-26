@@ -40,8 +40,8 @@ dart pub global deactivate dox
 | `dox make:middleware <name>` | create a middleware |
 | `dox make:dto <name>` | create a DTO (typed, checked input) |
 | `dox make:serializer <name>` | create a serializer |
-| `dox make:model <name> [-m]` (old name `create:model`) | create a model, and with `-m` its migration |
-| `dox make:migration <name> [--sql]` (old name `create:migration`) | create a Dart migration, or a `.sql` one with `--sql` |
+| `dox make:model <name> [-m]` | create a model, and with `-m` its migration |
+| `dox make:migration <name> [--sql]` | create a Dart migration, or a `.sql` one with `--sql` |
 | `dox migration:run` (or `dox migrate`) | run new migrations |
 | `dox migration:rollback [--step=N]` | undo the last batch, or the last N migrations |
 | `dox migration:reset` | undo all migrations |
@@ -49,7 +49,7 @@ dart pub global deactivate dox
 | `dox migration:fresh` (or `migrate:fresh`) | drop all tables, then run all migrations |
 | `dox migration:status` | show which migrations ran, and their batch |
 | `dox make:factory <model>` | create a model factory in `db/factories`, see [Factories](../database/factories.md) |
-| `dox make:seeder <name>` | create a seeder in `db/seeders`, see [Seeders](../database/seeders.md) |
+| `dox make:seeder <name>` | create a seeder in `db/seeders` (and `bin/seed.dart`), see [Seeders](../database/seeders.md) |
 | `dox db:seed [--class=<name>]` | run `DatabaseSeeder`, or another seeder |
 | `dox make:job <name>` | create a queue job in `lib/app/jobs` (and `bin/queue.dart`) |
 | `dox queue:work [--queue=a,b] [--concurrency=N] [--once] [--tries=N] [--timeout=S] [--sleep=S] [--stop-when-empty]` | run the queue worker |
@@ -64,7 +64,7 @@ dart pub global deactivate dox
 | `dox key:generate` | make a new `APP_KEY` |
 | `dox env:generate` | make `lib/config/env.dart` (the typed env class) from `.env.example`, see [Environment Variables](env.md) |
 | `dox env:check` | check the env against `lib/config/env.dart`. Prints every missing or bad key (exit code 1) |
-| `dox openapi:generate [dir]` | write `openapi.json` and `openapi.yaml` (default `storage/openapi`), see [OpenAPI](../packages/openapi.md#write-the-files-dox-openapigenerate) |
+| `dox openapi:generate [dir]` | run `bin/openapi.dart` to write `openapi.json` and `openapi.yaml` (default `storage/openapi`). A new project has no `bin/openapi.dart` yet, see [OpenAPI](../packages/openapi.md#write-the-files-dox-openapigenerate) |
 | `dox update` | update the CLI |
 | `dox version` (or `dox -v`) | show the CLI version |
 | `dox help [command]` | show help |
@@ -75,10 +75,14 @@ dart pub global deactivate dox
 
 ```bash
 dox create new_blog
-dox create new_blog --version v3.0.0-alpha.5
+dox create new_blog --version v3.0.0-alpha.17
 ```
 
 `dox create` copies the [dox-sample](https://github.com/dartondox/dox-sample) template from GitHub. Without `--version`, it uses the newest template release with the same major version as the CLI.
+
+- The folder name is the project name in snake case: `NewBlog` makes `new_blog`.
+- It makes `.env` from `.env.example`, with a new `APP_KEY`.
+- Then run `cd new_blog`, `dart pub get` and `dox serve`.
 
 ### Run the dev server
 
@@ -105,17 +109,17 @@ See [Deployment](deployment.md#build).
 ```bash
 dox make:controller Blog        # lib/app/http/controllers/blog.controller.dart
 dox make:controller Blog -r     # resource controller
-dox make:middleware Auth
+dox make:middleware Auth        # lib/app/http/middleware/auth.middleware.dart
 dox make:dto CreateBlog         # lib/app/dtos/create_blog/create_blog.dto.dart
-dox make:serializer Blog
-dox make:model Blog -m          # model and its create_blogs_table migration
+dox make:serializer Blog        # lib/app/http/serializers/blog.serializer.dart
+dox make:model Blog -m          # lib/app/models/blog/blog.model.dart and a create_blogs_table migration
 dox make:migration create_blogs_table          # .dart file (default)
 dox make:migration create_blogs_table --sql    # .sql file
 ```
 
 - `-r` adds the methods `index`, `create`, `store`, `show`, `edit`, `update` and `destroy`.
 - Word breaks are kept. `BlogPost` makes `blog_post.controller.dart` with the class `BlogPostController`.
-- After `make:dto`, run `dox build_runner:build`. See [Validation](../the-basic/validation.md).
+- After `make:controller` or `make:dto`, run `dox build_runner:build` (or keep `dox serve` running). See [Validation](../the-basic/validation.md).
 - The table of a model is its name in plural snake case: `BlogPost` makes `blog_posts`. The model gets `@DoxModel(table: 'blog_posts')`.
 
 ## Migrations
@@ -137,6 +141,7 @@ DB_PASSWORD=password
 
 - `DB_CONNECTION` defaults to `postgres`. The default port is `5432` for postgres and `3306` for mysql.
 - `DB_DATABASE` works too, in place of `DB_NAME`.
+- `DATABASE_URL` wins over all the `DB_*` keys when it is set.
 - Put comments on their own line. A `#` after a value becomes part of the value.
 
 All keys are in the [Env reference](../reference/env.md#read-by-the-framework).

@@ -30,22 +30,26 @@ Now every `POST`, `PUT`, `PATCH` and `DELETE` request must send the token. A req
 
 Dox reads the token from one of these places:
 
-- the `_token` field of the body
+- the `_token` field of the body (or of the query string)
 - the `X-CSRF-TOKEN` header
 - the `X-XSRF-TOKEN` header
 
 The token is `req.session.token`.
+Do not put it in a URL. URLs are kept in logs and in the browser history.
 
 ### HTML forms
 
-Put the token in a hidden field:
+Put the token in a hidden field.
+With [views](../the-basic/views.md#forms), `csrfField()` writes this field for you:
 
 ```html
 <form method="POST" action="/posts">
-  <input type="hidden" name="_token" value="{{ token }}">
+  {{ csrfField() }}
   ...
 </form>
 ```
+
+`csrfToken()` gives only the token, for example for a `<meta>` tag.
 
 ### axios and Inertia
 
@@ -79,6 +83,7 @@ const CsrfMiddleware(except: <String>['/api/*', '/webhooks/stripe']);
 - Any other path must match exactly.
 
 An excluded path is not checked and gets no `XSRF-TOKEN` cookie.
+Only skip paths that do not use the session login. A webhook should check its own signature instead.
 
 ## After login
 

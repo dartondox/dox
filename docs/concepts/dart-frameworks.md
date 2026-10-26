@@ -34,7 +34,7 @@ It lists facts only. Each project is good at different things.
 | Typed request validation | `@Dto` classes, checks generated at build time, `422` with errors | Not in their feature list (see their docs) | Typed, generated parameters for endpoints. Rules: see their docs. | Not built in | Route params only (type or regex) |
 | ORM and relations | `dox_orm`: models, has one, has many, belongs to, many to many | Not built in | Built in: filters, joins, one-to-one, one-to-many, many-to-many | Not built in | Not built in |
 | Migrations | `dox migrate` (SQL or Dart files) | Not built in | Built in, versioned migrations | Not built in | Not built in |
-| Auth | `dox_auth`: JWT guard, password hashing | `dart_frog_auth`: Basic, Bearer and Cookie middleware | Built in: email and password, Google, Apple, GitHub, passkeys and more | Not built in | See their docs |
+| Auth | `dox_auth`: JWT and session guards. Password hashing (`Hash`) is in `dox_core`. | `dart_frog_auth`: Basic, Bearer and Cookie middleware | Built in: email and password, Google, Apple, GitHub, passkeys and more | Not built in | See their docs |
 | WebSocket | A Socket.IO v4 server (`dox_socketio`) and raw `Route.websocket` | `dart_frog_web_socket` (`webSocketHandler`) | Streaming methods over a managed WebSocket | `shelf_web_socket` | Built in |
 | OpenAPI | Generated OpenAPI 3.1 (JSON, YAML) and a docs page | On their roadmap, not done | See their docs | See their docs | See their docs |
 | CLI and code generation | `dox` CLI, `build_runner` for DTOs, models and OpenAPI | `dart_frog` CLI: `create`, `dev` (hot reload), `build` | `serverpod` CLI, generates server and client code | No CLI (`shelf_router_generator` for routes from annotations) | No CLI |
@@ -75,4 +75,4 @@ To compare, run the same test on your own machine, with each server on the same 
 - **Your app is Flutter only, and you want the client made for you.** Serverpod generates a typed client for every endpoint. Dox does not generate a Dart client. It generates an OpenAPI document.
 - **You want a small tool with few parts.** Dart Frog is simpler. You add only what you need.
 - **You want to build your own stack.** Shelf gives you the base parts, and the Dart team publishes it.
-- **You need features Dox does not have yet**, like queues, a scheduler or mail. See [What Dox does not have yet](status-and-roadmap.md#what-dox-does-not-have-yet).
+- **You need features Dox does not have yet**, like notifications, events and listeners, or policies. See [What Dox does not have yet](status-and-roadmap.md#what-dox-does-not-have-yet).

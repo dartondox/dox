@@ -24,8 +24,9 @@ It runs on [`dox_cache`](../packages/cache.md), which is built into `dox_core`.
 
 ## Config
 
-Without a config, Dox has a `file` store (the default) and a `memory` store.
-To change the stores, make `lib/config/cache.dart`:
+A new project already has `lib/config/cache.dart`, with a `file` store and a `memory` store.
+`CACHE_STORE` in `.env` picks the default store (`file` when it is not set).
+To add a store, edit the file. This example adds a `redis` store:
 
 ```dart title="lib/config/cache.dart"
 import 'package:dox_core/dox_core.dart';
@@ -55,7 +56,7 @@ Redis needs two keys that a new project does not have yet. Add them to
   int get redisPort => 6379;
 ```
 
-Then pass it to `AppConfig(cache: cache)` in `lib/config/app.dart`.
+`lib/config/app.dart` already passes it to `AppConfig(cache: cache)`.
 Each store is made once per isolate, the first time you use it.
 
 ### Store options
@@ -63,7 +64,7 @@ Each store is made once per isolate, the first time you use it.
 | Driver | Options |
 | --- | --- |
 | `file` | `path` (default `storage/cache`), `prefix` |
-| `memory` | `max_size`: the most items. When it is full, the item that was used least recently is removed. No limit by default. Expired items are removed when read, and by a sweep every few thousand writes. Also `prefix`. |
+| `memory` | `max_size`: the most items. When it is full, the item that was used least recently is removed. No limit by default. Expired items are removed when read, and by a sweep after many writes (at least 1000). Also `prefix`. |
 | `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db` (default `0`), `tls` (`true`/`false`), `pool_size` (default 10), `prefix` |
 
 The default `prefix` is `dox_cache:`.

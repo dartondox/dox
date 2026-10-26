@@ -18,7 +18,7 @@ dart pub add dox_scheduler
 
 ## Set up in a Dox app
 
-A new app from `dox create` already has these files. For an older app, add them:
+A new app from `dox create` already has these files. In another app, add them:
 
 - `lib/config/schedule.dart`: the tasks and the `ScheduleConfig`. See [Define tasks](#define-tasks).
 - `bin/schedule.dart`: the program that runs the schedule. See [Run the schedule](#run-the-schedule).
@@ -29,6 +29,33 @@ Then start it next to your server:
 ```bash
 dart run bin/schedule.dart work
 ```
+
+## Without Dox
+
+`dox_scheduler` also works in a plain Dart app. Leave out `app`:
+
+```dart
+import 'dart:io';
+
+import 'package:dox_scheduler/dox_scheduler.dart';
+
+void schedule(Schedule s) {
+  s.call('cleanup', cleanup).dailyAt('02:00');
+}
+
+Future<void> cleanup() async {
+  // delete old files, ...
+}
+
+Future<void> main(List<String> args) async {
+  exitCode = await SchedulerRunner(schedule: schedule).run(args);
+}
+```
+
+- With no `app`, no providers start, and the locks use a memory store.
+- For many servers, pass a shared lock store: `SchedulerRunner(schedule: schedule, store: myRedisStore)`.
+  It is a `CacheStore` from `dox_cache`.
+- The commands are the same. See [Run the schedule](#run-the-schedule).
 
 ## Define tasks
 
@@ -172,7 +199,7 @@ Pass another expiry like this: `withoutOverlapping(Duration(hours: 1))`.
 
 Before a task runs, the scheduler takes a lock named after the task and the minute.
 The first process to take it runs the task. The others skip it.
-The lock is not released, so a late server can not run the same minute again.
+The lock is not released, so a late server can not run the same minute again. It expires after 10 minutes.
 
 The locks use a [cache](cache.md) store.
 
@@ -243,6 +270,8 @@ It stops them at the end.
 | `dart run bin/schedule.dart run` | runs the tasks due this minute once, then exits |
 | `dart run bin/schedule.dart list` | shows each task, its schedule and its next run time |
 | `dart run bin/schedule.dart test cleanup` | runs one task now |
+
+The `dox` CLI runs the same file: `dox schedule:work`, `dox schedule:run`, `dox schedule:list` and `dox schedule:test <name>`.
 
 ### work
 

@@ -17,6 +17,35 @@ WebSocket or Socket.IO routes.
 You do not need Rust. The package downloads a ready-built library for your
 system when you build the app.
 
+## Without Dox
+
+`dox_http_native` also works on its own, in any Dart app:
+
+```bash
+dart pub add dox_http_native
+```
+
+```dart
+import 'dart:io';
+
+import 'package:dox_http_native/dox_http_native.dart';
+
+Future<void> main() async {
+  NativeHttpServer server = await NativeHttpServer.bind(3000);
+  server.listen((HttpRequest req) async {
+    req.response.write('Hello World');
+    await req.response.close();
+  });
+}
+```
+
+- `NativeHttpServer.bind(port, address: '127.0.0.1')` listens on one host.
+  With no address, it listens on all interfaces.
+- `close()` waits for open requests. `close(force: true)` closes every
+  connection at once.
+
+The rest of this page is the same with or without Dox.
+
 ## How it works
 
 1. Rust reads the requests from the sockets.
@@ -43,7 +72,7 @@ Unsupported operation: dox_http_native did not load: <reason>.
 Fix: install Rust (cargo, see https://rustup.rs), then run the app again ...
 ```
 
-`<reason>` is for example `native library ABI 4, expected 5`: the library on
+`<reason>` is for example `native library ABI 5, expected 6`: the library on
 disk is from another version of the package. See
 [Troubleshooting](../reference/troubleshooting.md#the-native-http-library-did-not-load).
 
@@ -93,7 +122,7 @@ a gain.
   in memory. Dart reads more of the file only when the client has read
   what was sent. When the client leaves, Dart stops reading.
 - A request body of 64 KB or more goes to Dart without a copy.
-- `compress: true` works: Rust gzips the body on another thread, so the
+- `compress: true` in `AppConfig` works: Rust gzips the body on another thread, so the
   isolate does not wait. A streamed response is not compressed.
 
 ## Where the library comes from
@@ -116,6 +145,9 @@ that works:
    There are builds for macOS (arm64, x64), Linux (x64, arm64) and
    Windows (x64).
 4. A build from source with `cargo`, when Rust is installed.
+
+This order is for the package from pub.dev. For a git or path dependency,
+step 4 comes before step 3, because the source can be newer than the release.
 
 When none works, the app still builds, but it stops at start with the
 error above. Install Rust and run it again, so step 4 works.

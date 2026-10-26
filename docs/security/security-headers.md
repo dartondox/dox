@@ -33,9 +33,14 @@ Every answer now has these headers:
 
 `Content-Security-Policy` is off by default. A good policy depends on your pages.
 
+Without this middleware, the server already sends three headers on every answer, also on a `404`:
+`X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff` and `X-XSS-Protection: 1; mode=block`.
+`SecurityHeaders` replaces the first two with its own values.
+
 ## Change or turn off a header
 
-Each header has an option. Give a new value to change it, or `null` to turn it off:
+Each header has an option. Give a new value to change it, or `null` to turn it off.
+`null` for `frameOptions` or `contentTypeOptions` keeps the server value from above (`SAMEORIGIN` and `nosniff`).
 
 ```dart
 const SecurityHeaders(
@@ -71,7 +76,9 @@ AppConfig(trustedProxies: <String>['127.0.0.1', '::1']);
 Without it, Dox never sends HSTS. See [App config](../reference/app-config.md).
 
 !!! note
-    Middleware runs only for routes that exist. A `404` for an unknown url does not get these headers.
+    Middleware runs only for routes that exist. A `404` for an unknown url gets only the three server headers.
+    A preflight `OPTIONS` answer gets only them too.
+    Put `SecurityHeaders` first in `globalMiddleware`. Then an error from a later middleware, like a `419` or a `429`, also gets the headers.
 
 ## See also
 

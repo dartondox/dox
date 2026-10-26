@@ -6,11 +6,7 @@ icon: lucide/hard-drive
 
 `Storage()` saves and reads files on a disk: the local folder, AWS S3 (and R2, MinIO, Spaces), or memory.
 
-It is in the [`dox_storage`](../packages/storage.md) package. Add it to your app:
-
-```bash
-dart pub add dox_storage
-```
+It is in the [`dox_storage`](../packages/storage.md) package. A new project already has it.
 
 ```dart
 import 'package:dox_storage/dox_storage.dart';
@@ -24,8 +20,9 @@ Route.post('/avatar', (DoxRequest req) async {
 
 ## Config
 
-Without a config, `Storage()` has one disk: `local`, in the `storage` folder.
-To add disks, make `lib/config/storage.dart`:
+A new project already has `lib/config/storage.dart`, with one `local` disk in the `storage` folder.
+`STORAGE_DISK` in `.env` picks the default disk.
+To add disks, edit the file. This example adds a `url` to the local disk, an `s3` disk and a `memory` disk:
 
 ```dart title="lib/config/storage.dart"
 import 'package:dox_storage/dox_storage.dart';
@@ -39,14 +36,17 @@ StorageConfig storageConfig = StorageConfig(
       'root': 'storage',
       'url': 'https://app.test/files', // for url() and signedUrl()
     },
-    's3': <String, dynamic>{
-      'driver': 's3',
-      'bucket': env.awsBucket,
-      'region': env.awsDefaultRegion,
-      'key': env.awsAccessKeyId,
-      'secret': env.awsSecretAccessKey,
-      'endpoint': env.awsEndpoint, // R2, MinIO, Spaces
-    },
+
+    /// only when AWS_BUCKET is set
+    if (env.awsBucket != null)
+      's3': <String, dynamic>{
+        'driver': 's3',
+        'bucket': env.awsBucket,
+        'region': env.awsDefaultRegion,
+        'key': env.awsAccessKeyId,
+        'secret': env.awsSecretAccessKey,
+        'endpoint': env.awsEndpoint, // R2, MinIO, Spaces
+      },
     'memory': <String, dynamic>{'driver': 'memory'},
   },
 );
@@ -54,7 +54,7 @@ StorageConfig storageConfig = StorageConfig(
 
 The `s3` disk reads five keys that a new project does not have yet. Add them to
 `lib/config/env.dart` and run `dart run build_runner build`. They are nullable,
-so the app starts without them:
+and the `s3` disk is only added when `AWS_BUCKET` is set. So the app starts without them:
 
 ```dart title="lib/config/env.dart"
   String? get awsBucket;
@@ -69,7 +69,7 @@ so the app starts without them:
   String? get awsEndpoint;
 ```
 
-Then add the provider. It sets the disks in every isolate. Put it in `lib/`, so the generated container finds it:
+The provider of a new project sets these disks in every isolate. It is in `lib/providers/`, so the generated container finds it:
 
 ```dart title="lib/providers/storage_provider.dart"
 import 'package:dox_storage/dox_storage.dart';
@@ -86,7 +86,7 @@ class AppStorageProvider extends StorageProvider {
 | `s3` | `bucket`, `region`, `key`, `secret`, `token`, `endpoint`, `path_style` (MinIO), `url` (CDN), `visibility`, `acl`, `batch_delete` |
 | `memory` | none. For tests |
 
-The `s3` disk needs `bucket`, `key` and `secret`. When one is missing, the first use of the disk throws an `ArgumentError` that names the setting.
+The `s3` disk needs `bucket`, `key` and `secret`. When one is missing, the app stops at start with an `ArgumentError` that names the setting.
 
 ## Functions
 
@@ -136,7 +136,7 @@ A big file is never loaded into memory. A missing file answers `404`.
 // lib/routes/web.dart
 Storage.route('files');                    // GET /files/{key*}, signed URLs only
 Storage.route('public', signed: false);    // any file of the disk
-Storage.route('docs', disk: 'memory');     // another disk than the default
+Storage.route('docs', disk: 'memory', signed: false); // another disk than the default
 Storage.route('uploads', download: true);  // every file is a download
 ```
 
@@ -148,6 +148,7 @@ String url = await Storage().signedUrl('invoices/1.pdf'); // https://app.test/fi
 ```
 
 A missing, wrong or expired signature answers `403`.
+Signed URLs work only on a `local` disk. For another disk, use `signed: false`.
 Set the disk `url` option to the full URL of the route (`https://app.test/files`).
 
 ## Tests

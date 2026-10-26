@@ -14,9 +14,11 @@ A hash is one-way. You can not turn it back into the password.
 Hash the password before you save it.
 
 ```dart
-user.password = Hash.make(body.password);
+user.password = await Hash.makeAsync(body.password);
 await user.save();
 ```
+
+`makeAsync` runs bcrypt in another isolate. See [Without blocking the server](#without-blocking-the-server).
 
 The result looks like `$2a$10$...`. It holds the salt, so you only store this one string.
 The same password gives a different hash each time.
@@ -43,6 +45,7 @@ bool ok = await Hash.verifyAsync('secret', user.password!);
 ## Cost
 
 `Hash.rounds` is the bcrypt cost for new hashes. The default is `10`. Each step up doubles the time.
+The cost must be from 4 to 31. Do not go below 10.
 
 ```dart
 Hash.rounds = 12;
@@ -50,7 +53,18 @@ String hash = Hash.make('secret', rounds: 12); // or per call
 ```
 
 Old hashes keep their own cost, so they still verify.
-If you change it, also set `hashRounds` on `JwtAuthDriver` to the same value. See [Authentication](authentication.md).
+If you change it, also set `hashRounds` on `JwtAuthDriver` or `SessionAuthDriver` to the same value.
+Then a login with an unknown email takes as long as a wrong password. See [Authentication](authentication.md).
+
+## Long passwords
+
+bcrypt reads at most 72 bytes.
+`Hash.make` and `Hash.makeAsync` throw an `ArgumentError` when the password is longer than 72 bytes (UTF-8).
+`Hash.verify` returns `false` for such a password.
+
+So limit the length in your DTO, like `@Length(min: 8, max: 72)`.
+`@Length` counts characters, and a letter outside ASCII can use up to 4 bytes.
+So a password with such letters can still be too long. Catch the error and answer `422`, or use a smaller `max`.
 
 ## With login
 

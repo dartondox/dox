@@ -4,7 +4,9 @@ icon: lucide/list-ordered
 
 # Queue
 
-A queue runs slow work in the background. The request answers at once. A worker process does the work later.
+A queue runs slow work in the background, so the request can answer at once.
+
+A worker process does the work later.
 
 Use it to send emails, call slow APIs, make reports or resize images.
 The `dox_queue` package gives you jobs, three drivers (Redis, database and sync), retries, delays and a worker.
@@ -26,6 +28,8 @@ dart pub add dox_queue
 
 ## Set up
 
+A new app from `dox create` already has the files of steps 1 to 4. Check them, and change the driver if you want.
+
 ### 1. Config
 
 ```dart title="lib/config/queue.dart"
@@ -46,7 +50,7 @@ QueueConfig queueConfig = QueueConfig(
 | --- | --- | --- |
 | `driver` | `sync` | `sync`, `database` or `redis` |
 | `jobs` | empty | `jobRegistry` from `lib/generated/jobs.g.dart` |
-| `redis` | localhost:6379 | `RedisOptions(host: ..., port: ..., password: ...)` for the `redis` driver |
+| `redis` | 127.0.0.1:6379 | `RedisOptions(host: ..., port: ..., password: ...)` for the `redis` driver |
 | `prefix` | `dox_queue:` | the start of every Redis key |
 | `connection` | default | the dox_orm connection name, for the `database` driver |
 | `retryAfter` | 90 seconds | when a worker does not finish a job in this time, another worker can take it |
@@ -60,7 +64,7 @@ QueueConfig queueConfig = QueueConfig(
 
 ### 2. Provider
 
-The provider sets up the queue in every isolate. Put it in `lib/` so the generated container finds it.
+The provider sets up the queue in every isolate. Put it in `lib/providers/`, so the generated container finds it.
 
 ```dart title="lib/providers/queue_provider.dart"
 import 'package:dox_queue/dox_queue.dart';
@@ -80,7 +84,7 @@ class AppQueueProvider extends QueueProvider {
 import 'dart:io';
 
 import 'package:dox_queue/dox_queue.dart';
-import 'package:dox_sample/config/app.dart';
+import 'package:my_app/config/app.dart';
 
 /// run queued jobs: `dart run bin/queue.dart [work] [flags]`.
 /// the `dox` CLI runs this file for its queue commands.
@@ -162,6 +166,8 @@ class SendWelcomeEmail extends DoxJob {
 ```
 
 Run `dart run build_runner build` after you add or change a job.
+
+`dox make:job SendWelcomeEmail` makes a new job file in `lib/app/jobs/`.
 
 All the settings are optional:
 
@@ -270,6 +276,8 @@ Flags of `work`:
 ```bash
 dart run bin/queue.dart work --queue=emails,default --concurrency=4
 ```
+
+The `dox` CLI runs the same file: `dox queue:work`, `dox queue:failed`, `dox queue:retry <id|all>`, `dox queue:forget <id>` and `dox queue:flush`. They take the same flags.
 
 `--concurrency` runs jobs as async tasks on one thread. It helps for jobs that wait (email, HTTP, database).
 For CPU heavy jobs, run more worker processes.
@@ -396,7 +404,8 @@ Use the `sync` driver. `dispatch()` then runs the job at once, so you can check 
 
 ```dart
 import 'package:dox_queue/dox_queue.dart';
-import 'package:dox_sample/generated/jobs.g.dart';
+import 'package:my_app/app/jobs/send_welcome_email.job.dart';
+import 'package:my_app/generated/jobs.g.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -410,6 +419,8 @@ void main() {
   });
 }
 ```
+
+A job that uses `Dox()` (for example `Dox().ioc` or `Logger`) needs the app config. Call `Dox().initialize(appConfig)` in `setUpAll`.
 
 To test a job alone, call `handle()`:
 
@@ -426,3 +437,55 @@ await Worker(
   options: WorkerOptions(stopWhenEmpty: true),
 ).run();
 ```
+
+## Without Dox
+
+`dox_queue` also works in a plain Dart app. Add `build_runner`, so it writes `lib/generated/jobs.g.dart`:
+
+```bash
+dart pub add dox_queue dox_core
+dart pub add dev:build_runner
+```
+
+Write your jobs like in [Write a job](#write-a-job), and run `dart run build_runner build`.
+Then set up the queue and run a worker yourself:
+
+```dart
+import 'dart:async';
+import 'dart:io';
+
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_queue/dox_queue.dart';
+import 'package:my_app/generated/jobs.g.dart';
+import 'package:my_app/jobs/resize_image.dart';
+
+Future<void> main() async {
+  // the worker logs with the Dox logger, so it needs an AppConfig
+  Dox().initialize(AppConfig(appKey: 'not-used'));
+
+  Queue.configure(QueueConfig(
+    driver: 'redis',
+    jobs: jobRegistry,
+    redis: RedisOptions(host: '127.0.0.1', port: 6379),
+  ));
+
+  await ResizeImage(path: 'photo.png').dispatch();
+
+  Worker worker = Worker(
+    driver: Queue.driver,
+    jobs: jobRegistry,
+    options: WorkerOptions(queues: <String>['default'], concurrency: 4),
+  );
+
+  // Ctrl+C: finish the running jobs, then stop
+  StreamSubscription<ProcessSignal> signal =
+      ProcessSignal.sigint.watch().listen((_) => worker.stop());
+  await worker.run();
+  await signal.cancel();
+  await Queue.close();
+}
+```
+
+- `WorkerOptions` takes the same settings as the flags of `work`: `queues`, `concurrency`, `once`, `tries`, `timeout`, `sleep` and `stopWhenEmpty`.
+- The `database` driver uses the default `dox_orm` connection. Set it up first with `SqlQueryBuilder.initializeWithDatabaseConfig(...)`.
+- No services are in the Dox container. Make the services of a job in `handle()`.
