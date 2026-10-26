@@ -1,3 +1,7 @@
+## 3.0.0-alpha.17
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.16
 
 - Change: uses ioredis `^3.0.0`, the first stable ioredis release.
