@@ -13,6 +13,8 @@ Let a web app on another origin (`http://localhost:5173` in development, `https:
 
 ## 1. Write the config
 
+A new app already has `lib/config/cors.dart`, with `enabled: false`. Replace the whole file with this one:
+
 ```dart title="lib/config/cors.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/config/env.dart';
@@ -40,12 +42,7 @@ CORSConfig cors = CORSConfig(
 );
 ```
 
-```dart title="lib/config/app.dart"
-AppConfig appConfig = AppConfig(
-  cors: cors,
-  // ...
-);
-```
+`AppConfig` in `lib/config/app.dart` already passes it on with `cors: cors`.
 
 ## 2. Set the origin per environment
 
@@ -76,7 +73,7 @@ The origin is scheme, host and port. No path, no `/` at the end.
 !!! note "Two or more front-ends"
     Set `origin` to a list, like `['https://a.com', 'https://b.com']`.
     Dox compares the `Origin` header of the request with the list.
-    It sends back only the origin that matches. If none matches, it sends no `Access-Control-Allow-Origin` header, and the browser blocks the call.
+    It sends back only the origin that matches, with `Vary: Origin`. If none matches, it sends no `Access-Control-Allow-Origin` header, and the browser blocks the call.
 
 ## Check it
 

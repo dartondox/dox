@@ -116,9 +116,11 @@ gcloud run services logs read blog --region europe-west1 --limit 20
 gcloud beta run services logs tail blog --region europe-west1   # live, needs the log-streaming component
 ```
 
-The first log lines after a start:
+The first log lines after the first start:
 
 ```text
+Migrating: 2023_07_16_131937700_create_users_table
+Migrated: 2023_07_16_131937700_create_users_table
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
 {"level":"INFO","name":"dox","message":"Server started at http://[::]:3000 with 1 isolate (native)", ...}

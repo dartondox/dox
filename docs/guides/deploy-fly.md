@@ -140,9 +140,11 @@ fly status    # the machines and their state
 fly logs      # the app logs, live
 ```
 
-The first log lines after a start:
+The first log lines after the first start:
 
 ```text
+Migrating: 2023_07_16_131937700_create_users_table
+Migrated: 2023_07_16_131937700_create_users_table
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
 {"level":"INFO","name":"dox","message":"Server started at http://[::]:3000 with 1 isolate (native)", ...}
