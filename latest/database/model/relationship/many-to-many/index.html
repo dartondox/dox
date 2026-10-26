@@ -3333,6 +3333,8 @@
       
         
       
+        
+      
     
     
     
@@ -3576,6 +3578,49 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../../relation-queries/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-filter"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Query by relations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -3604,10 +3649,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10_6" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10_7" checked>
         
           
-          <label class="md-nav__link" for="__nav_4_10_6" id="__nav_4_10_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10_7" id="__nav_4_10_7_label" tabindex="0">
             
   
   
@@ -3625,8 +3670,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_6_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4_10_6">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_10_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3951,6 +3996,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filter-by-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter by it
+      
+    </span>
+  </a>
   
 </li>
       
@@ -6271,6 +6327,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#filter-by-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter by it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#options" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6456,6 +6523,17 @@ Do not set <code>eager: true</code> on both sides. Each side would load the othe
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="ss">"artist_song"</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="ss">"artist_song"</span><span class="p">.</span><span class="ss">"song_id"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">"song"</span><span class="p">.</span><span class="ss">"id"</span>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="k">WHERE</span><span class="w"> </span><span class="ss">"artist_song"</span><span class="p">.</span><span class="ss">"artist_id"</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="o">@</span><span class="n">artist_songartist_id_p0</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
 </span></code></pre></div>
+<h2 id="filter-by-it">Filter by it</h2>
+<p><code>whereHas()</code> keeps the artists that have a song.
+It checks the pivot table <code>artist_song</code> for you.
+It does not load the songs.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Artist</span><span class="o">&gt;</span><span class="w"> </span><span class="n">artists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Artist</span><span class="p">().</span><span class="n">whereHas</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">QueryBuilder</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="n">q</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'title'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Yesterday'</span><span class="p">);</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="p">}).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Artist</span><span class="o">&gt;</span><span class="w"> </span><span class="n">noSongs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Artist</span><span class="p">().</span><span class="n">whereDoesntHave</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span></code></pre></div>
+<p>See <a href="../../relation-queries/">Query by relations</a>.</p>
 <h2 id="options">Options</h2>
 <p>The examples are for <code>@ManyToMany(Song)</code> in the <code>Artist</code> model.</p>
 <table>
@@ -6520,28 +6598,28 @@ So <code>@DoxModel(table: 'artists')</code> does not change them.</p>
 <li><code>BlogPost</code> and <code>Tag</code> give <code>blog_post_tag</code>.</li>
 </ul>
 <h3 id="set-all-keys">Set all keys</h3>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nd">@ManyToMany</span><span class="p">(</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="n">Song</span><span class="p">,</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nl">pivotTable:</span><span class="w"> </span><span class="s1">'artist_song'</span><span class="p">,</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nl">pivotForeignKey:</span><span class="w"> </span><span class="s1">'artist_id'</span><span class="p">,</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nl">pivotRelatedForeignKey:</span><span class="w"> </span><span class="s1">'song_id'</span><span class="p">,</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="nl">localKey:</span><span class="w"> </span><span class="s1">'id'</span><span class="p">,</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="nl">relatedKey:</span><span class="w"> </span><span class="s1">'id'</span><span class="p">,</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="p">)</span>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">songs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">[];</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nd">@ManyToMany</span><span class="p">(</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="n">Song</span><span class="p">,</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nl">pivotTable:</span><span class="w"> </span><span class="s1">'artist_song'</span><span class="p">,</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="nl">pivotForeignKey:</span><span class="w"> </span><span class="s1">'artist_id'</span><span class="p">,</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="nl">pivotRelatedForeignKey:</span><span class="w"> </span><span class="s1">'song_id'</span><span class="p">,</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="nl">localKey:</span><span class="w"> </span><span class="s1">'id'</span><span class="p">,</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">  </span><span class="nl">relatedKey:</span><span class="w"> </span><span class="s1">'id'</span><span class="p">,</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="p">)</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">songs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">[];</span>
 </span></code></pre></div>
 <h3 id="onquery"><code>onQuery</code></h3>
 <p><code>onQuery</code> is a static function in the same model class.
 It gets the query of the related model and returns it.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nd">@DoxModel</span><span class="p">()</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Artist</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ArtistGenerator</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nd">@ManyToMany</span><span class="p">(</span><span class="n">Song</span><span class="p">,</span><span class="w"> </span><span class="nl">onQuery:</span><span class="w"> </span><span class="n">onlyPublished</span><span class="p">)</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">songs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">[];</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">onlyPublished</span><span class="p">(</span><span class="n">Song</span><span class="w"> </span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">q</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'song.status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'published'</span><span class="p">);</span>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nd">@DoxModel</span><span class="p">()</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Artist</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ArtistGenerator</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nd">@ManyToMany</span><span class="p">(</span><span class="n">Song</span><span class="p">,</span><span class="w"> </span><span class="nl">onQuery:</span><span class="w"> </span><span class="n">onlyPublished</span><span class="p">)</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">songs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">[];</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">onlyPublished</span><span class="p">(</span><span class="n">Song</span><span class="w"> </span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">q</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'song.status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'published'</span><span class="p">);</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="in-json">In JSON</h2>
 <ul>

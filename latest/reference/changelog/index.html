@@ -3324,6 +3324,8 @@
       
         
       
+        
+      
     
     
     
@@ -3568,6 +3570,49 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../../database/model/relation-queries/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-filter"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Query by relations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
       
@@ -3594,10 +3639,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10_6" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10_7" >
         
           
-          <label class="md-nav__link" for="__nav_4_10_6" id="__nav_4_10_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10_7" id="__nav_4_10_7_label" tabindex="0">
             
   
   
@@ -3615,8 +3660,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_10_6">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6404,6 +6449,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha16_2" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6788,6 +6844,17 @@
   
     <nav class="md-nav" aria-label="dox">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha16_4" class="md-nav__link">
@@ -7990,6 +8057,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-alpha16_2" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8374,6 +8452,17 @@
   
     <nav class="md-nav" aria-label="dox">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#300-alpha16_4" class="md-nav__link">
@@ -9317,6 +9406,10 @@
 <li><code>dart_jsonwebtoken</code> 3.</li>
 </ul>
 <h2 id="dox_builder">dox_builder</h2>
+<h3 id="unreleased">Unreleased</h3>
+<ul>
+<li>New: models get <code>setColumnValue(column, value)</code>. It sets a field by its column name, and returns false when the value is not of the field type. <code>model.increment()</code> and <code>model.decrement()</code> of dox_orm use it to set the field. The generated code needs the dox_orm that has <code>Model.setColumnValue()</code>. Run build_runner again after you update.</li>
+</ul>
 <h3 id="300-alpha16_2">3.0.0-alpha.16</h3>
 <ul>
 <li>Version bump only, to match the other packages.</li>
@@ -9488,6 +9581,10 @@
 <li><code>remember</code>, <code>pull</code>, <code>add</code>, <code>increment</code>, <code>many</code>, tags and atomic locks.</li>
 </ul>
 <h2 id="dox">dox</h2>
+<h3 id="unreleased_1">Unreleased</h3>
+<ul>
+<li><code>dox make:controller -r</code>: the <code>destroy</code> stub shows how to give a 404 when <code>delete()</code> deletes 0 rows.</li>
+</ul>
 <h3 id="300-alpha16_4">3.0.0-alpha.16</h3>
 <ul>
 <li>Version bump only, to match the other packages.</li>

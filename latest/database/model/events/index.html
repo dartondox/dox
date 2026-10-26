@@ -3332,6 +3332,8 @@
       
         
       
+        
+      
     
     
     
@@ -3745,6 +3747,49 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../relation-queries/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-filter"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Query by relations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
       
@@ -3771,10 +3816,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10_6" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10_7" >
         
           
-          <label class="md-nav__link" for="__nav_4_10_6" id="__nav_4_10_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10_7" id="__nav_4_10_7_label" tabindex="0">
             
   
   
@@ -3792,8 +3837,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_10_6">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6382,6 +6427,10 @@
 <td>the same as <code>save()</code> on a new model</td>
 </tr>
 <tr>
+<td><code>firstOrCreate()</code>, <code>updateOrCreate()</code></td>
+<td>the same as <code>save()</code> when they create or update a row</td>
+</tr>
+<tr>
 <td><code>delete()</code></td>
 <td><code>deleting</code> → <em>DELETE or soft delete</em> → <code>deleted</code></td>
 </tr>
@@ -6402,8 +6451,8 @@
 <div class="admonition warning">
 <p class="admonition-title">Query updates and deletes fire no events</p>
 <p>Events fire only on one model instance.
-<code>Post().where('draft', true).update({...})</code>, <code>Post().where(...).delete()</code>
-and <code>insertMultiple()</code> run one query and fire no events.</p>
+<code>Post().where('draft', true).update({...})</code>, <code>Post().where(...).delete()</code>,
+<code>insertMultiple()</code>, <code>upsert()</code>, <code>increment()</code> and <code>decrement()</code> run one query and fire no events.</p>
 </div>
 <h2 id="examples">Examples</h2>
 <h3 id="set-a-value-only-on-create">Set a value only on create</h3>
@@ -6415,7 +6464,8 @@ and <code>insertMultiple()</code> run one query and fire no events.</p>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <h3 id="stop-an-operation">Stop an operation</h3>
-<p>Throw <code>CancelModelEvent</code> in a before hook. The query does not run, and the call returns <code>false</code>.</p>
+<p>Throw <code>CancelModelEvent</code> in a before hook. The query does not run.
+<code>save()</code> and <code>restore()</code> return <code>false</code>. <code>delete()</code> and <code>forceDelete()</code> return <code>0</code>.</p>
 <div class="language-dart highlight"><span class="filename">lib/app/models/post/post.model.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nd">@override</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">onDeleting</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'published'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -6427,15 +6477,16 @@ and <code>insertMultiple()</code> run one query and fire no events.</p>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="n">Post</span><span class="o">?</span><span class="w"> </span><span class="n">post</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Post</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">post</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="n">NotFoundHttpException</span><span class="p">();</span>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">deleted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">delete</span><span class="p">();</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">deleted</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">deleted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">delete</span><span class="p">();</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">deleted</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="n">BadRequestException</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Unpublish the post first'</span><span class="p">);</span>
 </span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'message'</span><span class="o">:</span><span class="w"> </span><span class="s1">'deleted'</span><span class="p">};</span>
 </span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="p">}</span>
 </span></code></pre></div>
 <ul>
-<li><code>save()</code>, <code>delete()</code>, <code>forceDelete()</code> and <code>restore()</code> return <code>false</code> when a hook cancels.</li>
+<li><code>save()</code> and <code>restore()</code> return <code>false</code> when a hook cancels.</li>
+<li><code>delete()</code> and <code>forceDelete()</code> return the number of deleted rows. It is <code>0</code> when a hook cancels.</li>
 <li><code>create({...})</code> returns the unsaved model. Its <code>id</code> is <code>null</code>.</li>
 <li>Any other error from a hook is thrown to the caller.</li>
 </ul>

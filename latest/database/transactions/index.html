@@ -3106,6 +3106,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#row-locks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Row locks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#connections" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3427,6 +3438,8 @@
       
         
       
+        
+      
     
     
     
@@ -3674,6 +3687,49 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../model/relation-queries/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-filter"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Query by relations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
       
@@ -3700,10 +3756,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10_6" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10_7" >
         
           
-          <label class="md-nav__link" for="__nav_4_10_6" id="__nav_4_10_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10_7" id="__nav_4_10_7_label" tabindex="0">
             
   
   
@@ -3721,8 +3777,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_10_6">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6109,6 +6165,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#row-locks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Row locks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#connections" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6217,6 +6284,77 @@ It runs on the same connection as the outer one.</p>
 <li>On MySQL and MariaDB, a <code>CREATE</code>, <code>ALTER</code> or <code>DROP TABLE</code> inside a nested transaction
   saves the outer work and ends the savepoint. Do not change the schema there.</li>
 </ul>
+<h2 id="row-locks">Row locks</h2>
+<p>A row lock stops two requests from changing the same row at the same time.</p>
+<p>Think of a stock count. Two requests read <code>stock = 5</code> at the same time.
+Each one takes 1 and saves <code>4</code>. The right value is <code>3</code>.
+A lock makes the second request wait until the first one is done.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">buy</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">productId</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">quantity</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">transaction</span><span class="p">(()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="c1">// read the row and lock it</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="n">Product</span><span class="w"> </span><span class="n">product</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Product</span><span class="p">().</span><span class="n">lockForUpdate</span><span class="p">().</span><span class="n">findOrFail</span><span class="p">(</span><span class="n">productId</span><span class="p">);</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">product</span><span class="p">.</span><span class="n">stock</span><span class="o">!</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">quantity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">      </span><span class="k">throw</span><span class="w"> </span><span class="n">BadRequestException</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Not enough stock'</span><span class="p">);</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="c1">// change it and save it while the lock is held</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="n">product</span><span class="p">.</span><span class="n">stock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">product</span><span class="p">.</span><span class="n">stock</span><span class="o">!</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">quantity</span><span class="p">;</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">product</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">  </span><span class="p">});</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">  </span><span class="c1">// the lock ends here, when the transaction commits</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li><code>lockForUpdate()</code> adds <code>FOR UPDATE</code> to the select.
+  Other transactions that lock or change these rows wait.</li>
+<li><code>sharedLock()</code> adds a shared lock.
+  Other transactions can still read the rows, but they wait to change them.</li>
+<li>Use them with <code>find()</code>, <code>findOrFail()</code>, <code>getFirst()</code>, <code>firstOrFail()</code>, <code>get()</code>, <code>all()</code> and <code>pluck()</code>.</li>
+<li><code>count()</code>, <code>sum()</code> and the other aggregates do not lock.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Database</th>
+<th><code>lockForUpdate()</code></th>
+<th><code>sharedLock()</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Postgres</td>
+<td><code>FOR UPDATE</code></td>
+<td><code>FOR SHARE</code></td>
+</tr>
+<tr>
+<td>MySQL, MariaDB</td>
+<td><code>FOR UPDATE</code></td>
+<td><code>LOCK IN SHARE MODE</code></td>
+</tr>
+<tr>
+<td>SQLite</td>
+<td>nothing</td>
+<td>nothing</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Use a lock only inside a transaction</p>
+<p>A lock lasts until the transaction ends.
+Outside a transaction, each query commits right away, so the lock ends at once.</p>
+</div>
+<p>SQLite has no row locks, so the lock does nothing there.
+But a Dox transaction on SQLite starts with <code>BEGIN IMMEDIATE</code>.
+It takes the write lock of the whole database.
+So the same code is safe on SQLite too.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Postgres does not allow a lock with <code>groupBy()</code>, <code>distinct()</code>,
+or on the nullable side of a left join. The database throws an error then.</p>
+</div>
+<p>For one number column, <a href="../query-builder/#increment-and-decrement"><code>increment()</code></a> is simpler.
+It changes the value in one query, so it needs no lock.</p>
 <h2 id="connections">Connections</h2>
 <ul>
 <li>Postgres and MySQL use a connection pool.

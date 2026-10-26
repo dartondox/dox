@@ -3580,6 +3580,8 @@
       
         
       
+        
+      
     
     
     
@@ -3824,6 +3826,49 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../../database/model/relation-queries/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-filter"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Query by relations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
       
@@ -3850,10 +3895,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10_6" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10_7" >
         
           
-          <label class="md-nav__link" for="__nav_4_10_6" id="__nav_4_10_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10_7" id="__nav_4_10_7_label" tabindex="0">
             
   
   
@@ -3871,8 +3916,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_10_6">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6761,7 +6806,7 @@ See <a href="../../the-basic/validation/">Validation</a>.</p>
 </tr>
 <tr>
 <td><code>protected $fillable = [...]</code></td>
-<td>not needed. Only <code>@Column()</code> fields are saved.</td>
+<td><code>List&lt;String&gt; get fillable =&gt; &lt;String&gt;[...];</code></td>
 </tr>
 <tr>
 <td><code>protected $casts = ['meta' =&gt; 'array'];</code></td>
@@ -6784,6 +6829,14 @@ See <a href="../../the-basic/validation/">Validation</a>.</p>
 <td><code>await Blog().find(1)</code></td>
 </tr>
 <tr>
+<td><code>Blog::findOrFail(1)</code></td>
+<td><code>await Blog().findOrFail(1)</code> (throws <code>ModelNotFoundException</code>)</td>
+</tr>
+<tr>
+<td><code>-&gt;firstOrFail()</code></td>
+<td><code>.firstOrFail()</code></td>
+</tr>
+<tr>
 <td><code>Blog::where('age', '&gt;', 18)-&gt;get()</code></td>
 <td><code>await Blog().where('age', '&gt;', 18).get()</code></td>
 </tr>
@@ -6792,12 +6845,28 @@ See <a href="../../the-basic/validation/">Validation</a>.</p>
 <td><code>await Blog().create(&lt;String, dynamic&gt;{...})</code></td>
 </tr>
 <tr>
+<td><code>Blog::firstOrCreate([...], [...])</code></td>
+<td><code>await Blog().firstOrCreate(&lt;String, dynamic&gt;{...}, &lt;String, dynamic&gt;{...})</code></td>
+</tr>
+<tr>
+<td><code>Blog::firstOrNew([...])</code></td>
+<td><code>await Blog().firstOrNew(&lt;String, dynamic&gt;{...})</code></td>
+</tr>
+<tr>
+<td><code>Blog::updateOrCreate([...], [...])</code></td>
+<td><code>await Blog().updateOrCreate(&lt;String, dynamic&gt;{...}, &lt;String, dynamic&gt;{...})</code></td>
+</tr>
+<tr>
 <td><code>$blog-&gt;save()</code></td>
 <td><code>await blog.save()</code></td>
 </tr>
 <tr>
 <td><code>$blog-&gt;delete()</code></td>
-<td><code>await blog.delete()</code></td>
+<td><code>await blog.delete()</code> (returns the deleted rows as an <code>int</code>)</td>
+</tr>
+<tr>
+<td><code>$blog-&gt;increment('views')</code></td>
+<td><code>await blog.increment('views')</code></td>
 </tr>
 <tr>
 <td><code>Blog::withTrashed()</code></td>
@@ -6820,6 +6889,22 @@ See <a href="../../the-basic/validation/">Validation</a>.</p>
 <td><code>user.related&lt;Post&gt;('posts')?.where(...).get()</code></td>
 </tr>
 <tr>
+<td><code>User::whereHas('posts', fn ($q) =&gt; ...)</code></td>
+<td><code>User().whereHas('posts', (QueryBuilder&lt;dynamic&gt; q) { ... })</code></td>
+</tr>
+<tr>
+<td><code>orWhereHas</code>, <code>whereDoesntHave</code>, <code>orWhereDoesntHave</code></td>
+<td>the same names</td>
+</tr>
+<tr>
+<td><code>User::has('posts', '&gt;=', 3)</code></td>
+<td><code>User().has('posts', '&gt;=', 3)</code></td>
+</tr>
+<tr>
+<td><code>whereHas('posts.comments')</code></td>
+<td><code>whereHas('posts.comments')</code></td>
+</tr>
+<tr>
 <td><code>$with = ['posts']</code></td>
 <td><code>@HasMany(Post, eager: true)</code></td>
 </tr>
@@ -6829,7 +6914,11 @@ See <a href="../../the-basic/validation/">Validation</a>.</p>
 </tr>
 <tr>
 <td>local scope <code>scopeActive()</code></td>
-<td><code>onQuery: onlyActive</code> on a relation, or a static method that returns a query</td>
+<td>a static method with <code>@Scope()</code>, then <code>Blog().active()</code></td>
+</tr>
+<tr>
+<td>global scope</td>
+<td><code>@Scope(global: true)</code></td>
 </tr>
 <tr>
 <td><code>creating</code>, <code>saved</code>, <code>deleting</code> events</td>
@@ -6867,7 +6956,8 @@ See <a href="../../the-basic/validation/">Validation</a>.</p>
 </span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Every column field is nullable, because a new model has no values yet.
-Dox has no global scopes and no <code>$casts</code> list. Use the field type, <code>beforeSave</code> and <code>beforeGet</code>.
+Dox has no <code>$casts</code> list. Use the field type, a <a href="../../database/model/casts/">cast</a>, <code>beforeSave</code> or <code>beforeGet</code>.
+For scopes, see <a href="../../database/model/scopes/">Scopes</a>.
 See <a href="../../database/model/">Model</a>.</p>
 <h2 id="query-builder">Query builder</h2>
 <table>
@@ -6895,6 +6985,38 @@ See <a href="../../database/model/">Model</a>.</p>
 <td><code>.whereNull('deleted_at')</code></td>
 </tr>
 <tr>
+<td><code>-&gt;where(fn ($q) =&gt; $q-&gt;where(...)-&gt;orWhere(...))</code></td>
+<td><code>.whereGroup((QueryBuilder&lt;Blog&gt; q) { q.where(...).orWhere(...); })</code></td>
+</tr>
+<tr>
+<td><code>-&gt;orWhere(fn ($q) =&gt; ...)</code></td>
+<td><code>.orWhereGroup((QueryBuilder&lt;Blog&gt; q) { ... })</code></td>
+</tr>
+<tr>
+<td><code>-&gt;whereNot(fn ($q) =&gt; ...)</code></td>
+<td><code>.whereNot((QueryBuilder&lt;Blog&gt; q) { ... })</code></td>
+</tr>
+<tr>
+<td><code>-&gt;whereBetween('age', [18, 60])</code></td>
+<td><code>.whereBetween('age', &lt;int&gt;[18, 60])</code></td>
+</tr>
+<tr>
+<td><code>-&gt;whereColumn('a', '&gt;', 'b')</code></td>
+<td><code>.whereColumn('a', '&gt;', 'b')</code></td>
+</tr>
+<tr>
+<td><code>-&gt;whereLike('name', '%a%')</code></td>
+<td><code>.whereLike('name', '%a%')</code></td>
+</tr>
+<tr>
+<td><code>-&gt;whereExists(fn ($q) =&gt; $q-&gt;from('post')-&gt;...)</code></td>
+<td><code>.whereExists('post', (QueryBuilder&lt;Map&lt;String, dynamic&gt;&gt; q) { ... })</code></td>
+</tr>
+<tr>
+<td><code>-&gt;when($cond, fn ($q) =&gt; ...)</code></td>
+<td><code>.when(cond, (QueryBuilder&lt;Blog&gt; q) { ... })</code></td>
+</tr>
+<tr>
 <td><code>-&gt;whereRaw('lower(name) = ?', [$n])</code></td>
 <td><code>.whereRaw('lower(name) = @n', &lt;String, dynamic&gt;{'n': n})</code></td>
 </tr>
@@ -6905,6 +7027,18 @@ See <a href="../../database/model/">Model</a>.</p>
 <tr>
 <td><code>-&gt;orderBy('name', 'desc')-&gt;limit(10)-&gt;offset(20)</code></td>
 <td><code>.orderBy('name', 'desc').limit(10).offset(20)</code></td>
+</tr>
+<tr>
+<td><code>-&gt;latest()</code>, <code>-&gt;oldest()</code>, <code>-&gt;inRandomOrder()</code></td>
+<td><code>.latest()</code>, <code>.oldest()</code>, <code>.inRandomOrder()</code></td>
+</tr>
+<tr>
+<td><code>-&gt;distinct()</code></td>
+<td><code>.distinct()</code></td>
+</tr>
+<tr>
+<td><code>-&gt;having('a', '&gt;', 1)</code>, <code>-&gt;havingRaw(...)</code></td>
+<td><code>.having('a', '&gt;', 1)</code>, <code>.havingRaw(...)</code></td>
 </tr>
 <tr>
 <td><code>-&gt;join('posts', 'posts.user_id', '=', 'users.id')</code></td>
@@ -6919,6 +7053,30 @@ See <a href="../../database/model/">Model</a>.</p>
 <td><code>await ....count()</code></td>
 </tr>
 <tr>
+<td><code>-&gt;sum('a')</code>, <code>-&gt;avg('a')</code>, <code>-&gt;min('a')</code>, <code>-&gt;max('a')</code></td>
+<td><code>.sum('a')</code>, <code>.avg('a')</code>, <code>.min('a')</code>, <code>.max('a')</code></td>
+</tr>
+<tr>
+<td><code>-&gt;exists()</code>, <code>-&gt;doesntExist()</code></td>
+<td><code>.hasRows()</code>, <code>.hasNoRows()</code></td>
+</tr>
+<tr>
+<td><code>-&gt;pluck('name')</code></td>
+<td><code>.pluck('name')</code></td>
+</tr>
+<tr>
+<td><code>-&gt;pluck('name', 'id')</code></td>
+<td><code>.pluckMap('name', 'id')</code></td>
+</tr>
+<tr>
+<td><code>-&gt;value('email')</code></td>
+<td><code>.valueOf('email')</code></td>
+</tr>
+<tr>
+<td><code>-&gt;chunk(100, fn)</code>, <code>-&gt;chunkById(100, fn)</code></td>
+<td><code>.chunk(100, (rows) { ... })</code>, <code>.chunkById(100, (rows) { ... })</code></td>
+</tr>
+<tr>
 <td><code>-&gt;paginate(10)</code></td>
 <td><code>.paginate(currentPage: 1, perPage: 10)</code></td>
 </tr>
@@ -6928,11 +7086,23 @@ See <a href="../../database/model/">Model</a>.</p>
 </tr>
 <tr>
 <td><code>-&gt;update([...])</code></td>
-<td><code>.update(&lt;String, dynamic&gt;{...})</code></td>
+<td><code>.update(&lt;String, dynamic&gt;{...})</code> (returns the changed rows as an <code>int</code>)</td>
+</tr>
+<tr>
+<td><code>-&gt;increment('views', 5)</code>, <code>-&gt;decrement(...)</code></td>
+<td><code>.increment('views', 5)</code>, <code>.decrement(...)</code></td>
+</tr>
+<tr>
+<td><code>-&gt;upsert([...], ['email'], ['name'])</code></td>
+<td><code>.upsert(&lt;Map&lt;String, dynamic&gt;&gt;[...], &lt;String&gt;['email'], &lt;String&gt;['name'])</code></td>
 </tr>
 <tr>
 <td><code>-&gt;delete()</code></td>
-<td><code>.delete()</code></td>
+<td><code>.delete()</code> (returns the deleted rows as an <code>int</code>)</td>
+</tr>
+<tr>
+<td><code>-&gt;lockForUpdate()</code>, <code>-&gt;sharedLock()</code></td>
+<td><code>.lockForUpdate()</code>, <code>.sharedLock()</code></td>
 </tr>
 <tr>
 <td><code>DB::select('select ...', [$id])</code></td>
@@ -6953,6 +7123,7 @@ See <a href="../../database/model/">Model</a>.</p>
 </tbody>
 </table>
 <p>Values are always bound parameters. Names you pass are quoted. Do not pass user input as a column name or an operator.</p>
+<p><code>exists</code> and <code>value</code> are other names in Dox, because a model already has an <code>exists</code> getter, and <code>value</code> is a common column name.</p>
 <h2 id="migrations-and-schema">Migrations and schema</h2>
 <table>
 <thead>

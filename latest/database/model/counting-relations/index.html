@@ -16,7 +16,7 @@
         <link rel="prev" href="../casts/">
       
       
-        <link rel="next" href="../relationship/has-one/">
+        <link rel="next" href="../relation-queries/">
       
       
         
@@ -3332,6 +3332,8 @@
       
         
       
+        
+      
     
     
     
@@ -3675,6 +3677,49 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../relation-queries/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-filter"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Query by relations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
       
@@ -3701,10 +3746,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10_6" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10_7" >
         
           
-          <label class="md-nav__link" for="__nav_4_10_6" id="__nav_4_10_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10_7" id="__nav_4_10_7_label" tabindex="0">
             
   
   
@@ -3722,8 +3767,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_10_6">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6200,6 +6245,8 @@ The value is null when there is no related row.</p>
 <p><code>withCount()</code> is not for <code>belongsTo</code> relations. It throws an <code>UnsupportedError</code>.
 A relation from a table to the same table is not supported.</p>
 </div>
+<p>To keep only the rows that have related rows, use <code>whereHas()</code> or <code>has()</code>.
+See <a href="../relation-queries/">Query by relations</a>.</p>
 
 
 
@@ -6259,13 +6306,13 @@ A relation from a table to the same table is not supported.</p>
         
         
           
-          <a href="../relationship/has-one/" class="md-footer__link md-footer__link--next" aria-label="Next: HasOne">
+          <a href="../relation-queries/" class="md-footer__link md-footer__link--next" aria-label="Next: Query by relations">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                HasOne
+                Query by relations
               </div>
             </div>
             <div class="md-footer__button md-icon">

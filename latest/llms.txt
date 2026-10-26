@@ -64,6 +64,7 @@ The full docs as one file: https://dartondox.dev/latest/3.xllms-full.txt
 - [Query scopes](https://dartondox.dev/latest/3.xdatabase/model/scopes/)
 - [Attribute casts](https://dartondox.dev/latest/3.xdatabase/model/casts/)
 - [Counting relations](https://dartondox.dev/latest/3.xdatabase/model/counting-relations/)
+- [Query by relations](https://dartondox.dev/latest/3.xdatabase/model/relation-queries/)
 - [HasOne](https://dartondox.dev/latest/3.xdatabase/model/relationship/has-one/)
 - [HasMany](https://dartondox.dev/latest/3.xdatabase/model/relationship/has-many/)
 - [BelongsTo](https://dartondox.dev/latest/3.xdatabase/model/relationship/belongs-to/)

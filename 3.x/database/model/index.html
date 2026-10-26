@@ -3331,6 +3331,8 @@
       
         
       
+        
+      
     
     
     
@@ -3576,6 +3578,49 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="relation-queries/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-filter"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Query by relations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
       
@@ -3602,10 +3647,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10_6" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_10_7" >
         
           
-          <label class="md-nav__link" for="__nav_4_10_6" id="__nav_4_10_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10_7" id="__nav_4_10_7_label" tabindex="0">
             
   
   
@@ -3623,8 +3668,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_10_6">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_10_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6155,6 +6200,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#find-or-create" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Find or create
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#increment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Increment
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -6510,7 +6577,7 @@ The function gets a map and returns the value.</p>
 </span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="n">found</span><span class="o">?</span><span class="p">.</span><span class="n">slug</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
 </span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="kd">await</span><span class="w"> </span><span class="n">found</span><span class="o">?</span><span class="p">.</span><span class="n">save</span><span class="p">();</span><span class="w"> </span><span class="c1">// slug is now NULL in the database</span>
 </span><span id="__span-11-15"><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>
-</span><span id="__span-11-16"><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="c1">// create from a map</span>
+</span><span id="__span-11-16"><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="c1">// create from a map: returns the new model as it is in the table</span>
 </span><span id="__span-11-17"><a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a><span class="n">Blog</span><span class="w"> </span><span class="n">created</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">create</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
 </span><span id="__span-11-18"><a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a><span class="w">  </span><span class="s1">'title'</span><span class="o">:</span><span class="w"> </span><span class="s1">'My first blog'</span><span class="p">,</span>
 </span><span id="__span-11-19"><a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="w">  </span><span class="s1">'status'</span><span class="o">:</span><span class="w"> </span><span class="s1">'draft'</span><span class="p">,</span>
@@ -6525,10 +6592,10 @@ The function gets a map and returns the value.</p>
 <li>On update, a field is set to <code>NULL</code> only when it had a value before
   (loaded from the database, or saved).
   Fields that were not loaded, for example with <code>select()</code>, are not changed.</li>
-<li><code>save()</code> returns <code>false</code> when a <a href="events/">model event</a> cancels it.</li>
+<li><code>save()</code> returns <code>true</code> when it saved, and <code>false</code> when a <a href="events/">model event</a> cancels it.</li>
 </ul>
 <h3 id="mass-assignment">Mass assignment</h3>
-<p><code>create()</code>, <code>insert()</code> and <code>update()</code> take any key of the map.
+<p><code>create()</code>, <code>insert()</code>, <code>update()</code>, <code>upsert()</code> and the find or create methods take any key of the map.
 So <code>User().create(req.body)</code> with <code>{"is_admin": 1}</code> makes an admin.
 Set <code>fillable</code> or <code>guarded</code> to stop this.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nd">@DoxModel</span><span class="p">()</span>
@@ -6547,59 +6614,106 @@ Set <code>fillable</code> or <code>guarded</code> to stop this.</p>
 <li>Both lists are empty by default. Then every key is taken.</li>
 <li><code>save()</code> is not changed. Fields you set in code are always saved.</li>
 </ul>
-<h2 id="delete">Delete</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1">// delete a record</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="o">?</span><span class="p">.</span><span class="n">delete</span><span class="p">();</span><span class="w"> </span><span class="c1">// deletes only this record</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="c1">// force delete</span>
-</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">trashed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">withTrash</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="kd">await</span><span class="w"> </span><span class="n">trashed</span><span class="o">?</span><span class="p">.</span><span class="n">forceDelete</span><span class="p">();</span><span class="w"> </span><span class="c1">// deletes the row, also with softDelete</span>
-</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>
-</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="c1">// restore</span>
-</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">deleted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">withTrash</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="kd">await</span><span class="w"> </span><span class="n">deleted</span><span class="o">?</span><span class="p">.</span><span class="n">restore</span><span class="p">();</span><span class="w"> </span><span class="c1">// sets deleted_at back to NULL</span>
+<h3 id="find-or-create">Find or create</h3>
+<p>These methods find a row by the first map.
+When there is no row, they use both maps.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1">// find the user, or create it</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">firstOrCreate</span><span class="p">(</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="s1">'ann@example.com'</span><span class="p">},</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Ann'</span><span class="p">},</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="p">);</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="c1">// find the user, or make a new model that is not saved yet</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="n">User</span><span class="w"> </span><span class="n">other</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">firstOrNew</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="s1">'bob@example.com'</span><span class="p">});</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">other</span><span class="p">.</span><span class="n">exists</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
+</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="p">}</span>
+</span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>
+</span><span id="__span-13-13"><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="c1">// update the user, or create it</span>
+</span><span id="__span-13-14"><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="n">User</span><span class="w"> </span><span class="n">updated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">updateOrCreate</span><span class="p">(</span>
+</span><span id="__span-13-15"><a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a><span class="w">  </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="s1">'ann@example.com'</span><span class="p">},</span>
+</span><span id="__span-13-16"><a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a><span class="w">  </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Ann Lee'</span><span class="p">},</span>
+</span><span id="__span-13-17"><a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a><span class="p">);</span>
 </span></code></pre></div>
+<p><code>firstOrCreate()</code> and <code>updateOrCreate()</code> use <code>create()</code> and <code>save()</code>, so the <a href="events/">model events</a> run.
+<code>firstOrNew()</code> does not save, so no event runs.
+See <a href="../query-builder/#firstorcreate-firstornew-and-updateorcreate">Query builder</a>.</p>
+<h3 id="increment">Increment</h3>
+<p><code>increment()</code> and <code>decrement()</code> change a number column in one query.
+On a model from the table, they change only the row of that model.
+The field of the model gets the new value too.
+This example has an <code>int? views</code> column field on <code>Blog</code>.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="o">!</span><span class="p">.</span><span class="n">increment</span><span class="p">(</span><span class="s1">'views'</span><span class="p">);</span><span class="w">      </span><span class="c1">// views + 1</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">increment</span><span class="p">(</span><span class="s1">'views'</span><span class="p">,</span><span class="w"> </span><span class="m">5</span><span class="p">);</span><span class="w">    </span><span class="c1">// views + 5</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">decrement</span><span class="p">(</span><span class="s1">'views'</span><span class="p">);</span><span class="w">       </span><span class="c1">// views - 1</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="n">print</span><span class="p">(</span><span class="n">blog</span><span class="p">.</span><span class="n">views</span><span class="p">);</span>
+</span></code></pre></div>
+<ul>
+<li>They return the number of changed rows: 1, or 0 when the row is not there.</li>
+<li>They fire no model events and do not set <code>updated_at</code>.</li>
+<li>A third argument sets other columns in the same query:
+  <code>increment('views', 1, &lt;String, dynamic&gt;{'status': 'hot'})</code>.
+  Keys that <code>fillable</code> and <code>guarded</code> do not allow are dropped.</li>
+</ul>
+<h2 id="delete">Delete</h2>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1">// delete a record</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="o">!</span><span class="p">.</span><span class="n">delete</span><span class="p">();</span><span class="w"> </span><span class="c1">// deletes only this record</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="c1">// force delete</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">trashed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">withTrash</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="kd">await</span><span class="w"> </span><span class="n">trashed</span><span class="o">?</span><span class="p">.</span><span class="n">forceDelete</span><span class="p">();</span><span class="w"> </span><span class="c1">// deletes the row, also with softDelete</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="c1">// restore</span>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">deleted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">withTrash</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="kd">await</span><span class="w"> </span><span class="n">deleted</span><span class="o">?</span><span class="p">.</span><span class="n">restore</span><span class="p">();</span><span class="w"> </span><span class="c1">// sets deleted_at back to NULL</span>
+</span></code></pre></div>
+<ul>
+<li><code>delete()</code> and <code>forceDelete()</code> return the number of deleted rows.</li>
+<li>They return 1 when the row was deleted.</li>
+<li>They return 0 when the row was not there, or when a <a href="events/">model event</a> cancels.</li>
+</ul>
 <p><code>save()</code>, <code>delete()</code>, <code>forceDelete()</code> and <code>restore()</code> fire <a href="events/">model events</a>.</p>
 <h2 id="convert-to-a-map-or-json">Convert to a map or JSON</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;?</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blog</span><span class="o">?</span><span class="p">.</span><span class="n">toMap</span><span class="p">();</span><span class="w">  </span><span class="c1">// all columns and computed values</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;?</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blog</span><span class="o">?</span><span class="p">.</span><span class="n">toJson</span><span class="p">();</span><span class="w"> </span><span class="c1">// the same, without hidden fields</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;?</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blog</span><span class="o">?</span><span class="p">.</span><span class="n">toMap</span><span class="p">(</span><span class="nl">original:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span><span class="w"> </span><span class="c1">// the raw database row</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;?</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blog</span><span class="o">?</span><span class="p">.</span><span class="n">toMap</span><span class="p">();</span><span class="w">  </span><span class="c1">// all columns and computed values</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;?</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blog</span><span class="o">?</span><span class="p">.</span><span class="n">toJson</span><span class="p">();</span><span class="w"> </span><span class="c1">// the same, without hidden fields</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;?</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blog</span><span class="o">?</span><span class="p">.</span><span class="n">toMap</span><span class="p">(</span><span class="nl">original:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span><span class="w"> </span><span class="c1">// the raw database row</span>
 </span></code></pre></div>
 <p><code>jsonEncode(blog)</code> uses <code>toJson()</code>.
 So you can return a model, or a list of models, from a controller.</p>
 <h3 id="hide-fields">Hide fields</h3>
 <p>Fields in <code>hidden</code> are left out of <code>toJson()</code>.
 Use the column names.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nd">@DoxModel</span><span class="p">()</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">User</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">UserGenerator</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">hidden</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'password'</span><span class="p">,</span><span class="w"> </span><span class="s1">'remember_token'</span><span class="p">];</span>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nd">@DoxModel</span><span class="p">()</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">User</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">UserGenerator</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">hidden</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'password'</span><span class="p">,</span><span class="w"> </span><span class="s1">'remember_token'</span><span class="p">];</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <h3 id="computed-values">Computed values</h3>
 <p>A computed value is a getter that is added to <code>toJson()</code> and <code>toMap()</code>.
 Add <code>@Computed()</code> to the getter, then run <code>dart run build_runner build</code>.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nd">@DoxModel</span><span class="p">()</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">User</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">UserGenerator</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'first_name'</span><span class="p">)</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">firstName</span><span class="p">;</span>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>
-</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'last_name'</span><span class="p">)</span>
-</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">lastName</span><span class="p">;</span>
-</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>
-</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="w">  </span><span class="nd">@Computed</span><span class="p">()</span><span class="w"> </span><span class="c1">// json key: full_name</span>
-</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">fullName</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'</span><span class="si">$</span><span class="n">firstName</span><span class="s1"> </span><span class="si">$</span><span class="n">lastName</span><span class="s1">'</span><span class="p">;</span>
-</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>
-</span><span id="__span-16-12"><a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="w">  </span><span class="nd">@Computed</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'initials'</span><span class="p">)</span><span class="w"> </span><span class="c1">// custom json key</span>
-</span><span id="__span-16-13"><a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">shortName</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'</span><span class="si">${</span><span class="n">firstName</span><span class="o">?</span><span class="p">[</span><span class="m">0</span><span class="p">]</span><span class="si">}${</span><span class="n">lastName</span><span class="o">?</span><span class="p">[</span><span class="m">0</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">;</span>
-</span><span id="__span-16-14"><a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nd">@DoxModel</span><span class="p">()</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">User</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">UserGenerator</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'first_name'</span><span class="p">)</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">firstName</span><span class="p">;</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'last_name'</span><span class="p">)</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">lastName</span><span class="p">;</span>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>
+</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">  </span><span class="nd">@Computed</span><span class="p">()</span><span class="w"> </span><span class="c1">// json key: full_name</span>
+</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">fullName</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'</span><span class="si">$</span><span class="n">firstName</span><span class="s1"> </span><span class="si">$</span><span class="n">lastName</span><span class="s1">'</span><span class="p">;</span>
+</span><span id="__span-18-11"><a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>
+</span><span id="__span-18-12"><a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="w">  </span><span class="nd">@Computed</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'initials'</span><span class="p">)</span><span class="w"> </span><span class="c1">// custom json key</span>
+</span><span id="__span-18-13"><a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">shortName</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'</span><span class="si">${</span><span class="n">firstName</span><span class="o">?</span><span class="p">[</span><span class="m">0</span><span class="p">]</span><span class="si">}${</span><span class="n">lastName</span><span class="o">?</span><span class="p">[</span><span class="m">0</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">;</span>
+</span><span id="__span-18-14"><a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="p">}</span>
 </span></code></pre></div>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="n">print</span><span class="p">(</span><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">toJson</span><span class="p">());</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="c1">// {id: 1, first_name: John, last_name: Wick, ..., full_name: John Wick, initials: JW}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="n">print</span><span class="p">(</span><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">toJson</span><span class="p">());</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="c1">// {id: 1, first_name: John, last_name: Wick, ..., full_name: John Wick, initials: JW}</span>
 </span></code></pre></div>
 <ul>
 <li>The default key is the getter name in snake_case (<code>fullName</code> becomes <code>full_name</code>).</li>
@@ -6613,18 +6727,18 @@ Add <code>@Computed()</code> to the getter, then run <code>dart run build_runner
 <h2 id="new-query">New query</h2>
 <p>A model object keeps the parts of its query (<code>where</code>, <code>orderBy</code>, ...).
 <code>query()</code> gives a new, empty model, so you can start another query.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Blog</span><span class="p">();</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">&gt;</span><span class="w"> </span><span class="n">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'active'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
-</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="c1">// a new query, without the where above</span>
-</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">&gt;</span><span class="w"> </span><span class="n">deleted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">query</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'deleted'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Blog</span><span class="p">();</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">&gt;</span><span class="w"> </span><span class="n">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'active'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="c1">// a new query, without the where above</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">&gt;</span><span class="w"> </span><span class="n">deleted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">query</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'deleted'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
 </span></code></pre></div>
 <h2 id="debug">Debug</h2>
 <p><code>debug(true)</code> prints the SQL of this model in the terminal.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Blog</span><span class="p">();</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="n">blog</span><span class="p">.</span><span class="n">debug</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="n">blog</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">;</span>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Blog</span><span class="p">();</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="n">blog</span><span class="p">.</span><span class="n">debug</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="n">blog</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">;</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
 </span></code></pre></div>
 <h2 id="relationships">Relationships</h2>
 <p>A model can load related models.
