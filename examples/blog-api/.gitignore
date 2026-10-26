@@ -2,9 +2,11 @@
 .DS_Store
 .env
 bin/server
-storage/
+storage/cache
 build/
 *.sqlite
-*.sqlite-*
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
 # made by `dart run build_runner build`
 *.g.dart

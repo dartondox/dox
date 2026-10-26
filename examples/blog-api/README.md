@@ -24,10 +24,13 @@ The app uses SQLite. You need no database server and no Docker.
 ```bash
 cp .env.example .env
 dart pub get
+dart run ../../packages/dox-cli/bin/dox.dart key:generate
 dart run build_runner build --delete-conflicting-outputs
 dart analyze --fatal-infos
 dart test --concurrency=1
 ```
+
+`.env.example` has an empty `APP_KEY`. `key:generate` puts a new key in `.env`.
 
 The tests start the app on `APP_PORT` (3000) and call its routes.
 `test/http_test.dart` is the test of step 6.
@@ -41,3 +44,7 @@ CI runs these steps on every push, so the code of the tutorial keeps working.
 dart run bin/server.dart
 curl http://localhost:3000/api/ping
 ```
+
+The app has the same layout as a new `dox create` project.
+It also has the queue (`bin/queue.dart`), the scheduler (`bin/schedule.dart`)
+and the seeders (`bin/seed.dart`, `db/seeders/`). The tutorial does not change them.

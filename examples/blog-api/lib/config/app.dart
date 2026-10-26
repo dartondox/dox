@@ -42,7 +42,7 @@ AppConfig appConfig = AppConfig(
 
   /// Container
   /// -------------------------------
-  /// Every @Inject class, router and service of the app,
+  /// Every @Inject class, router and provider of the app,
   /// from lib/generated/container.g.dart (made by build_runner).
   container: registerContainer,
 
