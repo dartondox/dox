@@ -288,6 +288,27 @@ void main() {
       )).expectStatus(419);
     });
 
+    test('the token in the query string does not pass', () async {
+      DoxTestClient browser = client.withSession();
+      TestResponse page = await browser.get('/form');
+      String token = page.cookies[CsrfMiddleware.cookieName]!;
+      // only the session cookie: no automatic X-XSRF-TOKEN header
+      DoxTestClient noHeader = client.withCookies(<String, String>{
+        'dox_session': browser.cookies['dox_session']!,
+      });
+      (await noHeader.post(
+        '/save?_token=$token',
+        body: <String, dynamic>{},
+      )).expectStatus(419);
+      (await noHeader.post(
+        '/save',
+        body: '_token=$token',
+        headers: <String, String>{
+          'content-type': 'application/x-www-form-urlencoded',
+        },
+      )).expectStatus(200);
+    });
+
     test('excluded paths are not checked', () async {
       (await client.post(
         '/api/save',

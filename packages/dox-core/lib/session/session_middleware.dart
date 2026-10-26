@@ -190,8 +190,10 @@ class CsrfMiddleware implements IDoxNextMiddleware {
 
   bool _excluded(String path) => PathPattern.any(except, path);
 
+  /// the token from the body or a header. Not from the query string:
+  /// a url ends up in logs, the history and the `Referer` header.
   static String? _given(DoxRequest req) {
-    Object? field = req.input('_token');
+    Object? field = req.body['_token'];
     if (field is String) return field;
     return req.header('X-CSRF-TOKEN') ?? req.header('X-XSRF-TOKEN');
   }

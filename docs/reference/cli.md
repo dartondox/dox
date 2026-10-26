@@ -84,7 +84,7 @@ What it does:
 1. When `pubspec.yaml` contains `build_runner`: runs `dart run build_runner build`. Stops with exit code 1 when it fails.
 2. Runs `dart build cli --target bin/server.dart --output build`.
 3. When `bin/queue.dart` or `bin/schedule.dart` exists: builds it the same way, to `build/bundle/bin/queue` and `build/bundle/bin/schedule`.
-4. Deletes the old `build/bundle/db`, then copies `db/` to `build/bundle/db`. It leaves out SQLite files (`*.sqlite`, `*.sqlite3`, `*.db`, and their `-wal`, `-shm` and `-journal` files), so your local data does not go to production.
+4. Deletes the old `build/bundle/db`, then copies `db/` to `build/bundle/db`. It leaves out SQLite files (`*.sqlite`, `*.sqlite3`, `*.db`, and their `-wal`, `-shm`, `-journal` and `.lock` files), so your local data does not go to production.
 5. Copies `.env.example` to `build/bundle/.env.example`.
 6. Prints `[Dox] Built build/bundle. Run it with: cd build/bundle && ./bin/server`.
 

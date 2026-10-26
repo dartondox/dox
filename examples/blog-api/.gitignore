@@ -10,3 +10,4 @@ build/
 *.sqlite-wal
 # made by `dart run build_runner build`
 *.g.dart
+*.sqlite.lock

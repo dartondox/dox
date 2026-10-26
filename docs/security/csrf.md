@@ -30,7 +30,7 @@ Now every `POST`, `PUT`, `PATCH` and `DELETE` request must send the token. A req
 
 Dox reads the token from one of these places:
 
-- the `_token` field of the body (or of the query string)
+- the `_token` field of the body (not the query string: a url ends up in logs and in the `Referer` header)
 - the `X-CSRF-TOKEN` header
 - the `X-XSRF-TOKEN` header
 
