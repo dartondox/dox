@@ -6,7 +6,7 @@ String _getSample(String className, String filename) {
   return '''
 import 'package:dox_core/dox_core.dart';
 
-class ${className}Middleware extends IDoxMiddleware {
+class ${className}Middleware implements IDoxMiddleware {
   @override
   dynamic handle(IDoxRequest req) {
     /// add your logic here

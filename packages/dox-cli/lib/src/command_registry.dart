@@ -419,7 +419,8 @@ class CommandRegistry {
       helpInfo: 'db:seed [--class=<name>]',
       description: 'Run DatabaseSeeder, or another seeder with --class',
       category: CommandCategory.database,
-      maxArgs: 1,
+      // `--class=UserSeeder` is one argument, `--class UserSeeder` is two
+      maxArgs: 2,
       function: (args) async {
         await _seed(args);
       },

@@ -139,10 +139,21 @@ void main(List<String> args) {
       expect(job, contains("import 'package:dox_queue/dox_queue.dart';"));
       expect(job, contains('@Job()\nclass SendWelcomeEmail extends DoxJob {'));
       expect(job, contains('  SendWelcomeEmail();'));
-      String entry = File('bin/queue.dart').readAsStringSync();
-      expect(entry, contains("import 'package:my_app/config/app.dart';"));
-      expect(entry, contains("import 'package:my_app/generated/jobs.g.dart';"));
-      expect(entry, contains('QueueWorker(jobs: jobRegistry, app: appConfig)'));
+      expect(job, contains('await SendWelcomeEmail().dispatch();'));
+      // the same file as bin/queue.dart in the app template
+      expect(File('bin/queue.dart').readAsStringSync(), '''
+import 'dart:io';
+
+import 'package:dox_queue/dox_queue.dart';
+import 'package:my_app/config/app.dart';
+
+/// run queued jobs: `dart run bin/queue.dart [work] [flags]`, or `dox queue:work`.
+/// - work: run jobs until Ctrl+C or SIGTERM.
+/// - `failed`, `retry <id|all>`, `forget <id>`, `flush`: manage failed jobs.
+Future<void> main(List<String> args) async {
+  exitCode = await QueueWorker(app: appConfig).run(args);
+}
+''');
     });
 
     test(

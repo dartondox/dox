@@ -7,7 +7,7 @@ String _getSample(String className) {
   return '''
 import 'package:dox_queue/dox_queue.dart';
 
-/// Dispatch: await $className(userId: 1).dispatch();
+/// Dispatch: await $className().dispatch();
 /// Run `dart run build_runner build` after you change the fields.
 @Job()
 class $className extends DoxJob {
@@ -28,12 +28,12 @@ import 'dart:io';
 
 import 'package:dox_queue/dox_queue.dart';
 import 'package:$package/config/app.dart';
-import 'package:$package/generated/jobs.g.dart';
 
-/// Runs the queue worker: `dox queue:work`, or
-/// `dart run bin/queue.dart work [--queue=default] [--concurrency=1]`.
+/// run queued jobs: `dart run bin/queue.dart [work] [flags]`, or `dox queue:work`.
+/// - work: run jobs until Ctrl+C or SIGTERM.
+/// - `failed`, `retry <id|all>`, `forget <id>`, `flush`: manage failed jobs.
 Future<void> main(List<String> args) async {
-  exitCode = await QueueWorker(jobs: jobRegistry, app: appConfig).run(args);
+  exitCode = await QueueWorker(app: appConfig).run(args);
 }
 ''';
 }
