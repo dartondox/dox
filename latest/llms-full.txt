@@ -20083,6 +20083,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
+### 3.0.0-alpha.16
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.15
 
 - Version bump only, to match the other packages.
@@ -20154,6 +20158,10 @@ What changed in each package, newest first. This page is made from the
 - See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
 
 ## dox_auth
+
+### 3.0.0-alpha.16
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.15
 
@@ -20237,6 +20245,10 @@ What changed in each package, newest first. This page is made from the
 - `dart_jsonwebtoken` 3.
 
 ## dox_builder
+
+### 3.0.0-alpha.16
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.15
 
@@ -20326,6 +20338,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### 3.0.0-alpha.16
+
+- Change: uses ioredis `^3.0.0`, the first stable ioredis release.
+
 ### 3.0.0-alpha.15
 
 - Version bump only, to match the other packages.
@@ -20402,6 +20418,10 @@ What changed in each package, newest first. This page is made from the
 - `remember`, `pull`, `add`, `increment`, `many`, tags and atomic locks.
 
 ## dox
+
+### 3.0.0-alpha.16
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.15
 
@@ -20492,6 +20512,10 @@ What changed in each package, newest first. This page is made from the
 - Generated models import `package:dox_orm/dox_orm.dart`.
 
 ## dox_core
+
+### 3.0.0-alpha.16
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.15
 
@@ -20697,6 +20721,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_openapi
 
+### 3.0.0-alpha.16
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.15
 
 - Version bump only, to match the other packages.
@@ -20772,6 +20800,10 @@ What changed in each package, newest first. This page is made from the
 - Output as JSON and YAML, write files, serve `/openapi.json`, `/openapi.yaml` and `/docs`.
 
 ## dox_validation
+
+### 3.0.0-alpha.16
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.15
 
