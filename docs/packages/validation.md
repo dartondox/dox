@@ -5,6 +5,7 @@ icon: lucide/list-checks
 # Validation
 
 `dox_validation` checks input and gives you typed Dart objects.
+
 It has two parts:
 
 1. **DTOs**: a class with `@Dto()` and rule annotations. A generator writes the checks. Use this for almost everything.
@@ -260,6 +261,9 @@ createUser.safeParse(input, messages: MessageResolver(messages: <String, String>
   'email.required': 'We need your email',
 }));
 ```
+
+A resolver for one call is used in place of the global one.
+Codes that it does not have get the built-in text, not the global text.
 
 For other languages, extend `MessageResolver` and override `resolve()`.
 See [Messages](../the-basic/validation.md#messages).

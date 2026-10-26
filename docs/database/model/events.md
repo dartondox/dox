@@ -160,8 +160,8 @@ class UserObserver extends ModelObserver<User> {
   UserObserver(this.mailer);
 
   @override
-  Future<void> onCreated(User user) async {
-    await mailer.sendWelcome(user.email!);
+  Future<void> onCreated(User model) async {
+    await mailer.sendWelcome(model.email!);
   }
 }
 ```

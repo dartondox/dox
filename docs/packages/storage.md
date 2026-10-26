@@ -10,6 +10,8 @@ This page shows how to save and read files with `dox_storage`.
 
 ## In a Dox app
 
+A new app from `dox create` already has steps 1 to 3. Go to step 4.
+
 ### 1. Install
 
 ```bash
@@ -20,8 +22,10 @@ dart pub add dox_storage
 
 ```dart title="lib/config/storage.dart"
 import 'package:dox_storage/dox_storage.dart';
+import 'package:my_app/config/env.dart';
 
 StorageConfig storageConfig = StorageConfig(
+  defaultDisk: env.storageDisk, // STORAGE_DISK in .env, default 'local'
   disks: <String, Map<String, dynamic>>{
     'local': <String, dynamic>{'driver': 'local', 'root': 'storage'},
   },
@@ -41,7 +45,7 @@ class AppStorageProvider extends StorageProvider {
 }
 ```
 
-Run `dart run build_runner build`. A new app from `dox create` already has these two files.
+Run `dart run build_runner build`.
 
 ### 4. Use it
 

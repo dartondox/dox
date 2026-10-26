@@ -88,6 +88,7 @@ A row lock stops two requests from changing the same row at the same time.
 Think of a stock count. Two requests read `stock = 5` at the same time.
 Each one takes 1 and saves `4`. The right value is `3`.
 A lock makes the second request wait until the first one is done.
+This example has an `int? stock` column field on a `Product` model.
 
 ```dart
 Future<void> buy(int productId, int quantity) async {

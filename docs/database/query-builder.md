@@ -189,11 +189,12 @@ await Actor().where('age', '>=', 18).chunk(100, (List<Actor> actors) {
   for (Actor actor in actors) {
     print(actor.name);
   }
+  return true; // go on to the next page
 });
 ```
 
 - The function gets one page of rows.
-- Return `false` from the function to stop. Then `chunk()` returns `false`.
+- Return `true` to go on, or `false` to stop. After a stop, `chunk()` returns `false`.
   Otherwise it returns `true`.
 - Without `orderBy()`, `chunk()` orders by the primary key.
   So each page has other rows.
@@ -207,6 +208,7 @@ await Actor().where('age', '>', 100).chunkById(100, (List<Actor> actors) async {
   for (Actor actor in actors) {
     await actor.delete();
   }
+  return true;
 });
 ```
 
@@ -229,7 +231,7 @@ dynamic newest = await Actor().max('created_at');
 - `sum()` returns a `num`. It is an `int` or a `double`, by driver. Use `toInt()` or `toDouble()`.
 - `avg()` returns a `double`.
 - `min()` and `max()` return the value as the driver gives it.
-  A date is an ISO string. A Postgres or MySQL decimal is a `String`.
+  A date is an ISO string. A Postgres `numeric` is a `String`. A MySQL `DECIMAL` is a `double`.
 - Like `count()`, they use `where`, `join` and soft deletes.
   They ignore `limit`, `offset` and `orderBy`.
 - After `distinct()`, `sum()` and `avg()` use only the distinct values.
@@ -697,6 +699,8 @@ print(row['id']);
   Postgres and SQLite read the row with `RETURNING *`. MySQL reads it again by its id.
 - It works with any primary key type, for example a uuid string.
 - On a model with [events](model/events.md), `create` calls `save()`, so the hooks run.
+- On a model without events, `create` does not set `created_at` and `updated_at`.
+  Put them in the map, or use `save()`.
 
 !!! note "MySQL and a table without an auto increment id"
     MySQL can not read the new row when the table has no auto increment id,
@@ -898,6 +902,7 @@ await Actor().truncate(resetId: false); // keep the id counter on Postgres and S
 ```
 
 On Postgres it runs `TRUNCATE TABLE ... RESTART IDENTITY CASCADE`.
+On MySQL it runs `TRUNCATE TABLE`, and MySQL always resets the id counter.
 On SQLite it runs `DELETE FROM`.
 
 ## Debug

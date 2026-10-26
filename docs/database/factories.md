@@ -5,6 +5,7 @@ icon: lucide/factory
 # Factories
 
 A factory makes models with sample data.
+
 Use it in tests and in [seeders](seeders.md).
 
 ## Create a factory
@@ -13,7 +14,8 @@ Use it in tests and in [seeders](seeders.md).
 dox make:factory User
 ```
 
-This makes `db/factories/user.factory.dart`:
+This makes `db/factories/user.factory.dart`.
+Set the default values in `definition()`. For example:
 
 ```dart title="db/factories/user.factory.dart"
 import 'package:dox_orm/factory.dart';
@@ -56,6 +58,7 @@ So [model events](model/events.md) run, and each model gets its id.
 ## State
 
 `state()` changes each model after `definition()`.
+The examples below use a `bool? isAdmin` and a `String? role` field on `User`.
 
 ```dart
 User admin = await UserFactory()

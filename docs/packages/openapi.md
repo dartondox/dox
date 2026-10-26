@@ -5,6 +5,7 @@ icon: lucide/book-open
 # OpenAPI
 
 This page shows how Dox makes OpenAPI 3.1 docs for your API, and how to change them.
+
 You write no docs code. You get a [Scalar](https://github.com/scalar/scalar) docs page at `/docs`, plus `/openapi.json` and `/openapi.yaml`.
 
 The docs come from three places:
@@ -38,6 +39,8 @@ OpenApiConfig openApi = OpenApiConfig(
 ```
 
 ```dart title="lib/config/app.dart"
+import 'package:my_app/config/openapi.dart';
+
 AppConfig appConfig = AppConfig(
   openApi: openApi,
   // ...
@@ -319,7 +322,8 @@ dox openapi:generate              # storage/openapi/openapi.json and openapi.yam
 dox openapi:generate docs/api     # another folder
 ```
 
-It runs `bin/openapi.dart` of your app:
+It runs `bin/openapi.dart` of your app.
+A new app does not have this file. Make it with this code:
 
 ```dart title="bin/openapi.dart"
 import 'dart:io';

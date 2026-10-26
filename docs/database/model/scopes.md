@@ -5,6 +5,7 @@ icon: lucide/filter
 # Query scopes
 
 A scope is a query part that you use again and again, like "only active users".
+
 You write it once in the model. Then you call it like a query method.
 
 ## Local scopes

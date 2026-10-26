@@ -51,48 +51,56 @@ Put the connections in `lib/config/database.dart`.
 `connection` is the name of the default connection.
 
 ```dart title="lib/config/database.dart"
-import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart';
+import 'package:my_app/config/env.dart';
 
 DatabaseConfig databaseConfig = DatabaseConfig(
   connection: env.dbConnection,
   connections: <String, ConnectionConfig>{
     'postgres': ConnectionConfig(
       driver: Driver.postgres,
-      host: 'localhost',
-      port: 5432,
-      user: 'postgres',
-      password: 'postgres',
-      database: 'postgres',
+      host: env.dbHost,
+      port: env.dbPort ?? 5432,
+      user: env.dbUsername,
+      password: env.dbPassword,
+      database: env.dbName,
       extra: <String, dynamic>{'maxConnectionCount': 10},
-      debug: false,
+      debug: env.isDevelopment,
     ),
     'mysql': ConnectionConfig(
       driver: Driver.mysql, // also for MariaDB
-      host: 'localhost',
-      port: 3306,
-      user: 'root',
-      password: 'password',
-      database: 'dox',
+      host: env.dbHost,
+      port: env.dbPort ?? 3306,
+      user: env.dbUsername,
+      password: env.dbPassword,
+      database: env.dbName,
       extra: <String, dynamic>{'maxConnectionCount': 10},
-      debug: false,
+      debug: env.isDevelopment,
     ),
     'sqlite': ConnectionConfig(
       driver: Driver.sqlite,
-      database: 'storage/app.db', // file path, or ':memory:'
-      debug: false,
+      database: env.dbName, // file path, like db/dox.sqlite, or ':memory:'
+      debug: env.isDevelopment,
     ),
   },
 );
 ```
 
-- `debug: true` prints each SQL query and its values.
+`env` is the typed env of the app, in `lib/config/env.dart`.
+Change `my_app` to the name of your app in `pubspec.yaml`.
+
+- `debug: true` prints each SQL query and its values. The app template turns it on only in development.
 - `user`, `password`, `host` and `port` are not used by SQLite.
 
-Start the ORM in a provider. Each isolate runs the provider.
+Start the ORM in a provider. The app template already has this file.
+Each isolate runs the provider.
 Isolates with the same settings share one pool, so `maxConnectionCount` is for the whole process.
 
 ```dart title="lib/providers/orm_provider.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_orm/dox_orm.dart';
+import 'package:my_app/config/database.dart';
+
 class ORMProvider extends DoxProvider {
   @override
   Future<void> setup() async {
@@ -107,6 +115,9 @@ class ORMProvider extends DoxProvider {
 }
 ```
 
+Dox finds every `DoxProvider` class on its own.
+After you add a provider, run `dart run build_runner build`.
+
 ### `.env`
 
 The app config and the [migration](migration.md) commands read these values.
@@ -115,7 +126,7 @@ The app config and the [migration](migration.md) commands read these values.
 DB_CONNECTION=postgres # postgres, mysql or sqlite
 DB_HOST=localhost
 DB_PORT=5432           # 3306 for mysql
-DB_NAME=dox            # for sqlite: the file path, like storage/app.db
+DB_NAME=dox            # for sqlite: the file path, like db/dox.sqlite
 DB_USERNAME=postgres
 DB_PASSWORD=postgres
 ```
@@ -200,8 +211,8 @@ DATABASE_URL=mysql://app:secret@/app?socket=/var/run/mysqld/mysqld.sock
 | `threads` | Postgres, MySQL | `1` | Rust threads of the native driver. |
 | `maxConnectionAge` | MySQL | 12 hours | A connection older than this is opened again. |
 | `preparedStatementCacheSize` | MySQL, SQLite | `100` | Prepared statements kept per connection. |
-| `sslMode` | Postgres | `disable` | TLS mode: `disable`, `prefer`, `require` or `verify-full`. |
-| `sslRootCert` | Postgres | none | Path of a PEM file with the CA certificates to trust for `verify-full`. |
+| `sslMode` | Postgres | `disable` | TLS mode: `disable`, `prefer`, `require`, `verify-ca` or `verify-full`. |
+| `sslRootCert` | Postgres | none | Path of a PEM file with the CA certificates to trust for `verify-ca` and `verify-full`. |
 | `verifyCertificate` | MySQL | `true` | `false` skips the TLS certificate check. Only for development. |
 | `timeZone` | Postgres | `UTC` | Time zone of the session. |
 | `applicationName` | Postgres | none | Name of the app in `pg_stat_activity`. |
