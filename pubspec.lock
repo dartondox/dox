@@ -241,14 +241,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0-alpha.8"
-  dox_migration:
-    dependency: transitive
-    description:
-      name: dox_migration
-      sha256: e209603dcf958003abd208bfd53c91b1523cc5969bdbcb5bef0b62c99213dd50
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.0-rc.1"
   dox_mysql_native:
     dependency: transitive
     description:

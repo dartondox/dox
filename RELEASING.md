@@ -1,7 +1,7 @@
 # Releasing Dox
 
 This guide shows how to release a new Dox version to pub.dev.
-All packages in `packages/` share one version, for example `3.0.0-alpha.5`.
+All packages in `packages/` share one version, for example `x.y.z`.
 
 ## Native packages
 
@@ -15,7 +15,7 @@ Each one has its own version. To release one, push a `v<version>` tag in its rep
 Its CI builds the libraries, uploads them, fills the hashes and publishes the package to pub.dev.
 
 When a Dox release needs a new native version, release the native package first.
-Then raise its constraint (like `dox_http_native: ^3.0.0-alpha.7`) in the Dox packages that use it.
+Then raise its constraint (like `dox_http_native: ^x.y.z`) in the Dox packages that use it.
 
 ## Packages in other repos
 
@@ -26,12 +26,13 @@ These packages are not released from this repo either:
 - `dox_storage`: [dartondox/dox-storage](https://github.com/dartondox/dox-storage)
 - `dox_queue`: [dartondox/dox-queue](https://github.com/dartondox/dox-queue)
 - `dox_scheduler`: [dartondox/dox-scheduler](https://github.com/dartondox/dox-scheduler)
+- `dox` (the CLI, also called `dox_cli`): [dartondox/dox-cli](https://github.com/dartondox/dox-cli). Its version is also in `lib/src/version.dart`. Set both before you push the tag.
 
 Each repo has its own version. To release, push a `v<version>` tag in that repo.
 Its Release workflow publishes to pub.dev.
 
 `dox_socketio` and `dox_storage` depend on `dox_core`. When they need a new `dox_core`, release this repo first.
-`dox_auth`, `dox_cli` and `dox_core` (dev) depend on `dox_orm` or `dox_migration` from pub.dev.
+`dox_auth`, `dox_core` (dev) and the CLI depend on `dox_orm` or `dox_migration` from pub.dev.
 When they need a new one, release `dox-orm` first, then raise the constraint here.
 
 ## Before you start
@@ -44,26 +45,26 @@ When they need a new one, release `dox-orm` first, then raise the constraint her
   Without it, the Release workflow fails on that package.
   A package in another repo uses that repo name, like `dartondox/dox-orm`.
 
-In the steps below, replace `3.0.0-alpha.5` with the new version.
+In the steps below, replace `x.y.z` with the new version.
 
 ## 1. Bump the versions
 
 ```sh
-git checkout -b release-3.0.0-alpha.5 origin/main
+git checkout -b release-x.y.z origin/main
 ```
 
-1. Set `version: 3.0.0-alpha.5` in the root `pubspec.yaml`.
+1. Set `version: x.y.z` in the root `pubspec.yaml`.
 2. Run `bash bin/update_versions.sh`.
-   It sets the version of every package, every sibling constraint, and the CLI version constant.
+   It sets the version of every package and every sibling constraint.
 3. In every `packages/*/CHANGELOG.md`:
-   - rename `## Unreleased` to `## 3.0.0-alpha.5`, or
-   - if there is no `## Unreleased`, add `## 3.0.0-alpha.5` with "- Version bump only, to match the other packages."
+   - rename `## Unreleased` to `## x.y.z`, or
+   - if there is no `## Unreleased`, add `## x.y.z` with "- Version bump only, to match the other packages."
 4. Run `dart pub get` and `dart analyze --fatal-infos packages`.
 5. Commit and push the branch.
 
 ## 2. Merge the release PR
 
-Open a PR from `release-3.0.0-alpha.5` into `main`.
+Open a PR from `release-x.y.z` into `main`.
 Wait for CI, then squash merge it.
 
 ## 3. Publish to pub.dev
@@ -72,8 +73,8 @@ Tag the merge commit on `main`:
 
 ```sh
 git checkout main && git pull
-git tag v3.0.0-alpha.5
-git push origin v3.0.0-alpha.5
+git tag vx.y.z
+git push origin vx.y.z
 ```
 
 The tag starts `.github/workflows/publish.yaml` (the "Release" workflow).
@@ -97,7 +98,7 @@ It takes the newest release with the same major version as the CLI.
 
 In `dox-sample`:
 
-1. Set the `^3.0.0-alpha.5` versions in `pubspec.yaml` and `README.md`.
+1. Set the `^x.y.z` versions in `pubspec.yaml` and `README.md`.
    Remove any `pubspec_overrides.yaml`.
 2. Check it against pub.dev:
    ```sh
@@ -106,10 +107,10 @@ In `dox-sample`:
    dart analyze
    ```
 3. Commit and push `v3.x`.
-4. Tag and release it. Keep it a pre-release while Dox is in alpha or beta:
+4. Tag and release it. Keep it a pre-release when the version is a pre-release:
    ```sh
-   git tag v3.0.0-alpha.5 && git push origin v3.0.0-alpha.5
-   gh release create v3.0.0-alpha.5 --prerelease
+   git tag vx.y.z && git push origin vx.y.z
+   gh release create vx.y.z --prerelease
    ```
 5. Test it end to end:
    ```sh

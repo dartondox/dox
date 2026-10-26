@@ -1,6 +1,6 @@
 [
   {"name": "core", "packages": "dox-core", "group": "unit"},
-  {"name": "builder, cli", "packages": "dox-builder dox-cli", "group": "unit"},
+  {"name": "builder", "packages": "dox-builder", "group": "unit"},
   {"name": "small packages", "packages": "dox-annotation dox-auth dox-openapi dox-validation", "group": "unit"},
   {"name": "redis (cache)", "packages": "dox-cache", "services": "redis", "group": "unit"}
 ]

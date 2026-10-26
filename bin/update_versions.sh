@@ -2,7 +2,6 @@
 # Sync every package to the version in the root pubspec.yaml.
 # - sets `version:` in each packages/*/pubspec.yaml
 # - sets every sibling dependency (dox_core, dox_annotation, ...) to ^<version>
-# - writes the CLI version constant
 # Package names come from each packages/*/pubspec.yaml, so new packages are picked up
 # by themselves.
 # Run from the repo root. Safe to run many times. Works with BSD (macOS) and GNU sed.
@@ -30,6 +29,3 @@ for pubspec in packages/*/pubspec.yaml; do
   rm -f "$pubspec.bak"
   echo "Updated $pubspec"
 done
-
-echo "const version = '$VERSION';" > packages/dox-cli/lib/src/version.dart
-echo "Updated packages/dox-cli/lib/src/version.dart"

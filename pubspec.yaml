@@ -12,7 +12,6 @@ workspace:
   - packages/dox-auth
   - packages/dox-builder
   - packages/dox-cache
-  - packages/dox-cli
   - packages/dox-core
   - packages/dox-openapi
   - packages/dox-validation

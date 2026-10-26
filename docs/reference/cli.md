@@ -6,7 +6,7 @@ icon: lucide/terminal
 
 Every `dox` command, with its options and the files it writes.
 
-The commands come from `packages/dox-cli/lib/src/command_registry.dart`. The file templates are Dart strings inside `packages/dox-cli/lib/src/tools/`. The path of each template is given below.
+The CLI lives in the [dox-cli](https://github.com/dartondox/dox-cli) repo. The paths below are in that repo. The commands come from `lib/src/command_registry.dart`. The file templates are Dart strings inside `lib/src/tools/`. The path of each template is given below.
 
 How to install the CLI is on the [Dox CLI](../digging-deeper/dox-cli.md) page.
 
@@ -47,7 +47,7 @@ Needs `curl` and `git` on the `PATH`. When it can not find a release (no network
 
 The new project already has `bin/server.dart`, `bin/migrate.dart`, `bin/seed.dart`, `bin/queue.dart` and `bin/schedule.dart`. So the migration, seed, queue and schedule commands below work in it right away.
 
-Source: `packages/dox-cli/lib/src/tools/create_project.dart`.
+Source: `lib/src/tools/create_project.dart`.
 
 ### `dox serve`
 
@@ -69,7 +69,7 @@ What it does:
 2. Starts `dart run bin/server.dart` and prints its output.
 3. Watches the project folder. When a `.dart` file changes it prints `[Dox] File changed: <file>`. It waits until no file changed for 500 ms, then kills the server and starts it again.
 
-Source: `packages/dox-cli/lib/src/tools/server_serve.dart`.
+Source: `lib/src/tools/server_serve.dart`.
 
 ### `dox build`
 
@@ -101,7 +101,7 @@ Output:
 
 `dart compile exe` can not build packages with build hooks, so the CLI uses `dart build cli`.
 
-Source: `packages/dox-cli/lib/src/tools/server_serve.dart` (`buildServer`).
+Source: `lib/src/tools/server_serve.dart` (`buildServer`).
 
 ### `dox build_runner:build` and `dox build_runner:watch`
 
@@ -129,7 +129,7 @@ What it does with `.env`:
 - Replaces the value of `APP_KEY`. Every other line stays as it is, in the same order. This keeps comments, blank lines, quotes and values with more than one `=` (like `DATABASE_URL=postgres://u:p@h/db?a=b`).
 - Adds `APP_KEY=<key>` as the first line when there is no `APP_KEY`.
 
-Source: `packages/dox-cli/lib/src/tools/generate_key.dart`.
+Source: `lib/src/tools/generate_key.dart`.
 
 ### `dox env:generate`
 
@@ -145,7 +145,7 @@ Writes `lib/config/env.dart`, the typed env class, from `.env.example`.
 
 Rules for each key: a whole number (like `3000` or `-1`) gives `int get x => <value>;`, `true`/`false` give `bool get x => <value>;`, an empty value gives `String? get x;`, any other value gives `String get x;` (required, no default). `#` comment lines above a key become its doc comment. A key that does not map back from `camelCase` gets `@EnvKey('KEY')`.
 
-Source: `packages/dox-cli/lib/src/tools/env_tools.dart` (`EnvScaffold`).
+Source: `lib/src/tools/env_tools.dart` (`EnvScaffold`).
 
 ### `dox env:check`
 
@@ -158,7 +158,7 @@ Loads `AppEnv` from `lib/config/env.dart` with the real environment and `.env`. 
 It writes a small script to `.dart_tool/dox/env_check.dart` and runs it with `dart run`. It needs `lib/config/env.dart` and a `name:` in `pubspec.yaml`.
 Without `lib/config/env.dart` it prints `lib/config/env.dart is missing. Run `dox env:generate` first.` (exit code 1).
 
-Source: `packages/dox-cli/lib/src/tools/env_tools.dart` (`envCheck`).
+Source: `lib/src/tools/env_tools.dart` (`envCheck`).
 
 ### `dox openapi:generate`
 
@@ -170,7 +170,7 @@ Runs `dart run bin/openapi.dart [dir]`. That file writes `openapi.json` and `ope
 A new project has no `bin/openapi.dart`. You add it yourself, see [OpenAPI](../packages/openapi.md).
 When the file is not there, the command prints `bin/openapi.dart is missing.` and the code to put in it (exit code 1).
 
-Source: `packages/dox-cli/lib/src/tools/openapi_generate.dart`.
+Source: `lib/src/tools/openapi_generate.dart`.
 
 ### `dox update`
 
@@ -182,7 +182,7 @@ Installs the newest CLI with the same major version as the one you have. Pre-rel
 It reads the version list from pub.dev (retracted versions are skipped), then runs `dart pub global activate dox <version>`.
 Needs `curl` on the `PATH`.
 
-Source: `packages/dox-cli/lib/src/tools/update_dox.dart`.
+Source: `lib/src/tools/update_dox.dart`.
 
 ### `dox version`
 
@@ -223,7 +223,7 @@ A trailing `Controller` in the name is removed: `UserController` and `User` give
 
 | Form | Writes | Template |
 | --- | --- | --- |
-| plain | `lib/app/http/controllers/<name>.controller.dart` | `_getSample` in `packages/dox-cli/lib/src/tools/create_controller.dart` |
+| plain | `lib/app/http/controllers/<name>.controller.dart` | `_getSample` in `lib/src/tools/create_controller.dart` |
 | `-r` | `lib/app/http/controllers/<name>.controller.dart` | `_getResourceSample` in the same file |
 
 The class has `@Inject()`, so the container makes it. A comment shows the route to add, like `Route.get('path', (BlogController c) => c.index);`.
@@ -238,7 +238,7 @@ dox make:middleware <name>
 Writes `lib/app/http/middleware/<name>.middleware.dart`: a class `<Name>Middleware implements IDoxMiddleware` with a `handle(IDoxRequest req)` that returns `req`.
 A trailing `Middleware` in the name is removed.
 
-Template: `_getSample` in `packages/dox-cli/lib/src/tools/create_middleware.dart`.
+Template: `_getSample` in `lib/src/tools/create_middleware.dart`.
 
 ### `dox make:dto`
 
@@ -250,7 +250,7 @@ Writes `lib/app/dtos/<name>/<name>.dto.dart`: a `@Dto()` class with one `name` f
 The class name has no `Dto` at the end: `dox make:dto CreateBlog` gives the class `CreateBlog` in `lib/app/dtos/create_blog/create_blog.dto.dart`.
 A trailing `Dto` in the name is removed. Prints `Run `dox build_runner:build` to make <name>/<name>.dto.g.dart.`
 
-Template: `_getSample` in `packages/dox-cli/lib/src/tools/create_dto.dart`.
+Template: `_getSample` in `lib/src/tools/create_dto.dart`.
 
 ### `dox make:serializer`
 
@@ -261,7 +261,7 @@ dox make:serializer <name>
 Writes `lib/app/http/serializers/<name>.serializer.dart`: a class `<Name>Serializer extends Serializer<<Name>>`. It imports the model from `lib/app/models/<name>/<name>.model.dart`.
 A trailing `Serializer` in the name is removed.
 
-Template: `_getSample` in `packages/dox-cli/lib/src/tools/create_serializer.dart`.
+Template: `_getSample` in `lib/src/tools/create_serializer.dart`.
 
 ### `dox make:model`
 
@@ -278,7 +278,7 @@ Writes `lib/app/models/<name>/<name>.model.dart`: a `@DoxModel()` class with `pa
 
 Any other second argument prints `Invalid option <x>, use -m or --migration` (exit code 1).
 
-Template: `_getSample` in `packages/dox-cli/lib/src/tools/create_model.dart`.
+Template: `_getSample` in `lib/src/tools/create_model.dart`.
 
 ### `dox make:migration`
 
@@ -308,7 +308,7 @@ The Dart template depends on the name:
 | `<x>_to_<table>_table` (also `from`, `in`, `on`) | `schema.table('<table>', ...)` | `schema.table('<table>', ...)` |
 | anything else | a comment | a comment |
 
-Templates: `dartMigrationSource`, `migrateEntrySource` and `_sampleSql` in `packages/dox-cli/lib/src/tools/create_migration.dart`.
+Templates: `dartMigrationSource`, `migrateEntrySource` and `_sampleSql` in `lib/src/tools/create_migration.dart`.
 
 ## Migrations
 
@@ -342,7 +342,7 @@ A failed run prints the error and sets exit code 1.
 | `dox make:seeder <name>` | `dox create:seeder` | Make `db/seeders/<name>.seeder.dart`. It writes `db/seeders/seeders.dart` again, and makes `bin/seed.dart` when it is missing. |
 | `dox db:seed [--class=<name>]` | | Write `db/seeders/seeders.dart` again, then run `dart run bin/seed.dart [--class=<name>]`. Default seeder: `DatabaseSeeder`. `--class <name>` (with a space) works too. When `bin/seed.dart` is missing, it prints `bin/seed.dart is missing.` (exit code 1). |
 
-Templates: `createFactory` in `packages/dox-cli/lib/src/tools/create_factory.dart`, and `createSeeder` and `seedEntrySource` in `packages/dox-cli/lib/src/tools/create_seeder.dart`.
+Templates: `createFactory` in `lib/src/tools/create_factory.dart`, and `createSeeder` and `seedEntrySource` in `lib/src/tools/create_seeder.dart`.
 
 ## Queue
 
@@ -386,7 +386,7 @@ Future<void> main(List<String> args) async {
 }
 ```
 
-Templates: `createJob` and `queueEntrySource` in `packages/dox-cli/lib/src/tools/create_job.dart`.
+Templates: `createJob` and `queueEntrySource` in `lib/src/tools/create_job.dart`.
 
 ## Schedule
 

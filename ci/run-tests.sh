@@ -12,16 +12,10 @@ group_start="::group::"
 group_end="::endgroup::"
 if [ "${NO_LOG_GROUPS:-}" = 1 ]; then group_start="== "; group_end=""; fi
 
-# Test files run in parallel. These packages run one file at a time:
-# - dox-cli: the tests change the working folder. It is shared by all files.
-serial=" dox-cli "
-
 for p in $TEST_PACKAGES; do
   echo "$group_start$p"
-  jobs=""
-  if [[ "$serial" == *" $p "* ]]; then jobs="--concurrency=1"; fi
   # TEST_VARS is split into words on purpose: one word per env var.
   # shellcheck disable=SC2086
-  (cd "packages/$p" && env ${TEST_VARS:-} dart test $jobs)
+  (cd "packages/$p" && env ${TEST_VARS:-} dart test)
   echo "$group_end"
 done
