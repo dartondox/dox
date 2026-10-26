@@ -5,6 +5,7 @@ icon: lucide/corner-left-up
 # BelongsTo
 
 Use `BelongsTo` when this table keeps the foreign key to another table.
+
 For example, a comment belongs to a user.
 The comment table has the column `user_id`.
 
@@ -174,9 +175,3 @@ class Comment extends CommentGenerator {
 - A relation with `eager: true` is always in `toJson()`.
 - A relation loaded with `preload` is in `toJson()` of that query.
 - The JSON key is the field name in snake_case: `user`.
-
-!!! warning "Known issue: names with more than one word"
-    For a relation without `eager: true`, `toJson()` looks for the snake_case name in the preload list.
-    But `preload` needs the field name (`'activeUser'`).
-    So a preloaded `activeUser` is on the model, but it is not in `toJson()`.
-    Use a one word field name, or `eager: true`, when you need it in JSON.

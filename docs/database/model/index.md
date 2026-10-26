@@ -226,8 +226,8 @@ found?.title = 'New title';
 await found?.save();
 
 // set a field to null
-found?.slug = null;
-await found?.save(); // slug is now NULL in the database
+found?.status = null;
+await found?.save(); // status is now NULL in the database
 
 // create from a map: returns the new model as it is in the table
 Blog created = await Blog().create(<String, dynamic>{
@@ -245,6 +245,11 @@ Blog created = await Blog().create(<String, dynamic>{
   (loaded from the database, or saved).
   Fields that were not loaded, for example with `select()`, are not changed.
 - `save()` returns `true` when it saved, and `false` when a [model event](events.md) cancels it.
+
+!!! note "`create()` and `save()` are not the same"
+    On a model without [events](events.md), `create()` inserts the map as it is.
+    It does not run `beforeSave`, and it does not set `created_at` and `updated_at`.
+    Use `save()` when you need them, or put the values in the map.
 
 ### Mass assignment
 

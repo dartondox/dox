@@ -17,26 +17,33 @@ With no config, Dox has a `file` store (the default) and a `memory` store. Use i
 await Cache().put('foo', 'bar', duration: Duration(minutes: 10));
 String? foo = await Cache().get('foo');
 
+// store JSON values, so a model becomes a map with toJson()
 List<dynamic> posts = await Cache().remember(
   'posts',
   Duration(minutes: 5),
-  () => Post().all(),
+  () async => (await Post().all()).map((Post p) => p.toJson()).toList(),
 );
 ```
 
-To change the stores, make `lib/config/cache.dart` and pass it to `AppConfig(cache: cache)` in `lib/config/app.dart`:
+The app template has the stores in `lib/config/cache.dart`.
+`lib/config/app.dart` passes them to `AppConfig(cache: cache)`.
+Change this file to add a store, like Redis:
 
 ```dart title="lib/config/cache.dart"
 import 'package:dox_core/dox_core.dart';
+import 'package:my_app/config/env.dart';
 
 CacheConfig cache = CacheConfig(
-  defaultStore: 'redis',
+  defaultStore: env.cacheStore, // CACHE_STORE in .env, default 'file'
   stores: <String, Map<String, dynamic>>{
+    'file': <String, dynamic>{'driver': 'file', 'path': 'storage/cache'},
     'memory': <String, dynamic>{'driver': 'memory', 'max_size': 10000},
     'redis': <String, dynamic>{'driver': 'redis', 'host': '127.0.0.1', 'prefix': 'app_cache:'},
   },
 );
 ```
+
+Then set `CACHE_STORE=redis` in `.env`.
 
 - `Cache().store('memory')` uses another store.
 - `Dox().cache` is the `CacheManager` of this page. `Cache().repository` is the `CacheStore`.

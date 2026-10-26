@@ -5,6 +5,7 @@ icon: lucide/link
 # HasOne
 
 Use `HasOne` when one row of this table has one row in another table.
+
 For example, a user has one user info row.
 The other table keeps the foreign key (`user_info.user_id`).
 
@@ -163,9 +164,3 @@ class User extends UserGenerator {
 - A relation with `eager: true` is always in `toJson()`.
 - A relation loaded with `preload` is in `toJson()` of that query.
 - The JSON key is the field name in snake_case: `user_info`.
-
-!!! warning "Known issue: names with more than one word"
-    For a relation without `eager: true`, `toJson()` looks for the snake_case name in the preload list.
-    But `preload` needs the field name (`'userInfo'`).
-    So a preloaded `userInfo` is on the model, but it is not in `toJson()`.
-    Use a one word field name (like `info`), or `eager: true`, when you need it in JSON.

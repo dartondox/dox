@@ -5,6 +5,7 @@ icon: lucide/workflow
 # ManyToMany
 
 Use `ManyToMany` when rows on both sides can have many rows on the other side.
+
 For example, an artist has many songs, and a song has many artists.
 
 The link is kept in a third table, the pivot table.
@@ -208,9 +209,3 @@ class Artist extends ArtistGenerator {
 - A relation with `eager: true` is always in `toJson()`.
 - A relation loaded with `preload` is in `toJson()` of that query.
 - The JSON key is the field name in snake_case: `songs`.
-
-!!! warning "Known issue: names with more than one word"
-    For a relation without `eager: true`, `toJson()` looks for the snake_case name in the preload list.
-    But `preload` needs the field name, like `'topSongs'`.
-    So a preloaded `topSongs` is on the model, but it is not in `toJson()`.
-    Use a one word field name, or `eager: true`, when you need it in JSON.

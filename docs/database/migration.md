@@ -64,6 +64,7 @@ So Dox keeps a list of your Dart migrations in `db/migration/migrations.dart`:
 
 ```dart
 // Made by `dox make:migration` and the `dox migration:*` commands.
+// Do not edit, it is made again from the files in this folder.
 import 'package:dox_migration/dox_migration.dart';
 
 import '2026_10_21_120000_create_users_table.dart' as m1;
@@ -129,18 +130,24 @@ The AOT server binary can run the migrations, because the registry is compiled i
 The new app template already does this:
 
 ```dart title="bin/server.dart"
-import 'package:my_app/config/app.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_migration/dox_migration.dart';
+import 'package:my_app/config/app.dart';
+import 'package:my_app/config/database.dart';
 
 import '../db/migration/migrations.dart';
 
 void main() async {
   Dox().initialize(appConfig);
-  await Migrator(migrations: migrations).migrate();
+  await Migrator(
+    migrations: migrations,
+    config: databaseConfig.getConnectionConfig(),
+  ).migrate();
   await Dox().startServer();
 }
 ```
+
+It uses the config from `lib/config/database.dart`, so it also works without a `.env` file.
 
 Keep the `db/migration` folder next to the binary if you also have `.sql` migrations.
 
@@ -164,10 +171,11 @@ For SQLite, only two variables are needed:
 
 ```bash title=".env"
 DB_CONNECTION=sqlite
-DB_NAME=storage/app.db # file path, made if missing
+DB_NAME=db/dox.sqlite # file path, made if missing
 ```
 
 - `DB_DATABASE` works too, in place of `DB_NAME`.
+- Without `DB_CONNECTION`, the migrations use Postgres. So always set it in `.env`.
 - The default port is `5432` for Postgres and `3306` for MySQL.
 - One run opens one driver and closes it at the end. Each migration runs on one connection.
 - A `DB_HOST` that starts with `/` is a [Unix socket](index.md#unix-socket).

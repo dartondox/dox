@@ -5,6 +5,7 @@ icon: lucide/replace
 # Attribute casts
 
 A cast changes a column value between the database and Dart.
+
 For example, it reads JSON text as a map, or saves an enum by its name.
 Casts work the same on Postgres, MySQL, MariaDB and SQLite.
 

@@ -4,16 +4,18 @@ icon: lucide/radio-tower
 
 # Socket.IO
 
-This page shows how to set up Socket.IO in a Dox app with `dox_socketio`. It can also run on its own, see [Without Dox](#without-dox).
+This page shows how to set up Socket.IO in a Dox app with `dox_socketio`.
+
+It can also run on its own, see [Without Dox](#without-dox).
 
 `dox_socketio` is a Socket.IO v4 server for Dart.
 The official clients connect to it with no changes: `socket.io-client` (JavaScript v4) and the Dart `socket_io_client` package.
 It has acks, rooms, namespaces, binary data and long-polling.
 Socket.IO is the way to do realtime in Dox.
 
-## Set up in a Dox app
+## In a Dox app
 
-Socket.IO runs on the same port as your HTTP routes, at `/socket.io/`. You need four files: a provider, a config, a namespace and one env key.
+Socket.IO runs on the same port as your HTTP routes, at `/socket.io/`. You add a provider, a config, a namespace and one env key.
 
 ### 1. Install
 
@@ -115,7 +117,7 @@ Use `transports: ['websocket']`. See [Many isolates](#many-isolates-redis-adapte
 `SocketIoProvider.server` is the Socket.IO server of this isolate:
 
 ```dart
-SocketIoProvider.server?.of('/chat').to('lobby').emit('news', data);
+await SocketIoProvider.server?.of('/chat').to('lobby').emit('news', data);
 ```
 
 From a queue job or another program, use the [emitter](#emit-from-other-programs).
@@ -201,7 +203,7 @@ class ChatNamespace extends NamespaceHandler {
 
   void checkToken(Socket socket) {
     if (socket.handshake.auth['token'] != 'secret') {
-      throw SocketIoException('unauthorized', data: {'reason': 'bad token'});
+      throw SocketIoException('unauthorized', data: <String, dynamic>{'reason': 'bad token'});
     }
   }
 
@@ -255,8 +257,8 @@ SocketIoServer(
     pingInterval: Duration(seconds: 25),
     pingTimeout: Duration(seconds: 20),
     maxHttpBufferSize: 1000000,
-    transports: ['polling', 'websocket'],
-    cors: CorsOptions(origins: ['https://my.app'], credentials: true),
+    transports: <String>['polling', 'websocket'],
+    cors: CorsOptions(origins: <String>['https://my.app'], credentials: true),
   ),
 );
 ```
@@ -269,6 +271,7 @@ SocketIoServer(
 | `upgradeTimeout` | 10 s | how long an upgrade from polling to websocket may take |
 | `connectTimeout` | 45 s | how long the client has to join a namespace |
 | `maxHttpBufferSize` | 1,000,000 bytes | the biggest message. A bigger websocket message closes the connection |
+| `maxAttachments` | `10` | the most binary parts in one packet. A packet with more closes that client |
 | `transports` | `['polling', 'websocket']` | allowed transports |
 | `allowUpgrades` | `true` | let polling clients move to websocket |
 | `cors` | `null` | CORS headers for polling requests. It also checks the origin of websockets |
@@ -334,10 +337,10 @@ io.onServerSideEmit('reload-config', (ServerSideEvent event) {
 });
 
 // on one server
-await io.serverSideEmit('reload-config', ['v2']);
+await io.serverSideEmit('reload-config', <Object?>['v2']);
 
 // wait for one answer from each other server
-List<Object?> answers = await io.serverSideEmitWithAck('reload-config', ['v2']);
+List<Object?> answers = await io.serverSideEmitWithAck('reload-config', <Object?>['v2']);
 ```
 
 When a server does not answer in time, `serverSideEmitWithAck` throws an `AckTimeoutException`. Its `responses` holds the answers that came back.
@@ -359,7 +362,7 @@ Future<void> main() async {
   Redis redis = Redis(RedisOptions(host: '127.0.0.1', port: 6379));
   SocketIoEmitter emitter = SocketIoEmitter(redis);
 
-  await emitter.emit('news', {'title': 'hello'}); // all clients of `/`
+  await emitter.emit('news', <String, dynamic>{'title': 'hello'}); // all clients of `/`
   await emitter.to('room1').except('room2').emit('news', 'hi room1');
   await emitter.of('/chat').to('vip').emit('notice', 'for vip');
 

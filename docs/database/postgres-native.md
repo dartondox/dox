@@ -68,7 +68,9 @@ the `DATABASE_URL`:
 | `prefer` | TLS when the server has it. No certificate check. |
 | `require` | TLS. No certificate check, like libpq. `useSSL: true` gives this mode. |
 | `verify-ca` | TLS. The certificate is checked, the host name is not. |
-| `verify-full` | TLS. The certificate and the host name are checked. It uses the Mozilla roots and the roots of the system. |
+| `verify-full` | TLS. The certificate and the host name are checked. |
+
+Without `sslRootCert`, `verify-ca` and `verify-full` use the Mozilla roots and the roots of the system.
 
 ```dart
 ConnectionConfig(
@@ -81,8 +83,8 @@ ConnectionConfig(
 
 To trust your own CA (for example the CA bundle of your cloud database, or a
 self-signed CA in development), give the path of a PEM file in
-`extra['sslRootCert']`, or with `sslrootcert` in the url. Then `verify-full`
-trusts only the certificates in that file. `prefer` and `require` do not use it.
+`extra['sslRootCert']`, or with `sslrootcert` in the url. Then `verify-ca` and
+`verify-full` trust only the certificates in that file. `prefer` and `require` do not use it.
 
 ```dart
 extra: <String, dynamic>{
@@ -106,7 +108,7 @@ The driver reads these keys from `extra` of the `ConnectionConfig`:
 |---|---|---|
 | `maxConnectionCount` | `10` | Most connections in the pool, for the whole process. |
 | `sslMode` | `disable` | TLS mode, see [TLS](#tls). |
-| `sslRootCert` | none | Path of a PEM file with the CA certificates to trust for `verify-full`, see [TLS](#tls). |
+| `sslRootCert` | none | Path of a PEM file with the CA certificates to trust for `verify-ca` and `verify-full`, see [TLS](#tls). |
 | `timeZone` | `UTC` | Time zone of the session. |
 | `applicationName` | none | Name of the app in `pg_stat_activity`. |
 | `threads` | `1` | Rust threads for all pools of the process. `0` is one thread with a single-thread runtime. Only the first pool sets it. |

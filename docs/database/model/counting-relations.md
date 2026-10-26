@@ -5,6 +5,7 @@ icon: lucide/hash
 # Counting relations
 
 `withCount()` adds the number of related rows to each model.
+
 It does not load the rows. It adds a subquery to the select,
 so you get the counts with the same query.
 

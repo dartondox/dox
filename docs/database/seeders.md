@@ -5,6 +5,7 @@ icon: lucide/sprout
 # Seeders
 
 A seeder puts data in your database.
+
 Use it for sample data in development, or for data your app needs, like a list of countries.
 
 ## Create a seeder
@@ -20,6 +21,8 @@ This makes three files:
 | `db/seeders/user.seeder.dart` | the new seeder |
 | `db/seeders/seeders.dart` | the list of all seeders. Dox writes it again on each `make:seeder` and `db:seed`. Do not edit it. |
 | `bin/seed.dart` | the script that runs a seeder. It is made only when it is missing. |
+
+Write your code in `run()`. For example:
 
 ```dart title="db/seeders/user.seeder.dart"
 import 'package:dox_migration/dox_migration.dart';
