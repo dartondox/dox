@@ -6806,6 +6806,20 @@ A task runs once per tick, even when many isolates or servers run the schedule.
 dart pub add dox_scheduler
 ```
 
+## Set up in a Dox app
+
+A new app from `dox create` already has these files. For an older app, add them:
+
+- `lib/config/schedule.dart`: the tasks and the `ScheduleConfig`. See [Define tasks](#define-tasks).
+- `bin/schedule.dart`: the program that runs the schedule. See [Run the schedule](#run-the-schedule).
+- `lib/providers/schedule_provider.dart` (optional): runs the schedule inside the server. See [Run inside the server](#run-inside-the-server).
+
+Then start it next to your server:
+
+```bash
+dart run bin/schedule.dart work
+```
+
 ## Define tasks
 
 Put the tasks in `lib/config/schedule.dart`.
@@ -14306,12 +14320,38 @@ It has two parts:
 
 Both give all errors at once, and a JSON Schema for [OpenAPI](openapi.md).
 
-!!! tip "Built into Dox"
-    `dox_core` uses `dox_validation` and exports it. `import 'package:dox_core/dox_core.dart'` is all you need.
-    The guide is at [Validation](../the-basic/validation.md). Every rule is in the [rules reference](../the-basic/validation-rules.md).
-    This page is about the package itself, and about using it outside Dox.
+## In a Dox app
 
-## Install (outside Dox)
+`dox_core` uses `dox_validation` and exports it. There is nothing to install: `import 'package:dox_core/dox_core.dart'` is all you need.
+
+1. Make a DTO with `dox make:dto CreateUser`. It writes `lib/app/dtos/create_user/create_user.dto.dart`.
+2. Run the generator: `dox build_runner:build`.
+3. Give the list of DTOs to the app, once:
+
+```dart title="lib/config/app.dart"
+import 'package:my_app/generated/dtos.g.dart';
+
+AppConfig appConfig = AppConfig(
+  // ...
+  dtos: dtos, // from lib/generated/dtos.g.dart
+);
+```
+
+Then ask for the DTO in a controller. Dox checks the body before the method runs. Bad input gets `422` with the errors:
+
+```dart title="lib/app/http/controllers/user.controller.dart"
+class UserController {
+  Future<Map<String, dynamic>> store(CreateUser body) async {
+    // body is already checked and typed
+    return <String, dynamic>{'name': body.name};
+  }
+}
+```
+
+The full guide is at [Validation](../the-basic/validation.md). Every rule is in the [rules reference](../the-basic/validation-rules.md).
+The rest of this page is about the package itself.
+
+## Without Dox
 
 ```bash
 dart pub add dox_validation
@@ -14929,21 +14969,56 @@ This page shows how to save and read files with `dox_storage`.
 
 `dox_storage` gives one API for files in many places: local disk, AWS S3 and S3-compatible services.
 
-!!! tip "In a Dox app"
-    `dox_storage` gives your app [`Storage()`](../digging-deeper/file-storage.md).
-    Set the disks in `config/storage.dart` (a `StorageConfig`), register a `StorageProvider`, and use `Storage()`.
-    `Storage().use('s3')` gives the `Disk` of this page. `Storage.route('files')` serves local signed URLs.
-    This page is for the full `Disk` API and for using `dox_storage` outside Dox.
+## In a Dox app
 
-## Install
+### 1. Install
 
 ```bash
 dart pub add dox_storage
 ```
 
+### 2. The config
+
+```dart title="lib/config/storage.dart"
+import 'package:dox_storage/dox_storage.dart';
+
+StorageConfig storageConfig = StorageConfig(
+  disks: <String, Map<String, dynamic>>{
+    'local': <String, dynamic>{'driver': 'local', 'root': 'storage'},
+  },
+);
+```
+
+### 3. The provider
+
+The provider sets up the disks in every isolate. Put it in `lib/providers/`, so the generated container finds it:
+
+```dart title="lib/providers/storage_provider.dart"
+import 'package:dox_storage/dox_storage.dart';
+import 'package:my_app/config/storage.dart';
+
+class AppStorageProvider extends StorageProvider {
+  AppStorageProvider() : super(storageConfig);
+}
+```
+
+Run `dart run build_runner build`. A new app from `dox create` already has these two files.
+
+### 4. Use it
+
 ```dart
 import 'package:dox_storage/dox_storage.dart';
+
+Route.post('/avatar', (DoxRequest req) async {
+  RequestFile file = req.input('avatar');
+  String path = await Storage().putRequestFile('avatars', file);
+  return <String, String>{'path': path}; // /avatars/<uuid>.png
+});
 ```
+
+- `Storage().use('s3')` gives the full `Disk` of this page.
+- `Storage.route('files')` serves local signed URLs.
+- S3 disks, env keys and all `Storage()` functions are in [File Storage](../digging-deeper/file-storage.md).
 
 ## Drivers
 
@@ -14953,7 +15028,15 @@ import 'package:dox_storage/dox_storage.dart';
 | `S3Driver` | AWS S3, Cloudflare R2, MinIO, DigitalOcean Spaces, GCS (HMAC keys) | Yes (SigV4) | Yes (SigV4) |
 | `MemoryDriver` | tests | fake URLs | fake URLs |
 
-## Set up the disks
+## Without Dox
+
+`dox_storage` also works on its own:
+
+```bash
+dart pub add dox_storage
+```
+
+Make a `DriveManager` with your disks:
 
 ```dart
 import 'dart:io';
@@ -14985,6 +15068,8 @@ Disk disk = drive.use('s3'); // or drive.use() for the default disk
 `use()` throws `UnsupportedOperationException` when no disk has that name.
 
 ## Use a disk
+
+In a Dox app, get a disk with `Storage().use('s3')`. Without Dox, use `drive.use('s3')`.
 
 ```dart
 await disk.put('avatars/1.png', bytes); // String, List<int> or Stream<List<int>>
@@ -15181,25 +15266,39 @@ This page shows the full API of `dox_cache`, the cache behind `Cache()` in Dox.
 
 It has `remember`, tags, atomic locks and four drivers.
 
-!!! tip "Built into Dox"
-    `dox_core` uses `dox_cache` for [`Cache()`](../digging-deeper/cache.md).
-    In a Dox app, set the stores in `config/cache.dart` (the `CacheConfig` of this page), and use `Cache()`.
-    `Dox().cache` is the `CacheManager`. `Cache().repository` is the `CacheStore`.
-    This page is for the full API and for using `dox_cache` outside Dox.
+## In a Dox app
 
-## Install
-
-```bash
-dart pub add dox_cache
-```
+`dox_core` uses `dox_cache` and exports it. There is nothing to install.
+With no config, Dox has a `file` store (the default) and a `memory` store. Use it with `Cache()`:
 
 ```dart
-import 'package:dox_cache/dox_cache.dart';
+await Cache().put('foo', 'bar', duration: Duration(minutes: 10));
+String? foo = await Cache().get('foo');
+
+List<dynamic> posts = await Cache().remember(
+  'posts',
+  Duration(minutes: 5),
+  () => Post().all(),
+);
 ```
 
-!!! note
-    `dox_core` exports `CacheConfig`, `CacheManager`, `CacheStore` and `CacheLock` from this package.
-    They are the same classes, so importing both packages is fine.
+To change the stores, make `lib/config/cache.dart` and pass it to `AppConfig(cache: cache)` in `lib/config/app.dart`:
+
+```dart title="lib/config/cache.dart"
+import 'package:dox_core/dox_core.dart';
+
+CacheConfig cache = CacheConfig(
+  defaultStore: 'redis',
+  stores: <String, Map<String, dynamic>>{
+    'memory': <String, dynamic>{'driver': 'memory', 'max_size': 10000},
+    'redis': <String, dynamic>{'driver': 'redis', 'host': '127.0.0.1', 'prefix': 'app_cache:'},
+  },
+);
+```
+
+- `Cache().store('memory')` uses another store.
+- `Dox().cache` is the `CacheManager` of this page. `Cache().repository` is the `CacheStore`.
+- The full guide is at [Cache](../digging-deeper/cache.md).
 
 ## Drivers
 
@@ -15214,7 +15313,21 @@ import 'package:dox_cache/dox_cache.dart';
     Dox runs many isolates. Each isolate has its own `memory` cache.
     Use `redis` when isolates or servers must see the same data.
 
-## Set up
+## Without Dox
+
+```bash
+dart pub add dox_cache
+```
+
+```dart
+import 'package:dox_cache/dox_cache.dart';
+```
+
+!!! note
+    `dox_core` exports `CacheConfig`, `CacheManager`, `CacheStore` and `CacheLock` from this package.
+    They are the same classes, so importing both packages is fine.
+
+Make a `CacheManager` with your stores:
 
 ```dart
 CacheManager cache = CacheManager(CacheConfig(
