@@ -6243,7 +6243,7 @@ The value is null when there is no related row.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p><code>withCount()</code> is not for <code>belongsTo</code> relations. It throws an <code>UnsupportedError</code>.
-A relation from a table to the same table is not supported.</p>
+It works for a relation to the same table, like the children of a category.</p>
 </div>
 <p>To keep only the rows that have related rows, use <code>whereHas()</code> or <code>has()</code>.
 See <a href="../relation-queries/">Query by relations</a>.</p>

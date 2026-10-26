@@ -3735,6 +3735,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#a-relation-to-the-same-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A relation to the same table
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -6228,6 +6239,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#a-relation-to-the-same-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A relation to the same table
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -6357,12 +6379,24 @@ Give an operator and a number.</p>
 <li>Start the query with a model, like <code>User()</code>.
   On <code>QueryBuilder.table()</code> it throws a <code>StateError</code>.</li>
 <li>A name that is not a relation of the model throws an <code>ArgumentError</code>.</li>
+<li>It works for a relation to the same table, like a <code>Category</code> with a parent <code>Category</code>.</li>
 </ul>
+<h2 id="a-relation-to-the-same-table">A relation to the same table</h2>
+<p>The subquery gives the table its own name, so each row is not compared with itself.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">// categories that have at least one child category</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Category</span><span class="o">&gt;</span><span class="w"> </span><span class="n">parents</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Category</span><span class="p">().</span><span class="n">whereHas</span><span class="p">(</span><span class="s1">'children'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1">// categories whose parent is named 'Books'</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Category</span><span class="o">&gt;</span><span class="w"> </span><span class="n">books</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Category</span><span class="p">()</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="p">.</span><span class="n">whereHas</span><span class="p">(</span><span class="s1">'parent'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">QueryBuilder</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">      </span><span class="n">q</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Books'</span><span class="p">);</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="p">})</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
+</span></code></pre></div>
 <div class="admonition warning">
-<p class="admonition-title">Known limit</p>
-<p>A relation from a table to the same table does not work yet.
-For example, a <code>Category</code> with a parent <code>Category</code>.
-Use <a href="../../query-builder/#whereexists-and-wherenotexists"><code>whereExists</code></a> for it.</p>
+<p class="admonition-title">Warning</p>
+<p>In the function, write the column without the table name: <code>name</code>, not <code>categories.name</code>.
+With the table name, the column points to the parent row, not to the related row.</p>
 </div>
 
 
