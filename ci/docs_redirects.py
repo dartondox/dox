@@ -4,7 +4,8 @@
 # Now each version has its own folder, so old links would break.
 # This replaces every old root page with a small redirect page to the
 # same page in /latest/ (or in /2.x/ when latest does not have it).
-# It also writes the root index.html, 404.html and CNAME.
+# It also writes the root index.html, 404.html, CNAME, robots.txt and
+# sitemap.xml.
 # It runs on every deploy and always gives the same result.
 import json, os, shutil
 
@@ -61,8 +62,10 @@ with open('404.html', 'w') as f:
             '</body></html>' % home)
 with open('CNAME', 'w') as f:
     f.write('dartondox.dev\n')
-# robots.txt must be at the site root. The sitemap is the one of
-# /latest/, where canonical URLs point. Old 2.x docs stay online
+# /sitemap.xml is a copy of the /latest/ one. Its links point to
+# /latest/, where canonical URLs point.
+shutil.copy(os.path.join(home, 'sitemap.xml'), 'sitemap.xml')
+# robots.txt must be at the site root. Old 2.x docs stay online
 # for links, but are not crawled.
 with open('robots.txt', 'w') as f:
     f.write('# Algolia-Crawler-Verif: 7556FC76DBDC63BA\n'
@@ -70,5 +73,5 @@ with open('robots.txt', 'w') as f:
             'Allow: /\n'
             'Disallow: /2.x/\n'
             '\n'
-            'Sitemap: https://dartondox.dev/latest/sitemap.xml\n')
+            'Sitemap: https://dartondox.dev/sitemap.xml\n')
 print('redirect pages:', len(pages))
