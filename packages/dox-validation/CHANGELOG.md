@@ -1,3 +1,7 @@
+## 3.0.0-rc.1
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.17
 
 - Version bump only, to match the other packages.

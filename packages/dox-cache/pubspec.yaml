@@ -1,6 +1,6 @@
 name: dox_cache
 description: Cache for Dart and the Dox framework. Memory, file and Redis drivers, TTL, locks, tags and remember helpers.
-version: 3.0.0-alpha.17
+version: 3.0.0-rc.1
 repository: https://github.com/dartondox/dox
 homepage: https://dartondox.dev
 
@@ -10,7 +10,7 @@ resolution: workspace
 
 dependencies:
   crypto: ^3.0.7
-  ioredis: ^3.0.0
+  ioredis: ^3.0.1
 
 dev_dependencies:
   lints: ^6.1.0

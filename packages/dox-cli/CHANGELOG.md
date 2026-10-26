@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-rc.1
 
 - Fix: `dox make:job` wrote a `bin/queue.dart` that did not compile. It called `QueueWorker(jobs: ...)`, but `QueueWorker` has no `jobs` parameter. It now writes the same file as the app template: `QueueWorker(app: appConfig)`.
 - Fix: the job that `dox make:job` writes showed `X(userId: 1).dispatch()` in its comment. The class has no `userId`. The comment now shows `X().dispatch()`.

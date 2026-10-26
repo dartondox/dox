@@ -245,10 +245,10 @@ packages:
     dependency: transitive
     description:
       name: dox_migration
-      sha256: "330c653face05d13836a75fe2abfdc91df6632dd3801a1b671a9babc2fe66bbe"
+      sha256: e209603dcf958003abd208bfd53c91b1523cc5969bdbcb5bef0b62c99213dd50
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-alpha.12"
+    version: "3.0.0-rc.1"
   dox_mysql_native:
     dependency: transitive
     description:
@@ -261,10 +261,10 @@ packages:
     dependency: transitive
     description:
       name: dox_orm
-      sha256: "47bc95c2c3827f504ca4a1b12a5901b111d571be4142a15ee299e7aaec0b0346"
+      sha256: e986c8c7eadeed5f65486f546780bfa7348eeb68f73e192933c4f1b901cdff80
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-alpha.12"
+    version: "3.0.0-rc.1"
   dox_postgres_native:
     dependency: transitive
     description:
@@ -373,10 +373,10 @@ packages:
     dependency: transitive
     description:
       name: ioredis
-      sha256: fb9b8cc6ded0c3f27d14396d4e7426ade605ae9e04a5c1c942a17947c9647b27
+      sha256: "04bedac90c58eaeefaf974143d907b010d8376e9730501449bc45e1c8b1de126"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0"
+    version: "3.0.1"
   json_annotation:
     dependency: transitive
     description:
