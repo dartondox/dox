@@ -12,12 +12,38 @@ It has two parts:
 
 Both give all errors at once, and a JSON Schema for [OpenAPI](openapi.md).
 
-!!! tip "Built into Dox"
-    `dox_core` uses `dox_validation` and exports it. `import 'package:dox_core/dox_core.dart'` is all you need.
-    The guide is at [Validation](../the-basic/validation.md). Every rule is in the [rules reference](../the-basic/validation-rules.md).
-    This page is about the package itself, and about using it outside Dox.
+## In a Dox app
 
-## Install (outside Dox)
+`dox_core` uses `dox_validation` and exports it. There is nothing to install: `import 'package:dox_core/dox_core.dart'` is all you need.
+
+1. Make a DTO with `dox make:dto CreateUser`. It writes `lib/app/dtos/create_user/create_user.dto.dart`.
+2. Run the generator: `dox build_runner:build`.
+3. Give the list of DTOs to the app, once:
+
+```dart title="lib/config/app.dart"
+import 'package:my_app/generated/dtos.g.dart';
+
+AppConfig appConfig = AppConfig(
+  // ...
+  dtos: dtos, // from lib/generated/dtos.g.dart
+);
+```
+
+Then ask for the DTO in a controller. Dox checks the body before the method runs. Bad input gets `422` with the errors:
+
+```dart title="lib/app/http/controllers/user.controller.dart"
+class UserController {
+  Future<Map<String, dynamic>> store(CreateUser body) async {
+    // body is already checked and typed
+    return <String, dynamic>{'name': body.name};
+  }
+}
+```
+
+The full guide is at [Validation](../the-basic/validation.md). Every rule is in the [rules reference](../the-basic/validation-rules.md).
+The rest of this page is about the package itself.
+
+## Without Dox
 
 ```bash
 dart pub add dox_validation
