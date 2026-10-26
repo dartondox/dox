@@ -18,9 +18,10 @@ class CleanupProvider extends DoxProvider {
         .withTrash()
         .where('deleted_at', '<', limit)
         .get();
+    int removed = 0;
     for (User user in old) {
-      await user.forceDelete();
+      removed += await user.forceDelete();
     }
-    print('cleanup: removed ${old.length} users');
+    print('cleanup: removed $removed users');
   }
 }

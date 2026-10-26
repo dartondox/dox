@@ -4,6 +4,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_migration/dox_migration.dart';
 import 'package:dox_orm/dox_orm.dart';
 import 'package:dox_orm/testing.dart';
+import 'package:my_app/app/http/controllers/user.controller.dart';
 import 'package:my_app/app/models/user/user.model.dart';
 import 'package:test/test.dart';
 
@@ -62,5 +63,29 @@ void main() {
 
   test('the tables are empty again', () async {
     expect(await User().count(), 0);
+  });
+
+  test('destroy deletes a user once, then gives 404', () async {
+    for (String name in <String>['Ann', 'Bob']) {
+      await User().create(<String, dynamic>{
+        'name': name,
+        'email': '$name@example.com',
+        'password': 'x',
+      });
+    }
+    User? bob = await User().where('name', 'Bob').getFirst();
+    UserController controller = UserController();
+    expect(await controller.destroy(bob!.id!), <String, bool>{'deleted': true});
+
+    /// soft deleted: the user is still in the table, but not found
+    expect(await User().withTrash().count(), 2);
+    await expectLater(
+      controller.destroy(bob.id!),
+      throwsA(isA<NotFoundHttpException>()),
+    );
+
+    /// forceDelete() gives the rows it deleted: 0 when the row is gone
+    expect(await bob.forceDelete(), 1);
+    expect(await bob.forceDelete(), 0);
   });
 }

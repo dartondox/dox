@@ -1,3 +1,7 @@
+## Unreleased
+
+- `dox make:controller -r`: the `destroy` stub shows how to give a 404 when `delete()` deletes 0 rows.
+
 ## 3.0.0-alpha.16
 
 - Version bump only, to match the other packages.

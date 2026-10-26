@@ -28,7 +28,11 @@ class UserController {
       throw ForbiddenException(message: 'The first user can not be deleted');
     }
     User user = await show(id);
-    await user.delete();
+
+    /// 0 rows: the user was deleted after show() found it
+    if (await user.delete() == 0) {
+      throw NotFoundHttpException(message: 'User $id not found');
+    }
     return <String, bool>{'deleted': true};
   }
 }

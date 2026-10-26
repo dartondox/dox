@@ -40,6 +40,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      # dox_orm and dox_migration come from a clone of dox-orm (main, or
+      # the branch with the same name as this PR), not from pub.dev.
+      - run: ci/clone-siblings.sh && ci/use-sibling-orm.sh
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
@@ -81,6 +84,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      # dox_orm and dox_migration from the dox-orm clone, like lint
+      - run: ci/clone-siblings.sh && ci/use-sibling-orm.sh
       - name: Start services
         if: needs.changes.outputs.unit_services != ''
         run: ci/start-services.sh ${{ needs.changes.outputs.unit_services }}

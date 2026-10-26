@@ -160,6 +160,8 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         ${map['relationContent']}
         return map;
       }
+
+      ${_getCodeForSetColumnValue(visitor)}
       $computedCode
     }
     ${_getCodeForScopeExtension(visitor)}
@@ -390,6 +392,34 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       content += "..$filedName = $setValue\n";
     });
     return content += ';';
+  }
+
+  /// setColumnValue() sets a field by its column name. increment() and
+  /// decrement() on a model use it. A value that is not of the field type
+  /// is not set, and it returns false.
+  String _getCodeForSetColumnValue(ModelVisitor visitor) {
+    String className = visitor.className;
+    String content = '';
+    visitor.columns.forEach((fieldName, values) {
+      String jsonKey = toSnakeCase(values['jsonKey']);
+      content +=
+          """
+        case '$jsonKey':
+          if (value is! ${values['type']}) return false;
+          instance.$fieldName = value;
+          return true;
+      """;
+    });
+    return """
+      @override
+      bool setColumnValue(String column, dynamic value) {
+        $className instance = this as $className;
+        switch (column) {
+          $content
+        }
+        return false;
+      }
+    """;
   }
 
   Map<String, dynamic> _getCodeForToMap(ModelVisitor visitor) {
