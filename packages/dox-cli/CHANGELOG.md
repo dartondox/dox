@@ -1,3 +1,11 @@
+## Unreleased
+
+- Fix: `dox make:job` wrote a `bin/queue.dart` that did not compile. It called `QueueWorker(jobs: ...)`, but `QueueWorker` has no `jobs` parameter. It now writes the same file as the app template: `QueueWorker(app: appConfig)`.
+- Fix: the job that `dox make:job` writes showed `X(userId: 1).dispatch()` in its comment. The class has no `userId`. The comment now shows `X().dispatch()`.
+- Fix: `dox db:seed --class UserSeeder` (with a space) was refused. Both `--class=UserSeeder` and `--class UserSeeder` work now.
+- Fix: `dox make:middleware` wrote `extends IDoxMiddleware`. It now writes `implements IDoxMiddleware`, like the docs and the built-in middleware.
+- `dox build` also leaves the SQLite lock files of dox_migration (`*.sqlite.lock`, `*.sqlite3.lock`, `*.db.lock`) out of `build/bundle/db`.
+
 ## 3.0.0-alpha.17
 
 - Uses dox_migration 3.0.0-alpha.12.

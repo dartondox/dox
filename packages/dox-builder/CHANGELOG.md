@@ -1,3 +1,7 @@
+## Unreleased
+
+- `lib/generated/dtos.g.dart` is now written for every app, also with no `@Dto`. The list is empty then. So the app can always have `dtos: dtos` in `AppConfig`. An app here is a package that imports `AppConfig` (from dox_core). Other packages with no DTO still get no file. The empty list is `final`, not `const`, so `dtos: dtos` does not trigger the `avoid_redundant_argument_values` lint.
+
 ## 3.0.0-alpha.17
 
 - New: models get `setColumnValue(column, value)`. It sets a field by its column name, and returns false when the value is not of the field type. `model.increment()` and `model.decrement()` of dox_orm use it to set the field. The generated code needs the dox_orm that has `Model.setColumnValue()`. Run build_runner again after you update.

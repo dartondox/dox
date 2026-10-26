@@ -344,6 +344,7 @@ class NotADto {}
         contains("import 'package:dox_validation/dox_validation.dart';"),
       );
       expect(output, contains("import 'package:a/posts/posts.dart';"));
+      expect(output, contains('const List<DtoSchema<Object>> dtos'));
       expect(output, contains(r'$CreatePostDto,'));
       expect(output, contains(r'$CreateUserDto,'));
       expect(output, isNot(contains('NotADto')));
@@ -381,7 +382,7 @@ class NotADto {}
       expect(output, isNot(contains("import 'package:a/")));
       expect(
         output,
-        contains('const List<DtoSchema<Object>> dtos = <DtoSchema<Object>>[];'),
+        contains('final List<DtoSchema<Object>> dtos = <DtoSchema<Object>>[];'),
       );
     });
 

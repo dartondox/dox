@@ -1,3 +1,18 @@
+## Unreleased
+
+- Breaking: Dox no longer uses `APP_KEY` as it is. It makes one key per purpose from it with HKDF-SHA256 (RFC 5869): `dox:cookie` for cookies and the cookie session, `dox:encrypt` for `AESEncryptor`, and more. See the new `KeyDerivation` class. Existing encrypted cookies, sessions and tokens become invalid after this version. Users must log in again.
+- `AESEncryptor.encode` and `decode` take a `purpose` label. The default is `dox:encrypt`. The secret can now have any length.
+- Fix: `Hash.make` and `Hash.makeAsync` with a password over 72 bytes threw the bcrypt error, and its text held the password. So the password could end up in the logs. Dox now throws its own `ArgumentError` with no password in the text.
+- New: `Hash.equals(a, b)` compares two secrets in constant time. `CsrfMiddleware` uses it.
+- Fix: the `cookie` session driver did not check the save time in the cookie. A copied cookie stayed valid until `APP_KEY` changed. A session older than `lifetime` is now a new empty session.
+- Breaking: `req.auth` is now its own field on the request, not a value in the input. Before, a query or body field `dox_authentication_instance` made `req.auth` throw a 500. `AUTH_REQUEST_KEY` is removed. Use `Auth().setUser(req, user)` or set `req.auth`.
+- Fix: `APP_ENV=testing` stopped the app on a bad `APP_KEY`. It is now treated like `test`: only a warning.
+- `Logger` is now exported from `package:dox_core/dox_core.dart`.
+- The HTTP exceptions (`NotFoundHttpException` and the others) take a `dynamic message`, like `IHttpException`. A map message is sent as JSON as it is, like `NotFoundHttpException(message: {'error': 'not_found'})`.
+- Security: the server now sends `X-XSS-Protection: 0`, not `1; mode=block`. OWASP says the old browser filter should be off. `SecurityHeaders` has a new `xssProtection` option. A `null` option (or a `null` value in `extra`) now removes the header, also a server default like `X-Frame-Options`.
+- Security: `CsrfMiddleware` no longer reads `_token` from the query string. It reads only the body and the `X-CSRF-TOKEN` / `X-XSRF-TOKEN` headers.
+- Doc comments: fixed the examples of `Cache.remember`, `Route.domain`, `Route.middleware` and `Route.disabledCors`.
+
 ## 3.0.0-alpha.17
 
 - Version bump only, to match the other packages.

@@ -12,10 +12,7 @@ final List<MigrationEntry> migrations = <MigrationEntry>[
     '2023_07_16_131937700_create_users_table',
     m1.CreateUsersTable(),
   ),
-  MigrationEntry(
-    '2026_10_22_205345_create_posts_table',
-    m2.CreatePostsTable(),
-  ),
+  MigrationEntry('2026_10_22_205345_create_posts_table', m2.CreatePostsTable()),
   MigrationEntry(
     '2026_10_25_000000000_create_queue_tables',
     m3.CreateQueueTables(),

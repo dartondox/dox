@@ -11,8 +11,9 @@ import 'dto_model.dart';
 ///
 /// An app (a package that imports `AppConfig`, like from dox_core) gets
 /// the file even when it has no DTOs. The list is empty then, so
-/// `AppConfig(dtos: dtos)` always works. Other packages with no DTOs,
-/// like dox_orm, get no file.
+/// `AppConfig(dtos: dtos)` always works. The empty list is `final`, not
+/// `const`, so `dtos: dtos` gets no avoid_redundant_argument_values lint.
+/// Other packages with no DTOs, like dox_orm, get no file.
 class DoxDtoRegistryBuilder implements Builder {
   const DoxDtoRegistryBuilder({this.reader = const DtoReader()});
 
@@ -84,8 +85,14 @@ class DoxDtoRegistryBuilder implements Builder {
     }
     out
       ..writeln()
-      ..writeln('/// Every DTO of the app. Use it in `AppConfig(dtos: dtos)`.')
-      ..writeln('const List<DtoSchema<Object>> dtos = <DtoSchema<Object>>[');
+      ..writeln('/// Every DTO of the app. Use it in `AppConfig(dtos: dtos)`.');
+    if (found.isEmpty) {
+      // not const: a const empty list is the default of AppConfig.dtos, so
+      // `dtos: dtos` would get the avoid_redundant_argument_values lint
+      out.writeln('final List<DtoSchema<Object>> dtos = <DtoSchema<Object>>[');
+    } else {
+      out.writeln('const List<DtoSchema<Object>> dtos = <DtoSchema<Object>>[');
+    }
     List<String> names = found.keys.toList()..sort();
     for (String name in names) {
       out.writeln('\$${name}Dto,');

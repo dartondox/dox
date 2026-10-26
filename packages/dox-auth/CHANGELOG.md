@@ -1,3 +1,12 @@
+## Unreleased
+
+- Breaking: `JwtAuthDriver` no longer signs with the `SecretKey` text as it is. The HMAC key is made from it with HKDF-SHA256 and the label `dox:jwt`. Existing tokens become invalid after this version. Users must log in again. `driver.signingKey` gives the key, for another service that checks the tokens.
+- Security: `JwtAuthDriver.verifyToken` accepts only the configured `algorithm`. A token with another algorithm in its header is rejected.
+- Security: `attempt` only puts a string or a number into the user query. A map or a list as the email (or another identifier) fails the login.
+- `AuthMiddleware` and `Auth.setUser` set `req.auth` directly. They no longer put the auth into the request input.
+- `UnAuthorizedException` takes a `dynamic message`, so a map message works.
+- `APP_ENV=testing` is treated like `test` for the short secret check: only a warning.
+
 ## 3.0.0-alpha.17
 
 - Uses dox_orm 3.0.0-alpha.12.
