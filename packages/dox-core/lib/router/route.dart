@@ -305,7 +305,7 @@ class Route {
 
   /// domain route
   /// ```
-  /// Route.group('example.com', () {
+  /// Route.domain('example.com', () {
   ///   Route.get('/ping', controller);
   /// });
   /// ```
@@ -330,9 +330,9 @@ class Route {
     _cors(true, callback);
   }
 
-  // group of route to disabled cors
+  /// group of route to disabled cors
   /// ```
-  /// Route.disabledCors() {
+  /// Route.disabledCors(() {
   ///   Route.get('/ping', controller);
   /// });
   /// ```
@@ -340,12 +340,8 @@ class Route {
     _cors(false, callback);
   }
 
-  /// group of route to enable/disable cors
-  /// ```
-  /// Route.cors(true, () {
-  ///   Route.get('/ping', controller);
-  /// });
-  /// ```
+  /// group of route to enable/disable cors.
+  /// used by [enabledCors] and [disabledCors].
   static void _cors(bool enabled, Function() callback) {
     bool? originalCorsConfig = Route()._corsEnabled;
 
@@ -359,7 +355,7 @@ class Route {
 
   /// middleware for group of routes
   /// ```
-  /// Route.group('example.com', () {
+  /// Route.middleware(<dynamic>[AuthMiddleware()], () {
   ///   Route.get('/ping', controller);
   /// });
   /// ```

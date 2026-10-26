@@ -85,7 +85,7 @@ The generator makes, for each `@Dto` class:
 | Name | What it is |
 | --- | --- |
 | `$CreateUserDto` | a `const` `DtoSchema<CreateUser>`: the checks, the converter and the JSON Schema |
-| `lib/generated/dtos.g.dart` | `const List<DtoSchema<Object>> dtos`: every DTO in `lib/`. Dox uses it to find DTOs by type. |
+| `lib/generated/dtos.g.dart` | `const List<DtoSchema<Object>> dtos`: every DTO in `lib/`. Dox uses it to find DTOs by type. An app with no DTO gets an empty list. |
 
 The `static const ... schema = $CreateUserDto;` line is how you reach the schema: `CreateUser.schema`.
 

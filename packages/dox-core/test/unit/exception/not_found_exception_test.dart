@@ -23,5 +23,6 @@ void main() {
     });
     IHttpException e = ValidationException(message: body);
     expect(e.toResponse(), body);
+    expect(NotFoundHttpException(message: body).toResponse(), body);
   });
 }

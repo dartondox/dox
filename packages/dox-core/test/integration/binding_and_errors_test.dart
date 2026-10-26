@@ -71,6 +71,11 @@ void main() {
     Route.get('/fail/missing', (DoxRequest req) {
       throw NotFoundHttpException(message: 'no post');
     });
+    Route.get('/fail/gone', (DoxRequest req) {
+      throw NotFoundHttpException(
+        message: <String, String>{'error': 'not_found'},
+      );
+    });
     Route.get('/fail/invalid', (DoxRequest req) {
       throw ValidationException(message: <String, String>{'name': 'required'});
     });
@@ -125,6 +130,8 @@ void main() {
         '{"code":"not_found","message":"no post"}',
       ));
       expect(await get('/fail/invalid'), (422, '{"name":"required"}'));
+      // a map message is sent as JSON, with the status of the exception
+      expect(await get('/fail/gone'), (404, '{"error":"not_found"}'));
       expect(
         (await get('/no/route')).$2,
         '{"code":"not_found","message":"GET /no/route not found"}',

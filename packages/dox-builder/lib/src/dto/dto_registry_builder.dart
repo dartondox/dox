@@ -9,7 +9,10 @@ import 'dto_model.dart';
 /// Give it to the app: `AppConfig(dtos: dtos)`. Dox finds a DTO by its
 /// type with it (no `dart:mirrors`).
 ///
-/// Nothing is written when the package has no DTOs.
+/// An app (a package that imports `AppConfig`, like from dox_core) gets
+/// the file even when it has no DTOs. The list is empty then, so
+/// `AppConfig(dtos: dtos)` always works. Other packages with no DTOs,
+/// like dox_orm, get no file.
 class DoxDtoRegistryBuilder implements Builder {
   const DoxDtoRegistryBuilder({this.reader = const DtoReader()});
 
@@ -31,6 +34,8 @@ class DoxDtoRegistryBuilder implements Builder {
     List<String> imports = <String>[];
     String schemaImport = 'package:dox_validation/dox_validation.dart';
     bool schemaFound = false;
+    // the import that gives DtoSchema and AppConfig, for an app with no DTOs
+    String? appImport;
     List<AssetId> ids = await buildStep
         .findAssets(Glob('lib/**.dart'))
         .toList();
@@ -39,6 +44,7 @@ class DoxDtoRegistryBuilder implements Builder {
       if (id.path == output || id.path.endsWith('.g.dart')) continue;
       if (!await resolver.isLibrary(id)) continue;
       LibraryElement library = await resolver.libraryFor(id);
+      appImport ??= _schemaImport(library, alsoExports: 'AppConfig');
       bool used = false;
       for (ClassElement element in library.classes) {
         if (!reader.isDto(element)) continue;
@@ -63,7 +69,10 @@ class DoxDtoRegistryBuilder implements Builder {
         }
       }
     }
-    if (found.isEmpty) return;
+    if (found.isEmpty) {
+      if (appImport == null) return;
+      schemaImport = appImport;
+    }
     StringBuffer out = StringBuffer()
       ..writeln('// GENERATED CODE - DO NOT MODIFY BY HAND')
       ..writeln('// Made by dox_builder. Run `dart run build_runner build`.')
@@ -92,12 +101,15 @@ class DoxDtoRegistryBuilder implements Builder {
   }
 
   /// The import of [library] that gives `DtoSchema`, like
-  /// `package:dox_core/dox_core.dart`.
-  String? _schemaImport(LibraryElement library) {
+  /// `package:dox_core/dox_core.dart`. With [alsoExports], the import must
+  /// give that name too.
+  String? _schemaImport(LibraryElement library, {String? alsoExports}) {
     for (LibraryImport import in library.firstFragment.libraryImports) {
       LibraryElement? imported = import.importedLibrary;
       if (imported == null || import.prefix != null) continue;
-      if (imported.exportNamespace.get2('DtoSchema') != null) {
+      if (imported.exportNamespace.get2('DtoSchema') != null &&
+          (alsoExports == null ||
+              imported.exportNamespace.get2(alsoExports) != null)) {
         return imported.uri.toString();
       }
     }

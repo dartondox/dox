@@ -93,12 +93,13 @@ await Cache().flush();                // remove all items of the store
 ### `remember`
 
 `remember` reads the value from the cache. When it is missing, the function runs and its result is stored.
+The value is stored as JSON. Return maps, lists, strings and numbers, not models.
 
 ```dart
 List<dynamic> posts = await Cache().remember(
   'posts',
   Duration(minutes: 5),
-  () => Post().all(),
+  () async => (await Post().all()).map((Post p) => p.toJson()).toList(),
 );
 ```
 

@@ -25,7 +25,7 @@ One page to keep open while you work. Each section links to its full page.
 | `lib/app/models/<name>/` | `<name>.model.dart` |
 | `lib/app/jobs/` | `<name>.job.dart` |
 | `lib/providers/` | `DoxProvider` classes: ORM, storage, queue, schedule. You add others, like auth. |
-| `lib/generated/` | `container.g.dart`, `openapi.g.dart`, `jobs.g.dart` and (when you have a DTO) `dtos.g.dart`. Made by `build_runner`. Do not edit. |
+| `lib/generated/` | `container.g.dart`, `openapi.g.dart`, `jobs.g.dart` and `dtos.g.dart` (an empty list when the app has no DTO). Made by `build_runner`. Do not edit. |
 | `db/migration/` | migrations and `migrations.dart` (the registry) |
 | `db/seeders/`, `db/factories/` | seeders (`seeders.dart` is the registry) and model factories |
 

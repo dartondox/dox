@@ -4,7 +4,7 @@ import 'package:dox_core/dox_core.dart';
 /// missing or wrong. Dox answers with 419.
 class TokenMismatchException extends IHttpException {
   TokenMismatchException({
-    String message = 'CSRF token mismatch',
+    dynamic message = 'CSRF token mismatch',
     String errorCode = 'csrf_token_mismatch',
     int code = 419,
   }) {
