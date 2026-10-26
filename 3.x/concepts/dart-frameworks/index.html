@@ -6300,8 +6300,7 @@ Where this page is not sure, the table says "see their docs".</p>
 </div>
 <h2 id="what-each-one-is-for">What each one is for</h2>
 <ul>
-<li><strong>Dox</strong> is a full backend framework, in the style of Laravel. It has routes, controllers, typed DTOs, an ORM, migrations, auth, cache, storage and a CLI.
-  It is in <strong>3.0 alpha</strong>. The API can still change.</li>
+<li><strong>Dox</strong> is a full backend framework, in the style of Laravel. It has routes, controllers, typed DTOs, an ORM, migrations, auth, cache, storage and a CLI.</li>
 <li><strong>Dart Frog</strong> is a small backend framework. It is built on Shelf. Routes come from the files in the <code>routes/</code> folder.
   It describes itself as "a fast, minimalistic backend framework for Dart".</li>
 <li><strong>Serverpod</strong> is a full-stack framework for Flutter. You write endpoint methods on the server. Serverpod generates a typed Dart client for the Flutter app.
@@ -6438,7 +6437,7 @@ Where this page is not sure, the table says "see their docs".</p>
 </tr>
 <tr>
 <td>First release and maturity</td>
-<td>3.0 alpha (2026)</td>
+<td>New (2026)</td>
 <td>First on pub.dev in 2022, 1.0 about three years ago</td>
 <td>First on pub.dev in 2021, now 4.x</td>
 <td>First on pub.dev in 2014, 1.0 in 2021</td>
@@ -6471,11 +6470,10 @@ To compare, run the same test on your own machine, with each server on the same 
 <li>You need MySQL or MariaDB, not only Postgres.</li>
 <li>You want typed DTOs with the same rules on the server and in a Dart or Flutter client. See <a href="../../guides/share-code-with-flutter/">Share code with Flutter</a>.</li>
 <li>You want an OpenAPI document made from your code, for clients that are not written in Dart.</li>
-<li>You can accept an alpha: the API can change before 3.0 is stable. See <a href="../status-and-roadmap/">Status and roadmap</a>.</li>
 </ul>
 <h2 id="when-to-pick-something-else">When to pick something else</h2>
 <ul>
-<li><strong>You need a stable API today.</strong> Dox is alpha. Dart Frog, Serverpod and Shelf have had 1.0 or later for years.</li>
+<li><strong>You want a framework with many years of use.</strong> Dart Frog, Serverpod and Shelf have been out for years. Dox is new.</li>
 <li><strong>You want a hosted service.</strong> Serverpod has Serverpod Cloud. Dox has no hosted service. You deploy it yourself (a binary or Docker).</li>
 <li><strong>Your app is Flutter only, and you want the client made for you.</strong> Serverpod generates a typed client for every endpoint. Dox does not generate a Dart client. It generates an OpenAPI document.</li>
 <li><strong>You want a small tool with few parts.</strong> Dart Frog is simpler. You add only what you need.</li>

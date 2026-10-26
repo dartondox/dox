@@ -6310,12 +6310,9 @@
 
 <h1 id="installation">Installation</h1>
 <p>This page shows how to install the Dox CLI, make a new project and start the server.</p>
-<div class="admonition warning">
-<p class="admonition-title">3.x is a release candidate</p>
-<p>Dox 3 is a release candidate (<code>3.0.0-rc.x</code>). It needs <strong>Dart 3.13</strong> or newer.</p>
-</div>
+<p>Dox needs <strong>Dart 3.13</strong> or newer.</p>
 <h2 id="install-the-cli">Install the CLI</h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>global<span class="w"> </span>activate<span class="w"> </span>dox<span class="w"> </span>^3.0.0-rc
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>global<span class="w"> </span>activate<span class="w"> </span>dox
 </span></code></pre></div>
 <p>Check that it works:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dox<span class="w"> </span>version
@@ -6330,9 +6327,9 @@ Add this line to <code>~/.bashrc</code> or <code>~/.zshrc</code>, then open a ne
 <h2 id="create-a-new-project">Create a new project</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>dox<span class="w"> </span>create<span class="w"> </span>new_blog
 </span></code></pre></div>
-<p><code>dox create</code> downloads the newest 3.x release of
+<p><code>dox create</code> downloads the newest release of
 <a href="https://github.com/dartondox/dox-sample">dox-sample</a>, the starter project.
-To get one exact version, add <code>--version</code>, for example <code>dox create new_blog --version 3.0.0-rc.1</code>.</p>
+To get one exact release, add <code>--version</code> with a release tag of dox-sample.</p>
 <p>It also makes your <code>.env</code> file from <code>.env.example</code>, with a new random <code>APP_KEY</code>.
 Then get the packages:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">cd</span><span class="w"> </span>new_blog
@@ -6344,18 +6341,11 @@ To use Postgres or MySQL instead, change <code>DB_CONNECTION</code> and the <cod
 values in <code>.env</code>. See <a href="../../database/">Database</a>.</p>
 <div class="admonition info">
 <p class="admonition-title">Add Dox to an existing Dart project</p>
-<p>Add the packages you need to <code>pubspec.yaml</code>. Each Dox package has its own
-version number. Use <code>^3.0.0-rc</code> for each of them. It picks the newest 3.x release.</p>
-</div>
-<div class="language-yaml highlight"><span class="filename">pubspec.yaml</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">dependencies</span><span class="p">:</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">dox_core</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^3.0.0-rc</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">dox_orm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^3.0.0-rc</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">dox_migration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^3.0.0-rc</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="nt">dev_dependencies</span><span class="p">:</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="nt">dox_builder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^3.0.0-rc</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="nt">build_runner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^2.17.1</span>
+<p>Add the packages you need with <code>dart pub add</code>:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_core<span class="w"> </span>dox_orm<span class="w"> </span>dox_migration
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dev:dox_builder<span class="w"> </span>dev:build_runner
 </span></code></pre></div>
+</div>
 <h2 id="start-the-server">Start the server</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>dox<span class="w"> </span>s
 </span></code></pre></div>
@@ -6391,7 +6381,6 @@ Build a native binary with <code>dox build</code>. See <a href="../../digging-de
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>dox<span class="w"> </span>build_runner:build<span class="w">   </span><span class="c1"># runs once</span>
 </span></code></pre></div>
 <h2 id="packages">Packages</h2>
-<p>Each package has its own version number. All of them are 3.x.</p>
 <table>
 <thead>
 <tr>

@@ -6290,18 +6290,13 @@
 <h1 id="step-1-create-the-project">Step 1: Create the project</h1>
 <p>This step makes a new Dox project, points it at SQLite, starts the dev server and calls the first route.</p>
 <h2 id="1-install-the-cli-and-make-the-project">1. Install the CLI and make the project</h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>global<span class="w"> </span>activate<span class="w"> </span>dox<span class="w"> </span>^3.0.0-alpha
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>global<span class="w"> </span>activate<span class="w"> </span>dox
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>dox<span class="w"> </span>create<span class="w"> </span>blog
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nb">cd</span><span class="w"> </span>blog
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>dart<span class="w"> </span>pub<span class="w"> </span>get
 </span></code></pre></div>
 <p><code>dox create</code> downloads the <a href="https://github.com/dartondox/dox-sample">dox-sample</a> template from GitHub and names the package <code>blog</code>.
 So every import in this tutorial starts with <code>package:blog/</code>.</p>
-<div class="admonition note">
-<p class="admonition-title">Check the versions</p>
-<p>Open <code>pubspec.yaml</code>. Every Dox package must be a 3.x version, like <code>^3.0.0-alpha.17</code>.
-Each package has its own version number. That is fine.</p>
-</div>
 <h2 id="2-use-sqlite">2. Use SQLite</h2>
 <p><code>dox create</code> already made <code>.env</code> with a new random <code>APP_KEY</code>. The template already uses SQLite:</p>
 <div class="language-ini highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="na">APP_PORT</span><span class="o">=</span><span class="s">3000</span>

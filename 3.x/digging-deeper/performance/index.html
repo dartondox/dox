@@ -6518,7 +6518,7 @@ It is 5x faster than Dox on <code>dart:io</code>.</p>
 rows one after another. The table has 10,000 rows. Each server runs alone
 on one or two pinned CPUs, Postgres 18 and wrk on other CPUs, 256
 connections, 4 database connections per core, 3 runs of 10 seconds, median.
-Versions: Dox 3.0.0-alpha.3 (native server, <code>dox_postgres_native</code>), Go 1.27
+Versions: Dox (native server, <code>dox_postgres_native</code>), Go 1.27
 (<code>net/http</code> + pgx), Bun 1.4 (<code>Bun.serve</code> + <code>Bun.sql</code>), Node 24
 (<code>node:http</code> + <code>pg</code>), <code>dart:io</code> (<code>HttpServer</code> + <code>package:postgres</code>).</p>
 <h3 id="1-core_1">1 core</h3>
@@ -6560,7 +6560,7 @@ Versions: Dox 3.0.0-alpha.3 (native server, <code>dox_postgres_native</code>), G
     <span class="dox-bench__ram">62 MB</span>
   </div>
 </div>
-<p class="dox-bench__foot"><span>Dox 3.0.0-alpha.3 · Bun 1.4 · Go 1.27 · Dart 3.13 · Postgres 18 · 256 connections · wrk · median of 3 runs</span></p>
+<p class="dox-bench__foot"><span>Dox · Bun 1.4 · Go 1.27 · Dart 3.13 · Postgres 18 · 256 connections · wrk · median of 3 runs</span></p>
 </div>
 <table>
 <thead>
@@ -6649,7 +6649,7 @@ Versions: Dox 3.0.0-alpha.3 (native server, <code>dox_postgres_native</code>), G
     <span class="dox-bench__ram">22 MB</span>
   </div>
 </div>
-<p class="dox-bench__foot"><span>Dox 3.0.0-alpha.3 · Bun 1.4 · Go 1.27 · Node 24 · Postgres 18 · 256 connections · wrk · median of 3 runs</span></p>
+<p class="dox-bench__foot"><span>Dox · Bun 1.4 · Go 1.27 · Node 24 · Postgres 18 · 256 connections · wrk · median of 3 runs</span></p>
 </div>
 <div class="dox-bench dox-bench--simple">
 <p class="dox-bench__title">2 cores: 20 queries per request</p>
@@ -6679,7 +6679,7 @@ Versions: Dox 3.0.0-alpha.3 (native server, <code>dox_postgres_native</code>), G
     <span class="dox-bench__num">5,134<span class="dox-bench__vs">2.5× slower</span></span>
   </div>
 </div>
-<p class="dox-bench__foot"><span>Dox 3.0.0-alpha.3 · Bun 1.4 · Go 1.27 · Node 24 · Postgres 18 · 256 connections · wrk · median of 3 runs</span></p>
+<p class="dox-bench__foot"><span>Dox · Bun 1.4 · Go 1.27 · Node 24 · Postgres 18 · 256 connections · wrk · median of 3 runs</span></p>
 </div>
 <table>
 <thead>

@@ -6926,7 +6926,7 @@ Then a broadcast on one server reaches the clients of all servers.</p>
 </span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="p">);</span>
 </span></code></pre></div>
 <ul>
-<li><code>Redis</code> comes from the <code>ioredis</code> package (<code>^3.0.0</code>).</li>
+<li><code>Redis</code> comes from the <code>ioredis</code> package.</li>
 <li>The subscriber needs its own connection. A Redis connection in subscribe mode can not run other commands.</li>
 <li>It uses the format of <code>@socket.io/redis-adapter</code>. Node.js servers with that adapter can share one Redis with Dox servers.</li>
 <li>It reads messages in msgpack and in JSON. It writes msgpack, like the Node.js adapter.
