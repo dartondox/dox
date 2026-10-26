@@ -120,8 +120,8 @@ Dart. The speed comes from the Rust HTTP server and database drivers.
 Without a database (`GET /json`), Bun is faster.
 See [Performance](digging-deeper/performance.md) for every route.
 
-!!! warning "You are reading the 3.x docs (alpha)"
-    `3.0.0-alpha.x` is a preview. Things can still change before the stable release.
+!!! warning "You are reading the 3.x docs (release candidate)"
+    `3.0.0-rc.x` is a release candidate. Small things can still change before the stable release.
 
 ## Run it in two minutes
 
@@ -129,7 +129,7 @@ You need [Dart](https://dart.dev/get-dart) 3.13 or newer. Nothing else: the
 starter project uses SQLite, so there is no database to install.
 
 ```bash
-dart pub global activate dox ^3.0.0-alpha   # install the CLI
+dart pub global activate dox ^3.0.0-rc   # install the CLI
 dox create my_app                            # download the starter project
 cd my_app
 dart pub get
@@ -228,13 +228,13 @@ Source: https://dartondox.dev/latest/3.xgetting-started/installation/
 
 This page shows how to install the Dox CLI, make a new project and start the server.
 
-!!! warning "3.x is alpha"
-    Dox 3 is in alpha (`3.0.0-alpha.x`). It needs **Dart 3.13** or newer.
+!!! warning "3.x is a release candidate"
+    Dox 3 is a release candidate (`3.0.0-rc.x`). It needs **Dart 3.13** or newer.
 
 ## Install the CLI
 
 ```bash
-dart pub global activate dox ^3.0.0-alpha
+dart pub global activate dox ^3.0.0-rc
 ```
 
 Check that it works:
@@ -259,7 +259,7 @@ dox create new_blog
 
 `dox create` downloads the newest 3.x release of
 [dox-sample](https://github.com/dartondox/dox-sample), the starter project.
-To get one exact version, add `--version`, for example `dox create new_blog --version 3.0.0-alpha.17`.
+To get one exact version, add `--version`, for example `dox create new_blog --version 3.0.0-rc.1`.
 
 It also makes your `.env` file from `.env.example`, with a new random `APP_KEY`.
 Then get the packages:
@@ -276,16 +276,16 @@ values in `.env`. See [Database](../database/index.md).
 
 !!! info "Add Dox to an existing Dart project"
     Add the packages you need to `pubspec.yaml`. Each Dox package has its own
-    version number. Use `^3.0.0-alpha` for each of them. It picks the newest 3.x alpha.
+    version number. Use `^3.0.0-rc` for each of them. It picks the newest 3.x release.
 
 ```yaml title="pubspec.yaml"
 dependencies:
-  dox_core: ^3.0.0-alpha
-  dox_orm: ^3.0.0-alpha
-  dox_migration: ^3.0.0-alpha
+  dox_core: ^3.0.0-rc
+  dox_orm: ^3.0.0-rc
+  dox_migration: ^3.0.0-rc
 
 dev_dependencies:
-  dox_builder: ^3.0.0-alpha
+  dox_builder: ^3.0.0-rc
   build_runner: ^2.17.1
 ```
 
@@ -1044,7 +1044,7 @@ This step adds register and login with a JWT token, and only lets a logged in us
 ## 1. Add the package
 
 ```bash
-dart pub add dox_auth:^3.0.0-alpha
+dart pub add dox_auth:^3.0.0-rc
 ```
 
 ## 2. Make the users table
@@ -2369,10 +2369,10 @@ Source: https://dartondox.dev/latest/3.xconcepts/status-and-roadmap/
 
 This page shows what works in Dox today, what is missing and what is planned.
 
-Checked on 2026-10-26. The main repo is at version `3.0.0-alpha.17`.
+Checked on 2026-10-26. The main repo is at version `3.0.0-rc.1`.
 
-Dox 3.0 is an **alpha**. Every feature planned for 3.0.0 is in. What is left before 3.0 stable is testing and small fixes.
-The API can still change between alpha versions.
+Dox 3.0 is a **release candidate**. Every feature planned for 3.0.0 is in. What is left before 3.0 stable is testing and small fixes.
+The API should not change much before 3.0.0.
 
 ## Packages
 
@@ -2386,23 +2386,23 @@ The packages in the main repo share one version number. The other packages live 
 
 | Package | Version | What it does | State | Tests |
 | --- | --- | --- | --- | --- |
-| `dox_core` | `3.0.0-alpha.17` | Routes, middleware, controllers, request and response, isolates, config, the IoC container, exception handler, sessions, CSRF, rate limit, security headers, health check, test client | May change | 334 tests in 44 files. CI runs them on the native server. |
-| `dox_orm` | `3.0.0-alpha.14` | Query builder, models, relations, `whereHas`, scopes, casts, `withCount`, transactions, row locks, factories, seeders | May change | 355 tests in 37 files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite. |
-| `dox_validation` | `3.0.0-alpha.17` | `@Dto` rules, fluent schemas, JSON Schema, Standard Schema | Ready for stable | 90 tests in 6 files |
-| `dox_builder` | `3.0.0-alpha.17` | Code generator for models, DTOs, env classes, the container and OpenAPI | May change | 59 tests in 5 files |
-| `dox_annotation` | `3.0.0-alpha.17` | Annotations used by the generator | May change | 1 test in 1 file. Mostly tested through `dox_builder`. |
-| `dox` (CLI) | `3.0.0-alpha.17` | `dox create`, `dox serve`, `dox build`, `make:*`, `migration:*`, `db:seed`, `queue:*`, `schedule:*` | May change | 73 tests in 9 files |
-| `dox_migration` | `3.0.0-alpha.14` | Migrations for Postgres, MySQL, MariaDB and SQLite | Ready for stable | 31 tests in 5 files. CI runs them on each database. |
-| `dox_auth` | `3.0.0-alpha.17` | JWT and session auth guards and middleware | May change | 43 tests in 4 files |
-| `dox_cache` | `3.0.0-alpha.17` | Memory, file and Redis cache, tags, locks | Ready for stable | 63 tests in 4 files, with Redis in CI |
-| `dox_storage` | `3.0.0-alpha.13` | Local disk and S3 (and S3-compatible) storage | Ready for stable | 119 tests in 10 files, with MinIO in CI |
-| `dox_openapi` | `3.0.0-alpha.17` | OpenAPI 3.1 document and a docs page | Ready for stable | 56 tests in 4 files |
-| `dox_socketio` | `3.0.0-alpha.15` | Socket.IO v4 server with a Redis adapter | May change | 85 tests in 10 files, with Redis and the real `socket.io-client` in CI |
-| `dox_queue` | `3.0.0-alpha.5` | Queues and jobs | Experimental | 43 tests in 5 files, with Postgres, MariaDB and Redis in CI |
+| `dox_core` | `3.0.0-rc.1` | Routes, middleware, controllers, request and response, isolates, config, the IoC container, exception handler, sessions, CSRF, rate limit, security headers, health check, test client | May change | 334 tests in 44 files. CI runs them on the native server. |
+| `dox_orm` | `3.0.0-rc.1` | Query builder, models, relations, `whereHas`, scopes, casts, `withCount`, transactions, row locks, factories, seeders | May change | 355 tests in 37 files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite. |
+| `dox_validation` | `3.0.0-rc.1` | `@Dto` rules, fluent schemas, JSON Schema, Standard Schema | Ready for stable | 90 tests in 6 files |
+| `dox_builder` | `3.0.0-rc.1` | Code generator for models, DTOs, env classes, the container and OpenAPI | May change | 59 tests in 5 files |
+| `dox_annotation` | `3.0.0-rc.1` | Annotations used by the generator | May change | 1 test in 1 file. Mostly tested through `dox_builder`. |
+| `dox` (CLI) | `3.0.0-rc.1` | `dox create`, `dox serve`, `dox build`, `make:*`, `migration:*`, `db:seed`, `queue:*`, `schedule:*` | May change | 73 tests in 9 files |
+| `dox_migration` | `3.0.0-rc.1` | Migrations for Postgres, MySQL, MariaDB and SQLite | Ready for stable | 31 tests in 5 files. CI runs them on each database. |
+| `dox_auth` | `3.0.0-rc.1` | JWT and session auth guards and middleware | May change | 43 tests in 4 files |
+| `dox_cache` | `3.0.0-rc.1` | Memory, file and Redis cache, tags, locks | Ready for stable | 63 tests in 4 files, with Redis in CI |
+| `dox_storage` | `3.0.0-rc.1` | Local disk and S3 (and S3-compatible) storage | Ready for stable | 119 tests in 10 files, with MinIO in CI |
+| `dox_openapi` | `3.0.0-rc.1` | OpenAPI 3.1 document and a docs page | Ready for stable | 56 tests in 4 files |
+| `dox_socketio` | `3.0.0-rc.1` | Socket.IO v4 server with a Redis adapter | May change | 85 tests in 10 files, with Redis and the real `socket.io-client` in CI |
+| `dox_queue` | `3.0.0-rc.1` | Queues and jobs | Experimental | 43 tests in 5 files, with Postgres, MariaDB and Redis in CI |
 | `dox_scheduler` | `3.0.0-alpha.2` | Run tasks on a schedule | Experimental | 74 tests in 6 files, with Redis in CI |
-| `dox_view` | `3.0.0-alpha.3` | [Views](../the-basic/views.md): `.dox.html` templates with layouts and components | Experimental | 36 tests in 2 files |
+| `dox_view` | `3.0.0-rc.1` | [Views](../the-basic/views.md): `.dox.html` templates with layouts and components | Experimental | 36 tests in 2 files |
 | [`dox_inertia`](../the-basic/inertia.md) | `3.0.0-alpha.4` | Inertia.js server side: single page apps with React, Vue or Svelte and Dox controllers | Experimental | 26 tests in 2 files |
-| `dox_mailer` | `3.0.0-alpha.2` | Email with SMTP, Amazon SES, Azure, Resend, Mailgun, Postmark and sendmail | Experimental | 72 tests in 10 files, with a fake SMTP server |
+| `dox_mailer` | `3.0.0-rc.1` | Email with SMTP, Amazon SES, Azure, Resend, Mailgun, Postmark and sendmail | Experimental | 72 tests in 10 files, with a fake SMTP server |
 | `dox_http_native` | `3.0.0-alpha.8` | Native HTTP/1.1 and WebSocket server (Rust hyper). Dox has no other server. | Experimental | 35 Dart tests in 3 files, and 16 Rust tests |
 | `dox_postgres_native` | `3.0.0-alpha.8` | Native Postgres client (Rust tokio-postgres), the Postgres driver. Has TLS (`sslmode`, `sslRootCert`). | Experimental | 31 Dart tests in 5 files, plus the `dox_orm` tests |
 | `dox_mysql_native` | `3.0.0-alpha.7` | Native MySQL and MariaDB client (Rust mysql_async), the MySQL driver. Has TLS. | Experimental | 13 Dart tests in 1 file, plus the `dox_orm` tests |
@@ -2439,7 +2439,7 @@ The package CHANGELOGs have an `Unreleased` section when changes wait for the ne
 
 ## How to help
 
-- Try the alpha and open an issue when something breaks or is missing.
+- Try the release candidate and open an issue when something breaks or is missing.
 - Pick an item above and open an issue first, so the design can be discussed.
 - See [Contribute](../community/contribute.md) to set up the repo and run the tests.
 
@@ -18381,11 +18381,11 @@ environment:
   sdk: ^3.13.0
 
 dependencies:
-  dox_validation: ^3.0.0-alpha
+  dox_validation: ^3.0.0-rc
 
 dev_dependencies:
   build_runner: ^2.17.1
-  dox_builder: ^3.0.0-alpha
+  dox_builder: ^3.0.0-rc
 ```
 
 `dox_builder` is a dev dependency. It only runs when you generate code. The Flutter app does not get it.
@@ -18973,7 +18973,7 @@ RUN dart pub get --offline
 # `dox build` runs build_runner, then `dart build cli`.
 # The bundle is in build/bundle: bin/server, lib/, db/, .env.example
 # (and bin/queue, bin/schedule when the app has them)
-RUN dart pub global activate dox ^3.0.0-alpha \
+RUN dart pub global activate dox ^3.0.0-rc \
   && /root/.pub-cache/bin/dox build
 
 # The health check binary. Plain dart:io, so `dart compile exe` is fine.
@@ -19172,7 +19172,7 @@ So build it inside the `dart:stable` image (it is Debian):
 
 ```bash
 docker run --rm -v "$PWD":/app -w /app dart:stable sh -c \
-  'dart pub get && dart pub global activate dox ^3.0.0-alpha && /root/.pub-cache/bin/dox build'
+  'dart pub get && dart pub global activate dox ^3.0.0-rc && /root/.pub-cache/bin/dox build'
 ```
 
 The result is `build/bundle/`:
@@ -21910,7 +21910,7 @@ Dox opens a file database with `journal_mode = WAL`, `synchronous = NORMAL`, `fo
 zsh: command not found: dox
 ```
 
-right after `dart pub global activate dox ^3.0.0-alpha`.
+right after `dart pub global activate dox ^3.0.0-rc`.
 
 **Cause.** `dart pub global activate` puts the `dox` script in `$HOME/.pub-cache/bin`. That folder is not in your `PATH`.
 
@@ -22215,7 +22215,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
-### Unreleased
+### 3.0.0-rc.1
 
 - `IDoxRequest.auth` is now a field (getter and setter), not only a getter. The auth is kept apart from the input.
 
@@ -22299,7 +22299,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_auth
 
-### Unreleased
+### 3.0.0-rc.1
 
 - Breaking: `JwtAuthDriver` no longer signs with the `SecretKey` text as it is. The HMAC key is made from it with HKDF-SHA256 and the label `dox:jwt`. Existing tokens become invalid after this version. Users must log in again. `driver.signingKey` gives the key, for another service that checks the tokens.
 - Security: `JwtAuthDriver.verifyToken` accepts only the configured `algorithm`. A token with another algorithm in its header is rejected.
@@ -22399,7 +22399,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_builder
 
-### Unreleased
+### 3.0.0-rc.1
 
 - `lib/generated/dtos.g.dart` is now written for every app, also with no `@Dto`. The list is empty then. So the app can always have `dtos: dtos` in `AppConfig`. An app here is a package that imports `AppConfig` (from dox_core). Other packages with no DTO still get no file. The empty list is `final`, not `const`, so `dtos: dtos` does not trigger the `avoid_redundant_argument_values` lint.
 
@@ -22499,6 +22499,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### 3.0.0-rc.1
+
+- Needs `ioredis` 3.0.1. It fixes a crash on disconnect when the Redis host is a name like `localhost` or `redis`.
+
 ### 3.0.0-alpha.17
 
 - Version bump only, to match the other packages.
@@ -22584,7 +22588,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox
 
-### Unreleased
+### 3.0.0-rc.1
 
 - Fix: `dox make:job` wrote a `bin/queue.dart` that did not compile. It called `QueueWorker(jobs: ...)`, but `QueueWorker` has no `jobs` parameter. It now writes the same file as the app template: `QueueWorker(app: appConfig)`.
 - Fix: the job that `dox make:job` writes showed `X(userId: 1).dispatch()` in its comment. The class has no `userId`. The comment now shows `X().dispatch()`.
@@ -22691,7 +22695,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_core
 
-### Unreleased
+### 3.0.0-rc.1
 
 - Breaking: Dox no longer uses `APP_KEY` as it is. It makes one key per purpose from it with HKDF-SHA256 (RFC 5869): `dox:cookie` for cookies and the cookie session, `dox:encrypt` for `AESEncryptor`, and more. See the new `KeyDerivation` class. Existing encrypted cookies, sessions and tokens become invalid after this version. Users must log in again.
 - `AESEncryptor.encode` and `decode` take a `purpose` label. The default is `dox:encrypt`. The secret can now have any length.
@@ -22918,6 +22922,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_openapi
 
+### 3.0.0-rc.1
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.17
 
 - Version bump only, to match the other packages.
@@ -23001,6 +23009,10 @@ What changed in each package, newest first. This page is made from the
 - Output as JSON and YAML, write files, serve `/openapi.json`, `/openapi.yaml` and `/docs`.
 
 ## dox_validation
+
+### 3.0.0-rc.1
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.17
 

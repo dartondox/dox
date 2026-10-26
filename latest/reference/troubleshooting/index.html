@@ -6531,7 +6531,7 @@
 <p><strong>Symptom.</strong></p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>zsh: command not found: dox
 </span></code></pre></div>
-<p>right after <code>dart pub global activate dox ^3.0.0-alpha</code>.</p>
+<p>right after <code>dart pub global activate dox ^3.0.0-rc</code>.</p>
 <p><strong>Cause.</strong> <code>dart pub global activate</code> puts the <code>dox</code> script in <code>$HOME/.pub-cache/bin</code>. That folder is not in your <code>PATH</code>.</p>
 <p><strong>Fix.</strong> Add it to your shell profile and open a new terminal:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$PATH</span><span class="s2">"</span>:<span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.pub-cache/bin"</span>
