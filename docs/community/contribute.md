@@ -76,7 +76,7 @@ The full guide is [RELEASING.md](https://github.com/dartondox/dox/blob/main/RELE
 
 The native packages (`dox_http_native`, `dox_postgres_native`, `dox_mysql_native`) are not in this repo.
 See [Native packages](#native-packages) below.
-`dox_orm`, `dox_migration`, `dox_query_builder`, `dox_socketio` and `dox_storage` are not in this repo either.
+`dox_orm`, `dox_migration`, `dox_socketio` and `dox_storage` are not in this repo either.
 See [Packages in other repos](#packages-in-other-repos).
 
 **New package only:** turn on pub.dev automated publishing for it first. See [One-time setup](#one-time-setup).
@@ -129,7 +129,7 @@ Optional: add yourself as a required reviewer, and allow only tags `v*`.
 
 | Package | Repo |
 | --- | --- |
-| `dox_orm`, `dox_migration`, `dox_query_builder` | [dartondox/dox-orm](https://github.com/dartondox/dox-orm) |
+| `dox_orm`, `dox_migration` | [dartondox/dox-orm](https://github.com/dartondox/dox-orm) |
 | `dox_socketio` | [dartondox/dox-socketio](https://github.com/dartondox/dox-socketio) |
 | `dox_storage` | [dartondox/dox-storage](https://github.com/dartondox/dox-storage) |
 | `dox_queue` | [dartondox/dox-queue](https://github.com/dartondox/dox-queue) |

@@ -42,7 +42,7 @@ Some packages live in their own repos:
 
 | Package | Repo |
 | --- | --- |
-| `dox_orm`, `dox_migration`, `dox_query_builder` | [dartondox/dox-orm](https://github.com/dartondox/dox-orm) |
+| `dox_orm`, `dox_migration` | [dartondox/dox-orm](https://github.com/dartondox/dox-orm) |
 | `dox_socketio` | [dartondox/dox-socketio](https://github.com/dartondox/dox-socketio) |
 | `dox_storage` | [dartondox/dox-storage](https://github.com/dartondox/dox-storage) |
 | `dox_queue` | [dartondox/dox-queue](https://github.com/dartondox/dox-queue) |
