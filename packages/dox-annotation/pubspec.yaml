@@ -1,6 +1,6 @@
 name: dox_annotation
 description: Dox annotation for dox framework
-version: 3.0.0-alpha.17
+version: 3.0.0-rc.1
 repository: https://github.com/dartondox/dox
 homepage: https://dartondox.dev
 

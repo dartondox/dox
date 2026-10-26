@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-rc.1
 
 - Breaking: `JwtAuthDriver` no longer signs with the `SecretKey` text as it is. The HMAC key is made from it with HKDF-SHA256 and the label `dox:jwt`. Existing tokens become invalid after this version. Users must log in again. `driver.signingKey` gives the key, for another service that checks the tokens.
 - Security: `JwtAuthDriver.verifyToken` accepts only the configured `algorithm`. A token with another algorithm in its header is rejected.

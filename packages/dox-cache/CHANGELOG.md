@@ -1,3 +1,7 @@
+## 3.0.0-rc.1
+
+- Needs `ioredis` 3.0.1. It fixes a crash on disconnect when the Redis host is a name like `localhost` or `redis`.
+
 ## 3.0.0-alpha.17
 
 - Version bump only, to match the other packages.

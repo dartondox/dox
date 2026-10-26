@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0-rc.1
 
 - `lib/generated/dtos.g.dart` is now written for every app, also with no `@Dto`. The list is empty then. So the app can always have `dtos: dtos` in `AppConfig`. An app here is a package that imports `AppConfig` (from dox_core). Other packages with no DTO still get no file. The empty list is `final`, not `const`, so `dtos: dtos` does not trigger the `avoid_redundant_argument_values` lint.
 
