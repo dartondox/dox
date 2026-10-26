@@ -1,3 +1,7 @@
+## 3.0.0-alpha.16
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.15
 
 - `dox make:dto CreateBlog` now writes `lib/app/http/dtos/create_blog/create_blog.dto.dart`. Each DTO has its own folder, like models. The `.dto.g.dart` file is made next to it.

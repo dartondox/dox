@@ -1,3 +1,7 @@
+## 3.0.0-alpha.16
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.15
 
 - Change: the startup hook is `DoxProvider`. Write `class X extends DoxProvider`. `setup()` runs once in every isolate at start. `shutdown()` is optional and runs once in every isolate when the app stops. List providers in `AppConfig.providers`, or add them with `Dox().addProvider()` and `Dox().addProviders()`. The container method is `c.provider<T>()`.

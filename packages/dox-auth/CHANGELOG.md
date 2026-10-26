@@ -1,3 +1,7 @@
+## 3.0.0-alpha.16
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.15
 
 - Docs: the README and the example set up auth in an `AppAuthProvider` that extends `DoxProvider`.
