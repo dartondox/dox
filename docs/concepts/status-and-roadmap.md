@@ -38,7 +38,7 @@ The packages in the main repo share one version number. The other packages live 
 | `dox_queue` | Queues and jobs | Experimental | 5 test files |
 | `dox_scheduler` | Run tasks on a schedule | Experimental | 6 test files |
 | `dox_view` | [Views](../the-basic/views.md): `.dox.html` templates with layouts and components | Experimental | 2 test files |
-| `dox_inertia` | Inertia.js server side: single page apps with React, Vue or Svelte and Dox controllers | Experimental | 2 test files |
+| [`dox_inertia`](../the-basic/inertia.md) | Inertia.js server side: single page apps with React, Vue or Svelte and Dox controllers | Experimental | 2 test files |
 | `dox_mailer` | Email with SMTP, Amazon SES, Azure, Resend, Mailgun, Postmark and sendmail | Experimental | 6 test files, with a fake SMTP server |
 | `dox_http_native` | Native HTTP/1.1 and WebSocket server (Rust hyper). Dox has no other server. | Experimental | 3 Dart test files and Rust tests |
 | `dox_postgres_native` | Native Postgres client (Rust tokio-postgres), the Postgres driver. Has TLS (`sslmode`, `sslRootCert`). | Experimental | 5 Dart test files, plus the `dox_orm` tests |
