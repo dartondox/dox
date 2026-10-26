@@ -2357,34 +2357,35 @@ Checked on 2026-10-26.
 
 What the states mean:
 
-- **Ready for stable**: works, has tests and has not changed in a breaking way for a while. Only bug fixes are planned.
-- **May change**: works and has tests. Names and options can still change.
-- **Experimental**: new code. It changed in a breaking way recently, or it has a known gap.
+- **Stable**: works, has tests and has had real use.
+- **New**: works and has tests, but it is newer and has had less real use.
+
+All packages follow semantic versioning: a breaking change only comes in a new major version.
 
 The packages in the main repo share one version number. The other packages live in their own repos and have their own version numbers. See [Contribute](../community/contribute.md#packages-in-other-repos).
 
 | Package | What it does | State | Tests |
 | --- | --- | --- | --- |
-| `dox_core` | Routes, middleware, controllers, request and response, isolates, config, the IoC container, exception handler, sessions, CSRF, rate limit, security headers, health check, test client | May change | 334 tests in 44 files. CI runs them on the native server. |
-| `dox_orm` | Query builder, models, relations, `whereHas`, scopes, casts, `withCount`, transactions, row locks, factories, seeders | May change | 355 tests in 37 files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite. |
-| `dox_validation` | `@Dto` rules, fluent schemas, JSON Schema, Standard Schema | Ready for stable | 90 tests in 6 files |
-| `dox_builder` | Code generator for models, DTOs, env classes, the container and OpenAPI | May change | 59 tests in 5 files |
-| `dox_annotation` | Annotations used by the generator | May change | 1 test in 1 file. Mostly tested through `dox_builder`. |
-| `dox` (CLI) | `dox create`, `dox serve`, `dox build`, `make:*`, `migration:*`, `db:seed`, `queue:*`, `schedule:*` | May change | 73 tests in 9 files |
-| `dox_migration` | Migrations for Postgres, MySQL, MariaDB and SQLite | Ready for stable | 31 tests in 5 files. CI runs them on each database. |
-| `dox_auth` | JWT and session auth guards and middleware | May change | 43 tests in 4 files |
-| `dox_cache` | Memory, file and Redis cache, tags, locks | Ready for stable | 63 tests in 4 files, with Redis in CI |
-| `dox_storage` | Local disk and S3 (and S3-compatible) storage | Ready for stable | 119 tests in 10 files, with MinIO in CI |
-| `dox_openapi` | OpenAPI 3.1 document and a docs page | Ready for stable | 56 tests in 4 files |
-| `dox_socketio` | Socket.IO v4 server with a Redis adapter | May change | 85 tests in 10 files, with Redis and the real `socket.io-client` in CI |
-| `dox_queue` | Queues and jobs | Experimental | 43 tests in 5 files, with Postgres, MariaDB and Redis in CI |
-| `dox_scheduler` | Run tasks on a schedule | Experimental | 74 tests in 6 files, with Redis in CI |
-| `dox_view` | [Views](../the-basic/views.md): `.dox.html` templates with layouts and components | Experimental | 36 tests in 2 files |
-| [`dox_inertia`](../the-basic/inertia.md) | Inertia.js server side: single page apps with React, Vue or Svelte and Dox controllers | Experimental | 26 tests in 2 files |
-| `dox_mailer` | Email with SMTP, Amazon SES, Azure, Resend, Mailgun, Postmark and sendmail | Experimental | 72 tests in 10 files, with a fake SMTP server |
-| `dox_http_native` | Native HTTP/1.1 and WebSocket server (Rust hyper). Dox has no other server. | Experimental | 35 Dart tests in 3 files, and 16 Rust tests |
-| `dox_postgres_native` | Native Postgres client (Rust tokio-postgres), the Postgres driver. Has TLS (`sslmode`, `sslRootCert`). | Experimental | 31 Dart tests in 5 files, plus the `dox_orm` tests |
-| `dox_mysql_native` | Native MySQL and MariaDB client (Rust mysql_async), the MySQL driver. Has TLS. | Experimental | 13 Dart tests in 1 file, plus the `dox_orm` tests |
+| `dox_core` | Routes, middleware, controllers, request and response, isolates, config, the IoC container, exception handler, sessions, CSRF, rate limit, security headers, health check, test client | Stable | 334 tests in 44 files. CI runs them on the native server. |
+| `dox_orm` | Query builder, models, relations, `whereHas`, scopes, casts, `withCount`, transactions, row locks, factories, seeders | Stable | 355 tests in 37 files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite. |
+| `dox_validation` | `@Dto` rules, fluent schemas, JSON Schema, Standard Schema | Stable | 90 tests in 6 files |
+| `dox_builder` | Code generator for models, DTOs, env classes, the container and OpenAPI | Stable | 59 tests in 5 files |
+| `dox_annotation` | Annotations used by the generator | Stable | 1 test in 1 file. Mostly tested through `dox_builder`. |
+| `dox` (CLI) | `dox create`, `dox serve`, `dox build`, `make:*`, `migration:*`, `db:seed`, `queue:*`, `schedule:*` | Stable | 73 tests in 9 files |
+| `dox_migration` | Migrations for Postgres, MySQL, MariaDB and SQLite | Stable | 31 tests in 5 files. CI runs them on each database. |
+| `dox_auth` | JWT and session auth guards and middleware | Stable | 43 tests in 4 files |
+| `dox_cache` | Memory, file and Redis cache, tags, locks | Stable | 63 tests in 4 files, with Redis in CI |
+| `dox_storage` | Local disk and S3 (and S3-compatible) storage | Stable | 119 tests in 10 files, with MinIO in CI |
+| `dox_openapi` | OpenAPI 3.1 document and a docs page | Stable | 56 tests in 4 files |
+| `dox_socketio` | Socket.IO v4 server with a Redis adapter | Stable | 85 tests in 10 files, with Redis and the real `socket.io-client` in CI |
+| `dox_queue` | Queues and jobs | New | 43 tests in 5 files, with Postgres, MariaDB and Redis in CI |
+| `dox_scheduler` | Run tasks on a schedule | New | 74 tests in 6 files, with Redis in CI |
+| `dox_view` | [Views](../the-basic/views.md): `.dox.html` templates with layouts and components | New | 36 tests in 2 files |
+| [`dox_inertia`](../the-basic/inertia.md) | Inertia.js server side: single page apps with React, Vue or Svelte and Dox controllers | New | 26 tests in 2 files |
+| `dox_mailer` | Email with SMTP, Amazon SES, Azure, Resend, Mailgun, Postmark and sendmail | New | 72 tests in 10 files, with a fake SMTP server |
+| `dox_http_native` | Native HTTP/1.1 and WebSocket server (Rust hyper). Dox has no other server. | New | 35 Dart tests in 3 files, and 16 Rust tests |
+| `dox_postgres_native` | Native Postgres client (Rust tokio-postgres), the Postgres driver. Has TLS (`sslmode`, `sslRootCert`). | New | 31 Dart tests in 5 files, plus the `dox_orm` tests |
+| `dox_mysql_native` | Native MySQL and MariaDB client (Rust mysql_async), the MySQL driver. Has TLS. | New | 13 Dart tests in 1 file, plus the `dox_orm` tests |
 
 `Hash` (bcrypt password hashing) is in `dox_core`.
 
@@ -2551,6 +2552,9 @@ Optional: add yourself as a required reviewer, and allow only tags `v*`.
 | --- | --- |
 | `dox` (the CLI) | [dartondox/dox-cli](https://github.com/dartondox/dox-cli) |
 | `dox_orm`, `dox_migration` | [dartondox/dox-orm](https://github.com/dartondox/dox-orm) |
+| `dox_auth` | [dartondox/dox-auth](https://github.com/dartondox/dox-auth) |
+| `dox_openapi` | [dartondox/dox-openapi](https://github.com/dartondox/dox-openapi) |
+| `dox_validation` | [dartondox/dox-validation](https://github.com/dartondox/dox-validation) |
 | `dox_socketio` | [dartondox/dox-socketio](https://github.com/dartondox/dox-socketio) |
 | `dox_storage` | [dartondox/dox-storage](https://github.com/dartondox/dox-storage) |
 | `dox_queue` | [dartondox/dox-queue](https://github.com/dartondox/dox-queue) |
@@ -2560,22 +2564,23 @@ Optional: add yourself as a required reviewer, and allow only tags `v*`.
 | `dox_mailer` | [dartondox/dox-mailer](https://github.com/dartondox/dox-mailer) |
 
 The packages here use them from pub.dev. The database tests (Postgres, MySQL, MariaDB, SQLite) run in `dox-orm`.
-CI in this repo uses the newest `dox-orm` code: `ci/clone-siblings.sh`, then `ci/use-sibling-orm.sh`.
+`dox_core` uses `dox_openapi` and `dox_validation`.
+CI in this repo uses their newest code: `ci/clone-siblings.sh`, then `ci/use-siblings.sh`.
 
 To work on one of them and Dox together:
 
 1. Clone the repos next to the Dox repo, like `../dox-orm`.
-   `ci/clone-siblings.sh` clones `dox-orm`, `dox-socketio`, `dox-storage`, `dox-queue`, `dox-scheduler` and `dox-cli`.
+   `ci/clone-siblings.sh` clones `dox-orm`, `dox-auth`, `dox-openapi`, `dox-validation`, `dox-socketio`, `dox-storage`, `dox-queue`, `dox-scheduler` and `dox-cli`.
    Clone `dox-mailer`, `dox-view` and `dox-inertia` by hand when you need them.
 2. Add them to the root `pubspec_overrides.yaml` of the Dox repo. Git ignores this file.
-   For `dox_orm` and `dox_migration`, `ci/use-sibling-orm.sh` writes this file for you.
+   For `dox_openapi` and `dox_validation`, `ci/use-siblings.sh` writes this file for you.
 
     ```yaml
     dependency_overrides:
-      dox_orm:
-        path: ../dox-orm/packages/dox-orm
-      dox_migration:
-        path: ../dox-orm/packages/dox-migration
+      dox_openapi:
+        path: ../dox-openapi
+      dox_validation:
+        path: ../dox-validation
     ```
 
 3. Run `dart pub get`.
@@ -20471,7 +20476,7 @@ Source: `packages/dox-core/lib/openapi/openapi_config.dart`.
 | `include` | `List<String>` | `[]` (all routes) | Only routes with these paths are in the docs, like `['/api/*']`. A `*` at the end matches the rest of the path. |
 | `exclude` | `List<String>` | `[]` | Routes with these paths are left out. Checked after `include`. |
 
-`ScalarOptions` (`packages/dox-openapi/lib/src/docs_ui.dart`):
+`ScalarOptions` (`lib/src/docs_ui.dart` in [dartondox/dox-openapi](https://github.com/dartondox/dox-openapi)):
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
@@ -20563,7 +20568,7 @@ The `database.dart` of a new project also sets `maxConnectionAge` for Postgres a
 ## AuthConfig
 
 Auth is not a field of `AppConfig`. A provider calls `Auth.initialize(AuthConfig(...))` in its `setup()`.
-Source: `packages/dox-auth/lib/src/interfaces.dart`.
+Source: `lib/src/interfaces.dart` in [dartondox/dox-auth](https://github.com/dartondox/dox-auth).
 
 | Class | Field | Type | Default | Meaning |
 | --- | --- | --- | --- | --- |
@@ -21491,7 +21496,7 @@ Every class takes the named parameters `message`, `errorCode` and `code`. The ta
 | `InternalErrorException` | `dox_core` | `500` | `server_error` | `Server Error` | never by itself; for your own use |
 | `QueryException` | `dox_core` | `500` | `sql_query_error` | `Error in sql query` | never by itself; for your own use |
 
-Source files: `packages/dox-core/lib/exception/*.dart` and `packages/dox-auth/lib/src/auth_exception.dart`.
+Source files: `packages/dox-core/lib/exception/*.dart` and `lib/src/auth_exception.dart` in [dartondox/dox-auth](https://github.com/dartondox/dox-auth).
 
 ## What the client gets
 
@@ -22189,6 +22194,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
+### 3.0.0
+
+- The first stable release.
+
 ### 3.0.0-rc.1
 
 - `IDoxRequest.auth` is now a field (getter and setter), not only a getter. The auth is kept apart from the input.
@@ -22271,107 +22280,11 @@ What changed in each package, newest first. This page is made from the
 - Needs Dart 3.6 or newer.
 - See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
 
-## dox_auth
-
-### 3.0.0-rc.1
-
-- Breaking: `JwtAuthDriver` no longer signs with the `SecretKey` text as it is. The HMAC key is made from it with HKDF-SHA256 and the label `dox:jwt`. Existing tokens become invalid after this version. Users must log in again. `driver.signingKey` gives the key, for another service that checks the tokens.
-- Security: `JwtAuthDriver.verifyToken` accepts only the configured `algorithm`. A token with another algorithm in its header is rejected.
-- Security: `attempt` only puts a string or a number into the user query. A map or a list as the email (or another identifier) fails the login.
-- `AuthMiddleware` and `Auth.setUser` set `req.auth` directly. They no longer put the auth into the request input.
-- `UnAuthorizedException` takes a `dynamic message`, so a map message works.
-- `APP_ENV=testing` is treated like `test` for the short secret check: only a warning.
-
-### 3.0.0-alpha.17
-
-- Uses dox_orm 3.0.0-alpha.12.
-
-### 3.0.0-alpha.16
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.15
-
-- Docs: the README and the example set up auth in an `AppAuthProvider` that extends `DoxProvider`.
-
-### 3.0.0-alpha.14
-
-- New: `Auth().setUser(req, user)` sets the logged-in user on `req.auth`, with no token and no password check. Use it in your own auth middleware, like an API key check.
-- Docs: how to write a custom guard. Extend `AuthDriver`, return the user from `verifyToken`, and use `AuthMiddleware(guard: 'api')`. The README and the authentication page show an API key example.
-- Fix: importing `dox_auth` and `dox_core` together gave an "ambiguous import" error for `AUTH_REQUEST_KEY`. `dox_auth` no longer has its own copy. The one in `dox_core` is used.
-
-### 3.0.0-alpha.13
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.12
-
-- New: `SessionAuthDriver` keeps the login in the session, for web pages. Use `Auth().attemptSession(req, credentials)`, `Auth().loginSession(req, user)` and `Auth().logout(req)`. Login and logout give the session a new id. Needs `SessionMiddleware`.
-- New: `AuthMiddleware(redirectTo: '/login')` sends a guest to that page instead of a 401.
-- Docs: with the default `cookie` session driver, an old copy of the cookie still works after logout. The README now says to use the `cache` driver when logout must end old cookies.
-- Change: the password check of `attempt` moved to `AuthDriver.checkCredentials`, so all drivers share it.
-
-### 3.0.0-alpha.11
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.10
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.9
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.8
-
-- Security: a JWT secret (`SecretKey`) shorter than 32 bytes stops the app with an `ArgumentError` when `APP_ENV` is not `development`, `local` or `test`. In those envs it prints one warning line. Make a key with `dox key:generate` or `openssl rand -hex 32`.
-- `Hash` now comes from `dox_core`. dox_auth had its own copy. `package:dox_auth/src/hash.dart` re-exports it. No change in behaviour. dox_auth now depends on dox_core.
-
-### 3.0.0-alpha.7
-
-- Perf: `attempt` runs bcrypt in another isolate (`Isolate.run`). Before, each login blocked the server isolate for the whole hash.
-- Perf: the dummy hash for unknown users is made when the driver is created, in another isolate. Before, the first login paid for two hashes.
-- New: `JwtAuthDriver(hashRounds: 10)`. Set it to the bcrypt cost of your stored hashes.
-- New: `JwtAuthDriver(userCacheTtl: ...)`. Keeps the user of a token in memory for this time, so `verifyToken` does not run `find(id)` on every request. Off by default.
-- Security: `JwtAuthDriver` throws `ArgumentError` when the `SecretKey` is empty. Before, an app with no `APP_KEY` signed tokens with an empty key, so anyone could make a token for any user.
-- Security: `attempt` runs bcrypt also when no user is found, or when the user has no password. Before, an unknown email answered much faster than a wrong password, so the time told which emails have an account.
-
-### 3.0.0-alpha.6
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.5
-
-- Breaking: `JwtAuthDriver.expiresIn` is 1 hour by default. Before, it was `null`, and tokens never expired.
-- New: named guards work. Use `Auth(guard: 'admin')` and `AuthMiddleware(guard: 'admin')`. Before, only `defaultGuard` was used.
-- A token keeps its guard name in the `aud` claim. A token from one guard does not work on another guard.
-- `verifyToken` checks the `iss` claim when `issuer` is set.
-- Breaking: `AuthDriver` methods get the guard name as a new parameter. `AuthEngine().guard(name)` replaces `AuthEngine().driver` and `AuthEngine().provider`.
-
-### 3.0.0-alpha.4
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.3
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.2
-
-- Needs Dart 3.13 or newer.
-- All dependencies updated to their latest versions.
-- `dart_jsonwebtoken` 3.4 (`pointycastle` 4).
-
-### 3.0.0-alpha.1
-
-- Version 3 of Dox. All Dox packages now share one version.
-- Needs Dart 3.6 or newer.
-- See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
-- Uses `dox_orm` (was `dox_query_builder`).
-- `dart_jsonwebtoken` 3.
-
 ## dox_builder
+
+### 3.0.0
+
+- The first stable release.
 
 ### 3.0.0-rc.1
 
@@ -22473,6 +22386,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### 3.0.0
+
+- The first stable release.
+
 ### 3.0.0-rc.1
 
 - Needs `ioredis` 3.0.1. It fixes a crash on disconnect when the Redis host is a name like `localhost` or `redis`.
@@ -22561,6 +22478,10 @@ What changed in each package, newest first. This page is made from the
 - `remember`, `pull`, `add`, `increment`, `many`, tags and atomic locks.
 
 ## dox_core
+
+### 3.0.0
+
+- The first stable release.
 
 ### 3.0.0-rc.1
 
@@ -22786,188 +22707,4 @@ What changed in each package, newest first. This page is made from the
 - See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
 - Faster: streamed bodies, all CPU cores, faster router.
 - `uuid` 4 and `mime` 2.
-
-## dox_openapi
-
-### 3.0.0-rc.1
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.17
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.16
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.15
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.14
-
-- New: `OpenApiSecurity` and `OpenApiRegistry.security`: login schemes by middleware class name, from `@Security`.
-
-### 3.0.0-alpha.13
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.12
-
-- Fix: two controllers with the same method name (like `login`) could swap their docs. `OpenApiRegistry.find` now takes `controller:`. When the route knows its controller class, only methods of that class match.
-
-### 3.0.0-alpha.11
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.10
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.9
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.8
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.7
-
-- The `/docs` page loads its CDN files with an `integrity` hash, so the browser refuses a changed file.
-
-### 3.0.0-alpha.6
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.5
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.4
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.3
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.2
-
-- A request body with a file field (`format: binary`, also in a list) uses `multipart/form-data` instead of `application/json`, so the `/docs` page can send files. `RouteDoc(bodyMediaType:)` sets it by hand.
-- Needs Dart 3.13 or newer.
-- All dependencies updated to their latest versions.
-- `DoxRouteAdapter` reads `preMiddleware` and `body` from a route when it has them.
-- A Dox catch-all param `{path*}` and an optional param `{id?}` become `{path}` and `{id}` in the document.
-- `OpenApiOperation.formRequest` is removed (form requests are gone).
-- New `OpenApiRegistry`, `OpenApiOperation` and `OpenApiRouteBinding`: the docs that `dox_builder` finds in the code. `OpenApiRegistry.find()` matches them to a live route.
-- `RouteDoc` and `ApiDoc.route()` take `deprecated`.
-- `OpenApiServer` builds and encodes the document once, on the first call, and keeps it. Make a new `OpenApiServer` after you change the `OpenApi`.
-- `OpenApi.yamlEmitter` is now a public field.
-- `/docs` uses Scalar (`@scalar/api-reference` 1.75.1) by default. `OpenApiServer(ui: DocsUi.swagger)` gives Swagger UI. `ScalarOptions` sets the theme, dark mode, download button and proxy (off by default). The title and the config are escaped.
-- Swagger UI updated to 5.34.0.
-
-### 3.0.0-alpha.1
-
-- First release.
-- Build an OpenAPI 3.1 document with `OpenApi` and `ApiDoc`.
-- Add undocumented Dox routes with `DoxRouteAdapter`.
-- Output as JSON and YAML, write files, serve `/openapi.json`, `/openapi.yaml` and `/docs`.
-
-## dox_validation
-
-### 3.0.0-rc.1
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.17
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.16
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.15
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.14
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.13
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.12
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.11
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.10
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.9
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.8
-
-- Fix: `FileTypes.sniff` read any data that starts with `BM` as `bmp`, like the text "BMW...". Now it also checks the BMP header size at byte 14 (12, 40, 52, 56, 64, 108 or 124).
-
-### 3.0.0-alpha.7
-
-- Perf: object, list, map and union schemas work out `isAsync` once and keep the answer. Before, the whole schema tree was walked on every `validateSchema` call.
-- `url()` now allows only `http` and `https` links. Pass `schemes` to allow others.
-- File type checks now also need the file name extension to fit the bytes. A `.html` file with GIF bytes no longer passes `@Image`. Only another known type (like `.png` with GIF bytes) or a type the browser runs (`html`, `htm`, `xhtml`, `svg`, `xml`, `js`, `mjs`) is refused. A file with no or an unknown extension (like a canvas upload named `blob`) passes when the bytes match.
-
-### 3.0.0-alpha.6
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.5
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.4
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.3
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.2
-
-- A JSON body that is not an object now says `The request body must be a JSON object.` (key `_root`). Change it with the message key `_root.object`.
-- Needs Dart 3.13 or newer.
-- All dependencies updated to their latest versions.
-- New: DTOs. A class with `@Dto()` and rule annotations (`@Length`, `@Email`, `@Min`, `@Regex`, `@MaxSize`, ...). `dox_builder` writes a `const DtoSchema<T>` with the checks, a converter and the JSON Schema. See the Validation guide.
-- New: `DtoSchema<T>` with `validateMap`, `safeValidateMap`, `fromMap`, `toMap` and `toJsonSchema`. It is also a `Schema<T>`.
-- New: `Maybe<T>` knows a missing key from `null`. `DtoErrors` for checks across fields in `validate()`.
-- New: `FileTypes` finds the real type of a file from its first bytes. `@Image()` and `v.file().image()` do not allow `svg`.
-- New: `MessageRequest.locale`, `ParseState.params`. A message set on a rule is used as it is; the resolver only fills its placeholders.
-- `Rule` has a `const` constructor and a `final` `message`, so a rule class works as an annotation. `AsyncRule.failedItems()` checks a list in one call.
-- `FileInput` has `length` and `head` (the first bytes).
-- `Schema` has a `const` constructor. The fluent schemas extend `BaseSchema`.
-- Text length messages say "characters".
-- Breaking: removed `v.fromRules()`, `v.registerRule()`, `RuleRegistry`, `RuleDefinition`, `CallbackRule` and all rule strings. Use a DTO, or a `Rule<T>` class.
-
-### 3.0.0-alpha.1
-
-- First release of `dox_validation`.
-- Fluent schema builder: string, int, num, bool, date, enum, literal, list, object, map, union, any, file.
-- `optional`, `nullable`, `nullish`, `defaultTo`, `transform`, `refine`, `superRefine`, async refinements.
-- Coercion with `v.coerce` for query strings and form data.
-- `parse`, `safeParse`, `parseAsync`, `safeParseAsync` with issue paths.
-- Standard Schema interface (`StandardSchema`).
-- JSON Schema (draft 2020-12 / OpenAPI 3.1) export with `toJsonSchema()`.
-- Custom `Rule` classes and a global `MessageResolver`.
-- Laravel style string rules with `v.fromRules()`.
 

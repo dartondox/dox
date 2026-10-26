@@ -6690,6 +6690,18 @@ Optional: add yourself as a required reviewer, and allow only tags <code>v*</cod
 <td><a href="https://github.com/dartondox/dox-orm">dartondox/dox-orm</a></td>
 </tr>
 <tr>
+<td><code>dox_auth</code></td>
+<td><a href="https://github.com/dartondox/dox-auth">dartondox/dox-auth</a></td>
+</tr>
+<tr>
+<td><code>dox_openapi</code></td>
+<td><a href="https://github.com/dartondox/dox-openapi">dartondox/dox-openapi</a></td>
+</tr>
+<tr>
+<td><code>dox_validation</code></td>
+<td><a href="https://github.com/dartondox/dox-validation">dartondox/dox-validation</a></td>
+</tr>
+<tr>
 <td><code>dox_socketio</code></td>
 <td><a href="https://github.com/dartondox/dox-socketio">dartondox/dox-socketio</a></td>
 </tr>
@@ -6720,20 +6732,21 @@ Optional: add yourself as a required reviewer, and allow only tags <code>v*</cod
 </tbody>
 </table>
 <p>The packages here use them from pub.dev. The database tests (Postgres, MySQL, MariaDB, SQLite) run in <code>dox-orm</code>.
-CI in this repo uses the newest <code>dox-orm</code> code: <code>ci/clone-siblings.sh</code>, then <code>ci/use-sibling-orm.sh</code>.</p>
+<code>dox_core</code> uses <code>dox_openapi</code> and <code>dox_validation</code>.
+CI in this repo uses their newest code: <code>ci/clone-siblings.sh</code>, then <code>ci/use-siblings.sh</code>.</p>
 <p>To work on one of them and Dox together:</p>
 <ol>
 <li>Clone the repos next to the Dox repo, like <code>../dox-orm</code>.
-   <code>ci/clone-siblings.sh</code> clones <code>dox-orm</code>, <code>dox-socketio</code>, <code>dox-storage</code>, <code>dox-queue</code>, <code>dox-scheduler</code> and <code>dox-cli</code>.
+   <code>ci/clone-siblings.sh</code> clones <code>dox-orm</code>, <code>dox-auth</code>, <code>dox-openapi</code>, <code>dox-validation</code>, <code>dox-socketio</code>, <code>dox-storage</code>, <code>dox-queue</code>, <code>dox-scheduler</code> and <code>dox-cli</code>.
    Clone <code>dox-mailer</code>, <code>dox-view</code> and <code>dox-inertia</code> by hand when you need them.</li>
 <li>
 <p>Add them to the root <code>pubspec_overrides.yaml</code> of the Dox repo. Git ignores this file.
-   For <code>dox_orm</code> and <code>dox_migration</code>, <code>ci/use-sibling-orm.sh</code> writes this file for you.</p>
+   For <code>dox_openapi</code> and <code>dox_validation</code>, <code>ci/use-siblings.sh</code> writes this file for you.</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">dependency_overrides</span><span class="p">:</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">dox_orm</span><span class="p">:</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../dox-orm/packages/dox-orm</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">dox_migration</span><span class="p">:</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../dox-orm/packages/dox-migration</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">dox_openapi</span><span class="p">:</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../dox-openapi</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">dox_validation</span><span class="p">:</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../dox-validation</span>
 </span></code></pre></div>
 </li>
 <li>

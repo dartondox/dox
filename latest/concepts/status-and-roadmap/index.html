@@ -6305,10 +6305,10 @@
 <h2 id="packages">Packages</h2>
 <p>What the states mean:</p>
 <ul>
-<li><strong>Ready for stable</strong>: works, has tests and has not changed in a breaking way for a while. Only bug fixes are planned.</li>
-<li><strong>May change</strong>: works and has tests. Names and options can still change.</li>
-<li><strong>Experimental</strong>: new code. It changed in a breaking way recently, or it has a known gap.</li>
+<li><strong>Stable</strong>: works, has tests and has had real use.</li>
+<li><strong>New</strong>: works and has tests, but it is newer and has had less real use.</li>
 </ul>
+<p>All packages follow semantic versioning: a breaking change only comes in a new major version.</p>
 <p>The packages in the main repo share one version number. The other packages live in their own repos and have their own version numbers. See <a href="../../community/contribute/#packages-in-other-repos">Contribute</a>.</p>
 <table>
 <thead>
@@ -6323,121 +6323,121 @@
 <tr>
 <td><code>dox_core</code></td>
 <td>Routes, middleware, controllers, request and response, isolates, config, the IoC container, exception handler, sessions, CSRF, rate limit, security headers, health check, test client</td>
-<td>May change</td>
+<td>Stable</td>
 <td>334 tests in 44 files. CI runs them on the native server.</td>
 </tr>
 <tr>
 <td><code>dox_orm</code></td>
 <td>Query builder, models, relations, <code>whereHas</code>, scopes, casts, <code>withCount</code>, transactions, row locks, factories, seeders</td>
-<td>May change</td>
+<td>Stable</td>
 <td>355 tests in 37 files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite.</td>
 </tr>
 <tr>
 <td><code>dox_validation</code></td>
 <td><code>@Dto</code> rules, fluent schemas, JSON Schema, Standard Schema</td>
-<td>Ready for stable</td>
+<td>Stable</td>
 <td>90 tests in 6 files</td>
 </tr>
 <tr>
 <td><code>dox_builder</code></td>
 <td>Code generator for models, DTOs, env classes, the container and OpenAPI</td>
-<td>May change</td>
+<td>Stable</td>
 <td>59 tests in 5 files</td>
 </tr>
 <tr>
 <td><code>dox_annotation</code></td>
 <td>Annotations used by the generator</td>
-<td>May change</td>
+<td>Stable</td>
 <td>1 test in 1 file. Mostly tested through <code>dox_builder</code>.</td>
 </tr>
 <tr>
 <td><code>dox</code> (CLI)</td>
 <td><code>dox create</code>, <code>dox serve</code>, <code>dox build</code>, <code>make:*</code>, <code>migration:*</code>, <code>db:seed</code>, <code>queue:*</code>, <code>schedule:*</code></td>
-<td>May change</td>
+<td>Stable</td>
 <td>73 tests in 9 files</td>
 </tr>
 <tr>
 <td><code>dox_migration</code></td>
 <td>Migrations for Postgres, MySQL, MariaDB and SQLite</td>
-<td>Ready for stable</td>
+<td>Stable</td>
 <td>31 tests in 5 files. CI runs them on each database.</td>
 </tr>
 <tr>
 <td><code>dox_auth</code></td>
 <td>JWT and session auth guards and middleware</td>
-<td>May change</td>
+<td>Stable</td>
 <td>43 tests in 4 files</td>
 </tr>
 <tr>
 <td><code>dox_cache</code></td>
 <td>Memory, file and Redis cache, tags, locks</td>
-<td>Ready for stable</td>
+<td>Stable</td>
 <td>63 tests in 4 files, with Redis in CI</td>
 </tr>
 <tr>
 <td><code>dox_storage</code></td>
 <td>Local disk and S3 (and S3-compatible) storage</td>
-<td>Ready for stable</td>
+<td>Stable</td>
 <td>119 tests in 10 files, with MinIO in CI</td>
 </tr>
 <tr>
 <td><code>dox_openapi</code></td>
 <td>OpenAPI 3.1 document and a docs page</td>
-<td>Ready for stable</td>
+<td>Stable</td>
 <td>56 tests in 4 files</td>
 </tr>
 <tr>
 <td><code>dox_socketio</code></td>
 <td>Socket.IO v4 server with a Redis adapter</td>
-<td>May change</td>
+<td>Stable</td>
 <td>85 tests in 10 files, with Redis and the real <code>socket.io-client</code> in CI</td>
 </tr>
 <tr>
 <td><code>dox_queue</code></td>
 <td>Queues and jobs</td>
-<td>Experimental</td>
+<td>New</td>
 <td>43 tests in 5 files, with Postgres, MariaDB and Redis in CI</td>
 </tr>
 <tr>
 <td><code>dox_scheduler</code></td>
 <td>Run tasks on a schedule</td>
-<td>Experimental</td>
+<td>New</td>
 <td>74 tests in 6 files, with Redis in CI</td>
 </tr>
 <tr>
 <td><code>dox_view</code></td>
 <td><a href="../../the-basic/views/">Views</a>: <code>.dox.html</code> templates with layouts and components</td>
-<td>Experimental</td>
+<td>New</td>
 <td>36 tests in 2 files</td>
 </tr>
 <tr>
 <td><a href="../../the-basic/inertia/"><code>dox_inertia</code></a></td>
 <td>Inertia.js server side: single page apps with React, Vue or Svelte and Dox controllers</td>
-<td>Experimental</td>
+<td>New</td>
 <td>26 tests in 2 files</td>
 </tr>
 <tr>
 <td><code>dox_mailer</code></td>
 <td>Email with SMTP, Amazon SES, Azure, Resend, Mailgun, Postmark and sendmail</td>
-<td>Experimental</td>
+<td>New</td>
 <td>72 tests in 10 files, with a fake SMTP server</td>
 </tr>
 <tr>
 <td><code>dox_http_native</code></td>
 <td>Native HTTP/1.1 and WebSocket server (Rust hyper). Dox has no other server.</td>
-<td>Experimental</td>
+<td>New</td>
 <td>35 Dart tests in 3 files, and 16 Rust tests</td>
 </tr>
 <tr>
 <td><code>dox_postgres_native</code></td>
 <td>Native Postgres client (Rust tokio-postgres), the Postgres driver. Has TLS (<code>sslmode</code>, <code>sslRootCert</code>).</td>
-<td>Experimental</td>
+<td>New</td>
 <td>31 Dart tests in 5 files, plus the <code>dox_orm</code> tests</td>
 </tr>
 <tr>
 <td><code>dox_mysql_native</code></td>
 <td>Native MySQL and MariaDB client (Rust mysql_async), the MySQL driver. Has TLS.</td>
-<td>Experimental</td>
+<td>New</td>
 <td>13 Dart tests in 1 file, plus the <code>dox_orm</code> tests</td>
 </tr>
 </tbody>
