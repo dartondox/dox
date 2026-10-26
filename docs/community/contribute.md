@@ -70,13 +70,14 @@ It uses pub.dev automated publishing, so it needs no token or secret.
 
 The full guide is [RELEASING.md](https://github.com/dartondox/dox/blob/main/RELEASING.md) in the repo. In short:
 
-1. Bump every package with `bin/update_versions.sh`, and close the `## Unreleased` section of each `CHANGELOG.md`.
+1. Set the new version in the root `pubspec.yaml`. Then run `bin/update_versions.sh`: it sets this version in every package.
+   Close the `## Unreleased` section of each `CHANGELOG.md`.
 2. Merge the release PR, then push the tag `v<version>`. This publishes to pub.dev.
 3. Release the matching `dox-sample` template.
 
 The native packages (`dox_http_native`, `dox_postgres_native`, `dox_mysql_native`) are not in this repo.
 See [Native packages](#native-packages) below.
-`dox_orm`, `dox_migration`, `dox_socketio` and `dox_storage` are not in this repo either.
+`dox_orm`, `dox_migration`, `dox_socketio`, `dox_storage`, `dox_queue`, `dox_scheduler`, `dox_inertia`, `dox_view` and `dox_mailer` are not in this repo either.
 See [Packages in other repos](#packages-in-other-repos).
 
 **New package only:** turn on pub.dev automated publishing for it first. See [One-time setup](#one-time-setup).
@@ -138,13 +139,16 @@ Optional: add yourself as a required reviewer, and allow only tags `v*`.
 | `dox_view` | [dartondox/dox-view](https://github.com/dartondox/dox-view) |
 | `dox_mailer` | [dartondox/dox-mailer](https://github.com/dartondox/dox-mailer) |
 
-The packages here use them from pub.dev. The database tests (Postgres, MySQL, SQLite) run in `dox-orm`.
+The packages here use them from pub.dev. The database tests (Postgres, MySQL, MariaDB, SQLite) run in `dox-orm`.
+CI in this repo uses the newest `dox-orm` code: `ci/clone-siblings.sh`, then `ci/use-sibling-orm.sh`.
 
 To work on one of them and Dox together:
 
-1. Clone the repos next to the Dox repo: `../dox-orm`, `../dox-socketio`, `../dox-storage`.
-   `ci/clone-siblings.sh` does this.
+1. Clone the repos next to the Dox repo, like `../dox-orm`.
+   `ci/clone-siblings.sh` clones `dox-orm`, `dox-socketio`, `dox-storage`, `dox-queue` and `dox-scheduler`.
+   Clone `dox-mailer`, `dox-view` and `dox-inertia` by hand when you need them.
 2. Add them to the root `pubspec_overrides.yaml` of the Dox repo. Git ignores this file.
+   For `dox_orm` and `dox_migration`, `ci/use-sibling-orm.sh` writes this file for you.
 
     ```yaml
     dependency_overrides:
@@ -208,15 +212,23 @@ The docs site is https://dartondox.dev. It is built with MkDocs Material and
 
 ```bash
 python3 -m venv .venv
-.venv/bin/pip install mkdocs==1.6.1 mkdocs-material==9.7.7 mike==2.2.0
+.venv/bin/pip install -r requirements-docs.txt
 .venv/bin/mkdocs serve           # live preview of this branch
-.venv/bin/mkdocs build --strict  # the same check as CI. Broken links fail.
+.venv/bin/mkdocs build --strict  # the same build as CI. Broken links fail.
 ```
+
+`hooks/docs_hooks.py` runs during the build. It makes the changelog page from `packages/*/CHANGELOG.md`, and writes `llms.txt` and `llms-full.txt`.
+
+The `Docs check` workflow (`.github/workflows/docs-check.yaml`) runs on every pull request that changes the docs. It runs three checks:
+
+- `mkdocs build --strict`
+- a spell check: `codespell docs --skip "*.svg,*.png,*.ico,*.css,*.js" --ignore-words .codespell-ignore`
+- `ci/check-no-tabs.sh`: the docs must not use content tabs
 
 ### Deploy
 
 - 3.x deploys by itself. The `Docs` workflow (`.github/workflows/docs.yaml`) runs on every push
-  to `main` that changes `docs/`, `mkdocs.yml` or the workflow.
+  to `main` that changes `docs/`, `hooks/`, `overrides/`, a package `CHANGELOG.md`, `mkdocs.yml`, `requirements-docs.txt` or the workflow.
   It runs `mike deploy --update-aliases 3.x latest`.
 - 2.x deploys by hand. Open Actions > Docs > "Run workflow", pick version `2.x`.
   It builds from the `v2.x` branch (change it with the `ref` input).

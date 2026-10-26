@@ -301,6 +301,8 @@ The server can run the migrations at start. See [Migration](../database/migratio
 | `php artisan route:list` | not there. Use the OpenAPI docs page at `/docs`. |
 | `php artisan tinker` | not there |
 | `php artisan optimize` | `dox build` (one native binary in `build/bundle`) |
+| `php artisan queue:work` | `dox queue:work` |
+| `php artisan schedule:work` | `dox schedule:work` |
 
 The `make:*` and `migrate` commands are in the tables above. Two commands have no Laravel twin: `dox build_runner:build` makes the generated code, and `dox env:generate` makes the typed env class.
 See [Dox CLI](../digging-deeper/dox-cli.md).
@@ -313,10 +315,13 @@ See [Dox CLI](../digging-deeper/dox-cli.md).
 | `Auth::attempt(['email' => $e, 'password' => $p])` | `await Auth().attempt(<String, dynamic>{'email': e, 'password': p})` gives a JWT, or `null` |
 | `Auth::login($user)` | `Auth().login(user)` gives a JWT |
 | `Auth::user()` | `req.auth?.user<User>()` |
+| `Auth::attempt(...)` for a web page (session) | `await Auth().attemptSession(req, <String, dynamic>{...})` gives `true` or `false` |
+| `Auth::logout()` | `Auth().logout(req)` |
 | `->middleware('auth:sanctum')` | `AuthMiddleware()` from `dox_auth` |
 | `Hash::make($p)`, `Hash::check($p, $hash)` | `Hash.make(p)`, `Hash.verify(p, hash)` |
 
-Dox auth is a JWT in the `Authorization` header. There are no sessions, no cookies and no Sanctum tokens table.
+For an API, Dox auth is a JWT in the `Authorization` header. There is no Sanctum tokens table.
+For web pages, a guard with `SessionAuthDriver` keeps the login in the session cookie.
 See [Authentication](../security/authentication.md).
 
 ## Cache
@@ -396,20 +401,21 @@ See [Testing](../digging-deeper/testing.md).
 - **A native HTTP server and native database drivers.** Rust parses HTTP and talks to Postgres and MySQL. Your code stays in Dart. They come ready-built, so you do not need Rust.
 - **Types everywhere.** A DTO is a class with typed fields. A path param is an `int`. A model field is a `String?`. The compiler finds many mistakes before you run the app.
 - **Async is explicit.** Database calls return a `Future`. You write `await`. One isolate serves many requests at the same time while it waits for the database.
-- **JSON API first.** Dox returns text, JSON, files and streams. It has no view layer.
+- **JSON API first.** Dox returns text, JSON, files and streams. For HTML pages, add [views](../the-basic/views.md) (`dox_view`) or [Inertia](../the-basic/inertia.md) (`dox_inertia`).
 
 ## What is missing today
 
 Dox does not have these Laravel features yet:
 
-- queues and jobs, and the task scheduler
 - events and listeners (model events are there)
-- Blade views, mail and notifications
-- sessions (auth uses a JWT; encrypted cookies are there)
+- notifications
+- password reset
 - policies and gates
 
 See [What Dox does not have yet](status-and-roadmap.md#what-dox-does-not-have-yet) for what to use today.
 
 What is there, as separate packages: [validation](../packages/validation.md), [OpenAPI docs](../packages/openapi.md),
-[storage](../packages/storage.md), [cache](../packages/cache.md), [Socket.IO](../packages/socketio.md)
-and [auth](../security/authentication.md).
+[storage](../packages/storage.md), [cache](../packages/cache.md), [Socket.IO](../packages/socketio.md),
+[auth](../security/authentication.md), [queues](../digging-deeper/queue.md), the [scheduler](../digging-deeper/scheduler.md),
+[mail](../digging-deeper/mail.md), [views](../the-basic/views.md) and [Inertia](../the-basic/inertia.md).
+[Sessions](../the-basic/session.md) are in `dox_core`.
