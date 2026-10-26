@@ -11,7 +11,7 @@ Rust ([mysql_async](https://docs.rs/mysql_async)) owns the connections and the p
 Each connection keeps its prepared statements.
 It works with MySQL 8.4 (the default `caching_sha2_password` login) and MariaDB 11.
 
-!!! warning "Alpha"
+!!! note "New driver"
     This driver is new. If you see a problem, please
     [open an issue](https://github.com/dartondox/dox-mysql-native/issues).
 
