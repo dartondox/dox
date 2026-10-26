@@ -137,8 +137,24 @@ With `has()`, the count is for the last relation of one row.
 - Start the query with a model, like `User()`.
   On `QueryBuilder.table()` it throws a `StateError`.
 - A name that is not a relation of the model throws an `ArgumentError`.
+- It works for a relation to the same table, like a `Category` with a parent `Category`.
 
-!!! warning "Known limit"
-    A relation from a table to the same table does not work yet.
-    For example, a `Category` with a parent `Category`.
-    Use [`whereExists`](../query-builder.md#whereexists-and-wherenotexists) for it.
+## A relation to the same table
+
+The subquery gives the table its own name, so each row is not compared with itself.
+
+```dart
+// categories that have at least one child category
+List<Category> parents = await Category().whereHas('children').get();
+
+// categories whose parent is named 'Books'
+List<Category> books = await Category()
+    .whereHas('parent', (QueryBuilder<dynamic> q) {
+      q.where('name', 'Books');
+    })
+    .get();
+```
+
+!!! warning
+    In the function, write the column without the table name: `name`, not `categories.name`.
+    With the table name, the column points to the parent row, not to the related row.
