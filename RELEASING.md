@@ -114,7 +114,7 @@ In `dox-sample`:
 5. Test it end to end:
    ```sh
    dox create demo && cd demo
-   dart pub get && cp .env.example .env
+   dart pub get   # dox create already made .env with a new APP_KEY
    dox s
    curl localhost:3000/ping   # pong
    ```
