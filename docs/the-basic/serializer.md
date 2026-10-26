@@ -170,11 +170,11 @@ class WeatherSerializer extends Serializer<Weather> {
   WeatherSerializer(super.data);
 
   @override
-  Map<String, dynamic> convert(Weather w) {
+  Map<String, dynamic> convert(Weather m) {
     return <String, dynamic>{
-      'city': w.city,
-      'celsius': w.celsius,
-      'fahrenheit': w.celsius * 9 / 5 + 32,
+      'city': m.city,
+      'celsius': m.celsius,
+      'fahrenheit': m.celsius * 9 / 5 + 32,
     };
   }
 }
@@ -196,10 +196,10 @@ class SalesReportSerializer extends Serializer<Map<String, dynamic>> {
   SalesReportSerializer(super.data);
 
   @override
-  Map<String, dynamic> convert(Map<String, dynamic> row) {
+  Map<String, dynamic> convert(Map<String, dynamic> m) {
     return <String, dynamic>{
-      'product': row['name'],
-      'sold': row['total'],
+      'product': m['name'],
+      'sold': m['total'],
     };
   }
 }

@@ -168,6 +168,7 @@ Give the request, the page name and the props. The page name is the file in `res
 ```dart title="lib/app/http/controllers/user.controller.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_inertia/dox_inertia.dart';
+import 'package:my_app/app/models/user/user.model.dart';
 
 @Inject()
 class UserController {
@@ -331,9 +332,12 @@ In production (no dev server), Dox reads `public/build/.vite/manifest.json`. `@v
 Set `devServerUrl` from the env, so production does not use it:
 
 ```dart title="lib/config/inertia.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_inertia/dox_inertia.dart';
+
 InertiaConfig inertiaConfig = InertiaConfig(
   entryPoints: <String>['resources/js/app.jsx'],
-  devServerUrl: Env.get<String>('APP_ENV') == 'local'
+  devServerUrl: Env.get<String>('APP_ENV') == 'development'
       ? 'http://localhost:5173'
       : null,
   reactRefresh: true,

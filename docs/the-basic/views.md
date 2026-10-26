@@ -264,6 +264,20 @@ View.global('money', (num cents) => (cents / 100).toStringAsFixed(2));
 <p>{{ money(order.total) }}</p>
 ```
 
+The provider sets up the engine again in its `setup()`, and that removes the globals added before. So add globals in your provider, after `super.setup()`:
+
+```dart title="lib/providers/view_provider.dart"
+class AppViewProvider extends ViewProvider {
+  AppViewProvider() : super(const ViewConfig());
+
+  @override
+  void setup() {
+    super.setup();
+    View.global('year', DateTime.now().year);
+  }
+}
+```
+
 A value of type `SafeString` is printed with no escape:
 
 ```dart

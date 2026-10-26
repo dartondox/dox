@@ -94,6 +94,9 @@ That is all. `GET /api/users/5` makes the repository, the service and the contro
 
 ```dart title="lib/generated/container.g.dart"
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// Made by dox_builder. Run `dart run build_runner build`.
+// ignore_for_file: type=lint
+
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/http/controllers/user.controller.dart' as i1;
 import 'package:my_app/app/repositories/user.repository.dart' as i2;
@@ -102,6 +105,9 @@ import 'package:my_app/providers/orm_provider.dart' as i4;
 import 'package:my_app/routes/api.dart' as i5;
 import 'package:my_app/app/models/user/user.model.dart' as i6;
 
+/// Puts every class of the app into the container: the
+/// `@Inject()` classes, routers, providers and model binders.
+/// Use it in `AppConfig(container: registerContainer)`.
 void registerContainer(IocContainer c) {
   c.singleton<i1.UserController>(
     (IocContainer c) => i1.UserController(c.get<i3.UserService>()),
