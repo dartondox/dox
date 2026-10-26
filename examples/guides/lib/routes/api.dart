@@ -34,6 +34,7 @@ class ApiRouter extends Router {
 
     // background work
     Route.post('/reports', (ReportController c) => c.store);
+    Route.post('/reports/queued', (ReportController c) => c.queue);
     Route.get('/primes/{limit}', (ReportController c) => c.primes);
 
     // custom errors: remove after the check

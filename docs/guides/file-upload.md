@@ -8,18 +8,12 @@ Accept an image from a form, check its size and type, save it to a disk, and ret
 
 ## What you need
 
-- A Dox app (`dox create my_app`).
-- `build_runner` for the DTO (a new app has it).
+- A Dox app (`dox create my_app`). A new app has the `dox_storage` package, `lib/config/storage.dart` and `lib/providers/storage_provider.dart`.
 
 ## 1. Set up the disk
 
-`Storage()` is in the `dox_storage` package. Add it:
-
-```bash
-dart pub add dox_storage
-```
-
-Give the `local` disk a `url`. `Storage().url()` uses it to build the public URL of a file.
+The `local` disk of a new app saves files in the `storage` folder.
+Give it a `url`. `Storage().url()` uses it to build the public URL of a file.
 
 ```dart title="lib/config/storage.dart"
 import 'package:dox_storage/dox_storage.dart';
@@ -49,7 +43,7 @@ StorageConfig storageConfig = StorageConfig(
 Run `dart run build_runner build` to update `env.g.dart`.
 Then add `APP_URL=http://localhost:3000` to your `.env`.
 
-Add the provider. It sets the disks in every isolate. The generated container finds it:
+The provider of a new app sets the disks in every isolate. You do not change it:
 
 ```dart title="lib/providers/storage_provider.dart"
 import 'package:dox_storage/dox_storage.dart';
@@ -151,14 +145,26 @@ class WebRouter extends Router {
 
 `signed: false` makes every file public. Leave it out to serve only signed URLs. Then use `Storage().signedUrl(path)` in place of `Storage().url(path)`.
 
-## 5. Build and run
+## 5. Register the DTOs
+
+Dox finds a DTO in the `dtos` list of `AppConfig`. `build_runner` writes this list to `lib/generated/dtos.g.dart`.
+Add it once. Skip this step when your `app.dart` already has `dtos: dtos`.
+
+```dart title="lib/config/app.dart"
+import 'package:my_app/generated/dtos.g.dart';
+
+AppConfig appConfig = AppConfig(
+  dtos: dtos,
+  // ...
+);
+```
+
+## 6. Build and run
 
 ```bash
 dart run build_runner build --delete-conflicting-outputs
 dox serve
 ```
-
-Make sure `lib/config/app.dart` has `dtos: dtos` from `lib/generated/dtos.g.dart`. See [Validation: setup](../the-basic/validation.md#setup).
 
 ## Check it
 

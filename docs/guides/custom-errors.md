@@ -16,9 +16,9 @@ When a controller or a middleware throws:
 
 | Error | Status | What Dox does |
 | --- | --- | --- |
-| an `IHttpException`, like `NotFoundHttpException` | its `code` | sends its `message`. Does **not** call `report` |
-| a validation error (bad DTO input) | `422` | sends the field errors. Does not call `report` |
-| any other `Exception` or `Error` | `500` | sends `Server Error` (the error text only in development). Calls `report` |
+| an `IHttpException`, like `NotFoundHttpException` | its `code` | sends `{"code": ..., "message": ...}`. Does **not** call `report` |
+| a validation error (bad DTO input) | `422` | sends the field errors: `{"field": "message"}`. Does not call `report` |
+| any other `Exception` or `Error` | `500` | sends `{"code":"server_error","message":"Server Error"}`. When `APP_ENV` is `development` or `local`, it sends the error text. Calls `report` |
 
 `report` is a method of the [exception handler](../the-basic/errors.md). The response goes through the `responseHandler` of `AppConfig` last. This guide sets the shape there.
 
@@ -74,7 +74,11 @@ class UserController {
       throw ForbiddenException(message: 'The first user can not be deleted');
     }
     User user = await show(id);
-    await user.delete();
+
+    /// 0 rows: the user was deleted after show() found it
+    if (await user.delete() == 0) {
+      throw NotFoundHttpException(message: 'User $id not found');
+    }
     return <String, bool>{'deleted': true};
   }
 }
@@ -134,7 +138,8 @@ class ResponseHandler extends ResponseHandlerInterface {
 }
 ```
 
-The last `if` matters. Without it, a `500` sends `error.toString()` to the client. That can show a SQL query or a file path.
+The last `if` gives a `500` your shape too, in every environment.
+Without it, the client gets the default body. When `APP_ENV` is `development` or `local`, that is the error text. It can show a SQL query or a file path.
 
 ## 3. Log unexpected errors
 
@@ -198,7 +203,7 @@ Route.get('/boom', (DoxRequest req) => throw StateError('boom'));
 After `GET /api/boom`, the server prints one line:
 
 ```json
-{"level":"ERROR","message":"Bad state: boom","stack":"#0  ApiRouter.register.<anonymous closure> (package:my_app/routes/api.dart:40:44) ...","timestamp":"2026-10-22T14:01:12.000Z"}
+{"level":"ERROR","message":"Bad state: boom","stack":"#0  ApiRouter.register.<anonymous closure> (package:my_app/routes/api.dart:41:44) ...","timestamp":"2026-10-22T14:01:12.000Z"}
 ```
 
 Remove the `/boom` route when you are done.

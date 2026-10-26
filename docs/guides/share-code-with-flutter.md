@@ -8,6 +8,11 @@ Put a `@Dto` class in a shared Dart package, so the Dox server and the Flutter a
 
 The generated DTO code imports only `dox_validation`, which is pure Dart (no `dart:io`, no `dart:mirrors`). So it runs in Flutter and on the web.
 
+## What you need
+
+- A Dox app (`dox create server`). Here it is in the `server` folder.
+- A Flutter app (`flutter create app`). Here it is in the `app` folder.
+
 ## The layout
 
 ```text
@@ -99,24 +104,16 @@ Commit both files. Then the Flutter app does not need to run the generator.
 
 ## 2. The Dox server
 
-Add the shared package to the server:
+Add the shared package to the dependencies of the server:
 
 ```yaml title="server/pubspec.yaml"
-name: server
-publish_to: none
-
-environment:
-  sdk: ^3.13.0
-
 dependencies:
-  dox_core: ^3.0.0-alpha
+  # ... the packages of the new app stay
   blog_shared:
     path: ../packages/blog_shared
-
-dev_dependencies:
-  build_runner: ^2.17.1
-  dox_builder: ^3.0.0-alpha
 ```
+
+Run `dart pub get`.
 
 Dox finds a DTO in the `dtos` list of `AppConfig`. The server's own `lib/generated/dtos.g.dart` lists only the DTOs in the server.
 So add the list of the shared package too:
@@ -138,6 +135,7 @@ The controller asks for `SaveBlog` like any other DTO. Dox checks the body befor
 
 ```dart title="server/lib/app/http/controllers/blog.controller.dart"
 import 'package:blog_shared/blog_shared.dart' show SaveBlog;
+import 'package:dox_core/dox_core.dart';
 
 @Inject()
 class BlogController {

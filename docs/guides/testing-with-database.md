@@ -9,16 +9,11 @@ Migrations run once, and every test starts with empty tables.
 
 ## What you need
 
-- A Dox app with Dart migrations in `db/migration` (see [Migration](../database/migration.md)).
-- `test` as a dev dependency: `dart pub add dev:test`.
+- A Dox app (`dox create my_app`). A new app has the `User` model, a `users` migration in `db/migration` and the `test` package.
 
-## 1. Write the migration
+## 1. Check the migration
 
-If you do not have one yet:
-
-```bash
-dox make:migration create_users_table
-```
+A new app has this migration. Its file name starts with another date. For a new table, run `dox make:migration create_posts_table`.
 
 ```dart title="db/migration/2026_10_22_000000_create_users_table.dart"
 import 'package:dox_migration/dox_migration.dart';
@@ -43,7 +38,7 @@ class CreateUsersTable extends Migration {
 }
 ```
 
-The command also writes `db/migration/migrations.dart`, the list of all migrations. The test imports that list.
+`db/migration/migrations.dart` is the list of all migrations. `dox make:migration` updates it. The test imports that list.
 A Dart migration works on Postgres, MySQL and SQLite, so the same test runs on all of them.
 
 ## 2. Write the test (SQLite)
@@ -138,10 +133,14 @@ dart test test/user_test.dart
 
 ## Check it
 
+The migration names start with the dates of your files. A new app also has the tables of the queue.
+
 ```text
 00:00 +0: (setUpAll)
 Migrating: 2026_10_22_000000_create_users_table
 Migrated: 2026_10_22_000000_create_users_table
+Migrating: 2026_10_23_000000_create_queue_tables
+Migrated: 2026_10_23_000000_create_queue_tables
 00:00 +1: saves and finds a user
 00:00 +2: the tables are empty again
 00:00 +2: All tests passed!
@@ -191,6 +190,7 @@ dart test --concurrency=1
 
 ## Test a route with the database
 
+This test uses the `GET /api/users` route of the [Pagination](pagination.md) guide.
 `DoxTestClient` starts the app inside the test. It runs the providers, so the ORM is set up by `ORMProvider` from `lib/config/database.dart`.
 Set the database with env variables, so the app picks the test database:
 
@@ -221,8 +221,10 @@ void main() {
     await client.close();
   });
 
-  test('GET /api/users is empty', () async {
-    (await client.get('/api/users')).expectStatus(200).expectJson(isEmpty);
+  test('GET /api/users has no rows', () async {
+    TestResponse res = await client.get('/api/users');
+    res.expectStatus(200);
+    expect(res.json['data'], isEmpty);
   });
 }
 ```
