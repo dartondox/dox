@@ -6613,14 +6613,6 @@ There is one <code>pubspec.lock</code> for the whole repo.</p>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1"># Analyze and check format (same as CI)</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>melos<span class="w"> </span>run<span class="w"> </span>analyze
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>melos<span class="w"> </span>run<span class="w"> </span>format_check
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="c1"># Build the dox cli executable (AOT).</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1"># `dart compile exe` does not work: sqlite3 has a build hook. Use `dart build cli`.</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="nb">cd</span><span class="w"> </span>packages/dox-cli
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>dart<span class="w"> </span>build<span class="w"> </span>cli<span class="w"> </span>--target<span class="w"> </span>bin/dox.dart<span class="w"> </span>--output<span class="w"> </span>build
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="c1"># Run dox cli executable file</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>build/bundle/bin/dox<span class="w"> </span>--version
 </span></code></pre></div>
 <h3 id="if-the-project-does-not-run">If the project does not run</h3>
 <ol>
@@ -6630,7 +6622,7 @@ There is one <code>pubspec.lock</code> for the whole repo.</p>
 </ol>
 <h2 id="release-maintainers">Release (maintainers)</h2>
 <p>The <code>Release</code> GitHub workflow (<code>.github/workflows/publish.yaml</code>) publishes all public packages to pub.dev.
-It runs when you push a tag like <code>v3.0.0-alpha.5</code>.
+It runs when you push a tag like <code>v&lt;version&gt;</code>.
 It uses pub.dev automated publishing, so it needs no token or secret.</p>
 <h3 id="steps">Steps</h3>
 <p>The full guide is <a href="https://github.com/dartondox/dox/blob/main/RELEASING.md">RELEASING.md</a> in the repo. In short:</p>
@@ -6690,6 +6682,10 @@ Optional: add yourself as a required reviewer, and allow only tags <code>v*</cod
 </thead>
 <tbody>
 <tr>
+<td><code>dox</code> (the CLI)</td>
+<td><a href="https://github.com/dartondox/dox-cli">dartondox/dox-cli</a></td>
+</tr>
+<tr>
 <td><code>dox_orm</code>, <code>dox_migration</code></td>
 <td><a href="https://github.com/dartondox/dox-orm">dartondox/dox-orm</a></td>
 </tr>
@@ -6728,7 +6724,7 @@ CI in this repo uses the newest <code>dox-orm</code> code: <code>ci/clone-siblin
 <p>To work on one of them and Dox together:</p>
 <ol>
 <li>Clone the repos next to the Dox repo, like <code>../dox-orm</code>.
-   <code>ci/clone-siblings.sh</code> clones <code>dox-orm</code>, <code>dox-socketio</code>, <code>dox-storage</code>, <code>dox-queue</code> and <code>dox-scheduler</code>.
+   <code>ci/clone-siblings.sh</code> clones <code>dox-orm</code>, <code>dox-socketio</code>, <code>dox-storage</code>, <code>dox-queue</code>, <code>dox-scheduler</code> and <code>dox-cli</code>.
    Clone <code>dox-mailer</code>, <code>dox-view</code> and <code>dox-inertia</code> by hand when you need them.</li>
 <li>
 <p>Add them to the root <code>pubspec_overrides.yaml</code> of the Dox repo. Git ignores this file.
