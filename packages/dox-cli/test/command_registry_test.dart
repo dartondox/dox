@@ -200,6 +200,7 @@ void main() {
       expect(content, contains('edit(DoxRequest req, int id)'));
       expect(content, contains('update(DoxRequest req, int id)'));
       expect(content, contains('destroy(DoxRequest req, int id)'));
+      expect(content, contains('.delete() == 0) throw NotFoundHttpException'));
     });
 
     test('create:middleware should generate middleware file', () {

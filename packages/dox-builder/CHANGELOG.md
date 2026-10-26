@@ -1,3 +1,7 @@
+## Unreleased
+
+- New: models get `setColumnValue(column, value)`. It sets a field by its column name, and returns false when the value is not of the field type. `model.increment()` and `model.decrement()` of dox_orm use it to set the field. The generated code needs the dox_orm that has `Model.setColumnValue()`. Run build_runner again after you update.
+
 ## 3.0.0-alpha.16
 
 - Version bump only, to match the other packages.

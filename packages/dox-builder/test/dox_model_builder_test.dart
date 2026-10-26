@@ -248,6 +248,103 @@ class Item {
       expect(out, contains("'status': _statusCast.set(instance.status)"));
     });
 
+    test('setColumnValue sets a field by its column name', () async {
+      String out = await _generate('''
+@DoxModel(timestamps: false)
+class Post {
+  @Column()
+  int? viewCount;
+
+  @Column(name: 'title_text')
+  String? title;
+
+  @Column()
+  bool done = false;
+
+  @Column()
+  List<String>? tags;
+
+  @HasMany(Post)
+  List<Post> replies = <Post>[];
+
+  /// fields named like the parameters do not clash
+  @Column()
+  String? column;
+
+  @Column()
+  int? value;
+}
+''');
+      String flat = out.replaceAll(RegExp(r'\s+'), ' ');
+      expect(
+        flat,
+        contains(
+          '@override bool setColumnValue(String column, dynamic value) { '
+          'Post instance = this as Post; switch (column) {',
+        ),
+      );
+      expect(
+        flat,
+        contains(
+          "case 'id': if (value is! int?) return false; "
+          'instance.id = value; return true;',
+        ),
+      );
+      expect(
+        flat,
+        contains(
+          "case 'view_count': if (value is! int?) return false; "
+          'instance.viewCount = value; return true;',
+        ),
+      );
+      expect(
+        flat,
+        contains(
+          "case 'title_text': if (value is! String?) return false; "
+          'instance.title = value; return true;',
+        ),
+      );
+      expect(
+        flat,
+        contains(
+          "case 'done': if (value is! bool) return false; "
+          'instance.done = value; return true;',
+        ),
+      );
+      expect(
+        flat,
+        contains(
+          "case 'tags': if (value is! List<String>?) return false; "
+          'instance.tags = value; return true;',
+        ),
+      );
+      expect(flat, contains('instance.column = value; return true;'));
+      expect(flat, contains('instance.value = value; return true;'));
+      expect(flat, contains('} return false; }'));
+
+      /// a relation is not a column
+      expect(flat, isNot(contains("case 'replies'")));
+
+      /// no timestamps, no timestamp columns
+      expect(flat, isNot(contains("case 'created_at'")));
+    });
+
+    test('setColumnValue has the timestamp columns', () async {
+      String out = await _generate('''
+@DoxModel(createdAt: 'made_at')
+class Post {}
+''');
+      String flat = out.replaceAll(RegExp(r'\s+'), ' ');
+      expect(
+        flat,
+        contains(
+          "case 'made_at': if (value is! DateTime?) return false; "
+          'instance.createdAt = value; return true;',
+        ),
+      );
+      expect(flat, contains("case 'updated_at':"));
+    });
+
     test('local and global scopes', () async {
       String out = await _generate('''
 @DoxModel()
