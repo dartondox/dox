@@ -62,6 +62,9 @@ Route.delete('/blogs/{id}', (BlogController c) => c.destroy);
     There are also `Route.options`, `Route.copy`, `Route.view`, `Route.link`, `Route.unlink`,
     `Route.purge`, `Route.lock`, `Route.unlock` and `Route.propfind`.
 
+    `Route.health('/health')` adds a health check route. It answers `200` with `{"status": "ok"}`.
+    `Route.websocket('echo', (WebSocket socket, DoxRequest req) {...})` adds a raw WebSocket route.
+
 A `HEAD` request runs the `GET` route of the same path. The answer has the status and headers of `GET`, with no body.
 
 ## The handler
@@ -100,8 +103,9 @@ See [Controller](controller.md) for the parameters a handler can ask for.
 Put a param in `{}`. Ask for it as a typed parameter in the controller.
 
 ```dart
-Route.get('/blogs/{id}', controller.show);
+Route.get('/blogs/{id}', (BlogController c) => c.show);
 
+@Inject()
 class BlogController {
   Future<Blog?> show(int id) async {
     return Blog().find(id);
@@ -137,19 +141,19 @@ Route.get('/docs/{page*}', (String page) {
 ```dart
 // by prefix
 Route.group('/blogs', () { // (1)!
-  Route.get('/', controller.index);     // GET /blogs
-  Route.get('/{id}', controller.show); // (2)!
+  Route.get('/', (BlogController c) => c.index); // GET /blogs
+  Route.get('/{id}', (BlogController c) => c.show); // (2)!
 });
 
 // by domain
 Route.domain('dartondox.com', () { // (3)!
-  Route.get('/ping', controller.ping);
+  Route.get('/ping', (WebController c) => c.pong);
 });
 
 // by middleware
 Route.middleware(<dynamic>[AuthMiddleware()], () { // (4)!
-  Route.get('/me', controller.me);
-  Route.post('/logout', controller.logout);
+  Route.get('/me', (AuthController c) => c.me);
+  Route.post('/logout', (AuthController c) => c.logout);
 });
 ```
 
@@ -198,7 +202,7 @@ See [Resource controller](controller.md#resource-controller) to make one with th
 Give a route a name with `.name()`. Then build its URL from the name, so a path lives in one place.
 
 ```dart
-Route.get('/users/{id}', controller.show).name('users.show');
+Route.get('/users/{id}', (UserController c) => c.show).name('users.show');
 
 route('users.show', params: <String, Object>{'id': 5});
 // /users/5
@@ -214,7 +218,7 @@ A group can put a prefix in front of the names inside it:
 
 ```dart
 Route.group('admin', () {
-  Route.get('users', controller.index).name('users'); // admin.users
+  Route.get('users', (UserController c) => c.index).name('users'); // admin.users
 }, name: 'admin.');
 ```
 
@@ -287,7 +291,7 @@ Storage.route('uploads', download: true);
 It does **not** check the request. To check input, use a [DTO](validation.md).
 
 ```dart
-Route.post('/posts', controller.store, body: v.object(<String, Schema<Object?>>{
+Route.post('/posts', (PostController c) => c.store, body: v.object(<String, Schema<Object?>>{
   'title': v.string().min(3),
 }));
 ```

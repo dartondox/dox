@@ -8,11 +8,12 @@ This page shows how to read input, files, headers and cookies from a request.
 
 ## Typed input (recommended)
 
-Ask for a [DTO](validation.md) in your controller. Dox reads the body (or the query for `GET`), checks it, and gives you a typed object.
+Ask for a [DTO](validation.md) in your controller. Dox reads the body (or the query for `GET`, `HEAD` and `DELETE`), checks it, and gives you a typed object.
 
 ```dart
-Route.put('/users/{id}', controller.update);
+Route.put('/users/{id}', (UserController c) => c.update);
 
+@Inject()
 class UserController {
   Future<User?> update( // (1)!
     int id, // (2)!
@@ -38,6 +39,7 @@ Bad input gets `422` before your method runs. See [Validation](validation.md).
 Add a `DoxRequest` parameter to read the raw values. These values are **not** checked.
 
 ```dart
+@Inject()
 class ApiController {
   String sayHello(DoxRequest req) {
     String? name = req.input('name');
@@ -67,7 +69,11 @@ See [Controller: parameters](controller.md#parameters).
 An uploaded file is a `RequestFile`. The request must be `multipart/form-data`.
 Put the file in a DTO, so Dox checks its type and size:
 
-```dart
+```dart title="lib/app/dtos/upload_image/upload_image.dto.dart"
+import 'package:dox_core/dox_core.dart';
+
+part 'upload_image.dto.g.dart';
+
 @Dto()
 class UploadImage {
   @Image()
@@ -78,7 +84,10 @@ class UploadImage {
 
   static const DtoSchema<UploadImage> schema = $UploadImageDto;
 }
+```
 
+```dart title="lib/app/http/controllers/api.controller.dart"
+@Inject()
 class ApiController {
   Future<Map<String, String>> uploadImage(UploadImage input) async {
     String uploadedPath = await input.image.store('images');
