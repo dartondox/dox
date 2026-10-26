@@ -37,7 +37,7 @@ dox create new_blog
 
 `dox create` downloads the newest 3.x release of
 [dox-sample](https://github.com/dartondox/dox-sample), the starter project.
-To get one exact version, add `--version`, for example `dox create new_blog --version 3.0.0-alpha.5`.
+To get one exact version, add `--version`, for example `dox create new_blog --version 3.0.0-alpha.17`.
 
 It also makes your `.env` file from `.env.example`, with a new random `APP_KEY`.
 Then get the packages:
@@ -53,8 +53,8 @@ To use Postgres or MySQL instead, change `DB_CONNECTION` and the `DB_*`
 values in `.env`. See [Database](../database/index.md).
 
 !!! info "Add Dox to an existing Dart project"
-    Add the packages you need to `pubspec.yaml`. All Dox packages share one
-    version, so use `^3.0.0-alpha` for each of them. It picks the newest alpha.
+    Add the packages you need to `pubspec.yaml`. Each Dox package has its own
+    version number. Use `^3.0.0-alpha` for each of them. It picks the newest 3.x alpha.
 
 ```yaml title="pubspec.yaml"
 dependencies:
@@ -81,7 +81,7 @@ dox s
 To skip the builder, use `dox s --ignore-build-runner`.
 To start the server without the CLI, run `dart run bin/server.dart`.
 
-At the first start it also runs the migrations in `db/migration`.
+At each start it also runs the new migrations in `db/migration`.
 The server uses the port in `APP_PORT` in the `.env` file (`3000` by default).
 Check it:
 
@@ -96,8 +96,12 @@ pong
 ## Start the server with Docker
 
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
+
+This starts the app and a Postgres database.
+The app reads `.env`, so set `DB_CONNECTION=postgres` and `DB_NAME=postgres` there first.
+To start only the database and run the app with `dox s`, use `docker compose up -d postgres`.
 
 !!! tip "Production"
     Do not use `dox s` or `dart run` in production.
@@ -115,7 +119,7 @@ dox build_runner:build   # runs once
 
 ## Packages
 
-All Dox packages use the same version.
+Each package has its own version number. All of them are 3.x.
 
 | Package | What it does |
 | --- | --- |
@@ -124,11 +128,16 @@ All Dox packages use the same version.
 | `dox_orm` | query builder and models |
 | `dox_migration` | database migrations |
 | `dox_auth` | JWT authentication |
-| `dox_builder`, `dox_annotation` | code generation for models and DTOs |
+| `dox_builder`, `dox_annotation` | code generation for models, DTOs and the container |
 | `dox_validation` | [typed validation schemas](../packages/validation.md) |
 | `dox_openapi` | [OpenAPI docs](../packages/openapi.md) |
 | `dox_storage` | [file storage: local, S3](../packages/storage.md) |
 | `dox_cache` | [cache: memory, file, Redis](../packages/cache.md) |
 | `dox_socketio` | [Socket.IO server](../packages/socketio.md) |
+| `dox_queue` | [background jobs](../digging-deeper/queue.md) |
+| `dox_scheduler` | [scheduled tasks](../digging-deeper/scheduler.md) |
+| `dox_mailer` | [send email](../digging-deeper/mail.md) |
+| `dox_view` | [HTML views](../the-basic/views.md) |
+| `dox_inertia` | [Inertia.js pages](../the-basic/inertia.md) |
 | `dox_http_native` | [native HTTP server](../digging-deeper/native-server.md) (Rust) |
-| `dox_postgres_native`, `dox_mysql_native` | native database drivers for Postgres and MySQL/MariaDB |
+| `dox_postgres_native`, `dox_mysql_native` | native drivers for [Postgres](../database/postgres-native.md) and [MySQL/MariaDB](../database/mysql-native.md) |

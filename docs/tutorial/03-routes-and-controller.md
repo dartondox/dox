@@ -97,7 +97,7 @@ The controller has no `update` or `destroy`, so those routes are not made.
 dox s
 ```
 
-If it is still running from step 1, it restarts by itself.
+If it is already running, it restarts by itself when you save a file.
 
 ## Check it
 

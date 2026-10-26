@@ -41,12 +41,14 @@ You do not need Docker or a database server. The app uses SQLite, which is one f
 ## The finished project
 
 Files that you make or change in this tutorial are marked with `*`.
+The template has more files (queue, scheduler, storage). This tree shows the ones that matter here.
 
 ```text
 blog/
 ├── bin/
 │   ├── migrate.dart              runs the dox migration:* commands
-│   └── server.dart               runs the migrations, starts the server
+│   ├── server.dart               runs the migrations, starts the server
+│   └── queue.dart, schedule.dart, seed.dart
 ├── db/migration/
 │   ├── ..._create_posts_table.dart   *
 │   ├── ..._create_users_table.dart
@@ -74,7 +76,7 @@ blog/
 │       ├── container.g.dart      * generated
 │       └── dtos.g.dart           * generated
 ├── test/http_test.dart           *
-├── .env                          *
+├── .env                          made by dox create
 ├── Dockerfile
 └── pubspec.yaml                  * adds dox_auth
 ```

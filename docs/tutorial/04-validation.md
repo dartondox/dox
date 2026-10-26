@@ -116,7 +116,7 @@ class PostController {
 `dox s` runs it for you. Without `dox s`:
 
 ```bash
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
 
 It writes `lib/app/dtos/save_post/save_post.dto.g.dart` and `lib/generated/dtos.g.dart`.
