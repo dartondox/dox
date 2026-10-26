@@ -85,6 +85,43 @@ class AppMailProvider extends MailProvider {
 
 When the server stops, the provider closes open SMTP connections and HTTP clients.
 
+## Without Dox
+
+`dox_mailer` also works on its own. Call `Mail.configure()` once at start, and `Mail.close()` at the end:
+
+```dart
+import 'dart:io';
+
+import 'package:dox_mailer/dox_mailer.dart';
+
+Future<void> main() async {
+  Map<String, String> env = Platform.environment;
+
+  Mail.configure(MailConfig(
+    defaultMailer: 'smtp',
+    from: Address('hello@example.com', 'My app'),
+    mailers: <String, Transport>{
+      'smtp': SmtpTransport(
+        host: env['MAIL_HOST'] ?? 'localhost',
+        username: env['MAIL_USERNAME'],
+        password: env['MAIL_PASSWORD'],
+      ),
+    },
+  ));
+
+  await Mail.send(Message(
+    to: <Address>[Address('ann@example.com')],
+    subject: 'Hello',
+    text: 'Hello Ann!',
+  ));
+
+  // closes open SMTP connections and HTTP clients
+  await Mail.close();
+}
+```
+
+The rest of this page works the same way.
+
 ## Send an email
 
 ```dart
@@ -318,7 +355,7 @@ Prints each email and sends nothing. Good for local work.
 'log': LogTransport(),
 ```
 
-Pass `output` to print somewhere else, eg. `LogTransport(output: logger.info)`.
+Pass `output` to print somewhere else, eg. `LogTransport(output: stderr.writeln)` (from `dart:io`).
 
 ### Array
 
@@ -388,7 +425,7 @@ void main() {
 }
 ```
 
-`Mail.fake()` works with or without a config. Call it after the app has started, because `MailProvider` sets up the config again at start.
+`Mail.fake()` works with or without a config. The fake stays on when `MailProvider` sets up the config again.
 
 `mail.clear()` forgets the sent emails.
 

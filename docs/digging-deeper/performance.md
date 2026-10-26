@@ -240,7 +240,7 @@ One find-by-id query, AOT build (`dart build cli`), database on the same machine
 
 These are on by default. You only need to keep them:
 
-- A body over `maxBodySize` or `maxMultipartSize` gets `413` before it is all read. Set the same limit in the proxy. See [Size limits](../the-basic/request.md#size-limits).
+- A body over `maxBodySize` or `maxMultipartSize` gets `413` from the native server, before Dart reads it. Set the same limit in the proxy. See [Size limits](../the-basic/request.md#size-limits).
 - An upload over 1 MB streams to a temp file, so it does not fill the memory. See [Request](../the-basic/request.md#requestfile).
 - A `File` or `Stream` response is streamed, not loaded into memory. See [Files and big responses](../the-basic/response.md#files-and-big-responses).
 
@@ -256,8 +256,8 @@ AppConfig(compress: true);
   gzips on a Rust thread. Streamed responses are not compressed.
 - A proxy (Caddy, nginx) does it better. Turn it on in Dart only when there
   is no proxy.
-- With `compress: true`, text and JSON responses are sent chunked, without
-  `Content-Length`.
+- Only a body over 256 bytes is gzipped, and only when the client accepts
+  gzip. The gzipped body still gets a `Content-Length`.
 
 ## Logging
 
@@ -268,7 +268,7 @@ be lost. Errors from `Logger` are still written right away.
 
 Turn `LogMiddleware` off when a proxy already writes access logs. The new
 project does this for you: `enabled` is `false` when `APP_ENV` is
-`production`.
+`production` or not set.
 
 Leave `responseHandler` unset when you do not need it. With no handler, a
 plain value (text, map, list) is sent without building a `DoxResponse`.

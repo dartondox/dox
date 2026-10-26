@@ -8,7 +8,7 @@ This page shows how to test a Dox app with the `test` package: HTTP routes, cach
 
 ## Setup
 
-Add the test package as a dev dependency:
+A new app from `dox create` already has the `test` package. In another app, add it as a dev dependency:
 
 ```bash
 dart pub add dev:test
@@ -199,7 +199,7 @@ Put the values for tests in a `.env.testing` file, next to `.env`:
 
 ```ini title=".env.testing"
 DB_NAME=my_app_test
-LOG_REQUESTS=false
+CACHE_STORE=memory
 ```
 
 When the app runs its tests, Dox reads `.env` first and then `.env.testing`.
