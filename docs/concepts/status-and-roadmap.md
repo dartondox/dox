@@ -28,7 +28,7 @@ The packages in the main repo share one version number. The other packages live 
 | `dox_validation` | `3.0.0-rc.1` | `@Dto` rules, fluent schemas, JSON Schema, Standard Schema | Ready for stable | 90 tests in 6 files |
 | `dox_builder` | `3.0.0-rc.1` | Code generator for models, DTOs, env classes, the container and OpenAPI | May change | 59 tests in 5 files |
 | `dox_annotation` | `3.0.0-rc.1` | Annotations used by the generator | May change | 1 test in 1 file. Mostly tested through `dox_builder`. |
-| `dox` (CLI) | `3.0.0-rc.1` | `dox create`, `dox serve`, `dox build`, `make:*`, `migration:*`, `db:seed`, `queue:*`, `schedule:*` | May change | 73 tests in 9 files |
+| `dox` (CLI) | `3.0.0-rc.2` | `dox create`, `dox serve`, `dox build`, `make:*`, `migration:*`, `db:seed`, `queue:*`, `schedule:*` | May change | 73 tests in 9 files |
 | `dox_migration` | `3.0.0-rc.1` | Migrations for Postgres, MySQL, MariaDB and SQLite | Ready for stable | 31 tests in 5 files. CI runs them on each database. |
 | `dox_auth` | `3.0.0-rc.1` | JWT and session auth guards and middleware | May change | 43 tests in 4 files |
 | `dox_cache` | `3.0.0-rc.1` | Memory, file and Redis cache, tags, locks | Ready for stable | 63 tests in 4 files, with Redis in CI |
