@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
@@ -26,8 +27,11 @@ class Maybe<T> {
 class DtoErrors {}
 abstract class DtoSchema<T> {}
 ''',
-  'dox_validation|lib/src/dto/dto_annotations.dart': File(
-    '../dox-validation/lib/src/dto/dto_annotations.dart',
+  'dox_validation|lib/src/dto/dto_annotations.dart': File.fromUri(
+    // dox_validation lives in its own repo: find it through the package config
+    Isolate.resolvePackageUriSync(
+      Uri.parse('package:dox_validation/src/dto/dto_annotations.dart'),
+    )!,
   ).readAsStringSync(),
 };
 
