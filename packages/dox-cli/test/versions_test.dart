@@ -17,6 +17,22 @@ void main() {
     expect(newestOfMajor(all, '5.0.0'), isNull);
   });
 
+  test('rc ranks above beta and alpha, whatever the number', () {
+    List<String> all = <String>[
+      '3.0.0-alpha.17',
+      '3.0.0-rc.1',
+      '3.0.0-beta.3',
+      '3.0.0-alpha.9',
+    ];
+    expect(newestOfMajor(all, '3.0.0-rc.1'), '3.0.0-rc.1');
+    expect(
+      newestOfMajor(<String>[...all, '3.0.0-rc.2'], '3.0.0'),
+      '3.0.0-rc.2',
+    );
+    expect(newestOfMajor(<String>[...all, '3.0.0'], '3.0.0-rc.1'), '3.0.0');
+    expect(compareVersions('3.0.0-beta.3', '3.0.0-alpha.17'), greaterThan(0));
+  });
+
   test('dox update reads the pub.dev versions, not the retracted ones', () {
     String json = '''
 {"latest": {"version": "2.0.1"}, "versions": [

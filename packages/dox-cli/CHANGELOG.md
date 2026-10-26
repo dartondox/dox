@@ -1,3 +1,7 @@
+## Unreleased
+
+- Fix: `dox create` and `dox update` sorted pre-releases only by their number, so `3.0.0-alpha.17` looked newer than `3.0.0-rc.1`. `dox create` then cloned the alpha.17 template. Now the label counts first: alpha < beta < rc < stable.
+
 ## 3.0.0-rc.1
 
 - Fix: `dox make:job` wrote a `bin/queue.dart` that did not compile. It called `QueueWorker(jobs: ...)`, but `QueueWorker` has no `jobs` parameter. It now writes the same file as the app template: `QueueWorker(app: appConfig)`.
