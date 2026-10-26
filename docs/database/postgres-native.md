@@ -10,7 +10,7 @@ You use it through your models and queries. It needs no extra config.
 Rust ([tokio-postgres](https://docs.rs/tokio-postgres)) owns the connections and the pool.
 Each connection keeps its prepared statements.
 
-!!! warning "Alpha"
+!!! note "New driver"
     This driver is new. If you see a problem, please
     [open an issue](https://github.com/dartondox/dox-postgres-native/issues).
 

@@ -166,5 +166,5 @@ Add `--seed` to `migration:run`, `migration:refresh` or `migration:fresh` to run
 
 ## Update the CLI
 
-`dox update` installs the newest version with the same major version as your CLI, previews included.
+`dox update` installs the newest version with the same major version as your CLI.
 To pick the version yourself, run the install command again.

@@ -31,7 +31,7 @@ Makes a new project from the [dox-sample](https://github.com/dartondox/dox-sampl
 
 | Option | Meaning |
 | --- | --- |
-| `--version <v>` (or `--v`) | A release tag of `dox-sample` to clone. Without it, the newest `dox-sample` release with the same major version as the CLI is used (pre-releases included). |
+| `--version <v>` (or `--v`) | A release tag of `dox-sample` to clone. Without it, the newest `dox-sample` release with the same major version as the CLI is used. |
 
 What it does:
 
@@ -178,7 +178,7 @@ Source: `lib/src/tools/openapi_generate.dart`.
 dox update
 ```
 
-Installs the newest CLI with the same major version as the one you have. Pre-releases count.
+Installs the newest CLI with the same major version as the one you have.
 It reads the version list from pub.dev (retracted versions are skipped), then runs `dart pub global activate dox <version>`.
 Needs `curl` on the `PATH`.
 

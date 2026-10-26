@@ -107,10 +107,10 @@ In `dox-sample`:
    dart analyze
    ```
 3. Commit and push `v3.x`.
-4. Tag and release it. Keep it a pre-release when the version is a pre-release:
+4. Tag and release it:
    ```sh
    git tag vx.y.z && git push origin vx.y.z
-   gh release create vx.y.z --prerelease
+   gh release create vx.y.z
    ```
 5. Test it end to end:
    ```sh
