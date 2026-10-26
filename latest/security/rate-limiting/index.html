@@ -4353,10 +4353,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#count-by-api-key-not-by-ip" class="md-nav__link">
+  <a href="#count-by-user-not-by-ip" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Count by API key, not by ip
+        Count by user, not by ip
       
     </span>
   </a>
@@ -6242,10 +6242,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#count-by-api-key-not-by-ip" class="md-nav__link">
+  <a href="#count-by-user-not-by-ip" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Count by API key, not by ip
+        Count by user, not by ip
       
     </span>
   </a>
@@ -6353,14 +6353,24 @@ Use it on login, sign up and other routes that bots like to hammer.</p>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="c1">// ...</span>
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">);</span>
 </span></code></pre></div>
-<h2 id="count-by-api-key-not-by-ip">Count by API key, not by ip</h2>
-<p><code>key</code> picks who is counted. The default is <code>req.ip()</code>.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">RateLimit</span><span class="p">(</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nl">max:</span><span class="w"> </span><span class="m">100</span><span class="p">,</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nl">key:</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">header</span><span class="p">(</span><span class="s1">'X-Api-Key'</span><span class="p">)</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">ip</span><span class="p">(),</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">)</span>
+<h2 id="count-by-user-not-by-ip">Count by user, not by ip</h2>
+<p><code>key</code> picks who is counted. The default is <code>req.ip()</code>.
+The key is any <code>String</code>. For example, count by user id after <code>AuthMiddleware</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/reports'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="n">AuthMiddleware</span><span class="p">(),</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="n">RateLimit</span><span class="p">(</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="nl">max:</span><span class="w"> </span><span class="m">100</span><span class="p">,</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="nl">key:</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'</span><span class="si">${</span><span class="n">req</span><span class="p">.</span><span class="n">auth</span><span class="o">?</span><span class="p">.</span><span class="n">user</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="p">()</span><span class="o">?</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">ip</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="p">),</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="p">(</span><span class="n">ReportController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">index</span><span class="p">,</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="p">]);</span>
 </span></code></pre></div>
-<p>The key is any <code>String</code>, so you can also count by user id after your auth middleware.</p>
+<div class="admonition warning">
+<p class="admonition-title">Use a key the client can not choose</p>
+<p>Do not count by a raw header, like <code>req.header('X-Api-Key')</code>.
+A client can send a new value with each request and get a new count each time.
+Count by a value that you checked first, like the id of the logged in user.</p>
+</div>
 <div class="admonition warning">
 <p class="admonition-title">Behind a proxy</p>
 <p>Behind Caddy, nginx or a load balancer, every request comes from the proxy ip.
@@ -6368,7 +6378,7 @@ Then all clients share one count. Add the proxy to <code>AppConfig.trustedProxie
 See <a href="../../reference/app-config/">App config</a>.</p>
 </div>
 <h2 id="two-limits-on-the-same-key">Two limits on the same key</h2>
-<p>Two <code>RateLimit</code> with the same <code>max</code> and <code>per</code> share one counter. Give one a <code>name</code> to keep them apart:</p>
+<p>Two <code>RateLimit</code> with the same <code>max</code> and <code>per</code> share one counter for the same key. Give each one a <code>name</code> to keep them apart:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">Route</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/auth/login'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="n">RateLimit</span><span class="p">(</span><span class="nl">max:</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'login'</span><span class="p">),</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="p">(</span><span class="n">AuthController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">login</span><span class="p">,</span>
@@ -6382,7 +6392,8 @@ See <a href="../../reference/app-config/">App config</a>.</p>
 <p>The counts are kept in the <a href="../../digging-deeper/cache/">cache</a>:</p>
 <ul>
 <li>When the default cache store is <strong>Redis</strong>, the counts are in Redis. All isolates and all servers share them. Use this in production.</li>
-<li>Else the counts are in <strong>memory</strong>. Each isolate has its own counts. With 4 isolates a client can send up to 4 x <code>max</code> requests.</li>
+<li>Else the counts are in <strong>memory</strong>. Each isolate has its own counts. With 4 isolates a client can send up to 4 x <code>max</code> requests.
+  This is also true for the default <code>file</code> store of a new app.</li>
 </ul>
 <p>To use one store by name, pass <code>store</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">RateLimit</span><span class="p">(</span><span class="nl">max:</span><span class="w"> </span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="nl">store:</span><span class="w"> </span><span class="s1">'redis'</span><span class="p">)</span>

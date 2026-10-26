@@ -6329,18 +6329,21 @@
 <h2 id="send-the-token">Send the token</h2>
 <p>Dox reads the token from one of these places:</p>
 <ul>
-<li>the <code>_token</code> field of the body</li>
+<li>the <code>_token</code> field of the body (or of the query string)</li>
 <li>the <code>X-CSRF-TOKEN</code> header</li>
 <li>the <code>X-XSRF-TOKEN</code> header</li>
 </ul>
-<p>The token is <code>req.session.token</code>.</p>
+<p>The token is <code>req.session.token</code>.
+Do not put it in a URL. URLs are kept in logs and in the browser history.</p>
 <h3 id="html-forms">HTML forms</h3>
-<p>Put the token in a hidden field:</p>
+<p>Put the token in a hidden field.
+With <a href="../../the-basic/views/#forms">views</a>, <code>csrfField()</code> writes this field for you:</p>
 <div class="language-html highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">"POST"</span> <span class="na">action</span><span class="o">=</span><span class="s">"/posts"</span><span class="p">&gt;</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">"hidden"</span> <span class="na">name</span><span class="o">=</span><span class="s">"_token"</span> <span class="na">value</span><span class="o">=</span><span class="s">"{{ token }}"</span><span class="p">&gt;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  {{ csrfField() }}
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  ...
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
 </span></code></pre></div>
+<p><code>csrfToken()</code> gives only the token, for example for a <code>&lt;meta&gt;</code> tag.</p>
 <h3 id="axios-and-inertia">axios and Inertia</h3>
 <p>Dox also sets an <code>XSRF-TOKEN</code> cookie with the token. It is not <code>HttpOnly</code>, so page scripts can read it.
 axios reads this cookie and sends it in the <code>X-XSRF-TOKEN</code> header by itself. Inertia uses axios, so it works with no code.</p>
@@ -6364,7 +6367,8 @@ axios reads this cookie and sends it in the <code>X-XSRF-TOKEN</code> header by 
 <li>A path that ends with <code>*</code> matches everything that starts with it: <code>/api/*</code> matches <code>/api/posts</code> and <code>/api/users/5</code>.</li>
 <li>Any other path must match exactly.</li>
 </ul>
-<p>An excluded path is not checked and gets no <code>XSRF-TOKEN</code> cookie.</p>
+<p>An excluded path is not checked and gets no <code>XSRF-TOKEN</code> cookie.
+Only skip paths that do not use the session login. A webhook should check its own signature instead.</p>
 <h2 id="after-login">After login</h2>
 <p><code>req.session.regenerate()</code> also makes a new token. Dox sends the new <code>XSRF-TOKEN</code> cookie with the same response.</p>
 

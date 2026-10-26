@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A queue runs slow work in the background. The request answers at once. A worker process does the work later.">
+        <meta name="description" content="A queue runs slow work in the background, so the request can answer at once.">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Queue | Dox">
-  <meta property="og:description" content="A queue runs slow work in the background. The request answers at once. A worker process does the work later.">
+  <meta property="og:description" content="A queue runs slow work in the background, so the request can answer at once.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/digging-deeper/queue/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Queue | Dox">
-  <meta name="twitter:description" content="A queue runs slow work in the background. The request answers at once. A worker process does the work later.">
+  <meta name="twitter:description" content="A queue runs slow work in the background, so the request can answer at once.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -2646,6 +2646,17 @@
     <span class="md-ellipsis">
       
         Testing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#without-dox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without Dox
       
     </span>
   </a>
@@ -6677,6 +6688,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#without-dox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without Dox
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -6703,7 +6725,8 @@
 
 
 <h1 id="queue">Queue</h1>
-<p>A queue runs slow work in the background. The request answers at once. A worker process does the work later.</p>
+<p>A queue runs slow work in the background, so the request can answer at once.</p>
+<p>A worker process does the work later.</p>
 <p>Use it to send emails, call slow APIs, make reports or resize images.
 The <code>dox_queue</code> package gives you jobs, three drivers (Redis, database and sync), retries, delays and a worker.</p>
 <h2 id="install">Install</h2>
@@ -6718,6 +6741,7 @@ The <code>dox_queue</code> package gives you jobs, three drivers (Redis, databas
 <li>A worker (<code>dart run bin/queue.dart</code>) takes the job and runs its <code>handle()</code> method.</li>
 </ol>
 <h2 id="set-up">Set up</h2>
+<p>A new app from <code>dox create</code> already has the files of steps 1 to 4. Check them, and change the driver if you want.</p>
 <h3 id="1-config">1. Config</h3>
 <div class="language-dart highlight"><span class="filename">lib/config/queue.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_queue/dox_queue.dart'</span><span class="p">;</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
@@ -6752,7 +6776,7 @@ The <code>dox_queue</code> package gives you jobs, three drivers (Redis, databas
 </tr>
 <tr>
 <td><code>redis</code></td>
-<td>localhost:6379</td>
+<td>127.0.0.1:6379</td>
 <td><code>RedisOptions(host: ..., port: ..., password: ...)</code> for the <code>redis</code> driver</td>
 </tr>
 <tr>
@@ -6793,7 +6817,7 @@ The <code>dox_queue</code> package gives you jobs, three drivers (Redis, databas
 A job that runs longer than <code>retryAfter</code> looks crashed, so a second worker runs it again.</p>
 </div>
 <h3 id="2-provider">2. Provider</h3>
-<p>The provider sets up the queue in every isolate. Put it in <code>lib/</code> so the generated container finds it.</p>
+<p>The provider sets up the queue in every isolate. Put it in <code>lib/providers/</code>, so the generated container finds it.</p>
 <div class="language-dart highlight"><span class="filename">lib/providers/queue_provider.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_queue/dox_queue.dart'</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'../config/queue.dart'</span><span class="p">;</span>
@@ -6808,7 +6832,7 @@ A job that runs longer than <code>retryAfter</code> looks crashed, so a second w
 <div class="language-dart highlight"><span class="filename">bin/queue.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_queue/dox_queue.dart'</span><span class="p">;</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_sample/config/app.dart'</span><span class="p">;</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/app.dart'</span><span class="p">;</span>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1">/// run queued jobs: `dart run bin/queue.dart [work] [flags]`.</span>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1">/// the `dox` CLI runs this file for its queue commands.</span>
@@ -6880,6 +6904,7 @@ A job that runs longer than <code>retryAfter</code> looks crashed, so a second w
 </span><span id="__span-5-40"><a id="__codelineno-5-40" name="__codelineno-5-40" href="#__codelineno-5-40"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Run <code>dart run build_runner build</code> after you add or change a job.</p>
+<p><code>dox make:job SendWelcomeEmail</code> makes a new job file in <code>lib/app/jobs/</code>.</p>
 <p>All the settings are optional:</p>
 <table>
 <thead>
@@ -7047,6 +7072,7 @@ Keep the old name with <code>@Job(name: 'SendWelcomeEmail')</code>.</p>
 </table>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>dart<span class="w"> </span>run<span class="w"> </span>bin/queue.dart<span class="w"> </span>work<span class="w"> </span>--queue<span class="o">=</span>emails,default<span class="w"> </span>--concurrency<span class="o">=</span><span class="m">4</span>
 </span></code></pre></div>
+<p>The <code>dox</code> CLI runs the same file: <code>dox queue:work</code>, <code>dox queue:failed</code>, <code>dox queue:retry &lt;id|all&gt;</code>, <code>dox queue:forget &lt;id&gt;</code> and <code>dox queue:flush</code>. They take the same flags.</p>
 <p><code>--concurrency</code> runs jobs as async tasks on one thread. It helps for jobs that wait (email, HTTP, database).
 For CPU heavy jobs, run more worker processes.</p>
 <h3 id="stop-the-worker">Stop the worker</h3>
@@ -7160,20 +7186,22 @@ Use a worker process when your jobs are heavy or many.</p>
 <h2 id="testing">Testing</h2>
 <p>Use the <code>sync</code> driver. <code>dispatch()</code> then runs the job at once, so you can check the result right after.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_queue/dox_queue.dart'</span><span class="p">;</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_sample/generated/jobs.g.dart'</span><span class="p">;</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:test/test.dart'</span><span class="p">;</span>
-</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
-</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="kt">void</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">  </span><span class="n">setUp</span><span class="p">(()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">    </span><span class="n">Queue</span><span class="p">.</span><span class="n">configure</span><span class="p">(</span><span class="n">QueueConfig</span><span class="p">(</span><span class="nl">driver:</span><span class="w"> </span><span class="s1">'sync'</span><span class="p">,</span><span class="w"> </span><span class="nl">jobs:</span><span class="w"> </span><span class="n">jobRegistry</span><span class="p">));</span>
-</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">  </span><span class="p">});</span>
-</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>
-</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">  </span><span class="n">test</span><span class="p">(</span><span class="s1">'sends the welcome email'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-18-11"><a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">SendWelcomeEmail</span><span class="p">(</span><span class="nl">userId:</span><span class="w"> </span><span class="m">1</span><span class="p">).</span><span class="n">dispatch</span><span class="p">();</span>
-</span><span id="__span-18-12"><a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="w">    </span><span class="c1">// check the email was sent</span>
-</span><span id="__span-18-13"><a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="w">  </span><span class="p">});</span>
-</span><span id="__span-18-14"><a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="p">}</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/jobs/send_welcome_email.job.dart'</span><span class="p">;</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/generated/jobs.g.dart'</span><span class="p">;</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:test/test.dart'</span><span class="p">;</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="kt">void</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">  </span><span class="n">setUp</span><span class="p">(()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">    </span><span class="n">Queue</span><span class="p">.</span><span class="n">configure</span><span class="p">(</span><span class="n">QueueConfig</span><span class="p">(</span><span class="nl">driver:</span><span class="w"> </span><span class="s1">'sync'</span><span class="p">,</span><span class="w"> </span><span class="nl">jobs:</span><span class="w"> </span><span class="n">jobRegistry</span><span class="p">));</span>
+</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">  </span><span class="p">});</span>
+</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>
+</span><span id="__span-18-11"><a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="w">  </span><span class="n">test</span><span class="p">(</span><span class="s1">'sends the welcome email'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-18-12"><a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">SendWelcomeEmail</span><span class="p">(</span><span class="nl">userId:</span><span class="w"> </span><span class="m">1</span><span class="p">).</span><span class="n">dispatch</span><span class="p">();</span>
+</span><span id="__span-18-13"><a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="w">    </span><span class="c1">// check the email was sent</span>
+</span><span id="__span-18-14"><a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="w">  </span><span class="p">});</span>
+</span><span id="__span-18-15"><a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="p">}</span>
 </span></code></pre></div>
+<p>A job that uses <code>Dox()</code> (for example <code>Dox().ioc</code> or <code>Logger</code>) needs the app config. Call <code>Dox().initialize(appConfig)</code> in <code>setUpAll</code>.</p>
 <p>To test a job alone, call <code>handle()</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">SendWelcomeEmail</span><span class="p">(</span><span class="nl">userId:</span><span class="w"> </span><span class="m">1</span><span class="p">).</span><span class="n">handle</span><span class="p">();</span>
 </span></code></pre></div>
@@ -7184,6 +7212,52 @@ Use a worker process when your jobs are heavy or many.</p>
 </span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">  </span><span class="nl">options:</span><span class="w"> </span><span class="n">WorkerOptions</span><span class="p">(</span><span class="nl">stopWhenEmpty:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
 </span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="p">).</span><span class="n">run</span><span class="p">();</span>
 </span></code></pre></div>
+<h2 id="without-dox">Without Dox</h2>
+<p><code>dox_queue</code> also works in a plain Dart app. Add <code>build_runner</code>, so it writes <code>lib/generated/jobs.g.dart</code>:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_queue<span class="w"> </span>dox_core
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dev:build_runner
+</span></code></pre></div>
+<p>Write your jobs like in <a href="#write-a-job">Write a job</a>, and run <code>dart run build_runner build</code>.
+Then set up the queue and run a worker yourself:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:async'</span><span class="p">;</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_queue/dox_queue.dart'</span><span class="p">;</span>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/generated/jobs.g.dart'</span><span class="p">;</span>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/jobs/resize_image.dart'</span><span class="p">;</span>
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="w">  </span><span class="c1">// the worker logs with the Dox logger, so it needs an AppConfig</span>
+</span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="w">  </span><span class="n">Dox</span><span class="p">().</span><span class="n">initialize</span><span class="p">(</span><span class="n">AppConfig</span><span class="p">(</span><span class="nl">appKey:</span><span class="w"> </span><span class="s1">'not-used'</span><span class="p">));</span>
+</span><span id="__span-22-12"><a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a>
+</span><span id="__span-22-13"><a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a><span class="w">  </span><span class="n">Queue</span><span class="p">.</span><span class="n">configure</span><span class="p">(</span><span class="n">QueueConfig</span><span class="p">(</span>
+</span><span id="__span-22-14"><a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a><span class="w">    </span><span class="nl">driver:</span><span class="w"> </span><span class="s1">'redis'</span><span class="p">,</span>
+</span><span id="__span-22-15"><a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a><span class="w">    </span><span class="nl">jobs:</span><span class="w"> </span><span class="n">jobRegistry</span><span class="p">,</span>
+</span><span id="__span-22-16"><a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a><span class="w">    </span><span class="nl">redis:</span><span class="w"> </span><span class="n">RedisOptions</span><span class="p">(</span><span class="nl">host:</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">,</span><span class="w"> </span><span class="nl">port:</span><span class="w"> </span><span class="m">6379</span><span class="p">),</span>
+</span><span id="__span-22-17"><a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a><span class="w">  </span><span class="p">));</span>
+</span><span id="__span-22-18"><a id="__codelineno-22-18" name="__codelineno-22-18" href="#__codelineno-22-18"></a>
+</span><span id="__span-22-19"><a id="__codelineno-22-19" name="__codelineno-22-19" href="#__codelineno-22-19"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">ResizeImage</span><span class="p">(</span><span class="nl">path:</span><span class="w"> </span><span class="s1">'photo.png'</span><span class="p">).</span><span class="n">dispatch</span><span class="p">();</span>
+</span><span id="__span-22-20"><a id="__codelineno-22-20" name="__codelineno-22-20" href="#__codelineno-22-20"></a>
+</span><span id="__span-22-21"><a id="__codelineno-22-21" name="__codelineno-22-21" href="#__codelineno-22-21"></a><span class="w">  </span><span class="n">Worker</span><span class="w"> </span><span class="n">worker</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Worker</span><span class="p">(</span>
+</span><span id="__span-22-22"><a id="__codelineno-22-22" name="__codelineno-22-22" href="#__codelineno-22-22"></a><span class="w">    </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Queue</span><span class="p">.</span><span class="n">driver</span><span class="p">,</span>
+</span><span id="__span-22-23"><a id="__codelineno-22-23" name="__codelineno-22-23" href="#__codelineno-22-23"></a><span class="w">    </span><span class="nl">jobs:</span><span class="w"> </span><span class="n">jobRegistry</span><span class="p">,</span>
+</span><span id="__span-22-24"><a id="__codelineno-22-24" name="__codelineno-22-24" href="#__codelineno-22-24"></a><span class="w">    </span><span class="nl">options:</span><span class="w"> </span><span class="n">WorkerOptions</span><span class="p">(</span><span class="nl">queues:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'default'</span><span class="p">],</span><span class="w"> </span><span class="nl">concurrency:</span><span class="w"> </span><span class="m">4</span><span class="p">),</span>
+</span><span id="__span-22-25"><a id="__codelineno-22-25" name="__codelineno-22-25" href="#__codelineno-22-25"></a><span class="w">  </span><span class="p">);</span>
+</span><span id="__span-22-26"><a id="__codelineno-22-26" name="__codelineno-22-26" href="#__codelineno-22-26"></a>
+</span><span id="__span-22-27"><a id="__codelineno-22-27" name="__codelineno-22-27" href="#__codelineno-22-27"></a><span class="w">  </span><span class="c1">// Ctrl+C: finish the running jobs, then stop</span>
+</span><span id="__span-22-28"><a id="__codelineno-22-28" name="__codelineno-22-28" href="#__codelineno-22-28"></a><span class="w">  </span><span class="n">StreamSubscription</span><span class="o">&lt;</span><span class="n">ProcessSignal</span><span class="o">&gt;</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-22-29"><a id="__codelineno-22-29" name="__codelineno-22-29" href="#__codelineno-22-29"></a><span class="w">      </span><span class="n">ProcessSignal</span><span class="p">.</span><span class="n">sigint</span><span class="p">.</span><span class="n">watch</span><span class="p">().</span><span class="n">listen</span><span class="p">((</span><span class="n">_</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">worker</span><span class="p">.</span><span class="n">stop</span><span class="p">());</span>
+</span><span id="__span-22-30"><a id="__codelineno-22-30" name="__codelineno-22-30" href="#__codelineno-22-30"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">worker</span><span class="p">.</span><span class="n">run</span><span class="p">();</span>
+</span><span id="__span-22-31"><a id="__codelineno-22-31" name="__codelineno-22-31" href="#__codelineno-22-31"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">signal</span><span class="p">.</span><span class="n">cancel</span><span class="p">();</span>
+</span><span id="__span-22-32"><a id="__codelineno-22-32" name="__codelineno-22-32" href="#__codelineno-22-32"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">Queue</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+</span><span id="__span-22-33"><a id="__codelineno-22-33" name="__codelineno-22-33" href="#__codelineno-22-33"></a><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li><code>WorkerOptions</code> takes the same settings as the flags of <code>work</code>: <code>queues</code>, <code>concurrency</code>, <code>once</code>, <code>tries</code>, <code>timeout</code>, <code>sleep</code> and <code>stopWhenEmpty</code>.</li>
+<li>The <code>database</code> driver uses the default <code>dox_orm</code> connection. Set it up first with <code>SqlQueryBuilder.initializeWithDatabaseConfig(...)</code>.</li>
+<li>No services are in the Dox container. Make the services of a job in <code>handle()</code>.</li>
+</ul>
 
 
 

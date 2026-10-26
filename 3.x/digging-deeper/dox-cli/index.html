@@ -6491,11 +6491,11 @@ Run <code>dox help</code> to see all commands. Run <code>dox help &lt;command&gt
 <td>create a serializer</td>
 </tr>
 <tr>
-<td><code>dox make:model &lt;name&gt; [-m]</code> (old name <code>create:model</code>)</td>
+<td><code>dox make:model &lt;name&gt; [-m]</code></td>
 <td>create a model, and with <code>-m</code> its migration</td>
 </tr>
 <tr>
-<td><code>dox make:migration &lt;name&gt; [--sql]</code> (old name <code>create:migration</code>)</td>
+<td><code>dox make:migration &lt;name&gt; [--sql]</code></td>
 <td>create a Dart migration, or a <code>.sql</code> one with <code>--sql</code></td>
 </tr>
 <tr>
@@ -6528,7 +6528,7 @@ Run <code>dox help</code> to see all commands. Run <code>dox help &lt;command&gt
 </tr>
 <tr>
 <td><code>dox make:seeder &lt;name&gt;</code></td>
-<td>create a seeder in <code>db/seeders</code>, see <a href="../../database/seeders/">Seeders</a></td>
+<td>create a seeder in <code>db/seeders</code> (and <code>bin/seed.dart</code>), see <a href="../../database/seeders/">Seeders</a></td>
 </tr>
 <tr>
 <td><code>dox db:seed [--class=&lt;name&gt;]</code></td>
@@ -6588,7 +6588,7 @@ Run <code>dox help</code> to see all commands. Run <code>dox help &lt;command&gt
 </tr>
 <tr>
 <td><code>dox openapi:generate [dir]</code></td>
-<td>write <code>openapi.json</code> and <code>openapi.yaml</code> (default <code>storage/openapi</code>), see <a href="../../packages/openapi/#write-the-files-dox-openapigenerate">OpenAPI</a></td>
+<td>run <code>bin/openapi.dart</code> to write <code>openapi.json</code> and <code>openapi.yaml</code> (default <code>storage/openapi</code>). A new project has no <code>bin/openapi.dart</code> yet, see <a href="../../packages/openapi/#write-the-files-dox-openapigenerate">OpenAPI</a></td>
 </tr>
 <tr>
 <td><code>dox update</code></td>
@@ -6607,9 +6607,14 @@ Run <code>dox help</code> to see all commands. Run <code>dox help &lt;command&gt
 <h2 id="project">Project</h2>
 <h3 id="create-a-project">Create a project</h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>dox<span class="w"> </span>create<span class="w"> </span>new_blog
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>dox<span class="w"> </span>create<span class="w"> </span>new_blog<span class="w"> </span>--version<span class="w"> </span>v3.0.0-alpha.5
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>dox<span class="w"> </span>create<span class="w"> </span>new_blog<span class="w"> </span>--version<span class="w"> </span>v3.0.0-alpha.17
 </span></code></pre></div>
 <p><code>dox create</code> copies the <a href="https://github.com/dartondox/dox-sample">dox-sample</a> template from GitHub. Without <code>--version</code>, it uses the newest template release with the same major version as the CLI.</p>
+<ul>
+<li>The folder name is the project name in snake case: <code>NewBlog</code> makes <code>new_blog</code>.</li>
+<li>It makes <code>.env</code> from <code>.env.example</code>, with a new <code>APP_KEY</code>.</li>
+<li>Then run <code>cd new_blog</code>, <code>dart pub get</code> and <code>dox serve</code>.</li>
+</ul>
 <h3 id="run-the-dev-server">Run the dev server</h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>dox<span class="w"> </span>serve<span class="w">                         </span><span class="c1"># or: dox s</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>dox<span class="w"> </span>s<span class="w"> </span>--ignore-build-runner<span class="w">       </span><span class="c1"># do not run build_runner watch</span>
@@ -6625,17 +6630,17 @@ It also runs <code>build_runner watch</code>, so generated files stay up to date
 <h2 id="create-files">Create files</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>dox<span class="w"> </span>make:controller<span class="w"> </span>Blog<span class="w">        </span><span class="c1"># lib/app/http/controllers/blog.controller.dart</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>dox<span class="w"> </span>make:controller<span class="w"> </span>Blog<span class="w"> </span>-r<span class="w">     </span><span class="c1"># resource controller</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>dox<span class="w"> </span>make:middleware<span class="w"> </span>Auth
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>dox<span class="w"> </span>make:middleware<span class="w"> </span>Auth<span class="w">        </span><span class="c1"># lib/app/http/middleware/auth.middleware.dart</span>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>dox<span class="w"> </span>make:dto<span class="w"> </span>CreateBlog<span class="w">         </span><span class="c1"># lib/app/dtos/create_blog/create_blog.dto.dart</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>dox<span class="w"> </span>make:serializer<span class="w"> </span>Blog
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>dox<span class="w"> </span>make:model<span class="w"> </span>Blog<span class="w"> </span>-m<span class="w">          </span><span class="c1"># model and its create_blogs_table migration</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>dox<span class="w"> </span>make:serializer<span class="w"> </span>Blog<span class="w">        </span><span class="c1"># lib/app/http/serializers/blog.serializer.dart</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>dox<span class="w"> </span>make:model<span class="w"> </span>Blog<span class="w"> </span>-m<span class="w">          </span><span class="c1"># lib/app/models/blog/blog.model.dart and a create_blogs_table migration</span>
 </span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>dox<span class="w"> </span>make:migration<span class="w"> </span>create_blogs_table<span class="w">          </span><span class="c1"># .dart file (default)</span>
 </span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>dox<span class="w"> </span>make:migration<span class="w"> </span>create_blogs_table<span class="w"> </span>--sql<span class="w">    </span><span class="c1"># .sql file</span>
 </span></code></pre></div>
 <ul>
 <li><code>-r</code> adds the methods <code>index</code>, <code>create</code>, <code>store</code>, <code>show</code>, <code>edit</code>, <code>update</code> and <code>destroy</code>.</li>
 <li>Word breaks are kept. <code>BlogPost</code> makes <code>blog_post.controller.dart</code> with the class <code>BlogPostController</code>.</li>
-<li>After <code>make:dto</code>, run <code>dox build_runner:build</code>. See <a href="../../the-basic/validation/">Validation</a>.</li>
+<li>After <code>make:controller</code> or <code>make:dto</code>, run <code>dox build_runner:build</code> (or keep <code>dox serve</code> running). See <a href="../../the-basic/validation/">Validation</a>.</li>
 <li>The table of a model is its name in plural snake case: <code>BlogPost</code> makes <code>blog_posts</code>. The model gets <code>@DoxModel(table: 'blog_posts')</code>.</li>
 </ul>
 <h2 id="migrations">Migrations</h2>
@@ -6653,6 +6658,7 @@ It also runs <code>build_runner watch</code>, so generated files stay up to date
 <ul>
 <li><code>DB_CONNECTION</code> defaults to <code>postgres</code>. The default port is <code>5432</code> for postgres and <code>3306</code> for mysql.</li>
 <li><code>DB_DATABASE</code> works too, in place of <code>DB_NAME</code>.</li>
+<li><code>DATABASE_URL</code> wins over all the <code>DB_*</code> keys when it is set.</li>
 <li>Put comments on their own line. A <code>#</code> after a value becomes part of the value.</li>
 </ul>
 <p>All keys are in the <a href="../../reference/env/#read-by-the-framework">Env reference</a>.</p>

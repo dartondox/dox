@@ -4336,6 +4336,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#long-passwords" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Long passwords
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#with-login" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6259,6 +6270,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#long-passwords" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Long passwords
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#with-login" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6311,9 +6333,10 @@
 <code>Hash</code> uses bcrypt with a new random salt each time. It is in <code>package:dox_core/dox_core.dart</code>.</p>
 <h2 id="hash-a-password">Hash a password</h2>
 <p>Hash the password before you save it.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">user</span><span class="p">.</span><span class="n">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">make</span><span class="p">(</span><span class="n">body</span><span class="p">.</span><span class="n">password</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">user</span><span class="p">.</span><span class="n">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">makeAsync</span><span class="p">(</span><span class="n">body</span><span class="p">.</span><span class="n">password</span><span class="p">);</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
 </span></code></pre></div>
+<p><code>makeAsync</code> runs bcrypt in another isolate. See <a href="#without-blocking-the-server">Without blocking the server</a>.</p>
 <p>The result looks like <code>$2a$10$...</code>. It holds the salt, so you only store this one string.
 The same password gives a different hash each time.</p>
 <h2 id="check-a-password">Check a password</h2>
@@ -6328,12 +6351,21 @@ In a request handler, use the async versions. They run bcrypt in another isolate
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">verifyAsync</span><span class="p">(</span><span class="s1">'secret'</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">password</span><span class="o">!</span><span class="p">);</span>
 </span></code></pre></div>
 <h2 id="cost">Cost</h2>
-<p><code>Hash.rounds</code> is the bcrypt cost for new hashes. The default is <code>10</code>. Each step up doubles the time.</p>
+<p><code>Hash.rounds</code> is the bcrypt cost for new hashes. The default is <code>10</code>. Each step up doubles the time.
+The cost must be from 4 to 31. Do not go below 10.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">Hash</span><span class="p">.</span><span class="n">rounds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">12</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kt">String</span><span class="w"> </span><span class="n">hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">make</span><span class="p">(</span><span class="s1">'secret'</span><span class="p">,</span><span class="w"> </span><span class="nl">rounds:</span><span class="w"> </span><span class="m">12</span><span class="p">);</span><span class="w"> </span><span class="c1">// or per call</span>
 </span></code></pre></div>
 <p>Old hashes keep their own cost, so they still verify.
-If you change it, also set <code>hashRounds</code> on <code>JwtAuthDriver</code> to the same value. See <a href="../authentication/">Authentication</a>.</p>
+If you change it, also set <code>hashRounds</code> on <code>JwtAuthDriver</code> or <code>SessionAuthDriver</code> to the same value.
+Then a login with an unknown email takes as long as a wrong password. See <a href="../authentication/">Authentication</a>.</p>
+<h2 id="long-passwords">Long passwords</h2>
+<p>bcrypt reads at most 72 bytes.
+<code>Hash.make</code> and <code>Hash.makeAsync</code> throw an <code>ArgumentError</code> when the password is longer than 72 bytes (UTF-8).
+<code>Hash.verify</code> returns <code>false</code> for such a password.</p>
+<p>So limit the length in your DTO, like <code>@Length(min: 8, max: 72)</code>.
+<code>@Length</code> counts characters, and a letter outside ASCII can use up to 4 bytes.
+So a password with such letters can still be too long. Catch the error and answer <code>422</code>, or use a smaller <code>max</code>.</p>
 <h2 id="with-login">With login</h2>
 <p>You do not need <code>Hash.verify</code> for normal login.
 <code>Auth().attempt()</code> from <code>dox_auth</code> finds the user and checks the password with bcrypt.

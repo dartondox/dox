@@ -2813,6 +2813,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#without-dox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without Dox
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#how-it-works" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6221,6 +6232,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#without-dox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without Dox
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#how-it-works" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6334,6 +6356,29 @@ WebSocket or Socket.IO routes.</p>
 </ul>
 <p>You do not need Rust. The package downloads a ready-built library for your
 system when you build the app.</p>
+<h2 id="without-dox">Without Dox</h2>
+<p><code>dox_http_native</code> also works on its own, in any Dart app:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_http_native
+</span></code></pre></div>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_http_native/dox_http_native.dart'</span><span class="p">;</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="n">NativeHttpServer</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">NativeHttpServer</span><span class="p">.</span><span class="n">bind</span><span class="p">(</span><span class="m">3000</span><span class="p">);</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="n">server</span><span class="p">.</span><span class="n">listen</span><span class="p">((</span><span class="n">HttpRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="n">req</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="s1">'Hello World'</span><span class="p">);</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="p">});</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li><code>NativeHttpServer.bind(port, address: '127.0.0.1')</code> listens on one host.
+  With no address, it listens on all interfaces.</li>
+<li><code>close()</code> waits for open requests. <code>close(force: true)</code> closes every
+  connection at once.</li>
+</ul>
+<p>The rest of this page is the same with or without Dox.</p>
 <h2 id="how-it-works">How it works</h2>
 <ol>
 <li>Rust reads the requests from the sockets.</li>
@@ -6351,10 +6396,10 @@ than isolates.</p>
 <h2 id="when-the-library-does-not-load">When the library does not load</h2>
 <p>Dox stops at start, before any isolate runs. The error says why and how to
 fix it:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Unsupported operation: dox_http_native did not load: &lt;reason&gt;.
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Fix: install Rust (cargo, see https://rustup.rs), then run the app again ...
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Unsupported operation: dox_http_native did not load: &lt;reason&gt;.
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>Fix: install Rust (cargo, see https://rustup.rs), then run the app again ...
 </span></code></pre></div>
-<p><code>&lt;reason&gt;</code> is for example <code>native library ABI 4, expected 5</code>: the library on
+<p><code>&lt;reason&gt;</code> is for example <code>native library ABI 5, expected 6</code>: the library on
 disk is from another version of the package. See
 <a href="../../reference/troubleshooting/#the-native-http-library-did-not-load">Troubleshooting</a>.</p>
 <h2 id="websocket">WebSocket</h2>
@@ -6403,7 +6448,7 @@ a gain.</p>
   in memory. Dart reads more of the file only when the client has read
   what was sent. When the client leaves, Dart stops reading.</li>
 <li>A request body of 64 KB or more goes to Dart without a copy.</li>
-<li><code>compress: true</code> works: Rust gzips the body on another thread, so the
+<li><code>compress: true</code> in <code>AppConfig</code> works: Rust gzips the body on another thread, so the
   isolate does not wait. A streamed response is not compressed.</li>
 </ul>
 <h2 id="where-the-library-comes-from">Where the library comes from</h2>
@@ -6412,10 +6457,10 @@ that works:</p>
 <ol>
 <li>
 <p>A path you give in the root <code>pubspec.yaml</code> of your app:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">hooks</span><span class="p">:</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">user_defines</span><span class="p">:</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nt">dox_http_native</span><span class="p">:</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">      </span><span class="nt">lib_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/libdox_http_native.so</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">hooks</span><span class="p">:</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">user_defines</span><span class="p">:</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">dox_http_native</span><span class="p">:</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">      </span><span class="nt">lib_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/libdox_http_native.so</span>
 </span></code></pre></div>
 </li>
 <li>
@@ -6427,6 +6472,8 @@ that works:</p>
    Windows (x64).</li>
 <li>A build from source with <code>cargo</code>, when Rust is installed.</li>
 </ol>
+<p>This order is for the package from pub.dev. For a git or path dependency,
+step 4 comes before step 3, because the source can be newer than the release.</p>
 <p>When none works, the app still builds, but it stops at start with the
 error above. Install Rust and run it again, so step 4 works.</p>
 <div class="admonition note">
@@ -6438,10 +6485,10 @@ error above. Install Rust and run it again, so step 4 works.</p>
 <p><code>dox_http_native</code> lives in its own repo:
 <a href="https://github.com/dartondox/dox-http-native">dartondox/dox-http-native</a>.
 The Rust code is in its <code>native</code> folder.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">cd</span><span class="w"> </span>dox-http-native/native
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>cargo<span class="w"> </span>build<span class="w"> </span>--release<span class="w">   </span><span class="c1"># the hook uses this build from now on</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>cargo<span class="w"> </span><span class="nb">test</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nb">cd</span><span class="w"> </span>..<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>dart<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--concurrency<span class="o">=</span><span class="m">1</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">cd</span><span class="w"> </span>dox-http-native/native
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>cargo<span class="w"> </span>build<span class="w"> </span>--release<span class="w">   </span><span class="c1"># the hook uses this build from now on</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>cargo<span class="w"> </span><span class="nb">test</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nb">cd</span><span class="w"> </span>..<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>dart<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--concurrency<span class="o">=</span><span class="m">1</span>
 </span></code></pre></div>
 <p>To use your local copy in the Dox repo, or to release the package, see
 <a href="../../community/contribute/#native-packages">Contribute</a>.</p>

@@ -7302,6 +7302,14 @@ The server can run the migrations at start. See <a href="../../database/migratio
 <td><code>php artisan optimize</code></td>
 <td><code>dox build</code> (one native binary in <code>build/bundle</code>)</td>
 </tr>
+<tr>
+<td><code>php artisan queue:work</code></td>
+<td><code>dox queue:work</code></td>
+</tr>
+<tr>
+<td><code>php artisan schedule:work</code></td>
+<td><code>dox schedule:work</code></td>
+</tr>
 </tbody>
 </table>
 <p>The <code>make:*</code> and <code>migrate</code> commands are in the tables above. Two commands have no Laravel twin: <code>dox build_runner:build</code> makes the generated code, and <code>dox env:generate</code> makes the typed env class.
@@ -7332,6 +7340,14 @@ See <a href="../../digging-deeper/dox-cli/">Dox CLI</a>.</p>
 <td><code>req.auth?.user&lt;User&gt;()</code></td>
 </tr>
 <tr>
+<td><code>Auth::attempt(...)</code> for a web page (session)</td>
+<td><code>await Auth().attemptSession(req, &lt;String, dynamic&gt;{...})</code> gives <code>true</code> or <code>false</code></td>
+</tr>
+<tr>
+<td><code>Auth::logout()</code></td>
+<td><code>Auth().logout(req)</code></td>
+</tr>
+<tr>
 <td><code>-&gt;middleware('auth:sanctum')</code></td>
 <td><code>AuthMiddleware()</code> from <code>dox_auth</code></td>
 </tr>
@@ -7341,7 +7357,8 @@ See <a href="../../digging-deeper/dox-cli/">Dox CLI</a>.</p>
 </tr>
 </tbody>
 </table>
-<p>Dox auth is a JWT in the <code>Authorization</code> header. There are no sessions, no cookies and no Sanctum tokens table.
+<p>For an API, Dox auth is a JWT in the <code>Authorization</code> header. There is no Sanctum tokens table.
+For web pages, a guard with <code>SessionAuthDriver</code> keeps the login in the session cookie.
 See <a href="../../security/authentication/">Authentication</a>.</p>
 <h2 id="cache">Cache</h2>
 <table>
@@ -7533,21 +7550,22 @@ See <a href="../../digging-deeper/testing/">Testing</a>.</p>
 <li><strong>A native HTTP server and native database drivers.</strong> Rust parses HTTP and talks to Postgres and MySQL. Your code stays in Dart. They come ready-built, so you do not need Rust.</li>
 <li><strong>Types everywhere.</strong> A DTO is a class with typed fields. A path param is an <code>int</code>. A model field is a <code>String?</code>. The compiler finds many mistakes before you run the app.</li>
 <li><strong>Async is explicit.</strong> Database calls return a <code>Future</code>. You write <code>await</code>. One isolate serves many requests at the same time while it waits for the database.</li>
-<li><strong>JSON API first.</strong> Dox returns text, JSON, files and streams. It has no view layer.</li>
+<li><strong>JSON API first.</strong> Dox returns text, JSON, files and streams. For HTML pages, add <a href="../../the-basic/views/">views</a> (<code>dox_view</code>) or <a href="../../the-basic/inertia/">Inertia</a> (<code>dox_inertia</code>).</li>
 </ul>
 <h2 id="what-is-missing-today">What is missing today</h2>
 <p>Dox does not have these Laravel features yet:</p>
 <ul>
-<li>queues and jobs, and the task scheduler</li>
 <li>events and listeners (model events are there)</li>
-<li>Blade views, mail and notifications</li>
-<li>sessions (auth uses a JWT; encrypted cookies are there)</li>
+<li>notifications</li>
+<li>password reset</li>
 <li>policies and gates</li>
 </ul>
 <p>See <a href="../status-and-roadmap/#what-dox-does-not-have-yet">What Dox does not have yet</a> for what to use today.</p>
 <p>What is there, as separate packages: <a href="../../packages/validation/">validation</a>, <a href="../../packages/openapi/">OpenAPI docs</a>,
-<a href="../../packages/storage/">storage</a>, <a href="../../packages/cache/">cache</a>, <a href="../../packages/socketio/">Socket.IO</a>
-and <a href="../../security/authentication/">auth</a>.</p>
+<a href="../../packages/storage/">storage</a>, <a href="../../packages/cache/">cache</a>, <a href="../../packages/socketio/">Socket.IO</a>,
+<a href="../../security/authentication/">auth</a>, <a href="../../digging-deeper/queue/">queues</a>, the <a href="../../digging-deeper/scheduler/">scheduler</a>,
+<a href="../../digging-deeper/mail/">mail</a>, <a href="../../the-basic/views/">views</a> and <a href="../../the-basic/inertia/">Inertia</a>.
+<a href="../../the-basic/session/">Sessions</a> are in <code>dox_core</code>.</p>
 
 
 

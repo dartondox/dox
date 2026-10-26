@@ -6240,7 +6240,7 @@ You can also call it yourself.</p>
 <h2 id="encrypt-and-decrypt">Encrypt and decrypt</h2>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kt">String</span><span class="w"> </span><span class="n">secret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appKey</span><span class="p">;</span><span class="w"> </span><span class="c1">// 32 characters</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kt">String</span><span class="w"> </span><span class="n">secret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appKey</span><span class="p">;</span><span class="w"> </span><span class="c1">// 32 characters = 32 bytes, so AES-256</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kt">String</span><span class="w"> </span><span class="n">encoded</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AESEncryptor</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">'Hello world'</span><span class="p">,</span><span class="w"> </span><span class="n">secret</span><span class="p">);</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="kt">String</span><span class="w"> </span><span class="n">decoded</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AESEncryptor</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoded</span><span class="p">,</span><span class="w"> </span><span class="n">secret</span><span class="p">);</span><span class="w"> </span><span class="c1">// 'Hello world'</span>
@@ -6254,6 +6254,14 @@ You can also call it yourself.</p>
 <p>Make a new 32-character <code>APP_KEY</code> with the CLI:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dox<span class="w"> </span>key:generate
 </span></code></pre></div>
+<p>It writes a random key of letters and digits to <code>APP_KEY</code> in <code>.env</code>.
+Dox uses the key text as it is: its UTF-8 bytes are the AES key. It is not base64 or hex decoded.</p>
+<p>At startup Dox checks <code>APP_KEY</code>. When it is empty, not exactly 32 bytes, or an old public sample key, the app stops.
+In <code>development</code>, <code>local</code> and <code>test</code> it only prints a warning.</p>
+<ul>
+<li>Keep <code>APP_KEY</code> in <code>.env</code> or in the secrets of your host. Never put it in code or in git.</li>
+<li>If you change <code>APP_KEY</code>, old encrypted cookies and sessions can not be read any more. JWT tokens signed with it stop working too.</li>
+</ul>
 <h2 id="cookies">Cookies</h2>
 <p><code>DoxCookie</code> encrypts its value with <code>APP_KEY</code> by default.
 <code>req.cookie(key)</code> decrypts it.</p>
@@ -6271,6 +6279,7 @@ The cookie name is bound to the encrypted value, so a value can not be copied fr
 <li>Each message gets a new random 12-byte nonce.</li>
 <li>The output is base64 of <code>nonce + encrypted text + tag</code>.</li>
 <li>The 16-byte tag checks the message. If someone changes one byte, <code>decode</code> throws.</li>
+<li><code>encode</code> and <code>decode</code> also take <code>associatedData</code>, a text like a cookie name. It is not in the output, but <code>decode</code> needs the same value. Cookies use the cookie name here.</li>
 </ul>
 <p>To store passwords, do not encrypt them. Hash them. See <a href="../hashing/">Hashing</a>.</p>
 

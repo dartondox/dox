@@ -6358,7 +6358,7 @@ Where this page is not sure, the table says "see their docs".</p>
 </tr>
 <tr>
 <td>Auth</td>
-<td><code>dox_auth</code>: JWT guard, password hashing</td>
+<td><code>dox_auth</code>: JWT and session guards. Password hashing (<code>Hash</code>) is in <code>dox_core</code>.</td>
 <td><code>dart_frog_auth</code>: Basic, Bearer and Cookie middleware</td>
 <td>Built in: email and password, Google, Apple, GitHub, passkeys and more</td>
 <td>Not built in</td>
@@ -6480,7 +6480,7 @@ To compare, run the same test on your own machine, with each server on the same 
 <li><strong>Your app is Flutter only, and you want the client made for you.</strong> Serverpod generates a typed client for every endpoint. Dox does not generate a Dart client. It generates an OpenAPI document.</li>
 <li><strong>You want a small tool with few parts.</strong> Dart Frog is simpler. You add only what you need.</li>
 <li><strong>You want to build your own stack.</strong> Shelf gives you the base parts, and the Dart team publishes it.</li>
-<li><strong>You need features Dox does not have yet</strong>, like queues, a scheduler or mail. See <a href="../status-and-roadmap/#what-dox-does-not-have-yet">What Dox does not have yet</a>.</li>
+<li><strong>You need features Dox does not have yet</strong>, like notifications, events and listeners, or policies. See <a href="../status-and-roadmap/#what-dox-does-not-have-yet">What Dox does not have yet</a>.</li>
 </ul>
 
 

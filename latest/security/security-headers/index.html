@@ -6309,8 +6309,12 @@ The browser reads them and blocks some common attacks, like showing your page in
 </tbody>
 </table>
 <p><code>Content-Security-Policy</code> is off by default. A good policy depends on your pages.</p>
+<p>Without this middleware, the server already sends three headers on every answer, also on a <code>404</code>:
+<code>X-Frame-Options: SAMEORIGIN</code>, <code>X-Content-Type-Options: nosniff</code> and <code>X-XSS-Protection: 1; mode=block</code>.
+<code>SecurityHeaders</code> replaces the first two with its own values.</p>
 <h2 id="change-or-turn-off-a-header">Change or turn off a header</h2>
-<p>Each header has an option. Give a new value to change it, or <code>null</code> to turn it off:</p>
+<p>Each header has an option. Give a new value to change it, or <code>null</code> to turn it off.
+<code>null</code> for <code>frameOptions</code> or <code>contentTypeOptions</code> keeps the server value from above (<code>SAMEORIGIN</code> and <code>nosniff</code>).</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">const</span><span class="w"> </span><span class="n">SecurityHeaders</span><span class="p">(</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nl">frameOptions:</span><span class="w"> </span><span class="s1">'SAMEORIGIN'</span><span class="p">,</span><span class="w"> </span><span class="c1">// allow frames from your own site</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nl">permissionsPolicy:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="c1">// do not send this header</span>
@@ -6370,7 +6374,9 @@ So add your proxy to <code>AppConfig.trustedProxies</code>:</p>
 <p>Without it, Dox never sends HSTS. See <a href="../../reference/app-config/">App config</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Middleware runs only for routes that exist. A <code>404</code> for an unknown url does not get these headers.</p>
+<p>Middleware runs only for routes that exist. A <code>404</code> for an unknown url gets only the three server headers.
+A preflight <code>OPTIONS</code> answer gets only them too.
+Put <code>SecurityHeaders</code> first in <code>globalMiddleware</code>. Then an error from a later middleware, like a <code>419</code> or a <code>429</code>, also gets the headers.</p>
 </div>
 <h2 id="see-also">See also</h2>
 <ul>

@@ -6499,8 +6499,9 @@ So a value you put in one isolate is missing in the others.
 Use <code>redis</code> when all isolates and servers must see the same data.</p>
 </div>
 <h2 id="config">Config</h2>
-<p>Without a config, Dox has a <code>file</code> store (the default) and a <code>memory</code> store.
-To change the stores, make <code>lib/config/cache.dart</code>:</p>
+<p>A new project already has <code>lib/config/cache.dart</code>, with a <code>file</code> store and a <code>memory</code> store.
+<code>CACHE_STORE</code> in <code>.env</code> picks the default store (<code>file</code> when it is not set).
+To add a store, edit the file. This example adds a <code>redis</code> store:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/cache.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
@@ -6524,7 +6525,7 @@ To change the stores, make <code>lib/config/cache.dart</code>:</p>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">redisPort</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="m">6379</span><span class="p">;</span>
 </span></code></pre></div>
-<p>Then pass it to <code>AppConfig(cache: cache)</code> in <code>lib/config/app.dart</code>.
+<p><code>lib/config/app.dart</code> already passes it to <code>AppConfig(cache: cache)</code>.
 Each store is made once per isolate, the first time you use it.</p>
 <h3 id="store-options">Store options</h3>
 <table>
@@ -6541,7 +6542,7 @@ Each store is made once per isolate, the first time you use it.</p>
 </tr>
 <tr>
 <td><code>memory</code></td>
-<td><code>max_size</code>: the most items. When it is full, the item that was used least recently is removed. No limit by default. Expired items are removed when read, and by a sweep every few thousand writes. Also <code>prefix</code>.</td>
+<td><code>max_size</code>: the most items. When it is full, the item that was used least recently is removed. No limit by default. Expired items are removed when read, and by a sweep after many writes (at least 1000). Also <code>prefix</code>.</td>
 </tr>
 <tr>
 <td><code>redis</code></td>

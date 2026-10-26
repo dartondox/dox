@@ -1723,7 +1723,7 @@ Before it starts an isolate, Dox copies three things to it:
 
 - the `AppConfig`,
 - the list of providers,
-- the routes you added before `startServer()`.
+- the routes and route binders (`Route.bind`) you added before `startServer()`.
 
 Then each isolate does this, once:
 
@@ -1782,54 +1782,71 @@ Postgres and MySQL have only the native drivers. When the native library does no
 ```text
 my_app/
 ├── bin/
-│   └── server.dart          # starts the app
+│   ├── server.dart          # starts the app
+│   ├── migrate.dart         # runs the migrations (dox migration:*)
+│   ├── seed.dart            # runs the seeders (dox db:seed)
+│   ├── queue.dart           # the queue worker (dox queue:*)
+│   └── schedule.dart        # the scheduler (dox schedule:*)
 ├── db/
-│   └── migration/           # migrations (.dart with a registry, or .sql)
+│   ├── factories/           # model factories, *.factory.dart
+│   ├── migration/           # migrations (.dart with a registry, or .sql)
+│   └── seeders/             # seeders, *.seeder.dart
 ├── lib/
 │   ├── app/
-│   │   ├── dtos/            # one folder per DTO, *.dto.dart, typed and checked input
 │   │   ├── http/
-│   │   │   ├── controllers/     # *.controller.dart
-│   │   │   ├── middleware/      # *.middleware.dart
-│   │   │   ├── serializers/     # *.serializer.dart, custom JSON shapes
-│   │   │   └── response_handler.dart
+│   │   │   └── controllers/     # *.controller.dart
+│   │   ├── jobs/                # queue jobs, *.job.dart
 │   │   └── models/              # one folder per model, *.model.dart
 │   ├── config/
 │   │   ├── app.dart             # AppConfig: port, isolates, middleware
 │   │   ├── cache.dart           # cache stores
 │   │   ├── cors.dart
 │   │   ├── database.dart        # DatabaseConfig: connections
-│   │   ├── env.dart             # typed env class (@DoxEnv), optional
+│   │   ├── env.dart             # typed env class (@DoxEnv)
 │   │   ├── logger.dart
+│   │   ├── queue.dart           # QueueConfig
+│   │   ├── schedule.dart        # ScheduleConfig and your tasks
 │   │   └── storage.dart         # storage disks
 │   ├── routes/
 │   │   ├── api.dart             # ApiRouter, prefix `api`
 │   │   └── web.dart             # WebRouter
-│   ├── providers/
-│   │   └── orm_provider.dart    # opens the database in every isolate
+│   ├── providers/               # one DoxProvider per file, runs in every isolate
+│   │   ├── orm_provider.dart        # opens the database
+│   │   ├── queue_provider.dart
+│   │   ├── schedule_provider.dart
+│   │   └── storage_provider.dart
 │   └── generated/               # made by build_runner, do not edit
 │       ├── container.g.dart     # @Inject classes, routers, providers
-│       ├── dtos.g.dart          # the list of DTOs
+│       ├── jobs.g.dart          # the list of queue jobs
 │       └── openapi.g.dart       # the OpenAPI docs
-├── storage/                     # local disk, file cache, uploads
 ├── test/
-├── .env                         # local settings, not in git
+├── .env                         # local settings, not in git. `dox create` makes it
 ├── .env.example
 ├── Dockerfile
 ├── docker-compose.yml
 └── pubspec.yaml
 ```
 
+The `dox make:*` commands add more folders when you need them:
+
+- `dox make:dto` adds `lib/app/dtos/<name>/<name>.dto.dart`. Then `build_runner` writes `lib/generated/dtos.g.dart`, the list of DTOs.
+- `dox make:middleware` adds `lib/app/http/middleware/`.
+- `dox make:serializer` adds `lib/app/http/serializers/`.
+
+The app makes `storage/` when it writes files (the local disk, the file cache, uploads).
+
 | Folder | What goes there |
 | --- | --- |
-| `bin/` | `server.dart` calls `Dox().initialize(appConfig)`, runs the migrations, then `Dox().startServer()`. `dox make:migration` adds `migrate.dart`. |
-| `db/migration/` | Your migrations. Dart migrations are listed in `migrations.dart`, which the CLI writes. |
-| `lib/app/http/` | Everything about HTTP: controllers, DTOs, middleware, serializers. |
+| `bin/` | `server.dart` calls `Dox().initialize(appConfig)`, runs the migrations, then `Dox().startServer()`. The other files are the entry points that the `dox migration:*`, `db:seed`, `queue:*` and `schedule:*` commands run. |
+| `db/` | Your migrations, factories and seeders. Dart migrations are listed in `db/migration/migrations.dart`, which the CLI writes. |
+| `lib/app/http/` | Everything about HTTP: controllers, middleware, serializers. |
+| `lib/app/dtos/` | One folder per DTO: typed and checked input. |
+| `lib/app/jobs/` | Queue jobs. |
 | `lib/app/models/` | One folder per model. `build_runner` writes the `.g.dart` file next to it. |
 | `lib/config/` | One file per config object. `app.dart` puts them together in `AppConfig`. |
 | `lib/routes/` | One `Router` class per file. Dox finds each router by itself. |
-| `lib/providers/` | Classes that extend `DoxProvider`. Their `setup()` runs in every isolate. |
-| `lib/*.g.dart` | Generated files. Do not edit them. Run `dox build_runner:build` to make them again. |
+| `lib/providers/` | Classes that extend `DoxProvider`. Their `setup()` runs in every isolate. Dox finds each provider by itself. |
+| `lib/generated/` | Generated files. Do not edit them. Run `dox build_runner:build` to make them again. |
 | `storage/` | Files the app writes: uploads, the file cache, SQLite files. |
 
 `build_runner` with `dox_builder` makes the model classes, the DTO checks, the typed env class and the OpenAPI docs.
@@ -2140,6 +2157,8 @@ The server can run the migrations at start. See [Migration](../database/migratio
 | `php artisan route:list` | not there. Use the OpenAPI docs page at `/docs`. |
 | `php artisan tinker` | not there |
 | `php artisan optimize` | `dox build` (one native binary in `build/bundle`) |
+| `php artisan queue:work` | `dox queue:work` |
+| `php artisan schedule:work` | `dox schedule:work` |
 
 The `make:*` and `migrate` commands are in the tables above. Two commands have no Laravel twin: `dox build_runner:build` makes the generated code, and `dox env:generate` makes the typed env class.
 See [Dox CLI](../digging-deeper/dox-cli.md).
@@ -2152,10 +2171,13 @@ See [Dox CLI](../digging-deeper/dox-cli.md).
 | `Auth::attempt(['email' => $e, 'password' => $p])` | `await Auth().attempt(<String, dynamic>{'email': e, 'password': p})` gives a JWT, or `null` |
 | `Auth::login($user)` | `Auth().login(user)` gives a JWT |
 | `Auth::user()` | `req.auth?.user<User>()` |
+| `Auth::attempt(...)` for a web page (session) | `await Auth().attemptSession(req, <String, dynamic>{...})` gives `true` or `false` |
+| `Auth::logout()` | `Auth().logout(req)` |
 | `->middleware('auth:sanctum')` | `AuthMiddleware()` from `dox_auth` |
 | `Hash::make($p)`, `Hash::check($p, $hash)` | `Hash.make(p)`, `Hash.verify(p, hash)` |
 
-Dox auth is a JWT in the `Authorization` header. There are no sessions, no cookies and no Sanctum tokens table.
+For an API, Dox auth is a JWT in the `Authorization` header. There is no Sanctum tokens table.
+For web pages, a guard with `SessionAuthDriver` keeps the login in the session cookie.
 See [Authentication](../security/authentication.md).
 
 ## Cache
@@ -2235,23 +2257,24 @@ See [Testing](../digging-deeper/testing.md).
 - **A native HTTP server and native database drivers.** Rust parses HTTP and talks to Postgres and MySQL. Your code stays in Dart. They come ready-built, so you do not need Rust.
 - **Types everywhere.** A DTO is a class with typed fields. A path param is an `int`. A model field is a `String?`. The compiler finds many mistakes before you run the app.
 - **Async is explicit.** Database calls return a `Future`. You write `await`. One isolate serves many requests at the same time while it waits for the database.
-- **JSON API first.** Dox returns text, JSON, files and streams. It has no view layer.
+- **JSON API first.** Dox returns text, JSON, files and streams. For HTML pages, add [views](../the-basic/views.md) (`dox_view`) or [Inertia](../the-basic/inertia.md) (`dox_inertia`).
 
 ## What is missing today
 
 Dox does not have these Laravel features yet:
 
-- queues and jobs, and the task scheduler
 - events and listeners (model events are there)
-- Blade views, mail and notifications
-- sessions (auth uses a JWT; encrypted cookies are there)
+- notifications
+- password reset
 - policies and gates
 
 See [What Dox does not have yet](status-and-roadmap.md#what-dox-does-not-have-yet) for what to use today.
 
 What is there, as separate packages: [validation](../packages/validation.md), [OpenAPI docs](../packages/openapi.md),
-[storage](../packages/storage.md), [cache](../packages/cache.md), [Socket.IO](../packages/socketio.md)
-and [auth](../security/authentication.md).
+[storage](../packages/storage.md), [cache](../packages/cache.md), [Socket.IO](../packages/socketio.md),
+[auth](../security/authentication.md), [queues](../digging-deeper/queue.md), the [scheduler](../digging-deeper/scheduler.md),
+[mail](../digging-deeper/mail.md), [views](../the-basic/views.md) and [Inertia](../the-basic/inertia.md).
+[Sessions](../the-basic/session.md) are in `dox_core`.
 
 
 ---
@@ -2292,7 +2315,7 @@ It lists facts only. Each project is good at different things.
 | Typed request validation | `@Dto` classes, checks generated at build time, `422` with errors | Not in their feature list (see their docs) | Typed, generated parameters for endpoints. Rules: see their docs. | Not built in | Route params only (type or regex) |
 | ORM and relations | `dox_orm`: models, has one, has many, belongs to, many to many | Not built in | Built in: filters, joins, one-to-one, one-to-many, many-to-many | Not built in | Not built in |
 | Migrations | `dox migrate` (SQL or Dart files) | Not built in | Built in, versioned migrations | Not built in | Not built in |
-| Auth | `dox_auth`: JWT guard, password hashing | `dart_frog_auth`: Basic, Bearer and Cookie middleware | Built in: email and password, Google, Apple, GitHub, passkeys and more | Not built in | See their docs |
+| Auth | `dox_auth`: JWT and session guards. Password hashing (`Hash`) is in `dox_core`. | `dart_frog_auth`: Basic, Bearer and Cookie middleware | Built in: email and password, Google, Apple, GitHub, passkeys and more | Not built in | See their docs |
 | WebSocket | A Socket.IO v4 server (`dox_socketio`) and raw `Route.websocket` | `dart_frog_web_socket` (`webSocketHandler`) | Streaming methods over a managed WebSocket | `shelf_web_socket` | Built in |
 | OpenAPI | Generated OpenAPI 3.1 (JSON, YAML) and a docs page | On their roadmap, not done | See their docs | See their docs | See their docs |
 | CLI and code generation | `dox` CLI, `build_runner` for DTOs, models and OpenAPI | `dart_frog` CLI: `create`, `dev` (hot reload), `build` | `serverpod` CLI, generates server and client code | No CLI (`shelf_router_generator` for routes from annotations) | No CLI |
@@ -2333,7 +2356,7 @@ To compare, run the same test on your own machine, with each server on the same 
 - **Your app is Flutter only, and you want the client made for you.** Serverpod generates a typed client for every endpoint. Dox does not generate a Dart client. It generates an OpenAPI document.
 - **You want a small tool with few parts.** Dart Frog is simpler. You add only what you need.
 - **You want to build your own stack.** Shelf gives you the base parts, and the Dart team publishes it.
-- **You need features Dox does not have yet**, like queues, a scheduler or mail. See [What Dox does not have yet](status-and-roadmap.md#what-dox-does-not-have-yet).
+- **You need features Dox does not have yet**, like notifications, events and listeners, or policies. See [What Dox does not have yet](status-and-roadmap.md#what-dox-does-not-have-yet).
 
 
 ---
@@ -2346,7 +2369,7 @@ Source: https://dartondox.dev/latest/3.xconcepts/status-and-roadmap/
 
 This page shows what works in Dox today, what is missing and what is planned.
 
-Checked on 2026-10-25, for version `3.0.0-alpha.14`.
+Checked on 2026-10-26. The main repo is at version `3.0.0-alpha.17`.
 
 Dox 3.0 is an **alpha**. Every feature planned for 3.0.0 is in. What is left before 3.0 stable is testing and small fixes.
 The API can still change between alpha versions.
@@ -2361,34 +2384,35 @@ What the states mean:
 
 The packages in the main repo share one version number. The other packages live in their own repos and have their own version numbers. See [Contribute](../community/contribute.md#packages-in-other-repos).
 
-| Package | What it does | State | Tests |
-| --- | --- | --- | --- |
-| `dox_core` | Routes, middleware, controllers, request and response, isolates, config, the IoC container, exception handler, sessions, CSRF, rate limit, security headers, health check, test client | May change | 44 test files. CI runs them on the native server. |
-| `dox_orm` | Query builder, models, relations, `whereHas`, scopes, casts, `withCount`, transactions, row locks, factories, seeders | May change | 36 test files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite. |
-| `dox_validation` | `@Dto` rules, fluent schemas, JSON Schema, Standard Schema | Ready for stable | 6 test files |
-| `dox_builder` | Code generator for models, DTOs, env classes, the container and OpenAPI | May change | 5 test files |
-| `dox_annotation` | Annotations used by the generator | May change | 1 small test file. Mostly tested through `dox_builder`. |
-| `dox` (CLI) | `dox create`, `dox serve`, `dox build`, `make:*`, `migration:*`, `queue:*`, `schedule:*` | May change | 9 test files |
-| `dox_migration` | Migrations for Postgres, MySQL, MariaDB and SQLite | Ready for stable | 5 test files. CI runs them on each database. |
-| `dox_auth` | JWT and session auth guards and middleware | May change | 4 test files |
-| `dox_cache` | Memory, file and Redis cache, tags, locks | Ready for stable | 4 test files, with Redis in CI |
-| `dox_storage` | Local disk and S3 (and S3-compatible) storage | Ready for stable | 10 test files, with MinIO in CI |
-| `dox_openapi` | OpenAPI 3.1 document and a docs page | Ready for stable | 4 test files |
-| `dox_socketio` | Socket.IO v4 server with a Redis adapter | May change | 10 test files, with the real `socket.io-client` in CI |
-| `dox_queue` | Queues and jobs | Experimental | 5 test files |
-| `dox_scheduler` | Run tasks on a schedule | Experimental | 6 test files |
-| `dox_view` | [Views](../the-basic/views.md): `.dox.html` templates with layouts and components | Experimental | 2 test files |
-| [`dox_inertia`](../the-basic/inertia.md) | Inertia.js server side: single page apps with React, Vue or Svelte and Dox controllers | Experimental | 2 test files |
-| `dox_mailer` | Email with SMTP, Amazon SES, Azure, Resend, Mailgun, Postmark and sendmail | Experimental | 6 test files, with a fake SMTP server |
-| `dox_http_native` | Native HTTP/1.1 and WebSocket server (Rust hyper). Dox has no other server. | Experimental | 3 Dart test files and Rust tests |
-| `dox_postgres_native` | Native Postgres client (Rust tokio-postgres), the Postgres driver. Has TLS (`sslmode`, `sslRootCert`). | Experimental | 5 Dart test files, plus the `dox_orm` tests |
-| `dox_mysql_native` | Native MySQL and MariaDB client (Rust mysql_async), the MySQL driver. Has TLS. | Experimental | 1 Dart test file, plus the `dox_orm` tests |
+| Package | Version | What it does | State | Tests |
+| --- | --- | --- | --- | --- |
+| `dox_core` | `3.0.0-alpha.17` | Routes, middleware, controllers, request and response, isolates, config, the IoC container, exception handler, sessions, CSRF, rate limit, security headers, health check, test client | May change | 334 tests in 44 files. CI runs them on the native server. |
+| `dox_orm` | `3.0.0-alpha.14` | Query builder, models, relations, `whereHas`, scopes, casts, `withCount`, transactions, row locks, factories, seeders | May change | 355 tests in 37 files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite. |
+| `dox_validation` | `3.0.0-alpha.17` | `@Dto` rules, fluent schemas, JSON Schema, Standard Schema | Ready for stable | 90 tests in 6 files |
+| `dox_builder` | `3.0.0-alpha.17` | Code generator for models, DTOs, env classes, the container and OpenAPI | May change | 59 tests in 5 files |
+| `dox_annotation` | `3.0.0-alpha.17` | Annotations used by the generator | May change | 1 test in 1 file. Mostly tested through `dox_builder`. |
+| `dox` (CLI) | `3.0.0-alpha.17` | `dox create`, `dox serve`, `dox build`, `make:*`, `migration:*`, `db:seed`, `queue:*`, `schedule:*` | May change | 73 tests in 9 files |
+| `dox_migration` | `3.0.0-alpha.14` | Migrations for Postgres, MySQL, MariaDB and SQLite | Ready for stable | 31 tests in 5 files. CI runs them on each database. |
+| `dox_auth` | `3.0.0-alpha.17` | JWT and session auth guards and middleware | May change | 43 tests in 4 files |
+| `dox_cache` | `3.0.0-alpha.17` | Memory, file and Redis cache, tags, locks | Ready for stable | 63 tests in 4 files, with Redis in CI |
+| `dox_storage` | `3.0.0-alpha.13` | Local disk and S3 (and S3-compatible) storage | Ready for stable | 119 tests in 10 files, with MinIO in CI |
+| `dox_openapi` | `3.0.0-alpha.17` | OpenAPI 3.1 document and a docs page | Ready for stable | 56 tests in 4 files |
+| `dox_socketio` | `3.0.0-alpha.15` | Socket.IO v4 server with a Redis adapter | May change | 85 tests in 10 files, with Redis and the real `socket.io-client` in CI |
+| `dox_queue` | `3.0.0-alpha.5` | Queues and jobs | Experimental | 43 tests in 5 files, with Postgres, MariaDB and Redis in CI |
+| `dox_scheduler` | `3.0.0-alpha.2` | Run tasks on a schedule | Experimental | 74 tests in 6 files, with Redis in CI |
+| `dox_view` | `3.0.0-alpha.3` | [Views](../the-basic/views.md): `.dox.html` templates with layouts and components | Experimental | 36 tests in 2 files |
+| [`dox_inertia`](../the-basic/inertia.md) | `3.0.0-alpha.4` | Inertia.js server side: single page apps with React, Vue or Svelte and Dox controllers | Experimental | 26 tests in 2 files |
+| `dox_mailer` | `3.0.0-alpha.2` | Email with SMTP, Amazon SES, Azure, Resend, Mailgun, Postmark and sendmail | Experimental | 72 tests in 10 files, with a fake SMTP server |
+| `dox_http_native` | `3.0.0-alpha.8` | Native HTTP/1.1 and WebSocket server (Rust hyper). Dox has no other server. | Experimental | 35 Dart tests in 3 files, and 16 Rust tests |
+| `dox_postgres_native` | `3.0.0-alpha.8` | Native Postgres client (Rust tokio-postgres), the Postgres driver. Has TLS (`sslmode`, `sslRootCert`). | Experimental | 31 Dart tests in 5 files, plus the `dox_orm` tests |
+| `dox_mysql_native` | `3.0.0-alpha.7` | Native MySQL and MariaDB client (Rust mysql_async), the MySQL driver. Has TLS. | Experimental | 13 Dart tests in 1 file, plus the `dox_orm` tests |
 
 `Hash` (bcrypt password hashing) is in `dox_core`.
 
 !!! note "About test coverage"
-    The repo does not measure line coverage. The "Tests" column counts test files and says where CI runs them.
-    The CI setup is in `.github/workflows/test.yaml`. The packages in their own repos have their own CI.
+    The repos do not measure line coverage. The "Tests" column counts the `test(` calls and the `*_test.dart` files in the `test/` folder of each package, and says where CI runs them.
+    A test inside a loop counts once, so `dart test` can report more tests.
+    The CI setup of the main repo is in `.github/workflows/test.yaml`. The packages in their own repos have their own CI.
 
 ## What Dox does not have yet
 
@@ -2494,13 +2518,14 @@ It uses pub.dev automated publishing, so it needs no token or secret.
 
 The full guide is [RELEASING.md](https://github.com/dartondox/dox/blob/main/RELEASING.md) in the repo. In short:
 
-1. Bump every package with `bin/update_versions.sh`, and close the `## Unreleased` section of each `CHANGELOG.md`.
+1. Set the new version in the root `pubspec.yaml`. Then run `bin/update_versions.sh`: it sets this version in every package.
+   Close the `## Unreleased` section of each `CHANGELOG.md`.
 2. Merge the release PR, then push the tag `v<version>`. This publishes to pub.dev.
 3. Release the matching `dox-sample` template.
 
 The native packages (`dox_http_native`, `dox_postgres_native`, `dox_mysql_native`) are not in this repo.
 See [Native packages](#native-packages) below.
-`dox_orm`, `dox_migration`, `dox_socketio` and `dox_storage` are not in this repo either.
+`dox_orm`, `dox_migration`, `dox_socketio`, `dox_storage`, `dox_queue`, `dox_scheduler`, `dox_inertia`, `dox_view` and `dox_mailer` are not in this repo either.
 See [Packages in other repos](#packages-in-other-repos).
 
 **New package only:** turn on pub.dev automated publishing for it first. See [One-time setup](#one-time-setup).
@@ -2562,13 +2587,16 @@ Optional: add yourself as a required reviewer, and allow only tags `v*`.
 | `dox_view` | [dartondox/dox-view](https://github.com/dartondox/dox-view) |
 | `dox_mailer` | [dartondox/dox-mailer](https://github.com/dartondox/dox-mailer) |
 
-The packages here use them from pub.dev. The database tests (Postgres, MySQL, SQLite) run in `dox-orm`.
+The packages here use them from pub.dev. The database tests (Postgres, MySQL, MariaDB, SQLite) run in `dox-orm`.
+CI in this repo uses the newest `dox-orm` code: `ci/clone-siblings.sh`, then `ci/use-sibling-orm.sh`.
 
 To work on one of them and Dox together:
 
-1. Clone the repos next to the Dox repo: `../dox-orm`, `../dox-socketio`, `../dox-storage`.
-   `ci/clone-siblings.sh` does this.
+1. Clone the repos next to the Dox repo, like `../dox-orm`.
+   `ci/clone-siblings.sh` clones `dox-orm`, `dox-socketio`, `dox-storage`, `dox-queue` and `dox-scheduler`.
+   Clone `dox-mailer`, `dox-view` and `dox-inertia` by hand when you need them.
 2. Add them to the root `pubspec_overrides.yaml` of the Dox repo. Git ignores this file.
+   For `dox_orm` and `dox_migration`, `ci/use-sibling-orm.sh` writes this file for you.
 
     ```yaml
     dependency_overrides:
@@ -2632,15 +2660,23 @@ The docs site is https://dartondox.dev. It is built with MkDocs Material and
 
 ```bash
 python3 -m venv .venv
-.venv/bin/pip install mkdocs==1.6.1 mkdocs-material==9.7.7 mike==2.2.0
+.venv/bin/pip install -r requirements-docs.txt
 .venv/bin/mkdocs serve           # live preview of this branch
-.venv/bin/mkdocs build --strict  # the same check as CI. Broken links fail.
+.venv/bin/mkdocs build --strict  # the same build as CI. Broken links fail.
 ```
+
+`hooks/docs_hooks.py` runs during the build. It makes the changelog page from `packages/*/CHANGELOG.md`, and writes `llms.txt` and `llms-full.txt`.
+
+The `Docs check` workflow (`.github/workflows/docs-check.yaml`) runs on every pull request that changes the docs. It runs three checks:
+
+- `mkdocs build --strict`
+- a spell check: `codespell docs --skip "*.svg,*.png,*.ico,*.css,*.js" --ignore-words .codespell-ignore`
+- `ci/check-no-tabs.sh`: the docs must not use content tabs
 
 ### Deploy
 
 - 3.x deploys by itself. The `Docs` workflow (`.github/workflows/docs.yaml`) runs on every push
-  to `main` that changes `docs/`, `mkdocs.yml` or the workflow.
+  to `main` that changes `docs/`, `hooks/`, `overrides/`, a package `CHANGELOG.md`, `mkdocs.yml`, `requirements-docs.txt` or the workflow.
   It runs `mike deploy --update-aliases 3.x latest`.
 - 2.x deploys by hand. Open Actions > Docs > "Run workflow", pick version `2.x`.
   It builds from the `v2.x` branch (change it with the `ref` input).
@@ -5884,8 +5920,9 @@ It runs on [`dox_cache`](../packages/cache.md), which is built into `dox_core`.
 
 ## Config
 
-Without a config, Dox has a `file` store (the default) and a `memory` store.
-To change the stores, make `lib/config/cache.dart`:
+A new project already has `lib/config/cache.dart`, with a `file` store and a `memory` store.
+`CACHE_STORE` in `.env` picks the default store (`file` when it is not set).
+To add a store, edit the file. This example adds a `redis` store:
 
 ```dart title="lib/config/cache.dart"
 import 'package:dox_core/dox_core.dart';
@@ -5915,7 +5952,7 @@ Redis needs two keys that a new project does not have yet. Add them to
   int get redisPort => 6379;
 ```
 
-Then pass it to `AppConfig(cache: cache)` in `lib/config/app.dart`.
+`lib/config/app.dart` already passes it to `AppConfig(cache: cache)`.
 Each store is made once per isolate, the first time you use it.
 
 ### Store options
@@ -5923,7 +5960,7 @@ Each store is made once per isolate, the first time you use it.
 | Driver | Options |
 | --- | --- |
 | `file` | `path` (default `storage/cache`), `prefix` |
-| `memory` | `max_size`: the most items. When it is full, the item that was used least recently is removed. No limit by default. Expired items are removed when read, and by a sweep every few thousand writes. Also `prefix`. |
+| `memory` | `max_size`: the most items. When it is full, the item that was used least recently is removed. No limit by default. Expired items are removed when read, and by a sweep after many writes (at least 1000). Also `prefix`. |
 | `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db` (default `0`), `tls` (`true`/`false`), `pool_size` (default 10), `prefix` |
 
 The default `prefix` is `dox_cache:`.
@@ -6041,7 +6078,9 @@ Source: https://dartondox.dev/latest/3.xdigging-deeper/queue/
 
 # Queue
 
-A queue runs slow work in the background. The request answers at once. A worker process does the work later.
+A queue runs slow work in the background, so the request can answer at once.
+
+A worker process does the work later.
 
 Use it to send emails, call slow APIs, make reports or resize images.
 The `dox_queue` package gives you jobs, three drivers (Redis, database and sync), retries, delays and a worker.
@@ -6063,6 +6102,8 @@ dart pub add dox_queue
 
 ## Set up
 
+A new app from `dox create` already has the files of steps 1 to 4. Check them, and change the driver if you want.
+
 ### 1. Config
 
 ```dart title="lib/config/queue.dart"
@@ -6083,7 +6124,7 @@ QueueConfig queueConfig = QueueConfig(
 | --- | --- | --- |
 | `driver` | `sync` | `sync`, `database` or `redis` |
 | `jobs` | empty | `jobRegistry` from `lib/generated/jobs.g.dart` |
-| `redis` | localhost:6379 | `RedisOptions(host: ..., port: ..., password: ...)` for the `redis` driver |
+| `redis` | 127.0.0.1:6379 | `RedisOptions(host: ..., port: ..., password: ...)` for the `redis` driver |
 | `prefix` | `dox_queue:` | the start of every Redis key |
 | `connection` | default | the dox_orm connection name, for the `database` driver |
 | `retryAfter` | 90 seconds | when a worker does not finish a job in this time, another worker can take it |
@@ -6097,7 +6138,7 @@ QueueConfig queueConfig = QueueConfig(
 
 ### 2. Provider
 
-The provider sets up the queue in every isolate. Put it in `lib/` so the generated container finds it.
+The provider sets up the queue in every isolate. Put it in `lib/providers/`, so the generated container finds it.
 
 ```dart title="lib/providers/queue_provider.dart"
 import 'package:dox_queue/dox_queue.dart';
@@ -6117,7 +6158,7 @@ class AppQueueProvider extends QueueProvider {
 import 'dart:io';
 
 import 'package:dox_queue/dox_queue.dart';
-import 'package:dox_sample/config/app.dart';
+import 'package:my_app/config/app.dart';
 
 /// run queued jobs: `dart run bin/queue.dart [work] [flags]`.
 /// the `dox` CLI runs this file for its queue commands.
@@ -6199,6 +6240,8 @@ class SendWelcomeEmail extends DoxJob {
 ```
 
 Run `dart run build_runner build` after you add or change a job.
+
+`dox make:job SendWelcomeEmail` makes a new job file in `lib/app/jobs/`.
 
 All the settings are optional:
 
@@ -6307,6 +6350,8 @@ Flags of `work`:
 ```bash
 dart run bin/queue.dart work --queue=emails,default --concurrency=4
 ```
+
+The `dox` CLI runs the same file: `dox queue:work`, `dox queue:failed`, `dox queue:retry <id|all>`, `dox queue:forget <id>` and `dox queue:flush`. They take the same flags.
 
 `--concurrency` runs jobs as async tasks on one thread. It helps for jobs that wait (email, HTTP, database).
 For CPU heavy jobs, run more worker processes.
@@ -6433,7 +6478,8 @@ Use the `sync` driver. `dispatch()` then runs the job at once, so you can check 
 
 ```dart
 import 'package:dox_queue/dox_queue.dart';
-import 'package:dox_sample/generated/jobs.g.dart';
+import 'package:my_app/app/jobs/send_welcome_email.job.dart';
+import 'package:my_app/generated/jobs.g.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -6447,6 +6493,8 @@ void main() {
   });
 }
 ```
+
+A job that uses `Dox()` (for example `Dox().ioc` or `Logger`) needs the app config. Call `Dox().initialize(appConfig)` in `setUpAll`.
 
 To test a job alone, call `handle()`:
 
@@ -6463,6 +6511,58 @@ await Worker(
   options: WorkerOptions(stopWhenEmpty: true),
 ).run();
 ```
+
+## Without Dox
+
+`dox_queue` also works in a plain Dart app. Add `build_runner`, so it writes `lib/generated/jobs.g.dart`:
+
+```bash
+dart pub add dox_queue dox_core
+dart pub add dev:build_runner
+```
+
+Write your jobs like in [Write a job](#write-a-job), and run `dart run build_runner build`.
+Then set up the queue and run a worker yourself:
+
+```dart
+import 'dart:async';
+import 'dart:io';
+
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_queue/dox_queue.dart';
+import 'package:my_app/generated/jobs.g.dart';
+import 'package:my_app/jobs/resize_image.dart';
+
+Future<void> main() async {
+  // the worker logs with the Dox logger, so it needs an AppConfig
+  Dox().initialize(AppConfig(appKey: 'not-used'));
+
+  Queue.configure(QueueConfig(
+    driver: 'redis',
+    jobs: jobRegistry,
+    redis: RedisOptions(host: '127.0.0.1', port: 6379),
+  ));
+
+  await ResizeImage(path: 'photo.png').dispatch();
+
+  Worker worker = Worker(
+    driver: Queue.driver,
+    jobs: jobRegistry,
+    options: WorkerOptions(queues: <String>['default'], concurrency: 4),
+  );
+
+  // Ctrl+C: finish the running jobs, then stop
+  StreamSubscription<ProcessSignal> signal =
+      ProcessSignal.sigint.watch().listen((_) => worker.stop());
+  await worker.run();
+  await signal.cancel();
+  await Queue.close();
+}
+```
+
+- `WorkerOptions` takes the same settings as the flags of `work`: `queues`, `concurrency`, `once`, `tries`, `timeout`, `sleep` and `stopWhenEmpty`.
+- The `database` driver uses the default `dox_orm` connection. Set it up first with `SqlQueryBuilder.initializeWithDatabaseConfig(...)`.
+- No services are in the Dox container. Make the services of a job in `handle()`.
 
 
 ---
@@ -6538,7 +6638,7 @@ MAIL_PASSWORD=secret
 
 ### 2. Provider
 
-The provider sets up the mailers in every isolate. Put it in `lib/` so the generated container finds it.
+The provider sets up the mailers in every isolate. Put it in `lib/providers/`, so the generated container finds it.
 
 ```dart title="lib/providers/mail_provider.dart"
 import 'package:dox_mailer/dox_mailer.dart';
@@ -6553,6 +6653,43 @@ class AppMailProvider extends MailProvider {
 ```
 
 When the server stops, the provider closes open SMTP connections and HTTP clients.
+
+## Without Dox
+
+`dox_mailer` also works on its own. Call `Mail.configure()` once at start, and `Mail.close()` at the end:
+
+```dart
+import 'dart:io';
+
+import 'package:dox_mailer/dox_mailer.dart';
+
+Future<void> main() async {
+  Map<String, String> env = Platform.environment;
+
+  Mail.configure(MailConfig(
+    defaultMailer: 'smtp',
+    from: Address('hello@example.com', 'My app'),
+    mailers: <String, Transport>{
+      'smtp': SmtpTransport(
+        host: env['MAIL_HOST'] ?? 'localhost',
+        username: env['MAIL_USERNAME'],
+        password: env['MAIL_PASSWORD'],
+      ),
+    },
+  ));
+
+  await Mail.send(Message(
+    to: <Address>[Address('ann@example.com')],
+    subject: 'Hello',
+    text: 'Hello Ann!',
+  ));
+
+  // closes open SMTP connections and HTTP clients
+  await Mail.close();
+}
+```
+
+The rest of this page works the same way.
 
 ## Send an email
 
@@ -6787,7 +6924,7 @@ Prints each email and sends nothing. Good for local work.
 'log': LogTransport(),
 ```
 
-Pass `output` to print somewhere else, eg. `LogTransport(output: logger.info)`.
+Pass `output` to print somewhere else, eg. `LogTransport(output: stderr.writeln)` (from `dart:io`).
 
 ### Array
 
@@ -6857,7 +6994,7 @@ void main() {
 }
 ```
 
-`Mail.fake()` works with or without a config. Call it after the app has started, because `MailProvider` sets up the config again at start.
+`Mail.fake()` works with or without a config. The fake stays on when `MailProvider` sets up the config again.
 
 `mail.clear()` forgets the sent emails.
 
@@ -6902,7 +7039,7 @@ dart pub add dox_scheduler
 
 ## Set up in a Dox app
 
-A new app from `dox create` already has these files. For an older app, add them:
+A new app from `dox create` already has these files. In another app, add them:
 
 - `lib/config/schedule.dart`: the tasks and the `ScheduleConfig`. See [Define tasks](#define-tasks).
 - `bin/schedule.dart`: the program that runs the schedule. See [Run the schedule](#run-the-schedule).
@@ -6913,6 +7050,33 @@ Then start it next to your server:
 ```bash
 dart run bin/schedule.dart work
 ```
+
+## Without Dox
+
+`dox_scheduler` also works in a plain Dart app. Leave out `app`:
+
+```dart
+import 'dart:io';
+
+import 'package:dox_scheduler/dox_scheduler.dart';
+
+void schedule(Schedule s) {
+  s.call('cleanup', cleanup).dailyAt('02:00');
+}
+
+Future<void> cleanup() async {
+  // delete old files, ...
+}
+
+Future<void> main(List<String> args) async {
+  exitCode = await SchedulerRunner(schedule: schedule).run(args);
+}
+```
+
+- With no `app`, no providers start, and the locks use a memory store.
+- For many servers, pass a shared lock store: `SchedulerRunner(schedule: schedule, store: myRedisStore)`.
+  It is a `CacheStore` from `dox_cache`.
+- The commands are the same. See [Run the schedule](#run-the-schedule).
 
 ## Define tasks
 
@@ -7056,7 +7220,7 @@ Pass another expiry like this: `withoutOverlapping(Duration(hours: 1))`.
 
 Before a task runs, the scheduler takes a lock named after the task and the minute.
 The first process to take it runs the task. The others skip it.
-The lock is not released, so a late server can not run the same minute again.
+The lock is not released, so a late server can not run the same minute again. It expires after 10 minutes.
 
 The locks use a [cache](cache.md) store.
 
@@ -7127,6 +7291,8 @@ It stops them at the end.
 | `dart run bin/schedule.dart run` | runs the tasks due this minute once, then exits |
 | `dart run bin/schedule.dart list` | shows each task, its schedule and its next run time |
 | `dart run bin/schedule.dart test cleanup` | runs one task now |
+
+The `dox` CLI runs the same file: `dox schedule:work`, `dox schedule:run`, `dox schedule:list` and `dox schedule:test <name>`.
 
 ### work
 
@@ -7250,11 +7416,7 @@ Source: https://dartondox.dev/latest/3.xdigging-deeper/file-storage/
 
 `Storage()` saves and reads files on a disk: the local folder, AWS S3 (and R2, MinIO, Spaces), or memory.
 
-It is in the [`dox_storage`](../packages/storage.md) package. Add it to your app:
-
-```bash
-dart pub add dox_storage
-```
+It is in the [`dox_storage`](../packages/storage.md) package. A new project already has it.
 
 ```dart
 import 'package:dox_storage/dox_storage.dart';
@@ -7268,8 +7430,9 @@ Route.post('/avatar', (DoxRequest req) async {
 
 ## Config
 
-Without a config, `Storage()` has one disk: `local`, in the `storage` folder.
-To add disks, make `lib/config/storage.dart`:
+A new project already has `lib/config/storage.dart`, with one `local` disk in the `storage` folder.
+`STORAGE_DISK` in `.env` picks the default disk.
+To add disks, edit the file. This example adds a `url` to the local disk, an `s3` disk and a `memory` disk:
 
 ```dart title="lib/config/storage.dart"
 import 'package:dox_storage/dox_storage.dart';
@@ -7283,14 +7446,17 @@ StorageConfig storageConfig = StorageConfig(
       'root': 'storage',
       'url': 'https://app.test/files', // for url() and signedUrl()
     },
-    's3': <String, dynamic>{
-      'driver': 's3',
-      'bucket': env.awsBucket,
-      'region': env.awsDefaultRegion,
-      'key': env.awsAccessKeyId,
-      'secret': env.awsSecretAccessKey,
-      'endpoint': env.awsEndpoint, // R2, MinIO, Spaces
-    },
+
+    /// only when AWS_BUCKET is set
+    if (env.awsBucket != null)
+      's3': <String, dynamic>{
+        'driver': 's3',
+        'bucket': env.awsBucket,
+        'region': env.awsDefaultRegion,
+        'key': env.awsAccessKeyId,
+        'secret': env.awsSecretAccessKey,
+        'endpoint': env.awsEndpoint, // R2, MinIO, Spaces
+      },
     'memory': <String, dynamic>{'driver': 'memory'},
   },
 );
@@ -7298,7 +7464,7 @@ StorageConfig storageConfig = StorageConfig(
 
 The `s3` disk reads five keys that a new project does not have yet. Add them to
 `lib/config/env.dart` and run `dart run build_runner build`. They are nullable,
-so the app starts without them:
+and the `s3` disk is only added when `AWS_BUCKET` is set. So the app starts without them:
 
 ```dart title="lib/config/env.dart"
   String? get awsBucket;
@@ -7313,7 +7479,7 @@ so the app starts without them:
   String? get awsEndpoint;
 ```
 
-Then add the provider. It sets the disks in every isolate. Put it in `lib/`, so the generated container finds it:
+The provider of a new project sets these disks in every isolate. It is in `lib/providers/`, so the generated container finds it:
 
 ```dart title="lib/providers/storage_provider.dart"
 import 'package:dox_storage/dox_storage.dart';
@@ -7330,7 +7496,7 @@ class AppStorageProvider extends StorageProvider {
 | `s3` | `bucket`, `region`, `key`, `secret`, `token`, `endpoint`, `path_style` (MinIO), `url` (CDN), `visibility`, `acl`, `batch_delete` |
 | `memory` | none. For tests |
 
-The `s3` disk needs `bucket`, `key` and `secret`. When one is missing, the first use of the disk throws an `ArgumentError` that names the setting.
+The `s3` disk needs `bucket`, `key` and `secret`. When one is missing, the app stops at start with an `ArgumentError` that names the setting.
 
 ## Functions
 
@@ -7380,7 +7546,7 @@ A big file is never loaded into memory. A missing file answers `404`.
 // lib/routes/web.dart
 Storage.route('files');                    // GET /files/{key*}, signed URLs only
 Storage.route('public', signed: false);    // any file of the disk
-Storage.route('docs', disk: 'memory');     // another disk than the default
+Storage.route('docs', disk: 'memory', signed: false); // another disk than the default
 Storage.route('uploads', download: true);  // every file is a download
 ```
 
@@ -7392,6 +7558,7 @@ String url = await Storage().signedUrl('invoices/1.pdf'); // https://app.test/fi
 ```
 
 A missing, wrong or expired signature answers `403`.
+Signed URLs work only on a `local` disk. For another disk, use `signed: false`.
 Set the disk `url` option to the full URL of the route (`https://app.test/files`).
 
 ## Tests
@@ -7673,7 +7840,7 @@ Source: https://dartondox.dev/latest/3.xdigging-deeper/providers/
 
 # Providers
 
-A provider is a class that sets up one part of your app when it starts. For example the database, auth or a Redis connection.
+A provider is a class that sets up one part of your app when it starts, for example the database, auth or a Redis connection.
 
 A provider has two methods:
 
@@ -7741,6 +7908,7 @@ await Dox().startServer();
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/models/user/user.model.dart';
+import 'package:my_app/config/env.dart';
 
 class AppAuthProvider extends DoxProvider {
   @override
@@ -7847,8 +8015,8 @@ dart pub global deactivate dox
 | `dox make:middleware <name>` | create a middleware |
 | `dox make:dto <name>` | create a DTO (typed, checked input) |
 | `dox make:serializer <name>` | create a serializer |
-| `dox make:model <name> [-m]` (old name `create:model`) | create a model, and with `-m` its migration |
-| `dox make:migration <name> [--sql]` (old name `create:migration`) | create a Dart migration, or a `.sql` one with `--sql` |
+| `dox make:model <name> [-m]` | create a model, and with `-m` its migration |
+| `dox make:migration <name> [--sql]` | create a Dart migration, or a `.sql` one with `--sql` |
 | `dox migration:run` (or `dox migrate`) | run new migrations |
 | `dox migration:rollback [--step=N]` | undo the last batch, or the last N migrations |
 | `dox migration:reset` | undo all migrations |
@@ -7856,7 +8024,7 @@ dart pub global deactivate dox
 | `dox migration:fresh` (or `migrate:fresh`) | drop all tables, then run all migrations |
 | `dox migration:status` | show which migrations ran, and their batch |
 | `dox make:factory <model>` | create a model factory in `db/factories`, see [Factories](../database/factories.md) |
-| `dox make:seeder <name>` | create a seeder in `db/seeders`, see [Seeders](../database/seeders.md) |
+| `dox make:seeder <name>` | create a seeder in `db/seeders` (and `bin/seed.dart`), see [Seeders](../database/seeders.md) |
 | `dox db:seed [--class=<name>]` | run `DatabaseSeeder`, or another seeder |
 | `dox make:job <name>` | create a queue job in `lib/app/jobs` (and `bin/queue.dart`) |
 | `dox queue:work [--queue=a,b] [--concurrency=N] [--once] [--tries=N] [--timeout=S] [--sleep=S] [--stop-when-empty]` | run the queue worker |
@@ -7871,7 +8039,7 @@ dart pub global deactivate dox
 | `dox key:generate` | make a new `APP_KEY` |
 | `dox env:generate` | make `lib/config/env.dart` (the typed env class) from `.env.example`, see [Environment Variables](env.md) |
 | `dox env:check` | check the env against `lib/config/env.dart`. Prints every missing or bad key (exit code 1) |
-| `dox openapi:generate [dir]` | write `openapi.json` and `openapi.yaml` (default `storage/openapi`), see [OpenAPI](../packages/openapi.md#write-the-files-dox-openapigenerate) |
+| `dox openapi:generate [dir]` | run `bin/openapi.dart` to write `openapi.json` and `openapi.yaml` (default `storage/openapi`). A new project has no `bin/openapi.dart` yet, see [OpenAPI](../packages/openapi.md#write-the-files-dox-openapigenerate) |
 | `dox update` | update the CLI |
 | `dox version` (or `dox -v`) | show the CLI version |
 | `dox help [command]` | show help |
@@ -7882,10 +8050,14 @@ dart pub global deactivate dox
 
 ```bash
 dox create new_blog
-dox create new_blog --version v3.0.0-alpha.5
+dox create new_blog --version v3.0.0-alpha.17
 ```
 
 `dox create` copies the [dox-sample](https://github.com/dartondox/dox-sample) template from GitHub. Without `--version`, it uses the newest template release with the same major version as the CLI.
+
+- The folder name is the project name in snake case: `NewBlog` makes `new_blog`.
+- It makes `.env` from `.env.example`, with a new `APP_KEY`.
+- Then run `cd new_blog`, `dart pub get` and `dox serve`.
 
 ### Run the dev server
 
@@ -7912,17 +8084,17 @@ See [Deployment](deployment.md#build).
 ```bash
 dox make:controller Blog        # lib/app/http/controllers/blog.controller.dart
 dox make:controller Blog -r     # resource controller
-dox make:middleware Auth
+dox make:middleware Auth        # lib/app/http/middleware/auth.middleware.dart
 dox make:dto CreateBlog         # lib/app/dtos/create_blog/create_blog.dto.dart
-dox make:serializer Blog
-dox make:model Blog -m          # model and its create_blogs_table migration
+dox make:serializer Blog        # lib/app/http/serializers/blog.serializer.dart
+dox make:model Blog -m          # lib/app/models/blog/blog.model.dart and a create_blogs_table migration
 dox make:migration create_blogs_table          # .dart file (default)
 dox make:migration create_blogs_table --sql    # .sql file
 ```
 
 - `-r` adds the methods `index`, `create`, `store`, `show`, `edit`, `update` and `destroy`.
 - Word breaks are kept. `BlogPost` makes `blog_post.controller.dart` with the class `BlogPostController`.
-- After `make:dto`, run `dox build_runner:build`. See [Validation](../the-basic/validation.md).
+- After `make:controller` or `make:dto`, run `dox build_runner:build` (or keep `dox serve` running). See [Validation](../the-basic/validation.md).
 - The table of a model is its name in plural snake case: `BlogPost` makes `blog_posts`. The model gets `@DoxModel(table: 'blog_posts')`.
 
 ## Migrations
@@ -7944,6 +8116,7 @@ DB_PASSWORD=password
 
 - `DB_CONNECTION` defaults to `postgres`. The default port is `5432` for postgres and `3306` for mysql.
 - `DB_DATABASE` works too, in place of `DB_NAME`.
+- `DATABASE_URL` wins over all the `DB_*` keys when it is set.
 - Put comments on their own line. A `#` after a value becomes part of the value.
 
 All keys are in the [Env reference](../reference/env.md#read-by-the-framework).
@@ -7999,13 +8172,16 @@ This makes a `build/bundle/` folder:
 | File                        | What it is                                       |
 | --------------------------- | ------------------------------------------------ |
 | `build/bundle/bin/server`   | the native binary. No Dart SDK needed to run it  |
+| `build/bundle/bin/queue`    | the queue worker, when `bin/queue.dart` exists   |
+| `build/bundle/bin/schedule` | the scheduler, when `bin/schedule.dart` exists   |
 | `build/bundle/lib/`         | native libraries from build hooks (eg. SQLite)   |
-| `build/bundle/db/`          | your migrations                                  |
+| `build/bundle/db/`          | your `db/` folder (migrations, seeders). SQLite database files are left out |
 | `build/bundle/.env.example` | copy it to `build/bundle/.env`, or use env variables |
 
 `dox build` runs `build_runner` (when your app uses it), then
-`dart build cli --target bin/server.dart --output build`. It exits with code 1
-when a step fails, so CI can stop.
+`dart build cli --target bin/server.dart --output build`. It builds
+`bin/queue.dart` and `bin/schedule.dart` the same way, when they exist.
+It exits with code 1 when a step fails, so CI can stop.
 
 !!! warning "Not `dart compile exe`"
     `dox_orm` depends on `sqlite3` v3. It bundles SQLite with a build hook.
@@ -8028,7 +8204,7 @@ So the database is up to date when the first request comes in.
 
 ## Docker
 
-A new Dox app has this multi-stage `Dockerfile`. The final image is `FROM scratch`: only the Dart AOT runtime, the bundle, `db/` and an empty `/tmp`.
+A new Dox app has this multi-stage `Dockerfile`. The final image is `FROM scratch`: only the Dart AOT runtime, the bundle, `db/`, `libgcc_s` and an empty `/tmp`.
 
 ```dockerfile
 FROM dart:stable AS build
@@ -8039,10 +8215,20 @@ COPY . .
 RUN dart pub get --offline
 RUN dart run build_runner build --delete-conflicting-outputs
 RUN dart build cli --target bin/server.dart --output build
+
+# the queue worker and the scheduler are binaries too
+RUN dart build cli --target bin/queue.dart --output build/queue \
+  && cp build/queue/bundle/bin/queue build/bundle/bin/ \
+  && dart build cli --target bin/schedule.dart --output build/schedule \
+  && cp build/schedule/bundle/bin/schedule build/bundle/bin/
+
 RUN mkdir -p /out/app/storage /out/tmp \
   && chmod 1777 /out/tmp \
   && cp -r build/bundle/. /out/app/ \
-  && cp -r db /out/app/db
+  && cp -r db /out/app/db \
+  # the native HTTP server (Rust) needs libgcc_s, which /runtime/ does not have
+  && LIBGCC=$(find / -name libgcc_s.so.1 -path '*lib*' | head -n 1) \
+  && mkdir -p /out$(dirname $LIBGCC) && cp $LIBGCC /out$LIBGCC
 
 FROM scratch
 COPY --from=build /runtime/ /
@@ -8057,18 +8243,30 @@ environment variables:
 
 ```bash
 docker build -t my-app .
-docker run -p 3000:3000 -e APP_PORT=3000 -e APP_KEY=... -e DB_HOST=... my-app
+docker run -p 3000:3000 --env-file .env -e DB_HOST=... my-app
 ```
 
-Or use `env_file: .env` in `docker-compose.yml`.
+A new app also has a `docker-compose.yml`. It runs the app and Postgres, and reads `.env` with `env_file: .env`:
+
+```bash
+docker compose up -d --build
+```
+
+A new `.env` uses SQLite. To use the Postgres of the compose file, set `DB_CONNECTION=postgres` and `DB_NAME` (for example `postgres`) in `.env`.
+
+The queue worker and the scheduler run as their own processes. In the image, start them with `/app/bin/queue work` and `/app/bin/schedule work`.
+See [Docker](../guides/docker.md) for a health check in the image.
 
 ## HTTPS: put a proxy in front
 
-Do not serve HTTPS from Dart. TLS in Dart's `HttpServer` is slow (a known
-Dart SDK issue). Dox has no `bindSecure`.
+Dox serves plain HTTP only. Its [native server](native-server.md) has no TLS.
 
 Run Dox on plain HTTP on a private port. Put [Caddy](https://caddyserver.com)
 or nginx in front of it. The proxy does TLS, HTTP/2 and gzip.
+
+By default Dox listens on all network interfaces. When the proxy runs on the
+same machine, set `APP_HOST=127.0.0.1`. Then the app port can not be reached
+from outside.
 
 ```mermaid
 flowchart LR
@@ -8213,7 +8411,7 @@ Keep it shorter than the time your platform waits before it kills the process:
 | Fly.io | 5 seconds | `kill_timeout` in `fly.toml` |
 | systemd | 90 seconds | `TimeoutStopSec` |
 
-In code, `await Dox().stop()` does steps 1 to 4 and does not exit.
+In code, `await Dox().stop()` does steps 1 to 5 and does not exit.
 
 ## Many processes or machines
 
@@ -8254,6 +8452,35 @@ WebSocket or Socket.IO routes.
 You do not need Rust. The package downloads a ready-built library for your
 system when you build the app.
 
+## Without Dox
+
+`dox_http_native` also works on its own, in any Dart app:
+
+```bash
+dart pub add dox_http_native
+```
+
+```dart
+import 'dart:io';
+
+import 'package:dox_http_native/dox_http_native.dart';
+
+Future<void> main() async {
+  NativeHttpServer server = await NativeHttpServer.bind(3000);
+  server.listen((HttpRequest req) async {
+    req.response.write('Hello World');
+    await req.response.close();
+  });
+}
+```
+
+- `NativeHttpServer.bind(port, address: '127.0.0.1')` listens on one host.
+  With no address, it listens on all interfaces.
+- `close()` waits for open requests. `close(force: true)` closes every
+  connection at once.
+
+The rest of this page is the same with or without Dox.
+
 ## How it works
 
 1. Rust reads the requests from the sockets.
@@ -8280,7 +8507,7 @@ Unsupported operation: dox_http_native did not load: <reason>.
 Fix: install Rust (cargo, see https://rustup.rs), then run the app again ...
 ```
 
-`<reason>` is for example `native library ABI 4, expected 5`: the library on
+`<reason>` is for example `native library ABI 5, expected 6`: the library on
 disk is from another version of the package. See
 [Troubleshooting](../reference/troubleshooting.md#the-native-http-library-did-not-load).
 
@@ -8330,7 +8557,7 @@ a gain.
   in memory. Dart reads more of the file only when the client has read
   what was sent. When the client leaves, Dart stops reading.
 - A request body of 64 KB or more goes to Dart without a copy.
-- `compress: true` works: Rust gzips the body on another thread, so the
+- `compress: true` in `AppConfig` works: Rust gzips the body on another thread, so the
   isolate does not wait. A streamed response is not compressed.
 
 ## Where the library comes from
@@ -8353,6 +8580,9 @@ that works:
    There are builds for macOS (arm64, x64), Linux (x64, arm64) and
    Windows (x64).
 4. A build from source with `cargo`, when Rust is installed.
+
+This order is for the package from pub.dev. For a git or path dependency,
+step 4 comes before step 3, because the source can be newer than the release.
 
 When none works, the app still builds, but it stops at start with the
 error above. Install Rust and run it again, so step 4 works.
@@ -8622,7 +8852,7 @@ One find-by-id query, AOT build (`dart build cli`), database on the same machine
 
 These are on by default. You only need to keep them:
 
-- A body over `maxBodySize` or `maxMultipartSize` gets `413` before it is all read. Set the same limit in the proxy. See [Size limits](../the-basic/request.md#size-limits).
+- A body over `maxBodySize` or `maxMultipartSize` gets `413` from the native server, before Dart reads it. Set the same limit in the proxy. See [Size limits](../the-basic/request.md#size-limits).
 - An upload over 1 MB streams to a temp file, so it does not fill the memory. See [Request](../the-basic/request.md#requestfile).
 - A `File` or `Stream` response is streamed, not loaded into memory. See [Files and big responses](../the-basic/response.md#files-and-big-responses).
 
@@ -8638,8 +8868,8 @@ AppConfig(compress: true);
   gzips on a Rust thread. Streamed responses are not compressed.
 - A proxy (Caddy, nginx) does it better. Turn it on in Dart only when there
   is no proxy.
-- With `compress: true`, text and JSON responses are sent chunked, without
-  `Content-Length`.
+- Only a body over 256 bytes is gzipped, and only when the client accepts
+  gzip. The gzipped body still gets a `Content-Length`.
 
 ## Logging
 
@@ -8650,7 +8880,7 @@ be lost. Errors from `Logger` are still written right away.
 
 Turn `LogMiddleware` off when a proxy already writes access logs. The new
 project does this for you: `enabled` is `false` when `APP_ENV` is
-`production`.
+`production` or not set.
 
 Leave `responseHandler` unset when you do not need it. With no handler, a
 plain value (text, map, list) is sent without building a `DoxResponse`.
@@ -8677,7 +8907,7 @@ This page shows how to test a Dox app with the `test` package: HTTP routes, cach
 
 ## Setup
 
-Add the test package as a dev dependency:
+A new app from `dox create` already has the `test` package. In another app, add it as a dev dependency:
 
 ```bash
 dart pub add dev:test
@@ -8868,7 +9098,7 @@ Put the values for tests in a `.env.testing` file, next to `.env`:
 
 ```ini title=".env.testing"
 DB_NAME=my_app_test
-LOG_REQUESTS=false
+CACHE_STORE=memory
 ```
 
 When the app runs its tests, Dox reads `.env` first and then `.env.testing`.
@@ -8966,8 +9196,14 @@ A health route tells a load balancer, Docker or Kubernetes if the app can serve 
 
 ## Add the route
 
+Add it in `register()` of a router:
+
 ```dart title="lib/routes/web.dart"
-Route.health('/health');
+@override
+void register() {
+  Route.get('/ping', (WebController c) => c.pong);
+  Route.health('/health');
+}
 ```
 
 `GET /health` answers `200` with:
@@ -8978,7 +9214,7 @@ Route.health('/health');
 
 ## Check the database and the cache
 
-Give named checks. Each check is a function:
+Give named checks. Each check is a function. Put the `Route.health` call in `register()`, as above:
 
 ```dart title="lib/routes/web.dart"
 import 'package:dox_orm/dox_orm.dart';
@@ -13652,11 +13888,18 @@ Dox finds the provider by itself. Run `dart run build_runner build` and it is in
 
 `AuthMiddleware` protects a route.
 When the token is missing or not valid, the request stops with `401 Authentication failed`.
+Put these routes in `register()` of the `ApiRouter`. Its prefix is `api`, so the paths start with `/api`.
+A [rate limit](rate-limiting.md) on login and register slows down password guessing.
 
 ```dart title="lib/routes/api.dart"
-
-Route.post('/auth/register', (AuthController c) => c.register);
-Route.post('/auth/login', (AuthController c) => c.login);
+Route.post('/auth/register', <dynamic>[
+  RateLimit(max: 5, name: 'register'),
+  (AuthController c) => c.register,
+]);
+Route.post('/auth/login', <dynamic>[
+  RateLimit(max: 5, name: 'login'),
+  (AuthController c) => c.login,
+]);
 Route.get('/auth/user', <dynamic>[AuthMiddleware(), (AuthController c) => c.user]);
 ```
 
@@ -13674,7 +13917,7 @@ class AuthController {
     User user = User();
     user.name = body.name;
     user.email = body.email;
-    user.password = Hash.make(body.password);
+    user.password = await Hash.makeAsync(body.password);
     await user.save();
 
     String? token = Auth().login(user);
@@ -13706,7 +13949,7 @@ class AuthController {
 ## 5. Send the token from the client
 
 ```http
-GET /auth/user
+GET /api/auth/user
 Authorization: Bearer <token>
 ```
 
@@ -13750,7 +13993,7 @@ It returns `null` when the password is not a `String`, when no identifier is giv
 
 | Option | Default | What it does |
 | --- | --- | --- |
-| `secret` | required | the key that signs tokens, like `SecretKey(env.appKey)`. An empty key throws `ArgumentError`. A key shorter than 32 bytes also throws in production, and prints a warning in development, local and test. Make one with `dox key:generate` or `openssl rand -hex 32` |
+| `secret` | required | the key that signs tokens, like `SecretKey(env.appKey)`. An empty key throws `ArgumentError`. A key shorter than 32 bytes also throws in production, and prints a warning in development, local and test. Make one with `dox key:generate`. For a separate JWT secret (not `APP_KEY`), `openssl rand -hex 32` also works |
 | `algorithm` | `JWTAlgorithm.HS256` | the signing algorithm |
 | `expiresIn` | `Duration(hours: 1)` | how long a token is valid |
 | `issuer` | `null` | the `iss` claim. When set, `verifyToken` also checks it |
@@ -13796,15 +14039,28 @@ You can check the user in your own way, like an API key in the header.
 Write a driver: extend `AuthDriver` and return the user from `verifyToken`.
 `AuthMiddleware` and `req.auth` then work as with the other drivers.
 
+The table stores a SHA-256 hash of each key in an `api_key_hash` column, not the key itself.
+So a leak of the table does not leak the keys.
+The example uses the `crypto` package (`dart pub add crypto`).
+
 ```dart
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
+import 'package:dox_auth/dox_auth.dart';
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_orm/dox_orm.dart';
+
 /// `Authorization: Bearer <api key>` gives the user with this key.
 class ApiKeyAuthDriver extends AuthDriver {
   @override
   Future<Model<dynamic>?> verifyToken(IDoxRequest req, String guard) async {
     String header = req.header('Authorization') ?? '';
     if (!header.startsWith('Bearer ')) return null;
+    String key = header.substring(7).trim();
+    String hash = sha256.convert(utf8.encode(key)).toString();
     Model<dynamic> model = AuthEngine().guard(guard).provider.model();
-    return await model.where('api_key', header.substring(7).trim()).getFirst();
+    return await model.where('api_key_hash', hash).getFirst();
   }
 
   /// no password login for this guard
@@ -13825,10 +14081,10 @@ Add it as a guard, and use the guard in the route:
   provider: AuthProvider(model: () => User()),
 ),
 
-Route.get('/api/me', <dynamic>[AuthMiddleware(guard: 'api'), (DoxRequest req) => req.auth?.user<User>()]);
+Route.get('/me', <dynamic>[AuthMiddleware(guard: 'api'), (DoxRequest req) => req.auth?.user<User>()]);
 ```
 
-Store a hash of the key, not the key itself, and compare the hash.
+Make each key long and random, like `openssl rand -hex 32`. Then a fast hash like SHA-256 is safe. Do not use bcrypt here: you can not search by a bcrypt hash.
 
 If you already have your own middleware, set the user with `Auth().setUser(req, user)`.
 It needs no token and no password check. `req.auth` then gives this user:
@@ -13889,7 +14145,7 @@ Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), (PageCon
 | `Auth().logout(req)` | removes the login and all session data |
 
 - Login and logout give the session a new id and a new CSRF token. So an id that someone saw before the login is of no use.
-- With the default `cookie` session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout. If logout must really end old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
+- With the default `cookie` session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout. The server also does not check its age, so a copied cookie works until `APP_KEY` changes. If logout must really end old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
 - The session keeps only the user id. `AuthMiddleware` loads the user from the database on each request, so a deleted user is logged out.
 - These methods throw a `StateError` on a guard that does not use `SessionAuthDriver`.
 - `SessionAuthDriver` has one option, `hashRounds` (default `10`), like `JwtAuthDriver`.
@@ -13921,6 +14177,8 @@ Dox adds these headers from `CORSConfig`.
 ## Set up
 
 The config is in `lib/config/cors.dart`. Pass it to `AppConfig(cors: cors)`.
+A new app has this file with `enabled: false`, so it sends no CORS headers.
+Set `origin` to the URL of your front end, and set `enabled: true`.
 
 ```dart title="lib/config/cors.dart"
 import 'package:dox_core/dox_core.dart';
@@ -13946,12 +14204,13 @@ AppConfig appConfig = AppConfig(
 ## Options
 
 Each option sets one response header.
-An option that is `null` sends no header.
+An option that is `null` sends no header. All options except `enabled` are `null` by default.
+So with no `origin`, Dox sends no `Access-Control-Allow-Origin` header, and the browser blocks pages on other domains.
 
 | Option | Header | Value |
 | --- | --- | --- |
 | `enabled` | - | `true` adds the headers to every route. Default: `true` |
-| `origin` | `Access-Control-Allow-Origin` | one origin, a `List<String>` of origins, or `'*'` for all |
+| `origin` | `Access-Control-Allow-Origin` | one origin, a `List<String>` of origins, or `'*'` for all. A text is sent as it is, so do not put many origins in one text |
 | `methods` | `Access-Control-Allow-Methods` | a `List<String>` or a text like `'GET,POST'`. `'*'` allows all |
 | `headers` | `Access-Control-Allow-Headers` | a `List<String>` or a text. `'*'` allows all |
 | `exposeHeaders` | `Access-Control-Expose-Headers` | the response headers the page may read |
@@ -13978,8 +14237,10 @@ CORSConfig cors = CORSConfig(
 ```
 
 !!! warning "`credentials` with `*`"
-    Browsers do not send cookies when `origin` is `'*'`.
-    When you need cookies, set `origin` to your real front-end URL.
+    Do not use `origin: '*'` with `credentials: true`.
+    Dox then sends `Access-Control-Allow-Origin: *`, and the browser blocks every call that has cookies.
+    When you need cookies, set `origin` to your real front-end URL, or to a list of URLs.
+    A page on an allowed origin can send requests with the cookies of your users, so list only sites you trust.
 
 ## Preflight requests
 
@@ -14040,22 +14301,26 @@ Now every `POST`, `PUT`, `PATCH` and `DELETE` request must send the token. A req
 
 Dox reads the token from one of these places:
 
-- the `_token` field of the body
+- the `_token` field of the body (or of the query string)
 - the `X-CSRF-TOKEN` header
 - the `X-XSRF-TOKEN` header
 
 The token is `req.session.token`.
+Do not put it in a URL. URLs are kept in logs and in the browser history.
 
 ### HTML forms
 
-Put the token in a hidden field:
+Put the token in a hidden field.
+With [views](../the-basic/views.md#forms), `csrfField()` writes this field for you:
 
 ```html
 <form method="POST" action="/posts">
-  <input type="hidden" name="_token" value="{{ token }}">
+  {{ csrfField() }}
   ...
 </form>
 ```
+
+`csrfToken()` gives only the token, for example for a `<meta>` tag.
 
 ### axios and Inertia
 
@@ -14089,6 +14354,7 @@ const CsrfMiddleware(except: <String>['/api/*', '/webhooks/stripe']);
 - Any other path must match exactly.
 
 An excluded path is not checked and gets no `XSRF-TOKEN` cookie.
+Only skip paths that do not use the session login. A webhook should check its own signature instead.
 
 ## After login
 
@@ -14113,7 +14379,7 @@ You can also call it yourself.
 ```dart
 import 'package:dox_core/dox_core.dart';
 
-String secret = env.appKey; // 32 characters
+String secret = env.appKey; // 32 characters = 32 bytes, so AES-256
 
 String encoded = AESEncryptor.encode('Hello world', secret);
 String decoded = AESEncryptor.decode(encoded, secret); // 'Hello world'
@@ -14129,6 +14395,15 @@ Make a new 32-character `APP_KEY` with the CLI:
 ```bash
 dox key:generate
 ```
+
+It writes a random key of letters and digits to `APP_KEY` in `.env`.
+Dox uses the key text as it is: its UTF-8 bytes are the AES key. It is not base64 or hex decoded.
+
+At startup Dox checks `APP_KEY`. When it is empty, not exactly 32 bytes, or an old public sample key, the app stops.
+In `development`, `local` and `test` it only prints a warning.
+
+- Keep `APP_KEY` in `.env` or in the secrets of your host. Never put it in code or in git.
+- If you change `APP_KEY`, old encrypted cookies and sessions can not be read any more. JWT tokens signed with it stop working too.
 
 ## Cookies
 
@@ -14153,6 +14428,7 @@ The cookie name is bound to the encrypted value, so a value can not be copied fr
 - Each message gets a new random 12-byte nonce.
 - The output is base64 of `nonce + encrypted text + tag`.
 - The 16-byte tag checks the message. If someone changes one byte, `decode` throws.
+- `encode` and `decode` also take `associatedData`, a text like a cookie name. It is not in the output, but `decode` needs the same value. Cookies use the cookie name here.
 
 To store passwords, do not encrypt them. Hash them. See [Hashing](hashing.md).
 
@@ -14175,9 +14451,11 @@ A hash is one-way. You can not turn it back into the password.
 Hash the password before you save it.
 
 ```dart
-user.password = Hash.make(body.password);
+user.password = await Hash.makeAsync(body.password);
 await user.save();
 ```
+
+`makeAsync` runs bcrypt in another isolate. See [Without blocking the server](#without-blocking-the-server).
 
 The result looks like `$2a$10$...`. It holds the salt, so you only store this one string.
 The same password gives a different hash each time.
@@ -14204,6 +14482,7 @@ bool ok = await Hash.verifyAsync('secret', user.password!);
 ## Cost
 
 `Hash.rounds` is the bcrypt cost for new hashes. The default is `10`. Each step up doubles the time.
+The cost must be from 4 to 31. Do not go below 10.
 
 ```dart
 Hash.rounds = 12;
@@ -14211,7 +14490,18 @@ String hash = Hash.make('secret', rounds: 12); // or per call
 ```
 
 Old hashes keep their own cost, so they still verify.
-If you change it, also set `hashRounds` on `JwtAuthDriver` to the same value. See [Authentication](authentication.md).
+If you change it, also set `hashRounds` on `JwtAuthDriver` or `SessionAuthDriver` to the same value.
+Then a login with an unknown email takes as long as a wrong password. See [Authentication](authentication.md).
+
+## Long passwords
+
+bcrypt reads at most 72 bytes.
+`Hash.make` and `Hash.makeAsync` throw an `ArgumentError` when the password is longer than 72 bytes (UTF-8).
+`Hash.verify` returns `false` for such a password.
+
+So limit the length in your DTO, like `@Length(min: 8, max: 72)`.
+`@Length` counts characters, and a letter outside ASCII can use up to 4 bytes.
+So a password with such letters can still be too long. Catch the error and answer `422`, or use a smaller `max`.
 
 ## With login
 
@@ -14276,18 +14566,26 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
-## Count by API key, not by ip
+## Count by user, not by ip
 
 `key` picks who is counted. The default is `req.ip()`.
+The key is any `String`. For example, count by user id after `AuthMiddleware`:
 
 ```dart
-RateLimit(
-  max: 100,
-  key: (DoxRequest req) => req.header('X-Api-Key') ?? req.ip(),
-)
+Route.get('/reports', <dynamic>[
+  AuthMiddleware(),
+  RateLimit(
+    max: 100,
+    key: (DoxRequest req) => '${req.auth?.user<User>()?.id ?? req.ip()}',
+  ),
+  (ReportController c) => c.index,
+]);
 ```
 
-The key is any `String`, so you can also count by user id after your auth middleware.
+!!! warning "Use a key the client can not choose"
+    Do not count by a raw header, like `req.header('X-Api-Key')`.
+    A client can send a new value with each request and get a new count each time.
+    Count by a value that you checked first, like the id of the logged in user.
 
 !!! warning "Behind a proxy"
     Behind Caddy, nginx or a load balancer, every request comes from the proxy ip.
@@ -14296,7 +14594,7 @@ The key is any `String`, so you can also count by user id after your auth middle
 
 ## Two limits on the same key
 
-Two `RateLimit` with the same `max` and `per` share one counter. Give one a `name` to keep them apart:
+Two `RateLimit` with the same `max` and `per` share one counter for the same key. Give each one a `name` to keep them apart:
 
 ```dart
 Route.post('/auth/login', <dynamic>[
@@ -14315,6 +14613,7 @@ The counts are kept in the [cache](../digging-deeper/cache.md):
 
 - When the default cache store is **Redis**, the counts are in Redis. All isolates and all servers share them. Use this in production.
 - Else the counts are in **memory**. Each isolate has its own counts. With 4 isolates a client can send up to 4 x `max` requests.
+  This is also true for the default `file` store of a new app.
 
 To use one store by name, pass `store`:
 
@@ -14372,9 +14671,14 @@ Every answer now has these headers:
 
 `Content-Security-Policy` is off by default. A good policy depends on your pages.
 
+Without this middleware, the server already sends three headers on every answer, also on a `404`:
+`X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff` and `X-XSS-Protection: 1; mode=block`.
+`SecurityHeaders` replaces the first two with its own values.
+
 ## Change or turn off a header
 
-Each header has an option. Give a new value to change it, or `null` to turn it off:
+Each header has an option. Give a new value to change it, or `null` to turn it off.
+`null` for `frameOptions` or `contentTypeOptions` keeps the server value from above (`SAMEORIGIN` and `nosniff`).
 
 ```dart
 const SecurityHeaders(
@@ -14410,7 +14714,9 @@ AppConfig(trustedProxies: <String>['127.0.0.1', '::1']);
 Without it, Dox never sends HSTS. See [App config](../reference/app-config.md).
 
 !!! note
-    Middleware runs only for routes that exist. A `404` for an unknown url does not get these headers.
+    Middleware runs only for routes that exist. A `404` for an unknown url gets only the three server headers.
+    A preflight `OPTIONS` answer gets only them too.
+    Put `SecurityHeaders` first in `globalMiddleware`. Then an error from a later middleware, like a `419` or a `429`, also gets the headers.
 
 ## See also
 

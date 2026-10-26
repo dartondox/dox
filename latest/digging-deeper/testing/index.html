@@ -6424,7 +6424,7 @@
 <h1 id="testing">Testing</h1>
 <p>This page shows how to test a Dox app with the <code>test</code> package: HTTP routes, cache, storage, env and the database.</p>
 <h2 id="setup">Setup</h2>
-<p>Add the test package as a dev dependency:</p>
+<p>A new app from <code>dox create</code> already has the <code>test</code> package. In another app, add it as a dev dependency:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dev:test
 </span></code></pre></div>
 <p>Put your tests in the <code>test/</code> folder. Run them with:</p>
@@ -6651,7 +6651,7 @@ Redirects are not followed, so you can check a <code>302</code> and its <code>Lo
 <h2 id="use-a-test-database-with-envtesting">Use a test database with <code>.env.testing</code></h2>
 <p>Put the values for tests in a <code>.env.testing</code> file, next to <code>.env</code>:</p>
 <div class="language-ini highlight"><span class="filename">.env.testing</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="na">DB_NAME</span><span class="o">=</span><span class="s">my_app_test</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="na">LOG_REQUESTS</span><span class="o">=</span><span class="s">false</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="na">CACHE_STORE</span><span class="o">=</span><span class="s">memory</span>
 </span></code></pre></div>
 <p>When the app runs its tests, Dox reads <code>.env</code> first and then <code>.env.testing</code>.
 A key in <code>.env.testing</code> wins over the same key in <code>.env</code>. Keys that are only in <code>.env</code> stay.</p>

@@ -6782,7 +6782,7 @@ flags for you. <code>DART_VM_OPTIONS</code> is read by the AOT binary from
 <h2 id="bodies-uploads-and-big-responses">Bodies, uploads and big responses</h2>
 <p>These are on by default. You only need to keep them:</p>
 <ul>
-<li>A body over <code>maxBodySize</code> or <code>maxMultipartSize</code> gets <code>413</code> before it is all read. Set the same limit in the proxy. See <a href="../../the-basic/request/#size-limits">Size limits</a>.</li>
+<li>A body over <code>maxBodySize</code> or <code>maxMultipartSize</code> gets <code>413</code> from the native server, before Dart reads it. Set the same limit in the proxy. See <a href="../../the-basic/request/#size-limits">Size limits</a>.</li>
 <li>An upload over 1 MB streams to a temp file, so it does not fill the memory. See <a href="../../the-basic/request/#requestfile">Request</a>.</li>
 <li>A <code>File</code> or <code>Stream</code> response is streamed, not loaded into memory. See <a href="../../the-basic/response/#files-and-big-responses">Files and big responses</a>.</li>
 </ul>
@@ -6795,8 +6795,8 @@ flags for you. <code>DART_VM_OPTIONS</code> is read by the AOT binary from
   gzips on a Rust thread. Streamed responses are not compressed.</li>
 <li>A proxy (Caddy, nginx) does it better. Turn it on in Dart only when there
   is no proxy.</li>
-<li>With <code>compress: true</code>, text and JSON responses are sent chunked, without
-  <code>Content-Length</code>.</li>
+<li>Only a body over 256 bytes is gzipped, and only when the client accepts
+  gzip. The gzipped body still gets a <code>Content-Length</code>.</li>
 </ul>
 <h2 id="logging">Logging</h2>
 <p><code>LogMiddleware</code> prints one JSON line per request. Writing to stdout blocks
@@ -6805,7 +6805,7 @@ the isolate. So Dox collects log lines and writes them every 20 ms (or every
 be lost. Errors from <code>Logger</code> are still written right away.</p>
 <p>Turn <code>LogMiddleware</code> off when a proxy already writes access logs. The new
 project does this for you: <code>enabled</code> is <code>false</code> when <code>APP_ENV</code> is
-<code>production</code>.</p>
+<code>production</code> or not set.</p>
 <p>Leave <code>responseHandler</code> unset when you do not need it. With no handler, a
 plain value (text, map, list) is sent without building a <code>DoxResponse</code>.</p>
 <h2 id="what-dox-does-for-you">What Dox does for you</h2>

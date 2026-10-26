@@ -6635,13 +6635,14 @@ It uses pub.dev automated publishing, so it needs no token or secret.</p>
 <h3 id="steps">Steps</h3>
 <p>The full guide is <a href="https://github.com/dartondox/dox/blob/main/RELEASING.md">RELEASING.md</a> in the repo. In short:</p>
 <ol>
-<li>Bump every package with <code>bin/update_versions.sh</code>, and close the <code>## Unreleased</code> section of each <code>CHANGELOG.md</code>.</li>
+<li>Set the new version in the root <code>pubspec.yaml</code>. Then run <code>bin/update_versions.sh</code>: it sets this version in every package.
+   Close the <code>## Unreleased</code> section of each <code>CHANGELOG.md</code>.</li>
 <li>Merge the release PR, then push the tag <code>v&lt;version&gt;</code>. This publishes to pub.dev.</li>
 <li>Release the matching <code>dox-sample</code> template.</li>
 </ol>
 <p>The native packages (<code>dox_http_native</code>, <code>dox_postgres_native</code>, <code>dox_mysql_native</code>) are not in this repo.
 See <a href="#native-packages">Native packages</a> below.
-<code>dox_orm</code>, <code>dox_migration</code>, <code>dox_socketio</code> and <code>dox_storage</code> are not in this repo either.
+<code>dox_orm</code>, <code>dox_migration</code>, <code>dox_socketio</code>, <code>dox_storage</code>, <code>dox_queue</code>, <code>dox_scheduler</code>, <code>dox_inertia</code>, <code>dox_view</code> and <code>dox_mailer</code> are not in this repo either.
 See <a href="#packages-in-other-repos">Packages in other repos</a>.</p>
 <p><strong>New package only:</strong> turn on pub.dev automated publishing for it first. See <a href="#one-time-setup">One-time setup</a>.
 A new package must first exist on pub.dev, so publish its first version by hand with <code>dart pub publish</code>.</p>
@@ -6722,13 +6723,16 @@ Optional: add yourself as a required reviewer, and allow only tags <code>v*</cod
 </tr>
 </tbody>
 </table>
-<p>The packages here use them from pub.dev. The database tests (Postgres, MySQL, SQLite) run in <code>dox-orm</code>.</p>
+<p>The packages here use them from pub.dev. The database tests (Postgres, MySQL, MariaDB, SQLite) run in <code>dox-orm</code>.
+CI in this repo uses the newest <code>dox-orm</code> code: <code>ci/clone-siblings.sh</code>, then <code>ci/use-sibling-orm.sh</code>.</p>
 <p>To work on one of them and Dox together:</p>
 <ol>
-<li>Clone the repos next to the Dox repo: <code>../dox-orm</code>, <code>../dox-socketio</code>, <code>../dox-storage</code>.
-   <code>ci/clone-siblings.sh</code> does this.</li>
+<li>Clone the repos next to the Dox repo, like <code>../dox-orm</code>.
+   <code>ci/clone-siblings.sh</code> clones <code>dox-orm</code>, <code>dox-socketio</code>, <code>dox-storage</code>, <code>dox-queue</code> and <code>dox-scheduler</code>.
+   Clone <code>dox-mailer</code>, <code>dox-view</code> and <code>dox-inertia</code> by hand when you need them.</li>
 <li>
-<p>Add them to the root <code>pubspec_overrides.yaml</code> of the Dox repo. Git ignores this file.</p>
+<p>Add them to the root <code>pubspec_overrides.yaml</code> of the Dox repo. Git ignores this file.
+   For <code>dox_orm</code> and <code>dox_migration</code>, <code>ci/use-sibling-orm.sh</code> writes this file for you.</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">dependency_overrides</span><span class="p">:</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">dox_orm</span><span class="p">:</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../dox-orm/packages/dox-orm</span>
@@ -6821,14 +6825,21 @@ Then raise the version constraint in the Dox packages that use it.</p>
 </table>
 <h3 id="write-and-preview">Write and preview</h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>.venv/bin/pip<span class="w"> </span>install<span class="w"> </span><span class="nv">mkdocs</span><span class="o">==</span><span class="m">1</span>.6.1<span class="w"> </span>mkdocs-material<span class="o">==</span><span class="m">9</span>.7.7<span class="w"> </span><span class="nv">mike</span><span class="o">==</span><span class="m">2</span>.2.0
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>.venv/bin/pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements-docs.txt
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>.venv/bin/mkdocs<span class="w"> </span>serve<span class="w">           </span><span class="c1"># live preview of this branch</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>.venv/bin/mkdocs<span class="w"> </span>build<span class="w"> </span>--strict<span class="w">  </span><span class="c1"># the same check as CI. Broken links fail.</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>.venv/bin/mkdocs<span class="w"> </span>build<span class="w"> </span>--strict<span class="w">  </span><span class="c1"># the same build as CI. Broken links fail.</span>
 </span></code></pre></div>
+<p><code>hooks/docs_hooks.py</code> runs during the build. It makes the changelog page from <code>packages/*/CHANGELOG.md</code>, and writes <code>llms.txt</code> and <code>llms-full.txt</code>.</p>
+<p>The <code>Docs check</code> workflow (<code>.github/workflows/docs-check.yaml</code>) runs on every pull request that changes the docs. It runs three checks:</p>
+<ul>
+<li><code>mkdocs build --strict</code></li>
+<li>a spell check: <code>codespell docs --skip "*.svg,*.png,*.ico,*.css,*.js" --ignore-words .codespell-ignore</code></li>
+<li><code>ci/check-no-tabs.sh</code>: the docs must not use content tabs</li>
+</ul>
 <h3 id="deploy">Deploy</h3>
 <ul>
 <li>3.x deploys by itself. The <code>Docs</code> workflow (<code>.github/workflows/docs.yaml</code>) runs on every push
-  to <code>main</code> that changes <code>docs/</code>, <code>mkdocs.yml</code> or the workflow.
+  to <code>main</code> that changes <code>docs/</code>, <code>hooks/</code>, <code>overrides/</code>, a package <code>CHANGELOG.md</code>, <code>mkdocs.yml</code>, <code>requirements-docs.txt</code> or the workflow.
   It runs <code>mike deploy --update-aliases 3.x latest</code>.</li>
 <li>2.x deploys by hand. Open Actions &gt; Docs &gt; "Run workflow", pick version <code>2.x</code>.
   It builds from the <code>v2.x</code> branch (change it with the <code>ref</code> input).</li>

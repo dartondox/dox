@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A provider is a class that sets up one part of your app when it starts. For example the database, auth or a Redis connection.">
+        <meta name="description" content="A provider is a class that sets up one part of your app when it starts, for example the database, auth or a Redis connection.">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Providers | Dox">
-  <meta property="og:description" content="A provider is a class that sets up one part of your app when it starts. For example the database, auth or a Redis connection.">
+  <meta property="og:description" content="A provider is a class that sets up one part of your app when it starts, for example the database, auth or a Redis connection.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/digging-deeper/providers/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Providers | Dox">
-  <meta name="twitter:description" content="A provider is a class that sets up one part of your app when it starts. For example the database, auth or a Redis connection.">
+  <meta name="twitter:description" content="A provider is a class that sets up one part of your app when it starts, for example the database, auth or a Redis connection.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -6321,7 +6321,7 @@
 
 
 <h1 id="providers">Providers</h1>
-<p>A provider is a class that sets up one part of your app when it starts. For example the database, auth or a Redis connection.</p>
+<p>A provider is a class that sets up one part of your app when it starts, for example the database, auth or a Redis connection.</p>
 <p>A provider has two methods:</p>
 <ul>
 <li><code>setup()</code> runs when the app starts. You must write it.</li>
@@ -6371,21 +6371,22 @@ See <a href="../../the-basic/dependency-injection/#routers-and-providers">Depend
 <div class="language-dart highlight"><span class="filename">lib/providers/auth_provider.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_auth/dox_auth.dart'</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/user/user.model.dart'</span><span class="p">;</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppAuthProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="n">Auth</span><span class="p">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">AuthConfig</span><span class="p">(</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">      </span><span class="nl">defaultGuard:</span><span class="w"> </span><span class="s1">'web'</span><span class="p">,</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">      </span><span class="nl">guards:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">AuthGuard</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">        </span><span class="s1">'web'</span><span class="o">:</span><span class="w"> </span><span class="n">AuthGuard</span><span class="p">(</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">          </span><span class="nl">driver:</span><span class="w"> </span><span class="n">JwtAuthDriver</span><span class="p">(</span><span class="nl">secret:</span><span class="w"> </span><span class="n">SecretKey</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">appKey</span><span class="p">)),</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">          </span><span class="nl">provider:</span><span class="w"> </span><span class="n">AuthProvider</span><span class="p">(</span><span class="nl">model:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">User</span><span class="p">()),</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">        </span><span class="p">),</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">      </span><span class="p">},</span>
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">    </span><span class="p">));</span>
-</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="p">}</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppAuthProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="n">Auth</span><span class="p">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">AuthConfig</span><span class="p">(</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">      </span><span class="nl">defaultGuard:</span><span class="w"> </span><span class="s1">'web'</span><span class="p">,</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">      </span><span class="nl">guards:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">AuthGuard</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">        </span><span class="s1">'web'</span><span class="o">:</span><span class="w"> </span><span class="n">AuthGuard</span><span class="p">(</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">          </span><span class="nl">driver:</span><span class="w"> </span><span class="n">JwtAuthDriver</span><span class="p">(</span><span class="nl">secret:</span><span class="w"> </span><span class="n">SecretKey</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">appKey</span><span class="p">)),</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">          </span><span class="nl">provider:</span><span class="w"> </span><span class="n">AuthProvider</span><span class="p">(</span><span class="nl">model:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">User</span><span class="p">()),</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">        </span><span class="p">),</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">      </span><span class="p">},</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">    </span><span class="p">));</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>The name is <code>AppAuthProvider</code>, because <code>dox_auth</code> already has a class named <code>AuthProvider</code> (it finds the user model).
 See <a href="../../security/authentication/">Authentication</a>.</p>

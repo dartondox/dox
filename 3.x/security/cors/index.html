@@ -6284,7 +6284,9 @@
 The API must send CORS headers to allow it.
 Dox adds these headers from <code>CORSConfig</code>.</p>
 <h2 id="set-up">Set up</h2>
-<p>The config is in <code>lib/config/cors.dart</code>. Pass it to <code>AppConfig(cors: cors)</code>.</p>
+<p>The config is in <code>lib/config/cors.dart</code>. Pass it to <code>AppConfig(cors: cors)</code>.
+A new app has this file with <code>enabled: false</code>, so it sends no CORS headers.
+Set <code>origin</code> to the URL of your front end, and set <code>enabled: true</code>.</p>
 <div class="language-dart highlight"><span class="filename">lib/config/cors.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">CORSConfig</span><span class="w"> </span><span class="n">cors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CORSConfig</span><span class="p">(</span>
@@ -6304,7 +6306,8 @@ Dox adds these headers from <code>CORSConfig</code>.</p>
 </span></code></pre></div>
 <h2 id="options">Options</h2>
 <p>Each option sets one response header.
-An option that is <code>null</code> sends no header.</p>
+An option that is <code>null</code> sends no header. All options except <code>enabled</code> are <code>null</code> by default.
+So with no <code>origin</code>, Dox sends no <code>Access-Control-Allow-Origin</code> header, and the browser blocks pages on other domains.</p>
 <table>
 <thead>
 <tr>
@@ -6322,7 +6325,7 @@ An option that is <code>null</code> sends no header.</p>
 <tr>
 <td><code>origin</code></td>
 <td><code>Access-Control-Allow-Origin</code></td>
-<td>one origin, a <code>List&lt;String&gt;</code> of origins, or <code>'*'</code> for all</td>
+<td>one origin, a <code>List&lt;String&gt;</code> of origins, or <code>'*'</code> for all. A text is sent as it is, so do not put many origins in one text</td>
 </tr>
 <tr>
 <td><code>methods</code></td>
@@ -6367,8 +6370,10 @@ So when <code>origin</code> is a list, Dox checks the <code>Origin</code> header
 </span></code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title"><code>credentials</code> with <code>*</code></p>
-<p>Browsers do not send cookies when <code>origin</code> is <code>'*'</code>.
-When you need cookies, set <code>origin</code> to your real front-end URL.</p>
+<p>Do not use <code>origin: '*'</code> with <code>credentials: true</code>.
+Dox then sends <code>Access-Control-Allow-Origin: *</code>, and the browser blocks every call that has cookies.
+When you need cookies, set <code>origin</code> to your real front-end URL, or to a list of URLs.
+A page on an allowed origin can send requests with the cookies of your users, so list only sites you trust.</p>
 </div>
 <h2 id="preflight-requests">Preflight requests</h2>
 <p>Before some requests, the browser sends an <code>OPTIONS</code> request.

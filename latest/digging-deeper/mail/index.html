@@ -2477,6 +2477,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#without-dox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without Dox
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#send-an-email" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6463,6 +6474,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#without-dox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without Dox
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#send-an-email" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6782,7 +6804,7 @@
 </tbody>
 </table>
 <h3 id="2-provider">2. Provider</h3>
-<p>The provider sets up the mailers in every isolate. Put it in <code>lib/</code> so the generated container finds it.</p>
+<p>The provider sets up the mailers in every isolate. Put it in <code>lib/providers/</code>, so the generated container finds it.</p>
 <div class="language-dart highlight"><span class="filename">lib/providers/mail_provider.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_mailer/dox_mailer.dart'</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'../config/mail.dart'</span><span class="p">;</span>
@@ -6794,20 +6816,52 @@
 </span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>When the server stops, the provider closes open SMTP connections and HTTP clients.</p>
-<h2 id="send-an-email">Send an email</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_mailer/dox_mailer.dart'</span><span class="p">;</span>
+<h2 id="without-dox">Without Dox</h2>
+<p><code>dox_mailer</code> also works on its own. Call <code>Mail.configure()</code> once at start, and <code>Mail.close()</code> at the end:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">Mail</span><span class="p">.</span><span class="n">send</span><span class="p">(</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="n">Message</span><span class="p">(</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="nl">to:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Address</span><span class="o">&gt;</span><span class="p">[</span><span class="n">Address</span><span class="p">(</span><span class="s1">'ann@example.com'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Ann Lee'</span><span class="p">)],</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="nl">subject:</span><span class="w"> </span><span class="s1">'Welcome'</span><span class="p">,</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="nl">text:</span><span class="w"> </span><span class="s1">'Hello Ann, welcome!'</span><span class="p">,</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="nl">html:</span><span class="w"> </span><span class="s1">'&lt;p&gt;Hello Ann, &lt;b&gt;welcome&lt;/b&gt;!&lt;/p&gt;'</span><span class="p">,</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="p">),</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="p">);</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_mailer/dox_mailer.dart'</span><span class="p">;</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Platform</span><span class="p">.</span><span class="n">environment</span><span class="p">;</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span><span class="n">Mail</span><span class="p">.</span><span class="n">configure</span><span class="p">(</span><span class="n">MailConfig</span><span class="p">(</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="nl">defaultMailer:</span><span class="w"> </span><span class="s1">'smtp'</span><span class="p">,</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="nl">from:</span><span class="w"> </span><span class="n">Address</span><span class="p">(</span><span class="s1">'hello@example.com'</span><span class="p">,</span><span class="w"> </span><span class="s1">'My app'</span><span class="p">),</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">    </span><span class="nl">mailers:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Transport</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">      </span><span class="s1">'smtp'</span><span class="o">:</span><span class="w"> </span><span class="n">SmtpTransport</span><span class="p">(</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">        </span><span class="nl">host:</span><span class="w"> </span><span class="n">env</span><span class="p">[</span><span class="s1">'MAIL_HOST'</span><span class="p">]</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">        </span><span class="nl">username:</span><span class="w"> </span><span class="n">env</span><span class="p">[</span><span class="s1">'MAIL_USERNAME'</span><span class="p">],</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">        </span><span class="nl">password:</span><span class="w"> </span><span class="n">env</span><span class="p">[</span><span class="s1">'MAIL_PASSWORD'</span><span class="p">],</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">      </span><span class="p">),</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">    </span><span class="p">},</span>
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">  </span><span class="p">));</span>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">Mail</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">Message</span><span class="p">(</span>
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="w">    </span><span class="nl">to:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Address</span><span class="o">&gt;</span><span class="p">[</span><span class="n">Address</span><span class="p">(</span><span class="s1">'ann@example.com'</span><span class="p">)],</span>
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="w">    </span><span class="nl">subject:</span><span class="w"> </span><span class="s1">'Hello'</span><span class="p">,</span>
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="w">    </span><span class="nl">text:</span><span class="w"> </span><span class="s1">'Hello Ann!'</span><span class="p">,</span>
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="w">  </span><span class="p">));</span>
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>
+</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="w">  </span><span class="c1">// closes open SMTP connections and HTTP clients</span>
+</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">Mail</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>The rest of this page works the same way.</p>
+<h2 id="send-an-email">Send an email</h2>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_mailer/dox_mailer.dart'</span><span class="p">;</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">Mail</span><span class="p">.</span><span class="n">send</span><span class="p">(</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="n">Message</span><span class="p">(</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="nl">to:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Address</span><span class="o">&gt;</span><span class="p">[</span><span class="n">Address</span><span class="p">(</span><span class="s1">'ann@example.com'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Ann Lee'</span><span class="p">)],</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="nl">subject:</span><span class="w"> </span><span class="s1">'Welcome'</span><span class="p">,</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="nl">text:</span><span class="w"> </span><span class="s1">'Hello Ann, welcome!'</span><span class="p">,</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="nl">html:</span><span class="w"> </span><span class="s1">'&lt;p&gt;Hello Ann, &lt;b&gt;welcome&lt;/b&gt;!&lt;/p&gt;'</span><span class="p">,</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="p">),</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="p">);</span>
 </span></code></pre></div>
 <p>Send with another mailer:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Mail</span><span class="p">.</span><span class="n">mailer</span><span class="p">(</span><span class="s1">'ses'</span><span class="p">).</span><span class="n">send</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Mail</span><span class="p">.</span><span class="n">mailer</span><span class="p">(</span><span class="s1">'ses'</span><span class="p">).</span><span class="n">send</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
 </span></code></pre></div>
 <p><code>send()</code> gives a <code>SentMessage</code>. Its <code>messageId</code> is the id of the provider (or the <code>Message-ID</code> header for SMTP and sendmail).</p>
 <p>When the message can not be sent, <code>send()</code> throws a <code>MailException</code>. It has the <code>statusCode</code> and the <code>body</code> of the answer of the server.</p>
@@ -6865,43 +6919,43 @@
 <p>An <code>Address</code> is an email and an optional name: <code>Address('ann@example.com', 'Ann')</code>. <code>Address.parse('Ann &lt;ann@example.com&gt;')</code> reads one from text.</p>
 <p>A message needs a from address, at least one recipient, and a text or HTML body. A subject or header with a line break is an error, so user input can not add headers.</p>
 <h3 id="attachments">Attachments</h3>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">Message</span><span class="p">(</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nl">to:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Address</span><span class="o">&gt;</span><span class="p">[</span><span class="n">Address</span><span class="p">(</span><span class="s1">'ann@example.com'</span><span class="p">)],</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nl">subject:</span><span class="w"> </span><span class="s1">'Your invoice'</span><span class="p">,</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nl">text:</span><span class="w"> </span><span class="s1">'The invoice is attached.'</span><span class="p">,</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="nl">attachments:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Attachment</span><span class="o">&gt;</span><span class="p">[</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="n">Attachment</span><span class="p">(</span><span class="n">pdfBytes</span><span class="p">,</span><span class="w"> </span><span class="s1">'invoice.pdf'</span><span class="p">),</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="n">Attachment</span><span class="p">.</span><span class="n">fromFile</span><span class="p">(</span><span class="s1">'storage/terms.pdf'</span><span class="p">),</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="p">],</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">Message</span><span class="p">(</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nl">to:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Address</span><span class="o">&gt;</span><span class="p">[</span><span class="n">Address</span><span class="p">(</span><span class="s1">'ann@example.com'</span><span class="p">)],</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nl">subject:</span><span class="w"> </span><span class="s1">'Your invoice'</span><span class="p">,</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nl">text:</span><span class="w"> </span><span class="s1">'The invoice is attached.'</span><span class="p">,</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="nl">attachments:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Attachment</span><span class="o">&gt;</span><span class="p">[</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="n">Attachment</span><span class="p">(</span><span class="n">pdfBytes</span><span class="p">,</span><span class="w"> </span><span class="s1">'invoice.pdf'</span><span class="p">),</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="n">Attachment</span><span class="p">.</span><span class="n">fromFile</span><span class="p">(</span><span class="s1">'storage/terms.pdf'</span><span class="p">),</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">  </span><span class="p">],</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="p">);</span>
 </span></code></pre></div>
 <p>The content type comes from the file extension. Pass <code>contentType</code> to set it.</p>
 <h3 id="inline-images">Inline images</h3>
 <p>Give the file a <code>cid</code>. Use it in the HTML with <code>cid:</code>.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">Message</span><span class="p">(</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nl">to:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Address</span><span class="o">&gt;</span><span class="p">[</span><span class="n">Address</span><span class="p">(</span><span class="s1">'ann@example.com'</span><span class="p">)],</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nl">subject:</span><span class="w"> </span><span class="s1">'Hello'</span><span class="p">,</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nl">html:</span><span class="w"> </span><span class="s1">'&lt;img src="cid:logo.png"&gt; Hello!'</span><span class="p">,</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="nl">attachments:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Attachment</span><span class="o">&gt;</span><span class="p">[</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="n">Attachment</span><span class="p">.</span><span class="n">fromFile</span><span class="p">(</span><span class="s1">'assets/logo.png'</span><span class="p">,</span><span class="w"> </span><span class="nl">cid:</span><span class="w"> </span><span class="s1">'logo.png'</span><span class="p">),</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="p">],</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">Message</span><span class="p">(</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nl">to:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Address</span><span class="o">&gt;</span><span class="p">[</span><span class="n">Address</span><span class="p">(</span><span class="s1">'ann@example.com'</span><span class="p">)],</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nl">subject:</span><span class="w"> </span><span class="s1">'Hello'</span><span class="p">,</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nl">html:</span><span class="w"> </span><span class="s1">'&lt;img src="cid:logo.png"&gt; Hello!'</span><span class="p">,</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nl">attachments:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Attachment</span><span class="o">&gt;</span><span class="p">[</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="n">Attachment</span><span class="p">.</span><span class="n">fromFile</span><span class="p">(</span><span class="s1">'assets/logo.png'</span><span class="p">,</span><span class="w"> </span><span class="nl">cid:</span><span class="w"> </span><span class="s1">'logo.png'</span><span class="p">),</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="p">],</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="p">);</span>
 </span></code></pre></div>
 <p>Mailgun uses the file name as the cid. So for Mailgun, use a cid like <code>logo.png</code>, with the file extension.</p>
 <h3 id="html-from-a-view">HTML from a view</h3>
 <p>With <a href="../../the-basic/views/">views</a>, render a template to HTML:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">html</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">View</span><span class="p">.</span><span class="n">render</span><span class="p">(</span><span class="s1">'emails/welcome'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Ann'</span><span class="p">});</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Mail</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">Message</span><span class="p">(</span><span class="nl">to:</span><span class="w"> </span><span class="n">to</span><span class="p">,</span><span class="w"> </span><span class="nl">subject:</span><span class="w"> </span><span class="s1">'Welcome'</span><span class="p">,</span><span class="w"> </span><span class="nl">html:</span><span class="w"> </span><span class="n">html</span><span class="p">));</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">html</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">View</span><span class="p">.</span><span class="n">render</span><span class="p">(</span><span class="s1">'emails/welcome'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Ann'</span><span class="p">});</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Mail</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">Message</span><span class="p">(</span><span class="nl">to:</span><span class="w"> </span><span class="n">to</span><span class="p">,</span><span class="w"> </span><span class="nl">subject:</span><span class="w"> </span><span class="s1">'Welcome'</span><span class="p">,</span><span class="w"> </span><span class="nl">html:</span><span class="w"> </span><span class="n">html</span><span class="p">));</span>
 </span></code></pre></div>
 <h2 id="transports">Transports</h2>
 <h3 id="smtp">SMTP</h3>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="s1">'smtp'</span><span class="o">:</span><span class="w"> </span><span class="n">SmtpTransport</span><span class="p">(</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'smtp.example.com'</span><span class="p">,</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nl">port:</span><span class="w"> </span><span class="m">587</span><span class="p">,</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="nl">username:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'MAIL_USERNAME'</span><span class="p">),</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="nl">password:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'MAIL_PASSWORD'</span><span class="p">),</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="nl">encryption:</span><span class="w"> </span><span class="n">SmtpEncryption</span><span class="p">.</span><span class="n">starttls</span><span class="p">,</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="p">),</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="s1">'smtp'</span><span class="o">:</span><span class="w"> </span><span class="n">SmtpTransport</span><span class="p">(</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'smtp.example.com'</span><span class="p">,</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nl">port:</span><span class="w"> </span><span class="m">587</span><span class="p">,</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="nl">username:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'MAIL_USERNAME'</span><span class="p">),</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="nl">password:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'MAIL_PASSWORD'</span><span class="p">),</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="nl">encryption:</span><span class="w"> </span><span class="n">SmtpEncryption</span><span class="p">.</span><span class="n">starttls</span><span class="p">,</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="p">),</span>
 </span></code></pre></div>
 <table>
 <thead>
@@ -6963,11 +7017,11 @@
 <p>For Gmail or Outlook with OAuth 2, use <code>auth: SmtpAuth.xoauth2</code>. The <code>username</code> is the email and the <code>password</code> is the access token.</p>
 <p><code>keepAlive: true</code> is good when you send many emails. One connection sends them one by one. When the server closed it, the next send opens a new one.</p>
 <p>For local work, <a href="https://mailpit.axllent.org">Mailpit</a> catches all emails:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="s1">'mailpit'</span><span class="o">:</span><span class="w"> </span><span class="n">SmtpTransport</span><span class="p">(</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nl">port:</span><span class="w"> </span><span class="m">1025</span><span class="p">,</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="nl">encryption:</span><span class="w"> </span><span class="n">SmtpEncryption</span><span class="p">.</span><span class="n">none</span><span class="p">,</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="p">),</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="s1">'mailpit'</span><span class="o">:</span><span class="w"> </span><span class="n">SmtpTransport</span><span class="p">(</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nl">port:</span><span class="w"> </span><span class="m">1025</span><span class="p">,</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nl">encryption:</span><span class="w"> </span><span class="n">SmtpEncryption</span><span class="p">.</span><span class="n">none</span><span class="p">,</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">),</span>
 </span></code></pre></div>
 <h3 id="amazon-ses">Amazon SES</h3>
 <p>There are two classes. Both send the same MIME message, with attachments and inline images.</p>
@@ -6975,11 +7029,11 @@
 <li><code>SesTransport</code>: SES API v1, <code>SendRawEmail</code>.</li>
 <li><code>SesV2Transport</code>: SES API v2, <code>SendEmail</code> with raw content.</li>
 </ul>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="s1">'ses'</span><span class="o">:</span><span class="w"> </span><span class="n">SesV2Transport</span><span class="p">(</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nl">key:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'AWS_ACCESS_KEY_ID'</span><span class="p">),</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nl">secret:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'AWS_SECRET_ACCESS_KEY'</span><span class="p">),</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nl">region:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'AWS_REGION'</span><span class="p">,</span><span class="w"> </span><span class="s1">'us-east-1'</span><span class="p">),</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">),</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="s1">'ses'</span><span class="o">:</span><span class="w"> </span><span class="n">SesV2Transport</span><span class="p">(</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nl">key:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'AWS_ACCESS_KEY_ID'</span><span class="p">),</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nl">secret:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'AWS_SECRET_ACCESS_KEY'</span><span class="p">),</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nl">region:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'AWS_REGION'</span><span class="p">,</span><span class="w"> </span><span class="s1">'us-east-1'</span><span class="p">),</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="p">),</span>
 </span></code></pre></div>
 <table>
 <thead>
@@ -7024,15 +7078,15 @@
 </table>
 <p>The requests are signed with AWS Signature Version 4. No AWS SDK is needed.</p>
 <h3 id="azure-communication-services">Azure Communication Services</h3>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="s1">'azure'</span><span class="o">:</span><span class="w"> </span><span class="n">AzureTransport</span><span class="p">(</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nl">endpoint:</span><span class="w"> </span><span class="s1">'https://my-app.europe.communication.azure.com'</span><span class="p">,</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nl">accessKey:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'AZURE_EMAIL_KEY'</span><span class="p">),</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="p">),</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="s1">'azure'</span><span class="o">:</span><span class="w"> </span><span class="n">AzureTransport</span><span class="p">(</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nl">endpoint:</span><span class="w"> </span><span class="s1">'https://my-app.europe.communication.azure.com'</span><span class="p">,</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="nl">accessKey:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'AZURE_EMAIL_KEY'</span><span class="p">),</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="p">),</span>
 </span></code></pre></div>
 <p>Or with the connection string of the Azure portal:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="s1">'azure'</span><span class="o">:</span><span class="w"> </span><span class="n">AzureTransport</span><span class="p">.</span><span class="n">fromConnectionString</span><span class="p">(</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'AZURE_EMAIL_CONNECTION_STRING'</span><span class="p">),</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="p">),</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="s1">'azure'</span><span class="o">:</span><span class="w"> </span><span class="n">AzureTransport</span><span class="p">.</span><span class="n">fromConnectionString</span><span class="p">(</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'AZURE_EMAIL_CONNECTION_STRING'</span><span class="p">),</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="p">),</span>
 </span></code></pre></div>
 <table>
 <thead>
@@ -7067,29 +7121,29 @@
 </table>
 <p>Requests are signed with the access key (HMAC-SHA256). Inline images need a newer <code>apiVersion</code> that supports them.</p>
 <h3 id="resend">Resend</h3>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="s1">'resend'</span><span class="o">:</span><span class="w"> </span><span class="n">ResendTransport</span><span class="p">(</span><span class="nl">apiKey:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'RESEND_API_KEY'</span><span class="p">)),</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="s1">'resend'</span><span class="o">:</span><span class="w"> </span><span class="n">ResendTransport</span><span class="p">(</span><span class="nl">apiKey:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'RESEND_API_KEY'</span><span class="p">)),</span>
 </span></code></pre></div>
 <h3 id="mailgun">Mailgun</h3>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="s1">'mailgun'</span><span class="o">:</span><span class="w"> </span><span class="n">MailgunTransport</span><span class="p">(</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nl">apiKey:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'MAILGUN_API_KEY'</span><span class="p">),</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="nl">domain:</span><span class="w"> </span><span class="s1">'mg.example.com'</span><span class="p">,</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span><span class="nl">region:</span><span class="w"> </span><span class="n">MailgunRegion</span><span class="p">.</span><span class="n">eu</span><span class="p">,</span>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="p">),</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="s1">'mailgun'</span><span class="o">:</span><span class="w"> </span><span class="n">MailgunTransport</span><span class="p">(</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="nl">apiKey:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'MAILGUN_API_KEY'</span><span class="p">),</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="nl">domain:</span><span class="w"> </span><span class="s1">'mg.example.com'</span><span class="p">,</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="nl">region:</span><span class="w"> </span><span class="n">MailgunRegion</span><span class="p">.</span><span class="n">eu</span><span class="p">,</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="p">),</span>
 </span></code></pre></div>
 <p><code>region</code> is <code>MailgunRegion.us</code> (the default) or <code>MailgunRegion.eu</code>. Use the region of your Mailgun domain.</p>
 <h3 id="postmark">Postmark</h3>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="s1">'postmark'</span><span class="o">:</span><span class="w"> </span><span class="n">PostmarkTransport</span><span class="p">(</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="nl">serverToken:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'POSTMARK_TOKEN'</span><span class="p">),</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="nl">messageStream:</span><span class="w"> </span><span class="s1">'outbound'</span><span class="p">,</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="p">),</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="s1">'postmark'</span><span class="o">:</span><span class="w"> </span><span class="n">PostmarkTransport</span><span class="p">(</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span><span class="nl">serverToken:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'POSTMARK_TOKEN'</span><span class="p">),</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span><span class="nl">messageStream:</span><span class="w"> </span><span class="s1">'outbound'</span><span class="p">,</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="p">),</span>
 </span></code></pre></div>
 <p><code>messageStream</code> is optional. Without it, Postmark uses the default stream of the server.</p>
 <h3 id="sendmail">sendmail</h3>
 <p>Sends with the <code>sendmail</code> program of the server (Postfix, Exim, msmtp and others).</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="s1">'sendmail'</span><span class="o">:</span><span class="w"> </span><span class="n">SendmailTransport</span><span class="p">(</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span><span class="nl">path:</span><span class="w"> </span><span class="s1">'/usr/sbin/sendmail'</span><span class="p">,</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span><span class="nl">mode:</span><span class="w"> </span><span class="n">SendmailMode</span><span class="p">.</span><span class="n">smtp</span><span class="p">,</span>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="p">),</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="s1">'sendmail'</span><span class="o">:</span><span class="w"> </span><span class="n">SendmailTransport</span><span class="p">(</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="nl">path:</span><span class="w"> </span><span class="s1">'/usr/sbin/sendmail'</span><span class="p">,</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span><span class="nl">mode:</span><span class="w"> </span><span class="n">SendmailMode</span><span class="p">.</span><span class="n">smtp</span><span class="p">,</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="p">),</span>
 </span></code></pre></div>
 <table>
 <thead>
@@ -7114,24 +7168,24 @@
 </table>
 <h3 id="log">Log</h3>
 <p>Prints each email and sends nothing. Good for local work.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="s1">'log'</span><span class="o">:</span><span class="w"> </span><span class="n">LogTransport</span><span class="p">(),</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="s1">'log'</span><span class="o">:</span><span class="w"> </span><span class="n">LogTransport</span><span class="p">(),</span>
 </span></code></pre></div>
-<p>Pass <code>output</code> to print somewhere else, eg. <code>LogTransport(output: logger.info)</code>.</p>
+<p>Pass <code>output</code> to print somewhere else, eg. <code>LogTransport(output: stderr.writeln)</code> (from <code>dart:io</code>).</p>
 <h3 id="array">Array</h3>
 <p>Keeps each email in a list and sends nothing. See <a href="#testing">Testing</a>.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="s1">'array'</span><span class="o">:</span><span class="w"> </span><span class="n">ArrayTransport</span><span class="p">(),</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="s1">'array'</span><span class="o">:</span><span class="w"> </span><span class="n">ArrayTransport</span><span class="p">(),</span>
 </span></code></pre></div>
 <h3 id="failover">Failover</h3>
 <p>Tries each transport in order, until one sends the email.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">SesV2Transport</span><span class="w"> </span><span class="n">ses</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SesV2Transport</span><span class="p">(</span><span class="nl">key:</span><span class="w"> </span><span class="s1">'...'</span><span class="p">,</span><span class="w"> </span><span class="nl">secret:</span><span class="w"> </span><span class="s1">'...'</span><span class="p">);</span>
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="n">SmtpTransport</span><span class="w"> </span><span class="n">smtp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SmtpTransport</span><span class="p">(</span><span class="nl">host:</span><span class="w"> </span><span class="s1">'smtp.example.com'</span><span class="p">);</span>
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
-</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="n">MailConfig</span><span class="w"> </span><span class="n">mailConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MailConfig</span><span class="p">(</span>
-</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">  </span><span class="nl">defaultMailer:</span><span class="w"> </span><span class="s1">'main'</span><span class="p">,</span>
-</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="w">  </span><span class="nl">mailers:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Transport</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="w">    </span><span class="s1">'main'</span><span class="o">:</span><span class="w"> </span><span class="n">FailoverTransport</span><span class="p">(</span><span class="o">&lt;</span><span class="n">Transport</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ses</span><span class="p">,</span><span class="w"> </span><span class="n">smtp</span><span class="p">]),</span>
-</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">SesV2Transport</span><span class="w"> </span><span class="n">ses</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SesV2Transport</span><span class="p">(</span><span class="nl">key:</span><span class="w"> </span><span class="s1">'...'</span><span class="p">,</span><span class="w"> </span><span class="nl">secret:</span><span class="w"> </span><span class="s1">'...'</span><span class="p">);</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="n">SmtpTransport</span><span class="w"> </span><span class="n">smtp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SmtpTransport</span><span class="p">(</span><span class="nl">host:</span><span class="w"> </span><span class="s1">'smtp.example.com'</span><span class="p">);</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="n">MailConfig</span><span class="w"> </span><span class="n">mailConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MailConfig</span><span class="p">(</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">  </span><span class="nl">defaultMailer:</span><span class="w"> </span><span class="s1">'main'</span><span class="p">,</span>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">  </span><span class="nl">mailers:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Transport</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">    </span><span class="s1">'main'</span><span class="o">:</span><span class="w"> </span><span class="n">FailoverTransport</span><span class="p">(</span><span class="o">&lt;</span><span class="n">Transport</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ses</span><span class="p">,</span><span class="w"> </span><span class="n">smtp</span><span class="p">]),</span>
+</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-21-9"><a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="p">);</span>
 </span></code></pre></div>
 <h2 id="tags-and-metadata">Tags and metadata</h2>
 <p>Each provider has its own way to group and mark emails. This is what each transport does with <code>tags</code> and <code>metadata</code>:</p>
@@ -7174,41 +7228,41 @@
 <p>For SMTP and sendmail, use <code>headers</code> instead.</p>
 <h2 id="testing">Testing</h2>
 <p><code>Mail.fake()</code> sends every mailer to one <code>ArrayTransport</code>. Nothing goes out. Then check what was sent.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_mailer/dox_mailer.dart'</span><span class="p">;</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:test/test.dart'</span><span class="p">;</span>
-</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
-</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="kt">void</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">  </span><span class="kd">late</span><span class="w"> </span><span class="n">ArrayTransport</span><span class="w"> </span><span class="n">mail</span><span class="p">;</span>
-</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>
-</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">  </span><span class="n">setUp</span><span class="p">(()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="w">    </span><span class="n">mail</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Mail</span><span class="p">.</span><span class="n">fake</span><span class="p">();</span>
-</span><span id="__span-21-9"><a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="w">  </span><span class="p">});</span>
-</span><span id="__span-21-10"><a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a>
-</span><span id="__span-21-11"><a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a><span class="w">  </span><span class="n">tearDown</span><span class="p">(()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-21-12"><a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a><span class="w">    </span><span class="n">Mail</span><span class="p">.</span><span class="n">restore</span><span class="p">();</span>
-</span><span id="__span-21-13"><a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a><span class="w">  </span><span class="p">});</span>
-</span><span id="__span-21-14"><a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a>
-</span><span id="__span-21-15"><a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a><span class="w">  </span><span class="n">test</span><span class="p">(</span><span class="s1">'sign up sends a welcome email'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-21-16"><a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">signUp</span><span class="p">(</span><span class="s1">'ann@example.com'</span><span class="p">);</span>
-</span><span id="__span-21-17"><a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a>
-</span><span id="__span-21-18"><a id="__codelineno-21-18" name="__codelineno-21-18" href="#__codelineno-21-18"></a><span class="w">    </span><span class="n">expect</span><span class="p">(</span><span class="n">mail</span><span class="p">.</span><span class="n">messages</span><span class="p">,</span><span class="w"> </span><span class="n">hasLength</span><span class="p">(</span><span class="m">1</span><span class="p">));</span>
-</span><span id="__span-21-19"><a id="__codelineno-21-19" name="__codelineno-21-19" href="#__codelineno-21-19"></a><span class="w">    </span><span class="n">Message</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mail</span><span class="p">.</span><span class="n">messages</span><span class="p">.</span><span class="n">single</span><span class="p">;</span>
-</span><span id="__span-21-20"><a id="__codelineno-21-20" name="__codelineno-21-20" href="#__codelineno-21-20"></a><span class="w">    </span><span class="n">expect</span><span class="p">(</span><span class="n">message</span><span class="p">.</span><span class="n">to</span><span class="p">.</span><span class="n">single</span><span class="p">.</span><span class="n">email</span><span class="p">,</span><span class="w"> </span><span class="s1">'ann@example.com'</span><span class="p">);</span>
-</span><span id="__span-21-21"><a id="__codelineno-21-21" name="__codelineno-21-21" href="#__codelineno-21-21"></a><span class="w">    </span><span class="n">expect</span><span class="p">(</span><span class="n">message</span><span class="p">.</span><span class="n">subject</span><span class="p">,</span><span class="w"> </span><span class="s1">'Welcome'</span><span class="p">);</span>
-</span><span id="__span-21-22"><a id="__codelineno-21-22" name="__codelineno-21-22" href="#__codelineno-21-22"></a><span class="w">  </span><span class="p">});</span>
-</span><span id="__span-21-23"><a id="__codelineno-21-23" name="__codelineno-21-23" href="#__codelineno-21-23"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_mailer/dox_mailer.dart'</span><span class="p">;</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:test/test.dart'</span><span class="p">;</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="kt">void</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="w">  </span><span class="kd">late</span><span class="w"> </span><span class="n">ArrayTransport</span><span class="w"> </span><span class="n">mail</span><span class="p">;</span>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="w">  </span><span class="n">setUp</span><span class="p">(()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="w">    </span><span class="n">mail</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Mail</span><span class="p">.</span><span class="n">fake</span><span class="p">();</span>
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="w">  </span><span class="p">});</span>
+</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a>
+</span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="w">  </span><span class="n">tearDown</span><span class="p">(()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-22-12"><a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a><span class="w">    </span><span class="n">Mail</span><span class="p">.</span><span class="n">restore</span><span class="p">();</span>
+</span><span id="__span-22-13"><a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a><span class="w">  </span><span class="p">});</span>
+</span><span id="__span-22-14"><a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a>
+</span><span id="__span-22-15"><a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a><span class="w">  </span><span class="n">test</span><span class="p">(</span><span class="s1">'sign up sends a welcome email'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-22-16"><a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">signUp</span><span class="p">(</span><span class="s1">'ann@example.com'</span><span class="p">);</span>
+</span><span id="__span-22-17"><a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a>
+</span><span id="__span-22-18"><a id="__codelineno-22-18" name="__codelineno-22-18" href="#__codelineno-22-18"></a><span class="w">    </span><span class="n">expect</span><span class="p">(</span><span class="n">mail</span><span class="p">.</span><span class="n">messages</span><span class="p">,</span><span class="w"> </span><span class="n">hasLength</span><span class="p">(</span><span class="m">1</span><span class="p">));</span>
+</span><span id="__span-22-19"><a id="__codelineno-22-19" name="__codelineno-22-19" href="#__codelineno-22-19"></a><span class="w">    </span><span class="n">Message</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mail</span><span class="p">.</span><span class="n">messages</span><span class="p">.</span><span class="n">single</span><span class="p">;</span>
+</span><span id="__span-22-20"><a id="__codelineno-22-20" name="__codelineno-22-20" href="#__codelineno-22-20"></a><span class="w">    </span><span class="n">expect</span><span class="p">(</span><span class="n">message</span><span class="p">.</span><span class="n">to</span><span class="p">.</span><span class="n">single</span><span class="p">.</span><span class="n">email</span><span class="p">,</span><span class="w"> </span><span class="s1">'ann@example.com'</span><span class="p">);</span>
+</span><span id="__span-22-21"><a id="__codelineno-22-21" name="__codelineno-22-21" href="#__codelineno-22-21"></a><span class="w">    </span><span class="n">expect</span><span class="p">(</span><span class="n">message</span><span class="p">.</span><span class="n">subject</span><span class="p">,</span><span class="w"> </span><span class="s1">'Welcome'</span><span class="p">);</span>
+</span><span id="__span-22-22"><a id="__codelineno-22-22" name="__codelineno-22-22" href="#__codelineno-22-22"></a><span class="w">  </span><span class="p">});</span>
+</span><span id="__span-22-23"><a id="__codelineno-22-23" name="__codelineno-22-23" href="#__codelineno-22-23"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>Mail.fake()</code> works with or without a config. Call it after the app has started, because <code>MailProvider</code> sets up the config again at start.</p>
+<p><code>Mail.fake()</code> works with or without a config. The fake stays on when <code>MailProvider</code> sets up the config again.</p>
 <p><code>mail.clear()</code> forgets the sent emails.</p>
 <h2 id="your-own-transport">Your own transport</h2>
 <p>Extend <code>Transport</code> and add it to <code>mailers</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">MyApiTransport</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Transport</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">SentMessage</span><span class="o">&gt;</span><span class="w"> </span><span class="n">send</span><span class="p">(</span><span class="n">Message</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">    </span><span class="c1">// call your API here</span>
-</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">SentMessage</span><span class="p">(</span><span class="n">message</span><span class="p">,</span><span class="w"> </span><span class="nl">messageId:</span><span class="w"> </span><span class="s1">'id from the API'</span><span class="p">);</span>
-</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">MyApiTransport</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Transport</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">SentMessage</span><span class="o">&gt;</span><span class="w"> </span><span class="n">send</span><span class="p">(</span><span class="n">Message</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">    </span><span class="c1">// call your API here</span>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">SentMessage</span><span class="p">(</span><span class="n">message</span><span class="p">,</span><span class="w"> </span><span class="nl">messageId:</span><span class="w"> </span><span class="s1">'id from the API'</span><span class="p">);</span>
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>The message is checked, and has a from address, when it gets to <code>send()</code>.</p>
 <p>For a provider that takes raw MIME, <code>MimeBuilder().build(message)</code> gives the MIME text.</p>
