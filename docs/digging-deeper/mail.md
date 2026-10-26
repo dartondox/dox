@@ -69,7 +69,7 @@ MAIL_PASSWORD=secret
 
 ### 2. Provider
 
-The provider sets up the mailers in every isolate. Put it in `lib/` so the generated container finds it.
+The provider sets up the mailers in every isolate. Put it in `lib/providers/`, so the generated container finds it.
 
 ```dart title="lib/providers/mail_provider.dart"
 import 'package:dox_mailer/dox_mailer.dart';

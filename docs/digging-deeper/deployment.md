@@ -23,13 +23,16 @@ This makes a `build/bundle/` folder:
 | File                        | What it is                                       |
 | --------------------------- | ------------------------------------------------ |
 | `build/bundle/bin/server`   | the native binary. No Dart SDK needed to run it  |
+| `build/bundle/bin/queue`    | the queue worker, when `bin/queue.dart` exists   |
+| `build/bundle/bin/schedule` | the scheduler, when `bin/schedule.dart` exists   |
 | `build/bundle/lib/`         | native libraries from build hooks (eg. SQLite)   |
-| `build/bundle/db/`          | your migrations                                  |
+| `build/bundle/db/`          | your `db/` folder (migrations, seeders). SQLite database files are left out |
 | `build/bundle/.env.example` | copy it to `build/bundle/.env`, or use env variables |
 
 `dox build` runs `build_runner` (when your app uses it), then
-`dart build cli --target bin/server.dart --output build`. It exits with code 1
-when a step fails, so CI can stop.
+`dart build cli --target bin/server.dart --output build`. It builds
+`bin/queue.dart` and `bin/schedule.dart` the same way, when they exist.
+It exits with code 1 when a step fails, so CI can stop.
 
 !!! warning "Not `dart compile exe`"
     `dox_orm` depends on `sqlite3` v3. It bundles SQLite with a build hook.
@@ -52,7 +55,7 @@ So the database is up to date when the first request comes in.
 
 ## Docker
 
-A new Dox app has this multi-stage `Dockerfile`. The final image is `FROM scratch`: only the Dart AOT runtime, the bundle, `db/` and an empty `/tmp`.
+A new Dox app has this multi-stage `Dockerfile`. The final image is `FROM scratch`: only the Dart AOT runtime, the bundle, `db/`, `libgcc_s` and an empty `/tmp`.
 
 ```dockerfile
 FROM dart:stable AS build
@@ -63,10 +66,20 @@ COPY . .
 RUN dart pub get --offline
 RUN dart run build_runner build --delete-conflicting-outputs
 RUN dart build cli --target bin/server.dart --output build
+
+# the queue worker and the scheduler are binaries too
+RUN dart build cli --target bin/queue.dart --output build/queue \
+  && cp build/queue/bundle/bin/queue build/bundle/bin/ \
+  && dart build cli --target bin/schedule.dart --output build/schedule \
+  && cp build/schedule/bundle/bin/schedule build/bundle/bin/
+
 RUN mkdir -p /out/app/storage /out/tmp \
   && chmod 1777 /out/tmp \
   && cp -r build/bundle/. /out/app/ \
-  && cp -r db /out/app/db
+  && cp -r db /out/app/db \
+  # the native HTTP server (Rust) needs libgcc_s, which /runtime/ does not have
+  && LIBGCC=$(find / -name libgcc_s.so.1 -path '*lib*' | head -n 1) \
+  && mkdir -p /out$(dirname $LIBGCC) && cp $LIBGCC /out$LIBGCC
 
 FROM scratch
 COPY --from=build /runtime/ /
@@ -81,18 +94,30 @@ environment variables:
 
 ```bash
 docker build -t my-app .
-docker run -p 3000:3000 -e APP_PORT=3000 -e APP_KEY=... -e DB_HOST=... my-app
+docker run -p 3000:3000 --env-file .env -e DB_HOST=... my-app
 ```
 
-Or use `env_file: .env` in `docker-compose.yml`.
+A new app also has a `docker-compose.yml`. It runs the app and Postgres, and reads `.env` with `env_file: .env`:
+
+```bash
+docker compose up -d --build
+```
+
+A new `.env` uses SQLite. To use the Postgres of the compose file, set `DB_CONNECTION=postgres` and `DB_NAME` (for example `postgres`) in `.env`.
+
+The queue worker and the scheduler run as their own processes. In the image, start them with `/app/bin/queue work` and `/app/bin/schedule work`.
+See [Docker](../guides/docker.md) for a health check in the image.
 
 ## HTTPS: put a proxy in front
 
-Do not serve HTTPS from Dart. TLS in Dart's `HttpServer` is slow (a known
-Dart SDK issue). Dox has no `bindSecure`.
+Dox serves plain HTTP only. Its [native server](native-server.md) has no TLS.
 
 Run Dox on plain HTTP on a private port. Put [Caddy](https://caddyserver.com)
 or nginx in front of it. The proxy does TLS, HTTP/2 and gzip.
+
+By default Dox listens on all network interfaces. When the proxy runs on the
+same machine, set `APP_HOST=127.0.0.1`. Then the app port can not be reached
+from outside.
 
 ```mermaid
 flowchart LR
@@ -237,7 +262,7 @@ Keep it shorter than the time your platform waits before it kills the process:
 | Fly.io | 5 seconds | `kill_timeout` in `fly.toml` |
 | systemd | 90 seconds | `TimeoutStopSec` |
 
-In code, `await Dox().stop()` does steps 1 to 4 and does not exit.
+In code, `await Dox().stop()` does steps 1 to 5 and does not exit.
 
 ## Many processes or machines
 

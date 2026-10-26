@@ -4,7 +4,7 @@ icon: lucide/blocks
 
 # Providers
 
-A provider is a class that sets up one part of your app when it starts. For example the database, auth or a Redis connection.
+A provider is a class that sets up one part of your app when it starts, for example the database, auth or a Redis connection.
 
 A provider has two methods:
 
