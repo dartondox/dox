@@ -1,6 +1,6 @@
 name: dox_framework
 publish_to: 'none'
-version: 3.0.0-rc.1
+version: 3.0.0
 
 environment:
   sdk: ^3.13.0
@@ -9,12 +9,9 @@ environment:
 # and writes one pubspec.lock.
 workspace:
   - packages/dox-annotation
-  - packages/dox-auth
   - packages/dox-builder
   - packages/dox-cache
   - packages/dox-core
-  - packages/dox-openapi
-  - packages/dox-validation
 
 dev_dependencies:
   melos: ^8.9.0

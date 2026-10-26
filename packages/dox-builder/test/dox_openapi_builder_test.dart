@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
@@ -295,8 +296,11 @@ export 'src/openapi_annotation.dart';
       'dox_annotation|lib/src/dox_model.dart': _annotationFile(
         'dox_model.dart',
       ),
-      'dox_validation|lib/src/dto/dto_annotations.dart': File(
-        '../dox-validation/lib/src/dto/dto_annotations.dart',
+      'dox_validation|lib/src/dto/dto_annotations.dart': File.fromUri(
+        // dox_validation lives in its own repo: find it through the package config
+        Isolate.resolvePackageUriSync(
+          Uri.parse('package:dox_validation/src/dto/dto_annotations.dart'),
+        )!,
       ).readAsStringSync(),
       'dox_annotation|lib/src/openapi_annotation.dart': _annotationFile(
         'openapi_annotation.dart',

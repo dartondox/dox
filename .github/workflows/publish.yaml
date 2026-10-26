@@ -1,6 +1,6 @@
 name: Release
 
-# Push a tag like v3.0.0-alpha.1 to publish all packages to pub.dev.
+# Push a tag like v<version> to publish all packages to pub.dev.
 # Run it by hand (workflow_dispatch) to do a dry run only. Nothing is published then.
 # Tests are not run here. The Test workflow runs on every push, so wait for it
 # to be green on the release commit before you push the tag.

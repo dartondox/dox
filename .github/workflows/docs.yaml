@@ -78,7 +78,7 @@ jobs:
         if: github.event_name == 'push' || inputs.version == '3.x'
         run: |
           mkdocs build --strict
-          mike deploy --update-aliases --alias-type copy --title "3.x (alpha)" 3.x latest
+          mike deploy --update-aliases --alias-type copy --title "3.x" 3.x latest
 
       - name: Deploy 2.x
         if: github.event_name == 'workflow_dispatch' && inputs.version == '2.x'

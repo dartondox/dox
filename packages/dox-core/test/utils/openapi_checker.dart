@@ -1,3 +1,6 @@
+// A copy of test/support/openapi_checker.dart in dartondox/dox-openapi.
+// ponytail: copied, not shared. Move it to a dox_openapi testing library if
+// the two copies start to differ.
 import 'package:dox_openapi/dox_openapi.dart';
 
 /// Structural checks for an OpenAPI 3.1 document.

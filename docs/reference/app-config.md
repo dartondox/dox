@@ -152,7 +152,7 @@ Source: `packages/dox-core/lib/openapi/openapi_config.dart`.
 | `include` | `List<String>` | `[]` (all routes) | Only routes with these paths are in the docs, like `['/api/*']`. A `*` at the end matches the rest of the path. |
 | `exclude` | `List<String>` | `[]` | Routes with these paths are left out. Checked after `include`. |
 
-`ScalarOptions` (`packages/dox-openapi/lib/src/docs_ui.dart`):
+`ScalarOptions` (`lib/src/docs_ui.dart` in [dartondox/dox-openapi](https://github.com/dartondox/dox-openapi)):
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
@@ -244,7 +244,7 @@ The `database.dart` of a new project also sets `maxConnectionAge` for Postgres a
 ## AuthConfig
 
 Auth is not a field of `AppConfig`. A provider calls `Auth.initialize(AuthConfig(...))` in its `setup()`.
-Source: `packages/dox-auth/lib/src/interfaces.dart`.
+Source: `lib/src/interfaces.dart` in [dartondox/dox-auth](https://github.com/dartondox/dox-auth).
 
 | Class | Field | Type | Default | Meaning |
 | --- | --- | --- | --- | --- |

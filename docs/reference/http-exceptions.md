@@ -43,7 +43,7 @@ Every class takes the named parameters `message`, `errorCode` and `code`. The ta
 | `InternalErrorException` | `dox_core` | `500` | `server_error` | `Server Error` | never by itself; for your own use |
 | `QueryException` | `dox_core` | `500` | `sql_query_error` | `Error in sql query` | never by itself; for your own use |
 
-Source files: `packages/dox-core/lib/exception/*.dart` and `packages/dox-auth/lib/src/auth_exception.dart`.
+Source files: `packages/dox-core/lib/exception/*.dart` and `lib/src/auth_exception.dart` in [dartondox/dox-auth](https://github.com/dartondox/dox-auth).
 
 ## What the client gets
 

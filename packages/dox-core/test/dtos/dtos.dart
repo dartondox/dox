@@ -1,7 +1,6 @@
 import 'package:dox_core/dox_core.dart';
 
 import 'custom.dto.dart';
-import 'database.dto.dart';
 import 'files.dto.dart';
 import 'nested.dto.dart';
 import 'rules.dto.dart';
@@ -28,6 +27,4 @@ const List<DtoSchema<Object>> testDtos = <DtoSchema<Object>>[
   $AsyncCheckDto,
   $CreatePostDto,
   $UploadAvatarDto,
-  $CreateMemberDto,
-  $UpdateMemberDto,
 ];

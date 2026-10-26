@@ -3,9 +3,11 @@
 # packages of this commit. It catches a change that breaks apps, the
 # template, dox_queue or dox_scheduler before it is merged.
 #
-# Steps: `dox create` (the CLI from ../dox-cli), override all Dox packages
-# with this repo (and with ../dox-orm, ../dox-socketio, ../dox-storage,
-# ../dox-queue, ../dox-scheduler when they are there, see
+# Steps: `dox create` (the CLI from ../dox-cli, on the same local packages),
+# override all Dox packages
+# with this repo (and with ../dox-orm, ../dox-auth, ../dox-openapi,
+# ../dox-validation, ../dox-socketio, ../dox-storage, ../dox-queue,
+# ../dox-scheduler when they are there, see
 # ci/clone-siblings.sh),
 # build_runner, analyze, the template tests, migrate, `dox build`, then
 # start the AOT server and call its routes.
@@ -15,9 +17,30 @@
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 
+# Prints a pubspec_overrides.yaml that points every Dox package to this
+# repo and the clones next to it.
+overrides() {
+  echo "# the Dox packages of this commit, not the ones on pub.dev"
+  echo "dependency_overrides:"
+  for dir in "$root"/packages/*/ "$root"/../dox-orm/packages/*/ \
+    "$root"/../dox-auth/ "$root"/../dox-openapi/ "$root"/../dox-validation/ \
+    "$root"/../dox-socketio/ "$root"/../dox-storage/ \
+    "$root"/../dox-queue/ "$root"/../dox-scheduler/; do
+    [ -f "$dir/pubspec.yaml" ] || continue
+    name=$(sed -nE 's/^name:[[:space:]]*([a-z0-9_]+).*/\1/p' "$dir/pubspec.yaml")
+    printf '  %s:\n    path: %s\n' "$name" "${dir%/}"
+  done
+}
+
 # The CLI lives in its own repo. ci/clone-siblings.sh clones it.
-[ -f "$root/../dox-cli/pubspec.yaml" ] || { echo "::error::no ../dox-cli, run ci/clone-siblings.sh"; exit 1; }
-dart pub global activate --source path "$root/../dox-cli" >/dev/null
+# It uses the local packages too: in a release, the new versions are not
+# on pub.dev yet. A local pubspec_overrides.yaml of your own is kept.
+cli="$root/../dox-cli"
+[ -f "$cli/pubspec.yaml" ] || { echo "::error::no ../dox-cli, run ci/clone-siblings.sh"; exit 1; }
+if [ -n "${CI:-}" ] || [ ! -f "$cli/pubspec_overrides.yaml" ]; then
+  overrides > "$cli/pubspec_overrides.yaml"
+fi
+dart pub global activate --source path "$cli" >/dev/null
 export PATH="$PATH:$HOME/.pub-cache/bin"
 
 work=$(mktemp -d)
@@ -30,17 +53,7 @@ cd smoke_app
 port=39123
 sed -i.bak "s/^APP_PORT=.*/APP_PORT=$port/" .env && rm .env.bak
 
-{
-  echo "# the Dox packages of this commit, not the ones on pub.dev"
-  echo "dependency_overrides:"
-  for dir in "$root"/packages/*/ "$root"/../dox-orm/packages/*/ \
-    "$root"/../dox-socketio/ "$root"/../dox-storage/ \
-    "$root"/../dox-queue/ "$root"/../dox-scheduler/; do
-    [ -f "$dir/pubspec.yaml" ] || continue
-    name=$(sed -nE 's/^name:[[:space:]]*([a-z0-9_]+).*/\1/p' "$dir/pubspec.yaml")
-    printf '  %s:\n    path: %s\n' "$name" "${dir%/}"
-  done
-} > pubspec_overrides.yaml
+overrides > pubspec_overrides.yaml
 
 dart pub get
 dart run build_runner build --delete-conflicting-outputs
