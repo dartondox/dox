@@ -21,7 +21,7 @@ Then raise its constraint (like `dox_http_native: ^3.0.0-alpha.7`) in the Dox pa
 
 These packages are not released from this repo either:
 
-- `dox_orm`, `dox_migration` and `dox_query_builder`: [dartondox/dox-orm](https://github.com/dartondox/dox-orm). The three share one version.
+- `dox_orm` and `dox_migration`: [dartondox/dox-orm](https://github.com/dartondox/dox-orm). The two share one version.
 - `dox_socketio`: [dartondox/dox-socketio](https://github.com/dartondox/dox-socketio)
 - `dox_storage`: [dartondox/dox-storage](https://github.com/dartondox/dox-storage)
 - `dox_queue`: [dartondox/dox-queue](https://github.com/dartondox/dox-queue)

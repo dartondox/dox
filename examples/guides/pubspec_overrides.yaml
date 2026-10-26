@@ -19,8 +19,6 @@ dependency_overrides:
     path: ../../packages/dox-openapi
   dox_orm:
     path: ../../../dox-orm/packages/dox-orm
-  dox_query_builder:
-    path: ../../../dox-orm/packages/dox-query-builder
   dox_socketio:
     path: ../../../dox-socketio
   dox_storage:
