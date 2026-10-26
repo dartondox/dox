@@ -1,13 +1,13 @@
 # Dox documentation
 
-Source: https://dartondox.dev/latest/3.x
+Source: https://dartondox.dev/latest
 
 
 ---
 
 # Getting Started
 
-Source: https://dartondox.dev/latest/3.x
+Source: https://dartondox.dev/latest
 
 <div class="dox-hero" markdown>
 
@@ -219,7 +219,7 @@ at a time.
 
 # Installation
 
-Source: https://dartondox.dev/latest/3.xgetting-started/installation/
+Source: https://dartondox.dev/latestgetting-started/installation/
 
 # Installation
 
@@ -356,7 +356,7 @@ dox build_runner:build   # runs once
 
 # Build a blog API
 
-Source: https://dartondox.dev/latest/3.xtutorial/
+Source: https://dartondox.dev/latesttutorial/
 
 # Build a blog API
 
@@ -448,7 +448,7 @@ Start with [step 1: create the project](01-create-project.md).
 
 # Step 1: Create the project
 
-Source: https://dartondox.dev/latest/3.xtutorial/01-create-project/
+Source: https://dartondox.dev/latesttutorial/01-create-project/
 
 # Step 1: Create the project
 
@@ -530,7 +530,7 @@ The route is in `lib/routes/api.dart`. The `ApiRouter` has the prefix `api`, so 
 
 # Step 2: Model and migration
 
-Source: https://dartondox.dev/latest/3.xtutorial/02-model-and-migration/
+Source: https://dartondox.dev/latesttutorial/02-model-and-migration/
 
 # Step 2: Model and migration
 
@@ -677,7 +677,7 @@ Now start the server again with `dox s`.
 
 # Step 3: Routes and controller
 
-Source: https://dartondox.dev/latest/3.xtutorial/03-routes-and-controller/
+Source: https://dartondox.dev/latesttutorial/03-routes-and-controller/
 
 # Step 3: Routes and controller
 
@@ -836,7 +836,7 @@ HTTP/1.1 404 Not Found
 
 # Step 4: Validation
 
-Source: https://dartondox.dev/latest/3.xtutorial/04-validation/
+Source: https://dartondox.dev/latesttutorial/04-validation/
 
 # Step 4: Validation
 
@@ -1019,7 +1019,7 @@ curl -X PUT http://localhost:3000/api/posts/1 \
 
 # Step 5: Login with dox_auth
 
-Source: https://dartondox.dev/latest/3.xtutorial/05-auth/
+Source: https://dartondox.dev/latesttutorial/05-auth/
 
 # Step 5: Login with dox_auth
 
@@ -1382,7 +1382,7 @@ No `password` in the answer, because it is in `hidden`.
 
 # Step 6: Test
 
-Source: https://dartondox.dev/latest/3.xtutorial/06-test/
+Source: https://dartondox.dev/latesttutorial/06-test/
 
 # Step 6: Test
 
@@ -1451,7 +1451,7 @@ dart test test/http_test.dart
 
 # Step 7: Build and deploy
 
-Source: https://dartondox.dev/latest/3.xtutorial/07-build-and-deploy/
+Source: https://dartondox.dev/latesttutorial/07-build-and-deploy/
 
 # Step 7: Build and deploy
 
@@ -1608,7 +1608,7 @@ docker run -p 3000:3000 \
 
 # How Dox works
 
-Source: https://dartondox.dev/latest/3.xconcepts/how-dox-works/
+Source: https://dartondox.dev/latestconcepts/how-dox-works/
 
 # How Dox works
 
@@ -1840,7 +1840,7 @@ The app makes `storage/` when it writes files (the local disk, the file cache, u
 
 # Coming from Laravel
 
-Source: https://dartondox.dev/latest/3.xconcepts/coming-from-laravel/
+Source: https://dartondox.dev/latestconcepts/coming-from-laravel/
 
 # Coming from Laravel
 
@@ -2265,7 +2265,7 @@ What is there, as separate packages: [validation](../packages/validation.md), [O
 
 # Dox and the other Dart backends
 
-Source: https://dartondox.dev/latest/3.xconcepts/dart-frameworks/
+Source: https://dartondox.dev/latestconcepts/dart-frameworks/
 
 # Dox and the other Dart backends
 
@@ -2345,7 +2345,7 @@ To compare, run the same test on your own machine, with each server on the same 
 
 # Status and roadmap
 
-Source: https://dartondox.dev/latest/3.xconcepts/status-and-roadmap/
+Source: https://dartondox.dev/latestconcepts/status-and-roadmap/
 
 # Status and roadmap
 
@@ -2428,7 +2428,7 @@ The package CHANGELOGs have an `Unreleased` section when changes wait for the ne
 
 # Contribute
 
-Source: https://dartondox.dev/latest/3.xcommunity/contribute/
+Source: https://dartondox.dev/latestcommunity/contribute/
 
 # Contribute
 
@@ -2668,7 +2668,7 @@ branch, and add `3.x` to the workflow input, so 3.x can still be fixed.
 
 # Meet Doxie
 
-Source: https://dartondox.dev/latest/3.xcommunity/mascot/
+Source: https://dartondox.dev/latestcommunity/mascot/
 
 # Meet Doxie
 
@@ -2712,7 +2712,7 @@ Please do not change Doxie's colors, and do not use Doxie to brand another produ
 
 # Routing
 
-Source: https://dartondox.dev/latest/3.xthe-basic/routing/
+Source: https://dartondox.dev/latestthe-basic/routing/
 
 # Routing
 
@@ -3013,7 +3013,7 @@ Route.post('/posts', (PostController c) => c.store, body: v.object(<String, Sche
 
 # Request
 
-Source: https://dartondox.dev/latest/3.xthe-basic/request/
+Source: https://dartondox.dev/latestthe-basic/request/
 
 # Request
 
@@ -3188,7 +3188,7 @@ Set `trustedProxies` in `AppConfig` to fix it. See [Deployment](../digging-deepe
 
 # Response
 
-Source: https://dartondox.dev/latest/3.xthe-basic/response/
+Source: https://dartondox.dev/latestthe-basic/response/
 
 # Response
 
@@ -3395,7 +3395,7 @@ AppConfig appConfig = AppConfig(
 
 # Views
 
-Source: https://dartondox.dev/latest/3.xthe-basic/views/
+Source: https://dartondox.dev/latestthe-basic/views/
 
 # Views
 
@@ -3711,7 +3711,7 @@ Prettier formats `.html` files, and it does not know the `@` tags. Add this line
 
 # Inertia
 
-Source: https://dartondox.dev/latest/3.xthe-basic/inertia/
+Source: https://dartondox.dev/latestthe-basic/inertia/
 
 # Inertia
 
@@ -4076,7 +4076,7 @@ Inertia needs [sessions](session.md) for the errors, flash data and redirects. T
 
 # Serializer
 
-Source: https://dartondox.dev/latest/3.xthe-basic/serializer/
+Source: https://dartondox.dev/latestthe-basic/serializer/
 
 # Serializer
 
@@ -4312,7 +4312,7 @@ Future<SalesReportSerializer> remote(DoxRequest req) async {
 
 # Error handling
 
-Source: https://dartondox.dev/latest/3.xthe-basic/errors/
+Source: https://dartondox.dev/latestthe-basic/errors/
 
 # Error handling
 
@@ -4414,7 +4414,7 @@ See [Custom errors](../guides/custom-errors.md) for a full example with your own
 
 # Controller
 
-Source: https://dartondox.dev/latest/3.xthe-basic/controller/
+Source: https://dartondox.dev/latestthe-basic/controller/
 
 # Controller
 
@@ -4569,7 +4569,7 @@ Return a `String`, a `Map`, a model, a `File` and more. See [Response](response.
 
 # Dependency injection
 
-Source: https://dartondox.dev/latest/3.xthe-basic/dependency-injection/
+Source: https://dartondox.dev/latestthe-basic/dependency-injection/
 
 # Dependency injection
 
@@ -4854,7 +4854,7 @@ The build stops with a clear message when:
 
 # Middleware
 
-Source: https://dartondox.dev/latest/3.xthe-basic/middleware/
+Source: https://dartondox.dev/latestthe-basic/middleware/
 
 # Middleware
 
@@ -5048,7 +5048,7 @@ flowchart LR
 
 # Session
 
-Source: https://dartondox.dev/latest/3.xthe-basic/session/
+Source: https://dartondox.dev/latestthe-basic/session/
 
 # Session
 
@@ -5242,7 +5242,7 @@ See [Testing: keep a session](../digging-deeper/testing.md#keep-a-session-cookie
 
 # Validation
 
-Source: https://dartondox.dev/latest/3.xthe-basic/validation/
+Source: https://dartondox.dev/latestthe-basic/validation/
 
 # Validation
 
@@ -5648,7 +5648,7 @@ expect(result.errors['email'], 'The email is not a valid email');
 
 # Validation rules
 
-Source: https://dartondox.dev/latest/3.xthe-basic/validation-rules/
+Source: https://dartondox.dev/latestthe-basic/validation-rules/
 
 # Validation rules
 
@@ -5875,7 +5875,7 @@ The build stops with a clear error when:
 
 # Cache
 
-Source: https://dartondox.dev/latest/3.xdigging-deeper/cache/
+Source: https://dartondox.dev/latestdigging-deeper/cache/
 
 # Cache
 
@@ -6054,7 +6054,7 @@ To use a memory store in tests, see [Testing](testing.md#test-the-cache).
 
 # Queue
 
-Source: https://dartondox.dev/latest/3.xdigging-deeper/queue/
+Source: https://dartondox.dev/latestdigging-deeper/queue/
 
 # Queue
 
@@ -6549,7 +6549,7 @@ Future<void> main() async {
 
 # Mail
 
-Source: https://dartondox.dev/latest/3.xdigging-deeper/mail/
+Source: https://dartondox.dev/latestdigging-deeper/mail/
 
 # Mail
 
@@ -7001,7 +7001,7 @@ For a provider that takes raw MIME, `MimeBuilder().build(message)` gives the MIM
 
 # Scheduler
 
-Source: https://dartondox.dev/latest/3.xdigging-deeper/scheduler/
+Source: https://dartondox.dev/latestdigging-deeper/scheduler/
 
 # Scheduler
 
@@ -7390,7 +7390,7 @@ test('cleanup runs at 02:00', () async {
 
 # File Storage
 
-Source: https://dartondox.dev/latest/3.xdigging-deeper/file-storage/
+Source: https://dartondox.dev/latestdigging-deeper/file-storage/
 
 # File Storage
 
@@ -7559,7 +7559,7 @@ await Storage().disk('dropbox').put('notes', bytes, extension: 'txt');
 
 # Environment Variables
 
-Source: https://dartondox.dev/latest/3.xdigging-deeper/env/
+Source: https://dartondox.dev/latestdigging-deeper/env/
 
 # Environment Variables
 
@@ -7727,7 +7727,7 @@ A missing or empty key gives the default. With no default:
 
 # Isolate
 
-Source: https://dartondox.dev/latest/3.xdigging-deeper/isolate/
+Source: https://dartondox.dev/latestdigging-deeper/isolate/
 
 # Isolate
 
@@ -7816,7 +7816,7 @@ Because the config and providers are copied, they must not hold open sockets or 
 
 # Providers
 
-Source: https://dartondox.dev/latest/3.xdigging-deeper/providers/
+Source: https://dartondox.dev/latestdigging-deeper/providers/
 
 # Providers
 
@@ -7955,7 +7955,7 @@ An error in `shutdown()` goes to the `report` method of the [exception handler](
 
 # Dox CLI
 
-Source: https://dartondox.dev/latest/3.xdigging-deeper/dox-cli/
+Source: https://dartondox.dev/latestdigging-deeper/dox-cli/
 
 # Dox CLI
 
@@ -8129,7 +8129,7 @@ To pick the version yourself, run the install command again.
 
 # Deployment
 
-Source: https://dartondox.dev/latest/3.xdigging-deeper/deployment/
+Source: https://dartondox.dev/latestdigging-deeper/deployment/
 
 # Deployment
 
@@ -8415,7 +8415,7 @@ process has its own memory.
 
 # Native server
 
-Source: https://dartondox.dev/latest/3.xdigging-deeper/native-server/
+Source: https://dartondox.dev/latestdigging-deeper/native-server/
 
 # Native server
 
@@ -8592,7 +8592,7 @@ To use your local copy in the Dox repo, or to release the package, see
 
 # Performance
 
-Source: https://dartondox.dev/latest/3.xdigging-deeper/performance/
+Source: https://dartondox.dev/latestdigging-deeper/performance/
 
 # Performance
 
@@ -8879,7 +8879,7 @@ plain value (text, map, list) is sent without building a `DoxResponse`.
 
 # Testing
 
-Source: https://dartondox.dev/latest/3.xdigging-deeper/testing/
+Source: https://dartondox.dev/latestdigging-deeper/testing/
 
 # Testing
 
@@ -9168,7 +9168,7 @@ See [Testing with a database](../guides/testing-with-database.md) for a full exa
 
 # Health check
 
-Source: https://dartondox.dev/latest/3.xdigging-deeper/health-check/
+Source: https://dartondox.dev/latestdigging-deeper/health-check/
 
 # Health check
 
@@ -9264,7 +9264,7 @@ Route.health(
 
 # Database
 
-Source: https://dartondox.dev/latest/3.xdatabase/
+Source: https://dartondox.dev/latestdatabase/
 
 # Database
 
@@ -9587,7 +9587,7 @@ For a busy production app, use Postgres or MySQL.
 
 # Query Builder
 
-Source: https://dartondox.dev/latest/3.xdatabase/query-builder/
+Source: https://dartondox.dev/latestdatabase/query-builder/
 
 # Query Builder
 
@@ -10527,7 +10527,7 @@ The default throws an `UnsupportedError`.
 
 # Transactions
 
-Source: https://dartondox.dev/latest/3.xdatabase/transactions/
+Source: https://dartondox.dev/latestdatabase/transactions/
 
 # Transactions
 
@@ -10681,7 +10681,7 @@ It changes the value in one query, so it needs no lock.
 
 # Migration
 
-Source: https://dartondox.dev/latest/3.xdatabase/migration/
+Source: https://dartondox.dev/latestdatabase/migration/
 
 # Migration
 
@@ -10945,7 +10945,7 @@ Both kinds can live in `db/migration`. They run in file name order (the timestam
 
 # Factories
 
-Source: https://dartondox.dev/latest/3.xdatabase/factories/
+Source: https://dartondox.dev/latestdatabase/factories/
 
 # Factories
 
@@ -11137,7 +11137,7 @@ See [Testing with a database](../guides/testing-with-database.md).
 
 # Seeders
 
-Source: https://dartondox.dev/latest/3.xdatabase/seeders/
+Source: https://dartondox.dev/latestdatabase/seeders/
 
 # Seeders
 
@@ -11294,7 +11294,7 @@ await DatabaseSeeder().run();
 
 # Schema builder
 
-Source: https://dartondox.dev/latest/3.xdatabase/schema/
+Source: https://dartondox.dev/latestdatabase/schema/
 
 # Schema builder
 
@@ -11528,7 +11528,7 @@ On SQLite, the changes that need a table rebuild only run on a database.
 
 # Native Postgres driver
 
-Source: https://dartondox.dev/latest/3.xdatabase/postgres-native/
+Source: https://dartondox.dev/latestdatabase/postgres-native/
 
 # Native Postgres driver
 
@@ -11738,7 +11738,7 @@ try {
 
 # Native MySQL driver
 
-Source: https://dartondox.dev/latest/3.xdatabase/mysql-native/
+Source: https://dartondox.dev/latestdatabase/mysql-native/
 
 # Native MySQL driver
 
@@ -11896,7 +11896,7 @@ try {
 
 # Model
 
-Source: https://dartondox.dev/latest/3.xdatabase/model/
+Source: https://dartondox.dev/latestdatabase/model/
 
 # Model
 
@@ -12378,7 +12378,7 @@ erDiagram
 
 # Model events
 
-Source: https://dartondox.dev/latest/3.xdatabase/model/events/
+Source: https://dartondox.dev/latestdatabase/model/events/
 
 # Model events
 
@@ -12592,7 +12592,7 @@ A model with no hooks and no observers does no event work.
 
 # Query scopes
 
-Source: https://dartondox.dev/latest/3.xdatabase/model/scopes/
+Source: https://dartondox.dev/latestdatabase/model/scopes/
 
 # Query scopes
 
@@ -12692,7 +12692,7 @@ The name of a global scope is the method name.
 
 # Attribute casts
 
-Source: https://dartondox.dev/latest/3.xdatabase/model/casts/
+Source: https://dartondox.dev/latestdatabase/model/casts/
 
 # Attribute casts
 
@@ -12791,7 +12791,7 @@ A column with `beforeGet` does not use its cast.
 
 # Counting relations
 
-Source: https://dartondox.dev/latest/3.xdatabase/model/counting-relations/
+Source: https://dartondox.dev/latestdatabase/model/counting-relations/
 
 # Counting relations
 
@@ -12875,7 +12875,7 @@ See [Query by relations](relation-queries.md).
 
 # Query by relations
 
-Source: https://dartondox.dev/latest/3.xdatabase/model/relation-queries/
+Source: https://dartondox.dev/latestdatabase/model/relation-queries/
 
 # Query by relations
 
@@ -13039,7 +13039,7 @@ List<Category> books = await Category()
 
 # HasOne
 
-Source: https://dartondox.dev/latest/3.xdatabase/model/relationship/has-one/
+Source: https://dartondox.dev/latestdatabase/model/relationship/has-one/
 
 # HasOne
 
@@ -13209,7 +13209,7 @@ class User extends UserGenerator {
 
 # HasMany
 
-Source: https://dartondox.dev/latest/3.xdatabase/model/relationship/has-many/
+Source: https://dartondox.dev/latestdatabase/model/relationship/has-many/
 
 # HasMany
 
@@ -13391,7 +13391,7 @@ class User extends UserGenerator {
 
 # BelongsTo
 
-Source: https://dartondox.dev/latest/3.xdatabase/model/relationship/belongs-to/
+Source: https://dartondox.dev/latestdatabase/model/relationship/belongs-to/
 
 # BelongsTo
 
@@ -13572,7 +13572,7 @@ class Comment extends CommentGenerator {
 
 # ManyToMany
 
-Source: https://dartondox.dev/latest/3.xdatabase/model/relationship/many-to-many/
+Source: https://dartondox.dev/latestdatabase/model/relationship/many-to-many/
 
 # ManyToMany
 
@@ -13787,7 +13787,7 @@ class Artist extends ArtistGenerator {
 
 # Authentication
 
-Source: https://dartondox.dev/latest/3.xsecurity/authentication/
+Source: https://dartondox.dev/latestsecurity/authentication/
 
 # Authentication
 
@@ -14144,7 +14144,7 @@ Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), (PageCon
 
 # CORS
 
-Source: https://dartondox.dev/latest/3.xsecurity/cors/
+Source: https://dartondox.dev/latestsecurity/cors/
 
 # CORS
 
@@ -14251,7 +14251,7 @@ Route.disabledCors(() {
 
 # CSRF protection
 
-Source: https://dartondox.dev/latest/3.xsecurity/csrf/
+Source: https://dartondox.dev/latestsecurity/csrf/
 
 # CSRF protection
 
@@ -14345,7 +14345,7 @@ Only skip paths that do not use the session login. A webhook should check its ow
 
 # Encryption
 
-Source: https://dartondox.dev/latest/3.xsecurity/encryption/
+Source: https://dartondox.dev/latestsecurity/encryption/
 
 # Encryption
 
@@ -14430,7 +14430,7 @@ To store passwords, do not encrypt them. Hash them. See [Hashing](hashing.md).
 
 # Hashing
 
-Source: https://dartondox.dev/latest/3.xsecurity/hashing/
+Source: https://dartondox.dev/latestsecurity/hashing/
 
 # Hashing
 
@@ -14524,7 +14524,7 @@ See [Authentication](authentication.md).
 
 # Rate limiting
 
-Source: https://dartondox.dev/latest/3.xsecurity/rate-limiting/
+Source: https://dartondox.dev/latestsecurity/rate-limiting/
 
 # Rate limiting
 
@@ -14642,7 +14642,7 @@ That is fine for most apps. For a hard limit, use a smaller window.
 
 # Security headers
 
-Source: https://dartondox.dev/latest/3.xsecurity/security-headers/
+Source: https://dartondox.dev/latestsecurity/security-headers/
 
 # Security headers
 
@@ -14736,7 +14736,7 @@ Without it, Dox never sends HSTS. See [App config](../reference/app-config.md).
 
 # Validation
 
-Source: https://dartondox.dev/latest/3.xpackages/validation/
+Source: https://dartondox.dev/latestpackages/validation/
 
 # Validation
 
@@ -15014,7 +15014,7 @@ Code that only needs to validate can accept any `StandardSchema`, from Dox or fr
 
 # OpenAPI
 
-Source: https://dartondox.dev/latest/3.xpackages/openapi/
+Source: https://dartondox.dev/latestpackages/openapi/
 
 # OpenAPI
 
@@ -15397,7 +15397,7 @@ Paths can use `{id}` or `:id`. Both become `{id}`.
 
 # Storage
 
-Source: https://dartondox.dev/latest/3.xpackages/storage/
+Source: https://dartondox.dev/latestpackages/storage/
 
 # Storage
 
@@ -15698,7 +15698,7 @@ await drive.use('dropbox').put('a.txt', 'hello');
 
 # Cache
 
-Source: https://dartondox.dev/latest/3.xpackages/cache/
+Source: https://dartondox.dev/latestpackages/cache/
 
 # Cache
 
@@ -15923,7 +15923,7 @@ In a Dox app you do not call it. Dox closes `Cache()` stores on shutdown, in eve
 
 # Socket.IO
 
-Source: https://dartondox.dev/latest/3.xpackages/socketio/
+Source: https://dartondox.dev/latestpackages/socketio/
 
 # Socket.IO
 
@@ -16321,7 +16321,7 @@ emitter.of('/chat').emit('notice', 'for everyone in /chat');
 
 # Guides
 
-Source: https://dartondox.dev/latest/3.xguides/
+Source: https://dartondox.dev/latestguides/
 
 # Guides
 
@@ -16360,7 +16360,7 @@ CI builds both and runs their tests on every push, so the code on these pages ke
 
 # File upload
 
-Source: https://dartondox.dev/latest/3.xguides/file-upload/
+Source: https://dartondox.dev/latestguides/file-upload/
 
 # File upload
 
@@ -16568,7 +16568,7 @@ Set the same limit in your proxy (`client_max_body_size` in nginx).
 
 # Pagination
 
-Source: https://dartondox.dev/latest/3.xguides/pagination/
+Source: https://dartondox.dev/latestguides/pagination/
 
 # Pagination
 
@@ -16727,7 +16727,7 @@ Future<Map<String, dynamic>> index(ListUsers query) async {
 
 # JWT authentication
 
-Source: https://dartondox.dev/latest/3.xguides/jwt-auth/
+Source: https://dartondox.dev/latestguides/jwt-auth/
 
 # JWT authentication
 
@@ -17027,7 +17027,7 @@ For a real "log out everywhere" button, add a `token_version` column to `users`,
 
 # Custom errors
 
-Source: https://dartondox.dev/latest/3.xguides/custom-errors/
+Source: https://dartondox.dev/latestguides/custom-errors/
 
 # Custom errors
 
@@ -17253,7 +17253,7 @@ Remove the `/boom` route when you are done.
 
 # Background work
 
-Source: https://dartondox.dev/latest/3.xguides/background-work/
+Source: https://dartondox.dev/latestguides/background-work/
 
 # Background work
 
@@ -17507,7 +17507,7 @@ curl http://localhost:3000/api/primes/100000
 
 # Static files and SPA
 
-Source: https://dartondox.dev/latest/3.xguides/static-files/
+Source: https://dartondox.dev/latestguides/static-files/
 
 # Static files and SPA
 
@@ -17673,7 +17673,7 @@ For a big site, serve `public` from the proxy or a CDN, and keep Dox for the API
 
 # CORS for a browser front-end
 
-Source: https://dartondox.dev/latest/3.xguides/cors-for-spa/
+Source: https://dartondox.dev/latestguides/cors-for-spa/
 
 # CORS for a browser front-end
 
@@ -17811,7 +17811,7 @@ Route.disabledCors(() {
 
 # Environments
 
-Source: https://dartondox.dev/latest/3.xguides/environments/
+Source: https://dartondox.dev/latestguides/environments/
 
 # Environments
 
@@ -18070,7 +18070,7 @@ The app listens on `4000`. `env.appEnv` is `'staging'`, and `env.isDevelopment` 
 
 # Testing with a database
 
-Source: https://dartondox.dev/latest/3.xguides/testing-with-database/
+Source: https://dartondox.dev/latestguides/testing-with-database/
 
 # Testing with a database
 
@@ -18316,7 +18316,7 @@ See [Testing: test HTTP routes](../digging-deeper/testing.md#test-http-routes) f
 
 # Share code with Flutter
 
-Source: https://dartondox.dev/latest/3.xguides/share-code-with-flutter/
+Source: https://dartondox.dev/latestguides/share-code-with-flutter/
 
 # Share code with Flutter
 
@@ -18581,7 +18581,7 @@ See [Validation](../the-basic/validation.md) and [dox_validation](../packages/va
 
 # API docs with OpenAPI
 
-Source: https://dartondox.dev/latest/3.xguides/api-docs-with-openapi/
+Source: https://dartondox.dev/latestguides/api-docs-with-openapi/
 
 # API docs with OpenAPI
 
@@ -18880,7 +18880,7 @@ Open `http://localhost:3000/docs`, find "Create a post" under "Posts", and send 
 
 # Docker
 
-Source: https://dartondox.dev/latest/3.xguides/docker/
+Source: https://dartondox.dev/latestguides/docker/
 
 # Docker
 
@@ -19122,7 +19122,7 @@ See [Deployment: HTTPS](../digging-deeper/deployment.md#https-put-a-proxy-in-fro
 
 # Deploy to a Linux server
 
-Source: https://dartondox.dev/latest/3.xguides/deploy-vps/
+Source: https://dartondox.dev/latestguides/deploy-vps/
 
 # Deploy to a Linux server
 
@@ -19397,7 +19397,7 @@ To go back: copy `/opt/blog.prev` to `/opt/blog` and restart. A migration that a
 
 # Deploy to Fly.io
 
-Source: https://dartondox.dev/latest/3.xguides/deploy-fly/
+Source: https://dartondox.dev/latestguides/deploy-fly/
 
 # Deploy to Fly.io
 
@@ -19597,7 +19597,7 @@ fly deploy
 
 # Deploy to Google Cloud Run
 
-Source: https://dartondox.dev/latest/3.xguides/deploy-cloud-run/
+Source: https://dartondox.dev/latestguides/deploy-cloud-run/
 
 # Deploy to Google Cloud Run
 
@@ -19762,7 +19762,7 @@ gcloud run deploy blog --source . --region europe-west1
 
 # Reference
 
-Source: https://dartondox.dev/latest/3.xreference/
+Source: https://dartondox.dev/latestreference/
 
 # Reference
 
@@ -19786,7 +19786,7 @@ Short lookup pages, with values taken from the Dox source code.
 
 # Cheat sheet
 
-Source: https://dartondox.dev/latest/3.xreference/cheat-sheet/
+Source: https://dartondox.dev/latestreference/cheat-sheet/
 
 # Cheat sheet
 
@@ -20324,7 +20324,7 @@ See [Testing](../digging-deeper/testing.md).
 
 # App config
 
-Source: https://dartondox.dev/latest/3.xreference/app-config/
+Source: https://dartondox.dev/latestreference/app-config/
 
 # App config
 
@@ -20750,7 +20750,7 @@ A new project has no `openapi.dart`, `socketio.dart` or auth provider. You add t
 
 # CLI
 
-Source: https://dartondox.dev/latest/3.xreference/cli/
+Source: https://dartondox.dev/latestreference/cli/
 
 # CLI
 
@@ -21227,7 +21227,7 @@ See [Scheduler](../digging-deeper/scheduler.md) for the task methods. See [Queue
 
 # Environment variables
 
-Source: https://dartondox.dev/latest/3.xreference/env/
+Source: https://dartondox.dev/latestreference/env/
 
 # Environment variables
 
@@ -21326,7 +21326,7 @@ DB_PASSWORD=postgres
 
 # Request and response
 
-Source: https://dartondox.dev/latest/3.xreference/request-and-response/
+Source: https://dartondox.dev/latestreference/request-and-response/
 
 # Request and response
 
@@ -21453,7 +21453,7 @@ A plain value returned from a controller (not a `DoxResponse`) is sent the same 
 
 # HTTP exceptions
 
-Source: https://dartondox.dev/latest/3.xreference/http-exceptions/
+Source: https://dartondox.dev/latestreference/http-exceptions/
 
 # HTTP exceptions
 
@@ -21576,7 +21576,7 @@ More examples are on the [Response](../the-basic/response.md#errors) page.
 
 # Production checklist
 
-Source: https://dartondox.dev/latest/3.xreference/production-checklist/
+Source: https://dartondox.dev/latestreference/production-checklist/
 
 # Production checklist
 
@@ -21700,7 +21700,7 @@ example.com {
 
 # Troubleshooting
 
-Source: https://dartondox.dev/latest/3.xreference/troubleshooting/
+Source: https://dartondox.dev/latestreference/troubleshooting/
 
 # Troubleshooting
 
@@ -21910,7 +21910,7 @@ Short errors, like a bad route, a missing DTO or a bad env key, are in the [Erro
 
 # Error index
 
-Source: https://dartondox.dev/latest/3.xreference/errors/
+Source: https://dartondox.dev/latestreference/errors/
 
 # Error index
 
@@ -22185,7 +22185,7 @@ See [CLI](cli.md).
 
 # Changelog
 
-Source: https://dartondox.dev/latest/3.xreference/changelog/
+Source: https://dartondox.dev/latestreference/changelog/
 
 # Changelog
 
