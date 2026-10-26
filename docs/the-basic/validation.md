@@ -24,10 +24,18 @@ class CreateUser {
   @Email()
   final String email;
 
+  @MinLength(8)
+  final String password;
+
   @Min(18)
   final int? age; // nullable, so optional
 
-  const CreateUser({required this.name, required this.email, this.age});
+  const CreateUser({
+    required this.name,
+    required this.email,
+    required this.password,
+    this.age,
+  });
 
   static const DtoSchema<CreateUser> schema = $CreateUserDto;
 }
@@ -39,7 +47,8 @@ class UserController {
     // body is already checked
     User user = User()
       ..name = body.name
-      ..email = body.email;
+      ..email = body.email
+      ..password = Hash.make(body.password);
     await user.save();
     return user;
   }
@@ -243,6 +252,7 @@ void validate(DtoErrors errors) {
 ## Database rules: `@Unique` and `@Exists`
 
 These read the database, so they run last.
+They come from `dox_orm`. Add `import 'package:dox_orm/dox_orm.dart';` to the DTO file.
 
 ```dart
 @Unique('users', column: 'email')
@@ -367,7 +377,11 @@ See [Fluent schemas](../packages/validation.md#fluent-schemas-for-dynamic-input)
 A DTO is a normal Dart class. Make one directly to skip the checks:
 
 ```dart
-CreateUser input = const CreateUser(name: 'Ann', email: 'ann@dox.dev');
+CreateUser input = const CreateUser(
+  name: 'Ann',
+  email: 'ann@dox.dev',
+  password: 'secret123',
+);
 ```
 
 To test the checks, use `safeValidateMap`. It never throws:
@@ -376,6 +390,7 @@ To test the checks, use `safeValidateMap`. It never throws:
 ParseResult<CreateUser> result = await CreateUser.schema.safeValidateMap(<String, dynamic>{
   'name': 'A',
   'email': 'not-an-email',
+  'password': 'secret123',
 });
 
 expect(result.success, isFalse);
