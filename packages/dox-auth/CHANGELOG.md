@@ -1,3 +1,7 @@
+## 3.0.0-alpha.17
+
+- Uses dox_orm 3.0.0-alpha.12.
+
 ## 3.0.0-alpha.16
 
 - Version bump only, to match the other packages.

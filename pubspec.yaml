@@ -1,6 +1,6 @@
 name: dox_framework
 publish_to: 'none'
-version: 3.0.0-alpha.16
+version: 3.0.0-alpha.17
 
 environment:
   sdk: ^3.13.0
