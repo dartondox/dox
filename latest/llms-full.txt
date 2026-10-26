@@ -20994,6 +20994,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
+### 3.0.0-alpha.17
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.16
 
 - Version bump only, to match the other packages.
@@ -21069,6 +21073,10 @@ What changed in each package, newest first. This page is made from the
 - See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
 
 ## dox_auth
+
+### 3.0.0-alpha.17
+
+- Uses dox_orm 3.0.0-alpha.12.
 
 ### 3.0.0-alpha.16
 
@@ -21157,7 +21165,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_builder
 
-### Unreleased
+### 3.0.0-alpha.17
 
 - New: models get `setColumnValue(column, value)`. It sets a field by its column name, and returns false when the value is not of the field type. `model.increment()` and `model.decrement()` of dox_orm use it to set the field. The generated code needs the dox_orm that has `Model.setColumnValue()`. Run build_runner again after you update.
 
@@ -21253,6 +21261,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### 3.0.0-alpha.17
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.16
 
 - Change: uses ioredis `^3.0.0`, the first stable ioredis release.
@@ -21334,8 +21346,9 @@ What changed in each package, newest first. This page is made from the
 
 ## dox
 
-### Unreleased
+### 3.0.0-alpha.17
 
+- Uses dox_migration 3.0.0-alpha.12.
 - `dox make:controller -r`: the `destroy` stub shows how to give a 404 when `delete()` deletes 0 rows.
 
 ### 3.0.0-alpha.16
@@ -21431,6 +21444,10 @@ What changed in each package, newest first. This page is made from the
 - Generated models import `package:dox_orm/dox_orm.dart`.
 
 ## dox_core
+
+### 3.0.0-alpha.17
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.16
 
@@ -21640,6 +21657,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_openapi
 
+### 3.0.0-alpha.17
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0-alpha.16
 
 - Version bump only, to match the other packages.
@@ -21719,6 +21740,10 @@ What changed in each package, newest first. This page is made from the
 - Output as JSON and YAML, write files, serve `/openapi.json`, `/openapi.yaml` and `/docs`.
 
 ## dox_validation
+
+### 3.0.0-alpha.17
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0-alpha.16
 
