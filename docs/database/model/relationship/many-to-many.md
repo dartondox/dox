@@ -135,6 +135,22 @@ SELECT "song".*, "artist_song"."artist_id" as "_owner_id" FROM "song"
   WHERE "artist_song"."artist_id" IN (@artist_songartist_id_p0, ...)
 ```
 
+## Filter by it
+
+`whereHas()` keeps the artists that have a song.
+It checks the pivot table `artist_song` for you.
+It does not load the songs.
+
+```dart
+List<Artist> artists = await Artist().whereHas('songs', (QueryBuilder<dynamic> q) {
+  q.where('title', 'Yesterday');
+}).get();
+
+List<Artist> noSongs = await Artist().whereDoesntHave('songs').get();
+```
+
+See [Query by relations](../relation-queries.md).
+
 ## Options
 
 The examples are for `@ManyToMany(Song)` in the `Artist` model.

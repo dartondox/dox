@@ -143,24 +143,35 @@ See [Validation](../the-basic/validation.md).
 | `use SoftDeletes;` | `@DoxModel(softDelete: true)` |
 | `public $timestamps = false;` | `@DoxModel(timestamps: false)` |
 | `protected $hidden = ['password'];` | `List<String> get hidden => <String>['password'];` |
-| `protected $fillable = [...]` | not needed. Only `@Column()` fields are saved. |
+| `protected $fillable = [...]` | `List<String> get fillable => <String>[...];` |
 | `protected $casts = ['meta' => 'array'];` | the field type: `Map<String, dynamic>? meta;` |
 | mutator `setSlugAttribute()` | `@Column(beforeSave: makeSlug)` |
 | accessor `getStatusAttribute()` | `@Column(beforeGet: readStatus)` |
 | `$appends` with an accessor | `@Computed() String get fullName => ...;` |
 | `Blog::find(1)` | `await Blog().find(1)` |
+| `Blog::findOrFail(1)` | `await Blog().findOrFail(1)` (throws `ModelNotFoundException`) |
+| `->firstOrFail()` | `.firstOrFail()` |
 | `Blog::where('age', '>', 18)->get()` | `await Blog().where('age', '>', 18).get()` |
 | `Blog::create([...])` | `await Blog().create(<String, dynamic>{...})` |
+| `Blog::firstOrCreate([...], [...])` | `await Blog().firstOrCreate(<String, dynamic>{...}, <String, dynamic>{...})` |
+| `Blog::firstOrNew([...])` | `await Blog().firstOrNew(<String, dynamic>{...})` |
+| `Blog::updateOrCreate([...], [...])` | `await Blog().updateOrCreate(<String, dynamic>{...}, <String, dynamic>{...})` |
 | `$blog->save()` | `await blog.save()` |
-| `$blog->delete()` | `await blog.delete()` |
+| `$blog->delete()` | `await blog.delete()` (returns the deleted rows as an `int`) |
+| `$blog->increment('views')` | `await blog.increment('views')` |
 | `Blog::withTrashed()` | `Blog().withTrash()` |
 | `$blog->restore()` | `await blog.restore()` |
 | `Blog::with('posts')->get()` | `await Blog().preload('posts').get()` |
 | `$blog->load('posts')` | `await blog.$getRelation('posts')` |
 | `$user->posts()->where(...)->get()` | `user.related<Post>('posts')?.where(...).get()` |
+| `User::whereHas('posts', fn ($q) => ...)` | `User().whereHas('posts', (QueryBuilder<dynamic> q) { ... })` |
+| `orWhereHas`, `whereDoesntHave`, `orWhereDoesntHave` | the same names |
+| `User::has('posts', '>=', 3)` | `User().has('posts', '>=', 3)` |
+| `whereHas('posts.comments')` | `whereHas('posts.comments')` |
 | `$with = ['posts']` | `@HasMany(Post, eager: true)` |
 | `hasOne`, `hasMany`, `belongsTo`, `belongsToMany` | `@HasOne`, `@HasMany`, `@BelongsTo`, `@ManyToMany` |
-| local scope `scopeActive()` | `onQuery: onlyActive` on a relation, or a static method that returns a query |
+| local scope `scopeActive()` | a static method with `@Scope()`, then `Blog().active()` |
+| global scope | `@Scope(global: true)` |
 | `creating`, `saved`, `deleting` events | `onCreating()`, `onSaved()`, `onDeleting()` hooks in the model |
 | `Blog::observe(BlogObserver::class)` | `Model.observe<Blog>(BlogObserver())` |
 | `$blog->saveQuietly()` | `await blog.saveQuietly()` |
@@ -186,7 +197,8 @@ class Blog extends BlogGenerator {
 ```
 
 Every column field is nullable, because a new model has no values yet.
-Dox has no global scopes and no `$casts` list. Use the field type, `beforeSave` and `beforeGet`.
+Dox has no `$casts` list. Use the field type, a [cast](../database/model/casts.md), `beforeSave` or `beforeGet`.
+For scopes, see [Scopes](../database/model/scopes.md).
 See [Model](../database/model/index.md).
 
 ## Query builder
@@ -197,22 +209,44 @@ See [Model](../database/model/index.md).
 | `->where('a', 1)->orWhere('b', 2)` | `.where('a', 1).orWhere('b', 2)` |
 | `->whereIn('id', [1, 2])` | `.whereIn('id', <int>[1, 2])` |
 | `->whereNull('deleted_at')` | `.whereNull('deleted_at')` |
+| `->where(fn ($q) => $q->where(...)->orWhere(...))` | `.whereGroup((QueryBuilder<Blog> q) { q.where(...).orWhere(...); })` |
+| `->orWhere(fn ($q) => ...)` | `.orWhereGroup((QueryBuilder<Blog> q) { ... })` |
+| `->whereNot(fn ($q) => ...)` | `.whereNot((QueryBuilder<Blog> q) { ... })` |
+| `->whereBetween('age', [18, 60])` | `.whereBetween('age', <int>[18, 60])` |
+| `->whereColumn('a', '>', 'b')` | `.whereColumn('a', '>', 'b')` |
+| `->whereLike('name', '%a%')` | `.whereLike('name', '%a%')` |
+| `->whereExists(fn ($q) => $q->from('post')->...)` | `.whereExists('post', (QueryBuilder<Map<String, dynamic>> q) { ... })` |
+| `->when($cond, fn ($q) => ...)` | `.when(cond, (QueryBuilder<Blog> q) { ... })` |
 | `->whereRaw('lower(name) = ?', [$n])` | `.whereRaw('lower(name) = @n', <String, dynamic>{'n': n})` |
 | `->select('id', 'name')` | `.select(<String>['id', 'name'])` |
 | `->orderBy('name', 'desc')->limit(10)->offset(20)` | `.orderBy('name', 'desc').limit(10).offset(20)` |
+| `->latest()`, `->oldest()`, `->inRandomOrder()` | `.latest()`, `.oldest()`, `.inRandomOrder()` |
+| `->distinct()` | `.distinct()` |
+| `->having('a', '>', 1)`, `->havingRaw(...)` | `.having('a', '>', 1)`, `.havingRaw(...)` |
 | `->join('posts', 'posts.user_id', '=', 'users.id')` | `.join('posts', 'posts.user_id', 'users.id')` |
 | `->groupBy('age')` | `.groupBy('age')` on `QueryBuilder.table()` (returns maps) |
 | `->count()` | `await ....count()` |
+| `->sum('a')`, `->avg('a')`, `->min('a')`, `->max('a')` | `.sum('a')`, `.avg('a')`, `.min('a')`, `.max('a')` |
+| `->exists()`, `->doesntExist()` | `.hasRows()`, `.hasNoRows()` |
+| `->pluck('name')` | `.pluck('name')` |
+| `->pluck('name', 'id')` | `.pluckMap('name', 'id')` |
+| `->value('email')` | `.valueOf('email')` |
+| `->chunk(100, fn)`, `->chunkById(100, fn)` | `.chunk(100, (rows) { ... })`, `.chunkById(100, (rows) { ... })` |
 | `->paginate(10)` | `.paginate(currentPage: 1, perPage: 10)` |
 | `->insert([...])` | `.insertMultiple(<Map<String, dynamic>>[...])` |
-| `->update([...])` | `.update(<String, dynamic>{...})` |
-| `->delete()` | `.delete()` |
+| `->update([...])` | `.update(<String, dynamic>{...})` (returns the changed rows as an `int`) |
+| `->increment('views', 5)`, `->decrement(...)` | `.increment('views', 5)`, `.decrement(...)` |
+| `->upsert([...], ['email'], ['name'])` | `.upsert(<Map<String, dynamic>>[...], <String>['email'], <String>['name'])` |
+| `->delete()` | `.delete()` (returns the deleted rows as an `int`) |
+| `->lockForUpdate()`, `->sharedLock()` | `.lockForUpdate()`, `.sharedLock()` |
 | `DB::select('select ...', [$id])` | `QueryBuilder.query('select ... @id', substitutionValues: {'id': id})` |
 | `DB::transaction(fn)` | `QueryBuilder.transaction(() async { ... })` |
 | `->toSql()` | `.toSql()` |
 | `DB::connection('mysql')` | `.withConnection('mysql')` |
 
 Values are always bound parameters. Names you pass are quoted. Do not pass user input as a column name or an operator.
+
+`exists` and `value` are other names in Dox, because a model already has an `exists` getter, and `value` is a common column name.
 
 ## Migrations and schema
 

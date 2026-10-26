@@ -58,6 +58,7 @@ All hooks come in pairs: one runs before the query, one after it.
 | `save()` on a new model | `saving` → `creating` → *INSERT* → `created` → `saved` |
 | `save()` on a loaded model | `saving` → `updating` → *UPDATE* → `updated` → `saved` |
 | `create({...})` | the same as `save()` on a new model |
+| `firstOrCreate()`, `updateOrCreate()` | the same as `save()` when they create or update a row |
 | `delete()` | `deleting` → *DELETE or soft delete* → `deleted` |
 | `forceDelete()` | `forceDeleting` → `deleting` → *DELETE* → `deleted` → `forceDeleted` |
 | `restore()` | `restoring` → *UPDATE deleted_at = NULL* → `restored` |
@@ -67,8 +68,8 @@ All hooks come in pairs: one runs before the query, one after it.
 
 !!! warning "Query updates and deletes fire no events"
     Events fire only on one model instance.
-    `Post().where('draft', true).update({...})`, `Post().where(...).delete()`
-    and `insertMultiple()` run one query and fire no events.
+    `Post().where('draft', true).update({...})`, `Post().where(...).delete()`,
+    `insertMultiple()`, `upsert()`, `increment()` and `decrement()` run one query and fire no events.
 
 ## Examples
 
@@ -86,7 +87,8 @@ Future<void> onCreating() async {
 
 ### Stop an operation
 
-Throw `CancelModelEvent` in a before hook. The query does not run, and the call returns `false`.
+Throw `CancelModelEvent` in a before hook. The query does not run.
+`save()` and `restore()` return `false`. `delete()` and `forceDelete()` return `0`.
 
 ```dart title="lib/app/models/post/post.model.dart"
 @override
@@ -102,15 +104,16 @@ Future<Map<String, String>> destroy(DoxRequest req, int id) async {
   Post? post = await Post().find(id);
   if (post == null) throw NotFoundHttpException();
 
-  bool deleted = await post.delete();
-  if (!deleted) {
+  int deleted = await post.delete();
+  if (deleted == 0) {
     throw BadRequestException(message: 'Unpublish the post first');
   }
   return <String, String>{'message': 'deleted'};
 }
 ```
 
-- `save()`, `delete()`, `forceDelete()` and `restore()` return `false` when a hook cancels.
+- `save()` and `restore()` return `false` when a hook cancels.
+- `delete()` and `forceDelete()` return the number of deleted rows. It is `0` when a hook cancels.
 - `create({...})` returns the unsaved model. Its `id` is `null`.
 - Any other error from a hook is thrown to the caller.
 

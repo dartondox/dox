@@ -104,6 +104,24 @@ The load runs this SQL:
 SELECT *, "user_id" as "_owner_id" FROM "user_info" WHERE "user_id" IN (@user_id_p0)
 ```
 
+## Filter by it
+
+`whereHas()` keeps the users that have a `user_info` row.
+`whereDoesntHave()` keeps the users without one.
+It does not load the `UserInfo`.
+
+```dart
+List<User> users = await User().whereHas('userInfo').get();
+
+List<User> inParis = await User().whereHas('userInfo', (QueryBuilder<dynamic> q) {
+  q.where('address', 'Paris');
+}).get();
+
+List<User> noInfo = await User().whereDoesntHave('userInfo').get();
+```
+
+See [Query by relations](../relation-queries.md).
+
 ## Options
 
 | Option | Default | What it is |
