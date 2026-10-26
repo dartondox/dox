@@ -4,7 +4,7 @@ icon: lucide/bug
 
 # Troubleshooting
 
-Real problems, with the text you see, the cause and the fix.
+This page lists known problems, with the text you see, the cause and the fix.
 
 The texts come from the source code.
 
@@ -27,7 +27,7 @@ dox_http_native: sha256 of dox_http_native-<os>-<arch>.<ext> does not match
 dox_http_native: cargo build failed
 ```
 
-**Cause.** The build hook of `dox_http_native` (`hook/build.dart` in [its repo](https://github.com/dartondox/dox-http-native)) tries, in this order: the `lib_path` user define, a local `native/target/release` build, the GitHub release download, and `cargo build`. None worked. Common reasons:
+**Cause.** The build hook of `dox_http_native` (`hook/build.dart` in [its repo](https://github.com/dartondox/dox-http-native)) tries, in this order: the `lib_path` user define, a local `native/target/release` build, the GitHub release download, and `cargo build`. None of them worked. Common reasons:
 
 - No internet during `dart pub get`, or the release has no build for your OS and CPU (there are builds for macOS arm64 and x64, Linux x64 and arm64, Windows x64).
 - Rust is not installed, so the fallback `cargo build` can not run.
@@ -65,10 +65,10 @@ See [Native server](../digging-deeper/native-server.md), [Postgres native](../da
 **Symptom.** At start:
 
 ```
-SocketException: dox_http_native: bind failed (<code>), port = 3000
+SocketException: dox_http_native: bind failed (<code>) (OS Error: errno = <errno>), port = 3000
 ```
 
-`<code>` is `-1000` minus the OS error: `-1048` on macOS, `-1098` on Linux.
+`<errno>` is the OS error: `48` on macOS, `98` on Linux. `<code>` is `-1000` minus it: `-1048` on macOS, `-1098` on Linux.
 
 **Cause.** Another process listens on the port. Often it is an old `bin/server.dart` that `dox serve` did not stop, or a second copy of the app.
 
@@ -100,7 +100,7 @@ If that is not enough, delete the named `.g.dart` files and build again. New bui
 
 **Symptom.** The analyzer or the build says a name like `Uuid`, `Name`, `Range`, `Image` or `Schema` is an "ambiguous import".
 
-**Cause.** `dox_core` exports the validation rule names (`Uuid`, `Name`, `Range`, `Image`, ...). Another import has a class with the same name, like `package:uuid`. `dox_orm` also has a `Schema` class.
+**Cause.** `dox_core` exports the validation names of `dox_validation`: the rule annotations (`Uuid`, `Name`, `Range`, `Image`, ...) and the `Schema` class. Another import has a class with the same name, like `package:uuid`. `dox_orm` also has a `Schema` class.
 
 **Fix.** Hide the name you do not use in that file:
 
@@ -121,38 +121,26 @@ DB_PASSWORD="abc # 123"    -> abc # 123 (quotes keep the #)
 
 When a value must have ` #` in it (a space, then `#`), put the value in quotes. The quotes are removed.
 
-## `Hash.verify` throws on a bad hash
+## `Hash.make` throws on a long password
 
-**Symptom.**
-
-```
-Invalid argument(s) (salt): Invalid salt length (The length should be greater than or equal to 28): "..."
-```
-
-or
-
-```
-Invalid argument(s) (salt): Invalid salt version: "..."
-```
-
-or, when the password is long:
+**Symptom.** Saving a user, or registering, gives a `500`. The log shows:
 
 ```
 Invalid argument(s) (password): Password is too long (The length should be less than or equal to 72): "..."
 ```
 
-**Cause.** `Hash.verify(password, hash)` calls `BCrypt.checkpw` from the `bcrypt` package. It throws an `ArgumentError` when `hash` is not a bcrypt hash (it must start with `$2` and be at least 28 characters), for example when the column holds a plain password, an empty string or a hash from another algorithm. It also throws when the password is longer than 72 bytes.
+**Cause.** `Hash.make()` uses bcrypt from the `bcrypt` package. bcrypt throws an `ArgumentError` when the password is longer than 72 bytes.
 
-**Fix.**
+**Fix.** Refuse long passwords in your DTO, before you hash them:
 
-- Make sure every stored password went through `Hash.make()`. A plain password in the column is a bug in the code that saved it.
-- Check the hash before you compare it, and treat a bad one as a failed login:
+```dart
+@MaxLength(72)
+final String password;
+```
 
-    ```dart
-    bool ok = hash.startsWith(r'$2') && Hash.verify(password, hash);
-    ```
+`@MaxLength` counts characters, not bytes. A password with non-ASCII characters can still be over 72 bytes.
 
-- Refuse passwords longer than 72 bytes in your DTO, for example `@Length(max: 72)`.
+`Hash.verify(password, hash)` does not throw. It gives `false` when `hash` is not a valid bcrypt hash, for example a plain password or an empty string in the column. Make sure every stored password went through `Hash.make()`.
 
 For normal login use `Auth().attempt()` from `dox_auth`. See [Hashing](../security/hashing.md).
 
@@ -180,7 +168,7 @@ ALTER USER 'app'@'%' IDENTIFIED WITH mysql_native_password BY 'secret';
 
 **Symptom.** An `SqliteException` with `unable to open database file`, or an empty database after `dox build`.
 
-**Cause.** `database` is a file path. A relative path is relative to the folder you start the app from. `dox build` tells you to run `cd build/bundle && ./bin/server`, so `dox.sqlite` is then `build/bundle/dox.sqlite`. SQLite makes a missing file, but not a missing folder.
+**Cause.** `database` is a file path. A relative path is relative to the folder you start the app from. `dox build` tells you to run `cd build/bundle && ./bin/server`. So the default `DB_NAME=db/dox.sqlite` is then `build/bundle/db/dox.sqlite`. `dox build` does not copy your SQLite files into the bundle, so that database starts empty. SQLite makes a missing file, but not a missing folder.
 
 **Fix.**
 

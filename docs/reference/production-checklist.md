@@ -4,18 +4,18 @@ icon: lucide/clipboard-check
 
 # Production checklist
 
-Check each item before you deploy.
+This page lists what to check before you deploy a Dox app.
 
 Items marked **Dox limit** are things Dox does not do for you. You must handle them outside Dox.
 
 ## Secrets and config
 
-If `APP_ENV` is not set, Dox treats the app as production: `/docs` is off and error details are hidden. Set `APP_ENV=development` in your `.env` and in CI.
+If `APP_ENV` is empty or not set, Dox treats the app as production: `/docs` is off and error details are hidden. Set `APP_ENV=development` in your local `.env` and in CI.
 
 | Check | How | Read more |
 | --- | --- | --- |
 | `APP_KEY` is set, 32 characters and secret | `dox key:generate`, or a random value of exactly 32 characters in the real env. It signs JWT tokens and encrypts cookies. Never use the value from `.env.example`. | [Encryption](../security/encryption.md) |
-| `APP_ENV=production` | An empty `APP_KEY`, a key that is not exactly 32 characters, or an old sample key stops the app at start (`StateError`). Only `APP_ENV` `development`, `local` or `test` logs a warning instead. | [Env reference](env.md) |
+| `APP_ENV=production` | Set it, or leave it empty. In production, a bad `APP_KEY` stops the app at start with a `StateError`: an empty key, a key that is not exactly 32 characters, or a public sample key. Only with `APP_ENV` `development`, `local` or `test` does Dox log a warning instead. | [Env reference](env.md) |
 | The env is complete | Run `dox env:check` in CI or before the deploy. It exits with code 1 when a key is missing or bad. | [CLI](cli.md) |
 | No secrets in the image or in git | `.env` in `.dockerignore` and `.gitignore`. Pass values as env vars (`docker run -e`, `env_file:`, systemd `EnvironmentFile=`). `dox build` copies `.env.example` only. | [Docker](../guides/docker.md) |
 | No comments after values in `.env` | The app strips `# note`, but migrations keep it in the value. Put comments on their own line. | [Env reference](env.md) |
@@ -62,7 +62,7 @@ If `APP_ENV` is not set, Dox treats the app as production: `/docs` is off and er
 | Check | How | Read more |
 | --- | --- | --- |
 | Postgres or MySQL for a busy app | SQLite has one connection per isolate, and a query blocks the isolate. Use it for small apps only. With SQLite use an absolute file path, never `:memory:` with many isolates. | [Database](../database/index.md) |
-| Migrations run once per deploy | The new project runs `Migrator(migrations: migrations).migrate()` in `bin/server.dart` before `startServer()`. Or run `dart run bin/migrate.dart run` (or `dox migrate`) in CI. Do one, not both at the same time on many machines. | [Migration](../database/migration.md) |
+| Migrations run once per deploy | The new project runs `Migrator(...).migrate()` in `bin/server.dart` before `startServer()`. Or run `dox migrate` (same as `dart run bin/migrate.dart run`) once in CI. With many machines, run migrations in one place only, so two machines do not migrate at the same time. | [Migration](../database/migration.md) |
 | Migrations use the right database | `dox_migration` reads `.env` and the real env. A real env var wins, but a key that is only in an old `.env` is still used. Do not ship a `.env` next to the binary, or give `Migrator(config: ...)` your own config. | [Migration](../database/migration.md) |
 | Small MySQL migrations | MySQL saves `CREATE`, `ALTER` and `DROP` at once. A failed migration can leave half the changes. One table change per migration. | [Migration](../database/migration.md) |
 | Pool size fits the database | `extra: {'maxConnectionCount': 10}`. The Postgres and MySQL drivers share one pool per process, so the total is the pool size, not isolates x pool size. Keep it under the database `max_connections`. | [Database](../database/index.md) |
@@ -75,7 +75,7 @@ If `APP_ENV` is not set, Dox treats the app as production: `/docs` is off and er
 | --- | --- | --- |
 | JSON logs | `LoggerConfig(enabled: true, prettyPrint: false)`. The new project sets `prettyPrint` only when `APP_ENV=development`. | [App config](app-config.md) |
 | Log level | Set `LOG_LEVEL=warn` to print only warnings and errors. | [App config](app-config.md) |
-| Access logs in one place | `LogMiddleware` writes one line per request, every 20 ms. A hard kill can lose the last lines. Turn it off when the proxy already logs requests. | [Performance](../digging-deeper/performance.md) |
+| Access logs in one place | `LogMiddleware` writes one line per request. It writes them in batches, every 20 ms, so a hard kill can lose the last lines. The new project turns it off when `APP_ENV=production`, because the proxy already logs requests. | [Performance](../digging-deeper/performance.md) |
 | Errors go to your tracker | Extend `ExceptionHandler` and set `AppConfig.exceptionHandler`. Any non-HTTP error is passed to its `report` method. The client gets `500` with `server_error`. The error text is sent only when `APP_ENV` is `development` or `local`. | [Error handling](../the-basic/errors.md) |
 
 ## Health and shutdown

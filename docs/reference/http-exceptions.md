@@ -28,15 +28,18 @@ abstract class IHttpException {
 ## The classes
 
 Every class takes the named parameters `message`, `errorCode` and `code`. The table shows the defaults.
+`message` is a `String`. Only `ValidationException` takes a `Map` too.
 
 | Class | Package | Status `code` | `errorCode` | Default `message` | Dox throws it when |
 | --- | --- | --- | --- | --- | --- |
 | `BadRequestException` | `dox_core` | `400` | `bad_request` | `Bad Request` | the body can not be read, like JSON that is not valid |
 | `UnAuthorizedException` | `dox_auth` | `401` | `unauthorized` | `Authentication failed` | `AuthMiddleware` finds no valid token |
-| `NotFoundHttpException` | `dox_core` | `404` | `not_found` | `Not Found` | a typed path param does not fit (`{id}` is not an `int`) |
+| `NotFoundHttpException` | `dox_core` | `404` | `not_found` | `Not Found` | no route fits the path, a typed path param does not fit (`{id}` is not an `int`), or a route model binding finds no row |
 | `PayloadTooLargeException` | `dox_core` | `413` | `payload_too_large` | `Payload Too Large` | the body is bigger than `maxBodySize` or `maxMultipartSize` |
 | `UnsupportedMediaTypeException` | `dox_core` | `415` | `unsupported_media_type` | `Unsupported Media Type` | a DTO reads a body that is not JSON and not form data |
+| `TokenMismatchException` | `dox_core` | `419` | `csrf_token_mismatch` | `CSRF token mismatch` | `CsrfMiddleware` finds no CSRF token, or a wrong one |
 | `ValidationException` | `dox_core` | `422` | `validation_failed` | `{}` (a `Map`) | a DTO or `req.validate()` finds bad input |
+| `TooManyRequestsException` | `dox_core` | `429` | `too_many_requests` | `Too Many Requests` | a `RateLimit` middleware sees too many requests |
 | `InternalErrorException` | `dox_core` | `500` | `server_error` | `Server Error` | never by itself; for your own use |
 | `QueryException` | `dox_core` | `500` | `sql_query_error` | `Error in sql query` | never by itself; for your own use |
 
@@ -74,15 +77,11 @@ content-type: application/json
 
 A request for a path that has no route answers like a `NotFoundHttpException` with the message `<METHOD> <path> not found`: `{"code":"not_found","message":"GET /nothing not found"}`. Your `responseHandler` gets it too, so you can change its shape.
 
-To send your own JSON shape from one exception, pass a map:
-
-```dart
-throw NotFoundHttpException(
-  message: <String, dynamic>{'error': 'not_found', 'message': 'Blog not found'},
-);
-```
+To send your own JSON shape, make your own exception class (see below) and override `toResponse()`.
 
 Other errors: any `Exception` or `Error` that is not an `IHttpException` gets `500` with `{"code": "server_error", "message": "Server Error"}`. When `APP_ENV` is `development` or `local`, the body is `error.toString()` as text instead. It is also passed to the `report` method of the [exception handler](../the-basic/errors.md). An `IHttpException` is not reported.
+
+A `ValidationException` on a request with a session (`SessionMiddleware`) that does not want JSON, like a form post, is not sent as JSON. Dox saves the errors and the old input in the session and redirects back.
 
 A `ValidationException` from `dox_validation` (thrown by `schema.parse()` in a controller) is turned into the `422` `ValidationException` of `dox_core` with the same errors.
 

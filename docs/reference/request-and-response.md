@@ -4,14 +4,14 @@ icon: lucide/arrow-down-up
 
 # Request and response
 
-A compact list of the members of `DoxRequest` and `DoxResponse`.
+A short list of the members of `DoxRequest`, `DoxResponse` and the response helpers.
 
 Examples and explanations are on the [Request](../the-basic/request.md) and [Response](../the-basic/response.md) pages.
 
 ## `DoxRequest`
 
 Source: `packages/dox-core/lib/http/request/dox_request.dart`. It implements `IDoxRequest` from `dox_annotation`.
-A middleware gets an `IDoxRequest`. A controller gets a `DoxRequest`. The members marked `IDoxRequest` are on both.
+A simple middleware (`IDoxMiddleware`) gets an `IDoxRequest`. A controller and a `next` middleware (`IDoxNextMiddleware`) get a `DoxRequest`. The members marked `IDoxRequest` are on both.
 
 ### Input
 
@@ -29,6 +29,7 @@ A middleware gets an `IDoxRequest`. A controller gets a `DoxRequest`. The member
 | `query` | `Map<String, dynamic>` | The query string. | no |
 | `param` | `Map<String, dynamic>` | The route params, like `{'id': '5'}`. | no |
 | `pathParams` | `Map<String, String>` | The route params as text. `null` values are left out. | no |
+| `bound<T>(String param)` | `T` | The value that `Route.bind` made for this route param. Throws `StateError` when there is none. | no |
 | `requestBody` | `RequestBody` | The body as it was read, for DTOs. | no |
 | `isJson()` | `bool` | The content type is JSON. | yes |
 | `isFormData()` | `bool` | The content type is form data (`multipart/form-data` or urlencoded). | yes |
@@ -53,6 +54,14 @@ A middleware gets an `IDoxRequest`. A controller gets a `DoxRequest`. The member
 | `referer()` | `String?` | The `Referer` header. | yes |
 | `locale` | `String?` | The first language of `Accept-Language`, like `th`. `null` when there is none or it is `*`. | no |
 | `auth` | `IAuth?` | The auth object set by `AuthMiddleware`, or `null`. | yes |
+| `expectsJson()` | `bool` | The client wants JSON: an `Accept` header with json, a JSON body, or `X-Requested-With: XMLHttpRequest`. An Inertia request is not. | no |
+
+### Session
+
+| Member | Returns | What it gives | On `IDoxRequest` |
+| --- | --- | --- | --- |
+| `session` | `Session` | The session of the request. Needs `SessionMiddleware`. Throws `StateError` without it. | no |
+| `hasSession` | `bool` | `true` when the request has a session. | no |
 
 ### Route and raw request
 
@@ -73,17 +82,28 @@ Every setter returns the same `DoxResponse`, so calls chain.
 | Member | Returns | What it does |
 | --- | --- | --- |
 | `DoxResponse(dynamic content)` | `DoxResponse` | The constructor. `content` can be a `String`, number, `Map`, `List`, a JSON serializable object, a `Stream<List<int>>`, a `File`, a `StreamFile` or a `DownloadableFile`. |
-| `response([dynamic content])` | `DoxResponse` | Top level helper. Same as `DoxResponse(content)`. |
 | `statusCode(int code)` | `DoxResponse` | Sets the status. Default `200`. |
+| `status` | `int?` | The status set with `statusCode()`, or `null` (which means `200`). |
 | `content(dynamic content)` | `DoxResponse` | Replaces the content. |
 | `getContent()` | `dynamic` | The content as it was given. |
 | `stream(Stream<List<int>> stream)` | `DoxResponse` | Sets a byte stream as content. |
 | `contentType(ContentType type)` | `DoxResponse` | Sets `Content-Type`. A `File` without it gets the type from its extension. |
-| `header(String key, dynamic value)` | `DoxResponse` | Adds one header. |
+| `header(String key, dynamic value)` | `DoxResponse` | Sets one header. A second call with the same key replaces the value. |
+| `headers` | `Map<String, dynamic>` | The headers set so far, by name. |
 | `withHeaders(Map<String, dynamic> values)` | `DoxResponse` | Replaces every header set so far with this map. |
 | `cookie(DoxCookie cookie, {bool setExpire = false})` | `DoxResponse` | Adds a `Set-Cookie` header. `setExpire: true` sends the cookie as expired, which removes it. |
 | `cache(Duration duration)` | `DoxResponse` | Sets `Cache-Control: max-age=<seconds>`. |
 | `process(HttpRequest request)` | `dynamic` | Internal. Writes headers, status, cookies and the body. |
+
+## Response helpers
+
+Top level functions in the same file. They give a `DoxResponse`.
+
+| Function | What it does |
+| --- | --- |
+| `response([dynamic content])` | Same as `DoxResponse(content)`. |
+| `redirect(String url, {int status = 302})` | A redirect to `url`. It sets the `Location` header. |
+| `back(DoxRequest req, {String fallback = '/'})` | A `302` redirect to the `Referer` header, or to `fallback` when there is none. |
 
 How the content is sent (`responseDataHandler` in `packages/dox-core/lib/http/http_response_handler.dart`):
 
@@ -94,10 +114,10 @@ How the content is sent (`responseDataHandler` in `packages/dox-core/lib/http/ht
 | `Map`, `List`, number, `bool`, object with `toJson()` | JSON, `Content-Type: application/json` |
 | `DateTime` | its ISO 8601 text |
 | `File` | streamed, with `Content-Length`, `Accept-Ranges` and one `Range` supported |
-| `StreamFile` | streamed with its content type |
-| `DownloadableFile` | streamed with `Content-Disposition: attachment` |
+| `StreamFile` | streamed with its content type. An HTML, XML or JavaScript type is sent as a download, in a sandbox. |
+| `DownloadableFile` | streamed with `Content-Disposition: attachment; filename="<name>"` |
 | `Stream<List<int>>` | streamed chunk by chunk |
 | `IHttpException` | its status and `toResponse()`, see [HTTP exceptions](http-exceptions.md) |
-| other `Exception` or `Error` | `500` with `toString()` as text |
+| other `Exception` or `Error` | `500` with `{"code": "server_error", "message": "Server Error"}`. When `APP_ENV` is `development` or `local`, the body is `toString()` as text. |
 
 A plain value returned from a controller (not a `DoxResponse`) is sent the same way. It only goes through a `DoxResponse` when `AppConfig.responseHandler` is set, or when it is a `File`, `StreamFile` or `DownloadableFile`.
