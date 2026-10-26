@@ -1,3 +1,7 @@
+## 3.0.0-alpha.16
+
+- Version bump only, to match the other packages.
+
 ## 3.0.0-alpha.15
 
 - Change: the container builder finds every class that extends `DoxProvider` and writes `c.provider<...>` for it.
