@@ -55,7 +55,7 @@ melos run format_check
 ## Release (maintainers)
 
 The `Release` GitHub workflow (`.github/workflows/publish.yaml`) publishes all public packages to pub.dev.
-It runs when you push a tag like `v3.0.0-alpha.5`.
+It runs when you push a tag like `v<version>`.
 It uses pub.dev automated publishing, so it needs no token or secret.
 
 ### Steps
