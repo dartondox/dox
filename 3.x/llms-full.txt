@@ -15367,94 +15367,26 @@ Source: https://dartondox.dev/latest/3.xpackages/socketio/
 
 # Socket.IO
 
-This page shows how to run a Socket.IO server with `dox_socketio`, inside Dox or on its own.
+This page shows how to set up Socket.IO in a Dox app with `dox_socketio`. It can also run on its own, see [Without Dox](#without-dox).
 
 `dox_socketio` is a Socket.IO v4 server for Dart.
 The official clients connect to it with no changes: `socket.io-client` (JavaScript v4) and the Dart `socket_io_client` package.
 It has acks, rooms, namespaces, binary data and long-polling.
 Socket.IO is the way to do realtime in Dox.
 
-## Install
+## Set up in a Dox app
+
+Socket.IO runs on the same port as your HTTP routes, at `/socket.io/`. You need four files: a provider, a config, a namespace and one env key.
+
+### 1. Install
 
 ```bash
 dart pub add dox_socketio
 ```
 
-## Quick start
+### 2. The provider
 
-```dart
-import 'package:dox_socketio/dox_socketio.dart';
-
-Future<void> main() async {
-  SocketIoServer io = SocketIoServer();
-  io.on('connection', onConnection);
-  await io.listen(3001);
-}
-
-void onConnection(Socket socket) {
-  socket.emit('welcome', 'hello');
-  socket.join('lobby');
-  socket.on('chat', onChat);
-}
-
-void onChat(SocketEvent event) {
-  event.socket.to('lobby').emit('chat', event.data); // everyone in lobby but me
-  event.ack('ok'); // answer the client callback
-}
-```
-
-Client (JavaScript):
-
-```js
-import { io } from 'socket.io-client';
-
-const socket = io('http://localhost:3001');
-socket.emit('chat', 'hi', (answer) => console.log(answer)); // 'ok'
-```
-
-## In a Dox app: same port as HTTP
-
-`SocketIoProvider` serves Socket.IO at `/socket.io/` on the app port.
-
-Add `dox_socketio`, and `ioredis` for the Redis adapter:
-
-```bash
-dart pub add dox_socketio ioredis
-```
-
-```dart title="lib/config/socketio.dart"
-import 'package:dox_socketio/dox_socketio.dart';
-import 'package:ioredis/ioredis.dart';
-import 'package:my_app/app/socket/chat.namespace.dart';
-import 'package:my_app/config/env.dart';
-
-Redis redis = Redis(RedisOptions(host: '127.0.0.1', port: 6379));
-
-SocketIoConfig socketIoConfig = SocketIoConfig(
-  enabled: env.socketioEnabled,
-  namespaces: <NamespaceHandler>[ChatNamespace(MessageService())],
-  adapter: const RedisSocketAdapterFactory(), // shares broadcasts between isolates
-);
-
-/// makes the Redis adapter inside each isolate
-class RedisSocketAdapterFactory extends SocketAdapterFactory {
-  const RedisSocketAdapterFactory();
-
-  @override
-  Adapter create() {
-    return RedisAdapter(subscriber: redis.duplicate(), publisher: redis);
-  }
-}
-```
-
-Add a getter for the `SOCKETIO_ENABLED` key to `lib/config/env.dart`, then run `dart run build_runner build`:
-
-```dart title="lib/config/env.dart"
-  /// serve Socket.IO on the app port
-  bool get socketioEnabled => false;
-```
-
-Then add the provider. Put it in `lib/`, so the generated container finds it:
+The provider starts Socket.IO in every isolate. Put it in `lib/providers/`, so the generated container finds it:
 
 ```dart title="lib/providers/socketio_provider.dart"
 import 'package:dox_socketio/dox_socketio.dart';
@@ -15465,45 +15397,158 @@ class AppSocketIoProvider extends SocketIoProvider {
 }
 ```
 
+### 3. The config
+
+The config says which namespaces to serve:
+
+```dart title="lib/config/socketio.dart"
+import 'package:dox_socketio/dox_socketio.dart';
+import 'package:my_app/app/socket/chat.namespace.dart';
+import 'package:my_app/config/env.dart';
+
+SocketIoConfig socketIoConfig = SocketIoConfig(
+  enabled: env.socketioEnabled,
+  namespaces: <NamespaceHandler>[ChatNamespace()],
+);
+```
+
 | `SocketIoConfig` option | Default | What it does |
 | --- | --- | --- |
 | `enabled` | `true` | serve Socket.IO at `options.path` |
 | `options` | `ServerOptions()` | see [Options](#options) |
 | `namespaces` | `[]` | `NamespaceHandler` classes to register |
-| `adapter` | `null` (in-memory) | makes one adapter in each isolate |
+| `adapter` | `null` (in memory) | makes one adapter in each isolate, see [Many isolates](#many-isolates-redis-adapter) |
+
+### 4. A namespace
+
+A namespace handles the events of one path, like `/chat`:
+
+```dart title="lib/app/socket/chat.namespace.dart"
+import 'package:dox_socketio/dox_socketio.dart';
+
+class ChatNamespace extends NamespaceHandler {
+  @override
+  String get path => '/chat';
+
+  @override
+  void onConnection(Socket socket) {
+    socket.emit('welcome', <String, dynamic>{'id': socket.id});
+    socket.join('lobby');
+    socket.on('message', onMessage);
+  }
+
+  void onMessage(SocketEvent event) {
+    event.socket.to('lobby').emit('message', event.data); // everyone in lobby but me
+    event.ack('sent'); // answer the client callback
+  }
+}
+```
+
+See [Namespaces](#namespaces) for middleware and dependencies.
+
+### 5. Turn it on
+
+Add a getter for the `SOCKETIO_ENABLED` key to `lib/config/env.dart`:
+
+```dart title="lib/config/env.dart"
+  /// serve Socket.IO on the app port
+  bool get socketioEnabled => false;
+```
+
+```bash title=".env"
+SOCKETIO_ENABLED=true
+```
+
+Then run `dart run build_runner build` and `dox serve`.
+
+### 6. Connect a client
+
+```js
+import { io } from 'socket.io-client';
+
+const socket = io('http://localhost:3000/chat', { transports: ['websocket'] });
+socket.on('welcome', (data) => console.log(data.id));
+socket.emit('message', 'hi', (answer) => console.log(answer)); // 'sent'
+```
+
+Use `transports: ['websocket']`. See [Many isolates](#many-isolates-redis-adapter) for why.
+
+### Send from a controller or a service
+
+`SocketIoProvider.server` is the Socket.IO server of this isolate:
+
+```dart
+SocketIoProvider.server?.of('/chat').to('lobby').emit('news', data);
+```
+
+From a queue job or another program, use the [emitter](#emit-from-other-programs).
 
 - Requests to `/socket.io/` go to Socket.IO before the router. Middleware and body reading are skipped.
 - With no provider, or with `enabled: false`, there is no extra work per request.
-- `SocketIoProvider.server` is the server of this isolate: `SocketIoProvider.server?.to('room').emit('news', data)`.
 - Need a plain WebSocket with no Socket.IO protocol? `Route.websocket(path, handler)` in `dox_core` gives you the raw socket.
 
-!!! warning "Many isolates"
-    Dox runs one isolate per CPU core, and each isolate has its own Socket.IO server.
+### Many isolates: Redis adapter
 
-    - Clients should connect with **websocket only**. One websocket stays on one isolate.
-      With the Redis adapter, a broadcast reaches clients on every isolate.
-    - HTTP long-polling sends many requests, and they can reach different isolates. It only works
-      with `totalIsolate: 1`, or with sticky sessions in front of many single-isolate servers.
+Dox runs one isolate per CPU core, and each isolate has its own Socket.IO server.
+With the default in-memory adapter, a broadcast only reaches the clients of the same isolate.
+Use the Redis adapter, so a broadcast reaches clients on every isolate (and on every server).
 
-    ```js
-    const socket = io('http://localhost:3000/chat', { transports: ['websocket'] });
-    ```
+```bash
+dart pub add ioredis
+```
 
+```dart title="lib/config/socketio.dart"
+import 'package:dox_socketio/dox_socketio.dart';
+import 'package:ioredis/ioredis.dart';
+import 'package:my_app/app/socket/chat.namespace.dart';
+import 'package:my_app/config/env.dart';
+
+SocketIoConfig socketIoConfig = SocketIoConfig(
+  enabled: env.socketioEnabled,
+  namespaces: <NamespaceHandler>[ChatNamespace()],
+  adapter: const RedisSocketAdapterFactory(),
+);
+
+/// makes the Redis adapter inside each isolate.
+/// A Redis connection can not be sent to another isolate.
+class RedisSocketAdapterFactory extends SocketAdapterFactory {
+  const RedisSocketAdapterFactory();
+
+  @override
+  Adapter create() {
+    Redis redis = Redis(); // 127.0.0.1:6379. Or Redis(RedisOptions(host: ..., port: ...))
+    return RedisAdapter(subscriber: redis.duplicate(), publisher: redis);
+  }
+}
+```
+
+!!! warning "Clients should connect with websocket only"
+    One websocket stays on one isolate. HTTP long-polling sends many requests, and they can reach different isolates.
+    Long-polling only works with `totalIsolate: 1`, or with sticky sessions in front of many single-isolate servers.
     Dox logs this hint at startup when it runs many isolates and polling is allowed.
 
-## Where to run it (outside Dox)
+## Without Dox
 
-`io.listen(port)` opens its own port. Run it in its own small program, for example `bin/socket.dart`,
-next to the Dox HTTP server. Put both behind the same proxy.
+`dox_socketio` also runs on its own, with no Dox app:
 
-- `io.listen(port)` starts a native server (`dox_http_native`).
+```dart
+import 'package:dox_socketio/dox_socketio.dart';
+
+Future<void> main() async {
+  SocketIoServer io = SocketIoServer();
+  io.register(ChatNamespace());
+  await io.listen(3001);
+}
+```
+
+- `io.listen(port)` starts a native server (`dox_http_native`) on its own port. Run it in its own small program, for example `bin/socket.dart`, and put it behind the same proxy as the HTTP server.
 - `io.attach(httpServer)` uses a server you already have: a `NativeHttpServer` or a `dart:io` one.
 - In your own server, call `io.handle(request)` when `io.matches(request)` is true.
-- The path is `/socket.io/` by default.
+- `io.on('connection', (Socket socket) {...})` handles the default namespace `/` with no class.
 
-## Namespaces in a class
+## Namespaces
 
-A namespace can be a class. Its dependencies come in through the constructor.
+A namespace is a class. Its dependencies come in through the constructor.
 
 ```dart
 class ChatNamespace extends NamespaceHandler {
@@ -15533,7 +15578,8 @@ class ChatNamespace extends NamespaceHandler {
   }
 }
 
-io.register(ChatNamespace(MessageService()));
+// in lib/config/socketio.dart
+namespaces: <NamespaceHandler>[ChatNamespace(MessageService())],
 ```
 
 When a middleware throws a `SocketIoException`, the client gets `connect_error` with the message and the data.
@@ -15608,7 +15654,7 @@ SocketIoServer io = SocketIoServer(
 );
 ```
 
-- `Redis` comes from the `ioredis` package (`^2.0.0-alpha.3`).
+- `Redis` comes from the `ioredis` package (`^3.0.0`).
 - The subscriber needs its own connection. A Redis connection in subscribe mode can not run other commands.
 - It uses the format of `@socket.io/redis-adapter`. Node.js servers with that adapter can share one Redis with Dox servers.
 - It reads messages in msgpack and in JSON. It writes msgpack, like the Node.js adapter.
@@ -15617,7 +15663,7 @@ SocketIoServer io = SocketIoServer(
 - Broadcasts with an ack get the acks of clients on all servers.
 - Servers can send events to each other with `serverSideEmit`. Clients do not get them.
 - A request waits at most `requestsTimeout` for the other servers (5 seconds by default, like Node.js).
-- Long-polling needs sticky sessions, the same as with [many isolates](#in-a-dox-app-same-port-as-http). Or use `transports: ['websocket']` on the client.
+- Long-polling needs sticky sessions, the same as with [many isolates](#many-isolates-redis-adapter). Or use `transports: ['websocket']` on the client.
 
 ### Act on all servers
 
