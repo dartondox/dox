@@ -117,6 +117,19 @@ SELECT * FROM "user"
 Each user is read once, also when it has many comments.
 Comments of the same user get the same `User` object.
 
+## Filter by it
+
+`whereHas()` keeps the comments by a user that matches.
+It does not load the users.
+
+```dart
+List<Comment> comments = await Comment().whereHas('user', (QueryBuilder<dynamic> q) {
+  q.where('name', 'Ann');
+}).get();
+```
+
+See [Query by relations](../relation-queries.md).
+
 ## Options
 
 | Option | Default | What it is |

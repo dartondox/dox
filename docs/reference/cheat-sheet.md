@@ -252,17 +252,24 @@ class Blog extends BlogGenerator {
 | Code | Does |
 | --- | --- |
 | `await Blog().find(1)` / `find('slug', 'a')` | one row or `null` |
-| `await Blog().all()` | every row (ignores `where`) |
+| `await Blog().all()` | every row that matches `where` |
 | `await Blog().where('status', 'live').get()` | rows that match |
 | `await Blog().where('id', '>', 5).getFirst()` | first match or `null` |
+| `await Blog().findOrFail(1)` / `firstOrFail()` | the row, or throws `ModelNotFoundException` |
 | `await Blog().count()` | `int` |
+| `await Blog().where('slug', s).hasRows()` / `hasNoRows()` | `bool` |
+| `await Blog().pluck('title')` / `valueOf('title')` | one column of all rows / of the first row |
+| `await Blog().sum('views')`, `avg`, `min`, `max` | one value, `null` when no row |
 | `await Blog().paginate(currentPage: 1, perPage: 20)` | `Pagination<Blog>`, rows in `data` |
 | `await Blog().create(<String, dynamic>{'title': 'a'})` | insert and return the model |
+| `await Blog().firstOrCreate({...}, {...})`, `firstOrNew`, `updateOrCreate` | find, or create |
 | `blog.title = 'b'; await blog.save()` | insert or update |
-| `await blog.delete()` | soft delete when `softDelete: true` |
+| `await blog.delete()` | soft delete when `softDelete: true`. Returns the deleted rows as an `int`. |
+| `await blog.increment('views')` / `decrement` | change a number in one query |
 | `await blog.forceDelete()` / `await blog.restore()` | real delete / undo soft delete |
 | `Blog().withTrash()` | include soft deleted rows |
 | `Blog().preload('comments').get()` | load a relation, one query |
+| `Blog().whereHas('comments').get()` / `whereDoesntHave` / `has('comments', '>=', 3)` | filter by a relation |
 | `await blog.$getRelation('user')` | load a relation on one model |
 | `blog.related<Comment>('comments')?.where(...).get()` | relation query |
 | `blog.toJson()` / `blog.toMap()` | map, `hidden` left out of `toJson()` |
@@ -272,7 +279,7 @@ Relations: `@HasOne(T)`, `@HasMany(T)`, `@BelongsTo(T)`, `@ManyToMany(T)`. Optio
 
 Events: override `onCreating()`, `onCreated()`, `onSaving()`, `onUpdated()`, `onDeleting()`, ... or `Model.observe<Blog>(BlogObserver())`. `throw CancelModelEvent('why')` in a "before" event stops it. `saveQuietly()` skips events.
 
-See [Model](../database/model/index.md), [Events](../database/model/events.md), [HasMany](../database/model/relationship/has-many.md).
+See [Model](../database/model/index.md), [Events](../database/model/events.md), [HasMany](../database/model/relationship/has-many.md), [Query by relations](../database/model/relation-queries.md).
 
 ## Query builder
 
@@ -293,12 +300,22 @@ List<Map<String, dynamic>> rows = await QueryBuilder.table('blogs')
 | Code | Does |
 | --- | --- |
 | `whereNotIn`, `whereNotNull`, `orWhereIn`, `orWhereNull` | more filters |
+| `where('a', null)`, `where('a', '!=', null)` | `IS NULL`, `IS NOT NULL` |
+| `whereBetween`, `whereColumn`, `whereLike`, `whereExists` (and `Not`, `or` forms) | more filters |
+| `whereGroup((QueryBuilder<Blog> q) { ... })`, `orWhereGroup`, `whereNot` | conditions in brackets |
+| `when(condition, (QueryBuilder<Blog> q) { ... })` | add parts only when `true` |
 | `whereRaw('lower(name) = @n', <String, dynamic>{'n': 'a'})` | raw SQL, bound values |
 | `leftJoin`, `rightJoin`, `joinRaw` | joins |
-| `groupBy('age')`, `selectRaw('DISTINCT name')` | groups, raw select |
+| `groupBy('age')`, `having(...)`, `havingRaw(...)` | groups |
+| `distinct()`, `selectRaw('count(*) as total')` | distinct rows, raw select |
+| `latest()`, `oldest()`, `inRandomOrder()` | order |
+| `chunk(100, (rows) { ... })`, `chunkById(...)` | work on a big table |
 | `insert({...})`, `insertMultiple([...])` | insert |
-| `where(...).update({...})` | update, no events, no `updated_at` |
-| `where(...).delete()`, `truncate()` | delete |
+| `upsert([...], ['email'])` | insert or update, returns an `int` |
+| `where(...).update({...})` | update, no events, no `updated_at`. Returns the changed rows as an `int`. |
+| `where(...).increment('views')`, `decrement` | change a number in one query |
+| `where(...).delete()`, `truncate()` | delete. `delete()` returns the deleted rows as an `int`. |
+| `lockForUpdate()`, `sharedLock()` | row lock, inside a transaction |
 | `QueryBuilder.query('select 1', substitutionValues: {...})` | raw query |
 | `withConnection('mysql')` | another connection |
 | `toSql()`, `debug(true)` | see the SQL |
@@ -356,9 +373,15 @@ int? id = await QueryBuilder.transaction(() async {
   await QueryBuilder.table('blog_info').insert(<String, dynamic>{'blog_id': blog.id});
   return blog.id;
 }); // throw inside = rollback
+
+await QueryBuilder.transaction(() async {
+  Blog blog = await Blog().lockForUpdate().findOrFail(1); // other writers wait
+  blog.title = 'b';
+  await blog.save();
+});
 ```
 
-See [Transactions](../database/transactions.md).
+See [Transactions](../database/transactions.md) and [Row locks](../database/transactions.md#row-locks).
 
 ## Cache
 

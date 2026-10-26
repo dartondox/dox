@@ -74,3 +74,6 @@ user?.aggregate('posts_max_views');
 !!! info
     `withCount()` is not for `belongsTo` relations. It throws an `UnsupportedError`.
     A relation from a table to the same table is not supported.
+
+To keep only the rows that have related rows, use `whereHas()` or `has()`.
+See [Query by relations](relation-queries.md).

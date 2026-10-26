@@ -81,6 +81,61 @@ This works on Postgres, MySQL, MariaDB and SQLite. You can nest many levels.
 - On MySQL and MariaDB, a `CREATE`, `ALTER` or `DROP TABLE` inside a nested transaction
   saves the outer work and ends the savepoint. Do not change the schema there.
 
+## Row locks
+
+A row lock stops two requests from changing the same row at the same time.
+
+Think of a stock count. Two requests read `stock = 5` at the same time.
+Each one takes 1 and saves `4`. The right value is `3`.
+A lock makes the second request wait until the first one is done.
+
+```dart
+Future<void> buy(int productId, int quantity) async {
+  await QueryBuilder.transaction(() async {
+    // read the row and lock it
+    Product product = await Product().lockForUpdate().findOrFail(productId);
+
+    if (product.stock! < quantity) {
+      throw BadRequestException(message: 'Not enough stock');
+    }
+
+    // change it and save it while the lock is held
+    product.stock = product.stock! - quantity;
+    await product.save();
+  });
+  // the lock ends here, when the transaction commits
+}
+```
+
+- `lockForUpdate()` adds `FOR UPDATE` to the select.
+  Other transactions that lock or change these rows wait.
+- `sharedLock()` adds a shared lock.
+  Other transactions can still read the rows, but they wait to change them.
+- Use them with `find()`, `findOrFail()`, `getFirst()`, `firstOrFail()`, `get()`, `all()` and `pluck()`.
+- `count()`, `sum()` and the other aggregates do not lock.
+
+| Database | `lockForUpdate()` | `sharedLock()` |
+| --- | --- | --- |
+| Postgres | `FOR UPDATE` | `FOR SHARE` |
+| MySQL, MariaDB | `FOR UPDATE` | `LOCK IN SHARE MODE` |
+| SQLite | nothing | nothing |
+
+!!! warning "Use a lock only inside a transaction"
+    A lock lasts until the transaction ends.
+    Outside a transaction, each query commits right away, so the lock ends at once.
+
+SQLite has no row locks, so the lock does nothing there.
+But a Dox transaction on SQLite starts with `BEGIN IMMEDIATE`.
+It takes the write lock of the whole database.
+So the same code is safe on SQLite too.
+
+!!! note
+    Postgres does not allow a lock with `groupBy()`, `distinct()`,
+    or on the nullable side of a left join. The database throws an error then.
+
+For one number column, [`increment()`](query-builder.md#increment-and-decrement) is simpler.
+It changes the value in one query, so it needs no lock.
+
 ## Connections
 
 - Postgres and MySQL use a connection pool.

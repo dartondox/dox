@@ -24,7 +24,7 @@ The packages in the main repo share one version number. The other packages live 
 | Package | What it does | State | Tests |
 | --- | --- | --- | --- |
 | `dox_core` | Routes, middleware, controllers, request and response, isolates, config, the IoC container, exception handler, sessions, CSRF, rate limit, security headers, health check, test client | May change | 44 test files. CI runs them on the native server. |
-| `dox_orm` | Query builder, models, relations, scopes, casts, `withCount`, transactions, factories, seeders | May change | 31 test files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite. |
+| `dox_orm` | Query builder, models, relations, `whereHas`, scopes, casts, `withCount`, transactions, row locks, factories, seeders | May change | 36 test files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite. |
 | `dox_validation` | `@Dto` rules, fluent schemas, JSON Schema, Standard Schema | Ready for stable | 6 test files |
 | `dox_builder` | Code generator for models, DTOs, env classes, the container and OpenAPI | May change | 5 test files |
 | `dox_annotation` | Annotations used by the generator | May change | 1 small test file. Mostly tested through `dox_builder`. |

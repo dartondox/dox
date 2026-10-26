@@ -113,6 +113,23 @@ The load runs this SQL:
 SELECT *, "user_id" as "_owner_id" FROM "post" WHERE "user_id" IN (@user_id_p0, ...)
 ```
 
+## Filter by it
+
+`whereHas()` keeps the users that have a post.
+`whereDoesntHave()` keeps the users with no post.
+It does not load the posts.
+
+```dart
+List<User> writers = await User().whereHas('posts', (QueryBuilder<dynamic> q) {
+  q.where('status', 'active');
+}).get();
+
+List<User> noPosts = await User().whereDoesntHave('posts').get();
+List<User> busy = await User().has('posts', '>=', 10).get();
+```
+
+See [Query by relations](../relation-queries.md).
+
 ## Options
 
 | Option | Default | What it is |

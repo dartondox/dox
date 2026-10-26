@@ -229,7 +229,7 @@ await found?.save();
 found?.slug = null;
 await found?.save(); // slug is now NULL in the database
 
-// create from a map
+// create from a map: returns the new model as it is in the table
 Blog created = await Blog().create(<String, dynamic>{
   'title': 'My first blog',
   'status': 'draft',
@@ -244,11 +244,11 @@ Blog created = await Blog().create(<String, dynamic>{
 - On update, a field is set to `NULL` only when it had a value before
   (loaded from the database, or saved).
   Fields that were not loaded, for example with `select()`, are not changed.
-- `save()` returns `false` when a [model event](events.md) cancels it.
+- `save()` returns `true` when it saved, and `false` when a [model event](events.md) cancels it.
 
 ### Mass assignment
 
-`create()`, `insert()` and `update()` take any key of the map.
+`create()`, `insert()`, `update()`, `upsert()` and the find or create methods take any key of the map.
 So `User().create(req.body)` with `{"is_admin": 1}` makes an admin.
 Set `fillable` or `guarded` to stop this.
 
@@ -269,12 +269,62 @@ class User extends UserGenerator {
 - Both lists are empty by default. Then every key is taken.
 - `save()` is not changed. Fields you set in code are always saved.
 
+### Find or create
+
+These methods find a row by the first map.
+When there is no row, they use both maps.
+
+```dart
+// find the user, or create it
+User user = await User().firstOrCreate(
+  <String, dynamic>{'email': 'ann@example.com'},
+  <String, dynamic>{'name': 'Ann'},
+);
+
+// find the user, or make a new model that is not saved yet
+User other = await User().firstOrNew(<String, dynamic>{'email': 'bob@example.com'});
+if (!other.exists) {
+  await other.save();
+}
+
+// update the user, or create it
+User updated = await User().updateOrCreate(
+  <String, dynamic>{'email': 'ann@example.com'},
+  <String, dynamic>{'name': 'Ann Lee'},
+);
+```
+
+`firstOrCreate()` and `updateOrCreate()` use `create()` and `save()`, so the [model events](events.md) run.
+`firstOrNew()` does not save, so no event runs.
+See [Query builder](../query-builder.md#firstorcreate-firstornew-and-updateorcreate).
+
+### Increment
+
+`increment()` and `decrement()` change a number column in one query.
+On a model from the table, they change only the row of that model.
+The field of the model gets the new value too.
+This example has an `int? views` column field on `Blog`.
+
+```dart
+Blog? blog = await Blog().find(1);
+await blog!.increment('views');      // views + 1
+await blog.increment('views', 5);    // views + 5
+await blog.decrement('views');       // views - 1
+print(blog.views);
+```
+
+- They return the number of changed rows: 1, or 0 when the row is not there.
+- They fire no model events and do not set `updated_at`.
+- A third argument sets other columns in the same query:
+  `increment('views', 1, <String, dynamic>{'status': 'hot'})`.
+  Keys that `fillable` and `guarded` do not allow are dropped.
+
 ## Delete
 
 ```dart
 // delete a record
 Blog? blog = await Blog().find(1);
-await blog?.delete(); // deletes only this record
+int count = await blog!.delete(); // deletes only this record
 
 // force delete
 Blog? trashed = await Blog().withTrash().find(1);
@@ -284,6 +334,10 @@ await trashed?.forceDelete(); // deletes the row, also with softDelete
 Blog? deleted = await Blog().withTrash().find(1);
 await deleted?.restore(); // sets deleted_at back to NULL
 ```
+
+- `delete()` and `forceDelete()` return the number of deleted rows.
+- They return 1 when the row was deleted.
+- They return 0 when the row was not there, or when a [model event](events.md) cancels.
 
 `save()`, `delete()`, `forceDelete()` and `restore()` fire [model events](events.md).
 
