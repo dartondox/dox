@@ -81,15 +81,22 @@ abstract class AuthDriver {
 
     /// find with credential except password field
     /// since password field is encrypted, we do not need to include
+    /// only a string or a number goes into the query. A map or a list
+    /// from the request body (like `{"email": {"op": "..."}}`) fails the
+    /// login, so the client can not change the query.
     bool hasIdentifier = false;
-    credentials.forEach((String key, dynamic value) {
-      if (key != provider.passwordField &&
-          provider.identifierFields.contains(key) &&
-          value != null) {
-        query.where(key, value);
-        hasIdentifier = true;
+    for (MapEntry<String, dynamic> entry in credentials.entries) {
+      String key = entry.key;
+      dynamic value = entry.value;
+      if (key == provider.passwordField ||
+          !provider.identifierFields.contains(key) ||
+          value == null) {
+        continue;
       }
-    });
+      if (value is! String && value is! num) return null;
+      query.where(key, value);
+      hasIdentifier = true;
+    }
 
     /// without an identifier the query would match any user
     if (!hasIdentifier) {

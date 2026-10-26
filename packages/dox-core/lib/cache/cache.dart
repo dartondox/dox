@@ -117,9 +117,14 @@ class Cache {
   }
 
   /// The cached value, or run [compute] and store the result.
+  /// The value is stored as JSON, so return maps, lists, strings and
+  /// numbers, not models:
   /// ```
-  /// List<dynamic> posts = await Cache().remember('posts',
-  ///   Duration(minutes: 5), () => Post().all());
+  /// List<dynamic> posts = await Cache().remember(
+  ///   'posts',
+  ///   Duration(minutes: 5),
+  ///   () async => (await Post().all()).map((Post p) => p.toJson()).toList(),
+  /// );
   /// ```
   Future<T> remember<T>(
     String key,

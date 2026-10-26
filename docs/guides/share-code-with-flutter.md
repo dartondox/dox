@@ -129,7 +129,7 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
-When the server has no DTOs of its own, there is no `server/lib/generated/dtos.g.dart`. Then use `dtos: shared.dtos`.
+When the server has no DTOs of its own, its `dtos` list is empty. The line above still works.
 
 The controller asks for `SaveBlog` like any other DTO. Dox checks the body before the method runs. Bad input gets `422`.
 

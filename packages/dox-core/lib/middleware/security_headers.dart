@@ -4,6 +4,8 @@ import 'package:dox_core/dox_core.dart';
 
 /// Adds security headers to every answer. Each header has a safe
 /// default. Give your own value to change it, or `null` to turn it off.
+/// `null` also removes a header that the server sends by default, like
+/// `X-Frame-Options: SAMEORIGIN`.
 ///
 /// ```
 /// AppConfig(
@@ -25,7 +27,8 @@ class SecurityHeaders implements IDoxMiddleware {
     this.permissionsPolicy = 'camera=(), microphone=(), geolocation=()',
     this.crossOriginOpenerPolicy = 'same-origin',
     this.contentSecurityPolicy,
-    this.extra = const <String, String>{},
+    this.xssProtection = '0',
+    this.extra = const <String, String?>{},
   });
 
   /// `X-Content-Type-Options`: the browser must not guess the type.
@@ -52,8 +55,14 @@ class SecurityHeaders implements IDoxMiddleware {
   /// depends on the pages of the app. Eg. `frame-ancestors 'none'`.
   final String? contentSecurityPolicy;
 
-  /// more headers to add, name to value
-  final Map<String, String> extra;
+  /// `X-XSS-Protection`. `0` turns the old XSS filter of browsers off,
+  /// like OWASP says. The filter is gone from new browsers, and in old
+  /// ones it can make holes. Use [contentSecurityPolicy] instead.
+  final String? xssProtection;
+
+  /// more headers to add, name to value. A `null` value removes the
+  /// header.
+  final Map<String, String?> extra;
 
   @override
   IDoxRequest handle(IDoxRequest req) {
@@ -64,16 +73,22 @@ class SecurityHeaders implements IDoxMiddleware {
     _set(headers, 'Permissions-Policy', permissionsPolicy);
     _set(headers, 'Cross-Origin-Opener-Policy', crossOriginOpenerPolicy);
     _set(headers, 'Content-Security-Policy', contentSecurityPolicy);
+    _set(headers, 'X-XSS-Protection', xssProtection);
     if (req is DoxRequest && req.isSecure()) {
       _set(headers, 'Strict-Transport-Security', strictTransportSecurity);
     }
-    for (MapEntry<String, String> header in extra.entries) {
-      headers.set(header.key, header.value);
+    for (MapEntry<String, String?> header in extra.entries) {
+      _set(headers, header.key, header.value);
     }
     return req;
   }
 
+  /// set the header, or remove it when [value] is null
   static void _set(HttpHeaders headers, String name, String? value) {
-    if (value != null) headers.set(name, value);
+    if (value == null) {
+      headers.removeAll(name);
+    } else {
+      headers.set(name, value);
+    }
   }
 }

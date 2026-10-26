@@ -4,7 +4,7 @@ import 'package:dox_core/dox_core.dart';
 
 class QueryException extends IHttpException {
   QueryException({
-    String message = 'Error in sql query',
+    dynamic message = 'Error in sql query',
     String errorCode = 'sql_query_error',
     int code = HttpStatus.internalServerError,
   }) {

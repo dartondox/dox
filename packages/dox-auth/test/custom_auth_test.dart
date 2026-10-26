@@ -1,5 +1,5 @@
 // ignore_for_file: depend_on_referenced_packages
-// Imports both packages on purpose: AUTH_REQUEST_KEY must not be ambiguous.
+// Imports both packages on purpose: they must not give ambiguous names.
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/testing.dart';
@@ -42,6 +42,14 @@ class HeaderUserMiddleware implements IDoxMiddleware {
   }
 }
 
+/// A route with no AuthMiddleware: req.auth is null.
+Map<String, dynamic> openRoute(DoxRequest req) {
+  return <String, dynamic>{
+    'auth': req.auth == null ? 'none' : 'set',
+    'all': req.all(),
+  };
+}
+
 class ApiRouter extends Router {
   @override
   void register() {
@@ -53,7 +61,8 @@ class ApiRouter extends Router {
       HeaderUserMiddleware(),
       (DoxRequest req) => req.auth?.user<FakeUser>()?.email,
     ]);
-    Route.get('key-name', (DoxRequest req) => AUTH_REQUEST_KEY);
+    Route.get('open', openRoute);
+    Route.post('open', openRoute);
   }
 }
 
@@ -98,7 +107,17 @@ void main() {
     expect((await client.get('/own')).status, 401);
   });
 
-  test('AUTH_REQUEST_KEY comes from one place', () async {
-    expect((await client.get('/key-name')).body, AUTH_REQUEST_KEY);
+  test('a client field can not set req.auth', () async {
+    // this was the input key of req.auth before
+    TestResponse res = await client.get('/open?dox_authentication_instance=x');
+    res.expectStatus(200).expectJson(<String, dynamic>{
+      'auth': 'none',
+      'all': <String, dynamic>{'dox_authentication_instance': 'x'},
+    });
+    TestResponse posted = await client.post(
+      '/open',
+      body: <String, dynamic>{'dox_authentication_instance': 'x'},
+    );
+    posted.expectStatus(200).expectJson(containsPair('auth', 'none'));
   });
 }

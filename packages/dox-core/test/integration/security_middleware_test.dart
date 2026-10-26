@@ -37,7 +37,9 @@ class SecurityRouter extends Router {
         frameOptions: 'SAMEORIGIN',
         permissionsPolicy: null,
         contentSecurityPolicy: "frame-ancestors 'none'",
-        extra: <String, String>{'X-Extra': 'yes'},
+        contentTypeOptions: null,
+        xssProtection: null,
+        extra: <String, String?>{'X-Extra': 'yes', 'X-Frame-Options': null},
       ),
       (DoxRequest req) => 'ok',
     ]);
@@ -193,12 +195,19 @@ void main() {
     });
 
     test('change, turn off and add headers', () async {
+      // null removes a header, also one the server sends by default
       (await client.get('/headers-custom'))
-          .expectHeader('x-frame-options', 'SAMEORIGIN')
+          .expectHeader('x-frame-options', isNull)
           .expectHeader('permissions-policy', isNull)
           .expectHeader('content-security-policy', "frame-ancestors 'none'")
           .expectHeader('x-extra', 'yes')
-          .expectHeader('x-content-type-options', 'nosniff');
+          .expectHeader('x-content-type-options', isNull)
+          .expectHeader('x-xss-protection', isNull);
+    });
+
+    test('X-XSS-Protection is 0, also with no SecurityHeaders', () async {
+      (await client.get('/headers')).expectHeader('x-xss-protection', '0');
+      (await client.get('/health')).expectHeader('x-xss-protection', '0');
     });
   });
 

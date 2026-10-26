@@ -148,7 +148,7 @@ class AuthController {
     User user = User()
       ..name = body.name
       ..email = body.email
-      ..password = Hash.make(body.password);
+      ..password = await Hash.makeAsync(body.password);
     await user.save();
 
     String? token = Auth().login(user);

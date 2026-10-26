@@ -14,7 +14,7 @@ You can also call it yourself.
 ```dart
 import 'package:dox_core/dox_core.dart';
 
-String secret = env.appKey; // 32 characters = 32 bytes, so AES-256
+String secret = env.appKey;
 
 String encoded = AESEncryptor.encode('Hello world', secret);
 String decoded = AESEncryptor.decode(encoded, secret); // 'Hello world'
@@ -23,7 +23,7 @@ String decoded = AESEncryptor.decode(encoded, secret); // 'Hello world'
 - `encode` returns base64 text.
 - The same text gives a different output each time.
 - `decode` throws `DecryptException` when the text was changed, or the key is wrong. It is a `400 Bad Request` error.
-- The secret must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256). Another length makes `encode` throw.
+- The AES key is not the secret itself. Dox makes a 32-byte key (AES-256) from the secret with HKDF-SHA256 (RFC 5869) and a label. The default label is `dox:encrypt`. Pick another one with `purpose:`, like `AESEncryptor.encode(text, secret, purpose: 'app:invoice')`. `decode` needs the same `purpose`.
 
 Make a new 32-character `APP_KEY` with the CLI:
 
@@ -32,10 +32,23 @@ dox key:generate
 ```
 
 It writes a random key of letters and digits to `APP_KEY` in `.env`.
-Dox uses the key text as it is: its UTF-8 bytes are the AES key. It is not base64 or hex decoded.
+
+## One key per purpose
+
+Dox does not use `APP_KEY` as it is. It makes one key per purpose from it, with HKDF-SHA256 and a label:
+
+| Label | Used for |
+| --- | --- |
+| `dox:cookie` | encrypted cookies, and the `cookie` session driver |
+| `dox:jwt` | the HMAC key of `JwtAuthDriver` (with a `SecretKey`) |
+| `dox:encrypt` | `AESEncryptor` when you give no `purpose` |
+| `dox:signed-url` | for signed URLs |
+
+So a value made for one purpose can not be used for another one.
+`KeyDerivation.forAppKey(label)` gives the 32-byte key of a label. Each isolate makes it once.
 
 At startup Dox checks `APP_KEY`. When it is empty, not exactly 32 bytes, or an old public sample key, the app stops.
-In `development`, `local` and `test` it only prints a warning.
+In `development`, `local`, `test` and `testing` it only prints a warning.
 
 - Keep `APP_KEY` in `.env` or in the secrets of your host. Never put it in code or in git.
 - If you change `APP_KEY`, old encrypted cookies and sessions can not be read any more. JWT tokens signed with it stop working too.

@@ -8,6 +8,7 @@ import 'package:dox/src/tools/create_dto.dart';
 import 'package:dox/src/tools/create_factory.dart';
 import 'package:dox/src/tools/create_seeder.dart';
 import 'package:dox/src/tools/create_serializer.dart';
+import 'package:dox/src/types.dart';
 import 'package:test/test.dart';
 
 /// Generators write relative to the current directory,
@@ -60,7 +61,10 @@ void main() {
     test('middleware', () {
       expect(createMiddleware('RateLimitMiddleware'), isTrue);
       String c = read('lib/app/http/middleware/rate_limit.middleware.dart');
-      expect(c, contains('class RateLimitMiddleware extends IDoxMiddleware'));
+      expect(
+        c,
+        contains('class RateLimitMiddleware implements IDoxMiddleware'),
+      );
       expect(c, contains('return req;'));
     });
 
@@ -401,6 +405,12 @@ void main() {
             .validateArgs(<String>['--class=UserSeeder']),
         isTrue,
       );
+    });
+
+    test('db:seed takes --class with a space too', () {
+      CommandDefinition seed = CommandRegistry.findCommand('db:seed')!;
+      expect(seed.validateArgs(<String>['--class', 'UserSeeder']), isTrue);
+      expect(seed.validateArgs(<String>['a', 'b', 'c']), isFalse);
     });
   });
 

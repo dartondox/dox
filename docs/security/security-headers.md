@@ -34,13 +34,16 @@ Every answer now has these headers:
 `Content-Security-Policy` is off by default. A good policy depends on your pages.
 
 Without this middleware, the server already sends three headers on every answer, also on a `404`:
-`X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff` and `X-XSS-Protection: 1; mode=block`.
-`SecurityHeaders` replaces the first two with its own values.
+`X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff` and `X-XSS-Protection: 0`.
+`SecurityHeaders` replaces them with its own values.
+`X-XSS-Protection: 0` turns the old XSS filter of browsers off, like OWASP says. The filter is gone from new browsers, and in old ones it can make holes. Use `Content-Security-Policy` instead.
 
 ## Change or turn off a header
 
 Each header has an option. Give a new value to change it, or `null` to turn it off.
-`null` for `frameOptions` or `contentTypeOptions` keeps the server value from above (`SAMEORIGIN` and `nosniff`).
+`null` removes the header, also one the server sends by default (like `frameOptions: null` for `X-Frame-Options`).
+The option for `X-XSS-Protection` is `xssProtection` (default `'0'`).
+In `extra`, a `null` value removes that header too.
 
 ```dart
 const SecurityHeaders(

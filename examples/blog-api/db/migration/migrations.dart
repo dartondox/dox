@@ -4,6 +4,7 @@ import 'package:dox_migration/dox_migration.dart';
 
 import '2023_07_16_131937700_create_users_table.dart' as m1;
 import '2026_10_22_205345_create_posts_table.dart' as m2;
+import '2026_10_25_000000000_create_queue_tables.dart' as m3;
 
 /// all Dart migrations of db/migration, sorted by name
 final List<MigrationEntry> migrations = <MigrationEntry>[
@@ -12,4 +13,8 @@ final List<MigrationEntry> migrations = <MigrationEntry>[
     m1.CreateUsersTable(),
   ),
   MigrationEntry('2026_10_22_205345_create_posts_table', m2.CreatePostsTable()),
+  MigrationEntry(
+    '2026_10_25_000000000_create_queue_tables',
+    m3.CreateQueueTables(),
+  ),
 ];

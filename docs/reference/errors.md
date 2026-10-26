@@ -14,7 +14,7 @@ This page lists the messages Dox prints or throws, so you can search for the tex
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `APP_KEY is not set. Run `dox key:generate` and put the key in .env` | `appKey` is empty. A `StateError` stops the app, unless `APP_ENV` is `development`, `local` or `test`. Then it is only a warning. | Run `dox key:generate`, or set `APP_KEY` in the env. |
+| `APP_KEY is not set. Run `dox key:generate` and put the key in .env` | `appKey` is empty. A `StateError` stops the app, unless `APP_ENV` is `development`, `local`, `test` or `testing`. Then it is only a warning. | Run `dox key:generate`, or set `APP_KEY` in the env. |
 | `APP_KEY must be exactly 32 characters. Run `dox key:generate`` | The key is shorter or longer. Same rule as above. | Run `dox key:generate`. |
 | `APP_KEY is a public sample key. Run `dox key:generate` for a new one` | The key is a known sample key. Same rule as above. | Run `dox key:generate`. |
 | `Unsupported operation: dox_http_native did not load: <reason>. Fix: ...` | The native HTTP library is missing or from another version (`native library ABI <x>, expected <y>`). The app stops at start. | Do what the `Fix:` part says. See [Troubleshooting](troubleshooting.md#the-native-http-library-did-not-load). |
@@ -96,9 +96,9 @@ The table shows the `message` text.
 | Text | When | What to do |
 | --- | --- | --- |
 | `401` `Authentication failed` | `AuthMiddleware` finds no token, a bad or expired token, or the user is deleted. | Send `Authorization: Bearer <token>`. Log in again. |
-| `Invalid argument(s) (password): Password is too long ...` | `Hash.make()` with a password over 72 bytes. | Limit the length in the DTO. See [Troubleshooting](troubleshooting.md#hashmake-throws-on-a-long-password). |
+| `Invalid argument(s) (password): The password is too long. bcrypt takes at most 72 bytes.` | `Hash.make()` or `Hash.makeAsync()` with a password over 72 bytes. | Limit the length in the DTO. See [Troubleshooting](troubleshooting.md#hashmake-throws-on-a-long-password). |
 | `Invalid argument(s) (secret): The JWT secret is empty. Set APP_KEY (run `dox key:generate`).` | `JwtAuthDriver` with an empty secret. | Set `APP_KEY`. |
-| `Invalid argument(s) (secret): The JWT secret is <n> bytes. It must be at least 32 bytes. ...` | A short secret. In `development`, `local` and `test` it is only a warning. | Run `dox key:generate`. |
+| `Invalid argument(s) (secret): The JWT secret is <n> bytes. It must be at least 32 bytes. ...` | A short secret. In `development`, `local`, `test` and `testing` it is only a warning. | Run `dox key:generate`. |
 
 `Hash.verify()` gives `false` for a value that is not a bcrypt hash. It does not throw.
 `Auth().attempt()` returns `null` for a wrong password. It does not throw. See [Authentication](../security/authentication.md).

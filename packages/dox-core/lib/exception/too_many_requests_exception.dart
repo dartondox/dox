@@ -6,7 +6,7 @@ import 'package:dox_core/dox_core.dart';
 /// Dox answers with 429 Too Many Requests.
 class TooManyRequestsException extends IHttpException {
   TooManyRequestsException({
-    String message = 'Too Many Requests',
+    dynamic message = 'Too Many Requests',
     String errorCode = 'too_many_requests',
     int code = HttpStatus.tooManyRequests,
   }) {

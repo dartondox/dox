@@ -138,7 +138,7 @@ AppConfig appConfig = AppConfig(
 | `driver` | `cookie` | `cookie` or `cache`. See below. |
 | `store` | `null` | The cache store for the `cache` driver, like `redis`, `memory` or `file`. `null` uses the default store of `AppConfig.cache`. |
 | `cookie` | `dox_session` | The name of the session cookie. |
-| `lifetime` | 2 hours | The session ends after this long with no use. |
+| `lifetime` | 2 hours | The session ends after this long with no use. The `cookie` driver keeps the save time in the encrypted cookie and checks it, so a copied old cookie stops working too. |
 | `path` | `/` | `Path` of the cookie. |
 | `domain` | `null` | `Domain` of the cookie. `null` means only the host that set it. |
 | `httpOnly` | `true` | Page scripts can not read the cookie. |

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/testing.dart';
 import 'package:test/test.dart';
@@ -214,6 +216,29 @@ void main() {
         .expectJson(containsPair('name', null));
   });
 
+  test('a cookie session older than the lifetime is a new empty one', () async {
+    Future<TestResponse> getAt(DateTime at) {
+      String payload = jsonEncode(<String, dynamic>{
+        'data': <String, dynamic>{'name': 'Ann'},
+        'flash': <String>[],
+        'token': null,
+        'at': at.millisecondsSinceEpoch,
+      });
+      String header = DoxCookie('dox_session', payload).get();
+      String value = header.split(';').first.substring('dox_session='.length);
+      return client
+          .withCookies(<String, String>{'dox_session': value})
+          .get('/get');
+    }
+
+    DateTime now = DateTime.now();
+    // the default lifetime is 2 hours
+    (await getAt(now.subtract(const Duration(minutes: 5))))
+        .expectJson(containsPair('name', 'Ann'));
+    (await getAt(now.subtract(const Duration(hours: 3))))
+        .expectJson(containsPair('name', null));
+  });
+
   test('the cookie driver stops a session that is too big', () async {
     (await client.get('/big')).expectStatus(500);
     (await client.get('/cache/big')).expectStatus(200);
@@ -261,6 +286,27 @@ void main() {
         body: <String, dynamic>{},
         headers: <String, String>{'X-CSRF-TOKEN': 'wrong'},
       )).expectStatus(419);
+    });
+
+    test('the token in the query string does not pass', () async {
+      DoxTestClient browser = client.withSession();
+      TestResponse page = await browser.get('/form');
+      String token = page.cookies[CsrfMiddleware.cookieName]!;
+      // only the session cookie: no automatic X-XSRF-TOKEN header
+      DoxTestClient noHeader = client.withCookies(<String, String>{
+        'dox_session': browser.cookies['dox_session']!,
+      });
+      (await noHeader.post(
+        '/save?_token=$token',
+        body: <String, dynamic>{},
+      )).expectStatus(419);
+      (await noHeader.post(
+        '/save',
+        body: '_token=$token',
+        headers: <String, String>{
+          'content-type': 'application/x-www-form-urlencoded',
+        },
+      )).expectStatus(200);
     });
 
     test('excluded paths are not checked', () async {

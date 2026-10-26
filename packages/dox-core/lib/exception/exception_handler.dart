@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/utils/logger.dart';
 
 /// The one place that turns a thrown error into a response.
 ///

@@ -152,7 +152,7 @@ After `AuthMiddleware`, `req.auth` holds the login.
 
 | Code | What it gives |
 | --- | --- |
-| `req.auth` | an `IAuth?`. `null` when the route has no `AuthMiddleware` |
+| `req.auth` | an `IAuth?`. `null` when the route has no `AuthMiddleware`. It is kept apart from the input, so a query or body field can not set it |
 | `req.auth?.isLoggedIn()` | `true` when a user is loaded |
 | `req.auth?.user<User>()` | the user model |
 | `req.auth?.toJson()` | the user as a map, without `hidden` fields |
@@ -170,7 +170,7 @@ After `AuthMiddleware`, `req.auth` holds the login.
 | `isLoggedIn()` | `true` when there is a user |
 
 `attempt` searches only by the fields in `identifierFields`. It runs bcrypt also when no user is found, or when the user has no password, so the answer time does not tell whether an email has an account.
-It returns `null` when the password is not a `String`, when no identifier is given, or when the password does not match.
+It returns `null` when the password is not a `String`, when no identifier is given, when an identifier is not a string or a number (a map or a list from the body), or when the password does not match.
 
 ## Options
 
@@ -186,8 +186,8 @@ It returns `null` when the password is not a `String`, when no identifier is giv
 
 | Option | Default | What it does |
 | --- | --- | --- |
-| `secret` | required | the key that signs tokens, like `SecretKey(env.appKey)`. An empty key throws `ArgumentError`. A key shorter than 32 bytes also throws in production, and prints a warning in development, local and test. Make one with `dox key:generate`. For a separate JWT secret (not `APP_KEY`), `openssl rand -hex 32` also works |
-| `algorithm` | `JWTAlgorithm.HS256` | the signing algorithm |
+| `secret` | required | the key that signs tokens, like `SecretKey(env.appKey)`. An empty key throws `ArgumentError`. A key shorter than 32 bytes also throws in production, and prints a warning in development, local, test and testing. Make one with `dox key:generate`. For a separate JWT secret (not `APP_KEY`), `openssl rand -hex 32` also works. Dox does not sign with this text as it is: the HMAC key is made from it with HKDF-SHA256 and the label `dox:jwt`. Another service that checks the tokens needs that key: `driver.signingKey` |
+| `algorithm` | `JWTAlgorithm.HS256` | the signing algorithm. A token with another algorithm in its header is rejected |
 | `expiresIn` | `Duration(hours: 1)` | how long a token is valid |
 | `issuer` | `null` | the `iss` claim. When set, `verifyToken` also checks it |
 | `hashRounds` | `10` | the bcrypt cost of your stored hashes. Use the same value as `Hash.rounds` |

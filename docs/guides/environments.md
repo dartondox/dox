@@ -205,7 +205,7 @@ On a server you can also keep a `.env` next to the binary, outside git, with `ch
 
 - Make one per environment with `dox key:generate`. Never share the production key with staging.
 - `APP_KEY` must be exactly 32 characters. `dox key:generate` makes a key of the right length.
-- When `APP_ENV` is not `development`, `local` or `test`, a bad key stops the app at start: empty, not 32 characters, or a public sample key. An empty `APP_ENV` counts as production. In development the app only logs a warning.
+- When `APP_ENV` is not `development`, `local`, `test` or `testing`, a bad key stops the app at start: empty, not 32 characters, or a public sample key. An empty `APP_ENV` counts as production. In development the app only logs a warning.
 - A new key makes every cookie, token and signed URL invalid. Every user is logged out. Plan it.
 
 ## 6. Check the env before a deploy

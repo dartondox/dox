@@ -19,7 +19,10 @@ abstract class IDoxRequest {
   Map<String, dynamic> all();
   Map<String, dynamic> only(List<String> keys);
   String ip();
-  IAuth? get auth;
+
+  /// the logged in user of the request. It is kept apart from the
+  /// input, so a client field can not change it.
+  IAuth? auth;
   bool has(String key);
   String? cookie(String key, {bool decrypt = true});
   String userAgent();

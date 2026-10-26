@@ -12,6 +12,11 @@ void main() {
     expect(isSqliteFile('db/dox.sqlite-shm'), isTrue);
     expect(isSqliteFile('db/app.db'), isTrue);
     expect(isSqliteFile('db/test.sqlite3'), isTrue);
+    // the lock file of dox_migration
+    expect(isSqliteFile('db/dox.sqlite.lock'), isTrue);
+    expect(isSqliteFile('db/test.sqlite3.lock'), isTrue);
+    expect(isSqliteFile('db/app.db.lock'), isTrue);
+    expect(isSqliteFile('db/other.lock'), isFalse);
     expect(isSqliteFile('db/migration/2026_create_users_table.dart'), isFalse);
     expect(isSqliteFile('db/migration/create_users.sql'), isFalse);
   });

@@ -55,6 +55,10 @@ class DoxServer {
     );
     server.autoCompress = config.compress;
 
+    /// `X-XSS-Protection: 1; mode=block` (the default of dart:io) turns
+    /// on an old browser filter that can make holes. OWASP says send 0.
+    server.defaultResponseHeaders.set('X-XSS-Protection', '0');
+
     /// a stray async error from app code (eg. an un-awaited future that
     /// fails) is logged here, instead of killing the whole isolate.
     runZonedGuarded(

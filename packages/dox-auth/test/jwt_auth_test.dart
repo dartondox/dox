@@ -6,6 +6,10 @@ import 'package:test/test.dart';
 
 const String secret = '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt';
 
+/// the key that the driver signs with: made from [secret], see
+/// `JwtAuthDriver.signingKey`
+final JWTKey signingKey = JwtAuthDriver(secret: SecretKey(secret)).signingKey;
+
 /// In-memory users, so the tests do not need a database.
 final Map<int, FakeUser> users = <int, FakeUser>{};
 
@@ -61,6 +65,9 @@ class FakeRequest implements IDoxRequest {
 
   @override
   void merge(Map<String, dynamic> values) => merged.addAll(values);
+
+  @override
+  IAuth? auth;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -130,7 +137,12 @@ void main() {
     test('login issues a token with the user payload and no hidden fields', () {
       String? token = Auth().login(users[1]!);
       expect(token, isNotNull);
-      JWT jwt = JWT.verify(token!, SecretKey(secret));
+      JWT jwt = JWT.verify(token!, signingKey);
+      // the raw secret (APP_KEY) does not check it
+      expect(
+        () => JWT.verify(token, SecretKey(secret)),
+        throwsA(isA<JWTException>()),
+      );
       expect(jwt.payload['id'], 1);
       expect(jwt.payload['email'], 'a@dox.dev');
       expect(jwt.payload.containsKey('password'), isFalse);
@@ -265,6 +277,11 @@ void main() {
         prints(contains('[dox] warning: The JWT secret is 5 bytes')),
       );
       expect(() => JwtAuthDriver(secret: SecretKey(secret)), prints(isEmpty));
+      Env().env['APP_ENV'] = 'testing';
+      expect(
+        () => JwtAuthDriver(secret: SecretKey('short')),
+        prints(contains('[dox] warning')),
+      );
       Env().env.remove('APP_ENV');
     });
 
@@ -434,17 +451,52 @@ void main() {
     });
 
     test('a token with no guard audience is rejected', () async {
-      String token = JWT(<String, dynamic>{'id': 1}).sign(SecretKey(secret));
+      String token = JWT(<String, dynamic>{'id': 1}).sign(signingKey);
       Auth auth = Auth();
       await auth.verifyToken(bearer(token));
       expect(auth.isLoggedIn(), isFalse);
+    });
+
+    test('a token signed with the raw secret is rejected', () async {
+      String token = JWT(<String, dynamic>{
+        'id': 1,
+      }, audience: Audience.one('web')).sign(SecretKey(secret));
+      Auth auth = Auth();
+      await auth.verifyToken(bearer(token));
+      expect(auth.isLoggedIn(), isFalse);
+    });
+
+    test('a token with another algorithm is rejected', () async {
+      JWT jwt = JWT(<String, dynamic>{'id': 1}, audience: Audience.one('web'));
+      Auth good = Auth();
+      await good.verifyToken(bearer(jwt.sign(signingKey)));
+      expect(good.isLoggedIn(), isTrue);
+      // the right key, but HS512 and not the configured HS256
+      Auth other = Auth();
+      await other.verifyToken(
+        bearer(jwt.sign(signingKey, algorithm: JWTAlgorithm.HS512)),
+      );
+      expect(other.isLoggedIn(), isFalse);
+    });
+
+    test('attempt with a map or a list as the email fails', () async {
+      for (dynamic email in <dynamic>[
+        <String, dynamic>{'like': '%'},
+        <dynamic>['a@dox.dev'],
+      ]) {
+        String? token = await Auth().attempt(<String, dynamic>{
+          'email': email,
+          'password': 'secret',
+        });
+        expect(token, isNull);
+      }
     });
 
     test('AuthMiddleware uses its guard', () async {
       String adminToken = Auth(guard: 'admin').login(admins[1]!)!;
       FakeRequest req = bearer(adminToken);
       await AuthMiddleware(guard: 'admin').handle(req);
-      Auth auth = req.merged[AUTH_REQUEST_KEY];
+      Auth auth = req.auth! as Auth;
       expect(auth.user<FakeUser>()?.email, 'boss@dox.dev');
 
       expect(
@@ -478,7 +530,7 @@ void main() {
       FakeRequest req = bearer(token);
       IDoxRequest res = await AuthMiddleware().handle(req);
       expect(res, same(req));
-      Auth auth = req.merged[AUTH_REQUEST_KEY];
+      Auth auth = req.auth! as Auth;
       expect(auth.user<FakeUser>()?.id, 1);
     });
 
@@ -486,6 +538,9 @@ void main() {
       UnAuthorizedException e = UnAuthorizedException();
       expect(e.code, 401);
       expect(e.errorCode, 'unauthorized');
+      // a map message is sent as it is
+      Map<String, String> body = <String, String>{'error': 'login_needed'};
+      expect(UnAuthorizedException(message: body).toResponse(), body);
     });
   });
 }

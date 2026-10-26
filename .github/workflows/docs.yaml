@@ -5,7 +5,7 @@ name: Docs
 #   /3.x/  docs from main (alias /latest/, the default)
 #   /2.x/  old docs, deployed by hand from the v2.x branch
 # Old links like /the-basic/routing/ are kept as small redirect pages.
-# See docs/others/contribute.md, section "Docs".
+# See docs/community/contribute.md, section "Docs".
 
 on:
   push:

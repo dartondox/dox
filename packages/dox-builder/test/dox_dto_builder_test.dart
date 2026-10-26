@@ -329,6 +329,7 @@ class NotADto {}
 ''',
         },
         rootPackage: 'a',
+        generateFor: <String>{r'a|lib/$lib$'},
         outputs: <String, Object>{
           'a|lib/generated/dtos.g.dart': decodedMatches(
             predicate<String>((String s) {
@@ -343,9 +344,46 @@ class NotADto {}
         contains("import 'package:dox_validation/dox_validation.dart';"),
       );
       expect(output, contains("import 'package:a/posts/posts.dart';"));
+      expect(output, contains('const List<DtoSchema<Object>> dtos'));
       expect(output, contains(r'$CreatePostDto,'));
       expect(output, contains(r'$CreateUserDto,'));
       expect(output, isNot(contains('NotADto')));
+    });
+
+    test('an app with no DTOs gets an empty list', () async {
+      String output = '';
+      await testBuilder(
+        buildDoxDtos(BuilderOptions.empty),
+        <String, String>{
+          ..._validation,
+          // like dox_core: it exports dox_validation and has AppConfig
+          'core|lib/core.dart': '''
+export 'package:dox_validation/dox_validation.dart';
+class AppConfig {}
+''',
+          'a|lib/config/app.dart': '''
+import 'package:core/core.dart';
+class NotADto {}
+''',
+        },
+        rootPackage: 'a',
+        generateFor: <String>{r'a|lib/$lib$'},
+        outputs: <String, Object>{
+          'a|lib/generated/dtos.g.dart': decodedMatches(
+            predicate<String>((String s) {
+              output = s;
+              return true;
+            }),
+          ),
+        },
+      );
+      // only the import that gives DtoSchema, so no unused import
+      expect(output, contains("import 'package:core/core.dart';"));
+      expect(output, isNot(contains("import 'package:a/")));
+      expect(
+        output,
+        contains('final List<DtoSchema<Object>> dtos = <DtoSchema<Object>>[];'),
+      );
     });
 
     test('two DTOs with the same name stop the build', () async {
@@ -370,11 +408,19 @@ class Same {}
       expect(result.errors.join(), contains('Two @Dto classes are named Same'));
     });
 
-    test('no DTOs, no file', () async {
+    test('no DTOs and no AppConfig import, no file', () async {
       await testBuilder(
         buildDoxDtos(BuilderOptions.empty),
-        <String, String>{'a|lib/a.dart': 'class A {}'},
+        <String, String>{
+          ..._validation,
+          // like dox_orm: it uses dox_validation, but it is not an app
+          'a|lib/a.dart': '''
+import 'package:dox_validation/dox_validation.dart';
+abstract class A implements Rule<String> {}
+''',
+        },
         rootPackage: 'a',
+        generateFor: <String>{r'a|lib/$lib$'},
         outputs: <String, Object>{},
       );
     });

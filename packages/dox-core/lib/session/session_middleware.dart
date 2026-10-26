@@ -48,7 +48,9 @@ class SessionMiddleware implements IDoxNextMiddleware {
   Future<Session> _start(DoxRequest req, SessionConfig config) async {
     String? value = req.cookie(config.cookie);
     if (config.driver == 'cookie') {
-      return Session(read: value == null ? null : () => _decode(value));
+      return Session(
+        read: value == null ? null : () => _decode(value, config.lifetime),
+      );
     }
     _checkDriver(config);
     if (value == null) return Session();
@@ -99,12 +101,23 @@ class SessionMiddleware implements IDoxNextMiddleware {
     );
   }
 
-  static Object? _decode(String value) {
+  /// The data of a `cookie` driver session, or null (a new empty
+  /// session). The cookie holds the time it was saved (`at`). A session
+  /// older than [lifetime] is null, so a copied cookie stops working too,
+  /// not only when the browser drops it.
+  static Object? _decode(String value, Duration lifetime) {
+    Object? stored;
     try {
-      return jsonDecode(value);
+      stored = jsonDecode(value);
     } on FormatException {
       return null;
     }
+    if (stored is! Map) return null;
+    Object? at = stored['at'];
+    if (at is! num) return null;
+    int age = DateTime.now().millisecondsSinceEpoch - at.toInt();
+    if (age > lifetime.inMilliseconds) return null;
+    return stored;
   }
 
   static CacheStore _store(SessionConfig config) {
@@ -150,7 +163,7 @@ class CsrfMiddleware implements IDoxNextMiddleware {
     if (method != 'GET' &&
         method != 'HEAD' &&
         method != 'OPTIONS' &&
-        !_same(session.token, _given(req))) {
+        !Hash.equals(session.token, _given(req) ?? '')) {
       throw TokenMismatchException();
     }
     DoxResponse res = await next();
@@ -177,19 +190,11 @@ class CsrfMiddleware implements IDoxNextMiddleware {
 
   bool _excluded(String path) => PathPattern.any(except, path);
 
+  /// the token from the body or a header. Not from the query string:
+  /// a url ends up in logs, the history and the `Referer` header.
   static String? _given(DoxRequest req) {
-    Object? field = req.input('_token');
+    Object? field = req.body['_token'];
     if (field is String) return field;
     return req.header('X-CSRF-TOKEN') ?? req.header('X-XSRF-TOKEN');
-  }
-
-  /// compare in constant time, so the time does not leak the token
-  static bool _same(String token, String? given) {
-    if (given == null || given.length != token.length) return false;
-    int diff = 0;
-    for (int i = 0; i < token.length; i++) {
-      diff |= token.codeUnitAt(i) ^ given.codeUnitAt(i);
-    }
-    return diff == 0;
   }
 }

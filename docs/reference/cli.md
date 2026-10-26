@@ -84,7 +84,7 @@ What it does:
 1. When `pubspec.yaml` contains `build_runner`: runs `dart run build_runner build`. Stops with exit code 1 when it fails.
 2. Runs `dart build cli --target bin/server.dart --output build`.
 3. When `bin/queue.dart` or `bin/schedule.dart` exists: builds it the same way, to `build/bundle/bin/queue` and `build/bundle/bin/schedule`.
-4. Deletes the old `build/bundle/db`, then copies `db/` to `build/bundle/db`. It leaves out SQLite files (`*.sqlite`, `*.sqlite3`, `*.db`, and their `-wal`, `-shm` and `-journal` files), so your local data does not go to production.
+4. Deletes the old `build/bundle/db`, then copies `db/` to `build/bundle/db`. It leaves out SQLite files (`*.sqlite`, `*.sqlite3`, `*.db`, and their `-wal`, `-shm`, `-journal` and `.lock` files), so your local data does not go to production.
 5. Copies `.env.example` to `build/bundle/.env.example`.
 6. Prints `[Dox] Built build/bundle. Run it with: cd build/bundle && ./bin/server`.
 
@@ -235,7 +235,7 @@ After the file is made, the CLI tells you to run `dart run build_runner build`. 
 dox make:middleware <name>
 ```
 
-Writes `lib/app/http/middleware/<name>.middleware.dart`: a class `<Name>Middleware extends IDoxMiddleware` with a `handle(IDoxRequest req)` that returns `req`.
+Writes `lib/app/http/middleware/<name>.middleware.dart`: a class `<Name>Middleware implements IDoxMiddleware` with a `handle(IDoxRequest req)` that returns `req`.
 A trailing `Middleware` in the name is removed.
 
 Template: `_getSample` in `packages/dox-cli/lib/src/tools/create_middleware.dart`.
@@ -340,7 +340,7 @@ A failed run prints the error and sets exit code 1.
 | --- | --- | --- |
 | `dox make:factory <model>` | `dox create:factory` | Make `db/factories/<model>.factory.dart`. It imports the model with the package name of `pubspec.yaml`. |
 | `dox make:seeder <name>` | `dox create:seeder` | Make `db/seeders/<name>.seeder.dart`. It writes `db/seeders/seeders.dart` again, and makes `bin/seed.dart` when it is missing. |
-| `dox db:seed [--class=<name>]` | | Write `db/seeders/seeders.dart` again, then run `dart run bin/seed.dart [--class=<name>]`. Default seeder: `DatabaseSeeder`. When `bin/seed.dart` is missing, it prints `bin/seed.dart is missing.` (exit code 1). |
+| `dox db:seed [--class=<name>]` | | Write `db/seeders/seeders.dart` again, then run `dart run bin/seed.dart [--class=<name>]`. Default seeder: `DatabaseSeeder`. `--class <name>` (with a space) works too. When `bin/seed.dart` is missing, it prints `bin/seed.dart is missing.` (exit code 1). |
 
 Templates: `createFactory` in `packages/dox-cli/lib/src/tools/create_factory.dart`, and `createSeeder` and `seedEntrySource` in `packages/dox-cli/lib/src/tools/create_seeder.dart`.
 

@@ -40,5 +40,28 @@ void main() {
       expect(hashed, startsWith(r'$2a$04$'));
       expect(Hash.verify('secret', hashed), true);
     });
+
+    test('equals compares two values', () {
+      expect(Hash.equals('key-123', 'key-123'), isTrue);
+      expect(Hash.equals('key-123', 'key-124'), isFalse);
+      expect(Hash.equals('key', 'key-123'), isFalse);
+      expect(Hash.equals('', ''), isTrue);
+    });
+
+    test('a password over 72 bytes throws, and the error hides it', () async {
+      String long = 'p' * 73;
+      Matcher safe = isA<ArgumentError>()
+          .having((ArgumentError e) => e.toString(), 'text', contains('72'))
+          .having(
+            (ArgumentError e) => e.toString(),
+            'text',
+            isNot(contains(long)),
+          );
+      expect(() => Hash.make(long, rounds: 4), throwsA(safe));
+      await expectLater(Hash.makeAsync(long, rounds: 4), throwsA(safe));
+      // 72 bytes is fine. 'é' is 2 bytes, so 37 of them is 74 bytes.
+      expect(Hash.make('p' * 72, rounds: 4), startsWith(r'$2a$04$'));
+      expect(() => Hash.make('é' * 37, rounds: 4), throwsA(safe));
+    });
   });
 }

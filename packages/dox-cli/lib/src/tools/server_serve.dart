@@ -190,6 +190,7 @@ void _copyDir(Directory from, String to) {
 }
 
 /// `dox.sqlite`, `dox.sqlite-wal`, `dox.sqlite-shm`, `app.db`, ...
+/// and `dox.sqlite.lock`, the lock file of dox_migration.
 bool isSqliteFile(String file) {
-  return RegExp(r'\.(sqlite3?|db)(-wal|-shm|-journal)?$').hasMatch(file);
+  return RegExp(r'\.(sqlite3?|db)(-wal|-shm|-journal|\.lock)?$').hasMatch(file);
 }

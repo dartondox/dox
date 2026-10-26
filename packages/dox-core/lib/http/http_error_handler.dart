@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_response_handler.dart';
-import 'package:dox_core/utils/logger.dart';
 import 'package:dox_validation/dox_validation.dart' as dv;
 
 /// Every error of a request comes here. The `ExceptionHandler` of

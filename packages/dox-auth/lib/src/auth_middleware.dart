@@ -25,8 +25,7 @@ class AuthMiddleware implements IDoxMiddleware {
     await auth.verifyToken(req);
 
     if (auth.isLoggedIn()) {
-      /// merge into request auth
-      req.merge(<String, dynamic>{AUTH_REQUEST_KEY: auth});
+      req.auth = auth;
       return req;
     }
     String? page = redirectTo;

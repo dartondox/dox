@@ -25,7 +25,7 @@ One page to keep open while you work. Each section links to its full page.
 | `lib/app/models/<name>/` | `<name>.model.dart` |
 | `lib/app/jobs/` | `<name>.job.dart` |
 | `lib/providers/` | `DoxProvider` classes: ORM, storage, queue, schedule. You add others, like auth. |
-| `lib/generated/` | `container.g.dart`, `openapi.g.dart`, `jobs.g.dart` and (when you have a DTO) `dtos.g.dart`. Made by `build_runner`. Do not edit. |
+| `lib/generated/` | `container.g.dart`, `openapi.g.dart`, `jobs.g.dart` and `dtos.g.dart` (an empty list when the app has no DTO). Made by `build_runner`. Do not edit. |
 | `db/migration/` | migrations and `migrations.dart` (the registry) |
 | `db/seeders/`, `db/factories/` | seeders (`seeders.dart` is the registry) and model factories |
 
@@ -130,7 +130,9 @@ See [Routing](../the-basic/routing.md), [Controller](../the-basic/controller.md)
 class ApiKeyMiddleware implements IDoxMiddleware {
   @override
   dynamic handle(IDoxRequest req) {
-    if (req.header('X-Api-Key') != 'secret') {
+    String apiKey = Env.get<String>('API_KEY');
+    // Hash.equals: constant time, so the time does not leak the key
+    if (apiKey.isEmpty || !Hash.equals(req.header('X-Api-Key') ?? '', apiKey)) {
       return response('no').statusCode(401); // stop here
     }
     return req; // go on
@@ -458,8 +460,8 @@ Auth.initialize(AuthConfig(
 
 String? token = await Auth().attempt(<String, dynamic>{'email': e, 'password': p});
 String? token2 = Auth().login(user);
-user.password = Hash.make(password);
-bool ok = Hash.verify(password, hash);
+user.password = await Hash.makeAsync(password); // bcrypt in another isolate
+bool ok = await Hash.verifyAsync(password, hash);
 ```
 
 Protect a route with `AuthMiddleware()`. Client sends `Authorization: Bearer <token>`.

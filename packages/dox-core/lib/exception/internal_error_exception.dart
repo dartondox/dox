@@ -4,7 +4,7 @@ import 'package:dox_core/dox_core.dart';
 
 class InternalErrorException extends IHttpException {
   InternalErrorException({
-    String message = 'Server Error',
+    dynamic message = 'Server Error',
     String errorCode = 'server_error',
     int code = HttpStatus.internalServerError,
   }) {

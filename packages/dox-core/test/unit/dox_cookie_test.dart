@@ -16,8 +16,18 @@ void main() {
           m.group(1)!,
           config.appKey,
           associatedData: 'x-auth',
+          purpose: KeyDerivation.cookie,
         ),
         'Bearerxxxxxxxxx',
+      );
+      // the cookie key is made from APP_KEY, it is not APP_KEY itself
+      expect(
+        () => AESEncryptor.decode(
+          m.group(1)!,
+          config.appKey,
+          associatedData: 'x-auth',
+        ),
+        throwsA(isA<DecryptException>()),
       );
     });
 
@@ -29,6 +39,7 @@ void main() {
           value.substring('locale='.length),
           config.appKey,
           associatedData: 'user_id',
+          purpose: KeyDerivation.cookie,
         ),
         throwsA(isA<DecryptException>()),
       );
