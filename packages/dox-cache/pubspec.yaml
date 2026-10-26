@@ -10,7 +10,7 @@ resolution: workspace
 
 dependencies:
   crypto: ^3.0.7
-  ioredis: ^2.0.0-alpha.3
+  ioredis: ^3.0.0
 
 dev_dependencies:
   lints: ^6.1.0
