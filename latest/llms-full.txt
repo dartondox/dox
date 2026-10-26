@@ -2376,17 +2376,6 @@ These were checked by searching the code with `rg`.
 
 ## Planned
 
-!!! warning "This is a plan, not a promise. Open an issue to discuss."
-    Items come from the code (`ponytail:` notes in `packages/*/lib`) and from the owner.
-    There are no dates.
-
-### For 3.0.0
-
-| Item | Notes |
-| --- | --- |
-| Testing and bug fixes | Try the alpha and report what breaks. |
-| 3.0 stable | When testing finds no more big problems |
-
 ### Later (3.1 and after)
 
 - Notifications
