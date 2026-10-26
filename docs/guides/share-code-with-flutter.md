@@ -41,12 +41,14 @@ publish_to: none
 environment:
   sdk: ^3.13.0
 
-dependencies:
-  dox_validation: ^3.0.0-rc
+```
 
-dev_dependencies:
-  build_runner: ^2.17.1
-  dox_builder: ^3.0.0-rc
+Add the packages:
+
+```bash
+cd packages/blog_shared
+dart pub add dox_validation
+dart pub add dev:dox_builder dev:build_runner
 ```
 
 `dox_builder` is a dev dependency. It only runs when you generate code. The Flutter app does not get it.

@@ -16,7 +16,7 @@ Add it as a dev dependency. A new app made with `dox create` already has it.
 dart pub add dev:dox_builder dev:build_runner
 ```
 
-Dox 3.x is in alpha (`3.0.0-alpha.x`).
+To see what is ready and what may still change, read [Status and roadmap](https://dartondox.dev/latest/concepts/status-and-roadmap/).
 
 ## How it is used
 
