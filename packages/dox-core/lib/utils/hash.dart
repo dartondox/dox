@@ -64,6 +64,23 @@ class Hash {
     return Isolate.run(() => verify(password, hashedPassword));
   }
 
+  /// true when [a] and [b] are the same. It takes the same time for
+  /// any two values of the same length, so the time does not tell how
+  /// much of a secret (an API key, a token) was right.
+  /// ```
+  /// if (!Hash.equals(req.header('X-Api-Key') ?? '', apiKey)) { ... }
+  /// ```
+  static bool equals(String a, String b) {
+    List<int> x = utf8.encode(a);
+    List<int> y = utf8.encode(b);
+    if (x.length != y.length) return false;
+    int diff = 0;
+    for (int i = 0; i < x.length; i++) {
+      diff |= x[i] ^ y[i];
+    }
+    return diff == 0;
+  }
+
   /// bcrypt throws its own error with the password in the text. Throw
   /// first, with no password in the text, so logs never show it.
   static void _checkLength(String password) {

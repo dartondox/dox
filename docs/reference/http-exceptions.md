@@ -28,7 +28,7 @@ abstract class IHttpException {
 ## The classes
 
 Every class takes the named parameters `message`, `errorCode` and `code`. The table shows the defaults.
-`message` is a `String`. Only `ValidationException` takes a `Map` too.
+`message` is a `String` or a `Map`, like `NotFoundHttpException(message: {'error': 'not_found'})`.
 
 | Class | Package | Status `code` | `errorCode` | Default `message` | Dox throws it when |
 | --- | --- | --- | --- | --- | --- |
@@ -66,7 +66,14 @@ content-type: application/json
 {"code":"not_found","message":"Blog not found"}
 ```
 
-A `Map` message is sent as it is, with no `code` key. `ValidationException` always has a map, one entry per field:
+A `Map` message is sent as it is, with no `code` key, and with the status of the exception:
+
+```dart
+throw NotFoundHttpException(message: <String, String>{'error': 'not_found'});
+// 404 {"error":"not_found"}
+```
+
+`ValidationException` always has a map, one entry per field:
 
 ```
 HTTP/1.1 422 Unprocessable Entity

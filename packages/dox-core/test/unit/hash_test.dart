@@ -41,6 +41,13 @@ void main() {
       expect(Hash.verify('secret', hashed), true);
     });
 
+    test('equals compares two values', () {
+      expect(Hash.equals('key-123', 'key-123'), isTrue);
+      expect(Hash.equals('key-123', 'key-124'), isFalse);
+      expect(Hash.equals('key', 'key-123'), isFalse);
+      expect(Hash.equals('', ''), isTrue);
+    });
+
     test('a password over 72 bytes throws, and the error hides it', () async {
       String long = 'p' * 73;
       Matcher safe = isA<ArgumentError>()

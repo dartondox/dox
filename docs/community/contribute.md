@@ -204,7 +204,6 @@ The docs site is https://dartondox.dev. It is built with MkDocs Material and
 | --- | --- |
 | `/3.x/...` | 3.x docs, built from `main` |
 | `/latest/...` | a copy of the newest version (now 3.x) |
-| `/2.x/...` | the old 2.x docs, built from the `v2.x` branch |
 | `/` | redirects to `/latest/` |
 | old links like `/the-basic/routing/` | redirect to `/latest/the-basic/routing/` |
 
@@ -230,8 +229,6 @@ The `Docs check` workflow (`.github/workflows/docs-check.yaml`) runs on every pu
 - 3.x deploys by itself. The `Docs` workflow (`.github/workflows/docs.yaml`) runs on every push
   to `main` that changes `docs/`, `hooks/`, `overrides/`, a package `CHANGELOG.md`, `mkdocs.yml`, `requirements-docs.txt` or the workflow.
   It runs `mike deploy --update-aliases 3.x latest`.
-- 2.x deploys by hand. Open Actions > Docs > "Run workflow", pick version `2.x`.
-  It builds from the `v2.x` branch (change it with the `ref` input).
 - After each deploy, the workflow writes small redirect pages for the old root links,
   the root `index.html`, a `404.html` and the `CNAME` file. So `dartondox.dev` and old links keep working.
 - The workflow pushes with the built-in `GITHUB_TOKEN`. This works because `gh-pages` is not a protected branch.

@@ -15,7 +15,7 @@ If `APP_ENV` is empty or not set, Dox treats the app as production: `/docs` is o
 | Check | How | Read more |
 | --- | --- | --- |
 | `APP_KEY` is set, 32 characters and secret | `dox key:generate`, or a random value of exactly 32 characters in the real env. It signs JWT tokens and encrypts cookies. Never use the value from `.env.example`. | [Encryption](../security/encryption.md) |
-| `APP_ENV=production` | Set it, or leave it empty. In production, a bad `APP_KEY` stops the app at start with a `StateError`: an empty key, a key that is not exactly 32 characters, or a public sample key. Only with `APP_ENV` `development`, `local` or `test` does Dox log a warning instead. | [Env reference](env.md) |
+| `APP_ENV=production` | Set it, or leave it empty. In production, a bad `APP_KEY` stops the app at start with a `StateError`: an empty key, a key that is not exactly 32 characters, or a public sample key. Only with `APP_ENV` `development`, `local`, `test` or `testing` does Dox log a warning instead. | [Env reference](env.md) |
 | The env is complete | Run `dox env:check` in CI or before the deploy. It exits with code 1 when a key is missing or bad. | [CLI](cli.md) |
 | No secrets in the image or in git | `.env` in `.dockerignore` and `.gitignore`. Pass values as env vars (`docker run -e`, `env_file:`, systemd `EnvironmentFile=`). `dox build` copies `.env.example` only. | [Docker](../guides/docker.md) |
 | No comments after values in `.env` | The app strips `# note`, but migrations keep it in the value. Put comments on their own line. | [Env reference](env.md) |
@@ -26,9 +26,9 @@ If `APP_ENV` is empty or not set, Dox treats the app as production: `/docs` is o
 | --- | --- | --- |
 | JWT tokens expire | `JwtAuthDriver.expiresIn` is 1 hour by default. Pick a time that fits your app, like `JwtAuthDriver(secret: SecretKey(env.appKey), expiresIn: Duration(hours: 12))`. | [Authentication](../security/authentication.md) |
 | You can not revoke one token | **Dox limit.** There is no token list on the server. To log out everyone, change `APP_KEY`. | [Authentication](../security/authentication.md) |
-| Passwords are hashed | `user.password = Hash.make(input)` (bcrypt). Never store or encrypt a plain password. | [Hashing](../security/hashing.md) |
+| Passwords are hashed | `user.password = await Hash.makeAsync(input)` (bcrypt). In a request, use `makeAsync`: it runs bcrypt in another isolate, so other requests do not wait. Never store or encrypt a plain password. | [Hashing](../security/hashing.md) |
 | The hash is never sent | `List<String> get hidden => <String>['password'];` in the user model. The JWT payload is `user.toJson()`, and anyone can read it. | [Authentication](../security/authentication.md) |
-| Passwords have a max length | bcrypt throws on input over 72 bytes. Add `@MaxLength(72)` to the password field of the DTO. It counts characters, so non-ASCII text can still pass 72 bytes. | [Troubleshooting](troubleshooting.md) |
+| Passwords have a max length | bcrypt takes at most 72 bytes. `Hash.make` and `Hash.makeAsync` throw an `ArgumentError` on longer input. Add `@MaxLength(72)` to the password field of the DTO. It counts characters, so non-ASCII text can still pass 72 bytes. | [Troubleshooting](troubleshooting.md) |
 
 ## HTTP and network
 
@@ -38,7 +38,7 @@ If `APP_ENV` is empty or not set, Dox treats the app as production: `/docs` is o
 | `trustedProxies` is set behind a proxy | `AppConfig(trustedProxies: <String>['127.0.0.1', '::1'])`, or the proxy network, like `'172.16.0.0/12'`. Without it, `req.ip()` is the proxy and `req.scheme()` is `http`. Do not use `['*']` when the app port is public. | [App config](app-config.md) |
 | Body limits are on | Keep `maxBodySize` (10 MB) and `maxMultipartSize` (100 MB), or lower them. Set the same limit in the proxy: `client_max_body_size 100m;` | [Request](../the-basic/request.md) |
 | CORS has real origins | `CORSConfig(origin: 'https://my.app')`, or a list like `<String>['https://my.app', 'https://admin.my.app']`. With a list, Dox sends back only the request origin when it is in the list. | [CORS](../security/cors.md) |
-| No `credentials: true` with `origin: '*'` | The new project's `cors.dart` has `origin: '*'` and `credentials: true` with `enabled: false`. When you turn CORS on, set a real origin first. | [CORS](../security/cors.md) |
+| No `credentials: true` with `origin: '*'` | The new project's `cors.dart` has `origin: <String>['http://localhost:3000']`, `credentials: true` and `enabled: false`. When you turn CORS on, put your real origins in the list. | [CORS](../security/cors.md) |
 | Rate limiting | Add `RateLimit(...)` to login and other busy routes. Use a Redis cache store, so all servers share the counts. Or limit at the proxy, see [below](#rate-limit-at-the-proxy). | [Rate limiting](../security/rate-limiting.md) |
 | Security headers | Add `const SecurityHeaders()` to `globalMiddleware`. | [Security headers](../security/security-headers.md) |
 | gzip at the proxy | Keep `compress: false`. Turn on gzip in Caddy (`encode gzip`) or nginx (`gzip on;`). | [Performance](../digging-deeper/performance.md) |

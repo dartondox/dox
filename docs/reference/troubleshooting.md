@@ -126,10 +126,10 @@ When a value must have ` #` in it (a space, then `#`), put the value in quotes. 
 **Symptom.** Saving a user, or registering, gives a `500`. The log shows:
 
 ```
-Invalid argument(s) (password): Password is too long (The length should be less than or equal to 72): "..."
+Invalid argument(s) (password): The password is too long. bcrypt takes at most 72 bytes.
 ```
 
-**Cause.** `Hash.make()` uses bcrypt from the `bcrypt` package. bcrypt throws an `ArgumentError` when the password is longer than 72 bytes.
+**Cause.** `Hash.make()` and `Hash.makeAsync()` use bcrypt. bcrypt takes at most 72 bytes, so Dox throws an `ArgumentError` for a longer password. The text does not hold the password, so it is safe in logs.
 
 **Fix.** Refuse long passwords in your DTO, before you hash them:
 

@@ -161,4 +161,4 @@ A missing or empty key gives the default. With no default:
 
 !!! warning "APP_KEY"
     When `APP_KEY` is missing, not 32 characters, or a public sample key, `Dox().startServer()` stops with an error.
-    When `APP_ENV` is `development`, `local` or `test`, it only logs a warning. Make a key with `dox key:generate`.
+    When `APP_ENV` is `development`, `local`, `test` or `testing`, it only logs a warning. Make a key with `dox key:generate`.

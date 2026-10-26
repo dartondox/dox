@@ -14,7 +14,7 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `appKey` | `String` | required | Encrypts cookies (`req.cookie()`, `DoxCookie`) and signs local storage URLs. It must be exactly 32 characters. The app stops at start when it is empty, has another length, or is a public sample key. When `APP_ENV` is `development`, `local` or `test`, this is only a warning. Make one with `dox key:generate`. |
+| `appKey` | `String` | required | Encrypts cookies (`req.cookie()`, `DoxCookie`) and signs local storage URLs. It must be exactly 32 characters. The app stops at start when it is empty, has another length, or is a public sample key. When `APP_ENV` is `development`, `local`, `test` or `testing`, this is only a warning. Make one with `dox key:generate`. |
 | `serverPort` | `int` | `3000` | The port the HTTP server listens on. When the env has no `APP_PORT` but has `PORT`, Dox listens on `PORT` instead (Cloud Run, Fly, Render and Heroku set it). |
 | `host` | `String?` | `null`: `APP_HOST`, else all interfaces | The network interface to listen on, like `127.0.0.1`. `null` reads the env var `APP_HOST`. With neither, Dox listens on all interfaces, IPv6 and IPv4 (`::`). |
 | `totalIsolate` | `int?` | `Platform.numberOfProcessors` | Isolates (threads) that serve HTTP, all on the same port. On Windows the native server runs on one isolate. |
@@ -368,9 +368,17 @@ import 'package:dox_core/dox_core.dart';
 
 CORSConfig cors = CORSConfig(
   enabled: false,
-  origin: '*',
-  methods: '*',
-  headers: '*',
+  // a list: Dox sends back the request origin only when it is in the list
+  origin: <String>['http://localhost:3000'],
+  methods: <String>['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  headers: <String>[
+    'accept',
+    'authorization',
+    'content-type',
+    'x-csrf-token',
+    'x-xsrf-token',
+    'x-requested-with',
+  ],
   exposeHeaders: <String>[
     'cache-control',
     'content-language',
@@ -383,6 +391,11 @@ CORSConfig cors = CORSConfig(
   maxAge: 90,
 );
 ```
+
+Do not use `origin: '*'` together with `credentials: true`.
+With credentials the browser sends cookies, so it does not accept `*`, and the call fails.
+Dox does not send back any origin in place of `*`, because that would let every site call the app with the user's cookies.
+`'*'` is fine for a public API with `credentials: false` (or not set).
 
 ```dart title="lib/providers/orm_provider.dart"
 import 'package:dox_core/dox_core.dart';

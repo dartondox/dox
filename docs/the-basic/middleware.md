@@ -55,12 +55,17 @@ A function that takes a `DoxRequest` also works as middleware.
 import 'package:dox_core/dox_core.dart';
 
 dynamic apiKeyMiddleware(DoxRequest req) {
-  if (req.header('X-Api-Key') != 'secret') {
+  String apiKey = Env.get<String>('API_KEY');
+  String given = req.header('X-Api-Key') ?? '';
+  if (apiKey.isEmpty || !Hash.equals(given, apiKey)) {
     return response(<String, String>{'message': 'Unauthorized'}).statusCode(401);
   }
   return req;
 }
 ```
+
+The key comes from the `API_KEY` env variable, not from the code.
+`Hash.equals` takes the same time for every wrong key, so the time does not tell how much of the key was right. A normal `==` stops at the first wrong character.
 
 ```dart title="lib/routes/api.dart"
 Route.get('/ping', <dynamic>[apiKeyMiddleware, (WebController c) => c.pong]);

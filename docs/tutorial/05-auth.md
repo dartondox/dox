@@ -177,7 +177,7 @@ class AuthController {
     User user = User()
       ..name = body.name
       ..email = body.email
-      ..password = Hash.make(body.password);
+      ..password = await Hash.makeAsync(body.password);
     await user.save();
 
     String? token = Auth().login(user);
@@ -207,7 +207,7 @@ class AuthController {
 }
 ```
 
-- `Hash.make()` makes a bcrypt hash. Never save a plain password.
+- `Hash.makeAsync()` makes a bcrypt hash. It runs in another isolate, so other requests do not wait. Never save a plain password.
 - `Auth().attempt()` finds the user by email and checks the password. It gives a token, or `null`.
 - `Auth().login(user)` gives a token without a password check. Register uses it, because the user was just made.
 

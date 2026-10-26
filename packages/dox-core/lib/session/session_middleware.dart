@@ -163,7 +163,7 @@ class CsrfMiddleware implements IDoxNextMiddleware {
     if (method != 'GET' &&
         method != 'HEAD' &&
         method != 'OPTIONS' &&
-        !_same(session.token, _given(req))) {
+        !Hash.equals(session.token, _given(req) ?? '')) {
       throw TokenMismatchException();
     }
     DoxResponse res = await next();
@@ -196,15 +196,5 @@ class CsrfMiddleware implements IDoxNextMiddleware {
     Object? field = req.body['_token'];
     if (field is String) return field;
     return req.header('X-CSRF-TOKEN') ?? req.header('X-XSRF-TOKEN');
-  }
-
-  /// compare in constant time, so the time does not leak the token
-  static bool _same(String token, String? given) {
-    if (given == null || given.length != token.length) return false;
-    int diff = 0;
-    for (int i = 0; i < token.length; i++) {
-      diff |= token.codeUnitAt(i) ^ given.codeUnitAt(i);
-    }
-    return diff == 0;
   }
 }

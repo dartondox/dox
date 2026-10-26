@@ -48,7 +48,7 @@ class UserController {
     User user = User()
       ..name = body.name
       ..email = body.email
-      ..password = Hash.make(body.password);
+      ..password = await Hash.makeAsync(body.password);
     await user.save();
     return user;
   }

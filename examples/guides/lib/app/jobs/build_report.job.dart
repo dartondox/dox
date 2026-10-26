@@ -1,4 +1,4 @@
-import 'package:dox_core/utils/logger.dart';
+import 'package:dox_core/dox_core.dart';
 import 'package:dox_queue/dox_queue.dart';
 
 /// Builds a report in the queue worker.

@@ -60,11 +60,22 @@ Then a login with an unknown email takes as long as a wrong password. See [Authe
 
 bcrypt reads at most 72 bytes.
 `Hash.make` and `Hash.makeAsync` throw an `ArgumentError` when the password is longer than 72 bytes (UTF-8).
+The error text does not hold the password, so it is safe in logs.
 `Hash.verify` returns `false` for such a password.
 
 So limit the length in your DTO, like `@Length(min: 8, max: 72)`.
 `@Length` counts characters, and a letter outside ASCII can use up to 4 bytes.
 So a password with such letters can still be too long. Catch the error and answer `422`, or use a smaller `max`.
+
+## Compare secrets
+
+To check an API key or a token, use `Hash.equals(given, expected)`, not `==`.
+`==` stops at the first wrong character, so the time can tell how much of the key was right.
+`Hash.equals` takes the same time for every value of the same length.
+
+```dart
+bool ok = Hash.equals(req.header('X-Api-Key') ?? '', Env.get<String>('API_KEY'));
+```
 
 ## With login
 
