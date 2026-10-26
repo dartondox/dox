@@ -8,13 +8,17 @@ Let users register and log in, give them a JWT token, protect routes with it, an
 
 ## What you need
 
-- A Dox app with a database and a `users` table with `name`, `email` and `password` columns.
-- The `dox_auth` package: `dart pub add dox_auth`. A new app has it.
-- `build_runner` for the DTOs.
+- A Dox app (`dox create my_app`). A new app has a database (SQLite), a `User` model and a `users` table with `name`, `email` and `password` columns.
+- The `dox_auth` package. A new app does not have it. Add it:
+
+```bash
+dart pub add dox_auth
+```
 
 ## 1. Hide the password in the model
 
 The token holds `user.toJson()`. Anyone with the token can read it. So the password hash must be in `hidden`.
+The model of a new app already does this:
 
 ```dart title="lib/app/models/user/user.model.dart"
 import 'package:dox_orm/dox_orm.dart';
@@ -67,6 +71,9 @@ class AppAuthProvider extends DoxProvider {
   }
 }
 ```
+
+`APP_KEY` must be at least 32 bytes. `dox key:generate` makes a key of this length.
+A shorter key stops the app in production, and prints a warning in development.
 
 Dox finds the provider by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
 
@@ -208,7 +215,21 @@ class ApiRouter extends Router {
 }
 ```
 
-## 6. Build and run
+## 6. Register the DTOs
+
+Dox finds a DTO in the `dtos` list of `AppConfig`. `build_runner` writes this list to `lib/generated/dtos.g.dart`.
+Add it once. Skip this step when your `app.dart` already has `dtos: dtos`.
+
+```dart title="lib/config/app.dart"
+import 'package:my_app/generated/dtos.g.dart';
+
+AppConfig appConfig = AppConfig(
+  dtos: dtos,
+  // ...
+);
+```
+
+## 7. Build and run
 
 ```bash
 dart run build_runner build --delete-conflicting-outputs
@@ -253,7 +274,7 @@ Without the header, `/api/auth/me` gives `401 Authentication failed`.
 
 !!! note "The error shape"
     The `{"error": ...}` shape comes from the response handler in [Custom errors](custom-errors.md).
-    Without it, the `401` body is only the message.
+    Without it, the `401` body is `{"code":"unauthorized","message":"Wrong email or password"}`.
 
 ## Logout and expiry
 
@@ -264,7 +285,7 @@ The server can not cancel one JWT. It checks only the signature. This is what yo
 | Log out on this device | The client deletes the token. That is all `logout` does. |
 | Limit the damage of a stolen token | Keep `expiresIn` short, for example `Duration(hours: 12)`. |
 | Log every user out at once | Change `APP_KEY`. Every old token stops working. |
-| Block one user | Delete or disable the user. `AuthMiddleware` loads the user from the database on each request, so a deleted user gets `401`. |
+| Block one user | Delete the user. `AuthMiddleware` loads the user from the database on each request, so a deleted user gets `401`. |
 
 For a real "log out everywhere" button, add a `token_version` column to `users`, put it in the token, and compare the two in a middleware after `AuthMiddleware`.
 

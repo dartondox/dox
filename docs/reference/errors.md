@@ -4,7 +4,7 @@ icon: lucide/circle-alert
 
 # Error index
 
-A lookup table of the messages Dox prints or throws. Search this page for the text you see.
+This page lists the messages Dox prints or throws, so you can search for the text you see.
 
 - `<...>` is a part that changes, like a name or a number.
 - Dart adds a prefix to some errors: `Bad state:` (`StateError`), `Invalid argument(s):` (`ArgumentError`), `Unsupported operation:` (`UnsupportedError`), `Exception:` (`Exception`).
@@ -14,14 +14,16 @@ A lookup table of the messages Dox prints or throws. Search this page for the te
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `APP_KEY is not set. Run `dox key:generate` and put the key in .env` | `appKey` is empty. A warning, or a `StateError` that stops the app when `APP_ENV=production`. | Run `dox key:generate`, or set `APP_KEY` in the env. |
+| `APP_KEY is not set. Run `dox key:generate` and put the key in .env` | `appKey` is empty. A `StateError` stops the app, unless `APP_ENV` is `development`, `local` or `test`. Then it is only a warning. | Run `dox key:generate`, or set `APP_KEY` in the env. |
+| `APP_KEY must be exactly 32 characters. Run `dox key:generate`` | The key is shorter or longer. Same rule as above. | Run `dox key:generate`. |
+| `APP_KEY is a public sample key. Run `dox key:generate` for a new one` | The key is a known sample key. Same rule as above. | Run `dox key:generate`. |
 | `Unsupported operation: dox_http_native did not load: <reason>. Fix: ...` | The native HTTP library is missing or from another version (`native library ABI <x>, expected <y>`). The app stops at start. | Do what the `Fix:` part says. See [Troubleshooting](troubleshooting.md#the-native-http-library-did-not-load). |
 | `Server started at http://<host>:<port> with <n> isolate (native)` | Normal start. `<host>` is the address it listens on: `[::]` means all interfaces. | Nothing. |
 | `Windows: the native server runs on one isolate` | Windows has no `SO_REUSEPORT`. | Nothing. |
 | `Socket.IO runs on <n> isolates: clients should use transports: ['websocket'] ...` | Socket.IO with more than one isolate and long-polling on. | Use a Redis adapter, and `transports: ['websocket']` in the client. |
 | `[dox] isolate <n> error: <error>` | An error killed a worker isolate. The stack is on the next line. | Fix the error. Dox restarts the isolate. |
 | `[dox] isolate <n> exited, restarting` | A worker isolate died. A new one starts after 1 second. | Look at the error line above it. |
-| `SocketException: dox_http_native: bind failed (<code>), port = <port>` | The port is in use. | See [Troubleshooting](troubleshooting.md#port-already-in-use). |
+| `SocketException: dox_http_native: bind failed (<code>) (OS Error: errno = <errno>), port = <port>` | The port is in use. | See [Troubleshooting](troubleshooting.md#port-already-in-use). |
 
 ## dox_core: routes and controllers
 
@@ -29,7 +31,9 @@ These stop the app at start, so a bad route never reaches a request.
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `Route <where>: the controller parameter type <T> is not known. Use DoxRequest, a @Dto class, a type from Route.bind, or String, int, double, num, bool for path params. ...` | A controller parameter has another type, the DTO is not in `AppConfig.dtos`, or there is no `Route.bind<T>` for a `{param}` of the route. | Change the type, add the binder, or run `dart run build_runner build` and set `dtos: dtos`. |
+| `Route <where>: the controller parameter type <T> is not known. Use DoxRequest, a @Dto class, an @Inject class, a @DoxModel, a type from Route.bind, or String, int, double, num, bool for path params. ...` | A controller parameter has another type, the DTO is not in `AppConfig.dtos`, the class is not in the container, or there is no `Route.bind<T>` for a `{param}` of the route. | Change the type or add the binder. Run `dart run build_runner build`, and set `dtos: dtos` and `container: registerContainer` in `AppConfig`. |
+| `Route <where>: the action gives a function. Give it one controller parameter from the container, like (UserController c) => c.index. ...` | A route action like `(c) => c.index` where Dox can not find the controller class. | Give the parameter its type, and mark the controller class with `@Inject()`. |
+| `Bad state: <T> is not in the container. Add @Inject() above the class and run `dart run build_runner build`. ...` | Dox needs a class that is not in the container. | Do what the text says, and set `AppConfig(container: registerContainer)`. |
 | `Route name "<name>" is used twice: <method> <path> and <method> <path>.` | Two routes have the same name. | Give one of them another name. |
 | `Invalid argument (name): No route has this name: "<name>"` | `route()` or `Route.url()` with a name that no route has. | Check the name and the group `name:` prefix. |
 | `Invalid argument(s): Route "<name>" (<path>) needs the param "<param>".` | `route()` without a value for a `{param}`. | Pass it in `params:`. |
@@ -60,11 +64,13 @@ The table shows the `message` text.
 | Status | Message | When | What to do |
 | --- | --- | --- | --- |
 | `404` | `<METHOD> <path> not found` | No route matches. | Check the method, the path and the router `prefix`. |
-| `404` | `Not Found` | A typed path param does not fit, like `abc` for `int id`. | Send a valid value. |
+| `404` | `Not Found` | A typed path param does not fit, like `abc` for `int id`, or a `Route.bind` finds no row. | Send a valid value. |
 | `400` | `The body is not valid JSON` | A DTO reads a JSON body that does not parse. | Send valid JSON. |
 | `400` | `The form body is not valid` | A urlencoded body that can not be decoded. | Fix the client encoding. |
 | `415` | `Unsupported Media Type` | A DTO reads a body that is not JSON or form data. | Send `Content-Type: application/json` or form data. |
 | `413` | `Payload Too Large` | The body is bigger than `maxBodySize` or `maxMultipartSize`. | Send less, or raise the limit. |
+| `419` | `CSRF token mismatch` | `CsrfMiddleware` finds no CSRF token, or a wrong one, on a `POST`, `PUT`, `PATCH` or `DELETE`. | Send the token. See [CSRF](../security/csrf.md). |
+| `429` | `Too Many Requests` | A `RateLimit` middleware sees too many requests. The `Retry-After` header says how many seconds to wait. | Wait, then try again. See [Rate limiting](../security/rate-limiting.md). |
 | `422` | `{"_root":"The input has too many items (max 1000) or levels (max 10)"}` | Form or query keys with more than 1000 list items or 10 levels. | Send less nested data. |
 | `422` | `{"<field>":"<message>"}` | A DTO check failed. | See [Validation rules](../the-basic/validation-rules.md). |
 | `431` | (no text) | Native server: request line plus headers over 16 KB. | Send smaller headers or cookies. |
@@ -74,6 +80,7 @@ The table shows the `message` text.
 
 | Text | When | What to do |
 | --- | --- | --- |
+| `Bad state: This request has no session. Add SessionMiddleware() to globalMiddleware or to the route.` | `req.session` on a route with no `SessionMiddleware`. | Do what the text says. See [Session](../the-basic/session.md). |
 | `Bad state: <T> is not a known DTO. Add @Dto() to it, run `dart run build_runner build` and set `dtos: dtos` (lib/generated/dtos.g.dart) in AppConfig.` | `req.validate<T>()` can not find `T`. | Do what the text says. |
 | `Invalid argument(s): Storage disk "<name>" has unknown driver "<type>"` | A disk in `StorageConfig` has a `driver` other than `local`, `s3` or `memory`. | Fix the driver name. |
 | `Invalid argument(s): Storage disk "<name>" needs the "<setting>" setting. It is missing or empty.` | An `s3` disk without `bucket`, `key` or `secret`, on its first use. | Set `AWS_BUCKET`, `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`. |
@@ -82,16 +89,18 @@ The table shows the `message` text.
 | `404` `file not found` | `Storage().stream()` or `download()` of a missing file. | Check the path. |
 | `Invalid argument (trustedProxies): not an ip or cidr: "<value>"` | A bad entry in `AppConfig.trustedProxies`. | Use an IP, a CIDR like `10.0.0.0/8`, or `*`. |
 | `Invalid argument (type): must be asc or desc: "<value>"` | `orderBy(column, type)` with another direction. | Use `asc` or `desc`. |
-| `400` `decrypt_failed` | `AESEncryptor.decode` got changed text or a wrong key. It throws `DecryptException`. `req.cookie()` catches it and returns `null`. | Check the key. For a cookie, ask the user to log in again. |
+| `400` `decrypt_failed`, `The encrypted value is not valid` | `AESEncryptor.decode` got changed text or a wrong key. It throws `DecryptException`. `req.cookie()` catches it and returns `null`. | Check the key. For a cookie, ask the user to log in again. |
 
 ## dox_auth
 
 | Text | When | What to do |
 | --- | --- | --- |
 | `401` `Authentication failed` | `AuthMiddleware` finds no token, a bad or expired token, or the user is deleted. | Send `Authorization: Bearer <token>`. Log in again. |
-| `Invalid argument(s) (salt): Invalid salt length ...` | `Hash.verify()` with a value that is not a bcrypt hash. | See [Troubleshooting](troubleshooting.md#hashverify-throws-on-a-bad-hash). |
-| `Invalid argument(s) (password): Password is too long ...` | bcrypt with a password over 72 bytes. | Limit the length in the DTO. |
+| `Invalid argument(s) (password): Password is too long ...` | `Hash.make()` with a password over 72 bytes. | Limit the length in the DTO. See [Troubleshooting](troubleshooting.md#hashmake-throws-on-a-long-password). |
+| `Invalid argument(s) (secret): The JWT secret is empty. Set APP_KEY (run `dox key:generate`).` | `JwtAuthDriver` with an empty secret. | Set `APP_KEY`. |
+| `Invalid argument(s) (secret): The JWT secret is <n> bytes. It must be at least 32 bytes. ...` | A short secret. In `development`, `local` and `test` it is only a warning. | Run `dox key:generate`. |
 
+`Hash.verify()` gives `false` for a value that is not a bcrypt hash. It does not throw.
 `Auth().attempt()` returns `null` for a wrong password. It does not throw. See [Authentication](../security/authentication.md).
 
 ## dox_orm
@@ -127,8 +136,8 @@ The table shows the `message` text.
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `Exception: Could not connect to database: <error>` | The migrator can not open the database. | Check `DATABASE_URL` or the `DB_*` values. A real env var wins over `.env`. |
-| `Unknown migration command: <cmd> (use run, rollback, reset, refresh or status)` | `dart run bin/migrate.dart <cmd>` with another command. | Use one of the five. |
+| `Migration failed: <name>` then the error | A migration threw, or the migrator can not reach the database. | Read the error below it. For a connection error, check `DATABASE_URL` or the `DB_*` values. A real env var wins over `.env`. |
+| `Unknown migration command: <cmd> (use run, rollback, reset, refresh, fresh or status)` | `dart run bin/migrate.dart <cmd>` with another command. | Use one of the six. |
 | `Invalid argument(s): Invalid option <x>, use --step=<count>` | `rollback` with a bad option. | Use `--step=2`. |
 | `Bad state: Migration <name> is both a Dart and a .sql migration` | Two files with the same name in `db/migration`. | Rename or delete one. |
 | `Bad state: foreign key check failed: <table> points to a missing <parent> row` | SQLite: a migration left a broken foreign key. | Fix the data in the migration. |
@@ -136,6 +145,8 @@ The table shows the `message` text.
 | `Migrations are already up to date!` | Nothing to run. | Nothing. |
 | `Nothing to rollback!` | No batch to undo. | Nothing. |
 | `No migrations found.` | `status` with no migrations. | Check `db/migration`. |
+| `Bad state: Seeder <name> not found. Seeders: <names>` | `dox db:seed --class=<name>` with a seeder that is not in `db/seeders/seeders.dart`. | Check the name, or add the seeder to the list. |
+| `Invalid argument(s): Unknown option <x>, use --class=<name>` | `dox db:seed` with another option. | Use `--class=UserSeeder`. |
 
 See [Migration](../database/migration.md).
 

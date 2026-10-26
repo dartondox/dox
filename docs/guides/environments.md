@@ -95,7 +95,7 @@ The key is the getter name in UPPER_SNAKE case: `dbPort` reads `DB_PORT`.
 - A nullable getter with no body is optional: `int? get dbPort;` is `null` when the key is not set.
 - Any other getter with no body is required: `String get appKey;`.
 
-A missing required key stops the app at start, with a list of all problems. The part file `env.g.dart` is made by `build_runner` and is in `.gitignore`.
+A missing required key stops the app at start, with a list of all problems. The part file `env.g.dart` is made by `build_runner`.
 
 ## 2. Add a key
 
@@ -204,7 +204,8 @@ On a server you can also keep a `.env` next to the binary, outside git, with `ch
 `APP_KEY` encrypts cookies and signs JWT tokens and local signed URLs.
 
 - Make one per environment with `dox key:generate`. Never share the production key with staging.
-- When `APP_ENV=production` and `APP_KEY` is empty, the app does not start.
+- `APP_KEY` must be exactly 32 characters. `dox key:generate` makes a key of the right length.
+- When `APP_ENV` is not `development`, `local` or `test`, a bad key stops the app at start: empty, not 32 characters, or a public sample key. An empty `APP_ENV` counts as production. In development the app only logs a warning.
 - A new key makes every cookie, token and signed URL invalid. Every user is logged out. Plan it.
 
 ## 6. Check the env before a deploy

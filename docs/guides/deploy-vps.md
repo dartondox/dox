@@ -38,6 +38,8 @@ The result is `build/bundle/`:
 build/bundle/
   bin/server                         the AOT binary
   lib/dox_http_native-linux-*.so     the native HTTP server
+  lib/dox_postgres_native-linux-*.so the native Postgres driver
+  lib/dox_mysql_native-linux-*.so    the native MySQL driver
   lib/libsqlite3.so                  SQLite
   db/                                the migrations
   .env.example
@@ -218,9 +220,11 @@ journalctl -u blog --since "1 hour ago"   # the last hour
 journalctl -u blog -b                     # since the last boot
 ```
 
-The first lines after a start look like this:
+The first lines after the first start look like this:
 
 ```text
+Migrating: 2023_07_16_131937700_create_users_table
+Migrated: 2023_07_16_131937700_create_users_table
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
 {"level":"INFO","name":"dox","message":"Server started at http://127.0.0.1:3000 with 2 isolate (native)", ...}

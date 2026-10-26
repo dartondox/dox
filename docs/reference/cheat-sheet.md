@@ -10,19 +10,24 @@ One page to keep open while you work. Each section links to its full page.
 
 | Path | What is in it |
 | --- | --- |
-| `bin/server.dart` | starts the app: `Dox().initialize()`, migrations, `startServer()` |
+| `bin/server.dart` | starts the app: `Dox().initialize()`, migrations, `Dox().startServer()` |
 | `bin/migrate.dart` | runs migrations for `dox migration:*` |
-| `bin/openapi.dart` | writes the OpenAPI files for `dox openapi:generate` |
-| `lib/config/` | `app.dart` (`AppConfig`), `env.dart`, `database.dart`, `cors.dart`, `cache.dart`, `storage.dart`, `openapi.dart`, `logger.dart`, `socketio.dart` |
-| `lib/routes/` | `api.dart`, `web.dart`, `websocket.dart`: one `Router` class each |
+| `bin/seed.dart` | runs seeders for `dox db:seed` |
+| `bin/queue.dart` | the queue worker for `dox queue:*` |
+| `bin/schedule.dart` | the scheduler for `dox schedule:*` |
+| `bin/openapi.dart` | you add it: writes the OpenAPI files for `dox openapi:generate` |
+| `lib/config/` | `app.dart` (`AppConfig`), `env.dart`, `database.dart`, `cors.dart`, `cache.dart`, `storage.dart`, `logger.dart`, `queue.dart`, `schedule.dart`. You add others, like `openapi.dart`. |
+| `lib/routes/` | `api.dart`, `web.dart`: one `Router` class each |
 | `lib/app/http/controllers/` | `<name>.controller.dart` |
 | `lib/app/dtos/<name>/` | `<name>.dto.dart` |
 | `lib/app/http/middleware/` | `<name>.middleware.dart` |
 | `lib/app/http/serializers/` | `<name>.serializer.dart` |
 | `lib/app/models/<name>/` | `<name>.model.dart` |
-| `lib/providers/` | `DoxProvider` classes: ORM, auth, websocket |
-| `lib/generated/container.g.dart`, `lib/generated/dtos.g.dart`, `lib/generated/openapi.g.dart` | made by `build_runner`. Do not edit. |
+| `lib/app/jobs/` | `<name>.job.dart` |
+| `lib/providers/` | `DoxProvider` classes: ORM, storage, queue, schedule. You add others, like auth. |
+| `lib/generated/` | `container.g.dart`, `openapi.g.dart`, `jobs.g.dart` and (when you have a DTO) `dtos.g.dart`. Made by `build_runner`. Do not edit. |
 | `db/migration/` | migrations and `migrations.dart` (the registry) |
+| `db/seeders/`, `db/factories/` | seeders (`seeders.dart` is the registry) and model factories |
 
 See [CLI](cli.md) and [App config](app-config.md).
 
@@ -40,11 +45,16 @@ dox make:controller Blog [-r]
 dox make:middleware Auth
 dox make:dto CreateBlog
 dox make:serializer Blog
-dox make:model Blog -m           # model + migration
+dox make:model Blog -m             # model + migration
 dox make:migration create_blogs_table [--sql]
+dox make:job SendWelcomeEmail
 dox migrate                        # migration:run
+dox migrate --seed                 # then run the seeders
 dox migration:rollback --step=1
 dox migration:status
+dox db:seed [--class=UserSeeder]
+dox queue:work                     # run queued jobs
+dox schedule:work                  # run scheduled tasks
 dox openapi:generate [dir]
 ```
 
@@ -80,7 +90,8 @@ class ApiRouter extends Router {
 | `Route.middleware(<dynamic>[M()], () { ... })` | middleware for a group |
 | `Route.domain('api.app.com', () { ... })` | match by `Host` |
 | `Route.resource('blogs', BlogController)` | `index`, `create`, `store`, `show`, `edit`, `update`, `destroy` |
-| `Storage.route('files')` | serve a storage disk, signed URLs only (`dox_storage`) |
+| `Route.health('/health')` | `200 {"status": "ok"}`, or `503` when a check fails. See [Health check](../digging-deeper/health-check.md). |
+| `Storage.route('files')` | serve a storage disk. Only signed URLs work, unless `signed: false` (`dox_storage`) |
 | `Route.enabledCors(() { ... })` / `Route.disabledCors(...)` | CORS for some routes |
 | `Route.websocket('echo', (WebSocket s, DoxRequest req) { ... })` | a raw WebSocket. For rooms and acks, use Socket.IO. |
 

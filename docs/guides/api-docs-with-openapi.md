@@ -71,18 +71,18 @@ This is the real output for the blog API, shortened. The top level:
   "openapi": "3.1.0",
   "info": {"title": "Blog API", "version": "1.0.0"},
   "paths": {
-    "/ping": {},
     "/api/ping": {},
     "/api/posts": {},
     "/api/posts/{id}": {},
     "/api/auth/register": {},
     "/api/auth/login": {},
-    "/api/auth/user": {}
+    "/api/auth/user": {},
+    "/ping": {}
   },
   "components": {
     "schemas": {"Post": {}, "SavePost": {}, "RegisterUser": {}, "LoginUser": {}, "User": {}, "ValidationError": {}},
     "securitySchemes": {
-      "bearerAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"}
+      "bearerAuth": {"type": "http", "scheme": "bearer"}
     }
   }
 }
@@ -101,14 +101,18 @@ This is the real output for the blog API, shortened. The top level:
   },
   "responses": {
     "200": {"description": "Successful response"},
-    "401": {"description": "Not logged in"},
+    "401": {
+      "description": "Not logged in",
+      "content": {"application/json": {"schema": {"type": "object", "properties": {"code": {"type": "string"}, "message": {"type": "string"}}}}}
+    },
     "422": {
       "description": "Validation failed",
       "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ValidationError"}}}
     },
     "500": {"description": "Server error"}
   },
-  "security": [{"bearerAuth": []}]
+  "security": [{"bearerAuth": []}],
+  "x-dox-middleware": ["LogMiddleware", "AuthMiddleware"]
 }
 ```
 
@@ -122,6 +126,7 @@ Where each part comes from:
 | `401` and `bearerAuth` | `AuthMiddleware` on the route |
 | `422` | the route has a request class |
 | `200` with no body | `store` returns `DoxResponse`, so the builder can not see the body. Step 6 fixes this |
+| `x-dox-middleware` | the middleware of the route: the global `LogMiddleware` and `AuthMiddleware` |
 
 ## 5. See how a DTO becomes a schema
 
@@ -208,7 +213,14 @@ Run `dart run build_runner build` again and restart the app. The real result:
   "tags": ["Post"],
   "summary": "List all posts",
   "description": "Newest posts are not first. There is no paging yet.",
-  "operationId": "PostController.index"
+  "operationId": "PostController.index",
+  "responses": {
+    "200": {
+      "description": "Successful response",
+      "content": {"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/Post"}}}}
+    },
+    "500": {}
+  }
 },
 "post": {
   "tags": ["Posts"],
@@ -245,6 +257,8 @@ curl -o /dev/null -w '%{http_code}\n' http://localhost:3000/openapi.json   # 404
 To show the docs on staging too, but never in production, set `enabled` yourself:
 
 ```dart title="lib/config/openapi.dart"
+import 'package:blog/config/env.dart';
+
 OpenApiConfig openApi = OpenApiConfig(
   enabled: env.appEnv != 'production',
   info: Info(title: 'Blog API', version: '1.0.0'),

@@ -3,10 +3,15 @@ import 'dart:io';
 
 import 'package:dox_core/testing.dart';
 import 'package:dox_migration/dox_migration.dart';
+import 'package:dox_orm/dox_orm.dart';
+import 'package:dox_queue/dox_queue.dart';
+import 'package:dox_scheduler/dox_scheduler.dart';
 import 'package:http/http.dart' as http;
 import 'package:my_app/config/app.dart';
 import 'package:my_app/config/database.dart';
 import 'package:my_app/config/env.dart';
+import 'package:my_app/config/schedule.dart';
+import 'package:my_app/generated/jobs.g.dart';
 import 'package:test/test.dart';
 
 import '../db/migration/migrations.dart';
@@ -241,6 +246,30 @@ void main() {
       TestResponse res = await client.post('/api/reports');
       expect(res.status, 200);
       expect(res.json['status'], 'queued');
+    });
+
+    test('POST /api/reports/queued saves a job, the worker runs it', () async {
+      TestResponse res = await client.post('/api/reports/queued');
+      expect(res.status, 200);
+      expect(res.json['status'], 'queued');
+      expect(await QueryBuilder.table('jobs').count(), 1);
+
+      await Worker(
+        driver: Queue.driver,
+        jobs: jobRegistry,
+        options: WorkerOptions(stopWhenEmpty: true),
+      ).run();
+      expect(await QueryBuilder.table('jobs').count(), 0);
+    });
+
+    test('the cleanup task runs every hour', () async {
+      Schedule s = Schedule();
+      schedule(s);
+      ScheduledTask cleanup = s.tasks.single;
+      expect(cleanup.name, 'cleanup');
+      expect(cleanup.isDue(DateTime.utc(2026, 10, 25, 2)), isTrue);
+      expect(cleanup.isDue(DateTime.utc(2026, 10, 25, 2, 30)), isFalse);
+      await cleanupUsers();
     });
 
     test('GET /api/primes/100000', () async {

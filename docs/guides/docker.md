@@ -14,6 +14,7 @@ Build a small production image with `dox build`, and run it with Postgres in Doc
 ## 1. Add a health route
 
 The health check asks this route. It answers 503 when the database does not answer.
+Put it in `register()` of `WebRouter`. `QueryBuilder` comes from `package:dox_orm/dox_orm.dart`.
 
 ```dart title="lib/routes/web.dart"
 Route.health(
@@ -70,6 +71,7 @@ RUN dart pub get --offline
 
 # `dox build` runs build_runner, then `dart build cli`.
 # The bundle is in build/bundle: bin/server, lib/, db/, .env.example
+# (and bin/queue, bin/schedule when the app has them)
 RUN dart pub global activate dox ^3.0.0-alpha \
   && /root/.pub-cache/bin/dox build
 
@@ -219,7 +221,7 @@ curl http://localhost:3000/health
 ```
 
 ```json
-{"status":"ok"}
+{"status":"ok","checks":{"database":"ok"}}
 ```
 
 Stop Postgres with `docker compose stop postgres`. After about 45 seconds, `docker compose ps` shows the app as `unhealthy`.

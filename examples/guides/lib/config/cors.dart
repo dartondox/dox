@@ -3,8 +3,8 @@ import 'package:my_app/config/env.dart';
 
 /// `enabled` is true by default, so every route sends the headers.
 CORSConfig cors = CORSConfig(
-  /// One origin only. A list is joined with commas, and browsers reject
-  /// that value. Set CORS_ORIGIN to the real front-end URL in production.
+  /// One origin, or a list of origins. Set CORS_ORIGIN to the real
+  /// front-end URL in production.
   origin: env.corsOrigin,
 
   methods: <String>['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],

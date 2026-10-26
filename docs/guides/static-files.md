@@ -14,11 +14,11 @@ Serve a folder of files, or a single page app (React, Vue, Flutter web), from th
 
 ## Serve a folder: one line
 
-`Storage.route` serves every file of a storage disk. Make a disk for the folder, and add the route.
+`Storage.route` serves every file of a storage disk. Add a `public` disk for the folder in `lib/config/storage.dart`:
 
 ```dart title="lib/config/storage.dart"
 StorageConfig storageConfig = StorageConfig(
-  defaultDisk: 'local',
+  defaultDisk: env.storageDisk,
   disks: <String, Map<String, dynamic>>{
     'local': <String, dynamic>{'driver': 'local', 'root': 'storage'},
 
@@ -27,6 +27,8 @@ StorageConfig storageConfig = StorageConfig(
   },
 );
 ```
+
+Then add the route in `register()` of `WebRouter`. `Storage` comes from `package:dox_storage/dox_storage.dart`.
 
 ```dart title="lib/routes/web.dart"
 Storage.route('static', disk: 'public', signed: false); // GET /static/{key*}

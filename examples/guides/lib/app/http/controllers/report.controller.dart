@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:isolate';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:my_app/app/jobs/build_report.job.dart';
 
 @Inject()
 class ReportController {
@@ -11,6 +12,16 @@ class ReportController {
     String id = DateTime.now().microsecondsSinceEpoch.toString();
     unawaited(_build(id));
     return <String, String>{'id': id, 'status': 'queued'};
+  }
+
+  /// POST /api/reports/queued
+  /// Saves a job in the jobs table and answers at once.
+  /// The queue worker (`dox queue:work`) runs it, and tries again when
+  /// it fails. The job is not lost when the server stops.
+  Future<Map<String, String>> queue(DoxRequest req) async {
+    String id = DateTime.now().microsecondsSinceEpoch.toString();
+    String jobId = await BuildReport(reportId: id).dispatch();
+    return <String, String>{'id': id, 'job': jobId, 'status': 'queued'};
   }
 
   /// I/O work (database, HTTP calls, email) is fine here. It shares the

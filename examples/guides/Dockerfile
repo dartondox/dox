@@ -12,6 +12,7 @@ RUN dart pub get --offline
 
 # `dox build` runs build_runner, then `dart build cli`.
 # The bundle is in build/bundle: bin/server, lib/, db/, .env.example
+# (and bin/queue, bin/schedule when the app has them)
 RUN dart pub global activate dox ^3.0.0-alpha \
   && /root/.pub-cache/bin/dox build
 

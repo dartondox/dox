@@ -8,8 +8,7 @@ Make a list route that takes `page` and `per_page` from the query string and ret
 
 ## What you need
 
-- A Dox app with a database and a `User` model (`dox make:model User -m`).
-- `build_runner` for the DTO.
+- A Dox app (`dox create my_app`). A new app has a database (SQLite), a `User` model and a `users` table.
 
 ## 1. Write the query DTO
 
@@ -70,7 +69,21 @@ Add a `where` before `paginate` to filter: `User().where('role', 'admin').orderB
 Route.get('/users', (UserController c) => c.index);
 ```
 
-## 4. Build and run
+## 4. Register the DTOs
+
+Dox finds a DTO in the `dtos` list of `AppConfig`. `build_runner` writes this list to `lib/generated/dtos.g.dart`.
+Add it once. Skip this step when your `app.dart` already has `dtos: dtos`.
+
+```dart title="lib/config/app.dart"
+import 'package:my_app/generated/dtos.g.dart';
+
+AppConfig appConfig = AppConfig(
+  dtos: dtos,
+  // ...
+);
+```
+
+## 5. Build and run
 
 ```bash
 dart run build_runner build --delete-conflicting-outputs
@@ -120,6 +133,7 @@ curl 'http://localhost:3000/api/users?page=0&per_page=500'
 ## Change the shape of a row
 
 Return a serializer for each row, when the model has fields you do not want to send.
+`dox make:serializer User` makes `lib/app/http/serializers/user.serializer.dart`.
 `page.data` gives the typed rows (`List<User>`):
 
 ```dart

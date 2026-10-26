@@ -14,7 +14,7 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `appKey` | `String` | required | Encrypts cookies (`req.cookie()`, `DoxCookie`) and signs local storage URLs. In production the app stops at start when it is empty. Make one with `dox key:generate`. |
+| `appKey` | `String` | required | Encrypts cookies (`req.cookie()`, `DoxCookie`) and signs local storage URLs. It must be exactly 32 characters. The app stops at start when it is empty, has another length, or is a public sample key. When `APP_ENV` is `development`, `local` or `test`, this is only a warning. Make one with `dox key:generate`. |
 | `serverPort` | `int` | `3000` | The port the HTTP server listens on. When the env has no `APP_PORT` but has `PORT`, Dox listens on `PORT` instead (Cloud Run, Fly, Render and Heroku set it). |
 | `host` | `String?` | `null`: `APP_HOST`, else all interfaces | The network interface to listen on, like `127.0.0.1`. `null` reads the env var `APP_HOST`. With neither, Dox listens on all interfaces, IPv6 and IPv4 (`::`). |
 | `totalIsolate` | `int?` | `Platform.numberOfProcessors` | Isolates (threads) that serve HTTP, all on the same port. On Windows the native server runs on one isolate. |
@@ -183,6 +183,7 @@ Source: `lib/src/dox/socket_io_config.dart` in [dartondox/dox-socketio](https://
 | `upgradeTimeout` | `Duration` | 10 s | Time a websocket upgrade may take. |
 | `connectTimeout` | `Duration` | 45 s | Time a client has to join a namespace after the handshake. |
 | `maxHttpBufferSize` | `int` | `1000000` | Biggest message in bytes a client may send. |
+| `maxAttachments` | `int` | `10` | Most binary attachments in one packet. A packet with more closes that client. |
 | `transports` | `List<String>` | `['polling', 'websocket']` | Allowed transports. |
 | `allowUpgrades` | `bool` | `true` | Allow upgrades from polling to websocket. |
 | `cors` | `CorsOptions?` | `null` (no CORS headers) | CORS for the long-polling requests. |
@@ -237,6 +238,8 @@ Keys of `extra`:
 | mysql | `verifyCertificate` | `bool` | `true` | `false` skips the TLS certificate check. Only for a self-signed certificate in development. |
 | mysql | `maxConnectionAge` | `Duration` | 12 hours | Close and reopen a connection after this time. |
 | sqlite | `busyTimeout` | `int` | `5000` | `PRAGMA busy_timeout` in milliseconds. |
+
+The `database.dart` of a new project also sets `maxConnectionAge` for Postgres and `collation` for MySQL. The Postgres driver does not read `maxConnectionAge`, and no driver reads `collation`. So these two keys change nothing.
 
 ## AuthConfig
 
@@ -400,5 +403,7 @@ class ORMProvider extends DoxProvider {
   }
 }
 ```
+
+A new project also has `lib/config/storage.dart`, `queue.dart` and `schedule.dart`, with a provider for each in `lib/providers/`. See [File storage](../digging-deeper/file-storage.md), [Queue](../digging-deeper/queue.md) and [Scheduler](../digging-deeper/scheduler.md).
 
 A new project has no `openapi.dart`, `socketio.dart` or auth provider. You add them when you need them. See [OpenAPI](../packages/openapi.md), [Socket.IO](../packages/socketio.md) and [Authentication](../security/authentication.md).
