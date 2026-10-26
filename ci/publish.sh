@@ -4,7 +4,7 @@
 # be run again.
 #
 # Env: PACKAGES (from ci/publish-order.sh), GITHUB_REF_NAME (the tag, like
-# v3.0.0-alpha.1), ACTIONS_ID_TOKEN_REQUEST_TOKEN and
+# v<version>), ACTIONS_ID_TOKEN_REQUEST_TOKEN and
 # ACTIONS_ID_TOKEN_REQUEST_URL (set by GitHub Actions with id-token: write).
 # Needs dart, curl and jq.
 set -euo pipefail

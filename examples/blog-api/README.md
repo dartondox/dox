@@ -24,7 +24,7 @@ The app uses SQLite. You need no database server and no Docker.
 ```bash
 cp .env.example .env
 dart pub get
-dox key:generate   # needs the dox CLI: dart pub global activate dox ^3.0.0-rc
+dox key:generate   # needs the dox CLI: dart pub global activate dox
 dart run build_runner build --delete-conflicting-outputs
 dart analyze --fatal-infos
 dart test --concurrency=1
