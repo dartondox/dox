@@ -15,39 +15,138 @@ The short version:
 
 ## Benchmark
 
-A "hello world" test. Each server answers `GET /` with the plain text
-`Hello World`. Dox is a small real Dox app with one route.
+The rules of [the-benchmarker/web-frameworks](https://github.com/the-benchmarker/web-frameworks):
+each server answers `GET /` (empty body), `GET /user/:id` (the id) and
+`POST /user` (empty body). Dox is a full Dox app with these three routes.
+"Dox server only" is `dox_http_native` with no framework, to show what the
+framework costs.
 
-Hello world only measures framework overhead. A real app spends most of its
-time on the database, JSON and your own code, so the gaps are much smaller
-there.
+This only measures the HTTP stack. A real app spends most of its time on
+the database, JSON and your own code, so the gaps are smaller there. See
+[App benchmark](#app-benchmark).
+
+### 2 cores
+
+<div class="dox-bench" markdown>
+
+<p class="dox-bench__title">2 cores: ahead of Rust hyper and Bun</p>
+<p class="dox-bench__sub"><code>GET /</code>, 256 connections. Every server has one worker per core: Dox one isolate, Bun and Node one process, Go and Rust one thread.</p>
+
+<div class="dox-bench__grid">
+  <span></span><span></span>
+  <span class="dox-bench__head">req/s</span>
+  <span class="dox-bench__head">p99</span>
+  <span class="dox-bench__head dox-bench__head--ram">RAM</span>
+
+  <div class="dox-bench__row dox-bench__row--win">
+    <span class="dox-bench__name"><strong>Dox</strong><span>full app</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
+    <span class="dox-bench__num">631,399<span class="dox-bench__vs">fastest</span></span>
+    <span class="dox-bench__p99">1.2 ms</span>
+    <span class="dox-bench__ram">58 MB</span>
+  </div>
+  <div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>Rust</strong><span>hyper</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 93.4%"></span></span>
+    <span class="dox-bench__num">589,565<span class="dox-bench__vs">1.07× slower</span></span>
+    <span class="dox-bench__p99">0.8 ms</span>
+    <span class="dox-bench__ram">15 MB</span>
+  </div>
+  <div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>Bun</strong><span>Bun.serve</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 83.6%"></span></span>
+    <span class="dox-bench__num">528,153<span class="dox-bench__vs">1.2× slower</span></span>
+    <span class="dox-bench__p99">1.0 ms</span>
+    <span class="dox-bench__ram">68 MB</span>
+  </div>
+  <div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>Node</strong><span>node:http</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 43.9%"></span></span>
+    <span class="dox-bench__num">277,430<span class="dox-bench__vs">2.3× slower</span></span>
+    <span class="dox-bench__p99">2.2 ms</span>
+    <span class="dox-bench__ram">252 MB</span>
+  </div>
+  <div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>Go</strong><span>net/http</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 38%"></span></span>
+    <span class="dox-bench__num">240,239<span class="dox-bench__vs">2.6× slower</span></span>
+    <span class="dox-bench__p99">3.2 ms</span>
+    <span class="dox-bench__ram">44 MB</span>
+  </div>
+  <div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>dart:io</strong><span>HttpServer</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 20%"></span></span>
+    <span class="dox-bench__num">126,371<span class="dox-bench__vs">5× slower</span></span>
+    <span class="dox-bench__p99">11.0 ms</span>
+    <span class="dox-bench__ram">49 MB</span>
+  </div>
+</div>
+
+<p class="dox-bench__foot"><span>Dox · Rust 1.99 · Bun 1.4 · Node 26 · Go 1.26 · Dart 3.13 · 2 cores · 256 connections · wrk</span></p>
+
+</div>
+
+Requests per second on `GET /` at 64, 256 and 512 connections:
+
+| Server              | 64      | 256     | 512     | p99 at 256 | peak MB |
+| ------------------- | ------: | ------: | ------: | ---------: | ------: |
+| Dox                 | 508,470 | 631,399 | 626,278 | 1.23 ms    | 58      |
+| Dox server only     | 572,947 | 694,841 | 711,105 | 0.74 ms    | 30      |
+| Rust (hyper)        | 493,065 | 589,565 | 561,625 | 0.77 ms    | 15      |
+| Bun (`Bun.serve`)   | 484,601 | 528,153 | 545,820 | 0.96 ms    | 68      |
+| Node (`node:http`)  | 257,777 | 277,430 | 266,678 | 2.17 ms    | 252     |
+| Go (`net/http`)     | 246,725 | 240,239 | 230,382 | 3.15 ms    | 44      |
+| `dart:io`           | 113,847 | 126,371 | 134,586 | 11.01 ms   | 49      |
+
+The other two routes at 256 connections:
+
+| Server            | `GET /user/:id` | `POST /user` |
+| ----------------- | --------------: | -----------: |
+| Dox               | 556,714         | 504,889      |
+| Dox server only   | 672,334         | 683,219      |
+| Rust (hyper)      | 555,040         | 554,464      |
+| Bun               | 501,058         | 516,647      |
+| Node              | 267,704         | 271,067      |
+| Go                | 229,308         | 232,366      |
+| `dart:io`         | 96,341          | 119,633      |
 
 ### 1 core
 
-| Server                        | req/s   | p99 ms | CPU % | peak MB |
-| ----------------------------- | ------: | -----: | ----: | ------: |
-| Dox, native server            | 171,042 | 0.92   | 100   | 9       |
-| Dox, `dart:io` server         | 33,154  | 5.48   | 101   | 39      |
-| Bun 1.4.3                     | 181,162 | 1.13   | 101   | 14      |
-| Node 24.22.0                  | 81,909  | 2.26   | 101   | 54      |
-| Pure Rust hyper (the ceiling) | 254,349 | 0.47   | 100   | 5       |
+| Server          | 64      | 256     | 512     | peak MB |
+| --------------- | ------: | ------: | ------: | ------: |
+| Dox             | 331,016 | 355,868 | 355,513 | 50      |
+| Dox server only | 361,034 | 398,202 | 392,098 | 24      |
+| `dart:io`       | 62,640  | 62,271  | 62,265  | 48      |
 
-On one core, Dox with the native server is about as fast as Bun (0.94x).
-It is 5x faster than Dox on `dart:io`.
+On one core Dox serves about 5.5 times more requests than `dart:io`.
 
-How it was run:
+### Why it is fast
+
+The server runs on the isolate's own thread. One FFI call writes the
+answers, reads the sockets and parses the new requests. Dart runs the
+handlers and calls again. A request never waits for another thread to
+wake up. A small helper thread only watches the sockets while the isolate
+has nothing to do. See [Native server](native-server.md#how-it-works).
+
+A profile with `perf` (4 server cores, 64 connections) shows the effect:
+
+| | Dox | Bun |
+| --- | ---: | ---: |
+| CPU time per request | 4.85 µs | 5.5 µs |
+| Context switches per request | 0.08 | 0.035 |
+
+### How it was run
 
 - Docker on an Apple M2 (8 CPUs in the Docker VM), `linux/arm64`.
-- The server and wrk run in two containers, pinned to different CPUs:
-  server on CPU 0, wrk on CPUs 2-7.
-- wrk 4.2.0, 100 connections (the tables) and 256 connections.
-  5 seconds warm-up, then 3 runs of 10 seconds. The tables show the median.
-- CPU % and peak memory come from `docker stats`. 100% = one core.
-- Dart 3.13.6, Rust 1.99.1. Dox is built with `dart build cli` (this is
-  what `dox build` does). The build hook of `dox_http_native` builds the
-  Rust library with cargo.
-- The `dart:io` row is the same Dox app on a `dart:io` `HttpServer`, for
-  comparison.
+- One server at a time. The server and wrk run in two containers on
+  different CPUs: the server on 2 CPUs (or 1), wrk on the other 6. Host
+  network, keep-alive.
+- wrk 4.1, 64, 256 and 512 connections, 5 seconds warm-up, then 15 seconds
+  per route.
+- Every server has as many workers as server CPUs.
+- Peak memory is the peak of the container (all workers).
+- Dart 3.13.6, AOT build with `dart build cli` (this is what `dox build`
+  does). Node 26.12, Bun 1.4.4, Go 1.26, Rust 1.99 with hyper 1.
 
 ## App benchmark
 
@@ -207,9 +306,7 @@ Versions: Dox (native server, `dox_postgres_native`), Go 1.27
 
 Dox runs one isolate per core, Bun and Node one worker process per core.
 On the database routes Dox is ahead of all of them on 2 cores, and its p99
-is the lowest. On `/json` Bun is faster: its server is C++ and calls the
-JavaScript handler on the same thread, while Dox hands each batch of
-requests from the Rust thread to the Dart isolate.
+is the lowest.
 
 Dox on `dart:io` with the Dart `postgres` driver is 4 to 10 times slower
 than Dox with the native server and driver. Keep both on.
