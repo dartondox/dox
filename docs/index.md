@@ -58,7 +58,7 @@ class BlogController {
 2.  `@Dto()` marks an input class. `build_runner` generates the checks from the fields and their types.
 3.  The generated schema. The same schema feeds the OpenAPI docs.
 4.  Ask for the DTO as a parameter. Dox reads the query (or the body), checks it, and gives you a typed object. Bad input gets a `422` before your code runs.
-5.  The ORM. The same code runs on Postgres, MySQL and SQLite, through native Rust drivers.
+5.  The ORM. The same code runs on Postgres, MySQL and SQLite. Postgres and MySQL use native Rust drivers.
 
 </div>
 
@@ -170,8 +170,8 @@ at a time.
 
 -   :material-database-outline: **ORM and query builder**
 
-    Models, relations, migrations and transactions for Postgres, MySQL/MariaDB and SQLite,
-    with native Rust drivers. See [Database](database/index.md).
+    Models, relations, migrations and transactions for Postgres, MySQL/MariaDB and SQLite.
+    Postgres and MySQL use native Rust drivers. See [Database](database/index.md).
 
 -   :material-check-decagram-outline: **Typed validation**
 

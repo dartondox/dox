@@ -8,6 +8,10 @@ This step makes the `posts` table with a Dart migration and a `Post` model for i
 
 ## 1. Make the model and the migration
 
+Stop `dox s` first with `Ctrl+C`.
+`dox s` restarts the server when a new file appears, and the server runs new migrations at start.
+So it would run the new migration before you add the columns.
+
 ```bash
 dox make:model Post -m
 ```
@@ -106,11 +110,15 @@ Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
 ```
 
+!!! tip "The migration ran too early?"
+    If `dox s` was still running, the `posts` table may already exist without `title` and `body`.
+    Run `dox migration:rollback`, then `dox migration:run` again.
+
 The model needs its generated file `post.model.g.dart`.
 `dox s` makes it while it runs. If `dox s` is not running, run the generator once:
 
 ```bash
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
 
 ## Check it
@@ -120,9 +128,15 @@ dox migration:status
 ```
 
 ```text
-Migration                             Batch  Status
-2026_10_22_205345_create_posts_table  1      Ran
+Migration                                 Batch  Status
+2023_07_16_131937700_create_users_table   1      Ran
+2026_10_25_000000000_create_queue_tables  1      Ran
+2026_10_22_205345_create_posts_table      2      Ran
 ```
+
+The first two come with the template. The server ran them at the first start in step 1.
+
+Now start the server again with `dox s`.
 
 ## Next
 

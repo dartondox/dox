@@ -19,8 +19,8 @@ dart pub get
 So every import in this tutorial starts with `package:blog/`.
 
 !!! note "Check the versions"
-    Open `pubspec.yaml`. Every Dox package must be `^3.0.0-alpha`.
-    If the template has an older version, change it and run `dart pub get` again.
+    Open `pubspec.yaml`. Every Dox package must be a 3.x version, like `^3.0.0-alpha.17`.
+    Each package has its own version number. That is fine.
 
 ## 2. Use SQLite
 
@@ -48,7 +48,9 @@ dox s
 ```
 
 `dox s` runs the code generator and the server. It restarts the server when you save a `.dart` file.
-The first start is slower, because it compiles the SQLite library. The last line is:
+The first start is slower, because it compiles the SQLite library.
+At the first start it also runs the migrations of the template.
+The last line is a JSON log line with this message:
 
 ```text
 Server started at http://[::]:3000 with 8 isolate (native)

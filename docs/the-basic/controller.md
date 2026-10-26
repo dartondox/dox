@@ -14,7 +14,7 @@ Make one with the CLI:
 dox make:controller Blog
 ```
 
-It writes `lib/app/http/controllers/blog.controller.dart`.
+It writes `lib/app/http/controllers/blog.controller.dart` with an empty `index` method. Fill it in:
 
 ```dart title="lib/app/http/controllers/blog.controller.dart"
 import 'package:dox_core/dox_core.dart';
@@ -108,6 +108,7 @@ A controller asks for what it needs by **type**. Dox fills each parameter.
 ```dart
 Route.put('/teams/{teamId}/users/{id}', (UserController c) => c.update);
 
+@Inject()
 class UserController {
   Future<User> update(int teamId, int id, UpdateUser body) async { ... }
 }

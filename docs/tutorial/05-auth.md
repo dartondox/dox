@@ -254,14 +254,13 @@ class ApiRouter extends Router {
 `AuthMiddleware` reads the `Authorization: Bearer <token>` header and loads the user.
 When the token is missing or wrong, it answers `401 Authentication failed`.
 
-## 7. Migrate and generate
+## 7. Run the generator
 
 ```bash
-dox migration:run
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
 
-`dox s` runs both for you when it restarts.
+`dox s` runs it for you. There is no new migration in this step, because the `users` table already exists.
 
 ## Check it
 

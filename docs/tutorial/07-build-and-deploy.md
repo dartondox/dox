@@ -32,25 +32,27 @@ Generated: /.../blog/build/bundle/bin/server
 | `bin/schedule` | the [scheduler](../digging-deeper/scheduler.md). Run it as its own process. |
 | `lib/` | native libraries from build hooks, like `libsqlite3`. Keep it next to `bin/`. |
 | `db/` | your migrations. Your local SQLite file is not copied. |
+| `.env.example` | a copy of the example env file. |
 
 ## 2. Run the binary
 
-The binary reads `.env` from the folder you start it in. Copy yours there,
-and make the `db` folder for the SQLite file:
+The binary reads `.env` from the folder you start it in. Copy yours there.
+The `db` folder for the SQLite file is already in `build/bundle`.
 
 ```bash
 cd build/bundle
 cp ../../.env .env
-mkdir -p db
 ./bin/server
 ```
 
 ```text
 Migrating: 2023_07_16_131937700_create_users_table
 Migrated: 2023_07_16_131937700_create_users_table
+Migrating: 2026_10_25_000000000_create_queue_tables
+Migrated: 2026_10_25_000000000_create_queue_tables
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
-Server started at http://[::]:3000 with 8 isolate (native)
+... "message":"Server started at http://[::]:3000 with 8 isolate (native)" ...
 ```
 
 The migrations run again, because `db/dox.sqlite` is a new file in `build/bundle`.
@@ -126,7 +128,7 @@ CMD ["/app/bin/server"]
 ```
 
 Build and run it. The image has no `.env` file, so pass the config as environment variables.
-`APP_KEY` must be 32 characters. The app does not start with a shorter key.
+`APP_KEY` must be exactly 32 characters. The app does not start with a shorter or longer key.
 
 ```bash
 docker build -t blog .

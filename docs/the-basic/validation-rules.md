@@ -119,7 +119,7 @@ For `DateTime` fields.
 | `@After('2000-01-01')` | `after` | `The {field} must be a date after {date}` | `format: date-time` |
 | `@Before('now')` | `before` | `The {field} must be a date before {date}` | `format: date-time` |
 
-- The value is an ISO 8601 date, or `'now'` (the time of the request).
+- The value is an ISO 8601 date, or `'now'` (the time of the request). A bad date text stops the build.
 - Both are exclusive: `@After('2000-01-01')` does not accept `2000-01-01T00:00:00Z`.
 - To compare two fields (end after start), use [`validate()`](validation.md#checks-across-fields-validate).
 
@@ -135,7 +135,9 @@ For `RequestFile` and `List<RequestFile>` fields.
 
 - `@MaxSize` units: `B`, `KB`, `MB`, `GB`. `1KB` = 1024 bytes. A bad size text stops the build.
 - `@Mimes` takes file extensions. Dox finds the real type from the first bytes of the file.
-  The file name extension must fit those bytes too. So `x.html` with GIF bytes does not pass.
+  The file name extension must not name another type, or a type a browser runs (like `html` or `svg`).
+  So `x.html` with GIF bytes does not pass. An empty or unknown extension is fine.
+  For zip based types (like `docx` or `xlsx`), the file name extension must match too.
   For types without a byte signature (like `txt` or `csv`), it uses the file name extension.
 - `@Image()` is `@Mimes(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'])`. No `svg`.
 - The JSON Schema of a file is `{"type": "string", "format": "binary"}`, plus the keys above.
@@ -150,6 +152,7 @@ From `dox_orm`. Async: they run after all other checks passed.
 | `@Exists(table, {column, connection})` | `exists` | `The selected {field} is invalid` |
 
 - `@Unique` column default: the input key. `@Exists` column default: `id`.
+- They read the table, not the model. So soft-deleted rows count too.
 - `ignoreParam: 'id'` skips the row where `ignoreColumn` (default `id`) equals the path param `{id}`.
 - They add nothing to the JSON Schema.
 
@@ -179,10 +182,11 @@ How each field type reads input. The short table is in [Types](validation.md#typ
 - `DateTime` takes `2024-01-31` or `2024-01-31T10:00:00Z`. A value without a time zone is read as UTC.
   The result is always UTC (`isUtc == true`). A number (timestamp) is not allowed.
 - An `enum` matches the Dart name exactly. `"Admin"` does not match `Role.admin`. Custom wire values (like `"ADMIN"`) are not supported.
-- `Object?`, `dynamic` and `Map<String, dynamic>` take any value. They are not checked.
+- `Object?` and `dynamic` take any value. They are not checked.
+- `Map<String, dynamic>` must be an object. Its values are not checked.
 - In query and form data, one value for a `List<T>` field gives a list with one item.
 - In bracket keys, list indexes are sorted and packed: `items[3]` alone gives a list with one item.
-- A list can have at most 1000 items, and keys can nest at most 10 levels. More gives `422`.
+- In query and form data, a list can have at most 1000 items, and keys can nest at most 10 levels. More gives `422` with the key `_root`.
 
 ## Body types
 

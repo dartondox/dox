@@ -18,6 +18,7 @@ You do not need to set anything. With the default handler:
 | --- | --- | --- |
 | an `IHttpException`, like `NotFoundHttpException` | its `code` | `{"code": "not_found", "message": "Not Found"}` |
 | a `ValidationException` (bad input) | `422` | the field errors, like `{"name": "The name is required"}` |
+| a `ValidationException` on a request with a [session](session.md#redirect-back-with-errors) that does not want JSON, like a form post | `302` | a redirect back. The errors and the old input are in the session. |
 | a URL with no route | `404` | `{"code": "not_found", "message": "GET /x not found"}` |
 | any other error | `500` | `{"code": "server_error", "message": "Server Error"}` |
 
@@ -38,6 +39,8 @@ Extend `ExceptionHandler`. Override one method or both.
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+
+class PaymentRequiredException implements Exception {}
 
 class AppExceptionHandler extends ExceptionHandler {
   const AppExceptionHandler();

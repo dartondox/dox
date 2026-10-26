@@ -16,7 +16,7 @@ Return the value from your controller. Dox turns it into the response.
 | a `Map` or a `List` | JSON |
 | a model, a list of models, a [serializer](serializer.md) | JSON (from `toJson()`) |
 | a `DateTime` | the ISO 8601 text |
-| an `IHttpException`, like `NotFoundHttpException()` | its status code and its message (text, or JSON for a `Map`) |
+| an `IHttpException`, like `NotFoundHttpException()` | its status code and JSON: `{"code": ..., "message": ...}`, or a `Map` message as it is |
 | a `File` (from `dart:io`) | the file, streamed |
 | a `Stream<List<int>>` | the bytes, streamed |
 | `StreamFile`, `DownloadableFile` (also from `Storage()` of `dox_storage`) | the file, streamed |
@@ -44,7 +44,9 @@ Throw or return an exception to answer with an error.
 | `NotFoundHttpException()` | `404` |
 | `PayloadTooLargeException()` | `413` |
 | `UnsupportedMediaTypeException()` | `415` |
+| `TokenMismatchException()` | `419` |
 | `ValidationException()` | `422` |
+| `TooManyRequestsException()` | `429` |
 | `InternalErrorException()` | `500` |
 
 Each one takes `message:`, `errorCode:` and `code:`:
@@ -85,6 +87,8 @@ Return a `File` or a `Stream<List<int>>`. Dox sends it in chunks. It does not lo
 ```dart
 import 'dart:io';
 
+import 'package:dox_storage/dox_storage.dart';
+
 // a file from disk
 Route.get('/video', (DoxRequest req) => File('storage/video.mp4'));
 
@@ -123,7 +127,7 @@ DoxResponse store(DoxRequest req) {
 | Method | Does |
 | --- | --- |
 | `statusCode(201)` | sets the status code. Default `200`. |
-| `header('X-Key', 'value')` | adds one header |
+| `header('X-Key', 'value')` | sets one header |
 | `withHeaders({...})` | **replaces** all headers set before |
 | `contentType(ContentType.html)` | sets `Content-Type` (`ContentType` is from `dart:io`) |
 | `cache(Duration(minutes: 5))` | sets `Cache-Control: max-age=300` |

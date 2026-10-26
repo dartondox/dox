@@ -38,7 +38,7 @@ List<dynamic> cart = req.session.get('cart', <int>[]);
 bool hasCart = req.session.has('cart');
 
 // read and remove
-dynamic cart = req.session.pull('cart');
+dynamic removed = req.session.pull('cart');
 
 // remove one value, or all of them
 req.session.forget('cart');
@@ -78,7 +78,7 @@ To keep flash data for one more request, call `req.session.reflash()`, or `req.s
 
 When a form post fails validation, Dox does this for you on a route with a session:
 
-1. It flashes the errors as `errors`, like `{'email': 'The email is not valid'}`.
+1. It flashes the errors as `errors`, like `{'email': 'The email is not a valid email'}`.
 2. It flashes the old input. Password fields (`password`, `password_confirmation`, `current_password`) and files are never kept.
 3. It redirects back with `302`.
 
