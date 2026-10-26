@@ -6299,8 +6299,8 @@
 So every import in this tutorial starts with <code>package:blog/</code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Check the versions</p>
-<p>Open <code>pubspec.yaml</code>. Every Dox package must be <code>^3.0.0-alpha</code>.
-If the template has an older version, change it and run <code>dart pub get</code> again.</p>
+<p>Open <code>pubspec.yaml</code>. Every Dox package must be a 3.x version, like <code>^3.0.0-alpha.17</code>.
+Each package has its own version number. That is fine.</p>
 </div>
 <h2 id="2-use-sqlite">2. Use SQLite</h2>
 <p><code>dox create</code> already made <code>.env</code> with a new random <code>APP_KEY</code>. The template already uses SQLite:</p>
@@ -6321,7 +6321,9 @@ If you set <code>DB_NAME=storage/blog.sqlite</code>, run <code>mkdir storage</co
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dox<span class="w"> </span>s
 </span></code></pre></div>
 <p><code>dox s</code> runs the code generator and the server. It restarts the server when you save a <code>.dart</code> file.
-The first start is slower, because it compiles the SQLite library. The last line is:</p>
+The first start is slower, because it compiles the SQLite library.
+At the first start it also runs the migrations of the template.
+The last line is a JSON log line with this message:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Server started at http://[::]:3000 with 8 isolate (native)
 </span></code></pre></div>
 <p>Open it at <code>http://localhost:3000</code>. The number of isolates is the number of CPU cores.</p>

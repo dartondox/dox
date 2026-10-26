@@ -6403,7 +6403,7 @@ This also adds <code>update</code>, so <code>PUT /api/posts/{id}</code> works:</
 <p><code>Route.resource</code> in <code>lib/routes/api.dart</code> sees the new <code>update</code> method and adds <code>PUT</code> and <code>PATCH /api/posts/{id}</code>. You change nothing there.</p>
 <h2 id="4-run-the-generator">4. Run the generator</h2>
 <p><code>dox s</code> runs it for you. Without <code>dox s</code>:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build<span class="w"> </span>--delete-conflicting-outputs
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build
 </span></code></pre></div>
 <p>It writes <code>lib/app/dtos/save_post/save_post.dto.g.dart</code> and <code>lib/generated/dtos.g.dart</code>.</p>
 <h2 id="check-it">Check it</h2>

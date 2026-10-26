@@ -62,7 +62,7 @@ class BlogController {
 2.  `@Dto()` marks an input class. `build_runner` generates the checks from the fields and their types.
 3.  The generated schema. The same schema feeds the OpenAPI docs.
 4.  Ask for the DTO as a parameter. Dox reads the query (or the body), checks it, and gives you a typed object. Bad input gets a `422` before your code runs.
-5.  The ORM. The same code runs on Postgres, MySQL and SQLite, through native Rust drivers.
+5.  The ORM. The same code runs on Postgres, MySQL and SQLite. Postgres and MySQL use native Rust drivers.
 
 </div>
 
@@ -174,8 +174,8 @@ at a time.
 
 -   :material-database-outline: **ORM and query builder**
 
-    Models, relations, migrations and transactions for Postgres, MySQL/MariaDB and SQLite,
-    with native Rust drivers. See [Database](database/index.md).
+    Models, relations, migrations and transactions for Postgres, MySQL/MariaDB and SQLite.
+    Postgres and MySQL use native Rust drivers. See [Database](database/index.md).
 
 -   :material-check-decagram-outline: **Typed validation**
 
@@ -259,7 +259,7 @@ dox create new_blog
 
 `dox create` downloads the newest 3.x release of
 [dox-sample](https://github.com/dartondox/dox-sample), the starter project.
-To get one exact version, add `--version`, for example `dox create new_blog --version 3.0.0-alpha.5`.
+To get one exact version, add `--version`, for example `dox create new_blog --version 3.0.0-alpha.17`.
 
 It also makes your `.env` file from `.env.example`, with a new random `APP_KEY`.
 Then get the packages:
@@ -275,8 +275,8 @@ To use Postgres or MySQL instead, change `DB_CONNECTION` and the `DB_*`
 values in `.env`. See [Database](../database/index.md).
 
 !!! info "Add Dox to an existing Dart project"
-    Add the packages you need to `pubspec.yaml`. All Dox packages share one
-    version, so use `^3.0.0-alpha` for each of them. It picks the newest alpha.
+    Add the packages you need to `pubspec.yaml`. Each Dox package has its own
+    version number. Use `^3.0.0-alpha` for each of them. It picks the newest 3.x alpha.
 
 ```yaml title="pubspec.yaml"
 dependencies:
@@ -303,7 +303,7 @@ dox s
 To skip the builder, use `dox s --ignore-build-runner`.
 To start the server without the CLI, run `dart run bin/server.dart`.
 
-At the first start it also runs the migrations in `db/migration`.
+At each start it also runs the new migrations in `db/migration`.
 The server uses the port in `APP_PORT` in the `.env` file (`3000` by default).
 Check it:
 
@@ -318,8 +318,12 @@ pong
 ## Start the server with Docker
 
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
+
+This starts the app and a Postgres database.
+The app reads `.env`, so set `DB_CONNECTION=postgres` and `DB_NAME=postgres` there first.
+To start only the database and run the app with `dox s`, use `docker compose up -d postgres`.
 
 !!! tip "Production"
     Do not use `dox s` or `dart run` in production.
@@ -337,7 +341,7 @@ dox build_runner:build   # runs once
 
 ## Packages
 
-All Dox packages use the same version.
+Each package has its own version number. All of them are 3.x.
 
 | Package | What it does |
 | --- | --- |
@@ -346,14 +350,19 @@ All Dox packages use the same version.
 | `dox_orm` | query builder and models |
 | `dox_migration` | database migrations |
 | `dox_auth` | JWT authentication |
-| `dox_builder`, `dox_annotation` | code generation for models and DTOs |
+| `dox_builder`, `dox_annotation` | code generation for models, DTOs and the container |
 | `dox_validation` | [typed validation schemas](../packages/validation.md) |
 | `dox_openapi` | [OpenAPI docs](../packages/openapi.md) |
 | `dox_storage` | [file storage: local, S3](../packages/storage.md) |
 | `dox_cache` | [cache: memory, file, Redis](../packages/cache.md) |
 | `dox_socketio` | [Socket.IO server](../packages/socketio.md) |
+| `dox_queue` | [background jobs](../digging-deeper/queue.md) |
+| `dox_scheduler` | [scheduled tasks](../digging-deeper/scheduler.md) |
+| `dox_mailer` | [send email](../digging-deeper/mail.md) |
+| `dox_view` | [HTML views](../the-basic/views.md) |
+| `dox_inertia` | [Inertia.js pages](../the-basic/inertia.md) |
 | `dox_http_native` | [native HTTP server](../digging-deeper/native-server.md) (Rust) |
-| `dox_postgres_native`, `dox_mysql_native` | native database drivers for Postgres and MySQL/MariaDB |
+| `dox_postgres_native`, `dox_mysql_native` | native drivers for [Postgres](../database/postgres-native.md) and [MySQL/MariaDB](../database/mysql-native.md) |
 
 
 ---
@@ -405,12 +414,14 @@ You do not need Docker or a database server. The app uses SQLite, which is one f
 ## The finished project
 
 Files that you make or change in this tutorial are marked with `*`.
+The template has more files (queue, scheduler, storage). This tree shows the ones that matter here.
 
 ```text
 blog/
 ├── bin/
 │   ├── migrate.dart              runs the dox migration:* commands
-│   └── server.dart               runs the migrations, starts the server
+│   ├── server.dart               runs the migrations, starts the server
+│   └── queue.dart, schedule.dart, seed.dart
 ├── db/migration/
 │   ├── ..._create_posts_table.dart   *
 │   ├── ..._create_users_table.dart
@@ -438,7 +449,7 @@ blog/
 │       ├── container.g.dart      * generated
 │       └── dtos.g.dart           * generated
 ├── test/http_test.dart           *
-├── .env                          *
+├── .env                          made by dox create
 ├── Dockerfile
 └── pubspec.yaml                  * adds dox_auth
 ```
@@ -469,8 +480,8 @@ dart pub get
 So every import in this tutorial starts with `package:blog/`.
 
 !!! note "Check the versions"
-    Open `pubspec.yaml`. Every Dox package must be `^3.0.0-alpha`.
-    If the template has an older version, change it and run `dart pub get` again.
+    Open `pubspec.yaml`. Every Dox package must be a 3.x version, like `^3.0.0-alpha.17`.
+    Each package has its own version number. That is fine.
 
 ## 2. Use SQLite
 
@@ -498,7 +509,9 @@ dox s
 ```
 
 `dox s` runs the code generator and the server. It restarts the server when you save a `.dart` file.
-The first start is slower, because it compiles the SQLite library. The last line is:
+The first start is slower, because it compiles the SQLite library.
+At the first start it also runs the migrations of the template.
+The last line is a JSON log line with this message:
 
 ```text
 Server started at http://[::]:3000 with 8 isolate (native)
@@ -540,6 +553,10 @@ Source: https://dartondox.dev/latest/3.xtutorial/02-model-and-migration/
 This step makes the `posts` table with a Dart migration and a `Post` model for it.
 
 ## 1. Make the model and the migration
+
+Stop `dox s` first with `Ctrl+C`.
+`dox s` restarts the server when a new file appears, and the server runs new migrations at start.
+So it would run the new migration before you add the columns.
 
 ```bash
 dox make:model Post -m
@@ -639,11 +656,15 @@ Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
 ```
 
+!!! tip "The migration ran too early?"
+    If `dox s` was still running, the `posts` table may already exist without `title` and `body`.
+    Run `dox migration:rollback`, then `dox migration:run` again.
+
 The model needs its generated file `post.model.g.dart`.
 `dox s` makes it while it runs. If `dox s` is not running, run the generator once:
 
 ```bash
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
 
 ## Check it
@@ -653,9 +674,15 @@ dox migration:status
 ```
 
 ```text
-Migration                             Batch  Status
-2026_10_22_205345_create_posts_table  1      Ran
+Migration                                 Batch  Status
+2023_07_16_131937700_create_users_table   1      Ran
+2026_10_25_000000000_create_queue_tables  1      Ran
+2026_10_22_205345_create_posts_table      2      Ran
 ```
+
+The first two come with the template. The server ran them at the first start in step 1.
+
+Now start the server again with `dox s`.
 
 ## Next
 
@@ -763,7 +790,7 @@ The controller has no `update` or `destroy`, so those routes are not made.
 dox s
 ```
 
-If it is still running from step 1, it restarts by itself.
+If it is already running, it restarts by itself when you save a file.
 
 ## Check it
 
@@ -941,7 +968,7 @@ class PostController {
 `dox s` runs it for you. Without `dox s`:
 
 ```bash
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
 
 It writes `lib/app/dtos/save_post/save_post.dto.g.dart` and `lib/generated/dtos.g.dart`.
@@ -1262,14 +1289,13 @@ class ApiRouter extends Router {
 `AuthMiddleware` reads the `Authorization: Bearer <token>` header and loads the user.
 When the token is missing or wrong, it answers `401 Authentication failed`.
 
-## 7. Migrate and generate
+## 7. Run the generator
 
 ```bash
-dox migration:run
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
 
-`dox s` runs both for you when it restarts.
+`dox s` runs it for you. There is no new migration in this step, because the `users` table already exists.
 
 ## Check it
 
@@ -1473,25 +1499,27 @@ Generated: /.../blog/build/bundle/bin/server
 | `bin/schedule` | the [scheduler](../digging-deeper/scheduler.md). Run it as its own process. |
 | `lib/` | native libraries from build hooks, like `libsqlite3`. Keep it next to `bin/`. |
 | `db/` | your migrations. Your local SQLite file is not copied. |
+| `.env.example` | a copy of the example env file. |
 
 ## 2. Run the binary
 
-The binary reads `.env` from the folder you start it in. Copy yours there,
-and make the `db` folder for the SQLite file:
+The binary reads `.env` from the folder you start it in. Copy yours there.
+The `db` folder for the SQLite file is already in `build/bundle`.
 
 ```bash
 cd build/bundle
 cp ../../.env .env
-mkdir -p db
 ./bin/server
 ```
 
 ```text
 Migrating: 2023_07_16_131937700_create_users_table
 Migrated: 2023_07_16_131937700_create_users_table
+Migrating: 2026_10_25_000000000_create_queue_tables
+Migrated: 2026_10_25_000000000_create_queue_tables
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
-Server started at http://[::]:3000 with 8 isolate (native)
+... "message":"Server started at http://[::]:3000 with 8 isolate (native)" ...
 ```
 
 The migrations run again, because `db/dox.sqlite` is a new file in `build/bundle`.
@@ -1567,7 +1595,7 @@ CMD ["/app/bin/server"]
 ```
 
 Build and run it. The image has no `.env` file, so pass the config as environment variables.
-`APP_KEY` must be 32 characters. The app does not start with a shorter key.
+`APP_KEY` must be exactly 32 characters. The app does not start with a shorter or longer key.
 
 ```bash
 docker build -t blog .
@@ -2736,6 +2764,9 @@ Route.delete('/blogs/{id}', (BlogController c) => c.destroy);
     There are also `Route.options`, `Route.copy`, `Route.view`, `Route.link`, `Route.unlink`,
     `Route.purge`, `Route.lock`, `Route.unlock` and `Route.propfind`.
 
+    `Route.health('/health')` adds a health check route. It answers `200` with `{"status": "ok"}`.
+    `Route.websocket('echo', (WebSocket socket, DoxRequest req) {...})` adds a raw WebSocket route.
+
 A `HEAD` request runs the `GET` route of the same path. The answer has the status and headers of `GET`, with no body.
 
 ## The handler
@@ -2774,8 +2805,9 @@ See [Controller](controller.md) for the parameters a handler can ask for.
 Put a param in `{}`. Ask for it as a typed parameter in the controller.
 
 ```dart
-Route.get('/blogs/{id}', controller.show);
+Route.get('/blogs/{id}', (BlogController c) => c.show);
 
+@Inject()
 class BlogController {
   Future<Blog?> show(int id) async {
     return Blog().find(id);
@@ -2811,19 +2843,19 @@ Route.get('/docs/{page*}', (String page) {
 ```dart
 // by prefix
 Route.group('/blogs', () { // (1)!
-  Route.get('/', controller.index);     // GET /blogs
-  Route.get('/{id}', controller.show); // (2)!
+  Route.get('/', (BlogController c) => c.index); // GET /blogs
+  Route.get('/{id}', (BlogController c) => c.show); // (2)!
 });
 
 // by domain
 Route.domain('dartondox.com', () { // (3)!
-  Route.get('/ping', controller.ping);
+  Route.get('/ping', (WebController c) => c.pong);
 });
 
 // by middleware
 Route.middleware(<dynamic>[AuthMiddleware()], () { // (4)!
-  Route.get('/me', controller.me);
-  Route.post('/logout', controller.logout);
+  Route.get('/me', (AuthController c) => c.me);
+  Route.post('/logout', (AuthController c) => c.logout);
 });
 ```
 
@@ -2872,7 +2904,7 @@ See [Resource controller](controller.md#resource-controller) to make one with th
 Give a route a name with `.name()`. Then build its URL from the name, so a path lives in one place.
 
 ```dart
-Route.get('/users/{id}', controller.show).name('users.show');
+Route.get('/users/{id}', (UserController c) => c.show).name('users.show');
 
 route('users.show', params: <String, Object>{'id': 5});
 // /users/5
@@ -2888,7 +2920,7 @@ A group can put a prefix in front of the names inside it:
 
 ```dart
 Route.group('admin', () {
-  Route.get('users', controller.index).name('users'); // admin.users
+  Route.get('users', (UserController c) => c.index).name('users'); // admin.users
 }, name: 'admin.');
 ```
 
@@ -2961,7 +2993,7 @@ Storage.route('uploads', download: true);
 It does **not** check the request. To check input, use a [DTO](validation.md).
 
 ```dart
-Route.post('/posts', controller.store, body: v.object(<String, Schema<Object?>>{
+Route.post('/posts', (PostController c) => c.store, body: v.object(<String, Schema<Object?>>{
   'title': v.string().min(3),
 }));
 ```
@@ -2979,11 +3011,12 @@ This page shows how to read input, files, headers and cookies from a request.
 
 ## Typed input (recommended)
 
-Ask for a [DTO](validation.md) in your controller. Dox reads the body (or the query for `GET`), checks it, and gives you a typed object.
+Ask for a [DTO](validation.md) in your controller. Dox reads the body (or the query for `GET`, `HEAD` and `DELETE`), checks it, and gives you a typed object.
 
 ```dart
-Route.put('/users/{id}', controller.update);
+Route.put('/users/{id}', (UserController c) => c.update);
 
+@Inject()
 class UserController {
   Future<User?> update( // (1)!
     int id, // (2)!
@@ -3009,6 +3042,7 @@ Bad input gets `422` before your method runs. See [Validation](validation.md).
 Add a `DoxRequest` parameter to read the raw values. These values are **not** checked.
 
 ```dart
+@Inject()
 class ApiController {
   String sayHello(DoxRequest req) {
     String? name = req.input('name');
@@ -3038,7 +3072,11 @@ See [Controller: parameters](controller.md#parameters).
 An uploaded file is a `RequestFile`. The request must be `multipart/form-data`.
 Put the file in a DTO, so Dox checks its type and size:
 
-```dart
+```dart title="lib/app/dtos/upload_image/upload_image.dto.dart"
+import 'package:dox_core/dox_core.dart';
+
+part 'upload_image.dto.g.dart';
+
 @Dto()
 class UploadImage {
   @Image()
@@ -3049,7 +3087,10 @@ class UploadImage {
 
   static const DtoSchema<UploadImage> schema = $UploadImageDto;
 }
+```
 
+```dart title="lib/app/http/controllers/api.controller.dart"
+@Inject()
 class ApiController {
   Future<Map<String, String>> uploadImage(UploadImage input) async {
     String uploadedPath = await input.image.store('images');
@@ -3153,7 +3194,7 @@ Return the value from your controller. Dox turns it into the response.
 | a `Map` or a `List` | JSON |
 | a model, a list of models, a [serializer](serializer.md) | JSON (from `toJson()`) |
 | a `DateTime` | the ISO 8601 text |
-| an `IHttpException`, like `NotFoundHttpException()` | its status code and its message (text, or JSON for a `Map`) |
+| an `IHttpException`, like `NotFoundHttpException()` | its status code and JSON: `{"code": ..., "message": ...}`, or a `Map` message as it is |
 | a `File` (from `dart:io`) | the file, streamed |
 | a `Stream<List<int>>` | the bytes, streamed |
 | `StreamFile`, `DownloadableFile` (also from `Storage()` of `dox_storage`) | the file, streamed |
@@ -3181,7 +3222,9 @@ Throw or return an exception to answer with an error.
 | `NotFoundHttpException()` | `404` |
 | `PayloadTooLargeException()` | `413` |
 | `UnsupportedMediaTypeException()` | `415` |
+| `TokenMismatchException()` | `419` |
 | `ValidationException()` | `422` |
+| `TooManyRequestsException()` | `429` |
 | `InternalErrorException()` | `500` |
 
 Each one takes `message:`, `errorCode:` and `code:`:
@@ -3222,6 +3265,8 @@ Return a `File` or a `Stream<List<int>>`. Dox sends it in chunks. It does not lo
 ```dart
 import 'dart:io';
 
+import 'package:dox_storage/dox_storage.dart';
+
 // a file from disk
 Route.get('/video', (DoxRequest req) => File('storage/video.mp4'));
 
@@ -3260,7 +3305,7 @@ DoxResponse store(DoxRequest req) {
 | Method | Does |
 | --- | --- |
 | `statusCode(201)` | sets the status code. Default `200`. |
-| `header('X-Key', 'value')` | adds one header |
+| `header('X-Key', 'value')` | sets one header |
 | `withHeaders({...})` | **replaces** all headers set before |
 | `contentType(ContentType.html)` | sets `Content-Type` (`ContentType` is from `dart:io`) |
 | `cache(Duration(minutes: 5))` | sets `Cache-Control: max-age=300` |
@@ -3604,6 +3649,20 @@ View.global('money', (num cents) => (cents / 100).toStringAsFixed(2));
 <p>{{ money(order.total) }}</p>
 ```
 
+The provider sets up the engine again in its `setup()`, and that removes the globals added before. So add globals in your provider, after `super.setup()`:
+
+```dart title="lib/providers/view_provider.dart"
+class AppViewProvider extends ViewProvider {
+  AppViewProvider() : super(const ViewConfig());
+
+  @override
+  void setup() {
+    super.setup();
+    View.global('year', DateTime.now().year);
+  }
+}
+```
+
 A value of type `SafeString` is printed with no escape:
 
 ```dart
@@ -3810,6 +3869,7 @@ Give the request, the page name and the props. The page name is the file in `res
 ```dart title="lib/app/http/controllers/user.controller.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_inertia/dox_inertia.dart';
+import 'package:my_app/app/models/user/user.model.dart';
 
 @Inject()
 class UserController {
@@ -3973,9 +4033,12 @@ In production (no dev server), Dox reads `public/build/.vite/manifest.json`. `@v
 Set `devServerUrl` from the env, so production does not use it:
 
 ```dart title="lib/config/inertia.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_inertia/dox_inertia.dart';
+
 InertiaConfig inertiaConfig = InertiaConfig(
   entryPoints: <String>['resources/js/app.jsx'],
-  devServerUrl: Env.get<String>('APP_ENV') == 'local'
+  devServerUrl: Env.get<String>('APP_ENV') == 'development'
       ? 'http://localhost:5173'
       : null,
   reactRefresh: true,
@@ -4173,11 +4236,11 @@ class WeatherSerializer extends Serializer<Weather> {
   WeatherSerializer(super.data);
 
   @override
-  Map<String, dynamic> convert(Weather w) {
+  Map<String, dynamic> convert(Weather m) {
     return <String, dynamic>{
-      'city': w.city,
-      'celsius': w.celsius,
-      'fahrenheit': w.celsius * 9 / 5 + 32,
+      'city': m.city,
+      'celsius': m.celsius,
+      'fahrenheit': m.celsius * 9 / 5 + 32,
     };
   }
 }
@@ -4199,10 +4262,10 @@ class SalesReportSerializer extends Serializer<Map<String, dynamic>> {
   SalesReportSerializer(super.data);
 
   @override
-  Map<String, dynamic> convert(Map<String, dynamic> row) {
+  Map<String, dynamic> convert(Map<String, dynamic> m) {
     return <String, dynamic>{
-      'product': row['name'],
-      'sold': row['total'],
+      'product': m['name'],
+      'sold': m['total'],
     };
   }
 }
@@ -4257,6 +4320,7 @@ You do not need to set anything. With the default handler:
 | --- | --- | --- |
 | an `IHttpException`, like `NotFoundHttpException` | its `code` | `{"code": "not_found", "message": "Not Found"}` |
 | a `ValidationException` (bad input) | `422` | the field errors, like `{"name": "The name is required"}` |
+| a `ValidationException` on a request with a [session](session.md#redirect-back-with-errors) that does not want JSON, like a form post | `302` | a redirect back. The errors and the old input are in the session. |
 | a URL with no route | `404` | `{"code": "not_found", "message": "GET /x not found"}` |
 | any other error | `500` | `{"code": "server_error", "message": "Server Error"}` |
 
@@ -4277,6 +4341,8 @@ Extend `ExceptionHandler`. Override one method or both.
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+
+class PaymentRequiredException implements Exception {}
 
 class AppExceptionHandler extends ExceptionHandler {
   const AppExceptionHandler();
@@ -4352,7 +4418,7 @@ Make one with the CLI:
 dox make:controller Blog
 ```
 
-It writes `lib/app/http/controllers/blog.controller.dart`.
+It writes `lib/app/http/controllers/blog.controller.dart` with an empty `index` method. Fill it in:
 
 ```dart title="lib/app/http/controllers/blog.controller.dart"
 import 'package:dox_core/dox_core.dart';
@@ -4446,6 +4512,7 @@ A controller asks for what it needs by **type**. Dox fills each parameter.
 ```dart
 Route.put('/teams/{teamId}/users/{id}', (UserController c) => c.update);
 
+@Inject()
 class UserController {
   Future<User> update(int teamId, int id, UpdateUser body) async { ... }
 }
@@ -4586,6 +4653,9 @@ That is all. `GET /api/users/5` makes the repository, the service and the contro
 
 ```dart title="lib/generated/container.g.dart"
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// Made by dox_builder. Run `dart run build_runner build`.
+// ignore_for_file: type=lint
+
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/http/controllers/user.controller.dart' as i1;
 import 'package:my_app/app/repositories/user.repository.dart' as i2;
@@ -4594,6 +4664,9 @@ import 'package:my_app/providers/orm_provider.dart' as i4;
 import 'package:my_app/routes/api.dart' as i5;
 import 'package:my_app/app/models/user/user.model.dart' as i6;
 
+/// Puts every class of the app into the container: the
+/// `@Inject()` classes, routers, providers and model binders.
+/// Use it in `AppConfig(container: registerContainer)`.
 void registerContainer(IocContainer c) {
   c.singleton<i1.UserController>(
     (IocContainer c) => i1.UserController(c.get<i3.UserService>()),
@@ -4795,6 +4868,8 @@ Create one with the CLI. It writes `lib/app/http/middleware/logger.middleware.da
 dox make:middleware Logger
 ```
 
+Write your code in `handle`. For example:
+
 ```dart title="lib/app/http/middleware/logger.middleware.dart"
 import 'package:dox_core/dox_core.dart';
 
@@ -4897,8 +4972,8 @@ Route.get('/ping', <dynamic>[
 
 ```dart
 Route.middleware(<dynamic>[LoggerMiddleware()], () {
-  Route.get('/me', controller.me);
-  Route.post('/logout', controller.logout);
+  Route.get('/me', (AuthController c) => c.me);
+  Route.post('/logout', (AuthController c) => c.logout);
 });
 ```
 
@@ -4946,7 +5021,7 @@ flowchart LR
 ```
 
 !!! tip "Built-in middleware"
-    - `LogMiddleware` from `dox_core` writes one JSON log line per request. Body fields and headers whose name has `password`, `secret`, `token`, `authorization`, `cookie` or `api_key` in it (upper or lower case) are logged as `[REDACTED]`. Change the list with `redact:`. The new project turns it off when `APP_ENV` is `production`.
+    - `LogMiddleware` from `dox_core` writes one JSON log line per request. Headers are logged only with `withHeader: true`. Body fields and headers whose name has a word like `password`, `secret`, `token`, `authorization`, `cookie` or `api_key` in it (upper or lower case) are logged as `[REDACTED]`. Change the list with `redact:`. The new project turns it off when `APP_ENV` is `production`.
     - `AuthMiddleware` from `dox_auth` checks the JWT token. See [Authentication](../security/authentication.md).
     - `RateLimit` from `dox_core` answers `429` when a client sends too many requests. See [Rate limiting](../security/rate-limiting.md).
     - `SecurityHeaders` from `dox_core` adds safe headers like `X-Frame-Options` to every answer. See [Security headers](../security/security-headers.md).
@@ -4996,7 +5071,7 @@ List<dynamic> cart = req.session.get('cart', <int>[]);
 bool hasCart = req.session.has('cart');
 
 // read and remove
-dynamic cart = req.session.pull('cart');
+dynamic removed = req.session.pull('cart');
 
 // remove one value, or all of them
 req.session.forget('cart');
@@ -5036,7 +5111,7 @@ To keep flash data for one more request, call `req.session.reflash()`, or `req.s
 
 When a form post fails validation, Dox does this for you on a route with a session:
 
-1. It flashes the errors as `errors`, like `{'email': 'The email is not valid'}`.
+1. It flashes the errors as `errors`, like `{'email': 'The email is not a valid email'}`.
 2. It flashes the old input. Password fields (`password`, `password_confirmation`, `current_password`) and files are never kept.
 3. It redirects back with `302`.
 
@@ -5176,10 +5251,18 @@ class CreateUser {
   @Email()
   final String email;
 
+  @MinLength(8)
+  final String password;
+
   @Min(18)
   final int? age; // nullable, so optional
 
-  const CreateUser({required this.name, required this.email, this.age});
+  const CreateUser({
+    required this.name,
+    required this.email,
+    required this.password,
+    this.age,
+  });
 
   static const DtoSchema<CreateUser> schema = $CreateUserDto;
 }
@@ -5191,7 +5274,8 @@ class UserController {
     // body is already checked
     User user = User()
       ..name = body.name
-      ..email = body.email;
+      ..email = body.email
+      ..password = Hash.make(body.password);
     await user.save();
     return user;
   }
@@ -5395,6 +5479,7 @@ void validate(DtoErrors errors) {
 ## Database rules: `@Unique` and `@Exists`
 
 These read the database, so they run last.
+They come from `dox_orm`. Add `import 'package:dox_orm/dox_orm.dart';` to the DTO file.
 
 ```dart
 @Unique('users', column: 'email')
@@ -5519,7 +5604,11 @@ See [Fluent schemas](../packages/validation.md#fluent-schemas-for-dynamic-input)
 A DTO is a normal Dart class. Make one directly to skip the checks:
 
 ```dart
-CreateUser input = const CreateUser(name: 'Ann', email: 'ann@dox.dev');
+CreateUser input = const CreateUser(
+  name: 'Ann',
+  email: 'ann@dox.dev',
+  password: 'secret123',
+);
 ```
 
 To test the checks, use `safeValidateMap`. It never throws:
@@ -5528,6 +5617,7 @@ To test the checks, use `safeValidateMap`. It never throws:
 ParseResult<CreateUser> result = await CreateUser.schema.safeValidateMap(<String, dynamic>{
   'name': 'A',
   'email': 'not-an-email',
+  'password': 'secret123',
 });
 
 expect(result.success, isFalse);
@@ -5662,7 +5752,7 @@ For `DateTime` fields.
 | `@After('2000-01-01')` | `after` | `The {field} must be a date after {date}` | `format: date-time` |
 | `@Before('now')` | `before` | `The {field} must be a date before {date}` | `format: date-time` |
 
-- The value is an ISO 8601 date, or `'now'` (the time of the request).
+- The value is an ISO 8601 date, or `'now'` (the time of the request). A bad date text stops the build.
 - Both are exclusive: `@After('2000-01-01')` does not accept `2000-01-01T00:00:00Z`.
 - To compare two fields (end after start), use [`validate()`](validation.md#checks-across-fields-validate).
 
@@ -5678,7 +5768,9 @@ For `RequestFile` and `List<RequestFile>` fields.
 
 - `@MaxSize` units: `B`, `KB`, `MB`, `GB`. `1KB` = 1024 bytes. A bad size text stops the build.
 - `@Mimes` takes file extensions. Dox finds the real type from the first bytes of the file.
-  The file name extension must fit those bytes too. So `x.html` with GIF bytes does not pass.
+  The file name extension must not name another type, or a type a browser runs (like `html` or `svg`).
+  So `x.html` with GIF bytes does not pass. An empty or unknown extension is fine.
+  For zip based types (like `docx` or `xlsx`), the file name extension must match too.
   For types without a byte signature (like `txt` or `csv`), it uses the file name extension.
 - `@Image()` is `@Mimes(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'])`. No `svg`.
 - The JSON Schema of a file is `{"type": "string", "format": "binary"}`, plus the keys above.
@@ -5693,6 +5785,7 @@ From `dox_orm`. Async: they run after all other checks passed.
 | `@Exists(table, {column, connection})` | `exists` | `The selected {field} is invalid` |
 
 - `@Unique` column default: the input key. `@Exists` column default: `id`.
+- They read the table, not the model. So soft-deleted rows count too.
 - `ignoreParam: 'id'` skips the row where `ignoreColumn` (default `id`) equals the path param `{id}`.
 - They add nothing to the JSON Schema.
 
@@ -5722,10 +5815,11 @@ How each field type reads input. The short table is in [Types](validation.md#typ
 - `DateTime` takes `2024-01-31` or `2024-01-31T10:00:00Z`. A value without a time zone is read as UTC.
   The result is always UTC (`isUtc == true`). A number (timestamp) is not allowed.
 - An `enum` matches the Dart name exactly. `"Admin"` does not match `Role.admin`. Custom wire values (like `"ADMIN"`) are not supported.
-- `Object?`, `dynamic` and `Map<String, dynamic>` take any value. They are not checked.
+- `Object?` and `dynamic` take any value. They are not checked.
+- `Map<String, dynamic>` must be an object. Its values are not checked.
 - In query and form data, one value for a `List<T>` field gives a list with one item.
 - In bracket keys, list indexes are sorted and packed: `items[3]` alone gives a list with one item.
-- A list can have at most 1000 items, and keys can nest at most 10 levels. More gives `422`.
+- In query and form data, a list can have at most 1000 items, and keys can nest at most 10 levels. More gives `422` with the key `_root`.
 
 ## Body types
 
@@ -9009,48 +9103,56 @@ Put the connections in `lib/config/database.dart`.
 `connection` is the name of the default connection.
 
 ```dart title="lib/config/database.dart"
-import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart';
+import 'package:my_app/config/env.dart';
 
 DatabaseConfig databaseConfig = DatabaseConfig(
   connection: env.dbConnection,
   connections: <String, ConnectionConfig>{
     'postgres': ConnectionConfig(
       driver: Driver.postgres,
-      host: 'localhost',
-      port: 5432,
-      user: 'postgres',
-      password: 'postgres',
-      database: 'postgres',
+      host: env.dbHost,
+      port: env.dbPort ?? 5432,
+      user: env.dbUsername,
+      password: env.dbPassword,
+      database: env.dbName,
       extra: <String, dynamic>{'maxConnectionCount': 10},
-      debug: false,
+      debug: env.isDevelopment,
     ),
     'mysql': ConnectionConfig(
       driver: Driver.mysql, // also for MariaDB
-      host: 'localhost',
-      port: 3306,
-      user: 'root',
-      password: 'password',
-      database: 'dox',
+      host: env.dbHost,
+      port: env.dbPort ?? 3306,
+      user: env.dbUsername,
+      password: env.dbPassword,
+      database: env.dbName,
       extra: <String, dynamic>{'maxConnectionCount': 10},
-      debug: false,
+      debug: env.isDevelopment,
     ),
     'sqlite': ConnectionConfig(
       driver: Driver.sqlite,
-      database: 'storage/app.db', // file path, or ':memory:'
-      debug: false,
+      database: env.dbName, // file path, like db/dox.sqlite, or ':memory:'
+      debug: env.isDevelopment,
     ),
   },
 );
 ```
 
-- `debug: true` prints each SQL query and its values.
+`env` is the typed env of the app, in `lib/config/env.dart`.
+Change `my_app` to the name of your app in `pubspec.yaml`.
+
+- `debug: true` prints each SQL query and its values. The app template turns it on only in development.
 - `user`, `password`, `host` and `port` are not used by SQLite.
 
-Start the ORM in a provider. Each isolate runs the provider.
+Start the ORM in a provider. The app template already has this file.
+Each isolate runs the provider.
 Isolates with the same settings share one pool, so `maxConnectionCount` is for the whole process.
 
 ```dart title="lib/providers/orm_provider.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_orm/dox_orm.dart';
+import 'package:my_app/config/database.dart';
+
 class ORMProvider extends DoxProvider {
   @override
   Future<void> setup() async {
@@ -9065,6 +9167,9 @@ class ORMProvider extends DoxProvider {
 }
 ```
 
+Dox finds every `DoxProvider` class on its own.
+After you add a provider, run `dart run build_runner build`.
+
 ### `.env`
 
 The app config and the [migration](migration.md) commands read these values.
@@ -9073,7 +9178,7 @@ The app config and the [migration](migration.md) commands read these values.
 DB_CONNECTION=postgres # postgres, mysql or sqlite
 DB_HOST=localhost
 DB_PORT=5432           # 3306 for mysql
-DB_NAME=dox            # for sqlite: the file path, like storage/app.db
+DB_NAME=dox            # for sqlite: the file path, like db/dox.sqlite
 DB_USERNAME=postgres
 DB_PASSWORD=postgres
 ```
@@ -9158,8 +9263,8 @@ DATABASE_URL=mysql://app:secret@/app?socket=/var/run/mysqld/mysqld.sock
 | `threads` | Postgres, MySQL | `1` | Rust threads of the native driver. |
 | `maxConnectionAge` | MySQL | 12 hours | A connection older than this is opened again. |
 | `preparedStatementCacheSize` | MySQL, SQLite | `100` | Prepared statements kept per connection. |
-| `sslMode` | Postgres | `disable` | TLS mode: `disable`, `prefer`, `require` or `verify-full`. |
-| `sslRootCert` | Postgres | none | Path of a PEM file with the CA certificates to trust for `verify-full`. |
+| `sslMode` | Postgres | `disable` | TLS mode: `disable`, `prefer`, `require`, `verify-ca` or `verify-full`. |
+| `sslRootCert` | Postgres | none | Path of a PEM file with the CA certificates to trust for `verify-ca` and `verify-full`. |
 | `verifyCertificate` | MySQL | `true` | `false` skips the TLS certificate check. Only for development. |
 | `timeZone` | Postgres | `UTC` | Time zone of the session. |
 | `applicationName` | Postgres | none | Name of the app in `pg_stat_activity`. |
@@ -9455,11 +9560,12 @@ await Actor().where('age', '>=', 18).chunk(100, (List<Actor> actors) {
   for (Actor actor in actors) {
     print(actor.name);
   }
+  return true; // go on to the next page
 });
 ```
 
 - The function gets one page of rows.
-- Return `false` from the function to stop. Then `chunk()` returns `false`.
+- Return `true` to go on, or `false` to stop. After a stop, `chunk()` returns `false`.
   Otherwise it returns `true`.
 - Without `orderBy()`, `chunk()` orders by the primary key.
   So each page has other rows.
@@ -9473,6 +9579,7 @@ await Actor().where('age', '>', 100).chunkById(100, (List<Actor> actors) async {
   for (Actor actor in actors) {
     await actor.delete();
   }
+  return true;
 });
 ```
 
@@ -9495,7 +9602,7 @@ dynamic newest = await Actor().max('created_at');
 - `sum()` returns a `num`. It is an `int` or a `double`, by driver. Use `toInt()` or `toDouble()`.
 - `avg()` returns a `double`.
 - `min()` and `max()` return the value as the driver gives it.
-  A date is an ISO string. A Postgres or MySQL decimal is a `String`.
+  A date is an ISO string. A Postgres `numeric` is a `String`. A MySQL `DECIMAL` is a `double`.
 - Like `count()`, they use `where`, `join` and soft deletes.
   They ignore `limit`, `offset` and `orderBy`.
 - After `distinct()`, `sum()` and `avg()` use only the distinct values.
@@ -9963,6 +10070,8 @@ print(row['id']);
   Postgres and SQLite read the row with `RETURNING *`. MySQL reads it again by its id.
 - It works with any primary key type, for example a uuid string.
 - On a model with [events](model/events.md), `create` calls `save()`, so the hooks run.
+- On a model without events, `create` does not set `created_at` and `updated_at`.
+  Put them in the map, or use `save()`.
 
 !!! note "MySQL and a table without an auto increment id"
     MySQL can not read the new row when the table has no auto increment id,
@@ -10164,6 +10273,7 @@ await Actor().truncate(resetId: false); // keep the id counter on Postgres and S
 ```
 
 On Postgres it runs `TRUNCATE TABLE ... RESTART IDENTITY CASCADE`.
+On MySQL it runs `TRUNCATE TABLE`, and MySQL always resets the id counter.
 On SQLite it runs `DELETE FROM`.
 
 ## Debug
@@ -10289,6 +10399,7 @@ A row lock stops two requests from changing the same row at the same time.
 Think of a stock count. Two requests read `stock = 5` at the same time.
 Each one takes 1 and saves `4`. The right value is `3`.
 A lock makes the second request wait until the first one is done.
+This example has an `int? stock` column field on a `Product` model.
 
 ```dart
 Future<void> buy(int productId, int quantity) async {
@@ -10418,6 +10529,7 @@ So Dox keeps a list of your Dart migrations in `db/migration/migrations.dart`:
 
 ```dart
 // Made by `dox make:migration` and the `dox migration:*` commands.
+// Do not edit, it is made again from the files in this folder.
 import 'package:dox_migration/dox_migration.dart';
 
 import '2026_10_21_120000_create_users_table.dart' as m1;
@@ -10483,18 +10595,24 @@ The AOT server binary can run the migrations, because the registry is compiled i
 The new app template already does this:
 
 ```dart title="bin/server.dart"
-import 'package:my_app/config/app.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_migration/dox_migration.dart';
+import 'package:my_app/config/app.dart';
+import 'package:my_app/config/database.dart';
 
 import '../db/migration/migrations.dart';
 
 void main() async {
   Dox().initialize(appConfig);
-  await Migrator(migrations: migrations).migrate();
+  await Migrator(
+    migrations: migrations,
+    config: databaseConfig.getConnectionConfig(),
+  ).migrate();
   await Dox().startServer();
 }
 ```
+
+It uses the config from `lib/config/database.dart`, so it also works without a `.env` file.
 
 Keep the `db/migration` folder next to the binary if you also have `.sql` migrations.
 
@@ -10518,10 +10636,11 @@ For SQLite, only two variables are needed:
 
 ```bash title=".env"
 DB_CONNECTION=sqlite
-DB_NAME=storage/app.db # file path, made if missing
+DB_NAME=db/dox.sqlite # file path, made if missing
 ```
 
 - `DB_DATABASE` works too, in place of `DB_NAME`.
+- Without `DB_CONNECTION`, the migrations use Postgres. So always set it in `.env`.
 - The default port is `5432` for Postgres and `3306` for MySQL.
 - One run opens one driver and closes it at the end. Each migration runs on one connection.
 - A `DB_HOST` that starts with `/` is a [Unix socket](index.md#unix-socket).
@@ -10615,6 +10734,7 @@ Source: https://dartondox.dev/latest/3.xdatabase/factories/
 # Factories
 
 A factory makes models with sample data.
+
 Use it in tests and in [seeders](seeders.md).
 
 ## Create a factory
@@ -10623,7 +10743,8 @@ Use it in tests and in [seeders](seeders.md).
 dox make:factory User
 ```
 
-This makes `db/factories/user.factory.dart`:
+This makes `db/factories/user.factory.dart`.
+Set the default values in `definition()`. For example:
 
 ```dart title="db/factories/user.factory.dart"
 import 'package:dox_orm/factory.dart';
@@ -10666,6 +10787,7 @@ So [model events](model/events.md) run, and each model gets its id.
 ## State
 
 `state()` changes each model after `definition()`.
+The examples below use a `bool? isAdmin` and a `String? role` field on `User`.
 
 ```dart
 User admin = await UserFactory()
@@ -10804,6 +10926,7 @@ Source: https://dartondox.dev/latest/3.xdatabase/seeders/
 # Seeders
 
 A seeder puts data in your database.
+
 Use it for sample data in development, or for data your app needs, like a list of countries.
 
 ## Create a seeder
@@ -10819,6 +10942,8 @@ This makes three files:
 | `db/seeders/user.seeder.dart` | the new seeder |
 | `db/seeders/seeders.dart` | the list of all seeders. Dox writes it again on each `make:seeder` and `db:seed`. Do not edit it. |
 | `bin/seed.dart` | the script that runs a seeder. It is made only when it is missing. |
+
+Write your code in `run()`. For example:
 
 ```dart title="db/seeders/user.seeder.dart"
 import 'package:dox_migration/dox_migration.dart';
@@ -11255,7 +11380,9 @@ the `DATABASE_URL`:
 | `prefer` | TLS when the server has it. No certificate check. |
 | `require` | TLS. No certificate check, like libpq. `useSSL: true` gives this mode. |
 | `verify-ca` | TLS. The certificate is checked, the host name is not. |
-| `verify-full` | TLS. The certificate and the host name are checked. It uses the Mozilla roots and the roots of the system. |
+| `verify-full` | TLS. The certificate and the host name are checked. |
+
+Without `sslRootCert`, `verify-ca` and `verify-full` use the Mozilla roots and the roots of the system.
 
 ```dart
 ConnectionConfig(
@@ -11268,8 +11395,8 @@ ConnectionConfig(
 
 To trust your own CA (for example the CA bundle of your cloud database, or a
 self-signed CA in development), give the path of a PEM file in
-`extra['sslRootCert']`, or with `sslrootcert` in the url. Then `verify-full`
-trusts only the certificates in that file. `prefer` and `require` do not use it.
+`extra['sslRootCert']`, or with `sslrootcert` in the url. Then `verify-ca` and
+`verify-full` trust only the certificates in that file. `prefer` and `require` do not use it.
 
 ```dart
 extra: <String, dynamic>{
@@ -11293,7 +11420,7 @@ The driver reads these keys from `extra` of the `ConnectionConfig`:
 |---|---|---|
 | `maxConnectionCount` | `10` | Most connections in the pool, for the whole process. |
 | `sslMode` | `disable` | TLS mode, see [TLS](#tls). |
-| `sslRootCert` | none | Path of a PEM file with the CA certificates to trust for `verify-full`, see [TLS](#tls). |
+| `sslRootCert` | none | Path of a PEM file with the CA certificates to trust for `verify-ca` and `verify-full`, see [TLS](#tls). |
 | `timeZone` | `UTC` | Time zone of the session. |
 | `applicationName` | none | Name of the app in `pg_stat_activity`. |
 | `threads` | `1` | Rust threads for all pools of the process. `0` is one thread with a single-thread runtime. Only the first pool sets it. |
@@ -11783,8 +11910,8 @@ found?.title = 'New title';
 await found?.save();
 
 // set a field to null
-found?.slug = null;
-await found?.save(); // slug is now NULL in the database
+found?.status = null;
+await found?.save(); // status is now NULL in the database
 
 // create from a map: returns the new model as it is in the table
 Blog created = await Blog().create(<String, dynamic>{
@@ -11802,6 +11929,11 @@ Blog created = await Blog().create(<String, dynamic>{
   (loaded from the database, or saved).
   Fields that were not loaded, for example with `select()`, are not changed.
 - `save()` returns `true` when it saved, and `false` when a [model event](events.md) cancels it.
+
+!!! note "`create()` and `save()` are not the same"
+    On a model without [events](events.md), `create()` inserts the map as it is.
+    It does not run `beforeSave`, and it does not set `created_at` and `updated_at`.
+    Use `save()` when you need them, or put the values in the map.
 
 ### Mass assignment
 
@@ -12190,8 +12322,8 @@ class UserObserver extends ModelObserver<User> {
   UserObserver(this.mailer);
 
   @override
-  Future<void> onCreated(User user) async {
-    await mailer.sendWelcome(user.email!);
+  Future<void> onCreated(User model) async {
+    await mailer.sendWelcome(model.email!);
   }
 }
 ```
@@ -12249,6 +12381,7 @@ Source: https://dartondox.dev/latest/3.xdatabase/model/scopes/
 # Query scopes
 
 A scope is a query part that you use again and again, like "only active users".
+
 You write it once in the model. Then you call it like a query method.
 
 ## Local scopes
@@ -12348,6 +12481,7 @@ Source: https://dartondox.dev/latest/3.xdatabase/model/casts/
 # Attribute casts
 
 A cast changes a column value between the database and Dart.
+
 For example, it reads JSON text as a map, or saves an enum by its name.
 Casts work the same on Postgres, MySQL, MariaDB and SQLite.
 
@@ -12446,6 +12580,7 @@ Source: https://dartondox.dev/latest/3.xdatabase/model/counting-relations/
 # Counting relations
 
 `withCount()` adds the number of related rows to each model.
+
 It does not load the rows. It adds a subquery to the select,
 so you get the counts with the same query.
 
@@ -12693,6 +12828,7 @@ Source: https://dartondox.dev/latest/3.xdatabase/model/relationship/has-one/
 # HasOne
 
 Use `HasOne` when one row of this table has one row in another table.
+
 For example, a user has one user info row.
 The other table keeps the foreign key (`user_info.user_id`).
 
@@ -12852,12 +12988,6 @@ class User extends UserGenerator {
 - A relation loaded with `preload` is in `toJson()` of that query.
 - The JSON key is the field name in snake_case: `user_info`.
 
-!!! warning "Known issue: names with more than one word"
-    For a relation without `eager: true`, `toJson()` looks for the snake_case name in the preload list.
-    But `preload` needs the field name (`'userInfo'`).
-    So a preloaded `userInfo` is on the model, but it is not in `toJson()`.
-    Use a one word field name (like `info`), or `eager: true`, when you need it in JSON.
-
 
 ---
 
@@ -12868,6 +12998,7 @@ Source: https://dartondox.dev/latest/3.xdatabase/model/relationship/has-many/
 # HasMany
 
 Use `HasMany` when one row of this table has many rows in another table.
+
 For example, a user has many posts.
 The other table keeps the foreign key (`post.user_id`).
 
@@ -13039,12 +13170,6 @@ class User extends UserGenerator {
 - A relation loaded with `preload` is in `toJson()` of that query.
 - The JSON key is the field name in snake_case.
 
-!!! warning "Known issue: names with more than one word"
-    For a relation without `eager: true`, `toJson()` looks for the snake_case name in the preload list.
-    But `preload` needs the field name (`'activePosts'`).
-    So a preloaded `activePosts` is on the model, but it is not in `toJson()`.
-    Use a one word field name, or `eager: true`, when you need it in JSON.
-
 
 ---
 
@@ -13055,6 +13180,7 @@ Source: https://dartondox.dev/latest/3.xdatabase/model/relationship/belongs-to/
 # BelongsTo
 
 Use `BelongsTo` when this table keeps the foreign key to another table.
+
 For example, a comment belongs to a user.
 The comment table has the column `user_id`.
 
@@ -13225,12 +13351,6 @@ class Comment extends CommentGenerator {
 - A relation loaded with `preload` is in `toJson()` of that query.
 - The JSON key is the field name in snake_case: `user`.
 
-!!! warning "Known issue: names with more than one word"
-    For a relation without `eager: true`, `toJson()` looks for the snake_case name in the preload list.
-    But `preload` needs the field name (`'activeUser'`).
-    So a preloaded `activeUser` is on the model, but it is not in `toJson()`.
-    Use a one word field name, or `eager: true`, when you need it in JSON.
-
 
 ---
 
@@ -13241,6 +13361,7 @@ Source: https://dartondox.dev/latest/3.xdatabase/model/relationship/many-to-many
 # ManyToMany
 
 Use `ManyToMany` when rows on both sides can have many rows on the other side.
+
 For example, an artist has many songs, and a song has many artists.
 
 The link is kept in a third table, the pivot table.
@@ -13444,12 +13565,6 @@ class Artist extends ArtistGenerator {
 - A relation with `eager: true` is always in `toJson()`.
 - A relation loaded with `preload` is in `toJson()` of that query.
 - The JSON key is the field name in snake_case: `songs`.
-
-!!! warning "Known issue: names with more than one word"
-    For a relation without `eager: true`, `toJson()` looks for the snake_case name in the preload list.
-    But `preload` needs the field name, like `'topSongs'`.
-    So a preloaded `topSongs` is on the model, but it is not in `toJson()`.
-    Use a one word field name, or `eager: true`, when you need it in JSON.
 
 
 ---
@@ -14313,6 +14428,7 @@ Source: https://dartondox.dev/latest/3.xpackages/validation/
 # Validation
 
 `dox_validation` checks input and gives you typed Dart objects.
+
 It has two parts:
 
 1. **DTOs**: a class with `@Dto()` and rule annotations. A generator writes the checks. Use this for almost everything.
@@ -14569,6 +14685,9 @@ createUser.safeParse(input, messages: MessageResolver(messages: <String, String>
 }));
 ```
 
+A resolver for one call is used in place of the global one.
+Codes that it does not have get the built-in text, not the global text.
+
 For other languages, extend `MessageResolver` and override `resolve()`.
 See [Messages](../the-basic/validation.md#messages).
 
@@ -14587,6 +14706,7 @@ Source: https://dartondox.dev/latest/3.xpackages/openapi/
 # OpenAPI
 
 This page shows how Dox makes OpenAPI 3.1 docs for your API, and how to change them.
+
 You write no docs code. You get a [Scalar](https://github.com/scalar/scalar) docs page at `/docs`, plus `/openapi.json` and `/openapi.yaml`.
 
 The docs come from three places:
@@ -14620,6 +14740,8 @@ OpenApiConfig openApi = OpenApiConfig(
 ```
 
 ```dart title="lib/config/app.dart"
+import 'package:my_app/config/openapi.dart';
+
 AppConfig appConfig = AppConfig(
   openApi: openApi,
   // ...
@@ -14901,7 +15023,8 @@ dox openapi:generate              # storage/openapi/openapi.json and openapi.yam
 dox openapi:generate docs/api     # another folder
 ```
 
-It runs `bin/openapi.dart` of your app:
+It runs `bin/openapi.dart` of your app.
+A new app does not have this file. Make it with this code:
 
 ```dart title="bin/openapi.dart"
 import 'dart:io';
@@ -14971,6 +15094,8 @@ This page shows how to save and read files with `dox_storage`.
 
 ## In a Dox app
 
+A new app from `dox create` already has steps 1 to 3. Go to step 4.
+
 ### 1. Install
 
 ```bash
@@ -14981,8 +15106,10 @@ dart pub add dox_storage
 
 ```dart title="lib/config/storage.dart"
 import 'package:dox_storage/dox_storage.dart';
+import 'package:my_app/config/env.dart';
 
 StorageConfig storageConfig = StorageConfig(
+  defaultDisk: env.storageDisk, // STORAGE_DISK in .env, default 'local'
   disks: <String, Map<String, dynamic>>{
     'local': <String, dynamic>{'driver': 'local', 'root': 'storage'},
   },
@@ -15002,7 +15129,7 @@ class AppStorageProvider extends StorageProvider {
 }
 ```
 
-Run `dart run build_runner build`. A new app from `dox create` already has these two files.
+Run `dart run build_runner build`.
 
 ### 4. Use it
 
@@ -15275,26 +15402,33 @@ With no config, Dox has a `file` store (the default) and a `memory` store. Use i
 await Cache().put('foo', 'bar', duration: Duration(minutes: 10));
 String? foo = await Cache().get('foo');
 
+// store JSON values, so a model becomes a map with toJson()
 List<dynamic> posts = await Cache().remember(
   'posts',
   Duration(minutes: 5),
-  () => Post().all(),
+  () async => (await Post().all()).map((Post p) => p.toJson()).toList(),
 );
 ```
 
-To change the stores, make `lib/config/cache.dart` and pass it to `AppConfig(cache: cache)` in `lib/config/app.dart`:
+The app template has the stores in `lib/config/cache.dart`.
+`lib/config/app.dart` passes them to `AppConfig(cache: cache)`.
+Change this file to add a store, like Redis:
 
 ```dart title="lib/config/cache.dart"
 import 'package:dox_core/dox_core.dart';
+import 'package:my_app/config/env.dart';
 
 CacheConfig cache = CacheConfig(
-  defaultStore: 'redis',
+  defaultStore: env.cacheStore, // CACHE_STORE in .env, default 'file'
   stores: <String, Map<String, dynamic>>{
+    'file': <String, dynamic>{'driver': 'file', 'path': 'storage/cache'},
     'memory': <String, dynamic>{'driver': 'memory', 'max_size': 10000},
     'redis': <String, dynamic>{'driver': 'redis', 'host': '127.0.0.1', 'prefix': 'app_cache:'},
   },
 );
 ```
+
+Then set `CACHE_STORE=redis` in `.env`.
 
 - `Cache().store('memory')` uses another store.
 - `Dox().cache` is the `CacheManager` of this page. `Cache().repository` is the `CacheStore`.
@@ -15480,16 +15614,18 @@ Source: https://dartondox.dev/latest/3.xpackages/socketio/
 
 # Socket.IO
 
-This page shows how to set up Socket.IO in a Dox app with `dox_socketio`. It can also run on its own, see [Without Dox](#without-dox).
+This page shows how to set up Socket.IO in a Dox app with `dox_socketio`.
+
+It can also run on its own, see [Without Dox](#without-dox).
 
 `dox_socketio` is a Socket.IO v4 server for Dart.
 The official clients connect to it with no changes: `socket.io-client` (JavaScript v4) and the Dart `socket_io_client` package.
 It has acks, rooms, namespaces, binary data and long-polling.
 Socket.IO is the way to do realtime in Dox.
 
-## Set up in a Dox app
+## In a Dox app
 
-Socket.IO runs on the same port as your HTTP routes, at `/socket.io/`. You need four files: a provider, a config, a namespace and one env key.
+Socket.IO runs on the same port as your HTTP routes, at `/socket.io/`. You add a provider, a config, a namespace and one env key.
 
 ### 1. Install
 
@@ -15591,7 +15727,7 @@ Use `transports: ['websocket']`. See [Many isolates](#many-isolates-redis-adapte
 `SocketIoProvider.server` is the Socket.IO server of this isolate:
 
 ```dart
-SocketIoProvider.server?.of('/chat').to('lobby').emit('news', data);
+await SocketIoProvider.server?.of('/chat').to('lobby').emit('news', data);
 ```
 
 From a queue job or another program, use the [emitter](#emit-from-other-programs).
@@ -15677,7 +15813,7 @@ class ChatNamespace extends NamespaceHandler {
 
   void checkToken(Socket socket) {
     if (socket.handshake.auth['token'] != 'secret') {
-      throw SocketIoException('unauthorized', data: {'reason': 'bad token'});
+      throw SocketIoException('unauthorized', data: <String, dynamic>{'reason': 'bad token'});
     }
   }
 
@@ -15731,8 +15867,8 @@ SocketIoServer(
     pingInterval: Duration(seconds: 25),
     pingTimeout: Duration(seconds: 20),
     maxHttpBufferSize: 1000000,
-    transports: ['polling', 'websocket'],
-    cors: CorsOptions(origins: ['https://my.app'], credentials: true),
+    transports: <String>['polling', 'websocket'],
+    cors: CorsOptions(origins: <String>['https://my.app'], credentials: true),
   ),
 );
 ```
@@ -15745,6 +15881,7 @@ SocketIoServer(
 | `upgradeTimeout` | 10 s | how long an upgrade from polling to websocket may take |
 | `connectTimeout` | 45 s | how long the client has to join a namespace |
 | `maxHttpBufferSize` | 1,000,000 bytes | the biggest message. A bigger websocket message closes the connection |
+| `maxAttachments` | `10` | the most binary parts in one packet. A packet with more closes that client |
 | `transports` | `['polling', 'websocket']` | allowed transports |
 | `allowUpgrades` | `true` | let polling clients move to websocket |
 | `cors` | `null` | CORS headers for polling requests. It also checks the origin of websockets |
@@ -15810,10 +15947,10 @@ io.onServerSideEmit('reload-config', (ServerSideEvent event) {
 });
 
 // on one server
-await io.serverSideEmit('reload-config', ['v2']);
+await io.serverSideEmit('reload-config', <Object?>['v2']);
 
 // wait for one answer from each other server
-List<Object?> answers = await io.serverSideEmitWithAck('reload-config', ['v2']);
+List<Object?> answers = await io.serverSideEmitWithAck('reload-config', <Object?>['v2']);
 ```
 
 When a server does not answer in time, `serverSideEmitWithAck` throws an `AckTimeoutException`. Its `responses` holds the answers that came back.
@@ -15835,7 +15972,7 @@ Future<void> main() async {
   Redis redis = Redis(RedisOptions(host: '127.0.0.1', port: 6379));
   SocketIoEmitter emitter = SocketIoEmitter(redis);
 
-  await emitter.emit('news', {'title': 'hello'}); // all clients of `/`
+  await emitter.emit('news', <String, dynamic>{'title': 'hello'}); // all clients of `/`
   await emitter.to('room1').except('room2').emit('news', 'hi room1');
   await emitter.of('/chat').to('vip').emit('notice', 'for vip');
 

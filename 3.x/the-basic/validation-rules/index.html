@@ -6808,7 +6808,7 @@
 </tbody>
 </table>
 <ul>
-<li>The value is an ISO 8601 date, or <code>'now'</code> (the time of the request).</li>
+<li>The value is an ISO 8601 date, or <code>'now'</code> (the time of the request). A bad date text stops the build.</li>
 <li>Both are exclusive: <code>@After('2000-01-01')</code> does not accept <code>2000-01-01T00:00:00Z</code>.</li>
 <li>To compare two fields (end after start), use <a href="../validation/#checks-across-fields-validate"><code>validate()</code></a>.</li>
 </ul>
@@ -6847,7 +6847,9 @@
 <ul>
 <li><code>@MaxSize</code> units: <code>B</code>, <code>KB</code>, <code>MB</code>, <code>GB</code>. <code>1KB</code> = 1024 bytes. A bad size text stops the build.</li>
 <li><code>@Mimes</code> takes file extensions. Dox finds the real type from the first bytes of the file.
-  The file name extension must fit those bytes too. So <code>x.html</code> with GIF bytes does not pass.
+  The file name extension must not name another type, or a type a browser runs (like <code>html</code> or <code>svg</code>).
+  So <code>x.html</code> with GIF bytes does not pass. An empty or unknown extension is fine.
+  For zip based types (like <code>docx</code> or <code>xlsx</code>), the file name extension must match too.
   For types without a byte signature (like <code>txt</code> or <code>csv</code>), it uses the file name extension.</li>
 <li><code>@Image()</code> is <code>@Mimes(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'])</code>. No <code>svg</code>.</li>
 <li>The JSON Schema of a file is <code>{"type": "string", "format": "binary"}</code>, plus the keys above.</li>
@@ -6877,6 +6879,7 @@
 </table>
 <ul>
 <li><code>@Unique</code> column default: the input key. <code>@Exists</code> column default: <code>id</code>.</li>
+<li>They read the table, not the model. So soft-deleted rows count too.</li>
 <li><code>ignoreParam: 'id'</code> skips the row where <code>ignoreColumn</code> (default <code>id</code>) equals the path param <code>{id}</code>.</li>
 <li>They add nothing to the JSON Schema.</li>
 </ul>
@@ -6927,10 +6930,11 @@
 <li><code>DateTime</code> takes <code>2024-01-31</code> or <code>2024-01-31T10:00:00Z</code>. A value without a time zone is read as UTC.
   The result is always UTC (<code>isUtc == true</code>). A number (timestamp) is not allowed.</li>
 <li>An <code>enum</code> matches the Dart name exactly. <code>"Admin"</code> does not match <code>Role.admin</code>. Custom wire values (like <code>"ADMIN"</code>) are not supported.</li>
-<li><code>Object?</code>, <code>dynamic</code> and <code>Map&lt;String, dynamic&gt;</code> take any value. They are not checked.</li>
+<li><code>Object?</code> and <code>dynamic</code> take any value. They are not checked.</li>
+<li><code>Map&lt;String, dynamic&gt;</code> must be an object. Its values are not checked.</li>
 <li>In query and form data, one value for a <code>List&lt;T&gt;</code> field gives a list with one item.</li>
 <li>In bracket keys, list indexes are sorted and packed: <code>items[3]</code> alone gives a list with one item.</li>
-<li>A list can have at most 1000 items, and keys can nest at most 10 levels. More gives <code>422</code>.</li>
+<li>In query and form data, a list can have at most 1000 items, and keys can nest at most 10 levels. More gives <code>422</code> with the key <code>_root</code>.</li>
 </ul>
 <h2 id="body-types">Body types</h2>
 <table>

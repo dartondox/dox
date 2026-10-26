@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="This page shows how Dox makes OpenAPI 3.1 docs for your API, and how to change them. You write no docs code. You get a Scalar docs page at /docs, plus...">
+        <meta name="description" content="This page shows how Dox makes OpenAPI 3.1 docs for your API, and how to change them.">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="OpenAPI | Dox">
-  <meta property="og:description" content="This page shows how Dox makes OpenAPI 3.1 docs for your API, and how to change them. You write no docs code. You get a Scalar docs page at /docs, plus...">
+  <meta property="og:description" content="This page shows how Dox makes OpenAPI 3.1 docs for your API, and how to change them.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/packages/openapi/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="OpenAPI | Dox">
-  <meta name="twitter:description" content="This page shows how Dox makes OpenAPI 3.1 docs for your API, and how to change them. You write no docs code. You get a Scalar docs page at /docs, plus...">
+  <meta name="twitter:description" content="This page shows how Dox makes OpenAPI 3.1 docs for your API, and how to change them.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -6523,8 +6523,8 @@
 
 
 <h1 id="openapi">OpenAPI</h1>
-<p>This page shows how Dox makes OpenAPI 3.1 docs for your API, and how to change them.
-You write no docs code. You get a <a href="https://github.com/scalar/scalar">Scalar</a> docs page at <code>/docs</code>, plus <code>/openapi.json</code> and <code>/openapi.yaml</code>.</p>
+<p>This page shows how Dox makes OpenAPI 3.1 docs for your API, and how to change them.</p>
+<p>You write no docs code. You get a <a href="https://github.com/scalar/scalar">Scalar</a> docs page at <code>/docs</code>, plus <code>/openapi.json</code> and <code>/openapi.yaml</code>.</p>
 <p>The docs come from three places:</p>
 <ul>
 <li><strong>the routes</strong>: method, path, path params, middleware (login),</li>
@@ -6547,10 +6547,12 @@ Run it again after you change routes, controllers, request classes or models.
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nl">registry:</span><span class="w"> </span><span class="n">openApiRegistry</span><span class="p">,</span>
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">);</span>
 </span></code></pre></div>
-<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nl">openApi:</span><span class="w"> </span><span class="n">openApi</span><span class="p">,</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">);</span>
+<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/openapi.dart'</span><span class="p">;</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nl">openApi:</span><span class="w"> </span><span class="n">openApi</span><span class="p">,</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">);</span>
 </span></code></pre></div>
 <table>
 <thead>
@@ -6975,7 +6977,8 @@ only methods of that class match. With a plain <code>links.index</code>, the pat
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>dox<span class="w"> </span>openapi:generate<span class="w">              </span><span class="c1"># storage/openapi/openapi.json and openapi.yaml</span>
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>dox<span class="w"> </span>openapi:generate<span class="w"> </span>docs/api<span class="w">     </span><span class="c1"># another folder</span>
 </span></code></pre></div>
-<p>It runs <code>bin/openapi.dart</code> of your app:</p>
+<p>It runs <code>bin/openapi.dart</code> of your app.
+A new app does not have this file. Make it with this code:</p>
 <div class="language-dart highlight"><span class="filename">bin/openapi.dart</span><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
 </span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
 </span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>

@@ -6334,6 +6334,9 @@
 <h1 id="step-2-model-and-migration">Step 2: Model and migration</h1>
 <p>This step makes the <code>posts</code> table with a Dart migration and a <code>Post</code> model for it.</p>
 <h2 id="1-make-the-model-and-the-migration">1. Make the model and the migration</h2>
+<p>Stop <code>dox s</code> first with <code>Ctrl+C</code>.
+<code>dox s</code> restarts the server when a new file appears, and the server runs new migrations at start.
+So it would run the new migration before you add the columns.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>make:model<span class="w"> </span>Post<span class="w"> </span>-m
 </span></code></pre></div>
 <p>This makes two files and updates one:</p>
@@ -6427,16 +6430,25 @@
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Migrating: 2026_10_22_205345_create_posts_table
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>Migrated: 2026_10_22_205345_create_posts_table
 </span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">The migration ran too early?</p>
+<p>If <code>dox s</code> was still running, the <code>posts</code> table may already exist without <code>title</code> and <code>body</code>.
+Run <code>dox migration:rollback</code>, then <code>dox migration:run</code> again.</p>
+</div>
 <p>The model needs its generated file <code>post.model.g.dart</code>.
 <code>dox s</code> makes it while it runs. If <code>dox s</code> is not running, run the generator once:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build<span class="w"> </span>--delete-conflicting-outputs
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build
 </span></code></pre></div>
 <h2 id="check-it">Check it</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>dox<span class="w"> </span>migration:status
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Migration                             Batch  Status
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>2026_10_22_205345_create_posts_table  1      Ran
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Migration                                 Batch  Status
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>2023_07_16_131937700_create_users_table   1      Ran
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>2026_10_25_000000000_create_queue_tables  1      Ran
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>2026_10_22_205345_create_posts_table      2      Ran
 </span></code></pre></div>
+<p>The first two come with the template. The server ran them at the first start in step 1.</p>
+<p>Now start the server again with <code>dox s</code>.</p>
 <h2 id="next">Next</h2>
 <p><a href="../03-routes-and-controller/">Step 3: Routes and controller</a></p>
 

@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="This page shows how to set up Socket.IO in a Dox app with dox_socketio. It can also run on its own, see Without Dox.">
+        <meta name="description" content="This page shows how to set up Socket.IO in a Dox app with dox_socketio.">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Socket.IO | Dox">
-  <meta property="og:description" content="This page shows how to set up Socket.IO in a Dox app with dox_socketio. It can also run on its own, see Without Dox.">
+  <meta property="og:description" content="This page shows how to set up Socket.IO in a Dox app with dox_socketio.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/packages/socketio/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Socket.IO | Dox">
-  <meta name="twitter:description" content="This page shows how to set up Socket.IO in a Dox app with dox_socketio. It can also run on its own, see Without Dox.">
+  <meta name="twitter:description" content="This page shows how to set up Socket.IO in a Dox app with dox_socketio.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -4681,15 +4681,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#set-up-in-a-dox-app" class="md-nav__link">
+  <a href="#in-a-dox-app" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Set up in a Dox app
+        In a Dox app
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Set up in a Dox app">
+    <nav class="md-nav" aria-label="In a Dox app">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6346,15 +6346,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#set-up-in-a-dox-app" class="md-nav__link">
+  <a href="#in-a-dox-app" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Set up in a Dox app
+        In a Dox app
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Set up in a Dox app">
+    <nav class="md-nav" aria-label="In a Dox app">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6570,13 +6570,14 @@
 
 
 <h1 id="socketio">Socket.IO</h1>
-<p>This page shows how to set up Socket.IO in a Dox app with <code>dox_socketio</code>. It can also run on its own, see <a href="#without-dox">Without Dox</a>.</p>
+<p>This page shows how to set up Socket.IO in a Dox app with <code>dox_socketio</code>.</p>
+<p>It can also run on its own, see <a href="#without-dox">Without Dox</a>.</p>
 <p><code>dox_socketio</code> is a Socket.IO v4 server for Dart.
 The official clients connect to it with no changes: <code>socket.io-client</code> (JavaScript v4) and the Dart <code>socket_io_client</code> package.
 It has acks, rooms, namespaces, binary data and long-polling.
 Socket.IO is the way to do realtime in Dox.</p>
-<h2 id="set-up-in-a-dox-app">Set up in a Dox app</h2>
-<p>Socket.IO runs on the same port as your HTTP routes, at <code>/socket.io/</code>. You need four files: a provider, a config, a namespace and one env key.</p>
+<h2 id="in-a-dox-app">In a Dox app</h2>
+<p>Socket.IO runs on the same port as your HTTP routes, at <code>/socket.io/</code>. You add a provider, a config, a namespace and one env key.</p>
 <h3 id="1-install">1. Install</h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_socketio
 </span></code></pre></div>
@@ -6671,7 +6672,7 @@ Socket.IO is the way to do realtime in Dox.</p>
 <p>Use <code>transports: ['websocket']</code>. See <a href="#many-isolates-redis-adapter">Many isolates</a> for why.</p>
 <h3 id="send-from-a-controller-or-a-service">Send from a controller or a service</h3>
 <p><code>SocketIoProvider.server</code> is the Socket.IO server of this isolate:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">SocketIoProvider</span><span class="p">.</span><span class="n">server</span><span class="o">?</span><span class="p">.</span><span class="n">of</span><span class="p">(</span><span class="s1">'/chat'</span><span class="p">).</span><span class="n">to</span><span class="p">(</span><span class="s1">'lobby'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">SocketIoProvider</span><span class="p">.</span><span class="n">server</span><span class="o">?</span><span class="p">.</span><span class="n">of</span><span class="p">(</span><span class="s1">'/chat'</span><span class="p">).</span><span class="n">to</span><span class="p">(</span><span class="s1">'lobby'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">);</span>
 </span></code></pre></div>
 <p>From a queue job or another program, use the <a href="#emit-from-other-programs">emitter</a>.</p>
 <ul>
@@ -6745,7 +6746,7 @@ Dox logs this hint at startup when it runs many isolates and polling is allowed.
 </span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>
 </span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">checkToken</span><span class="p">(</span><span class="n">Socket</span><span class="w"> </span><span class="n">socket</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">socket</span><span class="p">.</span><span class="n">handshake</span><span class="p">.</span><span class="n">auth</span><span class="p">[</span><span class="s1">'token'</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s1">'secret'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="w">      </span><span class="k">throw</span><span class="w"> </span><span class="n">SocketIoException</span><span class="p">(</span><span class="s1">'unauthorized'</span><span class="p">,</span><span class="w"> </span><span class="nl">data:</span><span class="w"> </span><span class="p">{</span><span class="s1">'reason'</span><span class="o">:</span><span class="w"> </span><span class="s1">'bad token'</span><span class="p">});</span>
+</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="w">      </span><span class="k">throw</span><span class="w"> </span><span class="n">SocketIoException</span><span class="p">(</span><span class="s1">'unauthorized'</span><span class="p">,</span><span class="w"> </span><span class="nl">data:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'reason'</span><span class="o">:</span><span class="w"> </span><span class="s1">'bad token'</span><span class="p">});</span>
 </span><span id="__span-11-15"><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="w">    </span><span class="p">}</span>
 </span><span id="__span-11-16"><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-11-17"><a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>
@@ -6843,8 +6844,8 @@ Any other error is written to stderr. The client only gets <code>{"message": "In
 </span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="nl">pingInterval:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">25</span><span class="p">),</span>
 </span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span><span class="nl">pingTimeout:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">20</span><span class="p">),</span>
 </span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">    </span><span class="nl">maxHttpBufferSize:</span><span class="w"> </span><span class="m">1000000</span><span class="p">,</span>
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">    </span><span class="nl">transports:</span><span class="w"> </span><span class="p">[</span><span class="s1">'polling'</span><span class="p">,</span><span class="w"> </span><span class="s1">'websocket'</span><span class="p">],</span>
-</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">    </span><span class="nl">cors:</span><span class="w"> </span><span class="n">CorsOptions</span><span class="p">(</span><span class="nl">origins:</span><span class="w"> </span><span class="p">[</span><span class="s1">'https://my.app'</span><span class="p">],</span><span class="w"> </span><span class="nl">credentials:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">    </span><span class="nl">transports:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'polling'</span><span class="p">,</span><span class="w"> </span><span class="s1">'websocket'</span><span class="p">],</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">    </span><span class="nl">cors:</span><span class="w"> </span><span class="n">CorsOptions</span><span class="p">(</span><span class="nl">origins:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'https://my.app'</span><span class="p">],</span><span class="w"> </span><span class="nl">credentials:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
 </span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">  </span><span class="p">),</span>
 </span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="p">);</span>
 </span></code></pre></div>
@@ -6886,6 +6887,11 @@ Any other error is written to stderr. The client only gets <code>{"message": "In
 <td><code>maxHttpBufferSize</code></td>
 <td>1,000,000 bytes</td>
 <td>the biggest message. A bigger websocket message closes the connection</td>
+</tr>
+<tr>
+<td><code>maxAttachments</code></td>
+<td><code>10</code></td>
+<td>the most binary parts in one packet. A packet with more closes that client</td>
 </tr>
 <tr>
 <td><code>transports</code></td>
@@ -6956,10 +6962,10 @@ Then a broadcast on one server reaches the clients of all servers.</p>
 </span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="p">});</span>
 </span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>
 </span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="c1">// on one server</span>
-</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">serverSideEmit</span><span class="p">(</span><span class="s1">'reload-config'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">'v2'</span><span class="p">]);</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">serverSideEmit</span><span class="p">(</span><span class="s1">'reload-config'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">[</span><span class="s1">'v2'</span><span class="p">]);</span>
 </span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>
 </span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="c1">// wait for one answer from each other server</span>
-</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">answers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">serverSideEmitWithAck</span><span class="p">(</span><span class="s1">'reload-config'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">'v2'</span><span class="p">]);</span>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">answers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">serverSideEmitWithAck</span><span class="p">(</span><span class="s1">'reload-config'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">[</span><span class="s1">'v2'</span><span class="p">]);</span>
 </span></code></pre></div>
 <p>When a server does not answer in time, <code>serverSideEmitWithAck</code> throws an <code>AckTimeoutException</code>. Its <code>responses</code> holds the answers that came back.
 <code>onServerSideEmit</code> is also on namespaces: <code>io.of('/chat').onServerSideEmit(...)</code>.</p>
@@ -6975,7 +6981,7 @@ It writes to Redis, and every server with the Redis adapter sends the event to i
 </span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">  </span><span class="n">Redis</span><span class="w"> </span><span class="n">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Redis</span><span class="p">(</span><span class="n">RedisOptions</span><span class="p">(</span><span class="nl">host:</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">,</span><span class="w"> </span><span class="nl">port:</span><span class="w"> </span><span class="m">6379</span><span class="p">));</span>
 </span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">  </span><span class="n">SocketIoEmitter</span><span class="w"> </span><span class="n">emitter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoEmitter</span><span class="p">(</span><span class="n">redis</span><span class="p">);</span>
 </span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>
-</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="s1">'title'</span><span class="o">:</span><span class="w"> </span><span class="s1">'hello'</span><span class="p">});</span><span class="w"> </span><span class="c1">// all clients of `/`</span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'title'</span><span class="o">:</span><span class="w"> </span><span class="s1">'hello'</span><span class="p">});</span><span class="w"> </span><span class="c1">// all clients of `/`</span>
 </span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="n">except</span><span class="p">(</span><span class="s1">'room2'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="s1">'hi room1'</span><span class="p">);</span>
 </span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">of</span><span class="p">(</span><span class="s1">'/chat'</span><span class="p">).</span><span class="n">to</span><span class="p">(</span><span class="s1">'vip'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'notice'</span><span class="p">,</span><span class="w"> </span><span class="s1">'for vip'</span><span class="p">);</span>
 </span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>

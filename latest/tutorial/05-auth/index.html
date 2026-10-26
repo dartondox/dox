@@ -1055,10 +1055,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-migrate-and-generate" class="md-nav__link">
+  <a href="#7-run-the-generator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. Migrate and generate
+        7. Run the generator
       
     </span>
   </a>
@@ -6317,10 +6317,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-migrate-and-generate" class="md-nav__link">
+  <a href="#7-run-the-generator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. Migrate and generate
+        7. Run the generator
       
     </span>
   </a>
@@ -6592,11 +6592,10 @@ You do not add it to a list.</p>
 </span></code></pre></div>
 <p><code>AuthMiddleware</code> reads the <code>Authorization: Bearer &lt;token&gt;</code> header and loads the user.
 When the token is missing or wrong, it answers <code>401 Authentication failed</code>.</p>
-<h2 id="7-migrate-and-generate">7. Migrate and generate</h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>dox<span class="w"> </span>migration:run
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build<span class="w"> </span>--delete-conflicting-outputs
+<h2 id="7-run-the-generator">7. Run the generator</h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build
 </span></code></pre></div>
-<p><code>dox s</code> runs both for you when it restarts.</p>
+<p><code>dox s</code> runs it for you. There is no new migration in this step, because the <code>users</code> table already exists.</p>
 <h2 id="check-it">Check it</h2>
 <p>Register:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl<span class="w"> </span>-i<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:3000/api/auth/register<span class="w"> </span><span class="se">\</span>

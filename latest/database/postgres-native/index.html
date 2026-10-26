@@ -6461,10 +6461,11 @@ the <code>DATABASE_URL</code>:</p>
 </tr>
 <tr>
 <td><code>verify-full</code></td>
-<td>TLS. The certificate and the host name are checked. It uses the Mozilla roots and the roots of the system.</td>
+<td>TLS. The certificate and the host name are checked.</td>
 </tr>
 </tbody>
 </table>
+<p>Without <code>sslRootCert</code>, <code>verify-ca</code> and <code>verify-full</code> use the Mozilla roots and the roots of the system.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">ConnectionConfig</span><span class="p">(</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">postgres</span><span class="p">,</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="c1">// ... host, user, password, database as before</span>
@@ -6474,8 +6475,8 @@ the <code>DATABASE_URL</code>:</p>
 </span></code></pre></div>
 <p>To trust your own CA (for example the CA bundle of your cloud database, or a
 self-signed CA in development), give the path of a PEM file in
-<code>extra['sslRootCert']</code>, or with <code>sslrootcert</code> in the url. Then <code>verify-full</code>
-trusts only the certificates in that file. <code>prefer</code> and <code>require</code> do not use it.</p>
+<code>extra['sslRootCert']</code>, or with <code>sslrootcert</code> in the url. Then <code>verify-ca</code> and
+<code>verify-full</code> trust only the certificates in that file. <code>prefer</code> and <code>require</code> do not use it.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="s1">'sslMode'</span><span class="o">:</span><span class="w"> </span><span class="s1">'verify-full'</span><span class="p">,</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="s1">'sslRootCert'</span><span class="o">:</span><span class="w"> </span><span class="s1">'/etc/ssl/certs/db-ca.pem'</span><span class="p">,</span>
@@ -6509,7 +6510,7 @@ when the pool opens.</p>
 <tr>
 <td><code>sslRootCert</code></td>
 <td>none</td>
-<td>Path of a PEM file with the CA certificates to trust for <code>verify-full</code>, see <a href="#tls">TLS</a>.</td>
+<td>Path of a PEM file with the CA certificates to trust for <code>verify-ca</code> and <code>verify-full</code>, see <a href="#tls">TLS</a>.</td>
 </tr>
 <tr>
 <td><code>timeZone</code></td>

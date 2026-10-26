@@ -6332,7 +6332,7 @@ Add this line to <code>~/.bashrc</code> or <code>~/.zshrc</code>, then open a ne
 </span></code></pre></div>
 <p><code>dox create</code> downloads the newest 3.x release of
 <a href="https://github.com/dartondox/dox-sample">dox-sample</a>, the starter project.
-To get one exact version, add <code>--version</code>, for example <code>dox create new_blog --version 3.0.0-alpha.5</code>.</p>
+To get one exact version, add <code>--version</code>, for example <code>dox create new_blog --version 3.0.0-alpha.17</code>.</p>
 <p>It also makes your <code>.env</code> file from <code>.env.example</code>, with a new random <code>APP_KEY</code>.
 Then get the packages:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">cd</span><span class="w"> </span>new_blog
@@ -6344,8 +6344,8 @@ To use Postgres or MySQL instead, change <code>DB_CONNECTION</code> and the <cod
 values in <code>.env</code>. See <a href="../../database/">Database</a>.</p>
 <div class="admonition info">
 <p class="admonition-title">Add Dox to an existing Dart project</p>
-<p>Add the packages you need to <code>pubspec.yaml</code>. All Dox packages share one
-version, so use <code>^3.0.0-alpha</code> for each of them. It picks the newest alpha.</p>
+<p>Add the packages you need to <code>pubspec.yaml</code>. Each Dox package has its own
+version number. Use <code>^3.0.0-alpha</code> for each of them. It picks the newest 3.x alpha.</p>
 </div>
 <div class="language-yaml highlight"><span class="filename">pubspec.yaml</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">dependencies</span><span class="p">:</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">dox_core</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^3.0.0-alpha</span>
@@ -6366,7 +6366,7 @@ version, so use <code>^3.0.0-alpha</code> for each of them. It picks the newest 
 </ul>
 <p>To skip the builder, use <code>dox s --ignore-build-runner</code>.
 To start the server without the CLI, run <code>dart run bin/server.dart</code>.</p>
-<p>At the first start it also runs the migrations in <code>db/migration</code>.
+<p>At each start it also runs the new migrations in <code>db/migration</code>.
 The server uses the port in <code>APP_PORT</code> in the <code>.env</code> file (<code>3000</code> by default).
 Check it:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>curl<span class="w"> </span>localhost:3000/ping
@@ -6374,8 +6374,11 @@ Check it:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>pong
 </span></code></pre></div>
 <h2 id="start-the-server-with-docker">Start the server with Docker</h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>docker-compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--build
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--build
 </span></code></pre></div>
+<p>This starts the app and a Postgres database.
+The app reads <code>.env</code>, so set <code>DB_CONNECTION=postgres</code> and <code>DB_NAME=postgres</code> there first.
+To start only the database and run the app with <code>dox s</code>, use <code>docker compose up -d postgres</code>.</p>
 <div class="admonition tip">
 <p class="admonition-title">Production</p>
 <p>Do not use <code>dox s</code> or <code>dart run</code> in production.
@@ -6388,7 +6391,7 @@ Build a native binary with <code>dox build</code>. See <a href="../../digging-de
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>dox<span class="w"> </span>build_runner:build<span class="w">   </span><span class="c1"># runs once</span>
 </span></code></pre></div>
 <h2 id="packages">Packages</h2>
-<p>All Dox packages use the same version.</p>
+<p>Each package has its own version number. All of them are 3.x.</p>
 <table>
 <thead>
 <tr>
@@ -6419,7 +6422,7 @@ Build a native binary with <code>dox build</code>. See <a href="../../digging-de
 </tr>
 <tr>
 <td><code>dox_builder</code>, <code>dox_annotation</code></td>
-<td>code generation for models and DTOs</td>
+<td>code generation for models, DTOs and the container</td>
 </tr>
 <tr>
 <td><code>dox_validation</code></td>
@@ -6442,12 +6445,32 @@ Build a native binary with <code>dox build</code>. See <a href="../../digging-de
 <td><a href="../../packages/socketio/">Socket.IO server</a></td>
 </tr>
 <tr>
+<td><code>dox_queue</code></td>
+<td><a href="../../digging-deeper/queue/">background jobs</a></td>
+</tr>
+<tr>
+<td><code>dox_scheduler</code></td>
+<td><a href="../../digging-deeper/scheduler/">scheduled tasks</a></td>
+</tr>
+<tr>
+<td><code>dox_mailer</code></td>
+<td><a href="../../digging-deeper/mail/">send email</a></td>
+</tr>
+<tr>
+<td><code>dox_view</code></td>
+<td><a href="../../the-basic/views/">HTML views</a></td>
+</tr>
+<tr>
+<td><code>dox_inertia</code></td>
+<td><a href="../../the-basic/inertia/">Inertia.js pages</a></td>
+</tr>
+<tr>
 <td><code>dox_http_native</code></td>
 <td><a href="../../digging-deeper/native-server/">native HTTP server</a> (Rust)</td>
 </tr>
 <tr>
 <td><code>dox_postgres_native</code>, <code>dox_mysql_native</code></td>
-<td>native database drivers for Postgres and MySQL/MariaDB</td>
+<td>native drivers for <a href="../../database/postgres-native/">Postgres</a> and <a href="../../database/mysql-native/">MySQL/MariaDB</a></td>
 </tr>
 </tbody>
 </table>

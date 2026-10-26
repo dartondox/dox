@@ -6622,8 +6622,8 @@ The function gets a map and returns the value.</p>
 </span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="kd">await</span><span class="w"> </span><span class="n">found</span><span class="o">?</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
 </span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>
 </span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="c1">// set a field to null</span>
-</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="n">found</span><span class="o">?</span><span class="p">.</span><span class="n">slug</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="kd">await</span><span class="w"> </span><span class="n">found</span><span class="o">?</span><span class="p">.</span><span class="n">save</span><span class="p">();</span><span class="w"> </span><span class="c1">// slug is now NULL in the database</span>
+</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="n">found</span><span class="o">?</span><span class="p">.</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="kd">await</span><span class="w"> </span><span class="n">found</span><span class="o">?</span><span class="p">.</span><span class="n">save</span><span class="p">();</span><span class="w"> </span><span class="c1">// status is now NULL in the database</span>
 </span><span id="__span-11-15"><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>
 </span><span id="__span-11-16"><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="c1">// create from a map: returns the new model as it is in the table</span>
 </span><span id="__span-11-17"><a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a><span class="n">Blog</span><span class="w"> </span><span class="n">created</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">create</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
@@ -6642,6 +6642,12 @@ The function gets a map and returns the value.</p>
   Fields that were not loaded, for example with <code>select()</code>, are not changed.</li>
 <li><code>save()</code> returns <code>true</code> when it saved, and <code>false</code> when a <a href="events/">model event</a> cancels it.</li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title"><code>create()</code> and <code>save()</code> are not the same</p>
+<p>On a model without <a href="events/">events</a>, <code>create()</code> inserts the map as it is.
+It does not run <code>beforeSave</code>, and it does not set <code>created_at</code> and <code>updated_at</code>.
+Use <code>save()</code> when you need them, or put the values in the map.</p>
+</div>
 <h3 id="mass-assignment">Mass assignment</h3>
 <p><code>create()</code>, <code>insert()</code>, <code>update()</code>, <code>upsert()</code> and the find or create methods take any key of the map.
 So <code>User().create(req.body)</code> with <code>{"is_admin": 1}</code> makes an admin.

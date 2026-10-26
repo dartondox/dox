@@ -6736,8 +6736,19 @@ Numbers have <code>toStringAsFixed()</code>, <code>round()</code>, <code>floor()
 </span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"{{ route('users.show', { id: user.id }) }}"</span><span class="p">&gt;</span>Profile<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
 </span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ money(order.total) }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
 </span></code></pre></div>
+<p>The provider sets up the engine again in its <code>setup()</code>, and that removes the globals added before. So add globals in your provider, after <code>super.setup()</code>:</p>
+<div class="language-dart highlight"><span class="filename">lib/providers/view_provider.dart</span><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppViewProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ViewProvider</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">  </span><span class="n">AppViewProvider</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">super</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ViewConfig</span><span class="p">());</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">    </span><span class="k">super</span><span class="p">.</span><span class="n">setup</span><span class="p">();</span>
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">    </span><span class="n">View</span><span class="p">.</span><span class="n">global</span><span class="p">(</span><span class="s1">'year'</span><span class="p">,</span><span class="w"> </span><span class="n">DateTime</span><span class="p">.</span><span class="n">now</span><span class="p">().</span><span class="n">year</span><span class="p">);</span>
+</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-21-9"><a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="p">}</span>
+</span></code></pre></div>
 <p>A value of type <code>SafeString</code> is printed with no escape:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">View</span><span class="p">.</span><span class="n">global</span><span class="p">(</span><span class="s1">'logo'</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">SafeString</span><span class="p">(</span><span class="s1">'&lt;img src="/logo.svg" alt="Logo"&gt;'</span><span class="p">));</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">View</span><span class="p">.</span><span class="n">global</span><span class="p">(</span><span class="s1">'logo'</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">SafeString</span><span class="p">(</span><span class="s1">'&lt;img src="/logo.svg" alt="Logo"&gt;'</span><span class="p">));</span>
 </span></code></pre></div>
 <h2 id="config">Config</h2>
 <table>
@@ -6774,11 +6785,11 @@ Numbers have <code>toStringAsFixed()</code>, <code>round()</code>, <code>floor()
 <p>With the cache off, a changed template shows on the next request, with no restart.</p>
 <h2 id="errors">Errors</h2>
 <p>A syntax error, or an error in an expression, throws a <code>ViewException</code>. The message has the template name and the line:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>ViewException: expected ")" but found the end (in "users/show", line 12)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>ViewException: expected ")" but found the end (in "users/show", line 12)
 </span></code></pre></div>
 <h2 id="prettier">Prettier</h2>
 <p>Prettier formats <code>.html</code> files, and it does not know the <code>@</code> tags. Add this line to <code>.prettierignore</code>:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>*.dox.html
+<div class="language-text highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>*.dox.html
 </span></code></pre></div>
 
 

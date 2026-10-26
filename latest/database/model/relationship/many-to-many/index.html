@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Use ManyToMany when rows on both sides can have many rows on the other side. For example, an artist has many songs, and a song has many artists.">
+        <meta name="description" content="Use ManyToMany when rows on both sides can have many rows on the other side.">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="ManyToMany | Dox">
-  <meta property="og:description" content="Use ManyToMany when rows on both sides can have many rows on the other side. For example, an artist has many songs, and a song has many artists.">
+  <meta property="og:description" content="Use ManyToMany when rows on both sides can have many rows on the other side.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/database/model/relationship/many-to-many/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="ManyToMany | Dox">
-  <meta name="twitter:description" content="Use ManyToMany when rows on both sides can have many rows on the other side. For example, an artist has many songs, and a song has many artists.">
+  <meta name="twitter:description" content="Use ManyToMany when rows on both sides can have many rows on the other side.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -6461,8 +6461,8 @@
 
 
 <h1 id="manytomany">ManyToMany</h1>
-<p>Use <code>ManyToMany</code> when rows on both sides can have many rows on the other side.
-For example, an artist has many songs, and a song has many artists.</p>
+<p>Use <code>ManyToMany</code> when rows on both sides can have many rows on the other side.</p>
+<p>For example, an artist has many songs, and a song has many artists.</p>
 <p>The link is kept in a third table, the pivot table.
 It has one foreign key to each side.</p>
 <h2 id="tables">Tables</h2>
@@ -6675,13 +6675,6 @@ It gets the query of the related model and returns it.</p>
 <li>A relation loaded with <code>preload</code> is in <code>toJson()</code> of that query.</li>
 <li>The JSON key is the field name in snake_case: <code>songs</code>.</li>
 </ul>
-<div class="admonition warning">
-<p class="admonition-title">Known issue: names with more than one word</p>
-<p>For a relation without <code>eager: true</code>, <code>toJson()</code> looks for the snake_case name in the preload list.
-But <code>preload</code> needs the field name, like <code>'topSongs'</code>.
-So a preloaded <code>topSongs</code> is on the model, but it is not in <code>toJson()</code>.
-Use a one word field name, or <code>eager: true</code>, when you need it in JSON.</p>
-</div>
 
 
 

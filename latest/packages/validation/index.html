@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="dox_validation checks input and gives you typed Dart objects. It has two parts:">
+        <meta name="description" content="dox_validation checks input and gives you typed Dart objects.">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Validation | Dox">
-  <meta property="og:description" content="dox_validation checks input and gives you typed Dart objects. It has two parts:">
+  <meta property="og:description" content="dox_validation checks input and gives you typed Dart objects.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/packages/validation/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Validation | Dox">
-  <meta name="twitter:description" content="dox_validation checks input and gives you typed Dart objects. It has two parts:">
+  <meta name="twitter:description" content="dox_validation checks input and gives you typed Dart objects.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -6479,8 +6479,8 @@
 
 
 <h1 id="validation">Validation</h1>
-<p><code>dox_validation</code> checks input and gives you typed Dart objects.
-It has two parts:</p>
+<p><code>dox_validation</code> checks input and gives you typed Dart objects.</p>
+<p>It has two parts:</p>
 <ol>
 <li><strong>DTOs</strong>: a class with <code>@Dto()</code> and rule annotations. A generator writes the checks. Use this for almost everything.</li>
 <li><strong>Fluent schemas</strong>: <code>v.object(...)</code>, like <a href="https://zod.dev">Zod</a>. Use it only when the shape is known at runtime.</li>
@@ -6785,6 +6785,8 @@ Placeholders: <code>{field}</code>, <code>{value}</code>, and rule values like <
 </span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">  </span><span class="s1">'email.required'</span><span class="o">:</span><span class="w"> </span><span class="s1">'We need your email'</span><span class="p">,</span>
 </span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="p">}));</span>
 </span></code></pre></div>
+<p>A resolver for one call is used in place of the global one.
+Codes that it does not have get the built-in text, not the global text.</p>
 <p>For other languages, extend <code>MessageResolver</code> and override <code>resolve()</code>.
 See <a href="../../the-basic/validation/#messages">Messages</a>.</p>
 <h2 id="standard-schema">Standard Schema</h2>

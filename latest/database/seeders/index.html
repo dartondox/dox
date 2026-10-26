@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A seeder puts data in your database. Use it for sample data in development, or for data your app needs, like a list of countries.">
+        <meta name="description" content="A seeder puts data in your database.">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Seeders | Dox">
-  <meta property="og:description" content="A seeder puts data in your database. Use it for sample data in development, or for data your app needs, like a list of countries.">
+  <meta property="og:description" content="A seeder puts data in your database.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/database/seeders/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Seeders | Dox">
-  <meta name="twitter:description" content="A seeder puts data in your database. Use it for sample data in development, or for data your app needs, like a list of countries.">
+  <meta name="twitter:description" content="A seeder puts data in your database.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -6303,8 +6303,8 @@
 
 
 <h1 id="seeders">Seeders</h1>
-<p>A seeder puts data in your database.
-Use it for sample data in development, or for data your app needs, like a list of countries.</p>
+<p>A seeder puts data in your database.</p>
+<p>Use it for sample data in development, or for data your app needs, like a list of countries.</p>
 <h2 id="create-a-seeder">Create a seeder</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>make:seeder<span class="w"> </span>UserSeeder
 </span></code></pre></div>
@@ -6331,6 +6331,7 @@ Use it for sample data in development, or for data your app needs, like a list o
 </tr>
 </tbody>
 </table>
+<p>Write your code in <code>run()</code>. For example:</p>
 <div class="language-dart highlight"><span class="filename">db/seeders/user.seeder.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_migration/dox_migration.dart'</span><span class="p">;</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'../factories/user.factory.dart'</span><span class="p">;</span>

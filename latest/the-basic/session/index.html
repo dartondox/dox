@@ -6453,7 +6453,7 @@ Add <code>CsrfMiddleware</code> after it. See <a href="../../security/csrf/">CSR
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="kt">bool</span><span class="w"> </span><span class="n">hasCart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">has</span><span class="p">(</span><span class="s1">'cart'</span><span class="p">);</span>
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
 </span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1">// read and remove</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="kt">dynamic</span><span class="w"> </span><span class="n">cart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">pull</span><span class="p">(</span><span class="s1">'cart'</span><span class="p">);</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="kt">dynamic</span><span class="w"> </span><span class="n">removed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">pull</span><span class="p">(</span><span class="s1">'cart'</span><span class="p">);</span>
 </span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
 </span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="c1">// remove one value, or all of them</span>
 </span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">forget</span><span class="p">(</span><span class="s1">'cart'</span><span class="p">);</span>
@@ -6483,7 +6483,7 @@ Add <code>CsrfMiddleware</code> after it. See <a href="../../security/csrf/">CSR
 <code>redirect('/path')</code> redirects to any path.</p>
 <p>When a form post fails validation, Dox does this for you on a route with a session:</p>
 <ol>
-<li>It flashes the errors as <code>errors</code>, like <code>{'email': 'The email is not valid'}</code>.</li>
+<li>It flashes the errors as <code>errors</code>, like <code>{'email': 'The email is not a valid email'}</code>.</li>
 <li>It flashes the old input. Password fields (<code>password</code>, <code>password_confirmation</code>, <code>current_password</code>) and files are never kept.</li>
 <li>It redirects back with <code>302</code>.</li>
 </ol>

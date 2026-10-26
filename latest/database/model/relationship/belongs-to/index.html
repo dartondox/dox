@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Use BelongsTo when this table keeps the foreign key to another table. For example, a comment belongs to a user. The comment table has the column user_id.">
+        <meta name="description" content="Use BelongsTo when this table keeps the foreign key to another table.">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="BelongsTo | Dox">
-  <meta property="og:description" content="Use BelongsTo when this table keeps the foreign key to another table. For example, a comment belongs to a user. The comment table has the column user_id.">
+  <meta property="og:description" content="Use BelongsTo when this table keeps the foreign key to another table.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/database/model/relationship/belongs-to/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="BelongsTo | Dox">
-  <meta name="twitter:description" content="Use BelongsTo when this table keeps the foreign key to another table. For example, a comment belongs to a user. The comment table has the column user_id.">
+  <meta name="twitter:description" content="Use BelongsTo when this table keeps the foreign key to another table.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -6438,8 +6438,8 @@
 
 
 <h1 id="belongsto">BelongsTo</h1>
-<p>Use <code>BelongsTo</code> when this table keeps the foreign key to another table.
-For example, a comment belongs to a user.
+<p>Use <code>BelongsTo</code> when this table keeps the foreign key to another table.</p>
+<p>For example, a comment belongs to a user.
 The comment table has the column <code>user_id</code>.</p>
 <p><code>BelongsTo</code> is the other side of <a href="../has-one/">HasOne</a> and <a href="../has-many/">HasMany</a>.</p>
 <h2 id="define-it">Define it</h2>
@@ -6584,13 +6584,6 @@ It gets the query of the related model and returns it.</p>
 <li>A relation loaded with <code>preload</code> is in <code>toJson()</code> of that query.</li>
 <li>The JSON key is the field name in snake_case: <code>user</code>.</li>
 </ul>
-<div class="admonition warning">
-<p class="admonition-title">Known issue: names with more than one word</p>
-<p>For a relation without <code>eager: true</code>, <code>toJson()</code> looks for the snake_case name in the preload list.
-But <code>preload</code> needs the field name (<code>'activeUser'</code>).
-So a preloaded <code>activeUser</code> is on the model, but it is not in <code>toJson()</code>.
-Use a one word field name, or <code>eager: true</code>, when you need it in JSON.</p>
-</div>
 
 
 

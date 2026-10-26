@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A factory makes models with sample data. Use it in tests and in seeders.">
+        <meta name="description" content="A factory makes models with sample data.">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Factories | Dox">
-  <meta property="og:description" content="A factory makes models with sample data. Use it in tests and in seeders.">
+  <meta property="og:description" content="A factory makes models with sample data.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/database/factories/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Factories | Dox">
-  <meta name="twitter:description" content="A factory makes models with sample data. Use it in tests and in seeders.">
+  <meta name="twitter:description" content="A factory makes models with sample data.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -6404,12 +6404,13 @@
 
 
 <h1 id="factories">Factories</h1>
-<p>A factory makes models with sample data.
-Use it in tests and in <a href="../seeders/">seeders</a>.</p>
+<p>A factory makes models with sample data.</p>
+<p>Use it in tests and in <a href="../seeders/">seeders</a>.</p>
 <h2 id="create-a-factory">Create a factory</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>make:factory<span class="w"> </span>User
 </span></code></pre></div>
-<p>This makes <code>db/factories/user.factory.dart</code>:</p>
+<p>This makes <code>db/factories/user.factory.dart</code>.
+Set the default values in <code>definition()</code>. For example:</p>
 <div class="language-dart highlight"><span class="filename">db/factories/user.factory.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/factory.dart'</span><span class="p">;</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/user/user.model.dart'</span><span class="p">;</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
@@ -6460,7 +6461,8 @@ It runs once for each model, so random values are new each time.</p>
 <p><code>create()</code> saves the models one by one with <code>save()</code>.
 So <a href="../model/events/">model events</a> run, and each model gets its id.</p>
 <h2 id="state">State</h2>
-<p><code>state()</code> changes each model after <code>definition()</code>.</p>
+<p><code>state()</code> changes each model after <code>definition()</code>.
+The examples below use a <code>bool? isAdmin</code> and a <code>String? role</code> field on <code>User</code>.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">User</span><span class="w"> </span><span class="n">admin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">UserFactory</span><span class="p">()</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="p">.</span><span class="n">state</span><span class="p">((</span><span class="n">User</span><span class="w"> </span><span class="n">u</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">u</span><span class="p">..</span><span class="n">isAdmin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="p">.</span><span class="n">createOne</span><span class="p">();</span>
