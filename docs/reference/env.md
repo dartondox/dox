@@ -16,11 +16,11 @@ The code reads env vars in three ways:
 
 ## Read by the framework
 
-If `APP_ENV` is not set, Dox treats the app as production: `/docs` is off and error details are hidden. Set `APP_ENV=development` in your `.env` and in CI.
+If `APP_ENV` is not set or empty, Dox treats the app as production: `/docs` is off and error details are hidden. Set `APP_ENV=development` in your `.env` and in CI.
 
 | Variable | Who reads it | Default | Meaning | Example |
 | --- | --- | --- | --- | --- |
-| `APP_ENV` | `dox_core` (`Dox().checkAppKey()`, `OpenApiConfig.isEnabled`) | empty | Any value except `development`, `local` or `test` (also empty) makes a bad `APP_KEY` a startup error: missing, not exactly 32 characters, or a public sample key. In `development`, `local` and `test` it is only a warning. `development` or `local` turn the `/docs` routes on when `openApi.enabled` is `null`. Read with `Env.get`. | `APP_ENV=production` |
+| `APP_ENV` | `dox_core`, `dox_auth`, `dox_view` | empty | Any value except `development`, `local` or `test` (also empty) makes a bad `APP_KEY` a startup error: missing, not exactly 32 characters, or a public sample key. The same rule applies to a JWT secret shorter than 32 bytes (`dox_auth`). In `development`, `local` and `test` both are only a warning. `development` or `local` also: show error details in `500` responses and in health check answers, turn the `/docs` routes on when `openApi.enabled` is `null`, and turn the template cache of `dox_view` off. `testing` as a real environment variable also loads `.env.testing` (see below). Read with `Env.get`. | `APP_ENV=production` |
 | `PORT` | `dox_core` (`DoxServer.portFor()`) | not set | The port to listen on, when `APP_PORT` is not set. Cloud Run, Fly, Render and Heroku set it. `APP_PORT` wins when both are set. Read with `Env.get`. | `PORT=8080` |
 | `APP_HOST` | `dox_core` (`DoxServer.hostFor()`) | not set (all interfaces, `::`) | The host to listen on. `127.0.0.1` keeps the app off the network, for an app behind a proxy on the same machine. `AppConfig.host` wins over it. Read with `Env.get`. | `APP_HOST=127.0.0.1` |
 | `DOX_HTTP_THREAD` | `dox_http_native` (Rust, `shared_thread()`) | not set (one thread per isolate) | `shared` puts the servers of all isolates on one network thread. Off by default: on 2 cores it cut req/s by a quarter. Real environment only (`std::env::var`), not `.env`. | `DOX_HTTP_THREAD=shared` |
@@ -42,13 +42,13 @@ A new project (`dox create`) reads these keys through its typed env class, `lib/
 | Variable | Getter | Type | Default | Used for |
 | --- | --- | --- | --- | --- |
 | `APP_NAME` | `appName` | `String` | `dox` | `LoggerConfig.name`. |
-| `APP_ENV` | `appEnv` | `String` | `production` | `development`, `staging` or `production`. `env.isDevelopment` is `true` for `development`. It turns on `prettyPrint` of the logger and the query log of the database. Also read by the framework (see above). |
+| `APP_ENV` | `appEnv` | `String` | `production` | `development`, `staging` or `production`. `env.isDevelopment` is `true` for `development`. It turns on `prettyPrint` of the logger and the query log of the database. Any value except `production` turns on `LogMiddleware` (one log line per request). Also read by the framework (see above). |
 | `APP_PORT` | `appPort` | `int` | `3000` | `AppConfig.serverPort`. When `APP_PORT` is not set, Dox listens on `PORT` if the env has it. |
 | `APP_KEY` | `appKey` | `String` | required | `AppConfig.appKey`. It must be exactly 32 characters. Run `dox key:generate` for one. The app stops at start when it is missing, has another length, or is a public sample key (only a warning in `development`, `local` and `test`). |
 | `APP_TOTAL_ISOLATE` | `appTotalIsolate` | `int?` | not set: one per CPU core | `AppConfig.totalIsolate`. |
 | `LOG_LEVEL` | `logLevel` | `String` | `info` | `LoggerConfig.level`. |
-| `CACHE_STORE` | `cacheStore` | `String` | `file` | `CacheConfig.defaultStore`: `memory`, `file` or `redis`. |
-| `STORAGE_DISK` | `storageDisk` | `String` | `local` | `StorageConfig.defaultDisk`: `local`, `s3` or `memory`. |
+| `CACHE_STORE` | `cacheStore` | `String` | `file` | `CacheConfig.defaultStore`. A new project has the stores `file` and `memory` in `lib/config/cache.dart`. Add a `redis` store there before you use it. |
+| `STORAGE_DISK` | `storageDisk` | `String` | `local` | `StorageConfig.defaultDisk`. A new project has the disk `local` in `lib/config/storage.dart`. Add an `s3` or `memory` disk there before you use it. |
 | `DB_CONNECTION` | `dbConnection` | `String` | `sqlite` | `DatabaseConfig.connection`: `sqlite`, `postgres` or `mysql`. |
 | `DB_NAME` | `dbName` | `String` | `db/dox.sqlite` | The database name. For SQLite: the file path. |
 | `DB_HOST` | `dbHost` | `String` | `localhost` | Database host. |
@@ -90,5 +90,6 @@ DB_PASSWORD=postgres
 - A value in quotes (`"`, `'` or `` ` ``) is kept as it is, also a `#`. The quotes are removed.
 - An empty value, or the text `null`, counts as missing.
 - The file is read once per isolate, from the current working directory.
+- In tests (`dart test`, or `APP_ENV=testing` as a real environment variable), Dox also reads `.env.testing` next to `.env`. Its keys win over the keys of `.env`. A real environment variable still wins over both.
 
-`dox_migration` has its own simpler parser. It removes every quote character and does not strip `# note` comments. Keep comments on their own line.
+`dox_migration` has its own simpler parser. It removes every quote character and does not strip `# note` comments. It does not read `.env.testing`. Keep comments on their own line.

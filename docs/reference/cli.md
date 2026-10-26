@@ -13,7 +13,7 @@ How to install the CLI is on the [Dox CLI](../digging-deeper/dox-cli.md) page.
 Rules that apply to every command:
 
 - `dox` with no command prints `Could not find a command. Run `dox help` for more information.`
-- An unknown command prints `Could not find a command named "<name>".`
+- An unknown command prints `Could not find a command named "<name>". Run `dox help` for more information.`
 - Too few or too many arguments prints `Invalid number of arguments for command "<name>".` with the expected count.
 - A name you pass is turned into `snake_case` for the file and `PascalCase` for the class. `BlogPost` and `blog_post` give the same result.
 - Every `make:*` command also answers to its `create:*` name, like `create:model`. `dox help <command>` shows the aliases.
@@ -39,10 +39,13 @@ What it does:
 2. Picks the release (see `--version` above) from the release list of `dartondox/dox-sample`.
 3. Runs `git clone --depth 1 --branch v<version> https://github.com/dartondox/dox-sample.git <name>`.
 4. Deletes the `.git` folder.
-5. Replaces `dox_sample` with your project name in every file, except files under `bin/dox`.
+5. Replaces `dox_sample` with your project name in every text file, except files under `bin/dox`.
 6. Copies `.env.example` to `.env` and writes a new random `APP_KEY` to it, like `dox key:generate`. It skips this step when `.env` is already there.
+7. Prints the next steps: `cd <name>`, `dart pub get` and `dox serve`.
 
-Needs `curl` and `git` on the `PATH`.
+Needs `curl` and `git` on the `PATH`. When it can not find a release (no network), it prints `Could not find a template release for Dox <version>. Check your network, or pass --version.`
+
+The new project already has `bin/server.dart`, `bin/migrate.dart`, `bin/seed.dart`, `bin/queue.dart` and `bin/schedule.dart`. So the migration, seed, queue and schedule commands below work in it right away.
 
 Source: `packages/dox-cli/lib/src/tools/create_project.dart`.
 
@@ -64,7 +67,7 @@ What it does:
 
 1. Starts `dart run build_runner watch` (unless the option is set).
 2. Starts `dart run bin/server.dart` and prints its output.
-3. Watches the project folder. When a `.dart` file changes it prints `[Dox] File changed: <file>`, waits 500 ms, kills the server and starts it again.
+3. Watches the project folder. When a `.dart` file changes it prints `[Dox] File changed: <file>`. It waits until no file changed for 500 ms, then kills the server and starts it again.
 
 Source: `packages/dox-cli/lib/src/tools/server_serve.dart`.
 
@@ -81,7 +84,7 @@ What it does:
 1. When `pubspec.yaml` contains `build_runner`: runs `dart run build_runner build`. Stops with exit code 1 when it fails.
 2. Runs `dart build cli --target bin/server.dart --output build`.
 3. When `bin/queue.dart` or `bin/schedule.dart` exists: builds it the same way, to `build/bundle/bin/queue` and `build/bundle/bin/schedule`.
-4. Copies `db/` to `build/bundle/db` (migrations are read at start). It leaves out SQLite files, so your local data does not go to production.
+4. Deletes the old `build/bundle/db`, then copies `db/` to `build/bundle/db`. It leaves out SQLite files (`*.sqlite`, `*.sqlite3`, `*.db`, and their `-wal`, `-shm` and `-journal` files), so your local data does not go to production.
 5. Copies `.env.example` to `build/bundle/.env.example`.
 6. Prints `[Dox] Built build/bundle. Run it with: cd build/bundle && ./bin/server`.
 
@@ -93,7 +96,7 @@ Output:
 | `build/bundle/bin/queue` | the queue worker, when `bin/queue.dart` exists |
 | `build/bundle/bin/schedule` | the scheduler, when `bin/schedule.dart` exists |
 | `build/bundle/lib/` | native libraries from build hooks (SQLite, `dox_http_native`, ...) |
-| `build/bundle/db/` | your migrations. SQLite files (`*.sqlite`, `*.db`) are not copied. |
+| `build/bundle/db/` | your migrations and seeders. SQLite files are not copied. |
 | `build/bundle/.env.example` | copy it to `.env` or set real env vars |
 
 `dart compile exe` can not build packages with build hooks, so the CLI uses `dart build cli`.
@@ -108,6 +111,7 @@ dox build_runner:watch
 ```
 
 Run `dart run build_runner build` once, or `dart run build_runner watch`. No options.
+`build_runner:build` prints only the first line of each output block of build_runner. Run `dart run build_runner build` yourself to see all of it.
 The CLI does not pass `--delete-conflicting-outputs` (build_runner removed that flag).
 
 ### `dox key:generate`
@@ -139,7 +143,7 @@ Writes `lib/config/env.dart`, the typed env class, from `.env.example`.
 - Stops with `lib/config/env.dart is already there. Delete it to make it again.` (exit code 1) when the file exists.
 - Prints `Run `dart run build_runner build` to make env.g.dart.` when done.
 
-Rules for each key: digits give `int get x => <value>;`, `true`/`false` give `bool`, an empty value gives `String? get x;`, any other value gives `String get x;` (required, no default). `#` comment lines above a key become its doc comment. A key that does not map back from `camelCase` gets `@EnvKey('KEY')`.
+Rules for each key: a whole number (like `3000` or `-1`) gives `int get x => <value>;`, `true`/`false` give `bool get x => <value>;`, an empty value gives `String? get x;`, any other value gives `String get x;` (required, no default). `#` comment lines above a key become its doc comment. A key that does not map back from `camelCase` gets `@EnvKey('KEY')`.
 
 Source: `packages/dox-cli/lib/src/tools/env_tools.dart` (`EnvScaffold`).
 
@@ -152,6 +156,7 @@ dox env:check
 Loads `AppEnv` from `lib/config/env.dart` with the real environment and `.env`. Prints `The env is valid.` or an `EnvException` with every missing or bad key (exit code 1).
 
 It writes a small script to `.dart_tool/dox/env_check.dart` and runs it with `dart run`. It needs `lib/config/env.dart` and a `name:` in `pubspec.yaml`.
+Without `lib/config/env.dart` it prints `lib/config/env.dart is missing. Run `dox env:generate` first.` (exit code 1).
 
 Source: `packages/dox-cli/lib/src/tools/env_tools.dart` (`envCheck`).
 
@@ -162,7 +167,8 @@ dox openapi:generate [dir]
 ```
 
 Runs `dart run bin/openapi.dart [dir]`. That file writes `openapi.json` and `openapi.yaml` into `dir` (default `storage/openapi`).
-Stops with `bin/openapi.dart is missing.` (exit code 1) when the file is not there. See [OpenAPI](../packages/openapi.md).
+A new project has no `bin/openapi.dart`. You add it yourself, see [OpenAPI](../packages/openapi.md).
+When the file is not there, the command prints `bin/openapi.dart is missing.` and the code to put in it (exit code 1).
 
 Source: `packages/dox-cli/lib/src/tools/openapi_generate.dart`.
 
@@ -173,7 +179,8 @@ dox update
 ```
 
 Installs the newest CLI with the same major version as the one you have. Pre-releases count.
-It reads the version list from pub.dev, then runs `dart pub global activate dox <version>`.
+It reads the version list from pub.dev (retracted versions are skipped), then runs `dart pub global activate dox <version>`.
+Needs `curl` on the `PATH`.
 
 Source: `packages/dox-cli/lib/src/tools/update_dox.dart`.
 
@@ -192,9 +199,11 @@ Prints `Dox version: <version>`. Aliases: `--version`, `-version`, `v`, `-v`, `-
 
 ```
 dox help [command]
+dox --help
+dox -h
 ```
 
-Without a command: lists every command by category. With a command: prints its usage, description, category, aliases and argument count.
+Aliases: `--help`, `-h`. Without a command: lists every command by category. With a command: prints its usage, description, category, aliases and argument count.
 
 ## Create files
 
@@ -238,6 +247,7 @@ dox make:dto <name>
 ```
 
 Writes `lib/app/dtos/<name>/<name>.dto.dart`: a `@Dto()` class with one `name` field and `part '<name>.dto.g.dart';`.
+The class name has no `Dto` at the end: `dox make:dto CreateBlog` gives the class `CreateBlog` in `lib/app/dtos/create_blog/create_blog.dto.dart`.
 A trailing `Dto` in the name is removed. Prints `Run `dox build_runner:build` to make <name>/<name>.dto.g.dart.`
 
 Template: `_getSample` in `packages/dox-cli/lib/src/tools/create_dto.dart`.
@@ -281,13 +291,13 @@ dox create:migration <name> [--sql]
 | --- | --- |
 | `--sql` | Make a `.sql` file with `-- up` and `-- down` sections instead of a Dart class. |
 
-Writes `db/migration/<yyyy>_<mm>_<dd>_<hhmmss>_<name>.dart` (or `.sql`). Characters that are not letters, digits or `_` are removed from the name.
+Writes `db/migration/<yyyy>_<mm>_<dd>_<hhmmss>_<name>.dart` (or `.sql`). Characters that are not letters, digits or `_` are removed from the name. A second argument other than `--sql` is ignored.
 
 Migrations run sorted by file name. So the new file always sorts after every file already in `db/migration`. When the current time is not later than the newest file (for example, two migrations in the same second), it uses the newest time plus 1 second.
 
 For a Dart migration it also:
 
-- writes `db/migration/migrations.dart`, the registry of every Dart migration in the folder, sorted by name;
+- writes `db/migration/migrations.dart`, the registry of every Dart migration in the folder, sorted by name. A file with no class that `extends Migration` is skipped with a warning;
 - writes `bin/migrate.dart` when it is missing, and prints `bin/migrate.dart created.`
 
 The Dart template depends on the name:
@@ -308,7 +318,7 @@ All `migration:*` commands work the same way:
 2. When there is no `bin/migrate.dart` but `db/migration` has Dart files: print `db/migration has Dart migrations, but bin/migrate.dart is missing.` (exit code 1).
 3. Else: run the `.sql` migrations with `Migrator()` from `dox_migration` in the CLI process.
 
-The database comes from `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` and `DB_DATABASE` (or `DB_NAME`). See [Environment variables](env.md).
+The database comes from `DATABASE_URL` when it is set. Else it comes from `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` and `DB_DATABASE` (or `DB_NAME`). See [Environment variables](env.md).
 A failed run prints the error and sets exit code 1.
 
 | Command | Aliases | What it does |
@@ -322,25 +332,27 @@ A failed run prints the error and sets exit code 1.
 
 `--seed` after `migration:run`, `migration:refresh` or `migration:fresh` runs `dox db:seed` when the migrations end well.
 
+`bin/migrate.dart` takes the same commands: `dart run bin/migrate.dart <run|rollback [--step=n]|reset|refresh|fresh|status>`. With no command it runs `run`.
+
 ## Factories and seeders
 
 | Command | Aliases | What it does |
 | --- | --- | --- |
 | `dox make:factory <model>` | `dox create:factory` | Make `db/factories/<model>.factory.dart`. It imports the model with the package name of `pubspec.yaml`. |
 | `dox make:seeder <name>` | `dox create:seeder` | Make `db/seeders/<name>.seeder.dart`. It writes `db/seeders/seeders.dart` again, and makes `bin/seed.dart` when it is missing. |
-| `dox db:seed [--class=<name>]` | | Write `db/seeders/seeders.dart` again, then run `dart run bin/seed.dart`. Default seeder: `DatabaseSeeder`. |
+| `dox db:seed [--class=<name>]` | | Write `db/seeders/seeders.dart` again, then run `dart run bin/seed.dart [--class=<name>]`. Default seeder: `DatabaseSeeder`. When `bin/seed.dart` is missing, it prints `bin/seed.dart is missing.` (exit code 1). |
 
 Templates: `createFactory` in `packages/dox-cli/lib/src/tools/create_factory.dart`, and `createSeeder` and `seedEntrySource` in `packages/dox-cli/lib/src/tools/create_seeder.dart`.
 
 ## Queue
 
-These commands run the app script `bin/queue.dart` with `dart run`. The script comes from the `dox_queue` package. `dox make:job` makes it when it is missing.
+These commands run the app script `bin/queue.dart` with `dart run`. A new project already has it. It uses the `dox_queue` package.
 Input, output and errors go straight to your terminal. `Ctrl+C` (SIGINT) and SIGTERM are sent on to the script, so a worker can finish its job and stop. The exit code of the script is the exit code of `dox`.
 When `bin/queue.dart` is missing, the command prints how to set it up and exits with code 1.
 
 | Command | Runs | What it does |
 | --- | --- | --- |
-| `dox make:job <name>` | | Make `lib/app/jobs/<name>.job.dart` with a `@Job()` class that extends `DoxJob`. Make `bin/queue.dart` when it is missing. Print a hint to add `dox_queue` to `pubspec.yaml` and to run `dox build_runner:build`. |
+| `dox make:job <name>` | | Make `lib/app/jobs/<name>.job.dart` with a `@Job()` class that extends `DoxJob`. A trailing `Job` in the name is removed. Make `bin/queue.dart` when it is missing. Print a hint to add `dox_queue` to `pubspec.yaml` when it is not there, and to run `dox build_runner:build` (it makes `lib/generated/jobs.g.dart`). |
 | `dox queue:work [flags]` | `bin/queue.dart work [flags]` | Run the worker. |
 | `dox queue:failed` | `bin/queue.dart failed` | List the failed jobs. |
 | `dox queue:retry <id\|all>` | `bin/queue.dart retry <id\|all>` | Put one failed job, or all of them, back on the queue. |
@@ -349,27 +361,28 @@ When `bin/queue.dart` is missing, the command prints how to set it up and exits 
 
 Flags of `queue:work`, passed on as they are:
 
-| Flag | Meaning |
-| --- | --- |
-| `--queue=a,b` | The queues to read, in this order. |
-| `--concurrency=N` | How many jobs run at the same time. |
-| `--once` | Run one job, then stop. |
-| `--tries=N` | How many times a job may run before it is marked as failed. |
-| `--timeout=S` | Seconds a job may run. |
-| `--sleep=S` | Seconds to wait when the queue is empty. |
-| `--stop-when-empty` | Stop when the queue is empty. |
+| Flag | Default | Meaning |
+| --- | --- | --- |
+| `--queue=a,b` | `default` | The queues to read, the first one first. |
+| `--concurrency=N` | `1` | How many jobs run at the same time in this process. |
+| `--once` | off | Run one job, then stop. |
+| `--tries=N` | `1` | How many times a job may run before it is marked as failed. A job can set its own `tries`. |
+| `--timeout=S` | `60` | Seconds a job may run. |
+| `--sleep=S` | `3` | Seconds to wait when the queues are empty. |
+| `--stop-when-empty` | off | Stop when the queues are empty. |
 
-The `bin/queue.dart` that `make:job` writes (`<app>` is the `name` in `pubspec.yaml`):
+An unknown flag or command prints the usage and exits with code 64.
+
+The `bin/queue.dart` of a new project (`<app>` is the `name` in `pubspec.yaml`). The jobs come from `queueConfig` in `lib/config/queue.dart`:
 
 ```dart
 import 'dart:io';
 
 import 'package:dox_queue/dox_queue.dart';
 import 'package:<app>/config/app.dart';
-import 'package:<app>/generated/jobs.g.dart';
 
 Future<void> main(List<String> args) async {
-  exitCode = await QueueWorker(jobs: jobRegistry, app: appConfig).run(args);
+  exitCode = await QueueWorker(app: appConfig).run(args);
 }
 ```
 
@@ -377,7 +390,7 @@ Templates: `createJob` and `queueEntrySource` in `packages/dox-cli/lib/src/tools
 
 ## Schedule
 
-These commands run the app script `bin/schedule.dart` with `dart run`. They pass the signals, the terminal and the exit code the same way as the queue commands.
+These commands run the app script `bin/schedule.dart` with `dart run`. A new project already has it. They pass the signals, the terminal and the exit code the same way as the queue commands.
 When `bin/schedule.dart` is missing, the command prints how to set it up and exits with code 1.
 
 | Command | Runs | What it does |
@@ -387,19 +400,19 @@ When `bin/schedule.dart` is missing, the command prints how to set it up and exi
 | `dox schedule:list` | `bin/schedule.dart list` | List the scheduled tasks. |
 | `dox schedule:test <name>` | `bin/schedule.dart test <name>` | Run one task now. |
 
-To set it up, add `dox_scheduler` to `pubspec.yaml`, then make two small files.
-The exact names come from the `dox_scheduler` package. This is the shape:
+You add tasks in `lib/config/schedule.dart`. These are the two files of a new project:
 
-```dart
-// lib/config/schedule.dart
+```dart title="lib/config/schedule.dart"
 import 'package:dox_scheduler/dox_scheduler.dart';
 
-final Schedule schedule = Schedule()
-  ..call('report', () async {/* your task */}).dailyAt('02:00');
+ScheduleConfig scheduleConfig = const ScheduleConfig();
+
+void schedule(Schedule s) {
+  // s.call('cleanup', cleanup).dailyAt('02:00');
+}
 ```
 
-```dart
-// bin/schedule.dart
+```dart title="bin/schedule.dart"
 import 'dart:io';
 
 import 'package:dox_scheduler/dox_scheduler.dart';
@@ -414,6 +427,8 @@ Future<void> main(List<String> args) async {
   ).run(args);
 }
 ```
+
+See [Scheduler](../digging-deeper/scheduler.md) for the task methods. See [Queue](../digging-deeper/queue.md) for jobs.
 
 ## Command list
 
@@ -455,4 +470,4 @@ Future<void> main(List<String> args) async {
 | `version` | `--version`, `-version`, `v`, `-v`, `--v` | System |
 | `update` | | System |
 | `env:check` | | System |
-| `help` | | System |
+| `help` | `--help`, `-h` | System |

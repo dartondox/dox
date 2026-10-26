@@ -13,3 +13,4 @@ Short lookup pages, with values taken from the Dox source code.
 | [Cheat sheet](cheat-sheet.md) | one page of the code you use every day, with links to the full pages |
 | [Production checklist](production-checklist.md) | what to check before you deploy, and what Dox does not do for you |
 | [Error index](errors.md) | every message Dox prints or throws, when it happens and what to do |
+| [Changelog](changelog.md) | what changed in each package, newest first |
