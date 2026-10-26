@@ -294,7 +294,7 @@ SocketIoServer io = SocketIoServer(
 );
 ```
 
-- `Redis` comes from the `ioredis` package (`^3.0.0`).
+- `Redis` comes from the `ioredis` package.
 - The subscriber needs its own connection. A Redis connection in subscribe mode can not run other commands.
 - It uses the format of `@socket.io/redis-adapter`. Node.js servers with that adapter can share one Redis with Dox servers.
 - It reads messages in msgpack and in JSON. It writes msgpack, like the Node.js adapter.

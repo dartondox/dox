@@ -31,7 +31,7 @@ Makes a new project from the [dox-sample](https://github.com/dartondox/dox-sampl
 
 | Option | Meaning |
 | --- | --- |
-| `--version <v>` (or `--v`) | The release tag to clone, like `3.0.0-alpha.5` or `v3.0.0-alpha.5`. Without it, the newest `dox-sample` release with the same major version as the CLI is used (pre-releases included). |
+| `--version <v>` (or `--v`) | A release tag of `dox-sample` to clone. Without it, the newest `dox-sample` release with the same major version as the CLI is used (pre-releases included). |
 
 What it does:
 

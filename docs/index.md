@@ -107,7 +107,7 @@ class BlogController {
   </div>
 </div>
 
-<p class="dox-bench__foot"><span>Dox 3.0.0-alpha.3 · Bun 1.4 · Go 1.27 · Dart 3.13 · Postgres 18 · 256 connections · wrk · median of 3 runs</span><a href="digging-deeper/performance/#app-benchmark">All results</a></p>
+<p class="dox-bench__foot"><span>Dox · Bun 1.4 · Go 1.27 · Dart 3.13 · Postgres 18 · 256 connections · wrk · median of 3 runs</span><a href="digging-deeper/performance/#app-benchmark">All results</a></p>
 
 </div>
 
@@ -116,16 +116,13 @@ Dart. The speed comes from the Rust HTTP server and database drivers.
 Without a database (`GET /json`), Bun is faster.
 See [Performance](digging-deeper/performance.md) for every route.
 
-!!! warning "You are reading the 3.x docs (release candidate)"
-    `3.0.0-rc.x` is a release candidate. Small things can still change before the stable release.
-
 ## Run it in two minutes
 
 You need [Dart](https://dart.dev/get-dart) 3.13 or newer. Nothing else: the
 starter project uses SQLite, so there is no database to install.
 
 ```bash
-dart pub global activate dox ^3.0.0-rc   # install the CLI
+dart pub global activate dox             # install the CLI
 dox create my_app                            # download the starter project
 cd my_app
 dart pub get

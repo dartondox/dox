@@ -6,13 +6,12 @@ icon: lucide/download
 
 This page shows how to install the Dox CLI, make a new project and start the server.
 
-!!! warning "3.x is a release candidate"
-    Dox 3 is a release candidate (`3.0.0-rc.x`). It needs **Dart 3.13** or newer.
+Dox needs **Dart 3.13** or newer.
 
 ## Install the CLI
 
 ```bash
-dart pub global activate dox ^3.0.0-rc
+dart pub global activate dox
 ```
 
 Check that it works:
@@ -35,9 +34,9 @@ dox version
 dox create new_blog
 ```
 
-`dox create` downloads the newest 3.x release of
+`dox create` downloads the newest release of
 [dox-sample](https://github.com/dartondox/dox-sample), the starter project.
-To get one exact version, add `--version`, for example `dox create new_blog --version 3.0.0-rc.1`.
+To get one exact release, add `--version` with a release tag of dox-sample.
 
 It also makes your `.env` file from `.env.example`, with a new random `APP_KEY`.
 Then get the packages:
@@ -53,19 +52,12 @@ To use Postgres or MySQL instead, change `DB_CONNECTION` and the `DB_*`
 values in `.env`. See [Database](../database/index.md).
 
 !!! info "Add Dox to an existing Dart project"
-    Add the packages you need to `pubspec.yaml`. Each Dox package has its own
-    version number. Use `^3.0.0-rc` for each of them. It picks the newest 3.x release.
+    Add the packages you need with `dart pub add`:
 
-```yaml title="pubspec.yaml"
-dependencies:
-  dox_core: ^3.0.0-rc
-  dox_orm: ^3.0.0-rc
-  dox_migration: ^3.0.0-rc
-
-dev_dependencies:
-  dox_builder: ^3.0.0-rc
-  build_runner: ^2.17.1
-```
+    ```bash
+    dart pub add dox_core dox_orm dox_migration
+    dart pub add dev:dox_builder dev:build_runner
+    ```
 
 ## Start the server
 
@@ -118,8 +110,6 @@ dox build_runner:build   # runs once
 ```
 
 ## Packages
-
-Each package has its own version number. All of them are 3.x.
 
 | Package | What it does |
 | --- | --- |

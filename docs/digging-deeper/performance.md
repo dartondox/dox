@@ -56,7 +56,7 @@ A small real app, the same in each language: `GET /json` returns a map,
 rows one after another. The table has 10,000 rows. Each server runs alone
 on one or two pinned CPUs, Postgres 18 and wrk on other CPUs, 256
 connections, 4 database connections per core, 3 runs of 10 seconds, median.
-Versions: Dox 3.0.0-alpha.3 (native server, `dox_postgres_native`), Go 1.27
+Versions: Dox (native server, `dox_postgres_native`), Go 1.27
 (`net/http` + pgx), Bun 1.4 (`Bun.serve` + `Bun.sql`), Node 24
 (`node:http` + `pg`), `dart:io` (`HttpServer` + `package:postgres`).
 
@@ -103,7 +103,7 @@ Versions: Dox 3.0.0-alpha.3 (native server, `dox_postgres_native`), Go 1.27
   </div>
 </div>
 
-<p class="dox-bench__foot"><span>Dox 3.0.0-alpha.3 · Bun 1.4 · Go 1.27 · Dart 3.13 · Postgres 18 · 256 connections · wrk · median of 3 runs</span></p>
+<p class="dox-bench__foot"><span>Dox · Bun 1.4 · Go 1.27 · Dart 3.13 · Postgres 18 · 256 connections · wrk · median of 3 runs</span></p>
 
 </div>
 
@@ -158,7 +158,7 @@ Versions: Dox 3.0.0-alpha.3 (native server, `dox_postgres_native`), Go 1.27
   </div>
 </div>
 
-<p class="dox-bench__foot"><span>Dox 3.0.0-alpha.3 · Bun 1.4 · Go 1.27 · Node 24 · Postgres 18 · 256 connections · wrk · median of 3 runs</span></p>
+<p class="dox-bench__foot"><span>Dox · Bun 1.4 · Go 1.27 · Node 24 · Postgres 18 · 256 connections · wrk · median of 3 runs</span></p>
 
 </div>
 
@@ -193,7 +193,7 @@ Versions: Dox 3.0.0-alpha.3 (native server, `dox_postgres_native`), Go 1.27
   </div>
 </div>
 
-<p class="dox-bench__foot"><span>Dox 3.0.0-alpha.3 · Bun 1.4 · Go 1.27 · Node 24 · Postgres 18 · 256 connections · wrk · median of 3 runs</span></p>
+<p class="dox-bench__foot"><span>Dox · Bun 1.4 · Go 1.27 · Node 24 · Postgres 18 · 256 connections · wrk · median of 3 runs</span></p>
 
 </div>
 

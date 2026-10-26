@@ -189,7 +189,7 @@ Dox opens a file database with `journal_mode = WAL`, `synchronous = NORMAL`, `fo
 zsh: command not found: dox
 ```
 
-right after `dart pub global activate dox ^3.0.0-rc`.
+right after `dart pub global activate dox`.
 
 **Cause.** `dart pub global activate` puts the `dox` script in `$HOME/.pub-cache/bin`. That folder is not in your `PATH`.
 

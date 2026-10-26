@@ -12,7 +12,7 @@ Run `dox help` to see all commands. Run `dox help <command>` for one command.
 ## Installation
 
 ```bash
-dart pub global activate dox ^3.0.0-alpha
+dart pub global activate dox
 ```
 
 !!! warning "Add the pub bin folder to your PATH"
@@ -75,7 +75,7 @@ dart pub global deactivate dox
 
 ```bash
 dox create new_blog
-dox create new_blog --version v3.0.0-alpha.17
+dox create new_blog --version <release tag>
 ```
 
 `dox create` copies the [dox-sample](https://github.com/dartondox/dox-sample) template from GitHub. Without `--version`, it uses the newest template release with the same major version as the CLI.

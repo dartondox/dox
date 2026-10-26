@@ -22,7 +22,7 @@ It holds:
 
 The DTO annotations (`@Dto`, `@Length`, `@Email`, ...) are in `dox_validation`.
 
-Dox 3.x is in alpha (`3.0.0-alpha.x`).
+To see what is ready and what may still change, read [Status and roadmap](https://dartondox.dev/latest/concepts/status-and-roadmap/).
 
 ## Documentation
 
