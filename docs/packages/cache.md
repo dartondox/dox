@@ -8,25 +8,39 @@ This page shows the full API of `dox_cache`, the cache behind `Cache()` in Dox.
 
 It has `remember`, tags, atomic locks and four drivers.
 
-!!! tip "Built into Dox"
-    `dox_core` uses `dox_cache` for [`Cache()`](../digging-deeper/cache.md).
-    In a Dox app, set the stores in `config/cache.dart` (the `CacheConfig` of this page), and use `Cache()`.
-    `Dox().cache` is the `CacheManager`. `Cache().repository` is the `CacheStore`.
-    This page is for the full API and for using `dox_cache` outside Dox.
+## In a Dox app
 
-## Install
-
-```bash
-dart pub add dox_cache
-```
+`dox_core` uses `dox_cache` and exports it. There is nothing to install.
+With no config, Dox has a `file` store (the default) and a `memory` store. Use it with `Cache()`:
 
 ```dart
-import 'package:dox_cache/dox_cache.dart';
+await Cache().put('foo', 'bar', duration: Duration(minutes: 10));
+String? foo = await Cache().get('foo');
+
+List<dynamic> posts = await Cache().remember(
+  'posts',
+  Duration(minutes: 5),
+  () => Post().all(),
+);
 ```
 
-!!! note
-    `dox_core` exports `CacheConfig`, `CacheManager`, `CacheStore` and `CacheLock` from this package.
-    They are the same classes, so importing both packages is fine.
+To change the stores, make `lib/config/cache.dart` and pass it to `AppConfig(cache: cache)` in `lib/config/app.dart`:
+
+```dart title="lib/config/cache.dart"
+import 'package:dox_core/dox_core.dart';
+
+CacheConfig cache = CacheConfig(
+  defaultStore: 'redis',
+  stores: <String, Map<String, dynamic>>{
+    'memory': <String, dynamic>{'driver': 'memory', 'max_size': 10000},
+    'redis': <String, dynamic>{'driver': 'redis', 'host': '127.0.0.1', 'prefix': 'app_cache:'},
+  },
+);
+```
+
+- `Cache().store('memory')` uses another store.
+- `Dox().cache` is the `CacheManager` of this page. `Cache().repository` is the `CacheStore`.
+- The full guide is at [Cache](../digging-deeper/cache.md).
 
 ## Drivers
 
@@ -41,7 +55,21 @@ import 'package:dox_cache/dox_cache.dart';
     Dox runs many isolates. Each isolate has its own `memory` cache.
     Use `redis` when isolates or servers must see the same data.
 
-## Set up
+## Without Dox
+
+```bash
+dart pub add dox_cache
+```
+
+```dart
+import 'package:dox_cache/dox_cache.dart';
+```
+
+!!! note
+    `dox_core` exports `CacheConfig`, `CacheManager`, `CacheStore` and `CacheLock` from this package.
+    They are the same classes, so importing both packages is fine.
+
+Make a `CacheManager` with your stores:
 
 ```dart
 CacheManager cache = CacheManager(CacheConfig(

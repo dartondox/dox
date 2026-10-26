@@ -8,21 +8,56 @@ This page shows how to save and read files with `dox_storage`.
 
 `dox_storage` gives one API for files in many places: local disk, AWS S3 and S3-compatible services.
 
-!!! tip "In a Dox app"
-    `dox_storage` gives your app [`Storage()`](../digging-deeper/file-storage.md).
-    Set the disks in `config/storage.dart` (a `StorageConfig`), register a `StorageProvider`, and use `Storage()`.
-    `Storage().use('s3')` gives the `Disk` of this page. `Storage.route('files')` serves local signed URLs.
-    This page is for the full `Disk` API and for using `dox_storage` outside Dox.
+## In a Dox app
 
-## Install
+### 1. Install
 
 ```bash
 dart pub add dox_storage
 ```
 
+### 2. The config
+
+```dart title="lib/config/storage.dart"
+import 'package:dox_storage/dox_storage.dart';
+
+StorageConfig storageConfig = StorageConfig(
+  disks: <String, Map<String, dynamic>>{
+    'local': <String, dynamic>{'driver': 'local', 'root': 'storage'},
+  },
+);
+```
+
+### 3. The provider
+
+The provider sets up the disks in every isolate. Put it in `lib/providers/`, so the generated container finds it:
+
+```dart title="lib/providers/storage_provider.dart"
+import 'package:dox_storage/dox_storage.dart';
+import 'package:my_app/config/storage.dart';
+
+class AppStorageProvider extends StorageProvider {
+  AppStorageProvider() : super(storageConfig);
+}
+```
+
+Run `dart run build_runner build`. A new app from `dox create` already has these two files.
+
+### 4. Use it
+
 ```dart
 import 'package:dox_storage/dox_storage.dart';
+
+Route.post('/avatar', (DoxRequest req) async {
+  RequestFile file = req.input('avatar');
+  String path = await Storage().putRequestFile('avatars', file);
+  return <String, String>{'path': path}; // /avatars/<uuid>.png
+});
 ```
+
+- `Storage().use('s3')` gives the full `Disk` of this page.
+- `Storage.route('files')` serves local signed URLs.
+- S3 disks, env keys and all `Storage()` functions are in [File Storage](../digging-deeper/file-storage.md).
 
 ## Drivers
 
@@ -32,7 +67,15 @@ import 'package:dox_storage/dox_storage.dart';
 | `S3Driver` | AWS S3, Cloudflare R2, MinIO, DigitalOcean Spaces, GCS (HMAC keys) | Yes (SigV4) | Yes (SigV4) |
 | `MemoryDriver` | tests | fake URLs | fake URLs |
 
-## Set up the disks
+## Without Dox
+
+`dox_storage` also works on its own:
+
+```bash
+dart pub add dox_storage
+```
+
+Make a `DriveManager` with your disks:
 
 ```dart
 import 'dart:io';
@@ -64,6 +107,8 @@ Disk disk = drive.use('s3'); // or drive.use() for the default disk
 `use()` throws `UnsupportedOperationException` when no disk has that name.
 
 ## Use a disk
+
+In a Dox app, get a disk with `Storage().use('s3')`. Without Dox, use `drive.use('s3')`.
 
 ```dart
 await disk.put('avatars/1.png', bytes); // String, List<int> or Stream<List<int>>

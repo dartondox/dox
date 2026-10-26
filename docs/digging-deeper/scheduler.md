@@ -16,6 +16,20 @@ A task runs once per tick, even when many isolates or servers run the schedule.
 dart pub add dox_scheduler
 ```
 
+## Set up in a Dox app
+
+A new app from `dox create` already has these files. For an older app, add them:
+
+- `lib/config/schedule.dart`: the tasks and the `ScheduleConfig`. See [Define tasks](#define-tasks).
+- `bin/schedule.dart`: the program that runs the schedule. See [Run the schedule](#run-the-schedule).
+- `lib/providers/schedule_provider.dart` (optional): runs the schedule inside the server. See [Run inside the server](#run-inside-the-server).
+
+Then start it next to your server:
+
+```bash
+dart run bin/schedule.dart work
+```
+
 ## Define tasks
 
 Put the tasks in `lib/config/schedule.dart`.
