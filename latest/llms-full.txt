@@ -16012,11 +16012,9 @@ Source: https://dartondox.dev/latest/3.xguides/
 
 # Guides
 
-Each guide solves one job from start to end. Copy the files, run the commands, and check the result.
-The reference pages explain each part in more detail. The guides link to them.
+Each guide solves one job from start to end: copy the files, run the commands, and check the result.
 
-The code of all guides is in one app on GitHub: [examples/guides](https://github.com/dartondox/dox/tree/main/examples/guides).
-CI builds it and runs its tests on every push, so the code on these pages keeps working.
+The reference pages explain each part in more detail. The guides link to them.
 
 | Guide | What you get |
 | --- | --- |
@@ -16024,15 +16022,25 @@ CI builds it and runs its tests on every push, so the code on these pages keeps 
 | [Pagination](pagination.md) | A list route with `page` and `per_page`, and the JSON shape it returns. |
 | [JWT authentication](jwt-auth.md) | Register, log in, protect routes, read the user, log out. |
 | [Custom errors](custom-errors.md) | Your own exception classes, one JSON shape for every error, logging. |
-| [Background work](background-work.md) | Run work after the response, use another thread for CPU work, run a timer. |
-| [Docker](docker.md) | A small production image with `dox build`, Postgres, env and a health check. |
-| [Testing with a database](testing-with-database.md) | Tests on SQLite or a test Postgres, with migrations and cleanup. |
+| [Background work](background-work.md) | Run work after the response, on another thread, in a queue job, or on a schedule. |
 | [Static files and SPA](static-files.md) | Serve a folder or a single page app, with cache headers. |
 | [CORS for a browser front-end](cors-for-spa.md) | The CORS setup that works with a React, Vue or Flutter web app. |
 | [Environments](environments.md) | Dev, staging and production config, `.env` files, secrets and `APP_KEY`. |
+| [Testing with a database](testing-with-database.md) | Tests on SQLite or a test Postgres, with migrations and cleanup. |
+| [Share code with Flutter](share-code-with-flutter.md) | One DTO package that the server and the Flutter app both use to check input. |
+| [API docs with OpenAPI](api-docs-with-openapi.md) | A docs page for your API, made from your routes, DTOs and models. |
+| [Docker](docker.md) | A small production image, Postgres in Docker Compose, env and a health check. |
+| [Deploy to a Linux server](deploy-vps.md) | Your own server with systemd, and Caddy in front for HTTPS. |
+| [Deploy to Fly.io](deploy-fly.md) | Fly.io from your `Dockerfile`, with SQLite on a volume or with Postgres. |
+| [Deploy to Google Cloud Run](deploy-cloud-run.md) | Cloud Run from your `Dockerfile`, with Cloud SQL and Secret Manager. |
 
-All guides use the app that `dox create my_app` makes. The package name is `my_app`.
+Most guides use the app that `dox create my_app` makes. The package name is `my_app`.
 Change it to your own package name in the imports.
+The OpenAPI guide and the deploy guides use the blog API of the [tutorial](../tutorial/01-create-project.md). Its package name is `blog`.
+
+The code of the app guides is in one app on GitHub: [examples/guides](https://github.com/dartondox/dox/tree/main/examples/guides).
+The blog API is in [examples/blog-api](https://github.com/dartondox/dox/tree/main/examples/blog-api).
+CI builds both and runs their tests on every push, so the code on these pages keeps working.
 
 
 ---
@@ -16047,18 +16055,12 @@ Accept an image from a form, check its size and type, save it to a disk, and ret
 
 ## What you need
 
-- A Dox app (`dox create my_app`).
-- `build_runner` for the DTO (a new app has it).
+- A Dox app (`dox create my_app`). A new app has the `dox_storage` package, `lib/config/storage.dart` and `lib/providers/storage_provider.dart`.
 
 ## 1. Set up the disk
 
-`Storage()` is in the `dox_storage` package. Add it:
-
-```bash
-dart pub add dox_storage
-```
-
-Give the `local` disk a `url`. `Storage().url()` uses it to build the public URL of a file.
+The `local` disk of a new app saves files in the `storage` folder.
+Give it a `url`. `Storage().url()` uses it to build the public URL of a file.
 
 ```dart title="lib/config/storage.dart"
 import 'package:dox_storage/dox_storage.dart';
@@ -16088,7 +16090,7 @@ StorageConfig storageConfig = StorageConfig(
 Run `dart run build_runner build` to update `env.g.dart`.
 Then add `APP_URL=http://localhost:3000` to your `.env`.
 
-Add the provider. It sets the disks in every isolate. The generated container finds it:
+The provider of a new app sets the disks in every isolate. You do not change it:
 
 ```dart title="lib/providers/storage_provider.dart"
 import 'package:dox_storage/dox_storage.dart';
@@ -16190,14 +16192,26 @@ class WebRouter extends Router {
 
 `signed: false` makes every file public. Leave it out to serve only signed URLs. Then use `Storage().signedUrl(path)` in place of `Storage().url(path)`.
 
-## 5. Build and run
+## 5. Register the DTOs
+
+Dox finds a DTO in the `dtos` list of `AppConfig`. `build_runner` writes this list to `lib/generated/dtos.g.dart`.
+Add it once. Skip this step when your `app.dart` already has `dtos: dtos`.
+
+```dart title="lib/config/app.dart"
+import 'package:my_app/generated/dtos.g.dart';
+
+AppConfig appConfig = AppConfig(
+  dtos: dtos,
+  // ...
+);
+```
+
+## 6. Build and run
 
 ```bash
 dart run build_runner build --delete-conflicting-outputs
 dox serve
 ```
-
-Make sure `lib/config/app.dart` has `dtos: dtos` from `lib/generated/dtos.g.dart`. See [Validation: setup](../the-basic/validation.md#setup).
 
 ## Check it
 
@@ -16249,8 +16263,7 @@ Make a list route that takes `page` and `per_page` from the query string and ret
 
 ## What you need
 
-- A Dox app with a database and a `User` model (`dox make:model User -m`).
-- `build_runner` for the DTO.
+- A Dox app (`dox create my_app`). A new app has a database (SQLite), a `User` model and a `users` table.
 
 ## 1. Write the query DTO
 
@@ -16311,7 +16324,21 @@ Add a `where` before `paginate` to filter: `User().where('role', 'admin').orderB
 Route.get('/users', (UserController c) => c.index);
 ```
 
-## 4. Build and run
+## 4. Register the DTOs
+
+Dox finds a DTO in the `dtos` list of `AppConfig`. `build_runner` writes this list to `lib/generated/dtos.g.dart`.
+Add it once. Skip this step when your `app.dart` already has `dtos: dtos`.
+
+```dart title="lib/config/app.dart"
+import 'package:my_app/generated/dtos.g.dart';
+
+AppConfig appConfig = AppConfig(
+  dtos: dtos,
+  // ...
+);
+```
+
+## 5. Build and run
 
 ```bash
 dart run build_runner build --delete-conflicting-outputs
@@ -16361,6 +16388,7 @@ curl 'http://localhost:3000/api/users?page=0&per_page=500'
 ## Change the shape of a row
 
 Return a serializer for each row, when the model has fields you do not want to send.
+`dox make:serializer User` makes `lib/app/http/serializers/user.serializer.dart`.
 `page.data` gives the typed rows (`List<User>`):
 
 ```dart
@@ -16394,13 +16422,17 @@ Let users register and log in, give them a JWT token, protect routes with it, an
 
 ## What you need
 
-- A Dox app with a database and a `users` table with `name`, `email` and `password` columns.
-- The `dox_auth` package: `dart pub add dox_auth`. A new app has it.
-- `build_runner` for the DTOs.
+- A Dox app (`dox create my_app`). A new app has a database (SQLite), a `User` model and a `users` table with `name`, `email` and `password` columns.
+- The `dox_auth` package. A new app does not have it. Add it:
+
+```bash
+dart pub add dox_auth
+```
 
 ## 1. Hide the password in the model
 
 The token holds `user.toJson()`. Anyone with the token can read it. So the password hash must be in `hidden`.
+The model of a new app already does this:
 
 ```dart title="lib/app/models/user/user.model.dart"
 import 'package:dox_orm/dox_orm.dart';
@@ -16453,6 +16485,9 @@ class AppAuthProvider extends DoxProvider {
   }
 }
 ```
+
+`APP_KEY` must be at least 32 bytes. `dox key:generate` makes a key of this length.
+A shorter key stops the app in production, and prints a warning in development.
 
 Dox finds the provider by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
 
@@ -16594,7 +16629,21 @@ class ApiRouter extends Router {
 }
 ```
 
-## 6. Build and run
+## 6. Register the DTOs
+
+Dox finds a DTO in the `dtos` list of `AppConfig`. `build_runner` writes this list to `lib/generated/dtos.g.dart`.
+Add it once. Skip this step when your `app.dart` already has `dtos: dtos`.
+
+```dart title="lib/config/app.dart"
+import 'package:my_app/generated/dtos.g.dart';
+
+AppConfig appConfig = AppConfig(
+  dtos: dtos,
+  // ...
+);
+```
+
+## 7. Build and run
 
 ```bash
 dart run build_runner build --delete-conflicting-outputs
@@ -16639,7 +16688,7 @@ Without the header, `/api/auth/me` gives `401 Authentication failed`.
 
 !!! note "The error shape"
     The `{"error": ...}` shape comes from the response handler in [Custom errors](custom-errors.md).
-    Without it, the `401` body is only the message.
+    Without it, the `401` body is `{"code":"unauthorized","message":"Wrong email or password"}`.
 
 ## Logout and expiry
 
@@ -16650,7 +16699,7 @@ The server can not cancel one JWT. It checks only the signature. This is what yo
 | Log out on this device | The client deletes the token. That is all `logout` does. |
 | Limit the damage of a stolen token | Keep `expiresIn` short, for example `Duration(hours: 12)`. |
 | Log every user out at once | Change `APP_KEY`. Every old token stops working. |
-| Block one user | Delete or disable the user. `AuthMiddleware` loads the user from the database on each request, so a deleted user gets `401`. |
+| Block one user | Delete the user. `AuthMiddleware` loads the user from the database on each request, so a deleted user gets `401`. |
 
 For a real "log out everywhere" button, add a `token_version` column to `users`, put it in the token, and compare the two in a middleware after `AuthMiddleware`.
 
@@ -16681,9 +16730,9 @@ When a controller or a middleware throws:
 
 | Error | Status | What Dox does |
 | --- | --- | --- |
-| an `IHttpException`, like `NotFoundHttpException` | its `code` | sends its `message`. Does **not** call `report` |
-| a validation error (bad DTO input) | `422` | sends the field errors. Does not call `report` |
-| any other `Exception` or `Error` | `500` | sends `Server Error` (the error text only in development). Calls `report` |
+| an `IHttpException`, like `NotFoundHttpException` | its `code` | sends `{"code": ..., "message": ...}`. Does **not** call `report` |
+| a validation error (bad DTO input) | `422` | sends the field errors: `{"field": "message"}`. Does not call `report` |
+| any other `Exception` or `Error` | `500` | sends `{"code":"server_error","message":"Server Error"}`. When `APP_ENV` is `development` or `local`, it sends the error text. Calls `report` |
 
 `report` is a method of the [exception handler](../the-basic/errors.md). The response goes through the `responseHandler` of `AppConfig` last. This guide sets the shape there.
 
@@ -16739,7 +16788,11 @@ class UserController {
       throw ForbiddenException(message: 'The first user can not be deleted');
     }
     User user = await show(id);
-    await user.delete();
+
+    /// 0 rows: the user was deleted after show() found it
+    if (await user.delete() == 0) {
+      throw NotFoundHttpException(message: 'User $id not found');
+    }
     return <String, bool>{'deleted': true};
   }
 }
@@ -16799,7 +16852,8 @@ class ResponseHandler extends ResponseHandlerInterface {
 }
 ```
 
-The last `if` matters. Without it, a `500` sends `error.toString()` to the client. That can show a SQL query or a file path.
+The last `if` gives a `500` your shape too, in every environment.
+Without it, the client gets the default body. When `APP_ENV` is `development` or `local`, that is the error text. It can show a SQL query or a file path.
 
 ## 3. Log unexpected errors
 
@@ -16863,7 +16917,7 @@ Route.get('/boom', (DoxRequest req) => throw StateError('boom'));
 After `GET /api/boom`, the server prints one line:
 
 ```json
-{"level":"ERROR","message":"Bad state: boom","stack":"#0  ApiRouter.register.<anonymous closure> (package:my_app/routes/api.dart:40:44) ...","timestamp":"2026-10-22T14:01:12.000Z"}
+{"level":"ERROR","message":"Bad state: boom","stack":"#0  ApiRouter.register.<anonymous closure> (package:my_app/routes/api.dart:41:44) ...","timestamp":"2026-10-22T14:01:12.000Z"}
 ```
 
 Remove the `/boom` route when you are done.
@@ -16890,34 +16944,34 @@ Source: https://dartondox.dev/latest/3.xguides/background-work/
 
 # Background work
 
-Answer the request now and do the slow work after. Use another thread for CPU work. Run a job on a timer.
+Answer the request now and do the slow work later: after the response, on another thread, in a queue, or on a timer.
 
 ## What you need
 
-- A Dox app.
+- A Dox app (`dox create my_app`). A new app has the queue (`dox_queue`) and the scheduler (`dox_scheduler`) set up.
 
-## What Dox gives you
+## Pick the right tool
 
-Dox has no job queue. It has three building blocks from Dart itself:
-
-| You want | Use | Runs where |
-| --- | --- | --- |
-| I/O work after the response (send an email, call an API, write rows) | a `Future` you do not await | the same isolate, between requests |
-| CPU work (resize an image, parse a big file, compute) | `Isolate.run()` | a new thread |
-| work every N minutes (cleanup, sync) | `Timer.periodic` in a provider | one isolate of your choice |
-
-None of them survive a restart. See [When you need a real queue](#when-you-need-a-real-queue).
+| You want | Use | Runs where | Lost when the process stops |
+| --- | --- | --- | --- |
+| small I/O work after the response (a log line, a cache update) | a `Future` you do not await | the same isolate, between requests | yes |
+| CPU work (resize an image, parse a big file, compute) | `Isolate.run()` | a new thread | yes |
+| work that must not get lost (an email, a payment call), with retries | a queue job | the queue worker process | no |
+| work every N minutes (cleanup, sync) | a scheduled task | the schedule process | it runs again at the next tick |
 
 ## 1. Work after the response
 
 Start the future and return. `unawaited` tells the linter you did this on purpose.
 An error in the future goes to the `report` method of the `ExceptionHandler` in `AppConfig`.
 
+This file has the code of steps 1, 2 and 3:
+
 ```dart title="lib/app/http/controllers/report.controller.dart"
 import 'dart:async';
 import 'dart:isolate';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:my_app/app/jobs/build_report.job.dart';
 
 @Inject()
 class ReportController {
@@ -16927,6 +16981,16 @@ class ReportController {
     String id = DateTime.now().microsecondsSinceEpoch.toString();
     unawaited(_build(id));
     return <String, String>{'id': id, 'status': 'queued'};
+  }
+
+  /// POST /api/reports/queued
+  /// Saves a job in the jobs table and answers at once.
+  /// The queue worker (`dox queue:work`) runs it, and tries again when
+  /// it fails. The job is not lost when the server stops.
+  Future<Map<String, String>> queue(DoxRequest req) async {
+    String id = DateTime.now().microsecondsSinceEpoch.toString();
+    String jobId = await BuildReport(reportId: id).dispatch();
+    return <String, String>{'id': id, 'job': jobId, 'status': 'queued'};
   }
 
   /// I/O work (database, HTTP calls, email) is fine here. It shares the
@@ -16976,57 +17040,114 @@ Pass plain data in (an `int`, a `String`, bytes) and get plain data out. Save th
 unawaited(Isolate.run(() => countPrimes(limit)).then(saveResult));
 ```
 
-## 3. Work on a timer
+## 3. A job that must not get lost
 
-`setup()` of a provider runs in **every** isolate, and Dox starts one per CPU core. So start the timer on isolate 1 only.
+A future you do not await is gone when the server stops, and it does not retry.
+For work that must happen, use a queue job. `dispatch()` saves the job in the database.
+A worker process takes it and runs `handle()`. A failed job is tried again.
 
-```dart title="lib/providers/cleanup_provider.dart"
-import 'dart:async';
+Make the job:
 
-import 'package:dox_core/dox_core.dart';
-import 'package:my_app/app/models/user/user.model.dart';
+```bash
+dox make:job BuildReport
+```
 
-/// Work on a timer. `setup()` runs in every isolate, so the timer is
-/// started on isolate 1 only. Otherwise 8 isolates do the same job.
-class CleanupProvider extends DoxProvider {
+```dart title="lib/app/jobs/build_report.job.dart"
+import 'package:dox_core/utils/logger.dart';
+import 'package:dox_queue/dox_queue.dart';
+
+/// Builds a report in the queue worker.
+/// Dispatch it: `await BuildReport(reportId: id).dispatch();`
+@Job()
+class BuildReport extends DoxJob {
+  BuildReport({required this.reportId});
+
+  final String reportId;
+
+  /// try 3 times, wait 10 seconds between tries
   @override
-  void setup() {
-    if (Dox().isolateId != 1) return;
-    Timer.periodic(const Duration(hours: 1), _run);
-  }
+  int get tries => 3;
 
-  Future<void> _run(Timer timer) async {
-    DateTime limit = DateTime.now().subtract(const Duration(days: 30));
-    List<User> old = await User()
-        .withTrash()
-        .where('deleted_at', '<', limit)
-        .get();
-    for (User user in old) {
-      await user.forceDelete();
-    }
-    print('cleanup: removed ${old.length} users');
+  @override
+  List<Duration> get backoff => const <Duration>[Duration(seconds: 10)];
+
+  @override
+  Future<void> handle() async {
+    Logger.info('report $reportId is ready');
   }
 }
 ```
 
-Dox finds `CleanupProvider` by itself. To be sure the database is ready first, list `ORMProvider` in `AppConfig`:
+The fields of the job (`reportId`) are saved with it. Use plain values like `String`, `int`, `bool`, `DateTime`, lists and maps.
+Save an id, not a model: load the model in `handle()`.
+Run `dart run build_runner build` after you add or change a job. It updates `lib/generated/jobs.g.dart`.
 
-```dart title="lib/config/app.dart"
-AppConfig appConfig = AppConfig(
-  container: registerContainer,
-  providers: <DoxProvider>[ORMProvider()], // runs before CleanupProvider
-  // ...
-);
+The `queue` method of the controller above dispatches it. `dispatch()` returns the id of the job.
+
+A new app uses the `database` driver (`lib/config/queue.dart`).
+Its jobs tables come from the migration `db/migration/..._create_queue_tables.dart`. The server runs it at start.
+
+Start the worker next to the server, in a second terminal:
+
+```bash
+dox queue:work
 ```
 
-When you run more than one process (two machines), each process has an isolate 1. Then the job runs twice. Use a database lock, or run the job from one place only.
+`dox queue:failed` lists the jobs that failed every try. `dox queue:retry all` puts them back on the queue.
+See [Queue](../digging-deeper/queue.md) for Redis, delays and all worker flags.
 
-## 4. Add the routes
+## 4. Work on a timer
+
+Put the task in `lib/config/schedule.dart`. A new app has this file with an empty `schedule` function.
+
+```dart title="lib/config/schedule.dart"
+import 'package:dox_scheduler/dox_scheduler.dart';
+import 'package:my_app/app/models/user/user.model.dart';
+
+/// `inProcess: false`: run `dox schedule:work` next to the server.
+ScheduleConfig scheduleConfig = const ScheduleConfig();
+
+/// The tasks. `dox schedule:list` shows them.
+void schedule(Schedule s) {
+  s.call('cleanup', cleanupUsers).hourly();
+}
+
+/// Removes the users that were soft deleted more than 30 days ago.
+Future<void> cleanupUsers() async {
+  DateTime limit = DateTime.now().subtract(const Duration(days: 30));
+  List<User> old = await User()
+      .withTrash()
+      .where('deleted_at', '<', limit)
+      .get();
+  int removed = 0;
+  for (User user in old) {
+    removed += await user.forceDelete();
+  }
+  print('cleanup: removed $removed users');
+}
+```
+
+Start the scheduler next to the server, in a third terminal:
+
+```bash
+dox schedule:work
+```
+
+`dox schedule:list` shows each task and its next run. `dox schedule:test cleanup` runs the task now.
+
+The scheduler runs each task once per tick, also when many processes run the schedule.
+With many servers, use a Redis cache store for the lock (`ScheduleConfig(store: 'redis')`).
+For a small app, you can run the schedule inside the server. See [Scheduler: run inside the server](../digging-deeper/scheduler.md#run-inside-the-server).
+
+## 5. Add the routes
 
 ```dart title="lib/routes/api.dart"
 Route.post('/reports', (ReportController c) => c.store);
+Route.post('/reports/queued', (ReportController c) => c.queue);
 Route.get('/primes/{limit}', (ReportController c) => c.primes);
 ```
+
+Run `dart run build_runner build --delete-conflicting-outputs` and `dox serve`.
 
 ## Check it
 
@@ -17043,6 +17164,17 @@ The answer comes at once:
 Two seconds later, the server prints `report 1792677668393002 is ready`.
 
 ```bash
+curl -X POST http://localhost:3000/api/reports/queued
+```
+
+```json
+{"id":"1792677670112345","job":"9f2c4e1a7b3d5f60a1c2e3f4a5b6c7d8","status":"queued"}
+```
+
+The terminal of `dox queue:work` shows a log line with `report 1792677670112345 is ready`.
+Stop the worker first, and the job waits in the `jobs` table until the worker runs again.
+
+```bash
 curl http://localhost:3000/api/primes/100000
 ```
 
@@ -17050,17 +17182,11 @@ curl http://localhost:3000/api/primes/100000
 {"limit":100000,"primes":9592}
 ```
 
-## When you need a real queue
-
-The work above is lost when the process stops, and it does not retry.
-When that is not OK (payments, emails that must arrive), save the job as a row in a table first.
-Then a `Timer.periodic` provider, or a second small Dart program, reads the table, does the work, and marks the row as done.
-A failed row stays in the table, so you can retry it.
-
 ## See also
 
+- [Queue](../digging-deeper/queue.md) for drivers, retries, delays and failed jobs
+- [Scheduler](../digging-deeper/scheduler.md) for every frequency, time zones and hooks
 - [Isolate](../digging-deeper/isolate.md) for what each isolate shares, and what it does not
-- [Providers](../digging-deeper/providers.md)
 - [Custom errors](custom-errors.md) for the `ExceptionHandler` that gets the errors of a future nobody awaits
 
 
@@ -17082,11 +17208,11 @@ Serve a folder of files, or a single page app (React, Vue, Flutter web), from th
 
 ## Serve a folder: one line
 
-`Storage.route` serves every file of a storage disk. Make a disk for the folder, and add the route.
+`Storage.route` serves every file of a storage disk. Add a `public` disk for the folder in `lib/config/storage.dart`:
 
 ```dart title="lib/config/storage.dart"
 StorageConfig storageConfig = StorageConfig(
-  defaultDisk: 'local',
+  defaultDisk: env.storageDisk,
   disks: <String, Map<String, dynamic>>{
     'local': <String, dynamic>{'driver': 'local', 'root': 'storage'},
 
@@ -17095,6 +17221,8 @@ StorageConfig storageConfig = StorageConfig(
   },
 );
 ```
+
+Then add the route in `register()` of `WebRouter`. `Storage` comes from `package:dox_storage/dox_storage.dart`.
 
 ```dart title="lib/routes/web.dart"
 Storage.route('static', disk: 'public', signed: false); // GET /static/{key*}
@@ -17245,6 +17373,8 @@ Let a web app on another origin (`http://localhost:5173` in development, `https:
 
 ## 1. Write the config
 
+A new app already has `lib/config/cors.dart`, with `enabled: false`. Replace the whole file with this one:
+
 ```dart title="lib/config/cors.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/config/env.dart';
@@ -17272,12 +17402,7 @@ CORSConfig cors = CORSConfig(
 );
 ```
 
-```dart title="lib/config/app.dart"
-AppConfig appConfig = AppConfig(
-  cors: cors,
-  // ...
-);
-```
+`AppConfig` in `lib/config/app.dart` already passes it on with `cors: cors`.
 
 ## 2. Set the origin per environment
 
@@ -17308,7 +17433,7 @@ The origin is scheme, host and port. No path, no `/` at the end.
 !!! note "Two or more front-ends"
     Set `origin` to a list, like `['https://a.com', 'https://b.com']`.
     Dox compares the `Origin` header of the request with the list.
-    It sends back only the origin that matches. If none matches, it sends no `Access-Control-Allow-Origin` header, and the browser blocks the call.
+    It sends back only the origin that matches, with `Vary: Origin`. If none matches, it sends no `Access-Control-Allow-Origin` header, and the browser blocks the call.
 
 ## Check it
 
@@ -17468,7 +17593,7 @@ The key is the getter name in UPPER_SNAKE case: `dbPort` reads `DB_PORT`.
 - A nullable getter with no body is optional: `int? get dbPort;` is `null` when the key is not set.
 - Any other getter with no body is required: `String get appKey;`.
 
-A missing required key stops the app at start, with a list of all problems. The part file `env.g.dart` is made by `build_runner` and is in `.gitignore`.
+A missing required key stops the app at start, with a list of all problems. The part file `env.g.dart` is made by `build_runner`.
 
 ## 2. Add a key
 
@@ -17577,7 +17702,8 @@ On a server you can also keep a `.env` next to the binary, outside git, with `ch
 `APP_KEY` encrypts cookies and signs JWT tokens and local signed URLs.
 
 - Make one per environment with `dox key:generate`. Never share the production key with staging.
-- When `APP_ENV=production` and `APP_KEY` is empty, the app does not start.
+- `APP_KEY` must be exactly 32 characters. `dox key:generate` makes a key of the right length.
+- When `APP_ENV` is not `development`, `local` or `test`, a bad key stops the app at start: empty, not 32 characters, or a public sample key. An empty `APP_ENV` counts as production. In development the app only logs a warning.
 - A new key makes every cookie, token and signed URL invalid. Every user is logged out. Plan it.
 
 ## 6. Check the env before a deploy
@@ -17640,16 +17766,11 @@ Migrations run once, and every test starts with empty tables.
 
 ## What you need
 
-- A Dox app with Dart migrations in `db/migration` (see [Migration](../database/migration.md)).
-- `test` as a dev dependency: `dart pub add dev:test`.
+- A Dox app (`dox create my_app`). A new app has the `User` model, a `users` migration in `db/migration` and the `test` package.
 
-## 1. Write the migration
+## 1. Check the migration
 
-If you do not have one yet:
-
-```bash
-dox make:migration create_users_table
-```
+A new app has this migration. Its file name starts with another date. For a new table, run `dox make:migration create_posts_table`.
 
 ```dart title="db/migration/2026_10_22_000000_create_users_table.dart"
 import 'package:dox_migration/dox_migration.dart';
@@ -17674,7 +17795,7 @@ class CreateUsersTable extends Migration {
 }
 ```
 
-The command also writes `db/migration/migrations.dart`, the list of all migrations. The test imports that list.
+`db/migration/migrations.dart` is the list of all migrations. `dox make:migration` updates it. The test imports that list.
 A Dart migration works on Postgres, MySQL and SQLite, so the same test runs on all of them.
 
 ## 2. Write the test (SQLite)
@@ -17769,10 +17890,14 @@ dart test test/user_test.dart
 
 ## Check it
 
+The migration names start with the dates of your files. A new app also has the tables of the queue.
+
 ```text
 00:00 +0: (setUpAll)
 Migrating: 2026_10_22_000000_create_users_table
 Migrated: 2026_10_22_000000_create_users_table
+Migrating: 2026_10_23_000000_create_queue_tables
+Migrated: 2026_10_23_000000_create_queue_tables
 00:00 +1: saves and finds a user
 00:00 +2: the tables are empty again
 00:00 +2: All tests passed!
@@ -17822,6 +17947,7 @@ dart test --concurrency=1
 
 ## Test a route with the database
 
+This test uses the `GET /api/users` route of the [Pagination](pagination.md) guide.
 `DoxTestClient` starts the app inside the test. It runs the providers, so the ORM is set up by `ORMProvider` from `lib/config/database.dart`.
 Set the database with env variables, so the app picks the test database:
 
@@ -17852,8 +17978,10 @@ void main() {
     await client.close();
   });
 
-  test('GET /api/users is empty', () async {
-    (await client.get('/api/users')).expectStatus(200).expectJson(isEmpty);
+  test('GET /api/users has no rows', () async {
+    TestResponse res = await client.get('/api/users');
+    res.expectStatus(200);
+    expect(res.json['data'], isEmpty);
   });
 }
 ```
@@ -17882,6 +18010,11 @@ Source: https://dartondox.dev/latest/3.xguides/share-code-with-flutter/
 Put a `@Dto` class in a shared Dart package, so the Dox server and the Flutter app check input with the same rules and error messages.
 
 The generated DTO code imports only `dox_validation`, which is pure Dart (no `dart:io`, no `dart:mirrors`). So it runs in Flutter and on the web.
+
+## What you need
+
+- A Dox app (`dox create server`). Here it is in the `server` folder.
+- A Flutter app (`flutter create app`). Here it is in the `app` folder.
 
 ## The layout
 
@@ -17974,24 +18107,16 @@ Commit both files. Then the Flutter app does not need to run the generator.
 
 ## 2. The Dox server
 
-Add the shared package to the server:
+Add the shared package to the dependencies of the server:
 
 ```yaml title="server/pubspec.yaml"
-name: server
-publish_to: none
-
-environment:
-  sdk: ^3.13.0
-
 dependencies:
-  dox_core: ^3.0.0-alpha
+  # ... the packages of the new app stay
   blog_shared:
     path: ../packages/blog_shared
-
-dev_dependencies:
-  build_runner: ^2.17.1
-  dox_builder: ^3.0.0-alpha
 ```
+
+Run `dart pub get`.
 
 Dox finds a DTO in the `dtos` list of `AppConfig`. The server's own `lib/generated/dtos.g.dart` lists only the DTOs in the server.
 So add the list of the shared package too:
@@ -18013,6 +18138,7 @@ The controller asks for `SaveBlog` like any other DTO. Dox checks the body befor
 
 ```dart title="server/lib/app/http/controllers/blog.controller.dart"
 import 'package:blog_shared/blog_shared.dart' show SaveBlog;
+import 'package:dox_core/dox_core.dart';
 
 @Inject()
 class BlogController {
@@ -18211,18 +18337,18 @@ This is the real output for the blog API, shortened. The top level:
   "openapi": "3.1.0",
   "info": {"title": "Blog API", "version": "1.0.0"},
   "paths": {
-    "/ping": {},
     "/api/ping": {},
     "/api/posts": {},
     "/api/posts/{id}": {},
     "/api/auth/register": {},
     "/api/auth/login": {},
-    "/api/auth/user": {}
+    "/api/auth/user": {},
+    "/ping": {}
   },
   "components": {
     "schemas": {"Post": {}, "SavePost": {}, "RegisterUser": {}, "LoginUser": {}, "User": {}, "ValidationError": {}},
     "securitySchemes": {
-      "bearerAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"}
+      "bearerAuth": {"type": "http", "scheme": "bearer"}
     }
   }
 }
@@ -18241,14 +18367,18 @@ This is the real output for the blog API, shortened. The top level:
   },
   "responses": {
     "200": {"description": "Successful response"},
-    "401": {"description": "Not logged in"},
+    "401": {
+      "description": "Not logged in",
+      "content": {"application/json": {"schema": {"type": "object", "properties": {"code": {"type": "string"}, "message": {"type": "string"}}}}}
+    },
     "422": {
       "description": "Validation failed",
       "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ValidationError"}}}
     },
     "500": {"description": "Server error"}
   },
-  "security": [{"bearerAuth": []}]
+  "security": [{"bearerAuth": []}],
+  "x-dox-middleware": ["LogMiddleware", "AuthMiddleware"]
 }
 ```
 
@@ -18262,6 +18392,7 @@ Where each part comes from:
 | `401` and `bearerAuth` | `AuthMiddleware` on the route |
 | `422` | the route has a request class |
 | `200` with no body | `store` returns `DoxResponse`, so the builder can not see the body. Step 6 fixes this |
+| `x-dox-middleware` | the middleware of the route: the global `LogMiddleware` and `AuthMiddleware` |
 
 ## 5. See how a DTO becomes a schema
 
@@ -18348,7 +18479,14 @@ Run `dart run build_runner build` again and restart the app. The real result:
   "tags": ["Post"],
   "summary": "List all posts",
   "description": "Newest posts are not first. There is no paging yet.",
-  "operationId": "PostController.index"
+  "operationId": "PostController.index",
+  "responses": {
+    "200": {
+      "description": "Successful response",
+      "content": {"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/Post"}}}}
+    },
+    "500": {}
+  }
 },
 "post": {
   "tags": ["Posts"],
@@ -18385,6 +18523,8 @@ curl -o /dev/null -w '%{http_code}\n' http://localhost:3000/openapi.json   # 404
 To show the docs on staging too, but never in production, set `enabled` yourself:
 
 ```dart title="lib/config/openapi.dart"
+import 'package:blog/config/env.dart';
+
 OpenApiConfig openApi = OpenApiConfig(
   enabled: env.appEnv != 'production',
   info: Info(title: 'Blog API', version: '1.0.0'),
@@ -18439,6 +18579,7 @@ Build a small production image with `dox build`, and run it with Postgres in Doc
 ## 1. Add a health route
 
 The health check asks this route. It answers 503 when the database does not answer.
+Put it in `register()` of `WebRouter`. `QueryBuilder` comes from `package:dox_orm/dox_orm.dart`.
 
 ```dart title="lib/routes/web.dart"
 Route.health(
@@ -18495,6 +18636,7 @@ RUN dart pub get --offline
 
 # `dox build` runs build_runner, then `dart build cli`.
 # The bundle is in build/bundle: bin/server, lib/, db/, .env.example
+# (and bin/queue, bin/schedule when the app has them)
 RUN dart pub global activate dox ^3.0.0-alpha \
   && /root/.pub-cache/bin/dox build
 
@@ -18644,7 +18786,7 @@ curl http://localhost:3000/health
 ```
 
 ```json
-{"status":"ok"}
+{"status":"ok","checks":{"database":"ok"}}
 ```
 
 Stop Postgres with `docker compose stop postgres`. After about 45 seconds, `docker compose ps` shows the app as `unhealthy`.
@@ -18703,6 +18845,8 @@ The result is `build/bundle/`:
 build/bundle/
   bin/server                         the AOT binary
   lib/dox_http_native-linux-*.so     the native HTTP server
+  lib/dox_postgres_native-linux-*.so the native Postgres driver
+  lib/dox_mysql_native-linux-*.so    the native MySQL driver
   lib/libsqlite3.so                  SQLite
   db/                                the migrations
   .env.example
@@ -18883,9 +19027,11 @@ journalctl -u blog --since "1 hour ago"   # the last hour
 journalctl -u blog -b                     # since the last boot
 ```
 
-The first lines after a start look like this:
+The first lines after the first start look like this:
 
 ```text
+Migrating: 2023_07_16_131937700_create_users_table
+Migrated: 2023_07_16_131937700_create_users_table
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
 {"level":"INFO","name":"dox","message":"Server started at http://127.0.0.1:3000 with 2 isolate (native)", ...}
@@ -19076,9 +19222,11 @@ fly status    # the machines and their state
 fly logs      # the app logs, live
 ```
 
-The first log lines after a start:
+The first log lines after the first start:
 
 ```text
+Migrating: 2023_07_16_131937700_create_users_table
+Migrated: 2023_07_16_131937700_create_users_table
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
 {"level":"INFO","name":"dox","message":"Server started at http://[::]:3000 with 1 isolate (native)", ...}
@@ -19250,9 +19398,11 @@ gcloud run services logs read blog --region europe-west1 --limit 20
 gcloud beta run services logs tail blog --region europe-west1   # live, needs the log-streaming component
 ```
 
-The first log lines after a start:
+The first log lines after the first start:
 
 ```text
+Migrating: 2023_07_16_131937700_create_users_table
+Migrated: 2023_07_16_131937700_create_users_table
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
 {"level":"INFO","name":"dox","message":"Server started at http://[::]:3000 with 1 isolate (native)", ...}
@@ -19314,6 +19464,7 @@ Short lookup pages, with values taken from the Dox source code.
 | [Cheat sheet](cheat-sheet.md) | one page of the code you use every day, with links to the full pages |
 | [Production checklist](production-checklist.md) | what to check before you deploy, and what Dox does not do for you |
 | [Error index](errors.md) | every message Dox prints or throws, when it happens and what to do |
+| [Changelog](changelog.md) | what changed in each package, newest first |
 
 
 ---
@@ -19330,19 +19481,24 @@ One page to keep open while you work. Each section links to its full page.
 
 | Path | What is in it |
 | --- | --- |
-| `bin/server.dart` | starts the app: `Dox().initialize()`, migrations, `startServer()` |
+| `bin/server.dart` | starts the app: `Dox().initialize()`, migrations, `Dox().startServer()` |
 | `bin/migrate.dart` | runs migrations for `dox migration:*` |
-| `bin/openapi.dart` | writes the OpenAPI files for `dox openapi:generate` |
-| `lib/config/` | `app.dart` (`AppConfig`), `env.dart`, `database.dart`, `cors.dart`, `cache.dart`, `storage.dart`, `openapi.dart`, `logger.dart`, `socketio.dart` |
-| `lib/routes/` | `api.dart`, `web.dart`, `websocket.dart`: one `Router` class each |
+| `bin/seed.dart` | runs seeders for `dox db:seed` |
+| `bin/queue.dart` | the queue worker for `dox queue:*` |
+| `bin/schedule.dart` | the scheduler for `dox schedule:*` |
+| `bin/openapi.dart` | you add it: writes the OpenAPI files for `dox openapi:generate` |
+| `lib/config/` | `app.dart` (`AppConfig`), `env.dart`, `database.dart`, `cors.dart`, `cache.dart`, `storage.dart`, `logger.dart`, `queue.dart`, `schedule.dart`. You add others, like `openapi.dart`. |
+| `lib/routes/` | `api.dart`, `web.dart`: one `Router` class each |
 | `lib/app/http/controllers/` | `<name>.controller.dart` |
 | `lib/app/dtos/<name>/` | `<name>.dto.dart` |
 | `lib/app/http/middleware/` | `<name>.middleware.dart` |
 | `lib/app/http/serializers/` | `<name>.serializer.dart` |
 | `lib/app/models/<name>/` | `<name>.model.dart` |
-| `lib/providers/` | `DoxProvider` classes: ORM, auth, websocket |
-| `lib/generated/container.g.dart`, `lib/generated/dtos.g.dart`, `lib/generated/openapi.g.dart` | made by `build_runner`. Do not edit. |
+| `lib/app/jobs/` | `<name>.job.dart` |
+| `lib/providers/` | `DoxProvider` classes: ORM, storage, queue, schedule. You add others, like auth. |
+| `lib/generated/` | `container.g.dart`, `openapi.g.dart`, `jobs.g.dart` and (when you have a DTO) `dtos.g.dart`. Made by `build_runner`. Do not edit. |
 | `db/migration/` | migrations and `migrations.dart` (the registry) |
+| `db/seeders/`, `db/factories/` | seeders (`seeders.dart` is the registry) and model factories |
 
 See [CLI](cli.md) and [App config](app-config.md).
 
@@ -19360,11 +19516,16 @@ dox make:controller Blog [-r]
 dox make:middleware Auth
 dox make:dto CreateBlog
 dox make:serializer Blog
-dox make:model Blog -m           # model + migration
+dox make:model Blog -m             # model + migration
 dox make:migration create_blogs_table [--sql]
+dox make:job SendWelcomeEmail
 dox migrate                        # migration:run
+dox migrate --seed                 # then run the seeders
 dox migration:rollback --step=1
 dox migration:status
+dox db:seed [--class=UserSeeder]
+dox queue:work                     # run queued jobs
+dox schedule:work                  # run scheduled tasks
 dox openapi:generate [dir]
 ```
 
@@ -19400,7 +19561,8 @@ class ApiRouter extends Router {
 | `Route.middleware(<dynamic>[M()], () { ... })` | middleware for a group |
 | `Route.domain('api.app.com', () { ... })` | match by `Host` |
 | `Route.resource('blogs', BlogController)` | `index`, `create`, `store`, `show`, `edit`, `update`, `destroy` |
-| `Storage.route('files')` | serve a storage disk, signed URLs only (`dox_storage`) |
+| `Route.health('/health')` | `200 {"status": "ok"}`, or `503` when a check fails. See [Health check](../digging-deeper/health-check.md). |
+| `Storage.route('files')` | serve a storage disk. Only signed URLs work, unless `signed: false` (`dox_storage`) |
 | `Route.enabledCors(() { ... })` / `Route.disabledCors(...)` | CORS for some routes |
 | `Route.websocket('echo', (WebSocket s, DoxRequest req) { ... })` | a raw WebSocket. For rooms and acks, use Socket.IO. |
 
@@ -19859,7 +20021,7 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `appKey` | `String` | required | Encrypts cookies (`req.cookie()`, `DoxCookie`) and signs local storage URLs. In production the app stops at start when it is empty. Make one with `dox key:generate`. |
+| `appKey` | `String` | required | Encrypts cookies (`req.cookie()`, `DoxCookie`) and signs local storage URLs. It must be exactly 32 characters. The app stops at start when it is empty, has another length, or is a public sample key. When `APP_ENV` is `development`, `local` or `test`, this is only a warning. Make one with `dox key:generate`. |
 | `serverPort` | `int` | `3000` | The port the HTTP server listens on. When the env has no `APP_PORT` but has `PORT`, Dox listens on `PORT` instead (Cloud Run, Fly, Render and Heroku set it). |
 | `host` | `String?` | `null`: `APP_HOST`, else all interfaces | The network interface to listen on, like `127.0.0.1`. `null` reads the env var `APP_HOST`. With neither, Dox listens on all interfaces, IPv6 and IPv4 (`::`). |
 | `totalIsolate` | `int?` | `Platform.numberOfProcessors` | Isolates (threads) that serve HTTP, all on the same port. On Windows the native server runs on one isolate. |
@@ -20028,6 +20190,7 @@ Source: `lib/src/dox/socket_io_config.dart` in [dartondox/dox-socketio](https://
 | `upgradeTimeout` | `Duration` | 10 s | Time a websocket upgrade may take. |
 | `connectTimeout` | `Duration` | 45 s | Time a client has to join a namespace after the handshake. |
 | `maxHttpBufferSize` | `int` | `1000000` | Biggest message in bytes a client may send. |
+| `maxAttachments` | `int` | `10` | Most binary attachments in one packet. A packet with more closes that client. |
 | `transports` | `List<String>` | `['polling', 'websocket']` | Allowed transports. |
 | `allowUpgrades` | `bool` | `true` | Allow upgrades from polling to websocket. |
 | `cors` | `CorsOptions?` | `null` (no CORS headers) | CORS for the long-polling requests. |
@@ -20082,6 +20245,8 @@ Keys of `extra`:
 | mysql | `verifyCertificate` | `bool` | `true` | `false` skips the TLS certificate check. Only for a self-signed certificate in development. |
 | mysql | `maxConnectionAge` | `Duration` | 12 hours | Close and reopen a connection after this time. |
 | sqlite | `busyTimeout` | `int` | `5000` | `PRAGMA busy_timeout` in milliseconds. |
+
+The `database.dart` of a new project also sets `maxConnectionAge` for Postgres and `collation` for MySQL. The Postgres driver does not read `maxConnectionAge`, and no driver reads `collation`. So these two keys change nothing.
 
 ## AuthConfig
 
@@ -20246,6 +20411,8 @@ class ORMProvider extends DoxProvider {
 }
 ```
 
+A new project also has `lib/config/storage.dart`, `queue.dart` and `schedule.dart`, with a provider for each in `lib/providers/`. See [File storage](../digging-deeper/file-storage.md), [Queue](../digging-deeper/queue.md) and [Scheduler](../digging-deeper/scheduler.md).
+
 A new project has no `openapi.dart`, `socketio.dart` or auth provider. You add them when you need them. See [OpenAPI](../packages/openapi.md), [Socket.IO](../packages/socketio.md) and [Authentication](../security/authentication.md).
 
 
@@ -20266,7 +20433,7 @@ How to install the CLI is on the [Dox CLI](../digging-deeper/dox-cli.md) page.
 Rules that apply to every command:
 
 - `dox` with no command prints `Could not find a command. Run `dox help` for more information.`
-- An unknown command prints `Could not find a command named "<name>".`
+- An unknown command prints `Could not find a command named "<name>". Run `dox help` for more information.`
 - Too few or too many arguments prints `Invalid number of arguments for command "<name>".` with the expected count.
 - A name you pass is turned into `snake_case` for the file and `PascalCase` for the class. `BlogPost` and `blog_post` give the same result.
 - Every `make:*` command also answers to its `create:*` name, like `create:model`. `dox help <command>` shows the aliases.
@@ -20292,10 +20459,13 @@ What it does:
 2. Picks the release (see `--version` above) from the release list of `dartondox/dox-sample`.
 3. Runs `git clone --depth 1 --branch v<version> https://github.com/dartondox/dox-sample.git <name>`.
 4. Deletes the `.git` folder.
-5. Replaces `dox_sample` with your project name in every file, except files under `bin/dox`.
+5. Replaces `dox_sample` with your project name in every text file, except files under `bin/dox`.
 6. Copies `.env.example` to `.env` and writes a new random `APP_KEY` to it, like `dox key:generate`. It skips this step when `.env` is already there.
+7. Prints the next steps: `cd <name>`, `dart pub get` and `dox serve`.
 
-Needs `curl` and `git` on the `PATH`.
+Needs `curl` and `git` on the `PATH`. When it can not find a release (no network), it prints `Could not find a template release for Dox <version>. Check your network, or pass --version.`
+
+The new project already has `bin/server.dart`, `bin/migrate.dart`, `bin/seed.dart`, `bin/queue.dart` and `bin/schedule.dart`. So the migration, seed, queue and schedule commands below work in it right away.
 
 Source: `packages/dox-cli/lib/src/tools/create_project.dart`.
 
@@ -20317,7 +20487,7 @@ What it does:
 
 1. Starts `dart run build_runner watch` (unless the option is set).
 2. Starts `dart run bin/server.dart` and prints its output.
-3. Watches the project folder. When a `.dart` file changes it prints `[Dox] File changed: <file>`, waits 500 ms, kills the server and starts it again.
+3. Watches the project folder. When a `.dart` file changes it prints `[Dox] File changed: <file>`. It waits until no file changed for 500 ms, then kills the server and starts it again.
 
 Source: `packages/dox-cli/lib/src/tools/server_serve.dart`.
 
@@ -20334,7 +20504,7 @@ What it does:
 1. When `pubspec.yaml` contains `build_runner`: runs `dart run build_runner build`. Stops with exit code 1 when it fails.
 2. Runs `dart build cli --target bin/server.dart --output build`.
 3. When `bin/queue.dart` or `bin/schedule.dart` exists: builds it the same way, to `build/bundle/bin/queue` and `build/bundle/bin/schedule`.
-4. Copies `db/` to `build/bundle/db` (migrations are read at start). It leaves out SQLite files, so your local data does not go to production.
+4. Deletes the old `build/bundle/db`, then copies `db/` to `build/bundle/db`. It leaves out SQLite files (`*.sqlite`, `*.sqlite3`, `*.db`, and their `-wal`, `-shm` and `-journal` files), so your local data does not go to production.
 5. Copies `.env.example` to `build/bundle/.env.example`.
 6. Prints `[Dox] Built build/bundle. Run it with: cd build/bundle && ./bin/server`.
 
@@ -20346,7 +20516,7 @@ Output:
 | `build/bundle/bin/queue` | the queue worker, when `bin/queue.dart` exists |
 | `build/bundle/bin/schedule` | the scheduler, when `bin/schedule.dart` exists |
 | `build/bundle/lib/` | native libraries from build hooks (SQLite, `dox_http_native`, ...) |
-| `build/bundle/db/` | your migrations. SQLite files (`*.sqlite`, `*.db`) are not copied. |
+| `build/bundle/db/` | your migrations and seeders. SQLite files are not copied. |
 | `build/bundle/.env.example` | copy it to `.env` or set real env vars |
 
 `dart compile exe` can not build packages with build hooks, so the CLI uses `dart build cli`.
@@ -20361,6 +20531,7 @@ dox build_runner:watch
 ```
 
 Run `dart run build_runner build` once, or `dart run build_runner watch`. No options.
+`build_runner:build` prints only the first line of each output block of build_runner. Run `dart run build_runner build` yourself to see all of it.
 The CLI does not pass `--delete-conflicting-outputs` (build_runner removed that flag).
 
 ### `dox key:generate`
@@ -20392,7 +20563,7 @@ Writes `lib/config/env.dart`, the typed env class, from `.env.example`.
 - Stops with `lib/config/env.dart is already there. Delete it to make it again.` (exit code 1) when the file exists.
 - Prints `Run `dart run build_runner build` to make env.g.dart.` when done.
 
-Rules for each key: digits give `int get x => <value>;`, `true`/`false` give `bool`, an empty value gives `String? get x;`, any other value gives `String get x;` (required, no default). `#` comment lines above a key become its doc comment. A key that does not map back from `camelCase` gets `@EnvKey('KEY')`.
+Rules for each key: a whole number (like `3000` or `-1`) gives `int get x => <value>;`, `true`/`false` give `bool get x => <value>;`, an empty value gives `String? get x;`, any other value gives `String get x;` (required, no default). `#` comment lines above a key become its doc comment. A key that does not map back from `camelCase` gets `@EnvKey('KEY')`.
 
 Source: `packages/dox-cli/lib/src/tools/env_tools.dart` (`EnvScaffold`).
 
@@ -20405,6 +20576,7 @@ dox env:check
 Loads `AppEnv` from `lib/config/env.dart` with the real environment and `.env`. Prints `The env is valid.` or an `EnvException` with every missing or bad key (exit code 1).
 
 It writes a small script to `.dart_tool/dox/env_check.dart` and runs it with `dart run`. It needs `lib/config/env.dart` and a `name:` in `pubspec.yaml`.
+Without `lib/config/env.dart` it prints `lib/config/env.dart is missing. Run `dox env:generate` first.` (exit code 1).
 
 Source: `packages/dox-cli/lib/src/tools/env_tools.dart` (`envCheck`).
 
@@ -20415,7 +20587,8 @@ dox openapi:generate [dir]
 ```
 
 Runs `dart run bin/openapi.dart [dir]`. That file writes `openapi.json` and `openapi.yaml` into `dir` (default `storage/openapi`).
-Stops with `bin/openapi.dart is missing.` (exit code 1) when the file is not there. See [OpenAPI](../packages/openapi.md).
+A new project has no `bin/openapi.dart`. You add it yourself, see [OpenAPI](../packages/openapi.md).
+When the file is not there, the command prints `bin/openapi.dart is missing.` and the code to put in it (exit code 1).
 
 Source: `packages/dox-cli/lib/src/tools/openapi_generate.dart`.
 
@@ -20426,7 +20599,8 @@ dox update
 ```
 
 Installs the newest CLI with the same major version as the one you have. Pre-releases count.
-It reads the version list from pub.dev, then runs `dart pub global activate dox <version>`.
+It reads the version list from pub.dev (retracted versions are skipped), then runs `dart pub global activate dox <version>`.
+Needs `curl` on the `PATH`.
 
 Source: `packages/dox-cli/lib/src/tools/update_dox.dart`.
 
@@ -20445,9 +20619,11 @@ Prints `Dox version: <version>`. Aliases: `--version`, `-version`, `v`, `-v`, `-
 
 ```
 dox help [command]
+dox --help
+dox -h
 ```
 
-Without a command: lists every command by category. With a command: prints its usage, description, category, aliases and argument count.
+Aliases: `--help`, `-h`. Without a command: lists every command by category. With a command: prints its usage, description, category, aliases and argument count.
 
 ## Create files
 
@@ -20491,6 +20667,7 @@ dox make:dto <name>
 ```
 
 Writes `lib/app/dtos/<name>/<name>.dto.dart`: a `@Dto()` class with one `name` field and `part '<name>.dto.g.dart';`.
+The class name has no `Dto` at the end: `dox make:dto CreateBlog` gives the class `CreateBlog` in `lib/app/dtos/create_blog/create_blog.dto.dart`.
 A trailing `Dto` in the name is removed. Prints `Run `dox build_runner:build` to make <name>/<name>.dto.g.dart.`
 
 Template: `_getSample` in `packages/dox-cli/lib/src/tools/create_dto.dart`.
@@ -20534,13 +20711,13 @@ dox create:migration <name> [--sql]
 | --- | --- |
 | `--sql` | Make a `.sql` file with `-- up` and `-- down` sections instead of a Dart class. |
 
-Writes `db/migration/<yyyy>_<mm>_<dd>_<hhmmss>_<name>.dart` (or `.sql`). Characters that are not letters, digits or `_` are removed from the name.
+Writes `db/migration/<yyyy>_<mm>_<dd>_<hhmmss>_<name>.dart` (or `.sql`). Characters that are not letters, digits or `_` are removed from the name. A second argument other than `--sql` is ignored.
 
 Migrations run sorted by file name. So the new file always sorts after every file already in `db/migration`. When the current time is not later than the newest file (for example, two migrations in the same second), it uses the newest time plus 1 second.
 
 For a Dart migration it also:
 
-- writes `db/migration/migrations.dart`, the registry of every Dart migration in the folder, sorted by name;
+- writes `db/migration/migrations.dart`, the registry of every Dart migration in the folder, sorted by name. A file with no class that `extends Migration` is skipped with a warning;
 - writes `bin/migrate.dart` when it is missing, and prints `bin/migrate.dart created.`
 
 The Dart template depends on the name:
@@ -20561,7 +20738,7 @@ All `migration:*` commands work the same way:
 2. When there is no `bin/migrate.dart` but `db/migration` has Dart files: print `db/migration has Dart migrations, but bin/migrate.dart is missing.` (exit code 1).
 3. Else: run the `.sql` migrations with `Migrator()` from `dox_migration` in the CLI process.
 
-The database comes from `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` and `DB_DATABASE` (or `DB_NAME`). See [Environment variables](env.md).
+The database comes from `DATABASE_URL` when it is set. Else it comes from `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` and `DB_DATABASE` (or `DB_NAME`). See [Environment variables](env.md).
 A failed run prints the error and sets exit code 1.
 
 | Command | Aliases | What it does |
@@ -20575,25 +20752,27 @@ A failed run prints the error and sets exit code 1.
 
 `--seed` after `migration:run`, `migration:refresh` or `migration:fresh` runs `dox db:seed` when the migrations end well.
 
+`bin/migrate.dart` takes the same commands: `dart run bin/migrate.dart <run|rollback [--step=n]|reset|refresh|fresh|status>`. With no command it runs `run`.
+
 ## Factories and seeders
 
 | Command | Aliases | What it does |
 | --- | --- | --- |
 | `dox make:factory <model>` | `dox create:factory` | Make `db/factories/<model>.factory.dart`. It imports the model with the package name of `pubspec.yaml`. |
 | `dox make:seeder <name>` | `dox create:seeder` | Make `db/seeders/<name>.seeder.dart`. It writes `db/seeders/seeders.dart` again, and makes `bin/seed.dart` when it is missing. |
-| `dox db:seed [--class=<name>]` | | Write `db/seeders/seeders.dart` again, then run `dart run bin/seed.dart`. Default seeder: `DatabaseSeeder`. |
+| `dox db:seed [--class=<name>]` | | Write `db/seeders/seeders.dart` again, then run `dart run bin/seed.dart [--class=<name>]`. Default seeder: `DatabaseSeeder`. When `bin/seed.dart` is missing, it prints `bin/seed.dart is missing.` (exit code 1). |
 
 Templates: `createFactory` in `packages/dox-cli/lib/src/tools/create_factory.dart`, and `createSeeder` and `seedEntrySource` in `packages/dox-cli/lib/src/tools/create_seeder.dart`.
 
 ## Queue
 
-These commands run the app script `bin/queue.dart` with `dart run`. The script comes from the `dox_queue` package. `dox make:job` makes it when it is missing.
+These commands run the app script `bin/queue.dart` with `dart run`. A new project already has it. It uses the `dox_queue` package.
 Input, output and errors go straight to your terminal. `Ctrl+C` (SIGINT) and SIGTERM are sent on to the script, so a worker can finish its job and stop. The exit code of the script is the exit code of `dox`.
 When `bin/queue.dart` is missing, the command prints how to set it up and exits with code 1.
 
 | Command | Runs | What it does |
 | --- | --- | --- |
-| `dox make:job <name>` | | Make `lib/app/jobs/<name>.job.dart` with a `@Job()` class that extends `DoxJob`. Make `bin/queue.dart` when it is missing. Print a hint to add `dox_queue` to `pubspec.yaml` and to run `dox build_runner:build`. |
+| `dox make:job <name>` | | Make `lib/app/jobs/<name>.job.dart` with a `@Job()` class that extends `DoxJob`. A trailing `Job` in the name is removed. Make `bin/queue.dart` when it is missing. Print a hint to add `dox_queue` to `pubspec.yaml` when it is not there, and to run `dox build_runner:build` (it makes `lib/generated/jobs.g.dart`). |
 | `dox queue:work [flags]` | `bin/queue.dart work [flags]` | Run the worker. |
 | `dox queue:failed` | `bin/queue.dart failed` | List the failed jobs. |
 | `dox queue:retry <id\|all>` | `bin/queue.dart retry <id\|all>` | Put one failed job, or all of them, back on the queue. |
@@ -20602,27 +20781,28 @@ When `bin/queue.dart` is missing, the command prints how to set it up and exits 
 
 Flags of `queue:work`, passed on as they are:
 
-| Flag | Meaning |
-| --- | --- |
-| `--queue=a,b` | The queues to read, in this order. |
-| `--concurrency=N` | How many jobs run at the same time. |
-| `--once` | Run one job, then stop. |
-| `--tries=N` | How many times a job may run before it is marked as failed. |
-| `--timeout=S` | Seconds a job may run. |
-| `--sleep=S` | Seconds to wait when the queue is empty. |
-| `--stop-when-empty` | Stop when the queue is empty. |
+| Flag | Default | Meaning |
+| --- | --- | --- |
+| `--queue=a,b` | `default` | The queues to read, the first one first. |
+| `--concurrency=N` | `1` | How many jobs run at the same time in this process. |
+| `--once` | off | Run one job, then stop. |
+| `--tries=N` | `1` | How many times a job may run before it is marked as failed. A job can set its own `tries`. |
+| `--timeout=S` | `60` | Seconds a job may run. |
+| `--sleep=S` | `3` | Seconds to wait when the queues are empty. |
+| `--stop-when-empty` | off | Stop when the queues are empty. |
 
-The `bin/queue.dart` that `make:job` writes (`<app>` is the `name` in `pubspec.yaml`):
+An unknown flag or command prints the usage and exits with code 64.
+
+The `bin/queue.dart` of a new project (`<app>` is the `name` in `pubspec.yaml`). The jobs come from `queueConfig` in `lib/config/queue.dart`:
 
 ```dart
 import 'dart:io';
 
 import 'package:dox_queue/dox_queue.dart';
 import 'package:<app>/config/app.dart';
-import 'package:<app>/generated/jobs.g.dart';
 
 Future<void> main(List<String> args) async {
-  exitCode = await QueueWorker(jobs: jobRegistry, app: appConfig).run(args);
+  exitCode = await QueueWorker(app: appConfig).run(args);
 }
 ```
 
@@ -20630,7 +20810,7 @@ Templates: `createJob` and `queueEntrySource` in `packages/dox-cli/lib/src/tools
 
 ## Schedule
 
-These commands run the app script `bin/schedule.dart` with `dart run`. They pass the signals, the terminal and the exit code the same way as the queue commands.
+These commands run the app script `bin/schedule.dart` with `dart run`. A new project already has it. They pass the signals, the terminal and the exit code the same way as the queue commands.
 When `bin/schedule.dart` is missing, the command prints how to set it up and exits with code 1.
 
 | Command | Runs | What it does |
@@ -20640,19 +20820,19 @@ When `bin/schedule.dart` is missing, the command prints how to set it up and exi
 | `dox schedule:list` | `bin/schedule.dart list` | List the scheduled tasks. |
 | `dox schedule:test <name>` | `bin/schedule.dart test <name>` | Run one task now. |
 
-To set it up, add `dox_scheduler` to `pubspec.yaml`, then make two small files.
-The exact names come from the `dox_scheduler` package. This is the shape:
+You add tasks in `lib/config/schedule.dart`. These are the two files of a new project:
 
-```dart
-// lib/config/schedule.dart
+```dart title="lib/config/schedule.dart"
 import 'package:dox_scheduler/dox_scheduler.dart';
 
-final Schedule schedule = Schedule()
-  ..call('report', () async {/* your task */}).dailyAt('02:00');
+ScheduleConfig scheduleConfig = const ScheduleConfig();
+
+void schedule(Schedule s) {
+  // s.call('cleanup', cleanup).dailyAt('02:00');
+}
 ```
 
-```dart
-// bin/schedule.dart
+```dart title="bin/schedule.dart"
 import 'dart:io';
 
 import 'package:dox_scheduler/dox_scheduler.dart';
@@ -20667,6 +20847,8 @@ Future<void> main(List<String> args) async {
   ).run(args);
 }
 ```
+
+See [Scheduler](../digging-deeper/scheduler.md) for the task methods. See [Queue](../digging-deeper/queue.md) for jobs.
 
 ## Command list
 
@@ -20708,7 +20890,7 @@ Future<void> main(List<String> args) async {
 | `version` | `--version`, `-version`, `v`, `-v`, `--v` | System |
 | `update` | | System |
 | `env:check` | | System |
-| `help` | | System |
+| `help` | `--help`, `-h` | System |
 
 
 ---
@@ -20731,11 +20913,11 @@ The code reads env vars in three ways:
 
 ## Read by the framework
 
-If `APP_ENV` is not set, Dox treats the app as production: `/docs` is off and error details are hidden. Set `APP_ENV=development` in your `.env` and in CI.
+If `APP_ENV` is not set or empty, Dox treats the app as production: `/docs` is off and error details are hidden. Set `APP_ENV=development` in your `.env` and in CI.
 
 | Variable | Who reads it | Default | Meaning | Example |
 | --- | --- | --- | --- | --- |
-| `APP_ENV` | `dox_core` (`Dox().checkAppKey()`, `OpenApiConfig.isEnabled`) | empty | Any value except `development`, `local` or `test` (also empty) makes a bad `APP_KEY` a startup error: missing, not exactly 32 characters, or a public sample key. In `development`, `local` and `test` it is only a warning. `development` or `local` turn the `/docs` routes on when `openApi.enabled` is `null`. Read with `Env.get`. | `APP_ENV=production` |
+| `APP_ENV` | `dox_core`, `dox_auth`, `dox_view` | empty | Any value except `development`, `local` or `test` (also empty) makes a bad `APP_KEY` a startup error: missing, not exactly 32 characters, or a public sample key. The same rule applies to a JWT secret shorter than 32 bytes (`dox_auth`). In `development`, `local` and `test` both are only a warning. `development` or `local` also: show error details in `500` responses and in health check answers, turn the `/docs` routes on when `openApi.enabled` is `null`, and turn the template cache of `dox_view` off. `testing` as a real environment variable also loads `.env.testing` (see below). Read with `Env.get`. | `APP_ENV=production` |
 | `PORT` | `dox_core` (`DoxServer.portFor()`) | not set | The port to listen on, when `APP_PORT` is not set. Cloud Run, Fly, Render and Heroku set it. `APP_PORT` wins when both are set. Read with `Env.get`. | `PORT=8080` |
 | `APP_HOST` | `dox_core` (`DoxServer.hostFor()`) | not set (all interfaces, `::`) | The host to listen on. `127.0.0.1` keeps the app off the network, for an app behind a proxy on the same machine. `AppConfig.host` wins over it. Read with `Env.get`. | `APP_HOST=127.0.0.1` |
 | `DOX_HTTP_THREAD` | `dox_http_native` (Rust, `shared_thread()`) | not set (one thread per isolate) | `shared` puts the servers of all isolates on one network thread. Off by default: on 2 cores it cut req/s by a quarter. Real environment only (`std::env::var`), not `.env`. | `DOX_HTTP_THREAD=shared` |
@@ -20757,13 +20939,13 @@ A new project (`dox create`) reads these keys through its typed env class, `lib/
 | Variable | Getter | Type | Default | Used for |
 | --- | --- | --- | --- | --- |
 | `APP_NAME` | `appName` | `String` | `dox` | `LoggerConfig.name`. |
-| `APP_ENV` | `appEnv` | `String` | `production` | `development`, `staging` or `production`. `env.isDevelopment` is `true` for `development`. It turns on `prettyPrint` of the logger and the query log of the database. Also read by the framework (see above). |
+| `APP_ENV` | `appEnv` | `String` | `production` | `development`, `staging` or `production`. `env.isDevelopment` is `true` for `development`. It turns on `prettyPrint` of the logger and the query log of the database. Any value except `production` turns on `LogMiddleware` (one log line per request). Also read by the framework (see above). |
 | `APP_PORT` | `appPort` | `int` | `3000` | `AppConfig.serverPort`. When `APP_PORT` is not set, Dox listens on `PORT` if the env has it. |
 | `APP_KEY` | `appKey` | `String` | required | `AppConfig.appKey`. It must be exactly 32 characters. Run `dox key:generate` for one. The app stops at start when it is missing, has another length, or is a public sample key (only a warning in `development`, `local` and `test`). |
 | `APP_TOTAL_ISOLATE` | `appTotalIsolate` | `int?` | not set: one per CPU core | `AppConfig.totalIsolate`. |
 | `LOG_LEVEL` | `logLevel` | `String` | `info` | `LoggerConfig.level`. |
-| `CACHE_STORE` | `cacheStore` | `String` | `file` | `CacheConfig.defaultStore`: `memory`, `file` or `redis`. |
-| `STORAGE_DISK` | `storageDisk` | `String` | `local` | `StorageConfig.defaultDisk`: `local`, `s3` or `memory`. |
+| `CACHE_STORE` | `cacheStore` | `String` | `file` | `CacheConfig.defaultStore`. A new project has the stores `file` and `memory` in `lib/config/cache.dart`. Add a `redis` store there before you use it. |
+| `STORAGE_DISK` | `storageDisk` | `String` | `local` | `StorageConfig.defaultDisk`. A new project has the disk `local` in `lib/config/storage.dart`. Add an `s3` or `memory` disk there before you use it. |
 | `DB_CONNECTION` | `dbConnection` | `String` | `sqlite` | `DatabaseConfig.connection`: `sqlite`, `postgres` or `mysql`. |
 | `DB_NAME` | `dbName` | `String` | `db/dox.sqlite` | The database name. For SQLite: the file path. |
 | `DB_HOST` | `dbHost` | `String` | `localhost` | Database host. |
@@ -20805,8 +20987,9 @@ DB_PASSWORD=postgres
 - A value in quotes (`"`, `'` or `` ` ``) is kept as it is, also a `#`. The quotes are removed.
 - An empty value, or the text `null`, counts as missing.
 - The file is read once per isolate, from the current working directory.
+- In tests (`dart test`, or `APP_ENV=testing` as a real environment variable), Dox also reads `.env.testing` next to `.env`. Its keys win over the keys of `.env`. A real environment variable still wins over both.
 
-`dox_migration` has its own simpler parser. It removes every quote character and does not strip `# note` comments. Keep comments on their own line.
+`dox_migration` has its own simpler parser. It removes every quote character and does not strip `# note` comments. It does not read `.env.testing`. Keep comments on their own line.
 
 
 ---
@@ -20817,14 +21000,14 @@ Source: https://dartondox.dev/latest/3.xreference/request-and-response/
 
 # Request and response
 
-A compact list of the members of `DoxRequest` and `DoxResponse`.
+A short list of the members of `DoxRequest`, `DoxResponse` and the response helpers.
 
 Examples and explanations are on the [Request](../the-basic/request.md) and [Response](../the-basic/response.md) pages.
 
 ## `DoxRequest`
 
 Source: `packages/dox-core/lib/http/request/dox_request.dart`. It implements `IDoxRequest` from `dox_annotation`.
-A middleware gets an `IDoxRequest`. A controller gets a `DoxRequest`. The members marked `IDoxRequest` are on both.
+A simple middleware (`IDoxMiddleware`) gets an `IDoxRequest`. A controller and a `next` middleware (`IDoxNextMiddleware`) get a `DoxRequest`. The members marked `IDoxRequest` are on both.
 
 ### Input
 
@@ -20842,6 +21025,7 @@ A middleware gets an `IDoxRequest`. A controller gets a `DoxRequest`. The member
 | `query` | `Map<String, dynamic>` | The query string. | no |
 | `param` | `Map<String, dynamic>` | The route params, like `{'id': '5'}`. | no |
 | `pathParams` | `Map<String, String>` | The route params as text. `null` values are left out. | no |
+| `bound<T>(String param)` | `T` | The value that `Route.bind` made for this route param. Throws `StateError` when there is none. | no |
 | `requestBody` | `RequestBody` | The body as it was read, for DTOs. | no |
 | `isJson()` | `bool` | The content type is JSON. | yes |
 | `isFormData()` | `bool` | The content type is form data (`multipart/form-data` or urlencoded). | yes |
@@ -20866,6 +21050,14 @@ A middleware gets an `IDoxRequest`. A controller gets a `DoxRequest`. The member
 | `referer()` | `String?` | The `Referer` header. | yes |
 | `locale` | `String?` | The first language of `Accept-Language`, like `th`. `null` when there is none or it is `*`. | no |
 | `auth` | `IAuth?` | The auth object set by `AuthMiddleware`, or `null`. | yes |
+| `expectsJson()` | `bool` | The client wants JSON: an `Accept` header with json, a JSON body, or `X-Requested-With: XMLHttpRequest`. An Inertia request is not. | no |
+
+### Session
+
+| Member | Returns | What it gives | On `IDoxRequest` |
+| --- | --- | --- | --- |
+| `session` | `Session` | The session of the request. Needs `SessionMiddleware`. Throws `StateError` without it. | no |
+| `hasSession` | `bool` | `true` when the request has a session. | no |
 
 ### Route and raw request
 
@@ -20886,17 +21078,28 @@ Every setter returns the same `DoxResponse`, so calls chain.
 | Member | Returns | What it does |
 | --- | --- | --- |
 | `DoxResponse(dynamic content)` | `DoxResponse` | The constructor. `content` can be a `String`, number, `Map`, `List`, a JSON serializable object, a `Stream<List<int>>`, a `File`, a `StreamFile` or a `DownloadableFile`. |
-| `response([dynamic content])` | `DoxResponse` | Top level helper. Same as `DoxResponse(content)`. |
 | `statusCode(int code)` | `DoxResponse` | Sets the status. Default `200`. |
+| `status` | `int?` | The status set with `statusCode()`, or `null` (which means `200`). |
 | `content(dynamic content)` | `DoxResponse` | Replaces the content. |
 | `getContent()` | `dynamic` | The content as it was given. |
 | `stream(Stream<List<int>> stream)` | `DoxResponse` | Sets a byte stream as content. |
 | `contentType(ContentType type)` | `DoxResponse` | Sets `Content-Type`. A `File` without it gets the type from its extension. |
-| `header(String key, dynamic value)` | `DoxResponse` | Adds one header. |
+| `header(String key, dynamic value)` | `DoxResponse` | Sets one header. A second call with the same key replaces the value. |
+| `headers` | `Map<String, dynamic>` | The headers set so far, by name. |
 | `withHeaders(Map<String, dynamic> values)` | `DoxResponse` | Replaces every header set so far with this map. |
 | `cookie(DoxCookie cookie, {bool setExpire = false})` | `DoxResponse` | Adds a `Set-Cookie` header. `setExpire: true` sends the cookie as expired, which removes it. |
 | `cache(Duration duration)` | `DoxResponse` | Sets `Cache-Control: max-age=<seconds>`. |
 | `process(HttpRequest request)` | `dynamic` | Internal. Writes headers, status, cookies and the body. |
+
+## Response helpers
+
+Top level functions in the same file. They give a `DoxResponse`.
+
+| Function | What it does |
+| --- | --- |
+| `response([dynamic content])` | Same as `DoxResponse(content)`. |
+| `redirect(String url, {int status = 302})` | A redirect to `url`. It sets the `Location` header. |
+| `back(DoxRequest req, {String fallback = '/'})` | A `302` redirect to the `Referer` header, or to `fallback` when there is none. |
 
 How the content is sent (`responseDataHandler` in `packages/dox-core/lib/http/http_response_handler.dart`):
 
@@ -20907,11 +21110,11 @@ How the content is sent (`responseDataHandler` in `packages/dox-core/lib/http/ht
 | `Map`, `List`, number, `bool`, object with `toJson()` | JSON, `Content-Type: application/json` |
 | `DateTime` | its ISO 8601 text |
 | `File` | streamed, with `Content-Length`, `Accept-Ranges` and one `Range` supported |
-| `StreamFile` | streamed with its content type |
-| `DownloadableFile` | streamed with `Content-Disposition: attachment` |
+| `StreamFile` | streamed with its content type. An HTML, XML or JavaScript type is sent as a download, in a sandbox. |
+| `DownloadableFile` | streamed with `Content-Disposition: attachment; filename="<name>"` |
 | `Stream<List<int>>` | streamed chunk by chunk |
 | `IHttpException` | its status and `toResponse()`, see [HTTP exceptions](http-exceptions.md) |
-| other `Exception` or `Error` | `500` with `toString()` as text |
+| other `Exception` or `Error` | `500` with `{"code": "server_error", "message": "Server Error"}`. When `APP_ENV` is `development` or `local`, the body is `toString()` as text. |
 
 A plain value returned from a controller (not a `DoxResponse`) is sent the same way. It only goes through a `DoxResponse` when `AppConfig.responseHandler` is set, or when it is a `File`, `StreamFile` or `DownloadableFile`.
 
@@ -20948,15 +21151,18 @@ abstract class IHttpException {
 ## The classes
 
 Every class takes the named parameters `message`, `errorCode` and `code`. The table shows the defaults.
+`message` is a `String`. Only `ValidationException` takes a `Map` too.
 
 | Class | Package | Status `code` | `errorCode` | Default `message` | Dox throws it when |
 | --- | --- | --- | --- | --- | --- |
 | `BadRequestException` | `dox_core` | `400` | `bad_request` | `Bad Request` | the body can not be read, like JSON that is not valid |
 | `UnAuthorizedException` | `dox_auth` | `401` | `unauthorized` | `Authentication failed` | `AuthMiddleware` finds no valid token |
-| `NotFoundHttpException` | `dox_core` | `404` | `not_found` | `Not Found` | a typed path param does not fit (`{id}` is not an `int`) |
+| `NotFoundHttpException` | `dox_core` | `404` | `not_found` | `Not Found` | no route fits the path, a typed path param does not fit (`{id}` is not an `int`), or a route model binding finds no row |
 | `PayloadTooLargeException` | `dox_core` | `413` | `payload_too_large` | `Payload Too Large` | the body is bigger than `maxBodySize` or `maxMultipartSize` |
 | `UnsupportedMediaTypeException` | `dox_core` | `415` | `unsupported_media_type` | `Unsupported Media Type` | a DTO reads a body that is not JSON and not form data |
+| `TokenMismatchException` | `dox_core` | `419` | `csrf_token_mismatch` | `CSRF token mismatch` | `CsrfMiddleware` finds no CSRF token, or a wrong one |
 | `ValidationException` | `dox_core` | `422` | `validation_failed` | `{}` (a `Map`) | a DTO or `req.validate()` finds bad input |
+| `TooManyRequestsException` | `dox_core` | `429` | `too_many_requests` | `Too Many Requests` | a `RateLimit` middleware sees too many requests |
 | `InternalErrorException` | `dox_core` | `500` | `server_error` | `Server Error` | never by itself; for your own use |
 | `QueryException` | `dox_core` | `500` | `sql_query_error` | `Error in sql query` | never by itself; for your own use |
 
@@ -20994,15 +21200,11 @@ content-type: application/json
 
 A request for a path that has no route answers like a `NotFoundHttpException` with the message `<METHOD> <path> not found`: `{"code":"not_found","message":"GET /nothing not found"}`. Your `responseHandler` gets it too, so you can change its shape.
 
-To send your own JSON shape from one exception, pass a map:
-
-```dart
-throw NotFoundHttpException(
-  message: <String, dynamic>{'error': 'not_found', 'message': 'Blog not found'},
-);
-```
+To send your own JSON shape, make your own exception class (see below) and override `toResponse()`.
 
 Other errors: any `Exception` or `Error` that is not an `IHttpException` gets `500` with `{"code": "server_error", "message": "Server Error"}`. When `APP_ENV` is `development` or `local`, the body is `error.toString()` as text instead. It is also passed to the `report` method of the [exception handler](../the-basic/errors.md). An `IHttpException` is not reported.
+
+A `ValidationException` on a request with a session (`SessionMiddleware`) that does not want JSON, like a form post, is not sent as JSON. Dox saves the errors and the old input in the session and redirects back.
 
 A `ValidationException` from `dox_validation` (thrown by `schema.parse()` in a controller) is turned into the `422` `ValidationException` of `dox_core` with the same errors.
 
@@ -21041,18 +21243,18 @@ Source: https://dartondox.dev/latest/3.xreference/production-checklist/
 
 # Production checklist
 
-Check each item before you deploy.
+This page lists what to check before you deploy a Dox app.
 
 Items marked **Dox limit** are things Dox does not do for you. You must handle them outside Dox.
 
 ## Secrets and config
 
-If `APP_ENV` is not set, Dox treats the app as production: `/docs` is off and error details are hidden. Set `APP_ENV=development` in your `.env` and in CI.
+If `APP_ENV` is empty or not set, Dox treats the app as production: `/docs` is off and error details are hidden. Set `APP_ENV=development` in your local `.env` and in CI.
 
 | Check | How | Read more |
 | --- | --- | --- |
 | `APP_KEY` is set, 32 characters and secret | `dox key:generate`, or a random value of exactly 32 characters in the real env. It signs JWT tokens and encrypts cookies. Never use the value from `.env.example`. | [Encryption](../security/encryption.md) |
-| `APP_ENV=production` | An empty `APP_KEY`, a key that is not exactly 32 characters, or an old sample key stops the app at start (`StateError`). Only `APP_ENV` `development`, `local` or `test` logs a warning instead. | [Env reference](env.md) |
+| `APP_ENV=production` | Set it, or leave it empty. In production, a bad `APP_KEY` stops the app at start with a `StateError`: an empty key, a key that is not exactly 32 characters, or a public sample key. Only with `APP_ENV` `development`, `local` or `test` does Dox log a warning instead. | [Env reference](env.md) |
 | The env is complete | Run `dox env:check` in CI or before the deploy. It exits with code 1 when a key is missing or bad. | [CLI](cli.md) |
 | No secrets in the image or in git | `.env` in `.dockerignore` and `.gitignore`. Pass values as env vars (`docker run -e`, `env_file:`, systemd `EnvironmentFile=`). `dox build` copies `.env.example` only. | [Docker](../guides/docker.md) |
 | No comments after values in `.env` | The app strips `# note`, but migrations keep it in the value. Put comments on their own line. | [Env reference](env.md) |
@@ -21099,7 +21301,7 @@ If `APP_ENV` is not set, Dox treats the app as production: `/docs` is off and er
 | Check | How | Read more |
 | --- | --- | --- |
 | Postgres or MySQL for a busy app | SQLite has one connection per isolate, and a query blocks the isolate. Use it for small apps only. With SQLite use an absolute file path, never `:memory:` with many isolates. | [Database](../database/index.md) |
-| Migrations run once per deploy | The new project runs `Migrator(migrations: migrations).migrate()` in `bin/server.dart` before `startServer()`. Or run `dart run bin/migrate.dart run` (or `dox migrate`) in CI. Do one, not both at the same time on many machines. | [Migration](../database/migration.md) |
+| Migrations run once per deploy | The new project runs `Migrator(...).migrate()` in `bin/server.dart` before `startServer()`. Or run `dox migrate` (same as `dart run bin/migrate.dart run`) once in CI. With many machines, run migrations in one place only, so two machines do not migrate at the same time. | [Migration](../database/migration.md) |
 | Migrations use the right database | `dox_migration` reads `.env` and the real env. A real env var wins, but a key that is only in an old `.env` is still used. Do not ship a `.env` next to the binary, or give `Migrator(config: ...)` your own config. | [Migration](../database/migration.md) |
 | Small MySQL migrations | MySQL saves `CREATE`, `ALTER` and `DROP` at once. A failed migration can leave half the changes. One table change per migration. | [Migration](../database/migration.md) |
 | Pool size fits the database | `extra: {'maxConnectionCount': 10}`. The Postgres and MySQL drivers share one pool per process, so the total is the pool size, not isolates x pool size. Keep it under the database `max_connections`. | [Database](../database/index.md) |
@@ -21112,7 +21314,7 @@ If `APP_ENV` is not set, Dox treats the app as production: `/docs` is off and er
 | --- | --- | --- |
 | JSON logs | `LoggerConfig(enabled: true, prettyPrint: false)`. The new project sets `prettyPrint` only when `APP_ENV=development`. | [App config](app-config.md) |
 | Log level | Set `LOG_LEVEL=warn` to print only warnings and errors. | [App config](app-config.md) |
-| Access logs in one place | `LogMiddleware` writes one line per request, every 20 ms. A hard kill can lose the last lines. Turn it off when the proxy already logs requests. | [Performance](../digging-deeper/performance.md) |
+| Access logs in one place | `LogMiddleware` writes one line per request. It writes them in batches, every 20 ms, so a hard kill can lose the last lines. The new project turns it off when `APP_ENV=production`, because the proxy already logs requests. | [Performance](../digging-deeper/performance.md) |
 | Errors go to your tracker | Extend `ExceptionHandler` and set `AppConfig.exceptionHandler`. Any non-HTTP error is passed to its `report` method. The client gets `500` with `server_error`. The error text is sent only when `APP_ENV` is `development` or `local`. | [Error handling](../the-basic/errors.md) |
 
 ## Health and shutdown
@@ -21165,7 +21367,7 @@ Source: https://dartondox.dev/latest/3.xreference/troubleshooting/
 
 # Troubleshooting
 
-Real problems, with the text you see, the cause and the fix.
+This page lists known problems, with the text you see, the cause and the fix.
 
 The texts come from the source code.
 
@@ -21188,7 +21390,7 @@ dox_http_native: sha256 of dox_http_native-<os>-<arch>.<ext> does not match
 dox_http_native: cargo build failed
 ```
 
-**Cause.** The build hook of `dox_http_native` (`hook/build.dart` in [its repo](https://github.com/dartondox/dox-http-native)) tries, in this order: the `lib_path` user define, a local `native/target/release` build, the GitHub release download, and `cargo build`. None worked. Common reasons:
+**Cause.** The build hook of `dox_http_native` (`hook/build.dart` in [its repo](https://github.com/dartondox/dox-http-native)) tries, in this order: the `lib_path` user define, a local `native/target/release` build, the GitHub release download, and `cargo build`. None of them worked. Common reasons:
 
 - No internet during `dart pub get`, or the release has no build for your OS and CPU (there are builds for macOS arm64 and x64, Linux x64 and arm64, Windows x64).
 - Rust is not installed, so the fallback `cargo build` can not run.
@@ -21226,10 +21428,10 @@ See [Native server](../digging-deeper/native-server.md), [Postgres native](../da
 **Symptom.** At start:
 
 ```
-SocketException: dox_http_native: bind failed (<code>), port = 3000
+SocketException: dox_http_native: bind failed (<code>) (OS Error: errno = <errno>), port = 3000
 ```
 
-`<code>` is `-1000` minus the OS error: `-1048` on macOS, `-1098` on Linux.
+`<errno>` is the OS error: `48` on macOS, `98` on Linux. `<code>` is `-1000` minus it: `-1048` on macOS, `-1098` on Linux.
 
 **Cause.** Another process listens on the port. Often it is an old `bin/server.dart` that `dox serve` did not stop, or a second copy of the app.
 
@@ -21261,7 +21463,7 @@ If that is not enough, delete the named `.g.dart` files and build again. New bui
 
 **Symptom.** The analyzer or the build says a name like `Uuid`, `Name`, `Range`, `Image` or `Schema` is an "ambiguous import".
 
-**Cause.** `dox_core` exports the validation rule names (`Uuid`, `Name`, `Range`, `Image`, ...). Another import has a class with the same name, like `package:uuid`. `dox_orm` also has a `Schema` class.
+**Cause.** `dox_core` exports the validation names of `dox_validation`: the rule annotations (`Uuid`, `Name`, `Range`, `Image`, ...) and the `Schema` class. Another import has a class with the same name, like `package:uuid`. `dox_orm` also has a `Schema` class.
 
 **Fix.** Hide the name you do not use in that file:
 
@@ -21282,38 +21484,26 @@ DB_PASSWORD="abc # 123"    -> abc # 123 (quotes keep the #)
 
 When a value must have ` #` in it (a space, then `#`), put the value in quotes. The quotes are removed.
 
-## `Hash.verify` throws on a bad hash
+## `Hash.make` throws on a long password
 
-**Symptom.**
-
-```
-Invalid argument(s) (salt): Invalid salt length (The length should be greater than or equal to 28): "..."
-```
-
-or
-
-```
-Invalid argument(s) (salt): Invalid salt version: "..."
-```
-
-or, when the password is long:
+**Symptom.** Saving a user, or registering, gives a `500`. The log shows:
 
 ```
 Invalid argument(s) (password): Password is too long (The length should be less than or equal to 72): "..."
 ```
 
-**Cause.** `Hash.verify(password, hash)` calls `BCrypt.checkpw` from the `bcrypt` package. It throws an `ArgumentError` when `hash` is not a bcrypt hash (it must start with `$2` and be at least 28 characters), for example when the column holds a plain password, an empty string or a hash from another algorithm. It also throws when the password is longer than 72 bytes.
+**Cause.** `Hash.make()` uses bcrypt from the `bcrypt` package. bcrypt throws an `ArgumentError` when the password is longer than 72 bytes.
 
-**Fix.**
+**Fix.** Refuse long passwords in your DTO, before you hash them:
 
-- Make sure every stored password went through `Hash.make()`. A plain password in the column is a bug in the code that saved it.
-- Check the hash before you compare it, and treat a bad one as a failed login:
+```dart
+@MaxLength(72)
+final String password;
+```
 
-    ```dart
-    bool ok = hash.startsWith(r'$2') && Hash.verify(password, hash);
-    ```
+`@MaxLength` counts characters, not bytes. A password with non-ASCII characters can still be over 72 bytes.
 
-- Refuse passwords longer than 72 bytes in your DTO, for example `@Length(max: 72)`.
+`Hash.verify(password, hash)` does not throw. It gives `false` when `hash` is not a valid bcrypt hash, for example a plain password or an empty string in the column. Make sure every stored password went through `Hash.make()`.
 
 For normal login use `Auth().attempt()` from `dox_auth`. See [Hashing](../security/hashing.md).
 
@@ -21341,7 +21531,7 @@ ALTER USER 'app'@'%' IDENTIFIED WITH mysql_native_password BY 'secret';
 
 **Symptom.** An `SqliteException` with `unable to open database file`, or an empty database after `dox build`.
 
-**Cause.** `database` is a file path. A relative path is relative to the folder you start the app from. `dox build` tells you to run `cd build/bundle && ./bin/server`, so `dox.sqlite` is then `build/bundle/dox.sqlite`. SQLite makes a missing file, but not a missing folder.
+**Cause.** `database` is a file path. A relative path is relative to the folder you start the app from. `dox build` tells you to run `cd build/bundle && ./bin/server`. So the default `DB_NAME=db/dox.sqlite` is then `build/bundle/db/dox.sqlite`. `dox build` does not copy your SQLite files into the bundle, so that database starts empty. SQLite makes a missing file, but not a missing folder.
 
 **Fix.**
 
@@ -21387,7 +21577,7 @@ Source: https://dartondox.dev/latest/3.xreference/errors/
 
 # Error index
 
-A lookup table of the messages Dox prints or throws. Search this page for the text you see.
+This page lists the messages Dox prints or throws, so you can search for the text you see.
 
 - `<...>` is a part that changes, like a name or a number.
 - Dart adds a prefix to some errors: `Bad state:` (`StateError`), `Invalid argument(s):` (`ArgumentError`), `Unsupported operation:` (`UnsupportedError`), `Exception:` (`Exception`).
@@ -21397,14 +21587,16 @@ A lookup table of the messages Dox prints or throws. Search this page for the te
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `APP_KEY is not set. Run `dox key:generate` and put the key in .env` | `appKey` is empty. A warning, or a `StateError` that stops the app when `APP_ENV=production`. | Run `dox key:generate`, or set `APP_KEY` in the env. |
+| `APP_KEY is not set. Run `dox key:generate` and put the key in .env` | `appKey` is empty. A `StateError` stops the app, unless `APP_ENV` is `development`, `local` or `test`. Then it is only a warning. | Run `dox key:generate`, or set `APP_KEY` in the env. |
+| `APP_KEY must be exactly 32 characters. Run `dox key:generate`` | The key is shorter or longer. Same rule as above. | Run `dox key:generate`. |
+| `APP_KEY is a public sample key. Run `dox key:generate` for a new one` | The key is a known sample key. Same rule as above. | Run `dox key:generate`. |
 | `Unsupported operation: dox_http_native did not load: <reason>. Fix: ...` | The native HTTP library is missing or from another version (`native library ABI <x>, expected <y>`). The app stops at start. | Do what the `Fix:` part says. See [Troubleshooting](troubleshooting.md#the-native-http-library-did-not-load). |
 | `Server started at http://<host>:<port> with <n> isolate (native)` | Normal start. `<host>` is the address it listens on: `[::]` means all interfaces. | Nothing. |
 | `Windows: the native server runs on one isolate` | Windows has no `SO_REUSEPORT`. | Nothing. |
 | `Socket.IO runs on <n> isolates: clients should use transports: ['websocket'] ...` | Socket.IO with more than one isolate and long-polling on. | Use a Redis adapter, and `transports: ['websocket']` in the client. |
 | `[dox] isolate <n> error: <error>` | An error killed a worker isolate. The stack is on the next line. | Fix the error. Dox restarts the isolate. |
 | `[dox] isolate <n> exited, restarting` | A worker isolate died. A new one starts after 1 second. | Look at the error line above it. |
-| `SocketException: dox_http_native: bind failed (<code>), port = <port>` | The port is in use. | See [Troubleshooting](troubleshooting.md#port-already-in-use). |
+| `SocketException: dox_http_native: bind failed (<code>) (OS Error: errno = <errno>), port = <port>` | The port is in use. | See [Troubleshooting](troubleshooting.md#port-already-in-use). |
 
 ## dox_core: routes and controllers
 
@@ -21412,7 +21604,9 @@ These stop the app at start, so a bad route never reaches a request.
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `Route <where>: the controller parameter type <T> is not known. Use DoxRequest, a @Dto class, a type from Route.bind, or String, int, double, num, bool for path params. ...` | A controller parameter has another type, the DTO is not in `AppConfig.dtos`, or there is no `Route.bind<T>` for a `{param}` of the route. | Change the type, add the binder, or run `dart run build_runner build` and set `dtos: dtos`. |
+| `Route <where>: the controller parameter type <T> is not known. Use DoxRequest, a @Dto class, an @Inject class, a @DoxModel, a type from Route.bind, or String, int, double, num, bool for path params. ...` | A controller parameter has another type, the DTO is not in `AppConfig.dtos`, the class is not in the container, or there is no `Route.bind<T>` for a `{param}` of the route. | Change the type or add the binder. Run `dart run build_runner build`, and set `dtos: dtos` and `container: registerContainer` in `AppConfig`. |
+| `Route <where>: the action gives a function. Give it one controller parameter from the container, like (UserController c) => c.index. ...` | A route action like `(c) => c.index` where Dox can not find the controller class. | Give the parameter its type, and mark the controller class with `@Inject()`. |
+| `Bad state: <T> is not in the container. Add @Inject() above the class and run `dart run build_runner build`. ...` | Dox needs a class that is not in the container. | Do what the text says, and set `AppConfig(container: registerContainer)`. |
 | `Route name "<name>" is used twice: <method> <path> and <method> <path>.` | Two routes have the same name. | Give one of them another name. |
 | `Invalid argument (name): No route has this name: "<name>"` | `route()` or `Route.url()` with a name that no route has. | Check the name and the group `name:` prefix. |
 | `Invalid argument(s): Route "<name>" (<path>) needs the param "<param>".` | `route()` without a value for a `{param}`. | Pass it in `params:`. |
@@ -21443,11 +21637,13 @@ The table shows the `message` text.
 | Status | Message | When | What to do |
 | --- | --- | --- | --- |
 | `404` | `<METHOD> <path> not found` | No route matches. | Check the method, the path and the router `prefix`. |
-| `404` | `Not Found` | A typed path param does not fit, like `abc` for `int id`. | Send a valid value. |
+| `404` | `Not Found` | A typed path param does not fit, like `abc` for `int id`, or a `Route.bind` finds no row. | Send a valid value. |
 | `400` | `The body is not valid JSON` | A DTO reads a JSON body that does not parse. | Send valid JSON. |
 | `400` | `The form body is not valid` | A urlencoded body that can not be decoded. | Fix the client encoding. |
 | `415` | `Unsupported Media Type` | A DTO reads a body that is not JSON or form data. | Send `Content-Type: application/json` or form data. |
 | `413` | `Payload Too Large` | The body is bigger than `maxBodySize` or `maxMultipartSize`. | Send less, or raise the limit. |
+| `419` | `CSRF token mismatch` | `CsrfMiddleware` finds no CSRF token, or a wrong one, on a `POST`, `PUT`, `PATCH` or `DELETE`. | Send the token. See [CSRF](../security/csrf.md). |
+| `429` | `Too Many Requests` | A `RateLimit` middleware sees too many requests. The `Retry-After` header says how many seconds to wait. | Wait, then try again. See [Rate limiting](../security/rate-limiting.md). |
 | `422` | `{"_root":"The input has too many items (max 1000) or levels (max 10)"}` | Form or query keys with more than 1000 list items or 10 levels. | Send less nested data. |
 | `422` | `{"<field>":"<message>"}` | A DTO check failed. | See [Validation rules](../the-basic/validation-rules.md). |
 | `431` | (no text) | Native server: request line plus headers over 16 KB. | Send smaller headers or cookies. |
@@ -21457,6 +21653,7 @@ The table shows the `message` text.
 
 | Text | When | What to do |
 | --- | --- | --- |
+| `Bad state: This request has no session. Add SessionMiddleware() to globalMiddleware or to the route.` | `req.session` on a route with no `SessionMiddleware`. | Do what the text says. See [Session](../the-basic/session.md). |
 | `Bad state: <T> is not a known DTO. Add @Dto() to it, run `dart run build_runner build` and set `dtos: dtos` (lib/generated/dtos.g.dart) in AppConfig.` | `req.validate<T>()` can not find `T`. | Do what the text says. |
 | `Invalid argument(s): Storage disk "<name>" has unknown driver "<type>"` | A disk in `StorageConfig` has a `driver` other than `local`, `s3` or `memory`. | Fix the driver name. |
 | `Invalid argument(s): Storage disk "<name>" needs the "<setting>" setting. It is missing or empty.` | An `s3` disk without `bucket`, `key` or `secret`, on its first use. | Set `AWS_BUCKET`, `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`. |
@@ -21465,16 +21662,18 @@ The table shows the `message` text.
 | `404` `file not found` | `Storage().stream()` or `download()` of a missing file. | Check the path. |
 | `Invalid argument (trustedProxies): not an ip or cidr: "<value>"` | A bad entry in `AppConfig.trustedProxies`. | Use an IP, a CIDR like `10.0.0.0/8`, or `*`. |
 | `Invalid argument (type): must be asc or desc: "<value>"` | `orderBy(column, type)` with another direction. | Use `asc` or `desc`. |
-| `400` `decrypt_failed` | `AESEncryptor.decode` got changed text or a wrong key. It throws `DecryptException`. `req.cookie()` catches it and returns `null`. | Check the key. For a cookie, ask the user to log in again. |
+| `400` `decrypt_failed`, `The encrypted value is not valid` | `AESEncryptor.decode` got changed text or a wrong key. It throws `DecryptException`. `req.cookie()` catches it and returns `null`. | Check the key. For a cookie, ask the user to log in again. |
 
 ## dox_auth
 
 | Text | When | What to do |
 | --- | --- | --- |
 | `401` `Authentication failed` | `AuthMiddleware` finds no token, a bad or expired token, or the user is deleted. | Send `Authorization: Bearer <token>`. Log in again. |
-| `Invalid argument(s) (salt): Invalid salt length ...` | `Hash.verify()` with a value that is not a bcrypt hash. | See [Troubleshooting](troubleshooting.md#hashverify-throws-on-a-bad-hash). |
-| `Invalid argument(s) (password): Password is too long ...` | bcrypt with a password over 72 bytes. | Limit the length in the DTO. |
+| `Invalid argument(s) (password): Password is too long ...` | `Hash.make()` with a password over 72 bytes. | Limit the length in the DTO. See [Troubleshooting](troubleshooting.md#hashmake-throws-on-a-long-password). |
+| `Invalid argument(s) (secret): The JWT secret is empty. Set APP_KEY (run `dox key:generate`).` | `JwtAuthDriver` with an empty secret. | Set `APP_KEY`. |
+| `Invalid argument(s) (secret): The JWT secret is <n> bytes. It must be at least 32 bytes. ...` | A short secret. In `development`, `local` and `test` it is only a warning. | Run `dox key:generate`. |
 
+`Hash.verify()` gives `false` for a value that is not a bcrypt hash. It does not throw.
 `Auth().attempt()` returns `null` for a wrong password. It does not throw. See [Authentication](../security/authentication.md).
 
 ## dox_orm
@@ -21510,8 +21709,8 @@ The table shows the `message` text.
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `Exception: Could not connect to database: <error>` | The migrator can not open the database. | Check `DATABASE_URL` or the `DB_*` values. A real env var wins over `.env`. |
-| `Unknown migration command: <cmd> (use run, rollback, reset, refresh or status)` | `dart run bin/migrate.dart <cmd>` with another command. | Use one of the five. |
+| `Migration failed: <name>` then the error | A migration threw, or the migrator can not reach the database. | Read the error below it. For a connection error, check `DATABASE_URL` or the `DB_*` values. A real env var wins over `.env`. |
+| `Unknown migration command: <cmd> (use run, rollback, reset, refresh, fresh or status)` | `dart run bin/migrate.dart <cmd>` with another command. | Use one of the six. |
 | `Invalid argument(s): Invalid option <x>, use --step=<count>` | `rollback` with a bad option. | Use `--step=2`. |
 | `Bad state: Migration <name> is both a Dart and a .sql migration` | Two files with the same name in `db/migration`. | Rename or delete one. |
 | `Bad state: foreign key check failed: <table> points to a missing <parent> row` | SQLite: a migration left a broken foreign key. | Fix the data in the migration. |
@@ -21519,6 +21718,8 @@ The table shows the `message` text.
 | `Migrations are already up to date!` | Nothing to run. | Nothing. |
 | `Nothing to rollback!` | No batch to undo. | Nothing. |
 | `No migrations found.` | `status` with no migrations. | Check `db/migration`. |
+| `Bad state: Seeder <name> not found. Seeders: <names>` | `dox db:seed --class=<name>` with a seeder that is not in `db/seeders/seeders.dart`. | Check the name, or add the seeder to the list. |
+| `Invalid argument(s): Unknown option <x>, use --class=<name>` | `dox db:seed` with another option. | Use `--class=UserSeeder`. |
 
 See [Migration](../database/migration.md).
 

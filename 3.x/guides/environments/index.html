@@ -6497,7 +6497,7 @@
 <li>A nullable getter with no body is optional: <code>int? get dbPort;</code> is <code>null</code> when the key is not set.</li>
 <li>Any other getter with no body is required: <code>String get appKey;</code>.</li>
 </ul>
-<p>A missing required key stops the app at start, with a list of all problems. The part file <code>env.g.dart</code> is made by <code>build_runner</code> and is in <code>.gitignore</code>.</p>
+<p>A missing required key stops the app at start, with a list of all problems. The part file <code>env.g.dart</code> is made by <code>build_runner</code>.</p>
 <h2 id="2-add-a-key">2. Add a key</h2>
 <p>Say the app needs a mail host. Add one getter to <code>AppEnv</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="w">  </span><span class="c1">/// the SMTP server for mails</span>
@@ -6601,7 +6601,8 @@
 <p><code>APP_KEY</code> encrypts cookies and signs JWT tokens and local signed URLs.</p>
 <ul>
 <li>Make one per environment with <code>dox key:generate</code>. Never share the production key with staging.</li>
-<li>When <code>APP_ENV=production</code> and <code>APP_KEY</code> is empty, the app does not start.</li>
+<li><code>APP_KEY</code> must be exactly 32 characters. <code>dox key:generate</code> makes a key of the right length.</li>
+<li>When <code>APP_ENV</code> is not <code>development</code>, <code>local</code> or <code>test</code>, a bad key stops the app at start: empty, not 32 characters, or a public sample key. An empty <code>APP_ENV</code> counts as production. In development the app only logs a warning.</li>
 <li>A new key makes every cookie, token and signed URL invalid. Every user is logged out. Plan it.</li>
 </ul>
 <h2 id="6-check-the-env-before-a-deploy">6. Check the env before a deploy</h2>

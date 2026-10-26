@@ -6601,23 +6601,35 @@
 <tbody>
 <tr>
 <td><code>bin/server.dart</code></td>
-<td>starts the app: <code>Dox().initialize()</code>, migrations, <code>startServer()</code></td>
+<td>starts the app: <code>Dox().initialize()</code>, migrations, <code>Dox().startServer()</code></td>
 </tr>
 <tr>
 <td><code>bin/migrate.dart</code></td>
 <td>runs migrations for <code>dox migration:*</code></td>
 </tr>
 <tr>
+<td><code>bin/seed.dart</code></td>
+<td>runs seeders for <code>dox db:seed</code></td>
+</tr>
+<tr>
+<td><code>bin/queue.dart</code></td>
+<td>the queue worker for <code>dox queue:*</code></td>
+</tr>
+<tr>
+<td><code>bin/schedule.dart</code></td>
+<td>the scheduler for <code>dox schedule:*</code></td>
+</tr>
+<tr>
 <td><code>bin/openapi.dart</code></td>
-<td>writes the OpenAPI files for <code>dox openapi:generate</code></td>
+<td>you add it: writes the OpenAPI files for <code>dox openapi:generate</code></td>
 </tr>
 <tr>
 <td><code>lib/config/</code></td>
-<td><code>app.dart</code> (<code>AppConfig</code>), <code>env.dart</code>, <code>database.dart</code>, <code>cors.dart</code>, <code>cache.dart</code>, <code>storage.dart</code>, <code>openapi.dart</code>, <code>logger.dart</code>, <code>socketio.dart</code></td>
+<td><code>app.dart</code> (<code>AppConfig</code>), <code>env.dart</code>, <code>database.dart</code>, <code>cors.dart</code>, <code>cache.dart</code>, <code>storage.dart</code>, <code>logger.dart</code>, <code>queue.dart</code>, <code>schedule.dart</code>. You add others, like <code>openapi.dart</code>.</td>
 </tr>
 <tr>
 <td><code>lib/routes/</code></td>
-<td><code>api.dart</code>, <code>web.dart</code>, <code>websocket.dart</code>: one <code>Router</code> class each</td>
+<td><code>api.dart</code>, <code>web.dart</code>: one <code>Router</code> class each</td>
 </tr>
 <tr>
 <td><code>lib/app/http/controllers/</code></td>
@@ -6640,16 +6652,24 @@
 <td><code>&lt;name&gt;.model.dart</code></td>
 </tr>
 <tr>
-<td><code>lib/providers/</code></td>
-<td><code>DoxProvider</code> classes: ORM, auth, websocket</td>
+<td><code>lib/app/jobs/</code></td>
+<td><code>&lt;name&gt;.job.dart</code></td>
 </tr>
 <tr>
-<td><code>lib/generated/container.g.dart</code>, <code>lib/generated/dtos.g.dart</code>, <code>lib/generated/openapi.g.dart</code></td>
-<td>made by <code>build_runner</code>. Do not edit.</td>
+<td><code>lib/providers/</code></td>
+<td><code>DoxProvider</code> classes: ORM, storage, queue, schedule. You add others, like auth.</td>
+</tr>
+<tr>
+<td><code>lib/generated/</code></td>
+<td><code>container.g.dart</code>, <code>openapi.g.dart</code>, <code>jobs.g.dart</code> and (when you have a DTO) <code>dtos.g.dart</code>. Made by <code>build_runner</code>. Do not edit.</td>
 </tr>
 <tr>
 <td><code>db/migration/</code></td>
 <td>migrations and <code>migrations.dart</code> (the registry)</td>
+</tr>
+<tr>
+<td><code>db/seeders/</code>, <code>db/factories/</code></td>
+<td>seeders (<code>seeders.dart</code> is the registry) and model factories</td>
 </tr>
 </tbody>
 </table>
@@ -6666,12 +6686,17 @@
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>dox<span class="w"> </span>make:middleware<span class="w"> </span>Auth
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>dox<span class="w"> </span>make:dto<span class="w"> </span>CreateBlog
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>dox<span class="w"> </span>make:serializer<span class="w"> </span>Blog
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>dox<span class="w"> </span>make:model<span class="w"> </span>Blog<span class="w"> </span>-m<span class="w">           </span><span class="c1"># model + migration</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>dox<span class="w"> </span>make:model<span class="w"> </span>Blog<span class="w"> </span>-m<span class="w">             </span><span class="c1"># model + migration</span>
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>dox<span class="w"> </span>make:migration<span class="w"> </span>create_blogs_table<span class="w"> </span><span class="o">[</span>--sql<span class="o">]</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>dox<span class="w"> </span>migrate<span class="w">                        </span><span class="c1"># migration:run</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>dox<span class="w"> </span>migration:rollback<span class="w"> </span>--step<span class="o">=</span><span class="m">1</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>dox<span class="w"> </span>migration:status
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>dox<span class="w"> </span>openapi:generate<span class="w"> </span><span class="o">[</span>dir<span class="o">]</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>dox<span class="w"> </span>make:job<span class="w"> </span>SendWelcomeEmail
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>dox<span class="w"> </span>migrate<span class="w">                        </span><span class="c1"># migration:run</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>dox<span class="w"> </span>migrate<span class="w"> </span>--seed<span class="w">                 </span><span class="c1"># then run the seeders</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>dox<span class="w"> </span>migration:rollback<span class="w"> </span>--step<span class="o">=</span><span class="m">1</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>dox<span class="w"> </span>migration:status
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>dox<span class="w"> </span>db:seed<span class="w"> </span><span class="o">[</span>--class<span class="o">=</span>UserSeeder<span class="o">]</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>dox<span class="w"> </span>queue:work<span class="w">                     </span><span class="c1"># run queued jobs</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>dox<span class="w"> </span>schedule:work<span class="w">                  </span><span class="c1"># run scheduled tasks</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>dox<span class="w"> </span>openapi:generate<span class="w"> </span><span class="o">[</span>dir<span class="o">]</span>
 </span></code></pre></div>
 <p>See <a href="../cli/">CLI</a>.</p>
 <h2 id="routes">Routes</h2>
@@ -6741,8 +6766,12 @@
 <td><code>index</code>, <code>create</code>, <code>store</code>, <code>show</code>, <code>edit</code>, <code>update</code>, <code>destroy</code></td>
 </tr>
 <tr>
+<td><code>Route.health('/health')</code></td>
+<td><code>200 {"status": "ok"}</code>, or <code>503</code> when a check fails. See <a href="../../digging-deeper/health-check/">Health check</a>.</td>
+</tr>
+<tr>
 <td><code>Storage.route('files')</code></td>
-<td>serve a storage disk, signed URLs only (<code>dox_storage</code>)</td>
+<td>serve a storage disk. Only signed URLs work, unless <code>signed: false</code> (<code>dox_storage</code>)</td>
 </tr>
 <tr>
 <td><code>Route.enabledCors(() { ... })</code> / <code>Route.disabledCors(...)</code></td>

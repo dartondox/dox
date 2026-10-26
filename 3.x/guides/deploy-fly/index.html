@@ -6568,10 +6568,12 @@ If the database asks for TLS, add <code>?sslmode=require</code> to the url with 
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>fly<span class="w"> </span>status<span class="w">    </span><span class="c1"># the machines and their state</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>fly<span class="w"> </span>logs<span class="w">      </span><span class="c1"># the app logs, live</span>
 </span></code></pre></div>
-<p>The first log lines after a start:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>Migrating: 2026_10_22_205345_create_posts_table
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>Migrated: 2026_10_22_205345_create_posts_table
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>{"level":"INFO","name":"dox","message":"Server started at http://[::]:3000 with 1 isolate (native)", ...}
+<p>The first log lines after the first start:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>Migrating: 2023_07_16_131937700_create_users_table
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>Migrated: 2023_07_16_131937700_create_users_table
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>Migrating: 2026_10_22_205345_create_posts_table
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>Migrated: 2026_10_22_205345_create_posts_table
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>{"level":"INFO","name":"dox","message":"Server started at http://[::]:3000 with 1 isolate (native)", ...}
 </span></code></pre></div>
 <h2 id="https-and-the-client-ip">HTTPS and the client IP</h2>
 <p>Fly.io ends TLS and sends plain HTTP to port 3000. <code>force_https = true</code> sends HTTP visitors to HTTPS.

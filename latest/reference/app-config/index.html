@@ -6449,7 +6449,7 @@
 <td><code>appKey</code></td>
 <td><code>String</code></td>
 <td>required</td>
-<td>Encrypts cookies (<code>req.cookie()</code>, <code>DoxCookie</code>) and signs local storage URLs. In production the app stops at start when it is empty. Make one with <code>dox key:generate</code>.</td>
+<td>Encrypts cookies (<code>req.cookie()</code>, <code>DoxCookie</code>) and signs local storage URLs. It must be exactly 32 characters. The app stops at start when it is empty, has another length, or is a public sample key. When <code>APP_ENV</code> is <code>development</code>, <code>local</code> or <code>test</code>, this is only a warning. Make one with <code>dox key:generate</code>.</td>
 </tr>
 <tr>
 <td><code>serverPort</code></td>
@@ -7184,6 +7184,12 @@ Source: <code>lib/src/dox/socket_io_config.dart</code> in <a href="https://githu
 <td>Biggest message in bytes a client may send.</td>
 </tr>
 <tr>
+<td><code>maxAttachments</code></td>
+<td><code>int</code></td>
+<td><code>10</code></td>
+<td>Most binary attachments in one packet. A packet with more closes that client.</td>
+</tr>
+<tr>
 <td><code>transports</code></td>
 <td><code>List&lt;String&gt;</code></td>
 <td><code>['polling', 'websocket']</code></td>
@@ -7436,6 +7442,7 @@ Source: <code>packages/dox-orm/lib/src/types/database_config.dart</code> and <co
 </tr>
 </tbody>
 </table>
+<p>The <code>database.dart</code> of a new project also sets <code>maxConnectionAge</code> for Postgres and <code>collation</code> for MySQL. The Postgres driver does not read <code>maxConnectionAge</code>, and no driver reads <code>collation</code>. So these two keys change nothing.</p>
 <h2 id="authconfig">AuthConfig</h2>
 <p>Auth is not a field of <code>AppConfig</code>. A provider calls <code>Auth.initialize(AuthConfig(...))</code> in its <code>setup()</code>.
 Source: <code>packages/dox-auth/lib/src/interfaces.dart</code>.</p>
@@ -7635,6 +7642,7 @@ Source: <code>packages/dox-auth/lib/src/interfaces.dart</code>.</p>
 </span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="p">}</span>
 </span></code></pre></div>
+<p>A new project also has <code>lib/config/storage.dart</code>, <code>queue.dart</code> and <code>schedule.dart</code>, with a provider for each in <code>lib/providers/</code>. See <a href="../../digging-deeper/file-storage/">File storage</a>, <a href="../../digging-deeper/queue/">Queue</a> and <a href="../../digging-deeper/scheduler/">Scheduler</a>.</p>
 <p>A new project has no <code>openapi.dart</code>, <code>socketio.dart</code> or auth provider. You add them when you need them. See <a href="../../packages/openapi/">OpenAPI</a>, <a href="../../packages/socketio/">Socket.IO</a> and <a href="../../security/authentication/">Authentication</a>.</p>
 
 

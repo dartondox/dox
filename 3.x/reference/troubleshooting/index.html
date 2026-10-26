@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Real problems, with the text you see, the cause and the fix.">
+        <meta name="description" content="This page lists known problems, with the text you see, the cause and the fix.">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Troubleshooting | Dox">
-  <meta property="og:description" content="Real problems, with the text you see, the cause and the fix.">
+  <meta property="og:description" content="This page lists known problems, with the text you see, the cause and the fix.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/reference/troubleshooting/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Troubleshooting | Dox">
-  <meta name="twitter:description" content="Real problems, with the text you see, the cause and the fix.">
+  <meta name="twitter:description" content="This page lists known problems, with the text you see, the cause and the fix.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -6074,10 +6074,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#hashverify-throws-on-a-bad-hash" class="md-nav__link">
+  <a href="#hashmake-throws-on-a-long-password" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Hash.verify throws on a bad hash
+        Hash.make throws on a long password
       
     </span>
   </a>
@@ -6316,10 +6316,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#hashverify-throws-on-a-bad-hash" class="md-nav__link">
+  <a href="#hashmake-throws-on-a-long-password" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Hash.verify throws on a bad hash
+        Hash.make throws on a long password
       
     </span>
   </a>
@@ -6396,7 +6396,7 @@
 
 
 <h1 id="troubleshooting">Troubleshooting</h1>
-<p>Real problems, with the text you see, the cause and the fix.</p>
+<p>This page lists known problems, with the text you see, the cause and the fix.</p>
 <p>The texts come from the source code.</p>
 <h2 id="the-native-http-library-did-not-load">The native HTTP library did not load</h2>
 <p><strong>Symptom.</strong> The app stops at start with this error:</p>
@@ -6410,7 +6410,7 @@
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>dox_http_native: sha256 of dox_http_native-&lt;os&gt;-&lt;arch&gt;.&lt;ext&gt; does not match
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>dox_http_native: cargo build failed
 </span></code></pre></div>
-<p><strong>Cause.</strong> The build hook of <code>dox_http_native</code> (<code>hook/build.dart</code> in <a href="https://github.com/dartondox/dox-http-native">its repo</a>) tries, in this order: the <code>lib_path</code> user define, a local <code>native/target/release</code> build, the GitHub release download, and <code>cargo build</code>. None worked. Common reasons:</p>
+<p><strong>Cause.</strong> The build hook of <code>dox_http_native</code> (<code>hook/build.dart</code> in <a href="https://github.com/dartondox/dox-http-native">its repo</a>) tries, in this order: the <code>lib_path</code> user define, a local <code>native/target/release</code> build, the GitHub release download, and <code>cargo build</code>. None of them worked. Common reasons:</p>
 <ul>
 <li>No internet during <code>dart pub get</code>, or the release has no build for your OS and CPU (there are builds for macOS arm64 and x64, Linux x64 and arm64, Windows x64).</li>
 <li>Rust is not installed, so the fallback <code>cargo build</code> can not run.</li>
@@ -6441,9 +6441,9 @@
 <p>See <a href="../../digging-deeper/native-server/">Native server</a>, <a href="../../database/postgres-native/">Postgres native</a> and <a href="../../database/mysql-native/">MySQL native</a>.</p>
 <h2 id="port-already-in-use">Port already in use</h2>
 <p><strong>Symptom.</strong> At start:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>SocketException: dox_http_native: bind failed (&lt;code&gt;), port = 3000
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>SocketException: dox_http_native: bind failed (&lt;code&gt;) (OS Error: errno = &lt;errno&gt;), port = 3000
 </span></code></pre></div>
-<p><code>&lt;code&gt;</code> is <code>-1000</code> minus the OS error: <code>-1048</code> on macOS, <code>-1098</code> on Linux.</p>
+<p><code>&lt;errno&gt;</code> is the OS error: <code>48</code> on macOS, <code>98</code> on Linux. <code>&lt;code&gt;</code> is <code>-1000</code> minus it: <code>-1048</code> on macOS, <code>-1098</code> on Linux.</p>
 <p><strong>Cause.</strong> Another process listens on the port. Often it is an old <code>bin/server.dart</code> that <code>dox serve</code> did not stop, or a second copy of the app.</p>
 <p><strong>Fix.</strong> Find and stop the process, or use another port.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>lsof<span class="w"> </span>-i<span class="w"> </span>:3000<span class="w">          </span><span class="c1"># macOS and Linux: who has the port</span>
@@ -6460,7 +6460,7 @@
 <p>If that is not enough, delete the named <code>.g.dart</code> files and build again. New build_runner versions have no <code>--delete-conflicting-outputs</code> flag, so the Dox CLI does not pass it.</p>
 <h2 id="ambiguous-import-uuid-name-or-schema">Ambiguous import: <code>Uuid</code>, <code>Name</code> or <code>Schema</code></h2>
 <p><strong>Symptom.</strong> The analyzer or the build says a name like <code>Uuid</code>, <code>Name</code>, <code>Range</code>, <code>Image</code> or <code>Schema</code> is an "ambiguous import".</p>
-<p><strong>Cause.</strong> <code>dox_core</code> exports the validation rule names (<code>Uuid</code>, <code>Name</code>, <code>Range</code>, <code>Image</code>, ...). Another import has a class with the same name, like <code>package:uuid</code>. <code>dox_orm</code> also has a <code>Schema</code> class.</p>
+<p><strong>Cause.</strong> <code>dox_core</code> exports the validation names of <code>dox_validation</code>: the rule annotations (<code>Uuid</code>, <code>Name</code>, <code>Range</code>, <code>Image</code>, ...) and the <code>Schema</code> class. Another import has a class with the same name, like <code>package:uuid</code>. <code>dox_orm</code> also has a <code>Schema</code> class.</p>
 <p><strong>Fix.</strong> Hide the name you do not use in that file:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="w"> </span><span class="k">hide</span><span class="w"> </span><span class="n">Uuid</span><span class="p">;</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="w"> </span><span class="k">hide</span><span class="w"> </span><span class="n">Schema</span><span class="p">;</span>
@@ -6472,29 +6472,17 @@
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="na">DB_PASSWORD</span><span class="o">=</span><span class="s">"abc # 123"</span><span class="w">    </span><span class="na">-&gt; abc # 123 (quotes keep the #)</span>
 </span></code></pre></div>
 <p>When a value must have <code>#</code> in it (a space, then <code>#</code>), put the value in quotes. The quotes are removed.</p>
-<h2 id="hashverify-throws-on-a-bad-hash"><code>Hash.verify</code> throws on a bad hash</h2>
-<p><strong>Symptom.</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Invalid argument(s) (salt): Invalid salt length (The length should be greater than or equal to 28): "..."
+<h2 id="hashmake-throws-on-a-long-password"><code>Hash.make</code> throws on a long password</h2>
+<p><strong>Symptom.</strong> Saving a user, or registering, gives a <code>500</code>. The log shows:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Invalid argument(s) (password): Password is too long (The length should be less than or equal to 72): "..."
 </span></code></pre></div>
-<p>or</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>Invalid argument(s) (salt): Invalid salt version: "..."
+<p><strong>Cause.</strong> <code>Hash.make()</code> uses bcrypt from the <code>bcrypt</code> package. bcrypt throws an <code>ArgumentError</code> when the password is longer than 72 bytes.</p>
+<p><strong>Fix.</strong> Refuse long passwords in your DTO, before you hash them:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nd">@MaxLength</span><span class="p">(</span><span class="m">72</span><span class="p">)</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">password</span><span class="p">;</span>
 </span></code></pre></div>
-<p>or, when the password is long:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Invalid argument(s) (password): Password is too long (The length should be less than or equal to 72): "..."
-</span></code></pre></div>
-<p><strong>Cause.</strong> <code>Hash.verify(password, hash)</code> calls <code>BCrypt.checkpw</code> from the <code>bcrypt</code> package. It throws an <code>ArgumentError</code> when <code>hash</code> is not a bcrypt hash (it must start with <code>$2</code> and be at least 28 characters), for example when the column holds a plain password, an empty string or a hash from another algorithm. It also throws when the password is longer than 72 bytes.</p>
-<p><strong>Fix.</strong></p>
-<ul>
-<li>Make sure every stored password went through <code>Hash.make()</code>. A plain password in the column is a bug in the code that saved it.</li>
-<li>
-<p>Check the hash before you compare it, and treat a bad one as a failed login:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hash</span><span class="p">.</span><span class="n">startsWith</span><span class="p">(</span><span class="s1">r'$2'</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">verify</span><span class="p">(</span><span class="n">password</span><span class="p">,</span><span class="w"> </span><span class="n">hash</span><span class="p">);</span>
-</span></code></pre></div>
-</li>
-<li>
-<p>Refuse passwords longer than 72 bytes in your DTO, for example <code>@Length(max: 72)</code>.</p>
-</li>
-</ul>
+<p><code>@MaxLength</code> counts characters, not bytes. A password with non-ASCII characters can still be over 72 bytes.</p>
+<p><code>Hash.verify(password, hash)</code> does not throw. It gives <code>false</code> when <code>hash</code> is not a valid bcrypt hash, for example a plain password or an empty string in the column. Make sure every stored password went through <code>Hash.make()</code>.</p>
 <p>For normal login use <code>Auth().attempt()</code> from <code>dox_auth</code>. See <a href="../../security/hashing/">Hashing</a>.</p>
 <h2 id="mysql-8-login-fails">MySQL 8 login fails</h2>
 <p><strong>Symptom.</strong> The connection to MySQL 8 is refused at login, while the same user works from the <code>mysql</code> client. Often the user was made with the default <code>caching_sha2_password</code> plugin.</p>
@@ -6523,11 +6511,11 @@
 </tbody>
 </table>
 <p>As a last resort, change the user on the server:</p>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">USER</span><span class="w"> </span><span class="s1">'app'</span><span class="o">@</span><span class="s1">'%'</span><span class="w"> </span><span class="n">IDENTIFIED</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="n">mysql_native_password</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="s1">'secret'</span><span class="p">;</span>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">USER</span><span class="w"> </span><span class="s1">'app'</span><span class="o">@</span><span class="s1">'%'</span><span class="w"> </span><span class="n">IDENTIFIED</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="n">mysql_native_password</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="s1">'secret'</span><span class="p">;</span>
 </span></code></pre></div>
 <h2 id="sqlite-the-database-file">SQLite: the database file</h2>
 <p><strong>Symptom.</strong> An <code>SqliteException</code> with <code>unable to open database file</code>, or an empty database after <code>dox build</code>.</p>
-<p><strong>Cause.</strong> <code>database</code> is a file path. A relative path is relative to the folder you start the app from. <code>dox build</code> tells you to run <code>cd build/bundle &amp;&amp; ./bin/server</code>, so <code>dox.sqlite</code> is then <code>build/bundle/dox.sqlite</code>. SQLite makes a missing file, but not a missing folder.</p>
+<p><strong>Cause.</strong> <code>database</code> is a file path. A relative path is relative to the folder you start the app from. <code>dox build</code> tells you to run <code>cd build/bundle &amp;&amp; ./bin/server</code>. So the default <code>DB_NAME=db/dox.sqlite</code> is then <code>build/bundle/db/dox.sqlite</code>. <code>dox build</code> does not copy your SQLite files into the bundle, so that database starts empty. SQLite makes a missing file, but not a missing folder.</p>
 <p><strong>Fix.</strong></p>
 <ul>
 <li>Use an absolute path, or make the folder first.</li>
@@ -6541,12 +6529,12 @@
 <p>Dox opens a file database with <code>journal_mode = WAL</code>, <code>synchronous = NORMAL</code>, <code>foreign_keys = ON</code> and <code>busy_timeout = 5000</code> (change it with <code>extra: {'busyTimeout': ...}</code>).</p>
 <h2 id="dox-command-not-found-after-dart-pub-global-activate"><code>dox: command not found</code> after <code>dart pub global activate</code></h2>
 <p><strong>Symptom.</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>zsh: command not found: dox
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>zsh: command not found: dox
 </span></code></pre></div>
 <p>right after <code>dart pub global activate dox ^3.0.0-alpha</code>.</p>
 <p><strong>Cause.</strong> <code>dart pub global activate</code> puts the <code>dox</code> script in <code>$HOME/.pub-cache/bin</code>. That folder is not in your <code>PATH</code>.</p>
 <p><strong>Fix.</strong> Add it to your shell profile and open a new terminal:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$PATH</span><span class="s2">"</span>:<span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.pub-cache/bin"</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$PATH</span><span class="s2">"</span>:<span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.pub-cache/bin"</span>
 </span></code></pre></div>
 <p>On Windows the folder is <code>%LOCALAPPDATA%\Pub\Cache\bin</code>.</p>
 <h2 id="other-startup-errors">Other startup errors</h2>

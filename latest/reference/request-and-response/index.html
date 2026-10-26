@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A compact list of the members of DoxRequest and DoxResponse.">
+        <meta name="description" content="A short list of the members of DoxRequest, DoxResponse and the response helpers.">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Request and response | Dox">
-  <meta property="og:description" content="A compact list of the members of DoxRequest and DoxResponse.">
+  <meta property="og:description" content="A short list of the members of DoxRequest, DoxResponse and the response helpers.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/reference/request-and-response/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Request and response | Dox">
-  <meta name="twitter:description" content="A compact list of the members of DoxRequest and DoxResponse.">
+  <meta name="twitter:description" content="A short list of the members of DoxRequest, DoxResponse and the response helpers.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -5903,6 +5903,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Session
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#route-and-raw-request" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5923,6 +5934,17 @@
     <span class="md-ellipsis">
       
         DoxResponse
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#response-helpers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Response helpers
       
     </span>
   </a>
@@ -6239,6 +6261,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Session
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#route-and-raw-request" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6259,6 +6292,17 @@
     <span class="md-ellipsis">
       
         DoxResponse
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#response-helpers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Response helpers
       
     </span>
   </a>
@@ -6291,11 +6335,11 @@
 
 
 <h1 id="request-and-response">Request and response</h1>
-<p>A compact list of the members of <code>DoxRequest</code> and <code>DoxResponse</code>.</p>
+<p>A short list of the members of <code>DoxRequest</code>, <code>DoxResponse</code> and the response helpers.</p>
 <p>Examples and explanations are on the <a href="../../the-basic/request/">Request</a> and <a href="../../the-basic/response/">Response</a> pages.</p>
 <h2 id="doxrequest"><code>DoxRequest</code></h2>
 <p>Source: <code>packages/dox-core/lib/http/request/dox_request.dart</code>. It implements <code>IDoxRequest</code> from <code>dox_annotation</code>.
-A middleware gets an <code>IDoxRequest</code>. A controller gets a <code>DoxRequest</code>. The members marked <code>IDoxRequest</code> are on both.</p>
+A simple middleware (<code>IDoxMiddleware</code>) gets an <code>IDoxRequest</code>. A controller and a <code>next</code> middleware (<code>IDoxNextMiddleware</code>) get a <code>DoxRequest</code>. The members marked <code>IDoxRequest</code> are on both.</p>
 <h3 id="input">Input</h3>
 <table>
 <thead>
@@ -6377,6 +6421,12 @@ A middleware gets an <code>IDoxRequest</code>. A controller gets a <code>DoxRequ
 <td><code>pathParams</code></td>
 <td><code>Map&lt;String, String&gt;</code></td>
 <td>The route params as text. <code>null</code> values are left out.</td>
+<td>no</td>
+</tr>
+<tr>
+<td><code>bound&lt;T&gt;(String param)</code></td>
+<td><code>T</code></td>
+<td>The value that <code>Route.bind</code> made for this route param. Throws <code>StateError</code> when there is none.</td>
 <td>no</td>
 </tr>
 <tr>
@@ -6506,6 +6556,37 @@ A middleware gets an <code>IDoxRequest</code>. A controller gets a <code>DoxRequ
 <td>The auth object set by <code>AuthMiddleware</code>, or <code>null</code>.</td>
 <td>yes</td>
 </tr>
+<tr>
+<td><code>expectsJson()</code></td>
+<td><code>bool</code></td>
+<td>The client wants JSON: an <code>Accept</code> header with json, a JSON body, or <code>X-Requested-With: XMLHttpRequest</code>. An Inertia request is not.</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<h3 id="session">Session</h3>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Returns</th>
+<th>What it gives</th>
+<th>On <code>IDoxRequest</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>session</code></td>
+<td><code>Session</code></td>
+<td>The session of the request. Needs <code>SessionMiddleware</code>. Throws <code>StateError</code> without it.</td>
+<td>no</td>
+</tr>
+<tr>
+<td><code>hasSession</code></td>
+<td><code>bool</code></td>
+<td><code>true</code> when the request has a session.</td>
+<td>no</td>
+</tr>
 </tbody>
 </table>
 <h3 id="route-and-raw-request">Route and raw request</h3>
@@ -6575,14 +6656,14 @@ Every setter returns the same <code>DoxResponse</code>, so calls chain.</p>
 <td>The constructor. <code>content</code> can be a <code>String</code>, number, <code>Map</code>, <code>List</code>, a JSON serializable object, a <code>Stream&lt;List&lt;int&gt;&gt;</code>, a <code>File</code>, a <code>StreamFile</code> or a <code>DownloadableFile</code>.</td>
 </tr>
 <tr>
-<td><code>response([dynamic content])</code></td>
-<td><code>DoxResponse</code></td>
-<td>Top level helper. Same as <code>DoxResponse(content)</code>.</td>
-</tr>
-<tr>
 <td><code>statusCode(int code)</code></td>
 <td><code>DoxResponse</code></td>
 <td>Sets the status. Default <code>200</code>.</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td><code>int?</code></td>
+<td>The status set with <code>statusCode()</code>, or <code>null</code> (which means <code>200</code>).</td>
 </tr>
 <tr>
 <td><code>content(dynamic content)</code></td>
@@ -6607,7 +6688,12 @@ Every setter returns the same <code>DoxResponse</code>, so calls chain.</p>
 <tr>
 <td><code>header(String key, dynamic value)</code></td>
 <td><code>DoxResponse</code></td>
-<td>Adds one header.</td>
+<td>Sets one header. A second call with the same key replaces the value.</td>
+</tr>
+<tr>
+<td><code>headers</code></td>
+<td><code>Map&lt;String, dynamic&gt;</code></td>
+<td>The headers set so far, by name.</td>
 </tr>
 <tr>
 <td><code>withHeaders(Map&lt;String, dynamic&gt; values)</code></td>
@@ -6628,6 +6714,30 @@ Every setter returns the same <code>DoxResponse</code>, so calls chain.</p>
 <td><code>process(HttpRequest request)</code></td>
 <td><code>dynamic</code></td>
 <td>Internal. Writes headers, status, cookies and the body.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="response-helpers">Response helpers</h2>
+<p>Top level functions in the same file. They give a <code>DoxResponse</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>response([dynamic content])</code></td>
+<td>Same as <code>DoxResponse(content)</code>.</td>
+</tr>
+<tr>
+<td><code>redirect(String url, {int status = 302})</code></td>
+<td>A redirect to <code>url</code>. It sets the <code>Location</code> header.</td>
+</tr>
+<tr>
+<td><code>back(DoxRequest req, {String fallback = '/'})</code></td>
+<td>A <code>302</code> redirect to the <code>Referer</code> header, or to <code>fallback</code> when there is none.</td>
 </tr>
 </tbody>
 </table>
@@ -6662,11 +6772,11 @@ Every setter returns the same <code>DoxResponse</code>, so calls chain.</p>
 </tr>
 <tr>
 <td><code>StreamFile</code></td>
-<td>streamed with its content type</td>
+<td>streamed with its content type. An HTML, XML or JavaScript type is sent as a download, in a sandbox.</td>
 </tr>
 <tr>
 <td><code>DownloadableFile</code></td>
-<td>streamed with <code>Content-Disposition: attachment</code></td>
+<td>streamed with <code>Content-Disposition: attachment; filename="&lt;name&gt;"</code></td>
 </tr>
 <tr>
 <td><code>Stream&lt;List&lt;int&gt;&gt;</code></td>
@@ -6678,7 +6788,7 @@ Every setter returns the same <code>DoxResponse</code>, so calls chain.</p>
 </tr>
 <tr>
 <td>other <code>Exception</code> or <code>Error</code></td>
-<td><code>500</code> with <code>toString()</code> as text</td>
+<td><code>500</code> with <code>{"code": "server_error", "message": "Server Error"}</code>. When <code>APP_ENV</code> is <code>development</code> or <code>local</code>, the body is <code>toString()</code> as text.</td>
 </tr>
 </tbody>
 </table>

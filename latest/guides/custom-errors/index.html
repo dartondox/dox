@@ -6366,17 +6366,17 @@
 <tr>
 <td>an <code>IHttpException</code>, like <code>NotFoundHttpException</code></td>
 <td>its <code>code</code></td>
-<td>sends its <code>message</code>. Does <strong>not</strong> call <code>report</code></td>
+<td>sends <code>{"code": ..., "message": ...}</code>. Does <strong>not</strong> call <code>report</code></td>
 </tr>
 <tr>
 <td>a validation error (bad DTO input)</td>
 <td><code>422</code></td>
-<td>sends the field errors. Does not call <code>report</code></td>
+<td>sends the field errors: <code>{"field": "message"}</code>. Does not call <code>report</code></td>
 </tr>
 <tr>
 <td>any other <code>Exception</code> or <code>Error</code></td>
 <td><code>500</code></td>
-<td>sends <code>Server Error</code> (the error text only in development). Calls <code>report</code></td>
+<td>sends <code>{"code":"server_error","message":"Server Error"}</code>. When <code>APP_ENV</code> is <code>development</code> or <code>local</code>, it sends the error text. Calls <code>report</code></td>
 </tr>
 </tbody>
 </table>
@@ -6427,10 +6427,14 @@
 </span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="w">      </span><span class="k">throw</span><span class="w"> </span><span class="n">ForbiddenException</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'The first user can not be deleted'</span><span class="p">);</span>
 </span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">    </span><span class="p">}</span>
 </span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">    </span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
-</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">delete</span><span class="p">();</span>
-</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'deleted'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">};</span>
-</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="p">}</span>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="w">    </span><span class="c1">/// 0 rows: the user was deleted after show() found it</span>
+</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="kd">await</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">delete</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="w">      </span><span class="k">throw</span><span class="w"> </span><span class="n">NotFoundHttpException</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'User </span><span class="si">$</span><span class="n">id</span><span class="s1"> not found'</span><span class="p">);</span>
+</span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'deleted'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">};</span>
+</span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-1-29"><a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="2-one-json-shape-for-every-error">2. One JSON shape for every error</h2>
 <p>The response handler sees every response before it is sent. For an error, the content is the exception object.
@@ -6482,7 +6486,8 @@ Turn it into your shape here.</p>
 </span><span id="__span-2-45"><a id="__codelineno-2-45" name="__codelineno-2-45" href="#__codelineno-2-45"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-2-46"><a id="__codelineno-2-46" name="__codelineno-2-46" href="#__codelineno-2-46"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>The last <code>if</code> matters. Without it, a <code>500</code> sends <code>error.toString()</code> to the client. That can show a SQL query or a file path.</p>
+<p>The last <code>if</code> gives a <code>500</code> your shape too, in every environment.
+Without it, the client gets the default body. When <code>APP_ENV</code> is <code>development</code> or <code>local</code>, that is the error text. It can show a SQL query or a file path.</p>
 <h2 id="3-log-unexpected-errors">3. Log unexpected errors</h2>
 <p>The <code>report</code> method of the exception handler runs for every <code>500</code>, and for errors outside a request (a future nobody awaited, a timer).</p>
 <div class="language-dart highlight"><span class="filename">lib/app/error_handler.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:convert'</span><span class="p">;</span>
@@ -6560,7 +6565,7 @@ Turn it into your shape here.</p>
 </tbody>
 </table>
 <p>After <code>GET /api/boom</code>, the server prints one line:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span><span class="nt">"level"</span><span class="p">:</span><span class="s2">"ERROR"</span><span class="p">,</span><span class="nt">"message"</span><span class="p">:</span><span class="s2">"Bad state: boom"</span><span class="p">,</span><span class="nt">"stack"</span><span class="p">:</span><span class="s2">"#0  ApiRouter.register.&lt;anonymous closure&gt; (package:my_app/routes/api.dart:40:44) ..."</span><span class="p">,</span><span class="nt">"timestamp"</span><span class="p">:</span><span class="s2">"2026-10-22T14:01:12.000Z"</span><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span><span class="nt">"level"</span><span class="p">:</span><span class="s2">"ERROR"</span><span class="p">,</span><span class="nt">"message"</span><span class="p">:</span><span class="s2">"Bad state: boom"</span><span class="p">,</span><span class="nt">"stack"</span><span class="p">:</span><span class="s2">"#0  ApiRouter.register.&lt;anonymous closure&gt; (package:my_app/routes/api.dart:41:44) ..."</span><span class="p">,</span><span class="nt">"timestamp"</span><span class="p">:</span><span class="s2">"2026-10-22T14:01:12.000Z"</span><span class="p">}</span>
 </span></code></pre></div>
 <p>Remove the <code>/boom</code> route when you are done.</p>
 <div class="admonition note">

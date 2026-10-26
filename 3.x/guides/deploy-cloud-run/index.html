@@ -6494,10 +6494,12 @@ Dox listens on <code>APP_PORT</code>, or on <code>PORT</code> when <code>APP_POR
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>gcloud<span class="w"> </span>run<span class="w"> </span>services<span class="w"> </span>logs<span class="w"> </span><span class="nb">read</span><span class="w"> </span>blog<span class="w"> </span>--region<span class="w"> </span>europe-west1<span class="w"> </span>--limit<span class="w"> </span><span class="m">20</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>gcloud<span class="w"> </span>beta<span class="w"> </span>run<span class="w"> </span>services<span class="w"> </span>logs<span class="w"> </span>tail<span class="w"> </span>blog<span class="w"> </span>--region<span class="w"> </span>europe-west1<span class="w">   </span><span class="c1"># live, needs the log-streaming component</span>
 </span></code></pre></div>
-<p>The first log lines after a start:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Migrating: 2026_10_22_205345_create_posts_table
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>Migrated: 2026_10_22_205345_create_posts_table
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>{"level":"INFO","name":"dox","message":"Server started at http://[::]:3000 with 1 isolate (native)", ...}
+<p>The first log lines after the first start:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Migrating: 2023_07_16_131937700_create_users_table
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>Migrated: 2023_07_16_131937700_create_users_table
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>Migrating: 2026_10_22_205345_create_posts_table
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>Migrated: 2026_10_22_205345_create_posts_table
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>{"level":"INFO","name":"dox","message":"Server started at http://[::]:3000 with 1 isolate (native)", ...}
 </span></code></pre></div>
 <p>If the deploy fails with "the container did not listen on the port", the app listens on a different port than <code>--port</code>. Check <code>APP_PORT</code> and <code>--port</code>.</p>
 <h2 id="https-and-the-client-ip">HTTPS and the client IP</h2>

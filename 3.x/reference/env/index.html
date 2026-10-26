@@ -6245,7 +6245,7 @@
 <li><code>dox_migration</code> has its own <code>loadEnv()</code>: it reads <code>.env</code> and the real environment. A real environment variable wins, the same as <code>Env.get()</code>.</li>
 </ul>
 <h2 id="read-by-the-framework">Read by the framework</h2>
-<p>If <code>APP_ENV</code> is not set, Dox treats the app as production: <code>/docs</code> is off and error details are hidden. Set <code>APP_ENV=development</code> in your <code>.env</code> and in CI.</p>
+<p>If <code>APP_ENV</code> is not set or empty, Dox treats the app as production: <code>/docs</code> is off and error details are hidden. Set <code>APP_ENV=development</code> in your <code>.env</code> and in CI.</p>
 <table>
 <thead>
 <tr>
@@ -6259,9 +6259,9 @@
 <tbody>
 <tr>
 <td><code>APP_ENV</code></td>
-<td><code>dox_core</code> (<code>Dox().checkAppKey()</code>, <code>OpenApiConfig.isEnabled</code>)</td>
+<td><code>dox_core</code>, <code>dox_auth</code>, <code>dox_view</code></td>
 <td>empty</td>
-<td>Any value except <code>development</code>, <code>local</code> or <code>test</code> (also empty) makes a bad <code>APP_KEY</code> a startup error: missing, not exactly 32 characters, or a public sample key. In <code>development</code>, <code>local</code> and <code>test</code> it is only a warning. <code>development</code> or <code>local</code> turn the <code>/docs</code> routes on when <code>openApi.enabled</code> is <code>null</code>. Read with <code>Env.get</code>.</td>
+<td>Any value except <code>development</code>, <code>local</code> or <code>test</code> (also empty) makes a bad <code>APP_KEY</code> a startup error: missing, not exactly 32 characters, or a public sample key. The same rule applies to a JWT secret shorter than 32 bytes (<code>dox_auth</code>). In <code>development</code>, <code>local</code> and <code>test</code> both are only a warning. <code>development</code> or <code>local</code> also: show error details in <code>500</code> responses and in health check answers, turn the <code>/docs</code> routes on when <code>openApi.enabled</code> is <code>null</code>, and turn the template cache of <code>dox_view</code> off. <code>testing</code> as a real environment variable also loads <code>.env.testing</code> (see below). Read with <code>Env.get</code>.</td>
 <td><code>APP_ENV=production</code></td>
 </tr>
 <tr>
@@ -6382,7 +6382,7 @@
 <td><code>appEnv</code></td>
 <td><code>String</code></td>
 <td><code>production</code></td>
-<td><code>development</code>, <code>staging</code> or <code>production</code>. <code>env.isDevelopment</code> is <code>true</code> for <code>development</code>. It turns on <code>prettyPrint</code> of the logger and the query log of the database. Also read by the framework (see above).</td>
+<td><code>development</code>, <code>staging</code> or <code>production</code>. <code>env.isDevelopment</code> is <code>true</code> for <code>development</code>. It turns on <code>prettyPrint</code> of the logger and the query log of the database. Any value except <code>production</code> turns on <code>LogMiddleware</code> (one log line per request). Also read by the framework (see above).</td>
 </tr>
 <tr>
 <td><code>APP_PORT</code></td>
@@ -6417,14 +6417,14 @@
 <td><code>cacheStore</code></td>
 <td><code>String</code></td>
 <td><code>file</code></td>
-<td><code>CacheConfig.defaultStore</code>: <code>memory</code>, <code>file</code> or <code>redis</code>.</td>
+<td><code>CacheConfig.defaultStore</code>. A new project has the stores <code>file</code> and <code>memory</code> in <code>lib/config/cache.dart</code>. Add a <code>redis</code> store there before you use it.</td>
 </tr>
 <tr>
 <td><code>STORAGE_DISK</code></td>
 <td><code>storageDisk</code></td>
 <td><code>String</code></td>
 <td><code>local</code></td>
-<td><code>StorageConfig.defaultDisk</code>: <code>local</code>, <code>s3</code> or <code>memory</code>.</td>
+<td><code>StorageConfig.defaultDisk</code>. A new project has the disk <code>local</code> in <code>lib/config/storage.dart</code>. Add an <code>s3</code> or <code>memory</code> disk there before you use it.</td>
 </tr>
 <tr>
 <td><code>DB_CONNECTION</code></td>
@@ -6499,8 +6499,9 @@
 <li>A value in quotes (<code>"</code>, <code>'</code> or <code>`</code>) is kept as it is, also a <code>#</code>. The quotes are removed.</li>
 <li>An empty value, or the text <code>null</code>, counts as missing.</li>
 <li>The file is read once per isolate, from the current working directory.</li>
+<li>In tests (<code>dart test</code>, or <code>APP_ENV=testing</code> as a real environment variable), Dox also reads <code>.env.testing</code> next to <code>.env</code>. Its keys win over the keys of <code>.env</code>. A real environment variable still wins over both.</li>
 </ul>
-<p><code>dox_migration</code> has its own simpler parser. It removes every quote character and does not strip <code># note</code> comments. Keep comments on their own line.</p>
+<p><code>dox_migration</code> has its own simpler parser. It removes every quote character and does not strip <code># note</code> comments. It does not read <code>.env.testing</code>. Keep comments on their own line.</p>
 
 
 

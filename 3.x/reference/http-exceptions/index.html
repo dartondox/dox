@@ -6251,7 +6251,8 @@
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="the-classes">The classes</h2>
-<p>Every class takes the named parameters <code>message</code>, <code>errorCode</code> and <code>code</code>. The table shows the defaults.</p>
+<p>Every class takes the named parameters <code>message</code>, <code>errorCode</code> and <code>code</code>. The table shows the defaults.
+<code>message</code> is a <code>String</code>. Only <code>ValidationException</code> takes a <code>Map</code> too.</p>
 <table>
 <thead>
 <tr>
@@ -6286,7 +6287,7 @@
 <td><code>404</code></td>
 <td><code>not_found</code></td>
 <td><code>Not Found</code></td>
-<td>a typed path param does not fit (<code>{id}</code> is not an <code>int</code>)</td>
+<td>no route fits the path, a typed path param does not fit (<code>{id}</code> is not an <code>int</code>), or a route model binding finds no row</td>
 </tr>
 <tr>
 <td><code>PayloadTooLargeException</code></td>
@@ -6305,12 +6306,28 @@
 <td>a DTO reads a body that is not JSON and not form data</td>
 </tr>
 <tr>
+<td><code>TokenMismatchException</code></td>
+<td><code>dox_core</code></td>
+<td><code>419</code></td>
+<td><code>csrf_token_mismatch</code></td>
+<td><code>CSRF token mismatch</code></td>
+<td><code>CsrfMiddleware</code> finds no CSRF token, or a wrong one</td>
+</tr>
+<tr>
 <td><code>ValidationException</code></td>
 <td><code>dox_core</code></td>
 <td><code>422</code></td>
 <td><code>validation_failed</code></td>
 <td><code>{}</code> (a <code>Map</code>)</td>
 <td>a DTO or <code>req.validate()</code> finds bad input</td>
+</tr>
+<tr>
+<td><code>TooManyRequestsException</code></td>
+<td><code>dox_core</code></td>
+<td><code>429</code></td>
+<td><code>too_many_requests</code></td>
+<td><code>Too Many Requests</code></td>
+<td>a <code>RateLimit</code> middleware sees too many requests</td>
 </tr>
 <tr>
 <td><code>InternalErrorException</code></td>
@@ -6353,30 +6370,27 @@
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>{"email":"The email is not a valid email","name":"The name is required"}
 </span></code></pre></div>
 <p>A request for a path that has no route answers like a <code>NotFoundHttpException</code> with the message <code>&lt;METHOD&gt; &lt;path&gt; not found</code>: <code>{"code":"not_found","message":"GET /nothing not found"}</code>. Your <code>responseHandler</code> gets it too, so you can change its shape.</p>
-<p>To send your own JSON shape from one exception, pass a map:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">throw</span><span class="w"> </span><span class="n">NotFoundHttpException</span><span class="p">(</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nl">message:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'error'</span><span class="o">:</span><span class="w"> </span><span class="s1">'not_found'</span><span class="p">,</span><span class="w"> </span><span class="s1">'message'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Blog not found'</span><span class="p">},</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="p">);</span>
-</span></code></pre></div>
+<p>To send your own JSON shape, make your own exception class (see below) and override <code>toResponse()</code>.</p>
 <p>Other errors: any <code>Exception</code> or <code>Error</code> that is not an <code>IHttpException</code> gets <code>500</code> with <code>{"code": "server_error", "message": "Server Error"}</code>. When <code>APP_ENV</code> is <code>development</code> or <code>local</code>, the body is <code>error.toString()</code> as text instead. It is also passed to the <code>report</code> method of the <a href="../../the-basic/errors/">exception handler</a>. An <code>IHttpException</code> is not reported.</p>
+<p>A <code>ValidationException</code> on a request with a session (<code>SessionMiddleware</code>) that does not want JSON, like a form post, is not sent as JSON. Dox saves the errors and the old input in the session and redirects back.</p>
 <p>A <code>ValidationException</code> from <code>dox_validation</code> (thrown by <code>schema.parse()</code> in a controller) is turned into the <code>422</code> <code>ValidationException</code> of <code>dox_core</code> with the same errors.</p>
 <h2 id="make-your-own">Make your own</h2>
 <p>Extend <code>IHttpException</code> and set the three fields in the constructor:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ForbiddenException</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">IHttpException</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="n">ForbiddenException</span><span class="p">({</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="kt">dynamic</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'Forbidden'</span><span class="p">,</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="kt">String</span><span class="w"> </span><span class="n">errorCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'forbidden'</span><span class="p">,</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HttpStatus</span><span class="p">.</span><span class="n">forbidden</span><span class="p">,</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">  </span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">    </span><span class="k">super</span><span class="p">.</span><span class="n">code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">code</span><span class="p">;</span>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">    </span><span class="k">super</span><span class="p">.</span><span class="n">errorCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">errorCode</span><span class="p">;</span>
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">    </span><span class="k">super</span><span class="p">.</span><span class="n">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">message</span><span class="p">;</span>
-</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ForbiddenException</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">IHttpException</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="n">ForbiddenException</span><span class="p">({</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="kt">dynamic</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'Forbidden'</span><span class="p">,</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="kt">String</span><span class="w"> </span><span class="n">errorCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'forbidden'</span><span class="p">,</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HttpStatus</span><span class="p">.</span><span class="n">forbidden</span><span class="p">,</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">    </span><span class="k">super</span><span class="p">.</span><span class="n">code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">code</span><span class="p">;</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">    </span><span class="k">super</span><span class="p">.</span><span class="n">errorCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">errorCode</span><span class="p">;</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">    </span><span class="k">super</span><span class="p">.</span><span class="n">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">message</span><span class="p">;</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Override <code>toResponse()</code> to give every error of your app the same JSON shape.</p>
 <p>More examples are on the <a href="../../the-basic/response/#errors">Response</a> page.</p>

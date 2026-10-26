@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A lookup table of the messages Dox prints or throws. Search this page for the text you see.">
+        <meta name="description" content="This page lists the messages Dox prints or throws, so you can search for the text you see.">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Error index | Dox">
-  <meta property="og:description" content="A lookup table of the messages Dox prints or throws. Search this page for the text you see.">
+  <meta property="og:description" content="This page lists the messages Dox prints or throws, so you can search for the text you see.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/reference/errors/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Error index | Dox">
-  <meta name="twitter:description" content="A lookup table of the messages Dox prints or throws. Search this page for the text you see.">
+  <meta name="twitter:description" content="This page lists the messages Dox prints or throws, so you can search for the text you see.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -6520,7 +6520,7 @@
 
 
 <h1 id="error-index">Error index</h1>
-<p>A lookup table of the messages Dox prints or throws. Search this page for the text you see.</p>
+<p>This page lists the messages Dox prints or throws, so you can search for the text you see.</p>
 <ul>
 <li><code>&lt;...&gt;</code> is a part that changes, like a name or a number.</li>
 <li>Dart adds a prefix to some errors: <code>Bad state:</code> (<code>StateError</code>), <code>Invalid argument(s):</code> (<code>ArgumentError</code>), <code>Unsupported operation:</code> (<code>UnsupportedError</code>), <code>Exception:</code> (<code>Exception</code>).</li>
@@ -6538,8 +6538,18 @@
 <tbody>
 <tr>
 <td><code>APP_KEY is not set. Run</code>dox key:generate<code>and put the key in .env</code></td>
-<td><code>appKey</code> is empty. A warning, or a <code>StateError</code> that stops the app when <code>APP_ENV=production</code>.</td>
+<td><code>appKey</code> is empty. A <code>StateError</code> stops the app, unless <code>APP_ENV</code> is <code>development</code>, <code>local</code> or <code>test</code>. Then it is only a warning.</td>
 <td>Run <code>dox key:generate</code>, or set <code>APP_KEY</code> in the env.</td>
+</tr>
+<tr>
+<td><code>APP_KEY must be exactly 32 characters. Run</code>dox key:generate``</td>
+<td>The key is shorter or longer. Same rule as above.</td>
+<td>Run <code>dox key:generate</code>.</td>
+</tr>
+<tr>
+<td><code>APP_KEY is a public sample key. Run</code>dox key:generate<code>for a new one</code></td>
+<td>The key is a known sample key. Same rule as above.</td>
+<td>Run <code>dox key:generate</code>.</td>
 </tr>
 <tr>
 <td><code>Unsupported operation: dox_http_native did not load: &lt;reason&gt;. Fix: ...</code></td>
@@ -6572,7 +6582,7 @@
 <td>Look at the error line above it.</td>
 </tr>
 <tr>
-<td><code>SocketException: dox_http_native: bind failed (&lt;code&gt;), port = &lt;port&gt;</code></td>
+<td><code>SocketException: dox_http_native: bind failed (&lt;code&gt;) (OS Error: errno = &lt;errno&gt;), port = &lt;port&gt;</code></td>
 <td>The port is in use.</td>
 <td>See <a href="../troubleshooting/#port-already-in-use">Troubleshooting</a>.</td>
 </tr>
@@ -6590,9 +6600,19 @@
 </thead>
 <tbody>
 <tr>
-<td><code>Route &lt;where&gt;: the controller parameter type &lt;T&gt; is not known. Use DoxRequest, a @Dto class, a type from Route.bind, or String, int, double, num, bool for path params. ...</code></td>
-<td>A controller parameter has another type, the DTO is not in <code>AppConfig.dtos</code>, or there is no <code>Route.bind&lt;T&gt;</code> for a <code>{param}</code> of the route.</td>
-<td>Change the type, add the binder, or run <code>dart run build_runner build</code> and set <code>dtos: dtos</code>.</td>
+<td><code>Route &lt;where&gt;: the controller parameter type &lt;T&gt; is not known. Use DoxRequest, a @Dto class, an @Inject class, a @DoxModel, a type from Route.bind, or String, int, double, num, bool for path params. ...</code></td>
+<td>A controller parameter has another type, the DTO is not in <code>AppConfig.dtos</code>, the class is not in the container, or there is no <code>Route.bind&lt;T&gt;</code> for a <code>{param}</code> of the route.</td>
+<td>Change the type or add the binder. Run <code>dart run build_runner build</code>, and set <code>dtos: dtos</code> and <code>container: registerContainer</code> in <code>AppConfig</code>.</td>
+</tr>
+<tr>
+<td><code>Route &lt;where&gt;: the action gives a function. Give it one controller parameter from the container, like (UserController c) =&gt; c.index. ...</code></td>
+<td>A route action like <code>(c) =&gt; c.index</code> where Dox can not find the controller class.</td>
+<td>Give the parameter its type, and mark the controller class with <code>@Inject()</code>.</td>
+</tr>
+<tr>
+<td><code>Bad state: &lt;T&gt; is not in the container. Add @Inject() above the class and run</code>dart run build_runner build<code>. ...</code></td>
+<td>Dox needs a class that is not in the container.</td>
+<td>Do what the text says, and set <code>AppConfig(container: registerContainer)</code>.</td>
 </tr>
 <tr>
 <td><code>Route name "&lt;name&gt;" is used twice: &lt;method&gt; &lt;path&gt; and &lt;method&gt; &lt;path&gt;.</code></td>
@@ -6701,7 +6721,7 @@ The table shows the <code>message</code> text.</p>
 <tr>
 <td><code>404</code></td>
 <td><code>Not Found</code></td>
-<td>A typed path param does not fit, like <code>abc</code> for <code>int id</code>.</td>
+<td>A typed path param does not fit, like <code>abc</code> for <code>int id</code>, or a <code>Route.bind</code> finds no row.</td>
 <td>Send a valid value.</td>
 </tr>
 <tr>
@@ -6727,6 +6747,18 @@ The table shows the <code>message</code> text.</p>
 <td><code>Payload Too Large</code></td>
 <td>The body is bigger than <code>maxBodySize</code> or <code>maxMultipartSize</code>.</td>
 <td>Send less, or raise the limit.</td>
+</tr>
+<tr>
+<td><code>419</code></td>
+<td><code>CSRF token mismatch</code></td>
+<td><code>CsrfMiddleware</code> finds no CSRF token, or a wrong one, on a <code>POST</code>, <code>PUT</code>, <code>PATCH</code> or <code>DELETE</code>.</td>
+<td>Send the token. See <a href="../../security/csrf/">CSRF</a>.</td>
+</tr>
+<tr>
+<td><code>429</code></td>
+<td><code>Too Many Requests</code></td>
+<td>A <code>RateLimit</code> middleware sees too many requests. The <code>Retry-After</code> header says how many seconds to wait.</td>
+<td>Wait, then try again. See <a href="../../security/rate-limiting/">Rate limiting</a>.</td>
 </tr>
 <tr>
 <td><code>422</code></td>
@@ -6764,6 +6796,11 @@ The table shows the <code>message</code> text.</p>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td><code>Bad state: This request has no session. Add SessionMiddleware() to globalMiddleware or to the route.</code></td>
+<td><code>req.session</code> on a route with no <code>SessionMiddleware</code>.</td>
+<td>Do what the text says. See <a href="../../the-basic/session/">Session</a>.</td>
+</tr>
 <tr>
 <td><code>Bad state: &lt;T&gt; is not a known DTO. Add @Dto() to it, run</code>dart run build_runner build<code>and set</code>dtos: dtos<code>(lib/generated/dtos.g.dart) in AppConfig.</code></td>
 <td><code>req.validate&lt;T&gt;()</code> can not find <code>T</code>.</td>
@@ -6805,7 +6842,7 @@ The table shows the <code>message</code> text.</p>
 <td>Use <code>asc</code> or <code>desc</code>.</td>
 </tr>
 <tr>
-<td><code>400</code> <code>decrypt_failed</code></td>
+<td><code>400</code> <code>decrypt_failed</code>, <code>The encrypted value is not valid</code></td>
 <td><code>AESEncryptor.decode</code> got changed text or a wrong key. It throws <code>DecryptException</code>. <code>req.cookie()</code> catches it and returns <code>null</code>.</td>
 <td>Check the key. For a cookie, ask the user to log in again.</td>
 </tr>
@@ -6827,18 +6864,24 @@ The table shows the <code>message</code> text.</p>
 <td>Send <code>Authorization: Bearer &lt;token&gt;</code>. Log in again.</td>
 </tr>
 <tr>
-<td><code>Invalid argument(s) (salt): Invalid salt length ...</code></td>
-<td><code>Hash.verify()</code> with a value that is not a bcrypt hash.</td>
-<td>See <a href="../troubleshooting/#hashverify-throws-on-a-bad-hash">Troubleshooting</a>.</td>
+<td><code>Invalid argument(s) (password): Password is too long ...</code></td>
+<td><code>Hash.make()</code> with a password over 72 bytes.</td>
+<td>Limit the length in the DTO. See <a href="../troubleshooting/#hashmake-throws-on-a-long-password">Troubleshooting</a>.</td>
 </tr>
 <tr>
-<td><code>Invalid argument(s) (password): Password is too long ...</code></td>
-<td>bcrypt with a password over 72 bytes.</td>
-<td>Limit the length in the DTO.</td>
+<td><code>Invalid argument(s) (secret): The JWT secret is empty. Set APP_KEY (run</code>dox key:generate<code>).</code></td>
+<td><code>JwtAuthDriver</code> with an empty secret.</td>
+<td>Set <code>APP_KEY</code>.</td>
+</tr>
+<tr>
+<td><code>Invalid argument(s) (secret): The JWT secret is &lt;n&gt; bytes. It must be at least 32 bytes. ...</code></td>
+<td>A short secret. In <code>development</code>, <code>local</code> and <code>test</code> it is only a warning.</td>
+<td>Run <code>dox key:generate</code>.</td>
 </tr>
 </tbody>
 </table>
-<p><code>Auth().attempt()</code> returns <code>null</code> for a wrong password. It does not throw. See <a href="../../security/authentication/">Authentication</a>.</p>
+<p><code>Hash.verify()</code> gives <code>false</code> for a value that is not a bcrypt hash. It does not throw.
+<code>Auth().attempt()</code> returns <code>null</code> for a wrong password. It does not throw. See <a href="../../security/authentication/">Authentication</a>.</p>
 <h2 id="dox_orm">dox_orm</h2>
 <table>
 <thead>
@@ -6969,14 +7012,14 @@ The table shows the <code>message</code> text.</p>
 </thead>
 <tbody>
 <tr>
-<td><code>Exception: Could not connect to database: &lt;error&gt;</code></td>
-<td>The migrator can not open the database.</td>
-<td>Check <code>DATABASE_URL</code> or the <code>DB_*</code> values. A real env var wins over <code>.env</code>.</td>
+<td><code>Migration failed: &lt;name&gt;</code> then the error</td>
+<td>A migration threw, or the migrator can not reach the database.</td>
+<td>Read the error below it. For a connection error, check <code>DATABASE_URL</code> or the <code>DB_*</code> values. A real env var wins over <code>.env</code>.</td>
 </tr>
 <tr>
-<td><code>Unknown migration command: &lt;cmd&gt; (use run, rollback, reset, refresh or status)</code></td>
+<td><code>Unknown migration command: &lt;cmd&gt; (use run, rollback, reset, refresh, fresh or status)</code></td>
 <td><code>dart run bin/migrate.dart &lt;cmd&gt;</code> with another command.</td>
-<td>Use one of the five.</td>
+<td>Use one of the six.</td>
 </tr>
 <tr>
 <td><code>Invalid argument(s): Invalid option &lt;x&gt;, use --step=&lt;count&gt;</code></td>
@@ -7012,6 +7055,16 @@ The table shows the <code>message</code> text.</p>
 <td><code>No migrations found.</code></td>
 <td><code>status</code> with no migrations.</td>
 <td>Check <code>db/migration</code>.</td>
+</tr>
+<tr>
+<td><code>Bad state: Seeder &lt;name&gt; not found. Seeders: &lt;names&gt;</code></td>
+<td><code>dox db:seed --class=&lt;name&gt;</code> with a seeder that is not in <code>db/seeders/seeders.dart</code>.</td>
+<td>Check the name, or add the seeder to the list.</td>
+</tr>
+<tr>
+<td><code>Invalid argument(s): Unknown option &lt;x&gt;, use --class=&lt;name&gt;</code></td>
+<td><code>dox db:seed</code> with another option.</td>
+<td>Use <code>--class=UserSeeder</code>.</td>
 </tr>
 </tbody>
 </table>

@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Each guide solves one job from start to end. Copy the files, run the commands, and check the result. The reference pages explain each part in more detail...">
+        <meta name="description" content="Each guide solves one job from start to end: copy the files, run the commands, and check the result.">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Guides | Dox">
-  <meta property="og:description" content="Each guide solves one job from start to end. Copy the files, run the commands, and check the result. The reference pages explain each part in more detail...">
+  <meta property="og:description" content="Each guide solves one job from start to end: copy the files, run the commands, and check the result.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/guides/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Guides | Dox">
-  <meta name="twitter:description" content="Each guide solves one job from start to end. Copy the files, run the commands, and check the result. The reference pages explain each part in more detail...">
+  <meta name="twitter:description" content="Each guide solves one job from start to end: copy the files, run the commands, and check the result.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -6098,10 +6098,8 @@
 
 
 <h1 id="guides">Guides</h1>
-<p>Each guide solves one job from start to end. Copy the files, run the commands, and check the result.
-The reference pages explain each part in more detail. The guides link to them.</p>
-<p>The code of all guides is in one app on GitHub: <a href="https://github.com/dartondox/dox/tree/main/examples/guides">examples/guides</a>.
-CI builds it and runs its tests on every push, so the code on these pages keeps working.</p>
+<p>Each guide solves one job from start to end: copy the files, run the commands, and check the result.</p>
+<p>The reference pages explain each part in more detail. The guides link to them.</p>
 <table>
 <thead>
 <tr>
@@ -6128,15 +6126,7 @@ CI builds it and runs its tests on every push, so the code on these pages keeps 
 </tr>
 <tr>
 <td><a href="background-work/">Background work</a></td>
-<td>Run work after the response, use another thread for CPU work, run a timer.</td>
-</tr>
-<tr>
-<td><a href="docker/">Docker</a></td>
-<td>A small production image with <code>dox build</code>, Postgres, env and a health check.</td>
-</tr>
-<tr>
-<td><a href="testing-with-database/">Testing with a database</a></td>
-<td>Tests on SQLite or a test Postgres, with migrations and cleanup.</td>
+<td>Run work after the response, on another thread, in a queue job, or on a schedule.</td>
 </tr>
 <tr>
 <td><a href="static-files/">Static files and SPA</a></td>
@@ -6150,10 +6140,42 @@ CI builds it and runs its tests on every push, so the code on these pages keeps 
 <td><a href="environments/">Environments</a></td>
 <td>Dev, staging and production config, <code>.env</code> files, secrets and <code>APP_KEY</code>.</td>
 </tr>
+<tr>
+<td><a href="testing-with-database/">Testing with a database</a></td>
+<td>Tests on SQLite or a test Postgres, with migrations and cleanup.</td>
+</tr>
+<tr>
+<td><a href="share-code-with-flutter/">Share code with Flutter</a></td>
+<td>One DTO package that the server and the Flutter app both use to check input.</td>
+</tr>
+<tr>
+<td><a href="api-docs-with-openapi/">API docs with OpenAPI</a></td>
+<td>A docs page for your API, made from your routes, DTOs and models.</td>
+</tr>
+<tr>
+<td><a href="docker/">Docker</a></td>
+<td>A small production image, Postgres in Docker Compose, env and a health check.</td>
+</tr>
+<tr>
+<td><a href="deploy-vps/">Deploy to a Linux server</a></td>
+<td>Your own server with systemd, and Caddy in front for HTTPS.</td>
+</tr>
+<tr>
+<td><a href="deploy-fly/">Deploy to Fly.io</a></td>
+<td>Fly.io from your <code>Dockerfile</code>, with SQLite on a volume or with Postgres.</td>
+</tr>
+<tr>
+<td><a href="deploy-cloud-run/">Deploy to Google Cloud Run</a></td>
+<td>Cloud Run from your <code>Dockerfile</code>, with Cloud SQL and Secret Manager.</td>
+</tr>
 </tbody>
 </table>
-<p>All guides use the app that <code>dox create my_app</code> makes. The package name is <code>my_app</code>.
-Change it to your own package name in the imports.</p>
+<p>Most guides use the app that <code>dox create my_app</code> makes. The package name is <code>my_app</code>.
+Change it to your own package name in the imports.
+The OpenAPI guide and the deploy guides use the blog API of the <a href="../tutorial/01-create-project/">tutorial</a>. Its package name is <code>blog</code>.</p>
+<p>The code of the app guides is in one app on GitHub: <a href="https://github.com/dartondox/dox/tree/main/examples/guides">examples/guides</a>.
+The blog API is in <a href="https://github.com/dartondox/dox/tree/main/examples/blog-api">examples/blog-api</a>.
+CI builds both and runs their tests on every push, so the code on these pages keeps working.</p>
 
 
 

@@ -6725,7 +6725,7 @@
 <p>Rules that apply to every command:</p>
 <ul>
 <li><code>dox</code> with no command prints <code>Could not find a command. Run</code>dox help<code>for more information.</code></li>
-<li>An unknown command prints <code>Could not find a command named "&lt;name&gt;".</code></li>
+<li>An unknown command prints <code>Could not find a command named "&lt;name&gt;". Run</code>dox help<code>for more information.</code></li>
 <li>Too few or too many arguments prints <code>Invalid number of arguments for command "&lt;name&gt;".</code> with the expected count.</li>
 <li>A name you pass is turned into <code>snake_case</code> for the file and <code>PascalCase</code> for the class. <code>BlogPost</code> and <code>blog_post</code> give the same result.</li>
 <li>Every <code>make:*</code> command also answers to its <code>create:*</code> name, like <code>create:model</code>. <code>dox help &lt;command&gt;</code> shows the aliases.</li>
@@ -6756,10 +6756,12 @@
 <li>Picks the release (see <code>--version</code> above) from the release list of <code>dartondox/dox-sample</code>.</li>
 <li>Runs <code>git clone --depth 1 --branch v&lt;version&gt; https://github.com/dartondox/dox-sample.git &lt;name&gt;</code>.</li>
 <li>Deletes the <code>.git</code> folder.</li>
-<li>Replaces <code>dox_sample</code> with your project name in every file, except files under <code>bin/dox</code>.</li>
+<li>Replaces <code>dox_sample</code> with your project name in every text file, except files under <code>bin/dox</code>.</li>
 <li>Copies <code>.env.example</code> to <code>.env</code> and writes a new random <code>APP_KEY</code> to it, like <code>dox key:generate</code>. It skips this step when <code>.env</code> is already there.</li>
+<li>Prints the next steps: <code>cd &lt;name&gt;</code>, <code>dart pub get</code> and <code>dox serve</code>.</li>
 </ol>
-<p>Needs <code>curl</code> and <code>git</code> on the <code>PATH</code>.</p>
+<p>Needs <code>curl</code> and <code>git</code> on the <code>PATH</code>. When it can not find a release (no network), it prints <code>Could not find a template release for Dox &lt;version&gt;. Check your network, or pass --version.</code></p>
+<p>The new project already has <code>bin/server.dart</code>, <code>bin/migrate.dart</code>, <code>bin/seed.dart</code>, <code>bin/queue.dart</code> and <code>bin/schedule.dart</code>. So the migration, seed, queue and schedule commands below work in it right away.</p>
 <p>Source: <code>packages/dox-cli/lib/src/tools/create_project.dart</code>.</p>
 <h3 id="dox-serve"><code>dox serve</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dox serve [--ignore-build-runner]
@@ -6785,7 +6787,7 @@
 <ol>
 <li>Starts <code>dart run build_runner watch</code> (unless the option is set).</li>
 <li>Starts <code>dart run bin/server.dart</code> and prints its output.</li>
-<li>Watches the project folder. When a <code>.dart</code> file changes it prints <code>[Dox] File changed: &lt;file&gt;</code>, waits 500 ms, kills the server and starts it again.</li>
+<li>Watches the project folder. When a <code>.dart</code> file changes it prints <code>[Dox] File changed: &lt;file&gt;</code>. It waits until no file changed for 500 ms, then kills the server and starts it again.</li>
 </ol>
 <p>Source: <code>packages/dox-cli/lib/src/tools/server_serve.dart</code>.</p>
 <h3 id="dox-build"><code>dox build</code></h3>
@@ -6797,7 +6799,7 @@
 <li>When <code>pubspec.yaml</code> contains <code>build_runner</code>: runs <code>dart run build_runner build</code>. Stops with exit code 1 when it fails.</li>
 <li>Runs <code>dart build cli --target bin/server.dart --output build</code>.</li>
 <li>When <code>bin/queue.dart</code> or <code>bin/schedule.dart</code> exists: builds it the same way, to <code>build/bundle/bin/queue</code> and <code>build/bundle/bin/schedule</code>.</li>
-<li>Copies <code>db/</code> to <code>build/bundle/db</code> (migrations are read at start). It leaves out SQLite files, so your local data does not go to production.</li>
+<li>Deletes the old <code>build/bundle/db</code>, then copies <code>db/</code> to <code>build/bundle/db</code>. It leaves out SQLite files (<code>*.sqlite</code>, <code>*.sqlite3</code>, <code>*.db</code>, and their <code>-wal</code>, <code>-shm</code> and <code>-journal</code> files), so your local data does not go to production.</li>
 <li>Copies <code>.env.example</code> to <code>build/bundle/.env.example</code>.</li>
 <li>Prints <code>[Dox] Built build/bundle. Run it with: cd build/bundle &amp;&amp; ./bin/server</code>.</li>
 </ol>
@@ -6828,7 +6830,7 @@
 </tr>
 <tr>
 <td><code>build/bundle/db/</code></td>
-<td>your migrations. SQLite files (<code>*.sqlite</code>, <code>*.db</code>) are not copied.</td>
+<td>your migrations and seeders. SQLite files are not copied.</td>
 </tr>
 <tr>
 <td><code>build/bundle/.env.example</code></td>
@@ -6843,6 +6845,7 @@
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>dox build_runner:watch
 </span></code></pre></div>
 <p>Run <code>dart run build_runner build</code> once, or <code>dart run build_runner watch</code>. No options.
+<code>build_runner:build</code> prints only the first line of each output block of build_runner. Run <code>dart run build_runner build</code> yourself to see all of it.
 The CLI does not pass <code>--delete-conflicting-outputs</code> (build_runner removed that flag).</p>
 <h3 id="dox-keygenerate"><code>dox key:generate</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>dox key:generate
@@ -6865,25 +6868,28 @@ Prints <code>&lt;key&gt; : Key have been updated successfully in .env!</code>.</
 <li>Stops with <code>lib/config/env.dart is already there. Delete it to make it again.</code> (exit code 1) when the file exists.</li>
 <li>Prints <code>Run</code>dart run build_runner build<code>to make env.g.dart.</code> when done.</li>
 </ul>
-<p>Rules for each key: digits give <code>int get x =&gt; &lt;value&gt;;</code>, <code>true</code>/<code>false</code> give <code>bool</code>, an empty value gives <code>String? get x;</code>, any other value gives <code>String get x;</code> (required, no default). <code>#</code> comment lines above a key become its doc comment. A key that does not map back from <code>camelCase</code> gets <code>@EnvKey('KEY')</code>.</p>
+<p>Rules for each key: a whole number (like <code>3000</code> or <code>-1</code>) gives <code>int get x =&gt; &lt;value&gt;;</code>, <code>true</code>/<code>false</code> give <code>bool get x =&gt; &lt;value&gt;;</code>, an empty value gives <code>String? get x;</code>, any other value gives <code>String get x;</code> (required, no default). <code>#</code> comment lines above a key become its doc comment. A key that does not map back from <code>camelCase</code> gets <code>@EnvKey('KEY')</code>.</p>
 <p>Source: <code>packages/dox-cli/lib/src/tools/env_tools.dart</code> (<code>EnvScaffold</code>).</p>
 <h3 id="dox-envcheck"><code>dox env:check</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>dox env:check
 </span></code></pre></div>
 <p>Loads <code>AppEnv</code> from <code>lib/config/env.dart</code> with the real environment and <code>.env</code>. Prints <code>The env is valid.</code> or an <code>EnvException</code> with every missing or bad key (exit code 1).</p>
-<p>It writes a small script to <code>.dart_tool/dox/env_check.dart</code> and runs it with <code>dart run</code>. It needs <code>lib/config/env.dart</code> and a <code>name:</code> in <code>pubspec.yaml</code>.</p>
+<p>It writes a small script to <code>.dart_tool/dox/env_check.dart</code> and runs it with <code>dart run</code>. It needs <code>lib/config/env.dart</code> and a <code>name:</code> in <code>pubspec.yaml</code>.
+Without <code>lib/config/env.dart</code> it prints <code>lib/config/env.dart is missing. Run</code>dox env:generate<code>first.</code> (exit code 1).</p>
 <p>Source: <code>packages/dox-cli/lib/src/tools/env_tools.dart</code> (<code>envCheck</code>).</p>
 <h3 id="dox-openapigenerate"><code>dox openapi:generate</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>dox openapi:generate [dir]
 </span></code></pre></div>
 <p>Runs <code>dart run bin/openapi.dart [dir]</code>. That file writes <code>openapi.json</code> and <code>openapi.yaml</code> into <code>dir</code> (default <code>storage/openapi</code>).
-Stops with <code>bin/openapi.dart is missing.</code> (exit code 1) when the file is not there. See <a href="../../packages/openapi/">OpenAPI</a>.</p>
+A new project has no <code>bin/openapi.dart</code>. You add it yourself, see <a href="../../packages/openapi/">OpenAPI</a>.
+When the file is not there, the command prints <code>bin/openapi.dart is missing.</code> and the code to put in it (exit code 1).</p>
 <p>Source: <code>packages/dox-cli/lib/src/tools/openapi_generate.dart</code>.</p>
 <h3 id="dox-update"><code>dox update</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>dox update
 </span></code></pre></div>
 <p>Installs the newest CLI with the same major version as the one you have. Pre-releases count.
-It reads the version list from pub.dev, then runs <code>dart pub global activate dox &lt;version&gt;</code>.</p>
+It reads the version list from pub.dev (retracted versions are skipped), then runs <code>dart pub global activate dox &lt;version&gt;</code>.
+Needs <code>curl</code> on the <code>PATH</code>.</p>
 <p>Source: <code>packages/dox-cli/lib/src/tools/update_dox.dart</code>.</p>
 <h3 id="dox-version"><code>dox version</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>dox version
@@ -6894,8 +6900,10 @@ It reads the version list from pub.dev, then runs <code>dart pub global activate
 <p>Prints <code>Dox version: &lt;version&gt;</code>. Aliases: <code>--version</code>, <code>-version</code>, <code>v</code>, <code>-v</code>, <code>--v</code>.</p>
 <h3 id="dox-help"><code>dox help</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>dox help [command]
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>dox --help
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>dox -h
 </span></code></pre></div>
-<p>Without a command: lists every command by category. With a command: prints its usage, description, category, aliases and argument count.</p>
+<p>Aliases: <code>--help</code>, <code>-h</code>. Without a command: lists every command by category. With a command: prints its usage, description, category, aliases and argument count.</p>
 <h2 id="create-files">Create files</h2>
 <h3 id="dox-makecontroller"><code>dox make:controller</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>dox make:controller &lt;name&gt; [-r]
@@ -6949,6 +6957,7 @@ A trailing <code>Middleware</code> in the name is removed.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>dox make:dto &lt;name&gt;
 </span></code></pre></div>
 <p>Writes <code>lib/app/dtos/&lt;name&gt;/&lt;name&gt;.dto.dart</code>: a <code>@Dto()</code> class with one <code>name</code> field and <code>part '&lt;name&gt;.dto.g.dart';</code>.
+The class name has no <code>Dto</code> at the end: <code>dox make:dto CreateBlog</code> gives the class <code>CreateBlog</code> in <code>lib/app/dtos/create_blog/create_blog.dto.dart</code>.
 A trailing <code>Dto</code> in the name is removed. Prints <code>Run</code>dox build_runner:build<code>to make &lt;name&gt;/&lt;name&gt;.dto.g.dart.</code></p>
 <p>Template: <code>_getSample</code> in <code>packages/dox-cli/lib/src/tools/create_dto.dart</code>.</p>
 <h3 id="dox-makeserializer"><code>dox make:serializer</code></h3>
@@ -6996,11 +7005,11 @@ A trailing <code>Serializer</code> in the name is removed.</p>
 </tr>
 </tbody>
 </table>
-<p>Writes <code>db/migration/&lt;yyyy&gt;_&lt;mm&gt;_&lt;dd&gt;_&lt;hhmmss&gt;_&lt;name&gt;.dart</code> (or <code>.sql</code>). Characters that are not letters, digits or <code>_</code> are removed from the name.</p>
+<p>Writes <code>db/migration/&lt;yyyy&gt;_&lt;mm&gt;_&lt;dd&gt;_&lt;hhmmss&gt;_&lt;name&gt;.dart</code> (or <code>.sql</code>). Characters that are not letters, digits or <code>_</code> are removed from the name. A second argument other than <code>--sql</code> is ignored.</p>
 <p>Migrations run sorted by file name. So the new file always sorts after every file already in <code>db/migration</code>. When the current time is not later than the newest file (for example, two migrations in the same second), it uses the newest time plus 1 second.</p>
 <p>For a Dart migration it also:</p>
 <ul>
-<li>writes <code>db/migration/migrations.dart</code>, the registry of every Dart migration in the folder, sorted by name;</li>
+<li>writes <code>db/migration/migrations.dart</code>, the registry of every Dart migration in the folder, sorted by name. A file with no class that <code>extends Migration</code> is skipped with a warning;</li>
 <li>writes <code>bin/migrate.dart</code> when it is missing, and prints <code>bin/migrate.dart created.</code></li>
 </ul>
 <p>The Dart template depends on the name:</p>
@@ -7038,7 +7047,7 @@ A trailing <code>Serializer</code> in the name is removed.</p>
 <li>When there is no <code>bin/migrate.dart</code> but <code>db/migration</code> has Dart files: print <code>db/migration has Dart migrations, but bin/migrate.dart is missing.</code> (exit code 1).</li>
 <li>Else: run the <code>.sql</code> migrations with <code>Migrator()</code> from <code>dox_migration</code> in the CLI process.</li>
 </ol>
-<p>The database comes from <code>DB_CONNECTION</code>, <code>DB_HOST</code>, <code>DB_PORT</code>, <code>DB_USERNAME</code>, <code>DB_PASSWORD</code> and <code>DB_DATABASE</code> (or <code>DB_NAME</code>). See <a href="../env/">Environment variables</a>.
+<p>The database comes from <code>DATABASE_URL</code> when it is set. Else it comes from <code>DB_CONNECTION</code>, <code>DB_HOST</code>, <code>DB_PORT</code>, <code>DB_USERNAME</code>, <code>DB_PASSWORD</code> and <code>DB_DATABASE</code> (or <code>DB_NAME</code>). See <a href="../env/">Environment variables</a>.
 A failed run prints the error and sets exit code 1.</p>
 <table>
 <thead>
@@ -7082,6 +7091,7 @@ A failed run prints the error and sets exit code 1.</p>
 </tbody>
 </table>
 <p><code>--seed</code> after <code>migration:run</code>, <code>migration:refresh</code> or <code>migration:fresh</code> runs <code>dox db:seed</code> when the migrations end well.</p>
+<p><code>bin/migrate.dart</code> takes the same commands: <code>dart run bin/migrate.dart &lt;run|rollback [--step=n]|reset|refresh|fresh|status&gt;</code>. With no command it runs <code>run</code>.</p>
 <h2 id="factories-and-seeders">Factories and seeders</h2>
 <table>
 <thead>
@@ -7105,13 +7115,13 @@ A failed run prints the error and sets exit code 1.</p>
 <tr>
 <td><code>dox db:seed [--class=&lt;name&gt;]</code></td>
 <td></td>
-<td>Write <code>db/seeders/seeders.dart</code> again, then run <code>dart run bin/seed.dart</code>. Default seeder: <code>DatabaseSeeder</code>.</td>
+<td>Write <code>db/seeders/seeders.dart</code> again, then run <code>dart run bin/seed.dart [--class=&lt;name&gt;]</code>. Default seeder: <code>DatabaseSeeder</code>. When <code>bin/seed.dart</code> is missing, it prints <code>bin/seed.dart is missing.</code> (exit code 1).</td>
 </tr>
 </tbody>
 </table>
 <p>Templates: <code>createFactory</code> in <code>packages/dox-cli/lib/src/tools/create_factory.dart</code>, and <code>createSeeder</code> and <code>seedEntrySource</code> in <code>packages/dox-cli/lib/src/tools/create_seeder.dart</code>.</p>
 <h2 id="queue">Queue</h2>
-<p>These commands run the app script <code>bin/queue.dart</code> with <code>dart run</code>. The script comes from the <code>dox_queue</code> package. <code>dox make:job</code> makes it when it is missing.
+<p>These commands run the app script <code>bin/queue.dart</code> with <code>dart run</code>. A new project already has it. It uses the <code>dox_queue</code> package.
 Input, output and errors go straight to your terminal. <code>Ctrl+C</code> (SIGINT) and SIGTERM are sent on to the script, so a worker can finish its job and stop. The exit code of the script is the exit code of <code>dox</code>.
 When <code>bin/queue.dart</code> is missing, the command prints how to set it up and exits with code 1.</p>
 <table>
@@ -7126,7 +7136,7 @@ When <code>bin/queue.dart</code> is missing, the command prints how to set it up
 <tr>
 <td><code>dox make:job &lt;name&gt;</code></td>
 <td></td>
-<td>Make <code>lib/app/jobs/&lt;name&gt;.job.dart</code> with a <code>@Job()</code> class that extends <code>DoxJob</code>. Make <code>bin/queue.dart</code> when it is missing. Print a hint to add <code>dox_queue</code> to <code>pubspec.yaml</code> and to run <code>dox build_runner:build</code>.</td>
+<td>Make <code>lib/app/jobs/&lt;name&gt;.job.dart</code> with a <code>@Job()</code> class that extends <code>DoxJob</code>. A trailing <code>Job</code> in the name is removed. Make <code>bin/queue.dart</code> when it is missing. Print a hint to add <code>dox_queue</code> to <code>pubspec.yaml</code> when it is not there, and to run <code>dox build_runner:build</code> (it makes <code>lib/generated/jobs.g.dart</code>).</td>
 </tr>
 <tr>
 <td><code>dox queue:work [flags]</code></td>
@@ -7160,54 +7170,62 @@ When <code>bin/queue.dart</code> is missing, the command prints how to set it up
 <thead>
 <tr>
 <th>Flag</th>
+<th>Default</th>
 <th>Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>--queue=a,b</code></td>
-<td>The queues to read, in this order.</td>
+<td><code>default</code></td>
+<td>The queues to read, the first one first.</td>
 </tr>
 <tr>
 <td><code>--concurrency=N</code></td>
-<td>How many jobs run at the same time.</td>
+<td><code>1</code></td>
+<td>How many jobs run at the same time in this process.</td>
 </tr>
 <tr>
 <td><code>--once</code></td>
+<td>off</td>
 <td>Run one job, then stop.</td>
 </tr>
 <tr>
 <td><code>--tries=N</code></td>
-<td>How many times a job may run before it is marked as failed.</td>
+<td><code>1</code></td>
+<td>How many times a job may run before it is marked as failed. A job can set its own <code>tries</code>.</td>
 </tr>
 <tr>
 <td><code>--timeout=S</code></td>
+<td><code>60</code></td>
 <td>Seconds a job may run.</td>
 </tr>
 <tr>
 <td><code>--sleep=S</code></td>
-<td>Seconds to wait when the queue is empty.</td>
+<td><code>3</code></td>
+<td>Seconds to wait when the queues are empty.</td>
 </tr>
 <tr>
 <td><code>--stop-when-empty</code></td>
-<td>Stop when the queue is empty.</td>
+<td>off</td>
+<td>Stop when the queues are empty.</td>
 </tr>
 </tbody>
 </table>
-<p>The <code>bin/queue.dart</code> that <code>make:job</code> writes (<code>&lt;app&gt;</code> is the <code>name</code> in <code>pubspec.yaml</code>):</p>
+<p>An unknown flag or command prints the usage and exits with code 64.</p>
+<p>The <code>bin/queue.dart</code> of a new project (<code>&lt;app&gt;</code> is the <code>name</code> in <code>pubspec.yaml</code>). The jobs come from <code>queueConfig</code> in <code>lib/config/queue.dart</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
 </span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
 </span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_queue/dox_queue.dart'</span><span class="p">;</span>
 </span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:&lt;app&gt;/config/app.dart'</span><span class="p">;</span>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:&lt;app&gt;/generated/jobs.g.dart'</span><span class="p">;</span>
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>
-</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">  </span><span class="n">exitCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueueWorker</span><span class="p">(</span><span class="nl">jobs:</span><span class="w"> </span><span class="n">jobRegistry</span><span class="p">,</span><span class="w"> </span><span class="nl">app:</span><span class="w"> </span><span class="n">appConfig</span><span class="p">).</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
-</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="p">}</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">  </span><span class="n">exitCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueueWorker</span><span class="p">(</span><span class="nl">app:</span><span class="w"> </span><span class="n">appConfig</span><span class="p">).</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Templates: <code>createJob</code> and <code>queueEntrySource</code> in <code>packages/dox-cli/lib/src/tools/create_job.dart</code>.</p>
 <h2 id="schedule">Schedule</h2>
-<p>These commands run the app script <code>bin/schedule.dart</code> with <code>dart run</code>. They pass the signals, the terminal and the exit code the same way as the queue commands.
+<p>These commands run the app script <code>bin/schedule.dart</code> with <code>dart run</code>. A new project already has it. They pass the signals, the terminal and the exit code the same way as the queue commands.
 When <code>bin/schedule.dart</code> is missing, the command prints how to set it up and exits with code 1.</p>
 <table>
 <thead>
@@ -7240,29 +7258,30 @@ When <code>bin/schedule.dart</code> is missing, the command prints how to set it
 </tr>
 </tbody>
 </table>
-<p>To set it up, add <code>dox_scheduler</code> to <code>pubspec.yaml</code>, then make two small files.
-The exact names come from the <code>dox_scheduler</code> package. This is the shape:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1">// lib/config/schedule.dart</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_scheduler/dox_scheduler.dart'</span><span class="p">;</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
-</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="kd">final</span><span class="w"> </span><span class="n">Schedule</span><span class="w"> </span><span class="n">schedule</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Schedule</span><span class="p">()</span>
-</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">  </span><span class="p">..</span><span class="n">call</span><span class="p">(</span><span class="s1">'report'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span><span class="cm">/* your task */</span><span class="p">}).</span><span class="n">dailyAt</span><span class="p">(</span><span class="s1">'02:00'</span><span class="p">);</span>
+<p>You add tasks in <code>lib/config/schedule.dart</code>. These are the two files of a new project:</p>
+<div class="language-dart highlight"><span class="filename">lib/config/schedule.dart</span><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_scheduler/dox_scheduler.dart'</span><span class="p">;</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="n">ScheduleConfig</span><span class="w"> </span><span class="n">scheduleConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ScheduleConfig</span><span class="p">();</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="kt">void</span><span class="w"> </span><span class="n">schedule</span><span class="p">(</span><span class="n">Schedule</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">  </span><span class="c1">// s.call('cleanup', cleanup).dailyAt('02:00');</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="p">}</span>
 </span></code></pre></div>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1">// bin/schedule.dart</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_scheduler/dox_scheduler.dart'</span><span class="p">;</span>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:&lt;app&gt;/config/app.dart'</span><span class="p">;</span>
-</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:&lt;app&gt;/config/schedule.dart'</span><span class="p">;</span>
-</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>
-</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="w">  </span><span class="n">exitCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">SchedulerRunner</span><span class="p">(</span>
-</span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="w">    </span><span class="nl">schedule:</span><span class="w"> </span><span class="n">schedule</span><span class="p">,</span>
-</span><span id="__span-19-11"><a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="w">    </span><span class="nl">app:</span><span class="w"> </span><span class="n">appConfig</span><span class="p">,</span>
-</span><span id="__span-19-12"><a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="w">    </span><span class="nl">config:</span><span class="w"> </span><span class="n">scheduleConfig</span><span class="p">,</span>
-</span><span id="__span-19-13"><a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="w">  </span><span class="p">).</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
-</span><span id="__span-19-14"><a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="p">}</span>
+<div class="language-dart highlight"><span class="filename">bin/schedule.dart</span><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_scheduler/dox_scheduler.dart'</span><span class="p">;</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:&lt;app&gt;/config/app.dart'</span><span class="p">;</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:&lt;app&gt;/config/schedule.dart'</span><span class="p">;</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="w">  </span><span class="n">exitCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">SchedulerRunner</span><span class="p">(</span>
+</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="w">    </span><span class="nl">schedule:</span><span class="w"> </span><span class="n">schedule</span><span class="p">,</span>
+</span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="w">    </span><span class="nl">app:</span><span class="w"> </span><span class="n">appConfig</span><span class="p">,</span>
+</span><span id="__span-19-11"><a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="w">    </span><span class="nl">config:</span><span class="w"> </span><span class="n">scheduleConfig</span><span class="p">,</span>
+</span><span id="__span-19-12"><a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="w">  </span><span class="p">).</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
+</span><span id="__span-19-13"><a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="p">}</span>
 </span></code></pre></div>
+<p>See <a href="../../digging-deeper/scheduler/">Scheduler</a> for the task methods. See <a href="../../digging-deeper/queue/">Queue</a> for jobs.</p>
 <h2 id="command-list">Command list</h2>
 <table>
 <thead>
@@ -7455,7 +7474,7 @@ The exact names come from the <code>dox_scheduler</code> package. This is the sh
 </tr>
 <tr>
 <td><code>help</code></td>
-<td></td>
+<td><code>--help</code>, <code>-h</code></td>
 <td>System</td>
 </tr>
 </tbody>

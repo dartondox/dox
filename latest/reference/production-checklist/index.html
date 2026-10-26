@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Check each item before you deploy.">
+        <meta name="description" content="This page lists what to check before you deploy a Dox app.">
       
       
       
@@ -78,7 +78,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Production checklist | Dox">
-  <meta property="og:description" content="Check each item before you deploy.">
+  <meta property="og:description" content="This page lists what to check before you deploy a Dox app.">
   <meta property="og:url" content="https://dartondox.dev/latest/3.x/reference/production-checklist/">
   <meta property="og:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -87,7 +87,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Production checklist | Dox">
-  <meta name="twitter:description" content="Check each item before you deploy.">
+  <meta name="twitter:description" content="This page lists what to check before you deploy a Dox app.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/3.xassets/social-card.png">
   
   <script type="application/ld+json">
@@ -6344,10 +6344,10 @@
 
 
 <h1 id="production-checklist">Production checklist</h1>
-<p>Check each item before you deploy.</p>
+<p>This page lists what to check before you deploy a Dox app.</p>
 <p>Items marked <strong>Dox limit</strong> are things Dox does not do for you. You must handle them outside Dox.</p>
 <h2 id="secrets-and-config">Secrets and config</h2>
-<p>If <code>APP_ENV</code> is not set, Dox treats the app as production: <code>/docs</code> is off and error details are hidden. Set <code>APP_ENV=development</code> in your <code>.env</code> and in CI.</p>
+<p>If <code>APP_ENV</code> is empty or not set, Dox treats the app as production: <code>/docs</code> is off and error details are hidden. Set <code>APP_ENV=development</code> in your local <code>.env</code> and in CI.</p>
 <table>
 <thead>
 <tr>
@@ -6364,7 +6364,7 @@
 </tr>
 <tr>
 <td><code>APP_ENV=production</code></td>
-<td>An empty <code>APP_KEY</code>, a key that is not exactly 32 characters, or an old sample key stops the app at start (<code>StateError</code>). Only <code>APP_ENV</code> <code>development</code>, <code>local</code> or <code>test</code> logs a warning instead.</td>
+<td>Set it, or leave it empty. In production, a bad <code>APP_KEY</code> stops the app at start with a <code>StateError</code>: an empty key, a key that is not exactly 32 characters, or a public sample key. Only with <code>APP_ENV</code> <code>development</code>, <code>local</code> or <code>test</code> does Dox log a warning instead.</td>
 <td><a href="../env/">Env reference</a></td>
 </tr>
 <tr>
@@ -6547,7 +6547,7 @@
 </tr>
 <tr>
 <td>Migrations run once per deploy</td>
-<td>The new project runs <code>Migrator(migrations: migrations).migrate()</code> in <code>bin/server.dart</code> before <code>startServer()</code>. Or run <code>dart run bin/migrate.dart run</code> (or <code>dox migrate</code>) in CI. Do one, not both at the same time on many machines.</td>
+<td>The new project runs <code>Migrator(...).migrate()</code> in <code>bin/server.dart</code> before <code>startServer()</code>. Or run <code>dox migrate</code> (same as <code>dart run bin/migrate.dart run</code>) once in CI. With many machines, run migrations in one place only, so two machines do not migrate at the same time.</td>
 <td><a href="../../database/migration/">Migration</a></td>
 </tr>
 <tr>
@@ -6599,7 +6599,7 @@
 </tr>
 <tr>
 <td>Access logs in one place</td>
-<td><code>LogMiddleware</code> writes one line per request, every 20 ms. A hard kill can lose the last lines. Turn it off when the proxy already logs requests.</td>
+<td><code>LogMiddleware</code> writes one line per request. It writes them in batches, every 20 ms, so a hard kill can lose the last lines. The new project turns it off when <code>APP_ENV=production</code>, because the proxy already logs requests.</td>
 <td><a href="../../digging-deeper/performance/">Performance</a></td>
 </tr>
 <tr>
