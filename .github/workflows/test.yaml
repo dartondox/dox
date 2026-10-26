@@ -40,9 +40,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      # dox_orm and dox_migration come from a clone of dox-orm (main, or
-      # the branch with the same name as this PR), not from pub.dev.
-      - run: ci/clone-siblings.sh && ci/use-sibling-orm.sh
+      # dox_openapi and dox_validation come from clones of their repos
+      # (main, or the branch with the same name as this PR), not from
+      # pub.dev.
+      - run: ci/clone-siblings.sh && ci/use-siblings.sh
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
@@ -69,8 +70,8 @@ jobs:
   # The server is native (dox_http_native). Its build hook downloads a
   # ready-built library. There is no dart:io server.
   # The database packages (dox_orm, dox_migration) and their database tests
-  # live in dartondox/dox-orm. dox_socketio, dox_storage and the dox CLI
-  # have their own repos too.
+  # live in dartondox/dox-orm. dox_auth, dox_openapi, dox_validation,
+  # dox_socketio, dox_storage and the dox CLI have their own repos too.
   #
   # One job, not one job per entry: each job waits in the queue and pays
   # about 30s of setup. ci/run-group.py runs the entries in parallel, each
@@ -84,8 +85,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      # dox_orm and dox_migration from the dox-orm clone, like lint
-      - run: ci/clone-siblings.sh && ci/use-sibling-orm.sh
+      # dox_openapi and dox_validation from the clones, like lint
+      - run: ci/clone-siblings.sh && ci/use-siblings.sh
       - name: Start services
         if: needs.changes.outputs.unit_services != ''
         run: ci/start-services.sh ${{ needs.changes.outputs.unit_services }}
@@ -110,8 +111,8 @@ jobs:
   # They use the local packages (pubspec_overrides.yaml) and SQLite, so
   # they need no database service. A broken docs example fails CI.
   # One job runs the picked examples one after the other.
-  # dox_orm, dox_migration, dox_socketio, dox_storage, dox_queue and
-  # dox_scheduler come from clones of their repos next to this one (main, or
+  # dox_orm, dox_migration, dox_auth, dox_openapi, dox_validation,
+  # dox_socketio, dox_storage, dox_queue and dox_scheduler come from clones of their repos next to this one (main, or
   # the branch with the same name as this PR, see ci/clone-siblings.sh).
   examples:
     needs: changes
@@ -135,8 +136,9 @@ jobs:
   # migrate, `dox build`, then the AOT server answers its routes.
   # It catches a change that breaks apps, the template, dox_queue or
   # dox_scheduler. See ci/smoke-template.sh.
-  # The dox CLI, dox_orm, dox_migration, dox_socketio, dox_storage,
-  # dox_queue and dox_scheduler come from clones of their repos next to this
+  # The dox CLI, dox_orm, dox_migration, dox_auth, dox_openapi,
+  # dox_validation, dox_socketio, dox_storage, dox_queue and dox_scheduler
+  # come from clones of their repos next to this
   # one (main, or the branch with the same name as this PR, see
   # ci/clone-siblings.sh).
   template:

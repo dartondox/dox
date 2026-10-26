@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 import 'package:yaml/yaml.dart';
 
-import '../../../../dox-openapi/test/support/openapi_checker.dart';
+import '../../utils/openapi_checker.dart';
 
 String get baseUrl => 'http://localhost:${Dox().server.httpServer.port}';
 

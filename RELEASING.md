@@ -22,6 +22,9 @@ Then raise its constraint (like `dox_http_native: ^x.y.z`) in the Dox packages t
 These packages are not released from this repo either:
 
 - `dox_orm` and `dox_migration`: [dartondox/dox-orm](https://github.com/dartondox/dox-orm). The two share one version.
+- `dox_auth`: [dartondox/dox-auth](https://github.com/dartondox/dox-auth)
+- `dox_openapi`: [dartondox/dox-openapi](https://github.com/dartondox/dox-openapi)
+- `dox_validation`: [dartondox/dox-validation](https://github.com/dartondox/dox-validation)
 - `dox_socketio`: [dartondox/dox-socketio](https://github.com/dartondox/dox-socketio)
 - `dox_storage`: [dartondox/dox-storage](https://github.com/dartondox/dox-storage)
 - `dox_queue`: [dartondox/dox-queue](https://github.com/dartondox/dox-queue)
@@ -31,9 +34,16 @@ These packages are not released from this repo either:
 Each repo has its own version. To release, push a `v<version>` tag in that repo.
 Its Release workflow publishes to pub.dev.
 
-`dox_socketio` and `dox_storage` depend on `dox_core`. When they need a new `dox_core`, release this repo first.
-`dox_auth`, `dox_core` (dev) and the CLI depend on `dox_orm` or `dox_migration` from pub.dev.
-When they need a new one, release `dox-orm` first, then raise the constraint here.
+The dependencies go one way only, so release the repos in this order:
+
+1. The native packages.
+2. `dox-validation` and `dox-openapi`. They depend on no other Dox package.
+3. This repo. `dox_core` depends on `dox_validation` and `dox_openapi`.
+4. `dox-orm`. It depends on `dox_annotation` and `dox_validation`.
+5. `dox-auth`, the CLI and the other package repos. They depend on `dox_core` or `dox_orm`.
+6. The project template (`dox-sample`).
+
+No package in this repo may depend on `dox_orm` or `dox_auth`. That would make a loop: neither repo could be released first.
 
 ## Before you start
 

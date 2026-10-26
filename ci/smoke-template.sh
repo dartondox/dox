@@ -4,8 +4,9 @@
 # template, dox_queue or dox_scheduler before it is merged.
 #
 # Steps: `dox create` (the CLI from ../dox-cli), override all Dox packages
-# with this repo (and with ../dox-orm, ../dox-socketio, ../dox-storage,
-# ../dox-queue, ../dox-scheduler when they are there, see
+# with this repo (and with ../dox-orm, ../dox-auth, ../dox-openapi,
+# ../dox-validation, ../dox-socketio, ../dox-storage, ../dox-queue,
+# ../dox-scheduler when they are there, see
 # ci/clone-siblings.sh),
 # build_runner, analyze, the template tests, migrate, `dox build`, then
 # start the AOT server and call its routes.
@@ -34,6 +35,7 @@ sed -i.bak "s/^APP_PORT=.*/APP_PORT=$port/" .env && rm .env.bak
   echo "# the Dox packages of this commit, not the ones on pub.dev"
   echo "dependency_overrides:"
   for dir in "$root"/packages/*/ "$root"/../dox-orm/packages/*/ \
+    "$root"/../dox-auth/ "$root"/../dox-openapi/ "$root"/../dox-validation/ \
     "$root"/../dox-socketio/ "$root"/../dox-storage/ \
     "$root"/../dox-queue/ "$root"/../dox-scheduler/; do
     [ -f "$dir/pubspec.yaml" ] || continue

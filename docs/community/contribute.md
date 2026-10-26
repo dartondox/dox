@@ -124,6 +124,9 @@ Optional: add yourself as a required reviewer, and allow only tags `v*`.
 | --- | --- |
 | `dox` (the CLI) | [dartondox/dox-cli](https://github.com/dartondox/dox-cli) |
 | `dox_orm`, `dox_migration` | [dartondox/dox-orm](https://github.com/dartondox/dox-orm) |
+| `dox_auth` | [dartondox/dox-auth](https://github.com/dartondox/dox-auth) |
+| `dox_openapi` | [dartondox/dox-openapi](https://github.com/dartondox/dox-openapi) |
+| `dox_validation` | [dartondox/dox-validation](https://github.com/dartondox/dox-validation) |
 | `dox_socketio` | [dartondox/dox-socketio](https://github.com/dartondox/dox-socketio) |
 | `dox_storage` | [dartondox/dox-storage](https://github.com/dartondox/dox-storage) |
 | `dox_queue` | [dartondox/dox-queue](https://github.com/dartondox/dox-queue) |
@@ -133,22 +136,23 @@ Optional: add yourself as a required reviewer, and allow only tags `v*`.
 | `dox_mailer` | [dartondox/dox-mailer](https://github.com/dartondox/dox-mailer) |
 
 The packages here use them from pub.dev. The database tests (Postgres, MySQL, MariaDB, SQLite) run in `dox-orm`.
-CI in this repo uses the newest `dox-orm` code: `ci/clone-siblings.sh`, then `ci/use-sibling-orm.sh`.
+`dox_core` uses `dox_openapi` and `dox_validation`.
+CI in this repo uses their newest code: `ci/clone-siblings.sh`, then `ci/use-siblings.sh`.
 
 To work on one of them and Dox together:
 
 1. Clone the repos next to the Dox repo, like `../dox-orm`.
-   `ci/clone-siblings.sh` clones `dox-orm`, `dox-socketio`, `dox-storage`, `dox-queue`, `dox-scheduler` and `dox-cli`.
+   `ci/clone-siblings.sh` clones `dox-orm`, `dox-auth`, `dox-openapi`, `dox-validation`, `dox-socketio`, `dox-storage`, `dox-queue`, `dox-scheduler` and `dox-cli`.
    Clone `dox-mailer`, `dox-view` and `dox-inertia` by hand when you need them.
 2. Add them to the root `pubspec_overrides.yaml` of the Dox repo. Git ignores this file.
-   For `dox_orm` and `dox_migration`, `ci/use-sibling-orm.sh` writes this file for you.
+   For `dox_openapi` and `dox_validation`, `ci/use-siblings.sh` writes this file for you.
 
     ```yaml
     dependency_overrides:
-      dox_orm:
-        path: ../dox-orm/packages/dox-orm
-      dox_migration:
-        path: ../dox-orm/packages/dox-migration
+      dox_openapi:
+        path: ../dox-openapi
+      dox_validation:
+        path: ../dox-validation
     ```
 
 3. Run `dart pub get`.

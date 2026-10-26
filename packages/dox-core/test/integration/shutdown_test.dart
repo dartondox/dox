@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:dox_cache/dox_cache.dart' show MemoryDriver;
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_orm/dox_orm.dart';
 import 'package:test/test.dart';
 
 import '../utils/free_port.dart';
@@ -18,29 +17,6 @@ class Cleanup extends DoxProvider {
 
   @override
   void shutdown() => calls++;
-}
-
-/// the ORM provider of an app: it closes the database on shutdown
-class OrmProvider extends DoxProvider {
-  @override
-  void setup() {
-    SqlQueryBuilder.initializeWithDatabaseConfig(
-      DatabaseConfig(
-        connection: 'sqlite',
-        url: '',
-        connections: <String, ConnectionConfig>{
-          'sqlite': ConnectionConfig(
-            driver: Driver.sqlite,
-            database: ':memory:',
-            debug: false,
-          ),
-        },
-      ),
-    );
-  }
-
-  @override
-  Future<void> shutdown() => SqlQueryBuilder.close();
 }
 
 /// a cache driver that counts close calls
@@ -91,7 +67,7 @@ void main() {
           // the OS picks a free port, so test files can run in parallel
           serverPort: 0,
           totalIsolate: 1,
-          providers: <DoxProvider>[cleanup, OrmProvider()],
+          providers: <DoxProvider>[cleanup],
           shutdownTimeout: const Duration(seconds: 2),
         ),
       );
@@ -116,18 +92,12 @@ void main() {
       expect(cleanup.calls, 1);
     });
 
-    test('stop closes the database and the cache', () async {
+    // closing the database on stop is tested in dartondox/dox-orm
+    test('stop closes the cache', () async {
       SpyCacheDriver spy = SpyCacheDriver();
       Dox().cache.addStore('spy', spy);
-      expect(
-        await SqlQueryBuilder().dbDriver.query('SELECT 1 AS n'),
-        <Map<String, dynamic>>[
-          <String, dynamic>{'n': 1},
-        ],
-      );
       await Dox().stop();
       expect(spy.closed, 1);
-      expect(() => SqlQueryBuilder().dbDriver, throwsStateError);
     });
 
     test('a request longer than shutdownTimeout is cut', () async {

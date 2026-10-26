@@ -9,12 +9,9 @@ environment:
 # and writes one pubspec.lock.
 workspace:
   - packages/dox-annotation
-  - packages/dox-auth
   - packages/dox-builder
   - packages/dox-cache
   - packages/dox-core
-  - packages/dox-openapi
-  - packages/dox-validation
 
 dev_dependencies:
   melos: ^8.9.0
