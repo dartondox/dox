@@ -28,6 +28,7 @@ The full docs as one file: https://dartondox.dev/latest/3.xllms-full.txt
 - [Request](https://dartondox.dev/latest/3.xthe-basic/request/)
 - [Response](https://dartondox.dev/latest/3.xthe-basic/response/)
 - [Views](https://dartondox.dev/latest/3.xthe-basic/views/)
+- [Inertia](https://dartondox.dev/latest/3.xthe-basic/inertia/)
 - [Serializer](https://dartondox.dev/latest/3.xthe-basic/serializer/)
 - [Error handling](https://dartondox.dev/latest/3.xthe-basic/errors/)
 - [Controller](https://dartondox.dev/latest/3.xthe-basic/controller/)
