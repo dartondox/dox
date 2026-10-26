@@ -153,14 +153,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.0"
-  clock:
-    dependency: transitive
-    description:
-      name: clock
-      sha256: e51d50bca3217c9a9fa2b41a30e4a38971133f5f9ec7a3d57bae095007f1d28e
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.3"
   code_assets:
     dependency: transitive
     description:
@@ -217,14 +209,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
-  dart_jsonwebtoken:
-    dependency: transitive
-    description:
-      name: dart_jsonwebtoken
-      sha256: ad84e60181696513d04d5f2078e0bbc20365b911f46f647797317414bdc88fbe
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.4.1"
   dart_style:
     dependency: transitive
     description:
@@ -237,34 +221,26 @@ packages:
     dependency: transitive
     description:
       name: dox_http_native
-      sha256: "477b15548fad7cfd0bb7d9137b5b23f01421316b1893d9769392c2f14a3dcd90"
+      sha256: d50bd45b9c03aa5acb9b073111e936719fc1660570b7235805f890727c543177
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-alpha.8"
-  dox_mysql_native:
+    version: "3.0.0"
+  dox_openapi:
     dependency: transitive
     description:
-      name: dox_mysql_native
-      sha256: "0263fe0ddf13256597a4b05c3426b1840e65c5e0c9d2d39f70ddd112d887b399"
+      name: dox_openapi
+      sha256: e1197b7c0fe9581778fa3917fb29bdb198a4c813574176579c970af3b09ae056
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-alpha.7"
-  dox_orm:
+    version: "3.0.0"
+  dox_validation:
     dependency: transitive
     description:
-      name: dox_orm
-      sha256: e986c8c7eadeed5f65486f546780bfa7348eeb68f73e192933c4f1b901cdff80
+      name: dox_validation
+      sha256: "6c0a9d250ac024eba3b77f81e565aaae0c941c89b185426fdc9c57ad231a8275"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-rc.1"
-  dox_postgres_native:
-    dependency: transitive
-    description:
-      name: dox_postgres_native
-      sha256: f779d340507a30f0c3ac7563dda17350d451f3fbe68fd67f6a3e74ce4f8dd669
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.0-alpha.8"
+    version: "3.0.0"
   ffi:
     dependency: transitive
     description:
@@ -433,14 +409,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.6"
-  native_toolchain_c:
-    dependency: transitive
-    description:
-      name: native_toolchain_c
-      sha256: "90eaad8059ebc2004a63810a4696ea9acdb02473e47ed3b6b3bafb100ac77e31"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.19.5"
   node_preamble:
     dependency: transitive
     description:
@@ -609,14 +577,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.2"
-  sqlite3:
-    dependency: transitive
-    description:
-      name: sqlite3
-      sha256: "144132790ec1947fad9f3ddceffd0af2ab80a1f0d1e81a4d094ee6707ec3df0b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.7.1"
   stack_trace:
     dependency: transitive
     description:
