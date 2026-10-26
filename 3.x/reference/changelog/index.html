@@ -6971,6 +6971,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-rc1_4" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8733,6 +8744,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#300-rc1_4" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -9970,6 +9992,10 @@
 <li><code>remember</code>, <code>pull</code>, <code>add</code>, <code>increment</code>, <code>many</code>, tags and atomic locks.</li>
 </ul>
 <h2 id="dox">dox</h2>
+<h3 id="unreleased">Unreleased</h3>
+<ul>
+<li>Fix: <code>dox create</code> and <code>dox update</code> sorted pre-releases only by their number, so <code>3.0.0-alpha.17</code> looked newer than <code>3.0.0-rc.1</code>. <code>dox create</code> then cloned the alpha.17 template. Now the label counts first: alpha &lt; beta &lt; rc &lt; stable.</li>
+</ul>
 <h3 id="300-rc1_4">3.0.0-rc.1</h3>
 <ul>
 <li>Fix: <code>dox make:job</code> wrote a <code>bin/queue.dart</code> that did not compile. It called <code>QueueWorker(jobs: ...)</code>, but <code>QueueWorker</code> has no <code>jobs</code> parameter. It now writes the same file as the app template: <code>QueueWorker(app: appConfig)</code>.</li>
