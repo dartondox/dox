@@ -6329,7 +6329,7 @@
 <h2 id="send-the-token">Send the token</h2>
 <p>Dox reads the token from one of these places:</p>
 <ul>
-<li>the <code>_token</code> field of the body (or of the query string)</li>
+<li>the <code>_token</code> field of the body (not the query string: a url ends up in logs and in the <code>Referer</code> header)</li>
 <li>the <code>X-CSRF-TOKEN</code> header</li>
 <li>the <code>X-XSRF-TOKEN</code> header</li>
 </ul>

@@ -4347,6 +4347,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#compare-secrets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compare secrets
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#with-login" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6281,6 +6292,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#compare-secrets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compare secrets
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#with-login" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6362,10 +6384,17 @@ Then a login with an unknown email takes as long as a wrong password. See <a hre
 <h2 id="long-passwords">Long passwords</h2>
 <p>bcrypt reads at most 72 bytes.
 <code>Hash.make</code> and <code>Hash.makeAsync</code> throw an <code>ArgumentError</code> when the password is longer than 72 bytes (UTF-8).
+The error text does not hold the password, so it is safe in logs.
 <code>Hash.verify</code> returns <code>false</code> for such a password.</p>
 <p>So limit the length in your DTO, like <code>@Length(min: 8, max: 72)</code>.
 <code>@Length</code> counts characters, and a letter outside ASCII can use up to 4 bytes.
 So a password with such letters can still be too long. Catch the error and answer <code>422</code>, or use a smaller <code>max</code>.</p>
+<h2 id="compare-secrets">Compare secrets</h2>
+<p>To check an API key or a token, use <code>Hash.equals(given, expected)</code>, not <code>==</code>.
+<code>==</code> stops at the first wrong character, so the time can tell how much of the key was right.
+<code>Hash.equals</code> takes the same time for every value of the same length.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">equals</span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">header</span><span class="p">(</span><span class="s1">'X-Api-Key'</span><span class="p">)</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'API_KEY'</span><span class="p">));</span>
+</span></code></pre></div>
 <h2 id="with-login">With login</h2>
 <p>You do not need <code>Hash.verify</code> for normal login.
 <code>Auth().attempt()</code> from <code>dox_auth</code> finds the user and checks the password with bcrypt.

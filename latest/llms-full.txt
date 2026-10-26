@@ -1212,7 +1212,7 @@ class AuthController {
     User user = User()
       ..name = body.name
       ..email = body.email
-      ..password = Hash.make(body.password);
+      ..password = await Hash.makeAsync(body.password);
     await user.save();
 
     String? token = Auth().login(user);
@@ -1242,7 +1242,7 @@ class AuthController {
 }
 ```
 
-- `Hash.make()` makes a bcrypt hash. Never save a plain password.
+- `Hash.makeAsync()` makes a bcrypt hash. It runs in another isolate, so other requests do not wait. Never save a plain password.
 - `Auth().attempt()` finds the user by email and checks the password. It gives a token, or `null`.
 - `Auth().login(user)` gives a token without a password check. Register uses it, because the user was just made.
 
@@ -2652,7 +2652,6 @@ The docs site is https://dartondox.dev. It is built with MkDocs Material and
 | --- | --- |
 | `/3.x/...` | 3.x docs, built from `main` |
 | `/latest/...` | a copy of the newest version (now 3.x) |
-| `/2.x/...` | the old 2.x docs, built from the `v2.x` branch |
 | `/` | redirects to `/latest/` |
 | old links like `/the-basic/routing/` | redirect to `/latest/the-basic/routing/` |
 
@@ -2678,8 +2677,6 @@ The `Docs check` workflow (`.github/workflows/docs-check.yaml`) runs on every pu
 - 3.x deploys by itself. The `Docs` workflow (`.github/workflows/docs.yaml`) runs on every push
   to `main` that changes `docs/`, `hooks/`, `overrides/`, a package `CHANGELOG.md`, `mkdocs.yml`, `requirements-docs.txt` or the workflow.
   It runs `mike deploy --update-aliases 3.x latest`.
-- 2.x deploys by hand. Open Actions > Docs > "Run workflow", pick version `2.x`.
-  It builds from the `v2.x` branch (change it with the `ref` input).
 - After each deploy, the workflow writes small redirect pages for the old root links,
   the root `index.html`, a `404.html` and the `CNAME` file. So `dartondox.dev` and old links keep working.
 - The workflow pushes with the built-in `GITHUB_TOKEN`. This works because `gh-pages` is not a protected branch.
@@ -4935,12 +4932,17 @@ A function that takes a `DoxRequest` also works as middleware.
 import 'package:dox_core/dox_core.dart';
 
 dynamic apiKeyMiddleware(DoxRequest req) {
-  if (req.header('X-Api-Key') != 'secret') {
+  String apiKey = Env.get<String>('API_KEY');
+  String given = req.header('X-Api-Key') ?? '';
+  if (apiKey.isEmpty || !Hash.equals(given, apiKey)) {
     return response(<String, String>{'message': 'Unauthorized'}).statusCode(401);
   }
   return req;
 }
 ```
+
+The key comes from the `API_KEY` env variable, not from the code.
+`Hash.equals` takes the same time for every wrong key, so the time does not tell how much of the key was right. A normal `==` stops at the first wrong character.
 
 ```dart title="lib/routes/api.dart"
 Route.get('/ping', <dynamic>[apiKeyMiddleware, (WebController c) => c.pong]);
@@ -5207,7 +5209,7 @@ AppConfig appConfig = AppConfig(
 | `driver` | `cookie` | `cookie` or `cache`. See below. |
 | `store` | `null` | The cache store for the `cache` driver, like `redis`, `memory` or `file`. `null` uses the default store of `AppConfig.cache`. |
 | `cookie` | `dox_session` | The name of the session cookie. |
-| `lifetime` | 2 hours | The session ends after this long with no use. |
+| `lifetime` | 2 hours | The session ends after this long with no use. The `cookie` driver keeps the save time in the encrypted cookie and checks it, so a copied old cookie stops working too. |
 | `path` | `/` | `Path` of the cookie. |
 | `domain` | `null` | `Domain` of the cookie. `null` means only the host that set it. |
 | `httpOnly` | `true` | Page scripts can not read the cookie. |
@@ -5311,7 +5313,7 @@ class UserController {
     User user = User()
       ..name = body.name
       ..email = body.email
-      ..password = Hash.make(body.password);
+      ..password = await Hash.makeAsync(body.password);
     await user.save();
     return user;
   }
@@ -5989,12 +5991,13 @@ await Cache().flush();                // remove all items of the store
 ### `remember`
 
 `remember` reads the value from the cache. When it is missing, the function runs and its result is stored.
+The value is stored as JSON. Return maps, lists, strings and numbers, not models.
 
 ```dart
 List<dynamic> posts = await Cache().remember(
   'posts',
   Duration(minutes: 5),
-  () => Post().all(),
+  () async => (await Post().all()).map((Post p) => p.toJson()).toList(),
 );
 ```
 
@@ -7740,7 +7743,7 @@ A missing or empty key gives the default. With no default:
 
 !!! warning "APP_KEY"
     When `APP_KEY` is missing, not 32 characters, or a public sample key, `Dox().startServer()` stops with an error.
-    When `APP_ENV` is `development`, `local` or `test`, it only logs a warning. Make a key with `dox key:generate`.
+    When `APP_ENV` is `development`, `local`, `test` or `testing`, it only logs a warning. Make a key with `dox key:generate`.
 
 
 ---
@@ -13959,7 +13962,7 @@ After `AuthMiddleware`, `req.auth` holds the login.
 
 | Code | What it gives |
 | --- | --- |
-| `req.auth` | an `IAuth?`. `null` when the route has no `AuthMiddleware` |
+| `req.auth` | an `IAuth?`. `null` when the route has no `AuthMiddleware`. It is kept apart from the input, so a query or body field can not set it |
 | `req.auth?.isLoggedIn()` | `true` when a user is loaded |
 | `req.auth?.user<User>()` | the user model |
 | `req.auth?.toJson()` | the user as a map, without `hidden` fields |
@@ -13977,7 +13980,7 @@ After `AuthMiddleware`, `req.auth` holds the login.
 | `isLoggedIn()` | `true` when there is a user |
 
 `attempt` searches only by the fields in `identifierFields`. It runs bcrypt also when no user is found, or when the user has no password, so the answer time does not tell whether an email has an account.
-It returns `null` when the password is not a `String`, when no identifier is given, or when the password does not match.
+It returns `null` when the password is not a `String`, when no identifier is given, when an identifier is not a string or a number (a map or a list from the body), or when the password does not match.
 
 ## Options
 
@@ -13993,8 +13996,8 @@ It returns `null` when the password is not a `String`, when no identifier is giv
 
 | Option | Default | What it does |
 | --- | --- | --- |
-| `secret` | required | the key that signs tokens, like `SecretKey(env.appKey)`. An empty key throws `ArgumentError`. A key shorter than 32 bytes also throws in production, and prints a warning in development, local and test. Make one with `dox key:generate`. For a separate JWT secret (not `APP_KEY`), `openssl rand -hex 32` also works |
-| `algorithm` | `JWTAlgorithm.HS256` | the signing algorithm |
+| `secret` | required | the key that signs tokens, like `SecretKey(env.appKey)`. An empty key throws `ArgumentError`. A key shorter than 32 bytes also throws in production, and prints a warning in development, local, test and testing. Make one with `dox key:generate`. For a separate JWT secret (not `APP_KEY`), `openssl rand -hex 32` also works. Dox does not sign with this text as it is: the HMAC key is made from it with HKDF-SHA256 and the label `dox:jwt`. Another service that checks the tokens needs that key: `driver.signingKey` |
+| `algorithm` | `JWTAlgorithm.HS256` | the signing algorithm. A token with another algorithm in its header is rejected |
 | `expiresIn` | `Duration(hours: 1)` | how long a token is valid |
 | `issuer` | `null` | the `iss` claim. When set, `verifyToken` also checks it |
 | `hashRounds` | `10` | the bcrypt cost of your stored hashes. Use the same value as `Hash.rounds` |
@@ -14301,7 +14304,7 @@ Now every `POST`, `PUT`, `PATCH` and `DELETE` request must send the token. A req
 
 Dox reads the token from one of these places:
 
-- the `_token` field of the body (or of the query string)
+- the `_token` field of the body (not the query string: a url ends up in logs and in the `Referer` header)
 - the `X-CSRF-TOKEN` header
 - the `X-XSRF-TOKEN` header
 
@@ -14379,7 +14382,7 @@ You can also call it yourself.
 ```dart
 import 'package:dox_core/dox_core.dart';
 
-String secret = env.appKey; // 32 characters = 32 bytes, so AES-256
+String secret = env.appKey;
 
 String encoded = AESEncryptor.encode('Hello world', secret);
 String decoded = AESEncryptor.decode(encoded, secret); // 'Hello world'
@@ -14388,7 +14391,7 @@ String decoded = AESEncryptor.decode(encoded, secret); // 'Hello world'
 - `encode` returns base64 text.
 - The same text gives a different output each time.
 - `decode` throws `DecryptException` when the text was changed, or the key is wrong. It is a `400 Bad Request` error.
-- The secret must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256). Another length makes `encode` throw.
+- The AES key is not the secret itself. Dox makes a 32-byte key (AES-256) from the secret with HKDF-SHA256 (RFC 5869) and a label. The default label is `dox:encrypt`. Pick another one with `purpose:`, like `AESEncryptor.encode(text, secret, purpose: 'app:invoice')`. `decode` needs the same `purpose`.
 
 Make a new 32-character `APP_KEY` with the CLI:
 
@@ -14397,10 +14400,23 @@ dox key:generate
 ```
 
 It writes a random key of letters and digits to `APP_KEY` in `.env`.
-Dox uses the key text as it is: its UTF-8 bytes are the AES key. It is not base64 or hex decoded.
+
+## One key per purpose
+
+Dox does not use `APP_KEY` as it is. It makes one key per purpose from it, with HKDF-SHA256 and a label:
+
+| Label | Used for |
+| --- | --- |
+| `dox:cookie` | encrypted cookies, and the `cookie` session driver |
+| `dox:jwt` | the HMAC key of `JwtAuthDriver` (with a `SecretKey`) |
+| `dox:encrypt` | `AESEncryptor` when you give no `purpose` |
+| `dox:signed-url` | for signed URLs |
+
+So a value made for one purpose can not be used for another one.
+`KeyDerivation.forAppKey(label)` gives the 32-byte key of a label. Each isolate makes it once.
 
 At startup Dox checks `APP_KEY`. When it is empty, not exactly 32 bytes, or an old public sample key, the app stops.
-In `development`, `local` and `test` it only prints a warning.
+In `development`, `local`, `test` and `testing` it only prints a warning.
 
 - Keep `APP_KEY` in `.env` or in the secrets of your host. Never put it in code or in git.
 - If you change `APP_KEY`, old encrypted cookies and sessions can not be read any more. JWT tokens signed with it stop working too.
@@ -14497,11 +14513,22 @@ Then a login with an unknown email takes as long as a wrong password. See [Authe
 
 bcrypt reads at most 72 bytes.
 `Hash.make` and `Hash.makeAsync` throw an `ArgumentError` when the password is longer than 72 bytes (UTF-8).
+The error text does not hold the password, so it is safe in logs.
 `Hash.verify` returns `false` for such a password.
 
 So limit the length in your DTO, like `@Length(min: 8, max: 72)`.
 `@Length` counts characters, and a letter outside ASCII can use up to 4 bytes.
 So a password with such letters can still be too long. Catch the error and answer `422`, or use a smaller `max`.
+
+## Compare secrets
+
+To check an API key or a token, use `Hash.equals(given, expected)`, not `==`.
+`==` stops at the first wrong character, so the time can tell how much of the key was right.
+`Hash.equals` takes the same time for every value of the same length.
+
+```dart
+bool ok = Hash.equals(req.header('X-Api-Key') ?? '', Env.get<String>('API_KEY'));
+```
 
 ## With login
 
@@ -14672,13 +14699,16 @@ Every answer now has these headers:
 `Content-Security-Policy` is off by default. A good policy depends on your pages.
 
 Without this middleware, the server already sends three headers on every answer, also on a `404`:
-`X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff` and `X-XSS-Protection: 1; mode=block`.
-`SecurityHeaders` replaces the first two with its own values.
+`X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff` and `X-XSS-Protection: 0`.
+`SecurityHeaders` replaces them with its own values.
+`X-XSS-Protection: 0` turns the old XSS filter of browsers off, like OWASP says. The filter is gone from new browsers, and in old ones it can make holes. Use `Content-Security-Policy` instead.
 
 ## Change or turn off a header
 
 Each header has an option. Give a new value to change it, or `null` to turn it off.
-`null` for `frameOptions` or `contentTypeOptions` keeps the server value from above (`SAMEORIGIN` and `nosniff`).
+`null` removes the header, also one the server sends by default (like `frameOptions: null` for `X-Frame-Options`).
+The option for `X-XSS-Protection` is `xssProtection` (default `'0'`).
+In `extra`, a `null` value removes that header too.
 
 ```dart
 const SecurityHeaders(
@@ -14814,7 +14844,7 @@ The generator makes, for each `@Dto` class:
 | Name | What it is |
 | --- | --- |
 | `$CreateUserDto` | a `const` `DtoSchema<CreateUser>`: the checks, the converter and the JSON Schema |
-| `lib/generated/dtos.g.dart` | `const List<DtoSchema<Object>> dtos`: every DTO in `lib/`. Dox uses it to find DTOs by type. |
+| `lib/generated/dtos.g.dart` | `const List<DtoSchema<Object>> dtos`: every DTO in `lib/`. Dox uses it to find DTOs by type. An app with no DTO gets an empty `final` list. |
 
 The `static const ... schema = $CreateUserDto;` line is how you reach the schema: `CreateUser.schema`.
 
@@ -16868,7 +16898,7 @@ class AuthController {
     User user = User()
       ..name = body.name
       ..email = body.email
-      ..password = Hash.make(body.password);
+      ..password = await Hash.makeAsync(body.password);
     await user.save();
 
     String? token = Auth().login(user);
@@ -17359,7 +17389,7 @@ dox make:job BuildReport
 ```
 
 ```dart title="lib/app/jobs/build_report.job.dart"
-import 'package:dox_core/utils/logger.dart';
+import 'package:dox_core/dox_core.dart';
 import 'package:dox_queue/dox_queue.dart';
 
 /// Builds a report in the queue worker.
@@ -18009,7 +18039,7 @@ On a server you can also keep a `.env` next to the binary, outside git, with `ch
 
 - Make one per environment with `dox key:generate`. Never share the production key with staging.
 - `APP_KEY` must be exactly 32 characters. `dox key:generate` makes a key of the right length.
-- When `APP_ENV` is not `development`, `local` or `test`, a bad key stops the app at start: empty, not 32 characters, or a public sample key. An empty `APP_ENV` counts as production. In development the app only logs a warning.
+- When `APP_ENV` is not `development`, `local`, `test` or `testing`, a bad key stops the app at start: empty, not 32 characters, or a public sample key. An empty `APP_ENV` counts as production. In development the app only logs a warning.
 - A new key makes every cookie, token and signed URL invalid. Every user is logged out. Plan it.
 
 ## 6. Check the env before a deploy
@@ -18438,7 +18468,7 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
-When the server has no DTOs of its own, there is no `server/lib/generated/dtos.g.dart`. Then use `dtos: shared.dtos`.
+When the server has no DTOs of its own, its `dtos` list is empty. The line above still works.
 
 The controller asks for `SaveBlog` like any other DTO. Dox checks the body before the method runs. Bad input gets `422`.
 
@@ -19802,7 +19832,7 @@ One page to keep open while you work. Each section links to its full page.
 | `lib/app/models/<name>/` | `<name>.model.dart` |
 | `lib/app/jobs/` | `<name>.job.dart` |
 | `lib/providers/` | `DoxProvider` classes: ORM, storage, queue, schedule. You add others, like auth. |
-| `lib/generated/` | `container.g.dart`, `openapi.g.dart`, `jobs.g.dart` and (when you have a DTO) `dtos.g.dart`. Made by `build_runner`. Do not edit. |
+| `lib/generated/` | `container.g.dart`, `openapi.g.dart`, `jobs.g.dart` and `dtos.g.dart` (an empty list when the app has no DTO). Made by `build_runner`. Do not edit. |
 | `db/migration/` | migrations and `migrations.dart` (the registry) |
 | `db/seeders/`, `db/factories/` | seeders (`seeders.dart` is the registry) and model factories |
 
@@ -19907,7 +19937,9 @@ See [Routing](../the-basic/routing.md), [Controller](../the-basic/controller.md)
 class ApiKeyMiddleware implements IDoxMiddleware {
   @override
   dynamic handle(IDoxRequest req) {
-    if (req.header('X-Api-Key') != 'secret') {
+    String apiKey = Env.get<String>('API_KEY');
+    // Hash.equals: constant time, so the time does not leak the key
+    if (apiKey.isEmpty || !Hash.equals(req.header('X-Api-Key') ?? '', apiKey)) {
       return response('no').statusCode(401); // stop here
     }
     return req; // go on
@@ -20235,8 +20267,8 @@ Auth.initialize(AuthConfig(
 
 String? token = await Auth().attempt(<String, dynamic>{'email': e, 'password': p});
 String? token2 = Auth().login(user);
-user.password = Hash.make(password);
-bool ok = Hash.verify(password, hash);
+user.password = await Hash.makeAsync(password); // bcrypt in another isolate
+bool ok = await Hash.verifyAsync(password, hash);
 ```
 
 Protect a route with `AuthMiddleware()`. Client sends `Authorization: Bearer <token>`.
@@ -20327,7 +20359,7 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `appKey` | `String` | required | Encrypts cookies (`req.cookie()`, `DoxCookie`) and signs local storage URLs. It must be exactly 32 characters. The app stops at start when it is empty, has another length, or is a public sample key. When `APP_ENV` is `development`, `local` or `test`, this is only a warning. Make one with `dox key:generate`. |
+| `appKey` | `String` | required | Encrypts cookies (`req.cookie()`, `DoxCookie`) and signs local storage URLs. It must be exactly 32 characters. The app stops at start when it is empty, has another length, or is a public sample key. When `APP_ENV` is `development`, `local`, `test` or `testing`, this is only a warning. Make one with `dox key:generate`. |
 | `serverPort` | `int` | `3000` | The port the HTTP server listens on. When the env has no `APP_PORT` but has `PORT`, Dox listens on `PORT` instead (Cloud Run, Fly, Render and Heroku set it). |
 | `host` | `String?` | `null`: `APP_HOST`, else all interfaces | The network interface to listen on, like `127.0.0.1`. `null` reads the env var `APP_HOST`. With neither, Dox listens on all interfaces, IPv6 and IPv4 (`::`). |
 | `totalIsolate` | `int?` | `Platform.numberOfProcessors` | Isolates (threads) that serve HTTP, all on the same port. On Windows the native server runs on one isolate. |
@@ -20681,9 +20713,17 @@ import 'package:dox_core/dox_core.dart';
 
 CORSConfig cors = CORSConfig(
   enabled: false,
-  origin: '*',
-  methods: '*',
-  headers: '*',
+  // a list: Dox sends back the request origin only when it is in the list
+  origin: <String>['http://localhost:3000'],
+  methods: <String>['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  headers: <String>[
+    'accept',
+    'authorization',
+    'content-type',
+    'x-csrf-token',
+    'x-xsrf-token',
+    'x-requested-with',
+  ],
   exposeHeaders: <String>[
     'cache-control',
     'content-language',
@@ -20696,6 +20736,11 @@ CORSConfig cors = CORSConfig(
   maxAge: 90,
 );
 ```
+
+Do not use `origin: '*'` together with `credentials: true`.
+With credentials the browser sends cookies, so it does not accept `*`, and the call fails.
+Dox does not send back any origin in place of `*`, because that would let every site call the app with the user's cookies.
+`'*'` is fine for a public API with `credentials: false` (or not set).
 
 ```dart title="lib/providers/orm_provider.dart"
 import 'package:dox_core/dox_core.dart';
@@ -20810,7 +20855,7 @@ What it does:
 1. When `pubspec.yaml` contains `build_runner`: runs `dart run build_runner build`. Stops with exit code 1 when it fails.
 2. Runs `dart build cli --target bin/server.dart --output build`.
 3. When `bin/queue.dart` or `bin/schedule.dart` exists: builds it the same way, to `build/bundle/bin/queue` and `build/bundle/bin/schedule`.
-4. Deletes the old `build/bundle/db`, then copies `db/` to `build/bundle/db`. It leaves out SQLite files (`*.sqlite`, `*.sqlite3`, `*.db`, and their `-wal`, `-shm` and `-journal` files), so your local data does not go to production.
+4. Deletes the old `build/bundle/db`, then copies `db/` to `build/bundle/db`. It leaves out SQLite files (`*.sqlite`, `*.sqlite3`, `*.db`, and their `-wal`, `-shm`, `-journal` and `.lock` files), so your local data does not go to production.
 5. Copies `.env.example` to `build/bundle/.env.example`.
 6. Prints `[Dox] Built build/bundle. Run it with: cd build/bundle && ./bin/server`.
 
@@ -20961,7 +21006,7 @@ After the file is made, the CLI tells you to run `dart run build_runner build`. 
 dox make:middleware <name>
 ```
 
-Writes `lib/app/http/middleware/<name>.middleware.dart`: a class `<Name>Middleware extends IDoxMiddleware` with a `handle(IDoxRequest req)` that returns `req`.
+Writes `lib/app/http/middleware/<name>.middleware.dart`: a class `<Name>Middleware implements IDoxMiddleware` with a `handle(IDoxRequest req)` that returns `req`.
 A trailing `Middleware` in the name is removed.
 
 Template: `_getSample` in `packages/dox-cli/lib/src/tools/create_middleware.dart`.
@@ -21066,7 +21111,7 @@ A failed run prints the error and sets exit code 1.
 | --- | --- | --- |
 | `dox make:factory <model>` | `dox create:factory` | Make `db/factories/<model>.factory.dart`. It imports the model with the package name of `pubspec.yaml`. |
 | `dox make:seeder <name>` | `dox create:seeder` | Make `db/seeders/<name>.seeder.dart`. It writes `db/seeders/seeders.dart` again, and makes `bin/seed.dart` when it is missing. |
-| `dox db:seed [--class=<name>]` | | Write `db/seeders/seeders.dart` again, then run `dart run bin/seed.dart [--class=<name>]`. Default seeder: `DatabaseSeeder`. When `bin/seed.dart` is missing, it prints `bin/seed.dart is missing.` (exit code 1). |
+| `dox db:seed [--class=<name>]` | | Write `db/seeders/seeders.dart` again, then run `dart run bin/seed.dart [--class=<name>]`. Default seeder: `DatabaseSeeder`. `--class <name>` (with a space) works too. When `bin/seed.dart` is missing, it prints `bin/seed.dart is missing.` (exit code 1). |
 
 Templates: `createFactory` in `packages/dox-cli/lib/src/tools/create_factory.dart`, and `createSeeder` and `seedEntrySource` in `packages/dox-cli/lib/src/tools/create_seeder.dart`.
 
@@ -21223,7 +21268,7 @@ If `APP_ENV` is not set or empty, Dox treats the app as production: `/docs` is o
 
 | Variable | Who reads it | Default | Meaning | Example |
 | --- | --- | --- | --- | --- |
-| `APP_ENV` | `dox_core`, `dox_auth`, `dox_view` | empty | Any value except `development`, `local` or `test` (also empty) makes a bad `APP_KEY` a startup error: missing, not exactly 32 characters, or a public sample key. The same rule applies to a JWT secret shorter than 32 bytes (`dox_auth`). In `development`, `local` and `test` both are only a warning. `development` or `local` also: show error details in `500` responses and in health check answers, turn the `/docs` routes on when `openApi.enabled` is `null`, and turn the template cache of `dox_view` off. `testing` as a real environment variable also loads `.env.testing` (see below). Read with `Env.get`. | `APP_ENV=production` |
+| `APP_ENV` | `dox_core`, `dox_auth`, `dox_view` | empty | Any value except `development`, `local`, `test` or `testing` (also empty) makes a bad `APP_KEY` a startup error: missing, not exactly 32 characters, or a public sample key. The same rule applies to a JWT secret shorter than 32 bytes (`dox_auth`). In `development`, `local`, `test` and `testing` both are only a warning. `development` or `local` also: show error details in `500` responses and in health check answers, turn the `/docs` routes on when `openApi.enabled` is `null`, and turn the template cache of `dox_view` off. `testing` as a real environment variable also loads `.env.testing` (see below). Read with `Env.get`. | `APP_ENV=production` |
 | `PORT` | `dox_core` (`DoxServer.portFor()`) | not set | The port to listen on, when `APP_PORT` is not set. Cloud Run, Fly, Render and Heroku set it. `APP_PORT` wins when both are set. Read with `Env.get`. | `PORT=8080` |
 | `APP_HOST` | `dox_core` (`DoxServer.hostFor()`) | not set (all interfaces, `::`) | The host to listen on. `127.0.0.1` keeps the app off the network, for an app behind a proxy on the same machine. `AppConfig.host` wins over it. Read with `Env.get`. | `APP_HOST=127.0.0.1` |
 | `DOX_HTTP_THREAD` | `dox_http_native` (Rust, `shared_thread()`) | not set (one thread per isolate) | `shared` puts the servers of all isolates on one network thread. Off by default: on 2 cores it cut req/s by a quarter. Real environment only (`std::env::var`), not `.env`. | `DOX_HTTP_THREAD=shared` |
@@ -21247,7 +21292,7 @@ A new project (`dox create`) reads these keys through its typed env class, `lib/
 | `APP_NAME` | `appName` | `String` | `dox` | `LoggerConfig.name`. |
 | `APP_ENV` | `appEnv` | `String` | `production` | `development`, `staging` or `production`. `env.isDevelopment` is `true` for `development`. It turns on `prettyPrint` of the logger and the query log of the database. Any value except `production` turns on `LogMiddleware` (one log line per request). Also read by the framework (see above). |
 | `APP_PORT` | `appPort` | `int` | `3000` | `AppConfig.serverPort`. When `APP_PORT` is not set, Dox listens on `PORT` if the env has it. |
-| `APP_KEY` | `appKey` | `String` | required | `AppConfig.appKey`. It must be exactly 32 characters. Run `dox key:generate` for one. The app stops at start when it is missing, has another length, or is a public sample key (only a warning in `development`, `local` and `test`). |
+| `APP_KEY` | `appKey` | `String` | required | `AppConfig.appKey`. It must be exactly 32 characters. Run `dox key:generate` for one. The app stops at start when it is missing, has another length, or is a public sample key (only a warning in `development`, `local`, `test` and `testing`). |
 | `APP_TOTAL_ISOLATE` | `appTotalIsolate` | `int?` | not set: one per CPU core | `AppConfig.totalIsolate`. |
 | `LOG_LEVEL` | `logLevel` | `String` | `info` | `LoggerConfig.level`. |
 | `CACHE_STORE` | `cacheStore` | `String` | `file` | `CacheConfig.defaultStore`. A new project has the stores `file` and `memory` in `lib/config/cache.dart`. Add a `redis` store there before you use it. |
@@ -21457,7 +21502,7 @@ abstract class IHttpException {
 ## The classes
 
 Every class takes the named parameters `message`, `errorCode` and `code`. The table shows the defaults.
-`message` is a `String`. Only `ValidationException` takes a `Map` too.
+`message` is a `String` or a `Map`, like `NotFoundHttpException(message: {'error': 'not_found'})`.
 
 | Class | Package | Status `code` | `errorCode` | Default `message` | Dox throws it when |
 | --- | --- | --- | --- | --- | --- |
@@ -21495,7 +21540,14 @@ content-type: application/json
 {"code":"not_found","message":"Blog not found"}
 ```
 
-A `Map` message is sent as it is, with no `code` key. `ValidationException` always has a map, one entry per field:
+A `Map` message is sent as it is, with no `code` key, and with the status of the exception:
+
+```dart
+throw NotFoundHttpException(message: <String, String>{'error': 'not_found'});
+// 404 {"error":"not_found"}
+```
+
+`ValidationException` always has a map, one entry per field:
 
 ```
 HTTP/1.1 422 Unprocessable Entity
@@ -21560,7 +21612,7 @@ If `APP_ENV` is empty or not set, Dox treats the app as production: `/docs` is o
 | Check | How | Read more |
 | --- | --- | --- |
 | `APP_KEY` is set, 32 characters and secret | `dox key:generate`, or a random value of exactly 32 characters in the real env. It signs JWT tokens and encrypts cookies. Never use the value from `.env.example`. | [Encryption](../security/encryption.md) |
-| `APP_ENV=production` | Set it, or leave it empty. In production, a bad `APP_KEY` stops the app at start with a `StateError`: an empty key, a key that is not exactly 32 characters, or a public sample key. Only with `APP_ENV` `development`, `local` or `test` does Dox log a warning instead. | [Env reference](env.md) |
+| `APP_ENV=production` | Set it, or leave it empty. In production, a bad `APP_KEY` stops the app at start with a `StateError`: an empty key, a key that is not exactly 32 characters, or a public sample key. Only with `APP_ENV` `development`, `local`, `test` or `testing` does Dox log a warning instead. | [Env reference](env.md) |
 | The env is complete | Run `dox env:check` in CI or before the deploy. It exits with code 1 when a key is missing or bad. | [CLI](cli.md) |
 | No secrets in the image or in git | `.env` in `.dockerignore` and `.gitignore`. Pass values as env vars (`docker run -e`, `env_file:`, systemd `EnvironmentFile=`). `dox build` copies `.env.example` only. | [Docker](../guides/docker.md) |
 | No comments after values in `.env` | The app strips `# note`, but migrations keep it in the value. Put comments on their own line. | [Env reference](env.md) |
@@ -21571,9 +21623,9 @@ If `APP_ENV` is empty or not set, Dox treats the app as production: `/docs` is o
 | --- | --- | --- |
 | JWT tokens expire | `JwtAuthDriver.expiresIn` is 1 hour by default. Pick a time that fits your app, like `JwtAuthDriver(secret: SecretKey(env.appKey), expiresIn: Duration(hours: 12))`. | [Authentication](../security/authentication.md) |
 | You can not revoke one token | **Dox limit.** There is no token list on the server. To log out everyone, change `APP_KEY`. | [Authentication](../security/authentication.md) |
-| Passwords are hashed | `user.password = Hash.make(input)` (bcrypt). Never store or encrypt a plain password. | [Hashing](../security/hashing.md) |
+| Passwords are hashed | `user.password = await Hash.makeAsync(input)` (bcrypt). In a request, use `makeAsync`: it runs bcrypt in another isolate, so other requests do not wait. Never store or encrypt a plain password. | [Hashing](../security/hashing.md) |
 | The hash is never sent | `List<String> get hidden => <String>['password'];` in the user model. The JWT payload is `user.toJson()`, and anyone can read it. | [Authentication](../security/authentication.md) |
-| Passwords have a max length | bcrypt throws on input over 72 bytes. Add `@MaxLength(72)` to the password field of the DTO. It counts characters, so non-ASCII text can still pass 72 bytes. | [Troubleshooting](troubleshooting.md) |
+| Passwords have a max length | bcrypt takes at most 72 bytes. `Hash.make` and `Hash.makeAsync` throw an `ArgumentError` on longer input. Add `@MaxLength(72)` to the password field of the DTO. It counts characters, so non-ASCII text can still pass 72 bytes. | [Troubleshooting](troubleshooting.md) |
 
 ## HTTP and network
 
@@ -21583,7 +21635,7 @@ If `APP_ENV` is empty or not set, Dox treats the app as production: `/docs` is o
 | `trustedProxies` is set behind a proxy | `AppConfig(trustedProxies: <String>['127.0.0.1', '::1'])`, or the proxy network, like `'172.16.0.0/12'`. Without it, `req.ip()` is the proxy and `req.scheme()` is `http`. Do not use `['*']` when the app port is public. | [App config](app-config.md) |
 | Body limits are on | Keep `maxBodySize` (10 MB) and `maxMultipartSize` (100 MB), or lower them. Set the same limit in the proxy: `client_max_body_size 100m;` | [Request](../the-basic/request.md) |
 | CORS has real origins | `CORSConfig(origin: 'https://my.app')`, or a list like `<String>['https://my.app', 'https://admin.my.app']`. With a list, Dox sends back only the request origin when it is in the list. | [CORS](../security/cors.md) |
-| No `credentials: true` with `origin: '*'` | The new project's `cors.dart` has `origin: '*'` and `credentials: true` with `enabled: false`. When you turn CORS on, set a real origin first. | [CORS](../security/cors.md) |
+| No `credentials: true` with `origin: '*'` | The new project's `cors.dart` has `origin: <String>['http://localhost:3000']`, `credentials: true` and `enabled: false`. When you turn CORS on, put your real origins in the list. | [CORS](../security/cors.md) |
 | Rate limiting | Add `RateLimit(...)` to login and other busy routes. Use a Redis cache store, so all servers share the counts. Or limit at the proxy, see [below](#rate-limit-at-the-proxy). | [Rate limiting](../security/rate-limiting.md) |
 | Security headers | Add `const SecurityHeaders()` to `globalMiddleware`. | [Security headers](../security/security-headers.md) |
 | gzip at the proxy | Keep `compress: false`. Turn on gzip in Caddy (`encode gzip`) or nginx (`gzip on;`). | [Performance](../digging-deeper/performance.md) |
@@ -21795,10 +21847,10 @@ When a value must have ` #` in it (a space, then `#`), put the value in quotes. 
 **Symptom.** Saving a user, or registering, gives a `500`. The log shows:
 
 ```
-Invalid argument(s) (password): Password is too long (The length should be less than or equal to 72): "..."
+Invalid argument(s) (password): The password is too long. bcrypt takes at most 72 bytes.
 ```
 
-**Cause.** `Hash.make()` uses bcrypt from the `bcrypt` package. bcrypt throws an `ArgumentError` when the password is longer than 72 bytes.
+**Cause.** `Hash.make()` and `Hash.makeAsync()` use bcrypt. bcrypt takes at most 72 bytes, so Dox throws an `ArgumentError` for a longer password. The text does not hold the password, so it is safe in logs.
 
 **Fix.** Refuse long passwords in your DTO, before you hash them:
 
@@ -21893,7 +21945,7 @@ This page lists the messages Dox prints or throws, so you can search for the tex
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `APP_KEY is not set. Run `dox key:generate` and put the key in .env` | `appKey` is empty. A `StateError` stops the app, unless `APP_ENV` is `development`, `local` or `test`. Then it is only a warning. | Run `dox key:generate`, or set `APP_KEY` in the env. |
+| `APP_KEY is not set. Run `dox key:generate` and put the key in .env` | `appKey` is empty. A `StateError` stops the app, unless `APP_ENV` is `development`, `local`, `test` or `testing`. Then it is only a warning. | Run `dox key:generate`, or set `APP_KEY` in the env. |
 | `APP_KEY must be exactly 32 characters. Run `dox key:generate`` | The key is shorter or longer. Same rule as above. | Run `dox key:generate`. |
 | `APP_KEY is a public sample key. Run `dox key:generate` for a new one` | The key is a known sample key. Same rule as above. | Run `dox key:generate`. |
 | `Unsupported operation: dox_http_native did not load: <reason>. Fix: ...` | The native HTTP library is missing or from another version (`native library ABI <x>, expected <y>`). The app stops at start. | Do what the `Fix:` part says. See [Troubleshooting](troubleshooting.md#the-native-http-library-did-not-load). |
@@ -21975,9 +22027,9 @@ The table shows the `message` text.
 | Text | When | What to do |
 | --- | --- | --- |
 | `401` `Authentication failed` | `AuthMiddleware` finds no token, a bad or expired token, or the user is deleted. | Send `Authorization: Bearer <token>`. Log in again. |
-| `Invalid argument(s) (password): Password is too long ...` | `Hash.make()` with a password over 72 bytes. | Limit the length in the DTO. See [Troubleshooting](troubleshooting.md#hashmake-throws-on-a-long-password). |
+| `Invalid argument(s) (password): The password is too long. bcrypt takes at most 72 bytes.` | `Hash.make()` or `Hash.makeAsync()` with a password over 72 bytes. | Limit the length in the DTO. See [Troubleshooting](troubleshooting.md#hashmake-throws-on-a-long-password). |
 | `Invalid argument(s) (secret): The JWT secret is empty. Set APP_KEY (run `dox key:generate`).` | `JwtAuthDriver` with an empty secret. | Set `APP_KEY`. |
-| `Invalid argument(s) (secret): The JWT secret is <n> bytes. It must be at least 32 bytes. ...` | A short secret. In `development`, `local` and `test` it is only a warning. | Run `dox key:generate`. |
+| `Invalid argument(s) (secret): The JWT secret is <n> bytes. It must be at least 32 bytes. ...` | A short secret. In `development`, `local`, `test` and `testing` it is only a warning. | Run `dox key:generate`. |
 
 `Hash.verify()` gives `false` for a value that is not a bcrypt hash. It does not throw.
 `Auth().attempt()` returns `null` for a wrong password. It does not throw. See [Authentication](../security/authentication.md).
@@ -22163,6 +22215,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
+### Unreleased
+
+- `IDoxRequest.auth` is now a field (getter and setter), not only a getter. The auth is kept apart from the input.
+
 ### 3.0.0-alpha.17
 
 - Version bump only, to match the other packages.
@@ -22242,6 +22298,15 @@ What changed in each package, newest first. This page is made from the
 - See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
 
 ## dox_auth
+
+### Unreleased
+
+- Breaking: `JwtAuthDriver` no longer signs with the `SecretKey` text as it is. The HMAC key is made from it with HKDF-SHA256 and the label `dox:jwt`. Existing tokens become invalid after this version. Users must log in again. `driver.signingKey` gives the key, for another service that checks the tokens.
+- Security: `JwtAuthDriver.verifyToken` accepts only the configured `algorithm`. A token with another algorithm in its header is rejected.
+- Security: `attempt` only puts a string or a number into the user query. A map or a list as the email (or another identifier) fails the login.
+- `AuthMiddleware` and `Auth.setUser` set `req.auth` directly. They no longer put the auth into the request input.
+- `UnAuthorizedException` takes a `dynamic message`, so a map message works.
+- `APP_ENV=testing` is treated like `test` for the short secret check: only a warning.
 
 ### 3.0.0-alpha.17
 
@@ -22333,6 +22398,10 @@ What changed in each package, newest first. This page is made from the
 - `dart_jsonwebtoken` 3.
 
 ## dox_builder
+
+### Unreleased
+
+- `lib/generated/dtos.g.dart` is now written for every app, also with no `@Dto`. The list is empty then. So the app can always have `dtos: dtos` in `AppConfig`. An app here is a package that imports `AppConfig` (from dox_core). Other packages with no DTO still get no file. The empty list is `final`, not `const`, so `dtos: dtos` does not trigger the `avoid_redundant_argument_values` lint.
 
 ### 3.0.0-alpha.17
 
@@ -22515,6 +22584,14 @@ What changed in each package, newest first. This page is made from the
 
 ## dox
 
+### Unreleased
+
+- Fix: `dox make:job` wrote a `bin/queue.dart` that did not compile. It called `QueueWorker(jobs: ...)`, but `QueueWorker` has no `jobs` parameter. It now writes the same file as the app template: `QueueWorker(app: appConfig)`.
+- Fix: the job that `dox make:job` writes showed `X(userId: 1).dispatch()` in its comment. The class has no `userId`. The comment now shows `X().dispatch()`.
+- Fix: `dox db:seed --class UserSeeder` (with a space) was refused. Both `--class=UserSeeder` and `--class UserSeeder` work now.
+- Fix: `dox make:middleware` wrote `extends IDoxMiddleware`. It now writes `implements IDoxMiddleware`, like the docs and the built-in middleware.
+- `dox build` also leaves the SQLite lock files of dox_migration (`*.sqlite.lock`, `*.sqlite3.lock`, `*.db.lock`) out of `build/bundle/db`.
+
 ### 3.0.0-alpha.17
 
 - Uses dox_migration 3.0.0-alpha.12.
@@ -22613,6 +22690,21 @@ What changed in each package, newest first. This page is made from the
 - Generated models import `package:dox_orm/dox_orm.dart`.
 
 ## dox_core
+
+### Unreleased
+
+- Breaking: Dox no longer uses `APP_KEY` as it is. It makes one key per purpose from it with HKDF-SHA256 (RFC 5869): `dox:cookie` for cookies and the cookie session, `dox:encrypt` for `AESEncryptor`, and more. See the new `KeyDerivation` class. Existing encrypted cookies, sessions and tokens become invalid after this version. Users must log in again.
+- `AESEncryptor.encode` and `decode` take a `purpose` label. The default is `dox:encrypt`. The secret can now have any length.
+- Fix: `Hash.make` and `Hash.makeAsync` with a password over 72 bytes threw the bcrypt error, and its text held the password. So the password could end up in the logs. Dox now throws its own `ArgumentError` with no password in the text.
+- New: `Hash.equals(a, b)` compares two secrets in constant time. `CsrfMiddleware` uses it.
+- Fix: the `cookie` session driver did not check the save time in the cookie. A copied cookie stayed valid until `APP_KEY` changed. A session older than `lifetime` is now a new empty session.
+- Breaking: `req.auth` is now its own field on the request, not a value in the input. Before, a query or body field `dox_authentication_instance` made `req.auth` throw a 500. `AUTH_REQUEST_KEY` is removed. Use `Auth().setUser(req, user)` or set `req.auth`.
+- Fix: `APP_ENV=testing` stopped the app on a bad `APP_KEY`. It is now treated like `test`: only a warning.
+- `Logger` is now exported from `package:dox_core/dox_core.dart`.
+- The HTTP exceptions (`NotFoundHttpException` and the others) take a `dynamic message`, like `IHttpException`. A map message is sent as JSON as it is, like `NotFoundHttpException(message: {'error': 'not_found'})`.
+- Security: the server now sends `X-XSS-Protection: 0`, not `1; mode=block`. OWASP says the old browser filter should be off. `SecurityHeaders` has a new `xssProtection` option. A `null` option (or a `null` value in `extra`) now removes the header, also a server default like `X-Frame-Options`.
+- Security: `CsrfMiddleware` no longer reads `_token` from the query string. It reads only the body and the `X-CSRF-TOKEN` / `X-XSRF-TOKEN` headers.
+- Doc comments: fixed the examples of `Cache.remember`, `Route.domain`, `Route.middleware` and `Route.disabledCors`.
 
 ### 3.0.0-alpha.17
 

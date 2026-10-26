@@ -6548,7 +6548,7 @@ An Inertia request (it has the <code>X-Inertia</code> header) is redirected like
 <tr>
 <td><code>lifetime</code></td>
 <td>2 hours</td>
-<td>The session ends after this long with no use.</td>
+<td>The session ends after this long with no use. The <code>cookie</code> driver keeps the save time in the encrypted cookie and checks it, so a copied old cookie stops working too.</td>
 </tr>
 <tr>
 <td><code>path</code></td>

@@ -6639,7 +6639,7 @@ A <a href="../rate-limiting/">rate limit</a> on login and register slows down pa
 <tbody>
 <tr>
 <td><code>req.auth</code></td>
-<td>an <code>IAuth?</code>. <code>null</code> when the route has no <code>AuthMiddleware</code></td>
+<td>an <code>IAuth?</code>. <code>null</code> when the route has no <code>AuthMiddleware</code>. It is kept apart from the input, so a query or body field can not set it</td>
 </tr>
 <tr>
 <td><code>req.auth?.isLoggedIn()</code></td>
@@ -6695,7 +6695,7 @@ A <a href="../rate-limiting/">rate limit</a> on login and register slows down pa
 </tbody>
 </table>
 <p><code>attempt</code> searches only by the fields in <code>identifierFields</code>. It runs bcrypt also when no user is found, or when the user has no password, so the answer time does not tell whether an email has an account.
-It returns <code>null</code> when the password is not a <code>String</code>, when no identifier is given, or when the password does not match.</p>
+It returns <code>null</code> when the password is not a <code>String</code>, when no identifier is given, when an identifier is not a string or a number (a map or a list from the body), or when the password does not match.</p>
 <h2 id="options">Options</h2>
 <h3 id="authprovider"><code>AuthProvider</code></h3>
 <table>
@@ -6737,12 +6737,12 @@ It returns <code>null</code> when the password is not a <code>String</code>, whe
 <tr>
 <td><code>secret</code></td>
 <td>required</td>
-<td>the key that signs tokens, like <code>SecretKey(env.appKey)</code>. An empty key throws <code>ArgumentError</code>. A key shorter than 32 bytes also throws in production, and prints a warning in development, local and test. Make one with <code>dox key:generate</code>. For a separate JWT secret (not <code>APP_KEY</code>), <code>openssl rand -hex 32</code> also works</td>
+<td>the key that signs tokens, like <code>SecretKey(env.appKey)</code>. An empty key throws <code>ArgumentError</code>. A key shorter than 32 bytes also throws in production, and prints a warning in development, local, test and testing. Make one with <code>dox key:generate</code>. For a separate JWT secret (not <code>APP_KEY</code>), <code>openssl rand -hex 32</code> also works. Dox does not sign with this text as it is: the HMAC key is made from it with HKDF-SHA256 and the label <code>dox:jwt</code>. Another service that checks the tokens needs that key: <code>driver.signingKey</code></td>
 </tr>
 <tr>
 <td><code>algorithm</code></td>
 <td><code>JWTAlgorithm.HS256</code></td>
-<td>the signing algorithm</td>
+<td>the signing algorithm. A token with another algorithm in its header is rejected</td>
 </tr>
 <tr>
 <td><code>expiresIn</code></td>

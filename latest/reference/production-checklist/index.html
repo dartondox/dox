@@ -6364,7 +6364,7 @@
 </tr>
 <tr>
 <td><code>APP_ENV=production</code></td>
-<td>Set it, or leave it empty. In production, a bad <code>APP_KEY</code> stops the app at start with a <code>StateError</code>: an empty key, a key that is not exactly 32 characters, or a public sample key. Only with <code>APP_ENV</code> <code>development</code>, <code>local</code> or <code>test</code> does Dox log a warning instead.</td>
+<td>Set it, or leave it empty. In production, a bad <code>APP_KEY</code> stops the app at start with a <code>StateError</code>: an empty key, a key that is not exactly 32 characters, or a public sample key. Only with <code>APP_ENV</code> <code>development</code>, <code>local</code>, <code>test</code> or <code>testing</code> does Dox log a warning instead.</td>
 <td><a href="../env/">Env reference</a></td>
 </tr>
 <tr>
@@ -6406,7 +6406,7 @@
 </tr>
 <tr>
 <td>Passwords are hashed</td>
-<td><code>user.password = Hash.make(input)</code> (bcrypt). Never store or encrypt a plain password.</td>
+<td><code>user.password = await Hash.makeAsync(input)</code> (bcrypt). In a request, use <code>makeAsync</code>: it runs bcrypt in another isolate, so other requests do not wait. Never store or encrypt a plain password.</td>
 <td><a href="../../security/hashing/">Hashing</a></td>
 </tr>
 <tr>
@@ -6416,7 +6416,7 @@
 </tr>
 <tr>
 <td>Passwords have a max length</td>
-<td>bcrypt throws on input over 72 bytes. Add <code>@MaxLength(72)</code> to the password field of the DTO. It counts characters, so non-ASCII text can still pass 72 bytes.</td>
+<td>bcrypt takes at most 72 bytes. <code>Hash.make</code> and <code>Hash.makeAsync</code> throw an <code>ArgumentError</code> on longer input. Add <code>@MaxLength(72)</code> to the password field of the DTO. It counts characters, so non-ASCII text can still pass 72 bytes.</td>
 <td><a href="../troubleshooting/">Troubleshooting</a></td>
 </tr>
 </tbody>
@@ -6453,7 +6453,7 @@
 </tr>
 <tr>
 <td>No <code>credentials: true</code> with <code>origin: '*'</code></td>
-<td>The new project's <code>cors.dart</code> has <code>origin: '*'</code> and <code>credentials: true</code> with <code>enabled: false</code>. When you turn CORS on, set a real origin first.</td>
+<td>The new project's <code>cors.dart</code> has <code>origin: &lt;String&gt;['http://localhost:3000']</code>, <code>credentials: true</code> and <code>enabled: false</code>. When you turn CORS on, put your real origins in the list.</td>
 <td><a href="../../security/cors/">CORS</a></td>
 </tr>
 <tr>

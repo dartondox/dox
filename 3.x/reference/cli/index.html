@@ -6799,7 +6799,7 @@
 <li>When <code>pubspec.yaml</code> contains <code>build_runner</code>: runs <code>dart run build_runner build</code>. Stops with exit code 1 when it fails.</li>
 <li>Runs <code>dart build cli --target bin/server.dart --output build</code>.</li>
 <li>When <code>bin/queue.dart</code> or <code>bin/schedule.dart</code> exists: builds it the same way, to <code>build/bundle/bin/queue</code> and <code>build/bundle/bin/schedule</code>.</li>
-<li>Deletes the old <code>build/bundle/db</code>, then copies <code>db/</code> to <code>build/bundle/db</code>. It leaves out SQLite files (<code>*.sqlite</code>, <code>*.sqlite3</code>, <code>*.db</code>, and their <code>-wal</code>, <code>-shm</code> and <code>-journal</code> files), so your local data does not go to production.</li>
+<li>Deletes the old <code>build/bundle/db</code>, then copies <code>db/</code> to <code>build/bundle/db</code>. It leaves out SQLite files (<code>*.sqlite</code>, <code>*.sqlite3</code>, <code>*.db</code>, and their <code>-wal</code>, <code>-shm</code>, <code>-journal</code> and <code>.lock</code> files), so your local data does not go to production.</li>
 <li>Copies <code>.env.example</code> to <code>build/bundle/.env.example</code>.</li>
 <li>Prints <code>[Dox] Built build/bundle. Run it with: cd build/bundle &amp;&amp; ./bin/server</code>.</li>
 </ol>
@@ -6950,7 +6950,7 @@ After the file is made, the CLI tells you to run <code>dart run build_runner bui
 <h3 id="dox-makemiddleware"><code>dox make:middleware</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>dox make:middleware &lt;name&gt;
 </span></code></pre></div>
-<p>Writes <code>lib/app/http/middleware/&lt;name&gt;.middleware.dart</code>: a class <code>&lt;Name&gt;Middleware extends IDoxMiddleware</code> with a <code>handle(IDoxRequest req)</code> that returns <code>req</code>.
+<p>Writes <code>lib/app/http/middleware/&lt;name&gt;.middleware.dart</code>: a class <code>&lt;Name&gt;Middleware implements IDoxMiddleware</code> with a <code>handle(IDoxRequest req)</code> that returns <code>req</code>.
 A trailing <code>Middleware</code> in the name is removed.</p>
 <p>Template: <code>_getSample</code> in <code>packages/dox-cli/lib/src/tools/create_middleware.dart</code>.</p>
 <h3 id="dox-makedto"><code>dox make:dto</code></h3>
@@ -7115,7 +7115,7 @@ A failed run prints the error and sets exit code 1.</p>
 <tr>
 <td><code>dox db:seed [--class=&lt;name&gt;]</code></td>
 <td></td>
-<td>Write <code>db/seeders/seeders.dart</code> again, then run <code>dart run bin/seed.dart [--class=&lt;name&gt;]</code>. Default seeder: <code>DatabaseSeeder</code>. When <code>bin/seed.dart</code> is missing, it prints <code>bin/seed.dart is missing.</code> (exit code 1).</td>
+<td>Write <code>db/seeders/seeders.dart</code> again, then run <code>dart run bin/seed.dart [--class=&lt;name&gt;]</code>. Default seeder: <code>DatabaseSeeder</code>. <code>--class &lt;name&gt;</code> (with a space) works too. When <code>bin/seed.dart</code> is missing, it prints <code>bin/seed.dart is missing.</code> (exit code 1).</td>
 </tr>
 </tbody>
 </table>

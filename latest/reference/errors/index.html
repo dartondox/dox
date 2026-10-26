@@ -6538,7 +6538,7 @@
 <tbody>
 <tr>
 <td><code>APP_KEY is not set. Run</code>dox key:generate<code>and put the key in .env</code></td>
-<td><code>appKey</code> is empty. A <code>StateError</code> stops the app, unless <code>APP_ENV</code> is <code>development</code>, <code>local</code> or <code>test</code>. Then it is only a warning.</td>
+<td><code>appKey</code> is empty. A <code>StateError</code> stops the app, unless <code>APP_ENV</code> is <code>development</code>, <code>local</code>, <code>test</code> or <code>testing</code>. Then it is only a warning.</td>
 <td>Run <code>dox key:generate</code>, or set <code>APP_KEY</code> in the env.</td>
 </tr>
 <tr>
@@ -6864,8 +6864,8 @@ The table shows the <code>message</code> text.</p>
 <td>Send <code>Authorization: Bearer &lt;token&gt;</code>. Log in again.</td>
 </tr>
 <tr>
-<td><code>Invalid argument(s) (password): Password is too long ...</code></td>
-<td><code>Hash.make()</code> with a password over 72 bytes.</td>
+<td><code>Invalid argument(s) (password): The password is too long. bcrypt takes at most 72 bytes.</code></td>
+<td><code>Hash.make()</code> or <code>Hash.makeAsync()</code> with a password over 72 bytes.</td>
 <td>Limit the length in the DTO. See <a href="../troubleshooting/#hashmake-throws-on-a-long-password">Troubleshooting</a>.</td>
 </tr>
 <tr>
@@ -6875,7 +6875,7 @@ The table shows the <code>message</code> text.</p>
 </tr>
 <tr>
 <td><code>Invalid argument(s) (secret): The JWT secret is &lt;n&gt; bytes. It must be at least 32 bytes. ...</code></td>
-<td>A short secret. In <code>development</code>, <code>local</code> and <code>test</code> it is only a warning.</td>
+<td>A short secret. In <code>development</code>, <code>local</code>, <code>test</code> and <code>testing</code> it is only a warning.</td>
 <td>Run <code>dox key:generate</code>.</td>
 </tr>
 </tbody>

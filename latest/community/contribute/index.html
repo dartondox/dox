@@ -6810,10 +6810,6 @@ Then raise the version constraint in the Dox packages that use it.</p>
 <td>a copy of the newest version (now 3.x)</td>
 </tr>
 <tr>
-<td><code>/2.x/...</code></td>
-<td>the old 2.x docs, built from the <code>v2.x</code> branch</td>
-</tr>
-<tr>
 <td><code>/</code></td>
 <td>redirects to <code>/latest/</code></td>
 </tr>
@@ -6841,8 +6837,6 @@ Then raise the version constraint in the Dox packages that use it.</p>
 <li>3.x deploys by itself. The <code>Docs</code> workflow (<code>.github/workflows/docs.yaml</code>) runs on every push
   to <code>main</code> that changes <code>docs/</code>, <code>hooks/</code>, <code>overrides/</code>, a package <code>CHANGELOG.md</code>, <code>mkdocs.yml</code>, <code>requirements-docs.txt</code> or the workflow.
   It runs <code>mike deploy --update-aliases 3.x latest</code>.</li>
-<li>2.x deploys by hand. Open Actions &gt; Docs &gt; "Run workflow", pick version <code>2.x</code>.
-  It builds from the <code>v2.x</code> branch (change it with the <code>ref</code> input).</li>
 <li>After each deploy, the workflow writes small redirect pages for the old root links,
   the root <code>index.html</code>, a <code>404.html</code> and the <code>CNAME</code> file. So <code>dartondox.dev</code> and old links keep working.</li>
 <li>The workflow pushes with the built-in <code>GITHUB_TOKEN</code>. This works because <code>gh-pages</code> is not a protected branch.</li>

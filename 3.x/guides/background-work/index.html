@@ -6495,7 +6495,7 @@ A worker process takes it and runs <code>handle()</code>. A failed job is tried 
 <p>Make the job:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dox<span class="w"> </span>make:job<span class="w"> </span>BuildReport
 </span></code></pre></div>
-<div class="language-dart highlight"><span class="filename">lib/app/jobs/build_report.job.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/utils/logger.dart'</span><span class="p">;</span>
+<div class="language-dart highlight"><span class="filename">lib/app/jobs/build_report.job.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_queue/dox_queue.dart'</span><span class="p">;</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1">/// Builds a report in the queue worker.</span>

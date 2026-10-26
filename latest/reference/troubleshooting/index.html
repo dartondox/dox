@@ -6474,9 +6474,9 @@
 <p>When a value must have <code>#</code> in it (a space, then <code>#</code>), put the value in quotes. The quotes are removed.</p>
 <h2 id="hashmake-throws-on-a-long-password"><code>Hash.make</code> throws on a long password</h2>
 <p><strong>Symptom.</strong> Saving a user, or registering, gives a <code>500</code>. The log shows:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Invalid argument(s) (password): Password is too long (The length should be less than or equal to 72): "..."
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Invalid argument(s) (password): The password is too long. bcrypt takes at most 72 bytes.
 </span></code></pre></div>
-<p><strong>Cause.</strong> <code>Hash.make()</code> uses bcrypt from the <code>bcrypt</code> package. bcrypt throws an <code>ArgumentError</code> when the password is longer than 72 bytes.</p>
+<p><strong>Cause.</strong> <code>Hash.make()</code> and <code>Hash.makeAsync()</code> use bcrypt. bcrypt takes at most 72 bytes, so Dox throws an <code>ArgumentError</code> for a longer password. The text does not hold the password, so it is safe in logs.</p>
 <p><strong>Fix.</strong> Refuse long passwords in your DTO, before you hash them:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nd">@MaxLength</span><span class="p">(</span><span class="m">72</span><span class="p">)</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">password</span><span class="p">;</span>

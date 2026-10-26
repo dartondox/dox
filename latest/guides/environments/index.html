@@ -6602,7 +6602,7 @@
 <ul>
 <li>Make one per environment with <code>dox key:generate</code>. Never share the production key with staging.</li>
 <li><code>APP_KEY</code> must be exactly 32 characters. <code>dox key:generate</code> makes a key of the right length.</li>
-<li>When <code>APP_ENV</code> is not <code>development</code>, <code>local</code> or <code>test</code>, a bad key stops the app at start: empty, not 32 characters, or a public sample key. An empty <code>APP_ENV</code> counts as production. In development the app only logs a warning.</li>
+<li>When <code>APP_ENV</code> is not <code>development</code>, <code>local</code>, <code>test</code> or <code>testing</code>, a bad key stops the app at start: empty, not 32 characters, or a public sample key. An empty <code>APP_ENV</code> counts as production. In development the app only logs a warning.</li>
 <li>A new key makes every cookie, token and signed URL invalid. Every user is logged out. Plan it.</li>
 </ul>
 <h2 id="6-check-the-env-before-a-deploy">6. Check the env before a deploy</h2>
