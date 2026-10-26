@@ -3,9 +3,10 @@
 # packages of this commit. It catches a change that breaks apps, the
 # template, dox_queue or dox_scheduler before it is merged.
 #
-# Steps: `dox create` (local CLI), override all Dox packages with this
-# repo (and with ../dox-orm, ../dox-socketio, ../dox-storage, ../dox-queue,
-# ../dox-scheduler when they are there, see ci/clone-siblings.sh),
+# Steps: `dox create` (the CLI from ../dox-cli), override all Dox packages
+# with this repo (and with ../dox-orm, ../dox-socketio, ../dox-storage,
+# ../dox-queue, ../dox-scheduler when they are there, see
+# ci/clone-siblings.sh),
 # build_runner, analyze, the template tests, migrate, `dox build`, then
 # start the AOT server and call its routes.
 #
@@ -14,7 +15,9 @@
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 
-dart pub global activate --source path "$root/packages/dox-cli" >/dev/null
+# The CLI lives in its own repo. ci/clone-siblings.sh clones it.
+[ -f "$root/../dox-cli/pubspec.yaml" ] || { echo "::error::no ../dox-cli, run ci/clone-siblings.sh"; exit 1; }
+dart pub global activate --source path "$root/../dox-cli" >/dev/null
 export PATH="$PATH:$HOME/.pub-cache/bin"
 
 work=$(mktemp -d)
@@ -34,7 +37,6 @@ sed -i.bak "s/^APP_PORT=.*/APP_PORT=$port/" .env && rm .env.bak
     "$root"/../dox-socketio/ "$root"/../dox-storage/ \
     "$root"/../dox-queue/ "$root"/../dox-scheduler/; do
     [ -f "$dir/pubspec.yaml" ] || continue
-    [ "$(basename "$dir")" = dox-cli ] && continue
     name=$(sed -nE 's/^name:[[:space:]]*([a-z0-9_]+).*/\1/p' "$dir/pubspec.yaml")
     printf '  %s:\n    path: %s\n' "$name" "${dir%/}"
   done

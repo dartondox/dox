@@ -69,8 +69,8 @@ jobs:
   # The server is native (dox_http_native). Its build hook downloads a
   # ready-built library. There is no dart:io server.
   # The database packages (dox_orm, dox_migration) and their database tests
-  # live in dartondox/dox-orm. dox_socketio and dox_storage have their own
-  # repos too.
+  # live in dartondox/dox-orm. dox_socketio, dox_storage and the dox CLI
+  # have their own repos too.
   #
   # One job, not one job per entry: each job waits in the queue and pays
   # about 30s of setup. ci/run-group.py runs the entries in parallel, each
@@ -98,12 +98,6 @@ jobs:
           key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
           restore-keys: pub-${{ runner.os }}-
       - run: dart pub get
-      - name: Copy .env.example to .env of cli
-        run: |
-          cp packages/dox-cli/.env.example packages/dox-cli/.env
-          # .env.example ships an empty APP_KEY, so CI makes its own.
-          key=$(openssl rand -hex 16)
-          sed -i "s/^APP_KEY=.*/APP_KEY=$key/" packages/dox-cli/.env
       - name: Wait for services
         if: needs.changes.outputs.unit_services != ''
         run: ci/wait-services.sh ${{ needs.changes.outputs.unit_services }}
@@ -141,9 +135,10 @@ jobs:
   # migrate, `dox build`, then the AOT server answers its routes.
   # It catches a change that breaks apps, the template, dox_queue or
   # dox_scheduler. See ci/smoke-template.sh.
-  # dox_orm, dox_migration, dox_socketio, dox_storage, dox_queue and
-  # dox_scheduler come from clones of their repos next to this one (main, or
-  # the branch with the same name as this PR, see ci/clone-siblings.sh).
+  # The dox CLI, dox_orm, dox_migration, dox_socketio, dox_storage,
+  # dox_queue and dox_scheduler come from clones of their repos next to this
+  # one (main, or the branch with the same name as this PR, see
+  # ci/clone-siblings.sh).
   template:
     needs: changes
     if: needs.changes.outputs.code == 'true'

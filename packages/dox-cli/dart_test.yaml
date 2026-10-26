@@ -1,2 +1,0 @@
-# Some tests change the current folder, so test files must not run at the same time.
-concurrency: 1

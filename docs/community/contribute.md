@@ -44,14 +44,6 @@ melos run test
 # Analyze and check format (same as CI)
 melos run analyze
 melos run format_check
-
-# Build the dox cli executable (AOT).
-# `dart compile exe` does not work: sqlite3 has a build hook. Use `dart build cli`.
-cd packages/dox-cli
-dart build cli --target bin/dox.dart --output build
-
-# Run dox cli executable file
-build/bundle/bin/dox --version
 ```
 
 ### If the project does not run
@@ -130,6 +122,7 @@ Optional: add yourself as a required reviewer, and allow only tags `v*`.
 
 | Package | Repo |
 | --- | --- |
+| `dox` (the CLI) | [dartondox/dox-cli](https://github.com/dartondox/dox-cli) |
 | `dox_orm`, `dox_migration` | [dartondox/dox-orm](https://github.com/dartondox/dox-orm) |
 | `dox_socketio` | [dartondox/dox-socketio](https://github.com/dartondox/dox-socketio) |
 | `dox_storage` | [dartondox/dox-storage](https://github.com/dartondox/dox-storage) |
@@ -145,7 +138,7 @@ CI in this repo uses the newest `dox-orm` code: `ci/clone-siblings.sh`, then `ci
 To work on one of them and Dox together:
 
 1. Clone the repos next to the Dox repo, like `../dox-orm`.
-   `ci/clone-siblings.sh` clones `dox-orm`, `dox-socketio`, `dox-storage`, `dox-queue` and `dox-scheduler`.
+   `ci/clone-siblings.sh` clones `dox-orm`, `dox-socketio`, `dox-storage`, `dox-queue`, `dox-scheduler` and `dox-cli`.
    Clone `dox-mailer`, `dox-view` and `dox-inertia` by hand when you need them.
 2. Add them to the root `pubspec_overrides.yaml` of the Dox repo. Git ignores this file.
    For `dox_orm` and `dox_migration`, `ci/use-sibling-orm.sh` writes this file for you.

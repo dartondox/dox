@@ -26,12 +26,13 @@ These packages are not released from this repo either:
 - `dox_storage`: [dartondox/dox-storage](https://github.com/dartondox/dox-storage)
 - `dox_queue`: [dartondox/dox-queue](https://github.com/dartondox/dox-queue)
 - `dox_scheduler`: [dartondox/dox-scheduler](https://github.com/dartondox/dox-scheduler)
+- `dox` (the CLI, also called `dox_cli`): [dartondox/dox-cli](https://github.com/dartondox/dox-cli). Its version is also in `lib/src/version.dart`. Set both before you push the tag.
 
 Each repo has its own version. To release, push a `v<version>` tag in that repo.
 Its Release workflow publishes to pub.dev.
 
 `dox_socketio` and `dox_storage` depend on `dox_core`. When they need a new `dox_core`, release this repo first.
-`dox_auth`, `dox_cli` and `dox_core` (dev) depend on `dox_orm` or `dox_migration` from pub.dev.
+`dox_auth`, `dox_core` (dev) and the CLI depend on `dox_orm` or `dox_migration` from pub.dev.
 When they need a new one, release `dox-orm` first, then raise the constraint here.
 
 ## Before you start
@@ -54,7 +55,7 @@ git checkout -b release-3.0.0-alpha.5 origin/main
 
 1. Set `version: 3.0.0-alpha.5` in the root `pubspec.yaml`.
 2. Run `bash bin/update_versions.sh`.
-   It sets the version of every package, every sibling constraint, and the CLI version constant.
+   It sets the version of every package and every sibling constraint.
 3. In every `packages/*/CHANGELOG.md`:
    - rename `## Unreleased` to `## 3.0.0-alpha.5`, or
    - if there is no `## Unreleased`, add `## 3.0.0-alpha.5` with "- Version bump only, to match the other packages."
