@@ -48,7 +48,9 @@ class SessionMiddleware implements IDoxNextMiddleware {
   Future<Session> _start(DoxRequest req, SessionConfig config) async {
     String? value = req.cookie(config.cookie);
     if (config.driver == 'cookie') {
-      return Session(read: value == null ? null : () => _decode(value));
+      return Session(
+        read: value == null ? null : () => _decode(value, config.lifetime),
+      );
     }
     _checkDriver(config);
     if (value == null) return Session();
@@ -99,12 +101,23 @@ class SessionMiddleware implements IDoxNextMiddleware {
     );
   }
 
-  static Object? _decode(String value) {
+  /// The data of a `cookie` driver session, or null (a new empty
+  /// session). The cookie holds the time it was saved (`at`). A session
+  /// older than [lifetime] is null, so a copied cookie stops working too,
+  /// not only when the browser drops it.
+  static Object? _decode(String value, Duration lifetime) {
+    Object? stored;
     try {
-      return jsonDecode(value);
+      stored = jsonDecode(value);
     } on FormatException {
       return null;
     }
+    if (stored is! Map) return null;
+    Object? at = stored['at'];
+    if (at is! num) return null;
+    int age = DateTime.now().millisecondsSinceEpoch - at.toInt();
+    if (age > lifetime.inMilliseconds) return null;
+    return stored;
   }
 
   static CacheStore _store(SessionConfig config) {

@@ -381,9 +381,7 @@ class NotADto {}
       expect(output, isNot(contains("import 'package:a/")));
       expect(
         output,
-        contains(
-          'const List<DtoSchema<Object>> dtos = <DtoSchema<Object>>[];',
-        ),
+        contains('const List<DtoSchema<Object>> dtos = <DtoSchema<Object>>[];'),
       );
     });
 

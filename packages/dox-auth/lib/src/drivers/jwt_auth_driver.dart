@@ -3,11 +3,21 @@ import 'dart:convert';
 
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/env/env.dart';
+import 'package:dox_core/utils/key_derivation.dart';
 import 'package:dox_orm/dox_orm.dart';
 
 class JwtAuthDriver extends AuthDriver {
-  /// Jwt secret
+  /// Jwt secret.
+  /// A [SecretKey] (like `SecretKey(env.appKey)`) is not used as it is.
+  /// The HMAC key is made from it with HKDF-SHA256 and the label
+  /// `dox:jwt` (see `KeyDerivation`), so APP_KEY is not shared with
+  /// cookies or other uses. [signingKey] gives that key, for another
+  /// service that checks the tokens. Other keys (RSA, EC) are used as
+  /// they are.
   final JWTKey secret;
+
+  /// The key that signs and checks the tokens. See [secret].
+  late final JWTKey signingKey = _signingKey(secret);
 
   /// JWT issuer
   final String? issuer;
@@ -59,11 +69,20 @@ class JwtAuthDriver extends AuthDriver {
     AuthDriver.prepareDummyHash(hashRounds);
   }
 
+  static JWTKey _signingKey(JWTKey secret) {
+    if (secret is! SecretKey) return secret;
+    return SecretKey(
+      base64.encode(KeyDerivation.derive(secret.key, KeyDerivation.jwt)),
+      isBase64Encoded: true,
+    );
+  }
+
   /// fewest bytes of an HMAC secret. A shorter one is easy to guess.
   static const int minSecretBytes = 32;
 
   /// A short secret stops the app in production, and only warns in
-  /// development, local and test (like the APP_KEY check of dox_core).
+  /// development, local, test and testing (like the APP_KEY check of
+  /// dox_core).
   static void _checkSecretLength(String secret) {
     int length = utf8.encode(secret).length;
     if (length >= minSecretBytes) return;
@@ -72,7 +91,7 @@ class JwtAuthDriver extends AuthDriver {
         '$minSecretBytes bytes. Run `dox key:generate` for APP_KEY, '
         'or make a secret with `openssl rand -hex 32`.';
     String env = Env.get<String>('APP_ENV').toLowerCase();
-    if (!<String>['development', 'local', 'test'].contains(env)) {
+    if (!<String>['development', 'local', 'test', 'testing'].contains(env)) {
       throw ArgumentError(message, 'secret');
     }
     print('[dox] warning: $message');
@@ -93,12 +112,18 @@ class JwtAuthDriver extends AuthDriver {
         return null;
       }
 
+      /// only the configured algorithm is accepted, so a token can not
+      /// pick another one (like `none`, or HS256 with a public RSA key).
+      if (JWT.decode(token).header?['alg'] != algorithm.name) {
+        return null;
+      }
+
       /// verify token
       /// the audience is the guard name, so a token of one guard
       /// does not work for another guard.
       JWT jwt = JWT.verify(
         token,
-        secret,
+        signingKey,
         audience: Audience.one(guard),
         issuer: issuer,
       );
@@ -167,7 +192,7 @@ class JwtAuthDriver extends AuthDriver {
   String? createToken(Map<String, dynamic>? userPayload, String guard) {
     try {
       JWT jwt = JWT(userPayload, issuer: issuer, audience: Audience.one(guard));
-      return jwt.sign(secret, algorithm: algorithm, expiresIn: expiresIn);
+      return jwt.sign(signingKey, algorithm: algorithm, expiresIn: expiresIn);
     } catch (error) {
       return null;
     }

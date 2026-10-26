@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dox_core/app.dart';
 import 'package:dox_core/utils/aes_encryptor.dart';
+import 'package:dox_core/utils/key_derivation.dart';
 
 class DoxCookie {
   final String key;
@@ -62,7 +63,12 @@ class DoxCookie {
   /// not be copied to another cookie.
   String get({bool https = false}) {
     String val = encrypt
-        ? AESEncryptor.encode(value, Dox().config.appKey, associatedData: key)
+        ? AESEncryptor.encode(
+            value,
+            Dox().config.appKey,
+            associatedData: key,
+            purpose: KeyDerivation.cookie,
+          )
         : value;
 
     Cookie cookie = Cookie(key, val);

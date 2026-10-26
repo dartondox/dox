@@ -59,8 +59,7 @@ void main() {
   test('wrong size or public APP_KEY fails at startup outside development', () {
     for (String key in <String>[
       'short-key',
-      // AES needs 16, 24 or 32 bytes, so a 48 or 64 character key breaks
-      // encrypted cookies.
+      // longer keys too: the rule is exactly 32 characters
       '832b1c5fb42a3e48e3167d3ad7d77b241e28fca0d5a7f931',
       '832b1c5fb42a3e48e3167d3ad7d77b241e28fca0d5a7f931832b1c5fb42a3e48',
       'ZrNbOZJAjC2MDzqehhsGV2DzFFI4pz5R',
@@ -71,7 +70,7 @@ void main() {
       expect(() => Dox().checkAppKey(), throwsStateError);
       Env().env['APP_ENV'] = 'staging';
       expect(() => Dox().checkAppKey(), throwsStateError);
-      for (String env in <String>['development', 'local', 'test']) {
+      for (String env in <String>['development', 'local', 'test', 'testing']) {
         Env().env['APP_ENV'] = env;
         expect(() => Dox().checkAppKey(), returnsNormally);
       }

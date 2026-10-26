@@ -60,7 +60,7 @@ class Auth implements IAuth {
   /// ```
   void setUser(IDoxRequest req, Model<dynamic> user) {
     _userData = user;
-    req.merge(<String, dynamic>{AUTH_REQUEST_KEY: this});
+    req.auth = this;
   }
 
   /// Check the credentials and keep the login in the session.

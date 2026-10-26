@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:dox_core/exception/bad_request_exception.dart';
+import 'package:dox_core/utils/key_derivation.dart';
 import 'package:pointycastle/export.dart';
 
 /// Thrown when encrypted text can not be decrypted.
@@ -25,15 +26,15 @@ class DecryptException extends BadRequestException {
 /// [associatedData] binds the text to a context, like a cookie name.
 /// It is not stored in the output. `decode` needs the same value, or it
 /// fails. So a value made for one cookie can not be used as another.
+///
+/// The AES key is not the secret itself. It is made from the secret and
+/// a [purpose] label with HKDF-SHA256 (see [KeyDerivation]). Cookies use
+/// the label `dox:cookie`, other values `dox:encrypt` by default. A value
+/// made for one purpose can not be read with another one.
 class AESEncryptor {
   static const int _nonceLength = 12;
   static const int _tagBits = 128;
   static final Random _random = Random.secure();
-
-  /// key bytes of the last secret. Apps use one secret, so this skips
-  /// the utf8 encode on every call.
-  static String? _lastSecret;
-  static Uint8List _lastKey = Uint8List(0);
 
   /// encode a message
   ///```
@@ -43,12 +44,18 @@ class AESEncryptor {
     String content,
     String secret, {
     String associatedData = '',
+    String purpose = KeyDerivation.encrypt,
   }) {
     Uint8List nonce = Uint8List(_nonceLength);
     for (int i = 0; i < _nonceLength; i++) {
       nonce[i] = _random.nextInt(256);
     }
-    GCMBlockCipher cipher = _cipher(true, secret, nonce, associatedData);
+    GCMBlockCipher cipher = _cipher(
+      true,
+      KeyDerivation.derive(secret, purpose),
+      nonce,
+      associatedData,
+    );
     Uint8List input = utf8.encode(content);
 
     /// write nonce + ciphertext + tag into one buffer
@@ -70,13 +77,19 @@ class AESEncryptor {
     String content,
     String secret, {
     String associatedData = '',
+    String purpose = KeyDerivation.encrypt,
   }) {
     try {
       Uint8List data = base64.decode(content);
       Uint8List nonce = Uint8List.sublistView(data, 0, _nonceLength);
       Uint8List sealed = Uint8List.sublistView(data, _nonceLength);
       return utf8.decode(
-        _cipher(false, secret, nonce, associatedData).process(sealed),
+        _cipher(
+          false,
+          KeyDerivation.derive(secret, purpose),
+          nonce,
+          associatedData,
+        ).process(sealed),
       );
     } catch (_) {
       throw DecryptException();
@@ -85,26 +98,18 @@ class AESEncryptor {
 
   static GCMBlockCipher _cipher(
     bool forEncryption,
-    String secret,
+    Uint8List key,
     Uint8List nonce,
     String associatedData,
   ) {
     return GCMBlockCipher(AESEngine())..init(
       forEncryption,
       AEADParameters<KeyParameter>(
-        KeyParameter(_key(secret)),
+        KeyParameter(key),
         _tagBits,
         nonce,
         utf8.encode(associatedData),
       ),
     );
-  }
-
-  static Uint8List _key(String secret) {
-    if (secret != _lastSecret) {
-      _lastKey = utf8.encode(secret);
-      _lastSecret = secret;
-    }
-    return _lastKey;
   }
 }

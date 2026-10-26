@@ -336,6 +336,7 @@ void main() {
           m.group(1)!,
           config.appKey,
           associatedData: 'x-key',
+          purpose: KeyDerivation.cookie,
         ),
         'ABCD',
       );

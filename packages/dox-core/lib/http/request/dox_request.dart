@@ -188,9 +188,11 @@ class DoxRequest implements IDoxRequest {
     return _scheme == 'https';
   }
 
-  /// get auth class
+  /// the auth of the logged in user. `AuthMiddleware` and
+  /// `Auth.setUser` set it. It is not in the input (query and body), so
+  /// a client field can not set it.
   @override
-  IAuth? get auth => input(AUTH_REQUEST_KEY);
+  IAuth? auth;
 
   /// Get request value
   /// ```
@@ -272,6 +274,7 @@ class DoxRequest implements IDoxRequest {
         _cookies[key],
         Dox().config.appKey,
         associatedData: key,
+        purpose: KeyDerivation.cookie,
       );
     } on DecryptException {
       return null;

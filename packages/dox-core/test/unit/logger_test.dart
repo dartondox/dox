@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/utils/logger.dart';
 import 'package:test/test.dart';
 
 /// run [body] and return what it printed

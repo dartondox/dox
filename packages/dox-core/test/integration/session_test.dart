@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/testing.dart';
 import 'package:test/test.dart';
@@ -211,6 +213,29 @@ void main() {
             .withCookies(<String, String>{'dox_session': 'not-valid'})
             .get('/get'))
         .expectStatus(200)
+        .expectJson(containsPair('name', null));
+  });
+
+  test('a cookie session older than the lifetime is a new empty one', () async {
+    Future<TestResponse> getAt(DateTime at) {
+      String payload = jsonEncode(<String, dynamic>{
+        'data': <String, dynamic>{'name': 'Ann'},
+        'flash': <String>[],
+        'token': null,
+        'at': at.millisecondsSinceEpoch,
+      });
+      String header = DoxCookie('dox_session', payload).get();
+      String value = header.split(';').first.substring('dox_session='.length);
+      return client
+          .withCookies(<String, String>{'dox_session': value})
+          .get('/get');
+    }
+
+    DateTime now = DateTime.now();
+    // the default lifetime is 2 hours
+    (await getAt(now.subtract(const Duration(minutes: 5))))
+        .expectJson(containsPair('name', 'Ann'));
+    (await getAt(now.subtract(const Duration(hours: 3))))
         .expectJson(containsPair('name', null));
   });
 

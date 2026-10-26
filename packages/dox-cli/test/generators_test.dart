@@ -61,7 +61,10 @@ void main() {
     test('middleware', () {
       expect(createMiddleware('RateLimitMiddleware'), isTrue);
       String c = read('lib/app/http/middleware/rate_limit.middleware.dart');
-      expect(c, contains('class RateLimitMiddleware implements IDoxMiddleware'));
+      expect(
+        c,
+        contains('class RateLimitMiddleware implements IDoxMiddleware'),
+      );
       expect(c, contains('return req;'));
     });
 

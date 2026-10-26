@@ -88,6 +88,7 @@ void main() {
         authKeyValue,
         config.appKey,
         associatedData: 'auth-key',
+        purpose: KeyDerivation.cookie,
       );
 
       http.Response res = await http.post(

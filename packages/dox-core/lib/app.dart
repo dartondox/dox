@@ -6,7 +6,6 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/isolate/dox_isolate.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/server/dox_server.dart';
-import 'package:dox_core/utils/logger.dart';
 import 'package:dox_http_native/dox_http_native.dart';
 
 IocContainer _ioc = IocContainer();
@@ -212,9 +211,8 @@ class Dox {
 
   /// stop at startup when `APP_KEY` is missing, not exactly 32
   /// characters, or a public sample key. a short or public key is easy
-  /// to guess, so anyone can sign tokens and cookies. AES needs a key
-  /// of 16, 24 or 32 bytes, so a longer key breaks encrypted cookies.
-  /// in development, local and test it only logs a warning.
+  /// to guess, so anyone can sign tokens and cookies.
+  /// in development, local, test and testing it only logs a warning.
   void checkAppKey() {
     String key = config.appKey.trim();
     String message;
@@ -229,7 +227,7 @@ class Dox {
       return;
     }
     String env = Env.get<String>('APP_ENV').toLowerCase();
-    if (!<String>['development', 'local', 'test'].contains(env)) {
+    if (!<String>['development', 'local', 'test', 'testing'].contains(env)) {
       throw StateError(message);
     }
     Logger.warn(message);
