@@ -2879,6 +2879,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#security-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-the-library-comes-from" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6298,6 +6309,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#security-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-the-library-comes-from" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6349,10 +6371,11 @@
 <p>You do not need to set anything. Every app uses it, also an app with
 WebSocket or Socket.IO routes.</p>
 <ul>
-<li>Rust (<a href="https://hyper.rs">hyper</a>) owns the sockets and parses HTTP.</li>
+<li>Rust owns the sockets and parses HTTP. It runs on the isolate's own
+  thread, so a request never waits for another thread.</li>
 <li>All your code stays in Dart: routes, controllers, DTOs, middleware, ORM.</li>
-<li>It is much faster than the <code>dart:io</code> server. In a hello world test on one
-  core it served about 5 times more requests. See <a href="../performance/">Performance</a>.</li>
+<li>It is much faster than the <code>dart:io</code> server: about 5 times more requests
+  on one or two cores. See <a href="../performance/">Performance</a>.</li>
 </ul>
 <p>You do not need Rust. The package downloads a ready-built library for your
 system when you build the app.</p>
@@ -6375,17 +6398,28 @@ system when you build the app.</p>
 <ul>
 <li><code>NativeHttpServer.bind(port, address: '127.0.0.1')</code> listens on one host.
   With no address, it listens on all interfaces.</li>
+<li><code>NativeHttpServer.bind(port, maxConnections: 10000)</code> stops accepting new
+  connections at the limit, until one closes. Default: no limit.</li>
 <li><code>close()</code> waits for open requests. <code>close(force: true)</code> closes every
   connection at once.</li>
 </ul>
 <p>The rest of this page is the same with or without Dox.</p>
 <h2 id="how-it-works">How it works</h2>
+<p>The server runs on the thread of the isolate, in a loop:</p>
 <ol>
-<li>Rust reads the requests from the sockets.</li>
-<li>It sends the requests to Dart in batches (one message per batch).</li>
-<li>Dart runs your handlers.</li>
-<li>Dart sends all answers back to Rust in one call.</li>
+<li>Dart calls Rust (one FFI call).</li>
+<li>Rust writes the answers of the last batch, reads the sockets and parses
+   the new requests. It gives them back to Dart as one batch.</li>
+<li>Dart runs your handlers and calls Rust again with their answers.</li>
 </ol>
+<p>Under load there is no other thread, so a request never waits for a thread
+to wake up. When the isolate has nothing to do, a small helper thread
+watches the sockets. When a request comes, it wakes the isolate once. Then
+the isolate takes over again.</p>
+<p>The loop gives the event loop a turn after a few batches, so timers,
+database answers and other async work of the isolate still run on time.
+A slow synchronous handler holds the sockets of its isolate, like in Node
+and Bun. <code>await</code> is fine.</p>
 <p>The native server has the same API as the <code>dart:io</code> <code>HttpServer</code>. So
 <code>req.httpRequest</code>, <code>HttpResponse</code> and code written for <code>dart:io</code> keep working.</p>
 <p>Each isolate runs its own server on the same port. See <a href="../isolate/">Isolate</a>.
@@ -6399,7 +6433,7 @@ fix it:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Unsupported operation: dox_http_native did not load: &lt;reason&gt;.
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>Fix: install Rust (cargo, see https://rustup.rs), then run the app again ...
 </span></code></pre></div>
-<p><code>&lt;reason&gt;</code> is for example <code>native library ABI 5, expected 6</code>: the library on
+<p><code>&lt;reason&gt;</code> is for example <code>native library ABI 8, expected 9</code>: the library on
 disk is from another version of the package. See
 <a href="../../reference/troubleshooting/#the-native-http-library-did-not-load">Troubleshooting</a>.</p>
 <h2 id="websocket">WebSocket</h2>
@@ -6427,10 +6461,9 @@ disk is from another version of the package. See
   <code>dox_http_native</code>. It gives a <code>dart:io</code> <code>WebSocket</code>.</li>
 </ol>
 <h2 id="threads">Threads</h2>
-<p>Each isolate has its own Rust network thread. <code>DOX_HTTP_THREAD=shared</code> puts
-all isolates on one thread. It is off by default: on 2 cores the one thread
-was the limit and req/s fell by a quarter. Leave it off unless you measure
-a gain.</p>
+<p>Each isolate does its own socket work on its own thread. Each server also
+has two small helper threads: one watches the sockets while the isolate is
+idle, one does gzip (only with <code>compress: true</code>). Under load both sleep.</p>
 <h2 id="limits">Limits</h2>
 <ul>
 <li>Max size of the request line plus headers: 16 KB. Bigger gets <code>431</code>.</li>
@@ -6442,14 +6475,40 @@ a gain.</p>
   <code>413</code>. Dart checks the limits again.</li>
 <li>A client that sends no body bytes for 120 seconds (idle time) gets <code>408</code>.
   A slow but steady upload is fine.</li>
+<li>A request head must arrive within 30 seconds. A keep-alive connection
+  with no request for 30 seconds is closed.</li>
+<li>A client that does not read its answer for 30 seconds is cut off.</li>
+<li>A request with both <code>Content-Length</code> and <code>Transfer-Encoding: chunked</code>
+  gets <code>400</code>. A transfer encoding other than <code>chunked</code> gets <code>501</code>.</li>
+<li>At most 64 requests of one connection wait for an answer, and at most
+  1 MB of answers waits to be sent. Then the server stops reading that
+  connection until the answers go out.</li>
+<li>A streamed response with a <code>contentLength</code> must send exactly that many
+  bytes. <code>add()</code> throws when the body passes it, and <code>close()</code> fails when
+  it is shorter.</li>
 <li>A small response is sent in one piece when it is closed. A streamed
   response (a file, a download, any <code>Stream</code>) over 64 KB goes out in
   parts: the client gets the first bytes early. At most 1 MB of it waits
   in memory. Dart reads more of the file only when the client has read
   what was sent. When the client leaves, Dart stops reading.</li>
 <li>A request body of 64 KB or more goes to Dart without a copy.</li>
-<li><code>compress: true</code> in <code>AppConfig</code> works: Rust gzips the body on another thread, so the
-  isolate does not wait. A streamed response is not compressed.</li>
+<li><code>compress: true</code> in <code>AppConfig</code> works: Rust gzips the body on a helper
+  thread, so the isolate does not wait. A streamed response is not compressed.</li>
+<li>WebSocket: one turn reads at most 256 KB of one socket, so one busy
+  client can not hold the isolate. While more than 256 KB waits to be sent
+  to a client (eg. pongs for a client that does not read), the server stops
+  reading its frames.</li>
+</ul>
+<h2 id="security-notes">Security notes</h2>
+<ul>
+<li>Run it behind a reverse proxy (Caddy, nginx) on the internet. The proxy
+  does HTTPS, buffers slow clients and caps connections.</li>
+<li>Set <code>maxConnections</code> when the app port is open to the internet.</li>
+<li>Another process of the same OS user can bind the same port (macOS
+  shared socket, Linux <code>SO_REUSEPORT</code>). Do not run untrusted code as the
+  user of the app.</li>
+<li><code>req.uri</code> resolves <code>..</code> in the path. Never build a file path from the
+  raw path. Use the storage helpers.</li>
 </ul>
 <h2 id="where-the-library-comes-from">Where the library comes from</h2>
 <p>The build hook of <code>dox_http_native</code> (<code>hook/build.dart</code>) picks the first one

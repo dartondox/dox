@@ -2,406 +2,406 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://dartondox.dev/latest/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/community/contribute/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/community/mascot/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/concepts/coming-from-laravel/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/concepts/dart-frameworks/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/concepts/how-dox-works/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/concepts/status-and-roadmap/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/factories/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/migration/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/mysql-native/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/postgres-native/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/query-builder/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/schema/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/seeders/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/transactions/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/model/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/model/casts/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/model/counting-relations/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/model/events/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/model/relation-queries/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/model/scopes/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/model/relationship/belongs-to/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/model/relationship/has-many/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/model/relationship/has-one/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/database/model/relationship/many-to-many/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/digging-deeper/cache/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/digging-deeper/deployment/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/digging-deeper/dox-cli/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/digging-deeper/env/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/digging-deeper/file-storage/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/digging-deeper/health-check/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/digging-deeper/isolate/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/digging-deeper/mail/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/digging-deeper/native-server/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/digging-deeper/performance/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/digging-deeper/providers/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/digging-deeper/queue/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/digging-deeper/scheduler/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/digging-deeper/testing/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/getting-started/installation/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/guides/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/guides/api-docs-with-openapi/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/guides/background-work/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/guides/cors-for-spa/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/guides/custom-errors/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/guides/deploy-cloud-run/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/guides/deploy-fly/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/guides/deploy-vps/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/guides/docker/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/guides/environments/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/guides/file-upload/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/guides/jwt-auth/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/guides/pagination/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/guides/share-code-with-flutter/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/guides/static-files/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/guides/testing-with-database/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/packages/cache/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/packages/openapi/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/packages/socketio/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/packages/storage/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/packages/validation/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/reference/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/reference/app-config/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/reference/cheat-sheet/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/reference/cli/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/reference/env/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/reference/errors/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/reference/http-exceptions/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/reference/production-checklist/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/reference/request-and-response/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/reference/troubleshooting/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/security/authentication/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/security/cors/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/security/csrf/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/security/encryption/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/security/hashing/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/security/rate-limiting/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/security/security-headers/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/the-basic/controller/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/the-basic/dependency-injection/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/the-basic/errors/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/the-basic/inertia/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/the-basic/middleware/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/the-basic/request/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/the-basic/response/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/the-basic/routing/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/the-basic/serializer/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/the-basic/session/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/the-basic/validation-rules/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/the-basic/validation/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/the-basic/views/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/tutorial/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/tutorial/01-create-project/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/tutorial/02-model-and-migration/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/tutorial/03-routes-and-controller/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/tutorial/04-validation/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/tutorial/05-auth/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/tutorial/06-test/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/tutorial/07-build-and-deploy/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/latest/reference/changelog/</loc>
-         <lastmod>2026-10-26</lastmod>
+         <lastmod>2026-10-27</lastmod>
     </url>
 </urlset>

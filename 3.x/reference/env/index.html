@@ -6279,13 +6279,6 @@
 <td><code>APP_HOST=127.0.0.1</code></td>
 </tr>
 <tr>
-<td><code>DOX_HTTP_THREAD</code></td>
-<td><code>dox_http_native</code> (Rust, <code>shared_thread()</code>)</td>
-<td>not set (one thread per isolate)</td>
-<td><code>shared</code> puts the servers of all isolates on one network thread. Off by default: on 2 cores it cut req/s by a quarter. Real environment only (<code>std::env::var</code>), not <code>.env</code>.</td>
-<td><code>DOX_HTTP_THREAD=shared</code></td>
-</tr>
-<tr>
 <td><code>DATABASE_URL</code></td>
 <td><code>dox_orm</code> (<code>DatabaseConfig.url</code>), <code>dox_migration</code></td>
 <td>not set</td>

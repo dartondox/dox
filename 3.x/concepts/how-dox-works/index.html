@@ -6552,7 +6552,7 @@ Dox starts one isolate per CPU core (<code>Platform.numberOfProcessors</code>). 
 </tr>
 </tbody>
 </table>
-<p>Each isolate also has its own Rust network thread. <code>DOX_HTTP_THREAD=shared</code> puts all isolates on one thread. Leave it off unless you measure a gain.</p>
+<p>Each isolate does its own socket work on its own thread. See <a href="../../digging-deeper/native-server/#how-it-works">Native server</a>.</p>
 <h3 id="what-each-isolate-gets">What each isolate gets</h3>
 <p>Before it starts an isolate, Dox copies three things to it:</p>
 <ul>
