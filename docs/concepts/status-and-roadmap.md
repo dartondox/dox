@@ -51,8 +51,6 @@ The packages in the main repo share one version number. The other packages live 
 
 ## What Dox does not have yet
 
-These were checked by searching the code with `rg`.
-
 | Feature | Status | What to do today |
 | --- | --- | --- |
 | Notifications | Not there | Send them from your own service class. |
