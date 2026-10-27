@@ -4,10 +4,10 @@
 # Now each version has its own folder, so old links would break.
 # This replaces every old root page with a small redirect page to the
 # same page in /latest/ (or in /2.x/ when latest does not have it).
-# It also writes the root index.html, 404.html, CNAME, robots.txt and
-# sitemap.xml.
+# It also writes the root index.html, 404.html, CNAME, robots.txt,
+# sitemap.xml, llms.txt and llms-full.txt.
 # It runs on every deploy and always gives the same result.
-import json, os, shutil
+import json, os, re, shutil
 
 versions = json.load(open('versions.json'))
 names = {'.git', '.nojekyll', 'CNAME', 'versions.json', 'robots.txt'}
@@ -19,9 +19,9 @@ home = 'latest' if os.path.isdir('latest') else versions[0]['version']
 # The script in <head> moves on before the page is drawn, and keeps
 # the ?query and #hash. So the visitor sees no "Redirecting" page.
 # The meta refresh and the <noscript> link are for no JavaScript.
-def redirect(url):
+def redirect(url, extra=''):
     return ('<!doctype html><html><head><meta charset="utf-8">'
-            '<title>Dox</title>'
+            '<title>Dox</title>' + extra +
             '<link rel="canonical" href="%s">'
             '<script>location.replace("%s" + location.search + location.hash)</script>'
             '<meta http-equiv="refresh" content="0; url=%s">'
@@ -53,8 +53,14 @@ for page in sorted(pages):
     with open(os.path.join(page, 'index.html'), 'w') as f:
         f.write(redirect('/%s/%s/' % (target, page.replace(os.sep, '/'))))
 
+# X, Facebook and others do not run the script or follow the meta refresh.
+# So the root page gets the link preview tags of the home page.
+home_page = open(os.path.join(home, 'index.html')).read()
+cards = ''.join(re.findall(r'<meta (?:property|name)="(?:og|twitter):[^>]*>', home_page))
+cards = cards.replace('content="https://dartondox.dev/%s/"' % home,
+                      'content="https://dartondox.dev/"')
 with open('index.html', 'w') as f:
-    f.write(redirect('/%s/' % home))
+    f.write(redirect('/%s/' % home, cards))
 with open('404.html', 'w') as f:
     f.write('<!doctype html><html><head><meta charset="utf-8">'
             '<title>Page not found</title></head><body>'
@@ -65,6 +71,10 @@ with open('CNAME', 'w') as f:
 # /sitemap.xml is a copy of the /latest/ one. Its links point to
 # /latest/, where canonical URLs point.
 shutil.copy(os.path.join(home, 'sitemap.xml'), 'sitemap.xml')
+# AI tools look for /llms.txt and /llms-full.txt at the site root (see
+# https://llmstxt.org). They are copies of the /latest/ ones.
+for name in ('llms.txt', 'llms-full.txt'):
+    shutil.copy(os.path.join(home, name), name)
 # robots.txt must be at the site root. Old 2.x docs stay online
 # for links, but are not crawled.
 with open('robots.txt', 'w') as f:

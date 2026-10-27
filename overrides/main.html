@@ -21,7 +21,8 @@
   {% if page %}
   {% set title = "Dox: fast web backend framework for Dart" if (page.file.src_uri == "index.md") else (page.meta.title or page.title | striptags) ~ " | Dox" %}
   {% set description = (page.meta.description if page.meta and page.meta.description else config.site_description) %}
-  {% set image = config.site_url ~ "assets/social-card.png" %}
+  {# mike sets site_url without the last slash (https://dartondox.dev/latest) #}
+  {% set image = config.site_url.rstrip("/") ~ "/assets/social-card.png" %}
   <meta property="og:type" content="{{ 'website' if (page.file.src_uri == "index.md") else 'article' }}">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="{{ title }}">
@@ -43,7 +44,7 @@
     "@type": "SoftwareApplication",
     "name": "Dox",
     "description": {{ config.site_description | tojson }},
-    "url": {{ config.site_url | tojson }},
+    "url": {{ (config.site_url.rstrip("/") ~ "/") | tojson }},
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Linux, macOS, Windows",
     "programmingLanguage": "Dart",
@@ -58,7 +59,7 @@
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Dox", "item": {{ config.site_url | tojson }} }
+      { "@type": "ListItem", "position": 1, "name": "Dox", "item": {{ (config.site_url.rstrip("/") ~ "/") | tojson }} }
       {%- set crumb = namespace(n=1) %}
       {%- for ancestor in page.ancestors | reverse %}
       {%- if ancestor.is_section and ancestor.children and ancestor.children[0].is_page and ancestor.children[0] != page %}
