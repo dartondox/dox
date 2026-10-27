@@ -128,8 +128,8 @@ def on_page_markdown(markdown, page, config, files):
 
 def on_post_build(config):
     site = Path(config["site_dir"])
-    # site_url is https://dartondox.dev/latest/ (see mkdocs.yml)
-    base = config["site_url"]
+    # mike sets site_url to https://dartondox.dev/latest (no last slash)
+    base = config["site_url"].rstrip("/") + "/"
     index = [
         "# Dox",
         "",

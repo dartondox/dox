@@ -4,8 +4,8 @@
 # Now each version has its own folder, so old links would break.
 # This replaces every old root page with a small redirect page to the
 # same page in /latest/ (or in /2.x/ when latest does not have it).
-# It also writes the root index.html, 404.html, CNAME, robots.txt and
-# sitemap.xml.
+# It also writes the root index.html, 404.html, CNAME, robots.txt,
+# sitemap.xml, llms.txt and llms-full.txt.
 # It runs on every deploy and always gives the same result.
 import json, os, re, shutil
 
@@ -71,6 +71,10 @@ with open('CNAME', 'w') as f:
 # /sitemap.xml is a copy of the /latest/ one. Its links point to
 # /latest/, where canonical URLs point.
 shutil.copy(os.path.join(home, 'sitemap.xml'), 'sitemap.xml')
+# AI tools look for /llms.txt and /llms-full.txt at the site root (see
+# https://llmstxt.org). They are copies of the /latest/ ones.
+for name in ('llms.txt', 'llms-full.txt'):
+    shutil.copy(os.path.join(home, name), name)
 # robots.txt must be at the site root. Old 2.x docs stay online
 # for links, but are not crawled.
 with open('robots.txt', 'w') as f:
