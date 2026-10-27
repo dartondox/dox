@@ -91,7 +91,7 @@ Every isolate runs its own HTTP server on the same port. The operating system sp
 | macOS | the isolates share one socket |
 | Windows | only one isolate serves HTTP |
 
-Each isolate also has its own Rust network thread. `DOX_HTTP_THREAD=shared` puts all isolates on one thread. Leave it off unless you measure a gain.
+Each isolate does its own socket work on its own thread. See [Native server](../digging-deeper/native-server.md#how-it-works).
 
 ### What each isolate gets
 

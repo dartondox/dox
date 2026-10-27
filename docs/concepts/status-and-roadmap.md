@@ -38,7 +38,7 @@ The packages in the main repo share one version number. The other packages live 
 | `dox_view` | [Views](../the-basic/views.md): `.dox.html` templates with layouts and components | New | 36 tests in 2 files |
 | [`dox_inertia`](../the-basic/inertia.md) | Inertia.js server side: single page apps with React, Vue or Svelte and Dox controllers | New | 26 tests in 2 files |
 | `dox_mailer` | Email with SMTP, Amazon SES, Azure, Resend, Mailgun, Postmark and sendmail | New | 72 tests in 10 files, with a fake SMTP server |
-| `dox_http_native` | Native HTTP/1.1 and WebSocket server (Rust hyper). Dox has no other server. | New | 35 Dart tests in 3 files, and 16 Rust tests |
+| `dox_http_native` | Native HTTP/1.1 and WebSocket server in Rust, on the isolate's own thread. Dox has no other server. | New | 55 Dart tests in 3 files, and 27 Rust tests |
 | `dox_postgres_native` | Native Postgres client (Rust tokio-postgres), the Postgres driver. Has TLS (`sslmode`, `sslRootCert`). | New | 31 Dart tests in 5 files, plus the `dox_orm` tests |
 | `dox_mysql_native` | Native MySQL and MariaDB client (Rust mysql_async), the MySQL driver. Has TLS. | New | 13 Dart tests in 1 file, plus the `dox_orm` tests |
 
