@@ -246,7 +246,7 @@ Then `dox build_runner:build`, and `dtos: dtos` in `AppConfig`.
 | Numbers | `@Min(1)`, `@Max(9)`, `@Range(1, 9)`, `@Positive()`, `@GreaterThan(0)`, `@LessThan(9)`, `@In`, `@NotIn` |
 | Lists | `@MinItems(1)`, `@MaxItems(5)`, `@UniqueItems()` |
 | Dates | `@After('2000-01-01')`, `@Before('now')` |
-| Files | `@MaxSize('2MB')`, `@Mimes(['pdf'])`, `@Image()` |
+| Files | `@MaxSize('2MB')`, `@MinSize('1KB')`, `@Mimes(['pdf'])`, `@MimeTypes(['image/png'])`, `@Image()`, `@Dimensions(minWidth: 100)` |
 | Database (`dox_orm`) | `@Unique('users', column: 'email', ignoreParam: 'id')`, `@Exists('teams')` |
 | Keys | `@Name('emailAddress')` |
 | Class | `@Dto(source: Source.query, keyCase: KeyCase.field, strict: true, messages: {...})` |
@@ -502,6 +502,8 @@ class ChatNamespace extends NamespaceHandler {
   }
 }
 ```
+
+Log users in at connect time with `SocketAuth(findUser).handle` in `middleware`. The user is in `socket.user`.
 
 Turn it on with a `SocketIoProvider` (extend it in `lib/`). Many isolates need the Redis adapter and `transports: ['websocket']` on the client.
 

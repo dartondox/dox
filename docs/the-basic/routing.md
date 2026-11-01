@@ -340,3 +340,37 @@ Route.post('/posts', (PostController c) => c.store, body: v.object(<String, Sche
   'title': v.string().min(3),
 }));
 ```
+
+## Mount a raw handler
+
+`Route.mount(prefix, handler)` sends every request under a path prefix straight to a raw `HttpRequest` handler.
+It runs before routing and before the body is read. The handler writes and closes the response itself.
+[Socket.IO](../packages/socketio.md) uses it for `/socket.io/`.
+
+```dart
+Route.mount('/socket.io/', io.handle);
+Route.mount('/admin', admin.handle, middleware: true);
+```
+
+How the prefix matches:
+
+- It matches whole path parts. `/admin` matches `/admin`, `/admin/` and `/admin/users`. It never matches `/administrator` or `/admin-login`.
+- A trailing `/` does not change the match. `/socket.io/` also matches `/socket.io`.
+- The query string is not part of the match.
+- When two prefixes match, the longest one wins. `//` counts as one `/`, so `/admin//secure/x` goes to a mount at `/admin/secure`.
+- The match uses the raw path. `%2F` stays encoded, so `/admin/secure%2Fx` goes to a mount at `/admin`. To protect a nested path, set `middleware: true` on the outer mount too.
+
+!!! warning
+    By default a mount skips all middleware, also the global middleware (security headers, CSRF, rate limit).
+    Set `middleware: true` to run `AppConfig.globalMiddleware` before the handler.
+    The global CORS config never applies to a mount. The handler must send its own CORS headers.
+
+With `middleware: true`:
+
+- A middleware that gives a response (like `403`) stops the request. The handler does not run.
+- The body is not read for the middleware, so the handler can still read it. A CSRF token must come in a header.
+- The handler sends the answer itself. So the part of a `next` middleware that runs after the handler cannot change the answer.
+- A `terminate` step runs once the answer is sent, like on other routes.
+- `RequestTimeout` does not run for a mount. The handler already owns the answer.
+- Cookies that a middleware adds after the handler (the session cookie, `XSRF-TOKEN`) are not sent. Get the CSRF token from a normal route.
+- An error in the handler gives `500`, like without middleware.

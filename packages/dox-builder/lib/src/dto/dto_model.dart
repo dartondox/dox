@@ -126,6 +126,17 @@ class DtoRule {
     return object?.toIntValue() ?? object?.toDoubleValue();
   }
 
+  /// The limits of `@Dimensions`, in the order of `ImageSize.fits`.
+  static const List<String> dimensionFields = <String>[
+    'width',
+    'height',
+    'minWidth',
+    'maxWidth',
+    'minHeight',
+    'maxHeight',
+    'ratio',
+  ];
+
   /// The `message:` of the annotation.
   String? get message {
     return stringField('message');
@@ -259,7 +270,14 @@ class DtoReader {
 
   static const Set<String> dateRules = <String>{'After', 'Before'};
 
-  static const Set<String> fileRules = <String>{'MaxSize', 'Mimes', 'Image'};
+  static const Set<String> fileRules = <String>{
+    'MaxSize',
+    'MinSize',
+    'Mimes',
+    'MimeTypes',
+    'Image',
+    'Dimensions',
+  };
 
   static const Set<String> valueRules = <String>{'In', 'NotIn'};
 
@@ -722,10 +740,19 @@ class DtoReader {
     }
     if (fileRules.contains(name)) {
       if (!_fits(field, name, where, errors, <DtoKind>{DtoKind.file})) return;
-      if (name == 'MaxSize' && sizeOf(rule.stringField('size') ?? '') == null) {
+      bool sized = name == 'MaxSize' || name == 'MinSize';
+      if (sized && sizeOf(rule.stringField('size') ?? '') == null) {
         errors.add(
-          '@MaxSize on $where needs a size like \'2MB\' '
+          '@$name on $where needs a size like \'2MB\' '
           '(units B, KB, MB, GB), not "${rule.stringField('size')}".',
+        );
+      }
+      if (name == 'Dimensions' &&
+          DtoRule.dimensionFields.every(
+            (String key) => rule.value.getField(key)?.isNull ?? true,
+          )) {
+        errors.add(
+          '@Dimensions on $where needs at least one limit, like minWidth:.',
         );
       }
     }

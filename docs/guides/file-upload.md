@@ -200,5 +200,5 @@ Set the same limit in your proxy (`client_max_body_size` in nginx).
 ## See also
 
 - [Request: form data](../the-basic/request.md#form-data-file) for `RequestFile`
-- [Validation: files](../the-basic/validation.md#files) for `@Image`, `@Mimes`, `@MaxSize`
+- [Validation: files](../the-basic/validation.md#files) for `@Image`, `@Mimes`, `@MimeTypes`, `@MaxSize`, `@MinSize`, `@Dimensions`
 - [File storage](../digging-deeper/file-storage.md) for S3 and signed URLs
