@@ -1,10 +1,9 @@
 import 'dart:convert';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:dox_core/exception/bad_request_exception.dart';
 import 'package:dox_core/utils/key_derivation.dart';
-import 'package:pointycastle/export.dart';
+import 'package:dox_http_native/dox_http_native.dart';
 
 /// Thrown when encrypted text can not be decrypted.
 /// The text was changed, cut, or made with another key.
@@ -31,10 +30,11 @@ class DecryptException extends BadRequestException {
 /// a [purpose] label with HKDF-SHA256 (see [KeyDerivation]). Cookies use
 /// the label `dox:cookie`, other values `dox:encrypt` by default. A value
 /// made for one purpose can not be read with another one.
+///
+/// The work runs in Rust (`AesGcm` of dox_http_native), with the AES
+/// instructions of the CPU.
 class AESEncryptor {
-  static const int _nonceLength = 12;
-  static const int _tagBits = 128;
-  static final Random _random = Random.secure();
+  static final Uint8List _noData = Uint8List(0);
 
   /// encode a message
   ///```
@@ -46,26 +46,12 @@ class AESEncryptor {
     String associatedData = '',
     String purpose = KeyDerivation.encrypt,
   }) {
-    Uint8List nonce = Uint8List(_nonceLength);
-    for (int i = 0; i < _nonceLength; i++) {
-      nonce[i] = _random.nextInt(256);
-    }
-    GCMBlockCipher cipher = _cipher(
-      true,
+    Uint8List sealed = AesGcm.seal(
       KeyDerivation.derive(secret, purpose),
-      nonce,
-      associatedData,
+      utf8.encode(content),
+      _aad(associatedData),
     );
-    Uint8List input = utf8.encode(content);
-
-    /// write nonce + ciphertext + tag into one buffer
-    Uint8List out = Uint8List(
-      _nonceLength + cipher.getOutputSize(input.length),
-    );
-    out.setAll(0, nonce);
-    int length = cipher.processBytes(input, 0, input.length, out, _nonceLength);
-    length += cipher.doFinal(out, _nonceLength + length);
-    return base64.encode(Uint8List.sublistView(out, 0, _nonceLength + length));
+    return base64.encode(sealed);
   }
 
   /// decode a message.
@@ -82,57 +68,34 @@ class AESEncryptor {
     String purpose = KeyDerivation.encrypt,
     List<String> previousSecrets = const <String>[],
   }) {
+    Uint8List data;
     try {
-      return _decode(content, secret, associatedData, purpose);
-    } on DecryptException {
-      for (String old in previousSecrets) {
-        try {
-          return _decode(content, old, associatedData, purpose);
-        } on DecryptException {
-          /// try the next one
-        }
-      }
-      rethrow;
+      data = base64.decode(content);
+    } on FormatException {
+      throw DecryptException();
     }
-  }
-
-  static String _decode(
-    String content,
-    String secret,
-    String associatedData,
-    String purpose,
-  ) {
-    try {
-      Uint8List data = base64.decode(content);
-      Uint8List nonce = Uint8List.sublistView(data, 0, _nonceLength);
-      Uint8List sealed = Uint8List.sublistView(data, _nonceLength);
-      return utf8.decode(
-        _cipher(
-          false,
-          KeyDerivation.derive(secret, purpose),
-          nonce,
-          associatedData,
-        ).process(sealed),
+    Uint8List aad = _aad(associatedData);
+    Uint8List? plain = AesGcm.open(
+      KeyDerivation.derive(secret, purpose),
+      data,
+      aad,
+    );
+    for (int i = 0; plain == null && i < previousSecrets.length; i++) {
+      plain = AesGcm.open(
+        KeyDerivation.derive(previousSecrets[i], purpose),
+        data,
+        aad,
       );
-    } catch (_) {
+    }
+    if (plain == null) throw DecryptException();
+    try {
+      return utf8.decode(plain);
+    } on FormatException {
       throw DecryptException();
     }
   }
 
-  static GCMBlockCipher _cipher(
-    bool forEncryption,
-    Uint8List key,
-    Uint8List nonce,
-    String associatedData,
-  ) {
-    return GCMBlockCipher(AESEngine())..init(
-      forEncryption,
-      AEADParameters<KeyParameter>(
-        KeyParameter(key),
-        _tagBits,
-        nonce,
-        utf8.encode(associatedData),
-      ),
-    );
+  static Uint8List _aad(String associatedData) {
+    return associatedData.isEmpty ? _noData : utf8.encode(associatedData);
   }
 }
