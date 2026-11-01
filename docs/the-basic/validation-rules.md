@@ -144,7 +144,11 @@ For `RequestFile` and `List<RequestFile>` fields.
   For types without a byte signature (like `txt` or `csv`), it uses the file name extension.
 - `@Image()` is `@Mimes(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'])`. No `svg`.
 - `@MimeTypes` takes MIME types. Dox turns each one into file extensions, then checks the real bytes like `@Mimes`.
-  It does not trust the content type the client sent. `image/*` means every image type Dox knows. No `svg`.
+  It does not trust the content type the client sent.
+  `image/*` means: jpg, jpeg, png, gif, webp, bmp, tif, tiff, ico, heic, heif, avif and psd. No `svg`.
+  This is wider than `@Image()`, and browsers can not show most of the extra types.
+  For images that browsers can show, use `@Image()` or list the MIME types.
+  Write `image/jpeg`, not `image/jpg`. `image/jpg` is not a real MIME type, so it never matches.
   An unknown MIME type never matches.
 - `@Dimensions` checks the width and height in pixels. Limits: `width`, `height` (exact), `minWidth`, `maxWidth`, `minHeight`, `maxHeight` and `ratio` (width / height, like `3 / 2`).
   Give at least one limit, or the build stops.
