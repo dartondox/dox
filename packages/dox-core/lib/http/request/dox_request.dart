@@ -283,17 +283,7 @@ class DoxRequest implements IDoxRequest {
   String? cookie(String key, {bool decrypt = true}) {
     if (_cookies[key] == null) return null;
     if (!decrypt) return _cookies[key];
-    try {
-      return AESEncryptor.decode(
-        _cookies[key],
-        Dox().config.appKey,
-        associatedData: key,
-        purpose: KeyDerivation.cookie,
-        previousSecrets: Dox().config.previousKeys,
-      );
-    } on DecryptException {
-      return null;
-    }
+    return DoxCookie.decrypt(key, _cookies[key]);
   }
 
   /// get user agent from header

@@ -1,5 +1,7 @@
 ## Unreleased
 
+- New: `SessionMiddleware().fromCookie(value)` loads a session from its cookie value, with no request. Use it for a Socket.IO login. Give the value as the browser sent it (still encrypted). It runs the same checks as the middleware: a changed cookie, a cookie of another name, a cookie made with another APP_KEY, an expired session or an unknown session id gives an empty session. Changes to it are not saved.
+- New: `DoxCookie.decrypt(name, value)` decrypts a cookie value like `req.cookie(name)` does. `req.cookie` now uses it, with no change in what it accepts.
 - Fix: `Route.mount` matches whole path parts only. A mount at `/admin` now gets `/admin`, `/admin/` and `/admin/...`, but no longer `/administrator` or `/admin-login`. Only requests that went to the wrong handler change. A prefix that ends in `/` (like Socket.IO's `/socket.io/`) works as before.
 - Fix: `//` counts as one `/` when a path is matched to a mount prefix. So `/admin//secure/x` goes to a mount at `/admin/secure`. The handler still gets the path as it came.
 - Change: when two mount prefixes match, the longest one wins. Before, the first one added won. Apps with one mount, or with mounts that do not overlap, do not change.

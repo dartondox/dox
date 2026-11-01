@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dox_core/app.dart';
+import 'package:dox_core/interfaces/app_config.dart';
 import 'package:dox_core/utils/aes_encryptor.dart';
 import 'package:dox_core/utils/key_derivation.dart';
 
@@ -36,6 +37,28 @@ class DoxCookie {
     this.maxAge = const Duration(hours: 1),
     this.sameSite,
   });
+
+  /// The value of the encrypted cookie [name], as the browser sent it,
+  /// decrypted with the APP_KEY (or one of `AppConfig.previousKeys`).
+  /// A changed cookie, one made with another key, or one made for
+  /// another cookie name gives null. `req.cookie(name)` uses it.
+  /// ```
+  /// DoxCookie.decrypt('dox_session', rawValue);
+  /// ```
+  static String? decrypt(String name, String value) {
+    AppConfig config = Dox().config;
+    try {
+      return AESEncryptor.decode(
+        value,
+        config.appKey,
+        associatedData: name,
+        purpose: KeyDerivation.cookie,
+        previousSecrets: config.previousKeys,
+      );
+    } on DecryptException {
+      return null;
+    }
+  }
 
   /// set expire the cookie
   /// ```

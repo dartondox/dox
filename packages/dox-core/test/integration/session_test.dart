@@ -239,6 +239,107 @@ void main() {
         .expectJson(containsPair('name', null));
   });
 
+  group('fromCookie', () {
+    /// a session middleware for the cache driver test config
+    const SessionMiddleware cacheMiddleware = SessionMiddleware(cacheSession);
+
+    /// a raw `dox_session` cookie (as the browser sends it) for [payload]
+    String rawCookie(String name, Map<String, dynamic> payload) {
+      String header = DoxCookie(name, jsonEncode(payload)).get();
+      return header.split(';').first.substring('$name='.length);
+    }
+
+    for (String prefix in <String>['', '/cache']) {
+      String driver = prefix.isEmpty ? 'cookie' : 'cache';
+      String cookie = prefix.isEmpty ? 'dox_session' : 'cache_session';
+      SessionMiddleware middleware = prefix.isEmpty
+          ? const SessionMiddleware()
+          : cacheMiddleware;
+
+      test('loads the session of a $driver cookie', () async {
+        DoxTestClient browser = client.withSession();
+        await browser.get('$prefix/put?name=Ann');
+        Session session = await middleware.fromCookie(browser.cookies[cookie]);
+        expect(session.get('name'), 'Ann');
+      });
+
+      test(
+        'a null, changed or plain $driver cookie is an empty session',
+        () async {
+          DoxTestClient browser = client.withSession();
+          await browser.get('$prefix/put?name=Ann');
+          String raw = browser.cookies[cookie]!;
+          String changed =
+              raw.substring(0, raw.length - 2) +
+              (raw.endsWith('AA') ? 'BB' : 'AA');
+          expect((await middleware.fromCookie(null)).get('name'), isNull);
+          expect((await middleware.fromCookie(changed)).get('name'), isNull);
+          expect((await middleware.fromCookie('')).get('name'), isNull);
+          // the decrypted value is not a valid cookie: it must be encrypted
+          String? plain = DoxCookie.decrypt(cookie, raw);
+          expect(plain, isNotNull);
+          expect((await middleware.fromCookie(plain)).get('name'), isNull);
+        },
+      );
+    }
+
+    test('a cookie made for another name is an empty session', () async {
+      DoxTestClient browser = client.withSession();
+      await browser.get('/cache/put?name=Ann');
+      // a cache_session cookie given as dox_session
+      String raw = browser.cookies['cache_session']!;
+      expect(DoxCookie.decrypt('dox_session', raw), isNull);
+      Session session = await const SessionMiddleware().fromCookie(raw);
+      expect(session.get('name'), isNull);
+    });
+
+    test('a cookie made with another APP_KEY is an empty session', () async {
+      String raw = rawCookie('dox_session', <String, dynamic>{
+        'data': <String, dynamic>{'name': 'Ann'},
+        'flash': <String>[],
+        'token': null,
+        'at': DateTime.now().millisecondsSinceEpoch,
+      });
+      expect(
+        (await const SessionMiddleware().fromCookie(raw)).get('name'),
+        'Ann',
+      );
+      String foreign = AESEncryptor.encode(
+        DoxCookie.decrypt('dox_session', raw)!,
+        'another-app-key-another-app-key-xx',
+        associatedData: 'dox_session',
+        purpose: KeyDerivation.cookie,
+      );
+      expect(
+        (await const SessionMiddleware().fromCookie(foreign)).get('name'),
+        isNull,
+      );
+    });
+
+    test('an expired cookie session is an empty session', () async {
+      String raw = rawCookie('dox_session', <String, dynamic>{
+        'data': <String, dynamic>{'name': 'Ann'},
+        'flash': <String>[],
+        'token': null,
+        'at': DateTime.now()
+            .subtract(const Duration(hours: 3))
+            .millisecondsSinceEpoch,
+      });
+      expect(
+        (await const SessionMiddleware().fromCookie(raw)).get('name'),
+        isNull,
+      );
+    });
+
+    test('an unknown cache session id is an empty session', () async {
+      String unknown = DoxCookie('cache_session', 'no-such-id').get();
+      unknown = unknown.split(';').first.substring('cache_session='.length);
+      Session session = await cacheMiddleware.fromCookie(unknown);
+      expect(session.get('name'), isNull);
+      expect(session.id, isNull);
+    });
+  });
+
   test('the cookie driver stops a session that is too big', () async {
     (await client.get('/big')).expectStatus(500);
     (await client.get('/cache/big')).expectStatus(200);
