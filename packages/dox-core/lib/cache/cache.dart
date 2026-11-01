@@ -43,6 +43,28 @@ class Cache {
     return this;
   }
 
+  /// [config] where each Redis store with no `prefix` gets
+  /// `<app name>_cache:`, so two apps on one Redis do not share keys.
+  /// `My Shop` gives `my_shop_cache:`. An empty [appName] changes nothing,
+  /// so the dox_cache default stays.
+  static CacheConfig withAppPrefix(CacheConfig config, String appName) {
+    String name = appName
+        .trim()
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+        .replaceAll(RegExp(r'^_+|_+$'), '');
+    if (name.isEmpty) return config;
+    Map<String, Map<String, dynamic>> stores = <String, Map<String, dynamic>>{
+      for (MapEntry<String, Map<String, dynamic>> store
+          in config.stores.entries)
+        store.key:
+            store.value['driver'] == 'redis' && store.value['prefix'] == null
+            ? <String, dynamic>{...store.value, 'prefix': '${name}_cache:'}
+            : store.value,
+    };
+    return CacheConfig(defaultStore: config.defaultStore, stores: stores);
+  }
+
   /// The `dox_cache` store, for the methods that are not here.
   CacheStore get repository {
     CacheStore store = (_manager ?? Dox().cache).store(_store);
@@ -126,20 +148,66 @@ class Cache {
   ///   () async => (await Post().all()).map((Post p) => p.toJson()).toList(),
   /// );
   /// ```
+  ///
+  /// [decode] turns the stored JSON back into [T] on a cache hit, eg.
+  /// `decode: (Object? j) => (j as List<dynamic>).cast<String>()`.
+  /// Without it, [T] must be a JSON type like `List<dynamic>`.
+  /// With [lock], only one caller on all isolates and servers runs
+  /// [compute]. The others wait for its value.
   Future<T> remember<T>(
     String key,
     Duration? duration,
-    FutureOr<T> Function() compute,
-  ) {
-    return repository.remember<T>(key, duration, compute);
+    FutureOr<T> Function() compute, {
+    T Function(Object? json)? decode,
+    bool lock = false,
+  }) {
+    return repository.remember<T>(
+      key,
+      duration,
+      compute,
+      decode: decode,
+      lock: lock,
+    );
   }
 
   /// Like [remember], but the value never expires.
-  Future<T> rememberForever<T>(String key, FutureOr<T> Function() compute) {
-    return repository.rememberForever<T>(key, compute);
+  Future<T> rememberForever<T>(
+    String key,
+    FutureOr<T> Function() compute, {
+    T Function(Object? json)? decode,
+    bool lock = false,
+  }) {
+    return repository.rememberForever<T>(
+      key,
+      compute,
+      decode: decode,
+      lock: lock,
+    );
   }
 
-  /// An atomic lock. Memory and Redis stores support it.
+  /// Stale while revalidate. For [fresh] the value is served as it is.
+  /// After that, until [fresh] + [stale], the old value is still served
+  /// at once, and one caller runs [compute] in the background.
+  /// ```
+  /// await Cache().flexible('stats', Duration(minutes: 1),
+  ///     Duration(minutes: 5), () => loadStats());
+  /// ```
+  Future<T> flexible<T>(
+    String key,
+    Duration fresh,
+    Duration stale,
+    FutureOr<T> Function() compute, {
+    T Function(Object? json)? decode,
+  }) {
+    return repository.flexible<T>(key, fresh, stale, compute, decode: decode);
+  }
+
+  /// Give [key] a new [duration] (null: forever). False when not found.
+  Future<bool> touch(String key, {Duration? duration}) {
+    return repository.touch(key, duration);
+  }
+
+  /// An atomic lock. Memory, file and Redis stores support it.
   CacheLock lock(String name, [Duration? ttl, String? owner]) {
     return repository.lock(name, ttl, owner);
   }
