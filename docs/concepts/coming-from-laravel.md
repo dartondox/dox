@@ -90,6 +90,9 @@ Dox middleware runs before the controller only. There is no "after" step; use a 
 | `'title' => ['required', 'string', 'max:50']` | `@MaxLength(50) final String title;` |
 | `'age' => ['nullable', 'integer', 'min:18']` | `@Min(18) final int? age;` |
 | `'email' => ['required', 'email', 'unique:users']` | `@Email() @Unique('users') final String email;` |
+| `'password' => ['required', 'confirmed', Password::min(8)->mixedCase()]` | `@Confirmed() @Password(mixedCase: true) final String password;` |
+| `'company' => 'required_if:type,company'` | `@RequiredIf('type', 'company') final String? company;` |
+| `'pin' => 'digits:4'`, `'meta' => 'json'`, `'day' => 'date_format:Y-m-d'` | `@Digits(4)`, `@Json()`, `@DateFormatted('Y-m-d')` on `String` fields |
 | `'role' => Rule::in(['admin', 'user'])` | `final Role role;` (a Dart enum) |
 | `'tags' => ['array', 'max:5']`, `'tags.*' => 'string'` | `@MaxItems(5) final List<String> tags;` |
 | `$request->validated()` | the DTO object itself, already typed |

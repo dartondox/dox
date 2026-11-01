@@ -240,6 +240,8 @@ Then `dox build_runner:build`, and `dtos: dtos` in `AppConfig`.
 | Kind | Annotations |
 | --- | --- |
 | Text | `@Length(min:, max:)`, `@MinLength(3)`, `@MaxLength(50)`, `@Email()`, `@Url()`, `@Uuid()`, `@Ip()`, `@Regex(r'..')`, `@In([..])`, `@NotIn([..])`, `@StartsWith('a')`, `@EndsWith('b')`, `@Alpha()`, `@AlphaNumeric()`, `@AlphaDash()` |
+| More text | `@Json()`, `@Digits(6)`, `@DigitsBetween(4, 6)`, `@DateFormatted('Y-m-d')`, `@Password(min: 8, mixedCase: true, numbers: true, symbols: true)` |
+| Other fields | `@Confirmed()`, `@Same('email')`, `@RequiredIf('type', 'company')`, `@RequiredWith(['phone'])` |
 | Change text | `@Trim()`, `@Lowercase()`, `@Uppercase()`, `@AllowEmpty()` |
 | Numbers | `@Min(1)`, `@Max(9)`, `@Range(1, 9)`, `@Positive()`, `@GreaterThan(0)`, `@LessThan(9)`, `@In`, `@NotIn` |
 | Lists | `@MinItems(1)`, `@MaxItems(5)`, `@UniqueItems()` |

@@ -67,6 +67,46 @@ Details:
 - `@Alpha()`, `@AlphaNumeric()` and `@AlphaDash()` use ASCII letters `a-z`, `A-Z`. `@AlphaDash()` also allows digits `0-9`, `-` and `_`.
 - `@In` and `@NotIn` compare exactly (case matters).
 
+## More text rules
+
+For `String` fields. Like the Laravel rules with the same names.
+
+| Annotation | Code | Message | JSON Schema |
+| --- | --- | --- | --- |
+| `@Json()` | `json` | `The {field} is not a valid json` | `contentMediaType: application/json` |
+| `@Digits(6)` | `digits` | `The {field} must be {digits} digits` | `pattern` |
+| `@DigitsBetween(4, 6)` | `digits_between` | `The {field} must be between {min} and {max} digits` | `pattern` |
+| `@DateFormatted('Y-m-d')` | `date_format` | `The {field} must match the format {format}` | |
+| `@Password(min: 8, ...)` | `password` | `The {field} must have {rules}` | `minLength` |
+
+- `@Digits` and `@DigitsBetween` take only `0-9`. No sign, no dot. Use a `String` field, so leading zeros stay.
+- `@DateFormatted` uses PHP format letters: `Y` (4 digit year), `y` (2 digit year), `m` / `n` (month), `d` / `j` (day), `H` / `G` (hour), `i` (minutes), `s` (seconds), `v` (milliseconds), `u` (microseconds), `P` (`+07:00`), `O` (`+0700`).
+  Put `\` before a letter to use it as text, like `Y-m-d\TH:i`. Other characters must be there as they are.
+  The date must exist: `2023-02-29` fails. The field stays a `String`. Use a `DateTime` field for ISO 8601 dates.
+- `@Password` options: `min` (default 8), `letters`, `mixedCase` (one upper and one lower case letter), `numbers`, `symbols`. They are all off by default.
+  Letters, numbers and symbols are Unicode, so `é` is a letter. `{rules}` lists the options you set, like `at least 8 characters, one number, and one symbol`.
+  It does not check leaked passwords (Laravel `uncompromised`).
+
+## Other fields
+
+These read another key of the same object. They compare with the raw input of that key.
+
+| Annotation | Code | Message |
+| --- | --- | --- |
+| `@Confirmed()` | `confirmed` | `The {field} confirmation does not match` |
+| `@Same('email')` | `same` | `The {field} must match {other}` |
+| `@RequiredIf('type', 'company')` | `required_if` | `The {field} is required when {other} is {values}` |
+| `@RequiredWith(['phone'])` | `required_with` | `The {field} is required when {others} is present` |
+
+- `@Confirmed()` on `password` needs the key `password_confirmation` with the same value. The error is on `password`. Use `@Confirmed(other: 'password_again')` for another key.
+  The DTO does not need a field for the confirmation key.
+- Text and numbers match by text, so `1234` matches `"1234"`.
+- `@RequiredIf` and `@RequiredWith` work on a nullable field, a `Maybe` field or a field with a default. On an always-required field the build stops.
+- `@RequiredIf('type', ['company', 'shop'])` takes a list: any of the values makes the field required. `"true"` matches `true`, `"1"` matches `1`.
+- `@RequiredWith(['phone', 'email'])`: the field is required when any of the keys is there and not empty.
+- Missing means: not there, `null`, blank text or an empty list.
+- They run in step 1, with the other "required" checks. `@Confirmed` and `@Same` run in step 2.
+
 ## Change text
 
 These change the value before the rules run. They always run in this order, wherever you put them:
@@ -96,7 +136,7 @@ For `int`, `double` and `num` fields (and list items).
 | `@In([1, 2, 3])` | `in` | `The selected {field} is invalid. Valid options are {values}` | `enum` |
 | `@NotIn([0])` | `not_in` | `The {field} field cannot be {value}` | `not: {enum}` |
 
-The values are `num`. `@Min(1.5)` on an `int` field stops the build.
+The values are `num`. `@Min(1.5)` on an `int` field stops the build. `@Range` is Laravel `between`.
 
 ## Lists
 
@@ -157,6 +197,9 @@ From `dox_orm`. Async: they run after all other checks passed.
 - They add nothing to the JSON Schema.
 
 See [Database rules](validation.md#database-rules-unique-and-exists).
+
+In a fluent schema, use `v.string().unique('users')` and `v.int().exists('teams')`. See [Fluent schemas](../packages/validation.md#rules-like-laravel).
+
 
 ## Keys and DTO options
 
@@ -219,5 +262,6 @@ The build stops with a clear error when:
 - a field type is not supported (see [Types](validation.md#types)),
 - a rule does not fit the field type (like `@Email()` on an `int`),
 - a `Maybe<T>` field has no `const Maybe.missing()` default,
+- `@RequiredIf` or `@RequiredWith` is on a field that is always required,
 - two `@Dto` classes in the app have the same name,
 - the class is generic, or extends another class (other than `Object`).
