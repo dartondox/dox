@@ -186,6 +186,68 @@ void main() {
     expect(await res.toList(), isEmpty);
   });
 
+  test('If-None-Match and If-Modified-Since on two lines: no 500', () async {
+    HttpClientResponse first = await get('/assets/app.js');
+    String etag = first.headers.value('etag')!;
+    String modified = first.headers.value('last-modified')!;
+    await first.drain<void>();
+    String res = await raw(
+      port,
+      'GET /assets/app.js HTTP/1.1\r\nHost: x\r\n'
+      'If-None-Match: W/"a"\r\nIf-None-Match: $etag\r\n'
+      'Connection: close\r\n\r\n',
+    );
+    expect(res, startsWith('HTTP/1.1 304'));
+    res = await raw(
+      port,
+      'GET /assets/app.js HTTP/1.1\r\nHost: x\r\n'
+      'If-Modified-Since: $modified\r\nIf-Modified-Since: $modified\r\n'
+      'Connection: close\r\n\r\n',
+    );
+    expect(res, startsWith('HTTP/1.1 200'));
+    expect(res, contains('console.log(1)'));
+  });
+
+  test('a 304 has the real content type', () async {
+    HttpClientResponse first = await get('/assets/app.js');
+    String etag = first.headers.value('etag')!;
+    await first.drain<void>();
+    HttpClientResponse res = await getWith('/assets/app.js', <String, String>{
+      'if-none-match': etag,
+    });
+    expect(res.statusCode, 304);
+    expect(res.headers.contentType?.mimeType, 'text/javascript');
+    await res.drain<void>();
+  });
+
+  test('If-Range: Range only for the same Last-Modified', () async {
+    HttpClientResponse first = await get('/assets/app.js');
+    String etag = first.headers.value('etag')!;
+    String modified = first.headers.value('last-modified')!;
+    await first.drain<void>();
+
+    HttpClientResponse res = await getWith('/assets/app.js', <String, String>{
+      'range': 'bytes=0-6',
+      'if-range': modified,
+    });
+    expect(res.statusCode, 206);
+    expect(await utf8.decodeStream(res), 'console');
+
+    for (String ifRange in <String>[
+      etag,
+      'W/"stale"',
+      HttpDate.format(DateTime.utc(2000)),
+      'not a date',
+    ]) {
+      res = await getWith('/assets/app.js', <String, String>{
+        'range': 'bytes=0-6',
+        'if-range': ifRange,
+      });
+      expect(res.statusCode, 200, reason: ifRange);
+      expect(await utf8.decodeStream(res), 'console.log(1)', reason: ifRange);
+    }
+  });
+
   test('the ETag changes when the file changes', () async {
     File f = File('${dir.path}/public/changing.txt');
     await f.writeAsString('one');

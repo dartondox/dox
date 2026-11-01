@@ -133,23 +133,29 @@ void _send(HttpRequest req, File file, FileStat stat, Duration? maxAge) {
       'public, max-age=${maxAge.inSeconds}',
     );
   }
+
+  /// set before the 304, so a cache that copies the 304 headers onto
+  /// the file it has keeps the right type
+  res.headers.contentType = ContentType.parse(
+    lookupMimeType(file.path) ?? 'application/octet-stream',
+  );
   if (_notModified(req, etag, modified)) {
     res.statusCode = HttpStatus.notModified;
     res.close();
     return;
   }
-  res.headers.contentType = ContentType.parse(
-    lookupMimeType(file.path) ?? 'application/octet-stream',
-  );
   responseDataHandler(file, req);
 }
 
 /// true when the client already has this version. `If-None-Match` wins
 /// over `If-Modified-Since` when both are sent (RFC 9110).
 bool _notModified(HttpRequest req, String etag, DateTime modified) {
-  String? match = req.headers.value(HttpHeaders.ifNoneMatchHeader);
-  if (match != null) return ETag.matches(match, etag);
-  String? header = req.headers.value(HttpHeaders.ifModifiedSinceHeader);
+  /// a list header: a client may send it on more than one line
+  List<String>? match = req.headers[HttpHeaders.ifNoneMatchHeader];
+  if (match != null) return ETag.matches(match.join(','), etag);
+
+  /// sent more than once: ignored, not a 500
+  String? header = singleHeader(req.headers, HttpHeaders.ifModifiedSinceHeader);
   DateTime? since = header == null ? null : _parseDate(header);
 
   /// a date in the future is not valid, and is ignored (RFC 9110)
