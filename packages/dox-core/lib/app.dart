@@ -113,6 +113,7 @@ class Dox {
     }
 
     await startProviders();
+    warnWebSocketOrigin();
     DoxServer().setResponseHandler(config.responseHandler);
     HttpServer server = await DoxServer().listen(
       DoxServer.portFor(config.serverPort),
@@ -202,6 +203,29 @@ class Dox {
         ? '[${address.address}]'
         : address.address;
     return 'http://$host:${server.port}';
+  }
+
+  bool _warnedWebSocketOrigin = false;
+
+  /// the text of the warning of [warnWebSocketOrigin]
+  static const String webSocketOriginWarning =
+      'dox: warning: WebSocket routes do not check the Origin header. Any '
+      'website can open a socket with the cookie of a logged in user. To '
+      'allow only your own sites, set AppConfig(webSocketAllowedOrigins: '
+      "['https://app.example.com']), or allowedOrigins: on Route.websocket. "
+      '[] allows the same host only.';
+
+  /// log one warning when a `Route.websocket` route checks no `Origin`.
+  /// Any site can then open a socket with the cookies of the user.
+  void warnWebSocketOrigin() {
+    if (_warnedWebSocketOrigin ||
+        config.webSocketAllowedOrigins != null ||
+        !Route().hasWebSocketWithoutOriginCheck) {
+      return;
+    }
+    _warnedWebSocketOrigin = true;
+    // stderr, not Logger: the logger is off by default
+    stderr.writeln(webSocketOriginWarning);
   }
 
   /// old sample keys from `.env.example` files. they are public on
