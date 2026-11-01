@@ -189,7 +189,7 @@ final String email;
 | Numbers | `@Min`, `@Max`, `@Range`, `@Positive`, `@GreaterThan`, `@LessThan`, `@In`, `@NotIn` |
 | Lists | `@MinItems`, `@MaxItems`, `@UniqueItems` |
 | Dates | `@After`, `@Before` |
-| Files | `@MaxSize`, `@Mimes`, `@Image` |
+| Files | `@MaxSize`, `@MinSize`, `@Mimes`, `@MimeTypes`, `@Image`, `@Dimensions` |
 | Database | `@Unique`, `@Exists` |
 
 Every rule, with its error code and message, is in [Validation rules](validation-rules.md).
@@ -224,6 +224,7 @@ A `RequestFile` field reads a file from `multipart/form-data`.
 ```dart
 @Image()
 @MaxSize('2MB')
+@Dimensions(minWidth: 100, maxWidth: 2000)
 final RequestFile avatar;
 
 @Mimes(<String>['pdf', 'docx'])

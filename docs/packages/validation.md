@@ -196,7 +196,7 @@ In a controller: `Map<String, dynamic> data = await req.validateSchema(createUse
 | `v.object({...})` | `strict`, `passthrough`, `strip`, `pick`, `omit`, `extend`, `partial` |
 | `v.map(values, keys: ...)` | any keys |
 | `v.union([...])` | the first match wins |
-| `v.any()`, `v.file()` | `file()` has `image` and `extensions` |
+| `v.any()`, `v.file()` | `file()` has `maxSize`, `minSize`, `mimes`, `mimeTypes`, `dimensions`, `image` and `extensions` |
 
 On every schema:
 
