@@ -8276,6 +8276,11 @@
 <h2 id="dox_core">dox_core</h2>
 <h3 id="unreleased">Unreleased</h3>
 <ul>
+<li>New: a path that has routes, but not for the request method, answers <code>405 Method Not Allowed</code> with an <code>Allow</code> header (like <code>Allow: GET, POST, HEAD</code>). Before, it was <code>404</code>.</li>
+<li>New: <code>abort(code, [message, headers])</code> and <code>HttpStatusException(code)</code> for any status. Common codes get a default <code>errorCode</code> and <code>message</code>. The <code>headers</code> are sent with the answer.</li>
+<li>New: <code>ForbiddenHttpException</code> (403) and <code>MethodNotAllowedHttpException</code> (405).</li>
+<li>New: bracket keys in form bodies and query strings nest, like in Laravel. <code>tags[]=a&amp;tags[]=b</code> gives <code>req.input('tags') == ['a', 'b']</code>, and <code>address[city]=x</code> gives a map. A repeated key with no brackets still keeps its last value.</li>
+<li>New: <code>AppConfig(previousKeys: [...])</code>. Encrypted cookies and cookie sessions made with an old <code>APP_KEY</code> can still be read, so a new key does not log out every user. <code>AESEncryptor.decode</code> has a new <code>previousSecrets</code> option.</li>
 <li>Fix: path params are now URL-decoded. <code>/users/a%20b</code> gives <code>'a b'</code>, not <code>'a%20b'</code>. A URL from <code>Route.url()</code> now gives back the same value. A param that is not valid UTF-8 (like <code>%ff</code>) gives 404.</li>
 <li>Fix: 5xx HTTP exceptions (like <code>InternalErrorException</code> and <code>QueryException</code>) are now sent to <code>ExceptionHandler.report</code>. Before, every <code>IHttpException</code> was skipped, so real server errors never reached the logs or Sentry. 4xx exceptions are still not reported.</li>
 <li>Fix: <code>req.headers</code> joins repeated header values with <code>,</code>. Before, two <code>Accept</code> values became one string with no separator.</li>

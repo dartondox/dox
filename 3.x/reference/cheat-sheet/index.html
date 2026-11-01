@@ -6918,6 +6918,10 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 <td><code>404 Not Found</code></td>
 </tr>
 <tr>
+<td><code>abort(403)</code>, <code>abort(409, 'Taken')</code></td>
+<td>any status</td>
+</tr>
+<tr>
 <td><code>response(...)</code></td>
 <td>full control</td>
 </tr>
@@ -6949,8 +6953,16 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 <td><code>401</code></td>
 </tr>
 <tr>
+<td><code>ForbiddenHttpException()</code></td>
+<td><code>403</code></td>
+</tr>
+<tr>
 <td><code>NotFoundHttpException()</code></td>
 <td><code>404</code></td>
+</tr>
+<tr>
+<td><code>MethodNotAllowedHttpException(['GET'])</code></td>
+<td><code>405</code></td>
 </tr>
 <tr>
 <td><code>PayloadTooLargeException()</code></td>
@@ -6967,6 +6979,10 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 <tr>
 <td><code>InternalErrorException()</code></td>
 <td><code>500</code></td>
+</tr>
+<tr>
+<td><code>HttpStatusException(code)</code></td>
+<td>any</td>
 </tr>
 </tbody>
 </table>

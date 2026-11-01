@@ -4258,6 +4258,56 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#change-the-key-key-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Change the key (key rotation)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Change the key (key rotation)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Steps
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-reads-the-old-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What reads the old keys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-the-key-leaked" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When the key leaked
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#cookies" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6210,6 +6260,56 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#change-the-key-key-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Change the key (key rotation)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Change the key (key rotation)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Steps
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-reads-the-old-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What reads the old keys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-the-key-leaked" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When the key leaked
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#cookies" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6312,16 +6412,86 @@ You can also call it yourself.</p>
 In <code>development</code>, <code>local</code>, <code>test</code> and <code>testing</code> it only prints a warning.</p>
 <ul>
 <li>Keep <code>APP_KEY</code> in <code>.env</code> or in the secrets of your host. Never put it in code or in git.</li>
-<li>If you change <code>APP_KEY</code>, old encrypted cookies and sessions can not be read any more. JWT tokens signed with it stop working too.</li>
+<li>If you change <code>APP_KEY</code> with no <code>previousKeys</code>, old encrypted cookies and sessions can not be read any more, so every user is logged out. JWT tokens signed with it stop working too. See <a href="#change-the-key-key-rotation">Change the key</a>.</li>
 </ul>
+<h2 id="change-the-key-key-rotation">Change the key (key rotation)</h2>
+<p>Change <code>APP_KEY</code> from time to time, or when someone who knew it leaves the team.
+With <code>previousKeys</code>, users stay logged in while you change it.</p>
+<h3 id="steps">Steps</h3>
+<ol>
+<li>Copy the current <code>APP_KEY</code> to <code>APP_PREVIOUS_KEYS</code>.</li>
+<li>
+<p>Run <code>dox key:generate</code>. It writes a new <code>APP_KEY</code>. Now <code>.env</code> has both:</p>
+<div class="language-bash highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">APP_KEY</span><span class="o">=</span>the-new-32-character-app-key....
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nv">APP_PREVIOUS_KEYS</span><span class="o">=</span>the-old-32-character-app-key....
+</span></code></pre></div>
+</li>
+<li>
+<p>Read it in the env class, and give it to <code>AppConfig</code>:</p>
+<div class="language-dart highlight"><span class="filename">lib/config/env.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">appPreviousKeys</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[];</span><span class="w"> </span><span class="c1">// APP_PREVIOUS_KEYS=a,b</span>
+</span></code></pre></div>
+<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nl">appKey:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appKey</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nl">previousKeys:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appPreviousKeys</span><span class="p">,</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="p">)</span>
+</span></code></pre></div>
+</li>
+<li>
+<p>Deploy. Every instance must get the new env at the same time.</p>
+</li>
+<li>Wait until the old cookies have expired: the session <code>lifetime</code>, and the <code>maxAge</code> of your own cookies.</li>
+<li>Remove the old key from <code>APP_PREVIOUS_KEYS</code> and deploy again.</li>
+</ol>
+<p><code>APP_PREVIOUS_KEYS</code> can hold more than one key, comma separated. Dox tries them in order.</p>
+<h3 id="what-reads-the-old-keys">What reads the old keys</h3>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>With an old key</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>encrypted cookies (<code>req.cookie</code>)</td>
+<td>read</td>
+</tr>
+<tr>
+<td><code>cookie</code> session driver</td>
+<td>read</td>
+</tr>
+<tr>
+<td>CSRF token</td>
+<td>read (it is in the session)</td>
+</tr>
+<tr>
+<td>JWT tokens of <code>JwtAuthDriver(secret: SecretKey(env.appKey))</code></td>
+<td>checked. A JWT secret that is not <code>APP_KEY</code> needs its own <code>previousSecrets</code> option, see <a href="../authentication/#change-the-jwt-secret">Authentication</a>.</td>
+</tr>
+<tr>
+<td><code>AESEncryptor.decode</code> in your code</td>
+<td>read only when you pass <code>previousSecrets: Dox().config.previousKeys</code></td>
+</tr>
+<tr>
+<td>anything new</td>
+<td>made with <code>APP_KEY</code> only</td>
+</tr>
+</tbody>
+</table>
+<p>Dox writes a cookie with the new key the next time it sends that cookie.
+So a user who comes back during step 5 moves to the new key without noticing.</p>
+<h3 id="when-the-key-leaked">When the key leaked</h3>
+<p>Do <strong>not</strong> put a leaked key in <code>previousKeys</code>.
+Anyone who has it can still make cookies and JWT tokens that Dox accepts.
+Change <code>APP_KEY</code> with no <code>previousKeys</code>. Every user is logged out, and that is what you want.</p>
 <h2 id="cookies">Cookies</h2>
 <p><code>DoxCookie</code> encrypts its value with <code>APP_KEY</code> by default.
 <code>req.cookie(key)</code> decrypts it.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">().</span><span class="n">cookie</span><span class="p">(</span><span class="n">DoxCookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="s1">'dark'</span><span class="p">));</span><span class="w">  </span><span class="c1">// encrypted</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">DoxCookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="s1">'dark'</span><span class="p">,</span><span class="w"> </span><span class="nl">encrypt:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">             </span><span class="c1">// plain text</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">theme</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">);</span><span class="w">                    </span><span class="c1">// decrypted</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="nl">decrypt:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">      </span><span class="c1">// as sent</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">().</span><span class="n">cookie</span><span class="p">(</span><span class="n">DoxCookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="s1">'dark'</span><span class="p">));</span><span class="w">  </span><span class="c1">// encrypted</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">DoxCookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="s1">'dark'</span><span class="p">,</span><span class="w"> </span><span class="nl">encrypt:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">             </span><span class="c1">// plain text</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">theme</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">);</span><span class="w">                    </span><span class="c1">// decrypted</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="nl">decrypt:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">      </span><span class="c1">// as sent</span>
 </span></code></pre></div>
 <p><code>req.cookie(key)</code> returns <code>null</code> when the cookie was changed, was made with another <code>APP_KEY</code>, or was made for another cookie name.
 The cookie name is bound to the encrypted value, so a value can not be copied from one cookie to another.</p>

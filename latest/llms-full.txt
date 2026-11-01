@@ -1919,7 +1919,7 @@ A controller can be a class method, a static method or a plain function.
 | `public function handle(Request $request, Closure $next)` | `dynamic handle(IDoxRequest req)` |
 | `return $next($request);` | `return req;` |
 | `return response('no', 401);` | `return response('no').statusCode(401);` |
-| `abort(404);` | `throw NotFoundHttpException();` |
+| `abort(404);` | `abort(404);` |
 | `$middleware->append(LogMiddleware::class)` in `bootstrap/app.php` | `AppConfig(globalMiddleware: <dynamic>[LogMiddleware()])` |
 
 ```dart title="lib/app/http/middleware/logger.middleware.dart"
@@ -1983,7 +1983,7 @@ See [Validation](../the-basic/validation.md).
 | `return response()->file($path);` | `return File(path);` |
 | `return response()->download($path);` | `return Storage().download(path);` |
 | `->cookie('theme', 'dark')` | `.cookie(DoxCookie('theme', 'dark'))` |
-| `abort(404, 'Not found');` | `throw NotFoundHttpException(message: 'Not found');` |
+| `abort(404, 'Not found');` | `abort(404, 'Not found');` |
 | `new BlogResource($blog)` | `BlogSerializer(blog)` |
 
 ## Eloquent vs Dox Model
@@ -3083,10 +3083,20 @@ class ApiController {
 | `req.query` | the query string only |
 | `req.add('key', value)`, `req.merge({...})` | add values, for example in a middleware |
 
+Form and query keys with brackets give lists and maps, like in Laravel:
+
+| Input | `req.input(...)` gives |
+| --- | --- |
+| `tags[]=a&tags[]=b` | `req.input('tags')` is `['a', 'b']` |
+| `address[city]=Yangon` | `req.input('address')` is `{'city': 'Yangon'}` |
+| `items[0][name]=x` | `req.input('items')` is `[{'name': 'x'}]` |
+| `name=a&name=b` (no brackets) | `req.input('name')` is `'b'`, the last value |
+
 ## Route params
 
 Ask for a path param as a typed parameter, like `int id` in the example above.
-The raw text values are also in `req.param`, like `req.param['id']`.
+The text values are also in `req.param`, like `req.param['id']`.
+They are URL-decoded: `/users/a%20b` gives `'a b'`.
 See [Controller: parameters](controller.md#parameters).
 
 ## Form data (File)
@@ -3164,7 +3174,7 @@ Set the same limit in your proxy, like `client_max_body_size` in nginx.
 
 ```dart
 String? token = req.header('X-Token');
-Map<String, dynamic> all = req.headers;
+Map<String, dynamic> all = req.headers; // a repeated header is joined with ', '
 
 req.userAgent();  // User-Agent header
 req.host();       // Host header
@@ -4349,8 +4359,9 @@ You do not need to set anything. With the default handler:
 For a `500`, the error text is sent only when `APP_ENV` is `development` or `local`.
 In production the client never sees it, because it can hold SQL, file paths or hosts.
 
-`report` is called for every error that is not an `IHttpException`.
-An `IHttpException` is a normal answer (like `404`), so it is not logged.
+`report` is called for every error, except an `IHttpException` with a `4xx` code.
+A `4xx` exception is a normal answer (like `404`), so it is not logged.
+A `5xx` exception, like `InternalErrorException`, is reported.
 The default `report` prints the error and the stack with the logger.
 
 See [HTTP exceptions](../reference/http-exceptions.md) for the built-in exception classes.
@@ -14044,6 +14055,26 @@ It returns `null` when the password is not a `String`, when no identifier is giv
 | `issuer` | `null` | the `iss` claim. When set, `verifyToken` also checks it |
 | `hashRounds` | `10` | the bcrypt cost of your stored hashes. Use the same value as `Hash.rounds` |
 | `userCacheTtl` | `null` (off) | keep the user of a token in memory for this time. See below |
+| `previousSecrets` | `null` | old secrets, only to check tokens after a key change. `null` with `secret` = `APP_KEY`: the old keys come from `AppConfig.previousKeys`. `[]` turns it off. See below |
+
+### Change the JWT secret
+
+New tokens are always signed with `secret`.
+A token is checked with `secret` first, then with each old secret.
+Only a wrong signature moves on to the next secret. An expired token fails at once.
+
+- **The secret is `APP_KEY`** (`SecretKey(env.appKey)`): follow [Change the key](encryption.md#change-the-key-key-rotation). The old keys in `AppConfig.previousKeys` are used. You need nothing more.
+- **A separate JWT secret**: give the old one to the driver.
+
+    ```dart
+    JwtAuthDriver(
+      secret: SecretKey(env.jwtSecret),
+      previousSecrets: <JWTKey>[SecretKey(env.jwtOldSecret)],
+    )
+    ```
+
+Remove the old secret once `expiresIn` has passed. Then every old token has expired anyway.
+Do not keep a leaked secret: anyone who has it can make tokens.
 
 ## More than one guard
 
@@ -14190,7 +14221,7 @@ Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), (PageCon
 | `Auth().logout(req)` | removes the login and all session data |
 
 - Login and logout give the session a new id and a new CSRF token. So an id that someone saw before the login is of no use.
-- With the default `cookie` session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout. The server also does not check its age, so a copied cookie works until `APP_KEY` changes. If logout must really end old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
+- With the default `cookie` session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout, until the session `lifetime` ends. If logout must really end old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
 - The session keeps only the user id. `AuthMiddleware` loads the user from the database on each request, so a deleted user is logged out.
 - These methods throw a `StateError` on a guard that does not use `SessionAuthDriver`.
 - `SessionAuthDriver` has one option, `hashRounds` (default `10`), like `JwtAuthDriver`.
@@ -14198,7 +14229,7 @@ Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), (PageCon
 ## Things to know
 
 - **The token is not secret.** Anyone with the token can read `user.toJson()`. Keep private columns in `hidden`.
-- **You can not cancel one token.** A token works until it expires. If you change the `secret` (your `APP_KEY`), all tokens stop working.
+- **You can not cancel one token.** A token works until it expires. To end all tokens, change the `secret` (your `APP_KEY`) with no old secrets. See [Change the JWT secret](#change-the-jwt-secret).
 - **The user is loaded on each request**, by the id in the token. A deleted user can not log in, even with a valid token.
 - **`userCacheTtl` skips that query.** With `Duration(seconds: 30)`, a deleted or changed user is seen only after 30 seconds. Each isolate has its own cache. Requests in that time share one user object, so do not change it per request.
 - **Login does not block the server.** `attempt` runs bcrypt in another isolate.
@@ -14461,7 +14492,61 @@ At startup Dox checks `APP_KEY`. When it is empty, not exactly 32 bytes, or an o
 In `development`, `local`, `test` and `testing` it only prints a warning.
 
 - Keep `APP_KEY` in `.env` or in the secrets of your host. Never put it in code or in git.
-- If you change `APP_KEY`, old encrypted cookies and sessions can not be read any more. JWT tokens signed with it stop working too.
+- If you change `APP_KEY` with no `previousKeys`, old encrypted cookies and sessions can not be read any more, so every user is logged out. JWT tokens signed with it stop working too. See [Change the key](#change-the-key-key-rotation).
+
+## Change the key (key rotation)
+
+Change `APP_KEY` from time to time, or when someone who knew it leaves the team.
+With `previousKeys`, users stay logged in while you change it.
+
+### Steps
+
+1. Copy the current `APP_KEY` to `APP_PREVIOUS_KEYS`.
+2. Run `dox key:generate`. It writes a new `APP_KEY`. Now `.env` has both:
+
+    ```bash title=".env"
+    APP_KEY=the-new-32-character-app-key....
+    APP_PREVIOUS_KEYS=the-old-32-character-app-key....
+    ```
+
+3. Read it in the env class, and give it to `AppConfig`:
+
+    ```dart title="lib/config/env.dart"
+    List<String> get appPreviousKeys => <String>[]; // APP_PREVIOUS_KEYS=a,b
+    ```
+
+    ```dart title="lib/config/app.dart"
+    AppConfig(
+      appKey: env.appKey,
+      previousKeys: env.appPreviousKeys,
+    )
+    ```
+
+4. Deploy. Every instance must get the new env at the same time.
+5. Wait until the old cookies have expired: the session `lifetime`, and the `maxAge` of your own cookies.
+6. Remove the old key from `APP_PREVIOUS_KEYS` and deploy again.
+
+`APP_PREVIOUS_KEYS` can hold more than one key, comma separated. Dox tries them in order.
+
+### What reads the old keys
+
+| Value | With an old key |
+| --- | --- |
+| encrypted cookies (`req.cookie`) | read |
+| `cookie` session driver | read |
+| CSRF token | read (it is in the session) |
+| JWT tokens of `JwtAuthDriver(secret: SecretKey(env.appKey))` | checked. A JWT secret that is not `APP_KEY` needs its own `previousSecrets` option, see [Authentication](authentication.md#change-the-jwt-secret). |
+| `AESEncryptor.decode` in your code | read only when you pass `previousSecrets: Dox().config.previousKeys` |
+| anything new | made with `APP_KEY` only |
+
+Dox writes a cookie with the new key the next time it sends that cookie.
+So a user who comes back during step 5 moves to the new key without noticing.
+
+### When the key leaked
+
+Do **not** put a leaked key in `previousKeys`.
+Anyone who has it can still make cookies and JWT tokens that Dox accepts.
+Change `APP_KEY` with no `previousKeys`. Every user is logged out, and that is what you want.
 
 ## Cookies
 
@@ -17116,21 +17201,15 @@ When a controller or a middleware throws:
 
 ## 1. Write your own exceptions
 
+For a quick error, use `abort(403)` or `abort(409, 'The email is taken')`. See [HTTP exceptions](../reference/http-exceptions.md#any-status-abort-and-httpstatusexception).
+For errors you throw in many places, write a class.
+
 Extend `IHttpException`. Set `code` (the HTTP status), `errorCode` (a short text for the client) and `message`.
 
 ```dart title="lib/app/exceptions/app_exception.dart"
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
-
-/// 403. Thrown when the user may not do this.
-class ForbiddenException extends IHttpException {
-  ForbiddenException({String message = 'Forbidden'}) {
-    super.code = HttpStatus.forbidden;
-    super.errorCode = 'forbidden';
-    super.message = message;
-  }
-}
 
 /// 409. Thrown when the row already exists or was changed by someone else.
 class ConflictException extends IHttpException {
@@ -17163,7 +17242,7 @@ class UserController {
   /// DELETE /api/users/{id}
   Future<Map<String, bool>> destroy(int id) async {
     if (id == 1) {
-      throw ForbiddenException(message: 'The first user can not be deleted');
+      throw ForbiddenHttpException(message: 'The first user can not be deleted');
     }
     User user = await show(id);
 
@@ -20030,6 +20109,7 @@ See [Request](../the-basic/request.md) and [Request and response](request-and-re
 | `Storage().stream(path)` / `Storage().download(path)` | file / download |
 | `Stream<List<int>>` | streamed bytes |
 | `throw NotFoundHttpException()` | `404 Not Found` |
+| `abort(403)`, `abort(409, 'Taken')` | any status |
 | `response(...)` | full control |
 
 ```dart
@@ -20047,11 +20127,14 @@ response('ok').cookie(DoxCookie('token', ''), setExpire: true); // delete
 | --- | --- |
 | `BadRequestException()` | `400` |
 | `UnAuthorizedException()` (`dox_auth`) | `401` |
+| `ForbiddenHttpException()` | `403` |
 | `NotFoundHttpException()` | `404` |
+| `MethodNotAllowedHttpException(['GET'])` | `405` |
 | `PayloadTooLargeException()` | `413` |
 | `UnsupportedMediaTypeException()` | `415` |
 | `ValidationException()` | `422` |
 | `InternalErrorException()` | `500` |
+| `HttpStatusException(code)` | any |
 
 See [Response](../the-basic/response.md) and [HTTP exceptions](http-exceptions.md).
 
@@ -21544,14 +21627,16 @@ abstract class IHttpException {
 
 ## The classes
 
-Every class takes the named parameters `message`, `errorCode` and `code`. The table shows the defaults.
+Most classes take the named parameters `message`, `errorCode` and `code`. The table shows the defaults.
 `message` is a `String` or a `Map`, like `NotFoundHttpException(message: {'error': 'not_found'})`.
 
 | Class | Package | Status `code` | `errorCode` | Default `message` | Dox throws it when |
 | --- | --- | --- | --- | --- | --- |
 | `BadRequestException` | `dox_core` | `400` | `bad_request` | `Bad Request` | the body can not be read, like JSON that is not valid |
 | `UnAuthorizedException` | `dox_auth` | `401` | `unauthorized` | `Authentication failed` | `AuthMiddleware` finds no valid token |
+| `ForbiddenHttpException` | `dox_core` | `403` | `forbidden` | `Forbidden` | never by itself; for your own use |
 | `NotFoundHttpException` | `dox_core` | `404` | `not_found` | `Not Found` | no route fits the path, a typed path param does not fit (`{id}` is not an `int`), or a route model binding finds no row |
+| `MethodNotAllowedHttpException` | `dox_core` | `405` | `method_not_allowed` | `Method Not Allowed` | the path has routes, but not for this method. The `Allow` header lists the methods. |
 | `PayloadTooLargeException` | `dox_core` | `413` | `payload_too_large` | `Payload Too Large` | the body is bigger than `maxBodySize` or `maxMultipartSize` |
 | `UnsupportedMediaTypeException` | `dox_core` | `415` | `unsupported_media_type` | `Unsupported Media Type` | a DTO reads a body that is not JSON and not form data |
 | `TokenMismatchException` | `dox_core` | `419` | `csrf_token_mismatch` | `CSRF token mismatch` | `CsrfMiddleware` finds no CSRF token, or a wrong one |
@@ -21599,15 +21684,36 @@ content-type: application/json
 {"email":"The email is not a valid email","name":"The name is required"}
 ```
 
-A request for a path that has no route answers like a `NotFoundHttpException` with the message `<METHOD> <path> not found`: `{"code":"not_found","message":"GET /nothing not found"}`. Your `responseHandler` gets it too, so you can change its shape.
+A request for a path that has no route answers like a `NotFoundHttpException` with the message `<METHOD> <path> not found`: `{"code":"not_found","message":"GET /nothing not found"}`.
+When the path has routes for other methods, the answer is `405` with an `Allow` header, like `Allow: GET, POST, HEAD`. Your `responseHandler` gets it too, so you can change its shape.
 
 To send your own JSON shape, make your own exception class (see below) and override `toResponse()`.
 
-Other errors: any `Exception` or `Error` that is not an `IHttpException` gets `500` with `{"code": "server_error", "message": "Server Error"}`. When `APP_ENV` is `development` or `local`, the body is `error.toString()` as text instead. It is also passed to the `report` method of the [exception handler](../the-basic/errors.md). An `IHttpException` is not reported.
+Other errors: any `Exception` or `Error` that is not an `IHttpException` gets `500` with `{"code": "server_error", "message": "Server Error"}`. When `APP_ENV` is `development` or `local`, the body is `error.toString()` as text instead. It is also passed to the `report` method of the [exception handler](../the-basic/errors.md). An `IHttpException` with a `4xx` code is not reported. One with a `5xx` code is.
 
 A `ValidationException` on a request with a session (`SessionMiddleware`) that does not want JSON, like a form post, is not sent as JSON. Dox saves the errors and the old input in the session and redirects back.
 
 A `ValidationException` from `dox_validation` (thrown by `schema.parse()` in a controller) is turned into the `422` `ValidationException` of `dox_core` with the same errors.
+
+## Any status: `abort` and `HttpStatusException`
+
+`abort(code)` stops the request and answers with that status. It throws an `HttpStatusException`.
+
+```dart
+if (post.userId != req.auth?.id) abort(403);
+abort(404, 'No post with this id');
+throw HttpStatusException(503, headers: {'retry-after': '60'});
+```
+
+```
+HTTP/1.1 403 Forbidden
+content-type: application/json
+
+{"code":"forbidden","message":"Forbidden"}
+```
+
+Common codes get a default `errorCode` and `message`, like `forbidden` / `Forbidden` for `403`.
+Other codes get `http_error` / `Error`. The `headers` are sent with the answer.
 
 ## Make your own
 
@@ -21618,11 +21724,11 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 
-class ForbiddenException extends IHttpException {
-  ForbiddenException({
-    dynamic message = 'Forbidden',
-    String errorCode = 'forbidden',
-    int code = HttpStatus.forbidden,
+class PaymentRequiredException extends IHttpException {
+  PaymentRequiredException({
+    dynamic message = 'Please pay',
+    String errorCode = 'payment_required',
+    int code = HttpStatus.paymentRequired,
   }) {
     super.code = code;
     super.errorCode = errorCode;
@@ -21665,7 +21771,7 @@ If `APP_ENV` is empty or not set, Dox treats the app as production: `/docs` is o
 | Check | How | Read more |
 | --- | --- | --- |
 | JWT tokens expire | `JwtAuthDriver.expiresIn` is 1 hour by default. Pick a time that fits your app, like `JwtAuthDriver(secret: SecretKey(env.appKey), expiresIn: Duration(hours: 12))`. | [Authentication](../security/authentication.md) |
-| You can not revoke one token | **Dox limit.** There is no token list on the server. To log out everyone, change `APP_KEY`. | [Authentication](../security/authentication.md) |
+| You can not revoke one token | **Dox limit.** There is no token list on the server. To log out everyone, change `APP_KEY` with no `previousKeys`. | [Authentication](../security/authentication.md) |
 | Passwords are hashed | `user.password = await Hash.makeAsync(input)` (bcrypt). In a request, use `makeAsync`: it runs bcrypt in another isolate, so other requests do not wait. Never store or encrypt a plain password. | [Hashing](../security/hashing.md) |
 | The hash is never sent | `List<String> get hidden => <String>['password'];` in the user model. The JWT payload is `user.toJson()`, and anyone can read it. | [Authentication](../security/authentication.md) |
 | Passwords have a max length | bcrypt takes at most 72 bytes. `Hash.make` and `Hash.makeAsync` throw an `ArgumentError` on longer input. Add `@MaxLength(72)` to the password field of the DTO. It counts characters, so non-ASCII text can still pass 72 bytes. | [Troubleshooting](troubleshooting.md) |
@@ -22545,6 +22651,11 @@ What changed in each package, newest first. This page is made from the
 
 ### Unreleased
 
+- New: a path that has routes, but not for the request method, answers `405 Method Not Allowed` with an `Allow` header (like `Allow: GET, POST, HEAD`). Before, it was `404`.
+- New: `abort(code, [message, headers])` and `HttpStatusException(code)` for any status. Common codes get a default `errorCode` and `message`. The `headers` are sent with the answer.
+- New: `ForbiddenHttpException` (403) and `MethodNotAllowedHttpException` (405).
+- New: bracket keys in form bodies and query strings nest, like in Laravel. `tags[]=a&tags[]=b` gives `req.input('tags') == ['a', 'b']`, and `address[city]=x` gives a map. A repeated key with no brackets still keeps its last value.
+- New: `AppConfig(previousKeys: [...])`. Encrypted cookies and cookie sessions made with an old `APP_KEY` can still be read, so a new key does not log out every user. `AESEncryptor.decode` has a new `previousSecrets` option.
 - Fix: path params are now URL-decoded. `/users/a%20b` gives `'a b'`, not `'a%20b'`. A URL from `Route.url()` now gives back the same value. A param that is not valid UTF-8 (like `%ff`) gives 404.
 - Fix: 5xx HTTP exceptions (like `InternalErrorException` and `QueryException`) are now sent to `ExceptionHandler.report`. Before, every `IHttpException` was skipped, so real server errors never reached the logs or Sentry. 4xx exceptions are still not reported.
 - Fix: `req.headers` joins repeated header values with `, `. Before, two `Accept` values became one string with no separator.

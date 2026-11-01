@@ -6325,8 +6325,9 @@ It does two things:</p>
 </table>
 <p>For a <code>500</code>, the error text is sent only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>.
 In production the client never sees it, because it can hold SQL, file paths or hosts.</p>
-<p><code>report</code> is called for every error that is not an <code>IHttpException</code>.
-An <code>IHttpException</code> is a normal answer (like <code>404</code>), so it is not logged.
+<p><code>report</code> is called for every error, except an <code>IHttpException</code> with a <code>4xx</code> code.
+A <code>4xx</code> exception is a normal answer (like <code>404</code>), so it is not logged.
+A <code>5xx</code> exception, like <code>InternalErrorException</code>, is reported.
 The default <code>report</code> prints the error and the stack with the logger.</p>
 <p>See <a href="../../reference/http-exceptions/">HTTP exceptions</a> for the built-in exception classes.</p>
 <h2 id="your-own-handler">Your own handler</h2>

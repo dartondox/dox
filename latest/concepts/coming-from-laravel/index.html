@@ -6669,7 +6669,7 @@ A controller can be a class method, a static method or a plain function.</p>
 </tr>
 <tr>
 <td><code>abort(404);</code></td>
-<td><code>throw NotFoundHttpException();</code></td>
+<td><code>abort(404);</code></td>
 </tr>
 <tr>
 <td><code>$middleware-&gt;append(LogMiddleware::class)</code> in <code>bootstrap/app.php</code></td>
@@ -6808,7 +6808,7 @@ See <a href="../../the-basic/validation/">Validation</a>.</p>
 </tr>
 <tr>
 <td><code>abort(404, 'Not found');</code></td>
-<td><code>throw NotFoundHttpException(message: 'Not found');</code></td>
+<td><code>abort(404, 'Not found');</code></td>
 </tr>
 <tr>
 <td><code>new BlogResource($blog)</code></td>

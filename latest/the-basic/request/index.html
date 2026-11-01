@@ -6452,9 +6452,37 @@
 </tr>
 </tbody>
 </table>
+<p>Form and query keys with brackets give lists and maps, like in Laravel:</p>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th><code>req.input(...)</code> gives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tags[]=a&amp;tags[]=b</code></td>
+<td><code>req.input('tags')</code> is <code>['a', 'b']</code></td>
+</tr>
+<tr>
+<td><code>address[city]=Yangon</code></td>
+<td><code>req.input('address')</code> is <code>{'city': 'Yangon'}</code></td>
+</tr>
+<tr>
+<td><code>items[0][name]=x</code></td>
+<td><code>req.input('items')</code> is <code>[{'name': 'x'}]</code></td>
+</tr>
+<tr>
+<td><code>name=a&amp;name=b</code> (no brackets)</td>
+<td><code>req.input('name')</code> is <code>'b'</code>, the last value</td>
+</tr>
+</tbody>
+</table>
 <h2 id="route-params">Route params</h2>
 <p>Ask for a path param as a typed parameter, like <code>int id</code> in the example above.
-The raw text values are also in <code>req.param</code>, like <code>req.param['id']</code>.
+The text values are also in <code>req.param</code>, like <code>req.param['id']</code>.
+They are URL-decoded: <code>/users/a%20b</code> gives <code>'a b'</code>.
 See <a href="../controller/#parameters">Controller: parameters</a>.</p>
 <h2 id="form-data-file">Form data (File)</h2>
 <p>An uploaded file is a <code>RequestFile</code>. The request must be <code>multipart/form-data</code>.
@@ -6514,7 +6542,7 @@ It also counts the bytes while it reads the body.</p>
 <p>Set the same limit in your proxy, like <code>client_max_body_size</code> in nginx.</p>
 <h2 id="headers">Headers</h2>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">header</span><span class="p">(</span><span class="s1">'X-Token'</span><span class="p">);</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">headers</span><span class="p">;</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">headers</span><span class="p">;</span><span class="w"> </span><span class="c1">// a repeated header is joined with ', '</span>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">req</span><span class="p">.</span><span class="n">userAgent</span><span class="p">();</span><span class="w">  </span><span class="c1">// User-Agent header</span>
 </span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">req</span><span class="p">.</span><span class="n">host</span><span class="p">();</span><span class="w">       </span><span class="c1">// Host header</span>
