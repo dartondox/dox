@@ -94,6 +94,7 @@ With `previousKeys`, users stay logged in while you change it.
 | encrypted cookies (`req.cookie`) | read |
 | `cookie` session driver | read |
 | CSRF token | read (it is in the session) |
+| JWT tokens of `JwtAuthDriver(secret: SecretKey(env.appKey))` | checked. A JWT secret that is not `APP_KEY` needs its own `previousSecrets` option, see [Authentication](authentication.md#change-the-jwt-secret). |
 | `AESEncryptor.decode` in your code | read only when you pass `previousSecrets: Dox().config.previousKeys` |
 | anything new | made with `APP_KEY` only |
 
@@ -103,7 +104,7 @@ So a user who comes back during step 5 moves to the new key without noticing.
 ### When the key leaked
 
 Do **not** put a leaked key in `previousKeys`.
-Anyone who has it can still make cookies that Dox accepts.
+Anyone who has it can still make cookies and JWT tokens that Dox accepts.
 Change `APP_KEY` with no `previousKeys`. Every user is logged out, and that is what you want.
 
 ## Cookies
