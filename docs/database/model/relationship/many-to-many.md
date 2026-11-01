@@ -131,12 +131,12 @@ Do not set `eager: true` on both sides. Each side would load the other side agai
 The load runs this SQL:
 
 ```sql
-SELECT "song".*, "artist_song"."artist_id" as "_owner_id",
-  "artist_song"."artist_id" as "_pivot_artist_id",
-  "artist_song"."song_id" as "_pivot_song_id" FROM "song"
+SELECT "song".*, "artist_song"."artist_id" as "_owner_id" FROM "song"
   LEFT JOIN "artist_song" on "artist_song"."song_id" = "song"."id"
   WHERE "artist_song"."artist_id" IN (@artist_songartist_id_p0, ...)
 ```
+
+With `withPivot` or `withTimestamps`, it also selects those pivot columns, like `"artist_song"."role" as "_pivot_role"`.
 
 ## Read pivot columns
 
@@ -157,10 +157,12 @@ for (Song song in artist!.songs) {
 ```
 
 - `pivot` always has the two pivot keys, like `artist_id` and `song_id`.
+  They are read from the loaded rows, so a relation without `withPivot` runs no extra SQL.
 - `withTimestamps: true` adds `created_at` and `updated_at` to `pivot`.
   `attach()` and `sync()` then set them too.
   The pivot table needs both columns (`table.timestamps()`).
 - A model that was not loaded by a ManyToMany relation has an empty `pivot`.
+- `pivot` is not in `toJson()`. Read it in Dart and add it to your response yourself.
 
 ## Change the links
 
@@ -238,7 +240,7 @@ await artist.toggle('songs', <int>[1, 2]);
 
 ### `updateExistingPivot`
 
-Sets pivot values on the row of one id.
+Sets pivot values on the rows of one id or a list of ids.
 It returns how many rows changed.
 
 ```dart
