@@ -39,14 +39,24 @@ await schema.create('comment', (Table table) {
 The morph map gives each model a type name.
 The type name is the value in the `commentable_type` column.
 
-Set it once when the app starts, before the first query.
+Set it in the `setup()` of a [provider](../../../digging-deeper/providers.md).
+Dox runs providers in every isolate, before the first request.
+The map is kept per isolate, so setting it only in `main()` is not enough.
+Then the other isolates store the class name, and `@MorphTo` throws there.
 
 ```dart
-Relation.morphMap(<String, Model<dynamic> Function()>{
-  'photo': Photo.new,
-  'video': Video.new,
-});
+class MorphMapProvider extends DoxProvider {
+  @override
+  void setup() {
+    Relation.morphMap(<String, Model<dynamic> Function()>{
+      'photo': Photo.new,
+      'video': Video.new,
+    });
+  }
+}
 ```
+
+A queue worker or a CLI command that reads these relations must call it too.
 
 - `@MorphTo` needs it. It reads the type and makes the model from the map.
 - Without a map, `@MorphMany` and `@MorphOne` store the class name, like `Photo`.
@@ -126,6 +136,19 @@ class Comment extends CommentGenerator {
 ```
 
 Run `dart run build_runner build` after you add a relationship.
+
+## Save a row
+
+There is no `associate()`. Set the two columns yourself.
+Use `Relation.morphTypeOf()` for the type, so it is the same as the morph map.
+
+```dart
+Comment comment = Comment()
+  ..body = 'Nice'
+  ..commentableId = photo.id
+  ..commentableType = Relation.morphTypeOf(photo);
+await comment.save();
+```
 
 ## Load it
 

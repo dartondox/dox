@@ -213,7 +213,7 @@ Makes the pivot rows match the ids.
 
 - It adds a row for each new id.
 - It deletes the rows of the ids that are not in the list.
-- It sets the pivot values of the rows that are already there.
+- It sets the pivot values of the rows that are already there, when a value changed. `updated` has those ids.
 
 It returns a `SyncResult` with the ids of each change.
 
