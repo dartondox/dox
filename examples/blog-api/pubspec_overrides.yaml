@@ -1,8 +1,8 @@
 # Use the Dox packages of this repo, not the ones on pub.dev.
 # The packages of other repos come from clones next to this repo
 # (../dox-orm, ../dox-auth, ../dox-openapi, ../dox-validation,
-# ../dox-socketio, ../dox-storage, ../dox-queue and
-# ../dox-scheduler). CI clones them with ci/clone-siblings.sh.
+# ../dox-socketio, ../dox-storage, ../dox-queue, ../dox-mailer,
+# ../dox-view and ../dox-scheduler). CI clones them with ci/clone-siblings.sh.
 dependency_overrides:
   dox_annotation:
     path: ../../packages/dox-annotation
@@ -14,6 +14,8 @@ dependency_overrides:
     path: ../../packages/dox-cache
   dox_core:
     path: ../../packages/dox-core
+  dox_mailer:
+    path: ../../../dox-mailer
   dox_migration:
     path: ../../../dox-orm/packages/dox-migration
   dox_openapi:
@@ -30,3 +32,5 @@ dependency_overrides:
     path: ../../../dox-storage
   dox_validation:
     path: ../../../dox-validation
+  dox_view:
+    path: ../../../dox-view

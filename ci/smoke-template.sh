@@ -7,7 +7,7 @@
 # override all Dox packages
 # with this repo (and with ../dox-orm, ../dox-auth, ../dox-openapi,
 # ../dox-validation, ../dox-socketio, ../dox-storage, ../dox-queue,
-# ../dox-scheduler when they are there, see
+# ../dox-mailer, ../dox-view, ../dox-scheduler when they are there, see
 # ci/clone-siblings.sh),
 # build_runner, analyze, the template tests, migrate, `dox build`, then
 # start the AOT server and call its routes.
@@ -25,7 +25,8 @@ overrides() {
   for dir in "$root"/packages/*/ "$root"/../dox-orm/packages/*/ \
     "$root"/../dox-auth/ "$root"/../dox-openapi/ "$root"/../dox-validation/ \
     "$root"/../dox-socketio/ "$root"/../dox-storage/ \
-    "$root"/../dox-queue/ "$root"/../dox-scheduler/; do
+    "$root"/../dox-queue/ "$root"/../dox-mailer/ "$root"/../dox-view/ \
+    "$root"/../dox-scheduler/; do
     [ -f "$dir/pubspec.yaml" ] || continue
     name=$(sed -nE 's/^name:[[:space:]]*([a-z0-9_]+).*/\1/p' "$dir/pubspec.yaml")
     printf '  %s:\n    path: %s\n' "$name" "${dir%/}"
