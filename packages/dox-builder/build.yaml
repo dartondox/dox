@@ -13,6 +13,10 @@ builders:
     auto_apply: dependents
     build_to: cache
     applies_builders: ["source_gen|combining_builder"]
+    # models, DTOs and env classes live in lib/. A package with them in
+    # test/ too sets generate_for for dox_builder in its own build.yaml.
+    defaults:
+      generate_for: ["lib/**"]
 
   # lib/generated/openapi.g.dart: the OpenAPI docs of the app, see dox_openapi
   openapi:

@@ -30,7 +30,13 @@ enum DtoKind {
 
 /// The type of a field, or of a list item / map value.
 class DtoType {
-  DtoType(this.kind, this.type, {this.item, this.enumNames = const []});
+  DtoType(
+    this.kind,
+    this.type, {
+    this.item,
+    this.enumNames = const [],
+    this.library,
+  });
 
   final DtoKind kind;
 
@@ -43,6 +49,10 @@ class DtoType {
   /// The value names of an enum.
   final List<String> enumNames;
 
+  /// The library the code is written for. Types get its import
+  /// prefixes, like `o.Role`.
+  final LibraryElement? library;
+
   bool get nullable {
     return type.nullabilitySuffix == NullabilitySuffix.question ||
         type is DynamicType;
@@ -50,13 +60,19 @@ class DtoType {
 
   /// The type in code, like `List<String>` or `int?`.
   String get code {
-    return type.getDisplayString();
+    return typeCode(type, library);
   }
 
   /// The type in code without `?`.
   String get nonNullCode {
     String text = code;
     return text.endsWith('?') ? text.substring(0, text.length - 1) : text;
+  }
+
+  /// The import prefix of a nested DTO or an enum, like `o.`, or empty.
+  String get prefix {
+    DartType value = type;
+    return value is InterfaceType ? prefixOf(value.element, library) : '';
   }
 
   /// The class name of a nested DTO or an enum.
@@ -171,7 +187,7 @@ class DtoField {
 
   /// The type of the field in code, like `Maybe<String?>`.
   String get fieldCode {
-    return element.type.getDisplayString();
+    return typeCode(element.type, element.library);
   }
 }
 
@@ -411,7 +427,7 @@ class DtoReader {
         );
       }
     }
-    DtoType? dtoType = typeOf(type, where, errors);
+    DtoType? dtoType = typeOf(type, where, errors, library: field.library);
     if (dtoType == null) return null;
     DtoField result = DtoField(
       element: field,
@@ -428,8 +444,24 @@ class DtoReader {
 
   /// The [DtoType] of [type], or null (with an error) when it is not
   /// supported.
-  DtoType? typeOf(DartType type, String where, List<String> errors) {
-    if (type is DynamicType) return DtoType(DtoKind.any, type);
+  /// Types are written for [library], with its import prefixes.
+  DtoType? typeOf(
+    DartType type,
+    String where,
+    List<String> errors, {
+    LibraryElement? library,
+  }) {
+    DtoType make(DtoKind kind, {DtoType? item, List<String>? enumNames}) {
+      return DtoType(
+        kind,
+        type,
+        item: item,
+        enumNames: enumNames ?? const <String>[],
+        library: library,
+      );
+    }
+
+    if (type is DynamicType) return make(DtoKind.any);
     if (type is! InterfaceType) {
       errors.add(
         'The type ${type.getDisplayString()} of $where is not '
@@ -439,27 +471,31 @@ class DtoReader {
     }
     InterfaceElement element = type.element;
     String name = element.displayName;
-    if (type.isDartCoreString) return DtoType(DtoKind.string, type);
-    if (type.isDartCoreInt) return DtoType(DtoKind.integer, type);
-    if (type.isDartCoreDouble) return DtoType(DtoKind.decimal, type);
-    if (type.isDartCoreNum) return DtoType(DtoKind.number, type);
-    if (type.isDartCoreBool) return DtoType(DtoKind.boolean, type);
-    if (type.isDartCoreObject) return DtoType(DtoKind.any, type);
+    if (type.isDartCoreString) return make(DtoKind.string);
+    if (type.isDartCoreInt) return make(DtoKind.integer);
+    if (type.isDartCoreDouble) return make(DtoKind.decimal);
+    if (type.isDartCoreNum) return make(DtoKind.number);
+    if (type.isDartCoreBool) return make(DtoKind.boolean);
+    if (type.isDartCoreObject) return make(DtoKind.any);
     if (element.library.isDartCore && name == 'DateTime') {
-      return DtoType(DtoKind.date, type);
+      return make(DtoKind.date);
     }
     if (element is EnumElement) {
-      return DtoType(
+      return make(
         DtoKind.enumName,
-        type,
         enumNames: <String>[
           for (FieldElement value in element.constants) value.displayName,
         ],
       );
     }
     if (type.isDartCoreList) {
-      DtoType? item = typeOf(type.typeArguments.first, '$where (item)', errors);
-      return item == null ? null : DtoType(DtoKind.list, type, item: item);
+      DtoType? item = typeOf(
+        type.typeArguments.first,
+        '$where (item)',
+        errors,
+        library: library,
+      );
+      return item == null ? null : make(DtoKind.list, item: item);
     }
     if (type.isDartCoreMap) {
       if (!type.typeArguments.first.isDartCoreString) {
@@ -470,13 +506,13 @@ class DtoReader {
       if (value is DynamicType ||
           (value.isDartCoreObject &&
               value.nullabilitySuffix == NullabilitySuffix.question)) {
-        return DtoType(DtoKind.anyMap, type);
+        return make(DtoKind.anyMap);
       }
-      DtoType? item = typeOf(value, '$where (value)', errors);
-      return item == null ? null : DtoType(DtoKind.map, type, item: item);
+      DtoType? item = typeOf(value, '$where (value)', errors, library: library);
+      return item == null ? null : make(DtoKind.map, item: item);
     }
-    if (isDto(element)) return DtoType(DtoKind.dto, type);
-    if (_implements(type, 'FileInput')) return DtoType(DtoKind.file, type);
+    if (isDto(element)) return make(DtoKind.dto);
+    if (_implements(type, 'FileInput')) return make(DtoKind.file);
     errors.add(
       'The type ${type.getDisplayString()} of $where is not supported. '
       'Use a basic type, an enum, DateTime, RequestFile, a @Dto class, '

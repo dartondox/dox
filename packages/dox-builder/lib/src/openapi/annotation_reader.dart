@@ -4,6 +4,8 @@ import 'package:analyzer/dart/element/type.dart';
 
 /// Finds annotations by their class name, like the model builder does.
 /// A lower case alias (`@summary`) gives the same class (`Summary`).
+/// Only classes of Dox packages (`package:dox_...`) count, so an app
+/// class with the same name is not taken for a Dox annotation.
 class AnnotationReader {
   const AnnotationReader();
 
@@ -19,7 +21,10 @@ class AnnotationReader {
     for (ElementAnnotation annotation in element.metadata.annotations) {
       DartObject? value = annotation.computeConstantValue();
       DartType? type = value?.type;
-      if (value != null && type is InterfaceType && type.element.name == name) {
+      if (value != null &&
+          type is InterfaceType &&
+          type.element.name == name &&
+          type.element.library.uri.toString().startsWith('package:dox_')) {
         found.add(value);
       }
     }

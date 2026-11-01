@@ -56,11 +56,11 @@ class ModelSchema {
       DartObject? column = annotations.first(field, 'Column');
       bool relation = _isRelation(field);
       if (column == null && !relation) continue;
+      // a name given in the code is used as it is, like the model builder
       String key = relation
           ? toSnakeCase(field.displayName)
-          : toSnakeCase(
-              column?.getField('name')?.toStringValue() ?? field.displayName,
-            );
+          : column?.getField('name')?.toStringValue() ??
+                toSnakeCase(field.displayName);
       properties[key] = await types.of(field.type) ?? <String, dynamic>{};
     }
     bool timestamps = options?.getField('timestamps')?.toBoolValue() ?? true;
@@ -68,14 +68,14 @@ class ModelSchema {
       String? key = timestamps
           ? options?.getField(name)?.toStringValue()
           : null;
-      if (key != null) properties[toSnakeCase(key)] = _timestamp;
+      if (key != null) properties[key] = _timestamp;
     }
     for (GetterElement getter in model.getters) {
       DartObject? computed = annotations.first(getter, 'Computed');
       if (getter.isStatic || computed == null) continue;
-      String key = toSnakeCase(
-        computed.getField('name')?.toStringValue() ?? getter.displayName,
-      );
+      String key =
+          computed.getField('name')?.toStringValue() ??
+          toSnakeCase(getter.displayName);
       properties[key] =
           await types.of(getter.returnType) ?? <String, dynamic>{};
     }

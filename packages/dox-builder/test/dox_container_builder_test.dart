@@ -178,6 +178,8 @@ class Service {
       expect(out, startsWith('ERROR'));
       expect(out, contains('Service (package:a/a.dart) needs a Mailer'));
       expect(out, contains('Add @Inject() above that class'));
+      // the error shows the file and line of the parameter
+      expect(out, matches(RegExp(r'a\.dart:\d+:\d+')));
     });
 
     test('a cycle stops the build and shows the chain', () async {
@@ -318,6 +320,88 @@ class Token {
         _sources(<String, String>{'a|lib/a.dart': 'class A {}'}),
         rootPackage: 'a',
         outputs: <String, Object>{},
+      );
+    });
+
+    test(
+      'an abstract parameter gets the one class that implements it',
+      () async {
+        String out = await _generate(<String, String>{
+          'a|lib/a.dart':
+              '''
+$_import
+abstract class Mailer {}
+@Inject()
+class SmtpMailer implements Mailer {}
+@Inject()
+class Service {
+  Service(this.mailer);
+  final Mailer mailer;
+}
+''',
+        });
+        expect(out, contains(_flat('i1.Service(c.get<i1.SmtpMailer>())')));
+      },
+    );
+
+    test(
+      'two classes that implement the parameter type stop the build',
+      () async {
+        String out = await _generate(<String, String>{
+          'a|lib/a.dart':
+              '''
+$_import
+abstract class Mailer {}
+@Inject()
+class SmtpMailer implements Mailer {}
+@Inject()
+class LogMailer extends Mailer {}
+@Inject()
+class Service {
+  Service(this.mailer);
+  final Mailer mailer;
+}
+''',
+        });
+        expect(out, startsWith('ERROR'));
+        expect(out, contains('more than one class in the container'));
+        expect(out, contains('SmtpMailer (package:a/a.dart)'));
+        expect(out, contains('LogMailer (package:a/a.dart)'));
+      },
+    );
+
+    test('a private class is left out, with a warning', () async {
+      Map<String, String> app = <String, String>{
+        'a|lib/a.dart':
+            '''
+$_import
+class _AdminRouter extends Router {
+  void register() {}
+}
+@Inject()
+class _Hidden {}
+@Inject()
+class Shown {}
+''',
+      };
+      List<String> logs = <String>[];
+      await testBuilder(
+        buildDoxContainer(BuilderOptions.empty),
+        _sources(app),
+        rootPackage: 'a',
+        onLog: (log) => logs.add(log.message),
+      );
+      String out = await _generate(app);
+      expect(out, contains(_flat('c.singleton<i1.Shown>')));
+      expect(out, isNot(contains('_Hidden')));
+      expect(out, isNot(contains('_AdminRouter')));
+      expect(
+        logs.join('\n'),
+        contains('_AdminRouter (package:a/a.dart) is private'),
+      );
+      expect(
+        logs.join('\n'),
+        contains('_Hidden (package:a/a.dart) is private'),
       );
     });
   });

@@ -42,10 +42,15 @@ part 'a.g.dart';
 ''';
 
 /// The generated part of [source], or the build errors.
-Future<String> _generate(String source) async {
+Future<String> _generate(
+  String source, {
+  String imports = '',
+  Map<String, String> files = const <String, String>{},
+}) async {
   Map<String, String> sources = <String, String>{
     ..._validation,
-    'a|lib/a.dart': '$_header$source',
+    ...files,
+    'a|lib/a.dart': '$imports\n$_header$source',
   };
   TestBuilderResult result = await testBuilder(
     buildDoxModel(BuilderOptions.empty),
@@ -59,6 +64,9 @@ Future<String> _generate(String source) async {
     sources,
     rootPackage: 'a',
     outputs: <String, Object>{
+      // a file with its own @Dto gets its own part
+      for (String file in files.keys)
+        file.replaceFirst('.dart', '.dox_model_generator.g.part'): anything,
       'a|lib/a.dox_model_generator.g.part': decodedMatches(
         predicate<String>((String text) {
           output = text;
@@ -310,6 +318,47 @@ class A {
   final List<B> items;
   const A({required this.items});
 }''', '@UniqueItems does not work');
+    });
+  });
+
+  group('DTO prefixes |', () {
+    test('types from a prefixed import keep the prefix', () async {
+      String out = await _generate(
+        '''
+@Dto()
+class Outer {
+  final o.Inner inner;
+  final List<o.Inner> list;
+  final o.Status status;
+  final Map<String, o.Status>? byName;
+  const Outer({
+    required this.inner,
+    required this.list,
+    required this.status,
+    this.byName,
+  });
+}
+''',
+        imports: "import 'other.dart' as o;",
+        files: <String, String>{
+          'a|lib/other.dart': '''
+import 'package:dox_validation/dox_validation.dart';
+enum Status { draft, live }
+@Dto()
+class Inner {
+  final String name;
+  const Inner({required this.name});
+}
+''',
+        },
+      );
+      expect(out, isNot(startsWith('ERROR')));
+      expect(out, contains(r'o.$InnerDto.convert('));
+      expect(out, contains(r'o.$InnerDto.fromMap('));
+      expect(out, contains('List<o.Inner>'));
+      expect(out, contains('o.Status.draft'));
+      expect(out, contains('Map<String, o.Status>?'));
+      expect(out, isNot(contains(' Inner ')));
     });
   });
 

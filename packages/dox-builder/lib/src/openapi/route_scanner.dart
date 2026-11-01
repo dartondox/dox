@@ -181,10 +181,7 @@ class RouteScanner extends RecursiveAstVisitor<void> {
       return;
     }
     super.visitMethodInvocation(node);
-    Expression? target = node.target;
-    if (target is! SimpleIdentifier || target.name != 'Route') return;
-    Element? route = target.element;
-    if (route is! ClassElement) return;
+    if (!_isRoute(node.target)) return;
     List<Expression> args = <Expression>[
       for (Argument arg in node.argumentList.arguments)
         if (arg is! NamedArgument) arg.argumentExpression,
@@ -273,11 +270,21 @@ class RouteScanner extends RecursiveAstVisitor<void> {
   }
 
   bool _isGroup(MethodInvocation node) {
-    Expression? target = node.target;
-    return target is SimpleIdentifier &&
-        target.name == 'Route' &&
+    return _isRoute(node.target) &&
         node.methodName.name == 'group' &&
         node.argumentList.arguments.isNotEmpty;
+  }
+
+  /// true for `Route` and `dox.Route`: the `Route` class of dox_core
+  bool _isRoute(Expression? target) {
+    Element? element = target is SimpleIdentifier
+        ? target.element
+        : target is PrefixedIdentifier
+        ? target.identifier.element
+        : null;
+    return element is ClassElement &&
+        element.name == 'Route' &&
+        element.library.uri.toString().startsWith('package:dox_core/');
   }
 
   Element? _element(Expression node) {

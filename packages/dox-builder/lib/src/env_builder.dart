@@ -5,6 +5,9 @@ import 'package:build/build.dart';
 import 'package:dox_annotation/dox_annotation.dart';
 import 'package:source_gen/source_gen.dart';
 
+import 'openapi/dart_literal.dart';
+import 'util.dart';
+
 /// Writes `_$<Class>` for a `@DoxEnv()` class.
 ///
 /// Each getter becomes a final field. `load()` reads every key once, then
@@ -58,13 +61,13 @@ class DoxEnvBuilder extends GeneratorForAnnotation<DoxEnv> {
         args.writeln('${f.name}: ${f.name},');
       } else {
         reads.writeln("${f.type}? ${f.name} = $read;");
-        reads.writeln("r.need('${f.key}');");
+        reads.writeln('r.need(${_literal.string(f.key)});');
         args.writeln('${f.name}: ${f.name}!,');
       }
       if (!f.hasDefault) {
         defaultGetters.writeln(
           '@override\n${f.type} get ${f.name} => '
-          "throw StateError('${f.key} has no default');",
+          'throw StateError(${_literal.string('${f.key} has no default')});',
         );
       }
     }
@@ -104,6 +107,8 @@ $defaultsClass
   }
 }
 
+const DartLiteral _literal = DartLiteral();
+
 /// one getter of the env class
 class _EnvField {
   final String name;
@@ -127,7 +132,7 @@ class _EnvField {
     String key = _envKey(getter) ?? upperSnake(name);
     DartType type = getter.returnType;
     bool nullable = type.nullabilitySuffix == NullabilitySuffix.question;
-    String typeName = type.getDisplayString();
+    String typeName = typeCode(type, getter.library);
     return _EnvField(
       name,
       key,
@@ -152,7 +157,7 @@ class _EnvField {
   }
 
   static String _readCall(GetterElement getter, DartType type, String key) {
-    String k = "'${key.replaceAll("'", r"\'")}'";
+    String k = _literal.string(key);
     if (type.isDartCoreString) return 'string($k)';
     if (type.isDartCoreInt) return 'integer($k)';
     if (type.isDartCoreDouble) return 'decimal($k)';
@@ -160,7 +165,8 @@ class _EnvField {
     if (type.isDartCoreBool) return 'boolean($k)';
     Element? element = type.element;
     if (element is EnumElement) {
-      return 'enumByName($k, ${element.displayName}.values)';
+      return 'enumByName($k, '
+          '${prefixOf(element, getter.library)}${element.displayName}.values)';
     }
     bool core = element?.library?.isDartCore ?? false;
     if (core && element?.displayName == 'Uri') return 'uri($k)';

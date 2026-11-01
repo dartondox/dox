@@ -35,7 +35,11 @@ class HasMany {
 }
 ''';
 
-Future<String> _generate(String model) async {
+Future<String> _generate(
+  String model, {
+  String imports = '',
+  Map<String, String> files = const <String, String>{},
+}) async {
   String output = '';
   await testBuilder(
     buildDoxModel(BuilderOptions.empty),
@@ -45,10 +49,12 @@ Future<String> _generate(String model) async {
         '../dox-annotation/lib/src/dox_model.dart',
       ).readAsStringSync(),
       'a|lib/annotations.dart': _annotations,
+      ...files,
       'a|lib/user.dart':
           '''
 import 'package:dox_annotation/dox_annotation.dart';
 import 'annotations.dart';
+$imports
 part 'user.g.dart';
 $model
 ''',
@@ -367,6 +373,102 @@ class Post {
       );
       expect(flat, contains("const {'visible': Post.visible}"));
       expect(flat, isNot(contains('dynamic visible(')));
+    });
+    test('types from a prefixed import keep the prefix', () async {
+      String out = await _generate(
+        '''
+@DoxModel()
+class Post {
+  @Column()
+  o.Role? role;
+
+  @Column()
+  List<o.Role>? roles;
+
+  @HasMany(o.Tag)
+  List<o.Tag> tags = <o.Tag>[];
+
+  @Scope()
+  static o.Tag? byRole(dynamic q, o.Role role) => null;
+}
+''',
+        imports: "import 'other.dart' as o;",
+        files: <String, String>{
+          'a|lib/other.dart': 'enum Role { admin, user }\nclass Tag {}',
+        },
+      );
+      String flat = out.replaceAll(RegExp(r'\s+'), ' ');
+      expect(
+        flat,
+        contains('static const _roleCast = EnumCast(o.Role.values);'),
+      );
+      expect(flat, contains('if (value is! o.Role?) return false;'));
+      expect(flat, contains("..roles = m['roles'] as List<o.Role>?"));
+      expect(flat, contains('getHasMany<Post, o.Tag>'));
+      expect(flat, contains('o.Tag? byRole(o.Role role) =>'));
+    });
+
+    test('digits stay, and a given name is used as written', () async {
+      String out = await _generate('''
+@DoxModel(primaryKey: 'postID', createdAt: 'madeAt', updatedAt: null)
+class Post {
+  @Column()
+  String? address2;
+
+  @Column(name: 'userID')
+  String? userId;
+
+  @Computed(name: 'fullName')
+  String get full => '';
+
+  @Computed()
+  String get line2 => '';
+}
+''');
+      String flat = out.replaceAll(RegExp(r'\s+'), ' ');
+      expect(flat, contains("'address2': instance.address2"));
+      expect(flat, contains("'userID': instance.userId"));
+      expect(flat, contains("String get primaryKey => 'postID';"));
+      expect(flat, contains("'created_at': 'madeAt'"));
+      expect(flat, contains("map['fullName'] = instance.full;"));
+      expect(flat, contains("map['line2'] = instance.line2;"));
+      expect(flat, isNot(contains('address_2')));
+      expect(flat, isNot(contains('user_i_d')));
+    });
+
+    test('table names and keys are escaped', () async {
+      String out = await _generate(r'''
+@DoxModel(table: "it's")
+class Post {
+  @Column(name: 'a\$b')
+  String? title;
+}
+''');
+      expect(out, contains(r"String get tableName => 'it\'s';"));
+      expect(out, contains(r"m['a\$b']"));
+    });
+
+    test('a cast in a part file is used', () async {
+      String out = await _generate(
+        "part 'post.dart';",
+        files: <String, String>{
+          'a|lib/post.dart': '''
+part of 'user.dart';
+
+@DoxModel()
+class Post {
+  @Column(cast: JsonCast())
+  Map<String, dynamic>? meta;
+}
+''',
+        },
+      );
+      expect(out, contains('static const _metaCast = JsonCast();'));
+    });
+
+    test('build.yaml runs the part builder only on lib/ by default', () {
+      String yaml = File('build.yaml').readAsStringSync();
+      expect(yaml, contains('defaults:\n      generate_for: ["lib/**"]'));
     });
   });
 }

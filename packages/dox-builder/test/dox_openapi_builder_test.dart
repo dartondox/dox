@@ -642,5 +642,186 @@ security: <String, OpenApiSecurity>{
         outputs: <String, Object>{},
       );
     });
+
+    test('routes with a prefixed dox_core import are found', () async {
+      String out = await _generate(<String, String>{
+        'a|lib/a.dart': '''
+import 'package:dox_core/dox_core.dart' as dox;
+
+class PingController {
+  /// Ping
+  String ping(dox.DoxRequest req) => 'pong';
+}
+
+class ApiRouter extends dox.Router {
+  void register() {
+    dox.Route.get('/ping', (PingController c) => c.ping);
+    dox.Route.group('v1', () {
+      dox.Route.get('again', (PingController c) => c.ping);
+    });
+  }
+}
+''',
+      });
+      expect(
+        out,
+        contains(
+          _flat("OpenApiRouteBinding('GET', '/ping', 'PingController.ping')"),
+        ),
+      );
+      expect(
+        out,
+        contains(
+          _flat(
+            "OpenApiRouteBinding('GET', '/v1/again', 'PingController.ping')",
+          ),
+        ),
+      );
+    });
+
+    test('an app class named Route or Summary is not a Dox one', () async {
+      String out = await _generate(<String, String>{
+        'a|lib/a.dart': '''
+import 'package:dox_core/dox_core.dart' hide Route;
+
+class Route {
+  static void get(String path, dynamic c) {}
+}
+
+class Summary {
+  const Summary(this.text);
+  final String text;
+}
+
+@DoxController()
+class PingController {
+  @Summary('not this')
+  String ping(DoxRequest req) => 'pong';
+}
+
+class OtherController {
+  String other(DoxRequest req) => '';
+}
+
+void register() {
+  Route.get('/other', (OtherController c) => c.other);
+}
+''',
+      });
+      expect(out, contains(_flat("controller: 'PingController'")));
+      expect(out, isNot(contains('notthis')));
+      expect(out, isNot(contains('OtherController')));
+    });
+
+    test('files are read in path order, generated files are skipped', () async {
+      String out = await _generate(<String, String>{
+        'a|lib/b.dart': '''
+import 'package:dox_core/dox_core.dart';
+@DoxController()
+class BController {
+  String b(DoxRequest req) => '';
+}
+''',
+        'a|lib/a.dart': '''
+import 'package:dox_core/dox_core.dart';
+@DoxController()
+class AController {
+  String a(DoxRequest req) => '';
+}
+''',
+        'a|lib/old.g.dart': '''
+import 'package:dox_core/dox_core.dart';
+@DoxController()
+class OldController {
+  String old(DoxRequest req) => '';
+}
+''',
+      });
+      int a = out.indexOf("controller:'AController'");
+      int b = out.indexOf("controller:'BController'");
+      expect(a, greaterThanOrEqualTo(0));
+      expect(b, greaterThan(a));
+      expect(out, isNot(contains('OldController')));
+    });
+
+    test('two controllers with one name stop the build', () async {
+      String controller(String method) =>
+          '''
+import 'package:dox_core/dox_core.dart';
+@DoxController()
+class UserController {
+  String $method(DoxRequest req) => '';
+}
+''';
+      TestBuilderResult result = await testBuilder(
+        buildDoxOpenApi(BuilderOptions.empty),
+        <String, String>{
+          'dox_annotation|lib/dox_annotation.dart': '''
+export 'src/dox_model.dart';
+export 'src/openapi_annotation.dart';
+''',
+          'dox_annotation|lib/src/dox_model.dart': _annotationFile(
+            'dox_model.dart',
+          ),
+          'dox_annotation|lib/src/openapi_annotation.dart': _annotationFile(
+            'openapi_annotation.dart',
+          ),
+          'dox_core|lib/dox_core.dart': '''
+export 'package:dox_annotation/dox_annotation.dart';
+class DoxRequest {}
+''',
+          'a|lib/a.dart': controller('a'),
+          'a|lib/b.dart': controller('b'),
+        },
+        rootPackage: 'a',
+      );
+      expect(result.succeeded, isFalse);
+      expect(
+        result.errors.join(),
+        contains('Two controllers are named UserController'),
+      );
+    });
+
+    test('two schema classes with one name stop the build', () async {
+      String model = '''
+import 'package:dox_core/dox_core.dart';
+@DoxModel()
+class User {}
+''';
+      TestBuilderResult result = await testBuilder(
+        buildDoxOpenApi(BuilderOptions.empty),
+        <String, String>{
+          'dox_annotation|lib/dox_annotation.dart': '''
+export 'src/dox_model.dart';
+export 'src/openapi_annotation.dart';
+''',
+          'dox_annotation|lib/src/dox_model.dart': _annotationFile(
+            'dox_model.dart',
+          ),
+          'dox_annotation|lib/src/openapi_annotation.dart': _annotationFile(
+            'openapi_annotation.dart',
+          ),
+          'dox_core|lib/dox_core.dart': '''
+export 'package:dox_annotation/dox_annotation.dart';
+class DoxRequest {}
+''',
+          'a|lib/a.dart': model,
+          'a|lib/b.dart': model,
+          'a|lib/c.dart': '''
+import 'package:dox_core/dox_core.dart';
+import 'a.dart' as a;
+import 'b.dart' as b;
+@DoxController()
+class UserController {
+  a.User one(DoxRequest req) => a.User();
+  b.User two(DoxRequest req) => b.User();
+}
+''',
+        },
+        rootPackage: 'a',
+      );
+      expect(result.succeeded, isFalse);
+      expect(result.errors.join(), contains('Two classes are named User'));
+    });
   });
 }

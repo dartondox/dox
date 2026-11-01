@@ -3,6 +3,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
+import 'package:source_gen/source_gen.dart';
 
 import '../openapi/annotation_reader.dart';
 import '../openapi/ast_finders.dart';
@@ -46,6 +47,10 @@ class JsonSchemaReader {
   /// Named schemas for `components/schemas`, by class name.
   final Map<String, Map<String, dynamic>> components =
       <String, Map<String, dynamic>>{};
+
+  /// The class of each name in [components], to find two classes with
+  /// one name.
+  final Map<String, ClassElement> _owners = <String, ClassElement>{};
 
   /// Where a `$ref` points: `#/components/schemas/` for OpenAPI,
   /// `#/$defs/` for the JSON Schema of one DTO.
@@ -213,6 +218,16 @@ class JsonSchemaReader {
     ClassElement element,
     int kind,
   ) async {
+    ClassElement? owner = _owners[name];
+    if (owner != null && owner != element) {
+      throw InvalidGenerationSourceError(
+        'Two classes are named $name: in ${owner.library.uri} and '
+        '${element.library.uri}. Schemas are found by class name, so '
+        'rename one.',
+        element: element,
+      );
+    }
+    _owners[name] = element;
     if (!components.containsKey(name)) {
       components[name] = <String, dynamic>{};
       components[name] = kind == _dtoKind

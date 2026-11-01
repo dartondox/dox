@@ -6,7 +6,7 @@ import 'package:dox_builder/dox_builder.dart';
 import 'package:dox_builder/src/env_builder.dart';
 import 'package:test/test.dart';
 
-Future<String> _generate(String source) async {
+Future<String> _generate(String source, {String imports = ''}) async {
   String output = '';
   await testBuilder(
     buildDoxModel(BuilderOptions.empty),
@@ -16,9 +16,11 @@ Future<String> _generate(String source) async {
       'dox_annotation|lib/src/env_annotation.dart': File(
         '../dox-annotation/lib/src/env_annotation.dart',
       ).readAsStringSync(),
+      'a|lib/other.dart': 'enum Mode { slow, fast }',
       'a|lib/env.dart':
           '''
 import 'package:dox_annotation/dox_annotation.dart';
+$imports
 part 'env.g.dart';
 enum Level { debug, info }
 $source
@@ -100,4 +102,21 @@ abstract class AppEnv {
       throwsA(anything),
     );
   });
+
+  test(
+    'DoxEnvBuilder | an enum from a prefixed import keeps the prefix',
+    () async {
+      String out = await _generate('''
+@DoxEnv()
+abstract class AppEnv {
+  o.Mode get mode;
+  @EnvKey(r'A\$B')
+  String? get odd;
+}
+''', imports: "import 'other.dart' as o;");
+      expect(out, contains('final o.Mode mode;'));
+      expect(out, contains("enumByName('MODE', o.Mode.values)"));
+      expect(out, contains(r"string('A\$B')"));
+    },
+  );
 }

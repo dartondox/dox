@@ -270,12 +270,33 @@ Call it before `DoxTestClient.start`. Controllers get their objects once, at sta
 The build stops with a clear message when:
 
 - a required parameter has a type that is not in the container,
+- a parameter has an abstract type, and two or more classes in the container implement it,
 - classes need each other in a circle. The message shows the chain, like `A -> B -> C -> A`,
 - `@Inject()` is on an abstract class or a generic class,
 - a class has no unnamed constructor.
 
+The message shows the file and line of the problem.
+
+A private class (like `_AdminRouter`) is not put in the container. The build shows a warning for it. Remove the `_` to add it.
+
 ## Limits
 
 - Dox finds classes in `lib/` only.
-- The container is keyed by the class. It does not map an interface to a class.
+- The container is keyed by the class. A constructor parameter of an abstract type gets the one container class that implements it:
+
+    ```dart
+    abstract class Mailer {}
+
+    @Inject()
+    class SmtpMailer implements Mailer {}
+
+    @Inject()
+    class SignupService {
+      SignupService(this.mailer); // gets the SmtpMailer
+
+      final Mailer mailer;
+    }
+    ```
+
+    This works for constructor parameters only. `c.get<Mailer>()` and handler parameters still need the class itself.
 - Two classes with the same name in two files both work. But use the typed route style (`Route.get<C>(...)`) for them. They can not be handler parameters, because Dox can not tell them apart by name.
