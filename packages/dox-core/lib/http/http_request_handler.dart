@@ -92,9 +92,15 @@ bool _underPrefix(String path, String prefix) {
 final Map<String, (RawRequestHandler, List<dynamic>, RouteData)> _mountRoutes =
     <String, (RawRequestHandler, List<dynamic>, RouteData)>{};
 
-/// what the mount route gives when the raw handler is done. the handler
-/// wrote the answer itself, so nothing more is sent.
-const Object _handled = Object();
+/// forget the route of the mount at [prefix], see `Route.unmount`
+void clearMountRoute(String prefix) {
+  _mountRoutes.remove(prefix);
+}
+
+/// requests whose mount handler has started. the handler writes the
+/// answer itself, so nothing more is sent for them. not even a `503` of
+/// `RequestTimeout` or a changed answer of a `next` middleware like `ETag`.
+final Expando<bool> _started = Expando<bool>();
 
 /// run the global middleware, then the mount handler. a middleware that
 /// gives a response sends it, and the handler never runs. the body is not
@@ -122,11 +128,7 @@ void _runMount(HttpRequest req, String prefix, RawRequestHandler handler) {
   List<IDoxTerminableMiddleware> ends = route.terminable;
   Future<dynamic>.sync(() => runMiddlewareAndController(doxReq)).then(
     (dynamic value) {
-      /// a `next` middleware wraps the result in a DoxResponse
-      bool sent =
-          identical(value, _handled) ||
-          (value is DoxResponse && identical(value.getContent(), _handled));
-      if (sent) {
+      if (_started[req] == true) {
         value = null;
       } else {
         _send(req, value);
@@ -134,6 +136,12 @@ void _runMount(HttpRequest req, String prefix, RawRequestHandler handler) {
       if (ends.isNotEmpty) _terminate(req, doxReq, value, ends);
     },
     onError: (Object error, StackTrace stackTrace) {
+      if (_started[req] == true) {
+        /// the handler owns the answer: only report the error
+        Dox().config.exceptionHandler.report(error, stackTrace);
+        if (ends.isNotEmpty) _terminate(req, doxReq, null, ends);
+        return;
+      }
       if (ends.isEmpty) {
         httpErrorHandler(req, error, stackTrace);
         return;
@@ -156,8 +164,17 @@ RouteData _mountRoute(
     controllers: <dynamic>[
       ...global,
       (DoxRequest req) async {
-        await handler(req.httpRequest);
-        return _handled;
+        HttpRequest raw = req.httpRequest;
+        _started[raw] = true;
+        try {
+          await handler(raw);
+        } catch (error, stackTrace) {
+          /// report the error and answer 500, so the client does not hang
+          httpErrorHandler(raw, error, stackTrace);
+        }
+
+        /// null: a `next` middleware like `ETag` has nothing to change
+        return null;
       },
     ],
     preMiddleware: List<dynamic>.unmodifiable(global),

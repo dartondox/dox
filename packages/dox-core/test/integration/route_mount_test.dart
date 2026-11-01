@@ -27,12 +27,29 @@ class Ends implements IDoxMiddleware, IDoxTerminableMiddleware {
   }
 }
 
-AppConfig mountConfig([List<dynamic>? middleware]) {
+/// keeps every reported error
+class Errors extends ExceptionHandler {
+  final List<Object> reported = <Object>[];
+
+  @override
+  void report(Object error, StackTrace stackTrace) {
+    reported.add(error);
+  }
+
+  /// also count errors whose request already got its answer
+  @override
+  void reportFor(HttpRequest req, Object error, StackTrace stackTrace) {
+    reported.add(error);
+  }
+}
+
+AppConfig mountConfig([List<dynamic>? middleware, Errors? errors]) {
   return AppConfig(
     appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
     serverPort: 0,
     totalIsolate: 1,
     globalMiddleware: middleware ?? <dynamic>[const SecurityHeaders(), blocker],
+    exceptionHandler: errors ?? const ExceptionHandler(),
   );
 }
 
@@ -182,5 +199,40 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 20));
     }
     expect(ends.statuses, <int>[201, 403]);
+  });
+
+  test('ETag sends no second answer for a mount', () async {
+    Errors errors = Errors();
+    Route.mount('/admin', echo, middleware: true);
+    await startHttpServer(mountConfig(<dynamic>[ETag()], errors));
+
+    for (int i = 0; i < 2; i++) {
+      HttpClientResponse res = await get('/admin/x');
+      expect(res.statusCode, 200);
+      expect(await body(res), 'mount:/admin/x');
+    }
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    expect(errors.reported, isEmpty);
+  });
+
+  test('RequestTimeout does not answer for a slow mount', () async {
+    Errors errors = Errors();
+    Route.mount('/admin', (HttpRequest req) async {
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      await echo(req);
+    }, middleware: true);
+    await startHttpServer(
+      mountConfig(<dynamic>[
+        const RequestTimeout(Duration(milliseconds: 50)),
+      ], errors),
+    );
+
+    HttpClientResponse res = await get('/admin');
+    expect(res.statusCode, 200);
+    expect(await body(res), 'mount:/admin');
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    // the 503 of the timeout is reported, but never sent. no error comes
+    // from a second answer on the closed response.
+    expect(errors.reported, everyElement(isA<HttpStatusException>()));
   });
 }

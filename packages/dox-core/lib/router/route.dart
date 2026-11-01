@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dox_core/constants/http_request_method.dart';
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/http/http_request_handler.dart' show clearMountRoute;
 import 'package:dox_core/http/http_static_handler.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/utils.dart';
@@ -200,7 +201,8 @@ class Route {
   /// response stops the request before [handler]. The body is not read
   /// for the middleware, so the handler can still read it. A `terminate`
   /// step runs once the answer is sent. The global CORS config does not
-  /// apply to a mount.
+  /// apply to a mount. `RequestTimeout` does not stop a mount: the
+  /// handler already owns the answer.
   /// ```
   /// Route.mount('/socket.io/', io.handle);
   /// Route.mount('/admin', admin.handle, middleware: true);
@@ -222,6 +224,7 @@ class Route {
   static void unmount(String prefix) {
     _mounts.remove(prefix);
     _mountsWithMiddleware.remove(prefix);
+    clearMountRoute(prefix);
   }
 
   /// prefixes of the mounts that run the global middleware first

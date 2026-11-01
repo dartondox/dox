@@ -369,4 +369,5 @@ With `middleware: true`:
 - The body is not read for the middleware, so the handler can still read it. A CSRF token must come in a header.
 - The handler sends the answer itself. So the part of a `next` middleware that runs after the handler cannot change the answer.
 - A `terminate` step runs once the answer is sent, like on other routes.
+- `RequestTimeout` does not stop a mount. The handler already owns the answer.
 - An error in the handler gives `500`, like without middleware.
