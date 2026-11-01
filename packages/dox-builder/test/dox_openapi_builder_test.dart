@@ -33,6 +33,14 @@ class BelongsTo {
   final Type model;
   const BelongsTo(this.model);
 }
+class MorphMany {
+  final Type model;
+  final String name;
+  const MorphMany(this.model, this.name);
+}
+class MorphTo {
+  const MorphTo();
+}
 class Router {}
 class Route {
   static void group(String prefix, Function() callback) {}
@@ -63,6 +71,12 @@ class User {
 
   @BelongsTo(User)
   User? parent;
+
+  @MorphMany(User, 'commentable')
+  List<User> comments = <User>[];
+
+  @MorphTo()
+  Object? commentable;
 
   @Computed()
   String get fullName => name ?? '';
@@ -564,11 +578,13 @@ tags: <String>['User'],'''),
       expect(out, contains(_flat("'Pagination': <String, dynamic>{")));
     });
 
-    test('model schema: columns, relations, computed, hidden', () {
-      expect(
-        out,
-        contains(
-          _flat('''
+    test(
+      'model schema: columns, relations, morph relations, computed, hidden',
+      () {
+        expect(
+          out,
+          contains(
+            _flat('''
 'User': <String, dynamic>{'type': 'object', 'description': 'A person.',
 'properties': <String, dynamic>{
 'id': <String, dynamic>{'type': 'integer'},
@@ -577,12 +593,15 @@ tags: <String>['User'],'''),
 'parent': <String, dynamic>{'anyOf': <dynamic>[
 <String, dynamic>{'\\\$ref': '#/components/schemas/User'},
 <String, dynamic>{'type': 'null'}]},
+'comments': <String, dynamic>{'type': 'array', 'items': <String, dynamic>{'\\\$ref': '#/components/schemas/User'}},
+'commentable': <String, dynamic>{},
 'created_at': <String, dynamic>{'type': <dynamic>['string', 'null'], 'format': 'date-time'},
 'updated_at': <String, dynamic>{'type': <dynamic>['string', 'null'], 'format': 'date-time'},
 'full_name': <String, dynamic>{'type': 'string'}}}'''),
-        ),
-      );
-    });
+          ),
+        );
+      },
+    );
 
     test('dto schema: constraints, defaults, enums, nested lists', () {
       expect(

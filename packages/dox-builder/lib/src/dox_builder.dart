@@ -320,14 +320,19 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       }
 
       static ${value['model']}? $queryFunctionName(List<Model<${visitor.className}>> list) {
-        return ${lcFirst(value['relationType'])}<${visitor.className}, ${value['model']}>(list, 
-          () => ${value['model']}() 
+        return ${lcFirst(value['relationType'])}<${visitor.className}, ${value['model']}>(list
+          ${value['morphTo'] == true ? '' : ", () => ${value['model']}()"}
+          ${_getParamKeyValue(value, 'name')}
+          ${_getParamKeyValue(value, 'typeColumn')}
+          ${_getParamKeyValue(value, 'idColumn')}
+          ${_getParamKeyValue(value, 'ownerKey')}
           ${_getParamKeyValue(value, 'foreignKey')}
           ${_getParamKeyValue(value, 'localKey')}
           ${_getParamKeyValue(value, 'relatedKey')}
           ${_getParamKeyValue(value, 'pivotForeignKey')}
           ${_getParamKeyValue(value, 'pivotRelatedForeignKey')}
           ${_getParamKeyValue(value, 'pivotTable')}
+          ${_getPivotParams(value)}
           $onQuery,
         );
       }
@@ -340,6 +345,16 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       'content': content,
       'eagerLoad': eagerLoad,
     };
+  }
+
+  /// `withPivot:` and `withTimestamps:` of a many to many relation
+  String _getPivotParams(Map<String, dynamic> value) {
+    List<String>? columns = value['withPivot'];
+    String code = columns == null || columns.isEmpty
+        ? ''
+        : ', withPivot: const <String>[${columns.map(_str).join(', ')}]';
+    if (value['withTimestamps'] == true) code += ', withTimestamps: true';
+    return code;
   }
 
   String _getParamKeyValue(Map<String, dynamic> value, String key) {

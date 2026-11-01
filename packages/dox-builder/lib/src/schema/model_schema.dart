@@ -22,6 +22,9 @@ class ModelSchema {
     'HasMany',
     'BelongsTo',
     'ManyToMany',
+    'MorphOne',
+    'MorphMany',
+    'MorphTo',
   ];
 
   static const Map<String, dynamic> _timestamp = <String, dynamic>{
