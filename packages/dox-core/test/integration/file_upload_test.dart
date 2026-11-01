@@ -51,5 +51,29 @@ void main() {
         expect(res.statusCode, isNot(200));
       },
     );
+    test('multipart with no boundary gives 400', () async {
+      Route.post('/no-boundary', (DoxRequest req) => 'ok');
+      http.Response res = await http.post(
+        Uri.parse('$baseUrl/no-boundary'),
+        headers: <String, String>{'content-type': 'multipart/form-data'},
+        body: 'x',
+      );
+      expect(res.statusCode, 400);
+    });
+
+    test('multipart part with no Content-Disposition gives 400', () async {
+      Route.post('/no-disposition', (DoxRequest req) => 'ok');
+      String boundary = 'dox-boundary';
+      http.Response res = await http.post(
+        Uri.parse('$baseUrl/no-disposition'),
+        headers: <String, String>{
+          'content-type': 'multipart/form-data; boundary=$boundary',
+        },
+        body:
+            '--$boundary\r\nContent-Type: text/plain\r\n\r\nx\r\n'
+            '--$boundary--\r\n',
+      );
+      expect(res.statusCode, 400);
+    });
   });
 }
