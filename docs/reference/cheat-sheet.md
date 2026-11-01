@@ -335,16 +335,22 @@ List<Map<String, dynamic>> rows = await QueryBuilder.table('blogs')
 | `whereNotIn`, `whereNotNull`, `orWhereIn`, `orWhereNull` | more filters |
 | `where('a', null)`, `where('a', '!=', null)` | `IS NULL`, `IS NOT NULL` |
 | `whereBetween`, `whereColumn`, `whereLike`, `whereExists` (and `Not`, `or` forms) | more filters |
+| `whereDate`, `whereTime`, `whereYear`, `whereMonth`, `whereDay` | parts of a date |
+| `whereJsonContains('tags', 'a')`, `whereJsonDoesntContain` | JSON values |
+| `whereIn('id', QueryBuilder.table('post').select('user_id'))` | sub query |
 | `whereGroup((QueryBuilder<Blog> q) { ... })`, `orWhereGroup`, `whereNot` | conditions in brackets |
 | `when(condition, (QueryBuilder<Blog> q) { ... })` | add parts only when `true` |
 | `whereRaw('lower(name) = @n', <String, dynamic>{'n': 'a'})` | raw SQL, bound values |
 | `leftJoin`, `rightJoin`, `joinRaw` | joins |
+| `joinSub(q, 'alias', 'alias.id', 'blog.id')`, `leftJoinSub`, `fromSub(q, 'alias')` | sub queries |
+| `union(q)`, `unionAll(q)` | add the rows of another query |
 | `groupBy('age')`, `having(...)`, `havingRaw(...)` | groups |
 | `distinct()`, `selectRaw('count(*) as total')` | distinct rows, raw select |
 | `latest()`, `oldest()`, `inRandomOrder()` | order |
 | `chunk(100, (rows) { ... })`, `chunkById(...)` | work on a big table |
 | `insert({...})`, `insertMultiple([...])` | insert |
 | `upsert([...], ['email'])` | insert or update, returns an `int` |
+| `insertOrIgnore([...])` | insert, skip duplicates, returns an `int` |
 | `where(...).update({...})` | update, no events, no `updated_at`. Returns the changed rows as an `int`. |
 | `where(...).increment('views')`, `decrement` | change a number in one query |
 | `where(...).delete()`, `truncate()` | delete. `delete()` returns the deleted rows as an `int`. |
