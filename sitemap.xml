@@ -293,6 +293,10 @@
          <lastmod>2026-11-01</lastmod>
     </url>
     <url>
+         <loc>https://dartondox.dev/latest/security/authorization/</loc>
+         <lastmod>2026-11-01</lastmod>
+    </url>
+    <url>
          <loc>https://dartondox.dev/latest/security/cors/</loc>
          <lastmod>2026-11-01</lastmod>
     </url>
@@ -314,6 +318,10 @@
     </url>
     <url>
          <loc>https://dartondox.dev/latest/security/security-headers/</loc>
+         <lastmod>2026-11-01</lastmod>
+    </url>
+    <url>
+         <loc>https://dartondox.dev/latest/security/signed-urls/</loc>
          <lastmod>2026-11-01</lastmod>
     </url>
     <url>

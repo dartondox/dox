@@ -2663,9 +2663,12 @@ The `Docs check` workflow (`.github/workflows/docs-check.yaml`) runs on every pu
 
 ### Deploy
 
-- 3.x deploys by itself. The `Docs` workflow (`.github/workflows/docs.yaml`) runs on every push
-  to `main` that changes `docs/`, `hooks/`, `overrides/`, a package `CHANGELOG.md`, `mkdocs.yml`, `requirements-docs.txt` or the workflow.
+- 3.x deploys with each release. The `Docs` workflow (`.github/workflows/docs.yaml`) runs on a
+  `v<version>` tag, the same tag that publishes the packages. So docs for a feature that is not released yet stay off the site.
   It runs `mike deploy --update-aliases 3.x latest`.
+- To deploy the docs only (a typo fix, or the docs of a package from another repo that was just released),
+  push a `docs-v<version>` tag on `main`, like `git tag docs-v3.0.1-1 && git push origin docs-v3.0.1-1`.
+  It publishes no package and runs no tests.
 - After each deploy, the workflow writes small redirect pages for the old root links,
   the root `index.html`, a `404.html` and the `CNAME` file. So `dartondox.dev` and old links keep working.
 - The workflow pushes with the built-in `GITHUB_TOKEN`. This works because `gh-pages` is not a protected branch.
@@ -4862,14 +4865,35 @@ Call it before `DoxTestClient.start`. Controllers get their objects once, at sta
 The build stops with a clear message when:
 
 - a required parameter has a type that is not in the container,
+- a parameter has an abstract type, and two or more classes in the container implement it,
 - classes need each other in a circle. The message shows the chain, like `A -> B -> C -> A`,
 - `@Inject()` is on an abstract class or a generic class,
 - a class has no unnamed constructor.
 
+The message shows the file and line of the problem.
+
+A private class (like `_AdminRouter`) is not put in the container. The build shows a warning for it. Remove the `_` to add it.
+
 ## Limits
 
 - Dox finds classes in `lib/` only.
-- The container is keyed by the class. It does not map an interface to a class.
+- The container is keyed by the class. A constructor parameter of an abstract type gets the one container class that implements it:
+
+    ```dart
+    abstract class Mailer {}
+
+    @Inject()
+    class SmtpMailer implements Mailer {}
+
+    @Inject()
+    class SignupService {
+      SignupService(this.mailer); // gets the SmtpMailer
+
+      final Mailer mailer;
+    }
+    ```
+
+    This works for constructor parameters only. `c.get<Mailer>()` and handler parameters still need the class itself.
 - Two classes with the same name in two files both work. But use the typed route style (`Route.get<C>(...)`) for them. They can not be handler parameters, because Dox can not tell them apart by name.
 
 
@@ -4993,6 +5017,92 @@ To stop early, return a response and do not call `next()`.
 !!! note "Speed"
     A route with no `next` middleware runs exactly as before. Only routes that have one pay for the extra step.
 
+## Run code after the answer is sent
+
+A middleware can run code after the answer has gone to the client, like `terminate` in Laravel.
+Use it for work the client should not wait for: logs, metrics, cleanup.
+Implement `IDoxTerminableMiddleware`:
+
+```dart title="lib/app/http/middleware/metrics.middleware.dart"
+import 'package:dox_core/dox_core.dart';
+
+class MetricsMiddleware implements IDoxMiddleware, IDoxTerminableMiddleware {
+  @override
+  dynamic handle(IDoxRequest req) => req; // before the controller
+
+  @override
+  void terminate(DoxRequest req, DoxResponse res) {
+    // the answer is already sent
+    print('${req.method} ${req.uri.path} ${res.status}');
+  }
+}
+```
+
+- `res.status` is the status that was sent, also for an error answer.
+- `terminate` can be `async`.
+- An error in `terminate` goes to `ExceptionHandler.report`. It never changes the answer.
+- The `handle` part is not needed. A class can implement only `IDoxTerminableMiddleware`.
+
+!!! note "Speed"
+    Dox checks each route once for such a middleware. Other routes do not pay for it.
+
+## Request id
+
+`RequestId` gives each request an id. It is sent back in the `X-Request-Id` header, and you can read it as `req.requestId`.
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  globalMiddleware: <dynamic>[
+    const RequestId(),
+    LogMiddleware(enabled: true),
+  ],
+  // ...
+);
+```
+
+- When the client (or a proxy) sends a safe `X-Request-Id` (1 to 128 characters of `A-Z a-z 0-9 . _ -`), Dox keeps it. Else it makes a new one of 32 hex characters.
+- `RequestId(trustClient: false)` always makes a new one.
+- `LogMiddleware` adds `request_id` to each log line. Put `RequestId` before it.
+- The default `ExceptionHandler.report` prints the id with the error. In your own `report`, read `ExceptionHandler.requestId`.
+
+## ETag and 304 Not Modified
+
+`ETag` adds an `ETag` header to GET and HEAD answers. When the client sends the same ETag back in `If-None-Match`, Dox answers `304 Not Modified` with no body.
+
+```dart
+Route.get('/posts', <dynamic>[const ETag(), (PostController c) => c.index]);
+```
+
+- It works on `200` answers with a body in memory: a `String`, a `Map`, a `List` or a model. Files and streams are not touched.
+- An answer that already has an `ETag` header or `Cache-Control: no-store` is not touched.
+- The ETag is weak (`W/"..."`), made from a fast 64-bit hash of the body. It is not a secure hash.
+- The controller still runs. A `304` saves bandwidth, not server time.
+
+## Request timeout
+
+`RequestTimeout` answers `503 Service Unavailable` when the middleware after it and the controller take too long.
+
+```dart
+Route.get('/report', (ReportController c) => c.show)
+    .timeout(Duration(seconds: 30));
+
+// the same as
+Route.get('/report', <dynamic>[
+  RequestTimeout(Duration(seconds: 30)),
+  (ReportController c) => c.show,
+]);
+```
+
+The answer is the normal error JSON:
+
+```json
+{"code": "request_timeout", "message": "The request took too long"}
+```
+
+- For every route, add `RequestTimeout(...)` to `globalMiddleware`.
+- Dart can not stop a running Future. The controller keeps running in the background. Its late result is dropped, so nothing is sent twice.
+- It is `503`, not `504`. `504 Gateway Timeout` is what a proxy sends when the app is slow. `503` says the app itself gave up.
+
 ## Many middleware on one route
 
 Put them in the list before the controller. They run from left to right.
@@ -5065,6 +5175,8 @@ flowchart LR
     - `SecurityHeaders` from `dox_core` adds safe headers like `X-Frame-Options` to every answer. See [Security headers](../security/security-headers.md).
     - `SessionMiddleware` from `dox_core` gives each request a session. See [Session](session.md).
     - `CsrfMiddleware` from `dox_core` stops cross site request forgery. See [CSRF protection](../security/csrf.md).
+    - `RequestId`, `ETag` and `RequestTimeout` from `dox_core`. See above.
+    - `ValidateSignature` from `dox_core` checks signed urls. See [Signed URLs](../security/signed-urls.md).
 
 
 ---
@@ -5963,9 +6075,9 @@ Each store is made once per isolate, the first time you use it.
 | --- | --- |
 | `file` | `path` (default `storage/cache`), `prefix` |
 | `memory` | `max_size`: the most items. When it is full, the item that was used least recently is removed. No limit by default. Expired items are removed when read, and by a sweep after many writes (at least 1000). Also `prefix`. |
-| `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db` (default `0`), `tls` (`true`/`false`), `pool_size` (default 10), `prefix` |
+| `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db` (default `0`), `tls` (`true`/`false`), `pool_size` (default 10), `max_value_bytes` (no limit by default), `prefix` |
 
-The default `prefix` is `dox_cache:`.
+A `redis` store with no `prefix` gets `<app name>_cache:` from `APP_NAME`, like `my_shop_cache:`. So two apps on one Redis do not share keys. The other drivers use `dox_cache:`.
 You rarely need `pool_size`: the cache sends no blocking commands, so each isolate uses about one Redis connection.
 
 ## Values are JSON
@@ -6002,6 +6114,17 @@ List<dynamic> posts = await Cache().remember(
 ```
 
 `rememberForever(key, fn)` does the same with no expiry.
+
+- `decode:` turns the stored JSON back into your type on a hit, like `decode: (j) => (j as List).cast<String>()`. Without it, use JSON types like `List<dynamic>`.
+- `lock: true` lets only one caller on all isolates and servers run the function. The others wait for its value.
+
+`flexible(key, fresh, stale, fn)` serves the value as it is for `fresh`. Then, until `stale` more has passed, it still serves the old value at once and runs `fn` once in the background:
+
+```dart
+Map<String, dynamic> stats = await Cache().flexible(
+  'stats', Duration(minutes: 1), Duration(minutes: 5), loadStats,
+);
+```
 
 ### `getRaw`
 
@@ -6040,7 +6163,7 @@ await Cache().tag('users').flush(); // removes only the items of this tag
 ### Locks
 
 A lock makes sure only one request (or one server) runs some code at a time.
-The `memory` and `redis` stores support locks. Use `redis` when many isolates must share the lock.
+The `memory`, `file` and `redis` stores support locks. The `memory` lock works inside one isolate only. The `file` lock works for all isolates on one machine. Use `redis` when many servers must share the lock.
 
 ```dart
 CacheLock lock = Cache().store('redis').lock('report', Duration(seconds: 30));
@@ -6056,14 +6179,17 @@ if (await lock.get()) {
 - `get()` tries once. It is `true` when you got the lock.
 - `block(Duration(seconds: 5))` tries again and again until the time is over.
 - The lock is freed after its `ttl`, even if you never call `release()`.
+- `block(timeout, callback)` runs the callback while it holds the lock, then frees it.
+- `forceRelease()` frees the lock, whoever holds it.
 
 ### More methods
 
 | Method | What it does |
 | --- | --- |
 | `add(key, value, duration:)` | store only when the key is missing. `true` when it was stored |
-| `pull(key)` | get the value and remove it |
+| `pull(key)` | get the value and remove it, in one step |
 | `increment(key, [by])` / `decrement(key, [by])` | change an integer. A missing key starts at 0 |
+| `touch(key, duration:)` | give a key a new expiry. `false` when it is missing |
 | `repository` | the `dox_cache` `CacheStore`, for everything else |
 
 See [dox_cache](../packages/cache.md) for custom drivers.
@@ -12033,9 +12159,9 @@ class Blog extends BlogGenerator { // (3)!
 2.  Marks the class as a model. The options, like `table` and `softDelete`, go here.
     The table is `blog` by default: the class name in snake_case.
 3.  The generated class gives the model `id`, `createdAt` and `updatedAt`, and the query builder methods.
-4.  One `@Column()` field is one table column. The column name is the field name in snake_case.
+4.  One `@Column()` field is one table column. The column name is the field name in snake_case. Digits stay as they are: `address2` is `address2`.
 5.  `beforeSave` runs this static function before a save. It gets all values and returns the value for this column.
-6.  `name` sets the column name when it is not the snake_case of the field. `description` reads and writes `body`.
+6.  `name` sets the column name when it is not the snake_case of the field. `description` reads and writes `body`. The name is used exactly as written: `name: 'userID'` is `userID`.
 
 Make every column field nullable (`String?`, `int?`). A new model has no values yet.
 
@@ -12376,7 +12502,7 @@ print(user?.toJson());
 // {id: 1, first_name: John, last_name: Wick, ..., full_name: John Wick, initials: JW}
 ```
 
-- The default key is the getter name in snake_case (`fullName` becomes `full_name`).
+- The default key is the getter name in snake_case (`fullName` becomes `full_name`). A `name:` is used exactly as written.
 - A computed value is **never a column**. It is not read from the database,
   and it is not sent in `INSERT` or `UPDATE`.
 - `hidden` also hides computed values. Use the json key, for example `['full_name']`.
@@ -14238,6 +14364,272 @@ Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), (PageCon
 
 ---
 
+# Authorization
+
+Source: https://dartondox.dev/latest/security/authorization/
+
+# Authorization
+
+This page shows how to say what a user may do, with gates and policies from `dox_auth`.
+
+[Authentication](authentication.md) says who the user is.
+Authorization says what this user may do.
+For example, a user may edit their own post, but not the post of another user.
+
+There are two ways to write the rules:
+
+- A **gate** is one rule, written as a function.
+- A **policy** is a class with all the rules of one model, like `Post`.
+
+## Register the rules
+
+Gates and policies are kept per isolate.
+Dox runs many isolates, so add them in a provider.
+The `setup()` of a provider runs in every isolate.
+
+```dart title="lib/providers/gate_provider.dart"
+import 'package:dox_auth/dox_auth.dart';
+import 'package:dox_core/dox_core.dart';
+import 'package:my_app/app/models/post/post.model.dart';
+import 'package:my_app/app/models/user/user.model.dart';
+import 'package:my_app/app/policies/post_policy.dart';
+
+class GateProvider extends DoxProvider {
+  @override
+  void setup() {
+    Gate.define('update-post', (User user, Post post) => post.userId == user.id);
+    Gate.policy<Post>(PostPolicy());
+  }
+}
+```
+
+Dox finds the provider by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
+
+## Gates
+
+A gate gets the user and a subject. It gives `true` when the user may do it.
+The user and subject types come from the function.
+A check with another type is denied.
+
+```dart
+Gate.define('update-post', (User user, Post post) => post.userId == user.id);
+```
+
+A gate with no subject uses `_` for the second parameter:
+
+```dart
+Gate.define('create-post', (User user, _) => user.verified == true);
+```
+
+A gate can be async:
+
+```dart
+Gate.define('publish-post', (User user, Post post) async {
+  return await user.canPublishIn(post.categoryId);
+});
+```
+
+### Check a gate
+
+```dart
+if (await Gate.allows(user, 'update-post', post)) {
+  // the user may update the post
+}
+
+if (await Gate.denies(user, 'create-post')) {
+  // the user may not create a post
+}
+
+// stop the request with 403 when denied
+await Gate.authorize(user, 'update-post', post);
+
+// true when the user may do at least one, or all of them
+await Gate.any(user, <String>['update-post', 'delete-post'], post);
+await Gate.all(user, <String>['update-post', 'delete-post'], post);
+```
+
+An ability with no gate and no policy is denied.
+
+### Give a reason
+
+A check can give a `GateResponse` instead of a `bool`.
+The reason of `GateResponse.deny` is the message of the 403 answer.
+
+```dart
+Gate.define('delete-post', (User user, Post post) {
+  if (post.published == true) {
+    return GateResponse.deny('You can not delete a published post.');
+  }
+  return post.userId == user.id;
+});
+
+GateResponse response = await Gate.inspect(user, 'delete-post', post);
+print(response.allowed);
+print(response.message);
+```
+
+## Policies
+
+A policy holds the rules of one model.
+Write one method per ability.
+A method takes the user, and the model when the ability needs one.
+List the methods in `abilities`.
+
+```dart title="lib/app/policies/post_policy.dart"
+import 'package:dox_auth/dox_auth.dart';
+import 'package:my_app/app/models/post/post.model.dart';
+import 'package:my_app/app/models/user/user.model.dart';
+
+class PostPolicy extends Policy<User, Post> {
+  bool create(User user) => user.verified == true;
+
+  bool update(User user, Post post) => post.userId == user.id;
+
+  bool delete(User user, Post post) => post.userId == user.id;
+
+  @override
+  Map<String, Function> get abilities => <String, Function>{
+    'create': create,
+    'update': update,
+    'delete': delete,
+  };
+}
+```
+
+Add the policy for its model:
+
+```dart
+Gate.policy<Post>(PostPolicy());
+```
+
+A check with a `Post` as the subject now uses the policy.
+For an ability with no model, like `create`, pass the type `Post`:
+
+```dart
+await Gate.allows(user, 'update', post);
+await Gate.allows(user, 'create', Post);
+await Gate.authorize(user, 'delete', post);
+```
+
+Each method must take `(User user)` or `(User user, Post post)`.
+A method with another signature fails at `Gate.policy`, so you see the mistake when the app starts.
+
+When the policy has no method with the ability name, the gate with that name is used.
+
+!!! note "Why a map of methods"
+    Dart has no runtime reflection in compiled apps.
+    So Dox can not find a method by its name.
+    The `abilities` map links each name to its method.
+    The methods stay normal typed Dart methods, so you can also call them directly in a test.
+
+## In a controller
+
+`req.can`, `req.cannot` and `req.authorize` use the logged-in user of `req.auth`.
+Use them after `AuthMiddleware`.
+
+```dart
+Future<Post> update(DoxRequest req, Post post) async {
+  await req.authorize('update', post);
+  post.title = req.input('title');
+  await post.save();
+  return post;
+}
+
+Future<Map<String, dynamic>> show(DoxRequest req, Post post) async {
+  return <String, dynamic>{
+    'post': post,
+    'can_edit': await req.can('update', post),
+  };
+}
+```
+
+`req.authorize` answers `401` for a guest and `403` for a user who may not do it.
+
+## On a route
+
+The `Can` middleware checks an ability before the controller runs.
+Put it after `AuthMiddleware`.
+
+```dart
+// a gate with no subject
+Route.get('/admin', <dynamic>[AuthMiddleware(), Can('view-admin'), adminController.index]);
+
+// a policy method with no model
+Route.post('/posts', <dynamic>[AuthMiddleware(), Can('create', subject: Post), postController.store]);
+
+// a policy method with the model of the route param
+Route.bind<Post>('post', (String id) => Post().find(id));
+Route.put('/posts/{post}', <dynamic>[AuthMiddleware(), Can('update', param: 'post'), postController.update]);
+```
+
+With `param`, the subject is the value of `Route.bind` for that route param.
+When `Route.bind` finds nothing, the answer is `404`.
+
+The answers:
+
+- A guest who may not do it gets `401`.
+- A logged-in user who may not do it gets `403`.
+
+## Guests
+
+A guest has no user. The user is `null`.
+A gate or a policy is denied for a guest, unless its user type is nullable:
+
+```dart
+Gate.define('view-post', (User? user, Post post) {
+  return post.published == true || post.userId == user?.id;
+});
+
+class CommentPolicy extends Policy<User?, Comment> {
+  bool view(User? user, Comment comment) => comment.visible == true;
+
+  @override
+  Map<String, Function> get abilities => <String, Function>{'view': view};
+}
+```
+
+`Can('view-post', param: 'post')` without `AuthMiddleware` then works for guests too.
+
+## Before and after hooks
+
+`Gate.before` runs before every check.
+It gives `true` or `false` to decide at once, or `null` to go on with the normal check.
+For example, an admin may do anything:
+
+```dart
+Gate.before((User user, String ability) => user.isAdmin == true ? true : null);
+```
+
+A hook runs only for users of its type. A `User` hook does not run for guests.
+
+`Gate.after` sees the answer of every check, for example to log it.
+It can not change the answer.
+
+```dart
+Gate.after((User user, String ability, GateResponse response) {
+  print('${user.id} $ability ${response.allowed}');
+});
+```
+
+A policy can have its own `before`. It runs before the methods of that policy:
+
+```dart
+class PostPolicy extends Policy<User, Post> {
+  @override
+  bool? before(User user, String ability) => user.isAdmin == true ? true : null;
+
+  // ...
+}
+```
+
+## In tests
+
+`Gate.flush()` removes all gates, policies and hooks.
+Call it in `setUp` when each test adds its own rules.
+
+
+---
+
 # CORS
 
 Source: https://dartondox.dev/latest/security/cors/
@@ -14880,6 +15272,95 @@ Without it, Dox never sends HSTS. See [App config](../reference/app-config.md).
 - [Middleware](../the-basic/middleware.md)
 - [CORS](cors.md)
 - [Rate limiting](rate-limiting.md)
+
+
+---
+
+# Signed URLs
+
+Source: https://dartondox.dev/latest/security/signed-urls/
+
+# Signed URLs
+
+A signed url has a `signature` in its query. Nobody can change the url without the `APP_KEY`.
+Use it for links in emails, like "unsubscribe" or "download your file", where the user is not logged in.
+
+## Make a signed url
+
+Give the route a name and add the `ValidateSignature` middleware:
+
+```dart title="lib/routes/web.dart"
+Route.get('/unsubscribe/{user}', <dynamic>[
+  const ValidateSignature(),
+  (UserController c) => c.unsubscribe,
+]).name('unsubscribe');
+```
+
+Then make the url with `Route.signedUrl`:
+
+```dart
+String url = Route.signedUrl(
+  'unsubscribe',
+  params: <String, Object>{'user': 5},
+);
+// https://example.com/unsubscribe/5?signature=3f9a...
+```
+
+A url with no `signature`, a wrong one, or a changed path or query gets `403 Forbidden`.
+
+## A url that expires
+
+Give `expires`. The url gets an `expires` query param (unix seconds), and it is signed too.
+After that time the url gets `403`.
+
+```dart
+String url = Route.signedUrl(
+  'download',
+  params: <String, Object>{'file': 12},
+  expires: Duration(hours: 1),
+);
+```
+
+## Absolute and relative urls
+
+By default the url is absolute. Dox puts `APP_URL` from the env in front, like `https://example.com`. The scheme and host are signed too.
+Give `baseUrl:` to use another one.
+
+- The `Host` of the request must be the host of `APP_URL`, with the same port.
+- The scheme must match too. Behind a proxy that ends TLS, add the proxy to `AppConfig.trustedProxies`, so Dox reads `X-Forwarded-Proto: https`.
+
+With `absolute: false`, only the path and the query are signed. Check it with `ValidateSignature(absolute: false)`:
+
+```dart
+Route.get('/files/{id}', <dynamic>[
+  const ValidateSignature(absolute: false),
+  (FileController c) => c.show,
+]).name('files.show');
+
+String url = Route.signedUrl(
+  'files.show',
+  params: <String, Object>{'id': 3},
+  absolute: false,
+);
+// /files/3?signature=...
+```
+
+## Check in a controller
+
+`ValidateSignature.hasValidSignature(req)` gives `true` or `false`, so you can answer in your own way:
+
+```dart
+if (!ValidateSignature.hasValidSignature(req)) {
+  return redirect('/link-expired');
+}
+```
+
+## How it works
+
+- The signature is HMAC-SHA256 of the url, with a key made from `APP_KEY` (`KeyDerivation.signedUrl`).
+- Dox compares it in constant time.
+- After you change `APP_KEY`, urls made with an old key still work when the old key is in `AppConfig.previousKeys`.
+- `signature` is a reserved query param. Any other param added to a signed url makes it invalid.
 
 
 ---
@@ -15944,8 +16425,8 @@ await cache.store('file').get('a');   // a named store
 | --- | --- |
 | every driver | `driver`, `prefix` (default `dox_cache:`) |
 | `memory` | `max_size`: the most items. When full, the least recently used item is removed. No limit when not set |
-| `file` | `path` (default `storage/cache`) |
-| `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db`, `tls`, `pool_size` |
+| `file` | `path` (default `storage/cache`). Each prefix gets its own sub folder |
+| `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db`, `tls`, `pool_size`, `max_value_bytes` (values bigger than this throw. No limit by default) |
 
 `pool_size` is the most Redis connections one store opens in one isolate (default 10). A store uses about one, so you rarely change it.
 
@@ -15974,11 +16455,44 @@ List<dynamic> posts = await store.remember('posts', Duration(minutes: 10), () as
 });
 ```
 
+A cached value comes back as JSON. A `List` is `List<dynamic>` and a `Map` is `Map<String, dynamic>`.
+So without `decode`, the type must be a raw JSON type.
+For other types, pass `decode`. It turns the cached JSON into your type:
+
+```dart
+List<String> names = await store.remember<List<String>>(
+  'names',
+  Duration(minutes: 10),
+  loadNames,
+  decode: (Object? json) => List<String>.from(json as List<dynamic>),
+);
+```
+
+- Many calls for the same key at the same time run the function once in one isolate. The others wait for the first.
+- With `lock: true`, callers in other isolates and servers wait too. It uses a cache lock, so the driver must support locks.
+
+## Flexible
+
+Stale while revalidate. The value is fresh for the first time. After that it is stale for the second time.
+A stale value is still returned right away, and one caller refreshes it in the background.
+After both times, the value is gone and the next call waits for the function.
+
+```dart
+int count = await store.flexible<int>(
+  'users',
+  Duration(minutes: 5),  // fresh
+  Duration(minutes: 10), // stale
+  countUsers,
+);
+```
+
+It takes `decode` like `remember`. The driver must support locks.
+
 ## All methods
 
 | Method | What it does |
 | --- | --- |
-| `get(key, [default])` | the value, or the default when missing or expired |
+| `get(key, [default])` | the value, or the default when missing or expired. The default can be a function. It runs only on a miss |
 | `getRaw(key)` | the stored JSON text, with no decode. Null when missing |
 | `put(key, value, [ttl])` | store it |
 | `add(key, value, [ttl])` | store only when missing. Returns true when stored |
@@ -15988,9 +16502,11 @@ List<dynamic> posts = await store.remember('posts', Duration(minutes: 10), () as
 | `many(keys)` / `putMany(map, [ttl])` | many keys at once |
 | `increment(key, [by])` / `decrement(key, [by])` | change a number. A missing key starts at 0. The ttl stays |
 | `forever(key, value)` | store without expiry |
-| `remember(key, ttl, compute)` | see above |
-| `rememberForever(key, compute)` | the same, without expiry |
-| `pull(key, [default])` | get it, then remove it |
+| `remember(key, ttl, compute, {decode, lock})` | see above |
+| `flexible(key, fresh, stale, compute, {decode})` | see above |
+| `touch(key, ttl)` | set a new ttl and keep the value. Returns true when the key was there |
+| `rememberForever(key, compute, {decode, lock})` | the same, without expiry |
+| `pull(key, [default])` | get it and remove it, in one atomic step |
 | `tags([...])` | a tagged view |
 | `lock(name, [ttl, owner])` | an atomic lock |
 
@@ -16032,16 +16548,30 @@ bool got = await lock.block(Duration(seconds: 5)); // wait up to 5 seconds
 - `block(timeout)` tries again every 50 ms until it gets the lock or the time is over.
 - The `ttl` frees the lock by itself if the worker crashes. Without a ttl, the lock stays until `release()`.
 - `release()` frees the lock only for the owner that took it.
-- `memory` and `redis` support locks. The `memory` lock works inside one isolate only. `file` and `null` throw `UnsupportedError`.
+- `block(timeout, callback)` runs the callback while it holds the lock, frees the lock and returns the result. It throws `LockTimeoutException` when the time is over.
+- `forceRelease()` frees the lock, whoever holds it.
+- `memory`, `file` and `redis` support locks. The `memory` lock works inside one isolate only. The `file` lock is a file made with `create(exclusive: true)`. It works for all isolates on one machine. `null` throws `UnsupportedError`.
 
 ## Prefix
 
 Every store has a `prefix` (default `dox_cache:`). It is added to every key.
 Use different prefixes when two apps share one Redis database.
+On Redis, a prefix with no `:` at the end gets one, so `app` does not match the keys of `app2`.
 
 !!! info "Redis `flush`"
     `flush` deletes only the keys with the prefix. It never runs `FLUSHDB`.
     An empty prefix makes `flush` throw.
+
+## File driver
+
+- Each prefix has its own sub folder inside `path`. `flush` deletes only the files of that prefix.
+- `add`, `increment` and `touch` take a file lock on the key, so they are safe across isolates.
+- A read never deletes a file. An expired file stays until it is written again.
+  Call `prune()` from time to time, eg. in a schedule, to delete expired files:
+
+```dart
+int deleted = await (store.driver as FileDriver).prune();
+```
 
 ## Your own driver
 
@@ -16059,6 +16589,7 @@ cache.addStore('ready', MemoryDriver()); // or add a ready driver
 
 `MyDriver extends CacheDriver`. It must implement `prefix`, `get`, `put`, `add`, `increment`, `forget` and `flush`.
 Override `lock` to support locks, and `close` to close its connections.
+Override `pull` to make it atomic, and `has` and `touch` to make them faster. The defaults work, but `pull` is a get and then a forget.
 
 ## Close
 
@@ -20070,7 +20601,15 @@ class ApiKeyMiddleware implements IDoxMiddleware {
 }
 ```
 
-See [Middleware](../the-basic/middleware.md).
+| Middleware | Does |
+| --- | --- |
+| `const RequestId()` | `X-Request-Id` header, `req.requestId` |
+| `const ETag()` | `ETag` header, `304` when `If-None-Match` matches |
+| `RequestTimeout(Duration(seconds: 30))` or `Route.get(...).timeout(...)` | `503` when the route is too slow |
+| `const ValidateSignature()` | `403` unless the url is from `Route.signedUrl(...)` |
+| `implements IDoxTerminableMiddleware` | `terminate(req, res)` runs after the answer is sent |
+
+See [Middleware](../the-basic/middleware.md) and [Signed URLs](../security/signed-urls.md).
 
 ## Request
 
@@ -21396,6 +21935,8 @@ If `APP_ENV` is not set or empty, Dox treats the app as production: `/docs` is o
 | Variable | Who reads it | Default | Meaning | Example |
 | --- | --- | --- | --- | --- |
 | `APP_ENV` | `dox_core`, `dox_auth`, `dox_view` | empty | Any value except `development`, `local`, `test` or `testing` (also empty) makes a bad `APP_KEY` a startup error: missing, not exactly 32 characters, or a public sample key. The same rule applies to a JWT secret shorter than 32 bytes (`dox_auth`). In `development`, `local`, `test` and `testing` both are only a warning. `development` or `local` also: show error details in `500` responses and in health check answers, turn the `/docs` routes on when `openApi.enabled` is `null`, and turn the template cache of `dox_view` off. `testing` as a real environment variable also loads `.env.testing` (see below). Read with `Env.get`. | `APP_ENV=production` |
+| `APP_NAME` | `dox_core` (`Cache`) | not set | The default `prefix` of a `redis` cache store: `My Shop` gives `my_shop_cache:`. So two apps on one Redis do not share keys. | `APP_NAME="My Shop"` |
+| `APP_URL` | `dox_core` (`Route.signedUrl`) | not set | The scheme and host in front of an absolute [signed URL](../security/signed-urls.md). | `APP_URL=https://example.com` |
 | `PORT` | `dox_core` (`DoxServer.portFor()`) | not set | The port to listen on, when `APP_PORT` is not set. Cloud Run, Fly, Render and Heroku set it. `APP_PORT` wins when both are set. Read with `Env.get`. | `PORT=8080` |
 | `APP_HOST` | `dox_core` (`DoxServer.hostFor()`) | not set (all interfaces, `::`) | The host to listen on. `127.0.0.1` keeps the app off the network, for an app behind a proxy on the same machine. `AppConfig.host` wins over it. Read with `Env.get`. | `APP_HOST=127.0.0.1` |
 | `DATABASE_URL` | `dox_orm` (`DatabaseConfig.url`), `dox_migration` | not set | A database url. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. `dox_orm` reads it from the real environment only. See [Database url](../database/index.md#database_url). | `DATABASE_URL=postgres://app:secret@db:5432/blog?sslmode=require` |
@@ -22364,6 +22905,11 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
+### 3.0.2
+
+- Removed: `ICacheDriver` and `IStorageDriver`. Nothing used them. For a cache driver, use `CacheDriver` from `dox_cache`.
+- Tests for `IHttpException.toResponse()`.
+
 ### 3.0.1
 
 - Version bump only, to match the other packages.
@@ -22455,6 +23001,34 @@ What changed in each package, newest first. This page is made from the
 - See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
 
 ## dox_builder
+
+### 3.0.2
+
+- **Breaking: column and JSON keys can change.** Please read this before you update.
+  - Digits are no longer split off. Before, `address2` gave the key `address_2`. Now it gives `address2`.
+  - A name you give is used exactly as written. Before, `@Column(name: 'userID')` gave `user_i_d`. Now it gives `userID`. The same is true for `@Computed(name:)`, and for `primaryKey`, `createdAt` and `updatedAt` in `@DoxModel`.
+  - DTO input keys change the same way: a field `line2` now reads the key `line2`, not `line_2`.
+  - What to do: run `build_runner` and look for changed keys in the generated files. Then rename the column in a migration. Or keep the old key with `@Column(name: 'address_2')` (or `@Name('line_2')` on a DTO field).
+- Fix: types from an import with a prefix (`import 'other.dart' as o;`) keep the prefix in the generated code, like `o.Role`, `List<o.Role>`, `EnumCast(o.Role.values)` and `o.$InnerDto`. Before, the code did not compile. This works in models, DTOs, env classes and scopes.
+- Fix: `@Column(cast: ...)` now works for a model in a `part` file. The cast is read from the AST of the field.
+- Fix: table names, column keys and relation keys are escaped in the generated code (`\`, `'` and `$`).
+- Fix: a private class (like `_AdminRouter` or `@Inject() class _Cache`) is no longer put in `container.g.dart`, where it did not compile. The build shows a warning with the class and file.
+- Fix: container errors now show the file and line of the problem.
+- New: a constructor parameter of an abstract type gets the one container class that implements it. When two or more classes implement it, the build stops and names them.
+- Fix: the OpenAPI builder reads the files in path order, so `openapi.g.dart` does not change between builds.
+- Fix: the OpenAPI builder finds routes with a prefixed dox_core import, like `dox.Route.get(...)`. Only the `Route` class of dox_core counts.
+- Fix: the OpenAPI builder stops with a clear error when two controllers, two `@Security` classes or two schema classes have the same name in two files. Before, one silently replaced the other. Dox finds them by name at runtime, so a new name would not match. Rename one of them.
+- Fix: OpenAPI annotations count only when they come from a Dox package (`package:dox_...`). An app class with the same name, like `Summary`, is no longer read as one.
+- Faster builds: the container, DTO list and OpenAPI builders skip `.g.dart` files. They also look at the text of a file first, and only resolve it when it can hold what they look for.
+- Change: the model, DTO and env builder runs on `lib/` only by default. Before, it also ran on `test/`, `bin/` and `tool/`. A package with models or DTOs in `test/` adds this to its `build.yaml`:
+
+    ```yaml
+    targets:
+      $default:
+        builders:
+          dox_builder:
+            generate_for: ["lib/**", "test/**"]
+    ```
 
 ### 3.0.1
 
@@ -22564,6 +23138,25 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### 3.0.2
+
+- Fix: `remember` and `rememberForever` threw on a cache hit when `T` was not a raw JSON type, like `List<String>`. Pass the new `decode` option to turn the cached JSON into `T`. Without it, `T` must be a raw JSON type.
+- Fix: `remember` runs `compute` once when many calls for the same key run at the same time in one isolate. The others wait for the first. With the new `lock: true`, callers in other isolates and servers wait too.
+- Fix: `pull` is atomic now. Redis uses `GETDEL` (needs Redis 6.2 or newer). Drivers get a new `pull` method.
+- Fix: the file driver keeps each prefix in its own sub folder. `flush` deletes only the files of its own prefix, and keeps temp files of writes that are running.
+- Change: because of this, files written by older versions are in the base folder and are not found any more. It is a cache, so they are only misses. You can delete the old files in the base folder by hand.
+- Fix: a file driver read no longer deletes an expired or broken file. Another isolate may have just written a new value. Use the new `FileDriver.prune()` to delete expired and broken files.
+- Fix: the file driver has locks now (`File.create(exclusive: true)`). `add`, `increment` and `touch` take a lock on the key, so they are safe across isolates.
+- Fix: a Redis prefix with no `:` at the end gets one. So the prefix `app` does not match the keys of `app2`.
+- New: `flexible(key, fresh, stale, compute)`: stale while revalidate.
+- New: `touch(key, ttl)` sets a new ttl and keeps the value.
+- New: `get` and `pull` take a function as the default. It runs only on a miss.
+- New: `lock.block(timeout, callback)` runs the callback while it holds the lock. It throws `LockTimeoutException` when the time is over. `lock.forceRelease()` frees a lock of any owner.
+- New: the Redis option `max_value_bytes`.
+- Faster: tagged `many`, `putMany`, `has`, `pull` and `remember` read the tag versions once per call.
+- Faster: the memory driver keeps the expiry as int milliseconds. It does not read the clock for items with no expiry. `has` does not decode the value.
+- Change: `MemoryEntry.expiresAt` is an `int` in milliseconds now. `CacheClock` has a new `nowMs()`.
+
 ### 3.0.1
 
 - Version bump only, to match the other packages.
@@ -22660,6 +23253,18 @@ What changed in each package, newest first. This page is made from the
 - `remember`, `pull`, `add`, `increment`, `many`, tags and atomic locks.
 
 ## dox_core
+
+### 3.0.2
+
+- Change: a Redis cache store with no `prefix` gets `<app name>_cache:` from `APP_NAME` (like `my_shop_cache:`), so two apps on one Redis do not share keys or flush each other's cache. Existing Redis cache keys are not found once after the update. Rate limit counters, cache locks and `cache` driver sessions start fresh, so users with a `cache` driver session log in again. Set `'prefix': 'dox_cache:'` on the store to keep the old keys.
+- New: the `Cache()` facade has `flexible` and `touch`, and `remember` / `rememberForever` take `decode` and `lock`.
+- Perf: the route binder does not load a value again when a middleware already bound it, like `Can(param: 'post')` of dox_auth.
+- New: `RequestId` middleware. Each request gets an id in the `X-Request-Id` header and in `req.requestId`. A safe id from the client is kept. `LogMiddleware` lines have `request_id`, and `ExceptionHandler.report` can read `ExceptionHandler.requestId`.
+- New: `ETag` middleware. GET and HEAD answers with a body in memory get a weak `ETag`. A matching `If-None-Match` gets `304 Not Modified` with no body.
+- New: signed urls. `Route.signedUrl(name, params:, query:, expires:, absolute:, baseUrl:)` adds a `signature` (HMAC-SHA256 with the `dox:signed-url` key) and an optional `expires`. The `ValidateSignature` middleware answers `403` for a bad or expired url. Old keys from `AppConfig.previousKeys` still work.
+- New: `RequestTimeout(Duration)` middleware and `Route.get(...).timeout(Duration)`. A slow route answers `503` with the code `request_timeout`. The late result is dropped.
+- New: `IDoxTerminableMiddleware`. Its `terminate(req, res)` runs after the answer is sent. An error in it is reported, and never changes the answer. Routes without one do not pay for it.
+- Fix: a middleware item with no `handle` step at the start of a route list ended the request with an empty answer. It is now skipped.
 
 ### 3.0.1
 
