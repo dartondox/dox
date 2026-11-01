@@ -84,6 +84,8 @@ void main() {
           'note': req.input('note'),
           'length': file.length,
           'on_disk': file.file != null,
+          'head_length': file.head.length,
+          'head_ok': file.head.every((int b) => b == 65),
           'temp': file.file?.path,
           'temp_exists': file.file?.existsSync(),
           'stream_length': await file.stream().fold<int>(
@@ -198,6 +200,9 @@ void main() {
       expect(data['length'], 1000);
       expect(data['on_disk'], false);
       expect(data['stream_length'], 1000);
+      // a file in memory gives all its bytes as head
+      expect(data['head_length'], 1000);
+      expect(data['head_ok'], true);
     });
 
     test('big upload goes to a temp file, deleted after response', () async {
@@ -214,6 +219,9 @@ void main() {
       expect(data['on_disk'], true);
       expect(data['temp_exists'], true);
       expect(data['stream_length'], size);
+      // a file on disk keeps its first 128 KB, for the JPEG image size
+      expect(data['head_length'], 128 * 1024);
+      expect(data['head_ok'], true);
 
       File temp = File(data['temp']);
       for (int i = 0; i < 50 && temp.existsSync(); i++) {

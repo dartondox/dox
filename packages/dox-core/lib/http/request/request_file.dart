@@ -42,16 +42,13 @@ class RequestFile implements FileInput {
   final List<int>? _head;
 
   /// the first bytes of the file. `@Mimes` and `@Image` read the real
-  /// file type from them.
+  /// file type from them, and `@Dimensions` reads the image size.
+  /// a file in memory gives all its bytes (no copy). a file on disk gives
+  /// its first 128 KB, so the size of a JPEG after its photo metadata is
+  /// still found.
   @override
   List<int> get head {
-    List<int>? known = _head;
-    if (known != null) return known;
-    Uint8List? memory = _bytes;
-    if (memory == null) return const <int>[];
-    return memory.length > FileTypes.headSize
-        ? Uint8List.sublistView(memory, 0, FileTypes.headSize)
-        : memory;
+    return _head ?? _bytes ?? const <int>[];
   }
 
   /// Get file extension

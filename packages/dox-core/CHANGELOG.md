@@ -1,7 +1,10 @@
 ## Unreleased
 
 - Fix: `Route.mount` matches whole path parts only. A mount at `/admin` now gets `/admin`, `/admin/` and `/admin/...`, but no longer `/administrator` or `/admin-login`. Only requests that went to the wrong handler change. A prefix that ends in `/` (like Socket.IO's `/socket.io/`) works as before.
+- Fix: `//` counts as one `/` when a path is matched to a mount prefix. So `/admin//secure/x` goes to a mount at `/admin/secure`. The handler still gets the path as it came.
+- Change: when two mount prefixes match, the longest one wins. Before, the first one added won. Apps with one mount, or with mounts that do not overlap, do not change.
 - New: `Route.mount(prefix, handler, middleware: true)` runs `AppConfig.globalMiddleware` (security headers, CSRF, rate limit) before the raw handler. A middleware that gives a response stops the request. `RequestTimeout` does not run for a mount. When two mount prefixes match, the longest one wins. `terminate` steps run once the answer is sent. The global CORS config does not apply to a mount. The default is still no middleware, so Socket.IO does not change.
+- `RequestFile.head` now keeps the first 128 KB of a big upload (on disk), and all bytes of a small upload (in memory, no copy). Before, it kept 32 bytes. A JPEG keeps its image size after the photo metadata, so `@Dimensions` and `v.file().dimensions()` need these bytes.
 - New: `Route.staticFiles(prefix, folder, maxAge:)` serves a folder (CSS, JS, images) for GET and HEAD requests that match no route. Routes always win. `..`, dot files and folders get 404. Files get `Last-Modified`, `304`, Range support, the global CORS headers and an optional `Cache-Control`. The prefix follows `Route.group`, the router prefix and `Route.domain`.
 - New: `Route.staticFiles` sends a weak `ETag` (from the file size and change time). A matching `If-None-Match` gets `304` with no body. `If-None-Match` wins over `If-Modified-Since`.
 - New: `Route.staticFiles` sends files in a `.well-known` folder at the top of the folder (ACME challenges, `security.txt`). Every other dot name, also inside `.well-known`, still gets `404`.
@@ -9,6 +12,7 @@
 - Fix: a `Range`, `If-Modified-Since` or `If-None-Match` header sent on two lines no longer gives `500`.
 - Fix: a static file `304` has the file's content type, not `text/plain`.
 - New: `AppConfig.idleTimeout`. A keep-alive connection with no new request for this long is closed. Default 30 seconds, as before. Behind a load balancer, set it longer than the balancer's idle timeout (eg. 65 seconds for AWS ALB). Needs dox_http_native 3.0.3.
+- New: `AppConfig.maxConnections`. The most connections one isolate holds open at once. Must be 1 or more (0 or less throws an `ArgumentError` when the server starts). When it is full, new clients wait in the OS listen queue until a connection closes. WebSocket connections and connections that are still closing count too. The queue holds up to 1024 clients, and the OS can make it smaller (`somaxconn`; 128 by default on macOS). When the queue is full, new clients wait and then time out. On Linux each new client goes to one isolate (`SO_REUSEPORT`), so it can wait for a full isolate even when others have room. Default no limit, as before. Needs dox_http_native 3.0.3.
 - New: `Route.websocket(maxMessageSize:)`. A bigger message closes the socket with 1009. Default 16 MB, as before.
 
 ## 3.0.2
