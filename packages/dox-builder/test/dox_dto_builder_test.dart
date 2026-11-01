@@ -340,6 +340,32 @@ class A {
       expect(output, isNot(startsWith('ERROR')));
     });
 
+    test('a strict DTO knows the key @Confirmed reads', () async {
+      String output = await _generate('''
+class Confirmed extends Rule<Object?> {
+  const Confirmed({this.other});
+  final String? other;
+}
+
+@Dto(strict: true)
+class A {
+  @Confirmed()
+  final String password;
+
+  @Confirmed(other: 'pin_again')
+  final String? pin;
+
+  const A({required this.password, this.pin});
+}''');
+      String code = output.replaceAll(RegExp(r'\s+'), '');
+      expect(
+        code,
+        contains(
+          "_keys=<String>{'password','pin','password_confirmation','pin_again',}",
+        ),
+      );
+    });
+
     test('@DateFormatted with a letter it does not know', () async {
       String rule = '''
 class DateFormatted extends Rule<String> {

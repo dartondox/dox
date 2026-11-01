@@ -74,9 +74,16 @@ class DtoWriter {
       )
       ..writeln();
     if (dto.strict) {
-      List<String> keys = <String>[
+      // the key `@Confirmed` reads is not a field, but it is not unknown
+      Set<String> keys = <String>{
         for (DtoField field in dto.fields) _keyLiteral(field),
-      ];
+        for (DtoField field in dto.fields)
+          for (DtoRule rule in field.rules)
+            if (rule.custom && rule.name == 'Confirmed')
+              literal.string(
+                rule.stringField('other') ?? '${field.key}_confirmation',
+              ),
+      };
       out.writeln(
         'static const Set<String> _keys = <String>{${keys.join(', ')}};',
       );

@@ -2364,3 +2364,85 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> {
     return j;
   }
 }
+
+/// The checks, the converter and the JSON Schema of [StrictPassword].
+const DtoSchema<StrictPassword> $StrictPasswordDto = _$StrictPasswordDto();
+
+class _$StrictPasswordDto extends DtoSchema<StrictPassword> {
+  const _$StrictPasswordDto();
+
+  static const Map<String, String> _m = <String, String>{};
+
+  static const Set<String> _keys = <String>{
+    'password',
+    'password_confirmation',
+  };
+
+  @override
+  Type get type => StrictPassword;
+
+  @override
+  String get name => 'StrictPassword';
+
+  @override
+  StrictPassword? convert(Object? input, DtoState s, List<Object> p) {
+    if (input is! Map) {
+      s.notObject(input, p, _m);
+      return null;
+    }
+    int e = s.issues.length;
+    for (Object? k in input.keys) {
+      if (!_keys.contains(k)) {
+        s.fail(
+          p,
+          '$k',
+          IssueCodes.unrecognizedKeys,
+          DefaultMessages.notAllowed,
+          input[k],
+          messages: _m,
+        );
+      }
+    }
+    // password: String
+    Object? c0;
+    c0 = s.string(s.read(input, 'password'), p, 'password', _m);
+    if (c0 == null || c0 is Undefined) s.required(p, 'password', _m);
+    if (s.issues.length != e) return null;
+    if (c0 is String) {
+      if (!(const Confirmed().check(c0, s.context(p, 'password', c0)))) {
+        s.failRule(const Confirmed(), p, 'password', c0, _m);
+      }
+    }
+    if (s.issues.length != e) return null;
+    return StrictPassword(password: c0 as String);
+  }
+
+  @override
+  StrictPassword fromMap(Map<String, dynamic> m) {
+    return StrictPassword(password: m['password'] as String);
+  }
+
+  @override
+  Map<String, dynamic> toMap(StrictPassword o) {
+    String f0 = o.password;
+    return <String, dynamic>{'password': f0};
+  }
+
+  @override
+  Map<String, dynamic> toJsonSchema() {
+    Map<String, dynamic> j = <String, dynamic>{
+      'type': 'object',
+      'title': 'StrictPassword',
+      'properties': <String, dynamic>{
+        'password': <String, dynamic>{'type': 'string'},
+      },
+      'required': <dynamic>['password'],
+      'additionalProperties': false,
+    };
+    JsonSchemaTools.merge(j, <String>[
+      'properties',
+      'password',
+    ], const Confirmed().toJsonSchema());
+    return j;
+  }
+}

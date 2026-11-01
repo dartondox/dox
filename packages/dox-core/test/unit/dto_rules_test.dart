@@ -259,6 +259,24 @@ void main() {
       );
     });
 
+    test('a strict DTO takes the key @Confirmed reads', () async {
+      expect(
+        await errorsOf($StrictPasswordDto, <String, dynamic>{
+          'password': 'secret',
+          'password_confirmation': 'secret',
+        }),
+        isEmpty,
+      );
+      expect(
+        await errorsOf($StrictPasswordDto, <String, dynamic>{
+          'password': 'secret',
+          'password_confirmation': 'other',
+          'extra': 1,
+        }),
+        <String, String>{'extra': 'The extra field is not allowed'},
+      );
+    });
+
     test('requiredWith on a Maybe field, from a query string', () async {
       expect(
         await errorsOf($MoreRulesDto, <String, dynamic>{

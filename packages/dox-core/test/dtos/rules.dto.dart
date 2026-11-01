@@ -384,3 +384,13 @@ class MoreRules {
 
   static const DtoSchema<MoreRules> schema = $MoreRulesDto;
 }
+
+@Dto(strict: true)
+class StrictPassword {
+  @Confirmed()
+  final String password;
+
+  const StrictPassword({required this.password});
+
+  static const DtoSchema<StrictPassword> schema = $StrictPasswordDto;
+}
