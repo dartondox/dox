@@ -578,11 +578,13 @@ tags: <String>['User'],'''),
       expect(out, contains(_flat("'Pagination': <String, dynamic>{")));
     });
 
-    test('model schema: columns, relations, morph relations, computed, hidden', () {
-      expect(
-        out,
-        contains(
-          _flat('''
+    test(
+      'model schema: columns, relations, morph relations, computed, hidden',
+      () {
+        expect(
+          out,
+          contains(
+            _flat('''
 'User': <String, dynamic>{'type': 'object', 'description': 'A person.',
 'properties': <String, dynamic>{
 'id': <String, dynamic>{'type': 'integer'},
@@ -596,9 +598,10 @@ tags: <String>['User'],'''),
 'created_at': <String, dynamic>{'type': <dynamic>['string', 'null'], 'format': 'date-time'},
 'updated_at': <String, dynamic>{'type': <dynamic>['string', 'null'], 'format': 'date-time'},
 'full_name': <String, dynamic>{'type': 'string'}}}'''),
-        ),
-      );
-    });
+          ),
+        );
+      },
+    );
 
     test('dto schema: constraints, defaults, enums, nested lists', () {
       expect(
