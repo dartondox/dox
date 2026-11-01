@@ -113,6 +113,7 @@ Add an `orderBy` in `onQuery` to pick the row, like with [HasOne](has-one.md).
 A comment belongs to a photo or a video.
 The field type is `Model<dynamic>?`.
 The morph name is the field name in snake_case: `commentable`.
+The `commentable_id` and `commentable_type` columns must be `@Column` fields, or the relation is always `null`.
 
 ```dart title="lib/app/models/comment/comment.model.dart"
 import 'package:dox_orm/dox_orm.dart';
