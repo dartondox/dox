@@ -244,6 +244,168 @@ class A {
 }''', '@Email does not fit the type int');
     });
 
+    test(
+      '@RequiredIf and @RequiredWith run when the value is missing',
+      () async {
+        String output = await _generate('''
+@Dto()
+class A {
+  final String? type;
+
+  @RequiredIf('type', 'company')
+  final String? company;
+
+  @RequiredWith(<String>['type'])
+  final Maybe<int> size;
+
+  const A({this.type, this.company, this.size = const Maybe.missing()});
+}''');
+        // the generated code is formatted, so compare without spaces
+        String code = output.replaceAll(RegExp(r'\s+'), '');
+        expect(
+          code,
+          contains(
+            "s.requiredWhen(constRequiredIf('type','company'),c1,input,p,'company',_m,);",
+          ),
+        );
+        expect(
+          code,
+          contains(
+            "s.requiredWhen(constRequiredWith(<String>['type']),c2,input,p,'size',_m,);",
+          ),
+        );
+      },
+    );
+
+    test('a Dart field name where the input key is needed', () async {
+      String rules = '''
+class Same extends Rule<Object?> {
+  const Same(this.other);
+  final String other;
+}
+class Confirmed extends Rule<Object?> {
+  const Confirmed({this.other});
+  final String? other;
+}
+''';
+      await expectError(
+        '''
+$rules
+@Dto()
+class A {
+  final String? accountType;
+
+  @RequiredIf('accountType', 'company')
+  final String? company;
+
+  const A({this.accountType, this.company});
+}''',
+        "@RequiredIf on A.company: 'accountType' is a Dart field name. Use the input key 'account_type'.",
+      );
+      await expectError('''
+$rules
+@Dto()
+class A {
+  final String? emailAddress;
+
+  @Same('emailAddress')
+  final String? again;
+
+  @RequiredWith(<String>['emailAddress'])
+  final String? name;
+
+  @Confirmed(other: 'emailAddress')
+  final String? pin;
+
+  const A({this.emailAddress, this.again, this.name, this.pin});
+}''', "@Same on A.again: 'emailAddress' is a Dart field name");
+      // input keys, keys that are no field, and same-name fields are fine
+      String output = await _generate('''
+$rules
+@Dto()
+class A {
+  final String? accountType;
+  final String? type;
+
+  @RequiredIf('account_type', 'company')
+  @Same('password_confirmation')
+  final String? company;
+
+  @RequiredWith(<String>['type', 'tag_source'])
+  @Confirmed()
+  final String? name;
+
+  const A({this.accountType, this.type, this.company, this.name});
+}''');
+      expect(output, isNot(startsWith('ERROR')));
+    });
+
+    test('a strict DTO knows the key @Confirmed reads', () async {
+      String output = await _generate('''
+class Confirmed extends Rule<Object?> {
+  const Confirmed({this.other});
+  final String? other;
+}
+
+@Dto(strict: true)
+class A {
+  @Confirmed()
+  final String password;
+
+  @Confirmed(other: 'pin_again')
+  final String? pin;
+
+  const A({required this.password, this.pin});
+}''');
+      String code = output.replaceAll(RegExp(r'\s+'), '');
+      expect(
+        code,
+        contains(
+          "_keys=<String>{'password','pin','password_confirmation','pin_again',}",
+        ),
+      );
+    });
+
+    test('@DateFormatted with a letter it does not know', () async {
+      String rule = '''
+class DateFormatted extends Rule<String> {
+  const DateFormatted(this.format);
+  final String format;
+}
+''';
+      await expectError('''
+$rule
+@Dto()
+class A {
+  @DateFormatted('Y-m-d Q')
+  final String? day;
+  const A({this.day});
+}''', '@DateFormatted on A.day: the letter "Q"');
+      String output = await _generate(
+        r'''
+''' +
+            rule +
+            r'''
+@Dto()
+class A {
+  @DateFormatted('Y-m-d\\TH:i:sP \\Q')
+  final String? day;
+  const A({this.day});
+}''',
+      );
+      expect(output, isNot(startsWith('ERROR')));
+    });
+
+    test('@RequiredIf on a field that is always required', () {
+      return expectError('''
+@Dto()
+class A {
+  @RequiredIf('type', 'company')
+  final String company;
+  const A({required this.company});
+}''', '@RequiredIf on A.company does nothing');
+    });
+
     test('a Maybe without const Maybe.missing()', () {
       return expectError('''
 @Dto()

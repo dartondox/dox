@@ -636,7 +636,7 @@ class _$TextRulesDto extends DtoSchema<TextRules> {
         },
         'dash': <String, dynamic>{
           'type': <dynamic>['string', 'null'],
-          'pattern': '^[a-zA-Z_-]+\$',
+          'pattern': '^[a-zA-Z0-9_-]+\$',
         },
       },
     };
@@ -2013,5 +2013,436 @@ class _$UpdateUserDto extends DtoSchema<UpdateUser> {
         'age': <String, dynamic>{'type': 'integer'},
       },
     };
+  }
+}
+
+/// The checks, the converter and the JSON Schema of [MoreRules].
+const DtoSchema<MoreRules> $MoreRulesDto = _$MoreRulesDto();
+
+class _$MoreRulesDto extends DtoSchema<MoreRules> {
+  const _$MoreRulesDto();
+
+  static const Map<String, String> _m = <String, String>{};
+
+  @override
+  Type get type => MoreRules;
+
+  @override
+  String get name => 'MoreRules';
+
+  @override
+  MoreRules? convert(Object? input, DtoState s, List<Object> p) {
+    if (input is! Map) {
+      s.notObject(input, p, _m);
+      return null;
+    }
+    int e = s.issues.length;
+    // password: String?
+    Object? c0;
+    c0 = s.string(s.read(input, 'password'), p, 'password', _m);
+    // emailAgain: String?
+    Object? c1;
+    c1 = s.string(s.read(input, 'email_again'), p, 'email_again', _m);
+    // email: String?
+    Object? c2;
+    c2 = s.string(s.read(input, 'email'), p, 'email', _m);
+    // type: String?
+    Object? c3;
+    c3 = s.string(s.read(input, 'type'), p, 'type', _m);
+    // company: String?
+    Object? c4;
+    c4 = s.string(s.read(input, 'company'), p, 'company', _m);
+    s.requiredWhen(
+      const RequiredIf('type', 'company'),
+      c4,
+      input,
+      p,
+      'company',
+      _m,
+    );
+    // countryCode: Maybe<String>
+    Object? c5;
+    c5 = s.string(s.read(input, 'country_code'), p, 'country_code', _m);
+    if (c5 == null) s.required(p, 'country_code', _m);
+    s.requiredWhen(
+      const RequiredWith(<String>['phone']),
+      c5,
+      input,
+      p,
+      'country_code',
+      _m,
+    );
+    // phone: String?
+    Object? c6;
+    c6 = s.string(s.read(input, 'phone'), p, 'phone', _m);
+    // meta: String?
+    Object? c7;
+    c7 = s.string(s.read(input, 'meta'), p, 'meta', _m);
+    // role: Role?
+    Object? c8;
+    c8 = s.enumName(s.read(input, 'role'), p, 'role', _m, const <String>[
+      'admin',
+      'user',
+    ]);
+    if (c8 is String) {
+      c8 = switch (c8) {
+        'admin' => Role.admin,
+        _ => Role.user,
+      };
+    }
+    // adminCode: String?
+    Object? c9;
+    c9 = s.string(s.read(input, 'admin_code'), p, 'admin_code', _m);
+    s.requiredWhen(
+      const RequiredIf('role', Role.admin),
+      c9,
+      input,
+      p,
+      'admin_code',
+      _m,
+    );
+    // tags: List<String>?
+    Object? c10;
+    c10 = s.list(s.read(input, 'tags'), p, 'tags', _m);
+    if (c10 is List) {
+      List<Object> q0 = <Object>[...p, 'tags'];
+      List<String> o0 = <String>[];
+      for (int i0 = 0; i0 < c10.length; i0++) {
+        Object? x0;
+        x0 = s.string(c10[i0], q0, i0, _m);
+        if (x0 == null || x0 is Undefined) {
+          s.required(q0, i0, _m);
+        } else if (x0 is! Invalid) {
+          o0.add(x0 as String);
+        }
+      }
+      c10 = o0;
+    }
+    s.requiredWhen(
+      const RequiredWith(<String>['tag_source']),
+      c10,
+      input,
+      p,
+      'tags',
+      _m,
+    );
+    // pin: String?
+    Object? c11;
+    c11 = s.string(s.read(input, 'pin'), p, 'pin', _m);
+    // code: String?
+    Object? c12;
+    c12 = s.string(s.read(input, 'code'), p, 'code', _m);
+    // day: String?
+    Object? c13;
+    c13 = s.string(s.read(input, 'day'), p, 'day', _m);
+    // secret: String?
+    Object? c14;
+    c14 = s.string(s.read(input, 'secret'), p, 'secret', _m);
+    if (s.issues.length != e) return null;
+    if (c0 is String) {
+      if (!(const Confirmed().check(c0, s.context(p, 'password', c0)))) {
+        s.failRule(const Confirmed(), p, 'password', c0, _m);
+      }
+    }
+    if (c1 is String) {
+      if (!(const Same('email').check(c1, s.context(p, 'email_again', c1)))) {
+        s.failRule(const Same('email'), p, 'email_again', c1, _m);
+      }
+    }
+    if (c7 is String) {
+      if (!(const Json().check(c7, s.context(p, 'meta', c7)))) {
+        s.failRule(const Json(), p, 'meta', c7, _m);
+      }
+    }
+    if (c11 is String) {
+      if (!(const Digits(4).check(c11, s.context(p, 'pin', c11)))) {
+        s.failRule(const Digits(4), p, 'pin', c11, _m);
+      }
+    }
+    if (c12 is String) {
+      if (!(const DigitsBetween(4, 6).check(c12, s.context(p, 'code', c12)))) {
+        s.failRule(const DigitsBetween(4, 6), p, 'code', c12, _m);
+      }
+    }
+    if (c13 is String) {
+      if (!(const DateFormatted('Y-m-d')
+          .check(c13, s.context(p, 'day', c13)))) {
+        s.failRule(const DateFormatted('Y-m-d'), p, 'day', c13, _m);
+      }
+    }
+    if (c14 is String) {
+      if (!(const Password(
+        mixedCase: true,
+        numbers: true,
+        symbols: true,
+      ).check(c14, s.context(p, 'secret', c14)))) {
+        s.failRule(
+          const Password(mixedCase: true, numbers: true, symbols: true),
+          p,
+          'secret',
+          c14,
+          _m,
+        );
+      }
+    }
+    if (s.issues.length != e) return null;
+    return MoreRules(
+      password: c0 is Undefined ? null : c0 as String?,
+      emailAgain: c1 is Undefined ? null : c1 as String?,
+      email: c2 is Undefined ? null : c2 as String?,
+      type: c3 is Undefined ? null : c3 as String?,
+      company: c4 is Undefined ? null : c4 as String?,
+      countryCode: c5 is Undefined
+          ? const Maybe<String>.missing()
+          : Maybe<String>(c5 as String),
+      phone: c6 is Undefined ? null : c6 as String?,
+      meta: c7 is Undefined ? null : c7 as String?,
+      role: c8 is Undefined ? null : c8 as Role?,
+      adminCode: c9 is Undefined ? null : c9 as String?,
+      tags: c10 is Undefined ? null : c10 as List<String>?,
+      pin: c11 is Undefined ? null : c11 as String?,
+      code: c12 is Undefined ? null : c12 as String?,
+      day: c13 is Undefined ? null : c13 as String?,
+      secret: c14 is Undefined ? null : c14 as String?,
+    );
+  }
+
+  @override
+  MoreRules fromMap(Map<String, dynamic> m) {
+    return MoreRules(
+      password: m['password'] == null ? null : (m['password'] as String),
+      emailAgain: m['email_again'] == null
+          ? null
+          : (m['email_again'] as String),
+      email: m['email'] == null ? null : (m['email'] as String),
+      type: m['type'] == null ? null : (m['type'] as String),
+      company: m['company'] == null ? null : (m['company'] as String),
+      countryCode: m.containsKey('country_code')
+          ? Maybe<String>(m['country_code'] as String)
+          : const Maybe<String>.missing(),
+      phone: m['phone'] == null ? null : (m['phone'] as String),
+      meta: m['meta'] == null ? null : (m['meta'] as String),
+      role: m['role'] == null
+          ? null
+          : (Role.values.byName(m['role'] as String)),
+      adminCode: m['admin_code'] == null ? null : (m['admin_code'] as String),
+      tags: m['tags'] == null
+          ? null
+          : (<String>[
+              for (Object? x0 in m['tags'] as List<dynamic>) x0 as String,
+            ]),
+      pin: m['pin'] == null ? null : (m['pin'] as String),
+      code: m['code'] == null ? null : (m['code'] as String),
+      day: m['day'] == null ? null : (m['day'] as String),
+      secret: m['secret'] == null ? null : (m['secret'] as String),
+    );
+  }
+
+  @override
+  Map<String, dynamic> toMap(MoreRules o) {
+    String? f0 = o.password;
+    String? f1 = o.emailAgain;
+    String? f2 = o.email;
+    String? f3 = o.type;
+    String? f4 = o.company;
+    Maybe<String> f5 = o.countryCode;
+    String? f6 = o.phone;
+    String? f7 = o.meta;
+    Role? f8 = o.role;
+    String? f9 = o.adminCode;
+    List<String>? f10 = o.tags;
+    String? f11 = o.pin;
+    String? f12 = o.code;
+    String? f13 = o.day;
+    String? f14 = o.secret;
+    return <String, dynamic>{
+      'password': f0,
+      'email_again': f1,
+      'email': f2,
+      'type': f3,
+      'company': f4,
+      if (f5 case Maybe<String>(isPresent: true, value: String g5))
+        'country_code': g5,
+      'phone': f6,
+      'meta': f7,
+      'role': f8 == null ? null : f8.name,
+      'admin_code': f9,
+      'tags': f10,
+      'pin': f11,
+      'code': f12,
+      'day': f13,
+      'secret': f14,
+    };
+  }
+
+  @override
+  Map<String, dynamic> toJsonSchema() {
+    Map<String, dynamic> j = <String, dynamic>{
+      'type': 'object',
+      'title': 'MoreRules',
+      'properties': <String, dynamic>{
+        'password': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+        },
+        'email_again': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+        },
+        'email': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+        },
+        'type': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+        },
+        'company': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+        },
+        'country_code': <String, dynamic>{'type': 'string'},
+        'phone': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+        },
+        'meta': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+        },
+        'role': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+          'enum': <dynamic>['admin', 'user'],
+        },
+        'admin_code': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+        },
+        'tags': <String, dynamic>{
+          'type': <dynamic>['array', 'null'],
+          'items': <String, dynamic>{'type': 'string'},
+        },
+        'pin': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+        },
+        'code': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+        },
+        'day': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+        },
+        'secret': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+        },
+      },
+    };
+    JsonSchemaTools.merge(j, <String>[
+      'properties',
+      'password',
+    ], const Confirmed().toJsonSchema());
+    JsonSchemaTools.merge(j, <String>[
+      'properties',
+      'email_again',
+    ], const Same('email').toJsonSchema());
+    JsonSchemaTools.merge(j, <String>[
+      'properties',
+      'meta',
+    ], const Json().toJsonSchema());
+    JsonSchemaTools.merge(j, <String>[
+      'properties',
+      'pin',
+    ], const Digits(4).toJsonSchema());
+    JsonSchemaTools.merge(j, <String>[
+      'properties',
+      'code',
+    ], const DigitsBetween(4, 6).toJsonSchema());
+    JsonSchemaTools.merge(j, <String>[
+      'properties',
+      'day',
+    ], const DateFormatted('Y-m-d').toJsonSchema());
+    JsonSchemaTools.merge(
+      j,
+      <String>['properties', 'secret'],
+      const Password(
+        mixedCase: true,
+        numbers: true,
+        symbols: true,
+      ).toJsonSchema(),
+    );
+    return j;
+  }
+}
+
+/// The checks, the converter and the JSON Schema of [StrictPassword].
+const DtoSchema<StrictPassword> $StrictPasswordDto = _$StrictPasswordDto();
+
+class _$StrictPasswordDto extends DtoSchema<StrictPassword> {
+  const _$StrictPasswordDto();
+
+  static const Map<String, String> _m = <String, String>{};
+
+  static const Set<String> _keys = <String>{
+    'password',
+    'password_confirmation',
+  };
+
+  @override
+  Type get type => StrictPassword;
+
+  @override
+  String get name => 'StrictPassword';
+
+  @override
+  StrictPassword? convert(Object? input, DtoState s, List<Object> p) {
+    if (input is! Map) {
+      s.notObject(input, p, _m);
+      return null;
+    }
+    int e = s.issues.length;
+    for (Object? k in input.keys) {
+      if (!_keys.contains(k)) {
+        s.fail(
+          p,
+          '$k',
+          IssueCodes.unrecognizedKeys,
+          DefaultMessages.notAllowed,
+          input[k],
+          messages: _m,
+        );
+      }
+    }
+    // password: String
+    Object? c0;
+    c0 = s.string(s.read(input, 'password'), p, 'password', _m);
+    if (c0 == null || c0 is Undefined) s.required(p, 'password', _m);
+    if (s.issues.length != e) return null;
+    if (c0 is String) {
+      if (!(const Confirmed().check(c0, s.context(p, 'password', c0)))) {
+        s.failRule(const Confirmed(), p, 'password', c0, _m);
+      }
+    }
+    if (s.issues.length != e) return null;
+    return StrictPassword(password: c0 as String);
+  }
+
+  @override
+  StrictPassword fromMap(Map<String, dynamic> m) {
+    return StrictPassword(password: m['password'] as String);
+  }
+
+  @override
+  Map<String, dynamic> toMap(StrictPassword o) {
+    String f0 = o.password;
+    return <String, dynamic>{'password': f0};
+  }
+
+  @override
+  Map<String, dynamic> toJsonSchema() {
+    Map<String, dynamic> j = <String, dynamic>{
+      'type': 'object',
+      'title': 'StrictPassword',
+      'properties': <String, dynamic>{
+        'password': <String, dynamic>{'type': 'string'},
+      },
+      'required': <dynamic>['password'],
+      'additionalProperties': false,
+    };
+    JsonSchemaTools.merge(j, <String>[
+      'properties',
+      'password',
+    ], const Confirmed().toJsonSchema());
+    return j;
   }
 }

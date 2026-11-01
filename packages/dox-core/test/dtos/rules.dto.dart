@@ -320,3 +320,77 @@ class UpdateUser {
 
   static const DtoSchema<UpdateUser> schema = $UpdateUserDto;
 }
+
+@Dto()
+class MoreRules {
+  @Confirmed()
+  final String? password;
+
+  @Same('email')
+  final String? emailAgain;
+
+  final String? email;
+
+  final String? type;
+
+  @RequiredIf('type', 'company')
+  final String? company;
+
+  @RequiredWith(<String>['phone'])
+  final Maybe<String> countryCode;
+
+  final String? phone;
+
+  @Json()
+  final String? meta;
+
+  final Role? role;
+
+  @RequiredIf('role', Role.admin)
+  final String? adminCode;
+
+  @RequiredWith(<String>['tag_source'])
+  final List<String>? tags;
+
+  @Digits(4)
+  final String? pin;
+
+  @DigitsBetween(4, 6)
+  final String? code;
+
+  @DateFormatted('Y-m-d')
+  final String? day;
+
+  @Password(mixedCase: true, numbers: true, symbols: true)
+  final String? secret;
+
+  const MoreRules({
+    this.password,
+    this.emailAgain,
+    this.email,
+    this.type,
+    this.company,
+    this.countryCode = const Maybe<String>.missing(),
+    this.phone,
+    this.meta,
+    this.role,
+    this.adminCode,
+    this.tags,
+    this.pin,
+    this.code,
+    this.day,
+    this.secret,
+  });
+
+  static const DtoSchema<MoreRules> schema = $MoreRulesDto;
+}
+
+@Dto(strict: true)
+class StrictPassword {
+  @Confirmed()
+  final String password;
+
+  const StrictPassword({required this.password});
+
+  static const DtoSchema<StrictPassword> schema = $StrictPasswordDto;
+}

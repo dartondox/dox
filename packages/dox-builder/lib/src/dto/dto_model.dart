@@ -176,6 +176,9 @@ class DtoField {
   final bool positional;
 
   final List<DtoRule> rules = <DtoRule>[];
+
+  /// `@RequiredIf` and `@RequiredWith`: checked when the value is missing.
+  final List<DtoRule> requiredWhen = <DtoRule>[];
   bool trim = false;
 
   /// 0 as is, 1 lower case, 2 upper case
@@ -280,6 +283,12 @@ class DtoReader {
   };
 
   static const Set<String> valueRules = <String>{'In', 'NotIn'};
+
+  /// Rules that make a missing value required, like `@RequiredIf`.
+  static const Set<String> requiredWhenRules = <String>{
+    'RequiredIf',
+    'RequiredWith',
+  };
 
   static const Set<String> textChanges = <String>{
     'Trim',
@@ -391,6 +400,7 @@ class DtoReader {
       }
     }
     _validateMethod(dto);
+    _otherKeys(dto);
     return dto;
   }
 
@@ -399,6 +409,40 @@ class DtoReader {
       if (field.name == name) return field;
     }
     return null;
+  }
+
+  /// `@RequiredIf`, `@RequiredWith`, `@Same` and `@Confirmed(other:)` name
+  /// another input key. The Dart name of a field with another key would
+  /// never match, so the check would be off without a word. Stop the build.
+  void _otherKeys(DtoClass dto) {
+    Map<String, String> keys = <String, String>{
+      for (DtoField field in dto.fields) field.name: field.key,
+    };
+    for (DtoField field in dto.fields) {
+      for (DtoRule rule in <DtoRule>[...field.requiredWhen, ...field.rules]) {
+        List<String> names = switch (rule.name) {
+          'RequiredIf' ||
+          'Same' ||
+          'Confirmed' => <String>[?rule.stringField('other')],
+          'RequiredWith' => <String>[
+            for (DartObject item
+                in rule.value.getField('others')?.toListValue() ??
+                    const <DartObject>[])
+              ?item.toStringValue(),
+          ],
+          _ => const <String>[],
+        };
+        for (String name in names) {
+          String? key = keys[name];
+          if (key != null && key != name) {
+            dto.errors.add(
+              '@${rule.name} on ${dto.name}.${field.name}: \'$name\' is a '
+              'Dart field name. Use the input key \'$key\'.',
+            );
+          }
+        }
+      }
+    }
   }
 
   void _validateMethod(DtoClass dto) {
@@ -596,6 +640,16 @@ class DtoReader {
         _fits(field, name, where, errors, <DtoKind>{DtoKind.string});
         continue;
       }
+      if (requiredWhenRules.contains(name)) {
+        if (!field.maybe && field.required) {
+          errors.add(
+            '@$name on $where does nothing: the field is always required. '
+            'Make it nullable, a Maybe, or give it a default.',
+          );
+        }
+        field.requiredWhen.add(DtoRule(name, value, source));
+        continue;
+      }
       if (!builtIn.contains(name)) continue;
       DtoRule item = DtoRule(name, value, source);
       _builtIn(field, item, where, errors);
@@ -779,7 +833,36 @@ class DtoReader {
       );
       return;
     }
+    if (rule.name == 'DateFormatted') {
+      String format = rule.stringField('format') ?? '';
+      String? bad = badDateLetter(format);
+      if (bad != null) {
+        errors.add(
+          '@DateFormatted on $where: the letter "$bad" in \'$format\' is not '
+          'supported. Put \\ before it to use it as text.',
+        );
+      }
+    }
     field.rules.add(rule);
+  }
+
+  /// The PHP `date()` letters that `@DateFormatted` knows.
+  static const String dateLetters = 'djDlNwSzmnMFtYyLaAgGhHisvueTPpOZIUcr';
+
+  /// The first letter of [format] that `@DateFormatted` does not know
+  /// (and that has no `\` before it), or null.
+  static String? badDateLetter(String format) {
+    for (int i = 0; i < format.length; i++) {
+      String char = format[i];
+      if (char == r'\') {
+        i++;
+        continue;
+      }
+      if (RegExp('[a-zA-Z]').hasMatch(char) && !dateLetters.contains(char)) {
+        return char;
+      }
+    }
+    return null;
   }
 
   /// The bytes of a size text like `2MB`, or null.

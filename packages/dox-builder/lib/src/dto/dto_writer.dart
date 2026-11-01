@@ -74,9 +74,16 @@ class DtoWriter {
       )
       ..writeln();
     if (dto.strict) {
-      List<String> keys = <String>[
+      // the key `@Confirmed` reads is not a field, but it is not unknown
+      Set<String> keys = <String>{
         for (DtoField field in dto.fields) _keyLiteral(field),
-      ];
+        for (DtoField field in dto.fields)
+          for (DtoRule rule in field.rules)
+            if (rule.custom && rule.name == 'Confirmed')
+              literal.string(
+                rule.stringField('other') ?? '${field.key}_confirmation',
+              ),
+      };
       out.writeln(
         'static const Set<String> _keys = <String>{${keys.join(', ')}};',
       );
@@ -168,6 +175,11 @@ class DtoWriter {
         );
       } else if (!field.type.nullable) {
         out.writeln('if ($c == null) s.required(p, $key, _m);');
+      }
+      // requiredWhen checks if the value is missing (blank text and an
+      // empty list count as missing too)
+      for (DtoRule rule in field.requiredWhen) {
+        out.writeln('s.requiredWhen(${rule.source}, $c, input, p, $key, _m);');
       }
     }
     out.writeln('if (s.issues.length != e) return null;');

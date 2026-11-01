@@ -1,5 +1,8 @@
 ## Unreleased
 
+- DTOs: `@RequiredIf('type', 'company')` and `@RequiredWith(['phone'])` from `dox_validation`. The field is required only when the condition is true. Use them on a nullable field, a `Maybe` field or a field with a default. On an always-required field the build stops with a clear error.
+- DTOs: the build stops when `@RequiredIf`, `@RequiredWith`, `@Same` or `@Confirmed(other:)` names a Dart field (like `accountType`) instead of its input key (`account_type`). The check would never match. It also stops for a `@DateFormatted` format with a letter it does not know.
+- DTOs: in a `@Dto(strict: true)` class, the key that `@Confirmed` reads (like `password_confirmation`) is not an unknown key.
 - New: DTO file rules `@MinSize('10KB')`, `@MimeTypes(['image/png', 'image/*'])` and `@Dimensions(minWidth:, maxWidth:, minHeight:, maxHeight:, width:, height:, ratio:)`. They need the next dox_validation release. A bad size or a `@Dimensions()` with no limit stops the build.
 - New: `@ManyToMany(withPivot: [...], withTimestamps: true)` is passed to the ORM, so the relation reads the extra pivot columns. Needs the dox_orm version with many to many writes.
 - New: the model builder makes the code for `@MorphMany`, `@MorphOne` and `@MorphTo` (polymorphic relations). A `@MorphTo` field has no model: its type is the field type, like `Model<dynamic>`, and its morph name is the field name in snake_case. The OpenAPI model schema has these relation keys too. Needs the dox_orm version with polymorphic relations.

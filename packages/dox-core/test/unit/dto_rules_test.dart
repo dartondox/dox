@@ -132,6 +132,195 @@ void main() {
     });
   });
 
+  group('more Laravel rules |', () {
+    checkCases($MoreRulesDto, const <RuleCase>[
+      RuleCase('meta', '{"a":1}', '{a:1}', 'The meta is not a valid json'),
+      RuleCase('pin', '0123', '123', 'The pin must be 4 digits'),
+      RuleCase(
+        'code',
+        '12345',
+        '123',
+        'The code must be between 4 and 6 digits',
+      ),
+      RuleCase(
+        'day',
+        '2024-02-29',
+        '2023-02-29',
+        'The day must match the format Y-m-d',
+      ),
+      RuleCase(
+        'secret',
+        'Abcdefg1!',
+        'abcdefg1!',
+        'The secret must have at least 8 characters, one upper case and '
+            'one lower case letter, one number, and one symbol',
+      ),
+    ]);
+
+    test('confirmed', () async {
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{
+          'password': 'secret',
+          'password_confirmation': 'secret',
+        }),
+        isEmpty,
+      );
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{'password': 'secret'}),
+        <String, String>{
+          'password': 'The password confirmation does not match',
+        },
+      );
+    });
+
+    test('same', () async {
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{
+          'email': 'a@dox.dev',
+          'email_again': 'a@dox.dev',
+        }),
+        isEmpty,
+      );
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{
+          'email': 'a@dox.dev',
+          'email_again': 'b@dox.dev',
+        }),
+        <String, String>{'email_again': 'The email_again must match email'},
+      );
+    });
+
+    test('requiredIf', () async {
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{'type': 'person'}),
+        isEmpty,
+      );
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{
+          'type': 'company',
+          'company': 'Dox',
+        }),
+        isEmpty,
+      );
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{'type': 'company'}),
+        <String, String>{
+          'company': 'The company is required when type is company',
+        },
+      );
+      // an empty string is missing too
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{
+          'type': 'company',
+          'company': '',
+        }),
+        hasLength(1),
+      );
+    });
+
+    test('blank text and an empty list are missing', () async {
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{
+          'type': 'company',
+          'company': '  ',
+        }),
+        <String, String>{
+          'company': 'The company is required when type is company',
+        },
+      );
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{
+          'tag_source': 'import',
+          'tags': <String>[],
+        }),
+        <String, String>{
+          'tags': 'The tags is required when tag_source is present',
+        },
+      );
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{
+          'tag_source': 'import',
+          'tags': <String>['x'],
+        }),
+        isEmpty,
+      );
+    });
+
+    test('requiredIf with an enum value', () async {
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{'role': 'admin'}),
+        <String, String>{
+          'admin_code': 'The admin_code is required when role is admin',
+        },
+      );
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{'role': 'user'}),
+        isEmpty,
+      );
+    });
+
+    test('a strict DTO takes the key @Confirmed reads', () async {
+      expect(
+        await errorsOf($StrictPasswordDto, <String, dynamic>{
+          'password': 'secret',
+          'password_confirmation': 'secret',
+        }),
+        isEmpty,
+      );
+      expect(
+        await errorsOf($StrictPasswordDto, <String, dynamic>{
+          'password': 'secret',
+          'password_confirmation': 'other',
+          'extra': 1,
+        }),
+        <String, String>{'extra': 'The extra field is not allowed'},
+      );
+    });
+
+    test('requiredWith on a Maybe field, from a query string', () async {
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{
+          'phone': '0812345678',
+          'country_code': '+66',
+        }, source: Source.query),
+        isEmpty,
+      );
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{
+          'phone': '0812345678',
+        }, source: Source.query),
+        <String, String>{
+          'country_code': 'The country_code is required when phone is present',
+        },
+      );
+    });
+
+    test('messages work by code and by key.code', () async {
+      MessageResolver messages = MessageResolver(
+        messages: <String, String>{
+          'required_if': 'Need {field}',
+          'pin.digits': 'Bad pin',
+        },
+      );
+      ParseResult<MoreRules> result = await $MoreRulesDto.safeValidateMap(
+        <String, dynamic>{'type': 'company'},
+        messages: messages,
+      );
+      expect(result.errors, <String, String>{'company': 'Need company'});
+      result = await $MoreRulesDto.safeValidateMap(<String, dynamic>{
+        'pin': '1',
+      }, messages: messages);
+      expect(result.errors, <String, String>{'pin': 'Bad pin'});
+    });
+
+    test('JSON Schema gets the rule hints', () {
+      Map<String, dynamic> props =
+          $MoreRulesDto.toJsonSchema()['properties'] as Map<String, dynamic>;
+      expect(props['pin']['pattern'], r'^[0-9]{4}$');
+      expect(props['secret']['minLength'], 8);
+    });
+  });
+
   group('change text |', () {
     test('trim, lower and upper case', () async {
       ChangeText value = await $ChangeTextDto.validateMap(<String, dynamic>{
