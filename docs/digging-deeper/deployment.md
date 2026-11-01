@@ -211,6 +211,18 @@ server {
 }
 ```
 
+### Pass the real `Host` header
+
+Behind a proxy, the proxy must pass the real `Host` header to Dox, like `proxy_set_header Host $host;` above.
+Some checks compare the request with this header:
+
+- the WebSocket origin check (`allowedOrigins` on `Route.websocket`, or `AppConfig.webSocketAllowedOrigins`): a page of the same host can open a socket.
+- `back()`: it only goes back to a page of the same host.
+- `allowedOrigins` of socket.io.
+
+If the proxy sends its own host (like `localhost:3000`) instead, pages of your site look like another site.
+Then sockets from your own pages get `403`, and `back()` goes to the fallback.
+
 ## Keep it running
 
 When a worker isolate dies, Dox starts it again. When the main isolate dies,
