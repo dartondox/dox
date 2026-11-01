@@ -109,7 +109,11 @@ Future<DoxResponse> _chain(DoxRequest req, int start) async {
 DoxResponse asResponse(dynamic value) {
   if (value is DoxResponse) return value;
   if (value is IHttpException) {
-    return DoxResponse(value.toResponse()).statusCode(value.code);
+    DoxResponse res = DoxResponse(value.toResponse()).statusCode(value.code);
+
+    /// keep the headers of `abort(503, msg, {'retry-after': '60'})`
+    if (value is HttpStatusException) value.headers.forEach(res.header);
+    return res;
   }
   return DoxResponse(value);
 }
