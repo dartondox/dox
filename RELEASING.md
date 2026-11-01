@@ -89,7 +89,9 @@ git push origin vx.y.z
 
 The tag starts `.github/workflows/publish.yaml` (the "Release" workflow).
 It checks that the tag matches every package version.
-Then it publishes the packages in dependency order (`bin/publish_order.py`).
+Then it checks every package with `dart pub publish --dry-run` (in the workspace, so it needs no wait for pub.dev).
+Then it uploads the packages in dependency order (`bin/publish_order.py`), with `--skip-validation`.
+So it does not wait for pub.dev to serve each new version. If pub.dev refuses an upload, it tries again every 15 seconds, for up to 10 minutes.
 
 If one package fails (for example, automated publishing is off):
 
