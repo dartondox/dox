@@ -4,9 +4,13 @@ on:
   push:
     branches:
       - '**'
-    # a docs-only tag changes no code, so it needs no test run
+    # A docs-only tag changes no code, so it needs no test run.
+    # A release tag (v*) runs this workflow from the Release workflow,
+    # before it publishes.
     tags-ignore:
       - 'docs-v*'
+      - 'v*'
+  workflow_call:
 
 # A new push to a branch cancels the old run of that branch.
 # Runs on main are never cancelled.
@@ -45,9 +49,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      # dox_openapi and dox_validation come from clones of their repos
-      # (main, or the branch with the same name as this PR), not from
-      # pub.dev.
+      # dox_openapi, dox_validation, ioredis and dox_http_native come from
+      # clones of their repos (main, or the branch with the same name as
+      # this PR), not from pub.dev. On a tag they come from pub.dev.
       - run: ci/clone-siblings.sh && ci/use-siblings.sh
       - uses: dart-lang/setup-dart@v1
         with:
@@ -90,8 +94,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      # dox_openapi and dox_validation from the clones, like lint
+      # dox_openapi, dox_validation, ioredis and dox_http_native from the
+      # clones, like lint
       - run: ci/clone-siblings.sh && ci/use-siblings.sh
+      # Caches the Rust dependencies of dox_http_native.
+      - uses: Swatinem/rust-cache@v2
+        if: github.ref_type != 'tag'
+        with:
+          workspaces: ../dox-http-native/native -> target
+      # Builds the dox_http_native library of the clone, for this machine only.
+      - run: ci/use-siblings.sh build
       - name: Start services
         if: needs.changes.outputs.unit_services != ''
         run: ci/start-services.sh ${{ needs.changes.outputs.unit_services }}
