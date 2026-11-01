@@ -66,6 +66,7 @@ Route.delete('/blogs/{id}', (BlogController c) => c.destroy);
     `Route.websocket('echo', (WebSocket socket, DoxRequest req) {...})` adds a raw WebSocket route.
     By default any website can open it from a browser, with the cookies of the user. To check the `Origin`, pass `allowedOrigins: ['https://app.example.com']`, or set `AppConfig(webSocketAllowedOrigins: [...])` for every WebSocket route. Then only pages of the same host and the listed sites can open it. Other origins get `403`. `[]` means the same host only.
     When a WebSocket route has no check, Dox prints one warning to stderr at start.
+    A message over `maxMessageSize` bytes (default 16 MB) closes the socket with code `1009`. Example: `Route.websocket('chat', handler, maxMessageSize: 64 * 1024)`.
 
 A `HEAD` request runs the `GET` route of the same path. The answer has the status and headers of `GET`, with no body.
 
@@ -283,6 +284,23 @@ The binder runs after the middleware, so an auth middleware can stop the request
 A `@DoxModel` class does not need `Route.bind`. Dox makes a binder for it in `lib/generated/container.g.dart`.
 See [Dependency injection: route model binding](dependency-injection.md#route-model-binding).
 `Route.bind` wins when both exist.
+
+## Serve static files
+
+`Route.staticFiles(prefix, folder)` serves the files of a folder, like CSS, JavaScript and images.
+
+```dart
+Route.staticFiles('/', 'public');
+Route.staticFiles('build', 'public/build', maxAge: Duration(days: 365));
+```
+
+- Only `GET` and `HEAD` requests read files, and only when no route matches. A route always wins.
+- `..`, dot files (like `.env`) and folders are never sent. They get `404`.
+- A file gets `Last-Modified`, and `304` when the browser already has it. Range requests work.
+- `maxAge` sends `Cache-Control: public, max-age=...`. Give a long `maxAge` to build files with a hash in the name (like Vite's).
+- No middleware runs for a file.
+
+Behind a proxy, the proxy can serve the folder instead. Then the files never reach Dox.
 
 ## Serve storage files
 

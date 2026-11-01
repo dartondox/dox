@@ -5,6 +5,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_cors_handler.dart';
 import 'package:dox_core/http/http_error_handler.dart';
 import 'package:dox_core/http/http_response_handler.dart';
+import 'package:dox_core/http/http_static_handler.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/utils.dart';
 
@@ -37,26 +38,41 @@ RouteMatch? httpRouteHandler(HttpRequest req) {
       httpCorsHandler(target?.corsEnabled, req);
       req.response.statusCode = HttpStatus.noContent;
       responseDataHandler(null, req);
-    } else {
-      /// same path as a thrown 404, so the app ExceptionHandler and
-      /// responseHandler can format it. the default body is JSON.
-      /// when the path has routes for other methods, it is 405.
-      List<String> allow = _allowedMethods(req.uri.path, host);
-      httpErrorHandler(
-        req,
-        allow.isEmpty
-            ? NotFoundHttpException(
-                message: '${req.method} ${req.uri.path} not found',
-              )
-            : MethodNotAllowedHttpException(
-                allow,
-                message: '${req.method} is not allowed for ${req.uri.path}',
-              ),
-        StackTrace.empty,
+    } else if (Route().statics.isNotEmpty &&
+        (req.method == 'GET' || req.method == 'HEAD')) {
+      /// a file of `Route.staticFiles`, else 404
+      httpStaticHandler(req, Route().statics).then(
+        (bool sent) {
+          if (!sent) _notFound(req, host);
+        },
+        onError: (Object error, StackTrace stackTrace) {
+          httpErrorHandler(req, error, stackTrace);
+        },
       );
+    } else {
+      _notFound(req, host);
     }
   }
   return match;
+}
+
+/// same path as a thrown 404, so the app ExceptionHandler and
+/// responseHandler can format it. the default body is JSON.
+/// when the path has routes for other methods, it is 405.
+void _notFound(HttpRequest req, String? host) {
+  List<String> allow = _allowedMethods(req.uri.path, host);
+  httpErrorHandler(
+    req,
+    allow.isEmpty
+        ? NotFoundHttpException(
+            message: '${req.method} ${req.uri.path} not found',
+          )
+        : MethodNotAllowedHttpException(
+            allow,
+            message: '${req.method} is not allowed for ${req.uri.path}',
+          ),
+    StackTrace.empty,
+  );
 }
 
 /// the methods with a route for [path], eg. `['GET', 'HEAD', 'POST']`.

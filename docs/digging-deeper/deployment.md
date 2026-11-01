@@ -223,6 +223,23 @@ Some checks compare the request with this header:
 If the proxy sends its own host (like `localhost:3000`) instead, pages of your site look like another site.
 Then sockets from your own pages get `403`, and `back()` goes to the fallback.
 
+## Behind a load balancer
+
+A load balancer keeps idle connections to Dox open, and sends new requests on them.
+Dox closes a connection with no request for 30 seconds.
+If the balancer keeps it longer, it may send a request on a connection Dox just closed.
+Then the client gets `502`.
+
+To fix this, set `idleTimeout` longer than the balancer's idle timeout.
+AWS ALB keeps idle connections for 60 seconds, so use 65 seconds:
+
+```dart
+AppConfig(
+  // ...
+  idleTimeout: Duration(seconds: 65),
+)
+```
+
 ## Keep it running
 
 When a worker isolate dies, Dox starts it again. When the main isolate dies,

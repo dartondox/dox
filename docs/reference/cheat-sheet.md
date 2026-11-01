@@ -91,6 +91,7 @@ class ApiRouter extends Router {
 | `Route.domain('api.app.com', () { ... })` | match by `Host` |
 | `Route.resource('blogs', BlogController)` | `index`, `create`, `store`, `show`, `edit`, `update`, `destroy` |
 | `Route.health('/health')` | `200 {"status": "ok"}`, or `503` when a check fails. See [Health check](../digging-deeper/health-check.md). |
+| `Route.staticFiles('/', 'public')` | serve a folder (CSS, JS, images) when no route matches. `maxAge:` sets `Cache-Control` |
 | `Storage.route('files')` | serve a storage disk. Only signed URLs work, unless `signed: false` (`dox_storage`) |
 | `Route.enabledCors(() { ... })` / `Route.disabledCors(...)` | CORS for some routes |
 | `Route.websocket('echo', (WebSocket s, DoxRequest req) { ... })` | a raw WebSocket. For rooms and acks, use Socket.IO. |

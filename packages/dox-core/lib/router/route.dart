@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dox_core/constants/http_request_method.dart';
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/http/http_static_handler.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/utils.dart';
 import 'package:dox_http_native/dox_http_native.dart';
@@ -38,6 +39,9 @@ typedef RawRequestHandler = Future<void> Function(HttpRequest request);
 /// prefix => handler. empty unless something is mounted.
 final Map<String, RawRequestHandler> _mounts = <String, RawRequestHandler>{};
 
+/// folders added with [Route.staticFiles]. empty unless one is added.
+final List<StaticFolder> _statics = <StaticFolder>[];
+
 /// gets the open socket of a [Route.websocket] request
 typedef WebSocketHandler = FutureOr<void> Function(
   WebSocket socket,
@@ -46,13 +50,16 @@ typedef WebSocketHandler = FutureOr<void> Function(
 
 /// upgrades the request, then gives the socket to the handler
 class _WebSocketRoute {
-  _WebSocketRoute(this.handler, this.allowedOrigins);
+  _WebSocketRoute(this.handler, this.allowedOrigins, this.maxMessageSize);
 
   final WebSocketHandler handler;
 
   /// null: no origin check, unless `AppConfig.webSocketAllowedOrigins`
   /// is set.
   final List<String>? allowedOrigins;
+
+  /// a bigger message or frame closes the socket with 1009
+  final int maxMessageSize;
 
   Future<WebSocket> call(DoxRequest req) async {
     if (!NativeWebSocket.isUpgradeRequest(req.httpRequest)) {
@@ -68,7 +75,10 @@ class _WebSocketRoute {
         )) {
       throw ForbiddenHttpException(message: 'WebSocket origin not allowed');
     }
-    WebSocket socket = await NativeWebSocket.upgrade(req.httpRequest);
+    WebSocket socket = await NativeWebSocket.upgrade(
+      req.httpRequest,
+      maxMessageSize: maxMessageSize,
+    );
     await handler(socket, req);
     return socket;
   }
@@ -187,6 +197,25 @@ class Route {
   /// remove a handler added with [mount]
   static void unmount(String prefix) {
     _mounts.remove(prefix);
+  }
+
+  /// folders added with [staticFiles]
+  List<StaticFolder> get statics => _statics;
+
+  /// serve the files in [folder] under [prefix], for GET and HEAD
+  /// requests that match no route. Routes always win, so a normal
+  /// request does not touch the disk. No middleware runs for a file.
+  /// `..`, dot files (like `.env`) and folders are never sent: they get
+  /// 404. A file gets `Last-Modified` (and 304 when the browser has it),
+  /// Range support, and `Cache-Control: public, max-age=...` with
+  /// [maxAge]. Give hashed build files (like Vite's) a long [maxAge].
+  /// ```
+  /// Route.staticFiles('/', 'public');
+  /// Route.staticFiles('build', 'public/build', maxAge: Duration(days: 365));
+  /// ```
+  /// Behind a proxy (nginx, Caddy), the proxy can serve the folder instead.
+  static void staticFiles(String prefix, String folder, {Duration? maxAge}) {
+    _statics.add(StaticFolder(prefix, folder, maxAge: maxAge));
   }
 
   /// health check route: `GET <path>` answers 200 `{"status": "ok"}`,
@@ -537,6 +566,9 @@ class Route {
   /// `https://app.example.com`, can open it. `[]` means the same host
   /// only. `*` allows every site. Other origins get 403. A client with no
   /// `Origin` header (not a browser) is always allowed.
+  ///
+  /// A message or frame over [maxMessageSize] bytes (default 16 MB)
+  /// closes the socket with 1009 before your code gets it.
   /// ```
   /// Route.websocket('echo', (WebSocket socket, DoxRequest req) {
   ///   socket.listen(socket.add);
@@ -547,11 +579,22 @@ class Route {
     WebSocketHandler handler, {
     List<dynamic> middleware = const <dynamic>[],
     List<String>? allowedOrigins,
+    int maxMessageSize = 16 * 1024 * 1024,
   }) {
+    if (maxMessageSize < 1) {
+      throw ArgumentError.value(
+        maxMessageSize,
+        'maxMessageSize',
+        'must be 1 or more',
+      );
+    }
     Route r = Route()._addRoute(
       HttpRequestMethod.GET,
       Route()._join(route),
-      <dynamic>[...middleware, _WebSocketRoute(handler, allowedOrigins).call],
+      <dynamic>[
+        ...middleware,
+        _WebSocketRoute(handler, allowedOrigins, maxMessageSize).call,
+      ],
     );
     if (allowedOrigins == null) _noOriginCheck[r._last!] = true;
     return r;
