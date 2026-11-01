@@ -364,6 +364,79 @@ class A {
     });
   });
 
+  group('DTO file rules |', () {
+    // copies of the new annotations, so the test also runs against a
+    // dox_validation release that does not have them yet
+    const String stubs = '''
+class MinSize {
+  const MinSize(this.size, {this.message});
+  final String size;
+  final String? message;
+}
+class MimeTypes {
+  const MimeTypes(this.types, {this.message});
+  final List<String> types;
+  final String? message;
+}
+class Dimensions {
+  const Dimensions({this.width, this.height, this.minWidth, this.maxWidth,
+    this.minHeight, this.maxHeight, this.ratio, this.message});
+  final int? width;
+  final int? height;
+  final int? minWidth;
+  final int? maxWidth;
+  final int? minHeight;
+  final int? maxHeight;
+  final double? ratio;
+  final String? message;
+}
+''';
+
+    test('size, MIME type and dimension checks', () async {
+      String out = await _generate('''
+$stubs
+@Dto()
+class A {
+  @MinSize('1KB')
+  @MimeTypes(<String>['IMAGE/PNG', 'image/*'])
+  @Dimensions(minWidth: 100, maxHeight: 500, ratio: 3 / 2)
+  final RequestFile a;
+  const A({required this.a});
+}''');
+      expect(out, isNot(startsWith('ERROR')), reason: out);
+      expect(out, contains('c0.length >= 1024'));
+      expect(out, contains('IssueCodes.minSize'));
+      expect(out, contains("params: const <String, Object?>{'min': '1KB'}"));
+      // the output is formatted, so check the parts
+      expect(out, contains('FileTypes.matchesMimeTypes(c0'));
+      expect(out, contains("'image/png',"));
+      expect(out, contains('IssueCodes.mimeTypes'));
+      expect(out, contains('ImageSize.fits('));
+      expect(out, contains('minWidth: 100,'));
+      expect(out, contains('maxHeight: 500,'));
+      expect(out, contains('ratio: 1.5,'));
+      expect(out, contains('IssueCodes.dimensions'));
+      expect(out, contains('DefaultMessages.dimensions'));
+    });
+
+    test('bad values stop the build', () async {
+      String out = await _generate('''
+$stubs
+@Dto()
+class A {
+  @MinSize('a lot')
+  final RequestFile a;
+  @Dimensions()
+  final RequestFile b;
+  const A({required this.a, required this.b});
+}''');
+      expect(out, contains('@MinSize on'));
+      expect(out, contains('needs a size like'));
+      expect(out, contains('@Dimensions on'));
+      expect(out, contains('needs at least one limit'));
+    });
+  });
+
   group('DTO prefixes |', () {
     test('types from a prefixed import keep the prefix', () async {
       String out = await _generate(

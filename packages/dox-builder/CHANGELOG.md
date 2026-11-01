@@ -1,6 +1,7 @@
 ## Unreleased
 
 - DTOs: `@RequiredIf('type', 'company')` and `@RequiredWith(['phone'])` from `dox_validation`. The field is required only when the condition is true. Use them on a nullable field, a `Maybe` field or a field with a default. On an always-required field the build stops with a clear error.
+- New: DTO file rules `@MinSize('10KB')`, `@MimeTypes(['image/png', 'image/*'])` and `@Dimensions(minWidth:, maxWidth:, minHeight:, maxHeight:, width:, height:, ratio:)`. They need the next dox_validation release. A bad size or a `@Dimensions()` with no limit stops the build.
 
 ## 3.0.2
 

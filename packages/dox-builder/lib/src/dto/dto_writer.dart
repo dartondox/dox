@@ -680,6 +680,30 @@ class DtoWriter {
           '$v.length <= $bytes',
           f('maxSize', 'maxSize', <String, Object?>{'max': size}),
         );
+      case 'MinSize':
+        String size = rule.stringField('size')!;
+        int bytes = DtoReader.sizeOf(size)!;
+        return _Check(
+          '$v.length >= $bytes',
+          f('minSize', 'minSize', <String, Object?>{'min': size}),
+        );
+      case 'MimeTypes':
+        List<String> types = <String>[
+          for (Object? type in _list(rule, 'types')) '$type'.toLowerCase(),
+        ];
+        return _Check(
+          'FileTypes.matchesMimeTypes($v, const ${literal.strings(types)})',
+          f('mimeTypes', 'mimes', <String, Object?>{'types': types.join(', ')}),
+        );
+      case 'Dimensions':
+        List<String> limits = <String>[
+          for (String key in DtoRule.dimensionFields)
+            if (rule.numField(key) != null) '$key: ${rule.numField(key)}',
+        ];
+        return _Check(
+          'ImageSize.fits($v, ${limits.join(', ')})',
+          f('dimensions', 'dimensions'),
+        );
       case 'Mimes':
         List<String> types = <String>[
           for (Object? type in _list(rule, 'types')) '$type'.toLowerCase(),

@@ -91,6 +91,21 @@ class AppConfig {
   /// get 502. Default 30 seconds.
   final Duration idleTimeout;
 
+  /// The most connections one isolate holds open at once. Must be 1 or
+  /// more. 0 or less throws an `ArgumentError` when the server starts.
+  /// When an isolate is full, it stops accepting until one closes.
+  /// WebSocket connections and connections that are still closing count
+  /// too. New clients wait in the OS listen queue. It holds up to 1024
+  /// clients, and the OS can make it smaller (`somaxconn`; 128 by default
+  /// on macOS). When the queue is full, new clients wait and then time
+  /// out. On Linux each new client goes to one isolate (`SO_REUSEPORT`),
+  /// so it can wait for a full isolate even when others have room. The
+  /// limit is per isolate, so the
+  /// whole app holds up to `maxConnections * totalIsolate`. Keep that
+  /// below the file limit of the process (`ulimit -n`). Native server
+  /// only. Default null: no limit.
+  final int? maxConnections;
+
   /// IPs or CIDR ranges of reverse proxies (nginx, Caddy, load balancer)
   /// that Dox trusts. Only when the direct client is in this list does Dox
   /// read `X-Forwarded-For` for `req.ip()` and `X-Forwarded-Proto` for
@@ -149,6 +164,7 @@ class AppConfig {
     this.maxMultipartSize = 100 * 1024 * 1024,
     this.bodyTimeout = const Duration(seconds: 120),
     this.idleTimeout = const Duration(seconds: 30),
+    this.maxConnections,
     this.trustedProxies = const <String>[],
     this.compress = false,
     this.shutdownTimeout = const Duration(seconds: 8),

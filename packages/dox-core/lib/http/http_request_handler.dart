@@ -59,19 +59,142 @@ void httpRequestHandler(HttpRequest req) {
 /// hand the request to a mounted handler. it writes the response itself.
 bool _mounted(HttpRequest req, Map<String, RawRequestHandler> mounts) {
   String path = req.uri.path;
-  for (MapEntry<String, RawRequestHandler> mount in mounts.entries) {
-    String prefix = mount.key;
-    if (path.startsWith(prefix) ||
-        (prefix.endsWith('/') &&
-            path == prefix.substring(0, prefix.length - 1))) {
-      /// report the error and answer 500, so the client does not hang
-      mount.value(req).catchError((Object error, StackTrace stackTrace) {
-        httpErrorHandler(req, error, stackTrace);
-      });
-      return true;
+
+  /// `//` is one `/` here, so `/admin//secure` cannot skip a mount at
+  /// `/admin/secure`. the handler still gets the path as it came.
+  if (path.contains('//')) path = path.replaceAll(_slashes, '/');
+
+  /// the longest prefix wins. the match uses the raw path: `%2F` stays
+  /// encoded, so `/admin/secure%2Fx` goes to a mount at `/admin`
+  String? prefix;
+  for (String key in mounts.keys) {
+    if (_underPrefix(path, key) &&
+        (prefix == null || _base(key) > _base(prefix))) {
+      prefix = key;
     }
   }
-  return false;
+  if (prefix == null) return false;
+  RawRequestHandler handler = mounts[prefix]!;
+  if (Route().mountsWithMiddleware.contains(prefix)) {
+    _runMount(req, prefix, handler);
+    return true;
+  }
+
+  /// report the error and answer 500, so the client does not hang
+  handler(req).catchError((Object error, StackTrace stackTrace) {
+    httpErrorHandler(req, error, stackTrace);
+  });
+  return true;
+}
+
+/// two or more `/` in a row
+final RegExp _slashes = RegExp('/{2,}');
+
+/// the length of [prefix] without a trailing `/`
+int _base(String prefix) {
+  return prefix.endsWith('/') ? prefix.length - 1 : prefix.length;
+}
+
+/// true when [path] is [prefix] or a path under it. a trailing `/` on
+/// the prefix does not matter: `/admin` and `/admin/` both match
+/// `/admin`, `/admin/` and `/admin/users`, but never `/administrator`.
+bool _underPrefix(String path, String prefix) {
+  int end = _base(prefix);
+  if (!path.startsWith(prefix.substring(0, end))) return false;
+  return path.length == end || path.codeUnitAt(end) == 0x2F;
+}
+
+/// prefix => the route that runs the global middleware, then the raw
+/// handler, with the handler and the middleware list it was made from.
+/// made again when either one changes (a new mount, or
+/// `Dox().initialize` with a new config).
+final Map<String, (RawRequestHandler, List<dynamic>, RouteData)> _mountRoutes =
+    <String, (RawRequestHandler, List<dynamic>, RouteData)>{};
+
+/// requests that have an answer: the mount handler started (it writes
+/// the answer itself), or Dox sent one (eg. a middleware said no). after
+/// that nothing more is sent, not even a changed answer of a `next`
+/// middleware like `ETag`, and the handler does not start.
+final Expando<bool> _started = Expando<bool>();
+
+/// run the global middleware, then the mount handler. a middleware that
+/// gives a response sends it, and the handler never runs. the body is not
+/// read here, so the handler can still read it. `terminate` steps run
+/// once the answer is sent.
+void _runMount(HttpRequest req, String prefix, RawRequestHandler handler) {
+  List<dynamic> global = Dox().config.globalMiddleware;
+  (RawRequestHandler, List<dynamic>, RouteData)? cached = _mountRoutes[prefix];
+  RouteData route;
+  if (cached != null &&
+      identical(cached.$1, handler) &&
+      identical(cached.$2, global)) {
+    route = cached.$3;
+  } else {
+    route = _mountRoute(prefix, handler, global);
+    _mountRoutes[prefix] = (handler, global, route);
+  }
+  DoxRequest doxReq = _doxRequest(
+    req,
+    route,
+    null,
+    RequestBody.empty(),
+    req.headers.contentType,
+  );
+  List<IDoxTerminableMiddleware> ends = route.terminable;
+  Future<dynamic>.sync(() => runMiddlewareAndController(doxReq)).then(
+    (dynamic value) {
+      if (_started[req] == true) {
+        value = null;
+      } else {
+        _started[req] = true;
+        _send(req, value);
+      }
+      if (ends.isNotEmpty) _terminate(req, doxReq, value, ends);
+    },
+    onError: (Object error, StackTrace stackTrace) {
+      _started[req] = true;
+      if (ends.isEmpty) {
+        httpErrorHandler(req, error, stackTrace);
+        return;
+      }
+      dynamic value = renderError(req, error, stackTrace);
+      _send(req, value);
+      _terminate(req, doxReq, value, ends);
+    },
+  );
+}
+
+RouteData _mountRoute(
+  String prefix,
+  RawRequestHandler handler,
+  List<dynamic> global,
+) {
+  return RouteData(
+    method: '*',
+    path: prefix,
+    controllers: <dynamic>[
+      /// `RequestTimeout` is left out: the handler owns the answer, so a
+      /// timeout would only report a false 503 for a long request
+      for (Object? item in global)
+        if (item is! RequestTimeout) item,
+      (DoxRequest req) async {
+        HttpRequest raw = req.httpRequest;
+
+        /// a `next` middleware gave up early and an answer is sent
+        if (_started[raw] == true) return null;
+        _started[raw] = true;
+        try {
+          await handler(raw);
+        } catch (error, stackTrace) {
+          /// report the error and answer 500, so the client does not hang
+          httpErrorHandler(raw, error, stackTrace);
+        }
+
+        /// null: a `next` middleware like `ETag` has nothing to change
+        return null;
+      },
+    ],
+  );
 }
 
 /// run middleware and controller, then send the result.
