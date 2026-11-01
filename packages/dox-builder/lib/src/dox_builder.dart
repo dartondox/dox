@@ -328,6 +328,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
           ${_getParamKeyValue(value, 'pivotForeignKey')}
           ${_getParamKeyValue(value, 'pivotRelatedForeignKey')}
           ${_getParamKeyValue(value, 'pivotTable')}
+          ${_getPivotParams(value)}
           $onQuery,
         );
       }
@@ -340,6 +341,16 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       'content': content,
       'eagerLoad': eagerLoad,
     };
+  }
+
+  /// `withPivot:` and `withTimestamps:` of a many to many relation
+  String _getPivotParams(Map<String, dynamic> value) {
+    List<String>? columns = value['withPivot'];
+    String code = columns == null || columns.isEmpty
+        ? ''
+        : ', withPivot: const <String>[${columns.map(_str).join(', ')}]';
+    if (value['withTimestamps'] == true) code += ', withTimestamps: true';
+    return code;
   }
 
   String _getParamKeyValue(Map<String, dynamic> value, String key) {

@@ -138,6 +138,14 @@ class ModelVisitor {
             ?.getField('pivotRelatedForeignKey')
             ?.toStringValue(),
         'pivotTable': object?.getField('pivotTable')?.toStringValue(),
+        'withPivot': object
+            ?.getField('withPivot')
+            ?.toListValue()
+            ?.map((DartObject o) => o.toStringValue())
+            .whereType<String>()
+            .toList(),
+        'withTimestamps':
+            object?.getField('withTimestamps')?.toBoolValue() ?? false,
       };
     }
 
