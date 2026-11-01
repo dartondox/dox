@@ -4156,6 +4156,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -4236,6 +4240,50 @@
     
   
     Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/authorization/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-shield-check"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+  <path d="m9 12 2 2 4-4" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Authorization
   
 
     
@@ -4512,6 +4560,50 @@
     
   
     Security headers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/signed-urls/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-link"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Signed URLs
   
 
     
@@ -6547,11 +6639,11 @@ Each store is made once per isolate, the first time you use it.</p>
 </tr>
 <tr>
 <td><code>redis</code></td>
-<td><code>host</code> (default <code>127.0.0.1</code>), <code>port</code> (default <code>6379</code>), <code>username</code>, <code>password</code>, <code>db</code> (default <code>0</code>), <code>tls</code> (<code>true</code>/<code>false</code>), <code>pool_size</code> (default 10), <code>prefix</code></td>
+<td><code>host</code> (default <code>127.0.0.1</code>), <code>port</code> (default <code>6379</code>), <code>username</code>, <code>password</code>, <code>db</code> (default <code>0</code>), <code>tls</code> (<code>true</code>/<code>false</code>), <code>pool_size</code> (default 10), <code>max_value_bytes</code> (no limit by default), <code>prefix</code></td>
 </tr>
 </tbody>
 </table>
-<p>The default <code>prefix</code> is <code>dox_cache:</code>.
+<p>A <code>redis</code> store with no <code>prefix</code> gets <code>&lt;app name&gt;_cache:</code> from <code>APP_NAME</code>, like <code>my_shop_cache:</code>. So two apps on one Redis do not share keys. The other drivers use <code>dox_cache:</code>.
 You rarely need <code>pool_size</code>: the cache sends no blocking commands, so each isolate uses about one Redis connection.</p>
 <h2 id="values-are-json">Values are JSON</h2>
 <p>A value must be a JSON type: <code>Map</code>, <code>List</code>, <code>String</code>, <code>num</code>, <code>bool</code> or <code>null</code>.
@@ -6578,42 +6670,53 @@ The value is stored as JSON. Return maps, lists, strings and numbers, not models
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">);</span>
 </span></code></pre></div>
 <p><code>rememberForever(key, fn)</code> does the same with no expiry.</p>
+<ul>
+<li><code>decode:</code> turns the stored JSON back into your type on a hit, like <code>decode: (j) =&gt; (j as List).cast&lt;String&gt;()</code>. Without it, use JSON types like <code>List&lt;dynamic&gt;</code>.</li>
+<li><code>lock: true</code> lets only one caller on all isolates and servers run the function. The others wait for its value.</li>
+</ul>
+<p><code>flexible(key, fresh, stale, fn)</code> serves the value as it is for <code>fresh</code>. Then, until <code>stale</code> more has passed, it still serves the old value at once and runs <code>fn</code> once in the background:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">stats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">flexible</span><span class="p">(</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="s1">'stats'</span><span class="p">,</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">1</span><span class="p">),</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">5</span><span class="p">),</span><span class="w"> </span><span class="n">loadStats</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="p">);</span>
+</span></code></pre></div>
 <h3 id="getraw"><code>getRaw</code></h3>
 <p><code>getRaw</code> gives the stored JSON text as it is. Send it as a response with no decode and no encode:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">getRaw</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">);</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">json</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="n">json</span><span class="p">).</span><span class="n">contentType</span><span class="p">(</span><span class="n">ContentType</span><span class="p">.</span><span class="n">json</span><span class="p">);</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">getRaw</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">);</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">json</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="n">json</span><span class="p">).</span><span class="n">contentType</span><span class="p">(</span><span class="n">ContentType</span><span class="p">.</span><span class="n">json</span><span class="p">);</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>A missing key gives <code>null</code>. A stored <code>String</code> comes back as JSON, with its quotes: <code>"bar"</code>.
 The <code>memory</code> driver also keeps JSON text, so <code>get</code> decodes on every hit there too.</p>
 <h3 id="another-store">Another store</h3>
 <p><code>store(name)</code> uses a store from the config instead of the default store:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">store</span><span class="p">(</span><span class="s1">'redis'</span><span class="p">).</span><span class="n">put</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span><span class="w"> </span><span class="s1">'bar'</span><span class="p">);</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">store</span><span class="p">(</span><span class="s1">'memory'</span><span class="p">).</span><span class="kd">get</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">store</span><span class="p">(</span><span class="s1">'redis'</span><span class="p">).</span><span class="n">put</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span><span class="w"> </span><span class="s1">'bar'</span><span class="p">);</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">store</span><span class="p">(</span><span class="s1">'memory'</span><span class="p">).</span><span class="kd">get</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">);</span>
 </span></code></pre></div>
 <h3 id="tags">Tags</h3>
 <p>Put items under a tag. Then you can remove only the items of that tag:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">tag</span><span class="p">(</span><span class="s1">'users'</span><span class="p">).</span><span class="n">put</span><span class="p">(</span><span class="s1">'u1'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Ann'</span><span class="p">);</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">tag</span><span class="p">(</span><span class="s1">'users'</span><span class="p">).</span><span class="n">flush</span><span class="p">();</span><span class="w"> </span><span class="c1">// removes only the items of this tag</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">tag</span><span class="p">(</span><span class="s1">'users'</span><span class="p">).</span><span class="n">put</span><span class="p">(</span><span class="s1">'u1'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Ann'</span><span class="p">);</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">tag</span><span class="p">(</span><span class="s1">'users'</span><span class="p">).</span><span class="n">flush</span><span class="p">();</span><span class="w"> </span><span class="c1">// removes only the items of this tag</span>
 </span></code></pre></div>
 <p><code>tags(['a', 'b'])</code> uses many tags.</p>
 <h3 id="locks">Locks</h3>
 <p>A lock makes sure only one request (or one server) runs some code at a time.
-The <code>memory</code> and <code>redis</code> stores support locks. Use <code>redis</code> when many isolates must share the lock.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">CacheLock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">store</span><span class="p">(</span><span class="s1">'redis'</span><span class="p">).</span><span class="n">lock</span><span class="p">(</span><span class="s1">'report'</span><span class="p">,</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">30</span><span class="p">));</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="kd">await</span><span class="w"> </span><span class="n">lock</span><span class="p">.</span><span class="kd">get</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">buildReport</span><span class="p">();</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">lock</span><span class="p">.</span><span class="n">release</span><span class="p">();</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="p">}</span>
+The <code>memory</code>, <code>file</code> and <code>redis</code> stores support locks. The <code>memory</code> lock works inside one isolate only. The <code>file</code> lock works for all isolates on one machine. Use <code>redis</code> when many servers must share the lock.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">CacheLock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">store</span><span class="p">(</span><span class="s1">'redis'</span><span class="p">).</span><span class="n">lock</span><span class="p">(</span><span class="s1">'report'</span><span class="p">,</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">30</span><span class="p">));</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="kd">await</span><span class="w"> </span><span class="n">lock</span><span class="p">.</span><span class="kd">get</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">buildReport</span><span class="p">();</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">lock</span><span class="p">.</span><span class="n">release</span><span class="p">();</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="p">}</span>
 </span></code></pre></div>
 <ul>
 <li><code>get()</code> tries once. It is <code>true</code> when you got the lock.</li>
 <li><code>block(Duration(seconds: 5))</code> tries again and again until the time is over.</li>
 <li>The lock is freed after its <code>ttl</code>, even if you never call <code>release()</code>.</li>
+<li><code>block(timeout, callback)</code> runs the callback while it holds the lock, then frees it.</li>
+<li><code>forceRelease()</code> frees the lock, whoever holds it.</li>
 </ul>
 <h3 id="more-methods">More methods</h3>
 <table>
@@ -6630,11 +6733,15 @@ The <code>memory</code> and <code>redis</code> stores support locks. Use <code>r
 </tr>
 <tr>
 <td><code>pull(key)</code></td>
-<td>get the value and remove it</td>
+<td>get the value and remove it, in one step</td>
 </tr>
 <tr>
 <td><code>increment(key, [by])</code> / <code>decrement(key, [by])</code></td>
 <td>change an integer. A missing key starts at 0</td>
+</tr>
+<tr>
+<td><code>touch(key, duration:)</code></td>
+<td>give a key a new expiry. <code>false</code> when it is missing</td>
 </tr>
 <tr>
 <td><code>repository</code></td>

@@ -4231,6 +4231,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -4311,6 +4315,50 @@
     
   
     Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/authorization/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-shield-check"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+  <path d="m9 12 2 2 4-4" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Authorization
   
 
     
@@ -4587,6 +4635,50 @@
     
   
     Security headers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/signed-urls/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-link"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Signed URLs
   
 
     
@@ -6844,9 +6936,12 @@ Then raise the version constraint in the Dox packages that use it.</p>
 </ul>
 <h3 id="deploy">Deploy</h3>
 <ul>
-<li>3.x deploys by itself. The <code>Docs</code> workflow (<code>.github/workflows/docs.yaml</code>) runs on every push
-  to <code>main</code> that changes <code>docs/</code>, <code>hooks/</code>, <code>overrides/</code>, a package <code>CHANGELOG.md</code>, <code>mkdocs.yml</code>, <code>requirements-docs.txt</code> or the workflow.
+<li>3.x deploys with each release. The <code>Docs</code> workflow (<code>.github/workflows/docs.yaml</code>) runs on a
+  <code>v&lt;version&gt;</code> tag, the same tag that publishes the packages. So docs for a feature that is not released yet stay off the site.
   It runs <code>mike deploy --update-aliases 3.x latest</code>.</li>
+<li>To deploy the docs only (a typo fix, or the docs of a package from another repo that was just released),
+  push a <code>docs-v&lt;version&gt;</code> tag on <code>main</code>, like <code>git tag docs-v3.0.1-1 &amp;&amp; git push origin docs-v3.0.1-1</code>.
+  It publishes no package and runs no tests.</li>
 <li>After each deploy, the workflow writes small redirect pages for the old root links,
   the root <code>index.html</code>, a <code>404.html</code> and the <code>CNAME</code> file. So <code>dartondox.dev</code> and old links keep working.</li>
 <li>The workflow pushes with the built-in <code>GITHUB_TOKEN</code>. This works because <code>gh-pages</code> is not a protected branch.</li>

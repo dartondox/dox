@@ -3948,6 +3948,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -4028,6 +4032,50 @@
     
   
     Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/authorization/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-shield-check"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+  <path d="m9 12 2 2 4-4" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Authorization
   
 
     
@@ -4304,6 +4352,50 @@
     
   
     Security headers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/signed-urls/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-link"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Signed URLs
   
 
     
@@ -6818,7 +6910,37 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 </span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>See <a href="../../the-basic/middleware/">Middleware</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Middleware</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>const RequestId()</code></td>
+<td><code>X-Request-Id</code> header, <code>req.requestId</code></td>
+</tr>
+<tr>
+<td><code>const ETag()</code></td>
+<td><code>ETag</code> header, <code>304</code> when <code>If-None-Match</code> matches</td>
+</tr>
+<tr>
+<td><code>RequestTimeout(Duration(seconds: 30))</code> or <code>Route.get(...).timeout(...)</code></td>
+<td><code>503</code> when the route is too slow</td>
+</tr>
+<tr>
+<td><code>const ValidateSignature()</code></td>
+<td><code>403</code> unless the url is from <code>Route.signedUrl(...)</code></td>
+</tr>
+<tr>
+<td><code>implements IDoxTerminableMiddleware</code></td>
+<td><code>terminate(req, res)</code> runs after the answer is sent</td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="../../the-basic/middleware/">Middleware</a> and <a href="../../security/signed-urls/">Signed URLs</a>.</p>
 <h2 id="request">Request</h2>
 <table>
 <thead>

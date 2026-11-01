@@ -3954,6 +3954,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -4034,6 +4038,50 @@
     
   
     Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/authorization/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-shield-check"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+  <path d="m9 12 2 2 4-4" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Authorization
   
 
     
@@ -4310,6 +4358,50 @@
     
   
     Security headers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/signed-urls/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-link"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Signed URLs
   
 
     
@@ -6430,9 +6522,9 @@ Run the generator after you make or change a model:</p>
 <li>Marks the class as a model. The options, like <code>table</code> and <code>softDelete</code>, go here.
     The table is <code>blog</code> by default: the class name in snake_case.</li>
 <li>The generated class gives the model <code>id</code>, <code>createdAt</code> and <code>updatedAt</code>, and the query builder methods.</li>
-<li>One <code>@Column()</code> field is one table column. The column name is the field name in snake_case.</li>
+<li>One <code>@Column()</code> field is one table column. The column name is the field name in snake_case. Digits stay as they are: <code>address2</code> is <code>address2</code>.</li>
 <li><code>beforeSave</code> runs this static function before a save. It gets all values and returns the value for this column.</li>
-<li><code>name</code> sets the column name when it is not the snake_case of the field. <code>description</code> reads and writes <code>body</code>.</li>
+<li><code>name</code> sets the column name when it is not the snake_case of the field. <code>description</code> reads and writes <code>body</code>. The name is used exactly as written: <code>name: 'userID'</code> is <code>userID</code>.</li>
 </ol>
 <p>Make every column field nullable (<code>String?</code>, <code>int?</code>). A new model has no values yet.</p>
 <h2 id="model-options">Model options</h2>
@@ -6771,7 +6863,7 @@ Add <code>@Computed()</code> to the getter, then run <code>dart run build_runner
 </span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="c1">// {id: 1, first_name: John, last_name: Wick, ..., full_name: John Wick, initials: JW}</span>
 </span></code></pre></div>
 <ul>
-<li>The default key is the getter name in snake_case (<code>fullName</code> becomes <code>full_name</code>).</li>
+<li>The default key is the getter name in snake_case (<code>fullName</code> becomes <code>full_name</code>). A <code>name:</code> is used exactly as written.</li>
 <li>A computed value is <strong>never a column</strong>. It is not read from the database,
   and it is not sent in <code>INSERT</code> or <code>UPDATE</code>.</li>
 <li><code>hidden</code> also hides computed values. Use the json key, for example <code>['full_name']</code>.</li>
