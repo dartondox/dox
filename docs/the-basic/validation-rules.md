@@ -150,6 +150,7 @@ For `RequestFile` and `List<RequestFile>` fields.
   Give at least one limit, or the build stops.
   It reads only the image header of PNG, GIF, WebP and JPEG files, never the whole file.
   Any other file, or a broken or cut short header, fails.
+  For a JPEG over 1 MB, Dox reads the first 128 KB. A JPEG with more photo metadata than that before its size fails.
   Like Laravel, a `ratio` passes when it is off by less than one pixel.
 - The JSON Schema of a file is `{"type": "string", "format": "binary"}`, plus the keys above.
 
