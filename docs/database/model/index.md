@@ -57,9 +57,9 @@ class Blog extends BlogGenerator { // (3)!
 2.  Marks the class as a model. The options, like `table` and `softDelete`, go here.
     The table is `blog` by default: the class name in snake_case.
 3.  The generated class gives the model `id`, `createdAt` and `updatedAt`, and the query builder methods.
-4.  One `@Column()` field is one table column. The column name is the field name in snake_case.
+4.  One `@Column()` field is one table column. The column name is the field name in snake_case. Digits stay as they are: `address2` is `address2`.
 5.  `beforeSave` runs this static function before a save. It gets all values and returns the value for this column.
-6.  `name` sets the column name when it is not the snake_case of the field. `description` reads and writes `body`.
+6.  `name` sets the column name when it is not the snake_case of the field. `description` reads and writes `body`. The name is used exactly as written: `name: 'userID'` is `userID`.
 
 Make every column field nullable (`String?`, `int?`). A new model has no values yet.
 
@@ -400,7 +400,7 @@ print(user?.toJson());
 // {id: 1, first_name: John, last_name: Wick, ..., full_name: John Wick, initials: JW}
 ```
 
-- The default key is the getter name in snake_case (`fullName` becomes `full_name`).
+- The default key is the getter name in snake_case (`fullName` becomes `full_name`). A `name:` is used exactly as written.
 - A computed value is **never a column**. It is not read from the database,
   and it is not sent in `INSERT` or `UPDATE`.
 - `hidden` also hides computed values. Use the json key, for example `['full_name']`.

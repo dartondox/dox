@@ -2,6 +2,7 @@ import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:dox_builder/src/util.dart';
 
 /// model hook methods, see Model.onSaving() in dox_orm
 const List<String> _hookNames = <String>[
@@ -40,14 +41,19 @@ class ModelVisitor {
   bool hasHooks = false;
 
   /// field name => source of the `cast:` argument of its @Column.
-  /// the builder reads it from the source file before visitClass().
+  /// the builder reads it from the AST of each field before visitClass().
   Map<String, String> castSources = {};
+
+  /// the library of the model. Types are written with its import
+  /// prefixes, like `o.Role`.
+  LibraryElement? library;
 
   /// static methods with @Scope: name => (global, method)
   Map<String, (bool, MethodElement)> scopes = {};
 
   void visitClass(ClassElement element) {
     className = element.displayName;
+    library = element.library;
     hasHooks = element.methods.any(
       (MethodElement m) => !m.isStatic && _hookNames.contains(m.displayName),
     );
@@ -77,7 +83,8 @@ class ModelVisitor {
         .computeConstantValue()
         ?.getField('name')
         ?.toStringValue();
-    computed[name] = key ?? name;
+    // a name given in the code is used as it is
+    computed[name] = key ?? toSnakeCase(name);
   }
 
   void _visitMethod(MethodElement element) {
@@ -99,7 +106,8 @@ class ModelVisitor {
     if (type.isDartCoreBool) return 'BoolCast()';
     Element? typeElement = type.element;
     if (typeElement is EnumElement) {
-      return 'EnumCast(${typeElement.displayName}.values)';
+      return 'EnumCast(${prefixOf(typeElement, library)}'
+          '${typeElement.displayName}.values)';
     }
     return null;
   }
@@ -113,15 +121,13 @@ class ModelVisitor {
     );
     if (relationMeta != null) {
       DartObject? object = relationMeta.computeConstantValue();
-      String? model = object
-          ?.getField('model')
-          ?.toTypeValue()
-          ?.getDisplayString();
+      DartType? modelType = object?.getField('model')?.toTypeValue();
+      String? model = modelType == null ? null : typeCode(modelType, library);
 
       relations[name] = {
         'relationType': _annotationName(relationMeta),
         'model': model?.replaceFirst('?', ''),
-        'dataType': element.type.getDisplayString(),
+        'dataType': typeCode(element.type, library),
         'localKey': object?.getField('localKey')?.toStringValue(),
         'foreignKey': object?.getField('foreignKey')?.toStringValue(),
         'onQuery': _functionName(object, 'onQuery'),
@@ -141,8 +147,10 @@ class ModelVisitor {
     if (columnMeta != null) {
       DartObject? object = columnMeta.computeConstantValue();
       columns[name] = {
-        'type': element.type.getDisplayString(),
-        'jsonKey': object?.getField('name')?.toStringValue() ?? name,
+        'type': typeCode(element.type, library),
+        // a name given in the code is used as it is, else snake_case
+        'jsonKey':
+            object?.getField('name')?.toStringValue() ?? toSnakeCase(name),
         'beforeSave': _functionName(object, 'beforeSave'),
         'beforeGet': _functionName(object, 'beforeGet'),
         'cast': _castOf(element),

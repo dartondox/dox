@@ -1,9 +1,10 @@
-import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 import 'package:dox_annotation/dox_annotation.dart';
 import 'package:dox_builder/src/model_visitor.dart';
+import 'package:dox_builder/src/openapi/dart_literal.dart';
 import 'package:dox_builder/src/util.dart';
 import 'package:source_gen/source_gen.dart';
 
@@ -17,16 +18,21 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     String? tableName = annotation.objectValue
         .getField('table')
         ?.toStringValue();
+    if (element is! ClassElement) {
+      throw InvalidGenerationSourceError(
+        '@DoxModel can only be used on a class.',
+        element: element,
+      );
+    }
     String primaryKeySnakeCase =
         annotation.objectValue.getField('primaryKey')?.toStringValue() ?? 'id';
     String primaryKey = toCamelCase(primaryKeySnakeCase);
-    String primaryKeyType =
-        annotation.objectValue
-            .getField('primaryKeyType')
-            ?.toTypeValue()
-            ?.getDisplayString()
-            .replaceFirst('?', '') ??
-        'int';
+    DartType? keyType = annotation.objectValue
+        .getField('primaryKeyType')
+        ?.toTypeValue();
+    String primaryKeyType = keyType == null
+        ? 'int'
+        : typeCode(keyType, element.library).replaceFirst('?', '');
     String? createdAt = annotation.objectValue
         .getField('createdAt')
         ?.toStringValue();
@@ -51,16 +57,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       },
     });
 
-    if (element is! ClassElement) {
-      throw InvalidGenerationSourceError(
-        '@DoxModel can only be used on a class.',
-        element: element,
-      );
-    }
-    visitor.castSources = _castSources(
-      await buildStep.readAsString(buildStep.inputId),
-      element.displayName,
-    );
+    visitor.castSources = await _castSources(element, buildStep.resolver);
     visitor.visitClass(element);
 
     if (createdAt != null) {
@@ -84,8 +81,8 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       });
     }
     String className = visitor.className;
-    String createdColumn = createdAt != null ? "'$createdAt'" : 'null';
-    String updatedColumn = updatedAt != null ? "'$updatedAt'" : 'null';
+    String createdColumn = createdAt != null ? _str(createdAt) : 'null';
+    String updatedColumn = updatedAt != null ? _str(updatedAt) : 'null';
 
     var r = _getRelationsCode(visitor);
     var map = _getCodeForToMap(visitor);
@@ -99,7 +96,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
 
     class ${className}Generator extends Model<$className> $softDeleteString {
       @override
-      String get primaryKey => '$primaryKeySnakeCase';
+      String get primaryKey => ${_str(primaryKeySnakeCase)};
 
       @override
       Map<String, dynamic> get timestampsColumn => const <String, dynamic>{
@@ -168,28 +165,27 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     """;
   }
 
+  /// [text] as a Dart string literal, with `\`, `'` and `$` escaped
+  String _str(String text) => const DartLiteral().string(text);
+
   /// field name => source of the `cast:` argument of its @Column, read
-  /// from the source, so the generated code can make the same cast
-  Map<String, String> _castSources(String source, String className) {
+  /// from the AST of the field, so the generated code can make the same
+  /// cast. This also works for a model in a `part` file.
+  Future<Map<String, String>> _castSources(
+    ClassElement element,
+    Resolver resolver,
+  ) async {
     Map<String, String> casts = {};
-    CompilationUnit unit = parseString(
-      content: source,
-      throwIfDiagnostics: false,
-    ).unit;
-    for (CompilationUnitMember c in unit.declarations) {
-      if (c is! ClassDeclaration || c.namePart.typeName.lexeme != className) {
-        continue;
-      }
-      for (ClassMember member in c.body.members) {
-        if (member is! FieldDeclaration) continue;
-        for (Annotation a in member.metadata) {
-          if (a.name.name != 'Column') continue;
-          for (Argument arg in a.arguments?.arguments ?? <Argument>[]) {
-            if (arg is NamedArgument && arg.name.lexeme == 'cast') {
-              for (VariableDeclaration v in member.fields.variables) {
-                casts[v.name.lexeme] = arg.argumentExpression.toSource();
-              }
-            }
+    for (FieldElement field in element.fields) {
+      if (!field.isOriginDeclaration || field.isStatic) continue;
+      AstNode? node = await resolver.astNodeFor(field.firstFragment);
+      FieldDeclaration? member = node?.thisOrAncestorOfType<FieldDeclaration>();
+      if (member == null) continue;
+      for (Annotation a in member.metadata) {
+        if (a.name.name != 'Column') continue;
+        for (Argument arg in a.arguments?.arguments ?? <Argument>[]) {
+          if (arg is NamedArgument && arg.name.lexeme == 'cast') {
+            casts[field.displayName] = arg.argumentExpression.toSource();
           }
         }
       }
@@ -234,7 +230,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       List<String> named = [];
       List<String> args = ['this'];
       for (FormalParameterElement p in method.formalParameters.skip(1)) {
-        String type = p.type.getDisplayString();
+        String type = typeCode(p.type, method.library);
         String pName = p.displayName;
         String value = p.defaultValueCode != null
             ? ' = ${p.defaultValueCode}'
@@ -257,7 +253,8 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         if (named.isNotEmpty) '{${named.join(', ')}}',
       ];
       content +=
-          '${method.returnType.getDisplayString()} $name(${params.join(', ')})'
+          '${typeCode(method.returnType, method.library)} '
+          '$name(${params.join(', ')})'
           ' => $className.$name(${args.join(', ')});\n';
     });
     if (content.isEmpty) return '';
@@ -281,7 +278,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     String className = visitor.className;
     String content = '';
     visitor.computed.forEach((getter, jsonKey) {
-      content += "map['${toSnakeCase(jsonKey)}'] = instance.$getter;\n";
+      content += "map[${_str(jsonKey)}] = instance.$getter;\n";
     });
     return """
       $hooks
@@ -346,14 +343,14 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
   }
 
   String _getParamKeyValue(Map<String, dynamic> value, String key) {
-    return value[key] != null ? ", $key: '${value[key]}'" : '';
+    return value[key] != null ? ', $key: ${_str(value[key])}' : '';
   }
 
   String _getTableNameSetter(String? tableName) {
     return tableName != null
         ? """
       @override
-      String get tableName => '$tableName';
+      String get tableName => ${_str(tableName)};
     """
         : '';
   }
@@ -371,7 +368,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     String className = visitor.className;
 
     visitor.columns.forEach((filedName, values) {
-      String jsonKey = toSnakeCase(values['jsonKey']);
+      String key = _str(values['jsonKey']);
       String? beforeGet = values['beforeGet'];
       String setValue = '';
 
@@ -379,15 +376,15 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         setValue = "$className.$beforeGet(m)";
       } else if (values['cast'] != null) {
         String as = values['nullable'] == false ? " as ${values['type']}" : '';
-        setValue = "_${filedName}Cast.get(m['$jsonKey'])$as";
+        setValue = "_${filedName}Cast.get(m[$key])$as";
       } else if (values['type'] == 'DateTime?') {
         setValue =
-            """m['$jsonKey'] is DateTime?
-              ? m['$jsonKey'] as DateTime?
-              : DateTime.parse(m['$jsonKey'] as String)
+            """m[$key] is DateTime?
+              ? m[$key] as DateTime?
+              : DateTime.parse(m[$key] as String)
           """;
       } else {
-        setValue = "m['$jsonKey'] as ${values['type']}";
+        setValue = "m[$key] as ${values['type']}";
       }
       content += "..$filedName = $setValue\n";
     });
@@ -401,10 +398,10 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     String className = visitor.className;
     String content = '';
     visitor.columns.forEach((fieldName, values) {
-      String jsonKey = toSnakeCase(values['jsonKey']);
+      String key = _str(values['jsonKey']);
       content +=
           """
-        case '$jsonKey':
+        case $key:
           if (value is! ${values['type']}) return false;
           instance.$fieldName = value;
           return true;
@@ -430,7 +427,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     String className = visitor.className;
     visitor.columns.forEach((filedName, values) {
       String? beforeSave = values['beforeSave'];
-      String jsonKey = toSnakeCase(values['jsonKey']);
+      String key = _str(values['jsonKey']);
       String setValue = '';
 
       if (values['cast'] != null && values['beforeGet'] == null) {
@@ -442,10 +439,10 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       }
 
       if (beforeSave != null) {
-        parseContent += "map['$jsonKey'] = $className.$beforeSave(map);\n";
+        parseContent += "map[$key] = $className.$beforeSave(map);\n";
       }
-      jsonMapper += "'$jsonKey' : $setValue,\n";
-      tableColumns.add("'$jsonKey'");
+      jsonMapper += "$key : $setValue,\n";
+      tableColumns.add(key);
     });
 
     String toMapRelation = "\nList<String> preload = getPreload();\n";
@@ -454,13 +451,13 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     visitor.relations.forEach((key, value) {
       if (value['eager'] == true) {
         relationContent +=
-            "map['${toSnakeCase(key)}'] = toMap(instance.$key);\n";
+            "map[${_str(toSnakeCase(key))}] = toMap(instance.$key);\n";
       } else {
         preloadRelations.add(key);
         toMapRelation +=
             """
-        if (preload.contains('$key')) {
-          map['${toSnakeCase(key)}'] = toMap(instance.$key);
+        if (preload.contains(${_str(key)})) {
+          map[${_str(toSnakeCase(key))}] = toMap(instance.$key);
         }
         """;
       }

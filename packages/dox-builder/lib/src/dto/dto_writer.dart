@@ -52,7 +52,7 @@ class DtoWriter {
   String get _class => '_\$${dto.name}Dto';
 
   String _ref(DtoType type) {
-    return '\$${type.name}Dto';
+    return '${type.prefix}\$${type.name}Dto';
   }
 
   /// The whole generated code of [dto].

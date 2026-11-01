@@ -1,3 +1,31 @@
+## Unreleased
+
+- **Breaking: column and JSON keys can change.** Please read this before you update.
+  - Digits are no longer split off. Before, `address2` gave the key `address_2`. Now it gives `address2`.
+  - A name you give is used exactly as written. Before, `@Column(name: 'userID')` gave `user_i_d`. Now it gives `userID`. The same is true for `@Computed(name:)`, and for `primaryKey`, `createdAt` and `updatedAt` in `@DoxModel`.
+  - DTO input keys change the same way: a field `line2` now reads the key `line2`, not `line_2`.
+  - What to do: run `build_runner` and look for changed keys in the generated files. Then rename the column in a migration. Or keep the old key with `@Column(name: 'address_2')` (or `@Name('line_2')` on a DTO field).
+- Fix: types from an import with a prefix (`import 'other.dart' as o;`) keep the prefix in the generated code, like `o.Role`, `List<o.Role>`, `EnumCast(o.Role.values)` and `o.$InnerDto`. Before, the code did not compile. This works in models, DTOs, env classes and scopes.
+- Fix: `@Column(cast: ...)` now works for a model in a `part` file. The cast is read from the AST of the field.
+- Fix: table names, column keys and relation keys are escaped in the generated code (`\`, `'` and `$`).
+- Fix: a private class (like `_AdminRouter` or `@Inject() class _Cache`) is no longer put in `container.g.dart`, where it did not compile. The build shows a warning with the class and file.
+- Fix: container errors now show the file and line of the problem.
+- New: a constructor parameter of an abstract type gets the one container class that implements it. When two or more classes implement it, the build stops and names them.
+- Fix: the OpenAPI builder reads the files in path order, so `openapi.g.dart` does not change between builds.
+- Fix: the OpenAPI builder finds routes with a prefixed dox_core import, like `dox.Route.get(...)`. Only the `Route` class of dox_core counts.
+- Fix: the OpenAPI builder stops with a clear error when two controllers, two `@Security` classes or two schema classes have the same name in two files. Before, one silently replaced the other. Dox finds them by name at runtime, so a new name would not match. Rename one of them.
+- Fix: OpenAPI annotations count only when they come from a Dox package (`package:dox_...`). An app class with the same name, like `Summary`, is no longer read as one.
+- Faster builds: the container, DTO list and OpenAPI builders skip `.g.dart` files. They also look at the text of a file first, and only resolve it when it can hold what they look for.
+- Change: the model, DTO and env builder runs on `lib/` only by default. Before, it also ran on `test/`, `bin/` and `tool/`. A package with models or DTOs in `test/` adds this to its `build.yaml`:
+
+    ```yaml
+    targets:
+      $default:
+        builders:
+          dox_builder:
+            generate_for: ["lib/**", "test/**"]
+    ```
+
 ## 3.0.1
 
 - Version bump only, to match the other packages.

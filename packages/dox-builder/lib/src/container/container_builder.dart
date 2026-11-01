@@ -5,8 +5,10 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:glob/glob.dart';
+import 'package:source_gen/source_gen.dart';
 
 import '../openapi/annotation_reader.dart';
+import '../util.dart';
 
 /// How a class goes into the container.
 enum EntryKind { inject, router, provider }
@@ -67,7 +69,9 @@ class ModelEntry {
 /// - classes that extend `DoxProvider` (their `setup()` runs at start),
 /// - classes with `@DoxModel()` (route model binding).
 ///
-/// Constructor parameters come from the container, by type. The build
+/// Constructor parameters come from the container, by type. A parameter
+/// of an abstract type gets the one container class that implements it.
+/// The build
 /// stops with a clear message for a parameter the container can not
 /// give, and for a dependency cycle.
 ///
@@ -96,7 +100,10 @@ class DoxContainerBuilder implements Builder {
         .toList();
     ids.sort(_byPath);
     for (AssetId id in ids) {
-      if (id.path == output || id.path.endsWith('.g.dart')) continue;
+      if (isGenerated(id)) continue;
+      // resolving is slow: first a quick look at the text
+      String text = await buildStep.readAsString(id);
+      if (!mayHave(text, _words)) continue;
       if (!await resolver.isLibrary(id)) continue;
       LibraryElement library = await resolver.libraryFor(id);
       String uri = id.uri.toString();
@@ -123,6 +130,15 @@ class DoxContainerBuilder implements Builder {
     );
   }
 
+  /// a library with none of these words has no container class
+  static const List<String> _words = <String>[
+    'inject',
+    'extends',
+    'implements',
+    'with',
+    'doxmodel',
+  ];
+
   ContainerEntry? _entry(ClassElement element, String library) {
     DartObject? inject = _annotations.first(element, 'Inject');
     bool router = _isA(element, 'Router');
@@ -131,16 +147,22 @@ class DoxContainerBuilder implements Builder {
       return null;
     }
     String name = element.displayName;
+    if (element.isPrivate) {
+      _warnPrivate(element, library);
+      return null;
+    }
     if (element.isAbstract) {
-      throw StateError(
+      throw InvalidGenerationSourceError(
         '@Inject() on $name ($library): an abstract class can not be made. '
         'Put @Inject() on a class that implements it.',
+        element: element,
       );
     }
     if (element.typeParameters.isNotEmpty) {
-      throw StateError(
+      throw InvalidGenerationSourceError(
         '@Inject() on $name ($library): a generic class can not be in the '
         'container. Make a class without type parameters.',
+        element: element,
       );
     }
     EntryKind kind = router
@@ -157,9 +179,21 @@ class DoxContainerBuilder implements Builder {
   ModelEntry? _model(ClassElement element, String library) {
     DartObject? model = _annotations.first(element, 'DoxModel');
     if (model == null || element.isAbstract) return null;
+    if (element.isPrivate) {
+      _warnPrivate(element, library);
+      return null;
+    }
     DartType? key = model.getField('primaryKeyType')?.toTypeValue();
     String keyType = key is InterfaceType ? key.element.displayName : 'int';
     return ModelEntry(element, library, keyType);
+  }
+
+  /// container.g.dart is another library: it can not see a private class
+  void _warnPrivate(ClassElement element, String library) {
+    log.warning(
+      '${element.displayName} ($library) is private, so it is not put in '
+      'the container. Remove the `_` from its name to add it.',
+    );
   }
 
   /// true when [element] extends or implements the dox_core class [name]
@@ -177,14 +211,15 @@ class DoxContainerBuilder implements Builder {
   void _readConstructor(ContainerEntry entry, List<ContainerEntry> all) {
     ConstructorElement? constructor = entry.element.unnamedConstructor;
     if (constructor == null) {
-      throw StateError(
+      throw InvalidGenerationSourceError(
         '${entry.name} (${entry.library}) needs an unnamed constructor to be '
         'in the container.',
+        element: entry.element,
       );
     }
     for (FormalParameterElement param in constructor.formalParameters) {
       DartType type = param.type;
-      ContainerEntry? need = _find(type, all);
+      ContainerEntry? need = _find(type, all, entry, param);
       String label = param.isNamed ? '${param.displayName}: ' : '';
       if (need != null) {
         entry.needs.add(need);
@@ -197,21 +232,50 @@ class DoxContainerBuilder implements Builder {
         entry.args.add(ContainerArg(label, null));
         continue;
       }
-      throw StateError(
+      throw InvalidGenerationSourceError(
         '${entry.name} (${entry.library}) needs a '
         '${type.getDisplayString()} for its parameter "${param.displayName}", '
         'but no class of that type is in the container. Add @Inject() above '
         'that class, or make the parameter optional or nullable.',
+        element: param,
       );
     }
   }
 
-  ContainerEntry? _find(DartType type, List<ContainerEntry> all) {
+  /// the entry of [type]: the class itself, or for an abstract class the
+  /// one entry that implements it
+  ContainerEntry? _find(
+    DartType type,
+    List<ContainerEntry> all,
+    ContainerEntry owner,
+    FormalParameterElement param,
+  ) {
     if (type is! InterfaceType || type.typeArguments.isNotEmpty) return null;
+    InterfaceElement wanted = type.element;
     for (ContainerEntry entry in all) {
-      if (entry.element == type.element) return entry;
+      if (entry.element == wanted) return entry;
     }
-    return null;
+    if (wanted is! ClassElement || !wanted.isAbstract) return null;
+    List<ContainerEntry> found = <ContainerEntry>[
+      for (ContainerEntry entry in all)
+        if (entry.element.allSupertypes.any(
+          (InterfaceType t) => t.element == wanted,
+        ))
+          entry,
+    ];
+    if (found.length > 1) {
+      String names = <String>[
+        for (ContainerEntry e in found) '${e.name} (${e.library})',
+      ].join(' and ');
+      throw InvalidGenerationSourceError(
+        '${owner.name} (${owner.library}) needs a ${wanted.displayName} for '
+        'its parameter "${param.displayName}", and more than one class in '
+        'the container implements it: $names. Change the parameter to one '
+        'of these classes.',
+        element: param,
+      );
+    }
+    return found.isEmpty ? null : found.first;
   }
 
   /// stop the build when a class needs itself, through other classes
@@ -234,9 +298,10 @@ class DoxContainerBuilder implements Builder {
         for (ContainerEntry e in path.sublist(start)) e.name,
         entry.name,
       ].join(' -> ');
-      throw StateError(
+      throw InvalidGenerationSourceError(
         'Dependency cycle in the container: $chain. A class can not need '
         'itself. Move the shared code into a new class that both use.',
+        element: entry.element,
       );
     }
     path.add(entry);

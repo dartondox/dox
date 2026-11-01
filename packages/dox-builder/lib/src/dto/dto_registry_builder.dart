@@ -3,6 +3,7 @@ import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:glob/glob.dart';
 
+import '../util.dart';
 import 'dto_model.dart';
 
 /// Writes `lib/generated/dtos.g.dart`: one list of every `@Dto` in `lib/`.
@@ -42,7 +43,11 @@ class DoxDtoRegistryBuilder implements Builder {
         .toList();
     ids.sort(_byPath);
     for (AssetId id in ids) {
-      if (id.path == output || id.path.endsWith('.g.dart')) continue;
+      if (isGenerated(id)) continue;
+      // resolving is slow: first a quick look at the text. `dto` finds
+      // `@Dto`, `appconfig` finds the app config for the import.
+      String text = await buildStep.readAsString(id);
+      if (!mayHave(text, const <String>['dto', 'appconfig'])) continue;
       if (!await resolver.isLibrary(id)) continue;
       LibraryElement library = await resolver.libraryFor(id);
       appImport ??= _schemaImport(library, alsoExports: 'AppConfig');
