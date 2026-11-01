@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.2
 
 - Fix: `remember` and `rememberForever` threw on a cache hit when `T` was not a raw JSON type, like `List<String>`. Pass the new `decode` option to turn the cached JSON into `T`. Without it, `T` must be a raw JSON type.
 - Fix: `remember` runs `compute` once when many calls for the same key run at the same time in one isolate. The others wait for the first. With the new `lock: true`, callers in other isolates and servers wait too.

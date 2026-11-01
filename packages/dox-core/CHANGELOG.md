@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.2
 
 - Change: a Redis cache store with no `prefix` gets `<app name>_cache:` from `APP_NAME` (like `my_shop_cache:`), so two apps on one Redis do not share keys or flush each other's cache. Existing Redis cache keys are not found once after the update. Rate limit counters, cache locks and `cache` driver sessions start fresh, so users with a `cache` driver session log in again. Set `'prefix': 'dox_cache:'` on the store to keep the old keys.
 - New: the `Cache()` facade has `flexible` and `touch`, and `remember` / `rememberForever` take `decode` and `lock`.

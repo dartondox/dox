@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.2
 
 - **Breaking: column and JSON keys can change.** Please read this before you update.
   - Digits are no longer split off. Before, `address2` gave the key `address_2`. Now it gives `address2`.
