@@ -13,7 +13,8 @@ How to install the CLI is on the [Dox CLI](../digging-deeper/dox-cli.md) page.
 Rules that apply to every command:
 
 - `dox` with no command prints `Could not find a command. Run `dox help` for more information.`
-- An unknown command prints `Could not find a command named "<name>". Run `dox help` for more information.`
+- An unknown command prints `Could not find a command named "<name>". Run `dox help` for more information.`, and a hint about the `dox: commands:` key.
+- A command that is not built in can come from a package or from the app. See [Package commands](../digging-deeper/package-commands.md).
 - Too few or too many arguments prints `Invalid number of arguments for command "<name>".` with the expected count.
 - A name you pass is turned into `snake_case` for the file and `PascalCase` for the class. `BlogPost` and `blog_post` give the same result.
 - Every `make:*` command also answers to its `create:*` name, like `create:model`. `dox help <command>` shows the aliases.
@@ -358,6 +359,7 @@ When `bin/queue.dart` is missing, the command prints how to set it up and exits 
 | `dox queue:retry <id\|all>` | `bin/queue.dart retry <id\|all>` | Put one failed job, or all of them, back on the queue. |
 | `dox queue:forget <id>` | `bin/queue.dart forget <id>` | Delete one failed job. |
 | `dox queue:flush` | `bin/queue.dart flush` | Delete all failed jobs. |
+| `dox queue:table` | | A [package command](../digging-deeper/package-commands.md) of `dox_queue`. Make `db/migration/<time>_create_queue_tables.dart`, which calls `QueueTables.up` and `QueueTables.down`. When a `create_queue_tables` migration is already there, it prints so and exits with code 1. |
 
 Flags of `queue:work`, passed on as they are:
 
