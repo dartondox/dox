@@ -74,6 +74,48 @@ void main() {
     expect(res.statusCode, 400);
     client.close();
   });
+
+  test('Route.websocket rejects a socket from another site', () async {
+    Route.websocket('/ws-origin', (WebSocket socket, DoxRequest req) {
+      socket.listen(socket.add);
+    });
+    await startHttpServer(nativeConfig());
+    int port = Dox().server.httpServer.port;
+
+    // another site: 403, no socket
+    await expectLater(
+      WebSocket.connect(
+        'ws://127.0.0.1:$port/ws-origin',
+        headers: <String, String>{'origin': 'https://evil.example'},
+      ),
+      throwsA(isA<WebSocketException>()),
+    );
+
+    // the same host: allowed
+    WebSocket ws = await WebSocket.connect(
+      'ws://127.0.0.1:$port/ws-origin',
+      headers: <String, String>{'origin': 'http://127.0.0.1:$port'},
+    );
+    ws.add('hi');
+    expect(await ws.first, 'hi');
+    await ws.close();
+  });
+
+  test('Route.websocket allows a site in allowedOrigins', () async {
+    Route.websocket('/ws-origin-list', (WebSocket socket, DoxRequest req) {
+      socket.listen(socket.add);
+    }, allowedOrigins: <String>['https://app.example.com']);
+    await startHttpServer(nativeConfig());
+    int port = Dox().server.httpServer.port;
+
+    WebSocket ws = await WebSocket.connect(
+      'ws://127.0.0.1:$port/ws-origin-list',
+      headers: <String, String>{'origin': 'https://app.example.com'},
+    );
+    ws.add('hi');
+    expect(await ws.first, 'hi');
+    await ws.close();
+  });
 }
 
 DoxRequest addWho(DoxRequest req) {
