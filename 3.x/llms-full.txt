@@ -22364,6 +22364,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
+### 3.0.1
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0
 
 - The first stable release.
@@ -22451,6 +22455,10 @@ What changed in each package, newest first. This page is made from the
 - See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
 
 ## dox_builder
+
+### 3.0.1
+
+- Version bump only, to match the other packages.
 
 ### 3.0.0
 
@@ -22556,6 +22564,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### 3.0.1
+
+- Version bump only, to match the other packages.
+
 ### 3.0.0
 
 - The first stable release.
@@ -22649,7 +22661,7 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_core
 
-### Unreleased
+### 3.0.1
 
 - Perf: `AESEncryptor` (encrypted cookies, the cookie session, CSRF) now runs AES-GCM in Rust (`AesGcm` of dox_http_native 3.0.2), with the AES instructions of the CPU. One session cookie took about 116 µs to encrypt and 95 µs to decrypt, now about 1.7 µs and 0.9 µs. The output is the same, so cookies made before still open.
 - Removed the `pointycastle` dependency. HKDF now uses HMAC-SHA256 of `package:crypto` (from the Dart team). The keys are the same.
