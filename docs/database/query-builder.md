@@ -415,6 +415,10 @@ await Actor()
 // WHERE "id" IN (SELECT "actor_id" FROM "award" WHERE "year" = @dox_sub0_year_p0)
 ```
 
+- The sub query is built when it is added. A change to it after `whereIn` is not used.
+  This is the same for `joinSub`, `fromSub` and `union`.
+- MySQL and MariaDB do not allow `LIMIT` in an `IN (sub query)`.
+
 ### `whereNull` and `whereNotNull`
 
 ```dart
@@ -523,7 +527,9 @@ await Actor().whereDay('created_at', 15).get();
 - `whereTime` takes a `DateTime` or a `hh:mm:ss` string.
 - `whereYear`, `whereMonth` and `whereDay` take an `int`, a number string or a `DateTime`.
 - Each one has an `or` form, like `orWhereDate`.
-- The column is read as it is stored. On SQLite, Dox stores dates in UTC.
+- The column is read as it is stored. On SQLite and Postgres, Dox stores a `DateTime` in UTC.
+- A `DateTime` value is compared the same way `where` binds it:
+  in UTC on SQLite and Postgres, and as the wall clock on MySQL and MariaDB.
 
 | Database | `whereDate` | `whereYear` |
 | --- | --- | --- |
@@ -559,6 +565,10 @@ await Actor().whereJsonDoesntContain('tags', 'horror').get();
 !!! note
     On SQLite, the value must be a string, a number, a bool or a list of them.
     A map throws an `ArgumentError`.
+
+!!! note
+    `whereJsonDoesntContain` on a row that does not have the key is not the same on every database.
+    SQLite and MariaDB keep the row. Postgres and MySQL drop it. Laravel works the same way.
 
 ### `whereRaw` and `orWhereRaw`
 
@@ -838,8 +848,8 @@ await QueryBuilder.table('actor')
 - `orderBy`, `limit` and `offset` of the first query sort and cut the whole result.
   Use a plain column name in `orderBy`, not `table.column`.
 - The added query can have its own `orderBy` and `limit`.
-- `count()` and `paginate()` count the whole result.
-- `sum()`, `avg()`, `min()` and `max()` throw a `StateError`.
+- `count()`, `paginate()`, `sum()`, `avg()`, `min()` and `max()` use the whole result:
+  `SELECT SUM("age") as dox_aggregate FROM (...) as dox_union_aggregate`.
 
 ## Row locks
 
@@ -955,7 +965,7 @@ int added = await QueryBuilder.table('tag').insertOrIgnore(<Map<String, dynamic>
 ```
 
 - Every row must have the same keys. Otherwise it throws an `ArgumentError`.
-- On a model, keys that `fillable` and `guarded` do not allow are dropped.
+- On a model, keys that `fillable` and `guarded` do not allow are dropped. A model with no `fillable` throws, see [mass assignment](model/index.md#mass-assignment).
 - It fires no [model events](model/events.md).
 
 | Database | SQL | Also skips |
