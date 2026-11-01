@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.1
 
 - Perf: `AESEncryptor` (encrypted cookies, the cookie session, CSRF) now runs AES-GCM in Rust (`AesGcm` of dox_http_native 3.0.2), with the AES instructions of the CPU. One session cookie took about 116 µs to encrypt and 95 µs to decrypt, now about 1.7 µs and 0.9 µs. The output is the same, so cookies made before still open.
 - Removed the `pointycastle` dependency. HKDF now uses HMAC-SHA256 of `package:crypto` (from the Dart team). The keys are the same.
