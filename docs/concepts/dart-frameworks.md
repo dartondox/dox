@@ -73,4 +73,4 @@ To compare, run the same test on your own machine, with each server on the same 
 - **Your app is Flutter only, and you want the client made for you.** Serverpod generates a typed client for every endpoint. Dox does not generate a Dart client. It generates an OpenAPI document.
 - **You want a small tool with few parts.** Dart Frog is simpler. You add only what you need.
 - **You want to build your own stack.** Shelf gives you the base parts, and the Dart team publishes it.
-- **You need features Dox does not have yet**, like notifications, events and listeners, or policies. See [What Dox does not have yet](status-and-roadmap.md#what-dox-does-not-have-yet).
+- **You need features Dox does not have yet**, like events and listeners, or policies. See [What Dox does not have yet](status-and-roadmap.md#what-dox-does-not-have-yet).

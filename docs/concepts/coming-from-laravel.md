@@ -411,7 +411,6 @@ See [Testing](../digging-deeper/testing.md).
 Dox does not have these Laravel features yet:
 
 - events and listeners (model events are there)
-- notifications
 - password reset
 - policies and gates
 

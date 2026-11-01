@@ -208,6 +208,117 @@ String html = View.render('emails/welcome', <String, dynamic>{'name': 'Ann'});
 await Mail.send(Message(to: to, subject: 'Welcome', html: html));
 ```
 
+## Mailables
+
+A mailable is one kind of email in its own class, for example the welcome email. It keeps the address, the subject, the template and the data in one place. Override the getters you need:
+
+```dart
+class WelcomeMail extends Mailable {
+  WelcomeMail(this.user);
+
+  final User user;
+
+  @override
+  List<Address> get to => <Address>[Address(user.email, user.name)];
+
+  @override
+  String get subject => 'Welcome';
+
+  @override
+  String? get view => 'emails/welcome';
+
+  @override
+  Map<String, Object?> get data => <String, Object?>{'name': user.name};
+}
+```
+
+Then send it, or put it on the queue:
+
+```dart
+await WelcomeMail(user).send();
+await WelcomeMail(user).queue();
+await WelcomeMail(user).later(Duration(minutes: 10));
+```
+
+`queue()` and `later()` render the templates at once. The worker sends the finished email, so it needs no templates and no data. They take the same `queue` and `encrypt` options as `Mail.queue()`.
+
+| Getter | What it is |
+| --- | --- |
+| `to`, `cc`, `bcc`, `replyTo` | the addresses |
+| `from` | the sender. Null: the `from` of the mail config |
+| `subject` | the subject |
+| `html`, `text` | the body as text, when there is no template |
+| `view` | a [views](../the-basic/views.md) template for the HTML body |
+| `textView` | a dox_view template for the plain text body |
+| `markdown` | a dox_view template with Markdown, see below |
+| `data` | the variables of the templates |
+| `attachments` | the files |
+| `mailer` | the mailer name, eg. `ses`. Null: the default mailer |
+
+`toMessage()` gives the email as a `Message`. To set more, like headers or tags, override it:
+
+```dart
+@override
+Message toMessage() {
+  return super.toMessage().copyWith(tags: <String>['welcome']);
+}
+```
+
+`{{ }}` in a template escapes HTML. For the plain text body of `textView` and `markdown`, the escape is undone, so `Tom & Jerry` stays `Tom & Jerry`.
+
+### Markdown mail
+
+Write the email in Markdown. You get a simple HTML email with a layout, and a plain text part, from one template.
+
+`resources/views/emails/welcome.dox.html`:
+
+```markdown
+# Hi {{ name }}
+
+Thanks for joining. Here is what you can do next:
+
+- Fill in your profile
+- Invite your team
+
+<a href="{{ url }}" class="button">Open the app</a>
+```
+
+```dart
+@override
+String? get markdown => 'emails/welcome';
+```
+
+- The HTML body is the Markdown as HTML, inside a white card on a grey page.
+- `<a class="button">` shows as a button. In the text body it stays an `<a>` tag, so the link is still there.
+- The text body is the Markdown itself.
+
+To use your own look, override `layout()`. It gets the HTML of the Markdown and returns the full page. Put it in a base class to use it for all your mailables:
+
+```dart
+abstract class AppMail extends Mailable {
+  @override
+  String layout(String body) {
+    return View.render('emails/layout', <String, Object?>{'body': SafeString(body)});
+  }
+}
+```
+
+### A simple email with no template
+
+`MailMessage` is a mailable made of lines and a button. It needs no template. It uses the Markdown layout.
+
+```dart
+await (MailMessage(subject: 'Invoice paid', to: <Address>[Address('ann@example.com')])
+      ..line('We got your payment.')
+      ..action('View invoice', 'https://example.com/invoices/1')
+      ..line('Thank you!'))
+    .send();
+```
+
+The email starts with `greeting` (default `Hello!`) and ends with `salutation` (default none). Set them to null to leave them out. Lines can use Markdown, like `**bold**`. HTML in a line is escaped.
+
+To send one email on more than one channel, see [Notifications](notifications.md).
+
 ## Transports
 
 ### SMTP
