@@ -26,12 +26,15 @@ void httpRequestHandler(HttpRequest req) {
 
     httpCorsHandler(route.corsEnabled, req);
 
-    /// no Content-Type means no body to read. then the request is
-    /// made at once, with no Future in between.
-    /// read the header once and pass it on.
+    /// no Content-Type means no body to read. a body the native server
+    /// already holds is read at once too. then the request is made with
+    /// no Future in between. read the header once and pass it on.
     ContentType? contentType = req.headers.contentType;
-    if (contentType == null) {
-      _run(req, _doxRequest(req, route, params, RequestBody.empty(), null));
+    RequestBody? now = contentType == null
+        ? RequestBody.empty()
+        : HttpBody.readNow(req, contentType);
+    if (now != null) {
+      _run(req, _doxRequest(req, route, params, now, contentType));
     } else {
       HttpBody.read(req, contentType).then(
         (RequestBody body) {

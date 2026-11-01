@@ -65,24 +65,13 @@ class HttpBody {
     ContentType? contentType,
   ]) async {
     contentType ??= request.headers.contentType;
-
     if (contentType == null) return RequestBody.empty();
 
+    RequestBody? now = readNow(request, contentType);
+    if (now != null) return now;
+
     if (HttpBody.isJson(contentType)) {
-      Uint8List bytes = await readBytes(request, Dox().config.maxBodySize);
-      if (bytes.isEmpty) {
-        return RequestBody.empty();
-      }
-      try {
-        Object? data = _jsonUtf8.convert(bytes);
-        return RequestBody(
-          data is Map<String, dynamic> ? data : <String, dynamic>{},
-          kind: BodyKind.json,
-          json: data,
-        );
-      } catch (err) {
-        return RequestBody(<String, dynamic>{}, kind: BodyKind.invalidJson);
-      }
+      return _json(await readBytes(request, Dox().config.maxBodySize));
     }
 
     if (HttpBody.isFormData(contentType)) {
@@ -101,20 +90,52 @@ class HttpBody {
       );
     }
 
-    if (HttpBody.isUrlEncoded(contentType)) {
-      Uint8List bytes = await readBytes(request, Dox().config.maxBodySize);
-      String text = utf8.decode(bytes, allowMalformed: true);
-      Map<String, dynamic> map = <String, dynamic>{};
-      try {
-        map = Uri.splitQueryString(text);
-      } catch (err) {
-        /// bad percent encoding: an empty body
-      }
-      map = const FormInput().nested(map, () => const FormInput().pairs(text));
-      return RequestBody(map, kind: BodyKind.urlEncoded, text: text);
-    }
+    return _urlEncoded(await readBytes(request, Dox().config.maxBodySize));
+  }
 
-    return RequestBody(<String, dynamic>{}, kind: BodyKind.other);
+  /// The body, when it can be made with no wait: a JSON or urlencoded body
+  /// on the native server (it holds the whole body already), or a body
+  /// type that Dox does not read. null when it needs [read] (dart:io, or
+  /// multipart). Throws 413 like [read].
+  static RequestBody? readNow(HttpRequest request, ContentType contentType) {
+    bool json = HttpBody.isJson(contentType);
+    bool urlEncoded = !json && HttpBody.isUrlEncoded(contentType);
+    if (!json && !urlEncoded) {
+      if (HttpBody.isFormData(contentType)) return null;
+      return RequestBody(<String, dynamic>{}, kind: BodyKind.other);
+    }
+    if (request is! NativeRequest) return null;
+    int max = Dox().config.maxBodySize;
+    _checkContentLength(request, max);
+    Uint8List bytes = request.body;
+    if (bytes.length > max) throw PayloadTooLargeException();
+    return json ? _json(bytes) : _urlEncoded(bytes);
+  }
+
+  static RequestBody _json(Uint8List bytes) {
+    if (bytes.isEmpty) return RequestBody.empty();
+    try {
+      Object? data = _jsonUtf8.convert(bytes);
+      return RequestBody(
+        data is Map<String, dynamic> ? data : <String, dynamic>{},
+        kind: BodyKind.json,
+        json: data,
+      );
+    } catch (err) {
+      return RequestBody(<String, dynamic>{}, kind: BodyKind.invalidJson);
+    }
+  }
+
+  static RequestBody _urlEncoded(Uint8List bytes) {
+    String text = utf8.decode(bytes, allowMalformed: true);
+    Map<String, dynamic> map = <String, dynamic>{};
+    try {
+      map = Uri.splitQueryString(text);
+    } catch (err) {
+      /// bad percent encoding: an empty body
+    }
+    map = const FormInput().nested(map, () => const FormInput().pairs(text));
+    return RequestBody(map, kind: BodyKind.urlEncoded, text: text);
   }
 
   /// read the whole body, but stop with 413 once it passes [max] bytes.
