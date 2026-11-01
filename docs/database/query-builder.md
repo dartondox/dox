@@ -179,6 +179,51 @@ So you can return a `Pagination` from a controller.
 - `perPage` must be 1 or more. A smaller value throws an `ArgumentError`.
 - A `currentPage` below 1 is read as page 1.
 
+### `simplePaginate`
+
+Like `paginate()`, but without the total count. So it runs one query, not two.
+It reads one row more to know if there is a next page.
+
+```dart
+SimplePagination<Actor> page = await Actor()
+    .orderBy('id')
+    .simplePaginate(currentPage: 2, perPage: 10);
+
+List<Actor> actors = page.data;
+print(page.hasMorePages); // true when there is a next page
+```
+
+`page.toJson()` gives `per_page`, `current_page`, `from`, `to`, `has_more_pages` and `data`.
+`from` and `to` are the numbers of the first and last row of the page. They are `null` on an empty page.
+
+### `cursorPaginate`
+
+Returns one page of rows after a cursor.
+It uses `WHERE id > ?`, not `OFFSET`, so it stays fast on a big table.
+Use it for an endless list or an API.
+
+```dart
+CursorPagination<Actor> page = await Actor()
+    .where('age', '>=', 18)
+    .cursorPaginate(perPage: 10, cursor: req.input('cursor'));
+
+List<Actor> actors = page.data;
+print(page.nextCursor); // send it back as `cursor` to read the next page
+print(page.prevCursor); // send it back as `cursor` to read the page before
+```
+
+`page.toJson()` gives `per_page`, `next_cursor`, `prev_cursor` and `data`.
+`next_cursor` is `null` on the last page. `prev_cursor` is `null` on the first page.
+
+- The rows are ordered by the primary key. Use `column` and `direction` to change it:
+  `cursorPaginate(perPage: 10, column: 'created_at', direction: 'desc')`.
+- Do not add `orderBy()`. It throws a `StateError`.
+- The column must be in the select, and it must have no `null` values.
+- Use a column with unique values. With a column like `created_at`, two rows
+  with the same value can be skipped.
+- The cursor is safe to take from a user. Its value is only sent as a query value, never as SQL.
+  A cursor that is not valid, or that is made for another column, gives the first page.
+
 ### `chunk` and `chunkById`
 
 Use them to work on a big table.
@@ -891,6 +936,30 @@ On a model without soft deletes it does nothing.
 ```dart
 List<Actor> actors = await Actor().withTrash().where('name', 'John Wick').get();
 ```
+
+### `onlyTrashed`
+
+`onlyTrashed()` gives only the soft deleted rows.
+
+```dart
+List<Actor> trashed = await Actor().onlyTrashed().get();
+
+// delete the soft deleted rows for good
+await Actor().onlyTrashed().forceDelete();
+```
+
+### `touch`
+
+Sets `updated_at` of the rows to now. Give a column name to set another column.
+It returns the number of changed rows.
+
+```dart
+await Actor().where('name', 'John Wick').touch();
+await Actor().where('id', 1).touch('seen_at');
+```
+
+On a model from the table, `touch()` changes only the row of that model.
+See [Models](model/index.md#touch-and-replicate).
 
 ### `truncate`
 

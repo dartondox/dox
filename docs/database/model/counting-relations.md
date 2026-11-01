@@ -57,19 +57,40 @@ user?.posts;              // the posts
 user?.countOf('posts');   // the number of posts
 ```
 
-## Sum and max
+## Sum, average, min and max
 
-`withSum()` and `withMax()` work the same way, on one column of the related rows.
+`withSum()`, `withAvg()`, `withMin()` and `withMax()` work the same way, on one column of the related rows.
 The value is null when there is no related row.
 
 ```dart
 User? user = await User()
     .withSum('posts', 'views')
+    .withAvg('posts', 'views')
+    .withMin('posts', 'views')
     .withMax('posts', 'views')
     .find(1);
 
 user?.aggregate('posts_sum_views');
+user?.aggregate('posts_avg_views');
+user?.aggregate('posts_min_views');
 user?.aggregate('posts_max_views');
+```
+
+## Exists
+
+`withExists()` adds `<relation>_exists`. It is `true` when there is at least one related row.
+It takes a function and `as`, like `withCount()`.
+
+```dart
+User? user = await User()
+    .withExists('posts')
+    .withExists('posts as has_published', (QueryBuilder<dynamic> q) {
+      q.where('published', true);
+    })
+    .find(1);
+
+user?.aggregate('posts_exists');   // true or false
+user?.aggregate('has_published');  // true or false
 ```
 
 !!! info

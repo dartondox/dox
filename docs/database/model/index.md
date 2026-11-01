@@ -153,7 +153,8 @@ class Blog extends BlogGenerator {}
 The table needs a nullable `deleted_at` column. In a migration, add `table.softDeletes();`.
 
 - `delete()` sets `deleted_at` to the current time. The row stays in the table.
-- Queries do not return soft deleted rows. Use `withTrash()` to get them too.
+- Queries do not return soft deleted rows. Use `withTrash()` to get them too,
+  or `onlyTrashed()` to get only them.
 - `forceDelete()` really deletes the row.
 - `restore()` sets `deleted_at` back to `NULL`.
 
@@ -333,6 +334,35 @@ print(blog.views);
 - A third argument sets other columns in the same query:
   `increment('views', 1, <String, dynamic>{'status': 'hot'})`.
   Keys that `fillable` and `guarded` do not allow are dropped.
+
+### Touch and replicate
+
+`touch()` sets `updated_at` to now. Give a column name to set another column.
+On a model from the table it changes only that row, and the field gets the new time too.
+
+```dart
+Blog? blog = await Blog().find(1);
+await blog!.touch();               // updated_at = now
+await blog.touch('published_at');  // published_at = now
+```
+
+- It returns the number of changed rows: 1, or 0 when the row is not there.
+- It fires no model events.
+
+`replicate()` makes a new model with the same column values. It is not saved yet.
+It has no primary key, `created_at` or `updated_at`, so `save()` inserts a new row.
+
+```dart
+Blog? blog = await Blog().find(1);
+Blog copy = blog!.replicate()..title = 'Copy of ${blog.title}';
+await copy.save();
+
+// leave out some columns, they are set to null
+Blog other = blog.replicate(<String>['slug']);
+```
+
+- Relations are not copied.
+- A column in the list that can not be `null`, or that is not a column, throws an `ArgumentError`.
 
 ## Delete
 
