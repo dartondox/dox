@@ -113,7 +113,7 @@ void main() {
         'dash',
         'a-b_c',
         'a b',
-        'The dash must be only alphabetic and dash',
+        'The dash must be only alphabetic, number, dash and underscore',
       ),
     ]);
 

@@ -1,29 +1,36 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
+/// keeps what is written to it, to read the stderr lines
+class _Capture implements Stdout {
+  final StringBuffer text = StringBuffer();
+
+  @override
+  void writeln([Object? object = '']) => text.writeln(object);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
+}
+
+/// default logger (off), so the warning must not need the logger
 AppConfig config({List<String>? webSocketAllowedOrigins}) {
   return AppConfig(
     appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
-    logger: const LoggerConfig(enabled: true),
     webSocketAllowedOrigins: webSocketAllowedOrigins,
   );
 }
 
-/// the lines that [Dox.warnWebSocketOrigin] prints
+/// the stderr lines of [Dox.warnWebSocketOrigin]
 List<String> warnings() {
-  List<String> lines = <String>[];
-  runZoned(
-    Dox().warnWebSocketOrigin,
-    zoneSpecification: ZoneSpecification(
-      print: (Zone self, ZoneDelegate parent, Zone zone, String line) {
-        lines.add(line);
-      },
-    ),
-  );
-  return lines.where((String l) => l.contains('Origin')).toList();
+  _Capture err = _Capture();
+  IOOverrides.runZoned(Dox().warnWebSocketOrigin, stderr: () => err);
+  return err.text
+      .toString()
+      .split('\n')
+      .where((String l) => l.isNotEmpty)
+      .toList();
 }
 
 void handler(WebSocket socket, DoxRequest req) {}
@@ -41,13 +48,12 @@ void main() {
     expect(warnings(), isEmpty);
   });
 
-  test('one warning for a route with no check, only once', () {
+  test('one warning on stderr with the logger off, only once', () {
     Dox().initialize(config());
+    expect(Dox().config.logger.enabled, isFalse);
     Route.websocket('/open-b', handler);
     Route.websocket('/open-c', handler);
-    List<String> first = warnings();
-    expect(first, hasLength(1));
-    expect(first.first, contains('webSocketAllowedOrigins'));
+    expect(warnings(), <String>[Dox.webSocketOriginWarning]);
     expect(warnings(), isEmpty);
   });
 }
