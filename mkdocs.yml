@@ -189,6 +189,7 @@ nav:
         - database/model/relationship/many-to-many.md
   - Security:
     - security/authentication.md
+    - security/authorization.md
     - security/cors.md
     - security/csrf.md
     - security/encryption.md
