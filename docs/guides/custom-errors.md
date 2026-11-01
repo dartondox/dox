@@ -24,21 +24,15 @@ When a controller or a middleware throws:
 
 ## 1. Write your own exceptions
 
+For a quick error, use `abort(403)` or `abort(409, 'The email is taken')`. See [HTTP exceptions](../reference/http-exceptions.md#any-status-abort-and-httpstatusexception).
+For errors you throw in many places, write a class.
+
 Extend `IHttpException`. Set `code` (the HTTP status), `errorCode` (a short text for the client) and `message`.
 
 ```dart title="lib/app/exceptions/app_exception.dart"
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
-
-/// 403. Thrown when the user may not do this.
-class ForbiddenException extends IHttpException {
-  ForbiddenException({String message = 'Forbidden'}) {
-    super.code = HttpStatus.forbidden;
-    super.errorCode = 'forbidden';
-    super.message = message;
-  }
-}
 
 /// 409. Thrown when the row already exists or was changed by someone else.
 class ConflictException extends IHttpException {
@@ -71,7 +65,7 @@ class UserController {
   /// DELETE /api/users/{id}
   Future<Map<String, bool>> destroy(int id) async {
     if (id == 1) {
-      throw ForbiddenException(message: 'The first user can not be deleted');
+      throw ForbiddenHttpException(message: 'The first user can not be deleted');
     }
     User user = await show(id);
 

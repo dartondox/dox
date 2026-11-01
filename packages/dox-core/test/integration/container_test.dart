@@ -59,7 +59,8 @@ void main() {
   test('Route.resource with a controller class', () async {
     (await client.get('/api/blogs')).expectStatus(200).expectBody('blogs');
     (await client.get('/api/blogs/4')).expectStatus(200).expectBody('blog 4');
-    (await client.post('/api/blogs')).expectStatus(404);
+    // only index and show: POST is a known path with another method
+    (await client.post('/api/blogs')).expectStatus(405);
   });
 
   test('container providers run at start', () {

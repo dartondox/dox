@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/http/request/form_input.dart';
 import 'package:dox_core/http/request/form_data_visitor.dart';
 import 'package:dox_http_native/dox_http_native.dart';
 
@@ -40,7 +41,8 @@ class RequestBody {
   /// An empty body.
   RequestBody.empty() : this(<String, dynamic>{});
 
-  /// The body as a map (`req.body`). Repeated form keys keep the last value.
+  /// The body as a map (`req.body`). A repeated form key keeps the last
+  /// value. Bracket keys nest: `tags[]=a&tags[]=b` gives a list.
   final Map<String, dynamic> map;
 
   final BodyKind kind;
@@ -93,7 +95,7 @@ class HttpBody {
       );
       await visitor.process();
       return RequestBody(
-        visitor.inputs,
+        const FormInput().nested(visitor.inputs, () => visitor.parts),
         kind: BodyKind.multipart,
         parts: visitor.parts,
       );
@@ -108,6 +110,7 @@ class HttpBody {
       } catch (err) {
         /// bad percent encoding: an empty body
       }
+      map = const FormInput().nested(map, () => const FormInput().pairs(text));
       return RequestBody(map, kind: BodyKind.urlEncoded, text: text);
     }
 

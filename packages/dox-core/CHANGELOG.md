@@ -1,5 +1,10 @@
 ## Unreleased
 
+- New: a path that has routes, but not for the request method, answers `405 Method Not Allowed` with an `Allow` header (like `Allow: GET, POST, HEAD`). Before, it was `404`.
+- New: `abort(code, [message, headers])` and `HttpStatusException(code)` for any status. Common codes get a default `errorCode` and `message`. The `headers` are sent with the answer.
+- New: `ForbiddenHttpException` (403) and `MethodNotAllowedHttpException` (405).
+- New: bracket keys in form bodies and query strings nest, like in Laravel. `tags[]=a&tags[]=b` gives `req.input('tags') == ['a', 'b']`, and `address[city]=x` gives a map. A repeated key with no brackets still keeps its last value.
+- New: `AppConfig(previousKeys: [...])`. Encrypted cookies and cookie sessions made with an old `APP_KEY` can still be read, so a new key does not log out every user. `AESEncryptor.decode` has a new `previousSecrets` option.
 - Fix: path params are now URL-decoded. `/users/a%20b` gives `'a b'`, not `'a%20b'`. A URL from `Route.url()` now gives back the same value. A param that is not valid UTF-8 (like `%ff`) gives 404.
 - Fix: 5xx HTTP exceptions (like `InternalErrorException` and `QueryException`) are now sent to `ExceptionHandler.report`. Before, every `IHttpException` was skipped, so real server errors never reached the logs or Sentry. 4xx exceptions are still not reported.
 - Fix: `req.headers` joins repeated header values with `, `. Before, two `Accept` values became one string with no separator.

@@ -65,7 +65,7 @@ A controller can be a class method, a static method or a plain function.
 | `public function handle(Request $request, Closure $next)` | `dynamic handle(IDoxRequest req)` |
 | `return $next($request);` | `return req;` |
 | `return response('no', 401);` | `return response('no').statusCode(401);` |
-| `abort(404);` | `throw NotFoundHttpException();` |
+| `abort(404);` | `abort(404);` |
 | `$middleware->append(LogMiddleware::class)` in `bootstrap/app.php` | `AppConfig(globalMiddleware: <dynamic>[LogMiddleware()])` |
 
 ```dart title="lib/app/http/middleware/logger.middleware.dart"
@@ -129,7 +129,7 @@ See [Validation](../the-basic/validation.md).
 | `return response()->file($path);` | `return File(path);` |
 | `return response()->download($path);` | `return Storage().download(path);` |
 | `->cookie('theme', 'dark')` | `.cookie(DoxCookie('theme', 'dark'))` |
-| `abort(404, 'Not found');` | `throw NotFoundHttpException(message: 'Not found');` |
+| `abort(404, 'Not found');` | `abort(404, 'Not found');` |
 | `new BlogResource($blog)` | `BlogSerializer(blog)` |
 
 ## Eloquent vs Dox Model

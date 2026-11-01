@@ -192,6 +192,26 @@ It returns `null` when the password is not a `String`, when no identifier is giv
 | `issuer` | `null` | the `iss` claim. When set, `verifyToken` also checks it |
 | `hashRounds` | `10` | the bcrypt cost of your stored hashes. Use the same value as `Hash.rounds` |
 | `userCacheTtl` | `null` (off) | keep the user of a token in memory for this time. See below |
+| `previousSecrets` | `null` | old secrets, only to check tokens after a key change. `null` with `secret` = `APP_KEY`: the old keys come from `AppConfig.previousKeys`. `[]` turns it off. See below |
+
+### Change the JWT secret
+
+New tokens are always signed with `secret`.
+A token is checked with `secret` first, then with each old secret.
+Only a wrong signature moves on to the next secret. An expired token fails at once.
+
+- **The secret is `APP_KEY`** (`SecretKey(env.appKey)`): follow [Change the key](encryption.md#change-the-key-key-rotation). The old keys in `AppConfig.previousKeys` are used. You need nothing more.
+- **A separate JWT secret**: give the old one to the driver.
+
+    ```dart
+    JwtAuthDriver(
+      secret: SecretKey(env.jwtSecret),
+      previousSecrets: <JWTKey>[SecretKey(env.jwtOldSecret)],
+    )
+    ```
+
+Remove the old secret once `expiresIn` has passed. Then every old token has expired anyway.
+Do not keep a leaked secret: anyone who has it can make tokens.
 
 ## More than one guard
 
@@ -338,7 +358,7 @@ Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), (PageCon
 | `Auth().logout(req)` | removes the login and all session data |
 
 - Login and logout give the session a new id and a new CSRF token. So an id that someone saw before the login is of no use.
-- With the default `cookie` session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout. The server also does not check its age, so a copied cookie works until `APP_KEY` changes. If logout must really end old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
+- With the default `cookie` session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout, until the session `lifetime` ends. If logout must really end old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
 - The session keeps only the user id. `AuthMiddleware` loads the user from the database on each request, so a deleted user is logged out.
 - These methods throw a `StateError` on a guard that does not use `SessionAuthDriver`.
 - `SessionAuthDriver` has one option, `hashRounds` (default `10`), like `JwtAuthDriver`.
@@ -346,7 +366,7 @@ Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), (PageCon
 ## Things to know
 
 - **The token is not secret.** Anyone with the token can read `user.toJson()`. Keep private columns in `hidden`.
-- **You can not cancel one token.** A token works until it expires. If you change the `secret` (your `APP_KEY`), all tokens stop working.
+- **You can not cancel one token.** A token works until it expires. To end all tokens, change the `secret` (your `APP_KEY`) with no old secrets. See [Change the JWT secret](#change-the-jwt-secret).
 - **The user is loaded on each request**, by the id in the token. A deleted user can not log in, even with a valid token.
 - **`userCacheTtl` skips that query.** With `Duration(seconds: 30)`, a deleted or changed user is seen only after 30 seconds. Each isolate has its own cache. Requests in that time share one user object, so do not change it per request.
 - **Login does not block the server.** `attempt` runs bcrypt in another isolate.

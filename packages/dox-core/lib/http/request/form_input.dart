@@ -46,8 +46,67 @@ class FormInput {
     return changed ? _packMap(root) : root;
   }
 
+  /// The input for `req.body` and `req.query`, like PHP and Laravel:
+  /// bracket keys nest (`tags[]=a&tags[]=b` gives `{'tags': ['a', 'b']}`),
+  /// and a repeated plain key keeps its last value.
+  /// [flat] (the last value of each key) is given back as it is when no
+  /// key has a `[`, so most requests skip the work.
+  Map<String, dynamic> nested(
+    Map<String, dynamic> flat,
+    Iterable<MapEntry<String, Object>> Function() pairs,
+  ) {
+    if (!flat.keys.any(_hasBracket)) return flat;
+    List<MapEntry<String, Object>> kept = <MapEntry<String, Object>>[];
+    Map<String, int> plainAt = <String, int>{};
+    for (MapEntry<String, Object> pair in pairs()) {
+      if (_hasBracket(pair.key)) {
+        kept.add(pair);
+        continue;
+      }
+      int? at = plainAt[pair.key];
+      if (at == null) {
+        plainAt[pair.key] = kept.length;
+        kept.add(pair);
+      } else {
+        kept[at] = pair;
+      }
+    }
+    return parse(kept);
+  }
+
+  static bool _hasBracket(String key) => key.contains('[');
+
+  /// The (key, value) pairs of an urlencoded text, in order.
+  /// A bad `%` code throws a [BadRequestException].
+  List<MapEntry<String, Object>> pairs(String text) {
+    List<MapEntry<String, Object>> pairs = <MapEntry<String, Object>>[];
+    if (text.isEmpty) return pairs;
+    for (String part in text.split('&')) {
+      if (part.isEmpty) continue;
+      int equals = part.indexOf('=');
+      String key = equals < 0 ? part : part.substring(0, equals);
+      String value = equals < 0 ? '' : part.substring(equals + 1);
+      try {
+        pairs.add(
+          MapEntry<String, Object>(
+            Uri.decodeQueryComponent(key),
+            Uri.decodeQueryComponent(value),
+          ),
+        );
+      } on FormatException {
+        throw BadRequestException(message: 'The form body is not valid');
+      } on ArgumentError {
+        throw BadRequestException(message: 'The form body is not valid');
+      }
+    }
+    return pairs;
+  }
+
   /// The input of a query string, with repeated keys.
-  Map<String, dynamic> query(Uri uri) {
+  Map<String, dynamic> query(Uri uri) => parse(queryPairs(uri));
+
+  /// The (key, value) pairs of the query string of [uri].
+  List<MapEntry<String, Object>> queryPairs(Uri uri) {
     List<MapEntry<String, Object>> pairs = <MapEntry<String, Object>>[];
     for (MapEntry<String, List<String>> entry
         in uri.queryParametersAll.entries) {
@@ -55,7 +114,7 @@ class FormInput {
         pairs.add(MapEntry<String, Object>(entry.key, value));
       }
     }
-    return parse(pairs);
+    return pairs;
   }
 
   /// `[]` adds a new item: its index is the next free one.

@@ -25,7 +25,7 @@ If `APP_ENV` is empty or not set, Dox treats the app as production: `/docs` is o
 | Check | How | Read more |
 | --- | --- | --- |
 | JWT tokens expire | `JwtAuthDriver.expiresIn` is 1 hour by default. Pick a time that fits your app, like `JwtAuthDriver(secret: SecretKey(env.appKey), expiresIn: Duration(hours: 12))`. | [Authentication](../security/authentication.md) |
-| You can not revoke one token | **Dox limit.** There is no token list on the server. To log out everyone, change `APP_KEY`. | [Authentication](../security/authentication.md) |
+| You can not revoke one token | **Dox limit.** There is no token list on the server. To log out everyone, change `APP_KEY` with no `previousKeys`. | [Authentication](../security/authentication.md) |
 | Passwords are hashed | `user.password = await Hash.makeAsync(input)` (bcrypt). In a request, use `makeAsync`: it runs bcrypt in another isolate, so other requests do not wait. Never store or encrypt a plain password. | [Hashing](../security/hashing.md) |
 | The hash is never sent | `List<String> get hidden => <String>['password'];` in the user model. The JWT payload is `user.toJson()`, and anyone can read it. | [Authentication](../security/authentication.md) |
 | Passwords have a max length | bcrypt takes at most 72 bytes. `Hash.make` and `Hash.makeAsync` throw an `ArgumentError` on longer input. Add `@MaxLength(72)` to the password field of the DTO. It counts characters, so non-ASCII text can still pass 72 bytes. | [Troubleshooting](troubleshooting.md) |

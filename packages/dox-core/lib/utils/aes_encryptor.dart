@@ -70,6 +70,8 @@ class AESEncryptor {
 
   /// decode a message.
   /// Throws [DecryptException] when the text was changed or the key is wrong.
+  /// When [secret] fails, each of [previousSecrets] is tried (old keys,
+  /// see `AppConfig.previousKeys`).
   ///```
   /// AESEncryptor.decode('encoded_message', secret);
   ///```
@@ -78,7 +80,28 @@ class AESEncryptor {
     String secret, {
     String associatedData = '',
     String purpose = KeyDerivation.encrypt,
+    List<String> previousSecrets = const <String>[],
   }) {
+    try {
+      return _decode(content, secret, associatedData, purpose);
+    } on DecryptException {
+      for (String old in previousSecrets) {
+        try {
+          return _decode(content, old, associatedData, purpose);
+        } on DecryptException {
+          /// try the next one
+        }
+      }
+      rethrow;
+    }
+  }
+
+  static String _decode(
+    String content,
+    String secret,
+    String associatedData,
+    String purpose,
+  ) {
     try {
       Uint8List data = base64.decode(content);
       Uint8List nonce = Uint8List.sublistView(data, 0, _nonceLength);

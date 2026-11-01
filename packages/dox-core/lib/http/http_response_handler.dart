@@ -117,6 +117,9 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
   /// which will parse into json and response as json
   if (payload is IHttpException) {
     res.statusCode = payload.code;
+    if (payload is HttpStatusException) {
+      payload.headers.forEach(res.headers.set);
+    }
     payload = payload.toResponse();
   }
 

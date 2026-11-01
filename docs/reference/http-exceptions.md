@@ -27,14 +27,16 @@ abstract class IHttpException {
 
 ## The classes
 
-Every class takes the named parameters `message`, `errorCode` and `code`. The table shows the defaults.
+Most classes take the named parameters `message`, `errorCode` and `code`. The table shows the defaults.
 `message` is a `String` or a `Map`, like `NotFoundHttpException(message: {'error': 'not_found'})`.
 
 | Class | Package | Status `code` | `errorCode` | Default `message` | Dox throws it when |
 | --- | --- | --- | --- | --- | --- |
 | `BadRequestException` | `dox_core` | `400` | `bad_request` | `Bad Request` | the body can not be read, like JSON that is not valid |
 | `UnAuthorizedException` | `dox_auth` | `401` | `unauthorized` | `Authentication failed` | `AuthMiddleware` finds no valid token |
+| `ForbiddenHttpException` | `dox_core` | `403` | `forbidden` | `Forbidden` | never by itself; for your own use |
 | `NotFoundHttpException` | `dox_core` | `404` | `not_found` | `Not Found` | no route fits the path, a typed path param does not fit (`{id}` is not an `int`), or a route model binding finds no row |
+| `MethodNotAllowedHttpException` | `dox_core` | `405` | `method_not_allowed` | `Method Not Allowed` | the path has routes, but not for this method. The `Allow` header lists the methods. |
 | `PayloadTooLargeException` | `dox_core` | `413` | `payload_too_large` | `Payload Too Large` | the body is bigger than `maxBodySize` or `maxMultipartSize` |
 | `UnsupportedMediaTypeException` | `dox_core` | `415` | `unsupported_media_type` | `Unsupported Media Type` | a DTO reads a body that is not JSON and not form data |
 | `TokenMismatchException` | `dox_core` | `419` | `csrf_token_mismatch` | `CSRF token mismatch` | `CsrfMiddleware` finds no CSRF token, or a wrong one |
@@ -82,15 +84,36 @@ content-type: application/json
 {"email":"The email is not a valid email","name":"The name is required"}
 ```
 
-A request for a path that has no route answers like a `NotFoundHttpException` with the message `<METHOD> <path> not found`: `{"code":"not_found","message":"GET /nothing not found"}`. Your `responseHandler` gets it too, so you can change its shape.
+A request for a path that has no route answers like a `NotFoundHttpException` with the message `<METHOD> <path> not found`: `{"code":"not_found","message":"GET /nothing not found"}`.
+When the path has routes for other methods, the answer is `405` with an `Allow` header, like `Allow: GET, POST, HEAD`. Your `responseHandler` gets it too, so you can change its shape.
 
 To send your own JSON shape, make your own exception class (see below) and override `toResponse()`.
 
-Other errors: any `Exception` or `Error` that is not an `IHttpException` gets `500` with `{"code": "server_error", "message": "Server Error"}`. When `APP_ENV` is `development` or `local`, the body is `error.toString()` as text instead. It is also passed to the `report` method of the [exception handler](../the-basic/errors.md). An `IHttpException` is not reported.
+Other errors: any `Exception` or `Error` that is not an `IHttpException` gets `500` with `{"code": "server_error", "message": "Server Error"}`. When `APP_ENV` is `development` or `local`, the body is `error.toString()` as text instead. It is also passed to the `report` method of the [exception handler](../the-basic/errors.md). An `IHttpException` with a `4xx` code is not reported. One with a `5xx` code is.
 
 A `ValidationException` on a request with a session (`SessionMiddleware`) that does not want JSON, like a form post, is not sent as JSON. Dox saves the errors and the old input in the session and redirects back.
 
 A `ValidationException` from `dox_validation` (thrown by `schema.parse()` in a controller) is turned into the `422` `ValidationException` of `dox_core` with the same errors.
+
+## Any status: `abort` and `HttpStatusException`
+
+`abort(code)` stops the request and answers with that status. It throws an `HttpStatusException`.
+
+```dart
+if (post.userId != req.auth?.id) abort(403);
+abort(404, 'No post with this id');
+throw HttpStatusException(503, headers: {'retry-after': '60'});
+```
+
+```
+HTTP/1.1 403 Forbidden
+content-type: application/json
+
+{"code":"forbidden","message":"Forbidden"}
+```
+
+Common codes get a default `errorCode` and `message`, like `forbidden` / `Forbidden` for `403`.
+Other codes get `http_error` / `Error`. The `headers` are sent with the answer.
 
 ## Make your own
 
@@ -101,11 +124,11 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 
-class ForbiddenException extends IHttpException {
-  ForbiddenException({
-    dynamic message = 'Forbidden',
-    String errorCode = 'forbidden',
-    int code = HttpStatus.forbidden,
+class PaymentRequiredException extends IHttpException {
+  PaymentRequiredException({
+    dynamic message = 'Please pay',
+    String errorCode = 'payment_required',
+    int code = HttpStatus.paymentRequired,
   }) {
     super.code = code;
     super.errorCode = errorCode;

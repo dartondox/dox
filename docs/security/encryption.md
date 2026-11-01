@@ -51,7 +51,61 @@ At startup Dox checks `APP_KEY`. When it is empty, not exactly 32 bytes, or an o
 In `development`, `local`, `test` and `testing` it only prints a warning.
 
 - Keep `APP_KEY` in `.env` or in the secrets of your host. Never put it in code or in git.
-- If you change `APP_KEY`, old encrypted cookies and sessions can not be read any more. JWT tokens signed with it stop working too.
+- If you change `APP_KEY` with no `previousKeys`, old encrypted cookies and sessions can not be read any more, so every user is logged out. JWT tokens signed with it stop working too. See [Change the key](#change-the-key-key-rotation).
+
+## Change the key (key rotation)
+
+Change `APP_KEY` from time to time, or when someone who knew it leaves the team.
+With `previousKeys`, users stay logged in while you change it.
+
+### Steps
+
+1. Copy the current `APP_KEY` to `APP_PREVIOUS_KEYS`.
+2. Run `dox key:generate`. It writes a new `APP_KEY`. Now `.env` has both:
+
+    ```bash title=".env"
+    APP_KEY=the-new-32-character-app-key....
+    APP_PREVIOUS_KEYS=the-old-32-character-app-key....
+    ```
+
+3. Read it in the env class, and give it to `AppConfig`:
+
+    ```dart title="lib/config/env.dart"
+    List<String> get appPreviousKeys => <String>[]; // APP_PREVIOUS_KEYS=a,b
+    ```
+
+    ```dart title="lib/config/app.dart"
+    AppConfig(
+      appKey: env.appKey,
+      previousKeys: env.appPreviousKeys,
+    )
+    ```
+
+4. Deploy. Every instance must get the new env at the same time.
+5. Wait until the old cookies have expired: the session `lifetime`, and the `maxAge` of your own cookies.
+6. Remove the old key from `APP_PREVIOUS_KEYS` and deploy again.
+
+`APP_PREVIOUS_KEYS` can hold more than one key, comma separated. Dox tries them in order.
+
+### What reads the old keys
+
+| Value | With an old key |
+| --- | --- |
+| encrypted cookies (`req.cookie`) | read |
+| `cookie` session driver | read |
+| CSRF token | read (it is in the session) |
+| JWT tokens of `JwtAuthDriver(secret: SecretKey(env.appKey))` | checked. A JWT secret that is not `APP_KEY` needs its own `previousSecrets` option, see [Authentication](authentication.md#change-the-jwt-secret). |
+| `AESEncryptor.decode` in your code | read only when you pass `previousSecrets: Dox().config.previousKeys` |
+| anything new | made with `APP_KEY` only |
+
+Dox writes a cookie with the new key the next time it sends that cookie.
+So a user who comes back during step 5 moves to the new key without noticing.
+
+### When the key leaked
+
+Do **not** put a leaked key in `previousKeys`.
+Anyone who has it can still make cookies and JWT tokens that Dox accepts.
+Change `APP_KEY` with no `previousKeys`. Every user is logged out, and that is what you want.
 
 ## Cookies
 
