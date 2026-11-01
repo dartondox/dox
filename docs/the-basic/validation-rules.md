@@ -132,15 +132,37 @@ For `RequestFile` and `List<RequestFile>` fields.
 | `@MaxSize('2MB')` | `max_size` | `The {field} may not be larger than {max}` | `maxLength` (bytes) |
 | `@Mimes(['pdf', 'png'])` | `mimes` | `The {field} must be a file of type: {types}` | `contentMediaType` |
 | `@Image()` | `image` | `The {field} must be an image` | `contentMediaType: image/*` |
+| `@MinSize('10KB')` | `min_size` | `The {field} must be at least {min}` | `minLength` (bytes) |
+| `@MimeTypes(['image/png', 'image/*'])` | `mime_types` | `The {field} must be a file of type: {types}` | `contentMediaType` |
+| `@Dimensions(minWidth: 100, ratio: 3 / 2)` | `dimensions` | `The {field} has invalid image dimensions` | `contentMediaType: image/*` |
 
-- `@MaxSize` units: `B`, `KB`, `MB`, `GB`. `1KB` = 1024 bytes. A bad size text stops the build.
+- `@MaxSize` and `@MinSize` units: `B`, `KB`, `MB`, `GB`. `1KB` = 1024 bytes. A bad size text stops the build.
 - `@Mimes` takes file extensions. Dox finds the real type from the first bytes of the file.
   The file name extension must not name another type, or a type a browser runs (like `html` or `svg`).
   So `x.html` with GIF bytes does not pass. An empty or unknown extension is fine.
   For zip based types (like `docx` or `xlsx`), the file name extension must match too.
   For types without a byte signature (like `txt` or `csv`), it uses the file name extension.
 - `@Image()` is `@Mimes(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'])`. No `svg`.
+- `@MimeTypes` takes MIME types. Dox turns each one into file extensions, then checks the real bytes like `@Mimes`.
+  It does not trust the content type the client sent. `image/*` means every image type Dox knows. No `svg`.
+  An unknown MIME type never matches.
+- `@Dimensions` checks the width and height in pixels. Limits: `width`, `height` (exact), `minWidth`, `maxWidth`, `minHeight`, `maxHeight` and `ratio` (width / height, like `3 / 2`).
+  Give at least one limit, or the build stops.
+  It reads only the image header of PNG, GIF, WebP and JPEG files, never the whole file.
+  Any other file, or a broken or cut short header, fails.
+  Like Laravel, a `ratio` passes when it is off by less than one pixel.
 - The JSON Schema of a file is `{"type": "string", "format": "binary"}`, plus the keys above.
+
+With fluent schemas, the same rules are on `v.file()`. Sizes there are in bytes, not text:
+
+```dart
+v.file()
+    .maxSize(2 * 1024 * 1024) // 2 MB
+    .mimeTypes(<String>['image/jpeg', 'image/png'])
+    .dimensions(minWidth: 100, maxWidth: 2000);
+```
+
+The fluent methods are `maxSize(bytes)`, `minSize(bytes)`, `mimes(types)`, `mimeTypes(types)`, `dimensions(...)`, `image()` and `extensions(types)`.
 
 ## Database
 
