@@ -235,6 +235,55 @@ Future<void> main() async {
       await plain.redis.disconnect();
     });
 
+    test('pull uses one GETDEL', () async {
+      await driver.put('p', <String, dynamic>{'a': 1}, null);
+      expect(await driver.pull('p'), <String, dynamic>{'a': 1});
+      expect(
+        await redis.sendCommand(<String>['GET', 'dox_cache_spec:*[x]:p']),
+        isNull,
+      );
+      expect(await driver.pull('p'), isNull);
+    });
+
+    test('touch uses PEXPIRE and PERSIST', () async {
+      await driver.put('t', 1, const Duration(seconds: 5));
+      expect(await driver.touch('t', const Duration(seconds: 60)), isTrue);
+      int ms = int.parse(
+        '${await redis.sendCommand(<String>['PTTL', 'dox_cache_spec:*[x]:t'])}',
+      );
+      expect(ms, greaterThan(50000));
+      expect(await driver.touch('t', null), isTrue);
+      expect(
+        await redis.sendCommand(<String>['PTTL', 'dox_cache_spec:*[x]:t']),
+        -1,
+      );
+      expect(await driver.touch('missing', null), isFalse);
+    });
+
+    test('a prefix with no colon gets one', () async {
+      RedisDriver app = RedisDriver(redis, prefix: 'dox_cache_spec_app');
+      RedisDriver app2 = RedisDriver(redis, prefix: 'dox_cache_spec_app2');
+      expect(app.prefix, 'dox_cache_spec_app:');
+      expect(RedisDriver(redis, prefix: '').prefix, '');
+      await app.put('k', 1, null);
+      await app2.put('k', 2, null);
+      await app.flush();
+      expect(await app2.get('k'), 2);
+      await app2.flush();
+    });
+
+    test('max_value_bytes is read from the config', () async {
+      RedisDriver built = const RedisDriverFactory().create(<String, dynamic>{
+        'host': RedisEnv.host,
+        'port': RedisEnv.port,
+        'prefix': 'dox_cache_spec:m:',
+        'max_value_bytes': 10,
+      }) as RedisDriver;
+      expect(built.maxValueBytes, 10);
+      await expectLater(built.put('big', 'x' * 20, null), throwsArgumentError);
+      await built.redis.disconnect();
+    });
+
     test('factory builds a driver from config', () async {
       CacheDriver built = const RedisDriverFactory().create(<String, dynamic>{
         'host': RedisEnv.host,

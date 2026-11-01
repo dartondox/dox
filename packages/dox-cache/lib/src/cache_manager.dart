@@ -16,7 +16,7 @@ import 'drivers/redis_driver.dart';
 /// await cache.store('redis').get('a');
 /// ```
 class CacheManager {
-  CacheManager(this.config, {CacheClock clock = const CacheClock()}) {
+  CacheManager(this.config, {this.clock = const CacheClock()}) {
     _factories[CacheConstants.memoryDriver] = MemoryDriverFactory(clock);
     _factories[CacheConstants.fileDriver] = FileDriverFactory(clock);
     _factories[CacheConstants.redisDriver] = const RedisDriverFactory();
@@ -24,6 +24,9 @@ class CacheManager {
   }
 
   final CacheConfig config;
+
+  /// Time source of every store and driver.
+  final CacheClock clock;
 
   final Map<String, CacheDriverFactory> _factories =
       <String, CacheDriverFactory>{};
@@ -37,7 +40,7 @@ class CacheManager {
     if (existing != null) {
       return existing;
     }
-    CacheStore created = CacheStore(_createDriver(storeName));
+    CacheStore created = CacheStore(_createDriver(storeName), clock: clock);
     _stores[storeName] = created;
     return created;
   }
@@ -49,7 +52,7 @@ class CacheManager {
 
   /// Add a ready driver as a store.
   void addStore(String name, CacheDriver driver) {
-    _stores[name] = CacheStore(driver);
+    _stores[name] = CacheStore(driver, clock: clock);
   }
 
   /// Close the connections of every store that was built (eg. Redis).

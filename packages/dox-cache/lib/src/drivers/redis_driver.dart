@@ -15,11 +15,13 @@ import '../constants/cache_constants.dart';
 /// with [prefix] (SCAN, then DEL). It never runs FLUSHDB.
 /// Redis error replies throw `RedisError` (from ioredis).
 class RedisDriver extends CacheDriver {
+  /// A [prefix] that does not end with `:` gets one, so the prefix
+  /// `app` never matches the keys of `app2`.
   RedisDriver(
     this.redis, {
-    this.prefix = CacheConstants.defaultPrefix,
+    String prefix = CacheConstants.defaultPrefix,
     this.maxValueBytes,
-  });
+  }) : prefix = withSeparator(prefix);
 
   /// The connection. Inject your own or use [RedisDriverFactory].
   final Redis redis;
@@ -43,6 +45,14 @@ return 0''';
       .convert(utf8.encode(_releaseScript))
       .toString();
 
+  /// [prefix] with a `:` at the end. An empty prefix stays empty.
+  static String withSeparator(String prefix) {
+    if (prefix.isEmpty || prefix.endsWith(':')) {
+      return prefix;
+    }
+    return '$prefix:';
+  }
+
   /// Close the connection and the pool connections, with no reconnect.
   /// It sends no command, so it works when Redis is down.
   @override
@@ -62,6 +72,35 @@ return 0''';
   Future<String?> getRaw(String key) async {
     Object? reply = await redis.sendCommand(<String>['GET', prefix + key]);
     return reply == null ? null : CacheDriver.liveText(reply.toString());
+  }
+
+  /// GET with no decode.
+  @override
+  Future<bool> has(String key) async {
+    return await getRaw(key) != null;
+  }
+
+  /// One atomic GETDEL. Needs Redis 6.2 or newer.
+  @override
+  Future<dynamic> pull(String key) async {
+    Object? reply = await redis.sendCommand(<String>['GETDEL', prefix + key]);
+    return reply == null ? null : jsonDecode(reply.toString());
+  }
+
+  /// PEXPIRE, or PERSIST for a null [ttl].
+  @override
+  Future<bool> touch(String key, Duration? ttl) async {
+    String fullKey = prefix + key;
+    if (ttl != null) {
+      return await redis.sendCommand(<String>[
+            'PEXPIRE',
+            fullKey,
+            _milliseconds(ttl),
+          ]) ==
+          1;
+    }
+    await redis.sendCommand(<String>['PERSIST', fullKey]);
+    return await redis.sendCommand(<String>['EXISTS', fullKey]) == 1;
   }
 
   /// One MGET for all keys.
@@ -184,6 +223,11 @@ return 0''';
     return reply == 1;
   }
 
+  /// DEL the lock, whoever holds it.
+  Future<bool> forceReleaseLock(String name) async {
+    return await redis.sendCommand(<String>['DEL', _lockKey(name)]) == 1;
+  }
+
   String _lockKey(String name) {
     return '$prefix${CacheConstants.lockKeyPart}$name';
   }
@@ -231,10 +275,16 @@ class RedisLock extends CacheLock {
   Future<bool> release() {
     return _driver.releaseLock(name, owner);
   }
+
+  @override
+  Future<bool> forceRelease() {
+    return _driver.forceReleaseLock(name);
+  }
 }
 
 /// Builds a [RedisDriver] with a new connection.
-/// Options: host, port, username, password, db, tls, prefix, pool_size.
+/// Options: host, port, username, password, db, tls, prefix, pool_size,
+/// max_value_bytes.
 /// pool_size is the most connections to open (ioredis maxConnection).
 /// ioredis shares one connection and only opens more for blocking commands.
 class RedisDriverFactory implements CacheDriverFactory {
@@ -270,6 +320,7 @@ class RedisDriverFactory implements CacheDriverFactory {
       prefix:
           options[CacheConstants.prefixOption] as String? ??
           CacheConstants.defaultPrefix,
+      maxValueBytes: options[CacheConstants.maxValueBytesOption] as int?,
     );
   }
 }

@@ -96,8 +96,8 @@ await cache.store('file').get('a');   // a named store
 | --- | --- |
 | every driver | `driver`, `prefix` (default `dox_cache:`) |
 | `memory` | `max_size`: the most items. When full, the least recently used item is removed. No limit when not set |
-| `file` | `path` (default `storage/cache`) |
-| `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db`, `tls`, `pool_size` |
+| `file` | `path` (default `storage/cache`). Each prefix gets its own sub folder |
+| `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db`, `tls`, `pool_size`, `max_value_bytes` (values bigger than this throw. No limit by default) |
 
 `pool_size` is the most Redis connections one store opens in one isolate (default 10). A store uses about one, so you rarely change it.
 
@@ -126,11 +126,44 @@ List<dynamic> posts = await store.remember('posts', Duration(minutes: 10), () as
 });
 ```
 
+A cached value comes back as JSON. A `List` is `List<dynamic>` and a `Map` is `Map<String, dynamic>`.
+So without `decode`, the type must be a raw JSON type.
+For other types, pass `decode`. It turns the cached JSON into your type:
+
+```dart
+List<String> names = await store.remember<List<String>>(
+  'names',
+  Duration(minutes: 10),
+  loadNames,
+  decode: (Object? json) => List<String>.from(json as List<dynamic>),
+);
+```
+
+- Many calls for the same key at the same time run the function once in one isolate. The others wait for the first.
+- With `lock: true`, callers in other isolates and servers wait too. It uses a cache lock, so the driver must support locks.
+
+## Flexible
+
+Stale while revalidate. The value is fresh for the first time. After that it is stale for the second time.
+A stale value is still returned right away, and one caller refreshes it in the background.
+After both times, the value is gone and the next call waits for the function.
+
+```dart
+int count = await store.flexible<int>(
+  'users',
+  Duration(minutes: 5),  // fresh
+  Duration(minutes: 10), // stale
+  countUsers,
+);
+```
+
+It takes `decode` like `remember`. The driver must support locks.
+
 ## All methods
 
 | Method | What it does |
 | --- | --- |
-| `get(key, [default])` | the value, or the default when missing or expired |
+| `get(key, [default])` | the value, or the default when missing or expired. The default can be a function. It runs only on a miss |
 | `getRaw(key)` | the stored JSON text, with no decode. Null when missing |
 | `put(key, value, [ttl])` | store it |
 | `add(key, value, [ttl])` | store only when missing. Returns true when stored |
@@ -140,9 +173,11 @@ List<dynamic> posts = await store.remember('posts', Duration(minutes: 10), () as
 | `many(keys)` / `putMany(map, [ttl])` | many keys at once |
 | `increment(key, [by])` / `decrement(key, [by])` | change a number. A missing key starts at 0. The ttl stays |
 | `forever(key, value)` | store without expiry |
-| `remember(key, ttl, compute)` | see above |
-| `rememberForever(key, compute)` | the same, without expiry |
-| `pull(key, [default])` | get it, then remove it |
+| `remember(key, ttl, compute, {decode, lock})` | see above |
+| `flexible(key, fresh, stale, compute, {decode})` | see above |
+| `touch(key, ttl)` | set a new ttl and keep the value. Returns true when the key was there |
+| `rememberForever(key, compute, {decode, lock})` | the same, without expiry |
+| `pull(key, [default])` | get it and remove it, in one atomic step |
 | `tags([...])` | a tagged view |
 | `lock(name, [ttl, owner])` | an atomic lock |
 
@@ -184,16 +219,30 @@ bool got = await lock.block(Duration(seconds: 5)); // wait up to 5 seconds
 - `block(timeout)` tries again every 50 ms until it gets the lock or the time is over.
 - The `ttl` frees the lock by itself if the worker crashes. Without a ttl, the lock stays until `release()`.
 - `release()` frees the lock only for the owner that took it.
-- `memory` and `redis` support locks. The `memory` lock works inside one isolate only. `file` and `null` throw `UnsupportedError`.
+- `block(timeout, callback)` runs the callback while it holds the lock, frees the lock and returns the result. It throws `LockTimeoutException` when the time is over.
+- `forceRelease()` frees the lock, whoever holds it.
+- `memory`, `file` and `redis` support locks. The `memory` lock works inside one isolate only. The `file` lock is a file made with `create(exclusive: true)`. It works for all isolates on one machine. `null` throws `UnsupportedError`.
 
 ## Prefix
 
 Every store has a `prefix` (default `dox_cache:`). It is added to every key.
 Use different prefixes when two apps share one Redis database.
+On Redis, a prefix with no `:` at the end gets one, so `app` does not match the keys of `app2`.
 
 !!! info "Redis `flush`"
     `flush` deletes only the keys with the prefix. It never runs `FLUSHDB`.
     An empty prefix makes `flush` throw.
+
+## File driver
+
+- Each prefix has its own sub folder inside `path`. `flush` deletes only the files of that prefix.
+- `add`, `increment` and `touch` take a file lock on the key, so they are safe across isolates.
+- A read never deletes a file. An expired file stays until it is written again.
+  Call `prune()` from time to time, eg. in a schedule, to delete expired files:
+
+```dart
+int deleted = await (store.driver as FileDriver).prune();
+```
 
 ## Your own driver
 
@@ -211,6 +260,7 @@ cache.addStore('ready', MemoryDriver()); // or add a ready driver
 
 `MyDriver extends CacheDriver`. It must implement `prefix`, `get`, `put`, `add`, `increment`, `forget` and `flush`.
 Override `lock` to support locks, and `close` to close its connections.
+Override `pull` to make it atomic, and `has` and `touch` to make them faster. The defaults work, but `pull` is a get and then a forget.
 
 ## Close
 

@@ -58,6 +58,36 @@ class MemoryDriver extends CacheDriver {
     return entry == null ? null : CacheDriver.liveText(entry.value);
   }
 
+  /// No decode: only checks the stored text.
+  @override
+  Future<bool> has(String key) async {
+    MemoryEntry? entry = _live(prefix + key);
+    return entry != null && CacheDriver.liveText(entry.value) != null;
+  }
+
+  /// Read and remove with no await in between, so it is atomic here.
+  @override
+  Future<dynamic> pull(String key) async {
+    String fullKey = prefix + key;
+    MemoryEntry? entry = _live(fullKey);
+    if (entry == null) {
+      return null;
+    }
+    _items.remove(fullKey);
+    return jsonDecode(entry.value);
+  }
+
+  @override
+  Future<bool> touch(String key, Duration? ttl) async {
+    String fullKey = prefix + key;
+    MemoryEntry? entry = _live(fullKey);
+    if (entry == null) {
+      return false;
+    }
+    _items[fullKey] = MemoryEntry(entry.value, _expiresAt(ttl));
+    return true;
+  }
+
   @override
   Future<void> put(String key, Object? value, Duration? ttl) async {
     _write(prefix + key, MemoryEntry(jsonEncode(value), _expiresAt(ttl)));
@@ -85,7 +115,7 @@ class MemoryDriver extends CacheDriver {
   @override
   Future<bool> forget(String key) async {
     MemoryEntry? entry = _items.remove(prefix + key);
-    return entry != null && !entry.isExpired(_clock.now());
+    return entry != null && !_isExpired(entry);
   }
 
   @override
@@ -101,7 +131,7 @@ class MemoryDriver extends CacheDriver {
   /// Take the lock for [owner] when it is free or expired.
   bool acquireLock(String name, String owner, Duration? ttl) {
     MemoryEntry? held = _locks[name];
-    if (held != null && !held.isExpired(_clock.now())) {
+    if (held != null && !_isExpired(held)) {
       return false;
     }
     _locks[name] = MemoryEntry(owner, _expiresAt(ttl));
@@ -119,6 +149,12 @@ class MemoryDriver extends CacheDriver {
     return true;
   }
 
+  /// Free the lock, whoever holds it.
+  bool forceReleaseLock(String name) {
+    MemoryEntry? held = _locks.remove(name);
+    return held != null && !_isExpired(held);
+  }
+
   /// The entry when it exists and is not expired. With [maxSize], marks
   /// it as recently used. Without a limit the order does not matter.
   MemoryEntry? _live(String fullKey) {
@@ -126,7 +162,7 @@ class MemoryDriver extends CacheDriver {
     if (entry == null) {
       return null;
     }
-    if (entry.isExpired(_clock.now())) {
+    if (_isExpired(entry)) {
       _items.remove(fullKey);
       return null;
     }
@@ -153,14 +189,19 @@ class MemoryDriver extends CacheDriver {
     if (--_writesUntilSweep > 0) {
       return;
     }
-    DateTime now = _clock.now();
+    int now = _clock.nowMs();
     _items.removeWhere((String key, MemoryEntry e) => e.isExpired(now));
     _locks.removeWhere((String key, MemoryEntry e) => e.isExpired(now));
     _writesUntilSweep = max(_minSweepWrites, _items.length + _locks.length);
   }
 
-  DateTime? _expiresAt(Duration? ttl) {
-    return ttl == null ? null : _clock.now().add(ttl);
+  int? _expiresAt(Duration? ttl) {
+    return ttl == null ? null : _clock.nowMs() + ttl.inMilliseconds;
+  }
+
+  /// Items with no expiry never read the clock.
+  bool _isExpired(MemoryEntry entry) {
+    return entry.expiresAt != null && entry.isExpired(_clock.nowMs());
   }
 
   int _toInt(Object? value, String key) {
@@ -176,11 +217,13 @@ class MemoryEntry {
   MemoryEntry(this.value, this.expiresAt);
 
   final String value;
-  final DateTime? expiresAt;
 
-  bool isExpired(DateTime now) {
-    DateTime? at = expiresAt;
-    return at != null && !now.isBefore(at);
+  /// Expiry time in milliseconds since epoch. Null means never.
+  final int? expiresAt;
+
+  bool isExpired(int nowMs) {
+    int? at = expiresAt;
+    return at != null && nowMs >= at;
   }
 }
 
@@ -198,6 +241,11 @@ class MemoryLock extends CacheLock {
   @override
   Future<bool> release() async {
     return _driver.releaseLock(name, owner);
+  }
+
+  @override
+  Future<bool> forceRelease() async {
+    return _driver.forceReleaseLock(name);
   }
 }
 

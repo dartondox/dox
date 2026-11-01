@@ -26,6 +26,31 @@ abstract class CacheDriver {
     return text == 'null' ? null : text;
   }
 
+  /// True when the key has a non-null value. Drivers should not decode
+  /// the value for this. The default uses [getRaw].
+  Future<bool> has(String key) async {
+    return await getRaw(key) != null;
+  }
+
+  /// Get the value and remove it. Drivers should do this in one atomic
+  /// step. The default is [get] and then [forget], which is not atomic.
+  Future<dynamic> pull(String key) async {
+    Object? value = await get(key);
+    await forget(key);
+    return value;
+  }
+
+  /// Set a new [ttl] on a key that exists. Null [ttl] means forever.
+  /// True when the key was there. The default reads and writes again.
+  Future<bool> touch(String key, Duration? ttl) async {
+    Object? value = await get(key);
+    if (value == null) {
+      return false;
+    }
+    await put(key, value, ttl);
+    return true;
+  }
+
   /// Store a value.
   Future<void> put(String key, Object? value, Duration? ttl);
 
