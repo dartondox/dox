@@ -189,10 +189,50 @@ DoxResponse redirect(String url, {int status = HttpStatus.found}) {
 
 /// A 302 redirect to the page the request came from (the `Referer`
 /// header), or to [fallback] when there is none.
+///
+/// Only a referer on the same host is used. A referer of another site
+/// goes to [fallback], so `back` can not send users to other sites
+/// (open redirect).
 /// ```
 /// req.session.flash('message', 'Saved');
 /// return back(req);
 /// ```
 DoxResponse back(DoxRequest req, {String fallback = '/'}) {
-  return redirect(req.referer() ?? fallback);
+  return redirect(
+    sameHostUrl(req.referer(), req.header(HttpHeaders.hostHeader)) ?? fallback,
+  );
+}
+
+/// [url] when it points to the same host as the [host] header, else null.
+///
+/// - a path like `/form` is kept. `//evil.com` and `/\evil.com` are not
+///   paths, browsers read them as other sites.
+/// - an `http` or `https` url is kept when its host and port are the
+///   same as [host].
+/// - anything else (other sites, `javascript:`, bad urls) gives null.
+String? sameHostUrl(String? url, String? host) {
+  if (url == null) return null;
+  String u = url.trim();
+  if (u.isEmpty || u.contains('\\') || _hasControlChar(u)) return null;
+  if (u.startsWith('/')) {
+    return u.startsWith('//') ? null : u;
+  }
+  if (host == null || host.trim().isEmpty) return null;
+  Uri? uri = Uri.tryParse(u);
+  if (uri == null || !(uri.isScheme('http') || uri.isScheme('https'))) {
+    return null;
+  }
+  if (uri.host.isEmpty || uri.userInfo.isNotEmpty) return null;
+  Uri? hostUri = Uri.tryParse('${uri.scheme}://${host.trim()}');
+  if (hostUri == null) return null;
+  if (uri.host.toLowerCase() != hostUri.host.toLowerCase()) return null;
+  if (uri.port != hostUri.port) return null;
+  return u;
+}
+
+bool _hasControlChar(String s) {
+  for (int c in s.codeUnits) {
+    if (c < 0x20 || c == 0x7f) return true;
+  }
+  return false;
 }

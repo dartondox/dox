@@ -357,6 +357,18 @@ void main() {
       )).expectStatus(302).expectHeader('location', '/');
     });
 
+    test('back() does not go to a Referer of another site', () async {
+      var (DoxTestClient browser, String token) = await start();
+      (await browser.post(
+        '/form',
+        body: '_token=$token&email=nope',
+        headers: <String, String>{
+          'content-type': 'application/x-www-form-urlencoded',
+          'referer': 'https://evil.example/phish',
+        },
+      )).expectStatus(302).expectHeader('location', '/');
+    });
+
     test('a JSON request still gets 422 JSON', () async {
       var (DoxTestClient browser, String token) = await start();
       (await browser.post(
