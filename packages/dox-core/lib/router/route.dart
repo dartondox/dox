@@ -46,18 +46,66 @@ typedef WebSocketHandler = FutureOr<void> Function(
 
 /// upgrades the request, then gives the socket to the handler
 class _WebSocketRoute {
-  _WebSocketRoute(this.handler);
+  _WebSocketRoute(this.handler, this.allowedOrigins);
 
   final WebSocketHandler handler;
+  final List<String> allowedOrigins;
 
   Future<WebSocket> call(DoxRequest req) async {
     if (!NativeWebSocket.isUpgradeRequest(req.httpRequest)) {
       throw BadRequestException(message: 'WebSocket upgrade required');
     }
+    if (!webSocketOriginAllowed(
+      req.origin(),
+      req.header(HttpHeaders.hostHeader),
+      allowedOrigins,
+    )) {
+      throw ForbiddenHttpException(message: 'WebSocket origin not allowed');
+    }
     WebSocket socket = await NativeWebSocket.upgrade(req.httpRequest);
     await handler(socket, req);
     return socket;
   }
+}
+
+/// true when a WebSocket upgrade with this [origin] may open.
+///
+/// A browser always sends `Origin` on a WebSocket upgrade, and it sends
+/// the cookies of the app too. So without this check any site could open
+/// a socket as the logged in user (cross-site WebSocket hijacking).
+///
+/// - no `Origin` header: allowed. This is not a browser.
+/// - the origin host and port are the same as the `Host` header: allowed.
+/// - the origin is in [allowedOrigins] (like `https://app.example.com`),
+///   or the list has `*`: allowed.
+/// - anything else: not allowed.
+bool webSocketOriginAllowed(
+  String? origin,
+  String? host,
+  List<String> allowedOrigins,
+) {
+  if (origin == null) return true;
+  if (allowedOrigins.contains('*')) return true;
+  String clean = _cleanOrigin(origin);
+  for (String allowed in allowedOrigins) {
+    if (_cleanOrigin(allowed) == clean) return true;
+  }
+  if (host == null || host.isEmpty) return false;
+  Uri? originUri = Uri.tryParse(origin.trim());
+  if (originUri == null || originUri.host.isEmpty) return false;
+  Uri? hostUri = Uri.tryParse('${originUri.scheme}://${host.trim()}');
+  if (hostUri == null) return false;
+  return originUri.host.toLowerCase() == hostUri.host.toLowerCase() &&
+      originUri.port == hostUri.port;
+}
+
+/// `HTTPS://App.com/` and `https://app.com` are the same origin
+String _cleanOrigin(String origin) {
+  String o = origin.trim().toLowerCase();
+  while (o.endsWith('/')) {
+    o = o.substring(0, o.length - 1);
+  }
+  return o;
 }
 
 /// A route action that points to a method of a controller from the
@@ -471,6 +519,11 @@ class Route {
   /// raw WebSocket route. [handler] gets the open socket.
   /// Middleware runs first, so it can check auth.
   /// For rooms, acks and the socket.io clients, use `dox_socketio`.
+  ///
+  /// Only pages of the same host can open the socket from a browser. Add
+  /// other sites to [allowedOrigins], like `https://app.example.com`.
+  /// `*` allows every site. Other origins get 403. A client with no
+  /// `Origin` header (not a browser) is always allowed.
   /// ```
   /// Route.websocket('echo', (WebSocket socket, DoxRequest req) {
   ///   socket.listen(socket.add);
@@ -480,11 +533,12 @@ class Route {
     String route,
     WebSocketHandler handler, {
     List<dynamic> middleware = const <dynamic>[],
+    List<String> allowedOrigins = const <String>[],
   }) {
     return Route()._addRoute(
       HttpRequestMethod.GET,
       Route()._join(route),
-      <dynamic>[...middleware, _WebSocketRoute(handler).call],
+      <dynamic>[...middleware, _WebSocketRoute(handler, allowedOrigins).call],
     );
   }
 
