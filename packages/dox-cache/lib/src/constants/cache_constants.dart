@@ -58,6 +58,9 @@ class CacheConstants {
   /// Lock ttl and wait time of file driver `add`, `increment` and `touch`.
   static const Duration fileKeyLockTtl = Duration(seconds: 5);
 
+  /// The file driver deletes expired files once every this many writes.
+  static const int filePruneEvery = 1000;
+
   /// End of file driver lock file names.
   static const String fileLockSuffix = '.lock';
   static const String fileKeyLockSuffix = '.klock';

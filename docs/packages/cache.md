@@ -238,7 +238,8 @@ On Redis, a prefix with no `:` at the end gets one, so `app` does not match the 
 - Each prefix has its own sub folder inside `path`. `flush` deletes only the files of that prefix.
 - `add`, `increment` and `touch` take a file lock on the key, so they are safe across isolates.
 - A read never deletes a file. An expired file stays until it is written again.
-  Call `prune()` from time to time, eg. in a schedule, to delete expired files:
+- Once every 1000 writes, the driver runs `prune()` in the background. It deletes the expired files.
+  You can also call `prune()` yourself, eg. in a schedule:
 
 ```dart
 int deleted = await (store.driver as FileDriver).prune();

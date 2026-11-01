@@ -19,7 +19,8 @@ import '../constants/cache_constants.dart';
 /// first and then rename, so a reader never sees half a file.
 ///
 /// A read never deletes a file. An expired file stays until it is
-/// written again, removed, or [prune] runs.
+/// written again, removed, or [prune] runs. [prune] runs by itself in the
+/// background once every [pruneEvery] writes, so the disk does not fill.
 ///
 /// `add`, `increment` and `touch` take a file lock on the key, so they
 /// are safe across isolates and processes on one machine.
@@ -28,6 +29,7 @@ class FileDriver extends CacheDriver {
     Directory? directory,
     this.prefix = CacheConstants.defaultPrefix,
     this._clock = const CacheClock(),
+    this.pruneEvery = CacheConstants.filePruneEvery,
   }) : directory = directory ?? Directory(CacheConstants.defaultFilePath);
 
   /// Base folder of the cache. Stores keep their files in sub folders.
@@ -37,6 +39,13 @@ class FileDriver extends CacheDriver {
   final String prefix;
 
   final CacheClock _clock;
+
+  /// Run [prune] in the background once every this many writes.
+  /// 0 turns it off.
+  final int pruneEvery;
+
+  int _writes = 0;
+  bool _pruning = false;
 
   /// Folder of this store: a short hash of [prefix] inside [directory].
   late final Directory storeDirectory = Directory(
@@ -238,6 +247,23 @@ class FileDriver extends CacheDriver {
       await temp.writeAsString(text, flush: true);
     }
     await temp.rename(file.path);
+    _pruneSometimes();
+  }
+
+  /// Start [prune] once every [pruneEvery] writes. It is not awaited, and
+  /// only one runs at a time.
+  void _pruneSometimes() {
+    if (pruneEvery <= 0 || ++_writes < pruneEvery || _pruning) return;
+    _writes = 0;
+    _pruning = true;
+    prune().catchError(_ignorePruneError).whenComplete(_prunedDone);
+  }
+
+  /// a failed prune only leaves files for the next one
+  int _ignorePruneError(Object error) => 0;
+
+  void _prunedDone() {
+    _pruning = false;
   }
 
   int? _expiresAt(Duration? ttl) {

@@ -163,6 +163,24 @@ void main() {
       expect(await driver.get('keep'), 2);
     });
 
+    test('writes prune expired files by themselves', () async {
+      FileDriver pruning = FileDriver(
+        directory: directory,
+        clock: clock,
+        pruneEvery: 3,
+      );
+      await pruning.put('old', 1, const Duration(seconds: 1));
+      clock.advance(const Duration(seconds: 2));
+      await pruning.put('a', 2, null);
+      expect(pruning.fileFor('old').existsSync(), isTrue);
+      await pruning.put('b', 3, null);
+      for (int i = 0; i < 100 && pruning.fileFor('old').existsSync(); i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+      }
+      expect(pruning.fileFor('old').existsSync(), isFalse);
+      expect(await pruning.get('a'), 2);
+    });
+
     test('flush clears only the folder of this prefix', () async {
       FileDriver other = FileDriver(directory: directory, prefix: 'q:');
       await driver.put('a', 1, null);
