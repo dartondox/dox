@@ -4,6 +4,7 @@ import 'dart:isolate';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/isolate/isolate_handler.dart';
 import 'package:dox_core/isolate/isolate_interfaces.dart';
+import 'package:dox_core/middleware/rate_limit_counter.dart';
 import 'package:dox_core/router/route_data.dart';
 
 class DoxIsolate {
@@ -80,6 +81,7 @@ class DoxIsolate {
     _isolates.clear();
     _receivePorts.clear();
     _sendPorts.clear();
+    RateLimitCounter.instance.close();
   }
 
   /// create a thread.
@@ -124,6 +126,7 @@ class DoxIsolate {
         routes: _baseRoutes,
         bindings: Route().bindings,
         control: controlPort.sendPort,
+        rateLimitPort: RateLimitCounter.instance.port,
       ),
       onError: errorPort.sendPort,
       onExit: exitPort.sendPort,
