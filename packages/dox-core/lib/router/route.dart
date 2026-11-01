@@ -39,6 +39,9 @@ typedef RawRequestHandler = Future<void> Function(HttpRequest request);
 /// prefix => handler. empty unless something is mounted.
 final Map<String, RawRequestHandler> _mounts = <String, RawRequestHandler>{};
 
+/// prefixes of the mounts added with `middleware: true`
+final Set<String> _mountsWithMiddleware = <String>{};
+
 /// folders added with [Route.staticFiles]. empty unless one is added.
 final List<StaticFolder> _statics = <StaticFolder>[];
 
@@ -183,21 +186,44 @@ class Route {
   /// raw handlers added with [mount]
   Map<String, RawRequestHandler> get mounts => _mounts;
 
-  /// send every request whose path starts with [prefix] straight to
-  /// [handler], before routing, middleware and body reading.
-  /// the handler writes and closes the response itself.
-  /// Socket.IO uses this for `/socket.io/`.
+  /// send every request under [prefix] straight to [handler], before
+  /// routing and body reading. the handler writes and closes the
+  /// response itself. Socket.IO uses this for `/socket.io/`.
+  ///
+  /// The prefix matches whole path parts. `/admin` and `/admin/` both
+  /// match `/admin`, `/admin/` and `/admin/users`, never `/administrator`.
+  /// The query string is not part of the match.
+  ///
+  /// By default no middleware runs, also no global middleware (security
+  /// headers, CSRF, rate limit). With [middleware] set to true, the
+  /// `AppConfig.globalMiddleware` runs first. A middleware that gives a
+  /// response stops the request before [handler]. The body is not read
+  /// for the middleware, so the handler can still read it.
   /// ```
   /// Route.mount('/socket.io/', io.handle);
+  /// Route.mount('/admin', admin.handle, middleware: true);
   /// ```
-  static void mount(String prefix, RawRequestHandler handler) {
+  static void mount(
+    String prefix,
+    RawRequestHandler handler, {
+    bool middleware = false,
+  }) {
     _mounts[prefix] = handler;
+    if (middleware) {
+      _mountsWithMiddleware.add(prefix);
+    } else {
+      _mountsWithMiddleware.remove(prefix);
+    }
   }
 
   /// remove a handler added with [mount]
   static void unmount(String prefix) {
     _mounts.remove(prefix);
+    _mountsWithMiddleware.remove(prefix);
   }
+
+  /// prefixes of the mounts that run the global middleware first
+  Set<String> get mountsWithMiddleware => _mountsWithMiddleware;
 
   /// folders added with [staticFiles]
   List<StaticFolder> get statics => _statics;

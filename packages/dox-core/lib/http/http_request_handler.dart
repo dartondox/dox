@@ -61,17 +61,80 @@ bool _mounted(HttpRequest req, Map<String, RawRequestHandler> mounts) {
   String path = req.uri.path;
   for (MapEntry<String, RawRequestHandler> mount in mounts.entries) {
     String prefix = mount.key;
-    if (path.startsWith(prefix) ||
-        (prefix.endsWith('/') &&
-            path == prefix.substring(0, prefix.length - 1))) {
-      /// report the error and answer 500, so the client does not hang
-      mount.value(req).catchError((Object error, StackTrace stackTrace) {
-        httpErrorHandler(req, error, stackTrace);
-      });
+    if (!_underPrefix(path, prefix)) continue;
+    if (Route().mountsWithMiddleware.contains(prefix)) {
+      _runMount(req, prefix, mount.value);
       return true;
     }
+
+    /// report the error and answer 500, so the client does not hang
+    mount.value(req).catchError((Object error, StackTrace stackTrace) {
+      httpErrorHandler(req, error, stackTrace);
+    });
+    return true;
   }
   return false;
+}
+
+/// true when [path] is [prefix] or a path under it. a trailing `/` on
+/// the prefix does not matter: `/admin` and `/admin/` both match
+/// `/admin`, `/admin/` and `/admin/users`, but never `/administrator`.
+bool _underPrefix(String path, String prefix) {
+  int end = prefix.endsWith('/') ? prefix.length - 1 : prefix.length;
+  if (!path.startsWith(prefix.substring(0, end))) return false;
+  return path.length == end || path.codeUnitAt(end) == 0x2F;
+}
+
+/// a route that runs the global middleware, then the raw handler.
+/// made on the first request, once per handler.
+final Expando<RouteData> _mountRoutes = Expando<RouteData>();
+
+/// what the mount route gives when the raw handler is done. the handler
+/// wrote the answer itself, so nothing more is sent.
+const Object _handled = Object();
+
+/// run the global middleware, then the mount handler. a middleware that
+/// gives a response sends it, and the handler never runs. the body is not
+/// read here, so the handler can still read it.
+void _runMount(HttpRequest req, String prefix, RawRequestHandler handler) {
+  RouteData route = _mountRoutes[handler] ??= _mountRoute(prefix, handler);
+  DoxRequest doxReq = _doxRequest(
+    req,
+    route,
+    null,
+    RequestBody.empty(),
+    req.headers.contentType,
+  );
+  Future<dynamic>.sync(() => runMiddlewareAndController(doxReq)).then(
+    (dynamic value) {
+      if (identical(value, _handled)) return;
+
+      /// a `next` middleware wraps the result in a DoxResponse
+      if (value is DoxResponse && identical(value.getContent(), _handled)) {
+        return;
+      }
+      _send(req, value);
+    },
+    onError: (Object error, StackTrace stackTrace) {
+      httpErrorHandler(req, error, stackTrace);
+    },
+  );
+}
+
+RouteData _mountRoute(String prefix, RawRequestHandler handler) {
+  List<dynamic> global = Dox().config.globalMiddleware;
+  return RouteData(
+    method: '*',
+    path: prefix,
+    controllers: <dynamic>[
+      ...global,
+      (DoxRequest req) async {
+        await handler(req.httpRequest);
+        return _handled;
+      },
+    ],
+    preMiddleware: List<dynamic>.unmodifiable(global),
+  );
 }
 
 /// run middleware and controller, then send the result.

@@ -339,3 +339,31 @@ Route.post('/posts', (PostController c) => c.store, body: v.object(<String, Sche
   'title': v.string().min(3),
 }));
 ```
+
+## Mount a raw handler
+
+`Route.mount(prefix, handler)` sends every request under a path prefix straight to a raw `HttpRequest` handler.
+It runs before routing and before the body is read. The handler writes and closes the response itself.
+[Socket.IO](../packages/socketio.md) uses it for `/socket.io/`.
+
+```dart
+Route.mount('/socket.io/', io.handle);
+Route.mount('/admin', admin.handle, middleware: true);
+```
+
+How the prefix matches:
+
+- It matches whole path parts. `/admin` matches `/admin`, `/admin/` and `/admin/users`. It never matches `/administrator` or `/admin-login`.
+- A trailing `/` does not change the match. `/socket.io/` also matches `/socket.io`.
+- The query string is not part of the match.
+
+!!! warning
+    By default a mount skips all middleware, also the global middleware (security headers, CSRF, rate limit).
+    Set `middleware: true` to run `AppConfig.globalMiddleware` before the handler.
+
+With `middleware: true`:
+
+- A middleware that gives a response (like `403`) stops the request. The handler does not run.
+- The body is not read for the middleware, so the handler can still read it. A CSRF token must come in a header.
+- The handler sends the answer itself. So work that a middleware does after the handler (the `next` or `terminate` step) does not change the answer.
+- An error in the handler gives `500`, like without middleware.
