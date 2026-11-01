@@ -291,7 +291,8 @@ static Future<User?> findUser(Handshake handshake) async {
 - `handshake.session()` uses `AppConfig.session`. Pass another `SessionConfig` like `handshake.session(config)`.
 - The session is read once, when the socket connects. A logout later does not close the socket. Call `socket.disconnect()` yourself if you need that.
 - The session is read only. Changes to it are not saved.
-- With no `allowedOrigins`, `handshake.session()` prints a warning once.
+- With no `allowedOrigins`, or with `'*'` in it, `handshake.session()` prints a warning once.
+- With the `cookie` session driver, an old copy of the session cookie still works after logout, until the session `lifetime` ends. If a logout must stop old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
 
 !!! warning "Cookie login needs `allowedOrigins`"
     A browser sends its cookies on a websocket from any website. So if you log users in with a cookie, set `allowedOrigins` to your own sites.

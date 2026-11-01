@@ -189,6 +189,7 @@ dynamic userId = session.get('auth_web');
 - Give the value as the browser sent it (still encrypted). Do not decrypt it first.
 - The checks are the same as for a request. A changed cookie, a cookie of another name, a cookie made with another `APP_KEY`, an expired session or an unknown id gives an empty session.
 - Changes to this session are not saved.
+- With the `cookie` driver, an old copy of the cookie still works after logout, until the session `lifetime` ends. If a logout must stop old cookies, use the `cache` driver.
 - `SessionMiddleware(config)` uses another `SessionConfig`, like on a route.
 
 ## Tests
