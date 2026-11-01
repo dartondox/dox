@@ -37,7 +37,7 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `responseHandler` | `ResponseHandlerInterface?` | `null` | A class with `DoxResponse handle(DoxResponse res)`. It sees every response before it is sent. |
 | `exceptionHandler` | `ExceptionHandler` | `ExceptionHandler()` | Reports every unhandled error and turns it into a response. The default logs the error with `Logger.warn` and the stack with `Logger.danger`. See [Error handling](../the-basic/errors.md). |
 | `providers` | `List<DoxProvider>` | `[]` | Providers to run first, in this order. Every other `DoxProvider` class comes from `container`. Dox runs them in every isolate at start. |
-| `webSocketAllowedOrigins` | `List<String>?` | `null` (no check) | Turns on the `Origin` check for every `Route.websocket` route. Only pages of the same host and the listed sites, like `https://app.example.com`, can open a socket. Other origins get `403`. `[]` means the same host only. `allowedOrigins` on a route wins over this. With `null`, any website can open a socket with the cookies of the user, and Dox logs one warning at start. |
+| `webSocketAllowedOrigins` | `List<String>?` | `null` (no check) | Turns on the `Origin` check for every `Route.websocket` route. Only pages of the same host and the listed sites, like `https://app.example.com`, can open a socket. Other origins get `403`. `[]` means the same host only. `allowedOrigins` on a route wins over this. With `null`, any website can open a socket with the cookies of the user, and Dox prints one warning to stderr at start. |
 
 ## Sub configs
 

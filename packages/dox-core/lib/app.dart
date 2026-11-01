@@ -216,7 +216,8 @@ class Dox {
       "['https://app.example.com']), or allowedOrigins: on Route.websocket. "
       '[] allows the same host only.';
 
-  /// log one warning when a `Route.websocket` route checks no `Origin`.
+  /// print one warning to stderr when a `Route.websocket` route checks
+  /// no `Origin`.
   /// Any site can then open a socket with the cookies of the user.
   void warnWebSocketOrigin() {
     if (_warnedWebSocketOrigin ||
