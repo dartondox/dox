@@ -267,6 +267,10 @@ socket.on('connect_error', (err) => console.log(err.message)); // 'Unauthorized'
 - With null, the client gets a `connect_error` with the message `Unauthorized`, and `onConnection` does not run. Change the message with `SocketAuth(findUser, message: '...')`.
 - `handshake.token` is `auth.token` from the client, else the `Authorization: Bearer` header. Browsers can not set headers on a websocket, so use `auth`.
 - `handshake.cookie('name')` reads a cookie and decrypts it with the APP_KEY, like `req.cookie('name')`. Use `decrypt: false` for a plain cookie.
+
+!!! warning "Cookie login needs `allowedOrigins`"
+    A browser sends its cookies on a websocket from any website. So if you log users in with a cookie, set `allowedOrigins` to your own sites.
+    Without it, another website can open a socket as your user. See [Allowed origins](#allowed-origins).
 - `io.use(SocketAuth(findUser).handle)` does the same for the default namespace.
 
 ## Node.js to Dart
@@ -318,12 +322,27 @@ SocketIoServer(
 | `transports` | `['polling', 'websocket']` | allowed transports |
 | `allowUpgrades` | `true` | let polling clients move to websocket |
 | `cors` | `null` | CORS headers for polling requests. It also checks the origin of websockets |
+| `allowedOrigins` | `null` | the sites that may connect, see [Allowed origins](#allowed-origins) |
 
 - `cors` with a list of origins: a websocket from another origin gets 403. A request with no `Origin` header (not a browser) is allowed.
 - `cors: null`, or `*` in `origins`: websockets from any origin are allowed. If you log users in with cookies, list your origins.
 - `*` together with `credentials: true` throws an `ArgumentError`. List your origins instead.
 - Websocket compression is off. A message bigger than `maxHttpBufferSize` closes with code 1009.
 - On a plain `dart:io` server (`io.attach`), the whole message is read before the size check. Also set a size limit in your proxy.
+
+### Allowed origins
+
+`allowedOrigins` says which websites may open a socket. Set it when you log users in with cookies.
+
+```dart
+ServerOptions(allowedOrigins: <String>['https://app.example.com']);
+```
+
+- `null` (the default): no extra check. Websockets are checked against `cors` when it is set. Dox logs a warning at start.
+- `[]`: only pages of the same host can connect.
+- A list of sites: the same host and those sites can connect.
+- `['*']`: every site can connect.
+- Other sites get 403. A client with no `Origin` header (not a browser) is always allowed.
 
 ## Many servers: Redis adapter
 
