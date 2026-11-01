@@ -347,7 +347,12 @@ await blog.touch('published_at');  // published_at = now
 ```
 
 - It returns the number of changed rows: 1, or 0 when the row is not there.
-- It fires no model events.
+  It also returns 0 when the model has no `updated_at` column and you give no column.
+- It fires the save events: `saving`, `updating`, `updated` and `saved`, like `save()`.
+  A hook that throws `CancelModelEvent` stops it, and it returns 0.
+- `touchQuietly()` does the same with no events.
+- On a new model that was never saved, there is no primary key value.
+  Then `touch()` runs as a query and changes every row, like `delete()`.
 
 `replicate()` makes a new model with the same column values. It is not saved yet.
 It has no primary key, `created_at` or `updated_at`, so `save()` inserts a new row.
@@ -362,6 +367,7 @@ Blog other = blog.replicate(<String>['slug']);
 ```
 
 - Relations are not copied.
+- Like Laravel, it copies `deleted_at`. A copy of a soft deleted model is soft deleted too.
 - A column in the list that can not be `null`, or that is not a column, throws an `ArgumentError`.
 
 ## Delete
@@ -384,7 +390,7 @@ await deleted?.restore(); // sets deleted_at back to NULL
 - They return 1 when the row was deleted.
 - They return 0 when the row was not there, or when a [model event](events.md) cancels.
 
-`save()`, `delete()`, `forceDelete()` and `restore()` fire [model events](events.md).
+`save()`, `touch()`, `delete()`, `forceDelete()` and `restore()` fire [model events](events.md).
 
 ## Convert to a map or JSON
 

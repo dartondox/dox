@@ -299,7 +299,7 @@ class Blog extends BlogGenerator {
 | `await blog.forceDelete()` / `await blog.restore()` | real delete / undo soft delete |
 | `Blog().withTrash()` | include soft deleted rows |
 | `Blog().onlyTrashed()` | only soft deleted rows |
-| `await blog.touch()` | set `updated_at` to now |
+| `await blog.touch()` | set `updated_at` to now, `touchQuietly()` with no events |
 | `blog.replicate()` | a new unsaved copy of the model |
 | `Blog().preload('comments').get()` | load a relation, one query |
 | `Blog().whereHas('comments').get()` / `whereDoesntHave` / `has('comments', '>=', 3)` | filter by a relation |

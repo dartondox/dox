@@ -62,6 +62,7 @@ All hooks come in pairs: one runs before the query, one after it.
 | `delete()` | `deleting` → *DELETE or soft delete* → `deleted` |
 | `forceDelete()` | `forceDeleting` → `deleting` → *DELETE* → `deleted` → `forceDeleted` |
 | `restore()` | `restoring` → *UPDATE deleted_at = NULL* → `restored` |
+| `touch()` | `saving` → `updating` → *UPDATE updated_at* → `updated` → `saved` (`touchQuietly()` fires none) |
 
 - The model hook runs first. Then the observers run, in the order you added them.
 - When a model has events, `create({...})` saves only the `@Column` fields.
@@ -69,7 +70,7 @@ All hooks come in pairs: one runs before the query, one after it.
 !!! warning "Query updates and deletes fire no events"
     Events fire only on one model instance.
     `Post().where('draft', true).update({...})`, `Post().where(...).delete()`,
-    `insertMultiple()`, `upsert()`, `increment()` and `decrement()` run one query and fire no events.
+    `insertMultiple()`, `upsert()`, `increment()`, `decrement()` and `Post().where(...).touch()` run one query and fire no events.
 
 ## Examples
 

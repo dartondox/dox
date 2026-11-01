@@ -199,12 +199,13 @@ print(page.hasMorePages); // true when there is a next page
 ### `cursorPaginate`
 
 Returns one page of rows after a cursor.
-It uses `WHERE id > ?`, not `OFFSET`, so it stays fast on a big table.
+It uses a `WHERE` on the order columns, not `OFFSET`, so it stays fast on a big table.
 Use it for an endless list or an API.
 
 ```dart
 CursorPagination<Actor> page = await Actor()
     .where('age', '>=', 18)
+    .orderBy('age', 'desc')
     .cursorPaginate(perPage: 10, cursor: req.input('cursor'));
 
 List<Actor> actors = page.data;
@@ -215,14 +216,16 @@ print(page.prevCursor); // send it back as `cursor` to read the page before
 `page.toJson()` gives `per_page`, `next_cursor`, `prev_cursor` and `data`.
 `next_cursor` is `null` on the last page. `prev_cursor` is `null` on the first page.
 
-- The rows are ordered by the primary key. Use `column` and `direction` to change it:
-  `cursorPaginate(perPage: 10, column: 'created_at', direction: 'desc')`.
-- Do not add `orderBy()`. It throws a `StateError`.
-- The column must be in the select, and it must have no `null` values.
-- Use a column with unique values. With a column like `created_at`, two rows
-  with the same value can be skipped.
-- The cursor is safe to take from a user. Its value is only sent as a query value, never as SQL.
-  A cursor that is not valid, or that is made for another column, gives the first page.
+- The rows are ordered by all the `orderBy()` columns. You can mix `asc` and `desc`.
+- With no `orderBy()`, they are ordered by the primary key.
+  Or use `column` and `direction`: `cursorPaginate(perPage: 10, column: 'created_at', direction: 'desc')`.
+- The primary key is added as the last order column, so rows with the same value are never skipped.
+- `orderBy()` together with `column`, `orderByRaw()` and `inRandomOrder()` throw a `StateError`.
+- The order columns must be in the select, and they must have no `null` values.
+- The cursor is safe to take from a user. The columns and the order come from your code.
+  The values of the cursor are only sent as query values, never as SQL.
+- A cursor that is not valid gives the first page. This is also true for a changed cursor
+  with a value of the wrong kind, like a text for a number column.
 
 ### `chunk` and `chunkById`
 
@@ -940,6 +943,7 @@ List<Actor> actors = await Actor().withTrash().where('name', 'John Wick').get();
 ### `onlyTrashed`
 
 `onlyTrashed()` gives only the soft deleted rows.
+On a model without soft deletes it throws a `StateError`.
 
 ```dart
 List<Actor> trashed = await Actor().onlyTrashed().get();
@@ -958,6 +962,7 @@ await Actor().where('name', 'John Wick').touch();
 await Actor().where('id', 1).touch('seen_at');
 ```
 
+On a query, `touch()` fires no model events.
 On a model from the table, `touch()` changes only the row of that model.
 See [Models](model/index.md#touch-and-replicate).
 
