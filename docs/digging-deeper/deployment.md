@@ -97,15 +97,15 @@ docker build -t my-app .
 docker run -p 3000:3000 --env-file .env -e DB_HOST=... my-app
 ```
 
-A new app also has a `docker-compose.yml`. It runs the app and Postgres, and reads `.env` with `env_file: .env`:
+A new app also has a `docker-compose.yml`. It runs the app, a queue worker and Postgres, and reads `.env` with `env_file: .env`:
 
 ```bash
 docker compose up -d --build
 ```
 
-A new `.env` uses SQLite. To use the Postgres of the compose file, set `DB_CONNECTION=postgres` and `DB_NAME` (for example `postgres`) in `.env`.
+A new `.env` uses SQLite. The compose services set `DB_CONNECTION=postgres` and `DB_NAME=dox` themselves. To use the compose Postgres with `dox s`, set the same two values in `.env`. The database port listens on `127.0.0.1` only.
 
-The queue worker and the scheduler run as their own processes. In the image, start them with `/app/bin/queue work` and `/app/bin/schedule work`.
+The queue worker and the scheduler run as their own processes. The compose file has a `worker` service for the queue. In the image, start them with `/app/bin/queue work` and `/app/bin/schedule work`.
 See [Docker](../guides/docker.md) for a health check in the image.
 
 ## HTTPS: put a proxy in front

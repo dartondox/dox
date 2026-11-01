@@ -91,9 +91,11 @@ pong
 docker compose up -d --build
 ```
 
-This starts the app and a Postgres database.
-The app reads `.env`, so set `DB_CONNECTION=postgres` and `DB_NAME=postgres` there first.
+This starts the app, a queue worker and a Postgres database.
+The app and the worker always use the Postgres service. They set `DB_CONNECTION` and `DB_NAME` themselves.
+The database port is open on this machine only (`127.0.0.1`), not on the network.
 To start only the database and run the app with `dox s`, use `docker compose up -d postgres`.
+Then set `DB_CONNECTION=postgres` and `DB_NAME=dox` in `.env`.
 
 !!! tip "Production"
     Do not use `dox s` or `dart run` in production.
