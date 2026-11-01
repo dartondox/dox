@@ -19,8 +19,10 @@ void httpRequestHandler(HttpRequest req) {
     Map<String, RawRequestHandler> mounts = Route().mounts;
     if (mounts.isNotEmpty && _mounted(req, mounts)) return;
 
-    RouteData? route = httpRouteHandler(req);
-    if (route == null) return;
+    RouteMatch? match = httpRouteHandler(req);
+    if (match == null) return;
+    RouteData route = match.route;
+    Map<String, dynamic>? params = match.params;
 
     httpCorsHandler(route.corsEnabled, req);
 
@@ -29,12 +31,12 @@ void httpRequestHandler(HttpRequest req) {
     /// read the header once and pass it on.
     ContentType? contentType = req.headers.contentType;
     if (contentType == null) {
-      _run(req, _doxRequest(req, route, RequestBody.empty(), null));
+      _run(req, _doxRequest(req, route, params, RequestBody.empty(), null));
     } else {
       HttpBody.read(req, contentType).then(
         (RequestBody body) {
           try {
-            _run(req, _doxRequest(req, route, body, contentType));
+            _run(req, _doxRequest(req, route, params, body, contentType));
           } catch (error, stackTrace) {
             httpErrorHandler(req, error, stackTrace);
           }
@@ -99,12 +101,13 @@ void _send(HttpRequest req, dynamic value) {
 Future<DoxRequest> getDoxRequest(HttpRequest req, RouteData route) async {
   ContentType? contentType = req.headers.contentType;
   RequestBody body = await HttpBody.read(req, contentType);
-  return _doxRequest(req, route, body, contentType);
+  return _doxRequest(req, route, null, body, contentType);
 }
 
 DoxRequest _doxRequest(
   HttpRequest req,
   RouteData route,
+  Map<String, dynamic>? params,
   RequestBody body,
   ContentType? contentType,
 ) {
@@ -116,6 +119,7 @@ DoxRequest _doxRequest(
     contentType: contentType,
     httpHeaders: req.headers,
     httpRequest: req,
+    params: params,
     // the client ip needs a socket call, so it is read on first use only
     readClient: true,
   );

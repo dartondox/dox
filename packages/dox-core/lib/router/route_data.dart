@@ -9,9 +9,6 @@ class RouteData {
   /// set by `Route.get(...).name('users.show')`, see `Route.url`
   String? name;
 
-  /// set by [withParams]. made only when a plain route reads it.
-  late Map<String, dynamic> params = <String, dynamic>{};
-
   /// middleware from groups and routers (`Route.middleware`, global
   /// middleware). they are also the first items of [controllers].
   final List<dynamic> preMiddleware;
@@ -138,30 +135,5 @@ class RouteData {
     if (text.endsWith('*}')) return '$slash(.+)';
     if (text.endsWith('?}')) return '(?:$slash([^/]+))?';
     return '$slash([^/]+)';
-  }
-
-  /// a copy for one request, with its own params.
-  /// the shared route is never changed, so two requests at the
-  /// same time can not see each other's params.
-  RouteData withParams(Map<String, dynamic> values) {
-    return RouteData(
-        method: method,
-        path: path,
-        controllers: controllers,
-        corsEnabled: corsEnabled,
-        preMiddleware: preMiddleware,
-        domain: domain,
-        body: body,
-      )
-      ..params = values
-      ..name = name
-      .._handler = handler
-      .._handlerRead = true
-      .._action = _action
-      .._actionRead = _actionRead
-      .._usesNext = usesNext
-      .._pattern = _pattern
-      .._paramNames = _paramNames
-      .._compiledFor = _compiledFor;
   }
 }

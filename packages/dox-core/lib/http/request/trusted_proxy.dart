@@ -20,8 +20,14 @@ class TrustedProxy {
   static List<String>? _cachedList;
   static TrustedProxy _cached = TrustedProxy(const <String>[]);
 
+  /// the answer of [readClient] per request. the socket call is slow, and
+  /// a request can ask twice (`req.ip()`, then the cookies of the answer).
+  static final Expando<({String? ip, String scheme})> _perRequest =
+      Expando<({String? ip, String scheme})>();
+
   /// The client ip and scheme of [req]. [trusted] is the
   /// `trustedProxies` setting. It is parsed once per isolate.
+  /// The answer is kept for [req], so a second call is cheap.
   static ({String? ip, String scheme}) readClient(
     HttpRequest req,
     List<String> trusted,
@@ -29,7 +35,12 @@ class TrustedProxy {
     if (!identical(trusted, _cachedList)) {
       _cached = TrustedProxy(trusted);
       _cachedList = trusted;
+      _perRequest[req] = null;
     }
+    return _perRequest[req] ??= _read(req);
+  }
+
+  static ({String? ip, String scheme}) _read(HttpRequest req) {
     String? address = req.connectionInfo?.remoteAddress.address;
     String? remote = address == null ? null : normalize(address);
     if (remote == null || !_cached.enabled) return (ip: remote, scheme: 'http');

@@ -42,12 +42,11 @@ class DoxRequest implements IDoxRequest {
 
   Map<String, dynamic> body;
 
-  /// the route params, eg. `{'id': '5'}`
-  /// a plain route (no params) is shared by all its requests,
-  /// so it gets a new map. a write here must not reach the next request.
-  late Map<String, dynamic> param = route.pattern == null
-      ? <String, dynamic>{}
-      : route.params;
+  /// the route params, eg. `{'id': '5'}`. each request has its own map.
+  late Map<String, dynamic> param = _params ?? <String, dynamic>{};
+
+  /// the params the router found, null for a route with no params
+  final Map<String, dynamic>? _params;
 
   /// values from `Route.bind`, set before the controller runs
   late final Map<String, Object> boundValues = <String, Object>{};
@@ -123,6 +122,7 @@ class DoxRequest implements IDoxRequest {
     required this.httpRequest,
     RequestBody? requestBody,
     this._readClient = false,
+    this._params,
   }) : _givenIp = clientIp,
        _givenScheme = scheme,
        requestBody = requestBody ?? RequestBody(body);
