@@ -179,6 +179,50 @@ void main() {
     expect(await ws.first, 'hi');
     await ws.close();
   });
+
+  test('Route.websocket closes on a message over maxMessageSize', () async {
+    Route.websocket('/ws-small', (WebSocket socket, DoxRequest req) {
+      socket.listen(socket.add);
+    }, maxMessageSize: 10);
+    await startHttpServer(nativeConfig());
+    int port = Dox().server.httpServer.port;
+
+    WebSocket ws = await WebSocket.connect('ws://127.0.0.1:$port/ws-small');
+    ws.add('0123456789');
+    expect(await ws.first, '0123456789');
+    WebSocket big = await WebSocket.connect('ws://127.0.0.1:$port/ws-small');
+    big.add('0123456789x');
+    await big.drain<void>();
+    expect(big.closeCode, 1009);
+    await ws.close();
+    expect(
+      () => Route.websocket(
+        '/ws-bad',
+        (WebSocket s, DoxRequest r) {},
+        maxMessageSize: 0,
+      ),
+      throwsArgumentError,
+    );
+  });
+
+  test('AppConfig.idleTimeout closes an idle keep-alive connection', () async {
+    Route.get('/idle', (DoxRequest req) => 'ok');
+    await startHttpServer(
+      AppConfig(
+        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        serverPort: 0,
+        totalIsolate: 1,
+        idleTimeout: const Duration(milliseconds: 300),
+      ),
+    );
+    Socket s = await Socket.connect('127.0.0.1', Dox().server.httpServer.port);
+    Stopwatch clock = Stopwatch()..start();
+    s.write('GET /idle HTTP/1.1\r\nHost: x\r\n\r\n');
+    // the answer, then the end when the server closes the idle connection
+    await s.drain<void>().timeout(const Duration(seconds: 5));
+    expect(clock.elapsed, greaterThan(const Duration(milliseconds: 250)));
+    s.destroy();
+  });
 }
 
 DoxRequest addWho(DoxRequest req) {
