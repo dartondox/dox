@@ -63,5 +63,12 @@ jobs:
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
+      # Check every package before anything is uploaded. The workspace links
+      # the local siblings, so this needs no wait for pub.dev. The uploads
+      # then skip this check (--skip-validation), see ci/publish.sh.
+      - name: Resolve the workspace
+        run: dart pub get
+      - name: Check every package (dry run)
+        run: ci/publish-dry-run.sh
       - name: Publish packages in order
         run: ci/publish.sh
