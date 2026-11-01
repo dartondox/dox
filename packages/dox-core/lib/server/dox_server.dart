@@ -53,6 +53,7 @@ class DoxServer {
       maxMultipartSize: config.maxMultipartSize,
       bodyTimeout: config.bodyTimeout,
       idleTimeout: config.idleTimeout,
+      maxConnections: config.maxConnections,
     );
     server.autoCompress = config.compress;
 
