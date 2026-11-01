@@ -64,8 +64,9 @@ bool _mounted(HttpRequest req, Map<String, RawRequestHandler> mounts) {
     if (path.startsWith(prefix) ||
         (prefix.endsWith('/') &&
             path == prefix.substring(0, prefix.length - 1))) {
+      /// report the error and answer 500, so the client does not hang
       mount.value(req).catchError((Object error, StackTrace stackTrace) {
-        Dox().config.exceptionHandler.report(error, stackTrace);
+        httpErrorHandler(req, error, stackTrace);
       });
       return true;
     }
@@ -155,6 +156,7 @@ void _send(HttpRequest req, dynamic value) {
   }
 }
 
+@Deprecated('Not used by Dox. Will be removed in 4.0.')
 Future<DoxRequest> getDoxRequest(HttpRequest req, RouteData route) async {
   ContentType? contentType = req.headers.contentType;
   RequestBody body = await HttpBody.read(req, contentType);

@@ -52,6 +52,23 @@ void main() {
     await ws.close();
   });
 
+  test('a mount that throws answers 500, the client does not hang', () async {
+    Route.mount('/raw/', (HttpRequest req) async {
+      throw StateError('mount failed');
+    });
+    await startHttpServer(nativeConfig());
+
+    HttpClient client = HttpClient();
+    HttpClientResponse res = await (await client.get(
+      '127.0.0.1',
+      Dox().server.httpServer.port,
+      '/raw/x',
+    )).close().timeout(const Duration(seconds: 5));
+    expect(res.statusCode, 500);
+    await res.drain<void>();
+    client.close();
+  });
+
   test('Route.websocket gives the open socket after middleware', () async {
     Route.websocket('/ws-echo', (WebSocket socket, DoxRequest req) {
       socket.listen((dynamic data) => socket.add('${req.input('who')}:$data'));

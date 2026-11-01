@@ -153,6 +153,10 @@ class CORSConfig {
   final dynamic methods;
   final dynamic headers;
   final dynamic exposeHeaders;
+
+  /// `true` sends `Access-Control-Allow-Credentials: true`. Browsers do
+  /// not accept it with origin `*`, so list your sites in [origin] then.
+  /// Dox prints a warning at start for that mix.
   final bool? credentials;
   final num? maxAge;
 

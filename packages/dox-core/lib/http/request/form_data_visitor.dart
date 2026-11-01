@@ -46,12 +46,20 @@ class FormDataVisitor {
   /// read the parts one by one. a part must be fully read before the
   /// next one arrives, so the whole body is never held in memory.
   Future<void> process() async {
-    MimeMultipartTransformer transformer = MimeMultipartTransformer(
-      boundary ?? request.headers.contentType!.parameters['boundary']!,
-    );
+    String? separator =
+        boundary ?? request.headers.contentType?.parameters['boundary'];
+    if (separator == null || separator.isEmpty) {
+      throw BadRequestException(message: 'Multipart body has no boundary');
+    }
+    MimeMultipartTransformer transformer = MimeMultipartTransformer(separator);
 
     await for (MimeMultipart formItem in _watch(body).transform(transformer)) {
-      String partHeaders = formItem.headers['content-disposition']!;
+      String? partHeaders = formItem.headers['content-disposition'];
+      if (partHeaders == null) {
+        throw BadRequestException(
+          message: 'Multipart part has no Content-Disposition',
+        );
+      }
       String? contentType = formItem.headers['content-type'];
 
       Map<String, String> data = _parseFormDataContentDisposition(partHeaders);

@@ -5,6 +5,7 @@ import 'package:dox_core/http/http_error_handler.dart';
 import 'package:dox_core/router/route_data.dart';
 
 /// Handle middleware and controllers
+@Deprecated('Not used by Dox. Will be removed in 4.0.')
 Future<dynamic> middlewareAndControllerHandler(DoxRequest doxReq) async {
   return await runMiddlewareAndController(doxReq);
 }
@@ -109,7 +110,11 @@ Future<DoxResponse> _chain(DoxRequest req, int start) async {
 DoxResponse asResponse(dynamic value) {
   if (value is DoxResponse) return value;
   if (value is IHttpException) {
-    return DoxResponse(value.toResponse()).statusCode(value.code);
+    DoxResponse res = DoxResponse(value.toResponse()).statusCode(value.code);
+
+    /// keep the headers of `abort(503, msg, {'retry-after': '60'})`
+    if (value is HttpStatusException) value.headers.forEach(res.header);
+    return res;
   }
   return DoxResponse(value);
 }

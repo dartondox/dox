@@ -114,6 +114,7 @@ class Dox {
 
     await startProviders();
     warnWebSocketOrigin();
+    warnCorsCredentials();
     DoxServer().setResponseHandler(config.responseHandler);
     HttpServer server = await DoxServer().listen(
       DoxServer.portFor(config.serverPort),
@@ -215,7 +216,8 @@ class Dox {
       "['https://app.example.com']), or allowedOrigins: on Route.websocket. "
       '[] allows the same host only.';
 
-  /// log one warning when a `Route.websocket` route checks no `Origin`.
+  /// print one warning to stderr when a `Route.websocket` route checks
+  /// no `Origin`.
   /// Any site can then open a socket with the cookies of the user.
   void warnWebSocketOrigin() {
     if (_warnedWebSocketOrigin ||
@@ -226,6 +228,27 @@ class Dox {
     _warnedWebSocketOrigin = true;
     // stderr, not Logger: the logger is off by default
     stderr.writeln(webSocketOriginWarning);
+  }
+
+  bool _warnedCorsCredentials = false;
+
+  /// the text of the warning of [warnCorsCredentials]
+  static const String corsCredentialsWarning =
+      "dox: warning: CORSConfig has origin '*' and credentials: true. "
+      'Browsers reject this, so requests with cookies from other sites '
+      "fail. List your sites in origin, eg. ['https://app.example.com'].";
+
+  /// print one warning when the CORS config allows every origin with
+  /// credentials. Browsers do not accept this. It does not change the
+  /// headers Dox sends.
+  void warnCorsCredentials() {
+    CORSConfig cors = config.cors;
+    dynamic origin = cors.origin;
+    bool any = origin == '*' || (origin is List && origin.contains('*'));
+    if (_warnedCorsCredentials || cors.credentials != true || !any) return;
+    _warnedCorsCredentials = true;
+    // stderr, not Logger: the logger is off by default
+    stderr.writeln(corsCredentialsWarning);
   }
 
   /// old sample keys from `.env.example` files. they are public on

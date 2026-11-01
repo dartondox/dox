@@ -58,6 +58,11 @@ class NextRouter extends Router {
       Around(),
       (DoxRequest req) => throw NotFoundHttpException(),
     ]);
+    Route.get('/busy', <dynamic>[
+      Around(),
+      (DoxRequest req) =>
+          abort(503, 'busy', <String, String>{'retry-after': '60'}),
+    ]);
     Route.get('/function', <dynamic>[timer, (DoxRequest req) => 'ok']);
     Route.get('/stop', <dynamic>[stop, (DoxRequest req) => 'ok']);
     Route.get('/plain', <dynamic>[before, (DoxRequest req) => 'plain']);
@@ -107,6 +112,13 @@ void main() {
         .expectStatus(404)
         .expectHeader('x-around', '404')
         .expectJson(containsPair('code', 'not_found'));
+  });
+
+  test('the headers of abort are kept', () async {
+    (await client.get('/busy'))
+        .expectStatus(503)
+        .expectHeader('retry-after', '60')
+        .expectHeader('x-around', '503');
   });
 
   test('a function middleware with next', () async {
