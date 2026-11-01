@@ -181,6 +181,113 @@ void runCacheContract(DriverHarness harness, {Object? skip}) {
       expect(await cache.get('rf'), <String, dynamic>{'id': 1});
     });
 
+    test('remember uses decode on a cache hit', () async {
+      List<String> load() {
+        return <String>['a', 'b'];
+      }
+
+      List<String> decode(Object? json) {
+        return List<String>.from(json as List<dynamic>);
+      }
+
+      expect(
+        await cache.remember<List<String>>('names', ttl, load, decode: decode),
+        <String>['a', 'b'],
+      );
+      List<String> hit = await cache.remember<List<String>>(
+        'names',
+        ttl,
+        load,
+        decode: decode,
+      );
+      expect(hit, <String>['a', 'b']);
+      Map<String, int> counts = await cache.rememberForever<Map<String, int>>(
+        'counts',
+        () => <String, int>{'a': 1},
+        decode: (Object? json) =>
+            Map<String, int>.from(json as Map<String, dynamic>),
+      );
+      expect(counts, <String, int>{'a': 1});
+      counts = await cache.rememberForever<Map<String, int>>(
+        'counts',
+        () => <String, int>{},
+        decode: (Object? json) =>
+            Map<String, int>.from(json as Map<String, dynamic>),
+      );
+      expect(counts, <String, int>{'a': 1});
+    });
+
+    test('remember runs compute once for parallel calls', () async {
+      int calls = 0;
+      Future<int> compute() async {
+        calls++;
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        return 7;
+      }
+
+      List<int> values = await Future.wait(<Future<int>>[
+        for (int i = 0; i < 5; i++) cache.remember<int>('once', ttl, compute),
+        for (int i = 0; i < 2; i++)
+          cache.tags(<String>['t']).remember<int>('once', ttl, compute),
+      ]);
+      expect(values, everyElement(7));
+      // one for the plain key, one for the tagged key
+      expect(calls, 2);
+    });
+
+    test('get and pull run a default function only on a miss', () async {
+      int calls = 0;
+      String fallback() {
+        calls++;
+        return 'made';
+      }
+
+      Future<String> asyncFallback() async {
+        return 'later';
+      }
+
+      expect(await cache.get('missing', fallback), 'made');
+      expect(await cache.get('missing', asyncFallback), 'later');
+      expect(await cache.pull('missing', fallback), 'made');
+      await cache.put('here', 'yes');
+      expect(await cache.get('here', fallback), 'yes');
+      expect(calls, 2);
+    });
+
+    test('pull is atomic: only one parallel pull gets the value', () async {
+      await cache.put('once', 'v');
+      List<dynamic> values = await Future.wait(<Future<dynamic>>[
+        for (int i = 0; i < 5; i++) cache.pull('once'),
+      ]);
+      expect(values.where(_isV), hasLength(1));
+      expect(await cache.has('once'), isFalse);
+    });
+
+    test('pull works with tags', () async {
+      await cache.tags(<String>['t']).put('p', 1);
+      expect(await cache.tags(<String>['t']).pull('p'), 1);
+      expect(await cache.tags(<String>['t']).has('p'), isFalse);
+    });
+
+    test('touch sets a new ttl and keeps the value', () async {
+      await cache.put('t', 'x', ttl);
+      expect(await cache.touch('t', const Duration(seconds: 30)), isTrue);
+      await harness.advance(pastTtl);
+      expect(await cache.get('t'), 'x');
+      expect(await cache.touch('t', null), isTrue);
+      expect(await cache.get('t'), 'x');
+      expect(await cache.touch('missing', ttl), isFalse);
+      expect(await cache.touch('t', Duration.zero), isTrue);
+      expect(await cache.has('t'), isFalse);
+    });
+
+    test('has is false for a stored null', () async {
+      await cache.put('n', null);
+      expect(await cache.has('n'), isFalse);
+      await cache.tags(<String>['t']).put('k', 0);
+      expect(await cache.tags(<String>['t']).has('k'), isTrue);
+    });
+
     test('flush removes everything', () async {
       await cache.put('a', 1);
       await cache.put('b', 2);
@@ -252,18 +359,66 @@ void runCacheContract(DriverHarness harness, {Object? skip}) {
         expect(await cache.lock('job3', ttl).get(), isTrue);
       });
 
+      test('block with a callback runs it and frees the lock', () async {
+        CacheLock first = cache.lock('job5', const Duration(seconds: 5));
+        int result = await first.block<int>(
+          const Duration(seconds: 1),
+          () => 7,
+        );
+        expect(result, 7);
+        CacheLock second = cache.lock('job5', const Duration(seconds: 5));
+        expect(await second.get(), isTrue);
+        await expectLater(
+          first.block<int>(const Duration(milliseconds: 60), () => 8),
+          throwsA(isA<LockTimeoutException>()),
+        );
+        await second.release();
+      });
+
+      test('forceRelease frees a lock of another owner', () async {
+        CacheLock first = cache.lock('job6', const Duration(seconds: 5));
+        expect(await first.get(), isTrue);
+        expect(await cache.lock('job6').forceRelease(), isTrue);
+        CacheLock second = cache.lock('job6', const Duration(seconds: 5));
+        expect(await second.get(), isTrue);
+        await second.release();
+      });
+
+      test('remember with lock runs compute once', () async {
+        int calls = 0;
+        Future<int> compute() async {
+          calls++;
+          await Future<void>.delayed(const Duration(milliseconds: 30));
+          return 3;
+        }
+
+        List<int> values = await Future.wait(<Future<int>>[
+          for (int i = 0; i < 3; i++)
+            cache.remember<int>('locked', ttl, compute, lock: true),
+        ]);
+        expect(values, everyElement(3));
+        expect(calls, 1);
+      });
+
       test('block waits for release', () async {
         CacheLock first = cache.lock('job4', const Duration(seconds: 5));
         expect(await first.get(), isTrue);
         CacheLock second = cache.lock('job4', const Duration(seconds: 5));
-        expect(await second.block(const Duration(milliseconds: 120)), isFalse);
+        expect(
+          await second.block<bool>(const Duration(milliseconds: 120)),
+          isFalse,
+        );
         Future<void>.delayed(
           const Duration(milliseconds: 80),
           first.release,
         ).ignore();
-        expect(await second.block(const Duration(seconds: 2)), isTrue);
+        expect(await second.block<bool>(const Duration(seconds: 2)), isTrue);
         await second.release();
       });
     }, skip: skip ?? (harness.supportsLocks ? null : 'driver has no locks'));
   }, skip: skip);
+}
+
+bool _isV(dynamic value) {
+  return value == 'v';
 }

@@ -1,3 +1,22 @@
+## Unreleased
+
+- Fix: `remember` and `rememberForever` threw on a cache hit when `T` was not a raw JSON type, like `List<String>`. Pass the new `decode` option to turn the cached JSON into `T`. Without it, `T` must be a raw JSON type.
+- Fix: `remember` runs `compute` once when many calls for the same key run at the same time in one isolate. The others wait for the first. With the new `lock: true`, callers in other isolates and servers wait too.
+- Fix: `pull` is atomic now. Redis uses `GETDEL` (needs Redis 6.2 or newer). Drivers get a new `pull` method.
+- Fix: the file driver keeps each prefix in its own sub folder. `flush` deletes only the files of its own prefix, and keeps temp files of writes that are running.
+- Change: because of this, files written by older versions are in the base folder and are not found any more. It is a cache, so they are only misses. You can delete the old files in the base folder by hand.
+- Fix: a file driver read no longer deletes an expired or broken file. Another isolate may have just written a new value. Use the new `FileDriver.prune()` to delete expired and broken files.
+- Fix: the file driver has locks now (`File.create(exclusive: true)`). `add`, `increment` and `touch` take a lock on the key, so they are safe across isolates.
+- Fix: a Redis prefix with no `:` at the end gets one. So the prefix `app` does not match the keys of `app2`.
+- New: `flexible(key, fresh, stale, compute)`: stale while revalidate.
+- New: `touch(key, ttl)` sets a new ttl and keeps the value.
+- New: `get` and `pull` take a function as the default. It runs only on a miss.
+- New: `lock.block(timeout, callback)` runs the callback while it holds the lock. It throws `LockTimeoutException` when the time is over. `lock.forceRelease()` frees a lock of any owner.
+- New: the Redis option `max_value_bytes`.
+- Faster: tagged `many`, `putMany`, `has`, `pull` and `remember` read the tag versions once per call.
+- Faster: the memory driver keeps the expiry as int milliseconds. It does not read the clock for items with no expiry. `has` does not decode the value.
+- Change: `MemoryEntry.expiresAt` is an `int` in milliseconds now. `CacheClock` has a new `nowMs()`.
+
 ## 3.0.1
 
 - Version bump only, to match the other packages.

@@ -65,7 +65,7 @@ Each store is made once per isolate, the first time you use it.
 | --- | --- |
 | `file` | `path` (default `storage/cache`), `prefix` |
 | `memory` | `max_size`: the most items. When it is full, the item that was used least recently is removed. No limit by default. Expired items are removed when read, and by a sweep after many writes (at least 1000). Also `prefix`. |
-| `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db` (default `0`), `tls` (`true`/`false`), `pool_size` (default 10), `prefix` |
+| `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db` (default `0`), `tls` (`true`/`false`), `pool_size` (default 10), `max_value_bytes` (no limit by default), `prefix` |
 
 The default `prefix` is `dox_cache:`.
 You rarely need `pool_size`: the cache sends no blocking commands, so each isolate uses about one Redis connection.
@@ -142,7 +142,7 @@ await Cache().tag('users').flush(); // removes only the items of this tag
 ### Locks
 
 A lock makes sure only one request (or one server) runs some code at a time.
-The `memory` and `redis` stores support locks. Use `redis` when many isolates must share the lock.
+The `memory`, `file` and `redis` stores support locks. The `memory` lock works inside one isolate only. The `file` lock works for all isolates on one machine. Use `redis` when many servers must share the lock.
 
 ```dart
 CacheLock lock = Cache().store('redis').lock('report', Duration(seconds: 30));
@@ -158,15 +158,17 @@ if (await lock.get()) {
 - `get()` tries once. It is `true` when you got the lock.
 - `block(Duration(seconds: 5))` tries again and again until the time is over.
 - The lock is freed after its `ttl`, even if you never call `release()`.
+- `block(timeout, callback)` runs the callback while it holds the lock, then frees it.
+- `forceRelease()` frees the lock, whoever holds it.
 
 ### More methods
 
 | Method | What it does |
 | --- | --- |
 | `add(key, value, duration:)` | store only when the key is missing. `true` when it was stored |
-| `pull(key)` | get the value and remove it |
+| `pull(key)` | get the value and remove it, in one step |
 | `increment(key, [by])` / `decrement(key, [by])` | change an integer. A missing key starts at 0 |
-| `repository` | the `dox_cache` `CacheStore`, for everything else |
+| `repository` | the `dox_cache` `CacheStore`, for everything else, like `flexible`, `touch` and `remember` with `decode` or `lock` |
 
 See [dox_cache](../packages/cache.md) for custom drivers.
 

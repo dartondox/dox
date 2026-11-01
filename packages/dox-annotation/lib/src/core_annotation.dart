@@ -32,25 +32,6 @@ abstract class IDoxRequest {
   Map<String, dynamic> toJson();
 }
 
-abstract class IStorageDriver {
-  Future<String> put(String filePath, List<int> bytes, {String? extension});
-  Future<List<int>?> get(String filepath);
-  Future<bool> exists(String filepath);
-  Future<dynamic> delete(String filepath);
-}
-
-abstract class ICacheDriver {
-  String tag = '';
-  String get prefix => 'dox-framework-cache-$tag:';
-  Future<void> put(String key, String value, {Duration? duration});
-  Future<void> forever(String key, String value);
-  Future<void> forget(String key);
-  Future<void> flush();
-  void setTag(String tagName);
-  Future<dynamic> get(String key);
-  Future<bool> has(String key);
-}
-
 abstract class IHttpException {
   int code = 500;
   String errorCode = 'server_error';

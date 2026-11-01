@@ -8,15 +8,21 @@ import '../cache_driver.dart';
 import '../cache_lock.dart';
 import '../constants/cache_constants.dart';
 
-/// Keeps one JSON text file per key in [directory].
+/// Keeps one JSON text file per key.
+///
+/// Each prefix has its own folder inside [directory], named by a short
+/// hash of the prefix. So two stores can share [directory], and `flush`
+/// of one store does not touch the other.
 ///
 /// The file name is the sha256 of prefix + key. The file holds
 /// `{"value": ..., "expires_at": <ms or null>}`. Writes go to a temp file
 /// first and then rename, so a reader never sees half a file.
-/// Expired files are deleted when read.
 ///
-/// `add` and `increment` read and then write. They are not atomic
-/// between processes. No locks.
+/// A read never deletes a file. An expired file stays until it is
+/// written again, removed, or [prune] runs.
+///
+/// `add`, `increment` and `touch` take a file lock on the key, so they
+/// are safe across isolates and processes on one machine.
 class FileDriver extends CacheDriver {
   FileDriver({
     Directory? directory,
@@ -24,7 +30,7 @@ class FileDriver extends CacheDriver {
     this._clock = const CacheClock(),
   }) : directory = directory ?? Directory(CacheConstants.defaultFilePath);
 
-  /// Folder for the cache files. `flush` deletes everything inside it.
+  /// Base folder of the cache. Stores keep their files in sub folders.
   final Directory directory;
 
   @override
@@ -32,65 +38,172 @@ class FileDriver extends CacheDriver {
 
   final CacheClock _clock;
 
+  /// Folder of this store: a short hash of [prefix] inside [directory].
+  late final Directory storeDirectory = Directory(
+    '${directory.path}${Platform.pathSeparator}'
+    '${_hash(prefix).substring(0, 16)}',
+  );
+
   /// File used for [key].
   File fileFor(String key) {
-    String hash = sha256.convert(utf8.encode(prefix + key)).toString();
-    return File('${directory.path}${Platform.pathSeparator}$hash');
+    return File(_pathFor(prefix + key));
   }
 
   @override
   Future<dynamic> get(String key) async {
-    Map<String, dynamic>? entry = await _read(key);
+    Map<String, dynamic>? entry = await _read(fileFor(key));
     return entry?[CacheConstants.fileValueField];
   }
 
   @override
+  Future<bool> has(String key) async {
+    return await get(key) != null;
+  }
+
+  @override
   Future<void> put(String key, Object? value, Duration? ttl) async {
-    DateTime? expiresAt = ttl == null ? null : _clock.now().add(ttl);
-    await _write(key, value, expiresAt?.millisecondsSinceEpoch);
+    await _write(key, value, _expiresAt(ttl));
   }
 
   @override
   Future<bool> add(String key, Object? value, Duration? ttl) async {
-    if (await _read(key) != null) {
-      return false;
+    CacheLock lock = await _lockKey(key);
+    try {
+      if (await _read(fileFor(key)) != null) {
+        return false;
+      }
+      await put(key, value, ttl);
+      return true;
+    } finally {
+      await lock.release();
     }
-    await put(key, value, ttl);
-    return true;
   }
 
   @override
   Future<int> increment(String key, int by) async {
-    Map<String, dynamic>? entry = await _read(key);
-    Object? current = entry?[CacheConstants.fileValueField] ?? 0;
-    if (current is! int) {
-      throw StateError('Cache value of "$key" is not an integer');
+    CacheLock lock = await _lockKey(key);
+    try {
+      Map<String, dynamic>? entry = await _read(fileFor(key));
+      Object? current = entry?[CacheConstants.fileValueField] ?? 0;
+      if (current is! int) {
+        throw StateError('Cache value of "$key" is not an integer');
+      }
+      int next = current + by;
+      await _write(
+        key,
+        next,
+        entry?[CacheConstants.fileExpiresAtField] as int?,
+      );
+      return next;
+    } finally {
+      await lock.release();
     }
-    int next = current + by;
-    await _write(key, next, entry?[CacheConstants.fileExpiresAtField] as int?);
-    return next;
+  }
+
+  @override
+  Future<bool> touch(String key, Duration? ttl) async {
+    CacheLock lock = await _lockKey(key);
+    try {
+      Map<String, dynamic>? entry = await _read(fileFor(key));
+      if (entry == null) {
+        return false;
+      }
+      await _write(key, entry[CacheConstants.fileValueField], _expiresAt(ttl));
+      return true;
+    } finally {
+      await lock.release();
+    }
+  }
+
+  /// Rename the file away first. Rename is atomic, so only one caller
+  /// gets the value.
+  @override
+  Future<dynamic> pull(String key) async {
+    File moved = _tempFor(fileFor(key));
+    try {
+      await fileFor(key).rename(moved.path);
+    } on FileSystemException {
+      return null;
+    }
+    Map<String, dynamic>? entry = await _read(moved);
+    await _delete(moved);
+    return entry?[CacheConstants.fileValueField];
   }
 
   @override
   Future<bool> forget(String key) async {
-    bool existed = await _read(key) != null;
+    bool existed = await _read(fileFor(key)) != null;
     await _delete(fileFor(key));
     return existed;
   }
 
+  /// Delete the value files of this store. Temp files of writes that
+  /// run right now, and lock files, are kept.
   @override
   Future<void> flush() async {
-    if (!await directory.exists()) {
-      return;
-    }
-    await for (FileSystemEntity entity in directory.list()) {
-      await entity.delete(recursive: true);
+    for (File file in await _dataFiles()) {
+      await _delete(file);
     }
   }
 
+  /// Delete the expired and broken files of this store.
+  /// Returns how many were deleted. Run it from time to time, eg. in a
+  /// schedule, to free disk space.
+  Future<int> prune() async {
+    int removed = 0;
+    for (File file in await _dataFiles()) {
+      // ponytail: another isolate may write this key between the read and
+      // the delete, then its new value is lost. It is only a cache miss.
+      if (await _read(file) == null) {
+        await _delete(file);
+        removed++;
+      }
+    }
+    return removed;
+  }
+
+  /// A lock kept in a file. Works across isolates and processes that
+  /// share the folder.
+  @override
+  CacheLock lock(String name, Duration? ttl, [String? owner]) {
+    File file = File(
+      '${_pathFor('$prefix${CacheConstants.lockKeyPart}$name')}'
+      '${CacheConstants.fileLockSuffix}',
+    );
+    return FileLock(file, _clock, name, ttl, owner);
+  }
+
+  /// Take the lock of one key, used by read-then-write methods.
+  Future<CacheLock> _lockKey(String key) async {
+    Duration wait = CacheConstants.fileKeyLockTtl;
+    CacheLock lock = FileLock(
+      File('${fileFor(key).path}${CacheConstants.fileKeyLockSuffix}'),
+      _clock,
+      key,
+      wait,
+    );
+    if (!await lock.block<bool>(wait)) {
+      throw LockTimeoutException(key, wait);
+    }
+    return lock;
+  }
+
+  /// Value files only. Their names have no dot, unlike temp and lock files.
+  Future<List<File>> _dataFiles() async {
+    List<File> files = <File>[];
+    if (!await storeDirectory.exists()) {
+      return files;
+    }
+    await for (FileSystemEntity entity in storeDirectory.list()) {
+      if (entity is File && !entity.uri.pathSegments.last.contains('.')) {
+        files.add(entity);
+      }
+    }
+    return files;
+  }
+
   /// The stored entry, or null when missing, expired or broken.
-  Future<Map<String, dynamic>?> _read(String key) async {
-    File file = fileFor(key);
+  Future<Map<String, dynamic>?> _read(File file) async {
     String text;
     try {
       text = await file.readAsString();
@@ -101,12 +214,10 @@ class FileDriver extends CacheDriver {
     try {
       entry = jsonDecode(text) as Map<String, dynamic>;
     } on FormatException {
-      await _delete(file);
       return null;
     }
     int? expiresAt = entry[CacheConstants.fileExpiresAtField] as int?;
-    if (expiresAt != null && _clock.now().millisecondsSinceEpoch >= expiresAt) {
-      await _delete(file);
+    if (expiresAt != null && _clock.nowMs() >= expiresAt) {
       return null;
     }
     return entry;
@@ -118,22 +229,155 @@ class FileDriver extends CacheDriver {
       CacheConstants.fileExpiresAtField: expiresAt,
     });
     File file = fileFor(key);
-    File temp = File('${file.path}.${CacheLock.randomOwner()}.tmp');
+    File temp = _tempFor(file);
     try {
       await temp.writeAsString(text, flush: true);
     } on PathNotFoundException {
       /// make the folder only when it is missing, not on every write
-      await directory.create(recursive: true);
+      await storeDirectory.create(recursive: true);
       await temp.writeAsString(text, flush: true);
     }
     await temp.rename(file.path);
   }
 
-  Future<void> _delete(File file) async {
+  int? _expiresAt(Duration? ttl) {
+    return ttl == null ? null : _clock.nowMs() + ttl.inMilliseconds;
+  }
+
+  String _pathFor(String name) {
+    return '${storeDirectory.path}${Platform.pathSeparator}${_hash(name)}';
+  }
+
+  static File _tempFor(File file) {
+    return File(
+      '${file.path}.${CacheLock.randomOwner()}${CacheConstants.fileTempSuffix}',
+    );
+  }
+
+  static String _hash(String text) {
+    return sha256.convert(utf8.encode(text)).toString();
+  }
+
+  static Future<void> _delete(File file) async {
     try {
       await file.delete();
     } on FileSystemException {
       // Already gone.
+    }
+  }
+}
+
+/// Lock kept in one file. `File.create(exclusive: true)` makes sure only
+/// one owner creates it. The file holds the owner and the expiry time.
+class FileLock extends CacheLock {
+  FileLock(this.file, this._clock, super.name, super.ttl, [super.owner]);
+
+  /// The lock file.
+  final File file;
+
+  final CacheClock _clock;
+
+  @override
+  Future<bool> get() async {
+    if (await _create()) {
+      return true;
+    }
+    if (await _isFree(await _readData(file), file) && await _takeAway(null)) {
+      return await _create();
+    }
+    return false;
+  }
+
+  @override
+  Future<bool> release() async {
+    Map<String, dynamic>? data = await _readData(file);
+    if (data?[CacheConstants.fileOwnerField] != owner) {
+      return false;
+    }
+    return await _takeAway(owner);
+  }
+
+  @override
+  Future<bool> forceRelease() async {
+    try {
+      await file.delete();
+      return true;
+    } on FileSystemException {
+      return false;
+    }
+  }
+
+  /// Create the lock file. False when it is there already.
+  Future<bool> _create() async {
+    try {
+      await file.create(exclusive: true);
+    } on PathNotFoundException {
+      await file.parent.create(recursive: true);
+      return await _create();
+    } on FileSystemException {
+      return false;
+    }
+    int? expiresAt = ttl == null ? null : _clock.nowMs() + ttl!.inMilliseconds;
+    await file.writeAsString(
+      jsonEncode(<String, Object?>{
+        CacheConstants.fileOwnerField: owner,
+        CacheConstants.fileExpiresAtField: expiresAt,
+      }),
+      flush: true,
+    );
+    return true;
+  }
+
+  /// Move the lock file away when [ownerToMatch] holds it, or, when
+  /// [ownerToMatch] is null, when the lock is free (expired).
+  /// The rename is atomic, so only one caller moves the file. When the
+  /// moved file does not match, it is put back.
+  Future<bool> _takeAway(String? ownerToMatch) async {
+    File moved = File(
+      '${file.path}.${CacheLock.randomOwner()}${CacheConstants.fileTempSuffix}',
+    );
+    try {
+      await file.rename(moved.path);
+    } on FileSystemException {
+      return false;
+    }
+    Map<String, dynamic>? data = await _readData(moved);
+    bool match = ownerToMatch == null
+        ? await _isFree(data, moved)
+        : data?[CacheConstants.fileOwnerField] == ownerToMatch;
+    if (match) {
+      await moved.delete();
+      return true;
+    }
+    // ponytail: a lock made in the short time the file was away is
+    // overwritten here. Use the redis driver when this matters.
+    await moved.rename(file.path);
+    return false;
+  }
+
+  /// True when the lock in [data] is expired. An empty file is a lock
+  /// that is being written. It counts as free only when it is old.
+  Future<bool> _isFree(Map<String, dynamic>? data, File from) async {
+    if (data == null) {
+      try {
+        DateTime changed = await from.lastModified();
+        return DateTime.now().difference(changed) >
+            CacheConstants.fileKeyLockTtl;
+      } on FileSystemException {
+        return false;
+      }
+    }
+    int? expiresAt = data[CacheConstants.fileExpiresAtField] as int?;
+    return expiresAt != null && _clock.nowMs() >= expiresAt;
+  }
+
+  static Future<Map<String, dynamic>?> _readData(File from) async {
+    try {
+      return jsonDecode(await from.readAsString()) as Map<String, dynamic>;
+    } on FileSystemException {
+      return null;
+    } on FormatException {
+      return null;
     }
   }
 }

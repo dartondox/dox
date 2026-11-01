@@ -24,6 +24,7 @@ class CacheConstants {
   static const String dbOption = 'db';
   static const String tlsOption = 'tls';
   static const String poolSizeOption = 'pool_size';
+  static const String maxValueBytesOption = 'max_value_bytes';
 
   /// Redis defaults.
   static const String defaultRedisHost = '127.0.0.1';
@@ -42,6 +43,28 @@ class CacheConstants {
   /// Key part for locks and tags.
   static const String lockKeyPart = 'lock:';
   static const String tagKeyPart = 'tag:';
+
+  /// Lock name part for `remember(lock: true)` and `flexible`.
+  static const String rememberLockPart = 'remember:';
+  static const String flexibleLockPart = 'flexible:';
+
+  /// Key part of the "created at" time that `flexible` stores.
+  static const String flexibleCreatedPart = 'flexible:created:';
+
+  /// Lock ttl and wait time of `remember(lock: true)` and `flexible`.
+  /// A compute that runs longer lets a second caller start.
+  static const Duration computeLockTtl = Duration(seconds: 10);
+
+  /// Lock ttl and wait time of file driver `add`, `increment` and `touch`.
+  static const Duration fileKeyLockTtl = Duration(seconds: 5);
+
+  /// End of file driver lock file names.
+  static const String fileLockSuffix = '.lock';
+  static const String fileKeyLockSuffix = '.klock';
+  static const String fileTempSuffix = '.tmp';
+
+  /// JSON field of a file lock.
+  static const String fileOwnerField = 'owner';
 
   /// JSON fields in a file driver entry.
   static const String fileValueField = 'value';

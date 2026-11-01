@@ -1,3 +1,8 @@
+## Unreleased
+
+- Removed: `ICacheDriver` and `IStorageDriver`. Nothing used them. For a cache driver, use `CacheDriver` from `dox_cache`.
+- Tests for `IHttpException.toResponse()`.
+
 ## 3.0.1
 
 - Version bump only, to match the other packages.
