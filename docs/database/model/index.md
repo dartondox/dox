@@ -229,7 +229,8 @@ await found?.save();
 found?.status = null;
 await found?.save(); // status is now NULL in the database
 
-// create from a map: returns the new model as it is in the table
+// create from a map: returns the new model as it is in the table.
+// Blog needs `fillable`, see mass assignment below.
 Blog created = await Blog().create(<String, dynamic>{
   'title': 'My first blog',
   'status': 'draft',
@@ -253,9 +254,10 @@ Blog created = await Blog().create(<String, dynamic>{
 
 ### Mass assignment
 
-`create()`, `insert()`, `update()`, `upsert()` and the find or create methods take any key of the map.
-So `User().create(req.body)` with `{"is_admin": 1}` makes an admin.
-Set `fillable` or `guarded` to stop this.
+`create()`, `insert()`, `update()`, `upsert()` and the find or create methods take keys from a map.
+If they took every key, `User().create(req.body)` with `{"is_admin": 1}` would make an admin.
+So a model is guarded by default, like Laravel.
+Set `fillable` to the keys that may be taken from a map.
 
 ```dart
 @DoxModel()
@@ -264,14 +266,22 @@ class User extends UserGenerator {
   @override
   List<String> get fillable => <String>['name', 'email'];
 
-  // or: these keys are never taken from a map
+  // or: every key but these is taken from a map
   @override
   List<String> get guarded => <String>['is_admin'];
 }
 ```
 
-- Keys that are not allowed are dropped. They do not throw.
-- Both lists are empty by default. Then every key is taken.
+- A model with no `fillable` (and the default `guarded`) throws a `MassAssignmentException` when it gets a map with keys.
+  It does not save an empty row.
+- With `fillable`, keys that are not in it are dropped. They do not throw.
+- To take every key (not safe with user input), set `guarded` to an empty list:
+
+    ```dart
+    @override
+    List<String> get guarded => const <String>[];
+    ```
+
 - `save()` is not changed. Fields you set in code are always saved.
 
 ### Find or create

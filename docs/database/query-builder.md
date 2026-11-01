@@ -747,7 +747,7 @@ int count = await Flight().upsert(
 - The third list is the columns to update. Leave it out to update every other column.
   An empty list keeps the old row as it is.
 - Every row must have the same keys. Otherwise it throws an `ArgumentError`.
-- On a model, keys that `fillable` and `guarded` do not allow are dropped.
+- On a model, keys that `fillable` and `guarded` do not allow are dropped. A model with no `fillable` throws, see [mass assignment](model/index.md#mass-assignment).
   `created_at` and `updated_at` are set. An update does not change `created_at`.
 - It fires no [model events](model/events.md).
 
@@ -793,7 +793,7 @@ User updated = await User().updateOrCreate(
 
 - They return the row as it is in the table: a model, or a map for `QueryBuilder.table()`.
 - On a model, `firstOrCreate` and `updateOrCreate` use `create()` and `save()`, so the [model events](model/events.md) run.
-- On a model, keys that `fillable` and `guarded` do not allow are dropped.
+- On a model, keys that `fillable` and `guarded` do not allow are dropped. A model with no `fillable` throws, see [mass assignment](model/index.md#mass-assignment).
 
 !!! warning
     Two requests at the same time can both create a row.
@@ -816,7 +816,7 @@ int count = await Actor()
 ```
 
 - An empty map runs no query and returns 0.
-- On a model, keys that `fillable` and `guarded` do not allow are dropped.
+- On a model, keys that `fillable` and `guarded` do not allow are dropped. A model with no `fillable` throws, see [mass assignment](model/index.md#mass-assignment).
   When no key is left, it runs no query and returns 0.
 - Postgres and SQLite count every row that the `where` part matched.
 - MySQL and MariaDB count only the rows that really changed.
