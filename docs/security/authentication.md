@@ -21,9 +21,10 @@ A new app made with the `dox` CLI already has it.
 
 ## 1. Hide the password in the model
 
-The token holds the user data as JSON, and anyone can read a JWT.
+By default, the token holds the user data as JSON (`toJson()`), and anyone can read a JWT.
 So the password hash must never be in `toJson()`.
-Put it in `hidden`:
+Put it in `hidden`.
+For a token that holds only the user id, see [Small tokens](#small-tokens).
 
 ```dart title="lib/app/models/user/user.model.dart"
 import 'package:dox_orm/dox_orm.dart';
@@ -146,6 +147,9 @@ GET /api/auth/user
 Authorization: Bearer <token>
 ```
 
+The `Bearer` prefix can be in any case, so `bearer <token>` also works.
+`JwtAuthDriver.bearerToken(req)` gives the token of a request.
+
 ## Read the user
 
 After `AuthMiddleware`, `req.auth` holds the login.
@@ -166,6 +170,12 @@ After `AuthMiddleware`, `req.auth` holds the login.
 | `await Auth().attempt(credentials)` | finds the user and checks the password. Gives a token, or `null` |
 | `Auth().login(user)` | gives a token for this user, with no password check |
 | `Auth().setUser(req, user)` | sets this user on `req.auth`, with no token and no password check. For your own auth middleware |
+| `Auth(ip: req.ip())` | gives the client ip to `attempt`, for the [login throttle](#login-throttle) |
+| `await Auth().revokeToken(req)` | revokes the bearer token of this request (a JWT logout). Needs [revocation](#revoke-tokens) |
+| `await Auth().revokeAllTokens(id)` | revokes all tokens of this user made before now. Needs [revocation](#revoke-tokens) |
+| `await Auth().forgetUser(id)` | drops this user from the `userCacheTtl` cache. Needs [revocation](#revoke-tokens) |
+| `Auth.needsRehash(hash)` | `true` when the hash was not made with the cost of `Hash.rounds`. See [Password hash cost](#password-hash-cost) |
+| `Auth.hashCost(hash)` | the bcrypt cost of a hash, or `null` when it is not a bcrypt hash |
 | `user<T>()` | the user after `attempt` or `login` |
 | `isLoggedIn()` | `true` when there is a user |
 
@@ -193,6 +203,9 @@ It returns `null` when the password is not a `String`, when no identifier is giv
 | `hashRounds` | `10` | the bcrypt cost of your stored hashes. Use the same value as `Hash.rounds` |
 | `userCacheTtl` | `null` (off) | keep the user of a token in memory for this time. See below |
 | `previousSecrets` | `null` | old secrets, only to check tokens after a key change. `null` with `secret` = `APP_KEY`: the old keys come from `AppConfig.previousKeys`. `[]` turns it off. See below |
+| `minimalPayload` | `false` | put only the user id (the `sub` claim) in new tokens. See [Small tokens](#small-tokens) |
+| `revocation` | `false` | turn on token revocation. See [Revoke tokens](#revoke-tokens) |
+| `revocationStore` | `null` | the cache store for revoked tokens. `null` is the default app store |
 
 ### Change the JWT secret
 
@@ -212,6 +225,100 @@ Only a wrong signature moves on to the next secret. An expired token fails at on
 
 Remove the old secret once `expiresIn` has passed. Then every old token has expired anyway.
 Do not keep a leaked secret: anyone who has it can make tokens.
+
+### Small tokens
+
+By default, a token holds the user (`toJson()`, `hidden` fields left out), plus the `iat`, `exp` and `jti` claims.
+Anyone can read a JWT payload.
+The safer choice is a small token:
+
+```dart
+JwtAuthDriver(secret: SecretKey(env.appKey), minimalPayload: true)
+```
+
+The token then holds only the user id (the `sub` claim).
+Load the user with `req.auth?.user<User>()`, not from the token.
+A front end that reads user fields from the token must then get the user from the API.
+
+## Revoke tokens
+
+By default, a token works until it expires. There is no server list of tokens.
+Turn on revocation to stop a token before it expires:
+
+```dart
+JwtAuthDriver(
+  secret: SecretKey(env.appKey),
+  revocation: true,
+  revocationStore: 'auth',
+)
+```
+
+Each token has a random id (the `jti` claim).
+With revocation on, the JWT driver keeps revoked tokens in the app cache (`Cache()` of `dox_core`).
+A revoked token stops working at once:
+
+```dart
+await Auth().revokeToken(req);     // revoke the bearer token of this request (a JWT logout)
+await Auth().revokeAllTokens(id);  // revoke all tokens of a user, eg. after a password change or a ban
+await Auth().forgetUser(id);       // drop the user from `userCacheTtl`, eg. after a ban
+```
+
+- With revocation off, these three methods throw a `StateError`. So no one thinks a token is revoked when it is not.
+- With revocation off, `verifyToken` never reads the cache.
+- `Auth().logout(req)` is the session logout. For a JWT, use `revokeToken`.
+- A revoked token stays on the deny-list only until it expires.
+- `revokeAllTokens` keeps tokens made after the call. A token made in the same second as the call also still works.
+- A token with no `jti` claim can not go on the deny-list, so `revokeToken` does nothing for it. `revokeAllTokens` still stops it when it has an `iat` claim. Tokens from `JwtAuthDriver` have one.
+- The `revokeAllTokens` time comes from the server clock. Keep server clocks in sync (NTP).
+- Give auth its own store, and never flush it. For example, a `redis` store with its own prefix. A flush of this store (`Cache().flush()`), or a `memory` store with `max_size` that drops old keys, brings revoked tokens back until they expire.
+- Cost: `verifyToken` reads this store on every request, also with `userCacheTtl`. It is one `many()` call: one round trip on `redis` and `memory`. On the `file` store (the default) it is 2 or 3 file reads per request. Use `memory` for one isolate, or `redis` for many isolates or servers.
+- When the store can not be read, the token is checked with only the signature and `exp`, and a warning is printed once. So a cache outage does not log everyone out. But revoked tokens work until the store is back.
+
+## Login throttle
+
+The login throttle limits failed logins per account and ip. It is off by default.
+Turn it on in `register()` or `boot()` of a provider.
+`Auth.throttle` is static, so each isolate has its own copy. If you set it in `main()` before the server starts, only the first isolate throttles.
+
+```dart
+Auth.throttle = LoginThrottle(maxAttempts: 5, decay: Duration(minutes: 1));
+
+// JWT: pass the client ip
+String? token = await Auth(ip: req.ip()).attempt(credentials);
+
+// session: the ip comes from the request
+bool ok = await Auth().attemptSession(req, credentials);
+```
+
+- After `maxAttempts` failed logins for the same login field (eg. the email) and ip, the next try throws `LoginThrottledException` (429) until `decay` has passed. Its `retryAfter` says how long to wait.
+- A good login clears the count. The login field is trimmed and lower case, so `A@x.com` and `a@x.com` share one count.
+- The counts live in the app cache. Pick a store with `LoginThrottle(store: 'redis')`. Use a shared store like `redis` for many isolates or servers.
+- Without an ip, `attempt` counts per account only. Then anyone can lock an account for `decay`. So pass the ip.
+- `attemptSession` sends a `Retry-After` header with the 429. `attempt` has no request, so catch `LoginThrottledException` and set the header from `retryAfter` if you need it.
+- A burst of parallel tries can get a few more than `maxAttempts`, because the check and the count are separate cache steps.
+
+## Password hash cost
+
+Passwords use bcrypt with cost 10 by default. Each step up doubles the time of a login.
+To raise it, set the cost for new hashes and tell the driver.
+Then a login for an unknown email takes as long as a wrong password:
+
+```dart
+Hash.rounds = 12;
+JwtAuthDriver(secret: SecretKey(env.appKey), hashRounds: 12);
+SessionAuthDriver(hashRounds: 12);
+```
+
+Old hashes keep their own cost, so they still work. Hash them again on the next good login:
+
+```dart
+if (Auth.needsRehash(user.password!)) {
+  user.password = Hash.make(password);
+  await user.save();
+}
+```
+
+`Auth.needsRehash(hash, rounds: 12)` checks against another cost.
 
 ## More than one guard
 
@@ -355,7 +462,7 @@ Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), (PageCon
 | --- | --- |
 | `await Auth().attemptSession(req, credentials)` | checks the password like `attempt`, and keeps the user id in the session. Gives `true` or `false` |
 | `Auth().loginSession(req, user)` | keeps this user in the session, with no password check |
-| `Auth().logout(req)` | removes the login and all session data |
+| `Auth().logout(req)` | removes the login and all session data. For a JWT, use [`revokeToken`](#revoke-tokens) |
 
 - Login and logout give the session a new id and a new CSRF token. So an id that someone saw before the login is of no use.
 - With the default `cookie` session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout, until the session `lifetime` ends. If logout must really end old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
@@ -365,8 +472,8 @@ Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), (PageCon
 
 ## Things to know
 
-- **The token is not secret.** Anyone with the token can read `user.toJson()`. Keep private columns in `hidden`.
-- **You can not cancel one token.** A token works until it expires. To end all tokens, change the `secret` (your `APP_KEY`) with no old secrets. See [Change the JWT secret](#change-the-jwt-secret).
+- **The token is not secret.** By default, anyone with the token can read `user.toJson()`. Keep private columns in `hidden`, or use [small tokens](#small-tokens).
+- **By default, you can not cancel one token.** A token works until it expires. Turn on [revocation](#revoke-tokens) to cancel one token, or all tokens of a user. Without it, to end all tokens, change the `secret` (your `APP_KEY`) with no old secrets. See [Change the JWT secret](#change-the-jwt-secret).
 - **The user is loaded on each request**, by the id in the token. A deleted user can not log in, even with a valid token.
 - **`userCacheTtl` skips that query.** With `Duration(seconds: 30)`, a deleted or changed user is seen only after 30 seconds. Each isolate has its own cache. Requests in that time share one user object, so do not change it per request.
 - **Login does not block the server.** `attempt` runs bcrypt in another isolate.

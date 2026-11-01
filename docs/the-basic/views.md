@@ -73,6 +73,28 @@ A comment is not in the output:
 
 To print `{{` or a tag as text, put `@` before it: `@{{ name }}` prints `{{ name }}`, and `@@if` prints `@if`.
 
+### Stay safe
+
+`{{ }}` escapes HTML. It does not make every place in a page safe.
+
+- **Always quote attributes.** Write `href="{{ url }}"`, not `href={{ url }}`.
+  Without quotes, a space in the value starts a new attribute, like `onclick=...`.
+- **Check URLs from users.** `href="{{ url }}"` does not block a `javascript:` URL.
+  A click on `javascript:alert(1)` runs the code.
+  Allow only `http://` and `https://` URLs (or your own paths) before you print them.
+- **`<script>` and `<style>` are not safe.** Inside them, `{{ }}` only escapes HTML.
+  It does not make a value safe for JavaScript or CSS.
+  Do not print user data there. Put it in a quoted `data-` attribute, and read it in your script.
+
+```html
+<a href="{{ profile.website }}">Website</a>  {{-- only after you check it is http or https --}}
+
+<div id="app" data-user-name="{{ user.name }}"></div>
+<script>
+  const name = document.getElementById('app').dataset.userName;
+</script>
+```
+
 ## Expressions
 
 Inside `{{ }}` and tags, you can use:

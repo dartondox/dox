@@ -53,7 +53,7 @@ For `String` fields (and `List<String>` items).
 | `@EndsWith('.dev')` | `end_with` | `The {field} must end with {suffix}` | `pattern` |
 | `@Alpha()` | `alpha` | `The {field} must be an alphabetic` | `pattern` |
 | `@AlphaNumeric()` | `alpha_numeric` | `The {field} must be only alphabetic and number` | `pattern` |
-| `@AlphaDash()` | `alpha_dash` | `The {field} must be only alphabetic and dash` | `pattern` |
+| `@AlphaDash()` | `alpha_dash` | `The {field} must be only alphabetic, number, dash and underscore` | `pattern` |
 
 Details:
 
@@ -64,7 +64,7 @@ Details:
 - `@Uuid()` takes any version. Upper or lower case.
 - `@Regex(pattern, {message})` must match the **whole** value. You do not need `^` and `$`.
   The regex is checked when the generator runs. A bad regex stops the build.
-- `@Alpha()`, `@AlphaNumeric()` and `@AlphaDash()` use ASCII letters `a-z`, `A-Z`. `@AlphaDash()` also allows `-` and `_`.
+- `@Alpha()`, `@AlphaNumeric()` and `@AlphaDash()` use ASCII letters `a-z`, `A-Z`. `@AlphaDash()` also allows digits `0-9`, `-` and `_`.
 - `@In` and `@NotIn` compare exactly (case matters).
 
 ## Change text
