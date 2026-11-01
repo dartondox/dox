@@ -85,9 +85,12 @@ bool _underPrefix(String path, String prefix) {
   return path.length == end || path.codeUnitAt(end) == 0x2F;
 }
 
-/// a route that runs the global middleware, then the raw handler.
-/// made on the first request, once per handler.
-final Expando<RouteData> _mountRoutes = Expando<RouteData>();
+/// prefix => the route that runs the global middleware, then the raw
+/// handler, with the handler and the middleware list it was made from.
+/// made again when either one changes (a new mount, or
+/// `Dox().initialize` with a new config).
+final Map<String, (RawRequestHandler, List<dynamic>, RouteData)> _mountRoutes =
+    <String, (RawRequestHandler, List<dynamic>, RouteData)>{};
 
 /// what the mount route gives when the raw handler is done. the handler
 /// wrote the answer itself, so nothing more is sent.
@@ -95,9 +98,20 @@ const Object _handled = Object();
 
 /// run the global middleware, then the mount handler. a middleware that
 /// gives a response sends it, and the handler never runs. the body is not
-/// read here, so the handler can still read it.
+/// read here, so the handler can still read it. `terminate` steps run
+/// once the answer is sent.
 void _runMount(HttpRequest req, String prefix, RawRequestHandler handler) {
-  RouteData route = _mountRoutes[handler] ??= _mountRoute(prefix, handler);
+  List<dynamic> global = Dox().config.globalMiddleware;
+  (RawRequestHandler, List<dynamic>, RouteData)? cached = _mountRoutes[prefix];
+  RouteData route;
+  if (cached != null &&
+      identical(cached.$1, handler) &&
+      identical(cached.$2, global)) {
+    route = cached.$3;
+  } else {
+    route = _mountRoute(prefix, handler, global);
+    _mountRoutes[prefix] = (handler, global, route);
+  }
   DoxRequest doxReq = _doxRequest(
     req,
     route,
@@ -105,24 +119,37 @@ void _runMount(HttpRequest req, String prefix, RawRequestHandler handler) {
     RequestBody.empty(),
     req.headers.contentType,
   );
+  List<IDoxTerminableMiddleware> ends = route.terminable;
   Future<dynamic>.sync(() => runMiddlewareAndController(doxReq)).then(
     (dynamic value) {
-      if (identical(value, _handled)) return;
-
       /// a `next` middleware wraps the result in a DoxResponse
-      if (value is DoxResponse && identical(value.getContent(), _handled)) {
-        return;
+      bool sent =
+          identical(value, _handled) ||
+          (value is DoxResponse && identical(value.getContent(), _handled));
+      if (sent) {
+        value = null;
+      } else {
+        _send(req, value);
       }
-      _send(req, value);
+      if (ends.isNotEmpty) _terminate(req, doxReq, value, ends);
     },
     onError: (Object error, StackTrace stackTrace) {
-      httpErrorHandler(req, error, stackTrace);
+      if (ends.isEmpty) {
+        httpErrorHandler(req, error, stackTrace);
+        return;
+      }
+      dynamic value = renderError(req, error, stackTrace);
+      _send(req, value);
+      _terminate(req, doxReq, value, ends);
     },
   );
 }
 
-RouteData _mountRoute(String prefix, RawRequestHandler handler) {
-  List<dynamic> global = Dox().config.globalMiddleware;
+RouteData _mountRoute(
+  String prefix,
+  RawRequestHandler handler,
+  List<dynamic> global,
+) {
   return RouteData(
     method: '*',
     path: prefix,

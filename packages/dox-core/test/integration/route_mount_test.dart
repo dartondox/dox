@@ -11,12 +11,28 @@ dynamic blocker(DoxRequest req) {
   return req;
 }
 
-AppConfig mountConfig() {
+/// stops every request
+dynamic blockAll(DoxRequest req) => response('all blocked').statusCode(401);
+
+/// keeps the status of each answer it sees in `terminate`
+class Ends implements IDoxMiddleware, IDoxTerminableMiddleware {
+  final List<int> statuses = <int>[];
+
+  @override
+  dynamic handle(IDoxRequest req) => req;
+
+  @override
+  void terminate(DoxRequest req, DoxResponse res) {
+    statuses.add(res.status!);
+  }
+}
+
+AppConfig mountConfig([List<dynamic>? middleware]) {
   return AppConfig(
     appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
     serverPort: 0,
     totalIsolate: 1,
-    globalMiddleware: <dynamic>[const SecurityHeaders(), blocker],
+    globalMiddleware: middleware ?? <dynamic>[const SecurityHeaders(), blocker],
   );
 }
 
@@ -131,5 +147,40 @@ void main() {
       await res.drain<void>();
       await Dox().server.close();
     }
+  });
+
+  test('a restart with new global middleware uses the new list', () async {
+    Route.mount('/admin', echo, middleware: true);
+    await startHttpServer(mountConfig());
+    HttpClientResponse res = await get('/admin');
+    expect(res.statusCode, 200);
+    await res.drain<void>();
+    await Dox().server.close();
+
+    await startHttpServer(mountConfig(<dynamic>[blockAll]));
+    res = await get('/admin');
+    expect(res.statusCode, 401);
+    expect(await body(res), 'all blocked');
+  });
+
+  test('terminate runs once the mount answer is sent', () async {
+    Ends ends = Ends();
+    Route.mount('/admin', (HttpRequest req) async {
+      req.response.statusCode = 201;
+      await echo(req);
+    }, middleware: true);
+    await startHttpServer(mountConfig(<dynamic>[ends, blocker]));
+
+    HttpClientResponse res = await get('/admin');
+    expect(res.statusCode, 201);
+    await res.drain<void>();
+    res = await get('/admin?block=1');
+    expect(res.statusCode, 403);
+    await res.drain<void>();
+
+    for (int i = 0; i < 50 && ends.statuses.length < 2; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    }
+    expect(ends.statuses, <int>[201, 403]);
   });
 }

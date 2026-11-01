@@ -361,10 +361,12 @@ How the prefix matches:
 !!! warning
     By default a mount skips all middleware, also the global middleware (security headers, CSRF, rate limit).
     Set `middleware: true` to run `AppConfig.globalMiddleware` before the handler.
+    The global CORS config never applies to a mount. The handler must send its own CORS headers.
 
 With `middleware: true`:
 
 - A middleware that gives a response (like `403`) stops the request. The handler does not run.
 - The body is not read for the middleware, so the handler can still read it. A CSRF token must come in a header.
-- The handler sends the answer itself. So work that a middleware does after the handler (the `next` or `terminate` step) does not change the answer.
+- The handler sends the answer itself. So the part of a `next` middleware that runs after the handler cannot change the answer.
+- A `terminate` step runs once the answer is sent, like on other routes.
 - An error in the handler gives `500`, like without middleware.

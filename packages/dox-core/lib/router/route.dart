@@ -198,7 +198,9 @@ class Route {
   /// headers, CSRF, rate limit). With [middleware] set to true, the
   /// `AppConfig.globalMiddleware` runs first. A middleware that gives a
   /// response stops the request before [handler]. The body is not read
-  /// for the middleware, so the handler can still read it.
+  /// for the middleware, so the handler can still read it. A `terminate`
+  /// step runs once the answer is sent. The global CORS config does not
+  /// apply to a mount.
   /// ```
   /// Route.mount('/socket.io/', io.handle);
   /// Route.mount('/admin', admin.handle, middleware: true);

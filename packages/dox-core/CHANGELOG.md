@@ -1,7 +1,7 @@
 ## Unreleased
 
 - Fix: `Route.mount` matches whole path parts only. A mount at `/admin` now gets `/admin`, `/admin/` and `/admin/...`, but no longer `/administrator` or `/admin-login`. Only requests that went to the wrong handler change. A prefix that ends in `/` (like Socket.IO's `/socket.io/`) works as before.
-- New: `Route.mount(prefix, handler, middleware: true)` runs `AppConfig.globalMiddleware` (security headers, CSRF, rate limit) before the raw handler. A middleware that gives a response stops the request. The default is still no middleware, so Socket.IO does not change.
+- New: `Route.mount(prefix, handler, middleware: true)` runs `AppConfig.globalMiddleware` (security headers, CSRF, rate limit) before the raw handler. A middleware that gives a response stops the request. `terminate` steps run once the answer is sent. The global CORS config does not apply to a mount. The default is still no middleware, so Socket.IO does not change.
 - New: `Route.staticFiles(prefix, folder, maxAge:)` serves a folder (CSS, JS, images) for GET and HEAD requests that match no route. Routes always win. `..`, dot files and folders get 404. Files get `Last-Modified`, `304`, Range support, the global CORS headers and an optional `Cache-Control`. The prefix follows `Route.group`, the router prefix and `Route.domain`.
 - New: `Route.staticFiles` sends a weak `ETag` (from the file size and change time). A matching `If-None-Match` gets `304` with no body. `If-None-Match` wins over `If-Modified-Since`.
 - New: `Route.staticFiles` sends files in a `.well-known` folder at the top of the folder (ACME challenges, `security.txt`). Every other dot name, also inside `.well-known`, still gets `404`.
