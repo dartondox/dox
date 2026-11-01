@@ -24,9 +24,10 @@ import 'package:dox_core/dox_core.dart';
 class ExceptionHandler {
   const ExceptionHandler();
 
-  /// Log the error. Dox calls it for every error that is not an
-  /// `IHttpException` (those are normal answers like 404 or 422), and for
-  /// errors outside a request, like a future that nobody awaited.
+  /// Log the error. Dox calls it for every error, except an
+  /// `IHttpException` with a 4xx code (those are normal answers like 404
+  /// or 422). It is also called for errors outside a request, like a
+  /// future that nobody awaited.
   /// The default prints the error and the stack with the logger.
   void report(Object error, StackTrace stackTrace) {
     Logger.warn(error);
