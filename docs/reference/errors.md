@@ -210,7 +210,8 @@ These stop `dart run build_runner build`.
 | `- @<Rule> does not fit the type <T> of <where>.` | A rule on the wrong type, like `@Email()` on an `int`. | Move the rule, or change the type. |
 | `- @Length on <where> needs min:, max: or both.` | `@Length()` with no limit. | Add `min:` or `max:`. |
 | `- The @Regex on <where> is not a valid regex: <reason>` | The pattern does not compile. | Fix the pattern. |
-| `- @MaxSize on <where> needs a size like '2MB' (units B, KB, MB, GB), not "<text>".` | Bad size text. | Use `'2MB'`. |
+| `- @MaxSize (or @MinSize) on <where> needs a size like '2MB' (units B, KB, MB, GB), not "<text>".` | Bad size text. | Use `'2MB'`. |
+| `- @Dimensions on <where> needs at least one limit, like minWidth:.` | `@Dimensions()` with no limit. | Add a limit, like `minWidth: 100`. |
 | `- The Maybe field <where> needs the default `const Maybe.missing()`.` | A `Maybe<T>` field without that default. | Add it. |
 | `- <where> can not have both @Lowercase and @Uppercase.` | Both on one field. | Keep one. |
 | `- The validate method of <Name> must take one DtoErrors: `void validate(DtoErrors errors)`.` | Wrong `validate` signature. | Use that signature. |
