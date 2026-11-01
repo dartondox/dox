@@ -169,6 +169,11 @@ class DtoWriter {
       } else if (!field.type.nullable) {
         out.writeln('if ($c == null) s.required(p, $key, _m);');
       }
+      for (DtoRule rule in field.requiredWhen) {
+        out.writeln(
+          'if ($c == null || $c is Undefined) s.requiredWhen(${rule.source}, input, p, $key, _m);',
+        );
+      }
     }
     out.writeln('if (s.issues.length != e) return null;');
     StringBuffer rules = StringBuffer();

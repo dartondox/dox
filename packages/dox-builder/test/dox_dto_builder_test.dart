@@ -244,6 +244,49 @@ class A {
 }''', '@Email does not fit the type int');
     });
 
+    test(
+      '@RequiredIf and @RequiredWith run when the value is missing',
+      () async {
+        String output = await _generate('''
+@Dto()
+class A {
+  final String? type;
+
+  @RequiredIf('type', 'company')
+  final String? company;
+
+  @RequiredWith(<String>['type'])
+  final Maybe<int> size;
+
+  const A({this.type, this.company, this.size = const Maybe.missing()});
+}''');
+        // the generated code is formatted, so compare without spaces
+        String code = output.replaceAll(RegExp(r'\s+'), '');
+        expect(
+          code,
+          contains(
+            "if(c1==null||c1isUndefined)s.requiredWhen(constRequiredIf('type','company'),input,p,'company',_m,);",
+          ),
+        );
+        expect(
+          code,
+          contains(
+            "if(c2==null||c2isUndefined)s.requiredWhen(constRequiredWith(<String>['type']),input,p,'size',_m,);",
+          ),
+        );
+      },
+    );
+
+    test('@RequiredIf on a field that is always required', () {
+      return expectError('''
+@Dto()
+class A {
+  @RequiredIf('type', 'company')
+  final String company;
+  const A({required this.company});
+}''', '@RequiredIf on A.company does nothing');
+    });
+
     test('a Maybe without const Maybe.missing()', () {
       return expectError('''
 @Dto()

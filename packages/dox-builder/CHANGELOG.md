@@ -1,3 +1,7 @@
+## Unreleased
+
+- DTOs: `@RequiredIf('type', 'company')` and `@RequiredWith(['phone'])` from `dox_validation`. The field is required only when the condition is true. Use them on a nullable field, a `Maybe` field or a field with a default. On an always-required field the build stops with a clear error.
+
 ## 3.0.2
 
 - **Breaking: column and JSON keys can change.** Please read this before you update.

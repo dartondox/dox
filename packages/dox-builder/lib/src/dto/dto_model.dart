@@ -165,6 +165,9 @@ class DtoField {
   final bool positional;
 
   final List<DtoRule> rules = <DtoRule>[];
+
+  /// `@RequiredIf` and `@RequiredWith`: checked when the value is missing.
+  final List<DtoRule> requiredWhen = <DtoRule>[];
   bool trim = false;
 
   /// 0 as is, 1 lower case, 2 upper case
@@ -262,6 +265,12 @@ class DtoReader {
   static const Set<String> fileRules = <String>{'MaxSize', 'Mimes', 'Image'};
 
   static const Set<String> valueRules = <String>{'In', 'NotIn'};
+
+  /// Rules that make a missing value required, like `@RequiredIf`.
+  static const Set<String> requiredWhenRules = <String>{
+    'RequiredIf',
+    'RequiredWith',
+  };
 
   static const Set<String> textChanges = <String>{
     'Trim',
@@ -576,6 +585,16 @@ class DtoReader {
       }
       if (textChanges.contains(name)) {
         _fits(field, name, where, errors, <DtoKind>{DtoKind.string});
+        continue;
+      }
+      if (requiredWhenRules.contains(name)) {
+        if (!field.maybe && field.required) {
+          errors.add(
+            '@$name on $where does nothing: the field is always required. '
+            'Make it nullable, a Maybe, or give it a default.',
+          );
+        }
+        field.requiredWhen.add(DtoRule(name, value, source));
         continue;
       }
       if (!builtIn.contains(name)) continue;
