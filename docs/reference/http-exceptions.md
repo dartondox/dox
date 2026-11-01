@@ -86,7 +86,7 @@ A request for a path that has no route answers like a `NotFoundHttpException` wi
 
 To send your own JSON shape, make your own exception class (see below) and override `toResponse()`.
 
-Other errors: any `Exception` or `Error` that is not an `IHttpException` gets `500` with `{"code": "server_error", "message": "Server Error"}`. When `APP_ENV` is `development` or `local`, the body is `error.toString()` as text instead. It is also passed to the `report` method of the [exception handler](../the-basic/errors.md). An `IHttpException` is not reported.
+Other errors: any `Exception` or `Error` that is not an `IHttpException` gets `500` with `{"code": "server_error", "message": "Server Error"}`. When `APP_ENV` is `development` or `local`, the body is `error.toString()` as text instead. It is also passed to the `report` method of the [exception handler](../the-basic/errors.md). An `IHttpException` with a `4xx` code is not reported. One with a `5xx` code is.
 
 A `ValidationException` on a request with a session (`SessionMiddleware`) that does not want JSON, like a form post, is not sent as JSON. Dox saves the errors and the old input in the session and redirects back.
 

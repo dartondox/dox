@@ -25,8 +25,9 @@ You do not need to set anything. With the default handler:
 For a `500`, the error text is sent only when `APP_ENV` is `development` or `local`.
 In production the client never sees it, because it can hold SQL, file paths or hosts.
 
-`report` is called for every error that is not an `IHttpException`.
-An `IHttpException` is a normal answer (like `404`), so it is not logged.
+`report` is called for every error, except an `IHttpException` with a `4xx` code.
+A `4xx` exception is a normal answer (like `404`), so it is not logged.
+A `5xx` exception, like `InternalErrorException`, is reported.
 The default `report` prints the error and the stack with the logger.
 
 See [HTTP exceptions](../reference/http-exceptions.md) for the built-in exception classes.

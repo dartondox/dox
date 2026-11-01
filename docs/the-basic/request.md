@@ -61,7 +61,8 @@ class ApiController {
 ## Route params
 
 Ask for a path param as a typed parameter, like `int id` in the example above.
-The raw text values are also in `req.param`, like `req.param['id']`.
+The text values are also in `req.param`, like `req.param['id']`.
+They are URL-decoded: `/users/a%20b` gives `'a b'`.
 See [Controller: parameters](controller.md#parameters).
 
 ## Form data (File)
@@ -139,7 +140,7 @@ Set the same limit in your proxy, like `client_max_body_size` in nginx.
 
 ```dart
 String? token = req.header('X-Token');
-Map<String, dynamic> all = req.headers;
+Map<String, dynamic> all = req.headers; // a repeated header is joined with ', '
 
 req.userAgent();  // User-Agent header
 req.host();       // Host header
