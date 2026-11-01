@@ -50,6 +50,7 @@ Relation.morphMap(<String, Model<dynamic> Function()>{
 
 - `@MorphTo` needs it. It reads the type and makes the model from the map.
 - Without a map, `@MorphMany` and `@MorphOne` store the class name, like `Photo`.
+- Use a morph map in production. The class name changes when you rename the class, or when you build with `--obfuscate`. Then the old rows do not match.
 - Do not change a type name later. The rows in the table keep the old name.
 - `Relation.morphMap(map, merge: false)` removes the names you set before.
 

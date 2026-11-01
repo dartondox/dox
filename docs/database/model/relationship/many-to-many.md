@@ -156,10 +156,12 @@ for (Song song in artist!.songs) {
 }
 ```
 
-- `pivot` always has the two pivot keys, like `artist_id` and `song_id`.
+- `pivot` has the two pivot keys, like `artist_id` and `song_id`, when the rows are loaded by the relation:
+  with `preload`, `$getRelation`, `eager` or `related('songs')!.get()`.
   They are read from the loaded rows, so a relation without `withPivot` runs no extra SQL.
 - `withTimestamps: true` adds `created_at` and `updated_at` to `pivot`.
-  `attach()` and `sync()` then set them too.
+  `attach()`, `sync()` and `toggle()` then set them.
+  `updateExistingPivot()` sets `updated_at`.
   The pivot table needs both columns (`table.timestamps()`).
 - A model that was not loaded by a ManyToMany relation has an empty `pivot`.
 - `pivot` is not in `toJson()`. Read it in Dart and add it to your response yourself.
