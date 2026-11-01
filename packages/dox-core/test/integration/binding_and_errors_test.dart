@@ -76,6 +76,9 @@ void main() {
         message: <String, String>{'error': 'not_found'},
       );
     });
+    Route.get('/fail/internal', (DoxRequest req) {
+      throw InternalErrorException(message: 'db down');
+    });
     Route.get('/fail/invalid', (DoxRequest req) {
       throw ValidationException(message: <String, String>{'name': 'required'});
     });
@@ -137,6 +140,11 @@ void main() {
         '{"code":"not_found","message":"GET /no/route not found"}',
       );
       expect(handler.reported, isEmpty);
+    });
+
+    test('a 5xx http exception is reported', () async {
+      expect((await get('/fail/internal')).$1, 500);
+      expect(handler.reported.single, isA<InternalErrorException>());
     });
 
     test('unknown error is 500 and hides details in production', () async {

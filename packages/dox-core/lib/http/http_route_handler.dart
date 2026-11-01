@@ -183,15 +183,34 @@ RouteData? _getMatchRoute(String inputRoute, String method, String? domain) {
     /// eg. /api/admin/{adminId}
     RegExpMatch? match = pattern.firstMatch(inputRoute);
     if (match != null) {
-      List<String> names = route.paramNames;
-      Map<String, dynamic> params = <String, dynamic>{};
-      for (int i = 0; i < names.length; i++) {
-        params[names[i]] = match.group(i + 1);
-      }
+      Map<String, dynamic>? params = _decodeParams(route.paramNames, match);
+      if (params == null) continue;
       return route.withParams(params);
     }
   }
   return null;
+}
+
+/// the params of [match], URL-decoded: `/users/a%20b` gives `'a b'`.
+/// null when a param can not be decoded (eg. `%ff` is not UTF-8),
+/// so the route does not match and the client gets 404.
+Map<String, dynamic>? _decodeParams(List<String> names, RegExpMatch match) {
+  Map<String, dynamic> params = <String, dynamic>{};
+  for (int i = 0; i < names.length; i++) {
+    String? value = match.group(i + 1);
+    if (value != null && value.contains('%')) {
+      try {
+        value = Uri.decodeComponent(value);
+      } on ArgumentError {
+        return null;
+      } on FormatException {
+        /// valid `%` codes, but not UTF-8, eg. `%ff`
+        return null;
+      }
+    }
+    params[names[i]] = value;
+  }
+  return params;
 }
 
 /// `example.com:3000` gives `example.com`, `[::1]:3000` gives `[::1]`.
