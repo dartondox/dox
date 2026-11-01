@@ -13,7 +13,7 @@ hide:
 
 # Fast backends<br>in Dart
 
-<p class="dox-hero__lead"><strong>Write in Dart. Serve with Rust.</strong></p>
+<p class="dox-hero__lead"><strong>Everything your Dart backend needs.</strong></p>
 
 <p class="dox-hero__lead">
 Dox is a web backend framework for Dart, like Laravel.
