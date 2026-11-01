@@ -79,6 +79,7 @@ Future<String> body(HttpClientResponse res) {
 void main() {
   tearDown(() async {
     Route.unmount('/admin');
+    Route.unmount('/admin/secure');
     Route.unmount('/io/');
     Route.unmount('/fail');
     await Dox().server.close();
@@ -231,8 +232,54 @@ void main() {
     expect(res.statusCode, 200);
     expect(await body(res), 'mount:/admin');
     await Future<void>.delayed(const Duration(milliseconds: 50));
-    // the 503 of the timeout is reported, but never sent. no error comes
-    // from a second answer on the closed response.
-    expect(errors.reported, everyElement(isA<HttpStatusException>()));
+    expect(errors.reported, isEmpty);
   });
+
+  test('the longest matching prefix wins', () async {
+    Route.mount('/admin', echo);
+    Route.mount('/admin/secure', echo, middleware: true);
+    await startHttpServer(mountConfig());
+
+    HttpClientResponse res = await get('/admin/secure/x?block=1');
+    expect(res.statusCode, 403);
+    await res.drain<void>();
+    res = await get('/admin/x?block=1');
+    expect(await body(res), 'mount:/admin/x');
+  });
+
+  test('the handler does not run after an answer was sent', () async {
+    Errors errors = Errors();
+    bool ran = false;
+    Route.mount('/admin', (HttpRequest req) async {
+      ran = true;
+      await echo(req);
+    }, middleware: true);
+    await startHttpServer(mountConfig(<dynamic>[GiveUp(), slow], errors));
+
+    HttpClientResponse res = await get('/admin');
+    expect(res.statusCode, 503);
+    await res.drain<void>();
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+    expect(ran, isFalse);
+    expect(errors.reported, isEmpty);
+  });
+}
+
+/// a `next` middleware that answers 503 after 50 ms, while the rest of
+/// the chain still runs
+class GiveUp implements IDoxNextMiddleware {
+  @override
+  Future<DoxResponse> handle(DoxRequest req, Next next) {
+    next();
+    return Future<DoxResponse>.delayed(
+      const Duration(milliseconds: 50),
+      () => response('gave up').statusCode(503),
+    );
+  }
+}
+
+/// waits 200 ms, then goes on
+Future<dynamic> slow(DoxRequest req) async {
+  await Future<void>.delayed(const Duration(milliseconds: 200));
+  return req;
 }

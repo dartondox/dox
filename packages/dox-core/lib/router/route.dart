@@ -201,8 +201,12 @@ class Route {
   /// response stops the request before [handler]. The body is not read
   /// for the middleware, so the handler can still read it. A `terminate`
   /// step runs once the answer is sent. The global CORS config does not
-  /// apply to a mount. `RequestTimeout` does not stop a mount: the
-  /// handler already owns the answer.
+  /// apply to a mount. `RequestTimeout` does not run for a mount: the
+  /// handler already owns the answer. Cookies that a middleware adds
+  /// after the handler (the session cookie, `XSRF-TOKEN`) are not sent.
+  /// Get the CSRF token from a normal route.
+  ///
+  /// When two prefixes match, the longest one wins.
   /// ```
   /// Route.mount('/socket.io/', io.handle);
   /// Route.mount('/admin', admin.handle, middleware: true);

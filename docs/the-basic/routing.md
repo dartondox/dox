@@ -357,6 +357,7 @@ How the prefix matches:
 - It matches whole path parts. `/admin` matches `/admin`, `/admin/` and `/admin/users`. It never matches `/administrator` or `/admin-login`.
 - A trailing `/` does not change the match. `/socket.io/` also matches `/socket.io`.
 - The query string is not part of the match.
+- When two prefixes match, the longest one wins. So `/admin/secure` with `middleware: true` is not skipped by a mount at `/admin`.
 
 !!! warning
     By default a mount skips all middleware, also the global middleware (security headers, CSRF, rate limit).
@@ -369,5 +370,6 @@ With `middleware: true`:
 - The body is not read for the middleware, so the handler can still read it. A CSRF token must come in a header.
 - The handler sends the answer itself. So the part of a `next` middleware that runs after the handler cannot change the answer.
 - A `terminate` step runs once the answer is sent, like on other routes.
-- `RequestTimeout` does not stop a mount. The handler already owns the answer.
+- `RequestTimeout` does not run for a mount. The handler already owns the answer.
+- Cookies that a middleware adds after the handler (the session cookie, `XSRF-TOKEN`) are not sent. Get the CSRF token from a normal route.
 - An error in the handler gives `500`, like without middleware.

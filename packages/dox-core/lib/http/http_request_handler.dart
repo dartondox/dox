@@ -59,28 +59,40 @@ void httpRequestHandler(HttpRequest req) {
 /// hand the request to a mounted handler. it writes the response itself.
 bool _mounted(HttpRequest req, Map<String, RawRequestHandler> mounts) {
   String path = req.uri.path;
-  for (MapEntry<String, RawRequestHandler> mount in mounts.entries) {
-    String prefix = mount.key;
-    if (!_underPrefix(path, prefix)) continue;
-    if (Route().mountsWithMiddleware.contains(prefix)) {
-      _runMount(req, prefix, mount.value);
-      return true;
-    }
 
-    /// report the error and answer 500, so the client does not hang
-    mount.value(req).catchError((Object error, StackTrace stackTrace) {
-      httpErrorHandler(req, error, stackTrace);
-    });
+  /// the longest prefix wins, so `/admin/secure` with middleware is never
+  /// skipped by a mount at `/admin` without it
+  String? prefix;
+  for (String key in mounts.keys) {
+    if (_underPrefix(path, key) &&
+        (prefix == null || _base(key) > _base(prefix))) {
+      prefix = key;
+    }
+  }
+  if (prefix == null) return false;
+  RawRequestHandler handler = mounts[prefix]!;
+  if (Route().mountsWithMiddleware.contains(prefix)) {
+    _runMount(req, prefix, handler);
     return true;
   }
-  return false;
+
+  /// report the error and answer 500, so the client does not hang
+  handler(req).catchError((Object error, StackTrace stackTrace) {
+    httpErrorHandler(req, error, stackTrace);
+  });
+  return true;
+}
+
+/// the length of [prefix] without a trailing `/`
+int _base(String prefix) {
+  return prefix.endsWith('/') ? prefix.length - 1 : prefix.length;
 }
 
 /// true when [path] is [prefix] or a path under it. a trailing `/` on
 /// the prefix does not matter: `/admin` and `/admin/` both match
 /// `/admin`, `/admin/` and `/admin/users`, but never `/administrator`.
 bool _underPrefix(String path, String prefix) {
-  int end = prefix.endsWith('/') ? prefix.length - 1 : prefix.length;
+  int end = _base(prefix);
   if (!path.startsWith(prefix.substring(0, end))) return false;
   return path.length == end || path.codeUnitAt(end) == 0x2F;
 }
@@ -97,9 +109,10 @@ void clearMountRoute(String prefix) {
   _mountRoutes.remove(prefix);
 }
 
-/// requests whose mount handler has started. the handler writes the
-/// answer itself, so nothing more is sent for them. not even a `503` of
-/// `RequestTimeout` or a changed answer of a `next` middleware like `ETag`.
+/// requests that have an answer: the mount handler started (it writes
+/// the answer itself), or Dox sent one (eg. a middleware said no). after
+/// that nothing more is sent, not even a changed answer of a `next`
+/// middleware like `ETag`, and the handler does not start.
 final Expando<bool> _started = Expando<bool>();
 
 /// run the global middleware, then the mount handler. a middleware that
@@ -131,6 +144,7 @@ void _runMount(HttpRequest req, String prefix, RawRequestHandler handler) {
       if (_started[req] == true) {
         value = null;
       } else {
+        _started[req] = true;
         _send(req, value);
       }
       if (ends.isNotEmpty) _terminate(req, doxReq, value, ends);
@@ -142,6 +156,7 @@ void _runMount(HttpRequest req, String prefix, RawRequestHandler handler) {
         if (ends.isNotEmpty) _terminate(req, doxReq, null, ends);
         return;
       }
+      _started[req] = true;
       if (ends.isEmpty) {
         httpErrorHandler(req, error, stackTrace);
         return;
@@ -162,9 +177,15 @@ RouteData _mountRoute(
     method: '*',
     path: prefix,
     controllers: <dynamic>[
-      ...global,
+      /// `RequestTimeout` is left out: the handler owns the answer, so a
+      /// timeout would only report a false 503 for a long request
+      for (Object? item in global)
+        if (item is! RequestTimeout) item,
       (DoxRequest req) async {
         HttpRequest raw = req.httpRequest;
+
+        /// a `next` middleware gave up early and an answer is sent
+        if (_started[raw] == true) return null;
         _started[raw] = true;
         try {
           await handler(raw);
