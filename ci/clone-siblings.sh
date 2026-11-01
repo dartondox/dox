@@ -2,7 +2,7 @@
 # Clones the Dox repos that live outside this one next to it:
 # ../dox-orm, ../dox-auth, ../dox-openapi, ../dox-validation,
 # ../dox-socketio, ../dox-storage, ../dox-queue, ../dox-scheduler,
-# ../dox-cli, ../dox-inertia, ../dox-view, ../ioredis, ../dox-http-native,
+# ../dox-mailer, ../dox-cli, ../dox-inertia, ../dox-view, ../ioredis, ../dox-http-native,
 # ../dox-postgres-native and ../dox-mysql-native. The examples
 # (their pubspec_overrides.yaml), ci/use-siblings.sh,
 # ci/smoke-template.sh and the dox-test CI use these clones, so they run
@@ -14,7 +14,7 @@ set -euo pipefail
 parent=$(cd "$(dirname "$0")/../.." && pwd)
 branch=${GITHUB_HEAD_REF:-${GITHUB_REF_NAME:-}}
 
-for repo in dox-orm dox-auth dox-openapi dox-validation dox-socketio dox-storage dox-queue dox-scheduler dox-cli dox-inertia dox-view ioredis \
+for repo in dox-orm dox-auth dox-openapi dox-validation dox-socketio dox-storage dox-queue dox-mailer dox-scheduler dox-cli dox-inertia dox-view ioredis \
   dox-http-native dox-postgres-native dox-mysql-native; do
   if [ -d "$parent/$repo" ]; then
     echo "$parent/$repo is there"
