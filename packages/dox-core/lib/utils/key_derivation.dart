@@ -28,7 +28,8 @@ class KeyDerivation {
   static const String signedUrl = 'dox:signed-url';
 
   /// keys made in this isolate, by secret and label
-  static final Map<String, Uint8List> _cache = <String, Uint8List>{};
+  static final Map<String, Map<String, Uint8List>> _cache =
+      <String, Map<String, Uint8List>>{};
 
   /// HKDF-SHA256 of RFC 5869: [length] bytes made from [secret], [info]
   /// and [salt]. An empty [salt] is 32 zero bytes, like the RFC says.
@@ -59,10 +60,9 @@ class KeyDerivation {
   /// The 32-byte key for [label], made from [secret]. It is made once per
   /// isolate, then read from a cache.
   static Uint8List derive(String secret, String label) {
-    return _cache.putIfAbsent(
-      '$label\n$secret',
-      () => hkdf(utf8.encode(secret), utf8.encode(label)),
-    );
+    /// secret, then label: no string is built per call
+    Map<String, Uint8List> keys = _cache[secret] ??= <String, Uint8List>{};
+    return keys[label] ??= hkdf(utf8.encode(secret), utf8.encode(label));
   }
 
   /// The 32-byte key for [label], made from `APP_KEY` of the app.

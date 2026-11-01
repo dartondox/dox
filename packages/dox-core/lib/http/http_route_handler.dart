@@ -8,19 +8,24 @@ import 'package:dox_core/http/http_response_handler.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/utils.dart';
 
-RouteData? httpRouteHandler(HttpRequest req) {
+/// the route for a request, and its params (null for a route with none).
+/// the params are not put on the shared [RouteData], so no copy of it is
+/// made per request.
+typedef RouteMatch = ({RouteData route, Map<String, dynamic>? params});
+
+RouteMatch? httpRouteHandler(HttpRequest req) {
   /// read Host once. only domain routes need it.
   _routeIndex();
   String? host = _hasDomain ? req.headers.value(HttpHeaders.hostHeader) : null;
-  RouteData? route = _getMatchRoute(req.uri.path, req.method, host);
+  RouteMatch? match = _getMatchRoute(req.uri.path, req.method, host);
 
   /// HEAD runs the GET route when there is no HEAD route.
   /// the server sends the status and headers, with no body.
-  if (route == null && req.method == 'HEAD') {
-    route = _getMatchRoute(req.uri.path, 'GET', host);
+  if (match == null && req.method == 'HEAD') {
+    match = _getMatchRoute(req.uri.path, 'GET', host);
   }
 
-  if (route == null) {
+  if (match == null) {
     /// answer preflight OPTIONS with 204 and cors headers.
     /// use cors setting of the route the browser is asking about.
     if (req.method == HttpRequestMethod.OPTIONS.name) {
@@ -28,7 +33,7 @@ RouteData? httpRouteHandler(HttpRequest req) {
         req.uri.path,
         req.headers.value('access-control-request-method') ?? '',
         host,
-      );
+      )?.route;
       httpCorsHandler(target?.corsEnabled, req);
       req.response.statusCode = HttpStatus.noContent;
       responseDataHandler(null, req);
@@ -51,7 +56,7 @@ RouteData? httpRouteHandler(HttpRequest req) {
       );
     }
   }
-  return route;
+  return match;
 }
 
 /// the methods with a route for [path], eg. `['GET', 'HEAD', 'POST']`.
@@ -169,7 +174,7 @@ Map<String, _MethodRoutes> _routeIndex() {
 
 /// get matched route from the list
 /// method, domain, path
-RouteData? _getMatchRoute(String inputRoute, String method, String? domain) {
+RouteMatch? _getMatchRoute(String inputRoute, String method, String? domain) {
   Map<String, _MethodRoutes> index = _routeIndex();
 
   /// methods are almost always upper case already
@@ -178,7 +183,7 @@ RouteData? _getMatchRoute(String inputRoute, String method, String? domain) {
 
   inputRoute = sanitizeRoutePath(inputRoute).trim();
   RouteData? exact = group.exact[inputRoute];
-  if (exact != null) return exact;
+  if (exact != null) return (route: exact, params: null);
   String? host = domain?.toLowerCase();
   String? hostName = host == null ? null : _withoutPort(host);
 
@@ -193,7 +198,9 @@ RouteData? _getMatchRoute(String inputRoute, String method, String? domain) {
     /// route without params, eg. /api/example
     RegExp? pattern = route.pattern;
     if (pattern == null) {
-      if (route.path.trim() == inputRoute) return route;
+      if (route.path.trim() == inputRoute) {
+        return (route: route, params: null);
+      }
       continue;
     }
 
@@ -203,7 +210,7 @@ RouteData? _getMatchRoute(String inputRoute, String method, String? domain) {
     if (match != null) {
       Map<String, dynamic>? params = _decodeParams(route.paramNames, match);
       if (params == null) continue;
-      return route.withParams(params);
+      return (route: route, params: params);
     }
   }
   return null;
