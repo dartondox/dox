@@ -1,6 +1,8 @@
 ## Unreleased
 
 - New: `Route.staticFiles(prefix, folder, maxAge:)` serves a folder (CSS, JS, images) for GET and HEAD requests that match no route. Routes always win. `..`, dot files and folders get 404. Files get `Last-Modified`, `304`, Range support, the global CORS headers and an optional `Cache-Control`. The prefix follows `Route.group`, the router prefix and `Route.domain`.
+- New: `Route.staticFiles` sends a weak `ETag` (from the file size and change time). A matching `If-None-Match` gets `304` with no body. `If-None-Match` wins over `If-Modified-Since`.
+- New: `Route.staticFiles` sends files in a `.well-known` folder at the top of the folder (ACME challenges, `security.txt`). Every other dot name, also inside `.well-known`, still gets `404`.
 - New: `AppConfig.idleTimeout`. A keep-alive connection with no new request for this long is closed. Default 30 seconds, as before. Behind a load balancer, set it longer than the balancer's idle timeout (eg. 65 seconds for AWS ALB). Needs dox_http_native 3.0.3.
 - New: `Route.websocket(maxMessageSize:)`. A bigger message closes the socket with 1009. Default 16 MB, as before.
 

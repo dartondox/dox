@@ -295,8 +295,9 @@ Route.staticFiles('build', 'public/build', maxAge: Duration(days: 365));
 ```
 
 - Only `GET` and `HEAD` requests read files, and only when no route matches. A route always wins.
-- `..`, dot files (like `.env`) and folders are never sent. They get `404`.
-- A file gets `Last-Modified`, and `304` when the browser already has it. Range requests work.
+- `..`, dot files (like `.env` or `.git`) and folders are never sent. They get `404`.
+- The one dot folder that is sent is `.well-known` at the top of the folder (`public/.well-known/...`). It holds ACME (Let's Encrypt) challenges, `security.txt` and `apple-app-site-association`. Dot files inside it still get `404`.
+- A file gets a weak `ETag` (from its size and change time) and `Last-Modified`. The browser gets `304` with no body when it already has the file. `If-None-Match` wins over `If-Modified-Since`. Range requests work.
 - `maxAge` sends `Cache-Control: public, max-age=...`. Give a long `maxAge` to build files with a hash in the name (like Vite's).
 - No middleware runs for a file. The global CORS config still applies.
 - Like other routes, the prefix follows `Route.group`, the router prefix and `Route.domain`.

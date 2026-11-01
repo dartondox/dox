@@ -210,7 +210,8 @@ class Route {
   /// Never save user uploads in [folder]: an uploaded html or svg file
   /// would run its script on your site. Use `dox_storage` for them.
   /// `..`, dot files (like `.env`) and folders are never sent: they get
-  /// 404. A file gets `Last-Modified` (and 304 when the browser has it),
+  /// 404. Only a `.well-known` folder at the top of [folder] is sent.
+  /// A file gets `ETag` and `Last-Modified` (and 304 when the browser has it),
   /// Range support, and `Cache-Control: public, max-age=...` with
   /// [maxAge]. Give hashed build files (like Vite's) a long [maxAge].
   /// ```

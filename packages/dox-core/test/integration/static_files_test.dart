@@ -27,6 +27,17 @@ void main() {
     await File('${public.path}/app.js').writeAsString('console.log(1)');
     await File('${public.path}/.env').writeAsString('APP_KEY=secret');
     await File('${public.path}/sub/x.css').writeAsString('a{}');
+    await Directory('${public.path}/.well-known/acme-challenge')
+        .create(recursive: true);
+    await File('${public.path}/.well-known/acme-challenge/tok123')
+        .writeAsString('tok123.key');
+    await File('${public.path}/.well-known/security.txt')
+        .writeAsString('Contact: x');
+    await File('${public.path}/.well-known/.env').writeAsString('APP_KEY=x');
+    await Directory('${public.path}/.git').create();
+    await File('${public.path}/.git/config').writeAsString('[core]');
+    await Directory('${public.path}/sub/.well-known').create();
+    await File('${public.path}/sub/.well-known/a.txt').writeAsString('deep');
     await File('${dir.path}/secret.txt').writeAsString('TOP-SECRET-CONTENT');
     Directory root = Directory('${dir.path}/root');
     await root.create();
@@ -115,6 +126,109 @@ void main() {
     res = await req.close();
     expect(res.statusCode, 200);
     await res.drain<void>();
+  });
+
+  Future<HttpClientResponse> getWith(String path, Map<String, String> h) async {
+    HttpClientRequest req = await client.get('127.0.0.1', port, path);
+    h.forEach(req.headers.set);
+    return req.close();
+  }
+
+  test('a file gets a weak ETag, and 304 when it matches', () async {
+    HttpClientResponse first = await get('/assets/app.js');
+    String etag = first.headers.value('etag')!;
+    String modified = first.headers.value('last-modified')!;
+    await first.drain<void>();
+    expect(etag, startsWith('W/"'));
+
+    HttpClientResponse res = await getWith('/assets/app.js', <String, String>{
+      'if-none-match': etag,
+    });
+    expect(res.statusCode, 304);
+    expect(res.headers.value('etag'), etag);
+    expect(await res.toList(), isEmpty);
+
+    // a list with the tag, and the strong form, also match
+    res = await getWith('/assets/app.js', <String, String>{
+      'if-none-match': '"other", ${etag.substring(2)}',
+    });
+    expect(res.statusCode, 304);
+    await res.drain<void>();
+
+    // another tag sends the file
+    res = await getWith('/assets/app.js', <String, String>{
+      'if-none-match': 'W/"other"',
+    });
+    expect(res.statusCode, 200);
+    expect(await utf8.decodeStream(res), 'console.log(1)');
+
+    // If-None-Match wins over If-Modified-Since
+    res = await getWith('/assets/app.js', <String, String>{
+      'if-none-match': 'W/"other"',
+      'if-modified-since': modified,
+    });
+    expect(res.statusCode, 200);
+    await res.drain<void>();
+
+    // HEAD works the same, with no body
+    HttpClientRequest req = await client.open(
+      'HEAD',
+      '127.0.0.1',
+      port,
+      '/assets/app.js',
+    );
+    req.headers.set('if-none-match', etag);
+    res = await req.close();
+    expect(res.statusCode, 304);
+    expect(await res.toList(), isEmpty);
+    res = await get('/assets/app.js', method: 'HEAD');
+    expect(res.headers.value('etag'), etag);
+    expect(await res.toList(), isEmpty);
+  });
+
+  test('the ETag changes when the file changes', () async {
+    File f = File('${dir.path}/public/changing.txt');
+    await f.writeAsString('one');
+    HttpClientResponse res = await get('/assets/changing.txt');
+    String before = res.headers.value('etag')!;
+    await res.drain<void>();
+    await f.writeAsString('one two');
+    res = await get('/assets/changing.txt');
+    expect(res.headers.value('etag'), isNot(before));
+    await res.drain<void>();
+  });
+
+  test('.well-known files are sent', () async {
+    HttpClientResponse res = await get(
+      '/assets/.well-known/acme-challenge/tok123',
+    );
+    expect(res.statusCode, 200);
+    expect(await utf8.decodeStream(res), 'tok123.key');
+    res = await get('/assets/.well-known/security.txt');
+    expect(res.statusCode, 200);
+    expect(await utf8.decodeStream(res), 'Contact: x');
+  });
+
+  test('other dot names, also inside .well-known, get 404', () async {
+    for (String path in <String>[
+      '/assets/.git/config',
+      '/assets/.well-known/.env',
+      '/assets/.well-known',
+      '/assets/.well-known/',
+      '/assets/.well-known/acme-challenge',
+      '/assets/sub/.well-known/a.txt',
+      '/assets/.well-known/../.env',
+      '/assets/.well-known/%2e%2e/.env',
+      '/assets/.well-known/..%2f.env',
+      '/assets/.Well-Known/security.txt',
+    ]) {
+      String res = await raw(
+        port,
+        'GET $path HTTP/1.1\r\nHost: x\r\nConnection: close\r\n\r\n',
+      );
+      expect(res, startsWith('HTTP/1.1 404'), reason: path);
+      expect(res, isNot(contains('APP_KEY')), reason: path);
+    }
   });
 
   test('a Range request gets part of the file', () async {
