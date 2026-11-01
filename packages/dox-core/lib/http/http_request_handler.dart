@@ -64,8 +64,9 @@ bool _mounted(HttpRequest req, Map<String, RawRequestHandler> mounts) {
     if (path.startsWith(prefix) ||
         (prefix.endsWith('/') &&
             path == prefix.substring(0, prefix.length - 1))) {
+      /// report the error and answer 500, so the client does not hang
       mount.value(req).catchError((Object error, StackTrace stackTrace) {
-        Dox().config.exceptionHandler.report(error, stackTrace);
+        httpErrorHandler(req, error, stackTrace);
       });
       return true;
     }
