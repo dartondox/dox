@@ -7,6 +7,9 @@ class User extends UserGenerator {
   @override
   List<String> get hidden => <String>['password'];
 
+  @override
+  List<String> get fillable => <String>['name', 'email', 'password'];
+
   @Column()
   String? name;
 
