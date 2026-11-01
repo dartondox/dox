@@ -479,7 +479,8 @@ User? user = await Auth(guard: 'api').userFromToken(token);
 User? user = await Auth(guard: 'web').userFromSession(session);
 ```
 
-- `userFromToken` runs the same checks as a request with a `Bearer` header: signature, algorithm, guard, `exp`, [revocation](#revoke-tokens) and `userCacheTtl`. Give the token with no `Bearer ` prefix. A missing, bad, expired, revoked or changed token gives `null`. It needs a guard with `JwtAuthDriver`.
+- `userFromToken` runs the same checks as a request with a `Bearer` header: signature, algorithm, guard, `exp` and [revocation](#revoke-tokens). Give the token with no `Bearer ` prefix. A missing, bad, expired, revoked or changed token gives `null`. It needs a guard with `JwtAuthDriver`.
+- `userCacheTtl` is a cache, not a check. With it on, a deleted or banned user can still connect until the cache time ends, unless `forgetUser` runs.
 - `userFromSession` gives the user of a session, or `null`. Load the session with `SessionMiddleware().fromCookie(value)`. See [Session](../the-basic/session.md#load-a-session-with-no-request). It needs a guard with `SessionAuthDriver`.
 - Both throw a `StateError` on a guard with the wrong driver.
 

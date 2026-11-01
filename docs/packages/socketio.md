@@ -286,11 +286,12 @@ static Future<User?> findUser(Handshake handshake) async {
 }
 ```
 
-- `userFromToken` runs the same checks as `AuthMiddleware`: signature, guard, `exp` and revocation. A bad, expired, revoked or changed token gives `null`, so the client is refused.
+- `userFromToken` runs the same checks as `AuthMiddleware`: signature, guard, `exp` and revocation. A bad, expired, revoked or changed token gives `null`, so the client is refused. With `userCacheTtl` on, a deleted or banned user can still connect until the cache time ends, unless `forgetUser` runs.
 - `handshake.session()` runs the same cookie checks as `SessionMiddleware`. A changed cookie, a cookie made with another `APP_KEY` or an expired session gives an empty session, so `userFromSession` gives `null`.
 - `handshake.session()` uses `AppConfig.session`. Pass another `SessionConfig` like `handshake.session(config)`.
 - The session is read once, when the socket connects. A logout later does not close the socket. Call `socket.disconnect()` yourself if you need that.
 - The session is read only. Changes to it are not saved.
+- With no `allowedOrigins`, `handshake.session()` prints a warning once.
 
 !!! warning "Cookie login needs `allowedOrigins`"
     A browser sends its cookies on a websocket from any website. So if you log users in with a cookie, set `allowedOrigins` to your own sites.
