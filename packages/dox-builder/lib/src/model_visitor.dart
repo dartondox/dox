@@ -25,6 +25,9 @@ const List<String> _relationTypes = <String>[
   'HasMany',
   'BelongsTo',
   'ManyToMany',
+  'MorphOne',
+  'MorphMany',
+  'MorphTo',
 ];
 
 /// Reads the columns, relations and computed getters of a model class.
@@ -124,9 +127,24 @@ class ModelVisitor {
       DartType? modelType = object?.getField('model')?.toTypeValue();
       String? model = modelType == null ? null : typeCode(modelType, library);
 
+      String? relationType = _annotationName(relationMeta);
+      bool morphTo = relationType == 'MorphTo';
+
       relations[name] = {
-        'relationType': _annotationName(relationMeta),
-        'model': model?.replaceFirst('?', ''),
+        'relationType': relationType,
+        // a morphTo can point to many models, so it has no model. Its
+        // type is the field type, like `Model<dynamic>`.
+        'model': morphTo
+            ? typeCode(element.type, library).replaceFirst('?', '')
+            : model?.replaceFirst('?', ''),
+        'morphTo': morphTo,
+        // the morph name, a morphTo uses the field name by default
+        'name':
+            object?.getField('name')?.toStringValue() ??
+            (morphTo ? toSnakeCase(name) : null),
+        'typeColumn': object?.getField('typeColumn')?.toStringValue(),
+        'idColumn': object?.getField('idColumn')?.toStringValue(),
+        'ownerKey': object?.getField('ownerKey')?.toStringValue(),
         'dataType': typeCode(element.type, library),
         'localKey': object?.getField('localKey')?.toStringValue(),
         'foreignKey': object?.getField('foreignKey')?.toStringValue(),

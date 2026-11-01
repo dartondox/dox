@@ -320,8 +320,12 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       }
 
       static ${value['model']}? $queryFunctionName(List<Model<${visitor.className}>> list) {
-        return ${lcFirst(value['relationType'])}<${visitor.className}, ${value['model']}>(list, 
-          () => ${value['model']}() 
+        return ${lcFirst(value['relationType'])}<${visitor.className}, ${value['model']}>(list
+          ${value['morphTo'] == true ? '' : ", () => ${value['model']}()"}
+          ${_getParamKeyValue(value, 'name')}
+          ${_getParamKeyValue(value, 'typeColumn')}
+          ${_getParamKeyValue(value, 'idColumn')}
+          ${_getParamKeyValue(value, 'ownerKey')}
           ${_getParamKeyValue(value, 'foreignKey')}
           ${_getParamKeyValue(value, 'localKey')}
           ${_getParamKeyValue(value, 'relatedKey')}

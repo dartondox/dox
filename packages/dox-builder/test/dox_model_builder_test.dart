@@ -33,6 +33,25 @@ class HasMany {
   final String? foreignKey;
   const HasMany(this.model, {this.eager, this.foreignKey});
 }
+class ManyToMany {
+  final Type model;
+  final List<String>? withPivot;
+  final bool withTimestamps;
+  const ManyToMany(this.model, {this.withPivot, this.withTimestamps = false});
+}
+class MorphMany {
+  final Type model;
+  final String name;
+  final String? typeColumn;
+  const MorphMany(this.model, this.name, {this.typeColumn});
+}
+class MorphTo {
+  final String? name;
+  final String? idColumn;
+  final String? ownerKey;
+  const MorphTo({this.name, this.idColumn, this.ownerKey});
+}
+class Model<T> {}
 ''';
 
 Future<String> _generate(
@@ -174,6 +193,66 @@ class Tag {
 }
 ''');
       expect(out, isNot(contains('readsRowDates')));
+    });
+
+    test('ManyToMany passes withPivot and withTimestamps', () async {
+      String out = await _generate('''
+@DoxModel()
+class User {
+  @ManyToMany(User, withPivot: <String>['role', 'note'], withTimestamps: true)
+  List<User> friends = <User>[];
+
+  @ManyToMany(User)
+  List<User> others = <User>[];
+}
+''');
+      String flat = out.replaceAll(RegExp(r'\s'), '');
+      expect(
+        flat,
+        contains("withPivot:const<String>['role','note'],withTimestamps:true"),
+      );
+      expect(flat, contains('manyToMany<User,User>(list,()=>User());'));
+    });
+
+    test('morph relations', () async {
+      String out = await _generate('''
+@DoxModel()
+class Comment {
+  @MorphMany(Comment, 'commentable', typeColumn: 'kind')
+  List<Comment> replies = <Comment>[];
+
+  @MorphTo()
+  Model<dynamic>? commentableItem;
+
+  @MorphTo(name: 'owner', idColumn: 'owner_key', ownerKey: 'uid')
+  Model<dynamic>? parent;
+}
+''');
+      String flat = out.replaceAll(RegExp(r'\s'), '');
+      expect(
+        flat,
+        contains(
+          "morphMany<Comment,Comment>(list,()=>Comment(),"
+          "name:'commentable',typeColumn:'kind',",
+        ),
+      );
+      expect(flat, contains('getMorphMany<Comment,Comment>('));
+
+      /// a morphTo has no model, and the name is the field name
+      expect(
+        flat,
+        contains(
+          "morphTo<Comment,Model<dynamic>>(list,name:'commentable_item');",
+        ),
+      );
+      expect(
+        flat,
+        contains(
+          "morphTo<Comment,Model<dynamic>>(list,name:'owner',"
+          "idColumn:'owner_key',ownerKey:'uid',);",
+        ),
+      );
+      expect(flat, contains('getMorphTo<Comment,Model<dynamic>>('));
     });
 
     test('a two word relation is found in the preload list', () async {
