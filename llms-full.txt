@@ -2955,6 +2955,24 @@ Dox stops with a clear error when:
 - `route()` gets a name that no route has,
 - a `{param}` of the path has no value, or `params` has a key the path does not have.
 
+### Signed routes
+
+A signed URL is a named route with a `signature` in its query, so nobody can change it. Use it for links in emails, like "unsubscribe".
+Protect the route with `ValidateSignature`, and make the URL with `Route.signedUrl`:
+
+```dart
+Route.get('/unsubscribe/{user}', <dynamic>[
+  const ValidateSignature(),
+  (UserController c) => c.unsubscribe,
+]).name('unsubscribe');
+
+Route.signedUrl('unsubscribe',
+    params: <String, Object>{'user': 5}, expires: Duration(days: 7));
+// https://example.com/unsubscribe/5?expires=...&signature=...
+```
+
+A changed or expired URL gets `403`. See [Signed URLs](../security/signed-urls.md).
+
 ## Route model binding
 
 A binder turns a route param into a value before the controller runs, for example a model from the database.
