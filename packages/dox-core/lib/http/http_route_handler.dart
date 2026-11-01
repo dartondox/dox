@@ -35,16 +35,34 @@ RouteData? httpRouteHandler(HttpRequest req) {
     } else {
       /// same path as a thrown 404, so the app ExceptionHandler and
       /// responseHandler can format it. the default body is JSON.
+      /// when the path has routes for other methods, it is 405.
+      List<String> allow = _allowedMethods(req.uri.path, host);
       httpErrorHandler(
         req,
-        NotFoundHttpException(
-          message: '${req.method} ${req.uri.path} not found',
-        ),
+        allow.isEmpty
+            ? NotFoundHttpException(
+                message: '${req.method} ${req.uri.path} not found',
+              )
+            : MethodNotAllowedHttpException(
+                allow,
+                message: '${req.method} is not allowed for ${req.uri.path}',
+              ),
         StackTrace.empty,
       );
     }
   }
   return route;
+}
+
+/// the methods with a route for [path], eg. `['GET', 'HEAD', 'POST']`.
+/// runs only for a request that matched no route.
+List<String> _allowedMethods(String path, String? host) {
+  List<String> allow = <String>[];
+  for (String method in _byMethod.keys) {
+    if (_getMatchRoute(path, method, host) != null) allow.add(method);
+  }
+  if (allow.contains('GET') && !allow.contains('HEAD')) allow.add('HEAD');
+  return allow;
 }
 
 /// routes grouped by method, rebuilt when the route list changes.

@@ -8,6 +8,15 @@ import 'package:dox_core/dox_core.dart';
 class AppConfig {
   final String appKey;
 
+  /// Old `APP_KEY`s, to change the key without logging out every user.
+  /// Encrypted cookies and cookie sessions made with one of them can
+  /// still be read. New ones are made with [appKey] only. Remove an old
+  /// key once its cookies have expired.
+  /// ```
+  /// previousKeys: ['the-old-32-character-app-key....'],
+  /// ```
+  final List<String> previousKeys;
+
   /// The port to listen on. Default 3000. When the env has no `APP_PORT`
   /// but has `PORT` (Cloud Run, Fly, Render, Heroku set it), Dox listens
   /// on `PORT` instead.
@@ -95,6 +104,7 @@ class AppConfig {
 
   AppConfig({
     required this.appKey,
+    this.previousKeys = const <String>[],
     this.serverPort = 3000,
     this.host,
 

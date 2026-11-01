@@ -67,7 +67,7 @@ class RequestValidator {
         case BodyKind.invalidJson:
           throw BadRequestException(message: 'The body is not valid JSON');
         case BodyKind.urlEncoded:
-          input = forms.parse(_pairs(body.text ?? ''));
+          input = forms.parse(forms.pairs(body.text ?? ''));
         case BodyKind.multipart:
           input = forms.parse(body.parts ?? const <MapEntry<String, Object>>[]);
         case BodyKind.other:
@@ -93,29 +93,5 @@ class RequestValidator {
         : schema.safeParse(data, messages: Dox().messages);
     if (!result.success) throw ValidationException(message: result.errors);
     return result.value as O;
-  }
-
-  List<MapEntry<String, Object>> _pairs(String text) {
-    List<MapEntry<String, Object>> pairs = <MapEntry<String, Object>>[];
-    if (text.isEmpty) return pairs;
-    for (String part in text.split('&')) {
-      if (part.isEmpty) continue;
-      int equals = part.indexOf('=');
-      String key = equals < 0 ? part : part.substring(0, equals);
-      String value = equals < 0 ? '' : part.substring(equals + 1);
-      try {
-        pairs.add(
-          MapEntry<String, Object>(
-            Uri.decodeQueryComponent(key),
-            Uri.decodeQueryComponent(value),
-          ),
-        );
-      } on FormatException {
-        throw BadRequestException(message: 'The form body is not valid');
-      } on ArgumentError {
-        throw BadRequestException(message: 'The form body is not valid');
-      }
-    }
-    return pairs;
   }
 }

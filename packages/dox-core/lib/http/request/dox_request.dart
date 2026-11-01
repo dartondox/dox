@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/http/request/form_input.dart';
 import 'package:dox_core/http/request/http_request_body.dart';
 import 'package:dox_core/http/request/trusted_proxy.dart';
 import 'package:dox_core/router/route_data.dart';
@@ -95,8 +96,12 @@ class DoxRequest implements IDoxRequest {
     return isJson() || header('x-requested-with') == 'XMLHttpRequest';
   }
 
-  /// the query string, read on first use
-  late Map<String, dynamic> query = uri.queryParameters;
+  /// the query string, read on first use. bracket keys nest, like the
+  /// body: `?tags[]=a&tags[]=b` gives `{'tags': ['a', 'b']}`.
+  late Map<String, dynamic> query = const FormInput().nested(
+    uri.queryParameters,
+    () => const FormInput().queryPairs(uri),
+  );
 
   /// cookies from the header, read on first use
   late final Map<String, dynamic> _cookies = _getCookies();
@@ -280,6 +285,7 @@ class DoxRequest implements IDoxRequest {
         Dox().config.appKey,
         associatedData: key,
         purpose: KeyDerivation.cookie,
+        previousSecrets: Dox().config.previousKeys,
       );
     } on DecryptException {
       return null;
@@ -393,12 +399,21 @@ class DoxRequest implements IDoxRequest {
   Map<String, dynamic> toJson() {
     Map<String, dynamic> ret = <String, dynamic>{};
     _allRequest.forEach((String key, dynamic value) {
-      if (value is RequestFile) {
-        ret[key] = value.filename;
-      } else {
-        ret[key] = value;
-      }
+      ret[key] = _withFileNames(value);
     });
     return ret;
+  }
+
+  /// [value] with each file as its name, also inside lists and maps
+  static dynamic _withFileNames(dynamic value) {
+    if (value is RequestFile) return value.filename;
+    if (value is List) return value.map(_withFileNames).toList();
+    if (value is Map<String, dynamic>) {
+      return value.map(
+        (String k, dynamic v) =>
+            MapEntry<String, dynamic>(k, _withFileNames(v)),
+      );
+    }
+    return value;
   }
 }
