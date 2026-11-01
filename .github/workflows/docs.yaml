@@ -7,18 +7,17 @@ name: Docs
 # Old links like /the-basic/routing/ are kept as small redirect pages.
 # See docs/community/contribute.md, section "Docs".
 
+# The docs go live with a release: a `v<version>` tag (the same tag that
+# publishes the packages) builds the docs of that tag. So docs for a
+# feature that is not released yet stay off the site.
+# Run it by hand (workflow_dispatch) to deploy main now, for example for a
+# typo fix, or for the docs of a package from another repo that was just
+# released.
+
 on:
   push:
-    branches:
-      - main
-    paths:
-      - 'docs/**'
-      - 'hooks/**'
-      - 'overrides/**'
-      - 'packages/*/CHANGELOG.md'
-      - 'mkdocs.yml'
-      - 'requirements-docs.txt'
-      - '.github/workflows/docs.yaml'
+    tags:
+      - 'v*'
   workflow_dispatch:
     inputs:
       version:

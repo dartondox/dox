@@ -29,3 +29,4 @@ __pycache__/
 
 # test coverage output
 coverage/
+.claude/
