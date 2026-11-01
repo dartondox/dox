@@ -7,7 +7,7 @@ icon: lucide/user-lock
 This page shows how to log users in with `dox_auth` and protect routes with a JWT token, an access token or a session.
 
 `dox_auth` checks an email and a password against your user table.
-It gives back a JWT token.
+It gives back a JWT token, or an [access token](#access-tokens) with `AccessTokenAuthDriver`.
 The client sends this token in the `Authorization` header.
 `AuthMiddleware` reads the token and loads the user from the database.
 
@@ -302,6 +302,7 @@ A token works until it expires or you revoke it.
 | `connection` | the default connection | The `dox_orm` connection name. |
 | `expiresIn` | `null` (no end) | How long a new token works. |
 | `hashRounds` | `10` | The bcrypt cost, for `attempt`. |
+| `type` | the guard name | The type of the tokens. A token works only on a guard with the same type. |
 
 ### 2. Add the table
 
@@ -329,7 +330,7 @@ class CreateAccessTokensTable extends Migration {
 Then run `dox migrate`.
 If the driver uses another table, like `AccessTokenAuthDriver(table: 'tokens')`, pass the same name: `AccessTokenTables.up(schema, table: 'tokens')`.
 
-The table has these columns: `id`, `tokenable_type`, `tokenable_id`, `name`, `hash`, `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at`.
+The table has these columns: `id`, `tokenable_type`, `tokenable_id`, `type`, `name`, `hash`, `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at`.
 
 ### 3. Make and revoke tokens
 
@@ -371,6 +372,8 @@ auth.currentAccessToken; // the AccessToken of this request
 - A token fails (401) when its format is bad, the secret is wrong, it is expired, it was revoked, its user is gone, or it was made for a guard with another user table.
 - A revoked token is deleted from the table, so it stops working at once.
 - A database error also fails the check (401). The error goes to `AppConfig.exceptionHandler`.
+- Each token has a `type`. By default it is the guard name. So two access token guards do not take each other's tokens. If you rename a guard, set `AccessTokenAuthDriver(type: 'old-name')` to keep its tokens working.
+- When you delete a user, call `revokeAllAccessTokens(user)` too. Then old tokens can never match a new user with the same id.
 - `tokenCan` is `false` when there is no access token. So a session or JWT login never passes it.
 - `last_used_at` is written at most once a minute per token. So a busy token does not write on every request.
 - `Auth().login(user)` throws a `StateError` with this driver. Use `createAccessToken`.
@@ -590,7 +593,7 @@ User? user = await Auth(guard: 'web').userFromSession(session);
 ## Things to know
 
 - **The token is not secret.** By default, anyone with the token can read `user.toJson()`. Keep private columns in `hidden`, or use [small tokens](#small-tokens).
-- **By default, you can not cancel one token.** A token works until it expires. Turn on [revocation](#revoke-tokens) to cancel one token, or all tokens of a user. Or use [access tokens](#access-tokens): they live in a table, and you can revoke them at any time. Without it, to end all tokens, change the `secret` (your `APP_KEY`) with no old secrets. See [Change the JWT secret](#change-the-jwt-secret).
+- **By default, you can not cancel one token.** A token works until it expires. Turn on [revocation](#revoke-tokens) to cancel one token, or all tokens of a user. Without revocation, to end all tokens, change the `secret` (your `APP_KEY`) with no old secrets. See [Change the JWT secret](#change-the-jwt-secret). Or use [access tokens](#access-tokens): they live in a table, and you can revoke them at any time.
 - **The user is loaded on each request**, by the id in the token. A deleted user can not log in, even with a valid token.
 - **`userCacheTtl` skips that query.** With `Duration(seconds: 30)`, a deleted or changed user is seen only after 30 seconds. Each isolate has its own cache. Requests in that time share one user object, so do not change it per request.
 - **Login does not block the server.** `attempt` runs bcrypt in another isolate.
