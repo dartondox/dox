@@ -11,6 +11,12 @@ dynamic blocker(DoxRequest req) {
   return req;
 }
 
+/// throws for every request that has `?throw=1`
+dynamic thrower(DoxRequest req) {
+  if (req.input('throw') == '1') throw StateError('middleware failed');
+  return req;
+}
+
 /// stops every request
 dynamic blockAll(DoxRequest req) => response('all blocked').statusCode(401);
 
@@ -263,6 +269,50 @@ void main() {
     expect(ran, isFalse);
     expect(errors.reported, isEmpty);
   });
+
+  test('// cannot skip a longer mount, %2F stays encoded', () async {
+    Route.mount('/admin', echo);
+    Route.mount('/admin/secure', echo, middleware: true);
+    await startHttpServer(mountConfig());
+
+    // `//` counts as one `/`: the inner mount and its middleware
+    HttpClientResponse res = await get('/admin//secure/x?block=1');
+    expect(res.statusCode, 403);
+    await res.drain<void>();
+
+    // the handler still gets the path as it came
+    res = await get('/admin//secure/x');
+    expect(await body(res), 'mount:/admin//secure/x');
+
+    // `%2F` stays encoded: it is not a path part, so the outer mount
+    res = await get('/admin/secure%2Fx?block=1');
+    expect(res.statusCode, 200);
+    expect(await body(res), 'mount:/admin/secure%2Fx');
+  });
+
+  test(
+    'a middleware that throws gives 500, the handler does not run',
+    () async {
+      Errors errors = Errors();
+      Ends ends = Ends();
+      bool ran = false;
+      Route.mount('/admin', (HttpRequest req) async {
+        ran = true;
+        await echo(req);
+      }, middleware: true);
+      await startHttpServer(mountConfig(<dynamic>[ends, thrower], errors));
+
+      HttpClientResponse res = await get('/admin?throw=1');
+      expect(res.statusCode, 500);
+      await res.drain<void>();
+      for (int i = 0; i < 50 && ends.statuses.isEmpty; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+      }
+      expect(ran, isFalse);
+      expect(ends.statuses, <int>[500]);
+      expect(errors.reported, hasLength(1));
+    },
+  );
 }
 
 /// a `next` middleware that answers 503 after 50 ms, while the rest of

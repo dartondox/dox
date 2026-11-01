@@ -357,7 +357,8 @@ How the prefix matches:
 - It matches whole path parts. `/admin` matches `/admin`, `/admin/` and `/admin/users`. It never matches `/administrator` or `/admin-login`.
 - A trailing `/` does not change the match. `/socket.io/` also matches `/socket.io`.
 - The query string is not part of the match.
-- When two prefixes match, the longest one wins. So `/admin/secure` with `middleware: true` is not skipped by a mount at `/admin`.
+- When two prefixes match, the longest one wins. `//` counts as one `/`, so `/admin//secure/x` goes to a mount at `/admin/secure`.
+- The match uses the raw path. `%2F` stays encoded, so `/admin/secure%2Fx` goes to a mount at `/admin`. To protect a nested path, set `middleware: true` on the outer mount too.
 
 !!! warning
     By default a mount skips all middleware, also the global middleware (security headers, CSRF, rate limit).

@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:dox_core/constants/http_request_method.dart';
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/http/http_request_handler.dart' show clearMountRoute;
 import 'package:dox_core/http/http_static_handler.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/utils/utils.dart';
@@ -206,7 +205,10 @@ class Route {
   /// after the handler (the session cookie, `XSRF-TOKEN`) are not sent.
   /// Get the CSRF token from a normal route.
   ///
-  /// When two prefixes match, the longest one wins.
+  /// When two prefixes match, the longest one wins. `//` counts as one
+  /// `/`. The match uses the raw path, so `/admin/secure%2Fx` goes to a
+  /// mount at `/admin`. To protect a nested path, set [middleware] on the
+  /// outer mount too.
   /// ```
   /// Route.mount('/socket.io/', io.handle);
   /// Route.mount('/admin', admin.handle, middleware: true);
@@ -228,7 +230,6 @@ class Route {
   static void unmount(String prefix) {
     _mounts.remove(prefix);
     _mountsWithMiddleware.remove(prefix);
-    clearMountRoute(prefix);
   }
 
   /// prefixes of the mounts that run the global middleware first

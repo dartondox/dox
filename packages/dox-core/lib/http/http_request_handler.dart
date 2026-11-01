@@ -60,8 +60,12 @@ void httpRequestHandler(HttpRequest req) {
 bool _mounted(HttpRequest req, Map<String, RawRequestHandler> mounts) {
   String path = req.uri.path;
 
-  /// the longest prefix wins, so `/admin/secure` with middleware is never
-  /// skipped by a mount at `/admin` without it
+  /// `//` is one `/` here, so `/admin//secure` cannot skip a mount at
+  /// `/admin/secure`. the handler still gets the path as it came.
+  if (path.contains('//')) path = path.replaceAll(_slashes, '/');
+
+  /// the longest prefix wins. the match uses the raw path: `%2F` stays
+  /// encoded, so `/admin/secure%2Fx` goes to a mount at `/admin`
   String? prefix;
   for (String key in mounts.keys) {
     if (_underPrefix(path, key) &&
@@ -83,6 +87,9 @@ bool _mounted(HttpRequest req, Map<String, RawRequestHandler> mounts) {
   return true;
 }
 
+/// two or more `/` in a row
+final RegExp _slashes = RegExp('/{2,}');
+
 /// the length of [prefix] without a trailing `/`
 int _base(String prefix) {
   return prefix.endsWith('/') ? prefix.length - 1 : prefix.length;
@@ -103,11 +110,6 @@ bool _underPrefix(String path, String prefix) {
 /// `Dox().initialize` with a new config).
 final Map<String, (RawRequestHandler, List<dynamic>, RouteData)> _mountRoutes =
     <String, (RawRequestHandler, List<dynamic>, RouteData)>{};
-
-/// forget the route of the mount at [prefix], see `Route.unmount`
-void clearMountRoute(String prefix) {
-  _mountRoutes.remove(prefix);
-}
 
 /// requests that have an answer: the mount handler started (it writes
 /// the answer itself), or Dox sent one (eg. a middleware said no). after
@@ -150,12 +152,6 @@ void _runMount(HttpRequest req, String prefix, RawRequestHandler handler) {
       if (ends.isNotEmpty) _terminate(req, doxReq, value, ends);
     },
     onError: (Object error, StackTrace stackTrace) {
-      if (_started[req] == true) {
-        /// the handler owns the answer: only report the error
-        Dox().config.exceptionHandler.report(error, stackTrace);
-        if (ends.isNotEmpty) _terminate(req, doxReq, null, ends);
-        return;
-      }
       _started[req] = true;
       if (ends.isEmpty) {
         httpErrorHandler(req, error, stackTrace);
@@ -198,7 +194,6 @@ RouteData _mountRoute(
         return null;
       },
     ],
-    preMiddleware: List<dynamic>.unmodifiable(global),
   );
 }
 
