@@ -205,6 +205,10 @@ class Route {
   /// serve the files in [folder] under [prefix], for GET and HEAD
   /// requests that match no route. Routes always win, so a normal
   /// request does not touch the disk. No middleware runs for a file.
+  /// Like other routes, [prefix] follows [group], the router prefix and
+  /// [domain]. [folder] is relative to the folder the app starts in.
+  /// Never save user uploads in [folder]: an uploaded html or svg file
+  /// would run its script on your site. Use `dox_storage` for them.
   /// `..`, dot files (like `.env`) and folders are never sent: they get
   /// 404. A file gets `Last-Modified` (and 304 when the browser has it),
   /// Range support, and `Cache-Control: public, max-age=...` with
@@ -215,7 +219,10 @@ class Route {
   /// ```
   /// Behind a proxy (nginx, Caddy), the proxy can serve the folder instead.
   static void staticFiles(String prefix, String folder, {Duration? maxAge}) {
-    _statics.add(StaticFolder(prefix, folder, maxAge: maxAge));
+    Route r = Route();
+    _statics.add(
+      StaticFolder(r._join(prefix), folder, maxAge: maxAge, domain: r._domain),
+    );
   }
 
   /// health check route: `GET <path>` answers 200 `{"status": "ok"}`,

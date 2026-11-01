@@ -1,13 +1,15 @@
 import 'dart:io';
 
+import 'package:dox_core/http/http_cors_handler.dart';
 import 'package:dox_core/http/http_response_handler.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 
 /// A folder of files served under a path prefix, see `Route.staticFiles`.
 class StaticFolder {
-  StaticFolder(String prefix, String folder, {this.maxAge})
-    : prefix = Uri(path: prefix).pathSegments
+  StaticFolder(String prefix, String folder, {this.maxAge, String? domain})
+    : domain = domain?.toLowerCase(),
+      prefix = Uri(path: prefix).pathSegments
           .where((String s) => s.isNotEmpty)
           .toList(),
       root = p.normalize(p.absolute(folder));
@@ -20,6 +22,22 @@ class StaticFolder {
 
   /// sent as `Cache-Control: public, max-age=...` when set
   final Duration? maxAge;
+
+  /// the host of `Route.domain` (lower case), or null for every host
+  final String? domain;
+
+  /// true when the folder serves [host] (the `Host` header). The domain
+  /// may have a port (`localhost:3000`) or not, like a domain route.
+  bool servesHost(String? host) {
+    String? want = domain;
+    if (want == null) return true;
+    if (host == null) return false;
+    host = host.toLowerCase();
+    if (want == host) return true;
+    int end = host.startsWith('[') ? host.indexOf(']') + 1 : 0;
+    int colon = host.indexOf(':', end);
+    return colon != -1 && want == host.substring(0, colon);
+  }
 
   /// the file for [segments] (the decoded request path), or null when the
   /// path is not under [prefix] or is not safe. `..`, `.env` and other
@@ -61,21 +79,35 @@ Future<bool> httpStaticHandler(
   } on ArgumentError {
     return false;
   }
+  String? host = req.headers.value(HttpHeaders.hostHeader);
   for (StaticFolder folder in folders) {
+    if (!folder.servesHost(host)) continue;
     File? file = folder.fileFor(segments);
     if (file == null) continue;
     FileStat stat = await file.stat();
     if (stat.type != FileSystemEntityType.file) continue;
+
+    /// a file that can not be read (no permission, just deleted) is a
+    /// 404, not a 200 with an empty body that a cache could keep
+    try {
+      await (await file.open()).close();
+    } on FileSystemException {
+      continue;
+    }
     _send(req, file, stat, folder.maxAge);
     return true;
   }
   return false;
 }
 
-/// `Last-Modified` and `Cache-Control`, then 304 when the client has this
-/// version, else the file (with Range support).
+/// CORS, `Last-Modified` and `Cache-Control`, then 304 when the client
+/// has this version, else the file (with Range support).
 void _send(HttpRequest req, File file, FileStat stat, Duration? maxAge) {
   HttpResponse res = req.response;
+
+  /// the global CORS config, so fonts and `crossorigin` scripts load
+  /// from another origin
+  httpCorsHandler(null, req);
 
   /// HTTP dates have whole seconds
   DateTime modified = DateTime.fromMillisecondsSinceEpoch(
@@ -91,7 +123,11 @@ void _send(HttpRequest req, File file, FileStat stat, Duration? maxAge) {
   }
   String? header = req.headers.value(HttpHeaders.ifModifiedSinceHeader);
   DateTime? since = header == null ? null : _parseDate(header);
-  if (since != null && !modified.isAfter(since)) {
+
+  /// a date in the future is not valid, and is ignored (RFC 9110)
+  if (since != null &&
+      !since.isAfter(DateTime.now()) &&
+      !modified.isAfter(since)) {
     res.statusCode = HttpStatus.notModified;
     res.close();
     return;

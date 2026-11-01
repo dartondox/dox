@@ -28,16 +28,29 @@ void main() {
     await File('${public.path}/.env').writeAsString('APP_KEY=secret');
     await File('${public.path}/sub/x.css').writeAsString('a{}');
     await File('${dir.path}/secret.txt').writeAsString('TOP-SECRET-CONTENT');
+    Directory root = Directory('${dir.path}/root');
+    await root.create();
+    await File('${root.path}/robots.txt').writeAsString('User-agent: *');
+    await File('${public.path}/locked.js').writeAsString('locked');
+    await Process.run('chmod', <String>['000', '${public.path}/locked.js']);
 
     Route.get('/assets/route.js', (DoxRequest req) => 'from route');
     Route.staticFiles('assets', public.path);
     Route.staticFiles('cached', public.path, maxAge: const Duration(days: 365));
+    Route.staticFiles('/', root.path);
+    Route.group('api', () {
+      Route.staticFiles('docs', public.path);
+    });
+    Route.domain('files.test', () {
+      Route.staticFiles('only-host', public.path);
+    });
     await File('${public.path}/route.js').writeAsString('from file');
     await startHttpServer(
       AppConfig(
         appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
         serverPort: 0,
         totalIsolate: 1,
+        cors: const CORSConfig(origin: '*'),
       ),
     );
     port = Dox().server.httpServer.port;
@@ -91,6 +104,85 @@ void main() {
     req.headers.set('if-modified-since', 'yesterday');
     res = await req.close();
     expect(res.statusCode, 200);
+    await res.drain<void>();
+
+    // a date in the future is not valid: the file is sent
+    req = await client.get('127.0.0.1', port, '/assets/app.js');
+    req.headers.set(
+      'if-modified-since',
+      HttpDate.format(DateTime.now().add(const Duration(days: 30))),
+    );
+    res = await req.close();
+    expect(res.statusCode, 200);
+    await res.drain<void>();
+  });
+
+  test('a Range request gets part of the file', () async {
+    HttpClientRequest req = await client.get(
+      '127.0.0.1',
+      port,
+      '/assets/app.js',
+    );
+    req.headers.set('range', 'bytes=0-6');
+    HttpClientResponse res = await req.close();
+    expect(res.statusCode, 206);
+    expect(await utf8.decodeStream(res), 'console');
+  });
+
+  test('prefix / serves the root of the site', () async {
+    HttpClientResponse res = await get('/robots.txt');
+    expect(res.statusCode, 200);
+    expect(await utf8.decodeStream(res), 'User-agent: *');
+  });
+
+  test('the prefix follows Route.group', () async {
+    HttpClientResponse res = await get('/api/docs/app.js');
+    expect(res.statusCode, 200);
+    await res.drain<void>();
+    res = await get('/docs/app.js');
+    expect(res.statusCode, 404);
+    await res.drain<void>();
+  });
+
+  test('Route.domain: only that host gets the files', () async {
+    HttpClientRequest req = await client.get(
+      '127.0.0.1',
+      port,
+      '/only-host/app.js',
+    );
+    req.headers.host = 'files.test';
+    HttpClientResponse res = await req.close();
+    expect(res.statusCode, 200);
+    await res.drain<void>();
+    res = await get('/only-host/app.js');
+    expect(res.statusCode, 404);
+    await res.drain<void>();
+  });
+
+  test('a file gets the global CORS headers', () async {
+    HttpClientRequest req = await client.get(
+      '127.0.0.1',
+      port,
+      '/assets/app.js',
+    );
+    req.headers.set('origin', 'http://other.test');
+    HttpClientResponse res = await req.close();
+    expect(res.headers.value('access-control-allow-origin'), '*');
+    await res.drain<void>();
+  });
+
+  test('a file that can not be read is 404, not an empty 200', () async {
+    File locked = File('${dir.path}/public/locked.js');
+    try {
+      await (await locked.open()).close();
+      markTestSkipped('running as root: every file can be read');
+      return;
+    } on FileSystemException {
+      // expected: no permission
+    }
+    HttpClientResponse res = await get('/cached/locked.js');
+    expect(res.statusCode, 404);
+    expect(res.headers.value('cache-control'), isNull);
     await res.drain<void>();
   });
 

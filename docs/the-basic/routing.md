@@ -298,7 +298,13 @@ Route.staticFiles('build', 'public/build', maxAge: Duration(days: 365));
 - `..`, dot files (like `.env`) and folders are never sent. They get `404`.
 - A file gets `Last-Modified`, and `304` when the browser already has it. Range requests work.
 - `maxAge` sends `Cache-Control: public, max-age=...`. Give a long `maxAge` to build files with a hash in the name (like Vite's).
-- No middleware runs for a file.
+- No middleware runs for a file. The global CORS config still applies.
+- Like other routes, the prefix follows `Route.group`, the router prefix and `Route.domain`.
+- The folder path is relative to the folder the app starts in. Symlinks in the folder are followed.
+
+!!! warning
+    Never save user uploads in this folder. An uploaded html or svg file would run its script on your site.
+    Use [`dox_storage`](../packages/storage.md) for uploads. It sends such files as downloads.
 
 Behind a proxy, the proxy can serve the folder instead. Then the files never reach Dox.
 

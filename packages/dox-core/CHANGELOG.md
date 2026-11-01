@@ -1,3 +1,9 @@
+## Unreleased
+
+- New: `Route.staticFiles(prefix, folder, maxAge:)` serves a folder (CSS, JS, images) for GET and HEAD requests that match no route. Routes always win. `..`, dot files and folders get 404. Files get `Last-Modified`, `304`, Range support, the global CORS headers and an optional `Cache-Control`. The prefix follows `Route.group`, the router prefix and `Route.domain`.
+- New: `AppConfig.idleTimeout`. A keep-alive connection with no new request for this long is closed. Default 30 seconds, as before. Behind a load balancer, set it longer than the balancer's idle timeout (eg. 65 seconds for AWS ALB). Needs dox_http_native 3.0.3.
+- New: `Route.websocket(maxMessageSize:)`. A bigger message closes the socket with 1009. Default 16 MB, as before.
+
 ## 3.0.2
 
 - Change: a Redis cache store with no `prefix` gets `<app name>_cache:` from `APP_NAME` (like `my_shop_cache:`), so two apps on one Redis do not share keys or flush each other's cache. Existing Redis cache keys are not found once after the update. Rate limit counters, cache locks and `cache` driver sessions start fresh, so users with a `cache` driver session log in again. Set `'prefix': 'dox_cache:'` on the store to keep the old keys.
