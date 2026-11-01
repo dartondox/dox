@@ -102,6 +102,14 @@ class AppConfig {
   /// below the kill timeout of your platform (docker stop: 10 seconds).
   final Duration shutdownTimeout;
 
+  /// Turns on the `Origin` check for every `Route.websocket` route.
+  /// Off (null) by default: any site can open a socket from a browser,
+  /// with the cookies of the user. Set it to only allow pages of the same
+  /// host and the sites in the list, like `['https://app.example.com']`.
+  /// `[]` means the same host only. Other origins get 403. The
+  /// `allowedOrigins` of a route wins over this.
+  final List<String>? webSocketAllowedOrigins;
+
   AppConfig({
     required this.appKey,
     this.previousKeys = const <String>[],
@@ -135,6 +143,7 @@ class AppConfig {
     this.trustedProxies = const <String>[],
     this.compress = false,
     this.shutdownTimeout = const Duration(seconds: 8),
+    this.webSocketAllowedOrigins,
   }) : totalIsolate = totalIsolate ?? Platform.numberOfProcessors;
 }
 

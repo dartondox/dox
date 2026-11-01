@@ -49,17 +49,23 @@ class _WebSocketRoute {
   _WebSocketRoute(this.handler, this.allowedOrigins);
 
   final WebSocketHandler handler;
-  final List<String> allowedOrigins;
+
+  /// null: no origin check, unless `AppConfig.webSocketAllowedOrigins`
+  /// is set.
+  final List<String>? allowedOrigins;
 
   Future<WebSocket> call(DoxRequest req) async {
     if (!NativeWebSocket.isUpgradeRequest(req.httpRequest)) {
       throw BadRequestException(message: 'WebSocket upgrade required');
     }
-    if (!webSocketOriginAllowed(
-      req.origin(),
-      req.header(HttpHeaders.hostHeader),
-      allowedOrigins,
-    )) {
+    List<String>? allowedOrigins =
+        this.allowedOrigins ?? Dox().config.webSocketAllowedOrigins;
+    if (allowedOrigins != null &&
+        !webSocketOriginAllowed(
+          req.origin(),
+          req.header(HttpHeaders.hostHeader),
+          allowedOrigins,
+        )) {
       throw ForbiddenHttpException(message: 'WebSocket origin not allowed');
     }
     WebSocket socket = await NativeWebSocket.upgrade(req.httpRequest);
@@ -67,6 +73,10 @@ class _WebSocketRoute {
     return socket;
   }
 }
+
+/// [Route.websocket] routes that check no origin. Read at start for
+/// the warning, see [Route.hasWebSocketWithoutOriginCheck].
+final Expando<bool> _noOriginCheck = Expando<bool>();
 
 /// true when a WebSocket upgrade with this [origin] may open.
 ///
@@ -520,9 +530,12 @@ class Route {
   /// Middleware runs first, so it can check auth.
   /// For rooms, acks and the socket.io clients, use `dox_socketio`.
   ///
-  /// Only pages of the same host can open the socket from a browser. Add
-  /// other sites to [allowedOrigins], like `https://app.example.com`.
-  /// `*` allows every site. Other origins get 403. A client with no
+  /// By default any site can open the socket from a browser, with the
+  /// cookies of the user. To check the `Origin`, set [allowedOrigins]
+  /// (or `AppConfig.webSocketAllowedOrigins` for every route). Then only
+  /// pages of the same host and the listed sites, like
+  /// `https://app.example.com`, can open it. `[]` means the same host
+  /// only. `*` allows every site. Other origins get 403. A client with no
   /// `Origin` header (not a browser) is always allowed.
   /// ```
   /// Route.websocket('echo', (WebSocket socket, DoxRequest req) {
@@ -533,14 +546,21 @@ class Route {
     String route,
     WebSocketHandler handler, {
     List<dynamic> middleware = const <dynamic>[],
-    List<String> allowedOrigins = const <String>[],
+    List<String>? allowedOrigins,
   }) {
-    return Route()._addRoute(
+    Route r = Route()._addRoute(
       HttpRequestMethod.GET,
       Route()._join(route),
       <dynamic>[...middleware, _WebSocketRoute(handler, allowedOrigins).call],
     );
+    if (allowedOrigins == null) _noOriginCheck[r._last!] = true;
+    return r;
   }
+
+  /// true when a [websocket] route has no `allowedOrigins`.
+  /// `AppConfig.webSocketAllowedOrigins` is not looked at here.
+  bool get hasWebSocketWithoutOriginCheck =>
+      _routes.any((RouteData r) => _noOriginCheck[r] == true);
 
   /// get route. [controller] is a function, or with a type `T` a
   /// function that picks the method of a controller from the container.

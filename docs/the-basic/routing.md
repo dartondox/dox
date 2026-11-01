@@ -64,7 +64,8 @@ Route.delete('/blogs/{id}', (BlogController c) => c.destroy);
 
     `Route.health('/health')` adds a health check route. It answers `200` with `{"status": "ok"}`.
     `Route.websocket('echo', (WebSocket socket, DoxRequest req) {...})` adds a raw WebSocket route.
-    A browser can open it only from a page of the same host. To allow other sites, pass `allowedOrigins: ['https://app.example.com']`. Other origins get `403`.
+    By default any website can open it from a browser, with the cookies of the user. To check the `Origin`, pass `allowedOrigins: ['https://app.example.com']`, or set `AppConfig(webSocketAllowedOrigins: [...])` for every WebSocket route. Then only pages of the same host and the listed sites can open it. Other origins get `403`. `[]` means the same host only.
+    When a WebSocket route has no check, Dox logs one warning at start.
 
 A `HEAD` request runs the `GET` route of the same path. The answer has the status and headers of `GET`, with no body.
 

@@ -75,10 +75,26 @@ void main() {
     client.close();
   });
 
-  test('Route.websocket rejects a socket from another site', () async {
-    Route.websocket('/ws-origin', (WebSocket socket, DoxRequest req) {
+  test('Route.websocket accepts any site by default (no check)', () async {
+    Route.websocket('/ws-open', (WebSocket socket, DoxRequest req) {
       socket.listen(socket.add);
     });
+    await startHttpServer(nativeConfig());
+    int port = Dox().server.httpServer.port;
+
+    WebSocket ws = await WebSocket.connect(
+      'ws://127.0.0.1:$port/ws-open',
+      headers: <String, String>{'origin': 'https://other.example'},
+    );
+    ws.add('hi');
+    expect(await ws.first, 'hi');
+    await ws.close();
+  });
+
+  test('Route.websocket with allowedOrigins rejects another site', () async {
+    Route.websocket('/ws-origin', (WebSocket socket, DoxRequest req) {
+      socket.listen(socket.add);
+    }, allowedOrigins: <String>[]);
     await startHttpServer(nativeConfig());
     int port = Dox().server.httpServer.port;
 
@@ -110,6 +126,36 @@ void main() {
 
     WebSocket ws = await WebSocket.connect(
       'ws://127.0.0.1:$port/ws-origin-list',
+      headers: <String, String>{'origin': 'https://app.example.com'},
+    );
+    ws.add('hi');
+    expect(await ws.first, 'hi');
+    await ws.close();
+  });
+
+  test('AppConfig.webSocketAllowedOrigins turns the check on', () async {
+    Route.websocket('/ws-config', (WebSocket socket, DoxRequest req) {
+      socket.listen(socket.add);
+    });
+    await startHttpServer(
+      AppConfig(
+        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        serverPort: 0,
+        totalIsolate: 1,
+        webSocketAllowedOrigins: <String>['https://app.example.com'],
+      ),
+    );
+    int port = Dox().server.httpServer.port;
+
+    await expectLater(
+      WebSocket.connect(
+        'ws://127.0.0.1:$port/ws-config',
+        headers: <String, String>{'origin': 'https://evil.example'},
+      ),
+      throwsA(isA<WebSocketException>()),
+    );
+    WebSocket ws = await WebSocket.connect(
+      'ws://127.0.0.1:$port/ws-config',
       headers: <String, String>{'origin': 'https://app.example.com'},
     );
     ws.add('hi');
