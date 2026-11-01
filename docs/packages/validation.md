@@ -187,8 +187,8 @@ In a controller: `Map<String, dynamic> data = await req.validateSchema(createUse
 
 | Schema | Checks |
 | --- | --- |
-| `v.string()` | `min`, `max`, `length`, `nonEmpty`, `email`, `url`, `uuid`, `ip`, `datetime`, `regex`, `startsWith`, `endsWith`, `includes`, `alpha`, `alphaDash`, `alphaNumeric`, `trim`, `toLowerCase`, `toUpperCase` |
-| `v.int()`, `v.num()` | `min`, `max`, `gt`, `lt`, `positive`, `nonNegative`, `multipleOf` |
+| `v.string()` | `min`, `max`, `length`, `nonEmpty`, `email`, `url`, `uuid`, `ip`, `datetime`, `regex`, `startsWith`, `endsWith`, `includes`, `alpha`, `alphaDash`, `alphaNumeric`, `json`, `digits`, `digitsBetween`, `dateFormat`, `password`, `exists`, `unique`, `trim`, `toLowerCase`, `toUpperCase` |
+| `v.int()`, `v.num()` | `min`, `max`, `between`, `gt`, `lt`, `positive`, `nonNegative`, `multipleOf`, `exists`, `unique` |
 | `v.bool()` | |
 | `v.date()` | `DateTime` only. `min`, `max` |
 | `v.enumOf([...])`, `v.literal(x)` | |
@@ -201,10 +201,12 @@ In a controller: `Map<String, dynamic> data = await req.validateSchema(createUse
 On every schema:
 
 - `optional()`: the key may be missing. `null` is still an error.
+  After it: `requiredIf(other, value)` and `requiredWith([others])`.
 - `nullable()`: the value may be `null`. The key must be there.
 - `nullish()`: both.
 - `defaultTo(x)`: the value when the key is missing. (`default` is a reserved word in Dart.)
 - `transform(fn)`, `refine(fn)`, `refineAsync(fn)`, `superRefine(fn)`, `superRefineAsync(fn)`, `use(rule)`.
+- `same(other)`, `confirmed()`: compare with another key of the same object.
 - `describe(text)`, `example(x)`: only used in the JSON Schema.
 
 ### Coercion
@@ -229,6 +231,67 @@ final ObjectSchema signUp = v.object(<String, Schema<Object?>>{
   return data['password'] == data['confirm'];
 }, message: 'Passwords do not match', path: <Object>['confirm']);
 ```
+
+### More rules
+
+```dart
+final ObjectSchema signUp = v.object(<String, Schema<Object?>>{
+  // needs password_confirmation with the same value
+  'password': v.string().password(min: 8, mixedCase: true, numbers: true).confirmed(),
+  'email': v.string().email().unique('users', column: 'email'),
+  'team_id': v.int().exists('teams'),
+  'type': v.enumOf<String>(<String>['person', 'company']),
+  'company': v.string().optional().requiredIf('type', 'company'),
+  'phone': v.string().digitsBetween(8, 12).optional(),
+  'country_code': v.string().optional().requiredWith(<String>['phone']),
+  'birthday': v.string().dateFormat('Y-m-d').optional(),
+  'settings': v.string().json().optional(),
+  'age': v.int().between(18, 120).optional(),
+});
+
+Map<String, dynamic> data = await signUp.parseAsync(input);
+```
+
+They use the same codes and messages as the DTO annotations. See the [rules reference](../the-basic/validation-rules.md#more-text-rules).
+
+- `requiredIf` and `requiredWith` come after `optional()` or `nullish()`.
+  Then a missing, `null` or blank value is an error when the condition is true.
+- `exists` and `unique` are async. Use `parseAsync()` or `safeParseAsync()`.
+- For one value, the database decides what matches. On MySQL `TAKEN@dox.dev` is taken when `taken@dox.dev` is there.
+- `exists(table, column: 'id')`: the column default is `id`. For a number id column, use `v.int().exists('teams')`, not `v.string()`. Then text like `abc` is a type error, before any query.
+- `unique(table, column: 'email', ignore: id)`: `column` is required. It is never taken from the input key, because a key in `v.map()` comes from the user. `ignore` skips the row where `ignoreColumn` (default `id`) has this value. Use it for updates.
+
+#### The presence verifier
+
+`exists` and `unique` ask a `PresenceVerifier` (like in Laravel). `dox_orm` sets one when the database starts, so in a Dox app they just work.
+Outside Dox, or with another database layer, set your own. Each isolate has its own value, so set it in a provider's `setup()`, which runs in every isolate:
+
+```dart
+class MyVerifier extends PresenceVerifier {
+  @override
+  Future<Set<String>> found(
+    String table,
+    String column,
+    List<Object?> values, {
+    String? exceptColumn,
+    Object? exceptValue,
+    String? connection,
+  }) async {
+    // Return the values that are in the column, as text.
+    // Bind the values as query parameters, never put them into the SQL.
+    return <String>{};
+  }
+}
+
+class VerifierProvider extends DoxProvider {
+  @override
+  void setup() {
+    PresenceVerifier.instance = MyVerifier();
+  }
+}
+```
+
+Table and column names are checked when the schema is built. They take the same names as the dox_orm query builder: letters, digits, `_` and `$`, with `.` between parts, like `2fa_codes` or `public.users`. Other names throw an `ArgumentError`.
 
 ### Async checks
 
