@@ -43,7 +43,7 @@ class User extends Model<User> with Notifiable {
 }
 ```
 
-The route can be an `Address`, an email text like `Ann <ann@example.com>`, or a `List<Address>`.
+The route can be an `Address`, an email text like `Ann <ann@example.com>`, or a list of these.
 
 Then send:
 
@@ -59,7 +59,7 @@ await Notification.send(<Object>[Address('ann@example.com')], InvoicePaid(1));
 
 When the mailable has its own `to` address, that address is used and the route is not.
 
-When a channel throws, the other channels and the other notifiables still get the notification. At the end, `Notification.send()` throws a `NotificationException`. Its `errors` list says which notifiable and channel failed, and why.
+When a channel throws, the other channels and the other notifiables still get the notification. At the end, `Notification.send()` throws a `NotificationException`. Its `errors` list says which notifiable and channel failed, and why. When `via()` throws, the channel is null. The error text lists every failure.
 
 ## Queue it
 
@@ -80,7 +80,7 @@ These getters set the queue options. They work like the options of `Mail.queue()
 | `delay` | null | the worker sends the email after this wait |
 | `encrypt` | `false` | save the job data encrypted with the app key |
 
-`shouldQueue` and these options only change the mail channel. Your own channels still run at once. To queue them, dispatch a job in the channel.
+When `shouldQueue` is false, the email is sent at once and these options do nothing. `shouldQueue` and these options only change the mail channel. Your own channels still run at once. To queue them, dispatch a job in the channel.
 
 ## Your own channel
 

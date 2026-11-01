@@ -248,7 +248,7 @@ await WelcomeMail(user).later(Duration(minutes: 10));
 | `from` | the sender. Null: the `from` of the mail config |
 | `subject` | the subject |
 | `html`, `text` | the body as text, when there is no template |
-| `view` | a [views](../the-basic/views.md) template for the HTML body |
+| `view` | a [dox_view](../the-basic/views.md) template for the HTML body |
 | `textView` | a dox_view template for the plain text body |
 | `markdown` | a dox_view template with Markdown, see below |
 | `data` | the variables of the templates |
@@ -280,7 +280,9 @@ Thanks for joining. Here is what you can do next:
 - Fill in your profile
 - Invite your team
 
-<a href="{{ url }}" class="button">Open the app</a>
+[Open your profile]({{ profileUrl }})
+
+<a href="{{ route('dashboard') }}" class="button">Open the app</a>
 ```
 
 ```dart
@@ -289,16 +291,17 @@ String? get markdown => 'emails/welcome';
 ```
 
 - The HTML body is the Markdown as HTML, inside a white card on a grey page.
+- The text body is the Markdown itself.
 - `<a class="button">` shows as a button. In the text body it stays an `<a>` tag, so the link is still there.
 
 !!! warning "User data in Markdown"
     `{{ }}` escapes HTML, but not Markdown. So a user's name like `[click](https://evil.example)` or `![x](https://evil.example/p.png)` becomes a normal link or image. Laravel works the same way.
     Links and images with an unsafe URL, like `javascript:`, `vbscript:` or `data:`, lose their URL. Only `http`, `https`, `mailto`, `tel`, `cid` and relative URLs are kept.
-    The same goes for the lines of `MailMessage`.
+    The same goes for the lines of `MailMessage`. `MailMessage.action()` throws an `ArgumentError` for an unsafe URL.
+    Raw HTML in the template, like `<a href="{{ url }}">`, is not checked. In raw HTML, use only URLs that your app builds, like `route()`. For a URL from a user, use a Markdown link: `[text]({{ url }})`.
 
 !!! warning "Indent"
     Markdown makes a line that starts with 4 spaces into a code block. So do not indent the Markdown inside `@if` or `@each`. Keep it at the start of the line.
-- The text body is the Markdown itself.
 
 To use your own look, override `layout()`. It gets the HTML of the Markdown and returns the full page. Put it in a base class to use it for all your mailables:
 
