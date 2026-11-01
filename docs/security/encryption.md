@@ -53,6 +53,22 @@ In `development`, `local`, `test` and `testing` it only prints a warning.
 - Keep `APP_KEY` in `.env` or in the secrets of your host. Never put it in code or in git.
 - If you change `APP_KEY`, old encrypted cookies and sessions can not be read any more. JWT tokens signed with it stop working too.
 
+## Change the key
+
+Put the old key in `previousKeys`, so users stay logged in:
+
+```dart title="lib/config/app.dart"
+AppConfig(
+  appKey: env.appKey,
+  previousKeys: <String>['the-old-32-character-app-key....'],
+)
+```
+
+Dox still reads encrypted cookies and cookie sessions made with an old key.
+New cookies are made with `appKey` only.
+Remove the old key once its cookies have expired.
+JWT tokens signed with the old key still stop working.
+
 ## Cookies
 
 `DoxCookie` encrypts its value with `APP_KEY` by default.

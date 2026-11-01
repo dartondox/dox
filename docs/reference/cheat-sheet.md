@@ -179,6 +179,7 @@ See [Request](../the-basic/request.md) and [Request and response](request-and-re
 | `Storage().stream(path)` / `Storage().download(path)` | file / download |
 | `Stream<List<int>>` | streamed bytes |
 | `throw NotFoundHttpException()` | `404 Not Found` |
+| `abort(403)`, `abort(409, 'Taken')` | any status |
 | `response(...)` | full control |
 
 ```dart
@@ -196,11 +197,14 @@ response('ok').cookie(DoxCookie('token', ''), setExpire: true); // delete
 | --- | --- |
 | `BadRequestException()` | `400` |
 | `UnAuthorizedException()` (`dox_auth`) | `401` |
+| `ForbiddenHttpException()` | `403` |
 | `NotFoundHttpException()` | `404` |
+| `MethodNotAllowedHttpException(['GET'])` | `405` |
 | `PayloadTooLargeException()` | `413` |
 | `UnsupportedMediaTypeException()` | `415` |
 | `ValidationException()` | `422` |
 | `InternalErrorException()` | `500` |
+| `HttpStatusException(code)` | any |
 
 See [Response](../the-basic/response.md) and [HTTP exceptions](http-exceptions.md).
 
