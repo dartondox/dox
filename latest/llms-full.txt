@@ -72,7 +72,7 @@ class BlogController {
 
 <div class="dox-bench" markdown>
 
-<p class="dox-bench__title">Ahead of Rust hyper. 1.2× Bun. 2.3× Node. 5× plain Dart.</p>
+<p class="dox-bench__title">Ahead of Rust hyper. 1.3× Bun. 2.2× Node. 4.9× plain Dart.</p>
 <p class="dox-bench__sub">A full Dox app answers <code>GET /</code>, with the rules of <a href="https://github.com/the-benchmarker/web-frameworks">the-benchmarker</a>. Requests per second on two CPU cores, higher is better.</p>
 
 <div class="dox-bench__grid">
@@ -84,44 +84,44 @@ class BlogController {
   <div class="dox-bench__row dox-bench__row--win">
     <span class="dox-bench__name"><strong>Dox</strong><span>native server</span></span>
     <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
-    <span class="dox-bench__num">640,951<span class="dox-bench__vs">fastest</span></span>
-    <span class="dox-bench__p99">0.8 ms</span>
-    <span class="dox-bench__ram">56 MB</span>
+    <span class="dox-bench__num">638,067<span class="dox-bench__vs">fastest</span></span>
+    <span class="dox-bench__p99">0.7 ms</span>
+    <span class="dox-bench__ram">19 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Rust</strong><span>hyper</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 92%"></span></span>
-    <span class="dox-bench__num">589,565<span class="dox-bench__vs">1.09× slower</span></span>
-    <span class="dox-bench__p99">0.8 ms</span>
-    <span class="dox-bench__ram">15 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 91.8%"></span></span>
+    <span class="dox-bench__num">585,658<span class="dox-bench__vs">1.09× slower</span></span>
+    <span class="dox-bench__p99">0.7 ms</span>
+    <span class="dox-bench__ram">13 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Bun</strong><span>Bun.serve</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 82.4%"></span></span>
-    <span class="dox-bench__num">528,153<span class="dox-bench__vs">1.2× slower</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 78.6%"></span></span>
+    <span class="dox-bench__num">501,529<span class="dox-bench__vs">1.27× slower</span></span>
     <span class="dox-bench__p99">1.0 ms</span>
-    <span class="dox-bench__ram">68 MB</span>
+    <span class="dox-bench__ram">40 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Node</strong><span>node:http</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 43.3%"></span></span>
-    <span class="dox-bench__num">277,430<span class="dox-bench__vs">2.3× slower</span></span>
-    <span class="dox-bench__p99">2.2 ms</span>
-    <span class="dox-bench__ram">252 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 45%"></span></span>
+    <span class="dox-bench__num">286,847<span class="dox-bench__vs">2.2× slower</span></span>
+    <span class="dox-bench__p99">1.7 ms</span>
+    <span class="dox-bench__ram">200 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Go</strong><span>net/http</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 37.5%"></span></span>
-    <span class="dox-bench__num">240,239<span class="dox-bench__vs">2.7× slower</span></span>
-    <span class="dox-bench__p99">3.2 ms</span>
-    <span class="dox-bench__ram">44 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 37.9%"></span></span>
+    <span class="dox-bench__num">242,043<span class="dox-bench__vs">2.6× slower</span></span>
+    <span class="dox-bench__p99">3.3 ms</span>
+    <span class="dox-bench__ram">36 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>dart:io</strong><span>HttpServer</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 19.7%"></span></span>
-    <span class="dox-bench__num">126,371<span class="dox-bench__vs">5× slower</span></span>
-    <span class="dox-bench__p99">11.0 ms</span>
-    <span class="dox-bench__ram">49 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 20.3%"></span></span>
+    <span class="dox-bench__num">129,796<span class="dox-bench__vs">4.9× slower</span></span>
+    <span class="dox-bench__p99">3.8 ms</span>
+    <span class="dox-bench__ram">75 MB</span>
   </div>
 </div>
 
@@ -8840,44 +8840,44 @@ the database, JSON and your own code, so the gaps are smaller there. See
   <div class="dox-bench__row dox-bench__row--win">
     <span class="dox-bench__name"><strong>Dox</strong><span>full app</span></span>
     <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
-    <span class="dox-bench__num">640,951<span class="dox-bench__vs">fastest</span></span>
-    <span class="dox-bench__p99">0.8 ms</span>
-    <span class="dox-bench__ram">56 MB</span>
+    <span class="dox-bench__num">638,067<span class="dox-bench__vs">fastest</span></span>
+    <span class="dox-bench__p99">0.7 ms</span>
+    <span class="dox-bench__ram">19 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Rust</strong><span>hyper</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 92%"></span></span>
-    <span class="dox-bench__num">589,565<span class="dox-bench__vs">1.09× slower</span></span>
-    <span class="dox-bench__p99">0.8 ms</span>
-    <span class="dox-bench__ram">15 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 91.8%"></span></span>
+    <span class="dox-bench__num">585,658<span class="dox-bench__vs">1.09× slower</span></span>
+    <span class="dox-bench__p99">0.7 ms</span>
+    <span class="dox-bench__ram">13 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Bun</strong><span>Bun.serve</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 82.4%"></span></span>
-    <span class="dox-bench__num">528,153<span class="dox-bench__vs">1.2× slower</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 78.6%"></span></span>
+    <span class="dox-bench__num">501,529<span class="dox-bench__vs">1.27× slower</span></span>
     <span class="dox-bench__p99">1.0 ms</span>
-    <span class="dox-bench__ram">68 MB</span>
+    <span class="dox-bench__ram">40 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Node</strong><span>node:http</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 43.3%"></span></span>
-    <span class="dox-bench__num">277,430<span class="dox-bench__vs">2.3× slower</span></span>
-    <span class="dox-bench__p99">2.2 ms</span>
-    <span class="dox-bench__ram">252 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 45%"></span></span>
+    <span class="dox-bench__num">286,847<span class="dox-bench__vs">2.2× slower</span></span>
+    <span class="dox-bench__p99">1.7 ms</span>
+    <span class="dox-bench__ram">200 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Go</strong><span>net/http</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 37.5%"></span></span>
-    <span class="dox-bench__num">240,239<span class="dox-bench__vs">2.7× slower</span></span>
-    <span class="dox-bench__p99">3.2 ms</span>
-    <span class="dox-bench__ram">44 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 37.9%"></span></span>
+    <span class="dox-bench__num">242,043<span class="dox-bench__vs">2.6× slower</span></span>
+    <span class="dox-bench__p99">3.3 ms</span>
+    <span class="dox-bench__ram">36 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>dart:io</strong><span>HttpServer</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 19.7%"></span></span>
-    <span class="dox-bench__num">126,371<span class="dox-bench__vs">5× slower</span></span>
-    <span class="dox-bench__p99">11.0 ms</span>
-    <span class="dox-bench__ram">49 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 20.3%"></span></span>
+    <span class="dox-bench__num">129,796<span class="dox-bench__vs">4.9× slower</span></span>
+    <span class="dox-bench__p99">3.8 ms</span>
+    <span class="dox-bench__ram">75 MB</span>
   </div>
 </div>
 
@@ -8889,25 +8889,25 @@ Requests per second on `GET /` at 64, 256 and 512 connections:
 
 | Server              | 64      | 256     | 512     | p99 at 256 | peak MB |
 | ------------------- | ------: | ------: | ------: | ---------: | ------: |
-| Dox                 | 523,641 | 640,951 | 633,856 | 0.84 ms    | 56      |
-| Dox server only     | 587,671 | 687,520 | 695,779 | 0.90 ms    | 32      |
-| Rust (hyper)        | 493,065 | 589,565 | 561,625 | 0.77 ms    | 15      |
-| Bun (`Bun.serve`)   | 484,601 | 528,153 | 545,820 | 0.96 ms    | 68      |
-| Node (`node:http`)  | 257,777 | 277,430 | 266,678 | 2.17 ms    | 252     |
-| Go (`net/http`)     | 246,725 | 240,239 | 230,382 | 3.15 ms    | 44      |
-| `dart:io`           | 113,847 | 126,371 | 134,586 | 11.01 ms   | 49      |
+| Dox                 | 494,223 | 638,067 | 612,032 | 0.74 ms    | 19      |
+| Dox server only     | 589,866 | 692,705 | 699,938 | 0.68 ms    | 16      |
+| Rust (hyper)        | 499,734 | 585,658 | 560,181 | 0.71 ms    | 13      |
+| Bun (`Bun.serve`)   | 508,243 | 501,529 | 531,310 | 1.00 ms    | 40      |
+| Node (`node:http`)  | 252,866 | 286,847 | 296,257 | 1.70 ms    | 200     |
+| Go (`net/http`)     | 248,951 | 242,043 | 232,687 | 3.27 ms    | 36      |
+| `dart:io`           | 125,428 | 129,796 | 132,112 | 3.83 ms    | 75      |
 
 The other two routes at 256 connections:
 
 | Server            | `GET /user/:id` | `POST /user` |
 | ----------------- | --------------: | -----------: |
-| Dox               | 556,877         | 505,741      |
-| Dox server only   | 663,978         | 681,310      |
-| Rust (hyper)      | 555,040         | 554,464      |
-| Bun               | 501,058         | 516,647      |
-| Node              | 267,704         | 271,067      |
-| Go                | 229,308         | 232,366      |
-| `dart:io`         | 96,341          | 119,633      |
+| Dox               | 572,658         | 545,986      |
+| Dox server only   | 672,098         | 683,477      |
+| Rust (hyper)      | 564,411         | 569,313      |
+| Bun               | 482,328         | 498,518      |
+| Node              | 274,067         | 301,084      |
+| Go                | 230,845         | 231,050      |
+| `dart:io`         | 93,561          | 126,027      |
 
 ### Why it is fast
 
@@ -8935,7 +8935,7 @@ A profile with `perf` (4 server cores, 64 connections) shows the effect:
 - Every server has as many workers as server CPUs.
 - Peak memory is the peak of the container (all workers).
 - Dart 3.13.6, AOT build with `dart build cli` (this is what `dox build`
-  does). Node 26.12, Bun 1.4.4, Go 1.26, Rust 1.99 with hyper 1.
+  does). `dox_core` 3.0.2, `dox_http_native` 3.0.2. Node 26.12, Bun 1.4.4, Go 1.26, Rust 1.99 with hyper 1.
 
 ## App benchmark
 
@@ -8956,45 +8956,45 @@ database driver directly, with no ORM. Dox uses `dox_postgres_native`.
   <span class="dox-bench__head dox-bench__head--ram">RAM</span>
 
   <div class="dox-bench__row dox-bench__row--win">
-    <span class="dox-bench__name"><strong>Bun</strong><span>Bun.sql</span></span>
+    <span class="dox-bench__name"><strong>Dox</strong><span>dox_postgres_native</span></span>
     <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
-    <span class="dox-bench__num">194,858<span class="dox-bench__vs">fastest</span></span>
-    <span class="dox-bench__p99">2.2 ms</span>
-    <span class="dox-bench__ram">66 MB</span>
+    <span class="dox-bench__num">266,432<span class="dox-bench__vs">fastest</span></span>
+    <span class="dox-bench__p99">1.8 ms</span>
+    <span class="dox-bench__ram">106 MB</span>
   </div>
   <div class="dox-bench__row">
-    <span class="dox-bench__name"><strong>Dox</strong><span>dox_postgres_native</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 76.5%"></span></span>
-    <span class="dox-bench__num">148,975<span class="dox-bench__vs">1.3× slower</span></span>
-    <span class="dox-bench__p99">5.1 ms</span>
-    <span class="dox-bench__ram">76 MB</span>
+    <span class="dox-bench__name"><strong>Bun</strong><span>Bun.sql</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 74.4%"></span></span>
+    <span class="dox-bench__num">198,296<span class="dox-bench__vs">1.34× slower</span></span>
+    <span class="dox-bench__p99">2.1 ms</span>
+    <span class="dox-bench__ram">64 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Rust</strong><span>tokio-postgres</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 66.3%"></span></span>
-    <span class="dox-bench__num">129,216<span class="dox-bench__vs">1.5× slower</span></span>
-    <span class="dox-bench__p99">2.9 ms</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 48.1%"></span></span>
+    <span class="dox-bench__num">128,065<span class="dox-bench__vs">2.1× slower</span></span>
+    <span class="dox-bench__p99">2.6 ms</span>
     <span class="dox-bench__ram">11 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Node</strong><span>pg</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 36.3%"></span></span>
-    <span class="dox-bench__num">70,693<span class="dox-bench__vs">2.8× slower</span></span>
-    <span class="dox-bench__p99">5.7 ms</span>
-    <span class="dox-bench__ram">229 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 28.3%"></span></span>
+    <span class="dox-bench__num">75,447<span class="dox-bench__vs">3.5× slower</span></span>
+    <span class="dox-bench__p99">4.1 ms</span>
+    <span class="dox-bench__ram">232 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Go</strong><span>pgx</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 29.2%"></span></span>
-    <span class="dox-bench__num">56,829<span class="dox-bench__vs">3.4× slower</span></span>
-    <span class="dox-bench__p99">6.2 ms</span>
-    <span class="dox-bench__ram">27 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 21%"></span></span>
+    <span class="dox-bench__num">55,903<span class="dox-bench__vs">4.8× slower</span></span>
+    <span class="dox-bench__p99">6.3 ms</span>
+    <span class="dox-bench__ram">31 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>dart:io</strong><span>package:postgres</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 14.6%"></span></span>
-    <span class="dox-bench__num">28,448<span class="dox-bench__vs">6.8× slower</span></span>
-    <span class="dox-bench__p99">14.1 ms</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 10.7%"></span></span>
+    <span class="dox-bench__num">28,598<span class="dox-bench__vs">9.3× slower</span></span>
+    <span class="dox-bench__p99">14.2 ms</span>
     <span class="dox-bench__ram">47 MB</span>
   </div>
 </div>
@@ -9007,24 +9007,32 @@ All three routes at 256 connections, requests per second:
 
 | Server                           | `/json` | `/db`   | `/queries?n=20` | peak MB |
 | -------------------------------- | ------: | ------: | --------------: | ------: |
-| Dox (`dox_postgres_native`)      | 565,920 | 148,975 | 18,378          | 76      |
-| Bun (`Bun.sql`)                  | 544,250 | 194,858 | 18,278          | 66      |
-| Rust (hyper + `tokio-postgres`)  | 677,954 | 129,216 | 9,082           | 11      |
-| Node (`node:http` + `pg`)        | 189,768 | 70,693  | 6,970           | 229     |
-| Go (`net/http` + pgx)            | 204,654 | 56,829  | 6,550           | 27      |
-| `dart:io` (+ `package:postgres`) | 88,656  | 28,448  | 2,274           | 47      |
+| Dox (`dox_postgres_native`)      | 555,216 | 266,432 | 17,772          | 106     |
+| Bun (`Bun.sql`)                  | 564,362 | 198,296 | 18,994          | 64      |
+| Rust (hyper + `tokio-postgres`)  | 667,718 | 128,065 | 9,312           | 11      |
+| Node (`node:http` + `pg`)        | 205,774 | 75,447  | 7,458           | 232     |
+| Go (`net/http` + pgx)            | 206,398 | 55,903  | 6,635           | 31      |
+| `dart:io` (+ `package:postgres`) | 89,480  | 28,598  | 2,269           | 47      |
 
-- On one query per request, only Bun is faster than Dox.
-- On 20 queries per request, Dox and Bun are the same, and both are about
-  twice as fast as Rust.
-- The same app with the ORM query builder (`dox_orm`) gets about 131,000
-  on `/db` and 12,500 on `/queries`. The query builder costs a little time
-  per query.
+- On one query per request, Dox is the fastest: 1.3 times Bun.
+- On 20 queries per request, Dox and Bun are about the same. Postgres is
+  the limit here. Both are about twice as fast as Rust.
+
+The same app on MySQL 8.4 (`dox_mysql_native`). The `dart:io` app has no
+MySQL version.
+
+| Server                           | `/json` | `/db`   | `/queries?n=20` | peak MB |
+| -------------------------------- | ------: | ------: | --------------: | ------: |
+| Dox (`dox_mysql_native`)         | 558,886 | 247,242 | 12,347          | 70      |
+| Bun (`Bun.sql`)                  | 561,340 | 201,923 | 12,676          | 65      |
+| Rust (hyper + `mysql_async`)     | 653,244 | 46,795  | 3,158           | 10      |
+| Node (`node:http` + `mysql2`)    | 205,630 | 74,809  | 6,001           | 239     |
+| Go (`net/http` + `go-sql-driver`)| 211,713 | 55,322  | 5,520           | 27      |
 
 How it was run: the same rig as the [benchmark](#how-it-was-run) above.
-The server gets 2 CPUs, Postgres 18 gets 2 CPUs and wrk gets the other 4.
+The server gets 2 CPUs, the database gets 2 CPUs and wrk gets the other 4.
 Each server has 4 database connections per core, 8 in total. One run of 15
-seconds per route.
+seconds per route. `dox_postgres_native` 3.0.2, `dox_mysql_native` 3.0.1.
 
 ### Dart VM flags
 

@@ -6317,7 +6317,7 @@ It runs one isolate per CPU core and builds to a small native binary.
 </div>
 <h2 id="how-fast">How fast</h2>
 <div class="dox-bench">
-<p class="dox-bench__title">Ahead of Rust hyper. 1.2× Bun. 2.3× Node. 5× plain Dart.</p>
+<p class="dox-bench__title">Ahead of Rust hyper. 1.3× Bun. 2.2× Node. 4.9× plain Dart.</p>
 <p class="dox-bench__sub">A full Dox app answers <code>GET /</code>, with the rules of <a href="https://github.com/the-benchmarker/web-frameworks">the-benchmarker</a>. Requests per second on two CPU cores, higher is better.</p>
 <div class="dox-bench__grid">
   <span></span><span></span>
@@ -6328,44 +6328,44 @@ It runs one isolate per CPU core and builds to a small native binary.
   <div class="dox-bench__row dox-bench__row--win">
     <span class="dox-bench__name"><strong>Dox</strong><span>native server</span></span>
     <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
-    <span class="dox-bench__num">640,951<span class="dox-bench__vs">fastest</span></span>
-    <span class="dox-bench__p99">0.8 ms</span>
-    <span class="dox-bench__ram">56 MB</span>
+    <span class="dox-bench__num">638,067<span class="dox-bench__vs">fastest</span></span>
+    <span class="dox-bench__p99">0.7 ms</span>
+    <span class="dox-bench__ram">19 MB</span>
   </div>
 <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Rust</strong><span>hyper</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 92%"></span></span>
-    <span class="dox-bench__num">589,565<span class="dox-bench__vs">1.09× slower</span></span>
-    <span class="dox-bench__p99">0.8 ms</span>
-    <span class="dox-bench__ram">15 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 91.8%"></span></span>
+    <span class="dox-bench__num">585,658<span class="dox-bench__vs">1.09× slower</span></span>
+    <span class="dox-bench__p99">0.7 ms</span>
+    <span class="dox-bench__ram">13 MB</span>
   </div>
 <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Bun</strong><span>Bun.serve</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 82.4%"></span></span>
-    <span class="dox-bench__num">528,153<span class="dox-bench__vs">1.2× slower</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 78.6%"></span></span>
+    <span class="dox-bench__num">501,529<span class="dox-bench__vs">1.27× slower</span></span>
     <span class="dox-bench__p99">1.0 ms</span>
-    <span class="dox-bench__ram">68 MB</span>
+    <span class="dox-bench__ram">40 MB</span>
   </div>
 <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Node</strong><span>node:http</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 43.3%"></span></span>
-    <span class="dox-bench__num">277,430<span class="dox-bench__vs">2.3× slower</span></span>
-    <span class="dox-bench__p99">2.2 ms</span>
-    <span class="dox-bench__ram">252 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 45%"></span></span>
+    <span class="dox-bench__num">286,847<span class="dox-bench__vs">2.2× slower</span></span>
+    <span class="dox-bench__p99">1.7 ms</span>
+    <span class="dox-bench__ram">200 MB</span>
   </div>
 <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Go</strong><span>net/http</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 37.5%"></span></span>
-    <span class="dox-bench__num">240,239<span class="dox-bench__vs">2.7× slower</span></span>
-    <span class="dox-bench__p99">3.2 ms</span>
-    <span class="dox-bench__ram">44 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 37.9%"></span></span>
+    <span class="dox-bench__num">242,043<span class="dox-bench__vs">2.6× slower</span></span>
+    <span class="dox-bench__p99">3.3 ms</span>
+    <span class="dox-bench__ram">36 MB</span>
   </div>
 <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>dart:io</strong><span>HttpServer</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 19.7%"></span></span>
-    <span class="dox-bench__num">126,371<span class="dox-bench__vs">5× slower</span></span>
-    <span class="dox-bench__p99">11.0 ms</span>
-    <span class="dox-bench__ram">49 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 20.3%"></span></span>
+    <span class="dox-bench__num">129,796<span class="dox-bench__vs">4.9× slower</span></span>
+    <span class="dox-bench__p99">3.8 ms</span>
+    <span class="dox-bench__ram">75 MB</span>
   </div>
 </div>
 <p class="dox-bench__foot"><span>Dox · Rust 1.99 · Bun 1.4 · Node 26 · Go 1.26 · Dart 3.13 · 2 cores · 256 connections · wrk</span><a href="digging-deeper/performance/#benchmark">All results</a></p>
