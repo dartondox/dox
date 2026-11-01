@@ -201,6 +201,29 @@ Future<void> _pipe(HttpRequest request, Future<dynamic> body) async {
   }
 }
 
+/// the value of header [name], or null when it is missing or sent more
+/// than once. `HttpHeaders.value` throws (a 500) on a repeated header.
+String? singleHeader(HttpHeaders headers, String name) {
+  List<String>? values = headers[name];
+  return values != null && values.length == 1 ? values.first : null;
+}
+
+/// true when `If-Range` is the strong `ETag` of [res] (same text), or a
+/// date equal to its `Last-Modified`. A weak ETag never matches.
+bool _ifRangeMatches(HttpRequest request, HttpResponse res) {
+  String? given = singleHeader(request.headers, HttpHeaders.ifRangeHeader);
+  if (given == null) return false;
+  String? etag = res.headers.value(HttpHeaders.etagHeader);
+  if (etag != null && !etag.startsWith('W/') && given == etag) return true;
+  String? modified = res.headers.value(HttpHeaders.lastModifiedHeader);
+  if (modified == null) return false;
+  try {
+    return HttpDate.parse(given) == HttpDate.parse(modified);
+  } on Exception {
+    return false;
+  }
+}
+
 final RegExp _rangePattern = RegExp(r'^bytes=(\d*)-(\d*)$');
 
 /// stream a file. supports a single `Range: bytes=a-b`
@@ -218,7 +241,15 @@ Future<void> _sendFile(File file, HttpRequest request) async {
   int end = length - 1;
   res.headers.set(HttpHeaders.acceptRangesHeader, 'bytes');
 
-  String? range = request.headers.value(HttpHeaders.rangeHeader);
+  String? range = singleHeader(request.headers, HttpHeaders.rangeHeader);
+
+  /// `If-Range` keeps the Range only when it is the strong `ETag` or the
+  /// `Last-Modified` date of this file. A weak ETag never matches
+  /// (RFC 9110). Else the whole file is sent.
+  if (request.headers[HttpHeaders.ifRangeHeader] != null &&
+      !_ifRangeMatches(request, res)) {
+    range = null;
+  }
   Match? match = range == null ? null : _rangePattern.firstMatch(range.trim());
   if (match != null && (match[1]!.isNotEmpty || match[2]!.isNotEmpty)) {
     if (match[1]!.isEmpty) {
