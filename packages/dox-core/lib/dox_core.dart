@@ -55,6 +55,7 @@ export 'interfaces/dox_provider.dart';
 export 'interfaces/next_middleware.dart';
 export 'interfaces/response_handler_interface.dart';
 export 'interfaces/router.dart';
+export 'interfaces/terminable_middleware.dart';
 
 /// OpenAPI
 export 'openapi/openapi_config.dart';
@@ -62,10 +63,14 @@ export 'openapi/openapi_document.dart';
 
 /// Tools
 export 'ioc/ioc_container.dart';
+export 'middleware/etag.dart';
 export 'middleware/health_check.dart';
 export 'middleware/log_middleware.dart';
 export 'middleware/rate_limit.dart';
+export 'middleware/request_id.dart';
+export 'middleware/request_timeout.dart';
 export 'middleware/security_headers.dart';
+export 'middleware/validate_signature.dart';
 
 /// Router
 export 'router/route.dart';

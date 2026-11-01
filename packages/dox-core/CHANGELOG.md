@@ -1,3 +1,12 @@
+## Unreleased
+
+- New: `RequestId` middleware. Each request gets an id in the `X-Request-Id` header and in `req.requestId`. A safe id from the client is kept. `LogMiddleware` lines have `request_id`, and `ExceptionHandler.report` can read `ExceptionHandler.requestId`.
+- New: `ETag` middleware. GET and HEAD answers with a body in memory get a weak `ETag`. A matching `If-None-Match` gets `304 Not Modified` with no body.
+- New: signed urls. `Route.signedUrl(name, params:, query:, expires:, absolute:, baseUrl:)` adds a `signature` (HMAC-SHA256 with the `dox:signed-url` key) and an optional `expires`. The `ValidateSignature` middleware answers `403` for a bad or expired url. Old keys from `AppConfig.previousKeys` still work.
+- New: `RequestTimeout(Duration)` middleware and `Route.get(...).timeout(Duration)`. A slow route answers `503` with the code `request_timeout`. The late result is dropped.
+- New: `IDoxTerminableMiddleware`. Its `terminate(req, res)` runs after the answer is sent. An error in it is reported, and never changes the answer. Routes without one do not pay for it.
+- Fix: a middleware item with no `handle` step at the start of a route list ended the request with an empty answer. It is now skipped.
+
 ## 3.0.1
 
 - Perf: `AESEncryptor` (encrypted cookies, the cookie session, CSRF) now runs AES-GCM in Rust (`AesGcm` of dox_http_native 3.0.2), with the AES instructions of the CPU. One session cookie took about 116 µs to encrypt and 95 µs to decrypt, now about 1.7 µs and 0.9 µs. The output is the same, so cookies made before still open.

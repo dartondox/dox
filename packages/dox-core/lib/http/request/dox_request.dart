@@ -64,6 +64,10 @@ class DoxRequest implements IDoxRequest {
     );
   }
 
+  /// The id of this request, set by the `RequestId` middleware.
+  /// Null when the route does not use it.
+  String? requestId;
+
   Session? _session;
 
   /// The session of the request. Needs `SessionMiddleware` on the route.

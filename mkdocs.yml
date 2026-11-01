@@ -195,6 +195,7 @@ nav:
     - security/hashing.md
     - security/rate-limiting.md
     - security/security-headers.md
+    - security/signed-urls.md
   - Packages:
     - packages/validation.md
     - packages/openapi.md

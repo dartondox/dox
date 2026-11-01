@@ -24,14 +24,35 @@ import 'package:dox_core/dox_core.dart';
 class ExceptionHandler {
   const ExceptionHandler();
 
+  /// The `X-Request-Id` of the request whose error is being reported
+  /// (see `RequestId`). It is set only while [report] runs for an error
+  /// of a request. Read it at the start of [report], before any `await`.
+  /// ```
+  /// sentry.captureException(error, hint: ExceptionHandler.requestId);
+  /// ```
+  static String? get requestId => _requestId;
+  static String? _requestId;
+
   /// Log the error. Dox calls it for every error, except an
   /// `IHttpException` with a 4xx code (those are normal answers like 404
   /// or 422). It is also called for errors outside a request, like a
   /// future that nobody awaited.
-  /// The default prints the error and the stack with the logger.
+  /// The default prints the error and the stack with the logger, and the
+  /// [requestId] when there is one.
   void report(Object error, StackTrace stackTrace) {
-    Logger.warn(error);
+    String? id = _requestId;
+    Logger.warn(id == null ? error : '[request $id] $error');
     Logger.danger(stackTrace.toString());
+  }
+
+  /// [report] for an error of [req], with [requestId] set while it runs.
+  void reportFor(HttpRequest req, Object error, StackTrace stackTrace) {
+    _requestId = req.response.headers.value(RequestId.header);
+    try {
+      report(error, stackTrace);
+    } finally {
+      _requestId = null;
+    }
   }
 
   /// What to send for [error]. Return anything a controller can return:

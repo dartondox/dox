@@ -53,7 +53,7 @@ dynamic renderError(HttpRequest req, Object error, StackTrace stackTrace) {
   try {
     /// 4xx answers are the client's fault, only 5xx are reported
     if (error is! IHttpException || error.code >= 500) {
-      handler.report(error, stackTrace);
+      handler.reportFor(req, error, stackTrace);
     }
     payload = handler.render(error, req);
   } catch (handlerError, handlerStack) {

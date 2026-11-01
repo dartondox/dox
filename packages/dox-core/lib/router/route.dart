@@ -198,6 +198,20 @@ class Route {
     return this;
   }
 
+  /// answer 503 when the route added last takes longer than [duration].
+  /// It covers its middleware too. See [RequestTimeout].
+  /// ```
+  /// Route.get('report', controller).timeout(Duration(seconds: 30));
+  /// ```
+  Route timeout(Duration duration) {
+    RouteData? last = _last;
+    if (last == null) {
+      throw StateError('Route.timeout(): there is no route to time.');
+    }
+    (last.controllers as List<dynamic>).insert(0, RequestTimeout(duration));
+    return this;
+  }
+
   void _setName(RouteData data, String name) {
     for (RouteData other in _routes) {
       if (other.name == name && !identical(other, data)) {
@@ -271,6 +285,52 @@ class Route {
     };
     if (values.isEmpty) return path;
     return '$path?${Uri(queryParameters: values).query}';
+  }
+
+  /// [url] with a `signature` query param, so the link can not be
+  /// changed. Check it with the `ValidateSignature` middleware. With
+  /// [expires], the url also has an `expires` param (unix seconds) and
+  /// stops working after that time.
+  ///
+  /// The url is absolute by default: [baseUrl] (default: `APP_URL` of
+  /// the env, like `https://example.com`) is put in front, and the host
+  /// is signed too. Use `absolute: false` to sign the path and query
+  /// only, and then `ValidateSignature(absolute: false)`.
+  /// ```
+  /// Route.signedUrl('unsubscribe', params: <String, Object>{'user': 5});
+  /// // https://example.com/unsubscribe/5?signature=...
+  /// Route.signedUrl('download', expires: Duration(hours: 1));
+  /// ```
+  static String signedUrl(
+    String name, {
+    Map<String, Object?> params = const <String, Object?>{},
+    Map<String, Object?> query = const <String, Object?>{},
+    Duration? expires,
+    bool absolute = true,
+    String? baseUrl,
+  }) {
+    if (query.containsKey('signature')) {
+      throw ArgumentError('"signature" is a reserved query param.');
+    }
+    Map<String, Object?> all = <String, Object?>{
+      ...query,
+      if (expires != null)
+        'expires': DateTime.now().add(expires).millisecondsSinceEpoch ~/ 1000,
+    };
+    String path = url(name, params: params, query: all);
+    if (absolute) {
+      String base = baseUrl ?? Env.get<String>('APP_URL', '');
+      if (base.isEmpty) {
+        throw ArgumentError(
+          'Route.signedUrl needs a host for an absolute url. Set APP_URL '
+          'in the env, give baseUrl, or use absolute: false.',
+        );
+      }
+      if (base.endsWith('/')) base = base.substring(0, base.length - 1);
+      path = '$base$path';
+    }
+    String signature = ValidateSignature.sign(path);
+    return '$path${path.contains('?') ? '&' : '?'}signature=$signature';
   }
 
   Map<String, RouteData> _byName() {

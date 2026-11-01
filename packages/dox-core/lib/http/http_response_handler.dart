@@ -69,6 +69,17 @@ void _guardActiveFile(HttpResponse res, ContentType type) {
 /// 8 KB chunks: most bodies fit in one, so there is no join.
 final JsonUtf8Encoder _jsonUtf8 = JsonUtf8Encoder(null, advanceEncode, 8192);
 
+/// [payload] as JSON bytes, like the response sends it
+List<int> encodeJson(dynamic payload) => _jsonUtf8.convert(payload);
+
+/// A JSON body that is already encoded, so it is not encoded twice
+/// (`ETag` hashes the bytes first). For internal use.
+class JsonBytes {
+  const JsonBytes(this.bytes);
+
+  final List<int> bytes;
+}
+
 /// Handle response for different types of data
 /// such as string, stream, file, Model, List, encodable.
 void responseDataHandler(dynamic payload, HttpRequest request) {
@@ -140,11 +151,14 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
 
   /// if payload is Map or List, parse into json
   /// and response as json
-  if (payload is! String) {
-    bytes = _jsonUtf8.convert(payload);
+  if (payload is String) {
+    bytes = res.encoding.encode(payload);
+  } else if (payload is JsonBytes) {
+    bytes = payload.bytes;
     res.headers.contentType = ContentType.json;
   } else {
-    bytes = res.encoding.encode(payload);
+    bytes = _jsonUtf8.convert(payload);
+    res.headers.contentType = ContentType.json;
   }
 
   /// finally write and close http connection.
