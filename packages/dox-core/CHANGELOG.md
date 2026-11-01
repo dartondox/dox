@@ -1,3 +1,12 @@
+## Unreleased
+
+- Fix: path params are now URL-decoded. `/users/a%20b` gives `'a b'`, not `'a%20b'`. A URL from `Route.url()` now gives back the same value. A param that is not valid UTF-8 (like `%ff`) gives 404.
+- Fix: 5xx HTTP exceptions (like `InternalErrorException` and `QueryException`) are now sent to `ExceptionHandler.report`. Before, every `IHttpException` was skipped, so real server errors never reached the logs or Sentry. 4xx exceptions are still not reported.
+- Fix: `req.headers` joins repeated header values with `, `. Before, two `Accept` values became one string with no separator.
+- Fix: a `Range` header with a number too big for an int gave 200 with an empty body. A start that is too big now gives 416, and a suffix that is too big gives the whole file.
+- Fix: `req.method` is now the request method. A HEAD request on a GET route said `GET`.
+- Fix: on a route with no params, a write to `req.param` stayed for the next requests to that route. Each request now has its own map.
+
 ## 3.0.0
 
 - The first stable release.

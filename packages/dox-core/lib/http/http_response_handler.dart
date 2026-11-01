@@ -205,11 +205,15 @@ Future<void> _sendFile(File file, HttpRequest request) async {
   Match? match = range == null ? null : _rangePattern.firstMatch(range.trim());
   if (match != null && (match[1]!.isNotEmpty || match[2]!.isNotEmpty)) {
     if (match[1]!.isEmpty) {
-      /// `bytes=-500` means the last 500 bytes
-      start = max(0, length - int.parse(match[2]!));
+      /// `bytes=-500` means the last 500 bytes.
+      /// a number too big for an int means the whole file.
+      start = max(0, length - (int.tryParse(match[2]!) ?? length));
     } else {
-      start = int.parse(match[1]!);
-      if (match[2]!.isNotEmpty) end = min(int.parse(match[2]!), length - 1);
+      /// a start too big for an int is past the end: 416 below
+      start = int.tryParse(match[1]!) ?? length;
+      if (match[2]!.isNotEmpty) {
+        end = min(int.tryParse(match[2]!) ?? length - 1, length - 1);
+      }
     }
     if (start > end || start >= length) {
       res.statusCode = HttpStatus.requestedRangeNotSatisfiable;

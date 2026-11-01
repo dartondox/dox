@@ -283,6 +283,24 @@ void main() {
       );
       expect(bad.statusCode, 416);
       expect(bad.headers['content-range'], 'bytes */20');
+
+      // numbers too big for an int: 416 for a start, whole file for a suffix
+      String huge = '99999999999999999999';
+      http.Response bigStart = await http.get(
+        url,
+        headers: <String, String>{'range': 'bytes=$huge-'},
+      );
+      expect(bigStart.statusCode, 416);
+      http.Response bigEnd = await http.get(
+        url,
+        headers: <String, String>{'range': 'bytes=18-$huge'},
+      );
+      expect(bigEnd.body, 'ij');
+      http.Response bigTail = await http.get(
+        url,
+        headers: <String, String>{'range': 'bytes=-$huge'},
+      );
+      expect(bigTail.body, '0123456789abcdefghij');
     });
 
     test('trusted proxy: X-Forwarded-For and X-Forwarded-Proto', () async {

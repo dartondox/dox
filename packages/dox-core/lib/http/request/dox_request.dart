@@ -36,12 +36,17 @@ class DoxRequest implements IDoxRequest {
 
   /// made on first use
   @override
-  late String method = route.method.toUpperCase();
+  /// the request method, so a HEAD request on a GET route says HEAD
+  late String method = httpRequest.method.toUpperCase();
 
   Map<String, dynamic> body;
 
   /// the route params, eg. `{'id': '5'}`
-  late Map<String, dynamic> param = route.params;
+  /// a plain route (no params) is shared by all its requests,
+  /// so it gets a new map. a write here must not reach the next request.
+  late Map<String, dynamic> param = route.pattern == null
+      ? <String, dynamic>{}
+      : route.params;
 
   /// values from `Route.bind`, set before the controller runs
   late final Map<String, Object> boundValues = <String, Object>{};
@@ -234,7 +239,7 @@ class DoxRequest implements IDoxRequest {
   Map<String, dynamic> get headers {
     Map<String, dynamic> ret = <String, dynamic>{};
     httpHeaders.forEach((String name, List<String> values) {
-      ret[name] = values.join();
+      ret[name] = values.join(', ');
     });
     return ret;
   }

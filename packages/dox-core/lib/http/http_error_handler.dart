@@ -51,7 +51,10 @@ dynamic renderError(HttpRequest req, Object error, StackTrace stackTrace) {
   ExceptionHandler handler = Dox().config.exceptionHandler;
   dynamic payload = error;
   try {
-    if (error is! IHttpException) handler.report(error, stackTrace);
+    /// 4xx answers are the client's fault, only 5xx are reported
+    if (error is! IHttpException || error.code >= 500) {
+      handler.report(error, stackTrace);
+    }
     payload = handler.render(error, req);
   } catch (handlerError, handlerStack) {
     /// a broken handler must not leave the client waiting.
