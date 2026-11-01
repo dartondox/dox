@@ -59,6 +59,8 @@ await Notification.send(<Object>[Address('ann@example.com')], InvoicePaid(1));
 
 When the mailable has its own `to` address, that address is used and the route is not.
 
+When a channel throws, the other channels and the other notifiables still get the notification. At the end, `Notification.send()` throws a `NotificationException`. Its `errors` list says which notifiable and channel failed, and why.
+
 ## Queue it
 
 Override `shouldQueue`. The mail channel then puts the email on the job queue, like `Mail.queue()`. This needs [a queue](queue.md).
@@ -69,6 +71,16 @@ bool get shouldQueue => true;
 ```
 
 The email is rendered at once. The worker sends the finished email.
+
+These getters set the queue options. They work like the options of `Mail.queue()`:
+
+| Getter | Default | What it does |
+| --- | --- | --- |
+| `queue` | null (`default`) | the queue name |
+| `delay` | null | the worker sends the email after this wait |
+| `encrypt` | `false` | save the job data encrypted with the app key |
+
+`shouldQueue` and these options only change the mail channel. Your own channels still run at once. To queue them, dispatch a job in the channel.
 
 ## Your own channel
 

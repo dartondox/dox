@@ -290,11 +290,22 @@ String? get markdown => 'emails/welcome';
 
 - The HTML body is the Markdown as HTML, inside a white card on a grey page.
 - `<a class="button">` shows as a button. In the text body it stays an `<a>` tag, so the link is still there.
+
+!!! warning "User data in Markdown"
+    `{{ }}` escapes HTML, but not Markdown. So a user's name like `[click](https://evil.example)` or `![x](https://evil.example/p.png)` becomes a normal link or image. Laravel works the same way.
+    Links and images with an unsafe URL, like `javascript:`, `vbscript:` or `data:`, lose their URL. Only `http`, `https`, `mailto`, `tel`, `cid` and relative URLs are kept.
+    The same goes for the lines of `MailMessage`.
+
+!!! warning "Indent"
+    Markdown makes a line that starts with 4 spaces into a code block. So do not indent the Markdown inside `@if` or `@each`. Keep it at the start of the line.
 - The text body is the Markdown itself.
 
 To use your own look, override `layout()`. It gets the HTML of the Markdown and returns the full page. Put it in a base class to use it for all your mailables:
 
 ```dart
+import 'package:dox_mailer/dox_mailer.dart';
+import 'package:dox_view/dox_view.dart'; // View, SafeString
+
 abstract class AppMail extends Mailable {
   @override
   String layout(String body) {
@@ -315,7 +326,7 @@ await (MailMessage(subject: 'Invoice paid', to: <Address>[Address('ann@example.c
     .send();
 ```
 
-The email starts with `greeting` (default `Hello!`) and ends with `salutation` (default none). Set them to null to leave them out. Lines can use Markdown, like `**bold**`. HTML in a line is escaped.
+The email starts with `greeting` (default `Hello!`) and ends with `salutation` (default none). Set them to null to leave them out. Lines can use Markdown, like `**bold**`. HTML in a line is escaped. See "User data in Markdown" above.
 
 To send one email on more than one channel, see [Notifications](notifications.md).
 
