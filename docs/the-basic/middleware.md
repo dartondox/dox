@@ -116,6 +116,92 @@ To stop early, return a response and do not call `next()`.
 !!! note "Speed"
     A route with no `next` middleware runs exactly as before. Only routes that have one pay for the extra step.
 
+## Run code after the answer is sent
+
+A middleware can run code after the answer has gone to the client, like `terminate` in Laravel.
+Use it for work the client should not wait for: logs, metrics, cleanup.
+Implement `IDoxTerminableMiddleware`:
+
+```dart title="lib/app/http/middleware/metrics.middleware.dart"
+import 'package:dox_core/dox_core.dart';
+
+class MetricsMiddleware implements IDoxMiddleware, IDoxTerminableMiddleware {
+  @override
+  dynamic handle(IDoxRequest req) => req; // before the controller
+
+  @override
+  void terminate(DoxRequest req, DoxResponse res) {
+    // the answer is already sent
+    print('${req.method} ${req.uri.path} ${res.status}');
+  }
+}
+```
+
+- `res.status` is the status that was sent, also for an error answer.
+- `terminate` can be `async`.
+- An error in `terminate` goes to `ExceptionHandler.report`. It never changes the answer.
+- The `handle` part is not needed. A class can implement only `IDoxTerminableMiddleware`.
+
+!!! note "Speed"
+    Dox checks each route once for such a middleware. Other routes do not pay for it.
+
+## Request id
+
+`RequestId` gives each request an id. It is sent back in the `X-Request-Id` header, and you can read it as `req.requestId`.
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  globalMiddleware: <dynamic>[
+    const RequestId(),
+    LogMiddleware(enabled: true),
+  ],
+  // ...
+);
+```
+
+- When the client (or a proxy) sends a safe `X-Request-Id` (1 to 128 characters of `A-Z a-z 0-9 . _ -`), Dox keeps it. Else it makes a new one of 32 hex characters.
+- `RequestId(trustClient: false)` always makes a new one.
+- `LogMiddleware` adds `request_id` to each log line. Put `RequestId` before it.
+- The default `ExceptionHandler.report` prints the id with the error. In your own `report`, read `ExceptionHandler.requestId`.
+
+## ETag and 304 Not Modified
+
+`ETag` adds an `ETag` header to GET and HEAD answers. When the client sends the same ETag back in `If-None-Match`, Dox answers `304 Not Modified` with no body.
+
+```dart
+Route.get('/posts', <dynamic>[const ETag(), (PostController c) => c.index]);
+```
+
+- It works on `200` answers with a body in memory: a `String`, a `Map`, a `List` or a model. Files and streams are not touched.
+- An answer that already has an `ETag` header or `Cache-Control: no-store` is not touched.
+- The ETag is weak (`W/"..."`), made from a fast 64-bit hash of the body. It is not a secure hash.
+- The controller still runs. A `304` saves bandwidth, not server time.
+
+## Request timeout
+
+`RequestTimeout` answers `503 Service Unavailable` when the middleware after it and the controller take too long.
+
+```dart
+Route.get('/report', (ReportController c) => c.show)
+    .timeout(Duration(seconds: 30));
+
+// the same as
+Route.get('/report', <dynamic>[
+  RequestTimeout(Duration(seconds: 30)),
+  (ReportController c) => c.show,
+]);
+```
+
+The answer is the normal error JSON:
+
+```json
+{"code": "request_timeout", "message": "The request took too long"}
+```
+
+- For every route, add `RequestTimeout(...)` to `globalMiddleware`.
+- Dart can not stop a running Future. The controller keeps running in the background. Its late result is dropped, so nothing is sent twice.
+- It is `503`, not `504`. `504 Gateway Timeout` is what a proxy sends when the app is slow. `503` says the app itself gave up.
+
 ## Many middleware on one route
 
 Put them in the list before the controller. They run from left to right.
@@ -188,3 +274,5 @@ flowchart LR
     - `SecurityHeaders` from `dox_core` adds safe headers like `X-Frame-Options` to every answer. See [Security headers](../security/security-headers.md).
     - `SessionMiddleware` from `dox_core` gives each request a session. See [Session](session.md).
     - `CsrfMiddleware` from `dox_core` stops cross site request forgery. See [CSRF protection](../security/csrf.md).
+    - `RequestId`, `ETag` and `RequestTimeout` from `dox_core`. See above.
+    - `ValidateSignature` from `dox_core` checks signed urls. See [Signed URLs](../security/signed-urls.md).

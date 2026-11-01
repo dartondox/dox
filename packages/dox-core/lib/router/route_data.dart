@@ -57,6 +57,25 @@ class RouteData {
     return false;
   }
 
+  List<IDoxTerminableMiddleware>? _terminable;
+
+  /// The middleware of this route with a `terminate` step
+  /// ([IDoxTerminableMiddleware]), in order. Read once. Empty for most
+  /// routes.
+  List<IDoxTerminableMiddleware> get terminable {
+    return _terminable ??= _findTerminable();
+  }
+
+  List<IDoxTerminableMiddleware> _findTerminable() {
+    Object? list = controllers;
+    if (list is! List<dynamic>) return const <IDoxTerminableMiddleware>[];
+    List<IDoxTerminableMiddleware> found = <IDoxTerminableMiddleware>[
+      for (Object? item in list)
+        if (item is IDoxTerminableMiddleware) item,
+    ];
+    return found.isEmpty ? const <IDoxTerminableMiddleware>[] : found;
+  }
+
   Function? _action;
   bool _actionRead = false;
 

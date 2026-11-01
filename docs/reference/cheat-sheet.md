@@ -140,7 +140,15 @@ class ApiKeyMiddleware implements IDoxMiddleware {
 }
 ```
 
-See [Middleware](../the-basic/middleware.md).
+| Middleware | Does |
+| --- | --- |
+| `const RequestId()` | `X-Request-Id` header, `req.requestId` |
+| `const ETag()` | `ETag` header, `304` when `If-None-Match` matches |
+| `RequestTimeout(Duration(seconds: 30))` or `Route.get(...).timeout(...)` | `503` when the route is too slow |
+| `const ValidateSignature()` | `403` unless the url is from `Route.signedUrl(...)` |
+| `implements IDoxTerminableMiddleware` | `terminate(req, res)` runs after the answer is sent |
+
+See [Middleware](../the-basic/middleware.md) and [Signed URLs](../security/signed-urls.md).
 
 ## Request
 

@@ -76,6 +76,12 @@ bool _mounted(HttpRequest req, Map<String, RawRequestHandler> mounts) {
 /// run middleware and controller, then send the result.
 /// a plain value is sent at once. only a Future waits.
 void _run(HttpRequest req, DoxRequest doxReq) {
+  /// read once per route: most routes have no terminate step
+  List<IDoxTerminableMiddleware> ends = doxReq.route.terminable;
+  if (ends.isNotEmpty) {
+    _runThenTerminate(req, doxReq, ends);
+    return;
+  }
   FutureOr<dynamic> result = runMiddlewareAndController(doxReq);
   if (result is Future<dynamic>) {
     /// one Future: `then` with `onError`, not `then().onError()`
@@ -89,6 +95,54 @@ void _run(HttpRequest req, DoxRequest doxReq) {
     );
   } else {
     httpResponseHandler(result, req);
+  }
+}
+
+/// like [_run], then call `terminate` of [ends] once the answer is sent
+void _runThenTerminate(
+  HttpRequest req,
+  DoxRequest doxReq,
+  List<IDoxTerminableMiddleware> ends,
+) {
+  Future<dynamic>.sync(() => runMiddlewareAndController(doxReq)).then(
+    (dynamic value) {
+      _send(req, value);
+      _terminate(req, doxReq, value, ends);
+    },
+    onError: (Object error, StackTrace stackTrace) {
+      dynamic value = renderError(req, error, stackTrace);
+      _send(req, value);
+      _terminate(req, doxReq, value, ends);
+    },
+  );
+}
+
+/// wait until the answer is sent, then run each `terminate`. an error
+/// in one is reported, and the next one still runs.
+Future<void> _terminate(
+  HttpRequest req,
+  DoxRequest doxReq,
+  dynamic value,
+  List<IDoxTerminableMiddleware> ends,
+) async {
+  HttpResponse res = req.response;
+  try {
+    await res.done;
+  } catch (_) {
+    /// the answer failed (eg. the client left). terminate still runs.
+  }
+  DoxResponse sent = asResponse(value).statusCode(res.statusCode);
+  ExceptionHandler handler = Dox().config.exceptionHandler;
+  for (IDoxTerminableMiddleware end in ends) {
+    try {
+      await end.terminate(doxReq, sent);
+    } catch (error, stackTrace) {
+      try {
+        handler.report(error, stackTrace);
+      } catch (_) {
+        Logger.danger('terminate failed: $error\n$stackTrace');
+      }
+    }
   }
 }
 

@@ -36,6 +36,9 @@ FutureOr<dynamic> _runFrom(DoxRequest doxReq, int start, dynamic result) {
     } else if (fn is IDoxMiddleware) {
       /// DoxMiddleware class with handle function
       result = fn.handle(doxReq);
+    } else {
+      /// eg. a terminate-only middleware: nothing to run now
+      continue;
     }
 
     if (result is Future<dynamic>) return _resume(result, i + 1);
@@ -88,6 +91,8 @@ Future<DoxResponse> _chain(DoxRequest req, int start) async {
         result = fn(req);
       } else if (fn is IDoxMiddleware) {
         result = fn.handle(req);
+      } else {
+        continue;
       }
       if (result is Future<dynamic>) result = await result;
       if (result is! DoxRequest) return asResponse(result);

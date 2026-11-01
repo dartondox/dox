@@ -58,6 +58,8 @@ class LogMiddleware implements IDoxMiddleware {
       'timestamp': DateTime.now().toIso8601String(),
       'payload': payload,
     };
+    String? requestId = req is DoxRequest ? req.requestId : null;
+    if (requestId != null) text['request_id'] = requestId;
     if (filter != null) {
       text = filter!(text);
     }
