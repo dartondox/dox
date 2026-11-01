@@ -8,7 +8,7 @@
 <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" height="20"/> <img src="https://github.com/dartondox/dox/actions/workflows/test.yaml/badge.svg?branch=main" height="20"/> <img src="https://img.shields.io/github/stars/dartondox/dox.svg" height="20"/> <img src="https://img.shields.io/github/forks/dartondox/dox.svg" height="20"/> <img src="https://img.shields.io/github/license/dartondox/dox.svg" height="20"/>
 </div>
 
-**Write in Dart. Serve with Rust.**
+**Everything your Dart backend needs.**
 </div>
 
 ## About Dox
