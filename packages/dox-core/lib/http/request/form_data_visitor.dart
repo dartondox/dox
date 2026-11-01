@@ -10,6 +10,12 @@ import 'package:string_scanner/string_scanner.dart';
 /// files up to this size stay in memory, bigger ones go to a temp file.
 const int multipartMemoryLimit = 1024 * 1024;
 
+/// how many first bytes of a file on disk stay in memory as
+/// `RequestFile.head`. The file type is in the first 32 bytes, but a JPEG
+/// keeps its image size after the photo metadata (EXIF, up to 64 KB),
+/// and `@Dimensions` needs it.
+const int fileHeadSize = 128 * 1024;
+
 class FormDataVisitor {
   final HttpRequest request;
 
@@ -96,13 +102,9 @@ class FormDataVisitor {
     RandomAccessFile? raf;
     File? temp;
     int length = 0;
-    List<int> head = <int>[];
+    Uint8List? head;
     try {
       await for (List<int> chunk in _guard(part)) {
-        if (head.length < FileTypes.headSize) {
-          int take = FileTypes.headSize - head.length;
-          head.addAll(chunk.length > take ? chunk.sublist(0, take) : chunk);
-        }
         length += chunk.length;
         if (raf == null && length > multipartMemoryLimit) {
           temp = File(
@@ -110,7 +112,9 @@ class FormDataVisitor {
           );
           _deleteWhenDone(temp);
           raf = await temp.open(mode: FileMode.write);
-          await raf.writeFrom(buffer.takeBytes());
+          Uint8List first = buffer.takeBytes();
+          head = _headOf(first, chunk);
+          await raf.writeFrom(first);
         }
         if (raf != null) {
           /// awaiting each write pauses the socket when the disk is slow
@@ -130,6 +134,20 @@ class FormDataVisitor {
       file: temp,
       head: head,
     );
+  }
+
+  /// a copy of the first [fileHeadSize] bytes of [first], then [chunk].
+  /// a copy, so the 1 MB [first] buffer is not kept alive.
+  static Uint8List _headOf(Uint8List first, List<int> chunk) {
+    BytesBuilder out = BytesBuilder();
+    out.add(
+      first.length > fileHeadSize
+          ? Uint8List.sublistView(first, 0, fileHeadSize)
+          : first,
+    );
+    int take = fileHeadSize - out.length;
+    if (take > 0) out.add(chunk.length > take ? chunk.sublist(0, take) : chunk);
+    return out.takeBytes();
   }
 
   /// pass the body through, and mark [_failed] when it fails

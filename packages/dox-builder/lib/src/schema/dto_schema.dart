@@ -160,7 +160,21 @@ class DtoJsonSchema {
               mediaType(type.toStringValue() ?? ''),
           ].join(', '),
         };
+      case 'MinSize':
+        return <String, dynamic>{
+          'minLength': DtoReader.sizeOf(rule.stringField('size') ?? ''),
+        };
+      case 'MimeTypes':
+        return <String, dynamic>{
+          'contentMediaType': <String>[
+            for (DartObject type
+                in rule.value.getField('types')?.toListValue() ??
+                    const <DartObject>[])
+              type.toStringValue() ?? '',
+          ].join(', '),
+        };
       case 'Image':
+      case 'Dimensions':
         return <String, dynamic>{'contentMediaType': 'image/*'};
     }
     return <String, dynamic>{};

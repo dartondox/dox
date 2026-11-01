@@ -1,5 +1,6 @@
 ## Unreleased
 
+- `RequestFile.head` now keeps the first 128 KB of a big upload (on disk), and all bytes of a small upload (in memory, no copy). Before, it kept 32 bytes. A JPEG keeps its image size after the photo metadata, so `@Dimensions` and `v.file().dimensions()` need these bytes.
 - New: `Route.staticFiles(prefix, folder, maxAge:)` serves a folder (CSS, JS, images) for GET and HEAD requests that match no route. Routes always win. `..`, dot files and folders get 404. Files get `Last-Modified`, `304`, Range support, the global CORS headers and an optional `Cache-Control`. The prefix follows `Route.group`, the router prefix and `Route.domain`.
 - New: `Route.staticFiles` sends a weak `ETag` (from the file size and change time). A matching `If-None-Match` gets `304` with no body. `If-None-Match` wins over `If-Modified-Since`.
 - New: `Route.staticFiles` sends files in a `.well-known` folder at the top of the folder (ACME challenges, `security.txt`). Every other dot name, also inside `.well-known`, still gets `404`.
