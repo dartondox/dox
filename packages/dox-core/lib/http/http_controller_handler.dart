@@ -4,11 +4,6 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_error_handler.dart';
 import 'package:dox_core/router/route_data.dart';
 
-/// Handle middleware and controllers
-Future<dynamic> middlewareAndControllerHandler(DoxRequest doxReq) async {
-  return await runMiddlewareAndController(doxReq);
-}
-
 /// Run middleware and controllers. It stays sync while every step gives
 /// a plain value, so a simple route needs no Future. At the first Future
 /// it waits, then goes on with the next item.
