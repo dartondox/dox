@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dox_core/http/http_cors_handler.dart';
 import 'package:dox_core/http/http_response_handler.dart';
+import 'package:dox_core/middleware/etag.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 
@@ -43,13 +44,18 @@ class StaticFolder {
   /// path is not under [prefix] or is not safe. `..`, `.env` and other
   /// dot names, empty segments (`a//b`, a trailing `/`) and `\` are
   /// refused, so no file outside [root] and no hidden file is sent.
+  /// The one dot name allowed is a `.well-known` folder at the top of
+  /// [root] (ACME challenges, security.txt). Dot names inside it are
+  /// still refused.
   File? fileFor(List<String> segments) {
     if (segments.length <= prefix.length) return null;
     for (int i = 0; i < prefix.length; i++) {
       if (segments[i] != prefix[i]) return null;
     }
     List<String> rest = segments.sublist(prefix.length);
-    for (String s in rest) {
+    for (int i = 0; i < rest.length; i++) {
+      String s = rest[i];
+      if (i == 0 && s == '.well-known') continue;
       if (s.isEmpty ||
           s.startsWith('.') ||
           s.contains('/') ||
@@ -100,8 +106,8 @@ Future<bool> httpStaticHandler(
   return false;
 }
 
-/// CORS, `Last-Modified` and `Cache-Control`, then 304 when the client
-/// has this version, else the file (with Range support).
+/// CORS, `ETag`, `Last-Modified` and `Cache-Control`, then 304 when
+/// the client has this version, else the file (with Range support).
 void _send(HttpRequest req, File file, FileStat stat, Duration? maxAge) {
   HttpResponse res = req.response;
 
@@ -115,27 +121,47 @@ void _send(HttpRequest req, File file, FileStat stat, Duration? maxAge) {
     isUtc: true,
   );
   res.headers.set(HttpHeaders.lastModifiedHeader, HttpDate.format(modified));
+
+  /// a weak ETag from the size and the change time, like nginx
+  String etag =
+      'W/"${stat.size.toRadixString(16)}-'
+      '${stat.modified.millisecondsSinceEpoch.toRadixString(16)}"';
+  res.headers.set(HttpHeaders.etagHeader, etag);
   if (maxAge != null) {
     res.headers.set(
       HttpHeaders.cacheControlHeader,
       'public, max-age=${maxAge.inSeconds}',
     );
   }
-  String? header = req.headers.value(HttpHeaders.ifModifiedSinceHeader);
-  DateTime? since = header == null ? null : _parseDate(header);
 
-  /// a date in the future is not valid, and is ignored (RFC 9110)
-  if (since != null &&
-      !since.isAfter(DateTime.now()) &&
-      !modified.isAfter(since)) {
+  /// set before the 304, so a cache that copies the 304 headers onto
+  /// the file it has keeps the right type
+  res.headers.contentType = ContentType.parse(
+    lookupMimeType(file.path) ?? 'application/octet-stream',
+  );
+  if (_notModified(req, etag, modified)) {
     res.statusCode = HttpStatus.notModified;
     res.close();
     return;
   }
-  res.headers.contentType = ContentType.parse(
-    lookupMimeType(file.path) ?? 'application/octet-stream',
-  );
   responseDataHandler(file, req);
+}
+
+/// true when the client already has this version. `If-None-Match` wins
+/// over `If-Modified-Since` when both are sent (RFC 9110).
+bool _notModified(HttpRequest req, String etag, DateTime modified) {
+  /// a list header: a client may send it on more than one line
+  List<String>? match = req.headers[HttpHeaders.ifNoneMatchHeader];
+  if (match != null) return ETag.matches(match.join(','), etag);
+
+  /// sent more than once: ignored, not a 500
+  String? header = singleHeader(req.headers, HttpHeaders.ifModifiedSinceHeader);
+  DateTime? since = header == null ? null : _parseDate(header);
+
+  /// a date in the future is not valid, and is ignored (RFC 9110)
+  return since != null &&
+      !since.isAfter(DateTime.now()) &&
+      !modified.isAfter(since);
 }
 
 /// null when [value] is not an HTTP date
