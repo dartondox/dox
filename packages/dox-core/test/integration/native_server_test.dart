@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
@@ -222,6 +223,37 @@ void main() {
     await s.drain<void>().timeout(const Duration(seconds: 5));
     expect(clock.elapsed, greaterThan(const Duration(milliseconds: 250)));
     s.destroy();
+  });
+
+  test('AppConfig.maxConnections makes a new client wait', () async {
+    Route.get('/cap', (DoxRequest req) => 'ok');
+    await startHttpServer(
+      AppConfig(
+        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        serverPort: 0,
+        totalIsolate: 1,
+        maxConnections: 1,
+      ),
+    );
+    int port = Dox().server.httpServer.port;
+    Socket first = await Socket.connect('127.0.0.1', port);
+    first.write('GET /cap HTTP/1.1\r\nHost: x\r\n\r\n');
+    await first.first.timeout(const Duration(seconds: 5));
+
+    // the first connection is still open, so the second gets no answer
+    Socket second = await Socket.connect('127.0.0.1', port);
+    second.write('GET /cap HTTP/1.1\r\nHost: x\r\n\r\n');
+    Future<List<int>> answer = second.first;
+    await expectLater(
+      answer.timeout(const Duration(milliseconds: 300)),
+      throwsA(isA<TimeoutException>()),
+    );
+
+    // when the first closes, the second is served
+    first.destroy();
+    List<int> bytes = await answer.timeout(const Duration(seconds: 5));
+    expect(String.fromCharCodes(bytes), contains('200'));
+    second.destroy();
   });
 }
 
