@@ -122,7 +122,7 @@ await SocketIoProvider.server?.of('/chat').to('lobby').emit('news', data);
 
 From a queue job or another program, use the [emitter](#emit-from-other-programs).
 
-- Requests to `/socket.io/` go to Socket.IO before the router. Middleware and body reading are skipped.
+- Requests to `/socket.io/` go to Socket.IO before the router. Middleware and body reading are skipped. To log users in, see [Log in a socket](#log-in-a-socket).
 - With no provider, or with `enabled: false`, there is no extra work per request.
 - Need a plain WebSocket with no Socket.IO protocol? `Route.websocket(path, handler)` in `dox_core` gives you the raw socket.
 
@@ -226,6 +226,49 @@ Any other error is written to stderr. The client only gets `{"message": "Interna
 
 A client that is refused is still closed after `connectTimeout`, unless it joins another namespace.
 
+## Log in a socket
+
+Socket.IO gets its requests before the router, so route middleware (session, auth) does not run for it.
+Use `SocketAuth` as a namespace middleware. Your function gets the handshake and gives the user, or null.
+
+```dart title="lib/app/socket/chat.namespace.dart"
+class ChatNamespace extends NamespaceHandler {
+  @override
+  String get path => '/chat';
+
+  @override
+  List<Middleware> get middleware => <Middleware>[SocketAuth(findUser).handle];
+
+  static Future<User?> findUser(Handshake handshake) async {
+    String? token = handshake.token;
+    if (token == null) return null;
+    return User().where('api_token', token).getFirst();
+  }
+
+  @override
+  void onConnection(Socket socket) {
+    User user = socket.user! as User;
+    socket.join('user:${user.id}');
+  }
+}
+```
+
+The client sends the token in `auth`:
+
+```js
+const socket = io('http://localhost:3000/chat', {
+  transports: ['websocket'],
+  auth: { token: 'the-user-token' },
+});
+socket.on('connect_error', (err) => console.log(err.message)); // 'Unauthorized'
+```
+
+- With a user, it is kept in `socket.user`. It stays on this server. `fetchSockets()` on other servers does not get it.
+- With null, the client gets a `connect_error` with the message `Unauthorized`, and `onConnection` does not run. Change the message with `SocketAuth(findUser, message: '...')`.
+- `handshake.token` is `auth.token` from the client, else the `Authorization: Bearer` header. Browsers can not set headers on a websocket, so use `auth`.
+- `handshake.cookie('name')` reads a cookie and decrypts it with the APP_KEY, like `req.cookie('name')`. Use `decrypt: false` for a plain cookie.
+- `io.use(SocketAuth(findUser).handle)` does the same for the default namespace.
+
 ## Node.js to Dart
 
 | Node.js | Dart |
@@ -238,7 +281,7 @@ A client that is refused is still closed after `connectTimeout`, unless it joins
 | `socket.broadcast.emit(...)` | the same |
 | `io.to(r).except(x).emit(...)` | the same |
 | `io.of('/chat')`, `io.use(fn)` | the same |
-| `socket.handshake` | `.headers`, `.query`, `.auth`, `.address` |
+| `socket.handshake` | `.headers`, `.query`, `.auth`, `.address`, `.token`, `.cookie(name)` |
 | `socket.data` | `socket.data` (a `Map`) |
 | `await io.in(r).fetchSockets()` | `await io.to(r).fetchSockets()` (all servers) |
 | `await io.timeout(5000).emitWithAck('e', a)` | `await io.timeout(Duration(seconds: 5)).emitWithAck('e', a)` |
