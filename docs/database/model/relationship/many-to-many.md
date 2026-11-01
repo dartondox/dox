@@ -179,7 +179,8 @@ The ids can be:
 - a list of ids or models: `[1, 2, song]`
 - a map of `id => pivot values`: `{1: {'role': 'singer'}, 2: {}}`
 
-`null` means no ids. So `attach('songs', null)` adds nothing, and `sync('songs', null)` deletes every link, like `sync('songs', [])`.
+`null` means no ids. So `attach('songs', null)` and `detach('songs', null)` change nothing, and `sync('songs', null)` deletes every link, like `sync('songs', [])`.
+Ids match by value, like the database: `'01'` and `1.0` are the same song as `1`.
 A `null` id or a model that is not saved is skipped by `attach`, `detach`, `toggle` and `syncWithoutDetaching`.
 `sync` throws an `ArgumentError` for one, before it changes anything, because it would delete every other link.
 Each id is used once: `[1, 1, '1']` adds one row.
@@ -203,7 +204,8 @@ Use `sync` or `syncWithoutDetaching` when the row may be there.
 ### `detach`
 
 Deletes the pivot rows of the ids.
-With no ids, it deletes every pivot row of the model.
+With no ids argument, it deletes every pivot row of the model.
+`detach('songs', null)` deletes nothing.
 It returns how many rows it deleted.
 The songs stay in the `song` table.
 

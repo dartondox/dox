@@ -171,7 +171,7 @@ for (Comment c in comments) {
   It has `where commentable_type = 'photo'`.
 - `@MorphTo` runs one query for each type in the list.
   A comment with a type that is not in the morph map throws a `StateError`.
-  A comment with no type gets `null`.
+  A comment with no type, or an empty type `''`, gets `null`.
 - `related<Photo>('commentable')` on one comment gives the query of its photo.
 
 ## Filter by it
