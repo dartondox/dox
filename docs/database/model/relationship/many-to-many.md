@@ -131,9 +131,118 @@ Do not set `eager: true` on both sides. Each side would load the other side agai
 The load runs this SQL:
 
 ```sql
-SELECT "song".*, "artist_song"."artist_id" as "_owner_id" FROM "song"
+SELECT "song".*, "artist_song"."artist_id" as "_owner_id",
+  "artist_song"."artist_id" as "_pivot_artist_id",
+  "artist_song"."song_id" as "_pivot_song_id" FROM "song"
   LEFT JOIN "artist_song" on "artist_song"."song_id" = "song"."id"
   WHERE "artist_song"."artist_id" IN (@artist_songartist_id_p0, ...)
+```
+
+## Read pivot columns
+
+The pivot table can have more columns, like a `role`.
+List them in `withPivot`.
+Read them with `pivot` on each related model.
+
+```dart
+@ManyToMany(Song, withPivot: <String>['role'])
+List<Song> songs = <Song>[];
+```
+
+```dart
+Artist? artist = await Artist().preload('songs').find(1);
+for (Song song in artist!.songs) {
+  print(song.pivot['role']);
+}
+```
+
+- `pivot` always has the two pivot keys, like `artist_id` and `song_id`.
+- `withTimestamps: true` adds `created_at` and `updated_at` to `pivot`.
+  `attach()` and `sync()` then set them too.
+  The pivot table needs both columns (`table.timestamps()`).
+- A model that was not loaded by a ManyToMany relation has an empty `pivot`.
+
+## Change the links
+
+These methods add and remove rows in the pivot table.
+The first argument is the relation name, like `'songs'`.
+Save the model first. A model without an id throws a `StateError`.
+
+The ids can be:
+
+- one id: `1`
+- a model: `song`
+- a list of ids or models: `[1, 2, song]`
+- a map of `id => pivot values`: `{1: {'role': 'singer'}, 2: {}}`
+
+### `attach`
+
+Adds a pivot row for each id.
+The third argument has the pivot values for every new row.
+
+```dart
+await artist.attach('songs', 1);
+await artist.attach('songs', <int>[2, 3], <String, dynamic>{'role': 'singer'});
+await artist.attach('songs', <int, Map<String, dynamic>>{
+  4: <String, dynamic>{'role': 'writer'},
+});
+```
+
+`attach` does not check for a row that is already there.
+Use `sync` or `syncWithoutDetaching` when the row may be there.
+
+### `detach`
+
+Deletes the pivot rows of the ids.
+With no ids, it deletes every pivot row of the model.
+It returns how many rows it deleted.
+The songs stay in the `song` table.
+
+```dart
+await artist.detach('songs', <int>[1, 2]);
+await artist.detach('songs');
+```
+
+### `sync`
+
+Makes the pivot rows match the ids.
+
+- It adds a row for each new id.
+- It deletes the rows of the ids that are not in the list.
+- It sets the pivot values of the rows that are already there.
+
+It returns a `SyncResult` with the ids of each change.
+
+```dart
+SyncResult result = await artist.sync('songs', <int>[1, 2, 3]);
+print(result.attached); // ids that got a new row
+print(result.detached); // ids whose row was deleted
+print(result.updated);  // ids whose pivot values changed
+```
+
+`syncWithoutDetaching` does the same, but it does not delete rows.
+
+```dart
+await artist.syncWithoutDetaching('songs', <int>[4]);
+```
+
+### `toggle`
+
+Adds a row for each id that has none.
+Deletes the row of each id that has one.
+It returns a `SyncResult` with `attached` and `detached`.
+
+```dart
+await artist.toggle('songs', <int>[1, 2]);
+```
+
+### `updateExistingPivot`
+
+Sets pivot values on the row of one id.
+It returns how many rows changed.
+
+```dart
+await artist.updateExistingPivot('songs', 1, <String, dynamic>{'role': 'writer'});
 ```
 
 ## Filter by it
@@ -163,6 +272,8 @@ The examples are for `@ManyToMany(Song)` in the `Artist` model.
 | `pivotRelatedForeignKey` | `{related model}_id` | `song_id` | The pivot column that points to the related model. |
 | `localKey` | the primary key of this model | `id` | The column in `artist` that `pivotForeignKey` points to. |
 | `relatedKey` | the primary key of the related model | `id` | The column in `song` that `pivotRelatedForeignKey` points to. |
+| `withPivot` | none | `['role']` | Extra pivot columns to read. See [Read pivot columns](#read-pivot-columns). |
+| `withTimestamps` | `false` | `true` | Read and set `created_at` and `updated_at` in the pivot table. |
 | `onQuery` | none | | A static function that changes the query. |
 | `eager` | `false` | | Load the relation on every query. |
 

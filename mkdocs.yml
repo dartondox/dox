@@ -187,6 +187,7 @@ nav:
         - database/model/relationship/has-many.md
         - database/model/relationship/belongs-to.md
         - database/model/relationship/many-to-many.md
+        - database/model/relationship/polymorphic.md
   - Security:
     - security/authentication.md
     - security/authorization.md
