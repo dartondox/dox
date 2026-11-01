@@ -277,6 +277,99 @@ class A {
       },
     );
 
+    test('a Dart field name where the input key is needed', () async {
+      String rules = '''
+class Same extends Rule<Object?> {
+  const Same(this.other);
+  final String other;
+}
+class Confirmed extends Rule<Object?> {
+  const Confirmed({this.other});
+  final String? other;
+}
+''';
+      await expectError(
+        '''
+$rules
+@Dto()
+class A {
+  final String? accountType;
+
+  @RequiredIf('accountType', 'company')
+  final String? company;
+
+  const A({this.accountType, this.company});
+}''',
+        "@RequiredIf on A.company: 'accountType' is a Dart field name. Use the input key 'account_type'.",
+      );
+      await expectError('''
+$rules
+@Dto()
+class A {
+  final String? emailAddress;
+
+  @Same('emailAddress')
+  final String? again;
+
+  @RequiredWith(<String>['emailAddress'])
+  final String? name;
+
+  @Confirmed(other: 'emailAddress')
+  final String? pin;
+
+  const A({this.emailAddress, this.again, this.name, this.pin});
+}''', "@Same on A.again: 'emailAddress' is a Dart field name");
+      // input keys, keys that are no field, and same-name fields are fine
+      String output = await _generate('''
+$rules
+@Dto()
+class A {
+  final String? accountType;
+  final String? type;
+
+  @RequiredIf('account_type', 'company')
+  @Same('password_confirmation')
+  final String? company;
+
+  @RequiredWith(<String>['type', 'tag_source'])
+  @Confirmed()
+  final String? name;
+
+  const A({this.accountType, this.type, this.company, this.name});
+}''');
+      expect(output, isNot(startsWith('ERROR')));
+    });
+
+    test('@DateFormatted with a letter it does not know', () async {
+      String rule = '''
+class DateFormatted extends Rule<String> {
+  const DateFormatted(this.format);
+  final String format;
+}
+''';
+      await expectError('''
+$rule
+@Dto()
+class A {
+  @DateFormatted('Y-m-d Q')
+  final String? day;
+  const A({this.day});
+}''', '@DateFormatted on A.day: the letter "Q"');
+      String output = await _generate(
+        r'''
+''' +
+            rule +
+            r'''
+@Dto()
+class A {
+  @DateFormatted('Y-m-d\\TH:i:sP \\Q')
+  final String? day;
+  const A({this.day});
+}''',
+      );
+      expect(output, isNot(startsWith('ERROR')));
+    });
+
     test('@RequiredIf on a field that is always required', () {
       return expectError('''
 @Dto()
