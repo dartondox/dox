@@ -64,6 +64,7 @@ Route.delete('/blogs/{id}', (BlogController c) => c.destroy);
 
     `Route.health('/health')` adds a health check route. It answers `200` with `{"status": "ok"}`.
     `Route.websocket('echo', (WebSocket socket, DoxRequest req) {...})` adds a raw WebSocket route.
+    A browser can open it only from a page of the same host. To allow other sites, pass `allowedOrigins: ['https://app.example.com']`. Other origins get `403`.
 
 A `HEAD` request runs the `GET` route of the same path. The answer has the status and headers of `GET`, with no body.
 
