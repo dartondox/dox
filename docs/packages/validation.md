@@ -258,7 +258,7 @@ They use the same codes and messages as the DTO annotations. See the [rules refe
   Then a missing, `null` or blank value is an error when the condition is true.
 - `exists` and `unique` are async. Use `parseAsync()` or `safeParseAsync()`.
 - For one value, the database decides what matches. On MySQL `TAKEN@dox.dev` is taken when `taken@dox.dev` is there.
-- `exists(table, column: 'id')`: the column default is `id`.
+- `exists(table, column: 'id')`: the column default is `id`. For a number id column, use `v.int().exists('teams')`, not `v.string()`. Then text like `abc` is a type error, before any query.
 - `unique(table, column: 'email', ignore: id)`: `column` is required. It is never taken from the input key, because a key in `v.map()` comes from the user. `ignore` skips the row where `ignoreColumn` (default `id`) has this value. Use it for updates.
 
 #### The presence verifier
@@ -277,15 +277,21 @@ class MyVerifier extends PresenceVerifier {
     Object? exceptValue,
     String? connection,
   }) async {
-    // return the values that are in the column, as text.
-    // bind the values as query parameters, never put them into the SQL.
+    // Return the values that are in the column, as text.
+    // Bind the values as query parameters, never put them into the SQL.
+    return <String>{};
   }
 }
 
-PresenceVerifier.instance = MyVerifier();
+class VerifierProvider extends DoxProvider {
+  @override
+  void setup() {
+    PresenceVerifier.instance = MyVerifier();
+  }
+}
 ```
 
-Table and column names are checked before the query. Only letters, digits, `_` and one `schema.` part pass, like `public.users`. Other names throw an `ArgumentError`.
+Table and column names are checked when the schema is built. They take the same names as the dox_orm query builder: letters, digits, `_` and `$`, with `.` between parts, like `2fa_codes` or `public.users`. Other names throw an `ArgumentError`.
 
 ### Async checks
 

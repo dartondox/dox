@@ -87,7 +87,9 @@ For `String` fields. Like the Laravel rules with the same names.
   time `a`, `A`, `g`, `h`, `G`, `H`, `i`, `s`, `v`, `u`;
   time zone `e`, `T`, `P`, `p`, `O`, `Z`, `I`;
   full `U`, `c`, `r`.
-  Put `\` before a letter to use it as text, like `Y-m-d\TH:i`. Any other letter throws an `ArgumentError`. Other characters must be there as they are.
+  Put `\` before a letter to use it as text, like `Y-m-d\TH:i`. Any other letter stops the build (and throws an `ArgumentError` in `v.string().dateFormat()`). Other characters must be there as they are.
+  Like Laravel, `j`, `n`, `g`, `G`, `z` and `U` take no leading zero: `j/n/Y` rejects `01/02/2024`.
+  `e` and `T` take any name that looks like a time zone. They do not check that it is a real one.
   The date must exist: `2023-02-29` fails. Names need the case shown (`Jan`, not `jan`). A day name must fit the date. The field stays a `String`. Use a `DateTime` field for ISO 8601 dates.
 - `@Password` options: `min` (default 8), `letters`, `mixedCase` (one upper and one lower case letter), `numbers`, `symbols`. They are all off by default.
   Letters, numbers and symbols are Unicode, so `é` is a letter. `{rules}` lists the options you set, like `at least 8 characters, one number, and one symbol`, or `at least 8 characters and one number`.
@@ -95,7 +97,7 @@ For `String` fields. Like the Laravel rules with the same names.
 
 ## Other fields
 
-These read another key of the same object. `@Confirmed` and `@Same` compare the raw input of both keys, like Laravel. So `@Trim` does not change the compare.
+These read another key of the same object. The other key is the input key, like `account_type`, not the Dart name `accountType`. If you give the Dart name of a field with another key, the build stops. `@Confirmed` and `@Same` compare the raw input of both keys, like Laravel. So `@Trim` does not change the compare.
 
 | Annotation | Code | Message |
 | --- | --- | --- |
@@ -110,7 +112,7 @@ These read another key of the same object. `@Confirmed` and `@Same` compare the 
 - `@RequiredIf` and `@RequiredWith` work on a nullable field, a `Maybe` field or a field with a default. On an always-required field the build stops.
 - `@RequiredIf('type', ['company', 'shop'])` takes a list: any of the values makes the field required. `"true"` matches `true`, `"1"` matches `1`. An enum value matches its name: `@RequiredIf('role', Role.admin)` matches `"admin"`.
 - `@RequiredWith(['phone', 'email'])`: the field is required when any of the keys is there and not empty.
-- Missing means: not there, `null`, blank text or an empty list.
+- Missing means: not there, `null`, blank text, an empty list or an empty map.
 - They run in step 1, with the other "required" checks. `@Confirmed` and `@Same` run in step 2.
 
 ## Change text
@@ -295,5 +297,7 @@ The build stops with a clear error when:
 - a rule does not fit the field type (like `@Email()` on an `int`),
 - a `Maybe<T>` field has no `const Maybe.missing()` default,
 - `@RequiredIf` or `@RequiredWith` is on a field that is always required,
+- `@RequiredIf`, `@RequiredWith`, `@Same` or `@Confirmed(other:)` names a Dart field (like `accountType`) instead of its input key (`account_type`),
+- `@DateFormatted` has a letter it does not know,
 - two `@Dto` classes in the app have the same name,
 - the class is generic, or extends another class (other than `Object`).
