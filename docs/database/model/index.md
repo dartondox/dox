@@ -446,7 +446,8 @@ await blog.save();
 
 A model can load related models.
 See [HasOne](relationship/has-one.md), [HasMany](relationship/has-many.md),
-[BelongsTo](relationship/belongs-to.md) and [ManyToMany](relationship/many-to-many.md).
+[BelongsTo](relationship/belongs-to.md), [ManyToMany](relationship/many-to-many.md)
+and [Polymorphic](relationship/polymorphic.md).
 
 The relationship pages use these tables:
 
