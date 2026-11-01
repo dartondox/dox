@@ -137,22 +137,6 @@ void main() {
       (await client.get('/limited-by-header', headers: bob)).expectStatus(200);
     });
 
-    test('warns when the counts are per isolate and isolates > 1', () {
-      String? warning = RateLimit.perIsolateWarning(Route().routes, 4);
-      expect(warning, contains('up to 4 x max'));
-      expect(warning, contains('RateLimit(max: 2) on /limited'));
-      expect(RateLimit.perIsolateWarning(Route().routes, 1), isNull);
-    });
-
-    test('no per isolate warning for a given or Redis store', () {
-      expect(
-        RateLimit(cacheStore: Dox().cache.store()).countsPerIsolate,
-        isFalse,
-      );
-      expect(RateLimit(store: 'memory').countsPerIsolate, isTrue);
-      expect(RateLimit().countsPerIsolate, isTrue);
-    });
-
     test('max must be 1 or more', () {
       expect(() => RateLimit(max: 0), throwsArgumentError);
     });

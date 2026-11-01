@@ -2,6 +2,7 @@ import 'dart:isolate';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/isolate/isolate_interfaces.dart';
+import 'package:dox_core/middleware/rate_limit_counter.dart';
 import 'package:dox_core/server/dox_server.dart';
 
 /// process middleware and controller and sent data via sentPort
@@ -12,6 +13,9 @@ void isolateHandler(IsolateSpawnParameter param) async {
 
   /// creating dox in new isolate;
   Dox().isolateId = param.isolateId;
+
+  /// RateLimit counts live in the main isolate
+  RateLimitCounter.instance.connect(param.rateLimitPort);
   Dox().initialize(appConfig);
   Dox().addProviders(providers);
 

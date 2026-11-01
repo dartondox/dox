@@ -113,11 +113,6 @@ class Dox {
     }
 
     await startProviders();
-    String? rateLimitWarning = RateLimit.perIsolateWarning(
-      Route().routes,
-      isolatesToSpawn,
-    );
-    if (rateLimitWarning != null) Logger.warn(rateLimitWarning);
     DoxServer().setResponseHandler(config.responseHandler);
     HttpServer server = await DoxServer().listen(
       DoxServer.portFor(config.serverPort),

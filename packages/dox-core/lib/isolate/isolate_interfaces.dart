@@ -16,6 +16,10 @@ class IsolateSpawnParameter {
   /// The main isolate sends a stop message to it on shutdown.
   final SendPort? control;
 
+  /// the port of the main isolate that keeps the `RateLimit` counts,
+  /// see `RateLimitCounter`
+  final SendPort? rateLimitPort;
+
   const IsolateSpawnParameter(
     this.isolateId,
     this.config,
@@ -23,5 +27,6 @@ class IsolateSpawnParameter {
     this.routes = const <RouteData>[],
     this.bindings = const <String, RouteBinding>{},
     this.control,
+    this.rateLimitPort,
   });
 }

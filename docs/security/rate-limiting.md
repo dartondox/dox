@@ -89,23 +89,21 @@ Route.post('/auth/register', <dynamic>[
 
 ## Where the counts live
 
-The counts are kept in the [cache](../digging-deeper/cache.md):
+Where the counts are kept depends on the default [cache](../digging-deeper/cache.md) store:
 
-- When the default cache store is **Redis**, the counts are in Redis. All isolates and all servers share them. Use this in production.
-- Else the counts are in **memory**. Each isolate has its own counts. With 4 isolates a client can send up to 4 x `max` requests.
+- When the default cache store is **Redis**, the counts are in Redis. All isolates and all servers share them. Use this when you run more than one server.
+- Else the counts are in the **main isolate**. All isolates of the server share them, so `max` holds for the whole server.
+  The other isolates send each count to the main isolate and wait for the answer. This is one small message per limited request.
+  Each server has its own counts, so with 3 servers a client can send up to 3 x `max` requests.
   This is also true for the default `file` store of a new app.
-
-!!! warning "Without Redis, the limit is per isolate"
-    Dox runs one isolate per CPU core by default. Without Redis each isolate counts on its own.
-    So `RateLimit(max: 5)` on an 8 core server really lets a client send up to 40 requests.
-    When this is the case, `Dox().startServer()` logs a warning that lists each such `RateLimit`.
-    For a real limit, use a Redis store, or run one isolate (`totalIsolate: 1`).
 
 To use one store by name, pass `store`:
 
 ```dart
 RateLimit(max: 10, store: 'redis')
 ```
+
+A `memory` store named in `store` counts in the main isolate too. A store passed in `cacheStore` is used as it is.
 
 ## How it counts
 
