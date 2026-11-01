@@ -2,6 +2,11 @@ name: Test
 
 on:
   push:
+    branches:
+      - '**'
+    # a docs-only tag changes no code, so it needs no test run
+    tags-ignore:
+      - 'docs-v*'
 
 # A new push to a branch cancels the old run of that branch.
 # Runs on main are never cancelled.
