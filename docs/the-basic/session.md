@@ -73,7 +73,7 @@ To keep flash data for one more request, call `req.session.reflash()`, or `req.s
 
 ## Redirect back with errors
 
-`back(req)` redirects to the page the request came from (the `Referer` header), or to `/` when there is none.
+`back(req)` redirects to the page the request came from (the `Referer` header), or to `/` when there is none. A `Referer` of another host is not used, so it also goes to `/`.
 `redirect('/path')` redirects to any path.
 
 When a form post fails validation, Dox does this for you on a route with a session:
