@@ -232,13 +232,13 @@ final ObjectSchema signUp = v.object(<String, Schema<Object?>>{
 }, message: 'Passwords do not match', path: <Object>['confirm']);
 ```
 
-### Rules like Laravel
+### More rules
 
 ```dart
 final ObjectSchema signUp = v.object(<String, Schema<Object?>>{
   // needs password_confirmation with the same value
   'password': v.string().password(min: 8, mixedCase: true, numbers: true).confirmed(),
-  'email': v.string().email().unique('users'),
+  'email': v.string().email().unique('users', column: 'email'),
   'team_id': v.int().exists('teams'),
   'type': v.enumOf<String>(<String>['person', 'company']),
   'company': v.string().optional().requiredIf('type', 'company'),
@@ -257,13 +257,14 @@ They use the same codes and messages as the DTO annotations. See the [rules refe
 - `requiredIf` and `requiredWith` come after `optional()` or `nullish()`.
   Then a missing, `null` or blank value is an error when the condition is true.
 - `exists` and `unique` are async. Use `parseAsync()` or `safeParseAsync()`.
+- For one value, the database decides what matches. On MySQL `TAKEN@dox.dev` is taken when `taken@dox.dev` is there.
 - `exists(table, column: 'id')`: the column default is `id`.
-- `unique(table, column: ..., ignore: id)`: the column default is the input key. `ignore` skips the row where `ignoreColumn` (default `id`) has this value. Use it for updates.
+- `unique(table, column: 'email', ignore: id)`: `column` is required. It is never taken from the input key, because a key in `v.map()` comes from the user. `ignore` skips the row where `ignoreColumn` (default `id`) has this value. Use it for updates.
 
 #### The presence verifier
 
 `exists` and `unique` ask a `PresenceVerifier` (like in Laravel). `dox_orm` sets one when the database starts, so in a Dox app they just work.
-Outside Dox, or with another database layer, set your own:
+Outside Dox, or with another database layer, set your own. Each isolate has its own value, so set it in a provider's `setup()`, which runs in every isolate:
 
 ```dart
 class MyVerifier extends PresenceVerifier {
