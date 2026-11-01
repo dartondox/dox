@@ -8,8 +8,8 @@ environment:
 resolution: workspace
 
 dependencies:
-  pointycastle: ^4.0.0
   bcrypt: ^1.2.0
+  crypto: ^3.0.7
   path: ^1.9.1
   matcher: ^0.12.20
   mime: ^2.1.0
@@ -17,7 +17,7 @@ dependencies:
   uuid: ^4.6.0
   dox_annotation: ^3.0.0
   dox_cache: ^3.0.0
-  dox_http_native: ^3.0.0
+  dox_http_native: ^3.0.2
   dox_openapi: ^3.0.0
   dox_validation: ^3.0.0
 

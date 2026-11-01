@@ -1,7 +1,15 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_http_native/dox_http_native.dart';
 import 'package:test/test.dart';
+
+/// Made by the old pure Dart AES-GCM (pointycastle) of Dox 3.0.0: the
+/// message below, secret [secret], purpose `dox:cookie`, associated data
+/// `dox_session`, nonce 0..11. A value from an older Dox must still open.
+const String legacyValue =
+    'AAECAwQFBgcICQoLJZMCWYL93OlHMVjfg+dWmnlzNFSdlz4E0rb+xopH507kJqvsZlzxL5aejA==';
 
 void main() {
   group('AES Encryptor |', () {
@@ -80,6 +88,50 @@ void main() {
           ),
         );
       }
+    });
+
+    test('a value made by the old pure Dart code still opens', () {
+      expect(
+        AESEncryptor.decode(
+          legacyValue,
+          secret,
+          associatedData: 'dox_session',
+          purpose: KeyDerivation.cookie,
+        ),
+        message,
+      );
+    });
+
+    test('a new value has the old layout: nonce + ciphertext + tag', () {
+      String encoded = AESEncryptor.encode(
+        message,
+        secret,
+        associatedData: 'name',
+      );
+      Uint8List data = base64.decode(encoded);
+      expect(data.length, 12 + utf8.encode(message).length + 16);
+      Uint8List key = KeyDerivation.derive(secret, KeyDerivation.encrypt);
+      expect(
+        utf8.decode(AesGcm.open(key, data, utf8.encode('name'))!),
+        message,
+      );
+    });
+
+    test('text that is not base64 or not UTF-8 throws DecryptException', () {
+      expect(
+        () => AESEncryptor.decode('***', secret),
+        throwsA(isA<DecryptException>()),
+      );
+      Uint8List key = KeyDerivation.derive(secret, KeyDerivation.encrypt);
+      Uint8List sealed = AesGcm.seal(
+        key,
+        Uint8List.fromList(<int>[0xff, 0xfe]),
+        Uint8List(0),
+      );
+      expect(
+        () => AESEncryptor.decode(base64.encode(sealed), secret),
+        throwsA(isA<DecryptException>()),
+      );
     });
   });
 }

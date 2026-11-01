@@ -125,7 +125,7 @@ The cookie name is bound to the encrypted value, so a value can not be copied fr
 
 ## How it works
 
-`AESEncryptor` uses AES-GCM.
+`AESEncryptor` uses AES-256-GCM. The work runs in Rust (in `dox_http_native`), with the AES instructions of the CPU. One cookie takes about 1–2 µs.
 
 - Each message gets a new random 12-byte nonce.
 - The output is base64 of `nonce + encrypted text + tag`.
