@@ -179,6 +179,9 @@ The ids can be:
 - a list of ids or models: `[1, 2, song]`
 - a map of `id => pivot values`: `{1: {'role': 'singer'}, 2: {}}`
 
+`null` means no ids, and a `null` id is skipped. So `attach('songs', null)` adds nothing, and `sync('songs', null)` deletes every link, like `sync('songs', [])`.
+Each id is used once: `[1, 1, '1']` adds one row.
+
 ### `attach`
 
 Adds a pivot row for each id.

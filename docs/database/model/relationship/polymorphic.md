@@ -208,7 +208,7 @@ The examples are for `@MorphMany(Comment, 'commentable')` in the `Photo` model.
 | `typeColumn` | `{name}_type` | `commentable_type` | The type column in this table. |
 | `idColumn` | `{name}_id` | `commentable_id` | The id column in this table. |
 | `ownerKey` | the primary key of the related model | `id` | The column in the related table that `idColumn` points to. |
-| `onQuery` | none | | A static function that changes the query of each type. |
+| `onQuery` | none | | A static function that changes the query of each type. It runs for every type, so it takes and returns `Model<dynamic>`. |
 | `eager` | `false` | | Load the relation on every query. |
 
 ## In JSON
