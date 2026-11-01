@@ -181,6 +181,33 @@ void main() {
       expect(await pruning.get('a'), 2);
     });
 
+    test('auto prune is off by default, prune_every turns it on', () {
+      expect(driver.pruneEvery, 0);
+      FileDriver built = const FileDriverFactory().create(<String, dynamic>{
+        'path': directory.path,
+        'prune_every': 50,
+      }) as FileDriver;
+      expect(built.pruneEvery, 50);
+    });
+
+    test('prune skips a key that add or increment holds', () async {
+      await driver.put('old', 1, const Duration(seconds: 1));
+      clock.advance(const Duration(seconds: 2));
+      FileLock held = FileLock(
+        File(
+          '${driver.fileFor('old').path}${CacheConstants.fileKeyLockSuffix}',
+        ),
+        clock,
+        'old',
+        const Duration(seconds: 5),
+      );
+      expect(await held.get(), isTrue);
+      expect(await driver.prune(), 0);
+      expect(driver.fileFor('old').existsSync(), isTrue);
+      await held.release();
+      expect(await driver.prune(), 1);
+    });
+
     test('flush clears only the folder of this prefix', () async {
       FileDriver other = FileDriver(directory: directory, prefix: 'q:');
       await driver.put('a', 1, null);

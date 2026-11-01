@@ -17,6 +17,7 @@ class CacheConstants {
   static const String prefixOption = 'prefix';
   static const String maxSizeOption = 'max_size';
   static const String pathOption = 'path';
+  static const String pruneEveryOption = 'prune_every';
   static const String hostOption = 'host';
   static const String portOption = 'port';
   static const String usernameOption = 'username';
@@ -58,8 +59,9 @@ class CacheConstants {
   /// Lock ttl and wait time of file driver `add`, `increment` and `touch`.
   static const Duration fileKeyLockTtl = Duration(seconds: 5);
 
-  /// The file driver deletes expired files once every this many writes.
-  static const int filePruneEvery = 1000;
+  /// The file driver runs `prune` once every this many writes.
+  /// 0 (the default) means never.
+  static const int filePruneEvery = 0;
 
   /// End of file driver lock file names.
   static const String fileLockSuffix = '.lock';

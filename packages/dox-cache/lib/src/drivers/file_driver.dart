@@ -19,8 +19,8 @@ import '../constants/cache_constants.dart';
 /// first and then rename, so a reader never sees half a file.
 ///
 /// A read never deletes a file. An expired file stays until it is
-/// written again, removed, or [prune] runs. [prune] runs by itself in the
-/// background once every [pruneEvery] writes, so the disk does not fill.
+/// written again, removed, or [prune] runs. Set [pruneEvery] to run
+/// [prune] by itself in the background once every that many writes.
 ///
 /// `add`, `increment` and `touch` take a file lock on the key, so they
 /// are safe across isolates and processes on one machine.
@@ -41,7 +41,7 @@ class FileDriver extends CacheDriver {
   final CacheClock _clock;
 
   /// Run [prune] in the background once every this many writes.
-  /// 0 turns it off.
+  /// 0 (the default) turns it off.
   final int pruneEvery;
 
   int _writes = 0;
@@ -158,14 +158,25 @@ class FileDriver extends CacheDriver {
   /// Delete the expired and broken files of this store.
   /// Returns how many were deleted. Run it from time to time, eg. in a
   /// schedule, to free disk space.
+  ///
+  /// It takes the same key lock as `add`, `increment` and `touch`, and
+  /// reads the file again under it. So it never deletes their new value.
+  /// A key that is locked right now is skipped.
   Future<int> prune() async {
     int removed = 0;
     for (File file in await _dataFiles()) {
-      // ponytail: another isolate may write this key between the read and
-      // the delete, then its new value is lost. It is only a cache miss.
-      if (await _read(file) == null) {
-        await _delete(file);
-        removed++;
+      if (await _read(file) != null) continue;
+      CacheLock lock = _keyLock(file, '');
+      if (!await lock.get()) continue;
+      try {
+        // ponytail: `put` takes no lock. A `put` between this read and
+        // the delete is lost, which is only a cache miss.
+        if (await _read(file) == null) {
+          await _delete(file);
+          removed++;
+        }
+      } finally {
+        await lock.release();
       }
     }
     return removed;
@@ -185,16 +196,21 @@ class FileDriver extends CacheDriver {
   /// Take the lock of one key, used by read-then-write methods.
   Future<CacheLock> _lockKey(String key) async {
     Duration wait = CacheConstants.fileKeyLockTtl;
-    CacheLock lock = FileLock(
-      File('${fileFor(key).path}${CacheConstants.fileKeyLockSuffix}'),
-      _clock,
-      key,
-      wait,
-    );
+    CacheLock lock = _keyLock(fileFor(key), key);
     if (!await lock.block<bool>(wait)) {
       throw LockTimeoutException(key, wait);
     }
     return lock;
+  }
+
+  /// The lock of the key kept in [file]
+  FileLock _keyLock(File file, String key) {
+    return FileLock(
+      File('${file.path}${CacheConstants.fileKeyLockSuffix}'),
+      _clock,
+      key,
+      CacheConstants.fileKeyLockTtl,
+    );
   }
 
   /// Value files only. Their names have no dot, unlike temp and lock files.
@@ -408,7 +424,7 @@ class FileLock extends CacheLock {
   }
 }
 
-/// Builds a [FileDriver]. Options: path, prefix.
+/// Builds a [FileDriver]. Options: path, prefix, prune_every.
 class FileDriverFactory implements CacheDriverFactory {
   const FileDriverFactory([this._clock = const CacheClock()]);
 
@@ -424,6 +440,9 @@ class FileDriverFactory implements CacheDriverFactory {
       prefix:
           options[CacheConstants.prefixOption] as String? ??
           CacheConstants.defaultPrefix,
+      pruneEvery:
+          options[CacheConstants.pruneEveryOption] as int? ??
+          CacheConstants.filePruneEvery,
       clock: _clock,
     );
   }
