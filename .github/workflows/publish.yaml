@@ -2,8 +2,10 @@ name: Release
 
 # Push a tag like v<version> to publish all packages to pub.dev.
 # Run it by hand (workflow_dispatch) to do a dry run only. Nothing is published then.
-# Tests are not run here. The Test workflow runs on every push, so wait for it
-# to be green on the release commit before you push the tag.
+# On a tag, the Test workflow runs first and must pass, or nothing is
+# published. On a tag, lint and the unit tests use pub.dev only (see
+# ci/use-siblings.sh). The examples and template jobs still use the
+# sibling clones on main (see test.yaml).
 
 on:
   push:
@@ -12,7 +14,6 @@ on:
   workflow_dispatch:
 
 permissions:
-  id-token: write # pub.dev automated publishing (OIDC)
   contents: read
 
 concurrency:
@@ -49,11 +50,22 @@ jobs:
       - name: Dry run publish
         run: ci/publish-dry-run.sh
 
+  # Read access only. The tests run a lot of other code, so they must not
+  # get the pub.dev token.
+  test:
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    uses: ./.github/workflows/test.yaml
+    permissions:
+      contents: read
+
   publish:
     if: github.event_name == 'push' && github.ref_type == 'tag'
-    needs: check-version
+    needs: [check-version, test]
     runs-on: ubuntu-latest
     environment: pub.dev
+    permissions:
+      id-token: write # pub.dev automated publishing (OIDC)
+      contents: read
     steps:
       - uses: actions/checkout@v4
       # Folder:package, in publish order. Sets PACKAGES for the next steps.

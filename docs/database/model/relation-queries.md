@@ -129,7 +129,8 @@ With `has()`, the count is for the last relation of one row.
 
 ## Rules
 
-- It works with `hasOne`, `hasMany`, `belongsTo` and `manyToMany` relations.
+- It works with `hasOne`, `hasMany`, `belongsTo`, `manyToMany`, `morphOne` and `morphMany` relations.
+  A `morphTo` relation throws an `UnsupportedError`.
 - Soft deleted related rows do not count.
   To count them, set `q.withTrashed = true` in the function.
 - The global scopes and the `onQuery` function of the relation are used.
