@@ -6496,7 +6496,7 @@ Change <code>APP_KEY</code> with no <code>previousKeys</code>. Every user is log
 <p><code>req.cookie(key)</code> returns <code>null</code> when the cookie was changed, was made with another <code>APP_KEY</code>, or was made for another cookie name.
 The cookie name is bound to the encrypted value, so a value can not be copied from one cookie to another.</p>
 <h2 id="how-it-works">How it works</h2>
-<p><code>AESEncryptor</code> uses AES-GCM.</p>
+<p><code>AESEncryptor</code> uses AES-256-GCM. The work runs in Rust (in <code>dox_http_native</code>), with the AES instructions of the CPU. One cookie takes about 1–2 µs.</p>
 <ul>
 <li>Each message gets a new random 12-byte nonce.</li>
 <li>The output is base64 of <code>nonce + encrypted text + tag</code>.</li>

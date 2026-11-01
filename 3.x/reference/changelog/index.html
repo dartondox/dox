@@ -8276,6 +8276,8 @@
 <h2 id="dox_core">dox_core</h2>
 <h3 id="unreleased">Unreleased</h3>
 <ul>
+<li>Perf: <code>AESEncryptor</code> (encrypted cookies, the cookie session, CSRF) now runs AES-GCM in Rust (<code>AesGcm</code> of dox_http_native 3.0.2), with the AES instructions of the CPU. One session cookie took about 116 µs to encrypt and 95 µs to decrypt, now about 1.7 µs and 0.9 µs. The output is the same, so cookies made before still open.</li>
+<li>Removed the <code>pointycastle</code> dependency. HKDF now uses HMAC-SHA256 of <code>package:crypto</code> (from the Dart team). The keys are the same.</li>
 <li>New: a path that has routes, but not for the request method, answers <code>405 Method Not Allowed</code> with an <code>Allow</code> header (like <code>Allow: GET, POST, HEAD</code>). Before, it was <code>404</code>.</li>
 <li>New: <code>abort(code, [message, headers])</code> and <code>HttpStatusException(code)</code> for any status. Common codes get a default <code>errorCode</code> and <code>message</code>. The <code>headers</code> are sent with the answer.</li>
 <li>New: <code>ForbiddenHttpException</code> (403) and <code>MethodNotAllowedHttpException</code> (405).</li>
