@@ -1,3 +1,7 @@
+## Unreleased
+
+- New: DTO file rules `@MinSize('10KB')`, `@MimeTypes(['image/png', 'image/*'])` and `@Dimensions(minWidth:, maxWidth:, minHeight:, maxHeight:, width:, height:, ratio:)`. They need the next dox_validation release. A bad size or a `@Dimensions()` with no limit stops the build.
+
 ## 3.0.2
 
 - **Breaking: column and JSON keys can change.** Please read this before you update.
