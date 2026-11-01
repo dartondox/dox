@@ -59,7 +59,9 @@ class Dox {
 
   /// cache stores from `config.cache`, made on first use in each isolate.
   /// `Cache()` uses it. replace it in tests.
-  late CacheManager cache = CacheManager(config.cache);
+  late CacheManager cache = CacheManager(
+    Cache.withAppPrefix(config.cache, Env.get<String>('APP_NAME')),
+  );
 
   /// total isolate to spawn
   int? _totalIsolate;

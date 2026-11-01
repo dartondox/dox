@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Change: a Redis cache store with no `prefix` gets `<app name>_cache:` from `APP_NAME` (like `my_shop_cache:`), so two apps on one Redis do not share keys or flush each other's cache. Existing Redis cache keys are not found once after the update. Rate limit counters, cache locks and `cache` driver sessions start fresh, so users with a `cache` driver session log in again. Set `'prefix': 'dox_cache:'` on the store to keep the old keys.
+- New: the `Cache()` facade has `flexible` and `touch`, and `remember` / `rememberForever` take `decode` and `lock`.
+- Perf: the route binder does not load a value again when a middleware already bound it, like `Can(param: 'post')` of dox_auth.
 - New: `RequestId` middleware. Each request gets an id in the `X-Request-Id` header and in `req.requestId`. A safe id from the client is kept. `LogMiddleware` lines have `request_id`, and `ExceptionHandler.report` can read `ExceptionHandler.requestId`.
 - New: `ETag` middleware. GET and HEAD answers with a body in memory get a weak `ETag`. A matching `If-None-Match` gets `304 Not Modified` with no body.
 - New: signed urls. `Route.signedUrl(name, params:, query:, expires:, absolute:, baseUrl:)` adds a `signature` (HMAC-SHA256 with the `dox:signed-url` key) and an optional `expires`. The `ValidateSignature` middleware answers `403` for a bad or expired url. Old keys from `AppConfig.previousKeys` still work.

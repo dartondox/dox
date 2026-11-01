@@ -34,7 +34,10 @@ class TestExceptionHandler extends ExceptionHandler {
   }
 }
 
+int finds = 0;
+
 Future<Person?> findPerson(String id) async {
+  finds++;
   return id == '404' ? null : Person(id);
 }
 
@@ -59,6 +62,14 @@ void main() {
     Route.get('/people/{person}', (DoxRequest req, Person person) {
       return <String, String>{'id': person.id};
     });
+    Route.get('/people/{person}/preloaded', <dynamic>[
+      (DoxRequest req) {
+        // like `Can(param: 'person')` of dox_auth: it loads the value first
+        req.boundValues['person'] = Person('from-middleware');
+        return req;
+      },
+      (DoxRequest req, Person person) => <String, String>{'id': person.id},
+    ]);
     Route.get('/people/{person}/raw', (DoxRequest req) {
       return <String, String>{'id': req.bound<Person>('person').id};
     });
@@ -101,6 +112,15 @@ void main() {
   group('route binding |', () {
     test('typed controller parameter gets the bound value', () async {
       expect(await get('/people/7'), (200, '{"id":"7"}'));
+    });
+
+    test('a value a middleware bound is not loaded again', () async {
+      finds = 0;
+      expect(await get('/people/9/preloaded'), (
+        200,
+        '{"id":"from-middleware"}',
+      ));
+      expect(finds, 0);
     });
 
     test('req.bound reads the bound value', () async {

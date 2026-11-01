@@ -7,6 +7,13 @@ targets:
       - benchmark/**
       - $package$
     builders:
+      # the model and DTO builder runs on lib/** by default. The DTOs of
+      # the tests and the benchmark are outside lib/.
+      dox_builder:
+        generate_for:
+          - lib/**
+          - test/dtos/**
+          - benchmark/**
       dox_builder:openapi:
         enabled: false
       dox_builder:dtos:

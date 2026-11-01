@@ -340,9 +340,11 @@ class ControllerPlan {
   }
 
   /// run the binders of the route, then the controller.
-  /// a binder that gives null answers 404.
+  /// a binder that gives null answers 404. a value a middleware already
+  /// bound (eg. `Can(param: 'post')` of dox_auth) is not loaded again.
   Future<dynamic> _bindThenCall(DoxRequest req) async {
     for (RouteParamBinder binder in binders) {
+      if (req.boundValues.containsKey(binder.param)) continue;
       Object? raw = req.param[binder.param];
       if (raw == null) continue; // an optional `{param?}` that is not set
       Object? value = await binder.resolve('$raw');

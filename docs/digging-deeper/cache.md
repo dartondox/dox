@@ -67,7 +67,7 @@ Each store is made once per isolate, the first time you use it.
 | `memory` | `max_size`: the most items. When it is full, the item that was used least recently is removed. No limit by default. Expired items are removed when read, and by a sweep after many writes (at least 1000). Also `prefix`. |
 | `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db` (default `0`), `tls` (`true`/`false`), `pool_size` (default 10), `max_value_bytes` (no limit by default), `prefix` |
 
-The default `prefix` is `dox_cache:`.
+A `redis` store with no `prefix` gets `<app name>_cache:` from `APP_NAME`, like `my_shop_cache:`. So two apps on one Redis do not share keys. The other drivers use `dox_cache:`.
 You rarely need `pool_size`: the cache sends no blocking commands, so each isolate uses about one Redis connection.
 
 ## Values are JSON
@@ -104,6 +104,17 @@ List<dynamic> posts = await Cache().remember(
 ```
 
 `rememberForever(key, fn)` does the same with no expiry.
+
+- `decode:` turns the stored JSON back into your type on a hit, like `decode: (j) => (j as List).cast<String>()`. Without it, use JSON types like `List<dynamic>`.
+- `lock: true` lets only one caller on all isolates and servers run the function. The others wait for its value.
+
+`flexible(key, fresh, stale, fn)` serves the value as it is for `fresh`. Then, until `stale` more has passed, it still serves the old value at once and runs `fn` once in the background:
+
+```dart
+Map<String, dynamic> stats = await Cache().flexible(
+  'stats', Duration(minutes: 1), Duration(minutes: 5), loadStats,
+);
+```
 
 ### `getRaw`
 
@@ -168,7 +179,8 @@ if (await lock.get()) {
 | `add(key, value, duration:)` | store only when the key is missing. `true` when it was stored |
 | `pull(key)` | get the value and remove it, in one step |
 | `increment(key, [by])` / `decrement(key, [by])` | change an integer. A missing key starts at 0 |
-| `repository` | the `dox_cache` `CacheStore`, for everything else, like `flexible`, `touch` and `remember` with `decode` or `lock` |
+| `touch(key, duration:)` | give a key a new expiry. `false` when it is missing |
+| `repository` | the `dox_cache` `CacheStore`, for everything else |
 
 See [dox_cache](../packages/cache.md) for custom drivers.
 

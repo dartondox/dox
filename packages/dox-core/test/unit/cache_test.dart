@@ -65,5 +65,69 @@ void main() {
       expect(data['name'], 'John');
       expect(data['age'], 16);
     });
+
+    test('remember with decode gives a typed list on a hit too', () async {
+      Future<List<String>> names() {
+        return Cache()
+            .store('memory')
+            .remember<List<String>>(
+              'typed-names',
+              null,
+              () => <String>['a', 'b'],
+              decode: (Object? json) => (json as List<dynamic>).cast<String>(),
+            );
+      }
+
+      expect(await names(), <String>['a', 'b']);
+      expect(await names(), <String>['a', 'b']);
+    });
+
+    test('touch and flexible reach the store', () async {
+      Cache memory = Cache().store('memory');
+      await memory.put('touch-me', 1);
+      expect(
+        await memory.touch('touch-me', duration: Duration(minutes: 1)),
+        isTrue,
+      );
+      expect(await memory.touch('not-there'), isFalse);
+      int runs = 0;
+      Future<int> stats() => memory.flexible<int>(
+        'stats',
+        Duration(minutes: 1),
+        Duration(minutes: 5),
+        () => ++runs,
+      );
+      expect(await stats(), 1);
+      expect(await stats(), 1);
+      expect(runs, 1);
+    });
+  });
+
+  group('Cache.withAppPrefix |', () {
+    CacheConfig config = CacheConfig(
+      defaultStore: 'redis',
+      stores: <String, Map<String, dynamic>>{
+        'redis': <String, dynamic>{'driver': 'redis'},
+        'own': <String, dynamic>{'driver': 'redis', 'prefix': 'mine:'},
+        'file': <String, dynamic>{'driver': 'file'},
+      },
+    );
+
+    test('a Redis store with no prefix gets the app name', () {
+      CacheConfig out = Cache.withAppPrefix(config, ' My Shop! ');
+      expect(out.stores['redis']!['prefix'], 'my_shop_cache:');
+      expect(out.stores['redis']!['driver'], 'redis');
+      expect(out.defaultStore, 'redis');
+    });
+
+    test('a given prefix and other drivers stay as they are', () {
+      CacheConfig out = Cache.withAppPrefix(config, 'shop');
+      expect(out.stores['own']!['prefix'], 'mine:');
+      expect(out.stores['file']!.containsKey('prefix'), isFalse);
+    });
+
+    test('no app name keeps the config', () {
+      expect(identical(Cache.withAppPrefix(config, '  '), config), isTrue);
+    });
   });
 }
