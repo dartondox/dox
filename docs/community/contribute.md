@@ -223,9 +223,12 @@ The `Docs check` workflow (`.github/workflows/docs-check.yaml`) runs on every pu
 
 ### Deploy
 
-- 3.x deploys by itself. The `Docs` workflow (`.github/workflows/docs.yaml`) runs on every push
-  to `main` that changes `docs/`, `hooks/`, `overrides/`, a package `CHANGELOG.md`, `mkdocs.yml`, `requirements-docs.txt` or the workflow.
+- 3.x deploys with each release. The `Docs` workflow (`.github/workflows/docs.yaml`) runs on a
+  `v<version>` tag, the same tag that publishes the packages. So docs for a feature that is not released yet stay off the site.
   It runs `mike deploy --update-aliases 3.x latest`.
+- To deploy the docs only (a typo fix, or the docs of a package from another repo that was just released),
+  push a `docs-v<version>` tag on `main`, like `git tag docs-v3.0.1-1 && git push origin docs-v3.0.1-1`.
+  It publishes no package and runs no tests.
 - After each deploy, the workflow writes small redirect pages for the old root links,
   the root `index.html`, a `404.html` and the `CNAME` file. So `dartondox.dev` and old links keep working.
 - The workflow pushes with the built-in `GITHUB_TOKEN`. This works because `gh-pages` is not a protected branch.
