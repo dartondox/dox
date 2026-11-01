@@ -7,7 +7,7 @@
 - Fix: a `Range`, `If-Modified-Since` or `If-None-Match` header sent on two lines no longer gives `500`.
 - Fix: a static file `304` has the file's content type, not `text/plain`.
 - New: `AppConfig.idleTimeout`. A keep-alive connection with no new request for this long is closed. Default 30 seconds, as before. Behind a load balancer, set it longer than the balancer's idle timeout (eg. 65 seconds for AWS ALB). Needs dox_http_native 3.0.3.
-- New: `AppConfig.maxConnections`. Each isolate holds at most this many connections open. When it is full, new clients wait in the OS listen queue until one closes. This stops a flood of idle sockets from using up all file descriptors. Default no limit, as before. Needs dox_http_native 3.0.3.
+- New: `AppConfig.maxConnections`. The most connections one isolate holds open at once. Must be 1 or more (0 or less throws an `ArgumentError` when the server starts). When it is full, new clients wait in the OS listen queue (about 1024) until a connection closes. After that, the OS drops new connections. On Linux each new client goes to one isolate (`SO_REUSEPORT`), so it can wait for a full isolate even when others have room. Default no limit, as before. Needs dox_http_native 3.0.3.
 - New: `Route.websocket(maxMessageSize:)`. A bigger message closes the socket with 1009. Default 16 MB, as before.
 
 ## 3.0.2
