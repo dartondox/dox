@@ -218,6 +218,47 @@ void main() {
       );
     });
 
+    test('blank text and an empty list are missing', () async {
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{
+          'type': 'company',
+          'company': '  ',
+        }),
+        <String, String>{
+          'company': 'The company is required when type is company',
+        },
+      );
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{
+          'tag_source': 'import',
+          'tags': <String>[],
+        }),
+        <String, String>{
+          'tags': 'The tags is required when tag_source is present',
+        },
+      );
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{
+          'tag_source': 'import',
+          'tags': <String>['x'],
+        }),
+        isEmpty,
+      );
+    });
+
+    test('requiredIf with an enum value', () async {
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{'role': 'admin'}),
+        <String, String>{
+          'admin_code': 'The admin_code is required when role is admin',
+        },
+      );
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{'role': 'user'}),
+        isEmpty,
+      );
+    });
+
     test('requiredWith on a Maybe field, from a query string', () async {
       expect(
         await errorsOf($MoreRulesDto, <String, dynamic>{

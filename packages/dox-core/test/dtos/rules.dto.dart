@@ -344,6 +344,14 @@ class MoreRules {
   @Json()
   final String? meta;
 
+  final Role? role;
+
+  @RequiredIf('role', Role.admin)
+  final String? adminCode;
+
+  @RequiredWith(<String>['tag_source'])
+  final List<String>? tags;
+
   @Digits(4)
   final String? pin;
 
@@ -365,6 +373,9 @@ class MoreRules {
     this.countryCode = const Maybe<String>.missing(),
     this.phone,
     this.meta,
+    this.role,
+    this.adminCode,
+    this.tags,
     this.pin,
     this.code,
     this.day,

@@ -169,10 +169,10 @@ class DtoWriter {
       } else if (!field.type.nullable) {
         out.writeln('if ($c == null) s.required(p, $key, _m);');
       }
+      // requiredWhen checks if the value is missing (blank text and an
+      // empty list count as missing too)
       for (DtoRule rule in field.requiredWhen) {
-        out.writeln(
-          'if ($c == null || $c is Undefined) s.requiredWhen(${rule.source}, input, p, $key, _m);',
-        );
+        out.writeln('s.requiredWhen(${rule.source}, $c, input, p, $key, _m);');
       }
     }
     out.writeln('if (s.issues.length != e) return null;');

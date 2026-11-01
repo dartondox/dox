@@ -265,13 +265,13 @@ class A {
         expect(
           code,
           contains(
-            "if(c1==null||c1isUndefined)s.requiredWhen(constRequiredIf('type','company'),input,p,'company',_m,);",
+            "s.requiredWhen(constRequiredIf('type','company'),c1,input,p,'company',_m,);",
           ),
         );
         expect(
           code,
           contains(
-            "if(c2==null||c2isUndefined)s.requiredWhen(constRequiredWith(<String>['type']),input,p,'size',_m,);",
+            "s.requiredWhen(constRequiredWith(<String>['type']),c2,input,p,'size',_m,);",
           ),
         );
       },
