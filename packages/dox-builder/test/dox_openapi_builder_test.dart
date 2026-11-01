@@ -97,6 +97,9 @@ class CreateUser {
   @Regex('[a-z]+')
   final String host;
 
+  @AlphaDash()
+  final String slug;
+
   final String? firstName;
 
   @MinItems(1)
@@ -110,6 +113,7 @@ class CreateUser {
     this.age = 18,
     this.role = Role.user,
     required this.host,
+    required this.slug,
     required this.addresses,
     this.firstName,
   });
@@ -593,11 +597,12 @@ tags: <String>['User'],'''),
 'age': <String, dynamic>{'type': 'integer', 'minimum': 18, 'maximum': 130, 'default': 18},
 'role': <String, dynamic>{'type': 'string', 'enum': <dynamic>['admin', 'user'], 'default': 'user'},
 'host': <String, dynamic>{'type': 'string', 'pattern': '^(?:[a-z]+)\\\$'},
+'slug': <String, dynamic>{'type': 'string', 'pattern': '^[a-zA-Z0-9_-]+\\\$'},
 'first_name': <String, dynamic>{'type': <dynamic>['string', 'null']},
 'addresses': <String, dynamic>{'type': 'array',
 'items': <String, dynamic>{'\\\$ref': '#/components/schemas/Address'},
 'minItems': 1, 'maxItems': 3}},
-'required': <dynamic>['name', 'email', 'host', 'addresses']}'''),
+'required': <dynamic>['name', 'email', 'host', 'slug', 'addresses']}'''),
         ),
       );
     });

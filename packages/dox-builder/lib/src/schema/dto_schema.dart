@@ -116,7 +116,7 @@ class DtoJsonSchema {
       case 'AlphaNumeric':
         return <String, dynamic>{'pattern': r'^[a-zA-Z0-9]+$'};
       case 'AlphaDash':
-        return <String, dynamic>{'pattern': r'^[a-zA-Z_-]+$'};
+        return <String, dynamic>{'pattern': r'^[a-zA-Z0-9_-]+$'};
       case 'In':
         return <String, dynamic>{'enum': _values(rule)};
       case 'NotIn':
