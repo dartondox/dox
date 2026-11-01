@@ -109,6 +109,10 @@ void main() {
         ]);
       });
       Route.get('/file', (DoxRequest req) => bigFile);
+      Route.get(
+        '/file-etag',
+        (DoxRequest req) => DoxResponse(bigFile).header('ETag', '"v1"'),
+      );
       Route.get('/ip', (DoxRequest req) {
         return <String, dynamic>{'ip': req.ip(), 'scheme': req.scheme()};
       });
@@ -301,6 +305,24 @@ void main() {
         headers: <String, String>{'range': 'bytes=-$huge'},
       );
       expect(bigTail.body, '0123456789abcdefghij');
+    });
+
+    test('If-Range with a strong ETag keeps the Range', () async {
+      Uri url = Uri.parse('$baseUrl/file-etag');
+      http.Response part = await http.get(
+        url,
+        headers: <String, String>{'range': 'bytes=0-1', 'if-range': '"v1"'},
+      );
+      expect(part.statusCode, 206);
+      expect(part.body, '01');
+      for (String ifRange in <String>['"v2"', 'W/"v1"']) {
+        http.Response full = await http.get(
+          url,
+          headers: <String, String>{'range': 'bytes=0-1', 'if-range': ifRange},
+        );
+        expect(full.statusCode, 200, reason: ifRange);
+        expect(full.body, '0123456789abcdefghij', reason: ifRange);
+      }
     });
 
     test('trusted proxy: X-Forwarded-For and X-Forwarded-Proto', () async {

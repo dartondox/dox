@@ -208,11 +208,15 @@ String? singleHeader(HttpHeaders headers, String name) {
   return values != null && values.length == 1 ? values.first : null;
 }
 
-/// true when `If-Range` is a date equal to the `Last-Modified` of [res]
+/// true when `If-Range` is the strong `ETag` of [res] (same text), or a
+/// date equal to its `Last-Modified`. A weak ETag never matches.
 bool _ifRangeMatches(HttpRequest request, HttpResponse res) {
   String? given = singleHeader(request.headers, HttpHeaders.ifRangeHeader);
+  if (given == null) return false;
+  String? etag = res.headers.value(HttpHeaders.etagHeader);
+  if (etag != null && !etag.startsWith('W/') && given == etag) return true;
   String? modified = res.headers.value(HttpHeaders.lastModifiedHeader);
-  if (given == null || modified == null) return false;
+  if (modified == null) return false;
   try {
     return HttpDate.parse(given) == HttpDate.parse(modified);
   } on Exception {
@@ -239,9 +243,9 @@ Future<void> _sendFile(File file, HttpRequest request) async {
 
   String? range = singleHeader(request.headers, HttpHeaders.rangeHeader);
 
-  /// `If-Range` keeps the Range only when it is the `Last-Modified` date
-  /// of this file. An ETag never matches: ours are weak, and If-Range
-  /// needs a strong one (RFC 9110). Else the whole file is sent.
+  /// `If-Range` keeps the Range only when it is the strong `ETag` or the
+  /// `Last-Modified` date of this file. A weak ETag never matches
+  /// (RFC 9110). Else the whole file is sent.
   if (request.headers[HttpHeaders.ifRangeHeader] != null &&
       !_ifRangeMatches(request, res)) {
     range = null;
