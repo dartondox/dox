@@ -221,10 +221,10 @@ packages:
     dependency: transitive
     description:
       name: dox_http_native
-      sha256: d50bd45b9c03aa5acb9b073111e936719fc1660570b7235805f890727c543177
+      sha256: "6c59ad187c185f742de9a17e76eaf3b9a6b7eb9dafc0632ae61992f9a9b0dd73"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0"
+    version: "3.0.2"
   dox_openapi:
     dependency: transitive
     description:
@@ -449,14 +449,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.6"
-  pointycastle:
-    dependency: transitive
-    description:
-      name: pointycastle
-      sha256: "92aa3841d083cc4b0f4709b5c74fd6409a3e6ba833ffc7dc6a8fee096366acf5"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.0"
   pool:
     dependency: transitive
     description:

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dox_core/app.dart';
-import 'package:pointycastle/export.dart';
+import 'package:crypto/crypto.dart';
 
 /// Makes keys for one purpose from one secret, with HKDF-SHA256
 /// (RFC 5869).
@@ -71,8 +71,6 @@ class KeyDerivation {
   }
 
   static Uint8List _hmac(List<int> key, List<int> data) {
-    HMac mac = HMac(SHA256Digest(), 64)
-      ..init(KeyParameter(Uint8List.fromList(key)));
-    return mac.process(Uint8List.fromList(data));
+    return Uint8List.fromList(Hmac(sha256, key).convert(data).bytes);
   }
 }

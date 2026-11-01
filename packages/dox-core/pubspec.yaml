@@ -8,8 +8,8 @@ environment:
 resolution: workspace
 
 dependencies:
-  pointycastle: ^4.0.0
   bcrypt: ^1.2.0
+  crypto: ^3.0.7
   path: ^1.9.1
   matcher: ^0.12.20
   mime: ^2.1.0

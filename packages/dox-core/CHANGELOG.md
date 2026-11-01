@@ -1,6 +1,7 @@
 ## Unreleased
 
 - Perf: `AESEncryptor` (encrypted cookies, the cookie session, CSRF) now runs AES-GCM in Rust (`AesGcm` of dox_http_native 3.0.2), with the AES instructions of the CPU. One session cookie took about 116 µs to encrypt and 95 µs to decrypt, now about 1.7 µs and 0.9 µs. The output is the same, so cookies made before still open.
+- Removed the `pointycastle` dependency. HKDF now uses HMAC-SHA256 of `package:crypto` (from the Dart team). The keys are the same.
 - New: a path that has routes, but not for the request method, answers `405 Method Not Allowed` with an `Allow` header (like `Allow: GET, POST, HEAD`). Before, it was `404`.
 - New: `abort(code, [message, headers])` and `HttpStatusException(code)` for any status. Common codes get a default `errorCode` and `message`. The `headers` are sent with the answer.
 - New: `ForbiddenHttpException` (403) and `MethodNotAllowedHttpException` (405).
