@@ -4,6 +4,7 @@ import 'dart:math' as math;
 
 import 'package:dox_cache/dox_cache.dart' show CacheConstants, MemoryDriver;
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/router/route_data.dart';
 
 /// Gives the name of the client to count requests for, eg. its ip.
 typedef RateLimitKey = String Function(DoxRequest req);
@@ -22,7 +23,8 @@ typedef RateLimitKey = String Function(DoxRequest req);
 ///
 /// The counts live in the cache. When the default cache store of the app
 /// is Redis, the counts are shared by all isolates and servers. Else they
-/// live in memory, in each isolate.
+/// live in memory, in each isolate: with N isolates a client can send up
+/// to N x [max] requests. `Dox().startServer()` logs a warning then.
 ///
 /// It is a fixed window: the counter starts again at each new window
 /// (eg. each new minute). So a client can send up to 2 x [max] requests
@@ -72,6 +74,41 @@ class RateLimit implements IDoxMiddleware {
   static final CacheStore _memory = CacheStore(MemoryDriver());
 
   static String _byIp(DoxRequest req) => req.ip();
+
+  /// True when the counts live in the memory of each isolate. Then with
+  /// N isolates a client can send up to N x [max] requests.
+  bool get countsPerIsolate {
+    if (cacheStore != null) return false;
+    CacheConfig config = Dox().config.cache;
+    String? storeName = store;
+    if (storeName == null) {
+      Object? driver = config.stores[config.defaultStore]?['driver'];
+      return driver != CacheConstants.redisDriver;
+    }
+    return config.stores[storeName]?['driver'] == CacheConstants.memoryDriver;
+  }
+
+  /// A warning when a [RateLimit] in [routes] counts per isolate and the
+  /// app runs more than one isolate. Null when all is fine.
+  /// `Dox().startServer()` logs it once.
+  static String? perIsolateWarning(Iterable<RouteData> routes, int isolates) {
+    if (isolates < 2) return null;
+    Set<String> names = <String>{};
+    for (RouteData route in routes) {
+      Object? list = route.controllers;
+      if (list is! List<dynamic>) continue;
+      for (Object? item in list) {
+        if (item is RateLimit && item.countsPerIsolate) {
+          names.add('RateLimit(max: ${item.max}) on ${route.path}');
+        }
+      }
+    }
+    if (names.isEmpty) return null;
+    return 'RateLimit counts in the memory of each isolate, and the app '
+        'runs $isolates isolates. So a client can send up to $isolates x '
+        'max requests. Use a Redis cache store (the default store or '
+        '`store:`) to share the counts. Found: ${names.join(', ')}';
+  }
 
   @override
   Future<dynamic> handle(IDoxRequest req) async {

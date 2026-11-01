@@ -95,6 +95,12 @@ The counts are kept in the [cache](../digging-deeper/cache.md):
 - Else the counts are in **memory**. Each isolate has its own counts. With 4 isolates a client can send up to 4 x `max` requests.
   This is also true for the default `file` store of a new app.
 
+!!! warning "Without Redis, the limit is per isolate"
+    Dox runs one isolate per CPU core by default. Without Redis each isolate counts on its own.
+    So `RateLimit(max: 5)` on an 8 core server really lets a client send up to 40 requests.
+    When this is the case, `Dox().startServer()` logs a warning that lists each such `RateLimit`.
+    For a real limit, use a Redis store, or run one isolate (`totalIsolate: 1`).
+
 To use one store by name, pass `store`:
 
 ```dart
