@@ -48,7 +48,7 @@ Then the other isolates store the class name, and `@MorphTo` throws there.
 class MorphMapProvider extends DoxProvider {
   @override
   void setup() {
-    Relation.morphMap(<String, Model<dynamic> Function()>{
+    Model.morphMap(<String, Model<dynamic> Function()>{
       'photo': Photo.new,
       'video': Video.new,
     });
@@ -62,13 +62,13 @@ A queue worker or a CLI command that reads these relations must call it too.
 - Without a map, `@MorphMany` and `@MorphOne` store the class name, like `Photo`.
 - Use a morph map in production. The class name changes when you rename the class, or when you build with `--obfuscate`. Then the old rows do not match.
 - Do not change a type name later. The rows in the table keep the old name.
-- `Relation.morphMap(map, merge: false)` removes the names you set before.
+- `Model.morphMap(map, merge: false)` removes the names you set before.
 
 Two helpers read the map:
 
 ```dart
-String type = Relation.morphTypeOf(Photo()); // 'photo'
-Model<dynamic> model = Relation.morphModel('video'); // a new Video()
+String type = Model.morphTypeOf(Photo()); // 'photo'
+Model<dynamic> model = Model.morphModel('video'); // a new Video()
 ```
 
 ## Define it
@@ -141,13 +141,13 @@ Run `dart run build_runner build` after you add a relationship.
 ## Save a row
 
 There is no `associate()`. Set the two columns yourself.
-Use `Relation.morphTypeOf()` for the type, so it is the same as the morph map.
+Use `Model.morphTypeOf()` for the type, so it is the same as the morph map.
 
 ```dart
 Comment comment = Comment()
   ..body = 'Nice'
   ..commentableId = photo.id
-  ..commentableType = Relation.morphTypeOf(photo);
+  ..commentableType = Model.morphTypeOf(photo);
 await comment.save();
 ```
 

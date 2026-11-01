@@ -179,7 +179,9 @@ The ids can be:
 - a list of ids or models: `[1, 2, song]`
 - a map of `id => pivot values`: `{1: {'role': 'singer'}, 2: {}}`
 
-`null` means no ids, and a `null` id is skipped. So `attach('songs', null)` adds nothing, and `sync('songs', null)` deletes every link, like `sync('songs', [])`.
+`null` means no ids. So `attach('songs', null)` adds nothing, and `sync('songs', null)` deletes every link, like `sync('songs', [])`.
+A `null` id or a model that is not saved is skipped by `attach`, `detach`, `toggle` and `syncWithoutDetaching`.
+`sync` throws an `ArgumentError` for one, before it changes anything, because it would delete every other link.
 Each id is used once: `[1, 1, '1']` adds one row.
 
 ### `attach`
@@ -218,10 +220,11 @@ Makes the pivot rows match the ids.
 - It deletes the rows of the ids that are not in the list.
 - It sets the pivot values of the rows that are already there, when a value changed. `updated` has those ids.
 
-It returns a `SyncResult` with the ids of each change.
+It returns a `PivotSyncResult` with the ids of each change.
+A number id is an `int` in the result, also when you gave `'3'`.
 
 ```dart
-SyncResult result = await artist.sync('songs', <int>[1, 2, 3]);
+PivotSyncResult result = await artist.sync('songs', <int>[1, 2, 3]);
 print(result.attached); // ids that got a new row
 print(result.detached); // ids whose row was deleted
 print(result.updated);  // ids whose pivot values changed
@@ -237,7 +240,7 @@ await artist.syncWithoutDetaching('songs', <int>[4]);
 
 Adds a row for each id that has none.
 Deletes the row of each id that has one.
-It returns a `SyncResult` with `attached` and `detached`.
+It returns a `PivotSyncResult` with `attached` and `detached`.
 
 ```dart
 await artist.toggle('songs', <int>[1, 2]);
