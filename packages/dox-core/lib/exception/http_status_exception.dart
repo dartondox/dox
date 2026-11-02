@@ -26,7 +26,7 @@ class HttpStatusException extends IHttpException {
 
 /// Stop the request and answer with [code].
 /// ```
-/// if (post.userId != req.auth?.id) abort(403);
+/// if (post.userId != req.auth?.id()) abort(403);
 /// abort(404, 'No post with this id');
 /// ```
 Never abort(

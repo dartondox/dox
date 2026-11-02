@@ -100,7 +100,7 @@ A `ValidationException` from `dox_validation` (thrown by `schema.parse()` in a c
 `abort(code)` stops the request and answers with that status. It throws an `HttpStatusException`.
 
 ```dart
-if (post.userId != req.auth?.id) abort(403);
+if (post.userId != req.auth?.id()) abort(403);
 abort(404, 'No post with this id');
 throw HttpStatusException(503, headers: {'retry-after': '60'});
 ```

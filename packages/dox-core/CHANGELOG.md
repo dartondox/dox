@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Docs: the `abort` example now uses `req.auth?.id()`. `req.auth?.id` does not exist.
 - New: `MethodOverride` middleware. Add it to `AppConfig.globalMiddleware`, and a POST request with a `_method` field of `PUT`, `PATCH` or `DELETE` goes to the route of that method. So a plain HTML form can reach `Route.put`, `Route.patch`, `Route.delete` and `Route.resource` routes. `req.method` gives the new method. `CsrfMiddleware` still checks the request. Other `_method` values and other request methods are ignored. It is off when the middleware is not there.
 - Fix: `res.header(name, value)` now replaces a header with the same name in any case, like `withHeaders` does. Before, `header('Cache-Control', ..)` after `cache()` sent two `Cache-Control` values.
 - Removed the unused `middlewareAndControllerHandler` and `getDoxRequest` helpers.
