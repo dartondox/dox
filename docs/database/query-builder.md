@@ -1045,6 +1045,7 @@ int count = await Actor()
 - An empty map runs no query and returns 0.
 - On a model, keys that `fillable` and `guarded` do not allow are dropped. A model with no `fillable` throws, see [mass assignment](model/index.md#mass-assignment).
   When no key is left, it runs no query and returns 0.
+  To set every key of the map, use `forceUpdate()`, see [skip the fillable check](model/index.md#skip-the-fillable-check).
 - Postgres and SQLite count every row that the `where` part matched.
 - MySQL and MariaDB count only the rows that really changed.
   A row that already has the new values counts 0.
