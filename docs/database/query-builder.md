@@ -221,6 +221,8 @@ print(page.prevCursor); // send it back as `cursor` to read the page before
   Or use `column` and `direction`: `cursorPaginate(perPage: 10, column: 'created_at', direction: 'desc')`.
 - The primary key is added as the last order column, so rows with the same value are never skipped.
 - `orderBy()` together with `column`, `orderByRaw()` and `inRandomOrder()` throw a `StateError`.
+- It does not work on a [`union`](#union) or a [`fromSub`](#fromsub) query. It throws a `StateError` there.
+  Use `paginate()` or `simplePaginate()`.
 - The order columns must be in the select, and they must have no `null` values.
 - The cursor is safe to take from a user. The columns and the order come from your code.
   The values of the cursor are only sent as query values, never as SQL.
@@ -262,6 +264,8 @@ await Actor().where('age', '>', 100).chunkById(100, (List<Actor> actors) async {
 
 - `chunkById()` reads the rows after the last id: `WHERE "id" > @last`.
 - It orders by the id itself. A query with `orderBy()` throws a `StateError`.
+- `chunkById()` does not work on a [`union`](#union) or a [`fromSub`](#fromsub) query. It throws a `StateError` there.
+  Use `chunk()`.
 - To use another column, add `column: 'uuid'`. The column must be unique.
 
 ## Aggregates
@@ -405,6 +409,21 @@ await Actor().where('age', 60).orWhereNotIn('id', <int>[1, 2]).get();
   parameter: `"id" = ANY(@id_p0)` (`<> ALL` for `whereNotIn`).
 - An empty list matches no rows for `whereIn`, and all rows for `whereNotIn`.
 
+The list can also be another `Iterable`, like a `Set`.
+The value can also be a query that selects one column.
+Its values are bound too.
+
+```dart
+await Actor()
+    .whereIn('id', QueryBuilder.table('award').select('actor_id').where('year', 2024))
+    .get();
+// WHERE "id" IN (SELECT "actor_id" FROM "award" WHERE "year" = @dox_sub0_year_p0)
+```
+
+- The sub query is built when it is added. A change to it after `whereIn` is not used.
+  This is the same for `joinSub`, `fromSub` and `union`.
+- MySQL and MariaDB do not allow `LIMIT` in an `IN (sub query)`.
+
 ### `whereNull` and `whereNotNull`
 
 ```dart
@@ -494,6 +513,72 @@ await User()
     The subquery does not use global scopes or soft deletes.
     Add those conditions in the function, for example `q.whereNull('deleted_at')`.
     For a relation of a model, [`whereHas`](model/relation-queries.md) is shorter.
+
+### `whereDate`, `whereTime`, `whereYear`, `whereMonth` and `whereDay`
+
+They compare one part of a date or datetime column.
+Like `where`, they take an optional operator.
+
+```dart
+await Actor().whereDate('created_at', '2024-05-01').get();
+await Actor().whereDate('created_at', '>=', DateTime(2024, 5, 1)).get();
+await Actor().whereTime('created_at', '>', '18:00:00').get();
+await Actor().whereYear('created_at', 2024).get();
+await Actor().whereMonth('created_at', 5).get();
+await Actor().whereDay('created_at', 15).get();
+```
+
+- `whereDate` takes a `DateTime` or a `yyyy-mm-dd` string.
+- `whereTime` takes a `DateTime` or a `hh:mm:ss` string.
+- `whereYear`, `whereMonth` and `whereDay` take an `int`, a number string or a `DateTime`.
+- Each one has an `or` form, like `orWhereDate`.
+- The column is read as it is stored. On SQLite and Postgres, Dox stores a `DateTime` in UTC.
+- A `DateTime` value is compared the same way `where` binds it:
+  in UTC on SQLite and Postgres, and as the wall clock on MySQL and MariaDB.
+- On Postgres, a `timestamptz` is read in the session time zone (UTC by default).
+  If the connection sets another `timeZone`, a `DateTime` value does not match.
+- On Postgres, a column with fractions of a second does not equal a time without them.
+  For example, `10:00:00.5` is not `10:00:00`. Laravel works the same way.
+
+| Database | `whereDate` | `whereYear` |
+| --- | --- | --- |
+| Postgres | `CAST(col AS date)` | `EXTRACT(year FROM col)` |
+| MySQL, MariaDB | `DATE(col)` | `YEAR(col)` |
+| SQLite | `date(col)` | `strftime('%Y', col)` |
+
+### `whereJsonContains` and `whereJsonDoesntContain`
+
+`whereJsonContains` keeps the rows where a JSON column has the value.
+For a JSON array, the value is one item. A list value needs all its items.
+
+```dart
+await Actor().whereJsonContains('tags', 'action').get();
+await Actor().whereJsonContains('tags', <String>['action', 'drama']).get();
+
+// a key inside the JSON
+await Actor().whereJsonContains('options->languages', 'en').get();
+
+await Actor().whereJsonDoesntContain('tags', 'horror').get();
+```
+
+- `column->key` reads a key inside the JSON. Keys can have letters, digits and `_`.
+  Any other key throws an `ArgumentError`.
+- Each one has an `or` form, like `orWhereJsonContains`.
+
+| Database | SQL |
+| --- | --- |
+| Postgres | `CAST(col AS jsonb) @> CAST(@value AS jsonb)` |
+| MySQL, MariaDB | `JSON_CONTAINS(col, @value)` |
+| SQLite | `EXISTS (SELECT 1 FROM json_each(col) WHERE value = @value)` |
+
+!!! note
+    On SQLite, the value must be a string, a number, a bool or a list of them.
+    A map throws an `ArgumentError`.
+    SQLite stores `true` as `1`, so `true`, `1` and `1.0` match each other there.
+
+!!! note
+    `whereJsonDoesntContain` on a row that does not have the key is not the same on every database.
+    SQLite and MariaDB keep the row. Postgres and MySQL drop it. Laravel works the same way.
 
 ### `whereRaw` and `orWhereRaw`
 
@@ -708,6 +793,77 @@ await Actor().rightJoinRaw(
 !!! note
     SQLite before 3.39 has no `RIGHT JOIN`.
 
+### `joinSub` and `leftJoinSub`
+
+They join the rows of another query.
+The second argument is the name of those rows.
+
+```dart
+QueryBuilder<Map<String, dynamic>> latest = QueryBuilder.table('post')
+    .selectRaw('actor_id, MAX(created_at) as last_post')
+    .groupBy('actor_id');
+
+await Actor()
+    .joinSub(latest, 'latest', 'latest.actor_id', 'actor.id')
+    .get();
+// JOIN (SELECT actor_id, MAX(created_at) as last_post FROM "post"
+//   GROUP BY "actor_id") AS "latest" on "latest"."actor_id" = "actor"."id"
+
+await Actor()
+    .leftJoinSub(latest, 'latest', 'latest.actor_id', '=', 'actor.id')
+    .get();
+```
+
+### `fromSub`
+
+`fromSub` reads from the rows of another query, not from a table.
+
+```dart
+QueryBuilder<Map<String, dynamic>> totals = QueryBuilder.table('order')
+    .selectRaw('actor_id, SUM(amount) as total')
+    .groupBy('actor_id');
+
+List<Map<String, dynamic>> rows = await QueryBuilder.table('totals')
+    .fromSub(totals, 'totals')
+    .where('total', '>', 100)
+    .get();
+// SELECT * FROM (SELECT ... GROUP BY "actor_id") AS "totals"
+// WHERE "total" > @total_p0
+```
+
+The name is also the table name of the query, so `totals.total` works in `where` and `orderBy`.
+
+## Union
+
+`union` adds the rows of another query.
+It drops rows that are the same. `unionAll` keeps them, and it is faster.
+
+```dart
+List<Actor> actors = await Actor()
+    .where('age', '<', 18)
+    .union(Actor().where('age', '>', 60))
+    .orderBy('name')
+    .get();
+// SELECT * FROM "actor" WHERE "age" < @age_p0
+// UNION SELECT * FROM (SELECT * FROM "actor" WHERE "age" > @dox_sub0_age_p0) AS "dox_union0"
+// ORDER BY "name"
+
+await QueryBuilder.table('actor')
+    .select('name')
+    .unionAll(QueryBuilder.table('director').select('name'))
+    .get();
+```
+
+- Both queries must select the same number of columns.
+- `orderBy`, `limit` and `offset` of the first query sort and cut the whole result.
+  Use a plain column name in `orderBy`, not `table.column`.
+- The added query can have its own `orderBy` and `limit`.
+- `count()`, `paginate()`, `sum()`, `avg()`, `min()` and `max()` use the whole result:
+  `SELECT SUM("age") as dox_aggregate FROM (...) as dox_union_aggregate`.
+- `sum()`, `avg()`, `min()` and `max()` keep `orderBy`, `limit` and `offset`. `count()` does not.
+- `cursorPaginate()` and `chunkById()` do not work on a union. They throw a `StateError`.
+  Use `paginate()`, `simplePaginate()` or `chunk()`.
+
 ## Row locks
 
 `lockForUpdate()` and `sharedLock()` lock the rows that a select reads.
@@ -808,6 +964,28 @@ int count = await Flight().upsert(
     MySQL and MariaDB do not use the unique columns you give.
     Any unique index of the table can find the old row.
     Postgres throws when two rows of one call have the same unique values.
+
+### `insertOrIgnore`
+
+`insertOrIgnore` inserts rows and skips the rows that clash with a unique key.
+It returns the number of inserted rows.
+
+```dart
+int added = await QueryBuilder.table('tag').insertOrIgnore(<Map<String, dynamic>>[
+  <String, dynamic>{'name': 'action'},
+  <String, dynamic>{'name': 'drama'},
+]);
+```
+
+- Every row must have the same keys. Otherwise it throws an `ArgumentError`.
+- On a model, keys that `fillable` and `guarded` do not allow are dropped. A model with no `fillable` throws, see [mass assignment](model/index.md#mass-assignment).
+- It fires no [model events](model/events.md).
+
+| Database | SQL | Also skips |
+| --- | --- | --- |
+| Postgres | `ON CONFLICT DO NOTHING` | nothing else |
+| SQLite | `INSERT OR IGNORE` | rows that break a `NOT NULL` or `CHECK` rule |
+| MySQL, MariaDB | `INSERT IGNORE` | some bad values become a warning, for example text that is too long is cut |
 
 ### `firstOrCreate`, `firstOrNew` and `updateOrCreate`
 

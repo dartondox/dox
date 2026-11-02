@@ -214,6 +214,7 @@ See [Model](../database/model/index.md).
 | `DB::table('users')->get()` | `await QueryBuilder.table('users').get()` |
 | `->where('a', 1)->orWhere('b', 2)` | `.where('a', 1).orWhere('b', 2)` |
 | `->whereIn('id', [1, 2])` | `.whereIn('id', <int>[1, 2])` |
+| `->whereIn('id', $subQuery)` | `.whereIn('id', subQuery)` |
 | `->whereNull('deleted_at')` | `.whereNull('deleted_at')` |
 | `->where(fn ($q) => $q->where(...)->orWhere(...))` | `.whereGroup((QueryBuilder<Blog> q) { q.where(...).orWhere(...); })` |
 | `->orWhere(fn ($q) => ...)` | `.orWhereGroup((QueryBuilder<Blog> q) { ... })` |
@@ -222,6 +223,8 @@ See [Model](../database/model/index.md).
 | `->whereColumn('a', '>', 'b')` | `.whereColumn('a', '>', 'b')` |
 | `->whereLike('name', '%a%')` | `.whereLike('name', '%a%')` |
 | `->whereExists(fn ($q) => $q->from('post')->...)` | `.whereExists('post', (QueryBuilder<Map<String, dynamic>> q) { ... })` |
+| `->whereDate('created_at', '2024-05-01')`, `->whereYear(...)` | `.whereDate('created_at', '2024-05-01')`, `.whereYear(...)` |
+| `->whereJsonContains('tags', 'a')` | `.whereJsonContains('tags', 'a')` |
 | `->when($cond, fn ($q) => ...)` | `.when(cond, (QueryBuilder<Blog> q) { ... })` |
 | `->whereRaw('lower(name) = ?', [$n])` | `.whereRaw('lower(name) = @n', <String, dynamic>{'n': n})` |
 | `->select('id', 'name')` | `.select(<String>['id', 'name'])` |
@@ -230,6 +233,9 @@ See [Model](../database/model/index.md).
 | `->distinct()` | `.distinct()` |
 | `->having('a', '>', 1)`, `->havingRaw(...)` | `.having('a', '>', 1)`, `.havingRaw(...)` |
 | `->join('posts', 'posts.user_id', '=', 'users.id')` | `.join('posts', 'posts.user_id', 'users.id')` |
+| `->joinSub($q, 'alias', 'alias.id', '=', 'users.id')` | `.joinSub(q, 'alias', 'alias.id', 'users.id')` |
+| `->fromSub($q, 'alias')` | `.fromSub(q, 'alias')` |
+| `->union($q)`, `->unionAll($q)` | `.union(q)`, `.unionAll(q)` |
 | `->groupBy('age')` | `.groupBy('age')` on `QueryBuilder.table()` (returns maps) |
 | `->count()` | `await ....count()` |
 | `->sum('a')`, `->avg('a')`, `->min('a')`, `->max('a')` | `.sum('a')`, `.avg('a')`, `.min('a')`, `.max('a')` |
@@ -244,6 +250,7 @@ See [Model](../database/model/index.md).
 | `->insert([...])` | `.insertMultiple(<Map<String, dynamic>>[...])` |
 | `->update([...])` | `.update(<String, dynamic>{...})` (returns the changed rows as an `int`) |
 | `->increment('views', 5)`, `->decrement(...)` | `.increment('views', 5)`, `.decrement(...)` |
+| `->insertOrIgnore([...])` | `.insertOrIgnore(<Map<String, dynamic>>[...])` |
 | `->upsert([...], ['email'], ['name'])` | `.upsert(<Map<String, dynamic>>[...], <String>['email'], <String>['name'])` |
 | `->delete()` | `.delete()` (returns the deleted rows as an `int`) |
 | `->lockForUpdate()`, `->sharedLock()` | `.lockForUpdate()`, `.sharedLock()` |
