@@ -185,16 +185,26 @@ Ids match with one rule:
 - Two texts only match when the text is the same.
   So on a text key column, `'007'` and `'7'` are two ids.
   The ORM does not know the type of the key column, so `attach('songs', ['1', '01'])` adds two rows.
-- When one id is a number (`int` or `double`), the other one is read as a number, like the database reads it.
-  A text is read as an int first (`' 1'`, `'+1'`, `'01'`, `'0x1'`), then as a double (`'1.0'`, `'1.'`, `'1e0'`).
+- When one id is a number (`int` or `double`), Dart reads the other one as a number.
+  It trims the text, drops a `.0` end, and tries `int.tryParse` (`' 1'`, `'+1'`, `'01'`, `'1.0'`), then `double.tryParse` (`'1.'`, `'1e0'`).
   They match when the two numbers are the same.
   Rows of a number key column come back as numbers, so `sync('songs', ['01'])` keeps the row of song `1`.
-- One row is matched once. So `toggle('songs', ['1', '01'])` detaches song `1` once.
+- This is only how Dart matches ids. The databases read some texts in other ways.
+  For example, `'0x1'` is `1` in Dart and on Postgres, `0` on MariaDB, and an error on MySQL.
+  Postgres throws for `'1.0'`, `'1.'` and `'1e0'` on an integer column.
+- A text that only reads as a number past ±2^53, like `'1e20'`, is not exact.
+  It throws an `ArgumentError` when it is matched to a number.
+- Each id finds its own stored row when it can. A row with the same text wins, so on a text key `1` finds `'1'`, not `'01'`.
+  A stored row is matched once, so on a number key `toggle('songs', ['1', '01'])` detaches song `1` once.
+- `detach` and `updateExistingPivot` send every given id.
+  So on a text key, `detach('songs', [1, '01'])` deletes both rows.
+- `sync` deletes a stored row only when none of the given ids matches it.
+  So on a text key, `sync('songs', [1, '01'])` keeps the rows `'1'` and `'01'`.
+- A new row is added once for ids that are the same by this rule, and the first id wins.
+  So on a number key `attach('songs', [1, '01'])` adds one row. On a text key it adds only the row `1`.
 - A whole double within ±2^53, like `2.0`, is sent as the int `2`.
   Any other double, like `1.5`, NaN, infinity or `1e20`, throws an `ArgumentError`.
 - Text ids are sent to the database as they are.
-  A database that does not read the text as a number throws, as in `where()`.
-  For example, Postgres does not take `'1.0'` for an integer column.
 
 A `null` id or a model that is not saved is skipped by `attach`, `detach`, `toggle`, `syncWithoutDetaching` and `updateExistingPivot`.
 `sync` throws an `ArgumentError` for one, before it changes anything, because it would delete every other link.
