@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Fix: `.where('id', '^[0-9]+$')` now matches. A leading `^` and a trailing `$` are dropped. Before, they ended up inside the route regex, so the route never matched.
 - `req.pathIs()` and `req.routeIs()` build the regex of a pattern once, not on every call.
 - Fix: `req.pathIs()` gives false for a path with a bare `%` or a bad code like `%zz`. Before, it threw an error and the client got 500.
 - `req.boolean()` no longer makes a new set of true words on every call.

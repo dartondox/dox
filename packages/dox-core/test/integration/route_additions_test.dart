@@ -39,6 +39,14 @@ class ExtraRouter extends Router {
       'tag/{tag?}',
       (DoxRequest req) => 'tag ${req.param['tag']}',
     ).where('tag', '[a-z]+');
+    Route.get(
+      'code/{code}',
+      (DoxRequest req) => 'code ${req.param['code']}',
+    ).where('code', '^[0-9]+\$');
+    Route.get(
+      'price/{price}',
+      (DoxRequest req) => 'price ${req.param['price']}',
+    ).where('price', r'[0-9]+\$');
     Route.post('only-post', (DoxRequest req) => 'posted');
 
     Route.get('forgot', <dynamic>[Forgot(), (DoxRequest req) => 'controller']);
@@ -92,6 +100,14 @@ void main() {
   test('where picks the route by the param text', () async {
     (await client.get('/users/42')).expectBody('id 42');
     (await client.get('/users/bob')).expectBody('name bob');
+  });
+
+  test('where ignores a leading ^ and a trailing \$', () async {
+    (await client.get('/code/12')).expectBody('code 12');
+    (await client.get('/code/ab')).expectBody('fallback /code/ab');
+    // an escaped `\$` is a real dollar sign and stays
+    (await client.get('/price/5\$')).expectBody('price 5\$');
+    (await client.get('/price/5')).expectBody('fallback /price/5');
   });
 
   test('where can let a param match slashes', () async {

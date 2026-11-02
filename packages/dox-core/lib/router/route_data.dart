@@ -134,10 +134,26 @@ class RouteData {
   /// so they build the same pattern as before.
   Map<String, String>? wheres;
 
-  /// only match [param] when its text matches [regex], see `Route.where`
+  /// only match [param] when its text matches [regex], see `Route.where`.
+  /// A leading `^` and a trailing `$` are dropped: the regex must match
+  /// the whole param text anyway, and inside the route regex they would
+  /// never match.
   void where(String param, String regex) {
-    (wheres ??= <String, String>{})[param] = regex;
+    (wheres ??= <String, String>{})[param] = _withoutAnchors(regex);
     _compiledFor = null;
+  }
+
+  /// `^[0-9]+$` gives `[0-9]+`. An escaped `\$` at the end stays.
+  static String _withoutAnchors(String regex) {
+    if (regex.startsWith('^')) regex = regex.substring(1);
+    if (regex.endsWith(r'$')) {
+      int slashes = 0;
+      for (int i = regex.length - 2; i >= 0 && regex[i] == r'\'; i--) {
+        slashes++;
+      }
+      if (slashes.isEven) regex = regex.substring(0, regex.length - 1);
+    }
+    return regex;
   }
 
   void _compile() {

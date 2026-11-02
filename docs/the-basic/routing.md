@@ -177,7 +177,7 @@ Route.get('/files/{type}', handler).where('type', 'png|jpg');
 Route.get('/docs/{page}', handler).where('page', '.*'); // matches slashes too
 ```
 
-- The regex must match the whole param text. You do not need `^` or `$`.
+- The regex must match the whole param text. You do not need `^` or `$`. A leading `^` and a trailing `$` are dropped.
 - Use `(?:...)` for a group, not `(...)`. A regex with a `(...)` group throws an `ArgumentError` at start.
 - A param name that the path does not have throws an `ArgumentError` at start.
 - Call `.where` more than once for more params.
