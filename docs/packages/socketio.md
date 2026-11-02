@@ -267,11 +267,36 @@ socket.on('connect_error', (err) => console.log(err.message)); // 'Unauthorized'
 - With null, the client gets a `connect_error` with the message `Unauthorized`, and `onConnection` does not run. Change the message with `SocketAuth(findUser, message: '...')`.
 - `handshake.token` is `auth.token` from the client, else the `Authorization: Bearer` header. Browsers can not set headers on a websocket, so use `auth`.
 - `handshake.cookie('name')` reads a cookie and decrypts it with the APP_KEY, like `req.cookie('name')`. Use `decrypt: false` for a plain cookie.
+- `await handshake.session()` gives the Dox session of the client, from its session cookie. See below.
+- `io.use(SocketAuth(findUser).handle)` does the same for the default namespace.
+
+### With dox_auth
+
+[dox_auth](../security/authentication.md#check-a-login-with-no-request) can check a JWT or the web login session for you:
+
+```dart
+static Future<User?> findUser(Handshake handshake) async {
+  // an API client or a mobile app sends a JWT
+  String? token = handshake.token;
+  if (token != null) return Auth(guard: 'api').userFromToken(token);
+
+  // a browser that logged in on a web page sends the session cookie
+  Session session = await handshake.session();
+  return Auth(guard: 'web').userFromSession(session);
+}
+```
+
+- `userFromToken` runs the same checks as `AuthMiddleware`: signature, guard, `exp` and revocation. A bad, expired, revoked or changed token gives `null`, so the client is refused. With `userCacheTtl` on, a deleted or banned user can still connect until the cache time ends, unless `forgetUser` runs.
+- `handshake.session()` runs the same cookie checks as `SessionMiddleware`. A changed cookie, a cookie made with another `APP_KEY` or an expired session gives an empty session, so `userFromSession` gives `null`.
+- `handshake.session()` uses `AppConfig.session`. Pass another `SessionConfig` like `handshake.session(config)`.
+- The session is read once, when the socket connects. A logout later does not close the socket. Call `socket.disconnect()` yourself if you need that.
+- The session is read only. Changes to it are not saved.
+- With no `allowedOrigins`, or with `'*'` in it, `handshake.session()` prints a warning once.
+- With the `cookie` session driver, an old copy of the session cookie still works after logout, until the session `lifetime` ends. If a logout must stop old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
 
 !!! warning "Cookie login needs `allowedOrigins`"
     A browser sends its cookies on a websocket from any website. So if you log users in with a cookie, set `allowedOrigins` to your own sites.
     Without it, another website can open a socket as your user. See [Allowed origins](#allowed-origins).
-- `io.use(SocketAuth(findUser).handle)` does the same for the default namespace.
 
 ## Node.js to Dart
 
@@ -285,7 +310,7 @@ socket.on('connect_error', (err) => console.log(err.message)); // 'Unauthorized'
 | `socket.broadcast.emit(...)` | the same |
 | `io.to(r).except(x).emit(...)` | the same |
 | `io.of('/chat')`, `io.use(fn)` | the same |
-| `socket.handshake` | `.headers`, `.query`, `.auth`, `.address`, `.token`, `.cookie(name)` |
+| `socket.handshake` | `.headers`, `.query`, `.auth`, `.address`, `.token`, `.cookie(name)`, `.session()` |
 | `socket.data` | `socket.data` (a `Map`) |
 | `await io.in(r).fetchSockets()` | `await io.to(r).fetchSockets()` (all servers) |
 | `await io.timeout(5000).emitWithAck('e', a)` | `await io.timeout(Duration(seconds: 5)).emitWithAck('e', a)` |

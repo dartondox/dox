@@ -177,6 +177,21 @@ if (req.hasSession) {
 }
 ```
 
+## Load a session with no request
+
+Code that has no request, like a Socket.IO login, can load the session from the cookie value:
+
+```dart
+Session session = await SessionMiddleware().fromCookie(value);
+dynamic userId = session.get('auth_web');
+```
+
+- Give the value as the browser sent it (still encrypted). Do not decrypt it first.
+- The checks are the same as for a request. A changed cookie, a cookie of another name, a cookie made with another `APP_KEY`, an expired session or an unknown id gives an empty session.
+- Changes to this session are not saved.
+- With the `cookie` driver, an old copy of the cookie still works after logout, until the session `lifetime` ends. If a logout must stop old cookies, use the `cache` driver.
+- `SessionMiddleware(config)` uses another `SessionConfig`, like on a route.
+
 ## Tests
 
 `client.withSession()` gives a test client that keeps cookies like a browser. It also sends the `XSRF-TOKEN` cookie back in `X-XSRF-TOKEN`, so `CsrfMiddleware` lets its posts in:

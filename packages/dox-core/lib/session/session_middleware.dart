@@ -45,8 +45,30 @@ class SessionMiddleware implements IDoxNextMiddleware {
     return res;
   }
 
-  Future<Session> _start(DoxRequest req, SessionConfig config) async {
-    String? value = req.cookie(config.cookie);
+  /// The session of [cookie]: the session cookie value as the browser
+  /// sent it (still encrypted). For code with no request, like a
+  /// socket. It has the same checks as this middleware: a changed or
+  /// foreign cookie, a cookie made with another key, an expired session
+  /// or an unknown id gives an empty session. Changes to it are not
+  /// saved.
+  /// ```
+  /// Session session = await SessionMiddleware().fromCookie(raw);
+  /// session.get('auth_web');
+  /// ```
+  Future<Session> fromCookie(String? cookie) {
+    SessionConfig config = this.config;
+    String? value = cookie == null
+        ? null
+        : DoxCookie.decrypt(config.cookie, cookie);
+    return _load(value, config);
+  }
+
+  Future<Session> _start(DoxRequest req, SessionConfig config) {
+    return _load(req.cookie(config.cookie), config);
+  }
+
+  /// [value] is the decrypted cookie value, or null.
+  Future<Session> _load(String? value, SessionConfig config) async {
     if (config.driver == 'cookie') {
       return Session(
         read: value == null ? null : () => _decode(value, config.lifetime),

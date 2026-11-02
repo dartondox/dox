@@ -470,6 +470,20 @@ Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), (PageCon
 - These methods throw a `StateError` on a guard that does not use `SessionAuthDriver`.
 - `SessionAuthDriver` has one option, `hashRounds` (default `10`), like `JwtAuthDriver`.
 
+## Check a login with no request
+
+Code that has no request, like a [Socket.IO](../packages/socketio.md#log-in-a-socket) login, can check a token or a session itself:
+
+```dart
+User? user = await Auth(guard: 'api').userFromToken(token);
+User? user = await Auth(guard: 'web').userFromSession(session);
+```
+
+- `userFromToken` runs the same checks as a request with a `Bearer` header: signature, algorithm, guard, `exp` and [revocation](#revoke-tokens). Give the token with no `Bearer ` prefix. A missing, bad, expired, revoked or changed token gives `null`. It needs a guard with `JwtAuthDriver`.
+- `userCacheTtl` is a cache, not a check. With it on, a deleted or banned user can still connect until the cache time ends, unless `forgetUser` runs.
+- `userFromSession` gives the user of a session, or `null`. Load the session with `SessionMiddleware().fromCookie(value)`. See [Session](../the-basic/session.md#load-a-session-with-no-request). It needs a guard with `SessionAuthDriver`.
+- Both throw a `StateError` on a guard with the wrong driver.
+
 ## Things to know
 
 - **The token is not secret.** By default, anyone with the token can read `user.toJson()`. Keep private columns in `hidden`, or use [small tokens](#small-tokens).
