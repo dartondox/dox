@@ -303,7 +303,8 @@ A token works until it expires or you revoke it.
 | `expiresIn` | `null` (no end) | How long a new token works. |
 | `hashRounds` | `10` | The bcrypt cost, for `attempt`. |
 | `type` | the guard name | The type of the tokens. A token works only on a guard with the same type. |
-| `stringIds` | `false` | `true` for users with text ids, like a uuid. Use the same value in the migration. |
+| `stringIds` | `false` | `true` for users with text ids. Text ids are compared exactly. Use the same value in the migration. For uuid ids, see `uuidIds`. |
+| `uuidIds` | `false` | `true` for users with uuid ids. A uuid is kept and compared in lower case. Use the same value in the migration. |
 
 ### 2. Add the table
 
@@ -335,8 +336,8 @@ Then run `dox migrate`.
 | Option | Default | What it does |
 | --- | --- | --- |
 | `table` | `'auth_access_tokens'` | The table name. Use the same name as the driver `table`. |
-| `stringIds` | `false` | `false`: `tokenable_id` is an unsigned big int, like Sanctum and AdonisJS. `true`: it is text, for users with text ids. Use the same value as the driver `stringIds`. |
-| `uuidIds` | `false` | `true`: `tokenable_id` is a uuid column (`UUID` on Postgres), for users with uuid ids. Then `usersTable` works with a uuid id. Set `stringIds: true` on the driver. |
+| `stringIds` | `false` | `false`: `tokenable_id` is an unsigned big int, like Sanctum and AdonisJS. `true`: it is text, for users with text ids. Use the same value as the driver `stringIds`. For uuid ids, see `uuidIds`. |
+| `uuidIds` | `false` | `true`: `tokenable_id` is a uuid column (`UUID` on Postgres), for users with uuid ids. Then `usersTable` works with a uuid id. Set `uuidIds: true` on the driver too. |
 | `usersTable` | none | Adds a foreign key from `tokenable_id` to `id` of this table, with cascade delete. Then the tokens of a deleted user are deleted too. The two id columns must have the same type. |
 
 The migration makes the table on the default connection.
@@ -389,6 +390,8 @@ auth.currentAccessToken; // the AccessToken of this request
 - A revoked token is deleted from the table, so it stops working at once.
 - A database error also fails the check (401). The error goes to `AppConfig.exceptionHandler`.
 - Each token has a `type`. By default it is the guard name. So two access token guards do not take each other's tokens. If you rename a guard, set `AccessTokenAuthDriver(type: 'old-name')` to keep its tokens working.
+- Pass a user of the guard's model. For admins, use `Auth(guard: 'admin').createAccessToken(admin)`. A user of another model throws an `ArgumentError`.
+- On Postgres a uuid is stored in lower case. With `uuidIds`, the driver keeps and compares uuids in lower case too. On other databases, keep uuids in lower case in the users table.
 - When you delete a user, call `revokeAllAccessTokens(user)` too, or use `usersTable` in the migration. Then old tokens can never match a new user with the same id.
 - `tokenCan` is `false` when there is no access token. So a session or JWT login never passes it.
 - `last_used_at` is written at most once a minute per token. So a busy token does not write on every request. If this write fails, the error is reported and the request goes on.
