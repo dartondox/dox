@@ -273,13 +273,10 @@ class DoxRequest implements IDoxRequest {
     dynamic val = _find(key).value;
     if (val == null) return defaultValue;
     if (val is bool) return val;
-    return <String>{
-      '1',
-      'true',
-      'on',
-      'yes',
-    }.contains(val.toString().trim().toLowerCase());
+    return _trueWords.contains(val.toString().trim().toLowerCase());
   }
+
+  static const Set<String> _trueWords = <String>{'1', 'true', 'on', 'yes'};
 
   /// The input as an int. [defaultValue] is given when the key is not
   /// there or the value is not a number.

@@ -1,5 +1,6 @@
 ## Unreleased
 
+- `req.boolean()` no longer makes a new set of true words on every call.
 - New: `Route.match(methods, path, handler)` adds one route for each method in the list. `Route.any(path, handler)` adds one for GET, POST, PUT, PATCH and DELETE. OPTIONS is left out, so the CORS preflight answer still works.
 - New: `Route.redirect(from, to, status:)` and `Route.permanentRedirect(from, to)`. 302 and 301.
 - New: `.where(param, regex)` on a route. The route matches only when the param text matches the regex. Else the next route is tried. Routes without it match the same as before.
