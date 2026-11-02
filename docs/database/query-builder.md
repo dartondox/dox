@@ -405,6 +405,7 @@ await Actor().where('age', 60).orWhereNotIn('id', <int>[1, 2]).get();
   parameter: `"id" = ANY(@id_p0)` (`<> ALL` for `whereNotIn`).
 - An empty list matches no rows for `whereIn`, and all rows for `whereNotIn`.
 
+The list can also be another `Iterable`, like a `Set`.
 The value can also be a query that selects one column.
 Its values are bound too.
 
@@ -530,11 +531,15 @@ await Actor().whereDay('created_at', 15).get();
 - The column is read as it is stored. On SQLite and Postgres, Dox stores a `DateTime` in UTC.
 - A `DateTime` value is compared the same way `where` binds it:
   in UTC on SQLite and Postgres, and as the wall clock on MySQL and MariaDB.
+- On Postgres, a `timestamptz` is read in the session time zone (UTC by default).
+  If the connection sets another `timeZone`, a `DateTime` value does not match.
+- On Postgres, a column with fractions of a second does not equal a time without them.
+  For example, `10:00:00.5` is not `10:00:00`. Laravel works the same way.
 
 | Database | `whereDate` | `whereYear` |
 | --- | --- | --- |
 | Postgres | `CAST(col AS date)` | `EXTRACT(year FROM col)` |
-| MySQL, MariaDB | `CAST(col AS date)` | `YEAR(col)` |
+| MySQL, MariaDB | `DATE(col)` | `YEAR(col)` |
 | SQLite | `date(col)` | `strftime('%Y', col)` |
 
 ### `whereJsonContains` and `whereJsonDoesntContain`
@@ -565,6 +570,7 @@ await Actor().whereJsonDoesntContain('tags', 'horror').get();
 !!! note
     On SQLite, the value must be a string, a number, a bool or a list of them.
     A map throws an `ArgumentError`.
+    SQLite stores `true` as `1`, so `true`, `1` and `1.0` match each other there.
 
 !!! note
     `whereJsonDoesntContain` on a row that does not have the key is not the same on every database.
@@ -850,6 +856,7 @@ await QueryBuilder.table('actor')
 - The added query can have its own `orderBy` and `limit`.
 - `count()`, `paginate()`, `sum()`, `avg()`, `min()` and `max()` use the whole result:
   `SELECT SUM("age") as dox_aggregate FROM (...) as dox_union_aggregate`.
+- `sum()`, `avg()`, `min()` and `max()` keep `orderBy`, `limit` and `offset`. `count()` does not.
 
 ## Row locks
 
