@@ -255,7 +255,7 @@ class Comment {
       expect(flat, contains('getMorphTo<Comment,Model<dynamic>>('));
     });
 
-    test('a nullable one-row relation is set to null on reload', () async {
+    test('reload with no rows gives null or an empty list', () async {
       String out = await _generate('''
 @DoxModel()
 class Comment {
@@ -264,6 +264,12 @@ class Comment {
 
   @MorphMany(Comment, 'commentable')
   List<Comment> replies = <Comment>[];
+
+  @HasMany(Comment)
+  List<Comment> children = <Comment>[];
+
+  @ManyToMany(Comment)
+  List<Comment>? related;
 }
 ''');
       String flat = out.replaceAll(RegExp(r'\s'), '');
@@ -277,13 +283,18 @@ class Comment {
         ),
       );
 
-      /// a list relation keeps the guard
+      /// a list relation with no rows gets an empty list
       expect(
         flat,
-        contains(
-          'if(result[i.tempIdValue.toString()]!=null){'
-          'i.replies=result[i.tempIdValue.toString()]!;}',
-        ),
+        contains('i.replies=result[i.tempIdValue.toString()]??<Comment>[];'),
+      );
+      expect(
+        flat,
+        contains('i.children=result[i.tempIdValue.toString()]??<Comment>[];'),
+      );
+      expect(
+        flat,
+        contains('i.related=result[i.tempIdValue.toString()]??<Comment>[];'),
       );
     });
 

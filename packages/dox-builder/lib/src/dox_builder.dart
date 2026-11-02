@@ -316,15 +316,18 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
 
       eagerLoad += value['eager'] == true ? "'$key'," : "";
 
-      /// a nullable one-row relation is set to null when the related row
-      /// is gone, so reload() does not keep an old value. List relations
-      /// and non nullable fields keep the old guard.
-      String setValue =
-          _singleRelations.contains(value['relationType']) &&
-              value['dataType'].toString().endsWith('?')
-          ? "i.$key = result[i.tempIdValue.toString()];"
-          : """if (result[i.tempIdValue.toString()] != null) {
-            i.$key = result[i.tempIdValue.toString()]!;
+      /// with no related rows, reload() and preload give an empty list
+      /// for a list relation and null for a nullable one-row relation,
+      /// so the old value is not kept. A non nullable one-row field keeps
+      /// the old guard.
+      String result = 'result[i.tempIdValue.toString()]';
+      bool single = _singleRelations.contains(value['relationType']);
+      String setValue = !single
+          ? "i.$key = $result ?? <${value['model']}>[];"
+          : value['dataType'].toString().endsWith('?')
+          ? "i.$key = $result;"
+          : """if ($result != null) {
+            i.$key = $result!;
           }""";
 
       content +=
