@@ -338,7 +338,10 @@ Then run `dox migrate`.
 | `table` | `'auth_access_tokens'` | The table name. Use the same name as the driver `table`. |
 | `stringIds` | `false` | `false`: `tokenable_id` is an unsigned big int, like Sanctum and AdonisJS. `true`: it is text, for users with text ids. Use the same value as the driver `stringIds`. For uuid ids, see `uuidIds`. |
 | `uuidIds` | `false` | `true`: `tokenable_id` is a uuid column (`UUID` on Postgres), for users with uuid ids. Then `usersTable` works with a uuid id. Set `uuidIds: true` on the driver too. |
-| `usersTable` | none | Adds a foreign key from `tokenable_id` to `id` of this table, with cascade delete. Then the tokens of a deleted user are deleted too. The two id columns must have the same type. |
+| `usersTable` | none | Adds a foreign key from `tokenable_id` to `usersKey` of this table, with cascade delete. Then the tokens of a deleted user are deleted too. The two id columns must have the same type. |
+| `usersKey` | `'id'` | The key column of `usersTable`, for the foreign key. |
+
+With `usersTable`, use one token table per user model. If you have more than one user model (like users and admins), give each model its own token table, with `table:` on the driver and in the migration. With one shared table, the foreign key fails for admin tokens, and deleting a user also deletes the tokens of the admin with the same id.
 
 The migration makes the table on the default connection.
 If the driver uses another connection, like `AccessTokenAuthDriver(connection: 'other')`, make the table on that connection.
@@ -354,7 +357,7 @@ String? token = await Auth(guard: 'api').attempt(credentials);
 // or make a token for a user
 AccessToken token = await Auth(guard: 'api').createAccessToken(
   user,
-  name: 'cli',
+  name: 'cli', // at most 255 characters
   abilities: <String>['posts:read'], // default: ['*'] (all)
   expiresIn: const Duration(days: 30), // default: the driver expiresIn
 );
@@ -390,6 +393,7 @@ auth.currentAccessToken; // the AccessToken of this request
 - A revoked token is deleted from the table, so it stops working at once.
 - A database error also fails the check (401). The error goes to `AppConfig.exceptionHandler`.
 - Each token has a `type`. By default it is the guard name. So two access token guards do not take each other's tokens. If you rename a guard, set `AccessTokenAuthDriver(type: 'old-name')` to keep its tokens working.
+- A token `name` over 255 characters throws an `ArgumentError`. Nothing is written.
 - Pass a user of the guard's model. For admins, use `Auth(guard: 'admin').createAccessToken(admin)`. A user of another model throws an `ArgumentError`.
 - On Postgres a uuid is stored in lower case. With `uuidIds`, the driver keeps and compares uuids in lower case too. On other databases, keep uuids in lower case in the users table.
 - When you delete a user, call `revokeAllAccessTokens(user)` too, or use `usersTable` in the migration. Then old tokens can never match a new user with the same id.
