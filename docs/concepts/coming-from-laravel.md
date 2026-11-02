@@ -163,6 +163,9 @@ See [Validation](../the-basic/validation.md).
 | `$blog->delete()` | `await blog.delete()` (returns the deleted rows as an `int`) |
 | `$blog->increment('views')` | `await blog.increment('views')` |
 | `Blog::withTrashed()` | `Blog().withTrash()` |
+| `Blog::onlyTrashed()` | `Blog().onlyTrashed()` |
+| `$blog->touch()` | `await blog.touch()` |
+| `$blog->replicate()` | `blog.replicate()` |
 | `$blog->restore()` | `await blog.restore()` |
 | `Blog::with('posts')->get()` | `await Blog().preload('posts').get()` |
 | `$blog->load('posts')` | `await blog.$getRelation('posts')` |
@@ -236,6 +239,8 @@ See [Model](../database/model/index.md).
 | `->value('email')` | `.valueOf('email')` |
 | `->chunk(100, fn)`, `->chunkById(100, fn)` | `.chunk(100, (rows) { ... })`, `.chunkById(100, (rows) { ... })` |
 | `->paginate(10)` | `.paginate(currentPage: 1, perPage: 10)` |
+| `->simplePaginate(10)` | `.simplePaginate(currentPage: 1, perPage: 10)` |
+| `->cursorPaginate(10)` | `.cursorPaginate(perPage: 10, cursor: cursor)` |
 | `->insert([...])` | `.insertMultiple(<Map<String, dynamic>>[...])` |
 | `->update([...])` | `.update(<String, dynamic>{...})` (returns the changed rows as an `int`) |
 | `->increment('views', 5)`, `->decrement(...)` | `.increment('views', 5)`, `.decrement(...)` |

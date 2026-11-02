@@ -153,7 +153,8 @@ class Blog extends BlogGenerator {}
 The table needs a nullable `deleted_at` column. In a migration, add `table.softDeletes();`.
 
 - `delete()` sets `deleted_at` to the current time. The row stays in the table.
-- Queries do not return soft deleted rows. Use `withTrash()` to get them too.
+- Queries do not return soft deleted rows. Use `withTrash()` to get them too,
+  or `onlyTrashed()` to get only them.
 - `forceDelete()` really deletes the row.
 - `restore()` sets `deleted_at` back to `NULL`.
 
@@ -334,6 +335,41 @@ print(blog.views);
   `increment('views', 1, <String, dynamic>{'status': 'hot'})`.
   Keys that `fillable` and `guarded` do not allow are dropped.
 
+### Touch and replicate
+
+`touch()` sets `updated_at` to now. Give a column name to set another column.
+On a model from the table it changes only that row, and the field gets the new time too.
+
+```dart
+Blog? blog = await Blog().find(1);
+await blog!.touch();               // updated_at = now
+await blog.touch('published_at');  // published_at = now
+```
+
+- It returns the number of changed rows: 1, or 0 when the row is not there.
+  It also returns 0 when the model has no `updated_at` column and you give no column.
+- It fires the save events: `saving`, `updating`, `updated` and `saved`, like `save()`.
+  A hook that throws `CancelModelEvent` stops it, and it returns 0.
+- `touchQuietly()` does the same with no events.
+- A model with no primary key value (never saved, or read without the key)
+  throws a `StateError`. So `touch()` can not change every row by mistake.
+
+`replicate()` makes a new model with the same column values. It is not saved yet.
+It has no primary key, `created_at` or `updated_at`, so `save()` inserts a new row.
+
+```dart
+Blog? blog = await Blog().find(1);
+Blog copy = blog!.replicate()..title = 'Copy of ${blog.title}';
+await copy.save();
+
+// leave out some columns, they are set to null
+Blog other = blog.replicate(<String>['slug']);
+```
+
+- Relations are not copied.
+- Like Laravel, it copies `deleted_at`. A copy of a soft deleted model is soft deleted too.
+- A column in the list that can not be `null`, or that is not a column, throws an `ArgumentError`.
+
 ## Delete
 
 ```dart
@@ -354,7 +390,7 @@ await deleted?.restore(); // sets deleted_at back to NULL
 - They return 1 when the row was deleted.
 - They return 0 when the row was not there, or when a [model event](events.md) cancels.
 
-`save()`, `delete()`, `forceDelete()` and `restore()` fire [model events](events.md).
+`save()`, `touch()`, `delete()`, `forceDelete()` and `restore()` fire [model events](events.md).
 
 ## Convert to a map or JSON
 

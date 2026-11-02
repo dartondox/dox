@@ -289,6 +289,8 @@ class Blog extends BlogGenerator {
 | `await Blog().pluck('title')` / `valueOf('title')` | one column of all rows / of the first row |
 | `await Blog().sum('views')`, `avg`, `min`, `max` | one value, `null` when no row |
 | `await Blog().paginate(currentPage: 1, perPage: 20)` | `Pagination<Blog>`, rows in `data` |
+| `await Blog().simplePaginate(currentPage: 1, perPage: 20)` | a page without the total count |
+| `await Blog().cursorPaginate(perPage: 20, cursor: c)` | a page after a cursor, `nextCursor` |
 | `await Blog().create(<String, dynamic>{'title': 'a'})` | insert and return the model |
 | `await Blog().firstOrCreate({...}, {...})`, `firstOrNew`, `updateOrCreate` | find, or create |
 | `blog.title = 'b'; await blog.save()` | insert or update |
@@ -296,6 +298,9 @@ class Blog extends BlogGenerator {
 | `await blog.increment('views')` / `decrement` | change a number in one query |
 | `await blog.forceDelete()` / `await blog.restore()` | real delete / undo soft delete |
 | `Blog().withTrash()` | include soft deleted rows |
+| `Blog().onlyTrashed()` | only soft deleted rows |
+| `await blog.touch()` | set `updated_at` to now, `touchQuietly()` with no events |
+| `blog.replicate()` | a new unsaved copy of the model |
 | `Blog().preload('comments').get()` | load a relation, one query |
 | `Blog().whereHas('comments').get()` / `whereDoesntHave` / `has('comments', '>=', 3)` | filter by a relation |
 | `await blog.$getRelation('user')` | load a relation on one model |
