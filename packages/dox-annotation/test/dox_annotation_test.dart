@@ -11,6 +11,24 @@ class TestException extends IHttpException {
 
 class DefaultException extends IHttpException {}
 
+class BasicAuth implements IAuth {
+  BasicAuth(this.loggedIn);
+  final bool loggedIn;
+  @override
+  Future<void> verifyToken(IDoxRequest req) async {}
+  @override
+  bool isLoggedIn() => loggedIn;
+  @override
+  T? user<T>() => null;
+  @override
+  Map<String, dynamic>? toJson() => null;
+}
+
+class AuthWithId extends BasicAuth {
+  AuthWithId() : super(true);
+  int id() => 7;
+}
+
 void main() {
   group('IHttpException.toResponse', () {
     test('a text message gives code and message', () {
@@ -39,6 +57,23 @@ void main() {
         'code': 'server_error',
         'message': 'Server Error',
       });
+    });
+  });
+
+  group('IAuth helpers', () {
+    test('guest is the opposite of isLoggedIn', () {
+      expect(BasicAuth(false).guest(), isTrue);
+      expect(BasicAuth(true).guest(), isFalse);
+    });
+
+    test('id calls the id of the auth class', () {
+      IAuth? auth = AuthWithId();
+      expect(auth.id(), 7);
+    });
+
+    test('id is null when the auth class has no id', () {
+      IAuth? auth = BasicAuth(true);
+      expect(auth.id(), isNull);
     });
   });
 }

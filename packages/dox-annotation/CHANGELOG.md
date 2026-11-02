@@ -1,3 +1,7 @@
+## Unreleased
+
+- New: `id()` and `guest()` on `IAuth`, so `req.auth?.id()` and `req.auth?.guest()` work. `guest()` is true when nobody is logged in. `id()` gives the primary key of the logged-in user from the `id()` of the auth class (like `Auth().id()` of `dox_auth`), or null. They are an extension (`IAuthHelpers`), so a class that implements `IAuth` does not need to change.
+
 ## 3.0.2
 
 - Removed: `ICacheDriver` and `IStorageDriver`. Nothing used them. For a cache driver, use `CacheDriver` from `dox_cache`.
