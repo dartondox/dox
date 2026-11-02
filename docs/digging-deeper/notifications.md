@@ -59,7 +59,7 @@ await Notification.send(<Object>[Address('ann@example.com')], InvoicePaid(1));
 
 When the mailable has its own `to` address, that address is used and the route is not.
 
-When a channel throws, the other channels and the other notifiables still get the notification. At the end, `Notification.send()` throws a `NotificationException`. Its `errors` list says which notifiable and channel failed, and why. When `via()` throws, the channel is null. The error text lists every failure, with the type and the mail address of each notifiable.
+When a channel throws, the other channels and the other notifiables still get the notification. At the end, `Notification.send()` throws a `NotificationException`. Its `errors` list says which notifiable and channel failed, and why. When `via()` throws, the channel is null. The error text has one line per failure: the place and the type of the notifiable, the channel, and the error type. It has no email addresses and no error text, so it is safe for logs. For the details, read `errors`.
 
 With one notifiable and one error, like `user.notify()`, the error is thrown as it is. So `on MailException catch (e)` still works there.
 

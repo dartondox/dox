@@ -299,7 +299,7 @@ String? get markdown => 'emails/welcome';
     Links and images with an unsafe URL, like `javascript:`, `vbscript:` or `data:`, lose their URL. Only `http`, `https`, `mailto`, `tel`, `cid` and relative URLs are kept.
     The same goes for the lines of `MailMessage`. `MailMessage.action()` throws an `ArgumentError` for an unsafe URL.
     Raw HTML in the template, like `<a href="{{ url }}">`, is not checked. In raw HTML, use only full URLs that your app builds. Email apps can not open a relative link like `/dashboard`.
-    For a URL in `{{ }}`, use a Markdown link: `[text]({{ url }})`. It goes through the URL check. A bare `{{ url }}` with a `&` in it shows `&amp;` in the link.
+    For a URL in `{{ }}`, use a Markdown link `[text]({{ url }})`, `<{{ url }}>`, or a bare `{{ url }}`. They all go through the URL check, and a `&` in the URL works.
 
 !!! warning "Indent"
     Markdown makes a line that starts with 4 spaces into a code block. So do not indent the Markdown inside `@if` or `@each`. Keep it at the start of the line.
