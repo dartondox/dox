@@ -174,7 +174,6 @@ The text has the form `<Exception>: <message> (key: "<key>")`.
 | `InvalidKeyException: Invalid key: path traversal is not allowed` | A key with `..`. | Do not build keys from user input. |
 | `InvalidKeyException: Invalid key: absolute paths are not allowed` | A `Disk` key that starts with `/` or a drive letter. | Remove the first `/`. |
 | `InvalidKeyException: Invalid key: key is empty` | An empty key. | Pass a file name. |
-| `UnsupportedOperationException: urlBase is not configured` | `Storage().url()` on a local disk with no `url` option. | Set `url` on the disk. |
 | `UnsupportedOperationException: urlBase and appKey are needed for signed URLs` | `signedUrl()` on a local disk with no `url`, or no `APP_KEY`. | Set both. |
 | `UnsupportedOperationException: S3 signed URLs must expire within 1 second and 7 days` | `signedUrl()` on S3 with a bad `expiresIn`. | Use a time up to 7 days. |
 | `UnsupportedOperationException: Disk "<name>" is not registered` | `Storage().disk('<name>')` with a missing disk. | Add the disk to `StorageConfig.disks`. |
