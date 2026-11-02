@@ -147,6 +147,9 @@ See [Validation](../the-basic/validation.md).
 | `public $timestamps = false;` | `@DoxModel(timestamps: false)` |
 | `protected $hidden = ['password'];` | `List<String> get hidden => <String>['password'];` |
 | `protected $fillable = [...]` | `List<String> get fillable => <String>[...];` |
+| `$user->forceFill([...])` | `user.forceFill(<String, dynamic>{...})` |
+| `User::forceCreate([...])` | `await User().forceCreate(<String, dynamic>{...})` |
+| `Model::unguarded(fn () => ...)` | `await Model.unguarded(() async { ... })` |
 | `protected $casts = ['meta' => 'array'];` | the field type: `Map<String, dynamic>? meta;` |
 | mutator `setSlugAttribute()` | `@Column(beforeSave: makeSlug)` |
 | accessor `getStatusAttribute()` | `@Column(beforeGet: readStatus)` |
@@ -162,7 +165,7 @@ See [Validation](../the-basic/validation.md).
 | `$blog->save()` | `await blog.save()` |
 | `$blog->delete()` | `await blog.delete()` (returns the deleted rows as an `int`) |
 | `$blog->increment('views')` | `await blog.increment('views')` |
-| `$blog->update([...])` | `await blog.update(<String, dynamic>{...})` (only that row, no model events) |
+| `$blog->update([...])` | `await blog.update(<String, dynamic>{...})` (only that row, sets `updated_at`, no model events) |
 | `Blog::withTrashed()` | `Blog().withTrash()` |
 | `Blog::onlyTrashed()` | `Blog().onlyTrashed()` |
 | `$blog->touch()` | `await blog.touch()` |
@@ -249,7 +252,7 @@ See [Model](../database/model/index.md).
 | `->simplePaginate(10)` | `.simplePaginate(currentPage: 1, perPage: 10)` |
 | `->cursorPaginate(10)` | `.cursorPaginate(perPage: 10, cursor: cursor)` |
 | `->insert([...])` | `.insertMultiple(<Map<String, dynamic>>[...])` |
-| `->update([...])` | `.update(<String, dynamic>{...})` (returns the changed rows as an `int`) |
+| `->update([...])` | `.update(<String, dynamic>{...})` (returns the changed rows as an `int`; on a model it keeps `fillable`, use `.forceUpdate()` to skip it) |
 | `->increment('views', 5)`, `->decrement(...)` | `.increment('views', 5)`, `.decrement(...)` |
 | `->insertOrIgnore([...])` | `.insertOrIgnore(<Map<String, dynamic>>[...])` |
 | `->upsert([...], ['email'], ['name'])` | `.upsert(<Map<String, dynamic>>[...], <String>['email'], <String>['name'])` |

@@ -247,6 +247,7 @@ Blog created = await Blog().create(<String, dynamic>{
   (loaded from the database, or saved).
   Fields that were not loaded, for example with `select()`, are not changed.
 - `save()` returns `true` when it saved, and `false` when a [model event](events.md) cancels it.
+- `blog.update(<String, dynamic>{...})` on a loaded model changes only that row and sets `updated_at` too. It fires no model events.
 
 !!! note "`create()` and `save()` are not the same"
     On a model without [events](events.md), `create()` inserts the map as it is.
@@ -284,6 +285,41 @@ class User extends UserGenerator {
     ```
 
 - `save()` is not changed. Fields you set in code are always saved.
+
+#### Skip the fillable check
+
+Sometimes your own code must set a guarded column, like `is_admin`.
+These methods ignore `fillable` and `guarded`.
+Never pass user input, like `req.body`, to them.
+
+```dart
+// create a row with every key of the map
+User admin = await User().forceCreate(<String, dynamic>{'name': 'Ann', 'is_admin': true});
+
+// update the rows of a query with every key of the map
+await User().where('id', 1).forceUpdate(<String, dynamic>{'is_admin': true});
+
+// set fields on a model, then save it
+User? user = await User().find(1);
+await user!.forceFill(<String, dynamic>{'is_admin': true}).save();
+
+// turn the check off for everything inside the callback
+await Model.unguarded(() async {
+  await User().create(<String, dynamic>{'name': 'Bob', 'is_admin': true});
+  await User().where('id', 2).update(<String, dynamic>{'is_admin': true});
+});
+```
+
+- `forceFill()` does not save. Call `save()` after it.
+  It skips a key that is not a column, and a value that is not of the field type.
+- `Model.unguarded()` covers every `await` inside the callback.
+  Other requests that run at the same time still use `fillable`.
+- Work that starts inside the callback and finishes later also runs with the check off.
+  This means timers, futures that are not awaited, and stream listeners.
+  So await everything inside the callback.
+- In Laravel, a query `update()` ignores `fillable`.
+  In Dox, a query `update()` keeps the check, so `update(req.body)` stays safe.
+  Use `forceUpdate()` when you need the Laravel behaviour.
 
 ### Find or create
 
