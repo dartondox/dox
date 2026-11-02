@@ -253,14 +253,20 @@ Printed to stderr. The connection or the request fails, the app keeps running.
 | Text | When | What to do |
 | --- | --- | --- |
 | `Could not find a command. Run `dox help` for more information.` | `dox` with no command. | Run `dox help`. |
-| `Could not find a command named "<name>". Run `dox help` for more information.` | Unknown command. | Check the spelling. |
+| `Could not find a command named "<name>". Run `dox help` for more information.` | Unknown command. A second line tells you about the `dox: commands:` key. | Check the spelling. For a [package command](../digging-deeper/package-commands.md), run `dart pub get` after you add the package. |
+| `More than one command is named "<name>", in: <packages>. ...` | Two commands (in two packages, or twice in one) have the same name. Exit code 1. | Remove one of these packages, or ask its author to rename the command. |
+| `Skip <package>: `dox: commands: <value>` must be a library of the package itself, like package:<package>/commands.dart.` | The `dox: commands:` value is not `package:<package>/<path>.dart`, or has `..`, quotes or other characters. The other packages still work. | Fix the value in that package's `pubspec.yaml`. |
+| `Skip <package>: `dox: commands:` must be a library, like package:<package>/commands.dart.` | The value is not a string (like a list). | Use one library. |
+| `Skip <package>: <library> is not there (<path>).` | The commands library file is missing. The other packages still work. `dox` looks again on the next run. | Make the file, or fix the key. |
+| `Skip <package>: its pubspec.yaml is not valid YAML.` | The package's `pubspec.yaml` can not be read. | Fix the YAML. |
+| `Could not load the package commands: ...` | `dox help` could not run `.dart_tool/dox/commands.dart` (like a compile error in a commands library). The built-in commands are still listed. | Fix the error it shows. |
+| `bin/migrate.dart created.` | `make:migration`, or a `migration:*` command, made the missing entry file. | Nothing. |
 | `Invalid number of arguments for command "<name>".` | Too few or too many arguments. | Run `dox help <name>`. |
 | `Command "<name>" not found.` | `dox help <name>` with an unknown command. | Run `dox help`. |
 | `<name> already exists` | A `make:*` file is already there. | Pick another name, or delete the file. |
 | `Folder name "<name>" already exist` | `dox create` into a folder that exists. | Pick another name. |
 | `Invalid option <x>, use -m or --migration` | `dox make:model` with another option. | Use `-m`. |
 | `Invalid option <x>, use --step=<count>` | `dox migration:rollback` with another option. | Use `--step=2`. |
-| `db/migration has Dart migrations, but bin/migrate.dart is missing. ...` | Dart migrations but no entry file. | Run `dox make:migration <name>` once. |
 | `Skip <file>: no class that extends Migration.` | A Dart file in `db/migration` has no migration class. | Add `class X extends Migration`, or move the file. |
 | `.env.example is missing.` | `dox env:generate` with no example file. | Make `.env.example`. |
 | `lib/config/env.dart is already there. Delete it to make it again.` | `dox env:generate` again. | Delete the file, or edit it by hand. |

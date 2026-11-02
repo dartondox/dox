@@ -316,7 +316,7 @@ Templates: `dartMigrationSource`, `migrateEntrySource` and `_sampleSql` in `lib/
 All `migration:*` commands work the same way:
 
 1. When `bin/migrate.dart` exists: write the registry again, then run `dart run bin/migrate.dart <command> [args]`. Your app code runs, so Dart migrations work.
-2. When there is no `bin/migrate.dart` but `db/migration` has Dart files: print `db/migration has Dart migrations, but bin/migrate.dart is missing.` (exit code 1).
+2. When there is no `bin/migrate.dart` but `db/migration` has Dart files: write `bin/migrate.dart` (the same text as `make:migration` writes, and print `bin/migrate.dart created.`), then go on like step 1. This happens after a package command like `dox queue:table` wrote the first Dart migration.
 3. Else: run the `.sql` migrations with `Migrator()` from `dox_migration` in the CLI process.
 
 The database comes from `DATABASE_URL` when it is set. Else it comes from `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` and `DB_DATABASE` (or `DB_NAME`). See [Environment variables](env.md).
