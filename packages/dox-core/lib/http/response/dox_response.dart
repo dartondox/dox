@@ -87,11 +87,16 @@ class DoxResponse {
     return this;
   }
 
-  /// set headers
+  /// set a header. It replaces the header with the same name, in any
+  /// case (`cache-control` and `Cache-Control` are one header).
   /// ```
   /// res.header('Authorization', 'Bearer xxx');
   /// ```
   DoxResponse header(String key, dynamic value) {
+    if (_headers.isNotEmpty) {
+      String name = key.toLowerCase();
+      _headers.removeWhere((String k, dynamic _) => k.toLowerCase() == name);
+    }
     _headers[key] = value;
     return this;
   }
@@ -111,8 +116,10 @@ class DoxResponse {
   /// res.cache(Duration(seconds: 10));
   /// ```
   DoxResponse cache(Duration duration) {
-    _headers[HttpHeaders.cacheControlHeader] = 'max-age=${duration.inSeconds}';
-    return this;
+    return header(
+      HttpHeaders.cacheControlHeader,
+      'max-age=${duration.inSeconds}',
+    );
   }
 
   /// Set list of headers by Map. A key in [values] replaces the header
@@ -123,11 +130,7 @@ class DoxResponse {
   /// ```
   DoxResponse withHeaders(Map<String, dynamic> values) {
     for (MapEntry<String, dynamic> entry in values.entries) {
-      String name = entry.key.toLowerCase();
-      _headers.removeWhere((String key, dynamic _) {
-        return key.toLowerCase() == name;
-      });
-      _headers[entry.key] = entry.value;
+      header(entry.key, entry.value);
     }
     return this;
   }
