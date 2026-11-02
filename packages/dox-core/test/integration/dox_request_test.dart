@@ -147,5 +147,206 @@ void main() {
       Map<String, dynamic> jsond = jsonDecode(res.body);
       expect(jsond['title'], 'hello');
     });
+    test('input helpers: dot keys, exists, filled, boolean, integer', () async {
+      Route.post('/request/helpers', (DoxRequest req) async {
+        return <String, dynamic>{
+          'name': req.input('user.name'),
+          'item': req.input('items.1.id'),
+          'flat': req.input('a.b'),
+          'none': req.input('user.age', 30),
+          'null_default': req.input('empty_null', 'x'),
+          'has_blank': req.has('blank'),
+          'exists_blank': req.exists('blank'),
+          'exists_null': req.exists('empty_null'),
+          'exists_dot': req.exists('user.name'),
+          'exists_nope': req.exists('nope'),
+          'missing_nope': req.missing('nope'),
+          'missing_blank': req.missing('blank'),
+          'filled_blank': req.filled('blank'),
+          'filled_space': req.filled('space'),
+          'filled_name': req.filled('user.name'),
+          'filled_list': req.filled('list'),
+          'filled_items': req.filled('items'),
+          'bool_on': req.boolean('on'),
+          'bool_true': req.boolean('t'),
+          'bool_no': req.boolean('no'),
+          'bool_none': req.boolean('nope'),
+          'bool_default': req.boolean('nope', true),
+          'int_text': req.integer('page'),
+          'int_num': req.integer('count'),
+          'int_bad': req.integer('blank', 7),
+          'int_none': req.integer('nope'),
+          'int_query': req.integer('q'),
+          'except': req.except(<String>['user', 'items']).keys.toList(),
+          'file': req.file('user.name')?.filename,
+          'has_file': req.hasFile('user'),
+        };
+      });
+
+      http.Response res = await http.post(
+        Uri.parse('$baseUrl/request/helpers?q=3'),
+        headers: <String, String>{'content-type': 'application/json'},
+        body: jsonEncode(<String, dynamic>{
+          'user': <String, dynamic>{'name': 'dox'},
+          'items': <dynamic>[
+            <String, dynamic>{'id': 1},
+            <String, dynamic>{'id': 2},
+          ],
+          'a.b': 'flat',
+          'a': <String, dynamic>{'b': 'nested'},
+          'blank': '',
+          'space': '  ',
+          'empty_null': null,
+          'list': <dynamic>[],
+          'on': 'on',
+          't': true,
+          'no': 'no',
+          'page': '12',
+          'count': 4.0,
+        }),
+      );
+      Map<String, dynamic> j = jsonDecode(res.body);
+      expect(j['name'], 'dox');
+      expect(j['item'], 2);
+      expect(j['flat'], 'flat');
+      expect(j['none'], 30);
+      expect(j['null_default'], 'x');
+      expect(j['has_blank'], false);
+      expect(j['exists_blank'], true);
+      expect(j['exists_null'], true);
+      expect(j['exists_dot'], true);
+      expect(j['exists_nope'], false);
+      expect(j['missing_nope'], true);
+      expect(j['missing_blank'], false);
+      expect(j['filled_blank'], false);
+      expect(j['filled_space'], false);
+      expect(j['filled_name'], true);
+      expect(j['filled_list'], false);
+      expect(j['filled_items'], true);
+      expect(j['bool_on'], true);
+      expect(j['bool_true'], true);
+      expect(j['bool_no'], false);
+      expect(j['bool_none'], false);
+      expect(j['bool_default'], true);
+      expect(j['int_text'], 12);
+      expect(j['int_num'], 4);
+      expect(j['int_bad'], 7);
+      expect(j['int_none'], 0);
+      expect(j['int_query'], 3);
+      expect(j['except'], isNot(contains('user')));
+      expect(j['except'], isNot(contains('items')));
+      expect(j['except'], contains('blank'));
+      expect(j['file'], null);
+      expect(j['has_file'], false);
+    });
+
+    test('url helpers: path, fullUrl, pathIs, routeIs, bearerToken', () async {
+      Route.get('/admin/users/{id}', (DoxRequest req) async {
+        return <String, dynamic>{
+          'path': req.path(),
+          'full': req.fullUrl(),
+          'is_admin': req.pathIs('admin/*'),
+          'is_admin_slash': req.pathIs('/admin/users/*'),
+          'is_users': req.pathIs('users/*'),
+          'route_is': req.routeIs('admin.*'),
+          'route_is_exact': req.routeIs('admin.users.show'),
+          'route_not': req.routeIs('users.*'),
+          'token': req.bearerToken(),
+        };
+      }).name('admin.users.show');
+      Route.get('/no-name', (DoxRequest req) async {
+        return <String, dynamic>{
+          'route_is': req.routeIs('*'),
+          'token': req.bearerToken(),
+        };
+      });
+
+      http.Response res = await http.get(
+        Uri.parse('$baseUrl/admin/users/5?tab=info'),
+        headers: <String, String>{'authorization': 'Bearer abc.123'},
+      );
+      Map<String, dynamic> j = jsonDecode(res.body);
+      expect(j['path'], '/admin/users/5');
+      expect(j['full'], '$baseUrl/admin/users/5?tab=info');
+      expect(j['is_admin'], true);
+      expect(j['is_admin_slash'], true);
+      expect(j['is_users'], false);
+      expect(j['route_is'], true);
+      expect(j['route_is_exact'], true);
+      expect(j['route_not'], false);
+      expect(j['token'], 'abc.123');
+
+      res = await http.get(
+        Uri.parse('$baseUrl/no-name'),
+        headers: <String, String>{'authorization': 'Basic abc'},
+      );
+      j = jsonDecode(res.body);
+      expect(j['route_is'], false);
+      expect(j['token'], null);
+    });
+
+    test('file and hasFile read an upload', () async {
+      Route.post('/request/file', (DoxRequest req) async {
+        return <String, dynamic>{
+          'file': req.file('photo')?.filename,
+          'has': req.hasFile('photo'),
+          'has_name': req.hasFile('name'),
+          'file_name': req.file('name'),
+        };
+      });
+
+      http.MultipartRequest request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/request/file'),
+      );
+      request.fields['name'] = 'dox';
+      request.files.add(
+        http.MultipartFile.fromBytes('photo', <int>[
+          1,
+          2,
+          3,
+        ], filename: 'a.png'),
+      );
+      http.Response res = await http.Response.fromStream(await request.send());
+      Map<String, dynamic> j = jsonDecode(res.body);
+      expect(j['file'], 'a.png');
+      expect(j['has'], true);
+      expect(j['has_name'], false);
+      expect(j['file_name'], null);
+    });
+    test('integer gives the default for NaN, Infinity and 1e400', () async {
+      Route.post('/request/integer-bad', (DoxRequest req) async {
+        return <String, dynamic>{
+          'nan': req.integer('nan', 5),
+          'inf': req.integer('inf', 5),
+          'big': req.integer('big', 5),
+          'big_body': req.integer('big_body', 5),
+        };
+      });
+      http.Response res = await http.post(
+        Uri.parse(
+          '$baseUrl/request/integer-bad?nan=NaN&inf=Infinity&big=1e400',
+        ),
+        headers: <String, String>{'content-type': 'application/json'},
+        body: '{"big_body": 1e400}',
+      );
+      expect(res.statusCode, 200);
+      Map<String, dynamic> j = jsonDecode(res.body);
+      expect(j['nan'], 5);
+      expect(j['inf'], 5);
+      expect(j['big'], 5);
+      expect(j['big_body'], 5);
+    });
+
+    test('pathIs is false for a path with a bad escape', () async {
+      Route.get('/bad-escape', (DoxRequest req) async {
+        // the router gives 404 for `/%ff`, so set the path here
+        req.uri = Uri.parse('/bad-escape/%ff');
+        return <String, dynamic>{'is': req.pathIs('bad-escape/*')};
+      });
+      http.Response res = await http.get(Uri.parse('$baseUrl/bad-escape'));
+      expect(res.statusCode, 200);
+      expect(jsonDecode(res.body)['is'], false);
+    });
   });
 }
