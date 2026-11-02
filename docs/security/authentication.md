@@ -303,6 +303,7 @@ A token works until it expires or you revoke it.
 | `expiresIn` | `null` (no end) | How long a new token works. |
 | `hashRounds` | `10` | The bcrypt cost, for `attempt`. |
 | `type` | the guard name | The type of the tokens. A token works only on a guard with the same type. |
+| `stringIds` | `false` | `true` for users with text ids, like a uuid. Use the same value in the migration. |
 
 ### 2. Add the table
 
@@ -328,7 +329,17 @@ class CreateAccessTokensTable extends Migration {
 ```
 
 Then run `dox migrate`.
-If the driver uses another table, like `AccessTokenAuthDriver(table: 'tokens')`, pass the same name: `AccessTokenTables.up(schema, table: 'tokens')`.
+
+`AccessTokenTables.up` options:
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `table` | `'auth_access_tokens'` | The table name. Use the same name as the driver `table`. |
+| `stringIds` | `false` | `false`: `tokenable_id` is an unsigned big int, like Sanctum and AdonisJS. `true`: it is text, for users with text ids. Use the same value as the driver `stringIds`. |
+| `usersTable` | none | Adds a foreign key from `tokenable_id` to `id` of this table, with cascade delete. Then the tokens of a deleted user are deleted too. The two id columns must have the same type. |
+
+The migration makes the table on the default connection.
+If the driver uses another connection, like `AccessTokenAuthDriver(connection: 'other')`, make the table on that connection.
 
 The table has these columns: `id`, `tokenable_type`, `tokenable_id`, `type`, `name`, `hash`, `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at`.
 
@@ -351,7 +362,10 @@ await Auth(guard: 'api').accessTokens(user);           // all tokens of the user
 await Auth(guard: 'api').revokeAccessToken(user, id);  // false when the user has no such token
 await Auth(guard: 'api').revokeAllAccessTokens(user);  // eg. after a password change
 await Auth(guard: 'api').revokeToken(req);             // logout: revoke the token of this request
+await Auth(guard: 'api').pruneExpiredAccessTokens();   // delete expired tokens, eg. from a scheduled job
 ```
+
+In a route behind `AuthMiddleware`, `(req.auth as Auth).revokeToken(req)` uses the token that was already checked. So it does not check the token again.
 
 `accessTokens` gives `AccessToken` objects. `token.toJson()` has no hash and no plain token, so you can send it to the client.
 
@@ -369,15 +383,16 @@ if (!auth.tokenCan('posts:write')) {
 auth.currentAccessToken; // the AccessToken of this request
 ```
 
-- A token fails (401) when its format is bad, the secret is wrong, it is expired, it was revoked, its user is gone, or it was made for a guard with another user table.
+- A token fails (401) when its format is bad, the secret is wrong, it is expired, it was revoked, its user is gone, it has another type, or it was made for a guard with another user table.
+- `tokenable_type` is the table name of the user model. If you rename the users table, the old tokens stop working.
 - A revoked token is deleted from the table, so it stops working at once.
 - A database error also fails the check (401). The error goes to `AppConfig.exceptionHandler`.
 - Each token has a `type`. By default it is the guard name. So two access token guards do not take each other's tokens. If you rename a guard, set `AccessTokenAuthDriver(type: 'old-name')` to keep its tokens working.
-- When you delete a user, call `revokeAllAccessTokens(user)` too. Then old tokens can never match a new user with the same id.
+- When you delete a user, call `revokeAllAccessTokens(user)` too, or use `usersTable` in the migration. Then old tokens can never match a new user with the same id.
 - `tokenCan` is `false` when there is no access token. So a session or JWT login never passes it.
-- `last_used_at` is written at most once a minute per token. So a busy token does not write on every request.
+- `last_used_at` is written at most once a minute per token. So a busy token does not write on every request. If this write fails, the error is reported and the request goes on.
 - `Auth().login(user)` throws a `StateError` with this driver. Use `createAccessToken`.
-- Expired tokens stay in the table. Delete old rows with a scheduled job if you need to.
+- Expired tokens stay in the table until you call `pruneExpiredAccessTokens()`.
 - `AccessTokenAuthDriver.check(token, guard)` checks a token without a request.
 
 ## Login throttle
