@@ -67,13 +67,25 @@ Future<dynamic> _resume(
 /// the middleware already warned about, so the log is not flooded
 final Set<Object> _warnedNull = <Object>{};
 
+/// `APP_ENV` is read on the first null, not on every one
+bool? _warnNullOn;
+
+bool _isDevelopment() {
+  String env = Env.get<String>('APP_ENV').toLowerCase();
+  return env == 'development' || env == 'local';
+}
+
+/// for tests: read `APP_ENV` again on the next null
+void resetNullMiddlewareWarning() {
+  _warnNullOn = null;
+}
+
 /// in development (`APP_ENV` is `development` or `local`), write a warning
 /// once per middleware that gives null. null ends the request with an
 /// empty 200, and the controller never runs. Most of the time the
 /// middleware forgot `return req`. Nothing else changes.
 void warnNullMiddleware(Object middleware, RouteData route) {
-  String env = Env.get<String>('APP_ENV').toLowerCase();
-  if (env != 'development' && env != 'local') return;
+  if (!(_warnNullOn ??= _isDevelopment())) return;
   if (!_warnedNull.add(middleware)) return;
   String name = middleware is Function
       ? 'A middleware function'

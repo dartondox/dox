@@ -169,6 +169,7 @@ void main() {
       controllers: <dynamic>[],
     );
 
+    setUp(resetNullMiddlewareWarning);
     tearDown(() => Env().env.remove('APP_ENV'));
 
     test('logs once in development', () {
@@ -184,6 +185,13 @@ void main() {
 
     test('logs nothing in production', () {
       Env().env['APP_ENV'] = 'production';
+      expect(logs(() => warnNullMiddleware(Forgot(), route)), isEmpty);
+    });
+
+    test('reads APP_ENV once', () {
+      Env().env['APP_ENV'] = 'production';
+      expect(logs(() => warnNullMiddleware(Forgot(), route)), isEmpty);
+      Env().env['APP_ENV'] = 'development';
       expect(logs(() => warnNullMiddleware(Forgot(), route)), isEmpty);
     });
   });

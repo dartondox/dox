@@ -1,5 +1,6 @@
 ## Unreleased
 
+- The warning for a middleware that returns `null` reads `APP_ENV` once, not on every such request.
 - Fix: a `Route.fallback` in a group with a param in its prefix, like `{tenant}`, now matches, and `req.param` gives the param. Before, the prefix was compared as plain text, so the fallback never ran.
 - Fix: `.where('id', '^[0-9]+$')` now matches. A leading `^` and a trailing `$` are dropped. Before, they ended up inside the route regex, so the route never matched.
 - `req.pathIs()` and `req.routeIs()` build the regex of a pattern once, not on every call.
