@@ -367,8 +367,18 @@ class DoxRequest implements IDoxRequest {
     return path.replaceFirst(RegExp(r'^/+'), '');
   }
 
+  /// pattern => its regex. patterns are most often fixed text in the
+  /// code, so the map stays small.
+  // ponytail: cleared when full, an LRU if apps build many patterns
+  static final Map<String, RegExp> _wildcards = <String, RegExp>{};
+
   static RegExp _wildcard(String pattern) {
-    return RegExp('^${pattern.split('*').map(RegExp.escape).join('.*')}\$');
+    RegExp? cached = _wildcards[pattern];
+    if (cached != null) return cached;
+    if (_wildcards.length >= 256) _wildcards.clear();
+    return _wildcards[pattern] = RegExp(
+      '^${pattern.split('*').map(RegExp.escape).join('.*')}\$',
+    );
   }
 
   /// the value of [key] in the input. a key that is there as it is wins,
