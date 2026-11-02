@@ -4,8 +4,8 @@ import 'dart:io';
 /// as `dox make:migration`: `2026_10_21_120000_create_queue_tables.dart`.
 ///
 /// Use it in a package command that adds a migration, like `queue:table`.
-/// The `dox` CLI updates `db/migration/migrations.dart` (and makes
-/// `bin/migrate.dart` when it is missing) after the command.
+/// `dox migrate` then writes `db/migration/migrations.dart` again (and
+/// makes `bin/migrate.dart` when it is missing), so the new file runs.
 class MigrationFile {
   /// [folder] is `db/migration` of the current folder by default.
   MigrationFile({Directory? folder})
@@ -14,7 +14,14 @@ class MigrationFile {
   final Directory folder;
 
   static final RegExp _stamp = RegExp(
-    r'^(\d{4})_(\d{2})_(\d{2})_(\d{2})(\d{2})(\d{2})_(\w+)\.(dart|sql)$',
+    r'^(\d{4})_(\d{2})_(\d{2})_(\d{2})(\d{2})(\d{2})_',
+  );
+
+  /// any migration file name, with any number of digits for the time,
+  /// like the `2026_10_25_000000000_` files of the app template. Same
+  /// rule as the migration list of the `dox` CLI.
+  static final RegExp _name = RegExp(
+    r'^\d{4}_\d{2}_\d{2}_\d+_(\w+)\.(dart|sql)$',
   );
 
   /// write [source] as a new migration named [name] (snake case, like
@@ -32,8 +39,8 @@ class MigrationFile {
   /// true when a migration named [name] is in the folder, at any time
   bool exists(String name) {
     for (File file in _files()) {
-      RegExpMatch? match = _stamp.firstMatch(file.uri.pathSegments.last);
-      if (match != null && match.group(7) == name) return true;
+      RegExpMatch? match = _name.firstMatch(file.uri.pathSegments.last);
+      if (match != null && match.group(1) == name) return true;
     }
     return false;
   }

@@ -34,6 +34,16 @@ void main() {
     expect(path, endsWith('2999_01_01_000001_x.dart'));
   });
 
+  test('sees a migration with a 9-digit time, like the app template', () {
+    File('${folder.path}/2026_10_25_000000000_create_queue_tables.dart')
+        .writeAsStringSync('old');
+    MigrationFile file = MigrationFile(folder: folder);
+    expect(file.exists('create_queue_tables'), isTrue);
+    expect(file.create('create_queue_tables', 'new'), isNull);
+    expect(file.exists('queue_tables'), isFalse);
+    expect(folder.listSync(), hasLength(1));
+  });
+
   test('does not write a second migration with the same name', () {
     File('${folder.path}/2020_01_01_000000_create_queue_tables.dart')
         .writeAsStringSync('old');

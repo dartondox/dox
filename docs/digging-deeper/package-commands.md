@@ -67,7 +67,7 @@ dox:
   commands: package:my_package/commands.dart
 ```
 
-The value must be a library of the package itself. That is all. An app that depends on your package now has `dox hello:say`.
+The value must be a library of the package itself, like `package:my_package/commands.dart`. Use only letters, digits, `_`, `-`, `.` and `/` in the path, and no `..`. That is all. An app that depends on your package now has `dox hello:say`.
 
 ## Add a command to your app
 
@@ -81,7 +81,7 @@ dox:
 ## Exit codes and errors
 
 - When `run` ends, `dox` exits with code 0.
-- To fail, set `exitCode` from `dart:io` (like `exitCode = 1`), or throw. A thrown error is printed, and the exit code is 1.
+- To fail, set `exitCode` from `dart:io` (like `exitCode = 1`), or throw. A thrown error is printed with its stack trace, and the exit code is 1.
 - The exit code of the command is the exit code of `dox`, so scripts and CI see it.
 
 ## Write a migration
@@ -96,7 +96,7 @@ if (path == null) {
 }
 ```
 
-`create` returns `null` and writes nothing when a migration with this name is already there. After the command, `dox` writes `db/migration/migrations.dart` again, and makes `bin/migrate.dart` when it is missing. So `dox migrate` runs the new file.
+`create` returns `null` and writes nothing when a migration with this name is already there, with any time in its name. `dox migrate` writes `db/migration/migrations.dart` again before it runs, and makes `bin/migrate.dart` when it is missing. So `dox migrate` runs the new file.
 
 ## Rules
 
@@ -112,4 +112,8 @@ if (path == null) {
 3. It writes `.dart_tool/dox/commands.dart`. This file imports each commands library and runs the command with your args.
 4. It runs that file with `dart run`.
 
-`dox` writes the file again only when `.dart_tool/package_config.json` or your `pubspec.yaml` change, so after `dart pub get`. `dox help` keeps the list of package commands in `.dart_tool/dox/commands.json`. It loads the list again when a package or a commands library changes.
+`dox` writes the file again only when `.dart_tool/package_config.json`, your `pubspec.yaml`, or the `pubspec.yaml` of a path dependency change. So after `dart pub get`, or after you change the key in a local package. The code of the commands is always the newest, because `dart run` compiles it each time.
+
+`dox help` keeps the list of package commands in `.dart_tool/dox/commands.json`. It loads the list again when a package or a commands library (the file in the key) changes. When you change only a file that the commands library imports, `dox help` can show the old description until then. The command itself always runs the new code.
+
+An app inside a pub workspace works too. `dox` finds `.dart_tool/package_config.json` in the workspace folder above the app.
