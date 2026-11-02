@@ -192,8 +192,12 @@ Ids match with one rule:
 - This is only how Dart matches ids. The databases read some texts in other ways.
   For example, `'0x1'` is `1` in Dart and on Postgres, `0` on MariaDB, and an error on MySQL.
   Postgres throws for `'1.0'`, `'1.'` and `'1e0'` on an integer column.
-- A text that only reads as a number past ±2^53, like `'1e20'`, is not exact.
+- A given text that only reads as a number at or past ±2^53, like `'1e20'` or `'9007199254740993.'`, is not exact.
   It throws an `ArgumentError` when it is matched to a number.
+  `sync` checks every id before its first write.
+- A stored value never throws. A value in the table that can not be read exactly does not match a number.
+  So a long digit text in a text key column does not stop `sync`.
+- A bool id is `1` or `0`, like the databases read it. So `sync('songs', true)` keeps the row of song `1`.
 - Each id finds its own stored row when it can. A row with the same text wins, so on a text key `1` finds `'1'`, not `'01'`.
   A stored row is matched once, so on a number key `toggle('songs', ['1', '01'])` detaches song `1` once.
 - `detach` and `updateExistingPivot` send every given id.
