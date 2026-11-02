@@ -47,6 +47,10 @@ Route.get('/ping', <dynamic>[LoggerMiddleware(), (WebController c) => c.pong]);
 !!! note
     `handle` takes an `IDoxRequest`, not a `DoxRequest`.
 
+!!! warning
+    Do not forget `return req`. A middleware that returns `null` ends the request with an empty `200`, and the controller does not run.
+    When `APP_ENV` is `development` or `local`, Dox prints a warning to stderr the first time a middleware does this.
+
 ## Function based middleware
 
 A function that takes a `DoxRequest` also works as middleware.

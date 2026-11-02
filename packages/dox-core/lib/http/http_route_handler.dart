@@ -4,6 +4,7 @@ import 'package:dox_core/constants/http_request_method.dart';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_cors_handler.dart';
 import 'package:dox_core/http/http_error_handler.dart';
+import 'package:dox_core/http/http_request_handler.dart';
 import 'package:dox_core/http/http_response_handler.dart';
 import 'package:dox_core/http/http_static_handler.dart';
 import 'package:dox_core/router/route_data.dart';
@@ -62,6 +63,14 @@ RouteMatch? httpRouteHandler(HttpRequest req, {String? method}) {
 /// responseHandler can format it. the default body is JSON.
 /// when the path has routes for other methods, it is 405.
 void _notFound(HttpRequest req, String? host) {
+  if (Route().fallbacks.isNotEmpty &&
+      (req.method == 'GET' || req.method == 'HEAD')) {
+    RouteData? fallback = _fallbackFor(req.uri.path, host);
+    if (fallback != null) {
+      runRoute(req, (route: fallback, params: null));
+      return;
+    }
+  }
   List<String> allow = _allowedMethods(req.uri.path, host);
   httpErrorHandler(
     req,
@@ -75,6 +84,28 @@ void _notFound(HttpRequest req, String? host) {
           ),
     StackTrace.empty,
   );
+}
+
+/// the [Route.fallback] for [path]: the one with the longest prefix
+/// that [path] is under, and whose domain matches. null when none.
+RouteData? _fallbackFor(String path, String? host) {
+  path = sanitizeRoutePath(path);
+  String? hostLower = host?.toLowerCase();
+  String? hostName = hostLower == null ? null : _withoutPort(hostLower);
+  RouteData? best;
+  for (RouteData route in Route().fallbacks) {
+    String want = route.path;
+    String? domain = route.domainLower;
+    if (domain != null && domain != hostLower && domain != hostName) continue;
+    bool under =
+        want == '/' ||
+        path == want ||
+        (path.startsWith(want) && path.codeUnitAt(want.length) == 0x2F);
+    if (under && (best == null || want.length > best.path.length)) {
+      best = route;
+    }
+  }
+  return best;
 }
 
 /// the methods with a route for [path], eg. `['GET', 'HEAD', 'POST']`.
@@ -93,8 +124,10 @@ List<String> _allowedMethods(String path, String? host) {
 Map<String, _MethodRoutes> _byMethod = <String, _MethodRoutes>{};
 List<RouteData>? _indexedList;
 int _indexedLength = -1;
+List<RouteData>? _indexedFallbacks;
+int _indexedFallbackLength = -1;
 
-/// true when any route has a domain. else Host is never read.
+/// true when any route or fallback has a domain. else Host is never read.
 bool _hasDomain = false;
 
 /// the routes of one method, plus a map for plain paths (no params).
@@ -171,13 +204,20 @@ String _firstSegment(String path) {
 
 Map<String, _MethodRoutes> _routeIndex() {
   List<RouteData> routes = Route().routes;
-  if (!identical(routes, _indexedList) || routes.length != _indexedLength) {
+  List<RouteData> fallbacks = Route().fallbacks;
+  if (!identical(routes, _indexedList) ||
+      routes.length != _indexedLength ||
+      !identical(fallbacks, _indexedFallbacks) ||
+      fallbacks.length != _indexedFallbackLength) {
     Map<String, _MethodRoutes> index = <String, _MethodRoutes>{};
     bool hasDomain = false;
     for (RouteData route in routes) {
       route.path = sanitizeRoutePath(route.path);
       hasDomain = hasDomain || route.domain != null;
       (index[route.method.toUpperCase()] ??= _MethodRoutes()).list.add(route);
+    }
+    for (RouteData fallback in fallbacks) {
+      hasDomain = hasDomain || fallback.domain != null;
     }
     for (_MethodRoutes group in index.values) {
       group.build();
@@ -186,6 +226,8 @@ Map<String, _MethodRoutes> _routeIndex() {
     _hasDomain = hasDomain;
     _indexedList = routes;
     _indexedLength = routes.length;
+    _indexedFallbacks = fallbacks;
+    _indexedFallbackLength = fallbacks.length;
   }
   return _byMethod;
 }

@@ -24,6 +24,9 @@ class DoxIsolate {
   /// each isolate registers those itself. kept so a restart gets the same.
   List<RouteData> _baseRoutes = <RouteData>[];
 
+  /// `Route.fallback` routes added before `startServer()`, like [_baseRoutes]
+  List<RouteData> _baseFallbacks = <RouteData>[];
+
   /// wait before a dead isolate is started again,
   /// so a crash loop does not burn the CPU
   Duration restartDelay = const Duration(seconds: 1);
@@ -39,6 +42,7 @@ class DoxIsolate {
   Future<void> spawn(int count) async {
     _stopped = false;
     _baseRoutes = List<RouteData>.of(Route().routes);
+    _baseFallbacks = List<RouteData>.of(Route().fallbacks);
     for (int i = 1; i < count; i++) {
       await _spawn(i + 1);
     }
@@ -124,6 +128,7 @@ class DoxIsolate {
         Dox().config,
         Dox().doxProviders,
         routes: _baseRoutes,
+        fallbacks: _baseFallbacks,
         bindings: Route().bindings,
         control: controlPort.sendPort,
         rateLimitPort: RateLimitCounter.instance.port,

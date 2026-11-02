@@ -240,6 +240,81 @@ void main() {
       expect(routes[1].method, 'POST');
       expect(routes[1].domain, 'dartondox.dev');
     });
+
+    test('match adds one route per method', () {
+      Route.match(<String>['get', 'POST'], '/ping', (DoxRequest req) {});
+      expect(Route().routes.map((RouteData r) => r.method), <String>[
+        'GET',
+        'POST',
+      ]);
+    });
+
+    test('match throws on an unknown method and on HEAD', () {
+      expect(
+        () => Route.match(<String>['FOO'], '/ping', (DoxRequest req) {}),
+        throwsArgumentError,
+      );
+      expect(
+        () => Route.match(<String>['HEAD'], '/ping', (DoxRequest req) {}),
+        throwsArgumentError,
+      );
+    });
+
+    test('any adds GET, POST, PUT, PATCH and DELETE', () {
+      Route.any('/ping', (DoxRequest req) {});
+      expect(Route().routes.map((RouteData r) => r.method), <String>[
+        'GET',
+        'POST',
+        'PUT',
+        'PATCH',
+        'DELETE',
+      ]);
+    });
+
+    test('where sets the param regex on every route of match', () {
+      Route.match(
+        <String>['GET', 'PUT'],
+        '/users/{id}',
+        (DoxRequest req) {},
+      ).where('id', '[0-9]+');
+      for (RouteData route in Route().routes) {
+        expect(route.pattern!.hasMatch('/users/12'), isTrue);
+        expect(route.pattern!.hasMatch('/users/ab'), isFalse);
+      }
+    });
+
+    test('where with a|b keeps the alternation inside the param', () {
+      Route.get('/f/{type}', (DoxRequest req) {}).where('type', 'png|jpg');
+      RegExp pattern = Route().routes.first.pattern!;
+      expect(pattern.hasMatch('/f/png'), isTrue);
+      expect(pattern.hasMatch('/f/jpg'), isTrue);
+      expect(pattern.hasMatch('/f/gif'), isFalse);
+    });
+
+    test('where throws on an unknown param, a bad regex or a group', () {
+      Route.get('/users/{id}', (DoxRequest req) {});
+      expect(() => Route().where('nope', '[0-9]+'), throwsArgumentError);
+      expect(() => Route().where('id', '[0-9'), throwsArgumentError);
+      expect(() => Route().where('id', '([0-9]+)'), throwsArgumentError);
+      Route().where('id', '(?:[0-9]+)');
+    });
+
+    test('timeout covers every route of any', () {
+      Route.any('/slow', (DoxRequest req) {}).timeout(Duration(seconds: 1));
+      for (RouteData route in Route().routes) {
+        expect(route.controllers.first, isA<RequestTimeout>());
+      }
+    });
+
+    test('fallback is kept apart from the routes', () {
+      Route().setFallbacks(<RouteData>[]);
+      Route.group('admin', () {
+        Route.fallback((DoxRequest req) {});
+      });
+      expect(Route().routes, isEmpty);
+      expect(Route().fallbacks.single.path, '/admin');
+      expect(Route().fallbacks.single.method, 'GET');
+    });
   });
 }
 

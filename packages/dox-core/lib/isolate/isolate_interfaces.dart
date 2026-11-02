@@ -9,6 +9,9 @@ class IsolateSpawnParameter {
   final List<DoxProvider> providers;
   final List<RouteData> routes;
 
+  /// routes from `Route.fallback`
+  final List<RouteData> fallbacks;
+
   /// binders from `Route.bind`
   final Map<String, RouteBinding> bindings;
 
@@ -25,6 +28,7 @@ class IsolateSpawnParameter {
     this.config,
     this.providers, {
     this.routes = const <RouteData>[],
+    this.fallbacks = const <RouteData>[],
     this.bindings = const <String, RouteBinding>{},
     this.control,
     this.rateLimitPort,

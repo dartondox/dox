@@ -1,5 +1,10 @@
 ## Unreleased
 
+- New: `Route.match(methods, path, handler)` adds one route for each method in the list. `Route.any(path, handler)` adds one for GET, POST, PUT, PATCH and DELETE. OPTIONS is left out, so the CORS preflight answer still works.
+- New: `Route.redirect(from, to, status:)` and `Route.permanentRedirect(from, to)`. 302 and 301.
+- New: `.where(param, regex)` on a route. The route matches only when the param text matches the regex. Else the next route is tried. Routes without it match the same as before.
+- New: `Route.fallback(handler)` answers a GET or HEAD request that matches no route and no static file. It runs its middleware, so in a router the global middleware runs too. It follows the group prefix and domain. The built-in 404 and 405 do not change.
+- New: in development (`APP_ENV` is `development` or `local`), Dox prints a warning to stderr when a middleware returns `null`. That ends the request with an empty 200, and the controller does not run. Nothing else changes.
 - New request helpers on `DoxRequest`:
   - `input(key, defaultValue)` takes a default. A dot key like `user.name` or `items.0.id` reads inside maps and lists. A key that is in the input as it is still wins, so old code works the same.
   - `filled(key)`: the key is there and not empty. `exists(key)`: the key is there, with any value. `missing(key)`: the key is not there. `has` does not change.

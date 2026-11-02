@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_error_handler.dart';
@@ -36,13 +37,14 @@ FutureOr<dynamic> _runFrom(DoxRequest doxReq, int start, dynamic result) {
       continue;
     }
 
-    if (result is Future<dynamic>) return _resume(result, i + 1);
+    if (result is Future<dynamic>) return _resume(result, i + 1, fn, route);
 
     /// a request from a middleware goes on to the next item,
     /// anything else is the response
     if (result is DoxRequest) {
       doxReq = result;
     } else {
+      if (result == null) warnNullMiddleware(fn, route);
       return result;
     }
   }
@@ -50,10 +52,38 @@ FutureOr<dynamic> _runFrom(DoxRequest doxReq, int start, dynamic result) {
 }
 
 /// wait for a middleware Future, then go on from item [next]
-Future<dynamic> _resume(Future<dynamic> pending, int next) async {
+Future<dynamic> _resume(
+  Future<dynamic> pending,
+  int next,
+  Object middleware,
+  RouteData route,
+) async {
   dynamic result = await pending;
   if (result is DoxRequest) return await _runFrom(result, next, result);
+  if (result == null) warnNullMiddleware(middleware, route);
   return result;
+}
+
+/// the middleware already warned about, so the log is not flooded
+final Set<Object> _warnedNull = <Object>{};
+
+/// in development (`APP_ENV` is `development` or `local`), write a warning
+/// once per middleware that gives null. null ends the request with an
+/// empty 200, and the controller never runs. Most of the time the
+/// middleware forgot `return req`. Nothing else changes.
+void warnNullMiddleware(Object middleware, RouteData route) {
+  String env = Env.get<String>('APP_ENV').toLowerCase();
+  if (env != 'development' && env != 'local') return;
+  if (!_warnedNull.add(middleware)) return;
+  String name = middleware is Function
+      ? 'A middleware function'
+      : '${middleware.runtimeType}';
+  // stderr, not Logger: the logger is off by default
+  stderr.writeln(
+    'dox: warning: $name on ${route.method} ${route.path} returned null, '
+    'so the request ended with an empty 200 and the controller did not '
+    'run. Return the request (return req) to go on, or return a response.',
+  );
 }
 
 /// Run the items from [start] for a route with a `next` middleware
@@ -90,7 +120,10 @@ Future<DoxResponse> _chain(DoxRequest req, int start) async {
         continue;
       }
       if (result is Future<dynamic>) result = await result;
-      if (result is! DoxRequest) return asResponse(result);
+      if (result is! DoxRequest) {
+        if (result == null) warnNullMiddleware(fn as Object, route);
+        return asResponse(result);
+      }
       req = result;
     }
     return asResponse(null);

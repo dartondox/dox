@@ -331,6 +331,9 @@ class Dox {
     for (RouteData route in Route().routes) {
       route.handler;
     }
+    for (RouteData route in Route().fallbacks) {
+      route.handler;
+    }
   }
 
   /// add the providers of the container that are not in [doxProviders]
