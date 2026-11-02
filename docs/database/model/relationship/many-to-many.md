@@ -180,7 +180,20 @@ The ids can be:
 - a map of `id => pivot values`: `{1: {'role': 'singer'}, 2: {}}`
 
 `null` means no ids. So `attach('songs', null)` and `detach('songs', null)` change nothing, and `sync('songs', null)` deletes every link, like `sync('songs', [])`.
-Ids match by value, like the database: `'01'` and `1.0` are the same song as `1`.
+Ids match with one rule:
+
+- When one id is a number (`int` or `double`), a text of the same whole number matches it.
+  The text can have a `+` or `-`, a `.0` end and spaces around it.
+  So `1`, `1.0`, `'01'`, `'+1'`, `'1.0'` and `' 1'` are the same song.
+  Rows of a number key column come back as numbers, so `sync('songs', ['01'])` keeps the row of song `1`.
+- Two texts only match when the text is the same.
+  So on a text key column, `'007'` and `'7'` are two ids.
+  The ORM does not know the type of the key column, so `attach('songs', ['1', '01'])` adds two rows.
+- A whole double like `2.0` is sent as the int `2`.
+  Any other double, like `1.5`, NaN, infinity or `1e20`, throws an `ArgumentError`.
+- Text ids are sent to the database as they are.
+  Postgres does not take `'1.0'` for an integer column, so a write that sends it throws there.
+
 A `null` id or a model that is not saved is skipped by `attach`, `detach`, `toggle` and `syncWithoutDetaching`.
 `sync` throws an `ArgumentError` for one, before it changes anything, because it would delete every other link.
 Each id is used once: `[1, 1, '1']` adds one row.
@@ -224,6 +237,7 @@ Makes the pivot rows match the ids.
 
 It returns a `PivotSyncResult` with the ids of each change.
 A number id is an `int` in the result, also when you gave `'3'`.
+A text that is not the plain text of an int, like `'03'` or `'007'`, stays text.
 
 ```dart
 PivotSyncResult result = await artist.sync('songs', <int>[1, 2, 3]);
