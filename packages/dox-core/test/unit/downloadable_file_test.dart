@@ -66,4 +66,22 @@ void main() {
       'X-New': '2',
     });
   });
+
+  test('withHeaders replaces a header in any case', () {
+    DoxResponse download = DoxResponse(
+      DownloadableFile(
+        ContentType.binary,
+        const Stream<List<int>>.empty(),
+        'a.pdf',
+      ),
+    ).withHeaders(<String, dynamic>{'content-disposition': 'inline'});
+    expect(download.headers, <String, dynamic>{
+      'content-disposition': 'inline',
+    });
+
+    DoxResponse cached = DoxResponse('x')
+        .cache(Duration(seconds: 10))
+        .withHeaders(<String, dynamic>{'Cache-Control': 'no-store'});
+    expect(cached.headers, <String, dynamic>{'Cache-Control': 'no-store'});
+  });
 }

@@ -116,12 +116,19 @@ class DoxResponse {
   }
 
   /// Set list of headers by Map. A key in [values] replaces the header
-  /// with the same name. Other headers stay.
+  /// with the same name, in any case (`cache-control` and
+  /// `Cache-Control` are one header). Other headers stay.
   /// ```
   /// res.withHeaders({'Authorization' : 'Bearer xxx'});
   /// ```
   DoxResponse withHeaders(Map<String, dynamic> values) {
-    _headers.addAll(values);
+    for (MapEntry<String, dynamic> entry in values.entries) {
+      String name = entry.key.toLowerCase();
+      _headers.removeWhere((String key, dynamic _) {
+        return key.toLowerCase() == name;
+      });
+      _headers[entry.key] = entry.value;
+    }
     return this;
   }
 
