@@ -180,8 +180,38 @@ The ids can be:
 - a map of `id => pivot values`: `{1: {'role': 'singer'}, 2: {}}`
 
 `null` means no ids. So `attach('songs', null)` and `detach('songs', null)` change nothing, and `sync('songs', null)` deletes every link, like `sync('songs', [])`.
-Ids match by value, like the database: `'01'` and `1.0` are the same song as `1`.
-A `null` id or a model that is not saved is skipped by `attach`, `detach`, `toggle` and `syncWithoutDetaching`.
+Ids match with one rule:
+
+- Two texts only match when the text is the same.
+  So on a text key column, `'007'` and `'7'` are two ids.
+  The ORM does not know the type of the key column, so `attach('songs', ['1', '01'])` adds two rows.
+- When one id is a number (`int` or `double`), Dart reads the other one as a number.
+  It trims the text, drops a `.0` end, and tries `int.tryParse` (`' 1'`, `'+1'`, `'01'`, `'1.0'`), then `double.tryParse` (`'1.'`, `'1e0'`).
+  They match when the two numbers are the same.
+  Rows of a number key column come back as numbers, so `sync('songs', ['01'])` keeps the row of song `1`.
+- This is only how Dart matches ids. The databases read some texts in other ways.
+  For example, `'0x1'` is `1` in Dart and on Postgres, `0` on MariaDB, and an error on MySQL.
+  Postgres throws for `'1.0'`, `'1.'` and `'1e0'` on an integer column.
+- A given text that only reads as a number at or past ±2^53, like `'1e20'` or `'9007199254740993.'`, is not exact.
+  It throws an `ArgumentError` when it is matched to a number.
+  `sync` checks every id before its first write.
+- A stored value never throws. A value in the table that can not be read exactly does not match a number.
+  So a long digit text in a text key column does not stop `sync`.
+- A bool id is `1` or `0`, like the databases read it. So `sync('songs', true)` keeps the row of song `1`.
+- A `BigInt` id is an `int` when it fits, else it throws an `ArgumentError`. Any other id type that is not an `int`, a `String`, a `bool`, a `double` or a model throws an `ArgumentError`.
+- Each id finds its own stored row when it can. A row with the same text wins, so on a text key `1` finds `'1'`, not `'01'`.
+  A stored row is matched once, so on a number key `toggle('songs', ['1', '01'])` detaches song `1` once.
+- `detach` and `updateExistingPivot` send every given id.
+  So on a text key, `detach('songs', [1, '01'])` deletes both rows.
+- `sync` deletes a stored row only when none of the given ids matches it.
+  So on a text key, `sync('songs', [1, '01'])` keeps the rows `'1'` and `'01'`.
+- A new row is added once for ids that are the same by this rule, and the first id wins.
+  So on a number key `attach('songs', [1, '01'])` adds one row. On a text key it adds only the row `1`.
+- A whole double within ±2^53, like `2.0`, is sent as the int `2`.
+  Any other double, like `1.5`, NaN, infinity or `1e20`, throws an `ArgumentError`.
+- Text ids are sent to the database as they are.
+
+A `null` id or a model that is not saved is skipped by `attach`, `detach`, `toggle`, `syncWithoutDetaching` and `updateExistingPivot`.
 `sync` throws an `ArgumentError` for one, before it changes anything, because it would delete every other link.
 Each id is used once: `[1, 1, '1']` adds one row.
 
@@ -224,6 +254,7 @@ Makes the pivot rows match the ids.
 
 It returns a `PivotSyncResult` with the ids of each change.
 A number id is an `int` in the result, also when you gave `'3'`.
+A text that is not the plain text of an int, like `'03'` or `'007'`, stays text.
 
 ```dart
 PivotSyncResult result = await artist.sync('songs', <int>[1, 2, 3]);
