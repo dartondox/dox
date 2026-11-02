@@ -221,6 +221,8 @@ print(page.prevCursor); // send it back as `cursor` to read the page before
   Or use `column` and `direction`: `cursorPaginate(perPage: 10, column: 'created_at', direction: 'desc')`.
 - The primary key is added as the last order column, so rows with the same value are never skipped.
 - `orderBy()` together with `column`, `orderByRaw()` and `inRandomOrder()` throw a `StateError`.
+- It does not work on a [`union`](#union) or a [`fromSub`](#fromsub) query. It throws a `StateError` there.
+  Use `paginate()` or `simplePaginate()`.
 - The order columns must be in the select, and they must have no `null` values.
 - The cursor is safe to take from a user. The columns and the order come from your code.
   The values of the cursor are only sent as query values, never as SQL.
@@ -262,6 +264,8 @@ await Actor().where('age', '>', 100).chunkById(100, (List<Actor> actors) async {
 
 - `chunkById()` reads the rows after the last id: `WHERE "id" > @last`.
 - It orders by the id itself. A query with `orderBy()` throws a `StateError`.
+- `chunkById()` does not work on a [`union`](#union) or a [`fromSub`](#fromsub) query. It throws a `StateError` there.
+  Use `chunk()`.
 - To use another column, add `column: 'uuid'`. The column must be unique.
 
 ## Aggregates
@@ -857,6 +861,8 @@ await QueryBuilder.table('actor')
 - `count()`, `paginate()`, `sum()`, `avg()`, `min()` and `max()` use the whole result:
   `SELECT SUM("age") as dox_aggregate FROM (...) as dox_union_aggregate`.
 - `sum()`, `avg()`, `min()` and `max()` keep `orderBy`, `limit` and `offset`. `count()` does not.
+- `cursorPaginate()` and `chunkById()` do not work on a union. They throw a `StateError`.
+  Use `paginate()`, `simplePaginate()` or `chunk()`.
 
 ## Row locks
 
