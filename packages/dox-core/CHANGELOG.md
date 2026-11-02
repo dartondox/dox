@@ -1,5 +1,15 @@
 ## Unreleased
 
+- Docs: `has` does not read dot keys (only `filled` and the other new helpers do). `.where` checks the param before `%` decoding. `Route.redirect` does not fill `{id}` in the target and drops the query string. A GET to a POST-only path gets the fallback, not 405. A fallback added after `startServer()` does not reach the other isolates.
+- With `MethodOverride`, a POST to a path with no route for any method gets 404 at once. Before, Dox read the whole body first.
+- Fix: with `MethodOverride`, a POST with `_method=PUT` to a path with no PUT route now says "PUT is not allowed" in the 405 message. Before, it said "POST is not allowed".
+- The router calls `Route()` once per route lookup, not twice.
+- The warning for a middleware that returns `null` reads `APP_ENV` once, not on every such request.
+- Fix: a `Route.fallback` in a group with a param in its prefix, like `{tenant}`, now matches, and `req.param` gives the param. Before, the prefix was compared as plain text, so the fallback never ran.
+- Fix: `.where('id', '^[0-9]+$')` now matches. A leading `^` and a trailing `$` are dropped. Before, they ended up inside the route regex, so the route never matched.
+- `req.pathIs()` and `req.routeIs()` build the regex of a pattern once, not on every call.
+- Fix: `req.pathIs()` gives false for a path with a bare `%` or a bad code like `%zz`. Before, it threw an error and the client got 500.
+- `req.boolean()` no longer makes a new set of true words on every call.
 - New: `Route.match(methods, path, handler)` adds one route for each method in the list. `Route.any(path, handler)` adds one for GET, POST, PUT, PATCH and DELETE. OPTIONS is left out, so the CORS preflight answer still works.
 - New: `Route.redirect(from, to, status:)` and `Route.permanentRedirect(from, to)`. 302 and 301.
 - New: `.where(param, regex)` on a route. The route matches only when the param text matches the regex. Else the next route is tried. Routes without it match the same as before.

@@ -273,13 +273,10 @@ class DoxRequest implements IDoxRequest {
     dynamic val = _find(key).value;
     if (val == null) return defaultValue;
     if (val is bool) return val;
-    return <String>{
-      '1',
-      'true',
-      'on',
-      'yes',
-    }.contains(val.toString().trim().toLowerCase());
+    return _trueWords.contains(val.toString().trim().toLowerCase());
   }
+
+  static const Set<String> _trueWords = <String>{'1', 'true', 'on', 'yes'};
 
   /// The input as an int. [defaultValue] is given when the key is not
   /// there or the value is not a number.
@@ -350,6 +347,9 @@ class DoxRequest implements IDoxRequest {
     } on FormatException {
       // a bad escape, like `/%ff`, matches no pattern
       return false;
+    } on ArgumentError {
+      // a bare `%` or a bad code like `%zz` matches no pattern
+      return false;
     }
     return _wildcard(_trimSlash(pattern)).hasMatch(path);
   }
@@ -367,8 +367,18 @@ class DoxRequest implements IDoxRequest {
     return path.replaceFirst(RegExp(r'^/+'), '');
   }
 
+  /// pattern => its regex. patterns are most often fixed text in the
+  /// code, so the map stays small.
+  // ponytail: cleared when full, an LRU if apps build many patterns
+  static final Map<String, RegExp> _wildcards = <String, RegExp>{};
+
   static RegExp _wildcard(String pattern) {
-    return RegExp('^${pattern.split('*').map(RegExp.escape).join('.*')}\$');
+    RegExp? cached = _wildcards[pattern];
+    if (cached != null) return cached;
+    if (_wildcards.length >= 256) _wildcards.clear();
+    return _wildcards[pattern] = RegExp(
+      '^${pattern.split('*').map(RegExp.escape).join('.*')}\$',
+    );
   }
 
   /// the value of [key] in the input. a key that is there as it is wins,

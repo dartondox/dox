@@ -46,14 +46,14 @@ RouteMatch? httpRouteHandler(HttpRequest req, {String? method}) {
       /// a file of `Route.staticFiles`, else 404
       httpStaticHandler(req, Route().statics).then(
         (bool sent) {
-          if (!sent) _notFound(req, host);
+          if (!sent) _notFound(req, host, method);
         },
         onError: (Object error, StackTrace stackTrace) {
           httpErrorHandler(req, error, stackTrace);
         },
       );
     } else {
-      _notFound(req, host);
+      _notFound(req, host, method);
     }
   }
   return match;
@@ -62,12 +62,13 @@ RouteMatch? httpRouteHandler(HttpRequest req, {String? method}) {
 /// same path as a thrown 404, so the app ExceptionHandler and
 /// responseHandler can format it. the default body is JSON.
 /// when the path has routes for other methods, it is 405.
-void _notFound(HttpRequest req, String? host) {
+/// [method] is the `_method` override, when there is one.
+void _notFound(HttpRequest req, String? host, String? method) {
   if (Route().fallbacks.isNotEmpty &&
       (req.method == 'GET' || req.method == 'HEAD')) {
-    RouteData? fallback = _fallbackFor(req.uri.path, host);
+    RouteMatch? fallback = _fallbackFor(req.uri.path, host);
     if (fallback != null) {
-      runRoute(req, (route: fallback, params: null));
+      runRoute(req, fallback);
       return;
     }
   }
@@ -80,7 +81,8 @@ void _notFound(HttpRequest req, String? host) {
           )
         : MethodNotAllowedHttpException(
             allow,
-            message: '${req.method} is not allowed for ${req.uri.path}',
+            message:
+                '${method ?? req.method} is not allowed for ${req.uri.path}',
           ),
     StackTrace.empty,
   );
@@ -88,24 +90,55 @@ void _notFound(HttpRequest req, String? host) {
 
 /// the [Route.fallback] for [path]: the one with the longest prefix
 /// that [path] is under, and whose domain matches. null when none.
-RouteData? _fallbackFor(String path, String? host) {
+/// a prefix with a param, like `/{tenant}`, gives its params.
+RouteMatch? _fallbackFor(String path, String? host) {
   path = sanitizeRoutePath(path);
   String? hostLower = host?.toLowerCase();
   String? hostName = hostLower == null ? null : _withoutPort(hostLower);
-  RouteData? best;
+  RouteMatch? best;
   for (RouteData route in Route().fallbacks) {
     String want = route.path;
     String? domain = route.domainLower;
     if (domain != null && domain != hostLower && domain != hostName) continue;
-    bool under =
-        want == '/' ||
-        path == want ||
-        (path.startsWith(want) && path.codeUnitAt(want.length) == 0x2F);
-    if (under && (best == null || want.length > best.path.length)) {
-      best = route;
+    if (best != null && want.length <= best.route.path.length) continue;
+    RegExp? pattern = route.pattern;
+    if (pattern == null) {
+      bool under =
+          want == '/' ||
+          path == want ||
+          (path.startsWith(want) && path.codeUnitAt(want.length) == 0x2F);
+      if (under) best = (route: route, params: null);
+      continue;
     }
+    RegExpMatch? match = _prefixPattern(pattern).firstMatch(path);
+    if (match == null) continue;
+    Map<String, dynamic>? params = _decodeParams(route.paramNames, match);
+    if (params != null) best = (route: route, params: params);
   }
   return best;
+}
+
+/// route regex => the same regex that also matches paths under it:
+/// `^/([^/]+)$` gives `^/([^/]+)(?:/|$)`.
+final Map<String, RegExp> _prefixPatterns = <String, RegExp>{};
+
+RegExp _prefixPattern(RegExp pattern) {
+  String source = pattern.pattern;
+  return _prefixPatterns[source] ??= RegExp(
+    '${source.substring(0, source.length - 1)}(?:/|\$)',
+  );
+}
+
+/// true when a route of any method matches the path of [req]. with
+/// `MethodOverride`, a POST to a path with no route at all is answered
+/// without reading its body.
+bool httpPathHasRoute(HttpRequest req) {
+  Map<String, _MethodRoutes> index = _routeIndex();
+  String? host = _hasDomain ? req.headers.value(HttpHeaders.hostHeader) : null;
+  for (String method in index.keys) {
+    if (_getMatchRoute(req.uri.path, method, host) != null) return true;
+  }
+  return false;
 }
 
 /// the methods with a route for [path], eg. `['GET', 'HEAD', 'POST']`.
@@ -203,8 +236,9 @@ String _firstSegment(String path) {
 }
 
 Map<String, _MethodRoutes> _routeIndex() {
-  List<RouteData> routes = Route().routes;
-  List<RouteData> fallbacks = Route().fallbacks;
+  Route router = Route();
+  List<RouteData> routes = router.routes;
+  List<RouteData> fallbacks = router.fallbacks;
   if (!identical(routes, _indexedList) ||
       routes.length != _indexedLength ||
       !identical(fallbacks, _indexedFallbacks) ||

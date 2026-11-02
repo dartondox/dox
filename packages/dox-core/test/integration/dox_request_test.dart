@@ -348,5 +348,52 @@ void main() {
       expect(res.statusCode, 200);
       expect(jsonDecode(res.body)['is'], false);
     });
+
+    test('pathIs is false for a bare % or a bad % code', () async {
+      Route.get('/bad-percent', (DoxRequest req) async {
+        // Uri.parse turns a bare `%` into `%25`, so use a raw path here
+        req.uri = _RawPathUri('/bad-percent/%');
+        bool bare = req.pathIs('bad-percent/*');
+        req.uri = _RawPathUri('/bad-percent/%zz');
+        return <String, dynamic>{'bare': bare, 'bad': req.pathIs('*')};
+      });
+      http.Response res = await http.get(Uri.parse('$baseUrl/bad-percent'));
+      expect(res.statusCode, 200);
+      expect(jsonDecode(res.body), <String, dynamic>{
+        'bare': false,
+        'bad': false,
+      });
+    });
+
+    test('pathIs matches regex characters as plain text', () async {
+      Route.get('/files/{name}', (DoxRequest req) async {
+        return <String, dynamic>{
+          'dot': req.pathIs('files/a.b'),
+          'plus': req.pathIs('files/a+b*'),
+        };
+      });
+      http.Response res = await http.get(Uri.parse('$baseUrl/files/a.b'));
+      expect(jsonDecode(res.body), <String, dynamic>{
+        'dot': true,
+        'plus': false,
+      });
+      res = await http.get(Uri.parse('$baseUrl/files/axb'));
+      expect(jsonDecode(res.body)['dot'], false);
+      res = await http.get(Uri.parse('$baseUrl/files/a+b.txt'));
+      expect(jsonDecode(res.body)['plus'], true);
+      res = await http.get(Uri.parse('$baseUrl/files/aab'));
+      expect(jsonDecode(res.body)['plus'], false);
+    });
   });
+}
+
+/// a [Uri] whose path is given as it is, not cleaned like [Uri.parse]
+class _RawPathUri implements Uri {
+  _RawPathUri(this.path);
+
+  @override
+  final String path;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

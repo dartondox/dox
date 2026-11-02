@@ -39,6 +39,14 @@ class ExtraRouter extends Router {
       'tag/{tag?}',
       (DoxRequest req) => 'tag ${req.param['tag']}',
     ).where('tag', '[a-z]+');
+    Route.get(
+      'code/{code}',
+      (DoxRequest req) => 'code ${req.param['code']}',
+    ).where('code', '^[0-9]+\$');
+    Route.get(
+      'price/{price}',
+      (DoxRequest req) => 'price ${req.param['price']}',
+    ).where('price', r'[0-9]+\$');
     Route.post('only-post', (DoxRequest req) => 'posted');
 
     Route.get('forgot', <dynamic>[Forgot(), (DoxRequest req) => 'controller']);
@@ -46,6 +54,9 @@ class ExtraRouter extends Router {
     Route.fallback((DoxRequest req) => 'fallback ${req.uri.path}');
     Route.group('admin', () {
       Route.fallback((DoxRequest req) => 'admin fallback');
+    });
+    Route.group('{tenant}/shop', () {
+      Route.fallback((DoxRequest req) => 'shop of ${req.param['tenant']}');
     });
   }
 }
@@ -94,6 +105,14 @@ void main() {
     (await client.get('/users/bob')).expectBody('name bob');
   });
 
+  test('where ignores a leading ^ and a trailing \$', () async {
+    (await client.get('/code/12')).expectBody('code 12');
+    (await client.get('/code/ab')).expectBody('fallback /code/ab');
+    // an escaped `\$` is a real dollar sign and stays
+    (await client.get('/price/5\$')).expectBody('price 5\$');
+    (await client.get('/price/5')).expectBody('fallback /price/5');
+  });
+
   test('where can let a param match slashes', () async {
     (await client.get('/docs/a/b/c')).expectBody('page a/b/c');
   });
@@ -122,6 +141,12 @@ void main() {
     (await client.get('/administrator')).expectBody('fallback /administrator');
   });
 
+  test('a group fallback with a param in its prefix matches', () async {
+    (await client.get('/acme/shop/x/y')).expectBody('shop of acme');
+    (await client.get('/acme/shop')).expectBody('shop of acme');
+    (await client.get('/acme/shopping')).expectBody('fallback /acme/shopping');
+  });
+
   test('fallback is only for GET and HEAD', () async {
     (await client.post('/nope')).expectStatus(404);
     (await client.delete('/only-post')).expectStatus(405);
@@ -144,6 +169,7 @@ void main() {
       controllers: <dynamic>[],
     );
 
+    setUp(resetNullMiddlewareWarning);
     tearDown(() => Env().env.remove('APP_ENV'));
 
     test('logs once in development', () {
@@ -159,6 +185,13 @@ void main() {
 
     test('logs nothing in production', () {
       Env().env['APP_ENV'] = 'production';
+      expect(logs(() => warnNullMiddleware(Forgot(), route)), isEmpty);
+    });
+
+    test('reads APP_ENV once', () {
+      Env().env['APP_ENV'] = 'production';
+      expect(logs(() => warnNullMiddleware(Forgot(), route)), isEmpty);
+      Env().env['APP_ENV'] = 'development';
       expect(logs(() => warnNullMiddleware(Forgot(), route)), isEmpty);
     });
   });
