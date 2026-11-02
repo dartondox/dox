@@ -115,6 +115,8 @@ So your migrations run as part of your app code.
 
 Add `--seed` to `migration:run`, `migration:refresh` or `migration:fresh` to run the [seeders](seeders.md) after it.
 
+When `APP_ENV=production`, `migration:reset`, `migration:refresh` and `migration:fresh` ask before they drop the tables. Type `y` to go on. Add `--force` to skip the question. With no terminal (CI or a deploy script), they print a warning and run.
+
 A batch is the group of migrations that ran in one `migration:run`.
 Migrations are undone newest first.
 The ran migrations are saved in the `dox_db_migration` table.
