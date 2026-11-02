@@ -26,7 +26,15 @@ void httpRequestHandler(HttpRequest req) {
     }
 
     RouteMatch? match = httpRouteHandler(req);
-    if (match == null) return;
+    if (match != null) runRoute(req, match);
+  } catch (error, stackTrace) {
+    httpErrorHandler(req, error, stackTrace);
+  }
+}
+
+/// read the body, then run the middleware and controller of [match]
+void runRoute(HttpRequest req, RouteMatch match) {
+  try {
     RouteData route = match.route;
     Map<String, dynamic>? params = match.params;
 

@@ -70,6 +70,31 @@ Route.delete('/blogs/{id}', (BlogController c) => c.destroy);
 
 A `HEAD` request runs the `GET` route of the same path. The answer has the status and headers of `GET`, with no body.
 
+### More than one method
+
+`Route.match` adds the same handler for a list of methods. `Route.any` adds it for `GET`, `POST`, `PUT`, `PATCH` and `DELETE`.
+
+```dart
+Route.match(<String>['GET', 'POST'], '/contact', (ContactController c) => c.handle);
+Route.any('/webhook', (WebhookController c) => c.handle);
+```
+
+- `HEAD` comes with `GET`, so do not list it. An unknown method throws an `ArgumentError` at start.
+- `Route.any` does not add `OPTIONS`. So Dox still answers the CORS preflight request for the path.
+- `.where(...)` and `.timeout(...)` after `Route.match` or `Route.any` work on every route it added. `.name(...)` names the last one.
+
+## Redirect routes
+
+`Route.redirect` sends a path to another URL. The status is `302` by default.
+
+```dart
+Route.redirect('/home', '/');
+Route.redirect('/old-blog', '/blog', status: 301);
+Route.permanentRedirect('/old-pricing', '/pricing'); // 301
+```
+
+The redirect works for the same methods as `Route.any`.
+
 ## The handler
 
 The second argument is the code that answers the request. It can be:
@@ -138,6 +163,25 @@ Route.get('/docs/{page*}', (String page) {
   return page; // GET /docs/a/b/c gives 'a/b/c'
 });
 ```
+
+### Param rules
+
+`.where(param, regex)` lets a route match only when the param text matches the regex.
+When it does not match, the router tries the next route. When no route matches, the client gets `404`.
+
+```dart
+Route.get('/users/{id}', (UserController c) => c.show).where('id', '[0-9]+');
+Route.get('/users/{name}', (UserController c) => c.byName); // gets the rest
+
+Route.get('/files/{type}', handler).where('type', 'png|jpg');
+Route.get('/docs/{page}', handler).where('page', '.*'); // matches slashes too
+```
+
+- The regex must match the whole param text. You do not need `^` or `$`.
+- Use `(?:...)` for a group, not `(...)`. A regex with a `(...)` group throws an `ArgumentError` at start.
+- A param name that the path does not have throws an `ArgumentError` at start.
+- Call `.where` more than once for more params.
+- Routes without `.where` match the same as before. The check costs nothing for them.
 
 ## Group routes
 
@@ -331,6 +375,34 @@ Route.staticFiles('build', 'public/build', maxAge: Duration(days: 365));
     Use [`dox_storage`](../packages/storage.md) for uploads. It sends such files as downloads.
 
 Behind a proxy, the proxy can serve the folder instead. Then the files never reach Dox.
+
+## Fallback route
+
+`Route.fallback` answers a `GET` or `HEAD` request that matches no route and no static file.
+Use it for a custom 404 page, or to send `index.html` of a single page app.
+
+```dart title="lib/routes/web.dart"
+class WebRouter extends Router {
+  @override
+  void register() {
+    Route.get('/', (WebController c) => c.home);
+
+    Route.fallback((DoxRequest req) {
+      return response(<String, String>{'message': 'Page not found'}).statusCode(404);
+    });
+  }
+}
+```
+
+- Other methods still get the normal `404` or `405`.
+- The fallback runs its middleware like any route. Add it in a `Router`, so the global middleware (like security headers) runs too.
+- It follows `Route.group`, the router prefix and `Route.domain`. In a group, it only answers paths under the group prefix. When two fallbacks match, the one with the longest prefix wins.
+- The handler decides the status. Return a `404` status for a "not found" page, else the client gets `200`.
+
+!!! note
+    The built-in `404` and `405` answers do not run the global middleware.
+    Running it there could change answers for apps today. For example, `CsrfMiddleware` would answer `419` to a `POST` to an unknown path, and `SessionMiddleware` would start a session for every bad link.
+    Use `Route.fallback` in a router when your `404` page needs the global middleware.
 
 ## Serve storage files
 

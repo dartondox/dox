@@ -17,6 +17,12 @@ The Laravel code is Laravel 11. The biggest changes are in [What is different](#
 | `Route::get('/blogs/{id}', ...)` and `function show(int $id)` | `Route.get('/blogs/{id}', ...)` and `show(int id)` |
 | `Route::get('/posts/{page?}', ...)` | `Route.get('/posts/{page?}', (int? page) => ...)` |
 | `->where('path', '.*')` | `Route.get('/docs/{page*}', (String page) => ...)` |
+| `->where('id', '[0-9]+')` | `Route.get('/users/{id}', ...).where('id', '[0-9]+')` |
+| `Route::match(['get', 'post'], '/contact', ...)` | `Route.match(<String>['GET', 'POST'], '/contact', ...)` |
+| `Route::any('/webhook', ...)` | `Route.any('/webhook', ...)` |
+| `Route::redirect('/here', '/there')` | `Route.redirect('/here', '/there')` |
+| `Route::permanentRedirect('/here', '/there')` | `Route.permanentRedirect('/here', '/there')` |
+| `Route::fallback(...)` | `Route.fallback(...)` |
 | `Route::prefix('blogs')->group(function () { ... });` | `Route.group('/blogs', () { ... });` |
 | `Route::middleware('auth')->group(...)` | `Route.middleware(<dynamic>[AuthMiddleware()], () { ... });` |
 | `Route::domain('admin.app.test')->group(...)` | `Route.domain('admin.app.test', () { ... });` |

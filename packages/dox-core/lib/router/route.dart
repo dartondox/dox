@@ -45,6 +45,9 @@ final Set<String> _mountsWithMiddleware = <String>{};
 /// folders added with [Route.staticFiles]. empty unless one is added.
 final List<StaticFolder> _statics = <StaticFolder>[];
 
+/// routes added with [Route.fallback]. empty unless one is added.
+List<RouteData> _fallbacks = <RouteData>[];
+
 /// gets the open socket of a [Route.websocket] request
 typedef WebSocketHandler = FutureOr<void> Function(
   WebSocket socket,
@@ -176,6 +179,10 @@ class Route {
 
   /// the last added route, for [name]
   RouteData? _last;
+
+  /// all routes of the last [match], [any] or [redirect] call, for
+  /// [where] and [timeout]. null when only [_last] was added.
+  List<RouteData>? _lastGroup;
   bool? _corsEnabled;
 
   List<dynamic> _preMiddleware = <dynamic>[];
@@ -339,8 +346,84 @@ class Route {
     if (last == null) {
       throw StateError('Route.timeout(): there is no route to time.');
     }
-    (last.controllers as List<dynamic>).insert(0, RequestTimeout(duration));
+    for (RouteData data in _lastGroup ?? <RouteData>[last]) {
+      (data.controllers as List<dynamic>).insert(0, RequestTimeout(duration));
+    }
     return this;
+  }
+
+  /// only match the route added last when its [param] matches [regex].
+  /// Else the route does not match, and the next route is tried (or the
+  /// client gets 404). The regex must match the whole param text. Use
+  /// `(?:...)` for groups, not `(...)`.
+  /// ```
+  /// Route.get('users/{id}', controller).where('id', '[0-9]+');
+  /// Route.get('docs/{page}', controller).where('page', '.*');
+  /// ```
+  Route where(String param, String regex) {
+    RouteData? last = _last;
+    if (last == null) {
+      throw StateError('Route.where("$param"): there is no route.');
+    }
+    int groups;
+    try {
+      groups = RegExp('(?:$regex)|').firstMatch('')!.groupCount;
+    } on FormatException catch (error) {
+      throw ArgumentError.value(regex, 'regex', error.message);
+    }
+    if (groups > 0) {
+      throw ArgumentError.value(
+        regex,
+        'regex',
+        'Use (?:...) for a group, not (...)',
+      );
+    }
+    for (RouteData data in _lastGroup ?? <RouteData>[last]) {
+      if (!data.paramNames.contains(param)) {
+        throw ArgumentError.value(
+          param,
+          'param',
+          'Route ${data.method} ${data.path} has no param "$param"',
+        );
+      }
+      data.where(param, regex);
+    }
+    return this;
+  }
+
+  /// routes added with [fallback]
+  List<RouteData> get fallbacks => _fallbacks;
+
+  /// set the fallback routes, eg. in a new isolate
+  void setFallbacks(List<RouteData> fallbacks) {
+    _fallbacks = fallbacks;
+  }
+
+  /// the route for a GET or HEAD request that matches no other route and
+  /// no [staticFiles] file. Use it for a custom 404 page, or to send
+  /// `index.html` of a single page app. Other methods still get 404 or 405.
+  ///
+  /// Like other routes, it follows [group], the router prefix, [domain]
+  /// and middleware. So in a router, the global middleware runs for it.
+  /// Inside a group, it only answers paths under the group prefix. When
+  /// two fallbacks match, the one with the longest prefix wins.
+  /// ```
+  /// Route.fallback((DoxRequest req) => res.status(404).json(...));
+  /// Route.group('admin', () {
+  ///   Route.fallback(controller); // only for /admin/...
+  /// });
+  /// ```
+  static Route fallback<T extends Object>(dynamic controller) {
+    Route r = Route();
+    RouteData data = r._routeData(
+      HttpRequestMethod.GET,
+      r._join(''),
+      _action<T>(controller),
+    );
+    _fallbacks.add(data);
+    r._last = data;
+    r._lastGroup = null;
+    return r;
   }
 
   void _setName(RouteData data, String name) {
@@ -837,6 +920,94 @@ class Route {
     );
   }
 
+  /// the methods of [any]. HEAD comes with GET. OPTIONS is left out, so
+  /// the CORS preflight answer still works.
+  static const List<HttpRequestMethod> _anyMethods = <HttpRequestMethod>[
+    HttpRequestMethod.GET,
+    HttpRequestMethod.POST,
+    HttpRequestMethod.PUT,
+    HttpRequestMethod.PATCH,
+    HttpRequestMethod.DELETE,
+  ];
+
+  /// one route for each method in [methods], like `['GET', 'POST']`.
+  /// HEAD comes with GET, so leave it out. An unknown method throws an
+  /// [ArgumentError].
+  /// ```
+  /// Route.match(<String>['GET', 'POST'], 'contact', controller);
+  /// ```
+  static Route match<T extends Object>(
+    List<String> methods,
+    String route,
+    dynamic controller,
+  ) {
+    List<HttpRequestMethod> list = <HttpRequestMethod>[];
+    for (String method in methods) {
+      String upper = method.toUpperCase();
+      HttpRequestMethod? found;
+      for (HttpRequestMethod value in HttpRequestMethod.values) {
+        if (value.name == upper) found = value;
+      }
+      if (found == null) {
+        throw ArgumentError.value(
+          method,
+          'methods',
+          upper == 'HEAD'
+              ? 'HEAD comes with GET, leave it out'
+              : 'Unknown HTTP method',
+        );
+      }
+      list.add(found);
+    }
+    return Route()._addMany(list, route, _action<T>(controller));
+  }
+
+  /// one route for GET (and HEAD), POST, PUT, PATCH and DELETE.
+  /// OPTIONS is left out, so the CORS preflight answer still works.
+  /// ```
+  /// Route.any('webhook', controller);
+  /// ```
+  static Route any<T extends Object>(String route, dynamic controller) {
+    return Route()._addMany(_anyMethods, route, _action<T>(controller));
+  }
+
+  /// redirect [from] to [to], for every method of [any]. 302 by default.
+  /// ```
+  /// Route.redirect('home', '/');
+  /// Route.redirect('old-blog', '/blog', status: 301);
+  /// ```
+  static Route redirect(
+    String from,
+    String to, {
+    int status = HttpStatus.found,
+  }) {
+    DoxResponse send(DoxRequest req) => _redirectTo(to, status: status);
+    return Route()._addMany(_anyMethods, from, send);
+  }
+
+  /// [redirect] with 301 (moved permanently)
+  /// ```
+  /// Route.permanentRedirect('old-blog', '/blog');
+  /// ```
+  static Route permanentRedirect(String from, String to) {
+    return redirect(from, to, status: HttpStatus.movedPermanently);
+  }
+
+  /// add one route per method. [where] and [timeout] cover all of them.
+  Route _addMany(
+    List<HttpRequestMethod> methods,
+    String route,
+    dynamic controller,
+  ) {
+    List<RouteData> added = <RouteData>[];
+    for (HttpRequestMethod method in methods) {
+      _addRoute(method, _join(route), controller);
+      added.add(_last!);
+    }
+    _lastGroup = added;
+    return this;
+  }
+
   /// resource route. [controller] is a controller class (a [Type]) from
   /// the container, or a controller object.
   /// ```
@@ -947,6 +1118,19 @@ class Route {
     dynamic controller, {
     Object? body,
   }) {
+    RouteData data = _routeData(method, path, controller, body: body);
+    _routes.add(data);
+    _last = data;
+    _lastGroup = null;
+    return this;
+  }
+
+  RouteData _routeData(
+    HttpRequestMethod method,
+    String path,
+    dynamic controller, {
+    Object? body,
+  }) {
     path = sanitizeRoutePath(path);
     List<dynamic> controllers = <dynamic>[];
     controllers.addAll(_preMiddleware);
@@ -956,7 +1140,7 @@ class Route {
     if (controller is List) {
       controllers.addAll(controller);
     }
-    RouteData data = RouteData(
+    return RouteData(
       method: method.name,
       path: path,
       controllers: controllers,
@@ -965,9 +1149,6 @@ class Route {
       preMiddleware: List<dynamic>.unmodifiable(_preMiddleware),
       body: body,
     );
-    _routes.add(data);
-    _last = data;
-    return this;
   }
 }
 
@@ -981,4 +1162,9 @@ String route(
   Map<String, Object?> query = const <String, Object?>{},
 }) {
   return Route.url(name, params: params, query: query);
+}
+
+/// the top level [redirect], which [Route.redirect] hides inside [Route]
+DoxResponse _redirectTo(String url, {required int status}) {
+  return redirect(url, status: status);
 }

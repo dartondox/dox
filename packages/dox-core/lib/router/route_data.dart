@@ -130,6 +130,16 @@ class RouteData {
   List<String> _paramNames = const <String>[];
   String? _compiledFor;
 
+  /// param name => regex, set with `Route.where`. null for most routes,
+  /// so they build the same pattern as before.
+  Map<String, String>? wheres;
+
+  /// only match [param] when its text matches [regex], see `Route.where`
+  void where(String param, String regex) {
+    (wheres ??= <String, String>{})[param] = regex;
+    _compiledFor = null;
+  }
+
   void _compile() {
     if (_compiledFor == path) return;
     _compiledFor = path;
@@ -143,8 +153,23 @@ class RouteData {
     ];
     _pattern = _paramNames.isEmpty
         ? null
-        : RegExp('^${path.replaceAllMapped(_param, _paramPattern)}\$');
+        : RegExp(
+            '^${path.replaceAllMapped(_param, wheres == null ? _paramPattern : _wherePattern)}\$',
+          );
   }
+
+  /// like [_paramPattern], with the regex of `Route.where` for the param
+  String _wherePattern(Match match) {
+    String text = match[0]!;
+    String name = text.replaceAll(_paramMarks, '');
+    String? regex = wheres![name];
+    if (regex == null) return _paramPattern(match);
+    String slash = text.startsWith('/') ? '/' : '';
+    if (text.endsWith('?}')) return '(?:$slash((?:$regex)))?';
+    return '$slash((?:$regex))';
+  }
+
+  static final RegExp _paramMarks = RegExp(r'[/{}*?]');
 
   static final RegExp _param = RegExp(r'/?{[^/]+}');
 
