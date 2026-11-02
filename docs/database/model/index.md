@@ -351,8 +351,8 @@ await blog.touch('published_at');  // published_at = now
 - It fires the save events: `saving`, `updating`, `updated` and `saved`, like `save()`.
   A hook that throws `CancelModelEvent` stops it, and it returns 0.
 - `touchQuietly()` does the same with no events.
-- On a new model that was never saved, there is no primary key value.
-  Then `touch()` runs as a query and changes every row, like `delete()`.
+- A model with no primary key value (never saved, or read without the key)
+  throws a `StateError`. So `touch()` can not change every row by mistake.
 
 `replicate()` makes a new model with the same column values. It is not saved yet.
 It has no primary key, `created_at` or `updated_at`, so `save()` inserts a new row.
