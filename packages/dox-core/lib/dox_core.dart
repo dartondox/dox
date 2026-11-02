@@ -66,6 +66,7 @@ export 'ioc/ioc_container.dart';
 export 'middleware/etag.dart';
 export 'middleware/health_check.dart';
 export 'middleware/log_middleware.dart';
+export 'middleware/method_override.dart';
 export 'middleware/rate_limit.dart';
 export 'middleware/request_id.dart';
 export 'middleware/request_timeout.dart';

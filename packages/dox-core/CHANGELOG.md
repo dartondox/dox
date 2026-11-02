@@ -1,5 +1,6 @@
 ## Unreleased
 
+- New: `MethodOverride` middleware. Add it to `AppConfig.globalMiddleware`, and a POST request with a `_method` field of `PUT`, `PATCH` or `DELETE` goes to the route of that method. So a plain HTML form can reach `Route.put`, `Route.patch`, `Route.delete` and `Route.resource` routes. `req.method` gives the new method. `CsrfMiddleware` still checks the request. Other `_method` values and other request methods are ignored. It is off when the middleware is not there.
 - Fix: `res.header(name, value)` now replaces a header with the same name in any case, like `withHeaders` does. Before, `header('Cache-Control', ..)` after `cache()` sent two `Cache-Control` values.
 - Removed the unused `middlewareAndControllerHandler` and `getDoxRequest` helpers.
 - Fix: `res.withHeaders(map)` now adds the headers to the ones set before it. Before, it dropped them all, also the `Content-Disposition` of a download. A key in the map replaces the header with the same name, in any case (`cache-control` and `Cache-Control` are one header).

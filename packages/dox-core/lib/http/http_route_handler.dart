@@ -14,11 +14,13 @@ import 'package:dox_core/utils/utils.dart';
 /// made per request.
 typedef RouteMatch = ({RouteData route, Map<String, dynamic>? params});
 
-RouteMatch? httpRouteHandler(HttpRequest req) {
+/// [method] is the method to match, when it is not the request method
+/// (a `_method` form field, see `MethodOverride`).
+RouteMatch? httpRouteHandler(HttpRequest req, {String? method}) {
   /// read Host once. only domain routes need it.
   _routeIndex();
   String? host = _hasDomain ? req.headers.value(HttpHeaders.hostHeader) : null;
-  RouteMatch? match = _getMatchRoute(req.uri.path, req.method, host);
+  RouteMatch? match = _getMatchRoute(req.uri.path, method ?? req.method, host);
 
   /// HEAD runs the GET route when there is no HEAD route.
   /// the server sends the status and headers, with no body.
