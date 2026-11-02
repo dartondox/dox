@@ -336,6 +336,7 @@ Then run `dox migrate`.
 | --- | --- | --- |
 | `table` | `'auth_access_tokens'` | The table name. Use the same name as the driver `table`. |
 | `stringIds` | `false` | `false`: `tokenable_id` is an unsigned big int, like Sanctum and AdonisJS. `true`: it is text, for users with text ids. Use the same value as the driver `stringIds`. |
+| `uuidIds` | `false` | `true`: `tokenable_id` is a uuid column (`UUID` on Postgres), for users with uuid ids. Then `usersTable` works with a uuid id. Set `stringIds: true` on the driver. |
 | `usersTable` | none | Adds a foreign key from `tokenable_id` to `id` of this table, with cascade delete. Then the tokens of a deleted user are deleted too. The two id columns must have the same type. |
 
 The migration makes the table on the default connection.
@@ -393,7 +394,7 @@ auth.currentAccessToken; // the AccessToken of this request
 - `last_used_at` is written at most once a minute per token. So a busy token does not write on every request. If this write fails, the error is reported and the request goes on.
 - `Auth().login(user)` throws a `StateError` with this driver. Use `createAccessToken`.
 - Expired tokens stay in the table until you call `pruneExpiredAccessTokens()`.
-- `AccessTokenAuthDriver.check(token, guard)` checks a token without a request.
+- To check a token without a request, like in Socket.IO, use `Auth(guard: 'api').userFromToken(token)`. See [Check a login with no request](#check-a-login-with-no-request). The driver method behind it is `check(token, guard)`, an instance method of `AccessTokenAuthDriver`.
 
 ## Login throttle
 
@@ -600,7 +601,8 @@ User? user = await Auth(guard: 'api').userFromToken(token);
 User? user = await Auth(guard: 'web').userFromSession(session);
 ```
 
-- `userFromToken` runs the same checks as a request with a `Bearer` header: signature, algorithm, guard, `exp` and [revocation](#revoke-tokens). Give the token with no `Bearer ` prefix. A missing, bad, expired, revoked or changed token gives `null`. It needs a guard with `JwtAuthDriver`.
+- `userFromToken` runs the same checks as a request with a `Bearer` header. For a JWT: signature, algorithm, guard, `exp` and [revocation](#revoke-tokens). For an [access token](#access-tokens): the hash, the type, the user table, `expires_at` and revocation. Give the token with no `Bearer ` prefix. A missing, bad, expired, revoked or changed token gives `null`. It needs a guard with `JwtAuthDriver` or `AccessTokenAuthDriver`.
+- With an access token, `currentAccessToken` and `tokenCan` work on the same `Auth` after `userFromToken`.
 - `userCacheTtl` is a cache, not a check. With it on, a deleted or banned user can still connect until the cache time ends, unless `forgetUser` runs.
 - `userFromSession` gives the user of a session, or `null`. Load the session with `SessionMiddleware().fromCookie(value)`. See [Session](../the-basic/session.md#load-a-session-with-no-request). It needs a guard with `SessionAuthDriver`.
 - Both throw a `StateError` on a guard with the wrong driver.
