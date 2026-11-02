@@ -308,7 +308,23 @@ A token works until it expires or you revoke it.
 
 ### 2. Add the table
 
-Add a migration in `db/migration`. `AccessTokenTables` makes the `auth_access_tokens` table.
+Run `dox auth:tokens-table`. It writes a migration in `db/migration` that makes the `auth_access_tokens` table. Then run `dox migrate`.
+
+```bash
+dox auth:tokens-table
+dox migrate
+```
+
+`auth:tokens-table` is a [package command](../digging-deeper/package-commands.md) of `dox_auth`. It does not overwrite: when a `create_access_tokens_table` migration is already there, it prints so and stops.
+
+Flags:
+
+- `--uuid`: for users with uuid ids (`uuidIds: true`).
+- `--string-ids`: for users with text ids (`stringIds: true`).
+- `--users-table=users`: adds a foreign key to this table (`usersTable:`).
+- `--users-key=uid`: the key column of the users table, when it is not `id` (`usersKey:`).
+
+For other options, like `table:`, edit the migration file. The migration it writes looks like this. You can also write it by hand. `AccessTokenTables` makes the table.
 
 ```dart title="db/migration/2026_11_02_000000000_create_access_tokens_table.dart"
 // ignore_for_file: file_names
@@ -328,8 +344,6 @@ class CreateAccessTokensTable extends Migration {
   }
 }
 ```
-
-Then run `dox migrate`.
 
 `AccessTokenTables.up` options:
 

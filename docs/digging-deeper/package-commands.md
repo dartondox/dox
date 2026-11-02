@@ -6,7 +6,7 @@ icon: lucide/blocks
 
 A package can add its own `dox` commands. Your app can add its own commands too. You do not write a `bin` file, and you do not register anything. The `dox` CLI finds the commands by itself.
 
-For example, `dox queue:table` comes from the `dox_queue` package.
+For example, `dox queue:table` comes from the `dox_queue` package, and `dox auth:tokens-table` comes from the `dox_auth` package.
 
 ## Use a package command
 
