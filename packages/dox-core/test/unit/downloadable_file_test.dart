@@ -84,4 +84,14 @@ void main() {
         .withHeaders(<String, dynamic>{'Cache-Control': 'no-store'});
     expect(cached.headers, <String, dynamic>{'Cache-Control': 'no-store'});
   });
+
+  test('header replaces a header in any case', () {
+    DoxResponse cached = DoxResponse('x')
+        .cache(Duration(seconds: 10))
+        .header('Cache-Control', 'no-store');
+    expect(cached.headers, <String, dynamic>{'Cache-Control': 'no-store'});
+
+    DoxResponse res = DoxResponse('x').header('X-A', '1').header('X-A', '2');
+    expect(res.headers, <String, dynamic>{'X-A': '2'});
+  });
 }

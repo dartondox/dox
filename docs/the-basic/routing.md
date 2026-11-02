@@ -200,6 +200,29 @@ A method that the controller does not have is skipped. No route is made for it.
 Any other error from the controller is not hidden. It stops the app at start, so you see it.
 See [Resource controller](controller.md#resource-controller) to make one with the CLI.
 
+## Forms with PUT, PATCH and DELETE
+
+An HTML form can only send GET or POST. To reach a `PUT`, `PATCH` or `DELETE` route, add `MethodOverride` to the global middleware.
+
+```dart
+AppConfig(
+  globalMiddleware: <dynamic>[const MethodOverride()],
+);
+```
+
+Then send the form as POST with a `_method` field.
+
+```html
+<form method="POST" action="/blogs/5">
+  <input type="hidden" name="_method" value="DELETE">
+</form>
+```
+
+- Only a POST request changes, and only to `PUT`, `PATCH` or `DELETE`. Other values are ignored.
+- `req.method` gives the new method.
+- `CsrfMiddleware` still checks the request, so send the `_token` field too.
+- It works only in `globalMiddleware`, not on a router or a route. It is off by default.
+
 ## Named routes
 
 Give a route a name with `.name()`. Then build its URL from the name, so a path lives in one place.

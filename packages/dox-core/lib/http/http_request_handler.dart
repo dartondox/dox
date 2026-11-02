@@ -19,6 +19,12 @@ void httpRequestHandler(HttpRequest req) {
     Map<String, RawRequestHandler> mounts = Route().mounts;
     if (mounts.isNotEmpty && _mounted(req, mounts)) return;
 
+    if (req.method == 'POST' &&
+        MethodOverride.enabledIn(Dox().config.globalMiddleware)) {
+      _withMethodOverride(req);
+      return;
+    }
+
     RouteMatch? match = httpRouteHandler(req);
     if (match == null) return;
     RouteData route = match.route;
@@ -54,6 +60,52 @@ void httpRequestHandler(HttpRequest req) {
   } catch (error, stackTrace) {
     httpErrorHandler(req, error, stackTrace);
   }
+}
+
+/// read the body first, then find the route for the method in its
+/// `_method` field (see `MethodOverride`). the route is found before
+/// middleware runs, so the middleware can not do it.
+void _withMethodOverride(HttpRequest req) {
+  ContentType? contentType = req.headers.contentType;
+  RequestBody? now = contentType == null
+      ? RequestBody.empty()
+      : HttpBody.readNow(req, contentType);
+  if (now != null) {
+    _runOverridden(req, now, contentType);
+    return;
+  }
+  HttpBody.read(req, contentType).then(
+    (RequestBody body) {
+      try {
+        _runOverridden(req, body, contentType);
+      } catch (error, stackTrace) {
+        httpErrorHandler(req, error, stackTrace);
+      }
+    },
+    onError: (Object error, StackTrace stackTrace) {
+      httpErrorHandler(req, error, stackTrace);
+    },
+  );
+}
+
+void _runOverridden(
+  HttpRequest req,
+  RequestBody body,
+  ContentType? contentType,
+) {
+  String? method = MethodOverride.from(body.map);
+  RouteMatch? match = httpRouteHandler(req, method: method);
+  if (match == null) return;
+  httpCorsHandler(match.route.corsEnabled, req);
+  DoxRequest doxReq = _doxRequest(
+    req,
+    match.route,
+    match.params,
+    body,
+    contentType,
+  );
+  if (method != null) doxReq.method = method;
+  _run(req, doxReq);
 }
 
 /// hand the request to a mounted handler. it writes the response itself.
