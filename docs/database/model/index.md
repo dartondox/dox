@@ -389,6 +389,10 @@ await deleted?.restore(); // sets deleted_at back to NULL
 - `delete()` and `forceDelete()` return the number of deleted rows.
 - They return 1 when the row was deleted.
 - They return 0 when the row was not there, or when a [model event](events.md) cancels.
+- A model with no primary key value (never saved, or read without the key)
+  throws a `StateError` and runs no query. So `Blog().delete()` can not delete every row by mistake.
+  `Blog().where('status', 'draft').delete()` is a query delete, and it works.
+  `update()`, `increment()` and `decrement()` on a model with no key and no `where` throw too.
 
 `save()`, `touch()`, `delete()`, `forceDelete()` and `restore()` fire [model events](events.md).
 

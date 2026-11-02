@@ -1049,7 +1049,10 @@ int count = await Actor()
   A row that already has the new values counts 0.
 
 !!! warning
-    `update` without `where` changes every row of the table.
+    On a model, `update` needs a `where`.
+    `Actor().update({...})` with no `where` throws a `StateError` and runs no query.
+    So does `update` on a model from the table, like `actor.update({...})`: use `save()` for one model.
+    `QueryBuilder.table('actor').update({...})` with no `where` still changes every row of the table.
     A query `update` does not set `updated_at` and fires no [model events](model/events.md).
     To do that, load the model, change it and call `save()`.
 
@@ -1072,6 +1075,8 @@ await Actor().where('id', 1).increment('views', 1, <String, dynamic>{'status': '
 - The amount is 1 when you give none.
 - A `NULL` column stays `NULL`, like in SQL.
 - They do not set `updated_at` and fire no model events.
+- On a model, they need a `where` or a model from the table.
+  `Actor().increment('views')` with no `where` throws a `StateError` and runs no query.
 
 On a model from the table, they change only the row of that model.
 The field of the model gets the new value too.
@@ -1097,6 +1102,13 @@ int count = await Actor().where('name', 'John Wick').delete();
 
 On a model with `softDelete: true`, `delete` sets `deleted_at` and keeps the row.
 Rows that are already soft deleted are not counted.
+
+!!! warning
+    On a model, `delete` needs a `where`, or a model from the table with its primary key.
+    `Actor().delete()` with no `where` throws a `StateError` and runs no query.
+    A model read without its primary key (like after `select('name')`) throws too.
+    So it can not delete every row by mistake. `forceDelete` does the same.
+    To delete every row, use [`truncate`](#truncate) or `QueryBuilder.table('actor').delete()`.
 
 ### `forceDelete`
 
