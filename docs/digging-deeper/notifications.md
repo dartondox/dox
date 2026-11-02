@@ -59,7 +59,9 @@ await Notification.send(<Object>[Address('ann@example.com')], InvoicePaid(1));
 
 When the mailable has its own `to` address, that address is used and the route is not.
 
-When a channel throws, the other channels and the other notifiables still get the notification. At the end, `Notification.send()` throws a `NotificationException`. Its `errors` list says which notifiable and channel failed, and why. When `via()` throws, the channel is null. The error text lists every failure.
+When a channel throws, the other channels and the other notifiables still get the notification. At the end, `Notification.send()` throws a `NotificationException`. Its `errors` list says which notifiable and channel failed, and why. When `via()` throws, the channel is null. The error text lists every failure, with the type and the mail address of each notifiable.
+
+With one notifiable and one error, like `user.notify()`, the error is thrown as it is. So `on MailException catch (e)` still works there.
 
 ## Queue it
 
@@ -90,9 +92,10 @@ Write a class that implements `NotificationChannel`. `toArray()` of the notifica
 class DatabaseChannel implements NotificationChannel {
   @override
   Future<void> send(Object notifiable, Notification notification) async {
+    // only a user has a row. An Address or an email text has none.
+    if (notifiable is! User) return;
     AppNotification row = AppNotification()
-      ..userId = (notifiable as User).id
-      ..type = notification.runtimeType.toString()
+      ..userId = notifiable.id
       ..data = jsonEncode(notification.toArray(notifiable));
     await row.save();
   }
@@ -108,7 +111,7 @@ class InvoicePaid extends Notification {
 
   @override
   Map<String, Object?> toArray(Object notifiable) {
-    return <String, Object?>{'invoice_id': invoiceId};
+    return <String, Object?>{'type': 'invoice_paid', 'invoice_id': invoiceId};
   }
 
   // ...

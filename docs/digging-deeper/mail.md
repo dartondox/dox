@@ -8,7 +8,7 @@ The `dox_mailer` package sends email from your app with SMTP, Amazon SES, Azure,
 
 You write a `Message` and call `Mail.send()`. A transport sends it. You pick the transport in a config file, so you can change providers with no code change.
 
-The package has its own SMTP client, AWS signer and MIME builder. Next to `dox_core`, it only needs `http` and `crypto`.
+The package has its own SMTP client, AWS signer and MIME builder. Next to `dox_core`, it only needs `dox_view`, `markdown`, `http` and `crypto`.
 
 Send slow emails from a [queue job](queue.md), so the request does not wait.
 
@@ -282,7 +282,7 @@ Thanks for joining. Here is what you can do next:
 
 [Open your profile]({{ profileUrl }})
 
-<a href="{{ route('dashboard') }}" class="button">Open the app</a>
+<a href="https://example.com/dashboard" class="button">Open the app</a>
 ```
 
 ```dart
@@ -298,7 +298,8 @@ String? get markdown => 'emails/welcome';
     `{{ }}` escapes HTML, but not Markdown. So a user's name like `[click](https://evil.example)` or `![x](https://evil.example/p.png)` becomes a normal link or image. Laravel works the same way.
     Links and images with an unsafe URL, like `javascript:`, `vbscript:` or `data:`, lose their URL. Only `http`, `https`, `mailto`, `tel`, `cid` and relative URLs are kept.
     The same goes for the lines of `MailMessage`. `MailMessage.action()` throws an `ArgumentError` for an unsafe URL.
-    Raw HTML in the template, like `<a href="{{ url }}">`, is not checked. In raw HTML, use only URLs that your app builds, like `route()`. For a URL from a user, use a Markdown link: `[text]({{ url }})`.
+    Raw HTML in the template, like `<a href="{{ url }}">`, is not checked. In raw HTML, use only full URLs that your app builds. Email apps can not open a relative link like `/dashboard`.
+    For a URL in `{{ }}`, use a Markdown link: `[text]({{ url }})`. It goes through the URL check. A bare `{{ url }}` with a `&` in it shows `&amp;` in the link.
 
 !!! warning "Indent"
     Markdown makes a line that starts with 4 spaces into a code block. So do not indent the Markdown inside `@if` or `@each`. Keep it at the start of the line.
@@ -329,7 +330,13 @@ await (MailMessage(subject: 'Invoice paid', to: <Address>[Address('ann@example.c
     .send();
 ```
 
-The email starts with `greeting` (default `Hello!`) and ends with `salutation` (default none). Set them to null to leave them out. Lines can use Markdown, like `**bold**`. HTML in a line is escaped. See "User data in Markdown" above.
+More options:
+
+- `cc:` in the constructor adds cc addresses.
+- `attach(Attachment(...))` adds a file.
+- `error()` makes the buttons red, for a message about a problem.
+
+The email starts with `greeting` (default `Hello!`) and ends with `salutation` (default none). Set them to null to leave them out. Lines can use Markdown, like `**bold**`. HTML tags in a line are escaped. See "User data in Markdown" above.
 
 To send one email on more than one channel, see [Notifications](notifications.md).
 
