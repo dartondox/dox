@@ -13,7 +13,8 @@ How to install the CLI is on the [Dox CLI](../digging-deeper/dox-cli.md) page.
 Rules that apply to every command:
 
 - `dox` with no command prints `Could not find a command. Run `dox help` for more information.`
-- An unknown command prints `Could not find a command named "<name>". Run `dox help` for more information.`
+- An unknown command prints `Could not find a command named "<name>". Run `dox help` for more information.`, and a hint about the `dox: commands:` key.
+- A command that is not built in can come from a package or from the app. See [Package commands](../digging-deeper/package-commands.md).
 - Too few or too many arguments prints `Invalid number of arguments for command "<name>".` with the expected count.
 - A name you pass is turned into `snake_case` for the file and `PascalCase` for the class. `BlogPost` and `blog_post` give the same result.
 - Every `make:*` command also answers to its `create:*` name, like `create:model`. `dox help <command>` shows the aliases.
@@ -315,7 +316,7 @@ Templates: `dartMigrationSource`, `migrateEntrySource` and `_sampleSql` in `lib/
 All `migration:*` commands work the same way:
 
 1. When `bin/migrate.dart` exists: write the registry again, then run `dart run bin/migrate.dart <command> [args]`. Your app code runs, so Dart migrations work.
-2. When there is no `bin/migrate.dart` but `db/migration` has Dart files: print `db/migration has Dart migrations, but bin/migrate.dart is missing.` (exit code 1).
+2. When there is no `bin/migrate.dart` but `db/migration` has Dart files: write `bin/migrate.dart` (the same text as `make:migration` writes, and print `bin/migrate.dart created.`), then go on like step 1. This happens after a package command like `dox queue:table` wrote the first Dart migration.
 3. Else: run the `.sql` migrations with `Migrator()` from `dox_migration` in the CLI process.
 
 The database comes from `DATABASE_URL` when it is set. Else it comes from `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` and `DB_DATABASE` (or `DB_NAME`). See [Environment variables](env.md).
@@ -358,6 +359,7 @@ When `bin/queue.dart` is missing, the command prints how to set it up and exits 
 | `dox queue:retry <id\|all>` | `bin/queue.dart retry <id\|all>` | Put one failed job, or all of them, back on the queue. |
 | `dox queue:forget <id>` | `bin/queue.dart forget <id>` | Delete one failed job. |
 | `dox queue:flush` | `bin/queue.dart flush` | Delete all failed jobs. |
+| `dox queue:table` | | A [package command](../digging-deeper/package-commands.md) of `dox_queue`. Make `db/migration/<time>_create_queue_tables.dart`, which calls `QueueTables.up` and `QueueTables.down`. When a `create_queue_tables` migration is already there, it prints so and exits with code 1. |
 
 Flags of `queue:work`, passed on as they are:
 
