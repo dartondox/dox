@@ -10,7 +10,7 @@ class DoxResponse {
   /// String, int, Map, json serializable object, `Stream<List<int>>`
   dynamic _contentData;
 
-  Map<String, dynamic> _headers = <String, dynamic>{};
+  final Map<String, dynamic> _headers = <String, dynamic>{};
   int? _statusCode;
   ContentType? _contentType;
 
@@ -115,12 +115,13 @@ class DoxResponse {
     return this;
   }
 
-  /// Set list of headers by Map
+  /// Set list of headers by Map. A key in [values] replaces the header
+  /// with the same name. Other headers stay.
   /// ```
   /// res.withHeaders({'Authorization' : 'Bearer xxx'});
   /// ```
   DoxResponse withHeaders(Map<String, dynamic> values) {
-    _headers = values;
+    _headers.addAll(values);
     return this;
   }
 

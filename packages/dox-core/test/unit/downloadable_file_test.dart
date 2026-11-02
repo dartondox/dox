@@ -49,4 +49,21 @@ void main() {
         .expectHeader('content-disposition', header('résumé.pdf'));
     await client.close();
   });
+
+  test('withHeaders keeps the headers set before it', () {
+    DoxResponse res = DoxResponse(
+      DownloadableFile(
+        ContentType.binary,
+        const Stream<List<int>>.empty(),
+        'a.pdf',
+      ),
+    ).header('X-Old', '1').header('X-Both', 'old');
+    res.withHeaders(<String, dynamic>{'X-Both': 'new', 'X-New': '2'});
+    expect(res.headers, <String, dynamic>{
+      'Content-Disposition': header('a.pdf'),
+      'X-Old': '1',
+      'X-Both': 'new',
+      'X-New': '2',
+    });
+  });
 }
