@@ -10,7 +10,7 @@ You write a `Message` and call `Mail.send()`. A transport sends it. You pick the
 
 The package has its own SMTP client, AWS signer and MIME builder. Next to `dox_core`, it only needs `dox_view`, `markdown`, `http` and `crypto`.
 
-Send slow emails from a [queue job](queue.md), so the request does not wait.
+Send slow emails from the [queue](queue.md) with `Mail.queue()`, so the request does not wait. See [Queue an email](#queue-an-email).
 
 ## Install
 
@@ -341,6 +341,67 @@ More options:
 The email starts with `greeting` (default `Hello!`) and ends with `salutation` (default none). Set them to null to leave them out. Lines can use Markdown, like `**bold**`. HTML in a line shows as text. See "User data in Markdown" above.
 
 To send one email on more than one channel, see [Notifications](notifications.md).
+
+## Queue an email
+
+Sending an email can take a second or more. With a queue, the request does not wait. A queue worker sends the email later.
+
+This needs [dox_queue](queue.md). Set up its config, its provider and a worker first. Then:
+
+```dart
+await Mail.queue(message);
+
+// send it in 10 minutes
+await Mail.later(Duration(minutes: 10), message);
+
+// another mailer and another queue
+await Mail.mailer('ses').queue(message, queue: 'emails');
+```
+
+`queue()` and `later()` return the job id.
+
+- The message is checked at once. A bad message fails in the request, not in the worker.
+- The default from and reply-to addresses are added at once.
+- The mailer name is saved with the job. The worker sends with the same mailer, so with the same transport.
+- The worker starts the providers of your app, so your `MailProvider` and mail config are there too.
+- The worker flags `--tries` and `--timeout` work for queued emails, like for other jobs.
+- With the `sync` queue driver, the email is sent at once. `later()` does not wait.
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `queue` | `default` | the queue name |
+| `encrypt` | `false` | save the job data encrypted with the app key. The worker needs the same key |
+
+!!! warning "The whole email is saved in the queue"
+    The addresses, the subject, the body and every attachment are saved in Redis or in the `jobs` table.
+    Attachments are saved as base64, so they take about 4/3 of their size.
+    Keep attachments small, a few MB at most. MySQL and MariaDB refuse a job bigger than `max_allowed_packet` (by default 64 MB in MySQL 8, 16 MB in MariaDB). Redis keeps every job in memory.
+    For a big file, write your own job. Save the file path or a storage key in the job, and build the email in `handle()`.
+
+!!! tip "Encrypt personal data"
+    An email has personal data. When other people can read Redis or the `jobs` table, use `encrypt: true`.
+    With `encrypt: true`, a send error is encrypted with the app key too. The plain text of the error is only its type and code, for example `RedactedMailError: MailException (code 550). Details are encrypted: ...`.
+    The full error text, with the answer of the server, is inside the encrypted part (at most the first 64K characters, counted in UTF-16 code units).
+    To read it, take a `FailedJob` from `Queue.driver.failed()` and call `RedactedMailError.decrypt(job.error)`. It works with the app key or any key in `AppConfig.previousKeys`.
+
+In tests, use `Mail.fake()` with the `sync` queue driver. A queued email then goes to the fake at once.
+Without a queue, `Mail.queue()` throws. So set up the queue in the test:
+
+```dart
+ArrayTransport mail = Mail.fake();
+Queue.configure(QueueConfig()); // the sync driver
+
+// Mail.fake() has no default from, so set one
+await Mail.queue(
+  Message(
+    from: Address('app@example.com'),
+    to: <Address>[Address('ann@example.com')],
+    subject: 'Welcome',
+    text: 'Hi Ann',
+  ),
+);
+expect(mail.sent, hasLength(1));
+```
 
 ## Transports
 

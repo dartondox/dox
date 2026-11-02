@@ -244,6 +244,19 @@ Run a job now, in this process, with no queue:
 await SendWelcomeEmail(userId: 1).dispatchSync();
 ```
 
+### Queue an email
+
+You do not need a job class to send an email later. With [dox_mailer](mail.md#queue-an-email), call `Mail.queue()`:
+
+```dart
+await Mail.queue(message);
+await Mail.later(Duration(minutes: 10), message, queue: 'emails');
+```
+
+dox_queue has a built-in job for it. It is not in `lib/generated/jobs.g.dart`, and you do not need to add it.
+
+Deploy the worker together with the web app. An old worker does not know this job, so it fails the queued emails.
+
 ## Run the worker
 
 ```bash
