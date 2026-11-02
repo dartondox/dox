@@ -182,19 +182,21 @@ The ids can be:
 `null` means no ids. So `attach('songs', null)` and `detach('songs', null)` change nothing, and `sync('songs', null)` deletes every link, like `sync('songs', [])`.
 Ids match with one rule:
 
-- When one id is a number (`int` or `double`), a text of the same whole number matches it.
-  The text can have a `+` or `-`, a `.0` end and spaces around it.
-  So `1`, `1.0`, `'01'`, `'+1'`, `'1.0'` and `' 1'` are the same song.
-  Rows of a number key column come back as numbers, so `sync('songs', ['01'])` keeps the row of song `1`.
 - Two texts only match when the text is the same.
   So on a text key column, `'007'` and `'7'` are two ids.
   The ORM does not know the type of the key column, so `attach('songs', ['1', '01'])` adds two rows.
-- A whole double like `2.0` is sent as the int `2`.
+- When one id is a number (`int` or `double`), the other one is read as a number, like the database reads it.
+  A text is read as an int first (`' 1'`, `'+1'`, `'01'`, `'0x1'`), then as a double (`'1.0'`, `'1.'`, `'1e0'`).
+  They match when the two numbers are the same.
+  Rows of a number key column come back as numbers, so `sync('songs', ['01'])` keeps the row of song `1`.
+- One row is matched once. So `toggle('songs', ['1', '01'])` detaches song `1` once.
+- A whole double within ±2^53, like `2.0`, is sent as the int `2`.
   Any other double, like `1.5`, NaN, infinity or `1e20`, throws an `ArgumentError`.
 - Text ids are sent to the database as they are.
-  Postgres does not take `'1.0'` for an integer column, so a write that sends it throws there.
+  A database that does not read the text as a number throws, as in `where()`.
+  For example, Postgres does not take `'1.0'` for an integer column.
 
-A `null` id or a model that is not saved is skipped by `attach`, `detach`, `toggle` and `syncWithoutDetaching`.
+A `null` id or a model that is not saved is skipped by `attach`, `detach`, `toggle`, `syncWithoutDetaching` and `updateExistingPivot`.
 `sync` throws an `ArgumentError` for one, before it changes anything, because it would delete every other link.
 Each id is used once: `[1, 1, '1']` adds one row.
 
