@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Removed the unused `middlewareAndControllerHandler` and `getDoxRequest` helpers.
 - Fix: `res.withHeaders(map)` now adds the headers to the ones set before it. Before, it dropped them all, also the `Content-Disposition` of a download. A key in the map replaces the header with the same name, in any case (`cache-control` and `Cache-Control` are one header).
 - New: `SessionMiddleware().fromCookie(value)` loads a session from its cookie value, with no request. Use it for a Socket.IO login. Give the value as the browser sent it (still encrypted). It runs the same checks as the middleware: a changed cookie, a cookie of another name, a cookie made with another APP_KEY, an expired session or an unknown session id gives an empty session. Changes to it are not saved.
 - New: `DoxCookie.decrypt(name, value)` decrypts a cookie value like `req.cookie(name)` does. `req.cookie` now uses it, with no change in what it accepts.

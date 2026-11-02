@@ -279,13 +279,6 @@ void _send(HttpRequest req, dynamic value) {
   }
 }
 
-@Deprecated('Not used by Dox. Will be removed in 4.0.')
-Future<DoxRequest> getDoxRequest(HttpRequest req, RouteData route) async {
-  ContentType? contentType = req.headers.contentType;
-  RequestBody body = await HttpBody.read(req, contentType);
-  return _doxRequest(req, route, null, body, contentType);
-}
-
 DoxRequest _doxRequest(
   HttpRequest req,
   RouteData route,
