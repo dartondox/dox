@@ -55,7 +55,7 @@ class ApiController {
 | `req.all()` | all values from the query string and the body, as a `Map` |
 | `req.only(<String>['name', 'email'])` | only these keys |
 | `req.except(<String>['password'])` | all values, without these keys |
-| `req.has('name')` | `true` when the key is there and not empty |
+| `req.has('name')` | `true` when the key is there as it is and not empty. It does not read dot keys. |
 | `req.filled('name')` | `true` when the key is there and not empty. A text of only spaces, an empty list and an empty map count as empty. |
 | `req.exists('name')` | `true` when the key is there, with any value (also `''` or null) |
 | `req.missing('name')` | `true` when the key is not there |
@@ -68,6 +68,7 @@ class ApiController {
 A dot key reads inside the input. `req.input('items.0.id')` gives the `id` of the first item.
 A key that is in the input as it is wins. So a body key `'a.b'` is read before the `b` key inside `a`.
 Dot keys also work in `filled`, `exists`, `missing`, `boolean`, `integer`, `file` and `hasFile`.
+`has` does not read dot keys: `req.has('user.name')` is `false` for `{"user": {"name": "Ann"}}`. Use `filled` for that.
 
 Form and query keys with brackets give lists and maps, like in Laravel:
 

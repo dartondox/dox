@@ -160,7 +160,7 @@ See [Middleware](../the-basic/middleware.md) and [Signed URLs](../security/signe
 | `req.all()` / `req.only(<String>['a', 'b'])` | many values |
 | `req.input('user.name', 'guest')` | dot key, with a default |
 | `req.except(<String>['password'])` | all values but these |
-| `req.has('name')` / `req.filled('name')` | key is there and not empty |
+| `req.has('name')` / `req.filled('name')` | key is there and not empty (only `filled` reads dot keys) |
 | `req.exists('name')` / `req.missing('name')` | key is there (any value) / not there |
 | `req.boolean('remember')` / `req.integer('page', 1)` | value as `bool` / `int` |
 | `req.file('avatar')` / `req.hasFile('avatar')` | uploaded file |

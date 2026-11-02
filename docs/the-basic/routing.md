@@ -95,6 +95,10 @@ Route.permanentRedirect('/old-pricing', '/pricing'); // 301
 
 The redirect works for the same methods as `Route.any`.
 
+- The target is sent as it is. A param like `{id}` in the target is not filled in: `Route.redirect('/u/{id}', '/users/{id}')` sends the client to `/users/{id}`.
+- The query string of the request is dropped. `/home?page=2` goes to `/`, not `/?page=2`.
+- For these cases, use a normal route and return `redirect(...)` with the URL you build.
+
 ## The handler
 
 The second argument is the code that answers the request. It can be:
@@ -182,6 +186,7 @@ Route.get('/docs/{page}', handler).where('page', '.*'); // matches slashes too
 - A param name that the path does not have throws an `ArgumentError` at start.
 - Call `.where` more than once for more params.
 - Routes without `.where` match the same as before. The check costs nothing for them.
+- The regex checks the param text as it is in the URL, before `%` codes are decoded. So `/users/%31` does not match `[0-9]+`, even though `%31` is `1`. The controller still gets the decoded value.
 
 ## Group routes
 
@@ -395,6 +400,8 @@ class WebRouter extends Router {
 ```
 
 - Other methods still get the normal `404` or `405`.
+- A `GET` to a path that only has a `POST` route gets the fallback, not `405`. Laravel works the same way.
+- Add the fallback before `startServer()`, like other routes. A fallback added later only works in the isolate that added it. The other isolates do not get it.
 - The fallback runs its middleware like any route. Add it in a `Router`, so the global middleware (like security headers) runs too.
 - It follows `Route.group`, the router prefix and `Route.domain`. In a group, it only answers paths under the group prefix. A prefix can have params, like `{tenant}`, and `req.param` gives them. When two fallbacks match, the one with the longest prefix wins.
 - The handler decides the status. Return a `404` status for a "not found" page, else the client gets `200`.
