@@ -222,8 +222,9 @@ String _firstSegment(String path) {
 }
 
 Map<String, _MethodRoutes> _routeIndex() {
-  List<RouteData> routes = Route().routes;
-  List<RouteData> fallbacks = Route().fallbacks;
+  Route router = Route();
+  List<RouteData> routes = router.routes;
+  List<RouteData> fallbacks = router.fallbacks;
   if (!identical(routes, _indexedList) ||
       routes.length != _indexedLength ||
       !identical(fallbacks, _indexedFallbacks) ||
