@@ -442,6 +442,42 @@ void main() {
 
 A job that uses `Dox()` (for example `Dox().ioc` or `Logger`) needs the app config. Call `Dox().initialize(appConfig)` in `setUpAll`.
 
+To check that your code dispatched a job, without running it, use `Queue.fake()`. It records every `dispatch()` in a list. It does not run or save the jobs. It needs no `Queue.configure()`.
+
+```dart
+late QueueFake queue;
+
+setUp(() {
+  queue = Queue.fake();
+});
+
+tearDown(Queue.restore);
+
+test('signing up queues the welcome email', () async {
+  await signUp(userId: 1);
+
+  queue.assertPushed<SendWelcomeEmail>();
+  queue.assertPushed<SendWelcomeEmail>(
+    (SendWelcomeEmail job) => job.userId == 1,
+  );
+  queue.assertPushedTimes<SendWelcomeEmail>(1);
+  queue.assertNotPushed<SendInvoice>();
+});
+```
+
+| Method | Checks |
+|---|---|
+| `assertPushed<T>([test])` | a `T` job was pushed. With `test`, one of them passes it |
+| `assertPushedTimes<T>(n)` | exactly `n` `T` jobs were pushed |
+| `assertNotPushed<T>()` | no `T` job was pushed |
+| `assertNothingPushed()` | no job was pushed at all |
+
+To read the jobs, use `queue.pushed`. Each item has the `job`, the `queue` name and the `delay`. `queue.jobsOf<T>()` gives the `T` jobs. `queue.clear()` forgets them. `Queue.restore()` stops the fake.
+
+- `dispatchSync()` is not faked. It still runs the job.
+- The fake does not encode the job. A job that is missing from `QueueConfig.jobs`, or has data that is not JSON, passes a faked test but fails for real.
+- The fake also catches `Mail.queue()`, but only when `Mail.fake()` is off. When both are on, `Mail.fake()` catches the email first. See [Mail](mail.md#testing).
+
 To test a job alone, call `handle()`:
 
 ```dart

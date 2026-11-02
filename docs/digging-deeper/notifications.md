@@ -132,4 +132,4 @@ await user.notify(InvoicePaid(1));
 expect(mail.messages.single.subject, 'Invoice paid');
 ```
 
-With `shouldQueue`, the email goes to the job queue, not to the fake. In the test, use the `sync` queue driver too (`Queue.configure(QueueConfig())`). Then the email reaches the fake at once.
+With `shouldQueue`, the email goes to `mail.queued`, not to `mail.messages`. It does not reach the job queue. Check it with `mail.assertQueued()`. See [Mail](mail.md#testing).
