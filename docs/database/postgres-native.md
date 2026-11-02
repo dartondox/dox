@@ -125,6 +125,8 @@ drops the one used longest ago. A request (pool slot, connect and query)
 fails after 300 s with no answer. A transaction that gets no request for
 300 s is rolled back.
 
+A `CREATE`, `ALTER` or `DROP` makes every connection prepare its statements again. If your app runs `CREATE TEMP TABLE` or `DROP` on every request, this happens each time. Do this once at start up, not per request.
+
 ## Use it without the ORM
 
 ```dart

@@ -530,6 +530,7 @@ await Actor().whereDay('created_at', 15).get();
 
 - `whereDate` takes a `DateTime` or a `yyyy-mm-dd` string.
 - `whereTime` takes a `DateTime` or a `hh:mm:ss` string.
+- On SQLite, a `whereDate` or `whereTime` string must be zero padded, like `2024-05-01` or `09:00:00`. A value like `2024-5-1` matches no row.
 - `whereYear`, `whereMonth` and `whereDay` take an `int`, a number string or a `DateTime`.
 - Each one has an `or` form, like `orWhereDate`.
 - The column is read as it is stored. On SQLite and Postgres, Dox stores a `DateTime` in UTC.
@@ -564,6 +565,7 @@ await Actor().whereJsonDoesntContain('tags', 'horror').get();
 - `column->key` reads a key inside the JSON. Keys can have letters, digits and `_`.
   Any other key throws an `ArgumentError`.
 - Each one has an `or` form, like `orWhereJsonContains`.
+- On SQLite, it also matches a value inside a JSON object, one level down. For example, `{"a": "x"}` matches `'x'`.
 
 | Database | SQL |
 | --- | --- |
@@ -861,9 +863,8 @@ await QueryBuilder.table('actor')
 - `count()`, `paginate()`, `sum()`, `avg()`, `min()` and `max()` use the whole result:
   `SELECT SUM("age") as dox_aggregate FROM (...) as dox_union_aggregate`.
 - `sum()`, `avg()`, `min()` and `max()` keep `orderBy`, `limit` and `offset`. `count()` does not.
-- `cursorPaginate()` and `chunkById()` do not work on a union. They throw a `StateError`.
+- `cursorPaginate()` and `chunkById()` do not work on a union. They throw a `StateError`. Use `paginate()`, `simplePaginate()` or `chunk()`.
 - `update`, `delete`, `forceDelete`, `increment`, `decrement`, `touch` and `all()` throw a `StateError` on a union, because they would use only the first query. Use `get()` to read it.
-  Use `paginate()`, `simplePaginate()` or `chunk()`.
 
 ## Row locks
 
@@ -1156,12 +1157,14 @@ await Actor().where('id', 1).touch('seen_at');
 ```
 
 On a query, `touch()` fires no model events.
+On a model query with no `where()` (and no global scope), `touch()` throws a `StateError`.
+On MySQL and MariaDB, it returns 0 when `updated_at` already has that value, because they count only changed rows.
 On a model from the table, `touch()` changes only the row of that model.
 See [Models](model/index.md#touch-and-replicate).
 
 ### Write every row
 
-On a model, `delete`, `forceDelete`, `update`, `increment` and `decrement` with no `where` throw a `StateError`.
+On a model, `delete`, `forceDelete`, `update`, `increment`, `decrement` and `touch` with no `where` throw a `StateError`.
 To write every row on purpose, use `whereRaw('1 = 1')`:
 
 ```dart

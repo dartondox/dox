@@ -320,6 +320,8 @@ await Model.unguarded(() async {
 - In Laravel, a query `update()` ignores `fillable`.
   In Dox, a query `update()` keeps the check, so `update(req.body)` stays safe.
   Use `forceUpdate()` when you need the Laravel behaviour.
+- Model events that fire inside `forceCreate()` and `forceUpdate()` (like `created`) also run with the check off, like Laravel.
+  A `create()` or `update()` inside such a hook skips `fillable` too.
 
 ### Find or create
 
@@ -428,7 +430,8 @@ await deleted?.restore(); // sets deleted_at back to NULL
 - A model with no primary key value (never saved, or read without the key)
   throws a `StateError` and runs no query. So `Blog().delete()` can not delete every row by mistake.
   `Blog().where('status', 'draft').delete()` is a query delete, and it works.
-  `update()`, `increment()` and `decrement()` on a model with no key and no `where` throw too.
+  `update()`, `increment()`, `decrement()` and `touch()` on a model with no key and no `where` throw too.
+  A global scope counts as a `where`, see [global scopes](scopes.md#global-scopes).
   To delete every row on purpose, use `Blog().whereRaw('1 = 1').delete()`.
   See [write every row](../query-builder.md#write-every-row).
 
