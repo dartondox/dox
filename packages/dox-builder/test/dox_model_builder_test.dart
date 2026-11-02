@@ -33,6 +33,14 @@ class HasMany {
   final String? foreignKey;
   const HasMany(this.model, {this.eager, this.foreignKey});
 }
+class HasOne {
+  final Type model;
+  const HasOne(this.model);
+}
+class BelongsTo {
+  final Type model;
+  const BelongsTo(this.model);
+}
 class ManyToMany {
   final Type model;
   final List<String>? withPivot;
@@ -295,6 +303,28 @@ class Comment {
       expect(
         flat,
         contains('i.related=result[i.tempIdValue.toString()]??<Comment>[];'),
+      );
+    });
+
+    test('a non nullable one row relation keeps the null check', () async {
+      String out = await _generate('''
+@DoxModel()
+class Comment {
+  @BelongsTo(User)
+  late User author;
+
+  @HasOne(User)
+  User reviewer = User();
+}
+''');
+      String flat = out.replaceAll(RegExp(r'\s'), '');
+      expect(
+        flat,
+        contains('if(result[i.tempIdValue.toString()]!=null){i.author='),
+      );
+      expect(
+        flat,
+        contains('if(result[i.tempIdValue.toString()]!=null){i.reviewer='),
       );
     });
 

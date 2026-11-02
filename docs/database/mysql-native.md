@@ -77,6 +77,8 @@ also give `driver.pool.handle` (an `int`) to another isolate and use
 `MysqlNativeDriver(MysqlNativePool.fromHandle(handle))` there.
 `MysqlNativeDriver` comes from `package:dox_orm/dox_orm.dart`.
 
+A `CREATE`, `ALTER` or `DROP` makes every connection prepare its statements again. If your app runs `CREATE TEMP TABLE` or `DROP` on every request, this happens each time. Do it once at start up, not per request.
+
 A request (pool slot, connect and query) fails after 300 s with no
 answer. A transaction that gets no request for 300 s is rolled back, so
 its connection goes back to the pool.

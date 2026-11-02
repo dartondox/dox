@@ -75,7 +75,7 @@ bool _isDevelopment() {
   return env == 'development' || env == 'local';
 }
 
-/// for tests: read `APP_ENV` again on the next null
+/// only for tests. Do not call it in app code. Read `APP_ENV` again on the next null
 void resetNullMiddlewareWarning() {
   _warnNullOn = null;
 }

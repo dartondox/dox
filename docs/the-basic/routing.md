@@ -400,7 +400,7 @@ class WebRouter extends Router {
 ```
 
 - Other methods still get the normal `404` or `405`.
-- A `GET` to a path that only has a `POST` route gets the fallback, not `405`. Laravel works the same way.
+- A `GET` to a path that only has a `POST` route gets the fallback, if a fallback covers that path. If none does, the client gets `405`.
 - Add the fallback before `startServer()`, like other routes. A fallback added later only works in the isolate that added it. The other isolates do not get it.
 - The fallback runs its middleware like any route. Add it in a `Router`, so the global middleware (like security headers) runs too.
 - It follows `Route.group`, the router prefix and `Route.domain`. In a group, it only answers paths under the group prefix. A prefix can have params, like `{tenant}`, and `req.param` gives them. When two fallbacks match, the one with the longest prefix wins.
