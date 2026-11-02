@@ -112,8 +112,8 @@ if (path == null) {
 3. It writes `.dart_tool/dox/commands.dart`. This file imports each commands library and runs the command with your args.
 4. It runs that file with `dart run`.
 
-`dox` writes the file again only when `.dart_tool/package_config.json`, your `pubspec.yaml`, or the `pubspec.yaml` of a path dependency change. So after `dart pub get`, or after you change the key in a local package. The code of the commands is always the newest, because `dart run` compiles it each time.
+`dox` writes the file again only when `.dart_tool/package_config.json`, your `pubspec.yaml`, or the `pubspec.yaml` of a package change. So after `dart pub get`, or after you change the key in a local package. When a package had a warning (like a commands library that is not there yet), `dox` looks again on the next run. The code of the commands is always the newest, because `dart run` compiles it each time.
 
 `dox help` keeps the list of package commands in `.dart_tool/dox/commands.json`. It loads the list again when a package or a commands library (the file in the key) changes. When you change only a file that the commands library imports, `dox help` can show the old description until then. The command itself always runs the new code.
 
-An app inside a pub workspace works too. `dox` finds `.dart_tool/package_config.json` in the workspace folder above the app.
+An app inside a pub workspace works too. When the app has `resolution: workspace`, `dox` uses `.dart_tool/package_config.json` of the workspace folder above it that lists the app under `workspace:`.

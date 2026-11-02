@@ -6,6 +6,10 @@ import 'dart:io';
 /// Use it in a package command that adds a migration, like `queue:table`.
 /// `dox migrate` then writes `db/migration/migrations.dart` again (and
 /// makes `bin/migrate.dart` when it is missing), so the new file runs.
+///
+/// Keep the name rules the same as `createMigration` and
+/// `nextMigrationTime` in dox-cli (`lib/src/tools/create_migration.dart`).
+/// dox-cli can not use dox_core yet, so the rules are in both places.
 class MigrationFile {
   /// [folder] is `db/migration` of the current folder by default.
   MigrationFile({Directory? folder})

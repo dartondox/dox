@@ -25,7 +25,8 @@ abstract class Command {
   /// one line for `dox help`
   String get description;
 
-  /// how to call it, like `queue:table [--force]`. Shown by `dox help`.
+  /// how to call it, like `make:report <name>`. Shown by `dox help`.
+  /// The default is [name].
   String get usage => name;
 
   /// run the command. [args] are the words after the name.
