@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Fix: `req.pathIs()` gives false for a path with a bare `%` or a bad code like `%zz`. Before, it threw an error and the client got 500.
 - `req.boolean()` no longer makes a new set of true words on every call.
 - New: `Route.match(methods, path, handler)` adds one route for each method in the list. `Route.any(path, handler)` adds one for GET, POST, PUT, PATCH and DELETE. OPTIONS is left out, so the CORS preflight answer still works.
 - New: `Route.redirect(from, to, status:)` and `Route.permanentRedirect(from, to)`. 302 and 301.

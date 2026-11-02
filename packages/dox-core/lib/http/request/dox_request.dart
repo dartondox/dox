@@ -347,6 +347,9 @@ class DoxRequest implements IDoxRequest {
     } on FormatException {
       // a bad escape, like `/%ff`, matches no pattern
       return false;
+    } on ArgumentError {
+      // a bare `%` or a bad code like `%zz` matches no pattern
+      return false;
     }
     return _wildcard(_trimSlash(pattern)).hasMatch(path);
   }
