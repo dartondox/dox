@@ -314,5 +314,39 @@ void main() {
       expect(j['has_name'], false);
       expect(j['file_name'], null);
     });
+    test('integer gives the default for NaN, Infinity and 1e400', () async {
+      Route.post('/request/integer-bad', (DoxRequest req) async {
+        return <String, dynamic>{
+          'nan': req.integer('nan', 5),
+          'inf': req.integer('inf', 5),
+          'big': req.integer('big', 5),
+          'big_body': req.integer('big_body', 5),
+        };
+      });
+      http.Response res = await http.post(
+        Uri.parse(
+          '$baseUrl/request/integer-bad?nan=NaN&inf=Infinity&big=1e400',
+        ),
+        headers: <String, String>{'content-type': 'application/json'},
+        body: '{"big_body": 1e400}',
+      );
+      expect(res.statusCode, 200);
+      Map<String, dynamic> j = jsonDecode(res.body);
+      expect(j['nan'], 5);
+      expect(j['inf'], 5);
+      expect(j['big'], 5);
+      expect(j['big_body'], 5);
+    });
+
+    test('pathIs is false for a path with a bad escape', () async {
+      Route.get('/bad-escape', (DoxRequest req) async {
+        // the router gives 404 for `/%ff`, so set the path here
+        req.uri = Uri.parse('/bad-escape/%ff');
+        return <String, dynamic>{'is': req.pathIs('bad-escape/*')};
+      });
+      http.Response res = await http.get(Uri.parse('$baseUrl/bad-escape'));
+      expect(res.statusCode, 200);
+      expect(jsonDecode(res.body)['is'], false);
+    });
   });
 }

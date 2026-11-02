@@ -288,10 +288,11 @@ class DoxRequest implements IDoxRequest {
   /// ```
   int integer(String key, [int defaultValue = 0]) {
     dynamic val = _find(key).value;
-    if (val is num) return val.toInt();
     if (val == null) return defaultValue;
-    String text = val.toString().trim();
-    return int.tryParse(text) ?? num.tryParse(text)?.toInt() ?? defaultValue;
+    num? number = val is num ? val : num.tryParse(val.toString().trim());
+    // NaN, Infinity and 1e400 have no int value
+    if (number == null || !number.isFinite) return defaultValue;
+    return number.toInt();
   }
 
   /// The uploaded file of the key, or null when it is not a file.
@@ -343,8 +344,14 @@ class DoxRequest implements IDoxRequest {
   /// req.pathIs('admin/*');
   /// ```
   bool pathIs(String pattern) {
-    return _wildcard(_trimSlash(pattern))
-        .hasMatch(Uri.decodeComponent(_trimSlash(uri.path)));
+    String path;
+    try {
+      path = Uri.decodeComponent(_trimSlash(uri.path));
+    } on FormatException {
+      // a bad escape, like `/%ff`, matches no pattern
+      return false;
+    }
+    return _wildcard(_trimSlash(pattern)).hasMatch(path);
   }
 
   /// True when the route name matches [pattern]. `*` matches any text.
