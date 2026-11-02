@@ -89,6 +89,8 @@ When `shouldQueue` is false, the email is sent at once and these options do noth
 Write a class that implements `NotificationChannel`. `toArray()` of the notification gives its data. For example, a channel that saves notifications in a table:
 
 ```dart
+import 'dart:convert';
+
 class DatabaseChannel implements NotificationChannel {
   @override
   Future<void> send(Object notifiable, Notification notification) async {
@@ -129,3 +131,5 @@ ArrayTransport mail = Mail.fake();
 await user.notify(InvoicePaid(1));
 expect(mail.messages.single.subject, 'Invoice paid');
 ```
+
+With `shouldQueue`, the email goes to the job queue, not to the fake. In the test, use the `sync` queue driver too (`Queue.configure(QueueConfig())`). Then the email reaches the fake at once.
