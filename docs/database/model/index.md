@@ -393,6 +393,8 @@ await deleted?.restore(); // sets deleted_at back to NULL
   throws a `StateError` and runs no query. So `Blog().delete()` can not delete every row by mistake.
   `Blog().where('status', 'draft').delete()` is a query delete, and it works.
   `update()`, `increment()` and `decrement()` on a model with no key and no `where` throw too.
+  To delete every row on purpose, use `Blog().whereRaw('1 = 1').delete()`.
+  See [write every row](../query-builder.md#write-every-row).
 
 `save()`, `touch()`, `delete()`, `forceDelete()` and `restore()` fire [model events](events.md).
 

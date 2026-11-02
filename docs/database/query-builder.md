@@ -862,6 +862,7 @@ await QueryBuilder.table('actor')
   `SELECT SUM("age") as dox_aggregate FROM (...) as dox_union_aggregate`.
 - `sum()`, `avg()`, `min()` and `max()` keep `orderBy`, `limit` and `offset`. `count()` does not.
 - `cursorPaginate()` and `chunkById()` do not work on a union. They throw a `StateError`.
+- `update`, `delete`, `forceDelete`, `increment`, `decrement`, `touch` and `all()` throw a `StateError` on a union, because they would use only the first query. Use `get()` to read it.
   Use `paginate()`, `simplePaginate()` or `chunk()`.
 
 ## Row locks
@@ -1049,10 +1050,9 @@ int count = await Actor()
   A row that already has the new values counts 0.
 
 !!! warning
-    On a model, `update` needs a `where`.
+    On a model, `update` needs a `where` (or a global scope).
     `Actor().update({...})` with no `where` throws a `StateError` and runs no query.
-    So does `update` on a model from the table, like `actor.update({...})`: use `save()` for one model.
-    `QueryBuilder.table('actor').update({...})` with no `where` still changes every row of the table.
+    To change every row on purpose, see [write every row](#write-every-row).
     A query `update` does not set `updated_at` and fires no [model events](model/events.md).
     To do that, load the model, change it and call `save()`.
 
@@ -1075,10 +1075,12 @@ await Actor().where('id', 1).increment('views', 1, <String, dynamic>{'status': '
 - The amount is 1 when you give none.
 - A `NULL` column stays `NULL`, like in SQL.
 - They do not set `updated_at` and fire no model events.
-- On a model, they need a `where` or a model from the table.
+- On a model, they need a `where`, a global scope or a model from the table.
   `Actor().increment('views')` with no `where` throws a `StateError` and runs no query.
 
 On a model from the table, they change only the row of that model.
+`update` on a model from the table does the same, like Laravel: `await actor!.update({'name': 'AJ'})`.
+It runs one query and fires no model events. Use `save()` for the events and `updated_at`.
 The field of the model gets the new value too.
 This example has an `int? views` column field on `Actor`.
 
@@ -1104,11 +1106,11 @@ On a model with `softDelete: true`, `delete` sets `deleted_at` and keeps the row
 Rows that are already soft deleted are not counted.
 
 !!! warning
-    On a model, `delete` needs a `where`, or a model from the table with its primary key.
+    On a model, `delete` needs a `where`, a global scope, or a model from the table with its primary key.
     `Actor().delete()` with no `where` throws a `StateError` and runs no query.
     A model read without its primary key (like after `select('name')`) throws too.
     So it can not delete every row by mistake. `forceDelete` does the same.
-    To delete every row, use [`truncate`](#truncate) or `QueryBuilder.table('actor').delete()`.
+    To delete every row on purpose, see [write every row](#write-every-row).
 
 ### `forceDelete`
 
@@ -1155,6 +1157,23 @@ await Actor().where('id', 1).touch('seen_at');
 On a query, `touch()` fires no model events.
 On a model from the table, `touch()` changes only the row of that model.
 See [Models](model/index.md#touch-and-replicate).
+
+### Write every row
+
+On a model, `delete`, `forceDelete`, `update`, `increment` and `decrement` with no `where` throw a `StateError`.
+To write every row on purpose, use `whereRaw('1 = 1')`:
+
+```dart
+await Actor().whereRaw('1 = 1').update(<String, dynamic>{'status': 'old'});
+await Actor().whereRaw('1 = 1').delete();
+```
+
+It keeps soft deletes (a soft delete model sets `deleted_at`) and global scopes.
+
+!!! warning
+    `QueryBuilder.table('actor').delete()` and `truncate` are not the same.
+    They skip soft deletes, so they really delete the rows. They also skip global scopes and `fillable`.
+    On Postgres, `truncate` runs `CASCADE`: it also empties every table with a foreign key to this table.
 
 ### `truncate`
 
