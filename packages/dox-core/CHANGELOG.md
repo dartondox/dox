@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Fix: `req.session.reflash()` now keeps the flash data when it is the first use of the session in a request. Before, it kept nothing, because the old flash keys were read before the session was loaded.
 - Docs: `has` does not read dot keys (only `filled` and the other new helpers do). `.where` checks the param before `%` decoding. `Route.redirect` does not fill `{id}` in the target and drops the query string. A GET to a POST-only path gets the fallback, not 405. A fallback added after `startServer()` does not reach the other isolates.
 - With `MethodOverride`, a POST to a path with no route for any method gets 404 at once. Before, Dox read the whole body first.
 - Fix: with `MethodOverride`, a POST with `_method=PUT` to a path with no PUT route now says "PUT is not allowed" in the 405 message. Before, it said "POST is not allowed".

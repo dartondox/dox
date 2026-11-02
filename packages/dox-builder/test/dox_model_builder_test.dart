@@ -255,6 +255,49 @@ class Comment {
       expect(flat, contains('getMorphTo<Comment,Model<dynamic>>('));
     });
 
+    test('reload with no rows gives null or an empty list', () async {
+      String out = await _generate('''
+@DoxModel()
+class Comment {
+  @MorphTo()
+  Model<dynamic>? commentableItem;
+
+  @MorphMany(Comment, 'commentable')
+  List<Comment> replies = <Comment>[];
+
+  @HasMany(Comment)
+  List<Comment> children = <Comment>[];
+
+  @ManyToMany(Comment)
+  List<Comment>? related;
+}
+''');
+      String flat = out.replaceAll(RegExp(r'\s'), '');
+
+      /// no related row gives null, the old value is not kept
+      expect(
+        flat,
+        contains(
+          'for(dynamiciinlist){'
+          'i.commentableItem=result[i.tempIdValue.toString()];}',
+        ),
+      );
+
+      /// a list relation with no rows gets an empty list
+      expect(
+        flat,
+        contains('i.replies=result[i.tempIdValue.toString()]??<Comment>[];'),
+      );
+      expect(
+        flat,
+        contains('i.children=result[i.tempIdValue.toString()]??<Comment>[];'),
+      );
+      expect(
+        flat,
+        contains('i.related=result[i.tempIdValue.toString()]??<Comment>[];'),
+      );
+    });
+
     test('a two word relation is found in the preload list', () async {
       String out = await _generate('''
 @DoxModel()
