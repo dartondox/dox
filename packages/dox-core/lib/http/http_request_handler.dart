@@ -19,8 +19,11 @@ void httpRequestHandler(HttpRequest req) {
     Map<String, RawRequestHandler> mounts = Route().mounts;
     if (mounts.isNotEmpty && _mounted(req, mounts)) return;
 
+    /// a path with no route at all gets 404 for any `_method`, so its
+    /// body is not read
     if (req.method == 'POST' &&
-        MethodOverride.enabledIn(Dox().config.globalMiddleware)) {
+        MethodOverride.enabledIn(Dox().config.globalMiddleware) &&
+        httpPathHasRoute(req)) {
       _withMethodOverride(req);
       return;
     }

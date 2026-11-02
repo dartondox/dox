@@ -129,6 +129,18 @@ RegExp _prefixPattern(RegExp pattern) {
   );
 }
 
+/// true when a route of any method matches the path of [req]. with
+/// `MethodOverride`, a POST to a path with no route at all is answered
+/// without reading its body.
+bool httpPathHasRoute(HttpRequest req) {
+  Map<String, _MethodRoutes> index = _routeIndex();
+  String? host = _hasDomain ? req.headers.value(HttpHeaders.hostHeader) : null;
+  for (String method in index.keys) {
+    if (_getMatchRoute(req.uri.path, method, host) != null) return true;
+  }
+  return false;
+}
+
 /// the methods with a route for [path], eg. `['GET', 'HEAD', 'POST']`.
 /// runs only for a request that matched no route.
 List<String> _allowedMethods(String path, String? host) {

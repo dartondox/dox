@@ -24,7 +24,8 @@ import 'package:dox_core/dox_core.dart';
 /// sent as POST.
 ///
 /// The route is found before middleware runs, so Dox reads the body of a
-/// POST request first and looks at `_method` there. The middleware
+/// POST request first and looks at `_method` there. A POST to a path
+/// with no route for any method gets 404 with no body read. The middleware
 /// itself does nothing; it only turns this on. It works only in
 /// `AppConfig.globalMiddleware`, not on a router or a route.
 class MethodOverride implements IDoxMiddleware {

@@ -97,6 +97,15 @@ void main() {
           .expectBody(contains('PATCH is not allowed for /safe/form'));
     });
 
+    test('a POST to an unknown path is 404 before the body is read', () async {
+      // a broken multipart body gives an error when it is read
+      (await client.post(
+        '/nowhere',
+        body: 'not multipart',
+        headers: <String, String>{'content-type': 'multipart/form-data'},
+      )).expectStatus(404);
+    });
+
     test('a GET with _method is not changed', () async {
       (await client.get('/post/5?_method=DELETE')).expectBody('get GET');
     });
