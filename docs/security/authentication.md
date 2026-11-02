@@ -607,7 +607,9 @@ Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), (PageCon
 
 A public page can still know the user. `AuthMiddleware(optional: true)` sets `req.auth` when the login is good, and lets guests through too.
 A guest, or a bad or expired token, goes on with `req.auth` as `null`.
-A database error also goes on as a guest, and it is reported.
+With the JWT and access-token drivers, a database error also goes on as a guest, and it is reported.
+With the session driver, a database error is not caught, so the answer is `500`.
+`redirectTo` is ignored when `optional: true`.
 
 Login and register pages are for guests only. `GuestMiddleware` lets only guests through.
 A logged-in user goes to `redirectTo`. With no `redirectTo`, the answer is `403` with the code `already_logged_in`.
