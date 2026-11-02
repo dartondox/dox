@@ -290,6 +290,14 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     """;
   }
 
+  /// relations that hold one model, not a list
+  static const List<String> _singleRelations = <String>[
+    'HasOne',
+    'BelongsTo',
+    'MorphOne',
+    'MorphTo',
+  ];
+
   Map<String, String> _getRelationsCode(ModelVisitor visitor) {
     String content = '';
     String mapResultContent = '';
@@ -308,14 +316,23 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
 
       eagerLoad += value['eager'] == true ? "'$key'," : "";
 
+      /// a nullable one-row relation is set to null when the related row
+      /// is gone, so reload() does not keep an old value. List relations
+      /// and non nullable fields keep the old guard.
+      String setValue =
+          _singleRelations.contains(value['relationType']) &&
+              value['dataType'].toString().endsWith('?')
+          ? "i.$key = result[i.tempIdValue.toString()];"
+          : """if (result[i.tempIdValue.toString()] != null) {
+            i.$key = result[i.tempIdValue.toString()]!;
+          }""";
+
       content +=
           """
       static Future<void> $getFunctionName(List<Model<${visitor.className}>> list) async {
         var result = await get${value['relationType']}<${visitor.className}, ${value['model']}>($queryFunctionName(list), list);
         for (dynamic i in list) {
-          if (result[i.tempIdValue.toString()] != null) {
-            i.$key = result[i.tempIdValue.toString()]!;
-          }
+          $setValue
         }
       }
 

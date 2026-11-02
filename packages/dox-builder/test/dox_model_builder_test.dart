@@ -255,6 +255,38 @@ class Comment {
       expect(flat, contains('getMorphTo<Comment,Model<dynamic>>('));
     });
 
+    test('a nullable one-row relation is set to null on reload', () async {
+      String out = await _generate('''
+@DoxModel()
+class Comment {
+  @MorphTo()
+  Model<dynamic>? commentableItem;
+
+  @MorphMany(Comment, 'commentable')
+  List<Comment> replies = <Comment>[];
+}
+''');
+      String flat = out.replaceAll(RegExp(r'\s'), '');
+
+      /// no related row gives null, the old value is not kept
+      expect(
+        flat,
+        contains(
+          'for(dynamiciinlist){'
+          'i.commentableItem=result[i.tempIdValue.toString()];}',
+        ),
+      );
+
+      /// a list relation keeps the guard
+      expect(
+        flat,
+        contains(
+          'if(result[i.tempIdValue.toString()]!=null){'
+          'i.replies=result[i.tempIdValue.toString()]!;}',
+        ),
+      );
+    });
+
     test('a two word relation is found in the preload list', () async {
       String out = await _generate('''
 @DoxModel()
