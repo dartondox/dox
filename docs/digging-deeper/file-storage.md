@@ -34,7 +34,7 @@ StorageConfig storageConfig = StorageConfig(
     'local': <String, dynamic>{
       'driver': 'local',
       'root': 'storage',
-      'url': 'https://app.test/files', // for url() and signedUrl()
+      'url': 'https://app.test/files', // for signedUrl(); url() gives /storage/<path> without it
     },
 
     /// only when AWS_BUCKET is set
@@ -99,12 +99,14 @@ Uint8List? bytes = await Storage().get(path);  // null when missing
 bool found = await Storage().exists(path);
 await Storage().delete(path);
 
-String url = await Storage().url(path);         // needs the disk `url` option
+String url = await Storage().url(path);         // /storage/<path> when the disk has no `url`
 String signed = await Storage().signedUrl(path, expiresIn: Duration(minutes: 10));
 
 // another disk
 await Storage().disk('s3').put('reports', bytes, extension: 'pdf');
 ```
+
+On a local disk with no `url` option, `url()` gives `/storage/<path>` (no host). Dox serves it only when you add `Storage.route('storage', signed: false)`. `signedUrl()` still needs `url`.
 
 `putRequestFile` on the local disk moves the upload temp file. It does not read it into memory.
 
