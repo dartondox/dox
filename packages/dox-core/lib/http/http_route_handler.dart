@@ -65,9 +65,9 @@ RouteMatch? httpRouteHandler(HttpRequest req, {String? method}) {
 void _notFound(HttpRequest req, String? host) {
   if (Route().fallbacks.isNotEmpty &&
       (req.method == 'GET' || req.method == 'HEAD')) {
-    RouteData? fallback = _fallbackFor(req.uri.path, host);
+    RouteMatch? fallback = _fallbackFor(req.uri.path, host);
     if (fallback != null) {
-      runRoute(req, (route: fallback, params: null));
+      runRoute(req, fallback);
       return;
     }
   }
@@ -88,24 +88,43 @@ void _notFound(HttpRequest req, String? host) {
 
 /// the [Route.fallback] for [path]: the one with the longest prefix
 /// that [path] is under, and whose domain matches. null when none.
-RouteData? _fallbackFor(String path, String? host) {
+/// a prefix with a param, like `/{tenant}`, gives its params.
+RouteMatch? _fallbackFor(String path, String? host) {
   path = sanitizeRoutePath(path);
   String? hostLower = host?.toLowerCase();
   String? hostName = hostLower == null ? null : _withoutPort(hostLower);
-  RouteData? best;
+  RouteMatch? best;
   for (RouteData route in Route().fallbacks) {
     String want = route.path;
     String? domain = route.domainLower;
     if (domain != null && domain != hostLower && domain != hostName) continue;
-    bool under =
-        want == '/' ||
-        path == want ||
-        (path.startsWith(want) && path.codeUnitAt(want.length) == 0x2F);
-    if (under && (best == null || want.length > best.path.length)) {
-      best = route;
+    if (best != null && want.length <= best.route.path.length) continue;
+    RegExp? pattern = route.pattern;
+    if (pattern == null) {
+      bool under =
+          want == '/' ||
+          path == want ||
+          (path.startsWith(want) && path.codeUnitAt(want.length) == 0x2F);
+      if (under) best = (route: route, params: null);
+      continue;
     }
+    RegExpMatch? match = _prefixPattern(pattern).firstMatch(path);
+    if (match == null) continue;
+    Map<String, dynamic>? params = _decodeParams(route.paramNames, match);
+    if (params != null) best = (route: route, params: params);
   }
   return best;
+}
+
+/// route regex => the same regex that also matches paths under it:
+/// `^/([^/]+)$` gives `^/([^/]+)(?:/|$)`.
+final Map<String, RegExp> _prefixPatterns = <String, RegExp>{};
+
+RegExp _prefixPattern(RegExp pattern) {
+  String source = pattern.pattern;
+  return _prefixPatterns[source] ??= RegExp(
+    '${source.substring(0, source.length - 1)}(?:/|\$)',
+  );
 }
 
 /// the methods with a route for [path], eg. `['GET', 'HEAD', 'POST']`.

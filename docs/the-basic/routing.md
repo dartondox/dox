@@ -396,7 +396,7 @@ class WebRouter extends Router {
 
 - Other methods still get the normal `404` or `405`.
 - The fallback runs its middleware like any route. Add it in a `Router`, so the global middleware (like security headers) runs too.
-- It follows `Route.group`, the router prefix and `Route.domain`. In a group, it only answers paths under the group prefix. When two fallbacks match, the one with the longest prefix wins.
+- It follows `Route.group`, the router prefix and `Route.domain`. In a group, it only answers paths under the group prefix. A prefix can have params, like `{tenant}`, and `req.param` gives them. When two fallbacks match, the one with the longest prefix wins.
 - The handler decides the status. Return a `404` status for a "not found" page, else the client gets `200`.
 
 !!! note

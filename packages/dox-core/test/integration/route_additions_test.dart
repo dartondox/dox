@@ -55,6 +55,9 @@ class ExtraRouter extends Router {
     Route.group('admin', () {
       Route.fallback((DoxRequest req) => 'admin fallback');
     });
+    Route.group('{tenant}/shop', () {
+      Route.fallback((DoxRequest req) => 'shop of ${req.param['tenant']}');
+    });
   }
 }
 
@@ -136,6 +139,12 @@ void main() {
     (await client.get('/admin/x')).expectBody('admin fallback');
     (await client.get('/admin')).expectBody('admin fallback');
     (await client.get('/administrator')).expectBody('fallback /administrator');
+  });
+
+  test('a group fallback with a param in its prefix matches', () async {
+    (await client.get('/acme/shop/x/y')).expectBody('shop of acme');
+    (await client.get('/acme/shop')).expectBody('shop of acme');
+    (await client.get('/acme/shopping')).expectBody('fallback /acme/shopping');
   });
 
   test('fallback is only for GET and HEAD', () async {
