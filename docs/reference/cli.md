@@ -333,6 +333,8 @@ A failed run prints the error and sets exit code 1.
 
 `--seed` after `migration:run`, `migration:refresh` or `migration:fresh` runs `dox db:seed` when the migrations end well.
 
+`--force` after `migration:reset`, `migration:refresh` or `migration:fresh` skips the question they ask when `APP_ENV=production` and stdin is a terminal. Without a terminal they print a warning and run.
+
 `bin/migrate.dart` takes the same commands: `dart run bin/migrate.dart <run|rollback [--step=n]|reset|refresh|fresh|status>`. With no command it runs `run`.
 
 ## Factories and seeders
