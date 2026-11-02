@@ -61,11 +61,6 @@ void main() {
   });
 
   group('IAuth helpers', () {
-    test('guest is the opposite of isLoggedIn', () {
-      expect(BasicAuth(false).guest(), isTrue);
-      expect(BasicAuth(true).guest(), isFalse);
-    });
-
     test('id calls the id of the auth class', () {
       IAuth? auth = AuthWithId();
       expect(auth.id(), 7);

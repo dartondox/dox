@@ -158,7 +158,7 @@ After `AuthMiddleware`, `req.auth` holds the login.
 | --- | --- |
 | `req.auth` | an `IAuth?`. `null` when the route has no `AuthMiddleware`. It is kept apart from the input, so a query or body field can not set it |
 | `req.auth?.isLoggedIn()` | `true` when a user is loaded |
-| `req.auth?.guest()` | `true` when nobody is logged in |
+| `req.auth == null` | `true` for a guest |
 | `req.auth?.id()` | the primary key of the user, or `null`. It works when the key is in `hidden` |
 | `req.auth?.user<User>()` | the user model |
 | `req.auth?.toJson()` | the user as a map, without `hidden` fields |

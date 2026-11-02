@@ -333,7 +333,7 @@ See [Dox CLI](../digging-deeper/dox-cli.md).
 | `Auth::login($user)` | `Auth().login(user)` gives a JWT |
 | `Auth::user()` | `req.auth?.user<User>()` |
 | `Auth::id()` | `req.auth?.id()` |
-| `Auth::guest()` | `req.auth?.guest()` |
+| `Auth::guest()` | `req.auth == null` |
 | `Auth::attempt(...)` for a web page (session) | `await Auth().attemptSession(req, <String, dynamic>{...})` gives `true` or `false` |
 | `Auth::logout()` | `Auth().logout(req)` |
 | `->middleware('auth:sanctum')` | `AuthMiddleware()` from `dox_auth` |

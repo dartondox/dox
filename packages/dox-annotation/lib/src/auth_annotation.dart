@@ -7,19 +7,19 @@ abstract class IAuth {
   Map<String, dynamic>? toJson();
 }
 
-/// Helpers on `req.auth`, which is typed `IAuth?`.
-/// They are an extension, not members of [IAuth], so a class that
-/// `implements IAuth` does not have to add them.
+/// A helper on `req.auth`, which is typed `IAuth?`.
+/// It is an extension, not a member of [IAuth], so a class that
+/// `implements IAuth` does not have to add it.
+/// For a guest, `req.auth` is null, so check `req.auth == null`.
 /// ```
 /// if (post.userId != req.auth?.id()) abort(403);
 /// ```
 extension IAuthHelpers on IAuth {
-  /// true when nobody is logged in. The opposite of [IAuth.isLoggedIn].
-  bool guest() => !isLoggedIn();
-
   /// The primary key of the logged-in user, or null for a guest.
   /// It calls the `id()` of the auth class (like `Auth` of `dox_auth`).
   /// An auth class with no `id()` gives null.
+  /// A `NoSuchMethodError` thrown inside a real `id()` is also caught and
+  /// gives null.
   dynamic id() {
     try {
       // ponytail: dynamic call reaches the class's own id(); an extension

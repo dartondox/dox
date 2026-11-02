@@ -1,6 +1,6 @@
 ## Unreleased
 
-- New: `id()` and `guest()` on `IAuth`, so `req.auth?.id()` and `req.auth?.guest()` work. `guest()` is true when nobody is logged in. `id()` gives the primary key of the logged-in user from the `id()` of the auth class (like `Auth().id()` of `dox_auth`), or null. They are an extension (`IAuthHelpers`), so a class that implements `IAuth` does not need to change.
+- New: `id()` on `IAuth`, so `req.auth?.id()` works. It gives the primary key of the logged-in user from the `id()` of the auth class (like `Auth().id()` of `dox_auth`), or null. It is an extension (`IAuthHelpers`), so a class that implements `IAuth` does not need to change. For a guest, `req.auth` is null.
 
 ## 3.0.2
 
