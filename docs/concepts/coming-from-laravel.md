@@ -396,6 +396,8 @@ A missing key stops the app at start, with a list of every missing key. See [Env
 | `$this->get('/api/ping')->assertStatus(200)` | `(await client.get('/api/ping')).expectStatus(200)` with `DoxTestClient` |
 | `RefreshDatabase` | run the migrations in `setUpAll`, then `setUp(refreshDatabase)` from `package:dox_orm/testing.dart` |
 | `Storage::fake('s3')` | `Storage.manager.fake('s3')` |
+| `Mail::fake()` | `Mail.fake()`, then `mail.assertSent()` and `mail.assertQueued()` |
+| `Queue::fake()` | `Queue.fake()`, then `queue.assertPushed<T>()` |
 | `Cache::fake()` | `Dox().cache = CacheManager(CacheConfig(...))` with a `memory` store |
 | `$this->actingAs($user)` | `client.withToken(token)` with the JWT from `Auth().login(user)` |
 

@@ -554,6 +554,8 @@ test('ping', () async {
 | --- | --- |
 | cache | `Dox().cache = CacheManager(CacheConfig(defaultStore: 'memory', stores: {...}))` |
 | storage | `Disk fake = Storage.manager.fake('s3');` then `Storage.manager.restore('s3')` |
+| mail | `ArrayTransport mail = Mail.fake();` then `mail.assertSent()`, `mail.assertQueued()`, and `Mail.restore()` |
+| queue | `QueueFake queue = Queue.fake();` then `queue.assertPushed<T>()`, and `Queue.restore()` |
 | env | `AppEnv.load(EnvReader(environment: {...}, dotEnv: {...}))` |
 | DTO | `await CreateBlog.schema.safeValidateMap(<String, dynamic>{...})` |
 

@@ -384,24 +384,7 @@ await Mail.mailer('ses').queue(message, queue: 'emails');
     The full error text, with the answer of the server, is inside the encrypted part (at most the first 64K characters, counted in UTF-16 code units).
     To read it, take a `FailedJob` from `Queue.driver.failed()` and call `RedactedMailError.decrypt(job.error)`. It works with the app key or any key in `AppConfig.previousKeys`.
 
-In tests, use `Mail.fake()` with the `sync` queue driver. A queued email then goes to the fake at once.
-Without a queue, `Mail.queue()` throws. So set up the queue in the test:
-
-```dart
-ArrayTransport mail = Mail.fake();
-Queue.configure(QueueConfig()); // the sync driver
-
-// Mail.fake() has no default from, so set one
-await Mail.queue(
-  Message(
-    from: Address('app@example.com'),
-    to: <Address>[Address('ann@example.com')],
-    subject: 'Welcome',
-    text: 'Hi Ann',
-  ),
-);
-expect(mail.sent, hasLength(1));
-```
+In tests, `Mail.fake()` also catches `Mail.queue()` and `Mail.later()`. The email goes to `mail.queued`, not to the job queue. You need no queue setup. See [Testing](#testing).
 
 ## Transports
 
@@ -622,7 +605,28 @@ void main() {
 
 `Mail.fake()` works with or without a config. The fake stays on when `MailProvider` sets up the config again.
 
-`mail.clear()` forgets the sent emails.
+`Mail.fake()` also catches `Mail.queue()`, `Mail.later()`, the `queue()` and `later()` of a Mailable, and notifications with `shouldQueue`. These emails go to `mail.queued`, not to `mail.sent` and not to the job queue. Each item is a `QueuedMessage` with `mailer`, `message`, `id`, `delay`, `queue` and `encrypt`.
+
+```dart
+await Mail.queue(message);
+
+mail.assertQueued((Message m) => m.subject == 'Welcome');
+mail.assertNothingSent();
+```
+
+| Method | Checks |
+|---|---|
+| `assertSent([test])` | an email was sent. With `test`, one of them passes it |
+| `assertSentCount(count, [test])` | exactly `count` emails were sent. With `test`, `count` emails pass it |
+| `assertNotSent(test)` | no sent email passes `test` |
+| `assertNothingSent()` | no email was sent |
+| `assertQueued([test])` | an email was queued. With `test`, one of them passes it |
+| `assertNotQueued(test)` | no queued email passes `test` |
+| `assertNothingQueued()` | no email was queued |
+
+`test` is a `bool Function(Message)`. A failed check throws a `StateError`.
+
+`mail.clear()` forgets the sent and the queued emails. `Mail.restore()` stops the fake.
 
 ## Your own transport
 
