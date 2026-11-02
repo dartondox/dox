@@ -53,7 +53,6 @@ The packages in the main repo share one version number. The other packages live 
 
 | Feature | Status | What to do today |
 | --- | --- | --- |
-| Notifications | Not there | Send them from your own service class. |
 | Events and listeners | Not there | Model events are there. See [Model events](../database/model/events.md). |
 | Password reset | Not there | Make a signed, short-lived token, send it with [Mail](../digging-deeper/mail.md) and check it in a controller. |
 | Policies and gates | Not there | Check the user in a middleware or in the controller. |
@@ -63,7 +62,6 @@ The packages in the main repo share one version number. The other packages live 
 
 ### Later
 
-- Notifications
 - Password reset
 - Gates and policies
 - Localization

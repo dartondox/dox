@@ -8,7 +8,7 @@ The `dox_mailer` package sends email from your app with SMTP, Amazon SES, Azure,
 
 You write a `Message` and call `Mail.send()`. A transport sends it. You pick the transport in a config file, so you can change providers with no code change.
 
-The package has its own SMTP client, AWS signer and MIME builder. Next to `dox_core`, it only needs `http` and `crypto`.
+The package has its own SMTP client, AWS signer and MIME builder. Next to `dox_core`, it only needs `dox_view`, `markdown`, `http` and `crypto`.
 
 Send slow emails from a [queue job](queue.md), so the request does not wait.
 
@@ -207,6 +207,140 @@ With [views](../the-basic/views.md), render a template to HTML:
 String html = View.render('emails/welcome', <String, dynamic>{'name': 'Ann'});
 await Mail.send(Message(to: to, subject: 'Welcome', html: html));
 ```
+
+## Mailables
+
+A mailable is one kind of email in its own class, for example the welcome email. It keeps the address, the subject, the template and the data in one place. Override the getters you need:
+
+```dart
+class WelcomeMail extends Mailable {
+  WelcomeMail(this.user);
+
+  final User user;
+
+  @override
+  List<Address> get to => <Address>[Address(user.email, user.name)];
+
+  @override
+  String get subject => 'Welcome';
+
+  @override
+  String? get view => 'emails/welcome';
+
+  @override
+  Map<String, Object?> get data => <String, Object?>{'name': user.name};
+}
+```
+
+Then send it, or put it on the queue:
+
+```dart
+await WelcomeMail(user).send();
+await WelcomeMail(user).queue();
+await WelcomeMail(user).later(Duration(minutes: 10));
+```
+
+`queue()` and `later()` render the templates at once. The worker sends the finished email, so it needs no templates and no data. They take the same `queue` and `encrypt` options as `Mail.queue()`.
+
+| Getter | What it is |
+| --- | --- |
+| `to`, `cc`, `bcc`, `replyTo` | the addresses |
+| `from` | the sender. Null: the `from` of the mail config |
+| `subject` | the subject |
+| `html`, `text` | the body as text, when there is no template |
+| `view` | a [dox_view](../the-basic/views.md) template for the HTML body |
+| `textView` | a dox_view template for the plain text body |
+| `markdown` | a dox_view template with Markdown, see below |
+| `data` | the variables of the templates |
+| `attachments` | the files |
+| `mailer` | the mailer name, eg. `ses`. Null: the default mailer |
+
+`toMessage()` gives the email as a `Message`. To set more, like headers or tags, override it:
+
+```dart
+@override
+Message toMessage() {
+  return super.toMessage().copyWith(tags: <String>['welcome']);
+}
+```
+
+`{{ }}` in a template escapes HTML. For the plain text body of `textView` and `markdown`, the escape is undone, so `Tom & Jerry` stays `Tom & Jerry`.
+
+### Markdown mail
+
+Write the email in Markdown. You get a simple HTML email with a layout, and a plain text part, from one template. The Markdown is CommonMark with tables, like Laravel mail.
+
+`resources/views/emails/welcome.dox.html`:
+
+```markdown
+# Hi {{ name }}
+
+Thanks for joining. Here is what you can do next:
+
+- Fill in your profile
+- Invite your team
+
+[Open your profile]({{ profileUrl }})
+
+<a href="https://example.com/dashboard" class="button">Open the app</a>
+```
+
+```dart
+@override
+String? get markdown => 'emails/welcome';
+```
+
+- The HTML body is the Markdown as HTML, inside a white card on a grey page.
+- The text body is the Markdown itself.
+- `<a class="button">` shows as a button. In the text body it stays an `<a>` tag, so the link is still there.
+
+!!! warning "User data in Markdown"
+    `{{ }}` escapes HTML, but not Markdown. So a user's name like `[click](https://evil.example)` or `![x](https://evil.example/p.png)` becomes a normal link or image. Laravel works the same way.
+    Links and images with an unsafe URL, like `javascript:`, `vbscript:` or `data:`, lose their URL. Only `http`, `https`, `mailto`, `tel`, `cid` and relative URLs are kept.
+    The same goes for the lines of `MailMessage`. `MailMessage.action()` throws an `ArgumentError` for an unsafe URL.
+    Raw HTML in the template, like `<a href="{{ url }}">`, is not checked. In raw HTML, use only full URLs that your app builds. Email apps can not open a relative link like `/dashboard`.
+    For a URL, write `[text]({{ url }})` or `<{{ url }}>`. They go through the URL check, and the URL stays as it is, with `&` and `%XX`.
+    A bare URL does not become a link, like in Laravel. Most email apps make it a link anyway.
+    Entity text inside a URL is decoded. So `?q=&lt;b&gt;` reaches the browser as `?q=<b>`.
+
+!!! warning "Indent"
+    Markdown makes a line that starts with 4 spaces into a code block. So do not indent the Markdown inside `@if` or `@each`. Keep it at the start of the line.
+
+To use your own look, override `layout()`. It gets the HTML of the Markdown and returns the full page. Put it in a base class to use it for all your mailables:
+
+```dart
+import 'package:dox_mailer/dox_mailer.dart';
+import 'package:dox_view/dox_view.dart'; // View, SafeString
+
+abstract class AppMail extends Mailable {
+  @override
+  String layout(String body) {
+    return View.render('emails/layout', <String, Object?>{'body': SafeString(body)});
+  }
+}
+```
+
+### A simple email with no template
+
+`MailMessage` is a mailable made of lines and a button. It needs no template. It uses the Markdown layout.
+
+```dart
+await (MailMessage(subject: 'Invoice paid', to: <Address>[Address('ann@example.com')])
+      ..line('We got your payment.')
+      ..action('View invoice', 'https://example.com/invoices/1')
+      ..line('Thank you!'))
+    .send();
+```
+
+More options:
+
+- `cc:` in the constructor adds cc addresses.
+- `attach(Attachment(...))` adds a file.
+- `error()` makes the buttons red, for a message about a problem.
+
+The email starts with `greeting` (default `Hello!`) and ends with `salutation` (default none). Set them to null to leave them out. Lines can use Markdown, like `**bold**`. HTML in a line shows as text. See "User data in Markdown" above.
+
+To send one email on more than one channel, see [Notifications](notifications.md).
 
 ## Transports
 
