@@ -123,7 +123,11 @@ class Session {
   }
 
   /// Keep all flash data for one more request.
-  void reflash() => keep(_flashOld);
+  void reflash() {
+    // load first: it fills _flashOld from the store
+    _load();
+    keep(_flashOld);
+  }
 
   /// Keep the flash data of [keys] for one more request.
   void keep(List<String> keys) {

@@ -26,6 +26,11 @@ void sessionRoutes() {
     req.session.flash('message', 'Saved');
     return 'ok';
   });
+  Route.get('reflash', (DoxRequest req) {
+    // reflash() before any other read of the session
+    req.session.reflash();
+    return 'ok';
+  });
   Route.get('id', (DoxRequest req) => req.session.token);
   Route.get('regenerate', (DoxRequest req) {
     req.session.regenerate();
@@ -167,6 +172,16 @@ void main() {
       test('flash lives for one request', () async {
         DoxTestClient browser = client.withSession();
         await browser.get('$prefix/flash');
+        (await browser.get('$prefix/get'))
+            .expectJson(containsPair('message', 'Saved'));
+        (await browser.get('$prefix/get'))
+            .expectJson(containsPair('message', null));
+      });
+
+      test('reflash keeps flash data for one more request', () async {
+        DoxTestClient browser = client.withSession();
+        await browser.get('$prefix/flash');
+        await browser.get('$prefix/reflash');
         (await browser.get('$prefix/get'))
             .expectJson(containsPair('message', 'Saved'));
         (await browser.get('$prefix/get'))
