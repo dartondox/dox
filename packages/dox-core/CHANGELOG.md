@@ -1,5 +1,12 @@
 ## Unreleased
 
+- New request helpers on `DoxRequest`:
+  - `input(key, defaultValue)` takes a default. A dot key like `user.name` or `items.0.id` reads inside maps and lists. A key that is in the input as it is still wins, so old code works the same.
+  - `filled(key)`: the key is there and not empty. `exists(key)`: the key is there, with any value. `missing(key)`: the key is not there. `has` does not change.
+  - `except(keys)`, `boolean(key)`, `integer(key, defaultValue)`.
+  - `file(key)` and `hasFile(key)` for uploads.
+  - `bearerToken()` reads the token of an `Authorization: Bearer` header.
+  - `path()`, `fullUrl()`, `pathIs(pattern)` and `routeIs(pattern)`. A `*` in the pattern matches any text. It is `pathIs`, not `is`, because `is` is a Dart keyword.
 - Docs: the `abort` example now uses `req.auth?.id()`. `req.auth?.id` does not exist.
 - New: `MethodOverride` middleware. Add it to `AppConfig.globalMiddleware`, and a POST request with a `_method` field of `PUT`, `PATCH` or `DELETE` goes to the route of that method. So a plain HTML form can reach `Route.put`, `Route.patch`, `Route.delete` and `Route.resource` routes. `req.method` gives the new method. `CsrfMiddleware` still checks the request. Other `_method` values and other request methods are ignored. It is off when the middleware is not there.
 - Fix: `res.header(name, value)` now replaces a header with the same name in any case, like `withHeaders` does. Before, `header('Cache-Control', ..)` after `cache()` sent two `Cache-Control` values.

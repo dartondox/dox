@@ -212,9 +212,180 @@ class DoxRequest implements IDoxRequest {
   /// ```
   /// req.input('email');
   /// ```
+  /// A dot key reads inside maps and lists, like `user.name` or
+  /// `items.0.id`. A key that is in the input as it is wins.
+  /// [defaultValue] is given when the key is not there or is null.
+  /// ```
+  /// req.input('user.name', 'guest');
+  /// ```
   @override
-  dynamic input(String key) {
-    return _allRequest[key];
+  dynamic input(String key, [dynamic defaultValue]) {
+    return _find(key).value ?? defaultValue;
+  }
+
+  /// The input without [keys].
+  /// ```
+  /// req.except(['password']);
+  /// ```
+  Map<String, dynamic> except(List<String> keys) {
+    Map<String, dynamic> ret = <String, dynamic>{..._allRequest};
+    for (String key in keys) {
+      ret.remove(key);
+    }
+    return ret;
+  }
+
+  /// True when the key is in the input, with any value (also `''` or
+  /// null). Dot keys work.
+  /// ```
+  /// req.exists('remember');
+  /// ```
+  bool exists(String key) {
+    return _find(key).found;
+  }
+
+  /// True when the key is not in the input. The opposite of [exists].
+  bool missing(String key) {
+    return !exists(key);
+  }
+
+  /// True when the key is in the input and is not empty: not null, not
+  /// a blank string, not an empty list or map. Dot keys work.
+  /// ```
+  /// req.filled('name');
+  /// ```
+  bool filled(String key) {
+    dynamic val = _find(key).value;
+    if (val == null) return false;
+    if (val is String) return val.trim().isNotEmpty;
+    if (val is Iterable) return val.isNotEmpty;
+    if (val is Map) return val.isNotEmpty;
+    return true;
+  }
+
+  /// The input as a bool. `true`, `1`, `on` and `yes` give true. Any
+  /// other value gives false. [defaultValue] is given when the key is
+  /// not there.
+  /// ```
+  /// req.boolean('remember');
+  /// ```
+  bool boolean(String key, [bool defaultValue = false]) {
+    dynamic val = _find(key).value;
+    if (val == null) return defaultValue;
+    if (val is bool) return val;
+    return <String>{
+      '1',
+      'true',
+      'on',
+      'yes',
+    }.contains(val.toString().trim().toLowerCase());
+  }
+
+  /// The input as an int. [defaultValue] is given when the key is not
+  /// there or the value is not a number.
+  /// ```
+  /// req.integer('page', 1);
+  /// ```
+  int integer(String key, [int defaultValue = 0]) {
+    dynamic val = _find(key).value;
+    if (val is num) return val.toInt();
+    if (val == null) return defaultValue;
+    String text = val.toString().trim();
+    return int.tryParse(text) ?? num.tryParse(text)?.toInt() ?? defaultValue;
+  }
+
+  /// The uploaded file of the key, or null when it is not a file.
+  /// For a field with many files, use [input].
+  /// ```
+  /// RequestFile? photo = req.file('photo');
+  /// ```
+  RequestFile? file(String key) {
+    dynamic val = _find(key).value;
+    return val is RequestFile ? val : null;
+  }
+
+  /// True when the key holds an uploaded file, or a list of files.
+  bool hasFile(String key) {
+    dynamic val = _find(key).value;
+    if (val is RequestFile) return true;
+    return val is List && val.isNotEmpty && val.every(_isFile);
+  }
+
+  static bool _isFile(dynamic value) => value is RequestFile;
+
+  /// The token of an `Authorization: Bearer <token>` header, or null.
+  /// ```
+  /// req.bearerToken();
+  /// ```
+  String? bearerToken() {
+    String? value = header(HttpHeaders.authorizationHeader);
+    if (value == null || value.length < 7) return null;
+    if (value.substring(0, 7).toLowerCase() != 'bearer ') return null;
+    String token = value.substring(7).trim();
+    return token.isEmpty ? null : token;
+  }
+
+  /// The path of the request, like `/users/5`.
+  String path() {
+    return uri.path;
+  }
+
+  /// The full URL with the query string, like
+  /// `https://example.com/users?page=2`.
+  String fullUrl() {
+    String query = uri.hasQuery ? '?${uri.query}' : '';
+    return '${scheme()}://${host()}${uri.path}$query';
+  }
+
+  /// True when the path matches [pattern]. `*` matches any text.
+  /// A `/` at the start does not matter. (`is` is a Dart keyword.)
+  /// ```
+  /// req.pathIs('admin/*');
+  /// ```
+  bool pathIs(String pattern) {
+    return _wildcard(_trimSlash(pattern))
+        .hasMatch(Uri.decodeComponent(_trimSlash(uri.path)));
+  }
+
+  /// True when the route name matches [pattern]. `*` matches any text.
+  /// ```
+  /// req.routeIs('users.*');
+  /// ```
+  bool routeIs(String pattern) {
+    String? name = route.name;
+    return name != null && _wildcard(pattern).hasMatch(name);
+  }
+
+  static String _trimSlash(String path) {
+    return path.replaceFirst(RegExp(r'^/+'), '');
+  }
+
+  static RegExp _wildcard(String pattern) {
+    return RegExp('^${pattern.split('*').map(RegExp.escape).join('.*')}\$');
+  }
+
+  /// the value of [key] in the input. a key that is there as it is wins,
+  /// else a dot key reads inside maps and lists.
+  ({bool found, dynamic value}) _find(String key) {
+    if (_allRequest.containsKey(key)) {
+      return (found: true, value: _allRequest[key]);
+    }
+    if (!key.contains('.')) return (found: false, value: null);
+    dynamic current = _allRequest;
+    for (String part in key.split('.')) {
+      if (current is Map && current.containsKey(part)) {
+        current = current[part];
+      } else if (current is List) {
+        int? index = int.tryParse(part);
+        if (index == null || index < 0 || index >= current.length) {
+          return (found: false, value: null);
+        }
+        current = current[index];
+      } else {
+        return (found: false, value: null);
+      }
+    }
+    return (found: true, value: current);
   }
 
   /// Check if input is present

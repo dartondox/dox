@@ -51,12 +51,23 @@ class ApiController {
 | Code | Gives |
 | --- | --- |
 | `req.input('name')` | one value from the query string or the body. The body wins when both have the key. |
+| `req.input('user.name', 'guest')` | a value inside a map or list, with a dot key. The second value is the default, used when the key is not there or is null. |
 | `req.all()` | all values from the query string and the body, as a `Map` |
 | `req.only(<String>['name', 'email'])` | only these keys |
+| `req.except(<String>['password'])` | all values, without these keys |
 | `req.has('name')` | `true` when the key is there and not empty |
+| `req.filled('name')` | `true` when the key is there and not empty. A text of only spaces, an empty list and an empty map count as empty. |
+| `req.exists('name')` | `true` when the key is there, with any value (also `''` or null) |
+| `req.missing('name')` | `true` when the key is not there |
+| `req.boolean('remember')` | `true` for `true`, `1`, `on` and `yes`. Else `false`. |
+| `req.integer('page', 1)` | the value as an `int`. The default is used when the key is not there or is not a number. |
 | `req.body` | the body only (JSON, form data) |
 | `req.query` | the query string only |
 | `req.add('key', value)`, `req.merge({...})` | add values, for example in a middleware |
+
+A dot key reads inside the input. `req.input('items.0.id')` gives the `id` of the first item.
+A key that is in the input as it is wins. So a body key `'a.b'` is read before the `b` key inside `a`.
+Dot keys also work in `filled`, `exists`, `missing`, `boolean`, `integer`, `file` and `hasFile`.
 
 Form and query keys with brackets give lists and maps, like in Laravel:
 
@@ -108,7 +119,9 @@ class ApiController {
 
 `store()` comes from the [`dox_storage`](../packages/storage.md) package. Add it and import `package:dox_storage/dox_storage.dart`.
 
-Without a DTO, `req.input('image')` gives the `RequestFile`. It is not checked.
+Without a DTO, `req.file('image')` gives the `RequestFile`, or null when the field is not a file.
+`req.hasFile('image')` is `true` when the field holds a file or a list of files.
+For a field with many files, use `req.input('images')`. The file is not checked.
 
 ### `RequestFile`
 
@@ -158,7 +171,20 @@ req.referer();    // Referer header, or null
 req.isJson();     // true for a JSON body
 req.isFormData(); // true for multipart/form-data
 req.locale;       // first language of Accept-Language, like 'th', or null
+req.bearerToken(); // the token of 'Authorization: Bearer <token>', or null
 ```
+
+## Path and URL
+
+```dart
+req.path();                   // '/admin/users/5'
+req.fullUrl();                // 'https://example.com/admin/users/5?tab=info'
+req.pathIs('admin/*');        // true. `*` matches any text
+req.routeIs('admin.users.*'); // true when the route name matches
+```
+
+`pathIs` does not care about a `/` at the start, so `'admin/*'` and `'/admin/*'` are the same.
+`routeIs` is `false` for a route with no name. Give a route a name with `.name('admin.users.show')`.
 
 ## Cookies
 

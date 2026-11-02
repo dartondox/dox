@@ -158,7 +158,15 @@ See [Middleware](../the-basic/middleware.md) and [Signed URLs](../security/signe
 | `await req.validate<CreateBlog>()` | checked DTO, or `422` |
 | `req.input('name')` | one value, query or body (body wins) |
 | `req.all()` / `req.only(<String>['a', 'b'])` | many values |
-| `req.has('name')` | key is there and not empty |
+| `req.input('user.name', 'guest')` | dot key, with a default |
+| `req.except(<String>['password'])` | all values but these |
+| `req.has('name')` / `req.filled('name')` | key is there and not empty |
+| `req.exists('name')` / `req.missing('name')` | key is there (any value) / not there |
+| `req.boolean('remember')` / `req.integer('page', 1)` | value as `bool` / `int` |
+| `req.file('avatar')` / `req.hasFile('avatar')` | uploaded file |
+| `req.bearerToken()` | token of `Authorization: Bearer` |
+| `req.path()` / `req.fullUrl()` | path / full URL with query |
+| `req.pathIs('admin/*')` / `req.routeIs('admin.*')` | path or route name matches |
 | `req.body` / `req.query` / `req.param['id']` | one source only |
 | `req.header('X-Token')` / `req.headers` | headers |
 | `req.cookie('token')` | decrypted cookie |
