@@ -158,6 +158,8 @@ After `AuthMiddleware`, `req.auth` holds the login.
 | --- | --- |
 | `req.auth` | an `IAuth?`. `null` when the route has no `AuthMiddleware`. It is kept apart from the input, so a query or body field can not set it |
 | `req.auth?.isLoggedIn()` | `true` when a user is loaded |
+| `req.auth?.guest()` | `true` when nobody is logged in |
+| `req.auth?.id()` | the primary key of the user, or `null`. It works when the key is in `hidden` |
 | `req.auth?.user<User>()` | the user model |
 | `req.auth?.toJson()` | the user as a map, without `hidden` fields |
 
@@ -178,6 +180,8 @@ After `AuthMiddleware`, `req.auth` holds the login.
 | `Auth.hashCost(hash)` | the bcrypt cost of a hash, or `null` when it is not a bcrypt hash |
 | `user<T>()` | the user after `attempt` or `login` |
 | `isLoggedIn()` | `true` when there is a user |
+| `guest()` | `true` when there is no user |
+| `id()` | the primary key of the user, or `null` for a guest |
 
 `attempt` searches only by the fields in `identifierFields`. It runs bcrypt also when no user is found, or when the user has no password, so the answer time does not tell whether an email has an account.
 It returns `null` when the password is not a `String`, when no identifier is given, when an identifier is not a string or a number (a map or a list from the body), or when the password does not match.
@@ -600,6 +604,20 @@ Send guests to the login page instead of a `401`:
 ```dart
 Route.get('/dashboard', <dynamic>[AuthMiddleware(redirectTo: '/login'), (PageController c) => c.dashboard]);
 ```
+
+A public page can still know the user. `AuthMiddleware(optional: true)` sets `req.auth` when the login is good, and lets guests through too.
+A guest, or a bad or expired token, goes on with `req.auth` as `null`.
+A database error also goes on as a guest, and it is reported.
+
+Login and register pages are for guests only. `GuestMiddleware` lets only guests through.
+A logged-in user goes to `redirectTo`. With no `redirectTo`, the answer is `403` with the code `already_logged_in`.
+
+```dart
+Route.get('/posts', <dynamic>[AuthMiddleware(optional: true), (PostController c) => c.index]);
+Route.get('/login', <dynamic>[GuestMiddleware(redirectTo: '/dashboard'), (PageController c) => c.login]);
+```
+
+Both take `guard:`, like `AuthMiddleware(guard: 'admin')`.
 
 | Method | What it does |
 | --- | --- |

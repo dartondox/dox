@@ -253,6 +253,7 @@ class ApiRouter extends Router {
 
 `AuthMiddleware` reads the `Authorization: Bearer <token>` header and loads the user.
 When the token is missing or wrong, it answers `401 Authentication failed`.
+On a public route, `AuthMiddleware(optional: true)` loads the user when there is a good token, and lets guests through.
 
 ## 7. Run the generator
 

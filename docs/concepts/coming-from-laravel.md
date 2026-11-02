@@ -332,9 +332,12 @@ See [Dox CLI](../digging-deeper/dox-cli.md).
 | `Auth::attempt(['email' => $e, 'password' => $p])` | `await Auth().attempt(<String, dynamic>{'email': e, 'password': p})` gives a JWT, or `null` |
 | `Auth::login($user)` | `Auth().login(user)` gives a JWT |
 | `Auth::user()` | `req.auth?.user<User>()` |
+| `Auth::id()` | `req.auth?.id()` |
+| `Auth::guest()` | `req.auth?.guest()` |
 | `Auth::attempt(...)` for a web page (session) | `await Auth().attemptSession(req, <String, dynamic>{...})` gives `true` or `false` |
 | `Auth::logout()` | `Auth().logout(req)` |
 | `->middleware('auth:sanctum')` | `AuthMiddleware()` from `dox_auth` |
+| `->middleware('guest')` | `GuestMiddleware(redirectTo: '/dashboard')` |
 | `Hash::make($p)`, `Hash::check($p, $hash)` | `Hash.make(p)`, `Hash.verify(p, hash)` |
 
 For an API, Dox auth is a JWT in the `Authorization` header. There is no Sanctum tokens table.
