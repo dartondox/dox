@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Fix: with `MethodOverride`, a POST with `_method=PUT` to a path with no PUT route now says "PUT is not allowed" in the 405 message. Before, it said "POST is not allowed".
 - The router calls `Route()` once per route lookup, not twice.
 - The warning for a middleware that returns `null` reads `APP_ENV` once, not on every such request.
 - Fix: a `Route.fallback` in a group with a param in its prefix, like `{tenant}`, now matches, and `req.param` gives the param. Before, the prefix was compared as plain text, so the fallback never ran.

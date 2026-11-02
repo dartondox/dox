@@ -46,14 +46,14 @@ RouteMatch? httpRouteHandler(HttpRequest req, {String? method}) {
       /// a file of `Route.staticFiles`, else 404
       httpStaticHandler(req, Route().statics).then(
         (bool sent) {
-          if (!sent) _notFound(req, host);
+          if (!sent) _notFound(req, host, method);
         },
         onError: (Object error, StackTrace stackTrace) {
           httpErrorHandler(req, error, stackTrace);
         },
       );
     } else {
-      _notFound(req, host);
+      _notFound(req, host, method);
     }
   }
   return match;
@@ -62,7 +62,8 @@ RouteMatch? httpRouteHandler(HttpRequest req, {String? method}) {
 /// same path as a thrown 404, so the app ExceptionHandler and
 /// responseHandler can format it. the default body is JSON.
 /// when the path has routes for other methods, it is 405.
-void _notFound(HttpRequest req, String? host) {
+/// [method] is the `_method` override, when there is one.
+void _notFound(HttpRequest req, String? host, String? method) {
   if (Route().fallbacks.isNotEmpty &&
       (req.method == 'GET' || req.method == 'HEAD')) {
     RouteMatch? fallback = _fallbackFor(req.uri.path, host);
@@ -80,7 +81,8 @@ void _notFound(HttpRequest req, String? host) {
           )
         : MethodNotAllowedHttpException(
             allow,
-            message: '${req.method} is not allowed for ${req.uri.path}',
+            message:
+                '${method ?? req.method} is not allowed for ${req.uri.path}',
           ),
     StackTrace.empty,
   );

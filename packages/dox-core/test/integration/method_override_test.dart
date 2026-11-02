@@ -91,6 +91,12 @@ void main() {
       )).expectBody('post POST');
     });
 
+    test('405 names the method of _method', () async {
+      (await client.post('/safe/form', body: '_method=PATCH', headers: form))
+          .expectStatus(405)
+          .expectBody(contains('PATCH is not allowed for /safe/form'));
+    });
+
     test('a GET with _method is not changed', () async {
       (await client.get('/post/5?_method=DELETE')).expectBody('get GET');
     });
