@@ -162,6 +162,7 @@ See [Validation](../the-basic/validation.md).
 | `$blog->save()` | `await blog.save()` |
 | `$blog->delete()` | `await blog.delete()` (returns the deleted rows as an `int`) |
 | `$blog->increment('views')` | `await blog.increment('views')` |
+| `$blog->update([...])` | `await blog.update(<String, dynamic>{...})` (only that row, no model events) |
 | `Blog::withTrashed()` | `Blog().withTrash()` |
 | `Blog::onlyTrashed()` | `Blog().onlyTrashed()` |
 | `$blog->touch()` | `await blog.touch()` |
@@ -253,6 +254,7 @@ See [Model](../database/model/index.md).
 | `->insertOrIgnore([...])` | `.insertOrIgnore(<Map<String, dynamic>>[...])` |
 | `->upsert([...], ['email'], ['name'])` | `.upsert(<Map<String, dynamic>>[...], <String>['email'], <String>['name'])` |
 | `->delete()` | `.delete()` (returns the deleted rows as an `int`) |
+| `Blog::query()->delete()` (every row) | `await Blog().whereRaw('1 = 1').delete()`. With no `where`, `Blog().delete()` throws a `StateError`. |
 | `->lockForUpdate()`, `->sharedLock()` | `.lockForUpdate()`, `.sharedLock()` |
 | `DB::select('select ...', [$id])` | `QueryBuilder.query('select ... @id', substitutionValues: {'id': id})` |
 | `DB::transaction(fn)` | `QueryBuilder.transaction(() async { ... })` |
