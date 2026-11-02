@@ -4,10 +4,10 @@ icon: lucide/user-lock
 
 # Authentication
 
-This page shows how to log users in with `dox_auth` and protect routes with a JWT token or a session.
+This page shows how to log users in with `dox_auth` and protect routes with a JWT token, an access token or a session.
 
 `dox_auth` checks an email and a password against your user table.
-It gives back a JWT token.
+It gives back a JWT token, or an [access token](#access-tokens) with `AccessTokenAuthDriver`.
 The client sends this token in the `Authorization` header.
 `AuthMiddleware` reads the token and loads the user from the database.
 
@@ -274,6 +274,135 @@ await Auth().forgetUser(id);       // drop the user from `userCacheTtl`, eg. aft
 - Cost: `verifyToken` reads this store on every request, also with `userCacheTtl`. It is one `many()` call: one round trip on `redis` and `memory`. On the `file` store (the default) it is 2 or 3 file reads per request. Use `memory` for one isolate, or `redis` for many isolates or servers.
 - When the store can not be read, the token is checked with only the signature and `exp`, and a warning is printed once. So a cache outage does not log everyone out. But revoked tokens work until the store is back.
 
+## Access tokens
+
+Access tokens are API tokens that you can revoke at any time.
+They are like AdonisJS access tokens or Laravel Sanctum tokens.
+They are opt-in. Session and JWT guards do not change.
+
+A token looks like `oat_12.<secret>`.
+The table keeps only a SHA-256 hash of the secret.
+You see the plain token once, when you make it.
+A token works until it expires or you revoke it.
+
+### 1. Add the guard
+
+```dart title="lib/config/auth.dart"
+'api': AuthGuard(
+  driver: AccessTokenAuthDriver(), // table: 'auth_access_tokens', expiresIn: null (no end)
+  provider: AuthProvider(model: () => User()),
+),
+```
+
+`AccessTokenAuthDriver` options:
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `table` | `'auth_access_tokens'` | The table of the tokens. |
+| `connection` | the default connection | The `dox_orm` connection name. |
+| `expiresIn` | `null` (no end) | How long a new token works. |
+| `hashRounds` | `10` | The bcrypt cost, for `attempt`. |
+| `type` | the guard name | The type of the tokens. A token works only on a guard with the same type. |
+| `stringIds` | `false` | `true` for users with text ids. Text ids are compared exactly. Use the same value in the migration. For uuid ids, see `uuidIds`. |
+| `uuidIds` | `false` | `true` for users with uuid ids. A uuid is kept and compared in lower case. Use the same value in the migration. |
+
+### 2. Add the table
+
+Add a migration in `db/migration`. `AccessTokenTables` makes the `auth_access_tokens` table.
+
+```dart title="db/migration/2026_11_02_000000000_create_access_tokens_table.dart"
+// ignore_for_file: file_names
+import 'package:dox_auth/dox_auth.dart';
+import 'package:dox_migration/dox_migration.dart';
+
+/// The auth_access_tokens table of dox_auth.
+class CreateAccessTokensTable extends Migration {
+  @override
+  Future<void> up(Schema schema) async {
+    await AccessTokenTables.up(schema);
+  }
+
+  @override
+  Future<void> down(Schema schema) async {
+    await AccessTokenTables.down(schema);
+  }
+}
+```
+
+Then run `dox migrate`.
+
+`AccessTokenTables.up` options:
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `table` | `'auth_access_tokens'` | The table name. Use the same name as the driver `table`. |
+| `stringIds` | `false` | `false`: `tokenable_id` is an unsigned big int, like Sanctum and AdonisJS. `true`: it is text, for users with text ids. Use the same value as the driver `stringIds`. For uuid ids, see `uuidIds`. |
+| `uuidIds` | `false` | `true`: `tokenable_id` is a uuid column (`UUID` on Postgres), for users with uuid ids. Then `usersTable` works with a uuid id. Set `uuidIds: true` on the driver too. |
+| `usersTable` | none | Adds a foreign key from `tokenable_id` to `usersKey` of this table, with cascade delete. Then the tokens of a deleted user are deleted too. The two id columns must have the same type. |
+| `usersKey` | `'id'` | The key column of `usersTable`, for the foreign key. |
+
+With `usersTable`, use one token table per user model. If you have more than one user model (like users and admins), give each model its own token table, with `table:` on the driver and in the migration. With one shared table, the foreign key fails for admin tokens, and deleting a user also deletes the tokens of the admin with the same id.
+
+The migration makes the table on the default connection.
+If the driver uses another connection, like `AccessTokenAuthDriver(connection: 'other')`, make the table on that connection.
+
+The table has these columns: `id`, `tokenable_type`, `tokenable_id`, `type`, `name`, `hash`, `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at`.
+
+### 3. Make and revoke tokens
+
+```dart
+// log in with a password: a new token with all abilities, or null
+String? token = await Auth(guard: 'api').attempt(credentials);
+
+// or make a token for a user
+AccessToken token = await Auth(guard: 'api').createAccessToken(
+  user,
+  name: 'cli', // at most 255 characters
+  abilities: <String>['posts:read'], // default: ['*'] (all)
+  expiresIn: const Duration(days: 30), // default: the driver expiresIn
+);
+return <String, dynamic>{'token': token.value}; // shown only once
+
+await Auth(guard: 'api').accessTokens(user);           // all tokens of the user, newest first
+await Auth(guard: 'api').revokeAccessToken(user, id);  // false when the user has no such token
+await Auth(guard: 'api').revokeAllAccessTokens(user);  // eg. after a password change
+await Auth(guard: 'api').revokeToken(req);             // logout: revoke the token of this request
+await Auth(guard: 'api').pruneExpiredAccessTokens();   // delete expired tokens, eg. from a scheduled job
+```
+
+In a route behind `AuthMiddleware`, `(req.auth as Auth).revokeToken(req)` uses the token that was already checked. So it does not check the token again.
+
+`accessTokens` gives `AccessToken` objects. `token.toJson()` has no hash and no plain token, so you can send it to the client.
+
+### 4. Protect routes and check abilities
+
+The client sends `Authorization: Bearer oat_12.<secret>`.
+Protect the route with `AuthMiddleware(guard: 'api')`.
+Then check the abilities of the token:
+
+```dart
+Auth auth = req.auth as Auth;
+if (!auth.tokenCan('posts:write')) {
+  throw ForbiddenHttpException();
+}
+auth.currentAccessToken; // the AccessToken of this request
+```
+
+- A token fails (401) when its format is bad, the secret is wrong, it is expired, it was revoked, its user is gone, it has another type, or it was made for a guard with another user table.
+- `tokenable_type` is the table name of the user model. If you rename the users table, the old tokens stop working.
+- A revoked token is deleted from the table, so it stops working at once.
+- A database error also fails the check (401). The error goes to `AppConfig.exceptionHandler`.
+- Each token has a `type`. By default it is the guard name. So two access token guards do not take each other's tokens. If you rename a guard, set `AccessTokenAuthDriver(type: 'old-name')` to keep its tokens working.
+- A token `name` over 255 characters throws an `ArgumentError`. Nothing is written.
+- Pass a user of the guard's model. For admins, use `Auth(guard: 'admin').createAccessToken(admin)`. A user of another model throws an `ArgumentError`.
+- On Postgres a uuid is stored in lower case. With `uuidIds`, the driver keeps and compares uuids in lower case too. On other databases, keep uuids in lower case in the users table.
+- When you delete a user, call `revokeAllAccessTokens(user)` too, or use `usersTable` in the migration. Then old tokens can never match a new user with the same id.
+- `tokenCan` is `false` when there is no access token. So a session or JWT login never passes it.
+- `last_used_at` is written at most once a minute per token. So a busy token does not write on every request. If this write fails, the error is reported and the request goes on.
+- `Auth().login(user)` throws a `StateError` with this driver. Use `createAccessToken`.
+- Expired tokens stay in the table until you call `pruneExpiredAccessTokens()`.
+- To check a token without a request, like in Socket.IO, use `Auth(guard: 'api').userFromToken(token)`. See [Check a login with no request](#check-a-login-with-no-request). The driver method behind it is `check(token, guard)`, an instance method of `AccessTokenAuthDriver`.
+
 ## Login throttle
 
 The login throttle limits failed logins per account and ip. It is off by default.
@@ -479,7 +608,8 @@ User? user = await Auth(guard: 'api').userFromToken(token);
 User? user = await Auth(guard: 'web').userFromSession(session);
 ```
 
-- `userFromToken` runs the same checks as a request with a `Bearer` header: signature, algorithm, guard, `exp` and [revocation](#revoke-tokens). Give the token with no `Bearer ` prefix. A missing, bad, expired, revoked or changed token gives `null`. It needs a guard with `JwtAuthDriver`.
+- `userFromToken` runs the same checks as a request with a `Bearer` header. For a JWT: signature, algorithm, guard, `exp` and [revocation](#revoke-tokens). For an [access token](#access-tokens): the hash, the type, the user table, `expires_at` and revocation. Give the token with no `Bearer ` prefix. A missing, bad, expired, revoked or changed token gives `null`. It needs a guard with `JwtAuthDriver` or `AccessTokenAuthDriver`.
+- With an access token, `currentAccessToken` and `tokenCan` work on the same `Auth` after `userFromToken`.
 - `userCacheTtl` is a cache, not a check. With it on, a deleted or banned user can still connect until the cache time ends, unless `forgetUser` runs.
 - `userFromSession` gives the user of a session, or `null`. Load the session with `SessionMiddleware().fromCookie(value)`. See [Session](../the-basic/session.md#load-a-session-with-no-request). It needs a guard with `SessionAuthDriver`.
 - Both throw a `StateError` on a guard with the wrong driver.
@@ -487,7 +617,7 @@ User? user = await Auth(guard: 'web').userFromSession(session);
 ## Things to know
 
 - **The token is not secret.** By default, anyone with the token can read `user.toJson()`. Keep private columns in `hidden`, or use [small tokens](#small-tokens).
-- **By default, you can not cancel one token.** A token works until it expires. Turn on [revocation](#revoke-tokens) to cancel one token, or all tokens of a user. Without it, to end all tokens, change the `secret` (your `APP_KEY`) with no old secrets. See [Change the JWT secret](#change-the-jwt-secret).
+- **By default, you can not cancel one token.** A token works until it expires. Turn on [revocation](#revoke-tokens) to cancel one token, or all tokens of a user. Without revocation, to end all tokens, change the `secret` (your `APP_KEY`) with no old secrets. See [Change the JWT secret](#change-the-jwt-secret). Or use [access tokens](#access-tokens): they live in a table, and you can revoke them at any time.
 - **The user is loaded on each request**, by the id in the token. A deleted user can not log in, even with a valid token.
 - **`userCacheTtl` skips that query.** With `Duration(seconds: 30)`, a deleted or changed user is seen only after 30 seconds. Each isolate has its own cache. Requests in that time share one user object, so do not change it per request.
 - **Login does not block the server.** `attempt` runs bcrypt in another isolate.
