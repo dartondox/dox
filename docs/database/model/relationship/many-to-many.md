@@ -198,6 +198,7 @@ Ids match with one rule:
 - A stored value never throws. A value in the table that can not be read exactly does not match a number.
   So a long digit text in a text key column does not stop `sync`.
 - A bool id is `1` or `0`, like the databases read it. So `sync('songs', true)` keeps the row of song `1`.
+- A `BigInt` id is an `int` when it fits, else it throws an `ArgumentError`. Any other id type that is not an `int`, a `String`, a `bool`, a `double` or a model throws an `ArgumentError`.
 - Each id finds its own stored row when it can. A row with the same text wins, so on a text key `1` finds `'1'`, not `'01'`.
   A stored row is matched once, so on a number key `toggle('songs', ['1', '01'])` detaches song `1` once.
 - `detach` and `updateExistingPivot` send every given id.
