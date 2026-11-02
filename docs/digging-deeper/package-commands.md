@@ -116,4 +116,4 @@ if (path == null) {
 
 `dox help` keeps the list of package commands in `.dart_tool/dox/commands.json`. It loads the list again when a package or a commands library (the file in the key) changes. When you change only a file that the commands library imports, `dox help` can show the old description until then. The command itself always runs the new code.
 
-An app inside a pub workspace works too. When the app has `resolution: workspace`, `dox` uses `.dart_tool/package_config.json` of the workspace folder above it that lists the app under `workspace:`.
+An app inside a pub workspace works too, also when the `workspace:` list uses a glob like `apps/*`. `dox` finds the workspace root from `.dart_tool/pub/workspace_ref.json`, which `dart pub get` writes in each member.
