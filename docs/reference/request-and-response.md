@@ -53,7 +53,7 @@ A simple middleware (`IDoxMiddleware`) gets an `IDoxRequest`. A controller and a
 | `origin()` | `String?` | The `Origin` header. | yes |
 | `referer()` | `String?` | The `Referer` header. | yes |
 | `locale` | `String?` | The first language of `Accept-Language`, like `th`. `null` when there is none or it is `*`. | no |
-| `auth` | `IAuth?` | The auth object set by `AuthMiddleware`, or `null`. | yes |
+| `auth` | `IAuth?` | The auth object set by `AuthMiddleware`, or `null`. `req.auth?.id()` gives the user id, For a guest, `req.auth` is `null`. | yes |
 | `expectsJson()` | `bool` | The client wants JSON: an `Accept` header with json, a JSON body, or `X-Requested-With: XMLHttpRequest`. An Inertia request is not. | no |
 
 ### Session

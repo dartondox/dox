@@ -166,6 +166,7 @@ See [Middleware](../the-basic/middleware.md) and [Signed URLs](../security/signe
 | `req.userAgent()` / `req.host()` / `req.origin()` / `req.locale` | more headers |
 | `req.isJson()` / `req.isFormData()` | content type |
 | `req.auth?.user<User>()` | logged in user (after `AuthMiddleware`) |
+| `req.auth?.id()` / `req.auth == null` | user id, or `true` for a guest |
 | `req.method` / `req.uri` | method and URI |
 
 Files:
@@ -491,6 +492,7 @@ bool ok = await Hash.verifyAsync(password, hash);
 ```
 
 Protect a route with `AuthMiddleware()`. Client sends `Authorization: Bearer <token>`.
+`AuthMiddleware(optional: true)` lets guests through too. `GuestMiddleware(redirectTo: '/dashboard')` is for login pages.
 
 See [Authentication](../security/authentication.md) and [Hashing](../security/hashing.md).
 

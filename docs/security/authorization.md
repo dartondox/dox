@@ -223,6 +223,14 @@ class CommentPolicy extends Policy<User?, Comment> {
 ```
 
 `Can('view-post', param: 'post')` without `AuthMiddleware` then works for guests too.
+But then a logged-in user is a guest too, because nothing loads the user.
+Use `AuthMiddleware(optional: true)` on a public route. It loads the user when the login is good, and lets guests through:
+
+```dart
+Route.get('/posts/{post}', <dynamic>[AuthMiddleware(optional: true), Can('view-post', param: 'post'), postController.show]);
+```
+
+`req.can()` then also sees the user on a public route.
 
 ## Before and after hooks
 
