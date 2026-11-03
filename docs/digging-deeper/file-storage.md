@@ -99,6 +99,13 @@ Uint8List? bytes = await Storage().get(path);  // null when missing
 bool found = await Storage().exists(path);
 await Storage().delete(path);
 
+int size = await Storage().size(path);                 // throws when missing
+DateTime changed = await Storage().lastModified(path); // throws when missing
+
+await Storage().append('logs/app.log', 'new line');    // a missing file is made
+await Storage().prepend('logs/app.log', 'first line');
+await Storage().makeDirectory('reports');              // local disk only
+
 String url = await Storage().url(path);         // /storage/<path> when the disk has no `url`
 String signed = await Storage().signedUrl(path, expiresIn: Duration(minutes: 10));
 
@@ -107,6 +114,14 @@ await Storage().disk('s3').put('reports', bytes, extension: 'pdf');
 ```
 
 On a local disk with no `url` option, `url()` gives `/storage/<path>` (no host). Dox serves it only when you add `Storage.route('storage', signed: false)`. `signedUrl()` still needs `url`.
+
+`get()` gives `null` for a missing file, but `size()` and `lastModified()` throw `FileNotFoundException`.
+
+`append()` and `prepend()` add a new line between the old and the new text, but only when the file is not empty. Change it with `separator`.
+They keep the visibility and content type of the file.
+They read the file and write it back, so two writers at the same time can lose a write.
+
+`makeDirectory()` makes a folder only on a local disk. On any other disk it does nothing.
 
 `putRequestFile` on the local disk moves the upload temp file. It does not read it into memory.
 

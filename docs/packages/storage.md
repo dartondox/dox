@@ -124,6 +124,12 @@ String text = await disk.getString('notes/a.txt');
 Stream<List<int>> stream = await disk.getStream('videos/big.mp4');
 ObjectMetaData meta = await disk.getMetaData('avatars/1.png'); // size, contentType, lastModified, etag
 bool found = await disk.exists('avatars/1.png');
+int bytes = await disk.size('avatars/1.png');
+DateTime changed = await disk.lastModified('avatars/1.png');
+
+await disk.append('logs/app.log', 'new line');  // a missing file is made
+await disk.prepend('logs/app.log', 'first line');
+await disk.makeDirectory('reports/2026');        // local disk only
 
 await disk.copy('a.png', 'b.png');
 await disk.move('b.png', 'c.png');
@@ -136,6 +142,12 @@ ListResult page = await disk.listAll('avatars', ListOptions(recursive: true, lim
 await disk.setVisibility('avatars/1.png', Visibility.public);
 Visibility v = await disk.getVisibility('avatars/1.png');
 ```
+
+- `size` and `lastModified` throw `FileNotFoundException` when the file is missing.
+- `append` and `prepend` put a `\n` between the old and the new text, but only when the file is not empty. Change it with `separator: ''`.
+- `append` and `prepend` keep the visibility and content type of the file.
+- `append` and `prepend` read the file and write it back. They are not atomic, so two writers at the same time can lose a write.
+- `makeDirectory` makes the folder and its parent folders on a local disk. On any other disk it does nothing, because those disks have no real folders.
 
 ### Save an upload
 
