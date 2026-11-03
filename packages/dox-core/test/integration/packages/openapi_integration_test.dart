@@ -248,6 +248,7 @@ class DocsRouter extends Router {
       Route.get('/', TagController().index);
     });
     Route.get('/posts/{id}/full', PostController().show);
+    Route.get('/greet/{name?}', (DoxRequest req) => 'hi');
     Route.get('/search', PostController().search);
     Route.get('/secret', PostController().secret);
     Route.post('/upload', PostController().upload);
@@ -425,6 +426,16 @@ void main() {
     expect(doc['paths']['/search']['get']['security'], <dynamic>[
       <String, dynamic>{'bearerAuth': <dynamic>[]},
     ]);
+  });
+
+  test('an optional param gives the path with and without it', () {
+    Map<String, dynamic> doc = OpenApiDocument(config.openApi)
+        .build(Route().routes)
+        .toJson();
+    expect(OpenApiChecker().check(doc), isEmpty);
+    Map<String, dynamic> paths = doc['paths'];
+    expect(paths.keys, containsAll(<String>['/greet', '/greet/{name}']));
+    expect(paths['/greet']['get']['parameters'], isNull);
   });
 
   test('include and exclude pick the routes by path', () {
