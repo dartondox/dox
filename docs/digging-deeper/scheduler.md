@@ -97,20 +97,31 @@ The task only puts the job on the queue. A queue worker runs it.
 | --- | --- |
 | `everyMinute()` | every minute (the default) |
 | `everyTwoMinutes()` | every 2 minutes |
+| `everyThreeMinutes()` | every 3 minutes |
+| `everyFourMinutes()` | every 4 minutes |
 | `everyFiveMinutes()` | every 5 minutes |
 | `everyTenMinutes()` | every 10 minutes |
 | `everyFifteenMinutes()` | every 15 minutes |
 | `everyThirtyMinutes()` | at minute 0 and 30 |
 | `hourly()` | at minute 0 of every hour |
 | `hourlyAt(17)` | at minute 17 of every hour |
+| `everyTwoHours()` | every 2 hours at minute 0. Also `everyThreeHours`, `everyFourHours`, `everySixHours`. Pass a minute: `everyTwoHours(15)` |
+| `everyOddHour()` | at 01:00, 03:00 ... 23:00. Pass a minute: `everyOddHour(30)` |
 | `daily()` | every day at 00:00 |
 | `dailyAt('13:00')` | every day at 13:00 |
 | `twiceDaily(1, 13)` | every day at 01:00 and 13:00 |
+| `twiceDailyAt(1, 13, 15)` | every day at 01:15 and 13:15 |
+| `at('13:00')` | same as `dailyAt('13:00')` |
 | `weekly()` | every Sunday at 00:00 |
 | `weeklyOn(DateTime.monday, '08:00')` | every Monday at 08:00 |
 | `monthly()` | the 1st of every month at 00:00 |
 | `monthlyOn(15, '12:00')` | the 15th of every month at 12:00 |
+| `twiceMonthly(1, 16, '13:00')` | the 1st and 16th of every month at 13:00 |
+| `lastDayOfMonth('15:00')` | the last day of every month at 15:00 |
+| `quarterly()` | January, April, July and October 1st at 00:00 |
+| `quarterlyOn(4, '14:00')` | January, April, July and October 4th at 14:00 |
 | `yearly()` | January 1st at 00:00 |
+| `yearlyOn(6, 1, '17:00')` | June 1st at 17:00 |
 | `cron('*/5 9-17 * * 1-5')` | any 5 field cron expression |
 
 You can limit the days. The order of the calls does not matter.
@@ -119,11 +130,16 @@ You can limit the days. The order of the calls does not matter.
 | --- | --- |
 | `weekdays()` | Monday to Friday |
 | `weekends()` | Saturday and Sunday |
+| `mondays()` ... `sundays()` | only on that day of the week |
 | `days(<int>[DateTime.monday, DateTime.friday])` | only on these days |
 
 ```dart
 s.call('standup', remind).weekdays().dailyAt('09:00');
 ```
+
+A day of the month and a day of the week join with OR, like cron.
+`monthlyOn(15).fridays()` runs on the 15th and on every Friday.
+`lastDayOfMonth()` is different: it runs only on the last day of the month, so `lastDayOfMonth().fridays()` still runs only on the last day.
 
 ### Cron expressions
 
@@ -153,6 +169,15 @@ s.call('report', sendReport).dailyAt('08:00').timezone('Asia/Yangon');
 ```
 
 The name is an IANA name, like `Europe/London` or `America/New_York`.
+
+To use one zone for every task, set it in the config.
+A task's own `timezone()` still wins.
+
+```dart
+ScheduleConfig scheduleConfig = const ScheduleConfig(timezone: 'Asia/Yangon');
+```
+
+An unknown name throws an `ArgumentError` when the schedule starts.
 The zone data comes from the `timezone` package.
 
 With summer time (DST):
@@ -166,6 +191,8 @@ With summer time (DST):
 ```dart
 s.call('sync', sync).everyFiveMinutes().between('09:00', '17:00');
 s.call('night', night).hourly().between('22:00', '06:00'); // crosses midnight
+s.call('quiet', quiet).hourly().unlessBetween('23:00', '04:00');
+s.call('emails', sendEmails).daily().environments(<String>['production']);
 s.call('promo', promo).daily().when(isPromoOn);
 s.call('backup', backup).daily().skip(isHoliday);
 ```
@@ -173,6 +200,8 @@ s.call('backup', backup).daily().skip(isHoliday);
 | Method | What it does |
 | --- | --- |
 | `between('09:00', '17:00')` | runs only in this time of day, both ends included, in the task zone |
+| `unlessBetween('23:00', '04:00')` | does not run in this time of day, both ends included, in the task zone |
+| `environments(<String>['production'])` | runs only when `APP_ENV` is one of these names. Case does not matter. It is read at run time. An empty list throws |
 | `when(function)` | runs only when the function gives `true` |
 | `skip(function)` | does not run when the function gives `true` |
 
@@ -304,7 +333,10 @@ report   0 * * * *                  2026-10-25 14:00 UTC
 ping     */5 * * * * Asia/Yangon    2026-10-25 20:35 Asia/Yangon
 ```
 
-The next run time checks the frequency and `between()`. It does not check `when()` and `skip()`.
+The next run time checks the frequency, `between()` and `unlessBetween()`. It does not check `when()`, `skip()` and `environments()`.
+
+`lastDayOfMonth()` shows as `0 0 28-31 * *`, but it runs only on the last day of the month.
+The next run time is right.
 
 ### test
 
