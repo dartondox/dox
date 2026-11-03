@@ -139,7 +139,8 @@ s.call('standup', remind).weekdays().dailyAt('09:00');
 
 A day of the month and a day of the week join with OR, like cron.
 `monthlyOn(15).fridays()` runs on the 15th and on every Friday.
-`lastDayOfMonth()` is different: it runs only on the last day of the month, so `lastDayOfMonth().fridays()` still runs only on the last day.
+`lastDayOfMonth()` is different: it runs only on the last day of the month.
+`lastDayOfMonth().fridays()` runs on every last day of the month, on any day of the week. The `fridays()` part has no effect.
 
 ### Cron expressions
 
@@ -169,6 +170,7 @@ s.call('report', sendReport).dailyAt('08:00').timezone('Asia/Yangon');
 ```
 
 The name is an IANA name, like `Europe/London` or `America/New_York`.
+The zone data comes from the `timezone` package.
 
 To use one zone for every task, set it in the config.
 A task's own `timezone()` still wins.
@@ -178,7 +180,6 @@ ScheduleConfig scheduleConfig = const ScheduleConfig(timezone: 'Asia/Yangon');
 ```
 
 An unknown name throws an `ArgumentError` when the schedule starts.
-The zone data comes from the `timezone` package.
 
 With summer time (DST):
 
@@ -201,7 +202,7 @@ s.call('backup', backup).daily().skip(isHoliday);
 | --- | --- |
 | `between('09:00', '17:00')` | runs only in this time of day, both ends included, in the task zone |
 | `unlessBetween('23:00', '04:00')` | does not run in this time of day, both ends included, in the task zone |
-| `environments(<String>['production'])` | runs only when `APP_ENV` is one of these names. Case does not matter. It is read at run time. An empty list throws |
+| `environments(<String>['production'])` | runs only when `APP_ENV` is one of these names. Case and spaces around the names do not matter. When `APP_ENV` is not set or empty, the task does not run. It is read at run time. An empty list throws |
 | `when(function)` | runs only when the function gives `true` |
 | `skip(function)` | does not run when the function gives `true` |
 
@@ -335,7 +336,7 @@ ping     */5 * * * * Asia/Yangon    2026-10-25 20:35 Asia/Yangon
 
 The next run time checks the frequency, `between()` and `unlessBetween()`. It does not check `when()`, `skip()` and `environments()`.
 
-`lastDayOfMonth()` shows as `0 0 28-31 * *`, but it runs only on the last day of the month.
+`lastDayOfMonth()` shows `28-31` in the day field, but it runs only on the last day of the month.
 The next run time is right.
 
 ### test
@@ -402,7 +403,7 @@ class FakeClock extends ScheduleClock {
 }
 
 test('cleanup runs at 02:00', () async {
-  Schedule s = Schedule();
+  Schedule s = Schedule(timezone: scheduleConfig.timezone);
   schedule(s);
   Scheduler scheduler = Scheduler(
     tasks: s.tasks,
