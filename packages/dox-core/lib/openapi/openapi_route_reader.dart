@@ -61,7 +61,9 @@ class OpenApiRouteReader {
     }
     return RouteDoc(
       method: method,
-      path: path,
+      // the raw path: RouteDoc converts it itself, and needs the `?` of an
+      // optional param like `{name?}` to also add the path without it
+      path: route.path,
       summary: op?.summary ?? '${method.toUpperCase()} $path',
       description: op?.description,
       operationId: _operationId(op, method, path),
