@@ -105,6 +105,10 @@ The load runs this SQL:
 SELECT *, "user_id" as "_owner_id" FROM "user_info" WHERE "user_id" IN (@user_id_p0)
 ```
 
+!!! note "After `reload()` or a preload"
+    `await user.reload()` loads the relations again. A relation with no related row is set again, so it never keeps an old value.
+    A to-one field that can be null becomes `null`. A to-many field becomes `[]`.
+
 ## Filter by it
 
 `whereHas()` keeps the users that have a `user_info` row.

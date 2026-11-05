@@ -5,6 +5,7 @@ icon: lucide/braces
 # Serializer
 
 A serializer sets the JSON shape of a response: which keys the client gets, their names and their values.
+
 It works with any Dart type: a model, a plain class, or a map.
 
 !!! tip

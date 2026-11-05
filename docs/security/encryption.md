@@ -111,6 +111,7 @@ Change `APP_KEY` with no `previousKeys`. Every user is logged out, and that is w
 
 `DoxCookie` encrypts its value with `APP_KEY` by default.
 `req.cookie(key)` decrypts it.
+To decrypt a raw cookie value yourself, call `DoxCookie.decrypt(name, value)`. It returns `null` when the value was changed, was made with another key, or was made for another cookie name.
 
 ```dart
 return response().cookie(DoxCookie('theme', 'dark'));  // encrypted

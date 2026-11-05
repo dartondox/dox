@@ -4,7 +4,9 @@ icon: lucide/radio-tower
 
 # Notifications
 
-Notifications are in the `dox_mailer` package. Set up [mail](mail.md) first.
+Notifications are in the `dox_mailer` package.
+
+Set up [mail](mail.md) first.
 
 A notification tells a user about something, like "your invoice is paid". It can go out on more than one channel: email, a database table, SMS. Each notification is a class. `via()` picks the channels.
 

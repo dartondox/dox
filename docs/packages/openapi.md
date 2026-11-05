@@ -170,6 +170,9 @@ Blog:
 
 Routes that the builder does not know (for example inline closures) still get a basic entry.
 
+An optional param shows as two paths. The route `/blog/{id?}` gives `/blog/{id}` and `/blog`. OpenAPI path params must always be required, so this is the only right way to show it.
+Only optional params at the end of the path are dropped, the same way the Dox router matches them.
+
 ### Request
 
 The builder looks in this order. The first one wins.
@@ -376,4 +379,17 @@ if (page != null) {
 
 A schema can be a JSON Schema `Map`, a [`dox_validation`](validation.md) schema, or any object with `toJsonSchema()`.
 Paths can use `{id}` or `:id`. Both become `{id}`.
+`responses` takes status codes as `int` keys. To use a text key like `default` or `2XX`, pass `namedResponses`:
+
+```dart
+docs.route('GET', '/users/{id}',
+    responses: <int, ResponseDoc>{
+      200: ResponseDoc(schema: user, description: 'The user'),
+    },
+    namedResponses: <String, ResponseDoc>{
+      'default': const ResponseDoc(description: 'Any other error'),
+    });
+```
+
+`namedResponses` come after `responses`. When the same key is in both, the one in `namedResponses` wins.
 `DoxRouteAdapter().addTo(docs, routes)` adds a basic entry for each route you did not describe.

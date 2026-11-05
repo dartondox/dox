@@ -128,7 +128,7 @@ DoxResponse store(DoxRequest req) {
 | --- | --- |
 | `statusCode(201)` | sets the status code. Default `200`. |
 | `header('X-Key', 'value')` | sets one header |
-| `withHeaders({...})` | **replaces** all headers set before |
+| `withHeaders({...})` | adds these headers. A key replaces the header with the same name, in any case. Other headers stay. |
 | `contentType(ContentType.html)` | sets `Content-Type` (`ContentType` is from `dart:io`) |
 | `cache(Duration(minutes: 5))` | sets `Cache-Control: max-age=300` |
 | `cookie(DoxCookie(...))` | sets a cookie |

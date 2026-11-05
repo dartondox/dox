@@ -174,6 +174,10 @@ for (Comment c in comments) {
   A comment with no type, or an empty type `''`, gets `null`.
 - `related<Photo>('commentable')` on one comment gives the query of its photo.
 
+!!! note "After `reload()` or a preload"
+    `await user.reload()` loads the relations again. A relation with no related row is set again, so it never keeps an old value.
+    A to-one field that can be null becomes `null`. A to-many field becomes `[]`.
+
 ## Filter by it
 
 `whereHas()`, `whereDoesntHave()` and `withCount()` work with `@MorphMany` and `@MorphOne`.

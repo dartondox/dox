@@ -50,13 +50,14 @@ QueueConfig queueConfig = QueueConfig(
 | --- | --- | --- |
 | `driver` | `sync` | `sync`, `database` or `redis` |
 | `jobs` | empty | `jobRegistry` from `lib/generated/jobs.g.dart` |
-| `redis` | 127.0.0.1:6379 | `RedisOptions(host: ..., port: ..., password: ...)` for the `redis` driver |
+| `redis` | 127.0.0.1:6379 | `RedisOptions(host: ..., port: ..., password: ...)` for the `redis` driver. `QueueConfig.redisFromEnv()` reads it from the env. |
 | `prefix` | `dox_queue:` | the start of every Redis key |
 | `connection` | default | the dox_orm connection name, for the `database` driver |
 | `retryAfter` | 90 seconds | when a worker does not finish a job in this time, another worker can take it |
 | `workInProcess` | `false` | run a worker inside the web server, see [Small apps](#small-apps-a-worker-in-the-web-server) |
 | `workerQueues` | `['default']` | the queues of the in-process worker |
 | `workerConcurrency` | `1` | jobs at once in the in-process worker |
+| `workerTimeoutGrace` | none | the `--timeout-grace` wait of the in-process worker, see [Retries and failed jobs](#retries-and-failed-jobs) |
 
 !!! warning "Keep `retryAfter` bigger than your longest job"
     `retryAfter` is how Dox finds the job of a crashed worker.
@@ -206,6 +207,21 @@ Any other type stops the build with a clear message.
     Do not save a `User`. Save the `userId`, and load the user in `handle()`.
     The user may change between dispatch and run. The id gives you fresh data.
 
+### Encrypt the saved data
+
+Add the `ShouldBeEncrypted` mixin to save the job data encrypted.
+A person who can read Redis or the `jobs` table then can not read it.
+
+```dart
+@Job()
+class ChargeCard extends DoxJob with ShouldBeEncrypted {
+  // ...
+}
+```
+
+The data is encrypted with the app key (`AppConfig.appKey`). The worker needs `Dox().initialize()` with the same key, or one of `AppConfig.previousKeys`.
+The job name, the queue and the id stay plain text.
+
 ### Services in a job
 
 A job is made again from its saved data, so it can not get services in its constructor.
@@ -292,6 +308,7 @@ Flags of `work`:
 | `--timeout=60` | `60` | max run time in seconds of a job that does not set `timeout` |
 | `--sleep=3` | `3` | seconds to wait when the queues are empty |
 | `--stop-when-empty` | off | stop when the queues are empty |
+| `--timeout-grace=10` | none | after a timeout, wait up to this many seconds for the old run to end before the next try |
 
 ```bash
 dart run bin/queue.dart work --queue=emails,default --concurrency=4
@@ -350,6 +367,10 @@ A timeout counts as a failed try.
     After a timeout the try counts as failed, but `handle()` keeps running in the background until it ends.
     Write jobs that are safe to run twice.
 
+To wait for the old run, start the worker with `--timeout-grace=SECONDS`. Or set `workerTimeoutGrace` in `QueueConfig` for the in-process worker.
+The worker waits up to that time for the old run to end before it retries or fails the job. It takes no other job while it waits.
+Keep `timeout` plus the grace time below `retryAfter`. If not, another worker can take the job while this one waits.
+
 When a worker crashes, its job stays reserved. After `retryAfter` another worker takes it.
 This counts as a try. When there are no tries left, the job fails with a message that the worker did not finish.
 
@@ -387,6 +408,19 @@ QueueConfig queueConfig = QueueConfig(
   driver: 'redis',
   jobs: jobRegistry,
   redis: RedisOptions(host: env.redisHost, port: 6379),
+);
+```
+
+To read the Redis server from the env, use `QueueConfig.redisFromEnv()`.
+It reads `REDIS_URL` (for example `rediss://user:password@host:6380/0`, where `rediss` turns on TLS).
+When `REDIS_URL` is not set, it reads `REDIS_HOST`, `REDIS_PORT`, `REDIS_USERNAME`, `REDIS_PASSWORD` and `REDIS_TLS`.
+A key that is not set keeps the default of `RedisOptions`.
+
+```dart
+QueueConfig queueConfig = QueueConfig(
+  driver: 'redis',
+  jobs: jobRegistry,
+  redis: QueueConfig.redisFromEnv(),
 );
 ```
 

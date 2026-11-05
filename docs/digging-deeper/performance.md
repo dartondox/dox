@@ -136,7 +136,7 @@ A profile with `perf` (4 server cores, 64 connections) shows the effect:
 - Every server has as many workers as server CPUs.
 - Peak memory is the peak of the container (all workers).
 - Dart 3.13.6, AOT build with `dart build cli` (this is what `dox build`
-  does). `dox_core` 3.0.2, `dox_http_native` 3.0.2. Node 26.12, Bun 1.4.4, Go 1.26, Rust 1.99 with hyper 1.
+  does). `dox_core` and `dox_http_native` from the current release. Node 26.12, Bun 1.4.4, Go 1.26, Rust 1.99 with hyper 1.
 
 ## App benchmark
 
@@ -233,7 +233,7 @@ MySQL version.
 How it was run: the same rig as the [benchmark](#how-it-was-run) above.
 The server gets 2 CPUs, the database gets 2 CPUs and wrk gets the other 4.
 Each server has 4 database connections per core, 8 in total. One run of 15
-seconds per route. `dox_postgres_native` 3.0.2, `dox_mysql_native` 3.0.1.
+seconds per route. `dox_postgres_native` and `dox_mysql_native` from the current release.
 
 ### Dart VM flags
 

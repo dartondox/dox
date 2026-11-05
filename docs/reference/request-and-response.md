@@ -21,8 +21,16 @@ A simple middleware (`IDoxMiddleware`) gets an `IDoxRequest`. A controller and a
 | `validateSchema<O>(Schema<O> schema)` | `Future<O>` | Query and body checked with a fluent `dox_validation` schema. | no |
 | `all()` | `Map<String, dynamic>` | Query and body together. Body wins on the same key. | yes |
 | `only(List<String> keys)` | `Map<String, dynamic>` | Only these keys from `all()`. A missing key gives `null`. | yes |
-| `input(String key)` | `dynamic` | One value from `all()`. | yes |
+| `input(String key, [dynamic defaultValue])` | `dynamic` | One value from `all()`. A dot key like `user.name` or `items.0.id` reads inside maps and lists. The default is used when the key is not there or is null. | yes |
+| `except(List<String> keys)` | `Map<String, dynamic>` | All values from `all()`, without these keys. | no |
 | `has(String key)` | `bool` | `true` when the key is there and its text is not empty. | yes |
+| `exists(String key)` | `bool` | `true` when the key is there, with any value (also `''` or null). | no |
+| `missing(String key)` | `bool` | `true` when the key is not there. | no |
+| `filled(String key)` | `bool` | `true` when the key is there and not empty. Dot keys work. | no |
+| `boolean(String key, [bool defaultValue = false])` | `bool` | `true` for `true`, `1`, `on` and `yes`. | no |
+| `integer(String key, [int defaultValue = 0])` | `int` | The value as an `int`. The default is used when the key is not there or is not a number. | no |
+| `file(String key)` | `RequestFile?` | The uploaded file, or `null` when the field is not a file. | no |
+| `hasFile(String key)` | `bool` | `true` when the field holds a file or a list of files. | no |
 | `add(String key, dynamic value)` | `void` | Adds a value to `all()` and `body`. | yes |
 | `merge(Map<String, dynamic> values)` | `void` | Adds many values to `all()` and `body`. | yes |
 | `body` | `Map<String, dynamic>` | The parsed body (JSON or form fields). Files are `RequestFile`. | no |
@@ -43,6 +51,7 @@ A simple middleware (`IDoxMiddleware`) gets an `IDoxRequest`. A controller and a
 | `headers` | `Map<String, dynamic>` | Every header. Many values of one name are joined. | yes |
 | `httpHeaders` | `HttpHeaders` | The `dart:io` headers object. | no |
 | `contentType` | `ContentType?` | The parsed `Content-Type`. | yes |
+| `bearerToken()` | `String?` | The token of `Authorization: Bearer <token>`, or `null`. | no |
 | `cookie(String key, {bool decrypt = true})` | `String?` | One cookie. Decrypted with `appKey` unless `decrypt: false`. | yes |
 | `ip()` | `String` | The client IP, or `unknown`. From `X-Forwarded-For` only behind a trusted proxy. | yes |
 | `scheme()` | `String` | `http` or `https`. From `X-Forwarded-Proto` only behind a trusted proxy. | no |
@@ -71,6 +80,10 @@ A simple middleware (`IDoxMiddleware`) gets an `IDoxRequest`. A controller and a
 | `uri` | `Uri` | The request URI. | yes |
 | `route` | `RouteData` | The matched route. | no |
 | `getRouteData()` | `RouteData` | Same as `route`. | yes |
+| `path()` | `String` | The request path, like `/admin/users/5`. | no |
+| `fullUrl()` | `String` | The full URL with the query string. | no |
+| `pathIs(String pattern)` | `bool` | `true` when the path matches. `*` matches any text. | no |
+| `routeIs(String pattern)` | `bool` | `true` when the route name matches. It is `false` for a route with no name. | no |
 | `getRouteIdentifier()` | `String` | base64 of `<method>|<domain><path>`. Useful as a cache or rate limit key. | yes |
 | `httpRequest` | `HttpRequest` | The `dart:io` request. Use it for raw access. | yes |
 
@@ -88,9 +101,9 @@ Every setter returns the same `DoxResponse`, so calls chain.
 | `getContent()` | `dynamic` | The content as it was given. |
 | `stream(Stream<List<int>> stream)` | `DoxResponse` | Sets a byte stream as content. |
 | `contentType(ContentType type)` | `DoxResponse` | Sets `Content-Type`. A `File` without it gets the type from its extension. |
-| `header(String key, dynamic value)` | `DoxResponse` | Sets one header. A second call with the same key replaces the value. |
+| `header(String key, dynamic value)` | `DoxResponse` | Sets one header. A second call with the same key replaces the value. `cache-control` and `Cache-Control` are one header. |
 | `headers` | `Map<String, dynamic>` | The headers set so far, by name. |
-| `withHeaders(Map<String, dynamic> values)` | `DoxResponse` | Replaces every header set so far with this map. |
+| `withHeaders(Map<String, dynamic> values)` | `DoxResponse` | Adds these headers. A key replaces the header with the same name, in any case. Other headers stay. |
 | `cookie(DoxCookie cookie, {bool setExpire = false})` | `DoxResponse` | Adds a `Set-Cookie` header. `setExpire: true` sends the cookie as expired, which removes it. |
 | `cache(Duration duration)` | `DoxResponse` | Sets `Cache-Control: max-age=<seconds>`. |
 | `process(HttpRequest request)` | `dynamic` | Internal. Writes headers, status, cookies and the body. |

@@ -138,6 +138,10 @@ SELECT "song".*, "artist_song"."artist_id" as "_owner_id" FROM "song"
 
 With `withPivot` or `withTimestamps`, it also selects those pivot columns, like `"artist_song"."role" as "_pivot_role"`.
 
+!!! note "After `reload()` or a preload"
+    `await user.reload()` loads the relations again. A relation with no related row is set again, so it never keeps an old value.
+    A to-one field that can be null becomes `null`. A to-many field becomes `[]`.
+
 ## Read pivot columns
 
 The pivot table can have more columns, like a `role`.
@@ -214,6 +218,17 @@ Ids match with one rule:
 A `null` id or a model that is not saved is skipped by `attach`, `detach`, `toggle`, `syncWithoutDetaching` and `updateExistingPivot`.
 `sync` throws an `ArgumentError` for one, before it changes anything, because it would delete every other link.
 Each id is used once: `[1, 1, '1']` adds one row.
+
+A text key column can compare text without case or without end spaces.
+This is the default in MySQL and MariaDB, and in SQLite with `COLLATE NOCASE`.
+Dart does not know that. So `sync` and `toggle` also ask the database about each text id that Dart did not match.
+The database runs `WHERE key = id`.
+When it finds a stored row, that row counts as a match. With a stored `'ABC'`:
+
+- `sync('songs', ['abc'])` keeps the row `'ABC'`. It adds no row and deletes nothing.
+- `toggle('songs', ['abc'])` detaches the row `'ABC'`. It adds no row.
+- The delete never removes a row that the database sees as a kept id.
+- `detached` has only the ids whose row is really gone.
 
 ### `attach`
 

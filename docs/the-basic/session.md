@@ -4,7 +4,9 @@ icon: lucide/fingerprint
 
 # Session
 
-A session keeps data for one browser between requests. Use it for web pages: the logged in user, a cart, a "Saved" message after a form post.
+A session keeps data for one browser between requests.
+
+Use it for web pages: the logged in user, a cart, a "Saved" message after a form post.
 
 An API with tokens does not need a session.
 

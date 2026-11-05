@@ -10,9 +10,24 @@ Serve a folder of files, or a single page app (React, Vue, Flutter web), from th
 
 - A Dox app.
 - A `public` folder with the built front-end (`index.html`, `assets/...`).
-- The `dox_storage` package, with its provider. See [File storage](../digging-deeper/file-storage.md#config).
+- For the storage way and the controller below: the `dox_storage` package, with its provider. See [File storage](../digging-deeper/file-storage.md#config).
 
 ## Serve a folder: one line
+
+`Route.staticFiles` serves the files of a folder.
+Add it in `register()` of `WebRouter`.
+
+```dart title="lib/routes/web.dart"
+Route.staticFiles('/', 'public');
+```
+
+`GET /app.js` sends `public/app.js` with the right `Content-Type`. A route always wins over a file. A missing file goes on to the other routes, then to `404`.
+It sends `ETag` and `Last-Modified`, and the browser gets `304` when it already has the file. Add `maxAge:` to send a `Cache-Control` header.
+See [Routing: serve static files](../the-basic/routing.md#serve-static-files) for all the rules.
+
+For a single page app, add `Route.fallback` to send `index.html` for every URL that has no route and no file. See [Routing: fallback route](../the-basic/routing.md#fallback-route).
+
+### Or serve a storage disk
 
 `Storage.route` serves every file of a storage disk. Add a `public` disk for the folder in `lib/config/storage.dart`:
 

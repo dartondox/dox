@@ -4,7 +4,9 @@ icon: lucide/circle-check
 
 # Step 4: Validation
 
-This step checks the input of create and update with a `@Dto` class. Bad input gets a `422` answer, and the controller does not run.
+This step checks the input of create and update with a `@Dto` class.
+
+Bad input gets a `422` answer, and the controller does not run.
 
 ## 1. Make the DTO
 

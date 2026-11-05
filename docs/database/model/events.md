@@ -61,7 +61,7 @@ All hooks come in pairs: one runs before the query, one after it.
 | `firstOrCreate()`, `updateOrCreate()` | the same as `save()` when they create or update a row |
 | `delete()` | `deleting` → *DELETE or soft delete* → `deleted` |
 | `forceDelete()` | `forceDeleting` → `deleting` → *DELETE* → `deleted` → `forceDeleted` |
-| `restore()` | `restoring` → *UPDATE deleted_at = NULL* → `restored` |
+| `restore()` | `restoring` → *UPDATE deleted_at = NULL and updated_at* → `restored` |
 | `touch()` | `saving` → `updating` → *UPDATE updated_at* → `updated` → `saved` (`touchQuietly()` fires none) |
 
 - The model hook runs first. Then the observers run, in the order you added them.

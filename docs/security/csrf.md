@@ -4,7 +4,10 @@ icon: lucide/octagon-alert
 
 # CSRF protection
 
-Cross site request forgery (CSRF) is an attack. Another site makes the browser of your user send a form to your app. The browser sends your session cookie with it, so the request looks real.
+Cross site request forgery (CSRF) is an attack.
+
+Another site makes the browser of your user send a form to your app.
+The browser sends your session cookie with it, so the request looks real.
 
 `CsrfMiddleware` stops it. Each session has a secret token. A request that changes data must send it back. Another site can not read the token, so it can not send it.
 

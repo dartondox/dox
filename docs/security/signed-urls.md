@@ -4,7 +4,9 @@ icon: lucide/link
 
 # Signed URLs
 
-A signed url has a `signature` in its query. Nobody can change the url without the `APP_KEY`.
+A signed url has a `signature` in its query.
+
+Nobody can change the url without the `APP_KEY`.
 Use it for links in emails, like "unsubscribe" or "download your file", where the user is not logged in.
 
 ## Make a signed url

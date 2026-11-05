@@ -440,7 +440,6 @@ Dox does not have these Laravel features yet:
 
 - events and listeners (model events are there)
 - password reset
-- policies and gates
 
 See [What Dox does not have yet](status-and-roadmap.md#what-dox-does-not-have-yet) for what to use today.
 

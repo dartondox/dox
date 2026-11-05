@@ -4,10 +4,13 @@ icon: lucide/syringe
 
 # Dependency injection
 
-Dox has a container. It makes your classes and gives each constructor what it needs.
+Dox has a container.
+
+It makes your classes and gives each constructor what it needs.
 You do not register classes by hand.
 Put `@Inject()` above a class, and `dox_builder` adds it to the container.
-Dox does not use `dart:mirrors`. All the wiring is generated code.
+Dox does not use `dart:mirrors`.
+All the wiring is generated code.
 
 ## A full example
 

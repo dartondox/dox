@@ -52,17 +52,18 @@ dart pub global deactivate dox
 | `dox make:seeder <name>` | create a seeder in `db/seeders` (and `bin/seed.dart`), see [Seeders](../database/seeders.md) |
 | `dox db:seed [--class=<name>]` | run `DatabaseSeeder`, or another seeder |
 | `dox make:job <name>` | create a queue job in `lib/app/jobs` (and `bin/queue.dart`) |
-| `dox queue:work [--queue=a,b] [--concurrency=N] [--once] [--tries=N] [--timeout=S] [--sleep=S] [--stop-when-empty]` | run the queue worker |
+| `dox queue:work [--queue=a,b] [--concurrency=N] [--once] [--tries=N] [--timeout=S] [--sleep=S] [--stop-when-empty] [--timeout-grace=S]` | run the queue worker |
 | `dox queue:failed` | list the failed jobs |
 | `dox queue:retry <id\|all>` | put a failed job (or all) back on the queue |
 | `dox queue:forget <id>` | delete one failed job |
 | `dox queue:flush` | delete all failed jobs |
 | `dox queue:table` | create a migration for the `jobs` and `failed_jobs` tables (from the `dox_queue` package) |
+| `dox auth:tokens-table` | create a migration for the `auth_access_tokens` table (from the `dox_auth` package) |
 | `dox schedule:work` | run the scheduler and keep it running |
 | `dox schedule:run` | run the tasks that are due now, once |
 | `dox schedule:list` | list the scheduled tasks |
 | `dox schedule:test <name>` | run one scheduled task now |
-| `dox key:generate` | make a new `APP_KEY` |
+| `dox key:generate [--show]` | make a new `APP_KEY`. `--show` prints a key and writes nothing |
 | `dox env:generate` | make `lib/config/env.dart` (the typed env class) from `.env.example`, see [Environment Variables](env.md) |
 | `dox env:check` | check the env against `lib/config/env.dart`. Prints every missing or bad key (exit code 1) |
 | `dox openapi:generate [dir]` | run `bin/openapi.dart` to write `openapi.json` and `openapi.yaml` (default `storage/openapi`). A new project has no `bin/openapi.dart` yet, see [OpenAPI](../packages/openapi.md#write-the-files-dox-openapigenerate) |
