@@ -190,6 +190,7 @@ test('saves the report', () async {
 
 - Call `Dox().initialize()` first. Without the `StorageProvider` running, `Storage.manager` has only the `local` disk. Start the app, or set the disks yourself: `Storage.manager = StorageDiskFactory().create(storageConfig);`.
 - `Storage()` paths start with `/`. A `Disk` key does not, so remove the first `/` when you ask the `Disk` directly.
+- A disk also has `assertExists(key)` and `assertMissing(key)`, like `await fake.assertExists('reports/a.pdf')`. They throw a `StateError` when the check fails.
 
 See [File Storage](file-storage.md).
 

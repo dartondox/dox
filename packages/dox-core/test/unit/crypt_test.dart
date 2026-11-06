@@ -21,6 +21,11 @@ void main() {
       expect(Crypt.decrypt(secret), <String, dynamic>{'id': 5});
     });
 
+    test('decrypt of text that is not JSON throws DecryptException', () {
+      String secret = Crypt.encryptString('not json');
+      expect(() => Crypt.decrypt(secret), throwsA(isA<DecryptException>()));
+    });
+
     test('a value made with another key throws', () {
       String other = AESEncryptor.encode(
         'x',

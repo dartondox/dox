@@ -147,6 +147,25 @@ await Mail.mailer('ses').send(message);
 
 When the message can not be sent, `send()` throws a `MailException`. It has the `statusCode` and the `body` of the answer of the server.
 
+### Short ways to send
+
+`Mail.raw()` sends a plain text email. `Mail.to()` starts an email with chained calls. Both take plain email text:
+
+```dart
+await Mail.raw('Your code is 1234', to: 'ann@example.com', subject: 'Your code');
+
+await Mail.to('ann@example.com')
+    .cc('Bob Lee <bob@example.com>')
+    .bcc(<String>['audit@example.com'])
+    .send(WelcomeMail(user));
+```
+
+- `to()`, `cc()` and `bcc()` take an `Address`, an email text, or a list of these.
+- `send()` takes a mailable. The recipients are added to the ones of the mailable.
+- `queue()` and `later()` work too, like `Mail.to(email).queue(WelcomeMail(user))`.
+- `Address.list()` reads addresses the same way: `Message(to: Address.list('ann@example.com'), ...)`.
+- One text is one address. For more addresses, pass a list: `Address.list(<String>['ann@example.com', 'bob@example.com'])`.
+
 ### The message
 
 | Field | What it is |
@@ -181,6 +200,13 @@ Message(
 ```
 
 The content type comes from the file extension. Pass `contentType` to set it.
+
+To attach a file from a storage disk, like S3, read its bytes first. This works with every disk:
+
+```dart
+Uint8List? pdf = await Storage().disk('s3').get('invoices/42.pdf');
+Attachment(pdf!, 'invoice.pdf');
+```
 
 ### Inline images
 
@@ -295,7 +321,11 @@ String? get markdown => 'emails/welcome';
 - `<a class="button">` shows as a button. In the text body it stays an `<a>` tag, so the link is still there.
 
 !!! warning "User data in Markdown"
-    `{{ }}` escapes HTML, but not Markdown. So a user's name like `[click](https://evil.example)` or `![x](https://evil.example/p.png)` becomes a normal link or image. Laravel works the same way.
+    `{{ }}` escapes HTML and Markdown. A user's name like `[click](https://evil.example)` shows as that text. It does not become a link.
+    This counts for text values in `data`, in its maps, lists and sets, and in objects with `toJson()`. Values from `View.global()` and from functions are not changed.
+    To put Markdown from a value in the email, pass a `SafeString`.
+    The kept characters are backslash, backtick, `*`, `[`, `]`, `#` and `|`. A `_` is not changed, so `_word_` can still be italic.
+    In `@if`, a value with one of these characters is not equal to the same text written in the template.
     Links and images with an unsafe URL, like `javascript:`, `vbscript:` or `data:`, lose their URL. Only `http`, `https`, `mailto`, `tel`, `cid` and relative URLs are kept.
     The same goes for the lines of `MailMessage`. `MailMessage.action()` throws an `ArgumentError` for an unsafe URL.
     Raw HTML in the template, like `<a href="{{ url }}">`, is not checked. In raw HTML, use only full URLs that your app builds. Email apps can not open a relative link like `/dashboard`.
@@ -545,7 +575,7 @@ Keeps each email in a list and sends nothing. See [Testing](#testing).
 
 ### Failover
 
-Tries each transport in order, until one sends the email.
+Tries each transport in order, until one sends the email. When every transport fails, it throws the error of the last one. To see why the first ones failed, pass `onError`. It gets the error of each transport that fails. When `onError` throws, the error is ignored and the next transport is still tried. An `async` `onError` is not awaited. A line break in an address, the subject or a header throws a `MailException` at once, and no transport tries it.
 
 ```dart
 SesV2Transport ses = SesV2Transport(key: '...', secret: '...');
@@ -572,6 +602,54 @@ Each provider has its own way to group and mark emails. This is what each transp
 | Azure, SMTP, sendmail | not used | not used |
 
 For SMTP and sendmail, use `headers` instead.
+
+## Hooks
+
+Run code before or after each email is sent, eg. to log it. Dox has no event system, so hooks are plain functions.
+
+Each isolate has its own hooks: the server isolates and the queue worker. So add them in `setup()` of your mail provider, after `super.setup()`. Then every isolate gets them. A hook added in `main()` does not reach queued emails.
+
+```dart
+class AppMailProvider extends MailProvider {
+  AppMailProvider() : super(mailConfig);
+
+  @override
+  void setup() {
+    super.setup();
+    Mail.onSending((Message message) {
+      print('sending "${message.subject}" to ${message.to}');
+    });
+    Mail.onSent((SentMessage sent) {
+      print('sent ${sent.messageId}');
+    });
+  }
+}
+```
+
+- Hooks run for every mailer. They also run for queued emails, when the worker sends them, and with `Mail.fake()`.
+- When an `onSending` hook throws, the email is not sent. `send()` throws that error.
+- When an `onSent` hook throws, `send()` throws that error. The email is already sent.
+- `Mail.clearHooks()` removes all hooks, eg. in a test.
+
+## Send all email to one address
+
+On a staging server, send every email to your own inbox, so real users get nothing. Like hooks, call it in `setup()` of your mail provider, after `super.setup()`, so every isolate gets it:
+
+```dart
+class AppMailProvider extends MailProvider {
+  AppMailProvider() : super(mailConfig);
+
+  @override
+  void setup() {
+    super.setup();
+    if (Env.get<String>('APP_ENV') == 'staging') {
+      Mail.alwaysTo('qa@example.com');
+    }
+  }
+}
+```
+
+The `to` of each email becomes that address, and `cc` and `bcc` are cleared. It counts for queued emails too. `Mail.alwaysTo(null)` turns it off.
 
 ## Testing
 

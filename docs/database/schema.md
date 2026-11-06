@@ -76,13 +76,28 @@ await schema.dropIfExists('posts');
 | `enumeration('c', ['a', 'b'])` | `VARCHAR(255)` + `CHECK` | `ENUM('a', 'b')` | `VARCHAR(255)` + `CHECK` |
 | `foreignId('user_id')` | `BIGINT` | `BIGINT UNSIGNED` | `INTEGER` |
 | `foreignUuid('user_id')` | `UUID` | `CHAR(36)` | `TEXT` |
+| `foreignIdFor(User())` | `BIGINT` | `BIGINT UNSIGNED` | `INTEGER` |
+| `ulid(['ulid'])` / `foreignUlid('user_id')` | `CHAR(26)` | `CHAR(26)` | `CHAR(26)` |
+| `year('c')` | `INTEGER` | `YEAR` | `INTEGER` |
+| `ipAddress(['ip_address'])` | `VARCHAR(45)` | `VARCHAR(45)` | `VARCHAR(45)` |
 
 Helpers:
 
 - `timestamps()`: nullable `created_at` and `updated_at` (`timestampTz`).
 - `softDeletes(['deleted_at'])`: nullable `deleted_at` (`timestampTz`), for models with `softDelete: true`.
 - `rememberToken()`: nullable `remember_token` `VARCHAR(100)`.
+- `softDeletesTz(['deleted_at'])`: the same as `softDeletes`. It is already a time with a zone.
 - `morphs('owner')`: `owner_id` (unsigned big integer), `owner_type` (string) and one index on both columns.
+- `nullableMorphs('owner')`: the same as `morphs`, but both columns can be `NULL`.
+- `uuidMorphs('owner')`: the same as `morphs`, with a uuid `owner_id`.
+
+`foreignIdFor(User())` makes the foreign key column of the model, like `user_id`. Give a name as the second argument to change it. `.constrained()` then points to the table and primary key of the model:
+
+```dart
+table.foreignIdFor(User()).constrained().cascadeOnDelete();
+```
+
+It is always a big integer. For a model with a text key, use `foreignUuid` or `foreignUlid`.
 
 !!! info "JSON on SQLite"
     SQLite has no JSON type. The column is declared as `JSON`,
@@ -124,6 +139,12 @@ await schema.table('users', (Table table) {
 });
 ```
 
+Drop helpers:
+
+- `dropTimestamps()`: drops `created_at` and `updated_at`.
+- `dropSoftDeletes(['deleted_at'])`: drops `deleted_at`.
+- `dropConstrainedForeignId('user_id')`: drops the foreign key of the column, then the column.
+
 A column in `schema.table` is **added**. Add `.change()` to change a column that exists.
 
 ### Change columns
@@ -157,7 +178,14 @@ table.primary(<String>['post_id', 'tag_id']);  // composite primary key
 
 table.dropIndex(<String>['state', 'created_at']); // by columns
 table.dropUnique('posts_slug_unique');            // or by name
+
+table.fullText('body');                           // posts_body_fulltext
+table.renameIndex('posts_slug_unique', 'posts_url_unique');
+table.dropPrimary();                              // posts_pkey on Postgres
 ```
+
+- `fullText` makes a `FULLTEXT` index on MySQL. On Postgres it makes a `gin` index on `to_tsvector('english', ...)`.
+- `dropPrimary([name])` takes the name for Postgres. The default is `{table}_pkey`. MySQL needs no name.
 
 Index names are `{table}_{columns}_{index|unique|foreign}`.
 You can give your own name as the last argument: `table.unique('slug', 'my_name')`.
@@ -176,7 +204,8 @@ table.foreign('user_id').references('id').on('users').onDelete('cascade');
   Dox models use singular table names by default (`User` is `user`).
   If your table is singular, give it: `constrained('user')`.
 - Actions: `onDelete('cascade' | 'set null' | 'restrict' | 'no action')`, `onUpdate(...)`,
-  and the short ones `cascadeOnDelete()`, `nullOnDelete()`, `restrictOnDelete()`, `cascadeOnUpdate()`.
+  and the short ones `cascadeOnDelete()`, `nullOnDelete()`, `restrictOnDelete()`, `cascadeOnUpdate()`,
+  `nullOnUpdate()` and `restrictOnUpdate()`.
 - Put `nullable()` before `constrained()`: `table.foreignId('editor_id').nullable().constrained('users')`.
 - Drop it: `table.dropForeign(<String>['user_id'])` or `table.dropForeign('posts_user_id_foreign')`.
 
@@ -201,6 +230,8 @@ It fails on tables with other `CHECK` constraints or with generated columns.
 Other SQLite limits:
 
 - `primary(...)` on an existing table is not supported.
+- `fullText` and `dropPrimary` throw an `UnsupportedError`. SQLite has no full text index, and it can not drop a primary key.
+- `renameIndex` drops the index and makes it again with the new name. So it only runs on a database, not in [See the SQL](#see-the-sql).
 - A new column that is `NOT NULL` needs a default. A new column can not default to `CURRENT_TIMESTAMP`.
 - `dropColumn` fails when the column is in an index or a foreign key. Drop those first.
 

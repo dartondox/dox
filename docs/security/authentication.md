@@ -174,12 +174,14 @@ After `AuthMiddleware`, `req.auth` holds the login.
 | `Auth().setUser(req, user)` | sets this user on `req.auth`, with no token and no password check. For your own auth middleware |
 | `Auth(ip: req.ip())` | gives the client ip to `attempt`, for the [login throttle](#login-throttle) |
 | `await Auth().revokeToken(req)` | revokes the bearer token of this request (a JWT logout). Needs [revocation](#revoke-tokens) |
-| `await Auth().revokeAllTokens(id)` | revokes all tokens of this user made before now. Needs [revocation](#revoke-tokens) |
+| `await Auth().revokeAllTokens(id)` | revokes all tokens of this user made before the current second. A token made in the same second still works. Needs [revocation](#revoke-tokens) |
 | `await Auth().forgetUser(id)` | drops this user from the `userCacheTtl` cache. Needs [revocation](#revoke-tokens) |
 | `Auth.needsRehash(hash)` | `true` when the hash was not made with the cost of `Hash.rounds`. See [Password hash cost](#password-hash-cost) |
 | `Auth.hashCost(hash)` | the bcrypt cost of a hash, or `null` when it is not a bcrypt hash |
 | `user<T>()` | the user after `attempt` or `login` |
+| `await Auth().once(credentials)` | checks the password like `attempt`. Gives `true` or `false`. It makes no token and does not touch the session. The user is logged in for this `Auth` only |
 | `isLoggedIn()` | `true` when there is a user |
+| `check()` | the same as `isLoggedIn()` |
 | `guest()` | `true` when there is no user |
 | `id()` | the primary key of the user, or `null` for a guest |
 
@@ -620,6 +622,14 @@ Route.get('/login', <dynamic>[GuestMiddleware(redirectTo: '/dashboard'), (PageCo
 ```
 
 Both take `guard:`, like `AuthMiddleware(guard: 'admin')`.
+
+`AuthMiddleware` also takes `guards:`, a list of guard names, like Laravel `auth:web,api`. It tries the guards in order. The first guard with a good login sets `req.auth`.
+
+```dart
+Route.get('/me', <dynamic>[AuthMiddleware(guards: <String>['web', 'api']), (UserController c) => c.me]);
+```
+
+Set `guard:` or `guards:`, not both. Both, or an empty list, throws an `ArgumentError`.
 
 | Method | What it does |
 | --- | --- |

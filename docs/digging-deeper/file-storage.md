@@ -101,9 +101,11 @@ The `s3` disk needs `bucket`, `key` and `secret`. When one is missing, the app s
 // save with a new uuid file name, returns '/images/<uuid>.png'
 String path = await Storage().put('images', bytes, extension: 'png');
 String path2 = await Storage().putRequestFile('images', file);
+String path3 = await Storage().putRequestFileAs('avatars', 'user-1.png', file); // your own name
 
 Uint8List? bytes = await Storage().get(path);  // null when missing
-bool found = await Storage().exists(path);
+bool found = await Storage().exists(path);            // files only
+bool folder = await Storage().directoryExists('images');
 await Storage().delete(path);
 
 int size = await Storage().size(path);                 // throws when missing
@@ -115,6 +117,7 @@ await Storage().makeDirectory('reports');              // local disk only
 
 String url = await Storage().url(path);         // /storage/<path> when the disk has no `url`
 String signed = await Storage().signedUrl(path, expiresIn: Duration(minutes: 10));
+String same = await Storage().temporaryUrl(path); // the same as signedUrl()
 
 // another disk
 await Storage().disk('s3').put('reports', bytes, extension: 'pdf');
@@ -130,7 +133,20 @@ They read the file and write it back, so two writers at the same time can lose a
 
 `makeDirectory()` makes a folder only on a local disk. On any other disk it does nothing.
 
+`exists()` finds files only. `directoryExists()` finds folders. On a local disk it checks the real folder. On S3 and memory disks, a folder exists when a file is under it.
+
 `putRequestFile` on the local disk moves the upload temp file. It does not read it into memory.
+
+An uploaded file can store itself. `store` gives it a new uuid name. `storeAs` uses your name, and replaces an old file with the same name. Both take `disk:`:
+
+```dart
+RequestFile file = req.input('image');
+String path = await file.store('images');
+String onS3 = await file.store('images', disk: 's3');
+String avatar = await file.storeAs('avatars', 'user-1.png');
+```
+
+`storeAs` and `putRequestFileAs` use the name as it is. Do not use the file name from the client. Make your own name, like `user-1.png`.
 
 `putRequestFile` and `file.store()` take the extension from the file name. When the bytes are a known format (png, jpg, pdf, zip, ...) that does not match the name, the extension of the bytes is used. So a png sent as `a.html` is saved as `.png` and is never served as a web page.
 

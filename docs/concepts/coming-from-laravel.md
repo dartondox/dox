@@ -142,6 +142,20 @@ See [Validation](../the-basic/validation.md).
 | `abort(404, 'Not found');` | `abort(404, 'Not found');` |
 | `new BlogResource($blog)` | `BlogSerializer(blog)` |
 
+## Views
+
+With [dox_view](../the-basic/views.md), templates end in `.dox.html`. Most Blade tags have the same name. A block ends with `@end`.
+
+| Laravel Blade | Dox |
+| --- | --- |
+| `{{ $user->name }}`, `{!! $html !!}` | `{{ user.name }}`, `{{{ html }}}` |
+| `@if ... @endif`, `@foreach ($users as $user)` | `@if ... @end`, `@each(user in users) ... @end` |
+| `@isset`, `@empty`, `@auth`, `@guest`, `@env`, `@production`, `@once`, `@verbatim` | the same names, closed with `@end` |
+| `@class`, `@checked`, `@selected`, `@disabled` | the same |
+| `@include('nav')` | `@include('nav')` |
+| `<x-button>`, `$attributes->merge([...])`, `$slot` | `@button(...) ... @end`, `$attributes.merge({...})`, `$slot` |
+| `@csrf`, `old('email')` | `{{ csrfField() }}`, `old('email')` |
+
 ## Eloquent vs Dox Model
 
 | Laravel | Dox |
@@ -344,9 +358,12 @@ See [Dox CLI](../digging-deeper/dox-cli.md).
 | `Auth::user()` | `req.auth?.user<User>()` |
 | `Auth::id()` | `req.auth?.id()` |
 | `Auth::guest()` | `req.auth == null` |
+| `Auth::check()` | `Auth().check()` (the same as `isLoggedIn()`) |
+| `Auth::once($credentials)` | `await Auth().once(credentials)` gives `true` or `false`, with no token and no session |
 | `Auth::attempt(...)` for a web page (session) | `await Auth().attemptSession(req, <String, dynamic>{...})` gives `true` or `false` |
 | `Auth::logout()` | `Auth().logout(req)` |
 | `->middleware('auth:sanctum')` | `AuthMiddleware()` from `dox_auth` |
+| `->middleware('auth:web,api')` | `AuthMiddleware(guards: <String>['web', 'api'])` |
 | `->middleware('guest')` | `GuestMiddleware(redirectTo: '/dashboard')` |
 | `Crypt::encryptString($v)`, `Crypt::decryptString($v)` | `Crypt.encryptString(v)`, `Crypt.decryptString(v)` |
 | `Hash::make($p)`, `Hash::check($p, $hash)` | `Hash.make(p)`, `Hash.check(p, hash)` (or `Hash.verify`) |

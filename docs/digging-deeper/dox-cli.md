@@ -57,6 +57,9 @@ dart pub global deactivate dox
 | `dox queue:retry <id\|all>` | put a failed job (or all) back on the queue |
 | `dox queue:forget <id>` | delete one failed job |
 | `dox queue:flush` | delete all failed jobs |
+| `dox queue:clear [queue]` | delete the jobs of a queue |
+| `dox queue:restart` | stop the running workers after their current jobs |
+| `dox queue:prune-failed [--hours=N]` | delete failed jobs older than N hours (default 24) |
 | `dox queue:table` | create a migration for the `jobs` and `failed_jobs` tables (from the `dox_queue` package) |
 | `dox auth:tokens-table` | create a migration for the `auth_access_tokens` table (from the `dox_auth` package) |
 | `dox schedule:work` | run the scheduler and keep it running |

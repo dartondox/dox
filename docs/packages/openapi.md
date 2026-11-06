@@ -164,14 +164,16 @@ Blog:
 | request | see [Request](#request) below |
 | 200 answer | the return type, see [Response](#response) below |
 | `401` and a login scheme | `@Security` on a middleware class, or a middleware whose class name ends with `AuthMiddleware`. See [Login schemes](#login-schemes) |
-| `404` | the path has a `{param}` |
+| `404` | the path has a `{param}`. The short path of an optional param, like `/blog`, has no `404` |
 | `422` | the route has a request class. The body is `{field: message}` |
 | `500` | every route |
 
 Routes that the builder does not know (for example inline closures) still get a basic entry.
 
 An optional param shows as two paths. The route `/blog/{id?}` gives `/blog/{id}` and `/blog`. OpenAPI path params must always be required.
-Only optional params at the end of the path are dropped, the same way the Dox router matches them.
+An optional param in the middle, like `/a/{x?}/b`, also gives the path without it: `/a/{x}/b` and `/a/b`.
+Optional params next to each other are dropped from the right, the same way the Dox router matches them.
+When the summary and operation id are made from the path, the short path gets its own, like `GET /blog` and `getBlog`.
 
 ### Request
 

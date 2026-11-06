@@ -136,6 +136,7 @@ DateTime changed = await disk.lastModified('avatars/1.png');
 await disk.append('logs/app.log', 'new line');  // a missing file is made
 await disk.prepend('logs/app.log', 'first line');
 await disk.makeDirectory('reports/2026');        // local disk only
+bool folder = await disk.directoryExists('reports');
 
 await disk.copy('a.png', 'b.png');
 await disk.move('b.png', 'c.png');
@@ -154,6 +155,7 @@ Visibility v = await disk.getVisibility('avatars/1.png');
 - `append` and `prepend` keep the visibility and content type of the file.
 - `append` and `prepend` read the file and write it back. They are not atomic, so two writers at the same time can lose a write.
 - `makeDirectory` makes the folder and its parent folders on a local disk. On any other disk it does nothing, because those disks have no real folders.
+- `directoryExists` is true when a folder exists. On a local disk it checks the real folder. On S3 and memory disks, a folder exists when a file is under it. `exists` is true for files only.
 
 ### Save an upload
 
@@ -301,6 +303,15 @@ Disk fake = drive.fake('s3'); // drive.use('s3') now writes to memory
 await uploadAvatar();         // your code
 expect(await fake.exists('avatars/1.png'), isTrue);
 drive.restore('s3');
+```
+
+A disk also has `assertExists` and `assertMissing`. They throw a `StateError` when the check fails:
+
+```dart
+Disk fake = drive.fake('s3');
+await uploadAvatar();
+await fake.assertExists('avatars/1.png');
+await fake.assertMissing('avatars/old.png');
 ```
 
 ## Your own driver

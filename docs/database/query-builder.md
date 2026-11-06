@@ -64,13 +64,16 @@ Actor? byName = await Actor().find('name', 'John Wick');
 // SELECT * FROM "actor" WHERE "name" = @name_p0 LIMIT 1
 ```
 
-### `getFirst`
+### `getFirst` and `first`
 
 Returns the first row of the query, or `null`.
+`first()` does the same, with the Laravel name.
 
 ```dart
 Actor? actor = await Actor().where('age', '>', 60).orderBy('age').getFirst();
 // SELECT * FROM "actor" WHERE "age" > @age_p0 ORDER BY "age" LIMIT 1
+
+Actor? same = await Actor().where('age', '>', 60).orderBy('age').first();
 ```
 
 ### `firstOrFail` and `findOrFail`
@@ -115,7 +118,7 @@ int adults = await Actor().where('age', '>=', 18).count();
 ### `hasRows` and `hasNoRows`
 
 `hasRows()` returns `true` when at least one row matches.
-`hasNoRows()` returns the opposite.
+`hasNoRows()` returns the opposite. `doesntExist()` is the same as `hasNoRows()`.
 They read one row at most, so they are faster than `count() > 0`.
 
 ```dart
@@ -129,6 +132,9 @@ if (await User().where('email', email).hasNoRows()) {
 A model also has the `exists` getter.
 It tells if that one model is saved in the table.
 `hasRows()` checks a query.
+
+There is no `exists()` method on a query, because a model already has the getter `exists`. Use `hasRows()`.
+There is no `value()` either, because `value` is a common column name. Use [`valueOf`](#valueof).
 
 ### `pluck` and `pluckMap`
 
@@ -391,6 +397,16 @@ await Actor()
     .get();
 ```
 
+They also take a column and a value, like `where`:
+
+```dart
+await Actor().whereNot('status', 'draft').get();
+await Actor().whereNot('age', '<', 18).get();
+await Actor().where('id', 1).orWhereNot('status', 'draft').get();
+```
+
+Give the function its type, like `(QueryBuilder<Actor> q) {...}`. Without it, `q` is `dynamic`.
+
 !!! note
     A row with `NULL` in a column of the brackets matches neither the brackets nor `NOT` of them.
     This is how SQL works with `NULL`.
@@ -633,6 +649,31 @@ await Actor()
     )
     .get();
 ```
+
+### `unless` and `whenValue`
+
+`unless` is the opposite of `when`. It runs the function only when the condition is `false`.
+
+```dart
+await Actor()
+    .unless(showDrafts, (QueryBuilder<Actor> q) {
+      q.where('status', 'published');
+    })
+    .get();
+```
+
+`whenValue` runs the function when the value is not `null`. The function gets the value, and it is not `null` there.
+It is like Laravel `when($value, fn)`.
+
+```dart
+await Actor()
+    .whenValue(req.query['status'], (QueryBuilder<Actor> q, status) {
+      q.where('status', status);
+    })
+    .get();
+```
+
+Both take a third function too. It runs in the other case.
 
 ## Select
 
@@ -933,6 +974,30 @@ await Actor().insertMultiple(<Map<String, dynamic>>[
 The columns are the keys from all rows.
 When a row does not have a key, that column gets its default value.
 
+### `insertGetId` and `insertMany`
+
+`insertGetId` inserts one row and returns its new id.
+The id is the auto increment id, or the id in the map when the table has no auto increment.
+
+```dart
+dynamic id = await QueryBuilder.table('actor').insertGetId(<String, dynamic>{
+  'name': 'John Wick',
+});
+```
+
+`insertMany` inserts many rows, reads nothing back and returns `true`.
+It works on a table with no `id` column, like a pivot table. An empty list runs no query.
+
+```dart
+await QueryBuilder.table('actor_movie').insertMany(<Map<String, dynamic>>[
+  <String, dynamic>{'actor_id': 1, 'movie_id': 2},
+  <String, dynamic>{'actor_id': 1, 'movie_id': 3},
+]);
+```
+
+- Both fire no model events and set no timestamps.
+- On a model, the keys that `fillable` and `guarded` do not allow are dropped.
+
 ### `upsert`
 
 `upsert` inserts rows, or updates the row that is already there.
@@ -1214,6 +1279,16 @@ The values are not quoted or escaped, so use it only to read the query.
 ```dart
 String sql = Actor().where('name', 'John Wick').toSql();
 print(sql); // SELECT * FROM "actor" WHERE "name" = John Wick
+```
+
+### `toRawSql`
+
+Returns the SQL with each value quoted for the database.
+Use it for logs and debugging. Run queries with bound values, not with this text.
+
+```dart
+String sql = Actor().where('name', "it's").toRawSql();
+print(sql); // SELECT * FROM "actor" WHERE "name" = 'it''s'
 ```
 
 ### `debug`

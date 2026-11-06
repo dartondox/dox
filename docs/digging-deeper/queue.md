@@ -184,6 +184,9 @@ All the settings are optional:
 | `tries` | the worker `--tries` (1) | how many times to run the job before it fails |
 | `backoff` | none (retry at once) | the wait before each retry. The last entry is used for the rest |
 | `timeout` | the worker `--timeout` (60 seconds) | the max run time of one try |
+| `retryUntil` | none | retry until this time, not `tries` times. Read once, when the job is dispatched |
+| `maxExceptions` | none | fail after this many tries that threw an error. A timeout does not count |
+| `failOnTimeout` | `false` | fail at once when a try times out, with no retry |
 | `queue` | `default` | the queue to put the job on |
 | `failed()` | does nothing | runs once, after the last try failed |
 
@@ -259,7 +262,26 @@ await SendWelcomeEmail(userId: 1).dispatch(
 );
 ```
 
+Wait until a time:
+
+```dart
+await SendWelcomeEmail(userId: 1).dispatch(
+  delayUntil: DateTime.utc(2030, 1, 1, 9),
+);
+```
+
+Give `delay` or `delayUntil`, not both.
+
 `dispatch()` returns the job id.
+
+Dispatch only when a condition is true, or false:
+
+```dart
+await SendWelcomeEmail(userId: 1).dispatchIf(user.wantsEmail);
+await SendWelcomeEmail(userId: 1).dispatchUnless(user.isBlocked);
+```
+
+They return null when the job was not dispatched.
 
 Run a job now, in this process, with no queue:
 
@@ -296,6 +318,9 @@ Commands:
 | `retry all` | put all failed jobs back |
 | `forget <id>` | delete one failed job |
 | `flush` | delete all failed jobs |
+| `clear [queue]` | delete the jobs of a queue. Default: `default` |
+| `restart` | stop the running workers after their current jobs |
+| `prune-failed` | delete failed jobs older than `--hours=N` (default 24) |
 
 Flags of `work`:
 
@@ -309,12 +334,18 @@ Flags of `work`:
 | `--sleep=3` | `3` | seconds to wait when the queues are empty |
 | `--stop-when-empty` | off | stop when the queues are empty |
 | `--timeout-grace=10` | none | after a timeout, wait up to this many seconds for the old run to end before the next try |
+| `--backoff=1,5,10` | none | seconds to wait before each retry of a job that does not set `backoff` |
+| `--max-jobs=1000` | off | stop after this many jobs |
+| `--max-time=3600` | off | stop after this many seconds |
+| `--memory=256` | off | stop when the process uses more than this many MB |
+
+With `--max-jobs`, `--max-time` and `--memory`, the worker stops after its running jobs. Let your process manager start it again.
 
 ```bash
 dart run bin/queue.dart work --queue=emails,default --concurrency=4
 ```
 
-The `dox` CLI runs the same file: `dox queue:work`, `dox queue:failed`, `dox queue:retry <id|all>`, `dox queue:forget <id>` and `dox queue:flush`. They take the same flags.
+The `dox` CLI runs the same file: `dox queue:work`, `dox queue:failed`, `dox queue:retry <id|all>`, `dox queue:forget <id>`, `dox queue:flush`, `dox queue:clear [queue]`, `dox queue:restart` and `dox queue:prune-failed`. They take the same flags.
 
 `--concurrency` runs jobs as async tasks on one thread. It helps for jobs that wait (email, HTTP, database).
 For CPU heavy jobs, run more worker processes.
@@ -327,6 +358,12 @@ A second signal stops it at once.
 
 !!! warning "Restart the worker after a deploy"
     The worker keeps your code in memory. Restart it after each deploy, or it runs the old code.
+
+`dart run bin/queue.dart restart` tells every running worker to stop after its current jobs.
+Your process manager then starts it with the new code.
+It writes a time to the app cache. Each worker reads it every 3 seconds.
+So the workers and the command must use the same cache store, like `file` on one machine, or `redis`.
+The `memory` store does not work for it.
 
 ### Keep it running
 
