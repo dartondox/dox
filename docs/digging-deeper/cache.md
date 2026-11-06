@@ -88,6 +88,9 @@ await Cache().has('foo');             // true
 await Cache().forget('foo');          // remove one key
 await Cache().forever('settings', <String, dynamic>{'theme': 'dark'});
 await Cache().flush();                // remove all items of the store
+
+await Cache().putMany(<String, Object?>{'a': 1, 'b': 2}); // many at once
+await Cache().many(<String>['a', 'b', 'c']); // {a: 1, b: 2, c: null}
 ```
 
 ### `remember`

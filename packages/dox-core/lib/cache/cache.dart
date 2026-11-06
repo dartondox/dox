@@ -108,6 +108,22 @@ class Cache {
     return repository.getRaw(key);
   }
 
+  /// Many values at once. A missing key gives null.
+  /// ```
+  /// Map<String, dynamic> values = await Cache().many(<String>['a', 'b']);
+  /// ```
+  Future<Map<String, dynamic>> many(List<String> keys) {
+    return repository.many(keys);
+  }
+
+  /// Store many values. No duration means forever.
+  /// ```
+  /// await Cache().putMany(<String, Object?>{'a': 1, 'b': 2});
+  /// ```
+  Future<void> putMany(Map<String, Object?> values, {Duration? duration}) {
+    return repository.putMany(values, duration);
+  }
+
   /// True when the key has a value.
   Future<bool> has(String key) {
     return repository.has(key);

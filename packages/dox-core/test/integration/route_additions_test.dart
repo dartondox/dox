@@ -147,6 +147,10 @@ void main() {
     (await client.get('/docs/a/b/c')).expectBody('page a/b/c');
   });
 
+  test('where .* still matches a decoded new line', () async {
+    (await client.get('/docs/a%0Ab')).expectBody('page a\nb');
+  });
+
   test('where works on an optional param', () async {
     (await client.get('/tag/news')).expectBody('tag news');
     (await client.get('/tag')).expectBody('tag null');

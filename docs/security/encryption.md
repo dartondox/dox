@@ -4,12 +4,28 @@ icon: lucide/lock-keyhole
 
 # Encryption
 
-This page shows how to encrypt and decrypt text with `AESEncryptor`.
+This page shows how to encrypt and decrypt text with `Crypt` and `AESEncryptor`.
 
 Dox uses `AESEncryptor` to encrypt cookies with your `APP_KEY`.
 You can also call it yourself.
 
-## Encrypt and decrypt
+## Encrypt with the app key
+
+`Crypt` uses the `APP_KEY` of the app. You do not pass the key.
+
+```dart
+String secret = Crypt.encryptString('card-1234');
+String card = Crypt.decryptString(secret); // 'card-1234'
+
+String data = Crypt.encrypt(<String, dynamic>{'id': 5}); // any JSON value
+Map<String, dynamic> map = Crypt.decrypt(data);
+```
+
+- `decryptString` and `decrypt` also try the old keys in `AppConfig.previousKeys`.
+- They throw `DecryptException` when the text was changed or made with another key.
+- `Crypt.encryptString(v)` gives the same as `AESEncryptor.encode(v, appKey)`.
+
+## Encrypt and decrypt with your own key
 
 ```dart
 import 'package:dox_core/dox_core.dart';
@@ -95,6 +111,7 @@ With `previousKeys`, users stay logged in while you change it.
 | `cookie` session driver | read |
 | CSRF token | read (it is in the session) |
 | JWT tokens of `JwtAuthDriver(secret: SecretKey(env.appKey))` | checked. A JWT secret that is not `APP_KEY` needs its own `previousSecrets` option, see [Authentication](authentication.md#change-the-jwt-secret). |
+| `Crypt.decryptString` and `Crypt.decrypt` | read |
 | `AESEncryptor.decode` in your code | read only when you pass `previousSecrets: Dox().config.previousKeys` |
 | anything new | made with `APP_KEY` only |
 

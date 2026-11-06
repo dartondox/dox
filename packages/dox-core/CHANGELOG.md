@@ -1,5 +1,13 @@
 ## Unreleased
 
+- New: `Crypt.encryptString` / `Crypt.decryptString` (and `Crypt.encrypt` / `Crypt.decrypt` for JSON values) use the `APP_KEY` of the app. Old keys in `previousKeys` still decrypt.
+- New: `Hash.check`, the same as `Hash.verify`, with the Laravel name.
+- New: `Cache().many(keys)` and `Cache().putMany(values, duration:)` on the facade. The store already had them.
+- New: `MethodOverride(header: true)` also reads the `X-HTTP-Method-Override` header on a POST. It is off by default, so apps do not change.
+- Fix: `Route().setStatics(Route().statics)` emptied the static folders. It cleared the list before it copied it.
+- Fix: after `%` decoding, the `.where` check now lets `.` match a new line. Before, `.where('page', '.*')` did not match `/docs/a%0Ab` any more.
+- `req.pathIs(pattern)` cleans each pattern once, not on every call.
+- Docs: `Route.view` is the WebDAV `VIEW` method. It does not render a template like Laravel `Route::view`. `Route.where` says the value is checked again after decoding.
 - Security fix: `.where` now checks the param again after `%` decoding. Before, it checked only the text as it is in the URL. So `.where('name', '[^/]+')` let `/nos/..%2F..%2Fetc%2Fpasswd` through, and the controller got `../../etc/passwd`. Now a decoded value that does not match the regex makes the route not match, like any other miss (the next route, the fallback or 404). Params with no `%` and routes without `.where` do not change.
 - Security fix: `req.pathIs()` now cleans the path like the router does. Before, it only dropped the `/` at the start. So `/admin/` and `/admin//` reached the `/admin` route, but `pathIs('admin')` was false, and a middleware guard on it was skipped. Now `//` counts as one `/`, and a `/` at the end does not matter, in the path and in the pattern. A path that matched before still matches.
 - Fix: with more than one isolate, `Route.staticFiles` added before `startServer()` and outside a `Router` worked only in the main isolate. A file like `/app.css` got a 404 at random. Now the static folders go to every isolate, like routes and fallbacks.

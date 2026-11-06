@@ -86,6 +86,7 @@ export 'validation/request_validator.dart';
 
 /// Utils
 export 'utils/aes_encryptor.dart';
+export 'utils/crypt.dart';
 export 'utils/extensions.dart';
 export 'utils/hash.dart';
 export 'utils/key_derivation.dart';

@@ -170,7 +170,7 @@ Blog:
 
 Routes that the builder does not know (for example inline closures) still get a basic entry.
 
-An optional param shows as two paths. The route `/blog/{id?}` gives `/blog/{id}` and `/blog`. OpenAPI path params must always be required, so this is the only right way to show it.
+An optional param shows as two paths. The route `/blog/{id?}` gives `/blog/{id}` and `/blog`. OpenAPI path params must always be required.
 Only optional params at the end of the path are dropped, the same way the Dox router matches them.
 
 ### Request

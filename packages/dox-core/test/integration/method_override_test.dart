@@ -106,6 +106,13 @@ void main() {
       )).expectStatus(404);
     });
 
+    test('the X-HTTP-Method-Override header is off by default', () async {
+      (await client.post(
+        '/post/5',
+        headers: <String, String>{'X-HTTP-Method-Override': 'DELETE'},
+      )).expectBody('post POST');
+    });
+
     test('a GET with _method is not changed', () async {
       (await client.get('/post/5?_method=DELETE')).expectBody('get GET');
     });
@@ -145,6 +152,47 @@ void main() {
         body: '_method=PUT&title=Hi',
         headers: form,
       )).expectStatus(200).expectBody('post POST');
+    });
+  });
+
+  group('with MethodOverride(header: true)', () {
+    late DoxTestClient client;
+
+    setUpAll(() async {
+      client = await DoxTestClient.start(
+        config(<dynamic>[const MethodOverride(header: true)]),
+      );
+    });
+
+    tearDownAll(() async {
+      await client.close();
+    });
+
+    test('the header changes a POST, and wins over _method', () async {
+      (await client.post(
+        '/post/5',
+        headers: <String, String>{'X-HTTP-Method-Override': 'delete'},
+      )).expectBody('delete DELETE');
+      (await client.post(
+        '/post/5',
+        body: '_method=DELETE&title=H',
+        headers: <String, String>{...form, 'X-HTTP-Method-Override': 'PUT'},
+      )).expectBody('put 5 PUT H');
+    });
+
+    test('an unknown header value falls back to _method', () async {
+      (await client.post(
+        '/post/5',
+        body: '_method=DELETE',
+        headers: <String, String>{...form, 'X-HTTP-Method-Override': 'GET'},
+      )).expectBody('delete DELETE');
+    });
+
+    test('a GET with the header is not changed', () async {
+      (await client.get(
+        '/post/5',
+        headers: <String, String>{'X-HTTP-Method-Override': 'DELETE'},
+      )).expectBody('get GET');
     });
   });
 }

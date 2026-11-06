@@ -247,9 +247,11 @@ class Route {
 
   /// set the static folders, eg. in a new isolate
   void setStatics(List<StaticFolder> statics) {
+    // copy first: `setStatics(statics)` passes the same list
+    List<StaticFolder> copy = List<StaticFolder>.of(statics);
     _statics
       ..clear()
-      ..addAll(statics);
+      ..addAll(copy);
   }
 
   /// serve the files in [folder] under [prefix], for GET and HEAD
@@ -362,7 +364,9 @@ class Route {
   /// only match the route added last when its [param] matches [regex].
   /// Else the route does not match, and the next route is tried (or the
   /// client gets 404). The regex must match the whole param text. Use
-  /// `(?:...)` for groups, not `(...)`.
+  /// `(?:...)` for groups, not `(...)`. The value is checked again after
+  /// `%` decoding, so the decoded text must match too (a `%20` is a space
+  /// then).
   /// ```
   /// Route.get('users/{id}', controller).where('id', '[0-9]+');
   /// Route.get('docs/{page}', controller).where('page', '.*');
@@ -855,7 +859,10 @@ class Route {
     );
   }
 
-  /// view route
+  /// a route for the WebDAV `VIEW` HTTP method. It does not render a
+  /// template like Laravel `Route::view`. For that, use a GET route:
+  /// `Route.get('welcome', (DoxRequest req) => view(req, 'welcome'))`
+  /// with `view()` of dox_view.
   /// ```
   /// Route.view('path', controller);
   ///

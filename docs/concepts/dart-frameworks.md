@@ -9,7 +9,7 @@ This page compares Dox with four other ways to build a backend in Dart: Dart Fro
 It lists facts only.
 Each project is good at different things.
 
-!!! note "Checked on 2026-10-22"
+!!! note "Facts can change"
     The facts about the other projects come from their own docs, READMEs and pub.dev pages, read on 2026-10-22.
     Projects change. Check their docs before you decide.
     Where this page is not sure, the table says "see their docs".

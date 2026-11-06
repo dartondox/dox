@@ -27,6 +27,7 @@ The Laravel code is Laravel 11. The biggest changes are in [What is different](#
 | `Route::middleware('auth')->group(...)` | `Route.middleware(<dynamic>[AuthMiddleware()], () { ... });` |
 | `Route::domain('admin.app.test')->group(...)` | `Route.domain('admin.app.test', () { ... });` |
 | `Route::resource('blogs', BlogController::class);` | `Route.resource('blogs', BlogController);` |
+| `Route::view('/welcome', 'welcome')` | `Route.get('/welcome', (DoxRequest req) => view(req, 'welcome'))` with `view()` of `dox_view`. Dox `Route.view` is the WebDAV `VIEW` method, not a template. |
 | `routes/api.php` with the `api` prefix | `lib/routes/api.dart`, a `Router` class with `prefix => 'api'` |
 
 In Dox, the container makes the controller. Put `@Inject()` above the class. The route picks the method with a typed function.
@@ -347,7 +348,8 @@ See [Dox CLI](../digging-deeper/dox-cli.md).
 | `Auth::logout()` | `Auth().logout(req)` |
 | `->middleware('auth:sanctum')` | `AuthMiddleware()` from `dox_auth` |
 | `->middleware('guest')` | `GuestMiddleware(redirectTo: '/dashboard')` |
-| `Hash::make($p)`, `Hash::check($p, $hash)` | `Hash.make(p)`, `Hash.verify(p, hash)` |
+| `Crypt::encryptString($v)`, `Crypt::decryptString($v)` | `Crypt.encryptString(v)`, `Crypt.decryptString(v)` |
+| `Hash::make($p)`, `Hash::check($p, $hash)` | `Hash.make(p)`, `Hash.check(p, hash)` (or `Hash.verify`) |
 
 For an API, Dox auth is a JWT in the `Authorization` header. For tokens you can revoke, like Sanctum, use `AccessTokenAuthDriver`. `dox auth:tokens-table` makes its `auth_access_tokens` table.
 For web pages, a guard with `SessionAuthDriver` keeps the login in the session cookie.
@@ -358,7 +360,8 @@ See [Authentication](../security/authentication.md).
 | Laravel | Dox |
 | --- | --- |
 | `config/cache.php` | `lib/config/cache.dart`, `CacheConfig(defaultStore:, stores:)` |
-| `Cache::put('k', $v, 600)` | `await Cache().put('k', v, duration: Duration(minutes: 10))` |
+| `Cache::put('k', $v, 600)` | `await Cache().put('k', v, duration: Duration(minutes: 10))`. The time is a named `duration:`, not the third value. |
+| `Cache::many(['a', 'b'])`, `Cache::putMany([...], 600)` | `await Cache().many(<String>['a', 'b'])`, `await Cache().putMany(<String, Object?>{...}, duration: ...)` |
 | `Cache::get('k', 'default')` | `await Cache().get('k', 'default')` |
 | `Cache::remember('k', 600, fn)` | `await Cache().remember('k', Duration(minutes: 10), fn)` |
 | `Cache::forget('k')` | `await Cache().forget('k')` |

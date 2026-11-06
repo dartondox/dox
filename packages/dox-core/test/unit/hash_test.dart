@@ -17,6 +17,12 @@ void main() {
       expect(result, false);
     });
 
+    test('check is the same as verify', () {
+      String hashed = Hash.make('secret', rounds: 4);
+      expect(Hash.check('secret', hashed), true);
+      expect(Hash.check('wrong', hashed), false);
+    });
+
     test('a malformed hash returns false', () {
       for (String bad in <String>['', 'abc', r'$2a$10$short']) {
         expect(Hash.verify('secret', bad), false);

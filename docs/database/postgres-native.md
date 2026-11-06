@@ -72,7 +72,7 @@ the `DATABASE_URL`:
 
 Without `sslRootCert`, `verify-ca` and `verify-full` use the Mozilla roots and the roots of the system.
 
-In mode `require`, Dox prints one warning, because the server certificate is not checked. To hide it, set `extra['sslWarning']` to `false`, or add `sslWarning=false` to `DATABASE_URL`.
+In mode `require`, Dox prints a warning (once per isolate), because the server certificate is not checked. To hide it, set `extra['sslWarning']` to `false`, or add `sslWarning=false` to `DATABASE_URL`.
 
 ```dart
 ConnectionConfig(

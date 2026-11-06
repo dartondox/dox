@@ -87,6 +87,7 @@ Actor byName = await Actor().findOrFail('name', 'John Wick');
 ```
 
 The exception has the `table`, and for `findOrFail()` also the `column` and the `id` it looked for.
+When a route does not catch it, the client gets `404` with `{"code": "not_found", "message": "Not Found"}`.
 
 ```dart
 try {
@@ -1169,7 +1170,7 @@ await Actor().where('id', 1).touch('seen_at');
 
 On a query, `touch()` fires no model events.
 On a model query with no `where()` (and no global scope), `touch()` throws a `StateError`.
-On MySQL and MariaDB, it returns 0 when `updated_at` already has that value, because they count only changed rows.
+On MySQL and MariaDB, it can return 0 when the new time is the same as the stored one (the same second), because they count only changed rows.
 On a model from the table, `touch()` changes only the row of that model.
 See [Models](model/index.md#touch-and-replicate).
 

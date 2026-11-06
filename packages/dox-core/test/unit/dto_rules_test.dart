@@ -246,6 +246,20 @@ void main() {
       );
     });
 
+    test('requiredIf reads a later field as converted', () async {
+      // `plan` comes after `plan_note`; ' PRO ' is 'pro' once converted
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{'plan': ' PRO '}),
+        <String, String>{
+          'plan_note': 'The plan_note is required when plan is pro',
+        },
+      );
+      expect(
+        await errorsOf($MoreRulesDto, <String, dynamic>{'plan': 'free'}),
+        isEmpty,
+      );
+    });
+
     test('requiredIf with an enum value', () async {
       expect(
         await errorsOf($MoreRulesDto, <String, dynamic>{'role': 'admin'}),

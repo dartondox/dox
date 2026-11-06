@@ -153,8 +153,11 @@ class RouteData {
   RegExp? whereCheck(String param) {
     String? regex = wheres?[param];
     if (regex == null) return null;
+    // dotAll: `.` must match a decoded `%0A` too, like it matches the
+    // raw `%0A` text in the route regex
     return (_whereChecks ??= <String, RegExp>{})[param] ??= RegExp(
       '^(?:$regex)\$',
+      dotAll: true,
     );
   }
 
