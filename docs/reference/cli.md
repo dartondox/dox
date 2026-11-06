@@ -12,8 +12,8 @@ How to install the CLI is on the [Dox CLI](../digging-deeper/dox-cli.md) page.
 
 Rules that apply to every command:
 
-- `dox` with no command prints `Could not find a command. Run `dox help` for more information.`
-- An unknown command prints `Could not find a command named "<name>". Run `dox help` for more information.`, and a hint about the `dox: commands:` key.
+- `dox` with no command prints `Could not find a command. Run `dox help` for more information.` and exits with code 1.
+- An unknown command prints `Could not find a command named "<name>". Run `dox help` for more information.`, and a hint about the `dox: commands:` key. It exits with code 1.
 - A command that is not built in can come from a package or from the app. See [Package commands](../digging-deeper/package-commands.md).
 - Too few or too many arguments prints `Invalid number of arguments for command "<name>".` with the expected count.
 - A name you pass is turned into `snake_case` for the file and `PascalCase` for the class. `BlogPost` and `blog_post` give the same result.
@@ -59,6 +59,8 @@ dox server
 ```
 
 Starts the dev server.
+
+`dox serve --port=...` does not set the port. Dox ignores it and prints a warning. Set `APP_PORT` in `.env`, or run `APP_PORT=9000 dox serve`.
 
 | Option | Meaning |
 | --- | --- |
@@ -118,11 +120,18 @@ The CLI does not pass `--delete-conflicting-outputs` (build_runner removed that 
 ### `dox key:generate`
 
 ```
-dox key:generate
+dox key:generate [--show] [--force]
 ```
 
 Makes a 32 character key (A-Z, a-z, 0-9, from `Random.secure()`) and writes it to `APP_KEY` in `.env`.
 Prints `<key> : Key have been updated successfully in .env!`.
+
+| Option | Meaning |
+| --- | --- |
+| `--show` | Print a new key and write nothing. |
+| `--force` | Skip the question below. |
+
+When `APP_ENV=production`, a new key logs every user out. In a terminal the command asks first. Without a terminal it prints a warning and runs. If you answer no, it prints `Stopped. APP_KEY was not changed.` and exits with code 1.
 
 What it does with `.env`:
 
@@ -271,11 +280,11 @@ dox make:model <name> [-m|--migration]
 dox create:model <name> [-m|--migration]
 ```
 
-Writes `lib/app/models/<name>/<name>.model.dart`: a `@DoxModel()` class with `part '<name>.model.g.dart';`.
+Writes `lib/app/models/<name>/<name>.model.dart`: a `@DoxModel(table: '<plural snake name>')` class with `part '<name>.model.g.dart';`. `BlogPost` gives `blog_posts`. The class has an empty `fillable` list. Add your columns to it.
 
 | Option | Meaning |
 | --- | --- |
-| `-m` or `--migration` | Also make a `create_<table>_table` migration. The table is the plural snake name: `BlogPost` gives `blog_posts`. The model then gets `@DoxModel(table: 'blog_posts')`. |
+| `-m` or `--migration` | Also make a `create_<table>_table` migration. |
 
 Any other second argument prints `Invalid option <x>, use -m or --migration` (exit code 1).
 
@@ -325,7 +334,7 @@ A failed run prints the error and sets exit code 1.
 | Command | Aliases | What it does |
 | --- | --- | --- |
 | `dox migration:run` | `dox migrate` | Run the migrations that did not run yet. |
-| `dox migration:rollback [--step=<count>]` | `dox migrate:rollback` | Undo the last batch, or the last `<count>` migrations. Any other option prints `Invalid option <x>, use --step=<count>` (exit code 1). |
+| `dox migration:rollback [--step=<count>] [--force]` | `dox migrate:rollback` | Undo the last batch, or the last `<count>` migrations. `--step 2` works too. Any other option prints `Invalid option <x>, use --step=<count> or --force` (exit code 1). |
 | `dox migration:reset` | `dox migrate:reset` | Undo every migration. |
 | `dox migration:refresh` | `dox migrate:refresh` | Undo every migration, then run them all again. |
 | `dox migration:fresh` | `dox migrate:fresh` | Drop every table, then run all migrations. |
@@ -333,7 +342,7 @@ A failed run prints the error and sets exit code 1.
 
 `--seed` after `migration:run`, `migration:refresh` or `migration:fresh` runs `dox db:seed` when the migrations end well.
 
-`--force` after `migration:reset`, `migration:refresh` or `migration:fresh` skips the question they ask when `APP_ENV=production` and stdin is a terminal. Without a terminal they print a warning and run.
+`--force` after `migration:rollback`, `migration:reset`, `migration:refresh` or `migration:fresh` skips the question they ask when `APP_ENV=production` and stdin is a terminal. Without a terminal they print a warning and run.
 
 `bin/migrate.dart` takes the same commands: `dart run bin/migrate.dart <run|rollback [--step=n]|reset|refresh|fresh|status>`. With no command it runs `run`.
 
@@ -362,6 +371,7 @@ When `bin/queue.dart` is missing, the command prints how to set it up and exits 
 | `dox queue:forget <id>` | `bin/queue.dart forget <id>` | Delete one failed job. |
 | `dox queue:flush` | `bin/queue.dart flush` | Delete all failed jobs. |
 | `dox queue:table` | | A [package command](../digging-deeper/package-commands.md) of `dox_queue`. Make `db/migration/<time>_create_queue_tables.dart`, which calls `QueueTables.up` and `QueueTables.down`. When a `create_queue_tables` migration is already there, it prints so and exits with code 1. |
+| `dox auth:tokens-table` | | A [package command](../digging-deeper/package-commands.md) of `dox_auth`. Make a migration for the `auth_access_tokens` table. When a `create_access_tokens_table` migration is already there, it prints so and exits with code 1. |
 
 Flags of `queue:work`, passed on as they are:
 
@@ -374,6 +384,7 @@ Flags of `queue:work`, passed on as they are:
 | `--timeout=S` | `60` | Seconds a job may run. |
 | `--sleep=S` | `3` | Seconds to wait when the queues are empty. |
 | `--stop-when-empty` | off | Stop when the queues are empty. |
+| `--timeout-grace=S` | none | After a timeout, wait up to `S` seconds for the old run to end before the next try. |
 
 An unknown flag or command prints the usage and exits with code 64.
 

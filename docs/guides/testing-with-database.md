@@ -5,6 +5,7 @@ icon: lucide/flask-conical
 # Testing with a database
 
 Run model tests against a real database: SQLite for fast local tests, or a test Postgres for the real thing.
+
 Migrations run once, and every test starts with empty tables.
 
 ## What you need

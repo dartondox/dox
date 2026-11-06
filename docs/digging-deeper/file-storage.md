@@ -52,6 +52,13 @@ StorageConfig storageConfig = StorageConfig(
 );
 ```
 
+A local disk writes a file in place by default. To write to a temp file and rename it when the write is done, add `'atomic_writes': true` to the disk. A failed or stopped upload then never leaves a partial file, and the old file stays. It is off by default.
+The rename makes a new file. So the folder must be writable, the file gets the default mode and the owner of the app, a hard link keeps the old content, and a symlink is replaced.
+
+```dart
+'local': <String, dynamic>{'driver': 'local', 'root': 'storage', 'atomic_writes': true},
+```
+
 The `s3` disk reads five keys that a new project does not have yet. Add them to
 `lib/config/env.dart` and run `dart run build_runner build`. They are nullable,
 and the `s3` disk is only added when `AWS_BUCKET` is set. So the app starts without them:
@@ -166,6 +173,7 @@ String url = await Storage().signedUrl('invoices/1.pdf'); // https://app.test/fi
 
 A missing, wrong or expired signature answers `403`.
 Signed URLs work only on a `local` disk. For another disk, use `signed: false`.
+A signed URL works only on the route of its own disk.
 Set the disk `url` option to the full URL of the route (`https://app.test/files`).
 
 ## Tests

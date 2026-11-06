@@ -327,6 +327,8 @@ Dox is in dev mode when:
 - `devServerUrl` is set, or
 - the file `public/hot` exists. Its text is the dev server url. Some Vite plugins write this file while `vite` runs.
 
+When `APP_ENV` is `production`, the `hot` file is ignored with one warning.
+
 In production (no dev server), Dox reads `public/build/.vite/manifest.json`. `@vite` gives a `<link>` tag for the css of each entry and of the chunks it imports, and a `<script type="module">` tag for each entry.
 
 Set `devServerUrl` from the env, so production does not use it:

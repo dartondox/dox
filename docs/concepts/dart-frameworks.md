@@ -5,7 +5,9 @@ icon: lucide/scale
 # Dox and the other Dart backends
 
 This page compares Dox with four other ways to build a backend in Dart: Dart Frog, Serverpod, Shelf (with `shelf_router`) and Alfred.
-It lists facts only. Each project is good at different things.
+
+It lists facts only.
+Each project is good at different things.
 
 !!! note "Checked on 2026-10-22"
     The facts about the other projects come from their own docs, READMEs and pub.dev pages, read on 2026-10-22.
@@ -73,4 +75,4 @@ To compare, run the same test on your own machine, with each server on the same 
 - **Your app is Flutter only, and you want the client made for you.** Serverpod generates a typed client for every endpoint. Dox does not generate a Dart client. It generates an OpenAPI document.
 - **You want a small tool with few parts.** Dart Frog is simpler. You add only what you need.
 - **You want to build your own stack.** Shelf gives you the base parts, and the Dart team publishes it.
-- **You need features Dox does not have yet**, like events and listeners, or policies. See [What Dox does not have yet](status-and-roadmap.md#what-dox-does-not-have-yet).
+- **You need features Dox does not have yet**, like events and listeners. See [What Dox does not have yet](status-and-roadmap.md#what-dox-does-not-have-yet).

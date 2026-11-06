@@ -1146,6 +1146,17 @@ List<Actor> trashed = await Actor().onlyTrashed().get();
 await Actor().onlyTrashed().forceDelete();
 ```
 
+### `restore`
+
+`restore()` on a query sets `deleted_at` back to `NULL` for every soft deleted row of the query. It sets `updated_at` too, when the model has timestamps.
+It returns `true` when it changed a row, else `false`.
+It fires no model events.
+With no `where()`, it throws a `StateError`, so it can not restore every row by mistake.
+
+```dart
+bool restored = await Blog().withTrash().where('status', 'old').restore();
+```
+
 ### `touch`
 
 Sets `updated_at` of the rows to now. Give a column name to set another column.

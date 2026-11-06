@@ -4,7 +4,9 @@ icon: lucide/notebook-pen
 
 # Cheat sheet
 
-One page to keep open while you work. Each section links to its full page.
+One page to keep open while you work.
+
+Each section links to its full page.
 
 ## Project layout
 
@@ -86,6 +88,12 @@ class ApiRouter extends Router {
 | `Route.get('/posts/{page?}', c.list)` | optional param. `list(int? page)` |
 | `Route.get('/docs/{path*}', c.page)` | rest of the path, with `/` |
 | `Route.get('/me', <dynamic>[AuthMiddleware(), c.me])` | middleware first, controller last |
+| `Route.match(<String>['GET', 'POST'], '/contact', handler)` | one handler for a list of methods |
+| `Route.any('/webhook', handler)` | one handler for `GET`, `POST`, `PUT`, `PATCH` and `DELETE` |
+| `Route.redirect('/home', '/')` / `Route.permanentRedirect('/old', '/new')` | send a path to another URL. `302` by default, `301` for `permanentRedirect`. |
+| `Route.get('/users/{id}', c.show).where('id', '[0-9]+')` | the route matches only when the param fits the regex |
+| `Route.fallback((DoxRequest req) { ... })` | answers a `GET` or `HEAD` request that matches no route and no static file. Use it for a 404 page or an SPA. |
+| `globalMiddleware: <dynamic>[const MethodOverride()]` | lets an HTML form reach `PUT`, `PATCH` and `DELETE` routes |
 | `Route.group('/blogs', () { ... })` | prefix. Dox adds the `/` between parts. |
 | `Route.middleware(<dynamic>[M()], () { ... })` | middleware for a group |
 | `Route.domain('api.app.com', () { ... })` | match by `Host` |
@@ -305,6 +313,10 @@ class Blog extends BlogGenerator {
 | `blog.title = 'b'; await blog.save()` | insert or update |
 | `await blog.delete()` | soft delete when `softDelete: true`. Returns the deleted rows as an `int`. |
 | `await blog.increment('views')` / `decrement` | change a number in one query |
+| `await Blog().forceCreate({...})` | create with every key, ignore `fillable` |
+| `await Model.unguarded(() async { ... })` | turn off the `fillable` check inside the callback |
+| `await blog.sync('tags', <int>[1, 2])` | many to many: make the links exactly these ids |
+| `await blog.attach('tags', 3)` / `await blog.detach('tags', 3)` | add / remove links |
 | `await blog.forceDelete()` / `await blog.restore()` | real delete / undo soft delete |
 | `Blog().withTrash()` | include soft deleted rows |
 | `Blog().onlyTrashed()` | only soft deleted rows |
@@ -317,7 +329,7 @@ class Blog extends BlogGenerator {
 | `blog.toJson()` / `blog.toMap()` | map, `hidden` left out of `toJson()` |
 | `Blog().query()` | a new, empty query |
 
-Relations: `@HasOne(T)`, `@HasMany(T)`, `@BelongsTo(T)`, `@ManyToMany(T)`. Options: `foreignKey`, `localKey`, `onQuery`, `eager`.
+Relations: `@HasOne(T)`, `@HasMany(T)`, `@BelongsTo(T)`, `@ManyToMany(T)`. Polymorphic: `@MorphMany(T, 'name')`, `@MorphOne(T, 'name')`, `@MorphTo()`. Options: `foreignKey`, `localKey`, `onQuery`, `eager`.
 
 Events: override `onCreating()`, `onCreated()`, `onSaving()`, `onUpdated()`, `onDeleting()`, ... or `Model.observe<Blog>(BlogObserver())`. `throw CancelModelEvent('why')` in a "before" event stops it. `saveQuietly()` skips events.
 

@@ -4,7 +4,9 @@ icon: lucide/layers
 
 # Middleware
 
-Middleware is code that runs before the controller, and if you want, after it too. Use it for checks like login, logging or rate limits, or to change the response.
+Middleware is code that runs before the controller, and if you want, after it too.
+
+Use it for checks like login, logging or rate limits, or to change the response.
 
 ## How it works
 

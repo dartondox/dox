@@ -115,10 +115,11 @@ So your migrations run as part of your app code.
 
 Add `--seed` to `migration:run`, `migration:refresh` or `migration:fresh` to run the [seeders](seeders.md) after it.
 
-When `APP_ENV=production`, `migration:reset`, `migration:refresh` and `migration:fresh` ask before they drop the tables. Type `y` to go on. Add `--force` to skip the question. With no terminal (CI or a deploy script), they print a warning and run.
+When `APP_ENV=production`, `migration:rollback`, `migration:reset`, `migration:refresh` and `migration:fresh` ask before they drop the tables. Type `y` to go on. Add `--force` to skip the question. With no terminal (CI or a deploy script), they print a warning and run.
 
 A batch is the group of migrations that ran in one `migration:run`.
 Migrations are undone newest first.
+When the file of a migration that ran is gone, rollback prints `Migration not found: <name>`. It keeps the row of that migration and rolls back the others.
 The ran migrations are saved in the `dox_db_migration` table.
 
 When a migration fails, the error shows its name, and the command exits with code `1`.

@@ -223,7 +223,8 @@ Source: `packages/dox-orm/lib/src/types/database_config.dart` and `connection_co
 | `database` | `String` | required | Database name. For sqlite: the file path, or `:memory:`. |
 | `useSSL` | `bool` | `false` | Use TLS. Postgres: mode `require` (no certificate check), set `extra['sslMode']` to change it. MySQL: the certificate is checked. |
 | `debug` | `bool` | required | Print every query with `printer`. |
-| `printer` | `QueryPrinter?` | `null` | `ConsoleQueryPrinter()`, `PrettyQueryPrinter()`, `FileQueryPrinter()` or your own. |
+| `printer` | `QueryPrinter?` | `null` | `ConsoleQueryPrinter()`, `PrettyQueryPrinter()`, `FileQueryPrinter(file: File('queries.log'))` or your own. `FileQueryPrinter(file: ..., buffered: true)` writes in the background, so a query does not wait for the disk. Then call `await printer.flush()` before `exit()`, or the last lines are lost. |
+| `logRedact` | `List<String>` | `[]` | Names of values to hide in the query log. A value shows as `***` when its key ends with one of these names, in any case. `['password', 'token']` hides `password`, `users.password` and `remember_token`. Only the log changes. The query gets the real values. |
 | `extra` | `Map<String, dynamic>` | `{}` | Driver options. See below. |
 | `driverFactory` | `DBDriver Function(ConnectionConfig)?` | `null` | Your own driver class. It wins over every other setting. |
 
@@ -236,6 +237,7 @@ Keys of `extra`:
 | mysql, sqlite | `preparedStatementCacheSize` | `int` | `100` | Prepared statements kept per connection. |
 | postgres | `sslMode` | `String` | `require` with `useSSL`, else `disable` | TLS mode: `disable`, `prefer`, `require` or `verify-full`. |
 | postgres | `sslRootCert` | `String` | none | Path of a PEM file with the CA certificates to trust for `verify-full`. `sslrootcert` in `DATABASE_URL`. |
+| postgres | `sslWarning` | `bool` | `true` | `false` hides the one warning that Dox prints when TLS mode is `require`. `sslWarning=false` in `DATABASE_URL` works too. |
 | postgres | `timeZone` | `String` | `UTC` | Session time zone. |
 | postgres | `applicationName` | `String` | none | Name of the app in `pg_stat_activity`. |
 | mysql | `verifyCertificate` | `bool` | `true` | `false` skips the TLS certificate check. Only for a self-signed certificate in development. |

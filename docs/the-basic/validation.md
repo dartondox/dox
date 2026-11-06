@@ -361,6 +361,7 @@ final String slug;
 
 - A rule with values: add `final` fields and override `params`. They become placeholders.
 - `context.lookup('other.key')` reads another input value.
+- `context.sibling('key')` reads the raw input of a field next to this one, in the same object. For example, `context.sibling('password_confirmation')` in a rule on `password`. It gives `undefined` when the field is missing.
 - A rule that needs the database: extend `AsyncRule<T>` and write `checkAsync`.
 
 ## Dynamic input

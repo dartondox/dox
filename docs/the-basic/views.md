@@ -4,7 +4,9 @@ icon: lucide/layout-template
 
 # Views
 
-Views are HTML templates. Dox fills them with your data and sends them as the response.
+Views are HTML templates.
+
+Dox fills them with your data and sends them as the response.
 
 The `dox_view` package has a template engine like Edge.js. Templates are `.dox.html` files in `resources/views`.
 

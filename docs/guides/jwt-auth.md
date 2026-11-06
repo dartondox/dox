@@ -174,8 +174,9 @@ class AuthController {
   }
 
   /// POST /api/auth/logout (behind AuthMiddleware)
-  /// A JWT can not be cancelled on the server. The client deletes the
-  /// token. The token still works until `expiresIn` passes.
+  /// By default a JWT is not cancelled on the server. The client deletes
+  /// the token, and it still works until `expiresIn` passes. To cancel it,
+  /// turn on revocation and call `Auth().revokeToken(req)`.
   Map<String, String> logout(DoxRequest req) {
     return <String, String>{'message': 'Delete the token on the client'};
   }
@@ -278,7 +279,7 @@ Without the header, `/api/auth/me` gives `401 Authentication failed`.
 
 ## Logout and expiry
 
-The server can not cancel one JWT. It checks only the signature. This is what you can do:
+By default the server checks only the signature, so it can not cancel one JWT. This is what you can do:
 
 | You want | Do this |
 | --- | --- |
@@ -287,7 +288,8 @@ The server can not cancel one JWT. It checks only the signature. This is what yo
 | Log every user out at once | Change `APP_KEY`. Every old token stops working. |
 | Block one user | Delete the user. `AuthMiddleware` loads the user from the database on each request, so a deleted user gets `401`. |
 
-For a real "log out everywhere" button, add a `token_version` column to `users`, put it in the token, and compare the two in a middleware after `AuthMiddleware`.
+To cancel one token, or all tokens of a user, turn on revocation. See [Revoke tokens](../security/authentication.md#revoke-tokens).
+Or use [access tokens](../security/authentication.md#access-tokens), which you can revoke at any time.
 
 ## See also
 

@@ -88,8 +88,8 @@ class Blog extends BlogGenerator {}
 ```
 
 !!! info
-    `dox make:model Blog -m` sets `table: 'blogs'` for you,
-    because the migration makes the plural table `blogs`.
+    `dox make:model Blog` always sets `table: 'blogs'` for you, with or without `-m`.
+    The migration that `-m` makes uses the same plural table `blogs`.
 
 ### `primaryKey`
 
@@ -153,10 +153,11 @@ class Blog extends BlogGenerator {}
 The table needs a nullable `deleted_at` column. In a migration, add `table.softDeletes();`.
 
 - `delete()` sets `deleted_at` to the current time. The row stays in the table.
+  When the model has timestamps, it sets `updated_at` too.
 - Queries do not return soft deleted rows. Use `withTrash()` to get them too,
   or `onlyTrashed()` to get only them.
 - `forceDelete()` really deletes the row.
-- `restore()` sets `deleted_at` back to `NULL`.
+- `restore()` sets `deleted_at` back to `NULL`. When the model has timestamps, it sets `updated_at` too.
 
 ## Columns
 
@@ -311,7 +312,7 @@ await Model.unguarded(() async {
 ```
 
 - `forceFill()` does not save. Call `save()` after it.
-  It skips a key that is not a column, and a value that is not of the field type.
+  It skips a key that is not a column. A value of the wrong type throws an `ArgumentError`.
 - `Model.unguarded()` covers every `await` inside the callback.
   Other requests that run at the same time still use `fillable`.
 - Work that starts inside the callback and finishes later also runs with the check off.
@@ -421,7 +422,7 @@ await trashed?.forceDelete(); // deletes the row, also with softDelete
 
 // restore
 Blog? deleted = await Blog().withTrash().find(1);
-await deleted?.restore(); // sets deleted_at back to NULL
+await deleted?.restore(); // sets deleted_at back to NULL, and updated_at
 ```
 
 - `delete()` and `forceDelete()` return the number of deleted rows.
@@ -529,6 +530,10 @@ A model can load related models.
 See [HasOne](relationship/has-one.md), [HasMany](relationship/has-many.md),
 [BelongsTo](relationship/belongs-to.md), [ManyToMany](relationship/many-to-many.md)
 and [Polymorphic](relationship/polymorphic.md).
+
+!!! note "After `reload()` or a preload"
+    `await user.reload()` and a preload set the relation fields again, also when there is no related row.
+    A to-one field that can be null becomes `null`. A to-many field becomes `[]`. A to-one field that can not be null keeps its old value.
 
 The relationship pages use these tables:
 

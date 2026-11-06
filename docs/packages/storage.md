@@ -94,6 +94,7 @@ DriveManager drive = DriveManager(
     'local': LocalDriver(LocalDriverConfig(
       root: 'storage',
       urlBase: 'https://app.test/uploads',
+      atomicWrites: true, // off by default
       appKey: env['APP_KEY'], // signs local URLs
     )),
     's3': S3Driver(S3DriverConfig(
@@ -109,6 +110,11 @@ Disk disk = drive.use('s3'); // or drive.use() for the default disk
 ```
 
 `use()` throws `UnsupportedOperationException` when no disk has that name.
+
+`LocalDriverConfig(atomicWrites: true)` makes a local disk write to a temp file and rename it when the write is done.
+In a Dox app, use `'atomic_writes': true` in the disk map.
+A failed or stopped upload then never leaves a partial file, and the old file stays. Temp file names end with `.dox-upload.tmp`, and `listAll()` hides them.
+It is off by default.
 
 ## Use a disk
 

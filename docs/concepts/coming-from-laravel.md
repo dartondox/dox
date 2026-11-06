@@ -349,7 +349,7 @@ See [Dox CLI](../digging-deeper/dox-cli.md).
 | `->middleware('guest')` | `GuestMiddleware(redirectTo: '/dashboard')` |
 | `Hash::make($p)`, `Hash::check($p, $hash)` | `Hash.make(p)`, `Hash.verify(p, hash)` |
 
-For an API, Dox auth is a JWT in the `Authorization` header. There is no Sanctum tokens table.
+For an API, Dox auth is a JWT in the `Authorization` header. For tokens you can revoke, like Sanctum, use `AccessTokenAuthDriver`. `dox auth:tokens-table` makes its `auth_access_tokens` table.
 For web pages, a guard with `SessionAuthDriver` keeps the login in the session cookie.
 See [Authentication](../security/authentication.md).
 
@@ -440,7 +440,6 @@ Dox does not have these Laravel features yet:
 
 - events and listeners (model events are there)
 - password reset
-- policies and gates
 
 See [What Dox does not have yet](status-and-roadmap.md#what-dox-does-not-have-yet) for what to use today.
 
