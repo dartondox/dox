@@ -1,6 +1,7 @@
 import 'dart:isolate';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/http/http_static_handler.dart';
 import 'package:dox_core/router/route_data.dart';
 
 class IsolateSpawnParameter {
@@ -11,6 +12,9 @@ class IsolateSpawnParameter {
 
   /// routes from `Route.fallback`
   final List<RouteData> fallbacks;
+
+  /// folders from `Route.staticFiles`
+  final List<StaticFolder> statics;
 
   /// binders from `Route.bind`
   final Map<String, RouteBinding> bindings;
@@ -29,6 +33,7 @@ class IsolateSpawnParameter {
     this.providers, {
     this.routes = const <RouteData>[],
     this.fallbacks = const <RouteData>[],
+    this.statics = const <StaticFolder>[],
     this.bindings = const <String, RouteBinding>{},
     this.control,
     this.rateLimitPort,

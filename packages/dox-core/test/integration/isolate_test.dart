@@ -36,8 +36,16 @@ class ExampleProvider extends DoxProvider {
 }
 
 void main() {
+  late Directory publicDir;
+
   group('Isolate', () {
     setUpAll(() async {
+      /// added before startServer and outside a Router, so only the
+      /// spawn parameter brings it to the other isolates
+      publicDir = await Directory.systemTemp.createTemp('dox_isolate_static_');
+      await File('${publicDir.path}/app.css').writeAsString('a{}');
+      Route.staticFiles('/', publicDir.path);
+
       int port = await freePort();
       baseUrl = 'http://localhost:$port';
       Dox().initialize(isolateConfig(port));
@@ -49,6 +57,17 @@ void main() {
     tearDownAll(() async {
       DoxIsolate().killAll();
       await Dox().server.close();
+      await publicDir.delete(recursive: true);
+    });
+
+    test('static files work in every isolate', () async {
+      /// http.get opens a new connection each time, so the requests
+      /// go to different isolates
+      for (int i = 0; i < 50; i++) {
+        http.Response res = await http.get(Uri.parse('$baseUrl/app.css'));
+        expect(res.statusCode, 200, reason: 'request $i');
+        expect(res.body, 'a{}');
+      }
     });
 
     test('test', () async {
