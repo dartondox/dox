@@ -47,6 +47,18 @@ class ExtraRouter extends Router {
       'price/{price}',
       (DoxRequest req) => 'price ${req.param['price']}',
     ).where('price', r'[0-9]+\$');
+    Route.get(
+      'nos/{name}',
+      (DoxRequest req) => 'nos ${req.param['name']}',
+    ).where('name', '[^/]+');
+    Route.get(
+      'file/{name}',
+      (DoxRequest req) => 'file ${req.param['name']}',
+    ).where('name', '[^./]+');
+    Route.get(
+      'tags/{t}',
+      (DoxRequest req) => 'tags ${req.param['t']}',
+    ).where('t', '[^<>]+');
     Route.post('only-post', (DoxRequest req) => 'posted');
 
     Route.get('forgot', <dynamic>[Forgot(), (DoxRequest req) => 'controller']);
@@ -111,6 +123,24 @@ void main() {
     // an escaped `\$` is a real dollar sign and stays
     (await client.get('/price/5\$')).expectBody('price 5\$');
     (await client.get('/price/5')).expectBody('fallback /price/5');
+  });
+
+  test('where checks the param again after % decoding', () async {
+    // `%2F` decodes to `/`, which `[^/]+` does not allow
+    (await client.get('/nos/..%2F..%2Fetc%2Fpasswd'))
+        .expectBody(startsWith('fallback'));
+    (await client.get('/file/x%2Fy')).expectBody(startsWith('fallback'));
+    (await client.get('/tags/%3Cscript%3E')).expectBody(startsWith('fallback'));
+  });
+
+  test('where still matches normal and decoded params', () async {
+    (await client.get('/nos/bob')).expectBody('nos bob');
+    (await client.get('/nos/a%20b')).expectBody('nos a b');
+    (await client.get('/file/report')).expectBody('file report');
+    (await client.get('/tags/news')).expectBody('tags news');
+    (await client.get('/tags/a%20b')).expectBody('tags a b');
+    (await client.get('/users/42')).expectBody('id 42');
+    (await client.get('/users/%34%32')).expectBody('id 42');
   });
 
   test('where can let a param match slashes', () async {

@@ -112,7 +112,7 @@ RouteMatch? _fallbackFor(String path, String? host) {
     }
     RegExpMatch? match = _prefixPattern(pattern).firstMatch(path);
     if (match == null) continue;
-    Map<String, dynamic>? params = _decodeParams(route.paramNames, match);
+    Map<String, dynamic>? params = _decodeParams(route, match);
     if (params != null) best = (route: route, params: params);
   }
   return best;
@@ -302,7 +302,7 @@ RouteMatch? _getMatchRoute(String inputRoute, String method, String? domain) {
     /// eg. /api/admin/{adminId}
     RegExpMatch? match = pattern.firstMatch(inputRoute);
     if (match != null) {
-      Map<String, dynamic>? params = _decodeParams(route.paramNames, match);
+      Map<String, dynamic>? params = _decodeParams(route, match);
       if (params == null) continue;
       return (route: route, params: params);
     }
@@ -313,7 +313,10 @@ RouteMatch? _getMatchRoute(String inputRoute, String method, String? domain) {
 /// the params of [match], URL-decoded: `/users/a%20b` gives `'a b'`.
 /// null when a param can not be decoded (eg. `%ff` is not UTF-8),
 /// so the route does not match and the client gets 404.
-Map<String, dynamic>? _decodeParams(List<String> names, RegExpMatch match) {
+/// Also null when a decoded param no longer matches its `Route.where`
+/// regex (eg. `[^/]+` and `..%2F..` gives `../..`).
+Map<String, dynamic>? _decodeParams(RouteData route, RegExpMatch match) {
+  List<String> names = route.paramNames;
   Map<String, dynamic> params = <String, dynamic>{};
   for (int i = 0; i < names.length; i++) {
     String? value = match.group(i + 1);
@@ -326,6 +329,8 @@ Map<String, dynamic>? _decodeParams(List<String> names, RegExpMatch match) {
         /// valid `%` codes, but not UTF-8, eg. `%ff`
         return null;
       }
+      RegExp? check = route.whereCheck(names[i]);
+      if (check != null && !check.hasMatch(value)) return null;
     }
     params[names[i]] = value;
   }

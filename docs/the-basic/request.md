@@ -184,7 +184,7 @@ req.pathIs('admin/*');        // true. `*` matches any text
 req.routeIs('admin.users.*'); // true when the route name matches
 ```
 
-`pathIs` does not care about a `/` at the start, so `'admin/*'` and `'/admin/*'` are the same.
+`pathIs` cleans the path like the router does. A `/` at the start or the end does not matter, and `//` counts as one `/`. So `'admin/*'` and `'/admin/*'` are the same, and `/admin/` and `/admin//` match `'admin'`, like they reach the `/admin` route.
 `routeIs` is `false` for a route with no name. Give a route a name with `.name('admin.users.show')`.
 
 ## Cookies
