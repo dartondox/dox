@@ -141,6 +141,21 @@ class RouteData {
   void where(String param, String regex) {
     (wheres ??= <String, String>{})[param] = _withoutAnchors(regex);
     _compiledFor = null;
+    _whereChecks = null;
+  }
+
+  Map<String, RegExp>? _whereChecks;
+
+  /// The `Route.where` regex of [param] as a full match (`^(?:regex)$`),
+  /// built once. Null when [param] has no `where`. The router checks the
+  /// param with it again after `%` decoding, so `%2F` can not sneak a `/`
+  /// past a rule like `[^/]+`.
+  RegExp? whereCheck(String param) {
+    String? regex = wheres?[param];
+    if (regex == null) return null;
+    return (_whereChecks ??= <String, RegExp>{})[param] ??= RegExp(
+      '^(?:$regex)\$',
+    );
   }
 
   /// `^[0-9]+$` gives `[0-9]+`. An escaped `\$` at the end stays.

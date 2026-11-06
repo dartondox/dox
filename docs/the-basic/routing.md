@@ -186,7 +186,7 @@ Route.get('/docs/{page}', handler).where('page', '.*'); // matches slashes too
 - A param name that the path does not have throws an `ArgumentError` at start.
 - Call `.where` more than once for more params.
 - Routes without `.where` match the same as before. The check costs nothing for them.
-- The regex checks the param text as it is in the URL, before `%` codes are decoded. So `/users/%31` does not match `[0-9]+`, even though `%31` is `1`. The controller still gets the decoded value.
+- The regex checks the param text two times: as it is in the URL, and again after `%` codes are decoded. Both checks must pass. So `/users/%31` does not match `[0-9]+`, even though `%31` is `1`. And `/files/x%2Fy` does not match `[^/]+`, because `%2F` is `/`. The controller gets the decoded value.
 
 ## Group routes
 

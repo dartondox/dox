@@ -365,6 +365,53 @@ void main() {
       });
     });
 
+    test('pathIs cleans the path like the router does', () async {
+      Map<String, dynamic> check(DoxRequest req) {
+        return <String, dynamic>{
+          'admin': req.pathIs('admin'),
+          'settings': req.pathIs('admin/settings'),
+          'slash_pattern': req.pathIs('/admin//settings/'),
+          'wild': req.pathIs('admin/*'),
+          'all': req.pathIs('*'),
+        };
+      }
+
+      Route.get('/admin', check);
+      Route.get('/admin/settings', check);
+
+      Future<Map<String, dynamic>> get(String path) async {
+        http.Response res = await http.get(Uri.parse('$baseUrl$path'));
+        expect(res.statusCode, 200, reason: path);
+        return jsonDecode(res.body);
+      }
+
+      for (String path in <String>['/admin', '/admin/', '/admin//']) {
+        Map<String, dynamic> j = await get(path);
+        expect(j['admin'], true, reason: path);
+        expect(j['settings'], false, reason: path);
+        expect(j['all'], true, reason: path);
+      }
+      // `/admin/` matched `admin/*` before, and still does
+      expect((await get('/admin'))['wild'], false);
+      expect((await get('/admin/'))['wild'], true);
+
+      for (String path in <String>[
+        '/admin/settings',
+        '/admin//settings',
+        '/admin/settings/',
+      ]) {
+        Map<String, dynamic> j = await get(path);
+        expect(j['settings'], true, reason: path);
+        expect(j['slash_pattern'], true, reason: path);
+        expect(j['wild'], true, reason: path);
+        expect(j['admin'], false, reason: path);
+      }
+
+      // `%61` is `a`, on the router side and on the pathIs side
+      expect((await get('/%61dmin'))['admin'], true);
+      expect((await get('/%61dmin/'))['admin'], true);
+    });
+
     test('pathIs matches regex characters as plain text', () async {
       Route.get('/files/{name}', (DoxRequest req) async {
         return <String, dynamic>{

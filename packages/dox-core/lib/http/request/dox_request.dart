@@ -6,6 +6,7 @@ import 'package:dox_core/http/request/form_input.dart';
 import 'package:dox_core/http/request/http_request_body.dart';
 import 'package:dox_core/http/request/trusted_proxy.dart';
 import 'package:dox_core/router/route_data.dart';
+import 'package:dox_core/utils/utils.dart';
 
 class DoxRequest implements IDoxRequest {
   final RouteData route;
@@ -336,14 +337,23 @@ class DoxRequest implements IDoxRequest {
   }
 
   /// True when the path matches [pattern]. `*` matches any text.
-  /// A `/` at the start does not matter. (`is` is a Dart keyword.)
+  /// The path and [pattern] are cleaned like the router does: `//` is one
+  /// `/`, and a `/` at the start or the end does not matter. So `/admin/`
+  /// and `/admin//` both match `admin`, like they reach the `/admin`
+  /// route. (`is` is a Dart keyword.)
   /// ```
   /// req.pathIs('admin/*');
   /// ```
   bool pathIs(String pattern) {
-    String path;
+    RegExp regex = _wildcard(sanitizeRoutePath(pattern).substring(1));
+    String raw = uri.path;
+    String clean = sanitizeRoutePath(raw);
     try {
-      path = Uri.decodeComponent(_trimSlash(uri.path));
+      if (regex.hasMatch(Uri.decodeComponent(clean.substring(1)))) return true;
+      // the path as it came still counts, so `/admin/` keeps matching
+      // `admin/*` like before
+      return clean != raw &&
+          regex.hasMatch(Uri.decodeComponent(_trimSlash(raw)));
     } on FormatException {
       // a bad escape, like `/%ff`, matches no pattern
       return false;
@@ -351,7 +361,6 @@ class DoxRequest implements IDoxRequest {
       // a bare `%` or a bad code like `%zz` matches no pattern
       return false;
     }
-    return _wildcard(_trimSlash(pattern)).hasMatch(path);
   }
 
   /// True when the route name matches [pattern]. `*` matches any text.
