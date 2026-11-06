@@ -141,6 +141,8 @@ void main() {
     (await client.get('/tags/a%20b')).expectBody('tags a b');
     (await client.get('/users/42')).expectBody('id 42');
     (await client.get('/users/%34%32')).expectBody('id 42');
+    // `%31` is a digit, so it is decoded before the router sees it
+    (await client.get('/users/%31')).expectBody('id 1');
   });
 
   test('where can let a param match slashes', () async {
