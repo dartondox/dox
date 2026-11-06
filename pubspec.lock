@@ -218,25 +218,28 @@ packages:
     source: hosted
     version: "3.1.14"
   dox_http_native:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "/Users/zinkyawkyaw/projects/dox/dox-http-native"
-      relative: false
-    source: path
-    version: "3.0.3"
+      name: dox_http_native
+      sha256: "6c59ad187c185f742de9a17e76eaf3b9a6b7eb9dafc0632ae61992f9a9b0dd73"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.2"
   dox_openapi:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "/Users/zinkyawkyaw/projects/dox/dox-openapi"
-      relative: false
-    source: path
+      name: dox_openapi
+      sha256: e1197b7c0fe9581778fa3917fb29bdb198a4c813574176579c970af3b09ae056
+      url: "https://pub.dev"
+    source: hosted
     version: "3.0.0"
   dox_validation:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "/Users/zinkyawkyaw/projects/dox/dox-validation"
-      relative: false
-    source: path
+      name: dox_validation
+      sha256: "6c0a9d250ac024eba3b77f81e565aaae0c941c89b185426fdc9c57ad231a8275"
+      url: "https://pub.dev"
+    source: hosted
     version: "3.0.0"
   ffi:
     dependency: transitive
@@ -335,11 +338,12 @@ packages:
     source: hosted
     version: "1.1.0"
   ioredis:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "/Users/zinkyawkyaw/projects/dox/ioredis"
-      relative: false
-    source: path
+      name: ioredis
+      sha256: "04bedac90c58eaeefaf974143d907b010d8376e9730501449bc45e1c8b1de126"
+      url: "https://pub.dev"
+    source: hosted
     version: "3.0.1"
   json_annotation:
     dependency: transitive
