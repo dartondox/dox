@@ -245,6 +245,13 @@ class Route {
   /// folders added with [staticFiles]
   List<StaticFolder> get statics => _statics;
 
+  /// set the static folders, eg. in a new isolate
+  void setStatics(List<StaticFolder> statics) {
+    _statics
+      ..clear()
+      ..addAll(statics);
+  }
+
   /// serve the files in [folder] under [prefix], for GET and HEAD
   /// requests that match no route. Routes always win, so a normal
   /// request does not touch the disk. No middleware runs for a file.

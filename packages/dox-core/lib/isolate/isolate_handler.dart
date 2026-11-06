@@ -22,6 +22,7 @@ void isolateHandler(IsolateSpawnParameter param) async {
   /// register routes
   Route().setRoutes(param.routes);
   Route().setFallbacks(param.fallbacks.toList());
+  Route().setStatics(param.statics);
   Route().setBindings(Map<String, RouteBinding>.of(param.bindings));
 
   /// starting registered providers in new isolate;
