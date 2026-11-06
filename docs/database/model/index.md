@@ -88,8 +88,8 @@ class Blog extends BlogGenerator {}
 ```
 
 !!! info
-    `dox make:model Blog -m` sets `table: 'blogs'` for you,
-    because the migration makes the plural table `blogs`.
+    `dox make:model Blog` always sets `table: 'blogs'` for you, with or without `-m`.
+    The migration that `-m` makes uses the same plural table `blogs`.
 
 ### `primaryKey`
 

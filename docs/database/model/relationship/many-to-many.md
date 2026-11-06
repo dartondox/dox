@@ -219,8 +219,9 @@ A `null` id or a model that is not saved is skipped by `attach`, `detach`, `togg
 `sync` throws an `ArgumentError` for one, before it changes anything, because it would delete every other link.
 Each id is used once: `[1, 1, '1']` adds one row.
 
-A text key column can compare text without case or without end spaces.
+A text key column can compare text without case.
 This is the default in MySQL and MariaDB, and in SQLite with `COLLATE NOCASE`.
+`COLLATE NOCASE` ignores case only. MariaDB can also ignore end spaces.
 Dart does not know that. So `sync` and `toggle` also ask the database about each text id that Dart did not match.
 The database runs `WHERE key = id`.
 When it finds a stored row, that row counts as a match. With a stored `'ABC'`:
