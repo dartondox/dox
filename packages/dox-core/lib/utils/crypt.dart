@@ -31,8 +31,15 @@ class Crypt {
     return encryptString(jsonEncode(value));
   }
 
-  /// the value of [encrypted] made with [encrypt]
+  /// the value of [encrypted] made with [encrypt]. Throws
+  /// [DecryptException] when it is not valid, or the text in it is not JSON
+  /// (it was made with [encryptString]).
   static dynamic decrypt(String encrypted) {
-    return jsonDecode(decryptString(encrypted));
+    String text = decryptString(encrypted);
+    try {
+      return jsonDecode(text);
+    } on FormatException {
+      throw DecryptException();
+    }
   }
 }

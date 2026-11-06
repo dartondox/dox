@@ -194,6 +194,57 @@ Total: {{ total }}
 @includeIf(user, 'partials/account')
 ```
 
+## More tags
+
+Close a block tag with `@end`. `@else` works in all of them, but not in `@once` and `@verbatim`.
+
+Put `@auth`, `@guest`, `@production`, `@once` and `@verbatim` alone on their line. In the middle of text, like `@once upon a time`, they stay text.
+
+| Tag | What it does |
+| --- | --- |
+| `@isset(user.phone) ... @end` | shows when the value is not `null`. A field of `null` is not an error here. |
+| `@empty(items) ... @end` | shows when the value is false: `null`, `false`, `0`, `''`, an empty list or map |
+| `@auth ... @end` | shows when the user is logged in (`req.auth`) |
+| `@guest ... @end` | shows when the user is not logged in |
+| `@env('local') ... @end` | shows when `APP_ENV` is this value. A list works too: `@env(['local', 'staging'])`. Case does not matter. |
+| `@production ... @end` | shows when `APP_ENV` is `production` |
+| `@once ... @end` | shows only the first time in one render, for example a `<script>` in a component |
+| `@verbatim ... @end` | prints the text as it is: no `{{ }}` and no tags run inside it |
+
+```html
+@auth
+  <a href="/logout">Log out</a>
+@else
+  <a href="/login">Log in</a>
+@end
+```
+
+`@auth` and `@guest` use the `req.auth` that `view()` gets. In `View.render` there is no request, so `@guest` shows.
+
+`@verbatim` ends at the first `@end`, so the text inside can not have `@end`. Use it for code of a JavaScript framework that also uses `{{ }}`:
+
+```html
+@verbatim
+  <div id="app">{{ message }}</div>
+@end
+```
+
+These tags print an HTML attribute:
+
+```html
+<a @class(['link', { active: isActive, muted: !isActive }])>Home</a>
+<input type="checkbox" name="news" @checked(user.news)>
+<option value="en" @selected(lang == 'en')>English</option>
+<button @disabled(saving)>Save</button>
+```
+
+- `@class` takes text, a map of class name to a condition, or a list of these. It prints `class="..."` with the names whose condition is true. The names are escaped.
+- `@checked`, `@selected` and `@disabled` print the attribute name when the value is true.
+
+A tag can not come right after a letter or a digit. Write `on @else off`, not `on@else off`.
+
+When `resources/views/components/` has a template with the same name, like `class.dox.html`, the component wins.
+
 ## Layouts and components
 
 A component is a template with its own props and slots. Use one for the page layout.
@@ -224,7 +275,8 @@ A component is a template with its own props and slots. Use one for the page lay
 - The second argument is the props. In the component they are variables (`title`), and also `$props.title`.
 - `@slot('name') ... @end` fills a named slot. Everything else goes into `$slots.main`.
 - A slot is HTML, so `{{ }}` does not escape it again.
-- A component only sees its props, `$props`, `$slots`, the globals and the request helpers of `view()` (see [Forms](#forms)). It does not see the variables of the page.
+- `$slot` is the same as `$slots.main`. Both are always there. They are empty when the component has no body.
+- A component only sees its props, `$props`, `$slots`, `$slot`, `$attributes`, the globals and the request helpers of `view()` (see [Forms](#forms)). It does not see the variables of the page.
 
 `@!component(...)` is a component with no body and no `@end`.
 
@@ -244,6 +296,28 @@ A template in `resources/views/components/` is also a tag with its name. A `.` i
 @!form.input({ name: 'email' })   {{-- components/form/input.dox.html --}}
 ```
 
+### Attributes
+
+`$attributes` has the props as HTML attributes. `{{ $attributes }}` prints them, like `id="save" title="Save"`. The values are escaped.
+
+`$attributes.merge({ ... })` adds default attributes. A prop wins over a default, but `class` is joined:
+
+```html
+<button {{ $attributes.merge({ class: 'btn', type: 'button' }) }}>{{ $slot }}</button>
+```
+
+```html
+@button({ class: 'btn-big', type: 'submit' })
+  Save
+@end
+```
+
+This prints `<button class="btn btn-big" type="submit">`.
+
+Only text, numbers and `true` are attributes. `true` prints the name alone, like `hidden`. `null`, `false`, lists, maps and objects are left out. You can still read any prop, like `$attributes.type`.
+
+`$attributes` keeps any attribute name, like `onclick`. So do not pass a map from the user as the props of a component.
+
 ## Forms
 
 With `SessionMiddleware`, `view()` adds these to every template:
@@ -255,6 +329,8 @@ With `SessionMiddleware`, `view()` adds these to every template:
 | `errors` | the flashed validation errors, like `errors.email` |
 | `old('email')` | the input of the request before |
 | `session('key')` | a value from the session |
+
+If your app has a global named `errors`, the global shows when the request has no validation errors. When there are validation errors, they win over the global.
 
 ```html
 <form method="POST" action="/register">
@@ -288,7 +364,9 @@ View.global('money', (num cents) => (cents / 100).toStringAsFixed(2));
 <p>{{ money(order.total) }}</p>
 ```
 
-The provider sets up the engine again in its `setup()`, and that removes the globals added before. So add globals in your provider, after `super.setup()`:
+You can add globals before or after `View.configure()`. The engine keeps them. When a name is in both, the value in `ViewConfig.globals` wins.
+
+Each isolate has its own engine. So add globals in your provider, after `super.setup()`. Then every isolate gets them:
 
 ```dart title="lib/providers/view_provider.dart"
 class AppViewProvider extends ViewProvider {

@@ -18,6 +18,8 @@
 - Fix: with `MethodOverride`, a POST with `_method=PUT` to a path with no PUT route now says "PUT is not allowed" in the 405 message. Before, it said "POST is not allowed".
 - The router calls `Route()` once per route lookup, not twice.
 - The warning for a middleware that returns `null` reads `APP_ENV` once, not on every such request.
+- Fix: `Crypt.decrypt` of a value made with `Crypt.encryptString` (text that is not JSON) gave a 500 error with a `FormatException`. Now it throws `DecryptException`, a 400 error.
+- Fix: in the OpenAPI docs, the short path of an optional route, like `/greet` for `/greet/{name?}`, listed a 404 "Not found" answer. It has no param, so no record can be missing. Now only `/greet/{name}` lists the 404.
 - Fix: a `Route.fallback` in a group with a param in its prefix, like `{tenant}`, now matches, and `req.param` gives the param. Before, the prefix was compared as plain text, so the fallback never ran.
 - Fix: `.where('id', '^[0-9]+$')` now matches. A leading `^` and a trailing `$` are dropped. Before, they ended up inside the route regex, so the route never matched.
 - `req.pathIs()` and `req.routeIs()` build the regex of a pattern once, not on every call.

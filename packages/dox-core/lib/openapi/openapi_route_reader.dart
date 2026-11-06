@@ -75,7 +75,12 @@ class OpenApiRouteReader {
       bodyMediaType: !inQuery && schema is Map<String, dynamic>
           ? RouteDoc.mediaTypeFor(schema)
           : null,
-      responses: _responses(op, request != null, security != null, path),
+      responses: _responses(op, request != null, security != null),
+      // only paths that still have a param can miss a record, so the short
+      // path of `/greet/{name?}` gets no 404
+      paramResponses: path.contains('{')
+          ? const <int, ResponseDoc>{404: ResponseDoc(description: 'Not found')}
+          : const <int, ResponseDoc>{},
       security: security,
       extensions: middleware.isEmpty
           ? const <String, dynamic>{}
@@ -205,7 +210,6 @@ class OpenApiRouteReader {
     OpenApiOperation? op,
     bool validates,
     bool secured,
-    String path,
   ) {
     Map<int, ResponseDoc> responses = <int, ResponseDoc>{...?op?.responses};
     if (responses.isEmpty) {
@@ -228,9 +232,6 @@ class OpenApiRouteReader {
           },
         ),
       );
-    }
-    if (path.contains('{')) {
-      _add(responses, 404, const ResponseDoc(description: 'Not found'));
     }
     if (validates) {
       usesValidationError = true;

@@ -370,6 +370,9 @@ When `bin/queue.dart` is missing, the command prints how to set it up and exits 
 | `dox queue:retry <id\|all>` | `bin/queue.dart retry <id\|all>` | Put one failed job, or all of them, back on the queue. |
 | `dox queue:forget <id>` | `bin/queue.dart forget <id>` | Delete one failed job. |
 | `dox queue:flush` | `bin/queue.dart flush` | Delete all failed jobs. |
+| `dox queue:clear [queue]` | `bin/queue.dart clear [queue]` | Delete the jobs of a queue. The default queue is `default`. |
+| `dox queue:restart` | `bin/queue.dart restart` | Make the running workers stop after their current jobs. The workers must share the cache store. |
+| `dox queue:prune-failed [--hours=N]` | `bin/queue.dart prune-failed [--hours=N]` | Delete failed jobs older than N hours. The default is 24. |
 | `dox queue:table` | | A [package command](../digging-deeper/package-commands.md) of `dox_queue`. Make `db/migration/<time>_create_queue_tables.dart`, which calls `QueueTables.up` and `QueueTables.down`. When a `create_queue_tables` migration is already there, it prints so and exits with code 1. |
 | `dox auth:tokens-table` | | A [package command](../digging-deeper/package-commands.md) of `dox_auth`. Make a migration for the `auth_access_tokens` table. When a `create_access_tokens_table` migration is already there, it prints so and exits with code 1. |
 

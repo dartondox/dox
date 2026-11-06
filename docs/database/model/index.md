@@ -244,6 +244,7 @@ Blog created = await Blog().create(<String, dynamic>{
   A field is compared to its value from the last load or save.
   A `Map` or `List` field is always sent, because it can change in place.
 - When nothing changed, `save()` runs no query, and `updated_at` stays as it is.
+- When you set `updatedAt` yourself, `save()` keeps your value. Else it sets `updated_at` to now.
 - On update, a field is set to `NULL` only when it had a value before
   (loaded from the database, or saved).
   Fields that were not loaded, for example with `select()`, are not changed.

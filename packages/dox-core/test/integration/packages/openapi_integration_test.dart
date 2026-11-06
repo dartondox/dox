@@ -345,7 +345,10 @@ void main() {
     expect(show['parameters'][0]['schema'], <String, dynamic>{
       'type': 'integer',
     });
-    expect(show['responses'].keys, <String>['200', '401', '404', '500']);
+    expect(
+      show['responses'].keys,
+      unorderedEquals(<String>['200', '401', '404', '500']),
+    );
 
     /// a GET request class becomes query params
     Map<String, dynamic> search = doc['paths']['/search']['get'];
@@ -436,6 +439,9 @@ void main() {
     Map<String, dynamic> paths = doc['paths'];
     expect(paths.keys, containsAll(<String>['/greet', '/greet/{name}']));
     expect(paths['/greet']['get']['parameters'], isNull);
+    // the short path has no param, so no record can be missing
+    expect(paths['/greet']['get']['responses'].keys, isNot(contains('404')));
+    expect(paths['/greet/{name}']['get']['responses'].keys, contains('404'));
   });
 
   test('include and exclude pick the routes by path', () {
