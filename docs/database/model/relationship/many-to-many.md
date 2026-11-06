@@ -139,8 +139,8 @@ SELECT "song".*, "artist_song"."artist_id" as "_owner_id" FROM "song"
 With `withPivot` or `withTimestamps`, it also selects those pivot columns, like `"artist_song"."role" as "_pivot_role"`.
 
 !!! note "After `reload()` or a preload"
-    `await user.reload()` loads the relations again. A relation with no related row is set again, so it never keeps an old value.
-    A to-one field that can be null becomes `null`. A to-many field becomes `[]`.
+    `await artist.reload()` and a preload set the relation fields again, also when there is no related row.
+    A to-one field that can be null becomes `null`. A to-many field becomes `[]`. A to-one field that can not be null keeps its old value.
 
 ## Read pivot columns
 

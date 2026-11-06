@@ -21,7 +21,7 @@ Add it in `register()` of `WebRouter`.
 Route.staticFiles('/', 'public');
 ```
 
-`GET /app.js` sends `public/app.js` with the right `Content-Type`. A route always wins over a file. A missing file goes on to the other routes, then to `404`.
+`GET /app.js` sends `public/app.js` with the right `Content-Type`. A route always wins over a file. A missing file goes to `Route.fallback` if you added one, else to `404`.
 It sends `ETag` and `Last-Modified`, and the browser gets `304` when it already has the file. Add `maxAge:` to send a `Cache-Control` header.
 See [Routing: serve static files](../the-basic/routing.md#serve-static-files) for all the rules.
 

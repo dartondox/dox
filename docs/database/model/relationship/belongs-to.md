@@ -119,8 +119,8 @@ Each user is read once, also when it has many comments.
 Comments of the same user get the same `User` object.
 
 !!! note "After `reload()` or a preload"
-    `await user.reload()` loads the relations again. A relation with no related row is set again, so it never keeps an old value.
-    A to-one field that can be null becomes `null`. A to-many field becomes `[]`.
+    `await comment.reload()` and a preload set the relation fields again, also when there is no related row.
+    A to-one field that can be null becomes `null`. A to-many field becomes `[]`. A to-one field that can not be null keeps its old value.
 
 ## Filter by it
 

@@ -106,8 +106,8 @@ SELECT *, "user_id" as "_owner_id" FROM "user_info" WHERE "user_id" IN (@user_id
 ```
 
 !!! note "After `reload()` or a preload"
-    `await user.reload()` loads the relations again. A relation with no related row is set again, so it never keeps an old value.
-    A to-one field that can be null becomes `null`. A to-many field becomes `[]`.
+    `await user.reload()` and a preload set the relation fields again, also when there is no related row.
+    A to-one field that can be null becomes `null`. A to-many field becomes `[]`. A to-one field that can not be null keeps its old value.
 
 ## Filter by it
 

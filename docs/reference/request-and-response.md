@@ -21,7 +21,8 @@ A simple middleware (`IDoxMiddleware`) gets an `IDoxRequest`. A controller and a
 | `validateSchema<O>(Schema<O> schema)` | `Future<O>` | Query and body checked with a fluent `dox_validation` schema. | no |
 | `all()` | `Map<String, dynamic>` | Query and body together. Body wins on the same key. | yes |
 | `only(List<String> keys)` | `Map<String, dynamic>` | Only these keys from `all()`. A missing key gives `null`. | yes |
-| `input(String key, [dynamic defaultValue])` | `dynamic` | One value from `all()`. A dot key like `user.name` or `items.0.id` reads inside maps and lists. The default is used when the key is not there or is null. | yes |
+| `input(String key)` | `dynamic` | One value from `all()`. | yes |
+| `input(String key, [dynamic defaultValue])` | `dynamic` | One value from `all()`. A dot key like `user.name` or `items.0.id` reads inside maps and lists. The default is used when the key is not there or is null. | no |
 | `except(List<String> keys)` | `Map<String, dynamic>` | All values from `all()`, without these keys. | no |
 | `has(String key)` | `bool` | `true` when the key is there and its text is not empty. | yes |
 | `exists(String key)` | `bool` | `true` when the key is there, with any value (also `''` or null). | no |
