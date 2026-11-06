@@ -19,9 +19,9 @@ The packages in the main repo share one version number. The other packages live 
 
 | Package | What it does | State | Tests |
 | --- | --- | --- | --- |
-| `dox_core` | Routes, middleware, controllers, request and response, isolates, config, the IoC container, exception handler, sessions, CSRF, rate limit, security headers, health check, test client | Stable | 527 tests in 61 files. CI runs them on the native server. |
-| `dox_orm` | Query builder, models, relations, `whereHas`, scopes, casts, `withCount`, transactions, row locks, many to many writes, polymorphic relations, factories, seeders | Stable | 544 tests in 51 files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite. |
-| `dox_validation` | `@Dto` rules, fluent schemas, JSON Schema, Standard Schema | Stable | 146 tests in 8 files |
+| `dox_core` | Routes, middleware, controllers, request and response, isolates, config, the IoC container, exception handler, sessions, CSRF, rate limit, security headers, health check, test client | Stable | 528 tests in 61 files. CI runs them on the native server. |
+| `dox_orm` | Query builder, models, relations, `whereHas`, scopes, casts, `withCount`, transactions, row locks, many to many writes, polymorphic relations, factories, seeders | Stable | 547 tests in 51 files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite. |
+| `dox_validation` | `@Dto` rules, fluent schemas, JSON Schema, Standard Schema | Stable | 147 tests in 8 files |
 | `dox_builder` | Code generator for models, DTOs, env classes, the container and OpenAPI | Stable | 86 tests in 5 files |
 | `dox_annotation` | Annotations used by the generator | Stable | 6 tests in 1 file. Mostly tested through `dox_builder`. |
 | `dox` (CLI) | `dox create`, `dox serve`, `dox build`, `make:*`, `migration:*`, `db:seed`, `queue:*`, `schedule:*`, package commands | Stable | 132 tests in 12 files |
@@ -35,7 +35,7 @@ The packages in the main repo share one version number. The other packages live 
 | `dox_scheduler` | Run tasks on a schedule | New | 106 tests in 6 files, with Redis in CI |
 | `dox_view` | [Views](../the-basic/views.md): `.dox.html` templates with layouts and components | New | 40 tests in 2 files |
 | [`dox_inertia`](../the-basic/inertia.md) | Inertia.js server side: single page apps with React, Vue or Svelte and Dox controllers | New | 34 tests in 2 files |
-| `dox_mailer` | Email with SMTP, Amazon SES, Azure, Resend, Mailgun, Postmark and sendmail, mailables, Markdown mail, notifications | New | 121 tests in 12 files, with a fake SMTP server |
+| `dox_mailer` | Email with SMTP, Amazon SES, Azure, Resend, Mailgun, Postmark and sendmail, mailables, Markdown mail, notifications | New | 122 tests in 12 files, with a fake SMTP server |
 | `dox_http_native` | Native HTTP/1.1 and WebSocket server in Rust, on the isolate's own thread. Dox has no other server. | New | 65 Dart tests in 4 files, and 32 Rust tests |
 | `dox_postgres_native` | Native Postgres client (Rust tokio-postgres), the Postgres driver. Has TLS (`sslmode`, `sslRootCert`). | New | 41 tests in 7 files, plus the `dox_orm` tests |
 | `dox_mysql_native` | Native MySQL and MariaDB client (Rust mysql_async), the MySQL driver. Has TLS. | New | 30 tests in 2 files, plus the `dox_orm` tests |
