@@ -274,6 +274,12 @@ class A {
             "s.requiredWhen(constRequiredWith(<String>['type']),c2,input,p,'size',_m,);",
           ),
         );
+        // the rules run after all fields are converted, so a rule can
+        // read a field that comes after it
+        expect(
+          code.indexOf('s.requiredWhen('),
+          greaterThan(code.indexOf('Object?c2;')),
+        );
       },
     );
 

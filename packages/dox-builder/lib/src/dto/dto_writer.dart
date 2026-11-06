@@ -157,6 +157,7 @@ class DtoWriter {
         ..writeln('}')
         ..writeln('}');
     }
+    StringBuffer requiredWhen = StringBuffer();
     for (int i = 0; i < dto.fields.length; i++) {
       DtoField field = dto.fields[i];
       String c = 'c$i';
@@ -177,12 +178,17 @@ class DtoWriter {
         out.writeln('if ($c == null) s.required(p, $key, _m);');
       }
       // requiredWhen checks if the value is missing (blank text and an
-      // empty list count as missing too)
+      // empty list count as missing too). It runs after all fields are
+      // converted, so it reads the converted value of a later field too.
       for (DtoRule rule in field.requiredWhen) {
-        out.writeln('s.requiredWhen(${rule.source}, $c, input, p, $key, _m);');
+        requiredWhen.writeln(
+          's.requiredWhen(${rule.source}, $c, input, p, $key, _m);',
+        );
       }
     }
-    out.writeln('if (s.issues.length != e) return null;');
+    out
+      ..write(requiredWhen)
+      ..writeln('if (s.issues.length != e) return null;');
     StringBuffer rules = StringBuffer();
     for (int i = 0; i < dto.fields.length; i++) {
       _fieldRules(rules, dto.fields[i], 'c$i');

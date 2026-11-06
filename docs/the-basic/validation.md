@@ -293,7 +293,7 @@ The key is the path to the value, with the input keys. List items use the index.
 Change a message in one of these places. The first one wins.
 
 1. On the rule: `@Email(message: 'Please check your email')`.
-2. On the DTO, by code or by `key.code`:
+2. On the DTO, by code or by `key.code`. A full dotted path works too, like `'address.city.required'` (it also reaches a nested DTO). Use `*` for list items, like `'tags.*.required'`:
 
 ```dart
 @Dto(messages: <String, String>{

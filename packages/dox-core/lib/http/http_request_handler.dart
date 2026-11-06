@@ -104,7 +104,9 @@ void _runOverridden(
   RequestBody body,
   ContentType? contentType,
 ) {
-  String? method = MethodOverride.from(body.map);
+  String? method =
+      MethodOverride.fromHeader(req.headers.value(MethodOverride.headerName)) ??
+      MethodOverride.from(body.map);
   RouteMatch? match = httpRouteHandler(req, method: method);
   if (match == null) return;
   httpCorsHandler(match.route.corsEnabled, req);

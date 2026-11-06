@@ -246,7 +246,7 @@ In a fluent schema, use `v.string().unique('users', column: 'email')` and `v.int
 | `@Dto(source: Source.query)` | where to read: `Source.auto` (default), `Source.query`, `Source.body`. |
 | `@Dto(keyCase: KeyCase.field)` | keys: `KeyCase.snake` (default) or `KeyCase.field` (the Dart name as is). |
 | `@Dto(strict: true)` | unknown keys are errors. Default `false`: they are dropped. |
-| `@Dto(messages: {...})` | messages by `code` or `key.code`. |
+| `@Dto(messages: {...})` | messages by `code` or `key.code`. A dotted path like `address.city.required` or `tags.*.required` works too. |
 
 A `///` doc comment on a field becomes its `description` in the JSON Schema.
 

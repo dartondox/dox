@@ -61,6 +61,8 @@ Route.delete('/blogs/{id}', (BlogController c) => c.destroy);
 !!! info
     There are also `Route.options`, `Route.copy`, `Route.view`, `Route.link`, `Route.unlink`,
     `Route.purge`, `Route.lock`, `Route.unlock` and `Route.propfind`.
+    These are HTTP methods. `Route.view` is the WebDAV `VIEW` method. It does not render a template like Laravel `Route::view`.
+    To show a template, use a GET route: `Route.get('welcome', (DoxRequest req) => view(req, 'welcome'))` with `view()` of `dox_view`.
 
     `Route.health('/health')` adds a health check route. It answers `200` with `{"status": "ok"}`.
     `Route.websocket('echo', (WebSocket socket, DoxRequest req) {...})` adds a raw WebSocket route.
@@ -186,7 +188,7 @@ Route.get('/docs/{page}', handler).where('page', '.*'); // matches slashes too
 - A param name that the path does not have throws an `ArgumentError` at start.
 - Call `.where` more than once for more params.
 - Routes without `.where` match the same as before. The check costs nothing for them.
-- The regex checks the param text two times: as it is in the URL, and again after `%` codes are decoded. Both checks must pass. So `/users/%31` does not match `[0-9]+`, even though `%31` is `1`. And `/files/x%2Fy` does not match `[^/]+`, because `%2F` is `/`. The controller gets the decoded value.
+- The regex checks the param text two times: as it is in the URL, and again after `%` codes are decoded. Both checks must pass. A `%` code for a letter, a digit or `-._~` is decoded before the router sees the path, so `/users/%31` is `/users/1` and matches `[0-9]+`. Other `%` codes stay in the URL text and must pass the second check. So `/files/x%2Fy` does not match `[^/]+`, because `%2F` is `/`. The controller gets the decoded value. In the second check, `.` also matches a new line (`%0A`), so `.*` still matches it.
 
 ## Group routes
 
@@ -271,6 +273,16 @@ Then send the form as POST with a `_method` field.
 - `req.method` gives the new method.
 - `CsrfMiddleware` still checks the request, so send the `_token` field too.
 - It works only in `globalMiddleware`, not on a router or a route. It is off by default.
+
+A client that can not send PUT, like an old proxy or JS client, can send the `X-HTTP-Method-Override` header instead. Turn it on with `header: true`. It is off by default.
+
+```dart
+AppConfig(
+  globalMiddleware: <dynamic>[const MethodOverride(header: true)],
+);
+```
+
+The header has the same rules as `_method`. When both are there, the header wins.
 
 ## Named routes
 

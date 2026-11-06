@@ -29,6 +29,15 @@ void main() {
       expect(value, null);
     });
 
+    test('many and putMany', () async {
+      await Cache().putMany(<String, Object?>{'m1': 'a', 'm2': 2});
+      expect(await Cache().many(<String>['m1', 'm2', 'm3']), <String, dynamic>{
+        'm1': 'a',
+        'm2': 2,
+        'm3': null,
+      });
+    });
+
     test('get', () async {
       await Cache().forget('name');
       String? value2 = await Cache().get('name');

@@ -174,9 +174,7 @@ for (Comment c in comments) {
   A comment with no type, or an empty type `''`, gets `null`.
 - `related<Photo>('commentable')` on one comment gives the query of its photo.
 
-!!! note "After `reload()` or a preload"
-    `await comment.reload()` and a preload set the relation fields again, also when there is no related row.
-    A to-one field that can be null becomes `null`. A to-many field becomes `[]`. A to-one field that can not be null keeps its old value.
+`reload()` and a preload set the relation fields again, also when there is no related row. See [Relationships](../index.md#relationships).
 
 ## Filter by it
 

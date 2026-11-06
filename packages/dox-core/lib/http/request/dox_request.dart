@@ -345,7 +345,7 @@ class DoxRequest implements IDoxRequest {
   /// req.pathIs('admin/*');
   /// ```
   bool pathIs(String pattern) {
-    RegExp regex = _wildcard(sanitizeRoutePath(pattern).substring(1));
+    RegExp regex = _pathWildcard(pattern);
     String raw = uri.path;
     String clean = sanitizeRoutePath(raw);
     try {
@@ -380,6 +380,19 @@ class DoxRequest implements IDoxRequest {
   /// code, so the map stays small.
   // ponytail: cleared when full, an LRU if apps build many patterns
   static final Map<String, RegExp> _wildcards = <String, RegExp>{};
+
+  /// raw `pathIs` pattern => its regex, so the pattern is cleaned once
+  // ponytail: cleared when full, like [_wildcards]
+  static final Map<String, RegExp> _pathWildcards = <String, RegExp>{};
+
+  static RegExp _pathWildcard(String pattern) {
+    RegExp? cached = _pathWildcards[pattern];
+    if (cached != null) return cached;
+    if (_pathWildcards.length >= 256) _pathWildcards.clear();
+    return _pathWildcards[pattern] = _wildcard(
+      sanitizeRoutePath(pattern).substring(1),
+    );
+  }
 
   static RegExp _wildcard(String pattern) {
     RegExp? cached = _wildcards[pattern];

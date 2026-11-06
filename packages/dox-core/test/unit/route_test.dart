@@ -1,5 +1,6 @@
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/router/route_data.dart';
+import 'package:dox_core/http/http_static_handler.dart';
 import 'package:test/test.dart';
 
 import '../integration/requirements/controllers/admin.controller.dart';
@@ -9,6 +10,14 @@ void main() {
   group('Route |', () {
     setUp(() {
       Route().setRoutes(<RouteData>[]);
+    });
+
+    test('setStatics with its own list keeps the folders', () {
+      Route().setStatics(<StaticFolder>[]);
+      Route.staticFiles('/', 'public');
+      Route().setStatics(Route().statics);
+      expect(Route().statics.length, 1);
+      Route().setStatics(<StaticFolder>[]);
     });
 
     test('get', () {

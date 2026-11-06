@@ -2052,26 +2052,10 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> {
     // company: String?
     Object? c4;
     c4 = s.string(s.read(input, 'company'), p, 'company', _m);
-    s.requiredWhen(
-      const RequiredIf('type', 'company'),
-      c4,
-      input,
-      p,
-      'company',
-      _m,
-    );
     // countryCode: Maybe<String>
     Object? c5;
     c5 = s.string(s.read(input, 'country_code'), p, 'country_code', _m);
     if (c5 == null) s.required(p, 'country_code', _m);
-    s.requiredWhen(
-      const RequiredWith(<String>['phone']),
-      c5,
-      input,
-      p,
-      'country_code',
-      _m,
-    );
     // phone: String?
     Object? c6;
     c6 = s.string(s.read(input, 'phone'), p, 'phone', _m);
@@ -2093,14 +2077,6 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> {
     // adminCode: String?
     Object? c9;
     c9 = s.string(s.read(input, 'admin_code'), p, 'admin_code', _m);
-    s.requiredWhen(
-      const RequiredIf('role', Role.admin),
-      c9,
-      input,
-      p,
-      'admin_code',
-      _m,
-    );
     // tags: List<String>?
     Object? c10;
     c10 = s.list(s.read(input, 'tags'), p, 'tags', _m);
@@ -2118,14 +2094,6 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> {
       }
       c10 = o0;
     }
-    s.requiredWhen(
-      const RequiredWith(<String>['tag_source']),
-      c10,
-      input,
-      p,
-      'tags',
-      _m,
-    );
     // pin: String?
     Object? c11;
     c11 = s.string(s.read(input, 'pin'), p, 'pin', _m);
@@ -2138,6 +2106,59 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> {
     // secret: String?
     Object? c14;
     c14 = s.string(s.read(input, 'secret'), p, 'secret', _m);
+    // planNote: String?
+    Object? c15;
+    c15 = s.string(s.read(input, 'plan_note'), p, 'plan_note', _m);
+    // plan: String?
+    Object? c16;
+    c16 = s.string(
+      s.read(input, 'plan'),
+      p,
+      'plan',
+      _m,
+      trim: true,
+      textCase: 1,
+    );
+    s.requiredWhen(
+      const RequiredIf('type', 'company'),
+      c4,
+      input,
+      p,
+      'company',
+      _m,
+    );
+    s.requiredWhen(
+      const RequiredWith(<String>['phone']),
+      c5,
+      input,
+      p,
+      'country_code',
+      _m,
+    );
+    s.requiredWhen(
+      const RequiredIf('role', Role.admin),
+      c9,
+      input,
+      p,
+      'admin_code',
+      _m,
+    );
+    s.requiredWhen(
+      const RequiredWith(<String>['tag_source']),
+      c10,
+      input,
+      p,
+      'tags',
+      _m,
+    );
+    s.requiredWhen(
+      const RequiredIf('plan', 'pro'),
+      c15,
+      input,
+      p,
+      'plan_note',
+      _m,
+    );
     if (s.issues.length != e) return null;
     if (c0 is String) {
       if (!(const Confirmed().check(c0, s.context(p, 'password', c0)))) {
@@ -2204,6 +2225,8 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> {
       code: c12 is Undefined ? null : c12 as String?,
       day: c13 is Undefined ? null : c13 as String?,
       secret: c14 is Undefined ? null : c14 as String?,
+      planNote: c15 is Undefined ? null : c15 as String?,
+      plan: c16 is Undefined ? null : c16 as String?,
     );
   }
 
@@ -2235,6 +2258,8 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> {
       code: m['code'] == null ? null : (m['code'] as String),
       day: m['day'] == null ? null : (m['day'] as String),
       secret: m['secret'] == null ? null : (m['secret'] as String),
+      planNote: m['plan_note'] == null ? null : (m['plan_note'] as String),
+      plan: m['plan'] == null ? null : (m['plan'] as String),
     );
   }
 
@@ -2255,6 +2280,8 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> {
     String? f12 = o.code;
     String? f13 = o.day;
     String? f14 = o.secret;
+    String? f15 = o.planNote;
+    String? f16 = o.plan;
     return <String, dynamic>{
       'password': f0,
       'email_again': f1,
@@ -2272,6 +2299,8 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> {
       'code': f12,
       'day': f13,
       'secret': f14,
+      'plan_note': f15,
+      'plan': f16,
     };
   }
 
@@ -2324,6 +2353,12 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> {
           'type': <dynamic>['string', 'null'],
         },
         'secret': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+        },
+        'plan_note': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+        },
+        'plan': <String, dynamic>{
           'type': <dynamic>['string', 'null'],
         },
       },

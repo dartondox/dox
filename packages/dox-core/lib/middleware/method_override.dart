@@ -28,11 +28,24 @@ import 'package:dox_core/dox_core.dart';
 /// with no route for any method gets 404 with no body read. The middleware
 /// itself does nothing; it only turns this on. It works only in
 /// `AppConfig.globalMiddleware`, not on a router or a route.
+///
+/// With [header] on, a POST can also ask for the method with the
+/// `X-HTTP-Method-Override` header, like a JS client that can not send
+/// PUT. The header wins over `_method`. It is off by default.
+/// ```
+/// globalMiddleware: <dynamic>[const MethodOverride(header: true)],
+/// ```
 class MethodOverride implements IDoxMiddleware {
-  const MethodOverride();
+  const MethodOverride({this.header = false});
+
+  /// also read the [headerName] header
+  final bool header;
 
   /// the form field name
   static const String field = '_method';
+
+  /// the header name, read only when [header] is on
+  static const String headerName = 'X-HTTP-Method-Override';
 
   static const Set<String> _allowed = <String>{'PUT', 'PATCH', 'DELETE'};
 
@@ -42,7 +55,17 @@ class MethodOverride implements IDoxMiddleware {
   /// The method [body] asks for with `_method`, or null when it asks for
   /// none or for one that is not PUT, PATCH or DELETE.
   static String? from(Map<String, dynamic> body) {
-    Object? value = body[field];
+    return _allowedMethod(body[field]);
+  }
+
+  /// The method the [headerName] header [value] asks for, like [from].
+  /// Null when no [MethodOverride] in the global middleware has [header]
+  /// on.
+  static String? fromHeader(String? value) {
+    return _header ? _allowedMethod(value) : null;
+  }
+
+  static String? _allowedMethod(Object? value) {
     if (value is! String) return null;
     String method = value.toUpperCase();
     return _allowed.contains(method) ? method : null;
@@ -50,6 +73,7 @@ class MethodOverride implements IDoxMiddleware {
 
   static List<dynamic>? _checked;
   static bool _on = false;
+  static bool _header = false;
 
   /// true when [global] has a [MethodOverride]. checked again only when
   /// the list changes.
@@ -57,8 +81,12 @@ class MethodOverride implements IDoxMiddleware {
     if (!identical(global, _checked)) {
       _checked = global;
       _on = false;
+      _header = false;
       for (Object? item in global) {
-        if (item is MethodOverride) _on = true;
+        if (item is MethodOverride) {
+          _on = true;
+          if (item.header) _header = true;
+        }
       }
     }
     return _on;

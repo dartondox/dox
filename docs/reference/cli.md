@@ -388,6 +388,15 @@ Flags of `queue:work`, passed on as they are:
 
 An unknown flag or command prints the usage and exits with code 64.
 
+Flags of `auth:tokens-table`. They set the same options of `AccessTokenTables.up`:
+
+| Flag | Meaning |
+| --- | --- |
+| `--uuid` | The users have uuid ids. Set `uuidIds: true` on `AccessTokenAuthDriver` too. |
+| `--string-ids` | The users have text ids. Set `stringIds: true` on `AccessTokenAuthDriver` too. Do not use it with `--uuid`. |
+| `--users-table=<table>` | Add a foreign key from `tokenable_id` to this table, with cascade delete. |
+| `--users-key=<column>` | The column of `--users-table` for the foreign key. Default: `id`. It does nothing without `--users-table`. |
+
 The `bin/queue.dart` of a new project (`<app>` is the `name` in `pubspec.yaml`). The jobs come from `queueConfig` in `lib/config/queue.dart`:
 
 ```dart

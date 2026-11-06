@@ -42,6 +42,14 @@ class Hash {
     }
   }
 
+  /// same as [verify], with the Laravel name
+  /// ```
+  /// Hash.check('secret', '<hashedString>');
+  /// ```
+  static bool check(String password, String hashedPassword) {
+    return verify(password, hashedPassword);
+  }
+
   /// same as [make], but runs bcrypt in a new isolate,
   /// so the server can answer other requests in the meantime.
   /// ```

@@ -141,10 +141,16 @@ void main() {
     (await client.get('/tags/a%20b')).expectBody('tags a b');
     (await client.get('/users/42')).expectBody('id 42');
     (await client.get('/users/%34%32')).expectBody('id 42');
+    // `%31` is a digit, so it is decoded before the router sees it
+    (await client.get('/users/%31')).expectBody('id 1');
   });
 
   test('where can let a param match slashes', () async {
     (await client.get('/docs/a/b/c')).expectBody('page a/b/c');
+  });
+
+  test('where .* still matches a decoded new line', () async {
+    (await client.get('/docs/a%0Ab')).expectBody('page a\nb');
   });
 
   test('where works on an optional param', () async {

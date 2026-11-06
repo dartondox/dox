@@ -364,6 +364,14 @@ class MoreRules {
   @Password(mixedCase: true, numbers: true, symbols: true)
   final String? secret;
 
+  // the rule reads `plan`, a field after it, as the converted text
+  @RequiredIf('plan', 'pro')
+  final String? planNote;
+
+  @Trim()
+  @Lowercase()
+  final String? plan;
+
   const MoreRules({
     this.password,
     this.emailAgain,
@@ -380,6 +388,8 @@ class MoreRules {
     this.code,
     this.day,
     this.secret,
+    this.planNote,
+    this.plan,
   });
 
   static const DtoSchema<MoreRules> schema = $MoreRulesDto;

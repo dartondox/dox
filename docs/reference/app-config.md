@@ -237,7 +237,7 @@ Keys of `extra`:
 | mysql, sqlite | `preparedStatementCacheSize` | `int` | `100` | Prepared statements kept per connection. |
 | postgres | `sslMode` | `String` | `require` with `useSSL`, else `disable` | TLS mode: `disable`, `prefer`, `require` or `verify-full`. |
 | postgres | `sslRootCert` | `String` | none | Path of a PEM file with the CA certificates to trust for `verify-full`. `sslrootcert` in `DATABASE_URL`. |
-| postgres | `sslWarning` | `bool` | `true` | `false` hides the one warning that Dox prints when TLS mode is `require`. `sslWarning=false` in `DATABASE_URL` works too. |
+| postgres | `sslWarning` | `bool` | `true` | `false` hides the warning that Dox prints (once per isolate) when TLS mode is `require`. `sslWarning=false` in `DATABASE_URL` works too. |
 | postgres | `timeZone` | `String` | `UTC` | Session time zone. |
 | postgres | `applicationName` | `String` | none | Name of the app in `pg_stat_activity`. |
 | mysql | `verifyCertificate` | `bool` | `true` | `false` skips the TLS certificate check. Only for a self-signed certificate in development. |

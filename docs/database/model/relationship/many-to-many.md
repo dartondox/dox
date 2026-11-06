@@ -138,9 +138,7 @@ SELECT "song".*, "artist_song"."artist_id" as "_owner_id" FROM "song"
 
 With `withPivot` or `withTimestamps`, it also selects those pivot columns, like `"artist_song"."role" as "_pivot_role"`.
 
-!!! note "After `reload()` or a preload"
-    `await artist.reload()` and a preload set the relation fields again, also when there is no related row.
-    A to-one field that can be null becomes `null`. A to-many field becomes `[]`. A to-one field that can not be null keeps its old value.
+`reload()` and a preload set the relation fields again, also when there is no related row. See [Relationships](../index.md#relationships).
 
 ## Read pivot columns
 
@@ -223,7 +221,7 @@ A text key column can compare text without case.
 This is the default in MySQL and MariaDB, and in SQLite with `COLLATE NOCASE`.
 `COLLATE NOCASE` ignores case only. MariaDB can also ignore end spaces.
 Dart does not know that. So `sync` and `toggle` also ask the database about each text id that Dart did not match.
-The database runs `WHERE key = id`.
+Dox asks the database about all of these ids in one query (one query per 100 ids), with `WHERE key = id` for each id.
 When it finds a stored row, that row counts as a match. With a stored `'ABC'`:
 
 - `sync('songs', ['abc'])` keeps the row `'ABC'`. It adds no row and deletes nothing.

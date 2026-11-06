@@ -174,6 +174,7 @@ String url = await Storage().signedUrl('invoices/1.pdf'); // https://app.test/fi
 A missing, wrong or expired signature answers `403`.
 Signed URLs work only on a `local` disk. For another disk, use `signed: false`.
 A signed URL works only on the route of its own disk.
+An old signed URL, made before the disk name was part of the signature, still works on any local disk with the same app key. This ends when it expires.
 Set the disk `url` option to the full URL of the route (`https://app.test/files`).
 
 ## Tests

@@ -114,9 +114,7 @@ The load runs this SQL:
 SELECT *, "user_id" as "_owner_id" FROM "post" WHERE "user_id" IN (@user_id_p0, ...)
 ```
 
-!!! note "After `reload()` or a preload"
-    `await user.reload()` and a preload set the relation fields again, also when there is no related row.
-    A to-one field that can be null becomes `null`. A to-many field becomes `[]`. A to-one field that can not be null keeps its old value.
+`reload()` and a preload set the relation fields again, also when there is no related row. See [Relationships](../index.md#relationships).
 
 ## Filter by it
 
