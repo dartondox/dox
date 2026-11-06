@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/http/http_static_handler.dart';
 import 'package:dox_core/isolate/isolate_handler.dart';
 import 'package:dox_core/isolate/isolate_interfaces.dart';
 import 'package:dox_core/middleware/rate_limit_counter.dart';
@@ -27,6 +28,10 @@ class DoxIsolate {
   /// `Route.fallback` routes added before `startServer()`, like [_baseRoutes]
   List<RouteData> _baseFallbacks = <RouteData>[];
 
+  /// `Route.staticFiles` folders added before `startServer()`, like
+  /// [_baseRoutes]
+  List<StaticFolder> _baseStatics = <StaticFolder>[];
+
   /// wait before a dead isolate is started again,
   /// so a crash loop does not burn the CPU
   Duration restartDelay = const Duration(seconds: 1);
@@ -43,6 +48,7 @@ class DoxIsolate {
     _stopped = false;
     _baseRoutes = List<RouteData>.of(Route().routes);
     _baseFallbacks = List<RouteData>.of(Route().fallbacks);
+    _baseStatics = List<StaticFolder>.of(Route().statics);
     for (int i = 1; i < count; i++) {
       await _spawn(i + 1);
     }
@@ -129,6 +135,7 @@ class DoxIsolate {
         Dox().doxProviders,
         routes: _baseRoutes,
         fallbacks: _baseFallbacks,
+        statics: _baseStatics,
         bindings: Route().bindings,
         control: controlPort.sendPort,
         rateLimitPort: RateLimitCounter.instance.port,

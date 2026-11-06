@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Fix: with more than one isolate, `Route.staticFiles` added before `startServer()` and outside a `Router` worked only in the main isolate. A file like `/app.css` got a 404 at random. Now the static folders go to every isolate, like routes and fallbacks.
 - Fix: a route with an optional param, like `/greet/{name?}`, now shows in the OpenAPI docs as both `/greet` and `/greet/{name}`. Before, only `/greet/{name}` was there, because the `?` was removed before `dox_openapi` could see it.
 - Fix: `req.session.reflash()` now keeps the flash data when it is the first use of the session in a request. Before, it kept nothing, because the old flash keys were read before the session was loaded.
 - Docs: `has` does not read dot keys (only `input`, `filled`, `exists`, `missing`, `boolean` and `integer` do). `.where` checks the param before `%` decoding. `Route.redirect` does not fill `{id}` in the target and drops the query string. A GET to a POST-only path gets the fallback if a fallback covers the path, else 405. A fallback added after `startServer()` does not reach the other isolates.
