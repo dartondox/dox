@@ -20,8 +20,8 @@ The packages in the main repo share one version number. The other packages live 
 | Package | What it does | State | Tests |
 | --- | --- | --- | --- |
 | `dox_core` | Routes, middleware, controllers, request and response, isolates, config, the IoC container, exception handler, sessions, CSRF, rate limit, security headers, health check, test client | Stable | 528 tests in 61 files. CI runs them on the native server. |
-| `dox_orm` | Query builder, models, relations, `whereHas`, scopes, casts, `withCount`, transactions, row locks, many to many writes, polymorphic relations, factories, seeders | Stable | 547 tests in 51 files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite. |
-| `dox_validation` | `@Dto` rules, fluent schemas, JSON Schema, Standard Schema | Stable | 147 tests in 8 files |
+| `dox_orm` | Query builder, models, relations, `whereHas`, scopes, casts, `withCount`, transactions, row locks, many to many writes, polymorphic relations, factories, seeders | Stable | 549 tests in 51 files. CI runs them on Postgres, MariaDB, MySQL 8.4 and SQLite. |
+| `dox_validation` | `@Dto` rules, fluent schemas, JSON Schema, Standard Schema | Stable | 149 tests in 8 files |
 | `dox_builder` | Code generator for models, DTOs, env classes, the container and OpenAPI | Stable | 86 tests in 5 files |
 | `dox_annotation` | Annotations used by the generator | Stable | 6 tests in 1 file. Mostly tested through `dox_builder`. |
 | `dox` (CLI) | `dox create`, `dox serve`, `dox build`, `make:*`, `migration:*`, `db:seed`, `queue:*`, `schedule:*`, package commands | Stable | 132 tests in 12 files |
