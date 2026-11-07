@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ (github.event_name == 'workflow_dispatch' && inputs.version == '2.x') && inputs.ref || github.ref }}
           fetch-depth: 0
@@ -57,7 +57,7 @@ jobs:
       # The scripts in ci/ come from this workflow's commit. A 2.x deploy
       # checks out v2.x above, which has no ci/ folder.
       - name: Checkout the CI scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: .ci
           sparse-checkout: ci
