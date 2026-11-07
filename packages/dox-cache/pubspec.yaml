@@ -9,7 +9,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  crypto: ^3.0.7
+  crypto: ^3.0.8
   ioredis: ^3.0.1
 
 dev_dependencies:
