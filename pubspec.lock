@@ -197,10 +197,10 @@ packages:
     dependency: transitive
     description:
       name: crypto
-      sha256: c8ea0233063ba03258fbcf2ca4d6dadfefe14f02fab57702265467a19f27fadf
+      sha256: e3626ae6270383c9e3a549f34c9e4cd26c09ae6a9adaab2bf4737a00340efdc4
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.7"
+    version: "3.0.8"
   csslib:
     dependency: transitive
     description:
@@ -221,10 +221,10 @@ packages:
     dependency: transitive
     description:
       name: dox_http_native
-      sha256: "6c59ad187c185f742de9a17e76eaf3b9a6b7eb9dafc0632ae61992f9a9b0dd73"
+      sha256: d11d9d967a3f1cba999a2bc8f94327f794eeebd5b187ea51c0b02f791a1a33b1
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.2"
+    version: "3.0.3"
   dox_openapi:
     dependency: transitive
     description:
