@@ -24,7 +24,7 @@ jobs:
   check-version:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Folder:package, in publish order. Sets PACKAGES for the next steps.
       - name: Publish order
         run: ci/publish-order.sh
@@ -36,7 +36,7 @@ jobs:
     needs: check-version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Folder:package, in publish order. Sets PACKAGES for the next steps.
       - name: Publish order
         run: ci/publish-order.sh
@@ -67,7 +67,7 @@ jobs:
       id-token: write # pub.dev automated publishing (OIDC)
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Folder:package, in publish order. Sets PACKAGES for the next steps.
       - name: Publish order
         run: ci/publish-order.sh
