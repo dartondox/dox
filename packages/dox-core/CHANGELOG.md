@@ -1,5 +1,13 @@
-## Unreleased
+## 3.1.0
 
+- Behavior change: without Redis, `RateLimit` counts are now shared by all isolates. Before, each isolate counted alone, so the real limit was `max` times the number of isolates. Now `max` holds for the whole server. An app with more than one isolate gets a lower real limit than before. Raise `max` if you relied on the old number.
+- Security: new check of the `Origin` header on a WebSocket upgrade. Use `Route.websocket(allowedOrigins: [...])` for one route, or `AppConfig.webSocketAllowedOrigins` for all of them. It is off by default, so apps do not change. A WebSocket route with no check prints one warning on stderr at start.
+- Security fix: `back()` only follows a `Referer` of the same host. A referer of another site goes to the fallback. Before, it was an open redirect.
+- Fix: a multipart body with no boundary or no `Content-Disposition` gets 400, not 500.
+- Fix: the headers of `abort()` are kept on routes that have a next middleware.
+- Fix: a mounted handler that throws now gives 500. Before, the client could hang.
+- Fix: a download name with quotes or non-ASCII letters now gets a safe `Content-Disposition`.
+- New: one warning on stderr when CORS has origin `*` together with `credentials: true`.
 - New: `Crypt.encryptString` / `Crypt.decryptString` (and `Crypt.encrypt` / `Crypt.decrypt` for JSON values) use the `APP_KEY` of the app. Old keys in `previousKeys` still decrypt.
 - New: `Hash.check`, the same as `Hash.verify`, with the Laravel name.
 - New: `Cache().many(keys)` and `Cache().putMany(values, duration:)` on the facade. The store already had them.
@@ -40,7 +48,7 @@
 - Docs: the `abort` example now uses `req.auth?.id()`. `req.auth?.id` does not exist.
 - New: `MethodOverride` middleware. Add it to `AppConfig.globalMiddleware`, and a POST request with a `_method` field of `PUT`, `PATCH` or `DELETE` goes to the route of that method. So a plain HTML form can reach `Route.put`, `Route.patch`, `Route.delete` and `Route.resource` routes. `req.method` gives the new method. `CsrfMiddleware` still checks the request. Other `_method` values and other request methods are ignored. It is off when the middleware is not there.
 - Fix: `res.header(name, value)` now replaces a header with the same name in any case, like `withHeaders` does. Before, `header('Cache-Control', ..)` after `cache()` sent two `Cache-Control` values.
-- Removed the unused `middlewareAndControllerHandler` and `getDoxRequest` helpers.
+- Break: removed the unused `middlewareAndControllerHandler` and `getDoxRequest` helpers.
 - Fix: `res.withHeaders(map)` now adds the headers to the ones set before it. Before, it dropped them all, also the `Content-Disposition` of a download. A key in the map replaces the header with the same name, in any case (`cache-control` and `Cache-Control` are one header).
 - New: `SessionMiddleware().fromCookie(value)` loads a session from its cookie value, with no request. Use it for a Socket.IO login. Give the value as the browser sent it (still encrypted). It runs the same checks as the middleware: a changed cookie, a cookie of another name, a cookie made with another APP_KEY, an expired session or an unknown session id gives an empty session. Changes to it are not saved.
 - New: `DoxCookie.decrypt(name, value)` decrypts a cookie value like `req.cookie(name)` does. `req.cookie` now uses it, with no change in what it accepts.

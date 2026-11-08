@@ -26,7 +26,8 @@ overrides() {
     "$root"/../dox-auth/ "$root"/../dox-openapi/ "$root"/../dox-validation/ \
     "$root"/../dox-socketio/ "$root"/../dox-storage/ \
     "$root"/../dox-queue/ "$root"/../dox-mailer/ "$root"/../dox-view/ \
-    "$root"/../dox-scheduler/; do
+    "$root"/../dox-scheduler/ "$root"/../ioredis/ \
+    "$root"/../dox-postgres-native/ "$root"/../dox-mysql-native/; do
     [ -f "$dir/pubspec.yaml" ] || continue
     name=$(sed -nE 's/^name:[[:space:]]*([a-z0-9_]+).*/\1/p' "$dir/pubspec.yaml")
     printf '  %s:\n    path: %s\n' "$name" "${dir%/}"
@@ -41,6 +42,7 @@ cli="$root/../dox-cli"
 if [ -n "${CI:-}" ] || [ ! -f "$cli/pubspec_overrides.yaml" ]; then
   overrides > "$cli/pubspec_overrides.yaml"
 fi
+[ -z "${CI:-}" ] || "$root/ci/system-sqlite.sh" "$cli/pubspec.yaml"
 dart pub global activate --source path "$cli" >/dev/null
 export PATH="$PATH:$HOME/.pub-cache/bin"
 
@@ -55,6 +57,9 @@ port=39123
 sed -i.bak "s/^APP_PORT=.*/APP_PORT=$port/" .env && rm .env.bak
 
 overrides > pubspec_overrides.yaml
+
+# The sqlite3 hook uses the runner's SQLite, no download from GitHub.
+"$root/ci/system-sqlite.sh" pubspec.yaml
 
 dart pub get
 dart run build_runner build --delete-conflicting-outputs

@@ -122,6 +122,8 @@ jobs:
           path: ~/.pub-cache
           key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
           restore-keys: pub-${{ runner.os }}-
+      # CI only: the sqlite3 hook uses the runner's SQLite, no download.
+      - run: ci/system-sqlite.sh pubspec.yaml
       - run: dart pub get
       - name: Wait for services
         if: needs.changes.outputs.unit_services != ''
