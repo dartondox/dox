@@ -24,7 +24,7 @@ jobs:
   check-version:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # Folder:package, in publish order. Sets PACKAGES for the next steps.
       - name: Publish order
         run: ci/publish-order.sh
@@ -36,11 +36,11 @@ jobs:
     needs: check-version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # Folder:package, in publish order. Sets PACKAGES for the next steps.
       - name: Publish order
         run: ci/publish-order.sh
-      - uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
         with:
           sdk: stable
       # Pub workspace: one `dart pub get` at the root links all local packages,
@@ -67,12 +67,12 @@ jobs:
       id-token: write # pub.dev automated publishing (OIDC)
       contents: read
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # Folder:package, in publish order. Sets PACKAGES for the next steps.
       - name: Publish order
         run: ci/publish-order.sh
       # Sets up the OIDC token for pub.dev. No PUB_CREDENTIALS secret needed.
-      - uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
         with:
           sdk: stable
       # Check every package before anything is uploaded. The workspace links
