@@ -12,6 +12,9 @@ on:
       - 'v*'
   workflow_call:
 
+permissions:
+  contents: read
+
 # A new push to a branch cancels the old run of that branch.
 # Runs on main are never cancelled.
 concurrency:
@@ -35,7 +38,7 @@ jobs:
       unit_services: ${{ steps.diff.outputs.unit_services }}
       examples: ${{ steps.diff.outputs.examples }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
       - id: diff
@@ -48,17 +51,17 @@ jobs:
     if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # dox_openapi, dox_validation, ioredis and dox_http_native come from
       # clones of their repos (main, or the branch with the same name as
       # this PR), not from pub.dev. On a tag they come from pub.dev.
       # On a tag nothing uses the clones, so it skips them.
       - if: github.ref_type != 'tag'
         run: ci/clone-siblings.sh && ci/use-siblings.sh
-      - uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
         with:
           sdk: stable
-      - uses: actions/cache@v6
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.pub-cache
           key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
@@ -95,14 +98,14 @@ jobs:
     if: needs.changes.outputs.unit != '[]'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # dox_openapi, dox_validation, ioredis and dox_http_native from the
       # clones, like lint
       # On a tag nothing uses the clones, so it skips them.
       - if: github.ref_type != 'tag'
         run: ci/clone-siblings.sh && ci/use-siblings.sh
       # Caches the Rust dependencies of dox_http_native.
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         if: github.ref_type != 'tag'
         with:
           workspaces: ../dox-http-native/native -> target
@@ -111,10 +114,10 @@ jobs:
       - name: Start services
         if: needs.changes.outputs.unit_services != ''
         run: ci/start-services.sh ${{ needs.changes.outputs.unit_services }}
-      - uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
         with:
           sdk: stable
-      - uses: actions/cache@v6
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.pub-cache
           key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
@@ -140,15 +143,15 @@ jobs:
     if: needs.changes.outputs.examples != ''
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # On a tag too, the examples use the sibling clones on main, on
       # purpose: dox is released before dox_orm and the other siblings, so
       # pub.dev does not have versions that match this dox yet.
       - run: ci/clone-siblings.sh
-      - uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
         with:
           sdk: stable
-      - uses: actions/cache@v6
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.pub-cache
           key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
@@ -172,12 +175,12 @@ jobs:
     if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: ci/clone-siblings.sh
-      - uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
         with:
           sdk: stable
-      - uses: actions/cache@v6
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.pub-cache
           key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
