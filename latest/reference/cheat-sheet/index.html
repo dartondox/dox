@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="One page to keep open while you work. Each section links to its full page.">
+        <meta name="description" content="One page to keep open while you work.">
       
       
       
@@ -79,7 +79,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Cheat sheet | Dox">
-  <meta property="og:description" content="One page to keep open while you work. Each section links to its full page.">
+  <meta property="og:description" content="One page to keep open while you work.">
   <meta property="og:url" content="https://dartondox.dev/latest/reference/cheat-sheet/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -88,7 +88,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Cheat sheet | Dox">
-  <meta name="twitter:description" content="One page to keep open while you work. Each section links to its full page.">
+  <meta name="twitter:description" content="One page to keep open while you work.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -2188,6 +2188,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -2357,6 +2361,55 @@
     
   
     Mail
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/notifications/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-radio-tower"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4.9 16.1C1 12.2 1 5.8 4.9 1.9" />
+  <path d="M7.8 4.7a6.14 6.14 0 0 0-.8 7.5" />
+  <circle cx="12" cy="9" r="2" />
+  <path d="M16.2 4.8c2 2 2.26 5.11.8 7.47" />
+  <path d="M19.1 1.9a9.96 9.96 0 0 1 0 14.1" />
+  <path d="M9.5 18h5" />
+  <path d="m8 22 4-11 4 11" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Notifications
   
 
     
@@ -2650,6 +2703,50 @@
     
   
     Dox CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/package-commands/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-blocks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2" />
+  <rect x="14" y="2" width="8" height="8" rx="1" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Package commands
   
 
     
@@ -3675,6 +3772,8 @@
       
         
       
+        
+      
     
     
     
@@ -3889,6 +3988,53 @@
     
   
     ManyToMany
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../database/model/relationship/polymorphic/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-share-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="18" cy="5" r="3" />
+  <circle cx="6" cy="12" r="3" />
+  <circle cx="18" cy="19" r="3" />
+  <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
+  <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Polymorphic
   
 
     
@@ -6682,7 +6828,8 @@
 
 
 <h1 id="cheat-sheet">Cheat sheet</h1>
-<p>One page to keep open while you work. Each section links to its full page.</p>
+<p>One page to keep open while you work.</p>
+<p>Each section links to its full page.</p>
 <h2 id="project-layout">Project layout</h2>
 <table>
 <thead>
@@ -6843,6 +6990,30 @@
 <td>middleware first, controller last</td>
 </tr>
 <tr>
+<td><code>Route.match(&lt;String&gt;['GET', 'POST'], '/contact', handler)</code></td>
+<td>one handler for a list of methods</td>
+</tr>
+<tr>
+<td><code>Route.any('/webhook', handler)</code></td>
+<td>one handler for <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>PATCH</code> and <code>DELETE</code></td>
+</tr>
+<tr>
+<td><code>Route.redirect('/home', '/')</code> / <code>Route.permanentRedirect('/old', '/new')</code></td>
+<td>send a path to another URL. <code>302</code> by default, <code>301</code> for <code>permanentRedirect</code>.</td>
+</tr>
+<tr>
+<td><code>Route.get('/users/{id}', c.show).where('id', '[0-9]+')</code></td>
+<td>the route matches only when the param fits the regex</td>
+</tr>
+<tr>
+<td><code>Route.fallback((DoxRequest req) { ... })</code></td>
+<td>answers a <code>GET</code> or <code>HEAD</code> request that matches no route and no static file. Use it for a 404 page or an SPA.</td>
+</tr>
+<tr>
+<td><code>globalMiddleware: &lt;dynamic&gt;[const MethodOverride()]</code></td>
+<td>lets an HTML form reach <code>PUT</code>, <code>PATCH</code> and <code>DELETE</code> routes</td>
+</tr>
+<tr>
 <td><code>Route.group('/blogs', () { ... })</code></td>
 <td>prefix. Dox adds the <code>/</code> between parts.</td>
 </tr>
@@ -6861,6 +7032,10 @@
 <tr>
 <td><code>Route.health('/health')</code></td>
 <td><code>200 {"status": "ok"}</code>, or <code>503</code> when a check fails. See <a href="../../digging-deeper/health-check/">Health check</a>.</td>
+</tr>
+<tr>
+<td><code>Route.staticFiles('/', 'public')</code></td>
+<td>serve a folder (CSS, JS, images) when no route matches. <code>maxAge:</code> sets <code>Cache-Control</code></td>
 </tr>
 <tr>
 <td><code>Storage.route('files')</code></td>
@@ -6963,8 +7138,40 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 <td>many values</td>
 </tr>
 <tr>
-<td><code>req.has('name')</code></td>
-<td>key is there and not empty</td>
+<td><code>req.input('user.name', 'guest')</code></td>
+<td>dot key, with a default</td>
+</tr>
+<tr>
+<td><code>req.except(&lt;String&gt;['password'])</code></td>
+<td>all values but these</td>
+</tr>
+<tr>
+<td><code>req.has('name')</code> / <code>req.filled('name')</code></td>
+<td>key is there and not empty (only <code>filled</code> reads dot keys)</td>
+</tr>
+<tr>
+<td><code>req.exists('name')</code> / <code>req.missing('name')</code></td>
+<td>key is there (any value) / not there</td>
+</tr>
+<tr>
+<td><code>req.boolean('remember')</code> / <code>req.integer('page', 1)</code></td>
+<td>value as <code>bool</code> / <code>int</code></td>
+</tr>
+<tr>
+<td><code>req.file('avatar')</code> / <code>req.hasFile('avatar')</code></td>
+<td>uploaded file</td>
+</tr>
+<tr>
+<td><code>req.bearerToken()</code></td>
+<td>token of <code>Authorization: Bearer</code></td>
+</tr>
+<tr>
+<td><code>req.path()</code> / <code>req.fullUrl()</code></td>
+<td>path / full URL with query</td>
+</tr>
+<tr>
+<td><code>req.pathIs('admin/*')</code> / <code>req.routeIs('admin.*')</code></td>
+<td>path or route name matches</td>
 </tr>
 <tr>
 <td><code>req.body</code> / <code>req.query</code> / <code>req.param['id']</code></td>
@@ -6993,6 +7200,10 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 <tr>
 <td><code>req.auth?.user&lt;User&gt;()</code></td>
 <td>logged in user (after <code>AuthMiddleware</code>)</td>
+</tr>
+<tr>
+<td><code>req.auth?.id()</code> / <code>req.auth == null</code></td>
+<td>user id, or <code>true</code> for a guest</td>
 </tr>
 <tr>
 <td><code>req.method</code> / <code>req.uri</code></td>
@@ -7138,6 +7349,14 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 <td><code>@Length(min:, max:)</code>, <code>@MinLength(3)</code>, <code>@MaxLength(50)</code>, <code>@Email()</code>, <code>@Url()</code>, <code>@Uuid()</code>, <code>@Ip()</code>, <code>@Regex(r'..')</code>, <code>@In([..])</code>, <code>@NotIn([..])</code>, <code>@StartsWith('a')</code>, <code>@EndsWith('b')</code>, <code>@Alpha()</code>, <code>@AlphaNumeric()</code>, <code>@AlphaDash()</code></td>
 </tr>
 <tr>
+<td>More text</td>
+<td><code>@Json()</code>, <code>@Digits(6)</code>, <code>@DigitsBetween(4, 6)</code>, <code>@DateFormatted('Y-m-d')</code>, <code>@Password(min: 8, mixedCase: true, numbers: true, symbols: true)</code></td>
+</tr>
+<tr>
+<td>Other fields</td>
+<td><code>@Confirmed()</code>, <code>@Same('email')</code>, <code>@RequiredIf('type', 'company')</code>, <code>@RequiredWith(['phone'])</code></td>
+</tr>
+<tr>
 <td>Change text</td>
 <td><code>@Trim()</code>, <code>@Lowercase()</code>, <code>@Uppercase()</code>, <code>@AllowEmpty()</code></td>
 </tr>
@@ -7155,7 +7374,7 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 </tr>
 <tr>
 <td>Files</td>
-<td><code>@MaxSize('2MB')</code>, <code>@Mimes(['pdf'])</code>, <code>@Image()</code></td>
+<td><code>@MaxSize('2MB')</code>, <code>@MinSize('1KB')</code>, <code>@Mimes(['pdf'])</code>, <code>@MimeTypes(['image/png'])</code>, <code>@Image()</code>, <code>@Dimensions(minWidth: 100)</code></td>
 </tr>
 <tr>
 <td>Database (<code>dox_orm</code>)</td>
@@ -7241,6 +7460,14 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 <td><code>Pagination&lt;Blog&gt;</code>, rows in <code>data</code></td>
 </tr>
 <tr>
+<td><code>await Blog().simplePaginate(currentPage: 1, perPage: 20)</code></td>
+<td>a page without the total count</td>
+</tr>
+<tr>
+<td><code>await Blog().cursorPaginate(perPage: 20, cursor: c)</code></td>
+<td>a page after a cursor, <code>nextCursor</code></td>
+</tr>
+<tr>
 <td><code>await Blog().create(&lt;String, dynamic&gt;{'title': 'a'})</code></td>
 <td>insert and return the model</td>
 </tr>
@@ -7261,12 +7488,40 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 <td>change a number in one query</td>
 </tr>
 <tr>
+<td><code>await Blog().forceCreate({...})</code></td>
+<td>create with every key, ignore <code>fillable</code></td>
+</tr>
+<tr>
+<td><code>await Model.unguarded(() async { ... })</code></td>
+<td>turn off the <code>fillable</code> check inside the callback</td>
+</tr>
+<tr>
+<td><code>await blog.sync('tags', &lt;int&gt;[1, 2])</code></td>
+<td>many to many: make the links exactly these ids</td>
+</tr>
+<tr>
+<td><code>await blog.attach('tags', 3)</code> / <code>await blog.detach('tags', 3)</code></td>
+<td>add / remove links</td>
+</tr>
+<tr>
 <td><code>await blog.forceDelete()</code> / <code>await blog.restore()</code></td>
 <td>real delete / undo soft delete</td>
 </tr>
 <tr>
 <td><code>Blog().withTrash()</code></td>
 <td>include soft deleted rows</td>
+</tr>
+<tr>
+<td><code>Blog().onlyTrashed()</code></td>
+<td>only soft deleted rows</td>
+</tr>
+<tr>
+<td><code>await blog.touch()</code></td>
+<td>set <code>updated_at</code> to now, <code>touchQuietly()</code> with no events</td>
+</tr>
+<tr>
+<td><code>blog.replicate()</code></td>
+<td>a new unsaved copy of the model</td>
 </tr>
 <tr>
 <td><code>Blog().preload('comments').get()</code></td>
@@ -7294,7 +7549,7 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 </tr>
 </tbody>
 </table>
-<p>Relations: <code>@HasOne(T)</code>, <code>@HasMany(T)</code>, <code>@BelongsTo(T)</code>, <code>@ManyToMany(T)</code>. Options: <code>foreignKey</code>, <code>localKey</code>, <code>onQuery</code>, <code>eager</code>.</p>
+<p>Relations: <code>@HasOne(T)</code>, <code>@HasMany(T)</code>, <code>@BelongsTo(T)</code>, <code>@ManyToMany(T)</code>. Polymorphic: <code>@MorphMany(T, 'name')</code>, <code>@MorphOne(T, 'name')</code>, <code>@MorphTo()</code>. Options: <code>foreignKey</code>, <code>localKey</code>, <code>onQuery</code>, <code>eager</code>.</p>
 <p>Events: override <code>onCreating()</code>, <code>onCreated()</code>, <code>onSaving()</code>, <code>onUpdated()</code>, <code>onDeleting()</code>, ... or <code>Model.observe&lt;Blog&gt;(BlogObserver())</code>. <code>throw CancelModelEvent('why')</code> in a "before" event stops it. <code>saveQuietly()</code> skips events.</p>
 <p>See <a href="../../database/model/">Model</a>, <a href="../../database/model/events/">Events</a>, <a href="../../database/model/relationship/has-many/">HasMany</a>, <a href="../../database/model/relation-queries/">Query by relations</a>.</p>
 <h2 id="query-builder">Query builder</h2>
@@ -7331,6 +7586,18 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 <td>more filters</td>
 </tr>
 <tr>
+<td><code>whereDate</code>, <code>whereTime</code>, <code>whereYear</code>, <code>whereMonth</code>, <code>whereDay</code></td>
+<td>parts of a date</td>
+</tr>
+<tr>
+<td><code>whereJsonContains('tags', 'a')</code>, <code>whereJsonDoesntContain</code></td>
+<td>JSON values</td>
+</tr>
+<tr>
+<td><code>whereIn('id', QueryBuilder.table('post').select('user_id'))</code></td>
+<td>sub query</td>
+</tr>
+<tr>
 <td><code>whereGroup((QueryBuilder&lt;Blog&gt; q) { ... })</code>, <code>orWhereGroup</code>, <code>whereNot</code></td>
 <td>conditions in brackets</td>
 </tr>
@@ -7345,6 +7612,14 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 <tr>
 <td><code>leftJoin</code>, <code>rightJoin</code>, <code>joinRaw</code></td>
 <td>joins</td>
+</tr>
+<tr>
+<td><code>joinSub(q, 'alias', 'alias.id', 'blog.id')</code>, <code>leftJoinSub</code>, <code>fromSub(q, 'alias')</code></td>
+<td>sub queries</td>
+</tr>
+<tr>
+<td><code>union(q)</code>, <code>unionAll(q)</code></td>
+<td>add the rows of another query</td>
 </tr>
 <tr>
 <td><code>groupBy('age')</code>, <code>having(...)</code>, <code>havingRaw(...)</code></td>
@@ -7369,6 +7644,10 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 <tr>
 <td><code>upsert([...], ['email'])</code></td>
 <td>insert or update, returns an <code>int</code></td>
+</tr>
+<tr>
+<td><code>insertOrIgnore([...])</code></td>
+<td>insert, skip duplicates, returns an <code>int</code></td>
 </tr>
 <tr>
 <td><code>where(...).update({...})</code></td>
@@ -7534,7 +7813,8 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 </span><span id="__span-14-13"><a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="n">user</span><span class="p">.</span><span class="n">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">makeAsync</span><span class="p">(</span><span class="n">password</span><span class="p">);</span><span class="w"> </span><span class="c1">// bcrypt in another isolate</span>
 </span><span id="__span-14-14"><a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">verifyAsync</span><span class="p">(</span><span class="n">password</span><span class="p">,</span><span class="w"> </span><span class="n">hash</span><span class="p">);</span>
 </span></code></pre></div>
-<p>Protect a route with <code>AuthMiddleware()</code>. Client sends <code>Authorization: Bearer &lt;token&gt;</code>.</p>
+<p>Protect a route with <code>AuthMiddleware()</code>. Client sends <code>Authorization: Bearer &lt;token&gt;</code>.
+<code>AuthMiddleware(optional: true)</code> lets guests through too. <code>GuestMiddleware(redirectTo: '/dashboard')</code> is for login pages.</p>
 <p>See <a href="../../security/authentication/">Authentication</a> and <a href="../../security/hashing/">Hashing</a>.</p>
 <h2 id="socketio">Socket.IO</h2>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ChatNamespace</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">NamespaceHandler</span><span class="w"> </span><span class="p">{</span>
@@ -7553,6 +7833,7 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 </span><span id="__span-15-14"><a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-15-15"><a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="p">}</span>
 </span></code></pre></div>
+<p>Log users in at connect time with <code>SocketAuth(findUser).handle</code> in <code>middleware</code>. The user is in <code>socket.user</code>.</p>
 <p>Turn it on with a <code>SocketIoProvider</code> (extend it in <code>lib/</code>). Many isolates need the Redis adapter and <code>transports: ['websocket']</code> on the client.</p>
 <p>See <a href="../../packages/socketio/">Socket.IO</a>.</p>
 <h2 id="openapi">OpenAPI</h2>
@@ -7592,6 +7873,14 @@ See <a href="../../the-basic/dependency-injection/">Dependency injection</a>.</p
 <tr>
 <td>storage</td>
 <td><code>Disk fake = Storage.manager.fake('s3');</code> then <code>Storage.manager.restore('s3')</code></td>
+</tr>
+<tr>
+<td>mail</td>
+<td><code>ArrayTransport mail = Mail.fake();</code> then <code>mail.assertSent()</code>, <code>mail.assertQueued()</code>, <code>mail.assertNothingSent()</code>, and <code>Mail.restore()</code></td>
+</tr>
+<tr>
+<td>queue</td>
+<td><code>QueueFake queue = Queue.fake();</code> then <code>queue.assertPushed&lt;T&gt;()</code>, and <code>Queue.restore()</code></td>
 </tr>
 <tr>
 <td>env</td>

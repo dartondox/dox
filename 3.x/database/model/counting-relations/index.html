@@ -2189,6 +2189,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -2358,6 +2362,55 @@
     
   
     Mail
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../digging-deeper/notifications/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-radio-tower"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4.9 16.1C1 12.2 1 5.8 4.9 1.9" />
+  <path d="M7.8 4.7a6.14 6.14 0 0 0-.8 7.5" />
+  <circle cx="12" cy="9" r="2" />
+  <path d="M16.2 4.8c2 2 2.26 5.11.8 7.47" />
+  <path d="M19.1 1.9a9.96 9.96 0 0 1 0 14.1" />
+  <path d="M9.5 18h5" />
+  <path d="m8 22 4-11 4 11" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Notifications
   
 
     
@@ -2651,6 +2704,50 @@
     
   
     Dox CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../digging-deeper/package-commands/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-blocks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2" />
+  <rect x="14" y="2" width="8" height="8" rx="1" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Package commands
   
 
     
@@ -3701,10 +3798,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sum-and-max" class="md-nav__link">
+  <a href="#sum-average-min-and-max" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Sum and max
+        Sum, average, min and max
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exists
       
     </span>
   </a>
@@ -3771,6 +3879,8 @@
   
     
     
+      
+        
       
         
       
@@ -3994,6 +4104,53 @@
     
   
     ManyToMany
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../relationship/polymorphic/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-share-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="18" cy="5" r="3" />
+  <circle cx="6" cy="12" r="3" />
+  <circle cx="18" cy="19" r="3" />
+  <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
+  <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Polymorphic
   
 
     
@@ -6296,10 +6453,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sum-and-max" class="md-nav__link">
+  <a href="#sum-average-min-and-max" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Sum and max
+        Sum, average, min and max
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exists
       
     </span>
   </a>
@@ -6335,7 +6503,7 @@
 <p><code>withCount()</code> adds the number of related rows to each model.</p>
 <p>It does not load the rows. It adds a subquery to the select,
 so you get the counts with the same query.</p>
-<p>It works with <code>hasOne</code>, <code>hasMany</code> and <code>manyToMany</code> relations.</p>
+<p>It works with <code>hasOne</code>, <code>hasMany</code>, <code>manyToMany</code>, <code>morphOne</code> and <code>morphMany</code> relations.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nd">@DoxModel</span><span class="p">()</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">User</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">UserGenerator</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nd">@HasMany</span><span class="p">(</span><span class="n">Post</span><span class="p">)</span>
@@ -6370,16 +6538,33 @@ Use <code>as</code> to give the count its own key.</p>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">posts</span><span class="p">;</span><span class="w">              </span><span class="c1">// the posts</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">countOf</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">);</span><span class="w">   </span><span class="c1">// the number of posts</span>
 </span></code></pre></div>
-<h2 id="sum-and-max">Sum and max</h2>
-<p><code>withSum()</code> and <code>withMax()</code> work the same way, on one column of the related rows.
+<h2 id="sum-average-min-and-max">Sum, average, min and max</h2>
+<p><code>withSum()</code>, <code>withAvg()</code>, <code>withMin()</code> and <code>withMax()</code> work the same way, on one column of the related rows.
 The value is null when there is no related row.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">()</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="p">.</span><span class="n">withSum</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">,</span><span class="w"> </span><span class="s1">'views'</span><span class="p">)</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="p">.</span><span class="n">withMax</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">,</span><span class="w"> </span><span class="s1">'views'</span><span class="p">)</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">aggregate</span><span class="p">(</span><span class="s1">'posts_sum_views'</span><span class="p">);</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">aggregate</span><span class="p">(</span><span class="s1">'posts_max_views'</span><span class="p">);</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="p">.</span><span class="n">withAvg</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">,</span><span class="w"> </span><span class="s1">'views'</span><span class="p">)</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="p">.</span><span class="n">withMin</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">,</span><span class="w"> </span><span class="s1">'views'</span><span class="p">)</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="p">.</span><span class="n">withMax</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">,</span><span class="w"> </span><span class="s1">'views'</span><span class="p">)</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">aggregate</span><span class="p">(</span><span class="s1">'posts_sum_views'</span><span class="p">);</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">aggregate</span><span class="p">(</span><span class="s1">'posts_avg_views'</span><span class="p">);</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">aggregate</span><span class="p">(</span><span class="s1">'posts_min_views'</span><span class="p">);</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">aggregate</span><span class="p">(</span><span class="s1">'posts_max_views'</span><span class="p">);</span>
+</span></code></pre></div>
+<h2 id="exists">Exists</h2>
+<p><code>withExists()</code> adds <code>&lt;relation&gt;_exists</code>. It is <code>true</code> when there is at least one related row.
+It takes a function and <code>as</code>, like <code>withCount()</code>.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">()</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="p">.</span><span class="n">withExists</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">)</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="p">.</span><span class="n">withExists</span><span class="p">(</span><span class="s1">'posts as has_published'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">QueryBuilder</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">      </span><span class="n">q</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'published'</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="p">})</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">aggregate</span><span class="p">(</span><span class="s1">'posts_exists'</span><span class="p">);</span><span class="w">   </span><span class="c1">// true or false</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">aggregate</span><span class="p">(</span><span class="s1">'has_published'</span><span class="p">);</span><span class="w">  </span><span class="c1">// true or false</span>
 </span></code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>

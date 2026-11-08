@@ -1315,6 +1315,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#views" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Views
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#eloquent-vs-dox-model" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2442,6 +2453,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -2611,6 +2626,55 @@
     
   
     Mail
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/notifications/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-radio-tower"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4.9 16.1C1 12.2 1 5.8 4.9 1.9" />
+  <path d="M7.8 4.7a6.14 6.14 0 0 0-.8 7.5" />
+  <circle cx="12" cy="9" r="2" />
+  <path d="M16.2 4.8c2 2 2.26 5.11.8 7.47" />
+  <path d="M19.1 1.9a9.96 9.96 0 0 1 0 14.1" />
+  <path d="M9.5 18h5" />
+  <path d="m8 22 4-11 4 11" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Notifications
   
 
     
@@ -2904,6 +2968,50 @@
     
   
     Dox CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/package-commands/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-blocks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2" />
+  <rect x="14" y="2" width="8" height="8" rx="1" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Package commands
   
 
     
@@ -3929,6 +4037,8 @@
       
         
       
+        
+      
     
     
     
@@ -4143,6 +4253,53 @@
     
   
     ManyToMany
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../database/model/relationship/polymorphic/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-share-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="18" cy="5" r="3" />
+  <circle cx="6" cy="12" r="3" />
+  <circle cx="18" cy="19" r="3" />
+  <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
+  <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Polymorphic
   
 
     
@@ -6478,6 +6635,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#views" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Views
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#eloquent-vs-dox-model" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6656,6 +6824,30 @@
 <td><code>Route.get('/docs/{page*}', (String page) =&gt; ...)</code></td>
 </tr>
 <tr>
+<td><code>-&gt;where('id', '[0-9]+')</code></td>
+<td><code>Route.get('/users/{id}', ...).where('id', '[0-9]+')</code></td>
+</tr>
+<tr>
+<td><code>Route::match(['get', 'post'], '/contact', ...)</code></td>
+<td><code>Route.match(&lt;String&gt;['GET', 'POST'], '/contact', ...)</code></td>
+</tr>
+<tr>
+<td><code>Route::any('/webhook', ...)</code></td>
+<td><code>Route.any('/webhook', ...)</code></td>
+</tr>
+<tr>
+<td><code>Route::redirect('/here', '/there')</code></td>
+<td><code>Route.redirect('/here', '/there')</code></td>
+</tr>
+<tr>
+<td><code>Route::permanentRedirect('/here', '/there')</code></td>
+<td><code>Route.permanentRedirect('/here', '/there')</code></td>
+</tr>
+<tr>
+<td><code>Route::fallback(...)</code></td>
+<td><code>Route.fallback(...)</code></td>
+</tr>
+<tr>
 <td><code>Route::prefix('blogs')-&gt;group(function () { ... });</code></td>
 <td><code>Route.group('/blogs', () { ... });</code></td>
 </tr>
@@ -6670,6 +6862,10 @@
 <tr>
 <td><code>Route::resource('blogs', BlogController::class);</code></td>
 <td><code>Route.resource('blogs', BlogController);</code></td>
+</tr>
+<tr>
+<td><code>Route::view('/welcome', 'welcome')</code></td>
+<td><code>Route.get('/welcome', (DoxRequest req) =&gt; view(req, 'welcome'))</code> with <code>view()</code> of <code>dox_view</code>. Dox <code>Route.view</code> is the WebDAV <code>VIEW</code> method, not a template.</td>
 </tr>
 <tr>
 <td><code>routes/api.php</code> with the <code>api</code> prefix</td>
@@ -6809,6 +7005,18 @@ Dox middleware runs before the controller only. There is no "after" step; use a 
 <td><code>@Email() @Unique('users') final String email;</code></td>
 </tr>
 <tr>
+<td><code>'password' =&gt; ['required', 'confirmed', Password::min(8)-&gt;mixedCase()]</code></td>
+<td><code>@Confirmed() @Password(mixedCase: true) final String password;</code></td>
+</tr>
+<tr>
+<td><code>'company' =&gt; 'required_if:type,company'</code></td>
+<td><code>@RequiredIf('type', 'company') final String? company;</code></td>
+</tr>
+<tr>
+<td><code>'pin' =&gt; 'digits:4'</code>, <code>'meta' =&gt; 'json'</code>, <code>'day' =&gt; 'date_format:Y-m-d'</code></td>
+<td><code>@Digits(4)</code>, <code>@Json()</code>, <code>@DateFormatted('Y-m-d')</code> on <code>String</code> fields</td>
+</tr>
+<tr>
 <td><code>'role' =&gt; Rule::in(['admin', 'user'])</code></td>
 <td><code>final Role role;</code> (a Dart enum)</td>
 </tr>
@@ -6908,6 +7116,46 @@ See <a href="../../the-basic/validation/">Validation</a>.</p>
 </tr>
 </tbody>
 </table>
+<h2 id="views">Views</h2>
+<p>With <a href="../../the-basic/views/">dox_view</a>, templates end in <code>.dox.html</code>. Most Blade tags have the same name. A block ends with <code>@end</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Laravel Blade</th>
+<th>Dox</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{{ $user-&gt;name }}</code>, <code>{!! $html !!}</code></td>
+<td><code>{{ user.name }}</code>, <code>{{{ html }}}</code></td>
+</tr>
+<tr>
+<td><code>@if ... @endif</code>, <code>@foreach ($users as $user)</code></td>
+<td><code>@if ... @end</code>, <code>@each(user in users) ... @end</code></td>
+</tr>
+<tr>
+<td><code>@isset</code>, <code>@empty</code>, <code>@auth</code>, <code>@guest</code>, <code>@env</code>, <code>@production</code>, <code>@once</code>, <code>@verbatim</code></td>
+<td>the same names, closed with <code>@end</code></td>
+</tr>
+<tr>
+<td><code>@class</code>, <code>@checked</code>, <code>@selected</code>, <code>@disabled</code></td>
+<td>the same</td>
+</tr>
+<tr>
+<td><code>@include('nav')</code></td>
+<td><code>@include('nav')</code></td>
+</tr>
+<tr>
+<td><code>&lt;x-button&gt;</code>, <code>$attributes-&gt;merge([...])</code>, <code>$slot</code></td>
+<td><code>@button(...) ... @end</code>, <code>$attributes.merge({...})</code>, <code>$slot</code></td>
+</tr>
+<tr>
+<td><code>@csrf</code>, <code>old('email')</code></td>
+<td><code>{{ csrfField() }}</code>, <code>old('email')</code></td>
+</tr>
+</tbody>
+</table>
 <h2 id="eloquent-vs-dox-model">Eloquent vs Dox Model</h2>
 <table>
 <thead>
@@ -6948,6 +7196,18 @@ See <a href="../../the-basic/validation/">Validation</a>.</p>
 <tr>
 <td><code>protected $fillable = [...]</code></td>
 <td><code>List&lt;String&gt; get fillable =&gt; &lt;String&gt;[...];</code></td>
+</tr>
+<tr>
+<td><code>$user-&gt;forceFill([...])</code></td>
+<td><code>user.forceFill(&lt;String, dynamic&gt;{...})</code></td>
+</tr>
+<tr>
+<td><code>User::forceCreate([...])</code></td>
+<td><code>await User().forceCreate(&lt;String, dynamic&gt;{...})</code></td>
+</tr>
+<tr>
+<td><code>Model::unguarded(fn () =&gt; ...)</code></td>
+<td><code>await Model.unguarded(() async { ... })</code></td>
 </tr>
 <tr>
 <td><code>protected $casts = ['meta' =&gt; 'array'];</code></td>
@@ -7010,8 +7270,24 @@ See <a href="../../the-basic/validation/">Validation</a>.</p>
 <td><code>await blog.increment('views')</code></td>
 </tr>
 <tr>
+<td><code>$blog-&gt;update([...])</code></td>
+<td><code>await blog.update(&lt;String, dynamic&gt;{...})</code> (only that row, sets <code>updated_at</code>, no model events)</td>
+</tr>
+<tr>
 <td><code>Blog::withTrashed()</code></td>
 <td><code>Blog().withTrash()</code></td>
+</tr>
+<tr>
+<td><code>Blog::onlyTrashed()</code></td>
+<td><code>Blog().onlyTrashed()</code></td>
+</tr>
+<tr>
+<td><code>$blog-&gt;touch()</code></td>
+<td><code>await blog.touch()</code></td>
+</tr>
+<tr>
+<td><code>$blog-&gt;replicate()</code></td>
+<td><code>blog.replicate()</code></td>
 </tr>
 <tr>
 <td><code>$blog-&gt;restore()</code></td>
@@ -7122,6 +7398,10 @@ See <a href="../../database/model/">Model</a>.</p>
 <td><code>.whereIn('id', &lt;int&gt;[1, 2])</code></td>
 </tr>
 <tr>
+<td><code>-&gt;whereIn('id', $subQuery)</code></td>
+<td><code>.whereIn('id', subQuery)</code></td>
+</tr>
+<tr>
 <td><code>-&gt;whereNull('deleted_at')</code></td>
 <td><code>.whereNull('deleted_at')</code></td>
 </tr>
@@ -7154,6 +7434,14 @@ See <a href="../../database/model/">Model</a>.</p>
 <td><code>.whereExists('post', (QueryBuilder&lt;Map&lt;String, dynamic&gt;&gt; q) { ... })</code></td>
 </tr>
 <tr>
+<td><code>-&gt;whereDate('created_at', '2024-05-01')</code>, <code>-&gt;whereYear(...)</code></td>
+<td><code>.whereDate('created_at', '2024-05-01')</code>, <code>.whereYear(...)</code></td>
+</tr>
+<tr>
+<td><code>-&gt;whereJsonContains('tags', 'a')</code></td>
+<td><code>.whereJsonContains('tags', 'a')</code></td>
+</tr>
+<tr>
 <td><code>-&gt;when($cond, fn ($q) =&gt; ...)</code></td>
 <td><code>.when(cond, (QueryBuilder&lt;Blog&gt; q) { ... })</code></td>
 </tr>
@@ -7184,6 +7472,18 @@ See <a href="../../database/model/">Model</a>.</p>
 <tr>
 <td><code>-&gt;join('posts', 'posts.user_id', '=', 'users.id')</code></td>
 <td><code>.join('posts', 'posts.user_id', 'users.id')</code></td>
+</tr>
+<tr>
+<td><code>-&gt;joinSub($q, 'alias', 'alias.id', '=', 'users.id')</code></td>
+<td><code>.joinSub(q, 'alias', 'alias.id', 'users.id')</code></td>
+</tr>
+<tr>
+<td><code>-&gt;fromSub($q, 'alias')</code></td>
+<td><code>.fromSub(q, 'alias')</code></td>
+</tr>
+<tr>
+<td><code>-&gt;union($q)</code>, <code>-&gt;unionAll($q)</code></td>
+<td><code>.union(q)</code>, <code>.unionAll(q)</code></td>
 </tr>
 <tr>
 <td><code>-&gt;groupBy('age')</code></td>
@@ -7222,16 +7522,28 @@ See <a href="../../database/model/">Model</a>.</p>
 <td><code>.paginate(currentPage: 1, perPage: 10)</code></td>
 </tr>
 <tr>
+<td><code>-&gt;simplePaginate(10)</code></td>
+<td><code>.simplePaginate(currentPage: 1, perPage: 10)</code></td>
+</tr>
+<tr>
+<td><code>-&gt;cursorPaginate(10)</code></td>
+<td><code>.cursorPaginate(perPage: 10, cursor: cursor)</code></td>
+</tr>
+<tr>
 <td><code>-&gt;insert([...])</code></td>
 <td><code>.insertMultiple(&lt;Map&lt;String, dynamic&gt;&gt;[...])</code></td>
 </tr>
 <tr>
 <td><code>-&gt;update([...])</code></td>
-<td><code>.update(&lt;String, dynamic&gt;{...})</code> (returns the changed rows as an <code>int</code>)</td>
+<td><code>.update(&lt;String, dynamic&gt;{...})</code> (returns the changed rows as an <code>int</code>; on a model it keeps <code>fillable</code>, use <code>.forceUpdate()</code> to skip it)</td>
 </tr>
 <tr>
 <td><code>-&gt;increment('views', 5)</code>, <code>-&gt;decrement(...)</code></td>
 <td><code>.increment('views', 5)</code>, <code>.decrement(...)</code></td>
+</tr>
+<tr>
+<td><code>-&gt;insertOrIgnore([...])</code></td>
+<td><code>.insertOrIgnore(&lt;Map&lt;String, dynamic&gt;&gt;[...])</code></td>
 </tr>
 <tr>
 <td><code>-&gt;upsert([...], ['email'], ['name'])</code></td>
@@ -7240,6 +7552,10 @@ See <a href="../../database/model/">Model</a>.</p>
 <tr>
 <td><code>-&gt;delete()</code></td>
 <td><code>.delete()</code> (returns the deleted rows as an <code>int</code>)</td>
+</tr>
+<tr>
+<td><code>Blog::query()-&gt;delete()</code> (every row)</td>
+<td><code>await Blog().whereRaw('1 = 1').delete()</code>. With no <code>where</code>, <code>Blog().delete()</code> throws a <code>StateError</code>.</td>
 </tr>
 <tr>
 <td><code>-&gt;lockForUpdate()</code>, <code>-&gt;sharedLock()</code></td>
@@ -7433,6 +7749,22 @@ See <a href="../../digging-deeper/dox-cli/">Dox CLI</a>.</p>
 <td><code>req.auth?.user&lt;User&gt;()</code></td>
 </tr>
 <tr>
+<td><code>Auth::id()</code></td>
+<td><code>req.auth?.id()</code></td>
+</tr>
+<tr>
+<td><code>Auth::guest()</code></td>
+<td><code>req.auth == null</code></td>
+</tr>
+<tr>
+<td><code>Auth::check()</code></td>
+<td><code>Auth().check()</code> (the same as <code>isLoggedIn()</code>)</td>
+</tr>
+<tr>
+<td><code>Auth::once($credentials)</code></td>
+<td><code>await Auth().once(credentials)</code> gives <code>true</code> or <code>false</code>, with no token and no session</td>
+</tr>
+<tr>
 <td><code>Auth::attempt(...)</code> for a web page (session)</td>
 <td><code>await Auth().attemptSession(req, &lt;String, dynamic&gt;{...})</code> gives <code>true</code> or <code>false</code></td>
 </tr>
@@ -7445,12 +7777,24 @@ See <a href="../../digging-deeper/dox-cli/">Dox CLI</a>.</p>
 <td><code>AuthMiddleware()</code> from <code>dox_auth</code></td>
 </tr>
 <tr>
+<td><code>-&gt;middleware('auth:web,api')</code></td>
+<td><code>AuthMiddleware(guards: &lt;String&gt;['web', 'api'])</code></td>
+</tr>
+<tr>
+<td><code>-&gt;middleware('guest')</code></td>
+<td><code>GuestMiddleware(redirectTo: '/dashboard')</code></td>
+</tr>
+<tr>
+<td><code>Crypt::encryptString($v)</code>, <code>Crypt::decryptString($v)</code></td>
+<td><code>Crypt.encryptString(v)</code>, <code>Crypt.decryptString(v)</code></td>
+</tr>
+<tr>
 <td><code>Hash::make($p)</code>, <code>Hash::check($p, $hash)</code></td>
-<td><code>Hash.make(p)</code>, <code>Hash.verify(p, hash)</code></td>
+<td><code>Hash.make(p)</code>, <code>Hash.check(p, hash)</code> (or <code>Hash.verify</code>)</td>
 </tr>
 </tbody>
 </table>
-<p>For an API, Dox auth is a JWT in the <code>Authorization</code> header. There is no Sanctum tokens table.
+<p>For an API, Dox auth is a JWT in the <code>Authorization</code> header. For tokens you can revoke, like Sanctum, use <code>AccessTokenAuthDriver</code>. <code>dox auth:tokens-table</code> makes its <code>auth_access_tokens</code> table.
 For web pages, a guard with <code>SessionAuthDriver</code> keeps the login in the session cookie.
 See <a href="../../security/authentication/">Authentication</a>.</p>
 <h2 id="cache">Cache</h2>
@@ -7468,7 +7812,11 @@ See <a href="../../security/authentication/">Authentication</a>.</p>
 </tr>
 <tr>
 <td><code>Cache::put('k', $v, 600)</code></td>
-<td><code>await Cache().put('k', v, duration: Duration(minutes: 10))</code></td>
+<td><code>await Cache().put('k', v, duration: Duration(minutes: 10))</code>. The time is a named <code>duration:</code>, not the third value.</td>
+</tr>
+<tr>
+<td><code>Cache::many(['a', 'b'])</code>, <code>Cache::putMany([...], 600)</code></td>
+<td><code>await Cache().many(&lt;String&gt;['a', 'b'])</code>, <code>await Cache().putMany(&lt;String, Object?&gt;{...}, duration: ...)</code></td>
 </tr>
 <tr>
 <td><code>Cache::get('k', 'default')</code></td>
@@ -7616,6 +7964,14 @@ A missing key stops the app at start, with a list of every missing key. See <a h
 <td><code>Storage.manager.fake('s3')</code></td>
 </tr>
 <tr>
+<td><code>Mail::fake()</code></td>
+<td><code>Mail.fake()</code>, then <code>mail.assertSent()</code> and <code>mail.assertQueued()</code></td>
+</tr>
+<tr>
+<td><code>Queue::fake()</code></td>
+<td><code>Queue.fake()</code>, then <code>queue.assertPushed&lt;T&gt;()</code></td>
+</tr>
+<tr>
 <td><code>Cache::fake()</code></td>
 <td><code>Dox().cache = CacheManager(CacheConfig(...))</code> with a <code>memory</code> store</td>
 </tr>
@@ -7649,9 +8005,7 @@ See <a href="../../digging-deeper/testing/">Testing</a>.</p>
 <p>Dox does not have these Laravel features yet:</p>
 <ul>
 <li>events and listeners (model events are there)</li>
-<li>notifications</li>
 <li>password reset</li>
-<li>policies and gates</li>
 </ul>
 <p>See <a href="../status-and-roadmap/#what-dox-does-not-have-yet">What Dox does not have yet</a> for what to use today.</p>
 <p>What is there, as separate packages: <a href="../../packages/validation/">validation</a>, <a href="../../packages/openapi/">OpenAPI docs</a>,

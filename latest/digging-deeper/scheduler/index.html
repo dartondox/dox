@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://dartondox.dev/latest/digging-deeper/scheduler/">
       
       
-        <link rel="prev" href="../mail/">
+        <link rel="prev" href="../notifications/">
       
       
         <link rel="next" href="../file-storage/">
@@ -2190,6 +2190,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -2360,6 +2364,55 @@
     
   
     Mail
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notifications/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-radio-tower"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4.9 16.1C1 12.2 1 5.8 4.9 1.9" />
+  <path d="M7.8 4.7a6.14 6.14 0 0 0-.8 7.5" />
+  <circle cx="12" cy="9" r="2" />
+  <path d="M16.2 4.8c2 2 2.26 5.11.8 7.47" />
+  <path d="M19.1 1.9a9.96 9.96 0 0 1 0 14.1" />
+  <path d="M9.5 18h5" />
+  <path d="m8 22 4-11 4 11" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Notifications
   
 
     
@@ -2975,6 +3028,50 @@
     
   
     Dox CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../package-commands/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-blocks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2" />
+  <rect x="14" y="2" width="8" height="8" rx="1" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Package commands
   
 
     
@@ -4000,6 +4097,8 @@
       
         
       
+        
+      
     
     
     
@@ -4214,6 +4313,53 @@
     
   
     ManyToMany
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../database/model/relationship/polymorphic/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-share-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="18" cy="5" r="3" />
+  <circle cx="6" cy="12" r="3" />
+  <circle cx="18" cy="19" r="3" />
+  <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
+  <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Polymorphic
   
 
     
@@ -6857,6 +7003,14 @@ A task with no frequency runs every minute.</p>
 <td>every 2 minutes</td>
 </tr>
 <tr>
+<td><code>everyThreeMinutes()</code></td>
+<td>every 3 minutes</td>
+</tr>
+<tr>
+<td><code>everyFourMinutes()</code></td>
+<td>every 4 minutes</td>
+</tr>
+<tr>
 <td><code>everyFiveMinutes()</code></td>
 <td>every 5 minutes</td>
 </tr>
@@ -6881,6 +7035,14 @@ A task with no frequency runs every minute.</p>
 <td>at minute 17 of every hour</td>
 </tr>
 <tr>
+<td><code>everyTwoHours()</code></td>
+<td>every 2 hours at minute 0. Also <code>everyThreeHours</code>, <code>everyFourHours</code>, <code>everySixHours</code>. Pass a minute: <code>everyTwoHours(15)</code></td>
+</tr>
+<tr>
+<td><code>everyOddHour()</code></td>
+<td>at 01:00, 03:00 ... 23:00. Pass a minute: <code>everyOddHour(30)</code></td>
+</tr>
+<tr>
 <td><code>daily()</code></td>
 <td>every day at 00:00</td>
 </tr>
@@ -6891,6 +7053,14 @@ A task with no frequency runs every minute.</p>
 <tr>
 <td><code>twiceDaily(1, 13)</code></td>
 <td>every day at 01:00 and 13:00</td>
+</tr>
+<tr>
+<td><code>twiceDailyAt(1, 13, 15)</code></td>
+<td>every day at 01:15 and 13:15</td>
+</tr>
+<tr>
+<td><code>at('13:00')</code></td>
+<td>same as <code>dailyAt('13:00')</code></td>
 </tr>
 <tr>
 <td><code>weekly()</code></td>
@@ -6909,8 +7079,28 @@ A task with no frequency runs every minute.</p>
 <td>the 15th of every month at 12:00</td>
 </tr>
 <tr>
+<td><code>twiceMonthly(1, 16, '13:00')</code></td>
+<td>the 1st and 16th of every month at 13:00</td>
+</tr>
+<tr>
+<td><code>lastDayOfMonth('15:00')</code></td>
+<td>the last day of every month at 15:00</td>
+</tr>
+<tr>
+<td><code>quarterly()</code></td>
+<td>January, April, July and October 1st at 00:00</td>
+</tr>
+<tr>
+<td><code>quarterlyOn(4, '14:00')</code></td>
+<td>January, April, July and October 4th at 14:00</td>
+</tr>
+<tr>
 <td><code>yearly()</code></td>
 <td>January 1st at 00:00</td>
+</tr>
+<tr>
+<td><code>yearlyOn(6, 1, '17:00')</code></td>
+<td>June 1st at 17:00. A day the month never has, like <code>yearlyOn(2, 30)</code>, throws</td>
 </tr>
 <tr>
 <td><code>cron('*/5 9-17 * * 1-5')</code></td>
@@ -6936,6 +7126,10 @@ A task with no frequency runs every minute.</p>
 <td>Saturday and Sunday</td>
 </tr>
 <tr>
+<td><code>mondays()</code> ... <code>sundays()</code></td>
+<td>only on that day of the week</td>
+</tr>
+<tr>
 <td><code>days(&lt;int&gt;[DateTime.monday, DateTime.friday])</code></td>
 <td>only on these days</td>
 </tr>
@@ -6943,6 +7137,10 @@ A task with no frequency runs every minute.</p>
 </table>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">s</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'standup'</span><span class="p">,</span><span class="w"> </span><span class="n">remind</span><span class="p">).</span><span class="n">weekdays</span><span class="p">().</span><span class="n">dailyAt</span><span class="p">(</span><span class="s1">'09:00'</span><span class="p">);</span>
 </span></code></pre></div>
+<p>A day of the month and a day of the week join with OR, like cron.
+<code>monthlyOn(15).fridays()</code> runs on the 15th and on every Friday.
+<code>lastDayOfMonth()</code> is different: it runs only on the last day of the month.
+<code>lastDayOfMonth().fridays()</code> runs on every last day of the month, on any day of the week. The <code>fridays()</code> part has no effect.</p>
 <h3 id="cron-expressions">Cron expressions</h3>
 <p><code>cron()</code> takes the standard 5 fields: <code>minute hour day-of-month month day-of-week</code>.</p>
 <table>
@@ -6986,6 +7184,11 @@ Use <code>timezone()</code> to read the time in another zone:</p>
 </span></code></pre></div>
 <p>The name is an IANA name, like <code>Europe/London</code> or <code>America/New_York</code>.
 The zone data comes from the <code>timezone</code> package.</p>
+<p>To use one zone for every task, set it in the config.
+A task's own <code>timezone()</code> still wins.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">ScheduleConfig</span><span class="w"> </span><span class="n">scheduleConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ScheduleConfig</span><span class="p">(</span><span class="nl">timezone:</span><span class="w"> </span><span class="s1">'Asia/Yangon'</span><span class="p">);</span>
+</span></code></pre></div>
+<p>An unknown name throws an <code>ArgumentError</code> when the schedule starts.</p>
 <p>With summer time (DST):</p>
 <ul>
 <li>A time that does not exist that day (it is skipped when the clock goes forward) does not run that day.</li>
@@ -6993,10 +7196,12 @@ The zone data comes from the <code>timezone</code> package.</p>
 <li><code>hourly()</code> and other "every" frequencies keep running every real hour.</li>
 </ul>
 <h2 id="filters">Filters</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">s</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'sync'</span><span class="p">,</span><span class="w"> </span><span class="kd">sync</span><span class="p">).</span><span class="n">everyFiveMinutes</span><span class="p">().</span><span class="n">between</span><span class="p">(</span><span class="s1">'09:00'</span><span class="p">,</span><span class="w"> </span><span class="s1">'17:00'</span><span class="p">);</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">s</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'night'</span><span class="p">,</span><span class="w"> </span><span class="n">night</span><span class="p">).</span><span class="n">hourly</span><span class="p">().</span><span class="n">between</span><span class="p">(</span><span class="s1">'22:00'</span><span class="p">,</span><span class="w"> </span><span class="s1">'06:00'</span><span class="p">);</span><span class="w"> </span><span class="c1">// crosses midnight</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">s</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'promo'</span><span class="p">,</span><span class="w"> </span><span class="n">promo</span><span class="p">).</span><span class="n">daily</span><span class="p">().</span><span class="n">when</span><span class="p">(</span><span class="n">isPromoOn</span><span class="p">);</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">s</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'backup'</span><span class="p">,</span><span class="w"> </span><span class="n">backup</span><span class="p">).</span><span class="n">daily</span><span class="p">().</span><span class="n">skip</span><span class="p">(</span><span class="n">isHoliday</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">s</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'sync'</span><span class="p">,</span><span class="w"> </span><span class="kd">sync</span><span class="p">).</span><span class="n">everyFiveMinutes</span><span class="p">().</span><span class="n">between</span><span class="p">(</span><span class="s1">'09:00'</span><span class="p">,</span><span class="w"> </span><span class="s1">'17:00'</span><span class="p">);</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">s</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'night'</span><span class="p">,</span><span class="w"> </span><span class="n">night</span><span class="p">).</span><span class="n">hourly</span><span class="p">().</span><span class="n">between</span><span class="p">(</span><span class="s1">'22:00'</span><span class="p">,</span><span class="w"> </span><span class="s1">'06:00'</span><span class="p">);</span><span class="w"> </span><span class="c1">// crosses midnight</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">s</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'quiet'</span><span class="p">,</span><span class="w"> </span><span class="n">quiet</span><span class="p">).</span><span class="n">hourly</span><span class="p">().</span><span class="n">unlessBetween</span><span class="p">(</span><span class="s1">'23:00'</span><span class="p">,</span><span class="w"> </span><span class="s1">'04:00'</span><span class="p">);</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">s</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'emails'</span><span class="p">,</span><span class="w"> </span><span class="n">sendEmails</span><span class="p">).</span><span class="n">daily</span><span class="p">().</span><span class="n">environments</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'production'</span><span class="p">]);</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">s</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'promo'</span><span class="p">,</span><span class="w"> </span><span class="n">promo</span><span class="p">).</span><span class="n">daily</span><span class="p">().</span><span class="n">when</span><span class="p">(</span><span class="n">isPromoOn</span><span class="p">);</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="n">s</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'backup'</span><span class="p">,</span><span class="w"> </span><span class="n">backup</span><span class="p">).</span><span class="n">daily</span><span class="p">().</span><span class="n">skip</span><span class="p">(</span><span class="n">isHoliday</span><span class="p">);</span>
 </span></code></pre></div>
 <table>
 <thead>
@@ -7009,6 +7214,14 @@ The zone data comes from the <code>timezone</code> package.</p>
 <tr>
 <td><code>between('09:00', '17:00')</code></td>
 <td>runs only in this time of day, both ends included, in the task zone</td>
+</tr>
+<tr>
+<td><code>unlessBetween('23:00', '04:00')</code></td>
+<td>does not run in this time of day, both ends included, in the task zone</td>
+</tr>
+<tr>
+<td><code>environments(&lt;String&gt;['production'])</code></td>
+<td>runs only when <code>APP_ENV</code> is one of these names. Case and spaces around the names do not matter. When <code>APP_ENV</code> is not set or empty, the task does not run. It is read at run time. An empty list or a blank name throws</td>
 </tr>
 <tr>
 <td><code>when(function)</code></td>
@@ -7064,27 +7277,31 @@ The lock is not released, so a late server can not run the same minute again. It
 <p>The locks use a <a href="../cache/">cache</a> store.</p>
 <div class="admonition warning">
 <p class="admonition-title">Many servers need Redis</p>
-<p>A <code>memory</code> store lives inside one process.
+<p>A <code>memory</code> store lives inside one process. A <code>file</code> store lives on one machine.
 It works for one <code>work</code> process, or for many isolates of one server.
 When many servers run the schedule, set a Redis store:
 <code>ScheduleConfig(store: 'redis')</code>.</p>
 </div>
-<p>When the store has no locks (<code>file</code>, <code>null</code>), the scheduler uses a memory store.</p>
+<p>When the store has no locks (<code>null</code>), the scheduler uses a memory store.</p>
+<p>At start, the scheduler prints one warning to stderr when a task uses <code>onOneServer()</code> and the lock store is <code>memory</code> or <code>file</code> (or <code>null</code>).
+These stores are not shared between servers, so the lock works only inside one server.
+The warning does not print when <code>APP_ENV</code> is <code>development</code> or <code>local</code>, because a dev machine is one server.
+With one server you can ignore it.</p>
 <h3 id="timeout">Timeout</h3>
 <p>Dart can not stop a running function.
 After the timeout, the run counts as failed and the hooks run, but the work may go on.</p>
 <h2 id="hooks">Hooks</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">s</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'report'</span><span class="p">,</span><span class="w"> </span><span class="n">sendReport</span><span class="p">)</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="p">.</span><span class="n">daily</span><span class="p">()</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="p">.</span><span class="n">before</span><span class="p">(</span><span class="n">logStart</span><span class="p">)</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="p">.</span><span class="n">onSuccess</span><span class="p">(</span><span class="n">logDone</span><span class="p">)</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="p">.</span><span class="n">onFailure</span><span class="p">(</span><span class="n">alertTeam</span><span class="p">)</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="p">.</span><span class="n">after</span><span class="p">(</span><span class="n">cleanUp</span><span class="p">);</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">alertTeam</span><span class="p">(</span><span class="kt">Object</span><span class="w"> </span><span class="n">error</span><span class="p">,</span><span class="w"> </span><span class="n">StackTrace</span><span class="w"> </span><span class="n">stack</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">notifyTeam</span><span class="p">(</span><span class="s1">'report failed: </span><span class="si">$</span><span class="n">error</span><span class="s1">'</span><span class="p">);</span>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">s</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'report'</span><span class="p">,</span><span class="w"> </span><span class="n">sendReport</span><span class="p">)</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="p">.</span><span class="n">daily</span><span class="p">()</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="p">.</span><span class="n">before</span><span class="p">(</span><span class="n">logStart</span><span class="p">)</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="p">.</span><span class="n">onSuccess</span><span class="p">(</span><span class="n">logDone</span><span class="p">)</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="p">.</span><span class="n">onFailure</span><span class="p">(</span><span class="n">alertTeam</span><span class="p">)</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="p">.</span><span class="n">after</span><span class="p">(</span><span class="n">cleanUp</span><span class="p">);</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">alertTeam</span><span class="p">(</span><span class="kt">Object</span><span class="w"> </span><span class="n">error</span><span class="p">,</span><span class="w"> </span><span class="n">StackTrace</span><span class="w"> </span><span class="n">stack</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">notifyTeam</span><span class="p">(</span><span class="s1">'report failed: </span><span class="si">$</span><span class="n">error</span><span class="s1">'</span><span class="p">);</span>
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="p">}</span>
 </span></code></pre></div>
 <table>
 <thead>
@@ -7115,19 +7332,19 @@ After the timeout, the run counts as failed and the hooks run, but the work may 
 <p>An error in a task is logged and the next task still runs.</p>
 <h2 id="run-the-schedule">Run the schedule</h2>
 <p><code>bin/schedule.dart</code> runs the schedule:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/app.dart'</span><span class="p">;</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/schedule.dart'</span><span class="p">;</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_scheduler/dox_scheduler.dart'</span><span class="p">;</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">  </span><span class="n">exitCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">SchedulerRunner</span><span class="p">(</span>
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">    </span><span class="nl">schedule:</span><span class="w"> </span><span class="n">schedule</span><span class="p">,</span>
-</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">    </span><span class="nl">app:</span><span class="w"> </span><span class="n">appConfig</span><span class="p">,</span>
-</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">    </span><span class="nl">config:</span><span class="w"> </span><span class="n">scheduleConfig</span><span class="p">,</span>
-</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">  </span><span class="p">).</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
-</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/app.dart'</span><span class="p">;</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/schedule.dart'</span><span class="p">;</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_scheduler/dox_scheduler.dart'</span><span class="p">;</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">  </span><span class="n">exitCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">SchedulerRunner</span><span class="p">(</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">    </span><span class="nl">schedule:</span><span class="w"> </span><span class="n">schedule</span><span class="p">,</span>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">    </span><span class="nl">app:</span><span class="w"> </span><span class="n">appConfig</span><span class="p">,</span>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">    </span><span class="nl">config:</span><span class="w"> </span><span class="n">scheduleConfig</span><span class="p">,</span>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">  </span><span class="p">).</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>With <code>app</code>, the runner starts your app providers first (like the database).
 It stops them at the end.</p>
@@ -7165,35 +7382,37 @@ On Ctrl+C or SIGTERM it starts no new task and waits for the running ones.
 A second signal stops it at once.</p>
 <h3 id="run">run</h3>
 <p><code>run</code> is for a system cron. Add one line to the crontab:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>/path/to/app/build/bundle<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./bin/schedule<span class="w"> </span>run
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>/path/to/app/build/bundle<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./bin/schedule<span class="w"> </span>run
 </span></code></pre></div>
 <p>It runs the tasks of this minute, waits for them, and exits.
 The exit code is 1 when a task failed.</p>
 <p><code>./bin/schedule</code> is the binary that <code>dox build</code> makes in <code>build/bundle</code>. It starts fast and needs no Dart SDK.
 Do not use <code>dart compile exe</code>. It can not build apps with native libraries, like SQLite.</p>
 <h3 id="list">list</h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Task     Schedule                   Next run
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>cleanup  0 2 * * *                  2026-10-26 02:00 UTC
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>report   0 * * * *                  2026-10-25 14:00 UTC
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>ping     */5 * * * * Asia/Yangon    2026-10-25 20:35 Asia/Yangon
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Task     Schedule                   Next run
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>cleanup  0 2 * * *                  2026-10-26 02:00 UTC
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>report   0 * * * *                  2026-10-25 14:00 UTC
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>ping     */5 * * * * Asia/Yangon    2026-10-25 20:35 Asia/Yangon
 </span></code></pre></div>
-<p>The next run time checks the frequency and <code>between()</code>. It does not check <code>when()</code> and <code>skip()</code>.</p>
+<p>The next run time checks the frequency, <code>between()</code> and <code>unlessBetween()</code>. It does not check <code>when()</code>, <code>skip()</code> and <code>environments()</code>.</p>
+<p><code>lastDayOfMonth()</code> shows <code>28-31</code> in the day field, but it runs only on the last day of the month.
+The next run time is right.</p>
 <h3 id="test">test</h3>
 <p><code>test &lt;name&gt;</code> runs one task now, with its hooks.
 It does not check the schedule, the filters or the locks.</p>
 <h2 id="run-inside-the-server">Run inside the server</h2>
 <p>You can run the schedule inside your Dox server instead of a <code>work</code> process.
 Add a provider that extends <code>SchedulerProvider</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1">// lib/providers/schedule_provider.dart</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_scheduler/dox_scheduler.dart'</span><span class="p">;</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/schedule.dart'</span><span class="p">;</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ScheduleProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">SchedulerProvider</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">  </span><span class="n">ScheduleProvider</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">super</span><span class="p">(</span><span class="nl">schedule:</span><span class="w"> </span><span class="n">schedule</span><span class="p">,</span><span class="w"> </span><span class="nl">config:</span><span class="w"> </span><span class="n">scheduleConfig</span><span class="p">);</span>
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1">// lib/providers/schedule_provider.dart</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_scheduler/dox_scheduler.dart'</span><span class="p">;</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/schedule.dart'</span><span class="p">;</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ScheduleProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">SchedulerProvider</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">  </span><span class="n">ScheduleProvider</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">super</span><span class="p">(</span><span class="nl">schedule:</span><span class="w"> </span><span class="n">schedule</span><span class="p">,</span><span class="w"> </span><span class="nl">config:</span><span class="w"> </span><span class="n">scheduleConfig</span><span class="p">);</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Then turn it on in <code>lib/config/schedule.dart</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">ScheduleConfig</span><span class="w"> </span><span class="n">scheduleConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ScheduleConfig</span><span class="p">(</span><span class="nl">inProcess:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">ScheduleConfig</span><span class="w"> </span><span class="n">scheduleConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ScheduleConfig</span><span class="p">(</span><span class="nl">inProcess:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
 </span></code></pre></div>
 <p>Run <code>dart run build_runner build</code>. The generated container finds the provider.</p>
 <p>How it works:</p>
@@ -7211,33 +7430,33 @@ Add a provider that extends <code>SchedulerProvider</code>:</p>
 <p>Use <code>work</code> for heavy tasks. Use the in-process provider for small apps.</p>
 <h2 id="testing">Testing</h2>
 <p><code>Scheduler</code> runs the tasks. Give it a fake clock to test a schedule with no waiting:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_cache/dox_cache.dart'</span><span class="p">;</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_scheduler/dox_scheduler.dart'</span><span class="p">;</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/schedule.dart'</span><span class="p">;</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:test/test.dart'</span><span class="p">;</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="kd">class</span><span class="w"> </span><span class="nc">FakeClock</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ScheduleClock</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">  </span><span class="n">FakeClock</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">time</span><span class="p">);</span>
-</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>
-</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="w">  </span><span class="n">DateTime</span><span class="w"> </span><span class="n">time</span><span class="p">;</span>
-</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>
-</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="w">  </span><span class="n">DateTime</span><span class="w"> </span><span class="n">now</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-14-13"><a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">time</span><span class="p">;</span>
-</span><span id="__span-14-14"><a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-14-15"><a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="p">}</span>
-</span><span id="__span-14-16"><a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a>
-</span><span id="__span-14-17"><a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="n">test</span><span class="p">(</span><span class="s1">'cleanup runs at 02:00'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-14-18"><a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="w">  </span><span class="n">Schedule</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Schedule</span><span class="p">();</span>
-</span><span id="__span-14-19"><a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a><span class="w">  </span><span class="n">schedule</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
-</span><span id="__span-14-20"><a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a><span class="w">  </span><span class="n">Scheduler</span><span class="w"> </span><span class="n">scheduler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Scheduler</span><span class="p">(</span>
-</span><span id="__span-14-21"><a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a><span class="w">    </span><span class="nl">tasks:</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">tasks</span><span class="p">,</span>
-</span><span id="__span-14-22"><a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a><span class="w">    </span><span class="nl">store:</span><span class="w"> </span><span class="n">CacheStore</span><span class="p">(</span><span class="n">MemoryDriver</span><span class="p">()),</span>
-</span><span id="__span-14-23"><a id="__codelineno-14-23" name="__codelineno-14-23" href="#__codelineno-14-23"></a><span class="w">    </span><span class="nl">clock:</span><span class="w"> </span><span class="n">FakeClock</span><span class="p">(</span><span class="n">DateTime</span><span class="p">.</span><span class="n">utc</span><span class="p">(</span><span class="m">2026</span><span class="p">,</span><span class="w"> </span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="m">25</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">)),</span>
-</span><span id="__span-14-24"><a id="__codelineno-14-24" name="__codelineno-14-24" href="#__codelineno-14-24"></a><span class="w">  </span><span class="p">);</span>
-</span><span id="__span-14-25"><a id="__codelineno-14-25" name="__codelineno-14-25" href="#__codelineno-14-25"></a><span class="w">  </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">TaskOutcome</span><span class="o">&gt;</span><span class="w"> </span><span class="n">outcomes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">scheduler</span><span class="p">.</span><span class="n">runDue</span><span class="p">();</span>
-</span><span id="__span-14-26"><a id="__codelineno-14-26" name="__codelineno-14-26" href="#__codelineno-14-26"></a><span class="w">  </span><span class="n">expect</span><span class="p">(</span><span class="n">outcomes</span><span class="p">[</span><span class="s1">'cleanup'</span><span class="p">],</span><span class="w"> </span><span class="n">TaskOutcome</span><span class="p">.</span><span class="n">ran</span><span class="p">);</span>
-</span><span id="__span-14-27"><a id="__codelineno-14-27" name="__codelineno-14-27" href="#__codelineno-14-27"></a><span class="p">});</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_cache/dox_cache.dart'</span><span class="p">;</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_scheduler/dox_scheduler.dart'</span><span class="p">;</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/schedule.dart'</span><span class="p">;</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:test/test.dart'</span><span class="p">;</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="kd">class</span><span class="w"> </span><span class="nc">FakeClock</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ScheduleClock</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">  </span><span class="n">FakeClock</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">time</span><span class="p">);</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="w">  </span><span class="n">DateTime</span><span class="w"> </span><span class="n">time</span><span class="p">;</span>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-15-12"><a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="w">  </span><span class="n">DateTime</span><span class="w"> </span><span class="n">now</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-13"><a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">time</span><span class="p">;</span>
+</span><span id="__span-15-14"><a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-15-15"><a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="p">}</span>
+</span><span id="__span-15-16"><a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>
+</span><span id="__span-15-17"><a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a><span class="n">test</span><span class="p">(</span><span class="s1">'cleanup runs at 02:00'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-18"><a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a><span class="w">  </span><span class="n">Schedule</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Schedule</span><span class="p">(</span><span class="nl">timezone:</span><span class="w"> </span><span class="n">scheduleConfig</span><span class="p">.</span><span class="n">timezone</span><span class="p">);</span>
+</span><span id="__span-15-19"><a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a><span class="w">  </span><span class="n">schedule</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+</span><span id="__span-15-20"><a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a><span class="w">  </span><span class="n">Scheduler</span><span class="w"> </span><span class="n">scheduler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Scheduler</span><span class="p">(</span>
+</span><span id="__span-15-21"><a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a><span class="w">    </span><span class="nl">tasks:</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">tasks</span><span class="p">,</span>
+</span><span id="__span-15-22"><a id="__codelineno-15-22" name="__codelineno-15-22" href="#__codelineno-15-22"></a><span class="w">    </span><span class="nl">store:</span><span class="w"> </span><span class="n">CacheStore</span><span class="p">(</span><span class="n">MemoryDriver</span><span class="p">()),</span>
+</span><span id="__span-15-23"><a id="__codelineno-15-23" name="__codelineno-15-23" href="#__codelineno-15-23"></a><span class="w">    </span><span class="nl">clock:</span><span class="w"> </span><span class="n">FakeClock</span><span class="p">(</span><span class="n">DateTime</span><span class="p">.</span><span class="n">utc</span><span class="p">(</span><span class="m">2026</span><span class="p">,</span><span class="w"> </span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="m">25</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">)),</span>
+</span><span id="__span-15-24"><a id="__codelineno-15-24" name="__codelineno-15-24" href="#__codelineno-15-24"></a><span class="w">  </span><span class="p">);</span>
+</span><span id="__span-15-25"><a id="__codelineno-15-25" name="__codelineno-15-25" href="#__codelineno-15-25"></a><span class="w">  </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">TaskOutcome</span><span class="o">&gt;</span><span class="w"> </span><span class="n">outcomes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">scheduler</span><span class="p">.</span><span class="n">runDue</span><span class="p">();</span>
+</span><span id="__span-15-26"><a id="__codelineno-15-26" name="__codelineno-15-26" href="#__codelineno-15-26"></a><span class="w">  </span><span class="n">expect</span><span class="p">(</span><span class="n">outcomes</span><span class="p">[</span><span class="s1">'cleanup'</span><span class="p">],</span><span class="w"> </span><span class="n">TaskOutcome</span><span class="p">.</span><span class="n">ran</span><span class="p">);</span>
+</span><span id="__span-15-27"><a id="__codelineno-15-27" name="__codelineno-15-27" href="#__codelineno-15-27"></a><span class="p">});</span>
 </span></code></pre></div>
 <p><code>ScheduledTask.isDue(time)</code> and <code>ScheduledTask.nextRun(time)</code> check a schedule with no run at all.</p>
 
@@ -7282,7 +7501,7 @@ Add a provider that extends <code>SchedulerProvider</code>:</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../mail/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Mail">
+          <a href="../notifications/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Notifications">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -7292,7 +7511,7 @@ Add a provider that extends <code>SchedulerProvider</code>:</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Mail
+                Notifications
               </div>
             </div>
           </a>

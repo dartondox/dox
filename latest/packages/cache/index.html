@@ -2188,6 +2188,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -2357,6 +2361,55 @@
     
   
     Mail
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/notifications/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-radio-tower"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4.9 16.1C1 12.2 1 5.8 4.9 1.9" />
+  <path d="M7.8 4.7a6.14 6.14 0 0 0-.8 7.5" />
+  <circle cx="12" cy="9" r="2" />
+  <path d="M16.2 4.8c2 2 2.26 5.11.8 7.47" />
+  <path d="M19.1 1.9a9.96 9.96 0 0 1 0 14.1" />
+  <path d="M9.5 18h5" />
+  <path d="m8 22 4-11 4 11" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Notifications
   
 
     
@@ -2650,6 +2703,50 @@
     
   
     Dox CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/package-commands/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-blocks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2" />
+  <rect x="14" y="2" width="8" height="8" rx="1" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Package commands
   
 
     
@@ -3675,6 +3772,8 @@
       
         
       
+        
+      
     
     
     
@@ -3889,6 +3988,53 @@
     
   
     ManyToMany
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../database/model/relationship/polymorphic/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-share-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="18" cy="5" r="3" />
+  <circle cx="6" cy="12" r="3" />
+  <circle cx="18" cy="19" r="3" />
+  <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
+  <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Polymorphic
   
 
     
@@ -6861,21 +7007,29 @@ An empty prefix makes <code>flush</code> throw.</p>
 <ul>
 <li>Each prefix has its own sub folder inside <code>path</code>. <code>flush</code> deletes only the files of that prefix.</li>
 <li><code>add</code>, <code>increment</code> and <code>touch</code> take a file lock on the key, so they are safe across isolates.</li>
-<li>A read never deletes a file. An expired file stays until it is written again.
-  Call <code>prune()</code> from time to time, eg. in a schedule, to delete expired files:</li>
+<li>A read never deletes a file. An expired file stays until it is written again.</li>
+<li><code>prune()</code> deletes the expired files. Call it from time to time, eg. in a schedule:</li>
 </ul>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">deleted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="p">(</span><span class="n">store</span><span class="p">.</span><span class="n">driver</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">FileDriver</span><span class="p">).</span><span class="n">prune</span><span class="p">();</span>
 </span></code></pre></div>
+<ul>
+<li>Or set <code>prune_every</code> on the store to run <code>prune()</code> in the background once every that many writes. It is off by default. Each run reads every file of the store, so pick a big number, eg. <code>1000</code>:</li>
+</ul>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="s1">'file'</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'file'</span><span class="p">,</span><span class="w"> </span><span class="s1">'path'</span><span class="o">:</span><span class="w"> </span><span class="s1">'storage/cache'</span><span class="p">,</span><span class="w"> </span><span class="s1">'prune_every'</span><span class="o">:</span><span class="w"> </span><span class="m">1000</span><span class="p">},</span>
+</span></code></pre></div>
+<ul>
+<li><code>prune()</code> takes the key lock that <code>add</code>, <code>increment</code> and <code>touch</code> use, so it never deletes their new value. A plain <code>put</code> takes no lock. If a <code>put</code> writes a key at the same moment <code>prune()</code> deletes it, the new value is lost. It is only a cache miss.</li>
+</ul>
 <h2 id="your-own-driver">Your own driver</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">MyDriverFactory</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">CacheDriverFactory</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="n">CacheDriver</span><span class="w"> </span><span class="n">create</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">options</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">MyDriver</span><span class="p">(</span><span class="n">options</span><span class="p">);</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="p">}</span>
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>
-</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="n">cache</span><span class="p">.</span><span class="n">extend</span><span class="p">(</span><span class="s1">'mine'</span><span class="p">,</span><span class="w"> </span><span class="n">MyDriverFactory</span><span class="p">());</span><span class="w"> </span><span class="c1">// config: {'driver': 'mine'}</span>
-</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="n">cache</span><span class="p">.</span><span class="n">addStore</span><span class="p">(</span><span class="s1">'ready'</span><span class="p">,</span><span class="w"> </span><span class="n">MemoryDriver</span><span class="p">());</span><span class="w"> </span><span class="c1">// or add a ready driver</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">MyDriverFactory</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">CacheDriverFactory</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="n">CacheDriver</span><span class="w"> </span><span class="n">create</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">options</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">MyDriver</span><span class="p">(</span><span class="n">options</span><span class="p">);</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="p">}</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="n">cache</span><span class="p">.</span><span class="n">extend</span><span class="p">(</span><span class="s1">'mine'</span><span class="p">,</span><span class="w"> </span><span class="n">MyDriverFactory</span><span class="p">());</span><span class="w"> </span><span class="c1">// config: {'driver': 'mine'}</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="n">cache</span><span class="p">.</span><span class="n">addStore</span><span class="p">(</span><span class="s1">'ready'</span><span class="p">,</span><span class="w"> </span><span class="n">MemoryDriver</span><span class="p">());</span><span class="w"> </span><span class="c1">// or add a ready driver</span>
 </span></code></pre></div>
 <p><code>MyDriver extends CacheDriver</code>. It must implement <code>prefix</code>, <code>get</code>, <code>put</code>, <code>add</code>, <code>increment</code>, <code>forget</code> and <code>flush</code>.
 Override <code>lock</code> to support locks, and <code>close</code> to close its connections.

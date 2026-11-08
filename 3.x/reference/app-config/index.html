@@ -2188,6 +2188,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -2357,6 +2361,55 @@
     
   
     Mail
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/notifications/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-radio-tower"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4.9 16.1C1 12.2 1 5.8 4.9 1.9" />
+  <path d="M7.8 4.7a6.14 6.14 0 0 0-.8 7.5" />
+  <circle cx="12" cy="9" r="2" />
+  <path d="M16.2 4.8c2 2 2.26 5.11.8 7.47" />
+  <path d="M19.1 1.9a9.96 9.96 0 0 1 0 14.1" />
+  <path d="M9.5 18h5" />
+  <path d="m8 22 4-11 4 11" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Notifications
   
 
     
@@ -2650,6 +2703,50 @@
     
   
     Dox CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/package-commands/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-blocks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2" />
+  <rect x="14" y="2" width="8" height="8" rx="1" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Package commands
   
 
     
@@ -3675,6 +3772,8 @@
       
         
       
+        
+      
     
     
     
@@ -3889,6 +3988,53 @@
     
   
     ManyToMany
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../database/model/relationship/polymorphic/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-share-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="18" cy="5" r="3" />
+  <circle cx="6" cy="12" r="3" />
+  <circle cx="18" cy="19" r="3" />
+  <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
+  <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Polymorphic
   
 
     
@@ -6587,6 +6733,18 @@
 <td>A client that sends no body bytes for this long gets <code>408</code>. A slow but steady upload is fine. Native server only.</td>
 </tr>
 <tr>
+<td><code>idleTimeout</code></td>
+<td><code>Duration</code></td>
+<td><code>Duration(seconds: 30)</code></td>
+<td>A keep-alive connection with no new request for this long is closed. A request head must also arrive in this time. Behind a load balancer, set it longer than the balancer's idle timeout. See <a href="../../digging-deeper/deployment/#behind-a-load-balancer">Behind a load balancer</a>.</td>
+</tr>
+<tr>
+<td><code>maxConnections</code></td>
+<td><code>int?</code></td>
+<td><code>null</code> (no limit)</td>
+<td>The most connections one isolate holds open at once. Must be 1 or more. 0 or less throws an <code>ArgumentError</code> when the server starts. When it is full, new clients wait in the OS listen queue until a connection closes. WebSocket connections and connections that are still closing count too. The queue holds up to 1024 clients, and the OS can make it smaller (<code>somaxconn</code>; 128 by default on macOS). When the queue is full, new clients wait and then time out. On Linux each new client goes to one isolate (<code>SO_REUSEPORT</code>), so it can wait for a full isolate even when others have room. The whole app holds up to <code>maxConnections * totalIsolate</code>, so keep that below <code>ulimit -n</code>. Native server only.</td>
+</tr>
+<tr>
 <td><code>shutdownTimeout</code></td>
 <td><code>Duration</code></td>
 <td><code>Duration(seconds: 8)</code></td>
@@ -6658,6 +6816,12 @@
 <td><code>List&lt;DoxProvider&gt;</code></td>
 <td><code>[]</code></td>
 <td>Providers to run first, in this order. Every other <code>DoxProvider</code> class comes from <code>container</code>. Dox runs them in every isolate at start.</td>
+</tr>
+<tr>
+<td><code>webSocketAllowedOrigins</code></td>
+<td><code>List&lt;String&gt;?</code></td>
+<td><code>null</code> (no check)</td>
+<td>Turns on the <code>Origin</code> check for every <code>Route.websocket</code> route. Only pages of the same host and the listed sites, like <code>https://app.example.com</code>, can open a socket. Other origins get <code>403</code>. <code>[]</code> means the same host only. <code>allowedOrigins</code> on a route wins over this. With <code>null</code>, any website can open a socket with the cookies of the user, and Dox prints one warning to stderr at start.</td>
 </tr>
 </tbody>
 </table>
@@ -7435,7 +7599,13 @@ Source: <code>packages/dox-orm/lib/src/types/database_config.dart</code> and <co
 <td><code>printer</code></td>
 <td><code>QueryPrinter?</code></td>
 <td><code>null</code></td>
-<td><code>ConsoleQueryPrinter()</code>, <code>PrettyQueryPrinter()</code>, <code>FileQueryPrinter()</code> or your own.</td>
+<td><code>ConsoleQueryPrinter()</code>, <code>PrettyQueryPrinter()</code>, <code>FileQueryPrinter(file: File('queries.log'))</code> or your own. <code>FileQueryPrinter(file: ..., buffered: true)</code> writes in the background, so a query does not wait for the disk. Then call <code>await printer.flush()</code> before <code>exit()</code>, or the last lines are lost.</td>
+</tr>
+<tr>
+<td><code>logRedact</code></td>
+<td><code>List&lt;String&gt;</code></td>
+<td><code>[]</code></td>
+<td>Names of values to hide in the query log. A value shows as <code>***</code> when its key ends with one of these names, in any case. <code>['password', 'token']</code> hides <code>password</code>, <code>users.password</code> and <code>remember_token</code>. Only the log changes. The query gets the real values. The list of the default connection counts for every query. The list of a named connection counts too, for the queries on that connection.</td>
 </tr>
 <tr>
 <td><code>extra</code></td>
@@ -7497,6 +7667,13 @@ Source: <code>packages/dox-orm/lib/src/types/database_config.dart</code> and <co
 <td><code>String</code></td>
 <td>none</td>
 <td>Path of a PEM file with the CA certificates to trust for <code>verify-full</code>. <code>sslrootcert</code> in <code>DATABASE_URL</code>.</td>
+</tr>
+<tr>
+<td>postgres</td>
+<td><code>sslWarning</code></td>
+<td><code>bool</code></td>
+<td><code>true</code></td>
+<td><code>false</code> hides the warning that Dox prints (once per isolate) when TLS mode is <code>require</code>. <code>sslWarning=false</code> in <code>DATABASE_URL</code> works too.</td>
 </tr>
 <tr>
 <td>postgres</td>

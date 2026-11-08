@@ -2450,6 +2450,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -2619,6 +2623,55 @@
     
   
     Mail
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/notifications/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-radio-tower"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4.9 16.1C1 12.2 1 5.8 4.9 1.9" />
+  <path d="M7.8 4.7a6.14 6.14 0 0 0-.8 7.5" />
+  <circle cx="12" cy="9" r="2" />
+  <path d="M16.2 4.8c2 2 2.26 5.11.8 7.47" />
+  <path d="M19.1 1.9a9.96 9.96 0 0 1 0 14.1" />
+  <path d="M9.5 18h5" />
+  <path d="m8 22 4-11 4 11" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Notifications
   
 
     
@@ -2912,6 +2965,50 @@
     
   
     Dox CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/package-commands/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-blocks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2" />
+  <rect x="14" y="2" width="8" height="8" rx="1" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Package commands
   
 
     
@@ -3937,6 +4034,8 @@
       
         
       
+        
+      
     
     
     
@@ -4151,6 +4250,53 @@
     
   
     ManyToMany
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../database/model/relationship/polymorphic/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-share-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="18" cy="5" r="3" />
+  <circle cx="6" cy="12" r="3" />
+  <circle cx="18" cy="19" r="3" />
+  <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
+  <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Polymorphic
   
 
     
@@ -6889,7 +7035,7 @@ To choose the source yourself:</p>
 </tr>
 <tr>
 <td>Files</td>
-<td><code>@MaxSize</code>, <code>@Mimes</code>, <code>@Image</code></td>
+<td><code>@MaxSize</code>, <code>@MinSize</code>, <code>@Mimes</code>, <code>@MimeTypes</code>, <code>@Image</code>, <code>@Dimensions</code></td>
 </tr>
 <tr>
 <td>Database</td>
@@ -6921,10 +7067,11 @@ To choose the source yourself:</p>
 <p>A <code>RequestFile</code> field reads a file from <code>multipart/form-data</code>.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nd">@Image</span><span class="p">()</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nd">@MaxSize</span><span class="p">(</span><span class="s1">'2MB'</span><span class="p">)</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="kd">final</span><span class="w"> </span><span class="n">RequestFile</span><span class="w"> </span><span class="n">avatar</span><span class="p">;</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="nd">@Mimes</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'pdf'</span><span class="p">,</span><span class="w"> </span><span class="s1">'docx'</span><span class="p">])</span>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="kd">final</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">RequestFile</span><span class="o">&gt;</span><span class="w"> </span><span class="n">documents</span><span class="p">;</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="nd">@Dimensions</span><span class="p">(</span><span class="nl">minWidth:</span><span class="w"> </span><span class="m">100</span><span class="p">,</span><span class="w"> </span><span class="nl">maxWidth:</span><span class="w"> </span><span class="m">2000</span><span class="p">)</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="kd">final</span><span class="w"> </span><span class="n">RequestFile</span><span class="w"> </span><span class="n">avatar</span><span class="p">;</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="nd">@Mimes</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'pdf'</span><span class="p">,</span><span class="w"> </span><span class="s1">'docx'</span><span class="p">])</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="kd">final</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">RequestFile</span><span class="o">&gt;</span><span class="w"> </span><span class="n">documents</span><span class="p">;</span>
 </span></code></pre></div>
 <p>Dox checks the real file type from its first bytes. It does not trust the file name or the client.
 To save the file, see <a href="../../guides/file-upload/">File upload</a>.</p>
@@ -6970,7 +7117,7 @@ The full order of checks is in <a href="../validation-rules/#the-order-of-checks
 <p>Change a message in one of these places. The first one wins.</p>
 <ol>
 <li>On the rule: <code>@Email(message: 'Please check your email')</code>.</li>
-<li>On the DTO, by code or by <code>key.code</code>:</li>
+<li>On the DTO, by code or by <code>key.code</code>. A full dotted path works too, like <code>'address.city.required'</code> (it also reaches a nested DTO). Use <code>*</code> for list items, like <code>'tags.*.required'</code>:</li>
 </ol>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nd">@Dto</span><span class="p">(</span><span class="nl">messages:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span>
 </span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="s1">'email.required'</span><span class="o">:</span><span class="w"> </span><span class="s1">'We need your email'</span><span class="p">,</span>
@@ -7031,6 +7178,7 @@ The full order of checks is in <a href="../validation-rules/#the-order-of-checks
 <ul>
 <li>A rule with values: add <code>final</code> fields and override <code>params</code>. They become placeholders.</li>
 <li><code>context.lookup('other.key')</code> reads another input value.</li>
+<li><code>context.sibling('key')</code> reads the raw input of a field next to this one, in the same object. For example, <code>context.sibling('password_confirmation')</code> in a rule on <code>password</code>. It gives <code>undefined</code> when the field is missing.</li>
 <li>A rule that needs the database: extend <code>AsyncRule&lt;T&gt;</code> and write <code>checkAsync</code>.</li>
 </ul>
 <h2 id="dynamic-input">Dynamic input</h2>

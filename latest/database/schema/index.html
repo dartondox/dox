@@ -2188,6 +2188,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -2357,6 +2361,55 @@
     
   
     Mail
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/notifications/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-radio-tower"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4.9 16.1C1 12.2 1 5.8 4.9 1.9" />
+  <path d="M7.8 4.7a6.14 6.14 0 0 0-.8 7.5" />
+  <circle cx="12" cy="9" r="2" />
+  <path d="M16.2 4.8c2 2 2.26 5.11.8 7.47" />
+  <path d="M19.1 1.9a9.96 9.96 0 0 1 0 14.1" />
+  <path d="M9.5 18h5" />
+  <path d="m8 22 4-11 4 11" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Notifications
   
 
     
@@ -2650,6 +2703,50 @@
     
   
     Dox CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/package-commands/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-blocks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2" />
+  <rect x="14" y="2" width="8" height="8" rx="1" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Package commands
   
 
     
@@ -3879,6 +3976,8 @@
       
         
       
+        
+      
     
     
     
@@ -4093,6 +4192,53 @@
     
   
     ManyToMany
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../model/relationship/polymorphic/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-share-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="18" cy="5" r="3" />
+  <circle cx="6" cy="12" r="3" />
+  <circle cx="18" cy="19" r="3" />
+  <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
+  <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Polymorphic
   
 
     
@@ -6771,6 +6917,30 @@ You can also give a driver: <code>Schema(driver)</code>.</p>
 <td><code>CHAR(36)</code></td>
 <td><code>TEXT</code></td>
 </tr>
+<tr>
+<td><code>foreignIdFor(User())</code></td>
+<td><code>BIGINT</code></td>
+<td><code>BIGINT UNSIGNED</code></td>
+<td><code>INTEGER</code></td>
+</tr>
+<tr>
+<td><code>ulid(['ulid'])</code> / <code>foreignUlid('user_id')</code></td>
+<td><code>CHAR(26)</code></td>
+<td><code>CHAR(26)</code></td>
+<td><code>CHAR(26)</code></td>
+</tr>
+<tr>
+<td><code>year('c')</code></td>
+<td><code>INTEGER</code></td>
+<td><code>YEAR</code></td>
+<td><code>INTEGER</code></td>
+</tr>
+<tr>
+<td><code>ipAddress(['ip_address'])</code></td>
+<td><code>VARCHAR(45)</code></td>
+<td><code>VARCHAR(45)</code></td>
+<td><code>VARCHAR(45)</code></td>
+</tr>
 </tbody>
 </table>
 <p>Helpers:</p>
@@ -6778,8 +6948,15 @@ You can also give a driver: <code>Schema(driver)</code>.</p>
 <li><code>timestamps()</code>: nullable <code>created_at</code> and <code>updated_at</code> (<code>timestampTz</code>).</li>
 <li><code>softDeletes(['deleted_at'])</code>: nullable <code>deleted_at</code> (<code>timestampTz</code>), for models with <code>softDelete: true</code>.</li>
 <li><code>rememberToken()</code>: nullable <code>remember_token</code> <code>VARCHAR(100)</code>.</li>
+<li><code>softDeletesTz(['deleted_at'])</code>: the same as <code>softDeletes</code>. It is already a time with a zone.</li>
 <li><code>morphs('owner')</code>: <code>owner_id</code> (unsigned big integer), <code>owner_type</code> (string) and one index on both columns.</li>
+<li><code>nullableMorphs('owner')</code>: the same as <code>morphs</code>, but both columns can be <code>NULL</code>.</li>
+<li><code>uuidMorphs('owner')</code>: the same as <code>morphs</code>, with a uuid <code>owner_id</code>.</li>
 </ul>
+<p><code>foreignIdFor(User())</code> makes the foreign key column of the model, like <code>user_id</code>. Give a name as the second argument to change it. <code>.constrained()</code> then points to the table and primary key of the model:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">table</span><span class="p">.</span><span class="n">foreignIdFor</span><span class="p">(</span><span class="n">User</span><span class="p">()).</span><span class="n">constrained</span><span class="p">().</span><span class="n">cascadeOnDelete</span><span class="p">();</span>
+</span></code></pre></div>
+<p>It is always a big integer. For a model with a text key, use <code>foreignUuid</code> or <code>foreignUlid</code>.</p>
 <div class="admonition info">
 <p class="admonition-title">JSON on SQLite</p>
 <p>SQLite has no JSON type. The column is declared as <code>JSON</code>,
@@ -6865,20 +7042,26 @@ so the SQLite driver knows to decode it when you read it.</p>
 The schema builder writes it as <code>DEFAULT ('value')</code> for you.</p>
 </div>
 <h2 id="change-a-table">Change a table</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">schema</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'users'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">Table</span><span class="w"> </span><span class="n">table</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="n">table</span><span class="p">.</span><span class="n">string</span><span class="p">(</span><span class="s1">'avatar'</span><span class="p">).</span><span class="n">nullable</span><span class="p">().</span><span class="n">after</span><span class="p">(</span><span class="s1">'email'</span><span class="p">);</span><span class="w"> </span><span class="c1">// add</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="n">table</span><span class="p">.</span><span class="n">string</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="m">100</span><span class="p">).</span><span class="n">nullable</span><span class="p">().</span><span class="n">change</span><span class="p">();</span><span class="w">    </span><span class="c1">// change</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="n">table</span><span class="p">.</span><span class="n">renameColumn</span><span class="p">(</span><span class="s1">'bio'</span><span class="p">,</span><span class="w"> </span><span class="s1">'about'</span><span class="p">);</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="n">table</span><span class="p">.</span><span class="n">dropColumn</span><span class="p">(</span><span class="s1">'age'</span><span class="p">);</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="n">table</span><span class="p">.</span><span class="n">dropColumns</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'a'</span><span class="p">,</span><span class="w"> </span><span class="s1">'b'</span><span class="p">]);</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">});</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">schema</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'users'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">Table</span><span class="w"> </span><span class="n">table</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="n">table</span><span class="p">.</span><span class="n">string</span><span class="p">(</span><span class="s1">'avatar'</span><span class="p">).</span><span class="n">nullable</span><span class="p">().</span><span class="n">after</span><span class="p">(</span><span class="s1">'email'</span><span class="p">);</span><span class="w"> </span><span class="c1">// add</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="n">table</span><span class="p">.</span><span class="n">string</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="m">100</span><span class="p">).</span><span class="n">nullable</span><span class="p">().</span><span class="n">change</span><span class="p">();</span><span class="w">    </span><span class="c1">// change</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="n">table</span><span class="p">.</span><span class="n">renameColumn</span><span class="p">(</span><span class="s1">'bio'</span><span class="p">,</span><span class="w"> </span><span class="s1">'about'</span><span class="p">);</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="n">table</span><span class="p">.</span><span class="n">dropColumn</span><span class="p">(</span><span class="s1">'age'</span><span class="p">);</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="n">table</span><span class="p">.</span><span class="n">dropColumns</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'a'</span><span class="p">,</span><span class="w"> </span><span class="s1">'b'</span><span class="p">]);</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">});</span>
 </span></code></pre></div>
+<p>Drop helpers:</p>
+<ul>
+<li><code>dropTimestamps()</code>: drops <code>created_at</code> and <code>updated_at</code>.</li>
+<li><code>dropSoftDeletes(['deleted_at'])</code>: drops <code>deleted_at</code>.</li>
+<li><code>dropConstrainedForeignId('user_id')</code>: drops the foreign key of the column, then the column.</li>
+</ul>
 <p>A column in <code>schema.table</code> is <strong>added</strong>. Add <code>.change()</code> to change a column that exists.</p>
 <h3 id="change-columns">Change columns</h3>
 <p><code>change()</code> sets the full new column: type, null, default and comment.
 Give every modifier you want to keep.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// before: string('title') NOT NULL DEFAULT 'x'</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">table</span><span class="p">.</span><span class="n">string</span><span class="p">(</span><span class="s1">'title'</span><span class="p">,</span><span class="w"> </span><span class="m">500</span><span class="p">).</span><span class="n">nullable</span><span class="p">().</span><span class="n">defaultTo</span><span class="p">(</span><span class="s1">'x'</span><span class="p">).</span><span class="n">change</span><span class="p">();</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">// before: string('title') NOT NULL DEFAULT 'x'</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">table</span><span class="p">.</span><span class="n">string</span><span class="p">(</span><span class="s1">'title'</span><span class="p">,</span><span class="w"> </span><span class="m">500</span><span class="p">).</span><span class="n">nullable</span><span class="p">().</span><span class="n">defaultTo</span><span class="p">(</span><span class="s1">'x'</span><span class="p">).</span><span class="n">change</span><span class="p">();</span>
 </span></code></pre></div>
 <p>How it runs:</p>
 <table>
@@ -6906,20 +7089,28 @@ Give every modifier you want to keep.</p>
 <p><code>change()</code> with <code>unique()</code> or <code>index()</code> adds the index. It fails when the index already exists.</p>
 <h2 id="indexes-and-keys">Indexes and keys</h2>
 <p><code>columns</code> is a column name or a list of names.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">table</span><span class="p">.</span><span class="n">index</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'state'</span><span class="p">,</span><span class="w"> </span><span class="s1">'created_at'</span><span class="p">]);</span><span class="w">  </span><span class="c1">// posts_state_created_at_index</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">table</span><span class="p">.</span><span class="n">unique</span><span class="p">(</span><span class="s1">'slug'</span><span class="p">);</span><span class="w">                          </span><span class="c1">// posts_slug_unique</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">table</span><span class="p">.</span><span class="n">primary</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'post_id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'tag_id'</span><span class="p">]);</span><span class="w">  </span><span class="c1">// composite primary key</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">table</span><span class="p">.</span><span class="n">dropIndex</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'state'</span><span class="p">,</span><span class="w"> </span><span class="s1">'created_at'</span><span class="p">]);</span><span class="w"> </span><span class="c1">// by columns</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">table</span><span class="p">.</span><span class="n">dropUnique</span><span class="p">(</span><span class="s1">'posts_slug_unique'</span><span class="p">);</span><span class="w">            </span><span class="c1">// or by name</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">table</span><span class="p">.</span><span class="n">index</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'state'</span><span class="p">,</span><span class="w"> </span><span class="s1">'created_at'</span><span class="p">]);</span><span class="w">  </span><span class="c1">// posts_state_created_at_index</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">table</span><span class="p">.</span><span class="n">unique</span><span class="p">(</span><span class="s1">'slug'</span><span class="p">);</span><span class="w">                          </span><span class="c1">// posts_slug_unique</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">table</span><span class="p">.</span><span class="n">primary</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'post_id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'tag_id'</span><span class="p">]);</span><span class="w">  </span><span class="c1">// composite primary key</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">table</span><span class="p">.</span><span class="n">dropIndex</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'state'</span><span class="p">,</span><span class="w"> </span><span class="s1">'created_at'</span><span class="p">]);</span><span class="w"> </span><span class="c1">// by columns</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="n">table</span><span class="p">.</span><span class="n">dropUnique</span><span class="p">(</span><span class="s1">'posts_slug_unique'</span><span class="p">);</span><span class="w">            </span><span class="c1">// or by name</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="n">table</span><span class="p">.</span><span class="n">fullText</span><span class="p">(</span><span class="s1">'body'</span><span class="p">);</span><span class="w">                           </span><span class="c1">// posts_body_fulltext</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="n">table</span><span class="p">.</span><span class="n">renameIndex</span><span class="p">(</span><span class="s1">'posts_slug_unique'</span><span class="p">,</span><span class="w"> </span><span class="s1">'posts_url_unique'</span><span class="p">);</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="n">table</span><span class="p">.</span><span class="n">dropPrimary</span><span class="p">();</span><span class="w">                              </span><span class="c1">// posts_pkey on Postgres</span>
 </span></code></pre></div>
+<ul>
+<li><code>fullText</code> makes a <code>FULLTEXT</code> index on MySQL. On Postgres it makes a <code>gin</code> index on <code>to_tsvector('english', ...)</code>.</li>
+<li><code>dropPrimary([name])</code> takes the name for Postgres. The default is <code>{table}_pkey</code>. MySQL needs no name.</li>
+</ul>
 <p>Index names are <code>{table}_{columns}_{index|unique|foreign}</code>.
 You can give your own name as the last argument: <code>table.unique('slug', 'my_name')</code>.</p>
 <h3 id="foreign-keys">Foreign keys</h3>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">table</span><span class="p">.</span><span class="n">foreignId</span><span class="p">(</span><span class="s1">'user_id'</span><span class="p">).</span><span class="n">constrained</span><span class="p">().</span><span class="n">cascadeOnDelete</span><span class="p">();</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="c1">// same as:</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">table</span><span class="p">.</span><span class="n">foreignId</span><span class="p">(</span><span class="s1">'user_id'</span><span class="p">);</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">table</span><span class="p">.</span><span class="n">foreign</span><span class="p">(</span><span class="s1">'user_id'</span><span class="p">).</span><span class="n">references</span><span class="p">(</span><span class="s1">'id'</span><span class="p">).</span><span class="kd">on</span><span class="p">(</span><span class="s1">'users'</span><span class="p">).</span><span class="n">onDelete</span><span class="p">(</span><span class="s1">'cascade'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">table</span><span class="p">.</span><span class="n">foreignId</span><span class="p">(</span><span class="s1">'user_id'</span><span class="p">).</span><span class="n">constrained</span><span class="p">().</span><span class="n">cascadeOnDelete</span><span class="p">();</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1">// same as:</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">table</span><span class="p">.</span><span class="n">foreignId</span><span class="p">(</span><span class="s1">'user_id'</span><span class="p">);</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">table</span><span class="p">.</span><span class="n">foreign</span><span class="p">(</span><span class="s1">'user_id'</span><span class="p">).</span><span class="n">references</span><span class="p">(</span><span class="s1">'id'</span><span class="p">).</span><span class="kd">on</span><span class="p">(</span><span class="s1">'users'</span><span class="p">).</span><span class="n">onDelete</span><span class="p">(</span><span class="s1">'cascade'</span><span class="p">);</span>
 </span></code></pre></div>
 <ul>
 <li><code>constrained([table], [column = 'id'])</code> guesses the table from the column:
@@ -6927,7 +7118,8 @@ You can give your own name as the last argument: <code>table.unique('slug', 'my_
   Dox models use singular table names by default (<code>User</code> is <code>user</code>).
   If your table is singular, give it: <code>constrained('user')</code>.</li>
 <li>Actions: <code>onDelete('cascade' | 'set null' | 'restrict' | 'no action')</code>, <code>onUpdate(...)</code>,
-  and the short ones <code>cascadeOnDelete()</code>, <code>nullOnDelete()</code>, <code>restrictOnDelete()</code>, <code>cascadeOnUpdate()</code>.</li>
+  and the short ones <code>cascadeOnDelete()</code>, <code>nullOnDelete()</code>, <code>restrictOnDelete()</code>, <code>cascadeOnUpdate()</code>,
+  <code>nullOnUpdate()</code> and <code>restrictOnUpdate()</code>.</li>
 <li>Put <code>nullable()</code> before <code>constrained()</code>: <code>table.foreignId('editor_id').nullable().constrained('users')</code>.</li>
 <li>Drop it: <code>table.dropForeign(&lt;String&gt;['user_id'])</code> or <code>table.dropForeign('posts_user_id_foreign')</code>.</li>
 </ul>
@@ -6951,6 +7143,8 @@ It fails on tables with other <code>CHECK</code> constraints or with generated c
 <p>Other SQLite limits:</p>
 <ul>
 <li><code>primary(...)</code> on an existing table is not supported.</li>
+<li><code>fullText</code> and <code>dropPrimary</code> throw an <code>UnsupportedError</code>. SQLite has no full text index, and it can not drop a primary key.</li>
+<li><code>renameIndex</code> drops the index and makes it again with the new name. So it only runs on a database, not in <a href="#see-the-sql">See the SQL</a>.</li>
 <li>A new column that is <code>NOT NULL</code> needs a default. A new column can not default to <code>CURRENT_TIMESTAMP</code>.</li>
 <li><code>dropColumn</code> fails when the column is in an index or a foreign key. Drop those first.</li>
 </ul>
@@ -6993,12 +7187,12 @@ It fails on tables with other <code>CHECK</code> constraints or with generated c
 </table>
 <h2 id="see-the-sql">See the SQL</h2>
 <p>Every change is a <code>Table</code> blueprint. A grammar turns it into SQL, without a database:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">Table</span><span class="w"> </span><span class="n">table</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Table</span><span class="p">(</span><span class="s1">'users'</span><span class="p">,</span><span class="w"> </span><span class="nl">creating:</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="p">..</span><span class="n">id</span><span class="p">()</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="p">..</span><span class="n">string</span><span class="p">(</span><span class="s1">'email'</span><span class="p">).</span><span class="n">unique</span><span class="p">();</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">print</span><span class="p">(</span><span class="n">table</span><span class="p">.</span><span class="n">toSql</span><span class="p">(</span><span class="n">PostgresGrammar</span><span class="p">()));</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="c1">// [CREATE TABLE "users" ("id" BIGSERIAL NOT NULL PRIMARY KEY, "email" VARCHAR(255) NOT NULL),</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="c1">//  CREATE UNIQUE INDEX "users_email_unique" ON "users" ("email")]</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">Table</span><span class="w"> </span><span class="n">table</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Table</span><span class="p">(</span><span class="s1">'users'</span><span class="p">,</span><span class="w"> </span><span class="nl">creating:</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="p">..</span><span class="n">id</span><span class="p">()</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="p">..</span><span class="n">string</span><span class="p">(</span><span class="s1">'email'</span><span class="p">).</span><span class="n">unique</span><span class="p">();</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">print</span><span class="p">(</span><span class="n">table</span><span class="p">.</span><span class="n">toSql</span><span class="p">(</span><span class="n">PostgresGrammar</span><span class="p">()));</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="c1">// [CREATE TABLE "users" ("id" BIGSERIAL NOT NULL PRIMARY KEY, "email" VARCHAR(255) NOT NULL),</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="c1">//  CREATE UNIQUE INDEX "users_email_unique" ON "users" ("email")]</span>
 </span></code></pre></div>
 <p>Grammars: <code>PostgresGrammar</code>, <code>MysqlGrammar</code> and <code>SqliteGrammar</code>.
 On SQLite, the changes that need a table rebuild only run on a database.</p>

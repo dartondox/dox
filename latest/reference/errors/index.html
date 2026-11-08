@@ -2188,6 +2188,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -2357,6 +2361,55 @@
     
   
     Mail
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/notifications/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-radio-tower"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4.9 16.1C1 12.2 1 5.8 4.9 1.9" />
+  <path d="M7.8 4.7a6.14 6.14 0 0 0-.8 7.5" />
+  <circle cx="12" cy="9" r="2" />
+  <path d="M16.2 4.8c2 2 2.26 5.11.8 7.47" />
+  <path d="M19.1 1.9a9.96 9.96 0 0 1 0 14.1" />
+  <path d="M9.5 18h5" />
+  <path d="m8 22 4-11 4 11" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Notifications
   
 
     
@@ -2650,6 +2703,50 @@
     
   
     Dox CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/package-commands/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-blocks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2" />
+  <rect x="14" y="2" width="8" height="8" rx="1" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Package commands
   
 
     
@@ -3675,6 +3772,8 @@
       
         
       
+        
+      
     
     
     
@@ -3889,6 +3988,53 @@
     
   
     ManyToMany
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../database/model/relationship/polymorphic/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-share-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="18" cy="5" r="3" />
+  <circle cx="6" cy="12" r="3" />
+  <circle cx="18" cy="19" r="3" />
+  <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
+  <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Polymorphic
   
 
     
@@ -7242,11 +7388,6 @@ The table shows the <code>message</code> text.</p>
 <td>Pass a file name.</td>
 </tr>
 <tr>
-<td><code>UnsupportedOperationException: urlBase is not configured</code></td>
-<td><code>Storage().url()</code> on a local disk with no <code>url</code> option.</td>
-<td>Set <code>url</code> on the disk.</td>
-</tr>
-<tr>
 <td><code>UnsupportedOperationException: urlBase and appKey are needed for signed URLs</code></td>
 <td><code>signedUrl()</code> on a local disk with no <code>url</code>, or no <code>APP_KEY</code>.</td>
 <td>Set both.</td>
@@ -7369,9 +7510,14 @@ The table shows the <code>message</code> text.</p>
 <td>Fix the pattern.</td>
 </tr>
 <tr>
-<td><code>- @MaxSize on &lt;where&gt; needs a size like '2MB' (units B, KB, MB, GB), not "&lt;text&gt;".</code></td>
-<td>Bad size text.</td>
+<td><code>- @&lt;Rule&gt; on &lt;where&gt; needs a size like '2MB' (units B, KB, MB, GB), not "&lt;text&gt;".</code></td>
+<td>Bad size text on <code>@MaxSize</code> or <code>@MinSize</code>.</td>
 <td>Use <code>'2MB'</code>.</td>
+</tr>
+<tr>
+<td><code>- @Dimensions on &lt;where&gt; needs at least one limit, like minWidth:.</code></td>
+<td><code>@Dimensions()</code> with no limit.</td>
+<td>Add a limit, like <code>minWidth: 100</code>.</td>
 </tr>
 <tr>
 <td><code>- The Maybe field &lt;where&gt; needs the default</code>const Maybe.missing()<code>.</code></td>
@@ -7505,8 +7651,43 @@ The table shows the <code>message</code> text.</p>
 </tr>
 <tr>
 <td><code>Could not find a command named "&lt;name&gt;". Run</code>dox help<code>for more information.</code></td>
-<td>Unknown command.</td>
-<td>Check the spelling.</td>
+<td>Unknown command. A second line tells you about the <code>dox: commands:</code> key.</td>
+<td>Check the spelling. For a <a href="../../digging-deeper/package-commands/">package command</a>, run <code>dart pub get</code> after you add the package.</td>
+</tr>
+<tr>
+<td><code>More than one command is named "&lt;name&gt;", in: &lt;packages&gt;. ...</code></td>
+<td>Two commands (in two packages, or twice in one) have the same name. Exit code 1.</td>
+<td>Remove one of these packages, or ask its author to rename the command.</td>
+</tr>
+<tr>
+<td><code>Skip &lt;package&gt;:</code>dox: commands: <value><code>must be a library of the package itself, like package:&lt;package&gt;/commands.dart.</code></td>
+<td>The <code>dox: commands:</code> value is not <code>package:&lt;package&gt;/&lt;path&gt;.dart</code>, or has <code>..</code>, quotes or other characters. The other packages still work.</td>
+<td>Fix the value in that package's <code>pubspec.yaml</code>.</td>
+</tr>
+<tr>
+<td><code>Skip &lt;package&gt;:</code>dox: commands:<code>must be a library, like package:&lt;package&gt;/commands.dart.</code></td>
+<td>The value is not a string (like a list).</td>
+<td>Use one library.</td>
+</tr>
+<tr>
+<td><code>Skip &lt;package&gt;: &lt;library&gt; is not there (&lt;path&gt;).</code></td>
+<td>The commands library file is missing. The other packages still work. <code>dox</code> looks again on the next run.</td>
+<td>Make the file, or fix the key.</td>
+</tr>
+<tr>
+<td><code>Skip &lt;package&gt;: its pubspec.yaml is not valid YAML.</code></td>
+<td>The package's <code>pubspec.yaml</code> can not be read.</td>
+<td>Fix the YAML.</td>
+</tr>
+<tr>
+<td><code>Could not load the package commands: ...</code></td>
+<td><code>dox help</code> could not run <code>.dart_tool/dox/commands.dart</code> (like a compile error in a commands library). The built-in commands are still listed.</td>
+<td>Fix the error it shows.</td>
+</tr>
+<tr>
+<td><code>bin/migrate.dart created.</code></td>
+<td><code>make:migration</code>, or a <code>migration:*</code> command, made the missing entry file.</td>
+<td>Nothing.</td>
 </tr>
 <tr>
 <td><code>Invalid number of arguments for command "&lt;name&gt;".</code></td>
@@ -7537,11 +7718,6 @@ The table shows the <code>message</code> text.</p>
 <td><code>Invalid option &lt;x&gt;, use --step=&lt;count&gt;</code></td>
 <td><code>dox migration:rollback</code> with another option.</td>
 <td>Use <code>--step=2</code>.</td>
-</tr>
-<tr>
-<td><code>db/migration has Dart migrations, but bin/migrate.dart is missing. ...</code></td>
-<td>Dart migrations but no entry file.</td>
-<td>Run <code>dox make:migration &lt;name&gt;</code> once.</td>
 </tr>
 <tr>
 <td><code>Skip &lt;file&gt;: no class that extends Migration.</code></td>

@@ -1776,6 +1776,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#path-and-url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path and URL
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#cookies" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2360,6 +2371,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -2529,6 +2544,55 @@
     
   
     Mail
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/notifications/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-radio-tower"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4.9 16.1C1 12.2 1 5.8 4.9 1.9" />
+  <path d="M7.8 4.7a6.14 6.14 0 0 0-.8 7.5" />
+  <circle cx="12" cy="9" r="2" />
+  <path d="M16.2 4.8c2 2 2.26 5.11.8 7.47" />
+  <path d="M19.1 1.9a9.96 9.96 0 0 1 0 14.1" />
+  <path d="M9.5 18h5" />
+  <path d="m8 22 4-11 4 11" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Notifications
   
 
     
@@ -2822,6 +2886,50 @@
     
   
     Dox CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/package-commands/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-blocks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2" />
+  <rect x="14" y="2" width="8" height="8" rx="1" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Package commands
   
 
     
@@ -3847,6 +3955,8 @@
       
         
       
+        
+      
     
     
     
@@ -4061,6 +4171,53 @@
     
   
     ManyToMany
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../database/model/relationship/polymorphic/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-share-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="18" cy="5" r="3" />
+  <circle cx="6" cy="12" r="3" />
+  <circle cx="18" cy="19" r="3" />
+  <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
+  <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Polymorphic
   
 
     
@@ -6424,6 +6581,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#path-and-url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path and URL
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#cookies" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6519,6 +6687,10 @@
 <td>one value from the query string or the body. The body wins when both have the key.</td>
 </tr>
 <tr>
+<td><code>req.input('user.name', 'guest')</code></td>
+<td>a value inside a map or list, with a dot key. The second value is the default, used when the key is not there or is null.</td>
+</tr>
+<tr>
 <td><code>req.all()</code></td>
 <td>all values from the query string and the body, as a <code>Map</code></td>
 </tr>
@@ -6527,8 +6699,32 @@
 <td>only these keys</td>
 </tr>
 <tr>
+<td><code>req.except(&lt;String&gt;['password'])</code></td>
+<td>all values, without these keys</td>
+</tr>
+<tr>
 <td><code>req.has('name')</code></td>
-<td><code>true</code> when the key is there and not empty</td>
+<td><code>true</code> when the key is there as it is and not empty. It does not read dot keys.</td>
+</tr>
+<tr>
+<td><code>req.filled('name')</code></td>
+<td><code>true</code> when the key is there and not empty. A text of only spaces, an empty list and an empty map count as empty.</td>
+</tr>
+<tr>
+<td><code>req.exists('name')</code></td>
+<td><code>true</code> when the key is there, with any value (also <code>''</code> or null)</td>
+</tr>
+<tr>
+<td><code>req.missing('name')</code></td>
+<td><code>true</code> when the key is not there</td>
+</tr>
+<tr>
+<td><code>req.boolean('remember')</code></td>
+<td><code>true</code> for <code>true</code>, <code>1</code>, <code>on</code> and <code>yes</code>. Else <code>false</code>.</td>
+</tr>
+<tr>
+<td><code>req.integer('page', 1)</code></td>
+<td>the value as an <code>int</code>. The default is used when the key is not there or is not a number.</td>
 </tr>
 <tr>
 <td><code>req.body</code></td>
@@ -6544,6 +6740,10 @@
 </tr>
 </tbody>
 </table>
+<p>A dot key reads inside the input. <code>req.input('items.0.id')</code> gives the <code>id</code> of the first item.
+A key that is in the input as it is wins. So a body key <code>'a.b'</code> is read before the <code>b</code> key inside <code>a</code>.
+Dot keys also work in <code>filled</code>, <code>exists</code>, <code>missing</code>, <code>boolean</code>, <code>integer</code>, <code>file</code> and <code>hasFile</code>.
+<code>has</code> does not read dot keys: <code>req.has('user.name')</code> is <code>false</code> for <code>{"user": {"name": "Ann"}}</code>. Use <code>filled</code> for that.</p>
 <p>Form and query keys with brackets give lists and maps, like in Laravel:</p>
 <table>
 <thead>
@@ -6603,7 +6803,9 @@ Put the file in a DTO, so Dox checks its type and size:</p>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">}</span>
 </span></code></pre></div>
 <p><code>store()</code> comes from the <a href="../../packages/storage/"><code>dox_storage</code></a> package. Add it and import <code>package:dox_storage/dox_storage.dart</code>.</p>
-<p>Without a DTO, <code>req.input('image')</code> gives the <code>RequestFile</code>. It is not checked.</p>
+<p>Without a DTO, <code>req.file('image')</code> gives the <code>RequestFile</code>, or null when the field is not a file.
+<code>req.hasFile('image')</code> is <code>true</code> when the field holds a file or a list of files.
+For a field with many files, use <code>req.input('images')</code>. The file is not checked.</p>
 <h3 id="requestfile"><code>RequestFile</code></h3>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">RequestFile</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'video'</span><span class="p">);</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
@@ -6643,16 +6845,25 @@ It also counts the bytes while it reads the body.</p>
 </span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="n">req</span><span class="p">.</span><span class="n">isJson</span><span class="p">();</span><span class="w">     </span><span class="c1">// true for a JSON body</span>
 </span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="n">req</span><span class="p">.</span><span class="n">isFormData</span><span class="p">();</span><span class="w"> </span><span class="c1">// true for multipart/form-data</span>
 </span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="n">req</span><span class="p">.</span><span class="n">locale</span><span class="p">;</span><span class="w">       </span><span class="c1">// first language of Accept-Language, like 'th', or null</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="n">req</span><span class="p">.</span><span class="n">bearerToken</span><span class="p">();</span><span class="w"> </span><span class="c1">// the token of 'Authorization: Bearer &lt;token&gt;', or null</span>
 </span></code></pre></div>
+<h2 id="path-and-url">Path and URL</h2>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">req</span><span class="p">.</span><span class="n">path</span><span class="p">();</span><span class="w">                   </span><span class="c1">// '/admin/users/5'</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">req</span><span class="p">.</span><span class="n">fullUrl</span><span class="p">();</span><span class="w">                </span><span class="c1">// 'https://example.com/admin/users/5?tab=info'</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">req</span><span class="p">.</span><span class="n">pathIs</span><span class="p">(</span><span class="s1">'admin/*'</span><span class="p">);</span><span class="w">        </span><span class="c1">// true. `*` matches any text</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">req</span><span class="p">.</span><span class="n">routeIs</span><span class="p">(</span><span class="s1">'admin.users.*'</span><span class="p">);</span><span class="w"> </span><span class="c1">// true when the route name matches</span>
+</span></code></pre></div>
+<p><code>pathIs</code> cleans the path like the router does. A <code>/</code> at the start or the end does not matter, and <code>//</code> counts as one <code>/</code>. So <code>'admin/*'</code> and <code>'/admin/*'</code> are the same, and <code>/admin/</code> and <code>/admin//</code> match <code>'admin'</code>, like they reach the <code>/admin</code> route.
+<code>routeIs</code> is <code>false</code> for a route with no name. Give a route a name with <code>.name('admin.users.show')</code>.</p>
 <h2 id="cookies">Cookies</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'token'</span><span class="p">);</span><span class="w">                 </span><span class="c1">// decrypted value</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="nl">decrypt:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">   </span><span class="c1">// value as sent</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'token'</span><span class="p">);</span><span class="w">                 </span><span class="c1">// decrypted value</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="nl">decrypt:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">   </span><span class="c1">// value as sent</span>
 </span></code></pre></div>
 <p>See <a href="../response/#cookie">Response</a> to set a cookie.</p>
 <h2 id="client-ip-and-scheme">Client IP and scheme</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">req</span><span class="p">.</span><span class="n">ip</span><span class="p">();</span><span class="w">       </span><span class="c1">// client IP</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">req</span><span class="p">.</span><span class="n">scheme</span><span class="p">();</span><span class="w">   </span><span class="c1">// http or https</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">req</span><span class="p">.</span><span class="n">isSecure</span><span class="p">();</span><span class="w"> </span><span class="c1">// true for https</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">req</span><span class="p">.</span><span class="n">ip</span><span class="p">();</span><span class="w">       </span><span class="c1">// client IP</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">req</span><span class="p">.</span><span class="n">scheme</span><span class="p">();</span><span class="w">   </span><span class="c1">// http or https</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">req</span><span class="p">.</span><span class="n">isSecure</span><span class="p">();</span><span class="w"> </span><span class="c1">// true for https</span>
 </span></code></pre></div>
 <p>Behind a proxy, <code>req.ip()</code> shows the proxy, not the client.
 Set <code>trustedProxies</code> in <code>AppConfig</code> to fix it. See <a href="../../digging-deeper/deployment/#https-put-a-proxy-in-front">Deployment</a>.</p>
