@@ -26,7 +26,8 @@ overrides() {
     "$root"/../dox-auth/ "$root"/../dox-openapi/ "$root"/../dox-validation/ \
     "$root"/../dox-socketio/ "$root"/../dox-storage/ \
     "$root"/../dox-queue/ "$root"/../dox-mailer/ "$root"/../dox-view/ \
-    "$root"/../dox-scheduler/; do
+    "$root"/../dox-scheduler/ "$root"/../ioredis/ \
+    "$root"/../dox-postgres-native/ "$root"/../dox-mysql-native/; do
     [ -f "$dir/pubspec.yaml" ] || continue
     name=$(sed -nE 's/^name:[[:space:]]*([a-z0-9_]+).*/\1/p' "$dir/pubspec.yaml")
     printf '  %s:\n    path: %s\n' "$name" "${dir%/}"
