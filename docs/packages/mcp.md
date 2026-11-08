@@ -89,7 +89,9 @@ McpTool.of(
 | `POST` with an unsupported `MCP-Protocol-Version` header | `400` |
 | `POST` with another `Content-Type` than JSON | `415` |
 | `GET` | `405`: there is no server-to-client stream |
-| `DELETE` with a session id | `200`, the session ends |
+| `DELETE` with a valid session id | `200`. The session ends only if `SignedMcpSessions` has an `ended` store (see [Sessions](#sessions)) |
+| `DELETE` with no session id | `400` |
+| `DELETE` with an unknown session id, or one of another `scope` | `404` |
 
 Methods: `initialize`, `ping`, `tools/list`, `tools/call`. Others get `-32601 Method not found`.
 
