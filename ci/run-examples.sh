@@ -15,6 +15,7 @@ for e in "$@"; do
   if ! (cd "examples/$e" &&
     key=$(openssl rand -hex 16) &&
     sed "s/^APP_KEY=.*/APP_KEY=$key/" .env.example > .env &&
+    ../../ci/system-sqlite.sh pubspec.yaml &&
     dart pub get &&
     dart run build_runner build --delete-conflicting-outputs &&
     dart analyze --fatal-infos &&
