@@ -1,5 +1,13 @@
 ## 3.1.0
 
+- Behavior change: without Redis, `RateLimit` counts are now shared by all isolates. Before, each isolate counted alone, so the real limit was `max` times the number of isolates. Now `max` holds for the whole server. An app with more than one isolate gets a lower real limit than before. Raise `max` if you relied on the old number.
+- Security: new check of the `Origin` header on a WebSocket upgrade. Use `Route.websocket(allowedOrigins: [...])` for one route, or `AppConfig.webSocketAllowedOrigins` for all of them. It is off by default, so apps do not change. A WebSocket route with no check prints one warning on stderr at start.
+- Security fix: `back()` only follows a `Referer` of the same host. A referer of another site goes to the fallback. Before, it was an open redirect.
+- Fix: a multipart body with no boundary or no `Content-Disposition` gets 400, not 500.
+- Fix: the headers of `abort()` are kept on routes that have a next middleware.
+- Fix: a mounted handler that throws now gives 500. Before, the client could hang.
+- Fix: a download name with quotes or non-ASCII letters now gets a safe `Content-Disposition`.
+- New: one warning on stderr when CORS has origin `*` together with `credentials: true`.
 - New: `Crypt.encryptString` / `Crypt.decryptString` (and `Crypt.encrypt` / `Crypt.decrypt` for JSON values) use the `APP_KEY` of the app. Old keys in `previousKeys` still decrypt.
 - New: `Hash.check`, the same as `Hash.verify`, with the Laravel name.
 - New: `Cache().many(keys)` and `Cache().putMany(values, duration:)` on the facade. The store already had them.
