@@ -41,6 +41,9 @@ export 'exception/validation_exception.dart';
 
 /// Request
 export 'http/request/dox_request.dart';
+// the body of a request (`req.requestBody`): its kind tells invalid JSON
+// from no body at all.
+export 'http/request/http_request_body.dart' show BodyKind, RequestBody;
 export 'http/request/request_file.dart';
 
 /// Response

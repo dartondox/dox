@@ -32,6 +32,7 @@ Dox is a powerful framework specifically developed for web application backend d
 - **Storage** (`dox_storage`): One API for local disk, AWS S3 and S3-compatible services.
 - **Schema validation** (`dox_validation`): Zod-like schemas with typed results.
 - **OpenAPI** (`dox_openapi`): OpenAPI 3.1 docs as JSON and YAML, with a docs page.
+- **MCP server** (`dox_mcp`): tools for AI clients over the Model Context Protocol, with sessions that work on every isolate.
 - **CORS**: Dox includes Cross-Origin Resource Sharing (CORS) support, allowing developers to control and manage cross-origin requests for enhanced security.
 - **CLI (Command-Line Interface)**: Dox provides a command-line interface with useful commands to streamline development tasks, such as creating migrations, generating models, and more.
 
@@ -51,6 +52,7 @@ Some packages live in their own repos:
 | `dox_storage` | [dartondox/dox-storage](https://github.com/dartondox/dox-storage) |
 | `dox_queue` | [dartondox/dox-queue](https://github.com/dartondox/dox-queue) |
 | `dox_scheduler` | [dartondox/dox-scheduler](https://github.com/dartondox/dox-scheduler) |
+| `dox_mcp` | [dartondox/dox-mcp](https://github.com/dartondox/dox-mcp) |
 | `dox_inertia` | [dartondox/dox-inertia](https://github.com/dartondox/dox-inertia) |
 | `dox_view` | [dartondox/dox-view](https://github.com/dartondox/dox-view) |
 | `dox_mailer` | [dartondox/dox-mailer](https://github.com/dartondox/dox-mailer) |

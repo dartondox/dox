@@ -33,6 +33,7 @@ The packages in the main repo share one version number. The other packages live 
 | `dox_socketio` | Socket.IO v4 server with a Redis adapter | Stable | 119 tests in 11 files, with Redis and the real `socket.io-client` in CI |
 | `dox_queue` | Queues and jobs | New | 96 tests in 12 files, with Postgres, MariaDB and Redis in CI |
 | `dox_scheduler` | Run tasks on a schedule | New | 106 tests in 6 files, with Redis in CI |
+| [`dox_mcp`](../packages/mcp.md) | MCP server: tools for AI clients over Streamable HTTP, signed sessions | New | 15 tests in 1 file |
 | `dox_view` | [Views](../the-basic/views.md): `.dox.html` templates with layouts and components | New | 40 tests in 2 files |
 | [`dox_inertia`](../the-basic/inertia.md) | Inertia.js server side: single page apps with React, Vue or Svelte and Dox controllers | New | 34 tests in 2 files |
 | `dox_mailer` | Email with SMTP, Amazon SES, Azure, Resend, Mailgun, Postmark and sendmail, mailables, Markdown mail, notifications | New | 122 tests in 12 files, with a fake SMTP server |

@@ -1,6 +1,5 @@
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/request/form_input.dart';
-import 'package:dox_core/http/request/http_request_body.dart';
 
 /// Finds a DTO schema by its type or class name.
 ///
