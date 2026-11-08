@@ -1,5 +1,6 @@
 ## 3.1.0
 
+- Fix: the JSON Schema pattern of `@AlphaDash` now allows digits, like the check does (needs dox_validation 3.1.0). The OpenAPI output of a DTO with `@AlphaDash` changes.
 - Fix: in generated DTO code, `@RequiredIf` and `@RequiredWith` now run after all fields are converted. Before, a rule on a field read the raw value of a field that comes after it, like `' PRO '`, not `'pro'` after `@Trim` and `@Lowercase`. Run `build_runner` to get the new code.
 - Fix: `reload()` and preload now set a nullable `@HasOne`, `@BelongsTo`, `@MorphOne` or `@MorphTo` field to null when the related row is gone. Before, the field kept its old value. Run `build_runner` to get the new code.
 - Fix: `reload()` and preload now set a `@HasMany`, `@ManyToMany` or `@MorphMany` field to an empty list when there are no related rows. Before, the field kept its old list. Run `build_runner` to get the new code.
@@ -7,9 +8,9 @@
 - DTOs: `@RequiredIf('type', 'company')` and `@RequiredWith(['phone'])` from `dox_validation`. The field is required only when the condition is true. Use them on a nullable field, a `Maybe` field or a field with a default. On an always-required field the build stops with a clear error.
 - DTOs: the build stops when `@RequiredIf`, `@RequiredWith`, `@Same` or `@Confirmed(other:)` names a Dart field (like `accountType`) instead of its input key (`account_type`). The check would never match. It also stops for a `@DateFormatted` format with a letter it does not know.
 - DTOs: in a `@Dto(strict: true)` class, the key that `@Confirmed` reads (like `password_confirmation`) is not an unknown key.
-- New: DTO file rules `@MinSize('10KB')`, `@MimeTypes(['image/png', 'image/*'])` and `@Dimensions(minWidth:, maxWidth:, minHeight:, maxHeight:, width:, height:, ratio:)`. They need the next dox_validation release. A bad size or a `@Dimensions()` with no limit stops the build.
-- New: `@ManyToMany(withPivot: [...], withTimestamps: true)` is passed to the ORM, so the relation reads the extra pivot columns. Needs the dox_orm version with many to many writes.
-- New: the model builder makes the code for `@MorphMany`, `@MorphOne` and `@MorphTo` (polymorphic relations). A `@MorphTo` field has no model: its type is the field type, like `Model<dynamic>`, and its morph name is the field name in snake_case. The OpenAPI model schema has these relation keys too. Needs the dox_orm version with polymorphic relations.
+- New: DTO file rules `@MinSize('10KB')`, `@MimeTypes(['image/png', 'image/*'])` and `@Dimensions(minWidth:, maxWidth:, minHeight:, maxHeight:, width:, height:, ratio:)`. They need dox_validation 3.1.0 or newer. A bad size or a `@Dimensions()` with no limit stops the build.
+- New: `@ManyToMany(withPivot: [...], withTimestamps: true)` is passed to the ORM, so the relation reads the extra pivot columns. Needs dox_orm 3.1.0 or newer.
+- New: the model builder makes the code for `@MorphMany`, `@MorphOne` and `@MorphTo` (polymorphic relations). A `@MorphTo` field has no model: its type is the field type, like `Model<dynamic>`, and its morph name is the field name in snake_case. The OpenAPI model schema has these relation keys too. Needs dox_orm 3.1.0 or newer.
 
 ## 3.0.2
 
