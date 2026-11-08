@@ -1,4 +1,4 @@
-## Unreleased
+## 3.1.0
 
 - New: `Crypt.encryptString` / `Crypt.decryptString` (and `Crypt.encrypt` / `Crypt.decrypt` for JSON values) use the `APP_KEY` of the app. Old keys in `previousKeys` still decrypt.
 - New: `Hash.check`, the same as `Hash.verify`, with the Laravel name.

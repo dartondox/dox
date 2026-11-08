@@ -1,4 +1,4 @@
-## Unreleased
+## 3.1.0
 
 - New: the file driver can delete expired and broken files by itself. Set the `prune_every` option (or `FileDriver(pruneEvery: ...)`) to run `prune()` in the background once every that many writes. It is off by default (`0`). Only one prune runs at a time, and a failed prune is ignored.
 - Fix: `FileDriver.prune()` could delete a new value that `add`, `increment` or `touch` wrote at the same time. Now it takes the same key lock as they do and reads the file again under it. A key that is locked right now is skipped.
