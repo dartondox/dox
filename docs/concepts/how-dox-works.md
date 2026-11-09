@@ -207,7 +207,7 @@ The `dox make:*` commands add more folders when you need them:
 
 - `dox make:dto` adds `lib/app/dtos/<name>/<name>.dto.dart`. Then `build_runner` writes `lib/generated/dtos.g.dart`, the list of DTOs.
 - `dox make:middleware` adds `lib/app/http/middleware/`.
-- `dox make:serializer` adds `lib/app/http/serializers/`.
+- `dox make:serializer` adds `lib/app/serializers/`.
 
 The app makes `storage/` when it writes files (the local disk, the file cache, uploads).
 
@@ -215,7 +215,8 @@ The app makes `storage/` when it writes files (the local disk, the file cache, u
 | --- | --- |
 | `bin/` | `server.dart` calls `Dox().initialize(appConfig)`, runs the migrations, then `Dox().startServer()`. The other files are the entry points that the `dox migration:*`, `db:seed`, `queue:*` and `schedule:*` commands run. |
 | `db/` | Your migrations, factories and seeders. Dart migrations are listed in `db/migration/migrations.dart`, which the CLI writes. |
-| `lib/app/http/` | Everything about HTTP: controllers, middleware, serializers. |
+| `lib/app/http/` | Everything about HTTP: controllers and middleware. |
+| `lib/app/serializers/` | Serializers. They are not only for HTTP: MCP and websocket use them too. |
 | `lib/app/dtos/` | One folder per DTO: typed and checked input. |
 | `lib/app/jobs/` | Queue jobs. |
 | `lib/app/models/` | One folder per model. `build_runner` writes the `.g.dart` file next to it. |

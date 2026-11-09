@@ -133,7 +133,7 @@ curl 'http://localhost:3000/api/users?page=0&per_page=500'
 ## Change the shape of a row
 
 Return a serializer for each row, when the model has fields you do not want to send.
-`dox make:serializer User` makes `lib/app/http/serializers/user.serializer.dart`.
+`dox make:serializer User` makes `lib/app/serializers/user.serializer.dart`.
 `page.data` gives the typed rows (`List<User>`):
 
 ```dart

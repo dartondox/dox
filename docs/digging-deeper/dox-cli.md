@@ -116,7 +116,7 @@ dox make:controller Blog        # lib/app/http/controllers/blog.controller.dart
 dox make:controller Blog -r     # resource controller
 dox make:middleware Auth        # lib/app/http/middleware/auth.middleware.dart
 dox make:dto CreateBlog         # lib/app/dtos/create_blog/create_blog.dto.dart
-dox make:serializer Blog        # lib/app/http/serializers/blog.serializer.dart
+dox make:serializer Blog        # lib/app/serializers/blog.serializer.dart
 dox make:model Blog -m          # lib/app/models/blog/blog.model.dart and a create_blogs_table migration
 dox make:migration create_blogs_table          # .dart file (default)
 dox make:migration create_blogs_table --sql    # .sql file
