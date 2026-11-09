@@ -5013,6 +5013,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#oauth-sign-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OAuth sign-in
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#security" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6534,6 +6545,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#oauth-sign-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OAuth sign-in
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#security" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6655,8 +6677,24 @@
 <td><code>400</code></td>
 </tr>
 <tr>
-<td><code>POST</code> with an unknown or ended session id, or one of another <code>scope</code></td>
+<td><code>POST</code> with an unknown session id, or one of another <code>scope</code></td>
 <td><code>404</code>, so the client starts a new session</td>
+</tr>
+<tr>
+<td><code>POST</code> with an ended session id</td>
+<td><code>404</code>, only when <code>SignedMcpSessions</code> has an <code>ended</code> store. Without it, the id still works</td>
+</tr>
+<tr>
+<td><code>POST</code> with a body that is not valid JSON</td>
+<td><code>400</code> with the JSON-RPC error <code>-32700</code></td>
+</tr>
+<tr>
+<td><code>POST</code> with an empty batch, or a message that is not JSON-RPC 2.0</td>
+<td><code>400</code> with the JSON-RPC error <code>-32600</code></td>
+</tr>
+<tr>
+<td><code>POST</code> with <code>initialize</code> in a batch with other messages</td>
+<td><code>400</code> with the JSON-RPC error <code>-32600</code>. Send <code>initialize</code> alone</td>
 </tr>
 <tr>
 <td><code>POST</code> with an unsupported <code>MCP-Protocol-Version</code> header</td>
@@ -6665,6 +6703,10 @@
 <tr>
 <td><code>POST</code> with another <code>Content-Type</code> than JSON</td>
 <td><code>415</code></td>
+</tr>
+<tr>
+<td>Any request with an <code>Origin</code> header that is not in <code>allowedOrigins</code></td>
+<td><code>403</code></td>
 </tr>
 <tr>
 <td><code>GET</code></td>
@@ -6680,7 +6722,7 @@
 </tr>
 <tr>
 <td><code>DELETE</code> with an unknown session id, or one of another <code>scope</code></td>
-<td><code>404</code></td>
+<td><code>404</code>. An ended id also gets <code>404</code> when there is an <code>ended</code> store</td>
 </tr>
 </tbody>
 </table>
@@ -6699,9 +6741,73 @@
 <li>A signed id can not be ended by itself. To refuse ended ids, give a cache store: <code>SignedMcpSessions(ended: Cache().store('redis'))</code>. Use a store that all isolates share (file or Redis, not memory).</li>
 </ul>
 <p>For another kind of session, implement <code>McpSessions</code>.</p>
+<h2 id="oauth-sign-in">OAuth sign-in</h2>
+<p><code>McpOAuth</code> lets a client sign in by itself. You give the client only the address, like <code>https://my.app/mcp</code>. The client finds the rest. This is the sign-in the MCP spec asks for: OAuth 2.1 with PKCE.</p>
+<p><code>dox_mcp</code> does the OAuth part. Your app does three things:</p>
+<ol>
+<li><strong>Tokens.</strong> Implement <code>McpOAuthTokens</code>. <code>issue</code> makes a token for a grant. <code>verify</code> gives what a token stands for (like a user), or <code>null</code>. You choose the table and how a token is revoked. Keep only a hash of the token.</li>
+<li><strong>The consent page.</strong> Serve it at <code>&lt;issuer&gt;/oauth/authorize</code>, or set <code>authorizePage</code>. It reads <code>client_id</code>, <code>redirect_uri</code>, <code>state</code>, <code>code_challenge</code>, <code>code_challenge_method</code> and <code>resource</code> from the query. The person signs in there the way your app always does.</li>
+<li><strong>The answer.</strong> Your page calls a route of your own, behind your own login. On yes, the route calls <code>oauth.approve(subject: ...)</code> and gives the page the address to send the browser to. On no, it calls <code>oauth.deny(...)</code>. <code>oauth.checkClient(...)</code> gives the client for the page and throws when the client or the redirect address is wrong. Then never send the browser anywhere.</li>
+</ol>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">final</span><span class="w"> </span><span class="n">McpOAuth</span><span class="w"> </span><span class="n">oauth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">McpOAuth</span><span class="p">(</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nl">issuer:</span><span class="w"> </span><span class="s1">'https://my.app'</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nl">tokens:</span><span class="w"> </span><span class="n">MyTokens</span><span class="p">(),</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nl">codes:</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">store</span><span class="p">(</span><span class="s1">'file'</span><span class="p">),</span><span class="w"> </span><span class="c1">// all isolates must share it</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">);</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="kd">class</span><span class="w"> </span><span class="nc">McpRouter</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Router</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">register</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="n">oauth</span><span class="p">.</span><span class="n">routes</span><span class="p">();</span><span class="w"> </span><span class="c1">// discovery, register and token</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">    </span><span class="n">Route</span><span class="p">.</span><span class="n">match</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'GET'</span><span class="p">,</span><span class="w"> </span><span class="s1">'POST'</span><span class="p">,</span><span class="w"> </span><span class="s1">'DELETE'</span><span class="p">],</span><span class="w"> </span><span class="s1">'/mcp'</span><span class="p">,</span><span class="w"> </span><span class="n">handleMcp</span><span class="p">);</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="p">}</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">DoxResponse</span><span class="o">&gt;</span><span class="w"> </span><span class="n">handleMcp</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">  </span><span class="kt">Object</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">oauth</span><span class="p">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">req</span><span class="p">);</span><span class="w"> </span><span class="c1">// reads Authorization: Bearer</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">user</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">oauth</span><span class="p">.</span><span class="n">unauthorized</span><span class="p">();</span><span class="w"> </span><span class="c1">// 401 with WWW-Authenticate</span>
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">mcp</span><span class="p">.</span><span class="n">handle</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="nl">auth:</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="nl">scope:</span><span class="w"> </span><span class="s1">'</span><span class="si">$</span><span class="n">user</span><span class="s1">'</span><span class="p">);</span>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>On the consent page, show the redirect host, so the person sees where the browser goes. Escape the client name before you print it. The client chose the name, so do not trust it.</p>
+<p><code>oauth.routes()</code> adds these routes:</p>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /.well-known/oauth-protected-resource</code> (also with <code>/mcp</code> after it)</td>
+<td>Names the MCP address and the issuer.</td>
+</tr>
+<tr>
+<td><code>GET /.well-known/oauth-authorization-server</code></td>
+<td>Lists the endpoints. PKCE <code>S256</code> only, <code>authorization_code</code> only, no client secret.</td>
+</tr>
+<tr>
+<td><code>POST /oauth/register</code></td>
+<td>Dynamic client registration. Nothing is stored. The <code>client_id</code> is the name and the redirect addresses, signed with <code>APP_KEY</code>.</td>
+</tr>
+<tr>
+<td><code>POST /oauth/token</code></td>
+<td>Swaps a code for a token. The body is a form or JSON. The code works once, for <code>codeTtl</code> (1 minute). The client, the redirect address and the PKCE verifier must all match.</td>
+</tr>
+</tbody>
+</table>
+<p>Rules:</p>
+<ul>
+<li>A redirect address must be <code>https</code>, or <code>http</code> on <code>localhost</code>, <code>127.0.0.1</code> or <code>[::1]</code>. It has no <code>#fragment</code>.</li>
+<li>The codes live in <code>codes</code>, a Dox cache. Use a store that all isolates share (file on one host, Redis on many). Each code is taken under a lock, so two isolates can not both swap it.</li>
+<li>These routes answer any origin (CORS <code>*</code>) and read no cookie. They skip the CORS list of the app.</li>
+<li><code>issue</code> may throw <code>McpOAuthException</code>, like <code>access_denied</code> when a person has too many clients. The client gets it from the token endpoint.</li>
+<li>There is no refresh token. To revoke a client, delete its token.</li>
+</ul>
 <h2 id="security">Security</h2>
 <ul>
-<li>Check who calls before <code>handle</code>: the MCP route has no auth of its own.</li>
+<li>Check who calls before <code>handle</code>: the MCP route has no auth of its own. <code>McpOAuth</code> is one way to do it.</li>
 <li><code>allowedOrigins</code> stops browser pages on other sites (DNS rebinding). Set it when the server runs on a local or private network.</li>
 <li>Keep tokens out of logs. A token in the URL ends up in proxy logs, so prefer a header when your clients can send one.</li>
 </ul>

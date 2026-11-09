@@ -6777,7 +6777,7 @@ Add it once. Skip this step when your <code>app.dart</code> already has <code>dt
 </span></code></pre></div>
 <h2 id="change-the-shape-of-a-row">Change the shape of a row</h2>
 <p>Return a serializer for each row, when the model has fields you do not want to send.
-<code>dox make:serializer User</code> makes <code>lib/app/http/serializers/user.serializer.dart</code>.
+<code>dox make:serializer User</code> makes <code>lib/app/serializers/user.serializer.dart</code>.
 <code>page.data</code> gives the typed rows (<code>List&lt;User&gt;</code>):</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">index</span><span class="p">(</span><span class="n">ListUsers</span><span class="w"> </span><span class="n">query</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="n">Pagination</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">()</span>

@@ -6400,6 +6400,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#311" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#310" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6657,6 +6668,17 @@
   
     <nav class="md-nav" aria-label="dox_builder">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#311_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1.1
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#310_1" class="md-nav__link">
@@ -6918,6 +6940,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#311_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#310_2" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7177,10 +7210,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
+  <a href="#311_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Unreleased
+        3.1.1
       
     </span>
   </a>
@@ -7489,6 +7522,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#311" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#310" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7746,6 +7790,17 @@
   
     <nav class="md-nav" aria-label="dox_builder">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#311_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1.1
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#310_1" class="md-nav__link">
@@ -8007,6 +8062,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#311_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#310_2" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8266,10 +8332,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
+  <a href="#311_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Unreleased
+        3.1.1
       
     </span>
   </a>
@@ -8544,6 +8610,10 @@
 <p>What changed in each package, newest first. This page is made from the
 <code>CHANGELOG.md</code> files in the repo when the docs are built.</p>
 <h2 id="dox_annotation">dox_annotation</h2>
+<h3 id="311">3.1.1</h3>
+<ul>
+<li>Version bump only, to match the other packages.</li>
+</ul>
 <h3 id="310">3.1.0</h3>
 <ul>
 <li>New: <code>id()</code> on <code>IAuth</code>, so <code>req.auth?.id()</code> works. It gives the primary key of the logged-in user from the <code>id()</code> of the auth class (like <code>Auth().id()</code> of <code>dox_auth</code>), or null. It is an extension (<code>IAuthHelpers</code>), so a class that implements <code>IAuth</code> does not need to change. For a guest, <code>req.auth</code> is null.</li>
@@ -8644,6 +8714,11 @@
 <li>See the <a href="https://github.com/dartondox/dox/pull/112">release notes</a> for all main changes.</li>
 </ul>
 <h2 id="dox_builder">dox_builder</h2>
+<h3 id="311_1">3.1.1</h3>
+<ul>
+<li>DTOs: <code>@Dto(emptyStringsToNull: true)</code> makes the generated code read <code>""</code> as <code>null</code> (needs the next dox_validation).</li>
+<li>DTOs: <code>@OrDefault()</code> makes a bad value of that field give its default (or <code>null</code>) instead of an error. A field with <code>@OrDefault()</code> and no default that is not nullable stops the build.</li>
+</ul>
 <h3 id="310_1">3.1.0</h3>
 <ul>
 <li>Fix: the JSON Schema pattern of <code>@AlphaDash</code> now allows digits, like the check does (needs dox_validation 3.1.0). The OpenAPI output of a DTO with <code>@AlphaDash</code> changes.</li>
@@ -8793,6 +8868,10 @@
 <li>Works with analyzer 5 and 6.</li>
 </ul>
 <h2 id="dox_cache">dox_cache</h2>
+<h3 id="311_2">3.1.1</h3>
+<ul>
+<li>New: <code>flexible</code> takes a null <code>stale</code>. Then the value is kept until a refresh replaces it, so callers still get the last good value when <code>compute</code> fails.</li>
+</ul>
 <h3 id="310_2">3.1.0</h3>
 <ul>
 <li>New: the file driver can delete expired and broken files by itself. Set the <code>prune_every</code> option (or <code>FileDriver(pruneEvery: ...)</code>) to run <code>prune()</code> in the background once every that many writes. It is off by default (<code>0</code>). Only one prune runs at a time, and a failed prune is ignored.</li>
@@ -8913,8 +8992,11 @@
 <li><code>remember</code>, <code>pull</code>, <code>add</code>, <code>increment</code>, <code>many</code>, tags and atomic locks.</li>
 </ul>
 <h2 id="dox_core">dox_core</h2>
-<h3 id="unreleased">Unreleased</h3>
+<h3 id="311_3">3.1.1</h3>
 <ul>
+<li><code>Cache().flexible</code> takes a null <code>stale</code>: keep the last good value until a refresh replaces it.</li>
+<li>New: <code>Hash.sha256(value)</code> gives the SHA-256 hex of a value, to store API keys and access tokens as a hash (not for passwords).</li>
+<li>New: <code>ValidationException.issues</code> keeps every issue of a failed DTO or schema check (path, rule code, message, params). An <code>ExceptionHandler</code> can use it for another 422 shape, like <code>[{field, message, rule}]</code>.</li>
 <li>New: <code>RequestBody</code> and <code>BodyKind</code> are exported, so <code>req.requestBody.kind</code> can tell invalid JSON (<code>BodyKind.invalidJson</code>) from no body, without importing a file of <code>lib/http</code>.</li>
 </ul>
 <h3 id="310_3">3.1.0</h3>

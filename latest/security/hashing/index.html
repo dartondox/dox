@@ -4553,6 +4553,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#store-tokens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Store tokens
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#with-login" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6592,6 +6603,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#store-tokens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Store tokens
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#with-login" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6684,6 +6706,14 @@ So a password with such letters can still be too long. Catch the error and answe
 <code>Hash.equals</code> takes the same time for every value of the same length.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">equals</span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">header</span><span class="p">(</span><span class="s1">'X-Api-Key'</span><span class="p">)</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'API_KEY'</span><span class="p">));</span>
 </span></code></pre></div>
+<h2 id="store-tokens">Store tokens</h2>
+<p>For a long random secret that you keep in the database (an API key, an access token), store only <code>Hash.sha256(token)</code>.
+Find the row by the hash of what the client sends.
+SHA-256 is fast and gives the same hash for the same input, so a unique index works on it.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">stored</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">token</span><span class="p">);</span><span class="w">          </span><span class="c1">// save this, never the token</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">Token</span><span class="o">?</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Token</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'hash'</span><span class="p">,</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">given</span><span class="p">)).</span><span class="n">getFirst</span><span class="p">();</span>
+</span></code></pre></div>
+<p>Never use <code>Hash.sha256</code> for passwords. A password is short and can be guessed, so use <code>Hash.make</code> (bcrypt).</p>
 <h2 id="with-login">With login</h2>
 <p>You do not need <code>Hash.verify</code> for normal login.
 <code>Auth().attempt()</code> from <code>dox_auth</code> finds the user and checks the password with bcrypt.

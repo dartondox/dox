@@ -7026,6 +7026,12 @@
 <td></td>
 </tr>
 <tr>
+<td><code>@HexColor()</code></td>
+<td><code>hex_color</code></td>
+<td><code>The {field} must be a hex color like #1a2b3c</code></td>
+<td><code>pattern</code></td>
+</tr>
+<tr>
 <td><code>@Password(min: 8, ...)</code></td>
 <td><code>password</code></td>
 <td><code>The {field} must have {rules}</code></td>
@@ -7389,6 +7395,14 @@
 <tr>
 <td><code>@Dto(strict: true)</code></td>
 <td>unknown keys are errors. Default <code>false</code>: they are dropped.</td>
+</tr>
+<tr>
+<td><code>@Dto(emptyStringsToNull: true)</code></td>
+<td><code>""</code> is read as <code>null</code>, not as missing. Default <code>false</code>.</td>
+</tr>
+<tr>
+<td><code>@OrDefault()</code></td>
+<td>on a field: a bad value gives the default (or <code>null</code>), not an error.</td>
 </tr>
 <tr>
 <td><code>@Dto(messages: {...})</code></td>

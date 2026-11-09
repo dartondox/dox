@@ -7273,7 +7273,7 @@ A trailing <code>Dto</code> in the name is removed. Prints <code>Run</code>dox b
 <h3 id="dox-makeserializer"><code>dox make:serializer</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>dox make:serializer &lt;name&gt;
 </span></code></pre></div>
-<p>Writes <code>lib/app/http/serializers/&lt;name&gt;.serializer.dart</code>: a class <code>&lt;Name&gt;Serializer extends Serializer&lt;&lt;Name&gt;&gt;</code>. It imports the model from <code>lib/app/models/&lt;name&gt;/&lt;name&gt;.model.dart</code>.
+<p>Writes <code>lib/app/serializers/&lt;name&gt;.serializer.dart</code>: a class <code>&lt;Name&gt;Serializer extends Serializer&lt;&lt;Name&gt;&gt;</code>. It imports the model with <code>package:&lt;app&gt;/app/models/&lt;name&gt;/&lt;name&gt;.model.dart</code>.
 A trailing <code>Serializer</code> in the name is removed.</p>
 <p>Template: <code>_getSample</code> in <code>lib/src/tools/create_serializer.dart</code>.</p>
 <h3 id="dox-makemodel"><code>dox make:model</code></h3>

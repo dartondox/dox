@@ -6949,6 +6949,8 @@ When the input is wrong, Dox answers <code>422</code> with the errors. Your cont
 <li>Rules on an optional field run only when it has a value.</li>
 <li>A default value is used only when the key is missing. The rules do not check it.</li>
 <li><strong>An empty string counts as missing.</strong> So a required <code>String</code> rejects <code>""</code>. Add <code>@AllowEmpty()</code> to keep <code>""</code>.</li>
+<li>To read <code>""</code> as <code>null</code> instead (like Laravel's <code>ConvertEmptyStringsToNull</code>), use <code>@Dto(emptyStringsToNull: true)</code>. Then <code>{"bio": ""}</code> clears a <code>Maybe&lt;String?&gt;</code> field. A required field still gets <code>required</code>.</li>
+<li>On a query field, <code>@OrDefault()</code> turns a bad value into the default, with no error: <code>@OrDefault() @NotIn(&lt;int&gt;[0]) final int page;</code> with <code>this.page = 1</code> in the constructor reads <code>page=abc</code> and <code>page=0</code> as <code>1</code>. The field needs a default in the constructor or a nullable type.</li>
 </ul>
 <h3 id="missing-or-null-for-patch">Missing or <code>null</code>? (for PATCH)</h3>
 <p>A <code>T?</code> field gives <code>null</code> for both. To know the difference, use <code>Maybe&lt;T&gt;</code>:</p>
@@ -7163,6 +7165,7 @@ The full order of checks is in <a href="../validation-rules/#the-order-of-checks
 </span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>The key is the path to the value, with the input keys. List items use the index.</p>
+<p>For another error shape, read <code>error.issues</code> of the <code>ValidationException</code> in your <code>ExceptionHandler</code>. Each issue has its <code>dottedPath</code>, its rule <code>code</code> (like <code>min_length</code>), its <code>message</code> and its <code>params</code>.</p>
 <h2 id="messages">Messages</h2>
 <p>Change a message in one of these places. The first one wins.</p>
 <ol>

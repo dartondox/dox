@@ -6962,7 +6962,7 @@ See <a href="../../database/postgres-native/#options">Native Postgres driver</a>
 <ul>
 <li><code>dox make:dto</code> adds <code>lib/app/dtos/&lt;name&gt;/&lt;name&gt;.dto.dart</code>. Then <code>build_runner</code> writes <code>lib/generated/dtos.g.dart</code>, the list of DTOs.</li>
 <li><code>dox make:middleware</code> adds <code>lib/app/http/middleware/</code>.</li>
-<li><code>dox make:serializer</code> adds <code>lib/app/http/serializers/</code>.</li>
+<li><code>dox make:serializer</code> adds <code>lib/app/serializers/</code>.</li>
 </ul>
 <p>The app makes <code>storage/</code> when it writes files (the local disk, the file cache, uploads).</p>
 <table>
@@ -6983,7 +6983,11 @@ See <a href="../../database/postgres-native/#options">Native Postgres driver</a>
 </tr>
 <tr>
 <td><code>lib/app/http/</code></td>
-<td>Everything about HTTP: controllers, middleware, serializers.</td>
+<td>Everything about HTTP: controllers and middleware.</td>
+</tr>
+<tr>
+<td><code>lib/app/serializers/</code></td>
+<td>Serializers. They are not only for HTTP: MCP and websocket use them too.</td>
 </tr>
 <tr>
 <td><code>lib/app/dtos/</code></td>
