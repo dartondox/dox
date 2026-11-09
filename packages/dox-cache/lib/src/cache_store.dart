@@ -198,6 +198,10 @@ class CacheStore {
   /// it is stale for [stale] more: it is still returned right away, and
   /// one caller refreshes it in the background. After [fresh] + [stale]
   /// it is gone, and the next call waits for [compute].
+  ///
+  /// A null [stale] keeps the value until a refresh replaces it. Use it
+  /// when an old value beats none, like rates from a provider that can be
+  /// down: when [compute] fails, callers still get the last good value.
   /// [decode] works like in [remember]. The driver must support locks.
   /// ```
   /// int count = await cache.flexible<int>(
@@ -210,7 +214,7 @@ class CacheStore {
   Future<T> flexible<T>(
     String key,
     Duration fresh,
-    Duration stale,
+    Duration? stale,
     FutureOr<T> Function() compute, {
     T Function(Object? json)? decode,
   }) async {
@@ -346,14 +350,14 @@ class CacheStore {
     String fullKey,
     String createdKey,
     Duration fresh,
-    Duration stale,
+    Duration? stale,
     FutureOr<T> Function() compute,
   ) async {
     T value = await compute();
     await driver.putMany(<String, Object?>{
       fullKey: value,
       createdKey: clock.nowMs(),
-    }, fresh + stale);
+    }, stale == null ? null : fresh + stale);
     return value;
   }
 
@@ -363,7 +367,7 @@ class CacheStore {
     String fullKey,
     String createdKey,
     Duration fresh,
-    Duration stale,
+    Duration? stale,
     FutureOr<T> Function() compute,
   ) async {
     CacheLock refreshLock = driver.lock(

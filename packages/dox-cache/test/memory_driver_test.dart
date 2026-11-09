@@ -208,6 +208,38 @@ void main() {
       expect(await read(), 2);
     });
 
+    test('a null stale keeps the value until a refresh replaces it', () async {
+      bool down = false;
+      Future<int> rates() async {
+        if (down) throw StateError('provider down');
+        calls++;
+        return calls;
+      }
+
+      Future<int> readForever() {
+        return cache.flexible<int>(
+          'forever',
+          const Duration(seconds: 10),
+          null,
+          rates,
+        );
+      }
+
+      expect(await readForever(), 1);
+      down = true;
+      clock.advance(const Duration(days: 30));
+      // the provider is down: the last good value stays
+      expect(await readForever(), 1);
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(await readForever(), 1);
+      // let the failed background refresh finish before the provider is back
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      down = false;
+      expect(await readForever(), 1); // this read starts the refresh
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(await readForever(), 2);
+    });
+
     test('decode is used for a cached value', () async {
       List<String> decode(Object? json) {
         return List<String>.from(json as List<dynamic>);

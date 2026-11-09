@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:isolate';
 
 import 'package:bcrypt/bcrypt.dart';
+import 'package:crypto/crypto.dart' as crypto;
 
 class Hash {
   /// bcrypt cost (log rounds) for new hashes. Default: 10.
@@ -87,6 +88,22 @@ class Hash {
       diff |= x[i] ^ y[i];
     }
     return diff == 0;
+  }
+
+  /// SHA-256 of [value], as 64 hex characters.
+  ///
+  /// For a long random secret that you store and look up, like an API key
+  /// or an access token: keep only this hash in the database, and find the
+  /// row by the hash of what the client sends. It is fast and the same for
+  /// the same input, so a unique index works on it.
+  ///
+  /// Never use it for passwords. A password is short and can be guessed,
+  /// so use [make] (bcrypt) for those.
+  /// ```
+  /// String stored = Hash.sha256(token);
+  /// ```
+  static String sha256(String value) {
+    return crypto.sha256.convert(utf8.encode(value)).toString();
   }
 
   /// bcrypt throws its own error with the password in the text. Throw

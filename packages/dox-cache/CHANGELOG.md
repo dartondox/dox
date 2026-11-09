@@ -1,3 +1,7 @@
+## Unreleased
+
+- New: `flexible` takes a null `stale`. Then the value is kept until a refresh replaces it, so callers still get the last good value when `compute` fails.
+
 ## 3.1.0
 
 - New: the file driver can delete expired and broken files by itself. Set the `prune_every` option (or `FileDriver(pruneEvery: ...)`) to run `prune()` in the background once every that many writes. It is off by default (`0`). Only one prune runs at a time, and a failed prune is ignored.
