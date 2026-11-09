@@ -17,7 +17,7 @@
 - Fix: in generated DTO code, `@RequiredIf` and `@RequiredWith` now run after all fields are converted. Before, a rule on a field read the raw value of a field that comes after it, like `' PRO '`, not `'pro'` after `@Trim` and `@Lowercase`. Run `build_runner` to get the new code.
 - Fix: `reload()` and preload now set a nullable `@HasOne`, `@BelongsTo`, `@MorphOne` or `@MorphTo` field to null when the related row is gone. Before, the field kept its old value. Run `build_runner` to get the new code.
 - Fix: `reload()` and preload now set a `@HasMany`, `@ManyToMany` or `@MorphMany` field to an empty list when there are no related rows. Before, the field kept its old list. Run `build_runner` to get the new code.
-- Note: a nullable list relation, like `List<Tag>? tags`, is now `[]` (not `null`) after a preload with no rows.
+- Behavior change: a nullable list relation, like `List<Tag>? tags`, is now `[]` (not `null`) after a preload with no rows.
 - DTOs: `@RequiredIf('type', 'company')` and `@RequiredWith(['phone'])` from `dox_validation`. The field is required only when the condition is true. Use them on a nullable field, a `Maybe` field or a field with a default. On an always-required field the build stops with a clear error.
 - DTOs: the build stops when `@RequiredIf`, `@RequiredWith`, `@Same` or `@Confirmed(other:)` names a Dart field (like `accountType`) instead of its input key (`account_type`). The check would never match. It also stops for a `@DateFormatted` format with a letter it does not know.
 - DTOs: in a `@Dto(strict: true)` class, the key that `@Confirmed` reads (like `password_confirmation`) is not an unknown key.
