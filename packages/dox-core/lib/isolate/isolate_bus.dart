@@ -79,6 +79,9 @@ class IsolateBus {
   int get size => _size;
 
   /// Sends [message] to every other isolate that listens [on] [channel].
+  ///
+  /// A [message] that a [SendPort] can not send throws an
+  /// [ArgumentError] here. It is all or nothing: then no isolate gets it.
   void publish(String channel, Object? message) {
     _send(<Object?>['send', _id, channel, message]);
   }
