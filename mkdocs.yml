@@ -135,6 +135,7 @@ nav:
       - concepts/status-and-roadmap.md
     - Community:
       - community/contribute.md
+      - community/showcase.md
       - community/mascot.md
   - The basics:
     - the-basic/routing.md
