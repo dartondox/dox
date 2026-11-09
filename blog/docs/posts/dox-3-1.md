@@ -253,7 +253,7 @@ Docs: [Authentication](/latest/security/authentication/)
 
 - `McpServer` (Streamable HTTP), `McpTool` with `dox_validation` input schemas, `McpTool.of`, `McpToolResult` and `McpContext`.
 - `SignedMcpSessions`: session ids signed with the `APP_KEY`.
-- `McpOAuth`: the OAuth 2.1 sign-in of the MCP spec, with PKCE and dynamic client registration (3.1.1).
+- `McpOAuth`: the OAuth 2.1 sign-in of the MCP spec, with PKCE and dynamic client registration (3.1.1). From 3.1.2, the `code_verifier`, `code_challenge` and redirect address are checked strictly.
 - `McpDtoTool<T>`: a tool that takes a `@Dto` class as its input. `handle` gets the typed object. `McpToolResult.invalidArguments()` gives the error result for bad arguments (3.1.2).
 
 ```dart
@@ -394,7 +394,6 @@ The template that `dox create` uses got new files too.
 - A local signed URL for one disk no longer works on the route of another disk.
 - Inertia ignores the Vite `public/hot` file when `APP_ENV` is `production`.
 - On MySQL, a key with a letter that is not ASCII can no longer set a guarded column.
-- MCP OAuth: the `code_verifier`, `code_challenge` and redirect address are checked (3.1.2).
 - Postgres: an unknown `verify` value now means the full certificate check.
 
 ### Routing and core
@@ -404,6 +403,8 @@ The template that `dox create` uses got new files too.
 - A mounted handler that throws gives 500. Before, the client could hang.
 - A download name with quotes or non-ASCII letters gets a safe `Content-Disposition`.
 - `res.withHeaders` and `res.header` no longer drop or double headers.
+- A resumed download with `If-Range` no longer mixes two versions of a file. `If-Range` is used only when it matches the file's `Last-Modified` date or its strong `ETag`.
+- A `Range`, `If-Modified-Since` or `If-None-Match` header sent on two lines no longer gives 500.
 - `req.session.reflash()` keeps the flash data on the first use of the session.
 
 ### ORM and database
@@ -445,7 +446,6 @@ The template that `dox create` uses got new files too.
 - **Socket.IO:** CORS origin matching ignores case and a trailing `/`.
 - **Views:** `{{ errors.email }}` works with no session. A global named `errors` shows. The `toJson()` cache lasts one render.
 - **Inertia:** flash messages are kept after a deploy. A function prop inside a map or a list runs too.
-- **OpenAPI:** an optional route param shows as two paths. The short path lists no 404.
 - **CLI:** `migration:rollback --step 2` (with a space) works.
 - **Redis client:** the client waits for AUTH and SELECT before it sends commands. A failed AUTH on reconnect no longer crashes the app. The connect has a timeout. A server that closes the connection right after connect no longer crashes the app. The handshake tries again when the server is not ready yet (`LOADING`, `BUSY`, `MASTERDOWN`, `TRYAGAIN`). The wait between tries grows, and a long run of tries no longer ends in a stack overflow. `disconnect()` stops a try that is waiting.
 
