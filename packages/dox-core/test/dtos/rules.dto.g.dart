@@ -23,6 +23,9 @@ class _$CreateUserDto extends DtoSchema<CreateUser> {
   String get name => 'CreateUser';
 
   @override
+  bool get usesRequiredWhen => false;
+
+  @override
   CreateUser? convert(Object? input, DtoState s, List<Object> p) {
     if (input is! Map) {
       s.notObject(input, p, _m);
@@ -214,6 +217,9 @@ class _$TextRulesDto extends DtoSchema<TextRules> {
 
   @override
   String get name => 'TextRules';
+
+  @override
+  bool get usesRequiredWhen => false;
 
   @override
   TextRules? convert(Object? input, DtoState s, List<Object> p) {
@@ -658,6 +664,9 @@ class _$ChangeTextDto extends DtoSchema<ChangeText> {
   String get name => 'ChangeText';
 
   @override
+  bool get usesRequiredWhen => false;
+
+  @override
   ChangeText? convert(Object? input, DtoState s, List<Object> p) {
     if (input is! Map) {
       s.notObject(input, p, _m);
@@ -762,6 +771,9 @@ class _$NumberRulesDto extends DtoSchema<NumberRules> {
 
   @override
   String get name => 'NumberRules';
+
+  @override
+  bool get usesRequiredWhen => false;
 
   @override
   NumberRules? convert(Object? input, DtoState s, List<Object> p) {
@@ -1010,6 +1022,9 @@ class _$ListRulesDto extends DtoSchema<ListRules> {
   String get name => 'ListRules';
 
   @override
+  bool get usesRequiredWhen => false;
+
+  @override
   ListRules? convert(Object? input, DtoState s, List<Object> p) {
     if (input is! Map) {
       s.notObject(input, p, _m);
@@ -1239,6 +1254,9 @@ class _$DateRulesDto extends DtoSchema<DateRules> {
   String get name => 'DateRules';
 
   @override
+  bool get usesRequiredWhen => false;
+
+  @override
   DateRules? convert(Object? input, DtoState s, List<Object> p) {
     if (input is! Map) {
       s.notObject(input, p, _m);
@@ -1339,6 +1357,9 @@ class _$AllTypesDto extends DtoSchema<AllTypes> {
 
   @override
   String get name => 'AllTypes';
+
+  @override
+  bool get usesRequiredWhen => false;
 
   @override
   AllTypes? convert(Object? input, DtoState s, List<Object> p) {
@@ -1561,6 +1582,9 @@ class _$SearchUsersDto extends DtoSchema<SearchUsers> {
   Source get source => Source.query;
 
   @override
+  bool get usesRequiredWhen => false;
+
+  @override
   SearchUsers? convert(Object? input, DtoState s, List<Object> p) {
     if (input is! Map) {
       s.notObject(input, p, _m);
@@ -1658,6 +1682,9 @@ class _$StrictInputDto extends DtoSchema<StrictInput> {
   String get name => 'StrictInput';
 
   @override
+  bool get usesRequiredWhen => false;
+
+  @override
   StrictInput? convert(Object? input, DtoState s, List<Object> p) {
     if (input is! Map) {
       s.notObject(input, p, _m);
@@ -1726,6 +1753,9 @@ class _$WithMessagesDto extends DtoSchema<WithMessages> {
 
   @override
   String get name => 'WithMessages';
+
+  @override
+  bool get usesRequiredWhen => false;
 
   @override
   WithMessages? convert(Object? input, DtoState s, List<Object> p) {
@@ -1827,6 +1857,9 @@ class _$SignUpKeysDto extends DtoSchema<SignUpKeys> {
   String get name => 'SignUpKeys';
 
   @override
+  bool get usesRequiredWhen => false;
+
+  @override
   SignUpKeys? convert(Object? input, DtoState s, List<Object> p) {
     if (input is! Map) {
       s.notObject(input, p, _m);
@@ -1889,6 +1922,9 @@ class _$CamelKeysDto extends DtoSchema<CamelKeys> {
   String get name => 'CamelKeys';
 
   @override
+  bool get usesRequiredWhen => false;
+
+  @override
   CamelKeys? convert(Object? input, DtoState s, List<Object> p) {
     if (input is! Map) {
       s.notObject(input, p, _m);
@@ -1940,6 +1976,9 @@ class _$UpdateUserDto extends DtoSchema<UpdateUser> {
 
   @override
   String get name => 'UpdateUser';
+
+  @override
+  bool get usesRequiredWhen => false;
 
   @override
   UpdateUser? convert(Object? input, DtoState s, List<Object> p) {
@@ -2418,6 +2457,9 @@ class _$StrictPasswordDto extends DtoSchema<StrictPassword> {
 
   @override
   String get name => 'StrictPassword';
+
+  @override
+  bool get usesRequiredWhen => false;
 
   @override
   StrictPassword? convert(Object? input, DtoState s, List<Object> p) {

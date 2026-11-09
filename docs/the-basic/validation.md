@@ -297,7 +297,7 @@ For another error shape, read `error.issues` of the `ValidationException` in you
 Change a message in one of these places. The first one wins.
 
 1. On the rule: `@Email(message: 'Please check your email')`.
-2. On the DTO, by code or by `key.code`. A full dotted path works too, like `'address.city.required'` (it also reaches a nested DTO). Use `*` for list items, like `'tags.*.required'`:
+2. On the DTO, by code or by `key.code`. A full dotted path works too, like `'address.city.required'` (it also reaches a nested DTO). A message in the nested DTO itself, like `'city.required'`, wins over it. Use `*` for list items, like `'tags.*.required'`:
 
 ```dart
 @Dto(messages: <String, String>{

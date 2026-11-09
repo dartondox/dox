@@ -1,3 +1,8 @@
+## Unreleased
+
+- DTOs: a DTO with no `@RequiredIf` or `@RequiredWith` field (and no nested DTO with one) now writes `usesRequiredWhen => false`. Then the check does not keep each converted value, which saves work. Needs the next dox_validation.
+- Fix: a nested DTO deeper in lists and maps, like `List<List<A>>` or `Map<String, List<A>>`, now runs its `validate()` and its async rules. Before, only one level (`List<A>`, `Map<String, A>`) was found.
+
 ## 3.1.3
 
 - Version bump only, to match the other packages.

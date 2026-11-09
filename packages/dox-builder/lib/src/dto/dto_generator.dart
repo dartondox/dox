@@ -74,26 +74,25 @@ class DtoFlagsReader implements DtoFlagsSource {
     bool checks = dto.validate != null;
     bool checksAsync = dto.validateIsAsync;
     bool async = false;
+    bool requiredWhen = false;
     for (DtoField field in dto.fields) {
+      requiredWhen = requiredWhen || field.requiredWhen.isNotEmpty;
       for (DtoRule rule in field.rules) {
         async = async || rule.isAsync;
       }
-      DtoType type = field.type;
-      DtoType? nested = type.kind == DtoKind.dto
-          ? type
-          : type.item?.kind == DtoKind.dto
-          ? type.item
-          : null;
+      DtoType? nested = field.type.dto;
       if (nested == null) continue;
       DtoFlags inner = flagsOf(nested);
       checks = checks || inner.checks;
       checksAsync = checksAsync || inner.checksAsync;
       async = async || inner.async;
+      requiredWhen = requiredWhen || inner.requiredWhen;
     }
     DtoFlags flags = DtoFlags(
       checks: checks,
       checksAsync: checksAsync,
       async: async,
+      requiredWhen: requiredWhen,
     );
     _done[element] = flags;
     return flags;

@@ -23,6 +23,9 @@ class _$UploadAvatarDto extends DtoSchema<UploadAvatar> {
   String get name => 'UploadAvatar';
 
   @override
+  bool get usesRequiredWhen => false;
+
+  @override
   UploadAvatar? convert(Object? input, DtoState s, List<Object> p) {
     if (input is! Map) {
       s.notObject(input, p, _m);

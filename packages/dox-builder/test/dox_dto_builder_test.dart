@@ -150,6 +150,8 @@ void main() {
       expect(out, contains("String get name => 'CreateUser';"));
       expect(out, contains('bool get hasChecks => true;'));
       expect(out, contains('bool get isAsync => true;'));
+      // no @RequiredIf or @RequiredWith: the converted values are not kept
+      expect(out, contains('bool get usesRequiredWhen => false;'));
     });
 
     test('snake_case keys and text changes', () {
@@ -267,6 +269,18 @@ class A {
   final Maybe<int> size;
 
   const A({this.type, this.company, this.size = const Maybe.missing()});
+}
+
+@Dto()
+class B {
+  final A a;
+  const B({required this.a});
+}
+
+@Dto()
+class C {
+  final String name;
+  const C({required this.name});
 }''');
         // the generated code is formatted, so compare without spaces
         String code = output.replaceAll(RegExp(r'\s+'), '');
@@ -288,8 +302,63 @@ class A {
           code.indexOf('s.requiredWhen('),
           greaterThan(code.indexOf('Object?c2;')),
         );
+        // A has the rules and B nests A: both keep the converted values.
+        // C has none, so only C says it does not use them.
+        String flag = 'boolgetusesRequiredWhen=>false;';
+        expect(flag.allMatches(code), hasLength(1));
+        expect(code.indexOf(flag), greaterThan(code.indexOf(r'class_$CDto')));
       },
     );
+
+    test('a DTO deep in lists and maps still counts as nested', () async {
+      String output = await _generate('''
+@Dto()
+class A {
+  @Trim()
+  final String? type;
+
+  @RequiredIf('type', 'company')
+  final String? vat;
+
+  const A({this.type, this.vat});
+
+  void validate(DtoErrors errors) {}
+}
+
+@Dto()
+class B {
+  final List<List<A>> rows;
+  const B({required this.rows});
+}
+
+@Dto()
+class C {
+  final Map<String, List<A?>> groups;
+  const C({required this.groups});
+}''');
+      expect(output, isNot(startsWith('ERROR')), reason: output);
+      String code = output.replaceAll(RegExp(r'\s+'), '');
+      // A has the rule, and B and C hold A deep inside: all keep values
+      expect(code, isNot(contains('boolgetusesRequiredWhen=>false;')));
+      // validate() of A runs for each item at any depth
+      String b = code.substring(
+        code.indexOf(r'class_$BDto'),
+        code.indexOf(r'class_$CDto'),
+      );
+      expect(b, contains('boolgethasChecks=>true;'));
+      expect(
+        b,
+        contains(r"$ADto.crossCheck(x1,s,<Object>[...p,'rows',i0,i1]);"),
+      );
+      String c = code.substring(code.indexOf(r'class_$CDto'));
+      expect(c, contains('boolgethasChecks=>true;'));
+      expect(
+        c,
+        contains(
+          r"if(x1!=null){$ADto.crossCheck(x1,s,<Object>[...p,'groups',e0.key,i1]);",
+        ),
+      );
+    });
 
     test('a Dart field name where the input key is needed', () async {
       String rules = '''
