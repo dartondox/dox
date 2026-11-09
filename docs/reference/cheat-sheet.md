@@ -266,6 +266,7 @@ Then `dox build_runner:build`, and `dtos: dtos` in `AppConfig`.
 | Files | `@MaxSize('2MB')`, `@MinSize('1KB')`, `@Mimes(['pdf'])`, `@MimeTypes(['image/png'])`, `@Image()`, `@Dimensions(minWidth: 100)` |
 | Database (`dox_orm`) | `@Unique('users', column: 'email', ignoreParam: 'id')`, `@Exists('teams')` |
 | Keys | `@Name('emailAddress')` |
+| Docs | `@Describe('Shown in OpenAPI and MCP.')` (only the JSON Schema `description`) |
 | Class | `@Dto(source: Source.query, keyCase: KeyCase.field, strict: true, messages: {...})` |
 
 Cross field check: add `void validate(DtoErrors errors)` to the DTO. PATCH "missing or null": `Maybe<T>` with `const Maybe.missing()`.
