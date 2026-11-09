@@ -1,6 +1,6 @@
-## Unreleased
+## 3.1.2
 
-- DTOs: `@Describe('...')` on a field sets `description` in its JSON Schema (the generated `toJsonSchema()` and the OpenAPI docs). It wins over the `///` doc comment. Needs the next dox_validation.
+- DTOs: `@Describe('...')` on a field sets `description` in its JSON Schema (the generated `toJsonSchema()` and the OpenAPI docs). It wins over the `///` doc comment. Needs dox_validation 3.1.2.
 
 ## 3.1.1
 
