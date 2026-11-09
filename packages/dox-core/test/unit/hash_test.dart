@@ -40,7 +40,7 @@ void main() {
     test('pkceChallenge matches the RFC 7636 example', () {
       expect(
         Hash.pkceChallenge('dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'),
-        'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWPkGjZCZFtMs',
+        'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
       );
     });
 
