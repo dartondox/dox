@@ -139,6 +139,13 @@ With many isolates and no `adapter`, the provider uses the `IsolateAdapter`. It 
 | `IsolateAdapter` (many isolates, the default) | the clients of every isolate of this process |
 | `RedisAdapter` | the clients of every isolate of every server |
 
+!!! warning "Add each namespace in every isolate"
+    The `IsolateAdapter` counts the isolates on the bus, not the isolates that have a namespace.
+    `fetchSockets` and `serverSideEmitWithAck` wait for an answer from each of them.
+    A `NamespaceHandler` in the config is added in every isolate, so it is fine.
+    A namespace that only one isolate adds with `io.of('/x')` gets no answer from the others.
+    Then these calls wait 5 seconds and throw.
+
 
 !!! warning "Clients should connect with websocket only"
     One websocket stays on one isolate. HTTP long-polling sends many requests, and they can reach different isolates.
