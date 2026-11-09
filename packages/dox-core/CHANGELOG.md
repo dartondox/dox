@@ -2,6 +2,7 @@
 
 - `Cache().flexible` takes a null `stale`: keep the last good value until a refresh replaces it.
 - New: `Hash.sha256(value)` gives the SHA-256 hex of a value, to store API keys and access tokens as a hash (not for passwords).
+- New: `ValidationException.issues` keeps every issue of a failed DTO or schema check (path, rule code, message, params). An `ExceptionHandler` can use it for another 422 shape, like `[{field, message, rule}]`.
 - New: `RequestBody` and `BodyKind` are exported, so `req.requestBody.kind` can tell invalid JSON (`BodyKind.invalidJson`) from no body, without importing a file of `lib/http`.
 
 ## 3.1.0

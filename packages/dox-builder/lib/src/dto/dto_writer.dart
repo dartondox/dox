@@ -165,7 +165,11 @@ class DtoWriter {
       out
         ..writeln('// ${field.name}: ${field.fieldCode}')
         ..writeln('Object? $c;');
-      _conv(out, field, field.type, 's.read(input, $key)', 'p', key, c, 0);
+      if (field.orDefault) out.writeln('int f$i = s.issues.length;');
+      String read = dto.emptyStringsToNull
+          ? 's.read(input, $key, emptyToNull: true)'
+          : 's.read(input, $key)';
+      _conv(out, field, field.type, read, 'p', key, c, 0);
       if (field.maybe) {
         if (!field.type.nullable) {
           out.writeln('if ($c == null) s.required(p, $key, _m);');
@@ -176,6 +180,10 @@ class DtoWriter {
         );
       } else if (!field.type.nullable) {
         out.writeln('if ($c == null) s.required(p, $key, _m);');
+      }
+      // @OrDefault: a type error (or null) gives the default
+      if (field.orDefault) {
+        out.writeln('if (s.dropIssuesAfter(f$i)) $c = undefined;');
       }
       // requiredWhen checks if the value is missing (blank text and an
       // empty list count as missing too). It runs after all fields are
@@ -191,7 +199,18 @@ class DtoWriter {
       ..writeln('if (s.issues.length != e) return null;');
     StringBuffer rules = StringBuffer();
     for (int i = 0; i < dto.fields.length; i++) {
-      _fieldRules(rules, dto.fields[i], 'c$i');
+      DtoField field = dto.fields[i];
+      StringBuffer one = StringBuffer();
+      _fieldRules(one, field, 'c$i');
+      if (field.orDefault && one.isNotEmpty) {
+        // @OrDefault: a failed rule gives the default too
+        rules
+          ..writeln('int r$i = s.issues.length;')
+          ..write(one)
+          ..writeln('if (s.dropIssuesAfter(r$i)) c$i = undefined;');
+      } else {
+        rules.write(one);
+      }
     }
     // the rules of this DTO run when all its fields have the right type
     if (rules.isNotEmpty) {

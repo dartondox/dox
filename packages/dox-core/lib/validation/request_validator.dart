@@ -81,7 +81,9 @@ class RequestValidator {
       text: text,
     );
     ParseResult<Object> result = await schema.run(input, state);
-    if (!result.success) throw ValidationException(message: result.errors);
+    if (!result.success) {
+      throw ValidationException(message: result.errors, issues: result.issues);
+    }
     return result.value as Object;
   }
 
@@ -90,7 +92,9 @@ class RequestValidator {
     ParseResult<O> result = schema.isAsync
         ? await schema.safeParseAsync(data, messages: Dox().messages)
         : schema.safeParse(data, messages: Dox().messages);
-    if (!result.success) throw ValidationException(message: result.errors);
+    if (!result.success) {
+      throw ValidationException(message: result.errors, issues: result.issues);
+    }
     return result.value as O;
   }
 }

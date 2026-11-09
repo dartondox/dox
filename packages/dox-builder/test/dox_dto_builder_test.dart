@@ -372,6 +372,49 @@ class A {
       );
     });
 
+    test('emptyStringsToNull reads "" as null', () async {
+      String output = await _generate('''
+@Dto(emptyStringsToNull: true)
+class A {
+  final String? note;
+
+  const A({this.note});
+}''');
+      expect(output, isNot(startsWith('ERROR')), reason: output);
+      expect(output, contains("s.read(input, 'note', emptyToNull: true)"));
+    });
+
+    test('@OrDefault drops the issues of its field', () async {
+      String output = await _generate('''
+@Dto()
+class A {
+  @OrDefault()
+  @Min(1)
+  final int days;
+
+  const A({this.days = 30});
+}''');
+      expect(output, isNot(startsWith('ERROR')), reason: output);
+      String code = output.replaceAll(RegExp(r'\s+'), '');
+      expect(code, contains('intf0=s.issues.length;'));
+      expect(code, contains('if(s.dropIssuesAfter(f0))c0=undefined;'));
+      expect(code, contains('intr0=s.issues.length;'));
+      expect(code, contains('if(s.dropIssuesAfter(r0))c0=undefined;'));
+      expect(code, contains('c0isUndefined?30:c0asint'));
+    });
+
+    test('@OrDefault on a required field stops the build', () async {
+      String output = await _generate('''
+@Dto()
+class A {
+  @OrDefault()
+  final int days;
+
+  const A({required this.days});
+}''');
+      expect(output, contains('@OrDefault on'));
+    });
+
     test('@DateFormatted with a letter it does not know', () async {
       String rule = '''
 class DateFormatted extends Rule<String> {

@@ -185,6 +185,9 @@ class DtoField {
   int textCase = 0;
   bool allowEmpty = false;
 
+  /// `@OrDefault`: a bad value gives the default, not an error.
+  bool orDefault = false;
+
   /// The `///` doc comment.
   String? get doc {
     return element.documentationComment;
@@ -216,6 +219,9 @@ class DtoClass {
   final List<DtoField> parameters = <DtoField>[];
   String source = 'auto';
   bool strict = false;
+
+  /// `@Dto(emptyStringsToNull: true)`: `""` is read as `null`.
+  bool emptyStringsToNull = false;
   Map<String, String> messages = <String, String>{};
 
   /// The `validate(DtoErrors errors)` method, or null.
@@ -328,6 +334,8 @@ class DtoReader {
     DartObject? options = annotations.first(element, 'Dto');
     dto.source = options?.getField('source')?.variable?.displayName ?? 'auto';
     dto.strict = options?.getField('strict')?.toBoolValue() ?? false;
+    dto.emptyStringsToNull =
+        options?.getField('emptyStringsToNull')?.toBoolValue() ?? false;
     bool snake =
         (options?.getField('keyCase')?.variable?.displayName ?? 'snake') ==
         'snake';
@@ -635,6 +643,14 @@ class DtoReader {
           field.textCase = 2;
         case 'AllowEmpty':
           field.allowEmpty = true;
+        case 'OrDefault':
+          field.orDefault = true;
+          if (field.required) {
+            errors.add(
+              '@OrDefault on $where needs a default value or a nullable type.',
+            );
+          }
+          continue;
       }
       if (textChanges.contains(name)) {
         _fits(field, name, where, errors, <DtoKind>{DtoKind.string});
