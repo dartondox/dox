@@ -77,8 +77,11 @@ for name in ('llms.txt', 'llms-full.txt'):
 # because some AI tools read only the sitemap and never try /llms.txt.
 with open(os.path.join(home, 'sitemap.xml')) as f:
     sitemap = f.read()
+# The llms files get the same date as the pages (the build date).
+lastmod = re.search(r'<lastmod>[^<]*</lastmod>', sitemap)
+lastmod = '         %s\n' % lastmod.group(0) if lastmod else ''
 llms_urls = ''.join('    <url>\n         <loc>https://dartondox.dev/%s</loc>\n'
-                    '    </url>\n' % name
+                    '%s    </url>\n' % (name, lastmod)
                     for name in ('llms.txt', 'llms-full.txt'))
 with open('sitemap.xml', 'w') as f:
     f.write(sitemap.replace('</urlset>', llms_urls + '</urlset>', 1))
