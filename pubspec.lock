@@ -237,10 +237,10 @@ packages:
     dependency: transitive
     description:
       name: dox_validation
-      sha256: aea6d8f59fa0016ffcf6c42fbbd2f4284dee10c464ea2bad603868b803d2294e
+      sha256: "2bc67273cce46cd33d4f01e71e7f6c687f6917479cc92570b8e8f5ebcdc23aab"
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.1"
+    version: "3.1.2"
   ffi:
     dependency: transitive
     description:
