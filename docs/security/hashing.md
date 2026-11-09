@@ -77,6 +77,19 @@ To check an API key or a token, use `Hash.equals(given, expected)`, not `==`.
 bool ok = Hash.equals(req.header('X-Api-Key') ?? '', Env.get<String>('API_KEY'));
 ```
 
+## Store tokens
+
+For a long random secret that you keep in the database (an API key, an access token), store only `Hash.sha256(token)`.
+Find the row by the hash of what the client sends.
+SHA-256 is fast and gives the same hash for the same input, so a unique index works on it.
+
+```dart
+String stored = Hash.sha256(token);          // save this, never the token
+Token? row = await Token().where('hash', Hash.sha256(given)).getFirst();
+```
+
+Never use `Hash.sha256` for passwords. A password is short and can be guessed, so use `Hash.make` (bcrypt).
+
 ## With login
 
 You do not need `Hash.verify` for normal login.

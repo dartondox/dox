@@ -17,6 +17,15 @@ void main() {
       expect(result, false);
     });
 
+    test('sha256 is the hex digest, the same for the same input', () {
+      expect(
+        Hash.sha256('abc'),
+        'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
+      );
+      expect(Hash.sha256('mex_token'), Hash.sha256('mex_token'));
+      expect(Hash.sha256('a'), isNot(Hash.sha256('b')));
+    });
+
     test('check is the same as verify', () {
       String hashed = Hash.make('secret', rounds: 4);
       expect(Hash.check('secret', hashed), true);

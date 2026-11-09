@@ -204,6 +204,8 @@ class Cache {
   /// Stale while revalidate. For [fresh] the value is served as it is.
   /// After that, until [fresh] + [stale], the old value is still served
   /// at once, and one caller runs [compute] in the background.
+  /// A null [stale] keeps the old value until a refresh replaces it, so a
+  /// failing [compute] never leaves callers with nothing.
   /// ```
   /// await Cache().flexible('stats', Duration(minutes: 1),
   ///     Duration(minutes: 5), () => loadStats());
@@ -211,7 +213,7 @@ class Cache {
   Future<T> flexible<T>(
     String key,
     Duration fresh,
-    Duration stale,
+    Duration? stale,
     FutureOr<T> Function() compute, {
     T Function(Object? json)? decode,
   }) {
