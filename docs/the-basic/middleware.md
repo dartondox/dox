@@ -208,6 +208,47 @@ The answer is the normal error JSON:
 - Dart can not stop a running Future. The controller keeps running in the background. Its late result is dropped, so nothing is sent twice.
 - It is `503`, not `504`. `504 Gateway Timeout` is what a proxy sends when the app is slow. `503` says the app itself gave up.
 
+## Server timing
+
+`ServerTiming` adds a `Server-Timing` header to the answer. The browser dev tools show it in the Network tab, under Timing.
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  globalMiddleware: <dynamic>[
+    if (Env.get<String>('APP_ENV') == 'development') const ServerTiming(),
+  ],
+  // ...
+);
+```
+
+It always sends two times, in milliseconds:
+
+- `handler`: the time in the controller.
+- `total`: the time of the middleware after `ServerTiming` and the controller.
+
+Add your own times to the current request from any code. You do not pass the request:
+
+```dart
+ServerTiming.add('db', Duration(milliseconds: 4));
+
+String html = await ServerTiming.measure('render', () => view.render());
+```
+
+The header looks like this:
+
+```
+Server-Timing: db;dur=4.10;desc="3 calls", handler;dur=12.34, total;dur=13.02
+```
+
+- `add` with the same name again adds the times together. With more than one call, the text shows the count, like `"3 calls"`. Pass `description:` to set your own text.
+- `measure` runs the function and adds the time it took, also when it throws.
+- Without the middleware, or outside a request, `add` and `measure` do nothing. The cost is one small lookup.
+- A name may only have letters, digits and ``!#$%&'*+-.^_`|~``. Other characters become `_`. An empty name is ignored.
+- One answer keeps at most 32 names, plus `handler` and `total`.
+
+!!! warning "Development or trusted clients only"
+    The header tells every client how long your code takes. An attacker can use that, for example to guess if an email has an account. `ServerTiming` is off unless you add it. Turn it on in development, or only for clients you trust.
+
 ## Many middleware on one route
 
 Put them in the list before the controller. They run from left to right.
@@ -280,5 +321,5 @@ flowchart LR
     - `SecurityHeaders` from `dox_core` adds safe headers like `X-Frame-Options` to every answer. See [Security headers](../security/security-headers.md).
     - `SessionMiddleware` from `dox_core` gives each request a session. See [Session](session.md).
     - `CsrfMiddleware` from `dox_core` stops cross site request forgery. See [CSRF protection](../security/csrf.md).
-    - `RequestId`, `ETag` and `RequestTimeout` from `dox_core`. See above.
+    - `RequestId`, `ETag`, `RequestTimeout` and `ServerTiming` from `dox_core`. See above.
     - `ValidateSignature` from `dox_core` checks signed urls. See [Signed URLs](../security/signed-urls.md).
