@@ -430,8 +430,10 @@
     </url>
     <url>
          <loc>https://dartondox.dev/llms.txt</loc>
+         <lastmod>2026-11-09</lastmod>
     </url>
     <url>
          <loc>https://dartondox.dev/llms-full.txt</loc>
+         <lastmod>2026-11-09</lastmod>
     </url>
 </urlset>
