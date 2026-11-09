@@ -151,6 +151,30 @@ class MetricsMiddleware implements IDoxMiddleware, IDoxTerminableMiddleware {
 !!! note "Speed"
     Dox checks each route once for such a middleware. Other routes do not pay for it.
 
+### From any code, with `AfterResponse`
+
+A middleware needs to be on the route. `AfterResponse` lets any code (a controller, a service, a package) add work that runs after the answer of the current request is sent. The code does not need the request.
+
+It is off by default. Turn it on once, in the `setup()` of a provider. `setup()` runs in every isolate.
+
+```dart title="lib/app/providers/app.provider.dart"
+@override
+void setup() {
+  AfterResponse.enable();
+}
+```
+
+Then add work anywhere in the request:
+
+```dart
+AfterResponse.run(() => mailer.sendWelcome(user));
+```
+
+- The work runs after the answer is sent, one after the other, in the order it was added.
+- Outside a request, or when it is off, the work runs soon, after the code that runs now.
+- An error in the work goes to `ExceptionHandler.report`. It never reaches the client and never stops the server.
+- The work is not saved anywhere. When the server stops, work that did not run yet is lost. Use a [queue](../digging-deeper/queue.md) for work that must run.
+
 ## Request id
 
 `RequestId` gives each request an id. It is sent back in the `X-Request-Id` header, and you can read it as `req.requestId`.

@@ -3,6 +3,11 @@
 - New: `ServerTiming` middleware. It adds a `Server-Timing` header with the `handler` and `total` time of the request. It is off unless you add it, because it shows timing to clients. Use it in development or for trusted clients.
 - New: `ServerTiming.add(name, duration)` and `ServerTiming.measure(name, fn)` add your own timing to the current request, with no request passed. The same name is summed and counted. Without the middleware they do nothing.
 
+- New: `AfterResponse.run(work)` runs work after the answer of the current request is sent. Any code can call it, with no request passed. It is off until `AfterResponse.enable()` (for example in the `setup()` of a provider). Errors in the work are reported and never stop the server.
+- Fix: `Dox().stop()` closes the `IsolateBus` again after the providers shut down. Before, a provider that used the bus during its shutdown joined it again, and the open port could keep the process alive.
+- Docs: `IsolateBus.publish` throws for a value that can not be sent, before any isolate gets it.
+- Test: the `IsolateBus` through the real isolates: a crashed isolate is dropped, and the new one joins again.
+
 ## 3.1.3
 
 - New: `IsolateBus` sends a message from one isolate to all the other isolates of the app, with no Redis. `publish(channel, message)` sends, `on(channel)` gets the messages of one channel, `size` counts the isolates that listen. The main isolate keeps the hub, like the `RateLimit` counts.

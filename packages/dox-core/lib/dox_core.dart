@@ -40,6 +40,7 @@ export 'exception/too_many_requests_exception.dart';
 export 'exception/validation_exception.dart';
 
 /// Request
+export 'http/after_response.dart';
 export 'http/request/dox_request.dart';
 // the body of a request (`req.requestBody`): its kind tells invalid JSON
 // from no body at all.
