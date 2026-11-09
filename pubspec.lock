@@ -234,11 +234,12 @@ packages:
     source: hosted
     version: "3.1.0"
   dox_validation:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "/Users/zinkyawkyaw/projects/dox/dox-validation"
-      relative: false
-    source: path
+      name: dox_validation
+      sha256: "2bc67273cce46cd33d4f01e71e7f6c687f6917479cc92570b8e8f5ebcdc23aab"
+      url: "https://pub.dev"
+    source: hosted
     version: "3.1.2"
   ffi:
     dependency: transitive
