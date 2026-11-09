@@ -211,7 +211,8 @@ Call `oauth.routes()` in a router with no prefix. The routes must sit at the roo
 
 Rules:
 
-- A redirect address must be `https`, or `http` on `localhost`, `127.0.0.1` or `[::1]`. It has no `#fragment`.
+- A redirect address must be `https`, or `http` on `localhost`, `127.0.0.1` or `[::1]`. It has no `#fragment`. It has at most 2048 characters (`McpOAuth.maxRedirectUriLength`).
+- A `code_verifier` must be 43 to 128 characters of `A-Z a-z 0-9 - . _ ~` (RFC 7636). Other verifiers get `invalid_request`. A `code_challenge` must be 43 base64url characters.
 - The codes live in `codes`, a Dox cache. Use a store that all isolates share (file on one host, Redis on many). Each code is taken under a lock, so two isolates cannot both swap it.
 - These routes answer any origin (CORS `*`) and read no cookie. They skip the CORS list of the app.
 - `issue` may throw `McpOAuthException`, like `access_denied` when a person has too many clients. The client gets it from the token endpoint.
