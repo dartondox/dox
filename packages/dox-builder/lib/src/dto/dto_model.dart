@@ -46,6 +46,17 @@ class DtoType {
   /// The item type of a list, the value type of a map.
   final DtoType? item;
 
+  /// The DTO in this type: the type itself, or the item at any depth of
+  /// lists and maps (`List<List<A>>`, `Map<String, List<A>>`). Else `null`.
+  DtoType? get dto {
+    DtoType? type = this;
+    while (type != null &&
+        (type.kind == DtoKind.list || type.kind == DtoKind.map)) {
+      type = type.item;
+    }
+    return type?.kind == DtoKind.dto ? type : null;
+  }
+
   /// The value names of an enum.
   final List<String> enumNames;
 

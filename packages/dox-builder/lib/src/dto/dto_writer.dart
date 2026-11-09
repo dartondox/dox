@@ -794,17 +794,12 @@ class DtoWriter {
   /// value of [field] that needs it.
   void _nested(StringBuffer out, DtoField field, String method, String wait) {
     DtoType type = field.type;
-    DtoType? dtoType = type.kind == DtoKind.dto
-        ? type
-        : (type.kind == DtoKind.list || type.kind == DtoKind.map) &&
-              type.item!.kind == DtoKind.dto
-        ? type.item
-        : null;
+    DtoType? dtoType = type.dto;
     if (dtoType == null) return;
     DtoFlags nested = flags.flagsOf(dtoType);
     if (!(method == 'crossCheck' ? nested.checks : nested.async)) return;
     String key = _keyLiteral(field);
-    String ref = _ref(dtoType);
+    String call = '$wait${_ref(dtoType)}.$method';
     out.writeln('{');
     out.writeln('${field.fieldCode} f = o.${field.name};');
     String value = 'f';
@@ -814,29 +809,47 @@ class DtoWriter {
       value = 'g';
     }
     if (type.nullable) out.writeln('if ($value != null) {');
-    if (type.kind == DtoKind.dto) {
-      out.writeln('$wait$ref.$method($value, s, <Object>[...p, $key]);');
-    } else if (type.kind == DtoKind.list) {
-      out
-        ..writeln('for (int i = 0; i < $value.length; i++) {')
-        ..writeln('${type.item!.code} x = $value[i];');
-      if (type.item!.nullable) out.writeln('if (x != null)');
-      out
-        ..writeln('$wait$ref.$method(x, s, <Object>[...p, $key, i]);')
-        ..writeln('}');
-    } else {
-      out
-        ..writeln(
-          'for (MapEntry<String, ${type.item!.code}> x in $value.entries) {',
-        )
-        ..writeln('${type.item!.code} y = x.value;');
-      if (type.item!.nullable) out.writeln('if (y != null)');
-      out
-        ..writeln('$wait$ref.$method(y, s, <Object>[...p, $key, x.key]);')
-        ..writeln('}');
-    }
+    _walk(out, type, value, <String>['...p', key], call, 0);
     if (type.nullable) out.writeln('}');
     if (field.maybe) out.writeln('}');
+    out.writeln('}');
+  }
+
+  /// Calls [call] on each DTO in [value] (not null) of [type], through
+  /// lists and maps at any depth. [path] is the path of [value], as the
+  /// parts of a list in code.
+  void _walk(
+    StringBuffer out,
+    DtoType type,
+    String value,
+    List<String> path,
+    String call,
+    int depth,
+  ) {
+    if (type.kind == DtoKind.dto) {
+      out.writeln("$call($value, s, <Object>[${path.join(', ')}]);");
+      return;
+    }
+    DtoType item = type.item!;
+    String x = 'x$depth';
+    String index;
+    if (type.kind == DtoKind.list) {
+      index = 'i$depth';
+      out
+        ..writeln('for (int $index = 0; $index < $value.length; $index++) {')
+        ..writeln('${item.code} $x = $value[$index];');
+    } else {
+      index = 'e$depth.key';
+      out
+        ..writeln(
+          'for (MapEntry<String, ${item.code}> e$depth in $value.entries) {',
+        )
+        ..writeln('${item.code} $x = e$depth.value;');
+    }
+    List<String> inner = <String>[...path, index];
+    if (item.nullable) out.writeln('if ($x != null) {');
+    _walk(out, item, x, inner, call, depth + 1);
+    if (item.nullable) out.writeln('}');
     out.writeln('}');
   }
 

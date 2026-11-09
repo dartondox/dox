@@ -310,6 +310,56 @@ class C {
       },
     );
 
+    test('a DTO deep in lists and maps still counts as nested', () async {
+      String output = await _generate('''
+@Dto()
+class A {
+  @Trim()
+  final String? type;
+
+  @RequiredIf('type', 'company')
+  final String? vat;
+
+  const A({this.type, this.vat});
+
+  void validate(DtoErrors errors) {}
+}
+
+@Dto()
+class B {
+  final List<List<A>> rows;
+  const B({required this.rows});
+}
+
+@Dto()
+class C {
+  final Map<String, List<A?>> groups;
+  const C({required this.groups});
+}''');
+      expect(output, isNot(startsWith('ERROR')), reason: output);
+      String code = output.replaceAll(RegExp(r'\s+'), '');
+      // A has the rule, and B and C hold A deep inside: all keep values
+      expect(code, isNot(contains('boolgetusesRequiredWhen=>false;')));
+      // validate() of A runs for each item at any depth
+      String b = code.substring(
+        code.indexOf(r'class_$BDto'),
+        code.indexOf(r'class_$CDto'),
+      );
+      expect(b, contains('boolgethasChecks=>true;'));
+      expect(
+        b,
+        contains(r"$ADto.crossCheck(x1,s,<Object>[...p,'rows',i0,i1]);"),
+      );
+      String c = code.substring(code.indexOf(r'class_$CDto'));
+      expect(c, contains('boolgethasChecks=>true;'));
+      expect(
+        c,
+        contains(
+          r"if(x1!=null){$ADto.crossCheck(x1,s,<Object>[...p,'groups',e0.key,i1]);",
+        ),
+      );
+    });
+
     test('a Dart field name where the input key is needed', () async {
       String rules = '''
 class Same extends Rule<Object?> {

@@ -55,15 +55,6 @@ class DtoFlagsReader implements DtoFlagsSource {
     checks: false,
     checksAsync: false,
     async: false,
-    requiredWhen: false,
-  );
-
-  /// The flags while a class is read. It keeps the converted values
-  /// (the safe side) for DTOs that point to each other.
-  static const DtoFlags _reading = DtoFlags(
-    checks: false,
-    checksAsync: false,
-    async: false,
   );
 
   @override
@@ -78,7 +69,7 @@ class DtoFlagsReader implements DtoFlagsSource {
     DtoFlags? known = _done[element];
     if (known != null) return known;
     // a placeholder, so DTOs that point to each other do not loop
-    _done[element] = _reading;
+    _done[element] = _none;
     DtoClass dto = reader.read(element);
     bool checks = dto.validate != null;
     bool checksAsync = dto.validateIsAsync;
@@ -89,12 +80,7 @@ class DtoFlagsReader implements DtoFlagsSource {
       for (DtoRule rule in field.rules) {
         async = async || rule.isAsync;
       }
-      DtoType type = field.type;
-      DtoType? nested = type.kind == DtoKind.dto
-          ? type
-          : type.item?.kind == DtoKind.dto
-          ? type.item
-          : null;
+      DtoType? nested = field.type.dto;
       if (nested == null) continue;
       DtoFlags inner = flagsOf(nested);
       checks = checks || inner.checks;
