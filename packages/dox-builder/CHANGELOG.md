@@ -1,3 +1,8 @@
+## Unreleased
+
+- DTOs: `@Dto(emptyStringsToNull: true)` makes the generated code read `""` as `null` (needs the next dox_validation).
+- DTOs: `@OrDefault()` makes a bad value of that field give its default (or `null`) instead of an error. A field with `@OrDefault()` and no default that is not nullable stops the build.
+
 ## 3.1.0
 
 - Fix: the JSON Schema pattern of `@AlphaDash` now allows digits, like the check does (needs dox_validation 3.1.0). The OpenAPI output of a DTO with `@AlphaDash` changes.

@@ -79,6 +79,7 @@ For `String` fields. Like the Laravel rules with the same names.
 | `@Digits(6)` | `digits` | `The {field} must be {digits} digits` | `pattern` |
 | `@DigitsBetween(4, 6)` | `digits_between` | `The {field} must be between {min} and {max} digits` | `pattern` |
 | `@DateFormatted('Y-m-d')` | `date_format` | `The {field} must match the format {format}` | |
+| `@HexColor()` | `hex_color` | `The {field} must be a hex color like #1a2b3c` | `pattern` |
 | `@Password(min: 8, ...)` | `password` | `The {field} must have {rules}` | `minLength` |
 
 - `@Digits` and `@DigitsBetween` take only `0-9`. No sign, no dot. Use a `String` field, so leading zeros stay.
@@ -246,6 +247,8 @@ In a fluent schema, use `v.string().unique('users', column: 'email')` and `v.int
 | `@Dto(source: Source.query)` | where to read: `Source.auto` (default), `Source.query`, `Source.body`. |
 | `@Dto(keyCase: KeyCase.field)` | keys: `KeyCase.snake` (default) or `KeyCase.field` (the Dart name as is). |
 | `@Dto(strict: true)` | unknown keys are errors. Default `false`: they are dropped. |
+| `@Dto(emptyStringsToNull: true)` | `""` is read as `null`, not as missing. Default `false`. |
+| `@OrDefault()` | on a field: a bad value gives the default (or `null`), not an error. |
 | `@Dto(messages: {...})` | messages by `code` or `key.code`. A dotted path like `address.city.required` or `tags.*.required` works too. |
 
 A `///` doc comment on a field becomes its `description` in the JSON Schema.

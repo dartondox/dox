@@ -46,7 +46,7 @@ final List<int> _plainErrorBody = 'Internal Server Error'.codeUnits;
 dynamic renderError(HttpRequest req, Object error, StackTrace stackTrace) {
   /// `schema.parse()` in a controller: answer 422 like `req.validate()`
   if (error is dv.ValidationException) {
-    error = ValidationException(message: error.errors);
+    error = ValidationException(message: error.errors, issues: error.issues);
   }
   ExceptionHandler handler = Dox().config.exceptionHandler;
   dynamic payload = error;
