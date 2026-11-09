@@ -9,6 +9,7 @@ class DtoFlags {
     required this.checks,
     required this.checksAsync,
     required this.async,
+    this.requiredWhen = true,
   });
 
   /// a `validate()` method here or in a nested DTO
@@ -19,6 +20,10 @@ class DtoFlags {
 
   /// an async rule (like `@Unique`), here or nested
   final bool async;
+
+  /// a `@RequiredIf` or `@RequiredWith` field, here or nested. `true` is
+  /// the safe side: the check keeps the converted values.
+  final bool requiredWhen;
 }
 
 /// Gives the [DtoFlags] of a nested DTO class.
@@ -109,6 +114,12 @@ class DtoWriter {
       out
         ..writeln('@override')
         ..writeln('bool get hasChecks => true;')
+        ..writeln();
+    }
+    if (!flags.requiredWhen) {
+      out
+        ..writeln('@override')
+        ..writeln('bool get usesRequiredWhen => false;')
         ..writeln();
     }
     if (flags.async || flags.checksAsync) {

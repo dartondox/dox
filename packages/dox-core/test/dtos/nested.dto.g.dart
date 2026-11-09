@@ -26,6 +26,9 @@ class _$AddressDto extends DtoSchema<Address> {
   bool get hasChecks => true;
 
   @override
+  bool get usesRequiredWhen => false;
+
+  @override
   Address? convert(Object? input, DtoState s, List<Object> p) {
     if (input is! Map) {
       s.notObject(input, p, _m);
@@ -111,6 +114,9 @@ class _$OrderItemDto extends DtoSchema<OrderItem> {
   String get name => 'OrderItem';
 
   @override
+  bool get usesRequiredWhen => false;
+
+  @override
   OrderItem? convert(Object? input, DtoState s, List<Object> p) {
     if (input is! Map) {
       s.notObject(input, p, _m);
@@ -188,6 +194,9 @@ class _$CreateOrderDto extends DtoSchema<CreateOrder> {
 
   @override
   bool get hasChecks => true;
+
+  @override
+  bool get usesRequiredWhen => false;
 
   @override
   CreateOrder? convert(Object? input, DtoState s, List<Object> p) {
@@ -361,6 +370,9 @@ class _$SignUpDto extends DtoSchema<SignUp> {
   bool get hasChecks => true;
 
   @override
+  bool get usesRequiredWhen => false;
+
+  @override
   SignUp? convert(Object? input, DtoState s, List<Object> p) {
     if (input is! Map) {
       s.notObject(input, p, _m);
@@ -481,6 +493,9 @@ class _$AsyncCheckDto extends DtoSchema<AsyncCheck> {
 
   @override
   bool get hasChecks => true;
+
+  @override
+  bool get usesRequiredWhen => false;
 
   @override
   bool get isAsync => true;

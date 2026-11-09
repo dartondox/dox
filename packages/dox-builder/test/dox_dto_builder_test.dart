@@ -150,6 +150,8 @@ void main() {
       expect(out, contains("String get name => 'CreateUser';"));
       expect(out, contains('bool get hasChecks => true;'));
       expect(out, contains('bool get isAsync => true;'));
+      // no @RequiredIf or @RequiredWith: the converted values are not kept
+      expect(out, contains('bool get usesRequiredWhen => false;'));
     });
 
     test('snake_case keys and text changes', () {
@@ -267,6 +269,18 @@ class A {
   final Maybe<int> size;
 
   const A({this.type, this.company, this.size = const Maybe.missing()});
+}
+
+@Dto()
+class B {
+  final A a;
+  const B({required this.a});
+}
+
+@Dto()
+class C {
+  final String name;
+  const C({required this.name});
 }''');
         // the generated code is formatted, so compare without spaces
         String code = output.replaceAll(RegExp(r'\s+'), '');
@@ -288,6 +302,11 @@ class A {
           code.indexOf('s.requiredWhen('),
           greaterThan(code.indexOf('Object?c2;')),
         );
+        // A has the rules and B nests A: both keep the converted values.
+        // C has none, so only C says it does not use them.
+        String flag = 'boolgetusesRequiredWhen=>false;';
+        expect(flag.allMatches(code), hasLength(1));
+        expect(code.indexOf(flag), greaterThan(code.indexOf(r'class_$CDto')));
       },
     );
 

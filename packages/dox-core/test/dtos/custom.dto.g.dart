@@ -23,6 +23,9 @@ class _$CreatePostDto extends DtoSchema<CreatePost> {
   String get name => 'CreatePost';
 
   @override
+  bool get usesRequiredWhen => false;
+
+  @override
   bool get isAsync => true;
 
   @override

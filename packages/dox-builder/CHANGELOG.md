@@ -1,3 +1,7 @@
+## Unreleased
+
+- DTOs: a DTO with no `@RequiredIf` or `@RequiredWith` field (and no nested DTO with one) now writes `usesRequiredWhen => false`. Then the check does not keep each converted value, which saves work. Needs the next dox_validation.
+
 ## 3.1.3
 
 - Version bump only, to match the other packages.
