@@ -68,13 +68,20 @@ with open('404.html', 'w') as f:
             '</body></html>' % home)
 with open('CNAME', 'w') as f:
     f.write('dartondox.dev\n')
-# /sitemap.xml is a copy of the /latest/ one. Its links point to
-# /latest/, where canonical URLs point.
-shutil.copy(os.path.join(home, 'sitemap.xml'), 'sitemap.xml')
 # AI tools look for /llms.txt and /llms-full.txt at the site root (see
 # https://llmstxt.org). They are copies of the /latest/ ones.
 for name in ('llms.txt', 'llms-full.txt'):
     shutil.copy(os.path.join(home, name), name)
+# /sitemap.xml is a copy of the /latest/ one. Its links point to
+# /latest/, where canonical URLs point. It also lists the llms files,
+# because some AI tools read only the sitemap and never try /llms.txt.
+with open(os.path.join(home, 'sitemap.xml')) as f:
+    sitemap = f.read()
+llms_urls = ''.join('    <url>\n         <loc>https://dartondox.dev/%s</loc>\n'
+                    '    </url>\n' % name
+                    for name in ('llms.txt', 'llms-full.txt'))
+with open('sitemap.xml', 'w') as f:
+    f.write(sitemap.replace('</urlset>', llms_urls + '</urlset>', 1))
 # robots.txt must be at the site root. Old 2.x docs stay online
 # for links, but are not crawled.
 with open('robots.txt', 'w') as f:
@@ -82,6 +89,10 @@ with open('robots.txt', 'w') as f:
             'User-agent: *\n'
             'Allow: /\n'
             'Disallow: /2.x/\n'
+            '\n'
+            '# The docs as Markdown, for AI tools:\n'
+            '# https://dartondox.dev/llms.txt\n'
+            '# https://dartondox.dev/llms-full.txt\n'
             '\n'
             'Sitemap: https://dartondox.dev/sitemap.xml\n')
 print('redirect pages:', len(pages))
