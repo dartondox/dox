@@ -101,6 +101,8 @@ class CreateUser {
   @Unique('users')
   final String email;
 
+  /// Not used: @Describe wins.
+  @Describe("Age in years. It's \\\$0 to join.")
   @Min(18)
   final int? age;
 
@@ -195,6 +197,12 @@ void main() {
       expect(out, contains('role: c3 is Undefined ? Role.user : c3 as Role'));
       expect(out, contains("'title': 'CreateUser'"));
       expect(out, contains("'description': 'The name.'"));
+      // @Describe: the text is escaped for a Dart string.
+      expect(
+        out,
+        contains(r"'description': 'Age in years. It\'s \$0 to join.'"),
+      );
+      expect(out, isNot(contains('Not used')));
       expect(out, contains('JsonSchemaTools.merge('));
       expect(out, contains('const Slug().toJsonSchema()'));
     });

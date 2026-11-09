@@ -54,7 +54,13 @@ class DtoJsonSchema {
         }
         target.addAll(keywords(rule));
       }
-      String? doc = types.docText(field.doc);
+      // `@Describe('...')` wins over the `///` doc comment.
+      String? doc =
+          reader.annotations
+              .first(field.element, 'Describe')
+              ?.getField('text')
+              ?.toStringValue() ??
+          types.docText(field.doc);
       if (doc != null) schema['description'] = doc;
       Object? defaultValue = _default(field);
       if (defaultValue != null) schema['default'] = defaultValue;

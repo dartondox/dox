@@ -1,3 +1,7 @@
+## Unreleased
+
+- DTOs: `@Describe('...')` on a field sets `description` in its JSON Schema (the generated `toJsonSchema()` and the OpenAPI docs). It wins over the `///` doc comment. Needs the next dox_validation.
+
 ## 3.1.1
 
 - DTOs: `@Dto(emptyStringsToNull: true)` makes the generated code read `""` as `null` (needs the next dox_validation).
