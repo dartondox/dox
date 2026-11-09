@@ -7007,7 +7007,7 @@ In a Dox app, both answer <code>422</code> when thrown in a controller. In tests
 <li>A nullable field has <code>"type": [..., "null"]</code>. A default becomes <code>default</code>.</li>
 <li>A nested DTO goes in <code>$defs</code> under its class name, with a <code>$ref</code>. OpenAPI moves it to <code>components/schemas</code>.</li>
 <li><code>@Dto(strict: true)</code> adds <code>"additionalProperties": false</code>.</li>
-<li>A <code>///</code> doc comment on a field becomes <code>description</code>.</li>
+<li>A <code>///</code> doc comment on a field becomes <code>description</code>. <code>@Describe('...')</code> on a field sets it too, and wins over the comment. It does not change the checks.</li>
 <li>Each rule adds its keys. See the <a href="../../the-basic/validation-rules/">rules reference</a>.</li>
 </ul>
 <h2 id="fluent-schemas-for-dynamic-input">Fluent schemas (for dynamic input)</h2>

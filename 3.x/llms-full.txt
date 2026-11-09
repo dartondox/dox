@@ -5913,7 +5913,7 @@ The Dart type decides. You do not write `required` or `nullable`.
 - A default value is used only when the key is missing. The rules do not check it.
 - **An empty string counts as missing.** So a required `String` rejects `""`. Add `@AllowEmpty()` to keep `""`.
 - To read `""` as `null` instead (like Laravel's `ConvertEmptyStringsToNull`), use `@Dto(emptyStringsToNull: true)`. Then `{"bio": ""}` clears a `Maybe<String?>` field. A required field still gets `required`.
-- On a query field, `@OrDefault()` turns a bad value into the default, with no error: `@OrDefault() @NotIn(<int>[0]) final int page;` with `this.page = 1` in the constructor reads `page=abc` and `page=0` as `1`. The field needs a default in the constructor or a nullable type.
+- On a query field, `@OrDefault()` turns a bad value into the default, with no error: `@OrDefault() @NotIn(<int>[0]) final int page;` with `this.page = 1` in the constructor reads `page=abc` and `page=0` as `1`. The field needs a default in the constructor or a nullable type. `@OrDefault()` only covers type errors and the normal rules of the field. Errors from `@Unique`, `@Exists` and `validate()` are not dropped: they still fail the request.
 
 ### Missing or `null`? (for PATCH)
 
@@ -6465,10 +6465,17 @@ In a fluent schema, use `v.string().unique('users', column: 'email')` and `v.int
 | `@Dto(keyCase: KeyCase.field)` | keys: `KeyCase.snake` (default) or `KeyCase.field` (the Dart name as is). |
 | `@Dto(strict: true)` | unknown keys are errors. Default `false`: they are dropped. |
 | `@Dto(emptyStringsToNull: true)` | `""` is read as `null`, not as missing. Default `false`. |
-| `@OrDefault()` | on a field: a bad value gives the default (or `null`), not an error. |
+| `@OrDefault()` | on a field: a bad value gives the default (or `null`), not an error. Errors from `@Unique`, `@Exists` and `validate()` are not dropped. |
 | `@Dto(messages: {...})` | messages by `code` or `key.code`. A dotted path like `address.city.required` or `tags.*.required` works too. |
+| `@Describe('...')` | on a field: a short text for the `description` of the field in the JSON Schema. It does not change the checks. |
 
 A `///` doc comment on a field becomes its `description` in the JSON Schema.
+`@Describe` wins over the `///` comment. Use it when the text is for API users and MCP clients, not for the code.
+The OpenAPI docs and MCP tools (`McpDtoTool`) show it.
+
+```dart
+@Describe('Category ID (see list_categories).') final int categoryId;
+```
 
 ## Types in detail
 
@@ -18117,7 +18124,7 @@ CreateUser.schema.toJsonSchema();
 - A nullable field has `"type": [..., "null"]`. A default becomes `default`.
 - A nested DTO goes in `$defs` under its class name, with a `$ref`. OpenAPI moves it to `components/schemas`.
 - `@Dto(strict: true)` adds `"additionalProperties": false`.
-- A `///` doc comment on a field becomes `description`.
+- A `///` doc comment on a field becomes `description`. `@Describe('...')` on a field sets it too, and wins over the comment. It does not change the checks.
 - Each rule adds its keys. See the [rules reference](../the-basic/validation-rules.md).
 
 ## Fluent schemas (for dynamic input)
@@ -19881,6 +19888,54 @@ McpTool.of(
 );
 ```
 
+## Tools that take a DTO
+
+A tool can take a `@Dto` class as its input. Extend `McpDtoTool<T>`. The rules of the DTO (like `@Length` and `@HexColor`) are written once, and `handle` gets the typed object, not a map.
+
+Use `@Describe` on a field to explain it to the model. It goes into the JSON Schema as `description`. It does not change the checks.
+
+```dart
+@Dto()
+class NewCategory {
+  @Describe('The category name, like Food.')
+  @Length(min: 1, max: 50)
+  final String name;
+
+  @Describe('A color, like #1a2b3c.')
+  @HexColor()
+  final String color;
+
+  const NewCategory({required this.name, required this.color});
+
+  static const DtoSchema<NewCategory> schema = $NewCategoryDto;
+}
+
+class CreateCategory extends McpDtoTool<NewCategory> {
+  @override
+  String get name => 'create_category';
+
+  @override
+  String get description => 'Add a category.';
+
+  @override
+  DtoSchema<NewCategory> get dto => NewCategory.schema;
+
+  @override
+  Future<McpToolResult> handle(NewCategory input, McpContext context) async {
+    // ... save it
+    return McpToolResult.text('Added ${input.name}.');
+  }
+}
+```
+
+- `tools/list` sends the JSON Schema of the DTO (`toJsonSchema()`) as `inputSchema`.
+- The arguments are checked like a DTO in a controller, with async rules like `@Unique` and `@Exists` too.
+- Bad arguments are a tool result with `isError: true`, not a JSON-RPC error. The text lists each problem, so the model can fix the call:
+
+```text
+Input validation error: Invalid arguments for tool create_category: name: The name is required; color: The color must be a hex color like #1a2b3c
+```
+
 ## What the server answers
 
 | Request | Answer |
@@ -19916,7 +19971,7 @@ Protocol versions: `2025-11-25`, `2025-06-18`, `2025-03-26` and `2024-11-05`. A 
 
 - Every isolate, and every server with the same `APP_KEY`, can check an id. Nothing is stored.
 - A new `APP_KEY` ends every session. Clients start a new one by themselves.
-- A signed id can not be ended by itself. To refuse ended ids, give a cache store: `SignedMcpSessions(ended: Cache().store('redis'))`. Use a store that all isolates share (file or Redis, not memory).
+- A signed id cannot be ended by itself. To refuse ended ids, give a cache store: `SignedMcpSessions(ended: Cache().store('redis'))`. Use a store that all isolates share (file or Redis, not memory).
 
 For another kind of session, implement `McpSessions`.
 
@@ -19928,7 +19983,7 @@ For another kind of session, implement `McpSessions`.
 
 1. **Tokens.** Implement `McpOAuthTokens`. `issue` makes a token for a grant. `verify` gives what a token stands for (like a user), or `null`. You choose the table and how a token is revoked. Keep only a hash of the token.
 2. **The consent page.** Serve it at `<issuer>/oauth/authorize`, or set `authorizePage`. It reads `client_id`, `redirect_uri`, `state`, `code_challenge`, `code_challenge_method` and `resource` from the query. The person signs in there the way your app always does.
-3. **The answer.** Your page calls a route of your own, behind your own login. On yes, the route calls `oauth.approve(subject: ...)` and gives the page the address to send the browser to. On no, it calls `oauth.deny(...)`. `oauth.checkClient(...)` gives the client for the page and throws when the client or the redirect address is wrong. Then never send the browser anywhere.
+3. **The answer.** Your page calls a route of your own, behind your own login. On yes, the route calls `oauth.approve(subject: ...)` and gives the page the address to send the browser to. On no, it calls `oauth.deny(...)`. `oauth.checkClient(...)` gives the client for the page and throws when the client or the redirect address is wrong. Then never send the browser anywhere. Put this route behind [CSRF protection](../security/csrf.md). Without it, another site can make a signed-in person say yes to a client without knowing it.
 
 ```dart
 final McpOAuth oauth = McpOAuth(
@@ -19952,7 +20007,9 @@ Future<DoxResponse> handleMcp(DoxRequest req) async {
 }
 ```
 
-On the consent page, show the redirect host, so the person sees where the browser goes. Escape the client name before you print it. The client chose the name, so do not trust it.
+On the consent page, show the redirect host, so the person sees where the browser goes. HTML-escape the client name before you print it. The client chose the name, so do not trust it.
+
+Call `oauth.routes()` in a router with no prefix. The routes must sit at the root of the host. Clients look for `/.well-known/...` at the root, as the OAuth specs say. The discovery file also gives `<issuer>/oauth/register` and `<issuer>/oauth/token` as full addresses. Under a prefix, the routes move, but these addresses do not, so clients cannot find them.
 
 `oauth.routes()` adds these routes:
 
@@ -19965,8 +20022,9 @@ On the consent page, show the redirect host, so the person sees where the browse
 
 Rules:
 
-- A redirect address must be `https`, or `http` on `localhost`, `127.0.0.1` or `[::1]`. It has no `#fragment`.
-- The codes live in `codes`, a Dox cache. Use a store that all isolates share (file on one host, Redis on many). Each code is taken under a lock, so two isolates can not both swap it.
+- A redirect address must be `https`, or `http` on `localhost`, `127.0.0.1` or `[::1]`. It has no `#fragment`. It has at most 2048 characters (`McpOAuth.maxRedirectUriLength`).
+- A `code_verifier` must be 43 to 128 characters of `A-Z a-z 0-9 - . _ ~` (RFC 7636). Other verifiers get `invalid_request`. A `code_challenge` must be 43 base64url characters.
+- The codes live in `codes`, a Dox cache. Use a store that all isolates share (file on one host, Redis on many). Each code is taken under a lock, so two isolates cannot both swap it.
 - These routes answer any origin (CORS `*`) and read no cookie. They skip the CORS list of the app.
 - `issue` may throw `McpOAuthException`, like `access_denied` when a person has too many clients. The client gets it from the token endpoint.
 - There is no refresh token. To revoke a client, delete its token.
@@ -22423,6 +22481,7 @@ And this is its schema in `/openapi.json`:
 | `@Length(min: 3, max: 100)` | `"minLength": 3, "maxLength": 100` |
 | `@MinLength(10)` | `"minLength": 10` |
 | `@Email()` (in `RegisterUser`) | `"format": "email"` |
+| `/// A comment` or `@Describe('...')` | `"description"`. `@Describe` wins over the comment |
 | `@Trim()`, `@Lowercase()`, `@Unique(...)` | nothing. They change or check the value on the server only |
 
 A model becomes a schema too. `Post` has `id`, the `@Column` fields `title` and `body`, and `created_at` and `updated_at`.
@@ -23725,6 +23784,7 @@ Then `dox build_runner:build`, and `dtos: dtos` in `AppConfig`.
 | Files | `@MaxSize('2MB')`, `@MinSize('1KB')`, `@Mimes(['pdf'])`, `@MimeTypes(['image/png'])`, `@Image()`, `@Dimensions(minWidth: 100)` |
 | Database (`dox_orm`) | `@Unique('users', column: 'email', ignoreParam: 'id')`, `@Exists('teams')` |
 | Keys | `@Name('emailAddress')` |
+| Docs | `@Describe('Shown in OpenAPI and MCP.')` (only the JSON Schema `description`) |
 | Class | `@Dto(source: Source.query, keyCase: KeyCase.field, strict: true, messages: {...})` |
 
 Cross field check: add `void validate(DtoErrors errors)` to the DTO. PATCH "missing or null": `Maybe<T>` with `const Maybe.missing()`.
@@ -25994,6 +26054,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
+### 3.1.2
+
+- Version bump only, to match the other packages.
+
 ### 3.1.1
 
 - Version bump only, to match the other packages.
@@ -26098,6 +26162,10 @@ What changed in each package, newest first. This page is made from the
 - See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
 
 ## dox_builder
+
+### 3.1.2
+
+- DTOs: `@Describe('...')` on a field sets `description` in its JSON Schema (the generated `toJsonSchema()` and the OpenAPI docs). It wins over the `///` doc comment. Needs dox_validation 3.1.2.
 
 ### 3.1.1
 
@@ -26254,6 +26322,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### 3.1.2
+
+- Version bump only, to match the other packages.
+
 ### 3.1.1
 
 - New: `flexible` takes a null `stale`. Then the value is kept until a refresh replaces it, so callers still get the last good value when `compute` fails.
@@ -26378,6 +26450,10 @@ What changed in each package, newest first. This page is made from the
 - `remember`, `pull`, `add`, `increment`, `many`, tags and atomic locks.
 
 ## dox_core
+
+### 3.1.2
+
+- Uses dox_validation 3.1.2, so `@Describe('...')` can be used on DTO fields.
 
 ### 3.1.1
 

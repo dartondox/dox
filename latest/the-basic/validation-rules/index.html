@@ -7402,15 +7402,23 @@
 </tr>
 <tr>
 <td><code>@OrDefault()</code></td>
-<td>on a field: a bad value gives the default (or <code>null</code>), not an error.</td>
+<td>on a field: a bad value gives the default (or <code>null</code>), not an error. Errors from <code>@Unique</code>, <code>@Exists</code> and <code>validate()</code> are not dropped.</td>
 </tr>
 <tr>
 <td><code>@Dto(messages: {...})</code></td>
 <td>messages by <code>code</code> or <code>key.code</code>. A dotted path like <code>address.city.required</code> or <code>tags.*.required</code> works too.</td>
 </tr>
+<tr>
+<td><code>@Describe('...')</code></td>
+<td>on a field: a short text for the <code>description</code> of the field in the JSON Schema. It does not change the checks.</td>
+</tr>
 </tbody>
 </table>
-<p>A <code>///</code> doc comment on a field becomes its <code>description</code> in the JSON Schema.</p>
+<p>A <code>///</code> doc comment on a field becomes its <code>description</code> in the JSON Schema.
+<code>@Describe</code> wins over the <code>///</code> comment. Use it when the text is for API users and MCP clients, not for the code.
+The OpenAPI docs and MCP tools (<code>McpDtoTool</code>) show it.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nd">@Describe</span><span class="p">(</span><span class="s1">'Category ID (see list_categories).'</span><span class="p">)</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">categoryId</span><span class="p">;</span>
+</span></code></pre></div>
 <h2 id="types-in-detail">Types in detail</h2>
 <p>How each field type reads input. The short table is in <a href="../validation/#types">Types</a>.</p>
 <ul>

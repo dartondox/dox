@@ -4991,6 +4991,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#tools-that-take-a-dto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tools that take a DTO
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#what-the-server-answers" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6523,6 +6534,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#tools-that-take-a-dto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tools that take a DTO
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#what-the-server-answers" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6651,6 +6673,48 @@
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="p">},</span>
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="p">);</span>
 </span></code></pre></div>
+<h2 id="tools-that-take-a-dto">Tools that take a DTO</h2>
+<p>A tool can take a <code>@Dto</code> class as its input. Extend <code>McpDtoTool&lt;T&gt;</code>. The rules of the DTO (like <code>@Length</code> and <code>@HexColor</code>) are written once, and <code>handle</code> gets the typed object, not a map.</p>
+<p>Use <code>@Describe</code> on a field to explain it to the model. It goes into the JSON Schema as <code>description</code>. It does not change the checks.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@Dto</span><span class="p">()</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">NewCategory</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nd">@Describe</span><span class="p">(</span><span class="s1">'The category name, like Food.'</span><span class="p">)</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nd">@Length</span><span class="p">(</span><span class="nl">min:</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="nl">max:</span><span class="w"> </span><span class="m">50</span><span class="p">)</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span><span class="nd">@Describe</span><span class="p">(</span><span class="s1">'A color, like #1a2b3c.'</span><span class="p">)</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span><span class="nd">@HexColor</span><span class="p">()</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">color</span><span class="p">;</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">NewCategory</span><span class="p">({</span><span class="kd">required</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="kd">required</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">color</span><span class="p">});</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">DtoSchema</span><span class="o">&lt;</span><span class="n">NewCategory</span><span class="o">&gt;</span><span class="w"> </span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">$NewCategoryDto</span><span class="p">;</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="p">}</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="kd">class</span><span class="w"> </span><span class="nc">CreateCategory</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">McpDtoTool</span><span class="o">&lt;</span><span class="n">NewCategory</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'create_category'</span><span class="p">;</span>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">description</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'Add a category.'</span><span class="p">;</span>
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="w">  </span><span class="n">DtoSchema</span><span class="o">&lt;</span><span class="n">NewCategory</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">dto</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">NewCategory</span><span class="p">.</span><span class="n">schema</span><span class="p">;</span>
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>
+</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">McpToolResult</span><span class="o">&gt;</span><span class="w"> </span><span class="n">handle</span><span class="p">(</span><span class="n">NewCategory</span><span class="w"> </span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">McpContext</span><span class="w"> </span><span class="n">context</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="w">    </span><span class="c1">// ... save it</span>
+</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">McpToolResult</span><span class="p">.</span><span class="n">text</span><span class="p">(</span><span class="s1">'Added </span><span class="si">${</span><span class="n">input</span><span class="p">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.'</span><span class="p">);</span>
+</span><span id="__span-4-30"><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-4-31"><a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li><code>tools/list</code> sends the JSON Schema of the DTO (<code>toJsonSchema()</code>) as <code>inputSchema</code>.</li>
+<li>The arguments are checked like a DTO in a controller, with async rules like <code>@Unique</code> and <code>@Exists</code> too.</li>
+<li>Bad arguments are a tool result with <code>isError: true</code>, not a JSON-RPC error. The text lists each problem, so the model can fix the call:</li>
+</ul>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Input validation error: Invalid arguments for tool create_category: name: The name is required; color: The color must be a hex color like #1a2b3c
+</span></code></pre></div>
 <h2 id="what-the-server-answers">What the server answers</h2>
 <table>
 <thead>
@@ -6738,7 +6802,7 @@
 <ul>
 <li>Every isolate, and every server with the same <code>APP_KEY</code>, can check an id. Nothing is stored.</li>
 <li>A new <code>APP_KEY</code> ends every session. Clients start a new one by themselves.</li>
-<li>A signed id can not be ended by itself. To refuse ended ids, give a cache store: <code>SignedMcpSessions(ended: Cache().store('redis'))</code>. Use a store that all isolates share (file or Redis, not memory).</li>
+<li>A signed id cannot be ended by itself. To refuse ended ids, give a cache store: <code>SignedMcpSessions(ended: Cache().store('redis'))</code>. Use a store that all isolates share (file or Redis, not memory).</li>
 </ul>
 <p>For another kind of session, implement <code>McpSessions</code>.</p>
 <h2 id="oauth-sign-in">OAuth sign-in</h2>
@@ -6747,29 +6811,30 @@
 <ol>
 <li><strong>Tokens.</strong> Implement <code>McpOAuthTokens</code>. <code>issue</code> makes a token for a grant. <code>verify</code> gives what a token stands for (like a user), or <code>null</code>. You choose the table and how a token is revoked. Keep only a hash of the token.</li>
 <li><strong>The consent page.</strong> Serve it at <code>&lt;issuer&gt;/oauth/authorize</code>, or set <code>authorizePage</code>. It reads <code>client_id</code>, <code>redirect_uri</code>, <code>state</code>, <code>code_challenge</code>, <code>code_challenge_method</code> and <code>resource</code> from the query. The person signs in there the way your app always does.</li>
-<li><strong>The answer.</strong> Your page calls a route of your own, behind your own login. On yes, the route calls <code>oauth.approve(subject: ...)</code> and gives the page the address to send the browser to. On no, it calls <code>oauth.deny(...)</code>. <code>oauth.checkClient(...)</code> gives the client for the page and throws when the client or the redirect address is wrong. Then never send the browser anywhere.</li>
+<li><strong>The answer.</strong> Your page calls a route of your own, behind your own login. On yes, the route calls <code>oauth.approve(subject: ...)</code> and gives the page the address to send the browser to. On no, it calls <code>oauth.deny(...)</code>. <code>oauth.checkClient(...)</code> gives the client for the page and throws when the client or the redirect address is wrong. Then never send the browser anywhere. Put this route behind <a href="../../security/csrf/">CSRF protection</a>. Without it, another site can make a signed-in person say yes to a client without knowing it.</li>
 </ol>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">final</span><span class="w"> </span><span class="n">McpOAuth</span><span class="w"> </span><span class="n">oauth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">McpOAuth</span><span class="p">(</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nl">issuer:</span><span class="w"> </span><span class="s1">'https://my.app'</span><span class="p">,</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nl">tokens:</span><span class="w"> </span><span class="n">MyTokens</span><span class="p">(),</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nl">codes:</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">store</span><span class="p">(</span><span class="s1">'file'</span><span class="p">),</span><span class="w"> </span><span class="c1">// all isolates must share it</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">);</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="kd">class</span><span class="w"> </span><span class="nc">McpRouter</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Router</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">register</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="n">oauth</span><span class="p">.</span><span class="n">routes</span><span class="p">();</span><span class="w"> </span><span class="c1">// discovery, register and token</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">    </span><span class="n">Route</span><span class="p">.</span><span class="n">match</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'GET'</span><span class="p">,</span><span class="w"> </span><span class="s1">'POST'</span><span class="p">,</span><span class="w"> </span><span class="s1">'DELETE'</span><span class="p">],</span><span class="w"> </span><span class="s1">'/mcp'</span><span class="p">,</span><span class="w"> </span><span class="n">handleMcp</span><span class="p">);</span>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="p">}</span>
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">DoxResponse</span><span class="o">&gt;</span><span class="w"> </span><span class="n">handleMcp</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">  </span><span class="kt">Object</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">oauth</span><span class="p">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">req</span><span class="p">);</span><span class="w"> </span><span class="c1">// reads Authorization: Bearer</span>
-</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">user</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">oauth</span><span class="p">.</span><span class="n">unauthorized</span><span class="p">();</span><span class="w"> </span><span class="c1">// 401 with WWW-Authenticate</span>
-</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">mcp</span><span class="p">.</span><span class="n">handle</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="nl">auth:</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="nl">scope:</span><span class="w"> </span><span class="s1">'</span><span class="si">$</span><span class="n">user</span><span class="s1">'</span><span class="p">);</span>
-</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">final</span><span class="w"> </span><span class="n">McpOAuth</span><span class="w"> </span><span class="n">oauth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">McpOAuth</span><span class="p">(</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nl">issuer:</span><span class="w"> </span><span class="s1">'https://my.app'</span><span class="p">,</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nl">tokens:</span><span class="w"> </span><span class="n">MyTokens</span><span class="p">(),</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nl">codes:</span><span class="w"> </span><span class="n">Cache</span><span class="p">().</span><span class="n">store</span><span class="p">(</span><span class="s1">'file'</span><span class="p">),</span><span class="w"> </span><span class="c1">// all isolates must share it</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">);</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="kd">class</span><span class="w"> </span><span class="nc">McpRouter</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Router</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">register</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">    </span><span class="n">oauth</span><span class="p">.</span><span class="n">routes</span><span class="p">();</span><span class="w"> </span><span class="c1">// discovery, register and token</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="n">Route</span><span class="p">.</span><span class="n">match</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'GET'</span><span class="p">,</span><span class="w"> </span><span class="s1">'POST'</span><span class="p">,</span><span class="w"> </span><span class="s1">'DELETE'</span><span class="p">],</span><span class="w"> </span><span class="s1">'/mcp'</span><span class="p">,</span><span class="w"> </span><span class="n">handleMcp</span><span class="p">);</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="p">}</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">DoxResponse</span><span class="o">&gt;</span><span class="w"> </span><span class="n">handleMcp</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">  </span><span class="kt">Object</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">oauth</span><span class="p">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">req</span><span class="p">);</span><span class="w"> </span><span class="c1">// reads Authorization: Bearer</span>
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">user</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">oauth</span><span class="p">.</span><span class="n">unauthorized</span><span class="p">();</span><span class="w"> </span><span class="c1">// 401 with WWW-Authenticate</span>
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">mcp</span><span class="p">.</span><span class="n">handle</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="nl">auth:</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="nl">scope:</span><span class="w"> </span><span class="s1">'</span><span class="si">$</span><span class="n">user</span><span class="s1">'</span><span class="p">);</span>
+</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>On the consent page, show the redirect host, so the person sees where the browser goes. Escape the client name before you print it. The client chose the name, so do not trust it.</p>
+<p>On the consent page, show the redirect host, so the person sees where the browser goes. HTML-escape the client name before you print it. The client chose the name, so do not trust it.</p>
+<p>Call <code>oauth.routes()</code> in a router with no prefix. The routes must sit at the root of the host. Clients look for <code>/.well-known/...</code> at the root, as the OAuth specs say. The discovery file also gives <code>&lt;issuer&gt;/oauth/register</code> and <code>&lt;issuer&gt;/oauth/token</code> as full addresses. Under a prefix, the routes move, but these addresses do not, so clients cannot find them.</p>
 <p><code>oauth.routes()</code> adds these routes:</p>
 <table>
 <thead>
@@ -6799,8 +6864,9 @@
 </table>
 <p>Rules:</p>
 <ul>
-<li>A redirect address must be <code>https</code>, or <code>http</code> on <code>localhost</code>, <code>127.0.0.1</code> or <code>[::1]</code>. It has no <code>#fragment</code>.</li>
-<li>The codes live in <code>codes</code>, a Dox cache. Use a store that all isolates share (file on one host, Redis on many). Each code is taken under a lock, so two isolates can not both swap it.</li>
+<li>A redirect address must be <code>https</code>, or <code>http</code> on <code>localhost</code>, <code>127.0.0.1</code> or <code>[::1]</code>. It has no <code>#fragment</code>. It has at most 2048 characters (<code>McpOAuth.maxRedirectUriLength</code>).</li>
+<li>A <code>code_verifier</code> must be 43 to 128 characters of <code>A-Z a-z 0-9 - . _ ~</code> (RFC 7636). Other verifiers get <code>invalid_request</code>. A <code>code_challenge</code> must be 43 base64url characters.</li>
+<li>The codes live in <code>codes</code>, a Dox cache. Use a store that all isolates share (file on one host, Redis on many). Each code is taken under a lock, so two isolates cannot both swap it.</li>
 <li>These routes answer any origin (CORS <code>*</code>) and read no cookie. They skip the CORS list of the app.</li>
 <li><code>issue</code> may throw <code>McpOAuthException</code>, like <code>access_denied</code> when a person has too many clients. The client gets it from the token endpoint.</li>
 <li>There is no refresh token. To revoke a client, delete its token.</li>
