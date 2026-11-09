@@ -1,4 +1,4 @@
-## Unreleased
+## 3.1.1
 
 - New: `RequestBody` and `BodyKind` are exported, so `req.requestBody.kind` can tell invalid JSON (`BodyKind.invalidJson`) from no body, without importing a file of `lib/http`.
 
