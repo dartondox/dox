@@ -77,6 +77,54 @@ McpTool.of(
 );
 ```
 
+## Tools that take a DTO
+
+A tool can take a `@Dto` class as its input. Extend `McpDtoTool<T>`. The rules of the DTO (like `@Length` and `@HexColor`) are written once, and `handle` gets the typed object, not a map.
+
+Use `@Describe` on a field to explain it to the model. It goes into the JSON Schema as `description`. It does not change the checks.
+
+```dart
+@Dto()
+class NewCategory {
+  @Describe('The category name, like Food.')
+  @Length(min: 1, max: 50)
+  final String name;
+
+  @Describe('A color, like #1a2b3c.')
+  @HexColor()
+  final String color;
+
+  const NewCategory({required this.name, required this.color});
+
+  static const DtoSchema<NewCategory> schema = $NewCategoryDto;
+}
+
+class CreateCategory extends McpDtoTool<NewCategory> {
+  @override
+  String get name => 'create_category';
+
+  @override
+  String get description => 'Add a category.';
+
+  @override
+  DtoSchema<NewCategory> get dto => NewCategory.schema;
+
+  @override
+  Future<McpToolResult> handle(NewCategory input, McpContext context) async {
+    // ... save it
+    return McpToolResult.text('Added ${input.name}.');
+  }
+}
+```
+
+- `tools/list` sends the JSON Schema of the DTO (`toJsonSchema()`) as `inputSchema`.
+- The arguments are checked like a DTO in a controller, with async rules like `@Unique` and `@Exists` too.
+- Bad arguments are a tool result with `isError: true`, not a JSON-RPC error. The text lists each problem, so the model can fix the call:
+
+```text
+Input validation error: Invalid arguments for tool create_category: name: The name is required; color: The color must be a hex color like #1a2b3c
+```
+
 ## What the server answers
 
 | Request | Answer |

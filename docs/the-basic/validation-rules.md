@@ -250,8 +250,15 @@ In a fluent schema, use `v.string().unique('users', column: 'email')` and `v.int
 | `@Dto(emptyStringsToNull: true)` | `""` is read as `null`, not as missing. Default `false`. |
 | `@OrDefault()` | on a field: a bad value gives the default (or `null`), not an error. Errors from `@Unique`, `@Exists` and `validate()` are not dropped. |
 | `@Dto(messages: {...})` | messages by `code` or `key.code`. A dotted path like `address.city.required` or `tags.*.required` works too. |
+| `@Describe('...')` | on a field: a short text for the `description` of the field in the JSON Schema. It does not change the checks. |
 
 A `///` doc comment on a field becomes its `description` in the JSON Schema.
+`@Describe` wins over the `///` comment. Use it when the text is for API users and MCP clients, not for the code.
+The OpenAPI docs and MCP tools (`McpDtoTool`) show it.
+
+```dart
+@Describe('Category ID (see list_categories).') final int categoryId;
+```
 
 ## Types in detail
 

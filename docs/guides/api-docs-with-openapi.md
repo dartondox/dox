@@ -169,6 +169,7 @@ And this is its schema in `/openapi.json`:
 | `@Length(min: 3, max: 100)` | `"minLength": 3, "maxLength": 100` |
 | `@MinLength(10)` | `"minLength": 10` |
 | `@Email()` (in `RegisterUser`) | `"format": "email"` |
+| `/// A comment` or `@Describe('...')` | `"description"`. `@Describe` wins over the comment |
 | `@Trim()`, `@Lowercase()`, `@Unique(...)` | nothing. They change or check the value on the server only |
 
 A model becomes a schema too. `Post` has `id`, the `@Column` fields `title` and `body`, and `created_at` and `updated_at`.

@@ -153,7 +153,7 @@ CreateUser.schema.toJsonSchema();
 - A nullable field has `"type": [..., "null"]`. A default becomes `default`.
 - A nested DTO goes in `$defs` under its class name, with a `$ref`. OpenAPI moves it to `components/schemas`.
 - `@Dto(strict: true)` adds `"additionalProperties": false`.
-- A `///` doc comment on a field becomes `description`.
+- A `///` doc comment on a field becomes `description`. `@Describe('...')` on a field sets it too, and wins over the comment. It does not change the checks.
 - Each rule adds its keys. See the [rules reference](../the-basic/validation-rules.md).
 
 ## Fluent schemas (for dynamic input)
