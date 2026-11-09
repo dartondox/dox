@@ -87,6 +87,7 @@ The full docs as one file: https://dartondox.dev/latest/llms-full.txt
 - [Storage](https://dartondox.dev/latest/packages/storage/)
 - [Cache](https://dartondox.dev/latest/packages/cache/)
 - [Socket.IO](https://dartondox.dev/latest/packages/socketio/)
+- [MCP server](https://dartondox.dev/latest/packages/mcp/)
 - [Guides](https://dartondox.dev/latest/guides/)
 - [File upload](https://dartondox.dev/latest/guides/file-upload/)
 - [Pagination](https://dartondox.dev/latest/guides/pagination/)
