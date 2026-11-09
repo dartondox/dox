@@ -52,7 +52,8 @@ npm install socket.io-client
 ## 2. The provider
 
 The provider starts Socket.IO in every isolate.
-Put it in `lib/providers/`, so the generated container finds it:
+Make the file `lib/providers/socket_io_provider.dart`.
+It must be in `lib/providers/`, so the generated container finds it:
 
 ```dart title="lib/providers/socket_io_provider.dart"
 import 'package:dox_socketio/dox_socketio.dart';
@@ -64,6 +65,8 @@ class AppSocketIoProvider extends SocketIoProvider {
 ```
 
 ## 3. The config
+
+Make the file `lib/config/socketio.dart`:
 
 ```dart title="lib/config/socketio.dart"
 import 'package:dox_socketio/dox_socketio.dart';
@@ -89,6 +92,8 @@ Two settings matter here:
 Socket.IO gets its requests before the router, so your route auth middleware does not run.
 Use `SocketAuth` as a namespace middleware instead.
 Your function gets the handshake and returns the user, or `null`.
+
+Make the file `lib/app/socket/live.namespace.dart`:
 
 ```dart title="lib/app/socket/live.namespace.dart"
 import 'package:dox_core/dox_core.dart';
@@ -131,6 +136,8 @@ See [Log in a socket](/latest/packages/socketio/#log-in-a-socket).
 A small service sends the events.
 `SocketIoProvider.server` is the Socket.IO server of this isolate.
 
+Make the file `lib/app/services/live.service.dart`:
+
 ```dart title="lib/app/services/live.service.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_socketio/dox_socketio.dart';
@@ -170,9 +177,10 @@ class LiveService {
 }
 ```
 
-Then call it from your services, after the write:
+Then call it from your services, after the write.
+For example, in `lib/app/services/task.service.dart`:
 
-```dart
+```dart title="lib/app/services/task.service.dart"
 Future<Task> create(int projectId, Map<String, dynamic> data) async {
   Task task = await tasks.create(projectId, data);
   await live.projectChanged(projectId, 'tasks');
@@ -197,6 +205,8 @@ You need no Redis.
 With more than one server process, use the [Redis adapter](/latest/packages/socketio/#many-servers-redis-adapter).
 
 ## 7. The client
+
+In the frontend, make the file `src/lib/live.ts`:
 
 ```ts title="src/lib/live.ts"
 import { io, type Socket } from 'socket.io-client'
@@ -250,7 +260,7 @@ Three things to note:
 ## 8. The dev proxy
 
 If your frontend dev server proxies the API, add `/socket.io` with websocket support.
-With Vite:
+With Vite, add it to `vite.config.ts`:
 
 ```ts title="vite.config.ts"
 server: {
