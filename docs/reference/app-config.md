@@ -225,6 +225,7 @@ Source: `packages/dox-orm/lib/src/types/database_config.dart` and `connection_co
 | `debug` | `bool` | required | Print every query with `printer`. |
 | `printer` | `QueryPrinter?` | `null` | `ConsoleQueryPrinter()`, `PrettyQueryPrinter()`, `FileQueryPrinter(file: File('queries.log'))` or your own. `FileQueryPrinter(file: ..., buffered: true)` writes in the background, so a query does not wait for the disk. Then call `await printer.flush()` before `exit()`, or the last lines are lost. |
 | `logRedact` | `List<String>` | `[]` | Names of values to hide in the query log. A value shows as `***` when its key ends with one of these names, in any case. `['password', 'token']` hides `password`, `users.password` and `remember_token`. Only the log changes. The query gets the real values. The list of the default connection counts for every query. The list of a named connection counts too, for the queries on that connection. |
+| `slowQueryMs` | `int?` | `null` | Log each query that takes longer than this many milliseconds, with `printer`. `null` turns it off. It works with `debug` off. Values named in `logRedact` show as `***`. |
 | `extra` | `Map<String, dynamic>` | `{}` | Driver options. See below. |
 | `driverFactory` | `DBDriver Function(ConnectionConfig)?` | `null` | Your own driver class. It wins over every other setting. |
 
