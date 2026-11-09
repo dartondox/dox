@@ -350,7 +350,7 @@ In dev mode, `@vite` loads `@vite/client` and the entry files from the Vite dev 
 Dox is in dev mode when:
 
 - `devServerUrl` is set, or
-- the file `public/hot` exists. Its text is the dev server url. Some Vite plugins write this file while `vite` runs. Dox ignores this file only when `APP_ENV` is exactly `production`, and prints a warning. Other values, like `staging` or an empty value, still use it.
+- the file `public/hot` exists. Its text is the dev server url. Some Vite plugins write this file while `vite` runs. Dox ignores this file only when `APP_ENV` is `production` (in any case, like `Production`), and prints a warning. Other values, like `staging` or an empty value, still use it.
 
 In production (no dev server), Dox reads `public/build/.vite/manifest.json`. `@vite` gives a `<link>` tag for the css of each entry and of the chunks it imports, and a `<script type="module">` tag for each entry.
 

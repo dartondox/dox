@@ -58,8 +58,9 @@ sed -i.bak "s/^APP_PORT=.*/APP_PORT=$port/" .env && rm .env.bak
 
 overrides > pubspec_overrides.yaml
 
-# The sqlite3 hook uses the runner's SQLite, no download from GitHub.
-"$root/ci/system-sqlite.sh" pubspec.yaml
+# On CI, the sqlite3 hook uses the runner's SQLite, no download from
+# GitHub. Not locally: the script may run sudo apt-get.
+[ -z "${CI:-}" ] || "$root/ci/system-sqlite.sh" pubspec.yaml
 
 dart pub get
 dart run build_runner build --delete-conflicting-outputs

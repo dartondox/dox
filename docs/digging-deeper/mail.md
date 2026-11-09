@@ -616,6 +616,7 @@ class AppMailProvider extends MailProvider {
   @override
   void setup() {
     super.setup();
+    Mail.clearHooks(); // a second setup() does not add each hook twice
     Mail.onSending((Message message) {
       print('sending "${message.subject}" to ${message.to}');
     });
@@ -628,8 +629,8 @@ class AppMailProvider extends MailProvider {
 
 - Hooks run for every mailer. They also run for queued emails, when the worker sends them, and with `Mail.fake()`.
 - When an `onSending` hook throws, the email is not sent. `send()` throws that error.
-- When an `onSent` hook throws, `send()` throws that error. The email is already sent.
-- `Mail.clearHooks()` removes all hooks, eg. in a test.
+- When an `onSent` hook throws, the error is logged and `send()` does not throw. The email is already sent, so a queue worker does not try the job again and send it twice. The other `onSent` hooks still run.
+- `Mail.clearHooks()` removes all hooks. Call it first in `setup()`, as above, and in tests.
 
 ## Send all email to one address
 

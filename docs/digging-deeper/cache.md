@@ -119,6 +119,16 @@ Map<String, dynamic> stats = await Cache().flexible(
 );
 ```
 
+After `fresh` + `stale`, the value is gone and the next call waits for `fn`.
+
+Pass `null` as `stale` to keep the value until a refresh replaces it. Use it when an old value is better than no value, like rates from a service that can be down. When `fn` fails, callers still get the last good value:
+
+```dart
+Map<String, dynamic> rates = await Cache().flexible(
+  'rates', Duration(minutes: 10), null, fetchRates,
+);
+```
+
 ### `getRaw`
 
 `getRaw` gives the stored JSON text as it is. Send it as a response with no decode and no encode:

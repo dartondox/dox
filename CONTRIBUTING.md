@@ -16,7 +16,7 @@ Send changes as pull requests against `main`. Before you ask for review:
 
 - CI is green.
 - `melos run analyze` (`dart analyze --fatal-infos`) has no warnings.
-- `dart format` is clean.
+- `melos run format_check` passes.
 - Add a changelog entry under `## Unreleased` in the package `CHANGELOG.md`.
 - Do not change versions in the PR.
 

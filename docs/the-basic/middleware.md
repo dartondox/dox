@@ -246,6 +246,18 @@ Server-Timing: db;dur=4.10;desc="3 calls", handler;dur=12.34, total;dur=13.02
 - A name may only have letters, digits and ``!#$%&'*+-.^_`|~``. Other characters become `_`. An empty name is ignored.
 - One answer keeps at most 32 names, plus `handler` and `total`.
 
+To add the time of every database query, listen to the queries once, for example in `setup()` of a provider. The listener runs inside the request that made the query, so `add` finds that request:
+
+```dart
+void onQuery(QueryEvent event) {
+  ServerTiming.add('db', event.time);
+}
+
+SqlQueryBuilder().listen(onQuery);
+```
+
+The header then shows the total query time and the count, like `db;dur=4.10;desc="3 calls"`. See [Listen to queries](../database/index.md#listen-to-queries).
+
 !!! warning "Development or trusted clients only"
     The header tells every client how long your code takes. An attacker can use that, for example to guess if an email has an account. `ServerTiming` is off unless you add it. Turn it on in development, or only for clients you trust.
 
