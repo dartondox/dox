@@ -203,7 +203,7 @@ Dox reads it from the `DATABASE_URL` environment variable.
 
 The rule: **when `DATABASE_URL` is set, it wins.**
 It replaces the config of the default connection (`DatabaseConfig.connection`).
-That config still gives `debug`, `printer` and `extra`.
+That config still gives `debug`, `printer`, `slowQueryMs` and `extra`.
 Other named connections do not change.
 
 ```bash
@@ -332,6 +332,49 @@ Blog blog = Blog()..withConnection('mysql');
 blog.title = 'Hello';
 await blog.save(); // saved on 'mysql'
 ```
+
+### Listen to queries
+
+`SqlQueryBuilder().listen()` runs your function after each query.
+It works on every connection and inside a transaction.
+Use it for metrics or your own query log.
+
+```dart
+void onQuery(QueryEvent e) {
+  print('${e.connection} ${e.time.inMilliseconds} ms: ${e.sql}');
+}
+
+SqlQueryBuilder().listen(onQuery);
+```
+
+A `QueryEvent` has:
+
+- `sql`: the SQL text, with `@name` for each value.
+- `bindings`: the values. A value named in `logRedact` shows as `***`.
+- `time`: how long the query took, a `Duration`.
+- `connection`: the name of the connection.
+
+The function runs only after a query that worked.
+If the function throws, Dox logs the error and the query still returns its rows.
+`SqlQueryBuilder().removeListener(onQuery)` stops it.
+
+### Slow query log
+
+Set `slowQueryMs` on a connection to log each query that takes longer than that many milliseconds.
+It is off by default. It works with `debug` off, so you can use it in production.
+
+```dart
+'postgres': ConnectionConfig(
+  driver: Driver.postgres,
+  // ...
+  debug: env.isDevelopment,
+  slowQueryMs: 500,
+),
+```
+
+The log line goes to the query `printer`.
+It has the time, the connection name and the SQL, like `Slow query (812 ms, postgres): select ...`.
+A value named in `logRedact` shows as `***`.
 
 ## MySQL and MariaDB
 
