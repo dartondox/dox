@@ -5,12 +5,13 @@ import 'dart:isolate';
 ///
 /// Each isolate has its own memory. To tell the other isolates about
 /// something (a broadcast for their sockets, a cache key to forget), an
-/// isolate [publish]es a message. Every other isolate that listens on
-/// [messages] gets it.
+/// isolate [publish]es a message on a channel. Every other isolate that
+/// listens [on] that channel gets it. A listener never sees the messages
+/// of another channel.
 ///
 /// ```
-/// IsolateBus.instance.messages.listen(onMessage);
-/// IsolateBus.instance.publish(<Object>['user-changed', 42]);
+/// IsolateBus.instance.on('users').listen(onMessage);
+/// IsolateBus.instance.publish('users', <Object>['changed', 42]);
 /// ```
 ///
 /// The main isolate keeps a hub. `DoxIsolate` gives every isolate it
@@ -37,10 +38,15 @@ class IsolateBus {
 
   /// messages from the hub to this isolate
   ReceivePort? _inbox;
-  StreamController<Object?> _messages = StreamController<Object?>.broadcast();
+
+  /// channel name -> its listeners in this isolate
+  final Map<String, StreamController<Object?>> _channels =
+      <String, StreamController<Object?>>{};
   int _size = 1;
 
   /// The port of the hub. Opened on the first call, in the main isolate.
+  ///
+  /// Internal: `DoxIsolate` uses it. Apps do not call it.
   SendPort get port {
     ReceivePort hub = _hubPort ??= ReceivePort()..listen(_serve);
     return hub.sendPort;
@@ -48,37 +54,47 @@ class IsolateBus {
 
   /// Use the hub [hub] (a [port] of the main isolate) from now on.
   /// [id] is the id of this isolate. null [hub]: this is the main isolate.
+  ///
+  /// Internal: the isolate start code calls it. Apps do not call it.
   void connect(SendPort? hub, int id) {
     _hub = hub;
     _id = id;
   }
 
-  /// Messages from the other isolates. The first listen joins the bus.
-  /// An isolate never gets its own messages.
-  Stream<Object?> get messages {
+  /// Messages on [channel] from the other isolates. The first call (on
+  /// any channel) joins the bus. An isolate never gets its own messages.
+  Stream<Object?> on(String channel) {
     if (_inbox == null) {
       ReceivePort inbox = ReceivePort()..listen(_onInbox);
       _inbox = inbox;
       _send(<Object>['join', _id, inbox.sendPort]);
     }
-    return _messages.stream;
+    return _channels
+        .putIfAbsent(channel, StreamController<Object?>.broadcast)
+        .stream;
   }
 
-  /// Number of isolates that listen on [messages], this one included.
-  /// It is 1 until this isolate listens and the hub answers.
+  /// Number of isolates that listen on the bus, this one included.
+  /// It is 1 until this isolate calls [on] and the hub answers.
   int get size => _size;
 
-  /// Sends [message] to every other isolate that listens.
-  void publish(Object? message) => _send(<Object?>['send', _id, message]);
+  /// Sends [message] to every other isolate that listens [on] [channel].
+  void publish(String channel, Object? message) {
+    _send(<Object?>['send', _id, channel, message]);
+  }
 
   /// In the main isolate: forget isolate [id], because it stopped.
   /// `DoxIsolate` calls it when an isolate exits, also after a crash.
+  ///
+  /// Internal: apps do not call it.
   void drop(int id) {
     if (_members.remove(id) != null) _sendSize();
   }
 
   /// Leave the bus and close the ports. In the main isolate it also
   /// closes the hub.
+  ///
+  /// Internal: Dox calls it when the app stops. Apps do not call it.
   void close() {
     if (_inbox != null) _send(<Object>['leave', _id]);
     _inbox?.close();
@@ -89,8 +105,10 @@ class IsolateBus {
     _hub = null;
     _id = 1;
     _size = 1;
-    unawaited(_messages.close());
-    _messages = StreamController<Object?>.broadcast();
+    for (StreamController<Object?> channel in _channels.values) {
+      unawaited(channel.close());
+    }
+    _channels.clear();
   }
 
   void _send(List<Object?> message) {
@@ -114,7 +132,9 @@ class IsolateBus {
       case 'leave':
         drop(from);
       case 'send':
-        List<Object?> out = <Object?>['msg', m[2]];
+        // ponytail: every member gets every channel and drops the ones
+        // it does not listen to. Filter in the hub if channels get busy.
+        List<Object?> out = <Object?>['msg', m[2], m[3]];
         _members.forEach((int id, SendPort member) {
           if (id != from) member.send(out);
         });
@@ -132,8 +152,8 @@ class IsolateBus {
     List<Object?> m = message as List<Object?>;
     if (m[0] == 'size') {
       _size = m[1] as int;
-    } else if (!_messages.isClosed) {
-      _messages.add(m[1]);
+    } else {
+      _channels[m[1] as String]?.add(m[2]);
     }
   }
 }

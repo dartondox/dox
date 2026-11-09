@@ -139,43 +139,13 @@ With many isolates and no `adapter`, the provider uses the `IsolateAdapter`. It 
 | `IsolateAdapter` (many isolates, the default) | the clients of every isolate of this process |
 | `RedisAdapter` | the clients of every isolate of every server |
 
-### Many servers or Node.js: Redis adapter
-
-With more than one server process, or next to Node.js servers, use the Redis adapter in each isolate.
-
-```bash
-dart pub add ioredis
-```
-
-```dart title="lib/config/socketio.dart"
-import 'package:dox_socketio/dox_socketio.dart';
-import 'package:ioredis/ioredis.dart';
-import 'package:my_app/app/socket/chat.namespace.dart';
-import 'package:my_app/config/env.dart';
-
-SocketIoConfig socketIoConfig = SocketIoConfig(
-  enabled: env.socketioEnabled,
-  namespaces: <NamespaceHandler>[ChatNamespace()],
-  adapter: const RedisSocketAdapterFactory(),
-);
-
-/// makes the Redis adapter inside each isolate.
-/// A Redis connection can not be sent to another isolate.
-class RedisSocketAdapterFactory extends SocketAdapterFactory {
-  const RedisSocketAdapterFactory();
-
-  @override
-  Adapter create() {
-    Redis redis = Redis(); // 127.0.0.1:6379. Or Redis(RedisOptions(host: ..., port: ...))
-    return RedisAdapter(subscriber: redis.duplicate(), publisher: redis);
-  }
-}
-```
 
 !!! warning "Clients should connect with websocket only"
     One websocket stays on one isolate. HTTP long-polling sends many requests, and they can reach different isolates.
     Long-polling only works with `totalIsolate: 1`, or with sticky sessions in front of many single-isolate servers.
     Dox logs this hint at startup when it runs many isolates and polling is allowed.
+
+With more than one server process, or next to Node.js servers, use the [Redis adapter](#many-servers-redis-adapter).
 
 ## Without Dox
 
@@ -382,8 +352,43 @@ ServerOptions(allowedOrigins: <String>['https://app.example.com']);
 
 ## Many servers: Redis adapter
 
-With more than one server process, use the Redis adapter.
-Then a broadcast on one server reaches the clients of all servers.
+With more than one server process, or next to Node.js servers, use the Redis adapter.
+Then a broadcast on one server reaches the clients of all servers, and of all their isolates.
+
+Add the `ioredis` package:
+
+```bash
+dart pub add ioredis
+```
+
+In a Dox app, make the adapter in each isolate with a factory:
+
+```dart title="lib/config/socketio.dart"
+import 'package:dox_socketio/dox_socketio.dart';
+import 'package:ioredis/ioredis.dart';
+import 'package:my_app/app/socket/chat.namespace.dart';
+import 'package:my_app/config/env.dart';
+
+SocketIoConfig socketIoConfig = SocketIoConfig(
+  enabled: env.socketioEnabled,
+  namespaces: <NamespaceHandler>[ChatNamespace()],
+  adapter: const RedisSocketAdapterFactory(),
+);
+
+/// makes the Redis adapter inside each isolate.
+/// A Redis connection can not be sent to another isolate.
+class RedisSocketAdapterFactory extends SocketAdapterFactory {
+  const RedisSocketAdapterFactory();
+
+  @override
+  Adapter create() {
+    Redis redis = Redis(); // 127.0.0.1:6379. Or Redis(RedisOptions(host: ..., port: ...))
+    return RedisAdapter(subscriber: redis.duplicate(), publisher: redis);
+  }
+}
+```
+
+Without Dox, pass the adapter to the server:
 
 ```dart
 Redis redis = Redis(RedisOptions(host: '127.0.0.1', port: 6379));
@@ -392,7 +397,6 @@ SocketIoServer io = SocketIoServer(
 );
 ```
 
-- `Redis` comes from the `ioredis` package.
 - The subscriber needs its own connection. A Redis connection in subscribe mode can not run other commands.
 - It uses the format of `@socket.io/redis-adapter`. Node.js servers with that adapter can share one Redis with Dox servers.
 - It reads messages in msgpack and in JSON. It writes msgpack, like the Node.js adapter.

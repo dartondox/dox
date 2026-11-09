@@ -5,20 +5,21 @@ import 'package:dox_core/isolate/isolate_bus.dart';
 import 'package:test/test.dart';
 
 /// joins the hub [args.first] as isolate [args[1]], tells [args[2]] it is
-/// ready, then sends back every message it gets on [args[2]]
+/// ready, then sends back every message it gets on channel 'a' to
+/// [args[2]]. A command is a message to publish on channel 'a'.
 Future<void> _member(List<Object> args) async {
   SendPort hub = args[0] as SendPort;
   int id = args[1] as int;
   SendPort out = args[2] as SendPort;
   IsolateBus bus = IsolateBus.instance..connect(hub, id);
   ReceivePort commands = ReceivePort();
-  bus.messages.listen(out.send);
+  bus.on('a').listen(out.send);
   commands.listen((dynamic command) {
     if (command == 'stop') {
       bus.close();
       commands.close();
     } else {
-      bus.publish(command);
+      bus.publish('a', command);
     }
   });
   out.send(commands.sendPort);
@@ -38,8 +39,8 @@ void main() {
   test('one isolate: publish sends nothing', () async {
     IsolateBus bus = IsolateBus.instance;
     List<Object?> got = <Object?>[];
-    bus.messages.listen(got.add);
-    bus.publish('hi');
+    bus.on('a').listen(got.add);
+    bus.publish('a', 'hi');
     await Future<void>.delayed(Duration(milliseconds: 20));
     expect(got, isEmpty);
     expect(bus.size, 1);
@@ -49,7 +50,9 @@ void main() {
     IsolateBus main = IsolateBus.instance;
     SendPort hub = main.port;
     List<Object?> gotMain = <Object?>[];
-    main.messages.listen(gotMain.add);
+    List<Object?> gotMainB = <Object?>[];
+    main.on('a').listen(gotMain.add);
+    main.on('b').listen(gotMainB.add);
 
     List<ReceivePort> outs = <ReceivePort>[];
     List<List<Object?>> got = <List<Object?>>[];
@@ -69,11 +72,14 @@ void main() {
     await _until(() => main.size == 3);
 
     commands[0].send(<Object>['from', 2]);
-    main.publish('from main');
+    // channels do not mix: the members only listen on 'a'
+    main.publish('b', 'only b');
+    main.publish('a', 'from main');
     await _until(() => gotMain.length == 1 && got[1].length == 2);
     expect(gotMain, <Object?>[
       <Object>['from', 2],
     ]);
+    expect(gotMainB, isEmpty);
     expect(got[0], <Object?>['from main']);
     // two senders: no order between them
     expect(
@@ -89,7 +95,7 @@ void main() {
     await _until(() => main.size == 2);
     main.drop(3); // like DoxIsolate after an isolate exits
     await _until(() => main.size == 1);
-    main.publish('late');
+    main.publish('a', 'late');
     await Future<void>.delayed(Duration(milliseconds: 20));
     expect(got[0], <Object?>['from main']);
     expect(got[1].length, 2);

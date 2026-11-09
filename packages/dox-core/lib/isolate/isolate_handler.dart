@@ -13,6 +13,7 @@ void isolateHandler(IsolateSpawnParameter param) async {
 
   /// creating dox in new isolate;
   Dox().isolateId = param.isolateId;
+  Dox().isolateCount = param.isolateCount;
 
   /// RateLimit counts live in the main isolate
   RateLimitCounter.instance.connect(param.rateLimitPort);

@@ -244,7 +244,7 @@ Printed to stderr. The connection or the request fails, the app keeps running.
 | --- | --- | --- |
 | `dox_socketio: handler error: <error>` | Your namespace handler threw. The stack follows. | Fix the handler. |
 | `dox_socketio: request error: <error>` | A Socket.IO HTTP request failed. The client gets `500`. | Check the client version and transport. |
-| `dox_socketio: publish failed: <error>` | The Redis or isolate adapter could not publish. | Check Redis. |
+| `dox_socketio: publish failed: <error>` | The Redis or isolate adapter could not publish. | Redis adapter: check Redis. Isolate adapter: it should not happen, so report it as a bug. |
 | `dox_socketio: bad adapter message: <error>` | The Redis or isolate adapter got a message it can not read. | Check that every app on the channel runs the same version. |
 
 ## CLI

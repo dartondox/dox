@@ -51,9 +51,7 @@ Dox().totalIsolate(2);
 await Dox().startServer();
 ```
 
-Use fewer isolates when:
-
-- the machine also runs the database or other heavy work, or
+Use fewer isolates when the machine also runs the database or other heavy work.
 
 ## Each isolate has its own memory
 
@@ -70,11 +68,13 @@ Isolates do not share memory:
 `IsolateBus` sends a message from one isolate to all the others in the same process. Use it to tell them that something changed, for example "forget this cache key". Socket.IO uses it to share broadcasts (see [Socket.IO](../packages/socketio.md#many-isolates)).
 
 ```dart
-IsolateBus.instance.messages.listen(onMessage); // in a provider's setup()
-IsolateBus.instance.publish(<Object>['user-changed', 42]);
+IsolateBus.instance.on('users').listen(onMessage); // in a provider's setup()
+IsolateBus.instance.publish('users', <Object>['changed', 42]);
 ```
 
+- A message goes to one channel. A listener on `'users'` never gets the messages of another channel.
 - An isolate never gets its own message.
+- `Dox().isolateCount` is the number of isolates that run, in every isolate.
 - `IsolateBus.instance.size` is the number of isolates that listen, this one included.
 - A message must be something a `SendPort` can send: null, bool, num, String, typed data, and lists and maps of those.
 - It works inside one process only. For many servers, use Redis.
