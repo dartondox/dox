@@ -1,3 +1,7 @@
+## 3.1.3
+
+- Version bump only, to match the other packages.
+
 ## 3.1.2
 
 - DTOs: `@Describe('...')` on a field sets `description` in its JSON Schema (the generated `toJsonSchema()` and the OpenAPI docs). It wins over the `///` doc comment. Needs dox_validation 3.1.2.
