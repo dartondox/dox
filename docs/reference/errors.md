@@ -232,6 +232,7 @@ There is no fallback. When a library is missing, the app stops with the reason a
 | `<pkg>: sha256 of <file> does not match` | The downloaded file is not the expected one. | Delete `.dart_tool` and try again. |
 | `<pkg>: cargo build failed` | The build from source failed. | Read the cargo output below it. |
 | `Bad state: <pkg>: <path> does not exist` | The `lib_path` user define points to a missing file. | Fix the path in `pubspec.yaml`. |
+| `<pkg> did not load: the native library is not in the build (...).` | The app opens Postgres or MySQL, but `pubspec.yaml` skips that driver. | Remove its `skip` line. See [Skip unused drivers](../database/index.md#skip-unused-drivers). |
 | `Unsupported operation: dox_http_native can not detach the socket. Use NativeWebSocket.upgrade for a WebSocket.` | Code called `detachSocket()` on a response. Rust owns the socket. | For a WebSocket use `NativeWebSocket.upgrade(request)`. |
 
 See [Native server](../digging-deeper/native-server.md).

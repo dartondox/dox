@@ -105,6 +105,8 @@ docker compose up -d --build
 
 A new `.env` uses SQLite. The compose services set `DB_CONNECTION=postgres` and `DB_NAME=dox` themselves. To use the compose Postgres with `dox s`, set the same two values in `.env`. The database port listens on `127.0.0.1` only.
 
+A new app skips the Postgres driver in `pubspec.yaml`, because it uses SQLite. Remove the `dox_postgres_native` skip lines before you run the compose app. See [Skip unused drivers](../database/index.md#skip-unused-drivers).
+
 The queue worker and the scheduler run as their own processes. The compose file has a `worker` service for the queue. In the image, start them with `/app/bin/queue work` and `/app/bin/schedule work`.
 See [Docker](../guides/docker.md) for a health check in the image.
 

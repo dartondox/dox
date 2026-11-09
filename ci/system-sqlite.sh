@@ -15,11 +15,21 @@ if [ "$(uname)" = Linux ] && ! ldconfig -p | grep -q 'libsqlite3\.so '; then
   sudo apt-get install -y libsqlite3-dev
 fi
 
+# A pubspec that has a hooks block already (like the app template, which
+# skips the Postgres and MySQL drivers) gets the sqlite3 lines inside it.
 for file in "$@"; do
-  if grep -q '^hooks:' "$file"; then
-    echo "$file: has a hooks block already, not changed"
+  if grep -q '^    sqlite3:' "$file"; then
+    echo "$file: sets sqlite3 already, not changed"
     continue
   fi
-  printf '\nhooks:\n  user_defines:\n    sqlite3:\n      source: system\n' >> "$file"
+  if grep -q '^  user_defines:' "$file"; then
+    awk '{ print } /^  user_defines:/ { print "    sqlite3:"; print "      source: system" }' \
+      "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+  elif grep -q '^hooks:' "$file"; then
+    awk '{ print } /^hooks:/ { print "  user_defines:"; print "    sqlite3:"; print "      source: system" }' \
+      "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+  else
+    printf '\nhooks:\n  user_defines:\n    sqlite3:\n      source: system\n' >> "$file"
+  fi
   echo "$file: sqlite3 uses the system library"
 done

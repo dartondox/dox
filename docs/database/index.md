@@ -45,6 +45,71 @@ import 'package:dox_orm/dox_orm.dart';
     See the [Postgres](postgres-native.md#when-the-library-does-not-load) and
     [MySQL](mysql-native.md#when-the-library-does-not-load) pages.
 
+## Skip unused drivers
+
+`dox_orm` brings all three drivers. The build downloads a native library for each one.
+An app needs only the driver of its database.
+To skip the others, add a `hooks: user_defines:` block to `pubspec.yaml`.
+
+- Put it in the `pubspec.yaml` of your app.
+- In a pub workspace, put it in the root `pubspec.yaml` of the workspace.
+  Dart reads `user_defines` only from the root package.
+
+`skip: true` turns off the download of a driver.
+Only the bool `true` skips. Any other value does nothing.
+
+### SQLite app
+
+A new app uses SQLite. Its `pubspec.yaml` already has this block.
+
+```yaml title="pubspec.yaml"
+hooks:
+  user_defines:
+    dox_postgres_native:
+      skip: true
+    dox_mysql_native:
+      skip: true
+```
+
+### Postgres app
+
+```yaml title="pubspec.yaml"
+hooks:
+  user_defines:
+    dox_mysql_native:
+      skip: true
+    sqlite3:
+      source: system
+```
+
+### MySQL app
+
+```yaml title="pubspec.yaml"
+hooks:
+  user_defines:
+    dox_postgres_native:
+      skip: true
+    sqlite3:
+      source: system
+```
+
+`sqlite3: source: system` comes from the `sqlite3` package.
+The build does not download SQLite.
+The app loads the `libsqlite3` library of the system when it opens SQLite.
+
+!!! warning "SQLite on a system without `libsqlite3`"
+    With `source: system`, the app fails when it opens SQLite on a system
+    without `libsqlite3`. The `FROM scratch` Docker image has no `libsqlite3`.
+    When your app opens SQLite, remove the `sqlite3` lines.
+
+### Switch the database
+
+When you switch the database, remove the `skip` line of the driver you now use.
+Then run `dart pub get`.
+
+A driver that is still skipped stops the app when it opens a pool.
+The error says that the native library is not in the build, and to remove `skip`.
+
 ## Config
 
 Put the connections in `lib/config/database.dart`.
