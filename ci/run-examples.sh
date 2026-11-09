@@ -12,10 +12,11 @@ for e in "$@"; do
   echo "::group::example $e"
   # One test file at a time: the test files of blog-api share one SQLite file.
   # .env.example has an empty APP_KEY, so each run makes its own key.
+  # On CI only: system-sqlite.sh edits pubspec.yaml and may run apt-get.
   if ! (cd "examples/$e" &&
     key=$(openssl rand -hex 16) &&
     sed "s/^APP_KEY=.*/APP_KEY=$key/" .env.example > .env &&
-    ../../ci/system-sqlite.sh pubspec.yaml &&
+    { [ -z "${CI:-}" ] || ../../ci/system-sqlite.sh pubspec.yaml; } &&
     dart pub get &&
     dart run build_runner build --delete-conflicting-outputs &&
     dart analyze --fatal-infos &&

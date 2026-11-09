@@ -11,7 +11,9 @@
 set -euo pipefail
 
 # libsqlite3.so (no version in the name) comes from the -dev package.
-if [ "$(uname)" = Linux ] && ! ldconfig -p | grep -q 'libsqlite3\.so '; then
+# grep reads all lines (no -q): with -q it can stop early, ldconfig then
+# gets SIGPIPE, and pipefail makes the check fail.
+if [ "$(uname)" = Linux ] && ! ldconfig -p | grep 'libsqlite3\.so ' >/dev/null; then
   sudo apt-get install -y libsqlite3-dev
 fi
 
