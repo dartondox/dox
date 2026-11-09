@@ -23,6 +23,7 @@ The full docs as one file: https://dartondox.dev/latest/llms-full.txt
 - [Dox and the other Dart backends](https://dartondox.dev/latest/concepts/dart-frameworks/)
 - [Status and roadmap](https://dartondox.dev/latest/concepts/status-and-roadmap/)
 - [Contribute](https://dartondox.dev/latest/community/contribute/)
+- [Showcase](https://dartondox.dev/latest/community/showcase/)
 - [Meet Doxie](https://dartondox.dev/latest/community/mascot/)
 - [Routing](https://dartondox.dev/latest/the-basic/routing/)
 - [Request](https://dartondox.dev/latest/the-basic/request/)
