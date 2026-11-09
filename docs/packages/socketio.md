@@ -56,7 +56,7 @@ SocketIoConfig socketIoConfig = SocketIoConfig(
 | `enabled` | `true` | serve Socket.IO at `options.path` |
 | `options` | `ServerOptions()` | see [Options](#options) |
 | `namespaces` | `[]` | `NamespaceHandler` classes to register |
-| `adapter` | `null` (in memory) | makes one adapter in each isolate, see [Many isolates](#many-isolates) |
+| `adapter` | `null` (in memory with one isolate, `IsolateAdapter` with many) | makes one adapter in each isolate, see [Many isolates](#many-isolates) |
 
 ### 4. A namespace
 
