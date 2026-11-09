@@ -206,6 +206,7 @@ nav:
     - packages/storage.md
     - packages/cache.md
     - packages/socketio.md
+    - packages/mcp.md
   - Guides:
     - guides/index.md
     - guides/file-upload.md

@@ -1,3 +1,7 @@
+## Unreleased
+
+- New: `RequestBody` and `BodyKind` are exported, so `req.requestBody.kind` can tell invalid JSON (`BodyKind.invalidJson`) from no body, without importing a file of `lib/http`.
+
 ## 3.1.0
 
 - Behavior change: without Redis, `RateLimit` counts are now shared by all isolates. Before, each isolate counted alone, so the real limit was `max` times the number of isolates. Now `max` holds for the whole server. An app with more than one isolate gets a lower real limit than before. Raise `max` if you relied on the old number.

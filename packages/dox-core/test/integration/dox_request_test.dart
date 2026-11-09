@@ -70,6 +70,36 @@ void main() {
       expect(res.headers['x-key'], 'ABCD');
     });
 
+    test('requestBody tells invalid JSON from no body', () async {
+      Route.post('/body_kind', (DoxRequest req) {
+        RequestBody body = req.requestBody;
+        return <String, dynamic>{
+          'kind': body.kind.name,
+          'json': body.kind == BodyKind.json ? body.json : null,
+        };
+      });
+
+      Uri url = Uri.parse('$baseUrl/body_kind');
+      Future<Map<String, dynamic>> kindOf(
+        Map<String, String> headers,
+        String body,
+      ) async {
+        http.Response res = await http.post(url, headers: headers, body: body);
+        return jsonDecode(res.body) as Map<String, dynamic>;
+      }
+
+      Map<String, String> json = <String, String>{
+        'content-type': 'application/json',
+      };
+      expect(await kindOf(json, '[1, 2]'), <String, dynamic>{
+        'kind': 'json',
+        'json': <dynamic>[1, 2],
+      });
+      expect((await kindOf(json, '{nope'))['kind'], 'invalidJson');
+      // package:http sends a String body as text/plain
+      expect((await kindOf(<String, String>{}, 'hi'))['kind'], 'other');
+    });
+
     test('get cookies', () async {
       String authKeyValue = 'auth-key-value';
 
