@@ -92,6 +92,7 @@ class DoxIsolate {
     _receivePorts.clear();
     _sendPorts.clear();
     RateLimitCounter.instance.close();
+    IsolateBus.instance.close();
   }
 
   /// create a thread.
@@ -121,6 +122,7 @@ class DoxIsolate {
       controlPort.close();
       _isolates.remove(isolateId);
       _sendPorts.remove(isolateId);
+      IsolateBus.instance.drop(isolateId);
       if (_stopped) return;
       stderr.writeln('[dox] isolate $isolateId exited, restarting');
       await Future<void>.delayed(restartDelay);
@@ -139,6 +141,7 @@ class DoxIsolate {
         bindings: Route().bindings,
         control: controlPort.sendPort,
         rateLimitPort: RateLimitCounter.instance.port,
+        busPort: IsolateBus.instance.port,
       ),
       onError: errorPort.sendPort,
       onExit: exitPort.sendPort,

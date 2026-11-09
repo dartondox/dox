@@ -1,3 +1,7 @@
+## 3.1.3
+
+- New: `IsolateBus` sends a message from one isolate to all the other isolates of the app, with no Redis. `publish(message)` sends, `messages` gets them, `size` counts the isolates that listen. The main isolate keeps the hub, like the `RateLimit` counts.
+
 ## 3.1.2
 
 - Uses dox_validation 3.1.2, so `@Describe('...')` can be used on DTO fields.

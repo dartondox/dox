@@ -20,7 +20,7 @@ This page lists the messages Dox prints or throws, so you can search for the tex
 | `Unsupported operation: dox_http_native did not load: <reason>. Fix: ...` | The native HTTP library is missing or from another version (`native library ABI <x>, expected <y>`). The app stops at start. | Do what the `Fix:` part says. See [Troubleshooting](troubleshooting.md#the-native-http-library-did-not-load). |
 | `Server started at http://<host>:<port> with <n> isolate (native)` | Normal start. `<host>` is the address it listens on: `[::]` means all interfaces. | Nothing. |
 | `Windows: the native server runs on one isolate` | Windows has no `SO_REUSEPORT`. | Nothing. |
-| `Socket.IO runs on <n> isolates: clients should use transports: ['websocket'] ...` | Socket.IO with more than one isolate and long-polling on. | Use a Redis adapter, and `transports: ['websocket']` in the client. |
+| `Socket.IO runs on <n> isolates: clients should use transports: ['websocket'] ...` | Socket.IO with more than one isolate and long-polling on. | Use `transports: ['websocket']` in the client. |
 | `[dox] isolate <n> error: <error>` | An error killed a worker isolate. The stack is on the next line. | Fix the error. Dox restarts the isolate. |
 | `[dox] isolate <n> exited, restarting` | A worker isolate died. A new one starts after 1 second. | Look at the error line above it. |
 | `SocketException: dox_http_native: bind failed (<code>) (OS Error: errno = <errno>), port = <port>` | The port is in use. | See [Troubleshooting](troubleshooting.md#port-already-in-use). |
@@ -244,8 +244,8 @@ Printed to stderr. The connection or the request fails, the app keeps running.
 | --- | --- | --- |
 | `dox_socketio: handler error: <error>` | Your namespace handler threw. The stack follows. | Fix the handler. |
 | `dox_socketio: request error: <error>` | A Socket.IO HTTP request failed. The client gets `500`. | Check the client version and transport. |
-| `dox_socketio: redis publish failed: <error>` | The Redis adapter could not publish. | Check Redis. |
-| `dox_socketio: bad redis message: <error>` | The Redis adapter got a message it can not read. | Check that every app on the channel runs the same version. |
+| `dox_socketio: publish failed: <error>` | The Redis or isolate adapter could not publish. | Check Redis. |
+| `dox_socketio: bad adapter message: <error>` | The Redis or isolate adapter got a message it can not read. | Check that every app on the channel runs the same version. |
 
 ## CLI
 

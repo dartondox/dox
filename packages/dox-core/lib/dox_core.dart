@@ -66,6 +66,7 @@ export 'openapi/openapi_document.dart';
 
 /// Tools
 export 'ioc/ioc_container.dart';
+export 'isolate/isolate_bus.dart';
 export 'middleware/etag.dart';
 export 'middleware/health_check.dart';
 export 'middleware/log_middleware.dart';

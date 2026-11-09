@@ -194,6 +194,8 @@ class Dox {
     } catch (error, stackTrace) {
       config.exceptionHandler.report(error, stackTrace);
     }
+    // after the providers too: they may still publish
+    if (isolateId != 1) IsolateBus.instance.close();
   }
 
   /// the real address of [server], like `http://127.0.0.1:3000` or

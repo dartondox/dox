@@ -56,7 +56,7 @@ SocketIoConfig socketIoConfig = SocketIoConfig(
 | `enabled` | `true` | serve Socket.IO at `options.path` |
 | `options` | `ServerOptions()` | see [Options](#options) |
 | `namespaces` | `[]` | `NamespaceHandler` classes to register |
-| `adapter` | `null` (in memory) | makes one adapter in each isolate, see [Many isolates](#many-isolates-redis-adapter) |
+| `adapter` | `null` (in memory) | makes one adapter in each isolate, see [Many isolates](#many-isolates) |
 
 ### 4. A namespace
 
@@ -110,7 +110,7 @@ socket.on('welcome', (data) => console.log(data.id));
 socket.emit('message', 'hi', (answer) => console.log(answer)); // 'sent'
 ```
 
-Use `transports: ['websocket']`. See [Many isolates](#many-isolates-redis-adapter) for why.
+Use `transports: ['websocket']`. See [Many isolates](#many-isolates) for why.
 
 ### Send from a controller or a service
 
@@ -126,11 +126,22 @@ From a queue job or another program, use the [emitter](#emit-from-other-programs
 - With no provider, or with `enabled: false`, there is no extra work per request.
 - Need a plain WebSocket with no Socket.IO protocol? `Route.websocket(path, handler)` in `dox_core` gives you the raw socket.
 
-### Many isolates: Redis adapter
+### Many isolates
 
 Dox runs one isolate per CPU core, and each isolate has its own Socket.IO server.
-With the default in-memory adapter, a broadcast only reaches the clients of the same isolate.
-Use the Redis adapter, so a broadcast reaches clients on every isolate (and on every server).
+A client is connected to one of them.
+
+With many isolates and no `adapter`, the provider uses the `IsolateAdapter`. It sends each broadcast to the other isolates of the process (through `IsolateBus` of `dox_core`), so it reaches the clients of every isolate. `socketsJoin`, `fetchSockets`, `serverSideEmit` and broadcast acks work across isolates too. You need no Redis.
+
+| Adapter | Reaches |
+|---|---|
+| `InMemoryAdapter` (one isolate) | the clients of this isolate |
+| `IsolateAdapter` (many isolates, the default) | the clients of every isolate of this process |
+| `RedisAdapter` | the clients of every isolate of every server |
+
+### Many servers or Node.js: Redis adapter
+
+With more than one server process, or next to Node.js servers, use the Redis adapter in each isolate.
 
 ```bash
 dart pub add ioredis
@@ -390,7 +401,7 @@ SocketIoServer io = SocketIoServer(
 - Broadcasts with an ack get the acks of clients on all servers.
 - Servers can send events to each other with `serverSideEmit`. Clients do not get them.
 - A request waits at most `requestsTimeout` for the other servers (5 seconds by default, like Node.js).
-- Long-polling needs sticky sessions, the same as with [many isolates](#many-isolates-redis-adapter). Or use `transports: ['websocket']` on the client.
+- Long-polling needs sticky sessions, the same as with [many isolates](#many-isolates). Or use `transports: ['websocket']` on the client.
 
 ### Act on all servers
 

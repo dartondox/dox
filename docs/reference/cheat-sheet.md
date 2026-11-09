@@ -539,7 +539,7 @@ class ChatNamespace extends NamespaceHandler {
 
 Log users in at connect time with `SocketAuth(findUser).handle` in `middleware`. The user is in `socket.user`.
 
-Turn it on with a `SocketIoProvider` (extend it in `lib/`). Many isolates need the Redis adapter and `transports: ['websocket']` on the client.
+Turn it on with a `SocketIoProvider` (extend it in `lib/`). With many isolates, clients use `transports: ['websocket']`. Broadcasts reach every isolate with no Redis; many servers need the Redis adapter.
 
 See [Socket.IO](../packages/socketio.md).
 

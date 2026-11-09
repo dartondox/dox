@@ -16,6 +16,7 @@ void isolateHandler(IsolateSpawnParameter param) async {
 
   /// RateLimit counts live in the main isolate
   RateLimitCounter.instance.connect(param.rateLimitPort);
+  IsolateBus.instance.connect(param.busPort, param.isolateId);
   Dox().initialize(appConfig);
   Dox().addProviders(providers);
 

@@ -27,6 +27,9 @@ class IsolateSpawnParameter {
   /// see `RateLimitCounter`
   final SendPort? rateLimitPort;
 
+  /// the hub of the main isolate, see `IsolateBus`
+  final SendPort? busPort;
+
   const IsolateSpawnParameter(
     this.isolateId,
     this.config,
@@ -37,5 +40,6 @@ class IsolateSpawnParameter {
     this.bindings = const <String, RouteBinding>{},
     this.control,
     this.rateLimitPort,
+    this.busPort,
   });
 }
