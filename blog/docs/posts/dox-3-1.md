@@ -404,7 +404,7 @@ The template that `dox create` uses got new files too.
 - A download name with quotes or non-ASCII letters gets a safe `Content-Disposition`.
 - `res.withHeaders` and `res.header` no longer drop or double headers.
 - A resumed download with `If-Range` no longer mixes two versions of a file. `If-Range` is used only when it matches the file's `Last-Modified` date or its strong `ETag`.
-- A `Range`, `If-Modified-Since` or `If-None-Match` header sent on two lines no longer gives 500.
+- A `Range` header sent on two lines no longer gives 500.
 - `req.session.reflash()` keeps the flash data on the first use of the session.
 
 ### ORM and database
