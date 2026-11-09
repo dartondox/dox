@@ -3,4 +3,8 @@ User-agent: *
 Allow: /
 Disallow: /2.x/
 
+# The docs as Markdown, for AI tools:
+# https://dartondox.dev/llms.txt
+# https://dartondox.dev/llms-full.txt
+
 Sitemap: https://dartondox.dev/sitemap.xml
