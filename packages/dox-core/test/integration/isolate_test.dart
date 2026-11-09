@@ -31,8 +31,22 @@ AppConfig isolateConfig(int port) => AppConfig(
 late String baseUrl;
 
 class ExampleProvider extends DoxProvider {
+  /// every other isolate answers a 'ping' on the bus with its id
   @override
-  void setup() {}
+  void setup() {
+    if (Dox().isolateId == 1) return;
+    IsolateBus.instance.on('ping').listen((Object? _) {
+      IsolateBus.instance.publish('pong', Dox().isolateId);
+    });
+  }
+}
+
+/// waits until [test] is true, for at most two seconds
+Future<void> _until(bool Function() test) async {
+  for (int i = 0; i < 100 && !test(); i++) {
+    await Future<void>.delayed(Duration(milliseconds: 20));
+  }
+  expect(test(), isTrue);
 }
 
 void main() {
@@ -92,6 +106,28 @@ void main() {
       }
       expect(fresh, isNotNull);
       expect(DoxIsolate().isolates.length, 5 - 1);
+    });
+
+    test('the bus drops a dead isolate and the new one joins', () async {
+      // long enough to see the drop before the restart
+      DoxIsolate().restartDelay = Duration(milliseconds: 500);
+      IsolateBus bus = IsolateBus.instance;
+      Set<Object?> pongs = <Object?>{};
+      bus.on('pong').listen(pongs.add);
+      await _until(() => bus.size == 5);
+
+      Isolate old = DoxIsolate().isolates[3]!;
+      old.kill(priority: Isolate.immediate);
+      await _until(() => bus.size == 4);
+
+      // started again: it joins the bus in the setup of the provider
+      await _until(() {
+        Isolate? fresh = DoxIsolate().isolates[3];
+        return fresh != null && fresh != old && bus.size == 5;
+      });
+      bus.publish('ping', null);
+      await _until(() => pongs.length == 4);
+      expect(pongs, <Object?>{2, 3, 4, 5});
     });
 
     test('default isolates is one per cpu core', () {
