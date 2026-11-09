@@ -68,14 +68,13 @@ with open('404.html', 'w') as f:
             '</body></html>' % home)
 with open('CNAME', 'w') as f:
     f.write('dartondox.dev\n')
-# /sitemap.xml is a copy of the /latest/ one. Its links point to
-# /latest/, where canonical URLs point.
 # AI tools look for /llms.txt and /llms-full.txt at the site root (see
 # https://llmstxt.org). They are copies of the /latest/ ones.
 for name in ('llms.txt', 'llms-full.txt'):
     shutil.copy(os.path.join(home, name), name)
-# The sitemap also lists the llms files, because some AI tools read
-# only the sitemap and never try /llms.txt.
+# /sitemap.xml is a copy of the /latest/ one. Its links point to
+# /latest/, where canonical URLs point. It also lists the llms files,
+# because some AI tools read only the sitemap and never try /llms.txt.
 with open(os.path.join(home, 'sitemap.xml')) as f:
     sitemap = f.read()
 llms_urls = ''.join('    <url>\n         <loc>https://dartondox.dev/%s</loc>\n'
