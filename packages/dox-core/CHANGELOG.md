@@ -1,3 +1,8 @@
+## Unreleased
+
+- New: `IsolateBus` sends a message from one isolate to all the other isolates of the app, with no Redis. `publish(channel, message)` sends, `on(channel)` gets the messages of one channel, `size` counts the isolates that listen. The main isolate keeps the hub, like the `RateLimit` counts.
+- New: `Dox().isolateCount` is the number of isolates that really run, in every isolate. It also counts `Dox().totalIsolate(n)` and the one isolate on Windows.
+
 ## 3.1.2
 
 - Uses dox_validation 3.1.2, so `@Describe('...')` can be used on DTO fields.

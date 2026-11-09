@@ -36,6 +36,12 @@ class Dox {
   /// isolate Id
   int isolateId = 1;
 
+  /// The number of isolates that really run the app. It is the same in
+  /// every isolate. Dox sets it when the server starts: from
+  /// [totalIsolate] or `config.totalIsolate`, and 1 on Windows. It is 1
+  /// before that, and in `DoxTestClient`. Do not change it.
+  int isolateCount = 1;
+
   /// checks DTOs and schemas for `req.validate<T>()` and controller
   /// parameters.
   RequestValidator validator = const RequestValidator();
@@ -108,6 +114,7 @@ class Dox {
       isolatesToSpawn = 1;
     }
 
+    isolateCount = isolatesToSpawn;
     if (isolatesToSpawn > 1) {
       await DoxIsolate().spawn(isolatesToSpawn);
     }
@@ -194,6 +201,8 @@ class Dox {
     } catch (error, stackTrace) {
       config.exceptionHandler.report(error, stackTrace);
     }
+    // after the providers too: they may still publish
+    if (isolateId != 1) IsolateBus.instance.close();
   }
 
   /// the real address of [server], like `http://127.0.0.1:3000` or

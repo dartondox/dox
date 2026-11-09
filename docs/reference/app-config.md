@@ -174,7 +174,7 @@ Source: `lib/src/dox/socket_io_config.dart` in [dartondox/dox-socketio](https://
 | `enabled` | `bool` | `true` | Mount Socket.IO on the HTTP port at `/socket.io/`. |
 | `options` | `ServerOptions` | `ServerOptions()` | Engine options. See below. |
 | `namespaces` | `List<NamespaceHandler>` | `[]` | Namespaces to register, like `ChatNamespace()`. |
-| `adapter` | `SocketAdapterFactory?` | `null` (in memory) | Makes the adapter in each isolate. Use a Redis adapter with many isolates. |
+| `adapter` | `SocketAdapterFactory?` | `null` (in memory with one isolate, `IsolateAdapter` with many) | Makes the adapter in each isolate. Use a Redis adapter with many servers. |
 
 `ServerOptions` (`lib/src/engine/server_options.dart` in dox-socketio). The defaults match the Node.js server.
 
