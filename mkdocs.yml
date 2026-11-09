@@ -239,4 +239,4 @@ nav:
     - reference/errors.md
     - reference/changelog.md
   # The blog is its own site (blog/mkdocs.yml), deployed to /blog/.
-  - Blog: https://dartondox.dev/blog/
+  - Blog: /blog/

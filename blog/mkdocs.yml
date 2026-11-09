@@ -46,7 +46,7 @@ plugins:
       comments_path: null
       image: https://dartondox.dev/blog/assets/social-card.png
 nav:
-  - Docs: https://dartondox.dev/latest/
+  - Docs: /latest/
   - Blog:
     - index.md
     - tags.md

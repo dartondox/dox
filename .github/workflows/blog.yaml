@@ -12,6 +12,7 @@ on:
       - main
     paths:
       - 'blog/**'
+      - 'ci/blog-deploy.sh'
       - 'hooks/**'
       - 'overrides/**'
       - 'docs/assets/**'

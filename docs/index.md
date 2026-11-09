@@ -24,6 +24,7 @@ It runs one isolate per CPU core and builds to a small native binary.
 <p class="dox-hero__actions" markdown>
 [Build your first API](tutorial/index.md){ .md-button .md-button--primary }
 [GitHub](https://github.com/dartondox/dox){ .md-button }
+[Blog](/blog/){ .md-button }
 </p>
 
 </div>
